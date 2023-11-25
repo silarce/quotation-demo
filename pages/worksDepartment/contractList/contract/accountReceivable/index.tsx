@@ -33,12 +33,14 @@ import TwoButtonModal_free, { TwoBtnFooter } from 'components/global/gear/modal/
 // api
 import {
   TupdateEngineeringContactDto,
+  TupdateAccountReceivableDto,
   TaccountReceivableDto,
   useGetEngineeringContact,
   apiPatchEngineeringContact,
   apiPostWorkSheet,
   useGetFinalProduct,
   useGetAccountReceivable_id,
+  apiPatchAccountReceivable,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -49,6 +51,7 @@ import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/
 
 // css
 import scss from './index.module.scss';
+import { set } from 'lodash';
 
 // ========================================================================
 
@@ -86,16 +89,11 @@ type TdeductionList = {
 
 // ========================================================================
 
-// 接著做 串接 apiPatchAccountReceivable
-// 接著做 串接 apiPatchAccountReceivable
-// 接著做 串接 apiPatchAccountReceivable
-// 接著做 串接 apiPatchAccountReceivable
-// 接著做 串接 apiPatchAccountReceivable
-
 export default function AccountReceivable() {
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
 
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState(true);
 
   // --------------------------------------------------------------------------
@@ -108,35 +106,48 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
-  const engineeringContactId = contract?.engineeringContactId;
+
+  const { engineeringContactId, accountReceivableId } = contract ?? {};
 
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
 
+  const doUpdate_contract = async () => {
+    if (contract) {
+      return;
+    }
+
+    try {
+      await update_contract();
+    } catch (error) {
+      myAlert.err({ title: '取得合約資料失敗' });
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      if (contract) {
-        return;
-      }
-
-      try {
-        await update_contract();
-      } catch (error) {
-        myAlert.err({ title: '取得合約資料失敗' });
-      }
-    })();
-
-    (async () => {
+    const req02 = async () => {
       try {
         await update_engineeringContact();
       } catch (error) {
         myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
+      }
+    };
+
+    (async () => {
+      try {
+        setIsLoading(true);
+        await doUpdate_contract();
+        await req02();
+      } catch (error) {
+      } finally {
+        setIsLoading(false);
       }
     })();
   }, [contractId, engineeringContactId]);
 
   // --------------------------------------------------------------------------
 
+  // 應收帳款明細DTO
   const [accountReceivable, setAccountReceivable] = useState<TaccountReceivableDto>();
 
   // console.log(accountReceivable);
@@ -157,9 +168,9 @@ export default function AccountReceivable() {
 
   useEffect(() => {
     const accountReceivable = contract?.accountReceivable;
-    console.log(contract);
+    // console.log(contract);
     setAccountReceivable(accountReceivable);
-  }, [contract]);
+  }, [contract, disabled]);
 
   const {
     lastestVerifyForm, // 請款比例表用的
@@ -952,6 +963,27 @@ export default function AccountReceivable() {
   }, [deductionList]);
 
   // --------------------------------------------------------------------------
+
+  // patch應收帳款明細
+  const reqPatchAccountReceivable = async () => {
+    if (!accountReceivable || !accountReceivableId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPatchAccountReceivable(accountReceivableId, accountReceivable);
+      setDisabled(true);
+      await doUpdate_contract();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --------------------------------------------------------------------------
   const panelList_01: TpanelList = [
     //
     { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
@@ -960,9 +992,7 @@ export default function AccountReceivable() {
     {
       type: 'redButton',
       label: '上傳',
-      onClick: () => {
-        alert('test');
-      },
+      onClick: reqPatchAccountReceivable,
     },
     {
       type: 'myButton',
@@ -977,19 +1007,19 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
       <div className={scss.main}>
-        <Profile control={control_profile} />
+        <Profile control={control_profile} disabled={disabled} />
 
         <div className={scss.checkBar01}>
-          <InputSel showBaseline="invisible" checkBoxProps={control_checkBar01} />
+          <InputSel disabled={disabled} showBaseline="invisible" checkBoxProps={control_checkBar01} />
         </div>
         {/* 請款表格 */}
         <Table_requestPayment disabled={disabled} control={control_table_requestPayment} />
 
         <div className={scss.checkBar02}>
-          <InputSel showBaseline="invisible" checkBoxProps={control_checkBar02} />
+          <InputSel disabled={disabled} showBaseline="invisible" checkBoxProps={control_checkBar02} />
         </div>
 
         {/* 發票給予紀錄 */}
