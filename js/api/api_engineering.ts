@@ -1003,17 +1003,22 @@ const apiGetAccountReceivableAccountants = async (id: string, params?: Tparams) 
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetAccountReceivableAccountants = (id: string, customParams?: Tparams) => {
+/**取得 所有 應收帳款 收款紀錄 account-receivable-accountant */
+export const useGetAccountReceivableAccountants = (accountReceivableId: string | undefined, customParams?: Tparams) => {
   const [res, setRes] = useState<TgetAccountant>();
 
   const params = {
-    // populate: [],
+    populate: ['billSerialNumber'],
     pageSize: 9999,
     ...customParams,
   };
 
   const update = async () => {
-    const newRes = await apiGetAccountReceivableAccountants(id, params);
+    if (!accountReceivableId) {
+      return;
+    }
+
+    const newRes = await apiGetAccountReceivableAccountants(accountReceivableId, params);
 
     if (newRes) {
       setRes(newRes);
@@ -1045,8 +1050,8 @@ export const apiPostAccountReceivableAccountant = async (
 };
 
 /**刪除 應收帳款 收款紀錄關聯 account-receivable-accountant */
-export const apiDeleteAccountReceivableAccountant = async (id: string, accountantId: string) => {
-  const api = `/engineering/account-receivable/${id}/accountant/${accountantId}`;
+export const apiDeleteAccountReceivableAccountant = async (accountReceivableId: string, accountantId: string) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/accountant/${accountantId}`;
 
   return axi
     .delete(api)
