@@ -989,8 +989,11 @@ export const apiPatchAccountReceivableVoidInvoice = async (id: string) => {
 };
 
 /**更新 應收帳款發票 account-receivable-invoice */
-export const apiPatchAccountReceivableInvoice = async (id: string, body: TupdateAccountReceivableInvoiceDto) => {
-  const api = `/engineering/account-receivable/invoice/${id}`;
+export const apiPatchAccountReceivableInvoice = async (
+  accountReceivableId: string,
+  body: TupdateAccountReceivableInvoiceDto
+) => {
+  const api = `/engineering/account-receivable/invoice/${accountReceivableId}`;
 
   return axi
     .patch<TaccountsReceivableInvoiceDto>(api, body)

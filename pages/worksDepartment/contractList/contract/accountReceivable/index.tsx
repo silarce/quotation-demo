@@ -47,6 +47,8 @@ import {
   apiDeleteAccountReceivableAccountant,
   useGetAccountReceivableIncoices,
   TaccountsReceivableInvoiceDto,
+  apiPatchAccountReceivableInvoice,
+  TupdateAccountReceivableInvoiceDto,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -106,7 +108,6 @@ export default function AccountReceivable() {
 
   const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
   const [showPeriodModal, setShowPeriodModal] = useState<boolean>(false);
-  const [showAddInvoiceModal, setShowAddInvoiceModal] = useState<boolean>(false);
   const [showPercentModal, setShowPercentModal] = useState<boolean>(false);
 
   // --------------------------------------------------------------------------
@@ -223,6 +224,9 @@ export default function AccountReceivable() {
   // }, [disabled]);
 
   const [invoiceArr, setInvoiceArr] = useState<TaccountsReceivableInvoiceDto[]>([]);
+
+  const [targetInvoice, setTargetInvoice] = useState<TaccountsReceivableInvoiceDto>();
+
   useEffect(() => {
     if (disabled) {
       setInvoiceArr(data_invoiceArr ?? []);
@@ -578,7 +582,9 @@ export default function AccountReceivable() {
       return {
         panelCell_03: {
           onChainBreakClick: () => {},
-          onEditClick: () => {},
+          onEditClick: () => {
+            setTargetInvoice(item);
+          },
           onAbandonClick: () => {},
         },
         list: {
@@ -1039,6 +1045,7 @@ export default function AccountReceivable() {
   }, [deductionList]);
 
   // --------------------------------------------------------------------------
+  // _request
 
   // patch應收帳款明細
   const reqPatchAccountReceivable = async () => {
@@ -1056,6 +1063,32 @@ export default function AccountReceivable() {
       myAlert.err({ title: err.message });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // 編輯發票
+  const reqPatchAccountReceivableInvoice = async (preBody: {
+    invoiceDate: string;
+    invoiceNumber: string;
+    price: number;
+    note: string;
+  }) => {
+    if (!accountReceivableId || !targetInvoice) {
+      return;
+    }
+
+    const body: TupdateAccountReceivableInvoiceDto = {
+      ...preBody,
+      accountants: [],
+    };
+
+    try {
+      await apiPatchAccountReceivableInvoice(accountReceivableId, body);
+      setTargetInvoice(undefined);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '編輯發票失敗', content: err.message });
+    } finally {
     }
   };
 
@@ -1174,11 +1207,11 @@ export default function AccountReceivable() {
         </div>
       </TwoButtonModal_free>
 
-      {/* <TwoButtonModal_free
+      <TwoButtonModal_free
         //
-        title="請輸入新增發票"
-        visible={showAddInvoiceModal}
-        onCancel={() => setShowAddInvoiceModal(false)}
+        title="編輯發票"
+        visible={!!targetInvoice}
+        onCancel={() => setTargetInvoice(undefined)}
         modalProps={{
           width: 400,
           footer: null,
@@ -1189,18 +1222,64 @@ export default function AccountReceivable() {
           onSubmit={(e) => {
             e.preventDefault();
             const target = e.target as HTMLFormElement;
-            const t0 = target[0] as HTMLInputElement;
-            const t1 = target[1] as HTMLInputElement;
-            console.log(t0.value);
-            console.log(t1.value);
+            const invoiceDate = (target[0] as HTMLInputElement).value;
+            const invoiceNumber = (target[1] as HTMLInputElement).value;
+            const price = Number((target[2] as HTMLInputElement).value);
+            const note = (target[3] as HTMLInputElement).value;
+            reqPatchAccountReceivableInvoice({
+              invoiceDate,
+              invoiceNumber,
+              price,
+              note,
+            });
           }}
         >
           <div className={scss.addInvoiceModal}>
             <label>
-              <InputSel caption="發票日期" datePickerProps={{}} showBaseline="invisible" />
+              <InputSel
+                caption="發票日期"
+                datePickerProps={{
+                  props: {
+                    defaultValue: moment(targetInvoice?.invoiceDate),
+                  },
+                }}
+                showBaseline="invisible"
+              />
             </label>
             <label>
-              <InputSel caption="發票號碼" inputProps={{}} showBaseline="invisible" />
+              <InputSel
+                caption="發票號碼"
+                inputProps={{
+                  props: {
+                    defaultValue: targetInvoice?.invoiceNumber,
+                  },
+                }}
+                showBaseline="invisible"
+              />
+            </label>
+            <label>
+              <InputSel
+                caption="發票金額"
+                inputProps={{
+                  props: {
+                    defaultValue: targetInvoice?.price,
+
+                    type: 'number',
+                  },
+                }}
+                showBaseline="invisible"
+              />
+            </label>
+            <label>
+              <InputSel
+                caption="發票備註"
+                inputProps={{
+                  props: {
+                    defaultValue: targetInvoice?.note ?? '',
+                  },
+                }}
+                showBaseline="invisible"
+              />
             </label>
           </div>
 
@@ -1208,11 +1287,11 @@ export default function AccountReceivable() {
             onConfirm={() => {}}
             onCancel={(e) => {
               e.preventDefault();
-              setShowAddInvoiceModal(false);
+              setTargetInvoice(undefined);
             }}
           />
         </form>
-      </TwoButtonModal_free> */}
+      </TwoButtonModal_free>
     </SubLayer>
   );
 }
