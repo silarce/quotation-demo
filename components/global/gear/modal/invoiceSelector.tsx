@@ -55,7 +55,8 @@ export default function InvoiceSelector({
 
   // ------------------------------------------------------------------
 
-  const [searchValue, setSearchValue] = useState<string[]>([]);
+  const [searchValueArr, setSearchValueArr] = useState<string[]>([]);
+  const searchValue = searchValueArr[0];
 
   const searchPrice = !searchValue ? undefined : isNaN(Number(searchValue)) ? undefined : Number(searchValue);
 
@@ -102,12 +103,12 @@ export default function InvoiceSelector({
     })();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accountReceivableId, searchValue, showModal]);
+  }, [accountReceivableId, searchValueArr, showModal]);
 
   useEffect(() => {
     if (!showModal) {
       setSelDataArr([]);
-      setSearchValue([]);
+      setSearchValueArr([]);
 
       return;
     }
@@ -156,7 +157,7 @@ export default function InvoiceSelector({
   };
 
   const onSearch = (v: string[]) => {
-    setSearchValue(v);
+    setSearchValueArr(v);
   };
 
   const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
