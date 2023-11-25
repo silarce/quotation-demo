@@ -1073,11 +1073,15 @@ export const apiDeleteAccountReceivableAccountant = async (accountReceivableId: 
 };
 
 /**更新 收款紀錄與發票關聯 account-receivable-accountant */
-export const apiPatchAccountReceivableAccountant = async (id: string, accountantId: string, body: string[]) => {
-  const api = `/engineering/account-receivable/${id}/accountant/${accountantId}`;
+export const apiPatchAccountReceivableAccountant = async (
+  accountReceivableId: string,
+  accountantId: string,
+  body: string[]
+) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/accountant/${accountantId}`;
 
   return axi
-    .patch(api)
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

@@ -54,6 +54,7 @@ import {
   TaccountsReceivableInvoiceDto,
   apiPatchAccountReceivableInvoice,
   TupdateAccountReceivableInvoiceDto,
+  apiPatchAccountReceivableAccountant,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -162,9 +163,11 @@ export default function AccountReceivable() {
   const { data: data_accountantArr, update: update_accountantArr } =
     useGetAccountReceivableAccountants(accountReceivableId);
 
+  const [targetAccountant, setTargetAccountant] = useState<TaccountantDto>();
+
   // _use發票給予紀錄
   const { data: data_invoiceArr, update: update_invoiceArr } = useGetAccountReceivableIncoices(accountReceivableId);
-  console.log('data_invoiceArr', data_invoiceArr);
+
   // --------------------------------------------------------------------------
 
   // 應收帳款明細
@@ -215,17 +218,6 @@ export default function AccountReceivable() {
   ]);
 
   // --------------------------------------------------------------------------
-
-  // const [requestPaymentArr, setRequestPaymentArr] = useState<TrequestPayment[]>([]);
-
-  // --------------------------------------------------------------------------
-
-  // const [invoiceArr, setInvoiceArr] = useState<Tinvoice[]>([]);
-  // useEffect(() => {
-  //   if (disabled) {
-  //     setInvoiceArr(fakeInvoiceArr);
-  //   }
-  // }, [disabled]);
 
   const [invoiceArr, setInvoiceArr] = useState<TaccountsReceivableInvoiceDto[]>([]);
 
@@ -787,7 +779,9 @@ export default function AccountReceivable() {
 
       const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'][number] = {
         panelCell_05: {
-          onChainClick: () => {},
+          onChainClick: () => {
+            setTargetAccountant(item);
+          },
           onRemoveClick: () => {
             deleteAccountant(item.id);
           },
@@ -1013,7 +1007,7 @@ export default function AccountReceivable() {
   }, [deductionList]);
 
   // --------------------------------------------------------------------------
-  // _request
+  // __request
 
   // patch應收帳款明細
   const reqPatchAccountReceivable = async () => {
@@ -1093,6 +1087,24 @@ export default function AccountReceivable() {
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '移除收款明細失敗', content: err.message });
+    }
+  };
+
+  /** 更新 收款紀錄與發票關聯 account-receivable-accountant*/
+  const reqPatchAccountReceivableAccountant = async (arr: TaccountsReceivableInvoiceDto[]) => {
+    if (!targetAccountant || !accountReceivableId) {
+      return;
+    }
+
+    const body = arr.map((item) => item.id);
+
+    try {
+      await apiPatchAccountReceivableAccountant(accountReceivableId, targetAccountant.id, body);
+      setTargetAccountant(undefined);
+      await update_accountantArr();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新收款紀錄與發票關聯失敗', content: err.message });
     }
   };
 
@@ -1187,9 +1199,11 @@ export default function AccountReceivable() {
         accountReceivableId={accountReceivableId}
         label="請選擇發票"
         tip="可複選"
-        showModal={true}
-        onConfirm={() => {}}
-        onCancel={() => {}}
+        showModal={!!targetAccountant}
+        onConfirm={reqPatchAccountReceivableAccountant}
+        onCancel={() => {
+          setTargetAccountant(undefined);
+        }}
         exceptInvoiceArr={[]}
       />
 
