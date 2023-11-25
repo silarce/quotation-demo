@@ -57,6 +57,8 @@ export default function InvoiceSelector({
 
   const [searchValue, setSearchValue] = useState<string[]>([]);
 
+  const searchPrice = !searchValue ? undefined : isNaN(Number(searchValue)) ? undefined : Number(searchValue);
+
   const params: Tparams = {
     pageSize: 9999,
     sort: 'createdAt',
@@ -67,7 +69,7 @@ export default function InvoiceSelector({
           invoiceNumber: { $eq: searchValue },
         },
         '1': {
-          price: { $eq: isNaN(Number(searchValue)) ? undefined : Number(searchValue) },
+          price: { $eq: searchPrice },
         },
         '2': {
           note: { $contains: searchValue },
