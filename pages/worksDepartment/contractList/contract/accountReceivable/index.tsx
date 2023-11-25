@@ -59,7 +59,6 @@ import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/
 
 // css
 import scss from './index.module.scss';
-import { set } from 'lodash';
 
 // ========================================================================
 
@@ -236,42 +235,6 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   // 收款明細
-
-  /** 新增收款明細*/
-  const addAccountant = async (newArr: TaccountantDto[]) => {
-    if (!accountReceivableId) {
-      return;
-    }
-
-    const accountantId = newArr.map((item) => item.id);
-
-    const body = {
-      accountantId,
-    };
-
-    try {
-      await apiPostAccountReceivableAccountant(accountReceivableId, body);
-      await update_accountantArr();
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '新增收款明細失敗', content: err.message });
-    }
-  };
-
-  /**移除收款明細 */
-  const deleteAccountant = async (id: string) => {
-    if (!accountReceivableId) {
-      return;
-    }
-
-    try {
-      await apiDeleteAccountReceivableAccountant(accountReceivableId, id);
-      await update_accountantArr();
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '移除收款明細失敗', content: err.message });
-    }
-  };
 
   // --------------------------------------------------------------------------
 
@@ -1092,11 +1055,41 @@ export default function AccountReceivable() {
     }
   };
 
-  // 新增收款記錄到應收帳款明細
+  /** 新增收款明細*/
+  const addAccountant = async (newArr: TaccountantDto[]) => {
+    if (!accountReceivableId) {
+      return;
+    }
 
-  // apiPostAccountReceivableAccountant
+    const accountantId = newArr.map((item) => item.id);
 
-  // const reqPostAccountReceivableAccountant = async () => {};
+    const body = {
+      accountantId,
+    };
+
+    try {
+      await apiPostAccountReceivableAccountant(accountReceivableId, body);
+      await update_accountantArr();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增收款明細失敗', content: err.message });
+    }
+  };
+
+  /**移除收款明細 */
+  const deleteAccountant = async (id: string) => {
+    if (!accountReceivableId) {
+      return;
+    }
+
+    try {
+      await apiDeleteAccountReceivableAccountant(accountReceivableId, id);
+      await update_accountantArr();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '移除收款明細失敗', content: err.message });
+    }
+  };
 
   // --------------------------------------------------------------------------
   const panelList_01: TpanelList = [
