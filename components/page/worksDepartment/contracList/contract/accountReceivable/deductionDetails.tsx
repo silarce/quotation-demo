@@ -2,10 +2,12 @@ import { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // icon
 import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
@@ -14,27 +16,14 @@ import scss from './deductionDetails.module.scss';
 
 // api
 import {
-  TupdateEngineeringContactDto,
-  TupdateAccountReceivableDto,
-  TaccountReceivableDto,
-  useGetEngineeringContact,
-  apiPatchEngineeringContact,
-  apiPostWorkSheet,
-  useGetFinalProduct,
-  useGetAccountReceivable_id,
-  apiPatchAccountReceivable,
-  useGetAccountReceivableAccountants,
-  apiPostAccountReceivableAccountant,
-  apiDeleteAccountReceivableAccountant,
-  useGetAccountReceivableIncoices,
-  TaccountsReceivableInvoiceDto,
-  apiPatchAccountReceivableInvoice,
-  TupdateAccountReceivableInvoiceDto,
-  apiPatchAccountReceivableAccountant,
+  TcreateAccountReceivableDeductionDto,
+  TaccountsReceivableDeductionDto,
+  TupdateAccountReceivableDeductionDto,
+  apiPostAccountReceivableDeduction,
+  apiPatchAccountReceivableDeduction,
+  apiDeleteAccountReceivableDeduction,
+  useGetAccountReceivableDeductions,
 } from 'js/api/api_engineering';
-import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
-import { TaccountantDto } from 'js/api/api_accountant';
-import { TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
 
 // ============================================================================
 type TcontrolItem = {
@@ -55,7 +44,10 @@ type TcontrolColumn = {
 type Tcontrol = {
   sideColumn: TcontrolColumn;
   columnArr: TcontrolColumn[];
-  onTopBtnClick: () => void;
+  onUploadClick: () => void;
+  onEditClick: () => void;
+  onCancelClick: () => void;
+  onAddClick: () => void;
 };
 
 type TdeductionList = {
@@ -79,22 +71,40 @@ export type { Tcontrol as Tcontrol_deductionDetails };
 
 // ============================================================================
 
-// ============================================================================
+export default function DeductionDetails({
+  accountReceivableId,
+  validInvoiceQty,
+}: {
+  accountReceivableId: string | undefined;
+  validInvoiceQty: number;
+}) {
+  const [disabled, setDisabled] = useState<boolean>(true);
 
-export default function DeductionDetails({ disabled }: { disabled?: boolean }) {
+  // ---------------------------------------------------------
+  const { data: deductionArr, update: update_deductionArr } = useGetAccountReceivableDeductions(accountReceivableId);
+
+  useEffect(() => {
+    update_deductionArr();
+  }, [accountReceivableId]);
+
+  // ---------------------------------------------------------
   //
   const [deductionList, setDeductionList] = useState<TdeductionList>({});
+  const [changedDeduction, setChangedDeduction] = useState<{ [key: string]: { [key: string]: Tdeduction } }>({});
+  const [deductionIdWillDeleteArr, setDeductionIdWillDeleteArr] = useState<string[]>([]);
 
   const { periodQty, periodArr, itemNameArr, sortedDeductionList } = useMemo(() => {
-    return createDeductionList(fakeAccountsReceivableDeduction);
-  }, [fakeAccountsReceivableDeduction]);
+    return createDeductionList({
+      validInvoiceQty,
+      dataArr: deductionArr ?? [],
+    });
+  }, [deductionArr, disabled]);
 
   useEffect(() => {
     setDeductionList(sortedDeductionList);
+    setChangedDeduction({});
+    setDeductionIdWillDeleteArr([]);
   }, [sortedDeductionList]);
-
-  const [changedDeduction, setChangedDeduction] = useState<{ [key: string]: { [key: string]: Tdeduction } }>({});
-  const [deductionIdWillDeleteArr, setDeductionIdWillDeleteArr] = useState<string[]>([]);
 
   const recordChangedDeduction = (data: Tdeduction, pKey: string) => {
     setChangedDeduction((state) => {
@@ -109,8 +119,98 @@ export default function DeductionDetails({ disabled }: { disabled?: boolean }) {
   };
 
   // ---------------------------------------------------------
+
+  const reqAccountReceivableDeduction = async () => {
+    if (!accountReceivableId) {
+      return;
+    }
+
+    const postBody: TcreateAccountReceivableDeductionDto[] = [];
+    const patchBody: TupdateAccountReceivableDeductionDto[] = [];
+
+    Object.values(changedDeduction).forEach((list) => {
+      Object.values(list).forEach((item) => {
+        const { id, itemName, period, detailedAmount } = item;
+
+        if (!period) {
+          return;
+        }
+
+        const thePeriod = period;
+        const theDetailedAmount = Number(detailedAmount || '0');
+
+        if (id) {
+          patchBody.push({
+            id,
+            itemName,
+            period: thePeriod,
+            detailedAmount: theDetailedAmount,
+          });
+        } else {
+          postBody.push({
+            itemName,
+            period: thePeriod,
+            detailedAmount: theDetailedAmount,
+          });
+        }
+      });
+    });
+
+    const reqPost = async () => {
+      if (postBody.length === 0) {
+        return;
+      }
+
+      try {
+        await apiPostAccountReceivableDeduction(accountReceivableId, postBody);
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '新增扣款明細失敗', content: err.message });
+      }
+    };
+
+    const reqPatch = async () => {
+      if (patchBody.length === 0) {
+        return;
+      }
+
+      try {
+        await apiPatchAccountReceivableDeduction(accountReceivableId, patchBody);
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '更新扣款明細失敗', content: err.message });
+      }
+    };
+
+    const reqDalete = async () => {
+      if (deductionIdWillDeleteArr.length === 0) {
+        return;
+      }
+
+      try {
+        await apiDeleteAccountReceivableDeduction(deductionIdWillDeleteArr);
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '刪除扣款明細失敗', content: err.message });
+      }
+    };
+
+    try {
+      await reqPost();
+      await reqPatch();
+      await reqDalete();
+      update_deductionArr();
+    } catch (error) {
+    } finally {
+      setDisabled(true);
+    }
+
+    //
+  };
+
+  // ---------------------------------------------------------
   const control = useMemo(() => {
-    const columnArr = Object.keys(deductionList).map((pKey, itemNameIndex) => {
+    const columnArr = Object.keys(deductionList).map((pKey) => {
       let subTotal = 0;
       const itemName = deductionList[pKey]?.itemName;
       const theList = deductionList[pKey]?.list;
@@ -183,11 +283,18 @@ export default function DeductionDetails({ disabled }: { disabled?: boolean }) {
             const list = newObj[pKey].list;
             const idArr = Object.values(list).map((item) => item.id);
             const theIdArr = idArr.filter((id) => id) as string[];
-            setDeductionIdWillDeleteArr((arr) => [...arr, ...theIdArr]);
+
+            setDeductionIdWillDeleteArr((arr) => {
+              const newArr = _.uniq([...arr, ...theIdArr]);
+
+              return newArr;
+            });
+
             delete newObj[pKey];
 
             return newObj;
           });
+
           setChangedDeduction((obj) => {
             const newObj = { ...obj };
             delete newObj[pKey];
@@ -202,7 +309,7 @@ export default function DeductionDetails({ disabled }: { disabled?: boolean }) {
     });
 
     const control_deductionDetails: Tcontrol = {
-      onTopBtnClick: () => {
+      onAddClick: () => {
         setDeductionList((obj) => {
           return {
             ...obj,
@@ -213,6 +320,14 @@ export default function DeductionDetails({ disabled }: { disabled?: boolean }) {
           };
         });
       },
+      onEditClick: () => {
+        setDisabled(false);
+      },
+      onCancelClick: () => {
+        setDisabled(true);
+      },
+      onUploadClick: reqAccountReceivableDeduction,
+
       sideColumn: {
         caption: '項目',
         subTotal: '合計',
@@ -237,15 +352,34 @@ export default function DeductionDetails({ disabled }: { disabled?: boolean }) {
 // ============================================================================
 
 function View({ control, disabled }: { control: Tcontrol; disabled?: boolean }) {
-  const { sideColumn, columnArr, onTopBtnClick } = control;
+  const {
+    //
+    sideColumn,
+    columnArr,
+    onAddClick,
+    onUploadClick,
+    onEditClick,
+    onCancelClick,
+  } = control;
 
   return (
     <div className={scss.container}>
       <div className={scss.wrapper}>
         <div className={scss.top}>
           <span>扣款明細</span>
-          <div>
-            <MyButton_v2 label="新增項目" px="px22" onClick={onTopBtnClick} />
+          <div className={scss.right}>
+            {disabled && (
+              <>
+                <MyButton_v2 label="編輯" px="px22" onClick={onEditClick} />
+              </>
+            )}
+            {!disabled && (
+              <>
+                <MyButton_v2 label="新增項目" px="px22" onClick={onAddClick} />
+                <MyButton_v2 label="上傳" px="px22" onClick={onUploadClick} />
+                <MyButton_v2 label="取消" px="px22" onClick={onCancelClick} />
+              </>
+            )}
           </div>
         </div>
         <div className={scss.table}>
@@ -360,61 +494,21 @@ const Column = ({
 };
 
 // ============================================================================
-const fakeAccountsReceivableDeduction: TaccountsReceivableDeductionDto[] = [
-  {
-    id: 'u1',
-    createdAt: '',
-    updatedAt: '',
-    itemName: '工作證',
-    period: 1,
-    detailedAmount: 999,
-    accountsReceivableId: '',
-  },
-  {
-    id: 'u2',
-    createdAt: '',
-    updatedAt: '',
-    itemName: '工作證',
-    period: 2,
-    detailedAmount: 111,
-    accountsReceivableId: '',
-  },
-  {
-    id: 'u3',
-    createdAt: '',
-    updatedAt: '',
-    itemName: '工作證',
-    period: 3,
-    detailedAmount: 333,
-    accountsReceivableId: '',
-  },
-  {
-    id: 'u4',
-    createdAt: '',
-    updatedAt: '',
-    itemName: '安衛費',
-    period: 1,
-    detailedAmount: 11,
-    accountsReceivableId: '',
-  },
-  {
-    id: 'u5',
-    createdAt: '',
-    updatedAt: '',
-    itemName: '安衛費',
-    period: 3,
-    detailedAmount: 322,
-    accountsReceivableId: '',
-  },
-];
 
+// validInvoiceQty
 /**用來把從後端取得的扣款明細變成這裡可以用的樣子 */
-const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
+const createDeductionList = ({
+  validInvoiceQty,
+  dataArr,
+}: {
+  validInvoiceQty: number;
+  dataArr: TaccountsReceivableDeductionDto[];
+}) => {
   let periodQty = 0;
   const itemNameArr: string[] = [];
   const list: TdeductionList = {};
 
-  data.forEach((item) => {
+  dataArr.forEach((item) => {
     const { id, itemName, period } = item;
 
     if (!itemNameArr.includes(itemName)) {
@@ -443,7 +537,9 @@ const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
     //
   });
 
-  const periodArr = Array.from({ length: periodQty }, (_, i) => String(i + 1));
+  const thePeriod = validInvoiceQty > periodQty ? validInvoiceQty : periodQty;
+
+  const periodArr = Array.from({ length: thePeriod }, (_, i) => String(i + 1));
 
   return {
     periodQty,

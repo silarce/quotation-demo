@@ -1092,8 +1092,8 @@ type TgetAccountReceivableDeductions = {
 };
 
 /**取得 所有 應收帳款 扣款明細 account-receivable-deduction */
-const apiGetAccountReceivableDeductions = async (id: string, params?: Tparams) => {
-  const api = `/engineering/account-receivable/${id}/deductions`;
+const apiGetAccountReceivableDeductions = async (accountReceivableId: string, params?: Tparams) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/deductions`;
 
   return axi
     .get<TgetAccountReceivableDeductions>(api, { params })
@@ -1102,17 +1102,23 @@ const apiGetAccountReceivableDeductions = async (id: string, params?: Tparams) =
 };
 
 /**取得 所有 應收帳款 扣款明細 account-receivable-deduction */
-export const useGetAccountReceivableDeductions = (id: string, customParams?: Tparams) => {
+export const useGetAccountReceivableDeductions = (accountReceivableId: string | undefined, customParams?: Tparams) => {
   const [res, setRes] = useState<TgetAccountReceivableDeductions>();
 
   const params = {
     // populate: [],
     pageSize: 9999,
+    sort: 'createdAt',
+    order: 'ASC',
     ...customParams,
   };
 
   const update = async () => {
-    const newRes = await apiGetAccountReceivableDeductions(id, params);
+    if (!accountReceivableId) {
+      return;
+    }
+
+    const newRes = await apiGetAccountReceivableDeductions(accountReceivableId, params);
 
     if (newRes) {
       setRes(newRes);

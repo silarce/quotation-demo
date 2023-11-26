@@ -2579,7 +2579,7 @@ export type TcreateAccountReceivableDeductionDto = Pick<
 >;
 
 export type TupdateAccountReceivableDeductionDto = Partial<TcreateAccountReceivableDeductionDto> & {
-  id?: string; // 不提供時將此筆視為新增資料
+  id: string; // 不提供時將此筆視為新增資料
 };
 
 export type TfinalProduct = {
