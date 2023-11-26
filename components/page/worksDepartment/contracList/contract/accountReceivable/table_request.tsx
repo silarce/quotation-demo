@@ -29,6 +29,9 @@ import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quot
 import { TaccountantDto } from 'js/api/api_accountant';
 import { TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
 
+// utils
+import { convertDate_add1911 } from 'js/utils/helpers/date/convertDate';
+
 // css
 import scss from './table_request.module.scss';
 
@@ -118,7 +121,7 @@ export default function Table_request({
             const note = (target[3] as HTMLInputElement).value;
 
             reqPostAccountReceivableIncoice({
-              invoiceDate,
+              invoiceDate: convertDate_add1911(invoiceDate),
               invoiceNumber,
               price,
               note,
