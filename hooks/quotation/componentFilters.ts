@@ -62,12 +62,15 @@ const filter_guideRails = ({
     isAntiTyphoon: boolean;
     /**消音條 */
     hasSilencingStrip: boolean; // 消音條
+    imageName: string;
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
     if (Number(data.thickness) !== Number(filterParams.thickness)) {
       return false;
     } else if (data.isAntiTyphoon !== filterParams.isAntiTyphoon) {
+      return false;
+    } else if (data.imageName !== null && data.imageName !== filterParams.imageName) {
       return false;
     } else if (data.hasSilencingStrip !== filterParams.hasSilencingStrip) {
       if (Number(data.thickness) !== 4.5) {
@@ -93,6 +96,7 @@ const filter_sidePlates = ({
     isIntegrated: boolean; // 一體式捲箱
     motorVendor: string; // 馬達廠商
     weight: number; // /products/door/calc-general-spec給的weight
+    sizeB: number;
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
@@ -103,6 +107,8 @@ const filter_sidePlates = ({
     } else if (data.isIntegrated !== null && data.isIntegrated !== filterParams.isIntegrated) {
       return false;
     } else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
+      return false;
+    } else if (data.sizeB !== null && data.sizeB !== filterParams.sizeB) {
       return false;
     } else if (data.maxDoorWeight !== null && data.maxDoorWeight < filterParams.weight) {
       return false;
@@ -198,6 +204,7 @@ const filter_motorAccessories = ({
     chains: number; // 鍊條排數
     /**軸承 */
     bearingType: string; // 軸承
+    gearNumber: string;
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
@@ -205,6 +212,8 @@ const filter_motorAccessories = ({
     //   isPass = false;
     // } else
     if (data.bearingType !== filterParams.bearingType) {
+      return false;
+    } else if (data.gearNumber !== null && data.gearNumber !== filterParams.gearNumber) {
       return false;
     }
 

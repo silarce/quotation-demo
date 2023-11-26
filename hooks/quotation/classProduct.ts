@@ -1,5 +1,6 @@
 /**
  *
+ * callRetrieveCreProdCom
  * retrieveOptions 下拉式選單產生器
  * Class_product
  * AcceList
@@ -1063,6 +1064,7 @@ class Class_product {
         thickness: String(this.doorTrackThick),
         isAntiTyphoon: this.typhoonProtection,
         hasSilencingStrip: this.doorTrackSilencerStrip,
+        imageName: this.doorTrack,
       },
     });
 
@@ -1089,6 +1091,8 @@ class Class_product {
         isIntegrated: this.onePieceRollUpBox,
         motorVendor: this.motor,
         weight: this.weight,
+        // sizeB: this.boxB,
+        sizeB: Number(this.boxB_mm),
       },
     });
 
@@ -1106,6 +1110,7 @@ class Class_product {
         chains: this._doorGeneralSpecs?.sprocketWheelChains ?? 0,
         /**軸承 */ // 從doorGeneralSpecs取資料
         bearingType: this._doorGeneralSpecs?.bearingName || '',
+        gearNumber: this._doorGeneralSpecs?.gearNumber || '',
       },
     });
 
@@ -2076,6 +2081,9 @@ class Class_product {
       return item?.value === v;
     });
     this._prodData.guideRailsOpening = theGuideRail?.guideRailsOpening ?? '';
+
+    this.callRetrieveCreProdCom();
+
     this.reRender();
   }
 

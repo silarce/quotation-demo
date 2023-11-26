@@ -1676,6 +1676,7 @@ export type TdoorGuideRailDto = {
   isAntiTyphoon: boolean;
   /**消音條 */
   hasSilencingStrip: boolean; // 消音條
+  imageName: string | null; // 圖片名稱
 };
 
 export type TdoorSidePlateDto = {
@@ -1696,6 +1697,7 @@ export type TdoorSidePlateDto = {
   maxDoorWeight: number | null; // 最大門重量(kg)
   minDoorWeight: number | null; // 最小門重量(kg)
 
+  sizeB: number | null;
   // 需要有表面
 };
 
@@ -1747,6 +1749,7 @@ export type TdoorMotorAccessoriesDto = {
   chains: number; // 鍊條排數
   /**軸承 */
   bearingType: string; // 軸承
+  gearNumber: string;
 };
 
 export type TdoorHeadBoxDto = {
