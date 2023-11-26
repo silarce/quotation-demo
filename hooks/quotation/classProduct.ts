@@ -1167,7 +1167,7 @@ class Class_product {
     }
 
     if (!sidePlate) {
-      myAlert.info({ title: '沒有符合規格的側板' });
+      myAlert.info({ title: '沒有符合規格的支板' });
     }
 
     const dataList = {
