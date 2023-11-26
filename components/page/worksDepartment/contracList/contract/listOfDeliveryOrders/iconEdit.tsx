@@ -29,18 +29,21 @@ export default function IconEdit({
   onChange,
   onAdd,
   onDel,
+  updateTrigger,
 }: {
   disabled: boolean;
   exchangeId: string | undefined;
   onChange?: UploadProps['onChange'];
   onAdd?: (arr: UploadFile[]) => void;
   onDel?: (arr: string[]) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  updateTrigger?: any;
 }) {
   const { attachments, updateAttachments } = useApiGetEngineeringExchangeAttachments(exchangeId);
 
   useEffect(() => {
     updateAttachments();
-  }, [exchangeId]);
+  }, [exchangeId, updateTrigger]);
 
   // console.log(attachments);
   // --------------------------------------------------------------------------

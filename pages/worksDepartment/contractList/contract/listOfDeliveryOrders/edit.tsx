@@ -72,6 +72,7 @@ export default function Edit() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(!!exchangeId);
+  const [attachmentUpdateTrigger, setAttachmentUpdateTrigger] = useState(0);
   // ----------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
@@ -161,9 +162,6 @@ export default function Edit() {
 
   const [newImgArr, setNewImgArr] = useState<UploadFile[]>([]);
   const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
-
-  console.log(newImgArr);
-  console.log(delImgIdArr);
 
   // ----------------------------------------------------
 
@@ -319,7 +317,6 @@ export default function Edit() {
 
       if (exchangeId) {
         await apiPatchEngineeringExchange(exchangeId, body);
-
         await updateAttachments({
           exchangeId,
           newImgArr,
@@ -327,6 +324,7 @@ export default function Edit() {
         });
 
         update_exchange();
+        setAttachmentUpdateTrigger((state) => state + 1);
       } else {
         const res = await apiPostEngineeringExchange(body);
         await updateAttachments({
@@ -334,7 +332,6 @@ export default function Edit() {
           newImgArr,
           delImgIdArr,
         });
-
         router.push({
           query: { ...router.query, exchangeId: res.id },
         });
@@ -431,6 +428,7 @@ export default function Edit() {
             onDel={(arr) => {
               setDelImgIdArr(arr);
             }}
+            updateTrigger={attachmentUpdateTrigger}
           />
           <Signature controll={controll_signature} disabled={disabled} />
         </div>
