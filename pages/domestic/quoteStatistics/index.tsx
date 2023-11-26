@@ -79,7 +79,7 @@ export default function QuoteStatistics() {
 
       return {
         idNumber: item.quotation_number,
-        designDepartment: '設計單位',
+        designDepartment: '',
         constructionName: item.project_name,
         customer: [
           {
@@ -94,7 +94,7 @@ export default function QuoteStatistics() {
       };
     });
 
-    const percent_locale = percent.div(arr.length).toString() + '%';
+    const percent_locale = percent.div(arr.length).toFixed(2) + '%';
 
     return {
       formatedDataArr: arr,
