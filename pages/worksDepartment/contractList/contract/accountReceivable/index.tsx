@@ -423,7 +423,7 @@ export default function AccountReceivable() {
   // 控制 發票給予紀錄
   const control_invoiceGivingRecord = useMemo(() => {
     const control_invoiceGivingRecord_rowArr: Tcontrol_dynaTable['rowArr'] = invoiceArr.map((item, index) => {
-      const accountantArr = item.accountantList;
+      const accountantArr = item.accountantList ?? [];
 
       const subRowArr: Trow[] = accountantArr.map((accountant) => {
         const {
