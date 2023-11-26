@@ -238,29 +238,29 @@ export default function AccountReceivable() {
 
   // deductionDetails 扣款明細
 
-  const [deductionList, setDeductionList] = useState<TdeductionList>({});
-  const [changedDeduction, setChangedDeduction] = useState<{ [key: string]: { [key: string]: Tdeduction } }>({});
-  const [deductionIdWillDeleteArr, setDeductionIdWillDeleteArr] = useState<string[]>([]);
+  // const [deductionList, setDeductionList] = useState<TdeductionList>({});
+  // const [changedDeduction, setChangedDeduction] = useState<{ [key: string]: { [key: string]: Tdeduction } }>({});
+  // const [deductionIdWillDeleteArr, setDeductionIdWillDeleteArr] = useState<string[]>([]);
 
-  const recordChangedDeduction = (data: Tdeduction, pKey: string) => {
-    setChangedDeduction((state) => {
-      return {
-        ...state,
-        [pKey]: {
-          ...state[pKey],
-          [data.key]: data,
-        },
-      };
-    });
-  };
+  // const recordChangedDeduction = (data: Tdeduction, pKey: string) => {
+  //   setChangedDeduction((state) => {
+  //     return {
+  //       ...state,
+  //       [pKey]: {
+  //         ...state[pKey],
+  //         [data.key]: data,
+  //       },
+  //     };
+  //   });
+  // };
 
-  const { periodQty, periodArr, itemNameArr, sortedDeductionList } = useMemo(() => {
-    return createDeductionList(fakeAccountsReceivableDeduction);
-  }, [fakeAccountsReceivableDeduction]);
+  // const { periodQty, periodArr, itemNameArr, sortedDeductionList } = useMemo(() => {
+  //   return createDeductionList(fakeAccountsReceivableDeduction);
+  // }, [fakeAccountsReceivableDeduction]);
 
-  useEffect(() => {
-    setDeductionList(sortedDeductionList);
-  }, [sortedDeductionList]);
+  // useEffect(() => {
+  //   setDeductionList(sortedDeductionList);
+  // }, [sortedDeductionList]);
 
   // --------------------------------------------------------------------------
 
@@ -905,126 +905,126 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
-  const control_deductionDetails = useMemo(() => {
-    const columnArr = Object.keys(deductionList).map((pKey, itemNameIndex) => {
-      let subTotal = 0;
-      const itemName = deductionList[pKey]?.itemName;
-      const theList = deductionList[pKey]?.list;
+  // const control_deductionDetails = useMemo(() => {
+  //   const columnArr = Object.keys(deductionList).map((pKey, itemNameIndex) => {
+  //     let subTotal = 0;
+  //     const itemName = deductionList[pKey]?.itemName;
+  //     const theList = deductionList[pKey]?.list;
 
-      const arr = periodArr.map((period) => {
-        const deduction = deductionList?.[pKey]?.list?.[period];
+  //     const arr = periodArr.map((period) => {
+  //       const deduction = deductionList?.[pKey]?.list?.[period];
 
-        const detailedAmount = deduction?.detailedAmount ?? '';
+  //       const detailedAmount = deduction?.detailedAmount ?? '';
 
-        subTotal = subTotal + Number(detailedAmount || '0');
+  //       subTotal = subTotal + Number(detailedAmount || '0');
 
-        const controlItem: Tcontrol_deductionDetails['columnArr'][number]['arr'][number] = {
-          value: detailedAmount,
-          onChange: (str) => {
-            setDeductionList((obj) => {
-              const newObj = { ...obj };
+  //       const controlItem: Tcontrol_deductionDetails['columnArr'][number]['arr'][number] = {
+  //         value: detailedAmount,
+  //         onChange: (str) => {
+  //           setDeductionList((obj) => {
+  //             const newObj = { ...obj };
 
-              if (!newObj[pKey]) {
-                newObj[pKey] = {
-                  itemName: itemName,
-                  list: {},
-                };
-              }
+  //             if (!newObj[pKey]) {
+  //               newObj[pKey] = {
+  //                 itemName: itemName,
+  //                 list: {},
+  //               };
+  //             }
 
-              if (!newObj[pKey].list[period]) {
-                newObj[pKey].list[period] = {
-                  key: nanoid(),
-                  itemName: itemName,
-                  period: Number(period),
-                  detailedAmount: '',
-                };
-              }
+  //             if (!newObj[pKey].list[period]) {
+  //               newObj[pKey].list[period] = {
+  //                 key: nanoid(),
+  //                 itemName: itemName,
+  //                 period: Number(period),
+  //                 detailedAmount: '',
+  //               };
+  //             }
 
-              newObj[pKey].list[period].detailedAmount = str;
-              recordChangedDeduction(newObj[pKey].list[period], pKey);
+  //             newObj[pKey].list[period].detailedAmount = str;
+  //             recordChangedDeduction(newObj[pKey].list[period], pKey);
 
-              return newObj;
-            });
-          },
-        };
+  //             return newObj;
+  //           });
+  //         },
+  //       };
 
-        return controlItem;
-      });
+  //       return controlItem;
+  //     });
 
-      const tax = new Decimal(subTotal).mul(0.05).toNumber();
+  //     const tax = new Decimal(subTotal).mul(0.05).toNumber();
 
-      const column: Tcontrol_deductionDetails['columnArr'][number] = {
-        caption: itemName,
-        onChange: (str) => {
-          setDeductionList((obj) => {
-            const newObj = { ...obj };
+  //     const column: Tcontrol_deductionDetails['columnArr'][number] = {
+  //       caption: itemName,
+  //       onChange: (str) => {
+  //         setDeductionList((obj) => {
+  //           const newObj = { ...obj };
 
-            const theItem = newObj[pKey];
-            theItem.itemName = str;
-            Object.keys(theItem.list).forEach((key) => {
-              theItem.list[key].itemName = str;
-            });
+  //           const theItem = newObj[pKey];
+  //           theItem.itemName = str;
+  //           Object.keys(theItem.list).forEach((key) => {
+  //             theItem.list[key].itemName = str;
+  //           });
 
-            newObj[pKey] = theItem;
+  //           newObj[pKey] = theItem;
 
-            return newObj;
-          });
-        },
-        subTotal: subTotal.toLocaleString(),
-        tax: tax.toLocaleString(),
-        total: (subTotal + tax).toLocaleString(),
-        onDeleteClick: () => {
-          setDeductionList((obj) => {
-            const newObj = { ...obj };
-            const list = newObj[pKey].list;
-            const idArr = Object.values(list).map((item) => item.id);
-            const theIdArr = idArr.filter((id) => id) as string[];
-            setDeductionIdWillDeleteArr((arr) => [...arr, ...theIdArr]);
-            delete newObj[pKey];
+  //           return newObj;
+  //         });
+  //       },
+  //       subTotal: subTotal.toLocaleString(),
+  //       tax: tax.toLocaleString(),
+  //       total: (subTotal + tax).toLocaleString(),
+  //       onDeleteClick: () => {
+  //         setDeductionList((obj) => {
+  //           const newObj = { ...obj };
+  //           const list = newObj[pKey].list;
+  //           const idArr = Object.values(list).map((item) => item.id);
+  //           const theIdArr = idArr.filter((id) => id) as string[];
+  //           setDeductionIdWillDeleteArr((arr) => [...arr, ...theIdArr]);
+  //           delete newObj[pKey];
 
-            return newObj;
-          });
-          setChangedDeduction((obj) => {
-            const newObj = { ...obj };
-            delete newObj[pKey];
+  //           return newObj;
+  //         });
+  //         setChangedDeduction((obj) => {
+  //           const newObj = { ...obj };
+  //           delete newObj[pKey];
 
-            return newObj;
-          });
-        },
-        arr,
-      };
+  //           return newObj;
+  //         });
+  //       },
+  //       arr,
+  //     };
 
-      return column;
-    });
+  //     return column;
+  //   });
 
-    const control_deductionDetails: Tcontrol_deductionDetails = {
-      onTopBtnClick: () => {
-        setDeductionList((obj) => {
-          return {
-            ...obj,
-            [nanoid()]: {
-              itemName: 'new',
-              list: {},
-            },
-          };
-        });
-      },
-      sideColumn: {
-        caption: '項目',
-        subTotal: '合計',
-        tax: '營業稅5%',
-        total: '總計',
-        arr: periodArr.map((item) => {
-          return {
-            value: `第${item}期`,
-          };
-        }),
-      },
-      columnArr: columnArr,
-    };
+  //   const control_deductionDetails: Tcontrol_deductionDetails = {
+  //     onTopBtnClick: () => {
+  //       setDeductionList((obj) => {
+  //         return {
+  //           ...obj,
+  //           [nanoid()]: {
+  //             itemName: 'new',
+  //             list: {},
+  //           },
+  //         };
+  //       });
+  //     },
+  //     sideColumn: {
+  //       caption: '項目',
+  //       subTotal: '合計',
+  //       tax: '營業稅5%',
+  //       total: '總計',
+  //       arr: periodArr.map((item) => {
+  //         return {
+  //           value: `第${item}期`,
+  //         };
+  //       }),
+  //     },
+  //     columnArr: columnArr,
+  //   };
 
-    return control_deductionDetails;
-  }, [deductionList]);
+  //   return control_deductionDetails;
+  // }, [deductionList]);
 
   // --------------------------------------------------------------------------
   // __request
@@ -1186,7 +1186,7 @@ export default function AccountReceivable() {
         {/* 收款紀錄*/}
         <AccountReceivable_dynaTable control={control_accountant} disabled={disabled} />
         {/* 扣款明細 */}
-        <DeductionDetails control={control_deductionDetails} disabled={disabled} />
+        <DeductionDetails disabled={disabled} />
       </div>
       {/*  */}
       <InputModal
@@ -1355,98 +1355,98 @@ export default function AccountReceivable() {
 // ========================================================================
 // ========================================================================
 
-const fakeAccountsReceivableDeduction: TaccountsReceivableDeductionDto[] = [
-  {
-    id: 'u1',
-    createdAt: '',
-    updatedAt: '',
-    itemName: '工作證',
-    period: 1,
-    detailedAmount: 999,
-    accountsReceivableId: '',
-  },
-  {
-    id: 'u2',
-    createdAt: '',
-    updatedAt: '',
-    itemName: '工作證',
-    period: 2,
-    detailedAmount: 111,
-    accountsReceivableId: '',
-  },
-  {
-    id: 'u3',
-    createdAt: '',
-    updatedAt: '',
-    itemName: '工作證',
-    period: 3,
-    detailedAmount: 333,
-    accountsReceivableId: '',
-  },
-  {
-    id: 'u4',
-    createdAt: '',
-    updatedAt: '',
-    itemName: '安衛費',
-    period: 1,
-    detailedAmount: 11,
-    accountsReceivableId: '',
-  },
-  {
-    id: 'u5',
-    createdAt: '',
-    updatedAt: '',
-    itemName: '安衛費',
-    period: 3,
-    detailedAmount: 322,
-    accountsReceivableId: '',
-  },
-];
+// const fakeAccountsReceivableDeduction: TaccountsReceivableDeductionDto[] = [
+//   {
+//     id: 'u1',
+//     createdAt: '',
+//     updatedAt: '',
+//     itemName: '工作證',
+//     period: 1,
+//     detailedAmount: 999,
+//     accountsReceivableId: '',
+//   },
+//   {
+//     id: 'u2',
+//     createdAt: '',
+//     updatedAt: '',
+//     itemName: '工作證',
+//     period: 2,
+//     detailedAmount: 111,
+//     accountsReceivableId: '',
+//   },
+//   {
+//     id: 'u3',
+//     createdAt: '',
+//     updatedAt: '',
+//     itemName: '工作證',
+//     period: 3,
+//     detailedAmount: 333,
+//     accountsReceivableId: '',
+//   },
+//   {
+//     id: 'u4',
+//     createdAt: '',
+//     updatedAt: '',
+//     itemName: '安衛費',
+//     period: 1,
+//     detailedAmount: 11,
+//     accountsReceivableId: '',
+//   },
+//   {
+//     id: 'u5',
+//     createdAt: '',
+//     updatedAt: '',
+//     itemName: '安衛費',
+//     period: 3,
+//     detailedAmount: 322,
+//     accountsReceivableId: '',
+//   },
+// ];
 
-/**用來把從後端取得的扣款明細變成這裡可以用的樣子 */
-const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
-  let periodQty = 0;
-  const itemNameArr: string[] = [];
-  const list: TdeductionList = {};
+// /**用來把從後端取得的扣款明細變成這裡可以用的樣子 */
+// const createDeductionList = (data: TaccountsReceivableDeductionDto[]) => {
+//   let periodQty = 0;
+//   const itemNameArr: string[] = [];
+//   const list: TdeductionList = {};
 
-  data.forEach((item) => {
-    const { id, itemName, period } = item;
+//   data.forEach((item) => {
+//     const { id, itemName, period } = item;
 
-    if (!itemNameArr.includes(itemName)) {
-      itemNameArr.push(itemName);
-    }
+//     if (!itemNameArr.includes(itemName)) {
+//       itemNameArr.push(itemName);
+//     }
 
-    if (period > periodQty) {
-      periodQty = period;
-    }
+//     if (period > periodQty) {
+//       periodQty = period;
+//     }
 
-    if (!list[itemName]) {
-      list[itemName] = {
-        itemName,
-        list: {},
-      };
-    }
+//     if (!list[itemName]) {
+//       list[itemName] = {
+//         itemName,
+//         list: {},
+//       };
+//     }
 
-    list[itemName].list[`${period}`] = {
-      id: id,
-      key: id,
-      itemName,
-      period,
-      detailedAmount: String(item.detailedAmount),
-    };
+//     list[itemName].list[`${period}`] = {
+//       id: id,
+//       key: id,
+//       itemName,
+//       period,
+//       detailedAmount: String(item.detailedAmount),
+//     };
 
-    //
-  });
+//     //
+//   });
 
-  const periodArr = Array.from({ length: periodQty }, (_, i) => String(i + 1));
+//   const periodArr = Array.from({ length: periodQty }, (_, i) => String(i + 1));
 
-  return {
-    periodQty,
-    periodArr,
-    itemNameArr,
-    sortedDeductionList: list,
-  };
-};
+//   return {
+//     periodQty,
+//     periodArr,
+//     itemNameArr,
+//     sortedDeductionList: list,
+//   };
+// };
 
 const createdHeadRowList_收款紀錄 = (props?: {
   onDateClick?: () => void;
