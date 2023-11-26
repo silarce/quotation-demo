@@ -94,7 +94,7 @@ export default function QuoteStatistics() {
       };
     });
 
-    const percent_locale = percent.div(arr.length).toFixed(2) + '%';
+    const percent_locale = percent.div(arr.length).toFixed(1) + '%';
 
     return {
       formatedDataArr: arr,
