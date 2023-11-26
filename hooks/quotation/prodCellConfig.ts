@@ -441,7 +441,7 @@ const prodCellConfig: TcellConfig = {
       selectProps: {
         props: {
           // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
-          options: optionsCreator_bottomBarAngleIron(),
+          // options: optionsCreator_bottomBarAngleIron(),
         },
       },
     },
@@ -453,7 +453,7 @@ const prodCellConfig: TcellConfig = {
       selectProps: {
         props: {
           // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
-          options: optionsCreator_bottomBarPlate(),
+          // options: optionsCreator_bottomBarPlate(),
         },
       },
     },

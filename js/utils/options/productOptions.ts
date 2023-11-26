@@ -202,20 +202,20 @@ export const optionsCreator_componentMaterial_03 = createOptionsCreator({
 // !如果options有變動，要去確認hooks/quotation/prodCellConfig.ts的bottomBarAngleIron有沒有不對
 export const optionsCreator_bottomBarAngleIron = createOptionsCreator({
   optionsArr: [
-    { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T' },
-    { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T' },
-    { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T' },
-    { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T' },
+    { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T', material: '鍍鋅鋼板' },
+    { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T', material: '高耐鍍鋅鋼板' },
+    { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T', material: '不鏽鋼#304' },
+    { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T', material: '不鏽鋼#316' },
   ],
 });
 
 // !如果options有變動，要去確認hooks/quotation/prodCellConfig.ts的bottomBarPlate有沒有不對
 export const optionsCreator_bottomBarPlate = createOptionsCreator({
   optionsArr: [
-    { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T' },
-    { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T' },
-    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T' },
-    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T' },
+    { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T', material: '鍍鋅鋼板' },
+    { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T', material: '高耐鍍鋅鋼板' },
+    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: '不鏽鋼#304' },
+    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: '不鏽鋼#316' },
   ],
 });
 
