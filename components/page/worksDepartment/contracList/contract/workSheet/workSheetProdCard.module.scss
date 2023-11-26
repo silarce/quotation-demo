@@ -90,6 +90,7 @@
     .row {
       display: grid;
       grid-template-columns: auto 30px fit-content(100%) 20px;
+      align-items: center;
       gap: 10px;
       padding: 5px;
       > span {
