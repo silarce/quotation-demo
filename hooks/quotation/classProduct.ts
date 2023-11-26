@@ -1832,6 +1832,10 @@ class Class_product {
     this._prodData.doorType = v;
     this.clearProd_all();
 
+    if (!this.doorTrack) {
+      this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
+    }
+
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
