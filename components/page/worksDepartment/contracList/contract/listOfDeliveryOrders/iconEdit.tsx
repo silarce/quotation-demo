@@ -92,7 +92,9 @@ export default function IconEdit({
       }) ?? [];
 
     setFileArr(arr);
-  }, [attachments]);
+    setNewImgArr([]);
+    setDelImgIdArr([]);
+  }, [attachments, disabled]);
 
   //
 
@@ -182,7 +184,7 @@ export default function IconEdit({
           onPreview={handlePreview}
           onChange={handleChange}
           withCredentials={true}
-          multiple={true} // 一次選擇多張圖片會使圖片不顯示，還不知道問題在哪
+          // multiple={true} // 一次選擇多張圖片會使圖片不顯示，還不知道問題在哪
         >
           {/* {fileList.length >= 8 ? null : uploadButton} */}
           {uploadButton}
