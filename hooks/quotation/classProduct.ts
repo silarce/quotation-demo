@@ -1,5 +1,6 @@
 /**
  *
+ * callRetrieveCreProdCom
  * retrieveOptions 下拉式選單產生器
  * Class_product
  * AcceList
@@ -1063,6 +1064,7 @@ class Class_product {
         thickness: String(this.doorTrackThick),
         isAntiTyphoon: this.typhoonProtection,
         hasSilencingStrip: this.doorTrackSilencerStrip,
+        imageName: this.doorTrack,
       },
     });
 
@@ -1089,6 +1091,8 @@ class Class_product {
         isIntegrated: this.onePieceRollUpBox,
         motorVendor: this.motor,
         weight: this.weight,
+        // sizeB: this.boxB,
+        sizeB: Number(this.boxB_mm),
       },
     });
 
@@ -1106,6 +1110,7 @@ class Class_product {
         chains: this._doorGeneralSpecs?.sprocketWheelChains ?? 0,
         /**軸承 */ // 從doorGeneralSpecs取資料
         bearingType: this._doorGeneralSpecs?.bearingName || '',
+        gearNumber: this._doorGeneralSpecs?.gearNumber || '',
       },
     });
 
@@ -1167,7 +1172,7 @@ class Class_product {
     }
 
     if (!sidePlate) {
-      myAlert.info({ title: '沒有符合規格的側板' });
+      myAlert.info({ title: '沒有符合規格的支板' });
     }
 
     const dataList = {
@@ -1827,6 +1832,10 @@ class Class_product {
     this._prodData.doorType = v;
     this.clearProd_all();
 
+    if (!this.doorTrack) {
+      this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
+    }
+
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
@@ -2076,6 +2085,9 @@ class Class_product {
       return item?.value === v;
     });
     this._prodData.guideRailsOpening = theGuideRail?.guideRailsOpening ?? '';
+
+    this.callRetrieveCreProdCom();
+
     this.reRender();
   }
 
