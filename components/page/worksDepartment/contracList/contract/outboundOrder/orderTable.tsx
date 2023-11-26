@@ -690,7 +690,7 @@ const creCellConfig_static = (): TcellConfigList => ({
 
 const creCellConfig_staticData2 = (): TcellConfigList => ({
   remark01: {
-    label: '備註1',
+    label: '選配',
     width: '200px',
     type: 'textarea',
     position: '',
