@@ -33,6 +33,10 @@ import {
   optionsCreator_doorModel,
   optionsCreator_bottomBarAngleIron,
   optionsCreator_bottomBarPlate,
+  optionsCreator_bottomBarAngleIron_303A,
+  optionsCreator_bottomBarPlate_303A,
+  optionsCreator_bottomBarAngleIron_303AS,
+  optionsCreator_bottomBarPlate_303AS,
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
@@ -1690,10 +1694,34 @@ class Class_product {
 
   /**底座角鐵 */
   get options_bottomBarAngleIron() {
-    return optionsCreator_bottomBarAngleIron();
+    if (this._prodData.doorType === 'SJ-302') {
+      return optionsCreator_bottomBarAngleIron();
+    }
+
+    if (this._prodData.doorType === 'SJ-303A') {
+      return optionsCreator_bottomBarAngleIron_303A();
+    }
+
+    if (this._prodData.doorType === 'SJ-303AS') {
+      return optionsCreator_bottomBarAngleIron_303AS();
+    }
+
+    return [];
   }
   get options_bottomBarPlate() {
-    return optionsCreator_bottomBarPlate();
+    if (this._prodData.doorType === 'SJ-302') {
+      return optionsCreator_bottomBarPlate();
+    }
+
+    if (this._prodData.doorType === 'SJ-303A') {
+      return optionsCreator_bottomBarPlate_303A();
+    }
+
+    if (this._prodData.doorType === 'SJ-303AS') {
+      return optionsCreator_bottomBarPlate_303AS();
+    }
+
+    return [];
   }
 
   // ---------------------------------------------------------
@@ -2786,8 +2814,8 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     // 'onePieceRollUpBox', // 一體式捲箱
     'rollUpBoxThick', // 捲箱厚度
     'close', // 開閉方式
-    'bottomBarAngleIron', // 底座角鐵
-    'bottomBarPlate', // 底座板
+    // 'bottomBarAngleIron', // 底座角鐵
+    // 'bottomBarPlate', // 底座板
   ];
 };
 
