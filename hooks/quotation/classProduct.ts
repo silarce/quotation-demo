@@ -98,6 +98,7 @@ import type {
   TquotationProductDto,
   TdoorAccessoryDto,
   TcreateQuotationProductDto,
+  TdoorGeneralSpecsMotorDto,
 } from 'js/api/dtoTypes';
 
 import type { TreRender, TcomponentKey } from './useProduct';
@@ -242,6 +243,8 @@ class Class_product {
   private _dualPrice;
   private _unitPrice;
   private _totalPrice;
+
+  private defaultMotor: TdoorGeneralSpecsMotorDto | undefined = undefined;
 
   // readonly options_doorTrack_normal = options_doorTrack_normal;
   // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
@@ -660,9 +663,13 @@ class Class_product {
     );
 
     //
+
     const defaultMotorIndex = res.defaultMotorIndex;
     const defaultMotor = res.motors[defaultMotorIndex];
     const defaultMotorBox = defaultMotor.box;
+
+    this.defaultMotor = defaultMotor;
+
     // ________________________
     // 設定馬力
     this.horsepower = defaultMotor.hp;
@@ -1204,11 +1211,15 @@ class Class_product {
   }
 
   takeDefaultDynaValue() {
+    // const defaultMotorIndex = this._doorGeneralSpecs?.defaultMotorIndex ?? 0;
+    const defaultMotor = this.defaultMotor;
+
     const call = () => {
       this._prodData.doorTrackThick = this.options_doorTrackThick?.[0].value ?? '';
       this._prodData.rollUpBoxThick = this.options_rollUpBoxThick?.[0].value ?? '';
       this._prodData.motor = this.options_motor?.[0].value ?? '';
-      this._prodData.horsepower = this.options_horsepower?.[0].value ?? '';
+      // this._prodData.horsepower = this.options_horsepower?.[defaultMotorIndex].value ?? '';
+      this._prodData.horsepower = defaultMotor?.hp ?? '';
       this._prodData.phase = Number(this.options_phase?.[0].value ?? '1');
       this._prodData.voltage = this.options_voltage?.[0].value ?? '';
       this.callRetrieveCreProdCom();
@@ -1219,7 +1230,8 @@ class Class_product {
       this._prodData.doorTrackThick !== this.options_doorTrackThick?.[0].value ||
       this._prodData.rollUpBoxThick !== this.options_rollUpBoxThick?.[0].value ||
       this._prodData.motor !== this.options_motor?.[0].value ||
-      this._prodData.horsepower !== this.options_horsepower?.[0].value ||
+      // this._prodData.horsepower !== this.options_horsepower?.[defaultMotorIndex].value ||
+      this._prodData.horsepower !== defaultMotor?.hp ||
       this._prodData.phase !== Number(this.options_phase?.[0].value) ||
       this._prodData.voltage !== this.options_voltage?.[0].value
     ) {
@@ -1237,6 +1249,7 @@ class Class_product {
     const motorArr = this._doorGeneralSpecs.motors;
     const hp = this.horsepower;
     const vendor = this.motor as '東元' | '大同' | '';
+
     const defaultMotor = motorArr[this._doorGeneralSpecs.defaultMotorIndex];
     const defaultHP = defaultMotor.hp;
     const box = defaultMotor.box;
