@@ -219,8 +219,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const latestContent = quotationData.latestContent;
     const attachedToContract = quotationData.attachedToContract;
-    const subContracts = attachedToContract?.subContracts;
-
+    let subContracts = attachedToContract?.subContracts;
+    subContracts = _.sortBy(subContracts, 'version');
     // 主合約與所有子合約的主產品，迭代後的列表
     const latestVersionProductList: { [key: string]: TquotationProductDto } = {};
 
