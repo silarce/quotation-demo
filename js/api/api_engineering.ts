@@ -937,7 +937,7 @@ export const useGetAccountReceivableIncoices = (accountReceivableId: string | un
   const [res, setRes] = useState<TgetAccountReceivableIncoices>();
 
   const params: Tparams = {
-    // populate: [],
+    populate: ['accountantList'],
     pageSize: 9999,
     sort: 'createdAt',
     order: 'DESC',
@@ -1021,7 +1021,7 @@ export const useGetAccountReceivableAccountants = (accountReceivableId: string |
   const [res, setRes] = useState<TgetAccountant>();
 
   const params = {
-    populate: ['billSerialNumber'],
+    populate: ['invoice'],
     pageSize: 9999,
     ...customParams,
   };
