@@ -1543,6 +1543,7 @@ export type TquotationAccouting = {
   contactnumber: string;
   contactperson: string;
   customername: string;
+  percentage: number;
 };
 
 export type TquotationAccouting_years = {

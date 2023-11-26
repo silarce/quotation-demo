@@ -737,8 +737,6 @@ export const useQuotationAccounting = (params: {
 }) => {
   const [res, setRes] = useState<TquotationAccouting[]>();
 
-  console.log(params.area);
-
   const update = async () => {
     if (!params.year || !params.month || !params.area) {
       return;
