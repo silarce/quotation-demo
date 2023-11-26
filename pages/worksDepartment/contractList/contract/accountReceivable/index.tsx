@@ -22,6 +22,7 @@ import Table_requestPayment, {
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_requestPayment';
 import AccountReceivable_dynaTable, {
   Tcontrol_dynaTable,
+  Trow,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountReceivable_dynaTable';
 import DeductionDetails, {
   Tcontrol_deductionDetails,
@@ -465,78 +466,95 @@ export default function AccountReceivable() {
   };
 
   // --------------------------------------------------------------------------
+  // __invoice control
   // data_invoiceArr
   // 控制 發票給予紀錄
   const control_invoiceGivingRecord = useMemo(() => {
     const control_invoiceGivingRecord_rowArr: Tcontrol_dynaTable['rowArr'] = invoiceArr.map((item, index) => {
+      const accountantArr = item.accountantList;
+
+      const subRowArr: Trow[] = accountantArr.map((accountant) => {
+        const {
+          //
+          createdAt,
+          paymentType,
+          accountingNumber, // 編號/存入帳號
+          price,
+          notes,
+          billSerialNumber, // 收入傳票序號
+          noteMaturityDate, // 票據到期日
+        } = accountant;
+
+        return {
+          panelCell_04: {
+            onChainBreakClick: () => {},
+          },
+          list: {
+            date: {
+              label: '日期',
+              cellStyle: { width: '120px' },
+              inputProps: {
+                props: {
+                  // value: 'no property',
+                  value: getTaiwanDateStr(createdAt) ?? '',
+                },
+              },
+            },
+            account: {
+              label: '帳號',
+              cellStyle: { width: '189px' },
+              inputProps: {
+                props: {
+                  value: accountingNumber,
+                },
+              },
+            },
+            chequeNumber: {
+              label: '票據號碼',
+              cellStyle: { width: '189px' },
+              inputProps: {
+                props: {
+                  value: accountingNumber,
+                },
+              },
+            },
+            chequeDate: {
+              label: '票據日期',
+              cellStyle: { width: '100px' },
+              inputProps: {
+                props: {
+                  value: getTaiwanDateStr(noteMaturityDate) ?? '',
+                },
+              },
+            },
+            price: {
+              label: '金額',
+              cellStyle: { width: '170px' },
+              inputProps: {
+                props: {
+                  value: price,
+                },
+              },
+            },
+            incomingSubpoenaSerialNumber: {
+              label: '收入傳票序號',
+              cellStyle: { width: '187px' },
+              inputProps: {
+                props: {
+                  value: billSerialNumber ?? '',
+                },
+              },
+            },
+          },
+        };
+      });
+
       const subTable = {
         subHeadRow: {
           panelCell_04: {},
           list: createdHeadRowList_收款紀錄(),
         }, // subHeadRow close
-        subRowArr: [
-          {
-            panelCell_04: {
-              onChainBreakClick: () => {},
-            },
-            list: {
-              date: {
-                label: '日期',
-                cellStyle: { width: '120px' },
-                inputProps: {
-                  props: {
-                    value: 'no property',
-                  },
-                },
-              },
-              account: {
-                label: '帳號',
-                cellStyle: { width: '189px' },
-                inputProps: {
-                  props: {
-                    value: 'foo',
-                  },
-                },
-              },
-              chequeNumber: {
-                label: '票據號碼',
-                cellStyle: { width: '189px' },
-                inputProps: {
-                  props: {
-                    value: 'no property',
-                  },
-                },
-              },
-              chequeDate: {
-                label: '票據日期',
-                cellStyle: { width: '100px' },
-                inputProps: {
-                  props: {
-                    value: 'foo',
-                  },
-                },
-              },
-              price: {
-                label: '金額',
-                cellStyle: { width: '170px' },
-                inputProps: {
-                  props: {
-                    value: item.price,
-                  },
-                },
-              },
-              incomingSubpoenaSerialNumber: {
-                label: '收入傳票序號',
-                cellStyle: { width: '187px' },
-                inputProps: {
-                  props: {
-                    value: 'no property',
-                  },
-                },
-              },
-            },
-          },
-        ],
+        subRowArr: subRowArr,
       };
 
       return {
@@ -692,6 +710,8 @@ export default function AccountReceivable() {
   }, [invoiceArr]);
 
   // --------------------------------------------------------------------------
+
+  // __accountant control
 
   // 收款紀錄 不應該叫paymentRecord的
   const control_accountant = useMemo(() => {

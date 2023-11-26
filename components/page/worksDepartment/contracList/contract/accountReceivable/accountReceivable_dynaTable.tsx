@@ -118,7 +118,7 @@ type Tcontrol = {
   };
 };
 
-export type { Tcontrol as Tcontrol_dynaTable };
+export type { Tcontrol as Tcontrol_dynaTable, Trow };
 
 // ==========================================================================
 const { Panel } = Collapse;

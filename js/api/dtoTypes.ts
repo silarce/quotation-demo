@@ -2528,6 +2528,8 @@ export type TaccountsReceivableInvoiceDto = {
   /** 所屬應收帳款ID */
   accountsReceivableId: string | null;
   accountsReceivable?: TaccountReceivableDto | null;
+
+  accountantList: TaccountantDto[];
 };
 
 export type TcreateAccountReceivableInvoiceDto = Pick<
