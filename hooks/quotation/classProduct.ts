@@ -28,7 +28,16 @@ import { AxiosError } from 'axios';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { optionsCreator_surface, optionsCreator_doorModel } from 'js/utils/options/productOptions';
+import {
+  optionsCreator_surface,
+  optionsCreator_doorModel,
+  optionsCreator_bottomBarAngleIron,
+  optionsCreator_bottomBarPlate,
+  optionsCreator_bottomBarAngleIron_303A,
+  optionsCreator_bottomBarPlate_303A,
+  optionsCreator_bottomBarAngleIron_303AS,
+  optionsCreator_bottomBarPlate_303AS,
+} from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
 const options_doorModel = optionsCreator_doorModel();
@@ -89,6 +98,7 @@ import type {
   TquotationProductDto,
   TdoorAccessoryDto,
   TcreateQuotationProductDto,
+  TdoorGeneralSpecsMotorDto,
 } from 'js/api/dtoTypes';
 
 import type { TreRender, TcomponentKey } from './useProduct';
@@ -233,6 +243,8 @@ class Class_product {
   private _dualPrice;
   private _unitPrice;
   private _totalPrice;
+
+  private defaultMotor: TdoorGeneralSpecsMotorDto | undefined = undefined;
 
   // readonly options_doorTrack_normal = options_doorTrack_normal;
   // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
@@ -651,9 +663,13 @@ class Class_product {
     );
 
     //
+
     const defaultMotorIndex = res.defaultMotorIndex;
     const defaultMotor = res.motors[defaultMotorIndex];
     const defaultMotorBox = defaultMotor.box;
+
+    this.defaultMotor = defaultMotor;
+
     // ________________________
     // 設定馬力
     this.horsepower = defaultMotor.hp;
@@ -1195,11 +1211,15 @@ class Class_product {
   }
 
   takeDefaultDynaValue() {
+    // const defaultMotorIndex = this._doorGeneralSpecs?.defaultMotorIndex ?? 0;
+    const defaultMotor = this.defaultMotor;
+
     const call = () => {
       this._prodData.doorTrackThick = this.options_doorTrackThick?.[0].value ?? '';
       this._prodData.rollUpBoxThick = this.options_rollUpBoxThick?.[0].value ?? '';
       this._prodData.motor = this.options_motor?.[0].value ?? '';
-      this._prodData.horsepower = this.options_horsepower?.[0].value ?? '';
+      // this._prodData.horsepower = this.options_horsepower?.[defaultMotorIndex].value ?? '';
+      this._prodData.horsepower = defaultMotor?.hp ?? '';
       this._prodData.phase = Number(this.options_phase?.[0].value ?? '1');
       this._prodData.voltage = this.options_voltage?.[0].value ?? '';
       this.callRetrieveCreProdCom();
@@ -1210,7 +1230,8 @@ class Class_product {
       this._prodData.doorTrackThick !== this.options_doorTrackThick?.[0].value ||
       this._prodData.rollUpBoxThick !== this.options_rollUpBoxThick?.[0].value ||
       this._prodData.motor !== this.options_motor?.[0].value ||
-      this._prodData.horsepower !== this.options_horsepower?.[0].value ||
+      // this._prodData.horsepower !== this.options_horsepower?.[defaultMotorIndex].value ||
+      this._prodData.horsepower !== defaultMotor?.hp ||
       this._prodData.phase !== Number(this.options_phase?.[0].value) ||
       this._prodData.voltage !== this.options_voltage?.[0].value
     ) {
@@ -1228,6 +1249,7 @@ class Class_product {
     const motorArr = this._doorGeneralSpecs.motors;
     const hp = this.horsepower;
     const vendor = this.motor as '東元' | '大同' | '';
+
     const defaultMotor = motorArr[this._doorGeneralSpecs.defaultMotorIndex];
     const defaultHP = defaultMotor.hp;
     const box = defaultMotor.box;
@@ -1549,6 +1571,30 @@ class Class_product {
     }
   }
 
+  /**變更角鐵與底座版 */
+  // getBottomBarAngleIronAndBottomBarPlate(v: '鍍鋅鋼板' | '高耐鍍鋅鋼板' | '不鏽鋼#304' | '不鏽鋼#316') {
+  getBottomBarAngleIronAndBottomBarPlate(
+    // v: '鍍鋅鋼板' | '高耐鍍鋅鋼板' | '不鏽鋼#304' | '不鏽鋼#316'
+    v: string
+  ) {
+    if (v === '鍍鋅鋼板') {
+      this.bottomBarAngleIron = this.options_bottomBarAngleIron[0].value;
+      this.bottomBarPlate = this.options_bottomBarPlate[0].value;
+    } else if (v.includes('高耐鍍鋅鋼板')) {
+      this.bottomBarAngleIron = this.options_bottomBarAngleIron[1].value;
+      this.bottomBarPlate = this.options_bottomBarPlate[1].value;
+    } else if (v.includes('304')) {
+      this.bottomBarAngleIron = this.options_bottomBarAngleIron[2].value;
+      this.bottomBarPlate = this.options_bottomBarPlate[2].value;
+    } else if (v.includes('316')) {
+      this.bottomBarAngleIron = this.options_bottomBarAngleIron[3].value;
+      this.bottomBarPlate = this.options_bottomBarPlate[3].value;
+    } else {
+      this.bottomBarAngleIron = this.options_bottomBarAngleIron[2].value;
+      this.bottomBarPlate = this.options_bottomBarPlate[2].value;
+    }
+  }
+
   // ---------------------------------------------------------
   // 下拉式選單的選項
 
@@ -1565,6 +1611,9 @@ class Class_product {
   //
   options_boxB: Toption[] | undefined = undefined;
   options_boxD: Toption[] | undefined = undefined;
+
+  // options_bottomBarAngleIron: Toption[] | undefined = undefined;
+  // options_bottomBarPlate: Toption[] | undefined = undefined;
 
   /**門型 options */
   get options_doorType() {
@@ -1654,6 +1703,38 @@ class Class_product {
     }
 
     return undefined;
+  }
+
+  /**底座角鐵 */
+  get options_bottomBarAngleIron() {
+    if (this._prodData.doorType === 'SJ-302') {
+      return optionsCreator_bottomBarAngleIron();
+    }
+
+    if (this._prodData.doorType === 'SJ-303A') {
+      return optionsCreator_bottomBarAngleIron_303A();
+    }
+
+    if (this._prodData.doorType === 'SJ-303AS') {
+      return optionsCreator_bottomBarAngleIron_303AS();
+    }
+
+    return [];
+  }
+  get options_bottomBarPlate() {
+    if (this._prodData.doorType === 'SJ-302') {
+      return optionsCreator_bottomBarPlate();
+    }
+
+    if (this._prodData.doorType === 'SJ-303A') {
+      return optionsCreator_bottomBarPlate_303A();
+    }
+
+    if (this._prodData.doorType === 'SJ-303AS') {
+      return optionsCreator_bottomBarPlate_303AS();
+    }
+
+    return [];
   }
 
   // ---------------------------------------------------------
@@ -1955,10 +2036,8 @@ class Class_product {
 
     this._prodData.material = v;
 
-    const bottomBarAngleIron_options = prodCellConfig.bottomBarAngleIron.inputSelProps.selectProps!.props!
-      .options! as Toption[];
-    const bottomBarPlate_options = prodCellConfig.bottomBarPlate.inputSelProps.selectProps!.props!
-      .options! as Toption[];
+    const bottomBarAngleIron_options = this.options_bottomBarAngleIron;
+    const bottomBarPlate_options = this.options_bottomBarPlate;
 
     if (v.includes('鍍鋅')) {
       this.bottomBarAngleIron = bottomBarAngleIron_options[0].value;

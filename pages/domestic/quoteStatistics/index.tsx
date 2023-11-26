@@ -75,7 +75,7 @@ export default function QuoteStatistics() {
     const arr: Tdata[] = data.map((item) => {
       listPriceTotal += Number(item.pricesum || 0);
       bearPriceTotal += Number(item.totalsum || 0);
-      percent = percent.add(item.percentage);
+      percent = percent.add(item.percentage ?? 0);
 
       return {
         idNumber: item.quotation_number,
@@ -88,7 +88,7 @@ export default function QuoteStatistics() {
             contactPhone: item.contactnumber,
             listPrice: Number(item.pricesum).toLocaleString(),
             bearPrice: Number(item.totalsum).toLocaleString(),
-            percent: `${item.percentage}%`,
+            percent: `${item.percentage ?? ''}%`,
           },
         ],
       };
