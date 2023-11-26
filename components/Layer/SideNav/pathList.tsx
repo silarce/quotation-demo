@@ -284,12 +284,11 @@ const sidePathList: TsidePathList = {
               path: path01 + '/contract',
               erpFeature: [domestic],
             },
-
-            {
-              label: '查詢報價單',
-              path: path01 + '/queryQuotation',
-              erpFeature: devPass,
-            },
+            // {
+            //   label: '查詢報價單',
+            //   path: path01 + '/queryQuotation',
+            //   erpFeature: devPass,
+            // },
             // {
             //   label: '歷史紀錄',
             //   path: path01 + '/history',
@@ -318,11 +317,11 @@ const sidePathList: TsidePathList = {
           path: path01 + '/unSet',
           erpFeature: [accountsReceivable],
         },
-        {
-          label: '查詢派工單明細',
-          path: path01 + '/unSet',
-          erpFeature: devPass,
-        },
+        // {
+        //   label: '查詢派工單明細',
+        //   path: path01 + '/unSet',
+        //   erpFeature: devPass,
+        // },
         {
           label: '統計表',
           erpFeature: [statisticsTable],
