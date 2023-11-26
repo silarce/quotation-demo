@@ -41,6 +41,8 @@ import {
   TfileDto,
 } from 'js/api/api_engineering';
 
+import { TuserDto } from 'js/api/dtoTypes';
+
 // -----------------------------------------------------------
 type Tprofile = {
   projectNumber: string;
@@ -66,7 +68,7 @@ type Ttransfer = {
 };
 
 // -----------------------------------------------------------
-export default function Edit() {
+export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
   const { contractId, exchangeId } = router.query as { contractId: string; exchangeId: string | undefined };
 
@@ -187,12 +189,16 @@ export default function Edit() {
       dispatchDate: dispatchDate ?? '',
     });
 
+    const isNew = !exchangeId;
+
+    const theFormCompleter = isNew ? userInfo.employee : formCompleter;
+
     setSignature({
       accounting,
       warehouseEmployee,
       factoryEmployee,
       supervisor,
-      formCompleter,
+      formCompleter: theFormCompleter,
     });
 
     const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
@@ -247,7 +253,8 @@ export default function Edit() {
     },
     formCompleter: {
       employee: signature.formCompleter,
-      onChange: (v: TemployeeDto) => changeSignature('formCompleter', v),
+      // onChange: (v: TemployeeDto) => changeSignature('formCompleter', v),
+      forbidden: true,
     },
   };
 
