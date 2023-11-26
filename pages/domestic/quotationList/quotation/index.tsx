@@ -1093,7 +1093,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         const prod = productList[key];
 
         const quantity = Number(prod.quantity);
-        const originProd = prod.originProd;
+        // const originProd = prod.originProd;
 
         prodQty = prodQty + quantity;
 
@@ -1102,11 +1102,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
           order: index,
         };
 
-        const isEqual = _.isEqual(originProd, preBody);
-
-        if (!isEqual) {
-          preBody.id = undefined;
-        }
+        // 不記得當初是為了解決什麼問題才寫這個，但是這個造成了問題了，isEqual似乎恆為true
+        // const isEqual = _.isEqual(originProd, preBody);
+        // if (!isEqual) {
+        //   preBody.id = undefined;
+        // }
 
         return preBody;
       }) ?? [];

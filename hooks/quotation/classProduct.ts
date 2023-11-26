@@ -1704,6 +1704,7 @@ class Class_product {
 
   clearId() {
     this._prodData.id = undefined;
+    this._prodData.rootProductId = undefined;
   }
   // ---------------------------------------------------------------------
   // ---------------------------------------------------------------------
@@ -2699,6 +2700,7 @@ type Tprod = {
   //
   reduceQty?: number;
   //
+  rootProductId?: string;
 };
 
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
