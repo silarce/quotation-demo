@@ -1105,7 +1105,7 @@ const apiGetAccountReceivableDeductions = async (accountReceivableId: string, pa
 export const useGetAccountReceivableDeductions = (accountReceivableId: string | undefined, customParams?: Tparams) => {
   const [res, setRes] = useState<TgetAccountReceivableDeductions>();
 
-  const params = {
+  const params: Tparams = {
     // populate: [],
     pageSize: 9999,
     sort: 'createdAt',
