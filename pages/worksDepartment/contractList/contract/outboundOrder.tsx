@@ -8,7 +8,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 import moment from 'moment';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
