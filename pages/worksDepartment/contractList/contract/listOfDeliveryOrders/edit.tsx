@@ -41,6 +41,8 @@ import {
   TfileDto,
 } from 'js/api/api_engineering';
 
+import { TuserDto } from 'js/api/dtoTypes';
+
 // -----------------------------------------------------------
 type Tprofile = {
   projectNumber: string;
@@ -66,12 +68,13 @@ type Ttransfer = {
 };
 
 // -----------------------------------------------------------
-export default function Edit() {
+export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
   const { contractId, exchangeId } = router.query as { contractId: string; exchangeId: string | undefined };
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(!!exchangeId);
+  const [attachmentUpdateTrigger, setAttachmentUpdateTrigger] = useState(0);
   // ----------------------------------------------------
 
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
@@ -162,9 +165,6 @@ export default function Edit() {
   const [newImgArr, setNewImgArr] = useState<UploadFile[]>([]);
   const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
 
-  console.log(newImgArr);
-  console.log(delImgIdArr);
-
   // ----------------------------------------------------
 
   useEffect(() => {
@@ -189,12 +189,16 @@ export default function Edit() {
       dispatchDate: dispatchDate ?? '',
     });
 
+    const isNew = !exchangeId;
+
+    const theFormCompleter = isNew ? userInfo.employee : formCompleter;
+
     setSignature({
       accounting,
       warehouseEmployee,
       factoryEmployee,
       supervisor,
-      formCompleter,
+      formCompleter: theFormCompleter,
     });
 
     const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
@@ -249,7 +253,8 @@ export default function Edit() {
     },
     formCompleter: {
       employee: signature.formCompleter,
-      onChange: (v: TemployeeDto) => changeSignature('formCompleter', v),
+      // onChange: (v: TemployeeDto) => changeSignature('formCompleter', v),
+      forbidden: true,
     },
   };
 
@@ -319,7 +324,6 @@ export default function Edit() {
 
       if (exchangeId) {
         await apiPatchEngineeringExchange(exchangeId, body);
-
         await updateAttachments({
           exchangeId,
           newImgArr,
@@ -327,6 +331,7 @@ export default function Edit() {
         });
 
         update_exchange();
+        setAttachmentUpdateTrigger((state) => state + 1);
       } else {
         const res = await apiPostEngineeringExchange(body);
         await updateAttachments({
@@ -334,7 +339,6 @@ export default function Edit() {
           newImgArr,
           delImgIdArr,
         });
-
         router.push({
           query: { ...router.query, exchangeId: res.id },
         });
@@ -431,6 +435,7 @@ export default function Edit() {
             onDel={(arr) => {
               setDelImgIdArr(arr);
             }}
+            updateTrigger={attachmentUpdateTrigger}
           />
           <Signature controll={controll_signature} disabled={disabled} />
         </div>

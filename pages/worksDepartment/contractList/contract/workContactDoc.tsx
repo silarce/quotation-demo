@@ -365,6 +365,7 @@ export default function WorkContactDoc() {
         address: {
           props: {
             disabled,
+            value: profile?.address ?? '',
             onChange: (e) => {
               profileChange('address', e.target.value);
             },

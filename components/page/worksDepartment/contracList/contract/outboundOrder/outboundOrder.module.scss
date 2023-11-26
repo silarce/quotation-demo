@@ -12,6 +12,7 @@ $cellgap: 16px;
     position: sticky;
     z-index: 2;
     top: 0;
+    display: flex;
     width: fit-content;
     white-space: nowrap;
     background-color: $bgc01;
@@ -19,6 +20,7 @@ $cellgap: 16px;
     padding-left: 22px;
     padding-right: 33px;
     border-top: solid 4px white;
+
     .theadItem {
       display: inline-flex;
       padding: 2px 3px;
@@ -57,7 +59,7 @@ $cellgap: 16px;
     .row {
       // border: solid 1px black;
       position: relative;
-      display: inline-flex;
+      display: flex;
       align-items: flex-start;
       width: fit-content;
       white-space: nowrap;
@@ -159,20 +161,13 @@ $cellgap: 16px;
 
   .pilar {
     position: relative;
-    display: inline-block;
+    display: block;
+    align-self: stretch;
     padding: 2px 0px;
     margin-left: 10px;
     margin-right: 6px;
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform: translate(-50%, -50%);
-      width: 1px;
-      height: 31px;
-      background-color: $colorBorder01;
-    }
+    width: 1px;
+    background-color: theme("colors.border");
   }
 }
 

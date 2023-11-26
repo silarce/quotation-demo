@@ -230,6 +230,8 @@ const useProductList = ({
     const newKey = nanoid();
 
     const copy = _.cloneDeep(list[copyKey]);
+    // copy.rootProductId = undefined;
+
     copy.delSelf = () => delSelf_prod(list, newKey);
     copy.copySelf = () => copySelf_prod(list, newKey);
 

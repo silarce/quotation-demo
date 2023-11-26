@@ -75,7 +75,7 @@ export default function QuoteStatistics() {
     const arr: Tdata[] = data.map((item) => {
       listPriceTotal += Number(item.pricesum || 0);
       bearPriceTotal += Number(item.totalsum || 0);
-      percent = percent.add(999);
+      percent = percent.add(item.percentage);
 
       return {
         idNumber: item.quotation_number,
@@ -86,15 +86,15 @@ export default function QuoteStatistics() {
             customerName: item.customername,
             contactPerson: item.contactperson,
             contactPhone: item.contactnumber,
-            listPrice: item.pricesum,
-            bearPrice: item.totalsum,
-            percent: '999%',
+            listPrice: Number(item.pricesum).toLocaleString(),
+            bearPrice: Number(item.totalsum).toLocaleString(),
+            percent: `${item.percentage}%`,
           },
         ],
       };
     });
 
-    const percent_locale = percent.div(arr.length).toNumber().toLocaleString();
+    const percent_locale = percent.div(arr.length).toString() + '%';
 
     return {
       formatedDataArr: arr,

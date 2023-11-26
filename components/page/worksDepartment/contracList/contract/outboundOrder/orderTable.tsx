@@ -511,7 +511,7 @@ const orderKeyArr_contract: (keyof TcontractData)[] = [
 ];
 
 const orderKeyArr_static: (keyof TstaticData)[] = [
-  // 'project',
+  // 'project', // 這個欄位顯示出來應該會讓這個報表比較清楚
   'L',
   'W',
   'B',
@@ -690,7 +690,7 @@ const creCellConfig_static = (): TcellConfigList => ({
 
 const creCellConfig_staticData2 = (): TcellConfigList => ({
   remark01: {
-    label: '備註1',
+    label: '選配',
     width: '200px',
     type: 'textarea',
     position: '',

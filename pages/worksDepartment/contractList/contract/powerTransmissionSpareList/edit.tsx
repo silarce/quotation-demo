@@ -44,7 +44,7 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 import style from './powerTransmissionSpareList.module.scss';
 
 // type
-import { TemployeeDto } from 'js/api/dtoTypes';
+import { TemployeeDto, TuserDto } from 'js/api/dtoTypes';
 
 // =================================================================
 type Tprofile = {
@@ -104,7 +104,7 @@ type Tsheet = {
 };
 
 // =================================================================
-export default function Edit() {
+export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
   const { contractId, electronicSuppliesId } = router.query as {
     contractId: string;
@@ -234,10 +234,14 @@ export default function Edit() {
       dispatchDate: dispatchDate ?? '',
     });
 
+    const isNew = !electronicSuppliesId;
+
+    const theFormCompleter = isNew ? userInfo.employee : formCompleter;
+
     setEmployeeList({
       materialHandler,
       ingredientTechnician,
-      formCompleter,
+      formCompleter: theFormCompleter,
     });
 
     const sheet: Tsheet = {};
@@ -643,13 +647,15 @@ export default function Edit() {
       },
     },
     formCompleter: {
+      // employee: employeeList.formCompleter,
       employee: employeeList.formCompleter,
-      onChange: (employee) => {
-        setEmployeeList((state) => ({
-          ...state,
-          formCompleter: employee,
-        }));
-      },
+      forbidden: true,
+      // onChange: (employee) => {
+      //   setEmployeeList((state) => ({
+      //     ...state,
+      //     formCompleter: employee,
+      //   }));
+      // },
     },
   };
 

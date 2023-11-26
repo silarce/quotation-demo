@@ -970,6 +970,7 @@ export type TquotationProductDto = {
   reduceQty?: number;
 };
 
+/**應收帳款明細 主產品請款比例 */
 export type TaccountsReceivableProductPaymentDto = {
   //  '期數'
   period: number;
@@ -1469,11 +1470,14 @@ export type TquotationContractDto = {
   /**工程聯絡單ID */
   engineeringContactId: string | null;
   /**工作表 */
-  worksheet: TworkSheetDto;
+  worksheet?: TworkSheetDto; // populate
   /**工作表ID */
   worksheetId: string | null;
   /**出庫單ID */
   engineeringDeliveryListId: string | null;
+  /**應收帳款明細 */
+  accountReceivable?: TaccountReceivableDto; // populate
+  accountReceivableId: string;
 };
 
 export type TcreateModifyQuotationDto = {
@@ -1539,6 +1543,7 @@ export type TquotationAccouting = {
   contactnumber: string;
   contactperson: string;
   customername: string;
+  percentage: number;
 };
 
 export type TquotationAccouting_years = {
@@ -1851,7 +1856,7 @@ export type TpaymentRatioDto = {
   // 金額
   price: string;
   // 備註
-  note: string;
+  note: string | null;
 };
 
 export type TquotationVerifyFormDto = {
@@ -2027,6 +2032,7 @@ export type TcreateEngineeringContactDto = {
   contractId?: string | null; // 合約ID
 };
 
+// 派工單
 export type TdispatchingDto = {
   id: string;
   createdAt: string;
@@ -2036,7 +2042,7 @@ export type TdispatchingDto = {
   // 工程名稱
   projectName: string;
   // 承包商;
-  contractor: string;
+  // contractor: string;
   // 承包商聯絡人;
   contractorContactPerson: string;
   // 工地電話;
@@ -2078,7 +2084,7 @@ export type TcreateDispatchingDto = {
   // 工程名稱;
   projectName: string;
   // 承包商;
-  contractor: string;
+  // contractor: string;
   // 承包商聯絡人;
   contractorContactPerson: string;
   // 工地電話;
@@ -2465,8 +2471,37 @@ export type TaccountReceivableDto = {
   paymentRatio: TpaymentRatioDto[];
   contract: TquotationContractDto;
   legacyContract: TlegacyContractDto;
-  accountReceivableDeduction: TaccountsReceivableDeductionDto | null;
+  accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
   accountant: TaccountantDto | null;
+};
+
+export type TcreateAccountReceivableDto = {
+  // 估價日期
+  valuationDate: string | null;
+  // 付清日期
+  payOffDay: string | null;
+  // 履約保證票
+  performanceBond: boolean;
+  // 訂金款保證票
+  depositGuaranteeTicket: boolean;
+  // 保固票
+  warrantyTicket: boolean;
+  // 異常燈號(工作表已開立，合約尚未簽回)
+  hasNoContract: boolean;
+  // 提醒燈號(已出具證明，尚未收足款項)
+  hasUncollectedAmounts: boolean;
+  // 已出貨，因故尚未安裝
+  hasNotInstall: boolean;
+  // 收款明細
+  accountantId: string[] | null;
+  // 扣款明細
+  accountReceivableDeduction: TcreateAccountReceivableDeductionDto[] | null;
+  // 發票紀錄
+  invoices: TcreateAccountReceivableInvoiceDto[] | null;
+  // 所屬合約Id;
+  contractId: string | null;
+  // 所屬合約Id;
+  legacyContractId: string | null;
 };
 
 export type TupdateAccountReceivableDto = Pick<
@@ -2495,6 +2530,8 @@ export type TaccountsReceivableInvoiceDto = {
   /** 所屬應收帳款ID */
   accountsReceivableId: string | null;
   accountsReceivable?: TaccountReceivableDto | null;
+
+  accountantList: TaccountantDto[];
 };
 
 export type TcreateAccountReceivableInvoiceDto = Pick<
@@ -2544,7 +2581,7 @@ export type TcreateAccountReceivableDeductionDto = Pick<
 >;
 
 export type TupdateAccountReceivableDeductionDto = Partial<TcreateAccountReceivableDeductionDto> & {
-  id?: string; // 不提供時將此筆視為新增資料
+  id: string; // 不提供時將此筆視為新增資料
 };
 
 export type TfinalProduct = {

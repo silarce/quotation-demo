@@ -24,6 +24,10 @@
     color: theme("colors.main");
     font-size: 18px;
   }
+  .right {
+    display: flex;
+    gap: 20px;
+  }
 }
 
 .table {

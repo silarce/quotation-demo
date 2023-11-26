@@ -479,6 +479,7 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       // 'content.products.items.components',
       'content.others',
       'content.verifyForm',
+      'accountReceivable',
 
       // 'rootContract.content.customer',
       // 'rootContract.content.agentEmployee',
@@ -735,8 +736,6 @@ export const useQuotationAccounting = (params: {
   area: 'northern' | 'central' | 'southern' | 'eastern' | undefined | 'all';
 }) => {
   const [res, setRes] = useState<TquotationAccouting[]>();
-
-  console.log(params.area);
 
   const update = async () => {
     if (!params.year || !params.month || !params.area) {
