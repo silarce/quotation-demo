@@ -1035,18 +1035,24 @@ export default function AccountReceivable() {
     price: number;
     note: string;
   }) => {
-    if (!accountReceivableId || !targetInvoice) {
+    if (!targetInvoice) {
       return;
     }
 
+    const accountants = targetInvoice.accountantList.map((item) => item.id);
+
     const body: TupdateAccountReceivableInvoiceDto = {
-      ...preBody,
-      accountants: [],
+      invoiceDate: preBody.invoiceDate,
+      invoiceNumber: preBody.invoiceNumber,
+      price: preBody.price,
+      note: preBody.note,
+      accountants,
     };
 
     try {
-      await apiPatchAccountReceivableInvoice(accountReceivableId, body);
+      await apiPatchAccountReceivableInvoice(targetInvoice.id, body);
       setTargetInvoice(undefined);
+      update_invoiceArr();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '編輯發票失敗', content: err.message });
