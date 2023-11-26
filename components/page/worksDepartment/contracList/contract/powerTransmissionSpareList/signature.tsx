@@ -18,14 +18,17 @@ type Tcontroll = {
   materialHandler: {
     employee: TemployeeDto | undefined;
     onChange: (v: TemployeeDto) => void;
+    forbidden?: boolean;
   };
   ingredientTechnician: {
     employee: TemployeeDto | undefined;
     onChange: (v: TemployeeDto) => void;
+    forbidden?: boolean;
   };
   formCompleter: {
     employee: TemployeeDto | undefined;
-    onChange: (v: TemployeeDto) => void;
+    onChange?: (v: TemployeeDto) => void;
+    forbidden?: boolean;
   };
 };
 
@@ -59,8 +62,13 @@ export default function Signature({
       {indexKeys.map((key, index) => {
         const { label, placeholder } = config[key];
         const value = (controll[key].employee?.chName || controll[key].employee?.enName) ?? '';
+        const forbidden = controll[key].forbidden;
 
         const onClick = () => {
+          if (disabled || forbidden) {
+            return;
+          }
+
           lookup[key](true);
         };
 
@@ -73,11 +81,12 @@ export default function Signature({
                 props: {
                   value,
                   placeholder,
+                  onChange: () => {},
                 },
               }}
-              disabled={disabled}
+              disabled={forbidden || disabled}
               showBaseline="auto"
-              showAddIcon={true}
+              showAddIcon={forbidden || disabled ? false : true}
             />
           </div>
         );
@@ -103,7 +112,7 @@ export default function Signature({
       <EmployeeSelector
         showModal={showFormCompleter}
         onConfirm={(arr) => {
-          controll.formCompleter.onChange(arr[0]);
+          controll.formCompleter.onChange?.(arr[0]);
         }}
         onCancel={() => setShowFormCompleter(false)}
         defaultEmpArr={controll.formCompleter.employee ? [controll.formCompleter.employee] : undefined}
