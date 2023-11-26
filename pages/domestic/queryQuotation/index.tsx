@@ -16,7 +16,7 @@ import QueryQuotationList, {
 } from 'components/page/domestic/queryQuotation/queryQuotationList';
 
 // api
-import { useGetQuotation, useGetQuotation_infinite } from 'js/api/api_quotation';
+import { Tparams, useGetQuotation, useGetQuotation_infinite } from 'js/api/api_quotation';
 
 // utils
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -30,7 +30,9 @@ export default function Budget() {
 
   // ----------------------------------------------------------------------
 
-  const params = {
+  const params: Tparams = {
+    sort: 'latestContent.quotationDate',
+    order: 'DESC',
     populate: [
       'contents.customer',
       // 'latestContent.customer',
