@@ -2031,6 +2031,7 @@ export type TcreateEngineeringContactDto = {
   contractId?: string | null; // 合約ID
 };
 
+// 派工單
 export type TdispatchingDto = {
   id: string;
   createdAt: string;
@@ -2040,7 +2041,7 @@ export type TdispatchingDto = {
   // 工程名稱
   projectName: string;
   // 承包商;
-  contractor: string;
+  // contractor: string;
   // 承包商聯絡人;
   contractorContactPerson: string;
   // 工地電話;
@@ -2082,7 +2083,7 @@ export type TcreateDispatchingDto = {
   // 工程名稱;
   projectName: string;
   // 承包商;
-  contractor: string;
+  // contractor: string;
   // 承包商聯絡人;
   contractorContactPerson: string;
   // 工地電話;

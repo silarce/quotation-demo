@@ -241,8 +241,8 @@ const config: Tconfig<
   contractor: {
     label: '承包商',
     labelWidth: '80px',
-    // showBaseline: 'auto',
-    disabled: true,
+    showBaseline: 'auto',
+    // disabled: true,
   },
   contractorContactPerson: {
     label: '聯絡人',
@@ -252,7 +252,8 @@ const config: Tconfig<
   constructionSiteContactNumber: {
     label: '工地電話',
     labelWidth: '80px',
-    disabled: true,
+    showBaseline: 'auto',
+    // disabled: true,
   },
   allAddress: {
     label: '工程地點',

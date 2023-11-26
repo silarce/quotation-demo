@@ -186,20 +186,22 @@ export default function EditDispatchList() {
       return;
     }
 
-    const {
-      projectName,
-      // contactPerson,
-      projectNumber,
-      contractor,
-      constructionSitePrincipalContactNumber,
-      // quotationNumber,
+    // const {
+    //   projectName,
+    //   // contactPerson,
+    //   projectNumber,
+    //   contractor,
+    //   constructionSitePrincipalContactNumber,
+    //   // quotationNumber,
 
-      county,
-      district,
-      address,
-    } = engineeringContact;
+    //   county,
+    //   district,
+    //   address,
+    // } = engineeringContact;
 
-    const allAddress = `${county ?? ''}${district ?? ''}${address ?? ''}`;
+    const allAddress = `${engineeringContact.county ?? ''}${engineeringContact.district ?? ''}${
+      engineeringContact.address ?? ''
+    }`;
 
     const {
       contractorContactPerson,
@@ -212,18 +214,20 @@ export default function EditDispatchList() {
       tasks,
       note,
       pricingMethod,
+      constructionSiteContactNumber,
       // constructionSiteContactNumber: projectNumber,
     } = dispatching ?? {};
 
     setProfile01({
-      projectName: projectName ?? '',
-      contractor: contractor ?? '',
+      projectName: engineeringContact.projectName ?? '',
+      // contractor: contractor ?? '',
+      contractor: engineeringContact.contractor ?? '',
       // 這是承包商的聯絡人
       contractorContactPerson: contractorContactPerson ?? '',
-      constructionSiteContactNumber: constructionSitePrincipalContactNumber ?? '',
+      constructionSiteContactNumber: constructionSiteContactNumber ?? '',
       allAddress,
       //
-      projectNumber: projectNumber ?? '',
+      projectNumber: engineeringContact.projectNumber ?? '',
       badgeNumber: badgeNumber ?? '',
     });
     setProfile02({
@@ -258,7 +262,7 @@ export default function EditDispatchList() {
     }
 
     if (!profile03?.workerEmployee?.id) {
-      return myAlert.info({ title: '請選擇公務人員' });
+      return myAlert.info({ title: '請選擇工務人員' });
     }
 
     const body: TcreateDispatchingDto = {
