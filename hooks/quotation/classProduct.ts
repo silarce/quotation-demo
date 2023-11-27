@@ -1327,12 +1327,17 @@ class Class_product {
     const unitPrice = new Decimal(this.comAllPrice.totalPrice || 0).add(this.AcceAllPrice.totalPrice || 0);
 
     const dualPrice = price.mul(quantity || 0).toNumber();
-    const totalPrice = unitPrice.mul(quantity || 0).toNumber();
 
     this.price = price.toFixed(0).toString();
     this.dualPrice = dualPrice.toFixed(0).toString();
-    this.unitPrice = unitPrice.toFixed(0).toString();
+
+    // 複價===四捨五入後的單價*數量
+    const fiexedUnitPrice = unitPrice.toFixed(0);
+    this.unitPrice = fiexedUnitPrice;
+    // const totalPrice = unitPrice.mul(quantity || 0).toNumber();
+    const totalPrice = new Decimal(fiexedUnitPrice).mul(quantity || 0).toNumber();
     this.totalPrice = totalPrice.toFixed(0).toString();
+
     this.callCalcSubTotal();
     this.reRender();
   }

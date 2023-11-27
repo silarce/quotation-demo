@@ -125,11 +125,15 @@ class Class_component {
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
     const unitPrice = new Decimal(price).mul(discount);
-    // 複價
-    const totalPrice = new Decimal(unitPrice).mul(quantity);
+    const fixedUnitPrice = unitPrice.toFixed(0);
+    // 複價 計算方式為四捨五入後的單價乘以數量
 
     this._dualPrice = Number(dualPrice.toFixed(0));
-    this._unitPrice = Number(unitPrice.toFixed(0));
+    this._unitPrice = Number(fixedUnitPrice);
+
+    // const totalPrice = new Decimal(unitPrice).mul(quantity);
+    const totalPrice = new Decimal(fixedUnitPrice).mul(quantity);
+
     this._totalPrice = Number(totalPrice.toFixed(0));
 
     if (calcProdTotal) {
