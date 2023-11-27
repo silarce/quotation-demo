@@ -217,10 +217,9 @@ const filter_motorAccessories = ({
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    // if (data.chains !== filterParams.chains) {
-    //   isPass = false;
-    // } else
-    if (data.bearingType !== filterParams.bearingType) {
+    if (data.chains !== filterParams.chains) {
+      return false;
+    } else if (data.bearingType !== filterParams.bearingType) {
       return false;
     } else if (data.gearNumber !== null && data.gearNumber !== filterParams.gearNumber) {
       return false;
