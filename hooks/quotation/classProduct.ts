@@ -1520,7 +1520,7 @@ class Class_product {
     }
 
     if (Object.keys(motorVendorList).length > 0) {
-      this.options_motor = Object.values(motorVendorList);
+      this.options_motor = Object.values(motorVendorList).reverse();
     } else {
       this.options_motor = undefined;
     }
