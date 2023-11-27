@@ -1072,7 +1072,6 @@ class Class_product {
       dataArr: availableComponents.motors,
       filterParams: {
         horsePower: this.horsepower,
-        // gearNumber: this., // DuST說先略過
         gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined', // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
         motorVendor: this.motor,
         phase: Number(this.phase),
@@ -1082,11 +1081,28 @@ class Class_product {
       },
     });
 
+    if (!motor) {
+      // ! 現在馬達欄位隱藏，不會給使用者操作，所以可以直接在這邊自動變更
+      // ! 以後若讓使用者操作馬達，就不能這樣直接變更
+      this._prodData.motor = this.options_motor?.[1].value ?? '';
+      motor = filter_motors({
+        dataArr: availableComponents.motors,
+        filterParams: {
+          horsePower: this.horsepower,
+          gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined', // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
+          motorVendor: this.motor,
+          phase: Number(this.phase),
+          voltage: Number(this.voltage),
+          weight: this.weight,
+          hasSupportStand: this.motorSupport,
+        },
+      });
+    }
+
     let sidePlate: Tcomponent | null = filter_sidePlates({
       dataArr: availableComponents.sidePlates,
       filterParams: {
         bearingType: this._doorGeneralSpecs?.bearingName ?? 'undefined', // 從doorGeneralSpecs取得
-        // gearNumber: motor?.gearNumber ?? '', // 從上面的motor取得
         gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined',
         isIntegrated: this.onePieceRollUpBox,
         motorVendor: this.motor,
@@ -1520,6 +1536,9 @@ class Class_product {
     }
 
     if (Object.keys(motorVendorList).length > 0) {
+      // console.log(motorVendorList);
+      // // 只留東元
+      // // delete motorVendorList.大同;
       this.options_motor = Object.values(motorVendorList).reverse();
     } else {
       this.options_motor = undefined;
