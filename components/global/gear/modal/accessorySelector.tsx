@@ -258,6 +258,8 @@ const RowArr = ({
 
         const theOnClick = isExcept ? undefined : () => onClick(acce);
 
+        const price_str = price !== null ? price.toLocaleString() : '';
+
         return (
           <CellWithBar key={index} isActive={isActive}>
             <div
@@ -267,8 +269,7 @@ const RowArr = ({
             >
               <span className={scss.idNumber}>{doorModelName}</span>
               <span>{name}</span>
-              {/* <span>{cost}</span> */}
-              <span>{price}</span>
+              <span>{price_str}</span>
             </div>
           </CellWithBar>
         );

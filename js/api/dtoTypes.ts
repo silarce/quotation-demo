@@ -2530,6 +2530,8 @@ export type TaccountsReceivableInvoiceDto = {
   invoiceNumber: string;
   price: number;
   note: string | null;
+  invoiceStatus: '已開立' | '已作廢';
+
   /** 所屬應收帳款ID */
   accountsReceivableId: string | null;
   accountsReceivable?: TaccountReceivableDto | null;
@@ -2560,6 +2562,7 @@ export type TaccountantDto = {
   notes: string | null; // 備註
   billSerialNumber: string | null; // 收入傳票序號
   noteMaturityDate: string | null; // 票據到期日
+  invoice: TaccountsReceivableInvoiceDto[] | null;
 };
 
 export type TcreateAccountantDto = Omit<TaccountantDto, 'id' | 'createdAt' | 'updatedAt' | 'noteMaturityDate'> & {

@@ -42,7 +42,7 @@ import {
   useGetEngineeringContact,
   apiPatchEngineeringContact,
   apiPostWorkSheet,
-  useGetFinalProduct,
+  // useGetFinalProduct,
   useGetAccountReceivable_id,
   apiPatchAccountReceivable,
   useGetAccountReceivableAccountants,
@@ -157,15 +157,15 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
-  const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
+  // const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
 
   // const {} = useGetAccountReceivable_id();
 
-  useEffect(() => {
-    (async () => {
-      const res = await update_finalProduct();
-    })();
-  }, [contractId]);
+  // useEffect(() => {
+  //   (async () => {
+  //     const res = await update_finalProduct();
+  //   })();
+  // }, [contractId]);
 
   // --------------------------------------------------------------------------
 
@@ -674,78 +674,89 @@ export default function AccountReceivable() {
       priceTotal = priceTotal + item.price;
 
       //
+
+      const subRowArr: Trow[] = (item.invoice ?? []).map((item) => {
+        return {
+          //
+          panelCell_07: {
+            onBreakChainClick: () => {},
+          },
+          list: {
+            date: {
+              label: '日期',
+              cellStyle: { width: '120px' },
+              datePickerProps: {
+                props: {
+                  value: item.invoiceDate ? moment(item.invoiceDate) : null,
+                  onChange: () => {},
+                },
+              },
+            },
+            invoiceNumber: {
+              label: '發票號碼',
+              cellStyle: { width: '300px' },
+              inputProps: {
+                props: {
+                  value: item.invoiceNumber ?? '',
+                  // onChange: (e) => {},
+                },
+              },
+              // twoInputProps: {
+              //   one: {
+              //     props: {
+              //       value: undefined,
+              //       onChange: () => {},
+              //     },
+              //   },
+              //   two: {
+              //     props: {
+              //       value: undefined,
+              //       onChange: () => {},
+              //     },
+              //   },
+              // },
+            },
+            price: {
+              label: '金額',
+              cellStyle: { width: '290px' },
+              inputProps: {
+                props: {
+                  type: 'number',
+                  value: String(item.price) ?? '',
+                  onChange: () => {},
+                },
+              },
+            },
+            remark: {
+              label: '備註',
+              cellStyle: { width: '300px' },
+              inputProps: {
+                props: {
+                  value: item.note ?? '',
+                  onChange: () => {},
+                },
+              },
+            },
+            period: {
+              label: '對應期數',
+              cellStyle: { width: '75px' },
+              inputProps: {
+                props: {
+                  value: 'no property',
+                },
+              },
+            },
+          },
+          //
+        }; // return
+      });
+
       const subTable: Tcontrol_dynaTable['rowArr'][number]['subTable'] = {
         subHeadRow: {
           panelCell_05: {},
           list: createHeadRowList_發票給予紀錄(),
         },
-        subRowArr: [
-          {
-            panelCell_05: {
-              onChainClick: () => {},
-              onRemoveClick: () => {},
-            },
-            list: {
-              date: {
-                label: '日期',
-                cellStyle: { width: '120px' },
-                datePickerProps: {
-                  props: {
-                    value: undefined,
-                    onChange: () => {},
-                  },
-                },
-              },
-              invoiceNumber: {
-                label: '發票號碼',
-                cellStyle: { width: '300px' },
-                twoInputProps: {
-                  one: {
-                    props: {
-                      value: undefined,
-                      onChange: () => {},
-                    },
-                  },
-                  two: {
-                    props: {
-                      value: undefined,
-                      onChange: () => {},
-                    },
-                  },
-                },
-              },
-              price: {
-                label: '金額',
-                cellStyle: { width: '290px' },
-                inputProps: {
-                  props: {
-                    value: undefined,
-                    onChange: () => {},
-                  },
-                },
-              },
-              remark: {
-                label: '備註',
-                cellStyle: { width: '300px' },
-                inputProps: {
-                  props: {
-                    value: undefined,
-                    onChange: () => {},
-                  },
-                },
-              },
-              period: {
-                label: '對應期數',
-                cellStyle: { width: '75px' },
-                inputProps: {
-                  props: {
-                    value: 'no property',
-                  },
-                },
-              },
-            },
-          },
-        ],
+        subRowArr,
       };
       //
 
