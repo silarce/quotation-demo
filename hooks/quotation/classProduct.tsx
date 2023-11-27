@@ -511,7 +511,12 @@ class Class_product {
         totalPrice: this._prodData.installationFeeTotalPrice,
         quantity: this._prodData.installationFeeQuantity,
         comName: '按裝及製造費用',
-        unit: 'M',
+        // unit: 'M',
+        unit: (
+          <span>
+            m<sup>2</sup>
+          </span>
+        ),
         desc: '(含送電及試車)',
       },
       prod: this,

@@ -1112,7 +1112,32 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }) ?? [];
 
     if (!data_watch.agentEmployee?.id) {
+      setIsLoading(false);
+
       return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
+    }
+
+    const emptyBomList: { [key: string]: boolean } = {};
+    prodArr.forEach((prod, pIndex) => {
+      const componentArr = prod.components;
+      componentArr.forEach((com) => {
+        const bom = com.bom;
+        console.log(bom);
+
+        if (!bom) {
+          emptyBomList[pIndex + 1] = true;
+        }
+      });
+    });
+    const emptyBomKeyArr = Object.keys(emptyBomList);
+
+    if (emptyBomKeyArr.length > 0) {
+      const str = emptyBomKeyArr.join('、');
+
+      myAlert.warning({ title: '上傳失敗', content: `請檢查第${str}項規格是否正確` });
+      setIsLoading(false);
+
+      return;
     }
 
     const body: TcreateQuotationContentDto = {
