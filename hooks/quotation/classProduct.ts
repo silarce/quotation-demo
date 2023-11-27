@@ -1,5 +1,6 @@
 /**
- *
+ *prodCellConfig
+
  * callRetrieveCreProdCom
  * retrieveOptions 下拉式選單產生器
  * Class_product
@@ -61,7 +62,9 @@ import {
 import { apiGetQuotationProducts } from 'js/api/api_quotation';
 
 // =============================================================================
-import { prodCellConfig } from './prodCellConfig';
+
+import { prodCellConfig, getInstallationFee } from './prodCellConfig';
+
 import { lookup_boxBAndBoxD } from 'config/product/lookup';
 
 // utils
@@ -1619,7 +1622,25 @@ class Class_product {
     }
   }
 
-  // ---------------------------------------------------------
+  toGetInstallationFee() {
+    const m2 = Number(this.area);
+    const doorType = this.doorType;
+
+    const installationFee_class = this.subComList.installationFee;
+
+    const fee = getInstallationFee({
+      doorModel: doorType,
+      m2,
+    });
+
+    installationFee_class.price_locale = String(fee);
+  }
+
+  // -----------------------------------------------------------------
+  // -----------------------------------------------------------------
+  // -----------------------------------------------------------------
+  // -----------------------------------------------------------------
+  // -----------------------------------------------------------------
   // 下拉式選單的選項
 
   // !!! options_xxx 後綴很重要 !!!
@@ -1855,6 +1876,8 @@ class Class_product {
       this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
     }
 
+    this.toGetInstallationFee();
+
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
@@ -2034,6 +2057,7 @@ class Class_product {
     }
 
     this.volume = this.calcVolume();
+    this.toGetInstallationFee();
     this.reRender();
   }
   //
