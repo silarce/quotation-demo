@@ -1122,7 +1122,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       const componentArr = prod.components;
       componentArr.forEach((com) => {
         const bom = com.bom;
-        console.log(bom);
 
         if (!bom) {
           emptyBomList[pIndex + 1] = true;
