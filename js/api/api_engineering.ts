@@ -45,6 +45,7 @@ import type {
   TupdateAccountReceivableDeductionDto,
   TfinalProduct,
   TcreateAccountReceivableDto,
+  TaccountsReceivableProductPaymentDto,
 } from './dtoTypes';
 
 export type {
@@ -81,6 +82,7 @@ export type {
   TupdateAccountReceivableDeductionDto,
   TfinalProduct,
   TcreateAccountReceivableDto,
+  TaccountsReceivableProductPaymentDto,
 } from './dtoTypes';
 
 // ========================================================================
@@ -1193,6 +1195,58 @@ export const useGetFinalProduct = (contractId: string | undefined) => {
 
   return {
     data: res,
+    update,
+  };
+};
+
+/**取得 所有 應收帳款 主產品請款比例 account-receivable-product-payment */
+
+type TgetAccountReceivableProductPayments = {
+  data: TaccountsReceivableProductPaymentDto[];
+  meta: TpageMetaDto;
+};
+
+// /engineering/account-receivable/{id}/product-payments
+const apiGetAccountReceivableProductPayments = async (accountReceivableId: string, params?: Tparams) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
+
+  return axi
+    .get<TgetAccountReceivableProductPayments>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountReceivableProductPayments = (
+  accountReceivableId: string | undefined,
+  customParams?: Tparams
+) => {
+  const [res, setRes] = useState<TgetAccountReceivableProductPayments>();
+
+  const params: Tparams = {
+    // populate: [],
+    pageSize: 9999,
+    sort: 'period',
+    order: 'ASC',
+    ...customParams,
+  };
+
+  const update = async () => {
+    if (!accountReceivableId) {
+      return;
+    }
+
+    const newRes = await apiGetAccountReceivableProductPayments(accountReceivableId, params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
     update,
   };
 };
