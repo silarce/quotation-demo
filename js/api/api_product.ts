@@ -43,6 +43,7 @@ export type {
   TdoorBomDto_Component,
   TdoorProductBomDto,
   TdoorAccessoryDto,
+  TgetBoxDParams,
 };
 // =======================================================================
 
@@ -191,11 +192,11 @@ type TgetBoxDParams = {
   motorVendor: string;
 };
 
-export const apiGetboxD = (param: TgetBoxDParams) => {
+export const apiGetboxD = (params: TgetBoxDParams) => {
   const api = '/products/door/calc-side-plate-size-d';
 
   return axi
-    .get<{ sidePlateSizeD: number }>(api)
+    .get<{ sidePlateSizeD: number }>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
