@@ -6,6 +6,7 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi, domain } from './_axiosCreator';
+import { createUseInfinite } from './createUseInfinite';
 
 // type
 import type {
@@ -54,6 +55,7 @@ export const apiGetQuotation = async (params?: Tparams) => {
 
   params = {
     populate: [
+      // 'contents.customer',
       'contents',
       'latestContent.customer',
       'latestContent.agentEmployee',
@@ -65,6 +67,7 @@ export const apiGetQuotation = async (params?: Tparams) => {
       'latestContent.products.quantity',
       'latestContent.products.options',
       'attachedToContract',
+      'attachedToContractId',
     ],
     ...params,
   };
@@ -95,12 +98,19 @@ export const useGetQuotation = (customParams?: Tparams) => {
   };
 };
 
+export const useGetQuotation_infinite = createUseInfinite<TgetQuotation>({
+  //
+  apiClient: apiGetQuotation,
+  errTitle: '取得報價單失敗',
+});
+
 export const apiGetQuotation_Id = async (id: string) => {
   const api = `/quotation/${id}`;
 
   const params = {
     populate: [
-      'contents',
+      // 'contents',
+      'contents.customer',
       'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.supervisorEmployee',
@@ -138,6 +148,57 @@ export const useGetQuotation_id = (id: string | undefined) => {
     }
 
     const newRes = await apiGetQuotation_Id(id);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
+const apiGetQuotationContent_Id = async (id: string) => {
+  const api = `/quotation/content/${id}`;
+
+  const params = {
+    populate: [
+      'customer',
+      'agentEmployee',
+      'supervisorEmployee',
+      'managerEmployee',
+      'reviewSalesEmployee',
+      'reviewWorkDirectorEmployee',
+      'reviewSupervisorEmployee',
+      'reviewManagerEmployee',
+
+      'products.items.accessories',
+      'products.items.components',
+      'products.items.rootProdductId',
+      'others',
+      'verifyForm',
+    ],
+  };
+
+  return axi
+    .get<TquotationContentDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetQuotationContent_id = (id: string | undefined) => {
+  const [res, setRes] = useState<TquotationContentDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    const newRes = await apiGetQuotationContent_Id(id);
 
     if (newRes) {
       setRes(newRes);
@@ -417,6 +478,8 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       // 'content.products.items.accessories',
       // 'content.products.items.components',
       'content.others',
+      'content.verifyForm',
+      'accountReceivable',
 
       // 'rootContract.content.customer',
       // 'rootContract.content.agentEmployee',
@@ -433,6 +496,7 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       // 'attachedContract',
       'subContracts.content.products.rootProdductId',
       'subContracts.content.customer',
+      'subContracts.content.verifyForm',
 
       'products',
     ],
@@ -672,8 +736,6 @@ export const useQuotationAccounting = (params: {
   area: 'northern' | 'central' | 'southern' | 'eastern' | undefined | 'all';
 }) => {
   const [res, setRes] = useState<TquotationAccouting[]>();
-
-  console.log(params.area);
 
   const update = async () => {
     if (!params.year || !params.month || !params.area) {

@@ -10,8 +10,9 @@ $cellgap: 16px;
   overflow: auto;
   .thead {
     position: sticky;
-    z-index: 1;
+    z-index: 2;
     top: 0;
+    display: flex;
     width: fit-content;
     white-space: nowrap;
     background-color: $bgc01;
@@ -19,23 +20,26 @@ $cellgap: 16px;
     padding-left: 22px;
     padding-right: 33px;
     border-top: solid 4px white;
+
     .theadItem {
       display: inline-flex;
       padding: 2px 3px;
       margin-left: $cellgap;
       border: solid 1px transparent;
       cursor: default;
+
       &:nth-of-type(1) {
+        // display: inline-flex;
+        display: inline-block;
         position: sticky;
+        z-index: 1;
         left: -5px;
         background-color: $bgc01;
         > span:nth-of-type(1) {
+          display: inline-block;
           width: 30px;
         }
       }
-      // &:nth-of-type(2) {
-      //   margin-left: 10px;
-      // }
       &.textCenter {
         > * {
           margin: auto;
@@ -50,13 +54,15 @@ $cellgap: 16px;
 
   .tableList {
     max-height: 410px;
+    // max-height: 810px;
     width: fit-content;
     .row {
+      // border: solid 1px black;
       position: relative;
-      display: inline-flex;
+      display: flex;
+      align-items: flex-start;
       width: fit-content;
       white-space: nowrap;
-      align-items: center;
       padding: 11px;
       padding-left: 22px;
       padding-right: 33px;
@@ -86,6 +92,7 @@ $cellgap: 16px;
       margin-left: $cellgap;
       display: inline-flex;
       align-items: center;
+
       &:nth-of-type(1) {
         // min-height: 28px;
         position: sticky;
@@ -94,53 +101,52 @@ $cellgap: 16px;
         background-color: white;
         > span:nth-of-type(1) {
           width: 30px;
-          &.hidden {
-            visibility: hidden;
-          }
         }
       }
 
-      // &:nth-of-type(1) {
-      //   position: sticky;
-      //   left: 0;
-      //   background-color: white;
-      //   z-index: 1;
-      // }
-      // &:nth-of-type(2) {
-      //   position: sticky;
-      //   left: 28px;
-      //   min-height: 28px;
-      //   margin-left: 10px;
-      //   background-color: pink;
-      //   z-index: 1;
-      // }
       &.textCenter {
         > span {
           margin: auto;
         }
       }
-      // > img {
-      //   display: inline-block;
-      //   margin-right: 6px;
-      // }
+
       > span {
         display: inline-block;
         font-size: 16px;
         word-break: break-all;
         white-space: pre-wrap;
       }
+      input {
+        font-size: 16px;
+      }
       .input03 {
         padding: 0;
-        &.hidden {
-          visibility: hidden;
-        }
+
         .datepicker {
           input {
             color: theme("colors.text");
           }
         }
       }
-    }
+
+      &.subGroup {
+        display: grid;
+        gap: 20px;
+
+        > div {
+          height: 27px;
+        }
+        .btnPanel {
+          display: flex;
+          align-items: center;
+          gap: 22px;
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    } // column
   }
 
   .indexCell {
@@ -155,22 +161,25 @@ $cellgap: 16px;
 
   .pilar {
     position: relative;
-    // display: inline-flex;
-    display: inline-block;
+    display: block;
+    align-self: stretch;
     padding: 2px 0px;
     margin-left: 10px;
     margin-right: 6px;
+    width: 1px;
+    background-color: theme("colors.border");
+  }
+}
 
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform: translate(-50%, -50%);
-      width: 1px;
-      // height: 31px;
-      height: 31px;
-      background-color: $colorBorder01;
-    }
+.hidden {
+  visibility: hidden;
+}
+
+.svgActive {
+  path:nth-of-type(1) {
+    fill: red;
+  }
+  path:nth-of-type(2) {
+    stroke: red;
   }
 }

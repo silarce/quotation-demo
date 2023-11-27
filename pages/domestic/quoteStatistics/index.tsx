@@ -75,26 +75,26 @@ export default function QuoteStatistics() {
     const arr: Tdata[] = data.map((item) => {
       listPriceTotal += Number(item.pricesum || 0);
       bearPriceTotal += Number(item.totalsum || 0);
-      percent = percent.add(999);
+      percent = percent.add(item.percentage ?? 0);
 
       return {
         idNumber: item.quotation_number,
-        designDepartment: '設計單位',
+        designDepartment: '',
         constructionName: item.project_name,
         customer: [
           {
             customerName: item.customername,
             contactPerson: item.contactperson,
             contactPhone: item.contactnumber,
-            listPrice: item.pricesum,
-            bearPrice: item.totalsum,
-            percent: '999%',
+            listPrice: Number(item.pricesum).toLocaleString(),
+            bearPrice: Number(item.totalsum).toLocaleString(),
+            percent: `${item.percentage ?? ''}%`,
           },
         ],
       };
     });
 
-    const percent_locale = percent.div(arr.length).toNumber().toLocaleString();
+    const percent_locale = percent.div(arr.length).toFixed(1) + '%';
 
     return {
       formatedDataArr: arr,

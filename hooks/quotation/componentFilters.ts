@@ -58,20 +58,24 @@ const filter_guideRails = ({
 }: {
   dataArr: TdoorComponentListDto['guideRails'];
   filterParams: {
-    // thickness: string; // 不用過濾
+    thickness: string; // 不用過濾
     isAntiTyphoon: boolean;
     /**消音條 */
     hasSilencingStrip: boolean; // 消音條
+    imageName: string;
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    // if (data.thickness && data.thickness !== filterParams.thickness) {
-    // isPass = false;
-    // } else
-    if (data.isAntiTyphoon !== filterParams.isAntiTyphoon) {
+    if (Number(data.thickness) !== Number(filterParams.thickness)) {
+      return false;
+    } else if (data.isAntiTyphoon !== filterParams.isAntiTyphoon) {
+      return false;
+    } else if (data.imageName !== null && data.imageName !== filterParams.imageName) {
       return false;
     } else if (data.hasSilencingStrip !== filterParams.hasSilencingStrip) {
-      return false;
+      if (Number(data.thickness) !== 4.5) {
+        return false;
+      }
     }
 
     return true;
@@ -87,11 +91,12 @@ const filter_sidePlates = ({
   dataArr: TdoorComponentListDto['sidePlates'];
   filterParams: {
     bearingType: string; // 軸承
-    gearNumber: string; // 鍊齒輪番號
+    gearNumber: string | undefined; // 鍊齒輪番號
     /**一體式捲箱 */
     isIntegrated: boolean; // 一體式捲箱
     motorVendor: string; // 馬達廠商
     weight: number; // /products/door/calc-general-spec給的weight
+    sizeB: number;
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
@@ -103,6 +108,8 @@ const filter_sidePlates = ({
       return false;
     } else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
       return false;
+    } else if (data.sizeB !== null && data.sizeB !== filterParams.sizeB) {
+      return false;
     } else if (data.maxDoorWeight !== null && data.maxDoorWeight < filterParams.weight) {
       return false;
     } else if (data.minDoorWeight !== null && data.minDoorWeight >= filterParams.weight) {
@@ -111,6 +118,10 @@ const filter_sidePlates = ({
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('sidePlates', filterParams);
+  }
 
   return filteredArr[0] || null;
 };
@@ -143,6 +154,7 @@ const filter_motors = ({
   filterParams: {
     horsePower: string; // 馬力數
     // gearNumber: string; // 鍊齒輪番號 // DuST說先略過
+    gearNumber: string; // 鍊齒輪番號 // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
     motorVendor: string; // 馬達廠商
     phase: number; // 相數
     /**電壓(V) */
@@ -166,11 +178,9 @@ const filter_motors = ({
 
     if (d_horsePower !== horsePoswer) {
       return false;
-    }
-    // else if (data.gearNumber !== filterParams.gearNumber) {
-    //   isPass = false;
-    // }
-    else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
+    } else if (data.gearNumber !== filterParams.gearNumber) {
+      return false;
+    } else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
       return false;
     } else if (data.phase !== null && data.phase !== filterParams.phase) {
       return false;
@@ -178,12 +188,17 @@ const filter_motors = ({
       return false;
     } else if (data.loadWeight !== null && data.loadWeight < filterParams.weight) {
       return false;
-    } else if (data.hasSupportStand !== null && data.hasSupportStand !== filterParams.hasSupportStand) {
-      return false;
     }
+    // else if (data.hasSupportStand !== null && data.hasSupportStand !== filterParams.hasSupportStand) {
+    //   return false;
+    // }
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('motors', filterParams);
+  }
 
   return filteredArr[0] || null;
 };
@@ -198,18 +213,24 @@ const filter_motorAccessories = ({
     chains: number; // 鍊條排數
     /**軸承 */
     bearingType: string; // 軸承
+    gearNumber: string;
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
-    // if (data.chains !== filterParams.chains) {
-    //   isPass = false;
-    // } else
-    if (data.bearingType !== filterParams.bearingType) {
+    if (data.chains !== filterParams.chains) {
+      return false;
+    } else if (data.bearingType !== filterParams.bearingType) {
+      return false;
+    } else if (data.gearNumber !== null && data.gearNumber !== filterParams.gearNumber) {
       return false;
     }
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('motorAccessories', filterParams);
+  }
 
   return filteredArr[0] || null;
 };

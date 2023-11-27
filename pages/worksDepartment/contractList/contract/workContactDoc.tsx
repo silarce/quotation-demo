@@ -365,6 +365,7 @@ export default function WorkContactDoc() {
         address: {
           props: {
             disabled,
+            value: profile?.address ?? '',
             onChange: (e) => {
               profileChange('address', e.target.value);
             },
@@ -512,6 +513,17 @@ export default function WorkContactDoc() {
   const panelList = disabled ? panelList_01 : panelList_02;
 
   // ----------------------------------------------------------------------------
+
+  // 把金額隱藏
+  const filteredProdKeyArr = prodKeyArr.filter((key) => {
+    if (key === 'price' || key === 'dualPrice' || key === 'unitPrice' || key === 'totalPrice') {
+      return false;
+    }
+
+    return true;
+  });
+
+  // ----------------------------------------------------------------------------
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
@@ -524,10 +536,13 @@ export default function WorkContactDoc() {
             disabled={true}
             prodList={productList}
             prodCellConfig={prodCellConfig}
-            prodKeyArr={prodKeyArr}
+            prodKeyArr={filteredProdKeyArr}
             changeProdKeyArr={changeProdKeyArr}
             addProd={() => {}}
             setTargetProd={() => {}}
+            panelBox="easyBox"
+            emptyBlockWidth="80px"
+            rowHeight="h106"
           />
           {/* <Remark /> */}
           <div className={scss.textListContainer}>

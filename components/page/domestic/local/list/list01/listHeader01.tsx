@@ -14,6 +14,7 @@ type Tcontract = {
   contactPerson: string;
   contactPhone: string;
   attn: string;
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
 };
 
 export type { Tcontract };
@@ -38,6 +39,7 @@ export default function ListHeader01({
     contactPerson,
     contactPhone,
     attn: Attn,
+    viewRef_bottom,
   } = contract;
 
   const parsedPriceTotal = priceTotal.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -45,7 +47,7 @@ export default function ListHeader01({
   const active = isActive ? style.active : '';
 
   return (
-    <div className={`${className} ${style.container} ${active}`}>
+    <div className={`${className} ${style.container} ${active}`} ref={viewRef_bottom}>
       <span>{quotationId}</span>
       <div className={style.name}>
         <span>{clientName}</span>

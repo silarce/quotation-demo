@@ -924,8 +924,6 @@ export type TquotationProductDto = {
   }[];
 
   quantity: number;
-  // 門片厚度
-  thickness: string;
   // 配電箱牌價;
   distributionBoxPrice: number;
   // 配電箱單價;
@@ -946,31 +944,100 @@ export type TquotationProductDto = {
 
   rootProductId: string;
 
+  guideRailsOpening?: string | null; //底座 - 開口
+  slatCount: string | null; //門片 - 捲片支數
+
+  bearingHousingSize?: number | null; //軸承座寸法
+  bearingHousingTotalLength?: string | null; //捲軸 - 總長
+  bearingInnerDiameter?: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
+  bearingName?: string | null; //軸承
+  diameter?: string | null; //捲軸 - 尺寸
+  gapA?: string | null; //
+  gapC?: string | null; //
+  gearNumber?: string | null; //
+  sprocketWheelModel?: string | null; //鏈齒輪 - 鏈齒輪番號
+  sprocketWheelTeethNumber?: string | null; //鏈齒輪 - 大鏈輪
+  sprocketWheelChains?: string | null; //
+  weight?: string | null; //
+  slatLength?: number | null; //門片長度
+  guideRailLength?: number | null; //門軌長度
+  headBoxLength?: number | null; //捲箱長度
+  thickness: string; // 門片厚度
+
+  //
   // 前端用的，後端沒有
   // 只是為了方便才寫在這邊
   reduceQty?: number;
+};
+
+/**應收帳款明細 主產品請款比例 */
+export type TaccountsReceivableProductPaymentDto = {
+  //  '期數'
+  period: number;
+  //  '請款比例(完成數量)'
+  paymentRatio: string | null;
+  //  '發票id'
+  invoiceId: string | null;
+  //  '發票' 要用的時候在跟Gina要型別吧
+  // invoice: AccountsReceivableInvoiceDto;
+  //  '關聯產品itemId'
+  productItemId: string | null;
+  //  '關聯產品itemId'
+  productItem: TquotationProductItemDto;
+  //  '完成項目'
+  // completeItemStatus: EngineeringDeliveryStatusDto[];
+  completeItemStatus: TdeliveryStatusDto[];
 };
 
 export type TdeliveryStatusDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  // @ApiProperty({ description: '所屬產品' })
+  productItemId: string;
+  //  '所屬產品'
   productItem?: TquotationProductItemDto;
-  // @ApiProperty({ description: '備註' })
+  //  '備註'
   notes: string | null;
-  // @ApiProperty({ description: '安裝人員Id' })
+  itemName: string | null;
+  shippingDate: string | null;
+  //  '安裝人員Id'
   installerEmployeeId: string | null;
-  // @ApiProperty({ description: '安裝人員' })
+  //  '安裝人員'
   installerEmployee?: TemployeeDto | null;
-  // @ApiProperty({ description: '安裝日期' })
+  //  '安裝日期'
   installationDate: string | null;
-  // @ApiProperty({ description: '工作表開立日期' })
+  //  '工作表開立日期'
   workSheetInvoiceDate: string | null;
-  // @ApiProperty({ description: '追加' })
+  //  '追加'
   append: string | null;
-  // @ApiProperty({ description: '完成追加' })
+  //  '完成追加'
   completeAppend: string | null;
+  //
+  completePayment: boolean | null;
+  productPaymentId: boolean | null;
+  productPayment: TaccountsReceivableProductPaymentDto;
+};
+
+export type TcreateEngineeringDeliveryStatusDto = {
+  notes: string | null;
+  itemName: string | null;
+  shippingDate: string | null;
+  installerEmployeeId: string | null;
+  installationDate: string | null;
+  append: string | null;
+  completeAppend: string | null;
+  productItemId: string;
+};
+
+export type TupdateEngineeringDeliveryStatusDto = {
+  notes: string | null;
+  itemName: string | null;
+  shippingDate: string | null;
+  installerEmployeeId: string | null;
+  installationDate: string | null;
+  append: string | null;
+  completeAppend: string | null;
+  productItemId: string;
 };
 
 export type TupdateDeliveryStatus = {
@@ -1006,7 +1073,7 @@ export type TquotationProductItemDto = Omit<
   itemNumber: string;
   worksheetId: string;
   others: null;
-  deliveryStatus?: TdeliveryStatusDto | null;
+  deliveryStatus?: TdeliveryStatusDto[] | null;
   adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
   adjustedItemId?: string | null;
   //
@@ -1024,9 +1091,29 @@ export type TquotationProductItemDto = Omit<
   bearingHousingTotalLength: string;
   // 底座開口
   guideRailsOpening: string;
+  //  '捲箱 - 正面'
+  headBoxFront: string | null;
+  //  '捲箱 - 有無凸'
+  headBoxProtruding: string | null;
+  //  '捲箱 - 角鐵數量'
+  headBoxAngleIronQuantity: number | null;
+  //  '支板 - 鏈條'
+  sidePlateChain: string | null;
+  //  '支板 - 方向'
+  sidePlateDirection: string | null;
+  //  '電動機 - 鍊條形式'
+  electricMotorChainType: string | null;
+  //  '電動機 - 方向'
+  electricMotorDirection: string | null;
+  //  '門軌 - 型式'
+  guideRailType: string | null;
+  // 底座 - 表面
+  bottomBarSurface: string | null;
+  // 門軌 - 表面
+  guideRailSurface: string | null;
 };
 
-type TquotationContentDto_foo = {
+type TquotationContentDto_copy = {
   id: string;
   createdAt: string;
   updateAt: string;
@@ -1044,7 +1131,7 @@ type TquotationContentDto_foo = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract'; // 報價單狀態: 預算 投標 發包 合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
@@ -1095,6 +1182,7 @@ type TquotationContentDto_foo = {
 
   verifyForm: TquotationVerifyFormDto;
 };
+
 export type TquotationContentDto = {
   id: string;
   createdAt: string;
@@ -1113,7 +1201,7 @@ export type TquotationContentDto = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract'; // 報價單狀態: 預算 投標 發包 合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
@@ -1164,11 +1252,19 @@ export type TquotationContentDto = {
 
   verifyForm: TquotationVerifyFormDto;
 
+  // ! 直接放TquotationContractDto會造成循環參考，電腦的效能被吃光
+  // ! 所以只設需要拿的東西
+  // contract?: TquotationContractDto;
+  contract?: {
+    id: string;
+  };
+
   // api文件上沒寫但應該會有的東西
   // rootContract?: Omit<TquotationContractDto, 'rootContract'>;
   // rootContract?: TquotationContractDto;
+
   // 為了避免check壞掉，暫時先這樣
-  rootContract?: TquotationContentDto_foo;
+  rootContract?: TquotationContentDto_copy;
 };
 
 export type TquotationDto = {
@@ -1179,6 +1275,7 @@ export type TquotationDto = {
   latestContent: TquotationContentDto;
   contents: TquotationContentDto[];
   attachedToContract?: TquotationContractDto;
+  attachedToContractId: string | null;
 };
 
 export type TcreateQuotationProductDto = {
@@ -1288,6 +1385,24 @@ export type TcreateQuotationProductDto = {
   installationFeeUnitPrice: number;
   // 安裝費 複價;
   installationFeeTotalPrice: number;
+
+  slatCount: string | null; //門片 - 捲片支數
+  sprocketWheelModel: string | null; //鏈齒輪 - 鏈齒輪番號
+  sprocketWheelTeethNumber: string | null; //鏈齒輪 - 大鏈輪
+  sprocketWheelChains: string | null; //
+  bearingInnerDiameter: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
+  diameter: string | null; //捲軸 - 尺寸
+  bearingHousingTotalLength: string | null; //捲軸 - 總長
+  guideRailsOpening: string | null; //底座 - 開口
+  slatLength: number | null; //門片長度
+  guideRailLength: number | null; //門軌長度
+  headBoxLength: number | null; //捲箱長度
+  bearingHousingSize: number | null; //軸承座寸法
+  bearingName: string | null; //軸承
+  gapA: string | null; //
+  gapC: string | null; //
+  gearNumber: string | null; //
+  weight: string | null; //
 };
 
 export type TcreateQuotationContentDto = {
@@ -1303,7 +1418,7 @@ export type TcreateQuotationContentDto = {
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting'; // 報價單狀態: 預算 投標 發包
+  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract'; // 報價單狀態: 預算 投標 發包 合約
   managerId?: string | undefined | null; // 經理ID
   supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID
@@ -1355,11 +1470,14 @@ export type TquotationContractDto = {
   /**工程聯絡單ID */
   engineeringContactId: string | null;
   /**工作表 */
-  worksheet: TworkSheetDto;
+  worksheet?: TworkSheetDto; // populate
   /**工作表ID */
   worksheetId: string | null;
   /**出庫單ID */
   engineeringDeliveryListId: string | null;
+  /**應收帳款明細 */
+  accountReceivable?: TaccountReceivableDto; // populate
+  accountReceivableId: string;
 };
 
 export type TcreateModifyQuotationDto = {
@@ -1425,6 +1543,7 @@ export type TquotationAccouting = {
   contactnumber: string;
   contactperson: string;
   customername: string;
+  percentage: number;
 };
 
 export type TquotationAccouting_years = {
@@ -1508,11 +1627,11 @@ export type TdoorGeneralSpecsDto = {
   sprocketWheelModel: string;
   sprocketWheelTeethNumber: string;
   sprocketWheelChains: number;
-  thickness: string;
   weight: number;
   slatLength: number; // 門片長度
   guideRailLength: number; // 門軌長度
   headBoxLength: number; //  捲箱長度
+  thickness: string; // 門片厚度
 };
 
 export type TdoorSlatDto = {
@@ -1557,6 +1676,7 @@ export type TdoorGuideRailDto = {
   isAntiTyphoon: boolean;
   /**消音條 */
   hasSilencingStrip: boolean; // 消音條
+  imageName: string | null; // 圖片名稱
 };
 
 export type TdoorSidePlateDto = {
@@ -1577,6 +1697,7 @@ export type TdoorSidePlateDto = {
   maxDoorWeight: number | null; // 最大門重量(kg)
   minDoorWeight: number | null; // 最小門重量(kg)
 
+  sizeB: number | null;
   // 需要有表面
 };
 
@@ -1628,6 +1749,7 @@ export type TdoorMotorAccessoriesDto = {
   chains: number; // 鍊條排數
   /**軸承 */
   bearingType: string; // 軸承
+  gearNumber: string;
 };
 
 export type TdoorHeadBoxDto = {
@@ -1737,7 +1859,7 @@ export type TpaymentRatioDto = {
   // 金額
   price: string;
   // 備註
-  note: string;
+  note: string | null;
 };
 
 export type TquotationVerifyFormDto = {
@@ -1855,10 +1977,12 @@ export type TengineeringContactDto = {
   /**備註列表 */
   annotations: string[] | null;
   /**聯絡人列表 */
-  contactInfo: {
-    contactPerson: string;
-    contactNumber: string;
-  }[];
+  contactInfo:
+    | {
+        contactPerson: string;
+        contactNumber: string;
+      }[]
+    | null;
   //
   contractId?: string | null;
   contract?: TquotationContractDto | null;
@@ -1911,6 +2035,7 @@ export type TcreateEngineeringContactDto = {
   contractId?: string | null; // 合約ID
 };
 
+// 派工單
 export type TdispatchingDto = {
   id: string;
   createdAt: string;
@@ -1920,7 +2045,7 @@ export type TdispatchingDto = {
   // 工程名稱
   projectName: string;
   // 承包商;
-  contractor: string;
+  // contractor: string;
   // 承包商聯絡人;
   contractorContactPerson: string;
   // 工地電話;
@@ -1962,7 +2087,7 @@ export type TcreateDispatchingDto = {
   // 工程名稱;
   projectName: string;
   // 承包商;
-  contractor: string;
+  // contractor: string;
   // 承包商聯絡人;
   contractorContactPerson: string;
   // 工地電話;
@@ -2245,21 +2370,59 @@ export type TupdateWorkSheetItem = {
   // 門片捲片支數
   slatCount: string;
   // 練齒輪番號
-  sprocketWheelModel: string;
+  // sprocketWheelModel: string;
   // 練齒輪大鏈輪
-  sprocketWheelTeethNumber: string;
+  // sprocketWheelTeethNumber: string;
   // 孔徑 軸徑
-  bearingInnerDiameter: string;
+  // bearingInnerDiameter: string;
   // 卷軸尺寸
-  diameter: string;
+  // diameter: string;
   // 捲軸總長
-  bearingHousingTotalLength: string;
+  // bearingHousingTotalLength: string;
   // 底座開口
   guideRailsOpening: string;
   //
   //
-  thickness: string;
+  // thickness: string;
   boxD: number;
+
+  bearingHousingSize?: number | null; //軸承座寸法
+  bearingHousingTotalLength?: string | null; //捲軸 - 總長
+  bearingInnerDiameter?: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
+  bearingName?: string | null; //軸承
+  diameter?: string | null; //捲軸 - 尺寸
+  gapA?: string | null; //
+  gapC?: string | null; //
+  gearNumber?: string | null; //
+  sprocketWheelModel?: string | null; //鏈齒輪 - 鏈齒輪番號
+  sprocketWheelTeethNumber?: string | null; //鏈齒輪 - 大鏈輪
+  sprocketWheelChains?: string | null; //
+  weight?: string | null; //
+  slatLength?: number | null; //門片長度
+  guideRailLength?: number | null; //門軌長度
+  headBoxLength?: number | null; //捲箱長度
+  thickness: string; // 門片厚度
+
+  //  '捲箱 - 正面'
+  headBoxFront: string | null;
+  //  '捲箱 - 有無凸'
+  headBoxProtruding: string | null;
+  //  '捲箱 - 角鐵數量'
+  headBoxAngleIronQuantity: number | null;
+  //  '支板 - 鏈條'
+  sidePlateChain: string | null;
+  //  '支板 - 方向'
+  sidePlateDirection: string | null;
+  //  '電動機 - 鍊條形式'
+  electricMotorChainType: string | null;
+  //  '電動機 - 方向'
+  electricMotorDirection: string | null;
+  //  '門軌 - 型式'
+  guideRailType: string | null;
+  // 底座 - 表面
+  bottomBarSurface: string | null;
+  // 門軌 - 表面
+  guideRailSurface: string | null;
 };
 
 export type TupdateWorkSheet = {
@@ -2276,7 +2439,160 @@ export type TengineeringDeliveryListDto = {
   contract: TquotationContractDto;
 };
 
-export type TupdateEngineeringDeliveryList = {
+// export type TupdateEngineeringDeliveryList = {
+//   notes: string;
+//   productsItemStatus?: TupdateDeliveryStatus[];
+// };
+
+export type TupdateEngineeringDeliveryListDto = {
   notes: string;
-  productsItemStatus?: TupdateDeliveryStatus[];
+};
+
+// 應收帳款明細
+
+export type TaccountReceivableDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  // 估價日期
+  valuationDate: string | null;
+  // 付清日期
+  payOffDay: string | null;
+  // 履約保證票
+  performanceBond: boolean;
+  // 訂金款保證票
+  depositGuaranteeTicket: boolean;
+  // 保固票
+  warrantyTicket: boolean;
+  // 異常燈號(工作表已開立，合約尚未簽回)
+  hasNoContract: boolean;
+  // 提醒燈號(已出具證明，尚未收足款項)
+  hasUncollectedAmounts: boolean;
+  // 已出貨，因故尚未安裝
+  hasNotInstall: boolean;
+  // 請款比例
+  paymentRatio: TpaymentRatioDto[];
+  contract: TquotationContractDto;
+  legacyContract: TlegacyContractDto;
+  accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
+  accountant: TaccountantDto | null;
+};
+
+export type TcreateAccountReceivableDto = {
+  // 估價日期
+  valuationDate: string | null;
+  // 付清日期
+  payOffDay: string | null;
+  // 履約保證票
+  performanceBond: boolean;
+  // 訂金款保證票
+  depositGuaranteeTicket: boolean;
+  // 保固票
+  warrantyTicket: boolean;
+  // 異常燈號(工作表已開立，合約尚未簽回)
+  hasNoContract: boolean;
+  // 提醒燈號(已出具證明，尚未收足款項)
+  hasUncollectedAmounts: boolean;
+  // 已出貨，因故尚未安裝
+  hasNotInstall: boolean;
+  // 收款明細
+  accountantId: string[] | null;
+  // 扣款明細
+  accountReceivableDeduction: TcreateAccountReceivableDeductionDto[] | null;
+  // 發票紀錄
+  invoices: TcreateAccountReceivableInvoiceDto[] | null;
+  // 所屬合約Id;
+  contractId: string | null;
+  // 所屬合約Id;
+  legacyContractId: string | null;
+};
+
+export type TupdateAccountReceivableDto = Pick<
+  TaccountReceivableDto,
+  | 'valuationDate'
+  | 'payOffDay'
+  | 'performanceBond'
+  | 'depositGuaranteeTicket'
+  | 'warrantyTicket'
+  | 'hasNoContract'
+  | 'hasUncollectedAmounts'
+  | 'hasNotInstall'
+>;
+
+// 發票
+export type TaccountsReceivableInvoiceDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  /** 發票日期 */
+  invoiceDate: string;
+  /** 發票號碼 */
+  invoiceNumber: string;
+  price: number;
+  note: string | null;
+  invoiceStatus: '已開立' | '已作廢';
+
+  /** 所屬應收帳款ID */
+  accountsReceivableId: string | null;
+  accountsReceivable?: TaccountReceivableDto | null;
+
+  accountantList: TaccountantDto[];
+};
+
+export type TcreateAccountReceivableInvoiceDto = Pick<
+  TaccountsReceivableInvoiceDto,
+  'invoiceDate' | 'invoiceNumber' | 'price' | 'note'
+>;
+
+export type TupdateAccountReceivableInvoiceDto = Pick<
+  TaccountsReceivableInvoiceDto,
+  'invoiceDate' | 'invoiceNumber' | 'price' | 'note'
+> & {
+  // 關聯的收款紀錄Id
+  accountants: string[];
+};
+
+export type TaccountantDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  paymentType: '匯款' | '票據' | '現金'; // 收款類型
+  accountingNumber: string; // 編號/存入帳號
+  price: number; // 金額
+  notes: string | null; // 備註
+  billSerialNumber: string | null; // 收入傳票序號
+  noteMaturityDate: string | null; // 票據到期日
+  invoice: TaccountsReceivableInvoiceDto[] | null;
+};
+
+export type TcreateAccountantDto = Omit<TaccountantDto, 'id' | 'createdAt' | 'updatedAt' | 'noteMaturityDate'> & {
+  noteMaturityDate?: string | null;
+};
+
+/**扣款明細 */
+export type TaccountsReceivableDeductionDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  itemName: string; // 項目
+  period: number; // 期數
+  detailedAmount: number; // 明細金額
+  accountsReceivableId: string; // 所屬應收帳款Id
+  accountsReceivable?: TaccountReceivableDto | null; // 所屬應收帳款
+};
+
+export type TcreateAccountReceivableDeductionDto = Pick<
+  TaccountsReceivableDeductionDto,
+  'itemName' | 'period' | 'detailedAmount'
+>;
+
+export type TupdateAccountReceivableDeductionDto = Partial<TcreateAccountReceivableDeductionDto> & {
+  id: string; // 不提供時將此筆視為新增資料
+};
+
+export type TfinalProduct = {
+  //源合約產品包含item deliveryStatus productPayment(主產品數量已扣追減)
+  finalRootContractProduct: TquotationProductDto[];
+  //追加合約產品包含item deliveryStatus productPayment
+  finalAppendContractProducts: TquotationProductDto[];
 };

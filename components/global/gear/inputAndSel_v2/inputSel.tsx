@@ -17,6 +17,9 @@ import MustTip_simple from '../other/mustTip_simple';
 import { creOptionWithIcon } from './selectCustom/creOptionWithIcon';
 import { creSingleValueWithIcon } from './selectCustom/creSingleValueWithIcon';
 
+// icon
+import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
+
 // css
 import scss from './inputSel.module.scss';
 
@@ -40,6 +43,7 @@ export type {
 
 type TinputSelProps = {
   disabled?: boolean;
+  onClick?: (e: React.MouseEvent) => void;
   //
   inputProps?: TinputProps;
   selectProps?: TselectProps;
@@ -77,12 +81,16 @@ type TinputSelProps = {
   // suffix?: string;
   suffix?: React.ReactNode;
   suffixClassName?: string;
+  //
+  showAddIcon?: boolean;
 };
 
 // =============================================================================
 
 export default function InputSel({
   disabled,
+  //
+  onClick,
   //
   inputProps,
   selectProps,
@@ -118,6 +126,8 @@ export default function InputSel({
   //
   suffix,
   suffixClassName,
+  //
+  showAddIcon,
 }: TinputSelProps) {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -163,6 +173,8 @@ export default function InputSel({
         if (inputSelBarProps || checkBoxProps) {
           e.preventDefault();
         }
+
+        onClick?.(e);
       }}
     >
       {caption && (
@@ -388,6 +400,7 @@ export default function InputSel({
         <CheckBar
           wrapperClassName={classNames(checkBoxProps.wrapperClassName)}
           wrapperStyle={checkBoxProps.wrapperStyle}
+          onClick={checkBoxProps.onClick}
           fontClassName={fontClassName}
           disabled={disabled}
           isRadio={checkBoxProps.isRadio}
@@ -417,6 +430,8 @@ export default function InputSel({
       {showBaseline !== 'invisible' && (
         <hr className={classNames(hrClasses, { [scss.isMust]: isMust })} style={hrStyle} />
       )}
+
+      {showAddIcon && <IconAddCircle className={scss.addIcon} />}
     </label>
   );
 }

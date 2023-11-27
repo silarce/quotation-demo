@@ -25,7 +25,15 @@ export default function Table({ productList }: { productList: TtableProdList }) 
   const [svgList, setSvgList] = useState<{ [key: string]: string | undefined | null }>({});
 
   const getSvg = async ({ fileName }: { fileName: string }) => {
-    if (svgList[fileName] !== null) {
+    if (svgList[fileName] === null) {
+      return;
+    }
+
+    if (svgList[fileName] === 'isLoading') {
+      return;
+    }
+
+    if (!!svgList[fileName]) {
       return;
     }
 
@@ -82,19 +90,25 @@ export default function Table({ productList }: { productList: TtableProdList }) 
           if (key === 'doorRail') {
             let svgString;
             let src;
+            // console.log(value);
 
             if (value) {
+              // 來自本地的圖片
               if (value.startsWith('/_next')) {
                 src = value;
               } else {
-                const arr = value.split('/');
-                const fileName = arr[arr.length - 1];
+                // const arr = value.split('/');
+                // const fileName = arr[arr.length - 1];
 
-                if (fileName) {
-                  getSvg({ fileName: fileName });
-                }
+                // if (fileName) {
+                //   getSvg({ fileName: fileName });
+                // }
 
-                svgString = svgList[`${fileName}`] ?? '';
+                // svgString = svgList[`${fileName}`] ?? '';
+
+                getSvg({ fileName: value });
+
+                svgString = svgList[`${value}`] ?? '';
               }
             }
 

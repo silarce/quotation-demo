@@ -139,11 +139,11 @@ export const optionsCreator_quoteType = (props: { haveEmpty?: boolean } = {}): T
   const { haveEmpty } = props;
   const arr = [
     { value: '捲門' as const, label: '捲門' },
-    { value: '伸縮大門' as const, label: '伸縮大門' },
-    { value: '水閘門' as const, label: '水閘門' },
-    { value: '上折門' as const, label: '上折門' },
-    { value: '機庫門' as const, label: '機庫門' },
-    { value: '客製化' as const, label: '客製化' },
+    // { value: '伸縮大門' as const, label: '伸縮大門' },
+    // { value: '水閘門' as const, label: '水閘門' },
+    // { value: '上折門' as const, label: '上折門' },
+    // { value: '機庫門' as const, label: '機庫門' },
+    // { value: '客製化' as const, label: '客製化' },
   ];
 
   if (haveEmpty) {
@@ -202,20 +202,56 @@ export const optionsCreator_componentMaterial_03 = createOptionsCreator({
 // !如果options有變動，要去確認hooks/quotation/prodCellConfig.ts的bottomBarAngleIron有沒有不對
 export const optionsCreator_bottomBarAngleIron = createOptionsCreator({
   optionsArr: [
-    { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T' },
-    { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T' },
-    { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T' },
-    { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T' },
+    { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T', material: '鍍鋅鋼板' },
+    { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T', material: '高耐鍍鋅鋼板' },
+    { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T', material: '不鏽鋼#304' },
+    { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T', material: '不鏽鋼#316' },
   ],
 });
 
 // !如果options有變動，要去確認hooks/quotation/prodCellConfig.ts的bottomBarPlate有沒有不對
 export const optionsCreator_bottomBarPlate = createOptionsCreator({
   optionsArr: [
-    { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T' },
-    { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T' },
-    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T' },
-    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T' },
+    { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T', material: '鍍鋅鋼板' },
+    { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T', material: '高耐鍍鋅鋼板' },
+    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: '不鏽鋼#304' },
+    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: '不鏽鋼#316' },
+  ],
+});
+
+export const optionsCreator_bottomBarAngleIron_303A = createOptionsCreator({
+  optionsArr: [
+    { value: '鍍鋅 1.0T', label: '鍍鋅 1.0T', material: '鍍鋅鋼板' },
+    { value: '高耐鍍鋅鋼板 1.0T', label: '高耐鍍鋅鋼板 1.0T', material: '高耐鍍鋅鋼板' },
+    { value: '不鏽鋼#304 1.0T', label: '不鏽鋼#304 1.0T', material: '不鏽鋼#304' },
+    { value: '不鏽鋼#316 1.0T', label: '不鏽鋼#316 1.0T', material: '不鏽鋼#316' },
+  ],
+});
+
+export const optionsCreator_bottomBarPlate_303A = createOptionsCreator({
+  optionsArr: [
+    { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T', material: '鍍鋅鋼板' },
+    { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T', material: '高耐鍍鋅鋼板' },
+    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: '不鏽鋼#304' },
+    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: '不鏽鋼#316' },
+  ],
+});
+
+export const optionsCreator_bottomBarAngleIron_303AS = createOptionsCreator({
+  optionsArr: [
+    { value: '鍍鋅 1.0T', label: '鍍鋅 1.0T(含遮菸條)', material: '鍍鋅鋼板' },
+    { value: '高耐鍍鋅鋼板 1.0T', label: '高耐鍍鋅鋼板 1.0T(含遮菸條)', material: '高耐鍍鋅鋼板' },
+    { value: '不鏽鋼#304 1.0T', label: '不鏽鋼#304 1.0T(含遮菸條)', material: '不鏽鋼#304' },
+    { value: '不鏽鋼#316 1.0T', label: '不鏽鋼#316 1.0T(含遮菸條)', material: '不鏽鋼#316' },
+  ],
+});
+
+export const optionsCreator_bottomBarPlate_303AS = createOptionsCreator({
+  optionsArr: [
+    { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T', material: '鍍鋅鋼板' },
+    { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T', material: '高耐鍍鋅鋼板' },
+    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: '不鏽鋼#304' },
+    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: '不鏽鋼#316' },
   ],
 });
 
@@ -225,6 +261,28 @@ export const optionsCreator_surface = createOptionsCreator({
     { value: 'HL', label: 'HL' },
     { value: 'BA', label: 'BA' },
     { value: 'NO.4', label: 'NO.4' },
+  ],
+});
+
+export const optionsCreator_boxB_SJ302 = createOptionsCreator({
+  optionsArr: [
+    { value: '0.35', label: '0.35' },
+    { value: '0.40', label: '0.40' },
+    { value: '0.45', label: '0.45' },
+    { value: '0.50', label: '0.50' },
+    { value: '0.55', label: '0.55' },
+    { value: '0.60', label: '0.60' },
+  ],
+});
+export const optionsCreator_boxB_SJ303A = createOptionsCreator({
+  optionsArr: [
+    { value: '0.63', label: '0.63' },
+    { value: '0.70', label: '0.70' },
+    { value: '0.77', label: '0.77' },
+    { value: '0.82', label: '0.82' },
+    { value: '0.88', label: '0.88' },
+    { value: '0.95', label: '0.95' },
+    { value: '1.02', label: '1.02' },
   ],
 });
 

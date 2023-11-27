@@ -1,9 +1,12 @@
-import React from 'react';
+import { useContext } from 'react';
+
 import { useRouter } from 'next/router';
 
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import PageHeaderFlex01 from 'components/PageHeader/pageHeaderFlex01';
+
+import { AppContext } from 'pages/_app';
 
 export type { TpanelList };
 
@@ -16,17 +19,22 @@ export default function PageHeader({
   panelList?: TpanelList;
   contractNumber?: string;
 }) {
+  const { erpFeature } = useContext(AppContext);
   const router = useRouter();
-  const isReady = router.isReady;
+  const query = router.query as {
+    contractId: string | undefined;
+    version: string | undefined;
+  };
+  const { contractId, version } = query as {
+    contractId: string | undefined;
+    version: string | undefined;
+  };
 
-  if (!isReady) {
-    return null;
-  }
+  const isShowAccountReceivable = !!erpFeature?.find((item) => item.name === '應收帳款');
 
-  const { contractId, version } = router.query;
-  const query = router.query;
+  // -------------------------------------------------------------
 
-  const tag = (tagCallback && tagCallback(contractId as string)) || `合約編號 ${contractNumber}`;
+  const tag = (tagCallback && tagCallback(contractId ?? '')) || `合約編號 ${contractNumber}`;
 
   const pathHead = `/worksDepartment/contractList/contract`;
   const linkList = [
@@ -34,7 +42,10 @@ export default function PageHeader({
       label: '工程聯絡單',
       href: {
         pathname: `${pathHead}/workContactDoc`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -42,7 +53,10 @@ export default function PageHeader({
       // disabled: true,
       href: {
         pathname: `${pathHead}/workSheet`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -50,29 +64,56 @@ export default function PageHeader({
       // disabled: true,
       href: {
         pathname: `${pathHead}/outboundOrder`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
-    {
-      label: '應收帳款明細',
-      disabled: true,
-      href: {
-        pathname: `${pathHead}/accountReceivable`,
-        query,
-      },
-    },
+    isShowAccountReceivable
+      ? {
+          label: '應收帳款明細',
+          disabled: !isShowAccountReceivable,
+          href: {
+            pathname: `${pathHead}/accountReceivable`,
+            query: {
+              contractId,
+              version,
+            },
+          },
+        }
+      : null,
+    isShowAccountReceivable
+      ? {
+          label: '合約',
+          disabled: !isShowAccountReceivable,
+          href: {
+            pathname: `${pathHead}/contractTable`,
+            query: {
+              contractId,
+              version,
+            },
+          },
+        }
+      : null,
     {
       label: '派工單列表',
       href: {
         pathname: `${pathHead}/dispatchList`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
       label: '送電備品列表',
       href: {
         pathname: `${pathHead}/powerTransmissionSpareList`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -80,7 +121,10 @@ export default function PageHeader({
       // disabled: true,
       href: {
         pathname: `${pathHead}/listOfDeliveryOrders`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -88,7 +132,10 @@ export default function PageHeader({
       disabled: true,
       href: {
         pathname: `${pathHead}/memorandum`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -96,7 +143,10 @@ export default function PageHeader({
       disabled: true,
       href: {
         pathname: `${pathHead}/undefined`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
     {
@@ -104,7 +154,10 @@ export default function PageHeader({
       disabled: true,
       href: {
         pathname: `${pathHead}/undefined`,
-        query,
+        query: {
+          contractId,
+          version,
+        },
       },
     },
   ];

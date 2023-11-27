@@ -77,6 +77,13 @@ export default function ContractSelector({
         // },
         // 'jobs.department.name': { $contains: searchValue[0] },
 
+        $or: {
+          'content.customer.name': { $contains: searchValue[0] },
+          'content.projectName': { $contains: searchValue[0] },
+          'content.county': { $contains: searchValue[0] },
+          // 'content.quotaionNumber': { $eq: searchValue[0] },
+        },
+
         ...customFilter,
       },
       ...customParams,

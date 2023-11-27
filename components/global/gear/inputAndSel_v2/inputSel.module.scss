@@ -316,7 +316,7 @@ div.selControl {
       &:global(.ant-checkbox-disabled) {
         :global(.ant-checkbox-inner) {
           // 4版antd設了important，我也只能設mportant了;
-          border-color: $colorMain !important 
+          border-color: $colorMain !important;
         }
       }
     }
@@ -385,4 +385,11 @@ div.selControl {
       }
     }
   }
+}
+
+// =================================================================
+
+.addIcon {
+  width: 16px;
+  height: 16px;
 }

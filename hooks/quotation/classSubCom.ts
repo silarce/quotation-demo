@@ -11,7 +11,8 @@ type TSubCom = {
   totalPrice: number;
   quantity: number;
   comName: string;
-  unit: string;
+  // unit: string;
+  unit: React.ReactNode;
   desc: string;
 };
 

@@ -16,6 +16,7 @@ type Tcontrol = {
     BD: string;
     /**捲門全高 */
     fullHeight: string;
+    weightConversion: string;
   };
   roller: {
     diameter: string;
@@ -27,10 +28,12 @@ type Tcontrol = {
   headBox: {
     angleIronQty: string;
     angleIronSize: string;
-    info: string;
+    form: string;
+    surface: string;
   };
   doorPiece: {
     material: string;
+    surface: string;
     thickness: string;
     slatLength: string;
     slatCount: string;
@@ -41,22 +44,35 @@ type Tcontrol = {
     /**相數加電壓 */
     phaseVoltage: string;
     horsepower: string;
+    direction: string;
   };
   guideRail: {
-    彎直: string;
+    form: string;
     material: string;
     guideRailLength: string;
     guideRailName: string;
     icon: string | undefined;
+    dangerSvg?: string;
+    antiTyphoonHook: string;
+    bendStraight: string; // 彎直
   };
   chainCog: {
     sprocketWheelModel: string;
     sprocketWheelTeethNumber: string;
     bearingInnerDiameter: string;
+    teethQuantity: string;
+    centerDistance: string;
+    eyesQuantity: string;
   };
   base: {
     material: string;
     guideRailsOpening: string;
+    surface: string;
+  };
+  sidePlate: {
+    direction: string;
+    bigSidePlate: string;
+    smallSidePlate: string;
   };
   memo: string;
 };
@@ -107,7 +123,7 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
             <C.TableHeader2 title={'捲箱'} />
             <C.TableContent2 label="捲箱角鐵數量" value={`${headBox.angleIronQty}`} />
             <C.TableContent2 label="捲箱角鐵尺寸" value={headBox.angleIronSize} />
-            <C.TableContent2 value={'捲箱資訊：' + headBox.info} height={69} />
+            <C.TableContent2 value={'捲箱資訊：' + headBox.form} height={69} />
           </section>
         </div>
 
@@ -130,9 +146,10 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
             <C.TableContent2 label="門軌長度" value={guideRail.guideRailLength} />
             <C.TableContentWithImage2
               label="門軌形式"
-              label2={guideRail.彎直}
+              label2={`(${guideRail.bendStraight})`}
               value={guideRail.guideRailName}
               image={guideRail.icon}
+              dangerSvg={guideRail.dangerSvg}
             />
 
             <C.TableHeader2 title="鏈齒輪" />

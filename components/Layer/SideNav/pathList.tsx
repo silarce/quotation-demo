@@ -308,21 +308,21 @@ const sidePathList: TsidePathList = {
           erpFeature: [legacyContractIntegration],
           // erpFeature: allPass,
         },
-        {
-          label: '查詢工作表',
-          path: path01 + '/unSet',
-          erpFeature: devPass,
-        },
+        // {
+        //   label: '查詢工作表',
+        //   path: path01 + '/unSet',
+        //   erpFeature: devPass,
+        // },
         {
           label: '查詢應收帳款明細',
           path: path01 + '/unSet',
-          erpFeature: devPass,
+          erpFeature: [accountsReceivable],
         },
-        {
-          label: '查詢派工單明細',
-          path: path01 + '/unSet',
-          erpFeature: devPass,
-        },
+        // {
+        //   label: '查詢派工單明細',
+        //   path: path01 + '/unSet',
+        //   erpFeature: devPass,
+        // },
         {
           label: '統計表',
           erpFeature: [statisticsTable],
@@ -455,7 +455,7 @@ const sidePathList: TsidePathList = {
             {
               label: '應收帳款表',
               path: path01 + '/accountsReceivableStatement',
-              erpFeature: devPass,
+              erpFeature: [accountsReceivable],
             },
             {
               label: '代辦事項總覽',
@@ -620,15 +620,15 @@ const topPathList: TtopPathListConfig[] = [
     },
     erpFeature: [worksDepartment],
   },
-  // {
-  //   icon: icon_project,
-  //   label: '會計部',
-  //   path01: sidePathList['/accounting'].path01,
-  //   href: {
-  //     pathname: sidePathList['/accounting'].path01 + '/contractList',
-  //   },
-  //   erpFeature: devPass,
-  // },
+  {
+    icon: icon_project,
+    label: '會計部',
+    path01: sidePathList['/accounting'].path01,
+    href: {
+      pathname: sidePathList['/accounting'].path01 + '/contractList',
+    },
+    erpFeature: [accountsReceivable],
+  },
 ];
 
 export default sidePathList;

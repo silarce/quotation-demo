@@ -32,37 +32,88 @@
       }
     }
     .right {
+      margin: auto;
+      margin-right: 0;
+      margin-top: 0;
+      width: fit-content;
+      > div:nth-of-type(1) {
+        display: flex;
+        .height {
+          position: relative;
+          width: 9px;
+          margin-right: 2px;
+          border: solid 1px red;
+          border-width: 1px 0;
+          background: linear-gradient(180deg, rgba(255, 0, 0, 1) 0%, rgba(255, 0, 0, 1) 100%);
+          background-size: 1px 100%;
+          background-position: center;
+          background-repeat: no-repeat;
+          > div {
+            position: absolute;
+            top: 50%;
+            right: 100%;
+            transform: translateY(-50%);
+          }
+        }
+      }
+      > div:nth-of-type(2) {
+        .width {
+          position: relative;
+          width: calc(100% - 11px);
+          height: 9px;
+          margin: auto;
+          margin-right: 0;
+          margin-top: 2px;
+          border: solid 1px red;
+          border-width: 0px 1px;
+          background: linear-gradient(90deg, rgba(255, 0, 0, 1) 0%, rgba(255, 0, 0, 1) 100%);
+          background-size: 100% 1px;
+          background-position: center;
+          background-repeat: no-repeat;
+          > div {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+          }
+        }
+      }
     }
   }
   .list {
+    // display: grid;
+    // gap: 10px;
+    padding: 5px 0;
     margin-top: 10px;
-    display: grid;
-    gap: 10px;
-    > div {
+    background-color: white;
+    border-top: solid 1px theme("colors.border");
+    .row {
       display: grid;
-      grid-template-columns: auto 30px 30px 20px;
-      gap: 5px;
+      grid-template-columns: auto 30px fit-content(100%) 20px;
+      align-items: center;
+      gap: 10px;
+      padding: 5px;
       > span {
         white-space: pre-wrap;
         word-break: break-all;
       }
       > button {
-        background-color: white;
         height: fit-content;
+        padding: 2px 3px;
+        border: solid 1px theme("colors.main");
+        font-size: 12px;
       }
     }
-    > .active {
-      background-color: #ffeeee;
-    }
-    > .original {
-      background-color: cornflowerblue;
-      > span {
-        color: white;
-      }
-      > svg {
-        color: white;
-      }
-    }
+
+    // > .original {
+    //   background-color: cornflowerblue;
+    //   > span {
+    //     color: white;
+    //   }
+    //   > svg {
+    //     color: white;
+    //   }
+    // }
   }
 }
 

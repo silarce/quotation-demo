@@ -1,3 +1,7 @@
+/**
+ 送了合約審核表就會被鎖定
+ */
+
 // 常用變數目錄
 /**
  * useProductList
@@ -55,10 +59,6 @@ import style from './quotation.module.scss';
 import { AppContext } from 'pages/_app';
 
 // ------------------------------------------------------------------
-
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
@@ -86,6 +86,8 @@ import {
   useQuotation_id_attachments,
   apiPostQuotation_id_attachments,
   apiDelQuotation_id_attachments,
+  //
+  useGetQuotationContent_id,
 } from 'js/api/api_quotation';
 
 // hook
@@ -114,9 +116,16 @@ export default function Quotation() {
 // =================================================================
 
 function TheQuotation({ router }: { router: NextRouter }) {
+  // const {
+  //   id: quotationId, //報價單id //若為新增報價單則為undefined
+  // } = router.query as { id: string | undefined };
   const {
     id: quotationId, //報價單id //若為新增報價單則為undefined
-  } = router.query as { id: string | undefined };
+    contentId,
+  } = router.query as {
+    id: string | undefined;
+    contentId: string | undefined;
+  };
   const { userInfo, userGrade } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
 
@@ -196,8 +205,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
-  const lastestContentId = quotationData?.latestContent.id;
-  const latestContent = quotationData?.latestContent;
+  const { data: quotationContentData, update: updateContent } = useGetQuotationContent_id(contentId as string);
+
+  const latestContent = quotationData?.latestContent ?? quotationContentData;
+  const lastestContentId = latestContent?.id;
   const status = latestContent?.status;
   const verifyForm = latestContent?.verifyForm;
   const attachedToContract = quotationData?.attachedToContract;
@@ -316,15 +327,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reset: resetClass,
     //
   } = useProductList({
-    productArr: quotationData?.latestContent.products,
-    others: quotationData?.latestContent.others,
-    resetTrigger: quotationData,
+    // productArr: quotationData?.latestContent.products,
+    // others: quotationData?.latestContent.others,
+    productArr: latestContent?.products,
+    others: latestContent?.others,
+    resetTrigger: quotationData ?? quotationContentData,
     onDoorTypeChange: onDoorTypeChange,
   });
 
   // const [targetProd, setTargetProd] = useState<Class_product>();
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
+
+  useEffect(() => {
+    if (targetProd) {
+      targetProd.callApiAndGetOptions();
+    }
+  }, [targetProd]);
 
   const [summary, setSummary] = useState<{
     discountRate: string;
@@ -345,7 +364,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   useEffect(() => {
-    if (quotationData) {
+    if (latestContent) {
       const {
         //
         discount,
@@ -357,7 +376,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         paymentMethods,
         annotations,
         quotationRanges,
-      } = quotationData.latestContent;
+      } = latestContent;
 
       setAnnotation(annotations ?? []);
       setQr(quotationRanges ?? []);
@@ -402,7 +421,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         deliveryDate: '',
       });
     }
-  }, [quotationData, disabled]);
+  }, [quotationData, quotationContentData, disabled]);
 
   useEffect(() => {
     const { subTotal, salesTax, total } = countPayInfoValue({
@@ -686,18 +705,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        await Promise.all([update(), updateAttachments()]);
-      } catch (error) {}
+    if (contentId) {
+      (async () => {
+        try {
+          setIsLoading(true);
+          await Promise.all([updateContent(), updateAttachments()]);
+        } catch (error) {}
 
-      setIsLoading(false);
-    })();
+        setIsLoading(false);
+      })();
+    } else {
+      (async () => {
+        try {
+          setIsLoading(true);
+          await Promise.all([update(), updateAttachments()]);
+        } catch (error) {}
+
+        setIsLoading(false);
+      })();
+    }
   }, [quotationId]);
 
   useEffect(() => {
-    const latestContent = quotationData?.latestContent;
+    // 直接取外範疇的latestContent
+    // const latestContent = quotationData?.latestContent;
 
     let agentEmployee;
 
@@ -740,7 +771,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       trackProgress: latestContent?.trackProgress,
       projectProgress: latestContent?.projectProgress,
     });
-  }, [quotationData]);
+  }, [quotationData, quotationContentData]);
 
   const onProfileChange = (v: Partial<TreturnBody>) => {
     setValue('validityPeriod', v.validityPeriod ?? '');
@@ -917,7 +948,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const tagList: TtagList = [
     {
-      label: quotationId ? `報價編號 ${quotationData?.latestContent.quotationNumber || ''}` : '新報價單',
+      label: quotationId ? `報價編號 ${latestContent?.quotationNumber || ''}` : '新報價單',
       onClick: () => {},
     },
   ];
@@ -978,7 +1009,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '匯出材料/配件',
       img: iconUpload.src,
       onClick: () => {
-        const prodArr = quotationData?.latestContent.products;
+        const prodArr = latestContent?.products;
         let isOk = true;
         prodArr?.forEach((prod) => {
           if (prod.quantity === 0) {
@@ -994,31 +1025,46 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
     },
 
-    // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
-    (!!isReviewer || null) && {
+    !contentId && isReviewer
+      ? {
+          type: 'myButton',
+          label: '審核',
+          onClick: () => setReviewModalShow(true),
+        }
+      : null,
+
+    !contentId && quotationId
+      ? {
+          type: 'myButton',
+          label: '送審',
+          onClick: () => {
+            openEmpSel('reviewSales');
+          },
+        }
+      : null,
+
+    !contentId && status === 'Contracting'
+      ? { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) }
+      : null,
+
+    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+
+    {
       type: 'myButton',
-      label: '審核',
-      onClick: () => setReviewModalShow(true),
-    },
-    // (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
-    (!!quotationId || null) && {
-      type: 'myButton',
-      label: '送審',
+      label: '返回',
       onClick: () => {
-        openEmpSel('reviewSales');
+        if (window.history.length === 1) {
+          router.push({
+            pathname: '/domestic/quotationList',
+            query: {
+              status: latestContent?.status,
+            },
+          });
+        } else {
+          router.back();
+        }
       },
     },
-    // status
-    // { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) },
-    (() => {
-      if (status === 'Contracting') {
-        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
-      } else {
-        return null;
-      }
-    })(),
-    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
   // --------------------------------------------------------------------------
@@ -1027,6 +1073,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const reqUpdateQuotation = async () => {
     const data_watch = watch();
+
+    setIsLoading(true);
+
+    for (const prod of Object.values(productList)) {
+      try {
+        await prod.reqGetDetailSpec();
+      } catch (error) {
+        setIsLoading(false);
+      }
+    }
 
     // 總樘數
     let prodQty = 0;
@@ -1037,7 +1093,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         const prod = productList[key];
 
         const quantity = Number(prod.quantity);
-        const originProd = prod.originProd;
+        // const originProd = prod.originProd;
 
         prodQty = prodQty + quantity;
 
@@ -1046,17 +1102,41 @@ function TheQuotation({ router }: { router: NextRouter }) {
           order: index,
         };
 
-        const isEqual = _.isEqual(originProd, preBody);
-
-        if (!isEqual) {
-          preBody.id = undefined;
-        }
+        // 不記得當初是為了解決什麼問題才寫這個，但是這個造成了問題了，isEqual似乎恆為true
+        // const isEqual = _.isEqual(originProd, preBody);
+        // if (!isEqual) {
+        //   preBody.id = undefined;
+        // }
 
         return preBody;
       }) ?? [];
 
     if (!data_watch.agentEmployee?.id) {
+      setIsLoading(false);
+
       return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
+    }
+
+    const emptyBomList: { [key: string]: boolean } = {};
+    prodArr.forEach((prod, pIndex) => {
+      const componentArr = prod.components;
+      componentArr.forEach((com) => {
+        const bom = com.bom;
+
+        if (!bom) {
+          emptyBomList[pIndex + 1] = true;
+        }
+      });
+    });
+    const emptyBomKeyArr = Object.keys(emptyBomList);
+
+    if (emptyBomKeyArr.length > 0) {
+      const str = emptyBomKeyArr.join('、');
+
+      myAlert.warning({ title: '上傳失敗', content: `請檢查第${str}項規格是否正確` });
+      setIsLoading(false);
+
+      return;
     }
 
     const body: TcreateQuotationContentDto = {
@@ -1128,6 +1208,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         await uploadAttachment(res.latestContent.id);
 
+        router.push({
+          query: {
+            ...router.query,
+            status: data_watch.status,
+          },
+        });
+
         await Promise.all([update(), updateAttachments()]);
       } else {
         const res = await apiPostQuotation(body);
@@ -1136,6 +1223,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         router.push({
           query: {
             id: res.id,
+            // status: data_watch.status,
           },
         });
       }
@@ -1236,11 +1324,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const size = `${lw} X ${h} + ${b}`;
 
-    const list = { ...prod.comList, ...prod.subComList };
-    delete list['sidePlate'];
-    delete list['motorAccessories'];
+    const list_com = { ...prod.comList, ...prod.subComList };
+    delete list_com['sidePlate'];
+    delete list_com['motorAccessories'];
 
-    const componentArr = Object.values(list ?? {});
+    const list_acce = prod.accessoriesList;
+
+    const componentArr = Object.values(list_com ?? {});
 
     let totalPrice = 0;
 
@@ -1252,9 +1342,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
         material: com.material,
         unit: com.unit,
         qty: Number(com.quantity).toFixed(2),
-        price: Number(com.price || 0).toLocaleString(),
         desc: com.desc ?? '',
-        totalPrice: Number(com.totalPrice || 0).toLocaleString(),
+        // price: Number(com.price || 0).toLocaleString(),
+        // totalPrice: Number(com.totalPrice || 0).toLocaleString(),
+        price: Number(999999 || 0).toLocaleString(),
+        totalPrice: Number(999999 || 0).toLocaleString(),
+      };
+    });
+
+    const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
+      return {
+        partName: acce.name,
+        material: '',
+        unit: acce.unit,
+        qty: String(acce.quantity),
+        price: acce.unitPrice_locale,
+        desc: '',
+        totalPrice: acce.totalPrice_locale,
       };
     });
 
@@ -1264,8 +1368,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       surface: prod.surface,
       doorType: prod.doorType,
       size: size,
-      part: part,
-      priceTotal: totalPrice.toLocaleString(),
+      part: [...part, ...part_acce],
+      // priceTotal: totalPrice.toLocaleString(),
+      priceTotal: prod.totalPrice,
     };
   });
 
@@ -1280,7 +1385,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile //
-            profile={quotationData?.latestContent}
+            profile={latestContent}
             disabled={disabled}
             onProfileChange={onProfileChange}
           />
@@ -1472,8 +1577,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <ContractReviewForm
         showModal={reviewFormShow}
         close={() => setReviewFormShow(false)}
-        contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
-        contractName={quotationData?.latestContent.projectName ?? ''}
+        contractIdNumber={latestContent?.quotationNumber ?? ''}
+        contractName={latestContent?.projectName ?? ''}
         contractPrice={Number(summary.total.replaceAll(',', ''))}
         lastestContentId={lastestContentId}
         verifyForm={verifyForm}
@@ -1504,11 +1609,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   );
 }
 
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============

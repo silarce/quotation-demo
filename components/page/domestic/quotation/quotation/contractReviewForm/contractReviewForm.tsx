@@ -128,7 +128,7 @@ export default function ContractReviewForm({
         title: item.level,
         percent: item.paymentRatio,
         price: item.price,
-        note: item.note,
+        note: item.note ?? '',
       };
     });
 
@@ -168,6 +168,14 @@ export default function ContractReviewForm({
 
     const preBody = watch();
 
+    if (isNaN(Number(preBody.askForPaymentDate))) {
+      preBody.askForPaymentDate = '';
+    }
+
+    if (isNaN(Number(preBody.disbursementDate))) {
+      preBody.disbursementDate = '';
+    }
+
     const body: TcreateQuotationVerifyFormDto = {
       // array
       paymentRatio: Object.values(payMethodList).map((item) => item.body),
@@ -193,7 +201,7 @@ export default function ContractReviewForm({
     body.paymentRatio.forEach((item) => {
       const { level, paymentRatio, price, note } = item;
 
-      if (!level || !paymentRatio || !price || !note) {
+      if (!level || !paymentRatio || !price) {
         isPaymentOk = false;
       }
     });
@@ -216,7 +224,8 @@ export default function ContractReviewForm({
     try {
       await apiSubmitContracting({ contentId: lastestContentId, body });
     } catch (error) {
-      myAlert.err({ title: '送審失敗' });
+      const err = error as Error;
+      myAlert.err({ title: '送出合約審核表失敗', content: err?.message });
     }
 
     close();
@@ -262,8 +271,17 @@ export default function ContractReviewForm({
                 props: {
                   value: watchData.askForPaymentDate ?? '',
                   onChange: (e) => {
-                    setValue('askForPaymentDate', e.target.value);
+                    const str = e.target.value;
+
+                    if (str === '') {
+                      setValue('askForPaymentDate', str);
+                    } else {
+                      let num = parseInt(str);
+                      num = Math.abs(num);
+                      setValue('askForPaymentDate', String(num));
+                    }
                   },
+                  type: 'number',
                 },
               }}
             />
@@ -274,8 +292,17 @@ export default function ContractReviewForm({
                 props: {
                   value: watchData.disbursementDate ?? '',
                   onChange: (e) => {
-                    setValue('disbursementDate', e.target.value);
+                    const str = e.target.value;
+
+                    if (str === '') {
+                      setValue('disbursementDate', str);
+                    } else {
+                      let num = parseInt(str);
+                      num = Math.abs(num);
+                      setValue('disbursementDate', String(num));
+                    }
                   },
+                  type: 'number',
                 },
               }}
             />

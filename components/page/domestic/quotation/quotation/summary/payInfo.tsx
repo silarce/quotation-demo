@@ -157,7 +157,11 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
 
             return (
               <div key={index} className={classNames(scss.inputBox02, scss.legacy)}>
-                <IconRemoveCircle className={scss.btn} onClick={() => delSelf(index)} />
+                <IconRemoveCircle
+                  className={classNames(scss.btn, disabled && scss.hidden)}
+                  onClick={() => delSelf(index)}
+                />
+
                 <span className={scss.label}>
                   {/* {index + 1}.{label} */}
                   {index + 1}.

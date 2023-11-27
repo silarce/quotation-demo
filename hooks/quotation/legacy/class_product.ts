@@ -220,12 +220,21 @@ class Class_product {
     return this._discountRate;
   }
   set discountRate(v) {
-    if (parseFloat(v) > 100) {
+    if (v === '') {
+      v = '0';
+    }
+
+    if (Number(v) > 100) {
       v = '100';
+    }
+
+    if (v.split('.')[1]?.length > 2) {
+      return;
     }
 
     this._discountRate = v;
     this._product.discountRate = Decimal.div(v || 0, 100).toString();
+
     // this._countTotalDiscount();
     this._countSubTotal();
     this._reRender();

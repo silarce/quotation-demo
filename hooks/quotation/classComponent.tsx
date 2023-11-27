@@ -125,11 +125,15 @@ class Class_component {
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
     const unitPrice = new Decimal(price).mul(discount);
-    // 複價
-    const totalPrice = new Decimal(unitPrice).mul(quantity);
+    const fixedUnitPrice = unitPrice.toFixed(0);
+    // 複價 計算方式為四捨五入後的單價乘以數量
 
     this._dualPrice = Number(dualPrice.toFixed(0));
-    this._unitPrice = Number(unitPrice.toFixed(0));
+    this._unitPrice = Number(fixedUnitPrice);
+
+    // const totalPrice = new Decimal(unitPrice).mul(quantity);
+    const totalPrice = new Decimal(fixedUnitPrice).mul(quantity);
+
     this._totalPrice = Number(totalPrice.toFixed(0));
 
     if (calcProdTotal) {
@@ -151,8 +155,9 @@ class Class_component {
   }
 
   get componentInfo() {
-    const info: TgenerateDoorProductBomDto_ComponentInfo = {
+    const info = {
       id: this._com.id ?? '',
+      componentId: this._com.componentId ?? '',
       material: this._com.material ?? '', // 注意，api不接受空字串
       materialSurface: this._com.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
       isPainted: !!this._com.isPainted,
@@ -424,6 +429,9 @@ class Class_component {
 
     if (this.key === 'bottomBar') {
       this.desc = creDesc_bottomBars(this);
+      this._prod.getBottomBarAngleIronAndBottomBarPlate(v);
+      // console.log(this.key);
+      // bottomBar
     }
 
     this.reRender();
@@ -499,6 +507,10 @@ class Class_component {
     return comLookUp[this.key].unit;
   }
 
+  get bottomBarAngleIron_options() {
+    return this._prod.options_bottomBarAngleIron;
+  }
+
   set bom(v: object[]) {
     this._com.bom = v;
   }
@@ -527,6 +539,7 @@ class Class_component {
 // ===========================================================
 
 type Tcomponent = {
+  // key: string;
   id?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -564,30 +577,30 @@ type Tcomponent = {
   hasAluminumBarrier?: boolean;
 
   // TdoorGuideRailDto
-  /**消音條 */
+
   hasSilencingStrip?: boolean; // 消音條
 
   //TdoorSidePlateDto
-  /**一體式捲箱 */
+
   maxDoorWeight?: number | null; // 最大門重量(kg)
   minDoorWeight?: number | null; // 最小門重量(kg)
 
   // TdoorRollerDto
-  /**直徑(inch) */
+
   diameter?: string; // 直徑(inch)
 
   // TdoorMotorDto
   horsePower?: string; // 馬力數
   phase?: number | null; // 相位
-  /**電壓(V) */
+
   voltage?: number | null; // 電壓(V)
-  /**荷重(kg) */
+
   loadWeight?: number | null; // 荷重(kg)
   hasSupportStand?: boolean | null; // 有腳
 
   // TdoorMotorAccessoriesDto
   // 沒有name
-  /**鍊條排數 */
+
   chains?: number; // 鍊條排數
 
   // TdoorMotorAccessoriesDto
@@ -701,7 +714,7 @@ const comCellConfig: TcellConfig = {
   surface: {
     label: '表面',
     inputSelProps: {
-      wrapperStyle: { width: '65px' },
+      wrapperStyle: { width: '75px' },
       selectProps: {
         props: {
           // options 寫在class裡面
@@ -881,8 +894,9 @@ const creDesc_bottomBars = (classCom: Class_component) => {
     material,
   } = classCom;
 
-  const bottomBarAngleIron_options = prodCellConfig.bottomBarAngleIron.inputSelProps.selectProps!.props!
-    .options! as Toption[];
+  // const bottomBarAngleIron_options = prodCellConfig.bottomBarAngleIron.inputSelProps.selectProps!.props!
+  //   .options! as Toption[];
+  const bottomBarAngleIron_options = classCom.bottomBarAngleIron_options;
 
   let desc = '';
 
@@ -1054,7 +1068,7 @@ type Tkit = {
   typeName: string;
   // type是api要收的東西
   type: 'slat' | 'bottomBar' | 'guideRail' | 'sidePlate' | 'roller' | 'motor' | 'motorAccessories' | 'headBox';
-  creDesc: (classCom: Class_component) => string;
+  creDesc: (classCom: Class_component, options?: Toption[]) => string;
   options: Toption[];
   hiddenKeyArr: string[];
   unit?: React.ReactNode;
@@ -1141,14 +1155,12 @@ const comTypeLookUp = {
   headBox: 'headBox',
 } as const;
 
-/**用來確定指定的value是否存在options裡面 */
 const findOptionValue = ({ options, value }: { options: Toption[]; value: string }) => {
   const option = options.find((option) => option.value === value);
 
   return option?.value;
 };
 
-/**取得預設數量 */
 const calcDefaultQuantity = ({
   //
   key,

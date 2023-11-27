@@ -1,4 +1,4 @@
-import { MouseEvent } from 'react';
+import Link from 'next/link';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -17,6 +17,7 @@ type Trecord = {
   discount: string;
   doorQty: string;
   total: string;
+  href: Parameters<typeof Link>[0]['href'];
 };
 
 export default function PanelBody({
@@ -29,7 +30,7 @@ export default function PanelBody({
   return (
     <div className={style.panelBody}>
       {recordArr.map((item, index) => {
-        const { date, editNotes, discount, doorQty, total } = item;
+        const { date, editNotes, discount, doorQty, total, href } = item;
 
         return (
           <CellWithBar className={style.detailRow} key={index}>
@@ -38,9 +39,11 @@ export default function PanelBody({
             <span>{discount}</span>
             <span>{doorQty}</span>
             <span>{total}</span>
-            {/* <div>
-              <IconDetail onClick={openQuotation} />
-            </div> */}
+            <div>
+              <Link href={href}>
+                <IconDetail />
+              </Link>
+            </div>
           </CellWithBar>
         );
       })}

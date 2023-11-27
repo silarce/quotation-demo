@@ -44,6 +44,7 @@ export default function WdContractList() {
       'content.county': { $eq: customerName },
       'content.customer.name': { $contains: customerName },
       'content.projectName': { $contains: projectName },
+      engineeringContactId: { $notNull: true },
     },
   };
 

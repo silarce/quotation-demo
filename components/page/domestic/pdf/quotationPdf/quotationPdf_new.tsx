@@ -99,13 +99,11 @@ export default function QuotationPdf({
         continue;
       }
 
-      const image = await html2canvas(
-        item
-        // ,{
-        //   useCORS: true,
-        //   allowTaint: true,
-        // }
-      ).then((canvas) => {
+      const image = await html2canvas(item, {
+        scale: 3,
+        // useCORS: true,
+        // allowTaint: true,
+      }).then((canvas) => {
         const image = canvas.toDataURL('image/JPEG');
 
         return image;
@@ -180,7 +178,6 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
-      // const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '------';
       const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
       return {
@@ -196,9 +193,10 @@ export default function QuotationPdf({
   const productArr: TtableProdList_series = (() => {
     return productArr_f.map((prod) => {
       // const lw = (Number(prod.WG) || Number(prod.fullWidth)) * 100;
-      const lw = Number(prod.fullWidth || 0) * 100;
-      const h = Number(prod.height) * 100;
-      const b = Number(prod.boxB) * 100;
+
+      const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
+      const h = new Decimal(prod.height || 0).mul(100).toNumber();
+      const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
 
       const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
 
@@ -211,7 +209,8 @@ export default function QuotationPdf({
         thickness: prod.thickness === '0' ? '' : prod.thickness,
         surface: prod.surface,
         // doorRail 要收圖片路徑
-        doorRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,
+        // doorRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,
+        doorRail: `${prod.doorTrack}`,
         horsepower: prod.horsepower,
         openType: prod.close,
         qty: prod.quantity,

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
 // global gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
+// import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // gear
 import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
@@ -16,22 +17,27 @@ type Tcontroll = {
   accounting: {
     employee: TemployeeDto | undefined;
     onChange: (v: TemployeeDto) => void;
+    forbidden?: boolean;
   };
   warehouseEmployee: {
     employee: TemployeeDto | undefined;
     onChange: (v: TemployeeDto) => void;
+    forbidden?: boolean;
   };
   factoryEmployee: {
     employee: TemployeeDto | undefined;
     onChange: (v: TemployeeDto) => void;
+    forbidden?: boolean;
   };
   supervisor: {
     employee: TemployeeDto | undefined;
     onChange: (v: TemployeeDto) => void;
+    forbidden?: boolean;
   };
   formCompleter: {
     employee: TemployeeDto | undefined;
-    onChange: (v: TemployeeDto) => void;
+    onChange?: (v: TemployeeDto) => void;
+    forbidden?: boolean;
   };
 };
 
@@ -48,6 +54,7 @@ export default function Signature({ controll, disabled }: { controll: Tcontroll;
       {indexKeys.map((key, index) => {
         const { label, placeholder } = config[key];
         const value = (controll[key].employee?.chName || controll[key].employee?.enName) ?? '';
+        const forbidden = controll[key].forbidden;
 
         const onClick = () => {
           setTargetControllKey(key);
@@ -59,11 +66,15 @@ export default function Signature({ controll, disabled }: { controll: Tcontroll;
             <InputSel
               className={style.input02}
               inputProps={{
-                value,
+                props: {
+                  value,
+                  placeholder,
+                },
               }}
-              placeholder={placeholder}
-              disabled={disabled}
+              disabled={forbidden || disabled}
+              // showBaseline="auto"
               showBaseline="auto"
+              showAddIcon={forbidden || disabled ? false : true}
             />
           </div>
         );
@@ -71,7 +82,7 @@ export default function Signature({ controll, disabled }: { controll: Tcontroll;
       <EmployeeSelector
         showModal={!!targetControll}
         onConfirm={(arr) => {
-          targetControll?.onChange(arr[0]);
+          targetControll?.onChange?.(arr[0]);
         }}
         onCancel={() => setTargetControllKey(undefined)}
         defaultEmpArr={targetControll?.employee ? [targetControll.employee] : undefined}

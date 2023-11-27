@@ -241,7 +241,7 @@ const group03Keys: Extract<TconfigKey, 'listPrice' | 'bearPrice' | 'percent'>[] 
 const colConfig: Tconfig = {
   idNumber: {
     label: '編號',
-    width: '95px',
+    width: '110px',
     color: 'black',
   },
   designDepartment: {

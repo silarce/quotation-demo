@@ -441,7 +441,7 @@ const prodCellConfig: TcellConfig = {
       selectProps: {
         props: {
           // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
-          options: optionsCreator_bottomBarAngleIron(),
+          // options: optionsCreator_bottomBarAngleIron(),
         },
       },
     },
@@ -453,11 +453,34 @@ const prodCellConfig: TcellConfig = {
       selectProps: {
         props: {
           // !如果options有變動，要去確認classProduct.ts的set material有沒有不對
-          options: optionsCreator_bottomBarPlate(),
+          // options: optionsCreator_bottomBarPlate(),
         },
       },
     },
   },
 }; // prodCellConfig close
 
-export { prodCellConfig };
+const getInstallationFee = ({
+  //
+  doorModel,
+  m2, // 面積
+}: {
+  doorModel: string;
+  m2: number;
+}) => {
+  if (doorModel === 'SJ-302') {
+    return 1800;
+  }
+
+  if (doorModel === 'SJ-303A' || doorModel === 'SJ-303AS') {
+    if (m2 < 10) {
+      return 5400;
+    } else {
+      return 3600;
+    }
+  }
+
+  return 0;
+};
+
+export { prodCellConfig, getInstallationFee };

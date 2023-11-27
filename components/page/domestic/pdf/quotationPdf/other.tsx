@@ -28,7 +28,7 @@ export default function Other({
 
   // 交貨日期
   const [year, month, day] = tradingDate.split('-');
-  const theTradingDate = !tradingDate || tradingDate !== 'Invalid date' ? '' : `民國${year}年${month}月${day}日`;
+  const theTradingDate = !tradingDate || tradingDate === 'Invalid date' ? '' : `民國${year}年${month}月${day}日`;
 
   return (
     <div className={style.other}>

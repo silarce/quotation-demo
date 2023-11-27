@@ -144,7 +144,7 @@ export default function WorkSheetProductDetail02({ control }: { control: Tcontro
         {/* left */}
         <div className={scss.left}>
           <Item label="尺寸" optionArr={arr_size01} />
-          <Item label="尺寸" optionArr={arr_size02} />
+          <Item label="捲軸" optionArr={arr_size02} />
           <Item02 label="捲箱" optionArr={arr_rollBox} />
         </div>
         {/* right */}
@@ -261,32 +261,3 @@ const Item02 = ({
     </div>
   );
 };
-
-// ====================================================================
-// ====================================================================
-// ====================================================================
-
-// const fakeSize = [
-//   { value: '型號', label: 'SJ-302' },
-//   { value: '5250 mm', label: '全寬' },
-//   { value: '4870 mm', label: '淨高' },
-//   { value: '5160 mm', label: 'W+G' },
-//   { value: '70 mm', label: '機械縫 A' },
-//   { value: '20 mm', label: '機械縫 C' },
-//   { value: '550*800', label: '支板尺寸 B*D(右)' },
-//   { value: '5420 mm', label: '捲門全高 H' },
-// ];
-
-// const fakeDoorTrack = [
-//   { value: '單向 220', label: '門軌材質' },
-//   { value: '4970', label: '門軌長度' },
-//   { label: '門軌形式(直)', img: option_doorTrack_normal[0].icon },
-// ];
-
-// const fakeRollBox = [
-//   { value: '4', label: '角鐵數量' },
-//   { value: '5240', label: '捲箱角鐵尺寸' },
-//   { value: '捲箱加機箱', label: '捲箱資訊', span: 2 as const },
-// ];
-
-// ======================================================================
