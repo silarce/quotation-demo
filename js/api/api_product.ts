@@ -182,3 +182,20 @@ export const apiGetProdAccessories = (params: { modelName: string }) => {
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
+
+type TgetBoxDParams = {
+  modelName: string;
+  rollerDiameter: number;
+  sidePlateSizeB: number;
+  hp: string;
+  motorVendor: string;
+};
+
+export const apiGetboxD = (param: TgetBoxDParams) => {
+  const api = '/products/door/calc-side-plate-size-d';
+
+  return axi
+    .get<{ sidePlateSizeD: number }>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
