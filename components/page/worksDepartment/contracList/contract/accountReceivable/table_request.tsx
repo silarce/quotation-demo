@@ -65,8 +65,8 @@ export default function Table_request({
   useEffect(() => {
     (async () => {
       const res01 = await update_finalProduct();
-      // console.log('finalProduct', res01);
-      // console.log('====================================');
+      console.log('finalProduct', res01);
+      console.log('====================================');
     })();
   }, [contractId]);
 
@@ -322,27 +322,27 @@ const View = ({ control }: { control: Tcontrol }) => {
             return (
               <div key={index} className={classNames(scss.row)}>
                 <div className={scss.left}>
-                  {leftKeyArr.map((key, index) => {
+                  {leftKeyArr.map((key, lIndex) => {
                     const { style } = config[key];
                     const value = left[key];
 
                     return (
-                      <div key={index} style={style} className={classNames(scss.cell)}>
+                      <div key={lIndex} style={style} className={classNames(scss.cell)}>
                         <span>{value}</span>
                       </div>
                     );
                   })}
                 </div>
                 <div className={scss.right}>
-                  {Object.values(periodList).map((itemArr, index) => {
+                  {Object.values(periodList).map((itemArr, rIndex) => {
                     return (
-                      <Fragment key={index}>
+                      <Fragment key={rIndex}>
                         <div className={scss.periodGroup}>
                           {itemArr.map((item, cindex) => {
                             const { completeItem, percentage, completePrice } = item;
 
                             return (
-                              <Fragment key={index}>
+                              <Fragment key={cindex}>
                                 <div className={classNames(scss.cell)} style={config.completeItem.style}>
                                   <span>{completeItem}</span>
                                 </div>
@@ -372,12 +372,12 @@ const View = ({ control }: { control: Tcontrol }) => {
           {/* 追加款項 */}
           <div className={classNames(scss.row, scss.thead)}>
             <div className={scss.left}>
-              {leftKeyArr.map((key, index) => {
+              {leftKeyArr.map((key, lIndex) => {
                 const { label, style } = config[key];
 
                 return (
-                  <div key={index} style={style} className={scss.cell}>
-                    {index === 0 && <span className={'whitespace-nowrap'}>追加款項：{appendContractRowQty}</span>}
+                  <div key={lIndex} style={style} className={scss.cell}>
+                    {lIndex === 0 && <span className={'whitespace-nowrap'}>追加款項：{appendContractRowQty}</span>}
                   </div>
                 );
               })}
@@ -411,7 +411,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                             const { completeItem, percentage, completePrice } = item;
 
                             return (
-                              <Fragment key={index}>
+                              <Fragment key={cindex}>
                                 <div className={classNames(scss.cell)} style={config.completeItem.style}>
                                   <span>{completeItem}</span>
                                 </div>
@@ -574,7 +574,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                       </div>
                       <div>
                         <p>{date}</p>
-                        <pattern>{invoiceNumber}</pattern>
+                        <p>{invoiceNumber}</p>
                       </div>
                     </div>
                     <div className={scss.pilar} />
