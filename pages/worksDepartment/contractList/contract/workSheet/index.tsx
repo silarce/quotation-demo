@@ -974,7 +974,7 @@ export default function WorkSheet() {
       寸法: numToStr(targetSheet?.prodSpec?.bearingHousingSize), //  軸承座寸法
     },
     rollBox: {
-      角鐵數量: '999',
+      角鐵數量: targetSheet?.headBoxAngleIronQuantity ?? '',
       捲箱角鐵尺寸: targetSheet?.angleIronSize ?? '',
       捲箱資訊: targetSheet?.headBoxForm_str ?? '',
     },
@@ -999,7 +999,6 @@ export default function WorkSheet() {
       },
     },
     chainCog: {
-      // 鏈齒輪番號: 'gearNumber',
       鏈齒輪番號: targetSheet?.sprocketWheelModel ?? '',
       大鏈輪: targetSheet?.sprocketWheelTeethNumber ?? '',
       孔徑: targetSheet?.bearingInnerDiameter ?? '',

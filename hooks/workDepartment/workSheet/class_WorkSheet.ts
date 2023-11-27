@@ -821,7 +821,7 @@ class Class_workSheet {
   }
 
   get headBoxAngleIronQuantity() {
-    return String(this._prod.headBoxAngleIronQuantity);
+    return String(this._prod.headBoxAngleIronQuantity ?? '0');
   }
   set headBoxAngleIronQuantity(str) {
     this._prod.headBoxAngleIronQuantity = Number(str);

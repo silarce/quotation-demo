@@ -119,6 +119,10 @@ const filter_sidePlates = ({
     return true;
   });
 
+  if (!filteredArr[0]) {
+    console.log('sidePlates', filterParams);
+  }
+
   return filteredArr[0] || null;
 };
 
@@ -184,12 +188,17 @@ const filter_motors = ({
       return false;
     } else if (data.loadWeight !== null && data.loadWeight < filterParams.weight) {
       return false;
-    } else if (data.hasSupportStand !== null && data.hasSupportStand !== filterParams.hasSupportStand) {
-      return false;
     }
+    // else if (data.hasSupportStand !== null && data.hasSupportStand !== filterParams.hasSupportStand) {
+    //   return false;
+    // }
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('motors', filterParams);
+  }
 
   return filteredArr[0] || null;
 };
@@ -219,6 +228,10 @@ const filter_motorAccessories = ({
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('motorAccessories', filterParams);
+  }
 
   return filteredArr[0] || null;
 };
