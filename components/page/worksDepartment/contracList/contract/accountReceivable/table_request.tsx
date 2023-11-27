@@ -263,7 +263,9 @@ const View = ({ control }: { control: Tcontrol }) => {
     <div className={scss.container}>
       <div className={scss.wrapper}>
         <div className={scss.top}>
-          <div></div>
+          <div>
+            <span>請款單</span>
+          </div>
           <div>
             <MyButton_v2 label="新增發票、期數" preImg="add" onClick={onAddClick} />
           </div>
