@@ -70,14 +70,9 @@ export default function AccessorySelector({
 
   useEffect(() => {
     if (!showModal) {
-      return;
-    }
+      setSearchValue([]);
+      setSelAcceArr([]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (!showModal) {
       return;
     }
 

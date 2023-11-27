@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import classNames from 'classnames';
 
 // components
@@ -63,7 +63,7 @@ export default function Table_prod({
   exchangeDiabled?: boolean;
 }) {
   const [allowMove, setAllowMove] = useState(false);
-
+  const ref = useRef<HTMLDivElement>(null);
   // -----------------------------------------------------------------------
   const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
   // -----------------------------------------------------------------------
@@ -102,7 +102,7 @@ export default function Table_prod({
       </div>
 
       {/*  */}
-      <div className={scss.main}>
+      <div className={scss.main} ref={ref}>
         <div className={scss.listContainer}>
           {/*  */}
 
@@ -150,7 +150,14 @@ export default function Table_prod({
 
             {!disabled && (
               <div className={classNames(scss.addBtnWrapper)}>
-                <MyButton_v2 className={scss.addBtn} label="新增產品" onClick={addProd} />
+                <MyButton_v2
+                  className={scss.addBtn}
+                  label="新增產品"
+                  onClick={() => {
+                    addProd();
+                    ref.current!.scrollTop = ref.current!.scrollHeight;
+                  }}
+                />
               </div>
             )}
           </div>

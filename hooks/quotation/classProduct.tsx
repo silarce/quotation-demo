@@ -39,6 +39,8 @@ import {
   optionsCreator_bottomBarPlate_303A,
   optionsCreator_bottomBarAngleIron_303AS,
   optionsCreator_bottomBarPlate_303AS,
+  optionsCreator_boxB_SJ302,
+  optionsCreator_boxB_SJ303A,
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
@@ -52,11 +54,13 @@ import { Class_SubCom, TSubCom } from './classSubCom';
 // =============================================================================
 // api
 import {
+  TgetBoxDParams,
+  TgenerateDoorProductBomDto,
   apiGetProdCalcGeneralSpec,
   apiGetProdAvailableComponents,
   apiPostProdGenerateDoorProductBom,
   apiGetProdCalcDetailSpec,
-  TgenerateDoorProductBomDto,
+  apiGetboxD,
 } from 'js/api/api_product';
 
 import { apiGetQuotationProducts } from 'js/api/api_quotation';
@@ -507,7 +511,12 @@ class Class_product {
         totalPrice: this._prodData.installationFeeTotalPrice,
         quantity: this._prodData.installationFeeQuantity,
         comName: '按裝及製造費用',
-        unit: 'M',
+        // unit: 'M',
+        unit: (
+          <span>
+            m<sup>2</sup>
+          </span>
+        ),
         desc: '(含送電及試車)',
       },
       prod: this,
@@ -637,26 +646,11 @@ class Class_product {
       return false;
     }
 
-    // let res: TdoorGeneralSpecsDto;
-
     const res = await reqGetCalcGeneralSpec(body);
 
     if (!res) {
       return false;
     }
-
-    // try {
-    //   res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
-    // } catch (error) {
-    //   const err = error as AxiosError<{ message: string }>;
-    //   myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });
-
-    //   return false;
-    // }
-
-    // 計算出WG
-
-    // this._prodData.WG = String((Number(this._prodData.fullWidth) * 1000 - res.gapA - res.gapC) / 1000);
 
     this._prodData.WG = String(
       calcProductWG({
@@ -689,15 +683,27 @@ class Class_product {
     if (defaultMotorBox) {
       if (defaultMotorBox.東元) {
         this.motor = '東元';
-        this.boxB_noCall = String(defaultMotorBox.東元.boxB / 1000);
+        this.changeBoxBNoCall({
+          str: String(defaultMotorBox.東元.boxB / 1000),
+          diameter: res.diameter,
+        });
       } else if (defaultMotorBox.大同) {
         this.motor = '大同';
-        this.boxB_noCall = String(defaultMotorBox.大同.boxB / 1000);
+        this.changeBoxBNoCall({
+          str: String(defaultMotorBox.大同.boxB / 1000),
+          diameter: res.diameter,
+        });
       } else if (defaultMotorBox.default) {
-        this.boxB_noCall = String(defaultMotorBox.default.boxB / 1000);
+        this.changeBoxBNoCall({
+          str: String(defaultMotorBox.default.boxB / 1000),
+          diameter: res.diameter,
+        });
       }
     } else {
-      this.boxB_noCall = boxB ? String(boxB / 1000) : '';
+      this.changeBoxBNoCall({
+        str: boxB ? String(boxB / 1000) : '',
+        diameter: res.diameter,
+      });
     }
 
     this._defaultBoxB = this.boxB;
@@ -1238,6 +1244,9 @@ class Class_product {
     // const defaultMotorIndex = this._doorGeneralSpecs?.defaultMotorIndex ?? 0;
     const defaultMotor = this.defaultMotor;
 
+    // console.log(defaultMotor);
+    // console.log(this.options_motor);
+
     const call = () => {
       this._prodData.doorTrackThick = this.options_doorTrackThick?.[0].value ?? '';
       this._prodData.rollUpBoxThick = this.options_rollUpBoxThick?.[0].value ?? '';
@@ -1543,10 +1552,13 @@ class Class_product {
       this.options_horsepower = undefined;
     }
 
+    console.log(motorVendorList);
+
     if (Object.keys(motorVendorList).length > 0) {
       // console.log(motorVendorList);
       // // 只留東元
       // // delete motorVendorList.大同;
+
       this.options_motor = Object.values(motorVendorList).reverse();
     } else {
       this.options_motor = undefined;
@@ -1597,9 +1609,20 @@ class Class_product {
       //     };
       //   });
       // }
-      const { options_boxB, options_boxD } = findBDoptions(this._prodData.doorType);
-      this.options_boxB = options_boxB;
-      this.options_boxD = options_boxD;
+      // const { options_boxB, options_boxD } = findBDoptions(this._prodData.doorType);
+
+      // this.options_boxB = options_boxB;
+      // this.options_boxD = undefined;
+      // this.options_boxB = options_boxB;
+      // this.options_boxD = options_boxD;
+      // optionsCreator_boxB_SJ302
+      // optionsCreator_boxB_SJ303
+      // optionsCreator_boxB_SJ303A
+      if (this.doorType === 'SJ-302') {
+        this.options_boxB = optionsCreator_boxB_SJ302();
+      } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
+        this.options_boxB = optionsCreator_boxB_SJ303A();
+      }
     }
   }
 
@@ -2000,35 +2023,113 @@ class Class_product {
     return this._prodData.boxB;
   }
   set boxB(v) {
-    if (v === 'auto') {
-      v = this._defaultBoxB;
-    }
+    const setBoxB = async () => {
+      if (v === 'auto') {
+        v = this._defaultBoxB;
+      }
 
-    this._prodData.boxB = v;
+      this._prodData.boxB = v;
 
-    const fixedV = Number(v).toFixed(2);
+      const reqBody: TgetBoxDParams = {
+        modelName: this.doorType,
+        rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
+        sidePlateSizeB: Number(this.boxB_mm),
+        hp: this.horsepower,
+        motorVendor: this.motor,
+      };
 
-    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[fixedV] ?? '';
-    this.area = this.calcArea();
+      try {
+        this.isLoading = true;
+        const res = await apiGetboxD(reqBody);
 
-    this.shouldCall_pgpb = true;
-    this.callAllReq();
+        if (res) {
+          const sidePlateSizeD = res?.sidePlateSizeD;
+          this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+        }
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得boxD失敗', content: err.message });
+      } finally {
+        this.isLoading = false;
+      }
 
-    this.reRender();
+      this.area = this.calcArea();
+
+      this.shouldCall_pgpb = true;
+      this.callAllReq();
+
+      this.reRender();
+    };
+
+    setBoxB();
   }
 
   set boxB_noCall(v: string) {
-    this._prodData.boxB = v;
+    const setBoxB = async () => {
+      this._prodData.boxB = v;
 
-    const fixedV = Number(v).toFixed(2);
+      const reqBody: TgetBoxDParams = {
+        modelName: this.doorType,
+        rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
+        sidePlateSizeB: Number(this.boxB_mm),
+        hp: this.horsepower,
+        motorVendor: this.motor,
+      };
 
-    this._prodData.boxD = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD[fixedV] ?? '';
-    this.area = this.calcArea();
-    this.reRender();
+      try {
+        this.isLoading = true;
+        const res = await apiGetboxD(reqBody);
+
+        if (res) {
+          const sidePlateSizeD = res?.sidePlateSizeD;
+          this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+        }
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得boxD失敗', content: err.message });
+      } finally {
+        this.isLoading = false;
+      }
+
+      this.area = this.calcArea();
+      this.reRender();
+    };
+
+    setBoxB();
   }
 
   get boxB_mm() {
     return String(Number(this._prodData.boxB) * 1000);
+  }
+
+  async changeBoxBNoCall({ str, diameter }: { str: string; diameter: number }) {
+    this._prodData.boxB = str;
+
+    const reqBody: TgetBoxDParams = {
+      modelName: this.doorType,
+      rollerDiameter: this._doorGeneralSpecs?.diameter ?? diameter ?? 0,
+      sidePlateSizeB: Number(this.boxB_mm),
+      hp: this.horsepower,
+      motorVendor: this.motor,
+    };
+
+    try {
+      this.isLoading = true;
+      const res = await apiGetboxD(reqBody);
+
+      if (res) {
+        const sidePlateSizeD = res?.sidePlateSizeD;
+        this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+      }
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得boxD失敗', content: err.message });
+    } finally {
+      this.isLoading = false;
+    }
+
+    this.area = this.calcArea();
+    this.reRender();
   }
 
   /**D(m) */
