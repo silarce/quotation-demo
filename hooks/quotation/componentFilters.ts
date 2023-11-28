@@ -23,6 +23,10 @@ const filter_slats = ({
     return data.isAntiTyphoon === filterParams.isAntiTyphoon;
   });
 
+  if (!filteredArr[0]) {
+    console.log('slat', filterParams);
+  }
+
   return filteredArr[0] || null;
 };
 
@@ -48,6 +52,10 @@ const filter_bottomBars = ({
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('bottomBars', filterParams);
+  }
 
   return filteredArr[0] || null;
 };
@@ -80,6 +88,10 @@ const filter_guideRails = ({
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('guideRails', filterParams);
+  }
 
   return filteredArr[0] || null;
 };
@@ -142,6 +154,10 @@ const filter_rollers = ({
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('roller', filterParams);
+  }
 
   return filteredArr[0] || null;
 };
