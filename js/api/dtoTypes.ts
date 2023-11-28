@@ -970,25 +970,6 @@ export type TquotationProductDto = {
   reduceQty?: number;
 };
 
-/**應收帳款明細 主產品請款比例 */
-export type TaccountsReceivableProductPaymentDto = {
-  //  '期數'
-  period: number;
-  //  '請款比例(完成數量)'
-  paymentRatio: string | null;
-  //  '發票id'
-  invoiceId: string | null;
-  //  '發票' 要用的時候在跟Gina要型別吧
-  // invoice: AccountsReceivableInvoiceDto;
-  //  '關聯產品itemId'
-  productItemId: string | null;
-  //  '關聯產品itemId'
-  productItem: TquotationProductItemDto;
-  //  '完成項目'
-  // completeItemStatus: EngineeringDeliveryStatusDto[];
-  completeItemStatus: TdeliveryStatusDto[];
-};
-
 export type TdeliveryStatusDto = {
   id: string;
   createdAt: string;
@@ -1015,7 +996,7 @@ export type TdeliveryStatusDto = {
   //
   completePayment: boolean | null;
   productPaymentId: boolean | null;
-  productPayment: TaccountsReceivableProductPaymentDto;
+  productPayment: TaccountsReceivableProductPaymentDto | null;
 };
 
 export type TcreateEngineeringDeliveryStatusDto = {
@@ -2531,7 +2512,7 @@ export type TaccountsReceivableInvoiceDto = {
   price: number;
   note: string | null;
   invoiceStatus: '已開立' | '已作廢';
-
+  period: number | null;
   /** 所屬應收帳款ID */
   accountsReceivableId: string | null;
   accountsReceivable?: TaccountReceivableDto | null;
@@ -2592,7 +2573,35 @@ export type TupdateAccountReceivableDeductionDto = Partial<TcreateAccountReceiva
 
 export type TfinalProduct = {
   //源合約產品包含item deliveryStatus productPayment(主產品數量已扣追減)
-  finalRootContractProduct: TquotationProductDto[];
+  // finalRootContractProduct: TquotationProductDto[];
+  finalRootContractProduct: TquotationProductItemDto[];
   //追加合約產品包含item deliveryStatus productPayment
-  finalAppendContractProducts: TquotationProductDto[];
+  finalAppendContractProducts: TquotationProductItemDto[];
+};
+
+/**應收帳款明細 主產品請款比例 */
+export type TaccountsReceivableProductPaymentDto = {
+  //  '期數'
+  period: number;
+  //  '請款比例(完成數量)'
+  paymentRatio: string | null;
+  //  '發票id'
+  invoiceId: string | null;
+  //  '發票' 要用的時候在跟Gina要型別吧
+  // invoice: AccountsReceivableInvoiceDto;
+  //  '關聯產品itemId'
+  productItemId: string | null;
+  //  '關聯產品itemId'
+  productItem: TquotationProductItemDto;
+  //  '完成項目'
+  // completeItemStatus: EngineeringDeliveryStatusDto[];
+  completeItemStatus: TdeliveryStatusDto[];
+};
+
+export type TcreateAccountReceivableProductPaymentDto = {
+  paymentRatio: string | null;
+  accountsReceivableId: string;
+  invoiceId: string | null;
+  productItemId: string | null;
+  deliveryStatusId: string[];
 };
