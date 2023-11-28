@@ -122,6 +122,7 @@ $semiMaring: 0 8px;
       word-break: break-all;
       font-size: 16px;
       font-weight: 400;
+      line-height: 33px;
     }
     img {
       width: 30px;
@@ -149,7 +150,7 @@ $semiMaring: 0 8px;
 // ======================================================================
 .total {
   border: solid 1px black;
-  margin-top: 50px;
+  margin-top: 20px;
   .remark {
     display: grid;
     grid-template-columns: 80px auto;
@@ -160,7 +161,10 @@ $semiMaring: 0 8px;
       margin: $semiMaring;
     }
     span {
-      font-size: $fontInfo;
+      // font-size: $fontInfo;
+      font-size: 18px;
+      line-height: 24px;
+
     }
     li {
       display: grid;
@@ -235,7 +239,7 @@ $semiMaring: 0 8px;
       list-style-type: decimal;
       > li {
         font-size: 16px;
-        line-height: 20px;
+        line-height: 22px;
       }
     }
   }

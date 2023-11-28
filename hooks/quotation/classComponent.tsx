@@ -725,7 +725,7 @@ const comCellConfig: TcellConfig = {
   density: {
     label: '重量基重',
     inputSelProps: {
-      wrapperStyle: { width: '80px' },
+      wrapperStyle: { width: '90px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
