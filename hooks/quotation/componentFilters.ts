@@ -23,6 +23,10 @@ const filter_slats = ({
     return data.isAntiTyphoon === filterParams.isAntiTyphoon;
   });
 
+  if (!filteredArr[0]) {
+    console.log('slat', filterParams);
+  }
+
   return filteredArr[0] || null;
 };
 
@@ -48,6 +52,10 @@ const filter_bottomBars = ({
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('bottomBars', filterParams);
+  }
 
   return filteredArr[0] || null;
 };
@@ -80,6 +88,10 @@ const filter_guideRails = ({
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('guideRails', filterParams);
+  }
 
   return filteredArr[0] || null;
 };
@@ -143,6 +155,10 @@ const filter_rollers = ({
     return true;
   });
 
+  if (!filteredArr[0]) {
+    console.log('roller', filterParams);
+  }
+
   return filteredArr[0] || null;
 };
 
@@ -182,9 +198,9 @@ const filter_motors = ({
     // else if (data.gearNumber !== filterParams.gearNumber) {
     //   return false;
     // }
-    else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
-      return false;
-    }
+    // else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
+    //   return false;
+    // }
     // else if (data.phase !== null && data.phase !== filterParams.phase) {
     //   return false;
     // } else if (data.voltage !== null && data.voltage !== filterParams.voltage) {
@@ -259,6 +275,10 @@ const filter_headBoxes = ({
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('headBoxes', filterParams);
+  }
 
   return filteredArr[0] || null;
 };

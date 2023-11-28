@@ -5,11 +5,17 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 16px;
+  align-items: center;
   padding: 11px 0;
   background-color: $bgc01;
   z-index: 1;
   > * {
     flex: none;
+  }
+  > div {
+    span {
+      font-size: 18px;
+    }
   }
 }
 
