@@ -200,7 +200,7 @@ const config: Tconfig = {
   },
   size: {
     label: '尺寸(單位:cm)',
-    width: '140px',
+    width: '160px',
   },
   doorType: {
     label: '門型',
@@ -223,7 +223,7 @@ const config: Tconfig = {
   },
   doorRail: {
     label: '門軌',
-    width: '70px',
+    width: '50px',
     align: 'center',
   },
   horsepower: {
