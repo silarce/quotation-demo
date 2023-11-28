@@ -182,9 +182,9 @@ const filter_motors = ({
     // else if (data.gearNumber !== filterParams.gearNumber) {
     //   return false;
     // }
-    else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
-      return false;
-    }
+    // else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
+    //   return false;
+    // }
     // else if (data.phase !== null && data.phase !== filterParams.phase) {
     //   return false;
     // } else if (data.voltage !== null && data.voltage !== filterParams.voltage) {
@@ -259,6 +259,10 @@ const filter_headBoxes = ({
 
     return true;
   });
+
+  if (!filteredArr[0]) {
+    console.log('headBoxes', filterParams);
+  }
 
   return filteredArr[0] || null;
 };
