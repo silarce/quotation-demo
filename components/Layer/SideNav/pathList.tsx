@@ -620,15 +620,15 @@ const topPathList: TtopPathListConfig[] = [
     },
     erpFeature: [worksDepartment],
   },
-  {
-    icon: icon_project,
-    label: '會計部',
-    path01: sidePathList['/accounting'].path01,
-    href: {
-      pathname: sidePathList['/accounting'].path01 + '/contractList',
-    },
-    erpFeature: [accountsReceivable],
-  },
+  // {
+  //   icon: icon_project,
+  //   label: '會計部',
+  //   path01: sidePathList['/accounting'].path01,
+  //   href: {
+  //     pathname: sidePathList['/accounting'].path01 + '/contractList',
+  //   },
+  //   erpFeature: [accountsReceivable],
+  // },
 ];
 
 export default sidePathList;
