@@ -176,7 +176,7 @@ export default function Table_prod({
                 <ExchangeRow
                   disabled={exchangeDiabled}
                   key={index}
-                  style={{ height: '106px' }}
+                  style={{ height: '60px' }}
                   oriQty={prod.quantity}
                   reduce={prod.reduceQty}
                   reduceOnChange={(v) => {
