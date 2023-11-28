@@ -164,8 +164,6 @@ const filter_motors = ({
     hasSupportStand: boolean; // 有腳 // 馬達支撐架
   };
 }) => {
-  console.log('filterParams', filterParams);
-
   const filteredArr = dataArr.filter((data) => {
     let horsePoswer = filterParams.horsePower;
     let d_horsePower = data.horsePower;
