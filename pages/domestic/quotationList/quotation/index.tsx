@@ -1328,7 +1328,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const size = `${lw} X ${h} + ${b}`;
 
     const list_com = { ...prod.comList, ...prod.subComList };
-    delete list_com['sidePlate'];
+
+    if (list_com.sidePlate?.totalPrice === '0') {
+      delete list_com['sidePlate'];
+    }
+
     delete list_com['motorAccessories'];
 
     const list_acce = prod.accessoriesList;

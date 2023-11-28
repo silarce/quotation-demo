@@ -952,7 +952,7 @@ const creDesc_sidePlates = (classCom: Class_component) => {
   const boxB_num = Number(name);
   const boxB_str = new Decimal(boxB_num).div(10).toString();
 
-  return `${boxB_str ?? ''} `;
+  return `${boxB_str ?? ''} CM`;
 };
 
 const creDesc_rollers = (classCom: Class_component) => {

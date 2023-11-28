@@ -1109,8 +1109,6 @@ class Class_product {
       });
     }
 
-    console.log(this.boxB_mm);
-
     let sidePlate: Tcomponent | null = filter_sidePlates({
       dataArr: availableComponents.sidePlates,
       filterParams: {

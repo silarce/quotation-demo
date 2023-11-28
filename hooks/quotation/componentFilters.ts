@@ -266,8 +266,14 @@ const filter_headBoxes = ({
     isIntegrated: boolean; // 一體式捲箱
   };
 }) => {
+  const fThickness_num = Number(filterParams.thickness);
+
   const filteredArr = dataArr.filter((data) => {
-    if (data.thickness !== filterParams.thickness) {
+    const dThickness_num = Number(data.thickness);
+
+    if (isNaN(fThickness_num)) {
+      return false;
+    } else if (dThickness_num !== fThickness_num) {
       return false;
     } else if (data.isIntegrated !== filterParams.isIntegrated) {
       return false;
