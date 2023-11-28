@@ -709,10 +709,11 @@ class Class_product {
     this._defaultBoxB = this.boxB;
 
     this.findBDoptions();
-    this.options_boxB?.unshift({
-      value: 'auto',
-      label: '自動計算',
-    });
+
+    // this.options_boxB?.unshift({
+    //   value: 'auto',
+    //   label: '自動計算',
+    // });
 
     // 先判斷跟原本的是否一樣
     if (
@@ -1552,8 +1553,6 @@ class Class_product {
       this.options_horsepower = undefined;
     }
 
-    console.log(motorVendorList);
-
     if (Object.keys(motorVendorList).length > 0) {
       // console.log(motorVendorList);
       // // 只留東元
@@ -1589,39 +1588,19 @@ class Class_product {
 
   findBDoptions() {
     if (this._prodData.doorType) {
-      // const BDList = lookup_boxBAndBoxD[this._prodData.doorType]?.BtoD;
-      // const DBList = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB;
+      this.options_boxB = undefined;
 
-      // if (BDList) {
-      //   this.options_boxB = Object.keys(BDList).map((key) => {
-      //     return {
-      //       value: key,
-      //       label: key,
-      //     };
-      //   });
-      // }
-
-      // if (DBList) {
-      //   this.options_boxD = Object.keys(DBList).map((key) => {
-      //     return {
-      //       value: key,
-      //       label: key,
-      //     };
-      //   });
-      // }
-      // const { options_boxB, options_boxD } = findBDoptions(this._prodData.doorType);
-
-      // this.options_boxB = options_boxB;
-      // this.options_boxD = undefined;
-      // this.options_boxB = options_boxB;
-      // this.options_boxD = options_boxD;
-      // optionsCreator_boxB_SJ302
-      // optionsCreator_boxB_SJ303
-      // optionsCreator_boxB_SJ303A
       if (this.doorType === 'SJ-302') {
         this.options_boxB = optionsCreator_boxB_SJ302();
       } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
         this.options_boxB = optionsCreator_boxB_SJ303A();
+      }
+
+      if (this.options_boxB) {
+        this.options_boxB.unshift({
+          value: 'auto',
+          label: '自動計算',
+        });
       }
     }
   }
