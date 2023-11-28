@@ -88,7 +88,7 @@ export default function Tbody({
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
   defalutVKeyArr?: string[];
   onVKeyChange?: (keyArr: string[] | undefined) => void;
-  rowHeight?: 'h106';
+  rowHeight?: 'h60';
   showAttatchModal?: () => void;
 }) {
   // ---------------------------------------------------------------
@@ -386,7 +386,7 @@ function DndRow({
   prodCellConfig: TcellConfig;
   isActive?: boolean;
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
-  rowHeight?: 'h106';
+  rowHeight?: 'h60';
   showAttatchModal?: () => void;
   clearAttach?: () => void;
 }) {

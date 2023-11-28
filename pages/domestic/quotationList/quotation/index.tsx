@@ -1409,7 +1409,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               setTargetProd={setTargetProdKey}
               // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
-              rowHeight="h106"
+              rowHeight="h60"
               isAttach={isAttach}
             />
 
