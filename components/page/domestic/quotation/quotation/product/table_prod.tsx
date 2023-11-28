@@ -52,7 +52,7 @@ export default function Table_prod({
   setTargetProd: (key: string) => void;
   defalutVKeyArr?: string[] | undefined;
   onVKeyChange?: (keyArr: string[] | undefined) => void;
-  rowHeight?: 'h106';
+  rowHeight?: 'h60';
   //
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
   emptyBlockWidth?: string;

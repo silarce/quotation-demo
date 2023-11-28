@@ -725,7 +725,7 @@ const comCellConfig: TcellConfig = {
   density: {
     label: '重量基重',
     inputSelProps: {
-      wrapperStyle: { width: '80px' },
+      wrapperStyle: { width: '90px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
@@ -948,7 +948,11 @@ const creDesc_sidePlates = (classCom: Class_component) => {
   // return `${desc_isIntegrated} 馬達供應商:${motorVendor ?? '無資料'} 軸承:${bearingType ?? '無資料'} 齒輪編號:${
   //   gearNumber ?? '無資料'
   // } 最大負重:${maxDoorWeight ?? '無資料'} 最小負重:${minDoorWeight ?? '無資料'}`;
-  return `${name ?? ''} `;
+
+  const boxB_num = Number(name);
+  const boxB_str = new Decimal(boxB_num).div(10).toString();
+
+  return `${boxB_str ?? ''} `;
 };
 
 const creDesc_rollers = (classCom: Class_component) => {

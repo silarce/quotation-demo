@@ -1108,6 +1108,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         //   preBody.id = undefined;
         // }
 
+        // 後端收到id會400錯誤，所以id全部拿掉
+        preBody.id = undefined;
+
         return preBody;
       }) ?? [];
 
@@ -1343,10 +1346,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         unit: com.unit,
         qty: Number(com.quantity).toFixed(2),
         desc: com.desc ?? '',
-        // price: Number(com.price || 0).toLocaleString(),
-        // totalPrice: Number(com.totalPrice || 0).toLocaleString(),
-        price: Number(999999 || 0).toLocaleString(),
-        totalPrice: Number(999999 || 0).toLocaleString(),
+        price: Number(com.price || 0).toLocaleString(),
+        totalPrice: Number(com.totalPrice || 0).toLocaleString(),
       };
     });
 
@@ -1406,7 +1407,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               setTargetProd={setTargetProdKey}
               // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
-              rowHeight="h106"
+              rowHeight="h60"
               isAttach={isAttach}
             />
 

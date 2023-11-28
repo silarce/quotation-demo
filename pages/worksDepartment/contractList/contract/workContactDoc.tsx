@@ -542,7 +542,7 @@ export default function WorkContactDoc() {
             setTargetProd={() => {}}
             panelBox="easyBox"
             emptyBlockWidth="80px"
-            rowHeight="h106"
+            rowHeight="h60"
           />
           {/* <Remark /> */}
           <div className={scss.textListContainer}>

@@ -1350,7 +1350,7 @@ latestContentProdArr為這次追加追減的主產品
               setTargetProd={setTargetProdKey}
               // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
-              rowHeight="h106"
+              rowHeight="h60"
               isAttach={isAttach}
               attachTotal={attachDivTotal}
             />
@@ -1430,7 +1430,7 @@ latestContentProdArr為這次追加追減的主產品
               // defalutVKeyArr={prodVKeyArr}
               // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               onVKeyChange={() => {}}
-              rowHeight="h106"
+              rowHeight="h60"
               attachTotal={attachAddTotal}
             />
 

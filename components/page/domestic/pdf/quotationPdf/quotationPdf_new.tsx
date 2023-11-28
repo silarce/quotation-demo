@@ -198,7 +198,7 @@ export default function QuotationPdf({
       const h = new Decimal(prod.height || 0).mul(100).toNumber();
       const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
 
-      const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
+      const size = `${lw}Ｘ${h}${b ? `＋${b}` : ''}`;
 
       return {
         category: prod.itemName,
@@ -217,7 +217,8 @@ export default function QuotationPdf({
         unitPrice: prod.unitPrice,
         priceTotal: prod.totalPrice,
         memo: prod.notes,
-        series: prod.itemName,
+        // series: prod.itemName,
+        series: prod.doorType,
       };
     });
   })();
