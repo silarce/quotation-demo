@@ -405,7 +405,7 @@ export default function AttachContract() {
               setTargetProd={setTargetProdKey}
               // defalutVKeyArr={prodVKeyArr}
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
-              rowHeight="h106"
+              rowHeight="h60"
               isAttach={true}
               panelBox="resetChangeBox"
               targetProd={targetProd}
@@ -473,7 +473,7 @@ export default function AttachContract() {
               defalutVKeyArr={Object.keys(attachProdList)}
               // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               onVKeyChange={() => {}}
-              rowHeight="h106"
+              rowHeight="h60"
               // isAttach={true}
               // panelBox="resetChangeBox"
               // targetProd={targetProd}

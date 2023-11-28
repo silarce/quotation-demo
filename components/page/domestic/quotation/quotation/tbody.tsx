@@ -88,7 +88,7 @@ export default function Tbody({
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
   defalutVKeyArr?: string[];
   onVKeyChange?: (keyArr: string[] | undefined) => void;
-  rowHeight?: 'h106';
+  rowHeight?: 'h60';
   showAttatchModal?: () => void;
 }) {
   // ---------------------------------------------------------------
@@ -231,7 +231,7 @@ const CopyDelBtnBox = ({
           }
         }}
       />
-      <span>{indexNum}</span>
+      <span className={scss.indexNum}>{indexNum}</span>
     </div>
   );
 };
@@ -248,7 +248,7 @@ const EasyBox = ({
   return (
     <div className={classNames(scss.buttonBox, 'chameleon', 'w-[80px]')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
-      <span>{indexNum}</span>
+      <span className={scss.indexNum}>{indexNum}</span>
     </div>
   );
 };
@@ -311,7 +311,7 @@ const ResetChangeBtnBox = ({
       <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={toSetTargetIndex}>
         變更
       </button> */}
-      <span>{indexNum}</span>
+      <span className={scss.indexNum}>{indexNum}</span>
     </div>
   );
 };
@@ -386,7 +386,7 @@ function DndRow({
   prodCellConfig: TcellConfig;
   isActive?: boolean;
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
-  rowHeight?: 'h106';
+  rowHeight?: 'h60';
   showAttatchModal?: () => void;
   clearAttach?: () => void;
 }) {
