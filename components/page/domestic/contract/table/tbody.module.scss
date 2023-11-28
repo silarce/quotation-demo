@@ -9,6 +9,9 @@
   &.h106 {
     height: 106px;
   }
+  &.h60 {
+    height: 60px;
+  }
 }
 
 .column {
@@ -40,6 +43,9 @@
     .checkbox {
       justify-content: center;
     }
+  }
+  input:disabled {
+    pointer-events: none;
   }
 }
 .hidden {

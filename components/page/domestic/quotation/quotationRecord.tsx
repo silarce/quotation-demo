@@ -234,7 +234,7 @@ const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) =
         addProd={() => {}}
         setTargetProd={() => {}}
         emptyBlockWidth="80px"
-        rowHeight={'h106'}
+        rowHeight={'h60'}
         panelBox="stateBox"
       />
     </div>

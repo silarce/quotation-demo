@@ -184,11 +184,13 @@ const filter_motors = ({
     // }
     else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
       return false;
-    } else if (data.phase !== null && data.phase !== filterParams.phase) {
-      return false;
-    } else if (data.voltage !== null && data.voltage !== filterParams.voltage) {
-      return false;
-    } else if (data.loadWeight !== null && data.loadWeight < filterParams.weight) {
+    }
+    // else if (data.phase !== null && data.phase !== filterParams.phase) {
+    //   return false;
+    // } else if (data.voltage !== null && data.voltage !== filterParams.voltage) {
+    //   return false;
+    // }
+    else if (data.loadWeight !== null && data.loadWeight < filterParams.weight) {
       return false;
     }
     // else if (data.hasSupportStand !== null && data.hasSupportStand !== filterParams.hasSupportStand) {

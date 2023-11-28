@@ -487,7 +487,7 @@ version>1 是子合約
                 setTargetProd={setTargetProdKey}
                 panelBox="easyBox"
                 emptyBlockWidth="80px"
-                rowHeight={'h106'}
+                rowHeight={'h60'}
               />
               {/* 原報價項目 */}
 
