@@ -38,7 +38,11 @@
     grid-template-columns: auto fit-content(100%);
     overflow: auto;
 
-    height: 471px;
+    // height: 471px;
+    height: fit-content;
+    &.mainProduct {
+      max-height: 470px;
+    }
     .listContainer {
       width: 100%;
 

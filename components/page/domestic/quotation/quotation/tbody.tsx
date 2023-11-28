@@ -460,12 +460,20 @@ function DndRow({
             const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;
             const isHidden = hiddenKeyArr?.includes(key);
 
-            const stateValue = item[key];
+            let stateValue = item[key];
 
             const { inputSelProps, isSuffixOnly } = _.cloneDeep(prodCellConfig[key]);
             const { inputProps, selectProps, checkBoxProps } = inputSelProps;
 
             if (isSuffixOnly) {
+              if (stateValue === 'm2') {
+                stateValue = (
+                  <span>
+                    m<sup>2</sup>
+                  </span>
+                );
+              }
+
               return (
                 <div
                   key={key}

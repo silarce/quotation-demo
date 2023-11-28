@@ -13,6 +13,8 @@ import {
   TdoorAccessoryDto,
 } from 'js/api/dtoTypes';
 
+import scss from './classComponent.module.scss';
+
 import { Class_product } from './classProduct';
 
 // =======================================================================
@@ -85,6 +87,14 @@ class Class_accessories {
       const w = 0;
       this.quantity = l || w;
       this.unit = 'M';
+    } else if (referenceSpec === 'area') {
+      this.quantity = Number(this._prod.area);
+      // this.unit = (
+      //   <span>
+      //     m<sup>2</sup>
+      //   </span>
+      // );
+      this.unit = 'm2';
     } else {
       this.unit = '組';
     }
@@ -217,6 +227,7 @@ type Taccessories = {
   codeName: string; //代號
   name: string; //名稱
   unit: string; // 單位
+  // unit: React.ReactNode; // 單位
   quantity: number; // 數量
   price: number; // 牌價
   totalPrice: number; // 複價
@@ -275,14 +286,18 @@ const accessoriesCellConfig: TcellConfig = {
   },
   unit: {
     label: '單位',
+    theadItemClassName: 'text-center',
+    isSuffixOnly: true,
     inputSelProps: {
       wrapperStyle: { width: '60px' },
       showBaseline: 'invisible',
-      inputProps: {
-        props: {
-          disabled: true,
-        },
-      },
+      suffixClassName: scss.suffix,
+      // inputProps: {
+      //   props: {
+      //     disabled: true,
+      //     placeholder: '',
+      //   },
+      // },
     },
   },
   quantity: {

@@ -978,7 +978,7 @@ class Class_product {
 
     this.callAllTimeoutId = setTimeout(() => {
       this.reqChain();
-    }, 300);
+    }, 800);
   }
 
   // ---------------------------------------------------------
@@ -1108,6 +1108,8 @@ class Class_product {
         },
       });
     }
+
+    console.log(this.boxB_mm);
 
     let sidePlate: Tcomponent | null = filter_sidePlates({
       dataArr: availableComponents.sidePlates,
@@ -1591,9 +1593,9 @@ class Class_product {
       this.options_boxB = undefined;
 
       if (this.doorType === 'SJ-302') {
-        this.options_boxB = optionsCreator_boxB_SJ302();
+        this.options_boxB = _.cloneDeep(optionsCreator_boxB_SJ302());
       } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
-        this.options_boxB = optionsCreator_boxB_SJ303A();
+        this.options_boxB = _.cloneDeep(optionsCreator_boxB_SJ303A());
       }
 
       if (this.options_boxB) {
@@ -1973,7 +1975,7 @@ class Class_product {
     this.timeoutId_calcFullWidth = setTimeout(async () => {
       await callReq();
       this.reRender();
-    }, 300);
+    }, 800);
 
     this.reRender();
   }
@@ -2026,13 +2028,16 @@ class Class_product {
           this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
         }
       } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得boxD失敗', content: err.message });
+        // const err = error as Error;
+        // myAlert.err({ title: '取得boxD失敗', content: err.message });
+        this._prodData.boxD = '0';
       } finally {
         this.isLoading = false;
       }
 
       this.area = this.calcArea();
+
+      this.callRetrieveCreProdCom();
 
       this.shouldCall_pgpb = true;
       this.callAllReq();
@@ -2064,8 +2069,9 @@ class Class_product {
           this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
         }
       } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得boxD失敗', content: err.message });
+        // const err = error as Error;
+        // myAlert.err({ title: '取得boxD失敗', content: err.message });
+        this._prodData.boxD = '0';
       } finally {
         this.isLoading = false;
       }
@@ -2101,8 +2107,9 @@ class Class_product {
         this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
       }
     } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '取得boxD失敗', content: err.message });
+      // const err = error as Error;
+      // myAlert.err({ title: '取得boxD失敗', content: err.message });
+      this._prodData.boxD = '0';
     } finally {
       this.isLoading = false;
     }
@@ -2116,12 +2123,12 @@ class Class_product {
     return this._prodData.boxD;
   }
   set boxD(v) {
-    this._prodData.boxD = v;
-    this._prodData.boxB = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB[v] ?? '';
-    this.area = this.calcArea();
+    // this._prodData.boxD = v;
+    // this._prodData.boxB = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB[v] ?? '';
+    // this.area = this.calcArea();
 
-    this.shouldCall_pgpb = true;
-    this.callAllReq();
+    // this.shouldCall_pgpb = true;
+    // this.callAllReq();
 
     this.reRender();
   }
@@ -2657,7 +2664,10 @@ class Class_product {
       arrForCreate?.map((key, index) => {
         const item = this.accessoriesList[key];
 
-        return { ...item.body, order: index };
+        return {
+          ...item.body,
+          order: index,
+        };
       }) ?? [];
 
     return accessories;
