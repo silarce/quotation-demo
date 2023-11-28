@@ -285,7 +285,7 @@ const prodCellConfig: TcellConfig = {
     theadItemClassName: 'text-center',
     inputSelProps: {
       showBaseline: 'invisible',
-      wrapperStyle: { width: '60px' },
+      wrapperStyle: { width: '70px' },
       checkBoxProps: {
         propsArr: [{ key: 'bounceDoor' }],
       },
