@@ -1,5 +1,7 @@
-import { useState, useEffect, CSSProperties, Fragment } from 'react';
+import { useState, useEffect, CSSProperties, Fragment, useMemo } from 'react';
 import classNames from 'classnames';
+import _ from 'lodash';
+import Decimal from 'decimal.js';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -31,7 +33,7 @@ import { TaccountantDto } from 'js/api/api_accountant';
 import { TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
 
 // utils
-import { convertDate_add1911 } from 'js/utils/helpers/date/convertDate';
+import { convertDate_add1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
@@ -54,6 +56,8 @@ export default function Table_request({
 
   const [showAddInvoiceModal, setShowAddInvoiceModal] = useState<boolean>(false);
 
+  // console.log('invoiceArr', invoiceArr);
+
   // ---------------------------------------------------------
 
   const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
@@ -65,20 +69,242 @@ export default function Table_request({
   useEffect(() => {
     (async () => {
       const res01 = await update_finalProduct();
-      console.log('finalProduct', res01);
-      console.log('====================================');
+      // console.log('finalProduct', res01);
+      // console.log('====================================');
     })();
   }, [contractId]);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const res02 = await update_payments();
-  //     console.log('payments', res02);
-  //     console.log('====================================');
-  //   })();
-  // }, [accountReceivableId]);
+  useEffect(() => {
+    (async () => {
+      const res02 = await update_payments();
+      // console.log('payments', res02);
+      // console.log('====================================');
+    })();
+  }, [accountReceivableId]);
 
   // console.log(invoiceArr);
+
+  // ---------------------------------------------------------
+
+  const { peroidList, invoiceList } = useMemo(() => {
+    // console.log(invoiceArr);
+
+    const peroidList: TperoidList = {};
+    const invoiceList: Tcontrol['invoiceList'] = {};
+
+    invoiceArr?.forEach((invoice) => {
+      const { period, invoiceStatus, invoiceDate, invoiceNumber } = invoice;
+
+      if (invoiceStatus === '已作廢') {
+        return;
+      }
+
+      if (period) {
+        peroidList[period] = {
+          period: String(period),
+          onDeleteClick: () => {
+            alert('test');
+          },
+        };
+        invoiceList[period] = {
+          period: String(period),
+          date: getTaiwanDateStr(invoiceDate) ?? '',
+          invoiceNumber,
+        };
+      }
+    });
+
+    return {
+      peroidList,
+      invoiceList,
+    };
+  }, [invoiceArr]);
+
+  const { firstContractRow, appendContractRow, appendContractRowQty, totalRow01 } = useMemo(() => {
+    // console.log(data_finalProduct);
+    const periodArr = Object.keys(peroidList);
+
+    const { finalRootContractProduct, finalAppendContractProducts } = data_finalProduct ?? {};
+
+    const firstContractRow: Trow[] = (finalRootContractProduct ?? []).map((item) => {
+      const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = item;
+
+      const periodList: Trow['periodList'] = {};
+
+      periodArr.forEach((period) => {
+        periodList[period] = (deliveryStatus ?? []).map((item) => {
+          return {
+            completeItem: item.itemName ?? '',
+            percentage: {
+              value: '0',
+              onClick: () => {},
+            },
+            completePrice: 1,
+          };
+        });
+
+        if (periodList[period].length === 0) {
+          periodList[period].push({
+            completeItem: '',
+            percentage: {
+              value: '0',
+              onClick: () => {},
+            },
+            completePrice: 1,
+          });
+        }
+      });
+
+      return {
+        left: {
+          itemName,
+          fullWidth: String(fullWidth),
+          height: String(height),
+          boxB: String(boxB),
+          qty: '1',
+          unitPrice: unitPrice,
+          totalPrice: totalPrice,
+        },
+        periodList,
+      };
+    });
+
+    const appendContractRow: Trow[] = (finalAppendContractProducts ?? []).map((item) => {
+      const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = item;
+
+      const periodList: Trow['periodList'] = {};
+
+      periodArr.forEach((period) => {
+        periodList[period] = (deliveryStatus ?? []).map((item) => {
+          return {
+            completeItem: item.itemName ?? '',
+            percentage: {
+              value: '0',
+              onClick: () => {},
+            },
+            completePrice: 1,
+          };
+        });
+
+        if (periodList[period].length === 0) {
+          periodList[period].push({
+            completeItem: '',
+            percentage: {
+              value: '0',
+              onClick: () => {},
+            },
+            completePrice: 1,
+          });
+        }
+      });
+
+      return {
+        left: {
+          itemName,
+          fullWidth: String(fullWidth),
+          height: String(height),
+          boxB: String(boxB),
+          qty: '1',
+          unitPrice: unitPrice,
+          totalPrice: totalPrice,
+        },
+        periodList,
+      };
+    });
+
+    const appendContractRowQty = appendContractRow.length;
+
+    const totalRow01 = (() => {
+      let unitPriceTotal = 0;
+      let unitPriceTax = 0;
+      let unitPriceSubTotal = 0;
+
+      let totalPriceTotal = 0;
+      let totalPriceTotalTax = 0;
+      let totalPriceTotalSubTotal = 0;
+
+      const periodList: TtotalRow['periodList'] = {};
+
+      firstContractRow.forEach((item) => {
+        const { unitPrice, totalPrice } = item.left;
+        unitPriceTotal += Number(unitPrice);
+        unitPriceTax = Number(new Decimal(unitPriceTotal).mul(0.05).toFixed(0));
+        unitPriceSubTotal = new Decimal(unitPriceTotal).add(unitPriceTax).toNumber();
+
+        totalPriceTotal += Number(totalPrice);
+        totalPriceTotalTax = Number(new Decimal(totalPriceTotal).mul(0.05).toFixed(0));
+        totalPriceTotalSubTotal = new Decimal(totalPriceTotal).add(totalPriceTotalTax).toNumber();
+
+        const { periodList: itemPeriodList } = item;
+        Object.keys(itemPeriodList).forEach((key) => {
+          const item = itemPeriodList[key];
+
+          if (!periodList[key]) {
+            periodList[key] = {
+              period: key,
+              completePrice: 0,
+              tax: 0,
+              totalWithTax: 0,
+            };
+          }
+
+          item.forEach((item) => {
+            periodList[key].completePrice += Number(item.completePrice);
+            // periodList[key].tax += new Decimal(item.completePrice).mul(0.05).toNumber();
+            periodList[key].tax += Number(new Decimal(item.completePrice).mul(0.05).toFixed(0));
+            periodList[key].totalWithTax += new Decimal(item.completePrice).add(periodList[key].tax).toNumber();
+          });
+        });
+        //
+      });
+
+      appendContractRow.forEach((item) => {
+        const { unitPrice, totalPrice } = item.left;
+        unitPriceTotal += Number(unitPrice);
+        totalPriceTotal += Number(totalPrice);
+
+        const { periodList: itemPeriodList } = item;
+        Object.keys(itemPeriodList).forEach((key) => {
+          const item = itemPeriodList[key];
+
+          if (!periodList[key]) {
+            periodList[key] = {
+              period: key,
+              completePrice: 0,
+              tax: 0,
+              totalWithTax: 0,
+            };
+          }
+
+          item.forEach((item) => {
+            periodList[key].completePrice += Number(item.completePrice);
+            periodList[key].tax += Number(new Decimal(item.completePrice).mul(0.05).toFixed(0));
+            periodList[key].totalWithTax += new Decimal(item.completePrice).add(periodList[key].tax).toNumber();
+          });
+        });
+
+        //
+      });
+
+      return {
+        left: {
+          unitPrice: unitPriceTotal,
+          unitPriceTax,
+          unitPriceSubTotal,
+          totalPrice: totalPriceTotal,
+          totalPriceTotalTax: totalPriceTotalTax,
+          totalPriceTotalSubTotal: totalPriceTotalSubTotal,
+        },
+        periodList,
+      };
+
+      //
+    })();
+
+    return { firstContractRow, appendContractRow, appendContractRowQty, totalRow01 };
+  }, [peroidList]);
+
+  // console.log(peroidList);
 
   // ---------------------------------------------------------
 
@@ -109,14 +335,19 @@ export default function Table_request({
     onAddClick: () => {
       setShowAddInvoiceModal(true);
     },
-    periodList: fakeperiodList,
-    firstContractRow: fakeFirstRow,
-    appendContractRow: fakeFirstRow,
-    appendContractRowQty: '99999',
-    totalRow01: fakeTotalRow,
-    totalRow02: fakeTotalRow,
-    totalRow03: fakeTotalRow,
-    invoiceList: fakeInvoiceList,
+    periodList: peroidList,
+    // firstContractRow: fakeFirstRow,
+    firstContractRow: firstContractRow,
+    // appendContractRow: fakeFirstRow,
+    appendContractRow: appendContractRow,
+    // appendContractRowQty: '99999',
+    appendContractRowQty: String(appendContractRowQty),
+    // totalRow01: fakeTotalRow,
+    totalRow01: totalRow01,
+    // totalRow02: fakeTotalRow,
+    // totalRow03: fakeTotalRow,
+    // invoiceList: fakeInvoiceList,
+    invoiceList: invoiceList,
   };
 
   // ---------------------------------------------------------
@@ -191,8 +422,8 @@ type Trow = {
     height: string;
     boxB: string;
     qty: string;
-    unitPrice: string;
-    totalPrice: string;
+    unitPrice: number;
+    totalPrice: number;
   };
   periodList: {
     [key: string]: {
@@ -201,41 +432,51 @@ type Trow = {
         value: string;
         onClick: () => void;
       };
-      completePrice: string;
+      completePrice: number;
     }[];
   };
 };
 
 type TtotalRow = {
   left?: {
-    unitPrice: string;
-    totalPrice: string;
+    unitPrice: number;
+    unitPriceTax: number;
+    unitPriceSubTotal: number;
+
+    totalPrice: number;
+    totalPriceTotalTax: number;
+    totalPriceTotalSubTotal: number;
   };
   periodList: {
     [key: string]: {
       period: string;
-      completePrice: string;
+      // completePrice: string;
+      completePrice: number;
+      tax: number;
+      totalWithTax: number;
     };
+  };
+};
+
+type TperoidList = {
+  [key: string]: {
+    period: string;
+    onDeleteClick: () => void;
   };
 };
 
 type Tcontrol = {
   onAddClick: () => void;
 
-  periodList: {
-    [key: string]: {
-      period: string;
-      onDeleteClick: () => void;
-    };
-  };
+  periodList: TperoidList;
 
   firstContractRow: Trow[];
   appendContractRow: Trow[];
   appendContractRowQty: string;
 
   totalRow01: TtotalRow;
-  totalRow02: TtotalRow;
-  totalRow03: TtotalRow;
+  // totalRow02: TtotalRow;
+  // totalRow03: TtotalRow;
 
   invoiceList: {
     [key: string]: {
@@ -252,10 +493,11 @@ const View = ({ control }: { control: Tcontrol }) => {
     onAddClick,
     periodList,
     firstContractRow,
+    appendContractRow,
     appendContractRowQty,
     totalRow01,
-    totalRow02,
-    totalRow03,
+    // totalRow02,
+    // totalRow03,
     invoiceList,
   } = control;
 
@@ -384,8 +626,8 @@ const View = ({ control }: { control: Tcontrol }) => {
             </div>
             <div className={classNames(scss.right, 'w-full')}></div>
           </div>
-          {/*  */}
-          {firstContractRow.map((item, index) => {
+          {/* appendContractRow */}
+          {appendContractRow.map((item, index) => {
             const { left, periodList } = item;
 
             return (
@@ -480,22 +722,22 @@ const View = ({ control }: { control: Tcontrol }) => {
           <div className={classNames(scss.row, scss.totalRow)}>
             <div className={scss.left}>
               <div style={config.itemName.style} className={classNames(scss.cell, scss.title)}>
-                <span>{'營業額'}</span>
+                <span>{'營業稅'}</span>
               </div>
               <div style={config.fullWidth.style} className={classNames(scss.cell)} />
               <div style={config.height.style} className={classNames(scss.cell)} />
               <div style={config.boxB.style} className={classNames(scss.cell)} />
               <div style={config.qty.style} className={classNames(scss.cell)} />
               <div style={config.unitPrice.style} className={classNames(scss.cell)}>
-                <span>{totalRow02.left?.unitPrice}</span>
+                <span>{totalRow01.left?.unitPriceTax}</span>
               </div>
               <div style={config.totalPrice.style} className={classNames(scss.cell)}>
-                <span>{totalRow02.left?.totalPrice}</span>
+                <span>{totalRow01.left?.totalPriceTotalTax}</span>
               </div>
             </div>
             {/* right */}
             <div className={scss.right}>
-              {Object.values(totalRow02.periodList).map((item, index) => {
+              {Object.values(totalRow01.periodList).map((item, index) => {
                 return (
                   <Fragment key={index}>
                     <div className={scss.periodGroup}>
@@ -504,7 +746,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                         <span>{`第${item.period}期合計`}</span>
                       </div>
                       <div className={classNames(scss.cell)} style={config.completePrice.style}>
-                        <span>{item.completePrice}</span>
+                        <span>{item.tax}</span>
                       </div>
                       <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
                     </div>
@@ -523,15 +765,15 @@ const View = ({ control }: { control: Tcontrol }) => {
               <div style={config.boxB.style} className={classNames(scss.cell)} />
               <div style={config.qty.style} className={classNames(scss.cell)} />
               <div style={config.unitPrice.style} className={classNames(scss.cell)}>
-                <span>{totalRow03.left?.unitPrice}</span>
+                <span>{totalRow01.left?.unitPriceSubTotal}</span>
               </div>
               <div style={config.totalPrice.style} className={classNames(scss.cell)}>
-                <span>{totalRow03.left?.totalPrice}</span>
+                <span>{totalRow01.left?.totalPriceTotalSubTotal}</span>
               </div>
             </div>
             {/* right */}
             <div className={scss.right}>
-              {Object.values(totalRow03.periodList).map((item, index) => {
+              {Object.values(totalRow01.periodList).map((item, index) => {
                 return (
                   <Fragment key={index}>
                     <div className={scss.periodGroup}>
@@ -540,7 +782,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                         <span>{`第${item.period}期合計`}</span>
                       </div>
                       <div className={classNames(scss.cell)} style={config.completePrice.style}>
-                        <span>{item.completePrice}</span>
+                        <span>{item.totalWithTax}</span>
                       </div>
                       <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
                     </div>
@@ -638,11 +880,11 @@ const config: Tconfig = {
   },
   unitPrice: {
     label: '合約單價',
-    style: { width: '45px' },
+    style: { width: '75px' },
   },
   totalPrice: {
     label: '合約金額',
-    style: { width: '73px' },
+    style: { width: '75px' },
   },
   completeItem: {
     label: '完成項目',
@@ -664,114 +906,114 @@ const config: Tconfig = {
 
 // =============================================================
 
-const fakeperiodList = {
-  '1': {
-    period: '1',
-    onDeleteClick: () => {
-      alert('test');
-    },
-  },
-  '2': {
-    period: '2',
-    onDeleteClick: () => {
-      alert('test');
-    },
-  },
-  '3': {
-    period: '3s',
-    onDeleteClick: () => {
-      alert('test');
-    },
-  },
-};
+// const fakeperiodList = {
+//   '1': {
+//     period: '1',
+//     onDeleteClick: () => {
+//       alert('test');
+//     },
+//   },
+//   '2': {
+//     period: '2',
+//     onDeleteClick: () => {
+//       alert('test');
+//     },
+//   },
+//   '3': {
+//     period: '3s',
+//     onDeleteClick: () => {
+//       alert('test');
+//     },
+//   },
+// };
 
-const fakeFirstRow: Trow[] = [
-  {
-    left: {
-      itemName: 'string',
-      fullWidth: 'string',
-      height: 'string',
-      boxB: 'string',
-      qty: 'string',
-      unitPrice: 'string',
-      totalPrice: 'string',
-    },
-    periodList: {
-      '1': [
-        {
-          completeItem: 'foo',
-          percentage: {
-            value: 'foo',
-            onClick: () => alert('test'),
-          },
-          completePrice: 'foo',
-        },
-        // {
-        //   completeItem: 'foo',
-        //   percentage: {
-        //     value: 'foo',
-        //     onClick: () => alert('test'),
-        //   },
-        //   completePrice: 'foo',
-        // },
-      ],
-      '2': [
-        {
-          completeItem: 'foo',
-          percentage: {
-            value: 'foo',
-            onClick: () => alert('test'),
-          },
-          completePrice: 'foo',
-        },
-        {
-          completeItem: 'foo',
-          percentage: {
-            value: 'foo',
-            onClick: () => alert('test'),
-          },
-          completePrice: 'foo',
-        },
-      ],
-    },
-  },
-];
+// const fakeFirstRow: Trow[] = [
+//   {
+//     left: {
+//       itemName: 'string',
+//       fullWidth: 'string',
+//       height: 'string',
+//       boxB: 'string',
+//       qty: 'string',
+//       unitPrice: 'string',
+//       totalPrice: 'string',
+//     },
+//     periodList: {
+//       '1': [
+//         {
+//           completeItem: 'foo',
+//           percentage: {
+//             value: 'foo',
+//             onClick: () => alert('test'),
+//           },
+//           completePrice: 'foo',
+//         },
+//         // {
+//         //   completeItem: 'foo',
+//         //   percentage: {
+//         //     value: 'foo',
+//         //     onClick: () => alert('test'),
+//         //   },
+//         //   completePrice: 'foo',
+//         // },
+//       ],
+//       '2': [
+//         {
+//           completeItem: 'foo',
+//           percentage: {
+//             value: 'foo',
+//             onClick: () => alert('test'),
+//           },
+//           completePrice: 'foo',
+//         },
+//         {
+//           completeItem: 'foo',
+//           percentage: {
+//             value: 'foo',
+//             onClick: () => alert('test'),
+//           },
+//           completePrice: 'foo',
+//         },
+//       ],
+//     },
+//   },
+// ];
 
-const fakeTotalRow: TtotalRow = {
-  left: {
-    unitPrice: '9999',
-    totalPrice: '9999',
-  },
-  periodList: {
-    '1': {
-      period: '1',
-      completePrice: '9999',
-    },
-    '2': {
-      period: '2',
-      completePrice: '9999',
-    },
-    '3': {
-      period: '3',
-      completePrice: '9999',
-    },
-  },
-};
+// const fakeTotalRow: TtotalRow = {
+//   left: {
+//     unitPrice: 9999,
+//     totalPrice: 9999,
+//   },
+//   periodList: {
+//     '1': {
+//       period: '1',
+//       completePrice: 9999,
+//     },
+//     '2': {
+//       period: '2',
+//       completePrice: 9999,
+//     },
+//     '3': {
+//       period: '3',
+//       completePrice: 9999,
+//     },
+//   },
+// };
 
-const fakeInvoiceList = {
-  '1': {
-    period: '1',
-    date: 'string',
-    invoiceNumber: 'string',
-  },
-  '2': {
-    period: '2',
-    date: 'string',
-    invoiceNumber: 'string',
-  },
-  '3': {
-    period: '3',
-    date: 'string',
-    invoiceNumber: 'string',
-  },
-};
+// const fakeInvoiceList = {
+//   '1': {
+//     period: '1',
+//     date: 'string',
+//     invoiceNumber: 'string',
+//   },
+//   '2': {
+//     period: '2',
+//     date: 'string',
+//     invoiceNumber: 'string',
+//   },
+//   '3': {
+//     period: '3',
+//     date: 'string',
+//     invoiceNumber: 'string',
+//   },
+// };

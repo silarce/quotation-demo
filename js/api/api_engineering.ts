@@ -46,6 +46,7 @@ import type {
   TfinalProduct,
   TcreateAccountReceivableDto,
   TaccountsReceivableProductPaymentDto,
+  TcreateAccountReceivableProductPaymentDto,
 } from './dtoTypes';
 
 export type {
@@ -83,6 +84,7 @@ export type {
   TfinalProduct,
   TcreateAccountReceivableDto,
   TaccountsReceivableProductPaymentDto,
+  TcreateAccountReceivableProductPaymentDto,
 } from './dtoTypes';
 
 // ========================================================================
@@ -1249,4 +1251,16 @@ export const useGetAccountReceivableProductPayments = (
     meta: res?.meta,
     update,
   };
+};
+
+export const apiPostProductPayment = async (
+  accountReceivableId: string,
+  body: TcreateAccountReceivableProductPaymentDto
+) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
+
+  return axi
+    .post<TaccountsReceivableProductPaymentDto[]>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
 };

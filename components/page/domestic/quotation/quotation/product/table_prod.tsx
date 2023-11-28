@@ -102,7 +102,7 @@ export default function Table_prod({
       </div>
 
       {/*  */}
-      <div className={scss.main} ref={ref}>
+      <div className={classNames(scss.main, scss.mainProduct)} ref={ref}>
         <div className={scss.listContainer}>
           {/*  */}
 
