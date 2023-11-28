@@ -1192,6 +1192,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     };
 
     if (!body.customerId) {
+      setIsLoading(false);
+
       return myAlert.warning({ title: '請選擇客戶' });
     }
 
