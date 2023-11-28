@@ -890,6 +890,10 @@ class Class_product {
 
   /**取得細部規格(取得slatCount) */
   async reqGetDetailSpec() {
+    if (!this.doorType) {
+      return;
+    }
+
     const res = await reqGetProdCalcDetailSpec({
       modelName: this.doorType as TpcgsPrams['modelName'],
       height: Number(this.height_mm),
@@ -2243,6 +2247,11 @@ class Class_product {
   }
   set surface(v) {
     this._prodData.surface = v;
+
+    if (this.comList) {
+      this.comList.slat.surface = v;
+    }
+
     this.reRender();
   }
 
