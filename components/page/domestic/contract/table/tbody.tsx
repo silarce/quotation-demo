@@ -56,7 +56,7 @@ export default function Tbody({
   prodCellConfig: TcellConfig;
   onRowClick?: (obj: { item: Titem; key: string }) => void;
   panelBox?: 'stateBox' | 'easyBox';
-  rowHeight?: 'h106';
+  rowHeight?: 'h60' | 'h106';
 }) {
   // ---------------------------------------------------------------
 
@@ -172,7 +172,7 @@ function DndRow({
   prodCellConfig: TcellConfig;
   isActive?: boolean;
   panelBox?: 'stateBox' | 'easyBox';
-  rowHeight?: 'h106';
+  rowHeight?: 'h60' | 'h106';
   // state: 'add' | 'div';
   //
 }) {

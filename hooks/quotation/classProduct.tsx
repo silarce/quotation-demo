@@ -1497,10 +1497,30 @@ class Class_product {
     motors.forEach((item) => {
       const { horsePower, motorVendor, phase, voltage } = item;
 
+      let theHorsePower = horsePower;
+
+      if (horsePower === '1.5HP') {
+        theHorsePower = '1 1/2HP';
+      }
+
+      const hpOrder =
+        horsePower === '1/4'
+          ? '0.25'
+          : horsePower === '1/3'
+          ? '0.33'
+          : horsePower === '1/2'
+          ? '0.5'
+          : horsePower === '3/4'
+          ? '0.75'
+          : horsePower === '1 1/2'
+          ? '1.5'
+          : horsePower;
+
       if (horsePower) {
         horsePowerList[horsePower] = {
-          value: horsePower,
-          label: horsePower,
+          value: theHorsePower,
+          label: theHorsePower,
+          hpOrder: hpOrder,
         };
       }
 
@@ -1549,21 +1569,38 @@ class Class_product {
       }
     });
 
+    console.log(horsePowerList);
+
     if (Object.keys(horsePowerList).length > 0) {
       this.options_horsepower = Object.values(horsePowerList);
     } else {
       this.options_horsepower = undefined;
     }
 
-    if (Object.keys(motorVendorList).length > 0) {
-      // console.log(motorVendorList);
-      // // 只留東元
-      // // delete motorVendorList.大同;
+    if (this.options_horsepower) {
+      this.options_horsepower = _.sortBy(this.options_horsepower, 'hpOrder');
+    }
 
+    if (Object.keys(motorVendorList).length > 0) {
       this.options_motor = Object.values(motorVendorList).reverse();
     } else {
       this.options_motor = undefined;
     }
+
+    // if (this.options_motor) {
+    //   const theIndex = this.options_motor.findIndex((item) => {
+    //     return item.value === '1 1/2HP';
+    //   });
+
+    //   if (theIndex > 0) {
+    //     const oneHPIndex = this.options_motor.findIndex((item) => {
+    //       return item.value === '1HP';
+    //     });
+
+    //     if()
+
+    //   }
+    // }
 
     if (Object.keys(phaseList).length > 0) {
       this.options_phase = Object.values(phaseList);
@@ -3082,19 +3119,6 @@ const creOptions_surface: () => Toption[] = () => [
   { value: 'NO.4', label: 'NO.4' },
 ];
 
-// 理論上不會有undefined，但現在情況混亂，先加上去吧
-// type TpariBD = {
-//   [key: string]:
-//     | {
-//         BtoD: {
-//           [key: string]: string | undefined;
-//         };
-//         DtoB: {
-//           [key: string]: string | undefined;
-//         };
-//       }
-//     | undefined;
-// };
 // // 單位為m
 // const pairBD: TpariBD = {
 //   'SJ-302': {
@@ -3115,6 +3139,13 @@ const creOptions_surface: () => Toption[] = () => [
 //       '0.90': '0.60',
 //     },
 //   },
+// };
+
+// const horsePowerLookup = {
+//   '1/4': '0.25',
+//   '1/3': '0.33',
+//   '1/2': '0.5',
+//   '3/4': '0.75',
 // };
 
 const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {

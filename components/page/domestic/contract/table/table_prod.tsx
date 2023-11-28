@@ -37,7 +37,7 @@ export default function Table_prod({
   setTargetProd: (key: string) => void;
   defalutVKeyArr?: string[] | undefined;
   onVKeyChange?: (keyArr: string[] | undefined) => void;
-  rowHeight?: 'h106';
+  rowHeight?: 'h60' | 'h106';
   //
   panelBox?: 'stateBox' | 'easyBox';
   emptyBlockWidth?: string;
