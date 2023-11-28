@@ -1108,6 +1108,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         //   preBody.id = undefined;
         // }
 
+        // 後端收到id會400錯誤，所以id全部拿掉
+        preBody.id = undefined;
+
         return preBody;
       }) ?? [];
 
