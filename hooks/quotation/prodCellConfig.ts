@@ -96,9 +96,11 @@ const prodCellConfig: TcellConfig = {
   boxB: {
     label: 'B(m)',
     inputSelProps: {
-      wrapperStyle: { width: '90px' },
+      wrapperStyle: { width: '60px' },
       selectProps: {
-        props: {},
+        props: {
+          placeholder: '',
+        },
       },
     },
   },
@@ -115,7 +117,7 @@ const prodCellConfig: TcellConfig = {
     label: '門片厚度',
     theadItemClassName: 'text-center',
     inputSelProps: {
-      wrapperStyle: { width: '80px' },
+      wrapperStyle: { width: '50px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
@@ -177,23 +179,24 @@ const prodCellConfig: TcellConfig = {
   doorTrack: {
     label: '門軌',
     inputSelProps: {
-      wrapperStyle: { width: '130px' },
+      wrapperStyle: { width: '70px' },
       selectProps: {
         withIcon: true,
         creOptionWithIconProps: {
           showLabel: false,
           imgProps: {
-            style: { height: '80px' },
+            style: { height: '40px' },
           },
         },
         creSingleValueWithIconProps: {
           showLabel: false,
           imgProps: {
-            style: { height: '80px' },
+            style: { height: '40px' },
           },
         },
         props: {
           // options由api取得
+          placeholder: '',
         },
       },
     },
