@@ -890,6 +890,10 @@ class Class_product {
 
   /**取得細部規格(取得slatCount) */
   async reqGetDetailSpec() {
+    if (!this.doorType) {
+      return;
+    }
+
     const res = await reqGetProdCalcDetailSpec({
       modelName: this.doorType as TpcgsPrams['modelName'],
       height: Number(this.height_mm),
@@ -1109,8 +1113,6 @@ class Class_product {
       });
     }
 
-    console.log(this.boxB_mm);
-
     let sidePlate: Tcomponent | null = filter_sidePlates({
       dataArr: availableComponents.sidePlates,
       filterParams: {
@@ -1152,8 +1154,9 @@ class Class_product {
     });
 
     const isGearNumberChanged = this.comList?.motor?.gearNumber !== motor?.gearNumber;
-    // TODO get /products/door/available-components取得的金額不是正確的金額
-    // 正的金額之後會補在 post /products/door/generate-door-product-bom
+
+    // get /products/door/available-components取得的金額不是正確的金額
+    // 正確的金額之後會在 post /products/door/generate-door-product-bom 取得
 
     slat = _.cloneDeep(slat);
     roller = _.cloneDeep(roller);
@@ -1504,15 +1507,15 @@ class Class_product {
       }
 
       const hpOrder =
-        horsePower === '1/4'
+        horsePower === '1/4HP'
           ? '0.25'
-          : horsePower === '1/3'
+          : horsePower === '1/3HP'
           ? '0.33'
-          : horsePower === '1/2'
+          : horsePower === '1/2HP'
           ? '0.5'
-          : horsePower === '3/4'
+          : horsePower === '3/4HP'
           ? '0.75'
-          : horsePower === '1 1/2'
+          : horsePower === '1 1/2HP'
           ? '1.5'
           : horsePower;
 
@@ -1520,7 +1523,8 @@ class Class_product {
         horsePowerList[horsePower] = {
           value: theHorsePower,
           label: theHorsePower,
-          hpOrder: hpOrder,
+          // hpOrder: hpOrder,
+          hpOrder: String(parseInt(hpOrder)),
         };
       }
 
@@ -1568,8 +1572,6 @@ class Class_product {
         };
       }
     });
-
-    console.log(horsePowerList);
 
     if (Object.keys(horsePowerList).length > 0) {
       this.options_horsepower = Object.values(horsePowerList);
@@ -2245,6 +2247,11 @@ class Class_product {
   }
   set surface(v) {
     this._prodData.surface = v;
+
+    if (this.comList) {
+      this.comList.slat.surface = v;
+    }
+
     this.reRender();
   }
 

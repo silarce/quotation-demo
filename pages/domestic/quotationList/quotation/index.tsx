@@ -1006,7 +1006,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
     {
       type: 'myButton',
-      label: '匯出材料/配件',
+      label: '單價分析',
       img: iconUpload.src,
       onClick: () => {
         const prodArr = latestContent?.products;
@@ -1192,6 +1192,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     };
 
     if (!body.customerId) {
+      setIsLoading(false);
+
       return myAlert.warning({ title: '請選擇客戶' });
     }
 
@@ -1321,14 +1323,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
     // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
 
-    const lw = new Decimal(prod.fullWidth || 0).mul(10).toNumber();
+    const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
     const h = new Decimal(prod.height || 0).mul(100).toNumber();
     const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
 
     const size = `${lw} X ${h} + ${b}`;
 
     const list_com = { ...prod.comList, ...prod.subComList };
-    delete list_com['sidePlate'];
+
+    if (list_com.sidePlate?.totalPrice === '0') {
+      delete list_com['sidePlate'];
+    }
+
     delete list_com['motorAccessories'];
 
     const list_acce = prod.accessoriesList;

@@ -380,6 +380,7 @@ export default function QuotationProfile({
             inputProps={{
               props: {
                 value: quotationNumber ?? '',
+                placeholder: '系統自動設定',
               },
             }}
           />
@@ -409,8 +410,8 @@ export default function QuotationProfile({
             wrapperStyle={{ gap: wrapperStyle.gap }}
             inputProps={{
               props: {
-                placeholder: '無日期',
                 value: quotationDate ?? '',
+                placeholder: '系統自動設定',
               },
             }}
           />

@@ -117,7 +117,7 @@ const prodCellConfig: TcellConfig = {
     label: '門片厚度',
     theadItemClassName: 'text-center',
     inputSelProps: {
-      wrapperStyle: { width: '50px' },
+      wrapperStyle: { width: '100px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
@@ -285,7 +285,7 @@ const prodCellConfig: TcellConfig = {
     theadItemClassName: 'text-center',
     inputSelProps: {
       showBaseline: 'invisible',
-      wrapperStyle: { width: '60px' },
+      wrapperStyle: { width: '70px' },
       checkBoxProps: {
         propsArr: [{ key: 'bounceDoor' }],
       },
@@ -477,7 +477,8 @@ const getInstallationFee = ({
 
   if (doorModel === 'SJ-303A' || doorModel === 'SJ-303AS') {
     if (m2 < 10) {
-      return 5400;
+      // return 5400;
+      return 3600;
     } else {
       return 3600;
     }
