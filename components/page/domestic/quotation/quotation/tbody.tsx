@@ -231,7 +231,7 @@ const CopyDelBtnBox = ({
           }
         }}
       />
-      <span>{indexNum}</span>
+      <span className={scss.indexNum}>{indexNum}</span>
     </div>
   );
 };
@@ -248,7 +248,7 @@ const EasyBox = ({
   return (
     <div className={classNames(scss.buttonBox, 'chameleon', 'w-[80px]')}>
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
-      <span>{indexNum}</span>
+      <span className={scss.indexNum}>{indexNum}</span>
     </div>
   );
 };
@@ -311,7 +311,7 @@ const ResetChangeBtnBox = ({
       <button className={classNames(scss.btn, !isLatestBatch && scss.hidden)} onClick={toSetTargetIndex}>
         變更
       </button> */}
-      <span>{indexNum}</span>
+      <span className={scss.indexNum}>{indexNum}</span>
     </div>
   );
 };
