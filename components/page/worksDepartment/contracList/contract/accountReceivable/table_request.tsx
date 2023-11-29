@@ -108,9 +108,9 @@ export default function Table_request({
       if (period) {
         peroidList[period] = {
           period: String(period),
-          onDeleteClick: () => {
-            alert('test');
-          },
+          // onDeleteClick: () => {
+          //   alert('test');
+          // },
         };
         validInvoiceList[period] = {
           id,
@@ -603,7 +603,7 @@ type TtotalRow = {
 type TperoidList = {
   [key: string]: {
     period: string;
-    onDeleteClick: () => void;
+    // onDeleteClick: () => void;
   };
 };
 
@@ -671,7 +671,10 @@ const View = ({ control }: { control: Tcontrol }) => {
             </div>
             <div className={scss.right}>
               {Object.values(periodList).map((item, index) => {
-                const { period, onDeleteClick } = item;
+                const {
+                  period,
+                  // onDeleteClick
+                } = item;
 
                 const { completeItem, percentage, completePrice, deleteIcon } = config;
 
@@ -690,7 +693,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                         <span>{completePrice.label}</span>
                       </div>
                       <div className={classNames(scss.cell)} style={deleteIcon.style}>
-                        <IconDelete01 onClick={onDeleteClick} />
+                        {/* <IconDelete01 onClick={onDeleteClick} /> */}
                       </div>
                     </div>
                     <div className={scss.pilar} />
