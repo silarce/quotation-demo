@@ -161,7 +161,7 @@ export default function Table_request({
           const { itemName, productPayment } = deliveryStatu;
           // const { paymentRatio, invoice } = productPayment;
           const thePaymentArr = productPayment?.filter((item) => {
-            return String(item.invoice?.period) === period;
+            return String(item.invoice?.period) === String(period);
           });
 
           // if (thePayment?.length > 1) {
