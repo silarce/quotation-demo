@@ -2548,6 +2548,7 @@ export type TaccountantDto = {
   billSerialNumber: string | null; // 收入傳票序號
   noteMaturityDate: string | null; // 票據到期日
   invoice: TaccountsReceivableInvoiceDto[] | null;
+  noteNumber: string | null; // 票據號碼
 };
 
 export type TcreateAccountantDto = Omit<TaccountantDto, 'id' | 'createdAt' | 'updatedAt' | 'noteMaturityDate'> & {

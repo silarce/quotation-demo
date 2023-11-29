@@ -147,6 +147,35 @@ export default function AccountReceivable() {
     order: sort_invoice.order ? 'ASC' : 'DESC',
   };
 
+  const [searchValue_accountant, setSearchValue_accountant] = useState<string>('');
+  const [sort_accountant, setSort_accountant] = useState<{
+    sort: string | undefined;
+    // order: 'ASC' | 'DESC' | undefined;
+    order: boolean;
+  }>({
+    sort: undefined,
+    order: false,
+  });
+
+  const params_accountant: Tparams = {
+    filter: {
+      $or: [
+        //
+
+        { accountingNumber: { $eq: searchValue_accountant } },
+        { noteNumber: { $eq: searchValue_accountant } },
+        {
+          price: {
+            $eq: isNaN(Number(searchValue_accountant || undefined)) ? undefined : Number(searchValue_accountant),
+          },
+        },
+        { billSerialNumber: { $eq: searchValue_accountant } },
+      ],
+    },
+    sort: sort_accountant.sort,
+    order: sort_accountant.order ? 'ASC' : 'DESC',
+  };
+
   // _use發票給予紀錄
   const { data: data_invoiceArr, update: update_invoiceArr } = useGetAccountReceivableIncoices(
     accountReceivableId,
@@ -154,8 +183,10 @@ export default function AccountReceivable() {
   );
 
   // _use收款紀錄
-  const { data: data_accountantArr, update: update_accountantArr } =
-    useGetAccountReceivableAccountants(accountReceivableId);
+  const { data: data_accountantArr, update: update_accountantArr } = useGetAccountReceivableAccountants(
+    accountReceivableId,
+    params_accountant
+  );
 
   const [targetAccountant, setTargetAccountant] = useState<TaccountantDto>();
 
@@ -182,7 +213,7 @@ export default function AccountReceivable() {
 
   useEffect(() => {
     update_accountantArr();
-  }, [accountReceivableId]);
+  }, [accountReceivableId, searchValue_accountant, sort_accountant]);
 
   const {
     lastestVerifyForm, // 請款比例表用的
@@ -821,6 +852,7 @@ export default function AccountReceivable() {
             inputProps: {
               props: {
                 value: getTaiwanDateStr(accItem.createdAt) ?? '',
+                placeholder: '',
               },
             },
           },
@@ -830,6 +862,7 @@ export default function AccountReceivable() {
             inputProps: {
               props: {
                 value: accItem.accountingNumber,
+                placeholder: '',
               },
             },
           },
@@ -838,7 +871,8 @@ export default function AccountReceivable() {
             cellStyle: { width: '189px' },
             inputProps: {
               props: {
-                value: accItem.accountingNumber,
+                value: accItem.noteNumber ?? '',
+                placeholder: '',
               },
             },
           },
@@ -848,6 +882,7 @@ export default function AccountReceivable() {
             inputProps: {
               props: {
                 value: getTaiwanDateStr(accItem.noteMaturityDate) ?? '',
+                placeholder: '',
               },
             },
           },
@@ -857,6 +892,7 @@ export default function AccountReceivable() {
             inputProps: {
               props: {
                 value: accItem.price,
+                placeholder: '',
               },
             },
           },
@@ -866,6 +902,7 @@ export default function AccountReceivable() {
             inputProps: {
               props: {
                 value: accItem.billSerialNumber ?? '',
+                placeholder: '',
               },
             },
           },
@@ -879,7 +916,7 @@ export default function AccountReceivable() {
     const control_accountant: Tcontrol_dynaTable = {
       caption: '收款紀錄',
       onSearchClick: (str) => {
-        alert(str);
+        setSearchValue_accountant(str);
       },
       tableBottomBtnProps: {
         label: '新增收款紀錄',
@@ -895,13 +932,34 @@ export default function AccountReceivable() {
         panelCell_05: {},
         list: createdHeadRowList_收款紀錄({
           onDateClick: () => {
-            alert('test');
+            setSort_accountant((state) => {
+              const order = state.sort === 'createdAt' ? !state.order : false;
+
+              return {
+                sort: 'createdAt',
+                order: order,
+              };
+            });
           },
           onChequeDateClick: () => {
-            alert('test');
+            setSort_accountant((state) => {
+              const order = state.sort === 'noteMaturityDate' ? !state.order : false;
+
+              return {
+                sort: 'noteMaturityDate',
+                order: order,
+              };
+            });
           },
-          onIncomingSubpoenaSerialNumberClick: () => {
-            alert('test');
+          onPriceClick: () => {
+            setSort_accountant((state) => {
+              const order = state.sort === 'price' ? !state.order : false;
+
+              return {
+                sort: 'price',
+                order: order,
+              };
+            });
           },
         }),
       },
@@ -1276,7 +1334,7 @@ export default function AccountReceivable() {
 const createdHeadRowList_收款紀錄 = (props?: {
   onDateClick?: () => void;
   onChequeDateClick?: () => void;
-  onIncomingSubpoenaSerialNumberClick?: () => void;
+  onPriceClick?: () => void;
 }) => ({
   date: {
     label: '日期',
@@ -1299,11 +1357,11 @@ const createdHeadRowList_收款紀錄 = (props?: {
   price: {
     label: '金額',
     cellStyle: { width: '170px' },
+    onClick: props?.onPriceClick,
   },
   incomingSubpoenaSerialNumber: {
     label: '收入傳票序號',
     cellStyle: { width: '187px' },
-    onClick: props?.onIncomingSubpoenaSerialNumberClick,
   },
 });
 
