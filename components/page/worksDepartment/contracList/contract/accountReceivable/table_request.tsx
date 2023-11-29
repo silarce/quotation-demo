@@ -44,6 +44,15 @@ import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 import scss from './table_request.module.scss';
 
 // =================================================
+
+type TmyInvoice = {
+  id: string;
+  period: string;
+  date: string;
+  invoiceNumber: string;
+};
+
+// =================================================
 export default function Table_request({
   contractId,
   accountReceivableId,
@@ -93,38 +102,17 @@ export default function Table_request({
   // TcreateAccountReceivableProductPaymentDto
   const [paymentPreBody, setPeymentPreBody] = useState<TcreateAccountReceivableProductPaymentDto>();
 
-  const reqPostProductPayment = async (ratio: string) => {
-    if (!paymentPreBody || !accountReceivableId) {
-      return;
-    }
-
-    const body = {
-      ...paymentPreBody,
-      paymentRatio: ratio,
-    };
-
-    try {
-      setIsLoading(true);
-      await apiPostProductPayment(accountReceivableId, body);
-      setPeymentPreBody(undefined);
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '新增請款比例失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // -----------------------------------------------------------------------------
 
-  const { peroidList, invoiceList } = useMemo(() => {
+  const { peroidList, validInvoiceList } = useMemo(() => {
     // console.log(invoiceArr);
 
     const peroidList: TperoidList = {};
-    const invoiceList: Tcontrol['invoiceList'] = {};
+    // const invoiceList: Tcontrol['invoiceList'] = {};
+    const validInvoiceList: { [key: string]: TmyInvoice } = {};
 
     invoiceArr?.forEach((invoice) => {
-      const { period, invoiceStatus, invoiceDate, invoiceNumber } = invoice;
+      const { id, period, invoiceStatus, invoiceDate, invoiceNumber } = invoice;
 
       if (invoiceStatus === '已作廢') {
         return;
@@ -137,7 +125,8 @@ export default function Table_request({
             alert('test');
           },
         };
-        invoiceList[period] = {
+        validInvoiceList[period] = {
+          id,
           period: String(period),
           date: getTaiwanDateStr(invoiceDate) ?? '',
           invoiceNumber,
@@ -145,9 +134,10 @@ export default function Table_request({
       }
     });
 
+    // myInvoice
     return {
       peroidList,
-      invoiceList,
+      validInvoiceList,
     };
   }, [invoiceArr]);
 
@@ -159,14 +149,16 @@ export default function Table_request({
 
     // console.log('data_finalProduct', data_finalProduct);
 
-    const firstContractRow: Trow[] = (finalAppendContractProductsItems ?? []).map((item) => {
-      const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = item;
+    const firstContractRow: Trow[] = (finalAppendContractProductsItems ?? []).map((prodIteom) => {
+      const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = prodIteom;
 
       const periodList: Trow['periodList'] = {};
 
       periodArr.forEach((period) => {
-        periodList[period] = (deliveryStatus ?? []).map((item) => {
-          const { itemName, productPayment } = item;
+        const validInvoice = validInvoiceList[period];
+
+        periodList[period] = (deliveryStatus ?? []).map((deliveryStatu) => {
+          const { itemName, productPayment } = deliveryStatu;
           // const { paymentRatio, invoice } = productPayment;
           const thePaymentArr = productPayment?.filter((item) => {
             return String(item.invoice?.period) === period;
@@ -183,10 +175,22 @@ export default function Table_request({
           }
 
           return {
-            completeItem: item.itemName ?? '',
+            completeItem: deliveryStatu.itemName ?? '',
             percentage: {
-              value: thePayment?.paymentRatio ?? '',
-              onClick: () => {},
+              value: thePayment?.paymentRatio ?? '---',
+              onClick: () => {
+                if (!accountReceivableId) {
+                  return;
+                }
+
+                setPeymentPreBody({
+                  paymentRatio: '0',
+                  accountsReceivableId: accountReceivableId,
+                  invoiceId: validInvoice.id,
+                  productItemId: prodIteom.id,
+                  deliveryStatusId: [deliveryStatu.id],
+                });
+              },
             },
             completePrice: 1,
           };
@@ -359,6 +363,8 @@ export default function Table_request({
 
   // ---------------------------------------------------------
 
+  // __req
+
   /**新增發票 */
   const reqPostAccountReceivableIncoice = async (body: TcreateAccountReceivableInvoiceDto) => {
     if (!accountReceivableId || isLoading) {
@@ -381,7 +387,33 @@ export default function Table_request({
     }
   };
 
+  /**新增付款比例 */
+  const reqPostProductPayment = async (ratio: string) => {
+    if (!paymentPreBody || !accountReceivableId) {
+      return;
+    }
+
+    const body = [
+      {
+        ...paymentPreBody,
+        paymentRatio: ratio,
+      },
+    ];
+
+    try {
+      setIsLoading(true);
+      await apiPostProductPayment(accountReceivableId, body);
+      setPeymentPreBody(undefined);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增請款比例失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // ---------------------------------------------------------
+
   const control: Tcontrol = {
     onAddClick: () => {
       setShowAddInvoiceModal(true);
@@ -398,7 +430,7 @@ export default function Table_request({
     // totalRow02: fakeTotalRow,
     // totalRow03: fakeTotalRow,
     // invoiceList: fakeInvoiceList,
-    invoiceList: invoiceList,
+    invoiceList: validInvoiceList,
   };
 
   // ---------------------------------------------------------
@@ -411,10 +443,11 @@ export default function Table_request({
         //
         title="請輸入百分比"
         visible={!!paymentPreBody}
-        onConfirm={(value) => {}}
+        onConfirm={reqPostProductPayment}
         onCancel={() => {
           setPeymentPreBody(undefined);
         }}
+        inputAttr={{ type: 'number' }}
       />
 
       {/*  */}
@@ -474,7 +507,17 @@ export default function Table_request({
   );
 }
 
-// =================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
 
 // row要固定高
 
