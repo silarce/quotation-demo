@@ -184,18 +184,18 @@ export default function RegionalPerformanceStatistics() {
   const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
 
   const panelList: TpanelList = [
-    {
-      searchGroup: {
-        searchTargetList: [
-          {
-            placeholder: '輸入搜尋內容',
-          },
-        ],
-        doSearch: (v) => {
-          console.log(v);
-        },
-      },
-    },
+    // {
+    //   searchGroup: {
+    //     searchTargetList: [
+    //       {
+    //         placeholder: '輸入搜尋內容',
+    //       },
+    //     ],
+    //     doSearch: (v) => {
+    //       console.log(v);
+    //     },
+    //   },
+    // },
   ];
 
   return (
