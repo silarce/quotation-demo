@@ -117,7 +117,7 @@ const prodCellConfig: TcellConfig = {
     label: '門片厚度',
     theadItemClassName: 'text-center',
     inputSelProps: {
-      wrapperStyle: { width: '50px' },
+      wrapperStyle: { width: '100px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {

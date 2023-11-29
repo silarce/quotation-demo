@@ -52,10 +52,22 @@ export default function AttachContract() {
   const router = useRouter();
   const contractId = router.query.contractId as string | undefined;
 
+  const [isLading, setIsLading] = useState(false);
+
   // ----------------------------------------------------
   const { data, update } = useGetContract_id_forAttach(contractId);
   useEffect(() => {
-    update();
+    (async () => {
+      try {
+        setIsLading(true);
+        await update();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '讀取追加追減報價單失敗', content: err.message });
+      } finally {
+        setIsLading(false);
+      }
+    })();
   }, [contractId]);
 
   // const content = data?.content;
@@ -300,7 +312,7 @@ export default function AttachContract() {
 
   const reqModify = async () => {
     try {
-      showRootLoading(true);
+      setIsLading(true);
 
       if (!data || !attachProdList || !contractId) {
         return;
@@ -342,12 +354,17 @@ export default function AttachContract() {
 
       try {
         await apiQuotationModify(contractId, body);
+        setIsLading(false);
         router.back();
-      } catch (error) {}
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '上傳失敗', content: err.message });
+      }
     } catch (error) {
-      myAlert.err({ title: '上傳失敗' });
+      const err = error as Error;
+      myAlert.err({ title: '上傳失敗', content: err.message });
     } finally {
-      showRootLoading(false);
+      setIsLading(false);
     }
   };
 
@@ -379,7 +396,7 @@ export default function AttachContract() {
 
   // ==========================================================================
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLading}>
       <PageHeader02 tagList={tagList} panelList={panel} />
       <div>
         <div className={scss.quotation}>
