@@ -1759,6 +1759,7 @@ class Class_product {
     const arr = doorModel.guideRails.map((item) => {
       const imgSrc = item.imgSrc;
       const withHook = item.withHook;
+      const hasSilencingStrip = item.hasSilencingStrip;
 
       const option = {
         value: imgSrc,
@@ -1769,9 +1770,16 @@ class Class_product {
         guideRailsOpening: item.opening,
       };
 
-      if (withHook === null || withHook === this.typhoonProtection) {
+      if (
+        (withHook === null || withHook === this.typhoonProtection) &&
+        (hasSilencingStrip === null || hasSilencingStrip === this.doorTrackSilencerStrip)
+      ) {
         return option;
       }
+
+      // if (hasSilencingStrip === null || hasSilencingStrip === this.hasSilencingStrip) {
+      //   return option;
+      // }
 
       return undefined;
     });
@@ -2391,6 +2399,7 @@ class Class_product {
   set typhoonProtection(v) {
     this._prodData.typhoonProtection = v;
     this._prodData.doorTrack = '';
+    // this.doorTrack = '';
 
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
@@ -2401,11 +2410,14 @@ class Class_product {
     this.reRender();
   }
 
+  // 彈射門
   get bounceDoor() {
     return this._prodData.bounceDoor;
   }
   set bounceDoor(v) {
     this._prodData.bounceDoor = v;
+    this._prodData.doorTrack = '';
+    // this.doorTrack = '';
     this.reRender();
   }
 

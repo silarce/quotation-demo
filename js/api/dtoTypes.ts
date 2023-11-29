@@ -1564,8 +1564,6 @@ export type TdoorMaterialDto = {
 };
 
 export type TdoorModelInfoDto = {
-  // 從name來看，get /products/door/models取得的陣列應該會有7個item，但實際上只一個?
-  // 因為DuST還在做
   name: TdoorModelName;
   density: number; // 密度?
   guideRails: {
@@ -1573,6 +1571,7 @@ export type TdoorModelInfoDto = {
     opening: string; // 印象中好像跟圖片中的開口有關??
     thickness: string;
     withHook: boolean | null; // 防颱勾?
+    hasSilencingStrip: boolean;
   }[];
   thickness: string;
   slatMaterials: TdoorMaterialDto[]; // 支板材質?
