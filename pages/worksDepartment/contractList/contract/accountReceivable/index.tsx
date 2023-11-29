@@ -181,6 +181,8 @@ export default function AccountReceivable() {
     accountReceivableId,
     params_invoice
   );
+  const { data: data_invoiceArr_table, update: update_invoiceArr_table } =
+    useGetAccountReceivableIncoices(accountReceivableId);
 
   // _use收款紀錄
   const { data: data_accountantArr, update: update_accountantArr } = useGetAccountReceivableAccountants(
@@ -190,8 +192,17 @@ export default function AccountReceivable() {
 
   const [targetAccountant, setTargetAccountant] = useState<TaccountantDto>();
 
-  const update_InvoiceAndAccountant = async () => {
-    await Promise.all([update_invoiceArr(), update_accountantArr()]);
+  const update_InvoiceAndAccountant = async ({ isGetInvoiceTable }: { isGetInvoiceTable?: boolean } = {}) => {
+    await Promise.all([
+      //
+      update_invoiceArr(),
+      update_accountantArr(),
+      isGetInvoiceTable ? update_invoiceArr_table() : null,
+    ]);
+  };
+
+  const update_allInvoice = async () => {
+    await Promise.all([update_accountantArr(), update_invoiceArr_table()]);
   };
 
   // --------------------------------------------------------------------------
@@ -210,6 +221,10 @@ export default function AccountReceivable() {
   useEffect(() => {
     update_invoiceArr();
   }, [accountReceivableId, searchValue_invoice, sort_invoice]);
+
+  useEffect(() => {
+    update_invoiceArr_table();
+  }, [accountReceivableId]);
 
   useEffect(() => {
     update_accountantArr();
@@ -1015,7 +1030,7 @@ export default function AccountReceivable() {
     try {
       await apiPatchAccountReceivableInvoice(targetInvoice.id, body);
       setTargetInvoice(undefined);
-      await update_InvoiceAndAccountant();
+      await update_InvoiceAndAccountant({ isGetInvoiceTable: true });
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '編輯發票失敗', content: err.message });
@@ -1048,7 +1063,7 @@ export default function AccountReceivable() {
   const reqPatchAccountReceivableVoidInvoice = async (invoiceId: string) => {
     try {
       await apiPatchAccountReceivableVoidInvoice(invoiceId);
-      await update_InvoiceAndAccountant();
+      await update_InvoiceAndAccountant({ isGetInvoiceTable: true });
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '作廢發票失敗', content: err.message });
@@ -1153,8 +1168,8 @@ export default function AccountReceivable() {
         <Table_request
           contractId={contractId}
           accountReceivableId={accountReceivableId}
-          invoiceArr={data_invoiceArr}
-          onInvoiceAdd={update_invoiceArr}
+          invoiceArr={data_invoiceArr_table}
+          onInvoiceAdd={update_allInvoice}
         />
 
         {/* 發票給予紀錄 */}

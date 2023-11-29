@@ -25,7 +25,7 @@ import {
 // utils
 import { convertDate_add1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+// import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './table_request.module.scss';
@@ -55,38 +55,18 @@ export default function Table_request({
 
   const [showAddInvoiceModal, setShowAddInvoiceModal] = useState<boolean>(false);
 
-  // console.log('invoiceArr', invoiceArr);
-
   // ---------------------------------------------------------
 
   const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
 
-  // const { data: data_payments, update: update_payments } = useGetAccountReceivableProductPayments(accountReceivableId);
-
-  // const {} = useGetAccountReceivable_id();
-
   useEffect(() => {
     (async () => {
       await update_finalProduct();
-      // console.log('finalProduct', res01);
-      // console.log('====================================');
     })();
   }, [contractId]);
 
-  useEffect(() => {
-    (async () => {
-      // const res02 = await update_payments();
-      // console.log('payments', res02);
-      // console.log('====================================');
-    })();
-  }, [accountReceivableId]);
-
-  // console.log(invoiceArr);
-
   // -----------------------------------------------------------------------------
 
-  // apiPostProductPayment
-  // TcreateAccountReceivableProductPaymentDto
   const [paymentPreBody, setPeymentPreBody] = useState<TupdateAccountReceivableProductPaymentDto>();
 
   // -----------------------------------------------------------------------------
@@ -129,12 +109,9 @@ export default function Table_request({
   }, [invoiceArr]);
 
   const { firstContractRow, appendContractRow, appendContractRowQty, totalRow01 } = useMemo(() => {
-    // console.log(data_finalProduct);
     const periodArr = Object.keys(peroidList);
 
     const { finalAppendContractProductsItems, finalRootContractProductItems } = data_finalProduct ?? {};
-
-    // console.log('data_finalProduct', data_finalProduct);
 
     const firstContractRow: Trow[] = (finalRootContractProductItems ?? []).map((prodItem) => {
       const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = prodItem;
