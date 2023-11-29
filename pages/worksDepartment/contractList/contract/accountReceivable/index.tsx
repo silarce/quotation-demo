@@ -124,6 +124,14 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   const [searchValue_invoice, setSearchValue_invoice] = useState<string>('');
+  const [sort_invoice, setSort_invoice] = useState<{
+    sort: string | undefined;
+    // order: 'ASC' | 'DESC' | undefined;
+    order: boolean;
+  }>({
+    sort: undefined,
+    order: false,
+  });
 
   const params_invoice: Tparams = {
     filter: {
@@ -135,8 +143,8 @@ export default function AccountReceivable() {
         { period: { $eq: isNaN(Number(searchValue_invoice || undefined)) ? undefined : Number(searchValue_invoice) } },
       ],
     },
-    // sort:""
-    // order: '',
+    sort: sort_invoice.sort,
+    order: sort_invoice.order ? 'ASC' : 'DESC',
   };
 
   // _use發票給予紀錄
@@ -170,7 +178,7 @@ export default function AccountReceivable() {
 
   useEffect(() => {
     update_invoiceArr();
-  }, [accountReceivableId, searchValue_invoice]);
+  }, [accountReceivableId, searchValue_invoice, sort_invoice]);
 
   useEffect(() => {
     update_accountantArr();
@@ -652,13 +660,34 @@ export default function AccountReceivable() {
         panelCell_03: {},
         list: createHeadRowList_發票給予紀錄({
           onDateClick: () => {
-            alert('test');
+            setSort_invoice((state) => {
+              const order = state.sort === 'invoiceDate' ? !state.order : false;
+
+              return {
+                sort: 'invoiceDate',
+                order: order,
+              };
+            });
           },
           onPriceClick: () => {
-            alert('test');
+            setSort_invoice((state) => {
+              const order = state.sort === 'price' ? !state.order : false;
+
+              return {
+                sort: 'price',
+                order: order,
+              };
+            });
           },
           onPeriodClick: () => {
-            alert('test');
+            setSort_invoice((state) => {
+              const order = state.sort === 'period' ? !state.order : false;
+
+              return {
+                sort: 'period',
+                order: order,
+              };
+            });
           },
         }),
       },

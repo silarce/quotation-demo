@@ -945,7 +945,7 @@ export const useGetAccountReceivableIncoices = (accountReceivableId: string | un
   const params: Tparams = {
     populate: ['accountantList'],
     pageSize: 9999,
-    sort: 'createdAt',
+    sort: 'invoiceDate',
     order: 'DESC',
     ...customParams,
   };
