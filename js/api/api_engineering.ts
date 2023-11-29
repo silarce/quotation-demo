@@ -955,13 +955,18 @@ export const useGetAccountReceivableIncoices = (accountReceivableId: string | un
       return;
     }
 
-    const newRes = await apiGetAccountReceivableIncoices(accountReceivableId, params);
+    try {
+      const newRes = await apiGetAccountReceivableIncoices(accountReceivableId, params);
 
-    if (newRes) {
-      setRes(newRes);
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得發票列表失敗', content: err.message });
     }
-
-    return newRes;
   };
 
   return {
@@ -1037,13 +1042,20 @@ export const useGetAccountReceivableAccountants = (accountReceivableId: string |
       return;
     }
 
-    const newRes = await apiGetAccountReceivableAccountants(accountReceivableId, params);
+    try {
+      const newRes = await apiGetAccountReceivableAccountants(accountReceivableId, params);
 
-    if (newRes) {
-      setRes(newRes);
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得收款紀錄失敗', content: err.message });
+
+      return undefined;
     }
-
-    return newRes;
   };
 
   return {

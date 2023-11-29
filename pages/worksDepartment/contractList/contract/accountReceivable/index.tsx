@@ -36,6 +36,7 @@ import InvoiceSelector from 'components/global/gear/modal/invoiceSelector';
 
 // api
 import {
+  Tparams,
   TupdateEngineeringContactDto,
   TupdateAccountReceivableDto,
   TaccountReceivableDto,
@@ -55,31 +56,14 @@ import {
   apiPatchAccountReceivableAccountant,
   apiPatchAccountReceivableVoidInvoice,
 } from 'js/api/api_engineering';
-import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
 
 // utils
-import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './index.module.scss';
-
-// ========================================================================
-
-// type TrequestPayment = {
-//   caption: string;
-//   paymentRatio: string;
-//   loanPeriod: string;
-//   remark: string;
-// };
-
-// type Tinvoice = {
-//   date: string;
-//   invoiceNumberPrefix: string;
-//   invoiceNumber: string;
-//   price: string;
-//   remark: string;
-// };
 
 // ========================================================================
 
@@ -94,7 +78,6 @@ export default function AccountReceivable() {
 
   const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
   const [showPeriodModal, setShowPeriodModal] = useState<boolean>(false);
-  const [showPercentModal, setShowPercentModal] = useState<boolean>(false);
 
   // --------------------------------------------------------------------------
 
@@ -140,45 +123,57 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  const [searchValue_invoice, setSearchValue_invoice] = useState<string>('');
+
+  const params_invoice: Tparams = {
+    filter: {
+      $or: [
+        //
+        { invoiceNumber: { $eq: searchValue_invoice } },
+        { price: { $eq: isNaN(Number(searchValue_invoice || undefined)) ? undefined : Number(searchValue_invoice) } },
+        { note: { $contains: searchValue_invoice } },
+        { period: { $eq: isNaN(Number(searchValue_invoice || undefined)) ? undefined : Number(searchValue_invoice) } },
+      ],
+    },
+    // sort:""
+    // order: '',
+  };
+
+  // _use發票給予紀錄
+  const { data: data_invoiceArr, update: update_invoiceArr } = useGetAccountReceivableIncoices(
+    accountReceivableId,
+    params_invoice
+  );
+
   // _use收款紀錄
   const { data: data_accountantArr, update: update_accountantArr } =
     useGetAccountReceivableAccountants(accountReceivableId);
 
   const [targetAccountant, setTargetAccountant] = useState<TaccountantDto>();
 
-  // _use發票給予紀錄
-  const { data: data_invoiceArr, update: update_invoiceArr } = useGetAccountReceivableIncoices(accountReceivableId);
+  const update_InvoiceAndAccountant = async () => {
+    await Promise.all([update_invoiceArr(), update_accountantArr()]);
+  };
 
   // --------------------------------------------------------------------------
 
   // 應收帳款明細
   const [accountReceivable, setAccountReceivable] = useState<TaccountReceivableDto>();
 
-  // console.log(accountReceivable);
-
-  // --------------------------------------------------------------------------
-
-  // const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
-
-  // const {} = useGetAccountReceivable_id();
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const res = await update_finalProduct();
-  //   })();
-  // }, [contractId]);
-
   // --------------------------------------------------------------------------
 
   useEffect(() => {
     const accountReceivable = contract?.accountReceivable;
-    // console.log(contract);
+
     setAccountReceivable(accountReceivable);
   }, [contract, disabled]);
 
   useEffect(() => {
-    update_accountantArr();
     update_invoiceArr();
+  }, [accountReceivableId, searchValue_invoice]);
+
+  useEffect(() => {
+    update_accountantArr();
   }, [accountReceivableId]);
 
   const {
@@ -214,8 +209,6 @@ export default function AccountReceivable() {
   }, [data_invoiceArr, disabled]);
 
   // --------------------------------------------------------------------------
-
-  // 收款明細
 
   // --------------------------------------------------------------------------
 
@@ -637,7 +630,7 @@ export default function AccountReceivable() {
     const control_invoiceGivingRecord: Tcontrol_dynaTable = {
       caption: '發票給予紀錄',
       onSearchClick: (str) => {
-        alert(str);
+        setSearchValue_invoice(str);
       },
       // tableBottomBtnProps: {
       //   label: '新增發票',
@@ -934,8 +927,7 @@ export default function AccountReceivable() {
     try {
       await apiPatchAccountReceivableInvoice(targetInvoice.id, body);
       setTargetInvoice(undefined);
-      update_invoiceArr();
-      update_accountantArr();
+      await update_InvoiceAndAccountant();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '編輯發票失敗', content: err.message });
@@ -956,8 +948,7 @@ export default function AccountReceivable() {
     try {
       await apiPatchAccountReceivableInvoice(invoice.id, body);
       setTargetInvoice(undefined);
-      update_invoiceArr();
-      update_accountantArr();
+      await update_InvoiceAndAccountant();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '清除關聯失敗', content: err.message });
@@ -968,7 +959,8 @@ export default function AccountReceivable() {
   /**作廢發票 */
   const reqPatchAccountReceivableVoidInvoice = async (invoiceId: string) => {
     try {
-      apiPatchAccountReceivableVoidInvoice(invoiceId);
+      await apiPatchAccountReceivableVoidInvoice(invoiceId);
+      await update_InvoiceAndAccountant();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '作廢發票失敗', content: err.message });
@@ -1005,7 +997,7 @@ export default function AccountReceivable() {
 
     try {
       await apiDeleteAccountReceivableAccountant(accountReceivableId, id);
-      await update_accountantArr();
+      await update_InvoiceAndAccountant();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '移除收款明細失敗', content: err.message });
@@ -1023,7 +1015,7 @@ export default function AccountReceivable() {
     try {
       await apiPatchAccountReceivableAccountant(accountReceivableId, targetAccountant.id, body);
       setTargetAccountant(undefined);
-      await update_accountantArr();
+      await update_InvoiceAndAccountant();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新收款紀錄與發票關聯失敗', content: err.message });
