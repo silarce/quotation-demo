@@ -17,7 +17,7 @@ import ContractSelector from 'components/global/gear/modal/contractSelector';
 import scss from './index.module.scss';
 
 // api
-import { useGetQuotation_infinite } from 'js/api/api_quotation';
+import { Tparams, useGetQuotation_infinite } from 'js/api/api_quotation';
 
 // option
 import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistrict';
@@ -33,7 +33,7 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 
 // ===========================================================
 
-export default function QuotationList() {
+export default function QuotationList({ userGrade }: { userGrade: number }) {
   const router = useRouter();
   const { county, customerName, projectName, reviewStatus } = router.query as { [key: string]: string };
   // Budget
@@ -43,7 +43,11 @@ export default function QuotationList() {
 
   const { userInfo } = useContext(AppContext);
   const userEmp = userInfo?.employee;
-  const userId = userEmp?.id;
+  let userId = userEmp?.id;
+
+  if (userGrade >= 14) {
+    userId = undefined;
+  }
 
   const [contractSelectShow, setContractSelectShow] = useState(false);
 
@@ -194,7 +198,10 @@ export default function QuotationList() {
     return {};
   })();
 
-  const params = {
+  const params: Tparams = {
+    // sort: 'updatedAt',
+    sort: 'latestContent.quotationDate',
+    order: 'DESC',
     filter: {
       'latestContent.status': {
         $eq: status,
