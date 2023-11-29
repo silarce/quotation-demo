@@ -950,6 +950,11 @@ const creDesc_sidePlates = (classCom: Class_component) => {
   // } 最大負重:${maxDoorWeight ?? '無資料'} 最小負重:${minDoorWeight ?? '無資料'}`;
 
   const boxB_num = Number(name);
+
+  if (isNaN(boxB_num)) {
+    return '';
+  }
+
   const boxB_str = new Decimal(boxB_num).div(10).toString();
 
   return `${boxB_str ?? ''} CM`;

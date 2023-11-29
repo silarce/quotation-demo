@@ -1255,7 +1255,7 @@ export const useGetAccountReceivableProductPayments = (
 
 export const apiPostProductPayment = async (
   accountReceivableId: string,
-  body: TcreateAccountReceivableProductPaymentDto
+  body: TcreateAccountReceivableProductPaymentDto[]
 ) => {
   const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
 

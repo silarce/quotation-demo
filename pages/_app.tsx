@@ -163,6 +163,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
           <Component
             {...pageProps}
             userInfo={userInfo}
+            userGrade={userGrade}
             userErpFeature={userErpFeature}
             rwd1023={rwd1023}
             onLogin={onLogin}

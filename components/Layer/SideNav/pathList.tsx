@@ -313,11 +313,11 @@ const sidePathList: TsidePathList = {
         //   path: path01 + '/unSet',
         //   erpFeature: devPass,
         // },
-        {
-          label: '查詢應收帳款明細',
-          path: path01 + '/unSet',
-          erpFeature: [accountsReceivable],
-        },
+        // {
+        //   label: '查詢應收帳款明細',
+        //   path: path01 + '/unSet',
+        //   erpFeature: [accountsReceivable],
+        // },
         // {
         //   label: '查詢派工單明細',
         //   path: path01 + '/unSet',

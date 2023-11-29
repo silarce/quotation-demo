@@ -106,7 +106,13 @@ export default function SearchBar({
 
   // ------------------------------------------------------------------
   return (
-    <div className={classNames(scss.wrapper, className)}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        theClick();
+      }}
+      className={classNames(scss.wrapper, className)}
+    >
       {caption && (
         <div className={classNames(captionFontClassName, scss.caption, captionClassName)} style={captionStyle}>
           <span>{caption}</span>
@@ -203,8 +209,12 @@ export default function SearchBar({
         })}
       </div>
 
-      {onClick && <IconSearch className={scss.btn} onClick={theClick} />}
+      {onClick && (
+        <button>
+          <IconSearch className={scss.btn} onClick={theClick} />
+        </button>
+      )}
       {showBaseline !== 'invisible' && <hr className={classNames(hrClasses)} style={hrStyle} />}
-    </div>
+    </form>
   );
 }

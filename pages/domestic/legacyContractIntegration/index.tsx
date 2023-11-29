@@ -58,14 +58,11 @@ export default function LegacyContractIntegration() {
   };
 
   const params: Tparams = {
-    // page: page,
-    // pageSize: 10,
     pageSize: 5,
     populate: ['products', 'additions', 'priceRecord'],
     filter,
-    sort: 'contractNumber',
-    // order: 'DESC',
-    order: 'ASC',
+    sort: 'createdAt',
+    order: 'DESC',
   };
 
   const { dataArr, viewRef_bottom, isLoadingPage1, isLoading, reset } = useLegacyContract_infinite({
