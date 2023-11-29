@@ -8,6 +8,7 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import TwoButtonModal_free, { TwoBtnFooter } from 'components/global/gear/modal/simpleModal/twoButtonModal_free';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // api
 import {
@@ -27,6 +28,8 @@ import {
   apiDeleteAccountReceivableAccountant,
   apiPostAccountReceivableIncoice,
   useGetAccountReceivableProductPayments,
+  apiPostProductPayment,
+  TcreateAccountReceivableProductPaymentDto,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -62,7 +65,7 @@ export default function Table_request({
 
   const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
 
-  const { data: data_payments, update: update_payments } = useGetAccountReceivableProductPayments(accountReceivableId);
+  // const { data: data_payments, update: update_payments } = useGetAccountReceivableProductPayments(accountReceivableId);
 
   // const {} = useGetAccountReceivable_id();
 
@@ -76,7 +79,7 @@ export default function Table_request({
 
   useEffect(() => {
     (async () => {
-      const res02 = await update_payments();
+      // const res02 = await update_payments();
       // console.log('payments', res02);
       // console.log('====================================');
     })();
@@ -84,7 +87,35 @@ export default function Table_request({
 
   // console.log(invoiceArr);
 
-  // ---------------------------------------------------------
+  // -----------------------------------------------------------------------------
+
+  // apiPostProductPayment
+  // TcreateAccountReceivableProductPaymentDto
+  const [paymentPreBody, setPeymentPreBody] = useState<TcreateAccountReceivableProductPaymentDto>();
+
+  const reqPostProductPayment = async (ratio: string) => {
+    if (!paymentPreBody || !accountReceivableId) {
+      return;
+    }
+
+    const body = {
+      ...paymentPreBody,
+      paymentRatio: ratio,
+    };
+
+    try {
+      setIsLoading(true);
+      await apiPostProductPayment(accountReceivableId, body);
+      setPeymentPreBody(undefined);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增請款比例失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // -----------------------------------------------------------------------------
 
   const { peroidList, invoiceList } = useMemo(() => {
     // console.log(invoiceArr);
@@ -124,19 +155,37 @@ export default function Table_request({
     // console.log(data_finalProduct);
     const periodArr = Object.keys(peroidList);
 
-    const { finalRootContractProduct, finalAppendContractProducts } = data_finalProduct ?? {};
+    const { finalAppendContractProductsItems, finalRootContractProductItems } = data_finalProduct ?? {};
 
-    const firstContractRow: Trow[] = (finalRootContractProduct ?? []).map((item) => {
+    // console.log('data_finalProduct', data_finalProduct);
+
+    const firstContractRow: Trow[] = (finalAppendContractProductsItems ?? []).map((item) => {
       const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = item;
 
       const periodList: Trow['periodList'] = {};
 
       periodArr.forEach((period) => {
         periodList[period] = (deliveryStatus ?? []).map((item) => {
+          const { itemName, productPayment } = item;
+          // const { paymentRatio, invoice } = productPayment;
+          const thePaymentArr = productPayment?.filter((item) => {
+            return String(item.invoice?.period) === period;
+          });
+
+          // if (thePayment?.length > 1) {
+          //   myAlert.err({ title: '請款比例符合項超過兩個' });
+          // }
+
+          const thePayment = thePaymentArr?.[0];
+
+          if (thePayment) {
+            console.log(thePayment);
+          }
+
           return {
             completeItem: item.itemName ?? '',
             percentage: {
-              value: '0',
+              value: thePayment?.paymentRatio ?? '',
               onClick: () => {},
             },
             completePrice: 1,
@@ -147,10 +196,10 @@ export default function Table_request({
           periodList[period].push({
             completeItem: '',
             percentage: {
-              value: '0',
+              value: '',
               onClick: () => {},
             },
-            completePrice: 1,
+            completePrice: 0,
           });
         }
       });
@@ -169,7 +218,7 @@ export default function Table_request({
       };
     });
 
-    const appendContractRow: Trow[] = (finalAppendContractProducts ?? []).map((item) => {
+    const appendContractRow: Trow[] = (finalRootContractProductItems ?? []).map((item) => {
       const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = item;
 
       const periodList: Trow['periodList'] = {};
@@ -190,10 +239,10 @@ export default function Table_request({
           periodList[period].push({
             completeItem: '',
             percentage: {
-              value: '0',
+              value: '',
               onClick: () => {},
             },
-            completePrice: 1,
+            completePrice: 0,
           });
         }
       });
@@ -301,9 +350,11 @@ export default function Table_request({
       //
     })();
 
-    return { firstContractRow, appendContractRow, appendContractRowQty, totalRow01 };
-  }, [peroidList]);
+    // console.log(finalRootContractProduct);
 
+    return { firstContractRow, appendContractRow, appendContractRowQty, totalRow01 };
+  }, [peroidList, data_finalProduct]);
+  // console.log(peroidList);
   // console.log(peroidList);
 
   // ---------------------------------------------------------
@@ -354,6 +405,18 @@ export default function Table_request({
   return (
     <>
       <View control={control} />
+      {/*  */}
+
+      <InputModal
+        //
+        title="請輸入百分比"
+        visible={!!paymentPreBody}
+        onConfirm={(value) => {}}
+        onCancel={() => {
+          setPeymentPreBody(undefined);
+        }}
+      />
+
       {/*  */}
       <TwoButtonModal_free
         //
