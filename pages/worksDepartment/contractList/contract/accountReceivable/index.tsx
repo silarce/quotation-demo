@@ -53,6 +53,7 @@ import {
   apiPatchAccountReceivableInvoice,
   TupdateAccountReceivableInvoiceDto,
   apiPatchAccountReceivableAccountant,
+  apiPatchAccountReceivableVoidInvoice,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -424,6 +425,8 @@ export default function AccountReceivable() {
   const control_invoiceGivingRecord = useMemo(() => {
     const control_invoiceGivingRecord_rowArr: Tcontrol_dynaTable['rowArr'] = invoiceArr.map((item, index) => {
       const accountantArr = item.accountantList ?? [];
+      const { invoiceStatus } = item;
+      const isForbidden = invoiceStatus === '已作廢';
 
       const subRowArr: Trow[] = accountantArr.map((accountant) => {
         const {
@@ -515,8 +518,11 @@ export default function AccountReceivable() {
           onEditClick: () => {
             setTargetInvoice(item);
           },
-          onAbandonClick: () => {},
+          onAbandonClick: () => {
+            reqPatchAccountReceivableVoidInvoice(item.id);
+          },
         },
+        isForbidden,
         list: {
           date: {
             label: '日期',
@@ -916,6 +922,16 @@ export default function AccountReceivable() {
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '編輯發票失敗', content: err.message });
+    } finally {
+    }
+  };
+
+  const reqPatchAccountReceivableVoidInvoice = async (invoiceId: string) => {
+    try {
+      apiPatchAccountReceivableVoidInvoice(invoiceId);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '作廢發票失敗', content: err.message });
     } finally {
     }
   };

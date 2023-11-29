@@ -69,6 +69,7 @@ type Trow = {
   panelCell_05?: TpanelCell0_05;
   panelCell_06?: TpanelCell0_06;
   panelCell_07?: TpanelCell0_07;
+  isForbidden?: boolean;
   list: {
     [key: string]: {
       label: string;
@@ -185,6 +186,7 @@ export default function AccountReceivable_dynaTable({
                     //
                     key={index}
                     header={<Row row={row} disabled={disabled} />}
+                    collapsible={row.isForbidden ? 'disabled' : undefined}
                   >
                     {subHeadRow && subRowArr && (
                       <div className={classNames(scss.table, scss.sub)}>
@@ -267,9 +269,11 @@ const PanelCell_02 = ({ isHidden, onDeleteClick }: { isHidden?: boolean; onDelet
 const PanelCell_03 = ({
   //
   isHidden,
+  isForbidden,
   control,
 }: {
   isHidden?: boolean;
+  isForbidden?: boolean;
   control?: {
     onChainBreakClick?: () => void;
     onEditClick?: () => void;
@@ -279,17 +283,23 @@ const PanelCell_03 = ({
   const { onChainBreakClick, onEditClick, onAbandonClick } = control ?? {};
 
   return (
-    <div className={classNames(scss.panelCell)}>
+    <div className={classNames(scss.panelCell, scss.panelCell3)}>
       <div>
-        <IconBreakChain onClick={onChainBreakClick} className={classNames(isHidden && scss.hidden)} />
+        <IconBreakChain onClick={onChainBreakClick} className={classNames((isHidden || isForbidden) && scss.hidden)} />
       </div>
       <div>
-        <IconEdit onClick={onEditClick} className={classNames(isHidden && scss.hidden)} />
+        <IconEdit onClick={onEditClick} className={classNames((isHidden || isForbidden) && scss.hidden)} />
       </div>
-      <div className={classNames(scss.abandon)}>
+      <div className={classNames(scss.abandon, isForbidden && scss.hidden)}>
         {isHidden && <span>作廢</span>}
         {!isHidden && <IconTearing onClick={onAbandonClick} className={classNames(scss.iconRemoveCircle)} />}
       </div>
+
+      {isForbidden && (
+        <div className={scss.forbiddenCell}>
+          <span>已作廢</span>
+        </div>
+      )}
     </div>
   );
 };
@@ -406,17 +416,18 @@ const Row = ({
     panelCell_05,
     panelCell_06,
     panelCell_07,
+    isForbidden,
   } = row;
 
   const arr = Object.values(list);
 
   return (
-    <CellWithBar className={classNames(scss.row)}>
+    <CellWithBar className={classNames(scss.row, isForbidden && scss.forbidden)}>
       {panelCell_01 && (
         <PanelCell_01 onDeleteClick={panelCell_01.onDeleteClick} onChainClick={panelCell_01.onChainClick} />
       )}
       {panelCell_02 && <PanelCell_02 onDeleteClick={panelCell_02.onDeleteClick} />}
-      {panelCell_03 && <PanelCell_03 control={panelCell_03} />}
+      {panelCell_03 && <PanelCell_03 control={panelCell_03} isForbidden={isForbidden} />}
       {panelCell_04 && <PanelCell_04 control={panelCell_04} />}
       {panelCell_05 && <PanelCell_05 control={panelCell_05} />}
       {panelCell_06 && <PanelCell_06 control={panelCell_06} />}
