@@ -870,6 +870,8 @@ export type TquotationProductDto = {
   materialSurface: string | null;
   // 門軌
   guideRail: string;
+  // 門軌G
+  guideRailG: number | null;
   // 馬力
   horsepower: string;
   // 馬達廠商
@@ -996,7 +998,7 @@ export type TdeliveryStatusDto = {
   //
   completePayment: boolean | null;
   productPaymentId: boolean | null;
-  productPayment: TaccountsReceivableProductPaymentDto[] | null;
+  productPayments: TaccountsReceivableProductPaymentDto[] | null;
 };
 
 export type TcreateEngineeringDeliveryStatusDto = {
@@ -1287,6 +1289,8 @@ export type TcreateQuotationProductDto = {
   materialSurface: string | null;
   // 門軌
   guideRail: string;
+  // 門軌G
+  guideRailG: number | null;
   // 馬力
   horsepower: string;
   // 馬達廠商
@@ -1572,6 +1576,7 @@ export type TdoorModelInfoDto = {
     thickness: string;
     withHook: boolean | null; // 防颱勾?
     hasSilencingStrip: boolean;
+    width: number;
   }[];
   thickness: string;
   slatMaterials: TdoorMaterialDto[]; // 支板材質?
@@ -2628,4 +2633,12 @@ export type TcreateAccountReceivableProductPaymentDto = {
   invoiceId: string | null;
   productItemId: string | null;
   deliveryStatusId: string[];
+};
+
+export type TupdateAccountReceivableProductPaymentDto = {
+  paymentRatio: string | null;
+  accountsReceivableId: string;
+  invoiceId: string | null;
+  productItemId: string | null;
+  deliveryStatusId: string[]; // ID, 不提供時將此筆視為新增資料
 };
