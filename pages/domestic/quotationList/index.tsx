@@ -17,7 +17,7 @@ import ContractSelector from 'components/global/gear/modal/contractSelector';
 import scss from './index.module.scss';
 
 // api
-import { useGetQuotation_infinite } from 'js/api/api_quotation';
+import { Tparams, useGetQuotation_infinite } from 'js/api/api_quotation';
 
 // option
 import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistrict';
@@ -194,7 +194,10 @@ export default function QuotationList() {
     return {};
   })();
 
-  const params = {
+  const params: Tparams = {
+    // sort: 'updatedAt',
+    sort: 'latestContent.quotationDate',
+    order: 'DESC',
     filter: {
       'latestContent.status': {
         $eq: status,
