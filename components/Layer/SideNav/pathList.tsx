@@ -428,89 +428,89 @@ const sidePathList: TsidePathList = {
           path: path01 + '/contractList',
           erpFeature: [worksDepartment],
         },
-        {
-          label: '新增派工單',
-          path: path01 + '/addDispatch',
-          erpFeature: devPass,
-        },
-        {
-          label: '派工進度表',
-          path: path01 + '/schedule',
-          erpFeature: devPass,
-        },
-        {
-          label: '報表',
-          erpFeature: devPass,
-          list: [
-            {
-              label: '出貨統計表',
-              path: path01 + '/shippingStatistics',
-              erpFeature: devPass,
-            },
-            {
-              label: '營業狀況表',
-              path: path01 + '/StatementOfBusinessConditions',
-              erpFeature: devPass,
-            },
-            {
-              label: '應收帳款表',
-              path: path01 + '/accountsReceivableStatement',
-              erpFeature: [accountsReceivable],
-            },
-            {
-              label: '代辦事項總覽',
-              path: path01 + '/toDoOverview',
-              erpFeature: devPass,
-            },
-          ],
-        },
-        {
-          label: '外包計價',
-          path: path01 + '/outsourcingPricing',
-          erpFeature: devPass,
-        },
-        {
-          label: '矯正預防措施處理單',
-          path: path01 + '/correctiveAndPreventiveActionSheet',
-          erpFeature: devPass,
-        },
-        {
-          label: '機具公物管理',
-          erpFeature: devPass,
-          list: [
-            {
-              label: '採購維修申請',
-              path: path01 + '/purchaseRepairRequest',
-              erpFeature: devPass,
-            },
-            {
-              label: '公物紀錄表',
-              path: path01 + '/publicPropertyRecord',
-              erpFeature: devPass,
-            },
-          ],
-        },
-        {
-          label: '保養合約',
-          erpFeature: devPass,
-          list: [
-            {
-              label: '合約',
-              path: path01 + '/contract',
-              erpFeature: devPass,
-            },
-            {
-              label: '派工進度表',
-              path: path01 + '/dispatchSchedule',
-              erpFeature: devPass,
-            },
-            {
-              label: '應收帳款明細',
-              path: path01 + '/accountsReceivableDetails',
-              erpFeature: [accountsReceivable],
-            },
-          ],
-        },
+        // {
+        //   label: '新增派工單',
+        //   path: path01 + '/addDispatch',
+        //   erpFeature: devPass,
+        // },
+        // {
+        //   label: '派工進度表',
+        //   path: path01 + '/schedule',
+        //   erpFeature: devPass,
+        // },
+        // {
+        //   label: '報表',
+        //   erpFeature: devPass,
+        //   list: [
+        //     {
+        //       label: '出貨統計表',
+        //       path: path01 + '/shippingStatistics',
+        //       erpFeature: devPass,
+        //     },
+        //     {
+        //       label: '營業狀況表',
+        //       path: path01 + '/StatementOfBusinessConditions',
+        //       erpFeature: devPass,
+        //     },
+        //     {
+        //       label: '應收帳款表',
+        //       path: path01 + '/accountsReceivableStatement',
+        //       erpFeature: [accountsReceivable],
+        //     },
+        //     {
+        //       label: '代辦事項總覽',
+        //       path: path01 + '/toDoOverview',
+        //       erpFeature: devPass,
+        //     },
+        //   ],
+        // },
+        // {
+        //   label: '外包計價',
+        //   path: path01 + '/outsourcingPricing',
+        //   erpFeature: devPass,
+        // },
+        // {
+        //   label: '矯正預防措施處理單',
+        //   path: path01 + '/correctiveAndPreventiveActionSheet',
+        //   erpFeature: devPass,
+        // },
+        // {
+        //   label: '機具公物管理',
+        //   erpFeature: devPass,
+        //   list: [
+        //     {
+        //       label: '採購維修申請',
+        //       path: path01 + '/purchaseRepairRequest',
+        //       erpFeature: devPass,
+        //     },
+        //     {
+        //       label: '公物紀錄表',
+        //       path: path01 + '/publicPropertyRecord',
+        //       erpFeature: devPass,
+        //     },
+        //   ],
+        // },
+        // {
+        //   label: '保養合約',
+        //   erpFeature: devPass,
+        //   list: [
+        //     {
+        //       label: '合約',
+        //       path: path01 + '/contract',
+        //       erpFeature: devPass,
+        //     },
+        //     {
+        //       label: '派工進度表',
+        //       path: path01 + '/dispatchSchedule',
+        //       erpFeature: devPass,
+        //     },
+        //     {
+        //       label: '應收帳款明細',
+        //       path: path01 + '/accountsReceivableDetails',
+        //       erpFeature: [accountsReceivable],
+        //     },
+        //   ],
+        // },
       ],
     };
   })(),
