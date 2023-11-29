@@ -618,7 +618,8 @@ export default function AccountReceivable() {
             cellStyle: { width: '75px' },
             inputProps: {
               props: {
-                value: 'no property',
+                value: invoice.period ?? '',
+                placeholder: '',
               },
             },
           },
