@@ -33,7 +33,7 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 
 // ===========================================================
 
-export default function QuotationList() {
+export default function QuotationList({ userGrade }: { userGrade: number }) {
   const router = useRouter();
   const { county, customerName, projectName, reviewStatus } = router.query as { [key: string]: string };
   // Budget
@@ -43,7 +43,11 @@ export default function QuotationList() {
 
   const { userInfo } = useContext(AppContext);
   const userEmp = userInfo?.employee;
-  const userId = userEmp?.id;
+  let userId = userEmp?.id;
+
+  if (userGrade >= 14) {
+    userId = undefined;
+  }
 
   const [contractSelectShow, setContractSelectShow] = useState(false);
 
