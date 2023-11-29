@@ -1040,7 +1040,7 @@ export default function AccountReceivable() {
         onCancel={() => setIsShowInvoicePrefixModal(false)}
       />
 
-      <InputModal
+      {/* <InputModal
         //
         title="請輸入百分比"
         visible={showPercentModal}
@@ -1048,7 +1048,7 @@ export default function AccountReceivable() {
         onCancel={() => {
           setShowPercentModal(false);
         }}
-      />
+      /> */}
 
       <PaymentRecordSelector
         label="請選擇收款紀錄"

@@ -166,21 +166,21 @@ export default function QuoteStatistics() {
   const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
 
   const panelList: TpanelList = [
-    {
-      type: 'inputSearch',
-      placeholder: '輸入搜尋內容',
-      /**
-      要搜尋的欄位有 編號 工程名稱 客戶 聯絡人 連絡電話
-       */
-      onClick: (str) => {
-        router.push({
-          query: {
-            ...router.query,
-            keyWord: str,
-          },
-        });
-      },
-    },
+    // {
+    //   type: 'inputSearch',
+    //   placeholder: '輸入搜尋內容',
+    //   /**
+    //   要搜尋的欄位有 編號 工程名稱 客戶 聯絡人 連絡電話
+    //    */
+    //   onClick: (str) => {
+    //     router.push({
+    //       query: {
+    //         ...router.query,
+    //         keyWord: str,
+    //       },
+    //     });
+    //   },
+    // },
   ];
   // ------------------------------------------------------------------
 

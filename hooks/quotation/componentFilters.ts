@@ -81,9 +81,10 @@ const filter_guideRails = ({
     } else if (data.imageName !== null && data.imageName !== filterParams.imageName) {
       return false;
     } else if (data.hasSilencingStrip !== filterParams.hasSilencingStrip) {
-      if (Number(data.thickness) !== 4.5) {
-        return false;
-      }
+      // if (Number(data.thickness) !== 4.5) {
+      //   return false;
+      // }
+      return false;
     }
 
     return true;

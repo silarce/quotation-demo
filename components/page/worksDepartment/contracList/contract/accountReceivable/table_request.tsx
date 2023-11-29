@@ -8,6 +8,7 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import TwoButtonModal_free, { TwoBtnFooter } from 'components/global/gear/modal/simpleModal/twoButtonModal_free';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // api
 import {
@@ -27,6 +28,8 @@ import {
   apiDeleteAccountReceivableAccountant,
   apiPostAccountReceivableIncoice,
   useGetAccountReceivableProductPayments,
+  apiPostProductPayment,
+  TcreateAccountReceivableProductPaymentDto,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -39,6 +42,15 @@ import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './table_request.module.scss';
+
+// =================================================
+
+type TmyInvoice = {
+  id: string;
+  period: string;
+  date: string;
+  invoiceNumber: string;
+};
 
 // =================================================
 export default function Table_request({
@@ -62,7 +74,7 @@ export default function Table_request({
 
   const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
 
-  const { data: data_payments, update: update_payments } = useGetAccountReceivableProductPayments(accountReceivableId);
+  // const { data: data_payments, update: update_payments } = useGetAccountReceivableProductPayments(accountReceivableId);
 
   // const {} = useGetAccountReceivable_id();
 
@@ -76,7 +88,7 @@ export default function Table_request({
 
   useEffect(() => {
     (async () => {
-      const res02 = await update_payments();
+      // const res02 = await update_payments();
       // console.log('payments', res02);
       // console.log('====================================');
     })();
@@ -84,16 +96,23 @@ export default function Table_request({
 
   // console.log(invoiceArr);
 
-  // ---------------------------------------------------------
+  // -----------------------------------------------------------------------------
 
-  const { peroidList, invoiceList } = useMemo(() => {
+  // apiPostProductPayment
+  // TcreateAccountReceivableProductPaymentDto
+  const [paymentPreBody, setPeymentPreBody] = useState<TcreateAccountReceivableProductPaymentDto>();
+
+  // -----------------------------------------------------------------------------
+
+  const { peroidList, validInvoiceList } = useMemo(() => {
     // console.log(invoiceArr);
 
     const peroidList: TperoidList = {};
-    const invoiceList: Tcontrol['invoiceList'] = {};
+    // const invoiceList: Tcontrol['invoiceList'] = {};
+    const validInvoiceList: { [key: string]: TmyInvoice } = {};
 
     invoiceArr?.forEach((invoice) => {
-      const { period, invoiceStatus, invoiceDate, invoiceNumber } = invoice;
+      const { id, period, invoiceStatus, invoiceDate, invoiceNumber } = invoice;
 
       if (invoiceStatus === '已作廢') {
         return;
@@ -106,7 +125,8 @@ export default function Table_request({
             alert('test');
           },
         };
-        invoiceList[period] = {
+        validInvoiceList[period] = {
+          id,
           period: String(period),
           date: getTaiwanDateStr(invoiceDate) ?? '',
           invoiceNumber,
@@ -114,9 +134,10 @@ export default function Table_request({
       }
     });
 
+    // myInvoice
     return {
       peroidList,
-      invoiceList,
+      validInvoiceList,
     };
   }, [invoiceArr]);
 
@@ -124,20 +145,52 @@ export default function Table_request({
     // console.log(data_finalProduct);
     const periodArr = Object.keys(peroidList);
 
-    const { finalRootContractProduct, finalAppendContractProducts } = data_finalProduct ?? {};
+    const { finalAppendContractProductsItems, finalRootContractProductItems } = data_finalProduct ?? {};
 
-    const firstContractRow: Trow[] = (finalRootContractProduct ?? []).map((item) => {
-      const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = item;
+    // console.log('data_finalProduct', data_finalProduct);
+
+    const firstContractRow: Trow[] = (finalAppendContractProductsItems ?? []).map((prodIteom) => {
+      const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = prodIteom;
 
       const periodList: Trow['periodList'] = {};
 
       periodArr.forEach((period) => {
-        periodList[period] = (deliveryStatus ?? []).map((item) => {
+        const validInvoice = validInvoiceList[period];
+
+        periodList[period] = (deliveryStatus ?? []).map((deliveryStatu) => {
+          const { itemName, productPayment } = deliveryStatu;
+          // const { paymentRatio, invoice } = productPayment;
+          const thePaymentArr = productPayment?.filter((item) => {
+            return String(item.invoice?.period) === period;
+          });
+
+          // if (thePayment?.length > 1) {
+          //   myAlert.err({ title: '請款比例符合項超過兩個' });
+          // }
+
+          const thePayment = thePaymentArr?.[0];
+
+          if (thePayment) {
+            console.log(thePayment);
+          }
+
           return {
-            completeItem: item.itemName ?? '',
+            completeItem: deliveryStatu.itemName ?? '',
             percentage: {
-              value: '0',
-              onClick: () => {},
+              value: thePayment?.paymentRatio ?? '---',
+              onClick: () => {
+                if (!accountReceivableId) {
+                  return;
+                }
+
+                setPeymentPreBody({
+                  paymentRatio: '0',
+                  accountsReceivableId: accountReceivableId,
+                  invoiceId: validInvoice.id,
+                  productItemId: prodIteom.id,
+                  deliveryStatusId: [deliveryStatu.id],
+                });
+              },
             },
             completePrice: 1,
           };
@@ -147,10 +200,10 @@ export default function Table_request({
           periodList[period].push({
             completeItem: '',
             percentage: {
-              value: '0',
+              value: '',
               onClick: () => {},
             },
-            completePrice: 1,
+            completePrice: 0,
           });
         }
       });
@@ -169,7 +222,7 @@ export default function Table_request({
       };
     });
 
-    const appendContractRow: Trow[] = (finalAppendContractProducts ?? []).map((item) => {
+    const appendContractRow: Trow[] = (finalRootContractProductItems ?? []).map((item) => {
       const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = item;
 
       const periodList: Trow['periodList'] = {};
@@ -190,10 +243,10 @@ export default function Table_request({
           periodList[period].push({
             completeItem: '',
             percentage: {
-              value: '0',
+              value: '',
               onClick: () => {},
             },
-            completePrice: 1,
+            completePrice: 0,
           });
         }
       });
@@ -301,12 +354,16 @@ export default function Table_request({
       //
     })();
 
-    return { firstContractRow, appendContractRow, appendContractRowQty, totalRow01 };
-  }, [peroidList]);
+    // console.log(finalRootContractProduct);
 
+    return { firstContractRow, appendContractRow, appendContractRowQty, totalRow01 };
+  }, [peroidList, data_finalProduct]);
+  // console.log(peroidList);
   // console.log(peroidList);
 
   // ---------------------------------------------------------
+
+  // __req
 
   /**新增發票 */
   const reqPostAccountReceivableIncoice = async (body: TcreateAccountReceivableInvoiceDto) => {
@@ -330,7 +387,33 @@ export default function Table_request({
     }
   };
 
+  /**新增付款比例 */
+  const reqPostProductPayment = async (ratio: string) => {
+    if (!paymentPreBody || !accountReceivableId) {
+      return;
+    }
+
+    const body = [
+      {
+        ...paymentPreBody,
+        paymentRatio: ratio,
+      },
+    ];
+
+    try {
+      setIsLoading(true);
+      await apiPostProductPayment(accountReceivableId, body);
+      setPeymentPreBody(undefined);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增請款比例失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // ---------------------------------------------------------
+
   const control: Tcontrol = {
     onAddClick: () => {
       setShowAddInvoiceModal(true);
@@ -347,13 +430,26 @@ export default function Table_request({
     // totalRow02: fakeTotalRow,
     // totalRow03: fakeTotalRow,
     // invoiceList: fakeInvoiceList,
-    invoiceList: invoiceList,
+    invoiceList: validInvoiceList,
   };
 
   // ---------------------------------------------------------
   return (
     <>
       <View control={control} />
+      {/*  */}
+
+      <InputModal
+        //
+        title="請輸入百分比"
+        visible={!!paymentPreBody}
+        onConfirm={reqPostProductPayment}
+        onCancel={() => {
+          setPeymentPreBody(undefined);
+        }}
+        inputAttr={{ type: 'number' }}
+      />
+
       {/*  */}
       <TwoButtonModal_free
         //
@@ -411,7 +507,17 @@ export default function Table_request({
   );
 }
 
-// =================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
 
 // row要固定高
 

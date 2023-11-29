@@ -996,7 +996,7 @@ export type TdeliveryStatusDto = {
   //
   completePayment: boolean | null;
   productPaymentId: boolean | null;
-  productPayment: TaccountsReceivableProductPaymentDto | null;
+  productPayment: TaccountsReceivableProductPaymentDto[] | null;
 };
 
 export type TcreateEngineeringDeliveryStatusDto = {
@@ -2574,27 +2574,52 @@ export type TupdateAccountReceivableDeductionDto = Partial<TcreateAccountReceiva
 export type TfinalProduct = {
   //源合約產品包含item deliveryStatus productPayment(主產品數量已扣追減)
   // finalRootContractProduct: TquotationProductDto[];
-  finalRootContractProduct: TquotationProductItemDto[];
+  // finalRootContractProduct: TquotationProductItemDto[];
+  finalAppendContractProductsItems: TquotationProductItemDto[];
   //追加合約產品包含item deliveryStatus productPayment
-  finalAppendContractProducts: TquotationProductItemDto[];
+  // finalAppendContractProducts: TquotationProductItemDto[];
+  finalRootContractProductItems: TquotationProductItemDto[];
 };
 
 /**應收帳款明細 主產品請款比例 */
 export type TaccountsReceivableProductPaymentDto = {
-  //  '期數'
-  period: number;
-  //  '請款比例(完成數量)'
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // //  '期數'
+  // period: number;
+  // //  '請款比例(完成數量)'
+  // paymentRatio: string | null;
+  // //  '發票id'
+  // invoiceId: string | null;
+  // //  '發票' 要用的時候在跟Gina要型別吧
+  // // invoice: AccountsReceivableInvoiceDto;
+  // //  '關聯產品itemId'
+  // productItemId: string | null;
+  // //  '關聯產品itemId'
+  // productItem: TquotationProductItemDto;
+  // //  '完成項目'
+  // // completeItemStatus: EngineeringDeliveryStatusDto[];
+  // completeItemStatus: TdeliveryStatusDto[];
+
+  // @ApiProperty({ description: '請款比例(完成數量)' })
   paymentRatio: string | null;
-  //  '發票id'
+
+  // @ApiProperty({ description: '發票id' })
   invoiceId: string | null;
-  //  '發票' 要用的時候在跟Gina要型別吧
-  // invoice: AccountsReceivableInvoiceDto;
-  //  '關聯產品itemId'
+
+  // @ApiProperty({ description: '發票' })
+  invoice: TaccountsReceivableInvoiceDto | undefined;
+
+  // @ApiProperty({ description: '關聯產品itemId' })
   productItemId: string | null;
-  //  '關聯產品itemId'
-  productItem: TquotationProductItemDto;
-  //  '完成項目'
-  // completeItemStatus: EngineeringDeliveryStatusDto[];
+
+  // @ApiProperty({ description: '關聯產品item' })
+  productItem: TquotationProductItemDto | undefined;
+
+  // @ApiProperty({ description: '完成項目' })
+  // completeItemStatus: TengineeringDeliveryStatusDto[];
   completeItemStatus: TdeliveryStatusDto[];
 };
 
