@@ -2640,5 +2640,6 @@ export type TupdateAccountReceivableProductPaymentDto = {
   accountsReceivableId: string;
   invoiceId: string | null;
   productItemId: string | null;
-  deliveryStatusId: string[]; // ID, 不提供時將此筆視為新增資料
+  deliveryStatusId: string[];
+  id?: string; // ID, 不提供時將此筆視為新增資料
 };

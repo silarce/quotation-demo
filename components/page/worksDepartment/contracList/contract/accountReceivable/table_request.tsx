@@ -31,6 +31,8 @@ import {
   useGetAccountReceivableProductPayments,
   apiPostProductPayment,
   TcreateAccountReceivableProductPaymentDto,
+  apiPatchProductPayment,
+  TupdateAccountReceivableProductPaymentDto,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -101,7 +103,7 @@ export default function Table_request({
 
   // apiPostProductPayment
   // TcreateAccountReceivableProductPaymentDto
-  const [paymentPreBody, setPeymentPreBody] = useState<TcreateAccountReceivableProductPaymentDto>();
+  const [paymentPreBody, setPeymentPreBody] = useState<TupdateAccountReceivableProductPaymentDto>();
 
   // -----------------------------------------------------------------------------
 
@@ -185,6 +187,7 @@ export default function Table_request({
                   invoiceId: validInvoice.id,
                   productItemId: prodItem.id,
                   deliveryStatusId: [deliveryStatu.id],
+                  id: thePayment?.id,
                 });
               },
             },
@@ -253,6 +256,7 @@ export default function Table_request({
                   invoiceId: validInvoice.id,
                   productItemId: prodItem.id,
                   deliveryStatusId: [deliveryStatu.id],
+                  id: thePayment?.id,
                 });
               },
             },
@@ -410,6 +414,9 @@ export default function Table_request({
 
   /**新增付款比例 */
   const reqPostProductPayment = async (ratio: string) => {
+    // 這個請求函示只能新增一筆付款比例
+    // 要批次新增或更新，要另外寫函示
+
     if (!paymentPreBody || !accountReceivableId) {
       return;
     }
@@ -424,7 +431,13 @@ export default function Table_request({
     try {
       setIsLoading(true);
       setPeymentPreBody(undefined);
-      await apiPostProductPayment(accountReceivableId, body);
+
+      if (body[0].id) {
+        await apiPatchProductPayment(accountReceivableId, body);
+      } else {
+        await apiPostProductPayment(accountReceivableId, body);
+      }
+
       await update_finalProduct();
     } catch (error) {
       const err = error as Error;
@@ -846,7 +859,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                       <div className={classNames(scss.cell)} style={config.percentage.style}>
                         <span>{`第${item.period}期合計`}</span>
                       </div>
-                      <div className={classNames(scss.cell)} style={config.completePrice.style}>
+                      <div className={classNames(scss.cell, scss.right)} style={config.completePrice.style}>
                         <span>{item.completePrice.toLocaleString()}</span>
                       </div>
                       <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
@@ -884,7 +897,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                       <div className={classNames(scss.cell)} style={config.percentage.style}>
                         <span>{`第${item.period}期合計`}</span>
                       </div>
-                      <div className={classNames(scss.cell)} style={config.completePrice.style}>
+                      <div className={classNames(scss.cell, scss.right)} style={config.completePrice.style}>
                         <span>{item.tax.toLocaleString()}</span>
                       </div>
                       <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
@@ -920,7 +933,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                       <div className={classNames(scss.cell)} style={config.percentage.style}>
                         <span>{`第${item.period}期合計`}</span>
                       </div>
-                      <div className={classNames(scss.cell)} style={config.completePrice.style}>
+                      <div className={classNames(scss.cell, scss.right)} style={config.completePrice.style}>
                         <span>{item.totalWithTax.toLocaleString()}</span>
                       </div>
                       <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>

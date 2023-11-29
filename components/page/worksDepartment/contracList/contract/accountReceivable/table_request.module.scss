@@ -50,7 +50,6 @@
   .cell {
     display: grid;
     min-height: 40px;
-    // justify-content: center;
     > * {
       margin: auto;
     }
@@ -96,6 +95,7 @@
         // flex: none;
         text-align: center;
       }
+
       // background-color: pink;
     }
     .pilar {
@@ -190,5 +190,11 @@
     input {
       border: none;
     }
+  }
+}
+
+.cell.right {
+  > * {
+    margin-right: 0;
   }
 }
