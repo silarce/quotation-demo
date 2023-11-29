@@ -506,7 +506,7 @@ function DndRow({
               //   selectProps.dynaOptionsKey = item.typhoonProtection ? 'typhoonProtection' : 'normal';
               // }
               const options = item[`options_${key}`] as Toption[] | undefined;
-
+              const staticOptions = selectProps.props.options;
               // ___________________
 
               if (isOptionValue) {
@@ -516,9 +516,19 @@ function DndRow({
               }
               // ___________________
 
+              let isDisabled: boolean | undefined = undefined;
+
+              if ((!options || options.length === 0) && (!staticOptions || staticOptions.length === 0)) {
+                isDisabled = true;
+              }
+
+              const placeholder = isDisabled ? 'X' : selectProps.props.placeholder ?? '請輸入';
+
               selectProps.props = {
                 options,
                 ...selectProps.props,
+                isDisabled: isDisabled,
+                placeholder,
                 onChange: (option) => {
                   if (isOptionValue) {
                     item[key] = option;

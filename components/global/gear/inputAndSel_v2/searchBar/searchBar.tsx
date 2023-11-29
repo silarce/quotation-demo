@@ -209,7 +209,11 @@ export default function SearchBar({
         })}
       </div>
 
-      {onClick && <IconSearch className={scss.btn} onClick={theClick} />}
+      {onClick && (
+        <button>
+          <IconSearch className={scss.btn} onClick={theClick} />
+        </button>
+      )}
       {showBaseline !== 'invisible' && <hr className={classNames(hrClasses)} style={hrStyle} />}
     </form>
   );
