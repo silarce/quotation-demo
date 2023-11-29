@@ -1027,7 +1027,7 @@ export const useGetAccountReceivableAccountants = (accountReceivableId: string |
   const [res, setRes] = useState<TgetAccountant>();
 
   const params = {
-    populate: ['invoice'],
+    populate: ['invoice.accountantList'],
     pageSize: 9999,
     ...customParams,
   };

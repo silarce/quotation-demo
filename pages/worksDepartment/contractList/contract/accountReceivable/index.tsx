@@ -442,7 +442,12 @@ export default function AccountReceivable() {
 
         return {
           panelCell_04: {
-            onChainBreakClick: () => {},
+            onChainBreakClick: () => {
+              const accountantId = accountant.id;
+              const accountantIdArr = invoice.accountantList.map((item) => item.id);
+              const remainAccountantIdArr = accountantIdArr.filter((item) => item !== accountantId);
+              reqPatchAccountReceivableInvoice_clearAccountant(invoice, remainAccountantIdArr);
+            },
           },
           list: {
             date: {
@@ -515,7 +520,7 @@ export default function AccountReceivable() {
       return {
         panelCell_03: {
           onChainBreakClick: () => {
-            reqPatchAccountReceivableInvoice_clearAccountant(invoice);
+            reqPatchAccountReceivableInvoice_clearAccountant(invoice, []);
           },
           onEditClick: () => {
             setTargetInvoice(invoice);
@@ -678,16 +683,25 @@ export default function AccountReceivable() {
     //
     let priceTotal = 0;
 
-    const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'] = (data_accountantArr ?? []).map((item, index) => {
-      priceTotal = priceTotal + item.price;
-
+    const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'] = (data_accountantArr ?? []).map((accItem, index) => {
+      priceTotal = priceTotal + accItem.price;
+      const { invoice: invoiceArr } = accItem;
+      const accountantId = accItem.id;
       //
 
-      const subRowArr: Trow[] = (item.invoice ?? []).map((item) => {
+      const subRowArr: Trow[] = (invoiceArr ?? []).map((invoice) => {
         return {
           //
           panelCell_07: {
-            onBreakChainClick: () => {},
+            onBreakChainClick: () => {
+              const invoiceAccountantIdArr = invoice.accountantList.map((item) => item.id);
+              const remainAccountantIdArr = invoiceAccountantIdArr.filter((item) => item !== accountantId);
+
+              console.log(invoiceAccountantIdArr);
+              // console.log(remainAccountantIdArr);
+
+              reqPatchAccountReceivableInvoice_clearAccountant(invoice, remainAccountantIdArr);
+            },
           },
           list: {
             date: {
@@ -695,7 +709,7 @@ export default function AccountReceivable() {
               cellStyle: { width: '120px' },
               datePickerProps: {
                 props: {
-                  value: item.invoiceDate ? moment(item.invoiceDate) : null,
+                  value: invoice.invoiceDate ? moment(invoice.invoiceDate) : null,
                   onChange: () => {},
                 },
               },
@@ -705,7 +719,7 @@ export default function AccountReceivable() {
               cellStyle: { width: '300px' },
               inputProps: {
                 props: {
-                  value: item.invoiceNumber ?? '',
+                  value: invoice.invoiceNumber ?? '',
                   // onChange: (e) => {},
                 },
               },
@@ -730,7 +744,7 @@ export default function AccountReceivable() {
               inputProps: {
                 props: {
                   type: 'number',
-                  value: String(item.price) ?? '',
+                  value: String(invoice.price) ?? '',
                   onChange: () => {},
                 },
               },
@@ -740,7 +754,7 @@ export default function AccountReceivable() {
               cellStyle: { width: '300px' },
               inputProps: {
                 props: {
-                  value: item.note ?? '',
+                  value: invoice.note ?? '',
                   onChange: () => {},
                 },
               },
@@ -771,10 +785,10 @@ export default function AccountReceivable() {
       const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'][number] = {
         panelCell_05: {
           onChainClick: () => {
-            setTargetAccountant(item);
+            setTargetAccountant(accItem);
           },
           onRemoveClick: () => {
-            deleteAccountant(item.id);
+            deleteAccountant(accItem.id);
           },
         },
         list: {
@@ -783,7 +797,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '120px' },
             inputProps: {
               props: {
-                value: getTaiwanDateStr(item.createdAt) ?? '',
+                value: getTaiwanDateStr(accItem.createdAt) ?? '',
               },
             },
           },
@@ -792,7 +806,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '189px' },
             inputProps: {
               props: {
-                value: item.accountingNumber,
+                value: accItem.accountingNumber,
               },
             },
           },
@@ -801,7 +815,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '189px' },
             inputProps: {
               props: {
-                value: item.accountingNumber,
+                value: accItem.accountingNumber,
               },
             },
           },
@@ -810,7 +824,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '100px' },
             inputProps: {
               props: {
-                value: getTaiwanDateStr(item.noteMaturityDate) ?? '',
+                value: getTaiwanDateStr(accItem.noteMaturityDate) ?? '',
               },
             },
           },
@@ -819,7 +833,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '170px' },
             inputProps: {
               props: {
-                value: item.price,
+                value: accItem.price,
               },
             },
           },
@@ -828,7 +842,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '187px' },
             inputProps: {
               props: {
-                value: item.billSerialNumber ?? '',
+                value: accItem.billSerialNumber ?? '',
               },
             },
           },
@@ -896,7 +910,7 @@ export default function AccountReceivable() {
     }
   };
 
-  // 編輯發票
+  // 編輯target發票
   const reqPatchAccountReceivableInvoice = async (preBody: {
     invoiceDate: string;
     invoiceNumber: string;
@@ -921,6 +935,7 @@ export default function AccountReceivable() {
       await apiPatchAccountReceivableInvoice(targetInvoice.id, body);
       setTargetInvoice(undefined);
       update_invoiceArr();
+      update_accountantArr();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '編輯發票失敗', content: err.message });
@@ -928,17 +943,21 @@ export default function AccountReceivable() {
     }
   };
 
-  //清空發票的收款紀錄連結
-  const reqPatchAccountReceivableInvoice_clearAccountant = async (invoice: TaccountsReceivableInvoiceDto) => {
+  //編輯發票的收款紀錄連結
+  const reqPatchAccountReceivableInvoice_clearAccountant = async (
+    invoice: TaccountsReceivableInvoiceDto,
+    remainAccountantIdArr: string[] // 要留下的收款紀錄id
+  ) => {
     const body: TupdateAccountReceivableInvoiceDto = {
       ...invoice,
-      accountants: [],
+      accountants: remainAccountantIdArr,
     };
 
     try {
       await apiPatchAccountReceivableInvoice(invoice.id, body);
       setTargetInvoice(undefined);
       update_invoiceArr();
+      update_accountantArr();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '清除關聯失敗', content: err.message });
