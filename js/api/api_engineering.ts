@@ -1186,13 +1186,20 @@ export const useGetFinalProduct = (contractId: string | undefined) => {
       return;
     }
 
-    const newRes = await apiGetFinalProduct(contractId);
+    try {
+      const newRes = await apiGetFinalProduct(contractId);
 
-    if (newRes) {
-      setRes(newRes);
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得請款單資料失敗', content: err.message });
     }
 
-    return newRes;
+    return undefined;
   };
 
   return {
@@ -1261,6 +1268,18 @@ export const apiPostProductPayment = async (
 
   return axi
     .post<TaccountsReceivableProductPaymentDto[]>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiPatchProductPayment = async (
+  accountReceivableId: string,
+  body: TcreateAccountReceivableProductPaymentDto[]
+) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
+
+  return axi
+    .patch<TaccountsReceivableProductPaymentDto[]>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
