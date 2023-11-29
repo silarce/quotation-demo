@@ -423,9 +423,9 @@ export default function AccountReceivable() {
   // data_invoiceArr
   // 控制 發票給予紀錄
   const control_invoiceGivingRecord = useMemo(() => {
-    const control_invoiceGivingRecord_rowArr: Tcontrol_dynaTable['rowArr'] = invoiceArr.map((item, index) => {
-      const accountantArr = item.accountantList ?? [];
-      const { invoiceStatus } = item;
+    const control_invoiceGivingRecord_rowArr: Tcontrol_dynaTable['rowArr'] = invoiceArr.map((invoice, index) => {
+      const accountantArr = invoice.accountantList ?? [];
+      const { invoiceStatus } = invoice;
       const isForbidden = invoiceStatus === '已作廢';
 
       const subRowArr: Trow[] = accountantArr.map((accountant) => {
@@ -514,12 +514,14 @@ export default function AccountReceivable() {
 
       return {
         panelCell_03: {
-          onChainBreakClick: () => {},
+          onChainBreakClick: () => {
+            reqPatchAccountReceivableInvoice_clearAccountant(invoice);
+          },
           onEditClick: () => {
-            setTargetInvoice(item);
+            setTargetInvoice(invoice);
           },
           onAbandonClick: () => {
-            reqPatchAccountReceivableVoidInvoice(item.id);
+            reqPatchAccountReceivableVoidInvoice(invoice.id);
           },
         },
         isForbidden,
@@ -529,7 +531,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '120px' },
             datePickerProps: {
               props: {
-                value: item.invoiceDate ? moment(item.invoiceDate) : null,
+                value: invoice.invoiceDate ? moment(invoice.invoiceDate) : null,
                 onChange: (date) => {
                   setInvoiceArr((arr) => {
                     const newArr = [...arr];
@@ -575,7 +577,7 @@ export default function AccountReceivable() {
             // },
             inputProps: {
               props: {
-                value: item.invoiceNumber ?? '',
+                value: invoice.invoiceNumber ?? '',
                 onChange: (e) => {
                   const arr = [...invoiceArr];
                   arr[index].invoiceNumber = e.target.value;
@@ -590,7 +592,7 @@ export default function AccountReceivable() {
             inputProps: {
               props: {
                 type: 'number',
-                value: String(item.price) ?? '',
+                value: String(invoice.price) ?? '',
                 onChange: (e) => {
                   const arr = [...invoiceArr];
                   arr[index].price = Number(e.target.value);
@@ -604,7 +606,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '300px' },
             inputProps: {
               props: {
-                value: item.note ?? '',
+                value: invoice.note ?? '',
                 onChange: (e) => {
                   const arr = [...invoiceArr];
                   arr[index].note = e.target.value;
@@ -884,8 +886,8 @@ export default function AccountReceivable() {
     try {
       setIsLoading(true);
       await apiPatchAccountReceivable(accountReceivableId, accountReceivable);
-      setDisabled(true);
       await doUpdate_contract();
+      setDisabled(true);
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: err.message });
@@ -926,6 +928,25 @@ export default function AccountReceivable() {
     }
   };
 
+  //清空發票的收款紀錄連結
+  const reqPatchAccountReceivableInvoice_clearAccountant = async (invoice: TaccountsReceivableInvoiceDto) => {
+    const body: TupdateAccountReceivableInvoiceDto = {
+      ...invoice,
+      accountants: [],
+    };
+
+    try {
+      await apiPatchAccountReceivableInvoice(invoice.id, body);
+      setTargetInvoice(undefined);
+      update_invoiceArr();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '清除關聯失敗', content: err.message });
+    } finally {
+    }
+  };
+
+  /**作廢發票 */
   const reqPatchAccountReceivableVoidInvoice = async (invoiceId: string) => {
     try {
       apiPatchAccountReceivableVoidInvoice(invoiceId);
