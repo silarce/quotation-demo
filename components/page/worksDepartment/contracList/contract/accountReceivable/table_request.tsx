@@ -33,6 +33,8 @@ import {
   TcreateAccountReceivableProductPaymentDto,
   apiPatchProductPayment,
   TupdateAccountReceivableProductPaymentDto,
+  apiPatchAccountReceivableInvoice,
+  apiPatchAccountReceivableVoidInvoice,
 } from 'js/api/api_engineering';
 import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -409,6 +411,20 @@ export default function Table_request({
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  /**作廢發票 */
+
+  const reqApiPatchAccountReceivableVoidInvoice = async (invoiceId: string) => {
+    try {
+      setIsLoading(true);
+      await apiPatchAccountReceivableVoidInvoice(invoiceId);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '作廢發票失敗', content: err.message });
+    } finally {
+      setIsLoading(true);
     }
   };
 
