@@ -2400,6 +2400,7 @@ class Class_product {
     this._prodData.typhoonProtection = v;
     this._prodData.doorTrack = '';
     // this.doorTrack = '';
+    // this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
 
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
@@ -2416,8 +2417,6 @@ class Class_product {
   }
   set bounceDoor(v) {
     this._prodData.bounceDoor = v;
-    this._prodData.doorTrack = '';
-    // this.doorTrack = '';
     this.reRender();
   }
 
@@ -2511,7 +2510,17 @@ class Class_product {
   }
   set doorTrackSilencerStrip(v) {
     this._prodData.doorTrackSilencerStrip = v;
-    this.callRetrieveCreProdCom();
+    this._prodData.doorTrack = '';
+    // this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
+
+    // this.callRetrieveCreProdCom();
+    // this.reRender();
+    this.shouldCall_cgs = true;
+    this.shouldCall_pac = true;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
+    // onDoorTypeChange必須放在賦值之後再執行
+    this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
     this.reRender();
   }
   //
