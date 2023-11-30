@@ -1,44 +1,31 @@
 import { useState, useEffect, CSSProperties, Fragment, useMemo } from 'react';
 import classNames from 'classnames';
-import _ from 'lodash';
 import Decimal from 'decimal.js';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import TwoButtonModal_free, { TwoBtnFooter } from 'components/global/gear/modal/simpleModal/twoButtonModal_free';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
+import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 
 // api
 import {
   TcreateAccountReceivableInvoiceDto,
   TaccountsReceivableInvoiceDto,
-  TupdateEngineeringContactDto,
-  TupdateAccountReceivableDto,
-  TaccountReceivableDto,
-  useGetEngineeringContact,
-  apiPatchEngineeringContact,
-  apiPostWorkSheet,
   useGetFinalProduct,
-  useGetAccountReceivable_id,
-  apiPatchAccountReceivable,
-  useGetAccountReceivableAccountants,
-  apiPostAccountReceivableAccountant,
-  apiDeleteAccountReceivableAccountant,
   apiPostAccountReceivableIncoice,
-  useGetAccountReceivableProductPayments,
   apiPostProductPayment,
-  TcreateAccountReceivableProductPaymentDto,
+  apiPatchProductPayment,
+  TupdateAccountReceivableProductPaymentDto,
+  apiPatchAccountReceivableVoidInvoice,
 } from 'js/api/api_engineering';
-import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
-import { TaccountantDto } from 'js/api/api_accountant';
-import { TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
 
 // utils
 import { convertDate_add1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+// import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './table_request.module.scss';
@@ -68,39 +55,19 @@ export default function Table_request({
 
   const [showAddInvoiceModal, setShowAddInvoiceModal] = useState<boolean>(false);
 
-  // console.log('invoiceArr', invoiceArr);
-
   // ---------------------------------------------------------
 
   const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
 
-  // const { data: data_payments, update: update_payments } = useGetAccountReceivableProductPayments(accountReceivableId);
-
-  // const {} = useGetAccountReceivable_id();
-
   useEffect(() => {
     (async () => {
-      const res01 = await update_finalProduct();
-      // console.log('finalProduct', res01);
-      // console.log('====================================');
+      await update_finalProduct();
     })();
   }, [contractId]);
 
-  useEffect(() => {
-    (async () => {
-      // const res02 = await update_payments();
-      // console.log('payments', res02);
-      // console.log('====================================');
-    })();
-  }, [accountReceivableId]);
-
-  // console.log(invoiceArr);
-
   // -----------------------------------------------------------------------------
 
-  // apiPostProductPayment
-  // TcreateAccountReceivableProductPaymentDto
-  const [paymentPreBody, setPeymentPreBody] = useState<TcreateAccountReceivableProductPaymentDto>();
+  const [paymentPreBody, setPeymentPreBody] = useState<TupdateAccountReceivableProductPaymentDto>();
 
   // -----------------------------------------------------------------------------
 
@@ -121,9 +88,9 @@ export default function Table_request({
       if (period) {
         peroidList[period] = {
           period: String(period),
-          onDeleteClick: () => {
-            alert('test');
-          },
+          // onDeleteClick: () => {
+          //   alert('test');
+          // },
         };
         validInvoiceList[period] = {
           id,
@@ -142,15 +109,12 @@ export default function Table_request({
   }, [invoiceArr]);
 
   const { firstContractRow, appendContractRow, appendContractRowQty, totalRow01 } = useMemo(() => {
-    // console.log(data_finalProduct);
     const periodArr = Object.keys(peroidList);
 
     const { finalAppendContractProductsItems, finalRootContractProductItems } = data_finalProduct ?? {};
 
-    // console.log('data_finalProduct', data_finalProduct);
-
-    const firstContractRow: Trow[] = (finalAppendContractProductsItems ?? []).map((prodIteom) => {
-      const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = prodIteom;
+    const firstContractRow: Trow[] = (finalRootContractProductItems ?? []).map((prodItem) => {
+      const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = prodItem;
 
       const periodList: Trow['periodList'] = {};
 
@@ -158,41 +122,37 @@ export default function Table_request({
         const validInvoice = validInvoiceList[period];
 
         periodList[period] = (deliveryStatus ?? []).map((deliveryStatu) => {
-          const { itemName, productPayment } = deliveryStatu;
-          // const { paymentRatio, invoice } = productPayment;
-          const thePaymentArr = productPayment?.filter((item) => {
-            return String(item.invoice?.period) === period;
-          });
+          const { productPayments } = deliveryStatu;
 
-          // if (thePayment?.length > 1) {
-          //   myAlert.err({ title: '請款比例符合項超過兩個' });
-          // }
+          const thePaymentArr = productPayments?.filter((item) => {
+            return String(item.invoice?.period) === String(period);
+          });
 
           const thePayment = thePaymentArr?.[0];
 
-          if (thePayment) {
-            console.log(thePayment);
-          }
+          const ratio = Number(thePayment?.paymentRatio || 0);
+          const completePrice = new Decimal(totalPrice).mul(ratio).toNumber();
 
           return {
             completeItem: deliveryStatu.itemName ?? '',
             percentage: {
-              value: thePayment?.paymentRatio ?? '---',
+              value: thePayment?.paymentRatio ? `${thePayment.paymentRatio}%` : '---',
               onClick: () => {
                 if (!accountReceivableId) {
                   return;
                 }
 
                 setPeymentPreBody({
-                  paymentRatio: '0',
+                  paymentRatio: thePayment?.paymentRatio || '0',
                   accountsReceivableId: accountReceivableId,
                   invoiceId: validInvoice.id,
-                  productItemId: prodIteom.id,
+                  productItemId: prodItem.id,
                   deliveryStatusId: [deliveryStatu.id],
+                  id: thePayment?.id,
                 });
               },
             },
-            completePrice: 1,
+            completePrice,
           };
         });
 
@@ -222,20 +182,46 @@ export default function Table_request({
       };
     });
 
-    const appendContractRow: Trow[] = (finalRootContractProductItems ?? []).map((item) => {
-      const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = item;
+    const appendContractRow: Trow[] = (finalAppendContractProductsItems ?? []).map((prodItem) => {
+      const { itemName, fullWidth, height, boxB, unitPrice, totalPrice, deliveryStatus } = prodItem;
 
       const periodList: Trow['periodList'] = {};
 
       periodArr.forEach((period) => {
-        periodList[period] = (deliveryStatus ?? []).map((item) => {
+        const validInvoice = validInvoiceList[period];
+
+        periodList[period] = (deliveryStatus ?? []).map((deliveryStatu) => {
+          const { itemName, productPayments } = deliveryStatu;
+
+          const thePaymentArr = productPayments?.filter((item) => {
+            return String(item.invoice?.period) === String(period);
+          });
+
+          const thePayment = thePaymentArr?.[0];
+
+          const ratio = Number(thePayment?.paymentRatio || 0);
+          const completePrice = new Decimal(totalPrice).mul(ratio).toNumber();
+
           return {
-            completeItem: item.itemName ?? '',
+            completeItem: deliveryStatu.itemName ?? '',
             percentage: {
-              value: '0',
-              onClick: () => {},
+              value: thePayment?.paymentRatio ? `${thePayment.paymentRatio}%` : '---',
+              onClick: () => {
+                if (!accountReceivableId) {
+                  return;
+                }
+
+                setPeymentPreBody({
+                  paymentRatio: thePayment?.paymentRatio || '0',
+                  accountsReceivableId: accountReceivableId,
+                  invoiceId: validInvoice.id,
+                  productItemId: prodItem.id,
+                  deliveryStatusId: [deliveryStatu.id],
+                  id: thePayment?.id,
+                });
+              },
             },
-            completePrice: 1,
+            completePrice,
           };
         });
 
@@ -387,8 +373,25 @@ export default function Table_request({
     }
   };
 
+  /**作廢發票 */
+
+  const reqApiPatchAccountReceivableVoidInvoice = async (invoiceId: string) => {
+    try {
+      setIsLoading(true);
+      await apiPatchAccountReceivableVoidInvoice(invoiceId);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '作廢發票失敗', content: err.message });
+    } finally {
+      setIsLoading(true);
+    }
+  };
+
   /**新增付款比例 */
   const reqPostProductPayment = async (ratio: string) => {
+    // 這個請求函示只能新增一筆付款比例
+    // 要批次新增或更新，要另外寫函示
+
     if (!paymentPreBody || !accountReceivableId) {
       return;
     }
@@ -402,8 +405,15 @@ export default function Table_request({
 
     try {
       setIsLoading(true);
-      await apiPostProductPayment(accountReceivableId, body);
       setPeymentPreBody(undefined);
+
+      if (body[0].id) {
+        await apiPatchProductPayment(accountReceivableId, body);
+      } else {
+        await apiPostProductPayment(accountReceivableId, body);
+      }
+
+      await update_finalProduct();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '新增請款比例失敗', content: err.message });
@@ -435,8 +445,11 @@ export default function Table_request({
 
   // ---------------------------------------------------------
   return (
-    <>
+    <div className="relative">
+      <LoadingCover01 isLoading={isLoading} />
       <View control={control} />
+
+      {/*  */}
       {/*  */}
 
       <InputModal
@@ -503,7 +516,7 @@ export default function Table_request({
           />
         </form>
       </TwoButtonModal_free>
-    </>
+    </div>
   );
 }
 
@@ -567,7 +580,7 @@ type TtotalRow = {
 type TperoidList = {
   [key: string]: {
     period: string;
-    onDeleteClick: () => void;
+    // onDeleteClick: () => void;
   };
 };
 
@@ -635,7 +648,10 @@ const View = ({ control }: { control: Tcontrol }) => {
             </div>
             <div className={scss.right}>
               {Object.values(periodList).map((item, index) => {
-                const { period, onDeleteClick } = item;
+                const {
+                  period,
+                  // onDeleteClick
+                } = item;
 
                 const { completeItem, percentage, completePrice, deleteIcon } = config;
 
@@ -654,7 +670,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                         <span>{completePrice.label}</span>
                       </div>
                       <div className={classNames(scss.cell)} style={deleteIcon.style}>
-                        <IconDelete01 onClick={onDeleteClick} />
+                        {/* <IconDelete01 onClick={onDeleteClick} /> */}
                       </div>
                     </div>
                     <div className={scss.pilar} />
@@ -672,7 +688,11 @@ const View = ({ control }: { control: Tcontrol }) => {
                 <div className={scss.left}>
                   {leftKeyArr.map((key, lIndex) => {
                     const { style } = config[key];
-                    const value = left[key];
+                    let value = left[key];
+
+                    if (key === 'unitPrice' || key === 'totalPrice') {
+                      value = value.toLocaleString();
+                    }
 
                     return (
                       <div key={lIndex} style={style} className={classNames(scss.cell)}>
@@ -702,7 +722,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                                   <span>{percentage.value}</span>
                                 </div>
                                 <div className={classNames(scss.cell)} style={config.completePrice.style}>
-                                  <span>{completePrice}</span>
+                                  <span>{completePrice.toLocaleString()}</span>
                                 </div>
                                 <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
                               </Fragment>
@@ -741,7 +761,11 @@ const View = ({ control }: { control: Tcontrol }) => {
                 <div className={scss.left}>
                   {leftKeyArr.map((key, index) => {
                     const { style } = config[key];
-                    const value = left[key];
+                    let value = left[key];
+
+                    if (key === 'unitPrice' || key === 'totalPrice') {
+                      value = value.toLocaleString();
+                    }
 
                     return (
                       <div key={index} style={style} className={classNames(scss.cell)}>
@@ -771,7 +795,7 @@ const View = ({ control }: { control: Tcontrol }) => {
                                   <span>{percentage.value}</span>
                                 </div>
                                 <div className={classNames(scss.cell)} style={config.completePrice.style}>
-                                  <span>{completePrice}</span>
+                                  <span>{completePrice.toLocaleString()}</span>
                                 </div>
                                 <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
                               </Fragment>
@@ -786,152 +810,154 @@ const View = ({ control }: { control: Tcontrol }) => {
               </div>
             );
           })}
-          {/* totalRow01 */}
-          <div className={classNames(scss.row, scss.totalRow, scss.firstTotalRow)}>
-            <div className={scss.left}>
-              <div style={config.itemName.style} className={classNames(scss.cell, scss.title)}>
-                <span>{'合計'}</span>
+
+          <div className={scss.bottom}>
+            {/* totalRow01 */}
+            <div className={classNames(scss.row, scss.totalRow, scss.firstTotalRow)}>
+              <div className={scss.left}>
+                <div style={config.itemName.style} className={classNames(scss.cell, scss.title)}>
+                  <span>{'合計'}</span>
+                </div>
+                <div style={config.fullWidth.style} className={classNames(scss.cell)} />
+                <div style={config.height.style} className={classNames(scss.cell)} />
+                <div style={config.boxB.style} className={classNames(scss.cell)} />
+                <div style={config.qty.style} className={classNames(scss.cell)} />
+                <div style={config.unitPrice.style} className={classNames(scss.cell, scss.mr0)}>
+                  <span>{totalRow01.left?.unitPrice.toLocaleString()}</span>
+                </div>
+                <div style={config.totalPrice.style} className={classNames(scss.cell, scss.mr0)}>
+                  <span>{totalRow01.left?.totalPrice.toLocaleString()}</span>
+                </div>
               </div>
-              <div style={config.fullWidth.style} className={classNames(scss.cell)} />
-              <div style={config.height.style} className={classNames(scss.cell)} />
-              <div style={config.boxB.style} className={classNames(scss.cell)} />
-              <div style={config.qty.style} className={classNames(scss.cell)} />
-              <div style={config.unitPrice.style} className={classNames(scss.cell)}>
-                <span>{totalRow01.left?.unitPrice}</span>
-              </div>
-              <div style={config.totalPrice.style} className={classNames(scss.cell)}>
-                <span>{totalRow01.left?.totalPrice}</span>
+              {/* right */}
+              <div className={scss.right}>
+                {Object.values(totalRow01.periodList).map((item, index) => {
+                  return (
+                    <Fragment key={index}>
+                      <div className={scss.periodGroup}>
+                        <div className={classNames(scss.cell)} style={config.completeItem.style}></div>
+                        <div className={classNames(scss.cell)} style={config.percentage.style}>
+                          <span>{`第${item.period}期合計`}</span>
+                        </div>
+                        <div className={classNames(scss.cell, scss.mr0)} style={config.completePrice.style}>
+                          <span>{item.completePrice.toLocaleString()}</span>
+                        </div>
+                        <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
+                      </div>
+                      <div className={scss.pilar}></div>
+                    </Fragment>
+                  );
+                })}
               </div>
             </div>
-            {/* right */}
-            <div className={scss.right}>
-              {Object.values(totalRow01.periodList).map((item, index) => {
-                return (
-                  <Fragment key={index}>
-                    <div className={scss.periodGroup}>
-                      <div className={classNames(scss.cell)} style={config.completeItem.style}></div>
-                      <div className={classNames(scss.cell)} style={config.percentage.style}>
-                        <span>{`第${item.period}期合計`}</span>
+            {/* totalRow02 */}
+            <div className={classNames(scss.row, scss.totalRow)}>
+              <div className={scss.left}>
+                <div style={config.itemName.style} className={classNames(scss.cell, scss.title)}>
+                  <span>{'營業稅'}</span>
+                </div>
+                <div style={config.fullWidth.style} className={classNames(scss.cell)} />
+                <div style={config.height.style} className={classNames(scss.cell)} />
+                <div style={config.boxB.style} className={classNames(scss.cell)} />
+                <div style={config.qty.style} className={classNames(scss.cell)} />
+                <div style={config.unitPrice.style} className={classNames(scss.cell, scss.mr0)}>
+                  <span>{totalRow01.left?.unitPriceTax.toLocaleString()}</span>
+                </div>
+                <div style={config.totalPrice.style} className={classNames(scss.cell, scss.mr0)}>
+                  <span>{totalRow01.left?.totalPriceTotalTax.toLocaleString()}</span>
+                </div>
+              </div>
+              {/* right */}
+              <div className={scss.right}>
+                {Object.values(totalRow01.periodList).map((item, index) => {
+                  return (
+                    <Fragment key={index}>
+                      <div className={scss.periodGroup}>
+                        <div className={classNames(scss.cell)} style={config.completeItem.style}></div>
+                        <div className={classNames(scss.cell)} style={config.percentage.style}>
+                          <span>{`第${item.period}期合計`}</span>
+                        </div>
+                        <div className={classNames(scss.cell, scss.mr0)} style={config.completePrice.style}>
+                          <span>{item.tax.toLocaleString()}</span>
+                        </div>
+                        <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
                       </div>
-                      <div className={classNames(scss.cell)} style={config.completePrice.style}>
-                        <span>{item.completePrice}</span>
+                      <div className={scss.pilar}></div>
+                    </Fragment>
+                  );
+                })}
+              </div>
+            </div>
+            {/* totalRow3 */}
+            <div className={classNames(scss.row, scss.totalRow)}>
+              <div className={scss.left}>
+                <div style={config.itemName.style} className={classNames(scss.cell, scss.title)}></div>
+                <div style={config.fullWidth.style} className={classNames(scss.cell)} />
+                <div style={config.height.style} className={classNames(scss.cell)} />
+                <div style={config.boxB.style} className={classNames(scss.cell)} />
+                <div style={config.qty.style} className={classNames(scss.cell)} />
+                <div style={config.unitPrice.style} className={classNames(scss.cell, scss.mr0)}>
+                  <span>{totalRow01.left?.unitPriceSubTotal.toLocaleString()}</span>
+                </div>
+                <div style={config.totalPrice.style} className={classNames(scss.cell, scss.mr0)}>
+                  <span>{totalRow01.left?.totalPriceTotalSubTotal.toLocaleString()}</span>
+                </div>
+              </div>
+              {/* right */}
+              <div className={scss.right}>
+                {Object.values(totalRow01.periodList).map((item, index) => {
+                  return (
+                    <Fragment key={index}>
+                      <div className={scss.periodGroup}>
+                        <div className={classNames(scss.cell)} style={config.completeItem.style}></div>
+                        <div className={classNames(scss.cell)} style={config.percentage.style}>
+                          <span>{`第${item.period}期合計`}</span>
+                        </div>
+                        <div className={classNames(scss.cell, scss.mr0)} style={config.completePrice.style}>
+                          <span>{item.totalWithTax.toLocaleString()}</span>
+                        </div>
+                        <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
                       </div>
-                      <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
-                    </div>
-                    <div className={scss.pilar}></div>
-                  </Fragment>
-                );
-              })}
+                      <div className={scss.pilar}></div>
+                    </Fragment>
+                  );
+                })}
+              </div>
+            </div>
+            {/* 發票 invoiceList */}
+            {/* invoiceList */}
+            <div className={scss.row}>
+              <div className={scss.left}>
+                {leftKeyArr.map((key, index) => {
+                  const { style } = config[key];
+
+                  return <div key={index} style={style} className={scss.cell}></div>;
+                })}
+              </div>
+
+              <div className={scss.right}>
+                {Object.values(invoiceList).map((item, index) => {
+                  const { period, date, invoiceNumber } = item;
+
+                  return (
+                    <Fragment key={index}>
+                      <div className={scss.invoiceCell}>
+                        <div>
+                          <p>{`第${period}期`}</p>
+                          <p>發票日期/發票號碼</p>
+                        </div>
+                        <div>
+                          <p>{date}</p>
+                          <p>{invoiceNumber}</p>
+                        </div>
+                      </div>
+                      <div className={scss.pilar} />
+                    </Fragment>
+                  );
+                })}
+              </div>
             </div>
           </div>
-          {/* totalRow02 */}
-          <div className={classNames(scss.row, scss.totalRow)}>
-            <div className={scss.left}>
-              <div style={config.itemName.style} className={classNames(scss.cell, scss.title)}>
-                <span>{'營業稅'}</span>
-              </div>
-              <div style={config.fullWidth.style} className={classNames(scss.cell)} />
-              <div style={config.height.style} className={classNames(scss.cell)} />
-              <div style={config.boxB.style} className={classNames(scss.cell)} />
-              <div style={config.qty.style} className={classNames(scss.cell)} />
-              <div style={config.unitPrice.style} className={classNames(scss.cell)}>
-                <span>{totalRow01.left?.unitPriceTax}</span>
-              </div>
-              <div style={config.totalPrice.style} className={classNames(scss.cell)}>
-                <span>{totalRow01.left?.totalPriceTotalTax}</span>
-              </div>
-            </div>
-            {/* right */}
-            <div className={scss.right}>
-              {Object.values(totalRow01.periodList).map((item, index) => {
-                return (
-                  <Fragment key={index}>
-                    <div className={scss.periodGroup}>
-                      <div className={classNames(scss.cell)} style={config.completeItem.style}></div>
-                      <div className={classNames(scss.cell)} style={config.percentage.style}>
-                        <span>{`第${item.period}期合計`}</span>
-                      </div>
-                      <div className={classNames(scss.cell)} style={config.completePrice.style}>
-                        <span>{item.tax}</span>
-                      </div>
-                      <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
-                    </div>
-                    <div className={scss.pilar}></div>
-                  </Fragment>
-                );
-              })}
-            </div>
-          </div>
-          {/* totalRow3 */}
-          <div className={classNames(scss.row, scss.totalRow)}>
-            <div className={scss.left}>
-              <div style={config.itemName.style} className={classNames(scss.cell, scss.title)}></div>
-              <div style={config.fullWidth.style} className={classNames(scss.cell)} />
-              <div style={config.height.style} className={classNames(scss.cell)} />
-              <div style={config.boxB.style} className={classNames(scss.cell)} />
-              <div style={config.qty.style} className={classNames(scss.cell)} />
-              <div style={config.unitPrice.style} className={classNames(scss.cell)}>
-                <span>{totalRow01.left?.unitPriceSubTotal}</span>
-              </div>
-              <div style={config.totalPrice.style} className={classNames(scss.cell)}>
-                <span>{totalRow01.left?.totalPriceTotalSubTotal}</span>
-              </div>
-            </div>
-            {/* right */}
-            <div className={scss.right}>
-              {Object.values(totalRow01.periodList).map((item, index) => {
-                return (
-                  <Fragment key={index}>
-                    <div className={scss.periodGroup}>
-                      <div className={classNames(scss.cell)} style={config.completeItem.style}></div>
-                      <div className={classNames(scss.cell)} style={config.percentage.style}>
-                        <span>{`第${item.period}期合計`}</span>
-                      </div>
-                      <div className={classNames(scss.cell)} style={config.completePrice.style}>
-                        <span>{item.totalWithTax}</span>
-                      </div>
-                      <div className={classNames(scss.cell)} style={config.deleteIcon.style}></div>
-                    </div>
-                    <div className={scss.pilar}></div>
-                  </Fragment>
-                );
-              })}
-            </div>
-          </div>
-          {/* 發票 invoiceList */}
-          {/* invoiceList */}
-          <div className={scss.row}>
-            <div className={scss.left}>
-              {leftKeyArr.map((key, index) => {
-                const { style } = config[key];
-
-                return <div key={index} style={style} className={scss.cell}></div>;
-              })}
-            </div>
-
-            <div className={scss.right}>
-              {Object.values(invoiceList).map((item, index) => {
-                const { period, date, invoiceNumber } = item;
-
-                return (
-                  <Fragment key={index}>
-                    <div className={scss.invoiceCell}>
-                      <div>
-                        <p>{`第${period}期`}</p>
-                        <p>發票日期/發票號碼</p>
-                      </div>
-                      <div>
-                        <p>{date}</p>
-                        <p>{invoiceNumber}</p>
-                      </div>
-                    </div>
-                    <div className={scss.pilar} />
-                  </Fragment>
-                );
-              })}
-            </div>
-          </div>
-
           {/* main close */}
         </div>
         {/*  */}
@@ -1011,115 +1037,3 @@ const config: Tconfig = {
 };
 
 // =============================================================
-
-// const fakeperiodList = {
-//   '1': {
-//     period: '1',
-//     onDeleteClick: () => {
-//       alert('test');
-//     },
-//   },
-//   '2': {
-//     period: '2',
-//     onDeleteClick: () => {
-//       alert('test');
-//     },
-//   },
-//   '3': {
-//     period: '3s',
-//     onDeleteClick: () => {
-//       alert('test');
-//     },
-//   },
-// };
-
-// const fakeFirstRow: Trow[] = [
-//   {
-//     left: {
-//       itemName: 'string',
-//       fullWidth: 'string',
-//       height: 'string',
-//       boxB: 'string',
-//       qty: 'string',
-//       unitPrice: 'string',
-//       totalPrice: 'string',
-//     },
-//     periodList: {
-//       '1': [
-//         {
-//           completeItem: 'foo',
-//           percentage: {
-//             value: 'foo',
-//             onClick: () => alert('test'),
-//           },
-//           completePrice: 'foo',
-//         },
-//         // {
-//         //   completeItem: 'foo',
-//         //   percentage: {
-//         //     value: 'foo',
-//         //     onClick: () => alert('test'),
-//         //   },
-//         //   completePrice: 'foo',
-//         // },
-//       ],
-//       '2': [
-//         {
-//           completeItem: 'foo',
-//           percentage: {
-//             value: 'foo',
-//             onClick: () => alert('test'),
-//           },
-//           completePrice: 'foo',
-//         },
-//         {
-//           completeItem: 'foo',
-//           percentage: {
-//             value: 'foo',
-//             onClick: () => alert('test'),
-//           },
-//           completePrice: 'foo',
-//         },
-//       ],
-//     },
-//   },
-// ];
-
-// const fakeTotalRow: TtotalRow = {
-//   left: {
-//     unitPrice: 9999,
-//     totalPrice: 9999,
-//   },
-//   periodList: {
-//     '1': {
-//       period: '1',
-//       completePrice: 9999,
-//     },
-//     '2': {
-//       period: '2',
-//       completePrice: 9999,
-//     },
-//     '3': {
-//       period: '3',
-//       completePrice: 9999,
-//     },
-//   },
-// };
-
-// const fakeInvoiceList = {
-//   '1': {
-//     period: '1',
-//     date: 'string',
-//     invoiceNumber: 'string',
-//   },
-//   '2': {
-//     period: '2',
-//     date: 'string',
-//     invoiceNumber: 'string',
-//   },
-//   '3': {
-//     period: '3',
-//     date: 'string',
-//     invoiceNumber: 'string',
-//   },
-// };

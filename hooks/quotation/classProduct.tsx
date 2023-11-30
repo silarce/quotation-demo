@@ -19,7 +19,9 @@
  * reqProdGenerateDoorProductBom
  * 
 
-  WG === fullWidth-gapA-gapC
+  WG = fullWidth-gapA-gapC
+  G = guideRailG
+  W = WG - G
 
  */
 
@@ -216,7 +218,13 @@ class Class_product {
       headBoxLength: Number(this._prodData.headBoxLength) ?? 0,
       thickness: this._prodData.thickness,
     };
-  } // = constructor close ===========================================================
+
+    this._theW = String(Number(this._prodData.WG || '0') - this._prodData.guideRailG);
+
+    if (this._theW === '0') {
+      this._theW = '';
+    }
+  } //  constructor close ===========================================================
 
   private reRender;
   // readonly setIsLoading;
@@ -256,6 +264,8 @@ class Class_product {
 
   // readonly options_doorTrack_normal = options_doorTrack_normal;
   // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
+
+  private _theW = '0';
 
   // ---------------------------------------------------------
   // 追加追減用的
@@ -534,9 +544,11 @@ class Class_product {
 
     const prod: Tprod = {
       ...empty,
+      discount: this._prodData.discount,
       doorType: this.doorType,
       fullWidth: this.fullWidth,
       WG: this.WG,
+      guideRailG: this.guildRailG_mm,
       height: this.height,
       area: this.area,
       quantity: this._prodData.quantity,
@@ -544,7 +556,6 @@ class Class_product {
       dualPrice: this._prodData.dualPrice,
       unitPrice: this._prodData.unitPrice,
       totalPrice: this._prodData.totalPrice,
-      discount: this._prodData.discount,
       itemName: this._prodData.itemName,
       quoteType: this._prodData.quoteType,
       //
@@ -581,6 +592,7 @@ class Class_product {
 
   clearProd_all() {
     const empty = emptyProdOri();
+    this._theW = '';
 
     const prod: Tprod = {
       ...empty,
@@ -659,6 +671,9 @@ class Class_product {
         gapC: res.gapC,
       }) / 1000
     );
+
+    // this._theW = this._prodData.WG - this.guildRailG;
+    this._theW = new Decimal(this._prodData.WG || 0).sub(this.guildRailG || 0).toString();
 
     //
 
@@ -1759,6 +1774,7 @@ class Class_product {
     const arr = doorModel.guideRails.map((item) => {
       const imgSrc = item.imgSrc;
       const withHook = item.withHook;
+      const hasSilencingStrip = item.hasSilencingStrip;
 
       const option = {
         value: imgSrc,
@@ -1767,11 +1783,19 @@ class Class_product {
         icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
         // icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
         guideRailsOpening: item.opening,
+        width: item.width,
       };
 
-      if (withHook === null || withHook === this.typhoonProtection) {
+      if (
+        (withHook === null || withHook === this.typhoonProtection) &&
+        (hasSilencingStrip === null || hasSilencingStrip === this.doorTrackSilencerStrip)
+      ) {
         return option;
       }
+
+      // if (hasSilencingStrip === null || hasSilencingStrip === this.hasSilencingStrip) {
+      //   return option;
+      // }
 
       return undefined;
     });
@@ -1850,7 +1874,7 @@ class Class_product {
       v = '100';
     }
 
-    if (v.split('.')[1]?.length > 2) {
+    if (v.split('.')[1]?.length > 3) {
       return;
     }
 
@@ -1922,6 +1946,7 @@ class Class_product {
 
     if (!this.doorTrack) {
       this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
+      this._prodData.guideRailG = this.options_doorTrack?.[0]?.width ?? 0;
     }
 
     this.toGetInstallationFee();
@@ -1951,42 +1976,14 @@ class Class_product {
     this.reRender();
   }
 
-  /**WG */
   get WG() {
     return this._prodData.WG;
   }
 
   set WG(v) {
-    /**
-  20231006
-  業主說fullWidth與WG不再互斥，可以同時存在
-  經理說所有用fullWidth或WG計算的地方，都改成只用fullWidth計算
-  為了避免未來又要改回來，把被改動的地方記錄了下來
-  
-  原本會用到WG的地方
-  req_calcGeneralSpec
-  reqProdGenerateDoorProductBom
-  calcArea
-  
-  Class_component 的calcDefaultQuantity
-  Class_accessories的calcPrice
-
-  quotationPdf_new的productArr
-
-  pages\domestic\quotationList\quotation\index.tsx
-  的pdfPartProps
-   */
-
-    // this._prodData.fullWidth = '0';
-    // this.area = this.calcArea();
-
-    // this.calcChangeAccePrice();
-
-    // this.clearProd();
-
-    // this.shouldCall_cgs = true;
-    // this.callAllReq();
     this._prodData.WG = v;
+    const w = new Decimal(v || 0).sub(this.guildRailG || 0).toString();
+    this._theW = w;
 
     const callReq = async () => {
       const fullWidth = await calcFullwidthWithWG({
@@ -2018,6 +2015,24 @@ class Class_product {
 
     this.reRender();
   }
+
+  // ------------------------------------
+
+  get W() {
+    return this._theW;
+  }
+
+  set W(v) {
+    if (v === '') {
+      v = '0';
+    }
+
+    const wg = new Decimal(v || 0).add(this.guildRailG || 0).toString();
+    this.WG = wg;
+    this.reRender;
+  }
+
+  // ------------------------------------
 
   //
   get height() {
@@ -2172,6 +2187,13 @@ class Class_product {
     this.reRender();
   }
 
+  get guildRailG() {
+    return new Decimal(this._prodData.guideRailG || 0).div(1000).toString();
+  }
+  get guildRailG_mm() {
+    return this._prodData.guideRailG || 0;
+  }
+
   //
   get area() {
     return this._prodData.area;
@@ -2264,6 +2286,7 @@ class Class_product {
       return item?.value === v;
     });
     this._prodData.guideRailsOpening = theGuideRail?.guideRailsOpening ?? '';
+    this._prodData.guideRailG = theGuideRail?.width ?? 0;
 
     this.callRetrieveCreProdCom();
 
@@ -2391,6 +2414,9 @@ class Class_product {
   set typhoonProtection(v) {
     this._prodData.typhoonProtection = v;
     this._prodData.doorTrack = '';
+    this._prodData.guideRailG = 0;
+    // this.doorTrack = '';
+    // this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
 
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
@@ -2401,6 +2427,7 @@ class Class_product {
     this.reRender();
   }
 
+  // 彈射門
   get bounceDoor() {
     return this._prodData.bounceDoor;
   }
@@ -2499,7 +2526,18 @@ class Class_product {
   }
   set doorTrackSilencerStrip(v) {
     this._prodData.doorTrackSilencerStrip = v;
-    this.callRetrieveCreProdCom();
+    this._prodData.doorTrack = '';
+    this._prodData.guideRailG = 0;
+    // this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
+
+    // this.callRetrieveCreProdCom();
+    // this.reRender();
+    this.shouldCall_cgs = true;
+    this.shouldCall_pac = true;
+    this.shouldCall_pgpb = true;
+    this.callAllReq();
+    // onDoorTypeChange必須放在賦值之後再執行
+    this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
     this.reRender();
   }
   //
@@ -2901,6 +2939,8 @@ type Tprod = {
   material: string;
   surface: string;
   doorTrack: string;
+  // 門軌G
+  guideRailG: number;
   horsepower: string;
   quantity: number;
   price: number;
@@ -2987,9 +3027,10 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'doorType',
 
     'fullWidth',
+    'W',
     'WG',
-
     'height',
+    'guildRailG',
     'boxB',
     // 'boxD',
     'thickness',
@@ -3044,6 +3085,8 @@ const emptyProdOri = (): Tprod => {
     material: '',
     surface: '',
     doorTrack: '',
+    // 門軌G
+    guideRailG: 0,
     horsepower: '',
     quantity: 1,
     price: 0,

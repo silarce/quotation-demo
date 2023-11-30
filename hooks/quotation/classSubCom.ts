@@ -53,11 +53,14 @@ class Class_SubCom {
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
     const unitPrice = new Decimal(price).mul(discount);
-    // 複價
-    const totalPrice = new Decimal(unitPrice).mul(quantity);
 
     this._data.dualPrice = Number(dualPrice.toFixed(0));
     this._data.unitPrice = Number(unitPrice.toFixed(0));
+
+    // 複價
+    // const totalPrice = new Decimal(unitPrice).mul(quantity);
+    const totalPrice = new Decimal(this._data.unitPrice).mul(quantity);
+
     this._data.totalPrice = Number(totalPrice.toFixed(0));
 
     this._prod.calcProdAllprice_timeout();

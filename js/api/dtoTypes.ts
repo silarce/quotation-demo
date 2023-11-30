@@ -870,6 +870,8 @@ export type TquotationProductDto = {
   materialSurface: string | null;
   // 門軌
   guideRail: string;
+  // 門軌G
+  guideRailG: number | null;
   // 馬力
   horsepower: string;
   // 馬達廠商
@@ -996,7 +998,7 @@ export type TdeliveryStatusDto = {
   //
   completePayment: boolean | null;
   productPaymentId: boolean | null;
-  productPayment: TaccountsReceivableProductPaymentDto[] | null;
+  productPayments: TaccountsReceivableProductPaymentDto[] | null;
 };
 
 export type TcreateEngineeringDeliveryStatusDto = {
@@ -1287,6 +1289,8 @@ export type TcreateQuotationProductDto = {
   materialSurface: string | null;
   // 門軌
   guideRail: string;
+  // 門軌G
+  guideRailG: number | null;
   // 馬力
   horsepower: string;
   // 馬達廠商
@@ -1564,8 +1568,6 @@ export type TdoorMaterialDto = {
 };
 
 export type TdoorModelInfoDto = {
-  // 從name來看，get /products/door/models取得的陣列應該會有7個item，但實際上只一個?
-  // 因為DuST還在做
   name: TdoorModelName;
   density: number; // 密度?
   guideRails: {
@@ -1573,6 +1575,8 @@ export type TdoorModelInfoDto = {
     opening: string; // 印象中好像跟圖片中的開口有關??
     thickness: string;
     withHook: boolean | null; // 防颱勾?
+    hasSilencingStrip: boolean;
+    width: number;
   }[];
   thickness: string;
   slatMaterials: TdoorMaterialDto[]; // 支板材質?
@@ -2544,6 +2548,7 @@ export type TaccountantDto = {
   billSerialNumber: string | null; // 收入傳票序號
   noteMaturityDate: string | null; // 票據到期日
   invoice: TaccountsReceivableInvoiceDto[] | null;
+  noteNumber: string | null; // 票據號碼
 };
 
 export type TcreateAccountantDto = Omit<TaccountantDto, 'id' | 'createdAt' | 'updatedAt' | 'noteMaturityDate'> & {
@@ -2629,4 +2634,13 @@ export type TcreateAccountReceivableProductPaymentDto = {
   invoiceId: string | null;
   productItemId: string | null;
   deliveryStatusId: string[];
+};
+
+export type TupdateAccountReceivableProductPaymentDto = {
+  paymentRatio: string | null;
+  accountsReceivableId: string;
+  invoiceId: string | null;
+  productItemId: string | null;
+  deliveryStatusId: string[];
+  id?: string; // ID, 不提供時將此筆視為新增資料
 };
