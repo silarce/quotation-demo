@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useContext } from 'react';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 // global gear
 import SelectorShell, { TsearcbBarProps } from './selectorShell';
@@ -57,7 +58,8 @@ export default function AccessorySelector({
   const getReq = async () => {
     if (modelName) {
       const res = await apiGetProdAccessories({ modelName });
-      setAcceArr(res);
+      const arr = _.sortBy(res, 'name');
+      setAcceArr(arr);
     }
   };
 

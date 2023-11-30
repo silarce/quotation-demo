@@ -68,18 +68,38 @@ const prodCellConfig: TcellConfig = {
     },
   },
   WG: {
-    label: 'W(m)', // WG
+    label: 'WG(m)', // WG
     theadItemClassName: 'text-center',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
+      // showBaseline: 'invisible',
       inputProps: {
         props: {
           type: 'number',
           className: 'text-center',
+          // disabled: true,
+          placeholder: '',
         },
       },
     },
   },
+  W: {
+    label: 'W(m)', // WG
+    theadItemClassName: 'text-center',
+    inputSelProps: {
+      wrapperStyle: { width: '60px' },
+      // showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          type: 'number',
+          className: 'text-center',
+          // disabled: true,
+          placeholder: '',
+        },
+      },
+    },
+  },
+
   height: {
     label: 'h(m)',
     theadItemClassName: 'text-center',
@@ -377,6 +397,22 @@ const prodCellConfig: TcellConfig = {
       selectProps: {
         props: {
           // options由api取得
+        },
+      },
+    },
+  },
+  guildRailG: {
+    label: 'G',
+    theadItemClassName: 'text-center',
+    inputSelProps: {
+      wrapperStyle: { width: '60px' },
+      showBaseline: 'invisible',
+      inputProps: {
+        props: {
+          disabled: true,
+          type: 'number',
+          className: 'text-center',
+          placeholder: '',
         },
       },
     },

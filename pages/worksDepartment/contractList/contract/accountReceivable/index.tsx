@@ -36,6 +36,7 @@ import InvoiceSelector from 'components/global/gear/modal/invoiceSelector';
 
 // api
 import {
+  Tparams,
   TupdateEngineeringContactDto,
   TupdateAccountReceivableDto,
   TaccountReceivableDto,
@@ -53,32 +54,16 @@ import {
   apiPatchAccountReceivableInvoice,
   TupdateAccountReceivableInvoiceDto,
   apiPatchAccountReceivableAccountant,
+  apiPatchAccountReceivableVoidInvoice,
 } from 'js/api/api_engineering';
-import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
 
 // utils
-import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './index.module.scss';
-
-// ========================================================================
-
-// type TrequestPayment = {
-//   caption: string;
-//   paymentRatio: string;
-//   loanPeriod: string;
-//   remark: string;
-// };
-
-// type Tinvoice = {
-//   date: string;
-//   invoiceNumberPrefix: string;
-//   invoiceNumber: string;
-//   price: string;
-//   remark: string;
-// };
 
 // ========================================================================
 
@@ -93,7 +78,6 @@ export default function AccountReceivable() {
 
   const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
   const [showPeriodModal, setShowPeriodModal] = useState<boolean>(false);
-  const [showPercentModal, setShowPercentModal] = useState<boolean>(false);
 
   // --------------------------------------------------------------------------
 
@@ -139,46 +123,112 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
+  const [searchValue_invoice, setSearchValue_invoice] = useState<string>('');
+  const [sort_invoice, setSort_invoice] = useState<{
+    sort: string | undefined;
+    // order: 'ASC' | 'DESC' | undefined;
+    order: boolean;
+  }>({
+    sort: undefined,
+    order: false,
+  });
+
+  const params_invoice: Tparams = {
+    filter: {
+      $or: [
+        //
+        { invoiceNumber: { $eq: searchValue_invoice } },
+        { price: { $eq: isNaN(Number(searchValue_invoice || undefined)) ? undefined : Number(searchValue_invoice) } },
+        { note: { $contains: searchValue_invoice } },
+        { period: { $eq: isNaN(Number(searchValue_invoice || undefined)) ? undefined : Number(searchValue_invoice) } },
+      ],
+    },
+    sort: sort_invoice.sort,
+    order: sort_invoice.order ? 'ASC' : 'DESC',
+  };
+
+  const [searchValue_accountant, setSearchValue_accountant] = useState<string>('');
+  const [sort_accountant, setSort_accountant] = useState<{
+    sort: string | undefined;
+    // order: 'ASC' | 'DESC' | undefined;
+    order: boolean;
+  }>({
+    sort: undefined,
+    order: false,
+  });
+
+  const params_accountant: Tparams = {
+    filter: {
+      $or: [
+        //
+
+        { accountingNumber: { $eq: searchValue_accountant } },
+        { noteNumber: { $eq: searchValue_accountant } },
+        {
+          price: {
+            $eq: isNaN(Number(searchValue_accountant || undefined)) ? undefined : Number(searchValue_accountant),
+          },
+        },
+        { billSerialNumber: { $eq: searchValue_accountant } },
+      ],
+    },
+    sort: sort_accountant.sort,
+    order: sort_accountant.order ? 'ASC' : 'DESC',
+  };
+
+  // _use發票給予紀錄
+  const { data: data_invoiceArr, update: update_invoiceArr } = useGetAccountReceivableIncoices(
+    accountReceivableId,
+    params_invoice
+  );
+  const { data: data_invoiceArr_table, update: update_invoiceArr_table } =
+    useGetAccountReceivableIncoices(accountReceivableId);
+
   // _use收款紀錄
-  const { data: data_accountantArr, update: update_accountantArr } =
-    useGetAccountReceivableAccountants(accountReceivableId);
+  const { data: data_accountantArr, update: update_accountantArr } = useGetAccountReceivableAccountants(
+    accountReceivableId,
+    params_accountant
+  );
 
   const [targetAccountant, setTargetAccountant] = useState<TaccountantDto>();
 
-  // _use發票給予紀錄
-  const { data: data_invoiceArr, update: update_invoiceArr } = useGetAccountReceivableIncoices(accountReceivableId);
+  const update_InvoiceAndAccountant = async ({ isGetInvoiceTable }: { isGetInvoiceTable?: boolean } = {}) => {
+    await Promise.all([
+      //
+      update_invoiceArr(),
+      update_accountantArr(),
+      isGetInvoiceTable ? update_invoiceArr_table() : null,
+    ]);
+  };
+
+  const update_allInvoice = async () => {
+    await Promise.all([update_accountantArr(), update_invoiceArr_table()]);
+  };
 
   // --------------------------------------------------------------------------
 
   // 應收帳款明細
   const [accountReceivable, setAccountReceivable] = useState<TaccountReceivableDto>();
 
-  // console.log(accountReceivable);
-
-  // --------------------------------------------------------------------------
-
-  // const { data: data_finalProduct, update: update_finalProduct } = useGetFinalProduct(contractId);
-
-  // const {} = useGetAccountReceivable_id();
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const res = await update_finalProduct();
-  //   })();
-  // }, [contractId]);
-
   // --------------------------------------------------------------------------
 
   useEffect(() => {
     const accountReceivable = contract?.accountReceivable;
-    // console.log(contract);
+
     setAccountReceivable(accountReceivable);
   }, [contract, disabled]);
 
   useEffect(() => {
-    update_accountantArr();
     update_invoiceArr();
+  }, [accountReceivableId, searchValue_invoice, sort_invoice]);
+
+  useEffect(() => {
+    update_invoiceArr_table();
   }, [accountReceivableId]);
+
+  useEffect(() => {
+    update_accountantArr();
+  }, [accountReceivableId, searchValue_accountant, sort_accountant]);
 
   const {
     lastestVerifyForm, // 請款比例表用的
@@ -213,8 +263,6 @@ export default function AccountReceivable() {
   }, [data_invoiceArr, disabled]);
 
   // --------------------------------------------------------------------------
-
-  // 收款明細
 
   // --------------------------------------------------------------------------
 
@@ -422,8 +470,10 @@ export default function AccountReceivable() {
   // data_invoiceArr
   // 控制 發票給予紀錄
   const control_invoiceGivingRecord = useMemo(() => {
-    const control_invoiceGivingRecord_rowArr: Tcontrol_dynaTable['rowArr'] = invoiceArr.map((item, index) => {
-      const accountantArr = item.accountantList ?? [];
+    const control_invoiceGivingRecord_rowArr: Tcontrol_dynaTable['rowArr'] = invoiceArr.map((invoice, index) => {
+      const accountantArr = invoice.accountantList ?? [];
+      const { invoiceStatus } = invoice;
+      const isForbidden = invoiceStatus === '已作廢';
 
       const subRowArr: Trow[] = accountantArr.map((accountant) => {
         const {
@@ -439,7 +489,12 @@ export default function AccountReceivable() {
 
         return {
           panelCell_04: {
-            onChainBreakClick: () => {},
+            onChainBreakClick: () => {
+              const accountantId = accountant.id;
+              const accountantIdArr = invoice.accountantList.map((item) => item.id);
+              const remainAccountantIdArr = accountantIdArr.filter((item) => item !== accountantId);
+              reqPatchAccountReceivableInvoice_clearAccountant(invoice, remainAccountantIdArr);
+            },
           },
           list: {
             date: {
@@ -511,19 +566,24 @@ export default function AccountReceivable() {
 
       return {
         panelCell_03: {
-          onChainBreakClick: () => {},
-          onEditClick: () => {
-            setTargetInvoice(item);
+          onChainBreakClick: () => {
+            reqPatchAccountReceivableInvoice_clearAccountant(invoice, []);
           },
-          onAbandonClick: () => {},
+          onEditClick: () => {
+            setTargetInvoice(invoice);
+          },
+          onAbandonClick: () => {
+            reqPatchAccountReceivableVoidInvoice(invoice.id);
+          },
         },
+        isForbidden,
         list: {
           date: {
             label: '日期',
             cellStyle: { width: '120px' },
             datePickerProps: {
               props: {
-                value: item.invoiceDate ? moment(item.invoiceDate) : null,
+                value: invoice.invoiceDate ? moment(invoice.invoiceDate) : null,
                 onChange: (date) => {
                   setInvoiceArr((arr) => {
                     const newArr = [...arr];
@@ -569,7 +629,7 @@ export default function AccountReceivable() {
             // },
             inputProps: {
               props: {
-                value: item.invoiceNumber ?? '',
+                value: invoice.invoiceNumber ?? '',
                 onChange: (e) => {
                   const arr = [...invoiceArr];
                   arr[index].invoiceNumber = e.target.value;
@@ -584,7 +644,7 @@ export default function AccountReceivable() {
             inputProps: {
               props: {
                 type: 'number',
-                value: String(item.price) ?? '',
+                value: String(invoice.price) ?? '',
                 onChange: (e) => {
                   const arr = [...invoiceArr];
                   arr[index].price = Number(e.target.value);
@@ -598,7 +658,7 @@ export default function AccountReceivable() {
             cellStyle: { width: '300px' },
             inputProps: {
               props: {
-                value: item.note ?? '',
+                value: invoice.note ?? '',
                 onChange: (e) => {
                   const arr = [...invoiceArr];
                   arr[index].note = e.target.value;
@@ -612,7 +672,8 @@ export default function AccountReceivable() {
             cellStyle: { width: '75px' },
             inputProps: {
               props: {
-                value: 'no property',
+                value: invoice.period ?? '',
+                placeholder: '',
               },
             },
           },
@@ -624,7 +685,7 @@ export default function AccountReceivable() {
     const control_invoiceGivingRecord: Tcontrol_dynaTable = {
       caption: '發票給予紀錄',
       onSearchClick: (str) => {
-        alert(str);
+        setSearchValue_invoice(str);
       },
       // tableBottomBtnProps: {
       //   label: '新增發票',
@@ -645,13 +706,34 @@ export default function AccountReceivable() {
         panelCell_03: {},
         list: createHeadRowList_發票給予紀錄({
           onDateClick: () => {
-            alert('test');
+            setSort_invoice((state) => {
+              const order = state.sort === 'invoiceDate' ? !state.order : false;
+
+              return {
+                sort: 'invoiceDate',
+                order: order,
+              };
+            });
           },
           onPriceClick: () => {
-            alert('test');
+            setSort_invoice((state) => {
+              const order = state.sort === 'price' ? !state.order : false;
+
+              return {
+                sort: 'price',
+                order: order,
+              };
+            });
           },
           onPeriodClick: () => {
-            alert('test');
+            setSort_invoice((state) => {
+              const order = state.sort === 'period' ? !state.order : false;
+
+              return {
+                sort: 'period',
+                order: order,
+              };
+            });
           },
         }),
       },
@@ -670,16 +752,25 @@ export default function AccountReceivable() {
     //
     let priceTotal = 0;
 
-    const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'] = (data_accountantArr ?? []).map((item, index) => {
-      priceTotal = priceTotal + item.price;
-
+    const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'] = (data_accountantArr ?? []).map((accItem, index) => {
+      priceTotal = priceTotal + accItem.price;
+      const { invoice: invoiceArr } = accItem;
+      const accountantId = accItem.id;
       //
 
-      const subRowArr: Trow[] = (item.invoice ?? []).map((item) => {
+      const subRowArr: Trow[] = (invoiceArr ?? []).map((invoice) => {
         return {
           //
           panelCell_07: {
-            onBreakChainClick: () => {},
+            onBreakChainClick: () => {
+              const invoiceAccountantIdArr = invoice.accountantList.map((item) => item.id);
+              const remainAccountantIdArr = invoiceAccountantIdArr.filter((item) => item !== accountantId);
+
+              console.log(invoiceAccountantIdArr);
+              // console.log(remainAccountantIdArr);
+
+              reqPatchAccountReceivableInvoice_clearAccountant(invoice, remainAccountantIdArr);
+            },
           },
           list: {
             date: {
@@ -687,7 +778,7 @@ export default function AccountReceivable() {
               cellStyle: { width: '120px' },
               datePickerProps: {
                 props: {
-                  value: item.invoiceDate ? moment(item.invoiceDate) : null,
+                  value: invoice.invoiceDate ? moment(invoice.invoiceDate) : null,
                   onChange: () => {},
                 },
               },
@@ -697,7 +788,7 @@ export default function AccountReceivable() {
               cellStyle: { width: '300px' },
               inputProps: {
                 props: {
-                  value: item.invoiceNumber ?? '',
+                  value: invoice.invoiceNumber ?? '',
                   // onChange: (e) => {},
                 },
               },
@@ -722,7 +813,7 @@ export default function AccountReceivable() {
               inputProps: {
                 props: {
                   type: 'number',
-                  value: String(item.price) ?? '',
+                  value: String(invoice.price) ?? '',
                   onChange: () => {},
                 },
               },
@@ -732,7 +823,7 @@ export default function AccountReceivable() {
               cellStyle: { width: '300px' },
               inputProps: {
                 props: {
-                  value: item.note ?? '',
+                  value: invoice.note ?? '',
                   onChange: () => {},
                 },
               },
@@ -763,10 +854,10 @@ export default function AccountReceivable() {
       const control_accountant_rowArr: Tcontrol_dynaTable['rowArr'][number] = {
         panelCell_05: {
           onChainClick: () => {
-            setTargetAccountant(item);
+            setTargetAccountant(accItem);
           },
           onRemoveClick: () => {
-            deleteAccountant(item.id);
+            deleteAccountant(accItem.id);
           },
         },
         list: {
@@ -775,7 +866,8 @@ export default function AccountReceivable() {
             cellStyle: { width: '120px' },
             inputProps: {
               props: {
-                value: getTaiwanDateStr(item.createdAt) ?? '',
+                value: getTaiwanDateStr(accItem.createdAt) ?? '',
+                placeholder: '',
               },
             },
           },
@@ -784,7 +876,8 @@ export default function AccountReceivable() {
             cellStyle: { width: '189px' },
             inputProps: {
               props: {
-                value: item.accountingNumber,
+                value: accItem.accountingNumber,
+                placeholder: '',
               },
             },
           },
@@ -793,7 +886,8 @@ export default function AccountReceivable() {
             cellStyle: { width: '189px' },
             inputProps: {
               props: {
-                value: item.accountingNumber,
+                value: accItem.noteNumber ?? '',
+                placeholder: '',
               },
             },
           },
@@ -802,7 +896,8 @@ export default function AccountReceivable() {
             cellStyle: { width: '100px' },
             inputProps: {
               props: {
-                value: getTaiwanDateStr(item.noteMaturityDate) ?? '',
+                value: getTaiwanDateStr(accItem.noteMaturityDate) ?? '',
+                placeholder: '',
               },
             },
           },
@@ -811,7 +906,8 @@ export default function AccountReceivable() {
             cellStyle: { width: '170px' },
             inputProps: {
               props: {
-                value: item.price,
+                value: accItem.price,
+                placeholder: '',
               },
             },
           },
@@ -820,7 +916,8 @@ export default function AccountReceivable() {
             cellStyle: { width: '187px' },
             inputProps: {
               props: {
-                value: item.billSerialNumber ?? '',
+                value: accItem.billSerialNumber ?? '',
+                placeholder: '',
               },
             },
           },
@@ -834,7 +931,7 @@ export default function AccountReceivable() {
     const control_accountant: Tcontrol_dynaTable = {
       caption: '收款紀錄',
       onSearchClick: (str) => {
-        alert(str);
+        setSearchValue_accountant(str);
       },
       tableBottomBtnProps: {
         label: '新增收款紀錄',
@@ -850,13 +947,34 @@ export default function AccountReceivable() {
         panelCell_05: {},
         list: createdHeadRowList_收款紀錄({
           onDateClick: () => {
-            alert('test');
+            setSort_accountant((state) => {
+              const order = state.sort === 'createdAt' ? !state.order : false;
+
+              return {
+                sort: 'createdAt',
+                order: order,
+              };
+            });
           },
           onChequeDateClick: () => {
-            alert('test');
+            setSort_accountant((state) => {
+              const order = state.sort === 'noteMaturityDate' ? !state.order : false;
+
+              return {
+                sort: 'noteMaturityDate',
+                order: order,
+              };
+            });
           },
-          onIncomingSubpoenaSerialNumberClick: () => {
-            alert('test');
+          onPriceClick: () => {
+            setSort_accountant((state) => {
+              const order = state.sort === 'price' ? !state.order : false;
+
+              return {
+                sort: 'price',
+                order: order,
+              };
+            });
           },
         }),
       },
@@ -878,8 +996,8 @@ export default function AccountReceivable() {
     try {
       setIsLoading(true);
       await apiPatchAccountReceivable(accountReceivableId, accountReceivable);
-      setDisabled(true);
       await doUpdate_contract();
+      setDisabled(true);
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: err.message });
@@ -888,7 +1006,7 @@ export default function AccountReceivable() {
     }
   };
 
-  // 編輯發票
+  // 編輯target發票
   const reqPatchAccountReceivableInvoice = async (preBody: {
     invoiceDate: string;
     invoiceNumber: string;
@@ -912,10 +1030,43 @@ export default function AccountReceivable() {
     try {
       await apiPatchAccountReceivableInvoice(targetInvoice.id, body);
       setTargetInvoice(undefined);
-      update_invoiceArr();
+      await update_InvoiceAndAccountant({ isGetInvoiceTable: true });
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '編輯發票失敗', content: err.message });
+    } finally {
+    }
+  };
+
+  //編輯發票的收款紀錄連結
+  const reqPatchAccountReceivableInvoice_clearAccountant = async (
+    invoice: TaccountsReceivableInvoiceDto,
+    remainAccountantIdArr: string[] // 要留下的收款紀錄id
+  ) => {
+    const body: TupdateAccountReceivableInvoiceDto = {
+      ...invoice,
+      accountants: remainAccountantIdArr,
+    };
+
+    try {
+      await apiPatchAccountReceivableInvoice(invoice.id, body);
+      setTargetInvoice(undefined);
+      await update_InvoiceAndAccountant();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '清除關聯失敗', content: err.message });
+    } finally {
+    }
+  };
+
+  /**作廢發票 */
+  const reqPatchAccountReceivableVoidInvoice = async (invoiceId: string) => {
+    try {
+      await apiPatchAccountReceivableVoidInvoice(invoiceId);
+      await update_InvoiceAndAccountant({ isGetInvoiceTable: true });
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '作廢發票失敗', content: err.message });
     } finally {
     }
   };
@@ -949,7 +1100,7 @@ export default function AccountReceivable() {
 
     try {
       await apiDeleteAccountReceivableAccountant(accountReceivableId, id);
-      await update_accountantArr();
+      await update_InvoiceAndAccountant();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '移除收款明細失敗', content: err.message });
@@ -967,7 +1118,7 @@ export default function AccountReceivable() {
     try {
       await apiPatchAccountReceivableAccountant(accountReceivableId, targetAccountant.id, body);
       setTargetAccountant(undefined);
-      await update_accountantArr();
+      await update_InvoiceAndAccountant();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新收款紀錄與發票關聯失敗', content: err.message });
@@ -1017,8 +1168,8 @@ export default function AccountReceivable() {
         <Table_request
           contractId={contractId}
           accountReceivableId={accountReceivableId}
-          invoiceArr={data_invoiceArr}
-          onInvoiceAdd={update_invoiceArr}
+          invoiceArr={data_invoiceArr_table}
+          onInvoiceAdd={update_allInvoice}
         />
 
         {/* 發票給予紀錄 */}
@@ -1198,7 +1349,7 @@ export default function AccountReceivable() {
 const createdHeadRowList_收款紀錄 = (props?: {
   onDateClick?: () => void;
   onChequeDateClick?: () => void;
-  onIncomingSubpoenaSerialNumberClick?: () => void;
+  onPriceClick?: () => void;
 }) => ({
   date: {
     label: '日期',
@@ -1221,11 +1372,11 @@ const createdHeadRowList_收款紀錄 = (props?: {
   price: {
     label: '金額',
     cellStyle: { width: '170px' },
+    onClick: props?.onPriceClick,
   },
   incomingSubpoenaSerialNumber: {
     label: '收入傳票序號',
     cellStyle: { width: '187px' },
-    onClick: props?.onIncomingSubpoenaSerialNumberClick,
   },
 });
 
