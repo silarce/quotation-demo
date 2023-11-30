@@ -154,6 +154,7 @@ const useProductList = ({
         height: String(Number(prod.height) / 1000),
         boxB: String(Number(prod.boxB) / 1000),
         boxD: String(Number(prod.boxD) / 1000),
+        guideRailG: prod.guideRailG || 0,
         // options: prod.options ?? [],
 
         // quantity: prod.items?.length ?? 0,
@@ -499,6 +500,7 @@ const useProductList = ({
           height: String(Number(prod.height) / 1000),
           boxB: String(Number(prod.boxB) / 1000),
           boxD: String(Number(prod.boxD) / 1000),
+          guideRailG: prod.guideRailG || 0,
           // options: prod.options ?? [],
 
           // quantity: prod.items?.length ?? 0,

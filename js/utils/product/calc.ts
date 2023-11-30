@@ -31,14 +31,18 @@ export const calcProductVolume = (area: number) => {
 // 所以這個計算是要配合apiGetProdCalcGeneralSpec取得新的gapA與gapC再使用
 /**計算WG 單位為mm*/
 export const calcProductWG = ({ fullWidth, gapA, gapC }: { fullWidth: number; gapA: number; gapC: number }) => {
-  return fullWidth - gapA - gapC;
+  const wg = new Decimal(fullWidth).sub(gapA).sub(gapC).toNumber();
+
+  return wg;
 };
 
 // warning 注意，變更WG就意味著gapA與gapC也會變更
 // 所以這個計算是要配合apiGetProdCalcGeneralSpec取得新的gapA與gapC再使用
 /**計算fullWidth 單位為mm*/
 export const calcProductFullWidth = ({ WG, gapA, gapC }: { WG: number; gapA: number; gapC: number }) => {
-  return WG + gapA + gapC;
+  const fullWidth = new Decimal(WG).add(gapA).add(gapC).toNumber();
+
+  return fullWidth;
 };
 
 export const findBDoptions = (doorModelName: string) => {
