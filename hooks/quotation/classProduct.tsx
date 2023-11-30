@@ -3028,9 +3028,9 @@ const prodkeyArrOri: () => TprodKey[] = () => {
 
     'fullWidth',
     'W',
-    'WG',
+    // 'WG',
     'height',
-    'guildRailG',
+    // 'guildRailG',
     'boxB',
     // 'boxD',
     'thickness',
