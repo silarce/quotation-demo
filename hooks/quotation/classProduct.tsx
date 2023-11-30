@@ -544,6 +544,7 @@ class Class_product {
 
     const prod: Tprod = {
       ...empty,
+      discount: this._prodData.discount,
       doorType: this.doorType,
       fullWidth: this.fullWidth,
       WG: this.WG,
@@ -555,7 +556,6 @@ class Class_product {
       dualPrice: this._prodData.dualPrice,
       unitPrice: this._prodData.unitPrice,
       totalPrice: this._prodData.totalPrice,
-      discount: this._prodData.discount,
       itemName: this._prodData.itemName,
       quoteType: this._prodData.quoteType,
       //
@@ -1874,7 +1874,7 @@ class Class_product {
       v = '100';
     }
 
-    if (v.split('.')[1]?.length > 2) {
+    if (v.split('.')[1]?.length > 3) {
       return;
     }
 

@@ -14,8 +14,8 @@ import { apiGetAnnotation, apiGetQuotationRanges } from 'js/api/api_workSheet';
 import { Class_product, Tprod, TprodKey, prodkeyArrOri, prodCellConfig } from './classProduct';
 import { Class_component, comKeyArrOri, comCellConfig } from './classComponent';
 import { Class_SubCom } from './classSubCom';
+import { Class_accessories, TaccessoriesKey, accessoriesCellConfig, accessoriesKeyArrOri } from './classAccessories';
 import { Class_other, Tothers, TothersKey, othersCellConfig, othersKeyArrOri, emptyOthersOri } from './classOthers';
-import { TaccessoriesKey, Class_accessories, accessoriesCellConfig, accessoriesKeyArrOri } from './classAccessories';
 
 // type
 import { TcreateQuotationContentOtherDto, TquotationProductDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
