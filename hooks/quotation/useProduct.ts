@@ -123,11 +123,14 @@ const useProductList = ({
   }, [resetTrigger, doorModelList]);
 
   const createProdList = () => {
-    if (!productArr || !doorModelList) {
+    // if (!productArr || !doorModelList) {
+    //   return;
+    // }
+    if (!doorModelList) {
       return;
     }
 
-    const copyArr = _.cloneDeep(productArr);
+    const copyArr = _.cloneDeep(productArr ?? []);
 
     const sortedProdArr = _.sortBy(copyArr, 'order');
     const list: TproductList = {};
