@@ -438,24 +438,24 @@ function DndRow({
               return null;
             }
 
-            let theDisabled = disabled;
+            const theDisabled = disabled;
 
-            if (key === 'quantity') {
-              // item.disabled_quantity === true ? (theDisabled = true) : undefined;
-              item.disabled_quantity === true
-                ? (theDisabled = true)
-                : item.disabled_quantity === false
-                ? (theDisabled = false)
-                : undefined;
-            }
+            // if (key === 'quantity') {
+            //   // item.disabled_quantity === true ? (theDisabled = true) : undefined;
+            //   item.disabled_quantity === true
+            //     ? (theDisabled = true)
+            //     : item.disabled_quantity === false
+            //     ? (theDisabled = false)
+            //     : undefined;
+            // }
 
-            if (disabledExceptionArr?.includes(key)) {
-              theDisabled = false;
-            }
+            // if (disabledExceptionArr?.includes(key)) {
+            //   theDisabled = false;
+            // }
 
-            if (disabled_plus) {
-              theDisabled = true;
-            }
+            // if (disabled_plus) {
+            //   theDisabled = true;
+            // }
 
             const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;
             const isHidden = hiddenKeyArr?.includes(key);
@@ -527,7 +527,7 @@ function DndRow({
               selectProps.props = {
                 options,
                 ...selectProps.props,
-                isDisabled: isDisabled,
+                isDisabled: isDisabled || theDisabled,
                 placeholder,
                 onChange: (option) => {
                   if (isOptionValue) {
