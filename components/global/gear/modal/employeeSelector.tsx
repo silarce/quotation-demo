@@ -140,10 +140,15 @@ export default function EmployeeSelector({
   // ==================================================
 
   const onClick = (newEmp: TemployeeDto) => {
-    const newArr = [...selEmployeeArr];
+    let newArr = [...selEmployeeArr];
 
     if (selLimit === 1) {
-      newArr[0] = newEmp;
+      if (newArr[0]?.id === newEmp.id) {
+        newArr = [];
+      } else {
+        newArr[0] = newEmp;
+      }
+
       setSelEmployeeArr(newArr);
 
       return;
