@@ -125,7 +125,7 @@ export default function Signature({
 // ========================================================
 
 type TindexKeys = keyof Tcontroll;
-const indexKeys: TindexKeys[] = ['materialHandler', 'ingredientTechnician', 'formCompleter'];
+const indexKeys: TindexKeys[] = ['ingredientTechnician', 'materialHandler', 'formCompleter'];
 
 const config: {
   [key in TindexKeys]: {
@@ -138,7 +138,7 @@ const config: {
     placeholder: '請選擇備料人員',
   },
   ingredientTechnician: {
-    label: '配料人員',
+    label: '領料人員',
     placeholder: '請選擇配料人員',
   },
   formCompleter: {
