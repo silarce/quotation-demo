@@ -509,13 +509,18 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       return;
     }
 
-    const newRes = await apiGetContract_Id(id, params);
+    try {
+      const newRes = await apiGetContract_Id(id, params);
 
-    if (newRes) {
-      setRes(newRes);
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得合約資料失敗', content: err.message });
     }
-
-    return newRes;
   };
 
   return {
