@@ -1318,43 +1318,42 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }; // reqUpdateQuotation
 
   // --------------------------------------------
-  const reqSetReviewer = async ({
-    reviewSales,
-    reviewWorkDirector,
-    reviewSupervisor,
-  }: {
-    reviewSales?: TemployeeDto | undefined | null;
-    reviewSupervisor?: TemployeeDto | undefined | null;
-    reviewWorkDirector?: TemployeeDto | undefined | null;
-  }) => {
-    if (!quotationId) {
-      return;
-    }
+  // const reqSetReviewer = async ({
+  //   reviewSales,
+  //   reviewWorkDirector,
+  //   reviewSupervisor,
+  // }: {
+  //   reviewSales?: TemployeeDto | undefined | null;
+  //   reviewSupervisor?: TemployeeDto | undefined | null;
+  //   reviewWorkDirector?: TemployeeDto | undefined | null;
+  // }) => {
+  //   if (!quotationId) {
+  //     return;
+  //   }
 
-    const reviewSalesEmployeeId = reviewSales?.id || null;
-    const reviewWorkDirectorEmployeeId = reviewWorkDirector?.id || null;
-    const reviewSupervisorEmployeeId = reviewSupervisor?.id || null;
+  //   const reviewSalesEmployeeId = reviewSales?.id || null;
+  //   const reviewWorkDirectorEmployeeId = reviewWorkDirector?.id || null;
+  //   const reviewSupervisorEmployeeId = reviewSupervisor?.id || null;
 
-    try {
-      setIsLoading(true);
+  //   try {
+  //     setIsLoading(true);
 
-      const res = await apiQuotationSubmitReview(quotationId, {
-        reviewSalesEmployeeId,
-        reviewWorkDirectorEmployeeId,
-        reviewSupervisorEmployeeId,
-      });
+  //     const res = await apiQuotationSubmitReview(quotationId, {
+  //       reviewSalesEmployeeId,
+  //       reviewWorkDirectorEmployeeId,
+  //       reviewSupervisorEmployeeId,
+  //     });
 
-      await update();
-    } catch (error) {
-      myAlert.err({ title: '更新審核人員失敗' });
-    } finally {
-      // setReviewSales(undefined);
-      // setReviewSupervisor(undefined);
-      // setIsLoading(false);
-    }
-  };
+  //     await update();
+  //   } catch (error) {
+  //     myAlert.err({ title: '更新審核人員失敗' });
+  //   } finally {
+  //     // setReviewSales(undefined);
+  //     // setReviewSupervisor(undefined);
+  //     // setIsLoading(false);
+  //   }
+  // };
 
-  // 現在只有admin可以呼叫這系列的api，所以無法測試
   const reqReview = async (isPass: boolean) => {
     if (!quotationId || !isReviewer) {
       return;
