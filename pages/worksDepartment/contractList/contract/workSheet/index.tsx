@@ -204,8 +204,6 @@ export default function WorkSheet() {
     const itemTokenList: TitemTokenList = {};
     const itemIdArrList: TitemIdArrList = {};
 
-    console.log(contractProductItems);
-
     contractProductItems.forEach((item) => {
       const { productId, adjustedItem, adjustedItemId } = item;
 
