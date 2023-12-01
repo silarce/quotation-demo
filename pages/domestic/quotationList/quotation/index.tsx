@@ -26,11 +26,8 @@ import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
-
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
-// import QuotationProdChangingRecord from "components/page/domestic/quotation/quotationProdChangingRecord"
-// import QuotationRecord from "components/page/domestic/quotation/quotationRecord"
-// import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf';
+import QuotationSinature_3, { Tcontroll_signature } from 'components/page/domestic/quotation/quotationSinature_3';
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
 
 import QuotationPdf_part, {
@@ -39,6 +36,14 @@ import QuotationPdf_part, {
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
 import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
+import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
+import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
+import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+import Summary, {
+  TsummaryControl,
+  TpayInfoControl,
+} from 'components/page/domestic/quotation/quotation/summary/summary';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -59,14 +64,6 @@ import style from './quotation.module.scss';
 import { AppContext } from 'pages/_app';
 
 // ------------------------------------------------------------------
-import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
-import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
-import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
-import Summary, {
-  TsummaryControl,
-  TpayInfoControl,
-} from 'components/page/domestic/quotation/quotation/summary/summary';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -134,7 +131,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // 是否可編輯
   const [disabled, setDisabled] = useState(true);
   // -----------------------------------------------------
-  const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
+  // const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
   const [reviewFormShow, setReviewFormShow] = useState(false);
   const [reviewModalShow, setReviewModalShow] = useState(false);
   // -----------------------------------------------------
@@ -645,19 +642,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // ----------------------------------------------------------------
 
-  const [reviewSales, setReviewSales] = useState<TemployeeDto>();
-  const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
-  const [reviewWorkDirector, setReviewWorkDirector] = useState<TemployeeDto>();
+  // const [reviewSales, setReviewSales] = useState<TemployeeDto>();
+  // const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
+  // const [reviewWorkDirector, setReviewWorkDirector] = useState<TemployeeDto>();
 
-  useEffect(() => {
-    if (!latestContent) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (!latestContent) {
+  //     return;
+  //   }
 
-    setReviewSales(latestContent.reviewSalesEmployee || undefined);
-    setReviewSupervisor(latestContent.reviewSupervisorEmployee || undefined);
-    setReviewWorkDirector(latestContent.reviewWorkDirectorEmployee || undefined);
-  }, [latestContent]);
+  //   setReviewSales(latestContent.reviewSalesEmployee || undefined);
+  //   setReviewSupervisor(latestContent.reviewSupervisorEmployee || undefined);
+  //   setReviewWorkDirector(latestContent.reviewWorkDirectorEmployee || undefined);
+  // }, [latestContent]);
 
   // ---------------------------------------------------------
   const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
@@ -789,137 +786,198 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------
 
-  const [empSelConfirmKey, setEmpSelConfirmKey] = useState<
-    'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector' | 'undefined'
-  >('undefined');
+  // const [empSelConfirmKey, setEmpSelConfirmKey] = useState<
+  //   'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector' | 'undefined'
+  // >('undefined');
 
-  const openEmpSel = (v: 'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector') => {
-    setEmpSelConfirmKey(v);
-    setEmployeeSelectorShow(true);
-  };
+  // const openEmpSel = (v: 'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector') => {
+  //   setEmpSelConfirmKey(v);
+  //   setEmployeeSelectorShow(true);
+  // };
 
-  const onEmpSelCancel = () => {
-    setEmployeeSelectorShow(false);
-    setEmpSelConfirmKey('undefined');
-  };
+  // const onEmpSelCancel = () => {
+  //   setEmployeeSelectorShow(false);
+  //   setEmpSelConfirmKey('undefined');
+  // };
 
-  const empSelLookup = {
-    reviewSales: {
-      label: '請選擇審核業務',
-      // tip: '可不選，直接按確定',\
-      employee: reviewSales,
-      onCancel: onEmpSelCancel,
-      onConfirm: (v: TemployeeDto[]) => {
-        setReviewSales(v[0]);
+  // const empSelLookup = {
+  //   reviewSales: {
+  //     label: '請選擇審核業務',
+  //     // tip: '可不選，直接按確定',\
+  //     employee: reviewSales,
+  //     onCancel: onEmpSelCancel,
+  //     onConfirm: (v: TemployeeDto[]) => {
+  //       setReviewSales(v[0]);
 
-        if (status === 'Contracting') {
-          setTimeout(() => {
-            openEmpSel('reviewSupervisor');
-          }, 300);
-        } else {
-          reqSetReviewer({
-            reviewSales: v[0],
-            reviewSupervisor,
-            reviewWorkDirector,
-          });
-        }
-      },
-    },
-    reviewSupervisor: {
-      label: '請選擇業務主管',
-      // tip: '可不選，直接按確定',
-      employee: reviewSupervisor,
-      onCancel: onEmpSelCancel,
-      onConfirm: async (v: TemployeeDto[]) => {
-        setReviewSupervisor(v[0]);
-        onEmpSelCancel();
-        setTimeout(() => {
-          openEmpSel('reviewWorkDirector');
-        }, 300);
-      },
-    },
-    reviewWorkDirector: {
-      label: '請選擇應收帳款',
-      // tip: '可不選，直接按確定',
-      employee: reviewWorkDirector,
-      onCancel: onEmpSelCancel,
-      onConfirm: (v: TemployeeDto[]) => {
-        setReviewWorkDirector(v[0]);
-        onEmpSelCancel();
-        reqSetReviewer({
-          reviewSales,
-          reviewSupervisor,
-          reviewWorkDirector: v[0],
-        });
-      },
-    },
-    undefined: {
-      label: '',
-      tip: '',
-      employee: undefined,
-      onCancel: () => {},
-      onConfirm: () => {},
-    },
-  };
+  //       if (status === 'Contracting') {
+  //         setTimeout(() => {
+  //           openEmpSel('reviewSupervisor');
+  //         }, 300);
+  //       } else {
+  //         reqSetReviewer({
+  //           reviewSales: v[0],
+  //           reviewSupervisor,
+  //           reviewWorkDirector,
+  //         });
+  //       }
+  //     },
+  //   },
+  //   reviewSupervisor: {
+  //     label: '請選擇業務主管',
+  //     // tip: '可不選，直接按確定',
+  //     employee: reviewSupervisor,
+  //     onCancel: onEmpSelCancel,
+  //     onConfirm: async (v: TemployeeDto[]) => {
+  //       setReviewSupervisor(v[0]);
+  //       onEmpSelCancel();
+  //       setTimeout(() => {
+  //         openEmpSel('reviewWorkDirector');
+  //       }, 300);
+  //     },
+  //   },
+  //   reviewWorkDirector: {
+  //     label: '請選擇應收帳款',
+  //     // tip: '可不選，直接按確定',
+  //     employee: reviewWorkDirector,
+  //     onCancel: onEmpSelCancel,
+  //     onConfirm: (v: TemployeeDto[]) => {
+  //       setReviewWorkDirector(v[0]);
+  //       onEmpSelCancel();
+  //       reqSetReviewer({
+  //         reviewSales,
+  //         reviewSupervisor,
+  //         reviewWorkDirector: v[0],
+  //       });
+  //     },
+  //   },
+  //   undefined: {
+  //     label: '',
+  //     tip: '',
+  //     employee: undefined,
+  //     onCancel: () => {},
+  //     onConfirm: () => {},
+  //   },
+  // };
 
   // --------------------------------------------------------------------------
 
-  const signatureArr: TsignatureProps[] = [
-    {
-      label: '總經理',
-      inputProps: {
-        props: {
-          value: (latestContent?.reviewManagerEmployee?.chName || latestContent?.reviewManagerEmployee?.enName) ?? '',
-          placeholder: '尚未選擇',
-          disabled: true,
-        },
-      },
-    },
-    {
-      label: '應收帳款',
-      inputProps: {
-        props: {
-          value:
-            (latestContent?.reviewWorkDirectorEmployee?.chName || latestContent?.reviewWorkDirectorEmployee?.enName) ??
-            '',
-          placeholder: '尚未選擇',
-          disabled: true,
-        },
-      },
-    },
+  // const signatureArr: TsignatureProps[] = [
+  //   {
+  //     label: '總經理',
+  //     inputProps: {
+  //       props: {
+  //         value: (latestContent?.reviewManagerEmployee?.chName || latestContent?.reviewManagerEmployee?.enName) ?? '',
+  //         placeholder: '尚未選擇',
+  //         disabled: true,
+  //       },
+  //     },
+  //   },
+  //   {
+  //     label: '應收帳款',
+  //     inputProps: {
+  //       props: {
+  //         value:
+  //           (latestContent?.reviewWorkDirectorEmployee?.chName || latestContent?.reviewWorkDirectorEmployee?.enName) ??
+  //           '',
+  //         placeholder: '尚未選擇',
+  //         disabled: true,
+  //       },
+  //     },
+  //   },
 
-    {
-      label: '業務主管',
-      inputProps: {
-        props: {
-          value:
-            (latestContent?.reviewSupervisorEmployee?.chName || latestContent?.reviewSupervisorEmployee?.enName) ?? '',
-          placeholder: '尚未選擇',
-          disabled: true,
-        },
+  //   {
+  //     label: '業務主管',
+  //     inputProps: {
+  //       props: {
+  //         value:
+  //           (latestContent?.reviewSupervisorEmployee?.chName || latestContent?.reviewSupervisorEmployee?.enName) ?? '',
+  //         placeholder: '尚未選擇',
+  //         disabled: true,
+  //       },
+  //     },
+  //   },
+  //   {
+  //     label: '業務',
+  //     inputProps: {
+  //       props: {
+  //         value: (latestContent?.reviewSalesEmployee?.chName || latestContent?.reviewSalesEmployee?.enName) ?? '',
+  //         placeholder: '尚未選擇',
+  //         disabled: true,
+  //       },
+  //     },
+  //   },
+  //   {
+  //     label: '經辦',
+  //     inputProps: {
+  //       props: {
+  //         // value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
+  //         value: getValues('agentEmployee.chName') || getValues('agentEmployee.enName') || '',
+  //         disabled: true,
+  //       },
+  //     },
+  //   },
+  // ];
+
+  // const [manager, setManager] = useState<TemployeeDto | null>();
+  const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
+  const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
+  const [sales, setSales] = useState<TemployeeDto | null>();
+  // const [agent, setAgent] = useState<TemployeeDto | null>();
+
+  useEffect(() => {
+    const {
+      // agentEmployee,
+      reviewSalesEmployee,
+      reviewSupervisorEmployee,
+      reviewWorkDirectorEmployee,
+      // reviewManagerEmployee,
+    } = quotationData?.latestContent ?? {};
+
+    // setManager(agentEmployee);
+    setworkDirector(reviewWorkDirectorEmployee);
+    setSupervisor(reviewSupervisorEmployee);
+    setSales(reviewSalesEmployee);
+    // setAgent(reviewManagerEmployee);
+  }, [quotationData, disabled]);
+
+  const control_signature: Tcontroll_signature = {
+    manager: {
+      // employee: manager,
+      employee: quotationData?.latestContent.reviewManagerEmployee,
+      // onChange: (emp) => {
+      //   setManager(emp);
+      // },
+      forbidden: true,
+    },
+    workDirector: {
+      employee: workDirector || quotationData?.latestContent.reviewWorkDirectorEmployee,
+      onChange: (emp) => {
+        setworkDirector(emp);
       },
     },
-    {
-      label: '業務',
-      inputProps: {
-        props: {
-          value: (latestContent?.reviewSalesEmployee?.chName || latestContent?.reviewSalesEmployee?.enName) ?? '',
-          placeholder: '尚未選擇',
-          disabled: true,
-        },
+    supervisor: {
+      employee: supervisor || quotationData?.latestContent.reviewSupervisorEmployee,
+      onChange: (emp) => {
+        setSupervisor(emp);
       },
     },
-    {
-      label: '經辦',
-      inputProps: {
-        props: {
-          // value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
-          value: getValues('agentEmployee.chName') || getValues('agentEmployee.enName') || '',
-          disabled: true,
-        },
+    sales: {
+      employee: sales || quotationData?.latestContent.reviewSalesEmployee,
+      onChange: (emp) => {
+        setSales(emp);
       },
     },
-  ];
+    agent: {
+      // employee: agent,
+      employee: quotationData?.latestContent.agentEmployee,
+      // onChange: (emp) => {
+      //   setAgent(emp);
+      // },
+      forbidden: true,
+    },
+  };
+
+  // console.log(control_signature);
 
   // --------------------------------------------------------------------------
 
@@ -1033,15 +1091,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }
       : null,
 
-    !contentId && quotationId
-      ? {
-          type: 'myButton',
-          label: '送審',
-          onClick: () => {
-            openEmpSel('reviewSales');
-          },
-        }
-      : null,
+    // !contentId && quotationId
+    //   ? {
+    //       type: 'myButton',
+    //       label: '送審',
+    //       onClick: () => {
+    //         openEmpSel('reviewSales');
+    //       },
+    //     }
+    //   : null,
 
     !contentId && status === 'Contracting'
       ? { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) }
@@ -1201,16 +1259,29 @@ function TheQuotation({ router }: { router: NextRouter }) {
       body.deliveryDate = null;
     }
 
+    const reqPatchReviewer = async (quotationId: string) => {
+      if (workDirector || supervisor || sales) {
+        try {
+          await apiQuotationSubmitReview(quotationId, {
+            reviewSalesEmployeeId: sales?.id ?? undefined,
+            reviewWorkDirectorEmployeeId: workDirector?.id ?? undefined,
+            reviewSupervisorEmployeeId: supervisor?.id ?? undefined,
+          });
+        } catch (error) {
+          const err = error as Error;
+          myAlert.err({ title: '更新審核人員失敗', content: err.message });
+        }
+      }
+    };
+
+    //
+
     try {
       setIsLoading(true);
 
       if (quotationId) {
         const res = await apiPatchQuotation(body, quotationId);
-        showRootLoading(true, '正在更新附件');
-        // res跟api文件不一樣，現在沒時間修正
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-
+        await reqPatchReviewer(quotationId);
         await uploadAttachment(res.latestContent.id);
 
         router.push({
@@ -1223,8 +1294,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         await Promise.all([update(), updateAttachments()]);
       } else {
         const res = await apiPostQuotation(body);
-        showRootLoading(true, '正在更新附件');
+        await reqPatchReviewer(res.id);
         await uploadAttachment(res.latestContent.id);
+
         router.push({
           query: {
             id: res.id,
@@ -1251,9 +1323,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reviewWorkDirector,
     reviewSupervisor,
   }: {
-    reviewSales?: TemployeeDto | undefined;
-    reviewSupervisor?: TemployeeDto | undefined;
-    reviewWorkDirector?: TemployeeDto | undefined;
+    reviewSales?: TemployeeDto | undefined | null;
+    reviewSupervisor?: TemployeeDto | undefined | null;
+    reviewWorkDirector?: TemployeeDto | undefined | null;
   }) => {
     if (!quotationId) {
       return;
@@ -1265,18 +1337,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     try {
       setIsLoading(true);
-      await apiQuotationSubmitReview(quotationId, {
+
+      const res = await apiQuotationSubmitReview(quotationId, {
         reviewSalesEmployeeId,
         reviewWorkDirectorEmployeeId,
         reviewSupervisorEmployeeId,
       });
+
       await update();
     } catch (error) {
       myAlert.err({ title: '更新審核人員失敗' });
     } finally {
-      setReviewSales(undefined);
-      setReviewSupervisor(undefined);
-      setIsLoading(false);
+      // setReviewSales(undefined);
+      // setReviewSupervisor(undefined);
+      // setIsLoading(false);
     }
   };
 
@@ -1486,7 +1560,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* 簽名 */}
           {/*  */}
           {/*  */}
-          <QuotationSinature signatureArr={signatureArr} disabled={disabled} />
+          {/* <QuotationSinature signatureArr={signatureArr} disabled={disabled} /> */}
+          <QuotationSinature_3 controll={control_signature} disabled={disabled} />
           {/*  */}
           {/*  */}
         </div>
@@ -1567,7 +1642,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         quotationId={latestContent?.quotationNumber ?? ''}
       />
       {/*  */}
-      <EmployeeSelector
+      {/* <EmployeeSelector
         showModal={employeeSelectorShow}
         label={empSelLookup[empSelConfirmKey]?.label}
         // tip={empSelLookup[empSelConfirmKey]?.tip}
@@ -1579,7 +1654,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         defaultEmpArr={
           empSelLookup[empSelConfirmKey]?.employee ? [empSelLookup[empSelConfirmKey].employee!] : undefined
         }
-      />
+      /> */}
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}

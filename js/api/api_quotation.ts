@@ -613,7 +613,7 @@ export const apiQuotationSubmitReview = (id: string, body: TsubmitReviewQotuatio
   const api = `/quotation/${id}/submit`;
 
   return axi
-    .patch<undefined>(api, body)
+    .patch<TquotationContentDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
