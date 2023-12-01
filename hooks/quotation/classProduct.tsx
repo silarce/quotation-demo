@@ -219,7 +219,10 @@ class Class_product {
       thickness: this._prodData.thickness,
     };
 
-    this._theW = String(Number(this._prodData.WG || '0') - this._prodData.guideRailG);
+    // this._theW = String(Number(this._prodData.WG || '0') - this._prodData.guideRailG);
+    const guideRailG_m = new Decimal(this._prodData.guideRailG).div(1000).toNumber();
+    // this._theW = String(Number(this._prodData.WG || '0') - guideRailG_m);
+    this._theW = new Decimal(this._prodData.WG || '0').sub(guideRailG_m).toString();
 
     if (this._theW === '0') {
       this._theW = '';
