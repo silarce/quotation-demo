@@ -694,23 +694,53 @@ class Class_product {
     this.thickness = res.thickness;
 
     // ________________________
+
+    // console.log(this.options_boxB);
+    // console.log('defaultMotorBox', defaultMotorBox);
+
     // 設定馬達廠商
     if (defaultMotorBox) {
       if (defaultMotorBox.東元) {
         this.motor = '東元';
+
+        const defaultBoxB_num = new Decimal(defaultMotorBox.東元.boxB).div(1000).toNumber();
+        const defaultBoxB = String(defaultBoxB_num);
+        const shouldChange = !this.isBoxBinOption({
+          boxB_m: defaultBoxB_num,
+        });
+
+        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
         this.changeBoxBNoCall({
-          str: String(defaultMotorBox.東元.boxB / 1000),
+          str: theBoxB,
           diameter: res.diameter,
         });
       } else if (defaultMotorBox.大同) {
         this.motor = '大同';
+
+        const defaultBoxB_num = new Decimal(defaultMotorBox.大同.boxB).div(1000).toNumber();
+        const defaultBoxB = String(defaultBoxB_num);
+        const shouldChange = !this.isBoxBinOption({
+          boxB_m: defaultBoxB_num,
+        });
+
+        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
         this.changeBoxBNoCall({
-          str: String(defaultMotorBox.大同.boxB / 1000),
+          str: theBoxB,
           diameter: res.diameter,
         });
       } else if (defaultMotorBox.default) {
+        const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
+        const defaultBoxB = String(defaultBoxB_num);
+        const shouldChange = !this.isBoxBinOption({
+          boxB_m: defaultBoxB_num,
+        });
+
+        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
         this.changeBoxBNoCall({
-          str: String(defaultMotorBox.default.boxB / 1000),
+          str: theBoxB,
           diameter: res.diameter,
         });
       }
@@ -1315,7 +1345,14 @@ class Class_product {
     const boxB = box[vendor]?.boxB || box.default?.boxB;
 
     if (boxB) {
-      this.boxB = String(boxB / 1000);
+      const boxB_num = new Decimal(boxB).div(1000).toNumber();
+      const shouldChange = !this.isBoxBinOption({
+        boxB_m: boxB_num,
+      });
+
+      if (shouldChange) {
+        this.boxB = String(boxB_num);
+      }
     }
   }
 
@@ -1697,6 +1734,20 @@ class Class_product {
     });
 
     installationFee_class.price_locale = String(fee);
+  }
+
+  isBoxBinOption({ boxB_m }: { boxB_m: number }) {
+    if (!this.options_boxB) {
+      return false;
+    }
+
+    return this.options_boxB.some((option) => {
+      if (isNaN(Number(option.value))) {
+        return false;
+      }
+
+      return Number(option.value) === boxB_m;
+    });
   }
 
   // -----------------------------------------------------------------
@@ -3028,9 +3079,9 @@ const prodkeyArrOri: () => TprodKey[] = () => {
 
     'fullWidth',
     'W',
-    'WG',
+    // 'WG',
     'height',
-    'guildRailG',
+    // 'guildRailG',
     'boxB',
     // 'boxD',
     'thickness',

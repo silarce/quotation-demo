@@ -10,12 +10,7 @@ import type { UploadFile } from 'antd/es/upload/interface';
 import style from './listOfDeliveryOrders.module.scss';
 
 // api
-import {
-  useApiGetEngineeringExchangeAttachments,
-  // apiPostEngineeringExchangeAttachments,
-  // apiDeleteEngineeringExchangeAttachments,
-  // TfileDto,
-} from 'js/api/api_engineering';
+import { useApiGetEngineeringExchangeAttachments } from 'js/api/api_engineering';
 
 // ====================================================================
 
@@ -45,7 +40,6 @@ export default function IconEdit({
     updateAttachments();
   }, [exchangeId, updateTrigger]);
 
-  // console.log(attachments);
   // --------------------------------------------------------------------------
   const [newImgArr, setNewImgArr] = useState<UploadFile[]>([]);
   const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
@@ -62,9 +56,6 @@ export default function IconEdit({
       });
     }
   };
-
-  // console.log(newImgArr);
-  // console.log(delImgIdArr);
 
   useEffect(() => {
     onAdd?.(newImgArr);
@@ -114,6 +105,7 @@ export default function IconEdit({
   // const handleChange: UploadProps['onChange'] = async ({ file, fileList: newFileList }) => {
   const handleChange: UploadProps['onChange'] = async (props) => {
     const { file, fileList: newFileList } = props;
+
     let isAdd = false;
     let isDel = false;
 
@@ -171,6 +163,8 @@ export default function IconEdit({
   );
 
   // -------------------------------------------------------------
+
+  // -------------------------------------------------------------
   return (
     <div className={style.iconEdit}>
       <div className={style.head}>
@@ -187,6 +181,35 @@ export default function IconEdit({
           onPreview={handlePreview}
           onChange={handleChange}
           withCredentials={true}
+          customRequest={async (options) => {
+            const { file } = options;
+            const thefile = file as File;
+            const base64 = await getBase64(thefile);
+            const rcFile = {
+              name: thefile.name,
+              originFileObj: thefile,
+              size: thefile.size,
+              status: 'done',
+              thumbUrl: base64,
+              type: thefile.type,
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              uid: thefile.uid,
+            };
+
+            rcFile.status = 'done';
+            const fmData = new FormData();
+            fmData.append('image', file);
+            const imgInfo = {
+              uid: rcFile.uid,
+              name: rcFile.name,
+              status: 'done',
+              url: base64,
+            };
+            const newNewImgArr = [...fileArr, imgInfo];
+            handleChange({ file: rcFile as UploadFile, fileList: newNewImgArr as UploadFile[] });
+          }}
+
           // multiple={true} // 一次選擇多張圖片會使圖片不顯示，還不知道問題在哪
         >
           {/* {fileList.length >= 8 ? null : uploadButton} */}
@@ -203,7 +226,7 @@ export default function IconEdit({
 }
 // ===============================================================================
 
-const getBase64 = (file: RcFile): Promise<string> =>
+const getBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
