@@ -12,7 +12,7 @@ import QuotationProfile from 'components/page/domestic/quotation/legacyContract/
 import QuotationProduction from 'components/page/domestic/quotation/legacyContract/quotationProduct_legacyContract';
 import QuotationAdditions from 'components/page/domestic/quotation/legacyContract/quotationAdditions_legacyContract';
 import QuotationTotal from 'components/page/domestic/quotation/legacyContract/quotationTotal_legacyContract';
-import QuotationSinature, { TinputProps } from 'components/page/domestic/quotation/quotationSinature';
+import QuotationSinature, { Tcontrol_sinature } from 'components/page/domestic/quotation/quotationSinature_2';
 import QuotationExProd from 'components/page/domestic/quotation/legacyContract/quotationExProd_legacyContract';
 import QuotationExAddi from 'components/page/domestic/quotation/legacyContract/quotationExAddi_legacyContract';
 
@@ -141,33 +141,33 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
 
-  const classSignature = classLegacyContract.classSignature;
-  const signatureArr: { label: string; inputProps: TinputProps }[] = [
-    {
-      label: '經理',
-      inputProps: {
-        props: {
-          value: classSignature.managerName,
-        },
-      },
-    },
-    {
-      label: '主管',
-      inputProps: {
-        props: {
-          value: classSignature.supervisorName,
-        },
-      },
-    },
-    {
-      label: '經辦',
-      inputProps: {
-        props: {
-          value: classSignature.operatorName,
-        },
-      },
-    },
-  ];
+  // const classSignature = classLegacyContract.classSignature;
+  // const signatureArr: { label: string; inputProps: TinputProps }[] = [
+  //   {
+  //     label: '經理',
+  //     inputProps: {
+  //       props: {
+  //         value: classSignature.managerName,
+  //       },
+  //     },
+  //   },
+  //   {
+  //     label: '主管',
+  //     inputProps: {
+  //       props: {
+  //         value: classSignature.supervisorName,
+  //       },
+  //     },
+  //   },
+  //   {
+  //     label: '經辦',
+  //     inputProps: {
+  //       props: {
+  //         value: classSignature.operatorName,
+  //       },
+  //     },
+  //   },
+  // ];
 
   useEffect(() => {
     reset();
@@ -255,6 +255,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
 
   // -----------------------------------------------------------------------
+
+  const conntrol_sinature: Tcontrol_sinature = {
+    manager: {
+      employee: legacyContract?.manager,
+    },
+    director: {
+      employee: legacyContract?.supervisor,
+    },
+    agent: {
+      employee: legacyContract?.operator,
+    },
+  };
+
+  // -----------------------------------------------------------------------
   if (!classLegacyContract) {
     return null;
   }
@@ -331,7 +345,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             isAppend={true}
           />
           {/* 簽名 */}
-          <QuotationSinature signatureArr={signatureArr} disabled={true} />
+          <QuotationSinature control={conntrol_sinature} disabled={true} />
         </div>
       </div>
       <QuotationPdf
@@ -341,6 +355,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }}
         classLegacyContract={classLegacyContract}
         verticalKeyArr={verticalKeyArr}
+        agentName={(legacyContract?.operator?.chName || legacyContract?.operator?.enName) ?? ''}
       />
     </SubLayer>
   );

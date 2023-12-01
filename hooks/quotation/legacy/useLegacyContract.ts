@@ -31,7 +31,7 @@ import {
 import { Class_addition, additionCellConfigCre, TaddtionInputCellType, TadditionCellConfig } from './class_addition';
 import { Class_payInfo } from './class_payInfo';
 import { Class_listString } from './class_listString';
-import { Class_signature } from './class_signature';
+// import { Class_signature } from './class_signature';
 
 // =======================================================================
 
@@ -166,7 +166,7 @@ class Class_legacyContract {
     this.classQuoteScopes = new Class_listString(reRender, this._legacyContract.quoteScopes);
 
     /**  簽名*/
-    this.classSignature = new Class_signature(reRender, this._legacyContract);
+    // this.classSignature = new Class_signature(reRender, this._legacyContract);
 
     // -------------------------------------------------------------
     // if (isAppend) {
@@ -201,7 +201,7 @@ class Class_legacyContract {
   classPayInfo;
   classNotes;
   classQuoteScopes;
-  classSignature;
+  // classSignature;
   // ---------------------
   /**主產品 格子設定 包括欄位keyArr */
   prodCellConfig;
@@ -675,6 +675,11 @@ class Class_legacyContract {
       quoteScopes,
       quoteDate: quoteDate_Date || null,
       deliveryDate: deliveryDate_Date || null,
+      // 這三個會在外面處理，為避免型別錯誤，在這裡先這樣處裡
+      // 這三個property不會實際在useLegacyContract用到
+      managerId: '',
+      supervisorId: '',
+      operatorId: '',
     };
   }
 
@@ -932,7 +937,10 @@ const emptyAdditionCre = (): TcreateLegacyContractAdditionDto => {
   };
 };
 
-type TemptyLegacyContract = Omit<TcreateLegacyContractDto, 'deliveryDate'> & {
+type TemptyLegacyContract = Omit<
+  TcreateLegacyContractDto,
+  'deliveryDate' | 'managerId' | 'supervisorId' | 'operatorId'
+> & {
   deliveryDate: TcreateLegacyContractDto['deliveryDate'] | string;
 };
 
@@ -979,9 +987,9 @@ const emptyLegacyContract = (): TemptyLegacyContract => {
     ],
     notes: [],
     quoteScopes: [],
-    managerName: '',
-    supervisorName: '',
-    operatorName: '',
+    // managerName: '',
+    // supervisorName: '',
+    // operatorName: '',
     products: [],
     additions: [],
   };
