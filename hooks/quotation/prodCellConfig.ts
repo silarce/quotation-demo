@@ -142,7 +142,7 @@ const prodCellConfig: TcellConfig = {
       inputProps: {
         props: {
           disabled: true,
-          type: 'number',
+          // type: 'number',
           className: 'text-center',
         },
       },

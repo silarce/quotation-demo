@@ -19,15 +19,17 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-import { useForm, useFormState } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
 // components
 import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
-import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
-import QuotationSinature_3, { Tcontroll_signature } from 'components/page/domestic/quotation/quotationSinature_3';
+import QuotationSinature_3, {
+  TemployeeDto,
+  Tcontroll_signature,
+} from 'components/page/domestic/quotation/quotationSinature_3';
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
 
 import QuotationPdf_part, {
@@ -49,9 +51,7 @@ import Summary, {
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
-import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
-import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01'; // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
@@ -1584,17 +1584,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
       
       輸出PDF的部分
       關於支板
-      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
+      金額為0時，不要顯示出來
       */}
       {/* 
       注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
       而是 主產品設定裡顯示的複價 * 右下方的總折數
       另外在PDF裡面 "1 1/2HP"要改成1.5HP
       有沒有更大的數?
-
+      
       輸出PDF的部分
       關於支板
-      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
+      金額為0時，不要顯示出來
       */}
 
       {latestContent && (
@@ -1618,17 +1618,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       
       輸出PDF的部分
       關於支板
-      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
-      */}
-      {/* 
-      注意，在PDF裡的商品複價不是主產品設定裡顯示的複價
-      而是 主產品設定裡顯示的複價 * 右下方的總折數
-      另外在PDF裡面 "1 1/2HP"要改成1.5HP
-      有沒有更大的數?
-      
-      輸出PDF的部分
-      關於支板
-      只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
+      金額為0時，不要顯示出來
       */}
 
       {/*  */}
