@@ -189,7 +189,8 @@ export default function WorkSheet() {
       return {};
     }
 
-    const contractProductItems = workSheet.contractProductItems;
+    // const contractProductItems = workSheet.contractProductItems;
+    const contractProductItems = _.sortBy(workSheet.contractProductItems, 'createdAt');
 
     type TitemTokenList = {
       [key: string]: {
@@ -202,6 +203,8 @@ export default function WorkSheet() {
 
     const itemTokenList: TitemTokenList = {};
     const itemIdArrList: TitemIdArrList = {};
+
+    console.log(contractProductItems);
 
     contractProductItems.forEach((item) => {
       const { productId, adjustedItem, adjustedItemId } = item;
@@ -1031,6 +1034,8 @@ export default function WorkSheet() {
 
     setIsLoading(true);
 
+    //
+
     for (const key in deleteIdList) {
       const deleteIdArr = deleteIdList[key];
 
@@ -1042,6 +1047,8 @@ export default function WorkSheet() {
         setDisabled(true);
       }
     }
+
+    //
 
     for (const key in changedSheetList) {
       const sheet = changedSheetList[key];
