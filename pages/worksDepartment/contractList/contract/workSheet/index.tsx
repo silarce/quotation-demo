@@ -1047,7 +1047,7 @@ export default function WorkSheet() {
       const sheet = changedSheetList[key];
 
       if (sheet.isOriginal) {
-        return;
+        continue;
       }
 
       try {
@@ -1074,11 +1074,12 @@ export default function WorkSheet() {
         setDisabled(true);
         break;
       }
-    }
+    } // for
 
     await update_workSheet();
     setIsLoading(false);
     setDisabled(true);
+
     //
   };
 
