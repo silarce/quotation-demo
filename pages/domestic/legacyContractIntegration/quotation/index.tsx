@@ -29,6 +29,7 @@ prodKeyArr用來map 主產品列表、與exchangePanel(追加追減面板)與pdf
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -102,7 +103,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
-    populate: ['customer', 'products', 'additions'],
+    populate: ['customer', 'products', 'additions', 'manager', 'supervisor', 'operator'],
   });
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
@@ -262,7 +263,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       type: 'redButton',
       label: '上傳',
       onClick: async () => {
-        const postBody = classLegacyContract.postBody;
+        const postBody = _.cloneDeep(classLegacyContract.postBody);
 
         if (!postBody) {
           return;
@@ -293,8 +294,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         try {
           setIsLoading(true);
           const res = contractId
-            ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
-            : await apiPostLegacyContracts(classLegacyContract.postBody);
+            ? await apiPatchLegacyContracts_id(contractId, postBody)
+            : await apiPostLegacyContracts(postBody);
 
           await uploadAttachment(res.id);
 

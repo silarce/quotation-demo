@@ -76,7 +76,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
-    populate: ['customer', 'products', 'additions', 'priceRecord'],
+    populate: ['customer', 'products', 'additions', 'priceRecord', 'manager', 'supervisor', 'operator'],
   });
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);

@@ -1,3 +1,13 @@
+// 這個檔案可以刪掉了
+// 這個檔案可以刪掉了
+// 這個檔案可以刪掉了
+// 這個檔案可以刪掉了
+// 這個檔案可以刪掉了
+// 這個檔案可以刪掉了
+// 這個檔案可以刪掉了
+// 這個檔案可以刪掉了
+// 這個檔案可以刪掉了
+
 import { TemptyLegacyContract, TlegacyContractDto, TreRender } from './useLegacyContract';
 
 class Class_signature {
