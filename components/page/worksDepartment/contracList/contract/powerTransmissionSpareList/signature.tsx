@@ -38,11 +38,13 @@ export type { Tcontroll };
 
 export default function Signature({
   controll,
+  userEmpId,
   // signature,
   // setSignature,
   disabled,
 }: {
   controll: Tcontroll;
+  userEmpId: string | undefined;
   // signature: Partial<Tsignature>;
   // setSignature: Dispatch<SetStateAction<Partial<Tsignature>>>;
   disabled?: boolean;
@@ -56,6 +58,10 @@ export default function Signature({
     ingredientTechnician: setShowIngredientTechnician,
     formCompleter: setShowFormCompleter,
   } as const;
+
+  const filter = {
+    id: { $eq: userEmpId },
+  };
 
   return (
     <div className={style.signature}>
@@ -98,6 +104,7 @@ export default function Signature({
         }}
         onCancel={() => setShowMaterialHandler(false)}
         defaultEmpArr={controll.materialHandler.employee ? [controll.materialHandler.employee] : undefined}
+        customFilter={filter}
         selLimit={1}
       />
       <EmployeeSelector
@@ -107,6 +114,7 @@ export default function Signature({
         }}
         onCancel={() => setShowIngredientTechnician(false)}
         defaultEmpArr={controll.ingredientTechnician.employee ? [controll.ingredientTechnician.employee] : undefined}
+        customFilter={filter}
         selLimit={1}
       />
       <EmployeeSelector
@@ -116,6 +124,7 @@ export default function Signature({
         }}
         onCancel={() => setShowFormCompleter(false)}
         defaultEmpArr={controll.formCompleter.employee ? [controll.formCompleter.employee] : undefined}
+        customFilter={filter}
         selLimit={1}
       />
     </div>
