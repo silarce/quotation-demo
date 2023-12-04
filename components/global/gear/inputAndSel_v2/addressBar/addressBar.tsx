@@ -28,7 +28,7 @@ type TinputSelProps_noProps = Omit<
 >;
 
 type TaddressProps = {
-  zipCode: TinputProps;
+  zipCode?: TinputProps;
   county: TselectProps<Toption>;
   district: TselectProps<Toption>;
   address: TtextareaProps;
