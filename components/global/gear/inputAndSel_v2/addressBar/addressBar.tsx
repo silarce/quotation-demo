@@ -2,7 +2,13 @@ import { useMemo, useEffect, useState } from 'react';
 import classNames from 'classnames';
 
 // global gear
-import InputSel, { TinputSelProps, TinputSelBarProps_reduce, TselectProps, TtextareaProps } from '../inputSel';
+import InputSel, {
+  TinputSelProps,
+  TinputProps,
+  TinputSelBarProps_reduce,
+  TselectProps,
+  TtextareaProps,
+} from '../inputSel';
 
 // config
 import { Toption, optionsCreator_county, districtOptionsSelector } from 'js/utils/options/countryAndDistrict';
@@ -22,11 +28,13 @@ type TinputSelProps_noProps = Omit<
 >;
 
 type TaddressProps = {
+  zipCode: TinputProps;
   county: TselectProps<Toption>;
   district: TselectProps<Toption>;
   address: TtextareaProps;
 
   showDistrict?: boolean;
+  showZipCode?: boolean;
 };
 
 export type { TinputSelProps_noProps, TaddressProps };
@@ -44,12 +52,22 @@ export default function AddressBar({
   // 內部控制，district.props.onChange為undefined時才會變化
   const [district_l, setDistrict_l] = useState<Toption | null>(null);
 
+  const [zipCode_l, setZipCode_l] = useState<string>('');
+
   // -------------------------------------------------------------
-  const { county, district, address } = addressProps;
-  let showDistrict = addressProps.showDistrict;
+  const { zipCode, county, district, address } = addressProps;
+  let { showDistrict, showZipCode } = addressProps;
 
   if (showDistrict === undefined) {
     showDistrict = true;
+  }
+
+  if (!!zipCode) {
+    showZipCode = true;
+  }
+
+  if (showZipCode === false) {
+    showZipCode = false;
   }
 
   // 地址
@@ -88,7 +106,20 @@ export default function AddressBar({
 
   // ------------------------------------------------------------------
 
-  const selectInputList: TinputSelBarProps_reduce['propsArr'] = [
+  const selectInputArr: TinputSelBarProps_reduce['propsArr'] = [
+    {
+      type: 'input',
+      itemProps: {
+        ...county,
+        wrapperClassName: classNames(scss.countyWrapper, county.wrapperClassName),
+        props: {
+          placeholder: '郵遞區號',
+          value: zipCode_l, // 被蓋掉就是由外層控制
+          disabled: true,
+          ...zipCode?.props,
+        },
+      },
+    },
     {
       type: 'select',
       itemProps: {
@@ -119,6 +150,7 @@ export default function AddressBar({
           value: district_l, // 被蓋掉就是由外層控制
           onChange: (e) => {
             setDistrict_l(e); // 被蓋掉就是由外層控制
+            setZipCode_l(e?.zipCode || '');
           },
           ...district.props,
         },
@@ -140,8 +172,12 @@ export default function AddressBar({
     },
   ];
 
+  if (!showZipCode) {
+    selectInputArr.shift();
+  }
+
   if (showDistrict === false) {
-    selectInputList.splice(1, 1);
+    selectInputArr.splice(1, 1);
   }
 
   // ------------------------------------------------------------------
@@ -150,7 +186,7 @@ export default function AddressBar({
   return (
     <InputSel
       inputSelBarProps={{
-        propsArr: selectInputList,
+        propsArr: selectInputArr,
       }}
       {...inputSelProps}
     />
