@@ -321,9 +321,9 @@ export default function OutboundOrder({
       const firstRow: Tgroup['rowArr'][0] = {
         contractData: {
           project: prod.itemName,
-          L: String(theOriginalContractContent.fullWidth),
-          W: String(theOriginalContractContent.WG),
-          B: String(theOriginalContractContent.boxB),
+          L: new Decimal(theOriginalContractContent.fullWidth).div(1000).toString(),
+          W: new Decimal(theOriginalContractContent.WG).div(1000).toString(),
+          B: new Decimal(theOriginalContractContent.boxB).div(1000).toString(),
           qty: String(prod.itemArr.length),
           implementQty: '',
           cai: theOriginalContractContent.volume ?? '',
@@ -335,9 +335,9 @@ export default function OutboundOrder({
         },
         staticData: {
           project: prod.itemName,
-          L: String(firstItem.fullWidth),
-          W: String(firstItem.WG),
-          B: String(firstItem.boxB),
+          L: new Decimal(firstItem.fullWidth).div(1000).toString(),
+          W: new Decimal(firstItem.WG).div(1000).toString(),
+          B: new Decimal(firstItem.boxB).div(1000).toString(),
           qty: String(prod.itemArr.length),
           implementQty: '',
           // cai: firstItem.volume,
@@ -634,9 +634,9 @@ export default function OutboundOrder({
             // 現在orderTable的orderKeyArr_static沒有project，所以不會顯示這個欄位
             // 但應該是顯示了會比較清楚
             project: item.itemName,
-            L: String(item.fullWidth),
-            W: String(item.WG),
-            B: String(item.boxB),
+            L: new Decimal(item.fullWidth).div(1000).toString(),
+            W: new Decimal(item.WG).div(1000).toString(),
+            B: new Decimal(item.boxB).div(1000).toString(),
             qty: '1',
             implementQty: '???',
             cai: item.volume,
