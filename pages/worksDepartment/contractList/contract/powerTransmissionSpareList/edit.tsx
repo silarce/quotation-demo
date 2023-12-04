@@ -55,9 +55,9 @@ type Tprofile = {
 };
 
 type TemployeeList = {
-  materialHandler: TemployeeDto | undefined; // 備料人員
-  ingredientTechnician: TemployeeDto | undefined; // 配料人員
-  formCompleter: TemployeeDto | undefined; // 填表人員
+  materialHandler: TemployeeDto | undefined | null; // 備料人員
+  ingredientTechnician: TemployeeDto | undefined | null; // 配料人員
+  formCompleter: TemployeeDto | undefined | null; // 填表人員
 };
 
 // type Tsheet = {
@@ -104,7 +104,7 @@ type Tsheet = {
 };
 
 // =================================================================
-export default function Edit({ userInfo }: { userInfo: TuserDto }) {
+export default function Edit({ isAdmin, userInfo }: { isAdmin: boolean; userInfo: TuserDto }) {
   const router = useRouter();
   const { contractId, electronicSuppliesId } = router.query as {
     contractId: string;
@@ -132,6 +132,17 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   useEffect(() => {
     update_engineeringContact();
   }, [engineeringContactId]);
+
+  // ----------------------------------------------------
+  let isFormCompleter = userInfo.employee?.id === electronicSupplies?.formCompleter?.id;
+
+  if (
+    //
+    (electronicSupplies && electronicSupplies.formCompleter?.id === undefined) ||
+    isAdmin
+  ) {
+    isFormCompleter = true;
+  }
 
   // ----------------------------------------------------
   const [profile, setProfile] = useState<Tprofile>(cre_emptyProfile());
@@ -629,7 +640,7 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   // ------------------------------------------------
   const contrll_signature: Tcontroll_Signature = {
     materialHandler: {
-      employee: employeeList.materialHandler,
+      employee: employeeList.materialHandler ?? undefined,
       onChange: (employee) => {
         setEmployeeList((state) => ({
           ...state,
@@ -638,7 +649,7 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
       },
     },
     ingredientTechnician: {
-      employee: employeeList.ingredientTechnician,
+      employee: employeeList.ingredientTechnician ?? undefined,
       onChange: (employee) => {
         setEmployeeList((state) => ({
           ...state,
@@ -648,7 +659,7 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
     },
     formCompleter: {
       // employee: employeeList.formCompleter,
-      employee: employeeList.formCompleter,
+      employee: employeeList.formCompleter ?? undefined,
       forbidden: true,
       // onChange: (employee) => {
       //   setEmployeeList((state) => ({
@@ -831,13 +842,18 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   // ----------------------------------------------------
 
   const reqPost = async () => {
-    if (!employeeList.materialHandler?.id) {
-      return myAlert.info({ title: '請選擇備料人員' });
-    } else if (!employeeList.ingredientTechnician?.id) {
-      return myAlert.info({ title: '請選擇配料人員' });
-    } else if (!employeeList.formCompleter?.id) {
-      return myAlert.info({ title: '請選擇填表人員' });
-    } else if (!profile.dispatchDate) {
+    if (!isFormCompleter) {
+      return myAlert.info({ title: '只有填表人員可以編輯' });
+    }
+
+    // if (!employeeList.materialHandler?.id) {
+    //   return myAlert.info({ title: '請選擇備料人員' });
+    // } else if (!employeeList.ingredientTechnician?.id) {
+    //   return myAlert.info({ title: '請選擇配料人員' });
+    // } else if (!employeeList.formCompleter?.id) {
+    //   return myAlert.info({ title: '請選擇填表人員' });
+    // } else
+    if (!profile.dispatchDate) {
       return myAlert.info({ title: '請選擇派工日期' });
     } else if (!profile.requirementsDate) {
       return myAlert.info({ title: '請選擇需求日期' });
@@ -862,9 +878,9 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
     // const body: TcreateElectronicSuppliesDto | TupdateElectronicSuppliesDto = {
     const body: TcreateElectronicSuppliesDto = {
       ...profile,
-      materialHandlerId: employeeList.materialHandler?.id ?? '',
-      ingredientTechnicianId: employeeList.ingredientTechnician?.id ?? '',
-      formCompleterId: employeeList.formCompleter?.id ?? '',
+      materialHandlerId: employeeList.materialHandler?.id ?? null,
+      ingredientTechnicianId: employeeList.ingredientTechnician?.id ?? null,
+      formCompleterId: employeeList.formCompleter?.id ?? null,
       electronicSuppliesRecords,
       projectNumber: profile.projectNumber,
       contractId: contractId,
@@ -944,7 +960,11 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
     {
       type: 'myButton',
       label: '編輯',
-      onClick: () => setDisabled(false),
+      onClick: () => {
+        if (isFormCompleter) {
+          setDisabled(false);
+        }
+      },
     },
     {
       type: 'myButton',
@@ -957,6 +977,10 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
       },
     },
   ];
+
+  if (!isFormCompleter) {
+    panelList03.splice(1, 1);
+  }
 
   const panelList = !electronicSuppliesId ? panelList01 : disabled ? panelList03 : panelList02;
 
