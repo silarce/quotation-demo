@@ -2155,17 +2155,17 @@ export type TelectronicSuppliesDto = {
   // others: string;
 
   // 備料人員Id
-  materialHandlerId: string;
+  materialHandlerId?: string | null;
   // 備料人員
-  materialHandler: TemployeeDto;
-  // 配料人員ID
-  ingredientTechnicianId: string;
-  // 配料人員
-  ingredientTechnician: TemployeeDto;
+  materialHandler?: TemployeeDto | null;
+  // 領料人員ID
+  ingredientTechnicianId?: string | null;
+  // 領料人員
+  ingredientTechnician?: TemployeeDto | null;
   //填表人員ID
-  formCompleterId: string;
+  formCompleterId?: string | null;
   // 填表人員
-  formCompleter: TemployeeDto;
+  formCompleter?: TemployeeDto | null;
 
   contractId?: string;
   contract?: TquotationContractDto;
