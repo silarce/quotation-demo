@@ -221,7 +221,7 @@ export default function LegacyContractIntegration() {
                 quantity: doorQty /**產品 數量 計算來的*/,
                 totalPrice: item.total /**總計 */,
                 customerName: item.customerName /**客戶名稱 */,
-                agentEmployeeName: item.operatorName /**經辦人 */,
+                agentEmployeeName: (item.operator?.chName || item.operator?.enName) ?? '' /**經辦人 */,
               };
 
               const href = {

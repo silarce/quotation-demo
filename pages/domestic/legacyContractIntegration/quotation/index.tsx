@@ -29,6 +29,7 @@ prodKeyArr用來map 主產品列表、與exchangePanel(追加追減面板)與pdf
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -38,7 +39,10 @@ import QuotationProfile from 'components/page/domestic/quotation/legacyContract/
 import QuotationProduction from 'components/page/domestic/quotation/legacyContract/quotationProduct_legacyContract';
 import QuotationAdditions from 'components/page/domestic/quotation/legacyContract/quotationAdditions_legacyContract';
 import QuotationTotal from 'components/page/domestic/quotation/legacyContract/quotationTotal_legacyContract';
-import QuotationSinature, { TinputProps } from 'components/page/domestic/quotation/quotationSinature';
+import QuotationSinature, {
+  Tcontrol_sinature,
+  TemployeeDto,
+} from 'components/page/domestic/quotation/quotationSinature_2';
 
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract';
 
@@ -99,7 +103,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
-    populate: ['customer', 'products', 'additions'],
+    populate: ['customer', 'products', 'additions', 'manager', 'supervisor', 'operator'],
   });
 
   const { legacyContract, updateLegacyContract } = useLegacyContract_id(contractId, legacyContractParams);
@@ -197,42 +201,43 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
 
-  const classSignature = classLegacyContract.classSignature;
-  const signatureArr: { label: string; inputProps: TinputProps }[] = [
-    {
-      label: '經理',
-      inputProps: {
-        props: {
-          value: classSignature.managerName,
-          onChange: (e) => {
-            classSignature.managerName = e.target.value;
-          },
-        },
-      },
-    },
-    {
-      label: '主管',
-      inputProps: {
-        props: {
-          value: classSignature.supervisorName,
-          onChange: (e) => {
-            classSignature.supervisorName = e.target.value;
-          },
-        },
-      },
-    },
-    {
-      label: '經辦',
-      inputProps: {
-        props: {
-          value: classSignature.operatorName,
-          onChange: (e) => {
-            classSignature.operatorName = e.target.value;
-          },
-        },
-      },
-    },
-  ];
+  // const classSignature = classLegacyContract.classSignature;
+
+  // const signatureArr: { label: string; inputProps: TinputProps }[] = [
+  //   {
+  //     label: '經理',
+  //     inputProps: {
+  //       props: {
+  //         value: classSignature.managerName,
+  //         onChange: (e) => {
+  //           classSignature.managerName = e.target.value;
+  //         },
+  //       },
+  //     },
+  //   },
+  //   {
+  //     label: '主管',
+  //     inputProps: {
+  //       props: {
+  //         value: classSignature.supervisorName,
+  //         onChange: (e) => {
+  //           classSignature.supervisorName = e.target.value;
+  //         },
+  //       },
+  //     },
+  //   },
+  //   {
+  //     label: '經辦',
+  //     inputProps: {
+  //       props: {
+  //         value: classSignature.operatorName,
+  //         onChange: (e) => {
+  //           classSignature.operatorName = e.target.value;
+  //         },
+  //       },
+  //     },
+  //   },
+  // ];
 
   useEffect(() => {
     if (disbaled) {
@@ -258,7 +263,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       type: 'redButton',
       label: '上傳',
       onClick: async () => {
-        const postBody = classLegacyContract.postBody;
+        const postBody = _.cloneDeep(classLegacyContract.postBody);
 
         if (!postBody) {
           return;
@@ -282,11 +287,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return myAlert.warning({ title: '請輸入地址' });
         }
 
+        postBody.managerId = emp_manager?.id || null;
+        postBody.supervisorId = emp_director?.id || null;
+        postBody.operatorId = emp_agent?.id || null;
+
         try {
           setIsLoading(true);
           const res = contractId
-            ? await apiPatchLegacyContracts_id(contractId, classLegacyContract.postBody)
-            : await apiPostLegacyContracts(classLegacyContract.postBody);
+            ? await apiPatchLegacyContracts_id(contractId, postBody)
+            : await apiPostLegacyContracts(postBody);
 
           await uploadAttachment(res.id);
 
@@ -355,6 +364,43 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ];
 
   // -----------------------------------------------------------------------
+
+  const [emp_manager, setEmp_manager] = useState<TemployeeDto | null>();
+  const [emp_director, setEmp_director] = useState<TemployeeDto | null>();
+  const [emp_agent, setEmp_agent] = useState<TemployeeDto | null>();
+
+  useEffect(() => {
+    const { manager, supervisor, operator } = legacyContract ?? {};
+    setEmp_manager(manager);
+    setEmp_director(supervisor);
+    setEmp_agent(operator);
+  }, [disbaled, legacyContract]);
+
+  const control_sinature: Tcontrol_sinature = {
+    manager: {
+      employee: emp_manager,
+      onChange: (v) => {
+        setEmp_manager(v);
+        // classSignature.managerName = v.chName;
+      },
+    },
+    director: {
+      employee: emp_director,
+      onChange: (v) => {
+        setEmp_director(v);
+        // classSignature.supervisorName = v.chName;
+      },
+    },
+    agent: {
+      employee: emp_agent,
+      onChange: (v) => {
+        setEmp_agent(v);
+        // classSignature.operatorName = v.chName;
+      },
+    },
+  };
+
+  // -----------------------------------------------------------------------
   if (!classLegacyContract) {
     return null;
   }
@@ -394,7 +440,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal legacyContract={classLegacyContract} disabled={disbaled} appendixParams={appendixParams} />
           {/* 簽名 */}
-          <QuotationSinature signatureArr={signatureArr} disabled={disbaled} />
+          <QuotationSinature control={control_sinature} disabled={disbaled} />
         </div>
       </div>
       <QuotationPdf
@@ -404,6 +450,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }}
         classLegacyContract={classLegacyContract}
         verticalKeyArr={verticalKeyArr}
+        agentName={(emp_agent?.chName || emp_agent?.enName) ?? ''}
       />
     </SubLayer>
   );

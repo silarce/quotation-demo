@@ -491,12 +491,21 @@ export type TlegacyContractDto = {
   notes: string[];
   /**報價範圍 */
   quoteScopes: string[];
+  // /**經理 */
+  // managerName: string;
+  // /**主管 */
+  // supervisorName: string;
+  // /**經辦人 */
+  // operatorName: string;
   /**經理 */
-  managerName: string;
+  managerId: string | null;
+  manager: TemployeeDto | null;
   /**主管 */
-  supervisorName: string;
+  supervisorId: string | null;
+  supervisor: TemployeeDto | null;
   /**經辦人 */
-  operatorName: string;
+  operatorId: string | null;
+  operator: TemployeeDto | null;
   /**產品 */
   products: TlegacyContractProductDto[];
   /**額外項目 */
@@ -642,11 +651,15 @@ export type TcreateLegacyContractDto = {
   quoteScopes: string[];
   //
   /* 經理 */
-  managerName: string;
+  managerId: string | null;
+  // managerName: string;
   /* 主管 */
-  supervisorName: string;
+  supervisorId: string | null;
+  // supervisorName: string;
   /* 經辦人 */
-  operatorName: string;
+  operatorId: string | null;
+  // operatorName: string;
+
   //
   /* 產品 */
   products: TcreateLegacyContractProductDto[];

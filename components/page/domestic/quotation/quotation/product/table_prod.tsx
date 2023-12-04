@@ -40,6 +40,7 @@ export default function Table_prod({
   attachTotal,
   isRedBorder,
   exchangeDiabled,
+  isShowDndBtn = true,
 }: {
   disabled: boolean;
   disabled_plus?: boolean;
@@ -54,13 +55,14 @@ export default function Table_prod({
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   rowHeight?: 'h60';
   //
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox' | 'emptyBox';
   emptyBlockWidth?: string;
   targetProd?: Class_product | undefined;
   isAttach?: boolean; // 追加追減介面
   attachTotal?: number | string;
   isRedBorder?: boolean;
   exchangeDiabled?: boolean;
+  isShowDndBtn?: boolean;
 }) {
   const [allowMove, setAllowMove] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -96,7 +98,15 @@ export default function Table_prod({
     <div className={classNames(scss.tableContainer, isRedBorder && scss.redBorder)}>
       <div className={scss.header}>
         <h2>主產品設定</h2>
-        <button className={(allowMove && scss.active) || ''} onClick={() => setAllowMove((state) => !state)}>
+        {/* <button className={(allowMove && scss.active) || ''} onClick={() => setAllowMove((state) => !state)}> */}
+        <button
+          className={classNames(
+            //
+            allowMove && scss.active,
+            !isShowDndBtn && 'invisible'
+          )}
+          onClick={() => setAllowMove((state) => !state)}
+        >
           {allowMove ? '確定排序' : '設定排序'}
         </button>
       </div>

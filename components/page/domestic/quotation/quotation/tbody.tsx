@@ -85,7 +85,7 @@ export default function Tbody({
   keyArr: string[];
   prodCellConfig: TcellConfig;
   onRowClick?: (obj: { item: Titem; key: string }) => void;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox' | 'emptyBox';
   defalutVKeyArr?: string[];
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   rowHeight?: 'h60';
@@ -316,6 +316,14 @@ const ResetChangeBtnBox = ({
   );
 };
 
+const EmptyBox = ({ indexNum }: { indexNum: string | number }) => {
+  return (
+    <div className={classNames(scss.buttonBox, 'chameleon', 'w-[40px]')}>
+      <span className={scss.indexNum}>{indexNum}</span>
+    </div>
+  );
+};
+
 // --------------------------------------------------------
 
 const NoItem = ({
@@ -385,7 +393,7 @@ function DndRow({
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
   isActive?: boolean;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox' | 'emptyBox';
   rowHeight?: 'h60';
   showAttatchModal?: () => void;
   clearAttach?: () => void;
@@ -417,6 +425,7 @@ function DndRow({
             />
           )}
           {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}
+          {panelBox === 'emptyBox' && <EmptyBox indexNum={pIndex + 1} />}
           {panelBox === 'comBox' && (
             <ComBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} comName={item.comName} />
           )}

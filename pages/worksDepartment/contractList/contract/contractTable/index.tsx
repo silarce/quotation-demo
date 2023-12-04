@@ -1,4 +1,4 @@
-import { useEffect, useMemo, Fragment } from 'react';
+import { useState, useEffect, useMemo, Fragment } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
@@ -34,7 +34,6 @@ type Tcontrol_left = {
   unitPrice: number;
   totalPrice: number;
 };
-type Tcontrol_center = TcenterItem[];
 
 type Tcontrol_right = {
   exchangedQuantity: number;
@@ -64,6 +63,7 @@ type TrightTotal = {
 export default function ContracTable() {
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
+  const [isLoading, setIsLoading] = useState(false);
 
   // -------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
@@ -72,25 +72,28 @@ export default function ContracTable() {
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
 
+  // useEffect(() => {
+  //   (async () => {
+  //     await update_contract();
+  //   })();
+  // }, [contractId]);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     await update_engineeringContact();
+  //   })();
+  // }, [engineeringContactId]);
+
   useEffect(() => {
     (async () => {
-      if (contract) {
-        return;
-      }
+      setIsLoading(true);
 
-      try {
+      if (!contract) {
         await update_contract();
-      } catch (error) {
-        myAlert.err({ title: '取得合約資料失敗' });
       }
-    })();
 
-    (async () => {
-      try {
-        await update_engineeringContact();
-      } catch (error) {
-        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
-      }
+      await update_engineeringContact();
+      setIsLoading(false);
     })();
   }, [contractId, engineeringContactId]);
 
@@ -264,8 +267,6 @@ export default function ContracTable() {
     //
     //----------
 
-    //----------
-
     let leftSubTotal = 0;
     const centerTotalArr: number[] = new Array(attachTimes).fill(0);
     let rightTotal = 0;
@@ -322,7 +323,7 @@ export default function ContracTable() {
 
   // -------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isLoading}>
       <PageHeader
         //  panelList={panelList}
         contractNumber={engineeringContact?.contractNumber ?? ''}

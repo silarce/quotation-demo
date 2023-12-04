@@ -189,7 +189,8 @@ export default function WorkSheet() {
       return {};
     }
 
-    const contractProductItems = workSheet.contractProductItems;
+    // const contractProductItems = workSheet.contractProductItems;
+    const contractProductItems = _.sortBy(workSheet.contractProductItems, 'createdAt');
 
     type TitemTokenList = {
       [key: string]: {
@@ -1031,6 +1032,8 @@ export default function WorkSheet() {
 
     setIsLoading(true);
 
+    //
+
     for (const key in deleteIdList) {
       const deleteIdArr = deleteIdList[key];
 
@@ -1043,11 +1046,13 @@ export default function WorkSheet() {
       }
     }
 
+    //
+
     for (const key in changedSheetList) {
       const sheet = changedSheetList[key];
 
       if (sheet.isOriginal) {
-        return;
+        continue;
       }
 
       try {
@@ -1074,11 +1079,12 @@ export default function WorkSheet() {
         setDisabled(true);
         break;
       }
-    }
+    } // for
 
     await update_workSheet();
     setIsLoading(false);
     setDisabled(true);
+
     //
   };
 

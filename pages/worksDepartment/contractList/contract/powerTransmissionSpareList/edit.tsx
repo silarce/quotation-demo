@@ -970,7 +970,7 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
         <div className={style.powerTransmissionSpareList}>
           <Profile controll={control_profile} disabled={disabled} />
           <Sheet editable={!disabled} controll={controll_sheet} />
-          <Signature controll={contrll_signature} disabled={disabled} />
+          <Signature controll={contrll_signature} userEmpId={userInfo.employee?.id} disabled={disabled} />
         </div>
       </div>
       {/* isShowPdf */}

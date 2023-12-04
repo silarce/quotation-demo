@@ -1,8 +1,11 @@
 /**
  *prodCellConfig
+ 
+ * retrieveOptions 下拉式選單產生器
+ * 下拉式選單的選項
+  
 
  * callRetrieveCreProdCom
- * retrieveOptions 下拉式選單產生器
  * Class_product
  * AcceList
  * retrieveCreProdAcce
@@ -12,7 +15,6 @@
  * takeDefaultDynaValue
  * calcProdAllprice_timeout
  *
- * 下拉式選單的選項
  *
  * req_calcGeneralSpec
  * req_getProdAvailableComponents
@@ -219,7 +221,10 @@ class Class_product {
       thickness: this._prodData.thickness,
     };
 
-    this._theW = String(Number(this._prodData.WG || '0') - this._prodData.guideRailG);
+    // this._theW = String(Number(this._prodData.WG || '0') - this._prodData.guideRailG);
+    const guideRailG_m = new Decimal(this._prodData.guideRailG).div(1000).toNumber();
+    // this._theW = String(Number(this._prodData.WG || '0') - guideRailG_m);
+    this._theW = new Decimal(this._prodData.WG || '0').sub(guideRailG_m).toString();
 
     if (this._theW === '0') {
       this._theW = '';
@@ -1609,7 +1614,7 @@ class Class_product {
       if (thickness) {
         headBoxThickList[thickness] = {
           value: String(thickness),
-          label: String(thickness),
+          label: String(thickness) + ' t',
         };
       }
     });
@@ -1620,7 +1625,7 @@ class Class_product {
       if (thickness) {
         railThickList[thickness] = {
           value: String(thickness),
-          label: String(thickness),
+          label: String(thickness) + ' t',
         };
       }
     });
@@ -2639,13 +2644,12 @@ class Class_product {
     this.reRender();
   }
 
-  //
-
-  /**門片厚度 */ //TODO api 沒有門片厚度 //好像有了?待確認
+  /**門片厚度 */
   get thickness() {
-    return this._prodData.thickness;
+    return this._prodData.thickness + ' t';
   }
   set thickness(v) {
+    v = v.replace(' t', '');
     this._prodData.thickness = v;
     this.reRender();
   }
