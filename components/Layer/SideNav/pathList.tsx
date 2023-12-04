@@ -75,17 +75,16 @@ interface TsidePathList {
 // =========================================================================
 
 const erpFeaturesLookup = {
-  // 基本資料建立
-  // BasicDataCreation: "5553602b-f640-4af0-aae6-7e284544a7a3",
   BasicDataCreation: '基本資料建立',
-  // 人事權限建立
-  // HRAuthoritySetup: "c02998a7-ee2f-4ce7-9f96-4af2740d50f4",
   HRAuthoritySetup: '人事權限建立',
   legacyContractIntegration: '舊合約',
   domestic: '營業部國內工程',
   statisticsTable: '統計表',
   worksDepartment: '工務部',
   accountsReceivable: '應收帳款',
+  accountingDepartment: '會計部',
+  worksDepartment_worksheet: '工務部-工作表編輯',
+  worksDepartment_deliveryList: '工務部-出庫單編輯',
 } as const;
 
 const swappedErpFeaturesLookup: { [key: string]: string } = {};
@@ -105,6 +104,9 @@ const {
   statisticsTable,
   worksDepartment,
   accountsReceivable,
+  accountingDepartment,
+  worksDepartment_worksheet,
+  worksDepartment_deliveryList,
 } = erpFeaturesLookup;
 
 /** "allPass" 即使沒有任何權限也pass */
@@ -426,7 +428,7 @@ const sidePathList: TsidePathList = {
         {
           label: '合約',
           path: path01 + '/contractList',
-          erpFeature: [worksDepartment],
+          erpFeature: [worksDepartment, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
         // {
         //   label: '新增派工單',
@@ -618,7 +620,7 @@ const topPathList: TtopPathListConfig[] = [
     href: {
       pathname: sidePathList['/worksDepartment'].path01 + '/contractList',
     },
-    erpFeature: [worksDepartment],
+    erpFeature: [worksDepartment, worksDepartment_worksheet, worksDepartment_deliveryList],
   },
   // {
   //   icon: icon_project,
