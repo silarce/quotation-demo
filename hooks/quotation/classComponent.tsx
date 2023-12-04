@@ -179,7 +179,7 @@ class Class_component {
         });
 
         if (theOption) {
-          theOption.label = '鐵板烤漆';
+          theOption.label = '鐵材烤漆';
         }
       }
 
