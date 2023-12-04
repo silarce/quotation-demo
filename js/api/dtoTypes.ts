@@ -1940,7 +1940,7 @@ export type TsubmitReviewQotuationContentDto = {
 // =========================================================================
 
 // engineering
-
+// 工程聯絡單
 export type TengineeringContactDto = {
   id: string;
   createdAt: string;
@@ -1952,6 +1952,7 @@ export type TengineeringContactDto = {
   projectName: string;
   /**工程內容 */
   projectContent: string;
+  zipCode: string | null;
   county: string;
   district: string;
   address: string;
@@ -1997,6 +1998,7 @@ export type TupdateEngineeringContactDto = {
   projectName?: string;
   /**工程內容 */
   projectContent?: string;
+  zipCode?: string | null;
   county?: string;
   district?: string;
   address?: string;

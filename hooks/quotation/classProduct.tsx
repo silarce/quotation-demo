@@ -19,6 +19,7 @@
  * req_calcGeneralSpec
  * req_getProdAvailableComponents
  * reqProdGenerateDoorProductBom
+ * toGetInstallationFee // 計算材料配件的 按裝及製造費用 的金額
  * 
 
   WG = fullWidth-gapA-gapC
@@ -1728,16 +1729,13 @@ class Class_product {
   }
 
   toGetInstallationFee() {
-    const m2 = Number(this.area);
+    const m2 = Number(this.subComList.installationFee?.quantity || '0');
     const doorType = this.doorType;
-
     const installationFee_class = this.subComList.installationFee;
-
     const fee = getInstallationFee({
       doorModel: doorType,
       m2,
     });
-
     installationFee_class.price_locale = String(fee);
   }
 
@@ -3298,7 +3296,7 @@ const reqGetComAndAcce = async (id: string | undefined) => {
 
   const res = await apiGetQuotationProducts(id);
 
-  if (res?.items) {
+  if (res?.items?.[0]) {
     const { components, accessories } = res.items[0];
 
     return { components, accessories };

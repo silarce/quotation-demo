@@ -117,7 +117,7 @@ import {
 } from 'js/utils/options/productOptions';
 
 // type
-import type { TquotationProductItemDto } from 'js/api/dtoTypes';
+import type { TquotationProductItemDto, TerpFeatureDto } from 'js/api/dtoTypes';
 
 // ====================================================================
 
@@ -137,7 +137,26 @@ type Tprofile = {
 };
 
 // ====================================================================
-export default function WorkSheet() {
+export default function WorkSheet({
+  isAdmin,
+  userErpFeature,
+}: {
+  isAdmin: boolean;
+  userErpFeature: TerpFeatureDto[] | undefined;
+}) {
+  const havePermissionToEdit = useMemo(() => {
+    if (isAdmin) {
+      return true;
+    }
+
+    const isHave = userErpFeature?.some((item) => {
+      return item.name === '工務部-工作表編輯';
+    });
+
+    return !!isHave;
+  }, [userErpFeature]);
+  // ----------------------------------------------------------------
+
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
 
@@ -1013,7 +1032,7 @@ export default function WorkSheet() {
   // -------------------------------------------------------------------------
 
   const reqPatch = async () => {
-    if (!worksheetId || !workSheet?.contractProductItems) {
+    if (!worksheetId || !workSheet?.contractProductItems || !havePermissionToEdit) {
       return;
     }
 
@@ -1243,10 +1262,16 @@ export default function WorkSheet() {
       type: 'myButton',
       label: '編輯',
       onClick: () => {
-        setDisabled(false);
+        if (havePermissionToEdit) {
+          setDisabled(false);
+        }
       },
     },
   ];
+
+  if (!havePermissionToEdit) {
+    panelList_allow.pop();
+  }
 
   const panelList_notAllow: TpanelList = [
     {

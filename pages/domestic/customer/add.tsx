@@ -69,7 +69,7 @@ export default function Add() {
           setRootLoading(true);
           const res = await apiPostCustomers(postBody);
           router.push({
-            pathname: '/setting/customer',
+            pathname: '/domestic/customer',
           });
           myAlert.success({ title: '新增客戶資料完成' });
         } catch {

@@ -40,7 +40,6 @@ class Class_customer {
     return this._typesArr;
   }
   addType = (v: TpostCustomer['types'][number]) => {
-    console.log(this);
     this._typesArr.push(v);
     this._reRender();
   };
