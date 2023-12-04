@@ -8,14 +8,12 @@ import _ from 'lodash';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
-// component
-
-// gear
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
 // api
 import { useGetEngineeringContact } from 'js/api/api_engineering';
 import { useGetContract_id_noItems } from 'js/api/api_quotation';
+
+// type
+import { TerpFeatureDto } from 'js/api/dtoTypes';
 
 // css
 import scss from './index.module.scss';
@@ -60,7 +58,26 @@ type TrightTotal = {
 };
 
 // ========================================================================
-export default function ContracTable() {
+export default function ContracTable({
+  isAdmin,
+  userErpFeature,
+}: {
+  isAdmin: boolean;
+  userErpFeature: TerpFeatureDto[] | undefined;
+}) {
+  const havePermissionToSee = useMemo(() => {
+    if (isAdmin) {
+      return true;
+    }
+
+    const isHave = userErpFeature?.some((item) => {
+      return item.name === '應收帳款';
+    });
+
+    return !!isHave;
+  }, [userErpFeature]);
+
+  // -------------------------------------------------------------
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
   const [isLoading, setIsLoading] = useState(false);
@@ -72,19 +89,11 @@ export default function ContracTable() {
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     await update_contract();
-  //   })();
-  // }, [contractId]);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     await update_engineeringContact();
-  //   })();
-  // }, [engineeringContactId]);
-
   useEffect(() => {
+    if (!havePermissionToSee) {
+      return;
+    }
+
     (async () => {
       setIsLoading(true);
 
