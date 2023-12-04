@@ -364,6 +364,7 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                           {group.map((item, index) => {
                             const {
                               disabled,
+                              forbidden,
                               value,
                               empolyee,
                               onChange,
@@ -380,7 +381,7 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                               const isFirst = index === 0;
 
                               return (
-                                <div key={index} className={classNames(scss.btnPanel)}>
+                                <div key={index} className={classNames(scss.btnPanel, forbidden && scss.hidden)}>
                                   <IconAddCircle className={classNames(!isFirst && scss.hidden)} onClick={onAddClick} />
                                   {disabled ? (
                                     //
