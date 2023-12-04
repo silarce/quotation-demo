@@ -55,6 +55,7 @@ type Tprofile = {
   paymentStatus: string;
   projectName: string;
   projectContent: string;
+  zipCode: string;
   county: string;
   district: string;
   address: string;
@@ -222,6 +223,7 @@ export default function WorkContactDoc() {
       paymentStatus,
       projectName,
       projectContent,
+      zipCode,
       county,
       district,
       address,
@@ -249,6 +251,7 @@ export default function WorkContactDoc() {
       paymentStatus,
       projectName,
       projectContent,
+      zipCode: zipCode ?? '',
       county,
       district,
       address,
@@ -336,6 +339,11 @@ export default function WorkContactDoc() {
         caption: '工程地點',
       },
       addressProps: {
+        zipCode: {
+          props: {
+            value: profile?.zipCode ?? '',
+          },
+        },
         county: {
           props: {
             isDisabled: disabled,
@@ -344,6 +352,7 @@ export default function WorkContactDoc() {
               const value = option ? option.value : '';
               profileChange('county', value);
               profileChange('district', '');
+              profileChange('zipCode', '');
             },
           },
         },
@@ -359,6 +368,7 @@ export default function WorkContactDoc() {
 
               const value = option ? option.value : '';
               profileChange('district', value);
+              profileChange('zipCode', option.zipCode ?? '');
             },
           },
         },
