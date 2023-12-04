@@ -491,12 +491,21 @@ export type TlegacyContractDto = {
   notes: string[];
   /**報價範圍 */
   quoteScopes: string[];
+  // /**經理 */
+  // managerName: string;
+  // /**主管 */
+  // supervisorName: string;
+  // /**經辦人 */
+  // operatorName: string;
   /**經理 */
-  managerName: string;
+  managerId: string | null;
+  manager: TemployeeDto | null;
   /**主管 */
-  supervisorName: string;
+  supervisorId: string | null;
+  supervisor: TemployeeDto | null;
   /**經辦人 */
-  operatorName: string;
+  operatorId: string | null;
+  operator: TemployeeDto | null;
   /**產品 */
   products: TlegacyContractProductDto[];
   /**額外項目 */
@@ -642,11 +651,15 @@ export type TcreateLegacyContractDto = {
   quoteScopes: string[];
   //
   /* 經理 */
-  managerName: string;
+  managerId: string | null;
+  // managerName: string;
   /* 主管 */
-  supervisorName: string;
+  supervisorId: string | null;
+  // supervisorName: string;
   /* 經辦人 */
-  operatorName: string;
+  operatorId: string | null;
+  // operatorName: string;
+
   //
   /* 產品 */
   products: TcreateLegacyContractProductDto[];
@@ -1927,7 +1940,7 @@ export type TsubmitReviewQotuationContentDto = {
 // =========================================================================
 
 // engineering
-
+// 工程聯絡單
 export type TengineeringContactDto = {
   id: string;
   createdAt: string;
@@ -1939,6 +1952,7 @@ export type TengineeringContactDto = {
   projectName: string;
   /**工程內容 */
   projectContent: string;
+  zipCode: string | null;
   county: string;
   district: string;
   address: string;
@@ -1984,6 +1998,7 @@ export type TupdateEngineeringContactDto = {
   projectName?: string;
   /**工程內容 */
   projectContent?: string;
+  zipCode?: string | null;
   county?: string;
   district?: string;
   address?: string;
@@ -2140,17 +2155,17 @@ export type TelectronicSuppliesDto = {
   // others: string;
 
   // 備料人員Id
-  materialHandlerId: string;
+  materialHandlerId?: string | null;
   // 備料人員
-  materialHandler: TemployeeDto;
-  // 配料人員ID
-  ingredientTechnicianId: string;
-  // 配料人員
-  ingredientTechnician: TemployeeDto;
+  materialHandler?: TemployeeDto | null;
+  // 領料人員ID
+  ingredientTechnicianId?: string | null;
+  // 領料人員
+  ingredientTechnician?: TemployeeDto | null;
   //填表人員ID
-  formCompleterId: string;
+  formCompleterId?: string | null;
   // 填表人員
-  formCompleter: TemployeeDto;
+  formCompleter?: TemployeeDto | null;
 
   contractId?: string;
   contract?: TquotationContractDto;

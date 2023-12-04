@@ -142,7 +142,7 @@ const prodCellConfig: TcellConfig = {
       inputProps: {
         props: {
           disabled: true,
-          type: 'number',
+          // type: 'number',
           className: 'text-center',
         },
       },
@@ -512,9 +512,8 @@ const getInstallationFee = ({
   }
 
   if (doorModel === 'SJ-303A' || doorModel === 'SJ-303AS') {
-    if (m2 < 10) {
-      // return 5400;
-      return 3600;
+    if (m2 <= 10) {
+      return 5400;
     } else {
       return 3600;
     }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, Fragment } from 'react';
+import { useState, useEffect, useMemo, Fragment } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
@@ -8,14 +8,12 @@ import _ from 'lodash';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
-// component
-
-// gear
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
 // api
 import { useGetEngineeringContact } from 'js/api/api_engineering';
 import { useGetContract_id_noItems } from 'js/api/api_quotation';
+
+// type
+import { TerpFeatureDto } from 'js/api/dtoTypes';
 
 // css
 import scss from './index.module.scss';
@@ -34,7 +32,6 @@ type Tcontrol_left = {
   unitPrice: number;
   totalPrice: number;
 };
-type Tcontrol_center = TcenterItem[];
 
 type Tcontrol_right = {
   exchangedQuantity: number;
@@ -61,9 +58,29 @@ type TrightTotal = {
 };
 
 // ========================================================================
-export default function ContracTable() {
+export default function ContracTable({
+  isAdmin,
+  userErpFeature,
+}: {
+  isAdmin: boolean;
+  userErpFeature: TerpFeatureDto[] | undefined;
+}) {
+  const havePermissionToSee = useMemo(() => {
+    if (isAdmin) {
+      return true;
+    }
+
+    const isHave = userErpFeature?.some((item) => {
+      return item.name === '應收帳款';
+    });
+
+    return !!isHave;
+  }, [userErpFeature]);
+
+  // -------------------------------------------------------------
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
+  const [isLoading, setIsLoading] = useState(false);
 
   // -------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
@@ -73,24 +90,19 @@ export default function ContracTable() {
     useGetEngineeringContact(engineeringContactId);
 
   useEffect(() => {
-    (async () => {
-      if (contract) {
-        return;
-      }
+    if (!havePermissionToSee) {
+      return;
+    }
 
-      try {
+    (async () => {
+      setIsLoading(true);
+
+      if (!contract) {
         await update_contract();
-      } catch (error) {
-        myAlert.err({ title: '取得合約資料失敗' });
       }
-    })();
 
-    (async () => {
-      try {
-        await update_engineeringContact();
-      } catch (error) {
-        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
-      }
+      await update_engineeringContact();
+      setIsLoading(false);
     })();
   }, [contractId, engineeringContactId]);
 
@@ -264,8 +276,6 @@ export default function ContracTable() {
     //
     //----------
 
-    //----------
-
     let leftSubTotal = 0;
     const centerTotalArr: number[] = new Array(attachTimes).fill(0);
     let rightTotal = 0;
@@ -322,7 +332,7 @@ export default function ContracTable() {
 
   // -------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isLoading}>
       <PageHeader
         //  panelList={panelList}
         contractNumber={engineeringContact?.contractNumber ?? ''}

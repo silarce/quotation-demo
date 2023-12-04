@@ -21,7 +21,7 @@
     display: grid;
     align-content: flex-start;
     gap: 14px;
-    max-height: 470px;
+    max-height: calc(100vh - 270px);
     padding: 0 9px;
     overflow-y: scroll;
   }

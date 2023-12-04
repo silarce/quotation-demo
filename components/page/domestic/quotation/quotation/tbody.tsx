@@ -85,7 +85,7 @@ export default function Tbody({
   keyArr: string[];
   prodCellConfig: TcellConfig;
   onRowClick?: (obj: { item: Titem; key: string }) => void;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox' | 'emptyBox';
   defalutVKeyArr?: string[];
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   rowHeight?: 'h60';
@@ -316,6 +316,14 @@ const ResetChangeBtnBox = ({
   );
 };
 
+const EmptyBox = ({ indexNum }: { indexNum: string | number }) => {
+  return (
+    <div className={classNames(scss.buttonBox, 'chameleon', 'w-[40px]')}>
+      <span className={scss.indexNum}>{indexNum}</span>
+    </div>
+  );
+};
+
 // --------------------------------------------------------
 
 const NoItem = ({
@@ -385,7 +393,7 @@ function DndRow({
   isAppend?: boolean;
   prodCellConfig: TcellConfig;
   isActive?: boolean;
-  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox';
+  panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox' | 'resetChangeBox' | 'emptyBox';
   rowHeight?: 'h60';
   showAttatchModal?: () => void;
   clearAttach?: () => void;
@@ -417,6 +425,7 @@ function DndRow({
             />
           )}
           {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}
+          {panelBox === 'emptyBox' && <EmptyBox indexNum={pIndex + 1} />}
           {panelBox === 'comBox' && (
             <ComBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} comName={item.comName} />
           )}
@@ -438,24 +447,24 @@ function DndRow({
               return null;
             }
 
-            let theDisabled = disabled;
+            const theDisabled = disabled;
 
-            if (key === 'quantity') {
-              // item.disabled_quantity === true ? (theDisabled = true) : undefined;
-              item.disabled_quantity === true
-                ? (theDisabled = true)
-                : item.disabled_quantity === false
-                ? (theDisabled = false)
-                : undefined;
-            }
+            // if (key === 'quantity') {
+            //   // item.disabled_quantity === true ? (theDisabled = true) : undefined;
+            //   item.disabled_quantity === true
+            //     ? (theDisabled = true)
+            //     : item.disabled_quantity === false
+            //     ? (theDisabled = false)
+            //     : undefined;
+            // }
 
-            if (disabledExceptionArr?.includes(key)) {
-              theDisabled = false;
-            }
+            // if (disabledExceptionArr?.includes(key)) {
+            //   theDisabled = false;
+            // }
 
-            if (disabled_plus) {
-              theDisabled = true;
-            }
+            // if (disabled_plus) {
+            //   theDisabled = true;
+            // }
 
             const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;
             const isHidden = hiddenKeyArr?.includes(key);
@@ -527,7 +536,7 @@ function DndRow({
               selectProps.props = {
                 options,
                 ...selectProps.props,
-                isDisabled: isDisabled,
+                isDisabled: isDisabled || theDisabled,
                 placeholder,
                 onChange: (option) => {
                   if (isOptionValue) {

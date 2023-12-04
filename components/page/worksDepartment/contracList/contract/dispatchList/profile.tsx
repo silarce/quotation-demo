@@ -50,8 +50,6 @@ export default function Profile({
 }) {
   // ------------------------------------------------
 
-  // ------------------------------------------------
-
   const [showSelector, setShowSelector] = useState(false);
 
   // ------------------------------------------------
@@ -217,7 +215,10 @@ const indexKeys01: TindexKey01[] = [
   'constructionSiteContactNumber',
   'allAddress',
 ];
-const indexKeys02: TindexKey02[] = ['projectNumber', 'badgeNumber'];
+const indexKeys02: TindexKey02[] = [
+  'projectNumber',
+  // 'badgeNumber'
+];
 // const indexKeys03: TindexKey03[] = ['workerName', 'finalContact'];
 
 type Tconfig<keys extends string> = {

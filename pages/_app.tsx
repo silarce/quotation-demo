@@ -162,6 +162,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
         {getLayout(
           <Component
             {...pageProps}
+            isAdmin={userInfo?.account === 'admin3'}
             userInfo={userInfo}
             userGrade={userGrade}
             userErpFeature={userErpFeature}

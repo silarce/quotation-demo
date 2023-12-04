@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 import moment from 'moment';
 import _ from 'lodash';
+import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -47,7 +48,7 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 // import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { TquotationProductItemDto, TdeliveryStatusDto, TemployeeDto } from 'js/api/dtoTypes';
+import { TerpFeatureDto, TquotationProductItemDto, TdeliveryStatusDto, TemployeeDto } from 'js/api/dtoTypes';
 
 // =====================================================================
 
@@ -73,7 +74,27 @@ type TdeliveryStatusInEdit = {
 };
 
 // =====================================================================
-export default function OutboundOrder() {
+export default function OutboundOrder({
+  isAdmin,
+  userErpFeature,
+}: {
+  isAdmin: boolean;
+  userErpFeature: TerpFeatureDto[] | undefined;
+}) {
+  const havePermissionToEdit = useMemo(() => {
+    if (isAdmin) {
+      return true;
+    }
+
+    const isHave = userErpFeature?.some((item) => {
+      return item.name === '工務部-工作表編輯';
+    });
+
+    return !!isHave;
+  }, [userErpFeature]);
+
+  // --------------------------------------------------------------------------
+
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
 
@@ -300,11 +321,11 @@ export default function OutboundOrder() {
       const firstRow: Tgroup['rowArr'][0] = {
         contractData: {
           project: prod.itemName,
-          L: String(theOriginalContractContent.fullWidth),
-          W: String(theOriginalContractContent.WG),
-          B: String(theOriginalContractContent.boxB),
+          L: new Decimal(theOriginalContractContent.fullWidth).div(1000).toString(),
+          W: new Decimal(theOriginalContractContent.WG).div(1000).toString(),
+          B: new Decimal(theOriginalContractContent.boxB).div(1000).toString(),
           qty: String(prod.itemArr.length),
-          implementQty: '???',
+          implementQty: '',
           cai: theOriginalContractContent.volume ?? '',
           totalCai: new Decimal(theOriginalContractContent.volume).mul(arrLength).toString(),
           doorType: theOriginalContractContent.doorModelName,
@@ -314,11 +335,11 @@ export default function OutboundOrder() {
         },
         staticData: {
           project: prod.itemName,
-          L: String(firstItem.fullWidth),
-          W: String(firstItem.WG),
-          B: String(firstItem.boxB),
+          L: new Decimal(firstItem.fullWidth).div(1000).toString(),
+          W: new Decimal(firstItem.WG).div(1000).toString(),
+          B: new Decimal(firstItem.boxB).div(1000).toString(),
           qty: String(prod.itemArr.length),
-          implementQty: '???',
+          implementQty: '',
           // cai: firstItem.volume,
           cai: '',
           totalCai: '0',
@@ -384,7 +405,7 @@ export default function OutboundOrder() {
             value?: string;
             employee?: TemployeeDto | null;
           }) => {
-            if (!deleveryStatus) {
+            if (!deleveryStatus || !havePermissionToEdit) {
               return;
             }
 
@@ -409,7 +430,12 @@ export default function OutboundOrder() {
           //
           btnPanelArr.push({
             disabled,
+            forbidden: !havePermissionToEdit,
             onEditClick: () => {
+              if (!havePermissionToEdit) {
+                return;
+              }
+
               setDeleveryStatusInEdit({
                 [prodKey]: {
                   [itemId]: {
@@ -419,9 +445,17 @@ export default function OutboundOrder() {
               });
             },
             onCancelClick: () => {
+              if (!havePermissionToEdit) {
+                return;
+              }
+
               setDeleveryStatusInEdit(undefined);
             },
             onDeleteClick: async () => {
+              if (!havePermissionToEdit) {
+                return;
+              }
+
               const res = await reqDelete(statusId);
 
               if (res) {
@@ -440,6 +474,10 @@ export default function OutboundOrder() {
               }
             },
             onAddClick: async () => {
+              if (!havePermissionToEdit) {
+                return;
+              }
+
               const res = await reqPost(itemId);
 
               if (res) {
@@ -452,7 +490,7 @@ export default function OutboundOrder() {
               }
             },
             onConfirmClick: async () => {
-              if (!deleveryStatus) {
+              if (!deleveryStatus || !havePermissionToEdit) {
                 return;
               }
 
@@ -492,7 +530,7 @@ export default function OutboundOrder() {
             disabled,
             value: deleveryStatus?.installationDate ?? status.installationDate ?? '',
             onChange_date: (v) => {
-              if (!deleveryStatus) {
+              if (!deleveryStatus || !havePermissionToEdit) {
                 return;
               }
 
@@ -507,7 +545,7 @@ export default function OutboundOrder() {
             disabled,
             empolyee: deleveryStatus?.installerEmployee ?? (status.installerEmployee || null),
             onChange_employee: (employee) => {
-              if (!deleveryStatus) {
+              if (!deleveryStatus || !havePermissionToEdit) {
                 return;
               }
 
@@ -522,7 +560,7 @@ export default function OutboundOrder() {
             disabled,
             value: deleveryStatus?.itemName ?? status.itemName ?? '',
             onChange: (v) => {
-              if (!deleveryStatus) {
+              if (!deleveryStatus || !havePermissionToEdit) {
                 return;
               }
 
@@ -537,7 +575,7 @@ export default function OutboundOrder() {
             disabled,
             value: deleveryStatus?.notes ?? status.notes ?? '',
             onChange: (v) => {
-              if (!deleveryStatus) {
+              if (!deleveryStatus || !havePermissionToEdit) {
                 return;
               }
 
@@ -553,9 +591,14 @@ export default function OutboundOrder() {
         if (btnPanelArr.length === 0) {
           btnPanelArr.push({
             disabled: true,
+            forbidden: !havePermissionToEdit,
             onConfirmClick: () => {},
             onCancelClick: () => {},
             onAddClick: async () => {
+              if (!havePermissionToEdit) {
+                return;
+              }
+
               const res = await reqPost(itemId);
 
               if (res) {
@@ -591,9 +634,9 @@ export default function OutboundOrder() {
             // 現在orderTable的orderKeyArr_static沒有project，所以不會顯示這個欄位
             // 但應該是顯示了會比較清楚
             project: item.itemName,
-            L: String(item.fullWidth),
-            W: String(item.WG),
-            B: String(item.boxB),
+            L: new Decimal(item.fullWidth).div(1000).toString(),
+            W: new Decimal(item.WG).div(1000).toString(),
+            B: new Decimal(item.boxB).div(1000).toString(),
             qty: '1',
             implementQty: '???',
             cai: item.volume,
@@ -637,7 +680,7 @@ export default function OutboundOrder() {
   // --------------------------------------------------------------------------
 
   const reqPatchNotes = async () => {
-    if (!engineeringDeliveryListId) {
+    if (!engineeringDeliveryListId || !havePermissionToEdit) {
       return;
     }
 
@@ -706,7 +749,7 @@ export default function OutboundOrder() {
             <div className={style.title}>
               <div>
                 <span>備註</span>
-                <div className={style.btnBar}>
+                <div className={classNames(style.btnBar, !havePermissionToEdit && style.hidden)}>
                   {notesDiasbled && (
                     <div>
                       <MyButton_v2 label="編輯" onClick={() => setNotesDiasbled(false)} />

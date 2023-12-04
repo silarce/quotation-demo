@@ -50,8 +50,6 @@ export default function DispatchList() {
     update_engineeringContact();
   }, [engineeringContactId]);
 
-  console.log(engineeringContact);
-
   // ----------------------------------------------------
   const [profile01, setProfile01] = useState<Tprofile01>(creEmptyProfile());
 

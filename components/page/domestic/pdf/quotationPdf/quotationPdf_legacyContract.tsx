@@ -35,10 +35,12 @@ export default function QuotationPdf({
   onCancel,
   classLegacyContract,
   verticalKeyArr,
+  agentName,
 }: {
   isVisable: boolean;
   onCancel: () => void;
   classLegacyContract: Class_legacyContract;
+  agentName: string;
   verticalKeyArr: string[];
 }) {
   const { classBasicInfo } = classLegacyContract;
@@ -156,7 +158,8 @@ export default function QuotationPdf({
   // other
   const otherPram = (() => {
     const quoteRangeArr = classLegacyContract.classQuoteScopes.stringArr;
-    const attn = classLegacyContract.classSignature.operatorName;
+    // const attn = classLegacyContract.classSignature.operatorName;
+    const attn = agentName;
 
     const payInfo = (() => {
       const { deliveryLocation, deliveryDate, paymentMethods } = classLegacyContract.classPayInfo;

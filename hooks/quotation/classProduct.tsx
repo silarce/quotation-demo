@@ -1,8 +1,11 @@
 /**
  *prodCellConfig
+ 
+ * retrieveOptions 下拉式選單產生器
+ * 下拉式選單的選項
+  
 
  * callRetrieveCreProdCom
- * retrieveOptions 下拉式選單產生器
  * Class_product
  * AcceList
  * retrieveCreProdAcce
@@ -12,11 +15,11 @@
  * takeDefaultDynaValue
  * calcProdAllprice_timeout
  *
- * 下拉式選單的選項
  *
  * req_calcGeneralSpec
  * req_getProdAvailableComponents
  * reqProdGenerateDoorProductBom
+ * toGetInstallationFee // 計算材料配件的 按裝及製造費用 的金額
  * 
 
   WG = fullWidth-gapA-gapC
@@ -219,7 +222,10 @@ class Class_product {
       thickness: this._prodData.thickness,
     };
 
-    this._theW = String(Number(this._prodData.WG || '0') - this._prodData.guideRailG);
+    // this._theW = String(Number(this._prodData.WG || '0') - this._prodData.guideRailG);
+    const guideRailG_m = new Decimal(this._prodData.guideRailG).div(1000).toNumber();
+    // this._theW = String(Number(this._prodData.WG || '0') - guideRailG_m);
+    this._theW = new Decimal(this._prodData.WG || '0').sub(guideRailG_m).toString();
 
     if (this._theW === '0') {
       this._theW = '';
@@ -694,23 +700,53 @@ class Class_product {
     this.thickness = res.thickness;
 
     // ________________________
+
+    // console.log(this.options_boxB);
+    // console.log('defaultMotorBox', defaultMotorBox);
+
     // 設定馬達廠商
     if (defaultMotorBox) {
       if (defaultMotorBox.東元) {
         this.motor = '東元';
+
+        const defaultBoxB_num = new Decimal(defaultMotorBox.東元.boxB).div(1000).toNumber();
+        const defaultBoxB = String(defaultBoxB_num);
+        const shouldChange = !this.isBoxBinOption({
+          boxB_m: defaultBoxB_num,
+        });
+
+        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
         this.changeBoxBNoCall({
-          str: String(defaultMotorBox.東元.boxB / 1000),
+          str: theBoxB,
           diameter: res.diameter,
         });
       } else if (defaultMotorBox.大同) {
         this.motor = '大同';
+
+        const defaultBoxB_num = new Decimal(defaultMotorBox.大同.boxB).div(1000).toNumber();
+        const defaultBoxB = String(defaultBoxB_num);
+        const shouldChange = !this.isBoxBinOption({
+          boxB_m: defaultBoxB_num,
+        });
+
+        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
         this.changeBoxBNoCall({
-          str: String(defaultMotorBox.大同.boxB / 1000),
+          str: theBoxB,
           diameter: res.diameter,
         });
       } else if (defaultMotorBox.default) {
+        const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
+        const defaultBoxB = String(defaultBoxB_num);
+        const shouldChange = !this.isBoxBinOption({
+          boxB_m: defaultBoxB_num,
+        });
+
+        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
         this.changeBoxBNoCall({
-          str: String(defaultMotorBox.default.boxB / 1000),
+          str: theBoxB,
           diameter: res.diameter,
         });
       }
@@ -1315,7 +1351,14 @@ class Class_product {
     const boxB = box[vendor]?.boxB || box.default?.boxB;
 
     if (boxB) {
-      this.boxB = String(boxB / 1000);
+      const boxB_num = new Decimal(boxB).div(1000).toNumber();
+      const shouldChange = !this.isBoxBinOption({
+        boxB_m: boxB_num,
+      });
+
+      if (shouldChange) {
+        this.boxB = String(boxB_num);
+      }
     }
   }
 
@@ -1572,7 +1615,7 @@ class Class_product {
       if (thickness) {
         headBoxThickList[thickness] = {
           value: String(thickness),
-          label: String(thickness),
+          label: String(thickness) + ' t',
         };
       }
     });
@@ -1583,7 +1626,7 @@ class Class_product {
       if (thickness) {
         railThickList[thickness] = {
           value: String(thickness),
-          label: String(thickness),
+          label: String(thickness) + ' t',
         };
       }
     });
@@ -1686,17 +1729,28 @@ class Class_product {
   }
 
   toGetInstallationFee() {
-    const m2 = Number(this.area);
+    const m2 = Number(this.subComList.installationFee?.quantity || '0');
     const doorType = this.doorType;
-
     const installationFee_class = this.subComList.installationFee;
-
     const fee = getInstallationFee({
       doorModel: doorType,
       m2,
     });
-
     installationFee_class.price_locale = String(fee);
+  }
+
+  isBoxBinOption({ boxB_m }: { boxB_m: number }) {
+    if (!this.options_boxB) {
+      return false;
+    }
+
+    return this.options_boxB.some((option) => {
+      if (isNaN(Number(option.value))) {
+        return false;
+      }
+
+      return Number(option.value) === boxB_m;
+    });
   }
 
   // -----------------------------------------------------------------
@@ -2588,13 +2642,12 @@ class Class_product {
     this.reRender();
   }
 
-  //
-
-  /**門片厚度 */ //TODO api 沒有門片厚度 //好像有了?待確認
+  /**門片厚度 */
   get thickness() {
-    return this._prodData.thickness;
+    return this._prodData.thickness + ' t';
   }
   set thickness(v) {
+    v = v.replace(' t', '');
     this._prodData.thickness = v;
     this.reRender();
   }
@@ -3028,9 +3081,9 @@ const prodkeyArrOri: () => TprodKey[] = () => {
 
     'fullWidth',
     'W',
-    'WG',
+    // 'WG',
     'height',
-    'guildRailG',
+    // 'guildRailG',
     'boxB',
     // 'boxD',
     'thickness',
@@ -3243,7 +3296,7 @@ const reqGetComAndAcce = async (id: string | undefined) => {
 
   const res = await apiGetQuotationProducts(id);
 
-  if (res?.items) {
+  if (res?.items?.[0]) {
     const { components, accessories } = res.items[0];
 
     return { components, accessories };
