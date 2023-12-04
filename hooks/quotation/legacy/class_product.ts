@@ -17,6 +17,9 @@ import { TlegacyContractProductDto, TcreateLegacyContractProductDto } from 'js/a
 import type { TreRender } from './useLegacyContract';
 import { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import { Toption } from 'js/utils/options/options';
+
+import { calcProductArea, calcProductVolume } from 'js/utils/product/calc';
+
 // ===========================================================
 
 /**
@@ -163,20 +166,25 @@ class Class_product {
   //----------------------------------------------
 
   calcArea = () => {
-    const area = Decimal.add(this._height || '0', this._boxB || '0') // h+b
-      /** "0"被視為true，所以用型別為number的值來計算 */
-      .mul(this._product.width || this._product.length || '0') // *w or *h
-      .toFixed(2)
-      .toString();
+    const h = Number(this._height || 0);
+    const b = Number(this._boxB || 0);
+
+    const w = Number(this._product.width || 0);
+    const l = Number(this._product.length || 0);
+
+    const area = calcProductArea({
+      height: h,
+      boxb: b,
+      fullWidth: l,
+      WG: w,
+    });
 
     return area;
   };
 
   /**計算才數 */
   calcVolume = () => {
-    return Decimal.mul(this.area || 0, 10.89)
-      .toFixed(2)
-      .toString();
+    return calcProductVolume(Number(this.area || 0));
   };
 
   get options_doorTrack() {
