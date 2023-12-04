@@ -541,8 +541,6 @@ export const optionsCreator_county: () => Toption[] = () => [
 
 // ===========================================================================
 
-console.log(postalCode);
-
 const thePostalCode = postalCode as unknown as {
   data: {
     zip_code: string;
