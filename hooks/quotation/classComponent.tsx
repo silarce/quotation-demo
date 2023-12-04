@@ -1,6 +1,7 @@
 // 相數符號 ∮
 
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 import type { TreRender } from './useProduct';
 import { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
@@ -170,7 +171,20 @@ class Class_component {
 
   get options_material() {
     if (this.key === 'slat') {
-      return this._prod.options_material;
+      const copy = _.cloneDeep(this._prod.options_material ?? []);
+
+      if (copy) {
+        const theOption = copy.find((item) => {
+          return item.value === '黑鐵';
+        });
+
+        if (theOption) {
+          theOption.label = '鐵板烤漆';
+        }
+      }
+
+      return copy;
+      // return this._prod.options_material;
     }
 
     return comLookUp[this.key].options;
