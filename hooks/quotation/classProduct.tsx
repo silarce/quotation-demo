@@ -3298,7 +3298,7 @@ const reqGetComAndAcce = async (id: string | undefined) => {
 
   const res = await apiGetQuotationProducts(id);
 
-  if (res?.items) {
+  if (res?.items?.[0]) {
     const { components, accessories } = res.items[0];
 
     return { components, accessories };
