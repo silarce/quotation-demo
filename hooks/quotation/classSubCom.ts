@@ -82,7 +82,11 @@ class Class_SubCom {
     return String(this._data.quantity);
   }
   set quantity(v) {
-    this._data.quantity = Number(v);
+    const num = Number(v);
+    this._data.quantity = num;
+
+    this._prod.toGetInstallationFee();
+
     this.calcAllPrice();
     this.reRender();
   }
