@@ -126,7 +126,7 @@ export default function Edit() {
           // 如果第一層的id存在，會在api那邊把id刪掉
           await apiPatchCustomers_id(postBody.id, postBody);
           router.push({
-            pathname: '/setting/customer',
+            pathname: '/domestic/customer',
           });
           myAlert.success({ title: '變更客戶資料完成' });
         } catch {
