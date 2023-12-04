@@ -428,7 +428,7 @@ const sidePathList: TsidePathList = {
         {
           label: '合約',
           path: path01 + '/contractList',
-          erpFeature: [worksDepartment, worksDepartment_worksheet, worksDepartment_deliveryList],
+          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
         // {
         //   label: '新增派工單',
@@ -620,7 +620,7 @@ const topPathList: TtopPathListConfig[] = [
     href: {
       pathname: sidePathList['/worksDepartment'].path01 + '/contractList',
     },
-    erpFeature: [worksDepartment, worksDepartment_worksheet, worksDepartment_deliveryList],
+    erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
   },
   // {
   //   icon: icon_project,
