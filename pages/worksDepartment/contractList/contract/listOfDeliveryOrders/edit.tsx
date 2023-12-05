@@ -210,25 +210,27 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   // ----------------------------------------------------
 
   const controll_profile: Tcontroll_profile = {
-    projectNumber: {
-      value: profile.projectNumber,
-      onChange: (v: string) => changeProfile('projectNumber', v),
-      disabled: true,
-      showBaseline: 'invisible',
-    },
-    projectName: {
-      value: profile.projectName,
-      onChange: (v: string) => changeProfile('projectName', v),
-      disabled: true,
-      showBaseline: 'invisible',
-    },
-    requirementsDate: {
-      value: profile.requirementsDate,
-      onChange: (v: string) => changeProfile('requirementsDate', v),
-    },
-    dispatchDate: {
-      value: profile.dispatchDate,
-      onChange: (v: string) => changeProfile('dispatchDate', v),
+    info: {
+      projectNumber: {
+        value: profile.projectNumber,
+        onChange: (v: string) => changeProfile('projectNumber', v),
+        disabled: true,
+        showBaseline: 'invisible',
+      },
+      projectName: {
+        value: profile.projectName,
+        onChange: (v: string) => changeProfile('projectName', v),
+        disabled: true,
+        showBaseline: 'invisible',
+      },
+      requirementsDate: {
+        value: profile.requirementsDate,
+        onChange: (v: string) => changeProfile('requirementsDate', v),
+      },
+      dispatchDate: {
+        value: profile.dispatchDate,
+        onChange: (v: string) => changeProfile('dispatchDate', v),
+      },
     },
   };
 
