@@ -238,7 +238,7 @@ export default function QuotationProfile({
     const name = contact?.name ?? '';
     const phone = contact?.phone ?? '';
 
-    const contactPerson = `${name} ${phone}`;
+    const contactPerson = `${name}${phone}`;
 
     setCustomer(v[0]);
     setValue('customerId', v[0].id);
