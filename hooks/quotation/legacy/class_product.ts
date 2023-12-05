@@ -884,10 +884,11 @@ function prodCellConfigCre(): TprodCellConfig {
         id: 'thickness',
         label: '厚度',
         inputSelProps: {
+          suffix: 't',
           wrapperStyle: { width: '60px' },
           inputProps: {
             props: {
-              // type: 'number',
+              type: 'number',
             },
           },
         },

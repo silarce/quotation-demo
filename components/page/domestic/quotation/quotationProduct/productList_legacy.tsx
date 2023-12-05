@@ -375,7 +375,7 @@ function DndRow({
 
             const stateValue = prod[key];
             const inputSelProps = _.cloneDeep(prodCellConfig.cellConfig[key].inputSelProps);
-            const { inputProps, selectProps, checkBoxProps } = inputSelProps;
+            const { inputProps, selectProps, checkBoxProps, suffix } = inputSelProps;
 
             //____
             if (inputProps?.props) {
@@ -423,7 +423,14 @@ function DndRow({
 
             //____
             return (
-              <InputSel key={key} className={scss.column} disabled={disabled} showBaseline="auto" {...inputSelProps} />
+              <InputSel
+                //
+                key={key}
+                className={scss.column}
+                disabled={disabled}
+                showBaseline="auto"
+                {...inputSelProps}
+              />
             );
           })}
           {/* column */}
