@@ -14,7 +14,7 @@ import Decimal from 'decimal.js';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // components
-import QuotationProfile from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
 import QuotationProdChangingRecord from 'components/page/domestic/quotation/quotationProdChangingRecord';
 import QuotationRecord from 'components/page/domestic/quotation/quotationRecord';
 

@@ -11,7 +11,10 @@ import Decimal from 'decimal.js';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // components
-import QuotationProfile, { TreturnBody, TquotationProfile } from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile, {
+  TreturnBody,
+  TquotationProfile,
+} from 'components/page/domestic/quotation/quotationProfile_old';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';

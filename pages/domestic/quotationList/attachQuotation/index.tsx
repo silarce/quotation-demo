@@ -15,13 +15,14 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-import { useForm } from 'react-hook-form';
+// import { useForm } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
 // components
-import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
+
 import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
 import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
 
@@ -88,10 +89,22 @@ import Summary, {
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
-import { TcreateQuotationProductDto, TquotationProductDto } from 'js/api/dtoTypes';
+import { TcreateQuotationProductDto, TquotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
 // ------------------------------------------------------------------
-// ------------------------------------------------------------------
+type Tprofile = {
+  validityPeriod: string;
+  projectName: string;
+  county: string;
+  district: string;
+  address: string;
+  contactPerson: string;
+  contactNumber: string;
+  faxNumber: string;
+  trackProgress: string;
+  projectProgress: string;
+};
+
 // ------------------------------------------------------------------
 export default function Quotation() {
   const router = useRouter();
@@ -207,7 +220,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
   const lastestContentId = quotationData?.latestContent.id;
   const latestContent = quotationData?.latestContent;
-  const status = latestContent?.status;
+  // const status = latestContent?.status;
   const verifyForm = latestContent?.verifyForm;
 
   const isAttach = true;
@@ -346,6 +359,117 @@ latestContentProdArr為這次追加追減的主產品
   };
 
   // -----------------------------------------------------
+  let agentEmployee: TemployeeDto | undefined | null;
+
+  if (!quotationId) {
+    agentEmployee = userInfo?.employee;
+  } else {
+    agentEmployee = latestContent?.agentEmployee;
+  }
+
+  // -----------------------------------------------------
+  const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
+
+  const [customer, setCustomer] = useState<TcustomerDto | undefined | null>();
+  const [profile, setProfile] = useState<Tprofile>(creEmptyProfile());
+
+  const changeProfile = (key: keyof Tprofile, value: string) => {
+    setProfile((state) => {
+      return {
+        ...state,
+        [key]: value,
+      };
+    });
+  };
+
+  useEffect(() => {
+    setStatus(latestContent?.status ?? 'Budget');
+    // setEditNotes(latestContent?.editNotes ?? '');
+
+    setCustomer(latestContent?.customer ?? null);
+
+    setProfile({
+      validityPeriod: latestContent?.validityPeriod ?? '',
+      projectName: latestContent?.projectName ?? '',
+      county: latestContent?.county ?? '',
+      district: latestContent?.district ?? '',
+      address: latestContent?.address ?? '',
+      contactPerson: latestContent?.contactPerson ?? '',
+      contactNumber: latestContent?.contactNumber ?? '',
+      faxNumber: latestContent?.faxNumber ?? '',
+      trackProgress: latestContent?.trackProgress ?? '',
+      projectProgress: latestContent?.projectProgress ?? '',
+    });
+  }, [quotationData]);
+
+  const control_profile = useMemo(() => {
+    const control_profile: Tcontrol_profile = {
+      quotationNumber: latestContent?.quotationNumber ?? '',
+      quotationDate: latestContent?.quotationDate ?? '',
+      customer: {
+        value: customer,
+        onChange: (customer) => {
+          const contact = customer.contacts?.[0];
+          const name = contact?.name ?? '';
+          const phone = contact?.phone ?? '';
+
+          setCustomer(customer);
+          changeProfile('contactPerson', `${name}${phone}`);
+          changeProfile('contactNumber', phone);
+        },
+        onClear: () => {
+          setCustomer(null);
+          changeProfile('contactPerson', '');
+          changeProfile('contactNumber', '');
+        },
+      },
+      itemList: {
+        validityPeriod: {
+          value: profile.validityPeriod,
+          onChange: (v) => changeProfile('validityPeriod', v),
+        },
+        projectName: {
+          value: profile.projectName,
+          onChange: (v) => changeProfile('projectName', v),
+        },
+        county: {
+          value: profile.county,
+          onChange: (v) => changeProfile('county', v),
+        },
+        district: {
+          value: profile.district,
+          onChange: (v) => changeProfile('district', v),
+        },
+        address: {
+          value: profile.address,
+          onChange: (v) => changeProfile('address', v),
+        },
+        contactPerson: {
+          value: profile.contactPerson,
+          onChange: (v) => changeProfile('contactPerson', v),
+        },
+        contactNumber: {
+          value: profile.contactNumber,
+          onChange: (v) => changeProfile('contactNumber', v),
+        },
+        faxNumber: {
+          value: profile.faxNumber,
+          onChange: (v) => changeProfile('faxNumber', v),
+        },
+        trackProgress: {
+          value: profile.trackProgress,
+          onChange: (v) => changeProfile('trackProgress', v),
+        },
+        projectProgress: {
+          value: profile.projectProgress,
+          onChange: (v) => changeProfile('projectProgress', v),
+        },
+      },
+    };
+
+    return control_profile;
+  }, [profile]);
+
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -692,7 +816,7 @@ latestContentProdArr為這次追加追減的主產品
   }, [latestContent]);
 
   // ---------------------------------------------------------
-  const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
+  // const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
   // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
@@ -762,48 +886,48 @@ latestContentProdArr為這次追加追減的主產品
       ? latestContent?.quotationDate
       : moment(latestContent?.quotationDate).toISOString();
 
-    reset({
-      quotationDate: quotationDate,
-      validityPeriod: latestContent?.validityPeriod,
-      // customerId: lContent.customer.id,
-      customer: latestContent?.customer,
-      projectName: latestContent?.projectName,
-      county: latestContent?.county,
-      district: latestContent?.district,
-      address: latestContent?.address,
-      contactPerson: latestContent?.contactPerson,
-      contactNumber: latestContent?.contactNumber,
-      discount: latestContent?.discount,
-      quantity: latestContent?.quantity,
-      editNotes: latestContent?.editNotes,
-      status: latestContent?.status ?? 'Budget',
-      // managerEmployee: latestContent?.managerEmployee,
-      // supervisorEmployee: latestContent?.supervisorEmployee,
-      // 審核流程改變，下方簽名bar的人等同審核人員(除了經辦)
-      managerEmployee: latestContent?.reviewSupervisorEmployee,
-      supervisorEmployee: latestContent?.reviewSalesEmployee,
-      //
-      //
-      agentEmployee: agentEmployee,
-      //
-      //
-      trackProgress: latestContent?.trackProgress,
-      projectProgress: latestContent?.projectProgress,
-    });
+    // reset({
+    //   quotationDate: quotationDate,
+    //   validityPeriod: latestContent?.validityPeriod,
+    //   // customerId: lContent.customer.id,
+    //   customer: latestContent?.customer,
+    //   projectName: latestContent?.projectName,
+    //   county: latestContent?.county,
+    //   district: latestContent?.district,
+    //   address: latestContent?.address,
+    //   contactPerson: latestContent?.contactPerson,
+    //   contactNumber: latestContent?.contactNumber,
+    //   discount: latestContent?.discount,
+    //   quantity: latestContent?.quantity,
+    //   editNotes: latestContent?.editNotes,
+    //   status: latestContent?.status ?? 'Budget',
+    //   // managerEmployee: latestContent?.managerEmployee,
+    //   // supervisorEmployee: latestContent?.supervisorEmployee,
+    //   // 審核流程改變，下方簽名bar的人等同審核人員(除了經辦)
+    //   managerEmployee: latestContent?.reviewSupervisorEmployee,
+    //   supervisorEmployee: latestContent?.reviewSalesEmployee,
+    //   //
+    //   //
+    //   agentEmployee: agentEmployee,
+    //   //
+    //   //
+    //   trackProgress: latestContent?.trackProgress,
+    //   projectProgress: latestContent?.projectProgress,
+    // });
   }, [quotationData]);
 
-  const onProfileChange = (v: Partial<TreturnBody>) => {
-    setValue('validityPeriod', v.validityPeriod ?? '');
-    setValue('customer', v.customer);
-    setValue('projectName', v.projectName ?? '');
-    setValue('county', v.county ?? '');
-    setValue('district', v.district ?? '');
-    setValue('address', v.address ?? '');
-    setValue('contactPerson', v.contactPerson ?? '');
-    setValue('contactNumber', v.contactNumber ?? '');
-    setValue('trackProgress', v.trackProgress ?? '');
-    setValue('projectProgress', v.projectProgress ?? '');
-  };
+  // const onProfileChange = (v: Partial<TreturnBody>) => {
+  //   setValue('validityPeriod', v.validityPeriod ?? '');
+  //   setValue('customer', v.customer);
+  //   setValue('projectName', v.projectName ?? '');
+  //   setValue('county', v.county ?? '');
+  //   setValue('district', v.district ?? '');
+  //   setValue('address', v.address ?? '');
+  //   setValue('contactPerson', v.contactPerson ?? '');
+  //   setValue('contactNumber', v.contactNumber ?? '');
+  //   setValue('trackProgress', v.trackProgress ?? '');
+  //   setValue('projectProgress', v.projectProgress ?? '');
+  // };
 
   // --------------------------------------------------------------
 
@@ -933,8 +1057,8 @@ latestContentProdArr為這次追加追減的主產品
       label: '經辦',
       inputProps: {
         props: {
-          // value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
-          value: getValues('agentEmployee.chName') || getValues('agentEmployee.enName') || '',
+          value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
+          // value: getValues('agentEmployee.chName') || getValues('agentEmployee.enName') || '',
           disabled: true,
         },
       },
@@ -962,13 +1086,11 @@ latestContentProdArr為這次追加追減的主產品
       return myAlert.warning({ title: '請輸入註解' });
     }
 
-    setValue('editNotes', v);
+    // setValue('editNotes', v);
 
     setShowMemoModal(false);
 
-    setTimeout(() => {
-      reqUpdateQuotation();
-    }, 10);
+    reqUpdateQuotation({ editNotes: v });
   };
 
   const tagList: TtagList = [
@@ -1003,9 +1125,9 @@ latestContentProdArr為這次追加追減的主產品
       // 報價/歷史狀態狀態
       custom: (
         <QuotationStateSel
-          quotationState={{ value: watch('status')!, label: quotationStatusLookup[watch('status')!] }}
+          quotationState={{ value: status, label: status }}
           setQuotationState={(option) => {
-            setValue('status', option.value as TquotationContentDto['status']);
+            setStatus(option.value as TquotationContentDto['status']);
           }}
           history={history}
         />
@@ -1065,8 +1187,8 @@ latestContentProdArr為這次追加追減的主產品
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
-  const reqUpdateQuotation = async () => {
-    const data_watch = watch();
+  const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
+    // const data_watch = watch();
 
     // 總樘數
     const prodQty = 0;
@@ -1112,39 +1234,39 @@ latestContentProdArr為這次追加追減的主產品
     });
 
     // ---------------------------------------------------------
-    if (!data_watch.agentEmployee?.id) {
+    if (!agentEmployee?.id) {
       return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
     }
 
     const body: TcreateQuotationContentDto = {
-      quotationDate: data_watch.quotationDate ?? '',
-      validityPeriod: data_watch.validityPeriod ?? '',
+      quotationDate: latestContent?.quotationDate ?? '',
+      validityPeriod: profile.validityPeriod ?? '',
       //
-      customerId: data_watch.customer?.id ?? '',
+      customerId: customer?.id ?? '',
       //
-      projectName: data_watch.projectName ?? '',
-      county: data_watch.county ?? '',
-      district: data_watch.district ?? '',
-      address: data_watch.address ?? '',
-      contactPerson: data_watch.contactPerson ?? '',
-      contactNumber: data_watch.contactNumber ?? '',
+      projectName: profile.projectName ?? '',
+      county: profile.county ?? '',
+      district: profile.district ?? '',
+      address: profile.address ?? '',
+      contactPerson: profile.contactPerson ?? '',
+      contactNumber: profile.contactNumber ?? '',
       quantity: prodQty ?? 0,
-      editNotes: data_watch.editNotes ?? '',
-      status: data_watch.status ?? 'Budget',
+      editNotes: editNotes ?? '',
+      status: status ?? 'Budget',
 
-      managerId: data_watch.managerEmployee?.id ?? null,
-      supervisorId: data_watch.supervisorEmployee?.id ?? null,
+      // managerId: latestContent.managerEmployee?.id ?? null,
+      // supervisorId: data_watch.supervisorEmployee?.id ?? null,
       //
-      agentId: data_watch.agentEmployee?.id,
+      agentId: agentEmployee?.id,
       //
       //
       annotations: anno,
       quotationRanges: qr,
       //
       //
-      faxNumber: data_watch.customer?.fax ?? '',
-      trackProgress: data_watch.trackProgress ?? '',
-      projectProgress: data_watch.projectProgress ?? '',
+      faxNumber: profile.faxNumber ?? '',
+      trackProgress: profile.trackProgress ?? '',
+      projectProgress: profile.projectProgress ?? '',
 
       discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
       subTotal: Number(summary.subTotal.replaceAll(',', '')),
@@ -1327,11 +1449,7 @@ latestContentProdArr為這次追加追減的主產品
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
-          <QuotationProfile //
-            profile={quotationData?.latestContent}
-            disabled={disabled}
-            onProfileChange={onProfileChange}
-          />
+          <QuotationProfile disabled={disabled} control={control_profile} />
 
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
@@ -1650,3 +1768,17 @@ const countPayInfoValue = ({
     total: totalStr,
   };
 };
+
+// ========================================================================
+const creEmptyProfile = (): Tprofile => ({
+  validityPeriod: '',
+  projectName: '',
+  county: '',
+  district: '',
+  address: '',
+  contactPerson: '',
+  contactNumber: '',
+  faxNumber: '',
+  trackProgress: '',
+  projectProgress: '',
+});

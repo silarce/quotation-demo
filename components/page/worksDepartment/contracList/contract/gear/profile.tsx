@@ -4,6 +4,8 @@ import InputSel from 'components/global/gear/inputAndSel/inputSel';
 // css
 import scss from './profile.module.scss';
 
+type TdoorTypeItem = { doorTypeName: string; qty: string };
+
 type Tcontroll = {
   info: {
     projectNumber: {
@@ -31,13 +33,13 @@ type Tcontroll = {
       showBaseline?: 'invisible' | 'always';
     };
   };
-  doorType: {
-    arr: { doorTypeName: string; qty: string }[];
+  doorType?: {
+    arr: TdoorTypeItem[];
     totalQty: string;
   };
 };
 
-export type { Tcontroll };
+export type { Tcontroll, TdoorTypeItem };
 // -----------------------------------------------------------
 
 export default function Profile({ disabled, controll }: { disabled: boolean; controll: Tcontroll }) {
@@ -92,36 +94,41 @@ export default function Profile({ disabled, controll }: { disabled: boolean; con
       })}
 
       {/*  */}
-      <div className={scss.doorTypeList}>
-        <div className={scss.caption}>
-          <span>門型數量</span>
-        </div>
-        <ul className={scss.list}>
-          {control_doorType.arr.map((item, index) => {
-            return (
-              <li key={index}>
-                <span>{item.doorTypeName}</span>
-                <span>{item.qty}</span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
 
-      {/*  */}
-      <InputSel
-        className={scss.input03}
-        disabled={disabled}
-        inputProps={{
-          value: control_doorType.totalQty,
-        }}
-        label={'總樘數'}
-        captionWidth="80px"
-        captionColor="main"
-        gap="40px"
-        width={'700px'}
-        showBaseline={'invisible'}
-      />
+      {control_doorType && (
+        <>
+          <div className={scss.doorTypeList}>
+            <div className={scss.caption}>
+              <span>門型數量</span>
+            </div>
+            <ul className={scss.list}>
+              {control_doorType.arr.map((item, index) => {
+                return (
+                  <li key={index}>
+                    <span>{item.doorTypeName}</span>
+                    <span>{item.qty}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/*  */}
+          <InputSel
+            className={scss.input03}
+            disabled={disabled}
+            inputProps={{
+              value: control_doorType.totalQty,
+            }}
+            label={'總樘數'}
+            captionWidth="80px"
+            captionColor="main"
+            gap="40px"
+            width={'700px'}
+            showBaseline={'invisible'}
+          />
+        </>
+      )}
       {/*  */}
     </div>
   );
