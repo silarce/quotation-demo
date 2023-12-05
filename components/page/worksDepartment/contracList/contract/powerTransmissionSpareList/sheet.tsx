@@ -69,9 +69,9 @@ export default function Sheet({ editable, controll }: { editable: boolean; contr
   return (
     <div className={style.sheet}>
       <div className={style.thead}>
-        <div>
+        {/* <div>
           <span>門型/數量</span>
-        </div>
+        </div> */}
         <div>
           <span>品名</span>
         </div>
@@ -85,9 +85,9 @@ export default function Sheet({ editable, controll }: { editable: boolean; contr
       </div>
 
       <Tbody>
-        <C1>
+        {/* <C1>
           <span>門型</span>
-        </C1>
+        </C1> */}
         {c2IndexKeys.map((c2Key, index) => {
           const { label, rSpan } = c2Config[c2Key];
 
@@ -218,7 +218,8 @@ export default function Sheet({ editable, controll }: { editable: boolean; contr
 
 const Tbody = styled.div`
   display: grid;
-  grid-template-columns: 2fr 2fr 7fr 1.5fr;
+  // grid-template-columns: 2fr 2fr 7fr 1.5fr;
+  grid-template-columns: 2fr 7fr 1.5fr;
 `;
 
 const CellInit = styled.div<{

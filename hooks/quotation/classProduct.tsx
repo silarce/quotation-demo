@@ -272,6 +272,8 @@ class Class_product {
   // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
 
   private _theW = '0';
+  // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
+  private _dontCalcWG = false;
 
   // ---------------------------------------------------------
   // 追加追減用的
@@ -670,13 +672,17 @@ class Class_product {
       return false;
     }
 
-    this._prodData.WG = String(
-      calcProductWG({
-        fullWidth: Number(this._prodData.fullWidth || 0) * 1000,
-        gapA: res.gapA,
-        gapC: res.gapC,
-      }) / 1000
-    );
+    if (!this._dontCalcWG) {
+      this._prodData.WG = String(
+        calcProductWG({
+          fullWidth: Number(this._prodData.fullWidth || 0) * 1000,
+          gapA: res.gapA,
+          gapC: res.gapC,
+        }) / 1000
+      );
+    }
+
+    this._dontCalcWG = false;
 
     // this._theW = this._prodData.WG - this.guildRailG;
     this._theW = new Decimal(this._prodData.WG || 0).sub(this.guildRailG || 0).toString();
@@ -2082,6 +2088,10 @@ class Class_product {
     }
 
     const wg = new Decimal(v || 0).add(this.guildRailG || 0).toString();
+
+    // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
+    this._dontCalcWG = true;
+
     this.WG = wg;
     this.reRender;
   }
