@@ -2,32 +2,38 @@
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
 // css
-import style from './profile.module.scss';
+import scss from './profile.module.scss';
 
 type Tcontroll = {
-  projectNumber: {
-    value: string;
-    onChange: (v: string) => void;
-    disabled?: boolean;
-    showBaseline?: 'invisible' | 'always';
+  info: {
+    projectNumber: {
+      value: string;
+      onChange: (v: string) => void;
+      disabled?: boolean;
+      showBaseline?: 'invisible' | 'always';
+    };
+    projectName: {
+      value: string;
+      onChange: (v: string) => void;
+      disabled?: boolean;
+      showBaseline?: 'invisible' | 'always';
+    };
+    requirementsDate: {
+      value: string;
+      onChange: (v: string) => void;
+      disabled?: boolean;
+      showBaseline?: 'invisible' | 'always';
+    };
+    dispatchDate: {
+      value: string;
+      onChange: (v: string) => void;
+      disabled?: boolean;
+      showBaseline?: 'invisible' | 'always';
+    };
   };
-  projectName: {
-    value: string;
-    onChange: (v: string) => void;
-    disabled?: boolean;
-    showBaseline?: 'invisible' | 'always';
-  };
-  requirementsDate: {
-    value: string;
-    onChange: (v: string) => void;
-    disabled?: boolean;
-    showBaseline?: 'invisible' | 'always';
-  };
-  dispatchDate: {
-    value: string;
-    onChange: (v: string) => void;
-    disabled?: boolean;
-    showBaseline?: 'invisible' | 'always';
+  doorType: {
+    arr: { doorTypeName: string; qty: string }[];
+    totalQty: string;
   };
 };
 
@@ -35,17 +41,19 @@ export type { Tcontroll };
 // -----------------------------------------------------------
 
 export default function Profile({ disabled, controll }: { disabled: boolean; controll: Tcontroll }) {
+  const control_doorType = controll.doorType;
+
   return (
-    <div className={style.profile}>
+    <div className={scss.profile}>
       {indexKeys.map((key, index) => {
-        const { label, type } = config[key];
-        const { value, onChange, disabled: disabled_single, showBaseline } = controll[key];
+        const { label, type } = config[key] ?? {};
+        const { value, onChange, disabled: disabled_single, showBaseline } = controll.info[key];
 
         // -----
         if (type === 'date') {
           return (
             <InputSel
-              className={style.input02}
+              className={scss.input02}
               key={index}
               datePickerProps={{
                 //
@@ -67,7 +75,7 @@ export default function Profile({ disabled, controll }: { disabled: boolean; con
         return (
           <InputSel
             key={index}
-            className={style.input02}
+            className={scss.input02}
             disabled={disabled_single || disabled}
             inputProps={{
               value: value,
@@ -82,18 +90,51 @@ export default function Profile({ disabled, controll }: { disabled: boolean; con
           />
         );
       })}
+
+      {/*  */}
+      <div className={scss.doorTypeList}>
+        <div className={scss.caption}>
+          <span>門型數量</span>
+        </div>
+        <ul className={scss.list}>
+          {control_doorType.arr.map((item, index) => {
+            return (
+              <li key={index}>
+                <span>{item.doorTypeName}</span>
+                <span>{item.qty}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/*  */}
+      <InputSel
+        className={scss.input03}
+        disabled={disabled}
+        inputProps={{
+          value: control_doorType.totalQty,
+        }}
+        label={'總樘數'}
+        captionWidth="80px"
+        captionColor="main"
+        gap="40px"
+        width={'700px'}
+        showBaseline={'invisible'}
+      />
+      {/*  */}
     </div>
   );
 }
 
 // ===================================================
 
-type TindexKeys = keyof Tcontroll;
+type TindexKeys = keyof Tcontroll['info'];
 
 const indexKeys: TindexKeys[] = ['dispatchDate', 'projectNumber', 'requirementsDate', 'projectName'];
 
 const config: {
-  [key in TindexKeys]: {
+  [key in TindexKeys]?: {
     label: string;
     type?: 'date';
   };

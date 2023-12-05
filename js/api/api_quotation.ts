@@ -461,8 +461,9 @@ export const useGetContract_id = (id: string | undefined) => {
   };
 };
 
-export const useGetContract_id_noItems = (id: string | undefined) => {
+export const useGetContract_id_noItems = (id: string | undefined, customParams?: Tparams) => {
   const params: Tparams = {
+    ...customParams,
     populate: [
       // 'contents',
       'content.customer',
@@ -499,6 +500,8 @@ export const useGetContract_id_noItems = (id: string | undefined) => {
       'subContracts.content.verifyForm',
 
       'products',
+
+      ...(customParams?.populate ?? []),
     ],
   };
 
