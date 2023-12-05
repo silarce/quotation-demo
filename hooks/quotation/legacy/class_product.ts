@@ -69,10 +69,16 @@ class Class_product {
     })();
 
     this._idNumber = this._product.idNumber ? this._product.idNumber.toString() : '';
-    this._length = this._product.length ? this._product.length.toString() : '';
-    this._width = this._product.width ? this._product.width.toString() : '';
-    this._height = this._product.height ? this._product.height.toString() : '';
-    this._boxB = this._product.boxB ? this._product.boxB.toString() : '';
+
+    // this._length = this._product.length ? this._product.length.toString() : '';
+    // this._width = this._product.width ? this._product.width.toString() : '';
+    // this._height = this._product.height ? this._product.height.toString() : '';
+    // this._boxB = this._product.boxB ? this._product.boxB.toString() : '';
+    this._length = this._product.length === '0' ? '' : this._product.length;
+    this._width = this._product.width === '0' ? '' : this._product.width;
+    this._height = this._product.height === '0' ? '' : this._product.height;
+    this._boxB = this._product.boxB === '0' ? '' : this._product.boxB;
+
     //
     // this._quantity = this._product.quantity ? this._product.quantity.toString() : '';
     this._quantity = this._product.quantity.toString();
@@ -878,10 +884,11 @@ function prodCellConfigCre(): TprodCellConfig {
         id: 'thickness',
         label: '厚度',
         inputSelProps: {
+          suffix: 't',
           wrapperStyle: { width: '60px' },
           inputProps: {
             props: {
-              // type: 'number',
+              type: 'number',
             },
           },
         },

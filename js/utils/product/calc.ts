@@ -31,7 +31,8 @@ export const calcProductVolume = (area: number) => {
 // 所以這個計算是要配合apiGetProdCalcGeneralSpec取得新的gapA與gapC再使用
 /**計算WG 單位為mm*/
 export const calcProductWG = ({ fullWidth, gapA, gapC }: { fullWidth: number; gapA: number; gapC: number }) => {
-  const wg = new Decimal(fullWidth).sub(gapA).sub(gapC).toNumber();
+  // const wg = new Decimal(fullWidth).sub(gapA).sub(gapC).toNumber();
+  const wg = Number(new Decimal(fullWidth).sub(gapA).sub(gapC).toFixed(3));
 
   return wg;
 };
@@ -40,7 +41,8 @@ export const calcProductWG = ({ fullWidth, gapA, gapC }: { fullWidth: number; ga
 // 所以這個計算是要配合apiGetProdCalcGeneralSpec取得新的gapA與gapC再使用
 /**計算fullWidth 單位為mm*/
 export const calcProductFullWidth = ({ WG, gapA, gapC }: { WG: number; gapA: number; gapC: number }) => {
-  const fullWidth = new Decimal(WG).add(gapA).add(gapC).toNumber();
+  // const fullWidth = new Decimal(WG).add(gapA).add(gapC).toNumber();
+  const fullWidth = Number(new Decimal(WG).add(gapA).add(gapC).toFixed(3));
 
   return fullWidth;
 };

@@ -23,7 +23,8 @@
   border: solid 1px $colorBorder01;
   .thead {
     display: grid;
-    grid-template-columns: 2fr 2fr 7fr 1.5fr;
+    // grid-template-columns: 2fr 2fr 7fr 1.5fr;
+    grid-template-columns: 2fr 7fr 1.5fr;
     padding: 11px 0;
     > div {
       text-align: center;

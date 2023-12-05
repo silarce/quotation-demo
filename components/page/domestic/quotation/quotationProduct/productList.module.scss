@@ -15,7 +15,8 @@
 }
 
 .column {
-  display: inline-block;
+  display: inline-flex;
+  gap: 5px;
   padding: 2px 3px;
   // margin-left: 16px;
   vertical-align: bottom;

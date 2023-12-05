@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 
@@ -116,7 +116,9 @@ export default function Edit({ isAdmin, userInfo }: { isAdmin: boolean; userInfo
   const [isShowPdf, setIsShowPdf] = useState(false);
 
   // ----------------------------------------------------
-  const { data: contract, update } = useGetContract_id_noItems(contractId);
+  const { data: contract, update } = useGetContract_id_noItems(contractId, {
+    populate: ['worksheet.contractProductItems'],
+  });
   const engineeringContactId = contract?.engineeringContactId;
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
@@ -606,35 +608,75 @@ export default function Edit({ isAdmin, userInfo }: { isAdmin: boolean; userInfo
 
   // ----------------------------------------------------
 
+  const doorTypeQtyList = useMemo(() => {
+    type TdoorTypeQtyList = {
+      [key: string]: number;
+    };
+
+    const list: TdoorTypeQtyList = {};
+
+    const itemArr = contract?.worksheet?.contractProductItems ?? [];
+    itemArr.forEach((item) => {
+      const { doorModelName } = item;
+
+      if (!list[doorModelName]) {
+        list[doorModelName] = 0;
+      }
+
+      list[doorModelName] = list[doorModelName] + 1;
+    });
+
+    return list;
+  }, [contract]);
+
+  const control_profile_doorType: Tcontroll_profile['doorType'] = useMemo(() => {
+    const arr: Tcontroll_profile['doorType']['arr'] = Object.keys(doorTypeQtyList).map((key) => {
+      const qty = doorTypeQtyList[key];
+
+      return {
+        doorTypeName: key,
+        qty: String(qty) + '樘',
+      };
+    });
+
+    return {
+      arr,
+      totalQty: String(contract?.worksheet?.contractProductItems.length ?? 0) + '樘',
+    };
+  }, [contract]);
+
   const control_profile: Tcontroll_profile = {
-    projectNumber: {
-      value: profile.projectNumber,
-      onChange: (v) => {
-        changeProfile('projectNumber', v);
+    info: {
+      projectNumber: {
+        value: profile.projectNumber,
+        onChange: (v) => {
+          changeProfile('projectNumber', v);
+        },
+        disabled: true,
+        showBaseline: 'invisible',
       },
-      disabled: true,
-      showBaseline: 'invisible',
-    },
-    projectName: {
-      value: profile.projectName,
-      onChange: (v) => {
-        changeProfile('projectName', v);
+      projectName: {
+        value: profile.projectName,
+        onChange: (v) => {
+          changeProfile('projectName', v);
+        },
+        disabled: true,
+        showBaseline: 'invisible',
       },
-      disabled: true,
-      showBaseline: 'invisible',
-    },
-    requirementsDate: {
-      value: profile.requirementsDate,
-      onChange: (v) => {
-        changeProfile('requirementsDate', v);
+      requirementsDate: {
+        value: profile.requirementsDate,
+        onChange: (v) => {
+          changeProfile('requirementsDate', v);
+        },
       },
-    },
-    dispatchDate: {
-      value: profile.dispatchDate,
-      onChange: (v) => {
-        changeProfile('dispatchDate', v);
+      dispatchDate: {
+        value: profile.dispatchDate,
+        onChange: (v) => {
+          changeProfile('dispatchDate', v);
+        },
       },
     },
+    doorType: control_profile_doorType,
   };
 
   // ------------------------------------------------
