@@ -129,17 +129,15 @@ export default function Quotation() {
 // =================================================================
 
 function TheQuotation({ router }: { router: NextRouter }) {
-  // const {
-  //   id: quotationId, //報價單id //若為新增報價單則為undefined
-  // } = router.query as { id: string | undefined };
   const {
     id: quotationId, //報價單id //若為新增報價單則為undefined
     contentId,
   } = router.query as {
     id: string | undefined;
+    // 從查詢報價單的展開列表點進來的話query裡就會有contentId
     contentId: string | undefined;
   };
-  const { userInfo, userGrade } = useContext(AppContext);
+  const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
 
   // -----------------------------------------------------
