@@ -1128,9 +1128,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // setEditNotes(v);
     setShowMemoModal(false);
 
-    setTimeout(() => {
-      reqUpdateQuotation({ editNotes: v });
-    }, 10);
+    reqUpdateQuotation({ editNotes: v });
+    // setTimeout(() => {
+    // }, 10);
   };
 
   const tagList: TtagList = [
