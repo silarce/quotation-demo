@@ -1233,7 +1233,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //     }
     //   : null,
 
-    !contentId && status === 'Contracting'
+    // !contentId && status === 'Contracting'
+    !contentId && status === 'Pending'
       ? { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) }
       : null,
 
