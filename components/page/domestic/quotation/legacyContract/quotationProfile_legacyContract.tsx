@@ -127,7 +127,7 @@ export default function QuotationProfile({
     const contact = customer.contacts;
     const contactPerson = contact?.[0]?.name ?? '';
     const contactNumber = contact?.[0]?.phone ?? '';
-    const theContactPerson = `${contactPerson} ${contactNumber}`;
+    const theContactPerson = `${contactPerson}${contactNumber}`;
 
     classLegacyContract.customer = customer;
     classBasicInfo.customerName = customer.name;
