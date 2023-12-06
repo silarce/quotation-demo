@@ -1210,7 +1210,7 @@ export default function WorkSheet({
         projectName: profile.projectName,
         projectAddress: profile.allAddress,
         customerName: contract?.content.customer.name ?? '',
-        contactPerson: engineeringContact?.contactInfo?.[0].contactPerson ?? '',
+        contactPerson: engineeringContact?.contactInfo?.[0]?.contactPerson ?? '',
         // 開單日
         billingDate: workSheet?.createdAt ? getTaiwanDateStr(workSheet.createdAt) ?? '' : '', // 未知
         // 出貨日
