@@ -11,6 +11,9 @@
  * reqReview 審核
  *
  */
+
+// 業務與業務主管審核過後，status就會自動轉為Pending
+
 // =============================================================
 // =============================================================
 // =============================================================
@@ -1495,7 +1498,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       reviewResult: isPass,
     };
 
-    if (status === 'Contracting' && !verifyForm) {
+    // if (status === 'Contracting' && !verifyForm) {
+    if (status === 'Pending' && !verifyForm) {
       return myAlert.warning({ title: '請先送出合約審核表' });
     }
 
