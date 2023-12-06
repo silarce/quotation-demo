@@ -1238,7 +1238,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       ? { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) }
       : null,
 
-    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+    !contentId && status !== 'Pending' ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
 
     {
       type: 'myButton',
@@ -1263,6 +1263,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
+    if (status === 'Pending') {
+      return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
+    }
+
     setIsLoading(true);
 
     for (const prod of Object.values(productList)) {
