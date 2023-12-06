@@ -2654,6 +2654,10 @@ class Class_product {
 
   /**門片厚度 */
   get thickness() {
+    if (!this._prodData.thickness) {
+      return '';
+    }
+
     return this._prodData.thickness + ' t';
   }
   set thickness(v) {
@@ -2862,7 +2866,7 @@ class Class_product {
       accessories: this.acceBodyArr,
       order: 0,
 
-      thickness: this.thickness || '',
+      thickness: this._prodData.thickness || '0',
 
       distributionBoxPrice: Number(this.subComList.distributionBox.price),
       distributionBoxUnitPrice: Number(this.subComList.distributionBox.unitPrice),

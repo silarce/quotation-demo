@@ -9,6 +9,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import Profile, {
   Tcontroll as Tcontroll_profile,
+  TdoorTypeItem,
 } from 'components/page/worksDepartment/contracList/contract/gear/profile';
 import Sheet, {
   Tcontroll as Tcontroll_sheet,
@@ -630,7 +631,7 @@ export default function Edit({ isAdmin, userInfo }: { isAdmin: boolean; userInfo
   }, [contract]);
 
   const control_profile_doorType: Tcontroll_profile['doorType'] = useMemo(() => {
-    const arr: Tcontroll_profile['doorType']['arr'] = Object.keys(doorTypeQtyList).map((key) => {
+    const arr: TdoorTypeItem[] = Object.keys(doorTypeQtyList).map((key) => {
       const qty = doorTypeQtyList[key];
 
       return {

@@ -102,7 +102,13 @@ export default function AddressBar({
       setDistrict_l(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [county.props?.value, county_l]);
+  }, [
+    // county.props?.value的型別是Toption，一定會有value
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    county.props?.value?.value,
+    county_l,
+  ]);
 
   // ------------------------------------------------------------------
 

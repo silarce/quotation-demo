@@ -19,13 +19,13 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-import { useForm } from 'react-hook-form';
+// import { useForm } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
 // components
-import QuotationProfile, { TreturnBody } from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationSinature_3, {
   TemployeeDto,
   Tcontroll_signature,
@@ -92,10 +92,23 @@ import { useProductList } from 'hooks/quotation/useProduct';
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-import { TcreateQuotationProductDto } from 'js/api/dtoTypes';
+import { TcreateQuotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
 // ------------------------------------------------------------------
-// ------------------------------------------------------------------
+
+type Tprofile = {
+  validityPeriod: string;
+  projectName: string;
+  county: string;
+  district: string;
+  address: string;
+  contactPerson: string;
+  contactNumber: string;
+  faxNumber: string;
+  trackProgress: string;
+  projectProgress: string;
+};
+
 // ------------------------------------------------------------------
 export default function Quotation() {
   const router = useRouter();
@@ -206,7 +219,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const latestContent = quotationData?.latestContent ?? quotationContentData;
   const lastestContentId = latestContent?.id;
-  const status = latestContent?.status;
+  // const status = latestContent?.status;
   const verifyForm = latestContent?.verifyForm;
   const attachedToContract = quotationData?.attachedToContract;
 
@@ -290,6 +303,122 @@ function TheQuotation({ router }: { router: NextRouter }) {
     removeFileInfo,
     toSetFileInfo,
   };
+
+  // -----------------------------------------------------
+  let agentEmployee: TemployeeDto | undefined | null;
+
+  if (!quotationId) {
+    agentEmployee = userInfo?.employee;
+  } else {
+    agentEmployee = latestContent?.agentEmployee;
+  }
+  // -----------------------------------------------------
+
+  // const [editNotes, setEditNotes] = useState<string>('');
+
+  // console.log(editNotes);
+
+  const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
+
+  const [customer, setCustomer] = useState<TcustomerDto | undefined | null>();
+  const [profile, setProfile] = useState<Tprofile>(creEmptyProfile());
+
+  const changeProfile = (key: keyof Tprofile, value: string) => {
+    setProfile((state) => {
+      return {
+        ...state,
+        [key]: value,
+      };
+    });
+  };
+
+  useEffect(() => {
+    setStatus(latestContent?.status ?? 'Budget');
+    // setEditNotes(latestContent?.editNotes ?? '');
+
+    setCustomer(latestContent?.customer ?? null);
+
+    setProfile({
+      validityPeriod: latestContent?.validityPeriod ?? '',
+      projectName: latestContent?.projectName ?? '',
+      county: latestContent?.county ?? '',
+      district: latestContent?.district ?? '',
+      address: latestContent?.address ?? '',
+      contactPerson: latestContent?.contactPerson ?? '',
+      contactNumber: latestContent?.contactNumber ?? '',
+      faxNumber: latestContent?.faxNumber ?? '',
+      trackProgress: latestContent?.trackProgress ?? '',
+      projectProgress: latestContent?.projectProgress ?? '',
+    });
+  }, [quotationData, quotationContentData]);
+
+  const control_profile = useMemo(() => {
+    const control_profile: Tcontrol_profile = {
+      quotationNumber: latestContent?.quotationNumber ?? '',
+      quotationDate: latestContent?.quotationDate ?? '',
+      customer: {
+        value: customer,
+        onChange: (customer) => {
+          const contact = customer.contacts?.[0];
+          const name = contact?.name ?? '';
+          const phone = contact?.phone ?? '';
+
+          setCustomer(customer);
+          changeProfile('contactPerson', `${name}${phone}`);
+          changeProfile('contactNumber', phone);
+        },
+        onClear: () => {
+          setCustomer(null);
+          changeProfile('contactPerson', '');
+          changeProfile('contactNumber', '');
+        },
+      },
+      itemList: {
+        validityPeriod: {
+          value: profile.validityPeriod,
+          onChange: (v) => changeProfile('validityPeriod', v),
+        },
+        projectName: {
+          value: profile.projectName,
+          onChange: (v) => changeProfile('projectName', v),
+        },
+        county: {
+          value: profile.county,
+          onChange: (v) => changeProfile('county', v),
+        },
+        district: {
+          value: profile.district,
+          onChange: (v) => changeProfile('district', v),
+        },
+        address: {
+          value: profile.address,
+          onChange: (v) => changeProfile('address', v),
+        },
+        contactPerson: {
+          value: profile.contactPerson,
+          onChange: (v) => changeProfile('contactPerson', v),
+        },
+        contactNumber: {
+          value: profile.contactNumber,
+          onChange: (v) => changeProfile('contactNumber', v),
+        },
+        faxNumber: {
+          value: profile.faxNumber,
+          onChange: (v) => changeProfile('faxNumber', v),
+        },
+        trackProgress: {
+          value: profile.trackProgress,
+          onChange: (v) => changeProfile('trackProgress', v),
+        },
+        projectProgress: {
+          value: profile.projectProgress,
+          onChange: (v) => changeProfile('projectProgress', v),
+        },
+      },
+    };
+
+    return control_profile;
+  }, [profile]);
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -657,7 +786,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // }, [latestContent]);
 
   // ---------------------------------------------------------
-  const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
+  // const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
   // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
@@ -739,50 +868,51 @@ function TheQuotation({ router }: { router: NextRouter }) {
       ? latestContent?.quotationDate
       : moment(latestContent?.quotationDate).toISOString();
 
-    reset({
-      quotationDate: quotationDate,
-      validityPeriod: latestContent?.validityPeriod,
-      // customerId: lContent.customer.id,
-      customer: latestContent?.customer,
-      projectName: latestContent?.projectName,
-      county: latestContent?.county,
-      district: latestContent?.district,
-      address: latestContent?.address,
-      contactPerson: latestContent?.contactPerson,
-      contactNumber: latestContent?.contactNumber,
-      faxNumber: latestContent?.faxNumber,
-      discount: latestContent?.discount,
-      quantity: latestContent?.quantity,
-      editNotes: latestContent?.editNotes,
-      status: latestContent?.status ?? 'Budget',
-      // managerEmployee: latestContent?.managerEmployee,
-      // supervisorEmployee: latestContent?.supervisorEmployee,
-      // 審核流程改變，下方簽名bar的人等同審核人員(除了經辦)
-      managerEmployee: latestContent?.reviewSupervisorEmployee,
-      supervisorEmployee: latestContent?.reviewSalesEmployee,
-      //
-      //
-      agentEmployee: agentEmployee,
-      //
-      //
-      trackProgress: latestContent?.trackProgress,
-      projectProgress: latestContent?.projectProgress,
-    });
+    // reset({
+    //   editNotes: latestContent?.editNotes,
+    //   status: latestContent?.status ?? 'Budget',
+
+    // quotationDate: quotationDate,
+    // validityPeriod: latestContent?.validityPeriod,
+    // customerId: lContent.customer.id,
+    // customer: latestContent?.customer,
+    // projectName: latestContent?.projectName,
+    // county: latestContent?.county,
+    // district: latestContent?.district,
+    // address: latestContent?.address,
+    // contactPerson: latestContent?.contactPerson,
+    // contactNumber: latestContent?.contactNumber,
+    // faxNumber: latestContent?.faxNumber,
+    // discount: latestContent?.discount,
+    // quantity: latestContent?.quantity,
+    // managerEmployee: latestContent?.managerEmployee,
+    // supervisorEmployee: latestContent?.supervisorEmployee,
+    // 審核流程改變，下方簽名bar的人等同審核人員(除了經辦)
+    // managerEmployee: latestContent?.reviewSupervisorEmployee,
+    // supervisorEmployee: latestContent?.reviewSalesEmployee,
+    //
+    //
+    // agentEmployee: agentEmployee,
+    //
+    //
+    // trackProgress: latestContent?.trackProgress,
+    // projectProgress: latestContent?.projectProgress,
+    // });
   }, [quotationData, quotationContentData]);
 
-  const onProfileChange = (v: Partial<TreturnBody>) => {
-    setValue('validityPeriod', v.validityPeriod ?? '');
-    setValue('customer', v.customer);
-    setValue('projectName', v.projectName ?? '');
-    setValue('county', v.county ?? '');
-    setValue('district', v.district ?? '');
-    setValue('address', v.address ?? '');
-    setValue('contactPerson', v.contactPerson ?? '');
-    setValue('contactNumber', v.contactNumber ?? '');
-    setValue('faxNumber', v.faxNumber ?? '');
-    setValue('trackProgress', v.trackProgress ?? '');
-    setValue('projectProgress', v.projectProgress ?? '');
-  };
+  // const onProfileChange = (v: Partial<TreturnBody>) => {
+  //   setValue('validityPeriod', v.validityPeriod ?? '');
+  //   setValue('customer', v.customer);
+  //   setValue('projectName', v.projectName ?? '');
+  //   setValue('county', v.county ?? '');
+  //   setValue('district', v.district ?? '');
+  //   setValue('address', v.address ?? '');
+  //   setValue('contactPerson', v.contactPerson ?? '');
+  //   setValue('contactNumber', v.contactNumber ?? '');
+  //   setValue('faxNumber', v.faxNumber ?? '');
+  //   setValue('trackProgress', v.trackProgress ?? '');
+  //   setValue('projectProgress', v.projectProgress ?? '');
+  // };
 
   // --------------------------------------------------------------
 
@@ -995,13 +1125,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return myAlert.warning({ title: '請輸入註解' });
     }
 
-    setValue('editNotes', v);
-
+    // setEditNotes(v);
     setShowMemoModal(false);
 
-    setTimeout(() => {
-      reqUpdateQuotation();
-    }, 10);
+    reqUpdateQuotation({ editNotes: v });
+    // setTimeout(() => {
+    // }, 10);
   };
 
   const tagList: TtagList = [
@@ -1036,9 +1165,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       // 報價/歷史狀態狀態
       custom: (
         <QuotationStateSel
-          quotationState={{ value: watch('status')!, label: quotationStatusLookup[watch('status')!] }}
+          quotationState={{ value: status, label: quotationStatusLookup[status] }}
           setQuotationState={(option) => {
-            setValue('status', option.value as TquotationContentDto['status']);
+            setStatus(option.value as TquotationContentDto['status']);
           }}
           history={history}
         />
@@ -1129,9 +1258,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
-  const reqUpdateQuotation = async () => {
-    const data_watch = watch();
-
+  const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
     setIsLoading(true);
 
     for (const prod of Object.values(productList)) {
@@ -1172,7 +1299,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         return preBody;
       }) ?? [];
 
-    if (!data_watch.agentEmployee?.id) {
+    if (!agentEmployee?.id) {
       setIsLoading(false);
 
       return myAlert.err({ title: '沒有取得經辦資料', content: '請聯絡開發人員' });
@@ -1204,25 +1331,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
       // quotationDate: data_watch.quotationDate ?? '',
       // 使用者需求:報價時間應為更新時間，也就會是上傳的時間
       quotationDate: new Date().toISOString(),
-      validityPeriod: data_watch.validityPeriod ?? '',
-      //
-      customerId: data_watch.customer?.id ?? '',
-      //
-      projectName: data_watch.projectName ?? '',
-      county: data_watch.county ?? '',
-      district: data_watch.district ?? '',
-      address: data_watch.address ?? '',
-      contactPerson: data_watch.contactPerson ?? '',
-      contactNumber: data_watch.contactNumber ?? '',
-      faxNumber: data_watch.faxNumber ?? '',
-      quantity: prodQty ?? 0,
-      editNotes: data_watch.editNotes ?? '',
-      status: data_watch.status ?? 'Budget',
 
-      managerId: data_watch.managerEmployee?.id ?? null,
-      supervisorId: data_watch.supervisorEmployee?.id ?? null,
+      validityPeriod: profile.validityPeriod ?? '',
       //
-      agentId: data_watch.agentEmployee?.id,
+      customerId: customer?.id ?? '',
+      //
+      projectName: profile.projectName ?? '',
+      county: profile.county ?? '',
+      district: profile.district ?? '',
+      address: profile.address ?? '',
+      contactPerson: profile.contactPerson ?? '',
+      contactNumber: profile.contactNumber ?? '',
+      faxNumber: profile.faxNumber ?? '',
+      quantity: prodQty ?? 0,
+      editNotes: editNotes ?? '',
+      status: status ?? 'Budget',
+
+      // managerId: data_watch.managerEmployee?.id ?? null,
+      // supervisorId: data_watch.supervisorEmployee?.id ?? null,
+      //
+      agentId: agentEmployee?.id || '',
       //
       //
       annotations: anno,
@@ -1230,8 +1358,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
       //
       // faxNumber: data_watch.customer?.fax ?? '',
-      trackProgress: data_watch.trackProgress ?? '',
-      projectProgress: data_watch.projectProgress ?? '',
+      trackProgress: profile.trackProgress ?? '',
+      projectProgress: profile.projectProgress ?? '',
 
       discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
       subTotal: Number(summary.subTotal.replaceAll(',', '')),
@@ -1287,7 +1415,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         router.push({
           query: {
             ...router.query,
-            status: data_watch.status,
+            status: status,
           },
         });
 
@@ -1465,9 +1593,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile //
-            profile={latestContent}
+            // profile={latestContent}
             disabled={disabled}
-            onProfileChange={onProfileChange}
+            // onProfileChange={onProfileChange}
+            control={control_profile}
           />
 
           <div className={classNames(style.switchBar)}>
@@ -1711,3 +1840,18 @@ const countPayInfoValue = ({
     total: totalStr,
   };
 };
+
+// =================================================================
+
+const creEmptyProfile = (): Tprofile => ({
+  validityPeriod: '',
+  projectName: '',
+  county: '',
+  district: '',
+  address: '',
+  contactPerson: '',
+  contactNumber: '',
+  faxNumber: '',
+  trackProgress: '',
+  projectProgress: '',
+});

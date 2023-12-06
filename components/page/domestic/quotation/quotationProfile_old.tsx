@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import classNames from 'classnames';
 
 // glogal gear
@@ -20,7 +21,7 @@ import { Toption } from 'js/utils/options/countryAndDistrict';
 
 // ====================================================
 import { TcustomerDto } from 'js/api/dtoTypes';
-import { TcustomerDto_TC } from 'js/api/api_customer';
+import { useCustomersById, TcustomerDto_TC } from 'js/api/api_customer';
 // ====================================================
 
 const wrapperStyle = {
@@ -37,137 +38,83 @@ const inputSelProps: TinputSelProps = {
 };
 
 // ====================================================
-// type TquotationProfile = {
-//   id: string;
-//   quotationNumber: string;
-//   quotationDate: string; // 報價日期
-//   validityPeriod: string; // 報價時效
-//   projectName: string; // 工程名稱
-//   county: string; // 縣市
-//   district: string; // 區
-//   address: string;
-//   contactPerson: string; //  聯絡人
-//   contactNumber: string; //  聯絡電話
-//   faxNumber: string; // 傳真號碼
-//   customer: TcustomerDto;
-//   trackProgress: string;
-//   projectProgress: string;
-// };
-
-// type TformBody = {
-//   validityPeriod: string;
-//   customerId?: string;
-//   projectName: string;
-//   county: string;
-//   district: string;
-//   address: string; // 剩餘地址
-//   contactPerson: string;
-//   contactNumber: string;
-//   faxNumber: string;
-//   trackProgress: string; // 追蹤狀態
-//   projectProgress: string; // 工地進度
-// };
-
-// type TreturnBody = {
-//   validityPeriod: string;
-//   customer: TcustomerDto | undefined;
-//   projectName: string;
-//   county: string;
-//   district: string;
-//   contactPerson: string;
-//   contactNumber: string;
-//   faxNumber: string;
-//   address?: string; // 剩餘地址
-
-//   trackProgress?: string; // 追蹤狀態
-//   projectProgress?: string; // 工地進度
-// };
-
-// -----------------------------------------------------------------------
-
-type TcontrolItem = {
-  value: string;
-  onChange?: (v: string) => void;
-};
-
-type Tcontrol = {
-  quotationNumber: string; // 報價編號
+type TquotationProfile = {
+  id: string;
+  quotationNumber: string;
   quotationDate: string; // 報價日期
-  // customer: TcustomerDto;
-  customer: {
-    value: TcustomerDto | undefined | null;
-    onChange?: (v: TcustomerDto) => void;
-    onClear?: () => void;
-  };
-  //
-  itemList: {
-    validityPeriod: TcontrolItem; // 報價時效
-    projectName: TcontrolItem; // 工程名稱
-    county: TcontrolItem; // 縣市
-    district: TcontrolItem; // 區
-    address: TcontrolItem;
-    contactPerson: TcontrolItem; //  聯絡人
-    contactNumber: TcontrolItem; //  聯絡電話
-    faxNumber: TcontrolItem; // 傳真號碼
-    trackProgress: TcontrolItem;
-    projectProgress: TcontrolItem;
-  };
+  validityPeriod: string; // 報價時效
+  projectName: string; // 工程名稱
+  county: string; // 縣市
+  district: string; // 區
+  address: string;
+  contactPerson: string; //  聯絡人
+  contactNumber: string; //  聯絡電話
+  faxNumber: string; // 傳真號碼
+  customer: TcustomerDto;
+  trackProgress: string;
+  projectProgress: string;
 };
 
-export type {
-  // TreturnBody,
-  // TquotationProfile,
-  Tcontrol as Tcontrol_profile,
+type TformBody = {
+  validityPeriod: string;
+  customerId?: string;
+  projectName: string;
+  county: string;
+  district: string;
+  address: string; // 剩餘地址
+  contactPerson: string;
+  contactNumber: string;
+  faxNumber: string;
+  trackProgress: string; // 追蹤狀態
+  projectProgress: string; // 工地進度
 };
+type TreturnBody = {
+  validityPeriod: string;
+  customer: TcustomerDto | undefined;
+  projectName: string;
+  county: string;
+  district: string;
+  contactPerson: string;
+  contactNumber: string;
+  faxNumber: string;
+  address?: string; // 剩餘地址
+  // api還沒上的資料
+  trackProgress?: string; // 追蹤狀態
+  projectProgress?: string; // 工地進度
+};
+
+export type { TreturnBody, TquotationProfile };
 
 // =================================================================
 export default function QuotationProfile({
-  // profile,
+  profile,
   disabled = false,
-  // onProfileChange,
-  control,
+  onProfileChange,
 }: {
-  // profile: TquotationProfile | undefined;
+  profile: TquotationProfile | undefined;
   disabled: boolean;
   // onProfileChange?: (v: Partial<TprofileReturnBody>) => void;
-  // onProfileChange?: (v: Partial<TreturnBody>) => void;
-  control: Tcontrol;
+  onProfileChange?: (v: Partial<TreturnBody>) => void;
 }) {
   // ----------------------------------------------------------------
 
   const [showModal, setShowModal] = useState(false);
   const openModal = () => (disabled ? '' : setShowModal(true));
   // ----------------------------------------------------------------
-  // const { register, control, reset, watch, setValue } = useForm<TformBody>();
-  // const watchState = useWatch({ control });
+  const { register, control, reset, watch, setValue } = useForm<TformBody>();
+  const watchState = useWatch({ control });
 
-  // useEffect(() => {
-  //   onProfileChange?.({ ...watchState, customer: data_customer });
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [watchState]);
+  useEffect(() => {
+    onProfileChange?.({ ...watchState, customer: data_customer });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchState]);
 
   // ----------------------------------------------------------------
   // 報價單資料
-  // const {
-  //   id,
-  //   quotationNumber,
-  //   quotationDate,
-  //   validityPeriod,
-  //   projectName,
-  //   county,
-  //   district,
-  //   address,
-  //   contactPerson,
-  //   contactNumber,
-  //   faxNumber,
-  //   customer,
-  //   trackProgress,
-  //   projectProgress,
-  // } = profile ?? {};
-
-  const { quotationNumber, quotationDate, customer, itemList } = control;
-
   const {
+    id,
+    quotationNumber,
+    quotationDate,
     validityPeriod,
     projectName,
     county,
@@ -176,103 +123,109 @@ export default function QuotationProfile({
     contactPerson,
     contactNumber,
     faxNumber,
+    customer,
     trackProgress,
     projectProgress,
-  } = itemList;
-
+  } = profile ?? {};
   // ----------------------------------------------------------------
 
   // 客戶資料
-  // const { data: data_customer, setData: setCustomer, update: update_cunstomer } = useCustomersById(customer?.id);
+  const { data: data_customer, setData: setCustomer, update: update_cunstomer } = useCustomersById(customer?.id);
   // 取消編輯時重置用的
-  // const [customerOri, setCustomerOri] = useState<TcustomerDto_TC>();
+  const [customerOri, setCustomerOri] = useState<TcustomerDto_TC>();
 
   // 客戶名稱與與傳真號碼要從data_customer取得
   // 還有客戶types
 
   // ----------------------------------------------------------------
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const res = await update_cunstomer();
+  useEffect(() => {
+    (async () => {
+      const res = await update_cunstomer();
 
-  //     if (res) {
-  //       setValue('customerId', res.id);
+      if (res) {
+        setValue('customerId', res.id);
 
-  //       if (!customerOri && profile?.id) {
-  //         setCustomerOri(res);
-  //       }
-  //     }
-  //   })();
+        if (!customerOri && profile?.id) {
+          setCustomerOri(res);
+        }
+      }
+    })();
 
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   // ----------------------------------------------------------------
 
-  // useEffect(() => {
-  //   reset({
-  //     validityPeriod,
-  //     customerId: customer?.id,
-  //     projectName,
-  //     county,
-  //     district,
-  //     contactPerson,
-  //     contactNumber,
-  //     faxNumber,
-  //     address,
-  //     // api還沒上的資料
-  //     trackProgress,
-  //     projectProgress,
-  //   });
-  //   setCustomer(customerOri);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [profile, disabled]);
+  useEffect(() => {
+    reset({
+      validityPeriod,
+      customerId: customer?.id,
+      projectName,
+      county,
+      district,
+      contactPerson,
+      contactNumber,
+      faxNumber,
+      address,
+      // api還沒上的資料
+      trackProgress,
+      projectProgress,
+    });
+    setCustomer(customerOri);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, disabled]);
 
   // ----------------------------------------------------------------
   // 客戶資料
   const theClientData = [
-    { key: 'contactPerson', label: '聯絡人', placeholder: '尚未選擇' },
-    { key: 'contactNumber', label: '聯絡電話', placeholder: '尚未選擇' },
-    { key: 'faxNumber', label: '傳真號碼', placeholder: '尚未選擇' },
+    { key: 'contactPerson', label: '聯絡人', placeholder: '尚未選擇', value: watch('contactPerson') },
+    { key: 'contactNumber', label: '聯絡電話', placeholder: '尚未選擇', value: watch('contactNumber') },
+    { key: 'faxNumber', label: '傳真號碼', placeholder: '尚未選擇', value: watch('faxNumber') },
   ] as const;
 
   // 工程地點
-
   const addressProps: TaddressProps = {
     county: {
       props: {
         isDisabled: disabled,
-        value: county.value ? { value: county.value, label: county.value } : null,
+        value: watch('county') ? { value: watch('county'), label: watch('county') } : null,
         onChange: (option: Toption | null) => {
-          county.onChange?.(option?.value ?? '');
+          if (!option) {
+            return;
+          }
+
+          setValue('county', option.value);
+          setValue('district', '');
         },
       },
     },
     district: {
       props: {
         isDisabled: disabled,
-        value: district.value ? { value: district.value, label: district.value } : null,
+        value: watch('district') ? { value: watch('district'), label: watch('district') } : null,
         onChange: (option: Toption | null) => {
-          district.onChange?.(option?.value ?? '');
+          if (!option) {
+            return;
+          }
+
+          setValue('district', option.value);
         },
       },
     },
     address: {
       props: {
         disabled,
+        // style: { height: 30 },
         className: 'overflow-hidden',
-        value: address.value,
-        onChange: (e) => {
-          address.onChange?.(e.target.value);
-        },
+        ...register('address'),
       },
     },
   };
 
   // ----------------------------------------------------------------
   // const customerTypes = data_customer?.types.map((type) => type.name).join('/');
-  const customerTypes = customer.value?.types.map((type) => customerTypesLookup[type.name]).join('/');
+  const customerTypes = data_customer?.types.map((type) => customerTypesLookup[type.name]).join('/');
   const styleHaveState = customerTypes ? scss.haveState : '';
 
   // ----------------------------------------------------------------
@@ -281,25 +234,18 @@ export default function QuotationProfile({
       return;
     }
 
-    customer.onChange?.(v[0]);
+    const contact = v[0].contacts[0];
+    const name = contact?.name ?? '';
+    const phone = contact?.phone ?? '';
 
-    // const contact = v[0].contacts[0];
-    // const name = contact?.name ?? '';
-    // const phone = contact?.phone ?? '';
+    const contactPerson = `${name}${phone}`;
 
-    // const contactPerson = `${name}${phone}`;
-
-    // setCustomer(v[0]);
-
-    // setValue('customerId', v[0].id);
+    setCustomer(v[0]);
+    setValue('customerId', v[0].id);
     // setValue('contactPerson', v[0].contacts[0]?.name ?? '');
-    // setValue('contactPerson', contactPerson);
-    // setValue('contactNumber', v[0].contacts[0]?.phone ?? '');
-    // setValue('faxNumber', v[0].fax ?? '');
-
-    // contactPerson.onChange(`${name}${phone}`);
-    // contactNumber.onChange(phone);
-    // faxNumber.onChange(v[0].fax ?? '');
+    setValue('contactPerson', contactPerson);
+    setValue('contactNumber', v[0].contacts[0]?.phone ?? '');
+    setValue('faxNumber', v[0].fax ?? '');
   };
 
   const clearClient = () => {
@@ -307,15 +253,10 @@ export default function QuotationProfile({
       return;
     }
 
-    customer.onClear?.();
-
-    // setCustomer(undefined);
-    // setValue('customerId', undefined);
-
-    // contactPerson.onChange('');
-
-    // setValue('contactPerson', '');
-    // setValue('contactNumber', '');
+    setCustomer(undefined);
+    setValue('customerId', undefined);
+    setValue('contactPerson', '');
+    setValue('contactNumber', '');
   };
 
   // ----------------------------------------------------------------------
@@ -331,10 +272,7 @@ export default function QuotationProfile({
           {...inputSelProps}
           textareaProps={{
             props: {
-              value: projectName.value,
-              onChange: (e) => {
-                projectName.onChange?.(e.target.value);
-              },
+              ...register('projectName'),
               className: 'overflow-hidden',
               // style: { height: '40px' },
             },
@@ -354,21 +292,21 @@ export default function QuotationProfile({
                 textareaProps={{
                   props: {
                     placeholder: undefined,
-                    value: customer.value?.name ?? '',
+                    value: data_customer?.name ?? '',
                     className: 'overflow-hidden',
                     // style: { height: 30 },
                   },
                 }}
               />
-              {!customer.value && <button onClick={openModal}>請選擇客戶</button>}
-              {customer.value && !disabled && <IconRemove02 onClick={clearClient} />}
+              {!data_customer && <button onClick={openModal}>請選擇客戶</button>}
+              {data_customer && !disabled && <IconRemove02 onClick={clearClient} />}
             </div>
           </div>
 
           <div>
             {/* 聯絡人，連絡電話，傳真號碼 */}
             {theClientData.map((item, index) => {
-              const { key, label, placeholder } = item;
+              const { key, label, value, placeholder } = item;
 
               return (
                 <InputSel
@@ -382,10 +320,7 @@ export default function QuotationProfile({
                   inputProps={{
                     props: {
                       placeholder: placeholder,
-                      value: itemList[key].value,
-                      onChange: (e) => {
-                        itemList[key].onChange?.(e.target.value);
-                      },
+                      ...register(key),
                     },
                   }}
                 />
@@ -401,10 +336,7 @@ export default function QuotationProfile({
               {...inputSelProps}
               inputProps={{
                 props: {
-                  value: trackProgress.value,
-                  onChange: (e) => {
-                    trackProgress.onChange?.(e.target.value);
-                  },
+                  ...register('trackProgress'),
                 },
               }}
             />
@@ -417,15 +349,12 @@ export default function QuotationProfile({
               {...inputSelProps}
               inputProps={{
                 props: {
-                  value: projectProgress.value,
-                  onChange: (e) => {
-                    projectProgress.onChange?.(e.target.value);
-                  },
+                  ...register('projectProgress'),
                 },
               }}
             />
           </div>
-        </div>
+        </div>{' '}
         {/* form02 */}
         <AddressBar
           addressProps={addressProps}
@@ -467,10 +396,7 @@ export default function QuotationProfile({
             wrapperStyle={{ gap: wrapperStyle.gap }}
             inputProps={{
               props: {
-                value: validityPeriod.value,
-                onChange: (e) => {
-                  validityPeriod.onChange?.(e.target.value);
-                },
+                ...register('validityPeriod'),
               },
             }}
           />
@@ -503,3 +429,5 @@ export default function QuotationProfile({
     </div>
   );
 }
+
+// ===================================================
