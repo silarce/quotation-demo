@@ -154,6 +154,24 @@ export const optionsCreator_quoteType = (props: { haveEmpty?: boolean } = {}): T
   return arr;
 };
 
+export const optionsCreator_quoteType_02 = (props: { haveEmpty?: boolean } = {}): Toption[] => {
+  const { haveEmpty } = props;
+  const arr = [
+    { value: '捲門' as const, label: '捲門' },
+    { value: '伸縮大門' as const, label: '伸縮大門' },
+    { value: '水閘門' as const, label: '水閘門' },
+    { value: '上折門' as const, label: '上折門' },
+    { value: '機庫門' as const, label: '機庫門' },
+    { value: '客製化' as const, label: '客製化' },
+  ];
+
+  if (haveEmpty) {
+    addEmpty(arr);
+  }
+
+  return arr;
+};
+
 export const optionsCreator_bottomBar = createOptionsCreator({
   optionsArr: [
     { value: 'none', label: '無' },
@@ -180,6 +198,20 @@ export const optionsCreator_closingType = createOptionsCreator({
   optionsArr: [
     { value: '電動', label: '電動' },
     { value: '手動', label: '手動' },
+  ],
+});
+
+export const optionsCreator_horsePower = createOptionsCreator({
+  optionsArr: [
+    { value: '1/4HP', label: '1/4HP' },
+    { value: '1/3HP', label: '1/3HP' },
+    { value: '1/2HP', label: '1/2HP' },
+    { value: '3/4HP', label: '3/4HP' },
+    { value: '1HP', label: '1HP' },
+    { value: '1 1/2HP', label: '1 1/2HP' },
+    { value: '2HP', label: '2HP' },
+    { value: '3HP', label: '3HP' },
+    { value: '5HP', label: '5HP' },
   ],
 });
 
