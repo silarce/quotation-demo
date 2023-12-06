@@ -10,4 +10,5 @@ export const quotationStatusLookup = Object.freeze({
   Bidding: '投標',
   Contracting: '發包',
   Contract: '合約',
+  Pending: '準合約',
 } as const);

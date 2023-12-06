@@ -282,6 +282,14 @@ const sidePathList: TsidePathList = {
               erpFeature: [domestic],
             },
             {
+              label: '準合約',
+              path: path01 + '/quotationList',
+              query: {
+                status: 'Pending',
+              },
+              erpFeature: [domestic],
+            },
+            {
               label: '合約',
               path: path01 + '/contract',
               erpFeature: [domestic],
