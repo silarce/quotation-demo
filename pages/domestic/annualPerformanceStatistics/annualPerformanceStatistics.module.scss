@@ -11,7 +11,8 @@
 
 .grid {
   display: grid;
-  grid-template-rows: 38px 34px repeat(14, 54px);
+  // grid-template-rows: 38px 34px repeat(14, 54px);
+  grid-template-rows: 38px 34px repeat(15, 54px);
   grid-auto-columns: 125px;
   grid-auto-flow: column;
 
