@@ -7,7 +7,11 @@ import {
   optionsCre_doorTrack_typhoonProtection,
   getDoorTrackByDoorModel,
 } from 'js/utils/options/doorTrackOptions';
-import { optionsCreator_doorModel, optionsCreator_quoteType } from 'js/utils/options/productOptions';
+import {
+  optionsCreator_doorModel,
+  optionsCreator_quoteType_02,
+  optionsCreator_horsePower,
+} from 'js/utils/options/productOptions';
 
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
@@ -783,7 +787,7 @@ function prodCellConfigCre(): TprodCellConfig {
           wrapperStyle: { width: '105px' },
           selectProps: {
             props: {
-              options: optionsCreator_quoteType(),
+              options: optionsCreator_quoteType_02(),
             },
           },
         },
@@ -942,13 +946,16 @@ function prodCellConfigCre(): TprodCellConfig {
           },
         },
       },
+      // optionsCreator_horsePower
       horsepower: {
         id: 'horsepower',
         label: '馬力',
         inputSelProps: {
-          wrapperStyle: { width: '90px' },
-          inputProps: {
-            props: {},
+          wrapperStyle: { width: '100px' },
+          selectProps: {
+            props: {
+              options: optionsCreator_horsePower(),
+            },
           },
         },
       },
