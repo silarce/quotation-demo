@@ -828,3 +828,40 @@ export const useQuotationAccounting_area = (params: { year: number; month: numbe
     update,
   };
 };
+
+type Tparam_accounting_modifyContract = {
+  employeeId: string;
+  year: number;
+  month: number;
+  area: string;
+};
+
+/**追加工程統計表 */
+const apiQuotationAccounting_modifyContract = async (params: Tparam_accounting_modifyContract) => {
+  const api = `/quotation/accounting/modify-contract/${params.employeeId}`;
+
+  return axi
+    .get(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**追加工程統計表 */
+const useQuotationAccounting_modifyContract = (params: Tparam_accounting_modifyContract) => {
+  const [res, setRes] = useState<object[]>();
+
+  const update = async () => {
+    const newRes = await apiQuotationAccounting_modifyContract(params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
