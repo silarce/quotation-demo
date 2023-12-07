@@ -2477,6 +2477,24 @@ class Class_product {
     return this._prodData.typhoonProtection;
   }
   set typhoonProtection(v) {
+    if (this.doorType !== 'SJ-302') {
+      if ((v = false)) {
+        return;
+      }
+
+      v = false;
+    }
+
+    if (this.doorType === 'SJ-312') {
+      if ((v = true)) {
+        return;
+      }
+
+      v = true;
+    }
+
+    //
+
     this._prodData.typhoonProtection = v;
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
