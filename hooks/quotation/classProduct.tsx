@@ -1847,7 +1847,8 @@ class Class_product {
       };
 
       if (
-        (withHook === null || withHook === this.typhoonProtection) &&
+        // (withHook === null || withHook === this.typhoonProtection) &&
+        (withHook ?? false) === this.typhoonProtection &&
         (hasSilencingStrip === null || hasSilencingStrip === this.doorTrackSilencerStrip)
       ) {
         return option;
