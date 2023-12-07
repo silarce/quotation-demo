@@ -16,15 +16,14 @@ import Table, {
 // gaer
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar/selectBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // option
 import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from 'js/utils/options/options';
 
 // api
 import { useQuotationAccounting_personalContract } from 'js/api/api_quotation';
-
-// css
-import scss from './index.module.scss';
+import { useEmployee, Tparams } from 'js/api/api_employee';
 
 // ==================================================================
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
@@ -32,32 +31,93 @@ type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 type Tquery = {
   year: string | undefined;
   month: string | undefined;
-  region: 'northern' | 'central' | 'southern' | 'eastern' | undefined;
+  emp: string | undefined;
   keyWord: string | undefined;
 };
 
 // ==================================================================
 const yearOptionArr = optionsCreator_year();
 const monthOptionArr = optionsCreator_month();
-const regionOptionArr = optionsCreator_region({ emptyOption: true });
 
 // ==================================================================
 export default function AdditionalEngineeringStatistics() {
   const router = useRouter();
-  const { year, month, region } = router.query as Tquery;
+  const { year, month, emp } = router.query as Tquery;
+
+  useEffect(() => {
+    const now = new Date();
+    const theYear = year || now.getFullYear() - 1911;
+    const theMonth = month || now.getMonth() + 1;
+
+    router.push({
+      query: {
+        year: theYear,
+        month: theMonth,
+      },
+    });
+  }, []);
+
+  // ------------------------------------------------------------------
+  const [isLoading, setIsLoading] = useState(false);
 
   // ------------------------------------------------------------------
 
-  const { data, update } = useQuotationAccounting_personalContract({
-    employeeId: '0a02a368-3a7b-4804-9d7e-954c5f67e5ea',
-    // employeeId: '738a9b5f-1f82-4210-8610-87597f8156da',
-    year: 2023,
-    month: 11,
-  });
+  const params = {
+    year: year ? Number(year) + 1911 : new Date().getFullYear(),
+    month: month ? Number(month) : new Date().getMonth() + 1,
+    employeeId: emp,
+  };
+
+  const { data, update } = useQuotationAccounting_personalContract(params);
+
+  const toUpdateData = async () => {
+    try {
+      setIsLoading(true);
+      await update();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得報表失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    update();
+    toUpdateData();
+  }, [year, month, emp]);
+
+  // ------------------------------------------------------------------
+
+  const empParams: Tparams = {
+    pageSize: 99999,
+    populate: ['jobs.department'],
+    filter: {
+      'jobs.department.name': { $eq: '營業部' },
+    },
+  };
+
+  const { data: data_emp, update: update_emp } = useEmployee(empParams);
+
+  useEffect(() => {
+    update_emp();
   }, []);
+
+  const empOptionArr = useMemo(() => {
+    if (!data_emp) {
+      return [];
+    }
+
+    const empArr = data_emp.data;
+
+    const optionArr = empArr.map((emp) => {
+      return {
+        label: emp.chName || emp.enName || '---',
+        value: emp.id,
+      };
+    });
+
+    return optionArr;
+  }, [data_emp]);
 
   // ------------------------------------------------------------------
 
@@ -194,6 +254,24 @@ export default function AdditionalEngineeringStatistics() {
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
+        value: emp,
+        options: empOptionArr,
+        onChange: (option) => {
+          if (typeof option?.value === 'string') {
+            router.push({
+              query: {
+                ...router.query,
+                emp: option.value,
+              },
+            });
+          }
+        },
+      },
+      placeholder: '選擇員工',
+      boxStyle: { width: '140px' },
+    },
+    {
+      selectProps: {
         value: year,
         options: yearOptionArr,
         onChange: (option) => {
@@ -228,31 +306,13 @@ export default function AdditionalEngineeringStatistics() {
       placeholder: '選擇月份',
       boxStyle: { width: '140px' },
     },
-    {
-      selectProps: {
-        value: region,
-        options: regionOptionArr,
-        onChange: (option) => {
-          if (typeof option?.value === 'string') {
-            router.push({
-              query: {
-                ...router.query,
-                region: option.value,
-              },
-            });
-          }
-        },
-      },
-      placeholder: '選擇區域',
-      boxStyle: { width: '140px' },
-    },
   ];
 
   const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
 
   // ------------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isLoading}>
       <PageHeader02 tag="個人業績統計表" customeLeft={customeLeft} />
 
       <Table control={control} />

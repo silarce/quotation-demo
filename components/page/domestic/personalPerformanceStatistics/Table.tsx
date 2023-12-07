@@ -52,7 +52,7 @@ export default function Table({ control }: { control: Tcontrol }) {
     <div className={classNames(scss.table)}>
       <Thead listKeyArr={listKeyArr} />
       <Tbody rowArr={rowArr} listKeyArr={listKeyArr} />
-      <Footer subTotalList={subTotalList} total={total} listKeyArr={listKeyArr} />
+      {rowArr.length > 0 && <Footer subTotalList={subTotalList} total={total} listKeyArr={listKeyArr} />}
     </div>
   );
 }

@@ -890,11 +890,20 @@ const apiQuotationAccounting_personalContract = async (params: Tparam_accounting
 };
 
 /**個人業績統計表_合約 */
-export const useQuotationAccounting_personalContract = (params: Tparam_accounting_personalContract) => {
+// export const useQuotationAccounting_personalContract = (params: Tparam_accounting_personalContract) => {
+export const useQuotationAccounting_personalContract = (
+  params: Omit<Tparam_accounting_personalContract, 'employeeId'> & { employeeId?: string | undefined }
+) => {
   const [res, setRes] = useState<TquotationAccounting_personal_contract[]>();
 
   const update = async () => {
-    const newRes = await apiQuotationAccounting_personalContract(params);
+    if (!params.employeeId) {
+      return;
+    }
+
+    const theParams = params as Tparam_accounting_personalContract;
+
+    const newRes = await apiQuotationAccounting_personalContract(theParams);
 
     if (newRes) {
       setRes(newRes);
