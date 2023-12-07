@@ -294,6 +294,10 @@ class Class_product {
   }
   set doorType(v) {
     this._product.doorType = v;
+
+    const options = this.options_doorTrack;
+    this.doorTrack = options[0]?.value ?? '';
+
     this._reRender();
   }
 
@@ -477,7 +481,8 @@ class Class_product {
   }
   set typhoonProtection(v) {
     this._product.typhoonProtection = v;
-    this._product.doorTrack = '';
+    const options = this.options_doorTrack;
+    this.doorTrack = options[0]?.value ?? '';
     this._reRender();
   }
 
