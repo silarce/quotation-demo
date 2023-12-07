@@ -109,41 +109,41 @@ const doorTrack_sorted: TdoorTrack_sorted = {
   'SJ-120A': {
     sJ120A_100_25_105_25: {
       value: 'sJ120A_100_25_105_25',
-      label: 'sJ120A_100_25_105_25',
+      label: 'SJ120A_100_25_105_25',
       icon: icon_sJ120A_100_25_105_25.src,
     },
   },
   'SJ-302': {
     sJ302_30: {
       value: 'sJ302_30',
-      label: 'sJ302_30',
+      label: 'SJ302_30',
       icon: icon_sJ302_30.src,
     },
     sj302_75_30t: {
       //
       value: 'sj302_75_30t',
-      label: 'sj302_75_30t',
+      label: 'Sj302_75_30t',
       icon: icon_sj302_75_30t.src,
       typhoonProtection: 'true',
     },
     sJ302_90_30t: {
       //
       value: 'sJ302_90_30t',
-      label: 'sJ302_90_30t',
+      label: 'SJ302_90_30t',
       icon: icon_sJ302_90_30t.src,
       typhoonProtection: 'true',
     },
     sJ302_95_30t: {
       //
       value: 'sJ302_95_30t',
-      label: 'sJ302_95_30t',
+      label: 'SJ302_95_30t',
       icon: icon_sJ302_95_30t.src,
       typhoonProtection: 'true',
     },
     sJ302_95_45t: {
       //
       value: 'sJ302_95_45t',
-      label: 'sJ302_95_45t',
+      label: 'SJ302_95_45t',
       icon: icon_sJ302_95_45t.src,
       typhoonProtection: 'true',
     },
@@ -151,39 +151,39 @@ const doorTrack_sorted: TdoorTrack_sorted = {
   'SJ-303A': {
     sJ303A_100_25_25: {
       value: 'sJ303A_100_25_25',
-      label: 'sJ303A_100_25_25',
+      label: 'SJ303A_100_25_25',
       icon: icon_sJ303A_100_25_25.src,
     },
     sJ303A_100_65_25: {
       value: 'sJ303A_100_65_25',
-      label: 'sJ303A_100_65_25',
+      label: 'SJ303A_100_65_25',
       icon: icon_sJ303A_100_65_25.src,
     },
   },
   'SJ-303S': {
     sJ303S_85: {
       value: 'sJ303S_85',
-      label: 'sJ303S_85',
+      label: 'SJ303S_85',
       icon: icon_sJ303S_85.src,
     },
   },
   'SJ-305D': {
     sJ305D_22: {
       value: 'sJ305D_22',
-      label: 'sJ305D_22',
+      label: 'SJ305D_22',
       icon: icon_sJ305D_22.src,
     },
   },
   'SJ-312': {
     sJ312_106_60t: {
       value: 'sJ312_106_60t',
-      label: 'sJ312_106_60t',
+      label: 'SJ312_106_60t',
       icon: icon_sJ312_106_60t.src,
       typhoonProtection: 'true',
     },
     sJ312_150_90t: {
       value: 'sJ312_150_90t',
-      label: 'sJ312_150_90t',
+      label: 'SJ312_150_90t',
       icon: icon_sJ312_150_90t.src,
       typhoonProtection: 'true',
     },
