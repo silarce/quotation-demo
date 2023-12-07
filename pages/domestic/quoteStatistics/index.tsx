@@ -18,9 +18,9 @@ import { useQuotationAccounting } from 'js/api/api_quotation';
 
 // option
 import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from 'js/utils/options/options';
-const monthOptionArr = optionsCreator_month({ emptyOption: true });
-const regionOptionArr = optionsCreator_region({ emptyOption: true });
 const yearOptionArr = optionsCreator_year();
+const monthOptionArr = optionsCreator_month();
+const regionOptionArr = optionsCreator_region({ emptyOption: true });
 
 type Tquery = {
   year: string | undefined;
