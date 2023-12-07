@@ -108,6 +108,38 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
         };
       }
 
+      if (status === 'Contracting') {
+        return {
+          // 同時滿足兩個條件
+          $and: {
+            // 1 使用者為經辦或任一階段的審核者
+            '1': {
+              $or: {
+                'latestContent.agentEmployee.id': { $eq: userId },
+                'latestContent.reviewSalesEmployee.id': { $eq: userId },
+                'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+                'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+                'latestContent.reviewManagerEmployee.id': { $eq: userId },
+              },
+            },
+            // 2 報價單已送審審核業務或業務主管
+            '2': {
+              $or: {
+                'latestContent.toSalesAt': { $notNull: true },
+                'latestContent.toSupervisorAt': { $notNull: true },
+              },
+            },
+            // 3 報價單沒有同時被審核業務與業務主管審核過
+            '3': {
+              $or: {
+                'latestContent.salesReviewedAt': { $null: true },
+                'latestContent.supervisorReviewedAt': { $null: true },
+              },
+            },
+          },
+        };
+      }
+
       return {
         // 同時滿足兩個條件
         $and: {
@@ -163,6 +195,30 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
             '2': {
               $and: {
                 'latestContent.salesReviewedAt': { $notNull: true },
+              },
+            },
+          },
+        };
+      }
+
+      if (status === 'Contracting') {
+        return {
+          $and: {
+            // 1 使用者為經辦或任一階段的審核者
+            '1': {
+              $or: {
+                'latestContent.agentEmployee.id': { $eq: userId },
+                'latestContent.reviewSalesEmployee.id': { $eq: userId },
+                'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+                'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+                'latestContent.reviewManagerEmployee.id': { $eq: userId },
+              },
+            },
+            // 2 報價單被業務與業務主管審核過
+            '2': {
+              $and: {
+                'latestContent.salesReviewedAt': { $notNull: true },
+                'latestContent.supervisorReviewedAt': { $notNull: true },
               },
             },
           },
@@ -392,4 +448,5 @@ const statusLookup = {
   Budget: '預算',
   Bidding: '投標',
   Contracting: '發包',
+  Pending: '準合約',
 };

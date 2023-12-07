@@ -1847,7 +1847,8 @@ class Class_product {
       };
 
       if (
-        (withHook === null || withHook === this.typhoonProtection) &&
+        // (withHook === null || withHook === this.typhoonProtection) &&
+        (withHook ?? false) === this.typhoonProtection &&
         (hasSilencingStrip === null || hasSilencingStrip === this.doorTrackSilencerStrip)
       ) {
         return option;
@@ -2003,6 +2004,12 @@ class Class_product {
   set doorType(v) {
     this._prodData.doorType = v;
     this.clearProd_all();
+
+    if (v === 'SJ-312') {
+      this._prodData.typhoonProtection = true;
+    } else if (v !== 'SJ-302') {
+      this._prodData.typhoonProtection = false;
+    }
 
     if (!this.doorTrack) {
       this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
@@ -2476,7 +2483,29 @@ class Class_product {
     return this._prodData.typhoonProtection;
   }
   set typhoonProtection(v) {
+    if (this.doorType === 'SJ-312') {
+      if ((v = true)) {
+        return;
+      }
+
+      v = true;
+    } else if (this.doorType !== 'SJ-302') {
+      if ((v = false)) {
+        return;
+      }
+
+      v = false;
+    }
+
+    if (v === this._prodData.typhoonProtection) {
+      this.reRender();
+
+      return;
+    }
+
+    //
     this._prodData.typhoonProtection = v;
+
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
     // this.doorTrack = '';
@@ -2489,6 +2518,12 @@ class Class_product {
     // onDoorTypeChange必須放在賦值之後再執行
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
     this.reRender();
+  }
+
+  get isTyphoonProtectionDisabled() {
+    if (this.doorType !== 'SJ-302') {
+      return true;
+    }
   }
 
   // 彈射門

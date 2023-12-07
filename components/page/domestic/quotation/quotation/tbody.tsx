@@ -447,7 +447,11 @@ function DndRow({
               return null;
             }
 
-            const theDisabled = disabled;
+            let theDisabled = disabled;
+
+            if (key === 'typhoonProtection' && item.isTyphoonProtectionDisabled) {
+              theDisabled = item.isTyphoonProtectionDisabled;
+            }
 
             // if (key === 'quantity') {
             //   // item.disabled_quantity === true ? (theDisabled = true) : undefined;
