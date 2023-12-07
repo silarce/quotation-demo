@@ -25,6 +25,8 @@ import type {
   TquotationAccouting,
   TquotationAccouting_years,
   TquotationAccouting_area,
+  TquotationAccounting_personal_content,
+  TquotationAccounting_personal_contract,
 } from './dtoTypes';
 
 export type {
@@ -43,6 +45,8 @@ export type {
   TquotationAccouting,
   TquotationAccouting_years,
   TquotationAccouting_area,
+  TquotationAccounting_personal_content,
+  TquotationAccounting_personal_contract,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -852,6 +856,45 @@ const useQuotationAccounting_modifyContract = (params: Tparam_accounting_modifyC
 
   const update = async () => {
     const newRes = await apiQuotationAccounting_modifyContract(params);
+
+    if (newRes) {
+      setRes(newRes);
+    }
+
+    return newRes;
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
+// /quotation/accounting/personal-contract/{employeeId}
+
+type Tparam_accounting_personalContract = {
+  employeeId: string;
+  year: number;
+  month: number;
+};
+
+/**個人業績統計表_合約 */
+const apiQuotationAccounting_personalContract = async (params: Tparam_accounting_personalContract) => {
+  const api = `/quotation/accounting/personal-contract/${params.employeeId}`;
+  // const api = `/quotation/accounting/personal-quotation/${params.employeeId}`;
+
+  return axi
+    .get<TquotationAccounting_personal_contract[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+/**個人業績統計表_合約 */
+export const useQuotationAccounting_personalContract = (params: Tparam_accounting_personalContract) => {
+  const [res, setRes] = useState<object[]>();
+
+  const update = async () => {
+    const newRes = await apiQuotationAccounting_personalContract(params);
 
     if (newRes) {
       setRes(newRes);

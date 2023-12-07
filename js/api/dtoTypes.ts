@@ -1564,6 +1564,26 @@ export type TquotationAccouting_area = {
   percentage: number; // 百分比
 };
 
+// 個人業績統計表_報價單
+export type TquotationAccounting_personal_content = {
+  project_name: string;
+  quotation_number: string;
+  quotetype: string;
+  totalsum: `${number}`;
+  pricesum: `${number}`;
+  percentage: number;
+};
+
+// 個人業績統計表_合約
+export type TquotationAccounting_personal_contract = {
+  projectname: string;
+  quotationnumber: string;
+  quotetype: string;
+  totalsum: `${number}`;
+  pricesum: `${number}`;
+  percentage: number;
+};
+
 // ========================================================================
 // ========================================================================
 // ========================================================================

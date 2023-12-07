@@ -342,11 +342,11 @@ const sidePathList: TsidePathList = {
               path: path01 + '/quoteStatistics',
               erpFeature: [statisticsTable],
             },
-            // {
-            //   label: '個人業績統計表',
-            //   path: path01 + '/personalPerformanceStatistics',
-            //   erpFeature: [statisticsTable],
-            // },
+            {
+              label: '個人業績統計表',
+              path: path01 + '/personalPerformanceStatistics',
+              erpFeature: [statisticsTable],
+            },
             {
               label: '全區業績統計表',
               path: path01 + '/regionalPerformanceStatistics',
