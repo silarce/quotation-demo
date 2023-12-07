@@ -119,10 +119,34 @@ const doorTrack_sorted: TdoorTrack_sorted = {
       label: 'sJ302_30',
       icon: icon_sJ302_30.src,
     },
-    sj302_75_30t: { value: 'sj302_75_30t', label: 'sj302_75_30t', icon: icon_sj302_75_30t.src },
-    sJ302_90_30t: { value: 'sJ302_90_30t', label: 'sJ302_90_30t', icon: icon_sJ302_90_30t.src },
-    sJ302_95_30t: { value: 'sJ302_95_30t', label: 'sJ302_95_30t', icon: icon_sJ302_95_30t.src },
-    sJ302_95_45t: { value: 'sJ302_95_45t', label: 'sJ302_95_45t', icon: icon_sJ302_95_45t.src },
+    sj302_75_30t: {
+      //
+      value: 'sj302_75_30t',
+      label: 'sj302_75_30t',
+      icon: icon_sj302_75_30t.src,
+      typhoonProtection: 'true',
+    },
+    sJ302_90_30t: {
+      //
+      value: 'sJ302_90_30t',
+      label: 'sJ302_90_30t',
+      icon: icon_sJ302_90_30t.src,
+      typhoonProtection: 'true',
+    },
+    sJ302_95_30t: {
+      //
+      value: 'sJ302_95_30t',
+      label: 'sJ302_95_30t',
+      icon: icon_sJ302_95_30t.src,
+      typhoonProtection: 'true',
+    },
+    sJ302_95_45t: {
+      //
+      value: 'sJ302_95_45t',
+      label: 'sJ302_95_45t',
+      icon: icon_sJ302_95_45t.src,
+      typhoonProtection: 'true',
+    },
   },
   'SJ-303A': {
     sJ303A_100_25_25: {
@@ -155,11 +179,13 @@ const doorTrack_sorted: TdoorTrack_sorted = {
       value: 'sJ312_106_60t',
       label: 'sJ312_106_60t',
       icon: icon_sJ312_106_60t.src,
+      typhoonProtection: 'true',
     },
     sJ312_150_90t: {
       value: 'sJ312_150_90t',
       label: 'sJ312_150_90t',
       icon: icon_sJ312_150_90t.src,
+      typhoonProtection: 'true',
     },
   },
 };

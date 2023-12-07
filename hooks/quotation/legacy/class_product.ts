@@ -198,17 +198,29 @@ class Class_product {
   };
 
   get options_doorTrack() {
-    const options_doorTrack_byDoorModel = getDoorTrackByDoorModel({ doorModelName: this._product.doorType });
+    let options_doorTrack_byDoorModel = getDoorTrackByDoorModel({ doorModelName: this._product.doorType });
 
     if (options_doorTrack_byDoorModel) {
+      const typhoonProtection = this._product.typhoonProtection;
+
+      options_doorTrack_byDoorModel = options_doorTrack_byDoorModel.filter((item) => {
+        if (typhoonProtection) {
+          return item.typhoonProtection === 'true';
+        } else {
+          return item.typhoonProtection !== 'true';
+        }
+      });
+
       return options_doorTrack_byDoorModel;
     }
 
-    if (this.typhoonProtection) {
-      return this.options_doorTrack_typhoonProtection;
-    } else {
-      return this.options_doorTrack_normal;
-    }
+    return this.options_doorTrack_normal;
+
+    // if (this.typhoonProtection) {
+    //   return this.options_doorTrack_typhoonProtection;
+    // } else {
+    //   return this.options_doorTrack_normal;
+    // }
   }
 
   get options_doorModel_byQuoteType() {
