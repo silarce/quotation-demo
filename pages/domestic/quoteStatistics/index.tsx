@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 
@@ -6,11 +6,11 @@ import Decimal from 'decimal.js';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
-import Table from 'components/page/domestic/quoteStatistics/index/Table';
+import Table, { Tcontrol_row, TcontrolTotalList } from 'components/page/domestic/quoteStatistics/index/Table';
 
 // gaer
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar/selectBar';
+import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
 // api
@@ -58,49 +58,121 @@ export default function QuoteStatistics() {
     });
   }, []);
 
-  const { formatedDataArr, listPriceTotal, bearPriceTotal, percent } = useMemo(() => {
+  const { control_rowArr, groupListKeyArr, control_totalList } = useMemo(() => {
     if (!data) {
       return {
-        formatedDataArr: [],
-        listPriceTotal: '0',
-        bearPriceTotal: '0',
-        percent: '0',
+        control_rowArr: [],
+        groupListKeyArr: [],
+        control_totalList: {},
       };
     }
 
-    let listPriceTotal = 0;
-    let bearPriceTotal = 0;
-    let percent = new Decimal(0);
+    const list: {
+      [key: string /**quotation_number */]: Tcontrol_row;
+    } = {};
 
-    const arr: Tdata[] = data.map((item) => {
-      listPriceTotal += Number(item.pricesum || 0);
-      bearPriceTotal += Number(item.totalsum || 0);
-      percent = percent.add(item.percentage ?? 0);
+    // 只是要在最後取key
+    const quoteTypeQtyList: { [key: string]: number } = {};
 
-      return {
-        idNumber: item.quotation_number,
-        designDepartment: '',
-        constructionName: item.project_name,
-        customer: [
-          {
-            customerName: item.customername,
-            contactPerson: item.contactperson,
-            contactPhone: item.contactnumber,
-            listPrice: Number(item.pricesum).toLocaleString(),
-            bearPrice: Number(item.totalsum).toLocaleString(),
-            percent: `${item.percentage ?? ''}%`,
-          },
-        ],
+    const totalList: {
+      [key: string]: {
+        listPrice: number;
+        bearPrice: number;
+        percent: number;
+      };
+    } = {};
+
+    data.forEach((item) => {
+      const {
+        //
+        quotation_number,
+        // quotetype,
+        project_name,
+        customername,
+        contactperson,
+        contactnumber,
+        // percentage,
+        pricesum,
+        totalsum,
+        percentage,
+      } = item;
+
+      let quotetype = item.quotetype;
+
+      if (!quotetype) {
+        quotetype = '無資料';
+      }
+
+      quoteTypeQtyList[quotetype] = (quoteTypeQtyList[quotetype] ?? 0) + 1;
+
+      // _______________________
+      if (!totalList[quotetype]) {
+        totalList[quotetype] = {
+          listPrice: 0,
+          bearPrice: 0,
+          percent: 0,
+        };
+      }
+
+      totalList[quotetype].listPrice += Number(pricesum || 0);
+      totalList[quotetype].bearPrice += Number(totalsum || 0);
+      totalList[quotetype].percent = new Decimal(totalList[quotetype].percent).add(percentage ?? 0).toNumber();
+
+      // _______________________
+
+      if (!list[quotation_number]) {
+        list[quotation_number] = {
+          idNumber: quotation_number,
+          designDepartment: '',
+          constructionName: project_name,
+          subRowArr: [],
+        };
+      }
+
+      let subRowIndex = list[quotation_number].subRowArr.findIndex((item) => {
+        return item.customerName === customername;
+      });
+
+      if (subRowIndex === -1) {
+        list[quotation_number].subRowArr.push({
+          customerName: customername,
+          contactPerson: contactperson,
+          contactPhone: contactnumber,
+          groupList: {},
+        });
+        subRowIndex = 0;
+      }
+
+      list[quotation_number].subRowArr[subRowIndex].groupList[quotetype] = {
+        listPrice: Number(item.pricesum).toLocaleString(),
+        bearPrice: Number(item.totalsum).toLocaleString(),
+        percent: `${item.percentage ?? ''}%`,
       };
     });
 
-    const percent_locale = percent.div(arr.length).toFixed(1) + '%';
+    const groupListKeyArr = Object.keys(quoteTypeQtyList);
+
+    groupListKeyArr.forEach((key) => {
+      const qty = quoteTypeQtyList[key];
+      const percent = totalList[key].percent;
+      totalList[key].percent = Number(new Decimal(percent).div(qty).toFixed(2));
+    });
+
+    const control_totalList: TcontrolTotalList = {};
+
+    Object.keys(totalList).forEach((key) => {
+      control_totalList[key] = {
+        listPrice: totalList[key].listPrice.toLocaleString(),
+        bearPrice: totalList[key].bearPrice.toLocaleString(),
+        percent: `${totalList[key].percent ?? ''}%`,
+      };
+    });
 
     return {
-      formatedDataArr: arr,
-      listPriceTotal: listPriceTotal.toLocaleString(),
-      bearPriceTotal: bearPriceTotal.toLocaleString(),
-      percent: percent_locale,
+      //
+      control_rowArr: Object.values(list),
+      groupListKeyArr,
+      control_totalList,
     };
   }, [data]);
 
@@ -188,11 +260,10 @@ export default function QuoteStatistics() {
     <SubLayer>
       <PageHeader02 tag="報價統計表" customeLeft={customeLeft} panelList={panelList} />
       <Table
-        dataArr={formatedDataArr}
-        totalInfo={{
-          listPrice: listPriceTotal,
-          bearPrice: bearPriceTotal,
-          percent: percent,
+        control={{
+          rowArr: control_rowArr,
+          groupListKeyArr,
+          totalList: control_totalList,
         }}
       />
     </SubLayer>
