@@ -88,22 +88,11 @@ export const useEmployee = (params?: Tparams) => {
     return data;
   };
 
-  const update_infinite = async () => {
-    if (!data) {
-      return;
-    }
-
-    const apiRes = await apiGetEmployee(params);
-    const newData = apiRes.data;
-    const oldData = data.data;
-    apiRes.data = [...oldData, ...newData];
-
-    setData({ ...apiRes });
-
-    return apiRes;
+  return {
+    data,
+    setData,
+    update,
   };
-
-  return { data, setData, update, update_infinite };
 };
 
 export const useCheckEmployee = (idNumber: string) => {
