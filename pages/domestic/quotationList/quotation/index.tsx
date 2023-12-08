@@ -1269,16 +1269,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     try {
       setIsLoading(true);
-
-      try {
-        await apiQuotationReview({ id: quotationId, body });
-      } catch (error) {
-        myAlert.err({ title: '審核發生錯誤' });
-        console.log(error);
-      }
-
+      await apiQuotationReview({ id: quotationId, body });
       await update();
     } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '審核發生錯誤', content: err.message });
+      console.log(error);
     } finally {
       setIsLoading(false);
       setReviewModalShow(false);
