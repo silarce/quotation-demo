@@ -771,25 +771,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // ----------------------------------------------------------------
 
-  // ----------------------------------------------------------------
-
-  // const [reviewSales, setReviewSales] = useState<TemployeeDto>();
-  // const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
-  // const [reviewWorkDirector, setReviewWorkDirector] = useState<TemployeeDto>();
-
-  // useEffect(() => {
-  //   if (!latestContent) {
-  //     return;
-  //   }
-
-  //   setReviewSales(latestContent.reviewSalesEmployee || undefined);
-  //   setReviewSupervisor(latestContent.reviewSupervisorEmployee || undefined);
-  //   setReviewWorkDirector(latestContent.reviewWorkDirectorEmployee || undefined);
-  // }, [latestContent]);
-
   // ---------------------------------------------------------
-  // const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
-  // const { data, update } = useGetQuotation_id(id as string);
 
   let isReviewer = false;
   let isSales = false;
@@ -854,231 +836,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   }, [quotationId]);
 
-  useEffect(() => {
-    // 直接取外範疇的latestContent
-    // const latestContent = quotationData?.latestContent;
-
-    let agentEmployee;
-
-    if (!quotationId) {
-      agentEmployee = userInfo?.employee;
-    } else {
-      agentEmployee = latestContent?.agentEmployee;
-    }
-
-    const quotationDate = latestContent?.quotationDate
-      ? latestContent?.quotationDate
-      : moment(latestContent?.quotationDate).toISOString();
-
-    // reset({
-    //   editNotes: latestContent?.editNotes,
-    //   status: latestContent?.status ?? 'Budget',
-
-    // quotationDate: quotationDate,
-    // validityPeriod: latestContent?.validityPeriod,
-    // customerId: lContent.customer.id,
-    // customer: latestContent?.customer,
-    // projectName: latestContent?.projectName,
-    // county: latestContent?.county,
-    // district: latestContent?.district,
-    // address: latestContent?.address,
-    // contactPerson: latestContent?.contactPerson,
-    // contactNumber: latestContent?.contactNumber,
-    // faxNumber: latestContent?.faxNumber,
-    // discount: latestContent?.discount,
-    // quantity: latestContent?.quantity,
-    // managerEmployee: latestContent?.managerEmployee,
-    // supervisorEmployee: latestContent?.supervisorEmployee,
-    // 審核流程改變，下方簽名bar的人等同審核人員(除了經辦)
-    // managerEmployee: latestContent?.reviewSupervisorEmployee,
-    // supervisorEmployee: latestContent?.reviewSalesEmployee,
-    //
-    //
-    // agentEmployee: agentEmployee,
-    //
-    //
-    // trackProgress: latestContent?.trackProgress,
-    // projectProgress: latestContent?.projectProgress,
-    // });
-  }, [quotationData, quotationContentData]);
-
-  // const onProfileChange = (v: Partial<TreturnBody>) => {
-  //   setValue('validityPeriod', v.validityPeriod ?? '');
-  //   setValue('customer', v.customer);
-  //   setValue('projectName', v.projectName ?? '');
-  //   setValue('county', v.county ?? '');
-  //   setValue('district', v.district ?? '');
-  //   setValue('address', v.address ?? '');
-  //   setValue('contactPerson', v.contactPerson ?? '');
-  //   setValue('contactNumber', v.contactNumber ?? '');
-  //   setValue('faxNumber', v.faxNumber ?? '');
-  //   setValue('trackProgress', v.trackProgress ?? '');
-  //   setValue('projectProgress', v.projectProgress ?? '');
-  // };
-
-  // --------------------------------------------------------------
-
-  // const [empSelConfirmKey, setEmpSelConfirmKey] = useState<
-  //   'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector' | 'undefined'
-  // >('undefined');
-
-  // const openEmpSel = (v: 'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector') => {
-  //   setEmpSelConfirmKey(v);
-  //   setEmployeeSelectorShow(true);
-  // };
-
-  // const onEmpSelCancel = () => {
-  //   setEmployeeSelectorShow(false);
-  //   setEmpSelConfirmKey('undefined');
-  // };
-
-  // const empSelLookup = {
-  //   reviewSales: {
-  //     label: '請選擇審核業務',
-  //     // tip: '可不選，直接按確定',\
-  //     employee: reviewSales,
-  //     onCancel: onEmpSelCancel,
-  //     onConfirm: (v: TemployeeDto[]) => {
-  //       setReviewSales(v[0]);
-
-  //       if (status === 'Contracting') {
-  //         setTimeout(() => {
-  //           openEmpSel('reviewSupervisor');
-  //         }, 300);
-  //       } else {
-  //         reqSetReviewer({
-  //           reviewSales: v[0],
-  //           reviewSupervisor,
-  //           reviewWorkDirector,
-  //         });
-  //       }
-  //     },
-  //   },
-  //   reviewSupervisor: {
-  //     label: '請選擇業務主管',
-  //     // tip: '可不選，直接按確定',
-  //     employee: reviewSupervisor,
-  //     onCancel: onEmpSelCancel,
-  //     onConfirm: async (v: TemployeeDto[]) => {
-  //       setReviewSupervisor(v[0]);
-  //       onEmpSelCancel();
-  //       setTimeout(() => {
-  //         openEmpSel('reviewWorkDirector');
-  //       }, 300);
-  //     },
-  //   },
-  //   reviewWorkDirector: {
-  //     label: '請選擇應收帳款',
-  //     // tip: '可不選，直接按確定',
-  //     employee: reviewWorkDirector,
-  //     onCancel: onEmpSelCancel,
-  //     onConfirm: (v: TemployeeDto[]) => {
-  //       setReviewWorkDirector(v[0]);
-  //       onEmpSelCancel();
-  //       reqSetReviewer({
-  //         reviewSales,
-  //         reviewSupervisor,
-  //         reviewWorkDirector: v[0],
-  //       });
-  //     },
-  //   },
-  //   undefined: {
-  //     label: '',
-  //     tip: '',
-  //     employee: undefined,
-  //     onCancel: () => {},
-  //     onConfirm: () => {},
-  //   },
-  // };
-
-  // --------------------------------------------------------------------------
-
-  // const signatureArr: TsignatureProps[] = [
-  //   {
-  //     label: '總經理',
-  //     inputProps: {
-  //       props: {
-  //         value: (latestContent?.reviewManagerEmployee?.chName || latestContent?.reviewManagerEmployee?.enName) ?? '',
-  //         placeholder: '尚未選擇',
-  //         disabled: true,
-  //       },
-  //     },
-  //   },
-  //   {
-  //     label: '應收帳款',
-  //     inputProps: {
-  //       props: {
-  //         value:
-  //           (latestContent?.reviewWorkDirectorEmployee?.chName || latestContent?.reviewWorkDirectorEmployee?.enName) ??
-  //           '',
-  //         placeholder: '尚未選擇',
-  //         disabled: true,
-  //       },
-  //     },
-  //   },
-
-  //   {
-  //     label: '業務主管',
-  //     inputProps: {
-  //       props: {
-  //         value:
-  //           (latestContent?.reviewSupervisorEmployee?.chName || latestContent?.reviewSupervisorEmployee?.enName) ?? '',
-  //         placeholder: '尚未選擇',
-  //         disabled: true,
-  //       },
-  //     },
-  //   },
-  //   {
-  //     label: '業務',
-  //     inputProps: {
-  //       props: {
-  //         value: (latestContent?.reviewSalesEmployee?.chName || latestContent?.reviewSalesEmployee?.enName) ?? '',
-  //         placeholder: '尚未選擇',
-  //         disabled: true,
-  //       },
-  //     },
-  //   },
-  //   {
-  //     label: '經辦',
-  //     inputProps: {
-  //       props: {
-  //         // value: (latestContent?.agentEmployee?.chName || latestContent?.agentEmployee?.enName) ?? '',
-  //         value: getValues('agentEmployee.chName') || getValues('agentEmployee.enName') || '',
-  //         disabled: true,
-  //       },
-  //     },
-  //   },
-  // ];
-
-  // const [manager, setManager] = useState<TemployeeDto | null>();
   const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
   const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
   const [sales, setSales] = useState<TemployeeDto | null>();
-  // const [agent, setAgent] = useState<TemployeeDto | null>();
 
   useEffect(() => {
     const {
-      // agentEmployee,
+      //
       reviewSalesEmployee,
       reviewSupervisorEmployee,
       reviewWorkDirectorEmployee,
-      // reviewManagerEmployee,
     } = quotationData?.latestContent ?? {};
 
-    // setManager(agentEmployee);
     setworkDirector(reviewWorkDirectorEmployee);
     setSupervisor(reviewSupervisorEmployee);
     setSales(reviewSalesEmployee);
-    // setAgent(reviewManagerEmployee);
   }, [quotationData, disabled]);
 
   const control_signature: Tcontroll_signature = {
     manager: {
-      // employee: manager,
       employee: quotationData?.latestContent.reviewManagerEmployee,
-      // onChange: (emp) => {
-      //   setManager(emp);
-      // },
       forbidden: true,
     },
     workDirector: {
@@ -1100,16 +877,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
     },
     agent: {
-      // employee: agent,
       employee: quotationData?.latestContent.agentEmployee,
-      // onChange: (emp) => {
-      //   setAgent(emp);
-      // },
       forbidden: true,
     },
   };
-
-  // console.log(control_signature);
 
   // --------------------------------------------------------------------------
 
@@ -1372,9 +1143,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       quantity: prodQty ?? 0,
       editNotes: editNotes ?? '',
       status: status ?? 'Budget',
-
-      // managerId: data_watch.managerEmployee?.id ?? null,
-      // supervisorId: data_watch.supervisorEmployee?.id ?? null,
       //
       agentId: agentEmployee?.id || '',
       //
@@ -1395,11 +1163,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryDate: summary.deliveryDate,
       paymentMethods: paymentMethod,
       //
-      //
       products: prodArr,
       others: getOthersPostBodyArr(),
       // productsOrder: null,
-      //
       //
     };
 
@@ -1472,41 +1238,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }; // reqUpdateQuotation
 
   // --------------------------------------------
-  // const reqSetReviewer = async ({
-  //   reviewSales,
-  //   reviewWorkDirector,
-  //   reviewSupervisor,
-  // }: {
-  //   reviewSales?: TemployeeDto | undefined | null;
-  //   reviewSupervisor?: TemployeeDto | undefined | null;
-  //   reviewWorkDirector?: TemployeeDto | undefined | null;
-  // }) => {
-  //   if (!quotationId) {
-  //     return;
-  //   }
-
-  //   const reviewSalesEmployeeId = reviewSales?.id || null;
-  //   const reviewWorkDirectorEmployeeId = reviewWorkDirector?.id || null;
-  //   const reviewSupervisorEmployeeId = reviewSupervisor?.id || null;
-
-  //   try {
-  //     setIsLoading(true);
-
-  //     const res = await apiQuotationSubmitReview(quotationId, {
-  //       reviewSalesEmployeeId,
-  //       reviewWorkDirectorEmployeeId,
-  //       reviewSupervisorEmployeeId,
-  //     });
-
-  //     await update();
-  //   } catch (error) {
-  //     myAlert.err({ title: '更新審核人員失敗' });
-  //   } finally {
-  //     // setReviewSales(undefined);
-  //     // setReviewSupervisor(undefined);
-  //     // setIsLoading(false);
-  //   }
-  // };
 
   const reqReview = async (isPass: boolean) => {
     if (!quotationId || !isReviewer) {
@@ -1739,7 +1470,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
           {/* 簽名 */}
           {/*  */}
           {/*  */}
-          {/* <QuotationSinature signatureArr={signatureArr} disabled={disabled} /> */}
           <QuotationSinature_3 controll={control_signature} disabled={disabled} />
           {/*  */}
           {/*  */}
@@ -1811,19 +1541,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
         quotationId={latestContent?.quotationNumber ?? ''}
       />
       {/*  */}
-      {/* <EmployeeSelector
-        showModal={employeeSelectorShow}
-        label={empSelLookup[empSelConfirmKey]?.label}
-        // tip={empSelLookup[empSelConfirmKey]?.tip}
-        onConfirm={(v) => {
-          empSelLookup[empSelConfirmKey]?.onConfirm(v);
-        }}
-        onCancel={() => empSelLookup[empSelConfirmKey]?.onCancel()}
-        selLimit={1}
-        defaultEmpArr={
-          empSelLookup[empSelConfirmKey]?.employee ? [empSelLookup[empSelConfirmKey].employee!] : undefined
-        }
-      /> */}
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
@@ -1878,9 +1595,6 @@ const countPayInfoValue = ({
   const tax = Decimal.mul(subTotal || 0, 0.05);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
-  // const subTotalStr = subTotal.toFixed(0).toNumber().toLocaleString();
-  // const taxStr = tax.toFixed(0).toNumber().toLocaleString();
-  // const totalStr = total.toFixed(0).toNumber().toLocaleString();
   const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();
   const taxStr = Number(tax.toFixed(0)).toLocaleString();
   const totalStr = Number(total.toFixed(0)).toLocaleString();
