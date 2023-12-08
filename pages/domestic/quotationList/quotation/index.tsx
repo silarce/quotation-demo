@@ -1254,7 +1254,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     // if (status === 'Contracting' && !verifyForm) {
     if (status === 'Pending' && !verifyForm) {
-      return myAlert.warning({ title: '請先送出合約審核表' });
+      if (isPass) {
+        return myAlert.warning({ title: '請先送出合約審核表' });
+      }
     }
 
     try {
