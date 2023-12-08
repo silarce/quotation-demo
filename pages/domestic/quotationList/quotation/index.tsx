@@ -1592,7 +1592,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
         contractPrice={Number(summary.total.replaceAll(',', ''))}
         lastestContentId={lastestContentId}
         verifyForm={verifyForm}
-        onConfirm={() => update()}
+        onConfirm={async () => {
+          setIsLoading(true);
+          await update();
+          setIsLoading(false);
+        }}
       />
       <ThreeButtonModal
         visible={reviewModalShow}
