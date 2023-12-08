@@ -60,6 +60,7 @@ import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButto
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
+import iconRedLock from 'public/image/icon/redLock.svg';
 
 // css
 import style from './quotation.module.scss';
@@ -81,7 +82,7 @@ import {
   apiPatchQuotation,
   apiQuotationSubmitReview,
   apiQuotationReview,
-  apiQuotationunLock,
+  apiQuotationUnlock,
   //
   useQuotation_id_attachments,
   apiPostQuotation_id_attachments,
@@ -1238,6 +1239,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     !contentId && status !== 'Pending' ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
 
+    status === 'Pending'
+      ? {
+          type: 'myButton',
+          label: '解除鎖定',
+          img: iconRedLock.src,
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定要解除鎖定?',
+              content: '此報價單將會清除所有審核人員並回到預算狀態',
+              props: {
+                onOk: () => {
+                  reqUnlock();
+                },
+              },
+            });
+          },
+        }
+      : null,
+
     {
       type: 'myButton',
       label: '返回',
@@ -1521,6 +1541,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
     } finally {
       setIsLoading(false);
       setReviewModalShow(false);
+    }
+  };
+
+  const reqUnlock = async () => {
+    if (!quotationId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationUnlock(quotationId);
+      await update();
+      myAlert.success({ title: '解除鎖定成功' });
+      router.push({
+        query: {
+          ...router.query,
+          status: 'Budget',
+        },
+      });
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '解除鎖定發生錯誤', content: err.message });
+    } finally {
+      setIsLoading(false);
     }
   };
 
