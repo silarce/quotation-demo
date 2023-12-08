@@ -1260,7 +1260,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       reviewResult: isPass,
     };
 
-    // if (status === 'Contracting' && !verifyForm) {
     if (status === 'Pending' && !verifyForm) {
       if (isPass) {
         return myAlert.warning({ title: '請先送出合約審核表' });
@@ -1294,7 +1293,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       router.push({
         query: {
           ...router.query,
-          status: 'Budget',
+          status: 'Contracting',
         },
       });
     } catch (error) {
