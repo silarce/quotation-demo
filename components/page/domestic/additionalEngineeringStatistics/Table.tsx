@@ -179,9 +179,9 @@ const Footer = ({
           </div>
         </div>
 
-        <div className={scss.group02} style={config.footTotalCell.style}>
+        <div className={scss.footTotalCell} style={config.footTotalCell.style}>
           <div>
-            <span>{'foooo'}</span>
+            <span>{'0'}</span>
           </div>
         </div>
       </div>
@@ -193,9 +193,9 @@ const Footer = ({
           </div>
         </div>
 
-        <div className={scss.group02} style={config.footTotalCell.style}>
+        <div className={scss.footTotalCell} style={config.footTotalCell.style}>
           <div>
-            <span>{'foooo'}</span>
+            <span>{'0'}</span>
           </div>
         </div>
       </div>
@@ -207,9 +207,9 @@ const Footer = ({
           </div>
         </div>
 
-        <div className={scss.group02} style={config.footTotalCell.style}>
+        <div className={scss.footTotalCell} style={config.footTotalCell.style}>
           <div>
-            <span>{'foooo'}</span>
+            <span>{total.pricesum}</span>
           </div>
         </div>
       </div>
