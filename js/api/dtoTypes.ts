@@ -1561,7 +1561,7 @@ export type TquotationAccouting_area = {
   county: string;
   totalsum: string; // 牌價複價
   pricesum: string; // 單價複價
-  percentage: number; // 百分比
+  percentage: number | null; // 百分比
 };
 
 // 個人業績統計表_報價單
@@ -1582,6 +1582,19 @@ export type TquotationAccounting_personal_contract = {
   totalsum: `${number}`;
   pricesum: `${number}`;
   percentage: number;
+};
+
+// 追加減工程統計表
+export type TquotationAccounting_modifyContract = {
+  projectname: string;
+  quotationnumber: string;
+  quotetype: string;
+  year: number;
+  month: number;
+  totalsum: `${number}`;
+  pricesum: `${number}`;
+  county: string;
+  percentage: number | null;
 };
 
 // ========================================================================

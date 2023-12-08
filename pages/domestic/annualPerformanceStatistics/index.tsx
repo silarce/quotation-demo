@@ -85,7 +85,7 @@ export default function AnnualPerformanceStatistics() {
           }
         });
         item_y.inTotal = inTotal.toLocaleString();
-        item_y.成長率 = '成長率';
+        item_y.成長率 = '---';
       });
     });
 

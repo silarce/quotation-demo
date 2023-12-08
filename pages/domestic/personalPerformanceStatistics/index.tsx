@@ -19,7 +19,7 @@ import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // option
-import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from 'js/utils/options/options';
+import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
 
 // api
 import { useQuotationAccounting_personalContract } from 'js/api/api_quotation';
@@ -37,9 +37,10 @@ type Tquery = {
 
 // ==================================================================
 const yearOptionArr = optionsCreator_year();
-const monthOptionArr = optionsCreator_month();
+const monthOptionArr = optionsCreator_month({ emptyOption: true });
 
 // ==================================================================
+// 個人業績統計表
 export default function AdditionalEngineeringStatistics() {
   const router = useRouter();
   const { year, month, emp } = router.query as Tquery;
@@ -47,7 +48,7 @@ export default function AdditionalEngineeringStatistics() {
   useEffect(() => {
     const now = new Date();
     const theYear = year || now.getFullYear() - 1911;
-    const theMonth = month || now.getMonth() + 1;
+    const theMonth = month;
 
     router.push({
       query: {
@@ -63,8 +64,8 @@ export default function AdditionalEngineeringStatistics() {
   // ------------------------------------------------------------------
 
   const params = {
-    year: year ? Number(year) + 1911 : new Date().getFullYear(),
-    month: month ? Number(month) : new Date().getMonth() + 1,
+    year: year ? Number(year) + 1911 : undefined,
+    month: month ? Number(month) : undefined,
     employeeId: emp,
   };
 

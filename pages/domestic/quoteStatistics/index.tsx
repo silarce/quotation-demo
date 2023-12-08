@@ -19,7 +19,7 @@ import { useQuotationAccounting } from 'js/api/api_quotation';
 // option
 import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from 'js/utils/options/options';
 const yearOptionArr = optionsCreator_year();
-const monthOptionArr = optionsCreator_month();
+const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const regionOptionArr = optionsCreator_region({ emptyOption: true });
 
 type Tquery = {
@@ -47,7 +47,7 @@ export default function QuoteStatistics() {
   useEffect(() => {
     const now = new Date();
     const theYear = year || now.getFullYear() - 1911;
-    const theMonth = month || now.getMonth() + 1;
+    const theMonth = month;
 
     router.push({
       query: {

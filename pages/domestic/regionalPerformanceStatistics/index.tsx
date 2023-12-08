@@ -24,38 +24,46 @@ type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 type Tquery = {
   year: string | undefined;
   month: string | undefined;
-
   keyWord: string | undefined;
 };
 
 // ==================================================================
-const monthOptionArr = optionsCreator_month();
+const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const yearOptionArr = optionsCreator_year();
 
 // ==================================================================
+// 全區業績統計表
 export default function RegionalPerformanceStatistics() {
   const router = useRouter();
   const { year, month } = router.query as Tquery;
 
-  const { data, update } = useQuotationAccounting_area({ year: Number(year) + 1911, month: Number(month) });
+  useEffect(() => {
+    const now = new Date();
+    const theYear = year || now.getFullYear() - 1911;
+    const theMonth = month;
+
+    router.push({
+      query: {
+        year: theYear,
+        month: theMonth,
+      },
+    });
+  }, []);
+
+  // ------------------------------------------------------------------
+
+  const params = {
+    year: year ? Number(year) + 1911 : undefined,
+    month: month ? Number(month) : undefined,
+  };
+
+  const { data, update } = useQuotationAccounting_area(params);
 
   useEffect(() => {
-    if (!year || !month) {
-      const yearNum = new Date().getFullYear();
-      const monthNum = new Date().getMonth() + 1;
-
-      router.push({
-        query: {
-          year: yearNum - 1911,
-          month: monthNum,
-        },
-      });
-
-      return;
-    }
-
     update();
   }, [year, month]);
+
+  // ------------------------------------------------------------------
 
   const { formatedList, quotetypeArr } = useMemo(() => {
     if (!data) {
@@ -67,7 +75,20 @@ export default function RegionalPerformanceStatistics() {
     const quotetypeList: { [key: string]: string } = {};
 
     data.forEach((item) => {
-      const { quotetype, year, month, county, totalsum, pricesum, percentage } = item;
+      const { year, month, totalsum, pricesum } = item;
+      let { percentage, quotetype, county } = item;
+
+      if (percentage === null) {
+        percentage = 0;
+      }
+
+      if (!quotetype) {
+        quotetype = '無資料';
+      }
+
+      if (!county) {
+        county = '無城市資料';
+      }
 
       quotetypeList[quotetype] = quotetype;
 
@@ -235,7 +256,7 @@ export default function RegionalPerformanceStatistics() {
               return (
                 <div key={index} className={scss.row}>
                   <div>
-                    <div className={classNames(scss.noBottom, scss.plus)}>
+                    <div className={classNames(scss.noBottom, scss.plus, scss.titleCell)}>
                       <span>{key}</span>
                     </div>
                     <div>
@@ -305,464 +326,3 @@ type TcountList = {
     };
   };
 };
-
-// const fakeData: TquotationAccouting_area[] = [
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 1,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 2,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 3,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 4,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 5,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 6,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 7,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 8,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 9,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 10,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 11,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 12,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   //
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 1,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 2,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 3,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 4,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 5,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 6,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 7,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 8,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 9,
-//     county: '高雄市',
-//     totalsum: '50',
-//     pricesum: '50',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 10,
-//     county: '高雄市',
-//     totalsum: '50',
-//     pricesum: '50',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 11,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 12,
-//     county: '高雄市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   // ----------------------------------------------------------------
-//   // ----------------------------------------------------------------
-//   // ----------------------------------------------------------------
-//   // ----------------------------------------------------------------
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 1,
-//     county: '臺北市',
-//     totalsum: '50',
-//     pricesum: '50',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 2,
-//     county: '臺北市',
-//     totalsum: '50',
-//     pricesum: '50',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 3,
-//     county: '臺北市',
-//     totalsum: '50',
-//     pricesum: '50',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 4,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 5,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 6,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 7,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 8,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 9,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 10,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 11,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '捲門',
-//     year: 2022,
-//     month: 12,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   //
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 1,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 2,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 3,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 4,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 5,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 6,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 7,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 8,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 9,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 10,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 11,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '水閘門',
-//     year: 2022,
-//     month: 12,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   //
-//   {
-//     quotetype: '特殊大門',
-//     year: 2022,
-//     month: 11,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   {
-//     quotetype: '特殊大門',
-//     year: 2022,
-//     month: 12,
-//     county: '臺北市',
-//     totalsum: '100',
-//     pricesum: '100',
-//     percentage: 999,
-//   },
-//   //
-// ];
