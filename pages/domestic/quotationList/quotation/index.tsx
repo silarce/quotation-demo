@@ -1031,7 +1031,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           onClick: () => {
             myAlert.confirm({
               title: '確定要解除鎖定?',
-              content: '此報價單將會清除所有審核人員並回到預算狀態',
+              content: '此報價單將需要重新送審並回到發包狀態',
               props: {
                 onOk: () => {
                   reqUnlock();
