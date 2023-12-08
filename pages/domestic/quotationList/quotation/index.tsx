@@ -11,6 +11,9 @@
  * reqReview 審核
  *
  */
+
+// 業務與業務主管審核過後，status就會自動轉為Pending
+
 // =============================================================
 // =============================================================
 // =============================================================
@@ -126,17 +129,15 @@ export default function Quotation() {
 // =================================================================
 
 function TheQuotation({ router }: { router: NextRouter }) {
-  // const {
-  //   id: quotationId, //報價單id //若為新增報價單則為undefined
-  // } = router.query as { id: string | undefined };
   const {
     id: quotationId, //報價單id //若為新增報價單則為undefined
     contentId,
   } = router.query as {
     id: string | undefined;
+    // 從查詢報價單的展開列表點進來的話query裡就會有contentId
     contentId: string | undefined;
   };
-  const { userInfo, userGrade } = useContext(AppContext);
+  const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
 
   // -----------------------------------------------------
@@ -1230,11 +1231,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //     }
     //   : null,
 
-    !contentId && status === 'Contracting'
+    // !contentId && status === 'Contracting'
+    !contentId && status === 'Pending'
       ? { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) }
       : null,
 
-    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+    !contentId && status !== 'Pending' ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
 
     {
       type: 'myButton',
@@ -1259,6 +1261,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
+    if (status === 'Pending') {
+      return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
+    }
+
     setIsLoading(true);
 
     for (const prod of Object.values(productList)) {
@@ -1495,7 +1501,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       reviewResult: isPass,
     };
 
-    if (status === 'Contracting' && !verifyForm) {
+    // if (status === 'Contracting' && !verifyForm) {
+    if (status === 'Pending' && !verifyForm) {
       return myAlert.warning({ title: '請先送出合約審核表' });
     }
 

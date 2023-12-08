@@ -1127,7 +1127,7 @@ type TquotationContentDto_copy = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract'; // 報價單狀態: 預算 投標 發包 合約
+  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending'; // 報價單狀態: 預算 投標 發包 合約 準合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
@@ -1197,7 +1197,7 @@ export type TquotationContentDto = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract'; // 報價單狀態: 預算 投標 發包 合約
+  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending'; // 報價單狀態: 預算 投標 發包 合約 準合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
@@ -1416,7 +1416,7 @@ export type TcreateQuotationContentDto = {
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract'; // 報價單狀態: 預算 投標 發包 合約
+  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending'; // 報價單狀態: 預算 投標 發包 合約 準合約
   managerId?: string | undefined | null; // 經理ID
   supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID
@@ -1561,7 +1561,40 @@ export type TquotationAccouting_area = {
   county: string;
   totalsum: string; // 牌價複價
   pricesum: string; // 單價複價
-  percentage: number; // 百分比
+  percentage: number | null; // 百分比
+};
+
+// 個人業績統計表_報價單
+export type TquotationAccounting_personal_content = {
+  project_name: string;
+  quotation_number: string;
+  quotetype: string;
+  totalsum: `${number}`;
+  pricesum: `${number}`;
+  percentage: number;
+};
+
+// 個人業績統計表_合約
+export type TquotationAccounting_personal_contract = {
+  projectname: string;
+  quotationnumber: string;
+  quotetype: string;
+  totalsum: `${number}`;
+  pricesum: `${number}`;
+  percentage: number;
+};
+
+// 追加減工程統計表
+export type TquotationAccounting_modifyContract = {
+  projectname: string;
+  quotationnumber: string;
+  quotetype: string;
+  year: number;
+  month: number;
+  totalsum: `${number}`;
+  pricesum: `${number}`;
+  county: string;
+  percentage: number | null;
 };
 
 // ========================================================================

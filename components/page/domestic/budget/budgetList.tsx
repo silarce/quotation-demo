@@ -130,6 +130,12 @@ export default function BudgetList({
             reviewStatuArr.pop();
           }
 
+          // 在發包階段，顯示到業務主管
+          if (status === 'Contracting') {
+            reviewStatuArr.pop();
+            reviewStatuArr.pop();
+          }
+
           const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
           sortedContent.shift();
 

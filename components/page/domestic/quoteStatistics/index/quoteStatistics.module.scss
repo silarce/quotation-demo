@@ -2,8 +2,6 @@
 
 .table {
   position: relative;
-  // display: grid;
-  // grid-template-rows: min-content auto min-content;
   height: calc(100% - 6px);
   overflow: auto;
   padding: 0 3px;
@@ -12,20 +10,20 @@
     display: flex;
     flex-wrap: nowrap;
     width: 100%;
-    > .group {
+    .group {
       border-right: solid 1px $colorBorder01;
       &.group01 {
-        flex: auto;
-        width: auto;
+        flex: none;
+        width: 850px;
       }
       &.group02 {
         flex: none;
-        width: fit-content;
+        width: 390px;
       }
       &.group03 {
         flex: none;
-        width: fit-content;
-        border-right: 0;
+        // width: fit-content;
+        width: 415px;
       }
     }
   } // .row
@@ -34,9 +32,10 @@
     border-bottom: solid 1px black;
     position: sticky;
     top: 0px;
+    width: fit-content;
     background-color: $bgc01;
     z-index: 1;
-    > .group {
+    .group {
       display: flex;
       span {
         font-size: 14px;
@@ -77,14 +76,42 @@
   .tbody {
     .row {
       border-bottom: solid 1px $colorBorder01;
-      > .group {
+      .subRow {
+        width: fit-content;
+        display: flex;
+        flex-wrap: nowrap;
+        .group03 {
+          display: grid;
+          width: 415px;
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          > div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-left: solid 1px $colorBorder01;
+            &:nth-of-type(1) {
+              border-left: 0;
+            }
+            span {
+              font-size: 16px;
+              font-weight: 400;
+              color: $colorMain;
+            }
+          }
+        }
+      }
+
+      .group {
         &.group01 {
+          width: 850px;
           display: flex;
           flex-wrap: nowrap;
           gap: 20px;
           padding: 17px 20px 17px 30px;
         }
         &.group02 {
+          width: 390px;
           > div {
             padding: 17px 20px 17px 20px;
             display: flex;
@@ -96,32 +123,6 @@
             }
           }
         }
-
-        &.group03 {
-          display: grid;
-          // grid-template-rows: auto;
-          > div {
-            display: flex;
-            flex-wrap: nowrap;
-            border-top: solid 1px $colorBorder01;
-            &:nth-of-type(1) {
-              border-top: 0;
-            }
-            > div {
-              border-left: solid 1px $colorBorder01;
-              display: grid;
-              place-items: center;
-              > span {
-                font-size: 16px;
-                font-weight: 400;
-                color: $colorMain;
-              }
-              &:nth-of-type(1) {
-                border-left: 0;
-              }
-            }
-          }
-        }
       }
     }
   } // .tbody
@@ -130,10 +131,12 @@
     position: sticky;
     bottom: 0;
     height: 82px;
+    width: fit-content;
     background-color: #fff;
     border-top: solid 1px black;
     > .group {
       &.group01 {
+        width: calc(850px + 390px);
         background-color: $bgc01;
         > .total {
           display: grid;

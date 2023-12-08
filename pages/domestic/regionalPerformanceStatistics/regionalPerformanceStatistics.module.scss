@@ -82,4 +82,7 @@
   .noBottom.plus {
     border-bottom-width: 0;
   }
+  .titleCell.plus {
+    border-right: solid 1px theme("colors.border");
+  }
 }
