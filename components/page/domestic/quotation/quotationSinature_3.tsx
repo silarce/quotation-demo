@@ -16,27 +16,27 @@ import { TemployeeDto } from 'js/api/dtoTypes';
 type Tcontroll = {
   manager: {
     employee: TemployeeDto | undefined | null;
-    onChange?: (v: TemployeeDto) => void;
+    onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
   };
   workDirector: {
     employee: TemployeeDto | undefined | null;
-    onChange?: (v: TemployeeDto) => void;
+    onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
   };
   supervisor: {
     employee: TemployeeDto | undefined | null;
-    onChange?: (v: TemployeeDto) => void;
+    onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
   };
   sales: {
     employee: TemployeeDto | undefined | null;
-    onChange?: (v: TemployeeDto) => void;
+    onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
   };
   agent: {
     employee: TemployeeDto | undefined | null;
-    onChange?: (v: TemployeeDto) => void;
+    onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
   };
 };
