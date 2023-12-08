@@ -38,7 +38,7 @@ type Tquery = {
 
 // ==================================================================
 const yearOptionArr = optionsCreator_year();
-const monthOptionArr = optionsCreator_month();
+const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const regionOptionArr = optionsCreator_region({ emptyOption: true });
 
 // ==================================================================
@@ -59,7 +59,7 @@ export default function AdditionalEngineeringStatistics() {
 
   useEffect(() => {
     update();
-  }, []);
+  }, [year, month, region]);
 
   useEffect(() => {
     const now = new Date();
