@@ -72,7 +72,7 @@ import {
   apiPatchQuotation,
   apiQuotationSubmitReview,
   apiQuotationReview,
-  apiQuotationunLock,
+  apiQuotationUnlock,
   //
   useQuotation_id_attachments,
   apiPostQuotation_id_attachments,
