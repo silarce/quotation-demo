@@ -1584,6 +1584,19 @@ export type TquotationAccounting_personal_contract = {
   percentage: number;
 };
 
+// 追加減工程統計表
+export type TquotationAccounting_modifyContract = {
+  projectname: string;
+  quotationnumber: string;
+  quotetype: string;
+  year: number;
+  month: number;
+  totalsum: `${number}`;
+  pricesum: `${number}`;
+  county: string;
+  percentage: number;
+};
+
 // ========================================================================
 // ========================================================================
 // ========================================================================

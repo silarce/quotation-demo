@@ -27,6 +27,7 @@ import type {
   TquotationAccouting_area,
   TquotationAccounting_personal_content,
   TquotationAccounting_personal_contract,
+  TquotationAccounting_modifyContract,
 } from './dtoTypes';
 
 export type {
@@ -47,6 +48,7 @@ export type {
   TquotationAccouting_area,
   TquotationAccounting_personal_content,
   TquotationAccounting_personal_contract,
+  TquotationAccounting_modifyContract,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -834,7 +836,7 @@ export const useQuotationAccounting_area = (params: { year: number; month: numbe
 };
 
 type Tparam_accounting_modifyContract = {
-  employeeId: string;
+  // employeeId: string;
   year: number;
   month: number;
   area: string;
@@ -842,20 +844,35 @@ type Tparam_accounting_modifyContract = {
 
 /**追加工程統計表 */
 const apiQuotationAccounting_modifyContract = async (params: Tparam_accounting_modifyContract) => {
-  const api = `/quotation/accounting/modify-contract/${params.employeeId}`;
+  // const api = `/quotation/accounting/modify-contract/${params.employeeId}`;
+  const api = `/quotation/accounting/modify-contract`;
 
   return axi
-    .get(api, { params })
+    .get<TquotationAccounting_modifyContract[]>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
 /**追加工程統計表 */
-const useQuotationAccounting_modifyContract = (params: Tparam_accounting_modifyContract) => {
-  const [res, setRes] = useState<object[]>();
+export const useQuotationAccounting_modifyContract = (params: {
+  year: number | undefined;
+  month: number | undefined;
+  area: 'northern' | 'central' | 'southern' | 'eastern' | undefined | 'all';
+}) => {
+  const [res, setRes] = useState<TquotationAccounting_modifyContract[]>();
 
   const update = async () => {
-    const newRes = await apiQuotationAccounting_modifyContract(params);
+    if (!params.year || !params.month || !params.area) {
+      return;
+    }
+
+    const okParams = {
+      year: params.year,
+      month: params.month,
+      area: params.area,
+    };
+
+    const newRes = await apiQuotationAccounting_modifyContract(okParams);
 
     if (newRes) {
       setRes(newRes);
@@ -869,8 +886,6 @@ const useQuotationAccounting_modifyContract = (params: Tparam_accounting_modifyC
     update,
   };
 };
-
-// /quotation/accounting/personal-contract/{employeeId}
 
 type Tparam_accounting_personalContract = {
   employeeId: string;
