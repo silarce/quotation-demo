@@ -21,6 +21,7 @@
   // display: grid;
   // grid-template-columns: repeat(3, 1fr);
   gap: 45px;
+
   .cell {
     > span {
       font-weight: 400;
@@ -29,6 +30,9 @@
     }
     > .input02 {
       padding: 24px 0 14px;
+      hr {
+        border-color: theme("colors.border");
+      }
     }
   }
 }

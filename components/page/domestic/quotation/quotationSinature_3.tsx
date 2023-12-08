@@ -76,8 +76,7 @@ export default function Signature({ controll, disabled }: { controll: Tcontroll;
                 },
               }}
               disabled={forbidden || disabled}
-              // showBaseline="auto"
-              showBaseline="auto"
+              showBaseline="always"
               showAddIcon={forbidden || disabled ? false : true}
             />
           </div>
