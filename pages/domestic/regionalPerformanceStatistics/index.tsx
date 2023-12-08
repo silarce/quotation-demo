@@ -24,38 +24,46 @@ type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 type Tquery = {
   year: string | undefined;
   month: string | undefined;
-
   keyWord: string | undefined;
 };
 
 // ==================================================================
-const monthOptionArr = optionsCreator_month();
+const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const yearOptionArr = optionsCreator_year();
 
 // ==================================================================
+// 全區業績統計表
 export default function RegionalPerformanceStatistics() {
   const router = useRouter();
   const { year, month } = router.query as Tquery;
 
-  const { data, update } = useQuotationAccounting_area({ year: Number(year) + 1911, month: Number(month) });
+  useEffect(() => {
+    const now = new Date();
+    const theYear = year || now.getFullYear() - 1911;
+    const theMonth = month;
+
+    router.push({
+      query: {
+        year: theYear,
+        month: theMonth,
+      },
+    });
+  }, []);
+
+  // ------------------------------------------------------------------
+
+  const params = {
+    year: year ? Number(year) + 1911 : undefined,
+    month: month ? Number(month) : undefined,
+  };
+
+  const { data, update } = useQuotationAccounting_area(params);
 
   useEffect(() => {
-    if (!year || !month) {
-      const yearNum = new Date().getFullYear();
-      const monthNum = new Date().getMonth() + 1;
-
-      router.push({
-        query: {
-          year: yearNum - 1911,
-          month: monthNum,
-        },
-      });
-
-      return;
-    }
-
     update();
   }, [year, month]);
+
+  // ------------------------------------------------------------------
 
   const { formatedList, quotetypeArr } = useMemo(() => {
     if (!data) {
@@ -67,7 +75,16 @@ export default function RegionalPerformanceStatistics() {
     const quotetypeList: { [key: string]: string } = {};
 
     data.forEach((item) => {
-      const { quotetype, year, month, county, totalsum, pricesum, percentage } = item;
+      const { year, month, county, totalsum, pricesum } = item;
+      let { percentage, quotetype } = item;
+
+      if (percentage === null) {
+        percentage = 0;
+      }
+
+      if (!quotetype) {
+        quotetype = '無資料';
+      }
 
       quotetypeList[quotetype] = quotetype;
 

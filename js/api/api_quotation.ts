@@ -733,7 +733,7 @@ export const apiQuotationModify = (contractId: string, body: TcreateModifyQuotat
 /**報價統計表 */
 export const apiQuotationAccounting = (params: {
   year: number;
-  month: number;
+  month?: number | undefined;
   area: 'northern' | 'central' | 'southern' | 'eastern' | 'all';
 }) => {
   const api = '/quotation/accounting';
@@ -752,7 +752,7 @@ export const useQuotationAccounting = (params: {
   const [res, setRes] = useState<TquotationAccouting[]>();
 
   const update = async () => {
-    if (!params.year || !params.month || !params.area) {
+    if (!params.year || !params.area) {
       return;
     }
 
@@ -807,7 +807,7 @@ export const useQuotationAccounting_years = () => {
 };
 
 /**全區業績統計表 */
-export const apiQuotationAccounting_area = (params: { year: number; month: number }) => {
+export const apiQuotationAccounting_area = (params: { year: number; month?: number | undefined }) => {
   const api = '/quotation/accounting/area';
 
   return axi
@@ -816,11 +816,20 @@ export const apiQuotationAccounting_area = (params: { year: number; month: numbe
     .catch((err) => Promise.reject(err));
 };
 
-export const useQuotationAccounting_area = (params: { year: number; month: number }) => {
+export const useQuotationAccounting_area = (params: { year?: number | undefined; month?: number | undefined }) => {
   const [res, setRes] = useState<TquotationAccouting_area[]>();
 
   const update = async () => {
-    const newRes = await apiQuotationAccounting_area(params);
+    if (!params.year) {
+      return;
+    }
+
+    const theParams = {
+      ...params,
+      year: params.year,
+    };
+
+    const newRes = await apiQuotationAccounting_area(theParams);
 
     if (newRes) {
       setRes(newRes);
@@ -838,7 +847,7 @@ export const useQuotationAccounting_area = (params: { year: number; month: numbe
 type Tparam_accounting_modifyContract = {
   // employeeId: string;
   year: number;
-  month: number;
+  month?: number | undefined;
   area: string;
 };
 
@@ -862,7 +871,7 @@ export const useQuotationAccounting_modifyContract = (params: {
   const [res, setRes] = useState<TquotationAccounting_modifyContract[]>();
 
   const update = async () => {
-    if (!params.year || !params.month || !params.area) {
+    if (!params.year || !params.area) {
       return;
     }
 
@@ -890,7 +899,7 @@ export const useQuotationAccounting_modifyContract = (params: {
 type Tparam_accounting_personalContract = {
   employeeId: string;
   year: number;
-  month: number;
+  month?: number | undefined;
 };
 
 /**個人業績統計表_合約 */
@@ -905,18 +914,24 @@ const apiQuotationAccounting_personalContract = async (params: Tparam_accounting
 };
 
 /**個人業績統計表_合約 */
-// export const useQuotationAccounting_personalContract = (params: Tparam_accounting_personalContract) => {
 export const useQuotationAccounting_personalContract = (
-  params: Omit<Tparam_accounting_personalContract, 'employeeId'> & { employeeId?: string | undefined }
+  params: Omit<Tparam_accounting_personalContract, 'employeeId' | 'year'> & {
+    employeeId?: string | undefined;
+    year: number | undefined;
+  }
 ) => {
   const [res, setRes] = useState<TquotationAccounting_personal_contract[]>();
 
   const update = async () => {
-    if (!params.employeeId) {
+    if (!params.employeeId || !params.year) {
       return;
     }
 
-    const theParams = params as Tparam_accounting_personalContract;
+    const theParams = {
+      ...params,
+      year: params.year,
+      employeeId: params.employeeId,
+    };
 
     const newRes = await apiQuotationAccounting_personalContract(theParams);
 

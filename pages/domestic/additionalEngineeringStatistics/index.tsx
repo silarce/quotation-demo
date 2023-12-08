@@ -64,7 +64,7 @@ export default function AdditionalEngineeringStatistics() {
   useEffect(() => {
     const now = new Date();
     const theYear = year || now.getFullYear() - 1911;
-    const theMonth = month || now.getMonth() + 1;
+    const theMonth = month;
 
     router.push({
       query: {
@@ -121,19 +121,23 @@ export default function AdditionalEngineeringStatistics() {
         //
         projectname,
         quotationnumber,
-        // quotetype,
+
         year,
         month,
         totalsum,
         pricesum,
         county,
-        percentage,
+        // percentage,
       } = item;
 
-      let quotetype = item.quotetype;
+      let { quotetype, percentage } = item;
 
       if (!quotetype) {
         quotetype = '無資料';
+      }
+
+      if (percentage === null) {
+        percentage = 0;
       }
 
       listKeyQty[quotetype] = (listKeyQty[quotetype] ?? 0) + 1;
