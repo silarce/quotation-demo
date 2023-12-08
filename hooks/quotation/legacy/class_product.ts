@@ -817,6 +817,7 @@ function prodCellConfigCre(): TprodCellConfig {
           selectProps: {
             props: {
               options: optionsCreator_doorModel(),
+              isSearchable: true, // 啟用react select 的createable功能
             },
           },
         },
