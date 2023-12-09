@@ -11,6 +11,9 @@ import Select, {
   // OptionProps,
   // SelectComponentsConfig,
 } from 'react-select';
+
+import CreatableSelect from 'react-select/creatable';
+
 import { GroupBase } from 'react-select/dist/declarations/src/types.d';
 // type
 import type { Toption } from 'js/utils/options/options';
@@ -75,10 +78,11 @@ export default function MySelect<
 
   return (
     <div className={classNames(scss.selectBox, wrapperClassName)} style={wrapperStyle}>
-      <Select
+      <CreatableSelect
         components={{
           DropdownIndicator,
           //
+
           ...props?.components,
         }}
         unstyled={true}
