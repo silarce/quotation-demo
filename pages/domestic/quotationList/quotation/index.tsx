@@ -1278,10 +1278,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     }
 
+    const shouldDirect = isPass && status === 'Pending';
+
     try {
       setIsLoading(true);
       await apiQuotationReview({ id: quotationId, body });
-      await update();
+
+      if (shouldDirect) {
+        router.push({
+          pathname: '/domestic/contract',
+        });
+      } else {
+        await update();
+      }
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '審核發生錯誤', content: err.message });
