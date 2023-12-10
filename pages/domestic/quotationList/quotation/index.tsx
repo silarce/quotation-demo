@@ -900,6 +900,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   };
 
+  // 在不同的審查階段只顯示不同的審核人員
+  if (status === 'Budget' || status === 'Bidding') {
+    delete control_signature.manager;
+    delete control_signature.workDirector;
+    delete control_signature.supervisor;
+  }
+
+  if (status === 'Contracting') {
+    delete control_signature.manager;
+    delete control_signature.workDirector;
+  }
+
   // --------------------------------------------------------------------------
 
   const [showPdf, setShowPdf] = useState(false);

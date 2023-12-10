@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import classNames from 'classnames';
 
 // global gear
 // import InputSel from 'components/global/gear/inputAndSel/inputSel';
@@ -14,17 +15,17 @@ import style from './quotationSinature.module.scss';
 import { TemployeeDto } from 'js/api/dtoTypes';
 
 type Tcontroll = {
-  manager: {
+  manager?: {
     employee: TemployeeDto | undefined | null;
     onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
   };
-  workDirector: {
+  workDirector?: {
     employee: TemployeeDto | undefined | null;
     onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
   };
-  supervisor: {
+  supervisor?: {
     employee: TemployeeDto | undefined | null;
     onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
@@ -49,12 +50,22 @@ export default function Signature({ controll, disabled }: { controll: Tcontroll;
   const [targetControllKey, setTargetControllKey] = useState<keyof Tcontroll | undefined>(undefined);
   const targetControll = targetControllKey ? controll[targetControllKey] : undefined;
 
+  const keyArr = Object.keys(controll) as TindexKeys[];
+
+  const toLeft = keyArr.length < 5;
+
   return (
-    <div className={style.signature}>
-      {indexKeys.map((key, index) => {
+    <div className={classNames(style.signature, toLeft && style.toLeft)}>
+      {keyArr.map((key, index) => {
+        if (!controll[key]) {
+          return null;
+        }
+
+        const theControl = controll[key]!;
+
         const { label, placeholder } = config[key];
-        const value = (controll[key].employee?.chName || controll[key].employee?.enName) ?? '';
-        const forbidden = controll[key].forbidden;
+        const value = (theControl.employee?.chName || theControl.employee?.enName) ?? '';
+        const forbidden = theControl.forbidden;
 
         const onClick = () => {
           if (disabled || forbidden) {
