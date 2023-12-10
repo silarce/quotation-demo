@@ -933,6 +933,18 @@ latestContentProdArr為這次追加追減的主產品
     },
   };
 
+  // 在不同的審查階段只顯示不同的審核人員
+  if (status === 'Budget' || status === 'Bidding') {
+    delete control_signature.manager;
+    delete control_signature.workDirector;
+    delete control_signature.supervisor;
+  }
+
+  if (status === 'Contracting') {
+    delete control_signature.manager;
+    delete control_signature.workDirector;
+  }
+
   // --------------------------------------------------------------
 
   // const [empSelConfirmKey, setEmpSelConfirmKey] = useState<
@@ -1346,10 +1358,19 @@ latestContentProdArr為這次追加追減的主產品
       }
     }
 
+    const shouldDirect = isPass && status === 'Pending';
+
     try {
       setIsLoading(true);
       await apiQuotationReview({ id: quotationId, body });
-      await update();
+
+      if (shouldDirect) {
+        router.push({
+          pathname: '/domestic/contract',
+        });
+      } else {
+        await update();
+      }
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '審核發生錯誤', content: err.message });
