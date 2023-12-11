@@ -1021,8 +1021,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     !contentId && quotationId
       ? {
           type: 'myButton',
-          label: '編輯送審人員',
+          label: '編輯審核人員',
           onClick: () => {
+            if (status === 'Pending' && !verifyForm) {
+              return myAlert.warning({ title: '請先送出合約審核表' });
+            }
+
             const reviewSalesEmployeeId = sales?.id ?? null;
             const reviewWorkDirectorEmployeeId = workDirector?.id ?? null;
             const reviewSupervisorEmployeeId = supervisor?.id ?? null;
@@ -1031,7 +1035,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               status === 'Pending' &&
               (reviewSalesEmployeeId || reviewWorkDirectorEmployeeId || reviewSupervisorEmployeeId)
             ) {
-              myAlert.info({ title: '此報價單已經送審，無法編輯送審人員' });
+              myAlert.info({ title: '此報價單已經送審，無法編輯審核人員' });
             } else {
               setDisabled_reviewer(false);
             }
