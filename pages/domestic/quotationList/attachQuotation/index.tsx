@@ -1314,6 +1314,12 @@ latestContentProdArr為這次追加追減的主產品
       }
     }
 
+    if (status === 'Pending') {
+      if (!reviewSalesEmployeeId || !reviewWorkDirectorEmployeeId || !reviewSupervisorEmployeeId) {
+        return myAlert.warning({ title: '請先設定所有審核人員' });
+      }
+    }
+
     const shouldDirect = isManager && status === 'Pending';
 
     try {
