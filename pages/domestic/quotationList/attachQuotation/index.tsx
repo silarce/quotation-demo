@@ -910,16 +910,14 @@ latestContentProdArr為這次追加追減的主產品
     },
   };
 
-  // 在不同的審查階段只顯示不同的審核人員
-  if (status === 'Budget' || status === 'Bidding') {
-    delete control_signature.manager;
+  // 在預算、投標、發包 不顯示應收帳款
+  if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
     delete control_signature.workDirector;
-    delete control_signature.supervisor;
   }
 
-  if (status === 'Contracting') {
-    delete control_signature.manager;
-    delete control_signature.workDirector;
+  // 在準合約階段不顯示經辦
+  if (status === 'Pending') {
+    delete control_signature.agent;
   }
 
   // --------------------------------------------------------------------------

@@ -123,17 +123,14 @@ export default function BudgetList({
             },
           ];
 
-          // 在預算與投標階段，只要顯示到業務
-          if (status === 'Budget' || status === 'Bidding') {
-            reviewStatuArr.pop();
-            reviewStatuArr.pop();
-            reviewStatuArr.pop();
+          // 在預算與投標階段，不顯示應收帳款
+          if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+            reviewStatuArr.splice(3, 1);
           }
 
-          // 在發包階段，顯示到業務主管
-          if (status === 'Contracting') {
-            reviewStatuArr.pop();
-            reviewStatuArr.pop();
+          // 在準合約階段，不顯示經辦
+          if (status === 'Pending') {
+            reviewStatuArr.shift();
           }
 
           const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();

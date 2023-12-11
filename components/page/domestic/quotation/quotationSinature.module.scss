@@ -18,16 +18,10 @@
 .signature {
   margin: 130px 50px 40px;
   display: flex;
-  // display: grid;
-  // grid-template-columns: repeat(3, 1fr);
   gap: 45px;
   justify-content: space-between;
-  &.toLeft {
-    gap: 80px;
-    justify-content: flex-end;
-  }
-
   .cell {
+    flex: auto;
     > span {
       font-weight: 400;
       font-size: 18px;

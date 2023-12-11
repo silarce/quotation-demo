@@ -25,21 +25,12 @@ import scss from './inputSel.module.scss';
 
 type TinputSelBarProps_reduce = Omit<TinputSelBarProps, 'disabled' | 'onFocus' | 'onBlur'>;
 
-export type {
-  TinputSelProps,
-  //
-  TselectProps,
-  TinputProps,
-  TcheckboxProps,
-  TtextareaProps,
-  TinputSelBarProps_reduce,
-  TdatePickerProps,
-  TtimePickerProps,
-  TtimePickerProps_mui,
-  TinputSelBarProps,
-};
-
 // =============================================================================
+
+type TinputPropsAndSelectProps = {
+  inputProps: TinputProps;
+  selectProps: TselectProps;
+};
 
 type TinputSelProps = {
   disabled?: boolean;
@@ -53,6 +44,7 @@ type TinputSelProps = {
   timePickerProps_mui?: TtimePickerProps_mui;
   checkBoxProps?: TcheckboxProps;
   inputSelBarProps?: Omit<TinputSelBarProps, 'onFocus' | 'onBlur'>;
+  inputPropsAndSelectProps?: TinputPropsAndSelectProps;
   //
   className?: string;
   wrapperPreStyle?: 'ps01';
@@ -85,6 +77,20 @@ type TinputSelProps = {
   showAddIcon?: boolean;
 };
 
+export type {
+  TinputSelProps,
+  //
+  TselectProps,
+  TinputProps,
+  TcheckboxProps,
+  TtextareaProps,
+  TinputSelBarProps_reduce,
+  TdatePickerProps,
+  TtimePickerProps,
+  TtimePickerProps_mui,
+  TinputSelBarProps,
+};
+
 // =============================================================================
 
 export default function InputSel({
@@ -100,6 +106,8 @@ export default function InputSel({
   timePickerProps_mui,
   checkBoxProps,
   inputSelBarProps,
+  inputPropsAndSelectProps,
+
   //
   className,
   wrapperPreStyle,
@@ -170,7 +178,7 @@ export default function InputSel({
       className={classNames(scss.label, className, 'w-full')}
       style={wrapperStyle}
       onClick={(e) => {
-        if (inputSelBarProps || checkBoxProps) {
+        if (inputSelBarProps || checkBoxProps || inputPropsAndSelectProps) {
           e.preventDefault();
         }
 
@@ -240,69 +248,15 @@ export default function InputSel({
 
       {selectProps &&
         (() => {
-          const {
-            //
-            dynaOptionsList,
-            dynaOptionsKey,
-            withIcon,
-            creOptionWithIconProps,
-            creSingleValueWithIconProps,
-          } = selectProps;
-
-          let dynyOptions: Toption[] | undefined = undefined;
-
-          if (dynaOptionsList && dynaOptionsKey) {
-            dynyOptions = dynaOptionsList[dynaOptionsKey];
-
-            if (selectProps.props && !selectProps.props.options) {
-              selectProps.props.options = dynyOptions;
-            }
-          }
-
-          let easyValue: Toption | undefined | null = undefined;
-          let easyDefaultValue: Toption | undefined | null = undefined;
-
-          if (selectProps.easyValue !== undefined) {
-            if (selectProps.easyValue === null || selectProps.easyValue === '') {
-              easyValue = null;
-            } else {
-              const options = selectProps.props?.options;
-
-              easyValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
-                value: selectProps.easyValue,
-                label: selectProps.easyValue,
-              };
-            }
-          }
-
-          if (selectProps.easyDefaultValue !== undefined) {
-            if (selectProps.easyDefaultValue === null || selectProps.easyDefaultValue === '') {
-              easyDefaultValue = null;
-            } else {
-              const options = selectProps.props?.options;
-
-              easyDefaultValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
-                value: selectProps.easyDefaultValue,
-                label: selectProps.easyDefaultValue,
-              };
-            }
-          }
-
-          const customComponents = withIcon
-            ? {
-                // Option: OptionWithIcon01,
-                // SingleValue: SingleValueWithIcon01,
-                // 這兩個是HOC，不這樣做會型別錯誤
-                Option: creOptionWithIcon(creOptionWithIconProps),
-                SingleValue: creSingleValueWithIcon(creSingleValueWithIconProps),
-              }
-            : undefined;
+          const { dealedSelectProps, customComponents, easyValue, easyDefaultValue, dynyOptions } = dealSelectProps({
+            selectProps: selectProps,
+          });
 
           return (
             <MySelect
-              wrapperClassName={selectProps.wrapperClassName}
-              wrapperStyle={selectProps.wrapperStyle}
-              arrowType={selectProps.arrowType}
+              wrapperClassName={dealedSelectProps.wrapperClassName}
+              wrapperStyle={dealedSelectProps.wrapperStyle}
+              arrowType={dealedSelectProps.arrowType}
               fontClassName={fontClassName}
               props={{
                 isDisabled: disabled,
@@ -310,21 +264,21 @@ export default function InputSel({
                 //
                 value: easyValue,
                 defaultValue: easyDefaultValue,
-                ...selectProps.props,
+                ...dealedSelectProps.props,
                 //
                 onFocus: (e) => {
-                  selectProps.props?.onFocus?.(e);
+                  dealedSelectProps.props?.onFocus?.(e);
                   setIsFocus(true);
                 },
                 onBlur: (e) => {
-                  selectProps.props?.onBlur?.(e);
+                  dealedSelectProps.props?.onBlur?.(e);
                   setIsFocus(false);
                 },
                 components: {
                   ...customComponents,
-                  ...selectProps.props?.components,
+                  ...dealedSelectProps.props?.components,
                 },
-                options: selectProps.props?.options || dynyOptions,
+                options: dealedSelectProps.props?.options || dynyOptions,
               }}
             />
           );
@@ -421,6 +375,71 @@ export default function InputSel({
         />
       )}
 
+      {inputPropsAndSelectProps &&
+        (() => {
+          const { dealedSelectProps, customComponents, easyValue, easyDefaultValue, dynyOptions } = dealSelectProps({
+            selectProps: inputPropsAndSelectProps.selectProps,
+          });
+
+          return (
+            <div className={classNames(scss.inputAndSelect)}>
+              <Input
+                wrapperClassName={classNames(fontClassName, inputPropsAndSelectProps.inputProps.wrapperClassName)}
+                wrapperStyle={inputPropsAndSelectProps.inputProps.wrapperStyle}
+                props={{
+                  disabled,
+                  placeholder: `請輸入${caption ?? ''}`,
+                  //
+                  ...inputPropsAndSelectProps.inputProps.props,
+                  //
+                  onFocus: (e) => {
+                    inputPropsAndSelectProps.inputProps.props?.onFocus?.(e);
+                    setIsFocus(true);
+                  },
+                  onBlur: (e) => {
+                    inputPropsAndSelectProps.inputProps.props?.onBlur?.(e);
+                    setIsFocus(false);
+                  },
+                }}
+              />
+
+              <MySelect
+                wrapperClassName={dealedSelectProps.wrapperClassName}
+                wrapperStyle={dealedSelectProps.wrapperStyle}
+                arrowType={dealedSelectProps.arrowType}
+                fontClassName={fontClassName}
+                props={{
+                  isDisabled: disabled,
+                  placeholder: `請輸入${caption ?? ''}`,
+                  //
+                  value: easyValue,
+                  defaultValue: easyDefaultValue,
+                  ...dealedSelectProps.props,
+                  //
+                  onFocus: (e) => {
+                    dealedSelectProps.props?.onFocus?.(e);
+                    setIsFocus(true);
+                  },
+                  onBlur: (e) => {
+                    dealedSelectProps.props?.onBlur?.(e);
+                    setIsFocus(false);
+                  },
+                  components: {
+                    ...customComponents,
+                    ...dealedSelectProps.props?.components,
+                  },
+                  options: dealedSelectProps.props?.options || dynyOptions,
+                  classNames: {
+                    valueContainer: () => {
+                      return scss.valueContainer;
+                    },
+                  },
+                }}
+              />
+            </div>
+          );
+        })()}
+
       {suffix && (
         <div className={classNames(fontClassName, scss.suffix, suffixClassName)}>
           <span>{suffix}</span>
@@ -435,3 +454,73 @@ export default function InputSel({
     </label>
   );
 }
+
+// =============================================================================
+
+const dealSelectProps = ({ selectProps }: { selectProps: TselectProps }) => {
+  const {
+    //
+    dynaOptionsList,
+    dynaOptionsKey,
+    withIcon,
+    creOptionWithIconProps,
+    creSingleValueWithIconProps,
+  } = selectProps;
+
+  let dynyOptions: Toption[] | undefined = undefined;
+
+  if (dynaOptionsList && dynaOptionsKey) {
+    dynyOptions = dynaOptionsList[dynaOptionsKey];
+
+    if (selectProps.props && !selectProps.props.options) {
+      selectProps.props.options = dynyOptions;
+    }
+  }
+
+  let easyValue: Toption | undefined | null = undefined;
+  let easyDefaultValue: Toption | undefined | null = undefined;
+
+  if (selectProps.easyValue !== undefined) {
+    if (selectProps.easyValue === null || selectProps.easyValue === '') {
+      easyValue = null;
+    } else {
+      const options = selectProps.props?.options;
+
+      easyValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
+        value: selectProps.easyValue,
+        label: selectProps.easyValue,
+      };
+    }
+  }
+
+  if (selectProps.easyDefaultValue !== undefined) {
+    if (selectProps.easyDefaultValue === null || selectProps.easyDefaultValue === '') {
+      easyDefaultValue = null;
+    } else {
+      const options = selectProps.props?.options;
+
+      easyDefaultValue = (options?.find((v) => (v as Toption).value === selectProps.easyValue) as Toption) || {
+        value: selectProps.easyDefaultValue,
+        label: selectProps.easyDefaultValue,
+      };
+    }
+  }
+
+  const customComponents = withIcon
+    ? {
+        // Option: OptionWithIcon01,
+        // SingleValue: SingleValueWithIcon01,
+        // 這兩個是HOC，不這樣做會型別錯誤
+        Option: creOptionWithIcon(creOptionWithIconProps),
+        SingleValue: creSingleValueWithIcon(creSingleValueWithIconProps),
+      }
+    : undefined;
+
+  return {
+    dealedSelectProps: selectProps,
+    customComponents,
+    easyValue,
+    easyDefaultValue,
+    dynyOptions,
+  };
+};

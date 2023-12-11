@@ -30,12 +30,12 @@ type Tcontroll = {
     onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
   };
-  sales: {
+  sales?: {
     employee: TemployeeDto | undefined | null;
     onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
   };
-  agent: {
+  agent?: {
     employee: TemployeeDto | undefined | null;
     onChange?: (v: TemployeeDto | undefined) => void;
     forbidden?: boolean;
@@ -52,10 +52,8 @@ export default function Signature({ controll, disabled }: { controll: Tcontroll;
 
   const keyArr = Object.keys(controll) as TindexKeys[];
 
-  const toLeft = keyArr.length < 5;
-
   return (
-    <div className={classNames(style.signature, toLeft && style.toLeft)}>
+    <div className={classNames(style.signature)}>
       {keyArr.map((key, index) => {
         if (!controll[key]) {
           return null;
@@ -109,7 +107,6 @@ export default function Signature({ controll, disabled }: { controll: Tcontroll;
 // ========================================================
 
 type TindexKeys = keyof Tcontroll;
-const indexKeys: TindexKeys[] = ['manager', 'workDirector', 'supervisor', 'sales', 'agent'];
 
 const config: {
   [key in TindexKeys]: {
