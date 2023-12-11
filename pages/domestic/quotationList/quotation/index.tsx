@@ -26,6 +26,7 @@ import moment from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { AxiosError } from 'axios';
 
 // components
 import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
@@ -993,17 +994,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '單價分析',
       img: iconUpload.src,
       onClick: () => {
-        const prodArr = latestContent?.products;
-        let isOk = true;
-        prodArr?.forEach((prod) => {
-          if (prod.quantity === 0) {
-            isOk = false;
-          }
-        });
+        // const prodArr = latestContent?.products;
+        // let isOk = true;
+        // prodArr?.forEach((prod) => {
+        //   if (prod.quantity === 0) {
+        //     isOk = false;
+        //   }
+        // });
 
-        if (!isOk) {
-          return myAlert.info({ title: '有主產品數量為0', content: '請先確認所有主產品的數量不為0' });
-        }
+        // if (!isOk) {
+        //   return myAlert.info({ title: '有主產品數量為0', content: '請先確認所有主產品的數量不為0' });
+        // }
 
         setShowPdf_part(true);
       },
@@ -1017,12 +1018,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }
       : null,
 
-    !contentId && quotationId && status !== 'Pending'
+    !contentId && quotationId
       ? {
           type: 'myButton',
-          label: '編輯送審人員',
+          label: '編輯審核人員',
           onClick: () => {
-            setDisabled_reviewer(false);
+            if (status === 'Pending' && !verifyForm) {
+              return myAlert.warning({ title: '請先送出合約審核表' });
+            }
+
+            const reviewSalesEmployeeId = sales?.id ?? null;
+            const reviewWorkDirectorEmployeeId = workDirector?.id ?? null;
+            const reviewSupervisorEmployeeId = supervisor?.id ?? null;
+
+            if (
+              status === 'Pending' &&
+              (reviewSalesEmployeeId || reviewWorkDirectorEmployeeId || reviewSupervisorEmployeeId)
+            ) {
+              myAlert.info({ title: '此報價單已經送審，無法編輯審核人員' });
+            } else {
+              setDisabled_reviewer(false);
+            }
           },
         }
       : null,
@@ -1316,8 +1332,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         },
       });
     } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '解除鎖定發生錯誤', content: err.message });
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '解除鎖定發生錯誤', content: err.response?.data.message });
     } finally {
       setIsLoading(false);
     }
@@ -1329,13 +1345,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
-    setIsLoading(true);
+    const reviewSalesEmployeeId = sales?.id ?? null;
+    const reviewWorkDirectorEmployeeId = workDirector?.id ?? null;
+    const reviewSupervisorEmployeeId = supervisor?.id ?? null;
+
+    if (
+      status === 'Pending' &&
+      (!reviewSalesEmployeeId || !reviewWorkDirectorEmployeeId || !reviewSupervisorEmployeeId)
+    ) {
+      myAlert.info({ title: '請選擇所有審核人員' });
+
+      return;
+    }
 
     try {
+      setIsLoading(true);
       await apiQuotationSubmitReview(quotationId, {
-        reviewSalesEmployeeId: sales?.id ?? null,
-        reviewWorkDirectorEmployeeId: workDirector?.id ?? null,
-        reviewSupervisorEmployeeId: supervisor?.id ?? null,
+        reviewSalesEmployeeId,
+        reviewWorkDirectorEmployeeId,
+        reviewSupervisorEmployeeId,
       });
       await update();
       setDisabled_reviewer(true);
@@ -1389,11 +1417,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
     });
 
     const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
+      totalPrice += Number(acce.totalPrice || 0);
+
       return {
         partName: acce.name,
         material: '',
         unit: acce.unit,
-        qty: String(acce.quantity),
+        // FIXME 型別為number，但實際上為string
+        // hooks/quotation/classAccessories.tsx // get quantity
+        qty: Number(acce.quantity).toFixed(2),
         price: acce.unitPrice_locale,
         desc: '',
         totalPrice: acce.totalPrice_locale,
@@ -1408,7 +1440,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       size: size,
       part: [...part, ...part_acce],
       // priceTotal: totalPrice.toLocaleString(),
-      priceTotal: prod.totalPrice,
+      priceTotal: totalPrice.toLocaleString(),
     };
   });
 
