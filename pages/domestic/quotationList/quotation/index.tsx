@@ -1436,7 +1436,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       size: size,
       part: [...part, ...part_acce],
       // priceTotal: totalPrice.toLocaleString(),
-      priceTotal: prod.totalPrice,
+      priceTotal: totalPrice.toLocaleString(),
     };
   });
 

@@ -1342,23 +1342,50 @@ latestContentProdArr為這次追加追減的主產品
 
   const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
     // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
-    const lw = Number(prod.fullWidth || 0) * 100;
-    const h = Number(prod.height || 0) * 100;
-    const b = Number(prod.boxB || 0) * 100;
+
+    const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
+    const h = new Decimal(prod.height || 0).mul(100).toNumber();
+    const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
 
     const size = `${lw} X ${h} + ${b}`;
 
-    const componentArr = Object.values(prod.comList ?? {});
+    const list_com = { ...prod.comList, ...prod.subComList };
+
+    if (list_com.sidePlate?.totalPrice === '0') {
+      delete list_com['sidePlate'];
+    }
+
+    delete list_com['motorAccessories'];
+
+    const list_acce = prod.accessoriesList;
+
+    const componentArr = Object.values(list_com ?? {});
+
+    let totalPrice = 0;
 
     const part: Tpart[] = componentArr.map((com) => {
+      totalPrice += Number(com.totalPrice || 0);
+
       return {
         partName: com.comName,
         material: com.material,
         unit: com.unit,
-        qty: com.quantity,
-        price: String(com.price || 0),
-        totalPrice: com.totalPrice,
+        qty: Number(com.quantity).toFixed(2),
         desc: com.desc ?? '',
+        price: Number(com.price || 0).toLocaleString(),
+        totalPrice: Number(com.totalPrice || 0).toLocaleString(),
+      };
+    });
+
+    const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
+      return {
+        partName: acce.name,
+        material: '',
+        unit: acce.unit,
+        qty: String(acce.quantity),
+        price: acce.unitPrice_locale,
+        desc: '',
+        totalPrice: acce.totalPrice_locale,
       };
     });
 
@@ -1368,8 +1395,9 @@ latestContentProdArr為這次追加追減的主產品
       surface: prod.surface,
       doorType: prod.doorType,
       size: size,
-      priceTotal: prod.totalPrice,
-      part: part,
+      part: [...part, ...part_acce],
+      // priceTotal: totalPrice.toLocaleString(),
+      priceTotal: totalPrice.toLocaleString(),
     };
   });
 
