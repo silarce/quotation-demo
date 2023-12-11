@@ -9,7 +9,8 @@
  * useGetQuotation_id
  * fileInfoArr
  * reqReview 審核
- *
+ * reqPatchReviewer 送審
+ * 編輯審核人員
  */
 
 // 業務與業務主管審核過後，status就會自動轉為Pending
@@ -854,46 +855,104 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   }, [quotationId]);
 
-  const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
-  const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
-  const [sales, setSales] = useState<TemployeeDto | null>();
+  // const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
+  // const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
+  // const [sales, setSales] = useState<TemployeeDto | null>();
+
+  const [workDirector, setworkDirector] = useState<{
+    emp: TemployeeDto | null;
+    workDirectorReviewedAt: string | null | undefined;
+    toWorkDirectorAt: string | null | undefined;
+  }>();
+  const [supervisor, setSupervisor] = useState<{
+    emp: TemployeeDto | null;
+    supervisorReviewedAt: string | null | undefined;
+    toSupervisorAt: string | null | undefined;
+  }>();
+  const [sales, setSales] = useState<{
+    emp: TemployeeDto | null;
+    salesReviewedAt: string | null | undefined;
+    toSalesAt: string | null | undefined;
+  }>();
 
   useEffect(() => {
     const {
       //
       reviewSalesEmployee,
+      salesReviewedAt,
+      toSalesAt,
+
       reviewSupervisorEmployee,
+      supervisorReviewedAt,
+      toSupervisorAt,
+
       reviewWorkDirectorEmployee,
+      workDirectorReviewedAt,
+      toWorkDirectorAt,
     } = quotationData?.latestContent ?? {};
 
-    setworkDirector(reviewWorkDirectorEmployee);
-    setSupervisor(reviewSupervisorEmployee);
-    setSales(reviewSalesEmployee);
+    setworkDirector({
+      emp: reviewWorkDirectorEmployee ?? null,
+      workDirectorReviewedAt: workDirectorReviewedAt ?? null,
+      toWorkDirectorAt: toWorkDirectorAt ?? null,
+    });
+    setSupervisor({
+      emp: reviewSupervisorEmployee ?? null,
+      supervisorReviewedAt: supervisorReviewedAt ?? null,
+      toSupervisorAt: toSupervisorAt ?? null,
+    });
+
+    setSales({
+      emp: reviewSalesEmployee ?? null,
+      salesReviewedAt: salesReviewedAt ?? null,
+      toSalesAt: toSalesAt ?? null,
+    });
   }, [quotationData, disabled_reviewer]);
 
+  // 已經在後端紀錄的審核人員不可以改變
   const control_signature: Tcontroll_signature = {
     manager: {
       employee: quotationData?.latestContent.reviewManagerEmployee,
       forbidden: true,
     },
     workDirector: {
-      employee: workDirector,
+      employee: workDirector?.emp ?? null,
       onChange: (emp) => {
-        console.log(emp);
-        setworkDirector(emp);
+        setworkDirector((workDirector) => {
+          if (!workDirector) {
+            return workDirector;
+          }
+
+          return { ...workDirector, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
     },
     supervisor: {
-      employee: supervisor,
+      employee: supervisor?.emp ?? null,
       onChange: (emp) => {
-        setSupervisor(emp);
+        setSupervisor((supervisor) => {
+          if (!supervisor) {
+            return supervisor;
+          }
+
+          return { ...supervisor, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
     },
     sales: {
-      employee: sales,
+      employee: sales?.emp ?? null,
       onChange: (emp) => {
-        setSales(emp);
+        setSales((sales) => {
+          if (!sales) {
+            return sales;
+          }
+
+          return { ...sales, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
     },
     agent: {
       employee: quotationData?.latestContent.agentEmployee,
@@ -1023,19 +1082,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
           type: 'myButton',
           label: '編輯審核人員',
           onClick: () => {
+            const toSalesAt = sales?.toSalesAt;
+            const toSupervisorAt = supervisor?.toSupervisorAt;
+            const toWorkDirectorAt = workDirector?.toWorkDirectorAt;
+
             if (status === 'Pending' && !verifyForm) {
               return myAlert.warning({ title: '請先送出合約審核表' });
             }
 
-            const reviewSalesEmployeeId = sales?.id ?? null;
-            const reviewWorkDirectorEmployeeId = workDirector?.id ?? null;
-            const reviewSupervisorEmployeeId = supervisor?.id ?? null;
-
-            if (
-              status === 'Pending' &&
-              (reviewSalesEmployeeId || reviewWorkDirectorEmployeeId || reviewSupervisorEmployeeId)
-            ) {
-              myAlert.info({ title: '此報價單已經送審，無法編輯審核人員' });
+            if (status === 'Pending' && (toSalesAt || toSupervisorAt || toWorkDirectorAt)) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
+            } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
             } else {
               setDisabled_reviewer(false);
             }
@@ -1345,14 +1403,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
-    const reviewSalesEmployeeId = sales?.id ?? null;
-    const reviewWorkDirectorEmployeeId = workDirector?.id ?? null;
-    const reviewSupervisorEmployeeId = supervisor?.id ?? null;
+    const reviewSalesEmployeeId = sales?.emp?.id ?? null;
+    const reviewWorkDirectorEmployeeId = workDirector?.emp?.id ?? null;
+    const reviewSupervisorEmployeeId = supervisor?.emp?.id ?? null;
 
     if (
       status === 'Pending' &&
       (!reviewSalesEmployeeId || !reviewWorkDirectorEmployeeId || !reviewSupervisorEmployeeId)
     ) {
+      myAlert.info({ title: '請選擇所有審核人員' });
+
+      return;
+    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
       myAlert.info({ title: '請選擇所有審核人員' });
 
       return;

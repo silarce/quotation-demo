@@ -865,46 +865,70 @@ latestContentProdArr為這次追加追減的主產品
     })();
   }, [quotationId]);
 
-  const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
-  const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
-  const [sales, setSales] = useState<TemployeeDto | null>();
+  // const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
+  // const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
+  // const [sales, setSales] = useState<TemployeeDto | null>();
 
-  useEffect(() => {
-    const {
-      //
-      reviewSalesEmployee,
-      reviewSupervisorEmployee,
-      reviewWorkDirectorEmployee,
-    } = quotationData?.latestContent ?? {};
+  const [workDirector, setworkDirector] = useState<{
+    emp: TemployeeDto | null;
+    workDirectorReviewedAt: string | null | undefined;
+    toWorkDirectorAt: string | null | undefined;
+  }>();
+  const [supervisor, setSupervisor] = useState<{
+    emp: TemployeeDto | null;
+    supervisorReviewedAt: string | null | undefined;
+    toSupervisorAt: string | null | undefined;
+  }>();
+  const [sales, setSales] = useState<{
+    emp: TemployeeDto | null;
+    salesReviewedAt: string | null | undefined;
+    toSalesAt: string | null | undefined;
+  }>();
 
-    setworkDirector(reviewWorkDirectorEmployee);
-    setSupervisor(reviewSupervisorEmployee);
-    setSales(reviewSalesEmployee);
-  }, [quotationData, disabled_reviewer]);
-
+  // 已經在後端紀錄的審核人員不可以改變
   const control_signature: Tcontroll_signature = {
     manager: {
       employee: quotationData?.latestContent.reviewManagerEmployee,
       forbidden: true,
     },
     workDirector: {
-      employee: workDirector,
+      employee: workDirector?.emp ?? null,
       onChange: (emp) => {
-        console.log(emp);
-        setworkDirector(emp);
+        setworkDirector((workDirector) => {
+          if (!workDirector) {
+            return workDirector;
+          }
+
+          return { ...workDirector, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
     },
     supervisor: {
-      employee: supervisor,
+      employee: supervisor?.emp ?? null,
       onChange: (emp) => {
-        setSupervisor(emp);
+        setSupervisor((supervisor) => {
+          if (!supervisor) {
+            return supervisor;
+          }
+
+          return { ...supervisor, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
     },
     sales: {
-      employee: sales,
+      employee: sales?.emp ?? null,
       onChange: (emp) => {
-        setSales(emp);
+        setSales((sales) => {
+          if (!sales) {
+            return sales;
+          }
+
+          return { ...sales, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
     },
     agent: {
       employee: quotationData?.latestContent.agentEmployee,
@@ -1019,20 +1043,18 @@ latestContentProdArr為這次追加追減的主產品
           type: 'myButton',
           label: '編輯審核人員',
           onClick: () => {
+            const toSalesAt = sales?.toSalesAt;
+            const toSupervisorAt = supervisor?.toSupervisorAt;
+            const toWorkDirectorAt = workDirector?.toWorkDirectorAt;
+
             if (status === 'Pending' && !verifyForm) {
               return myAlert.warning({ title: '請先送出合約審核表' });
             }
 
-            const reviewSalesEmployeeId = sales?.id ?? null;
-            const reviewWorkDirectorEmployeeId = workDirector?.id ?? null;
-            const reviewSupervisorEmployeeId = supervisor?.id ?? null;
-
-            if (
-              (status === 'Pending' && reviewSalesEmployeeId) ||
-              reviewWorkDirectorEmployeeId ||
-              reviewSupervisorEmployeeId
-            ) {
-              myAlert.info({ title: '此報價單已經送審，無法編輯審核人員' });
+            if (status === 'Pending' && (toSalesAt || toSupervisorAt || toWorkDirectorAt)) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
+            } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
             } else {
               setDisabled_reviewer(false);
             }
@@ -1282,9 +1304,9 @@ latestContentProdArr為這次追加追減的主產品
       return;
     }
 
-    const reviewSalesEmployeeId = sales?.id ?? null;
-    const reviewWorkDirectorEmployeeId = workDirector?.id ?? null;
-    const reviewSupervisorEmployeeId = supervisor?.id ?? null;
+    const reviewSalesEmployeeId = sales?.emp?.id ?? null;
+    const reviewWorkDirectorEmployeeId = workDirector?.emp?.id ?? null;
+    const reviewSupervisorEmployeeId = supervisor?.emp?.id ?? null;
 
     if (
       status === 'Pending' &&
@@ -1293,14 +1315,18 @@ latestContentProdArr為這次追加追減的主產品
       myAlert.info({ title: '請選擇所有審核人員' });
 
       return;
+    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
+      myAlert.info({ title: '請選擇所有審核人員' });
+
+      return;
     }
 
     try {
       setIsLoading(true);
       await apiQuotationSubmitReview(quotationId, {
-        reviewSalesEmployeeId: sales?.id ?? null,
-        reviewWorkDirectorEmployeeId: workDirector?.id ?? null,
-        reviewSupervisorEmployeeId: supervisor?.id ?? null,
+        reviewSalesEmployeeId: sales?.emp?.id ?? null,
+        reviewWorkDirectorEmployeeId: workDirector?.emp?.id ?? null,
+        reviewSupervisorEmployeeId: supervisor?.emp?.id ?? null,
       });
       await update();
       setDisabled_reviewer(true);
