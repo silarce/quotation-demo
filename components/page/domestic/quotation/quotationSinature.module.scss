@@ -21,6 +21,11 @@
   // display: grid;
   // grid-template-columns: repeat(3, 1fr);
   gap: 45px;
+  justify-content: space-between;
+  &.toLeft {
+    gap: 80px;
+    justify-content: flex-end;
+  }
 
   .cell {
     > span {

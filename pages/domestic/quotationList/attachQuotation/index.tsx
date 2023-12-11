@@ -15,7 +15,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-// import { useForm } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -41,7 +40,6 @@ import ContractReviewForm from 'components/page/domestic/quotation/quotation/con
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
-// import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
@@ -128,7 +126,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const {
     id: quotationId, //報價單id //若為新增報價單則為undefined
   } = router.query as { id: string | undefined };
-  const { userInfo, userGrade } = useContext(AppContext);
+  const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
 
   // -----------------------------------------------------
@@ -137,7 +135,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [disabled, setDisabled] = useState(true);
   const [disabled_reviewer, setDisabled_reviewer] = useState(true);
   // -----------------------------------------------------
-  const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
   const [reviewFormShow, setReviewFormShow] = useState(false);
   const [reviewModalShow, setReviewModalShow] = useState(false);
   // -----------------------------------------------------
@@ -803,26 +800,6 @@ latestContentProdArr為這次追加追減的主產品
 
   // ----------------------------------------------------------------
 
-  // ----------------------------------------------------------------
-
-  const [reviewSales, setReviewSales] = useState<TemployeeDto>();
-  const [reviewSupervisor, setReviewSupervisor] = useState<TemployeeDto>();
-  const [reviewWorkDirector, setReviewWorkDirector] = useState<TemployeeDto>();
-
-  useEffect(() => {
-    if (!latestContent) {
-      return;
-    }
-
-    setReviewSales(latestContent.reviewSalesEmployee || undefined);
-    setReviewSupervisor(latestContent.reviewSupervisorEmployee || undefined);
-    setReviewWorkDirector(latestContent.reviewWorkDirectorEmployee || undefined);
-  }, [latestContent]);
-
-  // ---------------------------------------------------------
-  // const { register, control, reset, watch, setValue, getValues } = useForm<Partial<TquotationContentDto>>();
-  // const { data, update } = useGetQuotation_id(id as string);
-
   let isReviewer = false;
   let isSales = false;
   let isWorkDirector = false;
@@ -933,80 +910,17 @@ latestContentProdArr為這次追加追減的主產品
     },
   };
 
-  // --------------------------------------------------------------
+  // 在不同的審查階段只顯示不同的審核人員
+  if (status === 'Budget' || status === 'Bidding') {
+    delete control_signature.manager;
+    delete control_signature.workDirector;
+    delete control_signature.supervisor;
+  }
 
-  // const [empSelConfirmKey, setEmpSelConfirmKey] = useState<
-  //   'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector' | 'undefined'
-  // >('undefined');
-
-  // const openEmpSel = (v: 'reviewSales' | 'reviewSupervisor' | 'reviewWorkDirector') => {
-  //   setEmpSelConfirmKey(v);
-  //   setEmployeeSelectorShow(true);
-  // };
-
-  // const onEmpSelCancel = () => {
-  //   setEmployeeSelectorShow(false);
-  //   setEmpSelConfirmKey('undefined');
-  // };
-
-  // const empSelLookup = {
-  //   reviewSales: {
-  //     label: '請選擇審核業務',
-  //     // tip: '可不選，直接按確定',
-  //     employee: reviewSales,
-  //     onCancel: onEmpSelCancel,
-  //     onConfirm: (v: TemployeeDto[]) => {
-  //       setReviewSales(v[0]);
-
-  //       if (status === 'Contracting') {
-  //         setTimeout(() => {
-  //           openEmpSel('reviewSupervisor');
-  //         }, 300);
-  //       } else {
-  //         reqSetReviewer({
-  //           reviewSales: v[0],
-  //           reviewSupervisor,
-  //           reviewWorkDirector,
-  //         });
-  //       }
-  //     },
-  //   },
-  //   reviewSupervisor: {
-  //     label: '請選擇業務主管',
-  //     // tip: '可不選，直接按確定',
-  //     employee: reviewSupervisor,
-  //     onCancel: onEmpSelCancel,
-  //     onConfirm: async (v: TemployeeDto[]) => {
-  //       setReviewSupervisor(v[0]);
-  //       onEmpSelCancel();
-  //       setTimeout(() => {
-  //         openEmpSel('reviewWorkDirector');
-  //       }, 300);
-  //     },
-  //   },
-  //   reviewWorkDirector: {
-  //     label: '請選擇應收帳款',
-  //     // tip: '可不選，直接按確定',
-  //     employee: reviewWorkDirector,
-  //     onCancel: onEmpSelCancel,
-  //     onConfirm: (v: TemployeeDto[]) => {
-  //       setReviewWorkDirector(v[0]);
-  //       onEmpSelCancel();
-  //       reqSetReviewer({
-  //         reviewSales,
-  //         reviewSupervisor,
-  //         reviewWorkDirector: v[0],
-  //       });
-  //     },
-  //   },
-  //   undefined: {
-  //     label: '',
-  //     tip: '',
-  //     employee: undefined,
-  //     onCancel: () => {},
-  //     onConfirm: () => {},
-  //   },
-  // };
+  if (status === 'Contracting') {
+    delete control_signature.manager;
+    delete control_signature.workDirector;
+  }
 
   // --------------------------------------------------------------------------
 
@@ -1094,20 +1008,11 @@ latestContentProdArr為這次追加追減的主產品
     //   onClick: () => setShowPdf_part(true),
     // },
 
-    // (!!isReviewer || null) && { type: 'myButton', label: '審核', onClick: () => reqReview() },
     (!!isReviewer || null) && {
       type: 'myButton',
       label: '審核',
       onClick: () => setReviewModalShow(true),
     },
-    // (!!quotationId || null) && { type: 'myButton', label: '送審', onClick: () => openEmpSel('reviewSales') },
-    // (!!quotationId || null) && {
-    //   type: 'myButton',
-    //   label: '送審',
-    //   onClick: () => {
-    //     openEmpSel('reviewSales');
-    //   },
-    // },
 
     quotationId && status !== 'Pending'
       ? {
@@ -1126,7 +1031,6 @@ latestContentProdArr為這次追加追減的主產品
         return null;
       }
     })(),
-    // { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -1148,8 +1052,6 @@ latestContentProdArr為這次追加追減的主產品
   // --------------------------------------------------------------------------
 
   const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
-    // const data_watch = watch();
-
     // 總樘數
     const prodQty = 0;
 
@@ -1293,39 +1195,6 @@ latestContentProdArr為這次追加追減的主產品
   }; // reqUpdateQuotation
 
   // --------------------------------------------
-  const reqSetReviewer = async ({
-    reviewSales,
-    reviewWorkDirector,
-    reviewSupervisor,
-  }: {
-    reviewSales?: TemployeeDto | undefined;
-    reviewSupervisor?: TemployeeDto | undefined;
-    reviewWorkDirector?: TemployeeDto | undefined;
-  }) => {
-    if (!quotationId) {
-      return;
-    }
-
-    const reviewSalesEmployeeId = reviewSales?.id || null;
-    const reviewWorkDirectorEmployeeId = reviewWorkDirector?.id || null;
-    const reviewSupervisorEmployeeId = reviewSupervisor?.id || null;
-
-    try {
-      setIsLoading(true);
-      await apiQuotationSubmitReview(quotationId, {
-        reviewSalesEmployeeId,
-        reviewWorkDirectorEmployeeId,
-        reviewSupervisorEmployeeId,
-      });
-      await update();
-    } catch (error) {
-      myAlert.err({ title: '更新審核人員失敗' });
-    } finally {
-      setReviewSales(undefined);
-      setReviewSupervisor(undefined);
-      setIsLoading(false);
-    }
-  };
 
   const reqReview = async (isPass: boolean) => {
     if (!quotationId || !isReviewer) {
@@ -1346,10 +1215,19 @@ latestContentProdArr為這次追加追減的主產品
       }
     }
 
+    const shouldDirect = isPass && status === 'Pending';
+
     try {
       setIsLoading(true);
       await apiQuotationReview({ id: quotationId, body });
-      await update();
+
+      if (shouldDirect) {
+        router.push({
+          pathname: '/domestic/contract',
+        });
+      } else {
+        await update();
+      }
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '審核發生錯誤', content: err.message });
@@ -1683,20 +1561,7 @@ latestContentProdArr為這次追加追減的主產品
         mainProductArr={pdfPartProps}
         quotationId={latestContent?.quotationNumber ?? ''}
       />
-      {/*  */}
-      {/* <EmployeeSelector
-        showModal={employeeSelectorShow}
-        label={empSelLookup[empSelConfirmKey]?.label}
-        // tip={empSelLookup[empSelConfirmKey]?.tip}
-        onConfirm={(v) => {
-          empSelLookup[empSelConfirmKey]?.onConfirm(v);
-        }}
-        onCancel={() => empSelLookup[empSelConfirmKey]?.onCancel()}
-        selLimit={1}
-        defaultEmpArr={
-          empSelLookup[empSelConfirmKey]?.employee ? [empSelLookup[empSelConfirmKey].employee!] : undefined
-        }
-      /> */}
+
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
