@@ -994,17 +994,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '單價分析',
       img: iconUpload.src,
       onClick: () => {
-        const prodArr = latestContent?.products;
-        let isOk = true;
-        prodArr?.forEach((prod) => {
-          if (prod.quantity === 0) {
-            isOk = false;
-          }
-        });
+        // const prodArr = latestContent?.products;
+        // let isOk = true;
+        // prodArr?.forEach((prod) => {
+        //   if (prod.quantity === 0) {
+        //     isOk = false;
+        //   }
+        // });
 
-        if (!isOk) {
-          return myAlert.info({ title: '有主產品數量為0', content: '請先確認所有主產品的數量不為0' });
-        }
+        // if (!isOk) {
+        //   return myAlert.info({ title: '有主產品數量為0', content: '請先確認所有主產品的數量不為0' });
+        // }
 
         setShowPdf_part(true);
       },
