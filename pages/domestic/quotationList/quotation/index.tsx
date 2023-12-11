@@ -26,6 +26,7 @@ import moment from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { AxiosError } from 'axios';
 
 // components
 import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
@@ -1327,8 +1328,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         },
       });
     } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '解除鎖定發生錯誤', content: err.message });
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '解除鎖定發生錯誤', content: err.response?.data.message });
     } finally {
       setIsLoading(false);
     }
