@@ -1382,7 +1382,9 @@ latestContentProdArr為這次追加追減的主產品
         partName: acce.name,
         material: '',
         unit: acce.unit,
-        qty: String(acce.quantity),
+        // FIXME 型別為number，但實際上為string
+        // hooks/quotation/classAccessories.tsx // get quantity
+        qty: Number(acce.quantity).toFixed(2),
         price: acce.unitPrice_locale,
         desc: '',
         totalPrice: acce.totalPrice_locale,
