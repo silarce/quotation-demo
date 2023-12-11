@@ -1417,6 +1417,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     });
 
     const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
+      totalPrice += Number(acce.totalPrice || 0);
+
       return {
         partName: acce.name,
         material: '',
