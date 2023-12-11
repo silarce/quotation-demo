@@ -206,7 +206,8 @@ export default function QuotationPdf({
         doorType: prod.doorType,
         material: prod.material,
         // thickness: prod.thickness,
-        thickness: prod.thickness === '0' ? '' : prod.thickness + 't',
+        // thickness: prod.thickness === '0' ? '' : prod.thickness + 't',
+        thickness: prod.thickness === '0' ? '' : prod.thickness,
         surface: prod.surface,
         // doorRail 要收圖片路徑
         // doorRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,
