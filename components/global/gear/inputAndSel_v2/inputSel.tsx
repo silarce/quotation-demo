@@ -89,6 +89,7 @@ export type {
   TtimePickerProps,
   TtimePickerProps_mui,
   TinputSelBarProps,
+  TinputPropsAndSelectProps,
 };
 
 // =============================================================================
