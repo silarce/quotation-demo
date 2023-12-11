@@ -652,7 +652,7 @@ export function apiSubmitContracting({ contentId, body }: { contentId: string; b
     .catch((err) => Promise.reject(err));
 }
 
-export const apiQuotationunLock = (id: string) => {
+export const apiQuotationUnlock = (id: string) => {
   const api = `/quotation/${id}/unLock`;
 
   return axi

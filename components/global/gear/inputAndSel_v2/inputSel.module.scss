@@ -284,6 +284,18 @@ div.selControl {
 
 // =================================================================
 
+.inputAndSelect {
+  display: grid;
+  grid-template-columns: auto fit-content(100%);
+  align-items: center;
+  width: 100%;
+  .valueContainer {
+    display: none;
+  }
+}
+
+// =================================================================
+
 .checkBar {
   display: flex;
   gap: 35px;
