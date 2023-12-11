@@ -1278,7 +1278,7 @@ latestContentProdArr為這次追加追減的主產品
       }
     }
 
-    const shouldDirect = isPass && status === 'Pending';
+    const shouldDirect = isManager && status === 'Pending';
 
     try {
       setIsLoading(true);

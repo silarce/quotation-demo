@@ -1353,7 +1353,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     }
 
-    const shouldDirect = isPass && status === 'Pending';
+    // const shouldDirect = isPass && status === 'Pending';
+    const shouldDirect = isManager && status === 'Pending';
 
     try {
       setIsLoading(true);
