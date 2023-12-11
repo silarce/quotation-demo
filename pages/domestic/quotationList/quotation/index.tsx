@@ -1093,7 +1093,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               return myAlert.warning({ title: '請先送出合約審核表' });
             }
 
-            if (status === 'Pending' && (toSalesAt || toSupervisorAt || toWorkDirectorAt)) {
+            if (status === 'Pending' && (toSupervisorAt || toWorkDirectorAt)) {
               myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
             } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
               myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
