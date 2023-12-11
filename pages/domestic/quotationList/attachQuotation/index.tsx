@@ -847,7 +847,10 @@ latestContentProdArr為這次追加追減的主產品
       // 總經理ID
       userId === '01f55698-49bb-4501-b432-1157a5109554'
     ) {
-      if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
+      if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
+        isManager = true;
+        isReviewer = true;
+      } else if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
       }
