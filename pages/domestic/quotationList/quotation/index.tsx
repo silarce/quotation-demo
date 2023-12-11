@@ -1017,12 +1017,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }
       : null,
 
-    !contentId && quotationId && status !== 'Pending'
+    !contentId && quotationId
       ? {
           type: 'myButton',
           label: '編輯送審人員',
           onClick: () => {
-            setDisabled_reviewer(false);
+            const reviewSalesEmployeeId = sales?.id ?? null;
+            const reviewWorkDirectorEmployeeId = workDirector?.id ?? null;
+            const reviewSupervisorEmployeeId = supervisor?.id ?? null;
+
+            if (
+              status === 'Pending' &&
+              (reviewSalesEmployeeId || reviewWorkDirectorEmployeeId || reviewSupervisorEmployeeId)
+            ) {
+              myAlert.info({ title: '此報價單已經送審，無法編輯送審人員' });
+            } else {
+              setDisabled_reviewer(false);
+            }
           },
         }
       : null,
@@ -1329,13 +1340,25 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
-    setIsLoading(true);
+    const reviewSalesEmployeeId = sales?.id ?? null;
+    const reviewWorkDirectorEmployeeId = workDirector?.id ?? null;
+    const reviewSupervisorEmployeeId = supervisor?.id ?? null;
+
+    if (
+      status === 'Pending' &&
+      (!reviewSalesEmployeeId || !reviewWorkDirectorEmployeeId || !reviewSupervisorEmployeeId)
+    ) {
+      myAlert.info({ title: '請選擇所有審核人員' });
+
+      return;
+    }
 
     try {
+      setIsLoading(true);
       await apiQuotationSubmitReview(quotationId, {
-        reviewSalesEmployeeId: sales?.id ?? null,
-        reviewWorkDirectorEmployeeId: workDirector?.id ?? null,
-        reviewSupervisorEmployeeId: supervisor?.id ?? null,
+        reviewSalesEmployeeId,
+        reviewWorkDirectorEmployeeId,
+        reviewSupervisorEmployeeId,
       });
       await update();
       setDisabled_reviewer(true);
