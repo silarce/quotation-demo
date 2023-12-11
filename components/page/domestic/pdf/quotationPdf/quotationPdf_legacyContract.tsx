@@ -205,7 +205,7 @@ export default function QuotationPdf({
         doorType: prod.doorType,
         material: prod.material,
         // thickness: prod.thickness,
-        thickness: prod.thickness === '0' ? '' : prod.thickness,
+        thickness: prod.thickness === '0' ? '' : prod.thickness + 't',
         surface: prod.surface,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
