@@ -16,7 +16,7 @@ import style from './contractList.module.scss';
 // type
 import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
-import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id_noItems_2 } from 'js/api/api_quotation';
 
 export type { Tcontract };
 
@@ -29,7 +29,7 @@ export default function ContractList({ contractList }: { contractList: Tcontract
   const [activeIndex, setActiveIndex] = useState(-1);
   const [activeContract, setActiveContract] = useState<Tcontract>();
 
-  const { data, update, clear } = useGetContract_id_noItems(activeContract?.id);
+  const { data, update, clear } = useGetContract_id_noItems_2(activeContract?.id);
   const subContracts = data?.subContracts;
 
   const changeActive = (panelIndex: string | string[]) => {
