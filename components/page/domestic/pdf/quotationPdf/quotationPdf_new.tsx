@@ -200,14 +200,15 @@ export default function QuotationPdf({
 
       const size = `${lw}Ｘ${h}${b ? `＋${b}` : ''}`;
 
+      const thickness_num = Number(prod.thickness.replaceAll('t', ''));
+      const thickness_str = thickness_num === 0 ? '' : thickness_num.toFixed(1) + 't';
+
       return {
         category: prod.itemName,
         size,
         doorType: prod.doorType,
         material: prod.material,
-        // thickness: prod.thickness,
-        // thickness: prod.thickness === '0' ? '' : prod.thickness + 't',
-        thickness: prod.thickness === '0' ? '' : prod.thickness,
+        thickness: thickness_str,
         surface: prod.surface,
         // doorRail 要收圖片路徑
         // doorRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,

@@ -199,13 +199,17 @@ export default function QuotationPdf({
 
       const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
 
+      const thickness_num = Number(prod.thickness.replaceAll('t', ''));
+      const thickness_str = thickness_num === 0 ? '' : thickness_num.toFixed(1) + 't';
+
       return {
         category: prod.itemName,
         size,
         doorType: prod.doorType,
         material: prod.material,
         // thickness: prod.thickness,
-        thickness: prod.thickness === '0' ? '' : prod.thickness + 't',
+        // thickness: prod.thickness === '0' ? '' : prod.thickness + 't',
+        thickness: thickness_str,
         surface: prod.surface,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
