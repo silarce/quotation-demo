@@ -888,6 +888,40 @@ latestContentProdArr為這次追加追減的主產品
     toSalesAt: string | null | undefined;
   }>();
 
+  useEffect(() => {
+    const {
+      //
+      reviewSalesEmployee,
+      salesReviewedAt,
+      toSalesAt,
+
+      reviewSupervisorEmployee,
+      supervisorReviewedAt,
+      toSupervisorAt,
+
+      reviewWorkDirectorEmployee,
+      workDirectorReviewedAt,
+      toWorkDirectorAt,
+    } = quotationData?.latestContent ?? {};
+
+    setworkDirector({
+      emp: reviewWorkDirectorEmployee ?? null,
+      workDirectorReviewedAt: workDirectorReviewedAt ?? null,
+      toWorkDirectorAt: toWorkDirectorAt ?? null,
+    });
+    setSupervisor({
+      emp: reviewSupervisorEmployee ?? null,
+      supervisorReviewedAt: supervisorReviewedAt ?? null,
+      toSupervisorAt: toSupervisorAt ?? null,
+    });
+
+    setSales({
+      emp: reviewSalesEmployee ?? null,
+      salesReviewedAt: salesReviewedAt ?? null,
+      toSalesAt: toSalesAt ?? null,
+    });
+  }, [quotationData, disabled_reviewer]);
+
   // 已經在後端紀錄的審核人員不可以改變
   const control_signature: Tcontroll_signature = {
     manager: {
@@ -938,6 +972,8 @@ latestContentProdArr為這次追加追減的主產品
       forbidden: true,
     },
   };
+
+  // console.log(sales);
 
   // 在預算、投標、發包 不顯示應收帳款
   if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
