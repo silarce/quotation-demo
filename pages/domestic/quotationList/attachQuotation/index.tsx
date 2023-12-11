@@ -18,6 +18,7 @@ import moment from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { AxiosError } from 'axios';
 
 // components
 import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
@@ -46,6 +47,7 @@ import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButto
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
+import iconRedLock from 'public/image/icon/redLock.svg';
 
 // css
 import style from './quotation.module.scss';
@@ -1041,6 +1043,26 @@ latestContentProdArr為這次追加追減的主產品
         return null;
       }
     })(),
+
+    status === 'Pending'
+      ? {
+          type: 'myButton',
+          label: '解除鎖定',
+          img: iconRedLock.src,
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定要解除鎖定?',
+              content: '此報價單將需要重新送審並回到發包狀態',
+              props: {
+                onOk: () => {
+                  reqUnlock();
+                },
+              },
+            });
+          },
+        }
+      : null,
+
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -1286,6 +1308,30 @@ latestContentProdArr為這次追加追減的主產品
     }
   };
 
+  const reqUnlock = async () => {
+    if (!quotationId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationUnlock(quotationId);
+      await update();
+      myAlert.success({ title: '解除鎖定成功' });
+      router.push({
+        query: {
+          ...router.query,
+          status: 'Contracting',
+        },
+      });
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '解除鎖定發生錯誤', content: err.response?.data.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -1504,7 +1550,6 @@ latestContentProdArr為這次追加追減的主產品
           {/* 簽名 */}
           {/*  */}
           {/*  */}
-          {/* <QuotationSinature signatureArr={signatureArr} disabled={disabled} /> */}
           <QuotationSinature_3 controll={control_signature} disabled={disabled_reviewer} />
           {/*  */}
           {/*  */}
