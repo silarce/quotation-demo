@@ -384,6 +384,10 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       <ContractSelector
         showModal={contractSelectShow}
         onConfirm={(v) => {
+          if (!v[0]) {
+            return;
+          }
+
           router.push({
             pathname: '/domestic/contract/attachContract',
             query: {
