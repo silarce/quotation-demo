@@ -182,7 +182,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
     // _____________________________________________
     if (reviewStatus === '審核完成') {
       // 如果在預算或投標階段
-      if (status === 'Budget' || status === 'Bidding' || 'Contracting') {
+      if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
         return {
           $and: {
             // 1 使用者為經辦或任一階段的審核者
