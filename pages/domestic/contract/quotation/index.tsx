@@ -34,7 +34,11 @@ import style from './quotation.module.scss';
 // =============================================================
 
 // api
-import { useGetContract_id_noItems, useQuotation_id_attachments, apiGetQuotationProducts } from 'js/api/api_quotation';
+import {
+  useGetContract_id_noItems_2,
+  useQuotation_id_attachments,
+  apiGetQuotationProducts,
+} from 'js/api/api_quotation';
 import { apiPostEngineeringContact } from 'js/api/api_engineering';
 
 // component
@@ -87,7 +91,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
 
-  const { data, update } = useGetContract_id_noItems(id as string | undefined);
+  const { data, update } = useGetContract_id_noItems_2(id as string | undefined);
   const engineeringContactId = data?.engineeringContactId;
 
   useEffect(() => {
