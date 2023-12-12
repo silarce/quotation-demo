@@ -3,6 +3,7 @@ import { MouseEventHandler } from 'react';
 import classNames from 'classnames';
 
 import { Button, ButtonProps } from 'antd';
+import Link from 'next/link';
 
 // icon
 import iconAdd from 'public/image/icon/add.svg';
@@ -50,33 +51,35 @@ export default function MyButton_v2({
   }
 
   return (
-    <Button
-      {...buttonProps}
-      className={classNames(scss.button, theme && scss[theme], px && scss[px], className)}
-      onClick={onClick}
-      loading={isLoading}
-      disabled={disabled}
-      href={href}
-      target={target}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      {img && <img src={img} alt="" />}
-      {label && <span>{label}</span>}
-    </Button>
-
-    // <button
-    //   className={classNames(
-    //     scss.button,
-    //     { [scss.red]: red },
-    //     px && scss[px],
-    //     className
-    //   )}
-    //   onClick={onClick}
-    // >
-    //   {/* eslint-disable-next-line @next/next/no-img-element */}
-    //   {img && <img src={img} alt="" />}
-    //   {label && <span >{label}</span>}
-    // </button>
+    <>
+      {!href && (
+        <Button
+          {...buttonProps}
+          className={classNames(scss.button, theme && scss[theme], px && scss[px], className)}
+          onClick={onClick}
+          loading={isLoading}
+          disabled={disabled}
+          href={href}
+          target={target}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {img && <img src={img} alt="" />}
+          {label && <span>{label}</span>}
+        </Button>
+      )}
+      {href && (
+        <Link
+          className={classNames(scss.button, theme && scss[theme], px && scss[px], className)}
+          onClick={onClick}
+          href={href}
+          target={target}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {img && <img src={img} alt="" />}
+          {label && <span>{label}</span>}
+        </Link>
+      )}
+    </>
   );
 }
 
