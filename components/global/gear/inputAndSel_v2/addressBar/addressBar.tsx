@@ -93,23 +93,6 @@ export default function AddressBar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [county.props?.value, county_l]);
 
-  useEffect(() => {
-    if (district?.props?.onChange) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      district.props.onChange(null); // 第二個參數應該用不到
-    } else {
-      setDistrict_l(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    // county.props?.value的型別是Toption，一定會有value
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    county.props?.value?.value,
-    county_l,
-  ]);
-
   // ------------------------------------------------------------------
 
   const selectInputArr: TinputSelBarProps_reduce['propsArr'] = [
@@ -138,6 +121,7 @@ export default function AddressBar({
           value: county_l, // 被蓋掉就是由外層控制
           onChange: (e) => {
             setCounty_l(e); // 被蓋掉就是由外層控制
+            setDistrict_l(null);
           },
           ...county.props,
         },

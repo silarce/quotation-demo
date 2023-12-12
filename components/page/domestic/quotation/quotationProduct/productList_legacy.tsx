@@ -375,7 +375,7 @@ function DndRow({
 
             const stateValue = prod[key];
             const inputSelProps = _.cloneDeep(prodCellConfig.cellConfig[key].inputSelProps);
-            const { inputProps, selectProps, checkBoxProps, suffix } = inputSelProps;
+            const { inputProps, selectProps, checkBoxProps, suffix, inputPropsAndSelectProps } = inputSelProps;
 
             //____
             if (inputProps?.props) {
@@ -406,6 +406,32 @@ function DndRow({
                 }
 
                 selectProps.props.onChange = (option) => {
+                  (prod[key] as string) = option?.value ?? '';
+                };
+              }
+            }
+
+            //____
+
+            if (inputPropsAndSelectProps) {
+              const {
+                // bro means brother
+                inputProps: inputProps_bro,
+                selectProps: selectProps_bro,
+              } = inputPropsAndSelectProps;
+
+              if (inputProps_bro?.props) {
+                inputProps_bro.props.value = stateValue as string;
+
+                inputProps_bro.props.onChange = (e) => {
+                  (prod[key] as string) = e.target.value;
+                };
+              }
+
+              selectProps_bro.easyValue = stateValue as string;
+
+              if (selectProps_bro.props) {
+                selectProps_bro.props.onChange = (option) => {
                   (prod[key] as string) = option?.value ?? '';
                 };
               }

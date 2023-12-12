@@ -539,6 +539,77 @@ export const useGetContract_id_noItems = (id: string | undefined, customParams?:
   };
 };
 
+export const useGetContract_id_noItems_2 = (id: string | undefined, customParams?: Tparams) => {
+  const params: Tparams = {
+    ...customParams,
+    populate: [
+      // 'contents',
+      'content.customer',
+      'content.agentEmployee',
+      'content.supervisorEmployee',
+      'content.managerEmployee',
+      'content.reviewSalesEmployee',
+      'content.reviewWorkDirectorEmployee',
+      'content.reviewSupervisorEmployee',
+      'content.reviewManagerEmployee',
+
+      'content.products',
+      // 'content.products.items.accessories',
+      // 'content.products.items.components',
+      'content.others',
+      'content.verifyForm',
+
+      // 'rootContract.content.customer',
+      // 'rootContract.content.agentEmployee',
+      // 'rootContract.content.supervisorEmployee',
+      // 'rootContract.content.managerEmployee',
+      // 'rootContract.content.reviewSalesEmployee',
+      // 'rootContract.content.reviewWorkDirectorEmployee',
+      // 'rootContract.content.reviewSupervisorEmployee',
+      // 'rootContract.content.others',
+      // 'rootContract.content.products.items.accessories',
+      // 'rootContract.content.products.items.components',
+
+      // 'attachedToContract',
+      // 'attachedContract',
+      'subContracts.content.products.rootProdductId',
+      'subContracts.content.customer',
+      'subContracts.content.verifyForm',
+
+      'products',
+
+      ...(customParams?.populate ?? []),
+    ],
+  };
+
+  const [res, setRes] = useState<TquotationContractDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const newRes = await apiGetContract_Id(id, params);
+
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得合約資料失敗', content: err.message });
+    }
+  };
+
+  return {
+    data: res,
+    update,
+    clear: () => setRes(undefined),
+  };
+};
+
 export const useGetContract_id_forAttach = (id: string | undefined) => {
   const params: Tparams = {
     populate: [

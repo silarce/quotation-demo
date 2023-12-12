@@ -18,6 +18,7 @@ import moment from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { AxiosError } from 'axios';
 
 // components
 import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
@@ -46,6 +47,7 @@ import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButto
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
+import iconRedLock from 'public/image/icon/redLock.svg';
 
 // css
 import style from './quotation.module.scss';
@@ -845,7 +847,10 @@ latestContentProdArr為這次追加追減的主產品
       // 總經理ID
       userId === '01f55698-49bb-4501-b432-1157a5109554'
     ) {
-      if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
+      if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
+        isManager = true;
+        isReviewer = true;
+      } else if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
       }
@@ -863,52 +868,112 @@ latestContentProdArr為這次追加追減的主產品
     })();
   }, [quotationId]);
 
-  const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
-  const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
-  const [sales, setSales] = useState<TemployeeDto | null>();
+  // const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
+  // const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
+  // const [sales, setSales] = useState<TemployeeDto | null>();
+
+  const [workDirector, setworkDirector] = useState<{
+    emp: TemployeeDto | null;
+    workDirectorReviewedAt: string | null | undefined;
+    toWorkDirectorAt: string | null | undefined;
+  }>();
+  const [supervisor, setSupervisor] = useState<{
+    emp: TemployeeDto | null;
+    supervisorReviewedAt: string | null | undefined;
+    toSupervisorAt: string | null | undefined;
+  }>();
+  const [sales, setSales] = useState<{
+    emp: TemployeeDto | null;
+    salesReviewedAt: string | null | undefined;
+    toSalesAt: string | null | undefined;
+  }>();
 
   useEffect(() => {
     const {
       //
       reviewSalesEmployee,
+      salesReviewedAt,
+      toSalesAt,
+
       reviewSupervisorEmployee,
+      supervisorReviewedAt,
+      toSupervisorAt,
+
       reviewWorkDirectorEmployee,
+      workDirectorReviewedAt,
+      toWorkDirectorAt,
     } = quotationData?.latestContent ?? {};
 
-    setworkDirector(reviewWorkDirectorEmployee);
-    setSupervisor(reviewSupervisorEmployee);
-    setSales(reviewSalesEmployee);
+    setworkDirector({
+      emp: reviewWorkDirectorEmployee ?? null,
+      workDirectorReviewedAt: workDirectorReviewedAt ?? null,
+      toWorkDirectorAt: toWorkDirectorAt ?? null,
+    });
+    setSupervisor({
+      emp: reviewSupervisorEmployee ?? null,
+      supervisorReviewedAt: supervisorReviewedAt ?? null,
+      toSupervisorAt: toSupervisorAt ?? null,
+    });
+
+    setSales({
+      emp: reviewSalesEmployee ?? null,
+      salesReviewedAt: salesReviewedAt ?? null,
+      toSalesAt: toSalesAt ?? null,
+    });
   }, [quotationData, disabled_reviewer]);
 
+  // 已經在後端紀錄的審核人員不可以改變
   const control_signature: Tcontroll_signature = {
     manager: {
       employee: quotationData?.latestContent.reviewManagerEmployee,
       forbidden: true,
     },
     workDirector: {
-      employee: workDirector,
+      employee: workDirector?.emp ?? null,
       onChange: (emp) => {
-        console.log(emp);
-        setworkDirector(emp);
+        setworkDirector((workDirector) => {
+          if (!workDirector) {
+            return workDirector;
+          }
+
+          return { ...workDirector, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
     },
     supervisor: {
-      employee: supervisor,
+      employee: supervisor?.emp ?? null,
       onChange: (emp) => {
-        setSupervisor(emp);
+        setSupervisor((supervisor) => {
+          if (!supervisor) {
+            return supervisor;
+          }
+
+          return { ...supervisor, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
     },
     sales: {
-      employee: sales,
+      employee: sales?.emp ?? null,
       onChange: (emp) => {
-        setSales(emp);
+        setSales((sales) => {
+          if (!sales) {
+            return sales;
+          }
+
+          return { ...sales, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
     },
     agent: {
       employee: quotationData?.latestContent.agentEmployee,
       forbidden: true,
     },
   };
+
+  // console.log(sales);
 
   // 在預算、投標、發包 不顯示應收帳款
   if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
@@ -1012,12 +1077,26 @@ latestContentProdArr為這次追加追減的主產品
       onClick: () => setReviewModalShow(true),
     },
 
-    quotationId && status !== 'Pending'
+    quotationId
       ? {
           type: 'myButton',
-          label: '編輯送審人員',
+          label: '編輯審核人員',
           onClick: () => {
-            setDisabled_reviewer(false);
+            const toSalesAt = sales?.toSalesAt;
+            const toSupervisorAt = supervisor?.toSupervisorAt;
+            const toWorkDirectorAt = workDirector?.toWorkDirectorAt;
+
+            if (status === 'Pending' && !verifyForm) {
+              return myAlert.warning({ title: '請先送出合約審核表' });
+            }
+
+            if (status === 'Pending' && (toSupervisorAt || toWorkDirectorAt)) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
+            } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
+            } else {
+              setDisabled_reviewer(false);
+            }
           },
         }
       : null,
@@ -1029,6 +1108,26 @@ latestContentProdArr為這次追加追減的主產品
         return null;
       }
     })(),
+
+    status === 'Pending'
+      ? {
+          type: 'myButton',
+          label: '解除鎖定',
+          img: iconRedLock.src,
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定要解除鎖定?',
+              content: '此報價單將需要重新送審並回到發包狀態',
+              props: {
+                onOk: () => {
+                  reqUnlock();
+                },
+              },
+            });
+          },
+        }
+      : null,
+
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -1036,7 +1135,9 @@ latestContentProdArr為這次追加追減的主產品
     {
       type: 'redButton',
       label: '送審',
-      onClick: () => reqPatchReviewer(),
+      onClick: () => {
+        reqPatchReviewer();
+      },
     },
     {
       type: 'myButton',
@@ -1213,7 +1314,13 @@ latestContentProdArr為這次追加追減的主產品
       }
     }
 
-    const shouldDirect = isPass && status === 'Pending';
+    if (status === 'Pending') {
+      if (!reviewSalesEmployeeId || !reviewWorkDirectorEmployeeId || !reviewSupervisorEmployeeId) {
+        return myAlert.warning({ title: '請先設定所有審核人員' });
+      }
+    }
+
+    const shouldDirect = isManager && status === 'Pending';
 
     try {
       setIsLoading(true);
@@ -1242,13 +1349,29 @@ latestContentProdArr為這次追加追減的主產品
       return;
     }
 
-    setIsLoading(true);
+    const reviewSalesEmployeeId = sales?.emp?.id ?? null;
+    const reviewWorkDirectorEmployeeId = workDirector?.emp?.id ?? null;
+    const reviewSupervisorEmployeeId = supervisor?.emp?.id ?? null;
+
+    if (
+      status === 'Pending' &&
+      (!reviewSalesEmployeeId || !reviewWorkDirectorEmployeeId || !reviewSupervisorEmployeeId)
+    ) {
+      myAlert.info({ title: '請選擇所有審核人員' });
+
+      return;
+    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
+      myAlert.info({ title: '請選擇所有審核人員' });
+
+      return;
+    }
 
     try {
+      setIsLoading(true);
       await apiQuotationSubmitReview(quotationId, {
-        reviewSalesEmployeeId: sales?.id ?? null,
-        reviewWorkDirectorEmployeeId: workDirector?.id ?? null,
-        reviewSupervisorEmployeeId: supervisor?.id ?? null,
+        reviewSalesEmployeeId: sales?.emp?.id ?? null,
+        reviewWorkDirectorEmployeeId: workDirector?.emp?.id ?? null,
+        reviewSupervisorEmployeeId: supervisor?.emp?.id ?? null,
       });
       await update();
       setDisabled_reviewer(true);
@@ -1260,29 +1383,84 @@ latestContentProdArr為這次追加追減的主產品
     }
   };
 
+  const reqUnlock = async () => {
+    if (!quotationId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiQuotationUnlock(quotationId);
+      await update();
+      myAlert.success({ title: '解除鎖定成功' });
+      router.push({
+        query: {
+          ...router.query,
+          status: 'Contracting',
+        },
+      });
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '解除鎖定發生錯誤', content: err.response?.data.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
   const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
     // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
-    const lw = Number(prod.fullWidth || 0) * 100;
-    const h = Number(prod.height || 0) * 100;
-    const b = Number(prod.boxB || 0) * 100;
+
+    const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
+    const h = new Decimal(prod.height || 0).mul(100).toNumber();
+    const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
 
     const size = `${lw} X ${h} + ${b}`;
 
-    const componentArr = Object.values(prod.comList ?? {});
+    const list_com = { ...prod.comList, ...prod.subComList };
+
+    if (list_com.sidePlate?.totalPrice === '0') {
+      delete list_com['sidePlate'];
+    }
+
+    delete list_com['motorAccessories'];
+
+    const list_acce = prod.accessoriesList;
+
+    const componentArr = Object.values(list_com ?? {});
+
+    let totalPrice = 0;
 
     const part: Tpart[] = componentArr.map((com) => {
+      totalPrice += Number(com.totalPrice || 0);
+
       return {
         partName: com.comName,
         material: com.material,
         unit: com.unit,
-        qty: com.quantity,
-        price: String(com.price || 0),
-        totalPrice: com.totalPrice,
+        qty: Number(com.quantity).toFixed(2),
         desc: com.desc ?? '',
+        price: Number(com.price || 0).toLocaleString(),
+        totalPrice: Number(com.totalPrice || 0).toLocaleString(),
+      };
+    });
+
+    const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
+      totalPrice += Number(acce.totalPrice || 0);
+
+      return {
+        partName: acce.name,
+        material: '',
+        unit: acce.unit,
+        // FIXME 型別為number，但實際上為string
+        // hooks/quotation/classAccessories.tsx // get quantity
+        qty: Number(acce.quantity).toFixed(2),
+        price: acce.unitPrice_locale,
+        desc: '',
+        totalPrice: acce.totalPrice_locale,
       };
     });
 
@@ -1292,8 +1470,9 @@ latestContentProdArr為這次追加追減的主產品
       surface: prod.surface,
       doorType: prod.doorType,
       size: size,
-      priceTotal: prod.totalPrice,
-      part: part,
+      part: [...part, ...part_acce],
+      // priceTotal: totalPrice.toLocaleString(),
+      priceTotal: totalPrice.toLocaleString(),
     };
   });
 
@@ -1478,7 +1657,6 @@ latestContentProdArr為這次追加追減的主產品
           {/* 簽名 */}
           {/*  */}
           {/*  */}
-          {/* <QuotationSinature signatureArr={signatureArr} disabled={disabled} /> */}
           <QuotationSinature_3 controll={control_signature} disabled={disabled_reviewer} />
           {/*  */}
           {/*  */}

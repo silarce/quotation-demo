@@ -78,37 +78,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
     // _____________________________________________
     if (reviewStatus === '審核中') {
       // 如果在預算或投標階段
-      if (status === 'Budget' || status === 'Bidding') {
-        return {
-          // 同時滿足兩個條件
-          $and: {
-            // 1 使用者為經辦或任一階段的審核者
-            '1': {
-              $or: {
-                'latestContent.agentEmployee.id': { $eq: userId },
-                'latestContent.reviewSalesEmployee.id': { $eq: userId },
-                'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
-                'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
-                'latestContent.reviewManagerEmployee.id': { $eq: userId },
-              },
-            },
-            // 2 報價單已送審審核業務
-            '2': {
-              $or: {
-                'latestContent.toSalesAt': { $notNull: true },
-              },
-            },
-            // 3 報價單沒有被審核業務審核過
-            '3': {
-              $and: {
-                'latestContent.salesReviewedAt': { $null: true },
-              },
-            },
-          },
-        };
-      }
-
-      if (status === 'Contracting') {
+      if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
         return {
           // 同時滿足兩個條件
           $and: {
@@ -127,18 +97,52 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
               $or: {
                 'latestContent.toSalesAt': { $notNull: true },
                 'latestContent.toSupervisorAt': { $notNull: true },
+                'latestContent.toManagerAt': { $notNull: true },
               },
             },
-            // 3 報價單沒有同時被審核業務與業務主管審核過
+            // 3 報價單沒有同時被被審核業務與業務主管審核過
             '3': {
               $or: {
                 'latestContent.salesReviewedAt': { $null: true },
                 'latestContent.supervisorReviewedAt': { $null: true },
+                'latestContent.managerReviewedAt': { $null: true },
               },
             },
           },
         };
       }
+
+      // if (status === 'Contracting') {
+      //   return {
+      //     // 同時滿足兩個條件
+      //     $and: {
+      //       // 1 使用者為經辦或任一階段的審核者
+      //       '1': {
+      //         $or: {
+      //           'latestContent.agentEmployee.id': { $eq: userId },
+      //           'latestContent.reviewSalesEmployee.id': { $eq: userId },
+      //           'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+      //           'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+      //           'latestContent.reviewManagerEmployee.id': { $eq: userId },
+      //         },
+      //       },
+      //       // 2 報價單已送審審核業務或業務主管
+      //       '2': {
+      //         $or: {
+      //           'latestContent.toSalesAt': { $notNull: true },
+      //           'latestContent.toSupervisorAt': { $notNull: true },
+      //         },
+      //       },
+      //       // 3 報價單沒有同時被審核業務與業務主管審核過
+      //       '3': {
+      //         $or: {
+      //           'latestContent.salesReviewedAt': { $null: true },
+      //           'latestContent.supervisorReviewedAt': { $null: true },
+      //         },
+      //       },
+      //     },
+      //   };
+      // }
 
       return {
         // 同時滿足兩個條件
@@ -178,30 +182,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
     // _____________________________________________
     if (reviewStatus === '審核完成') {
       // 如果在預算或投標階段
-      if (status === 'Budget' || status === 'Bidding') {
-        return {
-          $and: {
-            // 1 使用者為經辦或任一階段的審核者
-            '1': {
-              $or: {
-                'latestContent.agentEmployee.id': { $eq: userId },
-                'latestContent.reviewSalesEmployee.id': { $eq: userId },
-                'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
-                'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
-                'latestContent.reviewManagerEmployee.id': { $eq: userId },
-              },
-            },
-            // 2 報價單被業務審核過
-            '2': {
-              $and: {
-                'latestContent.salesReviewedAt': { $notNull: true },
-              },
-            },
-          },
-        };
-      }
-
-      if (status === 'Contracting') {
+      if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
         return {
           $and: {
             // 1 使用者為經辦或任一階段的審核者
@@ -219,11 +200,36 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
               $and: {
                 'latestContent.salesReviewedAt': { $notNull: true },
                 'latestContent.supervisorReviewedAt': { $notNull: true },
+                'latestContent.managerReviewedAt': { $notNull: true },
               },
             },
           },
         };
       }
+
+      // if (status === 'Contracting') {
+      //   return {
+      //     $and: {
+      //       // 1 使用者為經辦或任一階段的審核者
+      //       '1': {
+      //         $or: {
+      //           'latestContent.agentEmployee.id': { $eq: userId },
+      //           'latestContent.reviewSalesEmployee.id': { $eq: userId },
+      //           'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+      //           'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+      //           'latestContent.reviewManagerEmployee.id': { $eq: userId },
+      //         },
+      //       },
+      //       // 2 報價單被業務與業務主管審核過
+      //       '2': {
+      //         $and: {
+      //           'latestContent.salesReviewedAt': { $notNull: true },
+      //           'latestContent.supervisorReviewedAt': { $notNull: true },
+      //         },
+      //       },
+      //     },
+      //   };
+      // }
 
       return {
         $and: {
@@ -378,6 +384,10 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       <ContractSelector
         showModal={contractSelectShow}
         onConfirm={(v) => {
+          if (!v[0]) {
+            return;
+          }
+
           router.push({
             pathname: '/domestic/contract/attachContract',
             query: {

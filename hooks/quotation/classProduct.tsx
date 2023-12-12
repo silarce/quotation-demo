@@ -2693,7 +2693,9 @@ class Class_product {
       return '';
     }
 
-    return this._prodData.thickness + ' t';
+    const num = Number(this._prodData.thickness);
+
+    return num.toFixed(1) + ' t';
   }
   set thickness(v) {
     v = v.replace(' t', '');

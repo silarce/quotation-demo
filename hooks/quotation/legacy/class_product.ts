@@ -809,19 +809,32 @@ function prodCellConfigCre(): TprodCellConfig {
           },
         },
       },
+      //
       doorType: {
         id: 'doorType',
         label: '門型',
         inputSelProps: {
           wrapperStyle: { width: '320px' },
-          selectProps: {
-            props: {
-              options: optionsCreator_doorModel(),
-              isSearchable: true, // 啟用react select 的createable功能
+          // selectProps: {
+          //   props: {
+          //     options: optionsCreator_doorModel(),
+          //     isSearchable: true, // 啟用react select 的createable功能
+          //   },
+          // },
+          inputPropsAndSelectProps: {
+            inputProps: {
+              props: {},
+            },
+            selectProps: {
+              props: {
+                options: optionsCreator_doorModel(),
+                // isSearchable: true, // 啟用react select 的createable功能
+              },
             },
           },
         },
       },
+      //
       length: {
         id: 'length',
         label: 'L(m)',

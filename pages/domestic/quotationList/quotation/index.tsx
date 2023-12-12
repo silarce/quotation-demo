@@ -9,7 +9,8 @@
  * useGetQuotation_id
  * fileInfoArr
  * reqReview 審核
- *
+ * reqPatchReviewer 送審
+ * 編輯審核人員
  */
 
 // 業務與業務主管審核過後，status就會自動轉為Pending
@@ -26,6 +27,7 @@ import moment from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { AxiosError } from 'axios';
 
 // components
 import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
@@ -387,7 +389,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         },
         county: {
           value: profile.county,
-          onChange: (v) => changeProfile('county', v),
+          onChange: (v) => {
+            changeProfile('county', v);
+            changeProfile('district', '');
+          },
         },
         district: {
           value: profile.district,
@@ -422,6 +427,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     return control_profile;
   }, [profile]);
+
+  // console.log(profile);
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -824,7 +831,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       // 總經理ID
       userId === '01f55698-49bb-4501-b432-1157a5109554'
     ) {
-      if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
+      if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
+        isManager = true;
+        isReviewer = true;
+      } else if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
       }
@@ -853,46 +863,104 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   }, [quotationId]);
 
-  const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
-  const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
-  const [sales, setSales] = useState<TemployeeDto | null>();
+  // const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
+  // const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
+  // const [sales, setSales] = useState<TemployeeDto | null>();
+
+  const [workDirector, setworkDirector] = useState<{
+    emp: TemployeeDto | null;
+    workDirectorReviewedAt: string | null | undefined;
+    toWorkDirectorAt: string | null | undefined;
+  }>();
+  const [supervisor, setSupervisor] = useState<{
+    emp: TemployeeDto | null;
+    supervisorReviewedAt: string | null | undefined;
+    toSupervisorAt: string | null | undefined;
+  }>();
+  const [sales, setSales] = useState<{
+    emp: TemployeeDto | null;
+    salesReviewedAt: string | null | undefined;
+    toSalesAt: string | null | undefined;
+  }>();
 
   useEffect(() => {
     const {
       //
       reviewSalesEmployee,
+      salesReviewedAt,
+      toSalesAt,
+
       reviewSupervisorEmployee,
+      supervisorReviewedAt,
+      toSupervisorAt,
+
       reviewWorkDirectorEmployee,
+      workDirectorReviewedAt,
+      toWorkDirectorAt,
     } = quotationData?.latestContent ?? {};
 
-    setworkDirector(reviewWorkDirectorEmployee);
-    setSupervisor(reviewSupervisorEmployee);
-    setSales(reviewSalesEmployee);
+    setworkDirector({
+      emp: reviewWorkDirectorEmployee ?? null,
+      workDirectorReviewedAt: workDirectorReviewedAt ?? null,
+      toWorkDirectorAt: toWorkDirectorAt ?? null,
+    });
+    setSupervisor({
+      emp: reviewSupervisorEmployee ?? null,
+      supervisorReviewedAt: supervisorReviewedAt ?? null,
+      toSupervisorAt: toSupervisorAt ?? null,
+    });
+
+    setSales({
+      emp: reviewSalesEmployee ?? null,
+      salesReviewedAt: salesReviewedAt ?? null,
+      toSalesAt: toSalesAt ?? null,
+    });
   }, [quotationData, disabled_reviewer]);
 
+  // 已經在後端紀錄的審核人員不可以改變
   const control_signature: Tcontroll_signature = {
     manager: {
       employee: quotationData?.latestContent.reviewManagerEmployee,
       forbidden: true,
     },
     workDirector: {
-      employee: workDirector,
+      employee: workDirector?.emp ?? null,
       onChange: (emp) => {
-        console.log(emp);
-        setworkDirector(emp);
+        setworkDirector((workDirector) => {
+          if (!workDirector) {
+            return workDirector;
+          }
+
+          return { ...workDirector, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
     },
     supervisor: {
-      employee: supervisor,
+      employee: supervisor?.emp ?? null,
       onChange: (emp) => {
-        setSupervisor(emp);
+        setSupervisor((supervisor) => {
+          if (!supervisor) {
+            return supervisor;
+          }
+
+          return { ...supervisor, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
     },
     sales: {
-      employee: sales,
+      employee: sales?.emp ?? null,
       onChange: (emp) => {
-        setSales(emp);
+        setSales((sales) => {
+          if (!sales) {
+            return sales;
+          }
+
+          return { ...sales, emp: emp ?? null };
+        });
       },
+      forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
     },
     agent: {
       employee: quotationData?.latestContent.agentEmployee,
@@ -993,17 +1061,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '單價分析',
       img: iconUpload.src,
       onClick: () => {
-        const prodArr = latestContent?.products;
-        let isOk = true;
-        prodArr?.forEach((prod) => {
-          if (prod.quantity === 0) {
-            isOk = false;
-          }
-        });
+        // const prodArr = latestContent?.products;
+        // let isOk = true;
+        // prodArr?.forEach((prod) => {
+        //   if (prod.quantity === 0) {
+        //     isOk = false;
+        //   }
+        // });
 
-        if (!isOk) {
-          return myAlert.info({ title: '有主產品數量為0', content: '請先確認所有主產品的數量不為0' });
-        }
+        // if (!isOk) {
+        //   return myAlert.info({ title: '有主產品數量為0', content: '請先確認所有主產品的數量不為0' });
+        // }
 
         setShowPdf_part(true);
       },
@@ -1017,12 +1085,26 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }
       : null,
 
-    !contentId && quotationId && status !== 'Pending'
+    !contentId && quotationId
       ? {
           type: 'myButton',
-          label: '編輯送審人員',
+          label: '編輯審核人員',
           onClick: () => {
-            setDisabled_reviewer(false);
+            const toSalesAt = sales?.toSalesAt;
+            const toSupervisorAt = supervisor?.toSupervisorAt;
+            const toWorkDirectorAt = workDirector?.toWorkDirectorAt;
+
+            if (status === 'Pending' && !verifyForm) {
+              return myAlert.warning({ title: '請先送出合約審核表' });
+            }
+
+            if (status === 'Pending' && (toSupervisorAt || toWorkDirectorAt)) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
+            } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
+            } else {
+              setDisabled_reviewer(false);
+            }
           },
         }
       : null,
@@ -1276,7 +1358,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     }
 
-    const shouldDirect = isPass && status === 'Pending';
+    if (status === 'Pending') {
+      if (!reviewSalesEmployeeId || !reviewWorkDirectorEmployeeId || !reviewSupervisorEmployeeId) {
+        return myAlert.warning({ title: '請先設定所有審核人員' });
+      }
+    }
+
+    // const shouldDirect = isPass && status === 'Pending';
+    const shouldDirect = isManager && status === 'Pending';
 
     try {
       setIsLoading(true);
@@ -1316,8 +1405,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         },
       });
     } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '解除鎖定發生錯誤', content: err.message });
+      const err = error as AxiosError<{ message: string }>;
+      myAlert.err({ title: '解除鎖定發生錯誤', content: err.response?.data.message });
     } finally {
       setIsLoading(false);
     }
@@ -1329,13 +1418,29 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return;
     }
 
-    setIsLoading(true);
+    const reviewSalesEmployeeId = sales?.emp?.id ?? null;
+    const reviewWorkDirectorEmployeeId = workDirector?.emp?.id ?? null;
+    const reviewSupervisorEmployeeId = supervisor?.emp?.id ?? null;
+
+    if (
+      status === 'Pending' &&
+      (!reviewSalesEmployeeId || !reviewWorkDirectorEmployeeId || !reviewSupervisorEmployeeId)
+    ) {
+      myAlert.info({ title: '請選擇所有審核人員' });
+
+      return;
+    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
+      myAlert.info({ title: '請選擇所有審核人員' });
+
+      return;
+    }
 
     try {
+      setIsLoading(true);
       await apiQuotationSubmitReview(quotationId, {
-        reviewSalesEmployeeId: sales?.id ?? null,
-        reviewWorkDirectorEmployeeId: workDirector?.id ?? null,
-        reviewSupervisorEmployeeId: supervisor?.id ?? null,
+        reviewSalesEmployeeId,
+        reviewWorkDirectorEmployeeId,
+        reviewSupervisorEmployeeId,
       });
       await update();
       setDisabled_reviewer(true);
@@ -1389,11 +1494,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
     });
 
     const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
+      totalPrice += Number(acce.totalPrice || 0);
+
       return {
         partName: acce.name,
         material: '',
         unit: acce.unit,
-        qty: String(acce.quantity),
+        // FIXME 型別為number，但實際上為string
+        // hooks/quotation/classAccessories.tsx // get quantity
+        qty: Number(acce.quantity).toFixed(2),
         price: acce.unitPrice_locale,
         desc: '',
         totalPrice: acce.totalPrice_locale,
@@ -1408,7 +1517,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       size: size,
       part: [...part, ...part_acce],
       // priceTotal: totalPrice.toLocaleString(),
-      priceTotal: prod.totalPrice,
+      priceTotal: totalPrice.toLocaleString(),
     };
   });
 
