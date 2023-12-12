@@ -342,7 +342,32 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
-  // console.log(accountReceivable);
+  const control_checkBar_isDone: TcheckboxProps = {
+    onChange: (arr) => {
+      const isDone = arr.includes('isDone');
+
+      setAccountReceivable((state) => {
+        if (!state) {
+          return state;
+        }
+
+        const copy = { ...state };
+        copy.isDone = isDone;
+
+        return copy;
+      });
+    },
+    propsArr: [
+      {
+        key: 'isDone',
+        label: '已結案',
+        value: accountReceivable?.isDone,
+        props: {
+          className: classNames(accountReceivable?.isDone && scss.checkActive),
+        },
+      },
+    ],
+  };
 
   const control_checkBar01: TcheckboxProps = {
     onChange: (arr) => {
@@ -1154,6 +1179,9 @@ export default function AccountReceivable() {
       <div className={scss.main}>
         <Profile control={control_profile} disabled={disabled} />
 
+        <div className={scss.checkBar01}>
+          <InputSel disabled={disabled} showBaseline="invisible" checkBoxProps={control_checkBar_isDone} />
+        </div>
         <div className={scss.checkBar01}>
           <InputSel disabled={disabled} showBaseline="invisible" checkBoxProps={control_checkBar01} />
         </div>

@@ -2538,6 +2538,8 @@ export type TcreateAccountReceivableDto = {
   contractId: string | null;
   // 所屬合約Id;
   legacyContractId: string | null;
+  // 是否已做完
+  isDone: boolean | null;
 };
 
 export type TupdateAccountReceivableDto = Pick<
@@ -2550,6 +2552,7 @@ export type TupdateAccountReceivableDto = Pick<
   | 'hasNoContract'
   | 'hasUncollectedAmounts'
   | 'hasNotInstall'
+  | 'isDone'
 >;
 
 // 發票
