@@ -438,6 +438,11 @@ const sidePathList: TsidePathList = {
           path: path01 + '/contractList',
           erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
+        {
+          label: '合約(年度)',
+          path: path01 + '/contractList_year',
+          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
+        },
         // {
         //   label: '新增派工單',
         //   path: path01 + '/addDispatch',
