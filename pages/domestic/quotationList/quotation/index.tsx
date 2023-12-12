@@ -389,7 +389,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         },
         county: {
           value: profile.county,
-          onChange: (v) => changeProfile('county', v),
+          onChange: (v) => {
+            changeProfile('county', v);
+            changeProfile('district', '');
+          },
         },
         district: {
           value: profile.district,
@@ -424,6 +427,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     return control_profile;
   }, [profile]);
+
+  // console.log(profile);
 
   // -----------------------------------------------------
   // -----------------------------------------------------

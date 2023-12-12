@@ -246,6 +246,7 @@ export default function QuotationProfile({
         value: county.value ? { value: county.value, label: county.value } : null,
         onChange: (option: Toption | null) => {
           county.onChange?.(option?.value ?? '');
+          district.onChange?.('');
         },
       },
     },
