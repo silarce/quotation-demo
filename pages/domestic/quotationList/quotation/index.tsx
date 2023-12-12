@@ -1186,11 +1186,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     // 總樘數
     let prodQty = 0;
+    let isDoorModalNameEmpty = false;
 
     // prodVKeyArr 會在每一次垂直拖拉時更新
     const prodArr: TcreateQuotationProductDto[] =
       prodVKeyArr?.map((key, index) => {
         const prod = productList[key];
+
+        if (!prod.doorType) {
+          isDoorModalNameEmpty = true;
+        }
 
         const quantity = Number(prod.quantity);
         // const originProd = prod.originProd;
@@ -1213,6 +1218,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         return preBody;
       }) ?? [];
+
+    if (isDoorModalNameEmpty) {
+      setIsLoading(false);
+
+      return myAlert.warning({ title: '請確認所有主產品都有門型' });
+    }
 
     if (!agentEmployee?.id) {
       setIsLoading(false);
