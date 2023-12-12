@@ -88,8 +88,8 @@ export default function AccountReceivable() {
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
 
-  const doUpdate_contract = async () => {
-    if (contract) {
+  const doUpdate_contract = async ({ forceUpdate }: { forceUpdate?: boolean } = {}) => {
+    if (contract && !forceUpdate) {
       return;
     }
 
@@ -214,7 +214,6 @@ export default function AccountReceivable() {
 
   useEffect(() => {
     const accountReceivable = contract?.accountReceivable;
-
     setAccountReceivable(accountReceivable);
   }, [contract, disabled]);
 
@@ -1021,7 +1020,7 @@ export default function AccountReceivable() {
     try {
       setIsLoading(true);
       await apiPatchAccountReceivable(accountReceivableId, accountReceivable);
-      await doUpdate_contract();
+      await doUpdate_contract({ forceUpdate: true });
       setDisabled(true);
     } catch (error) {
       const err = error as Error;
