@@ -12,7 +12,7 @@ import ContractList_sorted, {
 } from 'components/page/worksDepartment/contracList/contractList_sorted';
 
 // css
-import style from './contractList.module.scss';
+import style from '../contractList.module.scss';
 
 // api
 import { useGetContract, Tparams } from 'js/api/api_quotation';
@@ -198,7 +198,7 @@ export default function WdContractList() {
       label: '返回',
       onClick: () => {
         router.push({
-          pathname: '/worksDepartment/contractList_yearCatalog',
+          pathname: '/worksDepartment/yearContractList',
         });
       },
     },
