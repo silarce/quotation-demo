@@ -61,11 +61,18 @@ export default function WdContractList() {
 
   const params: Tparams = {
     pageSize: 99999,
-    populate: ['content.customer', 'content.agentEmployee', 'content.reviewSalesEmployee', 'accountReceivable'],
+    populate: [
+      //
+      'content.customer',
+      'content.agentEmployee',
+      'content.reviewSalesEmployee',
+      'accountReceivable',
+      'content.products',
+    ],
 
     filter: {
       'content.product.doorModelName': { $eq: doorType },
-      'content.county': { $eq: customerName },
+      'content.county': { $eq: county },
       'content.customer.name': { $contains: customerName },
       $or: {
         'content.projectName': { $contains: keyWord },
@@ -159,12 +166,13 @@ export default function WdContractList() {
   // ===================================================
 
   const searchTargetList: TsearchGroup['searchTargetList'] = [
-    {
-      defaultValue: doorType ?? '',
-      options: optionDoorModel,
-      placeholder: '選擇門型',
-      width: '90px',
-    },
+    // 現在後端filter doorModelName無效，所以先拿掉
+    // {
+    //   defaultValue: doorType ?? '',
+    //   options: optionDoorModel,
+    //   placeholder: '選擇門型',
+    //   width: '90px',
+    // },
     {
       defaultValue: county ?? '',
       options: optionsCounty,
