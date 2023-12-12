@@ -42,13 +42,15 @@ export default function ContractList_yearCatalog({ rwd1439 }: { rwd1439: boolean
 
           <div className={scss.tbody}>
             {threeYearArr.map((year, index) => {
+              const href = `/worksDepartment/contractList_year?year=${year}`;
+
               return (
                 <div key={index} style={config.threeYear.style} className={scss.tbodyCell}>
                   <div>
-                    <MyButton_v2 label="已做" href={''} />
+                    <MyButton_v2 label="已做" href={href + '&isDone=true'} />
                   </div>
                   <div>
-                    <MyButton_v2 label="未做" href={''} />
+                    <MyButton_v2 label="未做" href={href + '&isDone=false'} />
                   </div>
                 </div>
               );
@@ -76,9 +78,11 @@ export default function ContractList_yearCatalog({ rwd1439 }: { rwd1439: boolean
                 </div>
                 <div className={scss.tbody}>
                   {yearArr.map((year, index) => {
+                    const href = `/worksDepartment/contractList_year?year=${year}`;
+
                     return (
                       <div key={index} style={config.otherYear.style}>
-                        <MyButton_v2 label="合約列表" href={''} />
+                        <MyButton_v2 label="合約列表" href={href} />
                       </div>
                     );
                   })}
@@ -86,9 +90,6 @@ export default function ContractList_yearCatalog({ rwd1439 }: { rwd1439: boolean
               </div>
             );
           })}
-
-          {/*  */}
-          {/*  */}
         </div>
       </div>
     </SubLayer>

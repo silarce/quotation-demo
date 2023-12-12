@@ -2482,7 +2482,6 @@ export type TupdateEngineeringDeliveryListDto = {
 };
 
 // 應收帳款明細
-
 export type TaccountReceivableDto = {
   id: string;
   createdAt: string;
@@ -2509,6 +2508,7 @@ export type TaccountReceivableDto = {
   legacyContract: TlegacyContractDto;
   accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
   accountant: TaccountantDto | null;
+  isDone: boolean;
 };
 
 export type TcreateAccountReceivableDto = {
