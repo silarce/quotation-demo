@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-// global gear
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 // components
 import ContractList, { Tcontract } from 'components/page/worksDepartment/contracList/contractList';
@@ -48,11 +48,13 @@ export default function WdContractList() {
     },
   };
 
-  const { dataList, dataArr, viewRef_top, viewRef_bottom, isLoadingPage1, isLoading, meta, init, reset } =
-    useContract_infinite({ customParams: params });
+  const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useContract_infinite({
+    customParams: params,
+  });
 
   useEffect(() => {
     reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doorType, county, customerName, projectName]);
 
   // ===================================================
@@ -108,34 +110,29 @@ export default function WdContractList() {
   const contractArr: Tcontract[] = dataArr.map((item) => {
     const { content } = item;
 
-    const foo: Tcontract = {
+    const obj: Tcontract = {
       contractId: item.id,
       quotationNumber: content.quotationNumber,
       customerName: content.customer.name,
       contactName: content.contactPerson,
       contactNumber: content.contactNumber,
       agentName: content.agentEmployee.chName,
-      // discount: content.discount,
-      // doorQty: String(content.quantity),
-      // totalPrice: content.total.toLocaleString(),
       date: content.quotationDate,
       county: content.county,
       projectName: content.projectName,
     };
 
-    return foo;
+    return obj;
   });
 
   // ===================================================
 
   return (
-    <div className={style.container}>
-      {/* header panel */}
+    <SubLayer isLoading_subLayer={isLoadingPage1}>
       <PageHeader02 tag="合約" panelList={panelList} />
-      {/*  */}
       <div className={style.mainContainer}>
-        <ContractList contractArr={contractArr} />
+        <ContractList viewRef={viewRef_bottom} contractArr={contractArr} />
       </div>
-    </div>
+    </SubLayer>
   );
 }

@@ -33,11 +33,13 @@ export default function PanelHeader({
   isActive,
   openQuotation,
   onClick,
+  viewRef,
 }: {
   contract: TtheadInfo;
   isActive: boolean;
   openQuotation: (e: MouseEvent) => void;
   onClick?: () => void;
+  viewRef?: (node?: Element | null | undefined) => void | undefined;
 }) {
   const {
     //
@@ -54,7 +56,7 @@ export default function PanelHeader({
 
   return (
     <CellWithBar className={style.panelHeader} isActive={isActive} onClick={onClick}>
-      <div className={style.row01}>
+      <div ref={viewRef} className={style.row01}>
         <span>{quotationId}</span>
         <span className={style.clientName}>{clientName}</span>
         <span>{contactName}</span>
