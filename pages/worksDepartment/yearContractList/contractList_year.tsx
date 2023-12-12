@@ -35,7 +35,7 @@ type Tquery = {
   doorType: string | undefined;
   county: string | undefined;
   customerName: string | undefined;
-  projectName: string | undefined;
+  keyWord: string | undefined;
   year: string | undefined;
   isDone: string | undefined;
 };
@@ -44,7 +44,7 @@ export default function WdContractList() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const { doorType, county, customerName, projectName, year, isDone } = router.query as Tquery;
+  const { doorType, county, customerName, keyWord, year, isDone } = router.query as Tquery;
 
   const { yearStart, yearEnd } = useMemo(() => {
     if (!year) {
@@ -67,7 +67,10 @@ export default function WdContractList() {
       'content.product.doorModelName': { $eq: doorType },
       'content.county': { $eq: customerName },
       'content.customer.name': { $contains: customerName },
-      'content.projectName': { $contains: projectName },
+      $or: {
+        'content.projectName': { $contains: keyWord },
+        'content.quotationNumber': { $eq: keyWord },
+      },
       engineeringContactId: { $notNull: true },
       'content.quotationDate': {
         $gte: yearStart,
@@ -99,7 +102,7 @@ export default function WdContractList() {
       await update();
       setIsLoading(false);
     })();
-  }, [doorType, county, customerName, projectName]);
+  }, [doorType, county, customerName, keyWord]);
 
   const control_sortedContractList: Tcontrol_sortedContractList = useMemo(() => {
     const list: Tcontrol_sortedContractList = {
@@ -173,8 +176,8 @@ export default function WdContractList() {
       placeholder: '請輸入客戶名稱',
     },
     {
-      defaultValue: projectName ?? '',
-      placeholder: '請輸入專案名稱',
+      defaultValue: keyWord ?? '',
+      placeholder: '工程名稱或合約編號',
     },
   ];
 
@@ -182,14 +185,14 @@ export default function WdContractList() {
     const doorType = (vArr[0] as Toption).value;
     const county = (vArr[1] as Toption).value;
     const customerName = vArr[2] as string;
-    const projectName = vArr[3] as string;
+    const keyWord = vArr[3] as string;
     router.push({
       query: {
         ...router.query,
         doorType,
         county,
         customerName,
-        projectName,
+        keyWord,
       },
     });
   };
