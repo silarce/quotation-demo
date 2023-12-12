@@ -6,9 +6,9 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import scss from './contractList_year.module.scss';
+import scss from './contractList_yearCatalog.module.scss';
 
-export default function ContractList_year({ rwd1439 }: { rwd1439: boolean }) {
+export default function ContractList_yearCatalog({ rwd1439 }: { rwd1439: boolean }) {
   const thisYear = moment().format('YYYY');
   const thisYear_num = Number(thisYear);
   const oldestYear = 2000;

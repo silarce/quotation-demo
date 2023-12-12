@@ -440,7 +440,7 @@ const sidePathList: TsidePathList = {
         },
         {
           label: '合約(年度)',
-          path: path01 + '/contractList_year',
+          path: path01 + '/contractList_yearCatalog',
           erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
         // {
