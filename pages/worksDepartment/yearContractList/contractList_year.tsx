@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 
 // global gear
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // components
@@ -40,6 +41,8 @@ type Tquery = {
 };
 
 export default function WdContractList() {
+  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
   const { doorType, county, customerName, projectName, year, isDone } = router.query as Tquery;
 
@@ -53,6 +56,8 @@ export default function WdContractList() {
 
     return { yearStart, yearEnd };
   }, [year]);
+
+  // =====================================================================
 
   const params: Tparams = {
     pageSize: 99999,
@@ -79,7 +84,7 @@ export default function WdContractList() {
   };
 
   const { data, update } = useGetContract(params);
-  // const dataArr = data ?? [];
+  // 在後端做出處置前，先在前端過濾
   const dataArr = (data ?? []).filter((item) => {
     if (isDone === 'true') {
       return item.accountReceivable?.isDone === true;
@@ -89,7 +94,11 @@ export default function WdContractList() {
   });
 
   useEffect(() => {
-    update();
+    (async () => {
+      setIsLoading(true);
+      await update();
+      setIsLoading(false);
+    })();
   }, [doorType, county, customerName, projectName]);
 
   const control_sortedContractList: Tcontrol_sortedContractList = useMemo(() => {
@@ -206,38 +215,15 @@ export default function WdContractList() {
 
   // ===================================================
 
-  const contractArr: Tcontract[] = dataArr.map((item) => {
-    const { content } = item;
-
-    const foo: Tcontract = {
-      contractId: item.id,
-      quotationNumber: content.quotationNumber,
-      customerName: content.customer.name,
-      contactName: content.contactPerson,
-      contactNumber: content.contactNumber,
-      agentName: content.agentEmployee.chName,
-      // discount: content.discount,
-      // doorQty: String(content.quantity),
-      // totalPrice: content.total.toLocaleString(),
-      date: content.quotationDate,
-      county: content.county,
-      projectName: content.projectName,
-    };
-
-    return foo;
-  });
-
-  // ===================================================
-
   return (
-    <div className={style.container}>
+    <SubLayer isLoading_subLayer={isLoading}>
       {/* header panel */}
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div className={style.mainContainer}>
         <ContractList_sorted control={control_sortedContractList} />
       </div>
-    </div>
+    </SubLayer>
   );
 }
 
