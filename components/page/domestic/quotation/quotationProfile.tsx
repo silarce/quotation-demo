@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames';
 
 // glogal gear
@@ -36,53 +36,6 @@ const inputSelProps: TinputSelProps = {
   captionStyle,
 };
 
-// ====================================================
-// type TquotationProfile = {
-//   id: string;
-//   quotationNumber: string;
-//   quotationDate: string; // 報價日期
-//   validityPeriod: string; // 報價時效
-//   projectName: string; // 工程名稱
-//   county: string; // 縣市
-//   district: string; // 區
-//   address: string;
-//   contactPerson: string; //  聯絡人
-//   contactNumber: string; //  聯絡電話
-//   faxNumber: string; // 傳真號碼
-//   customer: TcustomerDto;
-//   trackProgress: string;
-//   projectProgress: string;
-// };
-
-// type TformBody = {
-//   validityPeriod: string;
-//   customerId?: string;
-//   projectName: string;
-//   county: string;
-//   district: string;
-//   address: string; // 剩餘地址
-//   contactPerson: string;
-//   contactNumber: string;
-//   faxNumber: string;
-//   trackProgress: string; // 追蹤狀態
-//   projectProgress: string; // 工地進度
-// };
-
-// type TreturnBody = {
-//   validityPeriod: string;
-//   customer: TcustomerDto | undefined;
-//   projectName: string;
-//   county: string;
-//   district: string;
-//   contactPerson: string;
-//   contactNumber: string;
-//   faxNumber: string;
-//   address?: string; // 剩餘地址
-
-//   trackProgress?: string; // 追蹤狀態
-//   projectProgress?: string; // 工地進度
-// };
-
 // -----------------------------------------------------------------------
 
 type TcontrolItem = {
@@ -114,23 +67,17 @@ type Tcontrol = {
   };
 };
 
-export type {
-  // TreturnBody,
-  // TquotationProfile,
-  Tcontrol as Tcontrol_profile,
-};
+export type { Tcontrol as Tcontrol_profile };
 
 // =================================================================
 export default function QuotationProfile({
   // profile,
   disabled = false,
-  // onProfileChange,
+
   control,
 }: {
-  // profile: TquotationProfile | undefined;
   disabled: boolean;
-  // onProfileChange?: (v: Partial<TprofileReturnBody>) => void;
-  // onProfileChange?: (v: Partial<TreturnBody>) => void;
+
   control: Tcontrol;
 }) {
   // ----------------------------------------------------------------
@@ -138,32 +85,6 @@ export default function QuotationProfile({
   const [showModal, setShowModal] = useState(false);
   const openModal = () => (disabled ? '' : setShowModal(true));
   // ----------------------------------------------------------------
-  // const { register, control, reset, watch, setValue } = useForm<TformBody>();
-  // const watchState = useWatch({ control });
-
-  // useEffect(() => {
-  //   onProfileChange?.({ ...watchState, customer: data_customer });
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [watchState]);
-
-  // ----------------------------------------------------------------
-  // 報價單資料
-  // const {
-  //   id,
-  //   quotationNumber,
-  //   quotationDate,
-  //   validityPeriod,
-  //   projectName,
-  //   county,
-  //   district,
-  //   address,
-  //   contactPerson,
-  //   contactNumber,
-  //   faxNumber,
-  //   customer,
-  //   trackProgress,
-  //   projectProgress,
-  // } = profile ?? {};
 
   const { quotationNumber, quotationDate, customer, itemList } = control;
 
@@ -179,55 +100,6 @@ export default function QuotationProfile({
     trackProgress,
     projectProgress,
   } = itemList;
-
-  // ----------------------------------------------------------------
-
-  // 客戶資料
-  // const { data: data_customer, setData: setCustomer, update: update_cunstomer } = useCustomersById(customer?.id);
-  // 取消編輯時重置用的
-  // const [customerOri, setCustomerOri] = useState<TcustomerDto_TC>();
-
-  // 客戶名稱與與傳真號碼要從data_customer取得
-  // 還有客戶types
-
-  // ----------------------------------------------------------------
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const res = await update_cunstomer();
-
-  //     if (res) {
-  //       setValue('customerId', res.id);
-
-  //       if (!customerOri && profile?.id) {
-  //         setCustomerOri(res);
-  //       }
-  //     }
-  //   })();
-
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [id]);
-
-  // ----------------------------------------------------------------
-
-  // useEffect(() => {
-  //   reset({
-  //     validityPeriod,
-  //     customerId: customer?.id,
-  //     projectName,
-  //     county,
-  //     district,
-  //     contactPerson,
-  //     contactNumber,
-  //     faxNumber,
-  //     address,
-  //     // api還沒上的資料
-  //     trackProgress,
-  //     projectProgress,
-  //   });
-  //   setCustomer(customerOri);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [profile, disabled]);
 
   // ----------------------------------------------------------------
   // 客戶資料
@@ -272,7 +144,7 @@ export default function QuotationProfile({
   };
 
   // ----------------------------------------------------------------
-  // const customerTypes = data_customer?.types.map((type) => type.name).join('/');
+
   const customerTypes = customer.value?.types.map((type) => customerTypesLookup[type.name]).join('/');
   const styleHaveState = customerTypes ? scss.haveState : '';
 
@@ -283,24 +155,6 @@ export default function QuotationProfile({
     }
 
     customer.onChange?.(v[0]);
-
-    // const contact = v[0].contacts[0];
-    // const name = contact?.name ?? '';
-    // const phone = contact?.phone ?? '';
-
-    // const contactPerson = `${name}${phone}`;
-
-    // setCustomer(v[0]);
-
-    // setValue('customerId', v[0].id);
-    // setValue('contactPerson', v[0].contacts[0]?.name ?? '');
-    // setValue('contactPerson', contactPerson);
-    // setValue('contactNumber', v[0].contacts[0]?.phone ?? '');
-    // setValue('faxNumber', v[0].fax ?? '');
-
-    // contactPerson.onChange(`${name}${phone}`);
-    // contactNumber.onChange(phone);
-    // faxNumber.onChange(v[0].fax ?? '');
   };
 
   const clearClient = () => {
@@ -309,14 +163,6 @@ export default function QuotationProfile({
     }
 
     customer.onClear?.();
-
-    // setCustomer(undefined);
-    // setValue('customerId', undefined);
-
-    // contactPerson.onChange('');
-
-    // setValue('contactPerson', '');
-    // setValue('contactNumber', '');
   };
 
   // ----------------------------------------------------------------------
