@@ -2036,7 +2036,7 @@ class Class_product {
     // this._prodData.WG = '0';
     this.area = this.calcArea();
     this.clearProd();
-    this.calcChangeAccePrice();
+    // this.calcChangeAccePrice();
     this.shouldCall_cgs = true;
     this.callAllReq();
 
@@ -2066,7 +2066,7 @@ class Class_product {
 
       this.area = this.calcArea();
       this.clearProd();
-      this.calcChangeAccePrice();
+      // this.calcChangeAccePrice();
       this.shouldCall_cgs = true;
       this.callAllReq();
     };
@@ -2281,6 +2281,9 @@ class Class_product {
     }
 
     this.volume = this.calcVolume();
+
+    this.calcChangeAccePrice();
+
     this.toGetInstallationFee();
     this.reRender();
   }

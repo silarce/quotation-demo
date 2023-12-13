@@ -1,4 +1,5 @@
 import { MouseEvent } from 'react';
+import classNames from 'classnames';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -22,6 +23,8 @@ type TtheadInfo = {
   date: string;
   county: string;
   projectName: string;
+  alertLight?: boolean;
+  remindLight?: boolean;
 };
 
 // ===============================================================
@@ -32,10 +35,14 @@ export default function PanelHeader({
   contract,
   isActive,
   openQuotation,
+  onClick,
+  viewRef,
 }: {
   contract: TtheadInfo;
   isActive: boolean;
   openQuotation: (e: MouseEvent) => void;
+  onClick?: () => void;
+  viewRef?: (node?: Element | null | undefined) => void | undefined;
 }) {
   const {
     //
@@ -47,12 +54,14 @@ export default function PanelHeader({
     // discount,
     // doorQty,
     // totalPrice: budgetAmount,
+    alertLight,
+    remindLight,
   } = contract;
   const { date, county: country, projectName } = contract;
 
   return (
-    <CellWithBar className={style.panelHeader} isActive={isActive}>
-      <div className={style.row01}>
+    <CellWithBar className={style.panelHeader} isActive={isActive} onClick={onClick}>
+      <div ref={viewRef} className={style.row01}>
         <span>{quotationId}</span>
         <span className={style.clientName}>{clientName}</span>
         <span>{contactName}</span>
@@ -73,6 +82,8 @@ export default function PanelHeader({
           <span className={style.country}>{country}</span>
         </div>
         <span>{projectName}</span>
+        <span className={classNames(!alertLight && style.hidden)}>異常燈號：工作表已開立，合約尚未簽回</span>
+        <span className={classNames(!remindLight && style.hidden)}>提醒燈號：已出具說明，尚未收足款項</span>
         <div></div>
       </div>
     </CellWithBar>

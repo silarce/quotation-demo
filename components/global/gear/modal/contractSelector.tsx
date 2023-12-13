@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
-import moment from 'moment';
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // global gear
 import SelectorShell, { TsearcbBarProps } from './selectorShell';
@@ -59,29 +59,14 @@ export default function ContractSelector({
   const [searchValue, setSearchValue] = useState<string[]>([]);
 
   const params: Tparams = (() => {
-    const allNum = /^\d+$/.test(searchValue[1] ?? 'n');
-    const grade = allNum ? searchValue[1] : undefined;
-
     return {
       pageSize: 20,
-      // populate: [...(customPopulate ?? [])],
-      // sort: 'idNumber',
       filter: {
-        // $or: {
-        //   idNumber: {
-        //     $contains: searchValue[1],
-        //   },
-        //   chName: { $contains: searchValue[1] },
-        //   'jobs.name': { $contains: searchValue[1] },
-        //   'jobs.grade': { $eq: grade },
-        // },
-        // 'jobs.department.name': { $contains: searchValue[0] },
-
         $or: {
           'content.customer.name': { $contains: searchValue[0] },
           'content.projectName': { $contains: searchValue[0] },
           'content.county': { $contains: searchValue[0] },
-          // 'content.quotaionNumber': { $eq: searchValue[0] },
+          'content.quotationNumber': { $eq: searchValue[0] },
         },
 
         ...customFilter,
@@ -99,7 +84,6 @@ export default function ContractSelector({
       return;
     }
 
-    // setSelEmployeeArr([]);
     reset();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -249,9 +233,7 @@ const RowArr = ({
   return (
     <>
       {contractArr.map((contract, index, arr) => {
-        // const { idNumber, chName, jobs } = contract;
-        // const { name, grade, department } = jobs?.[0] ?? {};
-        const { customer, deliveryDate, quotationNumber, projectName, county } = contract.content;
+        const { customer, quotationDate, quotationNumber, projectName, county } = contract.content;
 
         const theViewRef = (() => {
           if (arr.length - 11 === index) {
@@ -275,12 +257,18 @@ const RowArr = ({
         //   return <div key={index} className="skip" ref={theViewRef}></div>;
         // }
 
+        let date = quotationDate ? getTaiwanDateStr(quotationDate) : '';
+
+        if (date === 'Invalid date') {
+          date = '';
+        }
+
         return (
           <CellWithBar key={index} isActive={isActive}>
             <div className={classNames(scss.row, isExcept && scss.except)} onClick={theOnClick} ref={theViewRef}>
               <div className={scss.left}>
                 <span>{quotationNumber}</span>
-                <span>{moment(convertDate_reduce1911(deliveryDate)).format('yy-MM-DD')}</span>
+                <span>{date}</span>
               </div>
               <div className={scss.right}>
                 <span>{customer.name}</span>

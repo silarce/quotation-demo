@@ -1153,6 +1153,7 @@ latestContentProdArr為這次追加追減的主產品
   const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
     // 總樘數
     const prodQty = 0;
+    let isDoorModalNameEmpty = false;
 
     // ---------------------------------------------------------
 
@@ -1191,8 +1192,16 @@ latestContentProdArr為這次追加追減的主產品
     products = products.map((item) => {
       item.id = undefined;
 
+      if (!item.doorModelName) {
+        isDoorModalNameEmpty = true;
+      }
+
       return item;
     });
+
+    if (isDoorModalNameEmpty) {
+      return myAlert.warning({ title: '請確認所有主產品都有門型' });
+    }
 
     // ---------------------------------------------------------
     if (!agentEmployee?.id) {

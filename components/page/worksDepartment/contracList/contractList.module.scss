@@ -2,6 +2,8 @@
 
 .container {
   padding: 4px;
+  padding-top: 0;
+  border-top: solid 4px white;
   :global(.ant-collapse) {
     border: none;
   }
@@ -25,6 +27,9 @@
 // ===============================================================
 
 .thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: grid;
   // grid-template-columns: 110px auto 85px 105px 85px 65px 28px 85px 20px;
   grid-template-columns: 110px auto 85px 105px 85px 20px;
@@ -69,7 +74,7 @@ div.panelHeader {
   }
   .row02 {
     display: grid;
-    grid-template-columns: 110px 65px auto 20px;
+    grid-template-columns: 110px 65px auto 300px 300px 20px;
     gap: 22px;
     .place {
       > * {
@@ -96,4 +101,22 @@ div.panelBody {
       font-size: 16px;
     }
   }
+}
+
+.sortTitle {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 12px 15px;
+  background-color: white;
+  border-bottom: solid 1px theme("colors.border");
+  span {
+    color: theme("colors.sub");
+    font-size: 16px;
+    font-weight: 700;
+  }
+}
+
+.hidden {
+  visibility: hidden;
 }
