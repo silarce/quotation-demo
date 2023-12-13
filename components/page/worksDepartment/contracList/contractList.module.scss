@@ -74,7 +74,7 @@ div.panelHeader {
   }
   .row02 {
     display: grid;
-    grid-template-columns: 110px 65px auto 20px;
+    grid-template-columns: 110px 65px auto 300px 300px 20px;
     gap: 22px;
     .place {
       > * {
@@ -115,4 +115,8 @@ div.panelBody {
     font-size: 16px;
     font-weight: 700;
   }
+}
+
+.hidden {
+  visibility: hidden;
 }

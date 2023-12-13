@@ -1,4 +1,5 @@
 import { MouseEvent } from 'react';
+import classNames from 'classnames';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -22,6 +23,8 @@ type TtheadInfo = {
   date: string;
   county: string;
   projectName: string;
+  alertLight?: boolean;
+  remindLight?: boolean;
 };
 
 // ===============================================================
@@ -51,6 +54,8 @@ export default function PanelHeader({
     // discount,
     // doorQty,
     // totalPrice: budgetAmount,
+    alertLight,
+    remindLight,
   } = contract;
   const { date, county: country, projectName } = contract;
 
@@ -77,6 +82,8 @@ export default function PanelHeader({
           <span className={style.country}>{country}</span>
         </div>
         <span>{projectName}</span>
+        <span className={classNames(!alertLight && style.hidden)}>異常燈號：工作表已開立，合約尚未簽回</span>
+        <span className={classNames(!remindLight && style.hidden)}>提醒燈號：已出具說明，尚未收足款項</span>
         <div></div>
       </div>
     </CellWithBar>

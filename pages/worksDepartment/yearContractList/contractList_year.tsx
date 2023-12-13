@@ -144,7 +144,7 @@ export default function WdContractList() {
     };
 
     dataArr.forEach((contract) => {
-      const { content } = contract;
+      const { content, accountReceivable } = contract;
 
       const {
         quotationNumber,
@@ -157,7 +157,9 @@ export default function WdContractList() {
         projectName,
       } = content;
 
-      const obj = {
+      const { hasNoContract, hasUncollectedAmounts } = accountReceivable ?? {};
+
+      const obj: Tcontract = {
         contractId: contract.id,
         quotationNumber,
         customerName: customer.name,
@@ -167,6 +169,8 @@ export default function WdContractList() {
         date: quotationDate,
         county,
         projectName,
+        alertLight: hasNoContract,
+        remindLight: hasUncollectedAmounts,
       };
 
       if (northernCountyArr.includes(county)) {
