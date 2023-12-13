@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 // layer
@@ -18,7 +18,7 @@ import { useContract_infinite, Tparams } from 'js/api/api_quotation';
 import { Toption } from 'js/utils/options/options';
 
 // option
-import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
+import { optionsCreator_county, districtOptionsSelector } from 'js/utils/options/countryAndDistrict';
 import { optionsCreator_doorModel_2 } from 'js/utils/options/productOptions';
 
 // ===========================================
@@ -30,19 +30,25 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 type Tquery = {
   doorType: string | undefined;
   county: string | undefined;
+  district: string | undefined;
+  address: string | undefined;
   customerName: string | undefined;
   keyWord: string | undefined;
 };
 
 export default function WdContractList() {
   const router = useRouter();
-  const { doorType, county, customerName, keyWord } = router.query as Tquery;
+  const { doorType, county, district, address, customerName, keyWord } = router.query as Tquery;
 
   const params: Tparams = {
     filter: {
       'content.product.doorModelName': { $eq: doorType },
-      'content.county': { $eq: county },
       'content.customer.name': { $contains: customerName },
+      $and: {
+        'content.county': { $eq: county || undefined },
+        'content.district': { $eq: district || undefined },
+        'content.address': { $contains: address || undefined },
+      },
       $or: {
         'content.projectName': { $contains: keyWord },
         'content.quotationNumber': { $eq: keyWord },
@@ -58,7 +64,23 @@ export default function WdContractList() {
   useEffect(() => {
     reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doorType, county, customerName, keyWord]);
+  }, [router.query]);
+
+  // ===================================================
+
+  const [countyState, setCountyState] = useState<string | undefined>(undefined);
+  const [districtState, setDistrictState] = useState<string | undefined>(undefined);
+  const [addressState, setAddressState] = useState<string | undefined>(undefined);
+  const [customerNameState, setCustomerNameState] = useState<string | undefined>(undefined);
+  const [keyWordState, setKeyWordState] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    setCountyState(county);
+    setDistrictState(district);
+    setAddressState(address);
+    setCustomerNameState(customerName);
+    setKeyWordState(keyWord);
+  }, [router.query]);
 
   // ===================================================
 
@@ -71,32 +93,73 @@ export default function WdContractList() {
     //   width: '90px',
     // },
     {
-      defaultValue: county ?? '',
       options: optionsCounty,
+      placeholder: '選擇縣市',
+      width: '80px',
+      value: countyState,
+      onChange: (v) => {
+        setCountyState(v);
+        setDistrictState(undefined);
+      },
+    },
+    {
+      options: (() => {
+        const arr = districtOptionsSelector(countyState ?? '');
+        arr.unshift({ value: '', label: '不拘' });
+
+        return arr;
+      })(),
       placeholder: '選擇地區',
       width: '80px',
+      value: districtState,
+      onChange: (v) => {
+        setDistrictState(v);
+      },
     },
     {
-      defaultValue: customerName ?? '',
+      placeholder: '請輸入地址',
+      value: addressState,
+      onChange: (v) => {
+        setAddressState(v);
+      },
+    },
+    {
       placeholder: '請輸入客戶名稱',
+      value: customerNameState,
+      onChange: (v) => {
+        setCustomerNameState(v);
+      },
     },
     {
-      defaultValue: keyWord ?? '',
       placeholder: '工程名稱或合約編號',
+      value: keyWordState,
+      onChange: (v) => {
+        setKeyWordState(v);
+      },
     },
   ];
 
   const doSearch: TsearchGroup['doSearch'] = (vArr) => {
-    const doorType = (vArr[0] as Toption).value;
-    const county = (vArr[1] as Toption).value;
-    const customerName = vArr[2] as string;
-    const keyWord = vArr[3] as string;
+    // const doorType = (vArr[0] as Toption).value;
+    // const county = (vArr[1] as Toption).value;
+    // const customerName = vArr[2] as string;
+    // const keyWord = vArr[3] as string;
+    // router.push({
+    //   query: {
+    //     doorType,
+    //     county,
+    //     customerName,
+    //     keyWord,
+    //   },
+    // });
     router.push({
       query: {
-        doorType,
-        county,
-        customerName,
-        keyWord,
+        ...router.query,
+        county: countyState,
+        district: districtState,
+        address: addressState,
+        customerName: customerNameState,
+        keyWord: keyWordState,
       },
     });
   };
