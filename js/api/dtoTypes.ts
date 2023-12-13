@@ -1475,7 +1475,7 @@ export type TquotationContractDto = {
   engineeringDeliveryListId: string | null;
   /**應收帳款明細 */
   accountReceivable?: TaccountReceivableDto; // populate
-  accountReceivableId: string;
+  accountReceivableId: string | null;
 };
 
 export type TcreateModifyQuotationDto = {
@@ -2482,7 +2482,6 @@ export type TupdateEngineeringDeliveryListDto = {
 };
 
 // 應收帳款明細
-
 export type TaccountReceivableDto = {
   id: string;
   createdAt: string;
@@ -2509,6 +2508,7 @@ export type TaccountReceivableDto = {
   legacyContract: TlegacyContractDto;
   accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
   accountant: TaccountantDto | null;
+  isDone: boolean;
 };
 
 export type TcreateAccountReceivableDto = {
@@ -2538,6 +2538,8 @@ export type TcreateAccountReceivableDto = {
   contractId: string | null;
   // 所屬合約Id;
   legacyContractId: string | null;
+  // 是否已做完
+  isDone: boolean;
 };
 
 export type TupdateAccountReceivableDto = Pick<
@@ -2550,6 +2552,7 @@ export type TupdateAccountReceivableDto = Pick<
   | 'hasNoContract'
   | 'hasUncollectedAmounts'
   | 'hasNotInstall'
+  | 'isDone'
 >;
 
 // 發票

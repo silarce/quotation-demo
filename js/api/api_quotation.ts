@@ -264,13 +264,18 @@ export const useGetContract = (customParams?: Tparams) => {
   };
 
   const update = async () => {
-    const newRes = await apiGetContract(params);
+    try {
+      const newRes = await apiGetContract(params);
 
-    if (newRes) {
-      setRes(newRes);
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得合約資料失敗', content: err.message });
     }
-
-    return newRes;
   };
 
   return {

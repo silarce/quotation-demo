@@ -167,8 +167,24 @@ export default function QuotationPdf_part({
 
   // -------------------------------------------------------------------------
 
-  const chunkedList = _.chunk(mainProductArr, 3) as TmainProduct[][];
-  // const pageCount = chunkedList.length
+  const partLimit = 30;
+  let partCount = 0;
+  let arrIndex = 0;
+  const chunkedList: TmainProduct[][] = [[]];
+
+  mainProductArr.forEach((prod) => {
+    const partQty = prod.part.length;
+
+    if (partCount + partQty > partLimit) {
+      partCount = partQty;
+      arrIndex++;
+      chunkedList[arrIndex] = [];
+    } else {
+      partCount += partQty;
+    }
+
+    chunkedList[arrIndex].push(prod);
+  });
 
   // -------------------------------------------------------------------------
   return (

@@ -58,6 +58,7 @@ export default function EditCustomerItem01({
       classCustomer.address = value;
     },
     showDistrict: classCustomer.county === '國外' ? false : true,
+    haveOutsea: false,
   };
 
   const selectInputPropsInvoice = {
@@ -85,6 +86,7 @@ export default function EditCustomerItem01({
       classCustomer.invoiceAddress = value;
     },
     showDistrict: classCustomer.invoiceCounty === '國外' ? false : true,
+    haveOutsea: false,
   };
 
   // ======================================================

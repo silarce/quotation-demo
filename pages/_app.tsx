@@ -42,6 +42,7 @@ type AppPropsWithLayout = AppProps & {
 // =============================================================================
 type TappContext = {
   rwd1023: boolean;
+  rwd1439: boolean;
   userInfo: TuserDto | undefined;
   userGrade: number;
   erpFeature: TerpFeatureDto[] | undefined;
@@ -54,6 +55,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false);
 
   const rwd1023 = useMediaQuery({ query: '(max-width: 1023px)' });
+  const rwd1439 = useMediaQuery({ query: '(max-width: 1439px)' });
 
   const router = appProps.router;
 
@@ -111,6 +113,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // -----------------------------------------------------------------------
   const appContextValue = {
     rwd1023,
+    rwd1439,
     userInfo,
     userGrade,
     erpFeature: userErpFeature,
@@ -167,6 +170,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
             userGrade={userGrade}
             userErpFeature={userErpFeature}
             rwd1023={rwd1023}
+            rwd1439={rwd1439}
             onLogin={onLogin}
           />
         )}

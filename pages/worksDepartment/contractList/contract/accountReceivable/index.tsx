@@ -55,6 +55,8 @@ import {
   TupdateAccountReceivableInvoiceDto,
   apiPatchAccountReceivableAccountant,
   apiPatchAccountReceivableVoidInvoice,
+  apiPostAccountReceivable,
+  TcreateAccountReceivableDto,
 } from 'js/api/api_engineering';
 import { useGetContract_id_noItems } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
@@ -88,8 +90,8 @@ export default function AccountReceivable() {
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
 
-  const doUpdate_contract = async () => {
-    if (contract) {
+  const doUpdate_contract = async ({ forceUpdate }: { forceUpdate?: boolean } = {}) => {
+    if (contract && !forceUpdate) {
       return;
     }
 
@@ -214,7 +216,6 @@ export default function AccountReceivable() {
 
   useEffect(() => {
     const accountReceivable = contract?.accountReceivable;
-
     setAccountReceivable(accountReceivable);
   }, [contract, disabled]);
 
@@ -342,7 +343,32 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
-  // console.log(accountReceivable);
+  const control_checkBar_isDone: TcheckboxProps = {
+    onChange: (arr) => {
+      const isDone = arr.includes('isDone');
+
+      setAccountReceivable((state) => {
+        if (!state) {
+          return state;
+        }
+
+        const copy = { ...state };
+        copy.isDone = isDone;
+
+        return copy;
+      });
+    },
+    propsArr: [
+      {
+        key: 'isDone',
+        label: '已結案',
+        value: accountReceivable?.isDone,
+        props: {
+          className: classNames(accountReceivable?.isDone && scss.checkActive),
+        },
+      },
+    ],
+  };
 
   const control_checkBar01: TcheckboxProps = {
     onChange: (arr) => {
@@ -996,7 +1022,7 @@ export default function AccountReceivable() {
     try {
       setIsLoading(true);
       await apiPatchAccountReceivable(accountReceivableId, accountReceivable);
-      await doUpdate_contract();
+      await doUpdate_contract({ forceUpdate: true });
       setDisabled(true);
     } catch (error) {
       const err = error as Error;
@@ -1125,10 +1151,49 @@ export default function AccountReceivable() {
     }
   };
 
+  // 新增應收帳款明細
+
+  const reaPostAccountReceivable = async () => {
+    if (!contractId) {
+      return myAlert.info({ title: '沒有合約編號' });
+    }
+
+    const emptyBody: TcreateAccountReceivableDto = {
+      valuationDate: null,
+      payOffDay: null,
+      performanceBond: false,
+      depositGuaranteeTicket: false,
+      warrantyTicket: false,
+      hasNoContract: false,
+      hasUncollectedAmounts: false,
+      hasNotInstall: false,
+      accountantId: [],
+      accountReceivableDeduction: [],
+      invoices: [],
+      contractId: contractId,
+      legacyContractId: null,
+      isDone: false,
+    };
+
+    try {
+      setIsLoading(true);
+      await apiPostAccountReceivable(emptyBody);
+      doUpdate_contract({ forceUpdate: true });
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增應收帳款明細失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // --------------------------------------------------------------------------
+
   const panelList_01: TpanelList = [
-    //
-    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+    accountReceivableId === null
+      ? { type: 'myButton', label: '建立應收帳款明細', onClick: () => reaPostAccountReceivable() }
+      : null,
+    !!accountReceivableId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
   ];
   const panelList_02: TpanelList = [
     {
@@ -1146,39 +1211,50 @@ export default function AccountReceivable() {
   ];
 
   const panelList = disabled ? panelList_01 : panelList_02;
-  // --------------------------------------------------------------------------
 
+  // --------------------------------------------------------------------------
+  // engineeringContactId
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
-      <div className={scss.main}>
-        <Profile control={control_profile} disabled={disabled} />
 
-        <div className={scss.checkBar01}>
-          <InputSel disabled={disabled} showBaseline="invisible" checkBoxProps={control_checkBar01} />
+      {accountReceivableId === null && <EmptyMain />}
+
+      {accountReceivableId && (
+        <div className={scss.main}>
+          <Profile control={control_profile} disabled={disabled} />
+
+          <div className={scss.checkBar01}>
+            <InputSel disabled={disabled} showBaseline="invisible" checkBoxProps={control_checkBar_isDone} />
+          </div>
+          <div className={scss.checkBar01}>
+            <InputSel disabled={disabled} showBaseline="invisible" checkBoxProps={control_checkBar01} />
+          </div>
+          {/* 請款表格 */}
+          <Table_requestPayment disabled={disabled} control={control_table_requestPayment} />
+
+          <div className={scss.checkBar02}>
+            <InputSel disabled={disabled} showBaseline="invisible" checkBoxProps={control_checkBar02} />
+          </div>
+
+          {/* 請款單表格 */}
+          <Table_request
+            contractId={contractId}
+            accountReceivableId={accountReceivableId}
+            invoiceArr={data_invoiceArr_table}
+            onInvoiceAdd={update_allInvoice}
+          />
+
+          {/* 發票給予紀錄 */}
+          <AccountReceivable_dynaTable control={control_invoiceGivingRecord} disabled={disabled} />
+          {/* 收款紀錄*/}
+          <AccountReceivable_dynaTable control={control_accountant} disabled={disabled} />
+          {/* 扣款明細 */}
+          <DeductionDetails accountReceivableId={accountReceivableId} validInvoiceQty={validInvoiceQty} />
         </div>
-        {/* 請款表格 */}
-        <Table_requestPayment disabled={disabled} control={control_table_requestPayment} />
+      )}
 
-        <div className={scss.checkBar02}>
-          <InputSel disabled={disabled} showBaseline="invisible" checkBoxProps={control_checkBar02} />
-        </div>
-
-        {/* 請款單表格 */}
-        <Table_request
-          contractId={contractId}
-          accountReceivableId={accountReceivableId}
-          invoiceArr={data_invoiceArr_table}
-          onInvoiceAdd={update_allInvoice}
-        />
-
-        {/* 發票給予紀錄 */}
-        <AccountReceivable_dynaTable control={control_invoiceGivingRecord} disabled={disabled} />
-        {/* 收款紀錄*/}
-        <AccountReceivable_dynaTable control={control_accountant} disabled={disabled} />
-        {/* 扣款明細 */}
-        <DeductionDetails accountReceivableId={accountReceivableId} validInvoiceQty={validInvoiceQty} />
-      </div>
+      {/*  */}
       {/*  */}
       <InputModal
         title="當月發票預設前兩碼"
@@ -1213,7 +1289,7 @@ export default function AccountReceivable() {
       />
 
       <InvoiceSelector
-        accountReceivableId={accountReceivableId}
+        accountReceivableId={accountReceivableId || undefined}
         label="請選擇發票"
         tip="可複選"
         showModal={!!targetAccountant}
@@ -1339,11 +1415,16 @@ export default function AccountReceivable() {
 // ========================================================================
 // ========================================================================
 // ========================================================================
-// ========================================================================
-// ========================================================================
-// ========================================================================
-// ========================================================================
-// ========================================================================
+
+const EmptyMain = () => {
+  return (
+    <div className={scss.main}>
+      <p className="text-3xl text-center">請先建立應收帳款明細</p>
+      <p className="text-2xl text-center">按鈕在右上方</p>
+    </div>
+  );
+};
+
 // ========================================================================
 
 const createdHeadRowList_收款紀錄 = (props?: {

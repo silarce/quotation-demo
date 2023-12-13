@@ -28,7 +28,13 @@ export type { Tcontract };
 
 // ========================
 
-export default function ContractList({ contractArr }: { contractArr: Tcontract[] }) {
+export default function ContractList({
+  contractArr,
+  viewRef,
+}: {
+  contractArr: Tcontract[];
+  viewRef?: (node?: Element | null | undefined) => void;
+}) {
   const router = useRouter();
 
   // ------------------------------------------------------------------
@@ -64,13 +70,9 @@ export default function ContractList({ contractArr }: { contractArr: Tcontract[]
     subContracts?.map((item) => {
       const content = item.content;
 
-      const foo: Tdetail = {
+      const detail: Tdetail = {
         date: content.quotationDate,
-        // describe: content.editNotes,
         describe: '',
-        // discount: content.discount,
-        // doorQty: String(content.quantity),
-        // contractAmount: content.total.toLocaleString(),
         onIconClick: () => {
           router.push({
             pathname: '/worksDepartment/contractList/contract/workContactDoc',
@@ -79,7 +81,7 @@ export default function ContractList({ contractArr }: { contractArr: Tcontract[]
         },
       };
 
-      return foo;
+      return detail;
     }) ?? [];
 
   // ------------------------------------------------------------------
@@ -100,13 +102,15 @@ export default function ContractList({ contractArr }: { contractArr: Tcontract[]
             });
           };
 
-          // ===========================
+          const theViewRef = index === contractArr.length - 3 ? viewRef : undefined;
 
           return (
             <Panel
               key={index}
               className={style.panel}
-              header={<PanelHeader contract={item} isActive={isActive} openQuotation={openQuotation} />}
+              header={
+                <PanelHeader viewRef={theViewRef} contract={item} isActive={isActive} openQuotation={openQuotation} />
+              }
             >
               <PanelBody contractDetailArr={contractDetailArr} />
             </Panel>
