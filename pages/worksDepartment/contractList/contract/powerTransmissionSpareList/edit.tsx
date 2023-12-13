@@ -282,7 +282,7 @@ export default function Edit({ isAdmin, userInfo }: { isAdmin: boolean; userInfo
     });
 
     setSheet(sheet);
-  }, [contract, electronicSupplies]);
+  }, [contract, electronicSupplies, disabled]);
 
   // ---------------------------------------------------------------------
 
