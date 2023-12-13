@@ -939,7 +939,10 @@ export const apiGetAccountReceivableIncoices = async (accountReceivableId: strin
 };
 
 /**以 應收帳款id取得 所有 應收帳款發票 account-receivable */
-export const useGetAccountReceivableIncoices = (accountReceivableId: string | undefined, customParams?: Tparams) => {
+export const useGetAccountReceivableIncoices = (
+  accountReceivableId: string | undefined | null,
+  customParams?: Tparams
+) => {
   const [res, setRes] = useState<TgetAccountReceivableIncoices>();
 
   const params: Tparams = {
@@ -1028,7 +1031,10 @@ const apiGetAccountReceivableAccountants = async (id: string, params?: Tparams) 
 };
 
 /**取得 所有 應收帳款 收款紀錄 account-receivable-accountant */
-export const useGetAccountReceivableAccountants = (accountReceivableId: string | undefined, customParams?: Tparams) => {
+export const useGetAccountReceivableAccountants = (
+  accountReceivableId: string | undefined | null,
+  customParams?: Tparams
+) => {
   const [res, setRes] = useState<TgetAccountant>();
 
   const params = {
@@ -1120,7 +1126,10 @@ const apiGetAccountReceivableDeductions = async (accountReceivableId: string, pa
 };
 
 /**取得 所有 應收帳款 扣款明細 account-receivable-deduction */
-export const useGetAccountReceivableDeductions = (accountReceivableId: string | undefined, customParams?: Tparams) => {
+export const useGetAccountReceivableDeductions = (
+  accountReceivableId: string | undefined | null,
+  customParams?: Tparams
+) => {
   const [res, setRes] = useState<TgetAccountReceivableDeductions>();
 
   const params: Tparams = {
@@ -1240,7 +1249,7 @@ const apiGetAccountReceivableProductPayments = async (accountReceivableId: strin
 };
 
 export const useGetAccountReceivableProductPayments = (
-  accountReceivableId: string | undefined,
+  accountReceivableId: string | undefined | null,
   customParams?: Tparams
 ) => {
   const [res, setRes] = useState<TgetAccountReceivableProductPayments>();

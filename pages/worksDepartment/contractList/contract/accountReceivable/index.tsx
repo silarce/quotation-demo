@@ -66,7 +66,6 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './index.module.scss';
-import { set } from 'lodash';
 
 // ========================================================================
 
@@ -1191,10 +1190,10 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   const panelList_01: TpanelList = [
-    //
-    accountReceivableId
-      ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) }
-      : { type: 'myButton', label: '建立應收帳款明細', onClick: () => reaPostAccountReceivable() },
+    accountReceivableId === null
+      ? { type: 'myButton', label: '建立應收帳款明細', onClick: () => reaPostAccountReceivable() }
+      : null,
+    !!accountReceivableId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
   ];
   const panelList_02: TpanelList = [
     {
@@ -1219,7 +1218,7 @@ export default function AccountReceivable() {
     <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
-      {!accountReceivableId && <EmptyMain />}
+      {accountReceivableId === null && <EmptyMain />}
 
       {accountReceivableId && (
         <div className={scss.main}>
@@ -1290,7 +1289,7 @@ export default function AccountReceivable() {
       />
 
       <InvoiceSelector
-        accountReceivableId={accountReceivableId}
+        accountReceivableId={accountReceivableId || undefined}
         label="請選擇發票"
         tip="可複選"
         showModal={!!targetAccountant}

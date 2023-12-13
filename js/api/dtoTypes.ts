@@ -1475,7 +1475,7 @@ export type TquotationContractDto = {
   engineeringDeliveryListId: string | null;
   /**應收帳款明細 */
   accountReceivable?: TaccountReceivableDto; // populate
-  accountReceivableId: string;
+  accountReceivableId: string | null;
 };
 
 export type TcreateModifyQuotationDto = {
