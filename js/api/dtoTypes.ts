@@ -2539,7 +2539,7 @@ export type TcreateAccountReceivableDto = {
   // 所屬合約Id;
   legacyContractId: string | null;
   // 是否已做完
-  isDone: boolean | null;
+  isDone: boolean;
 };
 
 export type TupdateAccountReceivableDto = Pick<
