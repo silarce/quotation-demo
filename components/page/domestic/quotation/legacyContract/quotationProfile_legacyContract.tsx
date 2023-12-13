@@ -81,6 +81,7 @@ export default function QuotationProfile({
     classBasicInfo.contactPerson = '';
     classBasicInfo.contactNumber = '';
     classBasicInfo.faxNumber = '';
+    classLegacyContract.customer = undefined;
   };
 
   // ==============================================

@@ -600,14 +600,14 @@ class Class_legacyContract {
 
   get postBody(): TcreateLegacyContractDto | false {
     const customerId = (() => {
-      return this._legacyContract.customer?.id;
+      return this._legacyContract.customer?.id || null;
     })();
 
-    if (!customerId) {
-      myAlert.warning({ title: '請選擇客戶' });
+    // if (!customerId) {
+    //   myAlert.warning({ title: '請選擇客戶' });
 
-      return false;
-    }
+    //   return false;
+    // }
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
