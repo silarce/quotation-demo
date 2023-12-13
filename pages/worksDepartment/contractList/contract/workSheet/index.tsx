@@ -1260,7 +1260,7 @@ export default function WorkSheet({
     },
     {
       type: 'myButton',
-      label: '編輯',
+      label: havePermissionToEdit ? '編輯' : '沒有編輯權限',
       onClick: () => {
         if (havePermissionToEdit) {
           setDisabled(false);
@@ -1269,9 +1269,9 @@ export default function WorkSheet({
     },
   ];
 
-  if (!havePermissionToEdit) {
-    panelList_allow.pop();
-  }
+  // if (!havePermissionToEdit) {
+  //   panelList_allow.pop();
+  // }
 
   const panelList_notAllow: TpanelList = [
     {

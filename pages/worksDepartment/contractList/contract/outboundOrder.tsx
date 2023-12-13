@@ -13,7 +13,7 @@ import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
 import OrderTable, {
@@ -723,9 +723,18 @@ export default function OutboundOrder({
   //   },
   // ];
 
+  const panelList_noPromission: TpanelList = [
+    {
+      type: 'myButton',
+      label: '沒有權限編輯',
+      onClick: () => {},
+    },
+  ];
+
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader
+        panelList={!havePermissionToEdit ? panelList_noPromission : undefined}
         // panelList={disabled ? panelList01 : panelList02}
         contractNumber={engineeringContact?.contractNumber ?? ''}
       />
