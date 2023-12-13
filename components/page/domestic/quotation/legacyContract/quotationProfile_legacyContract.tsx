@@ -172,7 +172,7 @@ export default function QuotationProfile({
           <div className={`${scss.clientName} ${disabled ? scss.disabled : ''}`}>
             <div>
               <InputSel
-                isMust={true}
+                // isMust={true}
                 isMustPreStyle="minimal"
                 label={'客戶名稱'}
                 placeholder={''}
