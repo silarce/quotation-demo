@@ -41,6 +41,8 @@ export default function WdContractList() {
   const { doorType, county, district, address, customerName, keyWord } = router.query as Tquery;
 
   const params: Tparams = {
+    sort: 'content.quotationDate',
+    order: 'DESC',
     filter: {
       'content.product.doorModelName': { $eq: doorType },
       'content.customer.name': { $contains: customerName },
