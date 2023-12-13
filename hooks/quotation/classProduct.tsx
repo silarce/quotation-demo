@@ -24,7 +24,7 @@
 
   WG = fullWidth-gapA-gapC
   G = guideRailG
-  W = WG - G
+  W = WG - G -G // 沒有多打，要減掉兩個G
 
  */
 
@@ -93,6 +93,7 @@ import {
   calcProductVolume,
   calcProductWG,
   calcProductFullWidth,
+  calcW,
   findBDoptions,
 } from 'js/utils/product/calc';
 
@@ -686,6 +687,13 @@ class Class_product {
 
     // this._theW = this._prodData.WG - this.guildRailG;
     this._theW = new Decimal(this._prodData.WG || 0).sub(this.guildRailG || 0).toString();
+    // this._theW = String(
+    //   calcW({
+    //     //
+    //     WG: Number(this._prodData.WG) || 0,
+    //     G: Number(this.guildRailG) || 0,
+    //   })
+    // );
 
     //
 
