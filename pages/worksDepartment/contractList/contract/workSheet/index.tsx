@@ -15,8 +15,10 @@ get /products/door/generate-door-product-bom 也不需要呼叫了
 看來需要呼叫並用來更新資料的只有
 get /products/door/calc-general-spec
 get /products/door/calc-detail-spec
-這兩個api的呼叫已經放進Class_workSheet.calcProd與Class_workSheet.getInitData了
-按下計算按鈕就會呼叫Class_workSheet.getInitData
+這兩個api的呼叫已經放進Class_workSheet.calcProd了
+
+Class_workSheet.getInitData
+會呼叫 getAccessoriesArr與getProdAvailableComponents
 
 如果工作表的是到現場實作後，修改主產品規格的紀錄
 那麼是不是厚度、馬力數的選項就不應該是從後端取得的資料
@@ -1294,7 +1296,7 @@ export default function WorkSheet({
   const forbidden = targetSheet?.isOriginal;
 
   return (
-    <SubLayer isLoading_all={isLoading}>
+    <SubLayer isLoading_all={isLoading || targetSheet?.isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <form
