@@ -415,15 +415,18 @@ latestContentProdArr為這次追加追減的主產品
           const contact = customer.contacts?.[0];
           const name = contact?.name ?? '';
           const phone = contact?.phone ?? '';
+          const fax = customer.fax || '';
 
           setCustomer(customer);
           changeProfile('contactPerson', `${name}${phone}`);
           changeProfile('contactNumber', phone);
+          changeProfile('faxNumber', fax);
         },
         onClear: () => {
           setCustomer(null);
           changeProfile('contactPerson', '');
           changeProfile('contactNumber', '');
+          changeProfile('faxNumber', '');
         },
       },
       itemList: {

@@ -92,7 +92,7 @@ export default function Signature({
               }}
               disabled={forbidden || disabled}
               showBaseline="auto"
-              showAddIcon={forbidden || disabled ? false : true}
+              // showAddIcon={forbidden || disabled ? false : true}
             />
           </div>
         );

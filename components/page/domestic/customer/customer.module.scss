@@ -236,14 +236,6 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
         align-items: center;
       }
     }
-    .subTitle {
-      padding: 11px $leftPadding_title;
-      font-weight: 400;
-      font-size: 18px;
-      line-height: 22px;
-      background-color: $bgc01;
-      margin: auto;
-    }
 
     .checkboxGroup {
       display: flex;
@@ -344,5 +336,14 @@ $leftPadding_div: $leftPadding_title - $leftPadding_option;
       color: red;
     }
   }
+}
+
+.subTitle {
+  padding: 11px $leftPadding_title;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 22px;
+  background-color: $bgc01;
+  margin: auto;
 }
 // =====================================================

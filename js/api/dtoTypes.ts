@@ -603,7 +603,7 @@ export type TupdateLegacyContractAdditionDto = TcreateLegacyContractAdditionDto 
 
 export type TcreateLegacyContractDto = {
   /* 客戶ID */
-  customerId: string;
+  customerId: string | null;
   /* 合約編號 */
   contractNumber: string;
   /* 報價時段 */

@@ -24,7 +24,7 @@
 
   WG = fullWidth-gapA-gapC
   G = guideRailG
-  W = WG - G
+  W = WG - G -G // 沒有多打，要減掉兩個G
 
  */
 
@@ -93,6 +93,7 @@ import {
   calcProductVolume,
   calcProductWG,
   calcProductFullWidth,
+  calcW,
   findBDoptions,
 } from 'js/utils/product/calc';
 
@@ -222,10 +223,13 @@ class Class_product {
       thickness: this._prodData.thickness,
     };
 
-    // this._theW = String(Number(this._prodData.WG || '0') - this._prodData.guideRailG);
     const guideRailG_m = new Decimal(this._prodData.guideRailG).div(1000).toNumber();
-    // this._theW = String(Number(this._prodData.WG || '0') - guideRailG_m);
-    this._theW = new Decimal(this._prodData.WG || '0').sub(guideRailG_m).toString();
+    this._theW = String(
+      calcW({
+        WG: Number(this._prodData.WG || '0'),
+        G: Number(guideRailG_m),
+      })
+    );
 
     if (this._theW === '0') {
       this._theW = '';
@@ -271,7 +275,7 @@ class Class_product {
   // readonly options_doorTrack_normal = options_doorTrack_normal;
   // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
 
-  private _theW = '0';
+  private _theW = '';
   // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
   private _dontCalcWG = false;
 
@@ -684,8 +688,12 @@ class Class_product {
 
     this._dontCalcWG = false;
 
-    // this._theW = this._prodData.WG - this.guildRailG;
-    this._theW = new Decimal(this._prodData.WG || 0).sub(this.guildRailG || 0).toString();
+    this._theW = String(
+      calcW({
+        WG: Number(this._prodData.WG) || 0,
+        G: Number(this.guildRailG) || 0,
+      })
+    );
 
     //
 
@@ -2049,8 +2057,11 @@ class Class_product {
 
   set WG(v) {
     this._prodData.WG = v;
-    const w = new Decimal(v || 0).sub(this.guildRailG || 0).toString();
-    this._theW = w;
+    const w = calcW({
+      WG: Number(v) || 0,
+      G: Number(this.guildRailG) || 0,
+    });
+    this._theW = String(w);
 
     const callReq = async () => {
       const fullWidth = await calcFullwidthWithWG({

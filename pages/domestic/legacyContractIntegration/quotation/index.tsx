@@ -201,44 +201,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------------
 
-  // const classSignature = classLegacyContract.classSignature;
-
-  // const signatureArr: { label: string; inputProps: TinputProps }[] = [
-  //   {
-  //     label: '經理',
-  //     inputProps: {
-  //       props: {
-  //         value: classSignature.managerName,
-  //         onChange: (e) => {
-  //           classSignature.managerName = e.target.value;
-  //         },
-  //       },
-  //     },
-  //   },
-  //   {
-  //     label: '主管',
-  //     inputProps: {
-  //       props: {
-  //         value: classSignature.supervisorName,
-  //         onChange: (e) => {
-  //           classSignature.supervisorName = e.target.value;
-  //         },
-  //       },
-  //     },
-  //   },
-  //   {
-  //     label: '經辦',
-  //     inputProps: {
-  //       props: {
-  //         value: classSignature.operatorName,
-  //         onChange: (e) => {
-  //           classSignature.operatorName = e.target.value;
-  //         },
-  //       },
-  //     },
-  //   },
-  // ];
-
   useEffect(() => {
     if (disbaled) {
       reset();
@@ -381,21 +343,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
       employee: emp_manager,
       onChange: (v) => {
         setEmp_manager(v);
-        // classSignature.managerName = v.chName;
       },
     },
     director: {
       employee: emp_director,
       onChange: (v) => {
         setEmp_director(v);
-        // classSignature.supervisorName = v.chName;
       },
     },
     agent: {
       employee: emp_agent,
       onChange: (v) => {
         setEmp_agent(v);
-        // classSignature.operatorName = v.chName;
       },
     },
   };
@@ -405,8 +364,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     return null;
   }
 
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   return (

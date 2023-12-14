@@ -367,15 +367,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
           const contact = customer.contacts?.[0];
           const name = contact?.name ?? '';
           const phone = contact?.phone ?? '';
+          const fax = customer.fax || '';
 
           setCustomer(customer);
           changeProfile('contactPerson', `${name}${phone}`);
           changeProfile('contactNumber', phone);
+          changeProfile('faxNumber', fax);
         },
         onClear: () => {
           setCustomer(null);
           changeProfile('contactPerson', '');
           changeProfile('contactNumber', '');
+          changeProfile('faxNumber', '');
         },
       },
       itemList: {
