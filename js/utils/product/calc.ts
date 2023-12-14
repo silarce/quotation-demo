@@ -50,7 +50,7 @@ export const calcProductFullWidth = ({ WG, gapA, gapC }: { WG: number; gapA: num
 // G就是門軌的width
 // 例如這個api get https://sanjeou-erp-be.caprover.credot-web.com/products/door/models
 // G = guideRails.width
-// 單位為mm
+// 注意要同樣長度單位
 export const calcW = ({ WG, G }: { WG: number; G: number }) => {
   return new Decimal(WG).sub(G).sub(G).toNumber();
 };
