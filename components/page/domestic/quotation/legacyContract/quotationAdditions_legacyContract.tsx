@@ -397,11 +397,16 @@ const EditBtnBox = ({
           onClick={(e) => {
             e.stopPropagation();
 
-            if (disabled) {
-              return;
+            if (!disabled) {
+              myAlert.confirm({
+                title: '確定移除',
+                props: {
+                  onOk: () => {
+                    del();
+                  },
+                },
+              });
             }
-
-            del();
           }}
         />
       </div>

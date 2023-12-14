@@ -4,6 +4,7 @@ import Image from 'next/image';
 import _ from 'lodash';
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
@@ -24,8 +25,6 @@ import { TprodCellConfig } from 'hooks/quotation/legacy/useLegacyContract';
 // ==========================================================
 // ==========================================================
 import { Class_legacyContract, Class_product } from 'hooks/quotation/legacy/useLegacyContract';
-
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // dnd
 import { useVerticalDnd } from '../hook/useVerticalDnd';
@@ -227,7 +226,14 @@ const CopyDelBtnBox = ({
           e.stopPropagation();
 
           if (!disabled) {
-            del();
+            myAlert.confirm({
+              title: '確定移除?',
+              props: {
+                onOk: () => {
+                  del();
+                },
+              },
+            });
           }
         }}
       />
