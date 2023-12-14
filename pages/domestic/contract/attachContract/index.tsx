@@ -353,6 +353,10 @@ export default function AttachContract() {
         subTotal: subTotal_calced,
         salesTax: salesTax_calced,
         total: total_calced,
+        //
+        // 其他設定有金錢，沒有參與追加追減，出現在追加追減報價單裡可能會被誤解
+        // 應該不送才是對的
+        others: [],
       };
 
       try {
