@@ -374,9 +374,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       customer: {
         value: customer,
         onChange: (customer) => {
+          const customerPhoneNumber = customer.phone || '';
           const contact = customer.contacts?.[0];
           const name = contact?.name ?? '';
-          const phone = contact?.phone ?? '';
+          const phone = contact?.phone || customerPhoneNumber || '';
           const fax = customer.fax || '';
 
           setCustomer(customer);
@@ -1570,12 +1571,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
-          <QuotationProfile //
-            // profile={latestContent}
-            disabled={disabled}
-            // onProfileChange={onProfileChange}
-            control={control_profile}
-          />
+          <QuotationProfile disabled={disabled} control={control_profile} />
 
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>

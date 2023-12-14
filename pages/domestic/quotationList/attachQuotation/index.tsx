@@ -412,9 +412,10 @@ latestContentProdArr為這次追加追減的主產品
       customer: {
         value: customer,
         onChange: (customer) => {
+          const customerPhoneNumber = customer.phone || '';
           const contact = customer.contacts?.[0];
           const name = contact?.name ?? '';
-          const phone = contact?.phone ?? '';
+          const phone = contact?.phone || customerPhoneNumber || '';
           const fax = customer.fax || '';
 
           setCustomer(customer);

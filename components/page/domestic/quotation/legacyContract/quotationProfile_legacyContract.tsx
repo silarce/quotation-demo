@@ -124,10 +124,11 @@ export default function QuotationProfile({
 
   const onConfirmClient = (customerArr: TcustomerDto[]) => {
     const customer = customerArr[0];
+    const customerPhoneNumber = customer.phone || '';
 
     const contact = customer.contacts;
     const contactPerson = contact?.[0]?.name ?? '';
-    const contactNumber = contact?.[0]?.phone ?? '';
+    const contactNumber = contact?.[0]?.phone || customerPhoneNumber || '';
     const theContactPerson = `${contactPerson}${contactNumber}`;
 
     classLegacyContract.customer = customer;
