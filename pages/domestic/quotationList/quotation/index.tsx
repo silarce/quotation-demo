@@ -947,7 +947,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return { ...workDirector, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
+      forbidden: !!quotationData?.latestContent.toWorkDirectorAt,
     },
     supervisor: {
       employee: supervisor?.emp ?? null,
@@ -960,7 +961,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return { ...supervisor, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
+      forbidden: !!quotationData?.latestContent.toSupervisorAt,
     },
     sales: {
       employee: sales?.emp ?? null,
@@ -973,7 +975,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return { ...sales, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
+      forbidden: !!quotationData?.latestContent.toSalesAt,
     },
     agent: {
       employee: quotationData?.latestContent.agentEmployee,

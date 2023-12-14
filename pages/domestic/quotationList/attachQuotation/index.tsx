@@ -942,7 +942,8 @@ latestContentProdArr為這次追加追減的主產品
           return { ...workDirector, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
+      forbidden: !!quotationData?.latestContent.toWorkDirectorAt,
     },
     supervisor: {
       employee: supervisor?.emp ?? null,
@@ -955,7 +956,8 @@ latestContentProdArr為這次追加追減的主產品
           return { ...supervisor, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
+      forbidden: !!quotationData?.latestContent.toSupervisorAt,
     },
     sales: {
       employee: sales?.emp ?? null,
@@ -968,7 +970,8 @@ latestContentProdArr為這次追加追減的主產品
           return { ...sales, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
+      forbidden: !!quotationData?.latestContent.toSalesAt,
     },
     agent: {
       employee: quotationData?.latestContent.agentEmployee,
