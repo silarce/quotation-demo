@@ -105,7 +105,7 @@ export default function Department() {
     // 這個流程有試過，確實可以再次patch一個name為AAAA的部門
     // 後端說這個問題應該由後端那邊處理，處理好之前先把刪除功能拿掉吧
     //
-    //
+    // 因為上面所提的問題，目前beta無法post或patch name為廠務部的部門
 
     // 刪除部門
     // showRootLoading(true, '正在刪除部門');
