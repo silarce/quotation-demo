@@ -4,15 +4,12 @@ import Decimal from 'decimal.js';
 import moment from 'moment';
 import { nanoid } from 'nanoid';
 
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
 import {
   TlegacyContractDto,
   TcreateLegacyContractDto,
   TcreateLegacyContractProductDto,
   TcreateLegacyContractAdditionDto,
   TcustomerDto,
-  TlegacyContractProductDto,
   TupdateLegacyContractProductDto,
   TupdateLegacyContractAdditionDto,
 } from 'js/api/dtoTypes';
@@ -207,14 +204,12 @@ class Class_legacyContract {
   prodCellConfig;
   /**配件 格子設定 包括欄位keyArr */
   additionCellConfig;
-  // ---------------------
+
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
-  // 先留著，免得哪天要改回來
-  // 先留著，免得哪天要改回來
   // 先留著，免得哪天要改回來
 
-  // 需求變更 編輯折數與總折數時不再影響其他數值
+  // 需求變更 編輯折數與總折數時不再影響其他數值，所以不再使用下面的函式
   /**計算總折數 */
   // countTotalDiscount = () => {
   // let totalDiscount = new Decimal(0);
@@ -225,7 +220,7 @@ class Class_legacyContract {
   // this.classPayInfo.discountRate_noLoop = Decimal.div(totalDiscount, this.classProductArr.length).toFixed(2);
   // };
 
-  // 需求變更 編輯折數與總折數時不再影響其他數值
+  // 需求變更 編輯折數與總折數時不再影響其他數值，所以不再使用下面的函式
   /**變更所有主產品的折數 */
   // editAllProdDiscount = (v: string) => {
   // this.classProductArr.forEach((prod) => {
@@ -321,24 +316,6 @@ class Class_legacyContract {
   get prodArr() {
     return Object.values(this._prodList);
   }
-
-  // copyProd(id: string) {
-  //   const key = 'new-' + nanoid();
-
-  //   const copy = _.cloneDeep(this._prodList[id]);
-
-  //   copy.id = undefined;
-
-  //   // copy.delSelf = () => {
-  //   //   delete this._prodList[key];
-  //   // };
-
-  //   this._prodList[key] = copy;
-
-  //   this.countSubTotal();
-
-  //   this._reRender();
-  // }
 
   addProd = () => {
     const key = 'new-' + nanoid();
@@ -464,21 +441,6 @@ class Class_legacyContract {
   get additionArr() {
     return Object.values(this._additionList);
   }
-
-  // copyAddition = (id: string) => {
-  //   const key = 'new-' + nanoid();
-
-  //   const copy = _.cloneDeep(this._additionList[id]);
-  //   copy.id = undefined;
-
-  //   copy.delSelf = () => {
-  //     delete this._additionList[key];
-  //   };
-
-  //   this._additionList[key] = copy;
-
-  //   this._reRender();
-  // };
 
   addAddition = () => {
     const key = 'new-' + nanoid();
@@ -1028,7 +990,7 @@ export type {
 
 // =============================================================
 /**
- 筆記
+ 筆記 (因為歷經多次需求變更，這個筆記的內容可能已經不準確)
  countTotalDiscount 計算總折數
  運作方式:將所有主產品的折數加起來並平均，計算到小數點第二位
  
