@@ -412,18 +412,22 @@ latestContentProdArr為這次追加追減的主產品
       customer: {
         value: customer,
         onChange: (customer) => {
+          const customerPhoneNumber = customer.phone || '';
           const contact = customer.contacts?.[0];
           const name = contact?.name ?? '';
-          const phone = contact?.phone ?? '';
+          const phone = contact?.phone || customerPhoneNumber || '';
+          const fax = customer.fax || '';
 
           setCustomer(customer);
           changeProfile('contactPerson', `${name}${phone}`);
           changeProfile('contactNumber', phone);
+          changeProfile('faxNumber', fax);
         },
         onClear: () => {
           setCustomer(null);
           changeProfile('contactPerson', '');
           changeProfile('contactNumber', '');
+          changeProfile('faxNumber', '');
         },
       },
       itemList: {
@@ -939,7 +943,8 @@ latestContentProdArr為這次追加追減的主產品
           return { ...workDirector, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
+      forbidden: !!quotationData?.latestContent.toWorkDirectorAt,
     },
     supervisor: {
       employee: supervisor?.emp ?? null,
@@ -952,7 +957,8 @@ latestContentProdArr為這次追加追減的主產品
           return { ...supervisor, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
+      forbidden: !!quotationData?.latestContent.toSupervisorAt,
     },
     sales: {
       employee: sales?.emp ?? null,
@@ -965,7 +971,8 @@ latestContentProdArr為這次追加追減的主產品
           return { ...sales, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
+      forbidden: !!quotationData?.latestContent.toSalesAt,
     },
     agent: {
       employee: quotationData?.latestContent.agentEmployee,

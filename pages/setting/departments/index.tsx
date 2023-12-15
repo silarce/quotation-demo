@@ -88,22 +88,40 @@ export default function Department() {
     // 刪除部門>刪除職等>新增部門>更新部門職等
 
     // -------------------------------
+
+    // ! 刪除部門有問題，所以先把這個功能拿掉
+    // 假設有一個部門的name為AAA
+    // 一旦將這個部門刪掉後，就再也不能post或patch一個name為AAA的部門，會被409
+    // 就算在delete前將這個部門的name改為隨機字串也沒有用
+    // 似乎是在post的時候後端就會將name帶入另一個property紀錄，並且不會因為name改變而改變
+    //
+    // 可能的解決方案(等後端人員回覆是否會有問題，沒問題再做)
+    // post部門時，name先帶入隨機字串
+    // 然後立刻patch該部門的name為使用者編輯的字串(假設為AAAA)
+    // 刪除該部門時，先把name帶入隨機字串
+    // 然後再刪除
+    // 於是使用者就可以再次新增name為AAAA的部門
+    //
+    // 這個流程有試過，確實可以再次patch一個name為AAAA的部門
+    // 後端說這個問題應該由後端那邊處理，處理好之前先把刪除功能拿掉吧
+    //
+    // 因為上面所提的問題，目前beta無法post或patch name為廠務部的部門
+
     // 刪除部門
-    showRootLoading(true, '正在刪除部門');
+    // showRootLoading(true, '正在刪除部門');
     // 移除dWillDelete為true的Cdepartment，並取得被移除的Cdepartment
-    const departmentWillDeleteArr = _.remove(CdepartmentArr, (item: ClassDepartment) => item.dWillDelete);
+    // const departmentWillDeleteArr = _.remove(CdepartmentArr, (item: ClassDepartment) => item.dWillDelete);
 
-    // dwe === departmentWillRemove
-    for (const dwr of departmentWillDeleteArr) {
-      const id = dwr.id;
-      const name = dwr.name;
+    // for (const dwr of departmentWillDeleteArr) {
+    //   const id = dwr.id;
+    //   const name = dwr.name;
 
-      try {
-        await apiDeleteDepartments(id);
-      } catch {
-        alert(`刪除部門${name}發生錯誤`);
-      }
-    }
+    //   try {
+    //     await apiDeleteDepartments(id);
+    //   } catch {
+    //     alert(`刪除部門${name}發生錯誤`);
+    //   }
+    // }
 
     // -------------------------------
     // 刪除職等

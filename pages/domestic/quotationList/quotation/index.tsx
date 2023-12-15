@@ -15,6 +15,16 @@
 
 // 業務與業務主管審核過後，status就會自動轉為Pending
 
+/**
+ * 只是送審，不會被後端鎖住
+ * 有人審核過了就會被後端鎖住
+ * 在Pending狀態會被後端鎖住
+ *
+ *
+ *
+ *
+ */
+
 // =============================================================
 // =============================================================
 // =============================================================
@@ -364,18 +374,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
       customer: {
         value: customer,
         onChange: (customer) => {
+          const customerPhoneNumber = customer.phone || '';
           const contact = customer.contacts?.[0];
           const name = contact?.name ?? '';
-          const phone = contact?.phone ?? '';
+          const phone = contact?.phone || customerPhoneNumber || '';
+          const fax = customer.fax || '';
 
           setCustomer(customer);
           changeProfile('contactPerson', `${name}${phone}`);
           changeProfile('contactNumber', phone);
+          changeProfile('faxNumber', fax);
         },
         onClear: () => {
           setCustomer(null);
           changeProfile('contactPerson', '');
           changeProfile('contactNumber', '');
+          changeProfile('faxNumber', '');
         },
       },
       itemList: {
@@ -934,7 +948,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return { ...workDirector, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
+      forbidden: !!quotationData?.latestContent.toWorkDirectorAt,
     },
     supervisor: {
       employee: supervisor?.emp ?? null,
@@ -947,7 +962,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return { ...supervisor, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
+      forbidden: !!quotationData?.latestContent.toSupervisorAt,
     },
     sales: {
       employee: sales?.emp ?? null,
@@ -960,7 +976,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return { ...sales, emp: emp ?? null };
         });
       },
-      forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
+      // forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
+      forbidden: !!quotationData?.latestContent.toSalesAt,
     },
     agent: {
       employee: quotationData?.latestContent.agentEmployee,
@@ -1554,12 +1571,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
-          <QuotationProfile //
-            // profile={latestContent}
-            disabled={disabled}
-            // onProfileChange={onProfileChange}
-            control={control_profile}
-          />
+          <QuotationProfile disabled={disabled} control={control_profile} />
 
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>

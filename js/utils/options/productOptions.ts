@@ -106,11 +106,10 @@ export const optionsCreator_doorModel_2 = (props: { haveEmpty?: boolean } = {}):
     { value: 'SJ-302', label: 'SJ-302' },
     { value: 'SJ-303A', label: 'SJ-303A' },
     { value: 'SJ-303AS', label: 'SJ-303AS' },
+    { value: 'SJ-303S', label: 'SJ-303S' },
     { value: 'SJ-305D', label: 'SJ-305D' },
     { value: 'SJ-312', label: 'SJ-312' },
     { value: 'SJ-120A', label: 'SJ-120A' },
-    // { value: 'SJ-303S', label: 'SJ-303S' },
-    // { value: 'SJ-303AS', label: 'SJ-303AS' },
   ];
 
   if (haveEmpty) {

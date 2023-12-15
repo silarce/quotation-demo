@@ -726,7 +726,7 @@ function prodCellConfigCre(): TprodCellConfig {
     keyArr: [
       // "idNumber",
       'batchNumber',
-      'discountRate',
+      // 'discountRate',
       'itemName',
       'quoteType',
       'length',

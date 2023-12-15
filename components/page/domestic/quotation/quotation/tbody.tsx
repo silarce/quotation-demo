@@ -8,6 +8,7 @@ import _ from 'lodash';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
@@ -219,7 +220,14 @@ const CopyDelBtnBox = ({
           e.stopPropagation();
 
           if (!disabled) {
-            del && del();
+            myAlert.confirm({
+              title: '確定移除?',
+              props: {
+                onOk: () => {
+                  del && del();
+                },
+              },
+            });
           }
         }}
       />

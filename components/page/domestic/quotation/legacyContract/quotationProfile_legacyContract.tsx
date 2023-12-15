@@ -81,6 +81,7 @@ export default function QuotationProfile({
     classBasicInfo.contactPerson = '';
     classBasicInfo.contactNumber = '';
     classBasicInfo.faxNumber = '';
+    classLegacyContract.customer = undefined;
   };
 
   // ==============================================
@@ -123,10 +124,11 @@ export default function QuotationProfile({
 
   const onConfirmClient = (customerArr: TcustomerDto[]) => {
     const customer = customerArr[0];
+    const customerPhoneNumber = customer.phone || '';
 
     const contact = customer.contacts;
     const contactPerson = contact?.[0]?.name ?? '';
-    const contactNumber = contact?.[0]?.phone ?? '';
+    const contactNumber = contact?.[0]?.phone || customerPhoneNumber || '';
     const theContactPerson = `${contactPerson}${contactNumber}`;
 
     classLegacyContract.customer = customer;
@@ -171,7 +173,7 @@ export default function QuotationProfile({
           <div className={`${scss.clientName} ${disabled ? scss.disabled : ''}`}>
             <div>
               <InputSel
-                isMust={true}
+                // isMust={true}
                 isMustPreStyle="minimal"
                 label={'客戶名稱'}
                 placeholder={''}

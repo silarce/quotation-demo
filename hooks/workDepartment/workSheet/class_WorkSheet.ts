@@ -151,6 +151,8 @@ class Class_workSheet {
 
   // ---------------------------------------------------------------------
 
+  isLoading = false;
+
   private _prod: TquotationProductItemDto | TupdateWorkSheetItem;
   readonly oldProd: TquotationProductItemDto;
   private forceUpdate: TforceUpdate_workSheet;
@@ -483,6 +485,16 @@ class Class_workSheet {
   // -------------------------
 
   async calcProd() {
+    // 取得產品規格
+    // 計算WG
+    // 從剛剛取得的產品規格設定預設馬達、預設馬力、預設boxB、預設門片厚度
+    // 取得boxB的選項
+    // 改變選配的材質為下拉選單第一項
+    // 取得門片數量
+    // 取得可用材料配件(components)
+
+    this.isLoading = true;
+
     const prodSpec = await this.getProdSpec();
 
     if (!prodSpec) {
@@ -530,17 +542,20 @@ class Class_workSheet {
     });
 
     this.changeComMaterial();
-    this.getProdDetailSepc();
-    this.getProdAvailableComponents();
+    await this.getProdDetailSepc();
+    await this.getProdAvailableComponents();
+    this.isLoading = false;
     this.forceUpdate();
 
     //
     //
   }
 
-  async getInitData() {
-    if (this.accessoriesOptionArr.length === 0) {
-      this.getAccessoriesArr();
+  async getInitData({ fonceInit = false }: { fonceInit?: boolean } = {}) {
+    this.isLoading = true;
+
+    if (this.accessoriesOptionArr.length === 0 || fonceInit) {
+      await this.getAccessoriesArr();
     }
 
     // if (this._prodDetailSpec === undefined) {
@@ -551,9 +566,11 @@ class Class_workSheet {
     //   await this.getProdSpec();
     // }
 
-    if (this._availableComponents === undefined) {
-      this.getProdAvailableComponents();
+    if (this._availableComponents === undefined || fonceInit) {
+      await this.getProdAvailableComponents();
     }
+
+    this.isLoading = false;
 
     this.forceUpdate({ isNoChange: true });
   }

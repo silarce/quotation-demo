@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
-import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -40,15 +39,6 @@ import {
 
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-
-// 接著做追加追減的修改備註功能
-// 接著做追加追減的修改備註功能
-// 接著做追加追減的修改備註功能
-// 接著做追加追減的修改備註功能
-// 接著做追加追減的修改備註功能
-// 接著做追加追減的修改備註功能
-// 接著做追加追減的修改備註功能
-// 接著做追加追減的修改備註功能
 
 // ========================================================================
 
@@ -140,34 +130,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [contractId, batch]);
 
   // --------------------------------------------------------------------------
-
-  // const classSignature = classLegacyContract.classSignature;
-  // const signatureArr: { label: string; inputProps: TinputProps }[] = [
-  //   {
-  //     label: '經理',
-  //     inputProps: {
-  //       props: {
-  //         value: classSignature.managerName,
-  //       },
-  //     },
-  //   },
-  //   {
-  //     label: '主管',
-  //     inputProps: {
-  //       props: {
-  //         value: classSignature.supervisorName,
-  //       },
-  //     },
-  //   },
-  //   {
-  //     label: '經辦',
-  //     inputProps: {
-  //       props: {
-  //         value: classSignature.operatorName,
-  //       },
-  //     },
-  //   },
-  // ];
 
   useEffect(() => {
     reset();
@@ -273,8 +235,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     return null;
   }
 
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   return (
