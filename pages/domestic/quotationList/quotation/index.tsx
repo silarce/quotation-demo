@@ -1192,12 +1192,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     setIsLoading(true);
 
+    let isGetDetailSpecSuccess = true;
+
     for (const prod of Object.values(productList)) {
       try {
         await prod.reqGetDetailSpec();
       } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得細部規格失敗', content: err.message });
+        isGetDetailSpecSuccess = false;
         setIsLoading(false);
+        break;
       }
+    }
+
+    if (!isGetDetailSpecSuccess) {
+      return;
     }
 
     // 總樘數
