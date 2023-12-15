@@ -356,6 +356,7 @@ class Class_addition {
     return {
       ...copy,
       id: this.id || undefined,
+      unit: copy.unit || null,
     };
   }
 
