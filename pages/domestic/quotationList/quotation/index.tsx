@@ -33,7 +33,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-// import { useForm } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -1193,12 +1192,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     setIsLoading(true);
 
+    let isGetDetailSpecSuccess = true;
+
     for (const prod of Object.values(productList)) {
       try {
         await prod.reqGetDetailSpec();
       } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得細部規格失敗', content: err.message });
+        isGetDetailSpecSuccess = false;
         setIsLoading(false);
+        break;
       }
+    }
+
+    if (!isGetDetailSpecSuccess) {
+      return;
     }
 
     // 總樘數
@@ -1362,7 +1371,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(false);
       showRootLoading(false);
     }
-    //
   }; // reqUpdateQuotation
 
   // --------------------------------------------
