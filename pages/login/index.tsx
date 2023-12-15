@@ -72,7 +72,13 @@ const Login: NextPageWithLayout<{
         </div>
       </div>
 
-      <form className={scss.loginPanel} onSubmit={() => {}}>
+      <form
+        className={scss.loginPanel}
+        onSubmit={(e) => {
+          e.preventDefault();
+          reqLog();
+        }}
+      >
         <Input_pw
           value={account}
           onChange={setAccont}
@@ -91,7 +97,7 @@ const Login: NextPageWithLayout<{
           firstGap="50px"
         />
 
-        <Button className={scss.btn} loading={isLoading} onClick={reqLog}>
+        <Button className={scss.btn} htmlType="submit" loading={isLoading}>
           登入
         </Button>
       </form>
