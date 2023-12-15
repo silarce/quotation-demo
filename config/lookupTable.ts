@@ -1,8 +1,12 @@
 export const customerTypesLookup = Object.freeze({
+  // construction: '營造',
+  // firm: '事務所',
+  // propertyOwner: '業主',
+  // contractor: '協力廠商',
   construction: '營造',
-  firm: '事務所',
+  firm: '協力廠商',
   propertyOwner: '業主',
-  contractor: '協力廠商',
+  contractor: '事務所',
 } as const);
 
 export const quotationStatusLookup = Object.freeze({
