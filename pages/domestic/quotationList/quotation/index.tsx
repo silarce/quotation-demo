@@ -33,7 +33,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-// import { useForm } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -1362,7 +1361,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(false);
       showRootLoading(false);
     }
-    //
   }; // reqUpdateQuotation
 
   // --------------------------------------------

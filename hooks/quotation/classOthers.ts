@@ -118,10 +118,23 @@ class Class_other {
     this.reRender();
   }
 
+  get unit() {
+    return this._data.unit || '';
+  }
+  set unit(v) {
+    this._data.unit = v;
+    this.reRender();
+  }
+
   // ---------------------------------------------------------
 
   get body() {
-    return this._data;
+    const copy = _.cloneDeep(this._data);
+
+    return {
+      ...copy,
+      unit: copy.unit || null,
+    };
   }
 } // Class_other  close
 
@@ -135,6 +148,7 @@ type Tothers = {
   unitPrice: number;
   totalPrice: number;
   notes: string;
+  unit: string | null;
 };
 
 // type TothersKey = Exclude<keyof Tothers, 'id'>;
@@ -145,6 +159,7 @@ const othersKeyArrOri: () => TothersKey[] = () => {
     'item',
     'description',
     'quantity',
+    'unit',
     //  'unitPrice',
     //  'totalPrice',
     'unitPrice_locale',
@@ -180,6 +195,15 @@ const othersCellConfig: TcellConfig = {
         props: {
           type: 'number',
         },
+      },
+    },
+  },
+  unit: {
+    label: '單位',
+    inputSelProps: {
+      wrapperStyle: { width: '60px' },
+      inputProps: {
+        props: {},
       },
     },
   },
@@ -248,6 +272,7 @@ const emptyOthersOri: () => Tothers = () => {
     unitPrice: 0,
     totalPrice: 0,
     notes: '',
+    unit: '',
   };
 };
 
