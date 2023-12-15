@@ -430,6 +430,8 @@ export type TlegacyContractAdditionDto = {
   totalPrice: number;
   /**備註 */
   notes: string;
+  /**單位 */
+  unit: string | null;
   //
   /**批次 */
   batch: number;
@@ -594,6 +596,8 @@ export type TcreateLegacyContractAdditionDto = {
   totalPrice: number;
   /** 備註 */
   notes: string;
+  /**單位 */
+  unit: string | null;
 };
 
 export type TupdateLegacyContractAdditionDto = TcreateLegacyContractAdditionDto & {

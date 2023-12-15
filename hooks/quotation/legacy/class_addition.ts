@@ -119,6 +119,7 @@ class Class_addition {
       unitPrice: this._addition.unitPrice,
       totalPrice: this._addition.totalPrice,
       notes: this._addition.notes,
+      unit: this._addition.unit || null,
     };
 
     this._belongList[key] = new Class_addition({
@@ -227,6 +228,15 @@ class Class_addition {
   }
   set notes(v) {
     this._addition.notes = v;
+    this._reRender();
+  }
+
+  get unit() {
+    return this._addition.unit ?? '';
+  }
+
+  set unit(v) {
+    this._addition.unit = v;
     this._reRender();
   }
 
@@ -374,7 +384,7 @@ class Class_addition {
 type TaddtionInputCellType = {
   [key in keyof Pick<
     Class_addition,
-    'batchNumber' | 'itemName' | 'content' | 'quantity' | 'unitPrice' | 'totalPrice' | 'notes'
+    'batchNumber' | 'itemName' | 'content' | 'quantity' | 'unit' | 'unitPrice' | 'totalPrice' | 'notes'
   >]: {
     type: 'input';
   };
@@ -394,7 +404,7 @@ type TadditionCellConfig = {
 
 const additionCellConfigCre = (): TadditionCellConfig => {
   return {
-    keyArr: ['batchNumber', 'itemName', 'content', 'quantity', 'unitPrice', 'totalPrice', 'notes'],
+    keyArr: ['batchNumber', 'itemName', 'content', 'quantity', 'unit', 'unitPrice', 'totalPrice', 'notes'],
     cellConfig: {
       batchNumber: {
         label: '合約編號',
@@ -434,6 +444,15 @@ const additionCellConfigCre = (): TadditionCellConfig => {
           wrapperStyle: { width: '60px' },
           inputProps: {
             props: { type: 'number' },
+          },
+        },
+      },
+      unit: {
+        label: '單位',
+        inputSelPorps: {
+          wrapperStyle: { width: '60px' },
+          inputProps: {
+            props: {},
           },
         },
       },
