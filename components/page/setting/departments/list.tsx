@@ -79,7 +79,7 @@ export default function List({
                     onFocus={() => (department.isFocus = true)}
                     onBlur={() => (department.isFocus = false)}
                   />
-                  {editable && <DeleteSwitch className={scss.iconCross01} onClick={editable ? onDelete : undefined} />}
+                  {/* {editable && <DeleteSwitch className={scss.iconCross01} onClick={editable ? onDelete : undefined} />} */}
                 </label>
 
                 <label className={classNames(scss.inputBox, { [scss.notEditable]: !editable || dWillDelete })}>

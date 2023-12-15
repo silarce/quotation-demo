@@ -93,7 +93,7 @@ export default function AdditionalEngineeringStatistics() {
     pageSize: 99999,
     populate: ['jobs.department'],
     filter: {
-      'jobs.department.name': { $eq: '營業部' },
+      'jobs.department.name': { $eq: '業務部' },
     },
   };
 
