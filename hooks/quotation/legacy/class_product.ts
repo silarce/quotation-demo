@@ -198,6 +198,8 @@ class Class_product {
   };
 
   get options_doorTrack() {
+    let optionArr: Toption[] | undefined = [];
+
     let options_doorTrack_byDoorModel = getDoorTrackByDoorModel({ doorModelName: this._product.doorType });
 
     if (options_doorTrack_byDoorModel) {
@@ -211,16 +213,14 @@ class Class_product {
         }
       });
 
-      return options_doorTrack_byDoorModel;
+      optionArr = _.cloneDeep(options_doorTrack_byDoorModel) ?? [];
+    } else {
+      optionArr = _.cloneDeep(this.options_doorTrack_normal) ?? [];
     }
 
-    return this.options_doorTrack_normal;
+    optionArr.unshift({ value: '', label: '清空' });
 
-    // if (this.typhoonProtection) {
-    //   return this.options_doorTrack_typhoonProtection;
-    // } else {
-    //   return this.options_doorTrack_normal;
-    // }
+    return optionArr;
   }
 
   get options_doorModel_byQuoteType() {
