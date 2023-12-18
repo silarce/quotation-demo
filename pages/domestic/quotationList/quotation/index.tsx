@@ -823,7 +823,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     toManagerAt,
   } = latestContent ?? {};
 
-  const isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toManagerAt);
+  const isSendToReview = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
 
   if (userId) {
     if (userId === reviewSalesEmployeeId && toSalesAt) {
