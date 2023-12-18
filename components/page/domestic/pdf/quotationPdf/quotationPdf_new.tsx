@@ -301,19 +301,6 @@ const PdfTypeA = ({
   totalPram: Parameters<typeof Total>[0];
   otherPram: Parameters<typeof Other>[0];
 }) => {
-  // const chunkedList = _.chunk(productArr, 12) as (typeof productArr)[];
-
-  // const chunkedList: TtableProdList[] = [[]];
-
-  // const rowLimit = 12;
-  // let rowCount = 0;
-  // const arrIndex = 0;
-
-  // productArr.forEach((prod) => {
-  //   const strLingth = prod.category.length;
-  //   rowCount = rowCount + Math.ceil(strLingth / 4);
-  // });
-
   const chunkedList: TtableProdList[] = [[]];
 
   const rowLimit = 12;
@@ -348,12 +335,12 @@ const PdfTypeA = ({
         // 如果字元是中文
         /[\u4e00-\u9fa5]/.test(char)
       ) {
-        memoStrLength += 1;
+        memoStrLength += (1 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
       } else if (
         // 如果字元是英文字母
         /[a-zA-Z]/.test(char)
       ) {
-        memoStrLength += 0.66; // 一個英文字母約是0.66個中文字寬
+        memoStrLength += (0.66 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
       }
     }
 

@@ -312,7 +312,7 @@ const PdfTypeA = ({
   let rowCount = 0;
   let arrIndex = 0;
 
-  productArr.forEach((prod) => {
+  productArr.forEach((prod, pIndex) => {
     let categoryStrLength = 0;
     let memoStrLength = 0;
 
@@ -339,12 +339,12 @@ const PdfTypeA = ({
         // 如果字元是中文
         /[\u4e00-\u9fa5]/.test(char)
       ) {
-        memoStrLength += 1;
+        memoStrLength += (1 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
       } else if (
         // 如果字元是英文字母
         /[a-zA-Z]/.test(char)
       ) {
-        memoStrLength += 0.66; // 一個英文字母約是0.66個中文字寬
+        memoStrLength += (0.66 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
       }
     }
 
