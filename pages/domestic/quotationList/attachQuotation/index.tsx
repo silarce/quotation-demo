@@ -829,6 +829,8 @@ latestContentProdArr為這次追加追減的主產品
     toManagerAt,
   } = latestContent ?? {};
 
+  const isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toManagerAt);
+
   if (userId) {
     if (userId === reviewSalesEmployeeId && toSalesAt) {
       isSales = true;
@@ -1765,6 +1767,7 @@ latestContentProdArr為這次追加追減的主產品
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
+        forbidden={status === 'Pending' && isSendToReview}
         close={() => setReviewFormShow(false)}
         contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
         contractName={quotationData?.latestContent.projectName ?? ''}

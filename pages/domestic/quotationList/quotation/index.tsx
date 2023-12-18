@@ -822,6 +822,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     toManagerAt,
   } = latestContent ?? {};
 
+  const isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toManagerAt);
+
   if (userId) {
     if (userId === reviewSalesEmployeeId && toSalesAt) {
       isSales = true;
@@ -1752,6 +1754,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
+        forbidden={status === 'Pending' && isSendToReview}
         close={() => setReviewFormShow(false)}
         contractIdNumber={latestContent?.quotationNumber ?? ''}
         contractName={latestContent?.projectName ?? ''}
