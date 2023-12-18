@@ -829,7 +829,7 @@ latestContentProdArr為這次追加追減的主產品
     toManagerAt,
   } = latestContent ?? {};
 
-  const isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toManagerAt);
+  const isSendToReview = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
 
   if (userId) {
     if (userId === reviewSalesEmployeeId && toSalesAt) {

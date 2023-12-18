@@ -90,7 +90,6 @@ export default function Table({ productList }: { productList: TtableProdList }) 
           if (key === 'doorRail') {
             let svgString;
             let src;
-            // console.log(value);
 
             if (value) {
               // 來自本地的圖片

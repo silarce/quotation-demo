@@ -382,10 +382,10 @@ const PdfTypeB = ({
 
     quoteTypeSumObj[key].qtySum = quoteTypeSumObj[key].qtySum + parseInt(qty);
     quoteTypeSumObj[key].unitPriceSum = new Decimal(quoteTypeSumObj[key].unitPriceSum)
-      .plus(unitPrice.replaceAll(',', ''))
+      .plus(unitPrice.replaceAll(',', '') || 0)
       .toNumber();
     quoteTypeSumObj[key].priceTotleSum = new Decimal(quoteTypeSumObj[key].priceTotleSum)
-      .plus(priceTotal.replaceAll(',', ''))
+      .plus(priceTotal.replaceAll(',', '') || 0)
       .toNumber();
   });
   const quoteTypeSumArr = Object.values(quoteTypeSumObj);

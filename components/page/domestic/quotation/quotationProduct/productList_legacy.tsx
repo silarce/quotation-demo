@@ -440,6 +440,10 @@ function DndRow({
                 selectProps_bro.props.onChange = (option) => {
                   (prod[key] as string) = option?.value ?? '';
                 };
+
+                if (key === 'doorType') {
+                  selectProps_bro.props.options = prod.options_doorModel_byQuoteType;
+                }
               }
             }
 

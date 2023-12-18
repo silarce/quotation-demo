@@ -324,13 +324,17 @@ export default function ContractReviewForm({
             </div>
             <div className={scss.payMethodContainer}>
               {Object.values(payMethodList).map((item, index, arr) => {
-                const onDel = arr.length > 1 ? item.delSelf : undefined;
+                let onDel = arr.length > 1 ? item.delSelf : undefined;
+
+                if (theDisabled) {
+                  onDel = undefined;
+                }
 
                 return (
                   <Row
                     key={index}
                     disabled={theDisabled}
-                    onAdd={addMethod}
+                    onAdd={theDisabled ? undefined : addMethod}
                     onDel={onDel}
                     serialNumber={index + 1}
                     title={{
@@ -643,8 +647,9 @@ const Row = ({
         />
       </div>
       <div>
-        <IconAdd attr={{ onClick: onAdd }} />
-        {onDel && <IconDel attr={{ onClick: onDel }} />}
+        <IconAdd attr={{ onClick: onAdd, className: classNames(!onAdd && scss.hidden) }} />
+        {/* {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />} */}
+        {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />}
       </div>
     </div>
   );
