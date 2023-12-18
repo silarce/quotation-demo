@@ -829,6 +829,8 @@ latestContentProdArr為這次追加追減的主產品
     toManagerAt,
   } = latestContent ?? {};
 
+  const isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toManagerAt);
+
   if (userId) {
     if (userId === reviewSalesEmployeeId && toSalesAt) {
       isSales = true;
@@ -1104,7 +1106,15 @@ latestContentProdArr為這次追加追減的主產品
             } else {
               setDisabled_reviewer(false);
             }
-          },
+
+            if (status === 'Pending') {
+              myAlert.info({
+                title: '送審後合約審核表將被鎖定',
+                content: '建議先確認合約審核表是否正確',
+                props: { width: 450 },
+              });
+            }
+          }, // onClick close
         }
       : null,
 
@@ -1757,6 +1767,7 @@ latestContentProdArr為這次追加追減的主產品
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
+        forbidden={status === 'Pending' && isSendToReview}
         close={() => setReviewFormShow(false)}
         contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
         contractName={quotationData?.latestContent.projectName ?? ''}
