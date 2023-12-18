@@ -229,6 +229,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+  // 沒記錯的話，從查詢報價單點進來會有contentId，就會用quotationContentData
   const { data: quotationContentData, update: updateContent } = useGetQuotationContent_id(contentId as string);
 
   const latestContent = quotationData?.latestContent ?? quotationContentData;
