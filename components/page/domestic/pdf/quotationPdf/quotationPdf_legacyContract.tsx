@@ -76,7 +76,11 @@ export default function QuotationPdf({
         continue;
       }
 
-      const image = await html2canvas(item).then((canvas) => {
+      const image = await html2canvas(item, {
+        scale: 3,
+        // useCORS: true,
+        // allowTaint: true,
+      }).then((canvas) => {
         const image = canvas.toDataURL('image/JPEG');
 
         return image;
@@ -373,7 +377,7 @@ const PdfTypeA = ({
         return (
           <Fragment key={index}>
             {index !== 0 && <hr className={scss.hr} />}
-            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[0] = ele)}>
+            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[index] = ele)}>
               <div>
                 <Header />
                 <Profile profileData={profilePram} index={index + 1} pageCount={pageCount} />
