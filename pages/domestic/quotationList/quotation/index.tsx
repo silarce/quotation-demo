@@ -1121,7 +1121,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
             } else {
               setDisabled_reviewer(false);
             }
-          },
+
+            if (status === 'Pending') {
+              myAlert.info({
+                title: '送審後合約審核表將被鎖定',
+                content: '建議先確認合約審核表是否正確',
+                props: { width: 450 },
+              });
+            }
+          }, // onClick close
         }
       : null,
 
