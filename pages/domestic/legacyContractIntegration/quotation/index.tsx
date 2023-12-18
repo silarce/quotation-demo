@@ -30,6 +30,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
 import _ from 'lodash';
+import { AxiosError } from 'axios';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -269,8 +270,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           myAlert.success({ title: '上傳完成' });
           setDisabled(true);
-        } catch {
-          myAlert.err({ title: '上傳失敗' });
+        } catch (error) {
+          const err = error as AxiosError<{
+            error: string;
+            message: string;
+            statusCode: number;
+          }>;
+
+          myAlert.err({ title: '上傳失敗', content: err.response?.data.message });
         } finally {
           setIsLoading(false);
         }
