@@ -208,7 +208,7 @@ export default function QuotationExAddi({
                 })}
               </SortableContext>
             </DndContext>
-            <AddButton className={scss.addBtn} label="追加配件" onClick={addExtraExAddi} />
+            <AddButton className={scss.addBtn} label="追加配件" onClick={() => addExtraExAddi()} />
           </div>
         </div>
       </div>
