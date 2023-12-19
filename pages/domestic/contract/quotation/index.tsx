@@ -43,7 +43,9 @@ import { apiPostEngineeringContact } from 'js/api/api_engineering';
 
 // component
 import Table_prod from 'components/page/domestic/contract/table/table_prod';
-import Table_com from 'components/page/domestic/contract/table/table_component';
+// import Table_com from 'components/page/domestic/contract/table/table_component';
+// 報價單使用的Table_com
+import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/contract/table/table_accessories';
 import Table_others from 'components/page/domestic/contract/table/table_others';
 
