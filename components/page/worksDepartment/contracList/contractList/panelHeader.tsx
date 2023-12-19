@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // css
-import style from '../contractList.module.scss';
+import scss from '../contractList.module.scss';
 
 // icon
 import iconPlace from 'public/image/icon/place.svg';
@@ -60,10 +60,10 @@ export default function PanelHeader({
   const { date, county: country, projectName } = contract;
 
   return (
-    <CellWithBar className={style.panelHeader} isActive={isActive} onClick={onClick}>
-      <div ref={viewRef} className={style.row01}>
+    <CellWithBar className={scss.panelHeader} isActive={isActive} onClick={onClick}>
+      <div ref={viewRef} className={scss.row01}>
         <span>{quotationId}</span>
-        <span className={style.clientName}>{clientName}</span>
+        <span className={scss.clientName}>{clientName}</span>
         <span>{contactName}</span>
         <span>{contactPhone}</span>
         <span>{undertaker}</span>
@@ -74,16 +74,22 @@ export default function PanelHeader({
           <IconDetail onClick={openQuotation} />
         </div>
       </div>
-      <div className={style.row02}>
+      <div className={scss.row02}>
         <span>{date}</span>
-        <div className={style.place}>
+        <div className={scss.place}>
           {/*  eslint-disable-next-line @next/next/no-img-element */}
           <img src={iconPlace.src} alt="place" />
-          <span className={style.country}>{country}</span>
+          <span className={scss.country}>{country}</span>
         </div>
         <span>{projectName}</span>
-        <span className={classNames(!alertLight && style.hidden)}>異常燈號：工作表已開立，合約尚未簽回</span>
-        <span className={classNames(!remindLight && style.hidden)}>提醒燈號：已出具說明，尚未收足款項</span>
+        <div className={classNames(scss.lightBox, !alertLight && scss.hidden)}>
+          <span className={scss.alertLight} />
+          <span>工作表已開立，合約尚未簽回</span>
+        </div>
+        <div className={classNames(scss.lightBox, !remindLight && scss.hidden)}>
+          <span className={scss.warningLight} />
+          <span>已出具說明，尚未收足款項</span>
+        </div>
         <div></div>
       </div>
     </CellWithBar>

@@ -290,11 +290,8 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
             </Panel>
           );
         })}
-
-        {/*  */}
         {/*  */}
       </Collapse>
-      {/*  */}
     </div>
   );
 }
