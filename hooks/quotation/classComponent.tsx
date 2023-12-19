@@ -260,11 +260,12 @@ class Class_component {
   }
 
   get price_locale() {
-    return this._com.price?.toLocaleString();
+    return String(this._com.price || 0);
+    // return this._com.price?.toLocaleString();
   }
   set price_locale(v) {
     v = v ?? '0';
-    v = v.replace(/,/g, '');
+    // v = v.replace(/,/g, '');
     this._com.price = Number(v);
     this.calcAllPrice();
     this.reRender();

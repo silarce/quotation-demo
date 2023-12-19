@@ -174,11 +174,12 @@ class Class_accessories {
     this.reRender();
   }
   get price_locale() {
-    return this._acceData.price.toLocaleString();
+    return String(this._acceData.price || 0);
+    // return this._acceData.price.toLocaleString();
   }
   set price_locale(v) {
     v = v ?? '0';
-    v = v.replace(/,/g, '');
+    // v = v.replace(/,/g, '');
     this._acceData.price = Number(v);
     this.calcAllPrice();
     this.reRender();

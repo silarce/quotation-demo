@@ -2424,11 +2424,12 @@ class Class_product {
       return '';
     }
 
-    return Number(this._price).toLocaleString();
+    return String(this._price);
+    // return Number(this._price).toLocaleString();
   }
 
   set price(v) {
-    v = v.replace(/,/g, '');
+    // v = v.replace(/,/g, '');
 
     this._prodData.price = Number(v);
     this._price = v;
