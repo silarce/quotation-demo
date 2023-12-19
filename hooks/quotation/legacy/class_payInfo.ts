@@ -82,10 +82,11 @@ class Class_payInfo {
       return '';
     }
 
-    return Number(this._subTotal).toLocaleString();
+    return this._subTotal;
+    // return Number(this._subTotal).toLocaleString();
   }
   set subTotal(v) {
-    v = v.replace(/,/g, '');
+    // v = v.replace(/,/g, '');
 
     const numberRegex = /^(\d+(\.\d+)?|)$/;
 
@@ -108,10 +109,11 @@ class Class_payInfo {
       return '';
     }
 
-    return Number(this._salesTax).toLocaleString();
+    return this._salesTax;
+    // return Number(this._salesTax).toLocaleString();
   }
   set salesTax(v) {
-    v = v.replace(/,/g, '');
+    // v = v.replace(/,/g, '');
 
     const numberRegex = /^(\d+(\.\d+)?|)$/;
 
@@ -129,7 +131,8 @@ class Class_payInfo {
       return '';
     }
 
-    return Number(this._total).toLocaleString();
+    return this._total;
+    // return Number(this._total).toLocaleString();
   }
   set total(v) {
     v = v.replace(/,/g, '');
