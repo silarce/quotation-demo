@@ -307,7 +307,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             legacyContract={classLegacyContract}
             disabled={true}
             appendixParams={appendixParams}
-            isAppend={true}
+            isAppending={isAppending}
           />
           {/* 簽名 */}
           <QuotationSinature control={conntrol_sinature} disabled={true} />
