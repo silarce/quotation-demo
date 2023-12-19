@@ -89,10 +89,11 @@ class Class_other {
     this.reRender();
   }
   get unitPrice_locale() {
-    return this._data.unitPrice.toLocaleString();
+    return String(this._data.unitPrice || 0);
+    // return this._data.unitPrice.toLocaleString();
   }
   set unitPrice_locale(v) {
-    v = v.replace(/,/g, '');
+    // v = v.replace(/,/g, '');
 
     this._data.unitPrice = Number(v);
     this.calcAllPrice();
@@ -118,10 +119,23 @@ class Class_other {
     this.reRender();
   }
 
+  get unit() {
+    return this._data.unit || '';
+  }
+  set unit(v) {
+    this._data.unit = v;
+    this.reRender();
+  }
+
   // ---------------------------------------------------------
 
   get body() {
-    return this._data;
+    const copy = _.cloneDeep(this._data);
+
+    return {
+      ...copy,
+      unit: copy.unit || null,
+    };
   }
 } // Class_other  close
 
@@ -135,6 +149,7 @@ type Tothers = {
   unitPrice: number;
   totalPrice: number;
   notes: string;
+  unit: string | null;
 };
 
 // type TothersKey = Exclude<keyof Tothers, 'id'>;
@@ -145,6 +160,7 @@ const othersKeyArrOri: () => TothersKey[] = () => {
     'item',
     'description',
     'quantity',
+    'unit',
     //  'unitPrice',
     //  'totalPrice',
     'unitPrice_locale',
@@ -180,6 +196,15 @@ const othersCellConfig: TcellConfig = {
         props: {
           type: 'number',
         },
+      },
+    },
+  },
+  unit: {
+    label: '單位',
+    inputSelProps: {
+      wrapperStyle: { width: '60px' },
+      inputProps: {
+        props: {},
       },
     },
   },
@@ -248,6 +273,7 @@ const emptyOthersOri: () => Tothers = () => {
     unitPrice: 0,
     totalPrice: 0,
     notes: '',
+    unit: '',
   };
 };
 

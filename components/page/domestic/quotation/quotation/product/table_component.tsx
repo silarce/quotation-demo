@@ -2,15 +2,18 @@ import { useState } from 'react';
 import classNames from 'classnames';
 
 // components
-import DndThead from '../DndThead';
-import Tbody, { TcellConfig } from '../tbody';
+// import DndThead from '../DndThead';
+// import Tbody, { TcellConfig } from '../tbody';
+import DndThead from 'components/page/domestic/quotation/quotation/DndThead';
+import Tbody, { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import { TcomList, TsubComList } from 'hooks/quotation/useProduct';
 
-import scss from '../table.module.scss';
+// import scss from '../table.module.scss';
+import scss from 'components/page/domestic/quotation/quotation/table.module.scss';
 
 export default function Table_acce({
   disabled,

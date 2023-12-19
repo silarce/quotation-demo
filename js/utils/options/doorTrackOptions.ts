@@ -30,54 +30,66 @@ type TdoorTrack_sorted = {
 };
 
 // ==========================================================================
+
+// 未來重構時要確認使用doorTrack_typhoonProtection的部分，到底還有沒有需要用到doorTrack_typhoonProtection
+// 然後把doorTrack_typhoonProtection與doorTrack_typhoonProtection_forLookup留一
 const doorTrack_typhoonProtection: { [key: string]: Toption } = {
   // sj302_75_30t: { value: 'sj302_75_30t', label: 'sj302_75_30t', icon: icon_sj302_75_30t.src },
   // sJ302_90_30t: { value: 'sJ302_90_30t', label: 'sJ302_90_30t', icon: icon_sJ302_90_30t.src },
   // sJ302_95_30t: { value: 'sJ302_95_30t', label: 'sJ302_95_30t', icon: icon_sJ302_95_30t.src },
   // sJ302_95_45t: { value: 'sJ302_95_45t', label: 'sJ302_95_45t', icon: icon_sJ302_95_45t.src },
 };
+const doorTrack_typhoonProtection_forLookup: { [key: string]: Toption } = {
+  sj302_75_30t: { value: 'sj302_75_30t', label: 'sj302_75_30t', icon: icon_sj302_75_30t.src },
+  sJ302_90_30t: { value: 'sJ302_90_30t', label: 'sJ302_90_30t', icon: icon_sJ302_90_30t.src },
+  sJ302_95_30t: { value: 'sJ302_95_30t', label: 'sJ302_95_30t', icon: icon_sJ302_95_30t.src },
+  sJ302_95_45t: { value: 'sJ302_95_45t', label: 'sJ302_95_45t', icon: icon_sJ302_95_45t.src },
+};
 
 const doorTrack_normal: { [key: string]: Toption } = {
-  // sJ120A_100_25_105_25: {
-  //   value: 'sJ120A_100_25_105_25',
-  //   label: 'sJ120A_100_25_105_25',
-  //   icon: icon_sJ120A_100_25_105_25.src,
-  // },
-  // sJ302_30: {
-  //   value: 'sJ302_30',
-  //   label: 'sJ302_30',
-  //   icon: icon_sJ302_30.src,
-  // },
-  // sJ303A_100_25_25: {
-  //   value: 'sJ303A_100_25_25',
-  //   label: 'sJ303A_100_25_25',
-  //   icon: icon_sJ303A_100_25_25.src,
-  // },
-  // sJ303A_100_65_25: {
-  //   value: 'sJ303A_100_65_25',
-  //   label: 'sJ303A_100_65_25',
-  //   icon: icon_sJ303A_100_65_25.src,
-  // },
-  // sJ303S_85: {
-  //   value: 'sJ303S_85',
-  //   label: 'sJ303S_85',
-  //   icon: icon_sJ303S_85.src,
-  // },
-  // sJ305D_22: {
-  //   value: 'sJ305D_22',
-  //   label: 'sJ305D_22',
-  //   icon: icon_sJ305D_22.src,
-  // },
-  // sJ312_106_60t: {
-  //   value: 'sJ312_106_60t',
-  //   label: 'sJ312_106_60t',
-  //   icon: icon_sJ312_106_60t.src,
-  // },
-  // sJ312_150_90t: {
-  //   value: 'sJ312_150_90t',
-  //   label: 'sJ312_150_90t',
-  //   icon: icon_sJ312_150_90t.src,
-  // },
+  sJ120A_100_25_105_25: {
+    value: 'sJ120A_100_25_105_25',
+    label: 'sJ120A_100_25_105_25',
+    icon: icon_sJ120A_100_25_105_25.src,
+  },
+  sJ302_30: {
+    value: 'sJ302_30',
+    label: 'sJ302_30',
+    icon: icon_sJ302_30.src,
+  },
+  sJ303A_100_25_25: {
+    value: 'sJ303A_100_25_25',
+    label: 'sJ303A_100_25_25',
+    icon: icon_sJ303A_100_25_25.src,
+  },
+  sJ303A_100_65_25: {
+    value: 'sJ303A_100_65_25',
+    label: 'sJ303A_100_65_25',
+    icon: icon_sJ303A_100_65_25.src,
+  },
+  sJ303S_85: {
+    value: 'sJ303S_85',
+    label: 'sJ303S_85',
+    icon: icon_sJ303S_85.src,
+  },
+  sJ305D_22: {
+    value: 'sJ305D_22',
+    label: 'sJ305D_22',
+    icon: icon_sJ305D_22.src,
+  },
+  sJ312_106_60t: {
+    value: 'sJ312_106_60t',
+    label: 'sJ312_106_60t',
+    icon: icon_sJ312_106_60t.src,
+  },
+  sJ312_150_90t: {
+    value: 'sJ312_150_90t',
+    label: 'sJ312_150_90t',
+    icon: icon_sJ312_150_90t.src,
+  },
+};
+
+const doorTrack_other: { [key: string]: Toption } = {
   '6kg': {
     value: '6kg',
     label: '6kg',
@@ -191,8 +203,10 @@ const doorTrack_sorted: TdoorTrack_sorted = {
 };
 
 const doorTrackLookup = {
-  ...doorTrack_typhoonProtection,
   ...doorTrack_normal,
+  // ...doorTrack_typhoonProtection,
+  ...doorTrack_typhoonProtection_forLookup,
+  ...doorTrack_other,
 } as const;
 
 const optionsCre_doorTrack_typhoonProtection = ({ emptyOption }: { emptyOption?: boolean } = {}): Toption[] => {
@@ -206,7 +220,7 @@ const optionsCre_doorTrack_typhoonProtection = ({ emptyOption }: { emptyOption?:
 };
 
 const optionsCre_doorTrack_normal = ({ emptyOption }: { emptyOption?: boolean } = {}): Toption[] => {
-  const optionArr = Object.values(doorTrack_normal);
+  const optionArr = Object.values(doorTrack_other);
 
   if (emptyOption) {
     optionArr.unshift({ value: '', label: '不拘', icon: undefined });

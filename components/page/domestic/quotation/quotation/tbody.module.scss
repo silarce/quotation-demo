@@ -49,13 +49,6 @@
     pointer-events: none;
   }
 }
-.hidden {
-  opacity: 0;
-  user-select: none;
-  > * {
-    display: none;
-  }
-}
 
 .buttonBox {
   position: sticky;
@@ -110,4 +103,21 @@
   > .move {
     cursor: pointer;
   }
+}
+
+.hidden {
+  opacity: 0;
+  user-select: none;
+  > * {
+    display: none;
+  }
+}
+
+.translucent {
+}
+
+.disabledBtn,
+.disabledBtn.plus {
+  opacity: 0.3;
+  cursor: not-allowed;
 }

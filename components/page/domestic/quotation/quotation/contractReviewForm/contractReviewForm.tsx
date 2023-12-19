@@ -34,6 +34,7 @@ export default function ContractReviewForm({
   contractPrice,
   lastestContentId,
   verifyForm,
+  forbidden,
   onConfirm,
 }: {
   showModal: boolean;
@@ -43,8 +44,13 @@ export default function ContractReviewForm({
   contractPrice: number;
   lastestContentId: string | undefined;
   verifyForm: TquotationVerifyFormDto | undefined;
+  forbidden?: boolean;
   onConfirm?: () => void;
 }) {
+  // ----------------------------------------------------------------------------
+
+  const theDisabled = forbidden;
+
   // ----------------------------------------------------------------------------
 
   const { payMethodList, addMethod, resetMethodList, getMethodBodyArr, allPercentStr } = usePayMethod({
@@ -162,7 +168,7 @@ export default function ContractReviewForm({
   };
 
   const theOnConfirm = async () => {
-    if (!lastestContentId) {
+    if (!lastestContentId || theDisabled) {
       return;
     }
 
@@ -267,6 +273,7 @@ export default function ContractReviewForm({
             <span>註明請款日</span>
             <InputSel
               className={scss.date}
+              disabled={theDisabled}
               inputProps={{
                 props: {
                   value: watchData.askForPaymentDate ?? '',
@@ -288,6 +295,7 @@ export default function ContractReviewForm({
             <span>，放款日</span>
             <InputSel
               className={scss.date}
+              disabled={theDisabled}
               inputProps={{
                 props: {
                   value: watchData.disbursementDate ?? '',
@@ -316,12 +324,17 @@ export default function ContractReviewForm({
             </div>
             <div className={scss.payMethodContainer}>
               {Object.values(payMethodList).map((item, index, arr) => {
-                const onDel = arr.length > 1 ? item.delSelf : undefined;
+                let onDel = arr.length > 1 ? item.delSelf : undefined;
+
+                if (theDisabled) {
+                  onDel = undefined;
+                }
 
                 return (
                   <Row
                     key={index}
-                    onAdd={addMethod}
+                    disabled={theDisabled}
+                    onAdd={theDisabled ? undefined : addMethod}
                     onDel={onDel}
                     serialNumber={index + 1}
                     title={{
@@ -355,7 +368,7 @@ export default function ContractReviewForm({
           <div className={scss.paymentTenor}>
             <span>合理的放款票期</span>
             <InputSel
-              className={classNames()}
+              disabled={theDisabled}
               inputProps={{
                 props: {
                   value: watchData.paymentTenor ?? '',
@@ -370,6 +383,7 @@ export default function ContractReviewForm({
           <div className={scss.numIndex}>4</div>
           <div>
             <RadioContainer
+              disabled={theDisabled}
               label={'是否出具履約保證票'}
               labelClassName="mr-[48px]"
               value={watchData.performanceBond}
@@ -383,6 +397,7 @@ export default function ContractReviewForm({
           <div className={scss.numIndex}>5</div>
           <div>
             <RadioContainer
+              disabled={theDisabled}
               label={'是否可請訂金款'}
               labelClassName="mr-[75px]"
               value={watchData.depositPayment}
@@ -397,15 +412,26 @@ export default function ContractReviewForm({
             合理的保固期{' '}
             <InputBox
               boxStyle={{ width: '60px' }}
-              inputAttr={{ ...register('warrantyPeriod'), className: 'text-center' }}
+              inputAttr={{
+                disabled: theDisabled,
+                ...register('warrantyPeriod'),
+                className: 'text-center',
+              }}
             />
             <span>年，備註</span>
-            <InputBox className="flex-auto" inputAttr={{ ...register('note') }} />
+            <InputBox
+              className="flex-auto"
+              inputAttr={{
+                disabled: theDisabled,
+                ...register('note'),
+              }}
+            />
           </div>
           {/*  */}
           <div className={scss.numIndex}>7</div>
           <div>
             <RadioContainer
+              disabled={theDisabled}
               label={'是否出具保固票或保固金'}
               labelClassName="mr-[48px]"
               value={watchData.warrantyPayment}
@@ -419,6 +445,7 @@ export default function ContractReviewForm({
           <div>
             <div>
               <RadioContainer
+                disabled={theDisabled}
                 label={'是否註明收足90%出具防火證明、出廠證明'}
                 labelClassName="mr-[48px]"
                 value={watchData.fireproofCertificate}
@@ -433,6 +460,7 @@ export default function ContractReviewForm({
           <div>
             <div>
               <RadioContainer
+                disabled={theDisabled}
                 label={'是否註明收足100%出具保固書'}
                 labelClassName="mr-[48px]"
                 value={watchData.warranty}
@@ -447,6 +475,7 @@ export default function ContractReviewForm({
           <div>
             <div>
               <RadioContainer
+                disabled={theDisabled}
                 label={'請按裝款時是否需配合工地試車'}
                 labelClassName="mr-[48px]"
                 value={watchData.testDrive}
@@ -462,7 +491,12 @@ export default function ContractReviewForm({
             <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
             <br />
             <div className={scss.textaraeBox}>
-              <textarea className="w-full resize-none" placeholder="請輸入" {...register('debitItem')} />
+              <textarea
+                disabled={theDisabled}
+                className="w-full resize-none"
+                placeholder="請輸入"
+                {...register('debitItem')}
+              />
             </div>
           </div>
           {/*  */}
@@ -493,8 +527,14 @@ export default function ContractReviewForm({
         </div> */}
 
         <div className={scss.btnBox}>
-          <MyButton_v2 label="確定" theme="danger" onClick={theOnConfirm} px="px44" />
-          <MyButton_v2 label="取消" onClick={onCancel} px="px44" />
+          <MyButton_v2
+            className={classNames(theDisabled && 'hidden')}
+            label="確定"
+            theme="danger"
+            onClick={theOnConfirm}
+            px="px44"
+          />
+          <MyButton_v2 label={theDisabled ? '關閉' : '取消'} onClick={onCancel} px="px44" />
         </div>
 
         {/*  */}
@@ -533,6 +573,7 @@ const InputBox = ({
 };
 
 const Row = ({
+  disabled,
   serialNumber,
   onAdd,
   onDel,
@@ -541,6 +582,7 @@ const Row = ({
   price,
   note,
 }: {
+  disabled?: boolean;
   serialNumber: number;
   onAdd?: () => void;
   onDel?: () => void;
@@ -567,6 +609,7 @@ const Row = ({
         <InputBox
           prefix={`${serialNumber}.`}
           inputAttr={{
+            disabled: disabled,
             value: title.value,
             onChange: title.onChange,
             placeholder: '請輸入標題',
@@ -575,6 +618,7 @@ const Row = ({
         <InputBox
           suffix="%"
           inputAttr={{
+            disabled: disabled,
             className: 'text-center',
             value: percent.value,
             onChange: percent.onChange,
@@ -595,6 +639,7 @@ const Row = ({
         <InputBox
           prefix="備註 :"
           inputAttr={{
+            disabled: disabled,
             value: note.value,
             onChange: note.onChange,
             placeholder: '請輸入備註',
@@ -602,8 +647,9 @@ const Row = ({
         />
       </div>
       <div>
-        <IconAdd attr={{ onClick: onAdd }} />
-        {onDel && <IconDel attr={{ onClick: onDel }} />}
+        <IconAdd attr={{ onClick: onAdd, className: classNames(!onAdd && scss.hidden) }} />
+        {/* {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />} */}
+        {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />}
       </div>
     </div>
   );
@@ -660,17 +706,19 @@ const RadioContainer = ({
   labelClassName,
   value,
   onChange,
+  disabled,
 }: {
   label: string;
   className?: string;
   labelClassName?: string;
   value: boolean;
   onChange: (v: boolean) => void;
+  disabled?: boolean;
 }) => {
   return (
     <div className={classNames(className)}>
       <span className={classNames('inline-block', labelClassName)}>{label}</span>
-      <Radio.Group onChange={(e) => onChange(e.target.value)} value={value}>
+      <Radio.Group disabled={disabled} onChange={(e) => onChange(e.target.value)} value={value}>
         <Radio value={true}>是</Radio>
         <Radio value={false}>否</Radio>
       </Radio.Group>

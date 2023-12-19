@@ -902,6 +902,7 @@ const emptyAdditionCre = (): TcreateLegacyContractAdditionDto => {
     unitPrice: 0,
     totalPrice: 0,
     notes: '',
+    unit: '',
   };
 };
 

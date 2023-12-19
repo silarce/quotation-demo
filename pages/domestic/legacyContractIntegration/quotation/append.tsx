@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
+import { AxiosError } from 'axios';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -150,8 +151,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     onClick: async () => {
       const appendBody = classLegacyContract.appendBody;
 
-      console.log(appendBody);
-
       if (!appendBody) {
         return;
       }
@@ -182,7 +181,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
           },
         });
       } catch (error) {
-        myAlert.err({ title: '上傳失敗' });
+        const err = error as AxiosError<{
+          error: string;
+          message: string;
+          statusCode: number;
+        }>;
+
+        myAlert.err({ title: '上傳失敗', content: err.response?.data.message });
       } finally {
         setIsLoading(false);
       }
@@ -302,7 +307,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             legacyContract={classLegacyContract}
             disabled={true}
             appendixParams={appendixParams}
-            isAppend={true}
+            isAppending={isAppending}
           />
           {/* 簽名 */}
           <QuotationSinature control={conntrol_sinature} disabled={true} />

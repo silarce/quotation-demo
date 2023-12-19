@@ -20,7 +20,7 @@ export default function QuotationTotal({
   legacyContract,
   disabled = false,
   appendixParams,
-  isAppend,
+  isAppending,
 }: {
   legacyContract: Class_legacyContract;
   disabled: boolean;
@@ -29,7 +29,7 @@ export default function QuotationTotal({
     removeFileInfo: (index: number) => void;
     toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void;
   };
-  isAppend?: boolean;
+  isAppending?: boolean;
 }) {
   const [show_anno, setShow_anno] = useState(false);
   const [show_qr, setShow_qr] = useState(false);
@@ -96,7 +96,7 @@ export default function QuotationTotal({
   return (
     <div className={style.container}>
       {/* <TextListEditor_v2 stringObj={annoObj} label="備註" disabled={disabled} /> */}
-      <TextListEditor_v2 stringObj={annoObj} label="備註" disabled={isAppend ? false : disabled} />
+      <TextListEditor_v2 stringObj={annoObj} label="備註" disabled={isAppending ? false : disabled} />
       <div className={style.layer01}>
         <div>
           <TextListEditor_v2 stringObj={quoteRangeObj} label="報價範圍" disabled={disabled} />

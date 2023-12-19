@@ -215,7 +215,13 @@ const CopyDelBtnBox = ({
       <Image className={scss.move} src={iconMove} alt="move" {...dndAttr} {...dndListener} />
 
       <IconDelete01
-        className={classNames(scss.svgBtn, hiddenDelCopy && scss.hidden)}
+        className={classNames(
+          //
+          scss.svgBtn,
+          hiddenDelCopy && scss.hidden,
+          disabled && scss.disabledBtn,
+          scss.plus
+        )}
         onClick={(e) => {
           e.stopPropagation();
 
@@ -232,7 +238,13 @@ const CopyDelBtnBox = ({
         }}
       />
       <IconCopy
-        className={classNames(scss.svgBtn, hiddenDelCopy && scss.hidden)}
+        className={classNames(
+          //
+          scss.svgBtn,
+          hiddenDelCopy && scss.hidden,
+          disabled && scss.disabledBtn,
+          scss.plus
+        )}
         onClick={() => {
           if (!disabled) {
             copy && copy();

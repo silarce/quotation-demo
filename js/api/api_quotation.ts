@@ -153,13 +153,18 @@ export const useGetQuotation_id = (id: string | undefined) => {
       return;
     }
 
-    const newRes = await apiGetQuotation_Id(id);
+    try {
+      const newRes = await apiGetQuotation_Id(id);
 
-    if (newRes) {
-      setRes(newRes);
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得報價單資料失敗', content: err.message });
     }
-
-    return newRes;
   };
 
   return {
@@ -168,6 +173,7 @@ export const useGetQuotation_id = (id: string | undefined) => {
   };
 };
 
+// 以 id 取得 QuotationContent
 const apiGetQuotationContent_Id = async (id: string) => {
   const api = `/quotation/content/${id}`;
 
@@ -204,13 +210,18 @@ export const useGetQuotationContent_id = (id: string | undefined) => {
       return;
     }
 
-    const newRes = await apiGetQuotationContent_Id(id);
+    try {
+      const newRes = await apiGetQuotationContent_Id(id);
 
-    if (newRes) {
-      setRes(newRes);
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得指定報價單內容資料失敗', content: err.message });
     }
-
-    return newRes;
   };
 
   return {

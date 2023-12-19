@@ -33,7 +33,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
-// import { useForm } from 'react-hook-form';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -230,6 +229,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // 資料
   const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+  // 沒記錯的話，從查詢報價單點進來會有contentId，就會用quotationContentData
   const { data: quotationContentData, update: updateContent } = useGetQuotationContent_id(contentId as string);
 
   const latestContent = quotationData?.latestContent ?? quotationContentData;
@@ -823,6 +823,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     toManagerAt,
   } = latestContent ?? {};
 
+  const isSendToReview = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
+
   if (userId) {
     if (userId === reviewSalesEmployeeId && toSalesAt) {
       isSales = true;
@@ -1122,7 +1124,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
             } else {
               setDisabled_reviewer(false);
             }
-          },
+
+            if (status === 'Pending') {
+              myAlert.info({
+                title: '送審後合約審核表將被鎖定',
+                content: '建議先確認合約審核表是否正確',
+                props: { width: 450 },
+              });
+            }
+          }, // onClick close
         }
       : null,
 
@@ -1193,12 +1203,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     setIsLoading(true);
 
+    let isGetDetailSpecSuccess = true;
+
     for (const prod of Object.values(productList)) {
       try {
         await prod.reqGetDetailSpec();
       } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得細部規格失敗', content: err.message });
+        isGetDetailSpecSuccess = false;
         setIsLoading(false);
+        break;
       }
+    }
+
+    if (!isGetDetailSpecSuccess) {
+      return;
     }
 
     // 總樘數
@@ -1362,7 +1382,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(false);
       showRootLoading(false);
     }
-    //
   }; // reqUpdateQuotation
 
   // --------------------------------------------
@@ -1736,6 +1755,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
+        forbidden={status === 'Pending' && isSendToReview}
         close={() => setReviewFormShow(false)}
         contractIdNumber={latestContent?.quotationNumber ?? ''}
         contractName={latestContent?.projectName ?? ''}
