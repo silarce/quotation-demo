@@ -52,8 +52,10 @@ export default function Signature({ controll, disabled }: { controll: Tcontroll;
 
   const keyArr = Object.keys(controll) as TindexKeys[];
 
+  const controlLength = keyArr.length;
+
   return (
-    <div className={classNames(style.signature)}>
+    <div className={classNames(style.signature, controlLength < 3 && style.toRight)}>
       {keyArr.map((key, index) => {
         if (!controll[key]) {
           return null;

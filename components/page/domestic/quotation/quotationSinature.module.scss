@@ -34,4 +34,11 @@
       }
     }
   }
+
+  &.toRight {
+    justify-content: flex-end;
+    .cell {
+      flex: 0 0 20%;
+    }
+  }
 }
