@@ -301,7 +301,64 @@ const PdfTypeA = ({
   totalPram: Parameters<typeof Total>[0];
   otherPram: Parameters<typeof Other>[0];
 }) => {
-  const chunkedList = _.chunk(productArr, 12) as (typeof productArr)[];
+  const chunkedList: TtableProdList[] = [[]];
+
+  const rowLimit = 12;
+  const rowStrLengthLimit = 4; // 項目欄位只能容納四個中文字 六個英文字母
+  let rowCount = 0;
+  let arrIndex = 0;
+
+  productArr.forEach((prod) => {
+    let categoryStrLength = 0;
+    let memoStrLength = 0;
+
+    for (let i = 0; i < prod.category.length; i++) {
+      const char = prod.category[i];
+
+      if (
+        // 如果字元是中文
+        /[\u4e00-\u9fa5]/.test(char)
+      ) {
+        categoryStrLength += 1;
+      } else if (
+        // 如果字元是英文字母
+        /[a-zA-Z]/.test(char)
+      ) {
+        categoryStrLength += 0.66; // 一個英文字母約是0.66個中文字寬
+      }
+    }
+
+    for (let i = 0; i < prod.memo.length; i++) {
+      const char = prod.memo[i];
+
+      if (
+        // 如果字元是中文
+        /[\u4e00-\u9fa5]/.test(char)
+      ) {
+        memoStrLength += (1 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
+      } else if (
+        // 如果字元是英文字母
+        /[a-zA-Z]/.test(char)
+      ) {
+        memoStrLength += (0.66 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
+      }
+    }
+
+    const length = categoryStrLength > memoStrLength ? categoryStrLength : memoStrLength;
+
+    const rowQty = Math.ceil(length / rowStrLengthLimit) || 1;
+
+    if (rowCount + rowQty > rowLimit) {
+      rowCount = rowQty;
+      arrIndex++;
+      chunkedList[arrIndex] = [];
+    } else {
+      rowCount += rowQty;
+    }
+
+    chunkedList[arrIndex].push(prod);
+  });
+
   const pageCount = chunkedList.length;
 
   // --------------------------------------------------------------------------
@@ -358,7 +415,7 @@ const PdfTypeB = ({
   totalPram: Parameters<typeof Total>[0];
   otherPram: Parameters<typeof Other>[0];
 }) => {
-  const chunkedList = _.chunk(productArr, 40) as (typeof productArr)[];
+  const chunkedList = chunkProdArr({ productArr, rowLimit: 35 });
   const pageCount = chunkedList.length + 1;
   // --------------------------------------------------------------------------
 
@@ -420,3 +477,65 @@ const PdfTypeB = ({
 };
 
 // ========================================================================
+
+const chunkProdArr = ({ productArr, rowLimit }: { productArr: TtableProdList; rowLimit: number }) => {
+  const chunkedList: TtableProdList[] = [[]];
+
+  // const rowLimit = 12;
+  const rowStrLengthLimit = 4; // 項目欄位只能容納四個中文字 六個英文字母
+  let rowCount = 0;
+  let arrIndex = 0;
+
+  productArr.forEach((prod) => {
+    let categoryStrLength = 0;
+    let memoStrLength = 0;
+
+    for (let i = 0; i < prod.category.length; i++) {
+      const char = prod.category[i];
+
+      if (
+        // 如果字元是中文
+        /[\u4e00-\u9fa5]/.test(char)
+      ) {
+        categoryStrLength += 1;
+      } else if (
+        // 如果字元是英文字母
+        /[a-zA-Z]/.test(char)
+      ) {
+        categoryStrLength += 0.66; // 一個英文字母約是0.66個中文字寬
+      }
+    }
+
+    for (let i = 0; i < prod.memo.length; i++) {
+      const char = prod.memo[i];
+
+      if (
+        // 如果字元是中文
+        /[\u4e00-\u9fa5]/.test(char)
+      ) {
+        memoStrLength += (1 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
+      } else if (
+        // 如果字元是英文字母
+        /[a-zA-Z]/.test(char)
+      ) {
+        memoStrLength += (0.66 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
+      }
+    }
+
+    const length = categoryStrLength > memoStrLength ? categoryStrLength : memoStrLength;
+
+    const rowQty = Math.ceil(length / rowStrLengthLimit) || 1;
+
+    if (rowCount + rowQty > rowLimit) {
+      rowCount = rowQty;
+      arrIndex++;
+      chunkedList[arrIndex] = [];
+    } else {
+      rowCount += rowQty;
+    }
+
+    chunkedList[arrIndex].push(prod);
+  });
+
+  return chunkedList;
+};

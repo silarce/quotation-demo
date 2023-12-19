@@ -12,7 +12,6 @@ import { Pagination } from 'antd';
 
 // global gear
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
-import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
@@ -59,6 +58,16 @@ const optionCountyArr = (() => {
 })();
 
 // ========================================================
+
+type Tquery = {
+  page: string;
+  searchTypes: string;
+  searchCounty: string;
+  searchOther: string;
+  searchOtherValue: string;
+};
+
+// ========================================================
 export default function Customer() {
   const router = useRouter();
 
@@ -71,50 +80,35 @@ export default function Customer() {
 // ========================================================
 
 function TheCustomer({ router }: { router: NextRouter }) {
-  const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   // -----------------------------------------------------
-  // 搜尋用的filter
-  const filter: TapiGetCustomersParams['filter'] = {};
-  const searchTypes = router.query.searchTypes as string;
-  const searchCounty = router.query.searchCounty as string;
-  const searchOther = router.query.searchOther as string;
-  const searchOtherValue = router.query.searchOtherValue as string;
 
-  if (searchTypes) {
-    filter.types = {};
-    filter['types.name'] = {
-      $eq: searchTypes,
-    };
-  }
+  const { page, searchTypes, searchCounty, searchOther, searchOtherValue } = router.query as Tquery;
 
-  if (searchCounty) {
-    filter.county = {};
-    filter.county.$contains = searchCounty;
-  }
-
-  if (searchOther && searchOther) {
-    filter[searchOther] = {};
-    filter[searchOther].$contains = searchOtherValue;
-  }
-
-  const [params, setParams] = useState<TapiGetCustomersParams>({
-    page: 1,
+  const theParams: TapiGetCustomersParams = {
+    page: Number(page || 1),
     pageSize: 8,
     populate: ['contacts', 'types'],
-    filter,
     sort: 'customerNumber',
-  });
+    filter: {
+      'types.name': { $eq: searchTypes },
+      county: { $contains: searchCounty },
+      [`${searchOther}`]: { $contains: searchOtherValue },
+    },
+  };
 
-  const { data: dataOri, meta, update } = useCustomers(params);
+  const { data: dataOri, meta, update } = useCustomers(theParams);
   const data = (dataOri ?? []) as TcustomerDto_TC[];
 
   // -----------------------------------------------------
-  const setPage = (page: number) => {
-    setParams((params) => {
-      params.page = page;
 
-      return { ...params };
+  const changePage = (page: number) => {
+    router.push({
+      query: {
+        ...router.query,
+        page,
+      },
     });
   };
 
@@ -125,7 +119,6 @@ function TheCustomer({ router }: { router: NextRouter }) {
 
       try {
         await update();
-        setIsReady(true);
       } catch {
         myAlert.err({ title: '取得資料失敗' });
       } finally {
@@ -133,7 +126,7 @@ function TheCustomer({ router }: { router: NextRouter }) {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [router.query]);
 
   // -----------------------------------------------------
   // pageHeader
@@ -170,43 +163,14 @@ function TheCustomer({ router }: { router: NextRouter }) {
       const searchOther = (valueArr[2] as Toption).value;
       const searchOtherValue = valueArr[3] as string;
       router.push({
-        pathname: '/domestic/customer',
         query: {
+          ...router.query,
+          page: 1,
           searchTypes,
           searchCounty,
           searchOther,
           searchOtherValue,
         },
-      });
-
-      setParams((params) => {
-        const filter: TapiGetCustomersParams['filter'] = {};
-
-        if (searchTypes) {
-          filter.types = {};
-          filter['types.name'] = {
-            $eq: searchTypes,
-          };
-          // filter["types.name"] = {
-          //   "$in": [searchTypes]
-          // }
-        }
-
-        if (searchCounty) {
-          filter.county = {};
-          filter.county['$contains'] = searchCounty;
-        }
-
-        if (searchOtherValue) {
-          filter[searchOther] = {};
-          filter[searchOther]['$contains'] = searchOtherValue;
-        }
-
-        return {
-          ...params,
-          page: 1,
-          filter,
-        };
       });
     },
   };
@@ -224,26 +188,22 @@ function TheCustomer({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer
+    // 取得客戶資料非常快，還放loading cover會有閃爍感，UX反而不好
+    // isLoading_subLayer={isLoading}
+    >
       <PageHeader02 tag="客戶列表" panelList={panelList} />
       <div className={style.body}>
-        {isReady && (
-          <>
-            <CustomerList customersList={data} toUpdate={update} isLoading={isLoading} />
-            <div className={style.paginationBox}>
-              <Pagination
-                current={meta?.page ?? 1}
-                total={meta?.itemCount ?? 0}
-                pageSize={meta?.pageSize ?? 0}
-                onChange={setPage}
-                showSizeChanger={false}
-              />
-            </div>
-          </>
-        )}
-        {/* <LoadingCover01
-          isLoading={isLoading}
-        /> */}
+        <CustomerList customersList={data} toUpdate={update} isLoading={isLoading} />
+        <div className={style.paginationBox}>
+          <Pagination
+            current={meta?.page ?? 1}
+            total={meta?.itemCount ?? 0}
+            pageSize={meta?.pageSize ?? 0}
+            onChange={changePage}
+            showSizeChanger={false}
+          />
+        </div>
       </div>
     </SubLayer>
   );

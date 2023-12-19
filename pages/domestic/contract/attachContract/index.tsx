@@ -11,10 +11,7 @@ import Decimal from 'decimal.js';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // components
-import QuotationProfile, {
-  TreturnBody,
-  TquotationProfile,
-} from 'components/page/domestic/quotation/quotationProfile_old';
+import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
@@ -23,11 +20,11 @@ import Summary, {
   TsummaryControl,
   TpayInfoControl,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
-import QuotationSinature, { TsignatureProps } from 'components/page/domestic/quotation/quotationSinature';
+import Signature, { Tcontroll_signature } from 'components/page/domestic/quotation/quotationSinature_3';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
@@ -37,10 +34,9 @@ import {
   TcreateModifyQuotationDto,
   TcreateQuotationProductDto,
   TquotationProductDto,
-  useGetContract_id,
   useQuotation_id_attachments,
-  apiGetQuotationProducts,
 } from 'js/api/api_quotation';
+import { TuserDto } from 'js/api/dtoTypes';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
@@ -51,11 +47,20 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 
 // ===========================================================================
 // 合約 追加追減介面
-export default function AttachContract() {
+export default function AttachContract({
+  //
+  userInfo,
+}: {
+  userInfo: TuserDto | undefined;
+}) {
   const router = useRouter();
   const contractId = router.query.contractId as string | undefined;
 
   const [isLading, setIsLading] = useState(false);
+
+  // const userId = userInfo?.employee?.id;
+  const userEmp = userInfo?.employee;
+  const userId = userEmp?.id;
 
   // ----------------------------------------------------
   const { data, update } = useGetContract_id_forAttach(contractId);
@@ -72,8 +77,6 @@ export default function AttachContract() {
       }
     })();
   }, [contractId]);
-
-  // const content = data?.content;
 
   const formatedContent = useMemo(() => {
     if (!data) {
@@ -239,48 +242,12 @@ export default function AttachContract() {
     },
   };
 
-  const signatureArr = [
-    {
-      label: '總經理',
-      inputProps: {
-        props: {
-          value: formatedContent?.reviewManagerEmployee?.chName ?? '',
-        },
-      },
+  const control_signature: Tcontroll_signature = {
+    agent: {
+      employee: userEmp,
+      forbidden: true,
     },
-    {
-      label: '工務主管',
-      inputProps: {
-        props: {
-          value: formatedContent?.reviewWorkDirectorEmployee?.chName ?? '',
-        },
-      },
-    },
-    {
-      label: '主管',
-      inputProps: {
-        props: {
-          value: formatedContent?.reviewSupervisorEmployee?.chName ?? '',
-        },
-      },
-    },
-    {
-      label: '業務',
-      inputProps: {
-        props: {
-          value: formatedContent?.reviewSalesEmployee?.chName ?? '',
-        },
-      },
-    },
-    {
-      label: '經辦',
-      inputProps: {
-        props: {
-          value: formatedContent?.agentEmployee?.chName ?? '',
-        },
-      },
-    },
-  ];
+  };
 
   // 附件
   const { attachments, updateAttachments, domain } = useQuotation_id_attachments(formatedContent?.id);
@@ -322,6 +289,24 @@ export default function AttachContract() {
       }
 
       const content = _.cloneDeep(data.content);
+      const theContent = {
+        //
+        ...content,
+        // 根據api文件，後端不收
+        // 但是預防萬一，還是把這些資料清掉比較安心
+        reviewSalesEmployee: undefined,
+        salesReviewedAt: undefined,
+        toSalesAt: undefined,
+        reviewSupervisorEmployee: undefined,
+        supervisorReviewedAt: undefined,
+        toSupervisorAt: undefined,
+        reviewWorkDirectorEmployee: undefined,
+        workDirectorReviewedAt: undefined,
+        toWorkDirectorAt: undefined,
+        reviewManagerEmployee: undefined,
+        managerReviewedAt: undefined,
+        toManagerAt: undefined,
+      };
 
       // 追減，要送給後端的是追減後的資料
       // 原本五個，追減兩個，送給後端的要是三個
@@ -345,11 +330,12 @@ export default function AttachContract() {
       });
 
       const body: TcreateModifyQuotationDto = {
-        ...content,
+        ...theContent,
         products: [...divProdArr, ...attachProdArr],
-        agentId: content.agentEmployee?.id,
-        managerId: content.managerEmployee?.id,
-        supervisorId: content.supervisorEmployee?.id,
+        // agentId: content.agentEmployee?.id,
+        agentId: userId,
+        // managerId: content.managerEmployee?.id,
+        // supervisorId: content.supervisorEmployee?.id,
         subTotal: subTotal_calced,
         salesTax: salesTax_calced,
         total: total_calced,
@@ -357,7 +343,21 @@ export default function AttachContract() {
         // 其他設定有金錢，沒有參與追加追減，出現在追加追減報價單裡可能會被誤解
         // 應該不送才是對的
         others: [],
+        //
       };
+
+      let isDoorModalNameEmpty = false;
+      body.products?.forEach((prod) => {
+        if (!prod.doorModelName) {
+          isDoorModalNameEmpty = true;
+        }
+      });
+
+      if (isDoorModalNameEmpty) {
+        myAlert.info({ title: '請確認所有主產品都有門型' });
+
+        return;
+      }
 
       try {
         await apiQuotationModify(contractId, body);
@@ -557,7 +557,8 @@ export default function AttachContract() {
         />
 
         {/* 簽名 */}
-        <QuotationSinature signatureArr={signatureArr} disabled={true} />
+        {/* control_signature */}
+        <Signature controll={control_signature} />
       </div>
     </SubLayer>
   );
