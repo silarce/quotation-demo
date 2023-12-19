@@ -182,10 +182,15 @@ class Class_addition {
       return '';
     }
 
-    return parseFloat(this._unitPrice).toLocaleString();
+    return String(this._unitPrice);
+    // 不知道為什麼，當輸入法為中文時，若value裡面有千分位，input的onChange會觸發兩次
+    // 決定先把千分位拿掉
+    // return Number(this._unitPrice).toLocaleString();
   }
   set unitPrice(v) {
-    v = clearThousandsSeparator(v);
+    // console.log(v);
+
+    // v = clearThousandsSeparator(v);
 
     if (!checkIsNumberStr(v)) {
       return;
