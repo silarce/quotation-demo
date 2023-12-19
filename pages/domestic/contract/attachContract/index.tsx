@@ -359,6 +359,19 @@ export default function AttachContract() {
         others: [],
       };
 
+      let isDoorModalNameEmpty = false;
+      body.products?.forEach((prod) => {
+        if (!prod.doorModelName) {
+          isDoorModalNameEmpty = true;
+        }
+      });
+
+      if (isDoorModalNameEmpty) {
+        myAlert.info({ title: '請確認所有主產品都有門型' });
+
+        return;
+      }
+
       try {
         await apiQuotationModify(contractId, body);
         setIsLading(false);
