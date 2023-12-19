@@ -89,10 +89,11 @@ class Class_other {
     this.reRender();
   }
   get unitPrice_locale() {
-    return this._data.unitPrice.toLocaleString();
+    return String(this._data.unitPrice || 0);
+    // return this._data.unitPrice.toLocaleString();
   }
   set unitPrice_locale(v) {
-    v = v.replace(/,/g, '');
+    // v = v.replace(/,/g, '');
 
     this._data.unitPrice = Number(v);
     this.calcAllPrice();

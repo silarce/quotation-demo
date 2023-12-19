@@ -95,11 +95,12 @@ class Class_SubCom {
     return `${this._data.price}`;
   }
   get price_locale() {
-    return this._data.price.toLocaleString();
+    return String(this._data.price || 0);
+    // return this._data.price.toLocaleString();
   }
   set price_locale(v) {
     v = v ?? '0';
-    v = v.replace(/,/g, '');
+    // v = v.replace(/,/g, '');
     this._data.price = Number(v);
     this.calcAllPrice();
     this.reRender();
