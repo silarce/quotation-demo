@@ -68,6 +68,7 @@ import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModa
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01'; // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
+import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -101,6 +102,7 @@ import {
   //
   useGetQuotationContent_id,
 } from 'js/api/api_quotation';
+import { apiPostCustomers } from 'js/api/api_customer';
 
 // hook
 import { useProductList } from 'hooks/quotation/useProduct';
@@ -1789,6 +1791,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
           },
         ]}
       />
+
+      {/* <InputModal
+        visible={true}
+        title="新增客戶"
+        placeholder="新客戶的名稱"
+        onConfirm={(str) => {
+          console.log(str);
+        }}
+      /> */}
     </div>
   );
 }
