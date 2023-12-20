@@ -120,7 +120,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const latestBatch = legacyContract?.latestBatch;
 
   // 這是class
-  const { classLegacyContract, reset } = useLegacyContract({ contract: legacyContract, batch: 0 });
+  const { classLegacyContract, reset, notesArrBeforeThisBatchAndThisBatch } = useLegacyContract({
+    contract: legacyContract,
+    batch: 0,
+  });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
 
@@ -424,6 +427,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         classLegacyContract={classLegacyContract}
         verticalKeyArr={verticalKeyArr}
         agentName={(emp_agent?.chName || emp_agent?.enName) ?? ''}
+        notesArrBeforeThisBatchAndThisBatch={notesArrBeforeThisBatchAndThisBatch}
       />
     </SubLayer>
   );

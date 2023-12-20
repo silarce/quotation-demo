@@ -87,7 +87,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   // 這是class
-  const { classLegacyContract, reset, difference_prod, difference_addi } = useLegacyContract({
+  const {
+    //
+    classLegacyContract,
+    reset,
+    difference_prod,
+    difference_addi,
+    notesArrBeforeThisBatchAndThisBatch,
+  } = useLegacyContract({
     //
     contract: legacyContract,
     batch: Number(batch),
@@ -209,7 +216,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //
     {
       type: 'myButton',
-      label: '匯出報價單',
+      label: '匯出舊合約',
       onClick: () => {
         setShowPdf(true);
       },
@@ -331,6 +338,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         classLegacyContract={classLegacyContract}
         verticalKeyArr={verticalKeyArr}
         agentName={(legacyContract?.operator?.chName || legacyContract?.operator?.enName) ?? ''}
+        notesArrBeforeThisBatchAndThisBatch={notesArrBeforeThisBatchAndThisBatch}
       />
     </SubLayer>
   );
