@@ -720,7 +720,53 @@ const useLegacyContract = ({
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => state + 1);
 
-  const copyContract = _.cloneDeep(contract);
+  const { copyContract, notesRecordByBatch, notesArrBeforeThisBatchAndThisBatch } = useMemo(() => {
+    if (!contract) {
+      return {
+        copyContract: undefined,
+        notesRecordByBatch: {},
+        notesArrBeforeThisBatchAndThisBatch: [],
+      };
+    }
+
+    // --------------------------
+    const copyContract = _.cloneDeep(contract);
+    type TnotesReacordItem = Exclude<typeof contract.notesRecord, undefined>[number];
+    const notesRecord = contract.notesRecord ?? [];
+
+    const notesRecordByBatch: { [key: string]: TnotesReacordItem | undefined } = {};
+    notesRecord.forEach((rec) => {
+      const batch = rec.batch;
+      const old = notesRecordByBatch[`${batch}`];
+
+      if (!old?.createdAt || old.createdAt < rec.createdAt) {
+        notesRecordByBatch[`${batch}`] = rec;
+      }
+    });
+
+    const thisBatchNotes = notesRecordByBatch[`${batch}`]?.notes ?? [];
+    copyContract.notes = thisBatchNotes;
+    // --------------------------
+
+    let notesArrBeforeThisBatchAndThisBatch: string[] = [];
+    Object.keys(notesRecordByBatch).forEach((key) => {
+      if (Number(key) <= batch) {
+        notesArrBeforeThisBatchAndThisBatch = [
+          ...notesArrBeforeThisBatchAndThisBatch,
+          ...(notesRecordByBatch[key]?.notes ?? []),
+        ];
+      }
+    });
+    notesArrBeforeThisBatchAndThisBatch = _.uniq(notesArrBeforeThisBatchAndThisBatch);
+
+    // --------------------------
+
+    return { copyContract, notesRecordByBatch, notesArrBeforeThisBatchAndThisBatch };
+  }, [contract]);
+
+  // -----------------------------------------------------------------
+
+  // -----------------------------------------------------------------
 
   const { lastBatchProductArr, lastBatchAddiArr, lastBatchTotal } = useMemo(() => {
     const copyContract = _.cloneDeep(contract);
@@ -854,7 +900,14 @@ const useLegacyContract = ({
 
   // -----------------------------------------------------------------
 
-  return { classLegacyContract, reset, difference_prod, difference_addi };
+  return {
+    classLegacyContract,
+    reset,
+    difference_prod,
+    difference_addi,
+    notesRecordByBatch,
+    notesArrBeforeThisBatchAndThisBatch,
+  };
 };
 
 // ==========================================================================
