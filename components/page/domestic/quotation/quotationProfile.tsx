@@ -71,13 +71,11 @@ export type { Tcontrol as Tcontrol_profile };
 
 // =================================================================
 export default function QuotationProfile({
-  // profile,
+  //
   disabled = false,
-
   control,
 }: {
   disabled: boolean;
-
   control: Tcontrol;
 }) {
   // ----------------------------------------------------------------
@@ -207,7 +205,25 @@ export default function QuotationProfile({
                   },
                 }}
               />
-              {!customer.value && <button onClick={openModal}>請選擇客戶</button>}
+              {!customer.value && (
+                <>
+                  <button className={scss.btnSelectCustomer} onClick={openModal}>
+                    請選擇客戶
+                  </button>
+                  <button
+                    className={scss.btnAddCustomer}
+                    onClick={() => {
+                      // router.push({
+                      //   pathname: '/domestic/customer/add',
+                      //   query: { shouldReDeirector: true },
+                      // });
+                      window.open('/domestic/customer/add?reDeirectorToEdit=true', '_blank');
+                    }}
+                  >
+                    新增客戶
+                  </button>
+                </>
+              )}
               {customer.value && !disabled && <IconRemove02 onClick={clearClient} />}
             </div>
           </div>

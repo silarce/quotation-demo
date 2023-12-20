@@ -149,7 +149,7 @@ export default function Edit() {
   return (
     <SubLayer>
       <PageHeader02 tag="客戶列表" panelList={panelList} />
-      <div>{isReady && <EditCustomer classCustomer={classCustomer} nameCheck={nameCheck} />}</div>
+      <div>{isReady && <EditCustomer disabled={true} classCustomer={classCustomer} nameCheck={nameCheck} />}</div>
     </SubLayer>
   );
 }

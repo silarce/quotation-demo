@@ -44,13 +44,17 @@ class Class_customer {
     this._reRender();
   };
   removeType = (index: number) => {
-    console.log(this);
     this._typesArr.splice(index, 1);
     this._reRender();
   };
 
   get customerNumber() {
-    return this._customerData.customerNumber;
+    return this._customerData.customerNumber || '';
+  }
+
+  set customerNumber(str) {
+    this._customerData.customerNumber = str;
+    this._reRender();
   }
 
   get name() {
@@ -148,7 +152,7 @@ class Class_customer {
   get postBody(): TpostCustomer {
     return {
       ...this._customerData,
-      customerNumber: undefined,
+      // customerNumber: undefined,
       types: this._typesArr,
     };
   }
