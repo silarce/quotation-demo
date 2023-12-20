@@ -34,12 +34,14 @@ export default function AnnualPerformanceStatistics() {
     const list: Partial<Tlist> = {};
     data.forEach((data) => {
       const { totalsum, company_location } = data;
-      const year = data.year?.toString() ?? '舊合約';
-      const month = (data.month?.toString() ?? 'noMonth') as (typeof monthArr)[number];
 
-      // if (year === undefined || month === undefined) {
-      //   return;
-      // }
+      if (!data.year || !data.month) {
+        return;
+      }
+
+      const year = data.year.toString();
+
+      const month = data.month.toString() as (typeof monthArr)[number];
 
       if (list[company_location] === undefined) {
         list[company_location] = {};
@@ -229,12 +231,26 @@ const leftStrArr = [
   '10月',
   '11月',
   '12月',
-  '舊合約',
+  // '舊合約',
   '總計',
   '成長率',
 ];
 
-const monthArr = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', 'noMonth'] as const;
+const monthArr = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  // 'noMonth'
+] as const;
 
 type TcompanyNameLookup = {
   [key: string]: string | undefined;
