@@ -36,14 +36,15 @@ export default function QuotationPdf({
   classLegacyContract,
   verticalKeyArr,
   agentName,
-  notesArrBeforeThisBatchAndThisBatch,
-}: {
+}: // notesArrBeforeThisBatchAndThisBatch,
+{
   isVisable: boolean;
   onCancel: () => void;
   classLegacyContract: Class_legacyContract;
   agentName: string;
   verticalKeyArr: string[];
-  notesArrBeforeThisBatchAndThisBatch: string[];
+  // 需求變更，不需要了
+  // notesArrBeforeThisBatchAndThisBatch: string[];
 }) {
   const { classBasicInfo } = classLegacyContract;
 
@@ -137,8 +138,8 @@ export default function QuotationPdf({
   // -------------------------------
   // total
   const totalPram = (() => {
-    // const memoArr = classLegacyContract.classNotes.stringArr;
-    const memoArr = notesArrBeforeThisBatchAndThisBatch;
+    const memoArr = classLegacyContract.classNotes.stringArr;
+    // const memoArr = notesArrBeforeThisBatchAndThisBatch;
 
     // let subTotal: string | number = classLegacyContract.classPayInfo.subTotal;
     // let businessTax: string | number = classLegacyContract.classPayInfo.salesTax;
