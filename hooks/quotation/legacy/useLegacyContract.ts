@@ -720,7 +720,30 @@ const useLegacyContract = ({
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => state + 1);
 
-  const copyContract = _.cloneDeep(contract);
+  const copyContract = useMemo(() => {
+    if (!contract) {
+      return undefined;
+    }
+
+    const copyContract = _.cloneDeep(contract);
+
+    let sortedRecordArr: Exclude<typeof contract.notesRecord, undefined> = [];
+    const notesRecord = contract.notesRecord ?? [];
+    notesRecord.forEach((rec) => {
+      if (rec.batch === batch) {
+        sortedRecordArr.push(rec);
+      }
+    });
+
+    sortedRecordArr = _.sortBy(sortedRecordArr, 'updatedAt');
+    copyContract.notes = sortedRecordArr[sortedRecordArr.length - 1]?.notes ?? [];
+
+    return copyContract;
+  }, [contract]);
+
+  // -----------------------------------------------------------------
+
+  // -----------------------------------------------------------------
 
   const { lastBatchProductArr, lastBatchAddiArr, lastBatchTotal } = useMemo(() => {
     const copyContract = _.cloneDeep(contract);

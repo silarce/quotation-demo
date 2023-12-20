@@ -491,6 +491,16 @@ export type TlegacyContractDto = {
   //
   /**備註 */
   notes: string[];
+
+  // 備註編輯紀錄
+  notesRecord?: {
+    updatedAt: string;
+    createdAt: string;
+    batch: number;
+    legacyContractId: string;
+    notes: string[];
+  }[];
+
   /**報價範圍 */
   quoteScopes: string[];
   // /**經理 */
