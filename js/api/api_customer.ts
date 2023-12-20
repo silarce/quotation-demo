@@ -64,7 +64,7 @@ export type TpostCustomer = {
   id?: string;
   createdAt?: string; // "2022-10-19T05:36:03.899Z",
   updatedAt?: string; // "2022-10-19T05:36:03.899Z",
-  customerNumber?: undefined; // 客戶編號 後端不收
+  customerNumber: string; // 不可以為空字串
   name: string; //客戶全稱
   nickname: string; //客戶簡稱
   types: ('construction' | 'firm' | 'propertyOwner' | 'contractor')[];
@@ -274,6 +274,41 @@ export const useApiCustomersNameExist = (name: string) => {
     try {
       setCheck('loading');
       const res = await apiCustomersNameExist(name);
+
+      if (!res.isExist) {
+        setCheck('ok');
+      } else {
+        setCheck('notOk');
+      }
+    } catch {
+      setCheck('notOk');
+    }
+  };
+
+  return {
+    check,
+    setCheck,
+    reCheck,
+  };
+};
+
+const apiCustomersNumberExist = (customerNumber: string) => {
+  const api = `/customers/customer-number-exist/${customerNumber}`;
+
+  return axi
+    .get(api)
+    .then(({ data }) => data as { isExist: boolean })
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useApiCustomersNumberExist = (customerNumber: string) => {
+  type Tcheck = 'ok' | 'notOk' | 'loading';
+  const [check, setCheck] = useState<Tcheck>('loading');
+
+  const reCheck = async () => {
+    try {
+      setCheck('loading');
+      const res = await apiCustomersNumberExist(customerNumber);
 
       if (!res.isExist) {
         setCheck('ok');
