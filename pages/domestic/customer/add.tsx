@@ -17,6 +17,13 @@ import { apiPostCustomers, useApiCustomersNameExist, useApiCustomersNumberExist 
 
 // hook
 import { useClassCustomer } from 'hooks/customer/useCustomer';
+import { ConsoleSqlOutlined } from '@ant-design/icons';
+
+// ====================================================
+
+type Tquery = {
+  reDeirectorToEdit: string | undefined;
+};
 
 // ====================================================
 // 防抖
@@ -26,6 +33,7 @@ let timeoutId_checkCustomerNumber: NodeJS.Timeout;
 // ====================================================
 export default function Add() {
   const router = useRouter();
+  const { reDeirectorToEdit } = router.query as Tquery;
   // ------------------------------------------------------
   const classCustomer = useClassCustomer();
 
@@ -105,9 +113,19 @@ export default function Add() {
           setRootLoading(true);
           const res = await apiPostCustomers(postBody);
           myAlert.success({ title: '新增客戶資料完成' });
-          router.push({
-            pathname: '/domestic/customer',
-          });
+
+          if (reDeirectorToEdit === 'true') {
+            router.push({
+              pathname: '/domestic/customer/edit',
+              query: {
+                id: res.id,
+              },
+            });
+          } else {
+            router.push({
+              pathname: '/domestic/customer',
+            });
+          }
         } catch {
           myAlert.err({ title: '新增客戶資料失敗' });
         } finally {
