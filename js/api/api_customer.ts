@@ -370,7 +370,7 @@ export const apiPostCustomers = (body: TpostCustomer) => {
   const api = `/customers`;
 
   return axi
-    .post(api, body)
+    .post<TcustomerDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };
