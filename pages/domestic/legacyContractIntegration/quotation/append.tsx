@@ -1,3 +1,5 @@
+// useLegacyContract
+
 // 舊合約
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
@@ -86,6 +88,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     legacyContract.contractNumber = '';
   }
 
+  // hook
   // 這是class
   const {
     //
@@ -93,7 +96,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reset,
     difference_prod,
     difference_addi,
-    notesArrBeforeThisBatchAndThisBatch,
+    // notesArrBeforeThisBatchAndThisBatch,
   } = useLegacyContract({
     //
     contract: legacyContract,
@@ -338,7 +341,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         classLegacyContract={classLegacyContract}
         verticalKeyArr={verticalKeyArr}
         agentName={(legacyContract?.operator?.chName || legacyContract?.operator?.enName) ?? ''}
-        notesArrBeforeThisBatchAndThisBatch={notesArrBeforeThisBatchAndThisBatch}
+        // notesArrBeforeThisBatchAndThisBatch={notesArrBeforeThisBatchAndThisBatch}
       />
     </SubLayer>
   );

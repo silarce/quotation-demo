@@ -720,12 +720,16 @@ const useLegacyContract = ({
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => state + 1);
 
-  const { copyContract, notesRecordByBatch, notesArrBeforeThisBatchAndThisBatch } = useMemo(() => {
+  const {
+    copyContract,
+    notesRecordByBatch,
+    //  notesArrBeforeThisBatchAndThisBatch
+  } = useMemo(() => {
     if (!contract) {
       return {
         copyContract: undefined,
         notesRecordByBatch: {},
-        notesArrBeforeThisBatchAndThisBatch: [],
+        // notesArrBeforeThisBatchAndThisBatch: [],
       };
     }
 
@@ -748,20 +752,24 @@ const useLegacyContract = ({
     copyContract.notes = thisBatchNotes;
     // --------------------------
 
-    let notesArrBeforeThisBatchAndThisBatch: string[] = [];
-    Object.keys(notesRecordByBatch).forEach((key) => {
-      if (Number(key) <= batch) {
-        notesArrBeforeThisBatchAndThisBatch = [
-          ...notesArrBeforeThisBatchAndThisBatch,
-          ...(notesRecordByBatch[key]?.notes ?? []),
-        ];
-      }
-    });
-    notesArrBeforeThisBatchAndThisBatch = _.uniq(notesArrBeforeThisBatchAndThisBatch);
+    // let notesArrBeforeThisBatchAndThisBatch: string[] = [];
+    // Object.keys(notesRecordByBatch).forEach((key) => {
+    //   if (Number(key) <= batch) {
+    //     notesArrBeforeThisBatchAndThisBatch = [
+    //       ...notesArrBeforeThisBatchAndThisBatch,
+    //       ...(notesRecordByBatch[key]?.notes ?? []),
+    //     ];
+    //   }
+    // });
+    // notesArrBeforeThisBatchAndThisBatch = _.uniq(notesArrBeforeThisBatchAndThisBatch);
 
     // --------------------------
 
-    return { copyContract, notesRecordByBatch, notesArrBeforeThisBatchAndThisBatch };
+    return {
+      copyContract,
+      notesRecordByBatch,
+      // notesArrBeforeThisBatchAndThisBatch
+    };
   }, [contract]);
 
   // -----------------------------------------------------------------
@@ -906,7 +914,7 @@ const useLegacyContract = ({
     difference_prod,
     difference_addi,
     notesRecordByBatch,
-    notesArrBeforeThisBatchAndThisBatch,
+    // notesArrBeforeThisBatchAndThisBatch,
   };
 };
 
