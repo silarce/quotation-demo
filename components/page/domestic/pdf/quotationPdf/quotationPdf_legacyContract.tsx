@@ -36,12 +36,14 @@ export default function QuotationPdf({
   classLegacyContract,
   verticalKeyArr,
   agentName,
+  notesArrBeforeThisBatchAndThisBatch,
 }: {
   isVisable: boolean;
   onCancel: () => void;
   classLegacyContract: Class_legacyContract;
   agentName: string;
   verticalKeyArr: string[];
+  notesArrBeforeThisBatchAndThisBatch: string[];
 }) {
   const { classBasicInfo } = classLegacyContract;
 
@@ -135,7 +137,8 @@ export default function QuotationPdf({
   // -------------------------------
   // total
   const totalPram = (() => {
-    const memoArr = classLegacyContract.classNotes.stringArr;
+    // const memoArr = classLegacyContract.classNotes.stringArr;
+    const memoArr = notesArrBeforeThisBatchAndThisBatch;
 
     // let subTotal: string | number = classLegacyContract.classPayInfo.subTotal;
     // let businessTax: string | number = classLegacyContract.classPayInfo.salesTax;
