@@ -597,6 +597,9 @@ latestContentProdArr為這次追加追減的主產品
   }, [quotationData]);
 
   useEffect(() => {
+    // 進入page後會自動計算attachTotal
+    // 所以沒有報價單那邊那樣的的問題
+
     const { subTotal, salesTax, total } = countPayInfoValue({
       discount: summary.discountRate,
       prodSubTotal: attachTotal,
@@ -1467,7 +1470,8 @@ latestContentProdArr為這次追加追減的主產品
         partName: com.comName,
         material: com.material,
         unit: com.unit,
-        qty: Number(com.quantity).toFixed(2),
+        // qty: Number(com.quantity).toFixed(2),
+        qty: new Decimal(com.quantity || 0).toFixed(2),
         desc: com.desc ?? '',
         // price: Number(com.price || 0).toLocaleString(),
         price: com.unitPrice_locale,
@@ -1484,7 +1488,8 @@ latestContentProdArr為這次追加追減的主產品
         unit: acce.unit,
         // FIXME 型別為number，但實際上為string
         // hooks/quotation/classAccessories.tsx // get quantity
-        qty: Number(acce.quantity).toFixed(2),
+        // qty: Number(acce.quantity).toFixed(2),
+        qty: new Decimal(acce.quantity || 0).toFixed(2),
         price: acce.unitPrice_locale,
         desc: '',
         totalPrice: acce.totalPrice_locale,
@@ -1829,9 +1834,12 @@ const countPayInfoValue = ({
   const tax = Decimal.mul(subTotal || 0, 0.05);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
-  const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();
-  const taxStr = Number(tax.toFixed(0)).toLocaleString();
-  const totalStr = Number(total.toFixed(0)).toLocaleString();
+  // const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();
+  // const taxStr = Number(tax.toFixed(0)).toLocaleString();
+  // const totalStr = Number(total.toFixed(0)).toLocaleString();
+  const subTotalStr = Number(new Decimal(subTotal).toFixed(0)).toLocaleString();
+  const taxStr = Number(new Decimal(tax).toFixed(0)).toLocaleString();
+  const totalStr = Number(new Decimal(total).toFixed(0)).toLocaleString();
 
   return {
     subTotal: subTotalStr,

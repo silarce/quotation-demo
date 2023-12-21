@@ -660,6 +660,8 @@ const useProductList = ({
     attachDivTotal,
     /**追加追減總金額 */
     attachTotal,
+    //
+    calcSubTotalPrice,
   };
 };
 
