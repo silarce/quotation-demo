@@ -86,8 +86,8 @@ export default function QuotationPdf_part({
     const sheetName = quotationId;
     const sheet = workbook.addWorksheet(sheetName);
     sheet.columns = [
-      { width: 30 /*font: { size: 16 }*/ }, // 直接在這邊設定font不知道為什麼無效
-      { width: 10 }, // 在google試算表裡10被換算為69
+      { width: 40 /*font: { size: 16 }*/ }, // 直接在這邊設定font不知道為什麼無效
+      { width: 50 }, // 在google試算表裡10被換算為69
       { width: 20 },
       { width: 10 },
       { width: 20 },
@@ -103,11 +103,30 @@ export default function QuotationPdf_part({
       sheet.getRow(rowCount).font = { bold: true, size: 18 };
       sheet.getRow(rowCount + 3).font = { bold: true, size: 18 };
 
-      const { part } = item;
-      const slatIndex = part.findIndex((item) => {
-        return item.partName === '捲門片';
+      let { part } = item;
+
+      // const slatIndex = part.findIndex((item) => {
+      //   return item.partName === '捲門片';
+      // });
+
+      // if (part[slatIndex]) {
+      //   part[slatIndex].unit = 'M2';
+      // }
+
+      // part.forEach((item, index) => {
+      //   console.log(item.partName);
+
+      //   if (item.partName === '捲門片' || item.partName === '按裝及製造費用') {
+      //     part[index].unit = 'M2';
+      //   }
+      // });
+      part = part.map((item, index) => {
+        if (item.unit === 'm2' || item.partName === '捲門片' || item.partName === '按裝及製造費用') {
+          item.unit = 'M2';
+        }
+
+        return item;
       });
-      part[slatIndex].unit = 'M2';
 
       const profileColumns = infoKeyIndex.map((key) => ({ name: infoConfig[key].label }));
       const profileRows = infoKeyIndex.map((key) => item[key]);
@@ -122,8 +141,6 @@ export default function QuotationPdf_part({
       });
 
       const partColumns = keyIndex.map((key) => ({ name: config[key].label }));
-
-      console.log(part);
 
       const partRows = part.map((item) => {
         return keyIndex.map((key) => item[key]);

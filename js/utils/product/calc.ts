@@ -37,6 +37,10 @@ export const calcProductWG = ({ fullWidth, gapA, gapC }: { fullWidth: number; ga
   return wg;
 };
 
+export const calcProductWG_withWAndG = ({ W, G }: { W: number; G: number }) => {
+  return new Decimal(W).add(G).add(G).toNumber();
+};
+
 // warning 注意，變更WG就意味著gapA與gapC也會變更
 // 所以這個計算是要配合apiGetProdCalcGeneralSpec取得新的gapA與gapC再使用
 /**計算fullWidth 單位為mm*/

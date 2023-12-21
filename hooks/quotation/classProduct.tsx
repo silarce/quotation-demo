@@ -94,6 +94,7 @@ import {
   calcProductWG,
   calcProductFullWidth,
   calcW,
+  calcProductWG_withWAndG,
   findBDoptions,
 } from 'js/utils/product/calc';
 
@@ -2121,12 +2122,20 @@ class Class_product {
       v = '0';
     }
 
-    const wg = new Decimal(v || 0).add(this.guildRailG || 0).toString();
+    // const wg = new Decimal(v || 0)
+    //   .add(this.guildRailG || 0)
+    //   .add(this.guildRailG || 0)
+    //   .toString();
+
+    const wg = calcProductWG_withWAndG({
+      W: Number(v || 0),
+      G: Number(this.guildRailG || 0),
+    });
 
     // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
     this._dontCalcWG = true;
 
-    this.WG = wg;
+    this.WG = String(wg);
     this.reRender;
   }
 
