@@ -420,7 +420,7 @@ latestContentProdArr為這次追加追減的主產品
 
           setCustomer(customer);
           changeProfile('contactPerson', `${name}${phone}`);
-          changeProfile('contactNumber', phone);
+          changeProfile('contactNumber', customerPhoneNumber);
           changeProfile('faxNumber', fax);
         },
         onClear: () => {
