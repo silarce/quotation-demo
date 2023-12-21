@@ -420,7 +420,7 @@ latestContentProdArr為這次追加追減的主產品
 
           setCustomer(customer);
           changeProfile('contactPerson', `${name}${phone}`);
-          changeProfile('contactNumber', phone);
+          changeProfile('contactNumber', customerPhoneNumber);
           changeProfile('faxNumber', fax);
         },
         onClear: () => {
@@ -1469,7 +1469,8 @@ latestContentProdArr為這次追加追減的主產品
         unit: com.unit,
         qty: Number(com.quantity).toFixed(2),
         desc: com.desc ?? '',
-        price: Number(com.price || 0).toLocaleString(),
+        // price: Number(com.price || 0).toLocaleString(),
+        price: com.unitPrice_locale,
         totalPrice: Number(com.totalPrice || 0).toLocaleString(),
       };
     });

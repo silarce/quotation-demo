@@ -1415,15 +1415,19 @@ class Class_product {
 
     const dualPrice = price.mul(quantity || 0).toNumber();
 
-    this.price = price.toFixed(0).toString();
-    this.dualPrice = dualPrice.toFixed(0).toString();
+    // this.price = price.toFixed(0).toString();
+    // this.dualPrice = dualPrice.toFixed(0).toString();
+    this.price = new Decimal(price).toFixed(0);
+    this.dualPrice = new Decimal(dualPrice).toFixed(0);
 
     // 複價===四捨五入後的單價*數量
-    const fiexedUnitPrice = unitPrice.toFixed(0);
+    // const fiexedUnitPrice = unitPrice.toFixed(0);
+    const fiexedUnitPrice = new Decimal(unitPrice).toFixed(0);
     this.unitPrice = fiexedUnitPrice;
     // const totalPrice = unitPrice.mul(quantity || 0).toNumber();
     const totalPrice = new Decimal(fiexedUnitPrice).mul(quantity || 0).toNumber();
-    this.totalPrice = totalPrice.toFixed(0).toString();
+    // this.totalPrice = totalPrice.toFixed(0).toString();
+    this.totalPrice = new Decimal(totalPrice).toFixed(0);
 
     this.callCalcSubTotal();
     this.reRender();
@@ -1448,10 +1452,14 @@ class Class_product {
     });
 
     this.AcceAllPrice = {
-      price: Number(d_price.toFixed(0)),
-      dualPrice: Number(d_dualPrice.toFixed(0)),
-      unitPrice: Number(d_unitPrice.toFixed(0)),
-      totalPrice: Number(d_totalPrice.toFixed(0)),
+      // price: Number(d_price.toFixed(0)),
+      // dualPrice: Number(d_dualPrice.toFixed(0)),
+      // unitPrice: Number(d_unitPrice.toFixed(0)),
+      // totalPrice: Number(d_totalPrice.toFixed(0)),
+      price: Number(new Decimal(d_price || 0).toFixed(0)),
+      dualPrice: Number(new Decimal(d_dualPrice || 0).toFixed(0)),
+      unitPrice: Number(new Decimal(d_unitPrice || 0).toFixed(0)),
+      totalPrice: Number(new Decimal(d_totalPrice || 0).toFixed(0)),
     };
   } // calcAccessoriesAllprice
 
@@ -1479,10 +1487,14 @@ class Class_product {
     });
 
     this.comAllPrice = {
-      price: Number(d_price.toFixed(0)),
-      dualPrice: Number(d_dualPrice.toFixed(0)),
-      unitPrice: Number(d_unitPrice.toFixed(0)),
-      totalPrice: Number(d_totalPrice.toFixed(0)),
+      // price: Number(d_price.toFixed(0)),
+      // dualPrice: Number(d_dualPrice.toFixed(0)),
+      // unitPrice: Number(d_unitPrice.toFixed(0)),
+      // totalPrice: Number(d_totalPrice.toFixed(0)),
+      price: Number(new Decimal(d_price || 0).toFixed(0)),
+      dualPrice: Number(new Decimal(d_dualPrice || 0).toFixed(0)),
+      unitPrice: Number(new Decimal(d_unitPrice || 0).toFixed(0)),
+      totalPrice: Number(new Decimal(d_totalPrice || 0).toFixed(0)),
     };
   } // calcComAllPrice
 
@@ -1508,10 +1520,14 @@ class Class_product {
     });
 
     this.comAllPrice = {
-      price: Number(d_price.toFixed(0)),
-      dualPrice: Number(d_dualPrice.toFixed(0)),
-      unitPrice: Number(d_unitPrice.toFixed(0)),
-      totalPrice: Number(d_totalPrice.toFixed(0)),
+      // price: Number(d_price.toFixed(0)),
+      // dualPrice: Number(d_dualPrice.toFixed(0)),
+      // unitPrice: Number(d_unitPrice.toFixed(0)),
+      // totalPrice: Number(d_totalPrice.toFixed(0)),
+      price: Number(new Decimal(d_price || 0).toFixed(0)),
+      dualPrice: Number(new Decimal(d_dualPrice || 0).toFixed(0)),
+      unitPrice: Number(new Decimal(d_unitPrice || 0).toFixed(0)),
+      totalPrice: Number(new Decimal(d_totalPrice || 0).toFixed(0)),
     };
   } // calcComAllPrice
 
@@ -2710,7 +2726,8 @@ class Class_product {
 
     const num = Number(this._prodData.thickness);
 
-    return num.toFixed(1) + ' t';
+    // return num.toFixed(1) + ' t';
+    return new Decimal(num || 0).toFixed(1) + ' t';
   }
   set thickness(v) {
     v = v.replace(' t', '');

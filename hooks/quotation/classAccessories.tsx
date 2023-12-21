@@ -82,13 +82,13 @@ class Class_accessories {
 
     // length跟width互斥，length為0的時候 price為0?
     if (referenceSpec === 'fullWidth') {
-      const l = Number(this._prod.fullWidth);
+      const l = Number(new Decimal(this._prod.fullWidth || 0).toFixed(2));
       // const w = Number(this._prod.WG);
       const w = 0;
       this.quantity = l || w;
       this.unit = 'M';
     } else if (referenceSpec === 'area') {
-      this.quantity = Number(this._prod.area);
+      this.quantity = Number(new Decimal(this._prod.area || 0).toFixed(2));
       // this.unit = (
       //   <span>
       //     m<sup>2</sup>
@@ -112,14 +112,17 @@ class Class_accessories {
     // 單價;
     const unitPrice = new Decimal(price).mul(discount);
 
-    this._acceData.dualPrice = Number(dualPrice.toFixed(0));
-    this._acceData.unitPrice = Number(unitPrice.toFixed(0));
+    // this._acceData.dualPrice = Number(dualPrice.toFixed(0));
+    // this._acceData.unitPrice = Number(unitPrice.toFixed(0));
+    this._acceData.dualPrice = Number(new Decimal(dualPrice).toFixed(0));
+    this._acceData.unitPrice = Number(new Decimal(unitPrice).toFixed(0));
 
     // 複價;
     // const totalPrice = new Decimal(unitPrice).mul(quantity);
     const totalPrice = new Decimal(this._acceData.unitPrice).mul(quantity);
 
-    this._acceData.totalPrice = Number(totalPrice.toFixed(0));
+    // this._acceData.totalPrice = Number(totalPrice.toFixed(0));
+    this._acceData.totalPrice = Number(new Decimal(totalPrice).toFixed(0));
 
     this._prod.calcProdAllprice_timeout();
 
