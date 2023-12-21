@@ -82,13 +82,14 @@ class Class_accessories {
 
     // length跟width互斥，length為0的時候 price為0?
     if (referenceSpec === 'fullWidth') {
-      const l = Number(this._prod.fullWidth);
+      // const l = Number(this._prod.fullWidth);
+      const l = Number(Number(this._prod.fullWidth).toFixed(2));
       // const w = Number(this._prod.WG);
       const w = 0;
       this.quantity = l || w;
       this.unit = 'M';
     } else if (referenceSpec === 'area') {
-      this.quantity = Number(this._prod.area);
+      this.quantity = Number(Number(this._prod.area).toFixed(2));
       // this.unit = (
       //   <span>
       //     m<sup>2</sup>
