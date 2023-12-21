@@ -418,7 +418,8 @@ const useProductList = ({
       subTotal = subTotal.add(item.totalPrice);
     });
 
-    setSubTotal(subTotal.toFixed(0));
+    // setSubTotal(subTotal.toFixed(0));
+    setSubTotal(new Decimal(subTotal).toFixed(0));
   };
 
   useEffect(() => {
