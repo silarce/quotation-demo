@@ -1537,7 +1537,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         unit: com.unit,
         qty: Number(com.quantity).toFixed(2),
         desc: com.desc ?? '',
-        price: Number(com.price || 0).toLocaleString(),
+        // price: Number(com.price || 0).toLocaleString(),
+        // price: Number(com.price || 0).toLocaleString(),
+        price: com.unitPrice_locale,
         totalPrice: Number(com.totalPrice || 0).toLocaleString(),
       };
     });
