@@ -126,16 +126,19 @@ class Class_component {
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
     const unitPrice = new Decimal(price).mul(discount);
-    const fixedUnitPrice = unitPrice.toFixed(0);
+    // const fixedUnitPrice = unitPrice.toFixed(0);
+    const fixedUnitPrice = new Decimal(unitPrice).toFixed(0);
     // 複價 計算方式為四捨五入後的單價乘以數量
 
-    this._dualPrice = Number(dualPrice.toFixed(0));
+    // this._dualPrice = Number(dualPrice.toFixed(0));
+    this._dualPrice = Number(new Decimal(dualPrice).toFixed(0));
     this._unitPrice = Number(fixedUnitPrice);
 
     // const totalPrice = new Decimal(unitPrice).mul(quantity);
     const totalPrice = new Decimal(fixedUnitPrice).mul(quantity);
 
-    this._totalPrice = Number(totalPrice.toFixed(0));
+    // this._totalPrice = Number(totalPrice.toFixed(0));
+    this._totalPrice = Number(new Decimal(totalPrice).toFixed(0));
 
     if (calcProdTotal) {
       this._prod.calcProdAllprice_timeout();
@@ -1207,11 +1210,13 @@ const calcDefaultQuantity = ({
   }
 
   if (key === 'bottomBar' || key === 'roller' || key === 'headBox') {
-    return wl.toFixed(2); // M
+    // return wl.toFixed(2); // M
+    return new Decimal(wl).toFixed(2); // M
   }
 
   if (key === 'guideRail') {
-    return h.toFixed(2); // M
+    // return h.toFixed(2); // M
+    return new Decimal(h).toFixed(2); // M
   }
 
   if (key === 'motor' || key === 'motorAccessories') {

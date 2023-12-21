@@ -201,7 +201,8 @@ export default function QuotationPdf({
       const size = `${lw}Ｘ${h}${b ? `＋${b}` : ''}`;
 
       const thickness_num = Number(prod.thickness.replaceAll('t', ''));
-      const thickness_str = thickness_num === 0 ? '' : thickness_num.toFixed(1) + 't';
+      // const thickness_str = thickness_num === 0 ? '' : thickness_num.toFixed(1) + 't';
+      const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
 
       return {
         category: prod.itemName,
