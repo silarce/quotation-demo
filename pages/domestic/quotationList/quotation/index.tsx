@@ -478,6 +478,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     subTotal: quotationProdSubTotal,
     reset: resetClass,
     //
+    calcSubTotalPrice,
+    //
   } = useProductList({
     // productArr: quotationData?.latestContent.products,
     // others: quotationData?.latestContent.others,
@@ -576,6 +578,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [quotationData, quotationContentData, disabled]);
 
   useEffect(() => {
+    // quotationProdSubTotal 如果是空字串，
+    // 代表剛進入page，還沒有編輯過主產品、材料配件、選配、其他設定或總折數
+    // 就不需要呼叫countPayInfoValue，也不應該呼叫
+    // 這會導致subTotal、salesTax、total計算出為0的值
+    // 既然會改變金額的因素都沒有被編輯過，那麼就不需要計算並帶入新的金額
+    if (quotationProdSubTotal === '') {
+      return;
+    }
+
     const { subTotal, salesTax, total } = countPayInfoValue({
       discount: summary.discountRate,
       prodSubTotal: quotationProdSubTotal,
@@ -675,6 +686,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
           disabled: disabled,
           value: summary.discountRate,
           onChange: (e) => {
+            // 如果quotationProdSubTotal為空字串會算出錯誤的值，
+            // 所以必須先計算出quotationProdSubTotal
+            if (quotationProdSubTotal === '') {
+              calcSubTotalPrice();
+            }
+
             let v = e.target.value;
             setSummary((state) => {
               const copy = { ...state };

@@ -597,6 +597,9 @@ latestContentProdArr為這次追加追減的主產品
   }, [quotationData]);
 
   useEffect(() => {
+    // 進入page後會自動計算attachTotal
+    // 所以沒有報價單那邊那樣的的問題
+
     const { subTotal, salesTax, total } = countPayInfoValue({
       discount: summary.discountRate,
       prodSubTotal: attachTotal,
