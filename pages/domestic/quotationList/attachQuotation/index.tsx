@@ -481,6 +481,26 @@ latestContentProdArr為這次追加追減的主產品
   // -----------------------------------------------------
   // -----------------------------------------------------
 
+  const [summary, setSummary] = useState<{
+    discountRate: string;
+    subTotal: string;
+    salesTax: string;
+    total: string;
+    deliveryLocation: string;
+    deliveryDate: string;
+  }>({
+    discountRate: '100',
+    subTotal: '',
+    salesTax: '',
+    total: '',
+    deliveryLocation: '',
+    deliveryDate: '',
+  });
+
+  const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
+
+  // -----------------------------------------------------
+
   const {
     productList,
     prodCellConfig,
@@ -520,7 +540,10 @@ latestContentProdArr為這次追加追減的主產品
     resetTrigger: contractArr,
     onDoorTypeChange: onDoorTypeChange,
     productArr_attach: contentArr,
+    quotationDiscount: Number(summary.discountRate || '100'),
   });
+
+  console.log(summary.discountRate);
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
@@ -546,23 +569,6 @@ latestContentProdArr為這次追加追減的主產品
   // -------------------------------------------------------
   // -------------------------------------------------------
   // -------------------------------------------------------
-  const [summary, setSummary] = useState<{
-    discountRate: string;
-    subTotal: string;
-    salesTax: string;
-    total: string;
-    deliveryLocation: string;
-    deliveryDate: string;
-  }>({
-    discountRate: '100',
-    subTotal: '',
-    salesTax: '',
-    total: '',
-    deliveryLocation: '',
-    deliveryDate: '',
-  });
-
-  const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   useEffect(() => {
     if (!quotationData) {
@@ -601,7 +607,7 @@ latestContentProdArr為這次追加追減的主產品
     // 所以沒有報價單那邊那樣的的問題
 
     const { subTotal, salesTax, total } = countPayInfoValue({
-      discount: summary.discountRate,
+      // discount: summary.discountRate,
       prodSubTotal: attachTotal,
     });
 
@@ -613,7 +619,10 @@ latestContentProdArr為這次追加追減的主產品
         total,
       };
     });
-  }, [summary.discountRate, attachTotal]);
+  }, [
+    // summary.discountRate,
+    attachTotal,
+  ]);
 
   //
   //
@@ -1821,16 +1830,17 @@ latestContentProdArr為這次追加追減的主產品
 // ------------------------------------------------------------------=============
 
 const countPayInfoValue = ({
-  discount,
+  // discount,
   //
   prodSubTotal,
 }: {
-  discount: string | number;
+  // discount: string | number;
   prodSubTotal: string | number;
 }) => {
-  const discountRate = new Decimal(discount || 0).div(100);
+  // const discountRate = new Decimal(discount || 0).div(100);
 
-  const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
+  // const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
+  const subTotal = prodSubTotal;
   const tax = Decimal.mul(subTotal || 0, 0.05);
   const total = Decimal.add(subTotal || 0, tax || 0);
 

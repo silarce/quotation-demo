@@ -444,12 +444,30 @@ function TheQuotation({ router }: { router: NextRouter }) {
     return control_profile;
   }, [profile]);
 
-  // console.log(profile);
+  // -----------------------------------------------------
+  // -----------------------------------------------------
+
+  const [summary, setSummary] = useState<{
+    discountRate: string;
+    subTotal: string;
+    salesTax: string;
+    total: string;
+    deliveryLocation: string;
+    deliveryDate: string;
+  }>({
+    discountRate: '',
+    subTotal: '',
+    salesTax: '',
+    total: '',
+    deliveryLocation: '',
+    deliveryDate: '',
+  });
+
+  const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   // -----------------------------------------------------
   // -----------------------------------------------------
-  // -----------------------------------------------------
-  // -----------------------------------------------------
+
   const {
     productList,
     prodCellConfig,
@@ -479,6 +497,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     reset: resetClass,
     //
     calcSubTotalPrice,
+    // changeAllProdQuotationDiscount,
     //
   } = useProductList({
     // productArr: quotationData?.latestContent.products,
@@ -487,9 +506,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
     others: latestContent?.others,
     resetTrigger: quotationData ?? quotationContentData,
     onDoorTypeChange: onDoorTypeChange,
+    quotationDiscount: Number(summary.discountRate || '100'),
   });
 
-  // const [targetProd, setTargetProd] = useState<Class_product>();
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
 
@@ -498,24 +517,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       targetProd.callApiAndGetOptions();
     }
   }, [targetProd]);
-
-  const [summary, setSummary] = useState<{
-    discountRate: string;
-    subTotal: string;
-    salesTax: string;
-    total: string;
-    deliveryLocation: string;
-    deliveryDate: string;
-  }>({
-    discountRate: '100',
-    subTotal: '',
-    salesTax: '',
-    total: '',
-    deliveryLocation: '',
-    deliveryDate: '',
-  });
-
-  const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   useEffect(() => {
     if (latestContent) {
@@ -583,12 +584,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // 就不需要呼叫countPayInfoValue，也不應該呼叫
     // 這會導致subTotal、salesTax、total計算出為0的值
     // 既然會改變金額的因素都沒有被編輯過，那麼就不需要計算並帶入新的金額
+    // 後記，因為現在useProductList會收quotationDiscount，
+    // 且有useEffect會依賴quotationDiscount執行變更所有主產品quotationDiscount
+    // 所以若資料的discount不是100，就會再進入page計算出新的quotationProdSubTotal(理論上一樣)
+    // 然後計算出新的subTotal、salesTax、total
+    // 理論上會跟取得的資料一樣
     if (quotationProdSubTotal === '') {
       return;
     }
 
     const { subTotal, salesTax, total } = countPayInfoValue({
-      discount: summary.discountRate,
+      // discount: summary.discountRate,
       prodSubTotal: quotationProdSubTotal,
     });
 
@@ -600,7 +606,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
         total,
       };
     });
-  }, [summary.discountRate, quotationProdSubTotal]);
+  }, [
+    // summary.discountRate,
+    // 現在summary.discountRate改變時就會改變quotationProdSubTotal
+    // 其實現在quotationProdSubTotal === ''也不會造成問題了
+    quotationProdSubTotal,
+  ]);
 
   //
   //
@@ -693,22 +704,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
             }
 
             let v = e.target.value;
+
+            if ((v as string) === '') {
+              v = '0';
+            }
+
+            if (Number(v) > 100) {
+              v = '100';
+            }
+
             setSummary((state) => {
               const copy = { ...state };
-
-              if ((v as string) === '') {
-                v = '0';
-              }
-
-              if (Number(v) > 100) {
-                v = '100';
-              }
 
               if (v.split('.')[1]?.length > 2) {
                 return copy;
               }
 
               copy.discountRate = v;
+              // changeAllProdQuotationDiscount(Number(v));
 
               return copy;
             });
@@ -1830,16 +1843,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
 // ------------------------------------------------------------------=============
 
 const countPayInfoValue = ({
-  discount,
+  // discount,
   //
   prodSubTotal,
 }: {
-  discount: string | number;
+  // discount: string | number;
   prodSubTotal: string | number;
 }) => {
-  const discountRate = new Decimal(discount || 0).div(100);
+  // const discountRate = new Decimal(discount || 0).div(100);
 
-  const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
+  // const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
+  const subTotal = prodSubTotal || 0;
   const tax = Decimal.mul(subTotal || 0, 0.05);
   const total = Decimal.add(subTotal || 0, tax || 0);
 

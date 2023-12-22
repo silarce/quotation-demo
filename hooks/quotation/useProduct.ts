@@ -60,6 +60,7 @@ const useProductList = ({
   resetTrigger,
   onDoorTypeChange,
   productArr_attach,
+  quotationDiscount,
 }: {
   productArr: TquotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
@@ -71,6 +72,7 @@ const useProductList = ({
     qrArr: string[] | undefined;
   }) => void;
   productArr_attach?: TquotationProductDto[] | undefined;
+  quotationDiscount: number;
 }) => {
   const [render, setRender] = useState(0);
 
@@ -207,6 +209,7 @@ const useProductList = ({
         doorModelList,
         originProd: prod,
         onDoorTypeChange: onClassDoorTypeChange,
+        quotationDiscount: quotationDiscount,
       });
     });
 
@@ -270,6 +273,7 @@ const useProductList = ({
       // calcSubTotalPrice,
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
+      quotationDiscount: quotationDiscount,
     });
     productList[newKey] = classProd;
 
@@ -428,6 +432,23 @@ const useProductList = ({
     }
   }, [calcTrigger]);
 
+  /**修改所有class_product的quotationDiscount */
+  const changeAllProdQuotationDiscount = (v: number) => {
+    Object.values(productList).forEach((prod) => {
+      prod.quotationDiscount = v;
+    });
+    Object.values(attachProdList).forEach((prod) => {
+      prod.quotationDiscount = v;
+    });
+  };
+
+  useEffect(() => {
+    // component裡面只有紀錄牌價，其他金額都是算出來的
+    // 因此即使沒有要變更主產品或總折數，也必須要執行changeAllProdQuotationDiscount
+    // 否則若quotationDiscount不是100，component的單價就會錯誤
+    changeAllProdQuotationDiscount(quotationDiscount);
+  }, [quotationDiscount]);
+
   // ---------------------------------------------------------
   /**回到編輯前的狀態，就是以一開始取得的資料重新建立list */
   const reset = () => {
@@ -457,6 +478,7 @@ const useProductList = ({
       callCalcSubTotal,
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
+      quotationDiscount: quotationDiscount,
     });
     productList_attach[newKey] = classProd;
 
@@ -538,6 +560,7 @@ const useProductList = ({
           originProd: prod,
           onDoorTypeChange: onClassDoorTypeChange,
           disabled_quantity: true,
+          quotationDiscount: quotationDiscount,
         });
       });
 
@@ -662,6 +685,7 @@ const useProductList = ({
     attachTotal,
     //
     calcSubTotalPrice,
+    // changeAllProdQuotationDiscount, // 修改所有class_product的quotationDiscount
   };
 };
 

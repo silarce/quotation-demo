@@ -4,6 +4,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import _ from 'lodash';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -35,6 +36,7 @@ import {
   TquotationProductDto,
   //
   useGetContract_id_noItems,
+  TquotationContractDto,
 } from 'js/api/api_quotation';
 
 // hook
@@ -84,9 +86,13 @@ export default function WorkContactDoc() {
   const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
   const engineeringContactId = contract?.engineeringContactId;
 
-  const productArr = useMemo(() => {
+  const { productArr, latestQuotationDiscount } = useMemo(() => {
     const list: { [key: string]: TquotationProductDto } = {};
-    contract?.subContracts.forEach((contract) => {
+
+    const subContractArr = contract?.subContracts ?? [];
+    const orderedSubContracts = _.sortBy(subContractArr, 'version');
+
+    orderedSubContracts.forEach((contract) => {
       const prodArr = contract.content.products;
 
       prodArr.forEach((prod) => {
@@ -94,7 +100,12 @@ export default function WorkContactDoc() {
       });
     });
 
-    return Object.values(list);
+    const productArr = Object.values(list);
+    const latestSubContract: TquotationContractDto | undefined = orderedSubContracts[orderedSubContracts.length - 1];
+
+    const latestQuotationDiscount = latestSubContract?.content?.discount || '100';
+
+    return { productArr, latestQuotationDiscount };
   }, [contract]);
 
   const {
@@ -107,6 +118,7 @@ export default function WorkContactDoc() {
     productArr: productArr,
     others: [],
     resetTrigger: productArr,
+    quotationDiscount: Number(latestQuotationDiscount) || 100,
   });
 
   // ---------------------------------------------------------------------------
