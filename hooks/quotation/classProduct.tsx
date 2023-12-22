@@ -442,7 +442,7 @@ class Class_product {
     acceDataArr.forEach((acceData) => {
       const newKey = `new-${nanoid()}`;
       const acceClassData: Taccessories = {
-        codeName: '',
+        codeName: acceData.id,
         name: acceData.name,
         unit: acceData.unit ?? '',
         quantity: 1,
@@ -469,10 +469,10 @@ class Class_product {
   accessoriesVKeyArr: string[] | undefined;
 
   creAcceList() {
-    const optionArr = _.sortBy(this._prodData.accessories, 'order');
+    const acceArr = _.sortBy(this._prodData.accessories, 'order');
     const list: { [key: string]: Class_accessories } = {};
 
-    optionArr?.forEach((item) => {
+    acceArr?.forEach((item) => {
       let key = item.order !== undefined ? `${item.order}` : nanoid();
 
       if (key in list) {
