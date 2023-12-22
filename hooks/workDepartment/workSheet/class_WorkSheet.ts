@@ -117,8 +117,7 @@ class Class_workSheet {
 
     this.comList = comList as { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
 
-    // 暫時先放進name，在getAccessoriesArr會改成放進id
-    this._acceIdArr = this._prod.accessories.map((item) => item.name);
+    this._acceIdArr = this._prod.accessories.map((item) => item.codeName);
 
     this._prodSpec = {
       bearingHousingSize: this._prod.bearingHousingSize ?? 0,
@@ -218,23 +217,23 @@ class Class_workSheet {
       this._accessoriesOptionArr = res;
 
       const list: typeof this._accessoriesOptionList = {};
-      const arr: string[] = [];
+      // const arr: string[] = [];
 
       this._accessoriesOptionArr.forEach((item) => {
         list[item.id] = item;
         this._accessoriesOptionArr_easy.push({ value: item.id, label: item.name });
 
-        const isHave = this._acceIdArr.some((name) => {
-          return name === item.name;
-        });
+        // const isHave = this._acceIdArr.some((name) => {
+        //   return name === item.name;
+        // });
 
-        if (isHave) {
-          arr.push(item.id);
-        }
+        // if (isHave) {
+        //   arr.push(item.id);
+        // }
       });
 
       this._accessoriesOptionList = list;
-      this._acceIdArr = arr;
+      // this._acceIdArr = arr;
     }
 
     this.forceUpdate({ isNoChange: true });
@@ -1246,7 +1245,7 @@ class Class_workSheet {
       const acce = this._accessoriesOptionList[id] ?? {};
 
       const acceBody: TupdateWorkSheetItem['accessories'][number] = {
-        codeName: '', //代號
+        codeName: acce.id, //代號
         name: acce.name, //名稱
         unit: acce.unit ?? '', // 單位
         quantity: 0, // 數量
