@@ -1,17 +1,15 @@
-import _ from 'lodash';
 import Decimal from 'decimal.js';
-import { nanoid } from 'nanoid';
 
 // type
 import type { TreRender } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
 
 // type
-import {
-  TcreateQuotationProductAccessoriesDto,
-  TquotationProductAccessoriesDto,
-  TdoorAccessoryDto,
-} from 'js/api/dtoTypes';
+// import {
+//   TcreateQuotationProductAccessoriesDto,
+//   TquotationProductAccessoriesDto,
+//   TdoorAccessoryDto,
+// } from 'js/api/dtoTypes';
 
 import scss from './classComponent.module.scss';
 

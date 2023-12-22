@@ -196,7 +196,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       // 把新的放進去，並拿掉重複的值
       if (annoArr) {
         annoCopy = [...annoCopy, ...annoArr];
-        annoCopy = [...new Set(annoCopy)];
+        // annoCopy = [...new Set(annoCopy)];
+        annoCopy = _.uniq(annoCopy);
       }
 
       return annoCopy;
@@ -219,7 +220,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       // 把新的放進去，並拿掉重複的值
       if (qrArr) {
         qrCopy = [...qrCopy, ...qrArr];
-        qrCopy = [...new Set(qrCopy)];
+        // qrCopy = [...new Set(qrCopy)];
+        qrCopy = _.uniq(qrCopy);
       }
 
       return qrCopy;
