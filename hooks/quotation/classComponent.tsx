@@ -118,6 +118,7 @@ class Class_component {
 
   calcAllPrice({ calcProdTotal = true }: { calcProdTotal?: boolean } = {}) {
     const discount = new Decimal(this._prod.discount).div(100);
+    const quotationDiscount = new Decimal(this._prod.quotationDiscount).div(100);
 
     const quantity = Number(this._com.quantity || 0);
 
@@ -125,7 +126,7 @@ class Class_component {
     // 牌價複價
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價
-    const unitPrice = new Decimal(price).mul(discount);
+    const unitPrice = new Decimal(price).mul(discount).mul(quotationDiscount);
     // const fixedUnitPrice = unitPrice.toFixed(0);
     const fixedUnitPrice = new Decimal(unitPrice).toFixed(0);
     // 複價 計算方式為四捨五入後的單價乘以數量

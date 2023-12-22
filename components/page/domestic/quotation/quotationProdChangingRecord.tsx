@@ -102,7 +102,7 @@ export default function TheQuotationProdChangingRecord({
 
           return (
             <Panel key={index} header={<PanelHeader record={record} isActive={isActive} />}>
-              <ProdRow prodArr={contentProdArr} />
+              <ProdRow prodArr={contentProdArr} quotationDiscount={Number(content.discount || '100')} />
             </Panel>
           );
         })}
@@ -184,7 +184,14 @@ const theadConfigList: TtheadConfigList = {
 };
 // ===================================================================
 
-const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) => {
+const ProdRow = ({
+  //
+  prodArr,
+  quotationDiscount,
+}: {
+  prodArr: TquotationProductDto[] | undefined;
+  quotationDiscount: number;
+}) => {
   const {
     // reRender,
     // reset,
@@ -218,6 +225,7 @@ const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) =
     productArr: prodArr ?? [],
     others: [],
     resetTrigger: prodArr,
+    quotationDiscount: quotationDiscount,
   });
 
   return (
