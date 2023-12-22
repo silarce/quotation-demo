@@ -151,6 +151,7 @@ export default function AttachContract({
     productArr: formatedContent?.products,
     others: formatedContent?.others,
     resetTrigger: data,
+    quotationDiscount: Number(formatedContent?.discount || '100'),
   });
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');

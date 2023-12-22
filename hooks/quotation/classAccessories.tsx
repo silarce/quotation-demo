@@ -103,14 +103,17 @@ class Class_accessories {
   }
 
   calcAllPrice() {
-    const price = this._acceData.price;
     const discount = new Decimal(this._prod.discount).div(100);
+    const quotationDiscount = new Decimal(this._prod.quotationDiscount).div(100);
 
     const quantity = this.quantity || 0;
+
+    const price = this._acceData.price;
+
     // 牌價複價;
     const dualPrice = new Decimal(price).mul(quantity);
     // 單價;
-    const unitPrice = new Decimal(price).mul(discount);
+    const unitPrice = new Decimal(price).mul(discount).mul(quotationDiscount);
 
     // this._acceData.dualPrice = Number(dualPrice.toFixed(0));
     // this._acceData.unitPrice = Number(unitPrice.toFixed(0));

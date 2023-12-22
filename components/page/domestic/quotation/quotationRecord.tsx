@@ -129,7 +129,11 @@ export default function QuotationRecord({ subContract }: { subContract: Tquotati
                 <div className={style.prodContainer}>
                   {/* <Thead />
                   <Tbody product={product} /> */}
-                  <ProdRow prodArr={contentProdArr} />
+                  <ProdRow
+                    //
+                    prodArr={contentProdArr}
+                    quotationDiscount={Number(content.discount || '100')}
+                  />
                 </div>
               </Panel>
             );
@@ -187,7 +191,13 @@ export default function QuotationRecord({ subContract }: { subContract: Tquotati
 // ================================================================
 // ================================================================
 
-const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) => {
+const ProdRow = ({
+  prodArr,
+  quotationDiscount,
+}: {
+  prodArr: TquotationProductDto[] | undefined;
+  quotationDiscount: number;
+}) => {
   const {
     // reRender,
     // reset,
@@ -221,6 +231,7 @@ const ProdRow = ({ prodArr }: { prodArr: TquotationProductDto[] | undefined }) =
     productArr: prodArr ?? [],
     others: [],
     resetTrigger: prodArr,
+    quotationDiscount: quotationDiscount,
   });
 
   return (

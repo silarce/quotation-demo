@@ -206,6 +206,7 @@ version>1 是子合約
     productArr: content?.products ?? [],
     others: content?.others ?? [],
     resetTrigger: content?.products,
+    quotationDiscount: Number(content?.discount || '100'),
   }); // 合約項目
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
@@ -618,6 +619,7 @@ const OldQuotationProduction = ({
     productArr: rootContent?.products ?? [],
     others: [],
     resetTrigger: rootContent?.products,
+    quotationDiscount: Number(rootContent?.discount || '100'),
   });
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');

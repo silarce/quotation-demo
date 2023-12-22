@@ -13,6 +13,7 @@
  * creAcceList
  * accessoriesList
  * takeDefaultDynaValue
+ * 
  * calcProdAllprice_timeout
  *
  *
@@ -139,6 +140,8 @@ class Class_product {
     //
     onDoorTypeChange,
     disabled_quantity,
+    //
+    quotationDiscount,
   }: {
     reRender: TreRender;
     prodData?: Tprod;
@@ -153,6 +156,9 @@ class Class_product {
     //
     onDoorTypeChange?: (obj: { newDoorType: string; newIsAntiTyphoon: boolean }) => void;
     disabled_quantity?: boolean;
+    //
+    // 報價單折數，也就是TquotationContentDto[discount]
+    quotationDiscount: number;
   }) {
     this.reRender = reRender;
     // this.setIsLoading = setIsLoading;
@@ -180,6 +186,9 @@ class Class_product {
     this.findBDoptions();
 
     this.disabled_quantity = disabled_quantity;
+
+    // 報價單折數，也就是TquotationContentDto[discount]
+    this._quotationDiscount = quotationDiscount;
 
     // __________________________________________________________;
 
@@ -279,6 +288,8 @@ class Class_product {
   private _theW = '';
   // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
   private _dontCalcWG = false;
+
+  private _quotationDiscount = 100;
 
   // ---------------------------------------------------------
   // 追加追減用的
@@ -1377,6 +1388,27 @@ class Class_product {
     }
   }
 
+  // ----------------------------------------------------------------
+
+  calcAllPrice_comAndSubComAndAcce() {
+    Object.values(this.comList ?? {}).forEach((item, index, arr) => {
+      if (item) {
+        item.calcAllPrice();
+      }
+    });
+    Object.values(this.subComList ?? {}).forEach((item, index, arr) => {
+      if (item) {
+        item.calcAllPrice();
+      }
+    });
+
+    Object.values(this.accessoriesList).forEach((item, index, arr) => {
+      item.calcAllPrice();
+    });
+  }
+
+  // ----------------------------------------------------------------
+
   private timeoutId_calcProdAllprice: NodeJS.Timeout | null = null;
 
   /**計算prod所有的價格 防抖*/
@@ -1390,14 +1422,17 @@ class Class_product {
     }, 100);
   }
 
+  // 直接編輯牌價(set price)時使用，不會涉及材料配件與選配的價格計算
   calcProdAllprice_simple() {
     const price = new Decimal(this._prodData.price);
     const qty = this._prodData.quantity;
-    const discount = Number(this._prodData.discount || '0');
+    const discount = new Decimal(this._prodData.discount || '0').div(100);
+    const quotationDiscount = new Decimal(this._quotationDiscount || '0').div(100);
 
-    this.dualPrice = price.mul(qty).toString();
-    this.unitPrice = price.mul(discount).div(100).toString();
-    this.totalPrice = price.mul(qty).mul(discount).div(100).toString();
+    this.dualPrice = price.mul(qty).toFixed(0);
+    const unitPrice = price.mul(discount).mul(quotationDiscount).toFixed(0);
+    this.unitPrice = unitPrice;
+    this.totalPrice = new Decimal(unitPrice).mul(qty).toFixed(0);
   }
 
   /**計算prod所有的價格 */
@@ -1948,6 +1983,20 @@ class Class_product {
   }
   // ---------------------------------------------------------
 
+  // 報價單折數，也就是TquotationContentDto[discount]
+  get quotationDiscount() {
+    return this._quotationDiscount;
+  }
+
+  set quotationDiscount(v) {
+    this._quotationDiscount = v;
+    // 因為折數改變了，所以選配設定的價格要重新計算
+    this.calcAllPrice_comAndSubComAndAcce();
+
+    // this.calcProdAllprice_timeout();
+    this.reRender();
+  }
+
   get discount() {
     return this._prodData.discount;
   }
@@ -1966,22 +2015,8 @@ class Class_product {
 
     this._prodData.discount = `${Number(v)}`;
 
-    // TODO 這個地方要做防抖
     // 因為折數改變了，所以選配設定的價格要重新計算
-    Object.values(this.comList ?? {}).forEach((item, index, arr) => {
-      if (item) {
-        item.calcAllPrice();
-      }
-    });
-    Object.values(this.subComList ?? {}).forEach((item, index, arr) => {
-      if (item) {
-        item.calcAllPrice();
-      }
-    });
-
-    Object.values(this.accessoriesList).forEach((item, index, arr) => {
-      item.calcAllPrice();
-    });
+    this.calcAllPrice_comAndSubComAndAcce();
 
     this.reRender();
   }
@@ -2842,6 +2877,7 @@ class Class_product {
       doorModelList: this._doorModelList,
       parentProd: this,
       disabled_quantity: true,
+      quotationDiscount: this._quotationDiscount,
     });
 
     this.reRender();
