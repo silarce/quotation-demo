@@ -1241,10 +1241,23 @@ class Class_workSheet {
   get bodyItemArr(): TupdateWorkSheetItem[] {
     const componentArr = Object.values(this.comList);
 
-    const accessories: TupdateWorkSheetItem['accessories'] = this._acceIdArr.map((id) => {
-      const acce = this._accessoriesOptionList[id] ?? {};
+    const accessories: TupdateWorkSheetItem['accessories'] = this._acceIdArr.map((codeName) => {
+      const acce = this._accessoriesOptionList[codeName] ?? {};
+
+      const theAcce = this._prod.accessories.find((item) => {
+        return item.codeName === codeName;
+      });
+
+      let id = undefined;
+
+      if (theAcce && 'id' in theAcce) {
+        if (theAcce.id) {
+          id = theAcce.id;
+        }
+      }
 
       const acceBody: TupdateWorkSheetItem['accessories'][number] = {
+        id: id,
         codeName: acce.id, //代號
         name: acce.name, //名稱
         unit: acce.unit ?? '', // 單位

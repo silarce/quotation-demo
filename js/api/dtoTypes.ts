@@ -827,7 +827,7 @@ export type TquotationProductAccessoriesDto = {
 export type TcreateQuotationProductAccessoriesDto = Omit<
   TquotationProductAccessoriesDto,
   'id' | 'createdAt' | 'updatedAt'
->;
+> & { id?: string };
 
 // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
 export type TquotationProductComponentsDto = {
