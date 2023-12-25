@@ -198,7 +198,7 @@ const useProductList = ({
         gapC: prod.gapC ?? '',
         gearNumber: prod.gearNumber ?? '',
         weight: prod.weight ?? '',
-        isUL: prod.isUL ?? false,
+        isULGuideRail: prod.isULGuideRail ?? false,
       };
 
       list[key] = new Class_product({
@@ -549,7 +549,7 @@ const useProductList = ({
           gapC: prod.gapC ?? '',
           gearNumber: prod.gearNumber ?? '',
           weight: prod.weight ?? '',
-          isUL: prod.isUL ?? false,
+          isULGuideRail: prod.isULGuideRail ?? false,
         };
 
         list[key] = new Class_product({

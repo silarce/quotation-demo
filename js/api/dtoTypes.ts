@@ -946,7 +946,7 @@ export type TquotationProductDto = {
   bottomBarAngleIron: string; // 底座角鐵
   bottomBarPlate: string; // 底座板
 
-  isUL?: boolean | null;
+  isULGuideRail?: boolean | null;
 
   items?: {
     // 材料配件

@@ -473,14 +473,14 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
-  isUL: {
+  isULGuideRail: {
     label: 'UL',
     theadItemClassName: 'text-center',
     inputSelProps: {
       showBaseline: 'invisible',
       wrapperStyle: { width: '100px' },
       checkBoxProps: {
-        propsArr: [{ key: 'isUL' }],
+        propsArr: [{ key: 'isULGuideRail' }],
       },
     },
   },

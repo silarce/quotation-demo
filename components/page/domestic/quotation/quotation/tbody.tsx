@@ -473,7 +473,7 @@ function DndRow({
               theDisabled = item.isTyphoonProtectionDisabled;
             }
 
-            if (key === 'isUL' && item.isIsULDisabled) {
+            if (key === 'isULGuideRail' && item.isIsULDisabled) {
               theDisabled = item.isIsULDisabled;
             }
 

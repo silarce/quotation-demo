@@ -217,7 +217,7 @@ type Tprod = {
   gearNumber: string | null; //
   weight: string | null; //
 
-  isUL: boolean;
+  isULGuideRail: boolean;
 
   //
   reduceQty?: number;
@@ -1257,7 +1257,7 @@ class Class_product {
         isAntiTyphoon: this.typhoonProtection,
         hasSilencingStrip: this.doorTrackSilencerStrip,
         imageName: this.doorTrack,
-        isUL: this.isUL,
+        isUL: this.isULGuideRail,
       },
     });
 
@@ -2682,7 +2682,7 @@ class Class_product {
 
     //
     this._prodData.typhoonProtection = v;
-    this._prodData.isUL = false;
+    this._prodData.isULGuideRail = false;
 
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
@@ -2852,11 +2852,11 @@ class Class_product {
     this.reRender();
   }
 
-  get isUL() {
-    return this._prodData.isUL;
+  get isULGuideRail() {
+    return this._prodData.isULGuideRail;
   }
-  set isUL(bool) {
-    this._prodData.isUL = bool;
+  set isULGuideRail(bool) {
+    this._prodData.isULGuideRail = bool;
     this.callRetrieveCreProdCom();
 
     this.reRender();
@@ -3267,7 +3267,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     // 'onePieceRollUpBox', // 一體式捲箱
     'rollUpBoxThick', // 捲箱厚度
     'close', // 開閉方式
-    'isUL',
+    'isULGuideRail',
     // 'bottomBarAngleIron', // 底座角鐵
     // 'bottomBarPlate', // 底座板
   ];
@@ -3357,7 +3357,7 @@ const emptyProdOri = (): Tprod => {
     gearNumber: '',
     weight: '',
 
-    isUL: false,
+    isULGuideRail: false,
   };
 };
 
