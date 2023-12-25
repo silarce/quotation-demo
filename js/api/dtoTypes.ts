@@ -404,6 +404,8 @@ export type TlegacyContractProductDto = {
   batch: number;
   /**所屬批次編號 */
   batchNumber: string;
+  //
+  order: number; // 排序編號
 };
 
 export type TlegacyContractProductItemDto = Omit<TlegacyContractProductDto, 'batch' | 'batchNumber' | 'quantity'> & {
@@ -586,6 +588,8 @@ export type TcreateLegacyContractProductDto = {
   thickness: string;
   /**開閉方式 */
   closingType: string;
+  //
+  order: number; // 排序編號
 };
 
 export type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {
@@ -860,6 +864,7 @@ export type TquotationProductComponentsDto = {
 
   desc: string | null;
   density: string | null;
+  //
 };
 // 但是後端有建立這個型別
 export type TcreateQuotationProductComponentDto = Omit<
@@ -944,6 +949,8 @@ export type TquotationProductDto = {
 
   bottomBarAngleIron: string; // 底座角鐵
   bottomBarPlate: string; // 底座板
+
+  isULGuideRail?: boolean | null;
 
   items?: {
     // 材料配件
@@ -1723,6 +1730,8 @@ export type TdoorGuideRailDto = {
   /**消音條 */
   hasSilencingStrip: boolean; // 消音條
   imageName: string | null; // 圖片名稱
+
+  isUL: boolean;
 };
 
 export type TdoorSidePlateDto = {

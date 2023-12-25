@@ -42,7 +42,7 @@ import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 
 // ==========================================================
 type Titem = {
-  [key: string]: any;
+  [key: string]: any; //TODO 重構時要處理好型別
   delSelf?: () => void;
   copySelf?: () => void;
   clearAttach?: () => void;
@@ -471,6 +471,10 @@ function DndRow({
 
             if (key === 'typhoonProtection' && item.isTyphoonProtectionDisabled) {
               theDisabled = item.isTyphoonProtectionDisabled;
+            }
+
+            if (key === 'isULGuideRail' && item.isIsULDisabled) {
+              theDisabled = item.isIsULDisabled;
             }
 
             // if (key === 'quantity') {

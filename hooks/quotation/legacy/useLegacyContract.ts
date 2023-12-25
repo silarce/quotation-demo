@@ -53,13 +53,19 @@ type TadditionList = {
 
 // =======================================================================
 class Class_legacyContract {
-  constructor(
-    reRender: TreRender,
-    legacyContract: (TlegacyContractDto | TemptyLegacyContract) & { customer?: TcustomerDto | undefined },
-    prodCellConfig: TprodCellConfig,
-    additionCellConfig: TadditionCellConfig,
-    isAppend = false
-  ) {
+  constructor({
+    reRender,
+    legacyContract,
+    prodCellConfig,
+    additionCellConfig,
+    isAppend = false,
+  }: {
+    reRender: TreRender;
+    legacyContract: (TlegacyContractDto | TemptyLegacyContract) & { customer?: TcustomerDto | undefined };
+    prodCellConfig: TprodCellConfig;
+    additionCellConfig: TadditionCellConfig;
+    isAppend?: boolean;
+  }) {
     this._legacyContract = legacyContract;
     this._reRender = reRender;
 
@@ -68,10 +74,10 @@ class Class_legacyContract {
 
     // --------------------------------------------------------------
 
-    const sortedProdArr = _.sortBy(this._legacyContract.products, 'createdAt');
+    // const sortedProdArr = _.sortBy(this._legacyContract.products, 'order');
     /**  主產品設定 (包括材料配件設定) 裡面裝的是class*/
     const prodList: TprodList = {};
-    sortedProdArr.forEach((prodData) => {
+    this._legacyContract.products.forEach((prodData) => {
       let key: string;
 
       if ('id' in prodData) {
@@ -178,6 +184,8 @@ class Class_legacyContract {
 
   private _legacyContract;
   private _reRender;
+
+  verticalKeyArr: string[] = [];
 
   // ---------------------
   private _prodList;
@@ -565,31 +573,18 @@ class Class_legacyContract {
       return this._legacyContract.customer?.id || null;
     })();
 
-    // if (!customerId) {
-    //   myAlert.warning({ title: '請選擇客戶' });
-
-    //   return false;
-    // }
-
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
-    // let haveQty0 = false;
+    const orderedProdArr = this.verticalKeyArr.map((key) => {
+      return this._prodList[key];
+    });
 
-    legacyContractCopy.products = Object.values(this._prodList).map((prod, index) => {
+    legacyContractCopy.products = Object.values(orderedProdArr).map((prod, index) => {
       const thePost = prod.postProd;
-
-      // if (!prod.postProd.quantity) {
-      //   haveQty0 = true;
-      // }
+      thePost.order = index;
 
       return thePost;
     });
-
-    // if (haveQty0) {
-    //   myAlert.warning({ title: '所有主產品的數量不可以為0或不輸入' });
-
-    //   return false;
-    // }
 
     legacyContractCopy.additions = Object.values(this._additionList).map((prod) => prod.postAddition);
 
@@ -712,10 +707,12 @@ const useLegacyContract = ({
   contract,
   batch,
   isAppend,
+  verticalKeyArr,
 }: {
   contract: TlegacyContractDto | undefined;
   batch: number;
   isAppend?: boolean;
+  verticalKeyArr: string[]; // 必須是狀態，有useEffect依賴這個property
 }) => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => state + 1);
@@ -733,8 +730,12 @@ const useLegacyContract = ({
       };
     }
 
-    // --------------------------
     const copyContract = _.cloneDeep(contract);
+    //_______________________________________________
+    copyContract.products = _.sortBy(copyContract.products, 'order');
+
+    //_______________________________________________
+
     type TnotesReacordItem = Exclude<typeof contract.notesRecord, undefined>[number];
     const notesRecord = contract.notesRecord ?? [];
 
@@ -750,7 +751,7 @@ const useLegacyContract = ({
 
     const thisBatchNotes = notesRecordByBatch[`${batch}`]?.notes ?? [];
     copyContract.notes = thisBatchNotes;
-    // --------------------------
+    //_______________________________________________
 
     // let notesArrBeforeThisBatchAndThisBatch: string[] = [];
     // Object.keys(notesRecordByBatch).forEach((key) => {
@@ -763,7 +764,7 @@ const useLegacyContract = ({
     // });
     // notesArrBeforeThisBatchAndThisBatch = _.uniq(notesArrBeforeThisBatchAndThisBatch);
 
-    // --------------------------
+    //_______________________________________________
 
     return {
       copyContract,
@@ -833,13 +834,14 @@ const useLegacyContract = ({
       }
     }
 
-    return new Class_legacyContract(
-      reRender,
-      _.cloneDeep(copyContract) ?? emptyLegacyContract(),
-      prodCellConfigCre(),
-      additionCellConfigCre(),
-      isAppend
-    );
+    return new Class_legacyContract({
+      reRender: reRender,
+      legacyContract: _.cloneDeep(copyContract) ?? emptyLegacyContract(),
+      prodCellConfig: prodCellConfigCre(),
+      additionCellConfig: additionCellConfigCre(),
+      isAppend: isAppend,
+      // verticalKeyArr: verticalKeyArr,
+    });
   };
 
   // 回朔到修改前的狀態
@@ -853,7 +855,13 @@ const useLegacyContract = ({
     if (classLegacyContract && isAppend) {
       classLegacyContract.countSubTotal();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classLegacyContract]);
+
+  useEffect(() => {
+    classLegacyContract.verticalKeyArr = verticalKeyArr;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [verticalKeyArr]);
 
   // -----------------------------------------------------------------
   const { difference_prod, difference_addi } = useMemo(() => {
@@ -952,6 +960,7 @@ const emptyProdCre = (): TcreateLegacyContractProductDto => {
     bounceDoor: false,
     notes: '',
     closingType: '',
+    order: 0,
   };
 };
 
