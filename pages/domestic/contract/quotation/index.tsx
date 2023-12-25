@@ -293,7 +293,7 @@ version>1 是子合約
 
           return {
             label: milestone,
-            value: totalPaymentRatio,
+            value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
             onChange: () => {},
             delSelf: () => {},
           };
