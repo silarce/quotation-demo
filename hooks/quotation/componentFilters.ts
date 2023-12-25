@@ -71,6 +71,7 @@ const filter_guideRails = ({
     /**消音條 */
     hasSilencingStrip: boolean; // 消音條
     imageName: string;
+    isUL: boolean;
   };
 }) => {
   const filteredArr = dataArr.filter((data) => {
@@ -84,6 +85,8 @@ const filter_guideRails = ({
       // if (Number(data.thickness) !== 4.5) {
       //   return false;
       // }
+      return false;
+    } else if (data.isUL !== filterParams.isUL) {
       return false;
     }
 
