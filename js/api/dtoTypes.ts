@@ -404,6 +404,8 @@ export type TlegacyContractProductDto = {
   batch: number;
   /**所屬批次編號 */
   batchNumber: string;
+  //
+  order: number; // 排序編號
 };
 
 export type TlegacyContractProductItemDto = Omit<TlegacyContractProductDto, 'batch' | 'batchNumber' | 'quantity'> & {
@@ -586,6 +588,8 @@ export type TcreateLegacyContractProductDto = {
   thickness: string;
   /**開閉方式 */
   closingType: string;
+  //
+  order: number; // 排序編號
 };
 
 export type TupdateLegacyContractProductDto = TcreateLegacyContractProductDto & {

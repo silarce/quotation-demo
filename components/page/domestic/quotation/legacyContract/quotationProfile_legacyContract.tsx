@@ -190,7 +190,11 @@ export default function QuotationProfile({
                   },
                 }}
               />
-              {!customerName && <button onClick={openModal}>請選擇客戶</button>}
+              {!customerName && (
+                <button className={scss.btnSelectCustomer} onClick={openModal}>
+                  請選擇客戶
+                </button>
+              )}
               {customerName && !disabled && <IconRemove02 onClick={clearClient} />}
             </div>
           </div>
