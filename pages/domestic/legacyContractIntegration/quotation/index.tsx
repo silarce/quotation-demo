@@ -3,26 +3,28 @@
 // 舊合約
 
 /**
-關於垂直排序記錄功能
-現在後端沒有紀錄order
-前端也沒有做在Class_legacyContract裡做紀錄
+關於主產品的垂直排序
+主產品的垂直排序，紀錄排序的property是order
+在useLegacyContract裡用
+copyContract.products = _.sortBy(copyContract.products, 'order');
+之後會改用[verticalKeyArr,setVerticalKeyArr]紀錄排序狀態
+排序的功能則在QuotationProduction裡的ProductList_legacy裡的useVerticalDnd處理
 
-現在的垂直排序是因應臨時需求做出來的
-只有很簡單的在QuotationProduction.ProductList_legacy裡面
-使用useVerticalDnd做垂直排序
+上傳時，在useLegacyContract的postBody
 
-之後要做這樣的功能的話
-預期後端會在product裡面放order
-前端再用order排序prodcut
-建立prodList的時候以order為key
-如果有重複的order，就用nanoid代替
-再用prodList建立prodKeyArr
+  const orderedProdArr = this.verticalKeyArr.map((key) => {
+      return this._prodList[key];
+    });
+    
+    legacyContractCopy.products = Object.values(orderedProdArr).map((prod, index) => {
+      const thePost = prod.postProd;
+      thePost.order = index;
 
-然後把prodList送進useVerticalDnd
-useVerticalDnd的onChange用來改變prodKeyArr
-prodKeyArr用來map 主產品列表、與exchangePanel(追加追減面板)與pdf
+      return thePost;
+    });
 
-上傳前，先用prodKeyArr.forEach，依序改變prodList的order就可以了
+得到正確排序的陣列，置入order
+然後才送給後端
 
  */
 
@@ -235,7 +237,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: `合約編號 ${classLegacyContract.classBasicInfo.contractNumber}`,
       onClick: () => {},
     },
-    // { label: "工程聯絡單", onClick: () => alert("工程聯絡單") },
   ];
 
   const panel_editable: TpanelList = [
@@ -249,11 +250,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
           return;
         }
 
-        // console.log(postBody.products);
-        // return;
-
-        //
-
         if (!postBody.contractNumber) {
           return myAlert.warning({ title: '請輸入合約編號' });
         }
@@ -261,10 +257,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
         if (!postBody.projectName) {
           return myAlert.warning({ title: '請輸入工程名稱' });
         }
-
-        // if (!postBody.customerId) {
-        //   return myAlert.warning({ title: '請選擇客戶' });
-        // }
 
         const { projectCity, projectDistrict, projectAddress } = postBody;
 
@@ -317,22 +309,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
     : undefined;
 
   const panel_noEditable: TpanelList = [
-    !contractId
-      ? undefined
-      : {
-          type: 'myButton',
-          label: '追加追減',
-          onClick: () =>
-            router.push({
-              // target: '_blank', // 不能用
-              pathname: '/domestic/legacyContractIntegration/quotation/append',
-              query: {
-                contractId: router.query.contractId,
-                batch: latestBatch,
-                isAppending: 'true',
-              },
-            }),
-        },
+    // 舊合約的追加追減功能已棄用
+    // !contractId
+    //   ? undefined
+    //   : {
+    //       type: 'myButton',
+    //       label: '追加追減',
+    //       onClick: () =>
+    //         router.push({
+    //           // target: '_blank', // 不能用
+    //           pathname: '/domestic/legacyContractIntegration/quotation/append',
+    //           query: {
+    //             contractId: router.query.contractId,
+    //             batch: latestBatch,
+    //             isAppending: 'true',
+    //           },
+    //         }),
+    //     },
+
     {
       type: 'myButton',
       label: '匯出舊合約',
