@@ -504,7 +504,11 @@ version>1 是子合約
                 {/* 材料配件設定 */}
                 <Table_com
                   disabled={true}
-                  comList={targetProd?.comList}
+                  // comList={targetProd?.comList}
+                  // FIXME 之後要把型別處理好
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
                   comCellConfig={comCellConfig}
                   comKeyArr={comKeyArr}
                   changeComKeyArr={changeComKeyArr}
