@@ -125,6 +125,107 @@ import type { TdoorModelInfoDto } from 'js/api/api_product';
 import type { TpcgsPrams, TpacParams, TdoorGeneralSpecsDto } from 'js/api/api_product';
 
 // =============================================================================
+
+type Tprod = {
+  id?: string;
+  // order?: string;
+  // discount: `${number}`;
+  discount: string;
+  itemName: string;
+  quoteType: string;
+  doorType: string;
+
+  fullWidth: string; // L(m)
+  WG: string; // W(m)
+
+  height: string; //h(m)
+  boxB: string; // B(m)
+  thickness: string; // 門片厚度?
+  area: string; // 面積
+  volume: string; // 才數
+  material: string;
+  surface: string;
+  doorTrack: string;
+  // 門軌G
+  guideRailG: number;
+  horsepower: string;
+  quantity: number;
+  price: number;
+  dualPrice: number;
+  unitPrice: number;
+  totalPrice: number;
+  typhoonProtection: boolean;
+  bounceDoor: boolean;
+  notes: string;
+  //
+  motor: string; // 馬達廠商
+  voltage: string; // 電壓
+  phase: number; // 相數
+  motorSupport: boolean; // 馬達支撐架
+  bottomBar: string; // 底座類型
+  motorLockBox: string; // 馬達鎖盒
+  doorTrackThick: string; // 門軌厚度
+  rollerSpec: string; // 捲軸規格
+  doorTrackSilencerStrip: boolean; // 門軌消音條
+  onePieceRollUpBox: boolean; // 一體式捲箱
+  rollUpBoxThick: string; // 捲箱厚度
+  close: string; // 開閉方式
+  //
+  // accessories: TcreateQuotationProductAccessoriesDto[];
+  // components: TcreateQuotationProductComponentDto[];
+  // accessories: TquotationProductAccessoriesDto[];
+  // components: TquotationProductComponentsDto[];
+  accessories: (Omit<TquotationProductAccessoriesDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
+  components: (Omit<TquotationProductComponentsDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
+  boxD: string;
+  //
+  bottomBarAngleIron: string;
+  bottomBarPlate: string;
+  //
+  // 用來辨識至追加追減
+  attachedToProductId?: string | null;
+  //
+  distributionBoxPrice: number;
+  // 配電箱單價;
+  distributionBoxUnitPrice: number;
+  // 安裝費牌價;
+  installationFeePrice: number;
+  // 安裝費牌價複價;
+  installationFeeDualPrice: number;
+  // 安裝費數量;
+  installationFeeQuantity: number;
+  // 安裝費單價;
+  installationFeeUnitPrice: number;
+  // 安裝費複價;
+  installationFeeTotalPrice: number;
+
+  slatCount: string | null; //門片 - 捲片支數
+  sprocketWheelModel: string | null; //鏈齒輪 - 鏈齒輪番號
+  sprocketWheelTeethNumber: string | null; //鏈齒輪 - 大鏈輪
+  sprocketWheelChains: string | null; //
+  bearingInnerDiameter: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
+  diameter: string | null; //捲軸 - 尺寸
+  bearingHousingTotalLength: string | null; //捲軸 - 總長
+  guideRailsOpening: string | null; //底座 - 開口
+  slatLength: number | null; //門片長度
+  guideRailLength: number | null; //門軌長度
+  headBoxLength: number | null; //捲箱長度
+  bearingHousingSize: number | null; //軸承座寸法
+  bearingName: string | null; //軸承
+  gapA: string | null; //
+  gapC: string | null; //
+  gearNumber: string | null; //
+  weight: string | null; //
+
+  isUL: boolean;
+
+  //
+  reduceQty?: number;
+  //
+  rootProductId?: string;
+};
+
+// =============================================================================
 class Class_product {
   constructor({
     reRender,
@@ -1156,6 +1257,7 @@ class Class_product {
         isAntiTyphoon: this.typhoonProtection,
         hasSilencingStrip: this.doorTrackSilencerStrip,
         imageName: this.doorTrack,
+        isUL: this.isUL,
       },
     });
 
@@ -2580,6 +2682,7 @@ class Class_product {
 
     //
     this._prodData.typhoonProtection = v;
+    this._prodData.isUL = false;
 
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
@@ -2597,6 +2700,14 @@ class Class_product {
 
   get isTyphoonProtectionDisabled() {
     if (this.doorType !== 'SJ-302') {
+      return true;
+    }
+  }
+
+  get isIsULDisabled() {
+    if (this.typhoonProtection) {
+      return false;
+    } else {
       return true;
     }
   }
@@ -2738,6 +2849,16 @@ class Class_product {
   }
   set close(v) {
     this._prodData.close = v;
+    this.reRender();
+  }
+
+  get isUL() {
+    return this._prodData.isUL;
+  }
+  set isUL(bool) {
+    this._prodData.isUL = bool;
+    this.callRetrieveCreProdCom();
+
     this.reRender();
   }
 
@@ -3100,103 +3221,6 @@ class Class_product {
 // ===========================================================
 // ===========================================================
 
-type Tprod = {
-  id?: string;
-  // order?: string;
-  // discount: `${number}`;
-  discount: string;
-  itemName: string;
-  quoteType: string;
-  doorType: string;
-
-  fullWidth: string; // L(m)
-  WG: string; // W(m)
-
-  height: string; //h(m)
-  boxB: string; // B(m)
-  thickness: string; // 門片厚度?
-  area: string; // 面積
-  volume: string; // 才數
-  material: string;
-  surface: string;
-  doorTrack: string;
-  // 門軌G
-  guideRailG: number;
-  horsepower: string;
-  quantity: number;
-  price: number;
-  dualPrice: number;
-  unitPrice: number;
-  totalPrice: number;
-  typhoonProtection: boolean;
-  bounceDoor: boolean;
-  notes: string;
-  //
-  motor: string; // 馬達廠商
-  voltage: string; // 電壓
-  phase: number; // 相數
-  motorSupport: boolean; // 馬達支撐架
-  bottomBar: string; // 底座類型
-  motorLockBox: string; // 馬達鎖盒
-  doorTrackThick: string; // 門軌厚度
-  rollerSpec: string; // 捲軸規格
-  doorTrackSilencerStrip: boolean; // 門軌消音條
-  onePieceRollUpBox: boolean; // 一體式捲箱
-  rollUpBoxThick: string; // 捲箱厚度
-  close: string; // 開閉方式
-  //
-  // accessories: TcreateQuotationProductAccessoriesDto[];
-  // components: TcreateQuotationProductComponentDto[];
-  // accessories: TquotationProductAccessoriesDto[];
-  // components: TquotationProductComponentsDto[];
-  accessories: (Omit<TquotationProductAccessoriesDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
-  components: (Omit<TquotationProductComponentsDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
-  boxD: string;
-  //
-  bottomBarAngleIron: string;
-  bottomBarPlate: string;
-  //
-  // 用來辨識至追加追減
-  attachedToProductId?: string | null;
-  //
-  distributionBoxPrice: number;
-  // 配電箱單價;
-  distributionBoxUnitPrice: number;
-  // 安裝費牌價;
-  installationFeePrice: number;
-  // 安裝費牌價複價;
-  installationFeeDualPrice: number;
-  // 安裝費數量;
-  installationFeeQuantity: number;
-  // 安裝費單價;
-  installationFeeUnitPrice: number;
-  // 安裝費複價;
-  installationFeeTotalPrice: number;
-
-  slatCount: string | null; //門片 - 捲片支數
-  sprocketWheelModel: string | null; //鏈齒輪 - 鏈齒輪番號
-  sprocketWheelTeethNumber: string | null; //鏈齒輪 - 大鏈輪
-  sprocketWheelChains: string | null; //
-  bearingInnerDiameter: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
-  diameter: string | null; //捲軸 - 尺寸
-  bearingHousingTotalLength: string | null; //捲軸 - 總長
-  guideRailsOpening: string | null; //底座 - 開口
-  slatLength: number | null; //門片長度
-  guideRailLength: number | null; //門軌長度
-  headBoxLength: number | null; //捲箱長度
-  bearingHousingSize: number | null; //軸承座寸法
-  bearingName: string | null; //軸承
-  gapA: string | null; //
-  gapC: string | null; //
-  gearNumber: string | null; //
-  weight: string | null; //
-
-  //
-  reduceQty?: number;
-  //
-  rootProductId?: string;
-};
-
 // type TprodKey = Exclude<keyof Tprod, 'id' | 'order'>;
 type TprodKey = string;
 
@@ -3243,6 +3267,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     // 'onePieceRollUpBox', // 一體式捲箱
     'rollUpBoxThick', // 捲箱厚度
     'close', // 開閉方式
+    'isUL',
     // 'bottomBarAngleIron', // 底座角鐵
     // 'bottomBarPlate', // 底座板
   ];
@@ -3331,6 +3356,8 @@ const emptyProdOri = (): Tprod => {
     gapC: '',
     gearNumber: '',
     weight: '',
+
+    isUL: false,
   };
 };
 

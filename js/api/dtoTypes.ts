@@ -860,6 +860,7 @@ export type TquotationProductComponentsDto = {
 
   desc: string | null;
   density: string | null;
+  //
 };
 // 但是後端有建立這個型別
 export type TcreateQuotationProductComponentDto = Omit<
@@ -944,6 +945,8 @@ export type TquotationProductDto = {
 
   bottomBarAngleIron: string; // 底座角鐵
   bottomBarPlate: string; // 底座板
+
+  isUL?: boolean | null;
 
   items?: {
     // 材料配件
@@ -1723,6 +1726,8 @@ export type TdoorGuideRailDto = {
   /**消音條 */
   hasSilencingStrip: boolean; // 消音條
   imageName: string | null; // 圖片名稱
+
+  isUL: boolean;
 };
 
 export type TdoorSidePlateDto = {
