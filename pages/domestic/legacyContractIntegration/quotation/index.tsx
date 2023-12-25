@@ -310,22 +310,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const panel_noEditable: TpanelList = [
     // 舊合約的追加追減功能已棄用
-    // !contractId
-    //   ? undefined
-    //   : {
-    //       type: 'myButton',
-    //       label: '追加追減',
-    //       onClick: () =>
-    //         router.push({
-    //           // target: '_blank', // 不能用
-    //           pathname: '/domestic/legacyContractIntegration/quotation/append',
-    //           query: {
-    //             contractId: router.query.contractId,
-    //             batch: latestBatch,
-    //             isAppending: 'true',
-    //           },
-    //         }),
-    //     },
+    !contractId
+      ? undefined
+      : {
+          type: 'myButton',
+          label: '追加追減',
+          className: ' opacity-50',
+          onClick: () => {
+            myAlert.info({ title: '此功能已棄用', content: '如有需求請洽資訊部' });
+            // router.push({
+            //   pathname: '/domestic/legacyContractIntegration/quotation/append',
+            //   query: {
+            //     contractId: router.query.contractId,
+            //     batch: latestBatch,
+            //     isAppending: 'true',
+            //   },
+            // });
+          },
+        },
 
     {
       type: 'myButton',
