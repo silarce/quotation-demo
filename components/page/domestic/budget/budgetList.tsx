@@ -134,7 +134,7 @@ export default function BudgetList({
           }
 
           const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
-          sortedContent.shift();
+          // sortedContent.shift(); // 不顯示第一筆
 
           const recordArr = sortedContent.map((content) => {
             const { updatedAt, editNotes, discount, quantity, total } = content;
