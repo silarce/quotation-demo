@@ -127,6 +127,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = useLegacyContract({
     contract: legacyContract,
     batch: 0,
+    verticalKeyArr,
   });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
@@ -247,6 +248,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
         if (!postBody) {
           return;
         }
+
+        // console.log(postBody.products);
+        // return;
+
+        //
 
         if (!postBody.contractNumber) {
           return myAlert.warning({ title: '請輸入合約編號' });

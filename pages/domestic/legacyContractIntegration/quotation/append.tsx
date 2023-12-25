@@ -102,6 +102,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     contract: legacyContract,
     batch: Number(batch),
     isAppend: true,
+    verticalKeyArr,
   });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
