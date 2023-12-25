@@ -575,22 +575,16 @@ class Class_legacyContract {
 
     const legacyContractCopy = _.cloneDeep(this._legacyContract);
 
-    const orderedProdList = this.verticalKeyArr.map((key) => {
+    const orderedProdArr = this.verticalKeyArr.map((key) => {
       return this._prodList[key];
     });
 
-    legacyContractCopy.products = Object.values(orderedProdList).map((prod, index) => {
+    legacyContractCopy.products = Object.values(orderedProdArr).map((prod, index) => {
       const thePost = prod.postProd;
       thePost.order = index;
 
       return thePost;
     });
-
-    // legacyContractCopy.products = Object.values(this._prodList).map((prod, index) => {
-    //   const thePost = prod.postProd;
-
-    //   return thePost;
-    // });
 
     legacyContractCopy.additions = Object.values(this._additionList).map((prod) => prod.postAddition);
 
