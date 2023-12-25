@@ -176,7 +176,7 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
                   disabled={disabled}
                   inputProps={{
                     props: {
-                      placeholder: '請輸入%數',
+                      placeholder: '請輸入比例',
                       value: value,
                       onChange: (e) => onChange(e.target.value),
                       type: 'number',

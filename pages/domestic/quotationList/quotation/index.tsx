@@ -788,6 +788,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         };
 
         const onChange = (v: string) => {
+          if (v === '') {
+            v = '0';
+          }
+
           setPaymentMethod((state) => {
             const copy = [...state];
             copy[index].totalPaymentRatio = v;
@@ -807,7 +811,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         return {
           label: milestone,
-          value: totalPaymentRatio,
+          value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
           onChange,
           onChangeMilestone,
           delSelf,
