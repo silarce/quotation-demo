@@ -1,3 +1,18 @@
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+// 舊合約追加追減功能(這個page)已經於2023-12-21棄用
+
 // useLegacyContract
 
 // 舊合約
@@ -138,6 +153,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   useEffect(() => {
+    return;
+
     (async () => {
       try {
         setIsLoading(true);
@@ -257,6 +274,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   // -----------------------------------------------------------------------
+
+  return <Deprecated router={router} />;
+
+  // -----------------------------------------------------------------------
   if (!classLegacyContract) {
     return null;
   }
@@ -347,3 +368,33 @@ function TheQuotation({ router }: { router: NextRouter }) {
     </SubLayer>
   );
 }
+
+const Deprecated = ({ router }: { router: NextRouter }) => {
+  const tagList: TtagList = [
+    {
+      label: `舊合約追加追減`,
+      onClick: () => {},
+    },
+  ];
+
+  const panel: TpanelList = [
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => {
+        router.back();
+      },
+    },
+  ];
+
+  return (
+    <SubLayer>
+      <PageHeader02 tagList={tagList} panelList={panel} />
+      <div className="p-10">
+        <p className="text-5xl text-center">舊合約追加追減功能已被棄用</p>
+        <p className="text-3xl text-center mt-5">請點擊右上方返回按鈕返回</p>
+        <p className="text-3xl text-center mt-5">如有需求請洽資訊部</p>
+      </div>
+    </SubLayer>
+  );
+};

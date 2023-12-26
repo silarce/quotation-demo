@@ -637,7 +637,7 @@ type Tcomponent = {
   componentId?: string;
 
   order?: number;
-}; //  Taccessory
+}; //  Tcomponent
 
 // type TacceKey = keyof Taccessory;
 // w Class_SubCom也會使用這邊的設定，所以這邊有更改的話Class_SubCom那邊也要處理Z

@@ -233,7 +233,7 @@ export default function AttachContract({
 
           return {
             label: milestone,
-            value: totalPaymentRatio,
+            value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
             onChange: () => {},
             delSelf: () => {},
           };
