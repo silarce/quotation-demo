@@ -166,7 +166,7 @@ class Class_component {
       componentId: this._com.componentId ?? '',
       material: this._com.material ?? '', // 注意，api不接受空字串
       // 臨時新增烤漆，烤漆的處理等同2B
-      materialSurface: this._com.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | undefined,
+      materialSurface: this._com.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | undefined,
       isPainted: !!this._com.isPainted,
     };
 

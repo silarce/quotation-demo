@@ -1031,7 +1031,7 @@ class Class_product {
       let materialSurface = item.componentInfo.materialSurface;
 
       // materialSurface臨時新增烤漆，烤漆的處理等同2B
-      if (materialSurface === '烤漆') {
+      if (materialSurface === '烤漆' || materialSurface === '氟碳') {
         materialSurface = '2B';
       }
 
