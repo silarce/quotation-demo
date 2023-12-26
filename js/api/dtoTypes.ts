@@ -1839,7 +1839,7 @@ export type TdoorComponentListDto = {
 export type TgenerateDoorProductBomDto_ComponentInfo = {
   id: string;
   material: string; // 材質
-  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4' | null; // 表面處理
+  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | null; // 表面處理
   isPainted: boolean; // 烤漆
 };
 

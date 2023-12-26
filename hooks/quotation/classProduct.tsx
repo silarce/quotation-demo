@@ -38,6 +38,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import {
   optionsCreator_surface,
+  optionsCreator_surface_onlyPaint,
   optionsCreator_doorModel,
   optionsCreator_bottomBarAngleIron,
   optionsCreator_bottomBarPlate,
@@ -50,6 +51,7 @@ import {
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
+const options_surface_onlyPaint = optionsCreator_surface_onlyPaint();
 const options_doorModel = optionsCreator_doorModel();
 
 // ===========================================================
@@ -1022,10 +1024,16 @@ class Class_product {
       const {
         // id,
         material,
-        materialSurface,
         isPainted,
         componentId,
       } = item.componentInfo;
+
+      let materialSurface = item.componentInfo.materialSurface;
+
+      // materialSurface臨時新增烤漆，烤漆的處理等同2B
+      if (materialSurface === '烤漆') {
+        materialSurface = '2B';
+      }
 
       if (!componentId || !material) {
         console.log('reqProdGenerateDoorProductBom中斷，componentId或material為空');
@@ -2034,6 +2042,10 @@ class Class_product {
 
   /**表面 */
   get options_surface() {
+    if (!this.material) {
+      return undefined;
+    }
+
     const isSST = checkIsSST(this.material);
 
     if (isSST) {
@@ -2046,7 +2058,9 @@ class Class_product {
       return options_surface;
     }
 
-    return undefined;
+    return options_surface_onlyPaint;
+
+    // return undefined;
   }
 
   /**底座角鐵 */
@@ -3374,13 +3388,7 @@ const checkIsSST = (material: string) => {
   return material.startsWith('SST#');
 };
 
-const creOptions_surface: () => Toption[] = () => [
-  { value: '2B', label: '2B' },
-  { value: 'HL', label: 'HL' },
-  { value: 'BA', label: 'BA' },
-  { value: 'NO.4', label: 'NO.4' },
-];
-
+const creOptions_surface: () => Toption[] = () => optionsCreator_surface();
 // // 單位為m
 // const pairBD: TpariBD = {
 //   'SJ-302': {

@@ -88,7 +88,8 @@ class Class_payInfo {
   set subTotal(v) {
     // v = v.replace(/,/g, '');
 
-    const numberRegex = /^(\d+(\.\d+)?|)$/;
+    // const numberRegex = /^(\d+(\.\d+)?|)$/;
+    const numberRegex = /^-?(\d+(\.\d+)?|)$/;
 
     if (!numberRegex.test(v)) {
       return;
@@ -115,7 +116,8 @@ class Class_payInfo {
   set salesTax(v) {
     // v = v.replace(/,/g, '');
 
-    const numberRegex = /^(\d+(\.\d+)?|)$/;
+    // const numberRegex = /^(\d+(\.\d+)?|)$/;
+    const numberRegex = /^-?(\d+(\.\d+)?|)$/;
 
     if (!numberRegex.test(v)) {
       return;
@@ -137,7 +139,8 @@ class Class_payInfo {
   set total(v) {
     v = v.replace(/,/g, '');
 
-    const numberRegex = /^(\d+(\.\d+)?|)$/;
+    // const numberRegex = /^(\d+(\.\d+)?|)$/;
+    const numberRegex = /^-?(\d+(\.\d+)?|)$/;
 
     if (!numberRegex.test(v)) {
       return;

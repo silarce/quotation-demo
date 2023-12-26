@@ -172,8 +172,8 @@ class Class_addition {
     }
 
     this._quantity = v;
-    v = parseInt(v || '0').toString();
-    this._addition.quantity = parseInt(v || '0');
+    v = Number(v || '0').toString();
+    this._addition.quantity = Number(v || '0');
     this._countTotalPrice();
     this._reRender();
   }
@@ -217,8 +217,8 @@ class Class_addition {
       return;
     }
 
-    this._totalPrice = v;
-    this._addition.totalPrice = parseFloat(v || '0');
+    this._totalPrice = new Decimal(v || '0').toFixed(0);
+    this._addition.totalPrice = Number(new Decimal(v || '0').toFixed(0));
     this._countSubTotal();
     this._reRender();
   }
