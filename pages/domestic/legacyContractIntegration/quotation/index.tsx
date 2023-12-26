@@ -268,6 +268,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
         postBody.supervisorId = emp_director?.id || null;
         postBody.operatorId = emp_agent?.id || null;
 
+        postBody.additions = postBody.additions.map((item, index) => {
+          item.order = index;
+
+          return item;
+        });
+
         try {
           setIsLoading(true);
           const res = contractId
