@@ -8,6 +8,7 @@ import { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody'
 
 import { TdoorComponentListDto } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
+import { optionsCreator_surface, optionsCreator_surface_onlyPaint } from 'js/utils/options/productOptions';
 
 import { Class_product, checkIsSST, creOptions_surface } from './classProduct';
 
@@ -164,7 +165,8 @@ class Class_component {
       id: this._com.id ?? '',
       componentId: this._com.componentId ?? '',
       material: this._com.material ?? '', // 注意，api不接受空字串
-      materialSurface: this._com.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | undefined,
+      // 臨時新增烤漆，烤漆的處理等同2B
+      materialSurface: this._com.materialSurface as '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | undefined,
       isPainted: !!this._com.isPainted,
     };
 
@@ -195,11 +197,15 @@ class Class_component {
   }
 
   get options_surface() {
-    if (checkIsSST(this.material ?? '')) {
-      return creOptions_surface();
+    if (!this.material) {
+      return undefined;
     }
 
-    return undefined;
+    if (checkIsSST(this.material ?? '')) {
+      return optionsCreator_surface();
+    }
+
+    return optionsCreator_surface_onlyPaint();
   }
 
   // ---------------------------------------------------------

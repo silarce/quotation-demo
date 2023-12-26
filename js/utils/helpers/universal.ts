@@ -5,7 +5,8 @@ const clearThousandsSeparator = (v: string) => {
 
 /**檢查是否為數字串 */
 const checkIsNumberStr = (v: string) => {
-  const numberRegex = /^(\d+(\.\d+)?|)$/;
+  // const numberRegex = /^(\d+(\.\d+)?|)$/;
+  const numberRegex = /^-?(\d+(\.\d+)?|)$/;
 
   if (!numberRegex.test(v)) {
     return false;
