@@ -294,10 +294,14 @@ export const optionsCreator_surface = createOptionsCreator({
     { value: 'BA', label: 'BA' },
     { value: 'NO.4', label: 'NO.4' },
     { value: '烤漆', label: '烤漆' },
+    { value: '氟碳', label: '氟碳' },
   ],
 });
 export const optionsCreator_surface_onlyPaint = createOptionsCreator({
-  optionsArr: [{ value: '烤漆', label: '烤漆' }],
+  optionsArr: [
+    { value: '烤漆', label: '烤漆' },
+    { value: '氟碳', label: '氟碳' },
+  ],
 });
 
 export const optionsCreator_boxB_SJ302 = createOptionsCreator({
