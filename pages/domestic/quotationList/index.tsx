@@ -39,7 +39,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
   // Budget
   // Bidding
   // Contracting
-  const status = router.query.status as 'Budget' | 'Bidding' | 'Contracting';
+  const status = router.query.status as 'Budget' | 'Bidding' | 'Contracting' | 'Pending';
 
   const { userInfo } = useContext(AppContext);
   const userEmp = userInfo?.employee;
@@ -62,6 +62,23 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
   // 待審核
   const foo = (() => {
     if (!reviewStatus || reviewStatus === '待審核') {
+      if (status === 'Pending') {
+        return {
+          // 使用者為經辦或審核業務
+          $or: {
+            'latestContent.agentEmployee.id': { $eq: userId },
+            'latestContent.reviewSalesEmployee.id': { $eq: userId },
+          },
+          // 還沒送審給業務以外的任一階段審核者
+          $and: {
+            // 'latestContent.toSalesAt': { $null: true },
+            'latestContent.toSupervisorAt': { $null: true },
+            'latestContent.toWorkDirectorAt': { $null: true },
+            'latestContent.toManagerAt': { $null: true },
+          },
+        };
+      }
+
       return {
         // 使用者為經辦
         'latestContent.agentEmployee.id': { $eq: userId },
@@ -144,6 +161,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       //   };
       // }
 
+      // status === "Pending"
       return {
         // 同時滿足兩個條件
         $and: {
@@ -157,10 +175,10 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
               'latestContent.reviewManagerEmployee.id': { $eq: userId },
             },
           },
-          // 2 報價單已送審給任一階段的審核者
+          // 2 報價單已送審給任一階段的審核者(除了業務)
           '2': {
             $or: {
-              'latestContent.toSalesAt': { $notNull: true },
+              // 'latestContent.toSalesAt': { $notNull: true },
               'latestContent.toSupervisorAt': { $notNull: true },
               'latestContent.toWorkDirectorAt': { $notNull: true },
               'latestContent.toManagerAt': { $notNull: true },
