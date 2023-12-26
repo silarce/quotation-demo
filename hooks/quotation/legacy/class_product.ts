@@ -469,7 +469,8 @@ class Class_product {
   set totalPrice(v) {
     v = v.replace(/,/g, '');
 
-    const numberRegex = /^(\d+(\.\d+)?|)$/;
+    // 檢查是否為數字
+    const numberRegex = /^-?(\d+(\.\d+)?|)$/;
 
     if (!numberRegex.test(v)) {
       return;
@@ -484,7 +485,9 @@ class Class_product {
   countTotalPrice() {
     const quantity = this.quantity.replace(/,/g, '') || 0;
     const unitPrice = this.unitPrice.replace(/,/g, '') || 0;
+
     const total = Decimal.mul(quantity, unitPrice).toString();
+
     this.totalPrice = total;
   }
 
