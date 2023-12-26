@@ -491,7 +491,10 @@ class Class_product {
   }
   /**配合apiGetQuotationProducts使用 */
   creComList_dyna({ componentsArr }: { componentsArr: TquotationProductComponentsDto[] }) {
+    const sortedComponent = sortComponent(componentsArr);
+
     const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
+
     componentsArr.forEach((item) => {
       const key = comTypeLookUp[item.type];
       comPreList[key] = {
@@ -507,9 +510,10 @@ class Class_product {
     });
 
     this.creComList({
-      dataList: comPreList as { [key in TcomponentKey]: Tcomponent },
+      dataList: sortedComponent as { [key in TcomponentKey]: Tcomponent },
       isNew: false,
     });
+    //
   }
 
   // ---------------------------------------------------------
@@ -3409,7 +3413,7 @@ const creOptions_surface: () => Toption[] = () => [
 const sortComponent = (comArr: TcreateQuotationProductComponentDto[]) => {
   const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
 
-  // 至邊改順序的話記得retrieveCreProdCom裡面的也要改
+  // 這邊改順序的話記得retrieveCreProdCom裡面的也要改
   const typeArr = [
     'slat',
     'roller',

@@ -1,3 +1,5 @@
+// comVKeyArr 材料配件垂直排序的key
+
 import { useState, useEffect, useMemo } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';

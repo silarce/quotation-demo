@@ -439,6 +439,8 @@ export type TlegacyContractAdditionDto = {
   batch: number;
   /**所屬批次編號 */
   batchNumber: string;
+
+  order: number; // 排序編號
 };
 
 /**舊合約 */
@@ -612,6 +614,7 @@ export type TcreateLegacyContractAdditionDto = {
   notes: string;
   /**單位 */
   unit: string | null;
+  order: number; // 排序編號
 };
 
 export type TupdateLegacyContractAdditionDto = TcreateLegacyContractAdditionDto & {

@@ -120,6 +120,7 @@ class Class_addition {
       totalPrice: this._addition.totalPrice,
       notes: this._addition.notes,
       unit: this._addition.unit || null,
+      order: this._addition.order ?? 0,
     };
 
     this._belongList[key] = new Class_addition({

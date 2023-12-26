@@ -780,6 +780,10 @@ latestContentProdArr為這次追加追減的主產品
         const { milestone, totalPaymentRatio } = item;
 
         const onChange = (v: string) => {
+          if (v === '') {
+            v = '0';
+          }
+
           setPaymentMethod((state) => {
             const copy = [...state];
             copy[index].totalPaymentRatio = v;
@@ -799,7 +803,7 @@ latestContentProdArr為這次追加追減的主產品
 
         return {
           label: milestone,
-          value: totalPaymentRatio,
+          value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
           onChange,
           delSelf,
         };
