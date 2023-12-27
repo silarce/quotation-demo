@@ -2,7 +2,7 @@ import Decimal from 'decimal.js';
 
 import { TlegacyContractDto } from 'js/api/dtoTypes';
 
-import { clearThousandsSeparator } from 'js/utils/helpers/universal';
+import { clearThousandsSeparator, checkIsNumberStr } from 'js/utils/helpers/universal';
 
 // ======================================================================
 import { TemptyLegacyContract, TreRender } from './useLegacyContract';
@@ -87,18 +87,26 @@ class Class_payInfo {
   }
   set subTotal(v) {
     // v = v.replace(/,/g, '');
+    if (!v) {
+      v = '0';
+    }
 
-    // const numberRegex = /^(\d+(\.\d+)?|)$/;
-    const numberRegex = /^-?(\d+(\.\d+)?|)$/;
-
-    if (!numberRegex.test(v)) {
+    if (!checkIsNumberStr(v)) {
       return;
     }
 
-    const salesTax = Decimal.mul(v || 0, 0.05).toFixed(0);
-    const total = Decimal.add(salesTax, v || 0).toString();
-    this._subTotal = v;
-    this._legacyContract.subTotal = parseFloat(v || '0');
+    const int = v === '-' ? 0 : new Decimal(v).round().toNumber();
+
+    if (v === '-') {
+      this._subTotal = '-';
+    } else {
+      this._subTotal = String(int);
+    }
+
+    const salesTax = Decimal.mul(int || 0, 0.05).toFixed(0);
+    const total = Decimal.add(salesTax, int || 0).toString();
+
+    this._legacyContract.subTotal = int;
     this.salesTax = salesTax;
     this.total = total;
     this._reRender();
@@ -116,15 +124,26 @@ class Class_payInfo {
   set salesTax(v) {
     // v = v.replace(/,/g, '');
 
-    // const numberRegex = /^(\d+(\.\d+)?|)$/;
-    const numberRegex = /^-?(\d+(\.\d+)?|)$/;
+    if (!v) {
+      v = '0';
+    }
 
-    if (!numberRegex.test(v)) {
+    if (!checkIsNumberStr(v)) {
       return;
     }
 
-    this._salesTax = v;
-    this._legacyContract.salesTax = Number(v || '0');
+    const int = v === '-' ? 0 : new Decimal(v).round().toNumber();
+
+    if (v === '-') {
+      this._salesTax = '-';
+    } else {
+      this._salesTax = v;
+    }
+
+    const total = Decimal.add(this._legacyContract.subTotal, int || 0).toString();
+
+    this._legacyContract.salesTax = int;
+    this.total = total;
     this._reRender();
   }
   /**總計 */
@@ -137,19 +156,27 @@ class Class_payInfo {
     // return Number(this._total).toLocaleString();
   }
   set total(v) {
-    v = v.replace(/,/g, '');
+    // v = v.replace(/,/g, '');
 
-    // const numberRegex = /^(\d+(\.\d+)?|)$/;
-    const numberRegex = /^-?(\d+(\.\d+)?|)$/;
+    if (!v) {
+      v = '0';
+    }
 
-    if (!numberRegex.test(v)) {
+    if (!checkIsNumberStr(v)) {
       return;
     }
 
-    v = new Decimal(v || 0).toDecimalPlaces(0).toString();
+    const int = v === '-' ? 0 : new Decimal(v).round().toNumber();
 
-    this._total = v; // 必須可以接受空字串""
-    this._legacyContract.total = Number(v || '0'); // 必須是number
+    // v = new Decimal(v || 0).toDecimalPlaces(0).toString();
+
+    if (v === '-') {
+      this._total = '-';
+    } else {
+      this._total = String(int);
+    }
+
+    this._legacyContract.total = int; // 必須是number
     // this._total = v; // 必須可以接受空字串""
     // this._legacyContract.total = parseFloat(v || "0");// 必須是num
     this._reRender();

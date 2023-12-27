@@ -163,17 +163,27 @@ class Class_addition {
     return this._quantity;
   }
   set quantity(v) {
+    if (!checkIsNumberStr(v)) {
+      return;
+    }
+
+    const int = v === '-' ? 0 : Math.trunc(Number(v || 0));
+
     if (this._parentAddition) {
       const parentRemain = this._parentAddition.remainQty + Number(this._quantity);
 
-      if (Number(v) > parentRemain) {
+      if (Number(int) > parentRemain) {
         return;
       }
     }
 
-    this._quantity = v;
-    v = Number(v || '0').toString();
-    this._addition.quantity = Number(v || '0');
+    if (v === '-') {
+      this._quantity = '-';
+    } else {
+      this._quantity = String(int);
+    }
+
+    this._addition.quantity = int;
     this._countTotalPrice();
     this._reRender();
   }
