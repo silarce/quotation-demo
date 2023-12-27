@@ -77,10 +77,11 @@ class Class_component {
   private _prod;
   private _com;
   readonly key;
-  readonly callReqGetCodeNumber = () => {
+
+  callReqGetCodeNumber() {
     this._prod.shouldCall_pgpb = true;
     this._prod.callAllReq();
-  };
+  }
   //
   //
   // private _material: undefined | string = undefined;
