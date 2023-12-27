@@ -5,7 +5,7 @@ export default function Table({ partArr, priceTotal }: { partArr: Tpart[]; price
   return (
     <div className={scss.table}>
       <div className={scss.thead}>
-        <div style={{ width: '90px' }}>
+        <div style={{ width: '50px' }}>
           <span>項次:</span>
         </div>
         {keyIndex.map((key, index) => {
@@ -23,7 +23,8 @@ export default function Table({ partArr, priceTotal }: { partArr: Tpart[]; price
         {partArr.map((part, pIndex) => {
           return (
             <div className={scss.row} key={pIndex}>
-              <div style={{ width: '90px' }}>
+              {/* 項次 */}
+              <div style={{ width: '50px' }}>
                 <span>{pIndex + 1}</span>
               </div>
               {keyIndex.map((key, cIndex) => {
@@ -84,7 +85,7 @@ const config: Tconfig = {
   partName: {
     label: '名稱',
     style: {
-      width: '220px',
+      width: '260px',
     },
   },
   desc: {
