@@ -118,6 +118,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     batch: Number(batch),
     isAppend: true,
     verticalKeyArr,
+    verticalKeyArr_addi: [],
   });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
@@ -322,6 +323,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             isAppend={true}
             isAppending={isAppending}
             difference_addi={difference_addi}
+            onVerticalKeyChange={() => {}}
           />
           {/* 變更 主產品 */}
           {isAppending && <QuotationExProd legacyContract={classLegacyContract} disabled={false} />}
