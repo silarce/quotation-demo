@@ -1461,13 +1461,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const shouldDirect = isManager && status === 'Pending';
 
-    if (isSales && salesReviewedAt) {
+    if (isSales && salesReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isSupervisor && supervisorReviewedAt) {
+    } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isWorkDirector && workDirectorReviewedAt) {
+    } else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
-    } else if (isManager && managerReviewedAt) {
+    } else if (isManager && managerReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
     }
 

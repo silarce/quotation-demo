@@ -13,6 +13,8 @@ import {
   optionsCreator_horsePower,
 } from 'js/utils/options/productOptions';
 
+import { checkIsNumberStr } from 'js/utils/helpers/universal';
+
 const options_doorTrack_normal = optionsCre_doorTrack_normal();
 const options_doorTrack_typhoonProtection = optionsCre_doorTrack_typhoonProtection();
 
@@ -420,18 +422,28 @@ class Class_product {
   get quantity() {
     return this._quantity;
   }
-  set quantity(v) {
+  set quantity(v: string) {
+    if (!checkIsNumberStr(v)) {
+      return;
+    }
+
+    const int = v === '-' ? 0 : Math.trunc(Number(v || 0));
+
     if (this.parentProd) {
       const remain = this.parentProd.remainQty + Number(this._quantity);
 
-      if (Number(v) > remain) {
+      if (Number(int) > remain) {
         return;
       }
     }
 
-    this._quantity = v;
-    v = parseInt(v || '0').toString();
-    this._product.quantity = parseInt(v || '0');
+    if (v === '-') {
+      this._quantity = '-';
+    } else {
+      this._quantity = String(int);
+    }
+
+    this._product.quantity = int;
     this.countTotalPrice();
     this._reRender();
   }
@@ -470,9 +482,7 @@ class Class_product {
     v = v.replace(/,/g, '');
 
     // 檢查是否為數字
-    const numberRegex = /^-?(\d+(\.\d+)?|)$/;
-
-    if (!numberRegex.test(v)) {
+    if (!checkIsNumberStr(v)) {
       return;
     }
 
@@ -483,7 +493,8 @@ class Class_product {
   }
 
   countTotalPrice() {
-    const quantity = this.quantity.replace(/,/g, '') || 0;
+    // const quantity = this.quantity.replace(/,/g, '') || 0;
+    const quantity = this._product.quantity || 0;
     const unitPrice = this.unitPrice.replace(/,/g, '') || 0;
 
     const total = Decimal.mul(quantity, unitPrice).toString();
@@ -999,7 +1010,8 @@ function prodCellConfigCre(): TprodCellConfig {
         inputSelProps: {
           wrapperStyle: { width: '55px' },
           inputProps: {
-            props: { type: 'number' },
+            props: {},
+            // props: { type: 'number' },
           },
         },
       },
