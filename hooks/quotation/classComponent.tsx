@@ -96,7 +96,7 @@ class Class_component {
 
   // ---------------------------------------------------------
 
-  changeFindedMaterial = (v: string) => {
+  changeFindedMaterial(v: string) {
     if (this.key === 'sidePlate' || this.key === 'roller' || this.key === 'motor' || this.key === 'motorAccessories') {
       return;
     }
@@ -115,7 +115,7 @@ class Class_component {
         this.surface = this.options_surface[0].value;
       }
     }
-  };
+  }
 
   calcAllPrice({ calcProdTotal = true }: { calcProdTotal?: boolean } = {}) {
     const discount = new Decimal(this._prod.discount).div(100);
