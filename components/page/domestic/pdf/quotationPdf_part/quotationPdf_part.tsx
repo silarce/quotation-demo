@@ -184,8 +184,11 @@ export default function QuotationPdf_part({
 
   // -------------------------------------------------------------------------
 
-  const partLimit = 46;
-  const partLimit_afterPage1 = 50;
+  // 如果發現有欄位裡的值有換行的情形，必須要調整欄位寬度或是調整演算法
+  // 不然應該會跑版
+
+  const partLimit = 52;
+  const partLimit_afterPage1 = partLimit + 4; // 公司資訊(<Header/>)約佔4行多
   let partCount = 0;
   let arrIndex = 0;
   const chunkedList: TmainProduct[][] = [[]];
