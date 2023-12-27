@@ -184,15 +184,24 @@ export default function QuotationPdf_part({
 
   // -------------------------------------------------------------------------
 
-  const partLimit = 30;
+  const partLimit = 46;
+  const partLimit_afterPage1 = 50;
   let partCount = 0;
   let arrIndex = 0;
   const chunkedList: TmainProduct[][] = [[]];
 
   mainProductArr.forEach((prod) => {
-    const partQty = prod.part.length;
+    const limit = arrIndex === 0 ? partLimit : partLimit_afterPage1;
 
-    if (partCount + partQty > partLimit) {
+    // +6是因為
+    // 兩行基本資料
+    // 一行thead
+    // 一行報價合計
+    // 一行空白分隔
+    // +1 border的高度
+    const partQty = prod.part.length + 6;
+
+    if (partCount + partQty > limit) {
       partCount = partQty;
       arrIndex++;
       chunkedList[arrIndex] = [];
@@ -231,7 +240,8 @@ export default function QuotationPdf_part({
         return (
           <div className={scss.pdf} key={index} ref={(ele) => (refPdf.current[index] = ele)}>
             {index !== 0 && <hr className={scss.hr} />}
-            <Header />
+            {index === 0 && <Header />}
+
             {chunk.map((prod, index) => {
               return (
                 <div className={scss.part} key={index}>
