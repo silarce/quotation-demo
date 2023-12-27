@@ -212,11 +212,17 @@ export default function QuotationPdf({
       // const thickness_str = thickness_num === 0 ? '' : thickness_num.toFixed(1) + 't';
       const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
 
+      let material = prod.material;
+
+      if (material === '高耐鍍鋅鋼板') {
+        material = '鍍鋅鋼板';
+      }
+
       return {
         category: prod.itemName,
         size,
         doorType: prod.doorType,
-        material: prod.material,
+        material: material,
         thickness: thickness_str,
         surface: prod.surface,
         // doorRail 要收圖片路徑
