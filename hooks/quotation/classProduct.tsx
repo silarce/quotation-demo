@@ -807,12 +807,19 @@ class Class_product {
 
     this._dontCalcWG = false;
 
+    if (!this.doorTrack) {
+      // 必須要有門軌才會有guildRailG才能計算正確的W
+      this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
+    }
+
     this._theW = String(
       calcW({
         WG: Number(this._prodData.WG) || 0,
         G: Number(this.guildRailG) || 0,
       })
     );
+
+    // console.log(this._theW);
 
     //
 
@@ -2705,6 +2712,7 @@ class Class_product {
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
     // this.doorTrack = '';
+
     // this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
 
     this.shouldCall_cgs = true;
