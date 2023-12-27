@@ -879,6 +879,16 @@ latestContentProdArr為這次追加追減的主產品
     }
   }
 
+  // 如果是準合約，如果業務與業務主管為同一人，視為業務主管
+  // 因為在準合約時業務預設為已審核過(salesReviewedAt不為null)所以可以這樣處理
+  if (status === 'Pending') {
+    if (userId === reviewSupervisorEmployeeId) {
+      isSupervisor = true;
+      isSales = false;
+      isReviewer = true;
+    }
+  }
+
   useEffect(() => {
     (async () => {
       try {
@@ -1363,6 +1373,16 @@ latestContentProdArr為這次追加追減的主產品
     }
 
     const shouldDirect = isManager && status === 'Pending';
+
+    if (isSales && salesReviewedAt && body.reviewResult) {
+      return myAlert.warning({ title: '您已經審核過此報價單' });
+    } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
+      return myAlert.warning({ title: '您已經審核過此報價單' });
+    } else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
+      return myAlert.warning({ title: '您已經審核過此報價單' });
+    } else if (isManager && managerReviewedAt && body.reviewResult) {
+      return myAlert.warning({ title: '您已經審核過此報價單' });
+    }
 
     try {
       setIsLoading(true);

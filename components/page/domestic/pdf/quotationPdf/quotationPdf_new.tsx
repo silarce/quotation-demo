@@ -173,10 +173,18 @@ export default function QuotationPdf({
     const attn = agentName;
 
     const payInfo = (() => {
-      const payWay = paymentMethods.map((item) => ({
-        label: item.milestone,
-        value: item.totalPaymentRatio,
-      }));
+      const payWay = paymentMethods.map((item) => {
+        let value = item.totalPaymentRatio;
+
+        if (value === '0') {
+          value = '';
+        }
+
+        return {
+          label: item.milestone,
+          value,
+        };
+      });
 
       const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 

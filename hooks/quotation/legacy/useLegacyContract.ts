@@ -186,6 +186,7 @@ class Class_legacyContract {
   private _reRender;
 
   verticalKeyArr: string[] = [];
+  verticalKeyArr_addi: string[] = [];
 
   // ---------------------
   private _prodList;
@@ -585,9 +586,23 @@ class Class_legacyContract {
 
       return thePost;
     });
+    //
+    //
 
-    legacyContractCopy.additions = Object.values(this._additionList).map((prod) => prod.postAddition);
+    const orderedAddiArr = this.verticalKeyArr_addi.map((key) => {
+      return this._additionList[key];
+    });
 
+    // legacyContractCopy.additions = Object.values(this._additionList).map((prod) => prod.postAddition);
+    legacyContractCopy.additions = orderedAddiArr.map((addi, index) => {
+      const theAddi = addi.postAddition;
+      theAddi.order = index;
+
+      return theAddi;
+    });
+
+    //
+    //
     const quoteDate_Date = (() => {
       if (!legacyContractCopy.quoteDate) {
         return null;
@@ -708,11 +723,13 @@ const useLegacyContract = ({
   batch,
   isAppend,
   verticalKeyArr,
+  verticalKeyArr_addi,
 }: {
   contract: TlegacyContractDto | undefined;
   batch: number;
   isAppend?: boolean;
   verticalKeyArr: string[]; // 必須是狀態，有useEffect依賴這個property
+  verticalKeyArr_addi: string[]; // 必須是狀態，有useEffect依賴這個property
 }) => {
   const [render, setRender] = useState(0);
   const reRender: TreRender = () => setRender((state) => state + 1);
@@ -733,6 +750,7 @@ const useLegacyContract = ({
     const copyContract = _.cloneDeep(contract);
     //_______________________________________________
     copyContract.products = _.sortBy(copyContract.products, 'order');
+    copyContract.additions = _.sortBy(copyContract.additions, 'order');
 
     //_______________________________________________
 
@@ -862,6 +880,10 @@ const useLegacyContract = ({
     classLegacyContract.verticalKeyArr = verticalKeyArr;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [verticalKeyArr]);
+  useEffect(() => {
+    classLegacyContract.verticalKeyArr_addi = verticalKeyArr_addi;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [verticalKeyArr_addi]);
 
   // -----------------------------------------------------------------
   const { difference_prod, difference_addi } = useMemo(() => {
