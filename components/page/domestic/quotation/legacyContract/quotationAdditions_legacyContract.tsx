@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -62,12 +62,14 @@ export default function QuotationAdditions({
   isAppend,
   isAppending,
   difference_addi = 0,
+  onVerticalKeyChange,
 }: {
   legacyContract: Class_legacyContract;
   disabled: boolean;
   isAppend?: boolean;
   isAppending?: boolean;
   difference_addi?: number;
+  onVerticalKeyChange: (newKeyArr: string[]) => void;
 }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -104,6 +106,11 @@ export default function QuotationAdditions({
     listKeyArr: Object.keys(additionList),
     resetTrigger: legacyContract,
   });
+
+  useEffect(() => {
+    onVerticalKeyChange(dndKeyArr);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dndKeyArr]);
 
   const DndRow = useCallback(
     function DndRow({
