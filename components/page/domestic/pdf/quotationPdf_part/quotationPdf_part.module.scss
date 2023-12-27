@@ -34,7 +34,7 @@ $semiMaring: 0 8px;
 .pdf {
   width: calc(595px * 2); // 595*2.7 = 1606
   height: calc(842px * 2);
-  padding: 60px 40px;
+  padding: 20px 40px;
   // line-height:0.5
   &.typeB {
     display: grid;
