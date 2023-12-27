@@ -103,6 +103,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
+  const [verticalKeyArr_addi, setVerticalKeyArr_addi] = useState<string[]>([]);
 
   // --------------------------------------------------------------------------
   const [legacyContractParams, setLegacyContractParams] = useState({
@@ -130,6 +131,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     contract: legacyContract,
     batch: 0,
     verticalKeyArr,
+    verticalKeyArr_addi,
   });
 
   const { attachments, updateAttachments, domain } = useLegacyContracts_id_attachments(contractId);
@@ -424,7 +426,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
             }}
           />
           {/* 其他設定 */}
-          <QuotationAdditions legacyContract={classLegacyContract} disabled={disbaled} />
+          <QuotationAdditions
+            legacyContract={classLegacyContract}
+            disabled={disbaled}
+            onVerticalKeyChange={(arr) => {
+              setVerticalKeyArr_addi(arr);
+            }}
+          />
           {/* 備註/報價範圍/付款資訊 */}
           <QuotationTotal legacyContract={classLegacyContract} disabled={disbaled} appendixParams={appendixParams} />
           {/* 簽名 */}
