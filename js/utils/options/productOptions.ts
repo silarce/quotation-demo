@@ -1,4 +1,6 @@
 import { Toption, addEmpty } from './options';
+import { annotationAndQuotationRangeType } from 'js/api/dtoTypes';
+import { annotationAndQuotationRangeTypeLookup } from 'config/lookupTable';
 
 export type { Toption };
 
@@ -122,10 +124,37 @@ export const optionsCreator_doorModel_2 = (props: { haveEmpty?: boolean } = {}):
 // 門的形式
 export const optionsCreator_doorForm = (props: { haveEmpty?: boolean } = {}): Toption[] => {
   const { haveEmpty } = props;
-  const arr = [
-    { value: 'normal' as const, label: '一般' },
-    { value: 'anti-typhoon' as const, label: '防颱' },
+
+  // annotationAndQuotationRangeType
+  const valueArr: annotationAndQuotationRangeType[] = [
+    'normal',
+    'anti-typhoon',
+    'heat-protection',
+    'heat-protection-smoke-covering',
   ];
+
+  const list = {
+    normal: 'aaaa',
+    'anti-typhoon': 'aaaa',
+    'heat-protection': 'aaaa',
+    'heat-protection-smoke-covering': 'aaaa',
+  };
+
+  const arr = [
+    { value: 'normal', label: annotationAndQuotationRangeTypeLookup['normal'] },
+    { value: 'anti-typhoon', label: annotationAndQuotationRangeTypeLookup['anti-typhoon'] },
+    { value: 'heat-protection', label: annotationAndQuotationRangeTypeLookup['heat-protection'] },
+    {
+      value: 'heat-protection-smoke-covering',
+      label: annotationAndQuotationRangeTypeLookup['heat-protection-smoke-covering'],
+    },
+  ];
+  // const arr = [
+  //   { value: valueArr[0], label: '一般' },
+  //   { value: valueArr[1], label: '防颱' },
+  //   { value: valueArr[2], label: '阻熱' },
+  //   { value: valueArr[3], label: '阻熱遮煙' },
+  // ];
 
   if (haveEmpty) {
     addEmpty(arr);

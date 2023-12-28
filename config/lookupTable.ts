@@ -1,3 +1,5 @@
+import { annotationAndQuotationRangeType } from 'js/api/dtoTypes';
+
 export const customerTypesLookup = Object.freeze({
   // construction: '營造',
   // firm: '事務所',
@@ -16,3 +18,12 @@ export const quotationStatusLookup = Object.freeze({
   Contract: '合約',
   Pending: '準合約',
 } as const);
+
+export const annotationAndQuotationRangeTypeLookup: {
+  [key in annotationAndQuotationRangeType]: string;
+} = {
+  normal: '一般',
+  'anti-typhoon': '防颱',
+  'heat-protection': '阻熱',
+  'heat-protection-smoke-covering': '阻熱遮煙',
+};
