@@ -286,9 +286,9 @@ class Class_product {
     return this._product.itemName;
   }
   set itemName(v) {
-    if (v.length >= 11) {
-      v = v.slice(0, 10);
-    }
+    // if (v.length >= 11) {
+    //   v = v.slice(0, 10);
+    // }
 
     this._product.itemName = v;
     this._reRender();

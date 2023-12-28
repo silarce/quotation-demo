@@ -143,9 +143,9 @@ class Class_addition {
     return this._addition.itemName;
   }
   set itemName(v) {
-    if (v.length >= 11) {
-      v = v.slice(0, 10);
-    }
+    // if (v.length >= 11) {
+    //   v = v.slice(0, 10);
+    // }
 
     this._addition.itemName = v;
     this._reRender();
