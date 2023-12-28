@@ -1792,8 +1792,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         setVisible={setShowMemoModal}
         title={'更新備註'}
         placeholder={'請輸入備註'}
-        tip="最多25字"
-        textLength={25}
+        tip="最多100字"
+        textLength={100}
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
       />
