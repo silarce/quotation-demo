@@ -468,10 +468,17 @@ class Class_product {
     const list: { [key: string]: Class_component } = {};
 
     keyArr.forEach((key) => {
-      const com = dataList[key];
+      let com = dataList[key];
 
       if (!com) {
         return null;
+      }
+
+      if (com.rawData && isNew === false) {
+        com = {
+          ...com.rawData,
+          ...com,
+        };
       }
 
       const theClass = new Class_component({
@@ -500,10 +507,11 @@ class Class_product {
     componentsArr.forEach((item) => {
       const key = comTypeLookUp[item.type];
       comPreList[key] = {
-        ...item,
-        doorModelName: key,
         code: '',
         specialSpec: '',
+        ...(item.rawData ?? {}),
+        ...item,
+        doorModelName: key,
         materialSurface: item.materialSurface || '',
         quantity: String(item.quantity || 0),
         desc: item.desc || '',

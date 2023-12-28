@@ -859,7 +859,17 @@ export type TquotationProductComponentsDto = {
     | 'headBox';
   number: string;
   componentId: string;
-  rawData: object;
+  // TODO 有空要調整型別
+  rawData: object; // 裡面裝的其實是TdoorComponentListDto裡面的property之一
+  // rawData:
+  //   | TdoorSlatDto
+  //   | TdoorBottomBarDto
+  //   | TdoorGuideRailDto
+  //   | TdoorSidePlateDto
+  //   | TdoorRollerDto
+  //   | TdoorMotorDto
+  //   | TdoorMotorAccessoriesDto
+  //   | TdoorHeadBoxDto;
   /**
   從TdoorBomDto_Component取得的bom要直接送進來這個bom
    */
