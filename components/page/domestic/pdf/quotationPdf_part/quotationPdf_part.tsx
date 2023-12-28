@@ -4,8 +4,6 @@ import jsPDF from 'jspdf';
 import ExcelJs from 'exceljs';
 import Moment from 'moment';
 
-import _ from 'lodash';
-
 // component
 import Header from './header';
 import Info from './info';
@@ -85,29 +83,29 @@ export default function QuotationPdf_part({
 
     const sheetName = quotationId;
     const sheet = workbook.addWorksheet(sheetName);
-    const foo = 1.10456536503; // 乘上這個值才會是excel上的寬度
+    const widthAdjust = 1.10456536503; // 乘上這個值才會是excel上的寬度 // 但還是有誤差
     sheet.columns = [
-      { width: 5.89 * foo },
-      { width: 50 },
-      { width: 20 },
-      { width: 10 },
-      { width: 20 },
-      { width: 25 },
-      { width: 20 },
+      { width: 5.89 * widthAdjust },
+      { width: 22.5 * widthAdjust },
+      { width: 22.5 * widthAdjust },
+      { width: 5.89 * widthAdjust },
+      { width: 5.89 * widthAdjust },
+      { width: 10.89 * widthAdjust },
+      { width: 10.89 * widthAdjust },
     ];
     // sheet.columns = [
-    //   { width: 40 },
-    //   { width: 50 },
-    //   { width: 20 },
-    //   { width: 10 },
-    //   { width: 20 },
-    //   { width: 25 },
-    //   { width: 20 },
+    //   { width: 5.89 * widthAdjust },
+    //   { width: 21.89 * widthAdjust },
+    //   { width: 21.89 * widthAdjust },
+    //   { width: 5.89 * widthAdjust },
+    //   { width: 5.89 * widthAdjust },
+    //   { width: 10.89 * widthAdjust },
+    //   { width: 10.89 * widthAdjust },
     // ];
+
     sheet.columns.forEach((item) => (item.font = { name: 'Calibri', size: 11 }));
     // -----------------------------------------------------------
 
-    const rowCount = 1;
     //
     const A1G1 = sheet.getCell('A1');
     sheet.mergeCells('A1:G1');
@@ -131,57 +129,123 @@ export default function QuotationPdf_part({
     G3.alignment = { horizontal: 'right' };
     //
     //
-    //
-    //
-    //
-    //
-    //
-    //
-    // mainProductArr.forEach((item) => {
-    //   sheet.getRow(rowCount).font = { bold: true, size: 18 };
-    //   sheet.getRow(rowCount + 3).font = { bold: true, size: 18 };
 
-    //   let { part } = item;
+    let rowCount = 4;
 
-    //   part = part.map((item, index) => {
-    //     if (item.unit === 'm2' || item.partName === '捲門片' || item.partName === '按裝及製造費用') {
-    //       item.unit = 'M2';
-    //     }
+    mainProductArr.forEach((item) => {
+      let { part } = item;
 
-    //     return item;
-    //   });
+      part = part.map((item, index) => {
+        if (item.unit === 'm2' || item.partName === '捲門片' || item.partName === '按裝及製造費用') {
+          item.unit = 'M2';
+        }
 
-    //   const profileColumns = infoKeyIndex.map((key) => ({ name: infoConfig[key].label }));
-    //   const profileRows = infoKeyIndex.map((key) => item[key]);
-    //   sheet.addTable({
-    //     name: 'profile',
-    //     ref: `A${rowCount}`,
-    //     style: {
-    //       showFirstColumn: true,
-    //     },
-    //     columns: [{ name: '報價編號' }, ...profileColumns],
-    //     rows: [[quotationId, ...profileRows]],
-    //   });
+        return item;
+      });
 
-    //   const partColumns = keyIndex.map((key) => ({ name: config[key].label }));
+      let rowIndex = rowCount + 1;
 
-    //   const partRows = part.map((item) => {
-    //     return keyIndex.map((key) => item[key]);
-    //   });
+      const quotationNumberCell = sheet.getCell(`A${rowIndex}`);
+      quotationNumberCell.value = `報價編號：${item.quotationNumber}`;
 
-    //   sheet.addTable({
-    //     name: 'part',
-    //     ref: `A${rowCount + 3}`,
-    //     style: {
-    //       showFirstColumn: true,
-    //     },
-    //     columns: partColumns,
-    //     rows: partRows,
-    //   });
+      const doorModelCell = sheet.getCell(`A${rowIndex + 1}`);
+      doorModelCell.value = `門型：${item.doorType}`;
 
-    //   // 這個迭代開始的的row編號 + header佔的row數 + part的數量 + 與下一次迭代的間隔
-    //   rowCount = rowCount + 4 + part.length + 3;
-    // });
+      const categoryCell = sheet.getCell(`C${rowIndex}`);
+      categoryCell.value = `項目：${item.category}`;
+
+      const sizeCell = sheet.getCell(`C${rowIndex + 1}`);
+      sizeCell.value = `尺寸：${item.size}`;
+
+      const materialCaptionCell = sheet.getCell(`D${rowIndex}`);
+      materialCaptionCell.value = '材質：';
+
+      const materialCell = sheet.getCell(`E${rowIndex}`);
+      const material = item.material.includes('SST') ? 'SST' : item.material.includes('鍍鋅') ? '鍍鋅' : item.material;
+      materialCell.value = material;
+
+      const surfaceCaptionCell = sheet.getCell(`F${rowIndex}`);
+      surfaceCaptionCell.value = '表面：';
+      surfaceCaptionCell.alignment = { horizontal: 'right' };
+
+      const surfaceCell = sheet.getCell(`G${rowIndex}`);
+      surfaceCell.value = item.surface;
+
+      rowIndex = rowIndex + 2;
+
+      const letterLookup = 'ABCDEFG';
+      excelKeyIndex.forEach((key, index) => {
+        const letter = letterLookup[index];
+
+        const cell = sheet.getCell(`${letter}${rowIndex}`);
+        cell.value = excelConfig[key].label;
+        cell.alignment = excelConfig[key].headAlignment;
+        cell.border = {
+          top: {
+            style: 'thin',
+            color: { argb: '000000' },
+          },
+          bottom: {
+            style: 'thin',
+            color: { argb: '000000' },
+          },
+        };
+      });
+
+      rowIndex = rowIndex + 1;
+
+      part.forEach((partItem, pIndex) => {
+        if (partItem.unit === 'M2' || partItem.partName === '捲門片' || partItem.partName === '按裝及製造費用') {
+          partItem.unit = 'm2';
+        }
+
+        excelKeyIndex.forEach((key, kIndex) => {
+          const letter = letterLookup[kIndex];
+          const cell = sheet.getCell(`${letter}${rowIndex}`);
+
+          let value = '';
+
+          if (key === 'indexNumber') {
+            value = `${pIndex + 1}`;
+          } else {
+            value = partItem[key];
+          }
+
+          if (key === 'qty' || key === 'price' || key === 'totalPrice' || key === 'indexNumber') {
+            cell.value = Number(value.replaceAll(',', ''));
+
+            if (key === 'price' || key === 'totalPrice' || key === 'indexNumber') {
+              cell.numFmt = '###,##0';
+            }
+          } else {
+            cell.value = value;
+          }
+
+          cell.alignment = excelConfig[key].alignment;
+
+          if (pIndex === part.length - 1) {
+            cell.border = {
+              bottom: {
+                style: 'thin',
+                color: { argb: '000000' },
+              },
+            };
+          }
+        });
+
+        rowIndex = rowIndex + 1;
+      });
+
+      const priceTotalCaptionCell = sheet.getCell(`F${rowIndex}`);
+      priceTotalCaptionCell.value = '報價合計：';
+
+      const priceTotalCell = sheet.getCell(`G${rowIndex}`);
+      priceTotalCell.value = Number(item.priceTotal.replaceAll(',', ''));
+      priceTotalCell.numFmt = '###,##0';
+
+      // 這個迭代開始的的row編號 + header佔的row數 + part的數量 + 與下一次迭代的間隔
+      rowCount = rowCount + 4 + part.length + 1;
+    });
 
     // -----------------------------------------------------------
 
@@ -289,6 +353,7 @@ export default function QuotationPdf_part({
 
 // ==============================================================================
 type TmainProduct = {
+  quotationNumber: string;
   category: string;
   material: string;
   surface: string;
@@ -315,44 +380,99 @@ const infoConfig: TinfoConfig = {
 // ----------------------------------------
 
 type Tpart = {
-  partName: string;
+  partName: string; //名稱
   material: string;
-  desc: string;
+  desc: string; // 說明
   // unit: string;
-  unit: React.ReactNode;
-  qty: string;
-  price: string;
-  totalPrice: string;
+  unit: React.ReactNode; // 單位
+  unit_str: string; // 單位
+  qty: string; // 數量
+  price: string; // 單價
+  totalPrice: string; //金額
 };
 
-type TkeyIndex = 'partName' | 'desc' | 'unit' | 'qty' | 'price' | 'totalPrice';
-type Tconfig = {
-  [key in TkeyIndex]: {
-    label: string;
-  };
-};
+// type TkeyIndex = 'partName' | 'desc' | 'unit' | 'qty' | 'price' | 'totalPrice';
+// type Tconfig = {
+//   [key in TkeyIndex]: {
+//     label: string;
+//   };
+// };
 
-const keyIndex: TkeyIndex[] = ['partName', 'desc', 'unit', 'qty', 'price', 'totalPrice'];
+const excelKeyIndex = [
+  //
+  'indexNumber',
+  'partName',
+  'desc',
+  'unit_str',
+  'qty',
+  'price',
+  'totalPrice',
+] as const;
 
-const config: Tconfig = {
+const excelConfig = {
+  indexNumber: {
+    label: '項次',
+    alignment: {
+      horizontal: 'center',
+    },
+    headAlignment: {
+      horizontal: 'left',
+    },
+  },
   partName: {
     label: '名稱',
+    alignment: {
+      horizontal: 'left',
+    },
+    headAlignment: {
+      horizontal: 'left',
+    },
   },
   desc: {
     label: '說明',
+    alignment: {
+      horizontal: 'left',
+    },
+    headAlignment: {
+      horizontal: 'left',
+    },
   },
-  unit: {
+  unit_str: {
     label: '單位',
+    alignment: {
+      horizontal: 'center',
+    },
+    headAlignment: {
+      horizontal: 'center',
+    },
   },
   qty: {
     label: '數量',
+    alignment: {
+      horizontal: 'right',
+    },
+    headAlignment: {
+      horizontal: 'center',
+    },
   },
   price: {
     label: '單價',
+    alignment: {
+      horizontal: 'right',
+    },
+    headAlignment: {
+      horizontal: 'center',
+    },
   },
   totalPrice: {
     label: '金額',
+    alignment: {
+      horizontal: 'right',
+    },
+    headAlignment: {
+      horizontal: 'center',
+    },
   },
-};
+} as const;
 
 export type { TmainProduct, Tpart };
