@@ -1514,6 +1514,7 @@ latestContentProdArr為這次追加追減的主產品
 
     const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
       totalPrice += Number(acce.totalPrice || 0);
+      const partName = acce.name.replaceAll('60A', '');
 
       return {
         partName: acce.name,
