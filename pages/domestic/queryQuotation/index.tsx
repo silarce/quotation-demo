@@ -82,8 +82,6 @@ export default function Budget() {
 
       const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
 
-      const theLatestContent = sortedContent[sortedContent.length - 1];
-
       const href_head =
         latestContent.status === 'Contract'
           ? {
@@ -105,7 +103,7 @@ export default function Budget() {
         quotationNumber: latestContent.quotationNumber,
         status: quotationStatusLookup[latestContent.status],
         quoteDate: moment(convertDate_reduce1911(latestContent.updatedAt)).format('yy-MM-DD'),
-        customerName: theLatestContent.customer?.name,
+        customerName: latestContent.customer?.name,
         contactPerson: latestContent.contactPerson,
         contactPhoneNumber: latestContent.contactNumber,
         href: href_head,
