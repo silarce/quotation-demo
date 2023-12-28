@@ -81,6 +81,9 @@ import { AppContext } from 'pages/_app';
 
 // ------------------------------------------------------------------
 
+// utils
+import { urlToFile } from 'js/utils/helpers/urlToFile';
+
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
 
@@ -102,7 +105,6 @@ import {
   //
   useGetQuotationContent_id,
 } from 'js/api/api_quotation';
-import { apiPostCustomers } from 'js/api/api_customer';
 
 // hook
 import { useProductList } from 'hooks/quotation/useProduct';
@@ -259,6 +261,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       const imageReg = /^image/;
       const pdfReg = /pdf$/;
       const fileType = imageReg.test(item.mime) ? 'image' : pdfReg.test(item.mime) ? 'pdf' : 'other';
+      // const fileType = 'other';
 
       return {
         fileId: item.id,
@@ -284,25 +287,48 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const uploadAttachment = async (newContentId: string) => {
     // 移除附件
-    for (const info of fileInfoArr) {
+    const theFileInfoArr = fileInfoArr.filter((info) => {
       const { fileId, willDelete, isNew } = info;
 
-      if (!fileId || !willDelete || isNew) {
-        continue;
-      }
+      // 如果 fileId 存在、willDelete 為 true 且 isNew 為 false，則移除該元素
+      return !(fileId && willDelete && !isNew);
+    });
+    setFileInfoArr(theFileInfoArr);
 
-      try {
-        await apiDelQuotation_id_attachments(newContentId, fileId);
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    // 已經不能使用，也不需要使用
+    // for (const info of fileInfoArr) {
+    //   const { fileId, willDelete, isNew } = info;
 
+    //   if (!fileId || !willDelete || isNew) {
+    //     continue;
+    //   }
+
+    //   try {
+    //     await apiDelQuotation_id_attachments(newContentId, fileId);
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
+
+    // 現在每個content都是獨立的，因此每次都必須重新上傳舊有的附件
+    // 因此以url取得File後上傳
     // 上傳附件
-    for (const info of fileInfoArr) {
-      const { fileId, willDelete, isNew, file } = info;
+    for (const info of theFileInfoArr) {
+      const { fileId, willDelete, isNew, fileSrc } = info;
+      let file = info.file;
 
-      if (fileId || !file || willDelete || !isNew) {
+      if (!file && fileSrc) {
+        file = await urlToFile({
+          url: fileSrc,
+          fileName: info.fileName,
+          mimeType: info.fileType,
+        });
+      }
+
+      // if (fileId || !file || willDelete || !isNew) {
+      //   continue;
+      // }
+      if (!file) {
         continue;
       }
 
@@ -332,10 +358,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     agentEmployee = latestContent?.agentEmployee;
   }
   // -----------------------------------------------------
-
-  // const [editNotes, setEditNotes] = useState<string>('');
-
-  // console.log(editNotes);
 
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
 
@@ -910,7 +932,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       (async () => {
         try {
           setIsLoading(true);
-          await Promise.all([updateContent(), updateAttachments()]);
+          await Promise.all([
+            updateContent(),
+            //  updateAttachments()
+          ]);
         } catch (error) {}
 
         setIsLoading(false);
@@ -919,13 +944,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
       (async () => {
         try {
           setIsLoading(true);
-          await Promise.all([update(), updateAttachments()]);
+          await Promise.all([
+            update(),
+            // updateAttachments()
+          ]);
         } catch (error) {}
 
         setIsLoading(false);
       })();
     }
   }, [quotationId]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await updateAttachments();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得附件失敗', content: err.message });
+      }
+    })();
+  }, [lastestContentId]);
 
   // const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
   // const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
