@@ -1050,6 +1050,10 @@ class Class_product {
         materialSurface = '2B';
       }
 
+      if (key === 'bottomBar') {
+        materialSurface = undefined;
+      }
+
       if (!componentId || !material) {
         console.log('reqProdGenerateDoorProductBom中斷，componentId或material為空');
         haveNull = true;
@@ -2521,25 +2525,7 @@ class Class_product {
 
     this._prodData.material = v;
 
-    const bottomBarAngleIron_options = this.options_bottomBarAngleIron;
-    const bottomBarPlate_options = this.options_bottomBarPlate;
-
-    if (v.includes('鍍鋅')) {
-      this.bottomBarAngleIron = bottomBarAngleIron_options[0].value;
-      this.bottomBarPlate = bottomBarPlate_options[0].value;
-    } else if (v.includes('高耐鍍鋅鋼板')) {
-      this.bottomBarAngleIron = bottomBarAngleIron_options[1].value;
-      this.bottomBarPlate = bottomBarPlate_options[1].value;
-    } else if (v.includes('304')) {
-      this.bottomBarAngleIron = bottomBarAngleIron_options[2].value;
-      this.bottomBarPlate = bottomBarPlate_options[2].value;
-    } else if (v.includes('316')) {
-      this.bottomBarAngleIron = bottomBarAngleIron_options[3].value;
-      this.bottomBarPlate = bottomBarPlate_options[3].value;
-    } else {
-      this.bottomBarAngleIron = bottomBarAngleIron_options[2].value;
-      this.bottomBarPlate = bottomBarPlate_options[2].value;
-    }
+    this.getBottomBarAngleIronAndBottomBarPlate(v);
 
     this.reRender();
   }
