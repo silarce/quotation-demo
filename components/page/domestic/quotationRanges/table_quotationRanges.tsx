@@ -28,6 +28,8 @@ import { Toption } from 'js/utils/options/options';
 import { Class_quotationRange } from 'pages/domestic/quotationRanges';
 import { TuseClassQuotationRange } from 'pages/domestic/quotationRanges';
 
+import { annotationAndQuotationRangeTypeLookup } from 'config/lookupTable';
+
 // =======================================================================
 const optionArr_category = optionsCreator_category();
 const optionArr_doorModel = optionsCreator_doorModel_2();
@@ -204,7 +206,7 @@ const BodyRowGroup = ({
                     <span>{doorModelName}</span>
                   </div>
                   <div className={config['type'].className}>
-                    <span>{typeLookup[type]}</span>
+                    <span>{annotationAndQuotationRangeTypeLookup[type]}</span>
                   </div>
                   <div className={config['description'].className}>
                     <span>{description}</span>
@@ -252,17 +254,17 @@ type Tconfig = {
 const config: Tconfig = {
   category: {
     label: '類別',
-    className: 'w-[156px] flex-none',
+    className: 'w-[160px] flex-none',
     optionArr: optionArr_category,
   },
   doorModelName: {
     label: '門型',
-    className: 'w-[86px] flex-none',
+    className: 'w-[90px] flex-none',
     optionArr: optionArr_doorModel,
   },
   type: {
     label: '形式',
-    className: 'w-[64px] flex-none',
+    className: 'w-[100px] flex-none',
     optionArr: optionArr_doorForm,
   },
   description: {
@@ -291,11 +293,5 @@ const headKeyArr = ['category', 'doorModelName', 'type', 'description'] as const
 const bodyKeyArr = ['category', 'doorModelName', 'type', 'description', 'edit', 'copy', 'del'] as const;
 
 const addKeyArr = ['category', 'doorModelName', 'type', 'description'] as const;
-
-// =============================================================================
-const typeLookup = {
-  normal: '一般',
-  'anti-typhoon': '防颱',
-} as const;
 
 // =============================================================================

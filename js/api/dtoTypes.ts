@@ -719,6 +719,12 @@ export type TmodifyLegacyContractDto = {
 // ==========================================================================
 // work-sheet
 
+export type annotationAndQuotationRangeType =
+  | 'normal'
+  | 'anti-typhoon'
+  | 'heat-protection'
+  | 'heat-protection-smoke-covering';
+
 export type TannotationDto = {
   id: string;
   createdAt: string;
@@ -728,7 +734,7 @@ export type TannotationDto = {
   /**門型 */
   doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   /**型式 */
-  type: 'normal' | 'anti-typhoon';
+  type: annotationAndQuotationRangeType;
   /**內容 */
   description: string;
 };
@@ -736,14 +742,14 @@ export type TannotationDto = {
 export type TcreateAnnotationDto = {
   category: string;
   doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
-  type: 'normal' | 'anti-typhoon';
+  type: annotationAndQuotationRangeType;
   description: string;
 };
 
 export type TcreateQuotationRangeDto = {
   category: string;
   doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
-  type: 'normal' | 'anti-typhoon';
+  type: annotationAndQuotationRangeType;
   description: string;
 };
 
@@ -756,7 +762,7 @@ export type TquotationRangeDto = {
   /**門型 */
   doorModelName: 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   /**型式 */
-  type: 'normal' | 'anti-typhoon';
+  type: annotationAndQuotationRangeType;
   /**內容 */
   description: string;
 };
