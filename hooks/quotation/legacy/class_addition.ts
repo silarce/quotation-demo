@@ -160,14 +160,22 @@ class Class_addition {
   }
 
   get quantity() {
+    if (this._quantity === '0') {
+      return '';
+    }
+
     return this._quantity;
   }
   set quantity(v) {
+    if (v === '') {
+      v = '0';
+    }
+
     if (!checkIsNumberStr(v)) {
       return;
     }
 
-    const int = v === '-' ? 0 : Math.trunc(Number(v || 0));
+    const int = v === '-' ? 0 : Number(v || 0);
 
     if (this._parentAddition) {
       const parentRemain = this._parentAddition.remainQty + Number(this._quantity);
