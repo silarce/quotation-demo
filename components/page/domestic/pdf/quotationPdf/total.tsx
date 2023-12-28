@@ -34,7 +34,7 @@ export default function Total({ memoArr, settlement }: { memoArr: TmemoArr; sett
             {memoArr.map((content, index) => {
               return (
                 <li key={index}>
-                  <span>{`(${index + 1})`}</span>
+                  {/* <span>{`(${index + 1})`}</span> */}
                   <span>{content}</span>
                 </li>
               );
