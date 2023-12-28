@@ -420,9 +420,17 @@ class Class_product {
   }
 
   get quantity() {
+    if (this._quantity === '0') {
+      return '';
+    }
+
     return this._quantity;
   }
   set quantity(v: string) {
+    if (v === '') {
+      v = '0';
+    }
+
     if (!checkIsNumberStr(v)) {
       return;
     }
