@@ -85,80 +85,103 @@ export default function QuotationPdf_part({
 
     const sheetName = quotationId;
     const sheet = workbook.addWorksheet(sheetName);
+    const foo = 1.10456536503; // 乘上這個值才會是excel上的寬度
     sheet.columns = [
-      { width: 40 /*font: { size: 16 }*/ }, // 直接在這邊設定font不知道為什麼無效
-      { width: 50 }, // 在google試算表裡10被換算為69
+      { width: 5.89 * foo },
+      { width: 50 },
       { width: 20 },
       { width: 10 },
       { width: 20 },
       { width: 25 },
       { width: 20 },
     ];
-    sheet.columns.forEach((item) => (item.font = { size: 16 }));
+    // sheet.columns = [
+    //   { width: 40 },
+    //   { width: 50 },
+    //   { width: 20 },
+    //   { width: 10 },
+    //   { width: 20 },
+    //   { width: 25 },
+    //   { width: 20 },
+    // ];
+    sheet.columns.forEach((item) => (item.font = { name: 'Calibri', size: 11 }));
     // -----------------------------------------------------------
 
-    let rowCount = 1;
+    const rowCount = 1;
+    //
+    const A1G1 = sheet.getCell('A1');
+    sheet.mergeCells('A1:G1');
+    A1G1.value = '三久建材工業股份有限公司';
 
-    mainProductArr.forEach((item) => {
-      sheet.getRow(rowCount).font = { bold: true, size: 18 };
-      sheet.getRow(rowCount + 3).font = { bold: true, size: 18 };
+    A1G1.alignment = { horizontal: 'center' };
+    A1G1.font = { name: '微軟正黑體', size: 18 };
+    //
+    const A2 = sheet.getCell('A2');
+    A2.value = '總公司工廠：台中市霧峰區峰北路666號';
+    //
+    const A3 = sheet.getCell('A3');
+    A3.value = '台北分公司：台北市內湖路一段387巷5號2樓之2';
+    //
+    const G2 = sheet.getCell('G2');
+    G2.value = 'TEL：04-24069939(七線)   FAX：04-24069909';
+    G2.alignment = { horizontal: 'right' };
+    //
+    const G3 = sheet.getCell('G3');
+    G3.value = 'TEL：02-26581508(三線)   FAX：02-26581507';
+    G3.alignment = { horizontal: 'right' };
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    // mainProductArr.forEach((item) => {
+    //   sheet.getRow(rowCount).font = { bold: true, size: 18 };
+    //   sheet.getRow(rowCount + 3).font = { bold: true, size: 18 };
 
-      let { part } = item;
+    //   let { part } = item;
 
-      // const slatIndex = part.findIndex((item) => {
-      //   return item.partName === '捲門片';
-      // });
+    //   part = part.map((item, index) => {
+    //     if (item.unit === 'm2' || item.partName === '捲門片' || item.partName === '按裝及製造費用') {
+    //       item.unit = 'M2';
+    //     }
 
-      // if (part[slatIndex]) {
-      //   part[slatIndex].unit = 'M2';
-      // }
+    //     return item;
+    //   });
 
-      // part.forEach((item, index) => {
-      //   console.log(item.partName);
+    //   const profileColumns = infoKeyIndex.map((key) => ({ name: infoConfig[key].label }));
+    //   const profileRows = infoKeyIndex.map((key) => item[key]);
+    //   sheet.addTable({
+    //     name: 'profile',
+    //     ref: `A${rowCount}`,
+    //     style: {
+    //       showFirstColumn: true,
+    //     },
+    //     columns: [{ name: '報價編號' }, ...profileColumns],
+    //     rows: [[quotationId, ...profileRows]],
+    //   });
 
-      //   if (item.partName === '捲門片' || item.partName === '按裝及製造費用') {
-      //     part[index].unit = 'M2';
-      //   }
-      // });
-      part = part.map((item, index) => {
-        if (item.unit === 'm2' || item.partName === '捲門片' || item.partName === '按裝及製造費用') {
-          item.unit = 'M2';
-        }
+    //   const partColumns = keyIndex.map((key) => ({ name: config[key].label }));
 
-        return item;
-      });
+    //   const partRows = part.map((item) => {
+    //     return keyIndex.map((key) => item[key]);
+    //   });
 
-      const profileColumns = infoKeyIndex.map((key) => ({ name: infoConfig[key].label }));
-      const profileRows = infoKeyIndex.map((key) => item[key]);
-      sheet.addTable({
-        name: 'profile',
-        ref: `A${rowCount}`,
-        style: {
-          showFirstColumn: true,
-        },
-        columns: [{ name: '報價編號' }, ...profileColumns],
-        rows: [[quotationId, ...profileRows]],
-      });
+    //   sheet.addTable({
+    //     name: 'part',
+    //     ref: `A${rowCount + 3}`,
+    //     style: {
+    //       showFirstColumn: true,
+    //     },
+    //     columns: partColumns,
+    //     rows: partRows,
+    //   });
 
-      const partColumns = keyIndex.map((key) => ({ name: config[key].label }));
-
-      const partRows = part.map((item) => {
-        return keyIndex.map((key) => item[key]);
-      });
-
-      sheet.addTable({
-        name: 'part',
-        ref: `A${rowCount + 3}`,
-        style: {
-          showFirstColumn: true,
-        },
-        columns: partColumns,
-        rows: partRows,
-      });
-
-      // 這個迭代開始的的row編號 + header佔的row數 + part的數量 + 與下一次迭代的間隔
-      rowCount = rowCount + 4 + part.length + 3;
-    });
+    //   // 這個迭代開始的的row編號 + header佔的row數 + part的數量 + 與下一次迭代的間隔
+    //   rowCount = rowCount + 4 + part.length + 3;
+    // });
 
     // -----------------------------------------------------------
 
