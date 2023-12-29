@@ -47,7 +47,9 @@ import QuotationSinature, {
   TemployeeDto,
 } from 'components/page/domestic/quotation/quotationSinature_2';
 
+// 這個元件已經不再使用，可以刪掉了
 // import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract';
+
 import QuotationPdf, {
   legacyContractToBasicInfo,
   legacyContractToTableProdList,
