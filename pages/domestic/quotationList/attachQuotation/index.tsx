@@ -1499,10 +1499,19 @@ latestContentProdArr為這次追加追減的主產品
     const part: Tpart[] = componentArr.map((com) => {
       totalPrice += Number(com.totalPrice || 0);
 
+      let unit_str = '';
+
+      if (typeof com.unit === 'object') {
+        unit_str = 'm\u00B2';
+      } else {
+        unit_str = com.unit as string;
+      }
+
       return {
         partName: com.comName,
         material: com.material,
         unit: com.unit,
+        unit_str,
         // qty: Number(com.quantity).toFixed(2),
         qty: new Decimal(com.quantity || 0).toFixed(2),
         desc: com.desc ?? '',
@@ -1515,10 +1524,21 @@ latestContentProdArr為這次追加追減的主產品
     const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
       totalPrice += Number(acce.totalPrice || 0);
 
+      let unit_str = '';
+
+      if (typeof list_acce.unit === 'object') {
+        unit_str = 'm\u00B2';
+      } else {
+        unit_str = list_acce.unit as string;
+      }
+
+      const partName = acce.name.replaceAll('60A', '');
+
       return {
-        partName: acce.name,
+        partName,
         material: '',
         unit: acce.unit,
+        unit_str,
         // FIXME 型別為number，但實際上為string
         // hooks/quotation/classAccessories.tsx // get quantity
         // qty: Number(acce.quantity).toFixed(2),
@@ -1530,6 +1550,7 @@ latestContentProdArr為這次追加追減的主產品
     });
 
     return {
+      quotationNumber: latestContent?.quotationNumber || '無報價編號',
       category: prod.itemName,
       material: prod.material,
       surface: prod.surface,

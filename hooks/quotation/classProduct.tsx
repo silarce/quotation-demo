@@ -468,10 +468,17 @@ class Class_product {
     const list: { [key: string]: Class_component } = {};
 
     keyArr.forEach((key) => {
-      const com = dataList[key];
+      let com = dataList[key];
 
       if (!com) {
         return null;
+      }
+
+      if (com.rawData && isNew === false) {
+        com = {
+          ...com.rawData,
+          ...com,
+        };
       }
 
       const theClass = new Class_component({
@@ -500,10 +507,11 @@ class Class_product {
     componentsArr.forEach((item) => {
       const key = comTypeLookUp[item.type];
       comPreList[key] = {
-        ...item,
-        doorModelName: key,
         code: '',
         specialSpec: '',
+        ...(item.rawData ?? {}),
+        ...item,
+        doorModelName: key,
         materialSurface: item.materialSurface || '',
         quantity: String(item.quantity || 0),
         desc: item.desc || '',
@@ -1040,6 +1048,10 @@ class Class_product {
       // materialSurface臨時新增烤漆，烤漆的處理等同2B
       if (materialSurface === '烤漆' || materialSurface === '氟碳') {
         materialSurface = '2B';
+      }
+
+      if (key === 'bottomBar') {
+        materialSurface = undefined;
       }
 
       if (!componentId || !material) {
@@ -2513,25 +2525,7 @@ class Class_product {
 
     this._prodData.material = v;
 
-    const bottomBarAngleIron_options = this.options_bottomBarAngleIron;
-    const bottomBarPlate_options = this.options_bottomBarPlate;
-
-    if (v.includes('鍍鋅')) {
-      this.bottomBarAngleIron = bottomBarAngleIron_options[0].value;
-      this.bottomBarPlate = bottomBarPlate_options[0].value;
-    } else if (v.includes('高耐鍍鋅鋼板')) {
-      this.bottomBarAngleIron = bottomBarAngleIron_options[1].value;
-      this.bottomBarPlate = bottomBarPlate_options[1].value;
-    } else if (v.includes('304')) {
-      this.bottomBarAngleIron = bottomBarAngleIron_options[2].value;
-      this.bottomBarPlate = bottomBarPlate_options[2].value;
-    } else if (v.includes('316')) {
-      this.bottomBarAngleIron = bottomBarAngleIron_options[3].value;
-      this.bottomBarPlate = bottomBarPlate_options[3].value;
-    } else {
-      this.bottomBarAngleIron = bottomBarAngleIron_options[2].value;
-      this.bottomBarPlate = bottomBarPlate_options[2].value;
-    }
+    this.getBottomBarAngleIronAndBottomBarPlate(v);
 
     this.reRender();
   }
