@@ -44,7 +44,10 @@ import QuotationSinature_3, {
   TemployeeDto,
   Tcontroll_signature,
 } from 'components/page/domestic/quotation/quotationSinature_3';
-import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
+import QuotationPdf, {
+  quotationContentToBasicInfo,
+  quotationProdToTableProdList,
+} from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new2';
 
 import QuotationPdf_part, {
   TmainProduct,
@@ -1840,10 +1843,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
           onCancel={() => {
             setShowPdf(false);
           }}
-          productArr_f={Object.values(productList)}
-          basicInfo={latestContent}
+          // productArr_f={Object.values(productList)}
+          // basicInfo={latestContent}
           noteArr={anno}
           qrArr={qr}
+          control_basicInfo={quotationContentToBasicInfo(latestContent)}
+          control_prodArr={quotationProdToTableProdList({
+            classProductArr: Object.values(productList ?? {}),
+            classOthersArr: Object.values(othersList ?? {}),
+          })}
         />
       )}
 
