@@ -5,7 +5,7 @@ import style from './quotationPdf.module.scss';
 
 import { apiGetAssets } from 'js/api/api_product';
 
-export type TtableProdList = {
+type TtableProdListItem = {
   category: string;
   size: string;
   doorType: string;
@@ -19,7 +19,12 @@ export type TtableProdList = {
   unitPrice: string;
   priceTotal: string;
   memo: string;
-}[];
+};
+
+type TtableProdList = TtableProdListItem[];
+
+export type { TtableProdList, TtableProdListItem };
+// =============================================================================
 
 export default function Table({ productList }: { productList: TtableProdList }) {
   const [svgList, setSvgList] = useState<{ [key: string]: string | undefined | null }>({});

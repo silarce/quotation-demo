@@ -8,7 +8,7 @@ import Decimal from 'decimal.js';
 // component
 import Header from './header';
 import Profile, { Tprofile } from './profile';
-import Table, { TtableProdList } from './table';
+import Table, { TtableProdList, TtableProdListItem } from './table';
 import Table_quoteTypeSum, { TquoteTypeSumList } from './table_quoteTypeSum';
 import Total from './total';
 import Other from './other';
@@ -23,13 +23,12 @@ import Modal from 'antd/lib/modal/Modal';
 import scss from './quotationPdf.module.scss';
 
 // type
-import { Class_product } from 'hooks/quotation/classProduct';
+import { Class_product, Class_other } from 'hooks/quotation/useProduct';
 
 import { TquotationContentDto } from 'js/api/api_quotation';
 
-type TtableProdList_series = (TtableProdList[number] & { series: string })[];
-
 // ============================================================================
+type TtableProdList_series = (TtableProdListItem & { series: string })[];
 
 type Tcontrol_basicInfo = {
   quotationDate: string;
@@ -44,11 +43,18 @@ type Tcontrol_basicInfo = {
   salesTax: string;
   total: string;
   agentName: string;
-  deliveryDate: string;
-  deliveryLocation: string;
+  tradingDate: string; // 交貨日期
+  tradingLocation: string; // 交貨地點
   validityPeriod: string;
-  paymentArr: { label: string; value: string }[];
+  payWayArr: { label: string; value: string }[];
 };
+
+type Tcontrol_prodArr = TtableProdList_series;
+
+type Tcontrol_noteArr = string[];
+type Tcontrol_qrArr = string[];
+
+export type { Tcontrol_basicInfo, Tcontrol_prodArr, Tcontrol_noteArr, Tcontrol_qrArr };
 
 // ============================================================================
 
@@ -56,44 +62,67 @@ export default function QuotationPdf({
   isVisable,
   onCancel,
 
-  productArr_f,
-  basicInfo,
+  // productArr_f,
+  // basicInfo,
   noteArr,
   qrArr,
-  basicInfo_control,
+  control_basicInfo,
+  control_prodArr,
 }: {
   isVisable: boolean;
   onCancel: () => void;
-  productArr_f: Class_product[];
-  basicInfo: TquotationContentDto;
-  noteArr: string[];
-  qrArr: string[];
-  basicInfo_control: Tcontrol_basicInfo;
+  // productArr_f: Class_product[];
+  // basicInfo: TquotationContentDto;
+  noteArr: Tcontrol_noteArr;
+  qrArr: Tcontrol_qrArr;
+  control_basicInfo: Tcontrol_basicInfo;
+  control_prodArr: Tcontrol_prodArr;
 }) {
+  // const {
+  //   // customerName,
+  //   quotationDate,
+  //   quotationNumber,
+  //   projectName,
+  //   customer,
+  //   contactPerson,
+  //   contactNumber,
+  //   faxNumber,
+  //   county,
+  //   district,
+  //   address,
+  //   subTotal: subTotal_f,
+  //   salesTax,
+  //   total: total_f,
+  //   agentEmployee,
+
+  //   deliveryDate,
+  //   deliveryLocation,
+  //   paymentMethods,
+  //   validityPeriod,
+  // } = basicInfo;
+
   const {
-    // customerName,
     quotationDate,
     quotationNumber,
     projectName,
-    customer,
+    customerName,
     contactPerson,
     contactNumber,
     faxNumber,
-    county,
-    district,
-    address,
+    allAddress,
     subTotal: subTotal_f,
     salesTax,
     total: total_f,
-    agentEmployee,
-
-    deliveryDate,
-    deliveryLocation,
-    paymentMethods,
+    agentName,
+    tradingDate,
+    tradingLocation,
     validityPeriod,
-  } = basicInfo;
+    payWayArr,
+  } = control_basicInfo;
 
-  const agentName = agentEmployee.chName;
+  const productArr = control_prodArr;
+
+  // const agentName = agentEmployee.chName;
 
   const [pdfType, setPdfType] = useState('typeA');
 
@@ -152,7 +181,7 @@ export default function QuotationPdf({
   // ----------------------------------------------------------------------------
   // profile
   const profilePram: Tprofile = (() => {
-    const customerName = customer.name;
+    // const customerName = customer.name;
 
     // const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
     const dateString = moment(quotationDate).subtract(1911, 'year').format('yy-MM-DD');
@@ -164,7 +193,8 @@ export default function QuotationPdf({
       contactPhone: contactNumber,
       fax: faxNumber ?? '',
       builtDate: dateString, // 報價日期
-      projectAddress: county + district + address,
+      // projectAddress: county + district + address,
+      projectAddress: allAddress,
       projectName: projectName,
       validityPeriod: validityPeriod,
     };
@@ -174,9 +204,9 @@ export default function QuotationPdf({
   const totalPram = (() => {
     const memoArr = noteArr;
 
-    let subTotal = String(subTotal_f);
-    let businessTax = String(salesTax);
-    let total = String(total_f);
+    let subTotal = subTotal_f;
+    let businessTax = salesTax;
+    let total = total_f;
 
     subTotal = Number(subTotal.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
     businessTax = Number(businessTax.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -198,72 +228,72 @@ export default function QuotationPdf({
     const attn = agentName;
 
     const payInfo = (() => {
-      const payWay = paymentMethods.map((item) => {
-        let value = item.totalPaymentRatio;
+      // const payWay = paymentMethods.map((item) => {
+      //   let value = item.totalPaymentRatio;
 
-        if (value === '0') {
-          value = '';
-        }
+      //   if (value === '0') {
+      //     value = '';
+      //   }
 
-        return {
-          label: item.milestone,
-          value,
-        };
-      });
+      //   return {
+      //     label: item.milestone,
+      //     value,
+      //   };
+      // });
 
-      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+      // const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
       return {
-        tradingLocation: deliveryLocation,
+        tradingLocation: tradingLocation,
         tradingDate: tradingDate, // 交貨日期
-        payWay,
+        payWay: payWayArr,
       };
     })();
 
-    return { quoteRangeArr, payInfo: payInfo!, attn };
+    return { quoteRangeArr, payInfo, attn };
   })();
 
-  const productArr: TtableProdList_series = (() => {
-    return productArr_f.map((prod) => {
-      // const lw = (Number(prod.WG) || Number(prod.fullWidth)) * 100;
+  // const productArr: TtableProdList_series = (() => {
+  //   return productArr_f.map((prod) => {
+  //     // const lw = (Number(prod.WG) || Number(prod.fullWidth)) * 100;
 
-      const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
-      const h = new Decimal(prod.height || 0).mul(100).toNumber();
-      const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
+  //     const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
+  //     const h = new Decimal(prod.height || 0).mul(100).toNumber();
+  //     const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
 
-      const size = `${lw}Ｘ${h}${b ? `＋${b}` : ''}`;
+  //     const size = `${lw}Ｘ${h}${b ? `＋${b}` : ''}`;
 
-      const thickness_num = Number(prod.thickness.replaceAll('t', ''));
-      // const thickness_str = thickness_num === 0 ? '' : thickness_num.toFixed(1) + 't';
-      const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
+  //     const thickness_num = Number(prod.thickness.replaceAll('t', ''));
+  //     // const thickness_str = thickness_num === 0 ? '' : thickness_num.toFixed(1) + 't';
+  //     const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
 
-      let material = prod.material;
+  //     let material = prod.material;
 
-      if (material === '高耐鍍鋅鋼板') {
-        material = '鍍鋅鋼板';
-      }
+  //     if (material === '高耐鍍鋅鋼板') {
+  //       material = '鍍鋅鋼板';
+  //     }
 
-      return {
-        category: prod.itemName,
-        size,
-        doorType: prod.doorType,
-        material: material,
-        thickness: thickness_str,
-        surface: prod.surface,
-        // doorRail 要收圖片路徑
-        // doorRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,
-        doorRail: `${prod.doorTrack}`,
-        horsepower: prod.horsepower,
-        openType: prod.close,
-        qty: prod.quantity,
-        unitPrice: prod.unitPrice,
-        priceTotal: prod.totalPrice,
-        memo: prod.notes,
-        // series: prod.itemName,
-        series: prod.doorType,
-      };
-    });
-  })();
+  //     return {
+  //       category: prod.itemName,
+  //       size,
+  //       doorType: prod.doorType,
+  //       material: material,
+  //       thickness: thickness_str,
+  //       surface: prod.surface,
+  //       // doorRail 要收圖片路徑
+  //       // doorRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,
+  //       doorRail: `${prod.doorTrack}`,
+  //       horsepower: prod.horsepower,
+  //       openType: prod.close,
+  //       qty: prod.quantity,
+  //       unitPrice: prod.unitPrice,
+  //       priceTotal: prod.totalPrice,
+  //       memo: prod.notes,
+  //       // series: prod.itemName,
+  //       series: prod.doorType,
+  //     };
+  //   });
+  // })();
 
   // ----------------------------------------------------------------------------
   return (
@@ -351,6 +381,7 @@ const PdfTypeA = ({
   productArr.forEach((prod) => {
     let categoryStrLength = 0;
     let memoStrLength = 0;
+    let doorTypeLength = 0;
 
     for (let i = 0; i < prod.category.length; i++) {
       const char = prod.category[i];
@@ -375,18 +406,36 @@ const PdfTypeA = ({
         // 如果字元是中文
         /[\u4e00-\u9fa5]/.test(char)
       ) {
-        memoStrLength += (1 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
+        memoStrLength += 1;
       } else if (
         // 如果字元是英文字母
         /[a-zA-Z]/.test(char)
       ) {
-        memoStrLength += (0.66 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
+        memoStrLength += 0.66;
       }
     }
 
-    const length = categoryStrLength > memoStrLength ? categoryStrLength : memoStrLength;
+    for (let i = 0; i < prod.doorType.length; i++) {
+      const char = prod.doorType[i];
 
-    const rowQty = Math.ceil(length / rowStrLengthLimit) || 1;
+      if (
+        // 如果字元是中文
+        /[\u4e00-\u9fa5]/.test(char)
+      ) {
+        doorTypeLength += 1;
+      } else if (
+        // 如果字元是英文字母
+        /[a-zA-Z]/.test(char)
+      ) {
+        doorTypeLength += 0.66;
+      }
+    }
+
+    const categoryStrRowCount = Math.ceil(categoryStrLength / 4) || 1; // 一行容納四個中文
+    const memoStrRowCount = Math.ceil(memoStrLength / 3) || 1; // 一行容納三個中文
+    const doorTypeRowCount = Math.ceil(doorTypeLength / 5) || 1; // 一行容納五個中文
+
+    const rowQty = Math.max(categoryStrRowCount, memoStrRowCount, doorTypeRowCount);
 
     if (rowCount + rowQty > rowLimit) {
       rowCount = rowQty;
@@ -482,6 +531,7 @@ const PdfTypeB = ({
       .plus(priceTotal.replaceAll(',', ''))
       .toNumber();
   });
+
   const quoteTypeSumArr = Object.values(quoteTypeSumObj);
 
   // --------------------------------------------------------------------------
@@ -583,7 +633,28 @@ const chunkProdArr = ({ productArr, rowLimit }: { productArr: TtableProdList; ro
 // ========================================================================
 
 // 專門給報價單使用的
-const quotationContentToBasicInfo = (quotationContent: TquotationContentDto): Tcontrol_basicInfo => {
+const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | undefined): Tcontrol_basicInfo => {
+  if (!quotationContent) {
+    return {
+      quotationDate: '',
+      quotationNumber: '',
+      projectName: '',
+      customerName: '',
+      contactPerson: '',
+      contactNumber: '',
+      faxNumber: '',
+      allAddress: '',
+      subTotal: '',
+      salesTax: '',
+      total: '',
+      agentName: '',
+      tradingDate: '',
+      tradingLocation: '',
+      validityPeriod: '',
+      payWayArr: [],
+    };
+  }
+
   const {
     quotationDate,
     quotationNumber,
@@ -606,9 +677,15 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto): Tc
     validityPeriod,
   } = quotationContent;
 
-  const paymentArr = paymentMethods.map((item) => {
+  const payWayArr = paymentMethods.map((item) => {
+    let value = item.totalPaymentRatio;
+
+    if (value === '0') {
+      value = '';
+    }
+
     return {
-      value: item.totalPaymentRatio,
+      value,
       label: item.milestone,
     };
   });
@@ -618,7 +695,9 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto): Tc
 
   const allAddress = county + district + address;
 
-  return {
+  const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+
+  const control_basicInfo: Tcontrol_basicInfo = {
     quotationDate,
     quotationNumber,
     projectName,
@@ -631,11 +710,79 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto): Tc
     salesTax: String(salesTax),
     total: String(total),
     agentName,
-    deliveryDate,
-    deliveryLocation,
+    tradingDate,
+    tradingLocation: deliveryLocation,
     validityPeriod,
-    paymentArr,
+    payWayArr,
   };
 
-  //
+  return control_basicInfo;
 };
+
+// 專門給報價單使用的
+const quotationProdToTableProdList = ({
+  classProductArr,
+  classOthersArr,
+}: {
+  classProductArr: Class_product[];
+  classOthersArr: Class_other[];
+}): Tcontrol_prodArr => {
+  const productArr: TtableProdList_series = (() => {
+    return classProductArr.map((prod) => {
+      const fullWidth = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
+      const height = new Decimal(prod.height || 0).mul(100).toNumber();
+      const boxB = new Decimal(prod.boxB || 0).mul(100).toNumber();
+
+      const size = `${fullWidth}Ｘ${height}${boxB ? `＋${boxB}` : ''}`;
+
+      const thickness_num = Number(prod.thickness.replaceAll('t', ''));
+      const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
+
+      let material = prod.material;
+
+      if (material === '高耐鍍鋅鋼板') {
+        material = '鍍鋅鋼板';
+      }
+
+      return {
+        category: prod.itemName,
+        size,
+        doorType: prod.doorType,
+        material: material,
+        thickness: thickness_str,
+        surface: prod.surface,
+        doorRail: `${prod.doorTrack}`,
+        horsepower: prod.horsepower,
+        openType: prod.close,
+        qty: prod.quantity,
+        unitPrice: prod.unitPrice,
+        priceTotal: prod.totalPrice,
+        memo: prod.notes,
+        series: prod.doorType,
+      };
+    });
+  })();
+
+  const othersArr: TtableProdList_series = classOthersArr.map((item, index) => {
+    return {
+      category: String(index + 1),
+      size: item.item,
+      doorType: item.description,
+      material: '',
+      thickness: '',
+      surface: '',
+      doorRail: '',
+      horsepower: '',
+      openType: '',
+      qty: String(item.quantity),
+      unitPrice: item.unitPrice_locale,
+      priceTotal: item.totalPrice_locale,
+      memo: item.notes,
+      series: '其他',
+    };
+  });
+
+  return [...productArr, ...othersArr];
+};
+
+export { quotationContentToBasicInfo, quotationProdToTableProdList };
