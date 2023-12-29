@@ -813,14 +813,14 @@ const legacyContractToBasicInfo = ({
     contactPerson,
     contactNumber,
     faxNumber,
-    quoteDate,
+    // quoteDate,
     projectCity,
     projectDistrict,
     projectAddress,
     projectName,
   } = classBasicInfo;
 
-  const { subTotal, salesTax, total } = classLegacyContract?.countProdTotal() ?? {};
+  const { subTotal, salesTax, total } = classLegacyContract?.classPayInfo ?? {};
 
   const { deliveryLocation, deliveryDate, paymentMethods } = classLegacyContract.classPayInfo;
 
@@ -837,9 +837,6 @@ const legacyContractToBasicInfo = ({
     };
   });
 
-  // const customerName = customer.name;
-  // const agentName = agentEmployee.chName;
-
   const allAddress = projectCity + projectDistrict + projectAddress;
 
   const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
@@ -853,9 +850,9 @@ const legacyContractToBasicInfo = ({
     contactNumber,
     faxNumber: faxNumber ?? '',
     allAddress,
-    subTotal: String(subTotal),
-    salesTax: String(salesTax),
-    total: String(total),
+    subTotal: subTotal,
+    salesTax: salesTax,
+    total: total,
     agentName,
     tradingDate,
     tradingLocation: deliveryLocation,

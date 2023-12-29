@@ -443,20 +443,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature control={control_sinature} disabled={disbaled} />
         </div>
       </div>
-      {/* legacyContractToBasicInfo
-legacyContractToTableProdList */}
 
       <QuotationPdf
         isVisable={showPdf}
         onCancel={() => {
           setShowPdf(false);
         }}
-        // classLegacyContract={classLegacyContract}
-        // verticalKeyArr={verticalKeyArr}
-        // agentName={(emp_agent?.chName || emp_agent?.enName) ?? ''}
-
-        noteArr={[]}
-        qrArr={[]}
+        noteArr={classLegacyContract.classNotes.stringArr ?? []}
+        qrArr={classLegacyContract.classQuoteScopes.stringArr ?? []}
         control_basicInfo={legacyContractToBasicInfo({
           classLegacyContract: classLegacyContract,
           agentName: (emp_agent?.chName || emp_agent?.enName) ?? '',
