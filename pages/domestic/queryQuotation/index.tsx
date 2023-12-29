@@ -99,7 +99,7 @@ export default function Budget() {
               },
             };
 
-      const latestCustomer = sortedContent[sortedContent.length - 1].customer;
+      const latestCustomer = sortedContent[0].customer;
 
       const header = {
         quotationNumber: latestContent.quotationNumber,
