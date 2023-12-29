@@ -258,7 +258,7 @@ const config: Tconfig = {
   },
   memo: {
     label: '備註',
-    width: '60px',
+    width: '80px',
     align: 'center',
   },
 };
