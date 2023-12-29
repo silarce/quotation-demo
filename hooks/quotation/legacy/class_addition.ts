@@ -196,6 +196,14 @@ class Class_addition {
     this._reRender();
   }
 
+  get unitPrice_locale() {
+    if (!this._unitPrice) {
+      return '';
+    }
+
+    return Number(this._unitPrice).toLocaleString();
+  }
+
   get unitPrice() {
     if (!this._unitPrice) {
       return '';
@@ -206,6 +214,7 @@ class Class_addition {
     // 決定先把千分位拿掉
     // return Number(this._unitPrice).toLocaleString();
   }
+
   set unitPrice(v) {
     // console.log(v);
 

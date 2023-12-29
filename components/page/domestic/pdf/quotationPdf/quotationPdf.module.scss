@@ -173,6 +173,8 @@ $semiMaring: 0 8px;
       > span {
         font-size: 18px;
         line-height: 24px;
+        //  為了使所有的空格都顯示出來，設pre-wrap
+        white-space: pre-wrap;
       }
     }
   } // remark
@@ -241,6 +243,8 @@ $semiMaring: 0 8px;
       > li {
         font-size: 16px;
         line-height: 22px;
+        //  為了使所有的空格都顯示出來，設pre-wrap
+        white-space: pre-wrap;
       }
     }
   }

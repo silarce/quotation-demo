@@ -27,7 +27,11 @@ import QuotationSinature_3, {
   TemployeeDto,
   Tcontroll_signature,
 } from 'components/page/domestic/quotation/quotationSinature_3';
-import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
+// import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
+import QuotationPdf, {
+  quotationContentToBasicInfo,
+  quotationProdToTableProdList,
+} from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new2';
 
 import QuotationPdf_part, {
   TmainProduct,
@@ -542,8 +546,6 @@ latestContentProdArr為這次追加追減的主產品
     productArr_attach: contentArr,
     quotationDiscount: Number(summary.discountRate || '100'),
   });
-
-  console.log(summary.discountRate);
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
@@ -1786,10 +1788,15 @@ latestContentProdArr為這次追加追減的主產品
           onCancel={() => {
             setShowPdf(false);
           }}
-          productArr_f={Object.values(productList)}
-          basicInfo={latestContent}
+          // productArr_f={Object.values(productList)}
+          // basicInfo={latestContent}
           noteArr={anno}
           qrArr={qr}
+          control_basicInfo={quotationContentToBasicInfo(latestContent)}
+          control_prodArr={quotationProdToTableProdList({
+            classProductArr: Object.values(productList ?? {}),
+            classOthersArr: Object.values(othersList ?? {}),
+          })}
         />
       )}
 

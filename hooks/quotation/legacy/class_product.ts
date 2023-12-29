@@ -456,6 +456,14 @@ class Class_product {
     this._reRender();
   }
 
+  get unitPrice_locale() {
+    if (!this._unitPrice) {
+      return '';
+    }
+
+    return Number(this._unitPrice).toLocaleString();
+  }
+
   get unitPrice() {
     if (!this._unitPrice) {
       return '';
