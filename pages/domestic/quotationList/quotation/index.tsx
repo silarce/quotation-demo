@@ -44,6 +44,10 @@ import QuotationSinature_3, {
   TemployeeDto,
   Tcontroll_signature,
 } from 'components/page/domestic/quotation/quotationSinature_3';
+
+// 這個元件已不再使用，可以刪掉了
+// 'components/page/domestic/pdf/quotationPdf/quotationPdf_new2'
+
 import QuotationPdf, {
   quotationContentToBasicInfo,
   quotationProdToTableProdList,

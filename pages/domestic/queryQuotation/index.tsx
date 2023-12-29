@@ -99,11 +99,13 @@ export default function Budget() {
               },
             };
 
+      const latestCustomer = sortedContent[sortedContent.length - 1].customer;
+
       const header = {
         quotationNumber: latestContent.quotationNumber,
         status: quotationStatusLookup[latestContent.status],
         quoteDate: moment(convertDate_reduce1911(latestContent.updatedAt)).format('yy-MM-DD'),
-        customerName: latestContent.customer?.name,
+        customerName: latestCustomer?.name,
         contactPerson: latestContent.contactPerson,
         contactPhoneNumber: latestContent.contactNumber,
         href: href_head,

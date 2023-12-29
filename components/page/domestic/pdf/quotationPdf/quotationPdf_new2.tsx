@@ -22,10 +22,14 @@ import Modal from 'antd/lib/modal/Modal';
 // css
 import scss from './quotationPdf.module.scss';
 
-// type
-import { Class_product, Class_other } from 'hooks/quotation/useProduct';
+// config
+import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
 
+// type
 import { TquotationContentDto } from 'js/api/api_quotation';
+//
+import { Class_product, Class_other } from 'hooks/quotation/useProduct';
+import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 // ============================================================================
 type TtableProdList_series = (TtableProdListItem & { series: string })[];
@@ -632,27 +636,31 @@ const chunkProdArr = ({ productArr, rowLimit }: { productArr: TtableProdList; ro
 
 // ========================================================================
 
+const emptyBasicInfo = (): Tcontrol_basicInfo => {
+  return {
+    quotationDate: '',
+    quotationNumber: '',
+    projectName: '',
+    customerName: '',
+    contactPerson: '',
+    contactNumber: '',
+    faxNumber: '',
+    allAddress: '',
+    subTotal: '',
+    salesTax: '',
+    total: '',
+    agentName: '',
+    tradingDate: '',
+    tradingLocation: '',
+    validityPeriod: '',
+    payWayArr: [],
+  };
+};
+
 // 專門給報價單使用的
 const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | undefined): Tcontrol_basicInfo => {
   if (!quotationContent) {
-    return {
-      quotationDate: '',
-      quotationNumber: '',
-      projectName: '',
-      customerName: '',
-      contactPerson: '',
-      contactNumber: '',
-      faxNumber: '',
-      allAddress: '',
-      subTotal: '',
-      salesTax: '',
-      total: '',
-      agentName: '',
-      tradingDate: '',
-      tradingLocation: '',
-      validityPeriod: '',
-      payWayArr: [],
-    };
+    return emptyBasicInfo();
   }
 
   const {
@@ -785,4 +793,174 @@ const quotationProdToTableProdList = ({
   return [...productArr, ...othersArr];
 };
 
-export { quotationContentToBasicInfo, quotationProdToTableProdList };
+// 舊合約專用
+const legacyContractToBasicInfo = ({
+  classLegacyContract,
+  agentName,
+}: {
+  classLegacyContract: Class_legacyContract;
+  agentName: string;
+}): Tcontrol_basicInfo => {
+  if (!classLegacyContract) {
+    return emptyBasicInfo();
+  }
+
+  const { classBasicInfo } = classLegacyContract;
+
+  const {
+    contractNumber,
+    customerName,
+    contactPerson,
+    contactNumber,
+    faxNumber,
+    // quoteDate,
+    projectCity,
+    projectDistrict,
+    projectAddress,
+    projectName,
+  } = classBasicInfo;
+
+  const { subTotal, salesTax, total } = classLegacyContract?.classPayInfo ?? {};
+
+  const { deliveryLocation, deliveryDate, paymentMethods } = classLegacyContract.classPayInfo;
+
+  const payWayArr = paymentMethods.map((item) => {
+    let value = item.totalPaymentRatio;
+
+    if (value === '0') {
+      value = '';
+    }
+
+    return {
+      value,
+      label: item.milestone,
+    };
+  });
+
+  const allAddress = projectCity + projectDistrict + projectAddress;
+
+  const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+
+  const control_basicInfo: Tcontrol_basicInfo = {
+    quotationDate: '', // 舊合約沒有報價日期
+    quotationNumber: contractNumber,
+    projectName,
+    customerName,
+    contactPerson,
+    contactNumber,
+    faxNumber: faxNumber ?? '',
+    allAddress,
+    subTotal: subTotal,
+    salesTax: salesTax,
+    total: total,
+    agentName,
+    tradingDate,
+    tradingLocation: deliveryLocation,
+    validityPeriod: '', // 舊合約沒有報價時效
+    payWayArr,
+  };
+
+  return control_basicInfo;
+};
+
+// 舊合約專用
+const legacyContractToTableProdList = ({
+  // 其實可以直接帶資料進來，但是為了避免有失誤，還是先直接複製原本的quotationPdf_legacyContract
+  classLegacyContract,
+  verticalKeyArr,
+  verticalKeyArr_addi,
+}: {
+  classLegacyContract: Class_legacyContract;
+  verticalKeyArr: string[];
+  verticalKeyArr_addi: string[];
+}): Tcontrol_prodArr => {
+  //
+  //
+  //
+  //
+
+  const productArr: TtableProdList_series = (() => {
+    const prodList = classLegacyContract.prodList;
+
+    let arr = verticalKeyArr.map((key) => {
+      const prod = prodList[key];
+
+      if (!prod) {
+        return null;
+      }
+
+      const lw = new Decimal(Number(prod?.width || 0) || Number(prod?.length || 0)).mul(100).toString();
+      const h = new Decimal(Number(prod?.height || 0)).mul(100).toString();
+      const b = new Decimal(Number(prod?.boxB || 0)).mul(100).toNumber();
+
+      const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
+
+      const thickness_num = Number(prod.thickness.replaceAll('t', ''));
+      const thickness_str = thickness_num === 0 ? '' : thickness_num.toFixed(1) + 't';
+
+      return {
+        category: prod.itemName,
+        size,
+        doorType: prod.doorType,
+        material: prod.material,
+        // thickness: prod.thickness,
+        // thickness: prod.thickness === '0' ? '' : prod.thickness + 't',
+        thickness: thickness_str,
+        surface: prod.surface,
+        doorRail: doorTrackLookup[prod.doorTrack]?.icon,
+        horsepower: prod.horsepower,
+        openType: prod.closingType,
+        qty: prod.quantity,
+        unitPrice: prod.unitPrice_locale,
+        priceTotal: prod.totalPrice,
+        memo: prod.notes,
+        series: prod.itemName,
+      };
+    });
+
+    arr = arr.filter((item) => !!item);
+
+    return arr as TtableProdList_series;
+  })();
+
+  const { additionList } = classLegacyContract;
+
+  const addiArr: TtableProdList_series = (() => {
+    let addiArr: (TtableProdList_series[number] | null)[] = verticalKeyArr_addi.map((key, index) => {
+      const addi = additionList[key];
+
+      if (!addi) {
+        return null;
+      }
+
+      return {
+        category: String(index + 1),
+        size: addi.itemName,
+        doorType: addi.content,
+        material: '',
+        thickness: '',
+        surface: '',
+        doorRail: '',
+        horsepower: '',
+        openType: '',
+        qty: addi.quantity,
+        unitPrice: addi.unitPrice_locale,
+        priceTotal: addi.totalPrice,
+        memo: addi.notes,
+        series: '其他',
+      };
+    });
+    addiArr = addiArr.filter((item) => !!item);
+
+    return addiArr as TtableProdList_series;
+  })();
+
+  return [...productArr, ...addiArr];
+};
+
+export {
+  quotationContentToBasicInfo,
+  quotationProdToTableProdList,
+  legacyContractToBasicInfo,
+  legacyContractToTableProdList,
+};
