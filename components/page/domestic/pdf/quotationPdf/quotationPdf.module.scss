@@ -71,7 +71,8 @@ $semiMaring: 0 8px;
       display: grid;
       grid-template-columns: 1fr 1.2fr;
       > div {
-        height: 42px;
+        // height: 42px;
+        // background-color: pink;
       }
       > div:nth-of-type(1),
       div:nth-of-type(2) {
@@ -82,7 +83,7 @@ $semiMaring: 0 8px;
   .info {
     display: grid;
     grid-template-columns: 100px fit-content(100%) auto;
-    // height: 42px;
+    height: 42px;
     .flexSpan {
       display: flex;
       justify-content: space-between;
