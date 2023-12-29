@@ -22,6 +22,9 @@ import Modal from 'antd/lib/modal/Modal';
 // css
 import scss from './quotationPdf.module.scss';
 
+// config
+import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
+
 // type
 import { TquotationContentDto } from 'js/api/api_quotation';
 //
@@ -865,11 +868,14 @@ const legacyContractToBasicInfo = ({
 
 // 舊合約專用
 const legacyContractToTableProdList = ({
+  // 其實可以直接帶資料進來，但是為了避免有失誤，還是先直接複製原本的quotationPdf_legacyContract
   classLegacyContract,
   verticalKeyArr,
+  verticalKeyArr_addi,
 }: {
   classLegacyContract: Class_legacyContract;
   verticalKeyArr: string[];
+  verticalKeyArr_addi: string[];
 }): Tcontrol_prodArr => {
   //
   //
@@ -904,13 +910,11 @@ const legacyContractToTableProdList = ({
         // thickness: prod.thickness === '0' ? '' : prod.thickness + 't',
         thickness: thickness_str,
         surface: prod.surface,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         doorRail: doorTrackLookup[prod.doorTrack]?.icon,
         horsepower: prod.horsepower,
         openType: prod.closingType,
         qty: prod.quantity,
-        unitPrice: prod.unitPrice,
+        unitPrice: prod.unitPrice_locale,
         priceTotal: prod.totalPrice,
         memo: prod.notes,
         series: prod.itemName,
@@ -922,34 +926,39 @@ const legacyContractToTableProdList = ({
     return arr as TtableProdList_series;
   })();
 
-  //
-  //
-  //
-  //
+  const { additionList } = classLegacyContract;
 
-  const { additionCellConfig, additionList, addAddition, addiSubPriceTotal } = classLegacyContract;
+  const addiArr: TtableProdList_series = (() => {
+    let addiArr: (TtableProdList_series[number] | null)[] = verticalKeyArr_addi.map((key, index) => {
+      const addi = additionList[key];
 
-  // const othersArr: TtableProdList_series = classOthersArr.map((item, index) => {
-  //   return {
-  //     category: String(index + 1),
-  //     size: item.item,
-  //     doorType: item.description,
-  //     material: '',
-  //     thickness: '',
-  //     surface: '',
-  //     doorRail: '',
-  //     horsepower: '',
-  //     openType: '',
-  //     qty: String(item.quantity),
-  //     unitPrice: item.unitPrice_locale,
-  //     priceTotal: item.totalPrice_locale,
-  //     memo: item.notes,
-  //     series: '其他',
-  //   };
-  // });
+      if (!addi) {
+        return null;
+      }
 
-  // return [...productArr, ...othersArr];
-  return productArr;
+      return {
+        category: String(index + 1),
+        size: addi.itemName,
+        doorType: addi.content,
+        material: '',
+        thickness: '',
+        surface: '',
+        doorRail: '',
+        horsepower: '',
+        openType: '',
+        qty: addi.quantity,
+        unitPrice: addi.unitPrice_locale,
+        priceTotal: addi.totalPrice,
+        memo: addi.notes,
+        series: '其他',
+      };
+    });
+    addiArr = addiArr.filter((item) => !!item);
+
+    return addiArr as TtableProdList_series;
+  })();
+
+  return [...productArr, ...addiArr];
 };
 
 export {

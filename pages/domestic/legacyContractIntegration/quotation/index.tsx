@@ -47,7 +47,11 @@ import QuotationSinature, {
   TemployeeDto,
 } from 'components/page/domestic/quotation/quotationSinature_2';
 
-import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract';
+// import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_legacyContract';
+import QuotationPdf, {
+  legacyContractToBasicInfo,
+  legacyContractToTableProdList,
+} from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new2';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -439,7 +443,31 @@ function TheQuotation({ router }: { router: NextRouter }) {
           <QuotationSinature control={control_sinature} disabled={disbaled} />
         </div>
       </div>
+      {/* legacyContractToBasicInfo
+legacyContractToTableProdList */}
+
       <QuotationPdf
+        isVisable={showPdf}
+        onCancel={() => {
+          setShowPdf(false);
+        }}
+        // classLegacyContract={classLegacyContract}
+        // verticalKeyArr={verticalKeyArr}
+        // agentName={(emp_agent?.chName || emp_agent?.enName) ?? ''}
+
+        noteArr={[]}
+        qrArr={[]}
+        control_basicInfo={legacyContractToBasicInfo({
+          classLegacyContract: classLegacyContract,
+          agentName: (emp_agent?.chName || emp_agent?.enName) ?? '',
+        })}
+        control_prodArr={legacyContractToTableProdList({
+          classLegacyContract: classLegacyContract,
+          verticalKeyArr: verticalKeyArr,
+          verticalKeyArr_addi: verticalKeyArr_addi,
+        })}
+      />
+      {/* <QuotationPdf
         isVisable={showPdf}
         onCancel={() => {
           setShowPdf(false);
@@ -448,7 +476,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         verticalKeyArr={verticalKeyArr}
         agentName={(emp_agent?.chName || emp_agent?.enName) ?? ''}
         // notesArrBeforeThisBatchAndThisBatch={notesArrBeforeThisBatchAndThisBatch}
-      />
+      /> */}
     </SubLayer>
   );
 }
