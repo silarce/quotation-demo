@@ -78,7 +78,7 @@ export default function Table_accessories({
               prodCellConfig={cellConfig}
               onRowClick={(obj) => {}}
               // defalutVKeyArr={defalutVKeyArr}
-              // onVKeyChange={onVKeyChange}
+              onVKeyChange={onVKeyChange}
               panelBox={panelBox}
             />
           )}

@@ -3062,6 +3062,7 @@ class Class_product {
     }
 
     const checkOptionsKey = Object.keys(this.accessoriesList).every((key) => this.accessoriesVKeyArr!.includes(key));
+
     const arrForCreate = checkOptionsKey ? this.accessoriesVKeyArr : Object.keys(this.accessoriesList);
 
     const accessories: TcreateQuotationProductAccessoriesDto[] =
