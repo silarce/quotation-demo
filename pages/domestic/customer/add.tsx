@@ -118,13 +118,14 @@ export default function Add() {
             router.push({
               pathname: '/domestic/customer/edit',
               query: {
+                ...router.query,
                 id: res.id,
+                reDeirectorToEdit: undefined,
+                isFromAdd: true,
               },
             });
           } else {
-            router.push({
-              pathname: '/domestic/customer',
-            });
+            router.back();
           }
 
           myAlert.success({ title: '新增客戶資料完成' });
@@ -139,7 +140,13 @@ export default function Add() {
       type: 'myButton',
       label: '取消',
       onClick: () => {
-        router.back();
+        if (router.query.reDeirectorToEdit === 'true') {
+          router.push({
+            pathname: '/domestic/customer',
+          });
+        } else {
+          router.back();
+        }
       },
     },
   ];

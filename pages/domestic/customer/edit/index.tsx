@@ -35,6 +35,9 @@ let timeoutId_check: NodeJS.Timeout;
 export default function Edit() {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
+
+  const { isFromAdd } = router.query as { isFromAdd: string | undefined };
+
   // ------------------------------------------------------
   const { data, setData, update } = useCustomersById(router.query.id as string, params);
 
@@ -127,7 +130,12 @@ export default function Edit() {
           await apiPatchCustomers_id(postBody.id, postBody);
           router.push({
             pathname: '/domestic/customer',
+            query: {
+              id: undefined,
+              ...router.query,
+            },
           });
+
           myAlert.success({ title: '變更客戶資料完成' });
         } catch {
           myAlert.err({ title: '變更客戶資料失敗' });
@@ -140,7 +148,13 @@ export default function Edit() {
       type: 'myButton',
       label: '取消',
       onClick: () => {
-        router.back();
+        if (router.query.isFromAdd === 'true') {
+          router.push({
+            pathname: '/domestic/customer',
+          });
+        } else {
+          router.back();
+        }
       },
     },
   ];

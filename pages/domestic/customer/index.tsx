@@ -182,7 +182,11 @@ function TheCustomer({ router }: { router: NextRouter }) {
     {
       type: 'addButton',
       label: '新增客戶資料',
-      onClick: () => router.push('/domestic/customer/add'),
+      onClick: () =>
+        router.push({
+          pathname: '/domestic/customer/add',
+          query: router.query,
+        }),
     },
   ];
 
