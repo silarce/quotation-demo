@@ -2065,6 +2065,10 @@ class Class_product {
       return undefined;
     }
 
+    if (!this.doorType) {
+      return undefined;
+    }
+
     const isSST = checkIsSST(this.material);
 
     if (isSST) {
