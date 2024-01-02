@@ -293,6 +293,11 @@ class Class_product {
     // 報價單折數，也就是TquotationContentDto[discount]
     this._quotationDiscount = quotationDiscount;
 
+    if (!this._prodData.material) {
+      this._prodData.material = 'SST#304';
+      this._prodData.surface = '2B';
+    }
+
     // __________________________________________________________;
 
     // 建立材料配件
@@ -738,6 +743,8 @@ class Class_product {
       doorType: this.doorType,
       quoteType: this._prodData.quoteType,
       itemName: this._prodData.itemName,
+      material: this._prodData.material,
+      surface: this._prodData.surface,
     };
 
     this._prodData = prod;
@@ -1436,6 +1443,7 @@ class Class_product {
     this.creComList({
       dataList,
     });
+
     this.material = this.material;
 
     this.shouldCall_pgpb = true;
@@ -1904,27 +1912,19 @@ class Class_product {
   }
 
   /**變更角鐵與底座版 */
-  // getBottomBarAngleIronAndBottomBarPlate(v: '鍍鋅鋼板' | '高耐鍍鋅鋼板' | '不鏽鋼#304' | '不鏽鋼#316') {
-  getBottomBarAngleIronAndBottomBarPlate(
-    // v: '鍍鋅鋼板' | '高耐鍍鋅鋼板' | '不鏽鋼#304' | '不鏽鋼#316'
+
+  changeBottomBarAngleIronAndBottomBarPlate(
+    // v: '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
     v: string
   ) {
-    if (v === '鍍鋅鋼板') {
-      this.bottomBarAngleIron = this.options_bottomBarAngleIron[0].value;
-      this.bottomBarPlate = this.options_bottomBarPlate[0].value;
-    } else if (v.includes('高耐鍍鋅鋼板')) {
-      this.bottomBarAngleIron = this.options_bottomBarAngleIron[1].value;
-      this.bottomBarPlate = this.options_bottomBarPlate[1].value;
-    } else if (v.includes('304')) {
-      this.bottomBarAngleIron = this.options_bottomBarAngleIron[2].value;
-      this.bottomBarPlate = this.options_bottomBarPlate[2].value;
-    } else if (v.includes('316')) {
-      this.bottomBarAngleIron = this.options_bottomBarAngleIron[3].value;
-      this.bottomBarPlate = this.options_bottomBarPlate[3].value;
-    } else {
-      this.bottomBarAngleIron = this.options_bottomBarAngleIron[2].value;
-      this.bottomBarPlate = this.options_bottomBarPlate[2].value;
-    }
+    const list_bottomBarAngleIron = _.keyBy<Toption>(this.options_bottomBarAngleIron, 'material');
+    const list_bottomBarPlate = _.keyBy<Toption>(this.options_bottomBarPlate, 'material');
+
+    const bottomBarAngleIron = list_bottomBarAngleIron[v]?.value || '';
+    const bottomBarPlate = list_bottomBarPlate[v]?.value || '';
+
+    this.bottomBarAngleIron = bottomBarAngleIron;
+    this.bottomBarPlate = bottomBarPlate;
   }
 
   toGetInstallationFee() {
@@ -2065,21 +2065,17 @@ class Class_product {
       return undefined;
     }
 
+    if (!this.doorType) {
+      return undefined;
+    }
+
     const isSST = checkIsSST(this.material);
 
     if (isSST) {
-      // return [
-      //   { value: '2B', label: '2B' },
-      //   { value: 'HL', label: 'HL' },
-      //   { value: 'BA', label: 'BA' },
-      //   { value: 'NO.4', label: 'NO.4' },
-      // ];
       return options_surface;
     }
 
     return options_surface_onlyPaint;
-
-    // return undefined;
   }
 
   /**底座角鐵 */
@@ -2511,12 +2507,6 @@ class Class_product {
     return this._prodData.material;
   }
   set material(v) {
-    const isSST = checkIsSST(v);
-
-    if (!isSST) {
-      this.surface = '';
-    }
-
     Object.values(this.comList || {}).forEach((com) => {
       if (com) {
         com.changeFindedMaterial(v);
@@ -2525,7 +2515,13 @@ class Class_product {
 
     this._prodData.material = v;
 
-    this.getBottomBarAngleIronAndBottomBarPlate(v);
+    const isSurfaceExist = this.options_surface?.some((item) => {
+      return item.value === this.surface;
+    });
+
+    if (!isSurfaceExist) {
+      this.surface = this.options_surface?.[0].value ?? '';
+    }
 
     this.reRender();
   }
@@ -2537,7 +2533,7 @@ class Class_product {
     this._prodData.surface = v;
 
     if (this.comList) {
-      this.comList.slat.surface = v;
+      this.comList.slat.surface_withCheckOptions = v;
     }
 
     this.reRender();
@@ -2705,9 +2701,6 @@ class Class_product {
 
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
-    // this.doorTrack = '';
-
-    // this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
 
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
@@ -3038,6 +3031,27 @@ class Class_product {
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
 
+  get isComponentOk() {
+    const componentBodyArr = this.comBodyArr;
+    let isComponentBreak = false;
+
+    if (componentBodyArr.length !== 8) {
+      isComponentBreak = true;
+    }
+
+    componentBodyArr.forEach((com) => {
+      if (!com.componentId) {
+        isComponentBreak = true;
+      }
+    });
+
+    // if (isComponentBreak) {
+    //   myAlert.err({ title: '主產品無材料配件或無componentId', content: `項目:${this.itemName}` });
+    // }
+
+    return !isComponentBreak;
+  }
+
   get comBodyArr() {
     const components: TcreateQuotationProductComponentDto[] = Object.values(this.comList ?? {}).map((com, index) => {
       const body = com.body;
@@ -3080,6 +3094,25 @@ class Class_product {
 
   get body() {
     const copy = _.cloneDeep(this._prodData);
+    // componentId
+    // const componentBodyArr = this.comBodyArr;
+    // let isComponentBreak = false;
+
+    // if (componentBodyArr.length !== 8) {
+    //   isComponentBreak = true;
+    // }
+
+    // componentBodyArr.forEach((com) => {
+    //   if (!com.componentId) {
+    //     isComponentBreak = true;
+    //   }
+    // });
+
+    // if (isComponentBreak) {
+    //   myAlert.err({ title: '主產品無材料配件', content: `項目:${this.itemName}` });
+
+    //   return null;
+    // }
 
     const body: TcreateQuotationProductDto & {
       id: string | undefined;
@@ -3105,6 +3138,8 @@ class Class_product {
       boxB: Number(this._prodData.boxB) * 1000,
       boxD: Number(this._prodData.boxD) * 1000,
       quantity: Number(this._prodData.quantity),
+      volume: this._prodData.volume || '0',
+      area: this._prodData.area || '0',
 
       headBoxThickness: Number(this._prodData.rollUpBoxThick),
       motorVoltage: Number(this._prodData.voltage),

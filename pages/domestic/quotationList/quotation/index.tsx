@@ -1312,6 +1312,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     if (!isGetDetailSpecSuccess) {
+      setIsLoading(false);
+
       return;
     }
 
@@ -1319,10 +1321,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
     let prodQty = 0;
     let isDoorModalNameEmpty = false;
 
+    // 材料配件有問題的主產品
+    let breakComponentProdIndex = '';
+
     // prodVKeyArr 會在每一次垂直拖拉時更新
     const prodArr: TcreateQuotationProductDto[] =
       prodVKeyArr?.map((key, index) => {
         const prod = productList[key];
+
+        if (!prod.isComponentOk) {
+          breakComponentProdIndex = breakComponentProdIndex + `${index + 1} `;
+        }
 
         if (!prod.doorType) {
           isDoorModalNameEmpty = true;
@@ -1349,6 +1358,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         return preBody;
       }) ?? [];
+
+    if (breakComponentProdIndex) {
+      setIsLoading(false);
+
+      return myAlert.warning({
+        title: '主產品材料配件有誤',
+        content: `請檢查第${breakComponentProdIndex}項主產品是否正確`,
+      });
+    }
 
     if (isDoorModalNameEmpty) {
       setIsLoading(false);

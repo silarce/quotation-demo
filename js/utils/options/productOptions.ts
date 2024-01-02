@@ -264,9 +264,9 @@ export const optionsCreator_componentMaterial_03 = createOptionsCreator({
 export const optionsCreator_bottomBarAngleIron = createOptionsCreator({
   optionsArr: [
     { value: '鍍鋅 50*50*4T', label: '鍍鋅 50*50*4T', material: '鍍鋅鋼板' },
-    { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T', material: '高耐鍍鋅鋼板' },
-    { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T', material: '不鏽鋼#304' },
-    { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T', material: '不鏽鋼#316' },
+    // { value: '高耐鍍鋅鋼板 50*50*3T', label: '高耐鍍鋅鋼板 50*50*3T', material: '高耐鍍鋅鋼板' },
+    { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T', material: 'SST#304' },
+    { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T', material: 'SST#316' },
   ],
 });
 
@@ -274,9 +274,9 @@ export const optionsCreator_bottomBarAngleIron = createOptionsCreator({
 export const optionsCreator_bottomBarPlate = createOptionsCreator({
   optionsArr: [
     { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T', material: '鍍鋅鋼板' },
-    { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T', material: '高耐鍍鋅鋼板' },
-    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: '不鏽鋼#304' },
-    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: '不鏽鋼#316' },
+    // { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T', material: '高耐鍍鋅鋼板' },
+    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: 'SST#304' },
+    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: 'SST#316' },
   ],
 });
 
@@ -284,8 +284,8 @@ export const optionsCreator_bottomBarAngleIron_303A = createOptionsCreator({
   optionsArr: [
     { value: '鍍鋅 1.0T', label: '鍍鋅 1.0T', material: '鍍鋅鋼板' },
     { value: '高耐鍍鋅鋼板 1.0T', label: '高耐鍍鋅鋼板 1.0T', material: '高耐鍍鋅鋼板' },
-    { value: '不鏽鋼#304 1.0T', label: '不鏽鋼#304 1.0T', material: '不鏽鋼#304' },
-    { value: '不鏽鋼#316 1.0T', label: '不鏽鋼#316 1.0T', material: '不鏽鋼#316' },
+    { value: '不鏽鋼#304 1.0T', label: '不鏽鋼#304 1.0T', material: 'SST#304' },
+    { value: '不鏽鋼#316 1.0T', label: '不鏽鋼#316 1.0T', material: 'SST#316' },
   ],
 });
 
@@ -293,8 +293,8 @@ export const optionsCreator_bottomBarPlate_303A = createOptionsCreator({
   optionsArr: [
     { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T', material: '鍍鋅鋼板' },
     { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T', material: '高耐鍍鋅鋼板' },
-    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: '不鏽鋼#304' },
-    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: '不鏽鋼#316' },
+    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: 'SST#304' },
+    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: 'SST#316' },
   ],
 });
 
@@ -302,8 +302,8 @@ export const optionsCreator_bottomBarAngleIron_303AS = createOptionsCreator({
   optionsArr: [
     { value: '鍍鋅 1.0T', label: '鍍鋅 1.0T(含遮菸條)', material: '鍍鋅鋼板' },
     { value: '高耐鍍鋅鋼板 1.0T', label: '高耐鍍鋅鋼板 1.0T(含遮菸條)', material: '高耐鍍鋅鋼板' },
-    { value: '不鏽鋼#304 1.0T', label: '不鏽鋼#304 1.0T(含遮菸條)', material: '不鏽鋼#304' },
-    { value: '不鏽鋼#316 1.0T', label: '不鏽鋼#316 1.0T(含遮菸條)', material: '不鏽鋼#316' },
+    { value: '不鏽鋼#304 1.0T', label: '不鏽鋼#304 1.0T(含遮菸條)', material: 'SST#304' },
+    { value: '不鏽鋼#316 1.0T', label: '不鏽鋼#316 1.0T(含遮菸條)', material: 'SST#316' },
   ],
 });
 
@@ -311,8 +311,8 @@ export const optionsCreator_bottomBarPlate_303AS = createOptionsCreator({
   optionsArr: [
     { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T', material: '鍍鋅鋼板' },
     { value: '高耐鍍鋅鋼板 1.5T', label: '高耐鍍鋅鋼板 1.5T', material: '高耐鍍鋅鋼板' },
-    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: '不鏽鋼#304' },
-    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: '不鏽鋼#316' },
+    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: 'SST#304' },
+    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: 'SST#316' },
   ],
 });
 

@@ -136,6 +136,9 @@ const useProductList = ({
 
     const copyArr = _.cloneDeep(productArr ?? []);
 
+    // TODO 之後要改為以productOrder排序
+    // 考慮到不同的追加追減合約裡的主產品的order可能會重複
+    // 所以要用productOrder排序
     const sortedProdArr = _.sortBy(copyArr, 'order');
     const list: TproductList = {};
 

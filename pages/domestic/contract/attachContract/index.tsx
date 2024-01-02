@@ -309,11 +309,19 @@ export default function AttachContract({
         toManagerAt: undefined,
       };
 
+      // 材料配件有問題的主產品
+      let breakComponentProdIndex_div = '';
+      let breakComponentProdIndex_attach = '';
+
       // 追減，要送給後端的是追減後的資料
-      // 原本五個，追減兩個，送給後端的要是三個
+      // 例如原本五個，追減兩個，送給後端的要是三個
       const divProdArr = (() => {
-        const arr = Object.values(productList).map((item) => {
+        const arr = Object.values(productList).map((item, index) => {
           if (item.isAttachDiv) {
+            if (item && !item.isComponentOk) {
+              breakComponentProdIndex_div = breakComponentProdIndex_div + `${index + 1} `;
+            }
+
             return item.body_attachDiv;
           }
 
@@ -325,10 +333,28 @@ export default function AttachContract({
         })[];
       })();
 
+      if (breakComponentProdIndex_div) {
+        return myAlert.warning({
+          title: '追減主產品之材料配件有誤',
+          content: `請檢查第${breakComponentProdIndex_div}項主產品是否正確`,
+        });
+      }
+
       // 追加跟變更
-      const attachProdArr = Object.values(attachProdList).map((prod) => {
+      const attachProdArr = Object.values(attachProdList).map((prod, index) => {
+        if (!prod.isComponentOk) {
+          breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+        }
+
         return prod.body;
       });
+
+      if (breakComponentProdIndex_attach) {
+        return myAlert.warning({
+          title: '追加/變更主產品之材料配件有誤',
+          content: `請檢查第${breakComponentProdIndex_attach}項主產品是否正確`,
+        });
+      }
 
       const body: TcreateModifyQuotationDto = {
         ...theContent,
