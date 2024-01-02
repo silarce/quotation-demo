@@ -450,15 +450,24 @@ class Class_component {
     return this._com.material ?? '';
   }
   set material(v) {
-    if (!checkIsSST(v ?? '')) {
-      this._com.materialSurface = '';
-    }
-
     this._com.material = v;
 
-    if (!this.surface && this.options_surface) {
-      this.surface = this.options_surface[0].value;
+    // ________________________________________________________________
+    const isSurfaceExist = this.options_surface?.some((item) => {
+      return item.value === this.surface;
+    });
+
+    const prodSurface = this._prod.surface || '';
+    const isProdSurfaceExistHere = this.options_surface?.some((item) => {
+      return item.value === prodSurface;
+    });
+
+    if (!isSurfaceExist) {
+      const surface = isProdSurfaceExistHere ? prodSurface : this.options_surface?.[0].value ?? '';
+
+      this.surface = surface;
     }
+    // ________________________________________________________________
 
     this.callReqGetCodeNumber();
 
@@ -474,6 +483,20 @@ class Class_component {
     return this._com.materialSurface;
   }
   set surface(v) {
+    this._com.materialSurface = v;
+    this.callReqGetCodeNumber();
+    this.reRender();
+  }
+
+  set surface_withCheckOptions(v: string | undefined) {
+    const isSurfaceExist = this.options_surface?.some((item) => {
+      return item.value === v;
+    });
+
+    if (!isSurfaceExist) {
+      return;
+    }
+
     this._com.materialSurface = v;
     this.callReqGetCodeNumber();
     this.reRender();

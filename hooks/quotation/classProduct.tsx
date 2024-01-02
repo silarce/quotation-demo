@@ -2533,7 +2533,7 @@ class Class_product {
     this._prodData.surface = v;
 
     if (this.comList) {
-      this.comList.slat.surface = v;
+      this.comList.slat.surface_withCheckOptions = v;
     }
 
     this.reRender();
