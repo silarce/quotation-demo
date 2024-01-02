@@ -649,10 +649,6 @@ class Class_workSheet {
     return String(this._prod.WG);
   }
 
-  get BD() {
-    return new Decimal(this._prod.boxB).mul(this._prod.boxD ?? 0).toString();
-  }
-
   get height() {
     return this._height_str;
   }
