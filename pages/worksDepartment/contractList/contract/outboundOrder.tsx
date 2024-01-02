@@ -327,7 +327,7 @@ export default function OutboundOrder({
           qty: String(prod.itemArr.length),
           implementQty: '',
           cai: theOriginalContractContent.volume ?? '',
-          totalCai: new Decimal(theOriginalContractContent.volume).mul(arrLength).toString(),
+          totalCai: new Decimal(theOriginalContractContent.volume || 0).mul(arrLength).toString(),
           doorType: theOriginalContractContent.doorModelName,
           material: theOriginalContractContent.materialName,
           horsepower: theOriginalContractContent.horsepower,
