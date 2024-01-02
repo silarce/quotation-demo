@@ -939,7 +939,7 @@ export type TquotationProductDto = {
   // 門軌厚度
   guideRailThickness: number;
   // 捲軸規格
-  rollerSpec: string;
+  rollerSpec: string; // 雙凸|無凸
   // 門軌消音條
   hasSilencingStrip: boolean;
   // 一體式捲箱
@@ -1360,7 +1360,7 @@ export type TcreateQuotationProductDto = {
   // 門軌厚度
   guideRailThickness: number;
   // 捲軸規格
-  rollerSpec: string;
+  rollerSpec: string; // 雙凸|無凸
   // 門軌消音條
   hasSilencingStrip: boolean;
   // 一體式捲箱
@@ -2420,7 +2420,7 @@ export type TupdateWorkSheetItem = {
   bottomBar: string;
   motorLockBox: string;
   guideRailThickness: string;
-  rollerSpec: string;
+  rollerSpec: string; // 雙凸|無凸
   hasSilencingStrip: boolean;
   isIntegratedHeadBox: boolean;
   headBoxThickness: string;
