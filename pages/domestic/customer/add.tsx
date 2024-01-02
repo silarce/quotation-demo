@@ -108,8 +108,9 @@ export default function Add() {
           return myAlert.info({ title: '正在檢查客戶編號' });
         }
 
+        const postBody = classCustomer.postBody;
+
         try {
-          const postBody = classCustomer.postBody;
           setRootLoading(true);
           const res = await apiPostCustomers(postBody);
           myAlert.success({ title: '新增客戶資料完成' });

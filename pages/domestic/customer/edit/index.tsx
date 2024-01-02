@@ -107,21 +107,21 @@ export default function Edit() {
       type: 'redButton',
       label: '上傳',
       onClick: async () => {
+        if (nameCheck === 'notOk') {
+          return myAlert.err({ title: '客戶全稱已被使用' });
+        }
+
+        if (nameCheck === 'loading') {
+          return myAlert.info({ title: '正在檢查客戶全稱' });
+        }
+
+        const postBody = classCustomer.postBody;
+
+        if (!postBody.id) {
+          return;
+        }
+
         try {
-          if (nameCheck === 'notOk') {
-            return myAlert.err({ title: '客戶全稱已被使用' });
-          }
-
-          if (nameCheck === 'loading') {
-            return myAlert.info({ title: '正在檢查客戶全稱' });
-          }
-
-          const postBody = classCustomer.postBody;
-
-          if (!postBody.id) {
-            return;
-          }
-
           setRootLoading(true);
           // 如果第一層的id存在，會在api那邊把id刪掉
           await apiPatchCustomers_id(postBody.id, postBody);
