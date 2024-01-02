@@ -3098,6 +3098,8 @@ class Class_product {
       boxB: Number(this._prodData.boxB) * 1000,
       boxD: Number(this._prodData.boxD) * 1000,
       quantity: Number(this._prodData.quantity),
+      volume: this._prodData.volume || '0',
+      area: this._prodData.area || '0',
 
       headBoxThickness: Number(this._prodData.rollUpBoxThick),
       motorVoltage: Number(this._prodData.voltage),
