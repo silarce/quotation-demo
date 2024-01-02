@@ -293,6 +293,11 @@ class Class_product {
     // 報價單折數，也就是TquotationContentDto[discount]
     this._quotationDiscount = quotationDiscount;
 
+    if (!this._prodData.material) {
+      this._prodData.material = 'SST#304';
+      this._prodData.surface = '2B';
+    }
+
     // __________________________________________________________;
 
     // 建立材料配件
@@ -738,6 +743,8 @@ class Class_product {
       doorType: this.doorType,
       quoteType: this._prodData.quoteType,
       itemName: this._prodData.itemName,
+      material: this._prodData.material,
+      surface: this._prodData.surface,
     };
 
     this._prodData = prod;
@@ -1436,6 +1443,7 @@ class Class_product {
     this.creComList({
       dataList,
     });
+
     this.material = this.material;
 
     this.shouldCall_pgpb = true;
@@ -2060,18 +2068,10 @@ class Class_product {
     const isSST = checkIsSST(this.material);
 
     if (isSST) {
-      // return [
-      //   { value: '2B', label: '2B' },
-      //   { value: 'HL', label: 'HL' },
-      //   { value: 'BA', label: 'BA' },
-      //   { value: 'NO.4', label: 'NO.4' },
-      // ];
       return options_surface;
     }
 
     return options_surface_onlyPaint;
-
-    // return undefined;
   }
 
   /**底座角鐵 */
