@@ -113,7 +113,6 @@ export default function Add() {
         try {
           setRootLoading(true);
           const res = await apiPostCustomers(postBody);
-          myAlert.success({ title: '新增客戶資料完成' });
 
           if (reDeirectorToEdit === 'true') {
             router.push({
@@ -127,6 +126,8 @@ export default function Add() {
               pathname: '/domestic/customer',
             });
           }
+
+          myAlert.success({ title: '新增客戶資料完成' });
         } catch {
           myAlert.err({ title: '新增客戶資料失敗' });
         } finally {
