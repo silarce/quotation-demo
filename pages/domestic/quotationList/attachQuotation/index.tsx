@@ -1195,16 +1195,24 @@ latestContentProdArr為這次追加追減的主產品
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
+  // 實際上追加追減報價單目前是不可以編輯的
   const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
     // 總樘數
     const prodQty = 0;
     let isDoorModalNameEmpty = false;
 
     // ---------------------------------------------------------
+    // 材料配件有問題的主產品
+    let breakComponentProdIndex_div = '';
+    let breakComponentProdIndex_attach = '';
 
     // 要送給後端的是quanity扣掉reduceQty後的prod
     const divProdArr = (() => {
-      const arr = Object.values(productList).map((item) => {
+      const arr = Object.values(productList).map((item, index) => {
+        if (item && !item.isComponentOk) {
+          breakComponentProdIndex_div = breakComponentProdIndex_div + `${index + 1} `;
+        }
+
         // 這個page的主產品介面，新增與複製都被鎖住了，所以不需要判斷isAttachDiv
         return item.body_attachDiv;
 
@@ -1220,9 +1228,27 @@ latestContentProdArr為這次追加追減的主產品
       })[];
     })();
 
-    const attachProdArr = Object.values(attachProdList).map((prod) => {
+    if (breakComponentProdIndex_div) {
+      return myAlert.warning({
+        title: '追減主產品之材料配件有誤',
+        content: `請檢查第${breakComponentProdIndex_div}項主產品是否正確`,
+      });
+    }
+
+    const attachProdArr = Object.values(attachProdList).map((prod, index) => {
+      if (!prod.isComponentOk) {
+        breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+      }
+
       return prod.body;
     });
+
+    if (breakComponentProdIndex_attach) {
+      return myAlert.warning({
+        title: '追加/變更主產品之材料配件有誤',
+        content: `請檢查第${breakComponentProdIndex_attach}項主產品是否正確`,
+      });
+    }
 
     /**
       FIXME 有id的話後端不收

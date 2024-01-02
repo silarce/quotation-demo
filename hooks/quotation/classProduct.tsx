@@ -3031,6 +3031,27 @@ class Class_product {
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
 
+  get isComponentOk() {
+    const componentBodyArr = this.comBodyArr;
+    let isComponentBreak = false;
+
+    if (componentBodyArr.length !== 8) {
+      isComponentBreak = true;
+    }
+
+    componentBodyArr.forEach((com) => {
+      if (!com.componentId) {
+        isComponentBreak = true;
+      }
+    });
+
+    // if (isComponentBreak) {
+    //   myAlert.err({ title: '主產品無材料配件或無componentId', content: `項目:${this.itemName}` });
+    // }
+
+    return !isComponentBreak;
+  }
+
   get comBodyArr() {
     const components: TcreateQuotationProductComponentDto[] = Object.values(this.comList ?? {}).map((com, index) => {
       const body = com.body;
@@ -3073,6 +3094,25 @@ class Class_product {
 
   get body() {
     const copy = _.cloneDeep(this._prodData);
+    // componentId
+    // const componentBodyArr = this.comBodyArr;
+    // let isComponentBreak = false;
+
+    // if (componentBodyArr.length !== 8) {
+    //   isComponentBreak = true;
+    // }
+
+    // componentBodyArr.forEach((com) => {
+    //   if (!com.componentId) {
+    //     isComponentBreak = true;
+    //   }
+    // });
+
+    // if (isComponentBreak) {
+    //   myAlert.err({ title: '主產品無材料配件', content: `項目:${this.itemName}` });
+
+    //   return null;
+    // }
 
     const body: TcreateQuotationProductDto & {
       id: string | undefined;
