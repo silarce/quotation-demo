@@ -191,7 +191,16 @@ class Class_component {
       }
 
       return copy;
-      // return this._prod.options_material;
+    }
+
+    // SJ-302的底座沒有高耐鍍鋅鋼板，因此將高耐鍍鋅鋼板的選項拿掉
+    if (this.key === 'bottomBar' && this._prod.doorType === 'SJ-302') {
+      let copy = _.cloneDeep(comLookUp[this.key].options ?? []);
+      copy = copy.filter((item) => {
+        return item.value !== '高耐鍍鋅鋼板';
+      });
+
+      return copy;
     }
 
     return comLookUp[this.key].options;
@@ -455,9 +464,7 @@ class Class_component {
 
     if (this.key === 'bottomBar') {
       this.desc = creDesc_bottomBars(this);
-      this._prod.getBottomBarAngleIronAndBottomBarPlate(v);
-      // console.log(this.key);
-      // bottomBar
+      this._prod.changeBottomBarAngleIronAndBottomBarPlate(v);
     }
 
     this.reRender();
@@ -920,30 +927,14 @@ const creDesc_bottomBars = (classCom: Class_component) => {
     material,
   } = classCom;
 
-  // const bottomBarAngleIron_options = prodCellConfig.bottomBarAngleIron.inputSelProps.selectProps!.props!
-  //   .options! as Toption[];
   const bottomBarAngleIron_options = classCom.bottomBarAngleIron_options;
 
   let desc = '';
 
-  if (material.includes('鍍鋅')) {
-    desc = bottomBarAngleIron_options[0].value;
-  } else if (material.includes('高耐鍍鋅鋼板')) {
-    desc = bottomBarAngleIron_options[1].value;
-  } else if (material.includes('304')) {
-    desc = bottomBarAngleIron_options[2].value;
-  } else if (material.includes('316')) {
-    desc = bottomBarAngleIron_options[3].value;
-  } else {
-    desc = bottomBarAngleIron_options[2].value;
-  }
+  const list_bottomBarAngleIron = _.keyBy<Toption>(bottomBarAngleIron_options, 'material');
 
-  // const desc_isAntiTyphoon = confomtTree.isAntiTyphoon[`${isAntiTyphoon}`];
-  // const desc_waterProof = confomtTree.isWaterProof[`${isWaterProof}`];
-  // const desc_luminumBarrier = confomtTree.hasAluminumBarrier[`${hasAluminumBarrier}`];
+  desc = list_bottomBarAngleIron[material]?.value || '';
 
-  // return `${desc_isAntiTyphoon} ${desc_waterProof} ${desc_luminumBarrier}`;
-  // 50*50*4T 錏 後端沒有給類似格式的的資料
   return `${desc}`;
 };
 

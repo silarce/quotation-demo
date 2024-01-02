@@ -1904,27 +1904,19 @@ class Class_product {
   }
 
   /**變更角鐵與底座版 */
-  // getBottomBarAngleIronAndBottomBarPlate(v: '鍍鋅鋼板' | '高耐鍍鋅鋼板' | '不鏽鋼#304' | '不鏽鋼#316') {
-  getBottomBarAngleIronAndBottomBarPlate(
-    // v: '鍍鋅鋼板' | '高耐鍍鋅鋼板' | '不鏽鋼#304' | '不鏽鋼#316'
+
+  changeBottomBarAngleIronAndBottomBarPlate(
+    // v: '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
     v: string
   ) {
-    if (v === '鍍鋅鋼板') {
-      this.bottomBarAngleIron = this.options_bottomBarAngleIron[0].value;
-      this.bottomBarPlate = this.options_bottomBarPlate[0].value;
-    } else if (v.includes('高耐鍍鋅鋼板')) {
-      this.bottomBarAngleIron = this.options_bottomBarAngleIron[1].value;
-      this.bottomBarPlate = this.options_bottomBarPlate[1].value;
-    } else if (v.includes('304')) {
-      this.bottomBarAngleIron = this.options_bottomBarAngleIron[2].value;
-      this.bottomBarPlate = this.options_bottomBarPlate[2].value;
-    } else if (v.includes('316')) {
-      this.bottomBarAngleIron = this.options_bottomBarAngleIron[3].value;
-      this.bottomBarPlate = this.options_bottomBarPlate[3].value;
-    } else {
-      this.bottomBarAngleIron = this.options_bottomBarAngleIron[2].value;
-      this.bottomBarPlate = this.options_bottomBarPlate[2].value;
-    }
+    const list_bottomBarAngleIron = _.keyBy<Toption>(this.options_bottomBarAngleIron, 'material');
+    const list_bottomBarPlate = _.keyBy<Toption>(this.options_bottomBarPlate, 'material');
+
+    const bottomBarAngleIron = list_bottomBarAngleIron[v]?.value || '';
+    const bottomBarPlate = list_bottomBarPlate[v]?.value || '';
+
+    this.bottomBarAngleIron = bottomBarAngleIron;
+    this.bottomBarPlate = bottomBarPlate;
   }
 
   toGetInstallationFee() {
@@ -2525,8 +2517,6 @@ class Class_product {
 
     this._prodData.material = v;
 
-    this.getBottomBarAngleIronAndBottomBarPlate(v);
-
     this.reRender();
   }
   //
@@ -2705,9 +2695,6 @@ class Class_product {
 
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
-    // this.doorTrack = '';
-
-    // this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
 
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
