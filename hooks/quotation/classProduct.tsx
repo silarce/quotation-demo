@@ -2507,12 +2507,6 @@ class Class_product {
     return this._prodData.material;
   }
   set material(v) {
-    const isSST = checkIsSST(v);
-
-    if (!isSST) {
-      this.surface = '';
-    }
-
     Object.values(this.comList || {}).forEach((com) => {
       if (com) {
         com.changeFindedMaterial(v);
@@ -2520,6 +2514,14 @@ class Class_product {
     });
 
     this._prodData.material = v;
+
+    const isSurfaceExist = this.options_surface?.some((item) => {
+      return item.value === this.surface;
+    });
+
+    if (!isSurfaceExist) {
+      this.surface = this.options_surface?.[0].value ?? '';
+    }
 
     this.reRender();
   }
