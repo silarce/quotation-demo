@@ -431,7 +431,9 @@ export default function WorkSheet({
     setProfile({
       projectName: projectName,
       projectContent,
-      projectNumber: contract?.content.quotationNumber ?? '',
+      // projectNumber: contract?.content.quotationNumber ?? '',
+      // 有空時把key改成projectPhoneNumber
+      projectNumber: constructionSiteContactNumber ?? '',
       projectFaxNumber: constructionSiteFaxNumber,
       projectPerson: projectPrincipal,
       projectPersonNumber: constructionSitePrincipalContactNumber,
@@ -481,7 +483,9 @@ export default function WorkSheet({
         changeProfile('projectContent', v);
       },
     },
+    // 有空時把key改成projectPhoneNumber
     projectNumber: {
+      // value: profile.projectNumber,
       value: profile.projectNumber,
       onChange: (v) => {
         changeProfile('projectNumber', v);
