@@ -209,7 +209,7 @@ export default function WorkSheet({
 
   // --------------------------------------------------------
   // --------------------------------------------------------
-  const { itemTokenList, itemIdArrList } = useMemo(() => {
+  const { itemTokenList, itemIdArrList, doorModelNameArr } = useMemo(() => {
     /**
 送給後端的item必須要有id，
 
@@ -222,7 +222,9 @@ export default function WorkSheet({
 用useWorkSheet裡的changedList配合forceUpdate紀錄 */
 
     if (!workSheet?.contractProductItems) {
-      return {};
+      return {
+        doorModelNameArr: [] as string[],
+      };
     }
 
     // const contractProductItems = workSheet.contractProductItems;
@@ -239,6 +241,8 @@ export default function WorkSheet({
 
     const itemTokenList: TitemTokenList = {};
     const itemIdArrList: TitemIdArrList = {};
+
+    const doorModelNameList: { [key: string]: string } = {};
 
     contractProductItems.forEach((item) => {
       const { productId, adjustedItem, adjustedItemId } = item;
@@ -264,6 +268,9 @@ export default function WorkSheet({
 
       itemTokenList[productId][theId] = theItem;
 
+      const { doorModelName } = theItem;
+      doorModelNameList[doorModelName] = doorModelName;
+
       //
       if (!itemIdArrList[productId]) {
         itemIdArrList[productId] = {
@@ -280,9 +287,12 @@ export default function WorkSheet({
       //
     }); //  forEach close
 
+    const doorModelNameArr = Object.values(doorModelNameList);
+
     return {
-      itemTokenList: itemTokenList,
-      itemIdArrList: itemIdArrList,
+      itemTokenList,
+      itemIdArrList,
+      doorModelNameArr,
     };
   }, [workSheet]);
 
@@ -309,6 +319,7 @@ export default function WorkSheet({
   const { sheetList, changedSheetList, reset } = useWorkSheet({
     itemTokenList: _.cloneDeep(itemTokenList) ?? {},
     itemIdArrList: _.cloneDeep(itemIdArrList) ?? {},
+    doorModelNameArr,
   });
 
   const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();

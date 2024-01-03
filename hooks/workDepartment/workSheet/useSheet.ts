@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { nanoid } from 'nanoid';
-import _ from 'lodash';
+
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { Class_workSheet } from './class_WorkSheet';
 
@@ -10,6 +10,8 @@ import {
   TquotationProductItemDto,
   TupdateWorkSheetItem,
 } from 'js/api/dtoTypes';
+
+import { apiGetProdAccessories, TdoorAccessoryDto } from 'js/api/api_product';
 
 // =====================================================================
 
@@ -33,16 +35,20 @@ type TchangedSheetList = {
 
 type TforceUpdate_workSheet = (props?: { isNoChange?: boolean }) => void;
 
+type TaccessoriesArrList = {
+  [key: string]: TdoorAccessoryDto[] | undefined;
+};
+
 // =====================================================================
 const useWorkSheet = ({
   itemTokenList,
   itemIdArrList,
+  doorModelNameArr,
 }: {
   itemTokenList: TitemTokenList_new;
   itemIdArrList: TitemIdArrList_new;
+  doorModelNameArr: string[]; // 必須是狀態，因為要讓useEffect依賴
 }) => {
-  // const [, updateState] = useState({});
-  // const forceUpdate = useCallback(() => updateState({}), []);
   const [sheetList, setSheetList] = useState<TsheetList>({});
 
   const forceUpdate = useCallback(() => {
@@ -50,6 +56,40 @@ const useWorkSheet = ({
   }, []);
 
   const [changedSheetList, setChangedSheetList] = useState<TchangedSheetList>({});
+
+  const [accessoriesArrList, setAccessoriesArrList] = useState<TaccessoriesArrList>({});
+
+  // ------------------------------------------------------------
+
+  const getAccessoriesArr = async (doorModelName: string) => {
+    try {
+      const res = await apiGetProdAccessories({ modelName: doorModelName });
+
+      return res;
+    } catch (error) {
+      const err = error as { response: { data: { message: string; statusCode: number } } };
+      const { message, statusCode } = err.response.data;
+      myAlert.err({ title: '取得選配列表失敗', content: statusCode + ' ' + message });
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      for (const modelName of doorModelNameArr) {
+        const res = await getAccessoriesArr(modelName);
+
+        if (res) {
+          setAccessoriesArrList((state) => ({ ...state, [modelName]: res }));
+        }
+      }
+    })();
+
+    setAccessoriesArrList((state) => {
+      console.log(state);
+
+      return state;
+    });
+  }, [doorModelNameArr]);
 
   // ------------------------------------------------------------
 
