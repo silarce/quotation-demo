@@ -875,14 +875,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
   const reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
 
-  let isAllReviewedBeforePending = false;
-
-  if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-    if (reviewSalesEmployeeId || reviewSupervisorEmployeeId || reviewManagerEmployeeId) {
-      isAllReviewedBeforePending = true;
-    }
-  }
-
   const {
     salesReviewedAt,
     supervisorReviewedAt,
@@ -894,6 +886,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
     toWorkDirectorAt,
     toManagerAt,
   } = latestContent ?? {};
+
+  let isAllReviewedBeforePending = false;
+
+  if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+    if (salesReviewedAt && supervisorReviewedAt && managerReviewedAt) {
+      isAllReviewedBeforePending = true;
+    }
+  }
 
   const isSendToReview = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
 

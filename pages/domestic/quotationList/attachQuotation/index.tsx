@@ -837,14 +837,6 @@ latestContentProdArr為這次追加追減的主產品
   const reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
   const reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
 
-  let isAllReviewedBeforePending = false;
-
-  if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-    if (reviewSalesEmployeeId || reviewSupervisorEmployeeId || reviewManagerEmployeeId) {
-      isAllReviewedBeforePending = true;
-    }
-  }
-
   const {
     salesReviewedAt,
     supervisorReviewedAt,
@@ -856,6 +848,14 @@ latestContentProdArr為這次追加追減的主產品
     toWorkDirectorAt,
     toManagerAt,
   } = latestContent ?? {};
+
+  let isAllReviewedBeforePending = false;
+
+  if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+    if (salesReviewedAt && supervisorReviewedAt && managerReviewedAt) {
+      isAllReviewedBeforePending = true;
+    }
+  }
 
   const isSendToReview = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
 
