@@ -692,7 +692,6 @@ class Class_product {
       doorType: this.doorType,
       fullWidth: this.fullWidth,
       WG: this.WG,
-      guideRailG: this.guildRailG_mm,
       height: this.height,
       area: this.area,
       quantity: this._prodData.quantity,
@@ -705,7 +704,11 @@ class Class_product {
       //
       material: this._prodData.material,
       surface: this._prodData.surface,
+      //
       doorTrack: this._prodData.doorTrack,
+      guideRailG: this.guildRailG_mm,
+      guideRailsOpening: this._prodData.guideRailsOpening,
+      //
       typhoonProtection: this._prodData.typhoonProtection,
       notes: this._prodData.notes,
     };
@@ -834,8 +837,6 @@ class Class_product {
       })
     );
 
-    // console.log(this._theW);
-
     //
 
     const defaultMotorIndex = res.defaultMotorIndex;
@@ -855,9 +856,6 @@ class Class_product {
     this.thickness = res.thickness;
 
     // ________________________
-
-    // console.log(this.options_boxB);
-    // console.log('defaultMotorBox', defaultMotorBox);
 
     // 設定馬達廠商
     if (defaultMotorBox) {
@@ -1467,9 +1465,6 @@ class Class_product {
   takeDefaultDynaValue() {
     // const defaultMotorIndex = this._doorGeneralSpecs?.defaultMotorIndex ?? 0;
     const defaultMotor = this.defaultMotor;
-
-    // console.log(defaultMotor);
-    // console.log(this.options_motor);
 
     const call = () => {
       this._prodData.doorTrackThick = this.options_doorTrackThick?.[0].value ?? '';
@@ -3094,25 +3089,6 @@ class Class_product {
 
   get body() {
     const copy = _.cloneDeep(this._prodData);
-    // componentId
-    // const componentBodyArr = this.comBodyArr;
-    // let isComponentBreak = false;
-
-    // if (componentBodyArr.length !== 8) {
-    //   isComponentBreak = true;
-    // }
-
-    // componentBodyArr.forEach((com) => {
-    //   if (!com.componentId) {
-    //     isComponentBreak = true;
-    //   }
-    // });
-
-    // if (isComponentBreak) {
-    //   myAlert.err({ title: '主產品無材料配件', content: `項目:${this.itemName}` });
-
-    //   return null;
-    // }
 
     const body: TcreateQuotationProductDto & {
       id: string | undefined;
