@@ -7,6 +7,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi, domain } from './_axiosCreator';
 import { createUseInfinite } from './createUseInfinite';
+import { AxiosError } from 'axios';
 
 // type
 import type {
@@ -1033,4 +1034,21 @@ export const useQuotationAccounting_personalContract = (
     data: res,
     update,
   };
+};
+
+// ========================================================================
+
+// 轉為準合約
+export const apiPatchQuotationToPending = (id: string) => {
+  const api = `/quotation/${id}/to-pending`;
+
+  return axi
+    .patch(api)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '轉為準合約失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };
