@@ -333,28 +333,28 @@ class Class_workSheet {
     this._prod.area = area;
   }
 
-  private toSetDefaultBoxB() {
-    if (!this._prodSpec) {
-      return;
-    }
+  // private toSetDefaultBoxB() {
+  //   if (!this._prodSpec) {
+  //     return;
+  //   }
 
-    const motorArr = this._prodSpec.motors;
-    const hp = this.horsepower;
-    const vendor = this.motorVendor as '東元' | '大同' | '';
-    const defaultMotor = motorArr[this._prodSpec.defaultMotorIndex];
-    const defaultHP = defaultMotor.hp;
-    const box = defaultMotor.box;
+  //   const motorArr = this._prodSpec.motors;
+  //   const hp = this.horsepower;
+  //   const vendor = this.motorVendor as '東元' | '大同' | '';
+  //   const defaultMotor = motorArr[this._prodSpec.defaultMotorIndex];
+  //   const defaultHP = defaultMotor.hp;
+  //   const box = defaultMotor.box;
 
-    if (hp !== defaultHP || !vendor || !box) {
-      return;
-    }
+  //   if (hp !== defaultHP || !vendor || !box) {
+  //     return;
+  //   }
 
-    const boxB = box[vendor]?.boxB || box.default?.boxB;
+  //   const boxB = box[vendor]?.boxB || box.default?.boxB;
 
-    if (boxB) {
-      this.boxB = String(boxB / 1000);
-    }
-  }
+  //   if (boxB) {
+  //     this.boxB = String(boxB / 1000);
+  //   }
+  // }
 
   findBoxBoptions() {
     const { options_boxB } = findBDoptions(this._prod.doorModelName);
@@ -960,7 +960,7 @@ class Class_workSheet {
   }
   set motorVendor(str) {
     this._prod.motorVendor = str;
-    this.toSetDefaultBoxB();
+    // this.toSetDefaultBoxB();
     this.forceUpdate();
   }
 

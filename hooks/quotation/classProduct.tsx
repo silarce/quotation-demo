@@ -2545,6 +2545,15 @@ class Class_product {
     this._prodData.guideRailsOpening = theGuideRail?.guideRailsOpening ?? '';
     this._prodData.guideRailG = theGuideRail?.width ?? 0;
 
+    if (this._prodData.WG) {
+      this._theW = String(
+        calcW({
+          WG: Number(this._prodData.WG) || 0,
+          G: Number(this.guildRailG) || 0,
+        })
+      );
+    }
+
     this.callRetrieveCreProdCom();
 
     this.reRender();

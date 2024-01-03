@@ -933,13 +933,13 @@ export type TquotationProductDto = {
   // 馬達支撐架
   hasMotorSupportStand: boolean;
   // 底座類型
-  bottomBar: string;
+  bottomBar: string; // 鋁障感 | 止水型 | ''
   // 馬達鎖盒
   motorLockBox: string;
   // 門軌厚度
   guideRailThickness: number;
   // 捲軸規格
-  rollerSpec: string;
+  rollerSpec: string; // 雙凸|無凸
   // 門軌消音條
   hasSilencingStrip: boolean;
   // 一體式捲箱
@@ -1354,13 +1354,13 @@ export type TcreateQuotationProductDto = {
   // 馬達支撐架
   hasMotorSupportStand: boolean;
   // 底座類型
-  bottomBar: string;
+  bottomBar: string; // 鋁障感 | 止水型 | ''
   // 馬達鎖盒
   motorLockBox: string;
   // 門軌厚度
   guideRailThickness: number;
   // 捲軸規格
-  rollerSpec: string;
+  rollerSpec: string; // 雙凸|無凸
   // 門軌消音條
   hasSilencingStrip: boolean;
   // 一體式捲箱
@@ -2417,10 +2417,10 @@ export type TupdateWorkSheetItem = {
   motorVendor: string;
   motorVoltage: number;
   hasMotorSupportStand: boolean;
-  bottomBar: string;
+  bottomBar: string; // 鋁障感 | 止水型 | ''
   motorLockBox: string;
   guideRailThickness: string;
-  rollerSpec: string;
+  rollerSpec: string; // 雙凸|無凸
   hasSilencingStrip: boolean;
   isIntegratedHeadBox: boolean;
   headBoxThickness: string;
@@ -2486,7 +2486,7 @@ export type TupdateWorkSheetItem = {
   //  '捲箱 - 角鐵數量'
   headBoxAngleIronQuantity: number | null;
   //  '支板 - 鏈條'
-  sidePlateChain: string | null;
+  sidePlateChain: string | null; // 改取用 sprocketWheelModel，這個property應該就不需要了
   //  '支板 - 方向'
   sidePlateDirection: string | null;
   //  '電動機 - 鍊條形式'
@@ -2496,9 +2496,9 @@ export type TupdateWorkSheetItem = {
   //  '門軌 - 型式'
   guideRailType: string | null;
   // 底座 - 表面
-  bottomBarSurface: string | null;
+  bottomBarSurface: string | null; // 可以記錄在component裡面，這個property應該就不需要了
   // 門軌 - 表面
-  guideRailSurface: string | null;
+  guideRailSurface: string | null; // 可以記錄在component裡面，這個property應該就不需要了
 };
 
 export type TupdateWorkSheet = {
