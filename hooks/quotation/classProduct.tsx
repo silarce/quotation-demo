@@ -708,6 +708,7 @@ class Class_product {
       doorTrack: this._prodData.doorTrack,
       guideRailG: this.guildRailG_mm,
       guideRailsOpening: this._prodData.guideRailsOpening,
+      doorTrackSilencerStrip: this._prodData.doorTrackSilencerStrip,
       //
       typhoonProtection: this._prodData.typhoonProtection,
       notes: this._prodData.notes,
