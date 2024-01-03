@@ -12,13 +12,24 @@
 component不變的話
 get /products/door/generate-door-product-bom 也不需要呼叫了
 
-看來需要呼叫並用來更新資料的只有
-get /products/door/calc-general-spec
-get /products/door/calc-detail-spec
+在工作表甚至工務部這邊，不需要 componentId
+所以即使componentId對應的規格與使用者編輯後的規格不搭配也沒關係
+工作表就是讓使用者依現場的情況編輯規格，然後交給相關部門(例如業務部)參考用的
+
+_________________________________________________________________
+
+
+get /products/door/calc-general-spec // 用來取得經過計算才能知道的規格(不可以隨意編輯)
+get /products/door/calc-detail-spec // 用來取得門片數量
 這兩個api的呼叫已經放進Class_workSheet.calcProd了
+
+get /products/door/calc-side-plate-size-d // 用來取得boxD
+這個不需要在init呼叫，按下計算按鈕時呼叫就好了
+
 
 Class_workSheet.getInitData
 會呼叫 getAccessoriesArr與getProdAvailableComponents
+
 
 如果工作表的是到現場實作後，修改主產品規格的紀錄
 那麼是不是厚度、馬力數的選項就不應該是從後端取得的資料
@@ -34,7 +45,11 @@ options_doorTrackThick
 先用主產品的作法吧，只是取得availableComponents後不把component換掉
 只取得options
 
+最好問一下建樺他期望的做法
+
 -----------------------------
+
+必須要把取得boxD的api放進去
 
 工作表更新後
 被更新的item會產生adjustedItem這個property

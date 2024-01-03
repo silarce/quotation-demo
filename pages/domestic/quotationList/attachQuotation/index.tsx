@@ -84,6 +84,8 @@ import {
   useQuotation_id_attachments,
   apiPostQuotation_id_attachments,
   apiDelQuotation_id_attachments,
+  //
+  apiPatchQuotationToPending,
 } from 'js/api/api_quotation';
 
 import { useProductList } from 'hooks/quotation/useProduct';
@@ -835,6 +837,14 @@ latestContentProdArr為這次追加追減的主產品
   const reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
   const reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
 
+  let isAllReviewedBeforePending = false;
+
+  if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+    if (reviewSalesEmployeeId || reviewSupervisorEmployeeId || reviewManagerEmployeeId) {
+      isAllReviewedBeforePending = true;
+    }
+  }
+
   const {
     salesReviewedAt,
     supervisorReviewedAt,
@@ -1107,6 +1117,22 @@ latestContentProdArr為這次追加追減的主產品
     //   img: iconUpload.src,
     //   onClick: () => setShowPdf_part(true),
     // },
+    isAllReviewedBeforePending && quotationId
+      ? {
+          type: 'redButton',
+          label: '轉為準合約',
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定轉為準合約',
+              props: {
+                onOk: () => {
+                  reqToPending();
+                },
+              },
+            });
+          },
+        }
+      : null,
 
     (!!isReviewer || null) && {
       type: 'myButton',
@@ -1492,6 +1518,42 @@ latestContentProdArr為這次追加追減的主產品
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
       myAlert.err({ title: '解除鎖定發生錯誤', content: err.response?.data.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 轉為準合約
+  const reqToPending = async () => {
+    if (!quotationId) {
+      return;
+    }
+
+    if (!isAllReviewedBeforePending) {
+      myAlert.info({ title: '此報價單尚未審核完畢' });
+
+      return;
+    }
+
+    if (status === 'Pending') {
+      myAlert.info({ title: '此報價單已經是準合約' });
+    }
+
+    if (status === 'Contract') {
+      myAlert.info({ title: '此報價單已是合約' });
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPatchQuotationToPending(quotationId);
+      await update();
+      router.push({
+        query: {
+          ...router.query,
+          status: 'Pending',
+        },
+      });
+    } catch (error) {
     } finally {
       setIsLoading(false);
     }

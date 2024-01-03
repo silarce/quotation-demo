@@ -108,24 +108,27 @@ export default function Add() {
           return myAlert.info({ title: '正在檢查客戶編號' });
         }
 
+        const postBody = classCustomer.postBody;
+
         try {
-          const postBody = classCustomer.postBody;
           setRootLoading(true);
           const res = await apiPostCustomers(postBody);
-          myAlert.success({ title: '新增客戶資料完成' });
 
           if (reDeirectorToEdit === 'true') {
             router.push({
               pathname: '/domestic/customer/edit',
               query: {
+                ...router.query,
                 id: res.id,
+                reDeirectorToEdit: undefined,
+                isFromAdd: true,
               },
             });
           } else {
-            router.push({
-              pathname: '/domestic/customer',
-            });
+            router.back();
           }
+
+          myAlert.success({ title: '新增客戶資料完成' });
         } catch {
           myAlert.err({ title: '新增客戶資料失敗' });
         } finally {
@@ -137,7 +140,13 @@ export default function Add() {
       type: 'myButton',
       label: '取消',
       onClick: () => {
-        router.back();
+        if (router.query.reDeirectorToEdit === 'true') {
+          router.push({
+            pathname: '/domestic/customer',
+          });
+        } else {
+          router.back();
+        }
       },
     },
   ];
