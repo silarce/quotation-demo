@@ -1702,13 +1702,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
         unit_str = com.unit as string;
       }
 
+      let desc = com.desc ?? '';
+
+      if (com.comName === '門箱') {
+        desc = desc.replaceAll('捲+機', '');
+        desc = desc.replaceAll('方型捲箱', '');
+      }
+
       return {
         partName: com.comName,
         material: com.material,
         unit: com.unit,
         unit_str,
         qty: new Decimal(com.quantity || 0).toFixed(2),
-        desc: com.desc ?? '',
+        desc,
         price: com.unitPrice_locale,
         totalPrice: Number(com.totalPrice || 0).toLocaleString(),
       };
