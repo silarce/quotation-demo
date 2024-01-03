@@ -3306,7 +3306,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'doorTrackThick', // 門軌厚度
     // 'rollerSpec', // 捲軸規格
     'doorTrackSilencerStrip', // 門軌消音條
-    // 'onePieceRollUpBox', // 一體式捲箱
+    'onePieceRollUpBox', // 一體式捲箱
     'rollUpBoxThick', // 捲箱厚度
     'close', // 開閉方式
     'isULGuideRail',
