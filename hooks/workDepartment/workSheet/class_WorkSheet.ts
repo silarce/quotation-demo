@@ -23,7 +23,7 @@ import {
 } from 'js/api/api_product';
 
 // type
-import { TforceUpdate_workSheet } from './useSheet';
+import { TforceUpdate_workSheet, TaccessoriesArrList } from './useSheet';
 import {
   TquotationProductDto,
   TupdateWorkSheetItem,
@@ -54,6 +54,8 @@ class Class_workSheet {
     addSheet,
     deleteSheet,
     clearSheet,
+    //
+    lookupAccessoriesArr,
   }: {
     //
     // forceUpdate: (props?: { isNoChange?: boolean }) => void;
@@ -73,6 +75,8 @@ class Class_workSheet {
     }) => void;
     deleteSheet: () => void;
     clearSheet: () => void;
+    //
+    lookupAccessoriesArr: (doorModelName: string) => Promise<TdoorAccessoryDto[]>;
   }) {
     this.forceUpdate = forceUpdate;
     this._prod = _.cloneDeep(prod);
@@ -83,6 +87,7 @@ class Class_workSheet {
     this._addSheet = addSheet;
     this._deleteSheet = deleteSheet;
     this._clearSheet = clearSheet;
+    this.lookupAccessoriesArr = lookupAccessoriesArr;
 
     if (this.identifyKey_p === this.identifyKey_c) {
       this._originalIdArr = _.cloneDeep(this._itemIdArr);
@@ -161,6 +166,7 @@ class Class_workSheet {
   private _addSheet;
   private _deleteSheet;
   private _clearSheet;
+  readonly lookupAccessoriesArr;
 
   private _originalIdArr: string[] | undefined = undefined;
 
@@ -203,40 +209,24 @@ class Class_workSheet {
   async getAccessoriesArr() {
     this._accessoriesOptionArr = [];
 
-    let res: TdoorAccessoryDto[] | undefined = undefined;
-
-    try {
-      res = await apiGetProdAccessories({ modelName: this.doorModelName });
-    } catch (error) {
-      const err = error as { response: { data: { message: string; statusCode: number } } };
-      const { message, statusCode } = err.response.data;
-      myAlert.err({ title: '取得選配列表失敗', content: statusCode + ' ' + message });
-    }
+    const res = await this.lookupAccessoriesArr(this.doorModelName);
 
     if (res) {
       this._accessoriesOptionArr = res;
 
       const list: typeof this._accessoriesOptionList = {};
-      // const arr: string[] = [];
 
       this._accessoriesOptionArr.forEach((item) => {
         list[item.id] = item;
         this._accessoriesOptionArr_easy.push({ value: item.id, label: item.name });
-
-        // const isHave = this._acceIdArr.some((name) => {
-        //   return name === item.name;
-        // });
-
-        // if (isHave) {
-        //   arr.push(item.id);
-        // }
       });
 
       this._accessoriesOptionList = list;
-      // this._acceIdArr = arr;
     }
 
     this.forceUpdate({ isNoChange: true });
+
+    return res;
   }
 
   async getProdSpec() {

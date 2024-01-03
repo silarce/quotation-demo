@@ -1,7 +1,19 @@
 // 工作表
 
 /*
-在報價單主產品
+
+
+捲軸
+捲箱
+底座
+支版
+門片
+電動機
+門軌
+這七個區塊的內容"大多"是對應的component
+沒有馬達配件區塊
+
+
 呼叫get /products/door/available-components
 是為了取得材料配件資料，並顯出來
 顯示出來的欄位有代號、說明、材料、表面、烤漆、單位、數量、牌價、牌價複價、單價、複價
@@ -45,7 +57,6 @@ options_doorTrackThick
 先用主產品的作法吧，只是取得availableComponents後不把component換掉
 只取得options
 
-最好問一下建樺他期望的做法
 
 -----------------------------
 
@@ -61,7 +72,6 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
-import moment from 'moment';
 
 // layer
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
@@ -100,7 +110,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // api
-import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id_noItems } from 'js/api/api_quotation';
 import {
   TupdateWorkSheetItem,
   useGetEngineeringContact,
@@ -108,7 +118,7 @@ import {
   apiPatchWorkSheet,
   apiDeleteWorkSheetItem,
 } from 'js/api/api_engineering';
-import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
+import { useApiGetProdDoorModels } from 'js/api/api_product';
 
 // hook
 import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
@@ -126,7 +136,6 @@ import {
   optionsCreator_bottomBar,
   optionsCreator_motorLockBox,
   optionsCreator_rollerSpec,
-  optionsCreator_closingType,
   optionsCreator_bottomBarAngleIron,
   optionsCreator_bottomBarPlate,
   optionsCreator_surface,
@@ -209,7 +218,7 @@ export default function WorkSheet({
 
   // --------------------------------------------------------
   // --------------------------------------------------------
-  const { itemTokenList, itemIdArrList, doorModelNameArr } = useMemo(() => {
+  const { itemTokenList, itemIdArrList } = useMemo(() => {
     /**
 送給後端的item必須要有id，
 
@@ -222,12 +231,9 @@ export default function WorkSheet({
 用useWorkSheet裡的changedList配合forceUpdate紀錄 */
 
     if (!workSheet?.contractProductItems) {
-      return {
-        doorModelNameArr: [] as string[],
-      };
+      return {};
     }
 
-    // const contractProductItems = workSheet.contractProductItems;
     const contractProductItems = _.sortBy(workSheet.contractProductItems, 'createdAt');
 
     type TitemTokenList = {
@@ -241,8 +247,6 @@ export default function WorkSheet({
 
     const itemTokenList: TitemTokenList = {};
     const itemIdArrList: TitemIdArrList = {};
-
-    const doorModelNameList: { [key: string]: string } = {};
 
     contractProductItems.forEach((item) => {
       const { productId, adjustedItem, adjustedItemId } = item;
@@ -268,9 +272,6 @@ export default function WorkSheet({
 
       itemTokenList[productId][theId] = theItem;
 
-      const { doorModelName } = theItem;
-      doorModelNameList[doorModelName] = doorModelName;
-
       //
       if (!itemIdArrList[productId]) {
         itemIdArrList[productId] = {
@@ -287,12 +288,9 @@ export default function WorkSheet({
       //
     }); //  forEach close
 
-    const doorModelNameArr = Object.values(doorModelNameList);
-
     return {
       itemTokenList,
       itemIdArrList,
-      doorModelNameArr,
     };
   }, [workSheet]);
 
@@ -319,7 +317,6 @@ export default function WorkSheet({
   const { sheetList, changedSheetList, reset } = useWorkSheet({
     itemTokenList: _.cloneDeep(itemTokenList) ?? {},
     itemIdArrList: _.cloneDeep(itemIdArrList) ?? {},
-    doorModelNameArr,
   });
 
   const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();
