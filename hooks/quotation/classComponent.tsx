@@ -102,6 +102,15 @@ class Class_component {
       return;
     }
 
+    if (this._prod.doorType === 'SJ-302' && this.key === 'bottomBar') {
+      const options = comLookUp[this.key].options;
+
+      //如果v === 高耐鍍鋅鋼板
+      if (v === options[3].value) {
+        v = options[0].value; // 鍍鋅鋼板
+      }
+    }
+
     const value = findOptionValue({
       options: this.options_material ?? [],
       value: v,
