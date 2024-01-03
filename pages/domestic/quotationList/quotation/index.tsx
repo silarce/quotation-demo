@@ -111,6 +111,8 @@ import {
   apiDelQuotation_id_attachments,
   //
   useGetQuotationContent_id,
+  //
+  apiPatchQuotationToPending,
 } from 'js/api/api_quotation';
 
 // hook
@@ -873,10 +875,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
   const reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
 
-  // const salesReviewedAt = latestContent?.salesReviewedAt;
-  // const supervisorReviewedAt = latestContent?.supervisorReviewedAt;
-  // const workDirectorReviewedAt = latestContent?.workDirectorReviewedAt;
-  // const managerReviewedAt = latestContent?.managerReviewedAt;
+  let isAllReviewedBeforePending = false;
+
+  if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+    if (reviewSalesEmployeeId || reviewSupervisorEmployeeId || reviewManagerEmployeeId) {
+      isAllReviewedBeforePending = true;
+    }
+  }
 
   const {
     salesReviewedAt,
@@ -1162,7 +1167,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
       },
     },
   ];
+
   const panel_noEditable: TpanelList = [
+    isAllReviewedBeforePending && quotationId
+      ? {
+          type: 'redButton',
+          label: '轉為準合約',
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定轉為準合約',
+              props: {
+                onOk: () => {
+                  reqToPending();
+                },
+              },
+            });
+          },
+        }
+      : null,
     {
       type: 'myButton',
       label: '匯出報價單',
@@ -1174,18 +1196,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       label: '單價分析',
       img: iconUpload.src,
       onClick: () => {
-        // const prodArr = latestContent?.products;
-        // let isOk = true;
-        // prodArr?.forEach((prod) => {
-        //   if (prod.quantity === 0) {
-        //     isOk = false;
-        //   }
-        // });
-
-        // if (!isOk) {
-        //   return myAlert.info({ title: '有主產品數量為0', content: '請先確認所有主產品的數量不為0' });
-        // }
-
         setShowPdf_part(true);
       },
     },
@@ -1615,6 +1625,42 @@ function TheQuotation({ router }: { router: NextRouter }) {
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新審核人員失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 轉為準合約
+  const reqToPending = async () => {
+    if (!quotationId) {
+      return;
+    }
+
+    if (!isAllReviewedBeforePending) {
+      myAlert.info({ title: '此報價單尚未審核完畢' });
+
+      return;
+    }
+
+    if (status === 'Pending') {
+      myAlert.info({ title: '此報價單已經是準合約' });
+    }
+
+    if (status === 'Contract') {
+      myAlert.info({ title: '此報價單已是合約' });
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPatchQuotationToPending(quotationId);
+      await update();
+      router.push({
+        query: {
+          ...router.query,
+          status: 'Pending',
+        },
+      });
+    } catch (error) {
     } finally {
       setIsLoading(false);
     }
