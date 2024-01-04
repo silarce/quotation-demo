@@ -1403,6 +1403,8 @@ class Class_workSheet {
         guideRailType: this._prod.guideRailType,
         bottomBarSurface: this._prod.bottomBarSurface,
         guideRailSurface: this._prod.guideRailSurface,
+        //
+        guideRailG: this._prod.guideRailG,
       };
 
       return item;

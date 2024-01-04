@@ -2489,6 +2489,9 @@ export type TupdateWorkSheetItem = {
   bottomBarSurface: string | null; // 可以記錄在component裡面，這個property應該就不需要了
   // 門軌 - 表面
   guideRailSurface: string | null; // 可以記錄在component裡面，這個property應該就不需要了
+  //
+  //
+  guideRailG: number | null;
 };
 
 export type TupdateWorkSheet = {
