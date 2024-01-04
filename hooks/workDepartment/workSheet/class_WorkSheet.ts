@@ -258,6 +258,7 @@ class Class_workSheet {
         this._prod.bearingInnerDiameter = res.bearingInnerDiameter;
         this._prod.diameter = String(res.diameter);
         this._prod.bearingHousingTotalLength = String(res.bearingHousingTotalLength);
+        this.calcBoxD();
 
         return res;
       }
@@ -547,7 +548,7 @@ class Class_workSheet {
 
     // 設定boxB與thickness
     // 後端說boxB只會在defaultMotorIndex指定的motors裡面
-    const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
+    const defaultBoxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
     this._prod.thickness = prodSpec.thickness; // 門片厚度
 
     // 設定馬達廠商
@@ -562,7 +563,7 @@ class Class_workSheet {
         this.boxB_noCall = defaultMotorBox.default.boxB;
       }
     } else {
-      this.boxB_noCall = boxB ?? 0;
+      this.boxB_noCall = defaultBoxB ?? 0;
     }
 
     this.findBoxBoptions();
@@ -655,6 +656,7 @@ class Class_workSheet {
   }
   set doorModelName(str) {
     this._prod.doorModelName = str;
+    this.calcBoxD();
     this.forceUpdate();
   }
 
@@ -989,6 +991,7 @@ class Class_workSheet {
   }
   set horsepower(str) {
     this._prod.horsepower = str;
+    this.calcBoxD();
     this.forceUpdate();
   }
   //廠商
@@ -997,6 +1000,7 @@ class Class_workSheet {
   }
   set motorVendor(str) {
     this._prod.motorVendor = str;
+    this.calcBoxD();
     // this.toSetDefaultBoxB();
     this.forceUpdate();
   }
