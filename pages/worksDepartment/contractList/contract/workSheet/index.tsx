@@ -1,5 +1,7 @@
 // 工作表
 
+// 按下計算按鈕會呼叫targetSheet.calcProd()
+
 /*
 
 
@@ -1101,19 +1103,6 @@ export default function WorkSheet({
 
       if (sheet.isOriginal) {
         continue;
-      }
-
-      try {
-        // 送給後端的資料中如果accessories裡的name是空的，會壞掉
-        // 所以要呼叫getAccessoriesArr()確保accessories的name都有值
-        if (!changedSheetList[key].isAccessoriesReady) {
-          await changedSheetList[key].getAccessoriesArr();
-        }
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得配件列表失敗，更新工作表失敗', content: err.message });
-        setDisabled(true);
-        break;
       }
 
       // 必須先執行確保accessories的name都有值的步驟才可以取body

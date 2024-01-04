@@ -88,6 +88,7 @@ class Class_workSheet {
     this._deleteSheet = deleteSheet;
     this._clearSheet = clearSheet;
     this.lookupAccessoriesArr = lookupAccessoriesArr;
+    this._doorModelName_state = this._prod.doorModelName;
 
     if (this.identifyKey_p === this.identifyKey_c) {
       this._originalIdArr = _.cloneDeep(this._itemIdArr);
@@ -168,6 +169,8 @@ class Class_workSheet {
   private _clearSheet;
   readonly lookupAccessoriesArr;
 
+  private _doorModelName_state;
+
   private _originalIdArr: string[] | undefined = undefined;
 
   private _deleteIdList: { [key: string]: string[] } = {};
@@ -208,7 +211,7 @@ class Class_workSheet {
 
   async getAccessoriesArr() {
     this._accessoriesOptionArr = [];
-
+    this._accessoriesOptionArr_easy = [];
     const res = await this.lookupAccessoriesArr(this.doorModelName);
 
     if (res) {
@@ -533,6 +536,13 @@ class Class_workSheet {
     this.changeComMaterial();
     await this.getProdDetailSepc();
     await this.getProdAvailableComponents();
+
+    if (this._doorModelName_state !== this._prod.doorModelName) {
+      this._doorModelName_state = this._prod.doorModelName;
+      this._acceIdArr = [];
+      await this.getAccessoriesArr();
+    }
+
     this.isLoading = false;
     this.forceUpdate();
 
