@@ -327,7 +327,7 @@ class Class_workSheet {
       fullWidth: this._prod.fullWidth,
     });
 
-    this._prod.area = area;
+    this._prod.area = new Decimal(area).div(1000000).toFixed(2);
   }
 
   async calcBoxD() {
