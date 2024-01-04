@@ -1127,9 +1127,12 @@ class Class_workSheet {
   set guideRail(option: Toption | null) {
     const str = option?.value ?? '';
     const opening = option?.opening ?? '';
+    const guideRailG = option?.width ?? '0';
 
     this._prod.guideRail = str;
     this._prod.guideRailsOpening = opening;
+    this._prod.guideRailG = Number(guideRailG);
+
     this.forceUpdate();
   }
 

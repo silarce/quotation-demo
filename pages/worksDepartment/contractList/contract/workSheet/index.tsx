@@ -379,6 +379,7 @@ export default function WorkSheet({
           label: item.imgSrc,
           opening: item.opening,
           icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
+          width: String(item.width),
         });
       } else {
         guideRailOptionArr_noHook.push({
@@ -386,6 +387,7 @@ export default function WorkSheet({
           label: item.imgSrc,
           opening: item.opening,
           icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
+          width: String(item.width),
         });
       }
     });
