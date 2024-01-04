@@ -416,8 +416,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
           const fax = customer.fax || '';
 
           setCustomer(customer);
-          changeProfile('contactPerson', `${name}${phone}`);
-          changeProfile('contactNumber', customerPhoneNumber);
+          changeProfile('contactPerson', `${name}`);
+          changeProfile('contactNumber', phone);
           changeProfile('faxNumber', fax);
         },
         onClear: () => {

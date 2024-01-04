@@ -51,6 +51,7 @@ class Class_accessories {
     if (isNew) {
       setTimeout(() => {
         this.calcPrice();
+        this.decideUnit();
       }, 0);
     }
 
@@ -84,9 +85,24 @@ class Class_accessories {
       // const w = Number(this._prod.WG);
       const w = 0;
       this.quantity = l || w;
-      this.unit = 'M';
     } else if (referenceSpec === 'area') {
       this.quantity = Number(new Decimal(this._prod.area || 0).toFixed(2));
+    }
+
+    this.price = String(this._acceData.originalPrice); // will call calcAllPrice
+  }
+
+  decideUnit = () => {
+    const referenceSpec = this._acceData.referenceSpec;
+    const unit = this._acceData.unit;
+
+    if (unit) {
+      return;
+    }
+
+    if (referenceSpec === 'fullWidth') {
+      this.unit = 'M';
+    } else if (referenceSpec === 'area') {
       // this.unit = (
       //   <span>
       //     m<sup>2</sup>
@@ -96,9 +112,7 @@ class Class_accessories {
     } else {
       this.unit = '組';
     }
-
-    this.price = String(this._acceData.originalPrice); // will call calcAllPrice
-  }
+  };
 
   calcAllPrice() {
     const discount = new Decimal(this._prod.discount).div(100);
