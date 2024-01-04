@@ -875,20 +875,21 @@ class Class_workSheet {
 
   // 型式
   get bottomBar() {
+    //   return this._prod.bottomBarSurface;
     return this._prod.bottomBar;
   }
   set bottomBar(str) {
+    //   this._prod.bottomBarSurface = str;
     this._prod.bottomBar = str;
     this.forceUpdate();
   }
 
-  // 表面
-  get bottomBarSurface() {
-    return this._prod.bottomBarSurface;
+  get com_bottomBar_surface() {
+    return this.comList.bottomBar.materialSurface;
   }
 
-  set bottomBarSurface(str) {
-    this._prod.bottomBarSurface = str;
+  set com_bottomBar_surface(str) {
+    this.comList.bottomBar.materialSurface = str;
     this.forceUpdate();
   }
 
@@ -1057,11 +1058,13 @@ class Class_workSheet {
   }
 
   // 表面
-  get guideRailSurface() {
-    return this._prod.guideRailSurface;
+  get com_guideRail_surface() {
+    // return this._prod.guideRailSurface;
+    return this.comList.guideRail.materialSurface;
   }
-  set guideRailSurface(str) {
-    this._prod.guideRailSurface = str;
+  set com_guideRail_surface(str) {
+    // this._prod.guideRailSurface = str;
+    this.comList.guideRail.materialSurface = str;
     this.forceUpdate();
   }
 

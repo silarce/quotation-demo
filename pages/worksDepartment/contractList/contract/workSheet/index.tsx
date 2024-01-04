@@ -790,10 +790,10 @@ export default function WorkSheet({
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_bottomBar() }),
       },
       surface: {
-        value: targetSheet?.bottomBarSurface ?? '',
+        value: targetSheet?.com_bottomBar_surface ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.bottomBarSurface = v;
+            targetSheet.com_bottomBar_surface = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
@@ -949,10 +949,10 @@ export default function WorkSheet({
         optionArr: targetSheet?.options_doorTrackThick ?? [],
       },
       surface: {
-        value: targetSheet?.guideRailSurface ?? '',
+        value: targetSheet?.com_guideRail_surface ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.guideRailSurface = v;
+            targetSheet.com_guideRail_surface = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
@@ -1157,7 +1157,7 @@ export default function WorkSheet({
             BD: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
             /**捲門全高 */
             fullHeight: sheet.fullHeight,
-            weightConversion: '', // 未知 // 重量換算
+            weightConversion: '', // 未知 // 重量換算 沒有在任一表單顯示
           },
           roller: {
             diameter: `${sheet.diameter}"` ?? '', // 要有 " 符號，代表吋
@@ -1167,7 +1167,7 @@ export default function WorkSheet({
             bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
           },
           headBox: {
-            angleIronQty: '', // 未知
+            angleIronQty: sheet.headBoxAngleIronQuantity,
             angleIronSize: sheet.angleIronSize,
             form: sheet.headBoxForm_str,
             surface: '',
@@ -1185,7 +1185,7 @@ export default function WorkSheet({
             /**相數加電壓 */
             phaseVoltage: sheet.motorPhaseVoltage,
             horsepower: sheet.horsepower,
-            direction: '', // 未知
+            direction: '', // 未知 // 在廠務部工作表 電動機方向
           },
           guideRail: {
             form: sheet.isAntiTyphoon ? '防颱' : '一般',
@@ -1195,24 +1195,24 @@ export default function WorkSheet({
             icon: sheet?.guideRailName
               ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
               : undefined,
-            antiTyphoonHook: '-50', // 未知
+            antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
             bendStraight: sheet.guideRailType ?? '',
           },
           chainCog: {
             sprocketWheelModel: sheet.sprocketWheelModel ?? '',
             sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber ?? '',
             bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
-            teethQuantity: '', // 未知
-            centerDistance: '', // 未知
-            eyesQuantity: '', // 未知
+            teethQuantity: '', // 未知 // 在廠務部工作表 齒數
+            centerDistance: '', // 未知 // 在廠務部工作表 中心距
+            eyesQuantity: '', // 未知 // 在廠務部工作表 目數
           },
           base: {
             material: sheet.com_bottomBar_material,
             guideRailsOpening: sheet.guideRailsOpening,
-            surface: '', // 未知
+            surface: '', // 未知 在廠務部工作表
           },
           sidePlate: {
-            direction: '', // 未知
+            direction: '', // 未知 在廠務部工作表
             bigSidePlate: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
             smallSidePlate: `${sheet.boxB_mm}*${sheet.boxB_mm}`,
           },
