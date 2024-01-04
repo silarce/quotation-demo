@@ -20,6 +20,8 @@ import {
   apiGetProdCalcDetailSpec,
   apiGetProdAvailableComponents,
   // apiGetProdAvailableComponents,
+  apiGetboxD,
+  TgetBoxDParams,
 } from 'js/api/api_product';
 
 // type
@@ -326,6 +328,39 @@ class Class_workSheet {
     });
 
     this._prod.area = area;
+  }
+
+  async calcBoxD() {
+    const diameter = this._prodSpec?.diameter;
+
+    if (!diameter) {
+      myAlert.err({ title: '取得boxD失敗', content: `傳軸直徑資料錯誤。資料為${this._prodSpec?.diameter}` });
+      this._prod.boxD = 0;
+
+      return;
+    }
+
+    const params: TgetBoxDParams = {
+      modelName: this.doorModelName,
+      rollerDiameter: diameter,
+      sidePlateSizeB: Number(this.boxB_mm),
+      hp: this.horsepower,
+      motorVendor: this._prod.motorVendor,
+    };
+
+    try {
+      const res = await apiGetboxD(params);
+
+      if (res) {
+        this._prod.boxD = res.sidePlateSizeD;
+        this.forceUpdate();
+      }
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      const { message } = err.response?.data ?? {};
+      myAlert.err({ title: '取得boxD失敗', content: message });
+      this._prod.boxD = 0;
+    }
   }
 
   // private toSetDefaultBoxB() {
@@ -676,15 +711,21 @@ class Class_workSheet {
     }
 
     this._prod.boxB = num;
-    const boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[str]) ?? 0;
-    this._prod.boxD = boxD * 1000;
+
+    // const boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[str]) ?? 0;
+    // this._prod.boxD = boxD * 1000;
+    this.calcBoxD();
+
     this.calcArea();
     this.forceUpdate();
   }
 
   set boxB_noCall(num: number) {
     this._prod.boxB = Number(num);
-    this._prod.boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[num]) ?? 0;
+
+    // this._prod.boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[num]) ?? 0;
+    this.calcBoxD();
+
     this.calcArea();
     this.forceUpdate();
   }
@@ -1378,8 +1419,6 @@ class Class_workSheet {
   //
 } // Class_workSheet close
 
-export { Class_workSheet as Class_workSheet };
-
 // ======================================================================
 
 const creEmptyCom = (type: TquotationProductComponentsDto['type']): TquotationProductComponentsDto => ({
@@ -1400,3 +1439,7 @@ const creEmptyCom = (type: TquotationProductComponentsDto['type']): TquotationPr
   desc: null,
   density: null,
 });
+
+// ======================================================================
+
+export { Class_workSheet as Class_workSheet };
