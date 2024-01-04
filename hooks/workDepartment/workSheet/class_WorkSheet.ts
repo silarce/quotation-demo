@@ -327,6 +327,7 @@ class Class_workSheet {
       fullWidth: this._prod.fullWidth,
     });
 
+    // 換算為平方公尺
     this._prod.area = new Decimal(area).div(1000000).toFixed(2);
   }
 
@@ -593,14 +594,6 @@ class Class_workSheet {
     if (this.accessoriesOptionArr.length === 0 || fonceInit) {
       await this.getAccessoriesArr();
     }
-
-    // if (this._prodDetailSpec === undefined) {
-    //   this.getProdDetailSepc();
-    // }
-
-    // if (this._prodSpec === undefined) {
-    //   await this.getProdSpec();
-    // }
 
     if (this._availableComponents === undefined || fonceInit) {
       await this.getProdAvailableComponents();

@@ -2445,16 +2445,6 @@ export type TupdateWorkSheetItem = {
   //
   // 門片捲片支數
   slatCount: string;
-  // 練齒輪番號
-  // sprocketWheelModel: string;
-  // 練齒輪大鏈輪
-  // sprocketWheelTeethNumber: string;
-  // 孔徑 軸徑
-  // bearingInnerDiameter: string;
-  // 卷軸尺寸
-  // diameter: string;
-  // 捲軸總長
-  // bearingHousingTotalLength: string;
   // 底座開口
   guideRailsOpening: string;
   //
