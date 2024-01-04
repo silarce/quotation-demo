@@ -336,7 +336,7 @@ class Class_workSheet {
     const diameter = this._prodSpec?.diameter;
 
     if (!diameter) {
-      myAlert.err({ title: '取得boxD失敗', content: `傳軸直徑資料錯誤。資料為${this._prodSpec?.diameter}` });
+      myAlert.err({ title: '取得boxD失敗', content: `捲軸直徑資料錯誤。資料為${this._prodSpec?.diameter}` });
       this._prod.boxD = 0;
 
       return;
