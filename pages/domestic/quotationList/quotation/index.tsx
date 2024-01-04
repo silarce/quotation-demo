@@ -1702,13 +1702,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
         unit_str = com.unit as string;
       }
 
+      let desc = com.desc ?? '';
+
+      if (com.comName === '門箱') {
+        desc = desc.replaceAll('捲+機', '');
+        desc = desc.replaceAll('方型捲箱', '');
+      }
+
       return {
         partName: com.comName,
         material: com.material,
         unit: com.unit,
         unit_str,
         qty: new Decimal(com.quantity || 0).toFixed(2),
-        desc: com.desc ?? '',
+        desc,
         price: com.unitPrice_locale,
         totalPrice: Number(com.totalPrice || 0).toLocaleString(),
       };
@@ -1719,10 +1726,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       let unit_str = '';
 
-      if (typeof list_acce.unit === 'object') {
+      if (typeof acce.unit === 'object') {
         unit_str = 'm\u00B2'; // m2
       } else {
-        unit_str = list_acce.unit as string;
+        unit_str = acce.unit as string;
       }
 
       const partName = acce.name.replaceAll('60A', '');
