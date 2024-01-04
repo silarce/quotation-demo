@@ -212,6 +212,8 @@ class Class_workSheet {
   async getAccessoriesArr() {
     this._accessoriesOptionArr = [];
     this._accessoriesOptionArr_easy = [];
+
+    // 需要注意，同樣是SST彈射門，不同門型取得的選配會有不同的id
     const res = await this.lookupAccessoriesArr(this.doorModelName);
 
     if (res) {
