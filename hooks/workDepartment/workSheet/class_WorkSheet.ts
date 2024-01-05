@@ -713,6 +713,7 @@ class Class_workSheet {
   }
   set doorModelName(str) {
     this._prod.doorModelName = str;
+    this.isAntiTyphoon = false;
 
     this.guideRail = this.options_guideRail?.[0] || null;
     this.calcBoxD();
@@ -812,8 +813,8 @@ class Class_workSheet {
   get isAntiTyphoon() {
     return this._prod.isAntiTyphoon;
   }
-  set isAntiTyphoon(str) {
-    this._prod.isAntiTyphoon = str;
+  set isAntiTyphoon(bool) {
+    this._prod.isAntiTyphoon = bool;
     this.guideRail = this.options_guideRail?.[0] || null;
     this.forceUpdate();
   }
