@@ -698,6 +698,8 @@ class Class_workSheet {
   }
   set doorModelName(str) {
     this._prod.doorModelName = str;
+
+    this.guideRail = this.options_guideRail?.[0] || null;
     this.calcBoxD();
     this.forceUpdate();
   }
@@ -797,6 +799,7 @@ class Class_workSheet {
   }
   set isAntiTyphoon(str) {
     this._prod.isAntiTyphoon = str;
+    this.guideRail = this.options_guideRail?.[0] || null;
     this.forceUpdate();
   }
 
