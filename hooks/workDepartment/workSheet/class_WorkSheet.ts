@@ -755,44 +755,6 @@ class Class_workSheet {
     return String(this._prod.height);
   }
 
-  get boxB() {
-    return String(this._prod.boxB / 1000);
-  }
-  set boxB(str) {
-    let num = Number(str) * 1000;
-
-    if (str === 'auto') {
-      num = this._defaultBoxB;
-    }
-
-    this._prod.boxB = num;
-
-    // const boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[str]) ?? 0;
-    // this._prod.boxD = boxD * 1000;
-    this.calcBoxD();
-
-    this.calcArea();
-    this.forceUpdate();
-  }
-
-  set boxB_noCall(num: number) {
-    this._prod.boxB = Number(num);
-
-    // this._prod.boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[num]) ?? 0;
-    this.calcBoxD();
-
-    this.calcArea();
-    this.forceUpdate();
-  }
-
-  get boxB_mm() {
-    return String(this._prod.boxB);
-  }
-
-  get boxD_mm() {
-    return String(this._prod.boxD);
-  }
-
   get quantity() {
     return String(this._itemIdArr.length);
   }
@@ -816,6 +778,77 @@ class Class_workSheet {
   set isAntiTyphoon(bool) {
     this._prod.isAntiTyphoon = bool;
     this.guideRail = this.options_guideRail?.[0] || null;
+    this.forceUpdate();
+  }
+
+  // -------------------------------------------------------
+
+  get gapA() {
+    return String(this._prodSpec?.gapA ?? '');
+  }
+  set gapA(str) {
+    if (this._prodSpec) {
+      this._prodSpec.gapA = Number(str);
+      this.calcArea();
+      this.forceUpdate();
+    }
+  }
+
+  get gapC() {
+    return String(this._prodSpec?.gapC ?? '');
+  }
+  set gapC(str) {
+    if (this._prodSpec) {
+      this._prodSpec.gapC = Number(str);
+      this.calcArea();
+      this.forceUpdate();
+    }
+  }
+
+  get boxB() {
+    return String(this._prod.boxB / 1000);
+  }
+  set boxB(str) {
+    let num = Number(str) * 1000;
+
+    if (str === 'auto') {
+      num = this._defaultBoxB;
+    }
+
+    this._prod.boxB = num;
+
+    this.calcBoxD();
+
+    this.calcArea();
+    this.forceUpdate();
+  }
+
+  set boxB_noCall(num: number) {
+    this._prod.boxB = Number(num);
+
+    // this._prod.boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[num]) ?? 0;
+    this.calcBoxD();
+
+    this.calcArea();
+    this.forceUpdate();
+  }
+
+  get boxB_mm() {
+    return String(this._prod.boxB);
+  }
+  set boxB_mm(str) {
+    this._prod.boxB = Number(str);
+    // this.calcBoxD();
+    this.calcArea();
+    this.forceUpdate();
+  }
+
+  get boxD_mm() {
+    return String(this._prod.boxD);
+  }
+
+  set boxD_mm(str) {
+    this._prod.boxD = Number(str);
     this.forceUpdate();
   }
 

@@ -27,6 +27,22 @@ type TcontrolItem = {
   placeholder?: string;
 };
 
+type TcontrolItem_input = {
+  value: string;
+  onChange?: (v: string) => void;
+  disabled?: boolean;
+  forbidden?: boolean;
+  inputType?: 'number';
+  placeholder?: string;
+};
+
+type Tcontrol_ABCD = {
+  gapA: TcontrolItem_input;
+  boxB: TcontrolItem_input;
+  gapC: TcontrolItem_input;
+  boxD: TcontrolItem_input;
+};
+
 type Tcontrol = {
   reel: {
     [key: string]: TcontrolItem | undefined;
@@ -85,7 +101,7 @@ type Tcontrol = {
   };
 };
 
-export type { Tcontrol as Tcontrol_detail };
+export type { Tcontrol as Tcontrol_detail, Tcontrol_ABCD };
 
 // ============================================================================
 const option_doorTrack_normal = optionsCre_doorTrack_normal();
@@ -93,19 +109,63 @@ const option_doorTrack_normal = optionsCre_doorTrack_normal();
 // ============================================================================
 export default function WorkSheetProductDetail01({
   control,
+  control_ABCD,
   supportTip,
   disabled,
 }: {
   control: Tcontrol;
+  control_ABCD: Tcontrol_ABCD;
   supportTip?: string;
   disabled: boolean;
 }) {
+  const { gapA: control_gapA, boxB: control_boxB, gapC: control_gapC, boxD: control_boxD } = control_ABCD;
+
   return (
     <div className={scss.container}>
       <p>設定產品細部規格：</p>
+      <div className={scss.top}>
+        <InputSel
+          label={'機械縫 A'}
+          inputProps={{ value: control_gapA.value, onChange: control_gapA.onChange }}
+          captionColor="main"
+          captionWidth={'110px'}
+          disabled={control_gapA.forbidden || control_gapA.disabled || disabled}
+          showBaseline="always"
+          placeholder={control_gapA.placeholder}
+        />
+        <InputSel
+          label={'支版尺寸 B'}
+          inputProps={{ value: control_boxB.value, onChange: control_boxB.onChange }}
+          captionColor="main"
+          captionWidth={'110px'}
+          disabled={control_boxB.forbidden || control_boxB.disabled || disabled}
+          showBaseline="always"
+          placeholder={control_boxB.placeholder}
+        />
+        <InputSel
+          label={'機械縫 C'}
+          inputProps={{ value: control_gapC.value, onChange: control_gapC.onChange }}
+          captionColor="main"
+          captionWidth={'110px'}
+          disabled={control_gapC.forbidden || control_gapC.disabled || disabled}
+          showBaseline="always"
+          placeholder={control_gapC.placeholder}
+        />
+        <InputSel
+          label={'支版尺寸 D'}
+          inputProps={{ value: control_boxD.value, onChange: control_boxD.onChange }}
+          captionColor="main"
+          captionWidth={'110px'}
+          disabled={control_boxD.forbidden || control_boxD.disabled || disabled}
+          showBaseline="always"
+          placeholder={control_boxD.placeholder}
+        />
+        <hr />
+      </div>
+      {/*  */}
       <div className={scss.left}>
         {configArr_left.map((item) => {
-          const { pKey: pKey, label, arr: list } = item;
+          const { pKey, label, arr: list } = item;
 
           return (
             <Item
@@ -123,7 +183,7 @@ export default function WorkSheetProductDetail01({
       {/* left */}
       <div className={scss.right}>
         {configArr_right.map((item) => {
-          const { pKey: pKey, label, arr: list } = item;
+          const { pKey, label, arr: list } = item;
 
           return <Item key={pKey} pKey={pKey} label_p={label} arr={list} control={control} disabled={disabled} />;
         })}

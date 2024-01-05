@@ -16,6 +16,16 @@
     // grid的span佔兩格
     grid-column: span 2;
   }
+
+  .top {
+    grid-template-columns: 1fr 1fr;
+    grid-column: span 2;
+    > hr {
+      grid-column: span 2;
+    }
+  }
+
+  .top,
   .left,
   .right {
     display: grid;

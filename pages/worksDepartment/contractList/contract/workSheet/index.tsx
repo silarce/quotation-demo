@@ -92,6 +92,7 @@ import WorkSheetProductOutline, {
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
 import WorkSheetProductDetail01, {
   Tcontrol_detail,
+  Tcontrol_ABCD,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
 import WorkSheetOptional, {
   Tcontrol_optional,
@@ -606,6 +607,49 @@ export default function WorkSheet({
   };
 
   // -------------------------------------------------------------------------
+
+  const control_detail_ABCD: Tcontrol_ABCD = {
+    gapA: {
+      value: targetSheet?.gapA ?? '',
+      onChange: (str) => {
+        if (targetSheet) {
+          targetSheet.gapA = str;
+        }
+      },
+      inputType: 'number',
+      placeholder: '機械縫 A',
+    },
+    boxB: {
+      value: targetSheet?.boxB_mm ?? '',
+      onChange: (str) => {
+        if (targetSheet) {
+          targetSheet.boxB_mm = str;
+        }
+      },
+      inputType: 'number',
+      placeholder: '支版尺寸 B',
+    },
+    gapC: {
+      value: targetSheet?.gapC ?? '',
+      onChange: (str) => {
+        if (targetSheet) {
+          targetSheet.gapC = str;
+        }
+      },
+      inputType: 'number',
+      placeholder: '機械縫 C',
+    },
+    boxD: {
+      value: targetSheet?.boxD_mm ?? '',
+      onChange: (str) => {
+        if (targetSheet) {
+          targetSheet.boxD_mm = str;
+        }
+      },
+      inputType: 'number',
+      placeholder: '支版尺寸 D',
+    },
+  };
 
   const control_detail: Tcontrol_detail = {
     // 捲軸
@@ -1360,6 +1404,7 @@ export default function WorkSheet({
 
             <hr />
             <WorkSheetProductDetail01
+              control_ABCD={control_detail_ABCD}
               control={control_detail}
               disabled={forbidden || disabled}
               // supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
