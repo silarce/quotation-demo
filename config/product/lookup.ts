@@ -33,8 +33,9 @@ export const lookup_boxBAndBoxD: TpariBD = {
 };
 
 // 配電箱及按鈕開關
-export const lookup_distributionBoxPrice = {
+export const lookup_distributionBoxPrice: { [key: string]: number | undefined } = {
   '1/4HP': 5940,
+  '1/3HP': 5940,
   '1/2HP': 5940,
   '3/4HP': 5940,
   '1HP': 5940,
