@@ -40,7 +40,6 @@ get /products/door/calc-detail-spec // 用來取得門片數量
 get /products/door/calc-side-plate-size-d // 用來取得boxD
 這個不需要在init呼叫，按下計算按鈕時呼叫就好了
 
-
 Class_workSheet.getInitData
 會呼叫 getAccessoriesArr與getProdAvailableComponents
 
@@ -60,9 +59,81 @@ options_doorTrackThick
 只取得options
 
 
------------------------------
+-----------------------------------------------------------------
+目前計算按鈕的功能
 
-必須要把取得boxD的api放進去
+1. 呼叫 getProdSpec
+getProdSpec會呼叫api取得規格並帶入新的規格
+被改變的東西包括
+_prodSpec.bearingHousingSize
+_prodSpec.bearingHousingTotalLength
+_prodSpec.bearingInnerDiameter
+_prodSpec.bearingName
+_prodSpec.defaultMotorIndex
+_prodSpec.density
+_prodSpec.diameter
+_prodSpec.gapA
+_prodSpec.gapC
+_prodSpec.motors
+_prodSpec.gearNumber
+_prodSpec.sprocketWheelModel
+_prodSpec.sprocketWheelTeethNumber
+_prodSpec.sprocketWheelChains
+_prodSpec.weight
+_prodSpec.slatLength
+_prodSpec.guideRailLength
+_prodSpec.headBoxLength
+_prodSpec.thickness
+另外還有
+_prod.sprocketWheelModel
+_prod.sprocketWheelTeethNumber
+_prod.bearingInnerDiameter
+_prod.diameter
+_prod.bearingHousingTotalLength
+以及
+boxD
+
+2.
+再用getProdSpec的回應
+計算WG
+取得預設馬達、預設馬力、預設boxB
+更新this._prod.thickness   this._prod.thickness = prodSpec.thickness
+
+3.
+產生boxB下拉選單選項options_boxB this.findBoxBoptions()
+
+4.
+變更所有材料配件的材質 this.changeComMaterial()
+
+5.
+呼叫getProdDetailSepc()取得捲門片數量 _prod.slatCount 
+
+6.
+呼叫getProdAvailableComponents()
+然後呼叫retrieveOptions()
+
+6.1
+retrieveOptions會更新以下下拉式選單的選項
+options_horsepower
+options_motor
+options_phase
+options_voltage
+options_rollUpBoxThick
+options_doorTrackThick
+
+7.
+如果
+if(this._doorModelName_state !== this._prod.doorModelName){
+  更新this._doorModelName_state
+  清空已選的選配
+  呼叫並更新可選選配列表
+}
+
+-----------------------------------------------------------------
+
+
+
+-----------------------------
 
 工作表更新後
 被更新的item會產生adjustedItem這個property
