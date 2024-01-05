@@ -29,6 +29,20 @@
 
  */
 
+/**
+關於馬達
+營業部現行的做法是
+以東元的單價計算
+2HP以上的馬達自動取三相馬達
+不管伏特數
+
+因此取得預設馬達時要以東元優先
+馬力2HP以上時要相數要自動改為三相
+低於2HP時要相數要自動改為單相
+馬達過濾器先以原本的伏特數過濾，沒有符合的馬達的話就改伏特數再過濾一次
+
+ */
+
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
@@ -839,11 +853,11 @@ class Class_product {
     );
 
     //
-
     const defaultMotorIndex = res.defaultMotorIndex;
     const defaultMotor = res.motors[defaultMotorIndex];
     const defaultMotorBox = defaultMotor.box;
 
+    // 內有預設boxB boxD 馬達廠商 馬力
     this.defaultMotor = defaultMotor;
 
     // ________________________
@@ -861,10 +875,27 @@ class Class_product {
 
     // 設定馬達廠商
     if (defaultMotorBox) {
+      //
+      //
+      //
+
       if (defaultMotorBox.東元) {
         this.motor = '東元';
 
         const defaultBoxB_num = new Decimal(defaultMotorBox.東元.boxB).div(1000).toNumber();
+        const defaultBoxB = String(defaultBoxB_num);
+        const shouldChange = !this.isBoxBinOption({
+          boxB_m: defaultBoxB_num,
+        });
+
+        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
+        this.changeBoxBNoCall({
+          str: theBoxB,
+          diameter: res.diameter,
+        });
+      } else if (defaultMotorBox.default) {
+        const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
         const defaultBoxB = String(defaultBoxB_num);
         const shouldChange = !this.isBoxBinOption({
           boxB_m: defaultBoxB_num,
@@ -891,20 +922,9 @@ class Class_product {
           str: theBoxB,
           diameter: res.diameter,
         });
-      } else if (defaultMotorBox.default) {
-        const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
-        const defaultBoxB = String(defaultBoxB_num);
-        const shouldChange = !this.isBoxBinOption({
-          boxB_m: defaultBoxB_num,
-        });
-
-        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
-
-        this.changeBoxBNoCall({
-          str: theBoxB,
-          diameter: res.diameter,
-        });
       }
+
+      //
     } else {
       this.changeBoxBNoCall({
         str: boxB ? String(boxB / 1000) : '',
