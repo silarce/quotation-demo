@@ -849,6 +849,7 @@ class Class_product {
     // ________________________
     // 設定馬力
     this.horsepower = defaultMotor.hp;
+    this.changeDistributionBoxPriceWithHorsepower();
 
     // ________________________
     // 設定boxB與thickness
@@ -1473,6 +1474,7 @@ class Class_product {
       this._prodData.motor = this.options_motor?.[0].value ?? '';
       // this._prodData.horsepower = this.options_horsepower?.[defaultMotorIndex].value ?? '';
       this._prodData.horsepower = defaultMotor?.hp ?? '';
+      this.changeDistributionBoxPriceWithHorsepower();
       this._prodData.phase = Number(this.options_phase?.[0].value ?? '1');
       this._prodData.voltage = this.options_voltage?.[0].value ?? '';
       this.callRetrieveCreProdCom();
@@ -1946,6 +1948,11 @@ class Class_product {
 
       return Number(option.value) === boxB_m;
     });
+  }
+
+  //
+  changeDistributionBoxPriceWithHorsepower() {
+    this.subComList.distributionBox.price_locale = String(lookup_distributionBoxPrice[this.horsepower] ?? 0);
   }
 
   // -----------------------------------------------------------------
@@ -2565,6 +2572,7 @@ class Class_product {
   }
   set horsepower(v) {
     this._prodData.horsepower = v;
+    this.changeDistributionBoxPriceWithHorsepower();
     this.toSetDefaultBoxB();
     this.callRetrieveCreProdCom();
     this.reRender();
