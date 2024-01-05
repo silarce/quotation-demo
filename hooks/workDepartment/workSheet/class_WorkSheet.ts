@@ -166,6 +166,8 @@ class Class_workSheet {
 
   isLoading = false;
 
+  private DebounceTimer_calcBoxD: NodeJS.Timeout | undefined = undefined;
+
   private _prod: TquotationProductItemDto | TupdateWorkSheetItem;
   readonly oldProd: TquotationProductItemDto;
   private forceUpdate: TforceUpdate_workSheet;
@@ -268,7 +270,7 @@ class Class_workSheet {
         this._prod.bearingInnerDiameter = res.bearingInnerDiameter;
         this._prod.diameter = String(res.diameter);
         this._prod.bearingHousingTotalLength = String(res.bearingHousingTotalLength);
-        this.calcBoxD();
+        this.calcBoxD_debounce();
 
         return res;
       }
@@ -373,6 +375,16 @@ class Class_workSheet {
       myAlert.err({ title: '取得boxD失敗', content: message });
       this._prod.boxD = 0;
     }
+  }
+
+  calcBoxD_debounce() {
+    if (this.DebounceTimer_calcBoxD) {
+      clearTimeout(this.DebounceTimer_calcBoxD);
+    }
+
+    this.DebounceTimer_calcBoxD = setTimeout(() => {
+      this.calcBoxD();
+    }, 50);
   }
 
   // private toSetDefaultBoxB() {
@@ -716,7 +728,7 @@ class Class_workSheet {
     this.isAntiTyphoon = false;
 
     this.guideRail = this.options_guideRail?.[0] || null;
-    this.calcBoxD();
+    this.calcBoxD_debounce();
     this.forceUpdate();
   }
 
@@ -817,7 +829,7 @@ class Class_workSheet {
 
     this._prod.boxB = num;
 
-    this.calcBoxD();
+    this.calcBoxD_debounce();
 
     this.calcArea();
     this.forceUpdate();
@@ -827,7 +839,7 @@ class Class_workSheet {
     this._prod.boxB = Number(num);
 
     // this._prod.boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[num]) ?? 0;
-    this.calcBoxD();
+    this.calcBoxD_debounce();
 
     this.calcArea();
     this.forceUpdate();
@@ -1085,7 +1097,7 @@ class Class_workSheet {
   }
   set horsepower(str) {
     this._prod.horsepower = str;
-    this.calcBoxD();
+    this.calcBoxD_debounce();
     this.forceUpdate();
   }
   //廠商
@@ -1094,7 +1106,7 @@ class Class_workSheet {
   }
   set motorVendor(str) {
     this._prod.motorVendor = str;
-    this.calcBoxD();
+    this.calcBoxD_debounce();
     // this.toSetDefaultBoxB();
     this.forceUpdate();
   }
