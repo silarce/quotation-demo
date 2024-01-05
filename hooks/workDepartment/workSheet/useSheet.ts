@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import _ from 'lodash';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -198,6 +198,19 @@ const useWorkSheet = ({
 
   // --------------------------------------------------------------------
 
+  const options_doorModel = useMemo(() => {
+    const oprions = Object.values(doorModelList || {}).map((item) => {
+      return {
+        value: item.name,
+        label: item.name,
+      };
+    });
+
+    return oprions;
+  }, [doorModelList]);
+
+  // --------------------------------------------------------------------
+
   const reset = async () => {
     if (!doorModelList) {
       return;
@@ -250,7 +263,7 @@ const useWorkSheet = ({
   };
 
   // ------------------------------------------------------------
-  return { sheetList, changedSheetList, reset, isHookLoading, doorModelList };
+  return { sheetList, changedSheetList, reset, isHookLoading, doorModelList, options_doorModel };
 };
 
 export { useWorkSheet };

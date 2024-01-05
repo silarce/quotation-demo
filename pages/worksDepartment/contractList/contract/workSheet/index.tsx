@@ -322,6 +322,7 @@ export default function WorkSheet({
     reset,
     isHookLoading,
     doorModelList: doorModelList_hook,
+    options_doorModel,
   } = useWorkSheet({
     itemTokenList: _.cloneDeep(itemTokenList) ?? {},
     itemIdArrList: _.cloneDeep(itemIdArrList) ?? {},
@@ -607,7 +608,7 @@ export default function WorkSheet({
             targetSheet.doorModelName = v?.value ?? '';
           }
         },
-        options: doorModelOptionArr,
+        options: options_doorModel,
       },
     },
     fullWidth: {
