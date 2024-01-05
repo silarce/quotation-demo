@@ -20,10 +20,12 @@ import {
   apiGetProdCalcDetailSpec,
   apiGetProdAvailableComponents,
   // apiGetProdAvailableComponents,
+  apiGetboxD,
+  TgetBoxDParams,
 } from 'js/api/api_product';
 
 // type
-import { TforceUpdate_workSheet } from './useSheet';
+import { TforceUpdate_workSheet, TaccessoriesArrList } from './useSheet';
 import {
   TquotationProductDto,
   TupdateWorkSheetItem,
@@ -54,6 +56,10 @@ class Class_workSheet {
     addSheet,
     deleteSheet,
     clearSheet,
+    //
+    lookupAccessoriesArr,
+    //
+    doorModelList,
   }: {
     //
     // forceUpdate: (props?: { isNoChange?: boolean }) => void;
@@ -73,6 +79,10 @@ class Class_workSheet {
     }) => void;
     deleteSheet: () => void;
     clearSheet: () => void;
+    //
+    lookupAccessoriesArr: (doorModelName: string) => Promise<TdoorAccessoryDto[]>;
+    //
+    doorModelList: { [key: string]: TdoorModelInfoDto };
   }) {
     this.forceUpdate = forceUpdate;
     this._prod = _.cloneDeep(prod);
@@ -83,6 +93,10 @@ class Class_workSheet {
     this._addSheet = addSheet;
     this._deleteSheet = deleteSheet;
     this._clearSheet = clearSheet;
+    this.lookupAccessoriesArr = lookupAccessoriesArr;
+    this._doorModelName_state = this._prod.doorModelName;
+
+    this.doorModelList = doorModelList;
 
     if (this.identifyKey_p === this.identifyKey_c) {
       this._originalIdArr = _.cloneDeep(this._itemIdArr);
@@ -152,6 +166,8 @@ class Class_workSheet {
 
   isLoading = false;
 
+  private DebounceTimer_calcBoxD: NodeJS.Timeout | undefined = undefined;
+
   private _prod: TquotationProductItemDto | TupdateWorkSheetItem;
   readonly oldProd: TquotationProductItemDto;
   private forceUpdate: TforceUpdate_workSheet;
@@ -161,6 +177,9 @@ class Class_workSheet {
   private _addSheet;
   private _deleteSheet;
   private _clearSheet;
+  readonly lookupAccessoriesArr;
+
+  private _doorModelName_state;
 
   private _originalIdArr: string[] | undefined = undefined;
 
@@ -179,6 +198,8 @@ class Class_workSheet {
   private _prodDetailSpec: { slatCount: number } | undefined = undefined;
 
   private _availableComponents: TdoorComponentListDto | undefined = undefined;
+
+  readonly doorModelList;
 
   // ---------------------------------------------------------------------
   options_com = optionsCreator_componentMaterial_01();
@@ -202,41 +223,29 @@ class Class_workSheet {
 
   async getAccessoriesArr() {
     this._accessoriesOptionArr = [];
+    this._accessoriesOptionArr_easy = [];
 
-    let res: TdoorAccessoryDto[] | undefined = undefined;
-
-    try {
-      res = await apiGetProdAccessories({ modelName: this.doorModelName });
-    } catch (error) {
-      const err = error as { response: { data: { message: string; statusCode: number } } };
-      const { message, statusCode } = err.response.data;
-      myAlert.err({ title: '取得選配列表失敗', content: statusCode + ' ' + message });
-    }
+    // 需要注意，同樣是SST彈射門，不同門型取得的選配會有不同的id
+    const res = await this.lookupAccessoriesArr(this.doorModelName);
 
     if (res) {
       this._accessoriesOptionArr = res;
 
-      const list: typeof this._accessoriesOptionList = {};
-      // const arr: string[] = [];
+      const accessoriesOptionList = this._accessoriesOptionList;
+
+      const list: typeof accessoriesOptionList = {};
 
       this._accessoriesOptionArr.forEach((item) => {
         list[item.id] = item;
         this._accessoriesOptionArr_easy.push({ value: item.id, label: item.name });
-
-        // const isHave = this._acceIdArr.some((name) => {
-        //   return name === item.name;
-        // });
-
-        // if (isHave) {
-        //   arr.push(item.id);
-        // }
       });
 
       this._accessoriesOptionList = list;
-      // this._acceIdArr = arr;
     }
 
     this.forceUpdate({ isNoChange: true });
+
+    return res;
   }
 
   async getProdSpec() {
@@ -261,6 +270,7 @@ class Class_workSheet {
         this._prod.bearingInnerDiameter = res.bearingInnerDiameter;
         this._prod.diameter = String(res.diameter);
         this._prod.bearingHousingTotalLength = String(res.bearingHousingTotalLength);
+        this.calcBoxD_debounce();
 
         return res;
       }
@@ -330,7 +340,51 @@ class Class_workSheet {
       fullWidth: this._prod.fullWidth,
     });
 
-    this._prod.area = area;
+    // 換算為平方公尺
+    this._prod.area = new Decimal(area).div(1000000).toFixed(2);
+  }
+
+  async calcBoxD() {
+    const diameter = this._prodSpec?.diameter;
+
+    if (!diameter) {
+      myAlert.err({ title: '取得boxD失敗', content: `捲軸直徑資料錯誤。資料為${this._prodSpec?.diameter}` });
+      this._prod.boxD = 0;
+
+      return;
+    }
+
+    const params: TgetBoxDParams = {
+      modelName: this.doorModelName,
+      rollerDiameter: diameter,
+      sidePlateSizeB: Number(this.boxB_mm),
+      hp: this.horsepower,
+      motorVendor: this._prod.motorVendor,
+    };
+
+    try {
+      const res = await apiGetboxD(params);
+
+      if (res) {
+        this._prod.boxD = res.sidePlateSizeD;
+        this.forceUpdate();
+      }
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      const { message } = err.response?.data ?? {};
+      myAlert.err({ title: '取得boxD失敗', content: message });
+      this._prod.boxD = 0;
+    }
+  }
+
+  calcBoxD_debounce() {
+    if (this.DebounceTimer_calcBoxD) {
+      clearTimeout(this.DebounceTimer_calcBoxD);
+    }
+
+    this.DebounceTimer_calcBoxD = setTimeout(() => {
+      this.calcBoxD();
+    }, 50);
   }
 
   // private toSetDefaultBoxB() {
@@ -516,7 +570,7 @@ class Class_workSheet {
 
     // 設定boxB與thickness
     // 後端說boxB只會在defaultMotorIndex指定的motors裡面
-    const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
+    const defaultBoxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
     this._prod.thickness = prodSpec.thickness; // 門片厚度
 
     // 設定馬達廠商
@@ -531,7 +585,7 @@ class Class_workSheet {
         this.boxB_noCall = defaultMotorBox.default.boxB;
       }
     } else {
-      this.boxB_noCall = boxB ?? 0;
+      this.boxB_noCall = defaultBoxB ?? 0;
     }
 
     this.findBoxBoptions();
@@ -543,6 +597,13 @@ class Class_workSheet {
     this.changeComMaterial();
     await this.getProdDetailSepc();
     await this.getProdAvailableComponents();
+
+    if (this._doorModelName_state !== this._prod.doorModelName) {
+      this._doorModelName_state = this._prod.doorModelName;
+      this._acceIdArr = [];
+      await this.getAccessoriesArr();
+    }
+
     this.isLoading = false;
     this.forceUpdate();
 
@@ -557,14 +618,6 @@ class Class_workSheet {
       await this.getAccessoriesArr();
     }
 
-    // if (this._prodDetailSpec === undefined) {
-    //   this.getProdDetailSepc();
-    // }
-
-    // if (this._prodSpec === undefined) {
-    //   await this.getProdSpec();
-    // }
-
     if (this._availableComponents === undefined || fonceInit) {
       await this.getProdAvailableComponents();
     }
@@ -575,6 +628,53 @@ class Class_workSheet {
   }
 
   // ---------------------------------------------------------------------
+
+  get options_material() {
+    const doorModelObj = this.doorModelList[this._prod.doorModelName];
+
+    const materialArr = doorModelObj.slatMaterials.map((item) => {
+      return {
+        value: item.name,
+        label: item.name,
+      };
+    });
+
+    return materialArr;
+  }
+
+  get options_guideRail() {
+    const doorModel = this.doorModelList[this._prod.doorModelName];
+
+    if (!doorModel) {
+      return undefined;
+    }
+
+    const arr = doorModel.guideRails.map((item) => {
+      const imgSrc = item.imgSrc;
+      const withHook = item.withHook;
+
+      const option = {
+        value: imgSrc,
+        label: imgSrc,
+        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
+        opening: item.opening,
+        width: item.width,
+      };
+
+      if ((withHook ?? false) === this.isAntiTyphoon) {
+        return option;
+      }
+
+      return undefined;
+    });
+
+    _.pull(arr, undefined);
+    const theArr = arr as unknown as Toption[];
+
+    return theArr;
+  } // options_doorTrack
+
+  // ____________________________________
 
   get isOriginal() {
     return this.identifyKey_p === this.identifyKey_c;
@@ -625,6 +725,10 @@ class Class_workSheet {
   }
   set doorModelName(str) {
     this._prod.doorModelName = str;
+    this.isAntiTyphoon = false;
+
+    this.guideRail = this.options_guideRail?.[0] || null;
+    this.calcBoxD_debounce();
     this.forceUpdate();
   }
 
@@ -663,38 +767,6 @@ class Class_workSheet {
     return String(this._prod.height);
   }
 
-  get boxB() {
-    return String(this._prod.boxB / 1000);
-  }
-  set boxB(str) {
-    let num = Number(str) * 1000;
-
-    if (str === 'auto') {
-      num = this._defaultBoxB;
-    }
-
-    this._prod.boxB = num;
-    const boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[str]) ?? 0;
-    this._prod.boxD = boxD * 1000;
-    this.calcArea();
-    this.forceUpdate();
-  }
-
-  set boxB_noCall(num: number) {
-    this._prod.boxB = Number(num);
-    this._prod.boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[num]) ?? 0;
-    this.calcArea();
-    this.forceUpdate();
-  }
-
-  get boxB_mm() {
-    return String(this._prod.boxB);
-  }
-
-  get boxD_mm() {
-    return String(this._prod.boxD);
-  }
-
   get quantity() {
     return String(this._itemIdArr.length);
   }
@@ -715,8 +787,80 @@ class Class_workSheet {
   get isAntiTyphoon() {
     return this._prod.isAntiTyphoon;
   }
-  set isAntiTyphoon(str) {
-    this._prod.isAntiTyphoon = str;
+  set isAntiTyphoon(bool) {
+    this._prod.isAntiTyphoon = bool;
+    this.guideRail = this.options_guideRail?.[0] || null;
+    this.forceUpdate();
+  }
+
+  // -------------------------------------------------------
+
+  get gapA() {
+    return String(this._prodSpec?.gapA ?? '');
+  }
+  set gapA(str) {
+    if (this._prodSpec) {
+      this._prodSpec.gapA = Number(str);
+      this.calcArea();
+      this.forceUpdate();
+    }
+  }
+
+  get gapC() {
+    return String(this._prodSpec?.gapC ?? '');
+  }
+  set gapC(str) {
+    if (this._prodSpec) {
+      this._prodSpec.gapC = Number(str);
+      this.calcArea();
+      this.forceUpdate();
+    }
+  }
+
+  get boxB() {
+    return String(this._prod.boxB / 1000);
+  }
+  set boxB(str) {
+    let num = Number(str) * 1000;
+
+    if (str === 'auto') {
+      num = this._defaultBoxB;
+    }
+
+    this._prod.boxB = num;
+
+    this.calcBoxD_debounce();
+
+    this.calcArea();
+    this.forceUpdate();
+  }
+
+  set boxB_noCall(num: number) {
+    this._prod.boxB = Number(num);
+
+    // this._prod.boxD = Number(lookup_boxBAndBoxD[this._prod.doorModelName]?.BtoD[num]) ?? 0;
+    this.calcBoxD_debounce();
+
+    this.calcArea();
+    this.forceUpdate();
+  }
+
+  get boxB_mm() {
+    return String(this._prod.boxB);
+  }
+  set boxB_mm(str) {
+    this._prod.boxB = Number(str);
+    // this.calcBoxD();
+    this.calcArea();
+    this.forceUpdate();
+  }
+
+  get boxD_mm() {
+    return String(this._prod.boxD);
+  }
+
+  set boxD_mm(str) {
+    this._prod.boxD = Number(str);
     this.forceUpdate();
   }
 
@@ -873,20 +1017,21 @@ class Class_workSheet {
 
   // 型式
   get bottomBar() {
+    //   return this._prod.bottomBarSurface;
     return this._prod.bottomBar;
   }
   set bottomBar(str) {
+    //   this._prod.bottomBarSurface = str;
     this._prod.bottomBar = str;
     this.forceUpdate();
   }
 
-  // 表面
-  get bottomBarSurface() {
-    return this._prod.bottomBarSurface;
+  get com_bottomBar_surface() {
+    return this.comList.bottomBar.materialSurface;
   }
 
-  set bottomBarSurface(str) {
-    this._prod.bottomBarSurface = str;
+  set com_bottomBar_surface(str) {
+    this.comList.bottomBar.materialSurface = str;
     this.forceUpdate();
   }
 
@@ -952,6 +1097,7 @@ class Class_workSheet {
   }
   set horsepower(str) {
     this._prod.horsepower = str;
+    this.calcBoxD_debounce();
     this.forceUpdate();
   }
   //廠商
@@ -960,6 +1106,7 @@ class Class_workSheet {
   }
   set motorVendor(str) {
     this._prod.motorVendor = str;
+    this.calcBoxD_debounce();
     // this.toSetDefaultBoxB();
     this.forceUpdate();
   }
@@ -1055,11 +1202,13 @@ class Class_workSheet {
   }
 
   // 表面
-  get guideRailSurface() {
-    return this._prod.guideRailSurface;
+  get com_guideRail_surface() {
+    // return this._prod.guideRailSurface;
+    return this.comList.guideRail.materialSurface;
   }
-  set guideRailSurface(str) {
-    this._prod.guideRailSurface = str;
+  set com_guideRail_surface(str) {
+    // this._prod.guideRailSurface = str;
+    this.comList.guideRail.materialSurface = str;
     this.forceUpdate();
   }
 
@@ -1088,9 +1237,12 @@ class Class_workSheet {
   set guideRail(option: Toption | null) {
     const str = option?.value ?? '';
     const opening = option?.opening ?? '';
+    const guideRailG = option?.width ?? '0';
 
     this._prod.guideRail = str;
     this._prod.guideRailsOpening = opening;
+    this._prod.guideRailG = Number(guideRailG);
+
     this.forceUpdate();
   }
 
@@ -1364,6 +1516,8 @@ class Class_workSheet {
         guideRailType: this._prod.guideRailType,
         bottomBarSurface: this._prod.bottomBarSurface,
         guideRailSurface: this._prod.guideRailSurface,
+        //
+        guideRailG: this._prod.guideRailG,
       };
 
       return item;
@@ -1372,8 +1526,6 @@ class Class_workSheet {
 
   //
 } // Class_workSheet close
-
-export { Class_workSheet as Class_workSheet };
 
 // ======================================================================
 
@@ -1395,3 +1547,7 @@ const creEmptyCom = (type: TquotationProductComponentsDto['type']): TquotationPr
   desc: null,
   density: null,
 });
+
+// ======================================================================
+
+export { Class_workSheet as Class_workSheet };

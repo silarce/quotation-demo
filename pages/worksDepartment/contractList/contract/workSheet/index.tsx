@@ -1,7 +1,21 @@
 // 工作表
 
+// 按下計算按鈕會呼叫targetSheet.calcProd()
+
 /*
-在報價單主產品
+
+
+捲軸
+捲箱
+底座
+支版
+門片
+電動機
+門軌
+這七個區塊的內容"大多"是對應的component
+沒有馬達配件區塊
+
+
 呼叫get /products/door/available-components
 是為了取得材料配件資料，並顯出來
 顯示出來的欄位有代號、說明、材料、表面、烤漆、單位、數量、牌價、牌價複價、單價、複價
@@ -26,7 +40,6 @@ get /products/door/calc-detail-spec // 用來取得門片數量
 get /products/door/calc-side-plate-size-d // 用來取得boxD
 這個不需要在init呼叫，按下計算按鈕時呼叫就好了
 
-
 Class_workSheet.getInitData
 會呼叫 getAccessoriesArr與getProdAvailableComponents
 
@@ -45,11 +58,87 @@ options_doorTrackThick
 先用主產品的作法吧，只是取得availableComponents後不把component換掉
 只取得options
 
-最好問一下建樺他期望的做法
+
+-----------------------------------------------------------------
+
+選擇門型的時候就會更新可選門軌與可選材質(上面的，非選配)
+並更新門軌，重置防颱
+
+-----------------------------------------------------------------
+目前計算按鈕的功能
+
+1. 呼叫 getProdSpec
+getProdSpec會呼叫api取得規格並帶入新的規格
+被改變的東西包括
+_prodSpec.bearingHousingSize
+_prodSpec.bearingHousingTotalLength
+_prodSpec.bearingInnerDiameter
+_prodSpec.bearingName
+_prodSpec.defaultMotorIndex
+_prodSpec.density
+_prodSpec.diameter
+_prodSpec.gapA
+_prodSpec.gapC
+_prodSpec.motors
+_prodSpec.gearNumber
+_prodSpec.sprocketWheelModel
+_prodSpec.sprocketWheelTeethNumber
+_prodSpec.sprocketWheelChains
+_prodSpec.weight
+_prodSpec.slatLength
+_prodSpec.guideRailLength
+_prodSpec.headBoxLength
+_prodSpec.thickness
+另外還有
+_prod.sprocketWheelModel
+_prod.sprocketWheelTeethNumber
+_prod.bearingInnerDiameter
+_prod.diameter
+_prod.bearingHousingTotalLength
+以及
+boxD
+
+2.
+再用getProdSpec的回應
+計算WG
+取得預設馬達、預設馬力、預設boxB
+更新this._prod.thickness   this._prod.thickness = prodSpec.thickness
+
+3.
+產生boxB下拉選單選項options_boxB this.findBoxBoptions()
+
+4.
+變更所有材料配件的材質 this.changeComMaterial()
+
+5.
+呼叫getProdDetailSepc()取得捲門片數量 _prod.slatCount 
+
+6.
+呼叫getProdAvailableComponents()
+然後呼叫retrieveOptions()
+
+6.1
+retrieveOptions會更新以下下拉式選單的選項
+options_horsepower
+options_motor
+options_phase
+options_voltage
+options_rollUpBoxThick
+options_doorTrackThick
+
+7.
+如果
+if(this._doorModelName_state !== this._prod.doorModelName){
+  更新this._doorModelName_state
+  清空已選的選配
+  呼叫並更新可選選配列表
+}
+
+-----------------------------------------------------------------
+
+
 
 -----------------------------
-
-必須要把取得boxD的api放進去
 
 工作表更新後
 被更新的item會產生adjustedItem這個property
@@ -61,7 +150,6 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
-import moment from 'moment';
 
 // layer
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
@@ -80,6 +168,7 @@ import WorkSheetProductOutline, {
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
 import WorkSheetProductDetail01, {
   Tcontrol_detail,
+  Tcontrol_ABCD,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
 import WorkSheetOptional, {
   Tcontrol_optional,
@@ -100,7 +189,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // api
-import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id_noItems } from 'js/api/api_quotation';
 import {
   TupdateWorkSheetItem,
   useGetEngineeringContact,
@@ -108,7 +197,7 @@ import {
   apiPatchWorkSheet,
   apiDeleteWorkSheetItem,
 } from 'js/api/api_engineering';
-import { useApiGetProdDoorModels, TdoorModelInfoDto } from 'js/api/api_product';
+import { useApiGetProdDoorModels } from 'js/api/api_product';
 
 // hook
 import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
@@ -126,7 +215,6 @@ import {
   optionsCreator_bottomBar,
   optionsCreator_motorLockBox,
   optionsCreator_rollerSpec,
-  optionsCreator_closingType,
   optionsCreator_bottomBarAngleIron,
   optionsCreator_bottomBarPlate,
   optionsCreator_surface,
@@ -225,7 +313,6 @@ export default function WorkSheet({
       return {};
     }
 
-    // const contractProductItems = workSheet.contractProductItems;
     const contractProductItems = _.sortBy(workSheet.contractProductItems, 'createdAt');
 
     type TitemTokenList = {
@@ -281,8 +368,8 @@ export default function WorkSheet({
     }); //  forEach close
 
     return {
-      itemTokenList: itemTokenList,
-      itemIdArrList: itemIdArrList,
+      itemTokenList,
+      itemIdArrList,
     };
   }, [workSheet]);
 
@@ -306,7 +393,14 @@ export default function WorkSheet({
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
-  const { sheetList, changedSheetList, reset } = useWorkSheet({
+  const {
+    sheetList,
+    changedSheetList,
+    reset,
+    isHookLoading,
+    doorModelList: doorModelList_hook,
+    options_doorModel,
+  } = useWorkSheet({
     itemTokenList: _.cloneDeep(itemTokenList) ?? {},
     itemIdArrList: _.cloneDeep(itemIdArrList) ?? {},
   });
@@ -323,73 +417,6 @@ export default function WorkSheet({
     targetSheetKey_p && targetSheetKey_c
       ? sheetList[targetSheetKey_p]?.[targetSheetKey_c]
       : sheetList[firstSheetKey_p]?.[firstSheetKey_p];
-
-  const doorModelOptionArr = useMemo(() => {
-    if (!doorModelList) {
-      return [];
-    }
-
-    return Object.values(doorModelList).map((item) => {
-      return {
-        value: item.name,
-        label: item.name,
-      };
-    });
-  }, [doorModelList]);
-
-  const { guideRailOptionArr_noHook, guideRailOptionArr_withHook, doorModelMaterialOptionArr } = useMemo(() => {
-    const empty = {
-      guideRailOptionArr_noHook: [],
-      guideRailOptionArr_withHook: [],
-      doorModelMaterialOptionArr: [],
-    };
-
-    if (!doorModelList || !targetSheet?.doorModelName) {
-      return empty;
-    }
-
-    const theDoorModel = doorModelList[targetSheet.doorModelName];
-
-    if (!theDoorModel) {
-      myAlert.warning({ title: '沒有匹配的門型', content: '資料庫中沒有該產品之門型資料' });
-
-      return empty;
-    }
-
-    const guideRailOptionArr_noHook: Toption[] = [];
-    const guideRailOptionArr_withHook: Toption[] = [];
-    const doorModelMaterialOptionArr: Toption[] = [];
-
-    const { guideRails, slatMaterials } = theDoorModel;
-
-    guideRails.forEach((item) => {
-      if (item.withHook) {
-        guideRailOptionArr_withHook.push({
-          value: item.imgSrc,
-          label: item.imgSrc,
-          opening: item.opening,
-          icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
-        });
-      } else {
-        guideRailOptionArr_noHook.push({
-          value: item.imgSrc,
-          label: item.imgSrc,
-          opening: item.opening,
-          icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
-        });
-      }
-    });
-
-    slatMaterials.forEach((item) => {
-      doorModelMaterialOptionArr.push({ value: item.name, label: item.name });
-    });
-
-    return {
-      guideRailOptionArr_noHook,
-      guideRailOptionArr_withHook,
-      doorModelMaterialOptionArr,
-    };
-  }, [doorModelList, targetSheet?.doorModelName]);
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -450,6 +477,10 @@ export default function WorkSheet({
 
   //
   useEffect(() => {
+    if (!doorModelList) {
+      return;
+    }
+
     if (disabled) {
       reset();
 
@@ -457,7 +488,7 @@ export default function WorkSheet({
         targetSheet.getInitData();
       }
     }
-  }, [disabled, itemTokenList]);
+  }, [disabled, itemTokenList, doorModelList_hook]);
   //
 
   useEffect(() => {
@@ -581,7 +612,7 @@ export default function WorkSheet({
             targetSheet.doorModelName = v?.value ?? '';
           }
         },
-        options: doorModelOptionArr,
+        options: options_doorModel,
       },
     },
     fullWidth: {
@@ -606,17 +637,17 @@ export default function WorkSheet({
         inputType: 'number',
       },
     },
-    boxB: {
-      selectProps: {
-        value: targetSheet?.boxB ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.boxB = v?.value ?? '';
-          }
-        },
-        options: targetSheet?.options_boxB ?? [],
-      },
-    },
+    // boxB: {
+    //   selectProps: {
+    //     value: targetSheet?.boxB ?? '',
+    //     onChange: (v) => {
+    //       if (targetSheet) {
+    //         targetSheet.boxB = v?.value ?? '';
+    //       }
+    //     },
+    //     options: targetSheet?.options_boxB ?? [],
+    //   },
+    // },
     quantity: {
       inputProps: {
         value: targetSheet?.quantity ?? '',
@@ -631,7 +662,8 @@ export default function WorkSheet({
             targetSheet.materialName = v?.value ?? '';
           }
         },
-        options: doorModelMaterialOptionArr,
+        // options: doorModelMaterialOptionArr,
+        options: targetSheet?.options_material ?? null,
       },
     },
     isAntiTyphoon: {
@@ -651,6 +683,49 @@ export default function WorkSheet({
   };
 
   // -------------------------------------------------------------------------
+
+  const control_detail_ABCD: Tcontrol_ABCD = {
+    gapA: {
+      value: targetSheet?.gapA ?? '',
+      onChange: (str) => {
+        if (targetSheet) {
+          targetSheet.gapA = str;
+        }
+      },
+      inputType: 'number',
+      placeholder: '機械縫 A',
+    },
+    boxB: {
+      value: targetSheet?.boxB_mm ?? '',
+      onChange: (str) => {
+        if (targetSheet) {
+          targetSheet.boxB_mm = str;
+        }
+      },
+      inputType: 'number',
+      placeholder: '支版尺寸 B',
+    },
+    gapC: {
+      value: targetSheet?.gapC ?? '',
+      onChange: (str) => {
+        if (targetSheet) {
+          targetSheet.gapC = str;
+        }
+      },
+      inputType: 'number',
+      placeholder: '機械縫 C',
+    },
+    boxD: {
+      value: targetSheet?.boxD_mm ?? '',
+      onChange: (str) => {
+        if (targetSheet) {
+          targetSheet.boxD_mm = str;
+        }
+      },
+      inputType: 'number',
+      placeholder: '支版尺寸 D',
+    },
+  };
 
   const control_detail: Tcontrol_detail = {
     // 捲軸
@@ -728,6 +803,10 @@ export default function WorkSheet({
             targetSheet.headBoxForm = bool;
           }
         },
+        optionArr: [
+          { value: 'false', label: '捲箱 + 機箱' },
+          { value: 'true', label: '方形捲箱' },
+        ],
       },
       // 角鐵數量
       angleIronQuantity: {
@@ -780,10 +859,10 @@ export default function WorkSheet({
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_bottomBar() }),
       },
       surface: {
-        value: targetSheet?.bottomBarSurface ?? '',
+        value: targetSheet?.com_bottomBar_surface ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.bottomBarSurface = v;
+            targetSheet.com_bottomBar_surface = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
@@ -821,7 +900,7 @@ export default function WorkSheet({
             targetSheet.com_slat_material = v;
           }
         },
-        optionArr: doorModelMaterialOptionArr,
+        optionArr: targetSheet?.options_material ?? null,
       },
       surface: {
         value: targetSheet?.com_slat_surface ?? '',
@@ -939,10 +1018,10 @@ export default function WorkSheet({
         optionArr: targetSheet?.options_doorTrackThick ?? [],
       },
       surface: {
-        value: targetSheet?.guideRailSurface ?? '',
+        value: targetSheet?.com_guideRail_surface ?? '',
         onChange: (v) => {
           if (targetSheet) {
-            targetSheet.guideRailSurface = v;
+            targetSheet.com_guideRail_surface = v;
           }
         },
         checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
@@ -989,7 +1068,8 @@ export default function WorkSheet({
         },
 
         icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRailName}`,
-        optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
+        // optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
+        optionArr: targetSheet?.options_guideRail ?? [],
       },
     },
   };
@@ -1095,19 +1175,6 @@ export default function WorkSheet({
         continue;
       }
 
-      try {
-        // 送給後端的資料中如果accessories裡的name是空的，會壞掉
-        // 所以要呼叫getAccessoriesArr()確保accessories的name都有值
-        if (!changedSheetList[key].isAccessoriesReady) {
-          await changedSheetList[key].getAccessoriesArr();
-        }
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得配件列表失敗，更新工作表失敗', content: err.message });
-        setDisabled(true);
-        break;
-      }
-
       // 必須先執行確保accessories的name都有值的步驟才可以取body
       const body = changedSheetList[key].bodyItemArr;
 
@@ -1160,7 +1227,7 @@ export default function WorkSheet({
             BD: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
             /**捲門全高 */
             fullHeight: sheet.fullHeight,
-            weightConversion: '', // 未知 // 重量換算
+            weightConversion: '', // 未知 // 重量換算 沒有在任一表單顯示
           },
           roller: {
             diameter: `${sheet.diameter}"` ?? '', // 要有 " 符號，代表吋
@@ -1170,7 +1237,7 @@ export default function WorkSheet({
             bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
           },
           headBox: {
-            angleIronQty: '', // 未知
+            angleIronQty: sheet.headBoxAngleIronQuantity,
             angleIronSize: sheet.angleIronSize,
             form: sheet.headBoxForm_str,
             surface: '',
@@ -1188,7 +1255,7 @@ export default function WorkSheet({
             /**相數加電壓 */
             phaseVoltage: sheet.motorPhaseVoltage,
             horsepower: sheet.horsepower,
-            direction: '', // 未知
+            direction: '', // 未知 // 在廠務部工作表 電動機方向
           },
           guideRail: {
             form: sheet.isAntiTyphoon ? '防颱' : '一般',
@@ -1198,24 +1265,24 @@ export default function WorkSheet({
             icon: sheet?.guideRailName
               ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
               : undefined,
-            antiTyphoonHook: '-50', // 未知
+            antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
             bendStraight: sheet.guideRailType ?? '',
           },
           chainCog: {
             sprocketWheelModel: sheet.sprocketWheelModel ?? '',
             sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber ?? '',
             bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
-            teethQuantity: '', // 未知
-            centerDistance: '', // 未知
-            eyesQuantity: '', // 未知
+            teethQuantity: '', // 未知 // 在廠務部工作表 齒數
+            centerDistance: '', // 未知 // 在廠務部工作表 中心距
+            eyesQuantity: '', // 未知 // 在廠務部工作表 目數
           },
           base: {
             material: sheet.com_bottomBar_material,
             guideRailsOpening: sheet.guideRailsOpening,
-            surface: '', // 未知
+            surface: '', // 未知 在廠務部工作表
           },
           sidePlate: {
-            direction: '', // 未知
+            direction: '', // 未知 在廠務部工作表
             bigSidePlate: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
             smallSidePlate: `${sheet.boxB_mm}*${sheet.boxB_mm}`,
           },
@@ -1315,7 +1382,7 @@ export default function WorkSheet({
   const forbidden = targetSheet?.isOriginal;
 
   return (
-    <SubLayer isLoading_all={isLoading || targetSheet?.isLoading}>
+    <SubLayer isLoading_all={isLoading || isHookLoading || targetSheet?.isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <form
@@ -1413,6 +1480,7 @@ export default function WorkSheet({
 
             <hr />
             <WorkSheetProductDetail01
+              control_ABCD={control_detail_ABCD}
               control={control_detail}
               disabled={forbidden || disabled}
               // supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
