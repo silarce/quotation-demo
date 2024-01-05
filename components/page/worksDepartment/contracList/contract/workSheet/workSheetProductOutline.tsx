@@ -37,7 +37,7 @@ type Tcontrol = {
   doorType: TcontrolItem;
   fullWidth: TcontrolItem;
   height: TcontrolItem;
-  boxB: TcontrolItem;
+  boxB?: TcontrolItem;
   quantity: TcontrolItem;
   material: TcontrolItem;
   isAntiTyphoon: {
@@ -110,6 +110,12 @@ export default function WorkSheetProductOutline({
           {configArr.map((item) => {
             const { key, label, className, placeholder, inputType } = item;
 
+            const theControl = control[key];
+
+            if (!theControl) {
+              return null;
+            }
+
             return (
               <InputSel
                 key={key}
@@ -117,11 +123,11 @@ export default function WorkSheetProductOutline({
                 label={label}
                 captionColor="main"
                 captionWidth={captionWidth}
-                disabled={disabled || control[key].disabled}
+                disabled={disabled || theControl.disabled}
                 showBaseline="always"
-                inputProps={control[key].inputProps}
-                selectProps={control[key].selectProps}
-                datePickerProps={control[key].datePickerProps}
+                inputProps={theControl.inputProps}
+                selectProps={theControl.selectProps}
+                datePickerProps={theControl.datePickerProps}
               />
             );
           })}

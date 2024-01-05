@@ -29,6 +29,20 @@
 
  */
 
+/**
+關於馬達
+營業部現行的做法是
+以東元的單價計算
+2HP以上的馬達自動取三相馬達
+不管伏特數
+
+因此取得預設馬達時要以東元優先
+馬力1.5HP以上時要相數要自動改為三相
+低於1.5HP時要相數要自動改為單相
+馬達過濾器先以原本的伏特數過濾，沒有符合的馬達的話就改伏特數再過濾一次
+
+ */
+
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
@@ -77,7 +91,7 @@ import { apiGetQuotationProducts } from 'js/api/api_quotation';
 
 import { prodCellConfig, getInstallationFee } from './prodCellConfig';
 
-import { lookup_distributionBoxPrice } from 'config/product/lookup';
+import { lookup_distributionBoxPrice, lookup_horsePowerToNumber } from 'config/product/lookup';
 
 // utils
 import {
@@ -839,17 +853,16 @@ class Class_product {
     );
 
     //
-
     const defaultMotorIndex = res.defaultMotorIndex;
     const defaultMotor = res.motors[defaultMotorIndex];
     const defaultMotorBox = defaultMotor.box;
 
+    // 內有預設boxB boxD 馬達廠商 馬力
     this.defaultMotor = defaultMotor;
 
     // ________________________
     // 設定馬力
     this.horsepower = defaultMotor.hp;
-    this.changeDistributionBoxPriceWithHorsepower();
 
     // ________________________
     // 設定boxB與thickness
@@ -861,10 +874,27 @@ class Class_product {
 
     // 設定馬達廠商
     if (defaultMotorBox) {
+      //
+      //
+      //
+
       if (defaultMotorBox.東元) {
         this.motor = '東元';
 
         const defaultBoxB_num = new Decimal(defaultMotorBox.東元.boxB).div(1000).toNumber();
+        const defaultBoxB = String(defaultBoxB_num);
+        const shouldChange = !this.isBoxBinOption({
+          boxB_m: defaultBoxB_num,
+        });
+
+        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
+        this.changeBoxBNoCall({
+          str: theBoxB,
+          diameter: res.diameter,
+        });
+      } else if (defaultMotorBox.default) {
+        const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
         const defaultBoxB = String(defaultBoxB_num);
         const shouldChange = !this.isBoxBinOption({
           boxB_m: defaultBoxB_num,
@@ -891,20 +921,9 @@ class Class_product {
           str: theBoxB,
           diameter: res.diameter,
         });
-      } else if (defaultMotorBox.default) {
-        const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
-        const defaultBoxB = String(defaultBoxB_num);
-        const shouldChange = !this.isBoxBinOption({
-          boxB_m: defaultBoxB_num,
-        });
-
-        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
-
-        this.changeBoxBNoCall({
-          str: theBoxB,
-          diameter: res.diameter,
-        });
       }
+
+      //
     } else {
       this.changeBoxBNoCall({
         str: boxB ? String(boxB / 1000) : '',
@@ -1315,19 +1334,31 @@ class Class_product {
     if (!motor) {
       // ! 現在馬達欄位隱藏，不會給使用者操作，所以可以直接在這邊自動變更
       // ! 以後若讓使用者操作馬達，就不能這樣直接變更
-      this._prodData.motor = this.options_motor?.[1].value ?? '';
+      let motorVendor = this.motor;
+
+      if (motorVendor === '東元') {
+        motorVendor = '大同';
+      } else if (motorVendor === '大同') {
+        motorVendor = '東元';
+      }
+
       motor = filter_motors({
         dataArr: availableComponents.motors,
         filterParams: {
           horsePower: this.horsepower,
           gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined', // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
-          motorVendor: this.motor,
+          // motorVendor: this.motor,
+          motorVendor: motorVendor,
           phase: Number(this.phase),
           voltage: Number(this.voltage),
           weight: this.weight,
           hasSupportStand: this.motorSupport,
         },
       });
+
+      if (motor) {
+        this._prodData.motor = motorVendor;
+      }
     }
 
     let sidePlate: Tcomponent | null = filter_sidePlates({
@@ -1474,8 +1505,9 @@ class Class_product {
       this._prodData.motor = this.options_motor?.[0].value ?? '';
       // this._prodData.horsepower = this.options_horsepower?.[defaultMotorIndex].value ?? '';
       this._prodData.horsepower = defaultMotor?.hp ?? '';
-      this.changeDistributionBoxPriceWithHorsepower();
-      this._prodData.phase = Number(this.options_phase?.[0].value ?? '1');
+      this.changeDistributionBoxPrice_byHorsepower();
+      this.changePhase_byHorsepower({ bySetter: false });
+      // this._prodData.phase = Number(this.options_phase?.[0].value ?? '1');
       this._prodData.voltage = this.options_voltage?.[0].value ?? '';
       this.callRetrieveCreProdCom();
     };
@@ -1951,8 +1983,23 @@ class Class_product {
   }
 
   //
-  changeDistributionBoxPriceWithHorsepower() {
+  changeDistributionBoxPrice_byHorsepower() {
     this.subComList.distributionBox.price_locale = String(lookup_distributionBoxPrice[this.horsepower] ?? 0);
+  }
+
+  changePhase_byHorsepower({ bySetter = true }: { bySetter?: boolean } = {}) {
+    const horsepower_num = lookup_horsePowerToNumber[this.horsepower] ?? 0;
+    let phase = 1;
+
+    if (horsepower_num >= 1.5) {
+      phase = 3;
+    }
+
+    if (bySetter) {
+      this.phase = String(phase);
+    } else {
+      this._prodData.phase = phase;
+    }
   }
 
   // -----------------------------------------------------------------
@@ -2572,7 +2619,9 @@ class Class_product {
   }
   set horsepower(v) {
     this._prodData.horsepower = v;
-    this.changeDistributionBoxPriceWithHorsepower();
+
+    this.changeDistributionBoxPrice_byHorsepower();
+    this.changePhase_byHorsepower();
     this.toSetDefaultBoxB();
     this.callRetrieveCreProdCom();
     this.reRender();

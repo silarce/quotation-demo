@@ -7,7 +7,7 @@ class MyDocument extends Document {
         <Head>
           {/* 公司擋住外網，導致無法取得字體 */}
           {/* 改用本地字體 */}
-          {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin={'crossOrigin'} />
           <link
             href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap"
@@ -16,7 +16,7 @@ class MyDocument extends Document {
           <link
             href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap"
             rel="stylesheet"
-          /> */}
+          />
         </Head>
         <body>
           <Main />
