@@ -45,3 +45,17 @@ export const lookup_distributionBoxPrice: { [key: string]: number | undefined } 
   '3HP': 12900,
   '5HP': 13500,
 };
+
+// 馬力對照表
+export const lookup_horsePowerToNumber: { [key: string]: number | undefined } = {
+  '1/4HP': 0.25,
+  '1/3HP': 0.33,
+  '1/2HP': 0.5,
+  '3/4HP': 0.75,
+  '1HP': 1,
+  '1 1/2HP': 1.5,
+  '1.5HP': 1.5,
+  '2HP': 2,
+  '3HP': 3,
+  '5HP': 5,
+};
