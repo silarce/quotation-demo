@@ -561,17 +561,17 @@ export default function WorkSheet({
         inputType: 'number',
       },
     },
-    boxB: {
-      selectProps: {
-        value: targetSheet?.boxB ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.boxB = v?.value ?? '';
-          }
-        },
-        options: targetSheet?.options_boxB ?? [],
-      },
-    },
+    // boxB: {
+    //   selectProps: {
+    //     value: targetSheet?.boxB ?? '',
+    //     onChange: (v) => {
+    //       if (targetSheet) {
+    //         targetSheet.boxB = v?.value ?? '';
+    //       }
+    //     },
+    //     options: targetSheet?.options_boxB ?? [],
+    //   },
+    // },
     quantity: {
       inputProps: {
         value: targetSheet?.quantity ?? '',
