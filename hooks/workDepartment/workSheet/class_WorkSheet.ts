@@ -657,7 +657,7 @@ class Class_workSheet {
         value: imgSrc,
         label: imgSrc,
         icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
-        guideRailsOpening: item.opening,
+        opening: item.opening,
         width: item.width,
       };
 
