@@ -17,13 +17,22 @@
     @apply inline-block;
   }
 }
+// 變量字體，有些瀏覽器或舊版瀏覽器不支援
+// @font-face {
+//   font-family: "Noto Sans TC";
+//   src: url("../public/fontFamily/NotoSansTC-VariableFont_wght.ttf") format("truetype");
+// }
 
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: noto sans tc;
+  font-family:
+    noto sans tc,
+    Microsoft JhengHei;
   // font-family: inter, noto sans tc;
+
+  // font-family: Microsoft JhengHei;
   height: 100%;
 }
 
@@ -43,8 +52,11 @@ div,
 a,
 textarea,
 input {
-  font-family: noto sans tc;
+  font-family:
+    noto sans tc,
+    Microsoft JhengHei;
   // font-family: inter, noto sans tc;
+  // font-family: Microsoft JhengHei;
   color: $colorText;
   outline: none;
 }

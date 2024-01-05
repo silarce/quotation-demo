@@ -1844,8 +1844,8 @@ latestContentProdArr為這次追加追減的主產品
         setVisible={setShowMemoModal}
         title={'追加追減備註'}
         placeholder={'請輸入備註'}
-        tip="最多25字"
-        textLength={25}
+        // tip="最多25字"
+        // textLength={25}
         onConfirm={inputModalOnConfirm}
         autoCloseOnConfirm={false}
       />
