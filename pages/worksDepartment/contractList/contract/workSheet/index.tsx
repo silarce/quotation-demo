@@ -341,79 +341,6 @@ export default function WorkSheet({
       ? sheetList[targetSheetKey_p]?.[targetSheetKey_c]
       : sheetList[firstSheetKey_p]?.[firstSheetKey_p];
 
-  const doorModelOptionArr = useMemo(() => {
-    if (!doorModelList) {
-      return [];
-    }
-
-    return Object.values(doorModelList).map((item) => {
-      return {
-        value: item.name,
-        label: item.name,
-      };
-    });
-  }, [doorModelList]);
-
-  const {
-    //  guideRailOptionArr_noHook,
-    //   guideRailOptionArr_withHook,
-    doorModelMaterialOptionArr,
-  } = useMemo(() => {
-    const empty = {
-      // guideRailOptionArr_noHook: [],
-      // guideRailOptionArr_withHook: [],
-      doorModelMaterialOptionArr: [],
-    };
-
-    if (!doorModelList || !targetSheet?.doorModelName) {
-      return empty;
-    }
-
-    const theDoorModel = doorModelList[targetSheet.doorModelName];
-
-    if (!theDoorModel) {
-      myAlert.warning({ title: '沒有匹配的門型', content: '資料庫中沒有該產品之門型資料' });
-
-      return empty;
-    }
-
-    // const guideRailOptionArr_noHook: Toption[] = [];
-    // const guideRailOptionArr_withHook: Toption[] = [];
-    const doorModelMaterialOptionArr: Toption[] = [];
-
-    const { guideRails, slatMaterials } = theDoorModel;
-
-    // guideRails.forEach((item) => {
-    //   if (item.withHook) {
-    //     guideRailOptionArr_withHook.push({
-    //       value: item.imgSrc,
-    //       label: item.imgSrc,
-    //       opening: item.opening,
-    //       icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
-    //       width: String(item.width),
-    //     });
-    //   } else {
-    //     guideRailOptionArr_noHook.push({
-    //       value: item.imgSrc,
-    //       label: item.imgSrc,
-    //       opening: item.opening,
-    //       icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
-    //       width: String(item.width),
-    //     });
-    //   }
-    // });
-
-    slatMaterials.forEach((item) => {
-      doorModelMaterialOptionArr.push({ value: item.name, label: item.name });
-    });
-
-    return {
-      // guideRailOptionArr_noHook,
-      // guideRailOptionArr_withHook,
-      doorModelMaterialOptionArr,
-    };
-  }, [doorModelList, targetSheet?.doorModelName]);
-
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -658,7 +585,8 @@ export default function WorkSheet({
             targetSheet.materialName = v?.value ?? '';
           }
         },
-        options: doorModelMaterialOptionArr,
+        // options: doorModelMaterialOptionArr,
+        options: targetSheet?.options_material ?? null,
       },
     },
     isAntiTyphoon: {
@@ -848,7 +776,7 @@ export default function WorkSheet({
             targetSheet.com_slat_material = v;
           }
         },
-        optionArr: doorModelMaterialOptionArr,
+        optionArr: targetSheet?.options_material ?? null,
       },
       surface: {
         value: targetSheet?.com_slat_surface ?? '',

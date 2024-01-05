@@ -198,15 +198,17 @@ const useWorkSheet = ({
 
   // --------------------------------------------------------------------
 
-  const options_doorModel = useMemo(() => {
-    const oprions = Object.values(doorModelList || {}).map((item) => {
+  const { options_doorModel } = useMemo(() => {
+    const options_doorModel = Object.values(doorModelList || {}).map((item) => {
       return {
         value: item.name,
         label: item.name,
       };
     });
 
-    return oprions;
+    // doorModelMaterialOptionArr
+
+    return { options_doorModel };
   }, [doorModelList]);
 
   // --------------------------------------------------------------------

@@ -615,6 +615,19 @@ class Class_workSheet {
 
   // ---------------------------------------------------------------------
 
+  get options_material() {
+    const doorModelObj = this.doorModelList[this._prod.doorModelName];
+
+    const materialArr = doorModelObj.slatMaterials.map((item) => {
+      return {
+        value: item.name,
+        label: item.name,
+      };
+    });
+
+    return materialArr;
+  }
+
   get options_guideRail() {
     const doorModel = this.doorModelList[this._prod.doorModelName];
 
