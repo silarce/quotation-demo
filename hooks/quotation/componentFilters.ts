@@ -198,10 +198,9 @@ const filter_motors = ({
 
     if (d_horsePower !== horsePoswer) {
       return false;
+    } else if (data.gearNumber !== filterParams.gearNumber) {
+      return false;
     }
-    // else if (data.gearNumber !== filterParams.gearNumber) {
-    //   return false;
-    // }
     // else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
     //   return false;
     // }
