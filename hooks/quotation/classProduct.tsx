@@ -77,7 +77,7 @@ import { apiGetQuotationProducts } from 'js/api/api_quotation';
 
 import { prodCellConfig, getInstallationFee } from './prodCellConfig';
 
-import { lookup_boxBAndBoxD } from 'config/product/lookup';
+import { lookup_distributionBoxPrice } from 'config/product/lookup';
 
 // utils
 import {
