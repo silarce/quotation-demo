@@ -1334,19 +1334,31 @@ class Class_product {
     if (!motor) {
       // ! 現在馬達欄位隱藏，不會給使用者操作，所以可以直接在這邊自動變更
       // ! 以後若讓使用者操作馬達，就不能這樣直接變更
-      this._prodData.motor = this.options_motor?.[1].value ?? '';
+      let motorVendor = this.motor;
+
+      if (motorVendor === '東元') {
+        motorVendor = '大同';
+      } else if (motorVendor === '大同') {
+        motorVendor = '東元';
+      }
+
       motor = filter_motors({
         dataArr: availableComponents.motors,
         filterParams: {
           horsePower: this.horsepower,
           gearNumber: this._doorGeneralSpecs?.gearNumber ?? 'undefined', // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
-          motorVendor: this.motor,
+          // motorVendor: this.motor,
+          motorVendor: motorVendor,
           phase: Number(this.phase),
           voltage: Number(this.voltage),
           weight: this.weight,
           hasSupportStand: this.motorSupport,
         },
       });
+
+      if (motor) {
+        this._prodData.motor = motorVendor;
+      }
     }
 
     let sidePlate: Tcomponent | null = filter_sidePlates({
