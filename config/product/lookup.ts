@@ -31,3 +31,16 @@ export const lookup_boxBAndBoxD: TpariBD = {
     },
   },
 };
+
+// 配電箱及按鈕開關
+export const lookup_distributionBoxPrice = {
+  '1/4HP': 5940,
+  '1/2HP': 5940,
+  '3/4HP': 5940,
+  '1HP': 5940,
+  '1 1/2HP': 5940,
+  '1.5HP': 5940,
+  '2HP': 12900,
+  '3HP': 12900,
+  '5HP': 13500,
+};

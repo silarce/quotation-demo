@@ -17,6 +17,11 @@
     @apply inline-block;
   }
 }
+// 變量字體，有些瀏覽器或舊版瀏覽器不支援
+@font-face {
+  font-family: "Noto Sans TC";
+  src: url("../public/fontFamily/NotoSansTC-VariableFont_wght.ttf") format("truetype");
+}
 
 html,
 body {
