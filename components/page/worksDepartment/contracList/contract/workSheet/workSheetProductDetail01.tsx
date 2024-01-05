@@ -166,7 +166,7 @@ const Item = ({
             label: label_c,
             placeholder,
             className: className_inputSel,
-            options: options_fake,
+            options: options_default,
             checkBarPropsListCre,
           } = item;
 
@@ -200,7 +200,7 @@ const Item = ({
               onChange: (v) => {
                 onChange?.(v?.value ?? '');
               },
-              options: optionArr ?? options_fake ?? [],
+              options: optionArr ?? options_default ?? [],
               selClassNames: {
                 singleValue: (state) => {
                   return scss.selSingleValue;
@@ -315,67 +315,6 @@ const Item = ({
 // ==================================================================
 const captionWidth = '100px';
 
-const fakeOption_material: Toption[] = [
-  { value: '304#', label: 'SST 304# (2B 霧面)' },
-  { value: '305#', label: 'SST 305# (2A 平面)' },
-  { value: '306#', label: 'SST 306# (3C 霧面)' },
-];
-
-const fakeOption_size: Toption[] = [
-  { value: '5', label: '5"' },
-  { value: '6', label: '6"' },
-  { value: '7', label: '7"' },
-  { value: '8', label: '8"' },
-];
-
-const fakeOption_thickness: Toption[] = [
-  { value: '0.4', label: '0.4T' },
-  { value: '0.6', label: '0.6T' },
-  { value: '0.8', label: '0.8T' },
-  { value: '1.0', label: '1.0T' },
-  { value: '1.2', label: '1.2T' },
-];
-
-const fakeOption_reelBoxType: Toption[] = [
-  { value: 'rollBox', label: '捲箱' },
-  { value: 'Chassis', label: '機箱' },
-  { value: 'rollBoxAndChassis', label: '捲箱+機箱' },
-];
-const fakeOption_bearing: Toption[] = [
-  { value: '6208', label: '6208#' },
-  { value: '1251', label: '1251#' },
-  { value: '356', label: '356#' },
-];
-
-const fakeOption_chain: Toption[] = [
-  { value: '640', label: '640#' },
-  { value: '580', label: '580#' },
-  { value: '455', label: '455#' },
-];
-
-const fakeOption_horsepower: Toption[] = [
-  { value: '0.25', label: '1/4HP' },
-  { value: '0.5', label: '1/2HP' },
-  { value: '1', label: '1HP' },
-  { value: '1.5', label: '1 1/2HP' },
-];
-
-const fakeOption_manufacturer: Toption[] = [
-  { value: '大同', label: '大同' },
-  { value: '士林電機', label: '士林電機' },
-  { value: '東元', label: '東元' },
-];
-
-const fakeOption_powerSupply: Toption[] = [
-  { value: '單相', label: '單相' },
-  { value: '三相', label: '三相' },
-];
-
-const fakeOption_voltage: Toption[] = [
-  { value: '110V', label: '110V' },
-  { value: '220V', label: '220V' },
-];
-
 // --------------------------------
 
 const createCheckBarPropsList = (arr: { key: string; label: string }[]): TcheckProps['propsList'] => {
@@ -463,7 +402,7 @@ const configArr_left: Tconfig[] = [
         label: '尺寸',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_size,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -487,7 +426,7 @@ const configArr_left: Tconfig[] = [
         label: '材質',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_material,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -496,7 +435,7 @@ const configArr_left: Tconfig[] = [
         label: '厚度',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_thickness,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -534,10 +473,11 @@ const configArr_left: Tconfig[] = [
         placeholder: undefined,
         className: undefined,
         // options: fakeOption_reelBoxType,
-        options: [
-          { value: 'false', label: '捲箱 + 機箱' },
-          { value: 'true', label: '方形捲箱' },
-        ],
+        // options: [
+        //   { value: 'false', label: '捲箱 + 機箱' },
+        //   { value: 'true', label: '方形捲箱' },
+        // ],
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -561,7 +501,7 @@ const configArr_left: Tconfig[] = [
         label: '材質',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_material,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -570,7 +510,7 @@ const configArr_left: Tconfig[] = [
         label: '角鐵材質',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_material,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -579,7 +519,7 @@ const configArr_left: Tconfig[] = [
         label: '底座板材質',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_material,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -612,7 +552,7 @@ const configArr_left: Tconfig[] = [
         label: '軸承',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_bearing,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -621,7 +561,7 @@ const configArr_left: Tconfig[] = [
         label: '鏈條',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_chain,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -648,7 +588,7 @@ const configArr_right: Tconfig[] = [
         label: '材質',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_material,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -672,7 +612,7 @@ const configArr_right: Tconfig[] = [
         label: '馬力數',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_horsepower,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -681,7 +621,7 @@ const configArr_right: Tconfig[] = [
         label: '廠商',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_manufacturer,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -690,7 +630,7 @@ const configArr_right: Tconfig[] = [
         label: '相數',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_powerSupply,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -699,7 +639,7 @@ const configArr_right: Tconfig[] = [
         label: '電壓',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_voltage,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -750,7 +690,7 @@ const configArr_right: Tconfig[] = [
         label: '材質',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_material,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {
@@ -759,7 +699,7 @@ const configArr_right: Tconfig[] = [
         label: '厚度',
         placeholder: undefined,
         className: undefined,
-        options: fakeOption_thickness,
+        options: undefined,
         checkBarPropsListCre: undefined,
       },
       {

@@ -683,6 +683,10 @@ export default function WorkSheet({
             targetSheet.headBoxForm = bool;
           }
         },
+        optionArr: [
+          { value: 'false', label: '捲箱 + 機箱' },
+          { value: 'true', label: '方形捲箱' },
+        ],
       },
       // 角鐵數量
       angleIronQuantity: {

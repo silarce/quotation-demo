@@ -229,7 +229,9 @@ class Class_workSheet {
     if (res) {
       this._accessoriesOptionArr = res;
 
-      const list: typeof this._accessoriesOptionList = {};
+      const accessoriesOptionList = this._accessoriesOptionList;
+
+      const list: typeof accessoriesOptionList = {};
 
       this._accessoriesOptionArr.forEach((item) => {
         list[item.id] = item;
