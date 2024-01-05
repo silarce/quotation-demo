@@ -316,7 +316,13 @@ export default function WorkSheet({
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
-  const { sheetList, changedSheetList, reset } = useWorkSheet({
+  const {
+    sheetList,
+    changedSheetList,
+    reset,
+    isHookLoading,
+    doorModelList: doorModelList_hook,
+  } = useWorkSheet({
     itemTokenList: _.cloneDeep(itemTokenList) ?? {},
     itemIdArrList: _.cloneDeep(itemIdArrList) ?? {},
   });
@@ -347,10 +353,14 @@ export default function WorkSheet({
     });
   }, [doorModelList]);
 
-  const { guideRailOptionArr_noHook, guideRailOptionArr_withHook, doorModelMaterialOptionArr } = useMemo(() => {
+  const {
+    //  guideRailOptionArr_noHook,
+    //   guideRailOptionArr_withHook,
+    doorModelMaterialOptionArr,
+  } = useMemo(() => {
     const empty = {
-      guideRailOptionArr_noHook: [],
-      guideRailOptionArr_withHook: [],
+      // guideRailOptionArr_noHook: [],
+      // guideRailOptionArr_withHook: [],
       doorModelMaterialOptionArr: [],
     };
 
@@ -366,39 +376,39 @@ export default function WorkSheet({
       return empty;
     }
 
-    const guideRailOptionArr_noHook: Toption[] = [];
-    const guideRailOptionArr_withHook: Toption[] = [];
+    // const guideRailOptionArr_noHook: Toption[] = [];
+    // const guideRailOptionArr_withHook: Toption[] = [];
     const doorModelMaterialOptionArr: Toption[] = [];
 
     const { guideRails, slatMaterials } = theDoorModel;
 
-    guideRails.forEach((item) => {
-      if (item.withHook) {
-        guideRailOptionArr_withHook.push({
-          value: item.imgSrc,
-          label: item.imgSrc,
-          opening: item.opening,
-          icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
-          width: String(item.width),
-        });
-      } else {
-        guideRailOptionArr_noHook.push({
-          value: item.imgSrc,
-          label: item.imgSrc,
-          opening: item.opening,
-          icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
-          width: String(item.width),
-        });
-      }
-    });
+    // guideRails.forEach((item) => {
+    //   if (item.withHook) {
+    //     guideRailOptionArr_withHook.push({
+    //       value: item.imgSrc,
+    //       label: item.imgSrc,
+    //       opening: item.opening,
+    //       icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
+    //       width: String(item.width),
+    //     });
+    //   } else {
+    //     guideRailOptionArr_noHook.push({
+    //       value: item.imgSrc,
+    //       label: item.imgSrc,
+    //       opening: item.opening,
+    //       icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item.imgSrc}`,
+    //       width: String(item.width),
+    //     });
+    //   }
+    // });
 
     slatMaterials.forEach((item) => {
       doorModelMaterialOptionArr.push({ value: item.name, label: item.name });
     });
 
     return {
-      guideRailOptionArr_noHook,
-      guideRailOptionArr_withHook,
+      // guideRailOptionArr_noHook,
+      // guideRailOptionArr_withHook,
       doorModelMaterialOptionArr,
     };
   }, [doorModelList, targetSheet?.doorModelName]);
@@ -462,6 +472,10 @@ export default function WorkSheet({
 
   //
   useEffect(() => {
+    if (!doorModelList) {
+      return;
+    }
+
     if (disabled) {
       reset();
 
@@ -469,7 +483,7 @@ export default function WorkSheet({
         targetSheet.getInitData();
       }
     }
-  }, [disabled, itemTokenList]);
+  }, [disabled, itemTokenList, doorModelList_hook]);
   //
 
   useEffect(() => {
@@ -1001,7 +1015,8 @@ export default function WorkSheet({
         },
 
         icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRailName}`,
-        optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
+        // optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
+        optionArr: targetSheet?.options_guideRail ?? [],
       },
     },
   };
@@ -1314,7 +1329,7 @@ export default function WorkSheet({
   const forbidden = targetSheet?.isOriginal;
 
   return (
-    <SubLayer isLoading_all={isLoading || targetSheet?.isLoading}>
+    <SubLayer isLoading_all={isLoading || isHookLoading || targetSheet?.isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <form

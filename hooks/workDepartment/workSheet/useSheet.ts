@@ -12,7 +12,7 @@ import {
   TupdateWorkSheetItem,
 } from 'js/api/dtoTypes';
 
-import { apiGetProdAccessories, TdoorAccessoryDto } from 'js/api/api_product';
+import { useApiGetProdDoorModels, apiGetProdAccessories, TdoorAccessoryDto } from 'js/api/api_product';
 
 // =====================================================================
 
@@ -48,6 +48,8 @@ const useWorkSheet = ({
   itemTokenList: TitemTokenList_new;
   itemIdArrList: TitemIdArrList_new;
 }) => {
+  const [isHookLoading, setIsHookLoading] = useState(false);
+
   const [sheetList, setSheetList] = useState<TsheetList>({});
 
   const forceUpdate = useCallback(() => {
@@ -57,6 +59,22 @@ const useWorkSheet = ({
   const [changedSheetList, setChangedSheetList] = useState<TchangedSheetList>({});
 
   const [accessoriesArrList, setAccessoriesArrList] = useState<TaccessoriesArrList>({});
+
+  // ------------------------------------------------------------
+
+  const { doorModelList, update: update_doorModelList } = useApiGetProdDoorModels();
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsHookLoading(true);
+
+        await update_doorModelList();
+      } catch (error) {
+      } finally {
+        setIsHookLoading(false);
+      }
+    })();
+  }, []);
 
   // ------------------------------------------------------------
 
@@ -109,6 +127,12 @@ const useWorkSheet = ({
     cKey: string;
     itemIdArr: string[];
   }) => {
+    if (!doorModelList) {
+      myAlert.err({ title: '尚未取得門型列表', content: '請稍後' });
+
+      return;
+    }
+
     setSheetList((sheetList) => {
       sheetList[pKey][cKey] = new Class_workSheet({
         identifyKey_p: pKey,
@@ -129,6 +153,7 @@ const useWorkSheet = ({
         deleteSheet: () => deleteSheet({ pKey, cKey }),
         clearSheet: () => clearSheet({ pKey, cKey }),
         lookupAccessoriesArr,
+        doorModelList,
       });
       // 分堆了，就要記錄在被改變清單中
       setChangedSheetList((state) => ({ ...state, [cKey]: sheetList[pKey][cKey] }));
@@ -174,6 +199,10 @@ const useWorkSheet = ({
   // --------------------------------------------------------------------
 
   const reset = async () => {
+    if (!doorModelList) {
+      return;
+    }
+
     const list: TsheetList = {};
 
     Object.keys(itemTokenList).forEach((pKey) => {
@@ -205,6 +234,7 @@ const useWorkSheet = ({
           deleteSheet: () => deleteSheet({ pKey, cKey }),
           clearSheet: () => clearSheet({ pKey, cKey }),
           lookupAccessoriesArr,
+          doorModelList,
         });
       });
     });
@@ -220,7 +250,7 @@ const useWorkSheet = ({
   };
 
   // ------------------------------------------------------------
-  return { sheetList, changedSheetList, reset };
+  return { sheetList, changedSheetList, reset, isHookLoading, doorModelList };
 };
 
 export { useWorkSheet };

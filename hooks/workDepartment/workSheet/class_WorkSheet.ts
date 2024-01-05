@@ -58,6 +58,8 @@ class Class_workSheet {
     clearSheet,
     //
     lookupAccessoriesArr,
+    //
+    doorModelList,
   }: {
     //
     // forceUpdate: (props?: { isNoChange?: boolean }) => void;
@@ -79,6 +81,8 @@ class Class_workSheet {
     clearSheet: () => void;
     //
     lookupAccessoriesArr: (doorModelName: string) => Promise<TdoorAccessoryDto[]>;
+    //
+    doorModelList: { [key: string]: TdoorModelInfoDto };
   }) {
     this.forceUpdate = forceUpdate;
     this._prod = _.cloneDeep(prod);
@@ -91,6 +95,8 @@ class Class_workSheet {
     this._clearSheet = clearSheet;
     this.lookupAccessoriesArr = lookupAccessoriesArr;
     this._doorModelName_state = this._prod.doorModelName;
+
+    this.doorModelList = doorModelList;
 
     if (this.identifyKey_p === this.identifyKey_c) {
       this._originalIdArr = _.cloneDeep(this._itemIdArr);
@@ -190,6 +196,8 @@ class Class_workSheet {
   private _prodDetailSpec: { slatCount: number } | undefined = undefined;
 
   private _availableComponents: TdoorComponentListDto | undefined = undefined;
+
+  readonly doorModelList;
 
   // ---------------------------------------------------------------------
   options_com = optionsCreator_componentMaterial_01();
@@ -606,6 +614,40 @@ class Class_workSheet {
   }
 
   // ---------------------------------------------------------------------
+
+  get options_guideRail() {
+    const doorModel = this.doorModelList[this._prod.doorModelName];
+
+    if (!doorModel) {
+      return undefined;
+    }
+
+    const arr = doorModel.guideRails.map((item) => {
+      const imgSrc = item.imgSrc;
+      const withHook = item.withHook;
+
+      const option = {
+        value: imgSrc,
+        label: imgSrc,
+        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
+        guideRailsOpening: item.opening,
+        width: item.width,
+      };
+
+      if ((withHook ?? false) === this.isAntiTyphoon) {
+        return option;
+      }
+
+      return undefined;
+    });
+
+    _.pull(arr, undefined);
+    const theArr = arr as unknown as Toption[];
+
+    return theArr;
+  } // options_doorTrack
+
+  // ____________________________________
 
   get isOriginal() {
     return this.identifyKey_p === this.identifyKey_c;
