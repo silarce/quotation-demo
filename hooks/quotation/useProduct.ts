@@ -204,6 +204,8 @@ const useProductList = ({
         gearNumber: prod.gearNumber ?? '',
         weight: prod.weight ?? '',
         isULGuideRail: prod.isULGuideRail ?? false,
+
+        bounceDoorWidth: prod.bounceDoorWidth || 0,
       };
 
       list[key] = new Class_product({
@@ -555,6 +557,7 @@ const useProductList = ({
           gearNumber: prod.gearNumber ?? '',
           weight: prod.weight ?? '',
           isULGuideRail: prod.isULGuideRail ?? false,
+          bounceDoorWidth: prod.bounceDoorWidth || 0,
         };
 
         list[key] = new Class_product({

@@ -970,6 +970,8 @@ export type TquotationProductDto = {
   bottomBarPlate: string; // 底座板
 
   isULGuideRail?: boolean | null;
+  // 彈射門尺寸
+  bounceDoorWidth?: number | null;
 
   items?: {
     // 材料配件
@@ -1381,6 +1383,8 @@ export type TcreateQuotationProductDto = {
   isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
+  // 彈射門尺寸
+  bounceDoorWidth: number | null;
   // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
   closingType: string;
   // 備註
@@ -2430,6 +2434,8 @@ export type TupdateWorkSheetItem = {
   dualPrice: number;
   isAntiTyphoon: boolean;
   bounceDoor: boolean;
+  // 彈射門尺寸
+  // bounceDoorWidth: number | null;
   closingType: string;
   notes: string;
   motorPhase: number;

@@ -311,6 +311,17 @@ const prodCellConfig: TcellConfig = {
       },
     },
   },
+  bounceDoorWidth: {
+    label: '彈射門寬度(m)',
+    inputSelProps: {
+      wrapperStyle: { width: '128px' },
+      inputProps: {
+        props: {
+          type: 'number',
+        },
+      },
+    },
+  },
   notes: {
     label: '備註',
     inputSelProps: {
