@@ -1887,6 +1887,7 @@ latestContentProdArr為這次追加追減的主產品
             classProductArr: Object.values(productList ?? {}),
             classOthersArr: Object.values(othersList ?? {}),
           })}
+          isBidding={status === 'Bidding'}
         />
       )}
 
