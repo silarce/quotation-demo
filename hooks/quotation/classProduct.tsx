@@ -3257,6 +3257,7 @@ class Class_product {
       headBoxLength: this._doorGeneralSpecs?.headBoxLength ?? 0,
       //
       bounceDoorWidth: this._prodData.bounceDoorWidth || null,
+      bounceDoor: !!(this._prodData.bounceDoorWidth || null),
     };
 
     if ('items' in body) {
@@ -3380,7 +3381,8 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'unitPrice', //單價
     'totalPrice', // 複價
     'typhoonProtection',
-    'bounceDoor',
+    // bounceDoor不再使用，直接以bounceDoorWidth代替
+    // 'bounceDoor',
     'bounceDoorWidth',
     'notes',
 
