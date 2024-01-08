@@ -740,14 +740,19 @@ const quotationProdToTableProdList = ({
       const fullWidth = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
       const height = new Decimal(prod.height || 0).mul(100).toNumber();
       const boxB = new Decimal(prod.boxB || 0).mul(100).toNumber();
+      const bounceDoorWidth = prod.bounceDoorWidth_mm || '';
 
-      const size = `${fullWidth}Ｘ${height}${boxB ? `＋${boxB}` : ''}`;
+      const boxB_formated = boxB ? `＋${boxB}` : '';
+      const bounceDoorWidth_formated = bounceDoorWidth ? `＋${bounceDoorWidth}` : '';
+
+      const size = `${fullWidth}${bounceDoorWidth_formated}Ｘ${height}${boxB_formated}`;
 
       const thickness_num = Number(prod.thickness.replaceAll('t', ''));
       const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
 
       let material = prod.material;
 
+      // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
       if (material === '高耐鍍鋅鋼板') {
         material = '鍍鋅鋼板';
       }
