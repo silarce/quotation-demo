@@ -1052,3 +1052,18 @@ export const apiPatchQuotationToPending = (id: string) => {
       return Promise.reject(err);
     });
 };
+
+// 複製報價單
+export const apiPostCopyQuotation = (body: { quotationId: string; customerId: string }) => {
+  const api = '/quotation/copy-quotation';
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '複製報價單失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};

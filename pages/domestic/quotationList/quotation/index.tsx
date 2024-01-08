@@ -76,6 +76,7 @@ import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
+import CustomerSelector from 'components/global/gear/modal/customerSelector';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -113,6 +114,7 @@ import {
   useGetQuotationContent_id,
   //
   apiPatchQuotationToPending,
+  apiPostCopyQuotation,
 } from 'js/api/api_quotation';
 
 // hook
@@ -171,9 +173,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [disabled, setDisabled] = useState(true);
   const [disabled_reviewer, setDisabled_reviewer] = useState(true);
   // -----------------------------------------------------
-  // const [employeeSelectorShow, setEmployeeSelectorShow] = useState(false);
   const [reviewFormShow, setReviewFormShow] = useState(false);
   const [reviewModalShow, setReviewModalShow] = useState(false);
+  // -----------------------------------------------------
+
+  // 複製報價單之客戶狀態
+  const [customerSelectorShow, setCustomerSelectorShow] = useState(false);
+
   // -----------------------------------------------------
 
   const [anno, setAnnotation] = useState<string[]>([]);
@@ -1246,6 +1252,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     !contentId && status !== 'Pending' ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
 
+    !contentId && status === 'Bidding'
+      ? {
+          type: 'myButton',
+          label: '複製報價單',
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定複製報價單?',
+              props: {
+                onOk: () => {
+                  setCustomerSelectorShow(true);
+                },
+              },
+            });
+          },
+        }
+      : null,
+
     status === 'Pending'
       ? {
           type: 'myButton',
@@ -1666,6 +1689,41 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   };
 
+  // 複製報價單
+  const reqCopyQuotation = async ({ customerId }: { customerId: string | undefined }) => {
+    if (!quotationId) {
+      myAlert.info({ title: '無報價單編號' });
+
+      return;
+    }
+
+    if (!customerId) {
+      myAlert.info({ title: '請選擇複製報價單之客戶' });
+
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiPostCopyQuotation({
+        quotationId,
+        customerId,
+      });
+
+      if (res) {
+        router.push({
+          query: {
+            ...router.query,
+            id: res.id,
+          },
+        });
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -1990,15 +2048,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
           },
         ]}
       />
+      {/*  */}
+      <CustomerSelector
+        showModal={customerSelectorShow}
+        label="複製報價單之客戶"
+        onConfirm={(customerArr) => {
+          const customerId = customerArr[0]?.id;
 
-      {/* <InputModal
-        visible={true}
-        title="新增客戶"
-        placeholder="新客戶的名稱"
-        onConfirm={(str) => {
-          console.log(str);
+          reqCopyQuotation({ customerId });
         }}
-      /> */}
+        onCancel={() => {
+          setCustomerSelectorShow(false);
+        }}
+        selLimit={1}
+      />
     </div>
   );
 }
