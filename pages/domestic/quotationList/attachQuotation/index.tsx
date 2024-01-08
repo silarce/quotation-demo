@@ -1569,8 +1569,10 @@ latestContentProdArr為這次追加追減的主產品
     const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
     const h = new Decimal(prod.height || 0).mul(100).toNumber();
     const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
+    const bounceDoorWidth = prod.bounceDoorWidth_mm;
+    const bounceDoorWidth_formated = bounceDoorWidth ? `＋${bounceDoorWidth}` : '';
 
-    const size = `${lw} X ${h} + ${b}`;
+    const size = `${lw}${bounceDoorWidth_formated} X ${h} + ${b}`;
 
     const list_com = { ...prod.comList, ...prod.subComList };
 
