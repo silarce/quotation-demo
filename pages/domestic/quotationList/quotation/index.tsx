@@ -1987,6 +1987,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             classProductArr: Object.values(productList ?? {}),
             classOthersArr: Object.values(othersList ?? {}),
           })}
+          isBidding={status === 'Bidding'}
         />
       )}
 
