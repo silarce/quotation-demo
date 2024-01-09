@@ -221,12 +221,6 @@ export const optionsCreator_horsepower = (): Toption[] => [
   { value: '3 HP', label: '3 HP' },
   { value: '5 HP', label: '5 HP' },
 ];
-// 報價單狀態
-export const optionsCreator_quotationState = (): Toption[] => [
-  { value: 'Budget', label: '預算' },
-  { value: 'Bidding', label: '投標' },
-  { value: 'Contracting', label: '發包' },
-];
 
 export const optionsCreator_month = ({
   ch,
@@ -332,6 +326,7 @@ export const optionsCreator_mealsCost = (): Toption[] => {
   ];
 };
 
+// 報價單狀態
 export const optionsCreator_quotationStatus = ({
   emptyOption,
   onlyNotContract,
