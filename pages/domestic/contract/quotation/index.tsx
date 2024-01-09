@@ -42,7 +42,8 @@ import {
 import { apiPostEngineeringContact } from 'js/api/api_engineering';
 
 // component
-import Table_prod from 'components/page/domestic/contract/table/table_prod';
+// import Table_prod from 'components/page/domestic/contract/table/table_prod';
+import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 // import Table_com from 'components/page/domestic/contract/table/table_component';
 // 報價單使用的Table_com
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
@@ -90,6 +91,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isShowWorkContactDoc, setIsShowWorkContactDoc] = useState(false);
 
   // =========================================================
 
@@ -390,26 +393,40 @@ version>1 是子合約
   const tagList: TtagList = [
     {
       label: `報價編號 ${data?.content.quotationNumber}`,
+      onClick: () => {
+        setIsShowWorkContactDoc(false);
+      },
+    },
+    {
+      label: `工程聯絡單`,
+      onClick: () => {
+        setIsShowWorkContactDoc(true);
+      },
     },
   ];
-  const linkArr: TlinkArr = [
-    engineeringContactId
-      ? {
-          label: '工程聯絡單',
-          linkProps: {
-            href: {
-              pathname: '/worksDepartment/contractList/contract/workContactDoc',
-              query: {
-                contractId: id,
-                engineeringContactId,
-                version: '1',
-              },
-            },
-            target: '_blank',
-          },
-        }
-      : null,
-  ];
+
+  if (!engineeringContactId) {
+    tagList.pop();
+  }
+
+  // const linkArr: TlinkArr = [
+  //   engineeringContactId
+  //     ? {
+  //         label: '工程聯絡單',
+  //         linkProps: {
+  //           href: {
+  //             pathname: '/worksDepartment/contractList/contract/workContactDoc',
+  //             query: {
+  //               contractId: id,
+  //               engineeringContactId,
+  //               version: '1',
+  //             },
+  //           },
+  //           target: '_blank',
+  //         },
+  //       }
+  //     : null,
+  // ];
 
   const panel_quotation01: TpanelList = [
     // 現在後端會在合約產生時自動產生工程聯絡單，因此把這個按鈕拿掉
@@ -459,112 +476,127 @@ version>1 是子合約
 
   // -----------------------------------------------------------------
 
-  return (
-    <SubLayer isLoading_all={isLoading}>
-      <PageHeader02 tagList={tagList} panelList={panelList} linkList={linkArr} />
-      {/*  */}
-      <div>
-        <div className={style.quotation}>
-          {/* 報價單基本資料 */}
-          <QuotationProfile profile={content} disabled={true} onProfileChange={() => {}} />
+  const ContactNode = () => {
+    return (
+      <div className={style.quotation}>
+        {/* 報價單基本資料 */}
+        <QuotationProfile profile={content} disabled={true} onProfileChange={() => {}} />
 
-          {/* switch01 */}
-          <div className={style.switchBar}>
-            {!switch02 && (
-              <div className={(switch01 && style.active) || ''} onClick={() => setSwitch01(true)}>
-                合約項目
-              </div>
-            )}
-            <div className={switch02 || !switch01 ? style.active : ''} onClick={() => setSwitch01(false)}>
-              追加 / 追減項目
+        {/* switch01 */}
+        <div className={style.switchBar}>
+          {!switch02 && (
+            <div className={(switch01 && style.active) || ''} onClick={() => setSwitch01(true)}>
+              合約項目
             </div>
+          )}
+          <div className={switch02 || !switch01 ? style.active : ''} onClick={() => setSwitch01(false)}>
+            追加 / 追減項目
           </div>
+        </div>
 
-          {/* 合約項目 追加/追減項目 */}
-          {switch01 || switch02 ? (
-            <>
-              {/* 主產品設定 */}
-              <Table_prod
+        {/* 合約項目 追加/追減項目 */}
+        {switch01 || switch02 ? (
+          <>
+            {/* 主產品設定 */}
+            <Table_prod
+              disabled={true}
+              prodList={productList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              changeProdKeyArr={changeProdKeyArr}
+              addProd={() => {}}
+              setTargetProd={setTargetProdKey}
+              panelBox="easyBox"
+              emptyBlockWidth="80px"
+              rowHeight={'h60'}
+            />
+            {/* 原報價項目 */}
+
+            {switch02 && <OldQuotationProduction rootContent={rootContent} />}
+            <br />
+            <div className={style.redWrapper}>
+              {/* 材料配件設定 */}
+              <Table_com
                 disabled={true}
-                prodList={productList}
-                prodCellConfig={prodCellConfig}
-                prodKeyArr={prodKeyArr}
-                changeProdKeyArr={changeProdKeyArr}
-                addProd={() => {}}
-                setTargetProd={setTargetProdKey}
+                // comList={targetProd?.comList}
+                // FIXME 之後要把型別處理好
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
+                comCellConfig={comCellConfig}
+                comKeyArr={comKeyArr}
+                changeComKeyArr={changeComKeyArr}
+                defalutVKeyArr={comVKeyArr}
+              />
+              <hr />
+              {/* 選配設定 */}
+              <br />
+              <Table_accessories
+                disabled={true}
+                list={targetProd?.accessoriesList}
+                cellConfig={accessoriesCellConfig}
+                keyArr={accessoriesKeyArr}
+                changeKeyArr={changeAccessoriesKeyArr}
+                defalutVKeyArr={targetProd?.accessoriesVKeyArr}
+                onVKeyChange={(keyArr) => {
+                  if (targetProd) {
+                    targetProd.accessoriesVKeyArr = keyArr;
+                  }
+                }}
+                doorModel={targetProd?.doorType}
+                onSelectorConfirm={(arr) => {}}
                 panelBox="easyBox"
                 emptyBlockWidth="80px"
-                rowHeight={'h60'}
               />
-              {/* 原報價項目 */}
-
-              {switch02 && <OldQuotationProduction rootContent={rootContent} />}
               <br />
-              <div className={style.redWrapper}>
-                {/* 材料配件設定 */}
-                <Table_com
-                  disabled={true}
-                  // comList={targetProd?.comList}
-                  // FIXME 之後要把型別處理好
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
-                  comCellConfig={comCellConfig}
-                  comKeyArr={comKeyArr}
-                  changeComKeyArr={changeComKeyArr}
-                  defalutVKeyArr={comVKeyArr}
-                />
-                <hr />
-                {/* 選配設定 */}
-                <br />
-                <Table_accessories
-                  disabled={true}
-                  list={targetProd?.accessoriesList}
-                  cellConfig={accessoriesCellConfig}
-                  keyArr={accessoriesKeyArr}
-                  changeKeyArr={changeAccessoriesKeyArr}
-                  defalutVKeyArr={targetProd?.accessoriesVKeyArr}
-                  onVKeyChange={(keyArr) => {
-                    if (targetProd) {
-                      targetProd.accessoriesVKeyArr = keyArr;
-                    }
-                  }}
-                  doorModel={targetProd?.doorType}
-                  onSelectorConfirm={(arr) => {}}
-                  panelBox="easyBox"
-                  emptyBlockWidth="80px"
-                />
-                <br />
-                {/* 其他設定 */}
-                <Table_others
-                  disabled={true}
-                  list={othersList}
-                  cellConfig={othersCellConfig}
-                  keyArr={othersKeyArr}
-                  changeKeyArr={() => {}}
-                  add={() => {}}
-                />
-              </div>
-            </>
-          ) : (
-            // 追加/追減項目
-            <QuotationProdChangingRecord subContract={subContracts} />
-          )}
+              {/* 其他設定 */}
+              <Table_others
+                disabled={true}
+                list={othersList}
+                cellConfig={othersCellConfig}
+                keyArr={othersKeyArr}
+                changeKeyArr={() => {}}
+                add={() => {}}
+              />
+            </div>
+          </>
+        ) : (
+          // 追加/追減項目
+          <QuotationProdChangingRecord subContract={subContracts} />
+        )}
 
-          {/* 展開版本的追加追減紀錄 (在很下面)*/}
-          {switch02 && <QuotationRecord subContract={subContracts} />}
+        {/* 展開版本的追加追減紀錄 (在很下面)*/}
+        {switch02 && <QuotationRecord subContract={subContracts} />}
 
-          <Summary
-            disabled={true}
-            payInfoControl={payInfoControl}
-            control_anno={control_anno}
-            control_qr={control_qr}
-            appendixParams={appendixParams}
-          />
+        <Summary
+          disabled={true}
+          payInfoControl={payInfoControl}
+          control_anno={control_anno}
+          control_qr={control_qr}
+          appendixParams={appendixParams}
+        />
 
-          {/* 簽名 */}
-          <QuotationSinature signatureArr={signatureArr} disabled={true} />
-        </div>
+        {/* 簽名 */}
+        <QuotationSinature signatureArr={signatureArr} disabled={true} />
+      </div>
+    );
+  };
+
+  // -----------------------------------------------------------------
+
+  return (
+    <SubLayer isLoading_all={isLoading}>
+      <PageHeader02
+        tagList={tagList}
+        panelList={panelList}
+        //  linkList={linkArr}
+      />
+      {/*  */}
+      <div>
+        {!isShowWorkContactDoc && <ContactNode />}
+        {isShowWorkContactDoc && engineeringContactId && (
+          <WorkContactDoc contract={data} engineeringContactId={engineeringContactId} />
+        )}
       </div>
     </SubLayer>
   );
@@ -696,3 +728,254 @@ const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: 
 };
 
 // ======================================================================
+
+import Profile, {
+  Tcontroll as Tcontroll_profile,
+} from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
+import TextListEditor_v2, {
+  TstringObj as Tcontroll_textListEditor,
+} from 'components/page/domestic/quotation/quotationTotal/TextListEditor_v2';
+
+import {
+  TquotationProductDto,
+  //
+  useGetContract_id_noItems,
+  TquotationContractDto,
+} from 'js/api/api_quotation';
+
+// api
+import {
+  TupdateEngineeringContactDto,
+  useGetEngineeringContact,
+  apiPatchEngineeringContact,
+  apiPostWorkSheet,
+} from 'js/api/api_engineering';
+
+const WorkContactDoc = ({
+  contract,
+  engineeringContactId,
+}: {
+  contract: TquotationContractDto | undefined;
+  engineeringContactId: string;
+}) => {
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await update_engineeringContact();
+      } catch (error) {
+        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
+      }
+    })();
+  }, [engineeringContactId]);
+
+  // --------------------------------------------------------------
+
+  const {
+    paymentStatus,
+    projectName,
+    projectContent,
+    zipCode,
+    county,
+    district,
+    address,
+    projectPrincipal,
+    constructionSitePrincipalContactNumber,
+    constructionSiteFaxNumber,
+    constructionSiteContactNumber,
+    projectNumber,
+    contractor,
+    contractorPrincipal,
+    contractorContactNumber,
+    contractorFaxNumber,
+
+    annotations,
+    contactInfo,
+  } = engineeringContact ?? {};
+
+  const contactPersonsArr: Tcontroll_profile['contactPersons']['arr'] = (contactInfo ?? []).map((item, index) => {
+    return {
+      contactPerson: {
+        value: item.contactPerson,
+      },
+      contactPhone: {
+        value: item.contactNumber,
+      },
+      onDelClick: () => {},
+    };
+  });
+
+  const controll: Tcontroll_profile = {
+    /**請款狀態 */
+    paymentStatus: {
+      value: paymentStatus ?? '',
+    },
+    projectName: {
+      value: projectName ?? '',
+    },
+    /**工程內容 */
+    projectContent: {
+      value: projectContent ?? '',
+    },
+
+    addressBarProps: {
+      inputSelProps: {
+        caption: '工程地點',
+      },
+      addressProps: {
+        zipCode: {
+          props: {
+            value: zipCode ?? '',
+          },
+        },
+        county: {
+          props: {
+            isDisabled: true,
+            value: county ? { value: county, label: county } : null,
+          },
+        },
+        district: {
+          easyValue: district ?? null,
+          props: {
+            isDisabled: true,
+            value: district ? { value: district, label: district } : null,
+          },
+        },
+        address: {
+          props: {
+            disabled: true,
+            value: address ?? '',
+          },
+        },
+      },
+    },
+    //
+    /**工程負責人 */
+    projectPerson: {
+      value: projectPrincipal ?? '',
+    },
+    /**工程負責人聯絡電話 */
+    projectPersonNumber: {
+      value: constructionSitePrincipalContactNumber ?? '',
+    },
+    projectFaxNumber: {
+      value: constructionSiteFaxNumber ?? '',
+
+      // disabled: true,
+    },
+    /**工地電話 */
+    projectNumber: {
+      value: constructionSiteContactNumber ?? '',
+    },
+    //
+    //
+    //
+    /**工程編號 */
+    engineeringNumber: {
+      value: projectNumber ?? '',
+
+      // disabled: true,
+    },
+    /**承包商 */
+    contractor: {
+      value: contractor ?? '',
+
+      // disabled: true,
+    },
+    /**負責人 */
+    principal: {
+      value: contractorPrincipal ?? '',
+
+      // disabled: true,
+    },
+    /**公司電話 */
+    contactNumber: {
+      value: contractorContactNumber ?? '',
+
+      // disabled: true,
+    },
+    faxNumber: {
+      value: contractorFaxNumber ?? '',
+    },
+    //
+    contactPersons: {
+      onAddClick: () => {},
+      arr: contactPersonsArr,
+    },
+  };
+
+  // --------------------------------------------------------------
+
+  const { productArr, latestQuotationDiscount } = useMemo(() => {
+    const list: { [key: string]: TquotationProductDto } = {};
+
+    const subContractArr = contract?.subContracts ?? [];
+    const orderedSubContracts = _.sortBy(subContractArr, 'version');
+
+    orderedSubContracts.forEach((contract) => {
+      const prodArr = contract.content.products;
+
+      prodArr.forEach((prod) => {
+        list[prod.rootProductId] = prod;
+      });
+    });
+
+    const productArr = Object.values(list);
+    const latestSubContract: TquotationContractDto | undefined = orderedSubContracts[orderedSubContracts.length - 1];
+
+    const latestQuotationDiscount = latestSubContract?.content?.discount || '100';
+
+    return { productArr, latestQuotationDiscount };
+  }, [contract]);
+
+  const {
+    //
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    changeProdKeyArr,
+  } = useProductList({
+    productArr: productArr,
+    others: [],
+    resetTrigger: productArr,
+    quotationDiscount: Number(latestQuotationDiscount) || 100,
+  });
+
+  // --------------------------------------------------------------
+  const control_anno: Tcontroll_textListEditor = {
+    stringArr: annotations ?? [],
+    editString: () => {},
+    delString: () => {},
+    addString: () => {},
+    showSelector: () => {},
+  };
+
+  // --------------------------------------------------------------
+  return (
+    <div>
+      <Profile controll={controll} disabled={true} />
+
+      <Table_prod
+        disabled={true}
+        prodList={productList}
+        prodCellConfig={prodCellConfig}
+        // prodKeyArr={filteredProdKeyArr}
+        prodKeyArr={prodKeyArr}
+        changeProdKeyArr={changeProdKeyArr}
+        addProd={() => {}}
+        setTargetProd={() => {}}
+        // panelBox="easyBox"
+        panelBox="emptyBox"
+        emptyBlockWidth="40px"
+        rowHeight="h60"
+        isShowDndBtn={false}
+      />
+
+      <div className={'mr-[50px] ml-[50px] mt-[40px] mb-[15px]'}>
+        <TextListEditor_v2 label={'備註'} disabled={true} stringObj={control_anno} />
+      </div>
+    </div>
+  );
+};
