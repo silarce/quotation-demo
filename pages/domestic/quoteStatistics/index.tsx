@@ -244,24 +244,24 @@ export default function QuoteStatistics() {
       placeholder: '選擇區域',
       boxStyle: { width: '140px' },
     },
-    {
-      selectProps: {
-        value: quotationStatus,
-        options: quotationStatusArr,
-        onChange: (option) => {
-          if (typeof option?.value === 'string') {
-            router.push({
-              query: {
-                ...router.query,
-                quotationStatus: option.value,
-              },
-            });
-          }
-        },
-      },
-      placeholder: '報價單狀態',
-      boxStyle: { width: '140px' },
-    },
+    // {
+    //   selectProps: {
+    //     value: quotationStatus,
+    //     options: quotationStatusArr,
+    //     onChange: (option) => {
+    //       if (typeof option?.value === 'string') {
+    //         router.push({
+    //           query: {
+    //             ...router.query,
+    //             quotationStatus: option.value,
+    //           },
+    //         });
+    //       }
+    //     },
+    //   },
+    //   placeholder: '報價單狀態',
+    //   boxStyle: { width: '140px' },
+    // },
   ];
 
   // ------------------------------------------------------------------
