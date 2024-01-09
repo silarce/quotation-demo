@@ -760,13 +760,13 @@ const creCellConfig_subGroup = (): TcellConfigList => ({
     position: '',
   },
   installDateArr: {
-    label: '安裝日期',
+    label: '施工日期',
     width: '150px',
     type: 'date',
     position: '',
   },
   installerArr: {
-    label: '安裝人員',
+    label: '施工人員',
     width: '85px',
     type: 'input',
     position: '',
