@@ -77,7 +77,7 @@ export default function QuotationPdf({
   qrArr: Tcontrol_qrArr;
   control_basicInfo: Tcontrol_basicInfo;
   control_prodArr: Tcontrol_prodArr;
-  isBidding: boolean;
+  isBidding?: boolean;
 }) {
   // const {
   //   quotationDate,
