@@ -332,6 +332,30 @@ export const optionsCreator_mealsCost = (): Toption[] => {
   ];
 };
 
+export const optionsCreator_quotationStatus = ({
+  emptyOption,
+  onlyNotContract,
+}: { emptyOption?: boolean; onlyNotContract?: boolean } = {}) => {
+  const arr = [
+    { value: 'Budget', label: '預算' },
+    { value: 'Bidding', label: '投標' },
+    { value: 'Contracting', label: '發包' },
+    { value: 'Contract', label: '合約' },
+    { value: 'Pending', label: '準合約' },
+  ];
+
+  if (onlyNotContract) {
+    arr.pop();
+    arr.pop();
+  }
+
+  if (emptyOption) {
+    arr.unshift({ value: '', label: '不拘' });
+  }
+
+  return arr;
+};
+
 export const optionsCreator_customerType = ({ emptyOption }: { emptyOption?: boolean } = {}): Toption[] => {
   const optionArr = Object.keys(customerTypesLookup).map((key) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

@@ -1170,7 +1170,7 @@ type TquotationContentDto_copy = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending'; // 報價單狀態: 預算 投標 發包 合約 準合約
+  status: TquotationStatus; // 報價單狀態: 預算 投標 發包 合約 準合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
@@ -1222,6 +1222,9 @@ type TquotationContentDto_copy = {
   verifyForm: TquotationVerifyFormDto;
 };
 
+// 報價單狀態: 預算 投標 發包 合約 準合約
+export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending';
+
 export type TquotationContentDto = {
   id: string;
   createdAt: string;
@@ -1240,7 +1243,7 @@ export type TquotationContentDto = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending'; // 報價單狀態: 預算 投標 發包 合約 準合約
+  status: TquotationStatus; // 報價單狀態: 預算 投標 發包 合約 準合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
@@ -1461,7 +1464,7 @@ export type TcreateQuotationContentDto = {
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending'; // 報價單狀態: 預算 投標 發包 合約 準合約
+  status: TquotationStatus; // 報價單狀態: 預算 投標 發包 合約 準合約
   managerId?: string | undefined | null; // 經理ID
   supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID

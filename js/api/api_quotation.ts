@@ -29,6 +29,7 @@ import type {
   TquotationAccounting_personal_content,
   TquotationAccounting_personal_contract,
   TquotationAccounting_modifyContract,
+  TquotationStatus,
 } from './dtoTypes';
 
 export type {
@@ -823,6 +824,7 @@ export const apiQuotationAccounting = (params: {
   year: number;
   month?: number | undefined;
   area: 'northern' | 'central' | 'southern' | 'eastern' | 'all';
+  quotationStatus?: TquotationStatus | 'all';
 }) => {
   const api = '/quotation/accounting';
 
@@ -836,6 +838,7 @@ export const useQuotationAccounting = (params: {
   year: number | undefined;
   month: number | undefined;
   area: 'northern' | 'central' | 'southern' | 'eastern' | undefined | 'all';
+  quotationStatus?: TquotationStatus | 'all';
 }) => {
   const [res, setRes] = useState<TquotationAccouting[]>();
 
@@ -848,6 +851,7 @@ export const useQuotationAccounting = (params: {
       year: params.year,
       month: params.month,
       area: params.area,
+      quotationStatus: params.quotationStatus,
     };
 
     const newRes = await apiQuotationAccounting(okParams);
