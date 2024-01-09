@@ -65,54 +65,46 @@ export type { Tcontrol_basicInfo, Tcontrol_prodArr, Tcontrol_noteArr, Tcontrol_q
 export default function QuotationPdf({
   isVisable,
   onCancel,
-
-  // productArr_f,
-  // basicInfo,
   noteArr,
   qrArr,
   control_basicInfo,
   control_prodArr,
+  isBidding,
 }: {
   isVisable: boolean;
   onCancel: () => void;
-  // productArr_f: Class_product[];
-  // basicInfo: TquotationContentDto;
   noteArr: Tcontrol_noteArr;
   qrArr: Tcontrol_qrArr;
   control_basicInfo: Tcontrol_basicInfo;
   control_prodArr: Tcontrol_prodArr;
+  isBidding?: boolean;
 }) {
   // const {
-  //   // customerName,
   //   quotationDate,
   //   quotationNumber,
   //   projectName,
-  //   customer,
+  //   customerName,
   //   contactPerson,
   //   contactNumber,
   //   faxNumber,
-  //   county,
-  //   district,
-  //   address,
+  //   allAddress,
   //   subTotal: subTotal_f,
   //   salesTax,
   //   total: total_f,
-  //   agentEmployee,
-
-  //   deliveryDate,
-  //   deliveryLocation,
-  //   paymentMethods,
+  //   agentName,
+  //   tradingDate,
+  //   tradingLocation,
   //   validityPeriod,
-  // } = basicInfo;
-
+  //   payWayArr,
+  // } = control_basicInfo;
   const {
     quotationDate,
     quotationNumber,
     projectName,
-    customerName,
-    contactPerson,
-    contactNumber,
-    faxNumber,
+    // customerName,
+    // contactPerson,
+    // contactNumber,
+    // faxNumber,
     allAddress,
     subTotal: subTotal_f,
     salesTax,
@@ -123,6 +115,14 @@ export default function QuotationPdf({
     validityPeriod,
     payWayArr,
   } = control_basicInfo;
+  let { customerName, contactPerson, contactNumber, faxNumber } = control_basicInfo;
+
+  if (isBidding) {
+    customerName = '';
+    contactPerson = '';
+    contactNumber = '';
+    faxNumber = '';
+  }
 
   const productArr = control_prodArr;
 
@@ -232,21 +232,6 @@ export default function QuotationPdf({
     const attn = agentName;
 
     const payInfo = (() => {
-      // const payWay = paymentMethods.map((item) => {
-      //   let value = item.totalPaymentRatio;
-
-      //   if (value === '0') {
-      //     value = '';
-      //   }
-
-      //   return {
-      //     label: item.milestone,
-      //     value,
-      //   };
-      // });
-
-      // const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
-
       return {
         tradingLocation: tradingLocation,
         tradingDate: tradingDate, // 交貨日期
@@ -256,48 +241,6 @@ export default function QuotationPdf({
 
     return { quoteRangeArr, payInfo, attn };
   })();
-
-  // const productArr: TtableProdList_series = (() => {
-  //   return productArr_f.map((prod) => {
-  //     // const lw = (Number(prod.WG) || Number(prod.fullWidth)) * 100;
-
-  //     const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
-  //     const h = new Decimal(prod.height || 0).mul(100).toNumber();
-  //     const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
-
-  //     const size = `${lw}Ｘ${h}${b ? `＋${b}` : ''}`;
-
-  //     const thickness_num = Number(prod.thickness.replaceAll('t', ''));
-  //     // const thickness_str = thickness_num === 0 ? '' : thickness_num.toFixed(1) + 't';
-  //     const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
-
-  //     let material = prod.material;
-
-  //     if (material === '高耐鍍鋅鋼板') {
-  //       material = '鍍鋅鋼板';
-  //     }
-
-  //     return {
-  //       category: prod.itemName,
-  //       size,
-  //       doorType: prod.doorType,
-  //       material: material,
-  //       thickness: thickness_str,
-  //       surface: prod.surface,
-  //       // doorRail 要收圖片路徑
-  //       // doorRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,
-  //       doorRail: `${prod.doorTrack}`,
-  //       horsepower: prod.horsepower,
-  //       openType: prod.close,
-  //       qty: prod.quantity,
-  //       unitPrice: prod.unitPrice,
-  //       priceTotal: prod.totalPrice,
-  //       memo: prod.notes,
-  //       // series: prod.itemName,
-  //       series: prod.doorType,
-  //     };
-  //   });
-  // })();
 
   // ----------------------------------------------------------------------------
   return (
@@ -740,14 +683,19 @@ const quotationProdToTableProdList = ({
       const fullWidth = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
       const height = new Decimal(prod.height || 0).mul(100).toNumber();
       const boxB = new Decimal(prod.boxB || 0).mul(100).toNumber();
+      const bounceDoorWidth = prod.bounceDoorWidth_mm || '';
 
-      const size = `${fullWidth}Ｘ${height}${boxB ? `＋${boxB}` : ''}`;
+      const boxB_formated = boxB ? `＋${boxB}` : '';
+      const bounceDoorWidth_formated = bounceDoorWidth ? `＋${bounceDoorWidth}` : '';
+
+      const size = `${fullWidth}${bounceDoorWidth_formated}Ｘ${height}${boxB_formated}`;
 
       const thickness_num = Number(prod.thickness.replaceAll('t', ''));
       const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
 
       let material = prod.material;
 
+      // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
       if (material === '高耐鍍鋅鋼板') {
         material = '鍍鋅鋼板';
       }

@@ -970,6 +970,8 @@ export type TquotationProductDto = {
   bottomBarPlate: string; // 底座板
 
   isULGuideRail?: boolean | null;
+  // 彈射門尺寸
+  bounceDoorWidth?: number | null;
 
   items?: {
     // 材料配件
@@ -1168,7 +1170,7 @@ type TquotationContentDto_copy = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending'; // 報價單狀態: 預算 投標 發包 合約 準合約
+  status: TquotationStatus; // 報價單狀態: 預算 投標 發包 合約 準合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
@@ -1220,6 +1222,9 @@ type TquotationContentDto_copy = {
   verifyForm: TquotationVerifyFormDto;
 };
 
+// 報價單狀態: 預算 投標 發包 合約 準合約
+export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending';
+
 export type TquotationContentDto = {
   id: string;
   createdAt: string;
@@ -1238,7 +1243,7 @@ export type TquotationContentDto = {
   contactNumber: string; //  聯絡電話
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending'; // 報價單狀態: 預算 投標 發包 合約 準合約
+  status: TquotationStatus; // 報價單狀態: 預算 投標 發包 合約 準合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
   agentEmployee: TemployeeDto;
@@ -1381,6 +1386,8 @@ export type TcreateQuotationProductDto = {
   isAntiTyphoon: boolean;
   // 彈射門
   bounceDoor: boolean;
+  // 彈射門尺寸
+  bounceDoorWidth: number | null;
   // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
   closingType: string;
   // 備註
@@ -1457,7 +1464,7 @@ export type TcreateQuotationContentDto = {
 
   quantity: number; // 樘數
   editNotes: string; // 編輯備註
-  status: 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending'; // 報價單狀態: 預算 投標 發包 合約 準合約
+  status: TquotationStatus; // 報價單狀態: 預算 投標 發包 合約 準合約
   managerId?: string | undefined | null; // 經理ID
   supervisorId?: string | undefined | null; // 主管ID
   agentId: string; // 經辦人ID
@@ -2430,6 +2437,8 @@ export type TupdateWorkSheetItem = {
   dualPrice: number;
   isAntiTyphoon: boolean;
   bounceDoor: boolean;
+  // 彈射門尺寸
+  // bounceDoorWidth: number | null;
   closingType: string;
   notes: string;
   motorPhase: number;

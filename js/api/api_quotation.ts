@@ -29,6 +29,7 @@ import type {
   TquotationAccounting_personal_content,
   TquotationAccounting_personal_contract,
   TquotationAccounting_modifyContract,
+  TquotationStatus,
 } from './dtoTypes';
 
 export type {
@@ -823,6 +824,7 @@ export const apiQuotationAccounting = (params: {
   year: number;
   month?: number | undefined;
   area: 'northern' | 'central' | 'southern' | 'eastern' | 'all';
+  quotationStatus?: TquotationStatus | 'all';
 }) => {
   const api = '/quotation/accounting';
 
@@ -836,6 +838,7 @@ export const useQuotationAccounting = (params: {
   year: number | undefined;
   month: number | undefined;
   area: 'northern' | 'central' | 'southern' | 'eastern' | undefined | 'all';
+  quotationStatus?: TquotationStatus | 'all';
 }) => {
   const [res, setRes] = useState<TquotationAccouting[]>();
 
@@ -848,6 +851,7 @@ export const useQuotationAccounting = (params: {
       year: params.year,
       month: params.month,
       area: params.area,
+      quotationStatus: params.quotationStatus,
     };
 
     const newRes = await apiQuotationAccounting(okParams);
@@ -1048,6 +1052,21 @@ export const apiPatchQuotationToPending = (id: string) => {
     .catch((error) => {
       const err = error as AxiosError;
       myAlert.err({ title: '轉為準合約失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 複製報價單
+export const apiPostCopyQuotation = (body: { quotationId: string; customerId: string }) => {
+  const api = '/quotation/copy-quotation';
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '複製報價單失敗', content: err.message });
 
       return Promise.reject(err);
     });

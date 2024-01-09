@@ -17,32 +17,44 @@ type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 import { useQuotationAccounting } from 'js/api/api_quotation';
 
 // option
-import { optionsCreator_month, optionsCreator_region, optionsCreator_year } from 'js/utils/options/options';
+import {
+  optionsCreator_month,
+  optionsCreator_region,
+  optionsCreator_year,
+  optionsCreator_quotationStatus,
+} from 'js/utils/options/options';
+
+import { TquotationStatus } from 'js/api/dtoTypes';
+
+// ==================================================================
 const yearOptionArr = optionsCreator_year();
 const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const regionOptionArr = optionsCreator_region({ emptyOption: true });
+const quotationStatusArr = optionsCreator_quotationStatus({ emptyOption: true, onlyNotContract: true });
 
 type Tquery = {
   year: string | undefined;
   month: string | undefined;
   region: 'northern' | 'central' | 'southern' | 'eastern' | undefined;
   keyWord: string | undefined;
+  quotationStatus: TquotationStatus | undefined;
 };
 
 // ==================================================================
 export default function QuoteStatistics() {
   const router = useRouter();
-  const { year, month, region } = router.query as Tquery;
+  const { year, month, region, quotationStatus } = router.query as Tquery;
 
   const { data, update } = useQuotationAccounting({
     year: year ? Number(year) + 1911 : undefined,
     month: month ? Number(month) : undefined,
     area: region || 'all',
+    quotationStatus: quotationStatus || 'all',
   });
 
   useEffect(() => {
     update();
-  }, [year, month, region]);
+  }, [year, month, region, quotationStatus]);
 
   useEffect(() => {
     const now = new Date();
@@ -232,6 +244,24 @@ export default function QuoteStatistics() {
       placeholder: '選擇區域',
       boxStyle: { width: '140px' },
     },
+    // {
+    //   selectProps: {
+    //     value: quotationStatus,
+    //     options: quotationStatusArr,
+    //     onChange: (option) => {
+    //       if (typeof option?.value === 'string') {
+    //         router.push({
+    //           query: {
+    //             ...router.query,
+    //             quotationStatus: option.value,
+    //           },
+    //         });
+    //       }
+    //     },
+    //   },
+    //   placeholder: '報價單狀態',
+    //   boxStyle: { width: '140px' },
+    // },
   ];
 
   // ------------------------------------------------------------------
