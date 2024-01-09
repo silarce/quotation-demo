@@ -18,6 +18,7 @@ export type TaddressProps = {
   onChangeAddress: (e: string) => void;
 
   showDistrict?: boolean;
+  haveOutsea?: boolean;
 };
 
 export default function InputSelBar_address({
@@ -68,6 +69,7 @@ export default function InputSelBar_address({
 }) {
   const { county, onChangeCounty, district, onChangeDistrict, address, onChangeAddress } = addressProps;
 
+  const { haveOutsea } = addressProps;
   let { showDistrict } = addressProps;
 
   if (showDistrict === undefined) {
@@ -87,7 +89,7 @@ export default function InputSelBar_address({
 
   // 地址
   // 城市
-  let countryOptions = optionsCreator_county();
+  let countryOptions = optionsCreator_county({ haveOutsea });
 
   if (customContyOption) {
     if (customContyOption.unshift) {
@@ -141,6 +143,9 @@ export default function InputSelBar_address({
         value: address || '',
         onChange: onChangeAddress,
         className: `${scss.address} ${scss.addressPlus}`,
+        props: {
+          className: 'overflow-hidden',
+        },
       },
     },
   ];

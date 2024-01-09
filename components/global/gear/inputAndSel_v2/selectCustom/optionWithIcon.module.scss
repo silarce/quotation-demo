@@ -1,0 +1,12 @@
+@use "styles/theme01" as *;
+
+.option {
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  > img {
+    margin-right: 6px;
+    height: 28px;
+  }
+}

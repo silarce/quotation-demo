@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 // type
 import { Tparams, TpageMetaDto } from './dtoTypes';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 interface TgetDto_array {
   data: { [key: string]: any }[];
@@ -47,15 +48,20 @@ const createUseApi_array_infinite = <TgetDto extends TgetDto_array>({
         return;
       }
 
-      const res = await apiClient(params);
-      setIsloading(false);
-      const dataArrQueueCopy = [...dataArrQueue];
-      dataArrQueueCopy[page - 1] = res.data;
-      setDataArrQueue(dataArrQueueCopy);
-      setData(dataArrQueueCopy.flat());
-      setMeta(res.meta);
+      try {
+        const res = await apiClient(params);
+        const dataArrQueueCopy = [...dataArrQueue];
+        dataArrQueueCopy[page - 1] = res.data;
+        setDataArrQueue(dataArrQueueCopy);
+        setData(dataArrQueueCopy.flat());
+        setMeta(res.meta);
 
-      return res;
+        return res;
+      } catch (error) {
+        myAlert.err({ title: '取得列表失敗' });
+      } finally {
+        setIsloading(false);
+      }
     };
 
     const nextPage = async () => {

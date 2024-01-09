@@ -1,7 +1,7 @@
-@use "styles/theme01" as *;
+// @use "styles/theme01" as *;
 
-$fontTitle: 40px;
-$fontInfo: 25px;
+$fontTitle: 30px;
+$fontInfo: 20px;
 $semiMaring: 0 8px;
 
 .semi {
@@ -10,17 +10,13 @@ $semiMaring: 0 8px;
 
 // ant-modal
 .quotationPdf {
-  // background-color: #ddd;
-  // padding: 0;
+  * {
+    font-family: Microsoft JhengHei;
+    color: black;
+  }
   :global(.ant-modal-content) {
-    // width: fit-content;
-    // margin: auto;
   }
   :global(.ant-modal-body) {
-    // width: 595.28px;
-    // height: 841.89px;
-    // width: calc(595px * 2.7); // 595*2.7 = 1606
-    // height: calc(842px * 2.7);
     padding: 0;
   }
   .hr {
@@ -29,8 +25,8 @@ $semiMaring: 0 8px;
 }
 // ======================================================================
 .pdf {
-  width: calc(595px * 2.7); // 595*2.7 = 1606
-  height: calc(842px * 2.7);
+  width: calc(595px * 2);
+  height: calc(842px * 2);
   padding: 60px 40px;
   // line-height:0.5
   &.spaceBetween {
@@ -47,7 +43,7 @@ $semiMaring: 0 8px;
   }
   > .contactInfo {
     display: grid;
-    grid-template-columns: 6fr 4fr;
+    grid-template-columns: 6fr 5fr;
     span {
       font-size: $fontInfo;
       line-height: 30px;
@@ -74,6 +70,10 @@ $semiMaring: 0 8px;
     .customer {
       display: grid;
       grid-template-columns: 1fr 1.2fr;
+      > div {
+        // height: 42px;
+        // background-color: pink;
+      }
       > div:nth-of-type(1),
       div:nth-of-type(2) {
         grid-column: span 2;
@@ -83,10 +83,15 @@ $semiMaring: 0 8px;
   .info {
     display: grid;
     grid-template-columns: 100px fit-content(100%) auto;
+    height: 42px;
     .flexSpan {
       display: flex;
       justify-content: space-between;
     }
+  }
+  .info2 {
+    @extend .info;
+    height: 42px;
   }
 }
 // ======================================================================
@@ -104,7 +109,7 @@ $semiMaring: 0 8px;
     min-height: 40.28px;
     span {
       margin: auto;
-      font-size: 25px;
+      font-size: 16px;
       font-weight: 500;
     }
   }
@@ -114,10 +119,16 @@ $semiMaring: 0 8px;
       margin: auto 5px auto;
     }
     span {
-      font-size: 25px;
+      // white-space: nowrap;
+      word-break: break-all;
+      font-size: 16px;
       font-weight: 400;
+      line-height: 33px;
     }
     img {
+      width: 30px;
+    }
+    svg {
       width: 30px;
     }
     &.center {
@@ -135,27 +146,36 @@ $semiMaring: 0 8px;
 // ======================================================================
 .table_quoteTypeSum {
   @extend .table;
-  grid-template-columns: 300px 200px repeat(2,1fr);
+  grid-template-columns: 300px 200px repeat(2, 1fr);
 }
 // ======================================================================
 .total {
   border: solid 1px black;
-  margin-top: 50px;
+  margin-top: 20px;
   .remark {
     display: grid;
     grid-template-columns: 80px auto;
-    min-height: 350px;
+    min-height: 200px;
     padding: 0 20px;
     margin-bottom: 50px;
     .semi {
       margin: $semiMaring;
     }
     span {
-      font-size: $fontInfo;
+      // font-size: $fontInfo;
+      font-size: 18px;
+      line-height: 24px;
     }
     li {
-      display: grid;
-      grid-template-columns: 35px auto;
+      // display: grid;
+      // grid-template-columns: 35px auto;
+      display: flex;
+      > span {
+        font-size: 18px;
+        line-height: 24px;
+        //  為了使所有的空格都顯示出來，設pre-wrap
+        white-space: pre-wrap;
+      }
     }
   } // remark
 
@@ -203,7 +223,8 @@ $semiMaring: 0 8px;
 // ======================================================================
 .other {
   display: grid;
-  grid-template-columns: 685px 500px;
+  // grid-template-columns: 685px 500px;
+  grid-template-columns: 6fr 5fr;
   justify-content: space-between;
   margin-top: 10px;
   h2 {
@@ -219,20 +240,30 @@ $semiMaring: 0 8px;
     ol {
       margin-left: 50px;
       list-style-type: decimal;
+      > li {
+        font-size: 16px;
+        line-height: 22px;
+        //  為了使所有的空格都顯示出來，設pre-wrap
+        white-space: pre-wrap;
+      }
     }
   }
 
   .address,
   .date {
     display: grid;
-    grid-template-columns: 170px auto;
+    grid-template-columns: 145px auto;
+    > h2 {
+      margin: auto;
+      margin-top: 0;
+      margin-left: 0;
+    }
     > div {
-      margin-top: 7px;
     }
   }
   .address {
     > div {
-      height: 94.27px;
+      height: 85px;
     }
   }
 
@@ -242,12 +273,14 @@ $semiMaring: 0 8px;
       margin-left: 50px;
       list-style-type: decimal;
       li {
+        display: grid;
+        grid-template-columns: 180px 80px min-content;
         h2 {
           display: inline-block;
         }
         h2:nth-of-type(2) {
           display: inline-block;
-          width: 100px;
+          // width: 100px;
           text-align: center;
           border-bottom: solid 1px black;
         }
@@ -269,10 +302,10 @@ $semiMaring: 0 8px;
   justify-content: space-between;
   width: 100%;
   padding: 10px 20px;
-  background-color: $bgc01;
+  background-color: theme("colors.bgc01");
   button {
     padding: 5px;
-    background-color: $colorBorder01;
+    background-color: theme("colors.border");
     cursor: pointer;
     > span {
       font-size: 18px;

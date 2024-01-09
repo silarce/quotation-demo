@@ -1,10 +1,9 @@
 import React, { useState, useRef, Fragment } from 'react';
+import moment from 'moment';
+import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-
 import Decimal from 'decimal.js';
-
-import _ from 'lodash';
 
 // component
 import Header from './header';
@@ -20,11 +19,14 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 // antd
 import Modal from 'antd/lib/modal/Modal';
 
+// config
+import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
+
 // css
 import scss from './quotationPdf.module.scss';
 
 // type
-import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 type TtableProdList_series = (TtableProdList[number] & { series: string })[];
 
@@ -32,10 +34,17 @@ export default function QuotationPdf({
   isVisable,
   onCancel,
   classLegacyContract,
-}: {
+  verticalKeyArr,
+  agentName,
+}: // notesArrBeforeThisBatchAndThisBatch,
+{
   isVisable: boolean;
   onCancel: () => void;
   classLegacyContract: Class_legacyContract;
+  agentName: string;
+  verticalKeyArr: string[];
+  // 需求變更，不需要了
+  // notesArrBeforeThisBatchAndThisBatch: string[];
 }) {
   const { classBasicInfo } = classLegacyContract;
 
@@ -70,7 +79,11 @@ export default function QuotationPdf({
         continue;
       }
 
-      const image = await html2canvas(item).then((canvas) => {
+      const image = await html2canvas(item, {
+        scale: 3,
+        // useCORS: true,
+        // allowTaint: true,
+      }).then((canvas) => {
         const image = canvas.toDataURL('image/JPEG');
 
         return image;
@@ -103,7 +116,12 @@ export default function QuotationPdf({
       projectCity,
       projectDistrict,
       projectAddress,
+      projectName,
     } = classBasicInfo;
+
+    // const updatedAtStr = moment(updatedAt).subtract(1911, 'year').format('yy-MM-DD');
+    const updatedAtStr = '';
+    // const dateString = quoteDate ? moment(quoteDate).subtract(1911, 'year').format('yy-MM-DD') : '';
 
     return {
       quotationId: contractNumber,
@@ -111,23 +129,35 @@ export default function QuotationPdf({
       contactPerson: contactPerson,
       contactPhone: contactNumber,
       fax: faxNumber ?? '',
-      builtDate: (quoteDate as string) ?? '',
+      builtDate: updatedAtStr,
       projectAddress: projectCity + projectDistrict + projectAddress,
+      projectName,
+      validityPeriod: '',
     };
   })();
   // -------------------------------
   // total
   const totalPram = (() => {
     const memoArr = classLegacyContract.classNotes.stringArr;
+    // const memoArr = notesArrBeforeThisBatchAndThisBatch;
 
-    const subTotal = classLegacyContract.classPayInfo.subTotal;
-    const businessTax = classLegacyContract.classPayInfo.salesTax;
-    const total = classLegacyContract.classPayInfo.total;
+    // let subTotal: string | number = classLegacyContract.classPayInfo.subTotal;
+    // let businessTax: string | number = classLegacyContract.classPayInfo.salesTax;
+    // let total: string | number = classLegacyContract.classPayInfo.total;
+    // subTotal = Number(subTotal.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    // businessTax = Number(businessTax.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    // total = Number(total.replaceAll(',', '')).toLocaleString(undefined, { maximumFractionDigits: 2 });
+
+    const { subTotal, salesTax: businessTax, total } = classLegacyContract?.countProdTotal() ?? {};
+
+    const theSubTotal = subTotal?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '';
+    const theBusinessTax = businessTax?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '';
+    const theTotal = total?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '';
 
     const settlement = {
-      subTotal: parseFloat(subTotal), //小計
-      businessTax: parseFloat(businessTax), //營業稅
-      total: parseFloat(total), // 統計
+      subTotal: theSubTotal, //小計
+      businessTax: theBusinessTax, //營業稅
+      total: theTotal, // 統計
     };
 
     return { memoArr, settlement };
@@ -136,7 +166,8 @@ export default function QuotationPdf({
   // other
   const otherPram = (() => {
     const quoteRangeArr = classLegacyContract.classQuoteScopes.stringArr;
-    const attn = classLegacyContract.classSignature.operatorName;
+    // const attn = classLegacyContract.classSignature.operatorName;
+    const attn = agentName;
 
     const payInfo = (() => {
       const { deliveryLocation, deliveryDate, paymentMethods } = classLegacyContract.classPayInfo;
@@ -145,9 +176,12 @@ export default function QuotationPdf({
         value: item.totalPaymentRatio,
       }));
 
+      // const tradingDate = deliveryDate ? moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD') : '';
+      const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+
       return {
         tradingLocation: deliveryLocation,
-        tradingDate: deliveryDate as string,
+        tradingDate: tradingDate,
         payWay,
       };
     })();
@@ -156,21 +190,40 @@ export default function QuotationPdf({
   })();
 
   const productArr: TtableProdList_series = (() => {
-    const classProdArr = classLegacyContract.classProductArr;
+    // const classProdArr = classLegacyContract.prodArr;
 
-    return classProdArr.map((prod) => {
-      const size = `${prod.width || prod.length} X ${prod.height} + ${prod.thickness}`;
+    const prodList = classLegacyContract.prodList;
+
+    let arr = verticalKeyArr.map((key) => {
+      const prod = prodList[key];
+
+      if (!prod) {
+        return null;
+      }
+
+      const lw = new Decimal(Number(prod?.width || 0) || Number(prod?.length || 0)).mul(100).toString();
+      const h = new Decimal(Number(prod?.height || 0)).mul(100).toString();
+      const b = new Decimal(Number(prod?.boxB || 0)).mul(100).toNumber();
+
+      const size = `${lw} X ${h} ${b ? `+ ${b}` : ''}`;
+
+      const thickness_num = Number(prod.thickness.replaceAll('t', ''));
+      const thickness_str = thickness_num === 0 ? '' : thickness_num.toFixed(1) + 't';
 
       return {
-        category: prod.idNumber,
+        category: prod.itemName,
         size,
         doorType: prod.doorType,
         material: prod.material,
-        thickness: prod.thickness,
+        // thickness: prod.thickness,
+        // thickness: prod.thickness === '0' ? '' : prod.thickness + 't',
+        thickness: thickness_str,
         surface: prod.surface,
-        doorRail: prod.doorTrack,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        doorRail: doorTrackLookup[prod.doorTrack]?.icon,
         horsepower: prod.horsepower,
-        openType: '',
+        openType: prod.closingType,
         qty: prod.quantity,
         unitPrice: prod.unitPrice,
         priceTotal: prod.totalPrice,
@@ -178,6 +231,10 @@ export default function QuotationPdf({
         series: prod.itemName,
       };
     });
+
+    arr = arr.filter((item) => !!item);
+
+    return arr as TtableProdList_series;
   })();
 
   // ----------------------------------------------------------------------------
@@ -255,7 +312,65 @@ const PdfTypeA = ({
   totalPram: Parameters<typeof Total>[0];
   otherPram: Parameters<typeof Other>[0];
 }) => {
-  const chunkedList = _.chunk(productArr, 12) as (typeof productArr)[];
+  // const chunkedList: TtableProdList[] = chunkProdArr({ productArr, rowLimit: 12 });
+  const chunkedList: TtableProdList[] = [[]];
+
+  const rowLimit = 12;
+  const rowStrLengthLimit = 4; // 項目欄位只能容納四個中文字 六個英文字母
+  let rowCount = 0;
+  let arrIndex = 0;
+
+  productArr.forEach((prod) => {
+    let categoryStrLength = 0;
+    let memoStrLength = 0;
+
+    for (let i = 0; i < prod.category.length; i++) {
+      const char = prod.category[i];
+
+      if (
+        // 如果字元是中文
+        /[\u4e00-\u9fa5]/.test(char)
+      ) {
+        categoryStrLength += 1;
+      } else if (
+        // 如果字元是英文字母
+        /[a-zA-Z]/.test(char)
+      ) {
+        categoryStrLength += 0.66; // 一個英文字母約是0.66個中文字寬
+      }
+    }
+
+    for (let i = 0; i < prod.memo.length; i++) {
+      const char = prod.memo[i];
+
+      if (
+        // 如果字元是中文
+        /[\u4e00-\u9fa5]/.test(char)
+      ) {
+        memoStrLength += (1 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
+      } else if (
+        // 如果字元是英文字母
+        /[a-zA-Z]/.test(char)
+      ) {
+        memoStrLength += (0.66 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
+      }
+    }
+
+    const length = categoryStrLength > memoStrLength ? categoryStrLength : memoStrLength;
+
+    const rowQty = Math.ceil(length / rowStrLengthLimit) || 1;
+
+    if (rowCount + rowQty > rowLimit) {
+      rowCount = rowQty;
+      arrIndex++;
+      chunkedList[arrIndex] = [];
+    } else {
+      rowCount += rowQty;
+    }
+
+    chunkedList[arrIndex].push(prod);
+  });
+
   const pageCount = chunkedList.length;
 
   // --------------------------------------------------------------------------
@@ -266,7 +381,7 @@ const PdfTypeA = ({
         return (
           <Fragment key={index}>
             {index !== 0 && <hr className={scss.hr} />}
-            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[0] = ele)}>
+            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[index] = ele)}>
               <div>
                 <Header />
                 <Profile profileData={profilePram} index={index + 1} pageCount={pageCount} />
@@ -312,7 +427,8 @@ const PdfTypeB = ({
   totalPram: Parameters<typeof Total>[0];
   otherPram: Parameters<typeof Other>[0];
 }) => {
-  const chunkedList = _.chunk(productArr, 40) as (typeof productArr)[];
+  const chunkedList: TtableProdList[] = chunkProdArr({ productArr, rowLimit: 35 });
+
   const pageCount = chunkedList.length + 1;
   // --------------------------------------------------------------------------
 
@@ -333,10 +449,10 @@ const PdfTypeB = ({
 
     quoteTypeSumObj[key].qtySum = quoteTypeSumObj[key].qtySum + parseInt(qty);
     quoteTypeSumObj[key].unitPriceSum = new Decimal(quoteTypeSumObj[key].unitPriceSum)
-      .plus(unitPrice.replace(',', ''))
+      .plus(unitPrice.replaceAll(',', '') || 0)
       .toNumber();
     quoteTypeSumObj[key].priceTotleSum = new Decimal(quoteTypeSumObj[key].priceTotleSum)
-      .plus(priceTotal.replace(',', ''))
+      .plus(priceTotal.replaceAll(',', '') || 0)
       .toNumber();
   });
   const quoteTypeSumArr = Object.values(quoteTypeSumObj);
@@ -374,3 +490,65 @@ const PdfTypeB = ({
 };
 
 // ========================================================================
+
+const chunkProdArr = ({ productArr, rowLimit }: { productArr: TtableProdList; rowLimit: number }) => {
+  const chunkedList: TtableProdList[] = [[]];
+
+  // const rowLimit = 12;
+  const rowStrLengthLimit = 4; // 項目欄位只能容納四個中文字 六個英文字母
+  let rowCount = 0;
+  let arrIndex = 0;
+
+  productArr.forEach((prod) => {
+    let categoryStrLength = 0;
+    let memoStrLength = 0;
+
+    for (let i = 0; i < prod.category.length; i++) {
+      const char = prod.category[i];
+
+      if (
+        // 如果字元是中文
+        /[\u4e00-\u9fa5]/.test(char)
+      ) {
+        categoryStrLength += 1;
+      } else if (
+        // 如果字元是英文字母
+        /[a-zA-Z]/.test(char)
+      ) {
+        categoryStrLength += 0.66; // 一個英文字母約是0.66個中文字寬
+      }
+    }
+
+    for (let i = 0; i < prod.memo.length; i++) {
+      const char = prod.memo[i];
+
+      if (
+        // 如果字元是中文
+        /[\u4e00-\u9fa5]/.test(char)
+      ) {
+        memoStrLength += (1 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
+      } else if (
+        // 如果字元是英文字母
+        /[a-zA-Z]/.test(char)
+      ) {
+        memoStrLength += (0.66 * 4) / 3; // 乘4除3是因為備註欄為只能容納3個中文字
+      }
+    }
+
+    const length = categoryStrLength > memoStrLength ? categoryStrLength : memoStrLength;
+
+    const rowQty = Math.ceil(length / rowStrLengthLimit) || 1;
+
+    if (rowCount + rowQty > rowLimit) {
+      rowCount = rowQty;
+      arrIndex++;
+      chunkedList[arrIndex] = [];
+    } else {
+      rowCount += rowQty;
+    }
+
+    chunkedList[arrIndex].push(prod);
+  });
+
+  return chunkedList;
+};

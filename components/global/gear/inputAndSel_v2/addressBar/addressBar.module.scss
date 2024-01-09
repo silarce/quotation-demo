@@ -1,0 +1,17 @@
+@use "styles/theme01" as *;
+
+// .addressPlus是為了加強CSS權重
+// .address.plus {
+//   flex: 0 1 auto;
+// }
+
+.countyWrapper {
+  width: 90px;
+}
+.districtWrapper {
+  width: 90px;
+}
+.addressWrapper {
+  width: auto;
+  flex: auto;
+}

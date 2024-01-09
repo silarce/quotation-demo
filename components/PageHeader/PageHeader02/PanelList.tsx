@@ -65,10 +65,10 @@ interface TpanelSearchBar {
   img?: undefined;
 }
 
-export type TpanelList = (Tpanel_btn | Tpanel_inpusearch | Tpanel_custom | TpanelSearchBar | null)[];
+export type TpanelList = (Tpanel_btn | Tpanel_inpusearch | Tpanel_custom | TpanelSearchBar | null | undefined)[];
 
 export default function PanelList({ panelList }: { panelList: TpanelList }) {
-  if (!panelList[0]) {
+  if (panelList.length === 0) {
     return null;
   }
 

@@ -1,14 +1,11 @@
+import { useState } from 'react';
+
 // css
 import style from './quotationPdf.module.scss';
 
-// option
-import { optionsCreator_doorRail } from 'js/utils/options/options';
-const optionsDoorRail = optionsCreator_doorRail();
+import { apiGetAssets } from 'js/api/api_product';
 
-// type
-// import {  ProdClass } from "components/page/domestic/quotation/hook/useProduct"
-
-export type TtableProdList = {
+type TtableProdListItem = {
   category: string;
   size: string;
   doorType: string;
@@ -22,9 +19,48 @@ export type TtableProdList = {
   unitPrice: string;
   priceTotal: string;
   memo: string;
-}[];
+};
+
+type TtableProdList = TtableProdListItem[];
+
+export type { TtableProdList, TtableProdListItem };
+// =============================================================================
 
 export default function Table({ productList }: { productList: TtableProdList }) {
+  const [svgList, setSvgList] = useState<{ [key: string]: string | undefined | null }>({});
+
+  const getSvg = async ({ fileName }: { fileName: string }) => {
+    if (svgList[fileName] === null) {
+      return;
+    }
+
+    if (svgList[fileName] === 'isLoading') {
+      return;
+    }
+
+    if (!!svgList[fileName]) {
+      return;
+    }
+
+    try {
+      svgList[fileName] = 'isLoading';
+
+      const svg = await apiGetAssets(fileName);
+
+      if (svg) {
+        setSvgList((list) => ({
+          ...list,
+          [fileName]: svg,
+        }));
+      }
+    } catch (error) {
+      setSvgList((list) => ({
+        ...list,
+        [fileName]: null,
+      }));
+    }
+  };
+
   return (
     <div className={style.table}>
       {indexKeys.map((key, index) => {
@@ -36,7 +72,7 @@ export default function Table({ productList }: { productList: TtableProdList }) 
             <span>
               {label === '開閉方式' ? (
                 <>
-                  <span>開閉</span> <br />
+                  <span>開閉</span>
                   <span>方式</span>
                 </>
               ) : (
@@ -52,24 +88,49 @@ export default function Table({ productList }: { productList: TtableProdList }) 
 
         return indexKeys.map((key, cIndex) => {
           const value = data[key];
-          const { width, align } = config[key];
+          const { width, align, suffix } = config[key];
           const theStyle = { width };
           const subClass = ' ' + style[align ?? ''];
 
           if (key === 'doorRail') {
-            const imgSrc = optionsDoorRail.find((item) => item.value === value)?.icon;
+            let svgString;
+            let src;
+
+            if (value) {
+              // 來自本地的圖片
+              if (value.startsWith('/_next')) {
+                src = value;
+              } else {
+                // const arr = value.split('/');
+                // const fileName = arr[arr.length - 1];
+
+                // if (fileName) {
+                //   getSvg({ fileName: fileName });
+                // }
+
+                // svgString = svgList[`${fileName}`] ?? '';
+
+                getSvg({ fileName: value });
+
+                svgString = svgList[`${value}`] ?? '';
+              }
+            }
 
             return (
               <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
                 {/*  eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imgSrc} alt="" />
+                {src && <img src={src} alt="" />}
+                {svgString !== undefined && <div dangerouslySetInnerHTML={{ __html: svgString }} />}
               </div>
             );
           }
 
           return (
             <div className={style.tbodyCell + subClass} key={cIndex} style={theStyle}>
-              <span>{value}</span>
+              <span>
+                {value}
+                {value && suffix}
+              </span>
             </div>
           );
         });
@@ -95,10 +156,6 @@ export default function Table({ productList }: { productList: TtableProdList }) 
 }
 
 // =============================================================================
-/* 產品資料中有厚度的資料
-但是不會出現在主產品設定中讓使用者編輯
-*/
-// =============================================================================
 
 type TindexKeys =
   | 'category'
@@ -120,6 +177,7 @@ type Tconfig = {
     label: string;
     width: string;
     align?: 'center' | 'right';
+    suffix?: string;
   };
 };
 
@@ -142,50 +200,51 @@ const indexKeys: TindexKeys[] = [
 const config: Tconfig = {
   category: {
     label: '項目',
-    width: '130px',
+    width: '80px',
   },
   size: {
     label: '尺寸(單位:cm)',
-    width: '210px',
+    width: '180px',
   },
   doorType: {
     label: '門型',
-    width: '150px',
+    width: '94px',
   },
   material: {
     label: '材料',
-    width: '140px',
+    width: '104px',
     align: 'center',
   },
   thickness: {
     label: '厚度',
-    width: '80px',
+    width: '50px',
     align: 'center',
   },
   surface: {
     label: '表面',
-    width: '80px',
+    width: '50px',
     align: 'center',
   },
   doorRail: {
     label: '門軌',
-    width: '70px',
+    width: '50px',
     align: 'center',
   },
   horsepower: {
     label: '馬力',
-    width: '110px',
-    align: 'right',
+    width: '75px',
+    align: 'center',
   },
   openType: {
     label: '開閉方式',
-    width: '80px',
+    width: '75px',
     align: 'center',
   },
   qty: {
     label: '數量',
-    width: '70px',
-    align: 'right',
+    width: '60px',
+    align: 'center',
+    suffix: '樘',
   },
   unitPrice: {
     label: '單價',

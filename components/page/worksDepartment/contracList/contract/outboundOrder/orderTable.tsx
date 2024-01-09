@@ -1,130 +1,478 @@
 import { useState } from 'react';
-import style from './outboundOrder.module.scss';
+import classNames from 'classnames';
+import moment from 'moment';
+
+import scss from './outboundOrder.module.scss';
 
 // global gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
+// import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
 
-// data
-import { dndCellConfigOutboundOrderOri, TdndCellConfigOutboundOrderKeys } from 'config/dndCellConfig';
-const dndCellConfigOutboundOrder = dndCellConfigOutboundOrderOri();
+// icon
+import { IconAddCircle, IconEdit, IconDelete01, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
 
-export default function OrderTable({ editable }: { editable: boolean }) {
-  const [orderList, setOrderList] = useState(fakeOrderData);
+// type
+import { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
+
+// ================================================================================
+
+type TcontractData = {
+  project: string;
+  L: string;
+  W: string;
+  B: string;
+  qty: string;
+  implementQty: string;
+  cai: string;
+  totalCai: string;
+  doorType: string;
+  material: string;
+  horsepower: string;
+  surface: string;
+};
+
+type TstaticData = {
+  project: string;
+  L: string;
+  W: string;
+  B: string;
+  qty: string;
+  implementQty: string;
+  cai: string;
+  totalCai: string;
+  doorType: string;
+  material: string;
+  horsepower: string;
+  surface: string;
+};
+
+type TdeliveryStatusItem = {
+  value: string;
+  empolyee?: undefined;
+  onChange?: (str: string) => void;
+  onChange_date?: undefined;
+  onChange_employee?: undefined;
+  hidden?: boolean;
+  disabled?: boolean;
+  forbidden?: boolean;
+  onEditClick?: undefined;
+  onDeleteClick?: undefined;
+  onAddClick?: undefined;
+  onConfirmClick?: undefined;
+  onCancelClick?: undefined;
+};
+type TdeliveryStatusItem_date = {
+  value: string;
+  empolyee?: undefined;
+  onChange?: undefined;
+  onChange_date?: (date: string | null) => void;
+  onChange_employee?: undefined;
+  hidden?: boolean;
+  disabled?: boolean;
+  forbidden?: boolean;
+  onEditClick?: undefined;
+  onDeleteClick?: undefined;
+  onAddClick?: undefined;
+  onConfirmClick?: undefined;
+  onCancelClick?: undefined;
+};
+
+type TdeliveryStatusItem_employee = {
+  value?: string | undefined;
+  empolyee: TemployeeDto | undefined | null;
+  onChange?: undefined;
+  onChange_date?: undefined;
+  onChange_employee?: (emp: TemployeeDto | null) => void;
+  hidden?: boolean;
+  disabled?: boolean;
+  forbidden?: boolean;
+  onEditClick?: undefined;
+  onDeleteClick?: undefined;
+  onAddClick?: undefined;
+  onConfirmClick?: undefined;
+  onCancelClick?: undefined;
+};
+
+type TdeliveryStatusItem_btnPanel = {
+  value?: undefined;
+  empolyee?: undefined;
+  onChange?: undefined;
+  onChange_date?: undefined;
+  onChange_employee?: undefined;
+  hidden?: boolean;
+  disabled?: boolean;
+  forbidden?: boolean;
+  onEditClick?: () => void;
+  onDeleteClick?: () => void;
+  onAddClick: () => void;
+  onConfirmClick: () => void;
+  onCancelClick: () => void;
+};
+
+type Tgroup = {
+  itemName: string;
+  rowArr: {
+    contractData: TcontractData;
+    staticData: TstaticData;
+    staticData2: {
+      remark01: TdeliveryStatusItem;
+      orderCreatedDate: TdeliveryStatusItem;
+    };
+
+    deliveryStatus: {
+      // disabled?: boolean;
+      groupList: {
+        btnPanelArr: TdeliveryStatusItem_btnPanel[];
+        installDateArr: TdeliveryStatusItem_date[];
+        installerArr: TdeliveryStatusItem_employee[];
+        itemNameArr: TdeliveryStatusItem[];
+        notesArr: TdeliveryStatusItem[];
+      };
+    };
+  }[];
+};
+
+type Tcontrol = Tgroup[];
+
+export type { Tcontrol as Tcontrol_orderTable, Tgroup };
+
+// ================================================================================
+export default function OrderTable({ control }: { control: Tcontrol }) {
+  const configList = creConfigList();
+
+  // const [targetRow, setTargetRow] = useState<Tgroup['rowArr'][number]['deliveryStatus'] | undefined>();
+  const [targetEmpControl, setTargetEmpControl] = useState<TdeliveryStatusItem_employee | undefined>();
 
   return (
-    <div className={style.orderTable}>
-      <div className={style.thead}>
+    <div className={scss.orderTable}>
+      <div className={scss.thead}>
         {/*  */}
-        <div className={`${style.theadItem} ${style.indexCell}`} />
+        {/* <div className={`${style.theadItem} ${style.indexCell}`} /> */}
         {/*  */}
 
-        {orderKeyIndex01.map((key, index) => {
-          const { label, width, position } = dndCellConfigOutboundOrder[key];
+        {orderKeyArr_contract.map((key, index) => {
+          const { label, width, position } = configList[key] ?? {};
           const theStyle = {
             width,
           };
-          const textCenter = position === 'center' ? style.textCenter : '';
+          const textCenter = position === 'center' ? scss.textCenter : '';
 
+          if (index === 0) {
+            return (
+              <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
+                <span></span>
+                <span>{label}</span>
+              </div>
+            );
+          }
+
+          // return (
+          //   <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+          //     <span>{label}</span>
+          //   </div>
+          // );
           return (
-            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
           );
         })}
-        {/* 灰色柱子 */}
-        <div className={` ${style.pilar}`}>
-          <div />
-        </div>
-        {/*  */}
-        {orderKeyIndex02.map((key, index) => {
-          const { label, width, position } = dndCellConfigOutboundOrder[key];
+
+        {/* 灰色柱子 分隔線*/}
+        <div className={` ${scss.pilar}`} />
+
+        {orderKeyArr_static.map((key, index) => {
+          const { label, width, position } = configList[key] ?? {};
           const theStyle = {
             width,
           };
-          const textCenter = position === 'center' ? style.textCenter : '';
+          const textCenter = position === 'center' ? scss.textCenter : '';
 
           return (
-            <div className={`${style.theadItem} ${textCenter}`} key={index} style={theStyle}>
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
               <span>{label}</span>
             </div>
           );
         })}
+        {/* 灰色分隔線 */}
+        <div className={` ${scss.pilar}`} />
+        {/*  */}
+        {orderKey_staticData2.map((key, index) => {
+          const { label, width, position } = configList[key] ?? {};
+          const theStyle = {
+            width,
+          };
+          const textCenter = position === 'center' ? scss.textCenter : '';
+
+          return (
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
+              <span>{label}</span>
+            </div>
+          );
+        })}
+        {/*  */}
+        {orderKey_deliveryStatus.map((key, index) => {
+          const { label, width, position } = configList[key] ?? {};
+          const theStyle = {
+            width,
+          };
+          const textCenter = position === 'center' ? scss.textCenter : '';
+
+          return (
+            <div className={`${scss.theadItem} ${textCenter}`} key={index} style={theStyle}>
+              <span>{label}</span>
+            </div>
+          );
+        })}
+        {/*  */}
       </div>
 
-      <div className={style.tableList}>
-        {orderList.map((item, groupIndex) => {
-          const { project, list } = item;
+      <div className={scss.tableList}>
+        {control.map((item, groupIndex) => {
+          const { itemName, rowArr } = item;
 
           return (
             <div key={groupIndex}>
-              {list.map((row, rowIndex) => {
-                const bgcSub = rowIndex !== 0 ? style.bgcSub : '';
+              {rowArr.map((row, rowIndex) => {
+                const bgcSub = rowIndex !== 0 ? scss.bgcSub : '';
 
                 return (
-                  <div className={`${style.row} ${bgcSub}`} key={rowIndex}>
+                  <div className={`${scss.row} ${bgcSub}`} key={rowIndex}>
                     {/*  */}
-                    {rowIndex === 0 ? (
-                      <div className={`${style.column} ${style.indexCell}`}>
-                        <span>{groupIndex + 1}</span>
-                      </div>
-                    ) : (
-                      <div className={`${style.column} ${style.indexCell}`}>
-                        <span></span>
-                      </div>
-                    )}
-                    {/*  */}
-                    {orderKeyIndex01.map((key, columnIndex) => {
-                      let { value } = row[key];
+
+                    {orderKeyArr_contract.map((key, columnIndex) => {
+                      const value = row.contractData[key];
 
                       if (rowIndex !== 0 && columnIndex === 0) {
-                        value = '';
+                        // value = '';
                       }
 
-                      const { width, position } = dndCellConfigOutboundOrder[key];
+                      const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
-                      const textCenter = position === 'center' ? style.textCenter : '';
+
+                      if (columnIndex === 0) {
+                        const isHiddenIndex = rowIndex !== 0;
+
+                        return (
+                          <div
+                            className={classNames(
+                              //
+                              scss.column,
+                              position === 'center' && scss.textCenter
+                            )}
+                            key={columnIndex}
+                            style={theStyle}
+                          >
+                            <span className={classNames('pr-[10px]', isHiddenIndex && scss.hidden)}>
+                              {groupIndex + 1}
+                            </span>
+                            <span>{value}</span>
+                          </div>
+                        );
+                      }
 
                       return (
-                        <div className={`${style.column} ${textCenter}`} key={columnIndex} style={theStyle}>
+                        <div
+                          className={classNames(
+                            //
+                            scss.column,
+                            position === 'center' && scss.textCenter,
+                            rowIndex !== 0 && scss.hidden
+                          )}
+                          key={columnIndex}
+                          style={theStyle}
+                        >
                           <span>{value}</span>
                         </div>
                       );
                     })}
-                    {/* 沒有柱子的灰色柱子 */}
-                    <div className={`${style.pilar}`} />
-                    {/*  */}
-                    {orderKeyIndex02.map((key, columnIndex) => {
-                      let { value } = row[key];
 
-                      if (rowIndex !== 0 && columnIndex === 0) {
-                        value = '';
-                      }
+                    {/* 灰色分隔線 */}
+                    <div className={classNames(scss.pilar, rowIndex !== 0 && scss.hidden)} />
 
-                      const { width, position } = dndCellConfigOutboundOrder[key];
+                    {/* orderKeyIndex01 */}
+                    {orderKeyArr_static.map((key, columnIndex) => {
+                      const value = row.staticData[key];
+
+                      // if (rowIndex !== 0 && columnIndex === 0) {
+                      //   value = '';
+                      // }
+
+                      const { width, position } = configList[key] ?? {};
                       const theStyle = { width };
-                      const textCenter = position === 'center' ? style.textCenter : '';
-
-                      const onChange = (v: string) => {
-                        orderList[groupIndex].list[rowIndex][key].value = v;
-                        setOrderList([...orderList]);
-                      };
 
                       return (
-                        <div className={`${style.column} ${textCenter}`} key={columnIndex} style={theStyle}>
-                          <InputSel
-                            className={style.input03}
+                        <div
+                          className={classNames(scss.column, position === 'center' && scss.textCenter)}
+                          key={columnIndex}
+                          style={theStyle}
+                        >
+                          <span>{value}</span>
+                        </div>
+                      );
+                    })}
+
+                    {/* 沒有柱子的灰色柱子 */}
+                    <div className={`${scss.pilar}`} />
+
+                    {/* orderKeyIndex02 */}
+                    {orderKey_staticData2.map((key, columnIndex) => {
+                      const { value } = row.staticData2[key];
+
+                      const { width, position } = configList[key] ?? {};
+                      const theStyle = { width };
+                      const textCenter = position === 'center' ? scss.textCenter : '';
+
+                      return (
+                        <div className={`${scss.column} ${textCenter}`} key={columnIndex} style={theStyle}>
+                          {/* <InputSel
+                            className={classNames(scss.input03)}
+                            showBaseline={'invisible'}
+                            disabled={true}
                             inputProps={{
-                              value,
-                              onChange,
+                              props: {
+                                value,
+                                placeholder: '',
+                              },
                             }}
-                            placeholder=""
-                            disabled={!editable}
-                          />
+                          /> */}
+                          <span>{value}</span>
                         </div>
                       );
                     })}
                     {/*  */}
-                    {rowIndex !== 0 && <div className={style.ribbon}></div>}
+
+                    {orderKey_deliveryStatus.map((key, index) => {
+                      const { groupList } = row.deliveryStatus;
+
+                      const group = groupList[key];
+
+                      const { width, position, type } = configList[key] ?? {};
+                      const theStyle = { width };
+                      const textCenter = position === 'center' ? scss.textCenter : '';
+
+                      const theProps: Parameters<typeof InputSel>[0] = {};
+
+                      return (
+                        <div
+                          //
+                          key={key}
+                          className={classNames(scss.column, textCenter, scss.subGroup)}
+                          style={theStyle}
+                        >
+                          {group.map((item, index) => {
+                            const {
+                              disabled,
+                              forbidden,
+                              value,
+                              empolyee,
+                              onChange,
+                              onChange_date,
+                              onChange_employee,
+                              onAddClick,
+                              onEditClick,
+                              onDeleteClick,
+                              onConfirmClick,
+                              onCancelClick,
+                            } = item;
+
+                            if (key === 'btnPanelArr') {
+                              const isFirst = index === 0;
+
+                              return (
+                                <div key={index} className={classNames(scss.btnPanel, forbidden && scss.hidden)}>
+                                  <IconAddCircle className={classNames(!isFirst && scss.hidden)} onClick={onAddClick} />
+                                  {disabled ? (
+                                    //
+                                    <IconEdit
+                                      onClick={onEditClick}
+                                      className={classNames(!onEditClick && scss.hidden)}
+                                    />
+                                  ) : (
+                                    <IconEdit onClick={onCancelClick} className={scss.svgActive} />
+                                  )}
+                                  {disabled ? (
+                                    <IconDelete01
+                                      onClick={onDeleteClick}
+                                      className={classNames(!onDeleteClick && scss.hidden)}
+                                    />
+                                  ) : (
+                                    <IconCheck02 onClick={onConfirmClick} />
+                                  )}
+                                </div>
+                              );
+                            }
+
+                            //
+                            if (onChange_employee) {
+                              theProps.inputProps = {
+                                props: {
+                                  value: value || empolyee?.chName || empolyee?.enName || '',
+                                  placeholder: '',
+                                },
+                              };
+
+                              const onClick = () => {
+                                !disabled && setTargetEmpControl(item);
+                              };
+
+                              return (
+                                <div key={index} onClick={onClick}>
+                                  <InputSel
+                                    className={classNames(scss.input03)}
+                                    showBaseline={'auto'}
+                                    // placeholder=""
+                                    disabled={disabled}
+                                    {...theProps}
+                                  />
+                                </div>
+                              );
+                            }
+
+                            //
+                            if (onChange_date) {
+                              return (
+                                <div key={index}>
+                                  <InputSel
+                                    datePickerProps={{
+                                      props: {
+                                        value: value ? moment(value) : null,
+                                        onChange: (date) => {
+                                          onChange_date(date?.toISOString() ?? '');
+                                        },
+                                      },
+                                    }}
+                                    disabled={disabled}
+                                    showBaseline={'auto'}
+                                  />
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <div key={index}>
+                                <InputSel
+                                  inputProps={{
+                                    props: {
+                                      value,
+                                      onChange: (e) => {
+                                        onChange?.(e.target.value);
+                                      },
+                                    },
+                                  }}
+                                  disabled={disabled}
+                                  showBaseline={'auto'}
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+
+                    {/*  */}
+                    {rowIndex !== 0 && <div className={scss.ribbon}></div>}
                   </div> // row
                 ); // return
               })}
@@ -132,18 +480,29 @@ export default function OrderTable({ editable }: { editable: boolean }) {
           );
         })}
       </div>
+      <EmployeeSelector
+        showModal={!!targetEmpControl}
+        onConfirm={(arr) => {
+          targetEmpControl?.onChange_employee?.(arr[0] ?? null);
+        }}
+        onCancel={() => {
+          setTargetEmpControl(undefined);
+        }}
+        selLimit={1}
+      />
     </div>
   );
 }
 
 // =======================================================
-const orderKeyIndex01: TdndCellConfigOutboundOrderKeys[] = [
+
+const orderKeyArr_contract: (keyof TcontractData)[] = [
   'project',
   'L',
   'W',
   'B',
   'qty',
-  'implementQty',
+  // 'implementQty',
   'cai',
   'totalCai',
   'doorType',
@@ -152,170 +511,284 @@ const orderKeyIndex01: TdndCellConfigOutboundOrderKeys[] = [
   'surface',
 ];
 
-const orderKeyIndex02: TdndCellConfigOutboundOrderKeys[] = [
-  'remark01',
-  'remark02',
-  'remark03',
-  'remark04',
-  'appended',
-  'orderCreatedDate',
-  'finishAppended',
-  'installer',
-  'installDate',
+const orderKeyArr_static: (keyof TstaticData)[] = [
+  // 'project', // 這個欄位顯示出來應該會讓這個報表比較清楚
+  'L',
+  'W',
+  'B',
+  'qty',
+  // 'implementQty',
+  'cai',
+  'totalCai',
+  'doorType',
+  'material',
+  'horsepower',
+  'surface',
 ];
 
-const fakeOrderDataItemOri = () => ({
+const orderKey_staticData2: (keyof Tgroup['rowArr'][number]['staticData2'])[] = [
+  //
+  'orderCreatedDate',
+  'remark01',
+];
+
+const orderKey_deliveryStatus: (keyof Tgroup['rowArr'][number]['deliveryStatus']['groupList'])[] = [
+  'btnPanelArr',
+  'installDateArr',
+  'installerArr',
+  'itemNameArr',
+  'notesArr',
+];
+
+// =======================================================================
+
+type Tconfig = {
+  label: string;
+  width: string;
+  type?: 'input' | 'select' | 'date' | 'employee' | 'textarea' | 'other';
+  position: string;
+};
+
+type TcellConfigList = {
+  [key: string]: Tconfig | undefined;
+};
+
+const creCellConfig_static = (): TcellConfigList => ({
+  discount: {
+    label: '折數',
+    width: '75px',
+    type: 'input',
+    position: '',
+  },
   project: {
-    value: 'SD2',
+    label: '項目',
+    width: '120px',
+    type: 'input',
+    position: '',
+  },
+  quoteType: {
+    label: '報價別',
+    width: '105px',
+    type: 'select',
+    position: '',
   },
   L: {
-    value: '516',
+    label: 'L',
+    width: '60px',
+    type: 'input',
+    position: 'center',
   },
   W: {
-    value: '230',
+    label: 'W',
+    width: '60px',
+    type: 'input',
+    position: 'center',
+  },
+  H: {
+    label: 'H',
+    width: '60px',
+    type: 'input',
+    position: 'center',
   },
   B: {
-    value: '45',
+    label: 'B',
+    width: '60px',
+    type: 'input',
+    position: 'center',
   },
-  qty: {
-    value: '1',
-  },
-  implementQty: {
-    value: '1',
+  area: {
+    label: '面積',
+    width: '60px',
+    type: 'input',
+    position: '',
   },
   cai: {
-    value: '22181.49',
+    label: '才數',
+    width: '75px',
+    type: 'input',
+    position: '',
   },
   totalCai: {
-    value: '22181.49',
+    label: '總才數',
+    width: '75px',
+    type: 'input',
+    position: '',
   },
   doorType: {
-    value: 'SJ-302',
+    label: '門型',
+    width: '75px',
+    type: 'input',
+    position: '',
   },
   material: {
-    value: '不鏽鋼304#',
-  },
-  horsepower: {
-    value: '1/3HP',
+    label: '材料',
+    width: '120px',
+    type: 'select',
+    position: '',
   },
   surface: {
-    value: '烤漆',
+    label: '表面',
+    width: '55px',
+    type: 'select',
+    position: '',
   },
-
-  remark01: {
-    value: '',
+  // doorRail: {
+  //   label: '門軌',
+  //   width: '70px',
+  //   type: 'selectWithIcon',
+  //   position: '',
+  // },
+  horsepower: {
+    label: '馬力',
+    width: '60px',
+    type: 'input',
+    position: '',
   },
-  remark02: {
-    value: '',
+  qty: {
+    label: '數量',
+    width: '43px',
+    type: 'input',
+    position: 'center',
   },
-  remark03: {
-    value: '',
+  unitPrice: {
+    label: '單價',
+    width: '84px',
+    type: 'input',
+    position: '',
   },
-  remark04: {
-    value: '',
+  subTotal: {
+    label: '複價',
+    width: '84px',
+    type: 'input',
+    position: '',
   },
-  appended: {
-    value: '',
+  memo: {
+    label: '備註',
+    width: '90px',
+    type: 'select',
+    position: '',
   },
-  orderCreatedDate: {
-    value: '',
+  // ejectionDoor: {
+  //   label: '彈射門',
+  //   width: '60px',
+  //   type: 'checkbox',
+  //   position: '',
+  // },
+  openType: {
+    label: '開門方式',
+    width: '82px',
+    type: 'select',
+    position: 'center',
   },
-  finishAppended: {
-    value: '',
-  },
-  installer: {
-    value: '',
-  },
-  installDate: {
-    value: '',
+  thickness: {
+    label: '厚度',
+    width: '45px',
+    type: 'input',
+    position: '',
   },
 });
-// const fakeOrderDataItem = {
-//   project: {
-//     value: "SD2"
-//   },
-//   L: {
-//     value: "516"
-//   },
-//   W: {
-//     value: "230"
-//   },
-//   B: {
-//     value: "45"
-//   },
-//   qty: {
-//     value: "1"
-//   },
-//   implementQty: {
-//     value: "1"
-//   },
-//   cai: {
-//     value: "22181.49"
-//   },
-//   totalCai: {
-//     value: "22181.49"
-//   },
-//   doorType: {
-//     value: "SJ-302"
-//   },
-//   material: {
-//     value: "不鏽鋼304#"
-//   },
-//   horsepower: {
-//     value: "1/3HP"
-//   },
-//   surface: {
-//     value: "烤漆"
-//   },
+// =============================================================
 
-//   remark01: {
-//     value: ""
-//   },
-//   remark02: {
-//     value: ""
-//   },
-//   remark03: {
-//     value: ""
-//   },
-//   remark04: {
-//     value: ""
-//   },
-//   appended: {
-//     value: ""
-//   },
-//   orderCreatedDate: {
-//     value: ""
-//   },
-//   finishAppended: {
-//     value: ""
-//   },
-//   installer: {
-//     value: ""
-//   },
-//   installDate: {
-//     value: ""
-//   },
-// }
+const creCellConfig_staticData2 = (): TcellConfigList => ({
+  remark01: {
+    label: '選配',
+    width: '200px',
+    type: 'textarea',
+    position: '',
+  },
+  remark02: {
+    label: '備註2',
+    width: '150px',
+    type: 'textarea',
+    position: '',
+  },
+  remark03: {
+    label: '備註3',
+    width: '65px',
+    type: 'input',
+    position: '',
+  },
+  remark04: {
+    label: '備註4',
+    width: '65px',
+    type: 'input',
+    position: '',
+  },
+  appended: {
+    label: '追加',
+    width: '65px',
+    type: 'input',
+    position: '',
+  },
+  orderCreatedDate: {
+    label: '工作表開立日期',
+    width: '115px',
+    type: 'input',
+    position: '',
+  },
+  finishAppended: {
+    label: '完成追加',
+    width: '75px',
+    type: 'input',
+    position: '',
+  },
+  installer: {
+    label: '安裝人員',
+    width: '85px',
+    type: 'employee',
+    position: '',
+  },
+  installDate: {
+    label: '安裝日期',
+    width: '120px',
+    type: 'date',
+    position: '',
+  },
+  implementQty: {
+    label: '實作數量',
+    width: '75px',
+    type: 'input',
+    position: 'center',
+  },
+});
 
-const fakeOrderData = [
-  {
-    project: 'SD2',
-    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri()],
+const creCellConfig_subGroup = (): TcellConfigList => ({
+  btnPanelArr: {
+    label: '',
+    width: '92px',
+    type: 'other',
+    position: '',
   },
-  {
-    project: 'SD3',
-    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri(), fakeOrderDataItemOri()],
+  installDateArr: {
+    label: '安裝日期',
+    width: '150px',
+    type: 'date',
+    position: '',
   },
-  {
-    project: 'SD4',
-    list: [fakeOrderDataItemOri(), fakeOrderDataItemOri()],
+  installerArr: {
+    label: '安裝人員',
+    width: '85px',
+    type: 'input',
+    position: '',
   },
-  {
-    project: 'SD5',
-    list: [fakeOrderDataItemOri()],
+  itemNameArr: {
+    label: '項目',
+    width: '100px',
+    type: 'input',
+    position: '',
   },
-  {
-    project: 'SD5',
-    list: [fakeOrderDataItemOri()],
+  notesArr: {
+    label: '備註',
+    width: '150px',
+    type: 'input',
+    position: '',
   },
-];
+});
+
+// =============================================================
+
+const creConfigList = (): TcellConfigList => ({
+  ...creCellConfig_static(),
+  ...creCellConfig_staticData2(),
+  ...creCellConfig_subGroup(),
+});

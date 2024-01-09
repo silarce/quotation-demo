@@ -1,4 +1,4 @@
-import { TfakeData } from 'pages/domestic/quoteStatistics';
+import { Tdata } from 'pages/domestic/quoteStatistics';
 import classNames from 'classnames';
 
 // gear
@@ -7,12 +7,54 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 // css
 import scss from './quoteStatistics.module.scss';
 
-export default function Table({ fakeDataArr }: { fakeDataArr: TfakeData[] }) {
+// ==================================================================
+
+type Tcontrol_row = {
+  idNumber: string;
+  designDepartment: string;
+  constructionName: string;
+  subRowArr: {
+    customerName: string;
+    contactPerson: string;
+    contactPhone: string;
+    groupList: {
+      [key: string]:
+        | {
+            listPrice: string;
+            bearPrice: string;
+            percent: string;
+          }
+        | undefined;
+    };
+  }[];
+};
+
+type TcontrolTotalList = {
+  [key: string]: {
+    listPrice: string;
+    bearPrice: string;
+    percent: string;
+  };
+};
+
+type Tcontrol = {
+  rowArr: Tcontrol_row[];
+  groupListKeyArr: string[];
+  totalList: TcontrolTotalList;
+};
+
+export type { Tcontrol as Tcontrol_quoteStatistics, Tcontrol_row, TcontrolTotalList };
+
+// ==================================================================
+export default function Table({ control }: { control: Tcontrol }) {
+  const { rowArr, totalList, groupListKeyArr } = control;
+
   return (
     <div className={classNames(scss.table)}>
-      <Thead />
-      <Tbody dataArr={fakeDataArr} />
-      <Tfoot />
+      <Thead groupListKeyArr={groupListKeyArr} />
+      {/* <Tbody dataArr={dataArr} /> */}
+      <Tbody rowArr={rowArr} groupListKeyArr={groupListKeyArr} />
+      <Tfoot totalList={totalList} groupListKeyArr={groupListKeyArr} />
     </div>
   );
 }
@@ -20,11 +62,8 @@ export default function Table({ fakeDataArr }: { fakeDataArr: TfakeData[] }) {
 // =======================================================================
 // =======================================================================
 // =======================================================================
-// =======================================================================
-// =======================================================================
-// =======================================================================
 
-const Thead = () => {
+const Thead = ({ groupListKeyArr }: { groupListKeyArr: string[] }) => {
   return (
     <div className={classNames(scss.row, scss.thead)}>
       {/*  */}
@@ -64,49 +103,60 @@ const Thead = () => {
         })}
       </div>
       {/*  */}
-      <div className={classNames(scss.group, scss.group03)}>
-        <div>
-          <span>捲門</span>
-        </div>
-        {group03Keys.map((key, index) => {
-          const { width, headLabel } = colConfig[key];
 
-          return (
-            <div key={index} style={{ width }}>
-              <span>{headLabel}</span>
+      {groupListKeyArr.map((key, index) => {
+        return (
+          <div key={index} className={classNames(scss.group, scss.group03)}>
+            <div>
+              <span>{key}</span>
             </div>
-          );
-        })}
-      </div>
-      {/*  */}
+            {group03Keys.map((key, index) => {
+              const { width, headLabel } = colConfig[key];
+
+              return (
+                <div key={index} style={{ width }}>
+                  <span>{headLabel}</span>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 };
 
 // =======================================================================
-const Tbody = ({ dataArr }: { dataArr: TfakeData[] }) => {
+const Tbody = ({
+  //
+  rowArr,
+  groupListKeyArr,
+}: {
+  rowArr: Tcontrol_row[];
+  groupListKeyArr: string[];
+}) => {
   return (
     <div className={scss.tbody}>
-      {dataArr.map((data, index) => {
+      {rowArr.map((row, index) => {
         return (
           <CellWithBar key={index}>
             <div className={scss.row}>
               <div className={classNames(scss.group, scss.group01)}>
                 {group01Keys.map((key, index) => {
                   const { label, width } = colConfig[key];
-                  const value = data[key];
+                  const value = row[key];
 
                   return <Info key={index} label={label} value={value} width={width} />;
                 })}
               </div>
               {/*  */}
               <div className={classNames(scss.group, scss.group02)}>
-                {data.customer.map((customer, index) => {
+                {row.subRowArr.map((subRow, index) => {
                   return (
                     <div key={index}>
                       {group02Keys.map((key, index) => {
                         const { label, width } = colConfig[key];
-                        const value = customer[key];
+                        const value = subRow[key];
 
                         return <Info key={index} label={label} value={value} width={width} />;
                       })}
@@ -115,24 +165,35 @@ const Tbody = ({ dataArr }: { dataArr: TfakeData[] }) => {
                 })}
               </div>
               {/*  */}
-              <div className={classNames(scss.group, scss.group03)}>
-                {data.customer.map((customer, index) => {
-                  return (
-                    <div key={index}>
-                      {group03Keys.map((key, index) => {
-                        const { width } = colConfig[key];
-                        const value = customer[key];
 
-                        return (
-                          <div key={index} style={{ width }}>
-                            <span>{value}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </div>
+              {row.subRowArr.map((subRow, subRowIndex) => {
+                const groupList = subRow.groupList;
+
+                return (
+                  <div key={subRowIndex} className={scss.subRow}>
+                    {groupListKeyArr.map((glKey, glIndex) => {
+                      const list = groupList[glKey];
+                      // console.log(glKey);
+                      // console.log(list);
+
+                      return (
+                        <div key={glIndex} className={classNames(scss.group, scss.group03)}>
+                          {group03Keys.map((key, index) => {
+                            const { width } = colConfig[key];
+                            const value = list?.[key] ?? '';
+
+                            return (
+                              <div key={index} style={{ width }}>
+                                <span>{value}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
             </div>
           </CellWithBar>
         );
@@ -140,9 +201,12 @@ const Tbody = ({ dataArr }: { dataArr: TfakeData[] }) => {
     </div>
   );
 };
+
+// =======================================================================
+// =======================================================================
 // =======================================================================
 
-const Tfoot = () => {
+const Tfoot = ({ totalList, groupListKeyArr }: { totalList: TcontrolTotalList; groupListKeyArr: string[] }) => {
   return (
     <div className={classNames(scss.row, scss.tfoot)}>
       <div className={classNames(scss.group, scss.group01)}>
@@ -155,18 +219,25 @@ const Tfoot = () => {
           </div>
         </div>
       </div>
-      <div className={classNames(scss.group, scss.group03)}>
-        {group03Keys.map((key, index) => {
-          const { label, width } = colConfig[key];
-          const value = fakeTotal[key];
 
-          return (
-            <div key={index} style={{ width }}>
-              <span>{value}</span>
-            </div>
-          );
-        })}
-      </div>
+      {groupListKeyArr.map((key, index) => {
+        const group = totalList[key];
+
+        return (
+          <div key={index} className={classNames(scss.group, scss.group03)}>
+            {group03Keys.map((key, index) => {
+              const { label, width } = colConfig[key];
+              const value = group[key];
+
+              return (
+                <div key={index} style={{ width }}>
+                  <span>{value}</span>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -191,11 +262,8 @@ const Info = ({
 
 // =======================================================================
 // =======================================================================
-// =======================================================================
-// =======================================================================
-// =======================================================================
-// =======================================================================
-type TconfigKey = Exclude<keyof TfakeData | keyof TfakeData['customer'][number], 'customer'>;
+
+type TconfigKey = Exclude<keyof Tdata | keyof Tdata['customer'][number], 'customer'>;
 
 type Tconfig = {
   [key in TconfigKey]: {
@@ -223,7 +291,7 @@ const group03Keys: Extract<TconfigKey, 'listPrice' | 'bearPrice' | 'percent'>[] 
 const colConfig: Tconfig = {
   idNumber: {
     label: '編號',
-    width: '95px',
+    width: '110px',
     color: 'black',
   },
   designDepartment: {
@@ -269,10 +337,4 @@ const colConfig: Tconfig = {
     width: '138px',
     color: 'black',
   },
-};
-
-const fakeTotal = {
-  listPrice: '1,373,614',
-  bearPrice: '841,913',
-  percent: '60%',
 };

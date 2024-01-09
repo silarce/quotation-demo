@@ -12,6 +12,11 @@
   height: 350px;
   padding: 0 1px;
 }
+.rowWrapper {
+  &:nth-last-of-type(1) {
+    border: none;
+  }
+}
 .listItem {
   display: grid;
   grid-template-columns: 100px auto;
@@ -21,9 +26,6 @@
   border-bottom: solid 1px $colorBorder01;
   cursor: pointer;
 
-  &:nth-last-of-type(1) {
-    border: none;
-  }
   > span {
     margin: auto;
     margin-left: 0;

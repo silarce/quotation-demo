@@ -1,0 +1,100 @@
+@use "styles/theme01" as *;
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+
+  gap: 30px;
+  margin-left: 57px;
+  > p {
+    margin-top: 20px;
+    margin-bottom: 27px;
+    // margin-left: 57px;
+    color: $colorMain;
+    font-size: 20px;
+    // grid的span佔兩格
+    grid-column: span 2;
+  }
+
+  .top {
+    grid-template-columns: 1fr 1fr;
+    grid-column: span 2;
+    > hr {
+      grid-column: span 2;
+    }
+  }
+
+  .top,
+  .left,
+  .right {
+    display: grid;
+    gap: 50px;
+    > .item {
+      > .list {
+        display: grid;
+        gap: 15px;
+      }
+      .sutTitle {
+        margin-bottom: 20px;
+        color: $colorMain;
+        font-size: 18px;
+        font-weight: 700;
+        > span {
+          margin-left: 20px;
+          color: $colorActive01;
+          font-size: 13px;
+          font-weight: 500;
+        }
+      }
+    }
+    .checkBar {
+      width: 100%;
+      flex-wrap: wrap;
+      > label {
+        flex: 20% 0 0;
+      }
+    }
+  }
+  .left {
+  }
+  .right {
+    .doorTrackName {
+      min-height: 114px;
+    }
+  }
+}
+
+.inputSel_big {
+  > * {
+    margin: auto;
+    margin-left: 0;
+  }
+}
+.forbidden {
+  background-color: #999;
+}
+
+.selSingleValue {
+  text-align: center;
+}
+
+.selSingleValue_custom {
+  img {
+    // width: 60px;
+    height: 114px;
+  }
+}
+
+.selOption_custom {
+  img {
+    // width: 60px;
+    height: 75px;
+  }
+}
+
+.inputClass {
+  input {
+    text-align: center;
+  }
+}

@@ -3,9 +3,10 @@
 
 .container {
   display: grid;
-  grid-template-columns: 123px 88px auto;
+  grid-template-columns: 123px 88px auto 50px;
   gap: 16px 25px;
   padding: 23px 30px;
+  padding-right: 0;
   background-color: $bgc01;
   max-height: 175px;
   overflow: auto;

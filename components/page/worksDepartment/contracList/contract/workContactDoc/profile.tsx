@@ -1,48 +1,211 @@
+import { Fragment } from 'react';
+import classNames from 'classnames';
+
 // glogal gear
 import Status from 'components/global/gear/other/status';
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import AddressBar, {
+  TaddressProps,
+  TinputSelProps_noProps,
+} from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+
+// icon
+import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
-import style from './workContactDoc.module.scss';
+import scss from './workContactDoc.module.scss';
+
+type TcontrollItem = {
+  value: string;
+  onChange?: (v: string) => void;
+  disabled?: boolean;
+};
+
+type TcontactItem = {
+  contactPerson: TcontrollItem;
+  contactPhone: TcontrollItem;
+  onDelClick: () => void;
+};
+
+type Tcontroll = {
+  /**請款狀態 */
+  paymentStatus: TcontrollItem;
+  projectName: TcontrollItem;
+  /**工程內容 */
+  projectContent: TcontrollItem;
+
+  addressBarProps: {
+    inputSelProps?: TinputSelProps_noProps;
+    addressProps: TaddressProps;
+  };
+
+  /**工程負責人 */
+  projectPerson: TcontrollItem;
+  /**工程負責人聯絡電話 */
+  projectPersonNumber: TcontrollItem;
+  projectFaxNumber: TcontrollItem;
+  /**工地電話 */
+  projectNumber: TcontrollItem;
+  /**工程編號 */
+  engineeringNumber: TcontrollItem;
+  /**承包商 */
+  contractor: TcontrollItem;
+  /**負責人 */
+  principal: TcontrollItem;
+  /**公司電話 */
+  contactNumber: TcontrollItem;
+  faxNumber: TcontrollItem;
+  //
+  contactPersons: {
+    onAddClick: () => void;
+    arr: TcontactItem[];
+  };
+};
+
+export type { Tcontroll };
 
 // ==================================================
-export default function Profile() {
+export default function Profile({ disabled, controll }: { disabled?: boolean; controll: Tcontroll }) {
+  const {
+    paymentStatus,
+    projectName,
+    projectContent,
+    // county,
+    // district,
+    // address,
+    addressBarProps,
+    projectPerson,
+    projectPersonNumber,
+    projectFaxNumber,
+    projectNumber,
+    engineeringNumber,
+    contractor,
+    principal,
+    contactNumber,
+    faxNumber,
+    contactPersons,
+  } = controll;
+
   return (
-    <div className={style.profile}>
-      <div className={style.leftBlock}>
-        <Status text={`請款狀態:${'已出具證明，尚未收足款項'}`} />
-        <div className={style.leftUpBlock}>
+    <div className={scss.profile}>
+      <div className={scss.leftBlock}>
+        <Status text={`請款狀態:${paymentStatus.value}`} />
+        <div className={scss.leftUpBlock}>
           <InputSel
+            disabled={projectName.disabled || disabled}
             label="工程名稱"
-            inputProps={{ value: '台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程' }}
+            inputProps={{ ...projectName }}
             {...inputStyle01}
           />
-          <InputSel label="工程內容" inputProps={{ value: '捲門＋大門工程' }} {...inputStyle01} />
+          <InputSel
+            disabled={projectContent.disabled || disabled}
+            label="工程內容"
+            inputProps={{ ...projectContent }}
+            {...inputStyle01}
+          />
         </div>
 
         <hr />
 
-        <div className={style.leftDownBlock}>
-          <InputSel label="工程電話" inputProps={{ value: '04-1234567' }} {...inputStyle01} />
-          <InputSel label="工程負責人" inputProps={{ value: '王先生' }} {...inputStyle02} />
-          <InputSel label="工程傳真" inputProps={{ value: '04-1234567' }} {...inputStyle01} />
-          <InputSel label="負責人電話" inputProps={{ value: '0987654321' }} {...inputStyle02} />
+        <div className={scss.leftDownBlock}>
           <InputSel
-            label="工程地點"
-            inputProps={{
-              value: '臺中市梧棲區經二路27號臺中市梧棲區經二路27號臺中市梧棲區經二路27號臺中市梧棲區經二路27號',
-            }}
+            disabled={projectNumber.disabled || disabled}
+            label="工程電話"
+            inputProps={{ ...projectNumber }}
             {...inputStyle01}
           />
+          <InputSel
+            disabled={projectPerson.disabled || disabled}
+            label="工程負責人"
+            inputProps={{ ...projectPerson }}
+            {...inputStyle02}
+          />
+          <InputSel
+            disabled={projectFaxNumber.disabled || disabled}
+            label="工程傳真"
+            inputProps={{ ...projectFaxNumber }}
+            {...inputStyle01}
+          />
+          <InputSel
+            disabled={projectPersonNumber.disabled || disabled}
+            label="負責人電話"
+            inputProps={{ ...projectPersonNumber }}
+            {...inputStyle02}
+          />
+          <AddressBar addressProps={addressBarProps.addressProps} inputSelProps={addressBarProps.inputSelProps} />
+        </div>
+
+        <div className={scss.leftBelowBlock}>
+          <div className={classNames(scss.caption, disabled && contactPersons.arr.length === 0 && scss.hidden)}>
+            <span>聯絡人</span>
+            <IconAddCircle onClick={contactPersons.onAddClick} className={classNames(disabled && scss.hidden)} />
+          </div>
+          <div className={scss.grid}>
+            {contactPersons.arr.map((item, index) => {
+              const { contactPerson, contactPhone } = item;
+
+              const indexStr = String(index + 1).padStart(2, '0');
+
+              return (
+                <Fragment key={index}>
+                  <InputSel
+                    disabled={contactPerson.disabled || disabled}
+                    label={`聯絡人${indexStr}`}
+                    placeholder="聯絡人"
+                    inputProps={{ ...contactPerson }}
+                    {...inputStyle01}
+                  />
+                  <div className={scss.wrapper}>
+                    <InputSel
+                      disabled={contactPhone.disabled || disabled}
+                      label={`聯絡人${indexStr}電話`}
+                      placeholder="聯絡人電話"
+                      inputProps={{ ...contactPhone }}
+                      {...inputStyle02}
+                    />
+                    <IconRemoveCircle
+                      onClick={item.onDelClick}
+                      className={classNames((contactPhone.disabled || disabled) && scss.hidden)}
+                    />
+                  </div>
+                </Fragment>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      <div className={style.rightBlock}>
-        <InputSel label="工程編號" inputProps={{ value: 'M-1101201' }} {...inputStyle01} />
-        <InputSel label="承包商" inputProps={{ value: '創典科技A有限公司' }} {...inputStyle01} />
-        <InputSel label="負責人" inputProps={{ value: '李先生' }} {...inputStyle01} />
-        <InputSel label="公司電話" inputProps={{ value: '04-1234567' }} {...inputStyle01} />
-        <InputSel label="公司傳真" inputProps={{ value: '04-1234567' }} {...inputStyle01} />
+      <div className={scss.rightBlock}>
+        <InputSel
+          disabled={engineeringNumber.disabled || disabled}
+          label="工程編號"
+          inputProps={{ ...engineeringNumber }}
+          {...inputStyle01}
+        />
+        <InputSel
+          disabled={contractor.disabled || disabled}
+          label="承包商"
+          inputProps={{ ...contractor }}
+          {...inputStyle01}
+        />
+        <InputSel
+          disabled={principal.disabled || disabled}
+          label="負責人"
+          inputProps={{ ...principal }}
+          {...inputStyle01}
+        />
+        <InputSel
+          disabled={contactNumber.disabled || disabled}
+          label="公司電話"
+          inputProps={{ ...contactNumber }}
+          {...inputStyle01}
+        />
+        <InputSel
+          disabled={faxNumber.disabled || disabled}
+          label="公司傳真"
+          inputProps={{ ...faxNumber }}
+          {...inputStyle01}
+        />
       </div>
     </div>
   );
@@ -54,16 +217,14 @@ export default function Profile() {
 const inputStyle01 = {
   captionWidth: '80px',
   gap: '24px',
-  captionClassName: style.inputCaption,
+  captionClassName: scss.inputCaption,
   captionColor: 'main' as const,
-  showBaseline: 'invisible' as const,
-  disabled: true,
+  showBaseline: 'auto' as const,
 };
 const inputStyle02 = {
-  captionWidth: '90px',
+  captionWidth: '110px',
   gap: '24px',
-  captionClassName: style.inputCaption,
+  captionClassName: scss.inputCaption,
   captionColor: 'main' as const,
-  showBaseline: 'invisible' as const,
-  disabled: true,
+  showBaseline: 'auto' as const,
 };

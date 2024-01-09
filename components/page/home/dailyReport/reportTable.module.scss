@@ -68,7 +68,7 @@
     top: 3px;
     z-index: 1;
     display: grid;
-    grid-template-columns: repeat(4, fit-content(100%)) auto repeat(4, fit-content(100%));
+    grid-template-columns: 50px repeat(4, fit-content(100%)) auto repeat(4, fit-content(100%));
     grid-template-rows: repeat(6, auto);
     height: 75px;
     > .cell {
@@ -103,6 +103,9 @@
         > span {
           white-space: nowrap;
         }
+        &.empty {
+          display: none;
+        }
         &.single {
           grid-column: span 1;
         }
@@ -129,9 +132,17 @@
       align-items: flex-start;
     }
     .row {
+      position: relative;
       display: grid;
-      grid-template-columns: repeat(4, fit-content(100%)) auto repeat(4, fit-content(100%));
+      grid-template-columns: 50px repeat(4, fit-content(100%)) auto repeat(4, fit-content(100%));
       width: 100%;
+      background-color: white;
+      // background-color: pink;
+      // padding-left: 50px;
+      &.isMoving {
+        z-index: 2;
+      }
+
       > .cell {
         display: grid;
         padding: 15px 20px;
@@ -147,6 +158,12 @@
           font-size: 16px;
           color: $colorMain;
         }
+        &.moveCell {
+          padding: 0;
+          > * {
+            margin: auto;
+          }
+        }
         &.rightEdge {
           border-right-width: 0;
         }
@@ -160,6 +177,9 @@
       @screen laptop {
         grid-template-columns: repeat(2, 85px);
         grid-template-rows: unset;
+        .moveCell {
+          display: none;
+        }
         > .cell {
           width: auto;
           padding: 0px 15px;
@@ -173,6 +193,9 @@
           input,
           textarea {
             text-align: center;
+          }
+          &.moveCell {
+            display: none;
           }
           &.single {
             grid-column: span 1;
@@ -188,6 +211,22 @@
           &.stayLength {
             input {
               width: 30px;
+            }
+          }
+          &.textareaCell {
+            place-content: unset;
+            overflow-y: hidden;
+            .textarea {
+              &.customerName {
+                textarea {
+                  max-height: 62px;
+                }
+              }
+              &.description {
+                textarea {
+                  max-height: 300px;
+                }
+              }
             }
           }
         }

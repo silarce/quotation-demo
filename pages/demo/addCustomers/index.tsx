@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { TpostCustomer, apiPostCustomers, customerTypesLookup } from 'js/api/api_customer';
 
 import { Button } from 'antd';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 type SheetData = {
   [key: string]: string;
@@ -44,6 +45,7 @@ function ExcelReader() {
   };
 
   // ------------------------------------------------------------------------
+
   const formatData = () => {
     const dataArr = xlsxData.map((data) => {
       const {
@@ -141,6 +143,10 @@ function ExcelReader() {
 
       try {
         const valuesArr = Object.values(body);
+
+        // 就是要檢查有沒有undefined
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         const haveUndefined = valuesArr.includes(undefined);
 
         if (haveUndefined) {
@@ -166,8 +172,40 @@ function ExcelReader() {
 
   // ------------------------------------------------------------------------
 
+  // TpostCustomer的型別有變更過customerNumber不再是undefined了
+  // 之前後端會自動產生customerNumber，現在不會了
+  // 所以程式必須要修改，要送customerNumber給後端
+  // TpostCustomer的型別有變更過customerNumber不再是undefined了
+  // 之前後端會自動產生customerNumber，現在不會了
+  // 所以程式必須要修改，要送customerNumber給後端
+  // TpostCustomer的型別有變更過customerNumber不再是undefined了
+  // 之前後端會自動產生customerNumber，現在不會了
+  // 所以程式必須要修改，要送customerNumber給後端
+  // TpostCustomer的型別有變更過customerNumber不再是undefined了
+  // 之前後端會自動產生customerNumber，現在不會了
+  // 所以程式必須要修改，要送customerNumber給後端
+  // TpostCustomer的型別有變更過customerNumber不再是undefined了
+  // 之前後端會自動產生customerNumber，現在不會了
+  // 所以程式必須要修改，要送customerNumber給後端
+  // TpostCustomer的型別有變更過customerNumber不再是undefined了
+  // 之前後端會自動產生customerNumber，現在不會了
+  // 所以程式必須要修改，要送customerNumber給後端
+  // TpostCustomer的型別有變更過customerNumber不再是undefined了
+  // 之前後端會自動產生customerNumber，現在不會了
+  // 所以程式必須要修改，要送customerNumber給後端
+  // TpostCustomer的型別有變更過customerNumber不再是undefined了
+  // 之前後端會自動產生customerNumber，現在不會了
+  // 所以程式必須要修改，要送customerNumber給後端
+  // TpostCustomer的型別有變更過customerNumber不再是undefined了
+  // 之前後端會自動產生customerNumber，現在不會了
+  // 所以程式必須要修改，要送customerNumber給後端
+
   // 批次發api
   const batchReq = async () => {
+    myAlert.info({ title: '使用前要請前端工程師查看註解並修改' });
+
+    return;
+
     const dataArr = formatData();
 
     if (dataArr.length === 0) {
@@ -262,6 +300,8 @@ const typesLookup = {
 };
 
 const emptyCustomer = (): TpostCustomer => ({
+  // TpostCustomer的型別有變更過customerNumber不再是undefined
+  customerNumber: '',
   name: '',
   nickname: '',
   principal: '',

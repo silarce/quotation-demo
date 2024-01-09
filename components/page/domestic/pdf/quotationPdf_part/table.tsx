@@ -5,15 +5,14 @@ export default function Table({ partArr, priceTotal }: { partArr: Tpart[]; price
   return (
     <div className={scss.table}>
       <div className={scss.thead}>
-        <div style={{ width: '90px' }}>
+        <div style={{ width: '50px' }}>
           <span>項次:</span>
         </div>
         {keyIndex.map((key, index) => {
-          const { label, style } = config[key];
-          const { width, flex } = style;
+          const { label, style, headStyle } = config[key];
 
           return (
-            <div key={index} style={{ width, flex }}>
+            <div key={index} style={{ ...style, ...headStyle }}>
               <span>{label}</span>
             </div>
           );
@@ -24,8 +23,9 @@ export default function Table({ partArr, priceTotal }: { partArr: Tpart[]; price
         {partArr.map((part, pIndex) => {
           return (
             <div className={scss.row} key={pIndex}>
-              <div style={{ width: '90px' }}>
-                <span>{pIndex}</span>
+              {/* 項次 */}
+              <div style={{ width: '50px' }}>
+                <span>{pIndex + 1}</span>
               </div>
               {keyIndex.map((key, cIndex) => {
                 const { style } = config[key];
@@ -58,14 +58,15 @@ export default function Table({ partArr, priceTotal }: { partArr: Tpart[]; price
 
 type Tpart = {
   partName: string;
-  material: string;
-  unit: string;
+  desc: string;
+  // unit: string;
+  unit: React.ReactNode;
   qty: string;
   price: string;
   totalPrice: string;
 };
 
-type TkeyIndex = 'partName' | 'material' | 'unit' | 'qty' | 'price' | 'totalPrice';
+type TkeyIndex = 'partName' | 'desc' | 'unit' | 'qty' | 'price' | 'totalPrice';
 type Tconfig = {
   [key in TkeyIndex]: {
     label: string;
@@ -74,20 +75,21 @@ type Tconfig = {
       textAlign?: 'left' | 'center' | 'right';
       flex?: string;
     };
+    headStyle?: React.CSSProperties;
   };
 };
 
-const keyIndex: TkeyIndex[] = ['partName', 'material', 'unit', 'qty', 'price', 'totalPrice'];
+const keyIndex: TkeyIndex[] = ['partName', 'desc', 'unit', 'qty', 'price', 'totalPrice'];
 
 const config: Tconfig = {
   partName: {
     label: '名稱',
     style: {
-      width: '300px',
+      width: '260px',
     },
   },
-  material: {
-    label: '材質',
+  desc: {
+    label: '說明',
     style: {
       width: 'auto',
       flex: '1',
@@ -96,28 +98,38 @@ const config: Tconfig = {
   unit: {
     label: '單位',
     style: {
-      width: '80px',
+      width: '60px',
+      textAlign: 'center',
     },
   },
   qty: {
     label: '數量',
     style: {
-      width: '100px',
+      width: '80px',
       textAlign: 'right',
+    },
+    headStyle: {
+      textAlign: 'left',
     },
   },
   price: {
     label: '單價',
     style: {
-      width: '120px',
+      width: '100px',
       textAlign: 'right',
+    },
+    headStyle: {
+      textAlign: 'left',
     },
   },
   totalPrice: {
     label: '金額',
     style: {
-      width: '150px',
+      width: '100px',
       textAlign: 'right',
+    },
+    headStyle: {
+      textAlign: 'left',
     },
   },
 };

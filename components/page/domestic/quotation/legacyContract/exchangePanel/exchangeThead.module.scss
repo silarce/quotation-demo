@@ -1,0 +1,23 @@
+.header {
+  position: sticky !important;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 70px 59px 48px 130px;
+  gap: 25px;
+  padding-left: 20px;
+  padding-right: 30px;
+  background-color: #e7e7e7;
+  border-bottom: solid 5px white;
+  > div {
+    span {
+      font-size: 18px;
+    }
+  }
+  > * {
+    margin: auto;
+    &:nth-last-of-type(1) {
+      margin-right: 0;
+    }
+  }
+}

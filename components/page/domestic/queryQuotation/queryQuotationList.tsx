@@ -1,11 +1,12 @@
 import { useState, MouseEvent } from 'react';
+import Link from 'next/link';
 
 import { useRouter } from 'next/router';
 
 // components
 import Thead from './queryQuotationList/thead';
-import PanelHeader from './queryQuotationList/panelHeader';
-import PanelBody from './queryQuotationList/panelBody';
+import PanelHeader, { Tcontrol_panelHeader } from './queryQuotationList/panelHeader';
+import PanelBody, { Tcontrol_panelBody } from './queryQuotationList/panelBody';
 
 // antd
 import { Collapse } from 'antd';
@@ -13,25 +14,27 @@ import { Collapse } from 'antd';
 // css
 import style from './queryQuotationList.module.scss';
 
-// data type
-// import {
-//   TbudgetList,
-// } from 'fakeDatabase/domestic/budget/fakeBudgetListGroup';
-import { TqueryQuotation } from 'pages/domestic/queryQuotation';
-import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
+// =======================================================================
 
+type Tcontrol = {
+  panelArr: {
+    header: Tcontrol_panelHeader;
+    body: Tcontrol_panelBody[];
+  }[];
+};
+
+export type { Tcontrol as Tcontrol_queryQuotationList };
+
+// =======================================================================
 const { Panel } = Collapse;
-// ========================
+// =======================================================================
 
 export default function QueryQuotationList({
-  queryQuotationList,
-  searchObj,
+  //
+  control,
 }: {
-  queryQuotationList: TqueryQuotation[];
-  searchObj: TsearchObj;
+  control: Tcontrol;
 }) {
-  const router = useRouter();
-
   // panelHeader點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -45,32 +48,15 @@ export default function QueryQuotationList({
       <Thead />
 
       <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
-        {queryQuotationList.map((item, index) => {
-          const { stepList, queryQuotationId } = item;
+        {control.panelArr.map((item, index) => {
+          const { header, body } = item;
           const isActive = activeIndex === index;
 
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-            // router.push(`/domestic/contract/quotation/${quotationId}`)
-            alert('test');
-          };
-
-          // ===========================
-          // 搜尋過濾
-          const regQueryQuotationId = new RegExp(searchObj.queryQuotationId ?? '');
-
-          if (!regQueryQuotationId.test(queryQuotationId)) {
-            return null;
-          }
           // ===========================
 
           return (
-            <Panel
-              key={index}
-              className={style.panel}
-              header={<PanelHeader queryQuotation={item} isActive={isActive} openQuotation={openQuotation} />}
-            >
-              <PanelBody stepList={stepList} />
+            <Panel key={index} className={style.panel} header={<PanelHeader control={header} isActive={isActive} />}>
+              <PanelBody control={body} />
             </Panel>
           );
         })}

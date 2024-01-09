@@ -2,10 +2,14 @@
 
 .label {
   position: relative;
-  display: grid;
-  grid-template-columns: fit-content(100%) auto;
-  align-items: center;
 
+  // display: grid;
+  // grid-template-columns: fit-content(100%) auto;
+
+  display: flex;
+  flex-wrap: nowrap;
+
+  align-items: center;
   gap: 20px;
   width: 100%;
 
@@ -13,6 +17,7 @@
     margin-left: 0;
   }
   .caption {
+    flex: none;
     font-weight: 500;
     font-size: 20px;
     color: $colorText;
@@ -24,6 +29,9 @@
     &.colorMain {
       color: $colorMain;
     }
+  }
+  .suffix {
+    flex: none;
   }
 
   .hr {
@@ -344,7 +352,10 @@ div.fontSize20px {
       padding: 0;
       font-size: 18px;
       font-weight: 400;
-      font-family: "Noto Sans TC", sans-serif;
+      font-family:
+        "Noto Sans TC",
+        sans-serif,
+        Microsoft JhengHei;
       height: auto;
       line-height: inherit;
     }

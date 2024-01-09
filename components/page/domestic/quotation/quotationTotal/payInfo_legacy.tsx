@@ -12,7 +12,7 @@ import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/
 import style from './payInfo.module.scss';
 
 // type
-import { Class_legacyContract } from 'hooks/quotation/useLegacyContract';
+import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 export default function PayInfo_legacy({
   legacyContract,
@@ -109,7 +109,7 @@ export default function PayInfo_legacy({
         </div>
         <div className={classNames(style.inputBox01, style.date)}>
           <span className={'relative'}>
-            <MustTip_simple />
+            {/* <MustTip_simple /> */}
             交貨日期
           </span>
           <InputSel

@@ -1,131 +1,187 @@
 import { useState } from 'react';
-import { format } from 'date-fns';
+import classNames from 'classnames';
 
-// components
-import ClientSelector from './modal/clientSelector';
 // glogal gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
-import InputSelBar_address from 'components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import AddressBar, { TaddressProps } from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+
+import CustomerSelector from 'components/global/gear/modal/customerSelector';
 
 // icon
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
 
+// config
+import { customerTypesLookup } from 'js/api/api_customer';
+
 // css
 import scss from './quotationProfile.module.scss';
 
-import { Class_basicInfo } from 'hooks/quotation/useQuotation';
 import { Toption } from 'js/utils/options/countryAndDistrict';
-import { Class_client } from 'fakeDatabase/fakeAPI/fakeClientApi';
 
 // ====================================================
-const inputStyle = {
-  captionWidth: '80px',
-  gap: '24px',
+import { TcustomerDto } from 'js/api/dtoTypes';
+import { TcustomerDto_TC } from 'js/api/api_customer';
+// ====================================================
+
+const wrapperStyle = {
   padding: '21px 0px 4px 0px',
-  labelWidth: '80px',
+  gap: '24px',
+};
+const captionStyle = {
+  width: '80px',
 };
 
-// ====================================================
+const inputSelProps: TinputSelProps = {
+  wrapperStyle,
+  captionStyle,
+};
+
+// -----------------------------------------------------------------------
+
+type TcontrolItem = {
+  value: string;
+  onChange?: (v: string) => void;
+};
+
+type Tcontrol = {
+  quotationNumber: string; // 報價編號
+  quotationDate: string; // 報價日期
+  // customer: TcustomerDto;
+  customer: {
+    value: TcustomerDto | undefined | null;
+    onChange?: (v: TcustomerDto) => void;
+    onClear?: () => void;
+  };
+  //
+  itemList: {
+    validityPeriod: TcontrolItem; // 報價時效
+    projectName: TcontrolItem; // 工程名稱
+    county: TcontrolItem; // 縣市
+    district: TcontrolItem; // 區
+    address: TcontrolItem;
+    contactPerson: TcontrolItem; //  聯絡人
+    contactNumber: TcontrolItem; //  聯絡電話
+    faxNumber: TcontrolItem; // 傳真號碼
+    trackProgress: TcontrolItem;
+    projectProgress: TcontrolItem;
+  };
+};
+
+export type { Tcontrol as Tcontrol_profile };
+
+// =================================================================
 export default function QuotationProfile({
-  classBasicInfo,
-  fakeClientList,
+  //
   disabled = false,
+  control,
 }: {
-  classBasicInfo: Class_basicInfo;
-  fakeClientList: ReturnType<Class_client['get']>;
   disabled: boolean;
+  control: Tcontrol;
 }) {
-  // ==============================================
+  // ----------------------------------------------------------------
 
-  // 報價單資料
-  const { basicInfo, clientProfile } = classBasicInfo.all;
+  const [showModal, setShowModal] = useState(false);
+  const openModal = () => (disabled ? '' : setShowModal(true));
+  // ----------------------------------------------------------------
+
+  const { quotationNumber, quotationDate, customer, itemList } = control;
+
   const {
-    quotationId,
-    tempQuotationAging,
-    date,
-    constructionName,
-    constructionCounty,
-    constructionDistrict,
-    constructionAddress,
-    trackingStatus,
-    siteProgress,
-  } = basicInfo;
+    validityPeriod,
+    projectName,
+    county,
+    district,
+    address,
+    contactPerson,
+    contactNumber,
+    faxNumber,
+    trackProgress,
+    projectProgress,
+  } = itemList;
 
-  const { name: clientName, fax, clientState, contact } = clientProfile ?? {};
-
-  const { setBasicInfoString } = classBasicInfo;
-
-  // ----------------------------------
-  const builtDate = format(new Date(date), 'yyy年MM月dd日');
-  // ----------------------------------
-  // ==============================================
-
-  // ==============================================
+  // ----------------------------------------------------------------
   // 客戶資料
   const theClientData = [
-    { label: '聯絡人', placeholder: '尚未選擇', value: contact?.[0].name },
-    { label: '聯絡電話', placeholder: '尚未選擇', value: contact?.[0].phone },
-    { label: '傳真號碼', placeholder: '尚未選擇', value: fax },
-  ];
+    { key: 'contactPerson', label: '聯絡人', placeholder: '尚未選擇' },
+    { key: 'contactNumber', label: '聯絡電話', placeholder: '尚未選擇' },
+    { key: 'faxNumber', label: '傳真號碼', placeholder: '尚未選擇' },
+  ] as const;
 
-  // ==============================================
+  // 工程地點
+
+  const addressProps: TaddressProps = {
+    county: {
+      props: {
+        isDisabled: disabled,
+        value: county.value ? { value: county.value, label: county.value } : null,
+        onChange: (option: Toption | null) => {
+          county.onChange?.(option?.value ?? '');
+          district.onChange?.('');
+        },
+      },
+    },
+    district: {
+      props: {
+        isDisabled: disabled,
+        value: district.value ? { value: district.value, label: district.value } : null,
+        onChange: (option: Toption | null) => {
+          district.onChange?.(option?.value ?? '');
+        },
+      },
+    },
+    address: {
+      props: {
+        disabled,
+        className: 'overflow-hidden',
+        value: address.value,
+        onChange: (e) => {
+          address.onChange?.(e.target.value);
+        },
+      },
+    },
+  };
+
+  // ----------------------------------------------------------------
+
+  const customerTypes = customer.value?.types.map((type) => customerTypesLookup[type.name]).join('/');
+  const styleHaveState = customerTypes ? scss.haveState : '';
+
+  // ----------------------------------------------------------------
+  const customeSelConfirm = (v: TcustomerDto_TC[]) => {
+    if (v.length === 0) {
+      return;
+    }
+
+    customer.onChange?.(v[0]);
+  };
+
   const clearClient = () => {
     if (disabled) {
       return;
     }
 
-    classBasicInfo.clientProfile = undefined;
+    customer.onClear?.();
   };
 
-  // ==============================================
-  const styleHaveState = clientState ? scss.haveState : '';
-  // ==============================================
-  // 工程地點
-  const selectInputList = {
-    county: constructionCounty,
-    onChangeCounty: (option: Toption | null) => {
-      if (!option) {
-        return;
-      }
-
-      setBasicInfoString('constructionCounty', option.value);
-      setBasicInfoString('constructionDistrict', '');
-    },
-    district: constructionDistrict,
-    onChangeDistrict: (option: Toption | null) => {
-      if (!option) {
-        return;
-      }
-
-      setBasicInfoString('constructionDistrict', option.value);
-    },
-    address: constructionAddress,
-    onChangeAddress: (value: string) => setBasicInfoString('constructionAddress', value),
-  };
-
-  // ==============================================
-  // modal
-  const [showModal, setShowModal] = useState(false);
-  const openModal = () => (disabled ? '' : setShowModal(true));
-
-  const onConfirmClient = (client: ReturnType<Class_client['get']>[0]) => {
-    classBasicInfo.clientProfile = client;
-  };
-
-  // ==============================================
-
+  // ----------------------------------------------------------------------
   return (
     <div className={scss.container}>
       <div className={scss.profile}>
-        <span className={`${scss.clientState}  ${styleHaveState}`}>狀態 : {clientState || '尚未選擇客戶'}</span>
+        <span className={classNames(scss.clientState, styleHaveState)}>
+          客戶類別 : {customerTypes || '尚未選擇客戶'}
+        </span>
         <InputSel
-          label="工程名稱"
+          caption="工程名稱"
           disabled={disabled}
-          {...{ ...inputStyle }}
-          inputProps={{
-            value: constructionName,
-            onChange: (v) => {
-              setBasicInfoString('constructionName', v);
+          {...inputSelProps}
+          textareaProps={{
+            props: {
+              value: projectName.value,
+              onChange: (e) => {
+                projectName.onChange?.(e.target.value);
+              },
+              className: 'overflow-hidden',
+              // style: { height: '40px' },
             },
           }}
         />
@@ -134,40 +190,66 @@ export default function QuotationProfile({
           <div className={`${scss.clientName} ${disabled ? scss.disabled : ''}`}>
             <div>
               <InputSel
-                label={'客戶名稱'}
-                placeholder={''}
+                caption={'客戶名稱'}
                 disabled={true}
                 showBaseline="invisible"
                 captionClassName={scss.input02}
-                captionWidth={inputStyle.captionWidth}
-                gap={inputStyle.gap}
+                captionStyle={{ width: captionStyle.width }}
+                wrapperStyle={{ gap: wrapperStyle.gap }}
                 textareaProps={{
-                  value: clientName ?? '',
-                  onChange: () => {},
+                  props: {
+                    placeholder: undefined,
+                    value: customer.value?.name ?? '',
+                    className: 'overflow-hidden',
+                    // style: { height: 30 },
+                  },
                 }}
               />
-              {!clientName && <button onClick={openModal}>請選擇客戶</button>}
-              {clientName && !disabled && <IconRemove02 onClick={clearClient} />}
+              {!customer.value && (
+                <>
+                  <button className={scss.btnSelectCustomer} onClick={openModal}>
+                    請選擇客戶
+                  </button>
+                  <button
+                    className={scss.btnAddCustomer}
+                    onClick={() => {
+                      // router.push({
+                      //   pathname: '/domestic/customer/add',
+                      //   query: { shouldReDeirector: true },
+                      // });
+                      window.open('/domestic/customer/add?reDeirectorToEdit=true', '_blank');
+                    }}
+                  >
+                    新增客戶
+                  </button>
+                </>
+              )}
+              {customer.value && !disabled && <IconRemove02 onClick={clearClient} />}
             </div>
           </div>
 
           <div>
-            {/* 客戶名稱，聯絡人，連絡電話，傳真號碼 */}
+            {/* 聯絡人，連絡電話，傳真號碼 */}
             {theClientData.map((item, index) => {
-              const { label, value, placeholder } = item;
+              const { key, label, placeholder } = item;
 
               return (
                 <InputSel
                   key={index}
-                  label={label}
-                  placeholder={placeholder}
+                  caption={label}
                   captionClassName={scss.input02}
-                  disabled={true}
-                  showBaseline="invisible"
-                  {...{ ...inputStyle }}
+                  // disabled={true}
+                  showBaseline="auto"
+                  disabled={disabled}
+                  {...inputSelProps}
                   inputProps={{
-                    value: value ?? '',
-                    onChange: () => {},
+                    props: {
+                      placeholder: placeholder,
+                      value: itemList[key].value,
+                      onChange: (e) => {
+                        itemList[key].onChange?.(e.target.value);
+                      },
+                    },
                   }}
                 />
               );
@@ -175,58 +257,112 @@ export default function QuotationProfile({
           </div>
           <div>
             <InputSel
-              label="追蹤狀態"
+              caption="追蹤狀態"
               captionClassName={scss.input02}
               showBaseline="auto"
               disabled={disabled}
-              {...{ ...inputStyle }}
+              {...inputSelProps}
               inputProps={{
-                value: trackingStatus,
-                onChange: (v) => {
-                  setBasicInfoString('trackingStatus', v);
+                props: {
+                  value: trackProgress.value,
+                  onChange: (e) => {
+                    trackProgress.onChange?.(e.target.value);
+                  },
                 },
               }}
             />
 
             <InputSel
-              label="工地進度"
+              caption="工地進度"
               captionClassName={scss.input02}
               showBaseline="auto"
               disabled={disabled}
-              {...{ ...inputStyle }}
+              {...inputSelProps}
               inputProps={{
-                value: siteProgress,
-                onChange: (v) => {
-                  setBasicInfoString('siteProgress', v);
+                props: {
+                  value: projectProgress.value,
+                  onChange: (e) => {
+                    projectProgress.onChange?.(e.target.value);
+                  },
                 },
               }}
             />
           </div>
-        </div>{' '}
+        </div>
         {/* form02 */}
-        <InputSelBar_address
-          label="工程地點"
-          captionClassName={scss.input02}
-          showBaseline="auto"
-          {...{ ...inputStyle }}
-          addressProps={selectInputList}
-          disabled={disabled}
+        <AddressBar
+          addressProps={addressProps}
+          inputSelProps={{
+            caption: '工程地點',
+            disabled,
+            captionClassName: scss.input02,
+            showBaseline: 'auto',
+            captionStyle,
+            wrapperStyle: { padding: wrapperStyle.padding, gap: wrapperStyle.gap },
+          }}
         />
       </div>
 
       <div className={scss.time}>
-        <span>報價編號</span>
-        <span>{quotationId}</span>
-        <span>報價時效</span>
-        <span>{tempQuotationAging}天內</span>
-        <span>報價日期</span>
-        <span>{builtDate}</span>
+        <div>
+          <InputSel
+            disabled={true}
+            caption="報價編號"
+            showBaseline="invisible"
+            captionClassName={scss.caption}
+            wrapperStyle={{ gap: wrapperStyle.gap }}
+            inputProps={{
+              props: {
+                value: quotationNumber ?? '',
+                placeholder: '系統自動設定',
+              },
+            }}
+          />
+        </div>
+        <div>
+          <InputSel
+            caption="報價時效"
+            showBaseline="auto"
+            disabled={disabled}
+            suffix="天內"
+            suffixClassName="text-[18px]"
+            captionClassName={scss.caption}
+            wrapperStyle={{ gap: wrapperStyle.gap }}
+            inputProps={{
+              props: {
+                value: validityPeriod.value,
+                onChange: (e) => {
+                  validityPeriod.onChange?.(e.target.value);
+                },
+              },
+            }}
+          />
+        </div>
+        <div>
+          <InputSel
+            disabled={true}
+            caption="報價日期"
+            showBaseline="invisible"
+            captionClassName={scss.caption}
+            wrapperStyle={{ gap: wrapperStyle.gap }}
+            inputProps={{
+              props: {
+                value: quotationDate ?? '',
+                placeholder: '系統自動設定',
+              },
+            }}
+          />
+        </div>
       </div>
 
       {/* modal */}
-      <ClientSelector {...{ showModal, setShowModal }} fakeClientList={fakeClientList} onConfirm={onConfirmClient} />
+      <CustomerSelector
+        label="請選擇客戶"
+        selLimit={1}
+        showModal={showModal}
+        onConfirm={customeSelConfirm}
+        onCancel={() => setShowModal(false)}
+      />
     </div>
   );
 }
-
-// ===================================================

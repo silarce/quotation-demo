@@ -1,0 +1,83 @@
+@use "styles/theme01" as *;
+
+.modal {
+  :global(.ant-modal-content) {
+    width: 620px;
+    height: 490px;
+    padding: 19px 30px;
+    padding-bottom: 24px;
+  }
+  :global(.ant-modal-body) {
+    padding: 0;
+    height: 100%;
+    // margin-bottom: 19px;
+  }
+  :global(.ant-modal-footer) {
+    padding: 0;
+  }
+}
+
+.container {
+  display: grid;
+  grid-template-rows: fit-content(100%) auto fit-content(100%);
+  height: 100%;
+}
+.header {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 11px;
+  @screen laptop {
+    grid-template-columns: auto;
+    justify-content: unset;
+    width: 100%;
+  }
+}
+.left {
+  margin: auto;
+  margin-left: 0;
+  // .filler {  }
+  .label {
+    display: inline-block;
+    margin-right: 14px;
+    font-weight: 400;
+    font-size: 18px;
+    color: $colorMain;
+  }
+  .tip {
+    display: inline-block;
+    font-weight: 400;
+    font-size: 14px;
+    color: red;
+  }
+  @screen laptop {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    width: 100%;
+    .tip {
+      margin: auto;
+      margin-right: 0;
+    }
+  }
+}
+.right.plus {
+  width: 100%;
+}
+
+.body {
+  padding: 0 4px;
+  border: solid 1px $colorBorder01;
+  margin-bottom: 19px;
+  overflow: auto;
+}
+
+.foo {
+  display: flex;
+  justify-content: center; /* 將內容水平置中 */
+  align-items: center; /* 將內容垂直置中 */
+}
+
+.foo > div:nth-child(2) {
+  margin-left: auto; /* 將第二個 div 靠右對齊 */
+}

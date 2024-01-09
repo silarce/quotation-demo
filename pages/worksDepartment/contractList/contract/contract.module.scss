@@ -1,10 +1,6 @@
 @use "styles/layout" as *;
 @use "styles/theme01" as *;
 
-// 工程聯絡單
-.workContactDoc {
-}
-
 // ==================================================
 // 出庫單
 .outboundOrder {
@@ -13,6 +9,15 @@
 
   .remark {
     margin-top: 40px;
+    .title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      button {
+        width: fit-content;
+      }
+    }
+
     .textarea {
       height: 175px;
       border: solid 1px $colorBorder01;
@@ -23,10 +28,8 @@
         resize: none;
         font-weight: 400;
         font-size: 18px;
+        background-color: transparent;
       }
-    }
-    .title {
-      margin-bottom: 15px;
     }
   }
 
@@ -36,6 +39,7 @@
     > div {
       display: grid;
       grid-template-columns: 75px auto;
+      align-items: center;
       gap: 20px;
       > span {
         font-weight: 400;
@@ -44,6 +48,10 @@
           color: $colorMain;
         }
       }
+    }
+    .btnBar {
+      display: flex;
+      gap: 20px;
     }
   }
 }
@@ -55,4 +63,8 @@
   > hr {
     border-color: red;
   }
+}
+
+.hidden {
+  visibility: hidden;
 }

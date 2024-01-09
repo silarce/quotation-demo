@@ -9,6 +9,7 @@ class Class_customer {
   constructor(reRender: () => void, customerOri: TcustomerDto_TC) {
     this._reRender = reRender;
     this._customerData = _.cloneDeep(customerOri);
+
     this._classContactArr = this._customerData.contacts.map(
       (contact) => new Class_customerContact(this._reRender, contact)
     );
@@ -40,18 +41,21 @@ class Class_customer {
     return this._typesArr;
   }
   addType = (v: TpostCustomer['types'][number]) => {
-    console.log(this);
     this._typesArr.push(v);
     this._reRender();
   };
   removeType = (index: number) => {
-    console.log(this);
     this._typesArr.splice(index, 1);
     this._reRender();
   };
 
   get customerNumber() {
-    return this._customerData.customerNumber;
+    return this._customerData.customerNumber || '';
+  }
+
+  set customerNumber(str) {
+    this._customerData.customerNumber = str;
+    this._reRender();
   }
 
   get name() {
@@ -147,10 +151,22 @@ class Class_customer {
   }
 
   get postBody(): TpostCustomer {
+    const contactArr = this._classContactArr.map((contact) => contact.postBody);
+
+    // 如果只有一個聯絡人，而且沒有name跟phone，就不要傳
+    if (contactArr.length === 1) {
+      const { name, phone } = contactArr[0];
+
+      if (!name && !phone) {
+        contactArr.pop();
+      }
+    }
+
     return {
       ...this._customerData,
-      customerNumber: undefined,
+      // customerNumber: undefined,
       types: this._typesArr,
+      contacts: contactArr,
     };
   }
 } // Class_customer

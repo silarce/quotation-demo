@@ -1,31 +1,58 @@
-import { Dispatch, SetStateAction } from 'react';
-import { useRouter } from 'next/router';
+import { useState } from 'react';
+import classNames from 'classnames';
+
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 
 // css
 import style from './dispatchList.module.scss';
 
-// fake
-import type { TfakeProfile } from 'pages/worksDepartment/contractList/contract/dispatchList';
-import type { TdispatchEmpty } from 'pages/worksDepartment/contractList/contract/dispatchList/add';
+type Tprofile01 = {
+  projectName: string;
+  contractor: string;
+  contractorContactPerson: string;
+  constructionSiteContactNumber: string;
+  allAddress: string;
+  projectNumber: string;
+  badgeNumber: string;
+};
 
+type Tprofile02 = {
+  dispatchDate: string;
+  // workerName: string;
+  finalContactPerson: string;
+};
+
+type Tprofile03 = {
+  workerEmployee: TemployeeDto | undefined;
+};
+
+export type { Tprofile01, Tprofile02, Tprofile03 };
+
+// ============================================================================
 export default function Profile({
-  profile,
-  setProfile,
+  profile01,
+  onProfile01Change,
   profile02,
-  setProfile02,
+  onProfile02Change,
+  profile03,
+  onProfile03Change,
+  disabled,
 }: {
-  profile: Partial<TfakeProfile>;
-  setProfile: Dispatch<SetStateAction<Partial<TfakeProfile>>>;
-  profile02?: TdispatchEmpty;
-  setProfile02?: Dispatch<SetStateAction<TdispatchEmpty>>;
+  profile01: Tprofile01 | undefined;
+  onProfile01Change: (key: keyof Tprofile01, v: string) => void;
+  profile02?: Tprofile02;
+  onProfile02Change?: (key: keyof Tprofile02, v: string) => void;
+  profile03?: Tprofile03;
+  onProfile03Change?: (key: keyof Tprofile03, v: TemployeeDto) => void;
+  disabled?: boolean;
 }) {
   // ------------------------------------------------
-  const router = useRouter();
-  const isAdd = router.route.split('/').pop() === 'add';
+
+  const [showSelector, setShowSelector] = useState(false);
+
   // ------------------------------------------------
-  const { 派工日期, 工務人員, 完工聯絡人 } = profile02 ?? {};
 
   return (
     <div className={style.profile}>
@@ -33,15 +60,14 @@ export default function Profile({
       <div className={style.left}>
         {profile02 && (
           <InputSel
-            className={`${style.input02}`}
-            inputProps={{
-              value: 派工日期 ?? '',
-              onChange: (v: string) => {
-                setProfile02!((data) => {
-                  data.派工日期 = v;
-
-                  return { ...data };
-                });
+            disabled={disabled}
+            // className={`${style.input02}`}
+            className={classNames(style.input02)}
+            datePickerProps={{
+              datePickerClassName: style.datePicker,
+              value: profile02.dispatchDate ?? '',
+              onChange02: (m) => {
+                onProfile02Change?.('dispatchDate', m?.toISOString() ?? '');
               },
             }}
             label={'派工日期'}
@@ -54,15 +80,11 @@ export default function Profile({
         )}
 
         {indexKeys01.map((key, index) => {
-          const value = profile[key] ?? '';
-          const { label, labelWidth } = config[key];
+          const value = profile01?.[key] ?? '';
+          const { label, labelWidth, disabled: disabled_2, showBaseline } = config[key];
 
           const onChange = (v: string) => {
-            setProfile((data) => {
-              data[key] = v;
-
-              return { ...data };
-            });
+            onProfile01Change(key, v);
           };
 
           return (
@@ -74,8 +96,9 @@ export default function Profile({
               captionWidth={labelWidth}
               captionColor="main"
               gap={'24px'}
-              disabled={true}
-              showBaseline="invisible"
+              disabled={disabled || disabled_2}
+              // showBaseline="invisible"
+              showBaseline={showBaseline ?? 'invisible'}
             />
           );
         })}
@@ -84,131 +107,178 @@ export default function Profile({
       {/* right */}
       <div className={style.right}>
         {indexKeys02.map((key, index) => {
-          const value = profile[key] ?? '';
+          const value = profile01?.[key] ?? '';
           const { label, labelWidth } = config[key];
 
           const onChange = (v: string) => {
-            setProfile((data) => {
-              data[key] = v;
-
-              return { ...data };
-            });
+            onProfile01Change(key, v);
           };
 
-          let styleShowUnderline = '';
+          // let styleShowUnderline = '';
 
-          if (key === '工程編號') {
-            styleShowUnderline = style.showUnderline;
-          }
+          // if (key === 'projectNumber') {
+          //   styleShowUnderline = style.showUnderline;
+          // }
 
-          if (key === '管制卡編號' && !isAdd) {
-            styleShowUnderline = style.showUnderline;
-          }
+          // if (key === 'badgeNumber' && !isAdd) {
+          //   styleShowUnderline = style.showUnderline;
+          // }
 
-          const className = `${style.input02} ${styleShowUnderline}`;
+          // const className = `${style.input02} ${styleShowUnderline}`;
+          const className = `${style.input02}`;
 
           return (
             <InputSel
               className={className}
               key={index}
+              disabled={disabled}
               inputProps={{ value, onChange }}
               label={label}
               captionWidth={labelWidth}
               captionColor="main"
               gap={'24px'}
-              disabled={styleShowUnderline ? true : false}
+              // disabled={styleShowUnderline ? true : false}
             />
           );
         })}
         {/*  */}
-        {indexKeys03.map((key, index) => {
-          if (!profile02) {
-            return null;
-          }
 
-          const value = profile02[key];
-          const { label, labelWidth } = config[key];
-
-          const onChange = (v: string) => {
-            setProfile((data) => {
-              profile02[key] = v;
-
-              return { ...data };
-            });
-          };
-
-          return (
+        {profile03 && (
+          <div
+            onClick={() => {
+              if (!disabled) {
+                setShowSelector(true);
+              }
+            }}
+          >
             <InputSel
+              disabled={disabled}
               className={`${style.input02}`}
-              key={index}
-              inputProps={{ value, onChange }}
-              label={label}
-              captionWidth={labelWidth}
+              inputProps={{
+                value: profile03?.workerEmployee?.chName ?? '',
+                // onChange: (v) => {
+                //   onProfile02Change?.('workerName', v);
+                // },
+              }}
+              label={'工務人員'}
+              captionWidth={'100px'}
               captionColor="main"
               gap={'24px'}
             />
-          );
-        })}
+          </div>
+        )}
+
+        {profile02 && (
+          <InputSel
+            className={`${style.input02}`}
+            disabled={disabled}
+            inputProps={{
+              value: profile02?.finalContactPerson ?? '',
+              onChange: (v) => {
+                onProfile02Change?.('finalContactPerson', v);
+              },
+            }}
+            label={'完工聯絡人'}
+            captionWidth={'100px'}
+            captionColor="main"
+            gap={'24px'}
+          />
+        )}
       </div>
+
+      <EmployeeSelector
+        showModal={showSelector}
+        selLimit={1}
+        onConfirm={(arr) => {
+          onProfile03Change?.('workerEmployee', arr[0]);
+        }}
+        onCancel={() => {
+          setShowSelector(false);
+        }}
+      />
     </div>
   );
 }
 // ============================================================
 
-type TindexKey01 = keyof Pick<TfakeProfile, '工程名稱' | '承包商' | '聯絡人' | '工地電話' | '工程地點'>;
-type TindexKey02 = keyof Pick<TfakeProfile, '工程編號' | '管制卡編號'>;
-type TindexKey03 = keyof Pick<TdispatchEmpty, '工務人員' | '完工聯絡人'>;
+type TindexKey01 = keyof Pick<
+  Tprofile01,
+  'projectName' | 'contractor' | 'contractorContactPerson' | 'constructionSiteContactNumber' | 'allAddress'
+>;
+type TindexKey02 = keyof Pick<Tprofile01, 'projectNumber' | 'badgeNumber'>;
+// type TindexKey03 = keyof Pick<Tprofile02, 'workerName' | 'finalContact'>;
 
-const indexKeys01: TindexKey01[] = ['工程名稱', '承包商', '聯絡人', '工地電話', '工程地點'];
-const indexKeys02: TindexKey02[] = ['工程編號', '管制卡編號'];
-const indexKeys03: TindexKey03[] = ['工務人員', '完工聯絡人'];
+const indexKeys01: TindexKey01[] = [
+  'projectName',
+  'contractor',
+  'contractorContactPerson',
+  'constructionSiteContactNumber',
+  'allAddress',
+];
+const indexKeys02: TindexKey02[] = [
+  'projectNumber',
+  // 'badgeNumber'
+];
+// const indexKeys03: TindexKey03[] = ['workerName', 'finalContact'];
 
 type Tconfig<keys extends string> = {
   [key in keys]: {
     label: string;
     labelWidth: string;
+    disabled?: boolean;
+    showBaseline?: 'invisible' | 'auto';
   };
 };
 
-const config: Tconfig<TindexKey01 | TindexKey02 | TindexKey03> = {
-  工程名稱: {
+const config: Tconfig<
+  TindexKey01 | TindexKey02
+  // | TindexKey03
+> = {
+  projectName: {
     label: '工程名稱',
     labelWidth: '80px',
+    disabled: true,
   },
-  承包商: {
+  contractor: {
     label: '承包商',
     labelWidth: '80px',
+    showBaseline: 'auto',
+    // disabled: true,
   },
-  聯絡人: {
+  contractorContactPerson: {
     label: '聯絡人',
     labelWidth: '80px',
+    showBaseline: 'auto',
   },
-  工地電話: {
+  constructionSiteContactNumber: {
     label: '工地電話',
     labelWidth: '80px',
+    showBaseline: 'auto',
+    // disabled: true,
   },
-  工程地點: {
+  allAddress: {
     label: '工程地點',
     labelWidth: '80px',
+    disabled: true,
   },
   // TindexKey02
-  工程編號: {
+  projectNumber: {
     label: '工程編號',
     labelWidth: '100px',
   },
-  管制卡編號: {
+  badgeNumber: {
     label: '管制卡編號',
     labelWidth: '100px',
   },
   // TindexKey03
-  工務人員: {
-    label: '工務人員',
-    labelWidth: '100px',
-  },
-  完工聯絡人: {
-    label: '完工聯絡人',
-    labelWidth: '100px',
-  },
+  // workerName: {
+  //   label: '工務人員',
+  //   labelWidth: '100px',
+  // },
+  // finalContact: {
+  //   label: '完工聯絡人',
+  //   labelWidth: '100px',
+  // },
 };
 
 // ==========================================

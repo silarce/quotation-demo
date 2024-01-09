@@ -1,6 +1,7 @@
 import { useState, Fragment } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import classNames from 'classnames';
 
 // type
 import { UrlObject } from 'url';
@@ -17,6 +18,7 @@ interface Ttag {
 interface Tlink {
   label: string;
   href: string | UrlObject;
+  disabled?: boolean;
 }
 
 export default function PageHeaderFlex01({
@@ -24,7 +26,7 @@ export default function PageHeaderFlex01({
   linkList = [],
 }: {
   tagList?: Ttag[]; // 左邊的多個標籤，帶click事件
-  linkList?: Tlink[]; // 左邊的標籤，不過是Link
+  linkList?: (Tlink | null)[]; // 左邊的標籤，不過是Link
 }) {
   const [active, setActive] = useState(0);
 
@@ -78,8 +80,12 @@ export default function PageHeaderFlex01({
 
     return (
       <>
-        {linkList.map((config, index) => {
-          const { label, href } = config;
+        {linkList.map((props, index) => {
+          if (!props) {
+            return null;
+          }
+
+          const { label, href, disabled } = props;
           let hrefPathname: string;
 
           if (typeof href === 'string') {
@@ -89,10 +95,19 @@ export default function PageHeaderFlex01({
           }
 
           const reg = new RegExp(`^${hrefPathname}`);
-          const isActive = reg.test(router.pathname) ? style.active : '';
+          const isActive = reg.test(router.pathname);
+
+          if (disabled) {
+            return (
+              <span className={style.fakeA} key={index}>
+                <span>{label}</span>
+                <hr className={style.bottomBar} />
+              </span>
+            );
+          }
 
           return (
-            <Link className={isActive} href={href} key={index}>
+            <Link className={classNames(isActive && style.active)} href={href} key={index}>
               <span>{label}</span>
               <hr className={style.bottomBar} />
             </Link>

@@ -251,6 +251,82 @@ export const IconCross01 = (props: SVGProps<SVGSVGElement>) => {
   );
 };
 
+function IconChain(props: SVGProps<SVGSVGElement>) {
+  const className = getClassName(props);
+
+  return (
+    <svg
+      {...{ ...props, className }}
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="7"
+      viewBox="0 0 20 7"
+      fill="none"
+    >
+      <path
+        d="M9 2V2C9 1.17157 8.32843 0.5 7.5 0.5H3C1.89543 0.5 1 1.39543 1 2.5V4.5C1 5.60457 1.89543 6.5 3 6.5H7.5C8.32843 6.5 9 5.82843 9 5V5"
+        stroke="#14256A"
+        strokeLinecap="round"
+      />
+      <path
+        d="M11 2V2C11 1.17157 11.6716 0.5 12.5 0.5H17C18.1046 0.5 19 1.39543 19 2.5V4.5C19 5.60457 18.1046 6.5 17 6.5H12.5C11.6716 6.5 11 5.82843 11 5V5"
+        stroke="#14256A"
+        strokeLinecap="round"
+      />
+      <path d="M6 3.5H14" stroke="#14256A" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconBreakChain(props: SVGProps<SVGSVGElement>) {
+  const className = getClassName(props);
+
+  return (
+    <svg
+      {...{ ...props, className }}
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="16"
+      viewBox="0 0 20 16"
+      fill="none"
+    >
+      <path
+        d="M9 7V7C9 6.17157 8.32843 5.5 7.5 5.5H3C1.89543 5.5 1 6.39543 1 7.5V9.5C1 10.6046 1.89543 11.5 3 11.5H7.5C8.32843 11.5 9 10.8284 9 10V10"
+        stroke="#14256A"
+        strokeLinecap="round"
+      />
+      <path d="M6 8.5H9" stroke="#14256A" strokeLinecap="round" />
+      <path
+        d="M11.8564 7.86637V7.86637C12.1981 7.11173 13.0869 6.77702 13.8416 7.11878L17.9408 8.97521C18.947 9.43089 19.3933 10.616 18.9376 11.6222L18.1125 13.444C17.6569 14.4502 16.4718 14.8965 15.4656 14.4408L11.3663 12.5844C10.6117 12.2427 10.277 11.3538 10.6187 10.5992V10.5992"
+        stroke="#14256A"
+        strokeLinecap="round"
+      />
+      <path d="M11.2383 9.23279L13.9711 10.4704" stroke="#14256A" strokeLinecap="round" />
+      <path d="M12.073 3.47432L12.5947 1.54358" stroke="#14256A" strokeLinecap="round" />
+      <path d="M8.81758 3.43537L8.47266 1.46533" stroke="#14256A" strokeLinecap="round" />
+      <path d="M14.7576 5.04058L16.0479 3.51245" stroke="#14256A" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconTearing(props: SVGProps<SVGSVGElement>) {
+  const className = getClassName(props);
+
+  return (
+    <svg
+      {...{ ...props, className }}
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="14"
+      viewBox="0 0 18 14"
+      fill="none"
+    >
+      <path d="M1 13V0.5H9.5L6.5 4.5L9 7L6.5 9.5L8 13H1Z" stroke="#14256A" />
+      <path d="M10 4.5L13 0.5H17V13H11L9.5 10L12.5 7L10 4.5Z" stroke="#14256A" />
+    </svg>
+  );
+}
+
 export {
   IconDelete01, //垃圾桶icon
   IconEdit,
@@ -260,4 +336,7 @@ export {
   IconAddCircle,
   IconRemoveCircle,
   IconRemove02,
+  IconChain,
+  IconBreakChain,
+  IconTearing,
 };
