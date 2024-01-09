@@ -1,35 +1,93 @@
 import styled from '@emotion/styled';
 import React, { Fragment } from 'react';
-import { useRouter } from 'next/router';
 
 // css
 import style from './powerTransmissionSpareList.module.scss';
 
-export default function Sheet({ editable }: { editable: boolean }) {
-  const router = useRouter();
-  const isAdd = router.route.split('/').pop() === 'add';
+// ==================================================================
 
+type TcontrolItem = {
+  unit: string;
+  onUnitChange: (unit: string, c2Key: string) => void;
+  qty: string;
+  onQtyChange: (qty: string, c2Key: string) => void;
+};
+
+type TcontrolItem_other = {
+  qty: string;
+  onQtyChange: (qty: string, c2Key: string) => void;
+  unit?: undefined;
+  onUnitChange?: undefined;
+};
+
+type Tcontroll = {
+  [key: string]: TcontrolItem | TcontrolItem_other;
+
+  智慧型: TcontrolItem;
+  面板式: TcontrolItem;
+  埋入式: TcontrolItem;
+  外露式: TcontrolItem;
+  電子式: TcontrolItem;
+  防爆式: TcontrolItem;
+  鎖號: TcontrolItem;
+  特殊鎖號: TcontrolItem;
+  三點式一般: TcontrolItem;
+  三點式遮煙: TcontrolItem;
+  //
+  '3HP馬達控制箱380v': TcontrolItem;
+  '2HP馬達控制箱380v': TcontrolItem;
+  '3HP馬達控制箱220v': TcontrolItem;
+  '2HP馬達控制箱220v': TcontrolItem;
+  彈射門控制箱: TcontrolItem;
+  紅外線控制盤: TcontrolItem;
+  //
+  煙感器: TcontrolItem;
+  中繼器: TcontrolItem;
+  //
+  門弓器: TcontrolItem;
+  平推鎖: TcontrolItem;
+  電磁扣: TcontrolItem;
+  //
+  遙控器加障感器: TcontrolItem;
+  遙控器: TcontrolItem;
+  障感器: TcontrolItem;
+  大門用主機: TcontrolItem;
+  //
+  對照式: TcontrolItem;
+  反射式: TcontrolItem;
+  //
+  防颱鎖固: TcontrolItem;
+  防颱中柱: TcontrolItem;
+  //
+  其他: TcontrolItem_other;
+};
+
+export type { Tcontroll };
+
+// ==================================================================
+export default function Sheet({ editable, controll }: { editable: boolean; controll: Tcontroll }) {
   return (
     <div className={style.sheet}>
       <div className={style.thead}>
-        <div>
+        {/* <div>
           <span>門型/數量</span>
-        </div>
+        </div> */}
         <div>
           <span>品名</span>
         </div>
         <div>
           <span>種類</span>
         </div>
-        <div>
+        <div className={style.c4}>
+          <span>單位</span>
           <span>數量</span>
         </div>
       </div>
 
       <Tbody>
-        <C1>
+        {/* <C1>
           <span>門型</span>
-        </C1>
+        </C1> */}
         {c2IndexKeys.map((c2Key, index) => {
           const { label, rSpan } = c2Config[c2Key];
 
@@ -45,10 +103,19 @@ export default function Sheet({ editable }: { editable: boolean }) {
                 const { label, rSpan, cSpan, type, defaultValue } = c3Config[c2Key].config[c3Key];
 
                 if (c2Key === '其他') {
+                  const { qty: value, onQtyChange: onChange } = controll[c2Key] ?? {};
+
                   return (
                     <Fragment key={c3Index}>
                       <Cother {...{ rSpan, cSpan }}>
-                        <textarea placeholder="其他..." disabled={!editable} />
+                        <textarea
+                          placeholder="其他..."
+                          disabled={!editable}
+                          value={value ?? ''}
+                          onChange={(e) => {
+                            onChange(e.target.value, c2Key);
+                          }}
+                        />
                       </Cother>
                     </Fragment>
                   );
@@ -57,7 +124,6 @@ export default function Sheet({ editable }: { editable: boolean }) {
                 if (type === 'subCell') {
                   const { label, subKeys, subConfig } = c3Config[c2Key].config[c3Key];
                   const rSpan = subKeys!.length;
-                  console.log(rSpan);
 
                   return (
                     <Fragment key={c3Index}>
@@ -78,9 +144,28 @@ export default function Sheet({ editable }: { editable: boolean }) {
                         </div>
                       </SubCell>
                       {subKeys!.map((key, subIndex) => {
+                        const { qty, onQtyChange, unit, onUnitChange } = controll[key] ?? {};
+
                         return (
                           <C4 key={subIndex} editable={editable}>
-                            <input type="text" defaultValue={isAdd ? '' : defaultValue} disabled={!editable} />
+                            <input
+                              type="text"
+                              // defaultValue={isAdd ? '' : defaultValue}
+                              disabled={!editable}
+                              value={unit ?? ''}
+                              onChange={(e) => {
+                                onUnitChange?.(e.target.value, c2Key);
+                              }}
+                            />
+                            <input
+                              type="number"
+                              // defaultValue={isAdd ? '' : defaultValue}
+                              disabled={!editable}
+                              value={qty ?? ''}
+                              onChange={(e) => {
+                                onQtyChange?.(e.target.value, c2Key);
+                              }}
+                            />
                           </C4>
                         );
                       })}
@@ -88,13 +173,32 @@ export default function Sheet({ editable }: { editable: boolean }) {
                   );
                 }
 
+                const { qty, onQtyChange, unit, onUnitChange } = controll[c3Key] ?? {};
+
                 return (
                   <Fragment key={c3Index}>
                     <C3>
                       <span>{label}</span>
                     </C3>
                     <C4 editable={editable}>
-                      <input type="text" defaultValue={isAdd ? '' : defaultValue} disabled={!editable} />
+                      <input
+                        type="text"
+                        // defaultValue={isAdd ? '' : defaultValue}
+                        disabled={!editable}
+                        value={unit ?? ''}
+                        onChange={(e) => {
+                          onUnitChange?.(e.target.value, c2Key);
+                        }}
+                      />
+                      <input
+                        type="number"
+                        // defaultValue={isAdd ? '' : defaultValue}
+                        disabled={!editable}
+                        value={qty ?? ''}
+                        onChange={(e) => {
+                          onQtyChange?.(e.target.value, c2Key);
+                        }}
+                      />
                     </C4>
                   </Fragment>
                 );
@@ -114,7 +218,8 @@ export default function Sheet({ editable }: { editable: boolean }) {
 
 const Tbody = styled.div`
   display: grid;
-  grid-template-columns: 2fr 2fr 7fr 1fr;
+  // grid-template-columns: 2fr 2fr 7fr 1.5fr;
+  grid-template-columns: 2fr 7fr 1.5fr;
 `;
 
 const CellInit = styled.div<{
@@ -150,7 +255,8 @@ const C3 = styled(CellInit)`
   }
 `;
 const C4 = styled(CellInit)<{ editable: boolean }>`
-  display: grid;
+  display: flex;
+  justify-content: space-evenly;
   border-right: none;
   > input {
     width: 50px;
@@ -232,28 +338,28 @@ const c3Config: {
   };
 } = {
   鎖盒: {
-    indexKeys: ['a', 'b', 'c', 'd', 'e', 'f'],
+    indexKeys: ['智慧型', '面板式', '埋入式', '外露式', '電子式', '防爆式'],
     config: {
-      a: { label: '智慧型', defaultValue: '1' },
-      b: { label: '面板式', defaultValue: '3' },
-      c: { label: '埋入式', defaultValue: '' },
-      d: { label: '外露式', defaultValue: '2' },
-      e: { label: '電子式', defaultValue: '1' },
-      f: { label: '防爆式', defaultValue: '1' },
+      智慧型: { label: '智慧型', defaultValue: '1' },
+      面板式: { label: '面板式', defaultValue: '3' },
+      埋入式: { label: '埋入式', defaultValue: '' },
+      外露式: { label: '外露式', defaultValue: '2' },
+      電子式: { label: '電子式', defaultValue: '1' },
+      防爆式: { label: '防爆式', defaultValue: '1' },
     },
   },
   鎖匙: {
-    indexKeys: ['a', 'b'],
+    indexKeys: ['鎖號', '特殊鎖號'],
     config: {
-      a: { label: '鎖號', defaultValue: '1' },
-      b: { label: '特殊鎖號', defaultValue: '2' },
+      鎖號: { label: '鎖號', defaultValue: '1' },
+      特殊鎖號: { label: '特殊鎖號', defaultValue: '2' },
     },
   },
   押扣: {
-    indexKeys: ['a', 'b'],
+    indexKeys: ['三點式一般', '三點式遮煙'],
     config: {
-      a: { label: '三點式（一般）' },
-      b: { label: '三點式（遮煙）' },
+      三點式一般: { label: '三點式（一般）' },
+      三點式遮煙: { label: '三點式（遮煙）' },
     },
   },
   控制箱盤: {
@@ -262,60 +368,67 @@ const c3Config: {
       a: {
         label: '捲門/水閘門',
         type: 'subCell',
-        subKeys: ['a', 'b', 'c', 'd', 'e', 'f'],
+        subKeys: [
+          '3HP馬達控制箱380v',
+          '2HP馬達控制箱380v',
+          '3HP馬達控制箱220v',
+          '2HP馬達控制箱220v',
+          '彈射門控制箱',
+          '紅外線控制盤',
+        ],
         subConfig: {
-          a: { label: '3HP 馬達控制箱（380V）' },
-          b: { label: '3HP 馬達控制箱（380V）' },
-          c: { label: '2HP 馬達控制箱（220V）' },
-          d: { label: '2HP 馬達控制箱（220V）' },
-          e: { label: '彈射門控制箱' },
-          f: { label: '紅外線控制盤（含面板）' },
+          '3HP馬達控制箱380v': { label: '3HP 馬達控制箱（380V）' },
+          '2HP馬達控制箱380v': { label: '2HP 馬達控制箱（380V）' },
+          '3HP馬達控制箱220v': { label: '3HP 馬達控制箱（220V）' },
+          '2HP馬達控制箱220v': { label: '2HP 馬達控制箱（220V）' },
+          彈射門控制箱: { label: '彈射門控制箱' },
+          紅外線控制盤: { label: '紅外線控制盤（含面板）' },
         },
       },
     },
   },
   消防備品: {
-    indexKeys: ['a', 'b'],
+    indexKeys: ['煙感器', '中繼器'],
     config: {
-      a: { label: '煙感器' },
-      b: { label: '中繼器' },
+      煙感器: { label: '煙感器' },
+      中繼器: { label: '中繼器' },
     },
   },
   板門配件: {
-    indexKeys: ['a', 'b', 'c'],
+    indexKeys: ['門弓器', '平推鎖', '電磁扣'],
     config: {
-      a: { label: '門弓器', defaultValue: '3' },
-      b: { label: '平推鎖' },
-      c: { label: '電磁扣', defaultValue: '5' },
+      門弓器: { label: '門弓器', defaultValue: '3' },
+      平推鎖: { label: '平推鎖' },
+      電磁扣: { label: '電磁扣', defaultValue: '5' },
     },
   },
   主機: {
-    indexKeys: ['a', 'b', 'c', 'd'],
+    indexKeys: ['遙控器加障感器', '遙控器', '障感器', '大門用主機'],
     config: {
-      a: { label: '遙控器（1:2）+障感器' },
-      b: { label: '遙控器（1:2）' },
-      c: { label: '障感器' },
-      d: { label: '大門用主機' },
+      遙控器加障感器: { label: '遙控器（1:2）+障感器' },
+      遙控器: { label: '遙控器（1:2）' },
+      障感器: { label: '障感器' },
+      大門用主機: { label: '大門用主機' },
     },
   },
   紅外線: {
-    indexKeys: ['a', 'b'],
+    indexKeys: ['對照式', '反射式'],
     config: {
-      a: { label: '對照式' },
-      b: { label: '反射式' },
+      對照式: { label: '對照式' },
+      反射式: { label: '反射式' },
     },
   },
   防颱配件: {
-    indexKeys: ['a', 'b'],
+    indexKeys: ['防颱鎖固', '防颱中柱'],
     config: {
-      a: { label: '防颱鎖固', defaultValue: '8' },
-      b: { label: '防颱中柱' },
+      防颱鎖固: { label: '防颱鎖固', defaultValue: '8' },
+      防颱中柱: { label: '防颱中柱' },
     },
   },
   其他: {
-    indexKeys: ['a'],
+    indexKeys: ['其他'],
     config: {
-      a: {
+      其他: {
         rSpan: 3,
         cSpan: 2,
         type: 'textarea',

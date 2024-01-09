@@ -26,7 +26,9 @@ export default function Other({
     // eleConnectPayment,
   } = payInfo;
 
+  // 交貨日期
   const [year, month, day] = tradingDate.split('-');
+  const theTradingDate = !tradingDate || tradingDate === 'Invalid date' ? '' : `民國${year}年${month}月${day}日`;
 
   return (
     <div className={style.other}>
@@ -43,13 +45,13 @@ export default function Other({
         <div className={style.address}>
           <h2>二、交貨地點 : </h2>
           <div>
-            <span>{tradingLocation || '未定'}</span>
+            <span>{tradingLocation ?? ''}</span>
           </div>
         </div>
         <div className={style.date}>
           <h2>三、交貨日期 : </h2>
           <div>
-            <span>{(tradingDate && `民國${year}年${month}月${day}日`) || '未定'}</span>
+            <span>{theTradingDate}</span>
           </div>
         </div>
 

@@ -1,0 +1,40 @@
+$pdfWidth: calc(595px * 2);
+$pdfHeight: calc(842px * 2);
+
+// $pdfWidth_horizontal: calc(595px * 1.5);
+// $pdfHeight_horizontal: calc(842px * 1.5);
+$pdfWidth_horizontal: calc(842px * 2);
+$pdfHeight_horizontal: calc(595px * 2);
+
+.antdModalWrapper {
+  // margin-top: 40px;
+}
+
+.standardPdf {
+  width: $pdfWidth;
+  height: $pdfHeight;
+  padding: 60px 40px;
+  * {
+    font-family: Microsoft JhengHei;
+    color: black;
+  }
+}
+
+.standardPdf_horizontal {
+  width: $pdfWidth_horizontal;
+  height: $pdfHeight_horizontal;
+  padding: 60px 40px;
+  * {
+    font-family: Microsoft JhengHei;
+    color: black;
+  }
+}
+
+.standardPdf_horizontal_02 {
+  width: $pdfWidth_horizontal;
+  height: $pdfHeight_horizontal;
+  padding: 60px 40px;
+  * {
+    color: black;
+  }
+}

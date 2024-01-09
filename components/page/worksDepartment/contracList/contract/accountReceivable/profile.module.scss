@@ -1,0 +1,32 @@
+.profileGrid {
+  display: grid;
+  grid-template-columns: auto 442px;
+  margin-left: 32px;
+  margin-right: 30px;
+  .left {
+    display: grid;
+    grid-template-columns: auto 202px;
+    gap: 21px 44px;
+    align-items: flex-end;
+    padding-right: 38px;
+    border-bottom: solid 1px theme("colors.border");
+    // border: solid 1px theme("colors.border");
+    padding-bottom: 10px;
+    .span2 {
+      grid-column: span 2;
+    }
+  }
+  .right {
+    height: fit-content;
+    display: grid;
+    gap: 24px;
+    padding: 20px 24px;
+    background-color: theme("colors.bgc01");
+  }
+}
+
+.caption {
+  color: theme("colors.main");
+  font-size: 18px;
+  width: 80px;
+}

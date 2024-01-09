@@ -1,30 +1,82 @@
 @use "styles/theme01" as *;
 
-.container {
+.wrapper {
   width: calc(100% - (17px * 2));
-  padding: 0 4px;
   margin: auto;
   margin-top: 17px;
+}
+
+.container {
+  padding: 0 4px;
   border: solid 1px $colorBorder01;
-  &.borderRed {
-    border: solid 1px #ea1833;
+  &.exchange {
+    border-color: #ea1833;
+    border-bottom-color: $colorBorder01;
   }
 }
 
-.listContainer {
-  width: 100%;
+.main {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto fit-content(100%);
   overflow: auto;
-  max-height: 500px;
-  .thead{
+
+  height: 471px;
+  .listContainer {
+    width: 100%;
+
+    .thead {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      border-bottom: solid 5px white;
+    }
+  }
+  .right {
     position: sticky;
-    top:0;
+    right: 0;
+    width: fit-content;
+    background-color: theme("colors.bgc01");
+    border-left: solid 5px white;
     z-index: 1;
   }
 }
 
-.addBtn {
-  width: fit-content;
-  text-align: left;
-  background-color: transparent;
-  border: none;
+.total {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  padding: 10px 42px;
+  border: solid 1px theme("colors.border");
+  border-top: 0;
+  &.exchange {
+    border-color: #ea1833;
+  }
+  span {
+    &:nth-of-type(1) {
+      color: theme("colors.main");
+      font-size: 16px;
+      font-weight: 600;
+    }
+    &:nth-of-type(2) {
+      font-size: 16px;
+      font-weight: 400;
+    }
+  }
+}
+
+.addBtnWrapper {
+  width: 100%;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background-color: white;
+  .addBtn {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    text-align: left;
+    border: none;
+    background-color: white;
+  }
 }

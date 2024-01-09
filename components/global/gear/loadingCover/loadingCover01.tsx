@@ -10,7 +10,7 @@ export default function LoadingCover01({
   size,
   className = '',
 }: {
-  isLoading: boolean;
+  isLoading?: boolean;
   size?: number;
   className?: string;
 }) {

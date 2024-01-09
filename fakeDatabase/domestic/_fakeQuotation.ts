@@ -16,7 +16,7 @@ import iconDoorRail_sj302_95_45t from 'public/image/fakeDB/doorRail/antiTyphoon/
 type Tquotation = {
   basicInfo: {
     quotationId: string; //報價單Id // 報價編號
-    tempQuotationAging: number; // 報價時效 天數 顯示`${quotationAging}天內`
+    tempQuotationAging: string; // 報價時效 天數 顯示`${quotationAging}天內`
     date: string; //報價日期
     constructionName: string; // 工程名稱
     undertaker: string; //承辦人
@@ -57,6 +57,7 @@ type Tquotation = {
       partType: string;
       partName: string;
       partId: string;
+      specification: string;
       material: string;
       basicWeight: string | undefined;
       unit: 'm2' | 'M' | '組' | '套' | '支' | string;
@@ -115,7 +116,7 @@ const fakeQuotationDataList: TquotationList = {
     // ---------------------------------------------------------
     basicInfo: {
       quotationId: 'S-110211-01',
-      tempQuotationAging: 10,
+      tempQuotationAging: '10',
       date: '110-02-02',
       constructionName: '台灣日鑛金屬(股)公司~JX金屬台灣彰濱廠房增建工程',
       undertaker: '陳小明小華',
@@ -157,6 +158,7 @@ const fakeQuotationDataList: TquotationList = {
             partType: 'SJ00',
             partName: '捲門片',
             partId: 'SJ0000A0000',
+            specification: '規格001',
             material: 'SST 304',
             basicWeight: '99.99',
             unit: 'm2',
@@ -167,6 +169,7 @@ const fakeQuotationDataList: TquotationList = {
             partType: 'SJ00',
             partName: '馬達機',
             partId: 'SJ0000A0000',
+            specification: '規格002',
             material: 'SST 304',
             basicWeight: '99.99',
             unit: '組',
@@ -253,7 +256,7 @@ const emptyQuotation: Tquotation = {
   // ---------------------------------------------------------
   basicInfo: {
     quotationId: '',
-    tempQuotationAging: 99,
+    tempQuotationAging: '99',
     date: '', // 時間是new date()，要在建立新報價單時處理，如果使用者操作時剛好過了一天，時間就不對了
     constructionName: '',
     undertaker: '',
@@ -295,6 +298,7 @@ const emptyQuotation: Tquotation = {
           partType: 'SJ00',
           partName: '捲門片',
           partId: 'SJ0000A0000',
+          specification: '規格001',
           material: 'SST 304',
           basicWeight: '99.99',
           unit: 'm2',
@@ -305,6 +309,7 @@ const emptyQuotation: Tquotation = {
           partType: 'SJ00',
           partName: '馬達機',
           partId: 'SJ0000A0000',
+          specification: '規格001',
           material: 'SST 304',
           basicWeight: '99.99',
           unit: '組',

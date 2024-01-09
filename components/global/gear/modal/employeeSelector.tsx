@@ -1,23 +1,25 @@
 import { useState, useEffect, useMemo, useContext } from 'react';
-import { useInView } from 'react-intersection-observer';
-import _ from 'lodash';
+import classNames from 'classnames';
 
 // global gear
-import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
+import SelectorShell, { TsearcbBarProps } from './selectorShell';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import myAlert, { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
+import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
-import style from './employeeSelector.module.scss';
+import scss from './employeeSelector.module.scss';
 
 // type
 import { TemployeeDto } from 'js/api/dtoTypes';
 
 // api
-import { Tparams, TapiGetEmployeeParams, useEmployee } from 'js/api/api_employee';
+import { Tparams, useEmployee_infinite } from 'js/api/api_employee';
+import { useDepartments } from 'js/api/api_department';
 
 import { AppContext } from 'pages/_app';
+
+export type { TemployeeDto };
 
 export default function EmployeeSelector({
   showModal,
@@ -28,6 +30,11 @@ export default function EmployeeSelector({
   selLimit,
   customParams,
   customFilter,
+  customPopulate,
+  defaultEmpArr,
+  exceptEmpArr,
+  isCancelOnConfirm = true,
+  exceptEmpCheck,
 }: {
   showModal: boolean;
   onConfirm: (v: TemployeeDto[]) => void;
@@ -37,117 +44,111 @@ export default function EmployeeSelector({
   selLimit?: 1;
   customParams?: Tparams;
   customFilter?: Tparams['filter'];
+  customPopulate?: Tparams['populate'];
+  defaultEmpArr?: TemployeeDto[];
+  exceptEmpArr?: { id: string }[];
+  isCancelOnConfirm?: boolean;
+  exceptEmpCheck?: (emp: TemployeeDto) => boolean;
 }) {
   const { rwd1023 } = useContext(AppContext);
-  const [isLoading, setIsLoading] = useState(false);
 
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([]);
 
-  const [searchValue, setSearchValue] = useState<string | undefined>();
-  const [pageObj, setPageObj] = useState({ page: -1 });
-  const page = pageObj.page;
+  const [searchValue, setSearchValue] = useState<string[]>([]);
 
   const params: Tparams = (() => {
-    const allNum = /^\d+$/.test(searchValue ?? 'n');
-    const grade = allNum ? searchValue : undefined;
+    const allNum = /^\d+$/.test(searchValue[1] ?? 'n');
+    const grade = allNum ? searchValue[1] : undefined;
 
     return {
-      page: page,
       pageSize: 20,
-      populate: ['jobs.department'],
+      populate: ['jobs.department', ...(customPopulate ?? [])],
       sort: 'idNumber',
       filter: {
         $or: {
           idNumber: {
-            $contains: searchValue,
+            $contains: searchValue[1],
           },
-          chName: { $contains: searchValue },
-          'jobs.name': { $contains: searchValue },
+          chName: { $contains: searchValue[1] },
+          'jobs.name': { $contains: searchValue[1] },
           'jobs.grade': { $eq: grade },
         },
+        'jobs.department.name': { $contains: searchValue[0] },
+
         ...customFilter,
       },
       ...customParams,
     };
   })();
 
-  const { data, setData, update, update_infinite } = useEmployee(params);
-  const employeeArr = data?.data || [];
-  const meta = data?.meta;
+  const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useEmployee_infinite({ customParams: params });
 
-  const [viewRef, inView] = useInView();
-
-  useEffect(() => {
-    if (!showModal) {
-      return;
-    }
-
-    if (!inView) {
-      return;
-    }
-
-    if (!meta?.hasNextPage) {
-      return;
-    }
-
-    const newPageObj = { ...pageObj, page: pageObj.page + 1 };
-    setPageObj(newPageObj);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView]);
+  //
+  const { data: departmentData, update: update_department } = useDepartments();
 
   useEffect(() => {
     if (!showModal) {
-      const newPageObj = { ...pageObj, page: -1 };
-      setPageObj(newPageObj);
-      setData(undefined);
-      setSearchValue(undefined);
-
       return;
     }
 
-    const newPageObj = { ...pageObj, page: 1 };
-    setPageObj(newPageObj);
+    reset();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue, showModal]);
 
   useEffect(() => {
-    if (page === -1) {
+    if (!showModal) {
+      setSelEmployeeArr([]);
+      setSearchValue([]);
+
       return;
     }
 
-    if (page === 1) {
-      setData(undefined);
-
-      (async () => {
-        try {
-          setIsLoading(true);
-          await update();
-        } catch (error) {
-          myAlert.err({ title: '取得人員資料失敗' });
-        }
-
-        setIsLoading(false);
-      })();
-    } else {
-      (async () => {
-        try {
-          await update_infinite();
-        } catch (error) {
-          myAlert.err({ title: '取得人員資料失敗' });
-        }
-      })();
+    if (defaultEmpArr) {
+      setSelEmployeeArr(defaultEmpArr);
     }
+
+    (async () => {
+      try {
+        const res = await update_department();
+      } catch (error) {}
+    })();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageObj]);
+  }, [showModal]);
+
+  const optionArr = useMemo(() => {
+    if (!departmentData) {
+      return [];
+    }
+
+    const arr = departmentData.data.map((data) => {
+      return {
+        value: data.name,
+        label: data.name,
+      };
+    });
+    arr.unshift({
+      value: '',
+      label: '不拘',
+    });
+
+    return arr;
+  }, [departmentData]);
 
   // ==================================================
 
   const onClick = (newEmp: TemployeeDto) => {
-    const newArr = [...selEmployeeArr];
+    let newArr = [...selEmployeeArr];
 
     if (selLimit === 1) {
-      newArr[0] = newEmp;
+      if (newArr[0]?.id === newEmp.id) {
+        newArr = [];
+      } else {
+        newArr[0] = newEmp;
+      }
+
       setSelEmployeeArr(newArr);
 
       return;
@@ -166,11 +167,14 @@ export default function EmployeeSelector({
 
   const theOnConfirm = () => {
     if (!selEmployeeArr) {
-      return ModalInfo('請選擇公司');
+      return ModalInfo('請選擇人員');
     }
 
     onConfirm(selEmployeeArr);
-    theOnCancel();
+
+    if (isCancelOnConfirm) {
+      theOnCancel();
+    }
   };
 
   const theOnCancel = () => {
@@ -178,52 +182,136 @@ export default function EmployeeSelector({
     setSelEmployeeArr([]);
   };
 
-  const onSearch = (v: string) => {
+  const onSearch = (v: string[]) => {
     setSearchValue(v);
   };
+
+  const inputSelPropsArr: TsearcbBarProps['inputSelPropsArr'] = [
+    {
+      selectProps: {
+        wrapperStyle: { width: '160px' },
+        props: {
+          options: optionArr,
+          // placeholder: '選擇部門',
+          placeholder: departmentData ? '選擇部門' : departmentData === null ? '無法取得部門' : '正在取得部門',
+          menuPortalTarget: undefined,
+          isLoading: departmentData === null ? false : !departmentData,
+        },
+      },
+    },
+    {
+      inputProps: {
+        wrapperStyle: { width: '160px' },
+        props: {
+          placeholder: '搜尋關鍵字',
+        },
+      },
+    },
+  ];
 
   // ==================================================
 
   return (
-    <ModalListSelectorWithSearch
+    <SelectorShell
       label={label ?? ''}
       visible={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
-      onSearch={onSearch}
+      // onSearch={onSearch}
       width={rwd1023 ? '80vw' : '800px'}
-      className={style.container}
+      className={scss.container}
       tip={tip}
+      searcbBarProps={{
+        inputSelPropsArr: inputSelPropsArr,
+        onClick: onSearch,
+      }}
     >
-      <LoadingCoverWrapper01 isLoading={isLoading}>
-        <div className={style.listContainer}>
-          {employeeArr.map((emp, index, arr) => {
-            const { idNumber, chName, jobs } = emp;
-            const { name, grade, department } = jobs?.[0] ?? {};
+      <LoadingCoverWrapper01 isLoading={isLoadingPage1}>
+        <div className={scss.listContainer}>
+          <RowArr
+            empArr={selEmployeeArr ?? []}
+            selEmployeeArr={selEmployeeArr}
+            exceptEmpArr={exceptEmpArr}
+            onClick={onClick}
+            exceptEmpCheck={exceptEmpCheck}
+          />
 
-            const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
+          {selEmployeeArr.length !== 0 && <div className={scss.divider} />}
 
-            const theViewRef = (() => {
-              if (arr.length - 11 === index) {
-                return viewRef;
-              }
-
-              return undefined;
-            })();
-
-            return (
-              <CellWithBar key={index} isActive={isActive}>
-                <div className={style.row} onClick={() => onClick(emp)} ref={theViewRef}>
-                  <span className={style.idNumber}>{idNumber}</span>
-                  <span>{chName}</span>
-                  <span>{name ? `${department?.name} / ${name}` : ''}</span>
-                  <span>{grade && `Level ${grade}`}</span>
-                </div>
-              </CellWithBar>
-            );
-          })}
+          <RowArr
+            empArr={dataArr}
+            selEmployeeArr={selEmployeeArr}
+            viewRef_bottom={viewRef_bottom}
+            exceptEmpArr={exceptEmpArr}
+            onClick={onClick}
+            // skipArr={defaultEmpArr}
+            exceptEmpCheck={exceptEmpCheck}
+          />
+          {/*  */}
         </div>
       </LoadingCoverWrapper01>
-    </ModalListSelectorWithSearch>
+    </SelectorShell>
   );
 }
+
+// =========================================================
+
+const RowArr = ({
+  empArr,
+  selEmployeeArr,
+  // skipArr,
+  viewRef_bottom,
+  exceptEmpArr,
+  onClick,
+  exceptEmpCheck,
+}: {
+  empArr: TemployeeDto[];
+  selEmployeeArr: TemployeeDto[];
+  // skipArr?: TemployeeDto[];
+  onClick: (v: TemployeeDto) => void;
+  exceptEmpArr?: { id: string }[];
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
+  exceptEmpCheck: ((emp: TemployeeDto) => boolean) | undefined;
+}) => {
+  return (
+    <>
+      {empArr.map((emp, index, arr) => {
+        const { idNumber, chName, jobs } = emp;
+        const { name, grade, department } = jobs?.[0] ?? {};
+
+        const theViewRef = (() => {
+          if (arr.length - 11 === index) {
+            return viewRef_bottom;
+          }
+
+          return undefined;
+        })();
+
+        const isActive = selEmployeeArr.some((selEmp) => selEmp.id === emp.id);
+        let isExcept = exceptEmpArr?.some((exceptEmp) => exceptEmp.id === emp.id);
+
+        if (!isExcept && exceptEmpCheck) {
+          isExcept = exceptEmpCheck(emp);
+        }
+        // const isSkinp = skipArr?.some((selEmp) => selEmp.id === emp.id);
+
+        const theOnClick = isExcept ? undefined : () => onClick(emp);
+
+        // if (isSkinp) {
+        //   return <div key={index} className="skip" ref={theViewRef}></div>;
+        // }
+
+        return (
+          <CellWithBar key={index} isActive={isActive}>
+            <div className={classNames(scss.row, isExcept && scss.except)} onClick={theOnClick} ref={theViewRef}>
+              <span className={scss.idNumber}>{idNumber}</span>
+              <span>{chName}</span>
+              <span>{name ? `${department?.name} / ${name}` : ''}</span>
+              <span>{grade && `Level ${grade}`}</span>
+            </div>
+          </CellWithBar>
+        );
+      })}
+    </>
+  );
+};

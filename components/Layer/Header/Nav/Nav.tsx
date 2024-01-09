@@ -6,7 +6,12 @@ import { useRouter } from 'next/router';
 import styled from './nav.module.scss';
 
 // 路由表
-import { topPathList } from 'components/Layer/SideNav/pathList';
+import {
+  TtopPathListConfig,
+  topPathList,
+  erpFeaturesLookup,
+  swappedErpFeaturesLookup,
+} from 'components/Layer/SideNav/pathList';
 
 // context
 import { LayerCtx } from 'components/Layer/Layer';
@@ -20,7 +25,7 @@ export default function Nav() {
   return (
     <div className={styled.container}>
       {topPathList.map((item, index) => {
-        const { icon, path01, href, label, subLabel, erpFeature } = item;
+        const { icon, path01, href, hrefList, label, subLabel, erpFeature } = item;
         const reg = new RegExp(`^${path01}`);
         let active = reg.test(pathname) ? styled.active : '';
 
@@ -34,8 +39,29 @@ export default function Nav() {
           return null;
         }
 
+        const userErpFeatureKeyArr = userErpFeature.map((item) => {
+          return swappedErpFeaturesLookup[item.name];
+        });
+
+        let theHref: TtopPathListConfig['href'] | undefined = undefined;
+
+        // 為了按照hrefList的順序，所以用hrefList執行forEach
+        Object.keys(hrefList ?? {}).forEach((key) => {
+          if (theHref) {
+            return;
+          }
+
+          const href = hrefList?.[key];
+
+          if (userErpFeatureKeyArr.includes(key)) {
+            theHref = href;
+          }
+        });
+
+        theHref = theHref ?? href;
+
         return (
-          <Link className={`${styled.link} ${active}`} href={href} key={index}>
+          <Link className={`${styled.link} ${active}`} href={theHref} key={index}>
             <Image src={icon} alt={label + subLabel} />
             <span>{label}</span>
             {subLabel && <span>{subLabel}</span>}

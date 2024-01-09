@@ -78,7 +78,13 @@ export default function SearchBar({
   );
 
   return (
-    <div className={`${style.container} ${className}`}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        doSearch(valueArr);
+      }}
+      className={`${style.container} ${className}`}
+    >
       {searchTargetList.map((item, index) => {
         const { options, placeholder, width, defaultValue, value, onChange } = item;
         const className = item.className || '';
@@ -110,11 +116,13 @@ export default function SearchBar({
                       return;
                     }
 
-                    if (controlled) {
-                      onChange?.(option.value);
+                    // if (controlled) {
+                    //   onChange?.(option.value);
 
-                      return;
-                    }
+                    //   return;
+                    // }
+
+                    onChange?.(option.value);
 
                     setValueArr((arr) => {
                       arr[index] = option;
@@ -145,11 +153,12 @@ export default function SearchBar({
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     const value = e.target.value;
 
-                    if (controlled) {
-                      onChange?.(value);
+                    // if (controlled) {
+                    //   onChange?.(value);
 
-                      return;
-                    }
+                    //   return;
+                    // }
+                    onChange?.(value);
 
                     setValueArr((arr) => {
                       arr[index] = value;
@@ -163,14 +172,15 @@ export default function SearchBar({
           );
         }
       })}
-
-      <IconSearch
-        className={style.iconSearch}
-        onClick={() => {
-          doSearch(valueArr);
-        }}
-      />
-    </div>
+      <button>
+        <IconSearch
+          className={style.iconSearch}
+          onClick={() => {
+            doSearch(valueArr);
+          }}
+        />
+      </button>
+    </form>
   );
 }
 

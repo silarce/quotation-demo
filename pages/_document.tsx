@@ -5,6 +5,8 @@ class MyDocument extends Document {
     return (
       <Html>
         <Head>
+          {/* 公司擋住外網，導致無法取得字體 */}
+          {/* 改用本地字體 */}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin={'crossOrigin'} />
           <link

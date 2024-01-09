@@ -26,7 +26,7 @@ import scss from './theCalendar.module.scss';
 // type
 import { TuserDto, Tparams } from 'js/api/dtoTypes';
 import { TdailyReportDto } from 'js/api/api_dailyReport';
-import { Ttag } from 'pages/home/dailyReport';
+import { Ttab } from 'pages/home/dailyReport';
 
 const localizer = momentLocalizer(moment);
 
@@ -54,13 +54,13 @@ type Tevent = {
 export default function TheCalendar({
   isMine,
   userInfo,
-  addTag,
+  addTab: addTag,
   dailyReportArr,
   update_calendar,
 }: {
   isMine: boolean;
   userInfo: TuserDto;
-  addTag: (employee: Ttag) => void;
+  addTab: (employee: Ttab) => void;
   dailyReportArr: TdailyReportDto[];
   update_calendar: (dynimicFilter: Tparams['filter']) => void;
 }) {
@@ -77,7 +77,7 @@ export default function TheCalendar({
       let isReviewedByUser = false;
       let isAllowToReview = false;
 
-      reviewStatus.forEach((statu) => {
+      reviewStatus?.forEach((statu) => {
         const { type, reviewerEmployee, reviewedAt, reviewerEmployeeId } = statu;
         const reviewerId = reviewerEmployee?.id ?? null;
 
@@ -203,7 +203,7 @@ const ToolBar = ({
 
 // ======================================================================
 // 壓在格子上方的event
-const EventWrapper = (e: EventWrapperProps<Tevent>, addTag: (employee: Ttag) => void) => {
+const EventWrapper = (e: EventWrapperProps<Tevent>, addTag: (employee: Ttab) => void) => {
   const { event } = e;
   const {
     isMine,

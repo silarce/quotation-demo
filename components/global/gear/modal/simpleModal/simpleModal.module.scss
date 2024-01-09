@@ -14,11 +14,19 @@
     > p {
       width: fit-content;
       margin: auto;
+    }
+    .title {
       font-weight: 400;
       font-size: 18px;
       line-height: 22px;
       color: #14256a;
     }
+
+    .tip {
+      margin-top: 5px;
+      color: red;
+    }
+
     > div {
       padding-bottom: 6px;
       margin: 68px 0 60px;

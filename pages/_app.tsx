@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext } from 'react';
 import type { ReactElement, ReactNode } from 'react';
+import _ from 'lodash';
 
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
@@ -15,15 +16,15 @@ import Layer from 'components/Layer/Layer';
 
 // global gear
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import { apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth';
-import { useApiErpFeaturesMe } from 'js/api/api_erpFeature';
+import { TuserDto, apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth';
+import { useApiErpFeaturesMe, TerpFeatureDto } from 'js/api/api_erpFeature';
 
 // css
-import '../styles/globals.scss';
 import 'antd/dist/antd.css';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import '../styles/globals.scss';
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // 行事曆 UI用的
 
 // 全域moment語系轉換
@@ -41,6 +42,10 @@ type AppPropsWithLayout = AppProps & {
 // =============================================================================
 type TappContext = {
   rwd1023: boolean;
+  rwd1439: boolean;
+  userInfo: TuserDto | undefined;
+  userGrade: number;
+  erpFeature: TerpFeatureDto[] | undefined;
 };
 
 export const AppContext = createContext<TappContext>(null!);
@@ -50,12 +55,22 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false);
 
   const rwd1023 = useMediaQuery({ query: '(max-width: 1023px)' });
+  const rwd1439 = useMediaQuery({ query: '(max-width: 1439px)' });
 
   const router = appProps.router;
 
   // ----------------------------------------------------------------------------
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe();
   const { erpFeature: userErpFeature, setErpFeature, updateErpFeature: updateUserErpFeature } = useApiErpFeaturesMe();
+
+  // const userGrade = _.sortBy(userInfo?.employee?.jobs, 'grade')?.reverse()[0]?.grade;
+  let userGrade = 0;
+
+  if (userInfo && !userInfo.employee) {
+    userGrade = 16;
+  } else if (userInfo && userInfo.employee) {
+    userGrade = _.sortBy(userInfo?.employee?.jobs, 'grade')?.reverse()[0]?.grade;
+  }
 
   useEffect(() => {
     (async () => {
@@ -98,6 +113,10 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // -----------------------------------------------------------------------
   const appContextValue = {
     rwd1023,
+    rwd1439,
+    userInfo,
+    userGrade,
+    erpFeature: userErpFeature,
   };
 
   // -----------------------------------------------------------------------
@@ -146,9 +165,12 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
         {getLayout(
           <Component
             {...pageProps}
+            isAdmin={userInfo?.account === 'admin3'}
             userInfo={userInfo}
+            userGrade={userGrade}
             userErpFeature={userErpFeature}
             rwd1023={rwd1023}
+            rwd1439={rwd1439}
             onLogin={onLogin}
           />
         )}

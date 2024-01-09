@@ -1,9 +1,5 @@
-import { Dispatch, SetStateAction } from 'react';
-
 // global gear
-
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
-
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // icon
@@ -17,25 +13,40 @@ import style from './listOfDeliveryOrders.module.scss';
 import { Toption } from 'js/utils/options/options';
 
 // other
-import { optionsCreator_material } from 'js/utils/options/options';
-const optionMaterial = optionsCreator_material();
+import { optionsCreator_doorModel_2 } from 'js/utils/options/productOptions';
+const optionMaterial = optionsCreator_doorModel_2();
 
-// fake
-import { Ttransfer } from 'pages/worksDepartment/contractList/contract/listOfDeliveryOrders/edit';
+// ========================================================
 
-export default function EditTransfer({
-  transferList,
-  setTransferList,
-  addTransfer,
-  delTransfer,
-  editable,
-}: {
-  transferList: Ttransfer[];
-  setTransferList: Dispatch<SetStateAction<Ttransfer[]>>;
-  addTransfer: () => void;
-  delTransfer: (index: number) => void;
-  editable: boolean;
-}) {
+type TcontrollItem = {
+  goodsName: {
+    value: string;
+    onChange: (v: string) => void;
+  };
+  goodsSpec: {
+    value: string;
+    onChange: (v: string) => void;
+  };
+  goodsQuantity: {
+    value: string;
+    onChange: (v: string) => void;
+  };
+  reason: {
+    value: string;
+    onChange: (v: string) => void;
+  };
+  onDelete: (index: number) => void;
+};
+
+type Tcontroll = {
+  arr: TcontrollItem[];
+  add: () => void;
+};
+
+export type { Tcontroll };
+
+// ========================================================
+export default function EditTransfer({ disabled, controll }: { disabled: boolean; controll: Tcontroll }) {
   return (
     <div className={style.editTransfer}>
       {/* thead */}
@@ -58,62 +69,70 @@ export default function EditTransfer({
       </div>
       {/* tbody */}
       <div className={style.tbody}>
-        {transferList.map((data, rowIndex) => {
+        {controll.arr.map((item, rowIndex) => {
           return (
             <CellWithBar key={rowIndex}>
               <div className={style.row}>
                 {/*  */}
-                <div className={style.deleteIcon} onClick={() => delTransfer(rowIndex)}>
+                <div className={style.deleteIcon} onClick={() => item.onDelete(rowIndex)}>
                   <IconDelete01 />
                 </div>
                 <div className={style.indexNumber}>{rowIndex + 1}</div>
                 {/*  */}
                 {indexKeys.map((key, index) => {
-                  const stateValue = data[key];
-                  const { type, width, marginRight, flex, options, center } = config[key];
+                  const { value, onChange } = item[key];
+
+                  const { type, width, marginRight, flex, options, center, inputType } = config[key];
                   const theStyle = { width, marginRight, flex };
 
                   const onChangeInput = (v: string) => {
-                    transferList[rowIndex][key] = v;
-                    setTransferList([...transferList]);
+                    onChange(v);
                   };
 
                   const onChangeSel = (option: Toption | null) => {
-                    if (!option) {
-                      return;
-                    }
+                    const value = option?.value ?? '';
 
-                    const value = option!.value;
-                    transferList[rowIndex][key] = value;
-                    setTransferList([...transferList]);
+                    onChange(value);
                   };
 
                   const className = center ? style.center : '';
 
                   return (
                     <div className={className} key={index} style={theStyle}>
-                      {type === 'input' && (
+                      {type === 'textarea' && (
                         <InputSel
                           textareaProps={{
-                            value: stateValue,
+                            value,
                             onChange: onChangeInput,
                             className: style.input,
                           }}
                           placeholder=""
-                          disabled={!editable}
+                          disabled={disabled}
+                        />
+                      )}
+                      {type === 'input' && (
+                        <InputSel
+                          inputProps={{
+                            value,
+                            onChange: onChangeInput,
+                            className: style.input,
+                            inputType: inputType,
+                          }}
+                          placeholder=""
+                          disabled={disabled}
                         />
                       )}
                       {type === 'select' && (
                         <InputSel
                           selectProps={{
-                            value: stateValue,
+                            value,
                             onChange: onChangeSel,
                             options: options ?? [],
                             fontSize: '16px',
                             arrowType: 'black',
                           }}
                           placeholder=""
-                          disabled={!editable}
+                          disabled={disabled}
                         />
                       )}
                     </div>
@@ -125,14 +144,16 @@ export default function EditTransfer({
           );
         })}
         {/* 新增項目 */}
-        <div className={style.row}>
-          <div className={style.addIcon} onClick={addTransfer}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={addIcon.src} alt="" />
-            <span>新增項目</span>
+        {!disabled && (
+          <div className={style.row}>
+            <div className={style.addIcon} onClick={controll.add}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={addIcon.src} alt="" />
+              <span>新增項目</span>
+            </div>
           </div>
-        </div>
-      </div>{' '}
+        )}
+      </div>
       {/* tbody */}
     </div>
   );
@@ -140,44 +161,46 @@ export default function EditTransfer({
 
 // ====================================================
 
-type TindexKeys = keyof Ttransfer;
+type TindexKeys = keyof Omit<TcontrollItem, 'onDelete'>;
 
-const indexKeys: TindexKeys[] = ['itemName', 'material', 'qty', 'reason'];
+const indexKeys: TindexKeys[] = ['goodsName', 'goodsSpec', 'goodsQuantity', 'reason'];
 
 const config: {
   [key in TindexKeys]: {
     label: string;
-    type: string;
+    type: 'input' | 'select' | 'textarea';
     width: string;
     marginRight: string;
     flex?: string;
     options?: Toption[];
     center?: boolean;
+    inputType?: 'number';
   };
 } = {
-  itemName: {
+  goodsName: {
     label: '物品名稱',
     type: 'input',
     width: '120px',
     marginRight: '22px',
   },
-  material: {
+  goodsSpec: {
     label: '材質規格',
     type: 'select',
     width: '120px',
     marginRight: '22px',
     options: optionMaterial,
   },
-  qty: {
+  goodsQuantity: {
     label: '數量',
     type: 'input',
     width: '45px',
     marginRight: '22px',
     center: true,
+    inputType: 'number',
   },
   reason: {
     label: '調貨理由',
-    type: 'input',
+    type: 'textarea',
     width: 'auto',
     marginRight: '0px',
     flex: 'auto',

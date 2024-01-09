@@ -37,7 +37,7 @@ axi.interceptors.response.use(
 
           myAlert.warning({
             title: '系統提醒',
-            content: '您已在其他地方登入',
+            content: '登入過期，請重新登入',
             props: {
               onOk: () => {
                 window.location.reload();

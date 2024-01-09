@@ -11,8 +11,8 @@ export default function TwoBtnFooter({
   confirmText,
   cancelText,
 }: {
-  onConfirm: () => void;
-  onCancel: () => void;
+  onConfirm?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onCancel?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   confirmText?: string;
   cancelText?: string;
 }) {

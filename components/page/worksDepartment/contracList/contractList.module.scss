@@ -2,6 +2,8 @@
 
 .container {
   padding: 4px;
+  padding-top: 0;
+  border-top: solid 4px white;
   :global(.ant-collapse) {
     border: none;
   }
@@ -25,8 +27,12 @@
 // ===============================================================
 
 .thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: grid;
-  grid-template-columns: 110px auto 85px 105px 85px 65px 28px 85px 20px;
+  // grid-template-columns: 110px auto 85px 105px 85px 65px 28px 85px 20px;
+  grid-template-columns: 110px auto 85px 105px 85px 20px;
   gap: 22px;
   height: 40px;
   padding: 0 30px;
@@ -61,13 +67,14 @@ div.panelHeader {
   }
   .row01 {
     display: grid;
-    grid-template-columns: 110px auto 85px 105px 85px 65px 28px 85px 20px;
+    // grid-template-columns: 110px auto 85px 105px 85px 65px 28px 85px 20px;
+    grid-template-columns: 110px auto 85px 105px 85px 20px;
     gap: 22px;
     margin-bottom: 16px;
   }
   .row02 {
     display: grid;
-    grid-template-columns: 110px 65px auto 20px;
+    grid-template-columns: 110px 65px auto 250px 250px 20px;
     gap: 22px;
     .place {
       > * {
@@ -82,14 +89,56 @@ div.panelHeader {
 }
 
 div.panelBody {
+  min-height: 82px;
   .detailRow {
     display: grid;
-    grid-template-columns: 110px auto 65px 28px 85px 20px;
+    // grid-template-columns: 110px auto 65px 28px 85px 20px;
+    grid-template-columns: 110px auto 20px;
     gap: 22px;
     padding: 8px 30px;
     > span {
       font-weight: 400;
       font-size: 16px;
     }
+  }
+}
+
+.sortTitle {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 12px 15px;
+  background-color: white;
+  border-bottom: solid 1px theme("colors.border");
+  span {
+    color: theme("colors.sub");
+    font-size: 16px;
+    font-weight: 700;
+  }
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.lightSpot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: theme("colors.border");
+  border-radius: 50%;
+}
+
+.lightBox {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  .alertLight {
+    @extend .lightSpot;
+    background-color: red;
+  }
+  .warningLight {
+    @extend .lightSpot;
+    background-color: orange;
   }
 }

@@ -26,6 +26,8 @@
 // }
 
 .scrollDiv {
+  width: 100%;
+  overflow: auto;
   max-height: 463px;
   .thead {
     position: sticky;

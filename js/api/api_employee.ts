@@ -68,7 +68,7 @@ const apiGetEmployee = (params?: Tparams) => {
 
   return (
     axi
-      .get(api, { params })
+      .get<TgetEmployee>(api, { params })
       // return axi.get(api)
       .then(({ data }) => data)
       .catch((err) => Promise.reject(err.message))
@@ -88,22 +88,11 @@ export const useEmployee = (params?: Tparams) => {
     return data;
   };
 
-  const update_infinite = async () => {
-    if (!data) {
-      return;
-    }
-
-    const apiRes = await apiGetEmployee(params);
-    const newData = apiRes.data;
-    const oldData = data.data;
-    apiRes.data = [...oldData, ...newData];
-
-    setData({ ...apiRes });
-
-    return apiRes;
+  return {
+    data,
+    setData,
+    update,
   };
-
-  return { data, setData, update, update_infinite };
 };
 
 export const useCheckEmployee = (idNumber: string) => {
@@ -231,4 +220,126 @@ export const apiDeleteEmployeeErpUser = (id: string) => {
     .delete(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+// =======================================================================
+// =======================================================================
+// =======================================================================
+
+import { useInView } from 'react-intersection-observer';
+import _ from 'lodash';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
+export const useEmployee_infinite = ({ customParams }: { customParams?: Tparams }) => {
+  /**resetCount就只是用來使呼叫reset後，若page沒有改變的話，還是可以觸發update*/
+  const [resetCount, setResetCount] = useState(0);
+  const [isLoadingPage1, setIsLoadingPage1] = useState(false);
+  const [isLoading, setIsloading] = useState(false);
+  const [viewRef_top, inView_top] = useInView();
+  const [viewRef_bottom, inView_bottom] = useInView();
+  // ----------------------------------------------------------------
+  const [dataList, setDataList] = useState<{ [key: `${number}`]: TemployeeDto[] }>({});
+
+  const [page, setPage] = useState<number>();
+  const [meta, setMeta] = useState<TpageMetaDto>();
+  const [hasNextPage, setHasNextPage] = useState<boolean>();
+
+  // ----------------------------------------------------------------
+  const defaultParams = {
+    page,
+  };
+  // ----------------------------------------------------------------
+
+  const update = async (dynaParams?: Tparams) => {
+    const params = {
+      ...defaultParams,
+      ...customParams,
+      ...dynaParams,
+    };
+
+    try {
+      if (page === 1) {
+        setIsLoadingPage1(true);
+      }
+
+      setIsloading(true);
+
+      const res = await apiGetEmployee(params);
+
+      if (res) {
+        setDataList((list) => {
+          list[`${res.meta.page}`] = res.data;
+
+          return { ...list };
+        });
+        setMeta(res.meta);
+        setHasNextPage(res.meta.hasNextPage);
+      }
+
+      return res;
+      //
+    } catch (error) {
+      myAlert.err({ title: '取得員工資料失敗' });
+      console.log(error);
+    } finally {
+      setIsloading(false);
+      setIsLoadingPage1(false);
+    }
+  };
+
+  const nextPage = () => {
+    if (hasNextPage === false || !page) {
+      return;
+    }
+
+    setPage((page) => (page ? page + 1 : page));
+  };
+
+  // -----------------------------------------------
+  const init = () => {
+    setDataList({});
+    setPage(undefined);
+    setHasNextPage(undefined);
+    setResetCount(0);
+  };
+
+  const reset = () => {
+    setDataList({});
+    setPage(1);
+    setHasNextPage(true);
+    setResetCount((count) => ++count);
+  };
+
+  // -----------------------------------------------
+  useEffect(() => {
+    if (!page) {
+      return;
+    }
+
+    update();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, resetCount]);
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    if (inView_bottom) {
+      nextPage();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inView_bottom, isLoading]);
+  // -----------------------------------------------
+
+  return {
+    dataList,
+    dataArr: _.flatten(Object.values(dataList)),
+    viewRef_top,
+    viewRef_bottom,
+    isLoadingPage1,
+    isLoading,
+    meta,
+    init,
+    reset,
+  };
 };

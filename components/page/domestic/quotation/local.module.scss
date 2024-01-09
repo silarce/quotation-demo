@@ -25,20 +25,21 @@
 }
 
 .thead {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 16px;
   padding: 11px 0;
   background-color: $bgc01;
-  min-width: 100%;
-  width: fit-content;
-  white-space: nowrap;
   z-index: 1;
+  > * {
+    flex: none;
+  }
 }
 
 .theadCell {
-  display: inline-block;
   padding: 2px 3px;
-  margin-left: 16px;
   border: solid 1px transparent;
-  width: 100%;
   cursor: default;
   > span {
     color: $colorMain;
@@ -101,7 +102,8 @@
     padding-bottom: 1px;
   }
   &.textCenter {
-    input,div {
+    input,
+    div {
       text-align: center;
     }
     .checkbox {

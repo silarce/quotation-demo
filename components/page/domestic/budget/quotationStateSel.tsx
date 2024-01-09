@@ -26,7 +26,7 @@ export default function QuotationStateSel({
   history,
 }: {
   quotationState: Toption;
-  setQuotationState: Dispatch<SetStateAction<Toption>>;
+  setQuotationState: (v: Toption) => void;
   history: TquotationStateHistory[];
 }) {
   // -------------------------------------------------------------------------
@@ -116,7 +116,7 @@ export default function QuotationStateSel({
           const timeString = mDate.format('HH:mm:ss');
 
           return (
-            <Fragment key={index}>
+            <React.Fragment key={index}>
               <div className={scss.item}>
                 <div>
                   <span>{`${state_from} > ${state_to}`}</span>
@@ -127,7 +127,7 @@ export default function QuotationStateSel({
                 </div>
               </div>
               {!(arr.length - 1 === index) && <hr />}
-            </Fragment>
+            </React.Fragment>
           );
         })}
       </div>

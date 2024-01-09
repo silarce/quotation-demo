@@ -1,57 +1,101 @@
-import { Dispatch, SetStateAction } from 'react';
+import { useState } from 'react';
 
 // global gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
+// import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+
+// gear
+import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
 
 // css
-import style from './listOfDeliveryOrders.module.scss';
+import style from './signature.module.scss';
 
-// fake
-import { Tsignature } from 'pages/worksDepartment/contractList/contract/listOfDeliveryOrders/edit';
+// type
+import { TemployeeDto } from 'js/api/dtoTypes';
 
-export default function Signature({
-  signature,
-  setSignature,
-  editable,
-}: {
-  signature: Partial<Tsignature>;
-  setSignature: Dispatch<SetStateAction<Partial<Tsignature>>>;
-  editable: boolean;
-}) {
+type Tcontroll = {
+  accounting: {
+    employee: TemployeeDto | undefined;
+    onChange: (v: TemployeeDto) => void;
+    forbidden?: boolean;
+  };
+  warehouseEmployee: {
+    employee: TemployeeDto | undefined;
+    onChange: (v: TemployeeDto) => void;
+    forbidden?: boolean;
+  };
+  factoryEmployee: {
+    employee: TemployeeDto | undefined;
+    onChange: (v: TemployeeDto) => void;
+    forbidden?: boolean;
+  };
+  supervisor: {
+    employee: TemployeeDto | undefined;
+    onChange: (v: TemployeeDto) => void;
+    forbidden?: boolean;
+  };
+  formCompleter: {
+    employee: TemployeeDto | undefined;
+    onChange?: (v: TemployeeDto) => void;
+    forbidden?: boolean;
+  };
+};
+
+export type { Tcontroll, TemployeeDto };
+
+// ===================================================================
+
+export default function Signature({ controll, disabled }: { controll: Tcontroll; disabled?: boolean }) {
+  const [targetControllKey, setTargetControllKey] = useState<keyof Tcontroll | undefined>(undefined);
+  const targetControll = targetControllKey ? controll[targetControllKey] : undefined;
+
   return (
     <div className={style.signature}>
       {indexKeys.map((key, index) => {
         const { label, placeholder } = config[key];
-        const stateValue = signature[key];
+        const value = (controll[key].employee?.chName || controll[key].employee?.enName) ?? '';
+        const forbidden = controll[key].forbidden;
 
-        const onChange = (v: string) => {
-          signature[key] = v;
-          setSignature({ ...signature });
+        const onClick = () => {
+          setTargetControllKey(key);
         };
 
         return (
-          <div className={style.cell} key={index}>
+          <div className={style.cell} key={index} onClick={onClick}>
             <span>{label}</span>
             <InputSel
               className={style.input02}
               inputProps={{
-                value: stateValue ?? '',
-                onChange,
+                props: {
+                  value,
+                  placeholder,
+                },
               }}
-              placeholder={placeholder}
-              disabled={!editable}
+              disabled={forbidden || disabled}
+              // showBaseline="auto"
+              showBaseline="auto"
+              showAddIcon={forbidden || disabled ? false : true}
             />
           </div>
         );
       })}
+      <EmployeeSelector
+        showModal={!!targetControll}
+        onConfirm={(arr) => {
+          targetControll?.onChange?.(arr[0]);
+        }}
+        onCancel={() => setTargetControllKey(undefined)}
+        defaultEmpArr={targetControll?.employee ? [targetControll.employee] : undefined}
+        selLimit={1}
+      />
     </div>
   );
 }
 
-// ====================================================
+// ========================================================
 
-type TindexKeys = keyof Tsignature;
-const indexKeys: TindexKeys[] = ['會計', '倉庫', '廠務主管', '單位主管', '填表'];
+type TindexKeys = keyof Tcontroll;
+const indexKeys: TindexKeys[] = ['accounting', 'warehouseEmployee', 'factoryEmployee', 'supervisor', 'formCompleter'];
 
 const config: {
   [key in TindexKeys]: {
@@ -59,24 +103,24 @@ const config: {
     placeholder: string;
   };
 } = {
-  會計: {
+  accounting: {
     label: '會計',
-    placeholder: '請輸入會計人員',
+    placeholder: '請選擇會計',
   },
-  倉庫: {
-    label: '倉庫',
-    placeholder: '請輸入倉庫人員',
+  warehouseEmployee: {
+    label: '倉庫人員',
+    placeholder: '請選擇倉庫人員',
   },
-  廠務主管: {
-    label: '廠務主管',
-    placeholder: '請輸入廠務主管',
+  factoryEmployee: {
+    label: '廠務人員',
+    placeholder: '請選擇廠務人員',
   },
-  單位主管: {
+  supervisor: {
     label: '單位主管',
-    placeholder: '請輸入單位主管',
+    placeholder: '請選擇單位主管',
   },
-  填表: {
-    label: '填表',
-    placeholder: '請輸入填表人',
+  formCompleter: {
+    label: '填表人員',
+    placeholder: '請選擇填表人員',
   },
 };

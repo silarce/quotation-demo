@@ -10,17 +10,17 @@ import { TuseProduct } from 'components/page/domestic/quotation/hook/useProduct'
 
 type TmemoArr = string[];
 type Tsettlement = {
-  subTotal: number;
-  businessTax: number;
-  total: number;
+  subTotal: string;
+  businessTax: string;
+  total: string;
 };
 
 export default function Total({ memoArr, settlement }: { memoArr: TmemoArr; settlement: Tsettlement }) {
   memoArr;
 
-  const subTotal = settlement.subTotal.toLocaleString(undefined, { maximumFractionDigits: 2 });
-  const businessTax = settlement.businessTax.toLocaleString(undefined, { maximumFractionDigits: 2 });
-  const total = settlement.total.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  const subTotal = settlement.subTotal;
+  const businessTax = settlement.businessTax;
+  const total = settlement.total;
 
   return (
     <div className={style.total}>
@@ -34,7 +34,7 @@ export default function Total({ memoArr, settlement }: { memoArr: TmemoArr; sett
             {memoArr.map((content, index) => {
               return (
                 <li key={index}>
-                  <span>{`(${index + 1})`}</span>
+                  {/* <span>{`(${index + 1})`}</span> */}
                   <span>{content}</span>
                 </li>
               );

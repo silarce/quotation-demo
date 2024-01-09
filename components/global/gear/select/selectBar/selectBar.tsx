@@ -13,6 +13,7 @@ export default function SelectBar({
   disabled,
   style,
   className,
+  menuPortalTarget,
 }: {
   // selectPropsArr: TselectProps[]
   selectPropsArr: {
@@ -23,6 +24,7 @@ export default function SelectBar({
   disabled?: boolean | undefined;
   style?: CSSProperties;
   className?: string;
+  menuPortalTarget?: TselectProps['menuPortalTarget'];
 }) {
   // ------------------------------------------------------------------------
   return (
@@ -53,6 +55,7 @@ export default function SelectBar({
               showBaseline="invisible"
               disabled={disabled}
               selectProps={{
+                menuPortalTarget,
                 ...selectProps,
                 arrowType: 'black',
                 selClassNames: {

@@ -33,6 +33,10 @@
     padding-left: 22px;
     padding-right: 22px;
   }
+  &.px32 {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
   &.px44 {
     padding-left: 44px;
     padding-right: 44px;
@@ -49,5 +53,9 @@
     &:hover {
       background-color: $chosenBgc01;
     }
+  }
+  &.transparent {
+    background-color: transparent;
+    border: none;
   }
 }

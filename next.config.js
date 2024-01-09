@@ -12,7 +12,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
     // domains: ["sanjeou-erp-be.caprover.credot-web.com"],
-  },
+  }
 };
 
 module.exports = {
