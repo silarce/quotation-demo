@@ -204,7 +204,7 @@ const config: Tconfig = {
   },
   size: {
     label: '尺寸(單位:cm)',
-    width: '160px',
+    width: '180px',
   },
   doorType: {
     label: '門型',
@@ -212,7 +212,7 @@ const config: Tconfig = {
   },
   material: {
     label: '材料',
-    width: '124px',
+    width: '104px',
     align: 'center',
   },
   thickness: {

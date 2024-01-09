@@ -87,6 +87,7 @@ const erpFeaturesLookup = {
   worksDepartment_deliveryList: '工務部-出庫單編輯',
 } as const;
 
+// key:value逆轉版本的erpFeaturesLookup
 const swappedErpFeaturesLookup: { [key: string]: string } = {};
 
 for (const key in erpFeaturesLookup) {

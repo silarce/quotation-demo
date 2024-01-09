@@ -172,6 +172,8 @@ type Tprod = {
   totalPrice: number;
   typhoonProtection: boolean;
   bounceDoor: boolean;
+  // 彈射門尺寸
+  bounceDoorWidth: number;
   notes: string;
   //
   motor: string; // 馬達廠商
@@ -2796,6 +2798,36 @@ class Class_product {
     this.reRender();
   }
 
+  // 單位為公尺
+  get bounceDoorWidth() {
+    if (!this._prodData.bounceDoorWidth) {
+      return '';
+    } else {
+      const bounceDoorWidth_m = new Decimal(this._prodData.bounceDoorWidth).div(1000).toString();
+
+      return bounceDoorWidth_m;
+    }
+  }
+  // 輸入的單位預期為公尺
+  set bounceDoorWidth(str) {
+    if (!str) {
+      this._prodData.bounceDoorWidth = 0;
+    } else {
+      const bounceDoorWidth_mm = new Decimal(str).mul(1000).toNumber();
+      this._prodData.bounceDoorWidth = bounceDoorWidth_mm;
+    }
+
+    this.reRender();
+  }
+
+  get bounceDoorWidth_mm() {
+    return this._prodData.bounceDoorWidth;
+  }
+
+  get bounceDoorWidth_cm() {
+    return new Decimal(this._prodData.bounceDoorWidth).div(10).toNumber();
+  }
+
   get notes() {
     return this._prodData.notes;
   }
@@ -3227,6 +3259,9 @@ class Class_product {
       slatLength: this._doorGeneralSpecs?.slatLength ?? 0,
       guideRailLength: this._doorGeneralSpecs?.guideRailLength ?? 0,
       headBoxLength: this._doorGeneralSpecs?.headBoxLength ?? 0,
+      //
+      bounceDoorWidth: this._prodData.bounceDoorWidth || null,
+      bounceDoor: !!(this._prodData.bounceDoorWidth || null),
     };
 
     if ('items' in body) {
@@ -3350,7 +3385,9 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'unitPrice', //單價
     'totalPrice', // 複價
     'typhoonProtection',
-    'bounceDoor',
+    // bounceDoor不再使用，直接以bounceDoorWidth代替
+    // 'bounceDoor',
+    'bounceDoorWidth',
     'notes',
 
     // 經理說這些要隱藏，不要顯示出來
@@ -3400,6 +3437,7 @@ const emptyProdOri = (): Tprod => {
     totalPrice: 0,
     typhoonProtection: false,
     bounceDoor: false,
+    bounceDoorWidth: 0,
     notes: '',
     //
     motor: '',
