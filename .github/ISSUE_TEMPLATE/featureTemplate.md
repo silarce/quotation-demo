@@ -1,3 +1,7 @@
+---
+name:featureTemplate
+about:feature模板
+---
 Description
 <!---描述要做的功能，預期達到的效果-->
 
