@@ -31,6 +31,13 @@ import { TquotationContentDto } from 'js/api/api_quotation';
 import { Class_product, Class_other } from 'hooks/quotation/useProduct';
 import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
+import { optionsCreator_quotationStatus } from 'js/utils/options/options';
+
+const quotationStatusLookup: { [key: string]: string } = {};
+optionsCreator_quotationStatus().forEach((item) => {
+  quotationStatusLookup[item.value] = item.label;
+});
+
 // ============================================================================
 type TtableProdList_series = (TtableProdListItem & { series: string })[];
 
@@ -38,6 +45,7 @@ type Tcontrol_basicInfo = {
   quotationDate: string;
   quotationNumber: string;
   projectName: string;
+  quotationStatus: string;
   customerName: string;
   contactPerson: string;
   contactNumber: string;
@@ -101,6 +109,7 @@ export default function QuotationPdf({
     quotationDate,
     quotationNumber,
     projectName,
+    quotationStatus,
     // customerName,
     // contactPerson,
     // contactNumber,
@@ -192,6 +201,7 @@ export default function QuotationPdf({
 
     return {
       quotationId: quotationNumber,
+      quotationStatus,
       clientName: customerName,
       contactPerson: contactPerson,
       contactPhone: contactNumber,
@@ -584,6 +594,7 @@ const emptyBasicInfo = (): Tcontrol_basicInfo => {
     quotationDate: '',
     quotationNumber: '',
     projectName: '',
+    quotationStatus: '',
     customerName: '',
     contactPerson: '',
     contactNumber: '',
@@ -610,6 +621,7 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | un
     quotationDate,
     quotationNumber,
     projectName,
+    status,
     customer,
     contactPerson,
     contactNumber,
@@ -641,6 +653,8 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | un
     };
   });
 
+  const quotationStatus = quotationStatusLookup[status] ?? '';
+
   const customerName = customer.name;
   const agentName = agentEmployee.chName;
 
@@ -652,6 +666,7 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | un
     quotationDate,
     quotationNumber,
     projectName,
+    quotationStatus,
     customerName,
     contactPerson,
     contactNumber,
@@ -793,6 +808,7 @@ const legacyContractToBasicInfo = ({
     quotationDate: '', // 舊合約沒有報價日期
     quotationNumber: contractNumber,
     projectName,
+    quotationStatus: '舊合約',
     customerName,
     contactPerson,
     contactNumber,
