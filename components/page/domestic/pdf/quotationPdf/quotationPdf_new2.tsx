@@ -698,7 +698,7 @@ const quotationProdToTableProdList = ({
       const fullWidth = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
       const height = new Decimal(prod.height || 0).mul(100).toNumber();
       const boxB = new Decimal(prod.boxB || 0).mul(100).toNumber();
-      const bounceDoorWidth = prod.bounceDoorWidth_mm || '';
+      const bounceDoorWidth = prod.bounceDoorWidth_cm || '';
 
       const boxB_formated = boxB ? `＋${boxB}` : '';
       const bounceDoorWidth_formated = bounceDoorWidth ? `＋${bounceDoorWidth}` : '';

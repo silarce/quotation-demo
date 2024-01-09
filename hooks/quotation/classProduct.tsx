@@ -2824,6 +2824,10 @@ class Class_product {
     return this._prodData.bounceDoorWidth;
   }
 
+  get bounceDoorWidth_cm() {
+    return new Decimal(this._prodData.bounceDoorWidth).div(10).toNumber();
+  }
+
   get notes() {
     return this._prodData.notes;
   }
