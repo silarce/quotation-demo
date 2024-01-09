@@ -60,7 +60,7 @@ export default function PageHeader({
       },
     },
     {
-      label: '出庫單',
+      label: '工程管理單',
       // disabled: true,
       href: {
         pathname: `${pathHead}/outboundOrder`,
