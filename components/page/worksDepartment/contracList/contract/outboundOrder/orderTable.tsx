@@ -733,13 +733,13 @@ const creCellConfig_staticData2 = (): TcellConfigList => ({
     position: '',
   },
   installer: {
-    label: '安裝人員',
+    label: '施工人員',
     width: '85px',
     type: 'employee',
     position: '',
   },
   installDate: {
-    label: '安裝日期',
+    label: '施工日期',
     width: '120px',
     type: 'date',
     position: '',
