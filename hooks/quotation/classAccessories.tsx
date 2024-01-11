@@ -67,6 +67,8 @@ class Class_accessories {
   copySelf: () => void;
   // readonly calcOptionsAllprice;
 
+  makeFormatValueDontTriggerTwice = false;
+
   // --------------------------------------------------------------------
 
   reNewMethod() {
@@ -196,11 +198,20 @@ class Class_accessories {
     // return this._acceData.price.toLocaleString();
   }
   set price_locale(v) {
+    if (this.makeFormatValueDontTriggerTwice) {
+      return;
+    }
+
     v = v ?? '0';
     // v = v.replace(/,/g, '');
     this._acceData.price = Number(v);
     this.calcAllPrice();
     this.reRender();
+
+    this.makeFormatValueDontTriggerTwice = true;
+    setTimeout(() => {
+      this.makeFormatValueDontTriggerTwice = false;
+    }, 0);
   }
 
   get dualPrice() {

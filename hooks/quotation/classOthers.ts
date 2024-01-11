@@ -41,7 +41,6 @@ class Class_other {
   callCalcSubTotal;
   // calcSubTotalPrice;
 
-  formatValueTimeoutId: NodeJS.Timeout | undefined = undefined;
   makeFormatValueDontTriggerTwice = false;
 
   // ---------------------------------------------------------

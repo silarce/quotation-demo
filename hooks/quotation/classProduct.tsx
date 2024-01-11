@@ -415,6 +415,8 @@ class Class_product {
 
   private _quotationDiscount = 100;
 
+  makeFormatValueDontTriggerTwice = false;
+
   // ---------------------------------------------------------
   // 追加追減用的
   private parentProd: Class_product | undefined = undefined;
@@ -2188,6 +2190,10 @@ class Class_product {
     return this._prodData.discount;
   }
   set discount(v) {
+    if (this.makeFormatValueDontTriggerTwice) {
+      return;
+    }
+
     if ((v as string) === '') {
       v = '0';
     }
@@ -2206,6 +2212,11 @@ class Class_product {
     this.calcAllPrice_comAndSubComAndAcce();
 
     this.reRender();
+
+    this.makeFormatValueDontTriggerTwice = true;
+    setTimeout(() => {
+      this.makeFormatValueDontTriggerTwice = false;
+    }, 0);
   }
 
   clearId() {
