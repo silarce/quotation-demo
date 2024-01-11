@@ -41,6 +41,9 @@ class Class_other {
   callCalcSubTotal;
   // calcSubTotalPrice;
 
+  formatValueTimeoutId: NodeJS.Timeout | undefined = undefined;
+  makeFormatValueDontTriggerTwice = false;
+
   // ---------------------------------------------------------
 
   calcAllPrice() {
@@ -89,15 +92,24 @@ class Class_other {
     this.reRender();
   }
   get unitPrice_locale() {
-    return String(this._data.unitPrice || 0);
+    return String(this._data.unitPrice || '0');
     // return this._data.unitPrice.toLocaleString();
   }
   set unitPrice_locale(v) {
     // v = v.replace(/,/g, '');
 
+    if (this.makeFormatValueDontTriggerTwice) {
+      return;
+    }
+
     this._data.unitPrice = Number(v);
     this.calcAllPrice();
     this.reRender();
+
+    this.makeFormatValueDontTriggerTwice = true;
+    setTimeout(() => {
+      this.makeFormatValueDontTriggerTwice = false;
+    }, 0);
   }
 
   get totalPrice() {
