@@ -19,6 +19,7 @@ const prodCellConfig: TcellConfig = {
       inputProps: {
         props: {
           type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
         },
       },
     },
@@ -62,6 +63,7 @@ const prodCellConfig: TcellConfig = {
       inputProps: {
         props: {
           type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
           className: 'text-center',
         },
       },
@@ -76,6 +78,7 @@ const prodCellConfig: TcellConfig = {
       inputProps: {
         props: {
           type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
           className: 'text-center',
           // disabled: true,
           placeholder: '',
@@ -91,7 +94,8 @@ const prodCellConfig: TcellConfig = {
       // showBaseline: 'invisible',
       inputProps: {
         props: {
-          // type: 'number',
+          type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
           className: 'text-center',
           // disabled: true,
           placeholder: '',
@@ -108,6 +112,7 @@ const prodCellConfig: TcellConfig = {
       inputProps: {
         props: {
           type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
           className: 'text-center',
         },
       },
@@ -157,6 +162,7 @@ const prodCellConfig: TcellConfig = {
         props: {
           disabled: true,
           type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
         },
       },
     },
@@ -170,6 +176,7 @@ const prodCellConfig: TcellConfig = {
         props: {
           disabled: true,
           type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
         },
       },
     },
@@ -237,7 +244,7 @@ const prodCellConfig: TcellConfig = {
     inputSelProps: {
       wrapperStyle: { width: '55px' },
       inputProps: {
-        props: { type: 'number' },
+        props: { type: 'number', onWheel: (e) => e.currentTarget.blur() },
       },
     },
   },
@@ -318,6 +325,7 @@ const prodCellConfig: TcellConfig = {
       inputProps: {
         props: {
           type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
         },
       },
     },
@@ -422,6 +430,7 @@ const prodCellConfig: TcellConfig = {
         props: {
           disabled: true,
           type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
           className: 'text-center',
           placeholder: '',
         },

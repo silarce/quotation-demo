@@ -1,14 +1,9 @@
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-import { nanoid } from 'nanoid';
 
 // type
 import type { TreRender } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
-import type { Toption } from 'js/utils/options/options';
-
-// type
-import { TcreateQuotationContentOtherDto } from 'js/api/dtoTypes';
 
 // =======================================================================
 class Class_other {
@@ -206,6 +201,7 @@ const othersCellConfig: TcellConfig = {
       inputProps: {
         props: {
           type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
         },
       },
     },
