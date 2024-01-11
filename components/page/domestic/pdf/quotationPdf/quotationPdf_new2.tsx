@@ -45,7 +45,7 @@ type Tcontrol_basicInfo = {
   quotationDate: string;
   quotationNumber: string;
   projectName: string;
-  quotationStatus: string;
+  // quotationStatus: string;
   customerName: string;
   contactPerson: string;
   contactNumber: string;
@@ -109,7 +109,7 @@ export default function QuotationPdf({
     quotationDate,
     quotationNumber,
     projectName,
-    quotationStatus,
+    // quotationStatus,
     // customerName,
     // contactPerson,
     // contactNumber,
@@ -201,7 +201,7 @@ export default function QuotationPdf({
 
     return {
       quotationId: quotationNumber,
-      quotationStatus,
+      // quotationStatus,
       clientName: customerName,
       contactPerson: contactPerson,
       contactPhone: contactNumber,
@@ -594,7 +594,7 @@ const emptyBasicInfo = (): Tcontrol_basicInfo => {
     quotationDate: '',
     quotationNumber: '',
     projectName: '',
-    quotationStatus: '',
+    // quotationStatus: '',
     customerName: '',
     contactPerson: '',
     contactNumber: '',
@@ -653,7 +653,7 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | un
     };
   });
 
-  const quotationStatus = quotationStatusLookup[status] ?? '';
+  // const quotationStatus = quotationStatusLookup[status] ?? '';
 
   const customerName = customer.name;
   const agentName = agentEmployee.chName;
@@ -666,7 +666,7 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | un
     quotationDate,
     quotationNumber,
     projectName,
-    quotationStatus,
+    // quotationStatus,
     customerName,
     contactPerson,
     contactNumber,
@@ -808,7 +808,7 @@ const legacyContractToBasicInfo = ({
     quotationDate: '', // 舊合約沒有報價日期
     quotationNumber: contractNumber,
     projectName,
-    quotationStatus: '舊合約',
+    // quotationStatus: '舊合約',
     customerName,
     contactPerson,
     contactNumber,
