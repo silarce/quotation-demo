@@ -415,6 +415,8 @@ class Class_product {
 
   private _quotationDiscount = 100;
 
+  makeFormatValueDontTriggerTwice = false;
+
   // ---------------------------------------------------------
   // 追加追減用的
   private parentProd: Class_product | undefined = undefined;
@@ -2188,6 +2190,10 @@ class Class_product {
     return this._prodData.discount;
   }
   set discount(v) {
+    if (this.makeFormatValueDontTriggerTwice) {
+      return;
+    }
+
     if ((v as string) === '') {
       v = '0';
     }
@@ -2206,6 +2212,11 @@ class Class_product {
     this.calcAllPrice_comAndSubComAndAcce();
 
     this.reRender();
+
+    this.makeFormatValueDontTriggerTwice = true;
+    setTimeout(() => {
+      this.makeFormatValueDontTriggerTwice = false;
+    }, 0);
   }
 
   clearId() {
@@ -2302,6 +2313,17 @@ class Class_product {
     });
     this._theW = String(w);
 
+    this.onWGChange();
+    this.reRender();
+  }
+
+  set WG_noChangeW(v: string) {
+    this._prodData.WG = v;
+    this.onWGChange();
+    this.reRender();
+  }
+
+  async onWGChange() {
     const callReq = async () => {
       const fullWidth = await calcFullwidthWithWG({
         body: {
@@ -2329,8 +2351,6 @@ class Class_product {
       await callReq();
       this.reRender();
     }, 800);
-
-    this.reRender();
   }
 
   // ------------------------------------
@@ -2344,11 +2364,6 @@ class Class_product {
       v = '0';
     }
 
-    // const wg = new Decimal(v || 0)
-    //   .add(this.guildRailG || 0)
-    //   .add(this.guildRailG || 0)
-    //   .toString();
-
     const wg = calcProductWG_withWAndG({
       W: Number(v || 0),
       G: Number(this.guildRailG || 0),
@@ -2357,7 +2372,9 @@ class Class_product {
     // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
     this._dontCalcWG = true;
 
-    this.WG = String(wg);
+    this._theW = String(v);
+    this.WG_noChangeW = String(wg);
+
     this.reRender;
   }
 

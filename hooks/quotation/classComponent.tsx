@@ -94,6 +94,7 @@ class Class_component {
   private _totalPrice = 0;
   //
   //
+  makeFormatValueDontTriggerTwice = false;
 
   // ---------------------------------------------------------
 
@@ -293,11 +294,20 @@ class Class_component {
     // return this._com.price?.toLocaleString();
   }
   set price_locale(v) {
+    if (this.makeFormatValueDontTriggerTwice) {
+      return;
+    }
+
     v = v ?? '0';
     // v = v.replace(/,/g, '');
     this._com.price = Number(v);
     this.calcAllPrice();
     this.reRender();
+
+    this.makeFormatValueDontTriggerTwice = true;
+    setTimeout(() => {
+      this.makeFormatValueDontTriggerTwice = false;
+    }, 0);
   }
 
   get name() {
