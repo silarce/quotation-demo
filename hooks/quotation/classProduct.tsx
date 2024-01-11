@@ -2302,6 +2302,17 @@ class Class_product {
     });
     this._theW = String(w);
 
+    this.onWGChange();
+    this.reRender();
+  }
+
+  set WG_noChangeW(v: string) {
+    this._prodData.WG = v;
+    this.onWGChange();
+    this.reRender();
+  }
+
+  async onWGChange() {
     const callReq = async () => {
       const fullWidth = await calcFullwidthWithWG({
         body: {
@@ -2329,8 +2340,6 @@ class Class_product {
       await callReq();
       this.reRender();
     }, 800);
-
-    this.reRender();
   }
 
   // ------------------------------------
@@ -2344,11 +2353,6 @@ class Class_product {
       v = '0';
     }
 
-    // const wg = new Decimal(v || 0)
-    //   .add(this.guildRailG || 0)
-    //   .add(this.guildRailG || 0)
-    //   .toString();
-
     const wg = calcProductWG_withWAndG({
       W: Number(v || 0),
       G: Number(this.guildRailG || 0),
@@ -2357,7 +2361,9 @@ class Class_product {
     // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
     this._dontCalcWG = true;
 
-    this.WG = String(wg);
+    this._theW = String(v);
+    this.WG_noChangeW = String(wg);
+
     this.reRender;
   }
 

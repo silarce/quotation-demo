@@ -91,7 +91,7 @@ const prodCellConfig: TcellConfig = {
       // showBaseline: 'invisible',
       inputProps: {
         props: {
-          type: 'number',
+          // type: 'number',
           className: 'text-center',
           // disabled: true,
           placeholder: '',
