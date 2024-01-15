@@ -25,6 +25,7 @@ import scss from './quotationPdf.module.scss';
 
 // config
 import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
+import { findGuideRailUnicode } from 'config/product/lookup';
 
 // type
 import { TquotationContentDto } from 'js/api/api_quotation';
@@ -33,9 +34,6 @@ import { Class_product, Class_other } from 'hooks/quotation/useProduct';
 import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 import { optionsCreator_quotationStatus } from 'js/utils/options/options';
-
-import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import changeNumberMoneyToChinese from 'js/tools/numToChineseNum';
 
 // ============================================================================
 
@@ -345,7 +343,9 @@ export default function QuotationPdf({
     // const rowHeight_title = 30 * rowHeightAdjust;
     const rowHeight_title = 25 * rowHeightAdjust;
     const rowHeight_thead = 24.9 * rowHeightAdjust;
-    const rowHeight_tbody = 20.1 * rowHeightAdjust;
+    const rowHeight_tbody = 20 * rowHeightAdjust;
+    // const rowHeight_tbody = 19.9 * rowHeightAdjust;
+    // const rowHeight_tbody = 16 * rowHeightAdjust;
     const rowHeight_notes = 14.1 * rowHeightAdjust;
     const rowHeight_total = 20.1 * rowHeightAdjust;
 
@@ -551,7 +551,8 @@ export default function QuotationPdf({
           doorType,
           thickness,
           surface,
-          doorRail,
+          // doorRail,
+          doorRailForExcel,
           horsepower,
           openType,
           qty,
@@ -559,6 +560,8 @@ export default function QuotationPdf({
           priceTotal,
           memo,
         } = prod;
+
+        // const doorRailUnicode
 
         let { size, material } = prod;
 
@@ -601,8 +604,7 @@ export default function QuotationPdf({
         cellE.value = material;
         cellF.value = thickness;
         cellG.value = surface;
-        // cellH.value = doorRail;
-        cellH.value = '';
+        cellH.value = doorRailForExcel;
         cellI.value = horsepower;
         cellJ.value = openType;
         cellK.value = qty_num;
@@ -1333,6 +1335,8 @@ const quotationProdToTableProdList = ({
 }): Tcontrol_prodArr => {
   const productArr: TtableProdList_series = (() => {
     return classProductArr.map((prod) => {
+      const { typhoonProtection, doorTrackSilencerStrip } = prod;
+
       const fullWidth = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
       const height = new Decimal(prod.height || 0).mul(100).toNumber();
       const boxB = new Decimal(prod.boxB || 0).mul(100).toNumber();
@@ -1347,6 +1351,11 @@ const quotationProdToTableProdList = ({
       const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
 
       let material = prod.material;
+
+      const doorRailForExcel = findGuideRailUnicode({
+        isAntiTyphoon: typhoonProtection,
+        isSilencing: doorTrackSilencerStrip,
+      });
 
       // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
       if (material === '高耐鍍鋅鋼板') {
@@ -1368,6 +1377,8 @@ const quotationProdToTableProdList = ({
         priceTotal: prod.totalPrice,
         memo: prod.notes,
         series: prod.doorType,
+        //
+        doorRailForExcel: doorRailForExcel,
       };
     });
   })();
@@ -1517,6 +1528,10 @@ const legacyContractToTableProdList = ({
         priceTotal: prod.totalPrice,
         memo: prod.notes,
         series: prod.itemName,
+        //
+        // 舊合約沒有消音條參數，不能取得正確的doorRailForExcel
+        // doorRailForExcel: doorTrackLookup[prod.doorTrack]?.excel,
+        doorRailForExcel: prod.doorTrack,
       };
     });
 
