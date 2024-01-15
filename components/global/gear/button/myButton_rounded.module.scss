@@ -1,0 +1,44 @@
+.antdBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: fit-content;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 700;
+
+  svg {
+    display: inline-block;
+  }
+
+  &.danger {
+    color: theme("colors.danger");
+    border-color: theme("colors.danger");
+    svg {
+      color: theme("colors.danger");
+      stroke: theme("colors.danger") !important;
+      line {
+        stroke: theme("colors.danger") !important;
+      }
+    }
+    * {
+      color: theme("colors.danger");
+    }
+  }
+
+  &.success {
+    color: theme("colors.success");
+    border-color: theme("colors.success");
+    svg {
+      color: theme("colors.success");
+      stroke: theme("colors.success") !important;
+      line {
+        stroke: theme("colors.success") !important;
+      }
+    }
+    * {
+      color: theme("colors.success");
+    }
+  }
+}
