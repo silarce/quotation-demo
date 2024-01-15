@@ -17,6 +17,12 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
 import QuotationProdChangingRecord from 'components/page/domestic/quotation/quotationProdChangingRecord';
 import QuotationRecord from 'components/page/domestic/quotation/quotationRecord';
+import Profile, {
+  Tcontroll as Tcontroll_profile,
+} from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
+import TextListEditor_v2, {
+  TstringObj as Tcontroll_textListEditor,
+} from 'components/page/domestic/quotation/quotationTotal/TextListEditor_v2';
 
 // antd
 import { Collapse } from 'antd';
@@ -29,17 +35,15 @@ import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 // css
 import style from './quotation.module.scss';
 
-// =============================================================
-// =============================================================
-// =============================================================
-
 // api
 import {
   useGetContract_id_noItems_2,
   useQuotation_id_attachments,
   apiGetQuotationProducts,
+  TquotationProductDto,
+  TquotationContractDto,
 } from 'js/api/api_quotation';
-import { apiPostEngineeringContact } from 'js/api/api_engineering';
+import { apiPostEngineeringContact, useGetEngineeringContact } from 'js/api/api_engineering';
 
 // component
 // import Table_prod from 'components/page/domestic/contract/table/table_prod';
@@ -728,28 +732,8 @@ const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: 
 };
 
 // ======================================================================
-
-import Profile, {
-  Tcontroll as Tcontroll_profile,
-} from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
-import TextListEditor_v2, {
-  TstringObj as Tcontroll_textListEditor,
-} from 'components/page/domestic/quotation/quotationTotal/TextListEditor_v2';
-
-import {
-  TquotationProductDto,
-  //
-  useGetContract_id_noItems,
-  TquotationContractDto,
-} from 'js/api/api_quotation';
-
-// api
-import {
-  TupdateEngineeringContactDto,
-  useGetEngineeringContact,
-  apiPatchEngineeringContact,
-  apiPostWorkSheet,
-} from 'js/api/api_engineering';
+// ======================================================================
+// ======================================================================
 
 const WorkContactDoc = ({
   contract,
@@ -769,6 +753,7 @@ const WorkContactDoc = ({
         myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engineeringContactId]);
 
   // --------------------------------------------------------------
