@@ -64,10 +64,15 @@ export const lookup_horsePowerToNumber: { [key: string]: number | undefined } = 
 // 該字型是天心系統附的，需要安裝的話找會計部怡君
 // 門軌unicode查找表
 export const lookup_guideRailUnicode = {
-  normal_silencing: '\uE001',
-  normal: '\uE000',
-  antiTyphoon: '\uE003',
+  normal_silencing: '\uE011',
+  normal: '\uE010',
+  antiTyphoon: '\uE013',
   antiTyphoon_silencing: '\uE016',
+  //
+  normal_silencing_thin: '\uE001',
+  normal_thin: '\uE000',
+  antiTyphoon_thin: '\uE003',
+  antiTyphoon_silencing_thin: '\uE016',
   //
   unknown01: '\uE002',
   unknown02: '\uE004',
@@ -76,10 +81,10 @@ export const lookup_guideRailUnicode = {
   // unknown05: '\uE007',
   // unknown06: '\uE008',
   // unknown07: '\uE009',
-  unknown08: '\uE010',
-  unknown09: '\uE011',
+  // unknown08: '\uE010',
+  // unknown09: '\uE011',
   unknown10: '\uE012',
-  unknown11: '\uE013',
+  // unknown11: '\uE013',
   // unknown12: '\uE014',
   unknown13: '\uE015',
 };
