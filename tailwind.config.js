@@ -15,6 +15,8 @@ module.exports = {
         bgc02: "#fcfcfc",
         hoverBgc: "#ecf1ff",
         chosenBgc: "#ffeeee",
+        danger: "#ea1833",
+        success: "#08f366",
       }
     },
     screens: {
