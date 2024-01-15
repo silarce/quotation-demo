@@ -282,6 +282,10 @@ export default function QuotationPdf({
       pageSetup: {
         paperSize: 9, // A4 paper size
         orientation: 'portrait', // page orientation
+        // showGridLines: true,
+        // fitToPage: true, // fit to page
+        // fitToWidth: 1, // fit to one page wide
+        // fitToHeight: 0, // auto height
       },
     });
 
@@ -291,35 +295,40 @@ export default function QuotationPdf({
 
     // 之后调整页面设置配置
     sheet.pageSetup.margins = {
-      left: 0.35,
-      right: 0.35,
+      left: 0.2,
+      right: 0.2,
       top: 0.2,
       bottom: 0.2,
       header: 0.3,
       footer: 0.3,
     };
 
-    // 整數 -1 + 0.38
-    // .6 無條件捨去
+    // 打開excel右下方的視圖模式 設為"頁面配置"
+    // 欄寬的單位就會是cm
+    // 0.1"大約"等於0.02cm
+    // 會有怎麼樣都無法調整到想要的公分值的情況
+
+    // 調整欄寬時建議視圖模式不要用"標準"
+    // 怪怪的
 
     // 這個放到最後再調整
     sheet.columns = [
-      { width: 0.9 }, // A // 0.56
-      { width: 7 }, // B // 6.33
-      { width: 13.5 }, // C // 12.33
-      { width: 10 }, // D // 9.33
-      { width: 6 }, // E // 5.33
-      { width: 5.6 }, // F // 4.89
-      { width: 5.6 }, // G // 4.89
-      { width: 5.6 }, // H // 4.89
-      { width: 5.6 }, // I // 4.89
-      { width: 7 }, // J // 6.33
-      { width: 4 }, // K // 3.33
-      { width: 2.5 }, // L // 1.89
-      { width: 9 }, // M // 8.33
-      { width: 10.6 }, // N // 9.89
-      { width: 5.6 }, // O // 4.89
-      { width: 0.6 }, // P // 0.38
+      { width: 1 }, // A // 0.56
+      { width: 7.6 }, // B // 6.33
+      { width: 14.25 }, // C // 12.33
+      { width: 10.9 }, // D // 9.33
+      { width: 6.7 }, // E // 5.33
+      { width: 6.1 }, // F // 4.89
+      { width: 6.1 }, // G // 4.89
+      { width: 6.1 }, // H // 4.89
+      { width: 6.1 }, // I // 4.89
+      { width: 7.6 }, // J // 6.33
+      { width: 4.4 }, // K // 3.33
+      { width: 2.9 }, // L // 1.89
+      { width: 9.7 }, // M // 8.33
+      { width: 11.5 }, // N // 9.89
+      { width: 6.2 }, // O // 4.89
+      { width: 0.65 }, // P // 0.38
     ];
 
     sheet.columns.forEach((item) => (item.font = { size: 11 }));
@@ -328,18 +337,24 @@ export default function QuotationPdf({
     //
     const rowHeightAdjust = 1.25;
 
-    const rowHeight_pageDeparate = 20 * rowHeightAdjust;
+    // const rowHeight_pageDeparate = 20 * rowHeightAdjust;
+    const rowHeight_pageDeparate = 15.8 * rowHeightAdjust;
     const rowHeight_companyName = 30 * rowHeightAdjust;
     const rowHeight_companyInfo = 15 * rowHeightAdjust;
     const rowHeight_hr = 5 * rowHeightAdjust;
-    const rowHeight_title = 24 * rowHeightAdjust;
-    const rowHeight_thead = 25 * rowHeightAdjust;
-    const rowHeight_tbody = 20 * rowHeightAdjust;
-    const rowHeight_notes = 14 * rowHeightAdjust;
-    const rowHeight_total = 20 * rowHeightAdjust;
+    // const rowHeight_title = 30 * rowHeightAdjust;
+    const rowHeight_title = 25 * rowHeightAdjust;
+    const rowHeight_thead = 24.9 * rowHeightAdjust;
+    const rowHeight_tbody = 20.1 * rowHeightAdjust;
+    const rowHeight_notes = 14.1 * rowHeightAdjust;
+    const rowHeight_total = 20.1 * rowHeightAdjust;
 
-    const rowHeight_otherFirstRow = 20 * rowHeightAdjust;
-    const rowHeight_other = 15 * rowHeightAdjust;
+    // const rowHeight_otherFirstRow = 20.1 * rowHeightAdjust;
+    const rowHeight_otherFirstRow = 18 * rowHeightAdjust;
+    const rowHeight_other_beforePayWay = 13.5 * rowHeightAdjust;
+    const rowHeight_other_payWay = 18 * rowHeightAdjust;
+    const rowHeight_other_afterPayWay = 9.9 * rowHeightAdjust;
+    const rowHeight_other_agent = 15 * rowHeightAdjust;
 
     // -----------------------------------------------------------
 
@@ -382,7 +397,8 @@ export default function QuotationPdf({
       const rOther = rTotal + 1;
       const rQuotationRange = rOther + 1;
       const rQuotationRangeLatest = rQuotationRange + quotaionRangeRowQty - 1;
-      const rPayWay = rQuotationRange + 4;
+
+      const rPayWay = rOther + 4;
       const rAgent = rPayWay + 6;
 
       //
@@ -392,8 +408,8 @@ export default function QuotationPdf({
       const B2O2 = sheet.getCell(`B${r2}`);
       sheet.mergeCells(`B${r2}:O${r2}`);
       B2O2.value = '三久建材工業股份有限公司';
-      B2O2.alignment = { horizontal: 'center' };
-      B2O2.font = { size: 16 };
+      B2O2.alignment = { horizontal: 'center', vertical: 'top' };
+      B2O2.font = { size: 16, bold: true };
       //
       const B3 = sheet.getCell(`B${r3}`);
       B3.value = '總公司工廠：台中市霧峰區峰北路666號';
@@ -439,8 +455,8 @@ export default function QuotationPdf({
 
       const B6O6 = sheet.getCell(`B${r6}`);
       sheet.mergeCells(`B${r6}:O${r6}`);
-      B6O6.alignment = { horizontal: 'center' };
-      B6O6.font = { size: 16 };
+      B6O6.alignment = { horizontal: 'center', vertical: 'bottom' };
+      B6O6.font = { size: 16, bold: true };
       B6O6.value = '報價單';
 
       //
@@ -467,7 +483,7 @@ export default function QuotationPdf({
       const O7 = sheet.getCell(`O${r7}`);
       O7.value = `頁次:${index + 1}/${chunkProdArr.length}`;
       O7.alignment = { horizontal: 'right' };
-      O7.font = { size: 9 };
+      // O7.font = { size: 9 };
       //____________________________________________________
 
       const headArr = [
@@ -499,6 +515,8 @@ export default function QuotationPdf({
           bottom: { style: 'thin', color: { argb: '000000' } },
           right: { style: 'thin', color: { argb: '000000' } },
         };
+
+        cell.font = { bold: true };
 
         if (headIndex === 0) {
           cell.border.left = { style: 'thin', color: { argb: '000000' } };
@@ -730,10 +748,18 @@ export default function QuotationPdf({
       const rowOtherFirstRow = sheet.getRow(rOther);
       rowOtherFirstRow.height = rowHeight_otherFirstRow;
 
-      for (let i = rOther; i <= rQuotationRangeLatest + 1; i++) {
+      for (let i = rQuotationRange; i <= rQuotationRangeLatest; i++) {
         const row = sheet.getRow(i);
-        row.height = rowHeight_other;
+        row.height = rowHeight_other_beforePayWay;
       }
+
+      for (let i = rPayWay + 1; i <= rPayWay + 5; i++) {
+        const row = sheet.getRow(i);
+        row.height = rowHeight_other_payWay;
+      }
+
+      sheet.getRow(rPayWay + 5).height = rowHeight_other_afterPayWay;
+      sheet.getRow(rAgent).height = rowHeight_other_agent;
 
       //
 
@@ -749,10 +775,10 @@ export default function QuotationPdf({
       cellQuotationRange.value = qrArr_formated.join('\n');
 
       //____________________________________________________
-      const cellTradingLocation = sheet.getCell(`J${rQuotationRange}`);
+      const cellTradingLocation = sheet.getCell(`J${rOther}`);
       cellTradingLocation.value = `      二、交貨地點：  ${tradingLocation}`;
 
-      const cellTradingDate = sheet.getCell(`J${rQuotationRange + 2}`);
+      const cellTradingDate = sheet.getCell(`J${rOther + 2}`);
       cellTradingDate.value = `      三、交貨日期：  ${tradingDate_tw}`;
 
       //____________________________________________________
