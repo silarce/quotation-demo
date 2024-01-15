@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
+import classNames from 'classnames';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -23,29 +24,6 @@ import Profile, {
 import TextListEditor_v2, {
   TstringObj as Tcontroll_textListEditor,
 } from 'components/page/domestic/quotation/quotationTotal/TextListEditor_v2';
-
-// antd
-import { Collapse } from 'antd';
-const { Panel } = Collapse;
-
-// global gear
-import PageHeader02, { TtagList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
-
-// css
-import style from './quotation.module.scss';
-
-// api
-import {
-  useGetContract_id_noItems_2,
-  useQuotation_id_attachments,
-  apiGetQuotationProducts,
-  TquotationProductDto,
-  TquotationContractDto,
-} from 'js/api/api_quotation';
-import { apiPostEngineeringContact, useGetEngineeringContact } from 'js/api/api_engineering';
-
-// component
 // import Table_prod from 'components/page/domestic/contract/table/table_prod';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 // import Table_com from 'components/page/domestic/contract/table/table_component';
@@ -60,8 +38,27 @@ import Summary, {
 } from 'components/page/domestic/quotation/quotation/summary/summary';
 import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
 
-// gear
+// antd
+import { Collapse } from 'antd';
+const { Panel } = Collapse;
+
+// global
+import PageHeader02, { TtagList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
+import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
+// css
+import scss from './quotation.module.scss';
+
+// api
+import {
+  useGetContract_id_noItems_2,
+  useQuotation_id_attachments,
+  apiGetQuotationProducts,
+  TquotationProductDto,
+  TquotationContractDto,
+} from 'js/api/api_quotation';
+import { apiPostEngineeringContact, useGetEngineeringContact } from 'js/api/api_engineering';
 
 // hook
 import { useProductList } from 'hooks/quotation/useProduct';
@@ -480,114 +477,6 @@ version>1 是子合約
 
   // -----------------------------------------------------------------
 
-  const ContactNode = () => {
-    return (
-      <div className={style.quotation}>
-        {/* 報價單基本資料 */}
-        <QuotationProfile profile={content} disabled={true} onProfileChange={() => {}} />
-
-        {/* switch01 */}
-        <div className={style.switchBar}>
-          {!switch02 && (
-            <div className={(switch01 && style.active) || ''} onClick={() => setSwitch01(true)}>
-              合約項目
-            </div>
-          )}
-          <div className={switch02 || !switch01 ? style.active : ''} onClick={() => setSwitch01(false)}>
-            追加 / 追減項目
-          </div>
-        </div>
-
-        {/* 合約項目 追加/追減項目 */}
-        {switch01 || switch02 ? (
-          <>
-            {/* 主產品設定 */}
-            <Table_prod
-              disabled={true}
-              prodList={productList}
-              prodCellConfig={prodCellConfig}
-              prodKeyArr={prodKeyArr}
-              changeProdKeyArr={changeProdKeyArr}
-              addProd={() => {}}
-              setTargetProd={setTargetProdKey}
-              panelBox="easyBox"
-              emptyBlockWidth="80px"
-              rowHeight={'h60'}
-            />
-            {/* 原報價項目 */}
-
-            {switch02 && <OldQuotationProduction rootContent={rootContent} />}
-            <br />
-            <div className={style.redWrapper}>
-              {/* 材料配件設定 */}
-              <Table_com
-                disabled={true}
-                // comList={targetProd?.comList}
-                // FIXME 之後要把型別處理好
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
-                comCellConfig={comCellConfig}
-                comKeyArr={comKeyArr}
-                changeComKeyArr={changeComKeyArr}
-                defalutVKeyArr={comVKeyArr}
-              />
-              <hr />
-              {/* 選配設定 */}
-              <br />
-              <Table_accessories
-                disabled={true}
-                list={targetProd?.accessoriesList}
-                cellConfig={accessoriesCellConfig}
-                keyArr={accessoriesKeyArr}
-                changeKeyArr={changeAccessoriesKeyArr}
-                defalutVKeyArr={targetProd?.accessoriesVKeyArr}
-                onVKeyChange={(keyArr) => {
-                  if (targetProd) {
-                    targetProd.accessoriesVKeyArr = keyArr;
-                  }
-                }}
-                doorModel={targetProd?.doorType}
-                onSelectorConfirm={(arr) => {}}
-                panelBox="easyBox"
-                emptyBlockWidth="80px"
-              />
-              <br />
-              {/* 其他設定 */}
-              <Table_others
-                disabled={true}
-                list={othersList}
-                cellConfig={othersCellConfig}
-                keyArr={othersKeyArr}
-                changeKeyArr={() => {}}
-                add={() => {}}
-              />
-            </div>
-          </>
-        ) : (
-          // 追加/追減項目
-          <QuotationProdChangingRecord subContract={subContracts} />
-        )}
-
-        {/* 展開版本的追加追減紀錄 (在很下面)*/}
-        {switch02 && <QuotationRecord subContract={subContracts} />}
-
-        <Summary
-          disabled={true}
-          payInfoControl={payInfoControl}
-          control_anno={control_anno}
-          control_qr={control_qr}
-          appendixParams={appendixParams}
-        />
-
-        {/* 簽名 */}
-        <QuotationSinature signatureArr={signatureArr} disabled={true} />
-      </div>
-    );
-  };
-
-  // -----------------------------------------------------------------
-
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader02
@@ -597,16 +486,128 @@ version>1 是子合約
       />
       {/*  */}
       <div>
-        {!isShowWorkContactDoc && <ContactNode />}
-        {isShowWorkContactDoc && engineeringContactId && (
-          <WorkContactDoc contract={data} engineeringContactId={engineeringContactId} />
-        )}
+        {/* <ContractNode /> */}
+        <div className={classNames(scss.quotation, isShowWorkContactDoc && 'hidden')}>
+          {/* 報價單基本資料 */}
+          <QuotationProfile profile={content} disabled={true} onProfileChange={() => {}} />
+
+          {/* switch01 */}
+          <div className={scss.switchBar}>
+            {!switch02 && (
+              <div className={(switch01 && scss.active) || ''} onClick={() => setSwitch01(true)}>
+                合約項目
+              </div>
+            )}
+            <div className={switch02 || !switch01 ? scss.active : ''} onClick={() => setSwitch01(false)}>
+              追加 / 追減項目
+            </div>
+          </div>
+
+          {/* 合約項目 追加/追減項目 */}
+          {switch01 || switch02 ? (
+            <>
+              {/* 主產品設定 */}
+              <Table_prod
+                disabled={true}
+                prodList={productList}
+                prodCellConfig={prodCellConfig}
+                prodKeyArr={prodKeyArr}
+                changeProdKeyArr={changeProdKeyArr}
+                addProd={() => {}}
+                setTargetProd={setTargetProdKey}
+                panelBox="easyBox"
+                emptyBlockWidth="80px"
+                rowHeight={'h60'}
+              />
+              {/* 原報價項目 */}
+
+              {switch02 && <OldQuotationProduction rootContent={rootContent} />}
+              <br />
+              <div className={scss.redWrapper}>
+                {/* 材料配件設定 */}
+                <Table_com
+                  disabled={true}
+                  // comList={targetProd?.comList}
+                  // FIXME 之後要把型別處理好
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
+                  comCellConfig={comCellConfig}
+                  comKeyArr={comKeyArr}
+                  changeComKeyArr={changeComKeyArr}
+                  defalutVKeyArr={comVKeyArr}
+                />
+                <hr />
+                {/* 選配設定 */}
+                <br />
+                <Table_accessories
+                  disabled={true}
+                  list={targetProd?.accessoriesList}
+                  cellConfig={accessoriesCellConfig}
+                  keyArr={accessoriesKeyArr}
+                  changeKeyArr={changeAccessoriesKeyArr}
+                  defalutVKeyArr={targetProd?.accessoriesVKeyArr}
+                  onVKeyChange={(keyArr) => {
+                    if (targetProd) {
+                      targetProd.accessoriesVKeyArr = keyArr;
+                    }
+                  }}
+                  doorModel={targetProd?.doorType}
+                  onSelectorConfirm={(arr) => {}}
+                  panelBox="easyBox"
+                  emptyBlockWidth="80px"
+                />
+                <br />
+                {/* 其他設定 */}
+                <Table_others
+                  disabled={true}
+                  list={othersList}
+                  cellConfig={othersCellConfig}
+                  keyArr={othersKeyArr}
+                  changeKeyArr={() => {}}
+                  add={() => {}}
+                />
+              </div>
+            </>
+          ) : (
+            // 追加/追減項目
+            <QuotationProdChangingRecord subContract={subContracts} />
+          )}
+
+          {/* 展開版本的追加追減紀錄 (在很下面)*/}
+          {switch02 && <QuotationRecord subContract={subContracts} />}
+
+          <Summary
+            disabled={true}
+            payInfoControl={payInfoControl}
+            control_anno={control_anno}
+            control_qr={control_qr}
+            appendixParams={appendixParams}
+          />
+
+          {/* 簽名 */}
+          <QuotationSinature signatureArr={signatureArr} disabled={true} />
+        </div>
+        {/*  */}
+        {/*  */}
+        {/*  */}
+        <WorkContactDoc
+          contract={data}
+          engineeringContactId={engineeringContactId}
+          isShow={!!(isShowWorkContactDoc && engineeringContactId)}
+        />
       </div>
     </SubLayer>
   );
 }
 
-// =========================================================
+// ====================================================================
+// ====================================================================
+// ====================================================================
+
+// ====================================================================
+// ====================================================================
+// ====================================================================
 
 const OldQuotationProduction = ({
   // prodList,
@@ -667,7 +668,7 @@ const OldQuotationProduction = ({
 
   return (
     <Collapse
-      className={`${style.oldQuotationProduction}`}
+      className={`${scss.oldQuotationProduction}`}
       expandIcon={() => <></>}
       accordion={false}
       activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
@@ -718,12 +719,12 @@ const OldQuotationProduction = ({
 
 // oqp就是OldQuotationProduction
 const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: () => void }) => {
-  const active = isActive ? style.active : '';
+  const active = isActive ? scss.active : '';
 
   return (
-    <div className={`${style.OqpHeader} ${active}`}>
+    <div className={`${scss.OqpHeader} ${active}`}>
       <span>原報價項目</span>
-      <button className={style.panelButton} onClick={panelSwitch}>
+      <button className={scss.panelButton} onClick={panelSwitch}>
         <span>展開</span>
         <RotatingArrow01 deg={0} defaultDeg={-180} isActive={!isActive} />
       </button>
@@ -738,9 +739,11 @@ const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: 
 const WorkContactDoc = ({
   contract,
   engineeringContactId,
+  isShow,
 }: {
   contract: TquotationContractDto | undefined;
-  engineeringContactId: string;
+  engineeringContactId: string | undefined | null;
+  isShow?: boolean;
 }) => {
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
@@ -939,7 +942,7 @@ const WorkContactDoc = ({
 
   // --------------------------------------------------------------
   return (
-    <div>
+    <div className={classNames(!isShow && 'hidden')}>
       <Profile controll={controll} disabled={true} />
 
       <Table_prod
