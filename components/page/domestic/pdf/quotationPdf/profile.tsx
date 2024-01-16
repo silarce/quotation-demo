@@ -5,7 +5,7 @@ import { TuseProfile } from 'components/page/domestic/quotation/hook/useProfile'
 
 export type Tprofile = {
   quotationId: string;
-  quotationStatus: string;
+  // quotationStatus: string;
   clientName: string;
   contactPerson: string;
   contactPhone: string;
@@ -27,7 +27,7 @@ export default function Profile({
 }) {
   const {
     quotationId,
-    quotationStatus: quatitionStatus,
+    // quotationStatus: quatitionStatus,
     clientName,
     contactPerson,
     contactPhone,
@@ -85,11 +85,11 @@ export default function Profile({
         </div>
 
         <div className={style.date}>
-          <div className={style.info}>
+          {/* <div className={style.info}>
             <span>報價狀態</span>
             <span className={style.semi}>:</span>
             <span>{quatitionStatus}</span>
-          </div>
+          </div> */}
           <div className={style.info}>
             <span>報價編號</span>
             <span className={style.semi}>:</span>

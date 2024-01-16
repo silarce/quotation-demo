@@ -1,14 +1,9 @@
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-import { nanoid } from 'nanoid';
 
 // type
 import type { TreRender } from './useProduct';
 import type { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
-import type { Toption } from 'js/utils/options/options';
-
-// type
-import { TcreateQuotationContentOtherDto } from 'js/api/dtoTypes';
 
 // =======================================================================
 class Class_other {
@@ -40,6 +35,8 @@ class Class_other {
   readonly copySelf;
   callCalcSubTotal;
   // calcSubTotalPrice;
+
+  makeFormatValueDontTriggerTwice = false;
 
   // ---------------------------------------------------------
 
@@ -89,15 +86,24 @@ class Class_other {
     this.reRender();
   }
   get unitPrice_locale() {
-    return String(this._data.unitPrice || 0);
+    return String(this._data.unitPrice || '0');
     // return this._data.unitPrice.toLocaleString();
   }
   set unitPrice_locale(v) {
     // v = v.replace(/,/g, '');
 
+    if (this.makeFormatValueDontTriggerTwice) {
+      return;
+    }
+
     this._data.unitPrice = Number(v);
     this.calcAllPrice();
     this.reRender();
+
+    this.makeFormatValueDontTriggerTwice = true;
+    setTimeout(() => {
+      this.makeFormatValueDontTriggerTwice = false;
+    }, 0);
   }
 
   get totalPrice() {
@@ -195,6 +201,7 @@ const othersCellConfig: TcellConfig = {
       inputProps: {
         props: {
           type: 'number',
+          onWheel: (e) => e.currentTarget.blur(),
         },
       },
     },
