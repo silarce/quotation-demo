@@ -3224,18 +3224,16 @@ class Class_product {
       motorPhase: Number(this.phase),
 
       // 送去後端要轉為要從m轉為mm
-      WG: Number(this._prodData.WG) * 1000,
-      fullWidth: Number(this._prodData.fullWidth) * 1000,
-      height: Number(this._prodData.height) * 1000,
-      boxB: Number(this._prodData.boxB) * 1000,
-      boxD: Number(this._prodData.boxD) * 1000,
-      quantity: Number(this._prodData.quantity),
+      WG: new Decimal(this._prodData.WG).mul(1000).toNumber(),
+      fullWidth: new Decimal(this._prodData.fullWidth).mul(1000).toNumber(),
+      height: new Decimal(this._prodData.height).mul(1000).toNumber(),
+      boxB: new Decimal(this._prodData.boxB).mul(1000).toNumber(),
+      boxD: new Decimal(this._prodData.boxD).mul(1000).toNumber(),
       volume: this._prodData.volume || '0',
       area: this._prodData.area || '0',
 
       headBoxThickness: Number(this._prodData.rollUpBoxThick),
       motorVoltage: Number(this._prodData.voltage),
-
       hasMotorSupportStand: this._prodData.motorSupport,
 
       isPainted: false,
