@@ -34,6 +34,11 @@ type Tcontroll = {
   projectName: TcontrollItem;
   /**工程內容 */
   projectContent: TcontrollItem;
+  // 工程圖表資料
+  projectPatternBtn: {
+    isOk: boolean;
+    onClick: () => void;
+  };
 
   addressBarProps: {
     inputSelProps?: TinputSelProps_noProps;
@@ -114,10 +119,11 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
               captionWidth={'110px'}
             />
             <MyButton_rounded
-              svgIcon="add"
-              theme="danger"
+              svgIcon={controll.projectPatternBtn.isOk ? undefined : 'add'}
+              theme={controll.projectPatternBtn.isOk ? 'success' : 'danger'}
               buttonProps={{
                 className: scss.btn_rounded,
+                onClick: controll.projectPatternBtn.onClick,
               }}
             >
               尚有缺件請附上圖表資料

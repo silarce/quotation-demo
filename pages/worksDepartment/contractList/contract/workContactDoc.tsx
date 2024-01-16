@@ -5,6 +5,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
+import classNames from 'classnames';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -16,6 +17,7 @@ import Profile, {
   Tcontroll as Tcontroll_profile,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import ProjectPattern from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -146,6 +148,8 @@ export default function WorkContactDoc() {
   }, [contractId, engineeringContactId]);
 
   // ---------------------------------------------------------------------------
+
+  const [isShowPattern, setIsShowPattern] = useState(false);
 
   const [profile, setProfile] = useState<Tprofile>();
 
@@ -345,7 +349,13 @@ export default function WorkContactDoc() {
         profileChange('projectContent', v);
       },
     },
-
+    projectPatternBtn: {
+      isOk: false,
+      onClick: () => {
+        setDisabled(true);
+        setIsShowPattern(true);
+      },
+    },
     addressBarProps: {
       inputSelProps: {
         caption: '工程地點',
@@ -532,7 +542,12 @@ export default function WorkContactDoc() {
     },
   ];
 
-  const panelList = disabled ? panelList_01 : panelList_02;
+  const panelList_pattern: TpanelList = [
+    //
+    { type: 'myButton', label: '返回', onClick: () => setIsShowPattern(false) },
+  ];
+
+  const panelList = isShowPattern ? panelList_pattern : disabled ? panelList_01 : panelList_02;
 
   // ----------------------------------------------------------------------------
 
@@ -551,7 +566,7 @@ export default function WorkContactDoc() {
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>
-        <div>
+        <div className={classNames(isShowPattern && 'hidden')}>
           <Profile controll={controll} disabled={disabled} />
           {/* <WorkProject /> */}
           <Table_prod
@@ -572,6 +587,10 @@ export default function WorkContactDoc() {
           <div className={scss.textListContainer}>
             <TextListEditor_v2 label={'備註'} disabled={disabled} stringObj={control_anno} />
           </div>
+        </div>
+
+        <div className={classNames(!isShowPattern && 'hidden')}>
+          <ProjectPattern />
         </div>
       </div>
 
