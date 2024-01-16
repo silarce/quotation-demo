@@ -8,6 +8,7 @@ import AddressBar, {
   TaddressProps,
   TinputSelProps_noProps,
 } from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+import MyButton_rounded from 'components/global/gear/button/myButton_rounded';
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
@@ -103,6 +104,25 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
             inputProps={{ ...projectContent }}
             {...inputStyle01}
           />
+          <div className={classNames(scss.projectPatternBtnBox)}>
+            <InputSel
+              className={scss.inutSel}
+              disabled={projectContent.disabled || disabled}
+              label="工程圖表資料"
+              // inputProps={{ ...projectContent }}
+              {...inputStyle01}
+              captionWidth={'110px'}
+            />
+            <MyButton_rounded
+              svgIcon="add"
+              theme="danger"
+              buttonProps={{
+                className: scss.btn_rounded,
+              }}
+            >
+              尚有缺件請附上圖表資料
+            </MyButton_rounded>
+          </div>
         </div>
 
         <hr />

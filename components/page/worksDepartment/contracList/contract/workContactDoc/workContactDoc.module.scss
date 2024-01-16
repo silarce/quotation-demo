@@ -100,6 +100,20 @@
   }
 }
 
+.projectPatternBtnBox {
+  display: flex;
+  justify-content: flex-start;
+  gap: 18px;
+
+  .inutSel {
+    width: unset;
+  }
+  > .btn_rounded {
+    width: 335px;
+    height: 27px;
+  }
+}
+
 .hidden {
   visibility: hidden;
 }
