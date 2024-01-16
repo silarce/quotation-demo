@@ -19,10 +19,10 @@ export default function MyButton_rounded({
   const Icon = iconLookup[svgIcon];
 
   buttonProps = {
-    className: classNames(scss.antdBtn, theme && scss[theme]),
     shape: 'round',
     icon: Icon && <Icon />,
     ...buttonProps,
+    className: classNames(scss.antdBtn, theme && scss[theme], buttonProps?.className),
   };
 
   return <Button {...buttonProps}>{children}</Button>;
