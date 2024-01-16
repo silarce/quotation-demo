@@ -67,5 +67,27 @@
         opacity: 0.85;
       }
     }
+    :global(.ant-collapse-content-box) {
+      padding: 47px 30px;
+    }
+  }
+}
+
+.antdDragger.plus {
+  height: 309px;
+  border-radius: 16px;
+  border: 2px dashed var(--Grayscale-Text, #4a4a68);
+  background: rgba(255, 255, 255, 0.1);
+
+  :global(.ant-upload-btn) {
+    .dragTip {
+      display: grid;
+      justify-content: center;
+      // background-color: pink;
+      > div {
+        display: grid;
+        justify-content: center;
+      }
+    }
   }
 }
