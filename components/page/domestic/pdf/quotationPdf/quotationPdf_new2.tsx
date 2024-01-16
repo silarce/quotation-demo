@@ -4,6 +4,7 @@ import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import Decimal from 'decimal.js';
+import ExcelJs from 'exceljs';
 
 // component
 import Header from './header';
@@ -24,6 +25,7 @@ import scss from './quotationPdf.module.scss';
 
 // config
 import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
+import { findGuideRailUnicode } from 'config/product/lookup';
 
 // type
 import { TquotationContentDto } from 'js/api/api_quotation';
@@ -32,6 +34,8 @@ import { Class_product, Class_other } from 'hooks/quotation/useProduct';
 import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 import { optionsCreator_quotationStatus } from 'js/utils/options/options';
+
+// ============================================================================
 
 const quotationStatusLookup: { [key: string]: string } = {};
 optionsCreator_quotationStatus().forEach((item) => {
@@ -191,6 +195,646 @@ export default function QuotationPdf({
     showRootLoading(false);
   };
 
+  const dlExcel = async () => {
+    // 一頁13列產品
+    const prodQtyPerPage = 13;
+
+    // console.log(control_prodArr);
+
+    const {
+      quotationDate,
+      quotationNumber,
+      projectName,
+      // quotationStatus,
+      customerName,
+      contactPerson,
+      contactNumber,
+      faxNumber,
+      allAddress,
+      subTotal,
+      salesTax,
+      total,
+      agentName,
+      tradingDate,
+      tradingLocation,
+      validityPeriod,
+      payWayArr,
+    } = control_basicInfo;
+
+    const subTotal_num = Number(subTotal.replaceAll(',', ''));
+    const salesTax_num = Number(salesTax.replaceAll(',', ''));
+    const total_num = Number(total.replaceAll(',', ''));
+
+    const quotationDate_tw = (() => {
+      const m_quotationDate = moment(quotationDate);
+      const isValid = m_quotationDate.isValid();
+
+      if (!isValid) {
+        return '';
+      } else {
+        m_quotationDate.subtract(1911, 'year');
+
+        return m_quotationDate.format('yy年MM月DD日');
+      }
+    })();
+
+    const tradingDate_tw = (() => {
+      const m_tradingDate = moment(tradingDate);
+      const isValid = m_tradingDate.isValid();
+
+      if (!isValid) {
+        return '';
+      } else {
+        // m_tradingDate.subtract(1911, 'year');
+
+        return m_tradingDate.format('yy年MM月DD日');
+      }
+    })();
+
+    let qrArr_formated = _.cloneDeep(qrArr);
+    qrArr_formated = qrArr_formated.map((qr, index) => {
+      return `${index + 1}. ` + qr;
+    });
+
+    if (payWayArr.length > 4) {
+      payWayArr.splice(4);
+    }
+
+    const payWayArr_formated = payWayArr.map((payway, index) => {
+      const { value, label } = payway;
+
+      if (!value) {
+        return `           ${index + 1}. ${label} ________%`;
+      } else {
+        return `           ${index + 1}. ${label}      ${value}     %`;
+      }
+    });
+
+    // -------------------------------------------------------------------
+    const chunkProdArr = _.chunk(control_prodArr, prodQtyPerPage);
+
+    // -------------------------------------------------------------------
+    const workbook = new ExcelJs.Workbook();
+    const sheetName = quotationNumber;
+    const sheet = workbook.addWorksheet(sheetName, {
+      pageSetup: {
+        paperSize: 9, // A4 paper size
+        orientation: 'portrait', // page orientation
+        // showGridLines: true,
+        // fitToPage: true, // fit to page
+        // fitToWidth: 1, // fit to one page wide
+        // fitToHeight: 0, // auto height
+      },
+    });
+
+    // const worksheetWriter = workbookWriter.addWorksheet('sheet', {
+    //   pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
+    // });
+
+    // 之后调整页面设置配置
+    sheet.pageSetup.margins = {
+      left: 0.2,
+      right: 0.2,
+      top: 0.2,
+      bottom: 0.2,
+      header: 0.3,
+      footer: 0.3,
+    };
+
+    // 打開excel右下方的視圖模式 設為"頁面配置"
+    // 欄寬的單位就會是cm
+    // 0.1"大約"等於0.02cm
+    // 會有怎麼樣都無法調整到想要的公分值的情況
+
+    // 調整欄寬時建議視圖模式不要用"標準"
+    // 怪怪的
+
+    // 這個放到最後再調整
+    sheet.columns = [
+      { width: 1 }, // A // 0.56
+      { width: 7.6 }, // B // 6.33
+      { width: 14.25 }, // C // 12.33
+      { width: 10.9 }, // D // 9.33
+      { width: 6.7 }, // E // 5.33
+      { width: 6.1 }, // F // 4.89
+      { width: 6.1 }, // G // 4.89
+      { width: 6.1 }, // H // 4.89
+      { width: 6.1 }, // I // 4.89
+      { width: 7.6 }, // J // 6.33
+      { width: 4.4 }, // K // 3.33
+      { width: 2.9 }, // L // 1.89
+      { width: 9.7 }, // M // 8.33
+      { width: 11.5 }, // N // 9.89
+      { width: 6.2 }, // O // 4.89
+      { width: 0.65 }, // P // 0.38
+    ];
+
+    sheet.columns.forEach((item) => (item.font = { size: 11 }));
+
+    //
+    // 公司有些電腦的excel是2010版本
+    // 在2010版本，同樣的height，呈現的列高不一樣
+    // 所以要用這個方式來調整列高
+    // const rowHeightAdjust = 1.25;
+    const rowHeightAdjust = 1.05;
+
+    // const rowHeight_pageDeparate = 20 * rowHeightAdjust;
+    const rowHeight_pageDeparate = 15.8 * rowHeightAdjust;
+    const rowHeight_companyName = 30 * rowHeightAdjust;
+    const rowHeight_companyInfo = 15 * rowHeightAdjust;
+    const rowHeight_hr = 5 * rowHeightAdjust;
+    // const rowHeight_title = 30 * rowHeightAdjust;
+    const rowHeight_title = 25 * rowHeightAdjust;
+    const rowHeight_thead = 24.9 * rowHeightAdjust;
+    const rowHeight_tbody = 20 * rowHeightAdjust;
+    // const rowHeight_tbody = 19.9 * rowHeightAdjust;
+    // const rowHeight_tbody = 16 * rowHeightAdjust;
+    const rowHeight_notes = 14.1 * rowHeightAdjust;
+    const rowHeight_total = 20.1 * rowHeightAdjust;
+
+    // const rowHeight_otherFirstRow = 20.1 * rowHeightAdjust;
+    const rowHeight_otherFirstRow = 18 * rowHeightAdjust;
+    const rowHeight_other_beforePayWay = 13.5 * rowHeightAdjust;
+    const rowHeight_other_payWay = 18 * rowHeightAdjust;
+    const rowHeight_other_afterPayWay = 9.9 * rowHeightAdjust;
+    const rowHeight_other_agent = 15 * rowHeightAdjust;
+
+    // -----------------------------------------------------------
+
+    // -----------------------------------------------------------
+
+    //
+    chunkProdArr.forEach((prodArr, index) => {
+      const page = index + 1;
+
+      const totalRowPerPage = 50;
+      const notesRowQty = 10;
+      const quotaionRangeRowQty = 12;
+
+      const beginRow = index * totalRowPerPage;
+
+      const letters = 'BCDEFGHIJKLMNO';
+      const letterArr = letters.split('');
+
+      //
+      const r1 = beginRow + 1;
+      const r2 = beginRow + 2;
+      const r3 = beginRow + 3;
+      const r4 = beginRow + 4;
+      const r5 = beginRow + 5;
+      const r6 = beginRow + 6;
+      const r7 = beginRow + 7;
+      const r8 = beginRow + 8;
+      const r9 = beginRow + 9;
+      const r10 = beginRow + 10;
+      const rThead = beginRow + 11;
+      const rTbody = rThead + 1;
+      const rTbodyLatest = rTbody + prodQtyPerPage - 1;
+      // const r12 = beginRow + 12;
+      // const r24 = beginRow + 24;
+      const rNotes = rThead + prodQtyPerPage + 1;
+      const rNotesLatest = rNotes + notesRowQty - 1;
+      const rSubToTal = rNotesLatest + 1;
+      const rTax = rSubToTal + 1;
+      const rTotal = rSubToTal + 2;
+      const rOther = rTotal + 1;
+      const rQuotationRange = rOther + 1;
+      const rQuotationRangeLatest = rQuotationRange + quotaionRangeRowQty - 1;
+
+      const rPayWay = rOther + 4;
+      const rAgent = rPayWay + 6;
+
+      //
+      const row1 = sheet.getRow(r1);
+      row1.height = rowHeight_pageDeparate;
+      //____________________________________________________
+      const B2O2 = sheet.getCell(`B${r2}`);
+      sheet.mergeCells(`B${r2}:O${r2}`);
+      B2O2.value = '三久建材工業股份有限公司';
+      B2O2.alignment = { horizontal: 'center', vertical: 'top' };
+      B2O2.font = { size: 16, bold: true };
+      //
+      const B3 = sheet.getCell(`B${r3}`);
+      B3.value = '總公司工廠：台中市霧峰區峰北路666號';
+      //
+      const B4 = sheet.getCell(`B${r4}`);
+      B4.value = '台北分公司：台北市內湖路一段387巷5號2樓之2';
+      //
+      const O3 = sheet.getCell(`O${r3}`);
+      O3.value = 'TEL：04-24069939(七線)   FAX：04-24069909';
+      O3.alignment = { horizontal: 'right' };
+      //
+      const O4 = sheet.getCell(`O${r4}`);
+      O4.value = 'TEL：02-26581508(三線)   FAX：02-26581507';
+      O4.alignment = { horizontal: 'right' };
+      //
+
+      const row2 = sheet.getRow(r2);
+      row2.height = rowHeight_companyName;
+      const row3 = sheet.getRow(r3);
+      row3.height = rowHeight_companyInfo;
+      const row4 = sheet.getRow(r4);
+      row4.height = rowHeight_companyInfo;
+
+      //
+      const row5 = sheet.getRow(r5);
+      row5.height = rowHeight_hr;
+
+      sheet.getCell(`O${r5}`).border = {
+        bottom: { style: 'thin', color: { argb: 'FF000000' } },
+      };
+
+      row5.eachCell({ includeEmpty: true }, (cell, rowNumber) => {
+        if (rowNumber !== 1) {
+          cell.border = {
+            bottom: { style: 'thin', color: { argb: 'FF000000' } },
+          };
+        }
+      });
+
+      //____________________________________________________
+      const row6 = sheet.getRow(r6);
+      row6.height = rowHeight_title;
+
+      const B6O6 = sheet.getCell(`B${r6}`);
+      sheet.mergeCells(`B${r6}:O${r6}`);
+      B6O6.alignment = { horizontal: 'center', vertical: 'bottom' };
+      B6O6.font = { size: 16, bold: true };
+      B6O6.value = '報價單';
+
+      //
+
+      const B7 = sheet.getCell(`B${r7}`);
+      B7.value = `A T T N ：${contactPerson}`;
+      const B8 = sheet.getCell(`B${r8}`);
+      B8.value = `客戶名稱：${customerName}`;
+      const B9 = sheet.getCell(`B${r9}`);
+      B9.value = `電　　話： ${contactNumber}`;
+      const B10 = sheet.getCell(`B${r10}`);
+      B10.value = `工程名稱地點：${projectName}  ${allAddress}`;
+
+      const E9 = sheet.getCell(`E${r9}`);
+      E9.value = `傳　　真：${faxNumber}`;
+
+      const K7 = sheet.getCell(`K${r7}`);
+      K7.value = `報價編號：${quotationNumber}`;
+      const K8 = sheet.getCell(`K${r8}`);
+      K8.value = `報價時效：${validityPeriod} 天內`;
+      const K9 = sheet.getCell(`K${r9}`);
+      K9.value = `報價日期：${quotationDate_tw}`;
+
+      const O7 = sheet.getCell(`O${r7}`);
+      O7.value = `頁次:${index + 1}/${chunkProdArr.length}`;
+      O7.alignment = { horizontal: 'right' };
+      // O7.font = { size: 9 };
+      //____________________________________________________
+
+      const headArr = [
+        //
+        '項目',
+        '尺寸(單位:cm)',
+        '門型',
+        '材料',
+        '厚度',
+        '表面',
+        '門軌',
+        '馬力',
+        '開閉方式',
+        '數量',
+        '',
+        '單價',
+        '複價',
+        '備註',
+      ];
+      headArr.forEach((head, headIndex) => {
+        const letter = letterArr[headIndex];
+        const cell = sheet.getCell(`${letter}${rThead}`);
+        cell.value = head;
+
+        cell.alignment = { horizontal: 'center' };
+
+        cell.border = {
+          top: { style: 'thin', color: { argb: '000000' } },
+          bottom: { style: 'thin', color: { argb: '000000' } },
+          right: { style: 'thin', color: { argb: '000000' } },
+        };
+
+        cell.font = { bold: true };
+
+        if (headIndex === 0) {
+          cell.border.left = { style: 'thin', color: { argb: '000000' } };
+        }
+
+        if (letter === 'J') {
+          cell.font = { size: 8 };
+        }
+
+        return cell;
+      });
+
+      sheet.mergeCells(`K${rThead}:L${rThead}`);
+
+      const rowThead = sheet.getRow(rThead);
+      rowThead.height = rowHeight_thead;
+
+      for (let i = rTbody; i <= rTbodyLatest; i++) {
+        const row = sheet.getRow(i);
+        row.height = rowHeight_tbody;
+      }
+
+      let pageSubTotal = 0;
+
+      //
+      prodArr.forEach((prod, prodRowIndex) => {
+        prodRowIndex = prodRowIndex + 1;
+
+        const {
+          category,
+          // size,
+          doorType,
+          thickness,
+          surface,
+          // doorRail,
+          doorRailForExcel,
+          horsepower,
+          openType,
+          qty,
+          unitPrice,
+          priceTotal,
+          memo,
+        } = prod;
+
+        // const doorRailUnicode
+
+        let { size, material } = prod;
+
+        size = size.replaceAll('Ｘ', ' x ');
+
+        if (material.includes('鍍鋅')) {
+          material = '鍍鋅';
+        }
+
+        if (material.includes('SST')) {
+          material = 'SST';
+        }
+
+        const qty_num = Number(qty.replaceAll(',', ''));
+        const unitPrice_num = Number(unitPrice.replaceAll(',', ''));
+        const priceTotal_num = Number(priceTotal.replaceAll(',', ''));
+
+        pageSubTotal = pageSubTotal + priceTotal_num;
+
+        const [cellB, cellC, cellD, cellE, cellF, cellG, cellH, cellI, cellJ, cellK, cellL, cellM, cellN, cellO] =
+          letterArr.map((letter, letterIndex) => {
+            const cell = sheet.getCell(`${letter}${rThead + prodRowIndex}`);
+
+            cell.font = { size: 10 };
+            cell.alignment = { vertical: 'top' };
+
+            cell.border = {
+              bottom: { style: 'thin', color: { argb: '000000' } },
+              right: { style: 'thin', color: { argb: '000000' } },
+            };
+
+            if (letterIndex === 0) {
+              cell.border.left = { style: 'thin', color: { argb: '000000' } };
+            }
+
+            return cell;
+          });
+        cellB.value = category;
+        cellC.value = size;
+        cellD.value = doorType;
+        cellE.value = material;
+        cellF.value = thickness;
+        cellG.value = surface;
+        cellH.value = doorRailForExcel;
+        cellI.value = horsepower;
+        cellJ.value = openType;
+        cellK.value = qty_num;
+        cellL.value = '樘';
+        cellM.value = unitPrice_num;
+        cellN.value = priceTotal_num;
+        cellO.value = memo;
+
+        cellE.alignment.horizontal = 'center';
+        cellF.alignment.horizontal = 'center';
+        cellG.alignment.horizontal = 'center';
+        cellH.alignment.horizontal = 'center';
+        cellJ.alignment.horizontal = 'center';
+
+        cellH.font = { size: 10 };
+
+        cellM.numFmt = '###,##0';
+        cellN.numFmt = '###,##0';
+
+        cellK.border.right = undefined;
+      });
+
+      //____________________________________________________
+
+      for (let i = rNotes; i <= rNotesLatest; i++) {
+        const row = sheet.getRow(i);
+        row.height = rowHeight_notes;
+      }
+
+      //
+
+      const notesCaptionCell = sheet.getCell(`B${rNotes}`);
+      notesCaptionCell.value = '備註：';
+      // notesCaptionCell.border.top = { style: 'thin', color: { argb: '000000' } };
+      notesCaptionCell.border = {
+        top: { style: 'thin', color: { argb: '000000' } },
+      };
+
+      const notesCaptionLatestCell = sheet.getCell(`B${rNotesLatest}`);
+      // notesCaptionLatestCell.border.bottom = { style: 'thin', color: { argb: '000000' } };
+      notesCaptionLatestCell.border = {
+        bottom: { style: 'thin', color: { argb: '000000' } },
+      };
+
+      for (let i = rNotes; i <= rNotesLatest; i++) {
+        const cell = sheet.getCell(`B${i}`);
+
+        if (!cell.border) {
+          cell.border = {};
+        }
+
+        cell.border.left = {
+          style: 'thin',
+          color: { argb: '000000' },
+        };
+      }
+
+      //
+      const notesCell = sheet.getCell(`C${rNotes}`);
+      sheet.mergeCells(`C${rNotes}:O${rNotesLatest}`);
+      notesCell.value = noteArr.join('\n');
+      notesCell.alignment = { vertical: 'top', wrapText: true };
+      notesCell.border = {
+        top: { style: 'thin', color: { argb: '000000' } },
+        bottom: { style: 'thin', color: { argb: '000000' } },
+        right: { style: 'thin', color: { argb: '000000' } },
+      };
+      notesCell.font = { size: 10 };
+
+      //____________________________________________________
+
+      const totalRowIndexArr = [rSubToTal, rTax, rTotal];
+
+      totalRowIndexArr.forEach((totalRowIndex) => {
+        const row = sheet.getRow(totalRowIndex);
+        row.height = rowHeight_total;
+
+        letterArr.forEach((letter, letterIndex) => {
+          const cell = sheet.getCell(`${letter}${totalRowIndex}`);
+          cell.border = {
+            bottom: { style: 'thin', color: { argb: '000000' } },
+          };
+
+          if (letterIndex === 0) {
+            cell.border.left = { style: 'thin', color: { argb: '000000' } };
+          }
+
+          if (letterIndex === letterArr.length - 1) {
+            cell.border.right = { style: 'thin', color: { argb: '000000' } };
+          }
+        });
+
+        const cellM = sheet.getCell(`M${totalRowIndex}`);
+        cellM.border.right = { style: 'thin', color: { argb: '000000' } };
+        const cellN = sheet.getCell(`N${totalRowIndex}`);
+        cellN.border.right = { style: 'thin', color: { argb: '000000' } };
+      });
+
+      const subTotalCaptionCell = sheet.getCell(`B${rSubToTal}`);
+      const subTotalCell = sheet.getCell(`N${rSubToTal}`);
+      subTotalCell.numFmt = '###,##0';
+      subTotalCell.font = { size: 10 };
+
+      const taxCaptionCell = sheet.getCell(`B${rTax}`);
+      const taxCell = sheet.getCell(`N${rTax}`);
+      taxCell.numFmt = '###,##0';
+      taxCell.font = { size: 10 };
+
+      const totalCaptionCell = sheet.getCell(`B${rTotal}`);
+      const totalCell = sheet.getCell(`N${rTotal}`);
+      totalCell.numFmt = '###,##0';
+      const totalChineseCell = sheet.getCell(`D${rTotal}`);
+      sheet.mergeCells(`D${rTotal}:L${rTotal}`);
+      totalCell.font = { size: 10 };
+
+      totalChineseCell.alignment = { horizontal: 'right' };
+      totalChineseCell.border.right = {
+        style: 'thin',
+        color: { argb: '000000' },
+      };
+      totalChineseCell.font = { size: 12 };
+
+      if (page !== chunkProdArr.length) {
+        subTotalCaptionCell.value = '　本頁合計';
+        subTotalCell.value = pageSubTotal;
+      } else {
+        subTotalCaptionCell.value = `　小　　計  (共  ${chunkProdArr.length}  頁)`;
+        subTotalCaptionCell.alignment = { wrapText: false };
+        subTotalCell.value = subTotal_num;
+
+        taxCaptionCell.value = '　營業稅5％';
+        taxCell.value = salesTax_num;
+
+        totalCaptionCell.value = '　總　　計   新台幣:';
+        totalCaptionCell.alignment = { wrapText: false };
+        totalCell.value = total_num;
+        totalChineseCell.value = total_num;
+        totalChineseCell.numFmt = '[DBNum2][$-404]General元整';
+
+        sheet.getCell(`M${rTotal}`).value = '總金額';
+        sheet.getCell(`M${rTotal}`).font = { size: 12 };
+      }
+
+      //____________________________________________________
+
+      const rowOtherFirstRow = sheet.getRow(rOther);
+      rowOtherFirstRow.height = rowHeight_otherFirstRow;
+
+      for (let i = rQuotationRange; i <= rQuotationRangeLatest; i++) {
+        const row = sheet.getRow(i);
+        row.height = rowHeight_other_beforePayWay;
+      }
+
+      for (let i = rPayWay + 1; i <= rPayWay + 5; i++) {
+        const row = sheet.getRow(i);
+        row.height = rowHeight_other_payWay;
+      }
+
+      sheet.getRow(rPayWay + 5).height = rowHeight_other_afterPayWay;
+      sheet.getRow(rAgent).height = rowHeight_other_agent;
+
+      //
+
+      const quotationRangeCaptionCell = sheet.getCell(`B${rOther}`);
+      quotationRangeCaptionCell.value = '一、報價範圍';
+      const cellQuotationRange = sheet.getCell(`B${rQuotationRange}`);
+      sheet.mergeCells(`B${rQuotationRange}:H${rQuotationRangeLatest}`);
+      cellQuotationRange.alignment = {
+        vertical: 'top',
+        wrapText: true,
+      };
+      cellQuotationRange.font = { size: 9 };
+      cellQuotationRange.value = qrArr_formated.join('\n');
+
+      //____________________________________________________
+      const cellTradingLocation = sheet.getCell(`J${rOther}`);
+      cellTradingLocation.value = `      二、交貨地點：  ${tradingLocation}`;
+
+      const cellTradingDate = sheet.getCell(`J${rOther + 2}`);
+      cellTradingDate.value = `      三、交貨日期：  ${tradingDate_tw}`;
+
+      //____________________________________________________
+      const cellPayWay = sheet.getCell(`J${rPayWay}`);
+      cellPayWay.value = '      四、付款辦法：  ';
+
+      payWayArr_formated.forEach((payWayStr, index) => {
+        const cellPayWayContent = sheet.getCell(`J${rPayWay + index + 1}`);
+        cellPayWayContent.value = payWayStr;
+      });
+
+      //____________________________________________________
+
+      const cellAgent = sheet.getCell(`J${rAgent}`);
+      cellAgent.value = `      經辦人： ${agentName}`;
+
+      //
+    }); // chunkProdArr.forEach close
+
+    // -----------------------------------------------------------
+
+    // -----------------------------------------------------------
+
+    await workbook.xlsx.writeBuffer();
+
+    // -----------------------------------------------------------
+    // 表格裡面的資料都填寫完成之後，訂出下載的callback function
+    // 異步的等待他處理完之後，創建url與連結，觸發下載
+    workbook.xlsx.writeBuffer().then((content) => {
+      const link = document.createElement('a');
+      const blobData = new Blob([content], {
+        type: 'application/vnd.ms-excel;charset=utf-8;',
+      });
+
+      const id = quotationNumber;
+      const today = moment().format('yyyy-MM-DD');
+      link.download = `${id}_${today}.xlsx`;
+      link.href = URL.createObjectURL(blobData);
+      link.click();
+      link.remove();
+    });
+
+    //
+    //
+    //
+  };
+
   // ----------------------------------------------------------------------------
   // profile
   const profilePram: Tprofile = (() => {
@@ -284,9 +928,12 @@ export default function QuotationPdf({
             <span>typeB</span>
           </button>
         </div>
-        <div>
+        <div className={scss.right}>
           <button onClick={dlPdf}>
             <span>下載PDF</span>
+          </button>
+          <button onClick={dlExcel}>
+            <span>下載Excel</span>
           </button>
         </div>
       </div>
@@ -695,6 +1342,8 @@ const quotationProdToTableProdList = ({
 }): Tcontrol_prodArr => {
   const productArr: TtableProdList_series = (() => {
     return classProductArr.map((prod) => {
+      const { typhoonProtection, doorTrackSilencerStrip } = prod;
+
       const fullWidth = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
       const height = new Decimal(prod.height || 0).mul(100).toNumber();
       const boxB = new Decimal(prod.boxB || 0).mul(100).toNumber();
@@ -709,6 +1358,11 @@ const quotationProdToTableProdList = ({
       const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
 
       let material = prod.material;
+
+      const doorRailForExcel = findGuideRailUnicode({
+        isAntiTyphoon: typhoonProtection,
+        isSilencing: doorTrackSilencerStrip,
+      });
 
       // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
       if (material === '高耐鍍鋅鋼板') {
@@ -730,6 +1384,8 @@ const quotationProdToTableProdList = ({
         priceTotal: prod.totalPrice,
         memo: prod.notes,
         series: prod.doorType,
+        //
+        doorRailForExcel: doorRailForExcel,
       };
     });
   })();
@@ -879,6 +1535,10 @@ const legacyContractToTableProdList = ({
         priceTotal: prod.totalPrice,
         memo: prod.notes,
         series: prod.itemName,
+        //
+        // 舊合約沒有消音條參數，不能取得正確的doorRailForExcel
+        // doorRailForExcel: doorTrackLookup[prod.doorTrack]?.excel,
+        doorRailForExcel: prod.doorTrack,
       };
     });
 
@@ -928,3 +1588,5 @@ export {
   legacyContractToBasicInfo,
   legacyContractToTableProdList,
 };
+
+// =================================================================
