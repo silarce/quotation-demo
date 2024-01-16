@@ -332,8 +332,11 @@ export default function QuotationPdf({
     sheet.columns.forEach((item) => (item.font = { size: 11 }));
 
     //
-    //
-    const rowHeightAdjust = 1.25;
+    // 公司有些電腦的excel是2010版本
+    // 在2010版本，同樣的height，呈現的列高不一樣
+    // 所以要用這個方式來調整列高
+    // const rowHeightAdjust = 1.25;
+    const rowHeightAdjust = 1.05;
 
     // const rowHeight_pageDeparate = 20 * rowHeightAdjust;
     const rowHeight_pageDeparate = 15.8 * rowHeightAdjust;
@@ -586,6 +589,7 @@ export default function QuotationPdf({
             const cell = sheet.getCell(`${letter}${rThead + prodRowIndex}`);
 
             cell.font = { size: 10 };
+            cell.alignment = { vertical: 'top' };
 
             cell.border = {
               bottom: { style: 'thin', color: { argb: '000000' } },
@@ -613,10 +617,13 @@ export default function QuotationPdf({
         cellN.value = priceTotal_num;
         cellO.value = memo;
 
-        cellE.alignment = { horizontal: 'center' };
-        cellF.alignment = { horizontal: 'center' };
-        cellG.alignment = { horizontal: 'center' };
-        cellJ.alignment = { horizontal: 'center' };
+        cellE.alignment.horizontal = 'center';
+        cellF.alignment.horizontal = 'center';
+        cellG.alignment.horizontal = 'center';
+        cellH.alignment.horizontal = 'center';
+        cellJ.alignment.horizontal = 'center';
+
+        cellH.font = { size: 10 };
 
         cellM.numFmt = '###,##0';
         cellN.numFmt = '###,##0';
