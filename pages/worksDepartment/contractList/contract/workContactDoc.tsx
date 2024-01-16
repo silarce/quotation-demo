@@ -566,6 +566,7 @@ export default function WorkContactDoc() {
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>
+        {/* 工程聯絡單 */}
         <div className={classNames(isShowPattern && 'hidden')}>
           <Profile controll={controll} disabled={disabled} />
           {/* <WorkProject /> */}
@@ -588,7 +589,7 @@ export default function WorkContactDoc() {
             <TextListEditor_v2 label={'備註'} disabled={disabled} stringObj={control_anno} />
           </div>
         </div>
-
+        {/* 工程圖表資料 */}
         <div className={classNames(!isShowPattern && 'hidden')}>
           <ProjectPattern />
         </div>
