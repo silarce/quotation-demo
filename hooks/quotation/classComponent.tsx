@@ -839,7 +839,7 @@ const comCellConfig: TcellConfig = {
     inputSelProps: {
       wrapperStyle: { width: '55px' },
       inputProps: {
-        props: { type: 'number' },
+        props: { type: 'number', onWheel: (e) => e.currentTarget.blur() },
       },
     },
   },
