@@ -186,9 +186,9 @@ export default function ProjectPattern() {
         <Panel header="色卡" key="4" className={scss.panel}>
           <ImageDragger {...props_d} />
         </Panel>
-        <Panel header="施工圖" key="5" className={scss.panel}>
+        {/* <Panel header="施工圖" key="5" className={scss.panel}>
           <ImageDragger {...props_e} />
-        </Panel>
+        </Panel> */}
       </Collapse>
     </div>
   );
@@ -240,5 +240,5 @@ const options = [
   { value: '平面圖', label: '平面圖' },
   { value: '設計圖', label: '設計圖' },
   { value: '色卡', label: '色卡' },
-  { value: '施工圖', label: '施工圖' },
+  // { value: '施工圖', label: '施工圖' },
 ];
