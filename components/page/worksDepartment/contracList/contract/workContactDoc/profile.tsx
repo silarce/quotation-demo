@@ -1,6 +1,9 @@
 import { Fragment } from 'react';
 import classNames from 'classnames';
 
+// antd
+import { Badge, Checkbox } from 'antd';
+
 // glogal gear
 import Status from 'components/global/gear/other/status';
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
@@ -27,12 +30,27 @@ type TcontactItem = {
   onDelClick: () => void;
 };
 
+type TprojectPatternStatus = {
+  label: string;
+  haveData: boolean; // Badge status
+  shouldHaveData: boolean; // checkBoxValue
+  onCheck: (bool: boolean) => void;
+  // onLabelClick: () => void;
+};
+
 type Tcontroll = {
   /**請款狀態 */
   paymentStatus: TcontrollItem;
   projectName: TcontrollItem;
   /**工程內容 */
   projectContent: TcontrollItem;
+  // 工程圖表資料
+  projectPattern: {
+    // isOk: boolean;
+    // onClick: () => void;
+    onCaptionClick: () => void;
+    statusArr: TprojectPatternStatus[];
+  };
 
   addressBarProps: {
     inputSelProps?: TinputSelProps_noProps;
@@ -103,6 +121,41 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
             inputProps={{ ...projectContent }}
             {...inputStyle01}
           />
+          <div className={classNames(scss.projectPatternBtnBox)}>
+            <div className={scss.inputSelBox} onClick={controll.projectPattern.onCaptionClick}>
+              <InputSel
+                className={scss.inputSel}
+                disabled={projectContent.disabled || disabled}
+                label="工程圖表資料"
+                // inputProps={{ ...projectContent }}
+                {...inputStyle01}
+                captionWidth={'110px'}
+              />
+            </div>
+
+            <div className={scss.statusBar}>
+              {controll.projectPattern.statusArr.map((item, index) => {
+                const { haveData, shouldHaveData, onCheck } = item;
+                let label = item.label;
+                label = shouldHaveData ? label : `此案無${label}`;
+                const status = haveData ? 'success' : 'error';
+
+                return (
+                  <div key={index}>
+                    <Checkbox
+                      checked={shouldHaveData}
+                      onChange={(e) => {
+                        onCheck(e.target.checked);
+                      }}
+                    />
+                    <span>
+                      <Badge status={status} text={label} dot={true} />
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         <hr />
