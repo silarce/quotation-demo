@@ -43,6 +43,10 @@ class Class_SubCom {
   private _data;
   private _prod: Class_product;
 
+  makeFormatValueDontTriggerTwice = false;
+
+  // ----------------------------------------------------------------
+
   calcAllPrice() {
     const discount = new Decimal(this._prod.discount).div(100);
     const quotationDiscount = new Decimal(this._prod.quotationDiscount).div(100);
@@ -87,6 +91,10 @@ class Class_SubCom {
     return String(this._data.quantity);
   }
   set quantity(v) {
+    if (this.makeFormatValueDontTriggerTwice) {
+      return;
+    }
+
     const num = Number(v);
     this._data.quantity = num;
 
@@ -94,6 +102,10 @@ class Class_SubCom {
 
     this.calcAllPrice();
     this.reRender();
+    this.makeFormatValueDontTriggerTwice = true;
+    setTimeout(() => {
+      this.makeFormatValueDontTriggerTwice = false;
+    }, 0);
   }
 
   get price() {
@@ -104,11 +116,20 @@ class Class_SubCom {
     // return this._data.price.toLocaleString();
   }
   set price_locale(v) {
+    if (this.makeFormatValueDontTriggerTwice) {
+      return;
+    }
+
     v = v ?? '0';
     // v = v.replace(/,/g, '');
     this._data.price = Number(v);
     this.calcAllPrice();
     this.reRender();
+
+    this.makeFormatValueDontTriggerTwice = true;
+    setTimeout(() => {
+      this.makeFormatValueDontTriggerTwice = false;
+    }, 0);
   }
   // set price(v) {
   //   this._data.price = Number(v);

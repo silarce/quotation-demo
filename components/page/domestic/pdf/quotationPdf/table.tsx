@@ -19,6 +19,8 @@ type TtableProdListItem = {
   unitPrice: string;
   priceTotal: string;
   memo: string;
+  //
+  doorRailForExcel?: string;
 };
 
 type TtableProdList = TtableProdListItem[];

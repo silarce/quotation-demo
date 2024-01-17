@@ -68,6 +68,9 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
           <div>
             <input
               type="number"
+              onWheel={(e) => {
+                e.currentTarget.blur();
+              }}
               className={classNames(
                 //
                 'bg-transparent',
@@ -180,6 +183,9 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
                       value: value,
                       onChange: (e) => onChange(e.target.value),
                       type: 'number',
+                      onWheel: (e) => {
+                        e.currentTarget.blur();
+                      },
                     },
                   }}
                 />
