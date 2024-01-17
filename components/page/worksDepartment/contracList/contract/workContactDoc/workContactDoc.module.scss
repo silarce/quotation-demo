@@ -100,6 +100,33 @@
   }
 }
 
+.projectPatternBtnBox {
+  display: flex;
+  justify-content: flex-start;
+  gap: 18px;
+  .inputSelBox {
+    border: solid 1px black;
+    border-radius: 5px;
+    padding: 5px;
+
+    .inputSel {
+      cursor: pointer;
+      width: unset;
+    }
+  }
+
+  .statusBar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    > div {
+      display: flex;
+      gap: 5px;
+    }
+  }
+}
+
 .hidden {
   visibility: hidden;
 }

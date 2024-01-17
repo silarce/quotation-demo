@@ -1,13 +1,13 @@
 // 報價單
-import React, { Dispatch, SetStateAction, FocusEvent, useState, useRef, Fragment } from 'react';
+import React, { FocusEvent, useState, useRef } from 'react';
 import moment from 'moment';
 
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
 // option
-import { optionsCreator_quotationState, Toption } from 'js/utils/options/options';
-const optionQuotationState = optionsCreator_quotationState();
+import { optionsCreator_quotationStatus, Toption } from 'js/utils/options/options';
+const optionQuotationState = optionsCreator_quotationStatus({ onlyNotContract: true });
 
 // css
 import scss from './quotationStateSel.module.scss';

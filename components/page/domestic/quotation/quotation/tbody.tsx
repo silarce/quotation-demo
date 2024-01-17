@@ -526,12 +526,18 @@ function DndRow({
             if (inputProps?.props) {
               inputProps.props.value = (stateValue as string) ?? '';
 
+              // 在中文輸入法(或許其他的輸入法都是)
+              // 若有對輸出的值做格式化，例如輸入1234，但格式化為123 4
+              // 那麼在輸入4的時候，會觸發onChange兩次
+              // 使的值變成123 44
+              // 因此要做防抖(做在class裡面了);
+
               inputProps.props.onChange = (e) => {
                 (item[key] as string) = e.target.value;
               };
             }
 
-            //____
+            //_____________________
             if (selectProps) {
               if (!selectProps.props) {
                 selectProps.props = {};
