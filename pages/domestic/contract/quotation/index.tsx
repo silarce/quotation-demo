@@ -808,6 +808,13 @@ const WorkContactDoc = ({
       value: projectContent ?? '',
     },
 
+    projectPattern: {
+      onCaptionClick: () => {
+        alert('施工中。工程師筆記，要把工程聯絡單做成元件');
+      },
+      statusArr: [],
+    },
+
     addressBarProps: {
       inputSelProps: {
         caption: '工程地點',
