@@ -5,6 +5,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
+import classNames from 'classnames';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -16,6 +17,7 @@ import Profile, {
   Tcontroll as Tcontroll_profile,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+import ProjectPattern from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -145,7 +147,54 @@ export default function WorkContactDoc() {
     })();
   }, [contractId, engineeringContactId]);
 
+  // 預計未來會有工程圖表資料
+  type Tpattern = {
+    label: string;
+    haveData: boolean;
+    shouldHaveData: boolean;
+  };
+
+  const [patternA, setPatternA] = useState<Tpattern>({
+    label: '簽認圖',
+    haveData: false,
+    shouldHaveData: true,
+  });
+  const [patternB, setPatternB] = useState<Tpattern>({
+    label: '平面圖',
+    haveData: true,
+    shouldHaveData: true,
+  });
+  const [patternC, setPatternC] = useState<Tpattern>({
+    label: '設計圖',
+    haveData: true,
+    shouldHaveData: true,
+  });
+  const [patternD, setPatternD] = useState<Tpattern>({
+    label: '色卡',
+    haveData: false,
+    shouldHaveData: false,
+  });
+
+  const changePatternShouldHaveData = (patternType: 'a' | 'b' | 'c' | 'd', bool: boolean) => {
+    if (patternType === 'a') {
+      setPatternA((pattern) => ({ ...pattern, shouldHaveData: bool }));
+    } else if (patternType === 'b') {
+      setPatternB((pattern) => ({ ...pattern, shouldHaveData: bool }));
+    } else if (patternType === 'c') {
+      setPatternC((pattern) => ({ ...pattern, shouldHaveData: bool }));
+    } else if (patternType === 'd') {
+      setPatternD((pattern) => ({ ...pattern, shouldHaveData: bool }));
+    }
+  };
+
   // ---------------------------------------------------------------------------
+
+  const [isShowPattern, setIsShowPattern] = useState(false);
+
+  const showPattern = () => {
+    setDisabled(true);
+    setIsShowPattern(true);
+  };
 
   const [profile, setProfile] = useState<Tprofile>();
 
@@ -345,7 +394,39 @@ export default function WorkContactDoc() {
         profileChange('projectContent', v);
       },
     },
-
+    projectPattern: {
+      onCaptionClick: showPattern,
+      statusArr: [
+        {
+          ...patternA,
+          onCheck: (bool) => {
+            changePatternShouldHaveData('a', bool);
+          },
+          // onLabelClick: showPattern,
+        },
+        {
+          ...patternB,
+          onCheck: (bool) => {
+            changePatternShouldHaveData('b', bool);
+          },
+          // onLabelClick: showPattern,
+        },
+        {
+          ...patternC,
+          onCheck: (bool) => {
+            changePatternShouldHaveData('c', bool);
+          },
+          // onLabelClick: showPattern,
+        },
+        {
+          ...patternD,
+          onCheck: (bool) => {
+            changePatternShouldHaveData('d', bool);
+          },
+          // onLabelClick: showPattern,
+        },
+      ],
+    },
     addressBarProps: {
       inputSelProps: {
         caption: '工程地點',
@@ -532,7 +613,12 @@ export default function WorkContactDoc() {
     },
   ];
 
-  const panelList = disabled ? panelList_01 : panelList_02;
+  const panelList_pattern: TpanelList = [
+    //
+    { type: 'myButton', label: '返回', onClick: () => setIsShowPattern(false) },
+  ];
+
+  const panelList = isShowPattern ? panelList_pattern : disabled ? panelList_01 : panelList_02;
 
   // ----------------------------------------------------------------------------
 
@@ -551,7 +637,8 @@ export default function WorkContactDoc() {
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>
-        <div>
+        {/* 工程聯絡單 */}
+        <div className={classNames(isShowPattern && 'hidden')}>
           <Profile controll={controll} disabled={disabled} />
           {/* <WorkProject /> */}
           <Table_prod
@@ -572,6 +659,10 @@ export default function WorkContactDoc() {
           <div className={scss.textListContainer}>
             <TextListEditor_v2 label={'備註'} disabled={disabled} stringObj={control_anno} />
           </div>
+        </div>
+        {/* 工程圖表資料 */}
+        <div className={classNames(!isShowPattern && 'hidden')}>
+          <ProjectPattern />
         </div>
       </div>
 

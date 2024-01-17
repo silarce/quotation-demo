@@ -327,6 +327,24 @@ function IconTearing(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+function IconAdd(props: SVGProps<SVGSVGElement>) {
+  const className = getClassName(props);
+
+  return (
+    <svg
+      {...{ ...props, className }}
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <line x1="2" y1="9.57692" x2="17" y2="9.57692" stroke="#14256A" />
+      <line x1="9.42308" y1="2" x2="9.42308" y2="17" stroke="#14256A" />
+    </svg>
+  );
+}
+
 export {
   IconDelete01, //垃圾桶icon
   IconEdit,
@@ -339,4 +357,5 @@ export {
   IconChain,
   IconBreakChain,
   IconTearing,
+  IconAdd,
 };
