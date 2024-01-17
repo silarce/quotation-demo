@@ -147,9 +147,54 @@ export default function WorkContactDoc() {
     })();
   }, [contractId, engineeringContactId]);
 
+  // 預計未來會有工程圖表資料
+  type Tpattern = {
+    label: string;
+    haveData: boolean;
+    shouldHaveData: boolean;
+  };
+
+  const [patternA, setPatternA] = useState<Tpattern>({
+    label: '簽認圖',
+    haveData: false,
+    shouldHaveData: true,
+  });
+  const [patternB, setPatternB] = useState<Tpattern>({
+    label: '平面圖',
+    haveData: true,
+    shouldHaveData: true,
+  });
+  const [patternC, setPatternC] = useState<Tpattern>({
+    label: '設計圖',
+    haveData: true,
+    shouldHaveData: true,
+  });
+  const [patternD, setPatternD] = useState<Tpattern>({
+    label: '色卡',
+    haveData: false,
+    shouldHaveData: true,
+  });
+
+  const changePatternShouldHaveData = (patternType: 'a' | 'b' | 'c' | 'd', bool: boolean) => {
+    if (patternType === 'a') {
+      setPatternA((pattern) => ({ ...pattern, shouldHaveData: bool }));
+    } else if (patternType === 'b') {
+      setPatternB((pattern) => ({ ...pattern, shouldHaveData: bool }));
+    } else if (patternType === 'c') {
+      setPatternC((pattern) => ({ ...pattern, shouldHaveData: bool }));
+    } else if (patternType === 'd') {
+      setPatternD((pattern) => ({ ...pattern, shouldHaveData: bool }));
+    }
+  };
+
   // ---------------------------------------------------------------------------
 
   const [isShowPattern, setIsShowPattern] = useState(false);
+
+  const showPattern = () => {
+    setDisabled(true);
+    setIsShowPattern(true);
+  };
 
   const [profile, setProfile] = useState<Tprofile>();
 
@@ -349,12 +394,37 @@ export default function WorkContactDoc() {
         profileChange('projectContent', v);
       },
     },
-    projectPatternBtn: {
-      isOk: false,
-      onClick: () => {
-        setDisabled(true);
-        setIsShowPattern(true);
-      },
+    projectPattern: {
+      statusArr: [
+        {
+          ...patternA,
+          onCheck: (bool) => {
+            changePatternShouldHaveData('a', bool);
+          },
+          onLabelClick: showPattern,
+        },
+        {
+          ...patternB,
+          onCheck: (bool) => {
+            changePatternShouldHaveData('b', bool);
+          },
+          onLabelClick: showPattern,
+        },
+        {
+          ...patternC,
+          onCheck: (bool) => {
+            changePatternShouldHaveData('c', bool);
+          },
+          onLabelClick: showPattern,
+        },
+        {
+          ...patternD,
+          onCheck: (bool) => {
+            changePatternShouldHaveData('d', bool);
+          },
+          onLabelClick: showPattern,
+        },
+      ],
     },
     addressBarProps: {
       inputSelProps: {

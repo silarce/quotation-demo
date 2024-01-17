@@ -108,9 +108,16 @@
   .inutSel {
     width: unset;
   }
-  > .btn_rounded {
-    width: 335px;
-    height: 27px;
+
+  .statusBar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    > div {
+      display: flex;
+      gap: 5px;
+    }
   }
 }
 

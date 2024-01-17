@@ -1,6 +1,9 @@
 import { Fragment } from 'react';
 import classNames from 'classnames';
 
+// antd
+import { Badge, Checkbox } from 'antd';
+
 // glogal gear
 import Status from 'components/global/gear/other/status';
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
@@ -8,7 +11,6 @@ import AddressBar, {
   TaddressProps,
   TinputSelProps_noProps,
 } from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
-import MyButton_rounded from 'components/global/gear/button/myButton_rounded';
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
@@ -28,6 +30,14 @@ type TcontactItem = {
   onDelClick: () => void;
 };
 
+type TprojectPatternStatus = {
+  label: string;
+  haveData: boolean; // Badge status
+  shouldHaveData: boolean; // checkBoxValue
+  onCheck: (bool: boolean) => void;
+  onLabelClick: () => void;
+};
+
 type Tcontroll = {
   /**請款狀態 */
   paymentStatus: TcontrollItem;
@@ -35,9 +45,10 @@ type Tcontroll = {
   /**工程內容 */
   projectContent: TcontrollItem;
   // 工程圖表資料
-  projectPatternBtn: {
-    isOk: boolean;
-    onClick: () => void;
+  projectPattern: {
+    // isOk: boolean;
+    // onClick: () => void;
+    statusArr: TprojectPatternStatus[];
   };
 
   addressBarProps: {
@@ -118,16 +129,29 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
               {...inputStyle01}
               captionWidth={'110px'}
             />
-            <MyButton_rounded
-              svgIcon={controll.projectPatternBtn.isOk ? undefined : 'add'}
-              theme={controll.projectPatternBtn.isOk ? 'success' : 'danger'}
-              buttonProps={{
-                className: scss.btn_rounded,
-                onClick: controll.projectPatternBtn.onClick,
-              }}
-            >
-              尚有缺件請附上圖表資料
-            </MyButton_rounded>
+
+            <div className={scss.statusBar}>
+              {controll.projectPattern.statusArr.map((item, index) => {
+                const { haveData, shouldHaveData, onCheck, onLabelClick } = item;
+                let label = item.label;
+                label = shouldHaveData ? label : `此案無${label}`;
+                const status = haveData ? 'success' : 'error';
+
+                return (
+                  <div key={index}>
+                    <Checkbox
+                      checked={shouldHaveData}
+                      onChange={(e) => {
+                        onCheck(e.target.checked);
+                      }}
+                    />
+                    <span className="cursor-pointer" onClick={onLabelClick}>
+                      <Badge status={status} text={label} dot={true} />
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
