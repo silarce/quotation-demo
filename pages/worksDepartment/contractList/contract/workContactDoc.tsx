@@ -172,7 +172,7 @@ export default function WorkContactDoc() {
   const [patternD, setPatternD] = useState<Tpattern>({
     label: '色卡',
     haveData: false,
-    shouldHaveData: true,
+    shouldHaveData: false,
   });
 
   const changePatternShouldHaveData = (patternType: 'a' | 'b' | 'c' | 'd', bool: boolean) => {
@@ -395,34 +395,35 @@ export default function WorkContactDoc() {
       },
     },
     projectPattern: {
+      onCaptionClick: showPattern,
       statusArr: [
         {
           ...patternA,
           onCheck: (bool) => {
             changePatternShouldHaveData('a', bool);
           },
-          onLabelClick: showPattern,
+          // onLabelClick: showPattern,
         },
         {
           ...patternB,
           onCheck: (bool) => {
             changePatternShouldHaveData('b', bool);
           },
-          onLabelClick: showPattern,
+          // onLabelClick: showPattern,
         },
         {
           ...patternC,
           onCheck: (bool) => {
             changePatternShouldHaveData('c', bool);
           },
-          onLabelClick: showPattern,
+          // onLabelClick: showPattern,
         },
         {
           ...patternD,
           onCheck: (bool) => {
             changePatternShouldHaveData('d', bool);
           },
-          onLabelClick: showPattern,
+          // onLabelClick: showPattern,
         },
       ],
     },

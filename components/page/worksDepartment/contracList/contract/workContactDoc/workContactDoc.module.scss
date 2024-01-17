@@ -104,9 +104,15 @@
   display: flex;
   justify-content: flex-start;
   gap: 18px;
+  .inputSelBox {
+    border: solid 1px black;
+    border-radius: 5px;
+    padding: 5px;
 
-  .inutSel {
-    width: unset;
+    .inputSel {
+      cursor: pointer;
+      width: unset;
+    }
   }
 
   .statusBar {

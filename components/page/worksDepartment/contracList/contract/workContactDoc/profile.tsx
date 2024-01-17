@@ -35,7 +35,7 @@ type TprojectPatternStatus = {
   haveData: boolean; // Badge status
   shouldHaveData: boolean; // checkBoxValue
   onCheck: (bool: boolean) => void;
-  onLabelClick: () => void;
+  // onLabelClick: () => void;
 };
 
 type Tcontroll = {
@@ -48,6 +48,7 @@ type Tcontroll = {
   projectPattern: {
     // isOk: boolean;
     // onClick: () => void;
+    onCaptionClick: () => void;
     statusArr: TprojectPatternStatus[];
   };
 
@@ -121,18 +122,20 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
             {...inputStyle01}
           />
           <div className={classNames(scss.projectPatternBtnBox)}>
-            <InputSel
-              className={scss.inutSel}
-              disabled={projectContent.disabled || disabled}
-              label="工程圖表資料"
-              // inputProps={{ ...projectContent }}
-              {...inputStyle01}
-              captionWidth={'110px'}
-            />
+            <div className={scss.inputSelBox} onClick={controll.projectPattern.onCaptionClick}>
+              <InputSel
+                className={scss.inputSel}
+                disabled={projectContent.disabled || disabled}
+                label="工程圖表資料"
+                // inputProps={{ ...projectContent }}
+                {...inputStyle01}
+                captionWidth={'110px'}
+              />
+            </div>
 
             <div className={scss.statusBar}>
               {controll.projectPattern.statusArr.map((item, index) => {
-                const { haveData, shouldHaveData, onCheck, onLabelClick } = item;
+                const { haveData, shouldHaveData, onCheck } = item;
                 let label = item.label;
                 label = shouldHaveData ? label : `此案無${label}`;
                 const status = haveData ? 'success' : 'error';
@@ -145,7 +148,7 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
                         onCheck(e.target.checked);
                       }}
                     />
-                    <span className="cursor-pointer" onClick={onLabelClick}>
+                    <span>
                       <Badge status={status} text={label} dot={true} />
                     </span>
                   </div>
