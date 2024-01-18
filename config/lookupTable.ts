@@ -27,3 +27,76 @@ export const annotationAndQuotationRangeTypeLookup: {
   'heat-protection': '阻熱',
   'heat-protection-smoke-covering': '阻熱遮煙',
 };
+
+const lookup_hpToGapAGapC = {
+  '1/4HP': {
+    HPValue: 0.25,
+    outputTooth: 9,
+    reelGear: 50,
+    gapA: 30,
+    gapC: 20,
+  },
+  '1/3HP': {
+    HPValue: 0.3,
+    outputTooth: 9,
+    reelGear: 50,
+    gapA: 40,
+    gapC: 20,
+  },
+  '1/2HP': {
+    HPValue: 0.5,
+    outputTooth: 9,
+    reelGear: 50,
+    gapA: 50,
+    gapC: 20,
+  },
+  '3/4HP': {
+    HPValue: 0.75,
+    outputTooth: 9,
+    reelGear: 50,
+    gapA: 60,
+    gapC: 20,
+  },
+  '1HP': {
+    HPValue: 1,
+    outputTooth: 9,
+    reelGear: 50,
+    gapA: 70,
+    gapC: 20,
+  },
+  '1 1/2HP': {
+    HPValue: 1.5,
+    outputTooth: 9,
+    reelGear: 60,
+    gapA: 70,
+    gapC: 20,
+  },
+  '2HP': {
+    HPValue: 2,
+    outputTooth: 15,
+    reelGear: 60,
+    gapA: 120,
+    gapC: 20,
+  },
+  '3HP': {
+    HPValue: 3,
+    outputTooth: 15,
+    reelGear: 60,
+    gapA: 150,
+    gapC: 20,
+  },
+  '5HP': {
+    HPValue: 5,
+    outputTooth: 17,
+    reelGear: 60,
+    gapA: 170,
+    gapC: 20,
+  },
+  '50Nm': {
+    HPValue: 50,
+    outputTooth: 17,
+    reelGear: 60,
+    gapA: 40,
+    gapC: 10,
+  },
+};
