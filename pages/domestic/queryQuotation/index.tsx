@@ -23,25 +23,34 @@ import { quotationStatusLookup } from 'config/lookupTable';
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 import { Toption, optionsCreator_county } from 'js/utils/options/countryAndDistrict';
+import { optionsCreator_productMaterial, optionsCreator_doorModel_2 } from 'js/utils/options/productOptions';
+
+const options_productMaterial = optionsCreator_productMaterial({ haveEmpty: true });
 
 // ===========================================
 
 type Tquery = {
+  // county: string | undefined;
+  // customerName: string | undefined;
+  // keyWord: string | undefined;
+  // keyWord_prod: string | undefined;
   county: string | undefined;
+  prodMaterial: string | undefined;
+  doorModel: string | undefined;
   customerName: string | undefined;
   keyWord: string | undefined;
-  keyWord_prod: string | undefined;
 };
 
 // ===========================================
 
 export default function Budget() {
   const router = useRouter();
-  let { county, customerName, keyWord, keyWord_prod } = router.query as Tquery;
+  let { county, prodMaterial, doorModel, customerName, keyWord } = router.query as Tquery;
   county = county || undefined;
+  prodMaterial = prodMaterial || undefined;
+  doorModel = doorModel || undefined;
   customerName = customerName || undefined;
   keyWord = keyWord || undefined;
-  keyWord_prod = keyWord_prod || undefined;
 
   // ----------------------------------------------------------------------
 
@@ -72,29 +81,43 @@ export default function Budget() {
       'latestContent.county': { $eq: county },
       // 客戶名稱
       'contents.customer.name': { $contains: customerName },
-      $and: [
-        // 工程名稱、聯絡人、完整報價單編號
+      // $and: [
+      //   // 工程名稱、聯絡人、完整報價單編號
+      //   {
+      //     $or: [
+      //       {
+      //         quotationNumber: { $eq: keyWord },
+      //       },
+      //       {
+      //         'latestContent.projectName': { $contains: keyWord },
+      //       },
+      //       {
+      //         'latestContent.contactPerson': { $contains: keyWord },
+      //       },
+      //     ],
+      //   },
+      //   // 主產品門型、材質
+      //   {
+      //     $or: [
+      //       // { 'latestContent.products.doorModelName': { $eq: doorModel } },
+      //       // { 'latestContent.products.materialName': { $eq: prodMaterial } },
+      //     ],
+      //   },
+      // ],
+      $or: [
         {
-          $or: [
-            {
-              quotationNumber: { $eq: keyWord },
-            },
-            {
-              'latestContent.projectName': { $contains: keyWord },
-            },
-            {
-              'latestContent.contactPerson': { $contains: keyWord },
-            },
-          ],
+          quotationNumber: { $eq: keyWord },
         },
-        // 主產品門型、材質
         {
-          $or: [
-            { 'latestContent.products.doorModelName': { $contains: keyWord_prod } },
-            { 'latestContent.products.materialName': { $contains: keyWord_prod } },
-          ],
+          'latestContent.projectName': { $contains: keyWord },
+        },
+        {
+          'latestContent.contactPerson': { $contains: keyWord },
         },
       ],
+
+      'latestContent.products.doorModelName': { $eq: doorModel },
+      'latestContent.products.materialName': { $eq: prodMaterial },
     },
     pageSize: 20,
   };
@@ -111,7 +134,7 @@ export default function Budget() {
 
   useEffect(() => {
     reset();
-  }, [county, customerName, keyWord, keyWord_prod]);
+  }, [county, prodMaterial, doorModel, customerName, keyWord]);
 
   // ----------------------------------------------------------------------
 
@@ -198,6 +221,14 @@ export default function Budget() {
       defaultValue: county,
     },
     {
+      placeholder: '主產品門型',
+      options: optionsCreator_doorModel_2({ haveEmpty: true }),
+    },
+    {
+      placeholder: '主產品材質',
+      options: options_productMaterial,
+    },
+    {
       placeholder: '客戶名稱',
       defaultValue: customerName,
     },
@@ -206,20 +237,22 @@ export default function Budget() {
       width: '340px',
       defaultValue: keyWord,
     },
-    {
-      placeholder: '主產品門型、材質',
-      defaultValue: keyWord_prod,
-    },
   ];
 
   const doSearch: TsearchGroup['doSearch'] = (vArr) => {
     const countyOption = vArr[0] as Toption;
-    const customerName = vArr[1] as string;
-    const keyWord = vArr[2] as string;
-    const keyWord_prod = vArr[3] as string;
+    const doorModelOption = vArr[1] as Toption;
+    const prodMaterialOption = vArr[2] as Toption;
+
+    const customerName = vArr[3] as string;
+    const keyWord = vArr[4] as string;
+
     const county = countyOption.value;
+    const prodMaterial = prodMaterialOption.value;
+    const doorModel = doorModelOption.value;
+
     router.push({
-      query: { county, customerName, keyWord, keyWord_prod },
+      query: { county, customerName, keyWord, prodMaterial, doorModel },
     });
   };
 
