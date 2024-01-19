@@ -1176,14 +1176,14 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     type: 'sidePlate',
     creDesc: creDesc_sidePlates,
     options: optionsCreator_componentMaterial_02(),
-    hiddenKeyArr: ['surface', 'density'],
+    hiddenKeyArr: ['surface', 'density', 'material'],
   },
   roller: {
     typeName: '捲軸',
     type: 'roller',
     creDesc: creDesc_rollers,
     options: optionsCreator_componentMaterial_02(),
-    hiddenKeyArr: ['surface', 'density'],
+    hiddenKeyArr: ['surface', 'density', 'material'],
     unit: 'M',
   },
   motor: {
@@ -1191,7 +1191,7 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     type: 'motor',
     creDesc: creDesc_motors,
     options: optionsCreator_componentMaterial_02(),
-    hiddenKeyArr: ['surface', 'density'],
+    hiddenKeyArr: ['surface', 'density', 'material'],
     unit: '組',
   },
   motorAccessories: {
@@ -1199,7 +1199,7 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     type: 'motorAccessories',
     creDesc: creDesc_motorComponent,
     options: optionsCreator_componentMaterial_03(),
-    hiddenKeyArr: ['surface', 'density'],
+    hiddenKeyArr: ['surface', 'density', 'material'],
     unit: '組',
   },
   headBox: {
