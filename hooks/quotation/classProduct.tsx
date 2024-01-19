@@ -433,7 +433,7 @@ class Class_product {
       thickness: this._prodData.thickness,
     };
 
-    const guideRailG_m = new Decimal(this._prodData.guideRailG).div(1000).toNumber();
+    // const guideRailG_m = new Decimal(this._prodData.guideRailG).div(1000).toNumber();
   } //  constructor close ===========================================================
 
   private reRender;
@@ -480,7 +480,7 @@ class Class_product {
   private makeFormatValueDontTriggerTwice = false;
 
   private isWgChanged = false;
-  private isTyphoonProtectionChanged = false;
+  private isDontClearProd = false;
 
   // ---------------------------------------------------------
   // 追加追減用的
@@ -879,11 +879,11 @@ class Class_product {
   // api請求
   // this.shouldCall_cgs
   async req_calcGeneralSpec() {
-    if (!this.isTyphoonProtectionChanged) {
+    if (!this.isDontClearProd) {
       this.clearProd();
     }
 
-    this.isTyphoonProtectionChanged = false;
+    this.isDontClearProd = false;
 
     if (!this.doorType || !this.height) {
       this.isWgChanged = false;
@@ -2961,7 +2961,7 @@ class Class_product {
 
     //
     this._prodData.typhoonProtection = v;
-    this.isTyphoonProtectionChanged = true;
+    this.isDontClearProd = true;
     this._prodData.isULGuideRail = false;
 
     this._prodData.doorTrack = '';
@@ -3117,8 +3117,14 @@ class Class_product {
   get doorTrackSilencerStrip() {
     return this._prodData.doorTrackSilencerStrip;
   }
+  // 如果使用者一開始就編輯門軌消音條
+  // 會因為還沒有取得預設馬達，導致馬達被清空
+  // 所以要呼叫req_calcGeneralSpec取得預設馬達
+  // 並且isDontClearProd設為true避免資料被重置
+  // 基本上與防颱一樣
   set doorTrackSilencerStrip(v) {
     this._prodData.doorTrackSilencerStrip = v;
+    this.isDontClearProd = true;
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
     // this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
@@ -3130,7 +3136,7 @@ class Class_product {
     this.shouldCall_pgpb = true;
     this.callAllReq();
     // onDoorTypeChange必須放在賦值之後再執行
-    this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
+    // this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
     this.reRender();
   }
   //
