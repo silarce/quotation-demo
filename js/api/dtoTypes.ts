@@ -1493,6 +1493,7 @@ export type TcreateQuotationContentDto = {
 /**合約 */
 export type TquotationContractDto = {
   id: string;
+  contractNumber: string | null;
   createdAt: string;
   updateAt: string;
   annotations: string[] | null;
