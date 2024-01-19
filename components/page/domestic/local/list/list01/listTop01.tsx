@@ -1,10 +1,10 @@
 // css
 import style from './listTop01.module.scss';
 
-export default function ListTop01() {
+export default function ContractListTop() {
   return (
     <div className={style.container}>
-      <span>報價編號</span>
+      <span>合約編號</span>
       <span>客戶名稱/工程名稱</span>
       <span>總折數</span>
       <span>合約金額</span>
