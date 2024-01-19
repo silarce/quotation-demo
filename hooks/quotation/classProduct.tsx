@@ -1,4 +1,79 @@
 /**
+
+太難處理了，決定暫時先放著
+先把其他的東西處理好
+
+
+先做 改變WG後 觸發呼叫api鏈但是不會變更馬達
+再做 編輯馬達時會連帶變更gapA再連帶變更W與WG然後觸發呼叫鏈
+再做 編輯門軌時會連帶變更gapA再連帶變更W與WG然後觸發呼叫鏈
+最後檢查L W WG是否計算正確
+再確認送給後端的WG是否正確
+
+
+
+
+
+送WG的話一定要同時送馬力數
+必須先有馬達才可以設定W
+
+預計要拿掉的值
+_theW
+
+記得改變馬力時要改變gapA
+
+選門型時已經會自動帶入門軌了
+
+編輯門軌時
+會改變W也會呼叫bom api
+但是沒有觸發改變WG後的機制
+
+
+馬達有其對應的boxB
+改變馬達就要改變boxB
+
+boxB與boxD是對應的
+改變boxB就要改變boxD
+boxB不變,boxD就不可以變
+
+
+
+
+要確認相數與伏特數的處理
+
+送WG的話一定要同時送馬力數
+必須先有馬達才可以設定W
+
+預計要拿掉的值
+_theW
+
+記得改變馬力時要改變gapA
+
+選門型時已經會自動帶入門軌了
+
+編輯門軌時
+會改變W也會呼叫bom api
+但是沒有觸發改變WG後的機制
+
+
+馬達有其對應的boxB
+改變馬達就要改變boxB
+
+boxB與boxD是對應的
+改變boxB就要改變boxD
+boxB不變,boxD就不可以變
+
+
+先做 改變WG後 觸發呼叫api鏈但是不會變更馬達
+再做 編輯馬達時會連帶變更gapA再連帶變更W與WG然後觸發呼叫鏈
+再做 編輯門軌時會連帶變更gapA再連帶變更W與WG然後觸發呼叫鏈
+最後檢查L W WG是否計算正確
+再確認送給後端的WG是否正確
+
+要確認相數與伏特數的處理
+ */
+
+/**
  *prodCellConfig
  
  * retrieveOptions 下拉式選單產生器
@@ -78,6 +153,7 @@ import { Class_SubCom, TSubCom } from './classSubCom';
 import {
   TgetBoxDParams,
   TgenerateDoorProductBomDto,
+  Thp,
   apiGetProdCalcGeneralSpec,
   apiGetProdAvailableComponents,
   apiPostProdGenerateDoorProductBom,
@@ -411,11 +487,13 @@ class Class_product {
 
   private _theW = '';
   // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
-  private _dontCalcWG = false;
+  // private _dontCalcWG = false;
 
   private _quotationDiscount = 100;
 
-  makeFormatValueDontTriggerTwice = false;
+  private makeFormatValueDontTriggerTwice = false;
+
+  private isWgChanged = false;
 
   // ---------------------------------------------------------
   // 追加追減用的
@@ -812,14 +890,32 @@ class Class_product {
 
     const body = (() => {
       const fullWidth = Number(this.fullWidth || 0) * 1000;
+      const modelName = this.doorType as TpcgsPrams['modelName'];
+      const height = Number(this.height) * 1000;
+      const isAntiTyphoon = this.typhoonProtection;
 
-      return {
-        modelName: this.doorType as TpcgsPrams['modelName'],
-        height: Number(this.height) * 1000,
-        isAntiTyphoon: this.typhoonProtection,
-        fullWidth,
-        WG: undefined,
-      };
+      // const WG = this.WG_mm;
+      const hp = this.horsepower.replaceAll('HP', '') as Thp;
+
+      if (!this.isWgChanged) {
+        return {
+          modelName,
+          height,
+          isAntiTyphoon,
+          fullWidth,
+          WG: undefined,
+          hp: undefined,
+        };
+      } else {
+        return {
+          modelName,
+          height,
+          isAntiTyphoon,
+          fullWidth,
+          WG: undefined,
+          hp,
+        };
+      }
     })();
 
     if (!body.fullWidth && !body.WG) {
@@ -832,29 +928,29 @@ class Class_product {
       return false;
     }
 
-    if (!this._dontCalcWG) {
-      this._prodData.WG = String(
-        calcProductWG({
-          fullWidth: Number(this._prodData.fullWidth || 0) * 1000,
-          gapA: res.gapA,
-          gapC: res.gapC,
-        }) / 1000
-      );
-    }
+    // if (!this._dontCalcWG) {
+    // }
+    this._prodData.WG = String(
+      calcProductWG({
+        fullWidth: Number(this._prodData.fullWidth || 0) * 1000,
+        gapA: res.gapA,
+        gapC: res.gapC,
+      }) / 1000
+    );
 
-    this._dontCalcWG = false;
+    // this._dontCalcWG = false;
 
     if (!this.doorTrack) {
       // 必須要有門軌才會有guildRailG才能計算正確的W
       this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
     }
 
-    this._theW = String(
-      calcW({
-        WG: Number(this._prodData.WG) || 0,
-        G: Number(this.guildRailG) || 0,
-      })
-    );
+    // this._theW = String(
+    //   calcW({
+    //     WG: Number(this._prodData.WG) || 0,
+    //     G: Number(this.guildRailG) || 0,
+    //   })
+    // );
 
     //
     const defaultMotorIndex = res.defaultMotorIndex;
@@ -966,6 +1062,8 @@ class Class_product {
     }
 
     this._doorGeneralSpecs = res;
+
+    this.isWgChanged = false;
 
     return true;
   } // calcGeneralSpec
@@ -2301,62 +2399,92 @@ class Class_product {
     this.reRender();
   }
 
+  get WG_mm() {
+    return new Decimal(this._prodData.WG || 0).mul(1000).toNumber();
+  }
   get WG() {
     return this._prodData.WG;
   }
 
-  set WG(v) {
-    this._prodData.WG = v;
-    const w = calcW({
-      WG: Number(v) || 0,
-      G: Number(this.guildRailG) || 0,
-    });
-    this._theW = String(w);
+  set WG(str: string) {
+    if (str === '') {
+      str = '0';
+    }
 
-    this.onWGChange();
+    this._prodData.WG = str;
+
+    // 改變了WG，就要呼叫
+    // 之後呼叫的req_calcGeneralSpec的時候就會把hp帶入
+    this.isWgChanged = true;
+
+    const L = calcProductFullWidth({
+      WG: new Decimal(this._prodData.WG).mul(1000).toNumber(),
+      gapA: this._doorGeneralSpecs?.gapA ?? 0,
+      gapC: this._doorGeneralSpecs?.gapC ?? 0,
+    });
+
+    this.fullWidth = new Decimal(L).div(1000).toString();
+
     this.reRender();
   }
+
+  // set WG(v) {
+  //   this._prodData.WG = v;
+  //   const w = calcW({
+  //     WG: Number(v) || 0,
+  //     G: Number(this.guildRailG) || 0,
+  //   });
+  //   this._theW = String(w);
+
+  //   this.onWGChange();
+  //   this.reRender();
+  // }
 
   set WG_noChangeW(v: string) {
     this._prodData.WG = v;
-    this.onWGChange();
-    this.reRender();
+    // this.onWGChange();
+    // this.reRender();
   }
 
-  async onWGChange() {
-    const callReq = async () => {
-      const fullWidth = await calcFullwidthWithWG({
-        body: {
-          modelName: this.doorType as TpcgsPrams['modelName'],
-          height: Number(this.height) * 1000,
-          isAntiTyphoon: this.typhoonProtection,
-          WG: Number(this.WG) * 1000,
-        },
-      });
+  // async onWGChange() {
+  //   const callReq = async () => {
+  //     const fullWidth = await calcFullwidthWithWG({
+  //       body: {
+  //         modelName: this.doorType as TpcgsPrams['modelName'],
+  //         height: Number(this.height) * 1000,
+  //         isAntiTyphoon: this.typhoonProtection,
+  //         WG: Number(this.WG) * 1000,
+  //       },
+  //     });
 
-      this._prodData.fullWidth = String(fullWidth / 1000);
+  //     this._prodData.fullWidth = String(fullWidth / 1000);
 
-      this.area = this.calcArea();
-      this.clearProd();
-      // this.calcChangeAccePrice();
-      this.shouldCall_cgs = true;
-      this.callAllReq();
-    };
+  //     this.area = this.calcArea();
+  //     this.clearProd();
+  //     // this.calcChangeAccePrice();
+  //     this.shouldCall_cgs = true;
+  //     this.callAllReq();
+  //   };
 
-    if (this.timeoutId_calcFullWidth) {
-      clearTimeout(this.timeoutId_calcFullWidth);
-    }
+  //   if (this.timeoutId_calcFullWidth) {
+  //     clearTimeout(this.timeoutId_calcFullWidth);
+  //   }
 
-    this.timeoutId_calcFullWidth = setTimeout(async () => {
-      await callReq();
-      this.reRender();
-    }, 800);
-  }
+  //   this.timeoutId_calcFullWidth = setTimeout(async () => {
+  //     await callReq();
+  //     this.reRender();
+  //   }, 800);
+  // }
 
   // ------------------------------------
 
   get W() {
-    return this._theW;
+    const W_num = calcW({
+      WG: this.WG_mm,
+      G: Number(this._prodData.guideRailG),
+    });
+
+    return new Decimal(W_num).div(1000).toString();
   }
 
   set W(v) {
@@ -2364,16 +2492,17 @@ class Class_product {
       v = '0';
     }
 
-    const wg = calcProductWG_withWAndG({
+    const WG = calcProductWG_withWAndG({
       W: Number(v || 0),
       G: Number(this.guildRailG || 0),
     });
 
+    this.WG = String(WG);
     // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
-    this._dontCalcWG = true;
+    // this._dontCalcWG = true;
 
-    this._theW = String(v);
-    this.WG_noChangeW = String(wg);
+    // this._theW = String(v);
+    // this.WG_noChangeW = String(WG);
 
     this.reRender;
   }
@@ -3615,6 +3744,7 @@ const calcFullwidthWithWG = async ({
     isAntiTyphoon: boolean;
     // fullWidth?:undefined
     WG: number; // 單位為mm
+    hp: Thp;
   };
 }) => {
   try {
@@ -3635,18 +3765,19 @@ const calcFullwidthWithWG = async ({
 };
 
 const reqGetCalcGeneralSpec = async ({
-  //
   modelName,
   height,
   fullWidth,
   WG,
   isAntiTyphoon,
+  hp,
 }: {
   modelName: string;
   height: number;
   fullWidth?: number;
   WG?: number;
   isAntiTyphoon: boolean;
+  hp?: Thp | undefined;
 }) => {
   const body = {
     modelName: modelName as TpcgsPrams['modelName'],
@@ -3654,6 +3785,7 @@ const reqGetCalcGeneralSpec = async ({
     isAntiTyphoon,
     fullWidth,
     WG: WG,
+    hp,
   };
 
   if (!body.fullWidth && !body.WG) {
