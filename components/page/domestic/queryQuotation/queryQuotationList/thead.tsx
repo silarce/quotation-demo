@@ -7,6 +7,8 @@ export default function Thead() {
       <span>報價編號</span>
       <span>狀態</span>
       <span>報價日期</span>
+      <span>地區</span>
+      <span>工程名稱</span>
       <span>客戶名稱</span>
       <span>聯絡人</span>
       <span>連絡電話</span>

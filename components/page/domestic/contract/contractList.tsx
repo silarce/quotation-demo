@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import moment from 'moment';
 
 // components
-import ListTop01 from '../local/list/list01/listTop01';
+import ContractListTop from '../local/list/list01/listTop01';
 import ListHeader01, { Tcontract } from '../local/list/list01/listHeader01';
 import ListBody01, { TmemoList } from '../local/list/list01/listBody01';
 
@@ -49,7 +49,8 @@ export default function ContractList({ contractList }: { contractList: Tcontract
   const memoArr: TmemoList[] =
     subContracts?.map((item) => {
       return {
-        memoId: item.content.quotationNumber,
+        // memoId: item.content.quotationNumber,
+        memoId: item.contractNumber ?? '',
         memoDate: moment(item.content.createdAt).format('YYYY-MM-DD'),
         // memoContent: item.content.editNotes,
         memoContent: '',
@@ -67,7 +68,7 @@ export default function ContractList({ contractList }: { contractList: Tcontract
   // ----------------------------------------------------------
   return (
     <div className={style.container}>
-      <ListTop01 />
+      <ContractListTop />
       <Collapse
         //
         expandIcon={() => <></>}

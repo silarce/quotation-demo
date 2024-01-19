@@ -2063,9 +2063,9 @@ class Class_product {
       return undefined;
     }
 
-    const slatMaterials = doorModel.slatMaterials;
-    const order = ['鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
-    const orderedArr = _.orderBy(slatMaterials, (item) => order.indexOf(item.name));
+    const slatMaterialsArr = doorModel.slatMaterials;
+    const order = ['黑鐵', '鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
+    const orderedArr = _.orderBy(slatMaterialsArr, (item) => order.indexOf(item.name));
 
     const arr = orderedArr.map((item) => {
       return {
@@ -2073,6 +2073,10 @@ class Class_product {
         label: item.name,
       };
     });
+
+    // 把黑鐵的label改為鐵材烤漆
+    const blackIron = arr.find((item) => item.value === '黑鐵');
+    blackIron && (blackIron.label = '鐵材烤漆');
 
     return arr;
   }
@@ -3393,7 +3397,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'height',
     // 'guildRailG',
     'boxB',
-    // 'boxD',
+    'boxD',
     'thickness',
     'area',
     'volume',

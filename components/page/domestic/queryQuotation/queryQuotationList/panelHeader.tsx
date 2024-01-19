@@ -15,6 +15,8 @@ type Tcontrol_panelHeader = {
   quotationNumber: string;
   status: string;
   quoteDate: string;
+  county: string;
+  projectName: string;
   customerName: string;
   contactPerson: string;
   contactPhoneNumber: string;
@@ -31,6 +33,8 @@ export default function PanelHeader({ control, isActive }: { control: Tcontrol_p
     quotationNumber,
     status,
     quoteDate: updatedAt,
+    county,
+    projectName,
     customerName,
     contactPerson,
     contactPhoneNumber,
@@ -43,6 +47,8 @@ export default function PanelHeader({ control, isActive }: { control: Tcontrol_p
       <span ref={viewRef_bottom}>{quotationNumber}</span>
       <span className={style.step}>{status}</span>
       <span>{updatedAt}</span>
+      <span>{county}</span>
+      <span className={style.clientName}>{projectName}</span>
       <span className={style.clientName}>{customerName}</span>
       <span>{contactPerson}</span>
       <span>{contactPhoneNumber}</span>

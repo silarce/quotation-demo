@@ -118,7 +118,8 @@ export default function Contract() {
 
       return {
         id: item.id,
-        quotationId: content.quotationNumber,
+        // quotationId: content.quotationNumber,
+        quotationId: item.contractNumber ?? '',
         clientName: content.customer.name,
         quotationName: content.projectName,
         discount: item.discount,

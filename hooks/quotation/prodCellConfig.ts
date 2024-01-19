@@ -131,11 +131,16 @@ const prodCellConfig: TcellConfig = {
   },
   boxD: {
     label: 'D(m)',
+    theadItemClassName: 'text-center',
     inputSelProps: {
+      showBaseline: 'invisible',
       wrapperStyle: { width: '80px' },
-      selectProps: {
-        props: {},
+      inputProps: {
+        props: { disabled: true, className: 'text-center' },
       },
+      // selectProps: {
+      //   props: {},
+      // },
     },
   },
   thickness: {
