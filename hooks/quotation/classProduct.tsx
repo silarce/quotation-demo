@@ -1040,26 +1040,31 @@ class Class_product {
     //   label: '自動計算',
     // });
 
+    // 這個判斷沒有意義，改變寬度或高度時weight一定會改變
     // 先判斷跟原本的是否一樣
-    if (
-      this._doorGeneralSpecs?.weight !== res.weight ||
-      this._doorGeneralSpecs?.diameter !== res.diameter
-      //
-    ) {
-      this.shouldCall_pac = true;
-    }
+    // if (
+    //   this._doorGeneralSpecs?.weight !== res.weight ||
+    //   this._doorGeneralSpecs?.diameter !== res.diameter
+    //   //
+    // ) {
+    //   this.shouldCall_pac = true;
+    // }
+    this.shouldCall_pac = true;
 
-    if (
-      this._doorGeneralSpecs?.diameter !== res.diameter ||
-      this._doorGeneralSpecs?.slatLength !== res.slatLength ||
-      this._doorGeneralSpecs?.guideRailLength !== res.guideRailLength ||
-      this._doorGeneralSpecs?.bearingHousingTotalLength !== res.bearingHousingTotalLength ||
-      this._doorGeneralSpecs?.headBoxLength !== res.headBoxLength ||
-      this._doorGeneralSpecs?.bearingName !== res.bearingName ||
-      this._doorGeneralSpecs?.sprocketWheelChains !== res.sprocketWheelChains
-    ) {
-      this.shouldCall_pgpb = true;
-    }
+    // 這個判斷幾乎沒有意義，改變寬度時部分欄位一定會改變
+    // 而寬度經常改變
+    // if (
+    //   this._doorGeneralSpecs?.diameter !== res.diameter ||
+    //   this._doorGeneralSpecs?.slatLength !== res.slatLength ||
+    //   this._doorGeneralSpecs?.guideRailLength !== res.guideRailLength ||
+    //   this._doorGeneralSpecs?.bearingHousingTotalLength !== res.bearingHousingTotalLength ||
+    //   this._doorGeneralSpecs?.headBoxLength !== res.headBoxLength ||
+    //   this._doorGeneralSpecs?.bearingName !== res.bearingName ||
+    //   this._doorGeneralSpecs?.sprocketWheelChains !== res.sprocketWheelChains
+    // ) {
+    //   this.shouldCall_pgpb = true;
+    // }
+    this.shouldCall_pgpb = true;
 
     this._doorGeneralSpecs = res;
 
