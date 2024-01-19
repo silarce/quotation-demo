@@ -434,16 +434,6 @@ class Class_product {
     };
 
     const guideRailG_m = new Decimal(this._prodData.guideRailG).div(1000).toNumber();
-    this._theW = String(
-      calcW({
-        WG: Number(this._prodData.WG || '0'),
-        G: Number(guideRailG_m),
-      })
-    );
-
-    if (this._theW === '0') {
-      this._theW = '';
-    }
   } //  constructor close ===========================================================
 
   private reRender;
@@ -484,10 +474,6 @@ class Class_product {
 
   // readonly options_doorTrack_normal = options_doorTrack_normal;
   // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
-
-  private _theW = '';
-  // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
-  // private _dontCalcWG = false;
 
   private _quotationDiscount = 100;
 
@@ -853,7 +839,6 @@ class Class_product {
 
   clearProd_all() {
     const empty = emptyProdOri();
-    this._theW = '';
 
     const prod: Tprod = {
       ...empty,
@@ -2806,14 +2791,12 @@ class Class_product {
     this._prodData.guideRailsOpening = theGuideRail?.guideRailsOpening ?? '';
     this._prodData.guideRailG = theGuideRail?.width ?? 0;
 
-    if (this._prodData.WG) {
-      this._theW = String(
-        calcW({
-          WG: Number(this._prodData.WG) || 0,
-          G: Number(this.guildRailG) || 0,
-        })
-      );
-    }
+    this.W = String(
+      calcW({
+        WG: Number(this._prodData.WG) || 0,
+        G: Number(this.guildRailG) || 0,
+      })
+    );
 
     this.callRetrieveCreProdCom();
 
