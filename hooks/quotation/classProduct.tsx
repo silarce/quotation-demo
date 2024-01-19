@@ -166,8 +166,7 @@ import { apiGetQuotationProducts } from 'js/api/api_quotation';
 // =============================================================================
 
 import { prodCellConfig, getInstallationFee } from './prodCellConfig';
-
-import { lookup_distributionBoxPrice, lookup_horsePowerToNumber } from 'config/product/lookup';
+import { lookup_distributionBoxPrice, lookup_horsePowerToNumber, lookup_hpToGapAGapC } from 'config/product/lookup';
 
 // utils
 import {
@@ -187,6 +186,7 @@ import {
   calcProductWG,
   calcProductFullWidth,
   calcW,
+  calcW_2,
   calcProductWG_withWAndG,
   findBDoptions,
 } from 'js/utils/product/calc';
@@ -826,8 +826,10 @@ class Class_product {
       prod.motor = this._prodData.motor;
       prod.boxB = this._prodData.boxB;
       prod.boxD = this._prodData.boxD;
-      prod.gapA = this._prodData.gapA;
-      prod.gapC = this._prodData.gapC;
+      // prod.gapA = this._prodData.gapA;
+      // prod.gapC = this._prodData.gapC;
+      // prod.gapA = this._doorGeneralSpecs?.gapA ?? 0;
+      // prod.gapC = this._doorGeneralSpecs?.gapC ?? 0;
     }
 
     this._prodData = prod;
@@ -891,6 +893,8 @@ class Class_product {
   // api請求
   // this.shouldCall_cgs
   async req_calcGeneralSpec() {
+    this.clearProd();
+
     if (!this.doorType || !this.height) {
       this.isWgChanged = false;
 
@@ -938,29 +942,20 @@ class Class_product {
       return false;
     }
 
-    // if (!this._dontCalcWG) {
-    // }
+    this._doorGeneralSpecs = res;
+
     this._prodData.WG = String(
       calcProductWG({
-        fullWidth: Number(this._prodData.fullWidth || 0) * 1000,
+        fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
         gapA: res.gapA,
         gapC: res.gapC,
       }) / 1000
     );
 
-    // this._dontCalcWG = false;
-
     if (!this.doorTrack) {
       // 必須要有門軌才會有guildRailG才能計算正確的W
       this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
     }
-
-    // this._theW = String(
-    //   calcW({
-    //     WG: Number(this._prodData.WG) || 0,
-    //     G: Number(this.guildRailG) || 0,
-    //   })
-    // );
 
     this.thickness = res.thickness;
 
@@ -976,90 +971,77 @@ class Class_product {
     // 設定馬力
     if (!this.isWgChanged) {
       this.horsepower = defaultMotor.hp;
-    }
 
-    // ________________________
-    // 設定boxB與thickness
-    // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
-    const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
+      // ________________________
+      // 設定boxB與thickness
+      // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
+      const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
 
-    // ________________________
+      // ________________________
 
-    // 設定馬達廠商
-    if (defaultMotorBox) {
-      //
-      //
-      //
+      // 設定馬達廠商
+      if (defaultMotorBox) {
+        //
+        //
+        //
 
-      if (defaultMotorBox.東元) {
-        this.motor = '東元';
+        if (defaultMotorBox.東元) {
+          this.motor = '東元';
 
-        const defaultBoxB_num = new Decimal(defaultMotorBox.東元.boxB).div(1000).toNumber();
-        const defaultBoxB = String(defaultBoxB_num);
-        const shouldChange = !this.isBoxBinOption({
-          boxB_m: defaultBoxB_num,
-        });
+          const defaultBoxB_num = new Decimal(defaultMotorBox.東元.boxB).div(1000).toNumber();
+          const defaultBoxB = String(defaultBoxB_num);
+          const shouldChange = !this.isBoxBinOption({
+            boxB_m: defaultBoxB_num,
+          });
 
-        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
-        this._defaultBoxB = theBoxB;
+          const theBoxB = shouldChange ? defaultBoxB : this.boxB;
 
-        if (!this.isWgChanged) {
+          this.changeBoxBNoCall({
+            str: theBoxB,
+            diameter: res.diameter,
+          });
+        } else if (defaultMotorBox.default) {
+          const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
+          const defaultBoxB = String(defaultBoxB_num);
+          const shouldChange = !this.isBoxBinOption({
+            boxB_m: defaultBoxB_num,
+          });
+
+          const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
+          this.changeBoxBNoCall({
+            str: theBoxB,
+            diameter: res.diameter,
+          });
+        } else if (defaultMotorBox.大同) {
+          this.motor = '大同';
+
+          const defaultBoxB_num = new Decimal(defaultMotorBox.大同.boxB).div(1000).toNumber();
+          const defaultBoxB = String(defaultBoxB_num);
+          const shouldChange = !this.isBoxBinOption({
+            boxB_m: defaultBoxB_num,
+          });
+
+          const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
           this.changeBoxBNoCall({
             str: theBoxB,
             diameter: res.diameter,
           });
         }
-      } else if (defaultMotorBox.default) {
-        const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
-        const defaultBoxB = String(defaultBoxB_num);
-        const shouldChange = !this.isBoxBinOption({
-          boxB_m: defaultBoxB_num,
-        });
 
-        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
-        this._defaultBoxB = theBoxB;
-
-        if (!this.isWgChanged) {
-          this.changeBoxBNoCall({
-            str: theBoxB,
-            diameter: res.diameter,
-          });
-        }
-      } else if (defaultMotorBox.大同) {
-        this.motor = '大同';
-
-        const defaultBoxB_num = new Decimal(defaultMotorBox.大同.boxB).div(1000).toNumber();
-        const defaultBoxB = String(defaultBoxB_num);
-        const shouldChange = !this.isBoxBinOption({
-          boxB_m: defaultBoxB_num,
-        });
-
-        const theBoxB = shouldChange ? defaultBoxB : this.boxB;
-        this._defaultBoxB = theBoxB;
-
-        if (!this.isWgChanged) {
-          this.changeBoxBNoCall({
-            str: theBoxB,
-            diameter: res.diameter,
-          });
-        }
-      }
-
-      //
-    } else {
-      this._defaultBoxB = boxB ? String(boxB / 1000) : '';
-
-      if (!this.isWgChanged) {
+        //
+      } else {
         this.changeBoxBNoCall({
           str: boxB ? String(boxB / 1000) : '',
           diameter: res.diameter,
         });
       }
+
+      this._defaultBoxB = this.boxB;
+
+      this.findBDoptions();
     }
-
-    // this._defaultBoxB = this.boxB;
-
-    this.findBDoptions();
 
     // this.options_boxB?.unshift({
     //   value: 'auto',
@@ -2433,12 +2415,15 @@ class Class_product {
     this._prodData.fullWidth = v;
     // this._prodData.WG = '0';
     this.area = this.calcArea();
-    this.clearProd();
     // this.calcChangeAccePrice();
+    // this.clearProd();
     this.shouldCall_cgs = true;
     this.callAllReq();
 
     this.reRender();
+  }
+  get fullWidth_mm() {
+    return new Decimal(this._prodData.fullWidth).mul(1000).toNumber();
   }
 
   get WG_mm() {
@@ -2482,11 +2467,11 @@ class Class_product {
   //   this.reRender();
   // }
 
-  set WG_noChangeW(v: string) {
-    this._prodData.WG = v;
-    // this.onWGChange();
-    // this.reRender();
-  }
+  // set WG_noChangeW(v: string) {
+  //   this._prodData.WG = v;
+  //   // this.onWGChange();
+  //   // this.reRender();
+  // }
 
   // async onWGChange() {
   //   const callReq = async () => {
@@ -2540,11 +2525,6 @@ class Class_product {
     });
 
     this.WG = String(WG);
-    // 為了避免在req_calcGeneralSpec二次計算WG而導致四捨五入誤差
-    // this._dontCalcWG = true;
-
-    // this._theW = String(v);
-    // this.WG_noChangeW = String(WG);
 
     this.reRender;
   }
@@ -2558,7 +2538,7 @@ class Class_product {
   set height(v) {
     this._prodData.height = v;
     this.area = this.calcArea();
-    this.clearProd();
+    // this.clearProd();
 
     this.shouldCall_cgs = true;
     this.shouldCall_pgpb = true;
@@ -2660,6 +2640,7 @@ class Class_product {
 
   async changeBoxBNoCall({ str, diameter }: { str: string; diameter: number }) {
     this._prodData.boxB = str;
+    console.log('str', str);
 
     const reqBody: TgetBoxDParams = {
       modelName: this.doorType,
@@ -2809,6 +2790,19 @@ class Class_product {
   }
   set horsepower(v) {
     this._prodData.horsepower = v;
+
+    const { gapA, gapC } = lookup_hpToGapAGapC[v as keyof typeof lookup_hpToGapAGapC];
+    this._doorGeneralSpecs && (this._doorGeneralSpecs.gapA = gapA);
+    this._doorGeneralSpecs && (this._doorGeneralSpecs.gapC = gapC);
+
+    const W = calcW_2({
+      fullWidth: this.fullWidth_mm,
+      gapA: Number(this._doorGeneralSpecs?.gapA || '0'),
+      gapC: Number(this._doorGeneralSpecs?.gapC || '0'),
+      G: this.guildRailG_mm,
+    });
+
+    this.W = new Decimal(W).div(1000).toString();
 
     this.changeDistributionBoxPrice_byHorsepower();
     this.changePhase_byHorsepower();
