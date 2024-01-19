@@ -494,6 +494,7 @@ class Class_product {
   private makeFormatValueDontTriggerTwice = false;
 
   private isWgChanged = false;
+  private isTyphoonProtectionChanged = false;
 
   // ---------------------------------------------------------
   // 追加追減用的
@@ -893,7 +894,11 @@ class Class_product {
   // api請求
   // this.shouldCall_cgs
   async req_calcGeneralSpec() {
-    this.clearProd();
+    if (!this.isTyphoonProtectionChanged) {
+      this.clearProd();
+    }
+
+    this.isTyphoonProtectionChanged = false;
 
     if (!this.doorType || !this.height) {
       this.isWgChanged = false;
@@ -2968,6 +2973,7 @@ class Class_product {
 
     //
     this._prodData.typhoonProtection = v;
+    this.isTyphoonProtectionChanged = true;
     this._prodData.isULGuideRail = false;
 
     this._prodData.doorTrack = '';
