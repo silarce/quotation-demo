@@ -3393,7 +3393,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'height',
     // 'guildRailG',
     'boxB',
-    // 'boxD',
+    'boxD',
     'thickness',
     'area',
     'volume',
