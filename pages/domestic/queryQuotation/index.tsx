@@ -144,6 +144,7 @@ export default function Budget() {
         quotationNumber: latestContent.quotationNumber,
         status: quotationStatusLookup[latestContent.status],
         quoteDate: moment(convertDate_reduce1911(latestContent.updatedAt)).format('yy-MM-DD'),
+        county: latestContent.county,
         projectName: latestContent.projectName,
         customerName: latestCustomer?.name,
         contactPerson: latestContent.contactPerson,
@@ -153,7 +154,7 @@ export default function Budget() {
       };
 
       const body = sortedContent.map((content, index) => {
-        const { status, updatedAt, projectName, customer } = content;
+        const { status, updatedAt, county, projectName, customer } = content;
 
         const href_body = {
           pathname: '/domestic/quotationList/quotation',
@@ -167,6 +168,7 @@ export default function Budget() {
         return {
           status: quotationStatusLookup[status],
           quoteDate: moment(convertDate_reduce1911(updatedAt)).format('yy-MM-DD'),
+          county: county,
           projectName: projectName,
           customerName: customer?.name,
           href: href_body,
