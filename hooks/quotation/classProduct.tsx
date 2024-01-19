@@ -995,11 +995,12 @@ class Class_product {
 
           const defaultBoxB_num = new Decimal(defaultMotorBox.東元.boxB).div(1000).toNumber();
           const defaultBoxB = String(defaultBoxB_num);
-          const shouldChange = !this.isBoxBinOption({
-            boxB_m: defaultBoxB_num,
-          });
 
-          const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+          // const shouldChange = !this.isBoxBinOption({
+          //   boxB_m: defaultBoxB_num,
+          // });
+          // const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+          const theBoxB = this.boxB ? this.boxB : defaultBoxB;
 
           this.changeBoxBNoCall({
             str: theBoxB,
@@ -1008,11 +1009,13 @@ class Class_product {
         } else if (defaultMotorBox.default) {
           const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
           const defaultBoxB = String(defaultBoxB_num);
-          const shouldChange = !this.isBoxBinOption({
-            boxB_m: defaultBoxB_num,
-          });
 
-          const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+          // const shouldChange = !this.isBoxBinOption({
+          //   boxB_m: defaultBoxB_num,
+          // });
+          // const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
+          const theBoxB = this.boxB ? this.boxB : defaultBoxB;
 
           this.changeBoxBNoCall({
             str: theBoxB,
@@ -1023,11 +1026,13 @@ class Class_product {
 
           const defaultBoxB_num = new Decimal(defaultMotorBox.大同.boxB).div(1000).toNumber();
           const defaultBoxB = String(defaultBoxB_num);
-          const shouldChange = !this.isBoxBinOption({
-            boxB_m: defaultBoxB_num,
-          });
 
-          const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+          // const shouldChange = !this.isBoxBinOption({
+          //   boxB_m: defaultBoxB_num,
+          // });
+          // const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
+          const theBoxB = this.boxB ? this.boxB : defaultBoxB;
 
           this.changeBoxBNoCall({
             str: theBoxB,
@@ -1655,36 +1660,36 @@ class Class_product {
 
   // ---------------------------------------------------------
 
-  private toSetDefaultBoxB() {
-    if (!this._doorGeneralSpecs) {
-      return;
-    }
+  // private toSetDefaultBoxB() {
+  //   if (!this._doorGeneralSpecs) {
+  //     return;
+  //   }
 
-    const motorArr = this._doorGeneralSpecs.motors;
-    const hp = this.horsepower;
-    const vendor = this.motor as '東元' | '大同' | '';
+  //   const motorArr = this._doorGeneralSpecs.motors;
+  //   const hp = this.horsepower;
+  //   const vendor = this.motor as '東元' | '大同' | '';
 
-    const defaultMotor = motorArr[this._doorGeneralSpecs.defaultMotorIndex];
-    const defaultHP = defaultMotor.hp;
-    const box = defaultMotor.box;
+  //   const defaultMotor = motorArr[this._doorGeneralSpecs.defaultMotorIndex];
+  //   const defaultHP = defaultMotor.hp;
+  //   const box = defaultMotor.box;
 
-    if (hp !== defaultHP || !vendor || !box) {
-      return;
-    }
+  //   if (hp !== defaultHP || !vendor || !box) {
+  //     return;
+  //   }
 
-    const boxB = box[vendor]?.boxB || box.default?.boxB;
+  //   const boxB = box[vendor]?.boxB || box.default?.boxB;
 
-    if (boxB) {
-      const boxB_num = new Decimal(boxB).div(1000).toNumber();
-      const shouldChange = !this.isBoxBinOption({
-        boxB_m: boxB_num,
-      });
+  //   if (boxB) {
+  //     const boxB_num = new Decimal(boxB).div(1000).toNumber();
+  //     const shouldChange = !this.isBoxBinOption({
+  //       boxB_m: boxB_num,
+  //     });
 
-      if (shouldChange) {
-        this.boxB = String(boxB_num);
-      }
-    }
-  }
+  //     if (shouldChange) {
+  //       this.boxB = String(boxB_num);
+  //     }
+  //   }
+  // }
 
   // ----------------------------------------------------------------
 
@@ -2097,19 +2102,19 @@ class Class_product {
     installationFee_class.price_locale = String(fee);
   }
 
-  isBoxBinOption({ boxB_m }: { boxB_m: number }) {
-    if (!this.options_boxB) {
-      return false;
-    }
+  // isBoxBinOption({ boxB_m }: { boxB_m: number }) {
+  //   if (!this.options_boxB) {
+  //     return false;
+  //   }
 
-    return this.options_boxB.some((option) => {
-      if (isNaN(Number(option.value))) {
-        return false;
-      }
+  //   return this.options_boxB.some((option) => {
+  //     if (isNaN(Number(option.value))) {
+  //       return false;
+  //     }
 
-      return Number(option.value) === boxB_m;
-    });
-  }
+  //     return Number(option.value) === boxB_m;
+  //   });
+  // }
 
   //
   changeDistributionBoxPrice_byHorsepower() {
@@ -2836,7 +2841,7 @@ class Class_product {
 
     this.changeDistributionBoxPrice_byHorsepower();
     this.changePhase_byHorsepower();
-    this.toSetDefaultBoxB();
+    // this.toSetDefaultBoxB();
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3058,7 +3063,7 @@ class Class_product {
   }
   set motor(v) {
     this._prodData.motor = v;
-    this.toSetDefaultBoxB();
+    // this.toSetDefaultBoxB();
     this.callRetrieveCreProdCom();
     this.reRender();
   }
