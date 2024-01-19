@@ -67,7 +67,7 @@ export default function ListOfDeliveryOrders() {
   // ----------------------------------------------------
   return (
     <div className={style.container}>
-      <PageHeader panelList={panelList} contractNumber={contract?.content.quotationNumber} />
+      <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? ''} />
 
       <div className={`${style.mainContainer} ${style.listOfDeliveryOrders}`}>
         <div className={style.thead}>

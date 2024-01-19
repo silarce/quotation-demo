@@ -1152,7 +1152,7 @@ class Class_product {
       bottomBarPlate: this.bottomBarPlate,
     };
 
-    const generateBomObj_empty: Partial<TgenerateDoorProductBomDto> = { doorSpec };
+    const generateBomObj_pre: Partial<TgenerateDoorProductBomDto> = { doorSpec };
 
     let haveNull = false;
 
@@ -1187,19 +1187,26 @@ class Class_product {
         haveNull = true;
       }
 
-      generateBomObj_empty[key] = {
+      generateBomObj_pre[key] = {
         id: componentId,
         material,
         materialSurface: materialSurface || undefined,
         isPainted,
       };
+
+      // 門軌必須要送厚度
+      if (key === 'guideRail' && generateBomObj_pre.guideRail && item.thickness) {
+        const thickness = Number(item.thickness ?? '');
+
+        generateBomObj_pre.guideRail.thickness = String(thickness);
+      }
     });
 
     if (haveNull) {
       return false;
     }
 
-    const generateBomObj = generateBomObj_empty as TgenerateDoorProductBomDto;
+    const generateBomObj = generateBomObj_pre as TgenerateDoorProductBomDto;
 
     try {
       const res = await apiPostProdGenerateDoorProductBom(generateBomObj);
@@ -2154,9 +2161,9 @@ class Class_product {
       return undefined;
     }
 
-    const slatMaterials = doorModel.slatMaterials;
-    const order = ['鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
-    const orderedArr = _.orderBy(slatMaterials, (item) => order.indexOf(item.name));
+    const slatMaterialsArr = doorModel.slatMaterials;
+    const order = ['黑鐵', '鍍鋅鋼板', 'SST#304', 'SST#316', '樹脂鋼板', '高耐鍍鋅鋼板'];
+    const orderedArr = _.orderBy(slatMaterialsArr, (item) => order.indexOf(item.name));
 
     const arr = orderedArr.map((item) => {
       return {
@@ -2164,6 +2171,10 @@ class Class_product {
         label: item.name,
       };
     });
+
+    // 把黑鐵的label改為鐵材烤漆
+    const blackIron = arr.find((item) => item.value === '黑鐵');
+    blackIron && (blackIron.label = '鐵材烤漆');
 
     return arr;
   }
@@ -2337,9 +2348,9 @@ class Class_product {
     return this._prodData.itemName;
   }
   set itemName(v) {
-    if (v.length >= 11) {
-      v = v.slice(0, 10);
-    }
+    // if (v.length >= 11) {
+    //   v = v.slice(0, 10);
+    // }
 
     this._prodData.itemName = v;
     this.reRender();
@@ -3515,7 +3526,7 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     'height',
     // 'guildRailG',
     'boxB',
-    // 'boxD',
+    'boxD',
     'thickness',
     'area',
     'volume',

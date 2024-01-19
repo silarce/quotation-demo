@@ -1493,6 +1493,7 @@ export type TcreateQuotationContentDto = {
 /**合約 */
 export type TquotationContractDto = {
   id: string;
+  contractNumber: string | null;
   createdAt: string;
   updateAt: string;
   annotations: string[] | null;
@@ -1864,6 +1865,7 @@ export type TgenerateDoorProductBomDto_ComponentInfo = {
   material: string; // 材質
   materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null; // 表面處理
   isPainted: boolean; // 烤漆
+  thickness?: string; // 厚度
 };
 
 export type TgenerateDoorProductBomDto_DoorSpec = {
