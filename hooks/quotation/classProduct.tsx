@@ -780,6 +780,8 @@ class Class_product {
   // ---------------------
 
   clearProd() {
+    // if(this.isWgChanged)
+
     const empty = emptyProdOri();
 
     const prod: Tprod = {
@@ -816,6 +818,18 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
+    // prod.boxB = '';
+    // prod.thickness = '';
+
+    if (this.isWgChanged) {
+      prod.horsepower = this._prodData.horsepower;
+      prod.motor = this._prodData.motor;
+      prod.boxB = this._prodData.boxB;
+      prod.boxD = this._prodData.boxD;
+      prod.gapA = this._prodData.gapA;
+      prod.gapC = this._prodData.gapC;
+    }
+
     this._prodData = prod;
 
     this.comList = undefined;
@@ -823,9 +837,9 @@ class Class_product {
     this._detailSpecs = undefined;
     this._availableComponents = undefined;
 
-    this._prodData.boxB = '';
+    // this._prodData.boxB = '';
+    // this._prodData.thickness = '';
     this._defaultBoxB = '';
-    this._prodData.thickness = '';
 
     this.options_boxB = undefined;
     this.options_boxD = undefined;
@@ -878,6 +892,8 @@ class Class_product {
   // this.shouldCall_cgs
   async req_calcGeneralSpec() {
     if (!this.doorType || !this.height) {
+      this.isWgChanged = false;
+
       return false;
     }
 
@@ -885,6 +901,8 @@ class Class_product {
       !this.fullWidth
       // && !this.WG
     ) {
+      this.isWgChanged = false;
+
       return false;
     }
 
@@ -894,37 +912,29 @@ class Class_product {
       const height = Number(this.height) * 1000;
       const isAntiTyphoon = this.typhoonProtection;
 
-      // const WG = this.WG_mm;
       const hp = this.horsepower.replaceAll('HP', '') as Thp;
 
-      if (!this.isWgChanged) {
-        return {
-          modelName,
-          height,
-          isAntiTyphoon,
-          fullWidth,
-          WG: undefined,
-          hp: undefined,
-        };
-      } else {
-        return {
-          modelName,
-          height,
-          isAntiTyphoon,
-          fullWidth,
-          WG: undefined,
-          hp,
-        };
-      }
+      return {
+        modelName,
+        height,
+        isAntiTyphoon,
+        fullWidth,
+        WG: undefined,
+        hp: this.isWgChanged ? hp : undefined,
+      };
     })();
 
     if (!body.fullWidth && !body.WG) {
+      this.isWgChanged = false;
+
       return false;
     }
 
     const res = await reqGetCalcGeneralSpec(body);
 
     if (!res) {
+      this.isWgChanged = false;
+
       return false;
     }
 
@@ -952,6 +962,8 @@ class Class_product {
     //   })
     // );
 
+    this.thickness = res.thickness;
+
     //
     const defaultMotorIndex = res.defaultMotorIndex;
     const defaultMotor = res.motors[defaultMotorIndex];
@@ -962,13 +974,14 @@ class Class_product {
 
     // ________________________
     // 設定馬力
-    this.horsepower = defaultMotor.hp;
+    if (!this.isWgChanged) {
+      this.horsepower = defaultMotor.hp;
+    }
 
     // ________________________
     // 設定boxB與thickness
     // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
     const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
-    this.thickness = res.thickness;
 
     // ________________________
 
@@ -988,11 +1001,14 @@ class Class_product {
         });
 
         const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+        this._defaultBoxB = theBoxB;
 
-        this.changeBoxBNoCall({
-          str: theBoxB,
-          diameter: res.diameter,
-        });
+        if (!this.isWgChanged) {
+          this.changeBoxBNoCall({
+            str: theBoxB,
+            diameter: res.diameter,
+          });
+        }
       } else if (defaultMotorBox.default) {
         const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
         const defaultBoxB = String(defaultBoxB_num);
@@ -1001,11 +1017,14 @@ class Class_product {
         });
 
         const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+        this._defaultBoxB = theBoxB;
 
-        this.changeBoxBNoCall({
-          str: theBoxB,
-          diameter: res.diameter,
-        });
+        if (!this.isWgChanged) {
+          this.changeBoxBNoCall({
+            str: theBoxB,
+            diameter: res.diameter,
+          });
+        }
       } else if (defaultMotorBox.大同) {
         this.motor = '大同';
 
@@ -1016,22 +1035,29 @@ class Class_product {
         });
 
         const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+        this._defaultBoxB = theBoxB;
 
-        this.changeBoxBNoCall({
-          str: theBoxB,
-          diameter: res.diameter,
-        });
+        if (!this.isWgChanged) {
+          this.changeBoxBNoCall({
+            str: theBoxB,
+            diameter: res.diameter,
+          });
+        }
       }
 
       //
     } else {
-      this.changeBoxBNoCall({
-        str: boxB ? String(boxB / 1000) : '',
-        diameter: res.diameter,
-      });
+      this._defaultBoxB = boxB ? String(boxB / 1000) : '';
+
+      if (!this.isWgChanged) {
+        this.changeBoxBNoCall({
+          str: boxB ? String(boxB / 1000) : '',
+          diameter: res.diameter,
+        });
+      }
     }
 
-    this._defaultBoxB = this.boxB;
+    // this._defaultBoxB = this.boxB;
 
     this.findBDoptions();
 
