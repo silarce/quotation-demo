@@ -393,7 +393,7 @@ version>1 是子合約
 
   const tagList: TtagList = [
     {
-      label: `報價編號 ${data?.content.quotationNumber}`,
+      label: `合約編號 ${data?.contractNumber ?? ''}`,
       onClick: () => {
         setIsShowWorkContactDoc(false);
       },

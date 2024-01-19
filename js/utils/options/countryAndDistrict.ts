@@ -7,10 +7,13 @@ import postalCode from 'public/postalCode.json';
 
 export type { Toption };
 
-export const optionsCreator_county = (
-  //
-  { haveOutsea = true }: { haveOutsea?: boolean } = {}
-): Toption[] => {
+export const optionsCreator_county = ({
+  haveOutsea = true,
+  emptyOption,
+}: {
+  haveOutsea?: boolean;
+  emptyOption?: boolean;
+} = {}): Toption[] => {
   const arr = [
     { value: '基隆市', label: '基隆市' },
     { value: '新北市', label: '新北市' },
@@ -38,6 +41,10 @@ export const optionsCreator_county = (
 
   if (haveOutsea) {
     arr.push({ value: '海外', label: '海外' });
+  }
+
+  if (emptyOption) {
+    arr.unshift({ value: '', label: '不拘' });
   }
 
   return arr;
