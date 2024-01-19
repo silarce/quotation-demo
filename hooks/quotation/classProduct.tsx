@@ -378,7 +378,7 @@ class Class_product {
 
     this.parentProd = parentProd;
 
-    this.findBDoptions();
+    // this.findBDoptions();
 
     this.disabled_quantity = disabled_quantity;
 
@@ -843,8 +843,8 @@ class Class_product {
     // this._prodData.thickness = '';
     this._defaultBoxB = '';
 
-    this.options_boxB = undefined;
-    this.options_boxD = undefined;
+    // this.options_boxB = undefined;
+    // this.options_boxD = undefined;
 
     // this.takeDefaultDynaValue();
     // this.findBDoptions();
@@ -881,8 +881,8 @@ class Class_product {
     this._defaultBoxB = '';
     this._prodData.thickness = '';
 
-    this.options_boxB = undefined;
-    this.options_boxD = undefined;
+    // this.options_boxB = undefined;
+    // this.options_boxD = undefined;
 
     this.creSubComList();
   }
@@ -1040,7 +1040,7 @@ class Class_product {
 
       this._defaultBoxB = this.boxB;
 
-      this.findBDoptions();
+      // this.findBDoptions();
     }
 
     // this.options_boxB?.unshift({
@@ -2044,24 +2044,26 @@ class Class_product {
     }
   } // retrieveOptions
 
-  findBDoptions() {
-    if (this._prodData.doorType) {
-      this.options_boxB = undefined;
+  // 原本還需要用這個方法取得boxD的選項
+  // 但是現在不需要了，也就不需要這個方法了
+  // findBDoptions() {
+  //   if (this._prodData.doorType) {
+  //     this.options_boxB = undefined;
 
-      if (this.doorType === 'SJ-302') {
-        this.options_boxB = _.cloneDeep(optionsCreator_boxB_SJ302());
-      } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
-        this.options_boxB = _.cloneDeep(optionsCreator_boxB_SJ303A());
-      }
+  //     if (this.doorType === 'SJ-302') {
+  //       this.options_boxB = _.cloneDeep(optionsCreator_boxB_SJ302());
+  //     } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
+  //       this.options_boxB = _.cloneDeep(optionsCreator_boxB_SJ303A());
+  //     }
 
-      if (this.options_boxB) {
-        this.options_boxB.unshift({
-          value: 'auto',
-          label: '自動計算',
-        });
-      }
-    }
-  }
+  //     if (this.options_boxB) {
+  //       this.options_boxB.unshift({
+  //         value: 'auto',
+  //         label: '自動計算',
+  //       });
+  //     }
+  //   }
+  // }
 
   /**變更角鐵與底座版 */
 
@@ -2142,8 +2144,8 @@ class Class_product {
   options_rollUpBoxThick: Toption[] | undefined = undefined;
   options_doorTrackThick: Toption[] | undefined = undefined;
   //
-  options_boxB: Toption[] | undefined = undefined;
-  options_boxD: Toption[] | undefined = undefined;
+  // options_boxB: Toption[] | undefined = undefined;
+  // options_boxD: Toption[] | undefined = undefined;
 
   // options_bottomBarAngleIron: Toption[] | undefined = undefined;
   // options_bottomBarPlate: Toption[] | undefined = undefined;
@@ -2284,6 +2286,30 @@ class Class_product {
     }
 
     return [];
+  }
+
+  get options_boxB() {
+    if (!this._prodData.doorType) {
+      return undefined;
+    }
+
+    let options: Toption[] | undefined = undefined;
+
+    if (this.doorType === 'SJ-302') {
+      options = _.cloneDeep(optionsCreator_boxB_SJ302());
+    } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
+      options = _.cloneDeep(optionsCreator_boxB_SJ303A());
+    }
+
+    // if (options) {
+    //   options.unshift({
+    //     value: 'auto',
+    //     // value: this._defaultBoxB,
+    //     label: '自動計算',
+    //   });
+    // }
+
+    return options;
   }
 
   // ---------------------------------------------------------
@@ -2640,7 +2666,6 @@ class Class_product {
 
   async changeBoxBNoCall({ str, diameter }: { str: string; diameter: number }) {
     this._prodData.boxB = str;
-    console.log('str', str);
 
     const reqBody: TgetBoxDParams = {
       modelName: this.doorType,
