@@ -22,11 +22,26 @@ import { Tparams, useGetQuotation, useGetQuotation_infinite } from 'js/api/api_q
 import { quotationStatusLookup } from 'config/lookupTable';
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
+import { Toption, optionsCreator_county } from 'js/utils/options/countryAndDistrict';
+
+// ===========================================
+
+type Tquery = {
+  county: string | undefined;
+  customerName: string | undefined;
+  keyWord: string | undefined;
+  keyWord_prod: string | undefined;
+};
+
 // ===========================================
 
 export default function Budget() {
   const router = useRouter();
-  const { quotationNumber: quotationNumber } = router.query as { quotationNumber: string };
+  let { county, customerName, keyWord, keyWord_prod } = router.query as Tquery;
+  county = county || undefined;
+  customerName = customerName || undefined;
+  keyWord = keyWord || undefined;
+  keyWord_prod = keyWord_prod || undefined;
 
   // ----------------------------------------------------------------------
 
@@ -48,17 +63,41 @@ export default function Budget() {
       'attachedToContract',
       'attachedToContractId',
     ],
+
     filter: {
-      quotationNumber: { $eq: quotationNumber },
+      // 需求提到 材料配件 目前沒有取product.item，沒有配件資料所以不能搜尋
+      // 真的要取product.item的話，回應要等很久很久吧
+
+      // 工程地點
+      'latestContent.county': { $eq: county },
+      // 客戶名稱
+      'contents.customer.name': { $contains: customerName },
+      $and: [
+        // 工程名稱、聯絡人、完整報價單編號
+        {
+          $or: [
+            {
+              quotationNumber: { $eq: keyWord },
+            },
+            {
+              'latestContent.projectName': { $contains: keyWord },
+            },
+            {
+              'latestContent.contactPerson': { $contains: keyWord },
+            },
+          ],
+        },
+        // 主產品門型、材質
+        {
+          $or: [
+            { 'latestContent.products.doorModelName': { $contains: keyWord_prod } },
+            { 'latestContent.products.materialName': { $contains: keyWord_prod } },
+          ],
+        },
+      ],
     },
     pageSize: 20,
   };
-
-  // const { data: quoatationArr, update } = useGetQuotation(params);
-
-  // useEffect(() => {
-  //   update();
-  // }, [quotationNumber]);
 
   const {
     //
@@ -72,7 +111,7 @@ export default function Budget() {
 
   useEffect(() => {
     reset();
-  }, [quotationNumber]);
+  }, [county, customerName, keyWord, keyWord_prod]);
 
   // ----------------------------------------------------------------------
 
@@ -152,15 +191,33 @@ export default function Budget() {
 
   const searchTargetList: TsearchGroup['searchTargetList'] = [
     {
-      value: quotationNumber,
-      placeholder: '請輸入報價單編號',
+      options: optionsCreator_county({ emptyOption: true }),
+      placeholder: '選擇地區',
+      defaultValue: county,
+    },
+    {
+      placeholder: '客戶名稱',
+      defaultValue: customerName,
+    },
+    {
+      placeholder: '工程名稱、聯絡人、完整報價單編號',
+      width: '340px',
+      defaultValue: keyWord,
+    },
+    {
+      placeholder: '主產品門型、材質',
+      defaultValue: keyWord_prod,
     },
   ];
 
   const doSearch: TsearchGroup['doSearch'] = (vArr) => {
-    const quotationNumber = vArr[0] as string;
+    const countyOption = vArr[0] as Toption;
+    const customerName = vArr[1] as string;
+    const keyWord = vArr[2] as string;
+    const keyWord_prod = vArr[3] as string;
+    const county = countyOption.value;
     router.push({
-      query: { quotationNumber },
+      query: { county, customerName, keyWord, keyWord_prod },
     });
   };
 
