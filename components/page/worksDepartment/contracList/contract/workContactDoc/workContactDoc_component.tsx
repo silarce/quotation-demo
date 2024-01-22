@@ -364,6 +364,12 @@ function PreWorkContactDoc_component(
     reSet();
   }, [engineeringContact]);
 
+  useEffect(() => {
+    if (disabled) {
+      reSet();
+    }
+  }, [disabled]);
+
   // ---------------------------------------------------------------------------
 
   const contactPersonsArr: Tcontroll_profile['contactPersons']['arr'] = contactArr.map((item, index) => {
@@ -596,24 +602,6 @@ function PreWorkContactDoc_component(
       setIsLoading(false);
     }
   };
-
-  // const reqCreateWorkSheet = async () => {
-  //   if (!contractId) {
-  //     return myAlert.info({ title: '無合約id', content: '請回到工務部合約列表再次選擇合約' });
-  //   }
-
-  //   try {
-  //     setIsLoading(true);
-  //     await apiPostWorkSheet({ contractId });
-  //     myAlert.success({ title: '產生工作表成功' });
-  //   } catch (error) {
-  //     const err = error as Error;
-
-  //     myAlert.info({ title: '產生工作表失敗', content: err.message });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   // ----------------------------------------------------------------------------
 
