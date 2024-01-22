@@ -64,7 +64,12 @@ type Tprofile = {
   contractorFaxNumber: string;
 };
 
-type TonStateChange = (props: { disabled: boolean; isLoading: boolean; isShowPattern: boolean }) => void;
+type TonStateChange = (props: {
+  disabled: boolean;
+  isLoading: boolean;
+  isShowPattern: boolean;
+  contractNumber: string;
+}) => void;
 
 type TimperativeHandle = {
   reqPatch: () => Promise<void>;
@@ -105,10 +110,6 @@ function PreWorkContactDoc_component(
     setDisabled(true);
     setIsShowPattern(true);
   };
-
-  useEffect(() => {
-    onStateChange && onStateChange({ disabled, isLoading, isShowPattern });
-  }, [disabled, isLoading, isShowPattern]);
 
   useImperativeHandle(ref, () => ({
     reqPatch,
@@ -207,6 +208,19 @@ function PreWorkContactDoc_component(
       setPatternD((pattern) => ({ ...pattern, shouldHaveData: bool }));
     }
   };
+
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    onStateChange &&
+      onStateChange({
+        disabled,
+        isLoading,
+        isShowPattern,
+        contractNumber: engineeringContact?.contractNumber ?? '',
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled, isLoading, isShowPattern, engineeringContact?.contractNumber]);
 
   // ---------------------------------------------------------------------------
 
