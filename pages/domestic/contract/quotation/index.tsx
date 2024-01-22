@@ -4,7 +4,7 @@
 // 展開版本的追加追減紀錄 (在很下面)
 // QuotationRecord
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { NextRouter } from 'next/router';
 import _ from 'lodash';
@@ -25,7 +25,10 @@ import Table_prod from 'components/page/domestic/quotation/quotation/product/tab
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/contract/table/table_accessories';
 import Table_others from 'components/page/domestic/contract/table/table_others';
-import WorkContactDoc_component from 'components/page/worksDepartment/contracList/contract/workContactDoc/workContactDoc_component';
+import WorkContactDoc_component, {
+  TimperativeHandle,
+  TonStateChange,
+} from 'components/page/worksDepartment/contracList/contract/workContactDoc/workContactDoc_component';
 
 import Summary, {
   TsummaryControl,
@@ -86,7 +89,28 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // 合約項目 追加/追減項目的開關
+  // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
+  const [switch01, setSwitch01] = useState(true);
+
+  // 展開版本追加追減紀錄的開關
+  // 按鈕是panelList的"追加追減報價單"
+  const [switch02, setSwitch02] = useState(false);
+
   const [isShowWorkContactDoc, setIsShowWorkContactDoc] = useState(false);
+
+  // 工程聯絡單的狀態
+  const [isShowPattern, setIsShowPattern] = useState(false);
+  const [disabed_workContactDoc, setDisabed_workContactDoc] = useState(true);
+  const [isLoading_workContact, setIsLoading_workContact] = useState(false);
+
+  const ref_workContact = useRef<TimperativeHandle>(null!);
+
+  const onWorkContactStateChange: TonStateChange = ({ disabled, isLoading, isShowPattern }) => {
+    setIsShowPattern(isShowPattern);
+    setDisabed_workContactDoc(disabled);
+    setIsLoading_workContact(isLoading);
+  };
 
   // =========================================================
 
@@ -374,14 +398,6 @@ version>1 是子合約
 
   // -----------------------------------------------------------------
 
-  // 合約項目 追加/追減項目的開關
-  // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
-  const [switch01, setSwitch01] = useState(true);
-
-  // 展開版本追加追減紀錄的開關
-  // 按鈕是panelList的"追加追減報價單"
-  const [switch02, setSwitch02] = useState(false);
-
   // =========================================================
 
   const tagList: TtagList = [
@@ -402,25 +418,6 @@ version>1 是子合約
   if (!engineeringContactId) {
     tagList.pop();
   }
-
-  // const linkArr: TlinkArr = [
-  //   engineeringContactId
-  //     ? {
-  //         label: '工程聯絡單',
-  //         linkProps: {
-  //           href: {
-  //             pathname: '/worksDepartment/contractList/contract/workContactDoc',
-  //             query: {
-  //               contractId: id,
-  //               engineeringContactId,
-  //               version: '1',
-  //             },
-  //           },
-  //           target: '_blank',
-  //         },
-  //       }
-  //     : null,
-  // ];
 
   const panel_quotation01: TpanelList = [
     // 現在後端會在合約產生時自動產生工程聯絡單，因此把這個按鈕拿掉
@@ -466,12 +463,63 @@ version>1 是子合約
     },
   ];
 
-  const panelList = switch02 ? panel_quotation03 : panel_quotation01;
+  const panel_workContack_disabled: TpanelList = [
+    {
+      type: 'myButton',
+      label: '編輯工程聯絡單',
+      onClick: () => {
+        ref_workContact.current.setDisabled(false);
+      },
+    },
+    { type: 'myButton', label: '返回', onClick: () => router.back() },
+  ];
+  const panel_workContack: TpanelList = [
+    {
+      type: 'redButton',
+      label: '上傳工程聯絡單',
+      onClick: async () => {
+        ref_workContact.current.reqPatch();
+      },
+    },
+    {
+      type: 'myButton',
+      label: '取消編輯',
+      onClick: () => {
+        ref_workContact.current.setDisabled(true);
+      },
+    },
+  ];
+
+  const panel_workContack_pattern: TpanelList = [
+    {
+      type: 'myButton',
+      label: '關閉工程圖表',
+      onClick: () => {
+        ref_workContact.current.closePattern();
+      },
+    },
+  ];
+
+  const panelList = (() => {
+    if (isShowWorkContactDoc) {
+      if (isShowPattern) {
+        return panel_workContack_pattern;
+      }
+
+      return disabed_workContactDoc ? panel_workContack_disabled : panel_workContack;
+    }
+
+    if (switch02) {
+      return panel_quotation03;
+    } else {
+      return panel_quotation01;
+    }
+  })();
 
   // -----------------------------------------------------------------
 
   return (
-    <SubLayer isLoading_all={isLoading}>
+    <SubLayer isLoading_all={isLoading || isLoading_workContact}>
       <PageHeader02
         tagList={tagList}
         panelList={panelList}
@@ -585,7 +633,12 @@ version>1 是子合約
         {/*  */}
         {/*  */}
         <div className={classNames(!(isShowWorkContactDoc && engineeringContactId) && 'hidden')}>
-          <WorkContactDoc_component contract={data} engineeringContactId={engineeringContactId} />
+          <WorkContactDoc_component
+            ref={ref_workContact}
+            contract={data}
+            engineeringContactId={engineeringContactId}
+            onStateChange={onWorkContactStateChange}
+          />
         </div>
       </div>
     </SubLayer>
