@@ -1,79 +1,4 @@
 /**
-
-太難處理了，決定暫時先放著
-先把其他的東西處理好
-
-
-先做 改變WG後 觸發呼叫api鏈但是不會變更馬達
-再做 編輯馬達時會連帶變更gapA再連帶變更W與WG然後觸發呼叫鏈
-再做 編輯門軌時會連帶變更gapA再連帶變更W與WG然後觸發呼叫鏈
-最後檢查L W WG是否計算正確
-再確認送給後端的WG是否正確
-
-
-
-
-
-送WG的話一定要同時送馬力數
-必須先有馬達才可以設定W
-
-預計要拿掉的值
-_theW
-
-記得改變馬力時要改變gapA
-
-選門型時已經會自動帶入門軌了
-
-編輯門軌時
-會改變W也會呼叫bom api
-但是沒有觸發改變WG後的機制
-
-
-馬達有其對應的boxB
-改變馬達就要改變boxB
-
-boxB與boxD是對應的
-改變boxB就要改變boxD
-boxB不變,boxD就不可以變
-
-
-
-
-要確認相數與伏特數的處理
-
-送WG的話一定要同時送馬力數
-必須先有馬達才可以設定W
-
-預計要拿掉的值
-_theW
-
-記得改變馬力時要改變gapA
-
-選門型時已經會自動帶入門軌了
-
-編輯門軌時
-會改變W也會呼叫bom api
-但是沒有觸發改變WG後的機制
-
-
-馬達有其對應的boxB
-改變馬達就要改變boxB
-
-boxB與boxD是對應的
-改變boxB就要改變boxD
-boxB不變,boxD就不可以變
-
-
-先做 改變WG後 觸發呼叫api鏈但是不會變更馬達
-再做 編輯馬達時會連帶變更gapA再連帶變更W與WG然後觸發呼叫鏈
-再做 編輯門軌時會連帶變更gapA再連帶變更W與WG然後觸發呼叫鏈
-最後檢查L W WG是否計算正確
-再確認送給後端的WG是否正確
-
-要確認相數與伏特數的處理
- */
-
-/**
  *prodCellConfig
  
  * retrieveOptions 下拉式選單產生器
@@ -779,6 +704,7 @@ class Class_product {
       WG: this.WG,
       height: this.height,
       area: this.area,
+      volume: this.volume,
       quantity: this._prodData.quantity,
       price: this._prodData.price,
       dualPrice: this._prodData.dualPrice,
