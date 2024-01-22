@@ -59,6 +59,21 @@ export const calcW = ({ WG, G }: { WG: number; G: number }) => {
   return new Decimal(WG).sub(G).sub(G).toNumber();
 };
 
+export const calcW_2 = ({
+  //
+  fullWidth,
+  gapA,
+  gapC,
+  G,
+}: {
+  fullWidth: number;
+  gapA: number;
+  gapC: number;
+  G: number;
+}) => {
+  return new Decimal(fullWidth).sub(gapA).sub(gapC).sub(G).sub(G).toNumber();
+};
+
 export const findBDoptions = (doorModelName: string) => {
   const BDList = lookup_boxBAndBoxD[doorModelName]?.BtoD;
   const DBList = lookup_boxBAndBoxD[doorModelName]?.DtoB;
