@@ -44,6 +44,7 @@ export type {
   TdoorProductBomDto,
   TdoorAccessoryDto,
   TgetBoxDParams,
+  Thp,
 };
 // =======================================================================
 
@@ -107,6 +108,9 @@ export const useApiGetProdDoorModels = () => {
 };
 
 // =======================================================================
+
+type Thp = '1/4' | '1/3' | '1/2' | '3/4' | '1' | '1 1/2' | '2' | '3' | '5';
+
 type TpcgsPrams = {
   modelName: TdoorModelInfoDto['name'];
   height: number;
@@ -115,10 +119,12 @@ type TpcgsPrams = {
   | {
       fullWidth: number;
       WG?: undefined;
+      hp?: Thp; // 不送hp的話會用預設馬達的資料計算相關數值
     }
   | {
       fullWidth?: undefined;
       WG: number;
+      hp: Thp;
     }
 );
 
