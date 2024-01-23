@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 // antd
 import { Select, Collapse, Upload, Image as AntdImage } from 'antd';
-import { UploadChangeParam, UploadFile } from 'antd/lib/upload';
+import { UploadChangeParam } from 'antd/lib/upload';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -86,6 +86,7 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     },
   } as const;
 
+  // -----------------------------------------------------------------------
   const reqUploadPattern = async (file: File | undefined, patternType: TpatternType) => {
     const info = patternList[patternType];
 
@@ -111,6 +112,7 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     } catch (error) {}
   };
 
+  //
   const reqDeletePattern = async (patternType: TpatternType) => {
     const id = patternList[patternType]?.id;
 
@@ -124,6 +126,8 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     } catch (error) {}
   };
 
+  // _____________________________________________________________
+  //
   const onUploadBtnClick = async () => {
     if (!patternType) {
       myAlert.info({ title: '請選擇要上傳的工程圖表項目' });
@@ -140,6 +144,7 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     await reqUploadPattern(preUploadFile, patternType);
   };
 
+  //
   const onDraggerChange = async (e: UploadChangeParam, patternType: TpatternType) => {
     const {
       file,
@@ -149,7 +154,18 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     await reqUploadPattern(file.originFileObj as File | undefined, patternType);
   };
 
+  //
+  const onRemoveClick = (pattern: TpatternType) => {
+    myAlert.confirm({
+      title: '確定移除?',
+      props: {
+        onOk: () => reqDeletePattern(pattern),
+      },
+    });
+  };
+
   // =======================================================================
+  // 上方上傳按鈕用的
   const [preUploadFile, setPreUploadFile] = useState<File>();
   const [patternType, setPatternType] = useState<TpatternType>();
 
@@ -174,22 +190,22 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
 
   const props_signature: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.signature.src,
-    onRemoveClick: () => reqDeletePattern('signature'),
+    onRemoveClick: () => onRemoveClick('signature'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'signature'),
   };
   const props_floor: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.floor.src,
-    onRemoveClick: () => reqDeletePattern('floor'),
+    onRemoveClick: () => onRemoveClick('floor'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'floor'),
   };
   const props_design: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.design.src,
-    onRemoveClick: () => reqDeletePattern('design'),
+    onRemoveClick: () => onRemoveClick('design'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'design'),
   };
   const props_color: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.color.src,
-    onRemoveClick: () => reqDeletePattern('color'),
+    onRemoveClick: () => onRemoveClick('color'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'color'),
   };
 
