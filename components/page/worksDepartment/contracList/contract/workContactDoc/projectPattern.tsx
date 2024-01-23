@@ -93,6 +93,14 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
       return;
     }
 
+    const isImage = checkFileIsImage(file);
+
+    if (!isImage) {
+      myAlert.info({ title: '該檔案非圖片，只能上傳圖片' });
+
+      return;
+    }
+
     const theFile = file;
     const formData = new FormData();
     formData.append('file', theFile);
@@ -151,8 +159,7 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     }
 
     const file = e.target.files[0];
-    const imageReg = /^image/;
-    const isImage = imageReg.test(file.type);
+    const isImage = checkFileIsImage(file);
 
     if (!isImage) {
       myAlert.info({ title: '該檔案非圖片，只能上傳圖片' });
@@ -282,6 +289,13 @@ const ImageDragger = ({
 };
 
 // ==================================================
+
+const checkFileIsImage = (file: File) => {
+  const imageReg = /^image/;
+  const isImage = imageReg.test(file.type);
+
+  return isImage;
+};
 
 const options = [
   { value: 'signature', label: '簽認圖' },
