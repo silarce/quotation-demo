@@ -206,6 +206,10 @@ const useProductList = ({
         isULGuideRail: prod.isULGuideRail ?? false,
 
         bounceDoorWidth: prod.bounceDoorWidth || 0,
+        //
+        distributionBoxQuantity: prod.distributionBoxQuantity ?? 1,
+        distributionBoxDualPrice: prod.distributionBoxDualPrice ?? prod.distributionBoxPrice,
+        distributionBoxTotalPrice: prod.distributionBoxTotalPrice ?? prod.distributionBoxUnitPrice,
       };
 
       list[key] = new Class_product({
@@ -558,6 +562,10 @@ const useProductList = ({
           weight: prod.weight ?? '',
           isULGuideRail: prod.isULGuideRail ?? false,
           bounceDoorWidth: prod.bounceDoorWidth || 0,
+          //
+          distributionBoxQuantity: prod.distributionBoxQuantity ?? 1,
+          distributionBoxDualPrice: prod.distributionBoxDualPrice ?? prod.distributionBoxPrice,
+          distributionBoxTotalPrice: prod.distributionBoxTotalPrice ?? prod.distributionBoxUnitPrice,
         };
 
         list[key] = new Class_product({
