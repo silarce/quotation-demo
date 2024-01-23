@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import Image from 'next/image';
 
 // antd
-import { Select, Collapse, Upload, Image as AntdImage } from 'antd';
+import { Select, Collapse, Upload, Image as AntdImage, Spin } from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload';
 
 // gear
@@ -40,8 +40,23 @@ type TpatternList = {
   };
 };
 
+type TisUploading = {
+  [key in TpatternType]: boolean;
+};
+
 // =======================================================================
 export default function ProjectPattern({ engineeringContactId }: { engineeringContactId: string | null | undefined }) {
+  const [isUploading, setIsUploading] = useState<TisUploading>({
+    signature: false,
+    floor: false,
+    design: false,
+    color: false,
+  });
+
+  const isUploading_any = Object.values(isUploading).some((v) => v);
+
+  // -----------------------------------------------------------------------
+
   const { signaturePatternArr, floorPlanPatternArr, designDiagramPatternArr, colorCardPatternArr, update, updateAll } =
     useEngineeringContactAttachments(engineeringContactId);
 
@@ -107,9 +122,13 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     formData.append('file', theFile);
 
     try {
+      setIsUploading((prev) => ({ ...prev, [patternType]: true }));
       await apiPostEngineeringContactAttachments(engineeringContactId, patternType, formData);
       await update(patternType);
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+      setIsUploading((prev) => ({ ...prev, [patternType]: false }));
+    }
   };
 
   //
@@ -129,6 +148,10 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
   // _____________________________________________________________
   //
   const onUploadBtnClick = async () => {
+    if (isUploading_any) {
+      return;
+    }
+
     if (!patternType) {
       myAlert.info({ title: '請選擇要上傳的工程圖表項目' });
 
@@ -192,21 +215,25 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     fileSrc: patternList.signature.src,
     onRemoveClick: () => onRemoveClick('signature'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'signature'),
+    isUploading: isUploading.signature,
   };
   const props_floor: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.floor.src,
     onRemoveClick: () => onRemoveClick('floor'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'floor'),
+    isUploading: isUploading.floor,
   };
   const props_design: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.design.src,
     onRemoveClick: () => onRemoveClick('design'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'design'),
+    isUploading: isUploading.design,
   };
   const props_color: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.color.src,
     onRemoveClick: () => onRemoveClick('color'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'color'),
+    isUploading: isUploading.color,
   };
 
   return (
@@ -241,6 +268,7 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
           onClick={() => {
             onUploadBtnClick();
           }}
+          isLoading={isUploading_any}
         />
       </div>
       {/*  */}
@@ -273,10 +301,12 @@ const ImageDragger = ({
   fileSrc,
   onRemoveClick,
   onDraggerChange,
+  isUploading,
 }: {
   fileSrc?: string | undefined;
   onRemoveClick: () => void;
   onDraggerChange: (e: UploadChangeParam) => void;
+  isUploading: boolean;
 }) => {
   return (
     <>
@@ -285,20 +315,22 @@ const ImageDragger = ({
         <IconRemove02 className="global_absoluteRightTop" onClick={() => onRemoveClick()} />
       </div>
       <div className={classNames(scss.draggerContainer, fileSrc && 'hidden')}>
-        <Dragger
-          className={classNames(scss.antdDragger, scss.plus)}
-          onChange={(e) => {
-            onDraggerChange(e);
-          }}
-          fileList={[]}
-        >
-          <div className={scss.dragTip}>
-            <div>
-              <Image src={iconGrayAddCircle} alt="" />
+        <Spin spinning={isUploading} size="large">
+          <Dragger
+            className={classNames(scss.antdDragger, scss.plus)}
+            onChange={(e) => {
+              onDraggerChange(e);
+            }}
+            fileList={[]}
+          >
+            <div className={scss.dragTip}>
+              <div>
+                <Image src={iconGrayAddCircle} alt="" />
+              </div>
+              <span>請選擇圖片</span>
             </div>
-            <span>請選擇圖片</span>
-          </div>
-        </Dragger>
+          </Dragger>
+        </Spin>
       </div>
     </>
   );
