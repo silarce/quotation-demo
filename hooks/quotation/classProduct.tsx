@@ -204,9 +204,20 @@ type Tprod = {
   // 用來辨識至追加追減
   attachedToProductId?: string | null;
   //
+  // distributionBoxPrice: number;
+  // // 配電箱單價;
+  // distributionBoxUnitPrice: number;
+  // 配電箱數量;
+  distributionBoxQuantity: number;
+  // 配電箱牌價;
   distributionBoxPrice: number;
+  // 配電箱牌價複價;
+  distributionBoxDualPrice: number;
   // 配電箱單價;
   distributionBoxUnitPrice: number;
+  // 配電箱複價;
+  distributionBoxTotalPrice: number;
+
   // 安裝費牌價;
   installationFeePrice: number;
   // 安裝費牌價複價;
@@ -647,14 +658,15 @@ class Class_product {
 
   creSubComList({ isNew = true }: { isNew?: boolean } = {}) {
     // 配電箱
+
     const distributionBox = new Class_SubCom({
       reRender: this.reRender,
       data: {
         price: this._prodData.distributionBoxPrice,
         unitPrice: this._prodData.distributionBoxUnitPrice,
-        dualPrice: this._prodData.distributionBoxPrice,
-        totalPrice: this._prodData.distributionBoxUnitPrice,
-        quantity: 1,
+        dualPrice: this._prodData.distributionBoxDualPrice,
+        totalPrice: this._prodData.distributionBoxTotalPrice,
+        quantity: this._prodData.distributionBoxQuantity,
         comName: '配電箱及按鈕開關',
         unit: '組',
         desc: '',
@@ -1049,8 +1061,6 @@ class Class_product {
     // }
   } //  req_getProdAvailableComponents
 
-  // this.shouldCall_pgpb
-  /**取得材料配件 */
   async reqProdGenerateDoorProductBom() {
     const comList = this.comList;
 
@@ -2344,6 +2354,7 @@ class Class_product {
     }
 
     this.toGetInstallationFee();
+    this.subComList.distributionBox.quantity = '1';
 
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
@@ -3367,6 +3378,10 @@ class Class_product {
 
       distributionBoxPrice: Number(this.subComList.distributionBox.price),
       distributionBoxUnitPrice: Number(this.subComList.distributionBox.unitPrice),
+      distributionBoxQuantity: Number(this.subComList.distributionBox.quantity),
+      distributionBoxDualPrice: Number(this.subComList.distributionBox.dualPrice),
+      distributionBoxTotalPrice: Number(this.subComList.distributionBox.totalPrice),
+
       installationFeePrice: Number(this.subComList.installationFee.price),
       installationFeeDualPrice: Number(this.subComList.installationFee.dualPrice),
       installationFeeQuantity: Number(this.subComList.installationFee.quantity),
@@ -3592,20 +3607,27 @@ const emptyProdOri = (): Tprod => {
     bottomBarPlate: '不鏽鋼#304 1.5T', // 來自prodCellConfig
     //
 
+    // 配電箱數量;
+    distributionBoxQuantity: 0,
+    // 配電箱牌價複價;
+    distributionBoxDualPrice: 0,
+    // 配電箱複價;
+    distributionBoxTotalPrice: 0,
     // 配電箱 牌價;
     distributionBoxPrice: 5940,
     // 配電箱 單價;
-    distributionBoxUnitPrice: 5940,
-    // 安裝費 牌價;
-    installationFeePrice: 1800,
-    // 安裝費 牌價複價;
-    installationFeeDualPrice: 1800,
+    distributionBoxUnitPrice: 0,
+
     // 安裝費 數量;
     installationFeeQuantity: 0,
-    // 安裝費 單價;
-    installationFeeUnitPrice: 1800,
+    // 安裝費 牌價複價;
+    installationFeeDualPrice: 0,
     // 安裝費 複價;
-    installationFeeTotalPrice: 1800,
+    installationFeeTotalPrice: 0,
+    // 安裝費 牌價;
+    installationFeePrice: 1800,
+    // 安裝費 單價;
+    installationFeeUnitPrice: 0,
 
     slatCount: '',
     sprocketWheelModel: '',
