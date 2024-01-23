@@ -48,6 +48,7 @@ type Tcontroll = {
   projectPattern: {
     // isOk: boolean;
     // onClick: () => void;
+    disabled?: boolean;
     onCaptionClick: () => void;
     statusArr: TprojectPatternStatus[];
   };
@@ -147,6 +148,7 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
                       onChange={(e) => {
                         onCheck(e.target.checked);
                       }}
+                      disabled={disabled || controll.projectPattern.disabled}
                     />
                     <span>
                       <Badge status={status} text={label} dot={true} />
