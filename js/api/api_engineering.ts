@@ -6,6 +6,7 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi } from './_axiosCreator';
+import { AxiosError } from 'axios';
 
 import { createUseInfinite } from './createUseInfinite';
 
@@ -89,7 +90,9 @@ export type {
   TupdateAccountReceivableProductPaymentDto,
 } from './dtoTypes';
 
-// ========================================================================
+type TengineeringContactAttachmentType = 'signature' | 'floor' | 'design' | 'color' | 'construction';
+
+export type { TengineeringContactAttachmentType };
 
 /**以id取得工程聯絡單 */
 export const apiGetEngineeringContact = async (id: string) => {
@@ -1305,4 +1308,119 @@ export const apiPatchProductPayment = async (
     .patch<TaccountsReceivableProductPaymentDto[]>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+// =======================================================================
+
+// 取得工程聯絡單的附件(圖表)
+export const apiGetEngineeringContactAttachments = (
+  //
+  id: string,
+  type: TengineeringContactAttachmentType
+) => {
+  const api = `/engineering/engineering-contact/${id}/attachments/${type}`;
+
+  return axi
+    .get<TfileDto[]>(api)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '取得工程聯絡單圖表失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 上傳工程聯絡單的附件(圖表)
+export const apiPostEngineeringContactAttachments = (
+  id: string,
+  // type在後端其實是收string，但為免未來type混亂，因此在前端做出規範
+  type: TengineeringContactAttachmentType,
+  body: FormData
+) => {
+  const api = `/engineering/engineering-contact/${id}/attachments/${type}`;
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '新增工程聯絡單圖表失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 刪除工程聯絡單附件
+export const apiDeleteEngineeringContactAttachments = (
+  //
+  id: string,
+  type: TengineeringContactAttachmentType,
+  fileId: string
+) => {
+  const api = `/engineering/engineering-contact/${id}/attachments/${type}/${fileId}`;
+
+  return axi
+    .delete(api)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '刪除工程聯絡單圖表失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+export const useEngineeringContactAttachments = (id: string | undefined | null) => {
+  const [signature, setSignature] = useState<TfileDto[]>([]);
+  const [floorPlan, setFloorPlan] = useState<TfileDto[]>([]);
+  const [designDiagram, setDesignDiagram] = useState<TfileDto[]>([]);
+  const [colorCard, setColorCard] = useState<TfileDto[]>([]);
+
+  const update = async (type: TengineeringContactAttachmentType) => {
+    if (!id) {
+      return;
+    }
+
+    let res: TfileDto[] | undefined;
+
+    if (type === 'signature') {
+      res = await apiGetEngineeringContactAttachments(id, 'signature');
+      res && setSignature(res);
+    }
+
+    if (type === 'floor') {
+      res = await apiGetEngineeringContactAttachments(id, 'floor');
+      res && setFloorPlan(res);
+    }
+
+    if (type === 'design') {
+      res = await apiGetEngineeringContactAttachments(id, 'design');
+      res && setDesignDiagram(res);
+    }
+
+    if (type === 'color') {
+      res = await apiGetEngineeringContactAttachments(id, 'color');
+      res && setColorCard(res);
+    }
+
+    return res;
+  };
+
+  const updateAll = async () => {
+    if (!id) {
+      return;
+    }
+
+    update('signature');
+    update('floor');
+    update('design');
+    update('color');
+  };
+
+  return {
+    signaturePatternArr: signature,
+    floorPlanPatternArr: floorPlan,
+    designDiagramPatternArr: designDiagram,
+    colorCardPatternArr: colorCard,
+    update,
+    updateAll,
+  };
 };

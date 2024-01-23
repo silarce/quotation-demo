@@ -26,7 +26,6 @@ import {
   TupdateEngineeringContactDto,
   useGetEngineeringContact,
   apiPatchEngineeringContact,
-  apiPostWorkSheet,
 } from 'js/api/api_engineering';
 
 import { TquotationProductDto, TquotationContractDto } from 'js/api/api_quotation';
@@ -89,10 +88,12 @@ function PreWorkContactDoc_component(
     contract,
     engineeringContactId,
     onStateChange,
+    isOnlyControlContactInfo = false,
   }: {
     contract: TquotationContractDto | undefined;
     engineeringContactId: string | undefined | null;
     onStateChange: TonStateChange;
+    isOnlyControlContactInfo?: boolean;
   },
   ref: React.ForwardedRef<unknown>
 ) {
@@ -414,12 +415,14 @@ function PreWorkContactDoc_component(
       onChange: (v) => {
         profileChange('paymentStatus', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
     projectName: {
       value: profile?.projectName ?? '',
       onChange: (v) => {
         profileChange('projectName', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
     /**工程內容 */
     projectContent: {
@@ -427,8 +430,11 @@ function PreWorkContactDoc_component(
       onChange: (v) => {
         profileChange('projectContent', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
+    // 工程圖表
     projectPattern: {
+      disabled: isOnlyControlContactInfo,
       onCaptionClick: showPattern,
       statusArr: [
         {
@@ -460,6 +466,7 @@ function PreWorkContactDoc_component(
     addressBarProps: {
       inputSelProps: {
         caption: '工程地點',
+        disabled: isOnlyControlContactInfo,
       },
       addressProps: {
         zipCode: {
@@ -469,7 +476,7 @@ function PreWorkContactDoc_component(
         },
         county: {
           props: {
-            isDisabled: disabled,
+            isDisabled: disabled || isOnlyControlContactInfo,
             value: profile?.county ? { value: profile.county, label: profile.county } : null,
             onChange: (option) => {
               const value = option ? option.value : '';
@@ -482,7 +489,7 @@ function PreWorkContactDoc_component(
         district: {
           easyValue: profile?.district ?? null,
           props: {
-            isDisabled: disabled,
+            isDisabled: disabled || isOnlyControlContactInfo,
             value: profile?.district ? { value: profile.district, label: profile.district } : null,
             onChange: (option) => {
               if (!option) {
@@ -497,7 +504,7 @@ function PreWorkContactDoc_component(
         },
         address: {
           props: {
-            disabled,
+            disabled: disabled || isOnlyControlContactInfo,
             value: profile?.address ?? '',
             onChange: (e) => {
               profileChange('address', e.target.value);
@@ -513,6 +520,7 @@ function PreWorkContactDoc_component(
       onChange: (v) => {
         profileChange('projectPrincipal', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
     /**工程負責人聯絡電話 */
     projectPersonNumber: {
@@ -520,12 +528,14 @@ function PreWorkContactDoc_component(
       onChange: (v) => {
         profileChange('constructionSitePrincipalContactNumber', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
     projectFaxNumber: {
       value: profile?.constructionSiteFaxNumber ?? '',
       onChange: (v) => {
         profileChange('constructionSiteFaxNumber', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
     /**工地電話 */
     projectNumber: {
@@ -533,6 +543,7 @@ function PreWorkContactDoc_component(
       onChange: (v) => {
         profileChange('constructionSiteContactNumber', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
 
     //
@@ -543,6 +554,7 @@ function PreWorkContactDoc_component(
       onChange: (v) => {
         profileChange('projectNumber', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
     /**承包商 */
     contractor: {
@@ -550,6 +562,7 @@ function PreWorkContactDoc_component(
       onChange: (v) => {
         profileChange('contractor', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
     /**負責人 */
     principal: {
@@ -557,6 +570,7 @@ function PreWorkContactDoc_component(
       onChange: (v) => {
         profileChange('contractorPrincipal', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
     /**公司電話 */
     contactNumber: {
@@ -564,12 +578,14 @@ function PreWorkContactDoc_component(
       onChange: (v) => {
         profileChange('contractorContactNumber', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
     faxNumber: {
       value: profile?.contractorFaxNumber ?? '',
       onChange: (v) => {
         profileChange('contractorFaxNumber', v);
       },
+      disabled: isOnlyControlContactInfo,
     },
     //
     contactPersons: {
@@ -638,12 +654,16 @@ function PreWorkContactDoc_component(
           />
           {/* <Remark /> */}
           <div className={scss.textListContainer}>
-            <TextListEditor_v2 label={'備註'} disabled={disabled} stringObj={control_anno} />
+            <TextListEditor_v2
+              label={'備註'}
+              disabled={disabled || isOnlyControlContactInfo}
+              stringObj={control_anno}
+            />
           </div>
         </div>
         {/* 工程圖表資料 */}
         <div className={classNames(!isShowPattern && 'hidden')}>
-          <ProjectPattern />
+          <ProjectPattern engineeringContactId={engineeringContactId} />
         </div>
       </div>
 
