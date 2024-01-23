@@ -90,7 +90,9 @@ export type {
   TupdateAccountReceivableProductPaymentDto,
 } from './dtoTypes';
 
-// ========================================================================
+type TengineeringContactAttachmentType = 'signature' | 'floor' | 'design' | 'color' | 'construction';
+
+export type { TengineeringContactAttachmentType };
 
 /**以id取得工程聯絡單 */
 export const apiGetEngineeringContact = async (id: string) => {
@@ -1310,8 +1312,6 @@ export const apiPatchProductPayment = async (
 
 // =======================================================================
 
-type TengineeringContactAttachmentType = 'signature' | 'floorPlan' | 'designDiagram' | 'colorCard';
-
 // 取得工程聯絡單的附件(圖表)
 export const apiGetEngineeringContactAttachments = (
   //
@@ -1368,7 +1368,7 @@ export const apiDeleteEngineeringContactAttachments = (
     });
 };
 
-export const useEngineeringContactAttachments = (id: string | undefined) => {
+export const useEngineeringContactAttachments = (id: string | undefined | null) => {
   const [signature, setSignature] = useState<TfileDto[]>([]);
   const [floorPlan, setFloorPlan] = useState<TfileDto[]>([]);
   const [designDiagram, setDesignDiagram] = useState<TfileDto[]>([]);
@@ -1386,18 +1386,18 @@ export const useEngineeringContactAttachments = (id: string | undefined) => {
       res && setSignature(res);
     }
 
-    if (type === 'floorPlan') {
-      res = await apiGetEngineeringContactAttachments(id, 'floorPlan');
+    if (type === 'floor') {
+      res = await apiGetEngineeringContactAttachments(id, 'floor');
       res && setFloorPlan(res);
     }
 
-    if (type === 'designDiagram') {
-      res = await apiGetEngineeringContactAttachments(id, 'designDiagram');
+    if (type === 'design') {
+      res = await apiGetEngineeringContactAttachments(id, 'design');
       res && setDesignDiagram(res);
     }
 
-    if (type === 'colorCard') {
-      res = await apiGetEngineeringContactAttachments(id, 'colorCard');
+    if (type === 'color') {
+      res = await apiGetEngineeringContactAttachments(id, 'color');
       res && setColorCard(res);
     }
 
@@ -1410,9 +1410,9 @@ export const useEngineeringContactAttachments = (id: string | undefined) => {
     }
 
     update('signature');
-    update('floorPlan');
-    update('designDiagram');
-    update('colorCard');
+    update('floor');
+    update('design');
+    update('color');
   };
 
   return {

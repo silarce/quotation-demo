@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 
 // antd
 import { Select, Collapse, Upload, Image as AntdImage } from 'antd';
-import type { UploadProps, UploadFile } from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload';
 
 // gear
@@ -17,7 +16,14 @@ import scss from './projectPattern.module.scss';
 import iconGrayAddCircle from 'public/image/icon/grayAddCircle.svg';
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
 
-import { getBase64_RcFile, RcFile } from 'js/utils/helpers/getBase64';
+// api
+import {
+  apiPostEngineeringContactAttachments,
+  apiDeleteEngineeringContactAttachments,
+  useEngineeringContactAttachments,
+  TengineeringContactAttachmentType,
+  TfileDto,
+} from 'js/api/api_engineering';
 
 // =======================================================================
 const { Panel } = Collapse;
@@ -25,26 +31,94 @@ const { Dragger } = Upload;
 
 // =======================================================================
 
-type TpatternType = 'a' | 'b' | 'c' | 'd' | 'e';
+type TpatternType = Exclude<TengineeringContactAttachmentType, 'construction'>;
+
+type TpatternList = {
+  [key in TpatternType]: {
+    id: string | undefined;
+    src: string | undefined;
+  };
+};
 
 // =======================================================================
-export default function ProjectPattern() {
-  // 簽認圖
-  const [fileList_a, setFileList_a] = useState<UploadProps['fileList']>([]);
-  // const fileA = fileList_a?.[0]?.originFileObj;
-  const fileA = fileList_a?.[0];
-  // 平面圖
-  const [fileList_b, setFileList_b] = useState<UploadProps['fileList']>([]);
-  const fileB = fileList_b?.[0];
-  // 設計圖
-  const [fileList_c, setFileList_c] = useState<UploadProps['fileList']>([]);
-  const fileC = fileList_c?.[0];
-  // 色卡
-  const [fileList_d, setFileList_d] = useState<UploadProps['fileList']>([]);
-  const fileD = fileList_d?.[0];
-  // 施工圖
-  const [fileList_e, setFileList_e] = useState<UploadProps['fileList']>([]);
-  const fileE = fileList_e?.[0];
+export default function ProjectPattern({ engineeringContactId }: { engineeringContactId: string | null | undefined }) {
+  const { signaturePatternArr, floorPlanPatternArr, designDiagramPatternArr, colorCardPatternArr, update, updateAll } =
+    useEngineeringContactAttachments(engineeringContactId);
+
+  useEffect(() => {
+    updateAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engineeringContactId]);
+
+  const fileInfo_signature = signaturePatternArr?.[0] as TfileDto | undefined;
+  const fileSrc_signature = fileInfo_signature
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_signature.id}`
+    : undefined;
+  const fileInfo_floor = floorPlanPatternArr?.[0] as TfileDto | undefined;
+  const fileSrc_floor = fileInfo_floor
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_floor.id}`
+    : undefined;
+  const fileInfo_design = designDiagramPatternArr?.[0] as TfileDto | undefined;
+  const fileSrc_design = fileInfo_design
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_design.id}`
+    : undefined;
+  const fileInfo_color = colorCardPatternArr?.[0] as TfileDto | undefined;
+  const fileSrc_color = fileInfo_color
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_color.id}`
+    : undefined;
+
+  const patternList: TpatternList = {
+    signature: {
+      id: fileInfo_signature?.id,
+      src: fileSrc_signature,
+    },
+    floor: {
+      id: fileInfo_floor?.id,
+      src: fileSrc_floor,
+    },
+    design: {
+      id: fileInfo_design?.id,
+      src: fileSrc_design,
+    },
+    color: {
+      id: fileInfo_color?.id,
+      src: fileSrc_color,
+    },
+  } as const;
+
+  const onDraggerChange_foo = async (e: UploadChangeParam, patternType: TpatternType) => {
+    const {
+      file,
+      // fileList
+    } = e;
+    const info = patternList[patternType];
+
+    if (!file.originFileObj || !info || !engineeringContactId) {
+      return;
+    }
+
+    const theFile = file.originFileObj as File;
+    const formData = new FormData();
+    formData.append('file', theFile);
+
+    try {
+      await apiPostEngineeringContactAttachments(engineeringContactId, patternType, formData);
+      await update(patternType);
+    } catch (error) {}
+  };
+
+  const reqDeletePattern = async (patternType: TpatternType) => {
+    const id = patternList[patternType]?.id;
+
+    if (!engineeringContactId || !id) {
+      return;
+    }
+
+    try {
+      await apiDeleteEngineeringContactAttachments(engineeringContactId, patternType, id);
+      await update(patternType);
+    } catch (error) {}
+  };
 
   // =======================================================================
   const [preUploadFile, setPreUploadFile] = useState<File>();
@@ -69,67 +143,25 @@ export default function ProjectPattern() {
     setPreUploadFile(file);
   };
 
-  const onDraggerChange = async (e: UploadChangeParam, patternType: TpatternType) => {
-    const {
-      file,
-      // fileList
-    } = e;
-
-    const url = await getBase64_RcFile(file.originFileObj as RcFile);
-
-    file.url = url;
-
-    if (patternType === 'a') {
-      setFileList_a([file]);
-    } else if (patternType === 'b') {
-      setFileList_b([file]);
-    } else if (patternType === 'c') {
-      setFileList_c([file]);
-    } else if (patternType === 'd') {
-      setFileList_d([file]);
-    } else if (patternType === 'e') {
-      setFileList_e([file]);
-    }
-  };
-
-  const onRemoveClick = (patternType: TpatternType) => {
-    if (patternType === 'a') {
-      setFileList_a([]);
-    } else if (patternType === 'b') {
-      setFileList_b([]);
-    } else if (patternType === 'c') {
-      setFileList_c([]);
-    } else if (patternType === 'd') {
-      setFileList_d([]);
-    } else if (patternType === 'e') {
-      setFileList_e([]);
-    }
-  };
-
   const props_a: Parameters<typeof ImageDragger>[0] = {
-    file: fileA,
-    onRemoveClick: () => onRemoveClick('a'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'a'),
+    fileSrc: patternList.signature.src,
+    onRemoveClick: () => reqDeletePattern('signature'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange_foo(e, 'signature'),
   };
   const props_b: Parameters<typeof ImageDragger>[0] = {
-    file: fileB,
-    onRemoveClick: () => onRemoveClick('b'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'b'),
+    fileSrc: patternList.floor.src,
+    onRemoveClick: () => reqDeletePattern('floor'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange_foo(e, 'floor'),
   };
   const props_c: Parameters<typeof ImageDragger>[0] = {
-    file: fileC,
-    onRemoveClick: () => onRemoveClick('c'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'c'),
+    fileSrc: patternList.design.src,
+    onRemoveClick: () => reqDeletePattern('design'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange_foo(e, 'design'),
   };
   const props_d: Parameters<typeof ImageDragger>[0] = {
-    file: fileD,
-    onRemoveClick: () => onRemoveClick('d'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'd'),
-  };
-  const props_e: Parameters<typeof ImageDragger>[0] = {
-    file: fileE,
-    onRemoveClick: () => onRemoveClick('e'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'e'),
+    fileSrc: patternList.color.src,
+    onRemoveClick: () => reqDeletePattern('color'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange_foo(e, 'color'),
   };
 
   return (
@@ -169,26 +201,21 @@ export default function ProjectPattern() {
 
       <Collapse
         className={scss.antdCollapse}
-        defaultActiveKey={['1']}
-        // onChange={(v) => {
-        //   console.log(v);
-        // }}
+        defaultActiveKey={['signature']}
+        // onChange={(v) => {console.log(v);}}
       >
-        <Panel header="簽認圖" key="1" className={scss.panel}>
+        <Panel header="簽認圖" key="signature" className={scss.panel}>
           <ImageDragger {...props_a} />
         </Panel>
-        <Panel header="平面圖" key="2" className={scss.panel}>
+        <Panel header="平面圖" key="floor" className={scss.panel}>
           <ImageDragger {...props_b} />
         </Panel>
-        <Panel header="設計圖" key="3" className={scss.panel}>
+        <Panel header="設計圖" key="design" className={scss.panel}>
           <ImageDragger {...props_c} />
         </Panel>
-        <Panel header="色卡" key="4" className={scss.panel}>
+        <Panel header="色卡" key="color" className={scss.panel}>
           <ImageDragger {...props_d} />
         </Panel>
-        {/* <Panel header="施工圖" key="5" className={scss.panel}>
-          <ImageDragger {...props_e} />
-        </Panel> */}
       </Collapse>
     </div>
   );
@@ -197,28 +224,26 @@ export default function ProjectPattern() {
 // ==================================================
 
 const ImageDragger = ({
-  //
-  file,
+  fileSrc,
   onRemoveClick,
   onDraggerChange,
 }: {
-  file: UploadFile<any> | undefined;
-  onRemoveClick: (fileType: TpatternType) => void;
+  fileSrc?: string | undefined;
+  onRemoveClick: () => void;
   onDraggerChange: (e: UploadChangeParam) => void;
 }) => {
   return (
     <>
-      <div className={classNames('relative w-fit', !file?.url && 'hidden')}>
-        <AntdImage className={scss.antdImage} src={file?.url ?? ''} alt="" />
-        <IconRemove02 className="global_absoluteRightTop" onClick={() => onRemoveClick('a')} />
+      <div className={classNames('relative w-fit', !fileSrc && 'hidden')}>
+        <AntdImage className={scss.antdImage} src={fileSrc ?? ''} alt="" />
+        <IconRemove02 className="global_absoluteRightTop" onClick={() => onRemoveClick()} />
       </div>
-      <div className={classNames(scss.draggerContainer, file?.url && 'hidden')}>
+      <div className={classNames(scss.draggerContainer, fileSrc && 'hidden')}>
         <Dragger
           className={classNames(scss.antdDragger, scss.plus)}
           onChange={(e) => {
             onDraggerChange(e);
           }}
-          // fileList={fileList_a}
           fileList={[]}
         >
           <div className={scss.dragTip}>

@@ -26,10 +26,6 @@ import {
   TupdateEngineeringContactDto,
   useGetEngineeringContact,
   apiPatchEngineeringContact,
-  //
-  apiGetEngineeringContactAttachments,
-  apiPostEngineeringContactAttachments,
-  apiDeleteEngineeringContactAttachments,
 } from 'js/api/api_engineering';
 
 import { TquotationProductDto, TquotationContractDto } from 'js/api/api_quotation';
@@ -646,7 +642,7 @@ function PreWorkContactDoc_component(
         </div>
         {/* 工程圖表資料 */}
         <div className={classNames(!isShowPattern && 'hidden')}>
-          <ProjectPattern />
+          <ProjectPattern engineeringContactId={engineeringContactId} />
         </div>
       </div>
 
