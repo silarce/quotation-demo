@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 // antd
 import { Select, Collapse, Upload, Image as AntdImage } from 'antd';
-import { UploadChangeParam } from 'antd/lib/upload';
+import { UploadChangeParam, UploadFile } from 'antd/lib/upload';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -86,18 +86,14 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     },
   } as const;
 
-  const onDraggerChange_foo = async (e: UploadChangeParam, patternType: TpatternType) => {
-    const {
-      file,
-      // fileList
-    } = e;
+  const reqUploadPattern = async (file: File | undefined, patternType: TpatternType) => {
     const info = patternList[patternType];
 
-    if (!file.originFileObj || !info || !engineeringContactId) {
+    if (!file || !info || !engineeringContactId) {
       return;
     }
 
-    const theFile = file.originFileObj as File;
+    const theFile = file;
     const formData = new FormData();
     formData.append('file', theFile);
 
@@ -120,8 +116,34 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     } catch (error) {}
   };
 
+  const onUploadBtnClick = async () => {
+    if (!patternType) {
+      myAlert.info({ title: '請選擇要上傳的工程圖表項目' });
+
+      return;
+    }
+
+    if (patternList[patternType].id) {
+      myAlert.info({ title: '該工程圖表項目已有圖片，請先刪除' });
+
+      return;
+    }
+
+    await reqUploadPattern(preUploadFile, patternType);
+  };
+
+  const onDraggerChange = async (e: UploadChangeParam, patternType: TpatternType) => {
+    const {
+      file,
+      // fileList
+    } = e;
+
+    await reqUploadPattern(file.originFileObj as File | undefined, patternType);
+  };
+
   // =======================================================================
   const [preUploadFile, setPreUploadFile] = useState<File>();
+  const [patternType, setPatternType] = useState<TpatternType>();
 
   const getFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) {
@@ -129,9 +151,7 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     }
 
     const file = e.target.files[0];
-
     const imageReg = /^image/;
-
     const isImage = imageReg.test(file.type);
 
     if (!isImage) {
@@ -143,25 +163,27 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     setPreUploadFile(file);
   };
 
-  const props_a: Parameters<typeof ImageDragger>[0] = {
+  // -----------------------------------------------------------------------
+
+  const props_signature: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.signature.src,
     onRemoveClick: () => reqDeletePattern('signature'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange_foo(e, 'signature'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'signature'),
   };
-  const props_b: Parameters<typeof ImageDragger>[0] = {
+  const props_floor: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.floor.src,
     onRemoveClick: () => reqDeletePattern('floor'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange_foo(e, 'floor'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'floor'),
   };
-  const props_c: Parameters<typeof ImageDragger>[0] = {
+  const props_design: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.design.src,
     onRemoveClick: () => reqDeletePattern('design'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange_foo(e, 'design'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'design'),
   };
-  const props_d: Parameters<typeof ImageDragger>[0] = {
+  const props_color: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.color.src,
     onRemoveClick: () => reqDeletePattern('color'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange_foo(e, 'color'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'color'),
   };
 
   return (
@@ -170,7 +192,8 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
         <Select
           className={classNames(scss.antdSelect, scss.plus)}
           options={options}
-          onChange={(v) => console.log(v)}
+          // onChange={(v) => console.log(v)}
+          onChange={(v) => setPatternType(v)}
           placeholder="選擇要上傳工程圖表項目"
           style={{ width: 359 }}
         />
@@ -193,7 +216,7 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
           px="px28"
           className={scss.btn_uploadImg}
           onClick={() => {
-            myAlert.success({ title: '測試上傳介面', content: '並沒有上傳' });
+            onUploadBtnClick();
           }}
         />
       </div>
@@ -205,16 +228,16 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
         // onChange={(v) => {console.log(v);}}
       >
         <Panel header="簽認圖" key="signature" className={scss.panel}>
-          <ImageDragger {...props_a} />
+          <ImageDragger {...props_signature} />
         </Panel>
         <Panel header="平面圖" key="floor" className={scss.panel}>
-          <ImageDragger {...props_b} />
+          <ImageDragger {...props_floor} />
         </Panel>
         <Panel header="設計圖" key="design" className={scss.panel}>
-          <ImageDragger {...props_c} />
+          <ImageDragger {...props_design} />
         </Panel>
         <Panel header="色卡" key="color" className={scss.panel}>
-          <ImageDragger {...props_d} />
+          <ImageDragger {...props_color} />
         </Panel>
       </Collapse>
     </div>
@@ -261,9 +284,9 @@ const ImageDragger = ({
 // ==================================================
 
 const options = [
-  { value: '簽認圖', label: '簽認圖' },
-  { value: '平面圖', label: '平面圖' },
-  { value: '設計圖', label: '設計圖' },
-  { value: '色卡', label: '色卡' },
+  { value: 'signature', label: '簽認圖' },
+  { value: 'floor', label: '平面圖' },
+  { value: 'design', label: '設計圖' },
+  { value: 'color', label: '色卡' },
   // { value: '施工圖', label: '施工圖' },
 ];
