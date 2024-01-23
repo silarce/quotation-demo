@@ -1321,7 +1321,7 @@ export const apiGetEngineeringContactAttachments = (
   const api = `/engineering/engineering-contact/${id}/attachments/${type}`;
 
   return axi
-    .get(api)
+    .get<TfileDto[]>(api)
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
       myAlert.err({ title: '取得工程聯絡單圖表失敗', content: err.message });
@@ -1366,4 +1366,61 @@ export const apiDeleteEngineeringContactAttachments = (
 
       return Promise.reject(err);
     });
+};
+
+export const useEngineeringContactAttachments = (id: string | undefined) => {
+  const [signature, setSignature] = useState<TfileDto[]>([]);
+  const [floorPlan, setFloorPlan] = useState<TfileDto[]>([]);
+  const [designDiagram, setDesignDiagram] = useState<TfileDto[]>([]);
+  const [colorCard, setColorCard] = useState<TfileDto[]>([]);
+
+  const update = async (type: TengineeringContactAttachmentType) => {
+    if (!id) {
+      return;
+    }
+
+    let res: TfileDto[] | undefined;
+
+    if (type === 'signature') {
+      res = await apiGetEngineeringContactAttachments(id, 'signature');
+      res && setSignature(res);
+    }
+
+    if (type === 'floorPlan') {
+      res = await apiGetEngineeringContactAttachments(id, 'floorPlan');
+      res && setFloorPlan(res);
+    }
+
+    if (type === 'designDiagram') {
+      res = await apiGetEngineeringContactAttachments(id, 'designDiagram');
+      res && setDesignDiagram(res);
+    }
+
+    if (type === 'colorCard') {
+      res = await apiGetEngineeringContactAttachments(id, 'colorCard');
+      res && setColorCard(res);
+    }
+
+    return res;
+  };
+
+  const updateAll = async () => {
+    if (!id) {
+      return;
+    }
+
+    update('signature');
+    update('floorPlan');
+    update('designDiagram');
+    update('colorCard');
+  };
+
+  return {
+    signaturePatternArr: signature,
+    floorPlanPatternArr: floorPlan,
+    designDiagramPatternArr: designDiagram,
+    colorCardPatternArr: colorCard,
+    update,
+    updateAll,
+  };
 };

@@ -26,7 +26,10 @@ import {
   TupdateEngineeringContactDto,
   useGetEngineeringContact,
   apiPatchEngineeringContact,
-  apiPostWorkSheet,
+  //
+  apiGetEngineeringContactAttachments,
+  apiPostEngineeringContactAttachments,
+  apiDeleteEngineeringContactAttachments,
 } from 'js/api/api_engineering';
 
 import { TquotationProductDto, TquotationContractDto } from 'js/api/api_quotation';
