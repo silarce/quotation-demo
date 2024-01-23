@@ -1,10 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 
 // antd
-import { Select, Collapse, Upload, Image as AntdImage } from 'antd';
-import type { UploadProps, UploadFile } from 'antd';
+import { Select, Collapse, Upload, Image as AntdImage, Spin } from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload';
 
 // gear
@@ -17,7 +16,14 @@ import scss from './projectPattern.module.scss';
 import iconGrayAddCircle from 'public/image/icon/grayAddCircle.svg';
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
 
-import { getBase64_RcFile, RcFile } from 'js/utils/helpers/getBase64';
+// api
+import {
+  apiPostEngineeringContactAttachments,
+  apiDeleteEngineeringContactAttachments,
+  useEngineeringContactAttachments,
+  TengineeringContactAttachmentType,
+  TfileDto,
+} from 'js/api/api_engineering';
 
 // =======================================================================
 const { Panel } = Collapse;
@@ -25,29 +31,166 @@ const { Dragger } = Upload;
 
 // =======================================================================
 
-type TpatternType = 'a' | 'b' | 'c' | 'd' | 'e';
+type TpatternType = Exclude<TengineeringContactAttachmentType, 'construction'>;
+
+type TpatternList = {
+  [key in TpatternType]: {
+    id: string | undefined;
+    src: string | undefined;
+  };
+};
+
+type TisUploading = {
+  [key in TpatternType]: boolean;
+};
 
 // =======================================================================
-export default function ProjectPattern() {
-  // 簽認圖
-  const [fileList_a, setFileList_a] = useState<UploadProps['fileList']>([]);
-  // const fileA = fileList_a?.[0]?.originFileObj;
-  const fileA = fileList_a?.[0];
-  // 平面圖
-  const [fileList_b, setFileList_b] = useState<UploadProps['fileList']>([]);
-  const fileB = fileList_b?.[0];
-  // 設計圖
-  const [fileList_c, setFileList_c] = useState<UploadProps['fileList']>([]);
-  const fileC = fileList_c?.[0];
-  // 色卡
-  const [fileList_d, setFileList_d] = useState<UploadProps['fileList']>([]);
-  const fileD = fileList_d?.[0];
-  // 施工圖
-  const [fileList_e, setFileList_e] = useState<UploadProps['fileList']>([]);
-  const fileE = fileList_e?.[0];
+export default function ProjectPattern({ engineeringContactId }: { engineeringContactId: string | null | undefined }) {
+  const [isUploading, setIsUploading] = useState<TisUploading>({
+    signature: false,
+    floor: false,
+    design: false,
+    color: false,
+  });
+
+  const isUploading_any = Object.values(isUploading).some((v) => v);
+
+  // -----------------------------------------------------------------------
+
+  const { signaturePatternArr, floorPlanPatternArr, designDiagramPatternArr, colorCardPatternArr, update, updateAll } =
+    useEngineeringContactAttachments(engineeringContactId);
+
+  useEffect(() => {
+    updateAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engineeringContactId]);
+
+  const fileInfo_signature = signaturePatternArr?.[0] as TfileDto | undefined;
+  const fileSrc_signature = fileInfo_signature
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_signature.id}`
+    : undefined;
+  const fileInfo_floor = floorPlanPatternArr?.[0] as TfileDto | undefined;
+  const fileSrc_floor = fileInfo_floor
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_floor.id}`
+    : undefined;
+  const fileInfo_design = designDiagramPatternArr?.[0] as TfileDto | undefined;
+  const fileSrc_design = fileInfo_design
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_design.id}`
+    : undefined;
+  const fileInfo_color = colorCardPatternArr?.[0] as TfileDto | undefined;
+  const fileSrc_color = fileInfo_color
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_color.id}`
+    : undefined;
+
+  const patternList: TpatternList = {
+    signature: {
+      id: fileInfo_signature?.id,
+      src: fileSrc_signature,
+    },
+    floor: {
+      id: fileInfo_floor?.id,
+      src: fileSrc_floor,
+    },
+    design: {
+      id: fileInfo_design?.id,
+      src: fileSrc_design,
+    },
+    color: {
+      id: fileInfo_color?.id,
+      src: fileSrc_color,
+    },
+  } as const;
+
+  // -----------------------------------------------------------------------
+  const reqUploadPattern = async (file: File | undefined, patternType: TpatternType) => {
+    const info = patternList[patternType];
+
+    if (!file || !info || !engineeringContactId) {
+      return;
+    }
+
+    const isImage = checkFileIsImage(file);
+
+    if (!isImage) {
+      myAlert.info({ title: '該檔案非圖片，只能上傳圖片' });
+
+      return;
+    }
+
+    const theFile = file;
+    const formData = new FormData();
+    formData.append('file', theFile);
+
+    try {
+      setIsUploading((prev) => ({ ...prev, [patternType]: true }));
+      await apiPostEngineeringContactAttachments(engineeringContactId, patternType, formData);
+      await update(patternType);
+    } catch (error) {
+    } finally {
+      setIsUploading((prev) => ({ ...prev, [patternType]: false }));
+    }
+  };
+
+  //
+  const reqDeletePattern = async (patternType: TpatternType) => {
+    const id = patternList[patternType]?.id;
+
+    if (!engineeringContactId || !id) {
+      return;
+    }
+
+    try {
+      await apiDeleteEngineeringContactAttachments(engineeringContactId, patternType, id);
+      await update(patternType);
+    } catch (error) {}
+  };
+
+  // _____________________________________________________________
+  //
+  const onUploadBtnClick = async () => {
+    if (isUploading_any) {
+      return;
+    }
+
+    if (!patternType) {
+      myAlert.info({ title: '請選擇要上傳的工程圖表項目' });
+
+      return;
+    }
+
+    if (patternList[patternType].id) {
+      myAlert.info({ title: '該工程圖表項目已有圖片，請先刪除' });
+
+      return;
+    }
+
+    await reqUploadPattern(preUploadFile, patternType);
+  };
+
+  //
+  const onDraggerChange = async (e: UploadChangeParam, patternType: TpatternType) => {
+    const {
+      file,
+      // fileList
+    } = e;
+
+    await reqUploadPattern(file.originFileObj as File | undefined, patternType);
+  };
+
+  //
+  const onRemoveClick = (pattern: TpatternType) => {
+    myAlert.confirm({
+      title: '確定移除?',
+      props: {
+        onOk: () => reqDeletePattern(pattern),
+      },
+    });
+  };
 
   // =======================================================================
+  // 上方上傳按鈕用的
   const [preUploadFile, setPreUploadFile] = useState<File>();
+  const [patternType, setPatternType] = useState<TpatternType>();
 
   const getFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) {
@@ -55,10 +198,7 @@ export default function ProjectPattern() {
     }
 
     const file = e.target.files[0];
-
-    const imageReg = /^image/;
-
-    const isImage = imageReg.test(file.type);
+    const isImage = checkFileIsImage(file);
 
     if (!isImage) {
       myAlert.info({ title: '該檔案非圖片，只能上傳圖片' });
@@ -69,67 +209,31 @@ export default function ProjectPattern() {
     setPreUploadFile(file);
   };
 
-  const onDraggerChange = async (e: UploadChangeParam, patternType: TpatternType) => {
-    const {
-      file,
-      // fileList
-    } = e;
+  // -----------------------------------------------------------------------
 
-    const url = await getBase64_RcFile(file.originFileObj as RcFile);
-
-    file.url = url;
-
-    if (patternType === 'a') {
-      setFileList_a([file]);
-    } else if (patternType === 'b') {
-      setFileList_b([file]);
-    } else if (patternType === 'c') {
-      setFileList_c([file]);
-    } else if (patternType === 'd') {
-      setFileList_d([file]);
-    } else if (patternType === 'e') {
-      setFileList_e([file]);
-    }
+  const props_signature: Parameters<typeof ImageDragger>[0] = {
+    fileSrc: patternList.signature.src,
+    onRemoveClick: () => onRemoveClick('signature'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'signature'),
+    isUploading: isUploading.signature,
   };
-
-  const onRemoveClick = (patternType: TpatternType) => {
-    if (patternType === 'a') {
-      setFileList_a([]);
-    } else if (patternType === 'b') {
-      setFileList_b([]);
-    } else if (patternType === 'c') {
-      setFileList_c([]);
-    } else if (patternType === 'd') {
-      setFileList_d([]);
-    } else if (patternType === 'e') {
-      setFileList_e([]);
-    }
+  const props_floor: Parameters<typeof ImageDragger>[0] = {
+    fileSrc: patternList.floor.src,
+    onRemoveClick: () => onRemoveClick('floor'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'floor'),
+    isUploading: isUploading.floor,
   };
-
-  const props_a: Parameters<typeof ImageDragger>[0] = {
-    file: fileA,
-    onRemoveClick: () => onRemoveClick('a'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'a'),
+  const props_design: Parameters<typeof ImageDragger>[0] = {
+    fileSrc: patternList.design.src,
+    onRemoveClick: () => onRemoveClick('design'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'design'),
+    isUploading: isUploading.design,
   };
-  const props_b: Parameters<typeof ImageDragger>[0] = {
-    file: fileB,
-    onRemoveClick: () => onRemoveClick('b'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'b'),
-  };
-  const props_c: Parameters<typeof ImageDragger>[0] = {
-    file: fileC,
-    onRemoveClick: () => onRemoveClick('c'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'c'),
-  };
-  const props_d: Parameters<typeof ImageDragger>[0] = {
-    file: fileD,
-    onRemoveClick: () => onRemoveClick('d'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'd'),
-  };
-  const props_e: Parameters<typeof ImageDragger>[0] = {
-    file: fileE,
-    onRemoveClick: () => onRemoveClick('e'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'e'),
+  const props_color: Parameters<typeof ImageDragger>[0] = {
+    fileSrc: patternList.color.src,
+    onRemoveClick: () => onRemoveClick('color'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'color'),
+    isUploading: isUploading.color,
   };
 
   return (
@@ -138,7 +242,8 @@ export default function ProjectPattern() {
         <Select
           className={classNames(scss.antdSelect, scss.plus)}
           options={options}
-          onChange={(v) => console.log(v)}
+          // onChange={(v) => console.log(v)}
+          onChange={(v) => setPatternType(v)}
           placeholder="選擇要上傳工程圖表項目"
           style={{ width: 359 }}
         />
@@ -161,34 +266,30 @@ export default function ProjectPattern() {
           px="px28"
           className={scss.btn_uploadImg}
           onClick={() => {
-            myAlert.success({ title: '測試上傳介面', content: '並沒有上傳' });
+            onUploadBtnClick();
           }}
+          isLoading={isUploading_any}
         />
       </div>
       {/*  */}
 
       <Collapse
         className={scss.antdCollapse}
-        defaultActiveKey={['1']}
-        // onChange={(v) => {
-        //   console.log(v);
-        // }}
+        defaultActiveKey={['signature']}
+        // onChange={(v) => {console.log(v);}}
       >
-        <Panel header="簽認圖" key="1" className={scss.panel}>
-          <ImageDragger {...props_a} />
+        <Panel header="簽認圖" key="signature" className={scss.panel}>
+          <ImageDragger {...props_signature} />
         </Panel>
-        <Panel header="平面圖" key="2" className={scss.panel}>
-          <ImageDragger {...props_b} />
+        <Panel header="平面圖" key="floor" className={scss.panel}>
+          <ImageDragger {...props_floor} />
         </Panel>
-        <Panel header="設計圖" key="3" className={scss.panel}>
-          <ImageDragger {...props_c} />
+        <Panel header="設計圖" key="design" className={scss.panel}>
+          <ImageDragger {...props_design} />
         </Panel>
-        <Panel header="色卡" key="4" className={scss.panel}>
-          <ImageDragger {...props_d} />
+        <Panel header="色卡" key="color" className={scss.panel}>
+          <ImageDragger {...props_color} />
         </Panel>
-        {/* <Panel header="施工圖" key="5" className={scss.panel}>
-          <ImageDragger {...props_e} />
-        </Panel> */}
       </Collapse>
     </div>
   );
@@ -197,37 +298,39 @@ export default function ProjectPattern() {
 // ==================================================
 
 const ImageDragger = ({
-  //
-  file,
+  fileSrc,
   onRemoveClick,
   onDraggerChange,
+  isUploading,
 }: {
-  file: UploadFile<any> | undefined;
-  onRemoveClick: (fileType: TpatternType) => void;
+  fileSrc?: string | undefined;
+  onRemoveClick: () => void;
   onDraggerChange: (e: UploadChangeParam) => void;
+  isUploading: boolean;
 }) => {
   return (
     <>
-      <div className={classNames('relative w-fit', !file?.url && 'hidden')}>
-        <AntdImage className={scss.antdImage} src={file?.url ?? ''} alt="" />
-        <IconRemove02 className="global_absoluteRightTop" onClick={() => onRemoveClick('a')} />
+      <div className={classNames('relative w-fit', !fileSrc && 'hidden')}>
+        <AntdImage className={scss.antdImage} src={fileSrc ?? ''} alt="" />
+        <IconRemove02 className="global_absoluteRightTop" onClick={() => onRemoveClick()} />
       </div>
-      <div className={classNames(scss.draggerContainer, file?.url && 'hidden')}>
-        <Dragger
-          className={classNames(scss.antdDragger, scss.plus)}
-          onChange={(e) => {
-            onDraggerChange(e);
-          }}
-          // fileList={fileList_a}
-          fileList={[]}
-        >
-          <div className={scss.dragTip}>
-            <div>
-              <Image src={iconGrayAddCircle} alt="" />
+      <div className={classNames(scss.draggerContainer, fileSrc && 'hidden')}>
+        <Spin spinning={isUploading} size="large">
+          <Dragger
+            className={classNames(scss.antdDragger, scss.plus)}
+            onChange={(e) => {
+              onDraggerChange(e);
+            }}
+            fileList={[]}
+          >
+            <div className={scss.dragTip}>
+              <div>
+                <Image src={iconGrayAddCircle} alt="" />
+              </div>
+              <span>請選擇圖片</span>
             </div>
-            <span>請選擇圖片</span>
-          </div>
-        </Dragger>
+          </Dragger>
+        </Spin>
       </div>
     </>
   );
@@ -235,10 +338,17 @@ const ImageDragger = ({
 
 // ==================================================
 
+const checkFileIsImage = (file: File) => {
+  const imageReg = /^image/;
+  const isImage = imageReg.test(file.type);
+
+  return isImage;
+};
+
 const options = [
-  { value: '簽認圖', label: '簽認圖' },
-  { value: '平面圖', label: '平面圖' },
-  { value: '設計圖', label: '設計圖' },
-  { value: '色卡', label: '色卡' },
+  { value: 'signature', label: '簽認圖' },
+  { value: 'floor', label: '平面圖' },
+  { value: 'design', label: '設計圖' },
+  { value: 'color', label: '色卡' },
   // { value: '施工圖', label: '施工圖' },
 ];
