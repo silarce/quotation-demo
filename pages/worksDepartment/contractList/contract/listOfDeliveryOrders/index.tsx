@@ -18,7 +18,7 @@ import {
   //
   useGetEngineeringExchanges,
 } from 'js/api/api_engineering';
-import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 
 // helper
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
@@ -40,7 +40,7 @@ export default function ListOfDeliveryOrders() {
     pageSize: 9999,
   };
 
-  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const { data: contract, update: update_contract } = useGetContract_id(contractId);
   const { data: exchangeArr, update: update_exchange } = useGetEngineeringExchanges(customParams);
 
   useEffect(() => {

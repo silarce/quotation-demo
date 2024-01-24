@@ -22,7 +22,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // api
 import { apiPostWorkSheet } from 'js/api/api_engineering';
 
-import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 
 // ============================================================================
 type Tquery = {
@@ -50,7 +50,9 @@ export default function WorkContactDoc() {
   };
 
   // ---------------------------------------------------------------------------
-  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+    preBuiltPopulate: 'worksDepartment02',
+  });
   const engineeringContactId = contract?.engineeringContactId;
 
   // ---------------------------------------------------------------------------

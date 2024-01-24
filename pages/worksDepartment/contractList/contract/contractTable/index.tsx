@@ -10,7 +10,7 @@ import PageHeader from 'components/page/worksDepartment/contracList/contract/gea
 
 // api
 import { useGetEngineeringContact } from 'js/api/api_engineering';
-import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 
 // type
 import { TerpFeatureDto } from 'js/api/dtoTypes';
@@ -83,7 +83,10 @@ export default function ContracTable({
   const [isLoading, setIsLoading] = useState(false);
 
   // -------------------------------------------------------------
-  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+
+  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+    customPopulate: ['subContracts.content.products.rootProdductId'],
+  });
   const engineeringContactId = contract?.engineeringContactId;
 
   const { data: engineeringContact, update: update_engineeringContact } =

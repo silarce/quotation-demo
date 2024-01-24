@@ -58,7 +58,7 @@ import {
   apiPostAccountReceivable,
   TcreateAccountReceivableDto,
 } from 'js/api/api_engineering';
-import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
 
 // utils
@@ -83,7 +83,9 @@ export default function AccountReceivable() {
 
   // --------------------------------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+    customPopulate: ['subContracts.content.verifyForm'],
+  });
 
   const { engineeringContactId, accountReceivableId } = contract ?? {};
 
