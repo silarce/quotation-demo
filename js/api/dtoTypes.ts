@@ -2088,6 +2088,14 @@ export type TengineeringContactDto = {
   contract?: TquotationContractDto | null;
   quotationId?: string | null;
   quotation?: TquotationDto | null;
+  //
+  // 是否要應有該工程圖表
+  shouldHasSignature: boolean | null; //
+  shouldHasColor: boolean | null; // 色卡
+  shouldHasConstruction: boolean | null; // 施工圖
+  shouldHasDetail: boolean | null; // 大樣詳圖、簽認圖
+  shouldHasFloor: boolean | null; // 平面圖
+  shouldHasDesign: boolean | null; // 設計圖
 };
 
 export type TupdateEngineeringContactDto = {
@@ -2129,6 +2137,13 @@ export type TupdateEngineeringContactDto = {
     contactPerson: string;
     contactNumber: string;
   }[];
+  // 是否要有該工程圖表
+  shouldHasSignature: boolean; //
+  shouldHasColor: boolean; // 色卡
+  shouldHasConstruction: boolean; // 施工圖
+  shouldHasDetail: boolean; // 大樣詳圖、簽認圖
+  shouldHasFloor: boolean; // 平面圖
+  shouldHasDesign: boolean; // 設計圖
 };
 
 export type TcreateEngineeringContactDto = {
