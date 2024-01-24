@@ -372,9 +372,9 @@ const checkFileIsImage = (file: File) => {
 };
 
 const options = [
-  { value: 'signature', label: '簽認圖' },
+  { value: 'detail', label: '簽認圖' },
   { value: 'floor', label: '平面圖' },
   { value: 'design', label: '設計圖' },
+  { value: 'construction', label: '施工圖' },
   { value: 'color', label: '色卡' },
-  // { value: '施工圖', label: '施工圖' },
 ];
