@@ -519,7 +519,11 @@ version>1 是子合約
   // -----------------------------------------------------------------
 
   return (
-    <SubLayer isLoading_all={isLoading || isLoading_workContact}>
+    <SubLayer
+      //
+      isLoading_all={isLoading || isLoading_workContact}
+      scrollToTopTrigger={[isShowWorkContactDoc, isShowPattern]}
+    >
       <PageHeader02
         tagList={tagList}
         panelList={panelList}
