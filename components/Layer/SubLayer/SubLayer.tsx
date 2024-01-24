@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import classNames from 'classnames';
 
 // layer
@@ -20,6 +20,7 @@ export default function SubLayer({
   containerChildren,
   isLoading_subLayer = false,
   isLoading_all = false,
+  scrollToTopTrigger,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -27,13 +28,20 @@ export default function SubLayer({
   containerChildren?: React.ReactNode;
   isLoading_subLayer?: boolean;
   isLoading_all?: boolean;
+  scrollToTopTrigger?: unknown;
 }) {
+  const ref_body = useRef<HTMLDivElement>(null!);
+
   const childredArr = React.Children.toArray(children);
+
+  useEffect(() => {
+    ref_body.current.scrollTo(0, 0);
+  }, [scrollToTopTrigger]);
 
   return (
     <div className={classNames(scss.container, className)}>
       {childredArr[0]}
-      <div className={classNames(scss.body, bodyClassName)}>
+      <div ref={ref_body} className={classNames(scss.body, bodyClassName)}>
         {childredArr[1]}
         {/*把剩下的childredArr的item放進來*/}
         {childredArr.slice(2)}
