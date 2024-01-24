@@ -191,7 +191,7 @@ function PreWorkContactDoc_component(
   // ---------------------------------------------------------------------------
 
   const [shouldHasPattern, setShouldHasPattern] = useState<TshouldPatternList>({
-    signature: false,
+    // signature: false,
     floor: false,
     detail: false,
     color: false,
@@ -210,7 +210,7 @@ function PreWorkContactDoc_component(
 
   useEffect(() => {
     const {
-      shouldHasSignature,
+      // shouldHasSignature,
       shouldHasColor,
       shouldHasConstruction,
       shouldHasDetail,
@@ -219,7 +219,6 @@ function PreWorkContactDoc_component(
     } = engineeringContact ?? {};
 
     setShouldHasPattern({
-      signature: shouldHasSignature ?? false,
       floor: shouldHasFloor ?? false,
       detail: shouldHasDetail ?? false,
       color: shouldHasColor ?? false,
@@ -626,7 +625,7 @@ function PreWorkContactDoc_component(
       ...profile,
       annotations: annoArr,
       contactInfo: contactArr,
-      shouldHasSignature: shouldHasPattern.signature,
+
       shouldHasColor: shouldHasPattern.color,
       shouldHasConstruction: shouldHasPattern.construction,
       shouldHasDetail: shouldHasPattern.detail,

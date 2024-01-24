@@ -2090,7 +2090,6 @@ export type TengineeringContactDto = {
   quotation?: TquotationDto | null;
   //
   // 是否要應有該工程圖表
-  shouldHasSignature: boolean | null; //
   shouldHasColor: boolean | null; // 色卡
   shouldHasConstruction: boolean | null; // 施工圖
   shouldHasDetail: boolean | null; // 大樣詳圖、簽認圖
@@ -2138,7 +2137,6 @@ export type TupdateEngineeringContactDto = {
     contactNumber: string;
   }[];
   // 是否要有該工程圖表
-  shouldHasSignature: boolean; //
   shouldHasColor: boolean; // 色卡
   shouldHasConstruction: boolean; // 施工圖
   shouldHasDetail: boolean; // 大樣詳圖、簽認圖

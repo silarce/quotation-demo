@@ -90,7 +90,7 @@ export type {
   TupdateAccountReceivableProductPaymentDto,
 } from './dtoTypes';
 
-type TengineeringContactAttachmentType = 'signature' | 'floor' | 'detail' | 'color' | 'construction' | 'design';
+type TengineeringContactAttachmentType = 'floor' | 'detail' | 'color' | 'construction' | 'design';
 
 export type { TengineeringContactAttachmentType };
 
@@ -1368,10 +1368,11 @@ export const apiDeleteEngineeringContactAttachments = (
 };
 
 export const useEngineeringContactAttachments = (id: string | undefined | null) => {
-  const [signature, setSignature] = useState<TfileDto[]>([]);
   const [floorPlan, setFloorPlan] = useState<TfileDto[]>([]);
   const [designDiagram, setDesignDiagram] = useState<TfileDto[]>([]);
   const [colorCard, setColorCard] = useState<TfileDto[]>([]);
+  const [pattern_construction, setPattern_Construction] = useState<TfileDto[]>([]);
+  const [pattern_detail, setPattern_Detail] = useState<TfileDto[]>([]);
 
   const update = async (type: TengineeringContactAttachmentType) => {
     if (!id) {
@@ -1379,11 +1380,6 @@ export const useEngineeringContactAttachments = (id: string | undefined | null) 
     }
 
     let res: TfileDto[] | undefined;
-
-    if (type === 'signature') {
-      res = await apiGetEngineeringContactAttachments(id, 'signature');
-      res && setSignature(res);
-    }
 
     if (type === 'floor') {
       res = await apiGetEngineeringContactAttachments(id, 'floor');
@@ -1400,6 +1396,16 @@ export const useEngineeringContactAttachments = (id: string | undefined | null) 
       res && setColorCard(res);
     }
 
+    if (type === 'construction') {
+      res = await apiGetEngineeringContactAttachments(id, 'construction');
+      res && setPattern_Construction(res);
+    }
+
+    if (type === 'detail') {
+      res = await apiGetEngineeringContactAttachments(id, 'detail');
+      res && setPattern_Detail(res);
+    }
+
     return res;
   };
 
@@ -1408,17 +1414,19 @@ export const useEngineeringContactAttachments = (id: string | undefined | null) 
       return;
     }
 
-    update('signature');
     update('floor');
     update('design');
     update('color');
+    update('construction');
+    update('detail');
   };
 
   return {
-    signaturePatternArr: signature,
     floorPlanPatternArr: floorPlan,
     designDiagramPatternArr: designDiagram,
     colorCardPatternArr: colorCard,
+    pattern_constructionArr: pattern_construction,
+    pattern_detailArr: pattern_detail,
     update,
     updateAll,
   };
