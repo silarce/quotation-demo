@@ -31,7 +31,7 @@ const { Dragger } = Upload;
 
 // =======================================================================
 
-type TpatternType = Exclude<TengineeringContactAttachmentType, 'construction'>;
+type TpatternType = Exclude<TengineeringContactAttachmentType, 'signature'>;
 
 type TpatternList = {
   [key in TpatternType]: {
@@ -44,31 +44,69 @@ type TisUploading = {
   [key in TpatternType]: boolean;
 };
 
+type ThasPattern = {
+  hasColor: boolean;
+  hasConstruction: boolean;
+  hasDetail: boolean;
+  hasFloor: boolean;
+  hasDesign: boolean;
+};
+
+export type { ThasPattern };
+
 // =======================================================================
-export default function ProjectPattern({ engineeringContactId }: { engineeringContactId: string | null | undefined }) {
+export default function ProjectPattern({
+  engineeringContactId,
+  onPatternChange,
+}: {
+  engineeringContactId: string | null | undefined;
+  onPatternChange: (hasPattern: ThasPattern) => void;
+}) {
   const [isUploading, setIsUploading] = useState<TisUploading>({
-    signature: false,
     floor: false,
-    design: false,
+    detail: false,
     color: false,
+    construction: false,
+    design: false,
   });
 
   const isUploading_any = Object.values(isUploading).some((v) => v);
 
   // -----------------------------------------------------------------------
 
-  const { signaturePatternArr, floorPlanPatternArr, designDiagramPatternArr, colorCardPatternArr, update, updateAll } =
-    useEngineeringContactAttachments(engineeringContactId);
+  const {
+    floorPlanPatternArr,
+    designDiagramPatternArr,
+    colorCardPatternArr,
+    pattern_constructionArr,
+    pattern_detailArr,
+    update,
+    updateAll,
+  } = useEngineeringContactAttachments(engineeringContactId);
 
   useEffect(() => {
     updateAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engineeringContactId]);
 
-  const fileInfo_signature = signaturePatternArr?.[0] as TfileDto | undefined;
-  const fileSrc_signature = fileInfo_signature
-    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_signature.id}`
-    : undefined;
+  useEffect(() => {
+    onPatternChange({
+      hasColor: colorCardPatternArr.length > 0,
+      hasConstruction: pattern_constructionArr.length > 0,
+      hasDetail: pattern_detailArr.length > 0,
+      hasFloor: floorPlanPatternArr.length > 0,
+      hasDesign: designDiagramPatternArr.length > 0,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    //
+    floorPlanPatternArr,
+    designDiagramPatternArr,
+    colorCardPatternArr,
+    pattern_constructionArr,
+    pattern_detailArr,
+  ]);
+
   const fileInfo_floor = floorPlanPatternArr?.[0] as TfileDto | undefined;
   const fileSrc_floor = fileInfo_floor
     ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_floor.id}`
@@ -81,12 +119,16 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
   const fileSrc_color = fileInfo_color
     ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_color.id}`
     : undefined;
+  const fileInfo_construction = pattern_constructionArr?.[0] as TfileDto | undefined;
+  const fileSrc_construction = fileInfo_construction
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_construction.id}`
+    : undefined;
+  const fileInfo_detail = pattern_detailArr?.[0] as TfileDto | undefined;
+  const fileSrc_detail = fileInfo_detail
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${fileInfo_detail.id}`
+    : undefined;
 
   const patternList: TpatternList = {
-    signature: {
-      id: fileInfo_signature?.id,
-      src: fileSrc_signature,
-    },
     floor: {
       id: fileInfo_floor?.id,
       src: fileSrc_floor,
@@ -98,6 +140,14 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     color: {
       id: fileInfo_color?.id,
       src: fileSrc_color,
+    },
+    construction: {
+      id: fileInfo_construction?.id,
+      src: fileSrc_construction,
+    },
+    detail: {
+      id: fileInfo_detail?.id,
+      src: fileSrc_detail,
     },
   } as const;
 
@@ -211,12 +261,6 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
 
   // -----------------------------------------------------------------------
 
-  const props_signature: Parameters<typeof ImageDragger>[0] = {
-    fileSrc: patternList.signature.src,
-    onRemoveClick: () => onRemoveClick('signature'),
-    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'signature'),
-    isUploading: isUploading.signature,
-  };
   const props_floor: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.floor.src,
     onRemoveClick: () => onRemoveClick('floor'),
@@ -234,6 +278,18 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     onRemoveClick: () => onRemoveClick('color'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'color'),
     isUploading: isUploading.color,
+  };
+  const props_construction: Parameters<typeof ImageDragger>[0] = {
+    fileSrc: patternList.construction.src,
+    onRemoveClick: () => onRemoveClick('construction'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'construction'),
+    isUploading: isUploading.construction,
+  };
+  const props_detail: Parameters<typeof ImageDragger>[0] = {
+    fileSrc: patternList.detail.src,
+    onRemoveClick: () => onRemoveClick('detail'),
+    onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'detail'),
+    isUploading: isUploading.detail,
   };
 
   return (
@@ -275,17 +331,20 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
 
       <Collapse
         className={scss.antdCollapse}
-        defaultActiveKey={['signature']}
+        defaultActiveKey={['detail']}
         // onChange={(v) => {console.log(v);}}
       >
-        <Panel header="簽認圖" key="signature" className={scss.panel}>
-          <ImageDragger {...props_signature} />
+        <Panel header="簽認圖" key="detail" className={scss.panel}>
+          <ImageDragger {...props_detail} />
         </Panel>
         <Panel header="平面圖" key="floor" className={scss.panel}>
           <ImageDragger {...props_floor} />
         </Panel>
         <Panel header="設計圖" key="design" className={scss.panel}>
           <ImageDragger {...props_design} />
+        </Panel>
+        <Panel header="施工圖" key="construction" className={scss.panel}>
+          <ImageDragger {...props_construction} />
         </Panel>
         <Panel header="色卡" key="color" className={scss.panel}>
           <ImageDragger {...props_color} />
@@ -346,9 +405,9 @@ const checkFileIsImage = (file: File) => {
 };
 
 const options = [
-  { value: 'signature', label: '簽認圖' },
+  { value: 'detail', label: '簽認圖' },
   { value: 'floor', label: '平面圖' },
   { value: 'design', label: '設計圖' },
+  { value: 'construction', label: '施工圖' },
   { value: 'color', label: '色卡' },
-  // { value: '施工圖', label: '施工圖' },
 ];

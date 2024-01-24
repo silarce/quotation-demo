@@ -17,6 +17,9 @@ module.exports = {
         chosenBgc: "#ffeeee",
         danger: "#ea1833",
         success: "#08f366",
+      },
+      width: {
+        table: "1100px"
       }
     },
     screens: {

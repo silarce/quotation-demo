@@ -12,7 +12,9 @@ import Profile, {
   Tcontroll as Tcontroll_profile,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-import ProjectPattern from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
+import ProjectPattern, {
+  ThasPattern,
+} from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -24,6 +26,7 @@ import TextListEditor_v2, {
 // api
 import {
   TupdateEngineeringContactDto,
+  TengineeringContactAttachmentType,
   useGetEngineeringContact,
   apiPatchEngineeringContact,
 } from 'js/api/api_engineering';
@@ -74,6 +77,10 @@ type TimperativeHandle = {
   reqPatch: () => Promise<void>;
   closePattern: () => void;
   setDisabled: (state: boolean) => void;
+};
+
+type TshouldPatternList = {
+  [key in TengineeringContactAttachmentType]: boolean;
 };
 
 export type { TimperativeHandle, TonStateChange };
@@ -170,46 +177,6 @@ function PreWorkContactDoc_component(
     })();
   }, [contractId, engineeringContactId]);
 
-  // 預計未來會有工程圖表資料
-  type Tpattern = {
-    label: string;
-    haveData: boolean;
-    shouldHaveData: boolean;
-  };
-
-  const [patternA, setPatternA] = useState<Tpattern>({
-    label: '簽認圖',
-    haveData: false,
-    shouldHaveData: true,
-  });
-  const [patternB, setPatternB] = useState<Tpattern>({
-    label: '平面圖',
-    haveData: true,
-    shouldHaveData: true,
-  });
-  const [patternC, setPatternC] = useState<Tpattern>({
-    label: '設計圖',
-    haveData: true,
-    shouldHaveData: true,
-  });
-  const [patternD, setPatternD] = useState<Tpattern>({
-    label: '色卡',
-    haveData: false,
-    shouldHaveData: false,
-  });
-
-  const changePatternShouldHaveData = (patternType: 'a' | 'b' | 'c' | 'd', bool: boolean) => {
-    if (patternType === 'a') {
-      setPatternA((pattern) => ({ ...pattern, shouldHaveData: bool }));
-    } else if (patternType === 'b') {
-      setPatternB((pattern) => ({ ...pattern, shouldHaveData: bool }));
-    } else if (patternType === 'c') {
-      setPatternC((pattern) => ({ ...pattern, shouldHaveData: bool }));
-    } else if (patternType === 'd') {
-      setPatternD((pattern) => ({ ...pattern, shouldHaveData: bool }));
-    }
-  };
-
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
@@ -222,6 +189,57 @@ function PreWorkContactDoc_component(
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled, isLoading, isShowPattern, engineeringContact?.contractNumber]);
+
+  // ---------------------------------------------------------------------------
+
+  const [shouldHasPattern, setShouldHasPattern] = useState<TshouldPatternList>({
+    // signature: false,
+    floor: false,
+    detail: false,
+    color: false,
+    construction: false,
+    design: false,
+  });
+
+  const [hasPattern, setHasPattern] = useState<ThasPattern>({
+    hasFloor: false,
+    hasDetail: false,
+    hasColor: false,
+    hasConstruction: false,
+    hasDesign: false,
+  });
+
+  const onPatternChange = (hasPattern: ThasPattern) => {
+    setHasPattern(hasPattern);
+  };
+
+  const editShouldHasPattern = (bool: boolean, key: keyof TshouldPatternList) => {
+    setShouldHasPattern((state) => {
+      return {
+        ...state,
+        [key]: bool,
+      };
+    });
+  };
+
+  useEffect(() => {
+    const {
+      // shouldHasSignature,
+      shouldHasColor,
+      shouldHasConstruction,
+      shouldHasDetail,
+      shouldHasFloor,
+      shouldHasDesign,
+    } = engineeringContact ?? {};
+
+    setShouldHasPattern({
+      floor: shouldHasFloor ?? false,
+      detail: shouldHasDetail ?? false,
+      color: shouldHasColor ?? false,
+      construction: shouldHasConstruction ?? false,
+      design: shouldHasDesign ?? false,
+    });
+  }, [engineeringContact]);
 
   // ---------------------------------------------------------------------------
 
@@ -438,27 +456,43 @@ function PreWorkContactDoc_component(
       onCaptionClick: showPattern,
       statusArr: [
         {
-          ...patternA,
+          label: '簽認圖',
+          haveData: hasPattern.hasDetail,
+          shouldHaveData: shouldHasPattern.detail,
           onCheck: (bool) => {
-            changePatternShouldHaveData('a', bool);
+            editShouldHasPattern(bool, 'detail');
           },
         },
         {
-          ...patternB,
+          label: '平面圖',
+          haveData: hasPattern.hasFloor,
+          shouldHaveData: shouldHasPattern.floor,
           onCheck: (bool) => {
-            changePatternShouldHaveData('b', bool);
+            editShouldHasPattern(bool, 'floor');
           },
         },
         {
-          ...patternC,
+          label: '設計圖',
+          haveData: hasPattern.hasDesign,
+          shouldHaveData: shouldHasPattern.design,
           onCheck: (bool) => {
-            changePatternShouldHaveData('c', bool);
+            editShouldHasPattern(bool, 'design');
           },
         },
         {
-          ...patternD,
+          label: '工程圖',
+          haveData: hasPattern.hasConstruction,
+          shouldHaveData: shouldHasPattern.construction,
           onCheck: (bool) => {
-            changePatternShouldHaveData('d', bool);
+            editShouldHasPattern(bool, 'construction');
+          },
+        },
+        {
+          label: '色卡',
+          haveData: hasPattern.hasColor,
+          shouldHaveData: shouldHasPattern.color,
+          onCheck: (bool) => {
+            editShouldHasPattern(bool, 'color');
           },
         },
       ],
@@ -605,6 +639,12 @@ function PreWorkContactDoc_component(
       ...profile,
       annotations: annoArr,
       contactInfo: contactArr,
+
+      shouldHasColor: shouldHasPattern.color,
+      shouldHasConstruction: shouldHasPattern.construction,
+      shouldHasDetail: shouldHasPattern.detail,
+      shouldHasFloor: shouldHasPattern.floor,
+      shouldHasDesign: shouldHasPattern.design,
     };
 
     try {
@@ -663,7 +703,7 @@ function PreWorkContactDoc_component(
         </div>
         {/* 工程圖表資料 */}
         <div className={classNames(!isShowPattern && 'hidden')}>
-          <ProjectPattern engineeringContactId={engineeringContactId} />
+          <ProjectPattern engineeringContactId={engineeringContactId} onPatternChange={onPatternChange} />
         </div>
       </div>
 

@@ -26,7 +26,7 @@ import SheetPDF, {
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 import {
   apiPostElectronicSupplies,
   apiPatchElectronicSupplies,
@@ -117,8 +117,8 @@ export default function Edit({ isAdmin, userInfo }: { isAdmin: boolean; userInfo
   const [isShowPdf, setIsShowPdf] = useState(false);
 
   // ----------------------------------------------------
-  const { data: contract, update } = useGetContract_id_noItems(contractId, {
-    populate: ['worksheet.contractProductItems'],
+  const { data: contract, update } = useGetContract_id(contractId, {
+    customPopulate: ['worksheet.contractProductItems'],
   });
   const engineeringContactId = contract?.engineeringContactId;
   const { data: engineeringContact, update: update_engineeringContact } =

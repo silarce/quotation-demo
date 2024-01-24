@@ -11,7 +11,7 @@ import PanelBody, { Tdetail } from './contractList/panelBody';
 import { Collapse } from 'antd';
 
 // api
-import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 
 // css
 import style from './contractList.module.scss';
@@ -41,7 +41,7 @@ export default function ContractList({
 
   const [contractId, setContractId] = useState<string>();
 
-  const { data: contract, update, clear } = useGetContract_id_noItems(contractId);
+  const { data: contract, update, clear } = useGetContract_id(contractId, { preBuiltPopulate: 'worksDepartment03' });
   const subContracts = contract?.subContracts;
 
   useEffect(() => {

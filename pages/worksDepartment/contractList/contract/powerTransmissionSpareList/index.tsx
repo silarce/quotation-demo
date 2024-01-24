@@ -13,7 +13,7 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // api
-import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 import { useGetEngineeringContact, useGetElectronicSupplies } from 'js/api/api_engineering';
 
 // helper
@@ -40,7 +40,7 @@ export default function PowerTransmissionSpareList() {
     },
   };
 
-  const { data: contract, update } = useGetContract_id_noItems(contractId);
+  const { data: contract, update } = useGetContract_id(contractId);
   const engineeringContactId = contract?.engineeringContactId ?? '';
 
   const { data: electronicSuppliesArr, update: updateElectronicSupplies } = useGetElectronicSupplies(customParams);

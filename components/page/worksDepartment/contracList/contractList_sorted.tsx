@@ -11,7 +11,7 @@ import PanelBody, { Tdetail } from './contractList/panelBody';
 import { Collapse } from 'antd';
 
 // api
-import { useGetContract_id_noItems, TquotationContractDto } from 'js/api/api_quotation';
+import { useGetContract_id, TquotationContractDto } from 'js/api/api_quotation';
 
 // css
 import style from './contractList.module.scss';
@@ -45,7 +45,7 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
 
   const [contractList, setContractList] = useState<{ [key: string]: TquotationContractDto | undefined }>({});
 
-  const { update } = useGetContract_id_noItems(targetContractId);
+  const { update } = useGetContract_id(targetContractId, { preBuiltPopulate: 'worksDepartment03' });
 
   useEffect(() => {
     if (contractList[targetContractId ?? 'undefined']) {

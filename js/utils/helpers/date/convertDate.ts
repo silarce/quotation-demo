@@ -38,10 +38,29 @@ export const convertDate_add1911 = (ISOString: string) => {
   return dateTime.toISOString();
 };
 
-export const getTaiwanDateStr = (ISOString: string | null) => {
+export const getTaiwanDateStr = (
+  ISOString: string | null,
+  {
+    withUnit,
+    customFormat,
+  }: {
+    withUnit?: boolean;
+    customFormat?: string;
+  } = {}
+) => {
   if (!ISOString) {
     return null;
   }
 
-  return moment(convertDate_reduce1911(ISOString)).format('yy-MM-DD');
+  let format = 'yy-MM-DD';
+
+  if (withUnit) {
+    format = 'yy年MM月DD日';
+  }
+
+  if (customFormat) {
+    format = customFormat;
+  }
+
+  return moment(convertDate_reduce1911(ISOString)).format(format);
 };
