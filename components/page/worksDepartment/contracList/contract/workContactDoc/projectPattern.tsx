@@ -44,8 +44,24 @@ type TisUploading = {
   [key in TpatternType]: boolean;
 };
 
+type ThasPattern = {
+  hasColor: boolean;
+  hasConstruction: boolean;
+  hasDetail: boolean;
+  hasFloor: boolean;
+  hasDesign: boolean;
+};
+
+export type { ThasPattern };
+
 // =======================================================================
-export default function ProjectPattern({ engineeringContactId }: { engineeringContactId: string | null | undefined }) {
+export default function ProjectPattern({
+  engineeringContactId,
+  onPatternChange,
+}: {
+  engineeringContactId: string | null | undefined;
+  onPatternChange: (hasPattern: ThasPattern) => void;
+}) {
   const [isUploading, setIsUploading] = useState<TisUploading>({
     floor: false,
     detail: false,
@@ -59,7 +75,6 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
   // -----------------------------------------------------------------------
 
   const {
-    // signaturePatternArr,
     floorPlanPatternArr,
     designDiagramPatternArr,
     colorCardPatternArr,
@@ -73,6 +88,24 @@ export default function ProjectPattern({ engineeringContactId }: { engineeringCo
     updateAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engineeringContactId]);
+
+  useEffect(() => {
+    onPatternChange({
+      hasColor: colorCardPatternArr.length > 0,
+      hasConstruction: pattern_constructionArr.length > 0,
+      hasDetail: pattern_detailArr.length > 0,
+      hasFloor: floorPlanPatternArr.length > 0,
+      hasDesign: designDiagramPatternArr.length > 0,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    //
+    floorPlanPatternArr,
+    designDiagramPatternArr,
+    colorCardPatternArr,
+    pattern_constructionArr,
+    pattern_detailArr,
+  ]);
 
   const fileInfo_floor = floorPlanPatternArr?.[0] as TfileDto | undefined;
   const fileSrc_floor = fileInfo_floor

@@ -12,7 +12,9 @@ import Profile, {
   Tcontroll as Tcontroll_profile,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-import ProjectPattern from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
+import ProjectPattern, {
+  ThasPattern,
+} from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -198,6 +200,18 @@ function PreWorkContactDoc_component(
     construction: false,
     design: false,
   });
+
+  const [hasPattern, setHasPattern] = useState<ThasPattern>({
+    hasFloor: false,
+    hasDetail: false,
+    hasColor: false,
+    hasConstruction: false,
+    hasDesign: false,
+  });
+
+  const onPatternChange = (hasPattern: ThasPattern) => {
+    setHasPattern(hasPattern);
+  };
 
   const editShouldHasPattern = (bool: boolean, key: keyof TshouldPatternList) => {
     setShouldHasPattern((state) => {
@@ -443,7 +457,7 @@ function PreWorkContactDoc_component(
       statusArr: [
         {
           label: '簽認圖',
-          haveData: false,
+          haveData: hasPattern.hasDetail,
           shouldHaveData: shouldHasPattern.detail,
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'detail');
@@ -451,7 +465,7 @@ function PreWorkContactDoc_component(
         },
         {
           label: '平面圖',
-          haveData: false,
+          haveData: hasPattern.hasFloor,
           shouldHaveData: shouldHasPattern.floor,
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'floor');
@@ -459,7 +473,7 @@ function PreWorkContactDoc_component(
         },
         {
           label: '設計圖',
-          haveData: false,
+          haveData: hasPattern.hasDesign,
           shouldHaveData: shouldHasPattern.design,
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'design');
@@ -467,7 +481,7 @@ function PreWorkContactDoc_component(
         },
         {
           label: '工程圖',
-          haveData: false,
+          haveData: hasPattern.hasConstruction,
           shouldHaveData: shouldHasPattern.construction,
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'construction');
@@ -475,7 +489,7 @@ function PreWorkContactDoc_component(
         },
         {
           label: '色卡',
-          haveData: false,
+          haveData: hasPattern.hasColor,
           shouldHaveData: shouldHasPattern.color,
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'color');
@@ -689,7 +703,7 @@ function PreWorkContactDoc_component(
         </div>
         {/* 工程圖表資料 */}
         <div className={classNames(!isShowPattern && 'hidden')}>
-          <ProjectPattern engineeringContactId={engineeringContactId} />
+          <ProjectPattern engineeringContactId={engineeringContactId} onPatternChange={onPatternChange} />
         </div>
       </div>
 
