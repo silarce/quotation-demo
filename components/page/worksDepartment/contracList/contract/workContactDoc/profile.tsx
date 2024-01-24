@@ -142,7 +142,7 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
                 const status = haveData ? 'success' : 'error';
 
                 return (
-                  <div key={index}>
+                  <label key={index}>
                     <Checkbox
                       checked={shouldHaveData}
                       onChange={(e) => {
@@ -153,7 +153,7 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
                     <span>
                       <Badge status={status} text={label} dot={true} />
                     </span>
-                  </div>
+                  </label>
                 );
               })}
             </div>
