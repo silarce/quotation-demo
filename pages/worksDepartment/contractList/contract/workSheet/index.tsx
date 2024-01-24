@@ -189,7 +189,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // api
-import { useGetContract_id_noItems } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 import {
   TupdateWorkSheetItem,
   useGetEngineeringContact,
@@ -272,7 +272,9 @@ export default function WorkSheet({
   const [isShowPdf02, setIsShowPdf02] = useState(false);
 
   // -------------------------------------------------------------------------
-  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
+  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+    customPopulate: ['content.customer'],
+  });
   // const engineeringContactId = contract?.engineeringContactId;
   const { engineeringContactId, worksheetId } = contract ?? {};
   const { data: engineeringContact, update: update_engineeringContact } =
