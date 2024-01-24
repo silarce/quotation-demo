@@ -90,7 +90,7 @@ export type {
   TupdateAccountReceivableProductPaymentDto,
 } from './dtoTypes';
 
-type TengineeringContactAttachmentType = 'signature' | 'floor' | 'design' | 'color' | 'construction';
+type TengineeringContactAttachmentType = 'signature' | 'floor' | 'detail' | 'color' | 'construction' | 'design';
 
 export type { TengineeringContactAttachmentType };
 
@@ -1333,7 +1333,6 @@ export const apiGetEngineeringContactAttachments = (
 // 上傳工程聯絡單的附件(圖表)
 export const apiPostEngineeringContactAttachments = (
   id: string,
-  // type在後端其實是收string，但為免未來type混亂，因此在前端做出規範
   type: TengineeringContactAttachmentType,
   body: FormData
 ) => {

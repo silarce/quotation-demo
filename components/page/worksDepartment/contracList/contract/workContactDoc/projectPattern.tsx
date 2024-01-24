@@ -21,7 +21,7 @@ import {
   apiPostEngineeringContactAttachments,
   apiDeleteEngineeringContactAttachments,
   useEngineeringContactAttachments,
-  TengineeringContactAttachmentType,
+  TengineeringContactAttachmentType_old,
   TfileDto,
 } from 'js/api/api_engineering';
 
@@ -31,7 +31,7 @@ const { Dragger } = Upload;
 
 // =======================================================================
 
-type TpatternType = Exclude<TengineeringContactAttachmentType, 'construction'>;
+type TpatternType = Exclude<TengineeringContactAttachmentType_old, 'construction'>;
 
 type TpatternList = {
   [key in TpatternType]: {
