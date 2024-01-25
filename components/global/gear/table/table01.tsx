@@ -8,6 +8,8 @@ import scss from './table01.module.scss';
 type Trow = {
   children: React.ReactNode;
   height?: React.CSSProperties['height'];
+  minHeight?: React.CSSProperties['minHeight'];
+  maxHeight?: React.CSSProperties['maxHeight'];
   className?: string;
   style?: React.CSSProperties;
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -87,10 +89,18 @@ const Table01 = ({
       {/*  */}
       <div className={classNames(scss.tbody)}>
         {tbody.rowArr.map((row, rIndex) => {
-          const { cellArr, height, className, style, onClick } = row;
+          const { cellArr, height, minHeight, maxHeight, className, style, onClick } = row;
 
           return (
-            <Row key={rIndex} height={height} className={className} style={style} onClick={onClick}>
+            <Row
+              key={rIndex}
+              height={height}
+              minHeight={minHeight}
+              maxHeight={maxHeight}
+              className={className}
+              style={style}
+              onClick={onClick}
+            >
               {cellArr.map((cell, cIndex) => {
                 const { width, flex, justifyContent, className, style, children } = cell;
 
@@ -115,13 +125,18 @@ const Table01 = ({
   );
 };
 
-const Row = ({ children, height, className, style, onClick }: Trow) => {
+const Row = ({ children, height, minHeight, maxHeight, className, style, onClick }: Trow) => {
   return (
     <CellWithBar className={scss.rowWrapper}>
       <div
         //
         className={classNames(scss.row, className, onClick && scss.clickable)}
-        style={{ height, ...style }}
+        style={{
+          height,
+          minHeight,
+          maxHeight,
+          ...style,
+        }}
         onClick={onClick}
       >
         {children}
