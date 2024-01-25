@@ -1,6 +1,5 @@
 import { useState } from 'react';
-
-// import classNames from 'classnames';
+import { useRouter } from 'next/router';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -13,15 +12,15 @@ import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_ta
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-// css
-// import scss from './memorandum.module.scss';
-
 // ============================================================================
 
 type TtabState = 'all' | 'recived' | 'sent';
 
 // ============================================================================
 export default function Memorandum() {
+  const router = useRouter();
+
+  // ---------------------------------------------------------------------------
   const [tabState, setTabState] = useState<TtabState>('all');
 
   // ---------------------------------------------------------------------------
@@ -56,7 +55,9 @@ export default function Memorandum() {
     {
       type: 'myButton',
       label: '新增',
-      onClick: () => {},
+      onClick: () => {
+        router.push('/worksDepartment/contractList/contract/memorandum/edit');
+      },
     },
   ];
 
@@ -78,8 +79,6 @@ export default function Memorandum() {
           <Table01 {...fakeTable} />
         </Wrapper_tab>
 
-        <br />
-        <br />
         <br />
         <br />
       </div>
