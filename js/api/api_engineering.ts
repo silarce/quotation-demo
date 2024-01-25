@@ -6,6 +6,7 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi } from './_axiosCreator';
+import { AxiosError } from 'axios';
 
 import { createUseInfinite } from './createUseInfinite';
 
@@ -89,7 +90,9 @@ export type {
   TupdateAccountReceivableProductPaymentDto,
 } from './dtoTypes';
 
-// ========================================================================
+type TengineeringContactAttachmentType = 'floor' | 'detail' | 'color' | 'construction' | 'design';
+
+export type { TengineeringContactAttachmentType };
 
 /**以id取得工程聯絡單 */
 export const apiGetEngineeringContact = async (id: string) => {
@@ -1305,4 +1308,126 @@ export const apiPatchProductPayment = async (
     .patch<TaccountsReceivableProductPaymentDto[]>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+// =======================================================================
+
+// 取得工程聯絡單的附件(圖表)
+export const apiGetEngineeringContactAttachments = (
+  //
+  id: string,
+  type: TengineeringContactAttachmentType
+) => {
+  const api = `/engineering/engineering-contact/${id}/attachments/${type}`;
+
+  return axi
+    .get<TfileDto[]>(api)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '取得工程聯絡單圖表失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 上傳工程聯絡單的附件(圖表)
+export const apiPostEngineeringContactAttachments = (
+  id: string,
+  type: TengineeringContactAttachmentType,
+  body: FormData
+) => {
+  const api = `/engineering/engineering-contact/${id}/attachments/${type}`;
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '新增工程聯絡單圖表失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 刪除工程聯絡單附件
+export const apiDeleteEngineeringContactAttachments = (
+  //
+  id: string,
+  type: TengineeringContactAttachmentType,
+  fileId: string
+) => {
+  const api = `/engineering/engineering-contact/${id}/attachments/${type}/${fileId}`;
+
+  return axi
+    .delete(api)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '刪除工程聯絡單圖表失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+export const useEngineeringContactAttachments = (id: string | undefined | null) => {
+  const [floorPlan, setFloorPlan] = useState<TfileDto[]>([]);
+  const [designDiagram, setDesignDiagram] = useState<TfileDto[]>([]);
+  const [colorCard, setColorCard] = useState<TfileDto[]>([]);
+  const [pattern_construction, setPattern_Construction] = useState<TfileDto[]>([]);
+  const [pattern_detail, setPattern_Detail] = useState<TfileDto[]>([]);
+
+  const update = async (type: TengineeringContactAttachmentType) => {
+    if (!id) {
+      return;
+    }
+
+    let res: TfileDto[] | undefined;
+
+    if (type === 'floor') {
+      res = await apiGetEngineeringContactAttachments(id, 'floor');
+      res && setFloorPlan(res);
+    }
+
+    if (type === 'design') {
+      res = await apiGetEngineeringContactAttachments(id, 'design');
+      res && setDesignDiagram(res);
+    }
+
+    if (type === 'color') {
+      res = await apiGetEngineeringContactAttachments(id, 'color');
+      res && setColorCard(res);
+    }
+
+    if (type === 'construction') {
+      res = await apiGetEngineeringContactAttachments(id, 'construction');
+      res && setPattern_Construction(res);
+    }
+
+    if (type === 'detail') {
+      res = await apiGetEngineeringContactAttachments(id, 'detail');
+      res && setPattern_Detail(res);
+    }
+
+    return res;
+  };
+
+  const updateAll = async () => {
+    if (!id) {
+      return;
+    }
+
+    update('floor');
+    update('design');
+    update('color');
+    update('construction');
+    update('detail');
+  };
+
+  return {
+    floorPlanPatternArr: floorPlan,
+    designDiagramPatternArr: designDiagram,
+    colorCardPatternArr: colorCard,
+    pattern_constructionArr: pattern_construction,
+    pattern_detailArr: pattern_detail,
+    update,
+    updateAll,
+  };
 };

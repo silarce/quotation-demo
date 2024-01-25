@@ -431,102 +431,21 @@ export const apiGetContract_Id = async (contractId: string, params?: Tparams) =>
     .catch((err) => Promise.reject(err.message));
 };
 
-export const useGetContract_id = (id: string | undefined) => {
+export const useGetContract_id = (
+  id: string | undefined,
+  option?: {
+    customPopulate?: string[];
+    preBuiltPopulate?: keyof typeof lookpu_contractPopulate;
+  }
+) => {
+  const preBuiltPopulate = lookpu_contractPopulate[option?.preBuiltPopulate ?? 'basic'];
+  const customPopulate = option?.customPopulate ?? [];
+
+  let populate = [...preBuiltPopulate, ...customPopulate];
+  populate = _.uniq(populate);
+
   const params: Tparams = {
-    populate: [
-      // 'contents',
-      'content.customer',
-      'content.agentEmployee',
-      'content.supervisorEmployee',
-      'content.managerEmployee',
-      'content.reviewSalesEmployee',
-      'content.reviewWorkDirectorEmployee',
-      'content.reviewSupervisorEmployee',
-      'content.products.items.accessories',
-      'content.products.items.components',
-      'content.others',
-
-      // 'rootContract.content.customer',
-      // 'rootContract.content.agentEmployee',
-      // 'rootContract.content.supervisorEmployee',
-      // 'rootContract.content.managerEmployee',
-      // 'rootContract.content.reviewSalesEmployee',
-      // 'rootContract.content.reviewWorkDirectorEmployee',
-      // 'rootContract.content.reviewSupervisorEmployee',
-      'rootContract.content.products.items.accessories',
-      'rootContract.content.products.items.components',
-      'rootContract.content.others',
-
-      // 'attachedToContract',
-      // 'attachedContract',
-      'subContracts.content.products',
-    ],
-  };
-
-  const [res, setRes] = useState<TquotationContractDto>();
-
-  const update = async () => {
-    if (!id) {
-      return;
-    }
-
-    const newRes = await apiGetContract_Id(id, params);
-
-    if (newRes) {
-      setRes(newRes);
-    }
-
-    return newRes;
-  };
-
-  return {
-    data: res,
-    update,
-  };
-};
-
-export const useGetContract_id_noItems = (id: string | undefined, customParams?: Tparams) => {
-  const params: Tparams = {
-    ...customParams,
-    populate: [
-      // 'contents',
-      'content.customer',
-      'content.agentEmployee',
-      'content.supervisorEmployee',
-      'content.managerEmployee',
-      'content.reviewSalesEmployee',
-      'content.reviewWorkDirectorEmployee',
-      'content.reviewSupervisorEmployee',
-      'content.reviewManagerEmployee',
-
-      'content.products',
-      // 'content.products.items.accessories',
-      // 'content.products.items.components',
-      'content.others',
-      'content.verifyForm',
-      'accountReceivable',
-
-      // 'rootContract.content.customer',
-      // 'rootContract.content.agentEmployee',
-      // 'rootContract.content.supervisorEmployee',
-      // 'rootContract.content.managerEmployee',
-      // 'rootContract.content.reviewSalesEmployee',
-      // 'rootContract.content.reviewWorkDirectorEmployee',
-      // 'rootContract.content.reviewSupervisorEmployee',
-      // 'rootContract.content.others',
-      // 'rootContract.content.products.items.accessories',
-      // 'rootContract.content.products.items.components',
-
-      // 'attachedToContract',
-      // 'attachedContract',
-      'subContracts.content.products.rootProdductId',
-      'subContracts.content.customer',
-      'subContracts.content.verifyForm',
-
-      'products',
-
-      ...(customParams?.populate ?? []),
-    ],
+    populate,
   };
 
   const [res, setRes] = useState<TquotationContractDto>();
@@ -561,41 +480,8 @@ export const useGetContract_id_noItems_2 = (id: string | undefined, customParams
   const params: Tparams = {
     ...customParams,
     populate: [
-      // 'contents',
-      'content.customer',
-      'content.agentEmployee',
-      'content.supervisorEmployee',
-      'content.managerEmployee',
-      'content.reviewSalesEmployee',
-      'content.reviewWorkDirectorEmployee',
-      'content.reviewSupervisorEmployee',
-      'content.reviewManagerEmployee',
-
-      'content.products',
-      // 'content.products.items.accessories',
-      // 'content.products.items.components',
-      'content.others',
-      'content.verifyForm',
-
-      // 'rootContract.content.customer',
-      // 'rootContract.content.agentEmployee',
-      // 'rootContract.content.supervisorEmployee',
-      // 'rootContract.content.managerEmployee',
-      // 'rootContract.content.reviewSalesEmployee',
-      // 'rootContract.content.reviewWorkDirectorEmployee',
-      // 'rootContract.content.reviewSupervisorEmployee',
-      // 'rootContract.content.others',
-      // 'rootContract.content.products.items.accessories',
-      // 'rootContract.content.products.items.components',
-
-      // 'attachedToContract',
-      // 'attachedContract',
-      'subContracts.content.products.rootProdductId',
-      'subContracts.content.customer',
-      'subContracts.content.verifyForm',
-
-      'products',
-
+      //
+      ...lookpu_contractPopulate.contract_noItem02,
       ...(customParams?.populate ?? []),
     ],
   };
@@ -630,34 +516,7 @@ export const useGetContract_id_noItems_2 = (id: string | undefined, customParams
 
 export const useGetContract_id_forAttach = (id: string | undefined) => {
   const params: Tparams = {
-    populate: [
-      // 'contents',
-      'content.customer',
-      'content.agentEmployee',
-      'content.supervisorEmployee',
-      'content.managerEmployee',
-      'content.reviewSalesEmployee',
-      'content.reviewWorkDirectorEmployee',
-      'content.reviewSupervisorEmployee',
-      'content.products.items.accessories',
-      'content.products.items.components',
-      'content.others',
-
-      // 'rootContract.content.customer',
-      // 'rootContract.content.agentEmployee',
-      // 'rootContract.content.supervisorEmployee',
-      // 'rootContract.content.managerEmployee',
-      // 'rootContract.content.reviewSalesEmployee',
-      // 'rootContract.content.reviewWorkDirectorEmployee',
-      // 'rootContract.content.reviewSupervisorEmployee',
-      // 'rootContract.content.products.items.accessories',
-      // 'rootContract.content.products.items.components',
-      // 'rootContract.content.others',
-
-      // 'attachedToContract',
-      // 'attachedContract',
-      'subContracts.content.products.rootProdductId',
-    ],
+    populate: [...lookpu_contractPopulate.forAttach],
   };
 
   const [res, setRes] = useState<TquotationContractDto>();
@@ -1071,3 +930,79 @@ export const apiPostCopyQuotation = (body: { quotationId: string; customerId: st
       return Promise.reject(err);
     });
 };
+
+// ========================================================================
+
+const lookpu_contractPopulate = {
+  basic: ['content'],
+  // contract_noItem: [
+  //   'content.customer',
+  //   'content.agentEmployee',
+  //   'content.supervisorEmployee',
+  //   'content.managerEmployee',
+  //   'content.reviewSalesEmployee',
+  //   'content.reviewWorkDirectorEmployee',
+  //   'content.reviewSupervisorEmployee',
+  //   'content.reviewManagerEmployee',
+
+  //   'content.products',
+  //   // 'content.products.items.accessories',
+  //   // 'content.products.items.components',
+  //   'content.others',
+  //   'content.verifyForm',
+  //   'accountReceivable',
+
+  //   // 'rootContract.content.customer',
+  //   // 'rootContract.content.agentEmployee',
+  //   // 'rootContract.content.supervisorEmployee',
+  //   // 'rootContract.content.managerEmployee',
+  //   // 'rootContract.content.reviewSalesEmployee',
+  //   // 'rootContract.content.reviewWorkDirectorEmployee',
+  //   // 'rootContract.content.reviewSupervisorEmployee',
+  //   // 'rootContract.content.others',
+  //   // 'rootContract.content.products.items.accessories',
+  //   // 'rootContract.content.products.items.components',
+
+  //   // 'attachedToContract',
+  //   // 'attachedContract',
+  //   'subContracts.content.products.rootProdductId',
+  //   'subContracts.content.customer',
+  //   'subContracts.content.verifyForm',
+
+  //   'products',
+  // ],
+  contract_noItem02: [
+    'content.customer',
+    'content.agentEmployee',
+    'content.supervisorEmployee',
+    'content.managerEmployee',
+    'content.reviewSalesEmployee',
+    'content.reviewWorkDirectorEmployee',
+    'content.reviewSupervisorEmployee',
+    'content.reviewManagerEmployee',
+    'content.products',
+    'content.others',
+    'content.verifyForm',
+    'subContracts.content.products.rootProdductId',
+    'subContracts.content.customer',
+    'subContracts.content.verifyForm',
+    'products',
+  ],
+  forAttach: [
+    'content.customer',
+    'content.agentEmployee',
+    'content.supervisorEmployee',
+    'content.managerEmployee',
+    'content.reviewSalesEmployee',
+    'content.reviewWorkDirectorEmployee',
+    'content.reviewSupervisorEmployee',
+    'content.products.items.accessories',
+    'content.products.items.components',
+    'content.others',
+    'subContracts.content.products.rootProdductId',
+  ],
+
+  worksDepartment: ['content', 'accountReceivable', 'content.verifyForm'],
+  worksDepartment02: ['content', 'subContracts.content.products.rootProdductId'],
+  worksDepartment03: ['content', 'subContracts.content'],
+} as const;

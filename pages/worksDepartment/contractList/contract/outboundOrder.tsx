@@ -29,7 +29,7 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import style from './contract.module.scss';
 
 // api
-import { TquotationProductDto, useGetContract_id_noItems } from 'js/api/api_quotation';
+import { TquotationProductDto, useGetContract_id } from 'js/api/api_quotation';
 import {
   // TupdateEngineeringDeliveryList,
   // TupdateDeliveryStatus,
@@ -104,8 +104,9 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id_noItems(contractId);
-  // const engineeringContactId = contract?.engineeringContactId;
+  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+    customPopulate: ['subContracts.content.products.rootProdductId'],
+  });
   const { engineeringContactId, engineeringDeliveryListId } = contract ?? {};
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
