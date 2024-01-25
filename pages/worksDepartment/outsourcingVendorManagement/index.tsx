@@ -10,11 +10,8 @@ import scss from './index.module.scss';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import { DEFAULT_MAX_VERSION } from 'tls';
 
 export default function OutsourcingVendorManagement() {
-  // ----------------------------------------------------------------
-
   const rowArr: Tcontrol['rowArr'] = fakeData.map((data) => {
     const { id, name, phoneNumber, receiptDate } = data;
     const dateStr = getTaiwanDateStr(receiptDate, { withUnit: true }) ?? '';
