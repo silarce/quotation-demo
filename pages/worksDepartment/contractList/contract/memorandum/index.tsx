@@ -1,13 +1,20 @@
 import { useState } from 'react';
 
-import classNames from 'classnames';
+// import classNames from 'classnames';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
+// component
+import Table01, { Ttable } from 'components/global/gear/table/table01';
+import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
+
+// gear
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+
 // css
-import scss from './memorandum.module.scss';
+// import scss from './memorandum.module.scss';
 
 // ============================================================================
 
@@ -58,15 +65,23 @@ export default function Memorandum() {
     <SubLayer>
       <PageHeader contractNumber={'foooo'} panelList={panelList} />
       <div>
-        <h1>備忘錄</h1>
-
-        <Wrapper_tab className={'m-auto'} tabArr={tabArr}>
-          <p>fooooo</p>
-          <p>fooooo</p>
-          <p>fooooo</p>
-          <p>fooooo</p>
-          <p>fooooo</p>
+        <Wrapper_tab
+          className={'m-auto'}
+          childrenOption={{
+            noBorderTop: true,
+          }}
+          tabArr={tabArr}
+          stickyTop={{
+            top: 40,
+          }}
+        >
+          <Table01 {...fakeTable} />
         </Wrapper_tab>
+
+        <br />
+        <br />
+        <br />
+        <br />
       </div>
     </SubLayer>
   );
@@ -74,60 +89,185 @@ export default function Memorandum() {
 
 // ============================================================================
 
-type Ttab = {
-  label: string;
-  isActive?: boolean;
-  className?: string;
-  style?: React.CSSProperties;
-  onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+// ============================================================================
+
+type TcellConfig = {
+  [key: string]: {
+    label: string;
+    width?: React.CSSProperties['width'];
+    flex?: React.CSSProperties['flex'];
+  };
 };
 
-const Wrapper_tab = ({
-  tabArr = [],
-  children,
-  className,
-  childrenOption,
-}: {
-  tabArr?: Ttab[];
-  children?: React.ReactNode;
-  className?: string;
-  childrenOption?: {
-    noBorder?: boolean;
-    noBorderTop?: boolean;
-  };
-}) => {
-  return (
-    <div className={classNames(scss.wrapper_tab, className)}>
-      <div className={scss.stickyCover} />
-      {/*  */}
+const tableConfig = {
+  row: {
+    minHeight: '60px',
+  },
+};
 
-      <div className={classNames(scss.tabBar)}>
-        {tabArr.map((tab, index) => {
-          const { label, isActive, className, style, onClick } = tab;
+const cellCofig: TcellConfig = {
+  sentDate: {
+    label: '發文日期',
+    width: '100px',
+  },
+  sentNumber: {
+    label: '發文字號',
+    width: '250px',
+  },
+  reciver: {
+    label: '受文者',
+    width: '250px',
+  },
+  subject: {
+    label: '主旨',
+    flex: 'auto',
+  },
+  reply: {
+    label: '回簽',
+    width: '150px',
+  },
+};
 
-          return (
-            <div
-              key={index}
-              className={classNames(scss.tab, isActive && scss.active, className)}
-              style={style}
-              onClick={onClick}
-            >
-              <span>{label}</span>
-            </div>
-          );
-        })}
-      </div>
+const fakeThead: Ttable['thead'] = {
+  stickyTop: {
+    top: '90px',
+  },
+  rowProps: {
+    minHeight: tableConfig.row.minHeight,
+  },
+  cellArr: [
+    {
+      children: cellCofig.sentDate.label,
+      width: cellCofig.sentDate.width,
+    },
+    {
+      children: cellCofig.sentNumber.label,
+      width: cellCofig.sentNumber.width,
+    },
+    {
+      children: cellCofig.reciver.label,
+      width: cellCofig.reciver.width,
+    },
+    {
+      children: cellCofig.subject.label,
+      flex: cellCofig.subject.flex,
+    },
+    {
+      children: cellCofig.reply.label,
+      width: cellCofig.reply.width,
+    },
+  ],
+};
 
-      {/*  */}
-      <div
-        className={classNames(
-          scss.childrenContainer,
-          childrenOption?.noBorder && scss.noBorder,
-          childrenOption?.noBorderTop && scss.notBorderTop
-        )}
-      >
-        {children}
-      </div>
-    </div>
-  );
+const fakeTbody: Ttable['tbody'] = {
+  rowArr: [
+    {
+      minHeight: tableConfig.row.minHeight,
+      cellArr: [
+        {
+          children: '112/1/2',
+          width: cellCofig.sentDate.width,
+        },
+        {
+          children: '三建工(112)年第11205321號',
+          width: cellCofig.sentNumber.width,
+        },
+        {
+          children: '皇昌營造股份有限公司',
+          width: cellCofig.reciver.width,
+        },
+        {
+          children: `捲門安裝位置，\n相關管線及障礙物須諸貴公司協助修改。`,
+          flex: cellCofig.subject.flex,
+        },
+        {
+          children: <MyButton_v2 label="回簽" />,
+          width: cellCofig.reply.width,
+        },
+      ],
+    },
+    {
+      minHeight: tableConfig.row.minHeight,
+      onClick: () => {
+        alert('foooo');
+      },
+      cellArr: [
+        {
+          children: '112/1/2',
+          width: cellCofig.sentDate.width,
+        },
+        {
+          children: '三建工(112)年第11205321號',
+          width: cellCofig.sentNumber.width,
+        },
+        {
+          children: '皇昌營造股份有限公司',
+          width: cellCofig.reciver.width,
+        },
+        {
+          children: `捲門安裝位置`,
+          flex: cellCofig.subject.flex,
+        },
+        {
+          children: '112/1/3 珮宸',
+          width: cellCofig.reply.width,
+        },
+      ],
+    },
+    {
+      minHeight: tableConfig.row.minHeight,
+      cellArr: [
+        {
+          children: '112/1/2',
+          width: cellCofig.sentDate.width,
+        },
+        {
+          children: '三建工(112)年第11205321號',
+          width: cellCofig.sentNumber.width,
+        },
+        {
+          children: '皇昌營造股份有限公司',
+          width: cellCofig.reciver.width,
+        },
+        {
+          children: `捲門安裝位置`,
+          flex: cellCofig.subject.flex,
+        },
+        {
+          children: <MyButton_v2 label="回簽" px="px28" py="py6" />,
+          width: cellCofig.reply.width,
+        },
+      ],
+    },
+    {
+      minHeight: tableConfig.row.minHeight,
+      cellArr: [
+        {
+          children: '112/1/2',
+          width: cellCofig.sentDate.width,
+        },
+        {
+          children: '三建工(112)年第11205321號',
+          width: cellCofig.sentNumber.width,
+        },
+        {
+          children: '皇昌營造股份有限公司',
+          width: cellCofig.reciver.width,
+        },
+        {
+          children: `捲門安裝位置\n捲門安裝位置\n捲門安裝位置\n捲門安裝位置\n`,
+          flex: cellCofig.subject.flex,
+        },
+        {
+          children: <MyButton_v2 label="回簽" px="px28" py="py6" />,
+          width: cellCofig.reply.width,
+        },
+      ],
+    },
+  ],
+};
+
+const fakeTable: Ttable = {
+  thead: fakeThead,
+  tbody: fakeTbody,
 };
