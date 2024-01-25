@@ -19,6 +19,7 @@ type TmyBtn = {
   img?: string;
   preImg?: keyof typeof preImgList;
   px?: 'px22' | 'px28' | 'px32' | 'px34' | 'px44' | 'px2227';
+  py?: 'py4' | 'py6' | 'py8' | 'py10';
   theme?: 'danger' | 'transparent' | undefined;
   // https://4x.ant.design/components/button-cn/#
   onClick?: MouseEventHandler<HTMLElement> | undefined;
@@ -37,6 +38,7 @@ export default function MyButton_v2({
   img,
   preImg,
   px,
+  py,
   theme,
   onClick,
   className,
@@ -55,7 +57,14 @@ export default function MyButton_v2({
       {!href && (
         <Button
           {...buttonProps}
-          className={classNames(scss.button, theme && scss[theme], px && scss[px], className)}
+          className={classNames(
+            //
+            scss.button,
+            theme && scss[theme],
+            px && scss[px],
+            py && scss[py],
+            className
+          )}
           onClick={onClick}
           loading={isLoading}
           disabled={disabled}

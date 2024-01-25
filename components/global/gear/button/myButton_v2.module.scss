@@ -54,6 +54,24 @@
     padding-left: 22px;
     padding-right: 27px;
   }
+
+  &.py10 {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  &.py8 {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  &.py6 {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+  &.py4 {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
   &.danger {
     border-color: #ea1833;
     > span {
