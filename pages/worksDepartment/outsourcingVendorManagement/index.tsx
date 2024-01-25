@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import Link, { LinkProps } from 'next/link';
 import classNames from 'classnames';
 
@@ -12,6 +13,9 @@ import scss from './index.module.scss';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 export default function OutsourcingVendorManagement() {
+  const router = useRouter();
+
+  // --------------------------------------------------------------
   const rowArr: Tcontrol['rowArr'] = fakeData.map((data) => {
     const { id, name, phoneNumber, receiptDate } = data;
     const dateStr = getTaiwanDateStr(receiptDate, { withUnit: true }) ?? '';
@@ -52,7 +56,9 @@ export default function OutsourcingVendorManagement() {
     {
       type: 'myButton',
       label: '新增',
-      onClick: () => {},
+      onClick: () => {
+        router.push('/worksDepartment/outsourcingVendorManagement/edit');
+      },
     },
   ];
 
