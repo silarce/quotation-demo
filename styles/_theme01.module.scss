@@ -1,0 +1,17 @@
+
+
+:export {
+  colors_main: theme("colors.main");
+  colors_sub: theme("colors.sub");
+  colors_text: theme("colors.text");
+  colors_active: theme("colors.active");
+  colors_border: theme("colors.border");
+  colors_bgc01: theme("colors.bgc01");
+  colors_bgc02: theme("colors.bgc02");
+  colors_hoverBgc: theme("colors.hoverBgc");
+  colors_chosenBgc: theme("colors.chosenBgc");
+  colors_danger: theme("colors.danger");
+  colors_success: theme("colors.success");
+  //
+  width_table: theme("width.table");
+}
