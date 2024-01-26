@@ -168,6 +168,34 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const userId = userInfo?.employee?.id;
 
   // -----------------------------------------------------
+
+  let reviewSalesEmployeeId: string | undefined = undefined;
+  let reviewWorkDirectorEmployeeId: string | undefined = undefined;
+  let reviewSupervisorEmployeeId: string | undefined = undefined;
+  let reviewManagerEmployeeId: string | undefined = undefined;
+
+  let isReviewer = false;
+  let isSales = false;
+  let isWorkDirector = false;
+  let isSupervisor = false;
+  let isManager = false;
+
+  let salesReviewedAt: string | null | undefined = undefined;
+  let supervisorReviewedAt: string | null | undefined = undefined;
+  let workDirectorReviewedAt: string | null | undefined = undefined;
+  let managerReviewedAt: string | null | undefined = undefined;
+
+  let toSalesAt: string | null | undefined = undefined;
+  let toSupervisorAt: string | null | undefined = undefined;
+  let toWorkDirectorAt: string | null | undefined = undefined;
+  let toManagerAt: string | null | undefined = undefined;
+
+  //
+  let isAttach = undefined;
+  //
+  let isAllReviewedBeforePending = false;
+
+  // -----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // 是否可編輯
   const [disabled, setDisabled] = useState(true);
@@ -175,6 +203,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   const [reviewFormShow, setReviewFormShow] = useState(false);
   const [reviewModalShow, setReviewModalShow] = useState(false);
+
+  const [showPdf, setShowPdf] = useState(false);
+  const [showPdf_part, setShowPdf_part] = useState(false);
+
+  const [showMemoModal, setShowMemoModal] = useState(false);
+
   // -----------------------------------------------------
 
   // 複製報價單之客戶狀態
@@ -259,7 +293,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const verifyForm = latestContent?.verifyForm;
   const attachedToContract = quotationData?.attachedToContract;
 
-  const isAttach = attachedToContract ? true : undefined;
+  isAttach = attachedToContract ? true : undefined;
+
+  reviewSalesEmployeeId = latestContent?.reviewSalesEmployee?.id;
+  reviewWorkDirectorEmployeeId = latestContent?.reviewWorkDirectorEmployee?.id;
+  reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
+  reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
+
+  salesReviewedAt = latestContent?.salesReviewedAt;
+  supervisorReviewedAt = latestContent?.supervisorReviewedAt;
+  workDirectorReviewedAt = latestContent?.workDirectorReviewedAt;
+  managerReviewedAt = latestContent?.managerReviewedAt;
+
+  toSalesAt = latestContent?.toSalesAt;
+  toSupervisorAt = latestContent?.toSupervisorAt;
+  toWorkDirectorAt = latestContent?.toWorkDirectorAt;
+  toManagerAt = latestContent?.toManagerAt;
+
+  const isSendToReview = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -309,21 +360,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return !(fileId && willDelete && !isNew);
     });
     setFileInfoArr(theFileInfoArr);
-
-    // 已經不能使用，也不需要使用
-    // for (const info of fileInfoArr) {
-    //   const { fileId, willDelete, isNew } = info;
-
-    //   if (!fileId || !willDelete || isNew) {
-    //     continue;
-    //   }
-
-    //   try {
-    //     await apiDelQuotation_id_attachments(newContentId, fileId);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
 
     // 現在每個content都是獨立的，因此每次都必須重新上傳舊有的附件
     // 因此以url取得File後上傳
@@ -866,42 +902,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   };
 
-  // ----------------------------------------------------------------
-
   // ---------------------------------------------------------
-
-  let isReviewer = false;
-  let isSales = false;
-  let isWorkDirector = false;
-  let isSupervisor = false;
-  let isManager = false;
-
-  const reviewSalesEmployeeId = latestContent?.reviewSalesEmployee?.id;
-  const reviewWorkDirectorEmployeeId = latestContent?.reviewWorkDirectorEmployee?.id;
-  const reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
-  const reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
-
-  const {
-    salesReviewedAt,
-    supervisorReviewedAt,
-    workDirectorReviewedAt,
-    managerReviewedAt,
-
-    toSalesAt,
-    toSupervisorAt,
-    toWorkDirectorAt,
-    toManagerAt,
-  } = latestContent ?? {};
-
-  let isAllReviewedBeforePending = false;
 
   if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
     if (salesReviewedAt && supervisorReviewedAt && managerReviewedAt) {
       isAllReviewedBeforePending = true;
     }
   }
-
-  const isSendToReview = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
 
   if (userId) {
     if (userId === reviewSalesEmployeeId && toSalesAt) {
@@ -984,24 +991,20 @@ function TheQuotation({ router }: { router: NextRouter }) {
     })();
   }, [lastestContentId]);
 
-  // const [workDirector, setworkDirector] = useState<TemployeeDto | null>();
-  // const [supervisor, setSupervisor] = useState<TemployeeDto | null>();
-  // const [sales, setSales] = useState<TemployeeDto | null>();
-
   const [workDirector, setworkDirector] = useState<{
     emp: TemployeeDto | null;
-    workDirectorReviewedAt: string | null | undefined;
-    toWorkDirectorAt: string | null | undefined;
+    workDirectorReviewedAt: string | null | undefined; // 好像是多餘的
+    toWorkDirectorAt: string | null | undefined; // 好像是多餘的
   }>();
   const [supervisor, setSupervisor] = useState<{
     emp: TemployeeDto | null;
-    supervisorReviewedAt: string | null | undefined;
-    toSupervisorAt: string | null | undefined;
+    supervisorReviewedAt: string | null | undefined; // 好像是多餘的
+    toSupervisorAt: string | null | undefined; // 好像是多餘的
   }>();
   const [sales, setSales] = useState<{
     emp: TemployeeDto | null;
-    salesReviewedAt: string | null | undefined;
-    toSalesAt: string | null | undefined;
+    salesReviewedAt: string | null | undefined; // 好像是多餘的
+    toSalesAt: string | null | undefined; // 好像是多餘的
   }>();
 
   useEffect(() => {
@@ -1103,15 +1106,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   // --------------------------------------------------------------------------
-
-  const [showPdf, setShowPdf] = useState(false);
-  const [showPdf_part, setShowPdf_part] = useState(false);
-
-  // --------------------------------------------------------------------------
-
-  // --------------------------------------------------------------------------
-
-  const [showMemoModal, setShowMemoModal] = useState(false);
 
   const inputModalOnConfirm = (v: string) => {
     if (!v) {
