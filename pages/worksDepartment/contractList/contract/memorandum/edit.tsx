@@ -6,6 +6,21 @@ import classNames from 'classnames';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
+// antd
+import { Image, Upload } from 'antd';
+
+// ui
+import {
+  Wrapper,
+  Wrapper_inpuSel_01,
+  inputSelProps,
+  WrappedTextarea,
+} from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
+
+// gear
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import CustomerSelector, { TcustomerDto } from 'components/global/gear/modal/customerSelector';
+
 import scss from './edit.module.scss';
 
 // ====================================================================
@@ -22,6 +37,20 @@ export default function Edit() {
   // ---------------------------------------------------------------------------
 
   const [disabled, setDisabled] = useState(false);
+
+  // ---------------------------------------------------------------------------
+
+  const [selectorTarget, setSelectorTarget] = useState<'reciver' | 'sender'>();
+  const [reciver, setReciver] = useState<TcustomerDto>();
+  const [sender, setSender] = useState<TcustomerDto>();
+
+  const onSelectorConfirm = (customer: TcustomerDto) => {
+    if (selectorTarget === 'reciver') {
+      setReciver(customer);
+    } else if (selectorTarget === 'sender') {
+      setSender(customer);
+    }
+  };
 
   // ---------------------------------------------------------------------------
   const panelList_disabled: TpanelList = [
@@ -84,8 +113,94 @@ export default function Edit() {
       <PageHeader contractNumber={'foooo'} panelList={panelList} />
 
       <div>
-        <div></div>
+        <Wrapper>
+          <Wrapper_inpuSel_01>
+            <InputSel
+              {...inputSelProps}
+              caption="受文者"
+              showBaseline="auto"
+              disabled={disabled}
+              onClick={() => setSelectorTarget('reciver')}
+              //
+              inputProps={{
+                props: {
+                  value: reciver?.name ?? '',
+                  placeholder: '請選擇受文者',
+                },
+              }}
+            />
+            <InputSel
+              {...inputSelProps}
+              caption="日期"
+              showBaseline="auto"
+              disabled={disabled}
+              //
+              datePickerProps={{}}
+            />
+            <InputSel
+              {...inputSelProps}
+              caption="發文者"
+              showBaseline="auto"
+              disabled={disabled}
+              onClick={() => setSelectorTarget('sender')}
+              //
+              inputProps={{
+                props: {
+                  value: sender?.name ?? '',
+                  placeholder: '請選擇發文者',
+                },
+              }}
+            />
+            <InputSel
+              {...inputSelProps}
+              caption="發文字號"
+              showBaseline="auto"
+              disabled={disabled}
+              //
+              inputProps={{}}
+            />
+            <InputSel
+              {...inputSelProps}
+              caption="主旨"
+              showBaseline="auto"
+              disabled={disabled}
+              //
+              inputProps={{}}
+              className="col-span-2"
+            />
+          </Wrapper_inpuSel_01>
+          {/* 說明 */}
+          <WrappedTextarea disabled={disabled} />
+          {/* 附件 */}
+
+          <div className={scss.attachmentContainer}>
+            <div className={scss.caption}>
+              <span>附件</span>
+            </div>
+
+            <div className={scss.uploadPanel}></div>
+            {/* <div className={scss.imgList}>
+              <Image src="https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg" />
+              <Image src="https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg" />
+              <Image src="https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg" />
+              <Image src="https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg" />
+            </div> */}
+          </div>
+
+          {/*  */}
+        </Wrapper>
       </div>
+      <CustomerSelector
+        showModal={!!selectorTarget}
+        onConfirm={(arr) => {
+          const customer = arr[0];
+
+          if (customer) {
+            onSelectorConfirm(customer);
+          }
+        }}
+        onCancel={() => setSelectorTarget(undefined)}
+      />
     </SubLayer>
   );
 }
