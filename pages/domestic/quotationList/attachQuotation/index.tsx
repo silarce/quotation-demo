@@ -160,6 +160,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   let toWorkDirectorAt: string | null | undefined = undefined;
   let toManagerAt: string | null | undefined = undefined;
 
+  let isSendToReview = false;
+  let isSendToReview_pending = false;
+
   //
   const isAttach = true;
   //
@@ -884,7 +887,8 @@ latestContentProdArr為這次追加追減的主產品
     }
   }
 
-  const isSendToReview = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
+  isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toManagerAt);
+  isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
 
   if (userId) {
     if (userId === reviewSalesEmployeeId && toSalesAt) {
@@ -1945,7 +1949,7 @@ latestContentProdArr為這次追加追減的主產品
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
-        forbidden={status === 'Pending' && isSendToReview}
+        forbidden={status === 'Pending' && isSendToReview_pending}
         close={() => setReviewFormShow(false)}
         contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
         contractName={quotationData?.latestContent.projectName ?? ''}

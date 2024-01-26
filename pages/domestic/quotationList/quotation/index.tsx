@@ -190,6 +190,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   let toWorkDirectorAt: string | null | undefined = undefined;
   let toManagerAt: string | null | undefined = undefined;
 
+  let isSendToReview = false;
+  let isSendToReview_pending = false;
+
   //
   let isAttach = undefined;
   //
@@ -310,7 +313,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   toWorkDirectorAt = latestContent?.toWorkDirectorAt;
   toManagerAt = latestContent?.toManagerAt;
 
-  const isSendToReview = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
+  isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toManagerAt);
+  isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -1244,7 +1248,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       ? { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) }
       : null,
 
-    !contentId && status !== 'Pending' ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+    // !contentId && status !== 'Pending' ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
+    !isSendToReview && !contentId && status !== 'Pending'
+      ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) }
+      : null,
 
     !contentId && status === 'Bidding'
       ? {
@@ -2009,7 +2016,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
-        forbidden={status === 'Pending' && isSendToReview}
+        forbidden={status === 'Pending' && isSendToReview_pending}
         close={() => setReviewFormShow(false)}
         contractIdNumber={latestContent?.quotationNumber ?? ''}
         contractName={latestContent?.projectName ?? ''}
