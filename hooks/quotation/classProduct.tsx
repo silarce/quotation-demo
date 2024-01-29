@@ -348,29 +348,7 @@ class Class_product {
     }
     // ___________________________________________________________
 
-    this._doorGeneralSpecs = {
-      bearingHousingSize: this._prodData.bearingHousingSize ?? 0,
-      bearingHousingTotalLength: Number(this._prodData.bearingHousingTotalLength) ?? 0,
-      bearingInnerDiameter: this._prodData.bearingInnerDiameter ?? '',
-      bearingName: this._prodData.bearingName ?? '',
-      defaultMotorIndex: -1,
-      density: 0,
-      diameter: Number(this._prodData.diameter) ?? 0,
-      gapA: Number(this._prodData.gapA) ?? 0,
-      gapC: Number(this._prodData.gapC) ?? 0,
-      motors: [],
-      gearNumber: this._prodData.gearNumber ?? '',
-      sprocketWheelModel: this._prodData.sprocketWheelModel ?? '',
-      sprocketWheelTeethNumber: this._prodData.sprocketWheelTeethNumber ?? '',
-      sprocketWheelChains: Number(this._prodData.sprocketWheelChains) ?? 0,
-      weight: Number(this._prodData.weight) ?? 0,
-      slatLength: Number(this._prodData.slatLength) ?? 0,
-      guideRailLength: Number(this._prodData.guideRailLength) ?? 0,
-      headBoxLength: Number(this._prodData.headBoxLength) ?? 0,
-      thickness: this._prodData.thickness,
-    };
-
-    // const guideRailG_m = new Decimal(this._prodData.guideRailG).div(1000).toNumber();
+    this.resetDoorGeneralSpacs();
   } //  constructor close ===========================================================
 
   private reRender;
@@ -857,7 +835,7 @@ class Class_product {
       };
     })();
 
-    if (!body.fullWidth && !body.WG) {
+    if (body.fullWidth <= 0 && !body.WG) {
       this.isWgChanged = false;
 
       return false;
@@ -1831,6 +1809,31 @@ class Class_product {
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
+
+  resetDoorGeneralSpacs() {
+    this._doorGeneralSpecs = {
+      bearingHousingSize: this._prodData.bearingHousingSize ?? 0,
+      bearingHousingTotalLength: Number(this._prodData.bearingHousingTotalLength) ?? 0,
+      bearingInnerDiameter: this._prodData.bearingInnerDiameter ?? '',
+      bearingName: this._prodData.bearingName ?? '',
+      defaultMotorIndex: -1,
+      density: 0,
+      diameter: Number(this._prodData.diameter) ?? 0,
+      gapA: Number(this._prodData.gapA) ?? 0,
+      gapC: Number(this._prodData.gapC) ?? 0,
+      motors: [],
+      gearNumber: this._prodData.gearNumber ?? '',
+      sprocketWheelModel: this._prodData.sprocketWheelModel ?? '',
+      sprocketWheelTeethNumber: this._prodData.sprocketWheelTeethNumber ?? '',
+      sprocketWheelChains: Number(this._prodData.sprocketWheelChains) ?? 0,
+      weight: Number(this._prodData.weight) ?? 0,
+      slatLength: Number(this._prodData.slatLength) ?? 0,
+      guideRailLength: Number(this._prodData.guideRailLength) ?? 0,
+      headBoxLength: Number(this._prodData.headBoxLength) ?? 0,
+      thickness: this._prodData.thickness,
+    };
+  }
+
   // 從_availableComponents撈出主產品下拉式選單的選項
   private retrieveOptions() {
     if (!this._availableComponents) {
@@ -2415,54 +2418,6 @@ class Class_product {
     this.reRender();
   }
 
-  // set WG(v) {
-  //   this._prodData.WG = v;
-  //   const w = calcW({
-  //     WG: Number(v) || 0,
-  //     G: Number(this.guildRailG) || 0,
-  //   });
-  //   this._theW = String(w);
-
-  //   this.onWGChange();
-  //   this.reRender();
-  // }
-
-  // set WG_noChangeW(v: string) {
-  //   this._prodData.WG = v;
-  //   // this.onWGChange();
-  //   // this.reRender();
-  // }
-
-  // async onWGChange() {
-  //   const callReq = async () => {
-  //     const fullWidth = await calcFullwidthWithWG({
-  //       body: {
-  //         modelName: this.doorType as TpcgsPrams['modelName'],
-  //         height: Number(this.height) * 1000,
-  //         isAntiTyphoon: this.typhoonProtection,
-  //         WG: Number(this.WG) * 1000,
-  //       },
-  //     });
-
-  //     this._prodData.fullWidth = String(fullWidth / 1000);
-
-  //     this.area = this.calcArea();
-  //     this.clearProd();
-  //     // this.calcChangeAccePrice();
-  //     this.shouldCall_cgs = true;
-  //     this.callAllReq();
-  //   };
-
-  //   if (this.timeoutId_calcFullWidth) {
-  //     clearTimeout(this.timeoutId_calcFullWidth);
-  //   }
-
-  //   this.timeoutId_calcFullWidth = setTimeout(async () => {
-  //     await callReq();
-  //     this.reRender();
-  //   }, 800);
-  // }
-
   // ------------------------------------
 
   get W() {
@@ -2749,13 +2704,19 @@ class Class_product {
     this._prodData.horsepower = v;
 
     const { gapA, gapC } = lookup_hpToGapAGapC[v as keyof typeof lookup_hpToGapAGapC];
-    this._doorGeneralSpecs && (this._doorGeneralSpecs.gapA = gapA);
-    this._doorGeneralSpecs && (this._doorGeneralSpecs.gapC = gapC);
+
+    if (!this._doorGeneralSpecs) {
+      this.isDontClearProd = true;
+      this.resetDoorGeneralSpacs();
+    }
+
+    this._doorGeneralSpecs!.gapA = gapA;
+    this._doorGeneralSpecs!.gapC = gapC;
 
     const W = calcW_2({
       fullWidth: this.fullWidth_mm,
-      gapA: Number(this._doorGeneralSpecs?.gapA || '0'),
-      gapC: Number(this._doorGeneralSpecs?.gapC || '0'),
+      gapA: Number(this._doorGeneralSpecs!.gapA || '0'),
+      gapC: Number(this._doorGeneralSpecs!.gapC || '0'),
       G: this.guildRailG_mm,
     });
 
