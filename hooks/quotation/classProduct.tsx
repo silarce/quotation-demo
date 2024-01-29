@@ -3490,25 +3490,19 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     // 'guildRailG',
     'boxB',
     'boxD',
+    'horsepower',
+    'doorTrack',
+    'typhoonProtection',
+    'doorTrackSilencerStrip', // 門軌消音條
     'thickness',
     'area',
     'volume',
     'material',
     'surface',
-    'doorTrack',
-    'horsepower',
-    'quantity',
-    'price', // 牌價
-    'dualPrice', // 牌價複價
-    'unitPrice', //單價
-    'totalPrice', // 複價
-    'typhoonProtection',
     // bounceDoor不再使用，直接以bounceDoorWidth代替
     // 'bounceDoor',
     'bounceDoorWidth',
-    'notes',
 
-    // 經理說這些要隱藏，不要顯示出來
     // 'motor', // 馬達廠商
     // 'voltage', // 電壓
     // 'phase', // 相數
@@ -3517,13 +3511,18 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     // 'motorLockBox', // 馬達鎖盒
     'doorTrackThick', // 門軌厚度
     // 'rollerSpec', // 捲軸規格
-    'doorTrackSilencerStrip', // 門軌消音條
-    'onePieceRollUpBox', // 一體式捲箱
     'rollUpBoxThick', // 捲箱厚度
     'close', // 開閉方式
+    'onePieceRollUpBox', // 一體式捲箱
     'isULGuideRail',
     // 'bottomBarAngleIron', // 底座角鐵
     // 'bottomBarPlate', // 底座板
+    'notes', // 備註
+    'quantity',
+    'price', // 牌價
+    'dualPrice', // 牌價複價
+    'unitPrice', //單價
+    'totalPrice', // 複價
   ];
 };
 
