@@ -2403,7 +2403,16 @@ class Class_product {
 
     this._prodData.WG = str;
 
-    // 改變了WG，就要呼叫
+    // 沒有horsepower就沒有gapA與gapC就無法計算正確的L
+    // 沒有boxB，呼叫api會錯誤
+    // 所以必須要在這邊做判斷
+    if (!this.horsepower || !this.boxB) {
+      this.reRender();
+
+      return;
+    }
+
+    // 改變了WG並改變了L，就要呼叫
     // 之後呼叫的req_calcGeneralSpec的時候就會把hp帶入
     this.isWgChanged = true;
 
