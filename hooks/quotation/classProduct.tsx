@@ -2383,7 +2383,7 @@ class Class_product {
     this.reRender();
   }
   get fullWidth_mm() {
-    return new Decimal(this._prodData.fullWidth).mul(1000).toNumber();
+    return new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber();
   }
 
   get WG_mm() {
