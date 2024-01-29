@@ -62,6 +62,7 @@ import {
   optionsCreator_bottomBarPlate_303AS,
   optionsCreator_boxB_SJ302,
   optionsCreator_boxB_SJ303A,
+  optionsCreator_horsePower,
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
@@ -1924,7 +1925,8 @@ class Class_product {
     if (Object.keys(horsePowerList).length > 0) {
       this.options_horsepower = Object.values(horsePowerList);
     } else {
-      this.options_horsepower = undefined;
+      // this.options_horsepower = undefined;
+      this.options_horsepower = optionsCreator_horsePower();
     }
 
     if (this.options_horsepower) {
@@ -2068,7 +2070,7 @@ class Class_product {
   // 這個xxx要與key吻合，在tbody才能取得options_xxx
 
   // 這幾個會經由執行retrieveOptions()來設定
-  options_horsepower: Toption[] | undefined = undefined;
+  options_horsepower: Toption[] = optionsCreator_horsePower();
   options_motor: Toption[] | undefined = undefined;
   options_phase: Toption[] | undefined = undefined;
   options_voltage: Toption[] | undefined = undefined;
