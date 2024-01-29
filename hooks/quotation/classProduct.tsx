@@ -62,6 +62,7 @@ import {
   optionsCreator_bottomBarPlate_303AS,
   optionsCreator_boxB_SJ302,
   optionsCreator_boxB_SJ303A,
+  optionsCreator_horsePower,
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
@@ -347,29 +348,7 @@ class Class_product {
     }
     // ___________________________________________________________
 
-    this._doorGeneralSpecs = {
-      bearingHousingSize: this._prodData.bearingHousingSize ?? 0,
-      bearingHousingTotalLength: Number(this._prodData.bearingHousingTotalLength) ?? 0,
-      bearingInnerDiameter: this._prodData.bearingInnerDiameter ?? '',
-      bearingName: this._prodData.bearingName ?? '',
-      defaultMotorIndex: -1,
-      density: 0,
-      diameter: Number(this._prodData.diameter) ?? 0,
-      gapA: Number(this._prodData.gapA) ?? 0,
-      gapC: Number(this._prodData.gapC) ?? 0,
-      motors: [],
-      gearNumber: this._prodData.gearNumber ?? '',
-      sprocketWheelModel: this._prodData.sprocketWheelModel ?? '',
-      sprocketWheelTeethNumber: this._prodData.sprocketWheelTeethNumber ?? '',
-      sprocketWheelChains: Number(this._prodData.sprocketWheelChains) ?? 0,
-      weight: Number(this._prodData.weight) ?? 0,
-      slatLength: Number(this._prodData.slatLength) ?? 0,
-      guideRailLength: Number(this._prodData.guideRailLength) ?? 0,
-      headBoxLength: Number(this._prodData.headBoxLength) ?? 0,
-      thickness: this._prodData.thickness,
-    };
-
-    // const guideRailG_m = new Decimal(this._prodData.guideRailG).div(1000).toNumber();
+    this.resetDoorGeneralSpacs();
   } //  constructor close ===========================================================
 
   private reRender;
@@ -856,7 +835,7 @@ class Class_product {
       };
     })();
 
-    if (!body.fullWidth && !body.WG) {
+    if (body.fullWidth <= 0 && !body.WG) {
       this.isWgChanged = false;
 
       return false;
@@ -1830,6 +1809,31 @@ class Class_product {
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
+
+  resetDoorGeneralSpacs() {
+    this._doorGeneralSpecs = {
+      bearingHousingSize: this._prodData.bearingHousingSize ?? 0,
+      bearingHousingTotalLength: Number(this._prodData.bearingHousingTotalLength) ?? 0,
+      bearingInnerDiameter: this._prodData.bearingInnerDiameter ?? '',
+      bearingName: this._prodData.bearingName ?? '',
+      defaultMotorIndex: -1,
+      density: 0,
+      diameter: Number(this._prodData.diameter) ?? 0,
+      gapA: Number(this._prodData.gapA) ?? 0,
+      gapC: Number(this._prodData.gapC) ?? 0,
+      motors: [],
+      gearNumber: this._prodData.gearNumber ?? '',
+      sprocketWheelModel: this._prodData.sprocketWheelModel ?? '',
+      sprocketWheelTeethNumber: this._prodData.sprocketWheelTeethNumber ?? '',
+      sprocketWheelChains: Number(this._prodData.sprocketWheelChains) ?? 0,
+      weight: Number(this._prodData.weight) ?? 0,
+      slatLength: Number(this._prodData.slatLength) ?? 0,
+      guideRailLength: Number(this._prodData.guideRailLength) ?? 0,
+      headBoxLength: Number(this._prodData.headBoxLength) ?? 0,
+      thickness: this._prodData.thickness,
+    };
+  }
+
   // 從_availableComponents撈出主產品下拉式選單的選項
   private retrieveOptions() {
     if (!this._availableComponents) {
@@ -1924,7 +1928,8 @@ class Class_product {
     if (Object.keys(horsePowerList).length > 0) {
       this.options_horsepower = Object.values(horsePowerList);
     } else {
-      this.options_horsepower = undefined;
+      // this.options_horsepower = undefined;
+      this.options_horsepower = optionsCreator_horsePower();
     }
 
     if (this.options_horsepower) {
@@ -2068,7 +2073,7 @@ class Class_product {
   // 這個xxx要與key吻合，在tbody才能取得options_xxx
 
   // 這幾個會經由執行retrieveOptions()來設定
-  options_horsepower: Toption[] | undefined = undefined;
+  options_horsepower: Toption[] = optionsCreator_horsePower();
   options_motor: Toption[] | undefined = undefined;
   options_phase: Toption[] | undefined = undefined;
   options_voltage: Toption[] | undefined = undefined;
@@ -2381,7 +2386,7 @@ class Class_product {
     this.reRender();
   }
   get fullWidth_mm() {
-    return new Decimal(this._prodData.fullWidth).mul(1000).toNumber();
+    return new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber();
   }
 
   get WG_mm() {
@@ -2398,7 +2403,16 @@ class Class_product {
 
     this._prodData.WG = str;
 
-    // 改變了WG，就要呼叫
+    // 沒有horsepower就沒有gapA與gapC就無法計算正確的L
+    // 沒有boxB，呼叫api會錯誤
+    // 所以必須要在這邊做判斷
+    if (!this.horsepower || !this.boxB) {
+      this.reRender();
+
+      return;
+    }
+
+    // 改變了WG並改變了L，就要呼叫
     // 之後呼叫的req_calcGeneralSpec的時候就會把hp帶入
     this.isWgChanged = true;
 
@@ -2412,54 +2426,6 @@ class Class_product {
 
     this.reRender();
   }
-
-  // set WG(v) {
-  //   this._prodData.WG = v;
-  //   const w = calcW({
-  //     WG: Number(v) || 0,
-  //     G: Number(this.guildRailG) || 0,
-  //   });
-  //   this._theW = String(w);
-
-  //   this.onWGChange();
-  //   this.reRender();
-  // }
-
-  // set WG_noChangeW(v: string) {
-  //   this._prodData.WG = v;
-  //   // this.onWGChange();
-  //   // this.reRender();
-  // }
-
-  // async onWGChange() {
-  //   const callReq = async () => {
-  //     const fullWidth = await calcFullwidthWithWG({
-  //       body: {
-  //         modelName: this.doorType as TpcgsPrams['modelName'],
-  //         height: Number(this.height) * 1000,
-  //         isAntiTyphoon: this.typhoonProtection,
-  //         WG: Number(this.WG) * 1000,
-  //       },
-  //     });
-
-  //     this._prodData.fullWidth = String(fullWidth / 1000);
-
-  //     this.area = this.calcArea();
-  //     this.clearProd();
-  //     // this.calcChangeAccePrice();
-  //     this.shouldCall_cgs = true;
-  //     this.callAllReq();
-  //   };
-
-  //   if (this.timeoutId_calcFullWidth) {
-  //     clearTimeout(this.timeoutId_calcFullWidth);
-  //   }
-
-  //   this.timeoutId_calcFullWidth = setTimeout(async () => {
-  //     await callReq();
-  //     this.reRender();
-  //   }, 800);
-  // }
 
   // ------------------------------------
 
@@ -2747,13 +2713,19 @@ class Class_product {
     this._prodData.horsepower = v;
 
     const { gapA, gapC } = lookup_hpToGapAGapC[v as keyof typeof lookup_hpToGapAGapC];
-    this._doorGeneralSpecs && (this._doorGeneralSpecs.gapA = gapA);
-    this._doorGeneralSpecs && (this._doorGeneralSpecs.gapC = gapC);
+
+    if (!this._doorGeneralSpecs) {
+      this.isDontClearProd = true;
+      this.resetDoorGeneralSpacs();
+    }
+
+    this._doorGeneralSpecs!.gapA = gapA;
+    this._doorGeneralSpecs!.gapC = gapC;
 
     const W = calcW_2({
       fullWidth: this.fullWidth_mm,
-      gapA: Number(this._doorGeneralSpecs?.gapA || '0'),
-      gapC: Number(this._doorGeneralSpecs?.gapC || '0'),
+      gapA: Number(this._doorGeneralSpecs!.gapA || '0'),
+      gapC: Number(this._doorGeneralSpecs!.gapC || '0'),
       G: this.guildRailG_mm,
     });
 
@@ -3518,25 +3490,19 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     // 'guildRailG',
     'boxB',
     'boxD',
+    'horsepower',
+    'doorTrack',
+    'typhoonProtection',
+    'doorTrackSilencerStrip', // 門軌消音條
     'thickness',
     'area',
     'volume',
     'material',
     'surface',
-    'doorTrack',
-    'horsepower',
-    'quantity',
-    'price', // 牌價
-    'dualPrice', // 牌價複價
-    'unitPrice', //單價
-    'totalPrice', // 複價
-    'typhoonProtection',
     // bounceDoor不再使用，直接以bounceDoorWidth代替
     // 'bounceDoor',
     'bounceDoorWidth',
-    'notes',
 
-    // 經理說這些要隱藏，不要顯示出來
     // 'motor', // 馬達廠商
     // 'voltage', // 電壓
     // 'phase', // 相數
@@ -3545,13 +3511,18 @@ const prodkeyArrOri: () => TprodKey[] = () => {
     // 'motorLockBox', // 馬達鎖盒
     'doorTrackThick', // 門軌厚度
     // 'rollerSpec', // 捲軸規格
-    'doorTrackSilencerStrip', // 門軌消音條
-    'onePieceRollUpBox', // 一體式捲箱
     'rollUpBoxThick', // 捲箱厚度
     'close', // 開閉方式
+    'onePieceRollUpBox', // 一體式捲箱
     'isULGuideRail',
     // 'bottomBarAngleIron', // 底座角鐵
     // 'bottomBarPlate', // 底座板
+    'notes', // 備註
+    'quantity',
+    'price', // 牌價
+    'dualPrice', // 牌價複價
+    'unitPrice', //單價
+    'totalPrice', // 複價
   ];
 };
 

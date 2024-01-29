@@ -125,21 +125,6 @@ export const optionsCreator_doorModel_2 = (props: { haveEmpty?: boolean } = {}):
 export const optionsCreator_doorForm = (props: { haveEmpty?: boolean } = {}): Toption[] => {
   const { haveEmpty } = props;
 
-  // annotationAndQuotationRangeType
-  const valueArr: annotationAndQuotationRangeType[] = [
-    'normal',
-    'anti-typhoon',
-    'heat-protection',
-    'heat-protection-smoke-covering',
-  ];
-
-  const list = {
-    normal: 'aaaa',
-    'anti-typhoon': 'aaaa',
-    'heat-protection': 'aaaa',
-    'heat-protection-smoke-covering': 'aaaa',
-  };
-
   const arr = [
     { value: 'normal', label: annotationAndQuotationRangeTypeLookup['normal'] },
     { value: 'anti-typhoon', label: annotationAndQuotationRangeTypeLookup['anti-typhoon'] },
@@ -149,12 +134,6 @@ export const optionsCreator_doorForm = (props: { haveEmpty?: boolean } = {}): To
       label: annotationAndQuotationRangeTypeLookup['heat-protection-smoke-covering'],
     },
   ];
-  // const arr = [
-  //   { value: valueArr[0], label: '一般' },
-  //   { value: valueArr[1], label: '防颱' },
-  //   { value: valueArr[2], label: '阻熱' },
-  //   { value: valueArr[3], label: '阻熱遮煙' },
-  // ];
 
   if (haveEmpty) {
     addEmpty(arr);
@@ -231,15 +210,15 @@ export const optionsCreator_closingType = createOptionsCreator({
 
 export const optionsCreator_horsePower = createOptionsCreator({
   optionsArr: [
-    { value: '1/4HP', label: '1/4HP' },
-    { value: '1/3HP', label: '1/3HP' },
-    { value: '1/2HP', label: '1/2HP' },
-    { value: '3/4HP', label: '3/4HP' },
-    { value: '1HP', label: '1HP' },
-    { value: '1 1/2HP', label: '1 1/2HP' },
-    { value: '2HP', label: '2HP' },
-    { value: '3HP', label: '3HP' },
-    { value: '5HP', label: '5HP' },
+    { value: '1/4HP', label: '1/4HP', hpValue: '0.25' },
+    { value: '1/3HP', label: '1/3HP', hpValue: '0.33' },
+    { value: '1/2HP', label: '1/2HP', hpValue: '0.5' },
+    { value: '3/4HP', label: '3/4HP', hpValue: '0.75' },
+    { value: '1HP', label: '1HP', hpValue: '1' },
+    { value: '1 1/2HP', label: '1 1/2HP', hpValue: '1.5' },
+    { value: '2HP', label: '2HP', hpValue: '2' },
+    { value: '3HP', label: '3HP', hpValue: '3' },
+    { value: '5HP', label: '5HP', hpValue: '5' },
   ],
 });
 
