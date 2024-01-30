@@ -145,6 +145,8 @@ export default function OutsourcingPricing() {
         {/*  */}
         <VendorMonthPanel className={classNames('m-auto mb-5 mt-[40px]', !isShowVendorMonthList && 'hidden')} />
         {/*  */}
+        <MonthVendorPanel className={classNames('m-auto mb-5 mt-[40px]', !isShowMonthVendorList && 'hidden')} />
+        {/*  */}
       </div>
     </SubLayer>
   );
@@ -224,6 +226,100 @@ const VendorMonthPanel = ({ className }: { className?: string }) => {
   );
 };
 
+const MonthVendorPanel = ({ className }: { className?: string }) => {
+  const router = useRouter();
+
+  // ----------------------------------------------------------------------
+
+  const [activeTab_vendor, setActiveTab_vendor] = useState<number>(0);
+
+  const tabArr: Tcontrol_tabCarousel['tabArr'] = useMemo(() => {
+    const dateList = generateMonthsSinceNow();
+
+    let dateArr: string[] = []; //  [2020年1月,2020年2月,2020年3月]
+    Object.entries(dateList).forEach(([year, monthArr]) => {
+      monthArr.forEach((month) => {
+        const twYear = String(Number(year) - 1911);
+        dateArr.push(`${twYear}年${month}月`);
+      });
+    });
+
+    dateArr = dateArr.reverse();
+
+    const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
+      return {
+        label: date,
+        onClick: ({ ref_slider }) => {
+          setActiveTab_vendor(index);
+          ref_slider.current.slickGoTo(index);
+        },
+      };
+    });
+
+    return arr;
+  }, []);
+
+  const control_tabCarousel: Tcontrol_tabCarousel = {
+    activeIndex: activeTab_vendor,
+    tabArr,
+  };
+
+  // ----------------------------------------------------------------------
+
+  const control_table: Ttable['tbody']['rowArr'] = useMemo(() => {
+    return fakeDataArr.map((data) => {
+      return {
+        minHeight: tableConfig.row.minHeight,
+        onClick: () => {
+          router.push({
+            pathname: router.pathname + '/edit',
+          });
+        },
+        cellArr: [
+          {
+            children: data.name,
+            width: cellCofig.vendor.width,
+          },
+          {
+            children: data.phoneNumber,
+            width: cellCofig.phoneNumber.width,
+          },
+        ],
+      };
+    });
+  }, []);
+
+  const fakeTable: Ttable = {
+    thead: fakeThead,
+    tbody: {
+      rowArr: control_table,
+    },
+  };
+
+  // ----------------------------------------------------------------------
+  return (
+    <div className={classNames(className)}>
+      <TabCarousel02 control={control_tabCarousel} />
+      <Wrapper_tab
+        className={classNames('m-auto')}
+        childrenOption={{
+          noBorderTop: true,
+        }}
+        stickyTop={{
+          top: 40,
+        }}
+      >
+        <Table01 {...fakeTable} />
+      </Wrapper_tab>
+    </div>
+  );
+};
+
+// ====================================================================
+// ====================================================================
+// ====================================================================
+// ====================================================================
+// ====================================================================
 // ====================================================================
 
 function generateRandomDate(): string {
