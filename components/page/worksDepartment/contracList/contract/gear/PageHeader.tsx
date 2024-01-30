@@ -129,7 +129,7 @@ export default function PageHeader({
     },
     {
       label: '備忘錄',
-      disabled: true,
+      // disabled: true,
       href: {
         pathname: `${pathHead}/memorandum`,
         query: {

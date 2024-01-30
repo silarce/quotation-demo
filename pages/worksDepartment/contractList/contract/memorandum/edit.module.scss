@@ -1,0 +1,18 @@
+.attachmentContainer {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 80px auto;
+  gap: 20px;
+  .caption {
+    > span {
+      color: theme("colors.main");
+      font-size: 18px;
+      font-weight: 400;
+    }
+  }
+  .imgList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+}

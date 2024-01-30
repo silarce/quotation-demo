@@ -22,6 +22,9 @@ import {
   useCustomers,
   useGetCustomers_infinite,
 } from 'js/api/api_customer';
+
+export type { TcustomerDto };
+
 // ====================================================================
 
 const customerTypeArr = optionsCreator_customerType({ emptyOption: true });

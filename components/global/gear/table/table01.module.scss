@@ -1,0 +1,49 @@
+.table {
+  width: theme("width.table");
+}
+
+.thead {
+  .row {
+    border-top: solid 1px theme("colors.border");
+  }
+  .cell {
+    border: none;
+    background-color: theme("colors.bgc01");
+    > span {
+      color: theme("colors.main");
+    }
+  }
+}
+.tbody {
+  .rowWrapper:nth-last-of-type(1) {
+    .row {
+      border: none;
+    }
+  }
+}
+
+.row {
+  display: flex;
+  border-bottom: solid 1px theme("colors.border");
+  &.clickable {
+    cursor: pointer;
+  }
+  > * {
+    flex: none;
+  }
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-right: solid 1px theme("colors.border");
+  &:nth-last-of-type(1) {
+    border: none;
+  }
+  > span {
+    font-size: 16px;
+    white-space: pre-wrap;
+  }
+}
