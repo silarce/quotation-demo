@@ -16,7 +16,9 @@ export const useHrManageLinkArr = () => {
 
   const dailyReporterReviewerSetting = {
     label: '日報表審核設定',
-    href: '/setting/hrManage/dailyReporterSetting',
+    linkProps: {
+      href: '/setting/hrManage/dailyReporterSetting',
+    },
   };
 
   let arr: Tlink[] = [];
