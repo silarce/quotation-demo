@@ -5,10 +5,11 @@
 .thead {
   .row {
     border-top: solid 1px theme("colors.border");
+    background-color: theme("colors.bgc01");
   }
   .cell {
     border: none;
-    background-color: theme("colors.bgc01");
+    // background-color: theme("colors.bgc01");
     > span {
       color: theme("colors.main");
     }
