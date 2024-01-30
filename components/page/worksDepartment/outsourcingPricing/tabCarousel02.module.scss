@@ -1,0 +1,38 @@
+.slider {
+  margin: auto;
+  width: 1100px;
+}
+
+.tab {
+  > div {
+    min-width: 160px;
+    border-radius: 100px;
+    // height: 40px;
+    padding: 10px;
+    margin: 0 12px;
+    text-align: center;
+    cursor: pointer;
+    background-color: transparent;
+    span {
+      // line-height: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: theme("colors.border");
+      white-space: nowrap;
+    }
+    &.active {
+      background-color: theme("colors.main");
+      span {
+        color: theme("colors.white");
+      }
+    }
+  }
+}
+
+.arrow {
+  &.fad {
+    path {
+      fill: theme("colors.border");
+    }
+  }
+}
