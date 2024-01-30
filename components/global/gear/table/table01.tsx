@@ -30,7 +30,7 @@ type Ttable = {
   style?: React.CSSProperties;
   thead: {
     cellArr: Tcell[];
-    rowProps?: Omit<Trow, 'children'>;
+    rowProps?: Omit<Trow, 'children' | 'onClick'>;
     className?: string;
     style?: React.CSSProperties;
     stickyTop?: {
@@ -59,7 +59,7 @@ const Table01 = ({
     <div className={classNames(scss.table, className)} style={style}>
       <div
         //
-        className={classNames(scss.thead, className)}
+        className={classNames(scss.thead)}
         style={{
           position: thead.stickyTop ? 'sticky' : undefined,
           top: thead.stickyTop?.top,
@@ -67,7 +67,7 @@ const Table01 = ({
           ...thead.style,
         }}
       >
-        <div className={scss.row} {...thead.rowProps}>
+        <Row_thead {...thead.rowProps}>
           {thead.cellArr.map((item, index) => {
             const { width, flex, justifyContent, className, style, children } = item;
 
@@ -84,8 +84,9 @@ const Table01 = ({
               </Cell>
             );
           })}
-        </div>
+        </Row_thead>
       </div>
+
       {/*  */}
       <div className={classNames(scss.tbody)}>
         {tbody.rowArr.map((row, rIndex) => {
@@ -142,6 +143,31 @@ const Row = ({ children, height, minHeight, maxHeight, className, style, onClick
         {children}
       </div>
     </CellWithBar>
+  );
+};
+
+const Row_thead = ({
+  //
+  children,
+  height,
+  minHeight,
+  maxHeight,
+  className,
+  style,
+}: Trow) => {
+  return (
+    <div
+      //
+      className={classNames(scss.row, className)}
+      style={{
+        height,
+        minHeight,
+        maxHeight,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
   );
 };
 
