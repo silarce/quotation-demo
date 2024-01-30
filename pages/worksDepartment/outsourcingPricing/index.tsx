@@ -4,6 +4,7 @@
 import { useState, useMemo } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
+import { useRouter } from 'next/router';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -13,19 +14,29 @@ import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/Pag
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
 import Table01, { Ttable } from 'components/global/gear/table/table01';
 import DateCollapse, { Tcontrol_dateCollapse } from 'components/page/worksDepartment/outsourcingPricing/dateCollapse';
+import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
 
 // css
 import scss from './index.module.scss';
+import { DeliveredProcedureOutlined } from '@ant-design/icons';
 
 // ========================================================
 type TfilterBy = 'vendor' | 'month';
 
 // ========================================================
 export default function OutsourcingPricing() {
+  const router = useRouter();
+
+  // ------------------------------------------------------------------------
   const [showListBy, setShowListBy] = useState<TfilterBy>('vendor');
 
-  const [sortByVendor, setSortByVendor] = useState<string>();
-  const [sortByDate, setSortByDate] = useState<`${number}-${number}`>();
+  const [isVendorMonth, setVendorMonth] = useState<string>();
+  const [isMonthVendor, setMonthVendor] = useState<`${number}-${number}`>();
+
+  const isShowVendorList = showListBy === 'vendor' && !isVendorMonth;
+  const isShowDateList = showListBy === 'month' && !isMonthVendor;
+  const isShowVendorMonthList = showListBy === 'vendor' && isVendorMonth;
+  const isShowMonthVendorList = showListBy === 'month' && isMonthVendor;
 
   // ------------------------------------------------------------------------
 
@@ -34,7 +45,7 @@ export default function OutsourcingPricing() {
       return {
         minHeight: tableConfig.row.minHeight,
         onClick: () => {
-          setSortByVendor(data.id);
+          setVendorMonth(data.id);
         },
         cellArr: [
           {
@@ -69,7 +80,13 @@ export default function OutsourcingPricing() {
         return {
           label: `${month}月`,
           onClick: () => {
-            setSortByDate(`${Number(year)}-${month}`);
+            if (showListBy === 'vendor') {
+              router.push({
+                pathname: router.pathname + '/edit',
+              });
+            } else {
+              setMonthVendor(`${Number(year)}-${month}`);
+            }
           },
         };
       });
@@ -85,7 +102,7 @@ export default function OutsourcingPricing() {
     return {
       panelArr,
     };
-  }, []);
+  }, [showListBy]);
 
   // ------------------------------------------------------------------------
   const tagList: TtagList = [
@@ -106,10 +123,10 @@ export default function OutsourcingPricing() {
   return (
     <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}>
       <PageHeader02 tagList={tagList} />
-
       <div>
+        {/*  */}
         <Wrapper_tab
-          className={classNames('m-auto mb-5', showListBy !== 'vendor' && 'hidden')}
+          className={classNames('m-auto mb-5', !isShowVendorList && 'hidden')}
           childrenOption={{
             noBorderTop: true,
           }}
@@ -119,11 +136,15 @@ export default function OutsourcingPricing() {
         >
           <Table01 {...fakeTable} />
         </Wrapper_tab>
-
+        {/*  */}
         <DateCollapse
-          className={classNames('m-auto mb-5 mt-[40px]', showListBy !== 'month' && 'hidden')}
+          className={classNames('m-auto mb-5 mt-[40px]', !isShowDateList && 'hidden')}
           control={control_dateCollapse}
         />
+
+        {/*  */}
+        <VendorMonthPanel className={classNames('m-auto mb-5 mt-[40px]', !isShowVendorMonthList && 'hidden')} />
+        {/*  */}
       </div>
     </SubLayer>
   );
@@ -134,6 +155,75 @@ export default function OutsourcingPricing() {
 // ====================================================================
 // ====================================================================
 // ====================================================================
+// ====================================================================
+
+const VendorMonthPanel = ({ className }: { className?: string }) => {
+  const router = useRouter();
+
+  // ----------------------------------------------------------------------
+
+  const [activeTab_vendor, setActiveTab_vendor] = useState<number>(0);
+
+  const tabArr: Tcontrol_tabCarousel['tabArr'] = useMemo(() => {
+    const arr: Tcontrol_tabCarousel['tabArr'] = fakeDataTempArr.map((data, index) => {
+      return {
+        label: data.name,
+        onClick: ({ ref_slider }) => {
+          setActiveTab_vendor(index);
+          ref_slider.current.slickGoTo(index);
+        },
+      };
+    });
+
+    return arr;
+  }, []);
+
+  const control_tabCarousel: Tcontrol_tabCarousel = {
+    activeIndex: activeTab_vendor,
+    tabArr,
+  };
+  // ----------------------------------------------------------------------
+
+  const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
+    const yearMonthList = generateMonthsSinceNow();
+
+    let panelArr: Tcontrol_dateCollapse['panelArr'] = Object.entries(yearMonthList).map(([year, monthArr]) => {
+      const twYear = String(Number(year) - 1911);
+
+      const cardList = monthArr.map((month) => {
+        return {
+          label: `${month}月`,
+          onClick: () => {
+            router.push({
+              pathname: router.pathname + '/edit',
+            });
+          },
+        };
+      });
+
+      return {
+        label: twYear,
+        cardArr: cardList,
+      };
+    });
+
+    panelArr = panelArr.reverse();
+
+    return {
+      panelArr,
+    };
+  }, []);
+
+  // ----------------------------------------------------------------------
+
+  return (
+    <div className={className}>
+      <TabCarousel02 control={control_tabCarousel} />
+      <DateCollapse className={classNames('m-auto mt-1')} control={control_dateCollapse} />
+    </div>
+  );
+};
+
 // ====================================================================
 
 function generateRandomDate(): string {
@@ -164,6 +254,26 @@ const fakeDataTempArr = [
   {
     name: '黃小強',
     phoneNumber: '0928-333-333',
+  },
+  {
+    name: '很長的名字很長的名字很長的名字',
+    phoneNumber: '0911-123-123',
+  },
+  {
+    name: '陳喵喵',
+    phoneNumber: '0911-111-111',
+  },
+  {
+    name: '林汪汪',
+    phoneNumber: '0911-111-222',
+  },
+  {
+    name: '嗚呼呼',
+    phoneNumber: '0911-111-456',
+  },
+  {
+    name: '屋咪茂',
+    phoneNumber: '0911-111-888',
   },
 ];
 
