@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
@@ -13,12 +13,15 @@ import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepart
 
 // gear
 import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
+import SignatureBar, { Tcontrol_signatureBar } from 'components/global/gear/signatureBar';
 
 // icon
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './edit.module.scss';
+
+import { TemployeeDto } from 'js/api/dtoTypes';
 
 //
 // fakeData
@@ -27,6 +30,30 @@ import { fakeDataArr, fakeDataTempArr, generateMonthsSinceNow } from './index';
 
 // ======================================================================
 export default function OutsourcingPricingEdit() {
+  const [disabled, setDisabled] = useState<boolean>(true);
+
+  // -------------------------------------------------------------------------
+  const [manager, setManager] = useState<TemployeeDto>();
+  const [supervisor, setSupervisor] = useState<TemployeeDto>();
+  const [accounting, setAccounting] = useState<TemployeeDto>();
+  const [checker, setChecker] = useState<TemployeeDto>();
+  const [agent, setAgent] = useState<TemployeeDto>();
+
+  // -------------------------------------------------------------------------
+
+  useEffect(
+    () => {
+      // setManager();
+      // setSupervisor();
+      // setAccounting();
+      // setChecker();
+      // setAgent();
+    },
+    [
+      // data
+    ]
+  );
+
   // -------------------------------------------------------------------------
 
   const { control_table_project, subTotal_project } = useMemo(() => {
@@ -285,7 +312,6 @@ export default function OutsourcingPricingEdit() {
 
   // -------------------------------------------------------------------------
 
-  // Tcontrol_processChain
   const control_processChain: Tcontrol_processChain = {
     statusArr: [
       {
@@ -337,6 +363,51 @@ export default function OutsourcingPricingEdit() {
   };
 
   // -------------------------------------------------------------------------
+
+  // Tcontrol_signatureBar
+
+  const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
+    {
+      label: '總經理',
+      employee: manager,
+      onChange: (employee) => {
+        // setManager(employee);
+      },
+      disabled: true,
+    },
+    {
+      label: '主管',
+      employee: supervisor,
+      onChange: (employee) => {
+        setSupervisor(employee);
+      },
+    },
+    {
+      label: '會計',
+      employee: accounting,
+      onChange: (employee) => {
+        setAccounting(employee);
+      },
+    },
+    {
+      label: '核對',
+      employee: checker,
+      onChange: (employee) => {
+        setChecker(employee);
+      },
+    },
+    {
+      label: '經辦',
+      employee: agent,
+      onChange: (employee) => {
+        setAgent(employee);
+      },
+    },
+  ];
+
+  const control_signatureBar: Tcontrol_signatureBar = { signatureArr };
+
+  // -------------------------------------------------------------------------
   return (
     <SubLayer>
       <PageHeader02 tag="外包計價" />
@@ -347,7 +418,16 @@ export default function OutsourcingPricingEdit() {
         <Table caption="應扣明細" className="w-fit m-auto mt-[96px]" control={control_table_amountToBeDeducted} />
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
         {/*  */}
-        <ProcessChain control={control_processChain} className="w-[1100px] m-auto mt-[80px]" />
+        <div className={classNames(!disabled && 'hidden')}>
+          <ProcessChain control={control_processChain} className={classNames('w-[1100px] m-auto mt-[80px]')} />
+        </div>
+        <div className={classNames(disabled && 'hidden')}>
+          <SignatureBar
+            control={control_signatureBar}
+            disabled={disabled}
+            className={classNames('w-[1100px] m-auto mt-[100px]')}
+          />
+        </div>
         {/*  */}
         <br />
       </div>
