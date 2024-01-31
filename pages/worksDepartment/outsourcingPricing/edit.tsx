@@ -40,6 +40,9 @@ type TfakeData_amountToBeDeducted = {
 
 // ======================================================================
 export default function OutsourcingPricingEdit() {
+  const router = useRouter();
+
+  // -------------------------------------------------------------------------
   const [disabled, setDisabled] = useState<boolean>(true);
   const [disabled_reviewer, setDisabled__reviewer] = useState<boolean>(true);
 
@@ -142,7 +145,7 @@ export default function OutsourcingPricingEdit() {
             ...config_projectTable.subTotal_invoice.tbody,
           },
           {
-            children: <IconDetail onClick={() => alert('test')} />,
+            children: <IconDetail onClick={() => router.push('./detail')} />,
             ...config_projectTable.btn_info.tbody,
           },
         ];
@@ -593,7 +596,7 @@ export default function OutsourcingPricingEdit() {
           disabled={disabled}
           className="w-fit m-auto mt-[96px]"
           control={control_table_project}
-          onAddClick={() => alert('test')}
+          onAddClick={() => router.push('./detail')}
         />
         <Table
           caption="應扣明細"
