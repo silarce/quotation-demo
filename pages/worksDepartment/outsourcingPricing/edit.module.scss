@@ -29,8 +29,10 @@
 }
 
 .inputInTable {
-  // background-color: transparent;
-  background-color: pink;
-
+  background-color: transparent;
   text-align: center;
+  border-bottom: solid 1px transparent;
+  &.enabled {
+    border-color: black;
+  }
 }

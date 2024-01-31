@@ -196,53 +196,42 @@ export default function OutsourcingPricingEdit() {
         const inputWidth_item = config_amountToBeDeducted.item.inputWidth;
         const inputWidth_subTotal_invoice = config_amountToBeDeducted.subTotal_invoice_enabled.inputWidth;
 
-        const { typeChildren, itemChildren, subTotal_invoiceChildren } = (() => {
-          const typeChildren = disabled ? (
-            type
-          ) : (
-            <input
-              value={type}
-              onChange={(e) => {
-                editAnmountToBeDeducted({ index, key: 'type', value: e.target.value });
-              }}
-              className={classNames(scss.inputInTable)}
-              style={{ width: inputWidth_type }}
-            />
-          );
+        const typeChildren = (
+          <input
+            value={type}
+            onChange={(e) => {
+              editAnmountToBeDeducted({ index, key: 'type', value: e.target.value });
+            }}
+            className={classNames(scss.inputInTable, !disabled && scss.enabled)}
+            style={{ width: inputWidth_type }}
+            readOnly={disabled}
+          />
+        );
 
-          const itemChildren = disabled ? (
-            item
-          ) : (
-            <input
-              value={item}
-              onChange={(e) => {
-                editAnmountToBeDeducted({ index, key: 'item', value: e.target.value });
-              }}
-              className={classNames(scss.inputInTable)}
-              style={{ width: inputWidth_item }}
-            />
-          );
+        const itemChildren = (
+          <input
+            value={item}
+            onChange={(e) => {
+              editAnmountToBeDeducted({ index, key: 'item', value: e.target.value });
+            }}
+            className={classNames(scss.inputInTable, !disabled && scss.enabled)}
+            style={{ width: inputWidth_item }}
+            readOnly={disabled}
+          />
+        );
 
-          const subTotal_invoiceChildren = disabled ? (
-            subTotal_invoice.toLocaleString()
-          ) : (
-            <input
-              value={subTotal_invoice}
-              onChange={(e) => {
-                editAnmountToBeDeducted({ index, key: 'subTotal_invoice', value: e.target.value });
-              }}
-              type="number"
-              className={classNames(scss.inputInTable)}
-              style={{ width: inputWidth_subTotal_invoice }}
-            />
-          );
-
-          return {
-            typeChildren,
-            itemChildren,
-            subTotal_invoiceChildren,
-          };
-        })();
+        const subTotal_invoiceChildren = (
+          <input
+            value={disabled ? subTotal_invoice.toLocaleString() : subTotal_invoice}
+            onChange={(e) => {
+              editAnmountToBeDeducted({ index, key: 'subTotal_invoice', value: e.target.value });
+            }}
+            type={disabled ? 'text' : 'number'}
+            className={classNames(scss.inputInTable, !disabled && scss.enabled)}
+            style={{ width: inputWidth_subTotal_invoice }}
+            readOnly={disabled}
+          />
+        );
 
         const cellArr: Tcell[] = [
           {
