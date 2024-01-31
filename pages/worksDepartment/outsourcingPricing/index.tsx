@@ -18,7 +18,6 @@ import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepart
 
 // css
 import scss from './index.module.scss';
-import { DeliveredProcedureOutlined } from '@ant-design/icons';
 
 // ========================================================
 type TfilterBy = 'vendor' | 'month';
@@ -110,12 +109,16 @@ export default function OutsourcingPricing() {
       label: '外包廠商',
       onClick: () => {
         setShowListBy('vendor');
+        setVendorMonth(undefined);
+        setMonthVendor(undefined);
       },
     },
     {
       label: '月份排列',
       onClick: () => {
         setShowListBy('month');
+        setVendorMonth(undefined);
+        setMonthVendor(undefined);
       },
     },
   ];
