@@ -226,7 +226,7 @@ const config_public: Tconfig = {
       flex: 'auto',
     },
   },
-  rigth: {
+  right: {
     tbody: {
       width: '270px',
       justifyContent: 'flex-end',
