@@ -28,6 +28,260 @@ import { fakeDataArr, fakeDataTempArr, generateMonthsSinceNow } from './index';
 export default function OutsourcingPricingEdit() {
   // -------------------------------------------------------------------------
 
+  const { control_table_project, subTotal_project } = useMemo(() => {
+    let decimal_subTotal = new Decimal(0);
+    const control_tbody: Ttable['tbody'] = (() => {
+      const rowArr: Ttable['tbody']['rowArr'] = fakeData_projectArr.map((data, index) => {
+        const { projectNumber, projectName, subTotal_invoice } = data;
+
+        decimal_subTotal = decimal_subTotal.add(subTotal_invoice);
+
+        const cellArr: Tcell[] = [
+          {
+            children: index + 1,
+            ...config_projectTable.indexNumber,
+          },
+          {
+            children: projectNumber,
+            ...config_projectTable.projectNumber,
+          },
+          {
+            children: projectName,
+            ...config_projectTable.projectName,
+          },
+          {
+            children: subTotal_invoice.toLocaleString(),
+            ...config_projectTable.subTotal_invoice.tbody,
+          },
+          {
+            children: <IconDetail onClick={() => alert('test')} />,
+            ...config_projectTable.btn_info.tbody,
+          },
+        ];
+
+        return {
+          cellArr,
+        };
+      });
+
+      rowArr.push({
+        cellArr: [
+          {
+            children: '小計',
+            ...config_projectTable.label_subTotal.tbody,
+          },
+          {
+            children: decimal_subTotal.toNumber().toLocaleString(),
+            ...config_projectTable.subtotal.tbody,
+          },
+        ],
+      });
+
+      return {
+        rowArr,
+      };
+    })();
+
+    const control_table: Ttable = {
+      thead: thead_projectTable,
+      tbody: control_tbody,
+      haveBorder: true,
+    };
+
+    return { control_table_project: control_table, subTotal_project: decimal_subTotal.toNumber() };
+  }, []);
+
+  // -------------------------------------------------------------------------
+
+  const { control_table_amountToBeDeducted, subTotal_amountToBeDeducted } = useMemo(() => {
+    let decimal_subTotal = new Decimal(0);
+    const control_tbody: Ttable['tbody'] = (() => {
+      const rowArr: Ttable['tbody']['rowArr'] = fakeData_amountToBeDeducted.map((data, index) => {
+        const { type, item, subTotal_invoice } = data;
+
+        decimal_subTotal = decimal_subTotal.add(subTotal_invoice);
+
+        const cellArr: Tcell[] = [
+          {
+            children: type,
+            ...config_amountToBeDeducted.type,
+          },
+          {
+            children: item,
+            ...config_amountToBeDeducted.item,
+          },
+          {
+            children: subTotal_invoice.toLocaleString(),
+            ...config_amountToBeDeducted.subTotal_invoice,
+          },
+        ];
+
+        return {
+          cellArr,
+        };
+      });
+
+      rowArr.push({
+        cellArr: [
+          {
+            children: '小計',
+            ...config_projectTable.label_subTotal.tbody,
+          },
+          {
+            children: decimal_subTotal.toNumber().toLocaleString(),
+            ...config_projectTable.subtotal.tbody,
+          },
+        ],
+      });
+
+      return {
+        rowArr,
+      };
+    })();
+
+    const control_table: Ttable = {
+      thead: thead_amountToBeDeducted,
+      tbody: control_tbody,
+      haveBorder: true,
+    };
+
+    return {
+      control_table_amountToBeDeducted: control_table,
+      subTotal_amountToBeDeducted: decimal_subTotal.toNumber(),
+    };
+  }, []);
+
+  // -------------------------------------------------------------------------
+
+  const { control_table_actualAmountReceived } = useMemo(() => {
+    //
+
+    // 本期保留10%
+    const periodKeep = new Decimal(subTotal_project).mul(0.1).toNumber();
+    // '上期保留10%'
+    const latestPeriodKeep = new Decimal(fakeData_latestPeriodKeep.price).mul(0.1).toNumber();
+
+    const subTotal = new Decimal(subTotal_project)
+      .sub(periodKeep)
+      .add(latestPeriodKeep)
+      .sub(subTotal_amountToBeDeducted)
+      .toNumber();
+
+    const tax = new Decimal(subTotal).mul(0.05).toDecimalPlaces(0).toNumber();
+    const actualAmountReceived = new Decimal(subTotal).add(tax).toNumber();
+
+    //
+    const rowArr: Ttable['tbody']['rowArr'] = [
+      //
+      {
+        cellArr: [
+          {
+            children: '請款合計',
+            ...config_actualAmountReceived.caption,
+          },
+          {
+            children: subTotal_project.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+          },
+        ],
+      },
+      //
+      {
+        cellArr: [
+          {
+            children: '本期保留10%',
+            ...config_actualAmountReceived.caption,
+          },
+          {
+            children: periodKeep.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+            className: scss.textRed,
+          },
+        ],
+      },
+      //
+      {
+        cellArr: [
+          {
+            children: '上期保留10%',
+            ...config_actualAmountReceived.caption,
+          },
+          {
+            children: latestPeriodKeep.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+          },
+        ],
+      },
+      //
+      {
+        cellArr: [
+          {
+            children: '應扣明細',
+            ...config_actualAmountReceived.caption,
+          },
+          {
+            children: subTotal_amountToBeDeducted.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+            className: scss.textRed,
+          },
+        ],
+      },
+      //
+      {
+        cellArr: [
+          {
+            children: '小計',
+            ...config_actualAmountReceived.caption.tbody,
+          },
+          {
+            children: subTotal.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+          },
+        ],
+      },
+      {
+        cellArr: [
+          {
+            children: '稅額5%',
+            ...config_actualAmountReceived.caption.tbody,
+          },
+          {
+            children: tax.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+          },
+        ],
+      },
+      {
+        cellArr: [
+          {
+            children: '實領金額',
+            ...config_actualAmountReceived.caption.tbody,
+          },
+          {
+            children: actualAmountReceived.toLocaleString(),
+            ...config_actualAmountReceived.subTotal_invoice.tbody,
+            className: scss.textBold,
+          },
+        ],
+      },
+    ]; // rowArr
+
+    const tbody = {
+      rowArr,
+    };
+
+    const control_table: Ttable = {
+      thead: thead_actualAmountReceived,
+      tbody,
+      haveBorder: true,
+    };
+
+    return {
+      control_table_actualAmountReceived: control_table,
+    };
+    //
+  }, [subTotal_project, subTotal_amountToBeDeducted]);
+
   // -------------------------------------------------------------------------
   return (
     <SubLayer>
@@ -35,8 +289,9 @@ export default function OutsourcingPricingEdit() {
 
       <div>
         <SlideBar className="mt-11" />
-        <ProjecTable className="w-fit m-auto mt-[96px]" />
-        <Table_AmountToBeDeducted className="w-fit m-auto mt-[96px]" />
+        <Table caption="工程列表" className="w-fit m-auto mt-[96px]" control={control_table_project} />
+        <Table caption="應扣明細" className="w-fit m-auto mt-[96px]" control={control_table_amountToBeDeducted} />
+        <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
         <br />
       </div>
     </SubLayer>
@@ -124,142 +379,11 @@ const SlideBar = ({ className }: { className?: string }) => {
 };
 
 // ======================================================================
-
-//  工程列表
-
-const ProjecTable = ({ className }: { className?: string }) => {
-  //
-  const control_tbody: Ttable['tbody'] = useMemo(() => {
-    let decimal_subTotal = new Decimal(0);
-
-    const rowArr: Ttable['tbody']['rowArr'] = fakeData_projectArr.map((data, index) => {
-      const { projectNumber, projectName, subTotal_invoice } = data;
-
-      decimal_subTotal = decimal_subTotal.add(subTotal_invoice);
-
-      const cellArr: Tcell[] = [
-        {
-          children: index + 1,
-          ...config_projectTable.indexNumber,
-        },
-        {
-          children: projectNumber,
-          ...config_projectTable.projectNumber,
-        },
-        {
-          children: projectName,
-          ...config_projectTable.projectName,
-        },
-        {
-          children: subTotal_invoice.toLocaleString(),
-          ...config_projectTable.subTotal_invoice.tbody,
-        },
-        {
-          children: <IconDetail onClick={() => alert('test')} />,
-          ...config_projectTable.btn_info.tbody,
-        },
-      ];
-
-      return {
-        cellArr,
-      };
-    });
-
-    rowArr.push({
-      cellArr: [
-        {
-          children: '小計',
-          ...config_projectTable.label_subTotal.tbody,
-        },
-        {
-          children: decimal_subTotal.toNumber().toLocaleString(),
-          ...config_projectTable.subtotal.tbody,
-        },
-      ],
-    });
-
-    return {
-      rowArr,
-    };
-
-    //
-  }, []);
-
-  const control_table: Ttable = {
-    thead: thead_projectTable,
-    tbody: control_tbody,
-    haveBorder: true,
-  };
-
+const Table = ({ caption, control, className }: { caption: string; control: Ttable; className?: string }) => {
   return (
     <div className={classNames(className)}>
-      <p className={scss.tableCaption}>工程列表</p>
-      <Table01 {...control_table} />
-    </div>
-  );
-};
-
-// ======================================================================
-const Table_AmountToBeDeducted = ({ className }: { className?: string }) => {
-  //
-  const control_tbody: Ttable['tbody'] = useMemo(() => {
-    let decimal_subTotal = new Decimal(0);
-
-    const rowArr: Ttable['tbody']['rowArr'] = fakeData_amountToBeDeducted.map((data, index) => {
-      const { type, item, subTotal_invoice } = data;
-
-      decimal_subTotal = decimal_subTotal.add(subTotal_invoice);
-
-      const cellArr: Tcell[] = [
-        {
-          children: type,
-          ...config_amountToBeDeducted.type,
-        },
-        {
-          children: item,
-          ...config_amountToBeDeducted.item,
-        },
-        {
-          children: subTotal_invoice.toLocaleString(),
-          ...config_amountToBeDeducted.subTotal_invoice.tbody,
-        },
-      ];
-
-      return {
-        cellArr,
-      };
-    });
-
-    rowArr.push({
-      cellArr: [
-        {
-          children: '小計',
-          ...config_projectTable.label_subTotal.tbody,
-        },
-        {
-          children: decimal_subTotal.toNumber().toLocaleString(),
-          ...config_projectTable.subtotal.tbody,
-        },
-      ],
-    });
-
-    return {
-      rowArr,
-    };
-
-    //
-  }, []);
-
-  const control_table: Ttable = {
-    thead: thead_amountToBeDeducted,
-    tbody: control_tbody,
-    haveBorder: true,
-  };
-
-  return (
-    <div className={classNames(className)}>
-      <p className={scss.tableCaption}>應扣明細</p>
-      <Table01 {...control_table} />
+      <p className={scss.tableCaption}>{caption}</p>
+      <Table01 {...control} />
     </div>
   );
 };
@@ -309,11 +433,11 @@ const config_projectTable: Tconfig = {
     justifyContent: 'center',
   },
   projectNumber: {
-    flex: '1',
+    flex: '1 0',
     justifyContent: 'center',
   },
   projectName: {
-    flex: '1',
+    flex: '1 0',
     justifyContent: 'center',
   },
   subTotal_invoice: {
@@ -358,11 +482,11 @@ const thead_projectTable: Ttable['thead'] = {
 
 const config_amountToBeDeducted: Tconfig = {
   type: {
-    flex: '1',
+    flex: '1 0',
     justifyContent: 'center',
   },
   item: {
-    flex: '1',
+    flex: '1 0',
     justifyContent: 'center',
   },
   subTotal_invoice: {
@@ -381,15 +505,15 @@ const thead_amountToBeDeducted: Ttable['thead'] = {
   cellArr: [
     {
       children: '類別',
-      ...config_projectTable.type,
+      ...config_amountToBeDeducted.type,
     },
     {
       children: '項目',
-      ...config_projectTable.item,
+      ...config_amountToBeDeducted.item,
     },
     {
       children: '請款小計',
-      ...config_projectTable.subTotal_invoice,
+      ...config_amountToBeDeducted.subTotal_invoice,
     },
   ],
 };
@@ -409,7 +533,7 @@ const config_actualAmountReceived: Tconfig = {
     width: '270px',
     justifyContent: 'center',
     tbody: {
-      width: '200px',
+      width: '270px',
       justifyContent: 'flex-end',
     },
   },
@@ -422,7 +546,7 @@ const thead_actualAmountReceived: Ttable['thead'] = {
       ...config_actualAmountReceived.caption,
     },
     {
-      children: '請款小計',
+      children: '金額',
       ...config_actualAmountReceived.subTotal_invoice,
     },
   ],

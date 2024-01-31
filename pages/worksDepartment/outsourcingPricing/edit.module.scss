@@ -3,3 +3,17 @@
   font-size: 18px;
   margin-bottom: 5px;
 }
+
+.textRed {
+  color: red;
+  span {
+    color: red;
+  }
+}
+
+.textBold {
+  font-weight: 700;
+  span {
+    font-weight: 700;
+  }
+}
