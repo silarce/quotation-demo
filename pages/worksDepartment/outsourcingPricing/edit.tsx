@@ -8,10 +8,11 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
 import Table01, { Ttable, Tcell } from 'components/global/gear/table/table01';
-import DateCollapse, { Tcontrol_dateCollapse } from 'components/page/worksDepartment/outsourcingPricing/dateCollapse';
 import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
+
+// gear
+import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
 
 // icon
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
@@ -283,6 +284,59 @@ export default function OutsourcingPricingEdit() {
   }, [subTotal_project, subTotal_amountToBeDeducted]);
 
   // -------------------------------------------------------------------------
+
+  // Tcontrol_processChain
+  const control_processChain: Tcontrol_processChain = {
+    statusArr: [
+      {
+        label: (
+          <>
+            <span className="inline-block mr-2">經辦</span>
+            <span className="inline-block">王阿明</span>
+          </>
+        ),
+        dotColor: 'green',
+      },
+      {
+        label: (
+          <>
+            <span className="inline-block mr-2">核對</span>
+            <span className="inline-block">王阿明</span>
+          </>
+        ),
+        dotColor: 'red',
+      },
+      {
+        label: (
+          <>
+            <span className="inline-block mr-2">會計</span>
+            <span className="inline-block">王阿明</span>
+          </>
+        ),
+        dotColor: 'red',
+      },
+      {
+        label: (
+          <>
+            <span className="inline-block mr-2">主管</span>
+            <span className="inline-block">王阿明</span>
+          </>
+        ),
+        dotColor: 'red',
+      },
+      {
+        label: (
+          <>
+            <span className="inline-block mr-2">核對</span>
+            <span className="inline-block">王阿明</span>
+          </>
+        ),
+        dotColor: undefined,
+      },
+    ],
+  };
+
+  // -------------------------------------------------------------------------
   return (
     <SubLayer>
       <PageHeader02 tag="外包計價" />
@@ -292,6 +346,9 @@ export default function OutsourcingPricingEdit() {
         <Table caption="工程列表" className="w-fit m-auto mt-[96px]" control={control_table_project} />
         <Table caption="應扣明細" className="w-fit m-auto mt-[96px]" control={control_table_amountToBeDeducted} />
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
+        {/*  */}
+        <ProcessChain control={control_processChain} className="w-[1100px] m-auto mt-[80px]" />
+        {/*  */}
         <br />
       </div>
     </SubLayer>
