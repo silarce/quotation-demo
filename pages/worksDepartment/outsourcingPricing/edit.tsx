@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -14,9 +15,10 @@ import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepart
 // gear
 import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
 import SignatureBar, { Tcontrol_signatureBar } from 'components/global/gear/signatureBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // icon
-import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+import { IconDetail, IconAddCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './edit.module.scss';
@@ -27,6 +29,14 @@ import { TemployeeDto } from 'js/api/dtoTypes';
 // fakeData
 import { fakeDataArr, fakeDataTempArr, generateMonthsSinceNow } from './index';
 //
+
+// ======================================================================
+
+type TfakeData_amountToBeDeducted = {
+  type: string;
+  item: string;
+  subTotal_invoice: number;
+};
 
 // ======================================================================
 export default function OutsourcingPricingEdit() {
@@ -42,6 +52,15 @@ export default function OutsourcingPricingEdit() {
 
   // -------------------------------------------------------------------------
 
+  // 接上api時要改為真實資料
+  const data_amountToBeDeducted = fakeData_amountToBeDeducted;
+
+  // -------------------------------------------------------------------------
+
+  const [amountToBeDeducted, setAmountToBeDeducted] = useState<TfakeData_amountToBeDeducted[]>([]);
+
+  // -------------------------------------------------------------------------
+
   useEffect(
     () => {
       // setManager();
@@ -54,6 +73,46 @@ export default function OutsourcingPricingEdit() {
       // data
     ]
   );
+
+  useEffect(() => {
+    setAmountToBeDeducted(_.cloneDeep(data_amountToBeDeducted));
+  }, [disabled]);
+
+  // -------------------------------------------------------------------------
+
+  const addAnmountToBeDeducted = () => {
+    setAmountToBeDeducted((prev) => {
+      return [...prev, create_emptyAmountToBeDeducted()];
+    });
+  };
+
+  const deleteAnmountToBeDeducted = (index: number) => {
+    setAmountToBeDeducted((prev) => {
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  const editAnmountToBeDeducted = ({
+    index,
+    key,
+    value,
+  }: {
+    index: number;
+    key: keyof TfakeData_amountToBeDeducted;
+    value: string;
+  }) => {
+    setAmountToBeDeducted((prev) => {
+      const newArr = [...prev];
+
+      if (key === 'subTotal_invoice') {
+        newArr[index][key] = Number(value);
+      } else {
+        newArr[index][key] = value;
+      }
+
+      return newArr;
+    });
+  };
 
   // -------------------------------------------------------------------------
 
@@ -123,27 +182,104 @@ export default function OutsourcingPricingEdit() {
   // -------------------------------------------------------------------------
 
   const { control_table_amountToBeDeducted, subTotal_amountToBeDeducted } = useMemo(() => {
+    //
     let decimal_subTotal = new Decimal(0);
+    //
     const control_tbody: Ttable['tbody'] = (() => {
-      const rowArr: Ttable['tbody']['rowArr'] = fakeData_amountToBeDeducted.map((data, index) => {
+      //
+      const rowArr: Ttable['tbody']['rowArr'] = amountToBeDeducted.map((data, index) => {
         const { type, item, subTotal_invoice } = data;
 
         decimal_subTotal = decimal_subTotal.add(subTotal_invoice);
 
+        const inputWidth_type = config_amountToBeDeducted.type.inputWidth;
+        const inputWidth_item = config_amountToBeDeducted.item.inputWidth;
+        const inputWidth_subTotal_invoice = config_amountToBeDeducted.subTotal_invoice_enabled.inputWidth;
+
+        const { typeChildren, itemChildren, subTotal_invoiceChildren } = (() => {
+          const typeChildren = disabled ? (
+            type
+          ) : (
+            <input
+              value={type}
+              onChange={(e) => {
+                editAnmountToBeDeducted({ index, key: 'type', value: e.target.value });
+              }}
+              className={classNames(scss.inputInTable)}
+              style={{ width: inputWidth_type }}
+            />
+          );
+
+          const itemChildren = disabled ? (
+            item
+          ) : (
+            <input
+              value={item}
+              onChange={(e) => {
+                editAnmountToBeDeducted({ index, key: 'item', value: e.target.value });
+              }}
+              className={classNames(scss.inputInTable)}
+              style={{ width: inputWidth_item }}
+            />
+          );
+
+          const subTotal_invoiceChildren = disabled ? (
+            subTotal_invoice.toLocaleString()
+          ) : (
+            <input
+              value={subTotal_invoice}
+              onChange={(e) => {
+                editAnmountToBeDeducted({ index, key: 'subTotal_invoice', value: e.target.value });
+              }}
+              type="number"
+              className={classNames(scss.inputInTable)}
+              style={{ width: inputWidth_subTotal_invoice }}
+            />
+          );
+
+          return {
+            typeChildren,
+            itemChildren,
+            subTotal_invoiceChildren,
+          };
+        })();
+
         const cellArr: Tcell[] = [
           {
-            children: type,
+            children: typeChildren,
             ...config_amountToBeDeducted.type,
           },
           {
-            children: item,
+            children: itemChildren,
             ...config_amountToBeDeducted.item,
           },
           {
-            children: subTotal_invoice.toLocaleString(),
-            ...config_amountToBeDeducted.subTotal_invoice,
+            children: subTotal_invoiceChildren,
+            ...(disabled
+              ? config_amountToBeDeducted.subTotal_invoice.tbody
+              : config_amountToBeDeducted.subTotal_invoice_enabled.tbody),
           },
         ];
+
+        if (!disabled) {
+          cellArr.push({
+            children: (
+              <IconDelete01
+                onClick={() => {
+                  myAlert.confirm({
+                    title: '確定要刪除嗎?',
+                    props: {
+                      onOk: () => {
+                        deleteAnmountToBeDeducted(index);
+                      },
+                    },
+                  });
+                }}
+              />
+            ),
+            ...config_amountToBeDeducted.btn_delete.tbody,
+          });
+        }
 
         return {
           cellArr,
@@ -178,7 +314,7 @@ export default function OutsourcingPricingEdit() {
       control_table_amountToBeDeducted: control_table,
       subTotal_amountToBeDeducted: decimal_subTotal.toNumber(),
     };
-  }, []);
+  }, [amountToBeDeducted, disabled]);
 
   // -------------------------------------------------------------------------
 
@@ -365,8 +501,6 @@ export default function OutsourcingPricingEdit() {
 
   // -------------------------------------------------------------------------
 
-  // Tcontrol_signatureBar
-
   const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
     {
       label: '總經理',
@@ -465,8 +599,20 @@ export default function OutsourcingPricingEdit() {
 
       <div>
         <SlideBar className="mt-11" />
-        <Table caption="工程列表" className="w-fit m-auto mt-[96px]" control={control_table_project} />
-        <Table caption="應扣明細" className="w-fit m-auto mt-[96px]" control={control_table_amountToBeDeducted} />
+        <Table
+          caption="工程列表"
+          disabled={disabled}
+          className="w-fit m-auto mt-[96px]"
+          control={control_table_project}
+          onAddClick={() => alert('test')}
+        />
+        <Table
+          caption="應扣明細"
+          disabled={disabled}
+          className="w-fit m-auto mt-[96px]"
+          control={control_table_amountToBeDeducted}
+          onAddClick={addAnmountToBeDeducted}
+        />
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
         {/*  */}
         <div className={classNames(!disabled_reviewer && 'hidden')}>
@@ -567,10 +713,25 @@ const SlideBar = ({ className }: { className?: string }) => {
 };
 
 // ======================================================================
-const Table = ({ caption, control, className }: { caption: string; control: Ttable; className?: string }) => {
+const Table = ({
+  caption,
+  control,
+  className,
+  onAddClick,
+  disabled,
+}: {
+  caption: string;
+  control: Ttable;
+  className?: string;
+  onAddClick?: () => void;
+  disabled?: boolean;
+}) => {
   return (
     <div className={classNames(className)}>
-      <p className={scss.tableCaption}>{caption}</p>
+      <div className={scss.captionBar}>
+        <p className={scss.tableCaption}>{caption}</p>
+        <IconAddCircle onClick={onAddClick} className={classNames((!onAddClick || disabled) && 'invisible')} />
+      </div>
       <Table01 {...control} />
     </div>
   );
@@ -597,6 +758,7 @@ type Tconfig = {
       className?: string;
       style?: React.CSSProperties;
     };
+    inputWidth?: React.CSSProperties['width'];
   };
 };
 
@@ -670,19 +832,36 @@ const thead_projectTable: Ttable['thead'] = {
 
 const config_amountToBeDeducted: Tconfig = {
   type: {
-    flex: '1 0',
+    width: 414,
+    // flex: '1 0',
     justifyContent: 'center',
+    inputWidth: 394,
   },
   item: {
-    flex: '1 0',
+    width: 414,
+    // flex: '1 0',
     justifyContent: 'center',
+    inputWidth: 394,
   },
   subTotal_invoice: {
     width: '270px',
     justifyContent: 'center',
     tbody: {
-      width: '200px',
+      width: '270px',
       justifyContent: 'flex-end',
+    },
+  },
+  subTotal_invoice_enabled: {
+    inputWidth: 180,
+    tbody: {
+      width: 200,
+      justifyContent: 'flex-end',
+    },
+  },
+  btn_delete: {
+    tbody: {
+      width: '70px',
+      justifyContent: 'center',
     },
   },
   label_subTotal: config_public.left,
@@ -765,7 +944,7 @@ const fakeData_projectArr = [
   },
 ] as const;
 
-const fakeData_amountToBeDeducted = [
+const fakeData_amountToBeDeducted: TfakeData_amountToBeDeducted[] = [
   {
     type: '安裝物料',
     item: '項目一',
@@ -776,8 +955,14 @@ const fakeData_amountToBeDeducted = [
     item: '團保',
     subTotal_invoice: 666,
   },
-] as const;
+];
 
 const fakeData_latestPeriodKeep = {
   price: 218350,
 };
+
+const create_emptyAmountToBeDeducted = (): TfakeData_amountToBeDeducted => ({
+  type: '',
+  item: '',
+  subTotal_invoice: 0,
+});
