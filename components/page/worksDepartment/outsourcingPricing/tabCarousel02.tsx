@@ -52,7 +52,7 @@ export default function TabCarousel02({
   return (
     <Slider
       // className={classNames(scss.slider, scss.theme_default, className)}
-      className={classNames(scss.slider, scss[`theme_${theme}`], className)}
+      className={classNames('m-auto', scss.slider, scss[`theme_${theme}`], className)}
       ref={sliderRef}
       infinite={false}
       dots={false}
