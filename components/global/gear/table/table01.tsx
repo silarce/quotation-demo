@@ -28,6 +28,7 @@ type Tcell = {
 type Ttable = {
   className?: string;
   style?: React.CSSProperties;
+  haveBorder?: boolean;
   thead: {
     cellArr: Tcell[];
     rowProps?: Omit<Trow, 'children' | 'onClick'>;
@@ -54,9 +55,10 @@ const Table01 = ({
   tbody,
   className,
   style,
+  haveBorder = true,
 }: Ttable) => {
   return (
-    <div className={classNames(scss.table, className)} style={style}>
+    <div className={classNames(scss.table, haveBorder && scss.haveBorder, className)} style={style}>
       <div
         //
         className={classNames(scss.thead)}

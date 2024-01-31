@@ -1,5 +1,9 @@
 .table {
   width: theme("width.table");
+  &.haveBorder {
+    border: solid 1px theme("colors.border");
+    border-top: 0;
+  }
 }
 
 .thead {

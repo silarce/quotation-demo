@@ -65,6 +65,7 @@ export default function OutsourcingPricing() {
     tbody: {
       rowArr: control_table,
     },
+    haveBorder: false,
   };
 
   // ------------------------------------------------------------------------
@@ -296,6 +297,7 @@ const MonthVendorPanel = ({ className }: { className?: string }) => {
     tbody: {
       rowArr: control_table,
     },
+    haveBorder: false,
   };
 
   // ----------------------------------------------------------------------
@@ -460,3 +462,5 @@ function generateMonthsSinceNow(): { [key: `${number}`]: number[] } {
 
   return result;
 }
+
+export { fakeDataArr, generateMonthsSinceNow, fakeDataTempArr };
