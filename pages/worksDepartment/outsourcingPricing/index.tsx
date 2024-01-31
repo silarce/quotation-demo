@@ -173,9 +173,8 @@ const VendorMonthPanel = ({ className }: { className?: string }) => {
     const arr: Tcontrol_tabCarousel['tabArr'] = fakeDataTempArr.map((data, index) => {
       return {
         label: data.name,
-        onClick: ({ ref_slider }) => {
+        onClick: () => {
           setActiveTab_vendor(index);
-          ref_slider.current.slickGoTo(index);
         },
       };
     });

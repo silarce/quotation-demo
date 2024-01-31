@@ -1,9 +1,9 @@
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import classNames from 'classnames';
 
 // import { useInView } from 'react-intersection-observer';
 
-import Slider, { CustomArrowProps } from 'react-slick';
+import Slider, { CustomArrowProps, Settings as TreactSlickProps } from 'react-slick';
 
 // css
 import scss from './tabCarousel02.module.scss';
@@ -27,9 +27,20 @@ type Tcontrol = {
 export type { Tcontrol as Tcontrol_tabCarousel };
 
 // ======================================================================
-export default function TabCarousel02({ className, control }: { className?: string; control: Tcontrol }) {
+export default function TabCarousel02({
+  //
+  className,
+  control,
+  props,
+}: {
+  className?: string;
+  control: Tcontrol;
+  props?: TreactSlickProps;
+}) {
   // const [viewRef_first, inView_first] = useInView();
   // const [viewRef_last, inView_last] = useInView();
+
+  const [isSliding, setIsSliding] = useState(false);
 
   // -------------------------------------------------------------------------
   const sliderRef = useRef<Slider>(null!);
@@ -42,11 +53,13 @@ export default function TabCarousel02({ className, control }: { className?: stri
       infinite={false}
       dots={false}
       arrows={true}
-      touchMove={false}
+      // touchMove={false}
+      // draggable={true}
       // slidesToShow={6}
       // slidesToScroll={6}
       slidesToScroll={3}
       variableWidth={true}
+      focusOnSelect={true}
       prevArrow={
         <PrevArrow
         // isFirstInView={inView_first}
@@ -57,8 +70,13 @@ export default function TabCarousel02({ className, control }: { className?: stri
         // isLastInView={inView_last}
         />
       }
-      //
-      // className="slider variable-width"
+      beforeChange={(e) => {
+        setIsSliding(true);
+      }}
+      afterChange={(e) => {
+        setIsSliding(false);
+      }}
+      {...props}
     >
       {tabArr.map((tab, index) => {
         const { label, onClick, className, className_tabContent } = tab;
@@ -66,7 +84,7 @@ export default function TabCarousel02({ className, control }: { className?: stri
         const isActive = activeIndex === index;
 
         const theClick = () => {
-          onClick && onClick({ ref_slider: sliderRef });
+          !isSliding && onClick && onClick({ ref_slider: sliderRef });
         };
 
         // const ref = index === 0 ? viewRef_first : index === tabArr.length - 1 ? viewRef_last : null;
