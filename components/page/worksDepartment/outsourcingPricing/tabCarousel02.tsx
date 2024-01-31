@@ -21,6 +21,7 @@ type Ttab = {
 
 type Tcontrol = {
   activeIndex?: number | undefined;
+  activeClassName?: string;
   tabArr: Ttab[];
 };
 
@@ -31,10 +32,12 @@ export default function TabCarousel02({
   //
   className,
   control,
+  theme = 'default',
   props,
 }: {
   className?: string;
   control: Tcontrol;
+  theme?: 'default' | 'dashed';
   props?: TreactSlickProps;
 }) {
   // const [viewRef_first, inView_first] = useInView();
@@ -48,7 +51,8 @@ export default function TabCarousel02({
 
   return (
     <Slider
-      className={classNames(scss.slider, className)}
+      // className={classNames(scss.slider, scss.theme_default, className)}
+      className={classNames(scss.slider, scss[`theme_${theme}`], className)}
       ref={sliderRef}
       infinite={false}
       dots={false}
