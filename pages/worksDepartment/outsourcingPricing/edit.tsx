@@ -31,6 +31,7 @@ import { fakeDataArr, fakeDataTempArr, generateMonthsSinceNow } from './index';
 // ======================================================================
 export default function OutsourcingPricingEdit() {
   const [disabled, setDisabled] = useState<boolean>(true);
+  const [disabled_reviewer, setDisabled__reviewer] = useState<boolean>(true);
 
   // -------------------------------------------------------------------------
   const [manager, setManager] = useState<TemployeeDto>();
@@ -408,9 +409,59 @@ export default function OutsourcingPricingEdit() {
   const control_signatureBar: Tcontrol_signatureBar = { signatureArr };
 
   // -------------------------------------------------------------------------
+
+  const panelList_disabled: TpanelList = [
+    {
+      type: 'redButton',
+      label: '送審',
+      onClick: () => {
+        setDisabled__reviewer(false);
+      },
+    },
+    {
+      type: 'myButton',
+      label: '編輯審核人員',
+      onClick: () => {
+        setDisabled__reviewer(false);
+      },
+    },
+    {
+      type: 'myButton',
+      label: '新增工程',
+      onClick: () => {},
+    },
+    {
+      type: 'myButton',
+      label: '編輯',
+      onClick: () => {
+        setDisabled(false);
+      },
+    },
+  ];
+
+  const panelList_enabled: TpanelList = [
+    {
+      type: 'redButton',
+      label: '確認',
+      onClick: () => {
+        alert('test');
+      },
+    },
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        setDisabled(true);
+      },
+    },
+  ];
+
+  const panelList = disabled ? panelList_disabled : panelList_enabled;
+
+  // -------------------------------------------------------------------------
   return (
     <SubLayer>
-      <PageHeader02 tag="外包計價" />
+      <PageHeader02 tag="外包計價" panelList={panelList} />
 
       <div>
         <SlideBar className="mt-11" />
@@ -418,13 +469,13 @@ export default function OutsourcingPricingEdit() {
         <Table caption="應扣明細" className="w-fit m-auto mt-[96px]" control={control_table_amountToBeDeducted} />
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
         {/*  */}
-        <div className={classNames(!disabled && 'hidden')}>
+        <div className={classNames(!disabled_reviewer && 'hidden')}>
           <ProcessChain control={control_processChain} className={classNames('w-[1100px] m-auto mt-[80px]')} />
         </div>
-        <div className={classNames(disabled && 'hidden')}>
+        <div className={classNames(disabled_reviewer && 'hidden')}>
           <SignatureBar
             control={control_signatureBar}
-            disabled={disabled}
+            disabled={disabled_reviewer}
             className={classNames('w-[1100px] m-auto mt-[100px]')}
           />
         </div>
