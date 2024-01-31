@@ -51,7 +51,7 @@ export default function SignatureBar({
         const value = (item.employee?.chName || item.employee?.enName) ?? '';
 
         const onClick = () => {
-          setTargetIndex(index);
+          !(item.disabled || disabled) && setTargetIndex(index);
         };
 
         return (
