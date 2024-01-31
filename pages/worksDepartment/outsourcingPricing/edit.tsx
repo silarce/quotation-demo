@@ -35,7 +35,9 @@ export default function OutsourcingPricingEdit() {
 
       <div>
         <SlideBar className="mt-11" />
-        <ProjecTable className="w-fit m-auto mt-5" />
+        <ProjecTable className="w-fit m-auto mt-[96px]" />
+        <Table_AmountToBeDeducted className="w-fit m-auto mt-[96px]" />
+        <br />
       </div>
     </SubLayer>
   );
@@ -191,6 +193,72 @@ const ProjecTable = ({ className }: { className?: string }) => {
 
   return (
     <div className={classNames(className)}>
+      <p className={scss.tableCaption}>工程列表</p>
+      <Table01 {...control_table} />
+    </div>
+  );
+};
+
+// ======================================================================
+const Table_AmountToBeDeducted = ({ className }: { className?: string }) => {
+  //
+  const control_tbody: Ttable['tbody'] = useMemo(() => {
+    let decimal_subTotal = new Decimal(0);
+
+    const rowArr: Ttable['tbody']['rowArr'] = fakeData_amountToBeDeducted.map((data, index) => {
+      const { type, item, subTotal_invoice } = data;
+
+      decimal_subTotal = decimal_subTotal.add(subTotal_invoice);
+
+      const cellArr: Tcell[] = [
+        {
+          children: type,
+          ...config_amountToBeDeducted.type,
+        },
+        {
+          children: item,
+          ...config_amountToBeDeducted.item,
+        },
+        {
+          children: subTotal_invoice.toLocaleString(),
+          ...config_amountToBeDeducted.subTotal_invoice.tbody,
+        },
+      ];
+
+      return {
+        cellArr,
+      };
+    });
+
+    rowArr.push({
+      cellArr: [
+        {
+          children: '小計',
+          ...config_projectTable.label_subTotal.tbody,
+        },
+        {
+          children: decimal_subTotal.toNumber().toLocaleString(),
+          ...config_projectTable.subtotal.tbody,
+        },
+      ],
+    });
+
+    return {
+      rowArr,
+    };
+
+    //
+  }, []);
+
+  const control_table: Ttable = {
+    thead: thead_amountToBeDeducted,
+    tbody: control_tbody,
+    haveBorder: true,
+  };
+
+  return (
+    <div className={classNames(className)}>
+      <p className={scss.tableCaption}>應扣明細</p>
       <Table01 {...control_table} />
     </div>
   );
@@ -224,6 +292,7 @@ const config_public: Tconfig = {
   left: {
     tbody: {
       flex: 'auto',
+      justifyContent: 'flex-end',
     },
   },
   right: {
@@ -280,8 +349,81 @@ const thead_projectTable: Ttable['thead'] = {
       ...config_projectTable.projectName,
     },
     {
-      children: '發票小計',
+      children: '請款小計',
       ...config_projectTable.subTotal_invoice,
+    },
+  ],
+};
+// ---------------------
+
+const config_amountToBeDeducted: Tconfig = {
+  type: {
+    flex: '1',
+    justifyContent: 'center',
+  },
+  item: {
+    flex: '1',
+    justifyContent: 'center',
+  },
+  subTotal_invoice: {
+    width: '270px',
+    justifyContent: 'center',
+    tbody: {
+      width: '200px',
+      justifyContent: 'flex-end',
+    },
+  },
+  label_subTotal: config_public.left,
+  subtotal: config_public.right,
+};
+
+const thead_amountToBeDeducted: Ttable['thead'] = {
+  cellArr: [
+    {
+      children: '類別',
+      ...config_projectTable.type,
+    },
+    {
+      children: '項目',
+      ...config_projectTable.item,
+    },
+    {
+      children: '請款小計',
+      ...config_projectTable.subTotal_invoice,
+    },
+  ],
+};
+
+// ======================================================================
+
+const config_actualAmountReceived: Tconfig = {
+  caption: {
+    flex: '1',
+    justifyContent: 'center',
+    tbody: {
+      flex: '1',
+      justifyContent: 'flex-end',
+    },
+  },
+  subTotal_invoice: {
+    width: '270px',
+    justifyContent: 'center',
+    tbody: {
+      width: '200px',
+      justifyContent: 'flex-end',
+    },
+  },
+};
+
+const thead_actualAmountReceived: Ttable['thead'] = {
+  cellArr: [
+    {
+      children: '金額名稱',
+      ...config_actualAmountReceived.caption,
+    },
+    {
+      children: '請款小計',
+      ...config_actualAmountReceived.subTotal_invoice,
     },
   ],
 };
@@ -309,4 +451,21 @@ const fakeData_projectArr = [
     projectName: '元大人壽',
     subTotal_invoice: 5000,
   },
-];
+] as const;
+
+const fakeData_amountToBeDeducted = [
+  {
+    type: '安裝物料',
+    item: '項目一',
+    subTotal_invoice: 1000,
+  },
+  {
+    type: '保險',
+    item: '團保',
+    subTotal_invoice: 666,
+  },
+] as const;
+
+const fakeData_latestPeriodKeep = {
+  price: 218350,
+};
