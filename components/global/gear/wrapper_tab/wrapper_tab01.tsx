@@ -51,30 +51,31 @@ const Wrapper_tab = ({
         }}
       />
       {/*  */}
+      {tabArr.length > 0 && (
+        <div
+          className={classNames(scss.tabBar)}
+          style={{
+            position: stickyTop && 'sticky',
+            top: stickyTopHeight,
+            ...tabBarStyle,
+          }}
+        >
+          {tabArr.map((tab, index) => {
+            const { label, isActive, className, style, onClick } = tab;
 
-      <div
-        className={classNames(scss.tabBar)}
-        style={{
-          position: stickyTop && 'sticky',
-          top: stickyTopHeight,
-          ...tabBarStyle,
-        }}
-      >
-        {tabArr.map((tab, index) => {
-          const { label, isActive, className, style, onClick } = tab;
-
-          return (
-            <div
-              key={index}
-              className={classNames(scss.tab, isActive && scss.active, className)}
-              style={style}
-              onClick={onClick}
-            >
-              <span>{label}</span>
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div
+                key={index}
+                className={classNames(scss.tab, isActive && scss.active, className)}
+                style={style}
+                onClick={onClick}
+              >
+                <span>{label}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/*  */}
       <div

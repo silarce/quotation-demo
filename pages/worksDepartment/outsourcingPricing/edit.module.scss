@@ -1,0 +1,45 @@
+.captionBar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 7px;
+  > svg {
+    width: 34px;
+    height: 34px;
+  }
+  .tableCaption {
+    color: theme("colors.main");
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+}
+
+.textRed {
+  color: red;
+  span {
+    color: red;
+  }
+}
+
+.textGreen {
+  color: theme("colors.pass");
+  span {
+    color: theme("colors.pass");
+  }
+}
+
+.textBold {
+  font-weight: 700;
+  span {
+    font-weight: 700;
+  }
+}
+
+.inputInTable {
+  background-color: transparent;
+  text-align: center;
+  border-bottom: solid 1px transparent;
+  &.enabled {
+    border-color: black;
+  }
+}

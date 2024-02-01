@@ -3,11 +3,6 @@ import classNames from 'classnames';
 import Image from 'next/image';
 
 import Slider, { CustomArrowProps, ResponsiveObject } from 'react-slick';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
-
-// // tools
-// import { yearConversion_standardToCh } from "js/tools/date/yearConversion_standardToCh";
 
 // icon
 import iconArrowRight from 'public/image/icon/arrow_right.svg';

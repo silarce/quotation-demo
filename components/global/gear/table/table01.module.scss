@@ -1,14 +1,19 @@
 .table {
   width: theme("width.table");
+  &.haveBorder {
+    border: solid 1px theme("colors.border");
+    border-top: 0;
+  }
 }
 
 .thead {
   .row {
     border-top: solid 1px theme("colors.border");
+    background-color: theme("colors.bgc01");
   }
   .cell {
     border: none;
-    background-color: theme("colors.bgc01");
+    // background-color: theme("colors.bgc01");
     > span {
       color: theme("colors.main");
     }
@@ -45,5 +50,34 @@
   > span {
     font-size: 16px;
     white-space: pre-wrap;
+  }
+}
+
+// =================================================================
+
+.cellInput {
+  padding: 0 20px;
+  .input {
+    width: 100%;
+    background-color: transparent;
+    text-align: center;
+    border-bottom: solid 1px transparent;
+    &.enabled {
+      border-color: theme("colors.sub");
+    }
+  }
+}
+
+.cellSelect {
+  padding: 0 20px;
+  .antdSelect {
+    width: 100%;
+    border-bottom: solid 1px transparent;
+    span {
+      font-size: 16px;
+    }
+    &.enabled {
+      border-color: theme("colors.sub");
+    }
   }
 }

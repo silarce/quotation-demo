@@ -269,4 +269,5 @@ const fakeTbody: Ttable['tbody'] = {
 const fakeTable: Ttable = {
   thead: fakeThead,
   tbody: fakeTbody,
+  haveBorder: false,
 };

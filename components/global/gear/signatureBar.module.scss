@@ -1,0 +1,13 @@
+.signatureBar {
+  display: flex;
+  .cell {
+    > span {
+      font-weight: 400;
+      font-size: 18px;
+      color: theme("colors.main");
+    }
+    > .input02 {
+      padding: 24px 0 14px;
+    }
+  }
+}

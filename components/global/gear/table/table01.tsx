@@ -1,5 +1,8 @@
 import classNames from 'classnames';
 
+// antd
+import { Select, SelectProps } from 'antd';
+
 // gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
@@ -28,9 +31,10 @@ type Tcell = {
 type Ttable = {
   className?: string;
   style?: React.CSSProperties;
+  haveBorder?: boolean;
   thead: {
     cellArr: Tcell[];
-    rowProps?: Omit<Trow, 'children'>;
+    rowProps?: Omit<Trow, 'children' | 'onClick'>;
     className?: string;
     style?: React.CSSProperties;
     stickyTop?: {
@@ -47,19 +51,39 @@ type Ttable = {
   };
 };
 
+type Tconfig_table = {
+  label?: string;
+  width?: React.CSSProperties['width'];
+  flex?: React.CSSProperties['flex'];
+  justifyContent?: React.CSSProperties['justifyContent'];
+  className?: string;
+  style?: React.CSSProperties;
+  tbody?: {
+    width?: React.CSSProperties['width'];
+    flex?: React.CSSProperties['flex'];
+    justifyContent?: React.CSSProperties['justifyContent'];
+    className?: string;
+    style?: React.CSSProperties;
+  };
+  inputWidth?: React.CSSProperties['width'];
+};
+
+export type { Trow, Tcell, Ttable, Tconfig_table };
+
 // ===================================================================
-const Table01 = ({
+export default function Table01({
   //
   thead,
   tbody,
   className,
   style,
-}: Ttable) => {
+  haveBorder = true,
+}: Ttable) {
   return (
-    <div className={classNames(scss.table, className)} style={style}>
+    <div className={classNames(scss.table, haveBorder && scss.haveBorder, className)} style={style}>
       <div
         //
-        className={classNames(scss.thead, className)}
+        className={classNames(scss.thead)}
         style={{
           position: thead.stickyTop ? 'sticky' : undefined,
           top: thead.stickyTop?.top,
@@ -67,7 +91,7 @@ const Table01 = ({
           ...thead.style,
         }}
       >
-        <div className={scss.row} {...thead.rowProps}>
+        <Row_thead {...thead.rowProps}>
           {thead.cellArr.map((item, index) => {
             const { width, flex, justifyContent, className, style, children } = item;
 
@@ -84,8 +108,9 @@ const Table01 = ({
               </Cell>
             );
           })}
-        </div>
+        </Row_thead>
       </div>
+
       {/*  */}
       <div className={classNames(scss.tbody)}>
         {tbody.rowArr.map((row, rIndex) => {
@@ -123,7 +148,7 @@ const Table01 = ({
       </div>
     </div>
   );
-};
+}
 
 const Row = ({ children, height, minHeight, maxHeight, className, style, onClick }: Trow) => {
   return (
@@ -142,6 +167,31 @@ const Row = ({ children, height, minHeight, maxHeight, className, style, onClick
         {children}
       </div>
     </CellWithBar>
+  );
+};
+
+const Row_thead = ({
+  //
+  children,
+  height,
+  minHeight,
+  maxHeight,
+  className,
+  style,
+}: Trow) => {
+  return (
+    <div
+      //
+      className={classNames(scss.row, className)}
+      style={{
+        height,
+        minHeight,
+        maxHeight,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
   );
 };
 
@@ -166,6 +216,58 @@ const Cell = ({
     </div>
   );
 };
+// ===================================================================
 
-export default Table01;
-export type { Trow, Tcell, Ttable };
+const CellInput = ({
+  className,
+  inputClassName,
+  inputProps,
+  disabled,
+  style,
+}: {
+  className?: string;
+  inputClassName?: string;
+  inputProps: React.InputHTMLAttributes<HTMLInputElement>;
+  disabled?: boolean;
+  style?: React.CSSProperties;
+}) => {
+  return (
+    <div className={classNames(scss.cellInput, className)} style={style}>
+      <input
+        //
+        className={classNames(scss.input, !disabled && scss.enabled, inputClassName)}
+        readOnly={disabled}
+        {...inputProps}
+      />
+    </div>
+  );
+};
+
+const CellSelect = ({
+  className,
+  selectClassName,
+  selectProps,
+  disabled,
+  style,
+}: {
+  className?: string;
+  selectClassName?: string;
+  selectProps: SelectProps;
+  disabled?: boolean;
+  style?: React.CSSProperties;
+}) => {
+  return (
+    <div className={classNames(scss.cellSelect, className)} style={style}>
+      <Select
+        className={classNames(scss.antdSelect, !disabled && scss.enabled, selectClassName)}
+        bordered={false}
+        showArrow={!disabled}
+        disabled={disabled}
+        size="small"
+        {...selectProps}
+      />
+    </div>
+  );
+};
+
+export { CellInput, CellSelect };
