@@ -9,7 +9,8 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // components
-import Table01, { Trow, Tcell, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
+import Table01, { CellInput, CellSelect } from 'components/global/gear/table/table01';
+import type { Trow, Tcell, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -211,7 +212,14 @@ const useTable01 = (): Ttable => {
           ...config_useTable01.qty,
         },
         {
-          children: unitPrice,
+          children: (
+            <CellInput
+              style={{ width: config_useTable01.unitPrice.width }}
+              inputProps={{
+                defaultValue: unitPrice,
+              }}
+            />
+          ),
           ...config_useTable01.unitPrice,
         },
         {
@@ -256,6 +264,8 @@ const useTable01 = (): Ttable => {
 
   return control_table;
 };
+
+// ===========================================================================
 
 // ===========================================================================
 
