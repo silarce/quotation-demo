@@ -614,7 +614,47 @@ const fakeData02_options = [
     value: '門楣',
   },
   {
-    label: '特殊門楣',
-    value: '特殊門楣',
+    label: '特殊門軌',
+    value: '特殊門軌',
+  },
+  {
+    label: '修改補貼',
+    value: '修改補貼',
+  },
+  {
+    label: '卸貨',
+    value: '卸貨',
+  },
+  {
+    label: '公工',
+    value: '公工',
+  },
+  {
+    label: '遠程',
+    value: '遠程',
+  },
+  {
+    label: '外宿',
+    value: '外宿',
+  },
+  {
+    label: '載貨',
+    value: '載貨',
+  },
+  {
+    label: '活動中柱',
+    value: '活動中柱',
+  },
+  {
+    label: '防颱支撐',
+    value: '防颱支撐',
+  },
+  {
+    label: '送電',
+    value: '送電',
+  },
+  {
+    label: '修繕',
+    value: '修繕',
   },
 ];
