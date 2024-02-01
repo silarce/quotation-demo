@@ -68,14 +68,14 @@ type Tconfig_table = {
 export type { Trow, Tcell, Ttable, Tconfig_table };
 
 // ===================================================================
-const Table01 = ({
+export default function Table01({
   //
   thead,
   tbody,
   className,
   style,
   haveBorder = true,
-}: Ttable) => {
+}: Ttable) {
   return (
     <div className={classNames(scss.table, haveBorder && scss.haveBorder, className)} style={style}>
       <div
@@ -145,7 +145,7 @@ const Table01 = ({
       </div>
     </div>
   );
-};
+}
 
 const Row = ({ children, height, minHeight, maxHeight, className, style, onClick }: Trow) => {
   return (
@@ -213,5 +213,30 @@ const Cell = ({
     </div>
   );
 };
+// ===================================================================
 
-export default Table01;
+const CellInput = ({
+  className,
+  inputClassName,
+  inputProps,
+  disabled,
+  style,
+}: {
+  className?: string;
+  inputClassName?: string;
+  inputProps: React.InputHTMLAttributes<HTMLInputElement>;
+  disabled?: boolean;
+  style?: React.CSSProperties;
+}) => {
+  return (
+    <div className={classNames(scss.cellInput, className)} style={style}>
+      <input
+        //
+        className={classNames(scss.input, !disabled && scss.enabled, inputClassName)}
+        {...inputProps}
+      />
+    </div>
+  );
+};
+
+export { CellInput };

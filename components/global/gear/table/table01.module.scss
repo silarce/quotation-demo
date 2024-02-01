@@ -52,3 +52,18 @@
     white-space: pre-wrap;
   }
 }
+
+// =================================================================
+
+.cellInput {
+  padding: 0 20px;
+  .input {
+    width: 100%;
+    background-color: transparent;
+    text-align: center;
+    border-bottom: solid 1px transparent;
+    &.enabled {
+      border-color: black;
+    }
+  }
+}
