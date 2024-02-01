@@ -366,6 +366,7 @@ export default function OutsourcingPricingEdit() {
           {
             children: latestPeriodKeep.toLocaleString(),
             ...config_actualAmountReceived.subTotal_invoice.tbody,
+            className: scss.textGreen,
           },
         ],
       },

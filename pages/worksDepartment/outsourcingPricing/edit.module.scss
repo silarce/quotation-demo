@@ -21,6 +21,13 @@
   }
 }
 
+.textGreen {
+  color: theme("colors.pass");
+  span {
+    color: theme("colors.pass");
+  }
+}
+
 .textBold {
   font-weight: 700;
   span {
