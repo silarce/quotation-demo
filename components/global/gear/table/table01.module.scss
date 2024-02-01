@@ -63,16 +63,21 @@
     text-align: center;
     border-bottom: solid 1px transparent;
     &.enabled {
-      border-color: black;
+      border-color: theme("colors.sub");
     }
   }
 }
 
 .cellSelect {
+  padding: 0 20px;
   .antdSelect {
     width: 100%;
+    border-bottom: solid 1px transparent;
     span {
       font-size: 16px;
+    }
+    &.enabled {
+      border-color: theme("colors.sub");
     }
   }
 }

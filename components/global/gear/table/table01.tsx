@@ -259,7 +259,7 @@ const CellSelect = ({
   return (
     <div className={classNames(scss.cellSelect, className)} style={style}>
       <Select
-        className={classNames(scss.antdSelect, selectClassName)}
+        className={classNames(scss.antdSelect, !disabled && scss.enabled, selectClassName)}
         bordered={false}
         showArrow={!disabled}
         disabled={disabled}
