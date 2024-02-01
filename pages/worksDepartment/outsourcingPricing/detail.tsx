@@ -78,8 +78,9 @@ export default function OutsourcingPricingDetail() {
 
   // ---------------------------------------------------------------------
 
-  const control_table01 = useTable01();
-  const control_table02 = useTable02({ dataArr: data02, editData02, disabled });
+  const { control_table01, subTotal01 } = useTable01();
+  const { control_table02, subTotal02 } = useTable02({ dataArr: data02, editData02, disabled });
+  const control_table_total = useTable_total({ subTotal01, subTotal02 });
 
   // ---------------------------------------------------------------------
 
@@ -182,9 +183,10 @@ export default function OutsourcingPricingDetail() {
         {/*  */}
         <Table01 className="mt-20" {...control_table01} />
         <div className="mt-20">
-          <IconAddCircle className=" mb-2" onClick={addData02} />
+          <IconAddCircle className="mb-2" onClick={addData02} />
           <Table01 {...control_table02} />
         </div>
+        <Table01 className="mt-20" {...control_table_total} />
         {/*  */}
       </div>
     </SubLayer>
@@ -198,9 +200,9 @@ export default function OutsourcingPricingDetail() {
 // ===========================================================================
 // ===========================================================================
 
-const useTable01 = (): Ttable => {
+const useTable01 = () => {
   //
-  const control_table = useMemo(() => {
+  const { control_table, subTotal } = useMemo(() => {
     const thead: Ttable['thead'] = {
       cellArr: [
         {
@@ -303,13 +305,18 @@ const useTable01 = (): Ttable => {
       rowArr,
     };
 
-    return {
+    const control_table = {
       thead,
       tbody,
     };
+
+    return {
+      control_table,
+      subTotal: decimal_subTotal.toNumber(),
+    };
   }, []); // useMemo
 
-  return control_table;
+  return { control_table01: control_table, subTotal01: subTotal };
 };
 
 // ===========================================================================
@@ -323,9 +330,9 @@ const useTable02 = ({
   dataArr: TfakeData02[];
   editData02: (props: { index: number; key: keyof TfakeData02; value: string }) => void;
   disabled?: boolean;
-}): Ttable => {
+}) => {
   //
-  const control_table = useMemo(() => {
+  const { control_table, subTotal } = useMemo(() => {
     const thead: Ttable['thead'] = {
       cellArr: [
         {
@@ -452,11 +459,58 @@ const useTable02 = ({
       rowArr,
     };
 
+    const control_table = {
+      thead,
+      tbody,
+    };
+
+    return {
+      control_table,
+      subTotal: decimal_subTotal.toNumber(),
+    };
+  }, [dataArr, disabled]); // useMemo
+
+  return { control_table02: control_table, subTotal02: subTotal };
+};
+
+const useTable_total = ({ subTotal01, subTotal02 }: { subTotal01: number; subTotal02: number }) => {
+  const control_table: Ttable = useMemo(() => {
+    const total = new Decimal(subTotal01).add(subTotal02).toNumber();
+
+    const thead: Ttable['thead'] = {
+      cellArr: [
+        {
+          children: '總計',
+          flex: 'auto',
+          width: '100%',
+        },
+      ],
+    };
+
+    const rowArr: Ttable['tbody']['rowArr'] = [
+      {
+        cellArr: [
+          {
+            children: '總計',
+            ...confit_public.left,
+          },
+          {
+            children: total.toLocaleString(),
+            ...confit_public.right,
+          },
+        ],
+      },
+    ];
+
+    const tbody = {
+      rowArr,
+    };
+
     return {
       thead,
       tbody,
     };
-  }, [dataArr, disabled]); // useMemo
+  }, [subTotal01, subTotal02]);
 
   return control_table;
 };
