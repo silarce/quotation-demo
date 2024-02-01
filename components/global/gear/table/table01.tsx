@@ -261,6 +261,7 @@ const CellSelect = ({
         className={classNames(scss.antdSelect, selectClassName)}
         bordered={false}
         showArrow={!disabled}
+        size="small"
         {...selectProps}
       />
     </div>
