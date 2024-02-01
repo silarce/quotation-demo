@@ -16,6 +16,9 @@ import type { Trow, Tcell, Ttable, Tconfig_table } from 'components/global/gear/
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
 
+// icon
+import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
+
 // css
 import scss from './detail.module.scss';
 
@@ -30,7 +33,53 @@ export default function OutsourcingPricingDetail() {
 
   // ---------------------------------------------------------------------
 
+  const [data02, setData02] = useState<TfakeData02[]>([]);
+
+  // ---------------------------------------------------------------------
+
+  const addData02 = () => {
+    setData02((prev) => [...prev, create_emptyFakeData02()]);
+  };
+
+  // const deleteData02 = (index: number) => {
+  //   setData02((prev) => prev.filter((_, i) => i !== index));
+  // };
+
+  const editData02 = ({
+    //
+    index,
+    key,
+    value,
+  }: {
+    index: number;
+    key: keyof TfakeData02;
+    value: string;
+  }) => {
+    setData02((prev) => {
+      const new_data02 = _.cloneDeep(prev);
+
+      if (key === 'qty' || key === 'unitPrice') {
+        new_data02[index][key] = Number(value);
+      } else {
+        new_data02[index][key] = value;
+      }
+
+      return new_data02;
+    });
+  };
+
+  // ---------------------------------------------------------------------
+
+  useEffect(() => {
+    if (disabled) {
+      setData02(_.cloneDeep(fakeData02Arr));
+    }
+  }, [disabled]);
+
+  // ---------------------------------------------------------------------
+
   const control_table01 = useTable01();
+  const control_table02 = useTable02({ dataArr: data02, editData02, disabled });
 
   // ---------------------------------------------------------------------
 
@@ -131,7 +180,11 @@ export default function OutsourcingPricingDetail() {
           />
         </div>
         {/*  */}
-        <Table01 className=" mt-20" {...control_table01} />
+        <Table01 className="mt-20" {...control_table01} />
+        <div className="mt-20">
+          <IconAddCircle className=" mb-2" onClick={addData02} />
+          <Table01 {...control_table02} />
+        </div>
         {/*  */}
       </div>
     </SubLayer>
@@ -250,22 +303,163 @@ const useTable01 = (): Ttable => {
       rowArr,
     };
 
-    //
-    //
     return {
       thead,
       tbody,
     };
-
-    //
-    //
-    //
   }, []); // useMemo
 
   return control_table;
 };
 
 // ===========================================================================
+
+const useTable02 = ({
+  //
+  dataArr,
+  editData02,
+  disabled,
+}: {
+  dataArr: TfakeData02[];
+  editData02: (props: { index: number; key: keyof TfakeData02; value: string }) => void;
+  disabled?: boolean;
+}): Ttable => {
+  //
+  const control_table = useMemo(() => {
+    const thead: Ttable['thead'] = {
+      cellArr: [
+        {
+          children: config_useTable02.floorNumber.label,
+          ...config_useTable02.floorNumber,
+        },
+        {
+          children: config_useTable02.workContent.label,
+          ...config_useTable02.workContent,
+        },
+        {
+          children: config_useTable02.qty.label,
+          ...config_useTable02.qty,
+        },
+        {
+          children: config_useTable02.unitPrice.label,
+          ...config_useTable02.unitPrice,
+        },
+        {
+          children: config_useTable02.dualPrice.label,
+          ...config_useTable02.dualPrice,
+        },
+      ],
+    };
+
+    let decimal_subTotal = new Decimal(0);
+
+    const rowArr: Ttable['tbody']['rowArr'] = dataArr.map((item, index) => {
+      const { floorNumber, workContent, qty, unitPrice } = item;
+
+      const dualPrice = new Decimal(unitPrice).mul(qty).toDecimalPlaces(0).toNumber();
+      decimal_subTotal = decimal_subTotal.add(dualPrice);
+
+      const cellArr: Tcell[] = [
+        {
+          children: (
+            <CellInput
+              disabled={disabled}
+              style={{ width: config_useTable02.floorNumber.width }}
+              inputProps={{
+                value: floorNumber,
+                onChange: (e) => {
+                  editData02({ index, key: 'floorNumber', value: e.target.value });
+                },
+              }}
+            />
+          ),
+          ...config_useTable02.floorNumber,
+        },
+        {
+          children: (
+            <CellSelect
+              disabled={disabled}
+              style={{ width: config_useTable02.workContent.width }}
+              selectProps={{
+                value: workContent || undefined,
+                placeholder: '工作內容...',
+                options: fakeData02_options,
+                onChange: (str) => {
+                  editData02({ index, key: 'workContent', value: str });
+                },
+              }}
+            />
+          ),
+          ...config_useTable02.workContent,
+        },
+        {
+          children: (
+            <CellInput
+              disabled={disabled}
+              style={{ width: config_useTable02.qty.width }}
+              inputProps={{
+                value: qty,
+                onChange: (e) => {
+                  editData02({ index, key: 'qty', value: e.target.value });
+                },
+                type: 'number',
+              }}
+            />
+          ),
+          ...config_useTable02.qty,
+        },
+        {
+          children: (
+            <CellInput
+              disabled={disabled}
+              style={{ width: config_useTable02.unitPrice.width }}
+              inputProps={{
+                value: unitPrice,
+                onChange: (e) => {
+                  editData02({ index, key: 'unitPrice', value: e.target.value });
+                },
+                type: 'number',
+              }}
+            />
+          ),
+          ...config_useTable02.unitPrice,
+        },
+        {
+          children: dualPrice,
+          ...config_useTable02.dualPrice,
+        },
+      ];
+
+      return {
+        cellArr,
+      };
+    });
+
+    rowArr.push({
+      cellArr: [
+        {
+          children: '合計',
+          ...confit_public.left,
+        },
+        {
+          children: decimal_subTotal.toNumber().toLocaleString(),
+          ...confit_public.right,
+        },
+      ],
+    });
+
+    const tbody = {
+      rowArr,
+    };
+
+    return {
+      thead,
+      tbody,
+    };
+  }, [dataArr, disabled]); // useMemo
+
+  return control_table;
+};
 
 // ===========================================================================
 
@@ -323,6 +517,35 @@ const config_useTable01: Tconfig = {
   },
 };
 
+const config_useTable02: Tconfig = {
+  floorNumber: {
+    label: '樓層編號',
+    width: 230,
+    justifyContent: 'center',
+  },
+  workContent: {
+    label: '工作內容',
+    flex: 'auto',
+    width: '418px',
+    justifyContent: 'center',
+  },
+  qty: {
+    label: '數量',
+    width: 150,
+    justifyContent: 'center',
+  },
+  unitPrice: {
+    label: '單價',
+    width: 150,
+    justifyContent: 'center',
+  },
+  dualPrice: {
+    label: '小計',
+    width: 150,
+    justifyContent: 'center',
+  },
+};
+
 // ===========================================================================
 
 const fakeData = [
@@ -351,3 +574,47 @@ const fakeData = [
     unitPrice: 999, // 單價
   },
 ] as const;
+
+type TfakeData02 = {
+  floorNumber: string;
+  workContent: string;
+  qty: number;
+  unitPrice: number;
+};
+
+const fakeData02Arr = [
+  {
+    floorNumber: 'F-001',
+    workContent: '打石',
+    qty: 1,
+    unitPrice: 999,
+  },
+  {
+    floorNumber: 'F-001',
+    workContent: '門楣',
+    qty: 3,
+    unitPrice: 999,
+  },
+];
+
+const create_emptyFakeData02 = () => ({
+  floorNumber: '',
+  workContent: '',
+  qty: 0,
+  unitPrice: 0,
+});
+
+const fakeData02_options = [
+  {
+    label: '打石',
+    value: '打石',
+  },
+  {
+    label: '門楣',
+    value: '門楣',
+  },
+  {
+    label: '特殊門楣',
+    value: '特殊門楣',
+  },
+];
