@@ -9,7 +9,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // components
-import Table01 from 'components/global/gear/table/table01';
+import Table01, { Trow, Tcell, Ttable } from 'components/global/gear/table/table01';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -132,3 +132,48 @@ export default function OutsourcingPricingDetail() {
 }
 
 // ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+
+// const useTable01 = () => {
+//   const decimal_subTotal = new Decimal(0);
+
+//   const rowArr: Ttable['tbody']['rowArr'] = fakeData.map((item, index) => {
+//     const { floorNumber, width, height, volume, qty, unitPrice } = item;
+
+//     const dualPrice = new Decimal(unitPrice).mul(qty).toDecimalPlaces(0).toNumber();
+//     decimal_subTotal.add(dualPrice);
+//   });
+// };
+
+// ===========================================================================
+
+const fakeData = [
+  {
+    floorNumber: 'F-001',
+    width: 999,
+    height: 999,
+    volume: 999, // 才數
+    qty: 999, // 樘數
+    unitPrice: 999, // 單價
+  },
+  {
+    floorNumber: 'F-002',
+    width: 999,
+    height: 999,
+    volume: 999, // 才數
+    qty: 999, // 樘數
+    unitPrice: 999, // 單價
+  },
+  {
+    floorNumber: 'F-003',
+    width: 999,
+    height: 999,
+    volume: 999, // 才數
+    qty: 999, // 樘數
+    unitPrice: 999, // 單價
+  },
+] as const;

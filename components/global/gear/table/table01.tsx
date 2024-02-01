@@ -48,6 +48,8 @@ type Ttable = {
   };
 };
 
+export type { Trow, Tcell, Ttable };
+
 // ===================================================================
 const Table01 = ({
   //
@@ -196,4 +198,3 @@ const Cell = ({
 };
 
 export default Table01;
-export type { Trow, Tcell, Ttable };
