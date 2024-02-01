@@ -236,6 +236,7 @@ const CellInput = ({
       <input
         //
         className={classNames(scss.input, !disabled && scss.enabled, inputClassName)}
+        readOnly={disabled}
         {...inputProps}
       />
     </div>
@@ -261,6 +262,7 @@ const CellSelect = ({
         className={classNames(scss.antdSelect, selectClassName)}
         bordered={false}
         showArrow={!disabled}
+        disabled={disabled}
         size="small"
         {...selectProps}
       />
