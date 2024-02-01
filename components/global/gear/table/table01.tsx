@@ -1,5 +1,8 @@
 import classNames from 'classnames';
 
+// antd
+import { Select, SelectProps } from 'antd';
+
 // gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
@@ -239,4 +242,29 @@ const CellInput = ({
   );
 };
 
-export { CellInput };
+const CellSelect = ({
+  className,
+  selectClassName,
+  selectProps,
+  disabled,
+  style,
+}: {
+  className?: string;
+  selectClassName?: string;
+  selectProps: SelectProps;
+  disabled?: boolean;
+  style?: React.CSSProperties;
+}) => {
+  return (
+    <div className={classNames(scss.cellSelect, className)} style={style}>
+      <Select
+        className={classNames(scss.antdSelect, selectClassName)}
+        bordered={false}
+        showArrow={!disabled}
+        {...selectProps}
+      />
+    </div>
+  );
+};
+
+export { CellInput, CellSelect };
