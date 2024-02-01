@@ -9,7 +9,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // components
-import Table01, { Trow, Tcell, Ttable } from 'components/global/gear/table/table01';
+import Table01, { Trow, Tcell, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -25,7 +25,11 @@ export default function OutsourcingPricingDetail() {
   const router = useRouter();
 
   // ---------------------------------------------------------------------
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+
+  // ---------------------------------------------------------------------
+
+  const control_table01 = useTable01();
 
   // ---------------------------------------------------------------------
 
@@ -126,6 +130,8 @@ export default function OutsourcingPricingDetail() {
           />
         </div>
         {/*  */}
+        <Table01 className=" mt-20" {...control_table01} />
+        {/*  */}
       </div>
     </SubLayer>
   );
@@ -138,16 +144,174 @@ export default function OutsourcingPricingDetail() {
 // ===========================================================================
 // ===========================================================================
 
-// const useTable01 = () => {
-//   const decimal_subTotal = new Decimal(0);
+const useTable01 = (): Ttable => {
+  //
+  const control_table = useMemo(() => {
+    const thead: Ttable['thead'] = {
+      cellArr: [
+        {
+          children: config_useTable01.floorNumber.label,
+          ...config_useTable01.floorNumber,
+        },
+        {
+          children: config_useTable01.width.label,
+          ...config_useTable01.width,
+        },
+        {
+          children: config_useTable01.height.label,
+          ...config_useTable01.height,
+        },
+        {
+          children: config_useTable01.volume.label,
+          ...config_useTable01.volume,
+        },
+        {
+          children: config_useTable01.qty.label,
+          ...config_useTable01.qty,
+        },
+        {
+          children: config_useTable01.unitPrice.label,
+          ...config_useTable01.unitPrice,
+        },
+        {
+          children: config_useTable01.dualPrice.label,
+          ...config_useTable01.dualPrice,
+        },
+      ],
+    };
+    //
 
-//   const rowArr: Ttable['tbody']['rowArr'] = fakeData.map((item, index) => {
-//     const { floorNumber, width, height, volume, qty, unitPrice } = item;
+    let decimal_subTotal = new Decimal(0);
 
-//     const dualPrice = new Decimal(unitPrice).mul(qty).toDecimalPlaces(0).toNumber();
-//     decimal_subTotal.add(dualPrice);
-//   });
-// };
+    const rowArr: Ttable['tbody']['rowArr'] = fakeData.map((item, index) => {
+      const { floorNumber, width, height, volume, qty, unitPrice } = item;
+
+      const dualPrice = new Decimal(unitPrice).mul(qty).toDecimalPlaces(0).toNumber();
+      decimal_subTotal = decimal_subTotal.add(dualPrice);
+
+      const cellArr: Tcell[] = [
+        {
+          children: floorNumber,
+          ...config_useTable01.floorNumber,
+        },
+        {
+          children: width,
+          ...config_useTable01.width,
+        },
+        {
+          children: height,
+          ...config_useTable01.height,
+        },
+        {
+          children: volume,
+          ...config_useTable01.volume,
+        },
+        {
+          children: qty,
+          ...config_useTable01.qty,
+        },
+        {
+          children: unitPrice,
+          ...config_useTable01.unitPrice,
+        },
+        {
+          children: dualPrice,
+          ...config_useTable01.dualPrice,
+        },
+      ];
+
+      return {
+        cellArr,
+      };
+    });
+
+    rowArr.push({
+      cellArr: [
+        {
+          children: '合計',
+          ...confit_public.left,
+        },
+        {
+          children: decimal_subTotal.toNumber().toLocaleString(),
+          ...confit_public.right,
+        },
+      ],
+    });
+
+    const tbody = {
+      rowArr,
+    };
+
+    //
+    //
+    return {
+      thead,
+      tbody,
+    };
+
+    //
+    //
+    //
+  }, []); // useMemo
+
+  return control_table;
+};
+
+// ===========================================================================
+
+type Tconfig = {
+  [key: string]: Tconfig_table;
+};
+
+const confit_public: Tconfig = {
+  left: {
+    flex: 'auto',
+    justifyContent: 'flex-end',
+  },
+  right: {
+    width: 150,
+    justifyContent: 'center',
+  },
+};
+
+const config_useTable01: Tconfig = {
+  floorNumber: {
+    label: '樓層編號',
+    // width:230
+    flex: 'auto',
+    justifyContent: 'center',
+  },
+  width: {
+    label: '寬',
+    width: 150,
+    justifyContent: 'center',
+  },
+  height: {
+    label: '高',
+    width: 150,
+    justifyContent: 'center',
+  },
+  volume: {
+    label: '才數',
+    width: 150,
+    justifyContent: 'center',
+  },
+  qty: {
+    label: '樘數',
+    width: 150,
+    justifyContent: 'center',
+  },
+  unitPrice: {
+    label: '價格/才',
+    width: 150,
+    justifyContent: 'center',
+  },
+  dualPrice: {
+    label: '小計',
+    width: 150,
+    justifyContent: 'center',
+  },
+};
 
 // ===========================================================================
 
@@ -156,7 +320,7 @@ const fakeData = [
     floorNumber: 'F-001',
     width: 999,
     height: 999,
-    volume: 999, // 才數
+    volume: 10, // 才數
     qty: 999, // 樘數
     unitPrice: 999, // 單價
   },
@@ -164,7 +328,7 @@ const fakeData = [
     floorNumber: 'F-002',
     width: 999,
     height: 999,
-    volume: 999, // 才數
+    volume: 20, // 才數
     qty: 999, // 樘數
     unitPrice: 999, // 單價
   },
@@ -172,7 +336,7 @@ const fakeData = [
     floorNumber: 'F-003',
     width: 999,
     height: 999,
-    volume: 999, // 才數
+    volume: 30, // 才數
     qty: 999, // 樘數
     unitPrice: 999, // 單價
   },

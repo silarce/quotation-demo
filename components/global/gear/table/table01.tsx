@@ -48,7 +48,24 @@ type Ttable = {
   };
 };
 
-export type { Trow, Tcell, Ttable };
+type Tconfig_table = {
+  label?: string;
+  width?: React.CSSProperties['width'];
+  flex?: React.CSSProperties['flex'];
+  justifyContent?: React.CSSProperties['justifyContent'];
+  className?: string;
+  style?: React.CSSProperties;
+  tbody?: {
+    width?: React.CSSProperties['width'];
+    flex?: React.CSSProperties['flex'];
+    justifyContent?: React.CSSProperties['justifyContent'];
+    className?: string;
+    style?: React.CSSProperties;
+  };
+  inputWidth?: React.CSSProperties['width'];
+};
+
+export type { Trow, Tcell, Ttable, Tconfig_table };
 
 // ===================================================================
 const Table01 = ({
