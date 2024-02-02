@@ -96,7 +96,9 @@ export default function OutsourcingVendorManagement() {
   ];
 
   return (
-    <SubLayer isLoading_subLayer={isLoadingPage1}>
+    <SubLayer
+    // isLoading_subLayer={isLoadingPage1}
+    >
       <PageHeader02 tag="外包廠商管理" panelList={panelList01} />
 
       <div className={scss.main}>

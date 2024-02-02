@@ -100,7 +100,7 @@ export default function Edit() {
       type: 'myButton',
       label: '返回',
       onClick: () => {
-        router.back();
+        router.push('./');
       },
     },
   ];
@@ -120,7 +120,7 @@ export default function Edit() {
         if (!!outsourcingId) {
           setDisabled(true);
         } else {
-          router.back();
+          router.push('./');
         }
       },
     },
