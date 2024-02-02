@@ -9,12 +9,12 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import scss from './edit.module.scss';
 
 // api
 import {
-  TcreateOutsourcingDto,
   TupdateOutsourcingDto,
   useGetOutsourcing_id,
   apiPostOutsourcing,
@@ -49,6 +49,12 @@ export default function Edit() {
 
   const reqPostPatch = async () => {
     const id = outsourcingId;
+
+    if (!outsourcing.name) {
+      myAlert.info({ title: '請輸入廠商名稱' });
+
+      return;
+    }
 
     try {
       setIsLoading(true);
