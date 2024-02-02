@@ -55,11 +55,15 @@ export default function Edit() {
 
       if (id) {
         await apiPatchOutsourcing(id, outsourcing);
+        update();
       } else {
-        await apiPostOutsourcing(outsourcing);
+        const res = await apiPostOutsourcing(outsourcing);
+        router.push({
+          query: { outsourcingId: res.id },
+        });
       }
 
-      update();
+      setDisabled(true);
     } catch (error) {
     } finally {
       setIsLoading(false);
