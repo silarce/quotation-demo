@@ -16,6 +16,7 @@ type Trow = {
   className?: string;
   style?: React.CSSProperties;
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  viewRef?: (node?: Element | null | undefined) => void;
 };
 
 type Tcell = {
@@ -34,7 +35,7 @@ type Ttable = {
   haveBorder?: boolean;
   thead: {
     cellArr: Tcell[];
-    rowProps?: Omit<Trow, 'children' | 'onClick'>;
+    rowProps?: Omit<Trow, 'children' | 'onClick' | 'viewRef'>;
     className?: string;
     style?: React.CSSProperties;
     stickyTop?: {
@@ -114,7 +115,7 @@ export default function Table01({
       {/*  */}
       <div className={classNames(scss.tbody)}>
         {tbody.rowArr.map((row, rIndex) => {
-          const { cellArr, height, minHeight, maxHeight, className, style, onClick } = row;
+          const { cellArr, height, minHeight, maxHeight, className, style, onClick, viewRef } = row;
 
           return (
             <Row
@@ -125,6 +126,7 @@ export default function Table01({
               className={className}
               style={style}
               onClick={onClick}
+              viewRef={viewRef}
             >
               {cellArr.map((cell, cIndex) => {
                 const { width, flex, justifyContent, className, style, children } = cell;
@@ -150,11 +152,12 @@ export default function Table01({
   );
 }
 
-const Row = ({ children, height, minHeight, maxHeight, className, style, onClick }: Trow) => {
+const Row = ({ children, height, minHeight, maxHeight, className, style, onClick, viewRef }: Trow) => {
   return (
     <CellWithBar className={scss.rowWrapper}>
       <div
         //
+        ref={viewRef}
         className={classNames(scss.row, className, onClick && scss.clickable)}
         style={{
           height,
