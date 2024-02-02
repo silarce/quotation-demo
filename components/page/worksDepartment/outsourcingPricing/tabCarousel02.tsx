@@ -1,7 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
-
-// import { useInView } from 'react-intersection-observer';
 
 import Slider, { CustomArrowProps, Settings as TreactSlickProps } from 'react-slick';
 
@@ -18,6 +16,7 @@ type Ttab = {
   className?: string;
   className_tabContent?: string;
   viewRef?: (node?: Element | null | undefined) => void;
+  isActive?: boolean;
 };
 
 type Tcontrol = {
@@ -35,11 +34,13 @@ export default function TabCarousel02({
   control,
   theme = 'default',
   props,
+  onMount,
 }: {
   className?: string;
   control: Tcontrol;
   theme?: 'default' | 'dashed';
   props?: TreactSlickProps;
+  onMount?: (props: { ref_slider: React.MutableRefObject<Slider> }) => void;
 }) {
   // const [viewRef_first, inView_first] = useInView();
   // const [viewRef_last, inView_last] = useInView();
@@ -49,6 +50,10 @@ export default function TabCarousel02({
   // -------------------------------------------------------------------------
   const sliderRef = useRef<Slider>(null!);
   const { tabArr, activeIndex } = control;
+
+  useEffect(() => {
+    onMount && onMount({ ref_slider: sliderRef });
+  }, []);
 
   return (
     <Slider
@@ -86,7 +91,7 @@ export default function TabCarousel02({
       {tabArr.map((tab, index) => {
         const { label, onClick, className, className_tabContent, viewRef } = tab;
 
-        const isActive = activeIndex === index;
+        const isActive = tab.isActive !== undefined ? tab.isActive : activeIndex === index;
 
         const theClick = () => {
           !isSliding && onClick && onClick({ ref_slider: sliderRef });
