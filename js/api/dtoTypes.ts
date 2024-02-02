@@ -2813,6 +2813,8 @@ export type TcreateOutsourcingDto = Omit<
   'outsourcingPayment' | 'latestPayment' | 'id' | 'createdAt' | 'updatedAt'
 >;
 
+export type TupdateOutsourcingDto = TcreateOutsourcingDto;
+
 export type ToutsourcingPaymentDto = {
   // 外包廠商Id
   outsourcingId: string | null;
