@@ -18,6 +18,11 @@ export type TpageMetaDto = {
   hasNextPage: boolean;
 };
 
+export type TpageResponse<Tdata> = {
+  data: Tdata[];
+  meta: TpageMetaDto;
+};
+
 export type TfileDto = {
   id: string;
   createdAt: string;
@@ -2778,6 +2783,9 @@ export type TupdateAccountReceivableProductPaymentDto = {
 // outsourcing
 
 export type ToutsourcingDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
   // 外包廠商名
   name: string;
   // 連絡電話
@@ -2799,6 +2807,11 @@ export type ToutsourcingDto = {
   // 最新外包計價單
   latestPayment: ToutsourcingPaymentDto;
 };
+
+export type TcreateOutsourcingDto = Omit<
+  ToutsourcingDto,
+  'outsourcingPayment' | 'latestPayment' | 'id' | 'createdAt' | 'updatedAt'
+>;
 
 export type ToutsourcingPaymentDto = {
   // 外包廠商Id
