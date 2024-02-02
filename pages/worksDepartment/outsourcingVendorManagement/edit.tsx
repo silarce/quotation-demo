@@ -13,7 +13,13 @@ import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/address
 import scss from './edit.module.scss';
 
 // api
-import { useGetOutsourcing_id, TcreateOutsourcingDto, TupdateOutsourcingDto } from 'js/api/api_outsourcing';
+import {
+  TcreateOutsourcingDto,
+  TupdateOutsourcingDto,
+  useGetOutsourcing_id,
+  apiPostOutsourcing,
+  apiPatchOutsourcing,
+} from 'js/api/api_outsourcing';
 
 // ====================================================================
 
@@ -27,16 +33,37 @@ export default function Edit() {
   const { outsourcingId } = router.query as Tquery;
 
   const [disabled, setDisabled] = useState(!!outsourcingId);
-
+  const [isLoading, setIsLoading] = useState(false);
   // --------------------------------------------------------------
 
-  const { data, update } = useGetOutsourcing_id(outsourcingId);
+  const { data, update, isLoading_outsourcing } = useGetOutsourcing_id(outsourcingId);
   const [outsourcing, setOutsourcing] = useState<TupdateOutsourcingDto>(createEmptyData());
 
   // --------------------------------------------------------------
 
   const editOutsourcing = (key: keyof TupdateOutsourcingDto, value: string) => {
     setOutsourcing((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // --------------------------------------------------------------
+
+  const reqPostPatch = async () => {
+    const id = outsourcingId;
+
+    try {
+      setIsLoading(true);
+
+      if (id) {
+        await apiPatchOutsourcing(id, outsourcing);
+      } else {
+        await apiPostOutsourcing(outsourcing);
+      }
+
+      update();
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // --------------------------------------------------------------
@@ -59,18 +86,9 @@ export default function Edit() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled]);
 
-  console.log(outsourcing);
-
   // --------------------------------------------------------------
 
   const panelList_disabled: TpanelList = [
-    {
-      type: 'redButton',
-      label: '刪除',
-      onClick: () => {
-        alert('test');
-      },
-    },
     {
       type: 'myButton',
       label: '編輯',
@@ -92,7 +110,7 @@ export default function Edit() {
       type: 'redButton',
       label: '確認',
       onClick: () => {
-        alert('test');
+        reqPostPatch();
       },
     },
     {
@@ -112,7 +130,12 @@ export default function Edit() {
 
   // --------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer
+      isLoading_subLayer={
+        isLoading
+        // || isLoading_outsourcing
+      }
+    >
       <PageHeader02 tag="外包廠商編輯" panelList={panelList} />
 
       <div className={scss.main}>
@@ -183,7 +206,6 @@ export default function Edit() {
                     isDisabled: disabled,
                     value: { label: outsourcing.county, value: outsourcing.county },
                     onChange: (option) => {
-                      console.log(option);
                       editOutsourcing('county', option?.value ?? '');
                       editOutsourcing('district', '');
                     },
@@ -207,7 +229,6 @@ export default function Edit() {
                     },
                   },
                 },
-                showZipCode: true,
               }}
             />
           </div>

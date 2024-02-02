@@ -38,7 +38,8 @@ type TgetOutsourcing = TpageResponse<ToutsourcingDto>;
 export const apiGetOutsourcing = async (params?: Tparams) => {
   const api = '/outsourcing';
 
-  return axi<TgetOutsourcing>(api, { params })
+  return axi
+    .get<TgetOutsourcing>(api, { params })
     .then((res) => res.data)
     .catch((err) => Promise.reject(err));
 };
@@ -51,13 +52,15 @@ export const useGetOutsourcing = createUseInfinite<TgetOutsourcing>({
 export const apiGetOutsourcing_id = async (id: string) => {
   const api = `/outsourcing/${id}`;
 
-  return axi<ToutsourcingDto>(api)
+  return axi
+    .get<ToutsourcingDto>(api)
     .then((res) => res.data)
     .catch((err) => Promise.reject(err));
 };
 
 export const useGetOutsourcing_id = (id?: string) => {
   const [res, setRes] = useState<ToutsourcingDto>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const update = async () => {
     if (!id) {
@@ -65,6 +68,7 @@ export const useGetOutsourcing_id = (id?: string) => {
     }
 
     try {
+      setIsLoading(true);
       const res = await apiGetOutsourcing_id(id);
       setRes(res);
 
@@ -75,11 +79,59 @@ export const useGetOutsourcing_id = (id?: string) => {
         title: '取得外包廠商失敗',
         content: err.message,
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return {
     data: res,
     update,
+    isLoading_outsourcing: isLoading,
   };
+};
+
+export const apiPostOutsourcing = async (
+  body: TcreateOutsourcingDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = '/outsourcing';
+
+  return axi
+    .post(api, body)
+    .then((res) => res.data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      callAlert &&
+        myAlert.err({
+          title: '新增外包廠商失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
+};
+
+export const apiPatchOutsourcing = async (
+  id: string,
+  body: TcreateOutsourcingDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = `/outsourcing/${id}`;
+
+  return axi
+    .patch(api, body)
+    .then((res) => res.data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      callAlert &&
+        myAlert.err({
+          title: '更新外包廠商失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
 };
