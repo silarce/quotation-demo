@@ -17,6 +17,7 @@ type Ttab = {
   onClick?: (props: { ref_slider: React.MutableRefObject<Slider> }) => void;
   className?: string;
   className_tabContent?: string;
+  viewRef?: (node?: Element | null | undefined) => void;
 };
 
 type Tcontrol = {
@@ -83,7 +84,7 @@ export default function TabCarousel02({
       {...props}
     >
       {tabArr.map((tab, index) => {
-        const { label, onClick, className, className_tabContent } = tab;
+        const { label, onClick, className, className_tabContent, viewRef } = tab;
 
         const isActive = activeIndex === index;
 
@@ -91,17 +92,9 @@ export default function TabCarousel02({
           !isSliding && onClick && onClick({ ref_slider: sliderRef });
         };
 
-        // const ref = index === 0 ? viewRef_first : index === tabArr.length - 1 ? viewRef_last : null;
-        // const ref = index === 0 ? viewRef_first : null;
-
         return (
           <div key={index} className={classNames(scss.tab, className)}>
-            <div
-              //
-              // ref={ref}
-              className={classNames(isActive && scss.active, className_tabContent)}
-              onClick={theClick}
-            >
+            <div ref={viewRef} className={classNames(isActive && scss.active, className_tabContent)} onClick={theClick}>
               <span>{label}</span>
             </div>
           </div>
