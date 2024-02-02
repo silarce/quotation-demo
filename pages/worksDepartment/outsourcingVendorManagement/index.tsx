@@ -12,7 +12,7 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import scss from './index.module.scss';
 
 // api
-import { useGetOutsourcing } from 'js/api/api_outsourcing';
+import { useGetOutsourcing, Tparams } from 'js/api/api_outsourcing';
 
 // --------------------------------------------------------------
 
@@ -31,13 +31,19 @@ export default function OutsourcingVendorManagement() {
     $or: [{ name: { $contains: keyword } }, { contactNumber: { $contains: keyword } }, { taxId: { $eq: keyword } }],
   };
 
+  const params: Tparams = {
+    filter,
+    sort: 'createdAt',
+    order: 'DESC',
+  };
+
   const {
     //
     dataArr,
     viewRef_bottom,
     isLoadingPage1,
     reset,
-  } = useGetOutsourcing({ customParams: { filter } });
+  } = useGetOutsourcing({ customParams: params });
 
   // --------------------------------------------------------------
 
