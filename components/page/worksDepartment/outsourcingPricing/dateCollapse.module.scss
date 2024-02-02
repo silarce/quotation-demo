@@ -34,6 +34,14 @@
   border: dashed 1px theme("colors.main");
   border-radius: 11.048px;
   cursor: pointer;
+
+  &.disabled {
+    opacity: 0.4;
+  }
+  &.forbidden {
+    opacity: 0.2;
+  }
+
   &:hover {
     background-color: theme("colors.hoverBgc");
   }

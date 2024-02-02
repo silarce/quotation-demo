@@ -135,3 +135,19 @@ export const apiPatchOutsourcing = async (
       return Promise.reject(err);
     });
 };
+
+//
+
+export const apiGetOutsourcingPayment = async (params?: Tparams) => {
+  const api = '/outsourcing-payment';
+
+  return axi
+    .get<TpageResponse<ToutsourcingPaymentDto>>(api, { params })
+    .then((res) => res.data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetOutsourcingPayment = createUseInfinite<TpageResponse<ToutsourcingPaymentDto>>({
+  apiClient: apiGetOutsourcingPayment,
+  errTitle: '取得外包計價列表失敗',
+});

@@ -11,6 +11,7 @@ import scss from './dateCollapse.module.scss';
 type Tcard = {
   label: string;
   onClick: () => void;
+  disabled?: boolean;
   forbidden?: boolean;
 };
 
@@ -42,9 +43,11 @@ export default function DateCollapse({
             <Panel key={pIndex} header={panel.label}>
               <div className={scss.panel}>
                 {panel.cardArr.map((card, cIndex) => {
-                  const { label, onClick } = card;
+                  const { label, onClick, forbidden, disabled } = card;
 
-                  return <Card key={cIndex} label={label} onClick={onClick} />;
+                  return (
+                    <Card key={cIndex} label={label} onClick={onClick} forbidden={forbidden} disabled={disabled} />
+                  );
                 })}
               </div>
             </Panel>
@@ -57,9 +60,9 @@ export default function DateCollapse({
 
 // ====================================================================
 
-const Card = ({ label, onClick }: { label: string; onClick: () => void }) => {
+const Card = ({ label, onClick, forbidden, disabled }: Tcard) => {
   return (
-    <div className={scss.card} onClick={onClick}>
+    <div className={classNames(scss.card, disabled && scss.disabled, forbidden && scss.forbidden)} onClick={onClick}>
       <span>{label}</span>
     </div>
   );

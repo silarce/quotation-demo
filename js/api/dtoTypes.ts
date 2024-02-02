@@ -2816,6 +2816,10 @@ export type TcreateOutsourcingDto = Omit<
 export type TupdateOutsourcingDto = TcreateOutsourcingDto;
 
 export type ToutsourcingPaymentDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 外包廠商Id
   outsourcingId: string | null;
   // 外包廠商
