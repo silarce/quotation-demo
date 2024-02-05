@@ -158,6 +158,7 @@ export function createUseInfinite<TapiReq extends Treq>({
       meta,
       init,
       reset,
+      nextPage,
     };
   };
 
