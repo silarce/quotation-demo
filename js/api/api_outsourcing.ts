@@ -141,6 +141,11 @@ export const apiPatchOutsourcing = async (
 export const apiGetOutsourcingPayment = async (params?: Tparams) => {
   const api = '/outsourcing-payment';
 
+  params = {
+    populate: ['outsourcing'],
+    ...params,
+  };
+
   return axi
     .get<TpageResponse<ToutsourcingPaymentDto>>(api, { params })
     .then((res) => res.data)

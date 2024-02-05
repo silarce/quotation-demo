@@ -1,6 +1,11 @@
 // 這裡一系列的介面切換
 // 其實都是同一個資料來源，不同的呈現方式
 
+// 每個外包廠商每個月只會有一張外包計價單
+
+// UX改善
+// 關於tabBar，被選中者置中應該會比較好，方便使用者點擊上一個被選中者
+
 import { useState, useEffect, useMemo, useLayoutEffect } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
@@ -28,6 +33,9 @@ import {
   useGetOutsourcingPayment,
 } from 'js/api/api_outsourcing';
 
+// utils
+import { getAllMonthByRange } from 'js/utils/helpers/date/getAllMonthByRange';
+
 // ========================================================
 type TfilterBy = 'vendor' | 'month';
 
@@ -38,18 +46,15 @@ export default function OutsourcingPricing() {
   // ------------------------------------------------------------------------
   const [showListBy, setShowListBy] = useState<TfilterBy>('vendor');
 
-  // const [isVendorMonth, setVendorMonth] = useState<string>();
-  // const [isMonthVendor, setMonthVendor] = useState<`${number}-${number}`>();
-
   const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
-  const [targetDate, setTargetDate] = useState<string>();
+  const [targetIsoDate, setTargetIsoDate] = useState<string>();
 
   // ------------------------------------------------------------------------
 
   const isShowVendorList = showListBy === 'vendor' && !targetOutsourcingId;
-  const isShowDateList = showListBy === 'month' && !targetDate;
+  const isShowDateList = showListBy === 'month' && !targetIsoDate;
   const isShowVendorMonthList = showListBy === 'vendor' && targetOutsourcingId;
-  const isShowMonthVendorList = showListBy === 'month' && targetDate;
+  const isShowMonthVendorList = showListBy === 'month' && targetIsoDate;
 
   // ------------------------------------------------------------------------
 
@@ -74,7 +79,7 @@ export default function OutsourcingPricing() {
       onClick: () => {
         setShowListBy('vendor');
         setTargetOutsourcingId(undefined);
-        setTargetDate(undefined);
+        setTargetIsoDate(undefined);
       },
     },
     {
@@ -82,7 +87,7 @@ export default function OutsourcingPricing() {
       onClick: () => {
         setShowListBy('month');
         setTargetOutsourcingId(undefined);
-        setTargetDate(undefined);
+        setTargetIsoDate(undefined);
       },
     },
   ];
@@ -106,7 +111,7 @@ export default function OutsourcingPricing() {
         <DateList
           className={classNames('m-auto mb-5 mt-[40px]', !isShowDateList && 'hidden')}
           onCardClick={(dateStr) => {
-            setTargetDate(dateStr);
+            setTargetIsoDate(new Date(dateStr).toISOString());
           }}
         />
 
@@ -123,7 +128,13 @@ export default function OutsourcingPricing() {
           />
         )}
         {/*  */}
-        <MonthVendorPanel className={classNames('m-auto mb-5 mt-[40px]', !isShowMonthVendorList && 'hidden')} />
+        <MonthVendorPanel
+          targetDate={targetIsoDate}
+          onDateTabClick={(isoString) => {
+            setTargetIsoDate(isoString);
+          }}
+          className={classNames('m-auto mb-5 mt-[40px]', !isShowMonthVendorList && 'hidden')}
+        />
         {/*  */}
       </div>
     </SubLayer>
@@ -384,32 +395,66 @@ const VendorMonthPanel = ({
   );
 };
 
-const MonthVendorPanel = ({ className }: { className?: string }) => {
+const MonthVendorPanel = ({
+  //
+  targetDate,
+  className,
+  onDateTabClick,
+}: {
+  targetDate: string | undefined;
+  className?: string;
+  onDateTabClick: (isoString: string) => void;
+}) => {
   const router = useRouter();
 
   // ----------------------------------------------------------------------
+  const [activeTab_date, setActiveTab_date] = useState<number>(0);
 
-  const [activeTab_vendor, setActiveTab_vendor] = useState<number>(0);
+  // ----------------------------------------------------------------------
+
+  const monthStart = moment(targetDate).startOf('month').toISOString();
+  const monthEnd = moment(targetDate).endOf('month').toISOString();
+
+  const filter = {
+    date: {
+      $gte: monthStart,
+      $lte: monthEnd,
+    },
+  };
+
+  const params: Tparams = {
+    pageSize: 99999,
+    filter,
+  };
+
+  const { dataArr: paymentArr, reset: reset_payment } = useGetOutsourcingPayment({ customParams: params });
+
+  // ----------------------------------------------------------------------
+
+  useEffect(() => {
+    reset_payment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetDate]);
+
+  // ----------------------------------------------------------------------
 
   const tabArr: Tcontrol_tabCarousel['tabArr'] = useMemo(() => {
-    const dateList = generateMonthsSinceNow();
-
-    let dateArr: string[] = []; //  [2020年1月,2020年2月,2020年3月]
-    Object.entries(dateList).forEach(([year, monthArr]) => {
-      monthArr.forEach((month) => {
-        const twYear = String(Number(year) - 1911);
-        dateArr.push(`${twYear}年${month}月`);
-      });
+    let dateArr = getAllMonthByRange({
+      start: 2022,
+      end: undefined,
     });
 
     dateArr = dateArr.reverse();
-
     const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
+      const twDate = moment(date).subtract(1911, 'years');
+
       return {
-        label: date,
+        label: twDate.format('yy-MM'),
         onClick: ({ ref_slider }) => {
-          setActiveTab_vendor(index);
+          setActiveTab_date(index);
           ref_slider.current.slickGoTo(index);
+          const theDate = moment(date);
+          onDateTabClick(theDate.toISOString());
         },
       };
     });
@@ -418,39 +463,63 @@ const MonthVendorPanel = ({ className }: { className?: string }) => {
   }, []);
 
   const control_tabCarousel: Tcontrol_tabCarousel = {
-    activeIndex: activeTab_vendor,
+    activeIndex: activeTab_date,
     tabArr,
   };
 
   // ----------------------------------------------------------------------
 
-  const control_table: Ttable['tbody']['rowArr'] = useMemo(() => {
-    return fakeDataArr.map((data) => {
+  const thead: Ttable['thead'] = {
+    stickyTop: {
+      top: '40px',
+    },
+    rowProps: {
+      minHeight: tableConfig.row.minHeight,
+    },
+    cellArr: [
+      {
+        children: cellCofig.vendor.label,
+        width: cellCofig.vendor.width,
+      },
+      {
+        children: cellCofig.phoneNumber.label,
+        width: cellCofig.phoneNumber.width,
+      },
+    ],
+  };
+
+  const control_rowArr: Ttable['tbody']['rowArr'] = useMemo(() => {
+    return paymentArr.map((paymentInfo) => {
+      const { outsourcing } = paymentInfo;
+
       return {
         minHeight: tableConfig.row.minHeight,
         onClick: () => {
           router.push({
             pathname: router.pathname + '/edit',
+            query: {
+              paymentId: paymentInfo?.id,
+            },
           });
         },
         cellArr: [
           {
-            children: data.name,
+            children: outsourcing.name,
             width: cellCofig.vendor.width,
           },
           {
-            children: data.phoneNumber,
+            children: outsourcing.contactNumber,
             width: cellCofig.phoneNumber.width,
           },
         ],
       };
     });
-  }, []);
+  }, [paymentArr]);
 
-  const fakeTable: Ttable = {
-    thead: fakeThead,
+  const control_table: Ttable = {
+    thead: thead,
     tbody: {
-      rowArr: control_table,
+      rowArr: control_rowArr,
     },
     haveBorder: false,
   };
@@ -468,7 +537,7 @@ const MonthVendorPanel = ({ className }: { className?: string }) => {
           top: 40,
         }}
       >
-        <Table01 {...fakeTable} />
+        <Table01 {...control_table} />
       </Wrapper_tab>
     </div>
   );
@@ -564,26 +633,6 @@ const cellCofig: TcellConfig = {
     width: '180px',
     // flex: 'auto',
   },
-};
-
-const fakeThead: Ttable['thead'] = {
-  stickyTop: {
-    top: '40px',
-  },
-  rowProps: {
-    minHeight: tableConfig.row.minHeight,
-  },
-  cellArr: [
-    {
-      children: cellCofig.vendor.label,
-      width: cellCofig.vendor.width,
-    },
-    {
-      children: cellCofig.phoneNumber.label,
-      width: cellCofig.phoneNumber.width,
-      // flex: cellCofig.phoneNumber.flex,
-    },
-  ],
 };
 
 type TfakeData = {
