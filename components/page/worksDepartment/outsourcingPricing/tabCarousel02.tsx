@@ -80,7 +80,7 @@ export default function TabCarousel02({
         // isLastInView={inView_last}
         />
       }
-      beforeChange={(e) => {
+      onSwipe={(e) => {
         setIsSliding(true);
       }}
       afterChange={(e) => {
@@ -94,6 +94,8 @@ export default function TabCarousel02({
         const isActive = tab.isActive !== undefined ? tab.isActive : activeIndex === index;
 
         const theClick = () => {
+          console.log(isSliding);
+
           !isSliding && onClick && onClick({ ref_slider: sliderRef });
         };
 
