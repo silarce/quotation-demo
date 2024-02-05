@@ -2825,7 +2825,7 @@ export type ToutsourcingPaymentDto = {
   // 外包廠商
   outsourcing: ToutsourcingDto;
   // 外包計價單日期
-  date: Date;
+  date: string;
   // 是否已結清
   isPaymentCleared: boolean;
   // 扣款明細
@@ -2843,45 +2843,45 @@ export type ToutsourcingPaymentDto = {
   // 經辦人
   agentEmployee: TemployeeDto;
   // 送審給核對人員的時間
-  toReviewCheckerAt: Date | null;
+  toReviewCheckerAt: string | null;
   // 核對人員Id
   reviewCheckerEmployeeId: string | null;
   // 核對人員
   reviewCheckerEmployee: TemployeeDto;
   // 核對人員審核時間
-  checkerReviewedAt: Date | null;
+  checkerReviewedAt: string | null;
   // 送審給主管的時間
-  toReviewSupervisorAt: Date | null;
+  toReviewSupervisorAt: string | null;
   // 審核主管id
   reviewSupervisorEmployeeId: string | null;
   // 審核主管
   reviewSupervisorEmployee: TemployeeDto;
   // 主管審核時間
-  supervisorReviewedAt: Date | null;
+  supervisorReviewedAt: string | null;
   // 送審給總經理的時間
-  toManagerAt: Date | null;
+  toManagerAt: string | null;
   // 總經理id
   reviewManagerEmployeeId: string | null;
   // 總經理
   reviewManagerEmployee: TemployeeDto;
   // 總經理審核時間
-  managerReviewedAt: Date | null;
+  managerReviewedAt: string | null;
   // 送審給會計的時間
-  toAccountingAt: Date | null;
+  toAccountingAt: string | null;
   // 會計id
   reviewAccountingEmployeeId: string | null;
   // 會計
   reviewAccountingEmployee: TemployeeDto;
   // 會計審核時間
-  accountingReviewedAt: Date | null;
+  accountingReviewedAt: string | null;
   // 送審給出納的時間
-  toCashierAt: Date | null;
+  toCashierAt: string | null;
   // 出納id
   reviewCashierEmployeeId: string | null;
   // 出納
   reviewCashierEmployee: TemployeeDto;
   // 出納審核時間
-  cashierReviewedAt: Date | null;
+  cashierReviewedAt: string | null;
 };
 
 export type TdeductionDto = {
