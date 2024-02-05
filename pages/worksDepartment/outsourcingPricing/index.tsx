@@ -34,7 +34,7 @@ import {
 } from 'js/api/api_outsourcing';
 
 // utils
-import { getAllMonthByRange, getAllyearMonthListByRange } from 'js/utils/helpers/date/getAllMonthByRange';
+import { getAllMonthByRange, getAllyearMonthListByRange } from 'js/utils/helpers/date/calcDate';
 
 // ========================================================
 type TfilterBy = 'vendor' | 'month';

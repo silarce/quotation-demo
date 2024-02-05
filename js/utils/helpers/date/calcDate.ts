@@ -14,21 +14,6 @@ function getAllMonthByRange({ start, end }: { start: MomentInput; end: MomentInp
   return dateArr;
 }
 
-// function getAllyearMonthListByRange({ start, end }: { start: MomentInput; end: MomentInput }): {
-//   [key: `${number}`]: number[];
-// } {
-//   const currentYear = moment(start).year();
-//   const endYear = moment(end).year();
-
-//   const result: { [key: string]: number[] } = {};
-
-//   for (let year = endYear; year <= currentYear; year++) {
-//     result[year.toString()] = Array.from({ length: 12 }, (_, i) => i + 1);
-//   }
-
-//   return result;
-// }
-
 type TyearMonthList = {
   [year: number]: number[];
 };
