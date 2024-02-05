@@ -6,7 +6,7 @@
 // UX改善
 // 關於tabBar，被選中者置中應該會比較好，方便使用者點擊上一個被選中者
 
-import { useState, useEffect, useMemo, useLayoutEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -16,7 +16,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
+import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
 import Table01, { Ttable } from 'components/global/gear/table/table01';
 import DateCollapse, { Tcontrol_dateCollapse } from 'components/page/worksDepartment/outsourcingPricing/dateCollapse';
 import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
@@ -41,8 +41,6 @@ type TfilterBy = 'vendor' | 'month';
 
 // ========================================================
 export default function OutsourcingPricing() {
-  const router = useRouter();
-
   // ------------------------------------------------------------------------
   const [showListBy, setShowListBy] = useState<TfilterBy>('vendor');
 
@@ -128,13 +126,15 @@ export default function OutsourcingPricing() {
           />
         )}
         {/*  */}
-        <MonthVendorPanel
-          targetDate={targetIsoDate}
-          onDateTabClick={(isoString) => {
-            setTargetIsoDate(isoString);
-          }}
-          className={classNames('m-auto mb-5 mt-[40px]', !isShowMonthVendorList && 'hidden')}
-        />
+        {isShowMonthVendorList && (
+          <MonthVendorPanel
+            targetDate={targetIsoDate}
+            onDateTabClick={(isoString) => {
+              setTargetIsoDate(isoString);
+            }}
+            className={classNames('m-auto mb-5 mt-[40px]')}
+          />
+        )}
         {/*  */}
       </div>
     </SubLayer>
@@ -438,15 +438,22 @@ const MonthVendorPanel = ({
 
   // ----------------------------------------------------------------------
 
-  const tabArr: Tcontrol_tabCarousel['tabArr'] = useMemo(() => {
-    let dateArr = getAllMonthByRange({
+  const { tabArr, defaultCarouselIndex } = useMemo(() => {
+    //
+    const dateArr = getAllMonthByRange({
       start: 2022,
       end: undefined,
-    });
+    }).reverse();
 
-    dateArr = dateArr.reverse();
-    const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
+    let defaultCarouselIndex = -1;
+
+    const tabArr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
       const twDate = moment(date).subtract(1911, 'years');
+
+      if (date === moment(targetDate).format('yy-MM')) {
+        defaultCarouselIndex = index;
+        setActiveTab_date(index);
+      }
 
       return {
         label: twDate.format('yy-MM'),
@@ -459,7 +466,7 @@ const MonthVendorPanel = ({
       };
     });
 
-    return arr;
+    return { tabArr, defaultCarouselIndex };
   }, []);
 
   const control_tabCarousel: Tcontrol_tabCarousel = {
@@ -527,7 +534,12 @@ const MonthVendorPanel = ({
   // ----------------------------------------------------------------------
   return (
     <div className={classNames(className)}>
-      <TabCarousel02 control={control_tabCarousel} />
+      <TabCarousel02
+        control={control_tabCarousel}
+        onMount={({ ref_slider }) => {
+          ref_slider.current.slickGoTo(defaultCarouselIndex);
+        }}
+      />
       <Wrapper_tab
         className={classNames('m-auto')}
         childrenOption={{
