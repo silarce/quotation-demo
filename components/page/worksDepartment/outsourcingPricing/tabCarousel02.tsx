@@ -57,7 +57,6 @@ export default function TabCarousel02({
 
   return (
     <Slider
-      // className={classNames(scss.slider, scss.theme_default, className)}
       className={classNames('m-auto', scss.slider, scss[`theme_${theme}`], className)}
       ref={sliderRef}
       infinite={false}
@@ -94,8 +93,6 @@ export default function TabCarousel02({
         const isActive = tab.isActive !== undefined ? tab.isActive : activeIndex === index;
 
         const theClick = () => {
-          console.log(isSliding);
-
           !isSliding && onClick && onClick({ ref_slider: sliderRef });
         };
 
