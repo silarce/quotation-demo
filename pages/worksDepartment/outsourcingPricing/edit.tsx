@@ -23,11 +23,27 @@ import { IconDetail, IconAddCircle, IconDelete01 } from 'public/image/icon/svgCo
 // css
 import scss from './edit.module.scss';
 
+// api
+import {
+  Tparams,
+  ToutsourcingDto,
+  ToutsourcingPaymentDto,
+  useGetOutsourcing,
+  useGetOutsourcingPayment,
+} from 'js/api/api_outsourcing';
+
+// type
 import { TemployeeDto } from 'js/api/dtoTypes';
 
 //
 // fakeData
-import { fakeDataArr, fakeDataTempArr, generateMonthsSinceNow } from './index';
+import {
+  VendorMonthPanel,
+  //
+  fakeDataArr,
+  fakeDataTempArr,
+  generateMonthsSinceNow,
+} from './index';
 //
 
 // ======================================================================
@@ -636,24 +652,56 @@ const SlideBar = ({ className }: { className?: string }) => {
   const router = useRouter();
 
   // -------------------------------------------------------------------------
-  const [activeTab_vendor, setActiveTab_vendor] = useState<number>(0);
 
-  const tabArr_vendor: Tcontrol_tabCarousel['tabArr'] = useMemo(() => {
-    const arr: Tcontrol_tabCarousel['tabArr'] = fakeDataTempArr.map((data, index) => {
+  const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
+
+  // -------------------------------------------------------------------------
+
+  const params: Tparams = {
+    // filter,
+    sort: 'createdAt',
+    order: 'DESC',
+  };
+
+  const { dataArr: outsourcingArr, viewRef_bottom, reset } = useGetOutsourcing({ customParams: params });
+
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    reset();
+  }, []);
+
+  // -------------------------------------------------------------------------
+
+  const { tabArr: tabArr_api, activeIndex } = useMemo(() => {
+    let activeIndex = -1;
+
+    const arr: Tcontrol_tabCarousel['tabArr'] = outsourcingArr.map((data, index) => {
+      const viewRef = index === outsourcingArr.length - 1 ? viewRef_bottom : undefined;
+
+      if (data.id === targetOutsourcingId) {
+        activeIndex = index;
+      }
+
       return {
         label: data.name,
+        viewRef,
+        isActive: targetOutsourcingId === data.id,
         onClick: () => {
-          setActiveTab_vendor(index);
+          setTargetOutsourcingId(data.id);
         },
       };
     });
 
-    return arr;
-  }, []);
+    return {
+      tabArr: arr,
+      activeIndex,
+    };
+  }, [outsourcingArr]);
 
-  const control_tabCarousel_vendor: Tcontrol_tabCarousel = {
-    activeIndex: activeTab_vendor,
-    tabArr: tabArr_vendor,
+  const control_tabCarousel_api: Tcontrol_tabCarousel = {
+    // activeIndex: activeIndex,
+    tabArr: tabArr_api,
   };
 
   // -------------------------------------------------------------------------
@@ -693,7 +741,16 @@ const SlideBar = ({ className }: { className?: string }) => {
 
   return (
     <div className={classNames(className)}>
-      <TabCarousel02 control={control_tabCarousel_vendor} className="mb-2" />
+      <TabCarousel02
+        control={control_tabCarousel_api}
+        //
+        // 只有在mount時觸發(以isShowVendorMonthList切換是否被mount)，
+        // 藉以移動到在OutsourcingList選中的廠商
+        // 在被渲染後，activeIndex不管怎麼改變，都不會再次觸發
+        onMount={({ ref_slider }) => {
+          ref_slider.current.slickGoTo(activeIndex);
+        }}
+      />
       <TabCarousel02
         control={control_tabCarousel}
         theme="dashed"

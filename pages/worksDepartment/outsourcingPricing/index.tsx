@@ -735,4 +735,10 @@ const getPaymentDateList = (paymentArr: ToutsourcingPaymentDto[]) => {
 //
 //
 //
-export { fakeDataArr, generateMonthsSinceNow, fakeDataTempArr };
+export {
+  VendorMonthPanel,
+  //
+  fakeDataArr,
+  generateMonthsSinceNow,
+  fakeDataTempArr,
+};
