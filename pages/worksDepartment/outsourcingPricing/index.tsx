@@ -34,7 +34,7 @@ import {
 } from 'js/api/api_outsourcing';
 
 // utils
-import { getAllMonthByRange } from 'js/utils/helpers/date/getAllMonthByRange';
+import { getAllMonthByRange, getAllyearMonthListByRange } from 'js/utils/helpers/date/getAllMonthByRange';
 
 // ========================================================
 type TfilterBy = 'vendor' | 'month';
@@ -231,8 +231,25 @@ const OutsourcingList = ({
 //--------------------------------------------------------
 
 const DateList = ({ className, onCardClick }: { className?: string; onCardClick: (dateString: string) => void }) => {
+  const params: Tparams = {
+    sort: 'date',
+    order: 'ASC',
+  };
+
+  const { dataArr, reset } = useGetOutsourcingPayment({ customParams: params });
+
+  const oldestDate = dataArr[0]?.date;
+
+  useEffect(() => {
+    reset();
+  }, []);
+
+  // ----------------------------------------------------------------------
   const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
-    const yearMonthList = generateMonthsSinceNow();
+    const yearMonthList = getAllyearMonthListByRange({
+      start: oldestDate,
+      end: undefined,
+    });
 
     let panelArr: Tcontrol_dateCollapse['panelArr'] = Object.entries(yearMonthList).map(([year, monthArr]) => {
       const twYear = String(Number(year) - 1911);
