@@ -30,20 +30,15 @@ import {
   ToutsourcingPaymentDto,
   useGetOutsourcing,
   useGetOutsourcingPayment,
+  useGetOutsourcingPayment_id,
 } from 'js/api/api_outsourcing';
 
 // type
 import { TemployeeDto } from 'js/api/dtoTypes';
 
-//
-// fakeData
-import {
-  VendorMonthPanel,
-  //
-  fakeDataArr,
-  fakeDataTempArr,
-  generateMonthsSinceNow,
-} from './index';
+// utils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 //
 
 // ======================================================================
@@ -54,9 +49,14 @@ type TfakeData_amountToBeDeducted = {
   subTotal_invoice: number;
 };
 
+type Tquery = {
+  paymentId: string | undefined;
+};
+
 // ======================================================================
 export default function OutsourcingPricingEdit() {
   const router = useRouter();
+  const { paymentId } = router.query as Tquery;
 
   // -------------------------------------------------------------------------
   const [disabled, setDisabled] = useState<boolean>(true);
@@ -70,6 +70,13 @@ export default function OutsourcingPricingEdit() {
   const [agent, setAgent] = useState<TemployeeDto>();
 
   // -------------------------------------------------------------------------
+
+  const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
+  const [targetDate, setTargetDate] = useState<string>();
+
+  // -------------------------------------------------------------------------
+
+  const { data: payment, update } = useGetOutsourcingPayment_id(paymentId);
 
   // 接上api時要改為真實資料
   const data_amountToBeDeducted = fakeData_amountToBeDeducted;
@@ -96,6 +103,17 @@ export default function OutsourcingPricingEdit() {
   useEffect(() => {
     setAmountToBeDeducted(_.cloneDeep(data_amountToBeDeducted));
   }, [disabled]);
+
+  useEffect(() => {
+    update();
+  }, [paymentId]);
+
+  useEffect(() => {
+    if (payment) {
+      setTargetOutsourcingId(payment.outsourcing.id);
+      setTargetDate(payment.date);
+    }
+  }, [!!payment]);
 
   // -------------------------------------------------------------------------
 
@@ -606,8 +624,20 @@ export default function OutsourcingPricingEdit() {
     <SubLayer>
       <PageHeader02 tag="外包計價" panelList={panelList} />
 
-      <div>
-        <SlideBar className="mt-11" />
+      <div className={classNames(!payment && 'hidden')}>
+        {targetOutsourcingId && (
+          <PaymentSelectSlideBar
+            //
+            className="mt-11"
+            targetOutsourcingId={targetOutsourcingId}
+            onTabClick_outsourcing={(id) => {
+              setTargetOutsourcingId(id);
+              setTargetDate(undefined);
+            }}
+            targetDate={targetDate}
+            onTabClick_date={setTargetDate}
+          />
+        )}
         <Table
           caption="工程列表"
           disabled={disabled}
@@ -648,12 +678,27 @@ export default function OutsourcingPricingEdit() {
 // ======================================================================
 // ======================================================================
 
-const SlideBar = ({ className }: { className?: string }) => {
-  const router = useRouter();
-
+const PaymentSelectSlideBar = ({
+  //
+  className,
+  targetOutsourcingId,
+  onTabClick_outsourcing,
+  targetDate,
+  onTabClick_date,
+}: {
+  className?: string;
+  targetOutsourcingId: string;
+  onTabClick_outsourcing: (id: string) => void;
+  targetDate: string | undefined;
+  onTabClick_date: (date: string | undefined) => void;
+}) => {
   // -------------------------------------------------------------------------
 
-  const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
+  const [activeIndex_outsourcing, setActiveIndex_outsourcing] = useState<number>(-1);
+  const [activeIndex_date, setActiveIndex_date] = useState<number>(-1);
+
+  const [slideToIndex, setSlideToIndex] = useState<number>();
+  const [slideToIndex_date, setSlideToIndex_date] = useState<number>();
 
   // -------------------------------------------------------------------------
 
@@ -663,7 +708,39 @@ const SlideBar = ({ className }: { className?: string }) => {
     order: 'DESC',
   };
 
-  const { dataArr: outsourcingArr, viewRef_bottom, reset } = useGetOutsourcing({ customParams: params });
+  const {
+    dataList: outsourcingList,
+    // dataArr: outsourcingArr,
+    viewRef_bottom,
+    reset,
+    nextPage,
+    isLoading,
+  } = useGetOutsourcing({ customParams: params });
+
+  const outsourcingArr = useMemo(() => {
+    return _.flatten(Object.values(outsourcingList)) as (typeof outsourcingList)[`${number}`];
+  }, [outsourcingList]);
+
+  // _______________________________________________________________
+
+  const params_payment: Tparams = {
+    filter: {
+      outsourcingId: { $eq: targetOutsourcingId },
+    },
+    pageSize: 99999,
+    sort: 'date',
+    order: 'ASC',
+  };
+
+  const {
+    //
+    dataList,
+    reset: reset_payment,
+  } = useGetOutsourcingPayment({ customParams: params_payment });
+
+  const paymentArr = useMemo(() => {
+    return _.flatten(Object.values(dataList)) as (typeof dataList)[`${number}`];
+  }, [dataList]);
 
   // -------------------------------------------------------------------------
 
@@ -671,92 +748,140 @@ const SlideBar = ({ className }: { className?: string }) => {
     reset();
   }, []);
 
+  useEffect(() => {
+    reset_payment();
+  }, [targetOutsourcingId]);
+
   // -------------------------------------------------------------------------
 
-  const { tabArr: tabArr_api, activeIndex } = useMemo(() => {
-    let activeIndex = -1;
+  const { tabArr: tabArr_api, defaultActiveIndex } = useMemo(() => {
+    let defaultActiveIndex = -1;
 
     const arr: Tcontrol_tabCarousel['tabArr'] = outsourcingArr.map((data, index) => {
       const viewRef = index === outsourcingArr.length - 1 ? viewRef_bottom : undefined;
 
       if (data.id === targetOutsourcingId) {
-        activeIndex = index;
+        defaultActiveIndex = index;
       }
 
       return {
         label: data.name,
         viewRef,
-        isActive: targetOutsourcingId === data.id,
+        // isActive: targetOutsourcingId === data.id,
         onClick: () => {
-          setTargetOutsourcingId(data.id);
+          onTabClick_outsourcing(data.id);
+          onTabClick_date(undefined);
+          setActiveIndex_outsourcing(index);
+          setActiveIndex_date(-1);
         },
       };
     });
 
     return {
       tabArr: arr,
-      activeIndex,
+      defaultActiveIndex,
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [outsourcingArr]);
 
   const control_tabCarousel_api: Tcontrol_tabCarousel = {
-    // activeIndex: activeIndex,
+    activeIndex: activeIndex_outsourcing,
     tabArr: tabArr_api,
   };
 
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    if (defaultActiveIndex === -1) {
+      nextPage();
+    } else {
+      setActiveIndex_outsourcing(defaultActiveIndex);
+      setSlideToIndex(defaultActiveIndex);
+    }
+  }, [isLoading, defaultActiveIndex === -1]);
+
   // -------------------------------------------------------------------------
-  const [activeTab_date, setActiveTab_date] = useState<number>(0);
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
 
-  const tabArr: Tcontrol_tabCarousel['tabArr'] = useMemo(() => {
-    const dateList = generateMonthsSinceNow();
+  const { tabArr_date, defaultIndex_date } = useMemo(() => {
+    let defaultIndex_date = -1;
 
-    let dateArr: string[] = []; //  [2020年1月,2020年2月,2020年3月]
-    Object.entries(dateList).forEach(([year, monthArr]) => {
-      monthArr.forEach((month) => {
-        const twYear = String(Number(year) - 1911);
-        dateArr.push(`${twYear}年${month}月`);
-      });
+    if (!targetDate) {
+      onTabClick_date(paymentArr[0]?.date);
+    }
+
+    const dateArr = paymentArr.map((payment) => {
+      return payment.date;
     });
 
-    dateArr = dateArr.reverse();
-
     const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
+      const twDate = getTaiwanDateStr(date);
+
+      if (date === targetDate) {
+        defaultIndex_date = index;
+      }
+
       return {
-        label: date,
+        label: twDate ?? '',
         onClick: ({ ref_slider }) => {
-          setActiveTab_date(index);
           ref_slider.current.slickGoTo(index);
+          onTabClick_date(date);
         },
       };
     });
 
-    return arr;
-  }, []);
+    return { tabArr_date: arr, defaultIndex_date };
+  }, [paymentArr]);
 
   const control_tabCarousel: Tcontrol_tabCarousel = {
-    activeIndex: activeTab_date,
-    tabArr,
+    activeIndex: activeIndex_date,
+    tabArr: tabArr_date,
   };
+
+  useEffect(() => {
+    if (paymentArr) {
+    }
+
+    //
+    if (defaultIndex_date !== -1) {
+      setActiveIndex_date(defaultIndex_date);
+      setSlideToIndex_date(defaultIndex_date);
+    } else {
+      if (!targetDate) {
+        onTabClick_date(paymentArr[0]?.date);
+        setActiveIndex_date(0);
+      }
+    }
+    //
+  }, [paymentArr, defaultIndex_date === -1, targetDate]);
+
   // -------------------------------------------------------------------------
 
   return (
     <div className={classNames(className)}>
       <TabCarousel02
+        className={'mb-2'}
         control={control_tabCarousel_api}
         //
         // 只有在mount時觸發(以isShowVendorMonthList切換是否被mount)，
         // 藉以移動到在OutsourcingList選中的廠商
         // 在被渲染後，activeIndex不管怎麼改變，都不會再次觸發
-        onMount={({ ref_slider }) => {
-          ref_slider.current.slickGoTo(activeIndex);
-        }}
+        // onMount={({ ref_slider }) => {
+        //   ref_slider.current.slickGoTo(activeIndex);
+        // }}
+        slideToIndex={slideToIndex}
       />
       <TabCarousel02
+        className="min-h-[56px]"
         control={control_tabCarousel}
         theme="dashed"
         props={{
           arrows: false,
         }}
+        slideToIndex={slideToIndex_date}
       />
     </div>
   );

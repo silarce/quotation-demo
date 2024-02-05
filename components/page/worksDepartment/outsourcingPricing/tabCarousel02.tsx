@@ -35,12 +35,14 @@ export default function TabCarousel02({
   theme = 'default',
   props,
   onMount,
+  slideToIndex,
 }: {
   className?: string;
   control: Tcontrol;
   theme?: 'default' | 'dashed';
   props?: TreactSlickProps;
   onMount?: (props: { ref_slider: React.MutableRefObject<Slider> }) => void;
+  slideToIndex?: number;
 }) {
   // const [viewRef_first, inView_first] = useInView();
   // const [viewRef_last, inView_last] = useInView();
@@ -52,8 +54,12 @@ export default function TabCarousel02({
   const { tabArr, activeIndex } = control;
 
   useEffect(() => {
-    onMount && onMount({ ref_slider: sliderRef });
+    !slideToIndex && onMount && onMount({ ref_slider: sliderRef });
   }, []);
+
+  useEffect(() => {
+    slideToIndex !== undefined && sliderRef.current.slickGoTo(slideToIndex);
+  }, [slideToIndex]);
 
   return (
     <Slider

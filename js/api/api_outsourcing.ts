@@ -156,3 +156,49 @@ export const useGetOutsourcingPayment = createUseInfinite<TpageResponse<Toutsour
   apiClient: apiGetOutsourcingPayment,
   errTitle: '取得外包計價列表失敗',
 });
+
+export const apiGetOutsourcingPayment_id = async (id: string) => {
+  const api = `/outsourcing-payment/${id}`;
+
+  const params = {
+    populate: ['outsourcing'],
+  };
+
+  return axi
+    .get<ToutsourcingPaymentDto>(api, { params })
+    .then((res) => res.data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetOutsourcingPayment_id = (id?: string) => {
+  const [res, setRes] = useState<ToutsourcingPaymentDto>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiGetOutsourcingPayment_id(id);
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '取得外包計價失敗',
+        content: err.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    data: res,
+    update,
+    isLoading_outsourcingPayment: isLoading,
+  };
+};
