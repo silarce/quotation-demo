@@ -2829,7 +2829,8 @@ export type ToutsourcingPaymentDto = {
   // 是否已結清
   isPaymentCleared: boolean;
   // 扣款明細
-  deduction: TdeductionDto[] | null;
+  // deduction: TdeductionDto[] | null;
+  deduction: string | null; // JSON
   // 扣款合計
   deductionTotal: number | null;
   // 上期保留款
@@ -2897,9 +2898,9 @@ export type ToutsourcingPaymentDetailDto = {
   // 工程聯絡單Id
   engineeringContactId: string | null;
   // 工程聯絡單
-  engineeringContact: TengineeringContactDto;
+  engineeringContact?: TengineeringContactDto;
   // 若為一般工程之一般項，則有此property
-  installItem: TquotationProductItemDto[];
+  installItem?: TquotationProductItemDto[];
   // 是否為非一般工程之特殊項
   isOther: boolean;
   // 項目名
@@ -2915,5 +2916,40 @@ export type ToutsourcingPaymentDetailDto = {
   // 外包計價單id
   outsourcingPaymentId: string | null;
   // 外包計價單
-  outsourcingPayment: ToutsourcingPaymentDto;
+  outsourcingPayment?: ToutsourcingPaymentDto;
 };
+
+// 暫時留作參考
+
+// type Tooo = {
+//   foo?: boolean;
+//   bar?: boolean;
+// };
+
+// export type ToutsourcingPaymentDetailDto_foo<ooo extends Tooo> = {
+//   // 工程聯絡單Id
+//   engineeringContactId: string | null;
+//   // 工程聯絡單
+//   engineeringContact: ooo['foo'] extends true ? TengineeringContactDto : undefined;
+//   // 若為一般工程之一般項，則有此property
+//   installItem: TquotationProductItemDto[];
+//   // 是否為非一般工程之特殊項
+//   isOther: boolean;
+//   // 項目名
+//   itemName: string;
+//   // 安裝內容
+//   installation: string | null;
+//   // 樘數
+//   quantity: number | null;
+//   // 單樘計價
+//   unitPrice: number | null;
+//   // 外包計價合計
+//   outsourcingTotal: number;
+//   // 外包計價單id
+//   outsourcingPaymentId: string | null;
+//   // 外包計價單
+//   // outsourcingPayment: ToutsourcingPaymentDto;
+//   outsourcingPayment: ooo['bar'] extends true ? ToutsourcingPaymentDto : undefined;
+// };
+
+// type Tpp = ToutsourcingPaymentDetailDto_foo<{ foo: true }>;

@@ -203,17 +203,17 @@ export const useGetOutsourcingPayment_id = (id?: string) => {
   };
 };
 
-export const apiGetOutsourcingPaymentDetail = async (id: string) => {
+export const apiGetOutsourcingPaymentDetail = async (id: string, params?: Tparams) => {
   const api = `/outsourcing-payment/${id}/detail`;
 
   return axi
-    .get<ToutsourcingPaymentDetailDto>(api)
+    .get<TpageResponse<ToutsourcingPaymentDetailDto>>(api, { params })
     .then((res) => res.data)
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetOutsourcingPaymentDetail = (id?: string) => {
-  const [res, setRes] = useState<ToutsourcingPaymentDetailDto>();
+export const useGetOutsourcingPaymentDetail = (id?: string, params?: Tparams) => {
+  const [res, setRes] = useState<TpageResponse<ToutsourcingPaymentDetailDto>>();
   const [isLoading, setIsLoading] = useState(false);
 
   const update = async () => {
@@ -223,7 +223,7 @@ export const useGetOutsourcingPaymentDetail = (id?: string) => {
 
     try {
       setIsLoading(true);
-      const res = await apiGetOutsourcingPaymentDetail(id);
+      const res = await apiGetOutsourcingPaymentDetail(id, params);
       setRes(res);
 
       return res;
@@ -239,7 +239,8 @@ export const useGetOutsourcingPaymentDetail = (id?: string) => {
   };
 
   return {
-    data: res,
+    data: res?.data,
+    meta: res?.meta,
     update,
     isLoading_outsourcingPaymentDetail: isLoading,
   };
