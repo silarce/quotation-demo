@@ -699,9 +699,9 @@ export default function OutsourcingPricingEdit() {
             targetOutsourcingId={targetOutsourcingId}
             onTabClick_outsourcing={(id) => {
               setTargetOutsourcingId(id);
-              setTargetPaymentId(undefined);
+              // setTargetPaymentId(undefined);
             }}
-            targetDate={targetPaymentId}
+            targetPaymentId={targetPaymentId}
             onTabClick_date={setTargetPaymentId}
           />
         )}
@@ -759,13 +759,13 @@ const PaymentSelectSlideBar = ({
   className,
   targetOutsourcingId,
   onTabClick_outsourcing,
-  targetDate,
+  targetPaymentId,
   onTabClick_date,
 }: {
   className?: string;
   targetOutsourcingId: string;
   onTabClick_outsourcing: (id: string) => void;
-  targetDate: string | undefined;
+  targetPaymentId: string | undefined;
   onTabClick_date: (date: string | undefined) => void;
 }) => {
   // -------------------------------------------------------------------------
@@ -786,7 +786,6 @@ const PaymentSelectSlideBar = ({
 
   const {
     dataList: outsourcingList,
-    // dataArr: outsourcingArr,
     viewRef_bottom,
     reset,
     nextPage,
@@ -810,23 +809,13 @@ const PaymentSelectSlideBar = ({
 
   const {
     //
-    dataList,
+    dataList: dataList_payment,
     reset: reset_payment,
   } = useGetOutsourcingPayment({ customParams: params_payment });
 
   const paymentArr = useMemo(() => {
-    return _.flatten(Object.values(dataList)) as (typeof dataList)[`${number}`];
-  }, [dataList]);
-
-  // -------------------------------------------------------------------------
-
-  useEffect(() => {
-    reset();
-  }, []);
-
-  useEffect(() => {
-    reset_payment();
-  }, [targetOutsourcingId]);
+    return _.flatten(Object.values(dataList_payment)) as (typeof dataList_payment)[`${number}`];
+  }, [dataList_payment]);
 
   // -------------------------------------------------------------------------
 
@@ -846,7 +835,6 @@ const PaymentSelectSlideBar = ({
         // isActive: targetOutsourcingId === data.id,
         onClick: () => {
           onTabClick_outsourcing(data.id);
-          onTabClick_date(undefined);
           setActiveIndex_outsourcing(index);
           setActiveIndex_id(-1);
         },
@@ -865,29 +853,12 @@ const PaymentSelectSlideBar = ({
     tabArr: tabArr_api,
   };
 
-  useEffect(() => {
-    if (isLoading) {
-      return;
-    }
-
-    if (defaultActiveIndex === -1) {
-      nextPage();
-    } else {
-      setActiveIndex_outsourcing(defaultActiveIndex);
-      setSlideToIndex(defaultActiveIndex);
-    }
-  }, [isLoading, defaultActiveIndex === -1]);
-
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
 
   const { tabArr_date, defaultIndex_date } = useMemo(() => {
     let defaultIndex_date = -1;
-
-    if (!targetDate) {
-      onTabClick_date(paymentArr[0]?.id);
-    }
 
     const dateArr = paymentArr.map((payment) => {
       return payment;
@@ -896,7 +867,7 @@ const PaymentSelectSlideBar = ({
     const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((payment, index) => {
       const twDate = getTaiwanDateStr(payment.date);
 
-      if (payment.id === targetDate) {
+      if (payment.id === targetPaymentId) {
         defaultIndex_date = index;
       }
 
@@ -917,22 +888,43 @@ const PaymentSelectSlideBar = ({
     tabArr: tabArr_date,
   };
 
+  // -------------------------------------------------------------------------
+
   useEffect(() => {
-    if (paymentArr) {
+    reset();
+  }, []);
+
+  useEffect(() => {
+    reset_payment();
+    onTabClick_date(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetOutsourcingId]);
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
     }
 
-    //
+    if (defaultActiveIndex === -1) {
+      nextPage();
+    } else {
+      setActiveIndex_outsourcing(defaultActiveIndex);
+      setSlideToIndex(defaultActiveIndex);
+    }
+  }, [isLoading, defaultActiveIndex === -1]);
+
+  useEffect(() => {
     if (defaultIndex_date !== -1) {
       setActiveIndex_id(defaultIndex_date);
       setSlideToIndex_date(defaultIndex_date);
     } else {
-      if (!targetDate) {
+      if (!targetPaymentId) {
         onTabClick_date(paymentArr[0]?.id);
         setActiveIndex_id(0);
       }
     }
     //
-  }, [paymentArr, defaultIndex_date === -1, targetDate]);
+  }, [paymentArr, defaultIndex_date === -1, targetPaymentId]);
 
   // -------------------------------------------------------------------------
 
