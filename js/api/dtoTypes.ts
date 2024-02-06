@@ -1054,8 +1054,8 @@ export type TdeliveryStatusDto = {
   shippingDate: string | null;
   //  '安裝人員Id'
   installerEmployeeId: string | null;
-  //  '安裝人員'
-  installerEmployee?: TemployeeDto | null;
+  //  '安裝人員/外包人員'
+  installerEmployee?: ToutsourcingDto | null;
   //  '安裝日期'
   installationDate: string | null;
   //  '工作表開立日期'
@@ -2803,9 +2803,9 @@ export type ToutsourcingDto = {
   // 備註
   notes: string | null;
   // 外包計價單
-  outsourcingPayment: ToutsourcingPaymentDto[];
+  outsourcingPayment?: ToutsourcingPaymentDto[];
   // 最新外包計價單
-  latestPayment: ToutsourcingPaymentDto;
+  latestPayment?: ToutsourcingPaymentDto;
 };
 
 export type TcreateOutsourcingDto = Omit<

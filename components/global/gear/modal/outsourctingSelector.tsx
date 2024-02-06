@@ -1,6 +1,10 @@
 import { selectModalCreator, Tconfig } from './selectorModalCreator';
 import { useGetOutsourcing, ToutsourcingDto } from 'js/api/api_outsourcing';
 
+// ======================================================================
+export type { ToutsourcingDto };
+
+// ======================================================================
 const configArr: readonly Tconfig[] = [
   {
     key: 'name',
