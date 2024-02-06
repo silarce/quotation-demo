@@ -202,3 +202,45 @@ export const useGetOutsourcingPayment_id = (id?: string) => {
     isLoading_outsourcingPayment: isLoading,
   };
 };
+
+export const apiGetOutsourcingPaymentDetail = async (id: string) => {
+  const api = `/outsourcing-payment/${id}/detail`;
+
+  return axi
+    .get<ToutsourcingPaymentDetailDto>(api)
+    .then((res) => res.data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetOutsourcingPaymentDetail = (id?: string) => {
+  const [res, setRes] = useState<ToutsourcingPaymentDetailDto>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiGetOutsourcingPaymentDetail(id);
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '取得外包計價明細失敗',
+        content: err.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    data: res,
+    update,
+    isLoading_outsourcingPaymentDetail: isLoading,
+  };
+};

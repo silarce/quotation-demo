@@ -31,6 +31,7 @@ import {
   useGetOutsourcing,
   useGetOutsourcingPayment,
   useGetOutsourcingPayment_id,
+  useGetOutsourcingPaymentDetail,
 } from 'js/api/api_outsourcing';
 
 // type
@@ -72,11 +73,14 @@ export default function OutsourcingPricingEdit() {
   // -------------------------------------------------------------------------
 
   const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
-  const [targetDate, setTargetDate] = useState<string>();
+  const [targetPaymentId, setTargetPaymentId] = useState<string>();
 
   // -------------------------------------------------------------------------
 
   const { data: payment, update } = useGetOutsourcingPayment_id(paymentId);
+  const { data: paymentDetail, update: update_detail } = useGetOutsourcingPaymentDetail(paymentId);
+
+  console.log(paymentDetail);
 
   // 接上api時要改為真實資料
   const data_amountToBeDeducted = fakeData_amountToBeDeducted;
@@ -106,14 +110,23 @@ export default function OutsourcingPricingEdit() {
 
   useEffect(() => {
     update();
+    update_detail();
   }, [paymentId]);
 
   useEffect(() => {
     if (payment) {
       setTargetOutsourcingId(payment.outsourcing.id);
-      setTargetDate(payment.date);
+      setTargetPaymentId(payment.id);
     }
   }, [!!payment]);
+
+  useEffect(() => {
+    router.push({
+      query: {
+        paymentId: targetPaymentId,
+      },
+    });
+  }, [targetPaymentId]);
 
   // -------------------------------------------------------------------------
 
@@ -632,10 +645,10 @@ export default function OutsourcingPricingEdit() {
             targetOutsourcingId={targetOutsourcingId}
             onTabClick_outsourcing={(id) => {
               setTargetOutsourcingId(id);
-              setTargetDate(undefined);
+              setTargetPaymentId(undefined);
             }}
-            targetDate={targetDate}
-            onTabClick_date={setTargetDate}
+            targetDate={targetPaymentId}
+            onTabClick_date={setTargetPaymentId}
           />
         )}
         <Table
@@ -695,7 +708,7 @@ const PaymentSelectSlideBar = ({
   // -------------------------------------------------------------------------
 
   const [activeIndex_outsourcing, setActiveIndex_outsourcing] = useState<number>(-1);
-  const [activeIndex_date, setActiveIndex_date] = useState<number>(-1);
+  const [activeIndex_id, setActiveIndex_id] = useState<number>(-1);
 
   const [slideToIndex, setSlideToIndex] = useState<number>();
   const [slideToIndex_date, setSlideToIndex_date] = useState<number>();
@@ -772,7 +785,7 @@ const PaymentSelectSlideBar = ({
           onTabClick_outsourcing(data.id);
           onTabClick_date(undefined);
           setActiveIndex_outsourcing(index);
-          setActiveIndex_date(-1);
+          setActiveIndex_id(-1);
         },
       };
     });
@@ -810,17 +823,18 @@ const PaymentSelectSlideBar = ({
     let defaultIndex_date = -1;
 
     if (!targetDate) {
-      onTabClick_date(paymentArr[0]?.date);
+      onTabClick_date(paymentArr[0]?.id);
     }
 
     const dateArr = paymentArr.map((payment) => {
-      return payment.date;
+      // return payment.date;
+      return payment;
     });
 
-    const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
-      const twDate = getTaiwanDateStr(date);
+    const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((payment, index) => {
+      const twDate = getTaiwanDateStr(payment.date);
 
-      if (date === targetDate) {
+      if (payment.id === targetDate) {
         defaultIndex_date = index;
       }
 
@@ -828,7 +842,7 @@ const PaymentSelectSlideBar = ({
         label: twDate ?? '',
         onClick: ({ ref_slider }) => {
           ref_slider.current.slickGoTo(index);
-          onTabClick_date(date);
+          onTabClick_date(payment.id);
         },
       };
     });
@@ -837,7 +851,7 @@ const PaymentSelectSlideBar = ({
   }, [paymentArr]);
 
   const control_tabCarousel: Tcontrol_tabCarousel = {
-    activeIndex: activeIndex_date,
+    activeIndex: activeIndex_id,
     tabArr: tabArr_date,
   };
 
@@ -847,12 +861,12 @@ const PaymentSelectSlideBar = ({
 
     //
     if (defaultIndex_date !== -1) {
-      setActiveIndex_date(defaultIndex_date);
+      setActiveIndex_id(defaultIndex_date);
       setSlideToIndex_date(defaultIndex_date);
     } else {
       if (!targetDate) {
-        onTabClick_date(paymentArr[0]?.date);
-        setActiveIndex_date(0);
+        onTabClick_date(paymentArr[0]?.id);
+        setActiveIndex_id(0);
       }
     }
     //
