@@ -18,6 +18,11 @@ export type TpageMetaDto = {
   hasNextPage: boolean;
 };
 
+export type TpageResponse<Tdata> = {
+  data: Tdata[];
+  meta: TpageMetaDto;
+};
+
 export type TfileDto = {
   id: string;
   createdAt: string;
@@ -1049,8 +1054,8 @@ export type TdeliveryStatusDto = {
   shippingDate: string | null;
   //  '安裝人員Id'
   installerEmployeeId: string | null;
-  //  '安裝人員'
-  installerEmployee?: TemployeeDto | null;
+  //  '安裝人員/外包人員'
+  installerEmployee?: ToutsourcingDto | null;
   //  '安裝日期'
   installationDate: string | null;
   //  '工作表開立日期'
@@ -2771,3 +2776,208 @@ export type TupdateAccountReceivableProductPaymentDto = {
   deliveryStatusId: string[];
   id?: string; // ID, 不提供時將此筆視為新增資料
 };
+
+// =========================================================================
+
+// 外包計價
+// outsourcing
+
+export type ToutsourcingDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  // 外包廠商名
+  name: string;
+  // 連絡電話
+  contactNumber: string;
+  // 負責人
+  principal: string;
+  // 統編
+  taxId: string;
+  // 廠商地點(縣市)
+  county: string;
+  // 廠商地點(區)
+  district: string;
+  // 廠商地點(詳細地點)
+  address: string;
+  // 備註
+  notes: string | null;
+  // 外包計價單
+  outsourcingPayment?: ToutsourcingPaymentDto[];
+  // 最新外包計價單
+  latestPayment?: ToutsourcingPaymentDto;
+};
+
+export type TcreateOutsourcingDto = Omit<
+  ToutsourcingDto,
+  'outsourcingPayment' | 'latestPayment' | 'id' | 'createdAt' | 'updatedAt'
+>;
+export type TupdateOutsourcingDto = TcreateOutsourcingDto;
+
+// 外包計價單
+export type ToutsourcingPaymentDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  //  '外包廠商Id'
+  outsourcingId: string | null;
+  //  '外包廠商'
+  outsourcing: ToutsourcingDto;
+  //  '外包計價單日期'
+  date: string; // ISOstring
+  //  '是否已結清'
+  isPaymentCleared: boolean;
+  //  '請款合計'
+  paymentSubTotal: number | null;
+  //  '扣款明細'
+  deduction: TdeductionDto[] | null;
+  //  '扣款合計'
+  deductionTotal: number | null;
+  //  '上期保留款'
+  priorPeriodRetainage: number | null;
+  //  '本期保留款'
+  retainage: number | null;
+  //  '小計'
+  subTotal: number | null;
+  //  '營業稅'
+  salesTax: number | null;
+  //  '實領總計'
+  total: number | null;
+  //  '外包計價帳款明細'
+  outsourcingPaymentDetail: ToutsourcingPaymentDetailDto[];
+  //  '經辦人Id'
+  agentEmployeeId: string | null;
+  //  '經辦人'
+  agentEmployee: TemployeeDto;
+  //  '送審給核對人員的時間'
+  toReviewCheckerAt: string | null; // ISOstring
+  //  '核對人員Id'
+  reviewCheckerEmployeeId: string | null;
+  //  '核對人員'
+  reviewCheckerEmployee: TemployeeDto;
+  //  '核對人員審核時間'
+  checkerReviewedAt: string | null; // ISOstring
+  //  '送審給主管的時間'
+  toReviewSupervisorAt: string | null; // ISOstring
+  //  '審核主管id'
+  reviewSupervisorEmployeeId: string | null;
+  //  '審核主管'
+  reviewSupervisorEmployee: TemployeeDto;
+  //  '主管審核時間'
+  supervisorReviewedAt: string | null; // ISOstring
+  //  '送審給總經理的時間'
+  toManagerAt: string | null; // ISOstring
+  //  '總經理id'
+  reviewManagerEmployeeId: string | null;
+  //  '總經理'
+  reviewManagerEmployee: TemployeeDto;
+  //  '總經理審核時間'
+  managerReviewedAt: string | null; // ISOstring
+  //  '送審給會計的時間'
+  toAccountingAt: string | null; // ISOstring
+  //  '會計id'
+  reviewAccountingEmployeeId: string | null;
+  //  '會計'
+  reviewAccountingEmployee: TemployeeDto;
+  //  '會計審核時間'
+  accountingReviewedAt: string | null; // ISOstring
+  //  '送審給出納的時間'
+  toCashierAt: string | null; // ISOstring
+  //  '出納id'
+  reviewCashierEmployeeId: string | null;
+  //  '出納'
+  reviewCashierEmployee: TemployeeDto;
+  //  '出納審核時間'
+  cashierReviewedAt: string | null; // ISOstring
+};
+
+export type TdeductionDto = {
+  // 類別
+  type: string;
+  // 項目
+  itemName: string;
+  // 扣款金額 // IsNumberString
+  // price: string;
+  price: number;
+};
+
+export type TupdateOutsourcingPaymentDto = {
+  // 外包計價日期
+  date: string;
+  // 請款合計
+  paymentSubTotal: number | null;
+  // 扣款明細
+  deduction: TdeductionDto[] | null;
+  // 扣款總金額
+  deductionTotal: number | null;
+  // 上期保留款項 // 不應該使用
+  // priorPeriodRetainage: number | null;
+  // 本期保留款項
+  retainage: number | null;
+  // 小計
+  subTotal: number | null;
+  // 營業稅
+  salesTax: number | null;
+  // 實領總計
+  total: number | null;
+};
+
+export type ToutsourcingPaymentDetailDto = {
+  // 工程聯絡單Id
+  engineeringContactId: string | null;
+  // 工程聯絡單
+  engineeringContact?: TengineeringContactDto;
+  // 若為一般工程之一般項，則有此property
+  installItem?: TquotationProductItemDto[];
+  // 是否為非一般工程之特殊項
+  isOther: boolean;
+  // 項目名
+  itemName: string;
+  // 安裝內容
+  installation: string | null;
+  // 樘數
+  quantity: number | null;
+  // 單樘計價
+  unitPrice: number | null;
+  // 外包計價合計
+  outsourcingTotal: number;
+  // 外包計價單id
+  outsourcingPaymentId: string | null;
+  // 外包計價單
+  outsourcingPayment?: ToutsourcingPaymentDto;
+};
+
+// 暫時留作參考
+
+// type Tooo = {
+//   foo?: boolean;
+//   bar?: boolean;
+// };
+
+// export type ToutsourcingPaymentDetailDto_foo<ooo extends Tooo> = {
+//   // 工程聯絡單Id
+//   engineeringContactId: string | null;
+//   // 工程聯絡單
+//   engineeringContact: ooo['foo'] extends true ? TengineeringContactDto : undefined;
+//   // 若為一般工程之一般項，則有此property
+//   installItem: TquotationProductItemDto[];
+//   // 是否為非一般工程之特殊項
+//   isOther: boolean;
+//   // 項目名
+//   itemName: string;
+//   // 安裝內容
+//   installation: string | null;
+//   // 樘數
+//   quantity: number | null;
+//   // 單樘計價
+//   unitPrice: number | null;
+//   // 外包計價合計
+//   outsourcingTotal: number;
+//   // 外包計價單id
+//   outsourcingPaymentId: string | null;
+//   // 外包計價單
+//   // outsourcingPayment: ToutsourcingPaymentDto;
+//   outsourcingPayment: ooo['bar'] extends true ? ToutsourcingPaymentDto : undefined;
+// };
+
+// type Tpp = ToutsourcingPaymentDetailDto_foo<{ foo: true }>;

@@ -8,16 +8,18 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // type
 import { Tparams, TpageMetaDto } from './dtoTypes';
 
-export type { Tparams };
-
-type Treq = {
+type Tres = {
   data: any[];
   meta: TpageMetaDto;
 };
 
 type Tapi<TapiReq> = (params?: Tparams) => Promise<TapiReq>;
 
-export function createUseInfinite<TapiReq extends Treq>({
+export type { Tparams, Tres };
+
+// ==================================================================
+
+export function createUseInfinite<TapiReq extends Tres>({
   //
   apiClient,
   errTitle,
@@ -25,7 +27,7 @@ export function createUseInfinite<TapiReq extends Treq>({
 }: {
   apiClient: Tapi<TapiReq>;
   errTitle: string;
-  errContent?: string;
+  errContent?: (error: AxiosError) => string;
 }) {
   const useApi_infinite = ({
     //
@@ -85,7 +87,11 @@ export function createUseInfinite<TapiReq extends Treq>({
         //
       } catch (error) {
         const err = error as AxiosError;
-        myAlert.err({ title: errTitle, content: errContent ?? err.message });
+        myAlert.err({
+          //
+          title: errTitle,
+          content: (errContent && errContent(err)) ?? err.message,
+        });
 
         console.log(error);
         setIsReqFail(true);
@@ -154,6 +160,7 @@ export function createUseInfinite<TapiReq extends Treq>({
       meta,
       init,
       reset,
+      nextPage,
     };
   };
 

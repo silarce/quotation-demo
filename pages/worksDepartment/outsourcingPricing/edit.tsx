@@ -23,26 +23,41 @@ import { IconDetail, IconAddCircle, IconDelete01 } from 'public/image/icon/svgCo
 // css
 import scss from './edit.module.scss';
 
-import { TemployeeDto } from 'js/api/dtoTypes';
+// api
+import {
+  Tparams,
+  ToutsourcingDto,
+  ToutsourcingPaymentDto,
+  useGetOutsourcing,
+  useGetOutsourcingPayment,
+  useGetOutsourcingPayment_id,
+  useGetOutsourcingPaymentDetail,
+  apiPatchOutsourcingPayment,
+  TupdateOutsourcingPaymentDto,
+} from 'js/api/api_outsourcing';
 
-//
-// fakeData
-import { fakeDataArr, fakeDataTempArr, generateMonthsSinceNow } from './index';
+// type
+import { TemployeeDto, TdeductionDto } from 'js/api/dtoTypes';
+
+// utils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 //
 
 // ======================================================================
 
-type TfakeData_amountToBeDeducted = {
-  type: string;
-  item: string;
-  subTotal_invoice: number;
+type Tquery = {
+  paymentId: string | undefined;
 };
 
 // ======================================================================
 export default function OutsourcingPricingEdit() {
   const router = useRouter();
+  const { paymentId } = router.query as Tquery;
 
   // -------------------------------------------------------------------------
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const [disabled, setDisabled] = useState<boolean>(true);
   const [disabled_reviewer, setDisabled__reviewer] = useState<boolean>(true);
 
@@ -55,12 +70,36 @@ export default function OutsourcingPricingEdit() {
 
   // -------------------------------------------------------------------------
 
-  // 接上api時要改為真實資料
-  const data_amountToBeDeducted = fakeData_amountToBeDeducted;
+  const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
+  const [targetPaymentId, setTargetPaymentId] = useState<string>();
+
+  // -------------------------------------------------------------------------
+  // const [deduction, setDeduction] = useState<TdeductionDto[]>([]);
+  const [payment, setPayment] = useState<TupdateOutsourcingPaymentDto>(create_emptyPayment());
 
   // -------------------------------------------------------------------------
 
-  const [amountToBeDeducted, setAmountToBeDeducted] = useState<TfakeData_amountToBeDeducted[]>([]);
+  const { data: data_payment, update: update_payment } = useGetOutsourcingPayment_id(paymentId);
+
+  const params_paymentDetail: Tparams = {
+    populate: ['engineeringContact'],
+    pageSize: 99999,
+  };
+
+  const { data: paymentDetail, update: update_detail } = useGetOutsourcingPaymentDetail(
+    paymentId,
+    params_paymentDetail
+  );
+
+  const { paymentOri } = useMemo(() => {
+    const payment = data_payment ?? create_emptyPayment();
+
+    return {
+      paymentOri: payment,
+    };
+  }, [data_payment]);
+
+  // -------------------------------------------------------------------------
 
   // -------------------------------------------------------------------------
 
@@ -78,54 +117,112 @@ export default function OutsourcingPricingEdit() {
   );
 
   useEffect(() => {
-    setAmountToBeDeducted(_.cloneDeep(data_amountToBeDeducted));
-  }, [disabled]);
+    setPayment(paymentOri);
+  }, [paymentOri, disabled]);
+
+  useEffect(() => {
+    update_payment();
+    update_detail();
+  }, [paymentId]);
+
+  useEffect(() => {
+    if (data_payment) {
+      setTargetOutsourcingId(data_payment.outsourcing.id);
+      setTargetPaymentId(data_payment.id);
+    }
+  }, [!!data_payment]);
+
+  useEffect(() => {
+    router.push({
+      query: {
+        paymentId: targetPaymentId,
+      },
+    });
+  }, [targetPaymentId]);
 
   // -------------------------------------------------------------------------
 
   const addAnmountToBeDeducted = () => {
-    setAmountToBeDeducted((prev) => {
-      return [...prev, create_emptyAmountToBeDeducted()];
+    setPayment((prev) => {
+      return {
+        ...prev,
+        deduction: [...(prev.deduction ?? []), create_emptyDeduction()],
+      };
     });
   };
 
   const deleteAnmountToBeDeducted = (index: number) => {
-    setAmountToBeDeducted((prev) => {
-      return prev.filter((_, i) => i !== index);
+    setPayment((prev) => {
+      return {
+        ...prev,
+        deduction: prev.deduction?.filter((_, i) => i !== index) ?? [],
+      };
     });
   };
 
-  const editAnmountToBeDeducted = ({
-    index,
-    key,
-    value,
-  }: {
-    index: number;
-    key: keyof TfakeData_amountToBeDeducted;
-    value: string;
-  }) => {
-    setAmountToBeDeducted((prev) => {
-      const newArr = [...prev];
+  const editDeduction = ({ index, key, value }: { index: number; key: keyof TdeductionDto; value: string }) => {
+    setPayment((prev) => {
+      const newArr = [...(prev.deduction ?? [])];
 
-      if (key === 'subTotal_invoice') {
+      if (key === 'price') {
         newArr[index][key] = Number(value);
       } else {
         newArr[index][key] = value;
       }
 
-      return newArr;
+      return {
+        ...prev,
+        deduction: newArr,
+      };
     });
   };
 
+  // -------------------------------------------------------------------------
+  // _req
+
+  // 確認
+  const reqPatchOutsourcingPayment = async () => {
+    if (!paymentId) {
+      return;
+    }
+
+    const body = {
+      date: new Date().toISOString(),
+      paymentSubTotal: subTotal_project,
+      deduction: payment.deduction ?? [],
+      deductionTotal: subTotal_deduction,
+      retainage: result.retainage,
+      subTotal: result.subTotal,
+      salesTax: result.salesTax,
+      total: result.total,
+    };
+
+    try {
+      setIsLoading(true);
+      await apiPatchOutsourcingPayment(paymentId, body);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
 
   const { control_table_project, subTotal_project } = useMemo(() => {
     let decimal_subTotal = new Decimal(0);
     const control_tbody: Ttable['tbody'] = (() => {
-      const rowArr: Ttable['tbody']['rowArr'] = fakeData_projectArr.map((data, index) => {
-        const { projectNumber, projectName, subTotal_invoice } = data;
+      const rowArr: Ttable['tbody']['rowArr'] = (paymentDetail ?? []).map((data, index) => {
+        const { outsourcingTotal, engineeringContact } = data;
 
-        decimal_subTotal = decimal_subTotal.add(subTotal_invoice);
+        const { projectName = '', projectNumber = '' } = engineeringContact ?? {};
+
+        decimal_subTotal = decimal_subTotal.add(outsourcingTotal);
 
         const cellArr: Tcell[] = [
           {
@@ -141,7 +238,7 @@ export default function OutsourcingPricingEdit() {
             ...config_projectTable.projectName,
           },
           {
-            children: subTotal_invoice.toLocaleString(),
+            children: outsourcingTotal.toLocaleString(),
             ...config_projectTable.subTotal_invoice.tbody,
           },
           {
@@ -184,26 +281,26 @@ export default function OutsourcingPricingEdit() {
 
   // -------------------------------------------------------------------------
 
-  const { control_table_amountToBeDeducted, subTotal_amountToBeDeducted } = useMemo(() => {
+  const { control_table_deduction, subTotal_deduction } = useMemo(() => {
     //
     let decimal_subTotal = new Decimal(0);
     //
     const control_tbody: Ttable['tbody'] = (() => {
       //
-      const rowArr: Ttable['tbody']['rowArr'] = amountToBeDeducted.map((data, index) => {
-        const { type, item, subTotal_invoice } = data;
+      const rowArr: Ttable['tbody']['rowArr'] = (payment.deduction ?? []).map((data, index) => {
+        const { type, itemName, price } = data;
 
-        decimal_subTotal = decimal_subTotal.add(subTotal_invoice);
+        decimal_subTotal = decimal_subTotal.add(price);
 
-        const inputWidth_type = config_amountToBeDeducted.type.inputWidth;
-        const inputWidth_item = config_amountToBeDeducted.item.inputWidth;
-        const inputWidth_subTotal_invoice = config_amountToBeDeducted.subTotal_invoice_enabled.inputWidth;
+        const inputWidth_type = config_deduction.type.inputWidth;
+        const inputWidth_item = config_deduction.itemName.inputWidth;
+        const inputWidth_price = config_deduction.price_enabled.inputWidth;
 
         const typeChildren = (
           <input
             value={type}
             onChange={(e) => {
-              editAnmountToBeDeducted({ index, key: 'type', value: e.target.value });
+              editDeduction({ index, key: 'type', value: e.target.value });
             }}
             className={classNames(scss.inputInTable, !disabled && scss.enabled)}
             style={{ width: inputWidth_type }}
@@ -213,9 +310,9 @@ export default function OutsourcingPricingEdit() {
 
         const itemChildren = (
           <input
-            value={item}
+            value={itemName}
             onChange={(e) => {
-              editAnmountToBeDeducted({ index, key: 'item', value: e.target.value });
+              editDeduction({ index, key: 'itemName', value: e.target.value });
             }}
             className={classNames(scss.inputInTable, !disabled && scss.enabled)}
             style={{ width: inputWidth_item }}
@@ -225,13 +322,13 @@ export default function OutsourcingPricingEdit() {
 
         const subTotal_invoiceChildren = (
           <input
-            value={disabled ? subTotal_invoice.toLocaleString() : subTotal_invoice}
+            value={disabled ? price.toLocaleString() : price}
             onChange={(e) => {
-              editAnmountToBeDeducted({ index, key: 'subTotal_invoice', value: e.target.value });
+              editDeduction({ index, key: 'price', value: e.target.value });
             }}
             type={disabled ? 'text' : 'number'}
             className={classNames(scss.inputInTable, !disabled && scss.enabled)}
-            style={{ width: inputWidth_subTotal_invoice }}
+            style={{ width: inputWidth_price }}
             readOnly={disabled}
           />
         );
@@ -239,17 +336,15 @@ export default function OutsourcingPricingEdit() {
         const cellArr: Tcell[] = [
           {
             children: typeChildren,
-            ...config_amountToBeDeducted.type,
+            ...config_deduction.type,
           },
           {
             children: itemChildren,
-            ...config_amountToBeDeducted.item,
+            ...config_deduction.itemName,
           },
           {
             children: subTotal_invoiceChildren,
-            ...(disabled
-              ? config_amountToBeDeducted.subTotal_invoice.tbody
-              : config_amountToBeDeducted.subTotal_invoice_enabled.tbody),
+            ...(disabled ? config_deduction.price.tbody : config_deduction.price_enabled.tbody),
           },
         ];
 
@@ -269,7 +364,7 @@ export default function OutsourcingPricingEdit() {
                 }}
               />
             ),
-            ...config_amountToBeDeducted.btn_delete.tbody,
+            ...config_deduction.btn_delete.tbody,
           });
         }
 
@@ -303,29 +398,36 @@ export default function OutsourcingPricingEdit() {
     };
 
     return {
-      control_table_amountToBeDeducted: control_table,
-      subTotal_amountToBeDeducted: decimal_subTotal.toNumber(),
+      control_table_deduction: control_table,
+      subTotal_deduction: decimal_subTotal.toNumber(),
     };
-  }, [amountToBeDeducted, disabled]);
+  }, [payment.deduction, disabled]);
 
   // -------------------------------------------------------------------------
 
-  const { control_table_actualAmountReceived } = useMemo(() => {
+  const { control_table_actualAmountReceived, result } = useMemo(() => {
     //
 
-    // 本期保留10%
-    const periodKeep = new Decimal(subTotal_project).mul(0.1).toNumber();
-    // '上期保留10%'
-    const latestPeriodKeep = new Decimal(fakeData_latestPeriodKeep.price).mul(0.1).toNumber();
+    // 本期保留10% // 本期保留款
+    const retainage = new Decimal(subTotal_project).mul(0.1).toNumber();
+    // '上期保留10%' // 上期保留款
+    const latestPeriodKeep = data_payment?.priorPeriodRetainage ?? 0;
 
     const subTotal = new Decimal(subTotal_project)
-      .sub(periodKeep)
+      .sub(retainage)
       .add(latestPeriodKeep)
-      .sub(subTotal_amountToBeDeducted)
+      .sub(subTotal_deduction)
       .toNumber();
 
     const tax = new Decimal(subTotal).mul(0.05).toDecimalPlaces(0).toNumber();
     const actualAmountReceived = new Decimal(subTotal).add(tax).toNumber();
+
+    const result = {
+      retainage: retainage, // 本期保留款項
+      subTotal: subTotal,
+      salesTax: tax,
+      total: actualAmountReceived, // 實領總計
+    };
 
     //
     const rowArr: Ttable['tbody']['rowArr'] = [
@@ -350,7 +452,7 @@ export default function OutsourcingPricingEdit() {
             ...config_actualAmountReceived.caption,
           },
           {
-            children: periodKeep.toLocaleString(),
+            children: retainage.toLocaleString(),
             ...config_actualAmountReceived.subTotal_invoice.tbody,
             className: scss.textRed,
           },
@@ -378,7 +480,7 @@ export default function OutsourcingPricingEdit() {
             ...config_actualAmountReceived.caption,
           },
           {
-            children: subTotal_amountToBeDeducted.toLocaleString(),
+            children: subTotal_deduction.toLocaleString(),
             ...config_actualAmountReceived.subTotal_invoice.tbody,
             className: scss.textRed,
           },
@@ -436,9 +538,10 @@ export default function OutsourcingPricingEdit() {
 
     return {
       control_table_actualAmountReceived: control_table,
+      result,
     };
     //
-  }, [subTotal_project, subTotal_amountToBeDeducted]);
+  }, [subTotal_project, subTotal_deduction, payment]);
 
   // -------------------------------------------------------------------------
 
@@ -570,9 +673,7 @@ export default function OutsourcingPricingEdit() {
     {
       type: 'redButton',
       label: '確認',
-      onClick: () => {
-        alert('test');
-      },
+      onClick: reqPatchOutsourcingPayment,
     },
     {
       type: 'myButton',
@@ -587,11 +688,23 @@ export default function OutsourcingPricingEdit() {
 
   // -------------------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader02 tag="外包計價" panelList={panelList} />
 
-      <div>
-        <SlideBar className="mt-11" />
+      <div className={classNames(!data_payment && 'hidden')}>
+        {targetOutsourcingId && (
+          <PaymentSelectSlideBar
+            //
+            className="mt-11"
+            targetOutsourcingId={targetOutsourcingId}
+            onTabClick_outsourcing={(id) => {
+              setTargetOutsourcingId(id);
+              // setTargetPaymentId(undefined);
+            }}
+            targetPaymentId={targetPaymentId}
+            onTabClick_date={setTargetPaymentId}
+          />
+        )}
         <Table
           caption="工程列表"
           disabled={disabled}
@@ -603,7 +716,7 @@ export default function OutsourcingPricingEdit() {
           caption="應扣明細"
           disabled={disabled}
           className="w-fit m-auto mt-[96px]"
-          control={control_table_amountToBeDeducted}
+          control={control_table_deduction}
           onAddClick={addAnmountToBeDeducted}
         />
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
@@ -631,75 +744,212 @@ export default function OutsourcingPricingEdit() {
 // ======================================================================
 // ======================================================================
 // ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
 
-const SlideBar = ({ className }: { className?: string }) => {
-  const router = useRouter();
+const PaymentSelectSlideBar = ({
+  //
+  className,
+  targetOutsourcingId,
+  onTabClick_outsourcing,
+  targetPaymentId,
+  onTabClick_date,
+}: {
+  className?: string;
+  targetOutsourcingId: string;
+  onTabClick_outsourcing: (id: string) => void;
+  targetPaymentId: string | undefined;
+  onTabClick_date: (date: string | undefined) => void;
+}) => {
+  // -------------------------------------------------------------------------
+
+  const [activeIndex_outsourcing, setActiveIndex_outsourcing] = useState<number>(-1);
+  const [activeIndex_id, setActiveIndex_id] = useState<number>(-1);
+
+  const [slideToIndex, setSlideToIndex] = useState<number>();
+  const [slideToIndex_date, setSlideToIndex_date] = useState<number>();
 
   // -------------------------------------------------------------------------
-  const [activeTab_vendor, setActiveTab_vendor] = useState<number>(0);
 
-  const tabArr_vendor: Tcontrol_tabCarousel['tabArr'] = useMemo(() => {
-    const arr: Tcontrol_tabCarousel['tabArr'] = fakeDataTempArr.map((data, index) => {
+  const params: Tparams = {
+    // filter,
+    sort: 'createdAt',
+    order: 'DESC',
+  };
+
+  const {
+    dataList: outsourcingList,
+    viewRef_bottom,
+    reset,
+    nextPage,
+    isLoading,
+  } = useGetOutsourcing({ customParams: params });
+
+  const outsourcingArr = useMemo(() => {
+    return _.flatten(Object.values(outsourcingList)) as (typeof outsourcingList)[`${number}`];
+  }, [outsourcingList]);
+
+  // _______________________________________________________________
+
+  const params_payment: Tparams = {
+    filter: {
+      outsourcingId: { $eq: targetOutsourcingId },
+    },
+    pageSize: 99999,
+    sort: 'date',
+    order: 'ASC',
+  };
+
+  const {
+    //
+    dataList: dataList_payment,
+    reset: reset_payment,
+  } = useGetOutsourcingPayment({ customParams: params_payment });
+
+  const paymentArr = useMemo(() => {
+    return _.flatten(Object.values(dataList_payment)) as (typeof dataList_payment)[`${number}`];
+  }, [dataList_payment]);
+
+  // -------------------------------------------------------------------------
+
+  const { tabArr: tabArr_api, defaultActiveIndex } = useMemo(() => {
+    let defaultActiveIndex = -1;
+
+    const arr: Tcontrol_tabCarousel['tabArr'] = outsourcingArr.map((data, index) => {
+      const viewRef = index === outsourcingArr.length - 1 ? viewRef_bottom : undefined;
+
+      if (data.id === targetOutsourcingId) {
+        defaultActiveIndex = index;
+      }
+
       return {
         label: data.name,
+        viewRef,
+        // isActive: targetOutsourcingId === data.id,
         onClick: () => {
-          setActiveTab_vendor(index);
+          onTabClick_outsourcing(data.id);
+          setActiveIndex_outsourcing(index);
+          setActiveIndex_id(-1);
         },
       };
     });
 
-    return arr;
-  }, []);
+    return {
+      tabArr: arr,
+      defaultActiveIndex,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outsourcingArr]);
 
-  const control_tabCarousel_vendor: Tcontrol_tabCarousel = {
-    activeIndex: activeTab_vendor,
-    tabArr: tabArr_vendor,
+  const control_tabCarousel_api: Tcontrol_tabCarousel = {
+    activeIndex: activeIndex_outsourcing,
+    tabArr: tabArr_api,
   };
 
   // -------------------------------------------------------------------------
-  const [activeTab_date, setActiveTab_date] = useState<number>(0);
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
 
-  const tabArr: Tcontrol_tabCarousel['tabArr'] = useMemo(() => {
-    const dateList = generateMonthsSinceNow();
+  const { tabArr_date, defaultIndex_date } = useMemo(() => {
+    let defaultIndex_date = -1;
 
-    let dateArr: string[] = []; //  [2020年1月,2020年2月,2020年3月]
-    Object.entries(dateList).forEach(([year, monthArr]) => {
-      monthArr.forEach((month) => {
-        const twYear = String(Number(year) - 1911);
-        dateArr.push(`${twYear}年${month}月`);
-      });
+    const dateArr = paymentArr.map((payment) => {
+      return payment;
     });
 
-    dateArr = dateArr.reverse();
+    const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((payment, index) => {
+      const twDate = getTaiwanDateStr(payment.date);
 
-    const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
+      if (payment.id === targetPaymentId) {
+        defaultIndex_date = index;
+      }
+
       return {
-        label: date,
+        label: twDate ?? '',
         onClick: ({ ref_slider }) => {
-          setActiveTab_date(index);
           ref_slider.current.slickGoTo(index);
+          onTabClick_date(payment.id);
         },
       };
     });
 
-    return arr;
-  }, []);
+    return { tabArr_date: arr, defaultIndex_date };
+  }, [paymentArr]);
 
   const control_tabCarousel: Tcontrol_tabCarousel = {
-    activeIndex: activeTab_date,
-    tabArr,
+    activeIndex: activeIndex_id,
+    tabArr: tabArr_date,
   };
+
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    reset();
+  }, []);
+
+  useEffect(() => {
+    reset_payment();
+    onTabClick_date(undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetOutsourcingId]);
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    if (defaultActiveIndex === -1) {
+      nextPage();
+    } else {
+      setActiveIndex_outsourcing(defaultActiveIndex);
+      setSlideToIndex(defaultActiveIndex);
+    }
+  }, [isLoading, defaultActiveIndex === -1]);
+
+  useEffect(() => {
+    if (defaultIndex_date !== -1) {
+      setActiveIndex_id(defaultIndex_date);
+      setSlideToIndex_date(defaultIndex_date);
+    } else {
+      if (!targetPaymentId) {
+        onTabClick_date(paymentArr[0]?.id);
+        setActiveIndex_id(0);
+      }
+    }
+    //
+  }, [paymentArr, defaultIndex_date === -1, targetPaymentId]);
+
   // -------------------------------------------------------------------------
 
   return (
     <div className={classNames(className)}>
-      <TabCarousel02 control={control_tabCarousel_vendor} className="mb-2" />
       <TabCarousel02
+        className={'mb-2'}
+        control={control_tabCarousel_api}
+        //
+        // 只有在mount時觸發(以isShowVendorMonthList切換是否被mount)，
+        // 藉以移動到在OutsourcingList選中的廠商
+        // 在被渲染後，activeIndex不管怎麼改變，都不會再次觸發
+        // onMount={({ ref_slider }) => {
+        //   ref_slider.current.slickGoTo(activeIndex);
+        // }}
+        slideToIndex={slideToIndex}
+      />
+      <TabCarousel02
+        className="min-h-[56px]"
         control={control_tabCarousel}
         theme="dashed"
         props={{
           arrows: false,
         }}
+        slideToIndex={slideToIndex_date}
       />
     </div>
   );
@@ -737,8 +987,8 @@ const Table = ({
 // ======================================================================
 // ======================================================================
 // ======================================================================
-type Tconfig = {
-  [key: string]: {
+type Tconfig<keys extends string = string> = {
+  [key in keys]: {
     width?: React.CSSProperties['width'];
     flex?: React.CSSProperties['flex'];
     justifyContent?: React.CSSProperties['justifyContent'];
@@ -823,20 +1073,22 @@ const thead_projectTable: Ttable['thead'] = {
 };
 // ---------------------
 
-const config_amountToBeDeducted: Tconfig = {
+const config_deduction: Tconfig<
+  'type' | 'itemName' | 'price' | 'price_enabled' | 'btn_delete' | 'label_subTotal' | 'subtotal'
+> = {
   type: {
     width: 414,
     // flex: '1 0',
     justifyContent: 'center',
     inputWidth: 394,
   },
-  item: {
+  itemName: {
     width: 414,
     // flex: '1 0',
     justifyContent: 'center',
     inputWidth: 394,
   },
-  subTotal_invoice: {
+  price: {
     width: '270px',
     justifyContent: 'center',
     tbody: {
@@ -844,7 +1096,7 @@ const config_amountToBeDeducted: Tconfig = {
       justifyContent: 'flex-end',
     },
   },
-  subTotal_invoice_enabled: {
+  price_enabled: {
     inputWidth: 180,
     tbody: {
       width: 200,
@@ -865,15 +1117,15 @@ const thead_amountToBeDeducted: Ttable['thead'] = {
   cellArr: [
     {
       children: '類別',
-      ...config_amountToBeDeducted.type,
+      ...config_deduction.type,
     },
     {
       children: '項目',
-      ...config_amountToBeDeducted.item,
+      ...config_deduction.itemName,
     },
     {
       children: '請款小計',
-      ...config_amountToBeDeducted.subTotal_invoice,
+      ...config_deduction.price,
     },
   ],
 };
@@ -919,43 +1171,19 @@ const thead_actualAmountReceived: Ttable['thead'] = {
 // ======================================================================
 // ======================================================================
 
-const fakeData_projectArr = [
-  {
-    projectNumber: 'M-110802',
-    projectName: '后里拓凱',
-    subTotal_invoice: 61960,
-  },
-  {
-    projectNumber: 'M-110802',
-    projectName: '環南市場',
-    subTotal_invoice: 13010,
-  },
-  {
-    projectNumber: 'M-110802',
-    projectName: '元大人壽',
-    subTotal_invoice: 5000,
-  },
-] as const;
+const create_emptyPayment = (): TupdateOutsourcingPaymentDto => ({
+  date: '',
+  paymentSubTotal: 0,
+  deduction: [],
+  deductionTotal: 0,
+  retainage: 0,
+  subTotal: 0,
+  salesTax: 0,
+  total: 0,
+});
 
-const fakeData_amountToBeDeducted: TfakeData_amountToBeDeducted[] = [
-  {
-    type: '安裝物料',
-    item: '項目一',
-    subTotal_invoice: 1000,
-  },
-  {
-    type: '保險',
-    item: '團保',
-    subTotal_invoice: 666,
-  },
-];
-
-const fakeData_latestPeriodKeep = {
-  price: 218350,
-};
-
-const create_emptyAmountToBeDeducted = (): TfakeData_amountToBeDeducted => ({
+const create_emptyDeduction = (): TdeductionDto => ({
   type: '',
-  item: '',
-  subTotal_invoice: 0,
+  itemName: '',
+  price: 0,
 });

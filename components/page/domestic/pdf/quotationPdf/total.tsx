@@ -4,10 +4,6 @@ import changeNumberMoneyToChinese from 'js/tools/numToChineseNum';
 // css
 import style from './quotationPdf.module.scss';
 
-// type
-import { TuseRemarkList } from 'components/page/domestic/quotation/hook/useRemarkList';
-import { TuseProduct } from 'components/page/domestic/quotation/hook/useProduct';
-
 type TmemoArr = string[];
 type Tsettlement = {
   subTotal: string;

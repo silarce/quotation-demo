@@ -1,7 +1,12 @@
 // 這裡一系列的介面切換
 // 其實都是同一個資料來源，不同的呈現方式
 
-import { useState, useMemo } from 'react';
+// 每個外包廠商每個月只會有一張外包計價單
+
+// UX改善
+// 關於tabBar，被選中者置中應該會比較好，方便使用者點擊上一個被選中者
+
+import { useState, useEffect, useMemo } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
@@ -11,7 +16,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
+import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
 import Table01, { Ttable } from 'components/global/gear/table/table01';
 import DateCollapse, { Tcontrol_dateCollapse } from 'components/page/worksDepartment/outsourcingPricing/dateCollapse';
 import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
@@ -19,90 +24,51 @@ import TabCarousel02, { Tcontrol_tabCarousel } from 'components/page/worksDepart
 // css
 import scss from './index.module.scss';
 
+// api
+import {
+  Tparams,
+  ToutsourcingDto,
+  ToutsourcingPaymentDto,
+  useGetOutsourcing,
+  useGetOutsourcingPayment,
+} from 'js/api/api_outsourcing';
+
+// utils
+import { getAllMonthByRange, getAllyearMonthListByRange } from 'js/utils/helpers/date/calcDate';
+
 // ========================================================
 type TfilterBy = 'vendor' | 'month';
 
 // ========================================================
 export default function OutsourcingPricing() {
-  const router = useRouter();
-
   // ------------------------------------------------------------------------
   const [showListBy, setShowListBy] = useState<TfilterBy>('vendor');
 
-  const [isVendorMonth, setVendorMonth] = useState<string>();
-  const [isMonthVendor, setMonthVendor] = useState<`${number}-${number}`>();
-
-  const isShowVendorList = showListBy === 'vendor' && !isVendorMonth;
-  const isShowDateList = showListBy === 'month' && !isMonthVendor;
-  const isShowVendorMonthList = showListBy === 'vendor' && isVendorMonth;
-  const isShowMonthVendorList = showListBy === 'month' && isMonthVendor;
+  const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
+  const [targetIsoDate, setTargetIsoDate] = useState<string>();
 
   // ------------------------------------------------------------------------
 
-  const control_table: Ttable['tbody']['rowArr'] = useMemo(() => {
-    return fakeDataArr.map((data) => {
-      return {
-        minHeight: tableConfig.row.minHeight,
-        onClick: () => {
-          setVendorMonth(data.id);
-        },
-        cellArr: [
-          {
-            children: data.name,
-            width: cellCofig.vendor.width,
-          },
-          {
-            children: data.phoneNumber,
-            width: cellCofig.phoneNumber.width,
-          },
-        ],
-      };
-    });
-  }, []);
+  const isShowVendorList = showListBy === 'vendor' && !targetOutsourcingId;
+  const isShowDateList = showListBy === 'month' && !targetIsoDate;
+  const isShowVendorMonthList = showListBy === 'vendor' && targetOutsourcingId;
+  const isShowMonthVendorList = showListBy === 'month' && targetIsoDate;
 
-  const fakeTable: Ttable = {
-    thead: fakeThead,
-    tbody: {
-      rowArr: control_table,
-    },
-    haveBorder: false,
+  // ------------------------------------------------------------------------
+
+  const params: Tparams = {
+    // filter,
+    sort: 'createdAt',
+    order: 'DESC',
   };
 
+  const { dataArr: outsourcingArr, viewRef_bottom, reset } = useGetOutsourcing({ customParams: params });
+
   // ------------------------------------------------------------------------
 
-  const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
-    const yearMonthList = generateMonthsSinceNow();
-
-    let panelArr: Tcontrol_dateCollapse['panelArr'] = Object.entries(yearMonthList).map(([year, monthArr]) => {
-      const twYear = String(Number(year) - 1911);
-
-      const cardList = monthArr.map((month) => {
-        return {
-          label: `${month}月`,
-          onClick: () => {
-            if (showListBy === 'vendor') {
-              router.push({
-                pathname: router.pathname + '/edit',
-              });
-            } else {
-              setMonthVendor(`${Number(year)}-${month}`);
-            }
-          },
-        };
-      });
-
-      return {
-        label: twYear,
-        cardArr: cardList,
-      };
-    });
-
-    panelArr = panelArr.reverse();
-
-    return {
-      panelArr,
-    };
-  }, [showListBy]);
+  useEffect(() => {
+    reset();
+  }, []);
 
   // ------------------------------------------------------------------------
   const tagList: TtagList = [
@@ -110,16 +76,16 @@ export default function OutsourcingPricing() {
       label: '外包廠商',
       onClick: () => {
         setShowListBy('vendor');
-        setVendorMonth(undefined);
-        setMonthVendor(undefined);
+        setTargetOutsourcingId(undefined);
+        setTargetIsoDate(undefined);
       },
     },
     {
       label: '月份排列',
       onClick: () => {
         setShowListBy('month');
-        setVendorMonth(undefined);
-        setMonthVendor(undefined);
+        setTargetOutsourcingId(undefined);
+        setTargetIsoDate(undefined);
       },
     },
   ];
@@ -129,27 +95,46 @@ export default function OutsourcingPricing() {
       <PageHeader02 tagList={tagList} />
       <div>
         {/*  */}
-        <Wrapper_tab
-          className={classNames('m-auto mb-5', !isShowVendorList && 'hidden')}
-          childrenOption={{
-            noBorderTop: true,
-          }}
-          stickyTop={{
-            top: 40,
-          }}
-        >
-          <Table01 {...fakeTable} />
-        </Wrapper_tab>
+        {isShowVendorList && (
+          <OutsourcingList
+            className={classNames('m-auto mb-5')}
+            outsourcingArr={outsourcingArr}
+            onRowClick={(outsourcingId: string) => {
+              setTargetOutsourcingId(outsourcingId);
+            }}
+            viewRef_bottom={viewRef_bottom}
+          />
+        )}
         {/*  */}
-        <DateCollapse
+        <DateList
           className={classNames('m-auto mb-5 mt-[40px]', !isShowDateList && 'hidden')}
-          control={control_dateCollapse}
+          onCardClick={(dateStr) => {
+            setTargetIsoDate(new Date(dateStr).toISOString());
+          }}
         />
 
         {/*  */}
-        <VendorMonthPanel className={classNames('m-auto mb-5 mt-[40px]', !isShowVendorMonthList && 'hidden')} />
+        {isShowVendorMonthList && (
+          <VendorMonthPanel
+            outsourcingArr={outsourcingArr}
+            viewRef_bottom={isShowVendorMonthList ? viewRef_bottom : undefined}
+            className={classNames('m-auto mb-5 mt-[40px]')}
+            targetOutsourcingId={targetOutsourcingId}
+            onTabClick={(outsourcingId) => {
+              setTargetOutsourcingId(outsourcingId);
+            }}
+          />
+        )}
         {/*  */}
-        <MonthVendorPanel className={classNames('m-auto mb-5 mt-[40px]', !isShowMonthVendorList && 'hidden')} />
+        {isShowMonthVendorList && (
+          <MonthVendorPanel
+            targetDate={targetIsoDate}
+            onDateTabClick={(isoString) => {
+              setTargetIsoDate(isoString);
+            }}
+            className={classNames('m-auto mb-5 mt-[40px]')}
+          />
+        )}
         {/*  */}
       </div>
     </SubLayer>
@@ -163,34 +148,108 @@ export default function OutsourcingPricing() {
 // ====================================================================
 // ====================================================================
 
-const VendorMonthPanel = ({ className }: { className?: string }) => {
-  const router = useRouter();
+const OutsourcingList = ({
+  className,
+  outsourcingArr,
+  onRowClick,
+  viewRef_bottom,
+}: {
+  className?: string;
+  outsourcingArr: ToutsourcingDto[];
+  onRowClick: (outsourcingId: string) => void;
+  viewRef_bottom: (node?: Element | null | undefined) => void;
+}) => {
+  //
+  const thead: Ttable['thead'] = {
+    stickyTop: {
+      top: '40px',
+    },
+    rowProps: {
+      minHeight: tableConfig.row.minHeight,
+    },
+    cellArr: [
+      {
+        children: cellCofig.vendor.label,
+        width: cellCofig.vendor.width,
+      },
+      {
+        children: cellCofig.phoneNumber.label,
+        width: cellCofig.phoneNumber.width,
+        // flex: cellCofig.phoneNumber.flex,
+      },
+    ],
+  };
 
-  // ----------------------------------------------------------------------
+  const rowArr: Ttable['tbody']['rowArr'] = useMemo(() => {
+    return outsourcingArr.map((data, index) => {
+      const viewRef = index === outsourcingArr.length - 5 ? viewRef_bottom : undefined;
 
-  const [activeTab_vendor, setActiveTab_vendor] = useState<number>(0);
-
-  const tabArr: Tcontrol_tabCarousel['tabArr'] = useMemo(() => {
-    const arr: Tcontrol_tabCarousel['tabArr'] = fakeDataTempArr.map((data, index) => {
       return {
-        label: data.name,
+        minHeight: tableConfig.row.minHeight,
         onClick: () => {
-          setActiveTab_vendor(index);
+          onRowClick(data.id);
         },
+        viewRef,
+        cellArr: [
+          {
+            children: data.name,
+            width: cellCofig.vendor.width,
+          },
+          {
+            children: data.contactNumber,
+            width: cellCofig.phoneNumber.width,
+          },
+        ],
       };
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outsourcingArr]);
 
-    return arr;
+  const control_table: Ttable = {
+    thead: thead,
+    tbody: {
+      rowArr,
+    },
+    haveBorder: false,
+  };
+
+  return (
+    <Wrapper_tab
+      className={classNames(className)}
+      // className={classNames('m-auto mb-5', !isShowVendorList && 'hidden')}
+      childrenOption={{
+        noBorderTop: true,
+      }}
+      stickyTop={{
+        top: 40,
+      }}
+    >
+      <Table01 {...control_table} />
+    </Wrapper_tab>
+  );
+};
+//--------------------------------------------------------
+
+const DateList = ({ className, onCardClick }: { className?: string; onCardClick: (dateString: string) => void }) => {
+  const params: Tparams = {
+    sort: 'date',
+    order: 'ASC',
+  };
+
+  const { dataArr, reset } = useGetOutsourcingPayment({ customParams: params });
+
+  const oldestDate = dataArr[0]?.date;
+
+  useEffect(() => {
+    reset();
   }, []);
 
-  const control_tabCarousel: Tcontrol_tabCarousel = {
-    activeIndex: activeTab_vendor,
-    tabArr,
-  };
   // ----------------------------------------------------------------------
-
   const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
-    const yearMonthList = generateMonthsSinceNow();
+    const yearMonthList = getAllyearMonthListByRange({
+      start: oldestDate,
+      end: undefined,
+    });
 
     let panelArr: Tcontrol_dateCollapse['panelArr'] = Object.entries(yearMonthList).map(([year, monthArr]) => {
       const twYear = String(Number(year) - 1911);
@@ -199,9 +258,7 @@ const VendorMonthPanel = ({ className }: { className?: string }) => {
         return {
           label: `${month}月`,
           onClick: () => {
-            router.push({
-              pathname: router.pathname + '/edit',
-            });
+            onCardClick(`${year}-${month}`);
           },
         };
       });
@@ -219,83 +276,274 @@ const VendorMonthPanel = ({ className }: { className?: string }) => {
     };
   }, []);
 
-  // ----------------------------------------------------------------------
-
-  return (
-    <div className={className}>
-      <TabCarousel02 control={control_tabCarousel} />
-      <DateCollapse className={classNames('m-auto mt-1')} control={control_dateCollapse} />
-    </div>
-  );
+  return <DateCollapse className={classNames(className)} control={control_dateCollapse} />;
 };
 
-const MonthVendorPanel = ({ className }: { className?: string }) => {
+// ====================================================================
+
+const VendorMonthPanel = ({
+  //
+  outsourcingArr,
+  className,
+  viewRef_bottom,
+  targetOutsourcingId,
+  onTabClick,
+}: {
+  outsourcingArr: ToutsourcingDto[];
+  className?: string;
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
+  targetOutsourcingId: string | undefined;
+  onTabClick: (outsourcingId: string) => void;
+}) => {
   const router = useRouter();
 
   // ----------------------------------------------------------------------
-
   const [activeTab_vendor, setActiveTab_vendor] = useState<number>(0);
 
-  const tabArr: Tcontrol_tabCarousel['tabArr'] = useMemo(() => {
-    const dateList = generateMonthsSinceNow();
+  // ----------------------------------------------------------------------
 
-    let dateArr: string[] = []; //  [2020年1月,2020年2月,2020年3月]
-    Object.entries(dateList).forEach(([year, monthArr]) => {
-      monthArr.forEach((month) => {
-        const twYear = String(Number(year) - 1911);
-        dateArr.push(`${twYear}年${month}月`);
-      });
-    });
+  const filter = {
+    outsourcingId: { $eq: targetOutsourcingId },
+  };
 
-    dateArr = dateArr.reverse();
+  const params: Tparams = {
+    pageSize: 99999,
+    filter,
+  };
 
-    const arr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
+  const {
+    dataArr: paymentArr,
+    isLoading,
+    reset: reset_payment,
+  } = useGetOutsourcingPayment({
+    customParams: params,
+  });
+
+  useEffect(() => {
+    reset_payment();
+  }, [targetOutsourcingId]);
+
+  // ----------------------------------------------------------------------
+
+  const { tabArr, activeIndex } = useMemo(() => {
+    let activeIndex = -1;
+
+    const arr: Tcontrol_tabCarousel['tabArr'] = outsourcingArr.map((data, index) => {
+      const viewRef = index === outsourcingArr.length - 1 ? viewRef_bottom : undefined;
+
+      if (data.id === targetOutsourcingId) {
+        setActiveTab_vendor(index);
+        activeIndex = index;
+      }
+
       return {
-        label: date,
-        onClick: ({ ref_slider }) => {
+        label: data.name,
+        viewRef,
+        // isActive: targetOutsourcingId === data.id,
+        onClick: () => {
           setActiveTab_vendor(index);
-          ref_slider.current.slickGoTo(index);
+          onTabClick(data.id);
         },
       };
     });
 
-    return arr;
-  }, []);
+    return {
+      tabArr: arr,
+      activeIndex,
+    };
+  }, [outsourcingArr]);
 
   const control_tabCarousel: Tcontrol_tabCarousel = {
     activeIndex: activeTab_vendor,
     tabArr,
   };
+  // ----------------------------------------------------------------------
+
+  const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
+    const yearMonthList = getPaymentDateList(paymentArr);
+
+    let panelArr: Tcontrol_dateCollapse['panelArr'] = Object.entries(yearMonthList).map(([year, monthList]) => {
+      const twYear = String(Number(year) - 1911);
+
+      const cardList = Object.entries(monthList).map(([month, paymentInfo]) => {
+        return {
+          label: `${month}月`,
+          onClick: () => {
+            router.push({
+              pathname: router.pathname + '/edit',
+              query: {
+                paymentId: paymentInfo?.id,
+              },
+            });
+          },
+          forbidden: !paymentInfo,
+        };
+      });
+
+      return {
+        label: twYear,
+        cardArr: cardList,
+      };
+    });
+
+    panelArr = panelArr.reverse();
+
+    return {
+      panelArr,
+    };
+  }, [paymentArr]);
 
   // ----------------------------------------------------------------------
 
-  const control_table: Ttable['tbody']['rowArr'] = useMemo(() => {
-    return fakeDataArr.map((data) => {
+  return (
+    <div className={className}>
+      <TabCarousel02
+        control={control_tabCarousel}
+        //
+        // 只有在mount時觸發(以isShowVendorMonthList切換是否被mount)，
+        // 藉以移動到在OutsourcingList選中的廠商
+        // 在被渲染後，activeIndex不管怎麼改變，都不會再次觸發
+        onMount={({ ref_slider }) => {
+          ref_slider.current.slickGoTo(activeIndex);
+        }}
+      />
+      <DateCollapse className={classNames('m-auto mt-1')} control={control_dateCollapse} />
+    </div>
+  );
+};
+
+const MonthVendorPanel = ({
+  //
+  targetDate,
+  className,
+  onDateTabClick,
+}: {
+  targetDate: string | undefined;
+  className?: string;
+  onDateTabClick: (isoString: string) => void;
+}) => {
+  const router = useRouter();
+
+  // ----------------------------------------------------------------------
+  const [activeTab_date, setActiveTab_date] = useState<number>(0);
+
+  // ----------------------------------------------------------------------
+
+  const monthStart = moment(targetDate).startOf('month').toISOString();
+  const monthEnd = moment(targetDate).endOf('month').toISOString();
+
+  const filter = {
+    date: {
+      $gte: monthStart,
+      $lte: monthEnd,
+    },
+  };
+
+  const params: Tparams = {
+    pageSize: 99999,
+    filter,
+  };
+
+  const { dataArr: paymentArr, reset: reset_payment } = useGetOutsourcingPayment({ customParams: params });
+
+  // ----------------------------------------------------------------------
+
+  useEffect(() => {
+    reset_payment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetDate]);
+
+  // ----------------------------------------------------------------------
+
+  const { tabArr, defaultCarouselIndex } = useMemo(() => {
+    //
+    const dateArr = getAllMonthByRange({
+      start: 2022,
+      end: undefined,
+    }).reverse();
+
+    let defaultCarouselIndex = -1;
+
+    const tabArr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
+      const twDate = moment(date).subtract(1911, 'years');
+
+      if (date === moment(targetDate).format('yy-MM')) {
+        defaultCarouselIndex = index;
+        setActiveTab_date(index);
+      }
+
+      return {
+        label: twDate.format('yy-MM'),
+        onClick: ({ ref_slider }) => {
+          setActiveTab_date(index);
+          ref_slider.current.slickGoTo(index);
+          const theDate = moment(date);
+          onDateTabClick(theDate.toISOString());
+        },
+      };
+    });
+
+    return { tabArr, defaultCarouselIndex };
+  }, []);
+
+  const control_tabCarousel: Tcontrol_tabCarousel = {
+    activeIndex: activeTab_date,
+    tabArr,
+  };
+
+  // ----------------------------------------------------------------------
+
+  const thead: Ttable['thead'] = {
+    stickyTop: {
+      top: '40px',
+    },
+    rowProps: {
+      minHeight: tableConfig.row.minHeight,
+    },
+    cellArr: [
+      {
+        children: cellCofig.vendor.label,
+        width: cellCofig.vendor.width,
+      },
+      {
+        children: cellCofig.phoneNumber.label,
+        width: cellCofig.phoneNumber.width,
+      },
+    ],
+  };
+
+  const control_rowArr: Ttable['tbody']['rowArr'] = useMemo(() => {
+    return paymentArr.map((paymentInfo) => {
+      const { outsourcing } = paymentInfo;
+
       return {
         minHeight: tableConfig.row.minHeight,
         onClick: () => {
           router.push({
             pathname: router.pathname + '/edit',
+            query: {
+              paymentId: paymentInfo?.id,
+            },
           });
         },
         cellArr: [
           {
-            children: data.name,
+            children: outsourcing.name,
             width: cellCofig.vendor.width,
           },
           {
-            children: data.phoneNumber,
+            children: outsourcing.contactNumber,
             width: cellCofig.phoneNumber.width,
           },
         ],
       };
     });
-  }, []);
+  }, [paymentArr]);
 
-  const fakeTable: Ttable = {
-    thead: fakeThead,
+  const control_table: Ttable = {
+    thead: thead,
     tbody: {
-      rowArr: control_table,
+      rowArr: control_rowArr,
     },
     haveBorder: false,
   };
@@ -303,7 +551,12 @@ const MonthVendorPanel = ({ className }: { className?: string }) => {
   // ----------------------------------------------------------------------
   return (
     <div className={classNames(className)}>
-      <TabCarousel02 control={control_tabCarousel} />
+      <TabCarousel02
+        control={control_tabCarousel}
+        onMount={({ ref_slider }) => {
+          ref_slider.current.slickGoTo(defaultCarouselIndex);
+        }}
+      />
       <Wrapper_tab
         className={classNames('m-auto')}
         childrenOption={{
@@ -313,7 +566,7 @@ const MonthVendorPanel = ({ className }: { className?: string }) => {
           top: 40,
         }}
       >
-        <Table01 {...fakeTable} />
+        <Table01 {...control_table} />
       </Wrapper_tab>
     </div>
   );
@@ -411,26 +664,6 @@ const cellCofig: TcellConfig = {
   },
 };
 
-const fakeThead: Ttable['thead'] = {
-  stickyTop: {
-    top: '40px',
-  },
-  rowProps: {
-    minHeight: tableConfig.row.minHeight,
-  },
-  cellArr: [
-    {
-      children: cellCofig.vendor.label,
-      width: cellCofig.vendor.width,
-    },
-    {
-      children: cellCofig.phoneNumber.label,
-      width: cellCofig.phoneNumber.width,
-      // flex: cellCofig.phoneNumber.flex,
-    },
-  ],
-};
-
 type TfakeData = {
   id: string;
   name: string;
@@ -463,4 +696,49 @@ function generateMonthsSinceNow(): { [key: `${number}`]: number[] } {
   return result;
 }
 
-export { fakeDataArr, generateMonthsSinceNow, fakeDataTempArr };
+const getPaymentDateList = (paymentArr: ToutsourcingPaymentDto[]) => {
+  const result: {
+    [year: string]: {
+      [month: string]: { id: string } | undefined;
+    };
+  } = {};
+
+  paymentArr.forEach((payment) => {
+    const date = moment(payment.date);
+    const year = date.year().toString();
+    const month = date.month().toString();
+
+    if (!result[year]) {
+      result[year] = {
+        '1': undefined,
+        '2': undefined,
+        '3': undefined,
+        '4': undefined,
+        '5': undefined,
+        '6': undefined,
+        '7': undefined,
+        '8': undefined,
+        '9': undefined,
+        '10': undefined,
+        '11': undefined,
+        '12': undefined,
+      };
+    }
+
+    result[year][month] = { id: payment.id };
+  });
+
+  return result;
+}; // getPaymentDateList
+
+//
+//
+//
+//
+export {
+  VendorMonthPanel,
+  //
+  fakeDataArr,
+  generateMonthsSinceNow,
+  fakeDataTempArr,
+};
