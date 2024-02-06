@@ -273,4 +273,21 @@ export const apiPatchOutsourcingPayment = async (
     });
 };
 
-//
+// 送審
+export const apiPatchOutsourcingPaymentSubmit = async (id: string) => {
+  const api = `/outsourcing-payment/${id}/submit`;
+
+  return axi
+    .patch(api)
+    .then((res) => res.data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      myAlert.err({
+        title: '送審外包計價單失敗',
+        content: err.message,
+      });
+
+      return Promise.reject(err);
+    });
+};

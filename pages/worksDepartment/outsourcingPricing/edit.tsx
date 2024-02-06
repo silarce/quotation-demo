@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -34,6 +34,7 @@ import {
   useGetOutsourcingPaymentDetail,
   apiPatchOutsourcingPayment,
   TupdateOutsourcingPaymentDto,
+  apiPatchOutsourcingPaymentSubmit,
 } from 'js/api/api_outsourcing';
 
 // type
@@ -194,8 +195,8 @@ export default function OutsourcingPricingEdit() {
   };
 
   // -------------------------------------------------------------------------
-  // _req
 
+  // _req
   // 確認
   const reqPatchOutsourcingPayment = async () => {
     if (!paymentId) {
@@ -220,6 +221,40 @@ export default function OutsourcingPricingEdit() {
     try {
       setIsLoading(true);
       await apiPatchOutsourcingPayment(paymentId, body);
+      await update_payment();
+      setDisabled(true);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const reqPatchOutsourcingPaymentSubmit = async () => {
+    if (!paymentId) {
+      return;
+    }
+
+    const reviewCheckerEmployeeId = checker?.id;
+    const reviewSupervisorEmployeeId = supervisor?.id;
+    const reviewAccountingEmployeeId = accounting?.id;
+    const reviewCashierEmployeeId = cashier?.id;
+
+    if (
+      !reviewCheckerEmployeeId ||
+      !reviewSupervisorEmployeeId ||
+      !reviewAccountingEmployeeId ||
+      !reviewCashierEmployeeId
+    ) {
+      myAlert.info({
+        title: '請填寫完整審核人員',
+      });
+
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPatchOutsourcingPaymentSubmit(paymentId);
       await update_payment();
       setDisabled(true);
     } catch (error) {
@@ -683,9 +718,7 @@ export default function OutsourcingPricingEdit() {
     {
       type: 'redButton',
       label: '送審',
-      onClick: () => {
-        alert('test');
-      },
+      onClick: reqPatchOutsourcingPaymentSubmit,
     },
     // {
     //   type: 'myButton',
