@@ -8,16 +8,18 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // type
 import { Tparams, TpageMetaDto } from './dtoTypes';
 
-export type { Tparams };
-
-type Treq = {
+type Tres = {
   data: any[];
   meta: TpageMetaDto;
 };
 
 type Tapi<TapiReq> = (params?: Tparams) => Promise<TapiReq>;
 
-export function createUseInfinite<TapiReq extends Treq>({
+export type { Tparams, Tres };
+
+// ==================================================================
+
+export function createUseInfinite<TapiReq extends Tres>({
   //
   apiClient,
   errTitle,
