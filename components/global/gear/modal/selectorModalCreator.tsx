@@ -45,7 +45,7 @@ export function selectModalCreator<Tdata extends Tobject>({
   useInfinit,
   configArr,
   params,
-  searchInputSelPropsArr = [],
+  searchInputSelPropsArr,
   modalWidth = 800,
 }: {
   useInfinit: TuseInfinite;
@@ -178,6 +178,11 @@ export function selectModalCreator<Tdata extends Tobject>({
       setSearchValue(v);
     };
 
+    const searcbBarProps = searchInputSelPropsArr && {
+      inputSelPropsArr: searchInputSelPropsArr,
+      onClick: onSearch,
+    };
+
     // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
 
@@ -195,10 +200,7 @@ export function selectModalCreator<Tdata extends Tobject>({
         width={rwd1023 ? '80vw' : modalWidth}
         className={scss.container}
         tip={tip}
-        searcbBarProps={{
-          inputSelPropsArr: searchInputSelPropsArr,
-          onClick: onSearch,
-        }}
+        searcbBarProps={searcbBarProps}
       >
         <LoadingCoverWrapper01 isLoading={isLoadingPage1}>
           <div className={scss.listContainer}>
