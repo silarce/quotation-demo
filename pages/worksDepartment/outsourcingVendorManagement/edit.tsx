@@ -9,32 +9,96 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import scss from './edit.module.scss';
+
+// api
+import {
+  TupdateOutsourcingDto,
+  useGetOutsourcing_id,
+  apiPostOutsourcing,
+  apiPatchOutsourcing,
+} from 'js/api/api_outsourcing';
 
 // ====================================================================
 
 type Tquery = {
-  vendorId: string | undefined;
+  outsourcingId: string | undefined;
 };
 
 // ====================================================================
 export default function Edit() {
   const router = useRouter();
-  const { vendorId } = router.query as Tquery;
+  const { outsourcingId } = router.query as Tquery;
 
-  const [disabled, setDisabled] = useState(!!vendorId);
+  const [disabled, setDisabled] = useState(!!outsourcingId);
+  const [isLoading, setIsLoading] = useState(false);
+  // --------------------------------------------------------------
+
+  const { data, update, isLoading_outsourcing } = useGetOutsourcing_id(outsourcingId);
+  const [outsourcing, setOutsourcing] = useState<TupdateOutsourcingDto>(createEmptyData());
+
+  // --------------------------------------------------------------
+
+  const editOutsourcing = (key: keyof TupdateOutsourcingDto, value: string) => {
+    setOutsourcing((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // --------------------------------------------------------------
+
+  const reqPostPatch = async () => {
+    const id = outsourcingId;
+
+    if (!outsourcing.name) {
+      myAlert.info({ title: '請輸入廠商名稱' });
+
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      if (id) {
+        await apiPatchOutsourcing(id, outsourcing);
+        update();
+      } else {
+        const res = await apiPostOutsourcing(outsourcing);
+        router.push({
+          query: { outsourcingId: res.id },
+        });
+      }
+
+      setDisabled(true);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --------------------------------------------------------------
+
+  useEffect(() => {
+    update();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outsourcingId]);
+
+  useEffect(() => {
+    if (data) {
+      setOutsourcing(data);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (disabled) {
+      setOutsourcing(data ?? createEmptyData());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
 
   // --------------------------------------------------------------
 
   const panelList_disabled: TpanelList = [
-    {
-      type: 'redButton',
-      label: '刪除',
-      onClick: () => {
-        alert('test');
-      },
-    },
     {
       type: 'myButton',
       label: '編輯',
@@ -46,7 +110,7 @@ export default function Edit() {
       type: 'myButton',
       label: '返回',
       onClick: () => {
-        router.back();
+        router.push('./');
       },
     },
   ];
@@ -56,17 +120,17 @@ export default function Edit() {
       type: 'redButton',
       label: '確認',
       onClick: () => {
-        alert('test');
+        reqPostPatch();
       },
     },
     {
       type: 'myButton',
-      label: `${!!vendorId ? '取消' : '返回'}`,
+      label: `${!!outsourcingId ? '取消' : '返回'}`,
       onClick: () => {
-        if (!!vendorId) {
+        if (!!outsourcingId) {
           setDisabled(true);
         } else {
-          router.back();
+          router.push('./');
         }
       },
     },
@@ -76,7 +140,12 @@ export default function Edit() {
 
   // --------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer
+      isLoading_subLayer={
+        isLoading
+        // || isLoading_outsourcing
+      }
+    >
       <PageHeader02 tag="外包廠商編輯" panelList={panelList} />
 
       <div className={scss.main}>
@@ -86,7 +155,12 @@ export default function Edit() {
             caption="廠商名稱"
             disabled={disabled}
             inputProps={{
-              props: {},
+              props: {
+                value: outsourcing.name,
+                onChange: (e) => {
+                  editOutsourcing('name', e.target.value);
+                },
+              },
             }}
           />
           <InputSel
@@ -94,7 +168,12 @@ export default function Edit() {
             caption="負責人"
             disabled={disabled}
             inputProps={{
-              props: {},
+              props: {
+                value: outsourcing.principal,
+                onChange: (e) => {
+                  editOutsourcing('principal', e.target.value);
+                },
+              },
             }}
           />
           <InputSel
@@ -102,15 +181,25 @@ export default function Edit() {
             caption="聯絡電話"
             disabled={disabled}
             inputProps={{
-              props: {},
+              props: {
+                value: outsourcing.contactNumber,
+                onChange: (e) => {
+                  editOutsourcing('contactNumber', e.target.value);
+                },
+              },
             }}
           />
           <InputSel
             {...inputSelProps}
-            caption="樘數計價"
+            caption="統一編號"
             disabled={disabled}
             inputProps={{
-              props: {},
+              props: {
+                value: outsourcing.taxId,
+                onChange: (e) => {
+                  editOutsourcing('taxId', e.target.value);
+                },
+              },
             }}
           />
           <div className={scss.address}>
@@ -118,14 +207,38 @@ export default function Edit() {
               inputSelProps={{
                 ...inputSelProps,
                 caption: '廠商地點',
-                disabled,
+                disabled: disabled,
                 showBaseline: 'auto',
               }}
               addressProps={{
-                county: {},
-                district: {},
-                address: {},
-                showZipCode: true,
+                county: {
+                  props: {
+                    isDisabled: disabled,
+                    value: { label: outsourcing.county, value: outsourcing.county },
+                    onChange: (option) => {
+                      editOutsourcing('county', option?.value ?? '');
+                      editOutsourcing('district', '');
+                    },
+                  },
+                },
+                district: {
+                  props: {
+                    isDisabled: disabled,
+                    value: { label: outsourcing.district, value: outsourcing.district },
+                    onChange: (option) => {
+                      editOutsourcing('district', option?.value ?? '');
+                    },
+                  },
+                },
+                address: {
+                  props: {
+                    disabled: disabled,
+                    value: outsourcing.address,
+                    onChange: (e) => {
+                      editOutsourcing('address', e.target.value);
+                    },
+                  },
+                },
               }}
             />
           </div>
@@ -142,6 +255,10 @@ export default function Edit() {
             textareaProps={{
               allowNewLineByUser: true,
               props: {
+                value: outsourcing.notes ?? '',
+                onChange: (e) => {
+                  editOutsourcing('notes', e.target.value);
+                },
                 className: classNames(scss.textarea, !disabled && scss.notDisabled),
                 maxRows: 14,
                 minRows: disabled ? undefined : 10,
@@ -150,7 +267,7 @@ export default function Edit() {
           />
         </div>
         {/*  */}
-        <div className={scss.bottom}>
+        {/* <div className={scss.bottom}>
           <InputSel
             {...inputSelProps}
             showBaseline="invisible"
@@ -175,11 +292,24 @@ export default function Edit() {
               },
             }}
           />
-        </div>
+        </div> */}
       </div>
     </SubLayer>
   );
 }
+
+// ====================================================================
+
+const createEmptyData = (): TupdateOutsourcingDto => ({
+  name: '',
+  contactNumber: '',
+  principal: '',
+  taxId: '',
+  county: '',
+  district: '',
+  address: '',
+  notes: '',
+});
 
 // ====================================================================
 

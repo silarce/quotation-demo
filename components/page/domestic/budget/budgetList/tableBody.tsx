@@ -8,9 +8,6 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import style from '../budgetList.module.scss';
 
-import { Class_fakeApi_projectSimple } from 'fakeDatabase/fakeAPI/fakeQuotationSimpleArrApi';
-type TprojectSimpleRecord = ReturnType<Class_fakeApi_projectSimple['get']>[0]['tempRecord'];
-
 type Trecord = {
   date: string;
   editNotes: string;

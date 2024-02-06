@@ -1,7 +1,5 @@
 // css
 import style from './quotationPdf.module.scss';
-// type
-import { TuseProfile } from 'components/page/domestic/quotation/hook/useProfile';
 
 export type Tprofile = {
   quotationId: string;

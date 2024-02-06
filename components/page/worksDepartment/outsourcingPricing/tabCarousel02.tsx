@@ -1,7 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
-
-// import { useInView } from 'react-intersection-observer';
 
 import Slider, { CustomArrowProps, Settings as TreactSlickProps } from 'react-slick';
 
@@ -17,6 +15,8 @@ type Ttab = {
   onClick?: (props: { ref_slider: React.MutableRefObject<Slider> }) => void;
   className?: string;
   className_tabContent?: string;
+  viewRef?: (node?: Element | null | undefined) => void;
+  isActive?: boolean;
 };
 
 type Tcontrol = {
@@ -34,11 +34,15 @@ export default function TabCarousel02({
   control,
   theme = 'default',
   props,
+  onMount,
+  slideToIndex,
 }: {
   className?: string;
   control: Tcontrol;
   theme?: 'default' | 'dashed';
   props?: TreactSlickProps;
+  onMount?: (props: { ref_slider: React.MutableRefObject<Slider> }) => void;
+  slideToIndex?: number;
 }) {
   // const [viewRef_first, inView_first] = useInView();
   // const [viewRef_last, inView_last] = useInView();
@@ -49,9 +53,16 @@ export default function TabCarousel02({
   const sliderRef = useRef<Slider>(null!);
   const { tabArr, activeIndex } = control;
 
+  useEffect(() => {
+    !slideToIndex && onMount && onMount({ ref_slider: sliderRef });
+  }, []);
+
+  useEffect(() => {
+    slideToIndex !== undefined && sliderRef.current.slickGoTo(slideToIndex);
+  }, [slideToIndex]);
+
   return (
     <Slider
-      // className={classNames(scss.slider, scss.theme_default, className)}
       className={classNames('m-auto', scss.slider, scss[`theme_${theme}`], className)}
       ref={sliderRef}
       infinite={false}
@@ -74,7 +85,7 @@ export default function TabCarousel02({
         // isLastInView={inView_last}
         />
       }
-      beforeChange={(e) => {
+      onSwipe={(e) => {
         setIsSliding(true);
       }}
       afterChange={(e) => {
@@ -83,25 +94,17 @@ export default function TabCarousel02({
       {...props}
     >
       {tabArr.map((tab, index) => {
-        const { label, onClick, className, className_tabContent } = tab;
+        const { label, onClick, className, className_tabContent, viewRef } = tab;
 
-        const isActive = activeIndex === index;
+        const isActive = tab.isActive !== undefined ? tab.isActive : activeIndex === index;
 
         const theClick = () => {
           !isSliding && onClick && onClick({ ref_slider: sliderRef });
         };
 
-        // const ref = index === 0 ? viewRef_first : index === tabArr.length - 1 ? viewRef_last : null;
-        // const ref = index === 0 ? viewRef_first : null;
-
         return (
           <div key={index} className={classNames(scss.tab, className)}>
-            <div
-              //
-              // ref={ref}
-              className={classNames(isActive && scss.active, className_tabContent)}
-              onClick={theClick}
-            >
+            <div ref={viewRef} className={classNames(isActive && scss.active, className_tabContent)} onClick={theClick}>
               <span>{label}</span>
             </div>
           </div>

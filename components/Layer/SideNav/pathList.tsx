@@ -162,21 +162,6 @@ const sidePathList: TsidePathList = {
                 idNumber: ['EM-10902-01'], // 會計的帳號(只在正式環境中)
               },
             },
-            // 移到了/setting/hrManage/dailyReporterSetting
-            // {
-            //   label: '審核設定',
-            //   path: path01 + '/reviewerSetting',
-            //   erpFeature: [HRAuthoritySetup],
-            //   otherPermissions: {
-            //     grade: 14,
-            //   },
-            //   exception: {
-            //     idNumber: [
-            //       'EM-10902-01', // 會計的帳號
-            //       'EM-09701-01', // 總務的帳號
-            //     ],
-            //   },
-            // },
           ],
         },
       ],
@@ -220,29 +205,11 @@ const sidePathList: TsidePathList = {
             },
           ],
         },
-        // {
-        //   label: '客戶列表',
-        //   path: path01 + '/customer',
-        //   // erpFeature: allPass,
-        //   erpFeature: 'allPass',
-        // },
         {
           label: '產品列表',
           path: path01 + '/productList',
           erpFeature: devPass,
         },
-        // {
-        //   label: '備註列表',
-        //   path: path01 + '/annotationList',
-        //   // erpFeature: [BasicDataCreation],
-        //   erpFeature: [domestic],
-        // },
-        // {
-        //   label: '報價範圍列表',
-        //   path: path01 + '/quotationRanges',
-        //   // erpFeature: [BasicDataCreation],
-        //   erpFeature: [domestic],
-        // },
       ],
     };
   })(),
