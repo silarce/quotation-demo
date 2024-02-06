@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -200,6 +200,8 @@ export default function OutsourcingPricingEdit() {
     try {
       setIsLoading(true);
       await apiPatchOutsourcingPayment(paymentId, body);
+      await update_payment();
+      setDisabled(true);
     } catch (error) {
     } finally {
       setIsLoading(false);
