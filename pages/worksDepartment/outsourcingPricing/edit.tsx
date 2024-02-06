@@ -32,10 +32,12 @@ import {
   useGetOutsourcingPayment,
   useGetOutsourcingPayment_id,
   useGetOutsourcingPaymentDetail,
+  apiPatchOutsourcingPayment,
+  TupdateOutsourcingPaymentDto,
 } from 'js/api/api_outsourcing';
 
 // type
-import { TemployeeDto } from 'js/api/dtoTypes';
+import { TemployeeDto, TdeductionDto } from 'js/api/dtoTypes';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
@@ -76,18 +78,32 @@ export default function OutsourcingPricingEdit() {
   const [targetPaymentId, setTargetPaymentId] = useState<string>();
 
   // -------------------------------------------------------------------------
-
-  const { data: payment, update } = useGetOutsourcingPayment_id(paymentId);
-  const { data: paymentDetail, update: update_detail } = useGetOutsourcingPaymentDetail(paymentId);
-
-  console.log(paymentDetail);
-
-  // 接上api時要改為真實資料
-  const data_amountToBeDeducted = fakeData_amountToBeDeducted;
+  // const [deduction, setDeduction] = useState<TdeductionDto[]>([]);
+  const [payment, setPayment] = useState<TupdateOutsourcingPaymentDto>(create_emptyPayment());
 
   // -------------------------------------------------------------------------
 
-  const [amountToBeDeducted, setAmountToBeDeducted] = useState<TfakeData_amountToBeDeducted[]>([]);
+  const { data: data_payment, update: update_payment } = useGetOutsourcingPayment_id(paymentId);
+
+  const params_paymentDetail: Tparams = {
+    populate: ['engineeringContact'],
+    pageSize: 99999,
+  };
+
+  const { data: paymentDetail, update: update_detail } = useGetOutsourcingPaymentDetail(
+    paymentId,
+    params_paymentDetail
+  );
+
+  const { paymentOri } = useMemo(() => {
+    const payment = data_payment ?? create_emptyPayment();
+
+    return {
+      paymentOri: payment,
+    };
+  }, [data_payment]);
+
+  // -------------------------------------------------------------------------
 
   // -------------------------------------------------------------------------
 
@@ -105,20 +121,20 @@ export default function OutsourcingPricingEdit() {
   );
 
   useEffect(() => {
-    setAmountToBeDeducted(_.cloneDeep(data_amountToBeDeducted));
-  }, [disabled]);
+    setPayment(paymentOri);
+  }, [paymentOri, disabled]);
 
   useEffect(() => {
-    update();
+    update_payment();
     update_detail();
   }, [paymentId]);
 
   useEffect(() => {
-    if (payment) {
-      setTargetOutsourcingId(payment.outsourcing.id);
-      setTargetPaymentId(payment.id);
+    if (data_payment) {
+      setTargetOutsourcingId(data_payment.outsourcing.id);
+      setTargetPaymentId(data_payment.id);
     }
-  }, [!!payment]);
+  }, [!!data_payment]);
 
   useEffect(() => {
     router.push({
@@ -131,48 +147,73 @@ export default function OutsourcingPricingEdit() {
   // -------------------------------------------------------------------------
 
   const addAnmountToBeDeducted = () => {
-    setAmountToBeDeducted((prev) => {
-      return [...prev, create_emptyAmountToBeDeducted()];
+    setPayment((prev) => {
+      return {
+        ...prev,
+        deduction: [...(prev.deduction ?? []), create_emptyDeduction()],
+      };
     });
   };
 
   const deleteAnmountToBeDeducted = (index: number) => {
-    setAmountToBeDeducted((prev) => {
-      return prev.filter((_, i) => i !== index);
+    setPayment((prev) => {
+      return {
+        ...prev,
+        deduction: prev.deduction?.filter((_, i) => i !== index) ?? [],
+      };
     });
   };
 
-  const editAnmountToBeDeducted = ({
-    index,
-    key,
-    value,
-  }: {
-    index: number;
-    key: keyof TfakeData_amountToBeDeducted;
-    value: string;
-  }) => {
-    setAmountToBeDeducted((prev) => {
-      const newArr = [...prev];
+  const editDeduction = ({ index, key, value }: { index: number; key: keyof TdeductionDto; value: string }) => {
+    setPayment((prev) => {
+      const newArr = [...(prev.deduction ?? [])];
 
-      if (key === 'subTotal_invoice') {
+      if (key === 'price') {
         newArr[index][key] = Number(value);
       } else {
         newArr[index][key] = value;
       }
 
-      return newArr;
+      return {
+        ...prev,
+        deduction: newArr,
+      };
     });
   };
 
+  // -------------------------------------------------------------------------
+  // _req
+
+  // 上傳
+  // const reqPatchOutsourcingPayment = async () => {
+  //   if (!paymentId) {
+  //     return;
+  //   }
+
+  //   const deductionStr = deduction ? JSON.stringify(deduction) : null;
+
+  //   try {
+  //     await apiPatchOutsourcingPayment(paymentId);
+  //   } catch (error) {}
+  // };
+
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
 
   const { control_table_project, subTotal_project } = useMemo(() => {
     let decimal_subTotal = new Decimal(0);
     const control_tbody: Ttable['tbody'] = (() => {
-      const rowArr: Ttable['tbody']['rowArr'] = fakeData_projectArr.map((data, index) => {
-        const { projectNumber, projectName, subTotal_invoice } = data;
+      const rowArr: Ttable['tbody']['rowArr'] = (paymentDetail ?? []).map((data, index) => {
+        const { outsourcingTotal, engineeringContact } = data;
 
-        decimal_subTotal = decimal_subTotal.add(subTotal_invoice);
+        const { projectName = '', projectNumber = '' } = engineeringContact ?? {};
+
+        decimal_subTotal = decimal_subTotal.add(outsourcingTotal);
 
         const cellArr: Tcell[] = [
           {
@@ -188,7 +229,7 @@ export default function OutsourcingPricingEdit() {
             ...config_projectTable.projectName,
           },
           {
-            children: subTotal_invoice.toLocaleString(),
+            children: outsourcingTotal.toLocaleString(),
             ...config_projectTable.subTotal_invoice.tbody,
           },
           {
@@ -237,20 +278,20 @@ export default function OutsourcingPricingEdit() {
     //
     const control_tbody: Ttable['tbody'] = (() => {
       //
-      const rowArr: Ttable['tbody']['rowArr'] = amountToBeDeducted.map((data, index) => {
-        const { type, item, subTotal_invoice } = data;
+      const rowArr: Ttable['tbody']['rowArr'] = (payment.deduction ?? []).map((data, index) => {
+        const { type, itemName, price } = data;
 
-        decimal_subTotal = decimal_subTotal.add(subTotal_invoice);
+        decimal_subTotal = decimal_subTotal.add(price);
 
-        const inputWidth_type = config_amountToBeDeducted.type.inputWidth;
-        const inputWidth_item = config_amountToBeDeducted.item.inputWidth;
-        const inputWidth_subTotal_invoice = config_amountToBeDeducted.subTotal_invoice_enabled.inputWidth;
+        const inputWidth_type = config_deduction.type.inputWidth;
+        const inputWidth_item = config_deduction.itemName.inputWidth;
+        const inputWidth_price = config_deduction.price_enabled.inputWidth;
 
         const typeChildren = (
           <input
             value={type}
             onChange={(e) => {
-              editAnmountToBeDeducted({ index, key: 'type', value: e.target.value });
+              editDeduction({ index, key: 'type', value: e.target.value });
             }}
             className={classNames(scss.inputInTable, !disabled && scss.enabled)}
             style={{ width: inputWidth_type }}
@@ -260,9 +301,9 @@ export default function OutsourcingPricingEdit() {
 
         const itemChildren = (
           <input
-            value={item}
+            value={itemName}
             onChange={(e) => {
-              editAnmountToBeDeducted({ index, key: 'item', value: e.target.value });
+              editDeduction({ index, key: 'itemName', value: e.target.value });
             }}
             className={classNames(scss.inputInTable, !disabled && scss.enabled)}
             style={{ width: inputWidth_item }}
@@ -272,13 +313,13 @@ export default function OutsourcingPricingEdit() {
 
         const subTotal_invoiceChildren = (
           <input
-            value={disabled ? subTotal_invoice.toLocaleString() : subTotal_invoice}
+            value={disabled ? price.toLocaleString() : price}
             onChange={(e) => {
-              editAnmountToBeDeducted({ index, key: 'subTotal_invoice', value: e.target.value });
+              editDeduction({ index, key: 'price', value: e.target.value });
             }}
             type={disabled ? 'text' : 'number'}
             className={classNames(scss.inputInTable, !disabled && scss.enabled)}
-            style={{ width: inputWidth_subTotal_invoice }}
+            style={{ width: inputWidth_price }}
             readOnly={disabled}
           />
         );
@@ -286,17 +327,15 @@ export default function OutsourcingPricingEdit() {
         const cellArr: Tcell[] = [
           {
             children: typeChildren,
-            ...config_amountToBeDeducted.type,
+            ...config_deduction.type,
           },
           {
             children: itemChildren,
-            ...config_amountToBeDeducted.item,
+            ...config_deduction.itemName,
           },
           {
             children: subTotal_invoiceChildren,
-            ...(disabled
-              ? config_amountToBeDeducted.subTotal_invoice.tbody
-              : config_amountToBeDeducted.subTotal_invoice_enabled.tbody),
+            ...(disabled ? config_deduction.price.tbody : config_deduction.price_enabled.tbody),
           },
         ];
 
@@ -316,7 +355,7 @@ export default function OutsourcingPricingEdit() {
                 }}
               />
             ),
-            ...config_amountToBeDeducted.btn_delete.tbody,
+            ...config_deduction.btn_delete.tbody,
           });
         }
 
@@ -353,7 +392,7 @@ export default function OutsourcingPricingEdit() {
       control_table_amountToBeDeducted: control_table,
       subTotal_amountToBeDeducted: decimal_subTotal.toNumber(),
     };
-  }, [amountToBeDeducted, disabled]);
+  }, [payment.deduction, disabled]);
 
   // -------------------------------------------------------------------------
 
@@ -637,7 +676,7 @@ export default function OutsourcingPricingEdit() {
     <SubLayer>
       <PageHeader02 tag="外包計價" panelList={panelList} />
 
-      <div className={classNames(!payment && 'hidden')}>
+      <div className={classNames(!data_payment && 'hidden')}>
         {targetOutsourcingId && (
           <PaymentSelectSlideBar
             //
@@ -684,6 +723,15 @@ export default function OutsourcingPricingEdit() {
   );
 }
 
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
 // ======================================================================
 // ======================================================================
 // ======================================================================
@@ -827,7 +875,6 @@ const PaymentSelectSlideBar = ({
     }
 
     const dateArr = paymentArr.map((payment) => {
-      // return payment.date;
       return payment;
     });
 
@@ -933,8 +980,8 @@ const Table = ({
 // ======================================================================
 // ======================================================================
 // ======================================================================
-type Tconfig = {
-  [key: string]: {
+type Tconfig<keys extends string = string> = {
+  [key in keys]: {
     width?: React.CSSProperties['width'];
     flex?: React.CSSProperties['flex'];
     justifyContent?: React.CSSProperties['justifyContent'];
@@ -1019,20 +1066,22 @@ const thead_projectTable: Ttable['thead'] = {
 };
 // ---------------------
 
-const config_amountToBeDeducted: Tconfig = {
+const config_deduction: Tconfig<
+  'type' | 'itemName' | 'price' | 'price_enabled' | 'btn_delete' | 'label_subTotal' | 'subtotal'
+> = {
   type: {
     width: 414,
     // flex: '1 0',
     justifyContent: 'center',
     inputWidth: 394,
   },
-  item: {
+  itemName: {
     width: 414,
     // flex: '1 0',
     justifyContent: 'center',
     inputWidth: 394,
   },
-  subTotal_invoice: {
+  price: {
     width: '270px',
     justifyContent: 'center',
     tbody: {
@@ -1040,7 +1089,7 @@ const config_amountToBeDeducted: Tconfig = {
       justifyContent: 'flex-end',
     },
   },
-  subTotal_invoice_enabled: {
+  price_enabled: {
     inputWidth: 180,
     tbody: {
       width: 200,
@@ -1061,15 +1110,15 @@ const thead_amountToBeDeducted: Ttable['thead'] = {
   cellArr: [
     {
       children: '類別',
-      ...config_amountToBeDeducted.type,
+      ...config_deduction.type,
     },
     {
       children: '項目',
-      ...config_amountToBeDeducted.item,
+      ...config_deduction.itemName,
     },
     {
       children: '請款小計',
-      ...config_amountToBeDeducted.subTotal_invoice,
+      ...config_deduction.price,
     },
   ],
 };
@@ -1115,43 +1164,55 @@ const thead_actualAmountReceived: Ttable['thead'] = {
 // ======================================================================
 // ======================================================================
 
-const fakeData_projectArr = [
-  {
-    projectNumber: 'M-110802',
-    projectName: '后里拓凱',
-    subTotal_invoice: 61960,
-  },
-  {
-    projectNumber: 'M-110802',
-    projectName: '環南市場',
-    subTotal_invoice: 13010,
-  },
-  {
-    projectNumber: 'M-110802',
-    projectName: '元大人壽',
-    subTotal_invoice: 5000,
-  },
-] as const;
+const create_emptyPayment = (): TupdateOutsourcingPaymentDto => ({
+  date: '',
+  paymentSubTotal: 0,
+  deduction: [],
+  deductionTotal: 0,
+  priorPeriodRetainage: 0,
+  retainage: 0,
+  subTotal: 0,
+  salesTax: 0,
+  total: 0,
+});
 
-const fakeData_amountToBeDeducted: TfakeData_amountToBeDeducted[] = [
-  {
-    type: '安裝物料',
-    item: '項目一',
-    subTotal_invoice: 1000,
-  },
-  {
-    type: '保險',
-    item: '團保',
-    subTotal_invoice: 666,
-  },
-];
+// const fakeData_projectArr = [
+//   {
+//     projectNumber: 'M-110802',
+//     projectName: '后里拓凱',
+//     subTotal_invoice: 61960,
+//   },
+//   {
+//     projectNumber: 'M-110802',
+//     projectName: '環南市場',
+//     subTotal_invoice: 13010,
+//   },
+//   {
+//     projectNumber: 'M-110802',
+//     projectName: '元大人壽',
+//     subTotal_invoice: 5000,
+//   },
+// ] as const;
+
+// const fakeData_amountToBeDeducted: TfakeData_amountToBeDeducted[] = [
+//   {
+//     type: '安裝物料',
+//     item: '項目一',
+//     subTotal_invoice: 1000,
+//   },
+//   {
+//     type: '保險',
+//     item: '團保',
+//     subTotal_invoice: 666,
+//   },
+// ];
 
 const fakeData_latestPeriodKeep = {
   price: 218350,
 };
 
-const create_emptyAmountToBeDeducted = (): TfakeData_amountToBeDeducted => ({
+const create_emptyDeduction = (): TdeductionDto => ({
   type: '',
-  item: '',
-  subTotal_invoice: 0,
+  itemName: '',
+  price: 0,
 });

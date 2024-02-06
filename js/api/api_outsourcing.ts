@@ -18,6 +18,7 @@ import type {
   ToutsourcingPaymentDetailDto,
   TcreateOutsourcingDto,
   TupdateOutsourcingDto,
+  TupdateOutsourcingPaymentDto,
 } from './dtoTypes';
 
 export type {
@@ -30,6 +31,7 @@ export type {
   ToutsourcingPaymentDetailDto,
   TcreateOutsourcingDto,
   TupdateOutsourcingDto,
+  TupdateOutsourcingPaymentDto,
 };
 
 // /outsourcing
@@ -244,4 +246,28 @@ export const useGetOutsourcingPaymentDetail = (id?: string, params?: Tparams) =>
     update,
     isLoading_outsourcingPaymentDetail: isLoading,
   };
+};
+
+// 以 id 更新 OutsourcingPayment 外包計價單
+export const apiPatchOutsourcingPayment = async (
+  id: string,
+  body: TupdateOutsourcingPaymentDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = `/outsourcing-payment/${id}`;
+
+  return axi
+    .patch(api, body)
+    .then((res) => res.data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      callAlert &&
+        myAlert.err({
+          title: '更新外包計價單失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
 };
