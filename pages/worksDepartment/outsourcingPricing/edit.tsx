@@ -59,14 +59,13 @@ export default function OutsourcingPricingEdit() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [disabled, setDisabled] = useState<boolean>(true);
-  const [disabled_reviewer, setDisabled__reviewer] = useState<boolean>(true);
 
   // -------------------------------------------------------------------------
   const [manager, setManager] = useState<TemployeeDto>();
   const [supervisor, setSupervisor] = useState<TemployeeDto>();
   const [accounting, setAccounting] = useState<TemployeeDto>();
   const [checker, setChecker] = useState<TemployeeDto>();
-  const [agent, setAgent] = useState<TemployeeDto>();
+  const [cashier, setCashier] = useState<TemployeeDto>();
 
   // -------------------------------------------------------------------------
 
@@ -74,12 +73,22 @@ export default function OutsourcingPricingEdit() {
   const [targetPaymentId, setTargetPaymentId] = useState<string>();
 
   // -------------------------------------------------------------------------
-  // const [deduction, setDeduction] = useState<TdeductionDto[]>([]);
   const [payment, setPayment] = useState<TupdateOutsourcingPaymentDto>(create_emptyPayment());
 
   // -------------------------------------------------------------------------
+  const params: Tparams = {
+    populate: [
+      'outsourcing',
+      'agentEmployee',
+      'reviewCheckerEmployee',
+      'reviewSupervisorEmployee',
+      'reviewManagerEmployee',
+      'reviewAccountingEmployee',
+      'reviewCashierEmployee',
+    ],
+  };
 
-  const { data: data_payment, update: update_payment } = useGetOutsourcingPayment_id(paymentId);
+  const { data: data_payment, update: update_payment } = useGetOutsourcingPayment_id(paymentId, params);
 
   const params_paymentDetail: Tparams = {
     populate: ['engineeringContact'],
@@ -92,7 +101,7 @@ export default function OutsourcingPricingEdit() {
   );
 
   const { paymentOri } = useMemo(() => {
-    const payment = data_payment ?? create_emptyPayment();
+    const payment = data_payment;
 
     return {
       paymentOri: payment,
@@ -103,21 +112,28 @@ export default function OutsourcingPricingEdit() {
 
   // -------------------------------------------------------------------------
 
-  useEffect(
-    () => {
-      // setManager();
-      // setSupervisor();
-      // setAccounting();
-      // setChecker();
-      // setAgent();
-    },
-    [
-      // data
-    ]
-  );
+  useEffect(() => {
+    if (!paymentOri) {
+      return;
+    }
+
+    const {
+      reviewCheckerEmployee, //  '核對人員'
+      reviewSupervisorEmployee, //  '審核主管'
+      reviewManagerEmployee, //  '總經理'
+      reviewAccountingEmployee, //  '會計'
+      reviewCashierEmployee, //  '出納'
+    } = paymentOri;
+
+    setManager(reviewManagerEmployee);
+    setSupervisor(reviewSupervisorEmployee);
+    setAccounting(reviewAccountingEmployee);
+    setChecker(reviewCheckerEmployee);
+    setCashier(reviewCashierEmployee);
+  }, [paymentOri, disabled]);
 
   useEffect(() => {
-    setPayment(paymentOri);
+    setPayment(paymentOri ?? create_emptyPayment());
   }, [paymentOri, disabled]);
 
   useEffect(() => {
@@ -195,6 +211,10 @@ export default function OutsourcingPricingEdit() {
       subTotal: result.subTotal,
       salesTax: result.salesTax,
       total: result.total,
+      reviewCheckerEmployeeId: checker?.id,
+      reviewSupervisorEmployeeId: supervisor?.id,
+      reviewAccountingEmployeeId: accounting?.id,
+      reviewCashierEmployeeId: cashier?.id,
     };
 
     try {
@@ -553,7 +573,7 @@ export default function OutsourcingPricingEdit() {
         label: (
           <>
             <span className="inline-block mr-2">經辦</span>
-            <span className="inline-block">王阿明</span>
+            <span className="inline-block">{paymentOri?.agentEmployee?.chName}</span>
           </>
         ),
         dotColor: 'green',
@@ -562,7 +582,7 @@ export default function OutsourcingPricingEdit() {
         label: (
           <>
             <span className="inline-block mr-2">核對</span>
-            <span className="inline-block">王阿明</span>
+            <span className="inline-block">{checker?.chName}</span>
           </>
         ),
         dotColor: 'red',
@@ -571,7 +591,16 @@ export default function OutsourcingPricingEdit() {
         label: (
           <>
             <span className="inline-block mr-2">會計</span>
-            <span className="inline-block">王阿明</span>
+            <span className="inline-block">{accounting?.chName}</span>
+          </>
+        ),
+        dotColor: 'red',
+      },
+      {
+        label: (
+          <>
+            <span className="inline-block mr-2">出納</span>
+            <span className="inline-block">{cashier?.chName}</span>
           </>
         ),
         dotColor: 'red',
@@ -580,7 +609,7 @@ export default function OutsourcingPricingEdit() {
         label: (
           <>
             <span className="inline-block mr-2">主管</span>
-            <span className="inline-block">王阿明</span>
+            <span className="inline-block">{supervisor?.chName}</span>
           </>
         ),
         dotColor: 'red',
@@ -588,8 +617,8 @@ export default function OutsourcingPricingEdit() {
       {
         label: (
           <>
-            <span className="inline-block mr-2">核對</span>
-            <span className="inline-block">王阿明</span>
+            <span className="inline-block mr-2">總經理</span>
+            <span className="inline-block">{manager?.chName}</span>
           </>
         ),
         dotColor: undefined,
@@ -623,6 +652,13 @@ export default function OutsourcingPricingEdit() {
       },
     },
     {
+      label: '出納',
+      employee: cashier,
+      onChange: (employee) => {
+        setCashier(employee);
+      },
+    },
+    {
       label: '核對',
       employee: checker,
       onChange: (employee) => {
@@ -631,10 +667,11 @@ export default function OutsourcingPricingEdit() {
     },
     {
       label: '經辦',
-      employee: agent,
+      employee: paymentOri?.agentEmployee,
       onChange: (employee) => {
-        setAgent(employee);
+        // setAgent(employee);
       },
+      disabled: true,
     },
   ];
 
@@ -647,21 +684,22 @@ export default function OutsourcingPricingEdit() {
       type: 'redButton',
       label: '送審',
       onClick: () => {
-        setDisabled__reviewer(false);
+        alert('test');
       },
     },
-    {
-      type: 'myButton',
-      label: '編輯審核人員',
-      onClick: () => {
-        setDisabled__reviewer(false);
-      },
-    },
-    {
-      type: 'myButton',
-      label: '新增工程',
-      onClick: () => {},
-    },
+    // {
+    //   type: 'myButton',
+    //   label: '編輯審核人員',
+    //   onClick: () => {
+    //     setDisabled__reviewer(false);
+    //     setDisabled(true);
+    //   },
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '新增工程',
+    //   onClick: () => {},
+    // },
     {
       type: 'myButton',
       label: '編輯',
@@ -686,7 +724,7 @@ export default function OutsourcingPricingEdit() {
     },
   ];
 
-  const panelList = disabled ? panelList_disabled : panelList_enabled;
+  const panelList: TpanelList = disabled ? panelList_disabled : panelList_enabled;
 
   // -------------------------------------------------------------------------
   return (
@@ -723,13 +761,13 @@ export default function OutsourcingPricingEdit() {
         />
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
         {/*  */}
-        <div className={classNames(!disabled_reviewer && 'hidden')}>
-          <ProcessChain control={control_processChain} className={classNames('w-[1100px] m-auto mt-[80px]')} />
+        <div className={classNames(!disabled && 'hidden')}>
+          <ProcessChain control={control_processChain} className={classNames('w-[1250px] m-auto mt-[80px]')} />
         </div>
-        <div className={classNames(disabled_reviewer && 'hidden')}>
+        <div className={classNames(disabled && 'hidden')}>
           <SignatureBar
             control={control_signatureBar}
-            disabled={disabled_reviewer}
+            disabled={disabled}
             className={classNames('w-[1100px] m-auto mt-[100px]')}
           />
         </div>

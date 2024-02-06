@@ -2852,7 +2852,7 @@ export type ToutsourcingPaymentDto = {
   //  '送審給核對人員的時間'
   toReviewCheckerAt: string | null; // ISOstring
   //  '核對人員Id'
-  reviewCheckerEmployeeId: string | null;
+  reviewCheckerEmployeeId: string;
   //  '核對人員'
   reviewCheckerEmployee: TemployeeDto;
   //  '核對人員審核時間'
@@ -2860,7 +2860,7 @@ export type ToutsourcingPaymentDto = {
   //  '送審給主管的時間'
   toReviewSupervisorAt: string | null; // ISOstring
   //  '審核主管id'
-  reviewSupervisorEmployeeId: string | null;
+  reviewSupervisorEmployeeId: string;
   //  '審核主管'
   reviewSupervisorEmployee: TemployeeDto;
   //  '主管審核時間'
@@ -2868,7 +2868,7 @@ export type ToutsourcingPaymentDto = {
   //  '送審給總經理的時間'
   toManagerAt: string | null; // ISOstring
   //  '總經理id'
-  reviewManagerEmployeeId: string | null;
+  reviewManagerEmployeeId: string;
   //  '總經理'
   reviewManagerEmployee: TemployeeDto;
   //  '總經理審核時間'
@@ -2876,7 +2876,7 @@ export type ToutsourcingPaymentDto = {
   //  '送審給會計的時間'
   toAccountingAt: string | null; // ISOstring
   //  '會計id'
-  reviewAccountingEmployeeId: string | null;
+  reviewAccountingEmployeeId: string;
   //  '會計'
   reviewAccountingEmployee: TemployeeDto;
   //  '會計審核時間'
@@ -2884,7 +2884,7 @@ export type ToutsourcingPaymentDto = {
   //  '送審給出納的時間'
   toCashierAt: string | null; // ISOstring
   //  '出納id'
-  reviewCashierEmployeeId: string | null;
+  reviewCashierEmployeeId: string;
   //  '出納'
   reviewCashierEmployee: TemployeeDto;
   //  '出納審核時間'
@@ -2920,6 +2920,11 @@ export type TupdateOutsourcingPaymentDto = {
   salesTax: number | null;
   // 實領總計
   total: number | null;
+
+  reviewCheckerEmployeeId?: string | null;
+  reviewSupervisorEmployeeId?: string | null;
+  reviewAccountingEmployeeId?: string | null;
+  reviewCashierEmployeeId?: string | null;
 };
 
 export type ToutsourcingPaymentDetailDto = {

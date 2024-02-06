@@ -159,12 +159,8 @@ export const useGetOutsourcingPayment = createUseInfinite<TpageResponse<Toutsour
   errTitle: '取得外包計價列表失敗',
 });
 
-export const apiGetOutsourcingPayment_id = async (id: string) => {
+export const apiGetOutsourcingPayment_id = async (id: string, params?: Tparams) => {
   const api = `/outsourcing-payment/${id}`;
-
-  const params = {
-    populate: ['outsourcing'],
-  };
 
   return axi
     .get<ToutsourcingPaymentDto>(api, { params })
@@ -172,9 +168,14 @@ export const apiGetOutsourcingPayment_id = async (id: string) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetOutsourcingPayment_id = (id?: string) => {
+export const useGetOutsourcingPayment_id = (id?: string, customerParams?: Tparams) => {
   const [res, setRes] = useState<ToutsourcingPaymentDto>();
   const [isLoading, setIsLoading] = useState(false);
+
+  const params = {
+    populate: ['outsourcing'],
+    ...customerParams,
+  };
 
   const update = async () => {
     if (!id) {
@@ -183,7 +184,7 @@ export const useGetOutsourcingPayment_id = (id?: string) => {
 
     try {
       setIsLoading(true);
-      const res = await apiGetOutsourcingPayment_id(id);
+      const res = await apiGetOutsourcingPayment_id(id, params);
       setRes(res);
 
       return res;
@@ -271,3 +272,5 @@ export const apiPatchOutsourcingPayment = async (
       return Promise.reject(err);
     });
 };
+
+//
