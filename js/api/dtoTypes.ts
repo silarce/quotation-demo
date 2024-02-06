@@ -2902,14 +2902,23 @@ export type TdeductionDto = {
 };
 
 export type TupdateOutsourcingPaymentDto = {
+  // 外包計價日期
   date: string;
+  // 請款合計
   paymentSubTotal: number | null;
+  // 扣款明細
   deduction: TdeductionDto[] | null;
+  // 扣款總金額
   deductionTotal: number | null;
-  priorPeriodRetainage: number | null;
+  // 上期保留款項 // 不應該使用
+  // priorPeriodRetainage: number | null;
+  // 本期保留款項
   retainage: number | null;
+  // 小計
   subTotal: number | null;
+  // 營業稅
   salesTax: number | null;
+  // 實領總計
   total: number | null;
 };
 

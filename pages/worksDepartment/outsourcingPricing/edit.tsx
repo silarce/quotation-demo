@@ -46,12 +46,6 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // ======================================================================
 
-type TfakeData_amountToBeDeducted = {
-  type: string;
-  item: string;
-  subTotal_invoice: number;
-};
-
 type Tquery = {
   paymentId: string | undefined;
 };
@@ -62,6 +56,8 @@ export default function OutsourcingPricingEdit() {
   const { paymentId } = router.query as Tquery;
 
   // -------------------------------------------------------------------------
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const [disabled, setDisabled] = useState<boolean>(true);
   const [disabled_reviewer, setDisabled__reviewer] = useState<boolean>(true);
 
@@ -184,18 +180,31 @@ export default function OutsourcingPricingEdit() {
   // -------------------------------------------------------------------------
   // _req
 
-  // 上傳
-  // const reqPatchOutsourcingPayment = async () => {
-  //   if (!paymentId) {
-  //     return;
-  //   }
+  // 確認
+  const reqPatchOutsourcingPayment = async () => {
+    if (!paymentId) {
+      return;
+    }
 
-  //   const deductionStr = deduction ? JSON.stringify(deduction) : null;
+    const body = {
+      date: new Date().toISOString(),
+      paymentSubTotal: subTotal_project,
+      deduction: payment.deduction ?? [],
+      deductionTotal: subTotal_deduction,
+      retainage: result.retainage,
+      subTotal: result.subTotal,
+      salesTax: result.salesTax,
+      total: result.total,
+    };
 
-  //   try {
-  //     await apiPatchOutsourcingPayment(paymentId);
-  //   } catch (error) {}
-  // };
+    try {
+      setIsLoading(true);
+      await apiPatchOutsourcingPayment(paymentId, body);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
@@ -272,7 +281,7 @@ export default function OutsourcingPricingEdit() {
 
   // -------------------------------------------------------------------------
 
-  const { control_table_amountToBeDeducted, subTotal_amountToBeDeducted } = useMemo(() => {
+  const { control_table_deduction, subTotal_deduction } = useMemo(() => {
     //
     let decimal_subTotal = new Decimal(0);
     //
@@ -389,29 +398,36 @@ export default function OutsourcingPricingEdit() {
     };
 
     return {
-      control_table_amountToBeDeducted: control_table,
-      subTotal_amountToBeDeducted: decimal_subTotal.toNumber(),
+      control_table_deduction: control_table,
+      subTotal_deduction: decimal_subTotal.toNumber(),
     };
   }, [payment.deduction, disabled]);
 
   // -------------------------------------------------------------------------
 
-  const { control_table_actualAmountReceived } = useMemo(() => {
+  const { control_table_actualAmountReceived, result } = useMemo(() => {
     //
 
-    // 本期保留10%
-    const periodKeep = new Decimal(subTotal_project).mul(0.1).toNumber();
-    // '上期保留10%'
-    const latestPeriodKeep = new Decimal(fakeData_latestPeriodKeep.price).mul(0.1).toNumber();
+    // 本期保留10% // 本期保留款
+    const retainage = new Decimal(subTotal_project).mul(0.1).toNumber();
+    // '上期保留10%' // 上期保留款
+    const latestPeriodKeep = data_payment?.priorPeriodRetainage ?? 0;
 
     const subTotal = new Decimal(subTotal_project)
-      .sub(periodKeep)
+      .sub(retainage)
       .add(latestPeriodKeep)
-      .sub(subTotal_amountToBeDeducted)
+      .sub(subTotal_deduction)
       .toNumber();
 
     const tax = new Decimal(subTotal).mul(0.05).toDecimalPlaces(0).toNumber();
     const actualAmountReceived = new Decimal(subTotal).add(tax).toNumber();
+
+    const result = {
+      retainage: retainage, // 本期保留款項
+      subTotal: subTotal,
+      salesTax: tax,
+      total: actualAmountReceived, // 實領總計
+    };
 
     //
     const rowArr: Ttable['tbody']['rowArr'] = [
@@ -436,7 +452,7 @@ export default function OutsourcingPricingEdit() {
             ...config_actualAmountReceived.caption,
           },
           {
-            children: periodKeep.toLocaleString(),
+            children: retainage.toLocaleString(),
             ...config_actualAmountReceived.subTotal_invoice.tbody,
             className: scss.textRed,
           },
@@ -464,7 +480,7 @@ export default function OutsourcingPricingEdit() {
             ...config_actualAmountReceived.caption,
           },
           {
-            children: subTotal_amountToBeDeducted.toLocaleString(),
+            children: subTotal_deduction.toLocaleString(),
             ...config_actualAmountReceived.subTotal_invoice.tbody,
             className: scss.textRed,
           },
@@ -522,9 +538,10 @@ export default function OutsourcingPricingEdit() {
 
     return {
       control_table_actualAmountReceived: control_table,
+      result,
     };
     //
-  }, [subTotal_project, subTotal_amountToBeDeducted]);
+  }, [subTotal_project, subTotal_deduction, payment]);
 
   // -------------------------------------------------------------------------
 
@@ -656,9 +673,7 @@ export default function OutsourcingPricingEdit() {
     {
       type: 'redButton',
       label: '確認',
-      onClick: () => {
-        alert('test');
-      },
+      onClick: reqPatchOutsourcingPayment,
     },
     {
       type: 'myButton',
@@ -673,7 +688,7 @@ export default function OutsourcingPricingEdit() {
 
   // -------------------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader02 tag="外包計價" panelList={panelList} />
 
       <div className={classNames(!data_payment && 'hidden')}>
@@ -701,7 +716,7 @@ export default function OutsourcingPricingEdit() {
           caption="應扣明細"
           disabled={disabled}
           className="w-fit m-auto mt-[96px]"
-          control={control_table_amountToBeDeducted}
+          control={control_table_deduction}
           onAddClick={addAnmountToBeDeducted}
         />
         <Table caption="實領金額" className="w-fit m-auto mt-[96px]" control={control_table_actualAmountReceived} />
@@ -1169,47 +1184,11 @@ const create_emptyPayment = (): TupdateOutsourcingPaymentDto => ({
   paymentSubTotal: 0,
   deduction: [],
   deductionTotal: 0,
-  priorPeriodRetainage: 0,
   retainage: 0,
   subTotal: 0,
   salesTax: 0,
   total: 0,
 });
-
-// const fakeData_projectArr = [
-//   {
-//     projectNumber: 'M-110802',
-//     projectName: '后里拓凱',
-//     subTotal_invoice: 61960,
-//   },
-//   {
-//     projectNumber: 'M-110802',
-//     projectName: '環南市場',
-//     subTotal_invoice: 13010,
-//   },
-//   {
-//     projectNumber: 'M-110802',
-//     projectName: '元大人壽',
-//     subTotal_invoice: 5000,
-//   },
-// ] as const;
-
-// const fakeData_amountToBeDeducted: TfakeData_amountToBeDeducted[] = [
-//   {
-//     type: '安裝物料',
-//     item: '項目一',
-//     subTotal_invoice: 1000,
-//   },
-//   {
-//     type: '保險',
-//     item: '團保',
-//     subTotal_invoice: 666,
-//   },
-// ];
-
-const fakeData_latestPeriodKeep = {
-  price: 218350,
-};
 
 const create_emptyDeduction = (): TdeductionDto => ({
   type: '',
