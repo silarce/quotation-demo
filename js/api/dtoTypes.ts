@@ -2812,77 +2812,83 @@ export type TcreateOutsourcingDto = Omit<
   ToutsourcingDto,
   'outsourcingPayment' | 'latestPayment' | 'id' | 'createdAt' | 'updatedAt'
 >;
-
 export type TupdateOutsourcingDto = TcreateOutsourcingDto;
 
+// 外包計價單
 export type ToutsourcingPaymentDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-
-  // 外包廠商Id
+  //  '外包廠商Id'
   outsourcingId: string | null;
-  // 外包廠商
+  //  '外包廠商'
   outsourcing: ToutsourcingDto;
-  // 外包計價單日期
-  date: string;
-  // 是否已結清
+  //  '外包計價單日期'
+  date: string; // ISOstring
+  //  '是否已結清'
   isPaymentCleared: boolean;
-  // 扣款明細
-  // deduction: TdeductionDto[] | null;
-  deduction: string | null; // JSON
-  // 扣款合計
+  //  '請款合計'
+  paymentSubTotal: number | null;
+  //  '扣款明細'
+  deduction: TdeductionDto[] | null;
+  //  '扣款合計'
   deductionTotal: number | null;
-  // 上期保留款
+  //  '上期保留款'
   priorPeriodRetainage: number | null;
-  // 本期保留款
+  //  '本期保留款'
   retainage: number | null;
-  // 應收帳款明細
+  //  '小計'
+  subTotal: number | null;
+  //  '營業稅'
+  salesTax: number | null;
+  //  '實領總計'
+  total: number | null;
+  //  '外包計價帳款明細'
   outsourcingPaymentDetail: ToutsourcingPaymentDetailDto[];
-  // 經辦人Id
+  //  '經辦人Id'
   agentEmployeeId: string | null;
-  // 經辦人
+  //  '經辦人'
   agentEmployee: TemployeeDto;
-  // 送審給核對人員的時間
-  toReviewCheckerAt: string | null;
-  // 核對人員Id
+  //  '送審給核對人員的時間'
+  toReviewCheckerAt: string | null; // ISOstring
+  //  '核對人員Id'
   reviewCheckerEmployeeId: string | null;
-  // 核對人員
+  //  '核對人員'
   reviewCheckerEmployee: TemployeeDto;
-  // 核對人員審核時間
-  checkerReviewedAt: string | null;
-  // 送審給主管的時間
-  toReviewSupervisorAt: string | null;
-  // 審核主管id
+  //  '核對人員審核時間'
+  checkerReviewedAt: string | null; // ISOstring
+  //  '送審給主管的時間'
+  toReviewSupervisorAt: string | null; // ISOstring
+  //  '審核主管id'
   reviewSupervisorEmployeeId: string | null;
-  // 審核主管
+  //  '審核主管'
   reviewSupervisorEmployee: TemployeeDto;
-  // 主管審核時間
-  supervisorReviewedAt: string | null;
-  // 送審給總經理的時間
-  toManagerAt: string | null;
-  // 總經理id
+  //  '主管審核時間'
+  supervisorReviewedAt: string | null; // ISOstring
+  //  '送審給總經理的時間'
+  toManagerAt: string | null; // ISOstring
+  //  '總經理id'
   reviewManagerEmployeeId: string | null;
-  // 總經理
+  //  '總經理'
   reviewManagerEmployee: TemployeeDto;
-  // 總經理審核時間
-  managerReviewedAt: string | null;
-  // 送審給會計的時間
-  toAccountingAt: string | null;
-  // 會計id
+  //  '總經理審核時間'
+  managerReviewedAt: string | null; // ISOstring
+  //  '送審給會計的時間'
+  toAccountingAt: string | null; // ISOstring
+  //  '會計id'
   reviewAccountingEmployeeId: string | null;
-  // 會計
+  //  '會計'
   reviewAccountingEmployee: TemployeeDto;
-  // 會計審核時間
-  accountingReviewedAt: string | null;
-  // 送審給出納的時間
-  toCashierAt: string | null;
-  // 出納id
+  //  '會計審核時間'
+  accountingReviewedAt: string | null; // ISOstring
+  //  '送審給出納的時間'
+  toCashierAt: string | null; // ISOstring
+  //  '出納id'
   reviewCashierEmployeeId: string | null;
-  // 出納
+  //  '出納'
   reviewCashierEmployee: TemployeeDto;
-  // 出納審核時間
-  cashierReviewedAt: string | null;
+  //  '出納審核時間'
+  cashierReviewedAt: string | null; // ISOstring
 };
 
 export type TdeductionDto = {
@@ -2891,7 +2897,20 @@ export type TdeductionDto = {
   // 項目
   itemName: string;
   // 扣款金額 // IsNumberString
-  price: string;
+  // price: string;
+  price: number;
+};
+
+export type TupdateOutsourcingPaymentDto = {
+  date: string;
+  paymentSubTotal: number | null;
+  deduction: TdeductionDto[] | null;
+  deductionTotal: number | null;
+  priorPeriodRetainage: number | null;
+  retainage: number | null;
+  subTotal: number | null;
+  salesTax: number | null;
+  total: number | null;
 };
 
 export type ToutsourcingPaymentDetailDto = {
