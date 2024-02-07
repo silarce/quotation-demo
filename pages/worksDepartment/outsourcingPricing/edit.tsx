@@ -77,6 +77,8 @@ export default function OutsourcingPricingEdit() {
   const [payment, setPayment] = useState<TupdateOutsourcingPaymentDto>(create_emptyPayment());
 
   // -------------------------------------------------------------------------
+
+  // -------------------------------------------------------------------------
   const params: Tparams = {
     populate: [
       'outsourcing',
@@ -101,16 +103,49 @@ export default function OutsourcingPricingEdit() {
     params_paymentDetail
   );
 
-  const { paymentOri } = useMemo(() => {
+  const {
+    paymentOri,
+    reviewStatus_checker,
+    reviewStatus_accounting,
+    reviewStatus_cashier,
+    reviewStatus_supervisor,
+    reviewStatus_manager,
+  } = useMemo(() => {
     const payment = data_payment;
+
+    const {
+      checkerReviewedAt,
+      supervisorReviewedAt,
+      managerReviewedAt,
+      accountingReviewedAt,
+      cashierReviewedAt,
+
+      toReviewCheckerAt,
+      toReviewSupervisorAt,
+      toManagerAt,
+      toAccountingAt,
+      toCashierAt,
+    } = payment ?? {};
+
+    type TdotColor = Tcontrol_processChain['statusArr'][number]['dotColor'];
+
+    const reviewStatus_checker: TdotColor = !toReviewCheckerAt ? 'gray' : checkerReviewedAt ? 'green' : 'red';
+    const reviewStatus_accounting: TdotColor = !toAccountingAt ? 'gray' : accountingReviewedAt ? 'green' : 'red';
+    const reviewStatus_cashier: TdotColor = !toCashierAt ? 'gray' : cashierReviewedAt ? 'green' : 'red';
+    const reviewStatus_supervisor: TdotColor = !toReviewSupervisorAt ? 'gray' : supervisorReviewedAt ? 'green' : 'red';
+    const reviewStatus_manager: TdotColor = !toManagerAt ? 'gray' : managerReviewedAt ? 'green' : 'red';
 
     return {
       paymentOri: payment,
+      reviewStatus_checker,
+      reviewStatus_accounting,
+      reviewStatus_cashier,
+      reviewStatus_supervisor,
+      reviewStatus_manager,
     };
   }, [data_payment]);
 
-  // -------------------------------------------------------------------------
-
+  // _______________________________________________________________________
   // -------------------------------------------------------------------------
 
   useEffect(() => {
@@ -617,46 +652,46 @@ export default function OutsourcingPricingEdit() {
         label: (
           <>
             <span className="inline-block mr-2">核對</span>
-            <span className="inline-block">{checker?.chName}</span>
+            <span className="inline-block">{paymentOri?.reviewCheckerEmployee.chName}</span>
           </>
         ),
-        dotColor: 'red',
+        dotColor: reviewStatus_checker,
       },
       {
         label: (
           <>
             <span className="inline-block mr-2">會計</span>
-            <span className="inline-block">{accounting?.chName}</span>
+            <span className="inline-block">{paymentOri?.reviewAccountingEmployee.chName}</span>
           </>
         ),
-        dotColor: 'red',
+        dotColor: reviewStatus_accounting,
       },
       {
         label: (
           <>
             <span className="inline-block mr-2">出納</span>
-            <span className="inline-block">{cashier?.chName}</span>
+            <span className="inline-block">{paymentOri?.reviewCashierEmployee.chName}</span>
           </>
         ),
-        dotColor: 'red',
+        dotColor: reviewStatus_cashier,
       },
       {
         label: (
           <>
             <span className="inline-block mr-2">主管</span>
-            <span className="inline-block">{supervisor?.chName}</span>
+            <span className="inline-block">{paymentOri?.reviewSupervisorEmployee.chName}</span>
           </>
         ),
-        dotColor: 'red',
+        dotColor: reviewStatus_supervisor,
       },
       {
         label: (
           <>
             <span className="inline-block mr-2">總經理</span>
-            <span className="inline-block">{manager?.chName}</span>
+            <span className="inline-block">{paymentOri?.reviewManagerEmployee.chName}</span>
           </>
         ),
-        dotColor: undefined,
+        dotColor: reviewStatus_manager,
       },
     ],
   };
@@ -680,17 +715,17 @@ export default function OutsourcingPricingEdit() {
       },
     },
     {
-      label: '會計',
-      employee: accounting,
-      onChange: (employee) => {
-        setAccounting(employee);
-      },
-    },
-    {
       label: '出納',
       employee: cashier,
       onChange: (employee) => {
         setCashier(employee);
+      },
+    },
+    {
+      label: '會計',
+      employee: accounting,
+      onChange: (employee) => {
+        setAccounting(employee);
       },
     },
     {
