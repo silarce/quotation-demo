@@ -419,7 +419,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
     };
 
     return { control_table_project: control_table, subTotal_project: decimal_subTotal.toNumber() };
-  }, []);
+  }, [paymentDetail]);
 
   // -------------------------------------------------------------------------
 
