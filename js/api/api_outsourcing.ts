@@ -291,3 +291,21 @@ export const apiPatchOutsourcingPaymentSubmit = async (id: string) => {
       return Promise.reject(err);
     });
 };
+
+// 審核
+export const apiPatchOutsourcingPaymentReview = async (id: string, body: { reviewResult: boolean }) => {
+  const api = `/outsourcing-payment/${id}/review`;
+
+  return axi
+    .patch(api, body)
+    .then((res) => res.data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '審核外包計價單失敗',
+        content: err.message,
+      });
+
+      return Promise.reject(err);
+    });
+};
