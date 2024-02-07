@@ -1041,6 +1041,42 @@ export type TquotationProductDto = {
   reduceQty?: number;
 };
 
+// export type TdeliveryStatusDto = {
+//   id: string;
+//   createdAt: string;
+//   updatedAt: string;
+//   productItemId: string;
+//   //  '所屬產品'
+//   productItem?: TquotationProductItemDto;
+//   //  '備註'
+//   notes: string | null;
+//   itemName: string | null;
+//   shippingDate: string | null;
+//   //  '安裝人員Id'
+//   installerEmployeeId: string | null;
+//   //  '安裝人員/外包人員'
+//   installerEmployee?: ToutsourcingDto | null;
+//   //  '安裝日期'
+//   installationDate: string | null;
+//   //  '工作表開立日期'
+//   workSheetInvoiceDate: string | null;
+//   //  '追加'
+//   append: string | null;
+//   //  '完成追加'
+//   completeAppend: string | null;
+//   //
+//   completePayment: boolean | null;
+//   productPaymentId: boolean | null;
+//   productPayments: TaccountsReceivableProductPaymentDto[] | null;
+//   //
+//   otherInstallation: string | null; // 特殊項目施作內容
+//   otherQuantity: number | null; // 特殊項目數量
+//   otherUnitPrice: number | null; // 特殊項目計價
+//   otherSubTotalPrice: number | null; // 特殊項目小計
+//   otherWorkItemTotal: number | null; // 特殊項目之合計
+//   itemId: string | null; // 自動代入之productItem的id
+//   itemPrice: number | null; // productItem的才數計價
+// };
 export type TdeliveryStatusDto = {
   id: string;
   createdAt: string;
@@ -1064,10 +1100,19 @@ export type TdeliveryStatusDto = {
   append: string | null;
   //  '完成追加'
   completeAppend: string | null;
-  //
-  completePayment: boolean | null;
-  productPaymentId: boolean | null;
-  productPayments: TaccountsReceivableProductPaymentDto[] | null;
+
+  // completePayment: boolean | null; // 後端將這個型別移除了
+  // productPaymentId: boolean | null; // 後端將這個型別移除了
+
+  // 後端將這個型別移除了，但是前端有用到，但也不記得是做什麼用的了
+  productPayments?: TaccountsReceivableProductPaymentDto[] | null;
+
+  // 單樘計價
+  unitPrice: number | null;
+  // 其他特殊工作項目
+  otherWorkItem: ToutsourcingPaymentDetailItemDto[] | null;
+  // 其他特殊工作項目合計
+  otherWorkItemTotal: number | null;
 };
 
 export type TcreateEngineeringDeliveryStatusDto = {
@@ -2928,6 +2973,10 @@ export type TupdateOutsourcingPaymentDto = {
 };
 
 export type ToutsourcingPaymentDetailDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 工程聯絡單Id
   engineeringContactId: string | null;
   // 工程聯絡單
@@ -2950,6 +2999,33 @@ export type ToutsourcingPaymentDetailDto = {
   outsourcingPaymentId: string | null;
   // 外包計價單
   outsourcingPayment?: ToutsourcingPaymentDto;
+};
+
+type TcreateOutsourcingPaymentDetailItemDto = {
+  otherInstallation: string | null; // 特殊項目施作內容
+  otherQuantity: number | null; // 特殊項目數量
+  otherUnitPrice: number | null; // 特殊項目計價
+  otherSubTotalPrice: number | null; // 特殊項目小計
+  otherWorkItemTotal: number | null; // 特殊項目之合計
+  itemId: string | null; // 自動代入之productItem的id
+  itemPrice: number | null; // productItem的才數計價
+};
+
+export type TupdateOutsourcingPaymentDetailDto = {
+  engineeringContactId: string; // 工程聯落單id
+  installItem: TcreateOutsourcingPaymentDetailItemDto[]; // 項目
+  outsourcing: number; // 外包計價明細總計
+};
+
+export type ToutsourcingPaymentDetailItemDto = {
+  // 特殊項目施作內容
+  otherInstallation?: string | null;
+  // 特殊項目數量
+  otherQuantity?: number | null;
+  // 特殊項目計價
+  otherUnitPrice: number;
+  // 特殊項目小計
+  otherSubTotalPrice?: number | null;
 };
 
 // 暫時留作參考
