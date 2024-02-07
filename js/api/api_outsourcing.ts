@@ -19,6 +19,7 @@ import type {
   TcreateOutsourcingDto,
   TupdateOutsourcingDto,
   TupdateOutsourcingPaymentDto,
+  TupdateOutsourcingPaymentDetailDto,
 } from './dtoTypes';
 
 export type {
@@ -32,6 +33,7 @@ export type {
   TcreateOutsourcingDto,
   TupdateOutsourcingDto,
   TupdateOutsourcingPaymentDto,
+  TupdateOutsourcingPaymentDetailDto,
 };
 
 // /outsourcing
@@ -159,12 +161,8 @@ export const useGetOutsourcingPayment = createUseInfinite<TpageResponse<Toutsour
   errTitle: '取得外包計價列表失敗',
 });
 
-export const apiGetOutsourcingPayment_id = async (id: string) => {
+export const apiGetOutsourcingPayment_id = async (id: string, params?: Tparams) => {
   const api = `/outsourcing-payment/${id}`;
-
-  const params = {
-    populate: ['outsourcing'],
-  };
 
   return axi
     .get<ToutsourcingPaymentDto>(api, { params })
@@ -172,9 +170,14 @@ export const apiGetOutsourcingPayment_id = async (id: string) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetOutsourcingPayment_id = (id?: string) => {
+export const useGetOutsourcingPayment_id = (id?: string, customerParams?: Tparams) => {
   const [res, setRes] = useState<ToutsourcingPaymentDto>();
   const [isLoading, setIsLoading] = useState(false);
+
+  const params = {
+    populate: ['outsourcing'],
+    ...customerParams,
+  };
 
   const update = async () => {
     if (!id) {
@@ -183,7 +186,7 @@ export const useGetOutsourcingPayment_id = (id?: string) => {
 
     try {
       setIsLoading(true);
-      const res = await apiGetOutsourcingPayment_id(id);
+      const res = await apiGetOutsourcingPayment_id(id, params);
       setRes(res);
 
       return res;
@@ -265,6 +268,119 @@ export const apiPatchOutsourcingPayment = async (
       callAlert &&
         myAlert.err({
           title: '更新外包計價單失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
+};
+
+// 送審
+export const apiPatchOutsourcingPaymentSubmit = async (id: string) => {
+  const api = `/outsourcing-payment/${id}/submit`;
+
+  return axi
+    .patch(api)
+    .then((res) => res.data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      myAlert.err({
+        title: '送審外包計價單失敗',
+        content: err.message,
+      });
+
+      return Promise.reject(err);
+    });
+};
+
+// 審核
+export const apiPatchOutsourcingPaymentReview = async (id: string, body: { reviewResult: boolean }) => {
+  const api = `/outsourcing-payment/${id}/review`;
+
+  return axi
+    .patch(api, body)
+    .then((res) => res.data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '審核外包計價單失敗',
+        content: err.message,
+      });
+
+      return Promise.reject(err);
+    });
+};
+
+// 取得外包計價單明細
+export const apiGetOutsourcingPaymentDetail_id = async (id: string) => {
+  const api = `/outsourcing-payment-detail/${id}`;
+
+  const params = {
+    populate: [
+      //
+      'engineeringContact',
+      'installItems.deliveryStatus',
+      'outsourcingPayment.outsourcing',
+    ],
+  };
+
+  return axi
+    .get<ToutsourcingPaymentDetailDto>(api, { params })
+    .then((res) => res.data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetOutsourcingPaymentDetail_id = (id: string | undefined) => {
+  const [res, setRes] = useState<ToutsourcingPaymentDetailDto>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiGetOutsourcingPaymentDetail_id(id);
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '取得外包計價明細失敗',
+        content: err.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    data: res,
+    update,
+    isLoading_outsourcingPaymentDetail: isLoading,
+  };
+};
+
+// 以 id 更新 OutsourcingPayment 外包計價單明細
+export const apiPatchOutsourcingPaymentDetail = async (
+  id: string,
+  body: TupdateOutsourcingPaymentDetailDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = `/outsourcing-payment-detail/${id}`;
+
+  return axi
+    .patch(api, body)
+    .then((res) => res.data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      callAlert &&
+        myAlert.err({
+          title: '更新外包計價明細失敗',
           content: err.message,
         });
 

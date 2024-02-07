@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -22,18 +22,76 @@ import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from './detail.module.scss';
 
+// api
+import { useGetOutsourcingPaymentDetail_id } from 'js/api/api_outsourcing';
+
+// utils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+// type
+import type { TquotationProductItemDto } from 'js/api/dtoTypes';
+
 // =======================================================================
+
+type Tquery = {
+  paymentDetailId: string | undefined;
+};
+
+type Tstate_otherWorkItem = {
+  installItemId: string;
+  installItemName: string;
+
+  otherInstallation: string;
+  otherQuantity: string;
+  otherUnitPrice: string;
+  otherSubTotalPrice: string;
+};
+
+type Tstate_installItem = {
+  itemId: string;
+  itemPrice: number;
+};
 
 // =======================================================================
 export default function OutsourcingPricingDetail() {
   const router = useRouter();
+  const { paymentDetailId } = router.query as Tquery;
 
   // ---------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
 
   // ---------------------------------------------------------------------
 
+  // ---------------------------------------------------------------------
+
+  const {
+    data: paymentDetail,
+    update,
+    isLoading_outsourcingPaymentDetail,
+  } = useGetOutsourcingPaymentDetail_id(paymentDetailId);
+
+  const {
+    //
+    engineeringContact,
+    outsourcingPayment,
+    outsourcingTotal,
+    installItems = [],
+  } = paymentDetail ?? {};
+
+  const { outsourcing, date } = outsourcingPayment ?? {};
+  const twDateStr = date ? getTaiwanDateStr(date) : '';
+
+  // ---------------------------------------------------------------------
+
   const [data02, setData02] = useState<TfakeData02[]>([]);
+
+  // ---------------------------------------------------------------------
+
+  useEffect(() => {
+    update();
+  }, [paymentDetailId]);
+
+  // ---------------------------------------------------------------------
 
   // ---------------------------------------------------------------------
 
@@ -78,8 +136,8 @@ export default function OutsourcingPricingDetail() {
 
   // ---------------------------------------------------------------------
 
-  const { control_table01, subTotal01 } = useTable01();
-  const { control_table02, subTotal02 } = useTable02({ dataArr: data02, editData02, disabled });
+  const { control_table01, subTotal01 } = useTable01({ installItems });
+  const { control_table02, subTotal02 } = useTable02({ installItems, disabled });
   const control_table_total = useTable_total({ subTotal01, subTotal02 });
 
   // ---------------------------------------------------------------------
@@ -126,7 +184,7 @@ export default function OutsourcingPricingDetail() {
   // ---------------------------------------------------------------------
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isLoading_outsourcingPaymentDetail}>
       <PageHeader02 tag="外包計價單明細" panelList={panelList} />
       <div className={scss.main}>
         {/*  */}
@@ -136,28 +194,48 @@ export default function OutsourcingPricingDetail() {
             caption={'外包廠商'}
             disabled={disabled}
             showBaseline="auto"
-            inputProps={{}}
+            inputProps={{
+              props: {
+                value: outsourcing?.name ?? '',
+                placeholder: '',
+              },
+            }}
           />
           <InputSel
             //
             caption={'工程編號'}
             disabled={disabled}
             showBaseline="auto"
-            inputProps={{}}
+            inputProps={{
+              props: {
+                value: engineeringContact?.projectNumber ?? '',
+                placeholder: '',
+              },
+            }}
           />
           <InputSel
             //
             caption={'工程日期'}
             disabled={disabled}
             showBaseline="auto"
-            inputProps={{}}
+            inputProps={{
+              props: {
+                value: twDateStr ?? '',
+                placeholder: '',
+              },
+            }}
           />
           <InputSel
             //
             caption={'安裝人員'}
             disabled={disabled}
             showBaseline="auto"
-            inputProps={{}}
+            inputProps={{
+              props: {
+                value: outsourcing?.name ?? '',
+                placeholder: '',
+              },
+            }}
           />
           <InputSel
             //
@@ -165,7 +243,12 @@ export default function OutsourcingPricingDetail() {
             className="col-span-2"
             disabled={disabled}
             showBaseline="auto"
-            inputProps={{}}
+            inputProps={{
+              props: {
+                value: engineeringContact?.projectName,
+                placeholder: '',
+              },
+            }}
           />
           <AddressBar
             inputSelProps={{
@@ -174,9 +257,28 @@ export default function OutsourcingPricingDetail() {
               showBaseline: 'auto',
             }}
             addressProps={{
-              county: {},
-              district: {},
-              address: {},
+              county: {
+                easyValue: engineeringContact?.county ?? '',
+                props: {
+                  isDisabled: true,
+                  value: { value: '', label: engineeringContact?.county ?? '' },
+                  placeholder: '',
+                },
+              },
+              district: {
+                props: {
+                  isDisabled: true,
+                  value: { value: '', label: engineeringContact?.district ?? '' },
+                  placeholder: '',
+                },
+              },
+              address: {
+                props: {
+                  readOnly: true,
+                  value: engineeringContact?.address ?? '',
+                  placeholder: '',
+                },
+              },
             }}
           />
         </div>
@@ -200,7 +302,27 @@ export default function OutsourcingPricingDetail() {
 // ===========================================================================
 // ===========================================================================
 
-const useTable01 = () => {
+const useTable01 = ({
+  //
+  installItems,
+  disabled,
+}: {
+  installItems: TquotationProductItemDto[];
+  disabled?: boolean;
+}) => {
+  const [state_installItem, setState_installItem] = useState<Tstate_installItem[]>([]);
+
+  useEffect(() => {
+    const newState_installItem: Tstate_installItem[] = installItems.map((item) => {
+      return {
+        itemId: item.id,
+        itemPrice: item.itemPrice || 0,
+      };
+    });
+
+    setState_installItem(newState_installItem);
+  }, [installItems]);
+
   //
   const { control_table, subTotal } = useMemo(() => {
     const thead: Ttable['thead'] = {
@@ -239,19 +361,22 @@ const useTable01 = () => {
 
     let decimal_subTotal = new Decimal(0);
 
-    const rowArr: Ttable['tbody']['rowArr'] = fakeData.map((item, index) => {
-      const { floorNumber, width, height, volume, qty, unitPrice } = item;
+    const rowArr: Ttable['tbody']['rowArr'] = state_installItem.map((_, index) => {
+      const item = installItems[index];
+      const { itemName, fullWidth, height, volume } = item;
 
-      const dualPrice = new Decimal(unitPrice).mul(qty).toDecimalPlaces(0).toNumber();
+      const itemPrice = state_installItem[index].itemPrice;
+
+      const dualPrice = new Decimal(itemPrice || 0).mul(1).toDecimalPlaces(0).toNumber();
       decimal_subTotal = decimal_subTotal.add(dualPrice);
 
       const cellArr: Tcell[] = [
         {
-          children: floorNumber,
+          children: itemName,
           ...config_useTable01.floorNumber,
         },
         {
-          children: width,
+          children: fullWidth,
           ...config_useTable01.width,
         },
         {
@@ -263,7 +388,7 @@ const useTable01 = () => {
           ...config_useTable01.volume,
         },
         {
-          children: qty,
+          children: 1,
           ...config_useTable01.qty,
         },
         {
@@ -271,7 +396,17 @@ const useTable01 = () => {
             <CellInput
               style={{ width: config_useTable01.unitPrice.width }}
               inputProps={{
-                defaultValue: unitPrice,
+                type: 'number',
+                value: state_installItem[index].itemPrice ?? '',
+                readOnly: disabled,
+                onChange: (e) => {
+                  setState_installItem((prev) => {
+                    const copy = [...prev];
+                    copy[index].itemPrice = Number(e.target.value);
+
+                    return copy;
+                  });
+                },
               }}
             />
           ),
@@ -314,23 +449,53 @@ const useTable01 = () => {
       control_table,
       subTotal: decimal_subTotal.toNumber(),
     };
-  }, []); // useMemo
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state_installItem, disabled]); // useMemo
 
-  return { control_table01: control_table, subTotal01: subTotal };
+  return { control_table01: control_table, subTotal01: subTotal, state_installItem };
 };
 
 // ===========================================================================
 
 const useTable02 = ({
   //
-  dataArr,
-  editData02,
+  // dataArr,
+  // editData02,
+  installItems,
   disabled,
 }: {
-  dataArr: TfakeData02[];
-  editData02: (props: { index: number; key: keyof TfakeData02; value: string }) => void;
+  // dataArr: TfakeData02[];
+  // editData02: (props: { index: number; key: keyof TfakeData02; value: string }) => void;
+  installItems: TquotationProductItemDto[];
   disabled?: boolean;
 }) => {
+  //
+
+  const [state_otherWorkItem, setState_otherWorkItem] = useState<Tstate_otherWorkItem[]>([]);
+
+  useEffect(() => {
+    const arr: Tstate_otherWorkItem[] = [];
+
+    installItems.forEach((item) => {
+      const { deliveryStatus } = item;
+      deliveryStatus?.forEach((ds) => {
+        const otherWorkItems = ds.otherWorkItems || [];
+        otherWorkItems.forEach((owi) => {
+          arr.push({
+            installItemId: item.id,
+            installItemName: item.itemName,
+            otherInstallation: owi.otherInstallation ?? '',
+            otherQuantity: String(owi.otherQuantity || 0),
+            otherUnitPrice: String(owi.otherUnitPrice || 0),
+            otherSubTotalPrice: String(owi.otherSubTotalPrice || 0),
+          });
+        });
+      });
+    });
+
+    setState_otherWorkItem(arr);
+  }, [installItems]);
+
   //
   const { control_table, subTotal } = useMemo(() => {
     const thead: Ttable['thead'] = {
@@ -360,10 +525,10 @@ const useTable02 = ({
 
     let decimal_subTotal = new Decimal(0);
 
-    const rowArr: Ttable['tbody']['rowArr'] = dataArr.map((item, index) => {
-      const { floorNumber, workContent, qty, unitPrice } = item;
+    const rowArr: Ttable['tbody']['rowArr'] = state_otherWorkItem.map((item, index) => {
+      const { otherInstallation, installItemName, otherQuantity, otherUnitPrice, otherSubTotalPrice } = item;
 
-      const dualPrice = new Decimal(unitPrice).mul(qty).toDecimalPlaces(0).toNumber();
+      const dualPrice = new Decimal(otherUnitPrice).mul(otherQuantity).toDecimalPlaces(0).toNumber();
       decimal_subTotal = decimal_subTotal.add(dualPrice);
 
       const cellArr: Tcell[] = [
@@ -373,9 +538,9 @@ const useTable02 = ({
               disabled={disabled}
               style={{ width: config_useTable02.floorNumber.width }}
               inputProps={{
-                value: floorNumber,
+                value: installItemName,
                 onChange: (e) => {
-                  editData02({ index, key: 'floorNumber', value: e.target.value });
+                  // editData02({ index, key: 'floorNumber', value: e.target.value });
                 },
               }}
             />
@@ -388,12 +553,12 @@ const useTable02 = ({
               disabled={disabled}
               style={{ width: config_useTable02.workContent.width }}
               selectProps={{
-                value: workContent || undefined,
+                // value: workContent || undefined,
                 placeholder: '工作內容...',
                 options: fakeData02_options,
-                onChange: (str) => {
-                  editData02({ index, key: 'workContent', value: str });
-                },
+                // onChange: (str) => {
+                //   editData02({ index, key: 'workContent', value: str });
+                // },
               }}
             />
           ),
@@ -405,10 +570,10 @@ const useTable02 = ({
               disabled={disabled}
               style={{ width: config_useTable02.qty.width }}
               inputProps={{
-                value: qty,
-                onChange: (e) => {
-                  editData02({ index, key: 'qty', value: e.target.value });
-                },
+                // value: qty,
+                // onChange: (e) => {
+                //   editData02({ index, key: 'qty', value: e.target.value });
+                // },
                 type: 'number',
               }}
             />
@@ -421,10 +586,10 @@ const useTable02 = ({
               disabled={disabled}
               style={{ width: config_useTable02.unitPrice.width }}
               inputProps={{
-                value: unitPrice,
-                onChange: (e) => {
-                  editData02({ index, key: 'unitPrice', value: e.target.value });
-                },
+                // value: unitPrice,
+                // onChange: (e) => {
+                //   editData02({ index, key: 'unitPrice', value: e.target.value });
+                // },
                 type: 'number',
               }}
             />
@@ -468,7 +633,7 @@ const useTable02 = ({
       control_table,
       subTotal: decimal_subTotal.toNumber(),
     };
-  }, [dataArr, disabled]); // useMemo
+  }, [state_otherWorkItem, disabled]); // useMemo
 
   return { control_table02: control_table, subTotal02: subTotal };
 };
