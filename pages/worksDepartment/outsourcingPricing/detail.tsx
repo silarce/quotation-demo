@@ -1,3 +1,9 @@
+// 外包計價的api接完了，但是`/outsourcing-payment-detail/${id}`沒有作用
+// paymentDetail.installItems.itemPrice仍是null，
+// paymentDetail.installItems.deliveryStatus.otherWorkItems仍是null，
+// paymentDetail.installItems.deliveryStatus.otherWorkItemTotal仍是null，
+// paymentDetail.outsourcingTotal仍是0
+
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
@@ -130,6 +136,7 @@ export default function OutsourcingPricingDetail() {
         itemId,
         itemPrice,
         otherWorkItems: [],
+        otherWorkItemTotal: 0,
       };
     });
 
@@ -145,11 +152,13 @@ export default function OutsourcingPricingDetail() {
       const installItem = installItemList[installItemId];
 
       if (installItem) {
+        const otherSubTotalPrice = Number(otherQuantity) * Number(otherUnitPrice);
+        installItem.otherWorkItemTotal = installItem.otherWorkItemTotal! + otherSubTotalPrice;
         installItem.otherWorkItems!.push({
           otherInstallation,
           otherQuantity: Number(otherQuantity),
           otherUnitPrice: Number(otherUnitPrice),
-          otherSubTotalPrice: Number(otherQuantity) * Number(otherUnitPrice),
+          otherSubTotalPrice: otherSubTotalPrice,
         });
       }
     });
