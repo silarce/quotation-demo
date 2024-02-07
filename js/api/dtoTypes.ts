@@ -1110,7 +1110,7 @@ export type TdeliveryStatusDto = {
   // 單樘計價
   unitPrice: number | null;
   // 其他特殊工作項目
-  otherWorkItem: ToutsourcingPaymentDetailItemDto[] | null;
+  otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
   // 其他特殊工作項目合計
   otherWorkItemTotal: number | null;
 };
@@ -1168,6 +1168,7 @@ export type TquotationProductItemDto = Omit<
   product: TquotationProductDto;
   productId: string;
   itemNumber: string;
+  itemName: string;
   worksheetId: string;
   others: null;
   deliveryStatus?: TdeliveryStatusDto[] | null;
@@ -1208,6 +1209,8 @@ export type TquotationProductItemDto = Omit<
   bottomBarSurface: string | null;
   // 門軌 - 表面
   guideRailSurface: string | null;
+  //
+  itemPrice: number | null; // 每一才的價格
 };
 
 type TquotationContentDto_copy = {
@@ -2982,7 +2985,7 @@ export type ToutsourcingPaymentDetailDto = {
   // 工程聯絡單
   engineeringContact?: TengineeringContactDto;
   // 若為一般工程之一般項，則有此property
-  installItem?: TquotationProductItemDto[];
+  installItems?: TquotationProductItemDto[];
   // 是否為非一般工程之特殊項
   isOther: boolean;
   // 項目名
@@ -3001,12 +3004,13 @@ export type ToutsourcingPaymentDetailDto = {
   outsourcingPayment?: ToutsourcingPaymentDto;
 };
 
-type TcreateOutsourcingPaymentDetailItemDto = {
-  otherInstallation: string | null; // 特殊項目施作內容
-  otherQuantity: number | null; // 特殊項目數量
-  otherUnitPrice: number | null; // 特殊項目計價
-  otherSubTotalPrice: number | null; // 特殊項目小計
-  otherWorkItemTotal: number | null; // 特殊項目之合計
+export type TcreateOutsourcingPaymentDetailItemDto = {
+  // otherInstallation: string | null; // 特殊項目施作內容
+  // otherQuantity: number | null; // 特殊項目數量
+  // otherUnitPrice: number | null; // 特殊項目計價
+  // otherSubTotalPrice: number | null; // 特殊項目小計
+  // otherWorkItemTotal: number | null; // 特殊項目之合計
+  otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
   itemId: string | null; // 自動代入之productItem的id
   itemPrice: number | null; // productItem的才數計價
 };

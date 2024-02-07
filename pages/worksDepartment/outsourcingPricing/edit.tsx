@@ -366,6 +366,13 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
 
         decimal_subTotal = decimal_subTotal.add(outsourcingTotal);
 
+        const href = {
+          pathname: './detail',
+          query: {
+            paymentDetailId: data.id,
+          },
+        };
+
         const cellArr: Tcell[] = [
           {
             children: index + 1,
@@ -384,7 +391,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
             ...config_projectTable.subTotal_invoice.tbody,
           },
           {
-            children: <IconDetail onClick={() => router.push('./detail')} />,
+            children: <IconDetail onClick={() => router.push(href)} />,
             ...config_projectTable.btn_info.tbody,
           },
         ];
@@ -900,7 +907,6 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
           disabled={disabled}
           className="w-fit m-auto mt-[96px]"
           control={control_table_project}
-          onAddClick={() => router.push('./detail')}
         />
         <Table
           caption="應扣明細"
