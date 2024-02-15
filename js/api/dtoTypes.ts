@@ -3009,10 +3009,10 @@ export type TcreateOutsourcingPaymentDetailItemDto = {
   // otherQuantity: number | null; // 特殊項目數量
   // otherUnitPrice: number | null; // 特殊項目計價
   // otherSubTotalPrice: number | null; // 特殊項目小計
-  // otherWorkItemTotal: number | null; // 特殊項目之合計
-  otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
   itemId: string | null; // 自動代入之productItem的id
   itemPrice: number | null; // productItem的才數計價
+  otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
+  otherWorkItemTotal: number | null; // 特殊項目之合計
 };
 
 export type TupdateOutsourcingPaymentDetailDto = {
@@ -3030,6 +3030,8 @@ export type ToutsourcingPaymentDetailItemDto = {
   otherUnitPrice: number;
   // 特殊項目小計
   otherSubTotalPrice?: number | null;
+  // 特殊項目關聯status
+  quotationItemStatusId?: string | null; // 其實應該是必填，不給會沒效果的樣子
 };
 
 // 暫時留作參考

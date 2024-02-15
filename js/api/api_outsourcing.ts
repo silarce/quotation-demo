@@ -20,6 +20,7 @@ import type {
   TupdateOutsourcingDto,
   TupdateOutsourcingPaymentDto,
   TupdateOutsourcingPaymentDetailDto,
+  TcreateOutsourcingPaymentDetailItemDto,
 } from './dtoTypes';
 
 export type {
@@ -34,6 +35,7 @@ export type {
   TupdateOutsourcingDto,
   TupdateOutsourcingPaymentDto,
   TupdateOutsourcingPaymentDetailDto,
+  TcreateOutsourcingPaymentDetailItemDto,
 };
 
 // /outsourcing
