@@ -26,6 +26,8 @@ import { useApiErpFeaturesMe, TerpFeatureDto } from 'js/api/api_erpFeature';
 import 'antd/dist/antd.css';
 import '../styles/globals.scss';
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // 行事曆 UI用的
+import 'slick-carousel/slick/slick.css'; // react-slick
+import 'slick-carousel/slick/slick-theme.css'; // react-slick
 
 // 全域moment語系轉換
 import 'moment/locale/zh-tw';

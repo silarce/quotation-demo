@@ -90,8 +90,6 @@ export default function SearchBar({
         const className = item.className || '';
         const theStyle = { width };
 
-        // console.log(value)
-
         if (valueArr[index] === undefined && !controlled) {
           setValueArr((arr) => {
             arr[index] = options?.[0] ?? null;
@@ -175,9 +173,9 @@ export default function SearchBar({
       <button>
         <IconSearch
           className={style.iconSearch}
-          onClick={() => {
-            doSearch(valueArr);
-          }}
+          // onClick={() => {
+          //   doSearch(valueArr);
+          // }}
         />
       </button>
     </form>

@@ -41,7 +41,7 @@ export default function SelectorShell({
   onCancel: () => void;
   className?: string;
   placeholder?: string;
-  width?: string;
+  width?: React.CSSProperties['width'];
   tip?: React.ReactNode;
   noSearch?: boolean;
   //

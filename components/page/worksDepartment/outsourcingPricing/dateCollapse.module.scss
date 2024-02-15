@@ -1,0 +1,52 @@
+.container {
+  width: 1100px;
+
+  :global(.ant-collapse),
+  :global(.ant-collapse-content),
+  :global(.ant-collapse-item) {
+    border-color: theme("colors.border");
+  }
+
+  :global(.ant-collapse-item) {
+    :global(.ant-collapse-expand-icon) {
+      transform: translateY(-3px);
+    }
+    :global(.ant-collapse-content-box) {
+      padding: 0;
+    }
+  }
+}
+
+.panel {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  justify-content: space-between;
+  gap: 30px 0;
+  padding: 35px;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 140px;
+  border: dashed 1px theme("colors.main");
+  border-radius: 11.048px;
+  cursor: pointer;
+
+  &.disabled {
+    opacity: 0.4;
+  }
+  &.forbidden {
+    opacity: 0.2;
+  }
+
+  &:hover {
+    background-color: theme("colors.hoverBgc");
+  }
+  span {
+    color: theme("colors.main");
+    font-size: 16;
+  }
+}

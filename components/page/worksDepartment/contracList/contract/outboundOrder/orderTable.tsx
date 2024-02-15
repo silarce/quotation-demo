@@ -5,15 +5,11 @@ import moment from 'moment';
 import scss from './outboundOrder.module.scss';
 
 // global gear
-// import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
+import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
 
 // icon
 import { IconAddCircle, IconEdit, IconDelete01, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
-
-// type
-import { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 
 // ================================================================================
 
@@ -80,10 +76,10 @@ type TdeliveryStatusItem_date = {
 
 type TdeliveryStatusItem_employee = {
   value?: string | undefined;
-  empolyee: TemployeeDto | undefined | null;
+  empolyee: ToutsourcingDto | undefined | null;
   onChange?: undefined;
   onChange_date?: undefined;
-  onChange_employee?: (emp: TemployeeDto | null) => void;
+  onChange_employee?: (emp: ToutsourcingDto | null) => void;
   hidden?: boolean;
   disabled?: boolean;
   forbidden?: boolean;
@@ -408,7 +404,7 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                             if (onChange_employee) {
                               theProps.inputProps = {
                                 props: {
-                                  value: value || empolyee?.chName || empolyee?.enName || '',
+                                  value: value || empolyee?.name || '',
                                   placeholder: '',
                                 },
                               };
@@ -480,7 +476,18 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
           );
         })}
       </div>
-      <EmployeeSelector
+      {/* <EmployeeSelector
+        showModal={!!targetEmpControl}
+        onConfirm={(arr) => {
+          targetEmpControl?.onChange_employee?.(arr[0] ?? null);
+        }}
+        onCancel={() => {
+          setTargetEmpControl(undefined);
+        }}
+        selLimit={1}
+      /> */}
+
+      <OutsourcingSelector
         showModal={!!targetEmpControl}
         onConfirm={(arr) => {
           targetEmpControl?.onChange_employee?.(arr[0] ?? null);
@@ -512,7 +519,7 @@ const orderKeyArr_contract: (keyof TcontractData)[] = [
 ];
 
 const orderKeyArr_static: (keyof TstaticData)[] = [
-  // 'project', // 這個欄位顯示出來應該會讓這個報表比較清楚
+  'project', // 這個欄位顯示出來應該會讓這個報表比較清楚
   'L',
   'W',
   'B',
@@ -733,7 +740,7 @@ const creCellConfig_staticData2 = (): TcellConfigList => ({
     position: '',
   },
   installer: {
-    label: '施工人員',
+    label: '外包人員',
     width: '85px',
     type: 'employee',
     position: '',
@@ -766,7 +773,7 @@ const creCellConfig_subGroup = (): TcellConfigList => ({
     position: '',
   },
   installerArr: {
-    label: '施工人員',
+    label: '外包人員',
     width: '85px',
     type: 'input',
     position: '',

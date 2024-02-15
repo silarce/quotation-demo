@@ -1,6 +1,6 @@
-// 出庫單
-// 出庫單
-// 出庫單
+// 工程管理單
+// 工程管理單
+// 工程管理單
 
 // setMyDeleveryList
 
@@ -24,6 +24,7 @@ import OrderTable, {
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
 
 // css
 import style from './contract.module.scss';
@@ -48,7 +49,7 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 // import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { TerpFeatureDto, TquotationProductItemDto, TdeliveryStatusDto, TemployeeDto } from 'js/api/dtoTypes';
+import { TerpFeatureDto, TquotationProductItemDto, TdeliveryStatusDto } from 'js/api/dtoTypes';
 
 // =====================================================================
 
@@ -67,7 +68,7 @@ type TdeliveryStatusInEdit = {
     [key: string /*itemId */]: {
       [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
         id?: string;
-        installerEmployee?: TemployeeDto | null;
+        installerEmployee?: ToutsourcingDto | null;
       };
     };
   };
@@ -101,6 +102,9 @@ export default function OutboundOrder({
   const [isLoading, setIsLoading] = useState(false);
   // const [disabled, setDisabled] = useState(true);
   const [isReqing, setIsReqing] = useState(false);
+
+  // 外包廠商選擇器的onConfirm
+  const [selectorConfirm, setSelectorConfirm] = useState<(outsourcingId: string) => void>();
 
   // --------------------------------------------------------------------------
 
@@ -171,8 +175,6 @@ export default function OutboundOrder({
     return list;
   }, [contract]);
 
-  // console.log(contractProdList);
-
   // --------------------------------------------------------------------------
 
   const [notes, setNotes] = useState<string>();
@@ -217,6 +219,8 @@ export default function OutboundOrder({
       }
 
       theItem.deliveryStatus = item.deliveryStatus;
+      // issue#198 // 改送item.id
+      theItem.id = item.id;
 
       if (!myDeleveryList?.[productId]) {
         myDeleveryList[productId] = {
@@ -232,11 +236,9 @@ export default function OutboundOrder({
     setMyDeleveryList(myDeleveryList);
   }, [deliveryList]);
 
-  // console.log(myDeleveryList);
-
   // --------------------------------------------------------------------------
 
-  const reqPost = async (productItemId: string) => {
+  const reqPost = async (productItemId: string, outsouctingId: string) => {
     if (!engineeringDeliveryListId || isReqing) {
       return undefined;
     }
@@ -248,7 +250,7 @@ export default function OutboundOrder({
           notes: null,
           itemName: null,
           shippingDate: null,
-          installerEmployeeId: null,
+          installerEmployeeId: outsouctingId,
           installationDate: null,
           append: null,
           completeAppend: null,
@@ -404,7 +406,7 @@ export default function OutboundOrder({
           }: {
             key: keyof TdeliveryStatusInEdit[string][string][string];
             value?: string;
-            employee?: TemployeeDto | null;
+            employee?: ToutsourcingDto | null;
           }) => {
             if (!deleveryStatus || !havePermissionToEdit) {
               return;
@@ -479,16 +481,33 @@ export default function OutboundOrder({
                 return;
               }
 
-              const res = await reqPost(itemId);
+              const onSelectorConfirm = async (outsourcingId: string) => {
+                const res = await reqPost(itemId, outsourcingId);
 
-              if (res) {
-                setMyDeleveryList((state) => {
-                  const copy = { ...state };
-                  copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
+                if (res) {
+                  setMyDeleveryList((state) => {
+                    const copy = { ...state };
+                    copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
 
-                  return copy;
-                });
-              }
+                    return copy;
+                  });
+                }
+              };
+
+              setSelectorConfirm(() => {
+                return onSelectorConfirm;
+              });
+
+              // const res = await reqPost(itemId);
+
+              // if (res) {
+              //   setMyDeleveryList((state) => {
+              //     const copy = { ...state };
+              //     copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
+
+              //     return copy;
+              //   });
+              // }
             },
             onConfirmClick: async () => {
               if (!deleveryStatus || !havePermissionToEdit) {
@@ -600,16 +619,33 @@ export default function OutboundOrder({
                 return;
               }
 
-              const res = await reqPost(itemId);
+              const onSelectorConfirm = async (outsourcingId: string) => {
+                const res = await reqPost(itemId, outsourcingId);
 
-              if (res) {
-                setMyDeleveryList((state) => {
-                  const copy = { ...state };
-                  copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
+                if (res) {
+                  setMyDeleveryList((state) => {
+                    const copy = { ...state };
+                    copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
 
-                  return copy;
-                });
-              }
+                    return copy;
+                  });
+                }
+              };
+
+              setSelectorConfirm(() => {
+                return onSelectorConfirm;
+              });
+
+              // const res = await reqPost(itemId);
+
+              // if (res) {
+              //   setMyDeleveryList((state) => {
+              //     const copy = { ...state };
+              //     copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
+
+              //     return copy;
+              //   });
+              // }
             },
           });
         }
@@ -794,6 +830,21 @@ export default function OutboundOrder({
           </div>
         </div>
       </div>
+
+      <OutsourcingSelector
+        showModal={!!selectorConfirm}
+        label="請選擇外包廠商"
+        onConfirm={(arr) => {
+          const outsourcing: (typeof arr)[number] | undefined = arr[0];
+
+          if (outsourcing && selectorConfirm) {
+            selectorConfirm(outsourcing.id);
+          }
+        }}
+        onCancel={() => {
+          setSelectorConfirm(undefined);
+        }}
+      />
     </SubLayer>
   );
 }

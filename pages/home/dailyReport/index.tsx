@@ -56,6 +56,9 @@ import { TuserDto } from 'js/api/dtoTypes';
 // css
 import scss from './dailyReport.module.scss';
 
+// config
+import { specialAccountList } from 'config/specilAccount';
+
 // =====================================================================
 
 const reportedAtOptions = [
@@ -818,6 +821,12 @@ const reqApiDailyReports_id = async (reportId: string) => {
 // ==========================================================================
 /**判斷是否為回報人員權限 */
 const checkIsSubordinate = (userInfo: TuserDto) => {
+  const idNumber = userInfo.employee?.idNumber;
+
+  if (idNumber === specialAccountList.accountant) {
+    return false;
+  }
+
   /**如果使用者是employee，從grade判斷 */
   if (userInfo?.employee?.jobs) {
     const jobs = userInfo.employee.jobs;

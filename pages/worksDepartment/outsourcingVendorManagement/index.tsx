@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { useRouter } from 'next/router';
 import Link, { LinkProps } from 'next/link';
 import classNames from 'classnames';
@@ -9,26 +11,59 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 import scss from './index.module.scss';
 
-// utils
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+// api
+import { useGetOutsourcing, Tparams } from 'js/api/api_outsourcing';
 
+// --------------------------------------------------------------
+
+type Tquery = {
+  keyword: string | undefined;
+};
+
+// --------------------------------------------------------------
 export default function OutsourcingVendorManagement() {
   const router = useRouter();
+  const { keyword } = router.query as Tquery;
 
   // --------------------------------------------------------------
-  const rowArr: Tcontrol['rowArr'] = fakeData.map((data) => {
-    const { id, name, phoneNumber, receiptDate } = data;
-    const dateStr = getTaiwanDateStr(receiptDate, { withUnit: true }) ?? '';
+
+  const filter = {
+    $or: [{ name: { $contains: keyword } }, { contactNumber: { $contains: keyword } }, { taxId: { $eq: keyword } }],
+  };
+
+  const params: Tparams = {
+    filter,
+    sort: 'createdAt',
+    order: 'DESC',
+  };
+
+  const {
+    //
+    dataArr,
+    viewRef_bottom,
+    isLoadingPage1,
+    reset,
+  } = useGetOutsourcing({ customParams: params });
+
+  // --------------------------------------------------------------
+
+  useEffect(() => {
+    reset();
+  }, [keyword]);
+
+  // --------------------------------------------------------------
+  const rowArr: Tcontrol['rowArr'] = dataArr.map((data) => {
+    const { id, name, contactNumber, taxId } = data;
 
     const href = {
       pathname: '/worksDepartment/outsourcingVendorManagement/edit',
-      query: { vendorId: id },
+      query: { outsourcingId: id },
     };
 
     return {
       name,
-      phoneNumber,
-      receiptDate: dateStr,
+      phoneNumber: contactNumber,
+      taxNumber: taxId,
       linkProps: { href },
     };
   });
@@ -39,15 +74,19 @@ export default function OutsourcingVendorManagement() {
 
   const searchTargetList: TsearchGroup['searchTargetList'] = [
     {
-      placeholder: '搜尋合約編號',
-      defaultValue: '',
+      placeholder: '關鍵字',
+      defaultValue: keyword,
     },
   ];
 
   const searchGroup: TsearchGroup = {
     searchTargetList,
-    doSearch: (valueArr) => {
-      console.log(valueArr);
+    doSearch: ([_keyword]) => {
+      const keyword = (_keyword || undefined) as string | undefined;
+
+      router.push({
+        query: { keyword },
+      });
     },
   };
 
@@ -63,11 +102,13 @@ export default function OutsourcingVendorManagement() {
   ];
 
   return (
-    <SubLayer>
+    <SubLayer
+    // isLoading_subLayer={isLoadingPage1}
+    >
       <PageHeader02 tag="外包廠商管理" panelList={panelList01} />
 
       <div className={scss.main}>
-        <Table control={control} />
+        <Table control={control} viewRef_bottom={viewRef_bottom} />
       </div>
     </SubLayer>
   );
@@ -78,7 +119,7 @@ export default function OutsourcingVendorManagement() {
 type TcontrolItem = {
   name: string;
   phoneNumber: string;
-  receiptDate: string;
+  taxNumber: string;
   linkProps: LinkProps;
 };
 
@@ -86,9 +127,13 @@ type Tcontrol = {
   rowArr: TcontrolItem[];
 };
 
-// CellWithBar
-
-const Table = ({ control }: { control: Tcontrol }) => {
+const Table = ({
+  viewRef_bottom,
+  control,
+}: {
+  viewRef_bottom: (node?: Element | null | undefined) => void;
+  control: Tcontrol;
+}) => {
   const { rowArr } = control;
 
   return (
@@ -103,16 +148,18 @@ const Table = ({ control }: { control: Tcontrol }) => {
           <span>連絡電話</span>
         </div>
         <div className={scss.cell}>
-          <span>收款日期</span>
+          <span>統一編號</span>
         </div>
       </div>
       <div className={classNames(scss.tbody)}>
         {rowArr.map((item, index) => {
-          const { name, phoneNumber, receiptDate, linkProps } = item;
+          const { name, phoneNumber, taxNumber, linkProps } = item;
+
+          const ref = index === rowArr.length - 5 ? viewRef_bottom : undefined;
 
           return (
             <CellWithBar key={index}>
-              <Link {...linkProps}>
+              <Link {...linkProps} ref={ref}>
                 <div className={scss.row}>
                   <div className={scss.cell}>
                     <span>{name}</span>
@@ -121,7 +168,7 @@ const Table = ({ control }: { control: Tcontrol }) => {
                     <span>{phoneNumber}</span>
                   </div>
                   <div className={scss.cell}>
-                    <span>{receiptDate}</span>
+                    <span>{taxNumber}</span>
                   </div>
                 </div>
               </Link>
@@ -132,156 +179,3 @@ const Table = ({ control }: { control: Tcontrol }) => {
     </div>
   );
 };
-
-const fakeData = [
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-  {
-    id: 'fooo',
-    name: 'fooo',
-    phoneNumber: 'fooo',
-    receiptDate: new Date().toISOString(),
-  },
-];
