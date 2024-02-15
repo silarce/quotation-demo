@@ -587,55 +587,6 @@ function generateRandomDate(): string {
   return randomDate.toISOString();
 }
 
-const fakeDataTempArr = [
-  {
-    name: '王小名',
-    phoneNumber: '0928-777-777',
-  },
-  {
-    name: '林小美',
-    phoneNumber: '0928-666-666',
-  },
-  {
-    name: '陳小華',
-    phoneNumber: '0928-555-555',
-  },
-  {
-    name: '張小英',
-    phoneNumber: '0928-444-444',
-  },
-  {
-    name: '黃小強',
-    phoneNumber: '0928-333-333',
-  },
-  {
-    name: '很長的名字很長的名字很長的名字',
-    phoneNumber: '0911-123-123',
-  },
-  {
-    name: '陳喵喵',
-    phoneNumber: '0911-111-111',
-  },
-  {
-    name: '林汪汪',
-    phoneNumber: '0911-111-222',
-  },
-  {
-    name: '嗚呼呼',
-    phoneNumber: '0911-111-456',
-  },
-  {
-    name: '屋咪茂',
-    phoneNumber: '0911-111-888',
-  },
-];
-
-const getRandomItem = () => {
-  const index = Math.floor(Math.random() * fakeDataTempArr.length);
-
-  return fakeDataTempArr[index];
-};
-
 // ====================================================================
 
 type TcellConfig = {
@@ -663,25 +614,6 @@ const cellCofig: TcellConfig = {
     // flex: 'auto',
   },
 };
-
-type TfakeData = {
-  id: string;
-  name: string;
-  phoneNumber: string;
-  date: string;
-};
-
-const fakeDataArr: TfakeData[] = [
-  // 生成30筆，id要依序
-  ...Array.from({ length: 30 }, (v, index) => ({
-    id: `${index}`,
-    // name: '王小名',
-    // phoneNumber: '0928-777-777',
-    name: getRandomItem().name,
-    phoneNumber: getRandomItem().phoneNumber,
-    date: generateRandomDate(),
-  })),
-];
 
 // ====================================================================
 
@@ -738,7 +670,5 @@ const getPaymentDateList = (paymentArr: ToutsourcingPaymentDto[]) => {
 export {
   VendorMonthPanel,
   //
-  fakeDataArr,
   generateMonthsSinceNow,
-  fakeDataTempArr,
 };
