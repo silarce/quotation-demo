@@ -3030,6 +3030,8 @@ export type ToutsourcingPaymentDetailItemDto = {
   otherUnitPrice: number;
   // 特殊項目小計
   otherSubTotalPrice?: number | null;
+  // 特殊項目關聯status
+  quotationItemStatusId?: string | null; // 其實應該是必填，不給會沒效果的樣子
 };
 
 // 暫時留作參考
