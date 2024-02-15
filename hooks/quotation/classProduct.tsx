@@ -797,6 +797,9 @@ class Class_product {
   // api請求
   // this.shouldCall_cgs
   async req_calcGeneralSpec() {
+    // const hadHorsepower = !!this._prodData.horsepower;
+    const wasWgChanged = this.isWgChanged;
+
     if (!this.isDontClearProd) {
       this.clearProd();
     }
@@ -804,7 +807,7 @@ class Class_product {
     this.isDontClearProd = false;
 
     if (!this.doorType || !this.height) {
-      this.isWgChanged = false;
+      // this.isWgChanged = false;
 
       return false;
     }
@@ -813,7 +816,7 @@ class Class_product {
       !this.fullWidth
       // && !this.WG
     ) {
-      this.isWgChanged = false;
+      // this.isWgChanged = false;
 
       return false;
     }
@@ -837,7 +840,7 @@ class Class_product {
     })();
 
     if (body.fullWidth <= 0 && !body.WG) {
-      this.isWgChanged = false;
+      // this.isWgChanged = false;
 
       return false;
     }
@@ -845,12 +848,14 @@ class Class_product {
     const res = await reqGetCalcGeneralSpec(body);
 
     if (!res) {
-      this.isWgChanged = false;
+      // this.isWgChanged = false;
 
       return false;
     }
 
     this._doorGeneralSpecs = res;
+
+    const oldW = this.W;
 
     this._prodData.WG = String(
       calcProductWG({
@@ -876,7 +881,7 @@ class Class_product {
     // 內有預設boxB boxD 馬達廠商 馬力
     this.defaultMotorSpecs = defaultMotorSpecs;
 
-    if (!this.isWgChanged) {
+    if (!wasWgChanged || !this._prodData.boxB || !this.horsepower) {
       this.horsepower = defaultMotorSpecs.hp;
 
       this.motor = defaultMotorVendor ?? '';
@@ -899,6 +904,10 @@ class Class_product {
       this._prodData.boxD = new Decimal(boxD).div(1000).toString();
       this.area = this.calcArea();
       this.reRender();
+
+      if (wasWgChanged) {
+        this.W = oldW;
+      }
     }
 
     // this.options_boxB?.unshift({
@@ -2321,6 +2330,8 @@ class Class_product {
     return this._prodData.fullWidth;
   }
   set fullWidth(v) {
+    this.isWgChanged = false;
+
     this._prodData.fullWidth = v;
     // this._prodData.WG = '0';
     this.area = this.calcArea();
@@ -2352,11 +2363,11 @@ class Class_product {
     // 沒有horsepower就沒有gapA與gapC就無法計算正確的L
     // 沒有boxB，呼叫api會錯誤
     // 所以必須要在這邊做判斷
-    if (!this.horsepower || !this.boxB) {
-      this.reRender();
+    // if (!this.horsepower || !this.boxB) {
+    //   this.reRender();
 
-      return;
-    }
+    //   return;
+    // }
 
     // 改變了WG並改變了L，就要呼叫
     // 之後呼叫的req_calcGeneralSpec的時候就會把hp帶入
@@ -2369,6 +2380,7 @@ class Class_product {
     });
 
     this.fullWidth = new Decimal(L).div(1000).toString();
+    this.isWgChanged = true;
 
     this.reRender();
   }
