@@ -8,6 +8,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -40,7 +41,7 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { optionsCreator_otherWorkItems } from 'js/utils/options/options';
 
 // type
-import type { TquotationProductItemDto } from 'js/api/dtoTypes';
+import type { TquotationProductItemDto, TdeliveryStatusDto } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -58,6 +59,8 @@ type Tstate_otherWorkItem = {
   otherQuantity: string;
   otherUnitPrice: string;
   otherSubTotalPrice: string;
+  quotationItemStatusId: string | null | undefined;
+  // quotationItemStatusId: string;
 };
 
 type Tstate_installItem = {
@@ -91,6 +94,7 @@ export default function OutsourcingPricingDetail() {
 
   const { outsourcing, date } = outsourcingPayment ?? {};
   const twDateStr = date ? getTaiwanDateStr(date) : '';
+  const outsourcingId = outsourcing?.id;
 
   // ---------------------------------------------------------------------
 
@@ -115,6 +119,7 @@ export default function OutsourcingPricingDetail() {
   } = useTable02({
     installItems,
     disabled,
+    outsourcingId,
   });
   const control_table_total = useTable_total({ subTotal01, subTotal02 });
 
@@ -520,9 +525,11 @@ const useTable02 = ({
   //
   installItems,
   disabled,
+  outsourcingId,
 }: {
   installItems: TquotationProductItemDto[];
   disabled?: boolean;
+  outsourcingId: string | undefined;
 }) => {
   //
 
@@ -558,6 +565,7 @@ const useTable02 = ({
         otherQuantity: '0',
         otherUnitPrice: '0',
         otherSubTotalPrice: '0',
+        quotationItemStatusId: '',
       },
     ]);
   };
@@ -568,31 +576,76 @@ const useTable02 = ({
     }
 
     const arr: Tstate_otherWorkItem[] = [];
-    const itemNameOptionArr: Toption[] = [];
+    const otherWorkItemsOptionArr: Toption[] = [];
+
+    // TODO
+    // 因為需求還未確定，後端也還就還沒確定資料結構，所以做了一些權宜的暫時處理
+    // 代都確定後要修改
+    // 以下是現在的狀況
+    // 工程管理單 每一筆contractProductItems 可能只會有一個 deliveryStatus
+    // 但是deliveryStatus是陣列，且可以post多筆deliveryStatus
+    // 不同筆的deliveryStatus可能是不同廠商
+    // 暫時的處理方式:
+    // 假設未來deliveryStatus只會有一筆
+    // 所以先過濾deliveryStatus，
+    // 取出item.installerEmployeeId === outsourcingId的資料，建立deliveryStatusArr
+    // 再取第一筆deliveryStatus
 
     installItems.forEach((item) => {
       const { deliveryStatus, id, itemName } = item;
 
-      itemNameOptionArr.push({ label: itemName, value: id });
+      let deliveryStatusArr = (deliveryStatus ?? []).filter((item) => {
+        return item.installerEmployeeId === outsourcingId;
+      });
 
-      deliveryStatus?.forEach((ds) => {
-        const otherWorkItems = ds.otherWorkItems || [];
-        otherWorkItems.forEach((owi) => {
-          arr.push({
-            installItemId: item.id,
-            // installItemName: item.itemName,
-            otherInstallation: owi.otherInstallation ?? '',
-            otherQuantity: String(owi.otherQuantity || 0),
-            otherUnitPrice: String(owi.otherUnitPrice || 0),
-            otherSubTotalPrice: String(owi.otherSubTotalPrice || 0),
-          });
+      // 以createdAt排序，確保順序保持一致
+      deliveryStatusArr = _.sortBy(deliveryStatusArr, 'createdAt');
+
+      const firstDeliveryStatus = deliveryStatusArr[0] as TdeliveryStatusDto | undefined;
+      const quotationItemStatusId = firstDeliveryStatus?.id;
+
+      if (quotationItemStatusId) {
+        otherWorkItemsOptionArr.push({
+          label: itemName,
+          value: id,
+          quotationItemStatusId,
+        });
+      }
+
+      const otherWorkItems = firstDeliveryStatus?.otherWorkItems || [];
+      otherWorkItems.forEach((owi) => {
+        arr.push({
+          installItemId: item.id,
+          // installItemName: item.itemName,
+          otherInstallation: owi.otherInstallation ?? '',
+          otherQuantity: String(owi.otherQuantity || 0),
+          otherUnitPrice: String(owi.otherUnitPrice || 0),
+          otherSubTotalPrice: String(owi.otherSubTotalPrice || 0),
+          quotationItemStatusId: owi.quotationItemStatusId,
         });
       });
+
+      // deliveryStatusArr?.forEach((ds) => {
+      //   const otherWorkItems = ds.otherWorkItems || [];
+      //   otherWorkItems.forEach((owi) => {
+      //     arr.push({
+      //       installItemId: item.id,
+      //       // installItemName: item.itemName,
+      //       otherInstallation: owi.otherInstallation ?? '',
+      //       otherQuantity: String(owi.otherQuantity || 0),
+      //       otherUnitPrice: String(owi.otherUnitPrice || 0),
+      //       otherSubTotalPrice: String(owi.otherSubTotalPrice || 0),
+      //       quotationItemStatusId: owi.quotationItemStatusId,
+      //     });
+      //   });
+      // });
+
+      //
     });
 
     setState_otherWorkItem(arr);
-    setItemNameOptionArr(itemNameOptionArr);
-  }, [installItems, disabled]);
+    setItemNameOptionArr(otherWorkItemsOptionArr);
+  }, [installItems, disabled, outsourcingId]);
 
   //
   const { control_table, subTotal } = useMemo(() => {
@@ -650,6 +703,7 @@ const useTable02 = ({
                 onChange: (_, option) => {
                   const theOption = option as Toption;
                   editState_otherWorkItem(index, 'installItemId', theOption.value);
+                  editState_otherWorkItem(index, 'quotationItemStatusId', theOption.quotationItemStatusId ?? '');
                   // editState_otherWorkItem(index, 'installItemName', theOption.label);
                 },
               }}
