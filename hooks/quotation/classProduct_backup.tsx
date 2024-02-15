@@ -133,7 +133,6 @@ import type {
   TdoorAccessoryDto,
   TcreateQuotationProductDto,
   TdoorGeneralSpecsMotorDto,
-  TdoorGeneralSpecsMotorBoxDto,
 } from 'js/api/dtoTypes';
 
 import type { TreRender, TcomponentKey } from './useProduct';
@@ -386,7 +385,7 @@ class Class_product {
   private _unitPrice;
   private _totalPrice;
 
-  private defaultMotorSpecs: TdoorGeneralSpecsMotorDto | undefined = undefined;
+  private defaultMotor: TdoorGeneralSpecsMotorDto | undefined = undefined;
 
   // readonly options_doorTrack_normal = options_doorTrack_normal;
   // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
@@ -489,6 +488,8 @@ class Class_product {
         reRender: this.reRender,
         data: _.cloneDeep(com),
         key: key,
+        // 因為prod的型別指向的是'./classProduct'的Class_product，所以這裡會型別錯誤
+        // pr前要刪掉。
         prod: this,
         isNew: isNew,
       });
@@ -855,8 +856,8 @@ class Class_product {
     this._prodData.WG = String(
       calcProductWG({
         fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
-        gapA: this._doorGeneralSpecs.gapA,
-        gapC: this._doorGeneralSpecs.gapC,
+        gapA: res.gapA,
+        gapC: res.gapC,
       }) / 1000
     );
 
@@ -865,40 +866,95 @@ class Class_product {
       this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
     }
 
-    this.thickness = this._doorGeneralSpecs.thickness;
+    this.thickness = res.thickness;
 
     //
-
-    const { defaultMotorSpecs, defaultMotorVendor, defaultBoxB, defaultMotorBox } = calcDefaultMotor({
-      doorGeneralSpecs: this._doorGeneralSpecs,
-    });
+    const defaultMotorIndex = res.defaultMotorIndex;
+    const defaultMotor = res.motors[defaultMotorIndex];
+    const defaultMotorBox = defaultMotor.box;
 
     // 內有預設boxB boxD 馬達廠商 馬力
-    this.defaultMotorSpecs = defaultMotorSpecs;
+    this.defaultMotor = defaultMotor;
 
+    // ________________________
+    // 設定馬力
     if (!this.isWgChanged) {
-      this.horsepower = defaultMotorSpecs.hp;
+      this.horsepower = defaultMotor.hp;
 
-      this.motor = defaultMotorVendor ?? '';
-      const theBoxB = String(this.boxB || defaultBoxB || '');
+      // ________________________
+      // 設定boxB與thickness
+      // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
+      const boxB = defaultMotorBox?.default?.boxB || defaultMotorBox?.東元?.boxB || defaultMotorBox?.大同?.boxB;
 
-      this._prodData.boxB = theBoxB;
-      this._defaultBoxB = theBoxB;
+      // ________________________
 
-      this.isLoading = true;
-      const res_boxD = await reqGetBoxD({
-        modelName: this.doorType,
-        rollerDiameter: this._doorGeneralSpecs.diameter,
-        sidePlateSizeB: Number(this.boxB_mm),
-        hp: this.horsepower,
-        motorVendor: this.horsepower,
-      });
-      this.isLoading = false;
+      // 設定馬達廠商
+      if (defaultMotorBox) {
+        //
+        //
+        //
 
-      const boxD = res_boxD?.sidePlateSizeD ?? '0';
-      this._prodData.boxD = new Decimal(boxD).div(1000).toString();
-      this.area = this.calcArea();
-      this.reRender();
+        if (defaultMotorBox.東元) {
+          this.motor = '東元';
+
+          const defaultBoxB_num = new Decimal(defaultMotorBox.東元.boxB).div(1000).toNumber();
+          const defaultBoxB = String(defaultBoxB_num);
+
+          // const shouldChange = !this.isBoxBinOption({
+          //   boxB_m: defaultBoxB_num,
+          // });
+          // const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+          const theBoxB = this.boxB ? this.boxB : defaultBoxB;
+
+          this.changeBoxBNoCall({
+            str: theBoxB,
+            diameter: res.diameter,
+          });
+        } else if (defaultMotorBox.default) {
+          const defaultBoxB_num = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
+          const defaultBoxB = String(defaultBoxB_num);
+
+          // const shouldChange = !this.isBoxBinOption({
+          //   boxB_m: defaultBoxB_num,
+          // });
+          // const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
+          const theBoxB = this.boxB ? this.boxB : defaultBoxB;
+
+          this.changeBoxBNoCall({
+            str: theBoxB,
+            diameter: res.diameter,
+          });
+        } else if (defaultMotorBox.大同) {
+          this.motor = '大同';
+
+          const defaultBoxB_num = new Decimal(defaultMotorBox.大同.boxB).div(1000).toNumber();
+          const defaultBoxB = String(defaultBoxB_num);
+
+          // const shouldChange = !this.isBoxBinOption({
+          //   boxB_m: defaultBoxB_num,
+          // });
+          // const theBoxB = shouldChange ? defaultBoxB : this.boxB;
+
+          const theBoxB = this.boxB ? this.boxB : defaultBoxB;
+
+          this.changeBoxBNoCall({
+            str: theBoxB,
+            diameter: res.diameter,
+          });
+        }
+
+        //
+      } else {
+        this.changeBoxBNoCall({
+          str: boxB ? String(boxB / 1000) : '',
+          diameter: res.diameter,
+        });
+      }
+
+      this._defaultBoxB = this.boxB;
+
+      // this.findBDoptions();
     }
 
     // this.options_boxB?.unshift({
@@ -1475,14 +1531,14 @@ class Class_product {
 
   takeDefaultDynaValue() {
     // const defaultMotorIndex = this._doorGeneralSpecs?.defaultMotorIndex ?? 0;
-    const defaultMotorSpecs = this.defaultMotorSpecs;
+    const defaultMotor = this.defaultMotor;
 
     const call = () => {
       this._prodData.doorTrackThick = this.options_doorTrackThick?.[0].value ?? '';
       this._prodData.rollUpBoxThick = this.options_rollUpBoxThick?.[0].value ?? '';
       this._prodData.motor = this.options_motor?.[0].value ?? '';
       // this._prodData.horsepower = this.options_horsepower?.[defaultMotorIndex].value ?? '';
-      this._prodData.horsepower = defaultMotorSpecs?.hp ?? '';
+      this._prodData.horsepower = defaultMotor?.hp ?? '';
       this.changeDistributionBoxPrice_byHorsepower();
       this.changePhase_byHorsepower({ bySetter: false });
       // this._prodData.phase = Number(this.options_phase?.[0].value ?? '1');
@@ -1496,7 +1552,7 @@ class Class_product {
       this._prodData.rollUpBoxThick !== this.options_rollUpBoxThick?.[0].value ||
       this._prodData.motor !== this.options_motor?.[0].value ||
       // this._prodData.horsepower !== this.options_horsepower?.[defaultMotorIndex].value ||
-      this._prodData.horsepower !== defaultMotorSpecs?.hp ||
+      this._prodData.horsepower !== defaultMotor?.hp ||
       this._prodData.phase !== Number(this.options_phase?.[0].value) ||
       this._prodData.voltage !== this.options_voltage?.[0].value
     ) {
@@ -2384,8 +2440,6 @@ class Class_product {
     return new Decimal(W_num).div(1000).toString();
   }
 
-  // WG才是後端實際要收的東西
-  // 所以編輯W的時候實際上是在編輯WG
   set W(v) {
     if (v === '') {
       v = '0';
@@ -2510,36 +2564,36 @@ class Class_product {
     return String(Number(this._prodData.boxB) * 1000);
   }
 
-  // async reqGetBoxD({ str, diameter }: { str: string; diameter: number }) {
-  //   this._prodData.boxB = str;
+  async changeBoxBNoCall({ str, diameter }: { str: string; diameter: number }) {
+    this._prodData.boxB = str;
 
-  //   const reqBody: TgetBoxDParams = {
-  //     modelName: this.doorType,
-  //     rollerDiameter: this._doorGeneralSpecs?.diameter ?? diameter ?? 0,
-  //     sidePlateSizeB: Number(this.boxB_mm),
-  //     hp: this.horsepower,
-  //     motorVendor: this.horsepower,
-  //   };
+    const reqBody: TgetBoxDParams = {
+      modelName: this.doorType,
+      rollerDiameter: this._doorGeneralSpecs?.diameter ?? diameter ?? 0,
+      sidePlateSizeB: Number(this.boxB_mm),
+      hp: this.horsepower,
+      motorVendor: this.motor,
+    };
 
-  //   try {
-  //     this.isLoading = true;
-  //     const res = await apiGetboxD(reqBody);
+    try {
+      this.isLoading = true;
+      const res = await apiGetboxD(reqBody);
 
-  //     if (res) {
-  //       const sidePlateSizeD = res?.sidePlateSizeD;
-  //       this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
-  //     }
-  //   } catch (error) {
-  //     // const err = error as Error;
-  //     // myAlert.err({ title: '取得boxD失敗', content: err.message });
-  //     this._prodData.boxD = '0';
-  //   } finally {
-  //     this.isLoading = false;
-  //   }
+      if (res) {
+        const sidePlateSizeD = res?.sidePlateSizeD;
+        this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+      }
+    } catch (error) {
+      // const err = error as Error;
+      // myAlert.err({ title: '取得boxD失敗', content: err.message });
+      this._prodData.boxD = '0';
+    } finally {
+      this.isLoading = false;
+    }
 
-  //   this.area = this.calcArea();
-  //   this.reRender();
-  // }
+    this.area = this.calcArea();
+    this.reRender();
+  }
 
   /**D(m) */
   get boxD() {
@@ -3768,134 +3822,6 @@ const reqGetProdCalcDetailSpec = async (body: { modelName: TdoorModelInfoDto['na
 
     return false;
   }
-};
-
-const reqGetBoxD = async ({ modelName, rollerDiameter, sidePlateSizeB, hp, motorVendor }: TgetBoxDParams) => {
-  const reqBody = {
-    modelName: modelName as TdoorModelInfoDto['name'],
-    rollerDiameter,
-    sidePlateSizeB,
-    hp,
-    motorVendor,
-  };
-
-  try {
-    const res = await apiGetboxD(reqBody);
-
-    return res;
-  } catch (error) {
-    return null;
-  } finally {
-  }
-};
-
-const calcFullWidthOrW = ({
-  fullWidth,
-  W,
-  G,
-  gapA,
-  gapC = 20, // gapC基本上都是20
-}:
-  | {
-      fullWidth: number;
-      W?: undefined;
-      gapA: number;
-      gapC?: number;
-      G: number;
-    }
-  | {
-      fullWidth?: undefined;
-      W: number;
-      G: number;
-      gapA: number;
-      gapC?: number;
-    }) => {
-  //
-  if (fullWidth !== undefined) {
-    W = calcW_2({
-      fullWidth,
-      gapA,
-      gapC,
-      G,
-    });
-  } else {
-    const WG = new Decimal(W || 0).add(G).add(G).toNumber();
-
-    fullWidth = calcProductFullWidth({
-      WG,
-      gapA,
-      gapC,
-    });
-  }
-
-  const WG = new Decimal(W || 0).add(G).add(G).toNumber();
-
-  return {
-    fullWidth,
-    W,
-    G,
-    gapA,
-    gapC,
-    WG,
-  };
-};
-
-const calcDefaultMotor = ({ doorGeneralSpecs }: { doorGeneralSpecs: TdoorGeneralSpecsDto }) => {
-  const {
-    // bearingHousingSize,
-    // bearingHousingTotalLength,
-    // bearingInnerDiameter,
-    // bearingName,
-    defaultMotorIndex,
-    // density,
-    // diameter,
-    // gapA,
-    // gapC,
-    motors,
-    // gearNumber,
-    // sprocketWheelModel,
-    // sprocketWheelTeethNumber,
-    // sprocketWheelChains,
-    // weight,
-    // slatLength,
-    // guideRailLength,
-    // headBoxLength,
-    // thickness,
-  } = doorGeneralSpecs;
-
-  // 後端說boxB只會在defaultMotorIndex指定的motors裡面會有
-
-  const defaultMotorSpecs = motors[defaultMotorIndex];
-  const defaultMotorBox: TdoorGeneralSpecsMotorBoxDto | undefined = defaultMotorSpecs.box;
-
-  let defaultMotorVendor: string | undefined | null;
-  let defaultBoxB: number | undefined | null;
-
-  if (defaultMotorBox?.東元) {
-    defaultMotorVendor = '東元';
-    defaultBoxB = new Decimal(defaultMotorBox.東元.boxB).div(1000).toNumber();
-  } else if (defaultMotorBox?.default) {
-    // default存在代表東元或大同都可以
-    // 馬達金額基本上都是用東元的金額，所以東元優先
-    defaultMotorVendor = '東元';
-    defaultBoxB = new Decimal(defaultMotorBox.default.boxB).div(1000).toNumber();
-  } else if (defaultMotorBox?.大同) {
-    defaultMotorVendor = '大同';
-    defaultBoxB = new Decimal(defaultMotorBox.大同.boxB).div(1000).toNumber();
-  } else {
-    defaultMotorVendor = null;
-    defaultBoxB = null;
-  }
-
-  return {
-    // thickness,
-    // diameter,
-    //
-    defaultMotorSpecs,
-    defaultMotorVendor,
-    defaultBoxB,
-    defaultMotorBox,
-  };
 };
 
 // ===========================================================
