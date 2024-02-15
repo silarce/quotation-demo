@@ -1,6 +1,6 @@
-// 出庫單
-// 出庫單
-// 出庫單
+// 工程管理單
+// 工程管理單
+// 工程管理單
 
 // setMyDeleveryList
 
@@ -219,6 +219,8 @@ export default function OutboundOrder({
       }
 
       theItem.deliveryStatus = item.deliveryStatus;
+      // issue#198 // 改送item.id
+      theItem.id = item.id;
 
       if (!myDeleveryList?.[productId]) {
         myDeleveryList[productId] = {

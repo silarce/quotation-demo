@@ -519,7 +519,7 @@ const orderKeyArr_contract: (keyof TcontractData)[] = [
 ];
 
 const orderKeyArr_static: (keyof TstaticData)[] = [
-  // 'project', // 這個欄位顯示出來應該會讓這個報表比較清楚
+  'project', // 這個欄位顯示出來應該會讓這個報表比較清楚
   'L',
   'W',
   'B',
