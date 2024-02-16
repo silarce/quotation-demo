@@ -3,6 +3,7 @@
 import styled from '@emotion/styled';
 import { css, ClassNames } from '@emotion/react';
 import theme01 from 'styles/_theme01.module.scss';
+import classNames from 'classnames';
 
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -48,12 +49,16 @@ const Wrapper_inpuSel_01 = ({ children }: { children: React.ReactNode }) => {
 const WrappedTextarea = ({
   //
   inputSelProps,
+  textareaProps,
   disabled,
   mt,
+  className,
 }: {
   inputSelProps?: TinputSelProps;
+  textareaProps?: TinputSelProps['textareaProps'];
   disabled?: boolean;
   mt?: React.CSSProperties['marginTop'];
+  className?: string;
 }) => {
   return (
     <ClassNames>
@@ -74,7 +79,7 @@ const WrappedTextarea = ({
         `;
 
         return (
-          <div className={css_textareaWrapper}>
+          <div className={classNames(css_textareaWrapper, className)}>
             <InputSel
               {...inputSelProps_default}
               className={css_inputSel_textarea}
@@ -84,10 +89,12 @@ const WrappedTextarea = ({
               disabled={disabled}
               textareaProps={{
                 allowNewLineByUser: true,
+                ...textareaProps,
                 props: {
                   className: css_textarea,
                   maxRows: 18,
                   minRows: disabled ? undefined : 18,
+                  ...textareaProps?.props,
                 },
               }}
               {...inputSelProps}

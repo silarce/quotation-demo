@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { forwardRef, useImperativeHandle } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
+import moment from 'moment';
 
 // component
 import Table01, { Ttable } from 'components/global/gear/table/table01';
@@ -17,13 +18,39 @@ import {
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
+
+// type
+import { TmeetingMinutesDto } from 'js/api/dtoTypes';
 
 // ---------------------------------------------------------------------------
+
+type TmeetingMinutes = TmeetingMinutesDto<{
+  contract: true;
+  chairmanEmployee: true;
+  attendeesEmployee: true;
+  minuteTakerEmployee: true;
+}>;
+
+type Tstate_meetingMinutes = Omit<
+  TmeetingMinutes,
+  | 'chairmanEmployeeId'
+  | 'minuteTakerEmployeeId'
+  | 'contractId'
+  | 'contract'
+  | 'chairmanEmployee'
+  | 'minuteTakerEmployee'
+> & {
+  contract: TmeetingMinutes['contract'] | undefined;
+  chairmanEmployee: TmeetingMinutes['chairmanEmployee'] | undefined;
+  minuteTakerEmployee: TmeetingMinutes['minuteTakerEmployee'] | undefined;
+};
+
+// -------------
 
 type Tquery = {
   contractId: string;
   meetingMinutesId: string | undefined;
-  // isAdd: 'true' | undefined;
 };
 
 type TimperativeHandle = {
@@ -55,6 +82,7 @@ function MeetingMinutes_contract_component(
   },
   ref: React.ForwardedRef<unknown>
 ) {
+  //
   const router = useRouter();
   const { contractId, meetingMinutesId } = router.query as Tquery;
 
@@ -128,11 +156,13 @@ function MeetingMinutes_contract_component(
 
   // ---------------------------------------------------------------------------
 
+  // 製表時間直接放createdAt
+
   return (
     <div>
       {isList && <List className="m-auto" stickyTop={40} onRowClick={onRowClick} />}
-      {meetingMinutesId && <Edit />}
-      {isAdd && <Edit />}
+      {meetingMinutesId && <Edit disabled={disabled} />}
+      {isAdd && <Edit disabled={disabled} />}
     </div>
   );
 }
@@ -155,7 +185,6 @@ const List = ({
   onRowClick: (meetingMinutesId: string) => void;
 }) => {
   const router = useRouter();
-  const { meetingMinutesId } = router.query as Tquery;
 
   // ---------------------------------------------------------------------------
   const { control_table } = useMemo(() => {
@@ -227,28 +256,312 @@ const List = ({
 // ============================================================================
 
 const Edit = ({ disabled }: { disabled?: boolean }) => {
+  type TonChangeKeys = keyof Omit<
+    Tstate_meetingMinutes,
+    'chairmanEmployee' | 'attendeesEmployee' | 'minuteTakerEmployee'
+  >;
+
+  type TselectorKeys = keyof Pick<
+    Tstate_meetingMinutes,
+    'chairmanEmployee' | 'attendeesEmployee' | 'minuteTakerEmployee'
+  >;
+
+  // ---------------------------------------------------------------------
+
+  const [state, setState] = useState<Tstate_meetingMinutes>(employeeMeetingMinute());
+
+  const [selectorKey, setSelectorKey] = useState<TselectorKeys>();
+
+  // ---------------------------------------------------------------------
+
+  const attendeesEmployeeNames = state.attendeesEmployee.map((v) => v.chName).join('、');
+  const selectorLimit = selectorKey === 'attendeesEmployee' ? undefined : 1;
+  const defaultEmpArr = selectorKey === 'attendeesEmployee' ? state.attendeesEmployee : undefined;
+
+  // ---------------------------------------------------------------------
+
+  const onChange = (key: TonChangeKeys, value: string) => {
+    setState((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const onSelectorClick = (key: TselectorKeys) => {
+    setSelectorKey(key);
+  };
+
+  const onSelectorConfirm = !selectorKey
+    ? null
+    : (empArr: TemployeeDto[]) => {
+        const key = selectorKey;
+
+        if (key === 'attendeesEmployee') {
+          setState((prev) => ({ ...prev, attendeesEmployee: empArr }));
+        } else {
+          setState((prev) => ({ ...prev, [key]: empArr[0] }));
+        }
+
+        setSelectorKey(undefined);
+      };
+
+  // ---------------------------------------------------------------------
+  useEffect(() => {
+    if (disabled) {
+      setState(employeeMeetingMinute());
+    }
+  }, [disabled]);
+
   return (
-    <Wrapper>
-      <Wrapper_inpuSel_01>
-        <InputSel
-          {...inputSelProps}
-          //
-          caption="會議名稱"
-          showBaseline="auto"
-          disabled={disabled}
-          inputProps={{
-            props: {
-              // value: reciver?.name ?? '',
-              // placeholder: '請選擇受文者',
-            },
-          }}
-        />
-      </Wrapper_inpuSel_01>
-    </Wrapper>
+    <>
+      <Wrapper>
+        <Wrapper_inpuSel_01>
+          {/*  */}
+          <InputSel
+            {...inputSelProps}
+            className="col-span-2"
+            caption="會議名稱"
+            showBaseline="auto"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                value: state.name,
+                onChange: (e) => {
+                  onChange('name', e.target.value);
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...inputSelProps}
+            caption="會議地點"
+            showBaseline="auto"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                value: state.location,
+                onChange: (e) => {
+                  onChange('location', e.target.value);
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...inputSelProps}
+            caption="會議日期"
+            showBaseline="auto"
+            disabled={disabled}
+            datePickerProps={{
+              props: {
+                value: !state.minuteDate ? null : moment(state.minuteDate),
+                onChange: (m) => {
+                  onChange('minuteDate', m?.toISOString() ?? '');
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...inputSelProps}
+            caption="會議主席"
+            showBaseline="auto"
+            disabled={disabled}
+            onClick={() => {
+              onSelectorClick('chairmanEmployee');
+            }}
+            inputProps={{
+              props: {
+                value: state.chairmanEmployee?.chName ?? '',
+              },
+            }}
+          />
+
+          <InputSel
+            {...inputSelProps}
+            caption="記錄人員"
+            showBaseline="auto"
+            disabled={disabled}
+            onClick={() => {
+              onSelectorClick('minuteTakerEmployee');
+            }}
+            inputProps={{
+              props: {
+                value: state.minuteTakerEmployee?.chName ?? '',
+              },
+            }}
+          />
+
+          <InputSel
+            {...inputSelProps}
+            className="col-span-2"
+            caption="與會人員"
+            showBaseline="auto"
+            disabled={disabled}
+            onClick={() => {
+              onSelectorClick('attendeesEmployee');
+            }}
+            textareaProps={{
+              props: {
+                value: attendeesEmployeeNames || '',
+                readOnly: true,
+              },
+            }}
+          />
+
+          {/*  */}
+          <WrappedTextarea
+            className="col-span-2"
+            disabled={disabled}
+            inputSelProps={{
+              caption: '會議記錄',
+            }}
+            textareaProps={{
+              props: {
+                value: state.content ?? '',
+                onChange: (e) => {
+                  onChange('content', e.target.value);
+                },
+              },
+            }}
+          />
+
+          <InputSel
+            {...inputSelProps}
+            className="col-span-2"
+            caption="工程編號"
+            showBaseline="auto"
+            disabled={true}
+            inputProps={{
+              props: {
+                value: 'M-999999',
+              },
+            }}
+          />
+
+          <InputSel
+            {...inputSelProps}
+            caption="進場時間"
+            showBaseline="auto"
+            disabled={disabled}
+            datePickerProps={{
+              props: {
+                value: !state.entryTime ? null : moment(state.entryTime),
+                onChange: (m) => {
+                  onChange('entryTime', m?.toISOString() ?? '');
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...inputSelProps}
+            caption="消檢時間"
+            showBaseline="auto"
+            disabled={disabled}
+            datePickerProps={{
+              props: {
+                value: !state.inspectionTime ? null : moment(state.inspectionTime),
+                onChange: (m) => {
+                  onChange('inspectionTime', m?.toISOString() ?? '');
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...inputSelProps}
+            caption="使照時程"
+            showBaseline="auto"
+            disabled={disabled}
+            datePickerProps={{
+              props: {
+                value: !state.timeline ? null : moment(state.timeline),
+                onChange: (m) => {
+                  onChange('timeline', m?.toISOString() ?? '');
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...inputSelProps}
+            caption="竣工時間"
+            showBaseline="auto"
+            disabled={disabled}
+            datePickerProps={{
+              props: {
+                value: !state.completionTime ? null : moment(state.completionTime),
+                onChange: (m) => {
+                  onChange('completionTime', m?.toISOString() ?? '');
+                },
+              },
+            }}
+          />
+
+          <InputSel
+            {...inputSelProps}
+            caption="製表日期"
+            showBaseline="auto"
+            disabled={true}
+            inputProps={{
+              props: {
+                value: '999-99-99',
+              },
+            }}
+          />
+          <InputSel
+            {...inputSelProps}
+            caption="製表人"
+            showBaseline="auto"
+            disabled={true}
+            inputProps={{
+              props: {
+                value: '製表人.chName',
+              },
+            }}
+          />
+
+          {/*  */}
+        </Wrapper_inpuSel_01>
+      </Wrapper>
+      <EmployeeSelector
+        showModal={!!onSelectorConfirm}
+        onConfirm={(arr) => {
+          onSelectorConfirm && onSelectorConfirm(arr);
+        }}
+        onCancel={() => {
+          setSelectorKey(undefined);
+        }}
+        selLimit={selectorLimit}
+        defaultEmpArr={defaultEmpArr}
+      />
+    </>
   );
 };
 
 // ============================================================================
+
+const employeeMeetingMinute = (): Tstate_meetingMinutes => ({
+  // 所屬合約
+  contract: undefined,
+  // 會議名稱
+  name: '',
+  // 地點
+  location: '',
+  // 主席
+  chairmanEmployee: undefined,
+  // 與會人員
+  attendeesEmployee: [],
+  // 會議時間 date
+  minuteDate: '',
+  // 記錄人
+  minuteTakerEmployee: undefined,
+  // 會議記錄內容
+  content: '',
+  // 進場時間 date
+  entryTime: '',
+  // 消檢時間 date
+  inspectionTime: '',
+  // 使照時程 date
+  timeline: '',
+  // 竣工時間 date
+  completionTime: '',
+  // 製表人
+  formMaker: '',
+});
 
 // ============================================================================
 // ============================================================================
