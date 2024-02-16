@@ -1,0 +1,51 @@
+.container {
+  display: flex;
+  gap: 20px;
+  // background-color: pink;
+}
+
+.left {
+  flex: none;
+  .caption {
+    font-size: 18px;
+    color: theme("colors.main");
+  }
+}
+
+.right {
+  flex: auto;
+  min-height: 27px;
+  .label {
+    display: inline-block;
+    font-size: 16px;
+    color: theme("colors.main");
+    background-color: theme("colors.bgc01");
+    border: solid 1px theme("colors.border");
+    cursor: pointer;
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+  ul {
+    margin-top: 10px;
+    display: grid;
+    gap: 8px;
+    li {
+      > div {
+        display: flex;
+        gap: 10px;
+        // justify-content: space-between;
+        > span {
+          cursor: pointer;
+        }
+        > .btn {
+          flex: none;
+        }
+      }
+    }
+  }
+  :global(.ant-image-mask) {
+    display: none;
+  }
+}
