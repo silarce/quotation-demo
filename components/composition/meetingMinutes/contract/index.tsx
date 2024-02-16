@@ -19,6 +19,7 @@ import {
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
+import { Upload_nameList } from 'components/global/gear/upload/upload_nameList/upload_nameList';
 
 // type
 import { TmeetingMinutesDto } from 'js/api/dtoTypes';
@@ -490,6 +491,21 @@ const Edit = ({ disabled }: { disabled?: boolean }) => {
               },
             }}
           />
+
+          {/*  */}
+          {/*  */}
+          <Upload_nameList
+            className={'mt-5 col-span-2'}
+            style={{ gap: 20 }}
+            captionStyle={{ width: 80 }}
+            disabled={disabled}
+            defaultFileArr={[]}
+            onFilesChange={(e) => {
+              console.log(e);
+            }}
+          />
+          {/*  */}
+          {/*  */}
 
           <InputSel
             {...inputSelProps}
