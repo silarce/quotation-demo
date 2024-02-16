@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { forwardRef, useImperativeHandle } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
@@ -6,29 +7,132 @@ import classNames from 'classnames';
 import Table01, { Ttable } from 'components/global/gear/table/table01';
 import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
 
+// ui
+import {
+  Wrapper,
+  Wrapper_inpuSel_01,
+  inputSelProps,
+  WrappedTextarea,
+} from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
+
+// gear
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+
 // ---------------------------------------------------------------------------
 
 type Tquery = {
   contractId: string;
-  meetingMinutesId: string;
+  meetingMinutesId: string | undefined;
+  // isAdd: 'true' | undefined;
 };
 
+type TimperativeHandle = {
+  add: () => void;
+  edit: () => void;
+  toList: () => void;
+  confirm: () => void;
+  cancelEdit: () => void;
+};
+
+type Tstate = {
+  isAdd: boolean;
+  isEdit: boolean;
+  isRead: boolean;
+};
+
+export type { TimperativeHandle, Tstate };
+
 // ---------------------------------------------------------------------------
-export default function MeetingMinutes_contract({
-  id,
-}: {
-  id?: string; // 未來接api時用的
-}) {
+
+const MeetingMinutes_contract = forwardRef(MeetingMinutes_contract_component);
+export default MeetingMinutes_contract;
+
+function MeetingMinutes_contract_component(
+  {
+    onStateChange,
+  }: {
+    onStateChange?: (state: Tstate) => void;
+  },
+  ref: React.ForwardedRef<unknown>
+) {
+  const router = useRouter();
+  const { contractId, meetingMinutesId } = router.query as Tquery;
+
+  // ------------------------------------------------------------------------
+  const [disabled, setDisabled] = useState(true);
+  // ------------------------------------------------------------------------
+  const isAdd = !disabled && !meetingMinutesId;
+  const isEdit = !disabled && !!meetingMinutesId;
+  const isRead = disabled && !!meetingMinutesId;
+  const isList = !isAdd && !isEdit && !isRead;
+
+  // ------------------------------------------------------------------------
+
+  useImperativeHandle(
+    ref,
+    (): TimperativeHandle => ({
+      //
+      toList: () => {
+        router.push({
+          query: {
+            ...router.query,
+            meetingMinutesId: undefined,
+          },
+        });
+        setDisabled(true);
+      },
+      add: () => {
+        router.push({
+          query: {
+            ...router.query,
+            meetingMinutesId: undefined,
+          },
+        });
+        setDisabled(false);
+      },
+      edit: () => {
+        setDisabled(false);
+      },
+      confirm: () => {
+        alert('test');
+      },
+      cancelEdit: () => {
+        setDisabled(true);
+      },
+      //
+    })
+  );
+
   // ---------------------------------------------------------------------------
+
+  const onRowClick = (meetingMinutesId: string) => {
+    router.push({
+      query: {
+        ...router.query,
+        meetingMinutesId,
+        isAdd: undefined,
+      },
+    });
+  };
+
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    onStateChange &&
+      onStateChange({
+        isAdd,
+        isEdit,
+        isRead,
+      });
+  }, [isAdd, isEdit, isRead]);
 
   // ---------------------------------------------------------------------------
 
   return (
     <div>
-      <List className="m-auto" stickyTop={40} />
-      <div></div>
-      <div></div>
-      <div></div>
+      {isList && <List className="m-auto" stickyTop={40} onRowClick={onRowClick} />}
+      {meetingMinutesId && <Edit />}
+      {isAdd && <Edit />}
     </div>
   );
 }
@@ -43,10 +147,12 @@ const List = ({
   data,
   className,
   stickyTop,
+  onRowClick,
 }: {
   data?: any[]; // 未來要送進memo建立control_table
   className?: string;
   stickyTop?: React.CSSProperties['top'];
+  onRowClick: (meetingMinutesId: string) => void;
 }) => {
   const router = useRouter();
   const { meetingMinutesId } = router.query as Tquery;
@@ -75,12 +181,7 @@ const List = ({
       rowArr: [
         {
           onClick: () => {
-            router.push({
-              query: {
-                ...router.query,
-                meetingMinutesId: '123',
-              },
-            });
+            onRowClick('foo123');
           },
           cellArr: [
             {
@@ -125,14 +226,25 @@ const List = ({
 
 // ============================================================================
 
-const Edit = () => {
+const Edit = ({ disabled }: { disabled?: boolean }) => {
   return (
-    <div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
+    <Wrapper>
+      <Wrapper_inpuSel_01>
+        <InputSel
+          {...inputSelProps}
+          //
+          caption="會議名稱"
+          showBaseline="auto"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              // value: reciver?.name ?? '',
+              // placeholder: '請選擇受文者',
+            },
+          }}
+        />
+      </Wrapper_inpuSel_01>
+    </Wrapper>
   );
 };
 

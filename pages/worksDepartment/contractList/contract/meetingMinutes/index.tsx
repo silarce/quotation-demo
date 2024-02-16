@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 
 // layout
@@ -7,7 +7,7 @@ import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // composition
-import MeetingMinutes_contract from 'components/composition/meetingMinutes/contract';
+import MeetingMinutes_contract, { TimperativeHandle, Tstate } from 'components/composition/meetingMinutes/contract';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -36,9 +36,12 @@ type Tquery = {
 export default function MeetingMinutes() {
   const router = useRouter();
   const { contractId } = router.query as Tquery;
+  const ref = useRef<TimperativeHandle>(null);
 
   // ---------------------------------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+  const [meetingMinutesState, setMeetingMinutesState] = useState<Tstate>();
 
   // ---------------------------------------------------------------------------
 
@@ -49,6 +52,12 @@ export default function MeetingMinutes() {
 
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
+
+  // ---------------------------------------------------------------------------
+
+  const onMeetingMinutesStateChange = (state: Tstate) => {
+    setMeetingMinutesState(state);
+  };
 
   // ---------------------------------------------------------------------------
 
@@ -81,7 +90,86 @@ export default function MeetingMinutes() {
 
   // ---------------------------------------------------------------------------
 
-  const panelList: TpanelList = [];
+  // ---------------------------------------------------------------------------
+
+  const panelList: TpanelList = (() => {
+    const panelList_list: TpanelList = [
+      {
+        type: 'myButton',
+        label: '新增',
+        onClick: () => {
+          ref.current?.add();
+        },
+      },
+    ];
+
+    const panelList_read: TpanelList = [
+      {
+        type: 'myButton',
+        label: '編輯',
+        onClick: () => {
+          ref.current?.edit();
+        },
+      },
+      {
+        type: 'myButton',
+        label: '返回',
+        onClick: () => {
+          ref.current?.toList();
+        },
+      },
+    ];
+
+    const panelList_edit: TpanelList = [
+      {
+        type: 'redButton',
+        label: '確定',
+        onClick: () => {
+          ref.current?.confirm();
+        },
+      },
+      {
+        type: 'myButton',
+        label: '取消',
+        onClick: () => {
+          ref.current?.cancelEdit();
+        },
+      },
+    ];
+
+    const panelList_add: TpanelList = [
+      {
+        type: 'redButton',
+        label: '確定',
+        onClick: () => {
+          ref.current?.confirm();
+        },
+      },
+      {
+        type: 'myButton',
+        label: '返回',
+        onClick: () => {
+          ref.current?.toList();
+        },
+      },
+    ];
+
+    const { isAdd, isEdit, isRead } = meetingMinutesState ?? {};
+
+    if (isAdd) {
+      return panelList_add;
+    }
+
+    if (isRead) {
+      return panelList_read;
+    }
+
+    if (isEdit) {
+      return panelList_edit;
+    }
+
+    return panelList_list;
+  })();
 
   // ---------------------------------------------------------------------------
   return (
@@ -89,8 +177,7 @@ export default function MeetingMinutes() {
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>
-        <MeetingMinutes_contract />
-        <div></div>
+        <MeetingMinutes_contract ref={ref} onStateChange={onMeetingMinutesStateChange} />
       </div>
     </SubLayer>
   );
