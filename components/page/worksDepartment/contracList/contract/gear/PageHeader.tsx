@@ -117,6 +117,16 @@ export default function PageHeader({
       },
     },
     {
+      label: '會議記錄',
+      href: {
+        pathname: `${pathHead}/meetingMinutes`,
+        query: {
+          contractId,
+          version,
+        },
+      },
+    },
+    {
       label: '調(退)貨單列表',
       // disabled: true,
       href: {
