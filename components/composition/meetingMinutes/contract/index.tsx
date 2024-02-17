@@ -21,20 +21,28 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
 import {
   Tfile,
-  TfileDto,
+  TfileOriginal,
   TonFilsChange,
   //
   Upload_nameList,
 } from 'components/global/gear/upload/upload_nameList/upload_nameList';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import {
+  AxiosError,
+  //
   TmeetingMinutesDto,
   TcreateMeetingMinutesDto,
   //
   useGetMeetingMinutes,
+  useGetMeetingMinutes_id,
   apiPostMeetingMinutes,
   apiPatchMeetingMinutes,
+  //
+  useGetMeetingMinutes_id_attachments,
+  apiPostMeetingMinutes_id_attachments,
+  apiDeleteMeetingMinutes_id_attachments,
 } from 'js/api/api_meetingMinutes';
 
 // utils
@@ -80,7 +88,6 @@ type TimperativeHandle = {
   add: () => void;
   edit: () => void;
   toList: () => void;
-  confirm: () => void;
   cancelEdit: () => void;
   reqPostPatch: () => void;
 };
@@ -89,6 +96,7 @@ type Tstate = {
   isAdd: boolean;
   isEdit: boolean;
   isRead: boolean;
+  isLoading?: boolean;
 };
 
 export type { TimperativeHandle, Tstate };
@@ -114,22 +122,21 @@ function MeetingMinutes_contract_component(
 
   // ------------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
+  const [isLoading_req, setIsLoading_req] = useState(false);
+  const [isLoading_edit, setIsLoading_edit] = useState(false);
   // ------------------------------------------------------------------------
 
   const [state_meetingMinures, setState_meetingMinures] = useState<Tstate_meetingMinutes>();
 
-  // const [fileList, setFileList] = useState<Tfile[]>([]);
-
-  // // Tfile,
-  // // TfileDto,
-  // // TonFilsChange,
+  const [newFileArr, setNewFileArr] = useState<Tfile[]>([]);
+  const [deletedFileDtoArr, setDeletedFileDtoArr] = useState<TfileOriginal[]>([]);
 
   // ------------------------------------------------------------------------
 
   const {
     data: meetingMinutesArr,
     update: update_meetingMinutesArr,
-    isLoading,
+    isLoading: isLoading_meetingMinutesArr,
   } = useGetMeetingMinutes<{
     contract: true;
     chairmanEmployee: true;
@@ -137,7 +144,7 @@ function MeetingMinutes_contract_component(
     minuteTakerEmployee: true;
   }>();
 
-  const meetingInEdit = meetingMinutesId ? meetingMinutesArr?.find((v) => v.id === meetingMinutesId) : undefined;
+  // const meetingInEdit = meetingMinutesId ? meetingMinutesArr?.find((v) => v.id === meetingMinutesId) : undefined;
 
   // ------------------------------------------------------------------------
   const isAdd = !disabled && !meetingMinutesId;
@@ -157,7 +164,13 @@ function MeetingMinutes_contract_component(
     });
   };
 
+  const onFilesChange: TonFilsChange = ({ deleteArr, newFileArr }) => {
+    setNewFileArr(newFileArr);
+    setDeletedFileDtoArr(deleteArr);
+  };
+
   // ------------------------------------------------------------------------
+
   const reqPostPatch = async () => {
     const state = state_meetingMinures;
 
@@ -195,6 +208,34 @@ function MeetingMinutes_contract_component(
     } catch (error) {}
   };
 
+  const reqAttachments = async () => {
+    if (!meetingMinutesId) {
+      return;
+    }
+
+    for (const file of deletedFileDtoArr) {
+      try {
+        await apiDeleteMeetingMinutes_id_attachments(meetingMinutesId, file.id, { showAlert: false });
+      } catch (error) {
+        const err = error as AxiosError;
+        myAlert.err({ title: '刪除附件失敗，刪除流程中止', content: err.message });
+        break;
+      }
+    }
+
+    for (const file of newFileArr) {
+      const formData = new FormData();
+      formData.append('file', file.file);
+
+      try {
+        await apiPostMeetingMinutes_id_attachments(meetingMinutesId, formData, { showAlert: false });
+      } catch (error) {
+        const err = error as AxiosError;
+        myAlert.err({ title: '新增附件失敗，新增流程中止', content: err.message });
+        break;
+      }
+    }
+  };
   // ------------------------------------------------------------------------
 
   useImperativeHandle(
@@ -222,13 +263,14 @@ function MeetingMinutes_contract_component(
       edit: () => {
         setDisabled(false);
       },
-      confirm: () => {
-        alert('test');
-      },
       cancelEdit: () => {
         setDisabled(true);
       },
-      reqPostPatch,
+      reqPostPatch: async () => {
+        setIsLoading_req(true);
+        await Promise.all([reqPostPatch(), reqAttachments()]);
+        setIsLoading_req(false);
+      },
       //
     })
   );
@@ -247,12 +289,12 @@ function MeetingMinutes_contract_component(
         isAdd,
         isEdit,
         isRead,
+        isLoading: isLoading_req || isLoading_edit || isLoading_meetingMinutesArr,
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdd, isEdit, isRead]);
 
   // ---------------------------------------------------------------------------
-
-  // 製表時間直接放createdAt
 
   return (
     <div>
@@ -261,12 +303,14 @@ function MeetingMinutes_contract_component(
       )}
 
       <Edit
-        className={classNames(!isAdd && 'hidden')}
-        meetingInEdit={meetingInEdit}
+        className={classNames(!(isAdd || isEdit) && 'hidden')}
+        meetingMinuteId={meetingMinutesId}
         disabled={disabled}
-        onStateChange={(state) => {
-          setState_meetingMinures(state);
+        onStateChange={({ state_meetingMinutes, isLoading_meetingMinute, isLoading_attachments }) => {
+          setState_meetingMinures(state_meetingMinutes);
+          setIsLoading_edit(isLoading_meetingMinute || isLoading_attachments);
         }}
+        onFilesChange={onFilesChange}
         formMakerName={userInfo?.employee?.chName ?? ''}
       />
     </div>
@@ -290,10 +334,6 @@ const List = ({
   stickyTop?: React.CSSProperties['top'];
   onRowClick: (meetingMinutesId: string) => void;
 }) => {
-  const router = useRouter();
-
-  // ---------------------------------------------------------------------------
-
   // ---------------------------------------------------------------------------
   const { control_table } = useMemo(() => {
     const thead: Ttable['thead'] = {
@@ -387,14 +427,20 @@ const List = ({
 // ============================================================================
 
 const Edit = ({
-  meetingInEdit,
+  meetingMinuteId,
   onStateChange,
+  onFilesChange,
   disabled,
   formMakerName,
   className,
 }: {
-  meetingInEdit: Tstate_meetingMinutes | undefined;
-  onStateChange: (state: Tstate_meetingMinutes) => void;
+  meetingMinuteId: string | undefined;
+  onStateChange: (states: {
+    state_meetingMinutes: Tstate_meetingMinutes;
+    isLoading_meetingMinute: boolean;
+    isLoading_attachments: boolean;
+  }) => void;
+  onFilesChange: TonFilsChange;
   disabled?: boolean;
   formMakerName?: string;
   className?: string;
@@ -411,20 +457,49 @@ const Edit = ({
 
   // ---------------------------------------------------------------------
 
-  const [state, setState] = useState<Tstate_meetingMinutes>(employeeMeetingMinute());
+  const [state_meetingMinutes, setState_meetingMinutes] = useState<Tstate_meetingMinutes>(employeeMeetingMinute());
 
   const [selectorKey, setSelectorKey] = useState<TselectorKeys>();
 
   // ---------------------------------------------------------------------
 
-  const attendeesEmployeeNames = state.attendeesEmployee.map((v) => v.chName).join('、');
+  const {
+    data: meeingMinute,
+    update: update_meetingMinute,
+    isLoading: isLoading_meetingMinute,
+  } = useGetMeetingMinutes_id(meetingMinuteId);
+  const {
+    data: attachments,
+    update: update_attachments,
+    setData: setAttachments,
+    isLoading: isLoading_attachments,
+  } = useGetMeetingMinutes_id_attachments(meetingMinuteId);
+  // ---------------------------------------------------------------------
+
+  const attendeesEmployeeNames = state_meetingMinutes.attendeesEmployee.map((v) => v.chName).join('、');
   const selectorLimit = selectorKey === 'attendeesEmployee' ? undefined : 1;
-  const defaultEmpArr = selectorKey === 'attendeesEmployee' ? state.attendeesEmployee : undefined;
+  const defaultEmpArr = selectorKey === 'attendeesEmployee' ? state_meetingMinutes.attendeesEmployee : undefined;
+
+  // ---------------------------------------------------------------------
+
+  const fileArr: TfileOriginal[] = useMemo(() => {
+    const fileArr: TfileOriginal[] =
+      attachments?.map((v) => {
+        const { id, name, mime } = v;
+        const type = mime.includes('image') ? 'image' : mime.includes('pdf') ? 'pdf' : 'other';
+
+        const src = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${id}`;
+
+        return { id, src, type, name };
+      }) ?? [];
+
+    return fileArr;
+  }, [attachments]);
 
   // ---------------------------------------------------------------------
 
   const onChange = (key: TonChangeKeys, value: string) => {
-    setState((prev) => ({ ...prev, [key]: value }));
+    setState_meetingMinutes((prev) => ({ ...prev, [key]: value }));
   };
 
   const onSelectorClick = (key: TselectorKeys) => {
@@ -437,9 +512,9 @@ const Edit = ({
         const key = selectorKey;
 
         if (key === 'attendeesEmployee') {
-          setState((prev) => ({ ...prev, attendeesEmployee: empArr }));
+          setState_meetingMinutes((prev) => ({ ...prev, attendeesEmployee: empArr }));
         } else {
-          setState((prev) => ({ ...prev, [key]: empArr[0] }));
+          setState_meetingMinutes((prev) => ({ ...prev, [key]: empArr[0] }));
         }
 
         setSelectorKey(undefined);
@@ -448,20 +523,33 @@ const Edit = ({
   // ---------------------------------------------------------------------
 
   useEffect(() => {
-    if (disabled) {
-      if (!meetingInEdit) {
-        const empty = employeeMeetingMinute();
-        empty.formMaker = formMakerName ?? '';
-        setState(empty);
-      } else {
-        setState(meetingInEdit);
-      }
-    }
-  }, [disabled, meetingInEdit]);
+    update_meetingMinute();
+    update_attachments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meetingMinuteId]);
 
   useEffect(() => {
-    onStateChange && onStateChange(state);
-  }, [state]);
+    if (disabled) {
+      if (!meeingMinute) {
+        const empty = employeeMeetingMinute();
+        empty.formMaker = formMakerName ?? '';
+        setState_meetingMinutes(empty);
+        setAttachments(undefined);
+      } else {
+        setState_meetingMinutes(meeingMinute);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled, meeingMinute]);
+
+  useEffect(() => {
+    onStateChange &&
+      onStateChange({
+        state_meetingMinutes,
+        isLoading_meetingMinute,
+        isLoading_attachments,
+      });
+  }, [state_meetingMinutes, isLoading_meetingMinute, isLoading_attachments]);
 
   return (
     <div className={classNames(className)}>
@@ -476,7 +564,7 @@ const Edit = ({
             disabled={disabled}
             inputProps={{
               props: {
-                value: state.name,
+                value: state_meetingMinutes.name,
                 onChange: (e) => {
                   onChange('name', e.target.value);
                 },
@@ -490,7 +578,7 @@ const Edit = ({
             disabled={disabled}
             inputProps={{
               props: {
-                value: state.location,
+                value: state_meetingMinutes.location,
                 onChange: (e) => {
                   onChange('location', e.target.value);
                 },
@@ -504,7 +592,7 @@ const Edit = ({
             disabled={disabled}
             datePickerProps={{
               props: {
-                value: !state.minuteDate ? null : moment(state.minuteDate),
+                value: !state_meetingMinutes.minuteDate ? null : moment(state_meetingMinutes.minuteDate),
                 onChange: (m) => {
                   onChange('minuteDate', m?.toISOString() ?? '');
                 },
@@ -521,7 +609,7 @@ const Edit = ({
             }}
             inputProps={{
               props: {
-                value: state.chairmanEmployee?.chName ?? '',
+                value: state_meetingMinutes.chairmanEmployee?.chName ?? '',
               },
             }}
           />
@@ -536,7 +624,7 @@ const Edit = ({
             }}
             inputProps={{
               props: {
-                value: state.minuteTakerEmployee?.chName ?? '',
+                value: state_meetingMinutes.minuteTakerEmployee?.chName ?? '',
               },
             }}
           />
@@ -567,7 +655,7 @@ const Edit = ({
             }}
             textareaProps={{
               props: {
-                value: state.content ?? '',
+                value: state_meetingMinutes.content ?? '',
                 onChange: (e) => {
                   onChange('content', e.target.value);
                 },
@@ -595,7 +683,7 @@ const Edit = ({
             disabled={disabled}
             datePickerProps={{
               props: {
-                value: !state.entryTime ? null : moment(state.entryTime),
+                value: !state_meetingMinutes.entryTime ? null : moment(state_meetingMinutes.entryTime),
                 onChange: (m) => {
                   onChange('entryTime', m?.toISOString() ?? '');
                 },
@@ -609,7 +697,7 @@ const Edit = ({
             disabled={disabled}
             datePickerProps={{
               props: {
-                value: !state.inspectionTime ? null : moment(state.inspectionTime),
+                value: !state_meetingMinutes.inspectionTime ? null : moment(state_meetingMinutes.inspectionTime),
                 onChange: (m) => {
                   onChange('inspectionTime', m?.toISOString() ?? '');
                 },
@@ -623,7 +711,7 @@ const Edit = ({
             disabled={disabled}
             datePickerProps={{
               props: {
-                value: !state.timeline ? null : moment(state.timeline),
+                value: !state_meetingMinutes.timeline ? null : moment(state_meetingMinutes.timeline),
                 onChange: (m) => {
                   onChange('timeline', m?.toISOString() ?? '');
                 },
@@ -637,7 +725,7 @@ const Edit = ({
             disabled={disabled}
             datePickerProps={{
               props: {
-                value: !state.completionTime ? null : moment(state.completionTime),
+                value: !state_meetingMinutes.completionTime ? null : moment(state_meetingMinutes.completionTime),
                 onChange: (m) => {
                   onChange('completionTime', m?.toISOString() ?? '');
                 },
@@ -652,10 +740,8 @@ const Edit = ({
             style={{ gap: 20 }}
             captionStyle={{ width: 80 }}
             disabled={disabled}
-            defaultFileArr={[]}
-            onFilesChange={(e) => {
-              console.log(e);
-            }}
+            fileArr={fileArr}
+            onFilesChange={onFilesChange}
           />
           {/*  */}
           {/*  */}
@@ -667,7 +753,7 @@ const Edit = ({
             disabled={true}
             inputProps={{
               props: {
-                value: getTaiwanDateStr(state.createdAt) ?? '',
+                value: getTaiwanDateStr(state_meetingMinutes.createdAt) ?? '',
               },
             }}
           />
@@ -678,7 +764,7 @@ const Edit = ({
             disabled={true}
             inputProps={{
               props: {
-                value: state.formMaker ?? '',
+                value: state_meetingMinutes.formMaker ?? '',
                 onChange: () => {},
               },
             }}

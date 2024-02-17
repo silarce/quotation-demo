@@ -40,7 +40,7 @@ export default function MeetingMinutes() {
 
   // ---------------------------------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
-  const [disabled, setDisabled] = useState(true);
+  // const [disabled, setDisabled] = useState(true);
   const [meetingMinutesState, setMeetingMinutesState] = useState<Tstate>();
 
   // ---------------------------------------------------------------------------
@@ -173,7 +173,7 @@ export default function MeetingMinutes() {
 
   // ---------------------------------------------------------------------------
   return (
-    <SubLayer isLoading_all={isLoading}>
+    <SubLayer isLoading_all={isLoading || meetingMinutesState?.isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>

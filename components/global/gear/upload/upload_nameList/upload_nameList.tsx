@@ -9,23 +9,16 @@ const PdfViewer01 = dynamic(() => import('components/global/gear/pdf/pdfViewer01
 import myAlert from '../../modal/simpleModal/alertModals';
 
 // icon
-import { IconAddCircle, IconRemoveCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
-import iconAttacth from 'public/image/icon/attach.svg';
+import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+// import iconAttacth from 'public/image/icon/attach.svg';
 
-import { TfileDto } from 'js/api/dtoTypes';
+// import { TfileDto } from 'js/api/dtoTypes';
 
 // css
 import scss from './upload_nameList.module.scss';
+import { set } from 'lodash';
 
 // ====================================================================
-
-type Tcontrol = {
-  // deleteList: {
-  //   [id: string]: TfileDto;
-  // };
-
-  fileList: TfileDto[];
-};
 
 type Tfile = {
   file: File;
@@ -34,39 +27,43 @@ type Tfile = {
   name: string;
 };
 
-type TonFilsChange = (props: { deleteArr: TfileDto[]; newFileArr: Tfile[] }) => void;
+type TfileOriginal = Omit<Tfile, 'file'> & { id: string };
+
+type TonFilsChange = (props: { deleteArr: TfileOriginal[]; newFileArr: Tfile[] }) => void;
+
+export type { TfileOriginal, Tfile, TonFilsChange };
 
 // ====================================================================
 export function Upload_nameList({
-  defaultFileArr,
+  fileArr: fileArr_original,
   disabled,
   className,
   onFilesChange,
   style: containerStyle,
   captionStyle,
 }: {
-  defaultFileArr: TfileDto[];
+  fileArr: TfileOriginal[];
   disabled?: boolean;
   className?: string;
   onFilesChange?: TonFilsChange;
   style?: React.CSSProperties;
   captionStyle?: React.CSSProperties;
 }) {
-  const [fileDtoArr, setFileDtoArr] = useState<TfileDto[]>([]);
-  const [deletedFileDtoArr, setDeletedFileDtoArr] = useState<TfileDto[]>([]);
+  const [fileArr, setFileArr] = useState<TfileOriginal[]>([]);
+  const [deletedFileDtoArr, setDeletedFileDtoArr] = useState<TfileOriginal[]>([]);
   const [newFileArr, setNewFileArr] = useState<Tfile[]>([]);
 
   const [showFileId, setShowFileId] = useState<string>();
 
   // ---------------------------------------------------------------------------
 
-  const deleteFileDto = (index: number, name?: string) => {
+  const deleteFile = (index: number, name?: string) => {
     myAlert.confirm({
       title: '確認刪除?',
       content: name,
       props: {
         onOk: () => {
-          setFileDtoArr((arr) => {
+          setFileArr((arr) => {
             const newArr = [...arr];
             const deletedFileDto = newArr.splice(index, 1);
             setDeletedFileDtoArr((arr) => [...arr, ...deletedFileDto]);
@@ -78,7 +75,7 @@ export function Upload_nameList({
     });
   };
 
-  const deleteFile = (index: number, name?: string) => {
+  const deleteNewFile = (index: number, name?: string) => {
     myAlert.confirm({
       title: '確認刪除?',
       content: name,
@@ -136,9 +133,11 @@ export function Upload_nameList({
 
   useEffect(() => {
     if (disabled) {
-      setFileDtoArr(defaultFileArr);
+      setFileArr(fileArr_original);
+      setNewFileArr([]);
+      setDeletedFileDtoArr([]);
     }
-  }, [defaultFileArr, disabled]);
+  }, [fileArr_original, disabled]);
 
   useEffect(() => {
     onFilesChange &&
@@ -146,6 +145,7 @@ export function Upload_nameList({
         deleteArr: deletedFileDtoArr,
         newFileArr,
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deletedFileDtoArr, newFileArr]);
 
   // ---------------------------------------------------------------------------
@@ -164,16 +164,15 @@ export function Upload_nameList({
         </label>
 
         <ul>
-          {fileDtoArr.map((item, index) => {
-            const { id, name, mime } = item;
+          {fileArr.map((item, index) => {
+            const { id, name, type, src } = item;
 
-            const src = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${id}`;
-            const type = mime.includes('image') ? 'image' : mime.includes('pdf') ? 'pdf' : 'other';
+            // const src = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${id}`;
 
             return (
               <li key={index}>
                 <div>
-                  <IconDelete01 className={scss.btn} onClick={() => deleteFileDto(index, name)} />
+                  <IconDelete01 className={scss.btn} onClick={() => deleteFile(index, name)} />
                   <span
                     onClick={() => {
                       setShowFileId(id);
@@ -210,7 +209,7 @@ export function Upload_nameList({
             return (
               <li key={index}>
                 <div>
-                  <IconDelete01 className={scss.btn} onClick={() => deleteFile(index, name)} />
+                  <IconDelete01 className={scss.btn} onClick={() => deleteNewFile(index, name)} />
                   <span
                     onClick={() => {
                       setShowFileId(`${index}`);

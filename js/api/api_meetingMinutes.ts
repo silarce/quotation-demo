@@ -16,7 +16,16 @@ import type {
   TupdateMeetingMinutesDto,
 } from './dtoTypes';
 
-export type { Tparams, TpageMetaDto, TpageResponse, TfileDto, TmeetingMinutesDto, TcreateMeetingMinutesDto };
+export type {
+  AxiosError,
+  //
+  Tparams,
+  TpageMetaDto,
+  TpageResponse,
+  TfileDto,
+  TmeetingMinutesDto,
+  TcreateMeetingMinutesDto,
+};
 
 type TgetMeetingMinutes<Tpopulate extends Tpopulate_meetingMinutesDto = object> = TpageResponse<
   TmeetingMinutesDto<Tpopulate>
@@ -61,6 +70,68 @@ export function useGetMeetingMinutes<Tpopulate extends Tpopulate_meetingMinutesD
     update,
   };
 }
+
+export const apiGetMeetingMinutes_id = async (id: string, params?: Tparams) => {
+  const api = `/meeting-minutes/${id}`;
+
+  const populate = ['contract', 'chairmanEmployee', 'attendeesEmployee', 'minuteTakerEmployee'];
+
+  params = { ...params, populate };
+
+  return axi
+    .get<
+      TmeetingMinutesDto<{
+        contract: true;
+        chairmanEmployee: true;
+        attendeesEmployee: true;
+        minuteTakerEmployee: true;
+      }>
+    >(api, { params })
+    .then((res) => res.data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetMeetingMinutes_id = (
+  id: string | undefined,
+  params?: Tparams,
+  { showAlert = true }: { showAlert?: boolean } = {}
+) => {
+  const [res, setRes] = useState<
+    TmeetingMinutesDto<{
+      contract: true;
+      chairmanEmployee: true;
+      attendeesEmployee: true;
+      minuteTakerEmployee: true;
+    }>
+  >();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiGetMeetingMinutes_id(id, params);
+      setRes(res);
+    } catch (error) {
+      const err = error as AxiosError;
+
+      if (showAlert) {
+        myAlert.err({ title: '取得會議紀錄失敗', content: err.message });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    data: res,
+    isLoading,
+    update,
+  };
+};
 
 export const apiPostMeetingMinutes = async (
   body: TcreateMeetingMinutesDto,
@@ -112,7 +183,39 @@ export const apiGetMeetingMinutes_id_attachments = async (id: string) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const apiPostMeetingMinutes_id_attachments = async (id: string, formData: FormData) => {
+export const useGetMeetingMinutes_id_attachments = (id: string | undefined) => {
+  const [res, setRes] = useState<TfileDto[]>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiGetMeetingMinutes_id_attachments(id);
+      setRes(res);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    data: res,
+    isLoading,
+    update,
+    setData: setRes,
+  };
+};
+
+export const apiPostMeetingMinutes_id_attachments = async (
+  id: string,
+  formData: FormData,
+
+  { showAlert }: { showAlert?: boolean } = {}
+) => {
   const api = `/meeting-minutes/${id}/attachments`;
 
   return axi
@@ -122,14 +225,34 @@ export const apiPostMeetingMinutes_id_attachments = async (id: string, formData:
       },
     })
     .then((res) => res.data)
-    .catch((err) => Promise.reject(err));
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      if (showAlert) {
+        myAlert.err({ title: '新增附件失敗', content: err.message });
+      }
+
+      return Promise.reject(err);
+    });
 };
 
-export const apiDeleteMeetingMinutes_id_attachments = async (id: string, fileId: string) => {
-  const api = `/meeting-minutes/${id}/attachments/${fileId}`;
+export const apiDeleteMeetingMinutes_id_attachments = async (
+  meetingMinuteId: string,
+  fileId: string,
+  { showAlert }: { showAlert?: boolean } = {}
+) => {
+  const api = `/meeting-minutes/${meetingMinuteId}/attachments/${fileId}`;
 
   return axi
     .delete(api)
     .then((res) => res.data)
-    .catch((err) => Promise.reject(err));
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      if (showAlert) {
+        myAlert.err({ title: '刪除附件失敗', content: err.message });
+      }
+
+      return Promise.reject(err);
+    });
 };
