@@ -125,7 +125,7 @@ export default function MeetingMinutes() {
         type: 'redButton',
         label: '確定',
         onClick: () => {
-          ref.current?.confirm();
+          ref.current?.reqPostPatch();
         },
       },
       {
@@ -142,7 +142,7 @@ export default function MeetingMinutes() {
         type: 'redButton',
         label: '確定',
         onClick: () => {
-          ref.current?.confirm();
+          ref.current?.reqPostPatch();
         },
       },
       {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useContext } from 'react';
 import { forwardRef, useImperativeHandle } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
@@ -19,10 +19,29 @@ import {
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
-import { Upload_nameList } from 'components/global/gear/upload/upload_nameList/upload_nameList';
+import {
+  Tfile,
+  TfileDto,
+  TonFilsChange,
+  //
+  Upload_nameList,
+} from 'components/global/gear/upload/upload_nameList/upload_nameList';
 
-// type
-import { TmeetingMinutesDto } from 'js/api/dtoTypes';
+// api
+import {
+  TmeetingMinutesDto,
+  TcreateMeetingMinutesDto,
+  //
+  useGetMeetingMinutes,
+  apiPostMeetingMinutes,
+  apiPatchMeetingMinutes,
+} from 'js/api/api_meetingMinutes';
+
+// utils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+// context
+import { AppContext } from 'pages/_app';
 
 // ---------------------------------------------------------------------------
 
@@ -41,7 +60,10 @@ type Tstate_meetingMinutes = Omit<
   | 'contract'
   | 'chairmanEmployee'
   | 'minuteTakerEmployee'
+  | 'id'
+  | 'updatedAt'
 > & {
+  id: string | undefined;
   contract: TmeetingMinutes['contract'] | undefined;
   chairmanEmployee: TmeetingMinutes['chairmanEmployee'] | undefined;
   minuteTakerEmployee: TmeetingMinutes['minuteTakerEmployee'] | undefined;
@@ -50,7 +72,7 @@ type Tstate_meetingMinutes = Omit<
 // -------------
 
 type Tquery = {
-  contractId: string;
+  contractId: string | undefined;
   meetingMinutesId: string | undefined;
 };
 
@@ -60,6 +82,7 @@ type TimperativeHandle = {
   toList: () => void;
   confirm: () => void;
   cancelEdit: () => void;
+  reqPostPatch: () => void;
 };
 
 type Tstate = {
@@ -87,13 +110,90 @@ function MeetingMinutes_contract_component(
   const router = useRouter();
   const { contractId, meetingMinutesId } = router.query as Tquery;
 
+  const { userInfo } = useContext(AppContext);
+
   // ------------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
+  // ------------------------------------------------------------------------
+
+  const [state_meetingMinures, setState_meetingMinures] = useState<Tstate_meetingMinutes>();
+
+  // const [fileList, setFileList] = useState<Tfile[]>([]);
+
+  // // Tfile,
+  // // TfileDto,
+  // // TonFilsChange,
+
+  // ------------------------------------------------------------------------
+
+  const {
+    data: meetingMinutesArr,
+    update: update_meetingMinutesArr,
+    isLoading,
+  } = useGetMeetingMinutes<{
+    contract: true;
+    chairmanEmployee: true;
+    attendeesEmployee: true;
+    minuteTakerEmployee: true;
+  }>();
+
+  const meetingInEdit = meetingMinutesId ? meetingMinutesArr?.find((v) => v.id === meetingMinutesId) : undefined;
+
   // ------------------------------------------------------------------------
   const isAdd = !disabled && !meetingMinutesId;
   const isEdit = !disabled && !!meetingMinutesId;
   const isRead = disabled && !!meetingMinutesId;
   const isList = !isAdd && !isEdit && !isRead;
+
+  // ------------------------------------------------------------------------
+
+  const onRowClick = (meetingMinutesId: string) => {
+    router.push({
+      query: {
+        ...router.query,
+        meetingMinutesId,
+        isAdd: undefined,
+      },
+    });
+  };
+
+  // ------------------------------------------------------------------------
+  const reqPostPatch = async () => {
+    const state = state_meetingMinures;
+
+    if (!contractId || !state || !state.chairmanEmployee || !state.minuteTakerEmployee) {
+      return;
+    }
+
+    let meetingMinuteId = state.id;
+
+    const body: TcreateMeetingMinutesDto = {
+      contractId: contractId,
+      name: state.name,
+      location: state.location,
+      chairmanEmployeeId: state.chairmanEmployee?.id,
+      attendeesEmployee: state.attendeesEmployee.map((v) => v.id),
+      minuteDate: state.minuteDate,
+      minuteTakerEmployeeId: state.minuteTakerEmployee?.id,
+      content: state.content,
+      entryTime: state.entryTime,
+      inspctionTime: state.inspectionTime,
+      timeline: state.timeline,
+      completionTime: state.completionTime,
+      formMaker: state.formMaker,
+    };
+
+    try {
+      if (!meetingMinuteId) {
+        const res = await apiPostMeetingMinutes(body);
+        meetingMinuteId = res.id;
+      } else {
+        await apiPatchMeetingMinutes(meetingMinuteId, body);
+      }
+
+      await update_meetingMinutesArr();
+    } catch (error) {}
+  };
 
   // ------------------------------------------------------------------------
 
@@ -128,23 +228,18 @@ function MeetingMinutes_contract_component(
       cancelEdit: () => {
         setDisabled(true);
       },
+      reqPostPatch,
       //
     })
   );
 
   // ---------------------------------------------------------------------------
 
-  const onRowClick = (meetingMinutesId: string) => {
-    router.push({
-      query: {
-        ...router.query,
-        meetingMinutesId,
-        isAdd: undefined,
-      },
-    });
-  };
-
   // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    update_meetingMinutesArr();
+  }, []);
 
   useEffect(() => {
     onStateChange &&
@@ -161,9 +256,19 @@ function MeetingMinutes_contract_component(
 
   return (
     <div>
-      {isList && <List className="m-auto" stickyTop={40} onRowClick={onRowClick} />}
-      {meetingMinutesId && <Edit disabled={disabled} />}
-      {isAdd && <Edit disabled={disabled} />}
+      {isList && (
+        <List className="m-auto" stickyTop={40} onRowClick={onRowClick} meetingMinutesArr={meetingMinutesArr ?? []} />
+      )}
+
+      <Edit
+        className={classNames(!isAdd && 'hidden')}
+        meetingInEdit={meetingInEdit}
+        disabled={disabled}
+        onStateChange={(state) => {
+          setState_meetingMinures(state);
+        }}
+        formMakerName={userInfo?.employee?.chName ?? ''}
+      />
     </div>
   );
 }
@@ -175,17 +280,19 @@ function MeetingMinutes_contract_component(
 // ===========================================================================
 
 const List = ({
-  data,
+  meetingMinutesArr,
   className,
   stickyTop,
   onRowClick,
 }: {
-  data?: any[]; // 未來要送進memo建立control_table
+  meetingMinutesArr: TmeetingMinutes[];
   className?: string;
   stickyTop?: React.CSSProperties['top'];
   onRowClick: (meetingMinutesId: string) => void;
 }) => {
   const router = useRouter();
+
+  // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
   const { control_table } = useMemo(() => {
@@ -208,27 +315,50 @@ const List = ({
     };
 
     const tbody: Ttable['tbody'] = {
-      rowArr: [
-        {
+      rowArr: meetingMinutesArr.map((item, index) => {
+        const { id, createdAt, name } = item;
+
+        return {
           onClick: () => {
-            onRowClick('foo123');
+            onRowClick(id);
           },
           cellArr: [
             {
-              children: '2024年02月06日',
+              children: getTaiwanDateStr(createdAt) ?? '',
               width: 200,
               justifyContent: 'center',
             },
             {
-              children: '第一次工程協調會議紀錄',
+              children: name,
               flex: '1 0',
               justifyContent: 'center',
             },
           ],
-        },
-        ...foo,
-      ],
+        };
+      }),
     };
+    // const tbody: Ttable['tbody'] = {
+    //   rowArr: [
+    //     {
+    //       onClick: () => {
+    //         onRowClick('foo123');
+    //       },
+    //       cellArr: [
+    //         {
+    //           children: '2024年02月06日',
+    //           width: 200,
+    //           justifyContent: 'center',
+    //         },
+    //         {
+    //           children: '第一次工程協調會議紀錄',
+    //           flex: '1 0',
+    //           justifyContent: 'center',
+    //         },
+    //       ],
+    //     },
+    //     ...foo,
+    //   ],
+    // };
 
     const control_table: Ttable = {
       thead: thead,
@@ -256,7 +386,19 @@ const List = ({
 
 // ============================================================================
 
-const Edit = ({ disabled }: { disabled?: boolean }) => {
+const Edit = ({
+  meetingInEdit,
+  onStateChange,
+  disabled,
+  formMakerName,
+  className,
+}: {
+  meetingInEdit: Tstate_meetingMinutes | undefined;
+  onStateChange: (state: Tstate_meetingMinutes) => void;
+  disabled?: boolean;
+  formMakerName?: string;
+  className?: string;
+}) => {
   type TonChangeKeys = keyof Omit<
     Tstate_meetingMinutes,
     'chairmanEmployee' | 'attendeesEmployee' | 'minuteTakerEmployee'
@@ -304,14 +446,25 @@ const Edit = ({ disabled }: { disabled?: boolean }) => {
       };
 
   // ---------------------------------------------------------------------
+
   useEffect(() => {
     if (disabled) {
-      setState(employeeMeetingMinute());
+      if (!meetingInEdit) {
+        const empty = employeeMeetingMinute();
+        empty.formMaker = formMakerName ?? '';
+        setState(empty);
+      } else {
+        setState(meetingInEdit);
+      }
     }
-  }, [disabled]);
+  }, [disabled, meetingInEdit]);
+
+  useEffect(() => {
+    onStateChange && onStateChange(state);
+  }, [state]);
 
   return (
-    <>
+    <div className={classNames(className)}>
       <Wrapper>
         <Wrapper_inpuSel_01>
           {/*  */}
@@ -514,7 +667,7 @@ const Edit = ({ disabled }: { disabled?: boolean }) => {
             disabled={true}
             inputProps={{
               props: {
-                value: '999-99-99',
+                value: getTaiwanDateStr(state.createdAt) ?? '',
               },
             }}
           />
@@ -525,7 +678,8 @@ const Edit = ({ disabled }: { disabled?: boolean }) => {
             disabled={true}
             inputProps={{
               props: {
-                value: '製表人.chName',
+                value: state.formMaker ?? '',
+                onChange: () => {},
               },
             }}
           />
@@ -544,13 +698,16 @@ const Edit = ({ disabled }: { disabled?: boolean }) => {
         selLimit={selectorLimit}
         defaultEmpArr={defaultEmpArr}
       />
-    </>
+    </div>
   );
 };
 
 // ============================================================================
 
 const employeeMeetingMinute = (): Tstate_meetingMinutes => ({
+  id: undefined,
+  createdAt: new Date().toISOString(),
+
   // 所屬合約
   contract: undefined,
   // 會議名稱
@@ -588,411 +745,411 @@ const employeeMeetingMinute = (): Tstate_meetingMinutes => ({
 // ============================================================================
 // ============================================================================
 
-const foo = [
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-  {
-    cellArr: [
-      {
-        children: '2024年02月06日',
-        width: 200,
-        justifyContent: 'center',
-      },
-      {
-        children: '第一次工程協調會議紀錄',
-        flex: '1 0',
-        justifyContent: 'center',
-      },
-    ],
-  },
-];
+// const foo = [
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+//   {
+//     cellArr: [
+//       {
+//         children: '2024年02月06日',
+//         width: 200,
+//         justifyContent: 'center',
+//       },
+//       {
+//         children: '第一次工程協調會議紀錄',
+//         flex: '1 0',
+//         justifyContent: 'center',
+//       },
+//     ],
+//   },
+// ];

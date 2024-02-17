@@ -3034,14 +3034,22 @@ export type ToutsourcingPaymentDetailItemDto = {
   quotationItemStatusId?: string | null; // 其實應該是必填，不給會沒效果的樣子
 };
 
-export type TmeetingMinutesDto<
-  Tpopulate extends {
-    contract?: boolean;
-    chairmanEmployee?: boolean;
-    attendeesEmployee?: boolean;
-    minuteTakerEmployee?: boolean;
-  } = object
-> = {
+// ====================================================================
+
+// meeting-minutes
+
+export type Tpopulate_meetingMinutesDto = {
+  contract?: boolean;
+  chairmanEmployee?: boolean;
+  attendeesEmployee?: boolean;
+  minuteTakerEmployee?: boolean;
+};
+
+export type TmeetingMinutesDto<Tpopulate extends Tpopulate_meetingMinutesDto = object> = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 所屬合約
   contractId: string | null;
   // 所屬合約
@@ -3076,7 +3084,7 @@ export type TmeetingMinutesDto<
   formMaker: string;
 };
 
-type TcreateMeetingMinutesDto = {
+export type TcreateMeetingMinutesDto = {
   // 所屬合約Id
   contractId: string;
   // 會議名稱
@@ -3104,6 +3112,8 @@ type TcreateMeetingMinutesDto = {
   // 製表人
   formMaker: string;
 };
+
+export type TupdateMeetingMinutesDto = Omit<TcreateMeetingMinutesDto, 'id'>;
 
 // 依賴populate的泛型寫法
 
