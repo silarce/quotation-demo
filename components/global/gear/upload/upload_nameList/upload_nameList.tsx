@@ -16,7 +16,6 @@ import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './upload_nameList.module.scss';
-import { set } from 'lodash';
 
 // ====================================================================
 
@@ -167,12 +166,13 @@ export function Upload_nameList({
           {fileArr.map((item, index) => {
             const { id, name, type, src } = item;
 
-            // const src = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${id}`;
-
             return (
               <li key={index}>
                 <div>
-                  <IconDelete01 className={scss.btn} onClick={() => deleteFile(index, name)} />
+                  <IconDelete01
+                    className={classNames(scss.btn, disabled && scss.disabled)}
+                    onClick={() => deleteFile(index, name)}
+                  />
                   <span
                     onClick={() => {
                       setShowFileId(id);
@@ -209,7 +209,10 @@ export function Upload_nameList({
             return (
               <li key={index}>
                 <div>
-                  <IconDelete01 className={scss.btn} onClick={() => deleteNewFile(index, name)} />
+                  <IconDelete01
+                    className={classNames(scss.btn, disabled && scss.disabled)}
+                    onClick={() => deleteNewFile(index, name)}
+                  />
                   <span
                     onClick={() => {
                       setShowFileId(`${index}`);

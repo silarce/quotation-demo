@@ -1,3 +1,8 @@
+.disabled_temp {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .container {
   display: flex;
   gap: 20px;
@@ -23,8 +28,7 @@
     border: solid 1px theme("colors.border");
     cursor: pointer;
     &.disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
+      @extend .disabled_temp;
     }
   }
   ul {
@@ -41,6 +45,9 @@
         }
         > .btn {
           flex: none;
+          &.disabled {
+            @extend .disabled_temp;
+          }
         }
       }
     }
