@@ -10,25 +10,31 @@ import TwoBtnFooter from 'components/global/gear/modal/footer/twoBtnFooter';
 // css
 import scss from './simpleModal.module.scss';
 
-export default function InputModal({
-  visible,
-  title,
-  tip,
-  placeholder,
-  className,
-  onConfirm,
-  onCancel,
-  inputAttr,
-}: {
+// =====================================================
+type TinputModalProps = {
   visible: boolean;
   title: string;
+  className?: string;
   tip?: string;
   placeholder?: string;
   onConfirm?: (value: string) => void;
-  className?: string;
   onCancel?: () => void;
   inputAttr?: React.InputHTMLAttributes<HTMLInputElement>;
-}) {
+};
+
+export type { TinputModalProps };
+
+// =====================================================
+export default function InputModal({
+  visible,
+  title,
+  className,
+  tip,
+  placeholder,
+  onConfirm,
+  onCancel,
+  inputAttr,
+}: TinputModalProps) {
   const [value, setValue] = useState('');
 
   useEffect(() => {
