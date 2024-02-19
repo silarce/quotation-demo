@@ -41,6 +41,8 @@ const inputSelProps: TinputSelProps = {
 type TcontrolItem = {
   value: string;
   onChange?: (v: string) => void;
+  onClick?: () => void;
+  disabled?: boolean;
 };
 
 type Tcontrol = {
@@ -260,7 +262,7 @@ export default function QuotationProfile({
               caption="追蹤狀態"
               captionClassName={scss.input02}
               showBaseline="auto"
-              disabled={disabled}
+              disabled={trackProgress.disabled !== undefined ? trackProgress.disabled : disabled}
               {...inputSelProps}
               inputProps={{
                 props: {
@@ -268,6 +270,7 @@ export default function QuotationProfile({
                   onChange: (e) => {
                     trackProgress.onChange?.(e.target.value);
                   },
+                  onClick: trackProgress.onClick,
                 },
               }}
             />
@@ -276,7 +279,7 @@ export default function QuotationProfile({
               caption="工地進度"
               captionClassName={scss.input02}
               showBaseline="auto"
-              disabled={disabled}
+              disabled={projectProgress.disabled !== undefined ? projectProgress.disabled : disabled}
               {...inputSelProps}
               inputProps={{
                 props: {
@@ -284,6 +287,7 @@ export default function QuotationProfile({
                   onChange: (e) => {
                     projectProgress.onChange?.(e.target.value);
                   },
+                  onClick: projectProgress.onClick,
                 },
               }}
             />

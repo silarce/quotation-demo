@@ -75,7 +75,7 @@ import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModa
 import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01'; // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
-import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
+import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import CustomerSelector from 'components/global/gear/modal/customerSelector';
 
 // icon
@@ -115,6 +115,7 @@ import {
   //
   apiPatchQuotationToPending,
   apiPostCopyQuotation,
+  apiPatchQuotationContent_id_progress,
 } from 'js/api/api_quotation';
 
 // hook
@@ -123,6 +124,7 @@ import { useProductList } from 'hooks/quotation/useProduct';
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 import { TcreateQuotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
+import { fi } from 'date-fns/locale';
 
 // ------------------------------------------------------------------
 
@@ -211,6 +213,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [showPdf_part, setShowPdf_part] = useState(false);
 
   const [showMemoModal, setShowMemoModal] = useState(false);
+
+  const [inputModalConfig, setInputModalConfig] = useState<TinputModalProps>();
 
   // -----------------------------------------------------
 
@@ -511,16 +515,74 @@ function TheQuotation({ router }: { router: NextRouter }) {
         },
         trackProgress: {
           value: profile.trackProgress,
-          onChange: (v) => changeProfile('trackProgress', v),
+
+          onChange: isSendToReview
+            ? undefined
+            : (v) => {
+                !isSendToReview && changeProfile('trackProgress', v);
+              },
+
+          onClick: !isSendToReview
+            ? undefined
+            : () => {
+                setInputModalConfig({
+                  visible: true,
+                  title: '追蹤進度',
+                  placeholder: '請輸入追蹤進度',
+                  onConfirm: async (v) => {
+                    const res = await reqPatchQuotationContent_id_progress({
+                      trackProgress: v,
+                    });
+
+                    if (res) {
+                      const trackProgress = res.trackProgress;
+                      changeProfile('trackProgress', trackProgress);
+                    }
+
+                    setInputModalConfig(undefined);
+                  },
+                  onCancel: () => setInputModalConfig(undefined),
+                });
+              },
+          disabled: isSendToReview ? false : undefined,
         },
         projectProgress: {
           value: profile.projectProgress,
-          onChange: (v) => changeProfile('projectProgress', v),
+          // onChange: (v) => changeProfile('projectProgress', v),
+          onChange: isSendToReview
+            ? undefined
+            : (v) => {
+                !isSendToReview && changeProfile('projectProgress', v);
+              },
+          onClick: !isSendToReview
+            ? undefined
+            : () => {
+                setInputModalConfig({
+                  visible: true,
+                  title: '工程進度',
+                  placeholder: '請輸入工程進度',
+                  onConfirm: async (v) => {
+                    const res = await reqPatchQuotationContent_id_progress({
+                      projectProgress: v,
+                    });
+
+                    if (res) {
+                      const projectProgress = res.projectProgress;
+                      changeProfile('projectProgress', projectProgress);
+                    }
+
+                    setInputModalConfig(undefined);
+                  },
+                  onCancel: () => setInputModalConfig(undefined),
+                });
+              },
+          disabled: isSendToReview ? false : undefined,
         },
       },
     };
 
     return control_profile;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
   // -----------------------------------------------------
@@ -1725,6 +1787,36 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   };
 
+  // apiPatchQuotationContent_id_Progress
+
+  const reqPatchQuotationContent_id_progress = async ({
+    trackProgress,
+    projectProgress,
+  }: {
+    trackProgress?: string | null;
+    projectProgress?: string | null;
+  }) => {
+    const contentId = latestContent?.id;
+
+    if (!contentId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const res = await apiPatchQuotationContent_id_progress(contentId, {
+        trackProgress,
+        projectProgress,
+      });
+
+      return res;
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -2063,6 +2155,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
           setCustomerSelectorShow(false);
         }}
         selLimit={1}
+      />
+      {/*  */}
+
+      <InputModal
+        visible={!!inputModalConfig?.visible}
+        onConfirm={inputModalConfig?.onConfirm}
+        onCancel={inputModalConfig?.onCancel}
+        title={inputModalConfig?.title ?? ''}
+        placeholder={inputModalConfig?.placeholder}
       />
     </div>
   );
