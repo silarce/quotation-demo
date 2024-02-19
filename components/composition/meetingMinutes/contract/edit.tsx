@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useContext } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -30,6 +30,9 @@ import {
   useGetMeetingMinutes_id_attachments,
 } from 'js/api/api_meetingMinutes';
 
+// context
+import { AppContext } from 'pages/_app';
+
 // ================================================================================================
 
 type TmeetingMinutes = TmeetingMinutesDto<{
@@ -37,6 +40,7 @@ type TmeetingMinutes = TmeetingMinutesDto<{
   chairmanEmployee: true;
   attendeesEmployee: true;
   minuteTakerEmployee: true;
+  formMakerEmployee: true;
 }>;
 
 type Tstate_meetingMinutes = Omit<
@@ -47,6 +51,7 @@ type Tstate_meetingMinutes = Omit<
   | 'contract'
   | 'chairmanEmployee'
   | 'minuteTakerEmployee'
+  | 'formMakerEmployee'
   | 'id'
   | 'updatedAt'
 > & {
@@ -54,6 +59,7 @@ type Tstate_meetingMinutes = Omit<
   contract: TmeetingMinutes['contract'] | undefined;
   chairmanEmployee: TmeetingMinutes['chairmanEmployee'] | undefined;
   minuteTakerEmployee: TmeetingMinutes['minuteTakerEmployee'] | undefined;
+  formMakerEmployee: TmeetingMinutes['formMakerEmployee'] | undefined;
 };
 
 export type { Tstate_meetingMinutes };
@@ -64,7 +70,7 @@ export const MeetingMinuteEdit = ({
   onStateChange,
   onFilesChange,
   disabled,
-  formMakerName,
+  // formMakerName,
   className,
 }: {
   meetingMinuteId: string | undefined;
@@ -75,7 +81,7 @@ export const MeetingMinuteEdit = ({
   }) => void;
   onFilesChange: TonFilsChange;
   disabled?: boolean;
-  formMakerName?: string;
+  // formMakerName?: string;
   className?: string;
 }) => {
   type TonChangeKeys = keyof Omit<
@@ -96,6 +102,10 @@ export const MeetingMinuteEdit = ({
 
   // ---------------------------------------------------------------------
 
+  const { userInfo } = useContext(AppContext);
+
+  // ---------------------------------------------------------------------
+
   const {
     data: meeingMinute,
     update: update_meetingMinute,
@@ -107,6 +117,7 @@ export const MeetingMinuteEdit = ({
     setData: setAttachments,
     isLoading: isLoading_attachments,
   } = useGetMeetingMinutes_id_attachments(meetingMinuteId);
+
   // ---------------------------------------------------------------------
 
   const attendeesEmployeeNames = state_meetingMinutes.attendeesEmployee.map((v) => v.chName).join('、');
@@ -165,7 +176,7 @@ export const MeetingMinuteEdit = ({
     if (disabled) {
       if (!meeingMinute) {
         const empty = employeeMeetingMinute();
-        empty.formMaker = formMakerName ?? '';
+        empty.formMakerEmployee = userInfo?.employee;
         setState_meetingMinutes(empty);
         setAttachments(undefined);
       } else {
@@ -391,15 +402,18 @@ export const MeetingMinuteEdit = ({
               },
             }}
           />
+
           <InputSel
             {...inputSelProps}
             caption="製表人"
             showBaseline="auto"
-            disabled={true}
+            disabled={disabled}
+            // onClick={() => {
+            //   // onSelectorClick('formMakerEmployee');
+            // }}
             inputProps={{
               props: {
-                value: state_meetingMinutes.formMaker ?? '',
-                onChange: () => {},
+                value: state_meetingMinutes.formMakerEmployee?.chName ?? '',
               },
             }}
           />
@@ -452,5 +466,5 @@ const employeeMeetingMinute = (): Tstate_meetingMinutes => ({
   // 竣工時間 date
   completionTime: '',
   // 製表人
-  formMaker: '',
+  formMakerEmployee: undefined,
 });

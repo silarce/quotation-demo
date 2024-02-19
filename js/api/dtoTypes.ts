@@ -3043,6 +3043,7 @@ export type Tpopulate_meetingMinutesDto = {
   chairmanEmployee?: boolean;
   attendeesEmployee?: boolean;
   minuteTakerEmployee?: boolean;
+  formMakerEmployee?: boolean;
 };
 
 export type TmeetingMinutesDto<Tpopulate extends Tpopulate_meetingMinutesDto = object> = {
@@ -3081,7 +3082,7 @@ export type TmeetingMinutesDto<Tpopulate extends Tpopulate_meetingMinutesDto = o
   // 竣工時間 date
   completionTime: string | null;
   // 製表人
-  formMaker: string;
+  formMakerEmployee: Tpopulate['formMakerEmployee'] extends true ? TemployeeDto : undefined;
 };
 
 export type TcreateMeetingMinutesDto = {
@@ -3110,7 +3111,7 @@ export type TcreateMeetingMinutesDto = {
   // 竣工時間
   completionTime?: string | null;
   // 製表人
-  formMaker: string;
+  formMakerEmployeeId: string;
 };
 
 export type TupdateMeetingMinutesDto = Omit<TcreateMeetingMinutesDto, 'id'>;

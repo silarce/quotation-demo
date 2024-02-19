@@ -74,7 +74,13 @@ export function useGetMeetingMinutes<Tpopulate extends Tpopulate_meetingMinutesD
 export const apiGetMeetingMinutes_id = async (id: string, params?: Tparams) => {
   const api = `/meeting-minutes/${id}`;
 
-  const populate = ['contract', 'chairmanEmployee', 'attendeesEmployee', 'minuteTakerEmployee'];
+  const populate: (keyof Tpopulate_meetingMinutesDto)[] = [
+    'contract',
+    'chairmanEmployee',
+    'attendeesEmployee',
+    'minuteTakerEmployee',
+    'formMakerEmployee',
+  ];
 
   params = { ...params, populate };
 
@@ -85,6 +91,7 @@ export const apiGetMeetingMinutes_id = async (id: string, params?: Tparams) => {
         chairmanEmployee: true;
         attendeesEmployee: true;
         minuteTakerEmployee: true;
+        formMakerEmployee: true;
       }>
     >(api, { params })
     .then((res) => res.data)
@@ -102,6 +109,7 @@ export const useGetMeetingMinutes_id = (
       chairmanEmployee: true;
       attendeesEmployee: true;
       minuteTakerEmployee: true;
+      formMakerEmployee: true;
     }>
   >();
   const [isLoading, setIsLoading] = useState(false);

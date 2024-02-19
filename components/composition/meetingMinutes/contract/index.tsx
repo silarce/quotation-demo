@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { forwardRef, useImperativeHandle } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
@@ -24,9 +24,6 @@ import {
   apiPostMeetingMinutes_id_attachments,
   apiDeleteMeetingMinutes_id_attachments,
 } from 'js/api/api_meetingMinutes';
-
-// context
-import { AppContext } from 'pages/_app';
 
 // ---------------------------------------------------------------------------
 
@@ -68,8 +65,6 @@ function MeetingMinutes_contract_component(
   //
   const router = useRouter();
   const { contractId, meetingMinutesId } = router.query as Tquery;
-
-  const { userInfo } = useContext(AppContext);
 
   // ------------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
@@ -123,7 +118,7 @@ function MeetingMinutes_contract_component(
   const reqPostPatch = async () => {
     const state = state_meetingMinures;
 
-    if (!contractId || !state || !state.chairmanEmployee || !state.minuteTakerEmployee) {
+    if (!contractId || !state || !state.chairmanEmployee || !state.minuteTakerEmployee || !state.formMakerEmployee) {
       return;
     }
 
@@ -142,7 +137,7 @@ function MeetingMinutes_contract_component(
       inspctionTime: state.inspectionTime,
       timeline: state.timeline,
       completionTime: state.completionTime,
-      formMaker: state.formMaker,
+      formMakerEmployeeId: state.formMakerEmployee?.id,
     };
 
     try {
@@ -264,7 +259,6 @@ function MeetingMinutes_contract_component(
           setIsLoading_edit(isLoading_meetingMinute || isLoading_attachments);
         }}
         onFilesChange={onFilesChange}
-        formMakerName={userInfo?.employee?.chName ?? ''}
       />
     </div>
   );
