@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect, useMemo, useContext, forwardRef, useImperativeHandle } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -72,28 +72,38 @@ type TselectorKeys = keyof Pick<
   'chairmanEmployee' | 'attendeesEmployee' | 'minuteTakerEmployee'
 >;
 
-export type { Tstate_meetingMinutes };
+type TimperativeHandle = {
+  update: () => void;
+};
+
+export type { Tstate_meetingMinutes, TimperativeHandle };
 
 // ================================================================================================
-export const MeetingMinuteEdit = ({
-  meetingMinuteId,
-  onStateChange,
-  onFilesChange,
-  disabled,
-  // formMakerName,
-  className,
-}: {
-  meetingMinuteId: string | undefined;
-  onStateChange: (states: {
-    state_meetingMinutes: Tstate_meetingMinutes;
-    isLoading_meetingMinute: boolean;
-    isLoading_attachments: boolean;
-  }) => void;
-  onFilesChange: TonFilsChange;
-  disabled?: boolean;
-  // formMakerName?: string;
-  className?: string;
-}) => {
+
+export const MeetingMinuteEdit = forwardRef(MeetingMinuteEdit_component);
+
+function MeetingMinuteEdit_component(
+  {
+    meetingMinuteId,
+    onStateChange,
+    onFilesChange,
+    disabled,
+    // formMakerName,
+    className,
+  }: {
+    meetingMinuteId: string | undefined;
+    onStateChange: (states: {
+      state_meetingMinutes: Tstate_meetingMinutes;
+      isLoading_meetingMinute: boolean;
+      isLoading_attachments: boolean;
+    }) => void;
+    onFilesChange: TonFilsChange;
+    disabled?: boolean;
+    // formMakerName?: string;
+    className?: string;
+  },
+  ref: React.ForwardedRef<unknown>
+) {
   // ---------------------------------------------------------------------
 
   const [state_meetingMinutes, setState_meetingMinutes] = useState<Tstate_meetingMinutes>(employeeMeetingMinute());
@@ -109,6 +119,7 @@ export const MeetingMinuteEdit = ({
   const {
     data: meeingMinute,
     update: update_meetingMinute,
+    setData: setMeetingMinute,
     isLoading: isLoading_meetingMinute,
   } = useGetMeetingMinutes_id(meetingMinuteId);
   const {
@@ -116,7 +127,7 @@ export const MeetingMinuteEdit = ({
     update: update_attachments,
     setData: setAttachments,
     isLoading: isLoading_attachments,
-  } = useGetMeetingMinutes_id_attachments(meetingMinuteId);
+  } = useGetMeetingMinutes_id_attachments(meetingMinuteId, { sortBy: 'createdAt' });
 
   // ---------------------------------------------------------------------
 
@@ -164,11 +175,29 @@ export const MeetingMinuteEdit = ({
         setSelectorKey(undefined);
       };
 
+  const update = async () => {
+    return Promise.all([update_meetingMinute(), update_attachments()]);
+  };
+
+  useImperativeHandle(
+    ref,
+    (): TimperativeHandle => ({
+      update,
+    })
+  );
+
   // ---------------------------------------------------------------------
 
   useEffect(() => {
-    update_meetingMinute();
-    update_attachments();
+    if (meetingMinuteId) {
+      update_meetingMinute();
+      update_attachments();
+    } else {
+      setMeetingMinute(undefined);
+      setAttachments(undefined);
+      setState_meetingMinutes(employeeMeetingMinute());
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [meetingMinuteId]);
 
@@ -434,7 +463,7 @@ export const MeetingMinuteEdit = ({
       />
     </div>
   );
-};
+}
 
 // =============================================================================
 const employeeMeetingMinute = (): Tstate_meetingMinutes => ({

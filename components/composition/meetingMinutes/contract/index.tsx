@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { forwardRef, useImperativeHandle } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
 // component
 import { MeetingMinuteList } from './list';
-import { MeetingMinuteEdit, Tstate_meetingMinutes } from './edit';
+import { MeetingMinuteEdit, Tstate_meetingMinutes, TimperativeHandle as TimperativeHandle_edit } from './edit';
 
 // gear
 import { Tfile, TfileOriginal, TonFilsChange } from 'components/global/gear/upload/upload_nameList/upload_nameList';
@@ -66,6 +66,8 @@ function MeetingMinutes_contract_component(
   const router = useRouter();
   const { contractId, meetingMinutesId } = router.query as Tquery;
 
+  const ref_edit = useRef<TimperativeHandle_edit>(null);
+
   // ------------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
   const [isLoading_req, setIsLoading_req] = useState(false);
@@ -119,7 +121,21 @@ function MeetingMinutes_contract_component(
     const state = state_meetingMinures;
 
     if (!contractId || !state || !state.chairmanEmployee || !state.minuteTakerEmployee || !state.formMakerEmployee) {
-      return;
+      myAlert.info({
+        title: '資料不足',
+        content: '請選擇會議主席、記錄人員、製表人',
+      });
+
+      return false;
+    }
+
+    if (!state.minuteDate) {
+      myAlert.info({
+        title: '資料不足',
+        content: '請選擇會議日期',
+      });
+
+      return false;
     }
 
     let meetingMinuteId = state.id;
@@ -133,13 +149,14 @@ function MeetingMinutes_contract_component(
       minuteDate: state.minuteDate,
       minuteTakerEmployeeId: state.minuteTakerEmployee?.id,
       content: state.content,
-      entryTime: state.entryTime,
-      inspctionTime: state.inspectionTime,
-      timeline: state.timeline,
-      completionTime: state.completionTime,
+      entryTime: state.entryTime || undefined,
+      inspectionTime: state.inspectionTime || undefined,
+      timeline: state.timeline || undefined,
+      completionTime: state.completionTime || undefined,
       formMakerEmployeeId: state.formMakerEmployee?.id,
     };
 
+    // admin不能用
     try {
       if (!meetingMinuteId) {
         const res = await apiPostMeetingMinutes(body);
@@ -148,15 +165,13 @@ function MeetingMinutes_contract_component(
         await apiPatchMeetingMinutes(meetingMinuteId, body);
       }
 
-      await update_meetingMinutesArr();
+      update_meetingMinutesArr();
+
+      return meetingMinuteId;
     } catch (error) {}
   };
 
-  const reqAttachments = async () => {
-    if (!meetingMinutesId) {
-      return;
-    }
-
+  const reqAttachments = async (meetingMinutesId: string) => {
     for (const file of deletedFileDtoArr) {
       try {
         await apiDeleteMeetingMinutes_id_attachments(meetingMinutesId, file.id, { showAlert: false });
@@ -212,7 +227,15 @@ function MeetingMinutes_contract_component(
       },
       reqPostPatch: async () => {
         setIsLoading_req(true);
-        await Promise.all([reqPostPatch(), reqAttachments()]);
+
+        const id = await reqPostPatch();
+
+        if (id) {
+          await reqAttachments(id);
+          await ref_edit.current?.update();
+          setDisabled(true);
+        }
+
         setIsLoading_req(false);
       },
       //
@@ -235,7 +258,7 @@ function MeetingMinutes_contract_component(
         isLoading: isLoading_req || isLoading_edit || isLoading_meetingMinutesArr,
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdd, isEdit, isRead]);
+  }, [isAdd, isEdit, isRead, isLoading_req, isLoading_edit, isLoading_meetingMinutesArr]);
 
   // ---------------------------------------------------------------------------
 
@@ -251,6 +274,7 @@ function MeetingMinutes_contract_component(
       )}
 
       <MeetingMinuteEdit
+        ref={ref_edit}
         className={classNames(!(isAdd || isEdit || isRead) && 'hidden')}
         meetingMinuteId={meetingMinutesId}
         disabled={disabled}

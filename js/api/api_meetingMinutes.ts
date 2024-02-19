@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import _ from 'lodash';
 
 import { axi } from './_axiosCreator';
 import { AxiosError } from 'axios';
@@ -137,6 +138,7 @@ export const useGetMeetingMinutes_id = (
   return {
     data: res,
     isLoading,
+    setData: setRes,
     update,
   };
 };
@@ -191,7 +193,16 @@ export const apiGetMeetingMinutes_id_attachments = async (id: string) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetMeetingMinutes_id_attachments = (id: string | undefined) => {
+export const useGetMeetingMinutes_id_attachments = (
+  id: string | undefined,
+  {
+    sortBy,
+    order = 'ASC',
+  }: {
+    sortBy?: string;
+    order?: 'DESC' | 'ASC';
+  } = {}
+) => {
   const [res, setRes] = useState<TfileDto[]>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -202,7 +213,16 @@ export const useGetMeetingMinutes_id_attachments = (id: string | undefined) => {
 
     try {
       setIsLoading(true);
-      const res = await apiGetMeetingMinutes_id_attachments(id);
+      let res = await apiGetMeetingMinutes_id_attachments(id);
+
+      if (sortBy) {
+        res = _.sortBy(res, sortBy);
+
+        if (order === 'DESC') {
+          res = res.reverse();
+        }
+      }
+
       setRes(res);
     } catch (error) {
     } finally {

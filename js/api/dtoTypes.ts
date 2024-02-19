@@ -3105,7 +3105,7 @@ export type TcreateMeetingMinutesDto = {
   // 進場時間
   entryTime?: string | null;
   // 消檢時間
-  inspctionTime?: string | null;
+  inspectionTime?: string | null;
   // 使照時程
   timeline?: string | null;
   // 竣工時間
