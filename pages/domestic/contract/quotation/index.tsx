@@ -15,7 +15,8 @@ import classNames from 'classnames';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // components
-import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
+// import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
+import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
 import QuotationProdChangingRecord from 'components/page/domestic/quotation/quotationProdChangingRecord';
 import QuotationRecord from 'components/page/domestic/quotation/quotationRecord';
 // import Table_prod from 'components/page/domestic/contract/table/table_prod';
@@ -40,10 +41,11 @@ import QuotationSinature from 'components/page/domestic/quotation/quotationSinat
 import { Collapse } from 'antd';
 const { Panel } = Collapse;
 
-// global
+// gear
 import PageHeader02, { TtagList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // css
 import scss from './quotation.module.scss';
@@ -53,6 +55,7 @@ import {
   useGetContract_id_noItems_2,
   useQuotation_id_attachments,
   apiGetQuotationProducts,
+  apiPatchQuotationContent_id_progress,
 } from 'js/api/api_quotation';
 import { apiPostEngineeringContact } from 'js/api/api_engineering';
 
@@ -516,7 +519,168 @@ version>1 是子合約
     }
   })();
 
-  // -----------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+
+  const [inputModalConfig, setInputModalConfig] = useState<TinputModalProps>();
+
+  const control_profile = useMemo(() => {
+    const control_profile: Tcontrol_profile = {
+      quotationNumber: content?.quotationNumber ?? '',
+      quotationDate: content?.quotationDate ?? '',
+      customer: {
+        value: content?.customer,
+        // onChange: (customer) => {
+        //   const customerPhoneNumber = customer.phone || '';
+        //   const contact = customer.contacts?.[0];
+        //   const name = contact?.name ?? '';
+        //   const phone = contact?.phone || customerPhoneNumber || '';
+        //   const fax = customer.fax || '';
+
+        //   setCustomer(customer);
+        //   changeProfile('contactPerson', `${name}`);
+        //   changeProfile('contactNumber', phone);
+        //   changeProfile('faxNumber', fax);
+        // },
+        // onClear: () => {
+        //   setCustomer(null);
+        //   changeProfile('contactPerson', '');
+        //   changeProfile('contactNumber', '');
+        //   changeProfile('faxNumber', '');
+        // },
+      },
+      itemList: {
+        validityPeriod: {
+          value: content?.validityPeriod ?? '',
+          // onChange: (v) => changeProfile('validityPeriod', v),
+        },
+        projectName: {
+          value: content?.projectName ?? '',
+          // onChange: (v) => changeProfile('projectName', v),
+        },
+        county: {
+          value: content?.county ?? '',
+          // onChange: (v) => {
+          //   changeProfile('county', v);
+          //   changeProfile('district', '');
+          // },
+        },
+        district: {
+          value: content?.district ?? '',
+          // onChange: (v) => changeProfile('district', v),
+        },
+        address: {
+          value: content?.address ?? '',
+          // onChange: (v) => changeProfile('address', v),
+        },
+        contactPerson: {
+          value: content?.contactPerson ?? '',
+          // onChange: (v) => changeProfile('contactPerson', v),
+        },
+        contactNumber: {
+          value: content?.contactNumber ?? '',
+          // onChange: (v) => changeProfile('contactNumber', v),
+        },
+        faxNumber: {
+          value: content?.faxNumber ?? '',
+          // onChange: (v) => changeProfile('faxNumber', v),
+        },
+        trackProgress: {
+          value: content?.trackProgress ?? '',
+
+          onClick: () => {
+            setInputModalConfig({
+              visible: true,
+              title: '追蹤進度',
+              placeholder: '請輸入追蹤進度',
+              onConfirm: async (v) => {
+                const res = await reqPatchQuotationContent_id_progress({
+                  trackProgress: v,
+                });
+
+                if (res) {
+                  // const trackProgress = res.trackProgress;
+                  // changeProfile('trackProgress', trackProgress);
+                  update();
+                }
+
+                setInputModalConfig(undefined);
+              },
+              onCancel: () => setInputModalConfig(undefined),
+            });
+          },
+          disabled: false,
+        },
+        projectProgress: {
+          value: content?.projectProgress ?? '',
+
+          onClick: () => {
+            setInputModalConfig({
+              visible: true,
+              title: '工程進度',
+              placeholder: '請輸入工程進度',
+              onConfirm: async (v) => {
+                const res = await reqPatchQuotationContent_id_progress({
+                  projectProgress: v,
+                });
+
+                if (res) {
+                  // const projectProgress = res.projectProgress;
+                  // changeProfile('projectProgress', projectProgress);
+                  update();
+                }
+
+                setInputModalConfig(undefined);
+              },
+              onCancel: () => setInputModalConfig(undefined),
+            });
+          },
+          disabled: false,
+        },
+      },
+    };
+
+    return control_profile;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content]);
+
+  const reqPatchQuotationContent_id_progress = async ({
+    trackProgress,
+    projectProgress,
+  }: {
+    trackProgress?: string | null;
+    projectProgress?: string | null;
+  }) => {
+    const contentId = content?.id;
+
+    if (!contentId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const res = await apiPatchQuotationContent_id_progress(contentId, {
+        trackProgress,
+        projectProgress,
+      });
+
+      return res;
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
 
   return (
     <SubLayer
@@ -534,7 +698,7 @@ version>1 是子合約
         {/* <ContractNode /> */}
         <div className={classNames(scss.quotation, isShowWorkContactDoc && 'hidden')}>
           {/* 報價單基本資料 */}
-          <QuotationProfile profile={content} disabled={true} onProfileChange={() => {}} />
+          <QuotationProfile disabled={true} control={control_profile} />
 
           {/* switch01 */}
           <div className={scss.switchBar}>
@@ -644,6 +808,13 @@ version>1 是子合約
             onStateChange={onWorkContactStateChange}
           />
         </div>
+        <InputModal
+          visible={!!inputModalConfig?.visible}
+          onConfirm={inputModalConfig?.onConfirm}
+          onCancel={inputModalConfig?.onCancel}
+          title={inputModalConfig?.title ?? ''}
+          placeholder={inputModalConfig?.placeholder}
+        />
       </div>
     </SubLayer>
   );

@@ -933,6 +933,28 @@ export const apiPostCopyQuotation = (body: { quotationId: string; customerId: st
 
 // ========================================================================
 
+// 編輯報價單追蹤狀態
+type TpatchQuotationContent_id_Progress = {
+  trackProgress?: string | null;
+  projectProgress?: string | null;
+};
+
+export const apiPatchQuotationContent_id_progress = (contentId: string, body: TpatchQuotationContent_id_Progress) => {
+  const api = `/quotation/content/${contentId}/progress`;
+
+  return axi
+    .patch<TquotationContentDto>(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '編輯報價單失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// ========================================================================
+
 const lookpu_contractPopulate = {
   basic: ['content'],
   // contract_noItem: [
