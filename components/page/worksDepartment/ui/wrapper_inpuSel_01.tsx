@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 
 import styled from '@emotion/styled';
-import { css, ClassNames } from '@emotion/react';
+import { ClassNames } from '@emotion/react';
 import theme01 from 'styles/_theme01.module.scss';
 import classNames from 'classnames';
 
@@ -69,11 +69,12 @@ const WrappedTextarea = ({
         const css_inputSel_textarea = css`
           align-items: flex-start;
         `;
-        const css_areatextCaption = css`
-          transform: translateY(-6px);
-        `;
+        // const css_areatextCaption = css`
+        //   transform: translateY(-0px);
+        // `;
         const css_textarea = css`
-          padding: 3px 12px;
+          /* 有左padding的話會無法對其上方或下方的inputSel */
+          padding: 3px 0px;
           font-size: 14px;
           border: solid 1px ${disabled ? 'transparent' : theme01.colors_border};
         `;
@@ -83,7 +84,7 @@ const WrappedTextarea = ({
             <InputSel
               {...inputSelProps_default}
               className={css_inputSel_textarea}
-              captionClassName={css_areatextCaption}
+              // captionClassName={css_areatextCaption}
               showBaseline="invisible"
               caption="備註"
               disabled={disabled}
