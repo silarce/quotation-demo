@@ -251,7 +251,7 @@ function MeetingMinutes_contract_component(
       )}
 
       <MeetingMinuteEdit
-        className={classNames(!(isAdd || isEdit) && 'hidden')}
+        className={classNames(!(isAdd || isEdit || isRead) && 'hidden')}
         meetingMinuteId={meetingMinutesId}
         disabled={disabled}
         onStateChange={({ state_meetingMinutes, isLoading_meetingMinute, isLoading_attachments }) => {

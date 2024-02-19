@@ -62,6 +62,16 @@ type Tstate_meetingMinutes = Omit<
   formMakerEmployee: TmeetingMinutes['formMakerEmployee'] | undefined;
 };
 
+type TonChangeKeys = keyof Omit<
+  Tstate_meetingMinutes,
+  'chairmanEmployee' | 'attendeesEmployee' | 'minuteTakerEmployee'
+>;
+
+type TselectorKeys = keyof Pick<
+  Tstate_meetingMinutes,
+  'chairmanEmployee' | 'attendeesEmployee' | 'minuteTakerEmployee'
+>;
+
 export type { Tstate_meetingMinutes };
 
 // ================================================================================================
@@ -84,16 +94,6 @@ export const MeetingMinuteEdit = ({
   // formMakerName?: string;
   className?: string;
 }) => {
-  type TonChangeKeys = keyof Omit<
-    Tstate_meetingMinutes,
-    'chairmanEmployee' | 'attendeesEmployee' | 'minuteTakerEmployee'
-  >;
-
-  type TselectorKeys = keyof Pick<
-    Tstate_meetingMinutes,
-    'chairmanEmployee' | 'attendeesEmployee' | 'minuteTakerEmployee'
-  >;
-
   // ---------------------------------------------------------------------
 
   const [state_meetingMinutes, setState_meetingMinutes] = useState<Tstate_meetingMinutes>(employeeMeetingMinute());
