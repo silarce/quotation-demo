@@ -250,15 +250,14 @@ function MeetingMinutes_contract_component(
   }, []);
 
   useEffect(() => {
-    onStateChange &&
-      onStateChange({
-        isAdd,
-        isEdit,
-        isRead,
-        isLoading: isLoading_req || isLoading_edit || isLoading_meetingMinutesArr,
+    return () => {
+      router.push({
+        query: {
+          ...router.query,
+          meetingMinutesId: undefined,
+        },
       });
 
-    return () => {
       onStateChange &&
         onStateChange({
           isAdd: false,
@@ -267,6 +266,16 @@ function MeetingMinutes_contract_component(
           isLoading: false,
         });
     };
+  }, []);
+
+  useEffect(() => {
+    onStateChange &&
+      onStateChange({
+        isAdd,
+        isEdit,
+        isRead,
+        isLoading: isLoading_req || isLoading_edit || isLoading_meetingMinutesArr,
+      });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdd, isEdit, isRead, isLoading_req, isLoading_edit, isLoading_meetingMinutesArr]);
