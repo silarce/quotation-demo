@@ -122,6 +122,11 @@
         }
       }
     }
+    &.notShowSuffixIcon {
+      :global(.ant-picker-suffix) {
+        visibility: hidden;
+      }
+    }
   }
 } // datePickerBox
 
