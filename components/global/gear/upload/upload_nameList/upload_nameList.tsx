@@ -171,7 +171,7 @@ export function Upload_nameList({
                 <div>
                   <IconDelete01
                     className={classNames(scss.btn, disabled && scss.disabled)}
-                    onClick={() => deleteFile(index, name)}
+                    onClick={() => !disabled && deleteFile(index, name)}
                   />
 
                   {type !== 'other' && (
@@ -220,7 +220,7 @@ export function Upload_nameList({
                 <div>
                   <IconDelete01
                     className={classNames(scss.btn, disabled && scss.disabled)}
-                    onClick={() => deleteNewFile(index, name)}
+                    onClick={() => !disabled && deleteNewFile(index, name)}
                   />
 
                   {type !== 'other' && (
