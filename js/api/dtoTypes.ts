@@ -1115,27 +1115,64 @@ export type TdeliveryStatusDto = {
   otherWorkItemTotal: number | null;
 };
 
-export type TcreateEngineeringDeliveryStatusDto = {
+export type TengineeringDeliveryStatusDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  // 所屬產品Id
+  productItemId: string | null;
+  // 所屬產品
+  productItem: TquotationProductItemDto;
+  // 備註
   notes: string | null;
-  itemName: string | null;
+  // 出貨日
   shippingDate: string | null;
-  installerEmployeeId: string | null;
+  // 項目名稱
+  itemName: string | null;
+  // 安裝人員(外包)ID
+  installerOutsourcingId: string | null;
+  // 安裝人員(外包)
+  installerOutsourcing: ToutsourcingDto;
+  // 安裝人員(員工)
+  installerEmployees: TemployeeDto[];
+  // 安裝日期
   installationDate: string | null;
+  // 工作表開立日期
+  workSheetInvoiceDate: string | null;
+  // 追加
   append: string | null;
+  // 完成追加
   completeAppend: string | null;
+  // 單樘計價
+  unitPrice: number | null;
+  // 其他特殊工作項目
+  otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
+  // 其他特殊工作項目合計
+  otherWorkItemTotal: number | null;
+};
+
+export type TcreateEngineeringDeliveryStatusDto = {
+  // 備註
+  notes: string | null;
+  // 項目名稱
+  itemName: string | null;
+  // 出貨日
+  shippingDate: string | null;
+  // 安裝人員id(外包廠商)
+  installerOutsourcingId: string | null;
+  // 安裝人員id(員工)
+  installerEmployees: (string | null)[];
+  // 安裝日期
+  installationDate: string | null;
+  // 追加
+  append: string | null;
+  // 完成追加
+  completeAppend: string | null;
+  // 所屬產品id
   productItemId: string;
 };
 
-export type TupdateEngineeringDeliveryStatusDto = {
-  notes: string | null;
-  itemName: string | null;
-  shippingDate: string | null;
-  installerEmployeeId: string | null;
-  installationDate: string | null;
-  append: string | null;
-  completeAppend: string | null;
-  productItemId: string;
-};
+export type TupdateEngineeringDeliveryStatusDto = TcreateEngineeringDeliveryStatusDto;
 
 export type TupdateDeliveryStatus = {
   id: string;
@@ -1171,7 +1208,7 @@ export type TquotationProductItemDto = Omit<
   itemName: string;
   worksheetId: string;
   others: null;
-  deliveryStatus?: TdeliveryStatusDto[] | null;
+  deliveryStatus?: TengineeringDeliveryStatusDto[] | null;
   adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
   adjustedItemId?: string | null;
   //

@@ -68,7 +68,7 @@ type TdeliveryStatusInEdit = {
     [key: string /*itemId */]: {
       [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
         id?: string;
-        installerEmployee?: ToutsourcingDto | null;
+        installerOutsourcing?: ToutsourcingDto | null;
       };
     };
   };
@@ -420,7 +420,7 @@ export default function OutboundOrder({
               const copy = { ...state };
 
               if (key === 'installerEmployee') {
-                copy[prodKey][itemId][statusId]['installerEmployee'] = employee;
+                copy[prodKey][itemId][statusId]['installerOutsourcing'] = employee;
               } else {
                 copy[prodKey][itemId][statusId][key] = value ?? '';
               }
@@ -516,7 +516,7 @@ export default function OutboundOrder({
 
               const body = {
                 ...deleveryStatus,
-                installerEmployeeId: deleveryStatus.installerEmployee?.id ?? null,
+                installerEmployeeId: deleveryStatus.installerOutsourcing?.id ?? null,
               };
 
               const res = await reqPatch({
@@ -563,7 +563,7 @@ export default function OutboundOrder({
 
           installerArr.push({
             disabled,
-            empolyee: deleveryStatus?.installerEmployee ?? (status.installerEmployee || null),
+            empolyee: deleveryStatus?.installerOutsourcing ?? (status.installerEmployee || null),
             onChange_employee: (employee) => {
               if (!deleveryStatus || !havePermissionToEdit) {
                 return;
