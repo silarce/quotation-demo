@@ -3034,7 +3034,89 @@ export type ToutsourcingPaymentDetailItemDto = {
   quotationItemStatusId?: string | null; // 其實應該是必填，不給會沒效果的樣子
 };
 
-// 暫時留作參考
+// ====================================================================
+
+// meeting-minutes
+
+export type Tpopulate_meetingMinutesDto = {
+  contract?: boolean;
+  chairmanEmployee?: boolean;
+  attendeesEmployee?: boolean;
+  minuteTakerEmployee?: boolean;
+  formMakerEmployee?: boolean;
+};
+
+export type TmeetingMinutesDto<Tpopulate extends Tpopulate_meetingMinutesDto = object> = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 所屬合約
+  contractId: string | null;
+  // 所屬合約
+  contract: Tpopulate['contract'] extends true ? TquotationContractDto : undefined;
+  // 會議名稱
+  name: string;
+  // 地點
+  location: string;
+  // 主席id
+  chairmanEmployeeId: string | null;
+  // 主席
+  chairmanEmployee: Tpopulate['chairmanEmployee'] extends true ? TemployeeDto : undefined;
+  // 與會人員
+  attendeesEmployee: Tpopulate['attendeesEmployee'] extends true ? TemployeeDto[] : undefined;
+  // 會議時間 date
+  minuteDate: string;
+  // 記錄人id
+  minuteTakerEmployeeId: string | null;
+  // 記錄人
+  minuteTakerEmployee: Tpopulate['minuteTakerEmployee'] extends true ? TemployeeDto : undefined;
+  // 會議記錄內容
+  content: string;
+  // 進場時間 date
+  entryTime: string | null;
+  // 消檢時間 date
+  inspectionTime: string | null;
+  // 使照時程 date
+  timeline: string | null;
+  // 竣工時間 date
+  completionTime: string | null;
+  // 製表人
+  formMakerEmployee: Tpopulate['formMakerEmployee'] extends true ? TemployeeDto : undefined;
+};
+
+export type TcreateMeetingMinutesDto = {
+  // 所屬合約Id
+  contractId: string;
+  // 會議名稱
+  name: string;
+  // 地點
+  location: string;
+  // 主席Id
+  chairmanEmployeeId: string;
+  // 與會人員
+  attendeesEmployee: string[];
+  // 會議時間
+  minuteDate: string;
+  // 記錄人
+  minuteTakerEmployeeId: string;
+  // 會議記錄內容
+  content: string;
+  // 進場時間
+  entryTime?: string | null;
+  // 消檢時間
+  inspectionTime?: string | null;
+  // 使照時程
+  timeline?: string | null;
+  // 竣工時間
+  completionTime?: string | null;
+  // 製表人
+  formMakerEmployeeId: string;
+};
+
+export type TupdateMeetingMinutesDto = Omit<TcreateMeetingMinutesDto, 'id'>;
+
+// 依賴populate的泛型寫法
 
 // type Tooo = {
 //   foo?: boolean;

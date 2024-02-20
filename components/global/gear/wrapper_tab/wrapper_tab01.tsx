@@ -23,7 +23,7 @@ const Wrapper_tab = ({
   tabBarStyle?: React.CSSProperties;
   tabArr?: Ttab[];
   stickyTop?: {
-    top: number;
+    top: React.CSSProperties['top'];
     background?: React.CSSProperties['background'];
     zIndex?: React.CSSProperties['zIndex'];
     style?: React.CSSProperties;

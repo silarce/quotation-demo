@@ -289,6 +289,7 @@ export default function InputSel({
         <MyDatePicker
           wrapperClassName={classNames(fontClassName, datePickerProps.wrapperClassName)}
           wrapperStyle={datePickerProps.wrapperStyle}
+          showSuffixIcon={datePickerProps.showSuffixIcon}
           props={{
             disabled,
             placeholder: '例 : 100-01-01',

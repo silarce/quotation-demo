@@ -16,9 +16,31 @@ export type TdatePickerProps = {
   props?: DatePickerProps;
   wrapperClassName?: string;
   wrapperStyle?: React.CSSProperties;
+  showSuffixIcon?: 'always' | 'never' | 'auto';
 };
 
-export default function MyDatePicker({ props, wrapperClassName, wrapperStyle }: TdatePickerProps) {
+export default function MyDatePicker({
+  props,
+  wrapperClassName,
+  wrapperStyle,
+  showSuffixIcon = 'auto',
+}: TdatePickerProps) {
+  let isShowSuffixIcon = true;
+
+  switch (showSuffixIcon) {
+    case 'always':
+      isShowSuffixIcon = true;
+      break;
+    case 'never':
+      isShowSuffixIcon = false;
+      break;
+    case 'auto':
+      isShowSuffixIcon = !props?.disabled;
+      break;
+    default:
+      isShowSuffixIcon = true;
+  }
+
   return (
     <div className={classNames(scss.datePickerBox, wrapperClassName)} style={wrapperStyle}>
       <DatePicker
@@ -35,7 +57,7 @@ export default function MyDatePicker({ props, wrapperClassName, wrapperStyle }: 
         // @ts-ignore // 明明就有showToday，但是ts表示沒有
         showToday={false}
         {...props}
-        className={classNames(scss.timePicker, props?.className)}
+        className={classNames(scss.timePicker, props?.className, !isShowSuffixIcon && scss.notShowSuffixIcon)}
       />
     </div>
   );
