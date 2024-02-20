@@ -14,6 +14,12 @@ import classNames from 'classnames';
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
+// composition
+import MeetingMinutes_contract, {
+  TimperativeHandle as TimperativeHandle_meetingMinutes,
+  Tstate as Tstate_meetingMinutes,
+} from 'components/composition/meetingMinutes/contract';
+
 // components
 // import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
 import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
@@ -92,6 +98,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // -----------------------------------------------------------\
+  const [isShowContract, setIsShowContract] = useState(true);
+  const [isShowWorkContactDoc, setIsShowWorkContactDoc] = useState(false);
+  const [isShowMeetingMinutes, setIsShowMeetingMinutes] = useState(false);
+
   // 合約項目 追加/追減項目的開關
   // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
   const [switch01, setSwitch01] = useState(true);
@@ -99,15 +110,31 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // 展開版本追加追減紀錄的開關
   // 按鈕是panelList的"追加追減報價單"
   const [switch02, setSwitch02] = useState(false);
-
-  const [isShowWorkContactDoc, setIsShowWorkContactDoc] = useState(false);
+  //
 
   // 工程聯絡單的狀態
   const [isShowPattern, setIsShowPattern] = useState(false);
   const [disabed_workContactDoc, setDisabed_workContactDoc] = useState(true);
   const [isLoading_workContact, setIsLoading_workContact] = useState(false);
+  //
+
+  const [state_meeting, setState_meeting] = useState<Tstate_meetingMinutes>({
+    isAdd: false,
+    isEdit: false,
+    isRead: false,
+    isLoading: false,
+  });
+
+  // -----------------------------------------------------------
+
+  const clearShow = () => {
+    setIsShowContract(false);
+    setIsShowWorkContactDoc(false);
+    setIsShowMeetingMinutes(false);
+  };
 
   const ref_workContact = useRef<TimperativeHandle>(null!);
+  const ref_meetingMinutes = useRef<TimperativeHandle_meetingMinutes>(null!);
 
   const onWorkContactStateChange: TonStateChange = ({ disabled, isLoading, isShowPattern }) => {
     setIsShowPattern(isShowPattern);
@@ -407,13 +434,22 @@ version>1 是子合約
     {
       label: `合約編號 ${data?.contractNumber ?? ''}`,
       onClick: () => {
-        setIsShowWorkContactDoc(false);
+        clearShow();
+        setIsShowContract(true);
       },
     },
     {
       label: `工程聯絡單`,
       onClick: () => {
+        clearShow();
         setIsShowWorkContactDoc(true);
+      },
+    },
+    {
+      label: `會議記錄`,
+      onClick: () => {
+        clearShow();
+        setIsShowMeetingMinutes(true);
       },
     },
   ];
@@ -503,21 +539,110 @@ version>1 是子合約
     },
   ];
 
-  const panelList = (() => {
-    if (isShowWorkContactDoc) {
-      if (isShowPattern) {
-        return panel_workContack_pattern;
-      }
+  const panel_meeting_list: TpanelList = [
+    {
+      type: 'myButton',
+      label: '新增',
+      onClick: () => {
+        ref_meetingMinutes.current?.add();
+      },
+    },
+  ];
 
-      return disabed_workContactDoc ? panel_workContack_disabled : panel_workContack;
-    }
+  const panel_meeting_read: TpanelList = [
+    {
+      type: 'myButton',
+      label: '編輯',
+      onClick: () => {
+        ref_meetingMinutes.current?.edit();
+      },
+    },
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => {
+        ref_meetingMinutes.current?.toList();
+      },
+    },
+  ];
 
-    if (switch02) {
-      return panel_quotation03;
-    } else {
-      return panel_quotation01;
-    }
-  })();
+  const panel_meeting_edit: TpanelList = [
+    {
+      type: 'redButton',
+      label: '確定',
+      onClick: () => {
+        ref_meetingMinutes.current?.reqPostPatch();
+      },
+    },
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        ref_meetingMinutes.current?.cancelEdit();
+      },
+    },
+  ];
+
+  const panel_meeting_add: TpanelList = [
+    {
+      type: 'redButton',
+      label: '確定',
+      onClick: () => {
+        ref_meetingMinutes.current?.reqPostPatch();
+      },
+    },
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => {
+        ref_meetingMinutes.current?.toList();
+      },
+    },
+  ];
+
+  // const panelList = (() => {
+  //   if (isShowWorkContactDoc) {
+  //     if (isShowPattern) {
+  //       return panel_workContack_pattern;
+  //     }
+
+  //     return disabed_workContactDoc ? panel_workContack_disabled : panel_workContack;
+  //   }
+
+  //   if (switch02) {
+  //     return panel_quotation03;
+  //   } else {
+  //     return panel_quotation01;
+  //   }
+  // })();
+
+  const panelListList: TpanelListList = {
+    panel_quotation01,
+    panel_quotation03,
+    panel_workContack_disabled,
+    panel_workContack,
+    panel_workContack_pattern,
+    panel_meeting_list,
+    panel_meeting_read,
+    panel_meeting_edit,
+    panel_meeting_add,
+  };
+
+  const panelList = panelListRouter({
+    panelListList,
+
+    isShowContract,
+    switch02,
+
+    isShowWorkContactDoc,
+    isShowPattern,
+    disabed_workContactDoc,
+
+    isShowMeetingMinutes,
+    isMeetingAdd: state_meeting.isAdd,
+    isMeetingEdit: state_meeting.isEdit,
+    isMeetingRead: state_meeting.isRead,
+  });
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -697,7 +822,7 @@ version>1 是子合約
       <div>
         {/* <ContractNode /> */}
 
-        {!isShowWorkContactDoc && (
+        {isShowContract && (
           <div className={classNames(scss.quotation)}>
             {/* 報價單基本資料 */}
             <QuotationProfile disabled={true} control={control_profile} />
@@ -813,6 +938,14 @@ version>1 是子合約
               onStateChange={onWorkContactStateChange}
             />
           </div>
+        )}
+
+        {isShowMeetingMinutes && (
+          <MeetingMinutes_contract
+            //
+            ref={ref_meetingMinutes}
+            onStateChange={setState_meeting}
+          />
         )}
 
         <InputModal
@@ -956,4 +1089,104 @@ const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: 
       </button>
     </div>
   );
+};
+
+// =============================================================================
+
+type TpanelListList = {
+  panel_quotation01: TpanelList;
+  panel_quotation03: TpanelList;
+  panel_workContack_disabled: TpanelList;
+  panel_workContack: TpanelList;
+  panel_workContack_pattern: TpanelList;
+  panel_meeting_list: TpanelList;
+  panel_meeting_read: TpanelList;
+  panel_meeting_edit: TpanelList;
+  panel_meeting_add: TpanelList;
+};
+
+const panelListRouter = ({
+  panelListList,
+
+  isShowContract,
+  switch02,
+
+  isShowWorkContactDoc,
+  isShowPattern,
+  disabed_workContactDoc,
+
+  isShowMeetingMinutes,
+  isMeetingAdd,
+  isMeetingRead,
+  isMeetingEdit,
+}: {
+  panelListList: TpanelListList;
+
+  isShowContract: boolean;
+  switch02: boolean;
+
+  isShowWorkContactDoc: boolean;
+  isShowPattern: boolean;
+  disabed_workContactDoc: boolean;
+
+  isShowMeetingMinutes: boolean;
+  isMeetingAdd: boolean;
+  isMeetingRead: boolean;
+  isMeetingEdit: boolean;
+}): TpanelList => {
+  const {
+    panel_quotation01,
+    panel_quotation03,
+    panel_workContack_disabled,
+    panel_workContack,
+    panel_workContack_pattern,
+  } = panelListList;
+
+  // if (isShowWorkContactDoc) {
+  //   if (isShowPattern) {
+  //     return panel_workContack_pattern;
+  //   }
+
+  //   return disabed_workContactDoc ? panel_workContack_disabled : panel_workContack;
+  // }
+
+  // if (switch02) {
+  //   return panel_quotation03;
+  // } else {
+  //   return panel_quotation01;
+  // }
+  if (isShowContract) {
+    if (switch02) {
+      return panel_quotation03;
+    } else {
+      return panel_quotation01;
+    }
+  }
+
+  if (isShowWorkContactDoc) {
+    if (isShowPattern) {
+      return panel_workContack_pattern;
+    } else if (disabed_workContactDoc) {
+      return panel_workContack_disabled;
+    } else {
+      return panel_workContack;
+    }
+  }
+
+  if (isShowMeetingMinutes) {
+    if (isMeetingAdd) {
+      return panelListList.panel_meeting_add;
+    } else if (isMeetingEdit) {
+      return panelListList.panel_meeting_edit;
+    } else if (isMeetingRead) {
+      return panelListList.panel_meeting_read;
+    } else {
+      return panelListList.panel_meeting_list;
+    }
+  }
+
+  return [];
+
+  //
+  //
 };

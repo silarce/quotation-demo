@@ -257,6 +257,17 @@ function MeetingMinutes_contract_component(
         isRead,
         isLoading: isLoading_req || isLoading_edit || isLoading_meetingMinutesArr,
       });
+
+    return () => {
+      onStateChange &&
+        onStateChange({
+          isAdd: false,
+          isEdit: false,
+          isRead: false,
+          isLoading: false,
+        });
+    };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdd, isEdit, isRead, isLoading_req, isLoading_edit, isLoading_meetingMinutesArr]);
 
