@@ -171,15 +171,24 @@ export function Upload_nameList({
                 <div>
                   <IconDelete01
                     className={classNames(scss.btn, disabled && scss.disabled)}
-                    onClick={() => deleteFile(index, name)}
+                    onClick={() => !disabled && deleteFile(index, name)}
                   />
-                  <span
-                    onClick={() => {
-                      setShowFileId(id);
-                    }}
-                  >
-                    {item.name}
-                  </span>
+
+                  {type !== 'other' && (
+                    <span
+                      onClick={() => {
+                        setShowFileId(`${id}`);
+                      }}
+                    >
+                      {item.name}
+                    </span>
+                  )}
+
+                  {type === 'other' && (
+                    <a href={src} download={name}>
+                      {item.name}
+                    </a>
+                  )}
                 </div>
 
                 {type === 'image' && (
@@ -211,15 +220,24 @@ export function Upload_nameList({
                 <div>
                   <IconDelete01
                     className={classNames(scss.btn, disabled && scss.disabled)}
-                    onClick={() => deleteNewFile(index, name)}
+                    onClick={() => !disabled && deleteNewFile(index, name)}
                   />
-                  <span
-                    onClick={() => {
-                      setShowFileId(`${index}`);
-                    }}
-                  >
-                    {item.name}
-                  </span>
+
+                  {type !== 'other' && (
+                    <span
+                      onClick={() => {
+                        setShowFileId(`${index}`);
+                      }}
+                    >
+                      {item.name}
+                    </span>
+                  )}
+
+                  {type === 'other' && (
+                    <a href={src} download={name} target="_blank" rel="noreferrer">
+                      {item.name}
+                    </a>
+                  )}
                 </div>
 
                 {type === 'image' && (

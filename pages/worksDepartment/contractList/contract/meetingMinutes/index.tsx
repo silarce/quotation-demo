@@ -93,24 +93,24 @@ export default function MeetingMinutes() {
   // ---------------------------------------------------------------------------
 
   const panelList: TpanelList = (() => {
-    const panelList_list: TpanelList = [
-      {
-        type: 'myButton',
-        label: '新增',
-        onClick: () => {
-          ref.current?.add();
-        },
-      },
-    ];
+    // const panelList_list: TpanelList = [
+    //   {
+    //     type: 'myButton',
+    //     label: '新增',
+    //     onClick: () => {
+    //       ref.current?.add();
+    //     },
+    //   },
+    // ];
 
     const panelList_read: TpanelList = [
-      {
-        type: 'myButton',
-        label: '編輯',
-        onClick: () => {
-          ref.current?.edit();
-        },
-      },
+      // {
+      //   type: 'myButton',
+      //   label: '編輯',
+      //   onClick: () => {
+      //     ref.current?.edit();
+      //   },
+      // },
       {
         type: 'myButton',
         label: '返回',
@@ -120,55 +120,47 @@ export default function MeetingMinutes() {
       },
     ];
 
-    const panelList_edit: TpanelList = [
-      {
-        type: 'redButton',
-        label: '確定',
-        onClick: () => {
-          ref.current?.reqPostPatch();
-        },
-      },
-      {
-        type: 'myButton',
-        label: '取消',
-        onClick: () => {
-          ref.current?.cancelEdit();
-        },
-      },
-    ];
+    // const panelList_edit: TpanelList = [
+    //   {
+    //     type: 'redButton',
+    //     label: '確定',
+    //     onClick: () => {
+    //       ref.current?.reqPostPatch();
+    //     },
+    //   },
+    //   {
+    //     type: 'myButton',
+    //     label: '取消',
+    //     onClick: () => {
+    //       ref.current?.cancelEdit();
+    //     },
+    //   },
+    // ];
 
-    const panelList_add: TpanelList = [
-      {
-        type: 'redButton',
-        label: '確定',
-        onClick: () => {
-          ref.current?.reqPostPatch();
-        },
-      },
-      {
-        type: 'myButton',
-        label: '返回',
-        onClick: () => {
-          ref.current?.toList();
-        },
-      },
-    ];
+    // const panelList_add: TpanelList = [
+    //   {
+    //     type: 'redButton',
+    //     label: '確定',
+    //     onClick: () => {
+    //       ref.current?.reqPostPatch();
+    //     },
+    //   },
+    //   {
+    //     type: 'myButton',
+    //     label: '返回',
+    //     onClick: () => {
+    //       ref.current?.toList();
+    //     },
+    //   },
+    // ];
 
     const { isAdd, isEdit, isRead } = meetingMinutesState ?? {};
-
-    if (isAdd) {
-      return panelList_add;
-    }
 
     if (isRead) {
       return panelList_read;
     }
 
-    if (isEdit) {
-      return panelList_edit;
-    }
-
-    return panelList_list;
+    return [];
   })();
 
   // ---------------------------------------------------------------------------
