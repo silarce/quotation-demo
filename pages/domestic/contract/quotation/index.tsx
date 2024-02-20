@@ -945,6 +945,7 @@ version>1 是子合約
             //
             ref={ref_meetingMinutes}
             onStateChange={setState_meeting}
+            contractIdFromProps={id}
           />
         )}
 
@@ -1142,19 +1143,6 @@ const panelListRouter = ({
     panel_workContack_pattern,
   } = panelListList;
 
-  // if (isShowWorkContactDoc) {
-  //   if (isShowPattern) {
-  //     return panel_workContack_pattern;
-  //   }
-
-  //   return disabed_workContactDoc ? panel_workContack_disabled : panel_workContack;
-  // }
-
-  // if (switch02) {
-  //   return panel_quotation03;
-  // } else {
-  //   return panel_quotation01;
-  // }
   if (isShowContract) {
     if (switch02) {
       return panel_quotation03;

@@ -57,14 +57,17 @@ export default MeetingMinutes_contract;
 function MeetingMinutes_contract_component(
   {
     onStateChange,
+    contractIdFromProps,
   }: {
     onStateChange?: (state: Tstate) => void;
+    contractIdFromProps?: string;
   },
   ref: React.ForwardedRef<unknown>
 ) {
   //
   const router = useRouter();
-  const { contractId, meetingMinutesId } = router.query as Tquery;
+  const { meetingMinutesId } = router.query as Tquery;
+  const contractId = (router.query.contractId as string | undefined) || contractIdFromProps;
 
   const ref_edit = useRef<TimperativeHandle_edit>(null);
 
@@ -120,7 +123,15 @@ function MeetingMinutes_contract_component(
   const reqPostPatch = async () => {
     const state = state_meetingMinures;
 
-    if (!contractId || !state || !state.chairmanEmployee || !state.minuteTakerEmployee || !state.formMakerEmployee) {
+    if (!contractId) {
+      myAlert.err({
+        title: '沒有合約編號',
+      });
+
+      return false;
+    }
+
+    if (!state || !state.chairmanEmployee || !state.minuteTakerEmployee || !state.formMakerEmployee) {
       myAlert.info({
         title: '資料不足',
         content: '請選擇會議主席、記錄人員、製表人',
