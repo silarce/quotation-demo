@@ -177,7 +177,7 @@ export function Upload_nameList({
                   {type !== 'other' && (
                     <span
                       onClick={() => {
-                        setShowFileId(`${index}`);
+                        setShowFileId(`${id}`);
                       }}
                     >
                       {item.name}
