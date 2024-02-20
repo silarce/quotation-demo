@@ -696,118 +696,125 @@ version>1 是子合約
       {/*  */}
       <div>
         {/* <ContractNode /> */}
-        <div className={classNames(scss.quotation, isShowWorkContactDoc && 'hidden')}>
-          {/* 報價單基本資料 */}
-          <QuotationProfile disabled={true} control={control_profile} />
 
-          {/* switch01 */}
-          <div className={scss.switchBar}>
-            {!switch02 && (
-              <div className={(switch01 && scss.active) || ''} onClick={() => setSwitch01(true)}>
-                合約項目
+        {!isShowWorkContactDoc && (
+          <div className={classNames(scss.quotation)}>
+            {/* 報價單基本資料 */}
+            <QuotationProfile disabled={true} control={control_profile} />
+
+            {/* switch01 */}
+            <div className={scss.switchBar}>
+              {!switch02 && (
+                <div className={(switch01 && scss.active) || ''} onClick={() => setSwitch01(true)}>
+                  合約項目
+                </div>
+              )}
+              <div className={switch02 || !switch01 ? scss.active : ''} onClick={() => setSwitch01(false)}>
+                追加 / 追減項目
               </div>
-            )}
-            <div className={switch02 || !switch01 ? scss.active : ''} onClick={() => setSwitch01(false)}>
-              追加 / 追減項目
             </div>
-          </div>
 
-          {/* 合約項目 追加/追減項目 */}
-          {switch01 || switch02 ? (
-            <>
-              {/* 主產品設定 */}
-              <Table_prod
-                disabled={true}
-                prodList={productList}
-                prodCellConfig={prodCellConfig}
-                prodKeyArr={prodKeyArr}
-                changeProdKeyArr={changeProdKeyArr}
-                addProd={() => {}}
-                setTargetProd={setTargetProdKey}
-                panelBox="easyBox"
-                emptyBlockWidth="80px"
-                rowHeight={'h60'}
-              />
-              {/* 原報價項目 */}
-
-              {switch02 && <OldQuotationProduction rootContent={rootContent} />}
-              <br />
-              <div className={scss.redWrapper}>
-                {/* 材料配件設定 */}
-                <Table_com
+            {/* 合約項目 追加/追減項目 */}
+            {switch01 || switch02 ? (
+              <>
+                {/* 主產品設定 */}
+                <Table_prod
                   disabled={true}
-                  // comList={targetProd?.comList}
-                  // FIXME 之後要把型別處理好
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
-                  comCellConfig={comCellConfig}
-                  comKeyArr={comKeyArr}
-                  changeComKeyArr={changeComKeyArr}
-                  defalutVKeyArr={comVKeyArr}
-                />
-                <hr />
-                {/* 選配設定 */}
-                <br />
-                <Table_accessories
-                  disabled={true}
-                  list={targetProd?.accessoriesList}
-                  cellConfig={accessoriesCellConfig}
-                  keyArr={accessoriesKeyArr}
-                  changeKeyArr={changeAccessoriesKeyArr}
-                  defalutVKeyArr={targetProd?.accessoriesVKeyArr}
-                  onVKeyChange={(keyArr) => {
-                    if (targetProd) {
-                      targetProd.accessoriesVKeyArr = keyArr;
-                    }
-                  }}
-                  doorModel={targetProd?.doorType}
-                  onSelectorConfirm={(arr) => {}}
+                  prodList={productList}
+                  prodCellConfig={prodCellConfig}
+                  prodKeyArr={prodKeyArr}
+                  changeProdKeyArr={changeProdKeyArr}
+                  addProd={() => {}}
+                  setTargetProd={setTargetProdKey}
                   panelBox="easyBox"
                   emptyBlockWidth="80px"
+                  rowHeight={'h60'}
                 />
+                {/* 原報價項目 */}
+
+                {switch02 && <OldQuotationProduction rootContent={rootContent} />}
                 <br />
-                {/* 其他設定 */}
-                <Table_others
-                  disabled={true}
-                  list={othersList}
-                  cellConfig={othersCellConfig}
-                  keyArr={othersKeyArr}
-                  changeKeyArr={() => {}}
-                  add={() => {}}
-                />
-              </div>
-            </>
-          ) : (
-            // 追加/追減項目
-            <QuotationProdChangingRecord subContract={subContracts} />
-          )}
+                <div className={scss.redWrapper}>
+                  {/* 材料配件設定 */}
+                  <Table_com
+                    disabled={true}
+                    // comList={targetProd?.comList}
+                    // FIXME 之後要把型別處理好
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
+                    comCellConfig={comCellConfig}
+                    comKeyArr={comKeyArr}
+                    changeComKeyArr={changeComKeyArr}
+                    defalutVKeyArr={comVKeyArr}
+                  />
+                  <hr />
+                  {/* 選配設定 */}
+                  <br />
+                  <Table_accessories
+                    disabled={true}
+                    list={targetProd?.accessoriesList}
+                    cellConfig={accessoriesCellConfig}
+                    keyArr={accessoriesKeyArr}
+                    changeKeyArr={changeAccessoriesKeyArr}
+                    defalutVKeyArr={targetProd?.accessoriesVKeyArr}
+                    onVKeyChange={(keyArr) => {
+                      if (targetProd) {
+                        targetProd.accessoriesVKeyArr = keyArr;
+                      }
+                    }}
+                    doorModel={targetProd?.doorType}
+                    onSelectorConfirm={(arr) => {}}
+                    panelBox="easyBox"
+                    emptyBlockWidth="80px"
+                  />
+                  <br />
+                  {/* 其他設定 */}
+                  <Table_others
+                    disabled={true}
+                    list={othersList}
+                    cellConfig={othersCellConfig}
+                    keyArr={othersKeyArr}
+                    changeKeyArr={() => {}}
+                    add={() => {}}
+                  />
+                </div>
+              </>
+            ) : (
+              // 追加/追減項目
+              <QuotationProdChangingRecord subContract={subContracts} />
+            )}
 
-          {/* 展開版本的追加追減紀錄 (在很下面)*/}
-          {switch02 && <QuotationRecord subContract={subContracts} />}
+            {/* 展開版本的追加追減紀錄 (在很下面)*/}
+            {switch02 && <QuotationRecord subContract={subContracts} />}
 
-          <Summary
-            disabled={true}
-            payInfoControl={payInfoControl}
-            control_anno={control_anno}
-            control_qr={control_qr}
-            appendixParams={appendixParams}
-          />
+            <Summary
+              disabled={true}
+              payInfoControl={payInfoControl}
+              control_anno={control_anno}
+              control_qr={control_qr}
+              appendixParams={appendixParams}
+            />
 
-          {/* 簽名 */}
-          <QuotationSinature signatureArr={signatureArr} disabled={true} />
-        </div>
+            {/* 簽名 */}
+            <QuotationSinature signatureArr={signatureArr} disabled={true} />
+          </div>
+        )}
+
         {/*  */}
         {/*  */}
         {/*  */}
-        <div className={classNames(!(isShowWorkContactDoc && engineeringContactId) && 'hidden')}>
-          <WorkContactDoc_component
-            ref={ref_workContact}
-            contract={data}
-            engineeringContactId={engineeringContactId}
-            onStateChange={onWorkContactStateChange}
-          />
-        </div>
+        {isShowWorkContactDoc && engineeringContactId && (
+          <div>
+            <WorkContactDoc_component
+              ref={ref_workContact}
+              contract={data}
+              engineeringContactId={engineeringContactId}
+              onStateChange={onWorkContactStateChange}
+            />
+          </div>
+        )}
+
         <InputModal
           visible={!!inputModalConfig?.visible}
           onConfirm={inputModalConfig?.onConfirm}
