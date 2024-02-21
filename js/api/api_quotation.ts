@@ -175,6 +175,79 @@ export const useGetQuotation_id = (id: string | undefined) => {
   };
 };
 
+export const apiGetQuotation_id_2 = async (id: string, params?: Tparams) => {
+  const api = `/quotation/${id}`;
+
+  return axi
+    .get<TquotationDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetQuotation_id_2 = (
+  id: string | undefined,
+  {
+    params,
+    preBuiltPopulate,
+    showAlert = true,
+  }: {
+    params?: Tparams;
+    preBuiltPopulate?: TquotationPopulateList[];
+    showAlert?: boolean;
+  } = {}
+) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [res, setRes] = useState<TquotationDto>();
+
+  let populate: string[] | undefined = undefined;
+
+  if (preBuiltPopulate) {
+    populate = quotationPopulateGeter(preBuiltPopulate);
+  }
+
+  const theParams = {
+    populate,
+    ...params,
+  };
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const res = await apiGetQuotation_id_2(id, theParams);
+
+      if (res) {
+        setIsLoading(true);
+        setRes(res);
+
+        return res;
+      }
+    } catch (error) {
+      const err = error as AxiosError;
+
+      if (showAlert) {
+        myAlert.err({ title: '取得報價單失敗', content: err.message });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    data: res,
+    isLoading,
+    update,
+    setData: setRes,
+  };
+
+  //
+};
+
+//
+//
+
 // 以 id 取得 QuotationContent
 const apiGetQuotationContent_Id = async (id: string) => {
   const api = `/quotation/content/${id}`;
@@ -232,7 +305,7 @@ export const useGetQuotationContent_id = (id: string | undefined) => {
   };
 };
 
-const apiGetQuotationContent_Id_2 = async (id: string, { params }: { params?: Tparams } = {}) => {
+const apiGetQuotationContent_Id_2 = async (id: string, params?: Tparams) => {
   const api = `/quotation/content/${id}`;
 
   return axi
@@ -271,7 +344,7 @@ export const useGetQuotationContent_id_2 = (
 
     try {
       setIsLoading(true);
-      const newRes = await apiGetQuotationContent_Id_2(id, { params: theParams });
+      const newRes = await apiGetQuotationContent_Id_2(id, theParams);
 
       if (newRes) {
         setRes(newRes);
