@@ -100,7 +100,8 @@ import {
   TquotationDto,
   TquotationContentDto,
   TcreateQuotationContentDto,
-  useGetQuotation_id,
+  // useGetQuotation_id,
+  useGetQuotation_id_2,
   apiPostQuotation,
   apiPatchQuotation,
   apiQuotationSubmitReview,
@@ -124,7 +125,6 @@ import { useProductList } from 'hooks/quotation/useProduct';
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 import { TcreateQuotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
-import { fi } from 'date-fns/locale';
 
 // ------------------------------------------------------------------
 
@@ -290,7 +290,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
   // 資料
-  const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+  // const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+  const { data: quotationData, update } = useGetQuotation_id_2(quotationId as string, {
+    preBuiltPopulate: ['simple', 'attached'],
+  });
   // 沒記錯的話，從查詢報價單點進來會有contentId，就會用quotationContentData
   const { data: quotationContentData, update: updateContent } = useGetQuotationContent_id(contentId as string);
 
