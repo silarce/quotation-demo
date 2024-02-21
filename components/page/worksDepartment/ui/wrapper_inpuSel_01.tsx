@@ -1,8 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
 import styled from '@emotion/styled';
-import { css, ClassNames } from '@emotion/react';
+import { ClassNames } from '@emotion/react';
 import theme01 from 'styles/_theme01.module.scss';
+import classNames from 'classnames';
 
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -48,12 +49,16 @@ const Wrapper_inpuSel_01 = ({ children }: { children: React.ReactNode }) => {
 const WrappedTextarea = ({
   //
   inputSelProps,
+  textareaProps,
   disabled,
   mt,
+  className,
 }: {
   inputSelProps?: TinputSelProps;
+  textareaProps?: TinputSelProps['textareaProps'];
   disabled?: boolean;
   mt?: React.CSSProperties['marginTop'];
+  className?: string;
 }) => {
   return (
     <ClassNames>
@@ -64,30 +69,33 @@ const WrappedTextarea = ({
         const css_inputSel_textarea = css`
           align-items: flex-start;
         `;
-        const css_areatextCaption = css`
-          transform: translateY(-6px);
-        `;
+        // const css_areatextCaption = css`
+        //   transform: translateY(-0px);
+        // `;
         const css_textarea = css`
-          padding: 3px 12px;
+          /* 有左padding的話會無法對其上方或下方的inputSel */
+          padding: 3px 0px;
           font-size: 14px;
           border: solid 1px ${disabled ? 'transparent' : theme01.colors_border};
         `;
 
         return (
-          <div className={css_textareaWrapper}>
+          <div className={classNames(css_textareaWrapper, className)}>
             <InputSel
               {...inputSelProps_default}
               className={css_inputSel_textarea}
-              captionClassName={css_areatextCaption}
+              // captionClassName={css_areatextCaption}
               showBaseline="invisible"
               caption="備註"
               disabled={disabled}
               textareaProps={{
                 allowNewLineByUser: true,
+                ...textareaProps,
                 props: {
                   className: css_textarea,
                   maxRows: 18,
                   minRows: disabled ? undefined : 18,
+                  ...textareaProps?.props,
                 },
               }}
               {...inputSelProps}

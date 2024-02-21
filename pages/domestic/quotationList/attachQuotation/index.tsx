@@ -74,7 +74,8 @@ import {
   TquotationDto,
   TquotationContentDto,
   TcreateQuotationContentDto,
-  useGetQuotation_id,
+  // useGetQuotation_id,
+  useGetQuotation_id_2,
   apiPostQuotation,
   apiPatchQuotation,
   apiQuotationSubmitReview,
@@ -262,7 +263,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
   // 資料
-  const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+  // const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+  const { data: quotationData, update } = useGetQuotation_id_2(quotationId as string, {
+    preBuiltPopulate: ['simple', 'attached'],
+  });
   const lastestContentId = quotationData?.latestContent.id;
   const latestContent = quotationData?.latestContent;
   // const status = latestContent?.status;

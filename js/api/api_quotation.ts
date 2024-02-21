@@ -175,6 +175,90 @@ export const useGetQuotation_id = (id: string | undefined) => {
   };
 };
 
+export const apiGetQuotation_id_2 = async (id: string, params?: Tparams) => {
+  const api = `/quotation/${id}`;
+
+  return axi
+    .get<TquotationDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetQuotation_id_2 = (
+  id: string | undefined,
+  {
+    params,
+    preBuiltPopulate,
+    showAlert = true,
+    getProductItems = true,
+  }: {
+    params?: Tparams;
+    preBuiltPopulate?: TquotationPopulateList[];
+    showAlert?: boolean;
+    getProductItems?: boolean;
+  } = {}
+) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [res, setRes] = useState<TquotationDto>();
+
+  let populate: string[] | undefined = undefined;
+
+  if (preBuiltPopulate) {
+    populate = quotationPopulateGeter(preBuiltPopulate);
+  }
+
+  const theParams = {
+    populate,
+    ...params,
+  };
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const res = await apiGetQuotation_id_2(id, theParams);
+
+      if (getProductItems) {
+        // 伺服器撐得住，不用批次呼叫
+        const productArr = await Promise.all(
+          res.latestContent.products.map(async (prod) => {
+            const productId = prod.id;
+
+            return await apiGetQuotationProducts(productId);
+          })
+        );
+
+        res.latestContent.products = productArr;
+      }
+
+      setIsLoading(true);
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+
+      if (showAlert) {
+        myAlert.err({ title: '取得報價單失敗', content: err.message });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    data: res,
+    isLoading,
+    update,
+    setData: setRes,
+  };
+};
+
+//
+//
+
 // 以 id 取得 QuotationContent
 const apiGetQuotationContent_Id = async (id: string) => {
   const api = `/quotation/content/${id}`;
@@ -229,6 +313,68 @@ export const useGetQuotationContent_id = (id: string | undefined) => {
   return {
     data: res,
     update,
+  };
+};
+
+const apiGetQuotationContent_Id_2 = async (id: string, params?: Tparams) => {
+  const api = `/quotation/content/${id}`;
+
+  return axi
+    .get<TquotationContentDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetQuotationContent_id_2 = (
+  id: string | undefined | null,
+  {
+    params,
+  }: // preBuiltPopulate
+  {
+    params?: Tparams;
+    // 做錯了，quotationContent的預建populate還沒建立
+    //  preBuiltPopulate?: TquotationPopulateList[]
+  } = {}
+) => {
+  const [res, setRes] = useState<TquotationContentDto>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 做錯了，quotationContent的預建populate還沒建立
+  // const populate = preBuiltPopulate ? undefined : quotationPopulateGeter(preBuiltPopulate ?? ['simple']);
+  const populate = undefined;
+
+  const theParams: Tparams = {
+    populate,
+    ...params,
+  };
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const newRes = await apiGetQuotationContent_Id_2(id, theParams);
+
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得指定報價單內容資料失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    data: res,
+    isLoading,
+    update,
+    setData: setRes,
   };
 };
 
@@ -1028,3 +1174,47 @@ const lookpu_contractPopulate = {
   worksDepartment02: ['content', 'subContracts.content.products.rootProdductId'],
   worksDepartment03: ['content', 'subContracts.content'],
 } as const;
+
+// ================================================================
+type TquotationPopulateList = 'simple' | 'attached';
+
+type Tclass_quotationPopulate = {
+  [key in TquotationPopulateList]: string[];
+};
+
+class class_quotationPopulate implements Tclass_quotationPopulate {
+  constructor() {}
+
+  simple = [
+    'contents.customer',
+    'latestContent.customer',
+    'latestContent.agentEmployee',
+    'latestContent.supervisorEmployee',
+    'latestContent.managerEmployee',
+
+    'latestContent.reviewSalesEmployee',
+    'latestContent.reviewWorkDirectorEmployee',
+    'latestContent.reviewSupervisorEmployee',
+    'latestContent.reviewManagerEmployee',
+
+    'latestContent.products',
+
+    'latestContent.others',
+    'latestContent.verifyForm',
+  ];
+
+  attached = ['attachedToContract.content.products', 'attachedToContract.subContracts.content.products'];
+
+  getPopulate = (populateNameArr: TquotationPopulateList[]) => {
+    let arr: string[] = [];
+    populateNameArr.forEach((name) => {
+      arr = arr.concat(this[name]);
+    });
+
+    arr = _.uniq(arr);
+
+    return arr;
+  };
+}
+
+const quotationPopulateGeter = new class_quotationPopulate().getPopulate;
