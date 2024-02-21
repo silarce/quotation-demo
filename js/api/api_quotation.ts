@@ -190,10 +190,12 @@ export const useGetQuotation_id_2 = (
     params,
     preBuiltPopulate,
     showAlert = true,
+    getProductItems = true,
   }: {
     params?: Tparams;
     preBuiltPopulate?: TquotationPopulateList[];
     showAlert?: boolean;
+    getProductItems?: boolean;
   } = {}
 ) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -218,12 +220,23 @@ export const useGetQuotation_id_2 = (
     try {
       const res = await apiGetQuotation_id_2(id, theParams);
 
-      if (res) {
-        setIsLoading(true);
-        setRes(res);
+      if (getProductItems) {
+        // 伺服器撐得住，不用批次呼叫
+        const productArr = await Promise.all(
+          res.latestContent.products.map(async (prod) => {
+            const productId = prod.id;
 
-        return res;
+            return await apiGetQuotationProducts(productId);
+          })
+        );
+
+        res.latestContent.products = productArr;
       }
+
+      setIsLoading(true);
+      setRes(res);
+
+      return res;
     } catch (error) {
       const err = error as AxiosError;
 
@@ -241,8 +254,6 @@ export const useGetQuotation_id_2 = (
     update,
     setData: setRes,
   };
-
-  //
 };
 
 //
