@@ -232,6 +232,59 @@ export const useGetQuotationContent_id = (id: string | undefined) => {
   };
 };
 
+const apiGetQuotationContent_Id_2 = async (id: string, { params }: { params?: Tparams } = {}) => {
+  const api = `/quotation/content/${id}`;
+
+  return axi
+    .get<TquotationContentDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetQuotationContent_id_2 = (
+  id: string | undefined | null,
+  { params, preBuiltPopulate }: { params?: Tparams; preBuiltPopulate?: TquotationPopulateList[] } = {}
+) => {
+  const [res, setRes] = useState<TquotationContentDto>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const populate = preBuiltPopulate ? undefined : quotationPopulateGeter(preBuiltPopulate ?? ['simple']);
+
+  const theParams: Tparams = {
+    populate,
+    ...params,
+  };
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const newRes = await apiGetQuotationContent_Id_2(id, { params: theParams });
+
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得指定報價單內容資料失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    data: res,
+    isLoading,
+    update,
+    setData: setRes,
+  };
+};
+
 // ================================================================
 type TgetContracts = {
   data: TquotationContractDto[];
@@ -1028,3 +1081,47 @@ const lookpu_contractPopulate = {
   worksDepartment02: ['content', 'subContracts.content.products.rootProdductId'],
   worksDepartment03: ['content', 'subContracts.content'],
 } as const;
+
+// ================================================================
+type TquotationPopulateList = 'simple' | 'attached';
+
+type Tclass_quotationPopulate = {
+  [key in TquotationPopulateList]: string[];
+};
+
+class class_quotationPopulate implements Tclass_quotationPopulate {
+  constructor() {}
+
+  simple = [
+    'contents.customer',
+    'latestContent.customer',
+    'latestContent.agentEmployee',
+    'latestContent.supervisorEmployee',
+    'latestContent.managerEmployee',
+
+    'latestContent.reviewSalesEmployee',
+    'latestContent.reviewWorkDirectorEmployee',
+    'latestContent.reviewSupervisorEmployee',
+    'latestContent.reviewManagerEmployee',
+
+    'latestContent.products',
+
+    'latestContent.others',
+    'latestContent.verifyForm',
+  ];
+
+  attached = ['attachedToContract.content.products', 'attachedToContract.subContracts.content.products'];
+
+  getPopulate(populateNameArr: TquotationPopulateList[]) {
+    let arr: string[] = [];
+    populateNameArr.forEach((name) => {
+      arr = arr.concat(this[name]);
+    });
+
+    arr = _.uniq(arr);
+
+    return arr;
+  }
+}
+
+const quotationPopulateGeter = new class_quotationPopulate().getPopulate;
