@@ -243,12 +243,21 @@ const apiGetQuotationContent_Id_2 = async (id: string, { params }: { params?: Tp
 
 export const useGetQuotationContent_id_2 = (
   id: string | undefined | null,
-  { params, preBuiltPopulate }: { params?: Tparams; preBuiltPopulate?: TquotationPopulateList[] } = {}
+  {
+    params,
+  }: // preBuiltPopulate
+  {
+    params?: Tparams;
+    // 做錯了，quotationContent的預建populate還沒建立
+    //  preBuiltPopulate?: TquotationPopulateList[]
+  } = {}
 ) => {
   const [res, setRes] = useState<TquotationContentDto>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const populate = preBuiltPopulate ? undefined : quotationPopulateGeter(preBuiltPopulate ?? ['simple']);
+  // 做錯了，quotationContent的預建populate還沒建立
+  // const populate = preBuiltPopulate ? undefined : quotationPopulateGeter(preBuiltPopulate ?? ['simple']);
+  const populate = undefined;
 
   const theParams: Tparams = {
     populate,
