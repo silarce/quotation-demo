@@ -1194,7 +1194,7 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
 
   attached = ['attachedToContract.content.products', 'attachedToContract.subContracts.content.products'];
 
-  getPopulate(populateNameArr: TquotationPopulateList[]) {
+  getPopulate = (populateNameArr: TquotationPopulateList[]) => {
     let arr: string[] = [];
     populateNameArr.forEach((name) => {
       arr = arr.concat(this[name]);
@@ -1203,7 +1203,7 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
     arr = _.uniq(arr);
 
     return arr;
-  }
+  };
 }
 
 const quotationPopulateGeter = new class_quotationPopulate().getPopulate;
