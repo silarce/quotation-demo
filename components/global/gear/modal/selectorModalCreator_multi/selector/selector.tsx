@@ -62,7 +62,8 @@ type TselectorProps<Tdata extends TapiData> = {
   caption?: string | null;
   tip?: string | null;
   //
-  // forbiddenCheck?: (data: Tdata) => boolean; // 目前還用不到 // 被禁用的選項要無法點選，背景色設為灰色
+  forbiddenCheck_dataList?: (data: Tdata) => boolean;
+  // forbiddenCheck_selectedList?: (data: Tdata) => boolean; // 目前還用不到
   defaultSelectedArr?: Tdata[];
   onStateChange?: (props: { dataArr: Tdata[] }) => void;
   limit?: number;
@@ -95,6 +96,7 @@ export function Selector_component<Tdata extends TapiData>(
     defaultSelectedArr,
     onStateChange,
     limit,
+    forbiddenCheck_dataList,
   } = props;
 
   const [selectedList, setSelectedList] = useState<{ [id: string]: Tdata }>({});
@@ -214,6 +216,7 @@ export function Selector_component<Tdata extends TapiData>(
           onRowClick={onRowClick}
           selectedList={selectedList}
           viewRef_bottom={viewRef_bottom}
+          forbiddenCheck={forbiddenCheck_dataList}
         />
       </DataList>
       {/*  */}
@@ -276,12 +279,14 @@ function DataList_table<Tdata extends TapiData>({
   onRowClick,
   selectedList,
   viewRef_bottom,
+  forbiddenCheck,
 }: {
   configArr: readonly Tconfig[];
   dataArr: Tdata[];
-  onRowClick?: (apiData: Tdata) => void;
+  onRowClick?: (data: Tdata) => void;
   selectedList: { [id: string]: Tdata };
   viewRef_bottom?: (node?: Element | null | undefined) => void;
+  forbiddenCheck?: (data: Tdata) => boolean;
 }) {
   return (
     <div className={scss.table}>
@@ -315,6 +320,8 @@ function DataList_table<Tdata extends TapiData>({
 
           const theViewRef_bottom = dataArr.length - 5 === index ? viewRef_bottom : undefined;
 
+          const isForbidden = forbiddenCheck && forbiddenCheck(apiData);
+
           return (
             <DataList_table_row<Tdata>
               key={index}
@@ -325,6 +332,7 @@ function DataList_table<Tdata extends TapiData>({
               }}
               isActive={isActive}
               viewRef_bottom={theViewRef_bottom}
+              isForbidden={isForbidden}
             />
           );
         })}
@@ -340,16 +348,23 @@ function DataList_table_row<Tdata extends TapiData>({
   onClick,
   isActive,
   viewRef_bottom,
+  isForbidden,
 }: {
   configArr: readonly Tconfig[];
   apiData: Tdata;
   onClick?: () => void;
   isActive?: boolean;
   viewRef_bottom?: (node?: Element | null | undefined) => void;
+  isForbidden?: boolean;
 }) {
   return (
-    <CellWithBar isActive={isActive} onClick={onClick}>
-      <div ref={viewRef_bottom} className={scss.row}>
+    <CellWithBar
+      isActive={isActive}
+      onClick={() => {
+        !isForbidden && onClick && onClick();
+      }}
+    >
+      <div ref={viewRef_bottom} className={classNames(scss.row, isForbidden && scss.forbidden)}>
         {configArr.map((config, index) => {
           const { key, width, flex, tbody } = config;
           const { className, style } = tbody || {};

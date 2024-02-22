@@ -30,39 +30,6 @@ import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 
 // ======================================================================
 
-// ======================================================================
-
-// type TuseInfinite = ReturnType<typeof createUseInfinite>;
-
-// type Tobject = {
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   [key: string]: any;
-//   id: string;
-// };
-
-// type Tconfig = {
-//   key: string;
-//   label?: string;
-//   className?: string;
-//   width?: React.CSSProperties['width'];
-//   flex?: React.CSSProperties['flex'];
-//   style?: React.CSSProperties;
-//   className_span?: string;
-//   style_span?: React.CSSProperties;
-// };
-
-// export type { Tconfig };
-
-// {
-//   selectProps: {
-//     props: {
-//       //
-//       menuPortalTarget: undefined,
-//       ...rest
-//     },
-//   },
-// }
-
 type TselectorArrItem<Tkey extends keyof TtypeLookup> = {
   // key: keyof typeof propsLookup;
   key: Tkey;
@@ -70,6 +37,7 @@ type TselectorArrItem<Tkey extends keyof TtypeLookup> = {
   tip?: string | null;
   clearOther?: number[];
   limit?: number;
+  forbiddenCheck_dataList?: TselectorProps<TtypeLookup[Tkey]>['forbiddenCheck_dataList'];
 };
 
 // type TselectorArr<TkeyArr extends (keyof TtypeLookup)[]> = {
@@ -82,45 +50,24 @@ type TselectorArr<TkeyArr extends (keyof TtypeLookup)[]> = {
 // ======================================================================
 
 export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>({
-  // useInfinit,
-  // configArr,
-  // params,
-  // searchInputSelPropsArr,
   modalWidth = 1300,
   selectorArr,
 }: {
-  // useInfinit: TuseInfinite;
-  // configArr: readonly Tconfig[];
-  // params?: Tparams;
-  // searchInputSelPropsArr?: TsearcbBarProps['inputSelPropsArr'];
   modalWidth?: React.CSSProperties['width'];
-  // selectorNameArr: (keyof typeof propsLookup)[];
   selectorArr: TselectorArr<TkeyArr>;
 }) {
-  //
-  //
-  //
-  //
-
   type TdataArrArr = keyTuple_to_dataTuple<TkeyArr>;
 
   const SelectModal = ({
     showModal,
     onConfirm,
     onCancel,
-  }: // selLimit,
-
-  // isCancelOnConfirm = true,
-
-  {
+    isCancelOnConfirm = true,
+  }: {
     showModal: boolean;
-
     onConfirm: (v: TdataArrArr) => void;
     onCancel: () => void;
-
-    // selLimit?: 1;
-
-    // isCancelOnConfirm?: boolean;
+    isCancelOnConfirm?: boolean;
 
     //
   }) => {
@@ -136,6 +83,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
     const theOnConfirm = () => {
       onConfirm(dataArrArr);
+      isCancelOnConfirm && onCancel();
     };
 
     // ------------------------------------------------------------------------
@@ -156,7 +104,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
         <div className={classNames(scss.body)}>
           {/*  */}
           {selectorArr.map((item, index) => {
-            const { key, clearOther, limit } = item;
+            const { key, clearOther, limit, forbiddenCheck_dataList } = item;
             const props = propsLookup[key]();
 
             if (item.caption === null) {
@@ -183,6 +131,10 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
                   }
                 });
               };
+            }
+
+            if (forbiddenCheck_dataList) {
+              props.forbiddenCheck_dataList = forbiddenCheck_dataList;
             }
 
             return (
