@@ -3,8 +3,8 @@ import classNames from 'classnames';
 
 import SearchBar, {
   TsearcbBarProps,
-  TinputSelProps,
-  TinputSelProp_search,
+  // TinputSelProps,
+  // TinputSelProp_search,
 } from 'components/global/gear/inputAndSel_v2/searchBar/searchBar';
 
 // gear
@@ -65,6 +65,7 @@ type TselectorProps<Tdata extends TapiData> = {
   // forbiddenCheck?: (data: Tdata) => boolean; // 目前還用不到 // 被禁用的選項要無法點選，背景色設為灰色
   defaultSelectedArr?: Tdata[];
   onStateChange?: (props: { dataArr: Tdata[] }) => void;
+  limit?: number;
 };
 
 export type { TimperativeHandle, TsearchInputSelProps, TselectorProps };
@@ -93,6 +94,7 @@ export function Selector_component<Tdata extends TapiData>(
     tip,
     defaultSelectedArr,
     onStateChange,
+    limit,
   } = props;
 
   const [selectedList, setSelectedList] = useState<{ [id: string]: Tdata }>({});
@@ -109,16 +111,16 @@ export function Selector_component<Tdata extends TapiData>(
 
   const {
     //
-    dataList,
+    // dataList,
     dataArr,
-    viewRef_top,
+    // viewRef_top,
     viewRef_bottom,
-    isLoadingPage1,
-    isLoading,
-    meta,
-    init,
+    // isLoadingPage1,
+    // isLoading,
+    // meta,
+    // init,
     reset,
-    nextPage,
+    // nextPage,
   } = useInfinit({ customParams: params });
 
   // ----------------------------------------------------------------------
@@ -136,6 +138,12 @@ export function Selector_component<Tdata extends TapiData>(
       });
       isRemove = true;
     } else {
+      if (limit && limit > 0) {
+        if (Object.keys(selectedList).length >= limit) {
+          return;
+        }
+      }
+
       setSelectedList((list) => {
         return { ...list, [id]: data };
       });

@@ -69,6 +69,7 @@ type TselectorArrItem<Tkey extends keyof TtypeLookup> = {
   caption?: string | null;
   tip?: string | null;
   clearOther?: number[];
+  limit?: number;
 };
 
 // type TselectorArr<TkeyArr extends (keyof TtypeLookup)[]> = {
@@ -107,34 +108,20 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     showModal,
     onConfirm,
     onCancel,
+  }: // selLimit,
 
-    selLimit,
-    customParams,
-    customFilter,
-    customPopulate,
-    defaultDataArr,
-    exceptDataArr,
-    isCancelOnConfirm = true,
-    exceptDataCheck,
-  }: // onGroupStateChange,
+  // isCancelOnConfirm = true,
+
   {
     showModal: boolean;
-    // !!!! any
-    // onConfirm: (v: any[]) => void;
+
     onConfirm: (v: TdataArrArr) => void;
     onCancel: () => void;
-    label?: string;
-    tip?: React.ReactNode;
-    selLimit?: 1;
-    customParams?: Tparams;
-    customFilter?: Tparams['filter'];
-    customPopulate?: Tparams['populate'];
-    // !!!! any
-    defaultDataArr?: any[];
-    exceptDataArr?: { id: string }[];
-    isCancelOnConfirm?: boolean;
-    // !!!! any
-    exceptDataCheck?: (data: any) => boolean;
+
+    // selLimit?: 1;
+
+    // isCancelOnConfirm?: boolean;
+
     //
   }) => {
     // ------------------------------------------------------------------------
@@ -157,16 +144,10 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     //
     return (
       <Modal
-        // label={label ?? ''}
         visible={showModal}
-        // onConfirm={theOnConfirm}
-        // onCancel={theOnCancel}
         // width={rwd1023 ? '80vw' : modalWidth}
         width={modalWidth}
         className={scss.container}
-        // tip={tip}
-        // searcbBarProps={searcbBarProps}
-
         closable={false}
         centered={true}
         destroyOnClose={true}
@@ -174,10 +155,8 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
       >
         <div className={classNames(scss.body)}>
           {/*  */}
-
           {selectorArr.map((item, index) => {
-            const { key, clearOther } = item;
-
+            const { key, clearOther, limit } = item;
             const props = propsLookup[key]();
 
             if (item.caption === null) {
@@ -213,11 +192,9 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
                     selectorRef.current[index] = ref!;
                   }}
                   {...props}
+                  limit={limit}
                   onStateChange={(state) => {
-                    // console.log(state);
-
                     const { dataArr } = state;
-
                     setDataArrArr((pArr) => {
                       const copy = [...pArr] as typeof pArr;
                       copy[index] = dataArr;
@@ -231,10 +208,6 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
             );
           })}
           <br />
-          <br />
-          <br />
-          <br />
-
           <TwoBtnFooter onConfirm={theOnConfirm} onCancel={onCancel} />
         </div>
       </Modal>
@@ -328,17 +301,13 @@ type TtypeLookup = {
   test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
 };
 
-type TtypeLookupKeys = keyof TtypeLookup;
-
-// type TdataArrArr<keyArr extends keyof TtypeLookup> = {
-//   [index in keyof keyArr]: TtypeLookup[keyArr[index]];
-// };
-
 type keyTuple_to_dataTuple<TkeyArr extends (keyof TtypeLookup)[]> = {
   [index in keyof TkeyArr]: TtypeLookup[TkeyArr[index]][];
 };
 
 // ======================================================================
+
+// 留做泛型參考
 
 // type TkeyArr = ['a', 'b', 'c'];
 
@@ -355,7 +324,3 @@ type keyTuple_to_dataTuple<TkeyArr extends (keyof TtypeLookup)[]> = {
 // type Tresult = TupleToObject<TkeyArr>; // ['string', 'number', 'boolean']
 
 // ======================================================================
-
-const arr = ['a', 'b', 'c'] as const;
-
-const foo = arr.map((item) => item);
