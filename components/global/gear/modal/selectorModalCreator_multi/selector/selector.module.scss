@@ -61,11 +61,13 @@
   gap: 10px;
   padding: 10px;
   cursor: pointer;
+  > * {
+    flex: none;
+  }
 }
 
 // ----------------------------------------------
 .selectedList {
-  // background-color: #0001;
   .caption {
     height: 35px;
     margin-bottom: 8px;
@@ -73,14 +75,19 @@
     color: theme("colors.main");
   }
   > ul {
-    display: grid;
-    gap: 10px;
+    height: 300px;
+    overflow: auto;
     li {
+      margin-bottom: 10px;
+      &:nth-last-of-type(1) {
+        margin-bottom: 0;
+      }
       .liContent {
         padding-left: 10px;
         display: flex;
         align-items: center;
         gap: 5px;
+        // height: fit-content;
 
         cursor: pointer;
         .dot {
@@ -88,11 +95,13 @@
           height: 7px;
           border-radius: 999px;
           background-color: theme("colors.main");
+          flex: none;
         }
         .value {
           transform: translateY(-2px);
           span {
             font-size: 14px;
+            word-break: break-all;
           }
         }
       }

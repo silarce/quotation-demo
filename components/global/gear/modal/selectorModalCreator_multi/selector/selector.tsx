@@ -14,7 +14,7 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import scss from './selector.module.scss';
 
 // type
-import { createUseInfinite, Tres, Tparams } from 'js/api/createUseInfinite';
+import { createUseInfinite, Tparams } from 'js/api/createUseInfinite';
 
 // ==============================================================================
 
@@ -56,9 +56,18 @@ type TselectorProps<Tdata extends TapiData> = {
   searchInputSelPropsArr?: TsearchInputSelProps[];
   onRowClick?: (props: { data: Tdata; isRemove: boolean }) => void;
   filter?: (searchStrArr: string[]) => Tparams['filter'];
+  //
+  dataType?: Tdata; // 就只是為了方便取得泛型的型別
+  clearOther?: number[]; // 用來清除其他的選擇 // 在父元素使用
+  caption?: string | null;
+  tip?: string | null;
+  //
+  // forbiddenCheck?: (data: Tdata) => boolean; // 目前還用不到 // 被禁用的選項要無法點選，背景色設為灰色
+  defaultSelectedArr?: Tdata[];
+  onStateChange?: (props: { dataArr: Tdata[] }) => void;
 };
 
-export type { TimperativeHandle, TsearchInputSelProps };
+export type { TimperativeHandle, TsearchInputSelProps, TselectorProps };
 
 // ==============================================================================
 
@@ -80,6 +89,10 @@ export function Selector_component<Tdata extends TapiData>(
     searchInputSelPropsArr,
     onRowClick: onRowClick_callback,
     filter: filter_callback,
+    caption,
+    tip,
+    defaultSelectedArr,
+    onStateChange,
   } = props;
 
   const [selectedList, setSelectedList] = useState<{ [id: string]: Tdata }>({});
@@ -141,18 +154,11 @@ export function Selector_component<Tdata extends TapiData>(
 
   // ----------------------------------------------------------------------
 
-  // ----------------------------------------------------------------------
-
   const searcbBarProps: TsearcbBarProps | undefined = searchInputSelPropsArr && {
     onClick: (strArr) => {
       setSearchStrArr(strArr);
     },
     onChange: () => {},
-    // inputSelPropsArr: [
-    //   {
-    //     inputProps: {},
-    //   },
-    // ],
     inputSelPropsArr: searchInputSelPropsArr ?? [],
   };
 
@@ -168,9 +174,23 @@ export function Selector_component<Tdata extends TapiData>(
     reset();
   }, [searchStrArr]);
 
-  // useEffect(() => {
-  //   reset();
-  // }, [searchStrArr]);
+  useEffect(() => {
+    // defaultSelectedArr
+    // setSelectedList
+
+    if (defaultSelectedArr) {
+      const list: { [id: string]: Tdata } = {};
+      defaultSelectedArr.forEach((item) => {
+        list[item.id] = item;
+      });
+      setSelectedList(list);
+    }
+  }, [defaultSelectedArr]);
+
+  useEffect(() => {
+    const dataArr = Object.values(selectedList);
+    onStateChange && onStateChange({ dataArr });
+  }, [selectedList]);
 
   // ----------------------------------------------------------------------
 
@@ -179,7 +199,7 @@ export function Selector_component<Tdata extends TapiData>(
       {/*  */}
 
       <DataList>
-        <DataList_top searcbBarProps={searcbBarProps} />
+        <DataList_top searcbBarProps={searcbBarProps} caption={caption} tip={tip} />
         <DataList_table<Tdata>
           configArr={configArr}
           dataArr={dataArr}
@@ -218,12 +238,20 @@ function DataList({ children }: { children?: React.ReactNode }) {
   return <div className={scss.dataList}>{children}</div>;
 }
 
-const DataList_top = ({ searcbBarProps }: { searcbBarProps?: TsearcbBarProps }) => {
+const DataList_top = ({
+  caption,
+  tip,
+  searcbBarProps,
+}: {
+  caption?: string | null;
+  tip?: string | null;
+  searcbBarProps?: TsearcbBarProps;
+}) => {
   return (
     <div className={scss.top}>
       <div className={scss.left}>
-        <span className={scss.caption}>CAPTION</span>
-        <span className={scss.tip}>TIP</span>
+        <span className={scss.caption}>{caption}</span>
+        <span className={scss.tip}>{tip}</span>
       </div>
       <div className={scss.right}>
         {/*  */}
