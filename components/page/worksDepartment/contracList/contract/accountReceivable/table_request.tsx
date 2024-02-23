@@ -121,40 +121,48 @@ export default function Table_request({
       periodArr.forEach((period) => {
         const validInvoice = validInvoiceList[period];
 
-        periodList[period] = (deliveryStatus ?? []).map((deliveryStatu) => {
-          const { productPayments } = deliveryStatu;
+        // 需求變更，請款單的金額不要與productPayments(型別為TaccountsReceivableProductPaymentDto)關聯
+        // 且新的deliveryStatu沒有productPayments
 
-          const thePaymentArr = productPayments?.filter((item) => {
-            return String(item.invoice?.period) === String(period);
-          });
+        // 請款單應該是要重做了
+        // 在動工前，把所有用到productPayments的資料處理註解
 
-          const thePayment = thePaymentArr?.[0];
+        // periodList[period] = (deliveryStatus ?? []).map((deliveryStatu) => {
+        //   const { productPayments } = deliveryStatu;
 
-          const ratio = Number(thePayment?.paymentRatio || 0);
-          const completePrice = new Decimal(totalPrice).mul(ratio).toNumber();
+        //   const thePaymentArr = productPayments?.filter((item) => {
+        //     return String(item.invoice?.period) === String(period);
+        //   });
 
-          return {
-            completeItem: deliveryStatu.itemName ?? '',
-            percentage: {
-              value: thePayment?.paymentRatio ? `${thePayment.paymentRatio}%` : '---',
-              onClick: () => {
-                if (!accountReceivableId) {
-                  return;
-                }
+        //   const thePayment = thePaymentArr?.[0];
 
-                setPeymentPreBody({
-                  paymentRatio: thePayment?.paymentRatio || '0',
-                  accountsReceivableId: accountReceivableId,
-                  invoiceId: validInvoice.id,
-                  productItemId: prodItem.id,
-                  deliveryStatusId: [deliveryStatu.id],
-                  id: thePayment?.id,
-                });
-              },
-            },
-            completePrice,
-          };
-        });
+        //   const thePayment = undefined;
+
+        //   const ratio = Number(thePayment?.paymentRatio || 0);
+        //   const completePrice = new Decimal(totalPrice).mul(ratio).toNumber();
+
+        //   return {
+        //     completeItem: deliveryStatu.itemName ?? '',
+        //     percentage: {
+        //       value: thePayment?.paymentRatio ? `${thePayment.paymentRatio}%` : '---',
+        //       onClick: () => {
+        //         if (!accountReceivableId) {
+        //           return;
+        //         }
+
+        //         setPeymentPreBody({
+        //           paymentRatio: thePayment?.paymentRatio || '0',
+        //           accountsReceivableId: accountReceivableId,
+        //           invoiceId: validInvoice.id,
+        //           productItemId: prodItem.id,
+        //           deliveryStatusId: [deliveryStatu.id],
+        //           id: thePayment?.id,
+        //         });
+        //       },
+        //     },
+        //     completePrice,
+        //   };
+        // });
 
         if (periodList[period].length === 0) {
           periodList[period].push({
@@ -190,40 +198,46 @@ export default function Table_request({
       periodArr.forEach((period) => {
         const validInvoice = validInvoiceList[period];
 
-        periodList[period] = (deliveryStatus ?? []).map((deliveryStatu) => {
-          const { itemName, productPayments } = deliveryStatu;
+        // 需求變更，請款單的金額不要與productPayments(型別為TaccountsReceivableProductPaymentDto)關聯
+        // 且新的deliveryStatu沒有productPayments
 
-          const thePaymentArr = productPayments?.filter((item) => {
-            return String(item.invoice?.period) === String(period);
-          });
+        // 請款單應該是要重做了
+        // 在動工前，把所有用到productPayments的資料處理註解
 
-          const thePayment = thePaymentArr?.[0];
+        // periodList[period] = (deliveryStatus ?? []).map((deliveryStatu) => {
+        //   const { itemName, productPayments } = deliveryStatu;
 
-          const ratio = Number(thePayment?.paymentRatio || 0);
-          const completePrice = new Decimal(totalPrice).mul(ratio).toNumber();
+        //   const thePaymentArr = productPayments?.filter((item) => {
+        //     return String(item.invoice?.period) === String(period);
+        //   });
 
-          return {
-            completeItem: deliveryStatu.itemName ?? '',
-            percentage: {
-              value: thePayment?.paymentRatio ? `${thePayment.paymentRatio}%` : '---',
-              onClick: () => {
-                if (!accountReceivableId) {
-                  return;
-                }
+        //   const thePayment = thePaymentArr?.[0];
 
-                setPeymentPreBody({
-                  paymentRatio: thePayment?.paymentRatio || '0',
-                  accountsReceivableId: accountReceivableId,
-                  invoiceId: validInvoice.id,
-                  productItemId: prodItem.id,
-                  deliveryStatusId: [deliveryStatu.id],
-                  id: thePayment?.id,
-                });
-              },
-            },
-            completePrice,
-          };
-        });
+        //   const ratio = Number(thePayment?.paymentRatio || 0);
+        //   const completePrice = new Decimal(totalPrice).mul(ratio).toNumber();
+
+        //   return {
+        //     completeItem: deliveryStatu.itemName ?? '',
+        //     percentage: {
+        //       value: thePayment?.paymentRatio ? `${thePayment.paymentRatio}%` : '---',
+        //       onClick: () => {
+        //         if (!accountReceivableId) {
+        //           return;
+        //         }
+
+        //         setPeymentPreBody({
+        //           paymentRatio: thePayment?.paymentRatio || '0',
+        //           accountsReceivableId: accountReceivableId,
+        //           invoiceId: validInvoice.id,
+        //           productItemId: prodItem.id,
+        //           deliveryStatusId: [deliveryStatu.id],
+        //           id: thePayment?.id,
+        //         });
+        //       },
+        //     },
+        //     completePrice,
+        //   };
+        // });
 
         if (periodList[period].length === 0) {
           periodList[period].push({
