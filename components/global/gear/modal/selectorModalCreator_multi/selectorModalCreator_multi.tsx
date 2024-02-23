@@ -55,12 +55,13 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     onConfirm,
     onCancel,
     isCancelOnConfirm = true,
+    defaultSeletedDataArrArr,
   }: {
     showModal: boolean;
     onConfirm: (v: TdataArrArr) => void;
     onCancel: () => void;
     isCancelOnConfirm?: boolean;
-
+    defaultSeletedDataArrArr?: Partial<TdataArrArr>;
     //
   }) => {
     // ------------------------------------------------------------------------
@@ -152,6 +153,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
                       return copy;
                     });
                   }}
+                  defaultSelectedArr={defaultSeletedDataArrArr?.[index]}
                 />
                 {index !== selectorArr.length - 1 && <hr />}
               </Fragment>
