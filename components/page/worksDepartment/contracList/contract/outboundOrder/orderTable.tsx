@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -7,6 +7,7 @@ import scss from './outboundOrder.module.scss';
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 // import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { TemployeeDto, ToutsourcingDto } from 'js/api/dtoTypes';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
@@ -145,6 +146,28 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
 
   // const [targetRow, setTargetRow] = useState<Tgroup['rowArr'][number]['deliveryStatus'] | undefined>();
   const [targetEmpControl, setTargetEmpControl] = useState<TdeliveryStatusItem_installer | undefined>();
+
+  console.log(targetEmpControl);
+
+  // 決定簡單處理就好
+  const defaultSeletedDataArrArr = useMemo(() => {
+    const installer = targetEmpControl?.installer;
+
+    if (!installer) {
+      return undefined;
+    }
+
+    type TdefaultSeletedDataArrArr = [TemployeeDto[] | undefined, ToutsourcingDto[] | undefined];
+    let arr: TdefaultSeletedDataArrArr = [[], []];
+
+    if ('name' in installer) {
+      arr = [undefined, [installer]] as TdefaultSeletedDataArrArr;
+    } else if ('chName' in installer) {
+      arr = [[installer], undefined] as TdefaultSeletedDataArrArr;
+    }
+
+    return arr;
+  }, [targetEmpControl]);
 
   return (
     <div className={scss.orderTable}>
@@ -495,6 +518,8 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
 
       <SelectorGroup
         showModal={!!targetEmpControl}
+        caption="選擇員工或外包廠商"
+        tip="員工或外包擇一"
         onConfirm={(dataArr) => {
           const employeeArr = dataArr[0];
           const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
@@ -502,15 +527,24 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
           const outsourcingArr = dataArr[1];
           const outsourcing = outsourcingArr[0] as (typeof outsourcingArr)[0] | undefined;
 
+          if (!employee && !outsourcing) {
+            myAlert.info({ title: '必須選擇安裝人員' });
+
+            return;
+          }
+
           targetEmpControl?.onChange_installer &&
             targetEmpControl.onChange_installer({
               employee,
               outsourcing,
             });
+          setTargetEmpControl(undefined);
         }}
         onCancel={() => {
           setTargetEmpControl(undefined);
         }}
+        isCancelOnConfirm={false}
+        defaultSeletedDataArrArr={defaultSeletedDataArrArr}
       />
     </div>
   );
@@ -755,7 +789,7 @@ const creCellConfig_staticData2 = (): TcellConfigList => ({
     position: '',
   },
   installer: {
-    label: '外包人員',
+    label: '安裝人員',
     width: '85px',
     type: 'employee',
     position: '',
@@ -788,7 +822,7 @@ const creCellConfig_subGroup = (): TcellConfigList => ({
     position: '',
   },
   installerArr: {
-    label: '外包人員',
+    label: '安裝人員',
     width: '85px',
     type: 'input',
     position: '',
@@ -822,14 +856,14 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
     {
       key: 'employee',
       caption: '員工',
-      tip: '單選，員工與外包擇一',
+      tip: '單選',
       limit: 1,
       clearOther: [1],
     },
     {
       key: 'outsourcing',
       caption: '外包廠商',
-      tip: '單選，員工與外包擇一',
+      tip: '單選',
       limit: 1,
       clearOther: [0],
     },

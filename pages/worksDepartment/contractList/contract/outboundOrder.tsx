@@ -63,17 +63,7 @@ type TmyDeleveryList = {
   [key: string]: Tdelevery;
 };
 
-// type TdeliveryStatusInEdit = {
-//   [key: string /*prodKey */]: {
-//     [key: string /*itemId */]: {
-//       [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
-//         id?: string;
-//         installerOutsourcing?: ToutsourcingDto | null;
-//         installerEmployees_obj?: TemployeeDto[];
-//       };
-//     };
-//   };
-// };
+// 爛程式，應該在根目錄把目標物件與路徑分離出來才對
 type TdeliveryStatusInEdit = {
   [key: string /*prodKey */]: {
     [key: string /*itemId */]: {
@@ -124,6 +114,8 @@ export default function OutboundOrder({
   // --------------------------------------------------------------------------
 
   const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
+
+  // console.log(deleveryStatusInEdit);
 
   const [notes, setNotes] = useState<string>();
   const [notesDiasbled, setNotesDiasbled] = useState(true);
@@ -788,6 +780,23 @@ export default function OutboundOrder({
       };
     }) ?? [];
 
+  const defaultSelectorSelected = useMemo(() => {
+    if (!deleveryStatusInEdit) {
+      return undefined;
+    }
+
+    const a = Object.values(deleveryStatusInEdit)[0];
+    const b = Object.values(a)[0];
+    const deleveryStatus = Object.values(b)[0];
+
+    const { installerOutsourcing, installerEmployees } = deleveryStatus;
+
+    const outsourcingArr = installerOutsourcing ? [installerOutsourcing] : [];
+    const employeeArr = installerEmployees ?? [];
+
+    return [employeeArr, outsourcingArr] as [typeof employeeArr, typeof outsourcingArr];
+  }, [deleveryStatusInEdit]);
+
   // --------------------------------------------------------------------------
 
   const reqPatchNotes = async () => {
@@ -907,6 +916,9 @@ export default function OutboundOrder({
 
       <SelectorGroup
         showModal={!!selectorConfirm}
+        caption="選擇員工或外包廠商"
+        tip="員工或外包擇一"
+        defaultSeletedDataArrArr={defaultSelectorSelected}
         onConfirm={(arr) => {
           const employeeArr = arr[0];
           const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
@@ -934,16 +946,18 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
     {
       key: 'employee',
       caption: '員工',
-      tip: '單選，員工與外包擇一',
+      tip: '單選',
       limit: 1,
       clearOther: [1],
     },
     {
       key: 'outsourcing',
       caption: '外包廠商',
-      tip: '單選，員工與外包擇一',
+      tip: '單選',
       limit: 1,
       clearOther: [0],
     },
   ],
 });
+
+// ======================================================================
