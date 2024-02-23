@@ -39,6 +39,7 @@ type Tconfig = {
   tbody?: {
     className?: string;
     style?: React.CSSProperties;
+    reducer?: (value: unknown) => string;
   };
 };
 
@@ -367,7 +368,7 @@ function DataList_table_row<Tdata extends TapiData>({
       <div ref={viewRef_bottom} className={classNames(scss.row, isForbidden && scss.forbidden)}>
         {configArr.map((config, index) => {
           const { key, width, flex, tbody } = config;
-          const { className, style } = tbody || {};
+          const { className, style, reducer } = tbody || {};
 
           const theStyle = {
             width,
@@ -375,7 +376,11 @@ function DataList_table_row<Tdata extends TapiData>({
             ...style,
           };
 
-          const value = apiData[key] as string | number;
+          let value = apiData[key] as string | number;
+
+          if (reducer) {
+            value = reducer(value);
+          }
 
           return (
             <div key={index} className={classNames(scss.cell, className)} style={theStyle}>
