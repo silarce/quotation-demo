@@ -24,7 +24,6 @@ import OrderTable, {
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // css
@@ -50,7 +49,13 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 // import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { TerpFeatureDto, TquotationProductItemDto, TdeliveryStatusDto } from 'js/api/dtoTypes';
+import {
+  ToutsourcingDto,
+  TerpFeatureDto,
+  TquotationProductItemDto,
+  TdeliveryStatusDto,
+  TemployeeDto,
+} from 'js/api/dtoTypes';
 
 // =====================================================================
 
@@ -64,12 +69,25 @@ type TmyDeleveryList = {
   [key: string]: Tdelevery;
 };
 
+// type TdeliveryStatusInEdit = {
+//   [key: string /*prodKey */]: {
+//     [key: string /*itemId */]: {
+//       [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
+//         id?: string;
+//         installerOutsourcing?: ToutsourcingDto | null;
+//         installerEmployees_obj?: TemployeeDto[];
+//       };
+//     };
+//   };
+// };
 type TdeliveryStatusInEdit = {
   [key: string /*prodKey */]: {
     [key: string /*itemId */]: {
-      [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
+      [key: string /*statusId */]: Omit<TcreateEngineeringDeliveryStatusDto, 'installerEmployees' | 'productItemId'> & {
         id?: string;
         installerOutsourcing?: ToutsourcingDto | null;
+        installerEmployees?: TemployeeDto[];
+        productItemId: string | null;
       };
     };
   };
@@ -414,20 +432,21 @@ export default function OutboundOrder({
 
         deliveryStatusArr?.forEach((status, statusIndex) => {
           const statusId = status.id;
-          const deleveryStatus = deleveryStatusInEdit?.[prodKey]?.[itemId]?.[statusId];
-          const disabled = !deleveryStatus;
+          const deleveryStatus_singleState = deleveryStatusInEdit?.[prodKey]?.[itemId]?.[statusId];
+          const disabled = !deleveryStatus_singleState;
 
           const edit = ({
             //
             key,
             value,
-            employee,
           }: {
-            key: keyof TdeliveryStatusInEdit[string][string][string];
+            key: Exclude<
+              keyof TdeliveryStatusInEdit[string][string][string],
+              'installerOutsourcing' | 'installerEmployees_obj' | 'installerEmployees'
+            >;
             value?: string;
-            employee?: ToutsourcingDto | null;
           }) => {
-            if (!deleveryStatus || !havePermissionToEdit) {
+            if (!deleveryStatus_singleState || !havePermissionToEdit) {
               return;
             }
 
@@ -438,11 +457,29 @@ export default function OutboundOrder({
 
               const copy = { ...state };
 
-              if (key === 'installerEmployee') {
-                copy[prodKey][itemId][statusId]['installerOutsourcing'] = employee;
-              } else {
-                copy[prodKey][itemId][statusId][key] = value ?? '';
+              copy[prodKey][itemId][statusId][key] = value ?? '';
+
+              return copy;
+              //
+            });
+          };
+
+          const editInstaller = ({
+            employee,
+            outsourcing,
+          }: {
+            employee?: TemployeeDto | null;
+            outsourcing?: ToutsourcingDto | null;
+          }) => {
+            setDeleveryStatusInEdit((state) => {
+              if (!state) {
+                return state;
               }
+
+              const copy = { ...state };
+
+              copy[prodKey][itemId][statusId].installerOutsourcing = outsourcing || null;
+              copy[prodKey][itemId][statusId].installerEmployees = employee ? [employee] : [];
 
               return copy;
               //
@@ -458,10 +495,12 @@ export default function OutboundOrder({
                 return;
               }
 
+              const copy = _.cloneDeep(status);
+
               setDeleveryStatusInEdit({
                 [prodKey]: {
                   [itemId]: {
-                    [statusId]: _.cloneDeep(status),
+                    [statusId]: copy,
                   },
                 },
               });
@@ -518,18 +557,39 @@ export default function OutboundOrder({
               });
             },
             onConfirmClick: async () => {
-              if (!deleveryStatus || !havePermissionToEdit) {
+              if (!deleveryStatus_singleState || !havePermissionToEdit) {
                 return;
               }
 
               const body = {
-                ...deleveryStatus,
-                installerEmployeeId: deleveryStatus.installerOutsourcing?.id ?? null,
+                ...deleveryStatus_singleState,
+                installerEmployeeId: deleveryStatus_singleState.installerOutsourcing?.id ?? null,
+              };
+
+              if (!body.productItemId) {
+                myAlert.err({ title: '更新失敗', content: 'productItemId不存在' });
+                console.log(body);
+
+                return;
+              }
+
+              const installerEmployees = (body.installerEmployees ?? []).map((item) => item.id);
+
+              const reqBody: TcreateEngineeringDeliveryStatusDto = {
+                notes: body.notes,
+                itemName: body.itemName,
+                shippingDate: body.shippingDate,
+                installerOutsourcingId: body.installerOutsourcingId,
+                installerEmployees,
+                installationDate: body.installationDate,
+                append: body.append,
+                completeAppend: body.completeAppend,
+                productItemId: body.productItemId,
               };
 
               const res = await reqPatch({
                 statusId,
-                body,
+                body: reqBody,
               });
 
               if (res) {
@@ -556,9 +616,9 @@ export default function OutboundOrder({
 
           installDateArr.push({
             disabled,
-            value: deleveryStatus?.installationDate ?? status.installationDate ?? '',
+            value: deleveryStatus_singleState?.installationDate ?? status.installationDate ?? '',
             onChange_date: (v) => {
-              if (!deleveryStatus || !havePermissionToEdit) {
+              if (!deleveryStatus_singleState || !havePermissionToEdit) {
                 return;
               }
 
@@ -571,24 +631,29 @@ export default function OutboundOrder({
 
           installerArr.push({
             disabled,
-            empolyee: deleveryStatus?.installerOutsourcing ?? (status.installerEmployee || null),
-            onChange_employee: (employee) => {
-              if (!deleveryStatus || !havePermissionToEdit) {
+            // installer: deleveryStatus?.installerOutsourcing ?? (status.installerEmployee || null),
+            installer:
+              deleveryStatus_singleState?.installerOutsourcing ??
+              (status.installerOutsourcing || null) ??
+              (status.installerEmployees?.[0] || null),
+            onChange_installer: (installer) => {
+              if (!deleveryStatus_singleState || !havePermissionToEdit) {
                 return;
               }
 
-              edit({
-                key: 'installerEmployee',
+              const { employee, outsourcing } = installer;
+              editInstaller({
                 employee,
+                outsourcing,
               });
             },
           });
 
           itemNameArr.push({
             disabled,
-            value: deleveryStatus?.itemName ?? status.itemName ?? '',
+            value: deleveryStatus_singleState?.itemName ?? status.itemName ?? '',
             onChange: (v) => {
-              if (!deleveryStatus || !havePermissionToEdit) {
+              if (!deleveryStatus_singleState || !havePermissionToEdit) {
                 return;
               }
 
@@ -601,9 +666,9 @@ export default function OutboundOrder({
 
           notesArr.push({
             disabled,
-            value: deleveryStatus?.notes ?? status.notes ?? '',
+            value: deleveryStatus_singleState?.notes ?? status.notes ?? '',
             onChange: (v) => {
-              if (!deleveryStatus || !havePermissionToEdit) {
+              if (!deleveryStatus_singleState || !havePermissionToEdit) {
                 return;
               }
 

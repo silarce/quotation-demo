@@ -750,7 +750,8 @@ export const apiGetEngineeringDeliveryList = (id: string) => {
 
   const params = {
     populate: [
-      'contract.worksheet.contractProductItems.deliveryStatus.installerEmployee',
+      'contract.worksheet.contractProductItems.deliveryStatus.installerEmployees',
+      'contract.worksheet.contractProductItems.deliveryStatus.installerOutsourcing',
       'contract.worksheet.contractProductItems.adjustedItem.accessories',
       'contract.worksheet.contractProductItems.accessories',
       'contract.worksheet.contractProductItems.rootproductId',
