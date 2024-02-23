@@ -41,7 +41,7 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { optionsCreator_otherWorkItems } from 'js/utils/options/options';
 
 // type
-import type { TquotationProductItemDto, TdeliveryStatusDto } from 'js/api/dtoTypes';
+import type { TquotationProductItemDto, TengineeringDeliveryStatusDto } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -595,13 +595,13 @@ const useTable02 = ({
       const { deliveryStatus, id, itemName } = item;
 
       let deliveryStatusArr = (deliveryStatus ?? []).filter((item) => {
-        return item.installerEmployeeId === outsourcingId;
+        return item.installerOutsourcingId === outsourcingId;
       });
 
       // 以createdAt排序，確保順序保持一致
       deliveryStatusArr = _.sortBy(deliveryStatusArr, 'createdAt');
 
-      const firstDeliveryStatus = deliveryStatusArr[0] as TdeliveryStatusDto | undefined;
+      const firstDeliveryStatus = deliveryStatusArr[0] as TengineeringDeliveryStatusDto | undefined;
       const quotationItemStatusId = firstDeliveryStatus?.id;
 
       if (quotationItemStatusId) {

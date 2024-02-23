@@ -49,13 +49,7 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 // import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import {
-  ToutsourcingDto,
-  TerpFeatureDto,
-  TquotationProductItemDto,
-  TdeliveryStatusDto,
-  TemployeeDto,
-} from 'js/api/dtoTypes';
+import { ToutsourcingDto, TerpFeatureDto, TquotationProductItemDto, TemployeeDto } from 'js/api/dtoTypes';
 
 // =====================================================================
 
