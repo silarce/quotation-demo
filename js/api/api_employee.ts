@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 
 import { axi } from './_axiosCreator';
 
+import { createUseInfinite } from './createUseInfinite';
+
 // type
 import { Tparams, TemployeeDto, TpageMetaDto } from './dtoTypes';
 
@@ -94,6 +96,11 @@ export const useEmployee = (params?: Tparams) => {
     update,
   };
 };
+
+export const useEmployee_infinite_2 = createUseInfinite<TgetEmployee>({
+  apiClient: apiGetEmployee,
+  errTitle: '取得員工資料失敗',
+});
 
 export const useCheckEmployee = (idNumber: string) => {
   type Tcheck = 'ok' | 'notOk' | 'loading';

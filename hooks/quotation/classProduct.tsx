@@ -2237,8 +2237,8 @@ class Class_product {
       v = '0';
     }
 
-    if (Number(v) > 100) {
-      v = '100';
+    if (Number(v) > 500) {
+      v = '500';
     }
 
     if (v.split('.')[1]?.length > 3) {
