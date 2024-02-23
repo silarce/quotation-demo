@@ -24,7 +24,7 @@ import OrderTable, {
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
+import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // css
 import style from './contract.module.scss';
@@ -35,10 +35,10 @@ import {
   // TupdateEngineeringDeliveryList,
   // TupdateDeliveryStatus,
   TupdateEngineeringDeliveryStatusDto,
+  TcreateEngineeringDeliveryStatusDto,
   useGetEngineeringContact,
   useGetEngineeringDeliveryList,
   apiPatchEngineeringDeliveryList,
-  TcreateEngineeringDeliveryStatusDto,
   apiPostDeliveryStatus,
   apiPatchDeliveryStatus,
   apiDeleteDeliveryStatus,
@@ -49,7 +49,7 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 // import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { TerpFeatureDto, TquotationProductItemDto, TdeliveryStatusDto } from 'js/api/dtoTypes';
+import { ToutsourcingDto, TerpFeatureDto, TquotationProductItemDto, TemployeeDto } from 'js/api/dtoTypes';
 
 // =====================================================================
 
@@ -63,16 +63,31 @@ type TmyDeleveryList = {
   [key: string]: Tdelevery;
 };
 
+// type TdeliveryStatusInEdit = {
+//   [key: string /*prodKey */]: {
+//     [key: string /*itemId */]: {
+//       [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
+//         id?: string;
+//         installerOutsourcing?: ToutsourcingDto | null;
+//         installerEmployees_obj?: TemployeeDto[];
+//       };
+//     };
+//   };
+// };
 type TdeliveryStatusInEdit = {
   [key: string /*prodKey */]: {
     [key: string /*itemId */]: {
-      [key: string /*statusId */]: TcreateEngineeringDeliveryStatusDto & {
+      [key: string /*statusId */]: Omit<TcreateEngineeringDeliveryStatusDto, 'installerEmployees' | 'productItemId'> & {
         id?: string;
-        installerEmployee?: ToutsourcingDto | null;
+        installerOutsourcing?: ToutsourcingDto | null;
+        installerEmployees?: TemployeeDto[];
+        productItemId: string | null;
       };
     };
   };
 };
+
+type TselectorConfirm = (props: { outsourcingId?: string; employeeId?: string }) => void;
 
 // =====================================================================
 export default function OutboundOrder({
@@ -104,7 +119,16 @@ export default function OutboundOrder({
   const [isReqing, setIsReqing] = useState(false);
 
   // 外包廠商選擇器的onConfirm
-  const [selectorConfirm, setSelectorConfirm] = useState<(outsourcingId: string) => void>();
+  const [selectorConfirm, setSelectorConfirm] = useState<TselectorConfirm>();
+
+  // --------------------------------------------------------------------------
+
+  const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
+
+  const [notes, setNotes] = useState<string>();
+  const [notesDiasbled, setNotesDiasbled] = useState(true);
+
+  const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
 
   // --------------------------------------------------------------------------
 
@@ -177,22 +201,15 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
-  const [notes, setNotes] = useState<string>();
-  const [notesDiasbled, setNotesDiasbled] = useState(true);
-
   useEffect(() => {
     setNotes(deliveryList?.notes);
   }, [deliveryList, notesDiasbled]);
 
   // --------------------------------------------------------------------------
 
-  const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
-
   // --------------------------------------------------------------------------
 
   const worksheet = deliveryList?.contract.worksheet;
-
-  const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
 
   useEffect(() => {
     if (!deliveryList?.contract.worksheet?.contractProductItems) {
@@ -234,12 +251,24 @@ export default function OutboundOrder({
     });
 
     setMyDeleveryList(myDeleveryList);
+
+    // ---------------------
   }, [deliveryList]);
 
   // --------------------------------------------------------------------------
 
-  const reqPost = async (productItemId: string, outsouctingId: string) => {
+  const reqPost = async (
+    productItemId: string,
+
+    { employeeId, outsourcingId }: { employeeId?: string; outsourcingId?: string }
+  ) => {
     if (!engineeringDeliveryListId || isReqing) {
+      return undefined;
+    }
+
+    if (!employeeId && !outsourcingId) {
+      myAlert.err({ title: '新增失敗', content: '請選擇員工或外包廠商' });
+
       return undefined;
     }
 
@@ -250,7 +279,11 @@ export default function OutboundOrder({
           notes: null,
           itemName: null,
           shippingDate: null,
-          installerEmployeeId: outsouctingId,
+          // installerEmployeeId: outsouctingId,
+
+          installerOutsourcingId: outsourcingId ?? null,
+          installerEmployees: employeeId ? [employeeId] : null,
+
           installationDate: null,
           append: null,
           completeAppend: null,
@@ -274,6 +307,16 @@ export default function OutboundOrder({
   const reqPatch = async ({ statusId, body }: { statusId: string; body: TupdateEngineeringDeliveryStatusDto }) => {
     if (!engineeringDeliveryListId || isReqing) {
       return;
+    }
+
+    if (body.installerEmployees?.length === 0) {
+      body.installerEmployees = null;
+    }
+
+    if (!body.installerOutsourcingId) {
+      {
+        body.installerOutsourcingId = null;
+      }
     }
 
     try {
@@ -395,20 +438,21 @@ export default function OutboundOrder({
 
         deliveryStatusArr?.forEach((status, statusIndex) => {
           const statusId = status.id;
-          const deleveryStatus = deleveryStatusInEdit?.[prodKey]?.[itemId]?.[statusId];
-          const disabled = !deleveryStatus;
+          const deleveryStatus_singleState = deleveryStatusInEdit?.[prodKey]?.[itemId]?.[statusId];
+          const disabled = !deleveryStatus_singleState;
 
           const edit = ({
             //
             key,
             value,
-            employee,
           }: {
-            key: keyof TdeliveryStatusInEdit[string][string][string];
+            key: Exclude<
+              keyof TdeliveryStatusInEdit[string][string][string],
+              'installerOutsourcing' | 'installerEmployees_obj' | 'installerEmployees'
+            >;
             value?: string;
-            employee?: ToutsourcingDto | null;
           }) => {
-            if (!deleveryStatus || !havePermissionToEdit) {
+            if (!deleveryStatus_singleState || !havePermissionToEdit) {
               return;
             }
 
@@ -419,11 +463,34 @@ export default function OutboundOrder({
 
               const copy = { ...state };
 
-              if (key === 'installerEmployee') {
-                copy[prodKey][itemId][statusId]['installerEmployee'] = employee;
-              } else {
-                copy[prodKey][itemId][statusId][key] = value ?? '';
+              copy[prodKey][itemId][statusId][key] = value ?? '';
+
+              return copy;
+              //
+            });
+          };
+
+          const editInstaller = ({
+            employee,
+            outsourcing,
+          }: {
+            employee?: TemployeeDto | null;
+            outsourcing?: ToutsourcingDto | null;
+          }) => {
+            setDeleveryStatusInEdit((state) => {
+              if (!state) {
+                return state;
               }
+
+              const copy = { ...state };
+
+              copy[prodKey][itemId][statusId].installerOutsourcing = outsourcing || null;
+
+              if (!copy[prodKey][itemId][statusId].installerOutsourcing) {
+                copy[prodKey][itemId][statusId].installerOutsourcingId = null;
+              }
+
+              copy[prodKey][itemId][statusId].installerEmployees = employee ? [employee] : [];
 
               return copy;
               //
@@ -439,10 +506,12 @@ export default function OutboundOrder({
                 return;
               }
 
+              const copy = _.cloneDeep(status);
+
               setDeleveryStatusInEdit({
                 [prodKey]: {
                   [itemId]: {
-                    [statusId]: _.cloneDeep(status),
+                    [statusId]: copy,
                   },
                 },
               });
@@ -481,8 +550,8 @@ export default function OutboundOrder({
                 return;
               }
 
-              const onSelectorConfirm = async (outsourcingId: string) => {
-                const res = await reqPost(itemId, outsourcingId);
+              const onSelectorConfirm: TselectorConfirm = async ({ employeeId, outsourcingId }) => {
+                const res = await reqPost(itemId, { employeeId, outsourcingId });
 
                 if (res) {
                   setMyDeleveryList((state) => {
@@ -497,31 +566,42 @@ export default function OutboundOrder({
               setSelectorConfirm(() => {
                 return onSelectorConfirm;
               });
-
-              // const res = await reqPost(itemId);
-
-              // if (res) {
-              //   setMyDeleveryList((state) => {
-              //     const copy = { ...state };
-              //     copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
-
-              //     return copy;
-              //   });
-              // }
             },
             onConfirmClick: async () => {
-              if (!deleveryStatus || !havePermissionToEdit) {
+              if (!deleveryStatus_singleState || !havePermissionToEdit) {
                 return;
               }
 
               const body = {
-                ...deleveryStatus,
-                installerEmployeeId: deleveryStatus.installerEmployee?.id ?? null,
+                ...deleveryStatus_singleState,
+                installerEmployeeId: deleveryStatus_singleState.installerOutsourcing?.id ?? null,
+              };
+
+              if (!body.productItemId) {
+                myAlert.err({ title: '更新失敗', content: 'productItemId不存在' });
+                console.log(body);
+
+                return;
+              }
+
+              const installerEmployees = (body.installerEmployees ?? []).map((item) => item.id);
+
+              const reqBody: TcreateEngineeringDeliveryStatusDto = {
+                notes: body.notes,
+                itemName: body.itemName,
+                shippingDate: body.shippingDate,
+                // installerOutsourcingId: body.installerOutsourcingId,
+                installerOutsourcingId: body.installerOutsourcing?.id ?? null,
+                installerEmployees,
+                installationDate: body.installationDate,
+                append: body.append,
+                completeAppend: body.completeAppend,
+                productItemId: body.productItemId,
               };
 
               const res = await reqPatch({
                 statusId,
-                body,
+                body: reqBody,
               });
 
               if (res) {
@@ -548,9 +628,9 @@ export default function OutboundOrder({
 
           installDateArr.push({
             disabled,
-            value: deleveryStatus?.installationDate ?? status.installationDate ?? '',
+            value: deleveryStatus_singleState?.installationDate ?? status.installationDate ?? '',
             onChange_date: (v) => {
-              if (!deleveryStatus || !havePermissionToEdit) {
+              if (!deleveryStatus_singleState || !havePermissionToEdit) {
                 return;
               }
 
@@ -563,24 +643,29 @@ export default function OutboundOrder({
 
           installerArr.push({
             disabled,
-            empolyee: deleveryStatus?.installerEmployee ?? (status.installerEmployee || null),
-            onChange_employee: (employee) => {
-              if (!deleveryStatus || !havePermissionToEdit) {
+            installer:
+              deleveryStatus_singleState?.installerOutsourcing ??
+              deleveryStatus_singleState?.installerEmployees?.[0] ??
+              (status.installerOutsourcing || null) ??
+              (status.installerEmployees?.[0] || null),
+            onChange_installer: (installer) => {
+              if (!deleveryStatus_singleState || !havePermissionToEdit) {
                 return;
               }
 
-              edit({
-                key: 'installerEmployee',
+              const { employee, outsourcing } = installer;
+              editInstaller({
                 employee,
+                outsourcing,
               });
             },
           });
 
           itemNameArr.push({
             disabled,
-            value: deleveryStatus?.itemName ?? status.itemName ?? '',
+            value: deleveryStatus_singleState?.itemName ?? status.itemName ?? '',
             onChange: (v) => {
-              if (!deleveryStatus || !havePermissionToEdit) {
+              if (!deleveryStatus_singleState || !havePermissionToEdit) {
                 return;
               }
 
@@ -593,9 +678,9 @@ export default function OutboundOrder({
 
           notesArr.push({
             disabled,
-            value: deleveryStatus?.notes ?? status.notes ?? '',
+            value: deleveryStatus_singleState?.notes ?? status.notes ?? '',
             onChange: (v) => {
-              if (!deleveryStatus || !havePermissionToEdit) {
+              if (!deleveryStatus_singleState || !havePermissionToEdit) {
                 return;
               }
 
@@ -619,8 +704,8 @@ export default function OutboundOrder({
                 return;
               }
 
-              const onSelectorConfirm = async (outsourcingId: string) => {
-                const res = await reqPost(itemId, outsourcingId);
+              const onSelectorConfirm: TselectorConfirm = async ({ outsourcingId, employeeId }) => {
+                const res = await reqPost(itemId, { employeeId, outsourcingId });
 
                 if (res) {
                   setMyDeleveryList((state) => {
@@ -635,17 +720,6 @@ export default function OutboundOrder({
               setSelectorConfirm(() => {
                 return onSelectorConfirm;
               });
-
-              // const res = await reqPost(itemId);
-
-              // if (res) {
-              //   setMyDeleveryList((state) => {
-              //     const copy = { ...state };
-              //     copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
-
-              //     return copy;
-              //   });
-              // }
             },
           });
         }
@@ -831,15 +905,20 @@ export default function OutboundOrder({
         </div>
       </div>
 
-      <OutsourcingSelector
+      <SelectorGroup
         showModal={!!selectorConfirm}
-        label="請選擇外包廠商"
         onConfirm={(arr) => {
-          const outsourcing: (typeof arr)[number] | undefined = arr[0];
+          const employeeArr = arr[0];
+          const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
 
-          if (outsourcing && selectorConfirm) {
-            selectorConfirm(outsourcing.id);
-          }
+          const outsourcingArr = arr[1];
+          const outsourcing = outsourcingArr[0] as (typeof outsourcingArr)[0] | undefined;
+
+          selectorConfirm &&
+            selectorConfirm({
+              employeeId: employee?.id,
+              outsourcingId: outsourcing?.id,
+            });
         }}
         onCancel={() => {
           setSelectorConfirm(undefined);
@@ -848,3 +927,23 @@ export default function OutboundOrder({
     </SubLayer>
   );
 }
+
+// ============================================================================
+const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
+  selectorArr: [
+    {
+      key: 'employee',
+      caption: '員工',
+      tip: '單選，員工與外包擇一',
+      limit: 1,
+      clearOther: [1],
+    },
+    {
+      key: 'outsourcing',
+      caption: '外包廠商',
+      tip: '單選，員工與外包擇一',
+      limit: 1,
+      clearOther: [0],
+    },
+  ],
+});

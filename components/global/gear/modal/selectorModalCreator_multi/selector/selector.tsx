@@ -133,6 +133,10 @@ export function Selector_component<Tdata extends TapiData>(
 
     let isRemove = false;
 
+    if (limit === 1) {
+      setSelectedList({ [id]: data });
+    }
+
     if (selectedList[id]) {
       setSelectedList((list) => {
         delete list[id];

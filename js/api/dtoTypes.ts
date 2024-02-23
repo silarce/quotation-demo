@@ -1041,6 +1041,7 @@ export type TquotationProductDto = {
   reduceQty?: number;
 };
 
+// 棄用
 // export type TdeliveryStatusDto = {
 //   id: string;
 //   createdAt: string;
@@ -1077,36 +1078,35 @@ export type TquotationProductDto = {
 //   itemId: string | null; // 自動代入之productItem的id
 //   itemPrice: number | null; // productItem的才數計價
 // };
-export type TdeliveryStatusDto = {
+
+export type TengineeringDeliveryStatusDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  productItemId: string;
-  //  '所屬產品'
-  productItem?: TquotationProductItemDto;
-  //  '備註'
+  // 所屬產品Id
+  productItemId: string | null;
+  // 所屬產品
+  productItem: TquotationProductItemDto;
+  // 備註
   notes: string | null;
-  itemName: string | null;
+  // 出貨日
   shippingDate: string | null;
-  //  '安裝人員Id'
-  installerEmployeeId: string | null;
-  //  '安裝人員/外包人員'
-  installerEmployee?: ToutsourcingDto | null;
-  //  '安裝日期'
+  // 項目名稱
+  itemName: string | null;
+  // 安裝人員(外包)ID
+  installerOutsourcingId: string | null;
+  // 安裝人員(外包)
+  installerOutsourcing: ToutsourcingDto;
+  // 安裝人員(員工)
+  installerEmployees: TemployeeDto[];
+  // 安裝日期
   installationDate: string | null;
-  //  '工作表開立日期'
+  // 工作表開立日期
   workSheetInvoiceDate: string | null;
-  //  '追加'
+  // 追加
   append: string | null;
-  //  '完成追加'
+  // 完成追加
   completeAppend: string | null;
-
-  // completePayment: boolean | null; // 後端將這個型別移除了
-  // productPaymentId: boolean | null; // 後端將這個型別移除了
-
-  // 後端將這個型別移除了，但是前端有用到，但也不記得是做什麼用的了
-  productPayments?: TaccountsReceivableProductPaymentDto[] | null;
-
   // 單樘計價
   unitPrice: number | null;
   // 其他特殊工作項目
@@ -1116,26 +1116,32 @@ export type TdeliveryStatusDto = {
 };
 
 export type TcreateEngineeringDeliveryStatusDto = {
+  // 備註
   notes: string | null;
+  // 項目名稱
   itemName: string | null;
+  // 出貨日
   shippingDate: string | null;
-  installerEmployeeId: string | null;
+
+  // installerOutsourcingId與installerEmployees二擇一
+
+  // 安裝人員id(外包廠商)
+  installerOutsourcingId: string | null;
+  // 安裝人員id(員工)
+  // installerEmployees: (string | null)[];
+  // api文件錯誤，應該長這樣才對
+  installerEmployees: string[] | null;
+  // 安裝日期
   installationDate: string | null;
+  // 追加
   append: string | null;
+  // 完成追加
   completeAppend: string | null;
+  // 所屬產品id
   productItemId: string;
 };
 
-export type TupdateEngineeringDeliveryStatusDto = {
-  notes: string | null;
-  itemName: string | null;
-  shippingDate: string | null;
-  installerEmployeeId: string | null;
-  installationDate: string | null;
-  append: string | null;
-  completeAppend: string | null;
-  productItemId: string;
-};
+export type TupdateEngineeringDeliveryStatusDto = TcreateEngineeringDeliveryStatusDto;
 
 export type TupdateDeliveryStatus = {
   id: string;
@@ -1171,7 +1177,7 @@ export type TquotationProductItemDto = Omit<
   itemName: string;
   worksheetId: string;
   others: null;
-  deliveryStatus?: TdeliveryStatusDto[] | null;
+  deliveryStatus?: TengineeringDeliveryStatusDto[] | null;
   adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
   adjustedItemId?: string | null;
   //
@@ -2805,7 +2811,7 @@ export type TaccountsReceivableProductPaymentDto = {
 
   // @ApiProperty({ description: '完成項目' })
   // completeItemStatus: TengineeringDeliveryStatusDto[];
-  completeItemStatus: TdeliveryStatusDto[];
+  completeItemStatus: TengineeringDeliveryStatusDto[];
 };
 
 export type TcreateAccountReceivableProductPaymentDto = {
