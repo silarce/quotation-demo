@@ -25,6 +25,7 @@ import OrderTable, {
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
+import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // css
 import style from './contract.module.scss';
@@ -74,6 +75,8 @@ type TdeliveryStatusInEdit = {
   };
 };
 
+type TselectorConfirm = (props: { outsourcingId?: string; employeeId?: string }) => void;
+
 // =====================================================================
 export default function OutboundOrder({
   isAdmin,
@@ -104,7 +107,7 @@ export default function OutboundOrder({
   const [isReqing, setIsReqing] = useState(false);
 
   // 外包廠商選擇器的onConfirm
-  const [selectorConfirm, setSelectorConfirm] = useState<(outsourcingId: string) => void>();
+  const [selectorConfirm, setSelectorConfirm] = useState<TselectorConfirm>();
 
   // --------------------------------------------------------------------------
 
@@ -234,12 +237,24 @@ export default function OutboundOrder({
     });
 
     setMyDeleveryList(myDeleveryList);
+
+    // ---------------------
   }, [deliveryList]);
 
   // --------------------------------------------------------------------------
 
-  const reqPost = async (productItemId: string, outsouctingId: string) => {
+  const reqPost = async (
+    productItemId: string,
+
+    { employeeId, outsourcingId }: { employeeId?: string; outsourcingId?: string }
+  ) => {
     if (!engineeringDeliveryListId || isReqing) {
+      return undefined;
+    }
+
+    if (!employeeId && !outsourcingId) {
+      myAlert.err({ title: '新增失敗', content: '請選擇員工或外包廠商' });
+
       return undefined;
     }
 
@@ -250,7 +265,11 @@ export default function OutboundOrder({
           notes: null,
           itemName: null,
           shippingDate: null,
-          installerEmployeeId: outsouctingId,
+          // installerEmployeeId: outsouctingId,
+
+          installerOutsourcingId: outsourcingId ?? null,
+          installerEmployees: employeeId ? [employeeId] : [],
+
           installationDate: null,
           append: null,
           completeAppend: null,
@@ -481,8 +500,8 @@ export default function OutboundOrder({
                 return;
               }
 
-              const onSelectorConfirm = async (outsourcingId: string) => {
-                const res = await reqPost(itemId, outsourcingId);
+              const onSelectorConfirm: TselectorConfirm = async ({ employeeId, outsourcingId }) => {
+                const res = await reqPost(itemId, { employeeId, outsourcingId });
 
                 if (res) {
                   setMyDeleveryList((state) => {
@@ -497,17 +516,6 @@ export default function OutboundOrder({
               setSelectorConfirm(() => {
                 return onSelectorConfirm;
               });
-
-              // const res = await reqPost(itemId);
-
-              // if (res) {
-              //   setMyDeleveryList((state) => {
-              //     const copy = { ...state };
-              //     copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
-
-              //     return copy;
-              //   });
-              // }
             },
             onConfirmClick: async () => {
               if (!deleveryStatus || !havePermissionToEdit) {
@@ -619,8 +627,8 @@ export default function OutboundOrder({
                 return;
               }
 
-              const onSelectorConfirm = async (outsourcingId: string) => {
-                const res = await reqPost(itemId, outsourcingId);
+              const onSelectorConfirm: TselectorConfirm = async ({ outsourcingId, employeeId }) => {
+                const res = await reqPost(itemId, { employeeId, outsourcingId });
 
                 if (res) {
                   setMyDeleveryList((state) => {
@@ -635,17 +643,6 @@ export default function OutboundOrder({
               setSelectorConfirm(() => {
                 return onSelectorConfirm;
               });
-
-              // const res = await reqPost(itemId);
-
-              // if (res) {
-              //   setMyDeleveryList((state) => {
-              //     const copy = { ...state };
-              //     copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
-
-              //     return copy;
-              //   });
-              // }
             },
           });
         }
@@ -831,15 +828,20 @@ export default function OutboundOrder({
         </div>
       </div>
 
-      <OutsourcingSelector
+      <SelectorGroup
         showModal={!!selectorConfirm}
-        label="請選擇外包廠商"
         onConfirm={(arr) => {
-          const outsourcing: (typeof arr)[number] | undefined = arr[0];
+          const employeeArr = arr[0];
+          const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
 
-          if (outsourcing && selectorConfirm) {
-            selectorConfirm(outsourcing.id);
-          }
+          const outsourcingArr = arr[1];
+          const outsourcing = outsourcingArr[0] as (typeof outsourcingArr)[0] | undefined;
+
+          selectorConfirm &&
+            selectorConfirm({
+              employeeId: employee?.id,
+              outsourcingId: outsourcing?.id,
+            });
         }}
         onCancel={() => {
           setSelectorConfirm(undefined);
@@ -848,3 +850,23 @@ export default function OutboundOrder({
     </SubLayer>
   );
 }
+
+// ============================================================================
+const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
+  selectorArr: [
+    {
+      key: 'employee',
+      caption: '員工',
+      tip: '單選，員工與外包擇一',
+      limit: 1,
+      clearOther: [1],
+    },
+    {
+      key: 'outsourcing',
+      caption: '外包廠商',
+      tip: '單選，員工與外包擇一',
+      limit: 1,
+      clearOther: [0],
+    },
+  ],
+});

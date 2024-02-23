@@ -31,6 +31,7 @@ import type {
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
   TfileDto,
+  TengineeringDeliveryStatusDto,
   TupdateEngineeringDeliveryStatusDto,
   TcreateEngineeringDeliveryStatusDto,
   TdeliveryStatusDto,
@@ -70,6 +71,7 @@ export type {
   TengineeringDeliveryListDto,
   TupdateDeliveryStatus,
   TfileDto,
+  TengineeringDeliveryStatusDto,
   TupdateEngineeringDeliveryStatusDto,
   TcreateEngineeringDeliveryStatusDto,
   TdeliveryStatusDto,
@@ -813,7 +815,7 @@ export const apiPostDeliveryStatus = ({
   const api = `/engineering/delivery-list/${id}/delivery-status`;
 
   return axi
-    .post<TdeliveryStatusDto>(api, body)
+    .post<TengineeringDeliveryStatusDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -831,7 +833,7 @@ export const apiPatchDeliveryStatus = ({
   const api = `/engineering/delivery-list/${id}/delivery-status/${statusId}`;
 
   return axi
-    .patch<TdeliveryStatusDto>(api, body)
+    .patch<TengineeringDeliveryStatusDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

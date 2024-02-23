@@ -121,7 +121,9 @@ type Tgroup = {
       groupList: {
         btnPanelArr: TdeliveryStatusItem_btnPanel[];
         installDateArr: TdeliveryStatusItem_date[];
+
         installerArr: TdeliveryStatusItem_employee[];
+
         itemNameArr: TdeliveryStatusItem[];
         notesArr: TdeliveryStatusItem[];
       };
