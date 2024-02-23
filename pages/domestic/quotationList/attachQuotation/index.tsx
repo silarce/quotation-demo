@@ -758,8 +758,8 @@ latestContentProdArr為這次追加追減的主產品
                 v = '0';
               }
 
-              if (Number(v) > 100) {
-                v = '100';
+              if (Number(v) > 500) {
+                v = '500';
               }
 
               if (v.split('.')[1]?.length > 2) {

@@ -853,8 +853,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
               v = '0';
             }
 
-            if (Number(v) > 100) {
-              v = '100';
+            if (Number(v) > 500) {
+              v = '500';
             }
 
             setSummary((state) => {
