@@ -1,15 +1,9 @@
-import { useState, useEffect, useMemo, useContext, useRef, Fragment } from 'react';
+import { useState, useRef, Fragment } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 
 // antd
 import { Modal } from 'antd';
-
-// global gear
-import SelectorShell, { TsearcbBarProps } from '../selectorShell';
-import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
-import LoadingCoverWrapper01 from '../../loadingCover/loadingCoverWrapper01';
 
 // composition
 import { Selector, TimperativeHandle, TselectorProps } from './selector/selector';
@@ -22,9 +16,7 @@ import scss from './selectorModalCreator_multi.module.scss';
 
 // api
 import { useGetOutsourcing, ToutsourcingDto } from 'js/api/api_outsourcing';
-
-// type
-import { Tparams } from 'js/api/createUseInfinite';
+import { useEmployee_infinite_2, TemployeeDto } from 'js/api/api_employee';
 
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 
@@ -73,7 +65,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
   }) => {
     // ------------------------------------------------------------------------
 
-    const [dataArrArr, setDataArrArr] = useState<TdataArrArr>([] as TdataArrArr);
+    const [dataArrArr, setDataArrArr] = useState<TdataArrArr>([] as unknown as TdataArrArr);
 
     // ------------------------------------------------------------------------
 
@@ -122,6 +114,9 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
             if (clearOther) {
               const theOnRowClick = props.onRowClick;
 
+              // FIXME 型別錯誤
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
               props.onRowClick = (props) => {
                 theOnRowClick && theOnRowClick(props);
 
@@ -139,7 +134,10 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
             return (
               <Fragment key={index}>
-                <Selector<TtypeLookup[typeof key]> // 搞這個泛型好像沒有意義...
+                {/* // FIXME 型別錯誤 */}
+                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                {/* @ts-ignore*/}
+                <Selector<TtypeLookup[typeof key]>
                   ref={(ref) => {
                     selectorRef.current[index] = ref!;
                   }}
@@ -148,7 +146,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
                   onStateChange={(state) => {
                     const { dataArr } = state;
                     setDataArrArr((pArr) => {
-                      const copy = [...pArr] as typeof pArr;
+                      const copy = [...pArr] as unknown as typeof pArr;
                       copy[index] = dataArr;
 
                       return copy;
@@ -213,10 +211,10 @@ const props_outsourcing: TselectorProps<ToutsourcingDto> = {
       },
     },
     {
-      wrapperStyle: { width: 100 },
+      wrapperStyle: { width: 150 },
       inputProps: {
         props: {
-          placeholder: '關鍵字...',
+          placeholder: '名稱、備註...',
         },
       },
     },
@@ -236,6 +234,102 @@ const props_outsourcing: TselectorProps<ToutsourcingDto> = {
   },
 };
 
+const props_employee: TselectorProps<TemployeeDto> = {
+  useInfinit: useEmployee_infinite_2,
+  selectedKey: 'chName',
+  caption: '員工',
+  params: {
+    populate: ['jobs.department'],
+  },
+  configArr: [
+    {
+      key: 'idNumber',
+      width: 100,
+      thead: {
+        label: '員工編號',
+      },
+      tbody: {},
+    },
+    {
+      key: 'chName',
+      width: 100,
+      thead: {
+        label: '姓名',
+      },
+      tbody: {},
+    },
+    {
+      key: 'jobs',
+      width: 250,
+      // flex: 'auto',
+      thead: {
+        label: '部門',
+      },
+      tbody: {
+        reducer: (value) => {
+          let jobs = value as TemployeeDto['jobs'];
+          jobs = _.sortBy(jobs, 'grade');
+
+          const job = jobs[0];
+
+          if (!job) {
+            return '';
+          }
+
+          const departmentName = job.department?.name;
+          const jobName = job.name;
+
+          return `${departmentName} / ${jobName}`;
+        },
+      },
+    },
+    {
+      key: 'jobs',
+      width: 100,
+      thead: {
+        label: '職等',
+      },
+      tbody: {
+        reducer: (value) => {
+          let jobs = value as TemployeeDto['jobs'];
+          jobs = _.sortBy(jobs, 'grade');
+
+          if (jobs[0]?.grade) {
+            return `Level ${jobs[0]?.grade}`;
+          } else {
+            return '';
+          }
+        },
+      },
+    },
+  ],
+
+  searchInputSelPropsArr: [
+    {
+      wrapperStyle: { width: 150 },
+      inputProps: {
+        props: {
+          placeholder: '完整編號、姓名...',
+        },
+      },
+    },
+  ],
+
+  filter: (strArr) => {
+    return {
+      $or: [
+        {
+          idNumber: { $eq: strArr[0] },
+        },
+        {
+          chName: { $contains: strArr[0] },
+        },
+      ],
+    };
+  },
+};
+
+// ---
 // w   propsLookup 與 TtypeLookup的key必須一致
 // w   propsLookup 與 TtypeLookup的key必須一致
 // w   propsLookup 與 TtypeLookup的key必須一致
@@ -243,14 +337,22 @@ const propsLookup = {
   outsourcing: () => {
     return _.cloneDeep(props_outsourcing);
   },
-  test: () => {
-    return _.cloneDeep(props_outsourcing);
+  employee: () => {
+    return _.cloneDeep(props_employee);
   },
+  // test: () => {
+  //   return _.cloneDeep(props_outsourcing);
+  // },
+  // foooo: () => {
+  //   return _.cloneDeep(props_outsourcing);
+  // },
 } as const;
 
 type TtypeLookup = {
   outsourcing: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
-  test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
+  employee: Exclude<(typeof props_employee)['dataType'], undefined>;
+  // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
+  // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
 };
 
 type keyTuple_to_dataTuple<TkeyArr extends (keyof TtypeLookup)[]> = {
@@ -260,6 +362,7 @@ type keyTuple_to_dataTuple<TkeyArr extends (keyof TtypeLookup)[]> = {
 // ======================================================================
 
 // 留做泛型參考
+// 元祖產生元祖
 
 // type TkeyArr = ['a', 'b', 'c'];
 
