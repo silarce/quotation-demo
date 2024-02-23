@@ -35,10 +35,10 @@ import {
   // TupdateEngineeringDeliveryList,
   // TupdateDeliveryStatus,
   TupdateEngineeringDeliveryStatusDto,
+  TcreateEngineeringDeliveryStatusDto,
   useGetEngineeringContact,
   useGetEngineeringDeliveryList,
   apiPatchEngineeringDeliveryList,
-  TcreateEngineeringDeliveryStatusDto,
   apiPostDeliveryStatus,
   apiPatchDeliveryStatus,
   apiDeleteDeliveryStatus,
@@ -123,6 +123,15 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
+  const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
+
+  const [notes, setNotes] = useState<string>();
+  const [notesDiasbled, setNotesDiasbled] = useState(true);
+
+  const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
+
+  // --------------------------------------------------------------------------
+
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
     customPopulate: ['subContracts.content.products.rootProdductId'],
   });
@@ -192,22 +201,15 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
-  const [notes, setNotes] = useState<string>();
-  const [notesDiasbled, setNotesDiasbled] = useState(true);
-
   useEffect(() => {
     setNotes(deliveryList?.notes);
   }, [deliveryList, notesDiasbled]);
 
   // --------------------------------------------------------------------------
 
-  const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
-
   // --------------------------------------------------------------------------
 
   const worksheet = deliveryList?.contract.worksheet;
-
-  const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
 
   useEffect(() => {
     if (!deliveryList?.contract.worksheet?.contractProductItems) {
@@ -280,7 +282,7 @@ export default function OutboundOrder({
           // installerEmployeeId: outsouctingId,
 
           installerOutsourcingId: outsourcingId ?? null,
-          installerEmployees: employeeId ? [employeeId] : [],
+          installerEmployees: employeeId ? [employeeId] : null,
 
           installationDate: null,
           append: null,
@@ -305,6 +307,16 @@ export default function OutboundOrder({
   const reqPatch = async ({ statusId, body }: { statusId: string; body: TupdateEngineeringDeliveryStatusDto }) => {
     if (!engineeringDeliveryListId || isReqing) {
       return;
+    }
+
+    if (body.installerEmployees?.length === 0) {
+      body.installerEmployees = null;
+    }
+
+    if (!body.installerOutsourcingId) {
+      {
+        body.installerOutsourcingId = null;
+      }
     }
 
     try {
@@ -473,6 +485,11 @@ export default function OutboundOrder({
               const copy = { ...state };
 
               copy[prodKey][itemId][statusId].installerOutsourcing = outsourcing || null;
+
+              if (!copy[prodKey][itemId][statusId].installerOutsourcing) {
+                copy[prodKey][itemId][statusId].installerOutsourcingId = null;
+              }
+
               copy[prodKey][itemId][statusId].installerEmployees = employee ? [employee] : [];
 
               return copy;
@@ -573,7 +590,8 @@ export default function OutboundOrder({
                 notes: body.notes,
                 itemName: body.itemName,
                 shippingDate: body.shippingDate,
-                installerOutsourcingId: body.installerOutsourcingId,
+                // installerOutsourcingId: body.installerOutsourcingId,
+                installerOutsourcingId: body.installerOutsourcing?.id ?? null,
                 installerEmployees,
                 installationDate: body.installationDate,
                 append: body.append,
@@ -625,9 +643,9 @@ export default function OutboundOrder({
 
           installerArr.push({
             disabled,
-            // installer: deleveryStatus?.installerOutsourcing ?? (status.installerEmployee || null),
             installer:
               deleveryStatus_singleState?.installerOutsourcing ??
+              deleveryStatus_singleState?.installerEmployees?.[0] ??
               (status.installerOutsourcing || null) ??
               (status.installerEmployees?.[0] || null),
             onChange_installer: (installer) => {

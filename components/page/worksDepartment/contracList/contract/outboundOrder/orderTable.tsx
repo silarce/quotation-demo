@@ -492,27 +492,7 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
           );
         })}
       </div>
-      {/* <EmployeeSelector
-        showModal={!!targetEmpControl}
-        onConfirm={(arr) => {
-          targetEmpControl?.onChange_employee?.(arr[0] ?? null);
-        }}
-        onCancel={() => {
-          setTargetEmpControl(undefined);
-        }}
-        selLimit={1}
-      /> */}
 
-      {/* <OutsourcingSelector
-        showModal={!!targetEmpControl}
-        onConfirm={(arr) => {
-          targetEmpControl?.onChange_installer?.(arr[0] ?? null);
-        }}
-        onCancel={() => {
-          setTargetEmpControl(undefined);
-        }}
-        selLimit={1}
-      /> */}
       <SelectorGroup
         showModal={!!targetEmpControl}
         onConfirm={(dataArr) => {

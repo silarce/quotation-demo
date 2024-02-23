@@ -1122,10 +1122,15 @@ export type TcreateEngineeringDeliveryStatusDto = {
   itemName: string | null;
   // 出貨日
   shippingDate: string | null;
+
+  // installerOutsourcingId與installerEmployees二擇一
+
   // 安裝人員id(外包廠商)
   installerOutsourcingId: string | null;
   // 安裝人員id(員工)
-  installerEmployees: (string | null)[];
+  // installerEmployees: (string | null)[];
+  // api文件錯誤，應該長這樣才對
+  installerEmployees: string[] | null;
   // 安裝日期
   installationDate: string | null;
   // 追加
