@@ -23,6 +23,9 @@ import { Icon_info } from 'public/image/icon/svgComponent/svgIcons';
 // css
 import scss from './electronicSupplies.module.scss';
 
+// utils
+import { workSheetReducer, TquotationProductItemDto } from 'js/utils/worksheet/reducer';
+
 // ------------------------------------------------------------------
 
 type Tquery = {
@@ -36,6 +39,13 @@ type TdoorInfo = {
       doorTypeName: string;
       qty: number;
     };
+  };
+};
+
+type TproductItemList = {
+  [key: string]: {
+    productItem: TquotationProductItemDto;
+    qty: number;
   };
 };
 
@@ -54,7 +64,7 @@ export default function ElectronicSupplies() {
   });
   // const engineeringContactId = contract?.engineeringContactId ?? '';
 
-  const {} = contract?.worksheet ?? {};
+  const worksheet = contract?.worksheet;
 
   const {
     contractNumber = '',
@@ -64,30 +74,77 @@ export default function ElectronicSupplies() {
   } = contract?.engineeringContact ?? {};
   // ------------------------------------------------------------------
 
-  const doorsInfo: TdoorInfo = useMemo(() => {
-    const list: TdoorInfo['list'] = {};
+  // const doorsInfo: TdoorInfo = useMemo(() => {
+  //   const list: TdoorInfo['list'] = {};
 
-    const itemArr = contract?.worksheet?.contractProductItems ?? [];
-    const qtyTotal = itemArr?.length ?? 0;
+  //   const itemArr = contract?.worksheet?.contractProductItems ?? [];
+  //   const qtyTotal = itemArr?.length ?? 0;
 
-    itemArr.forEach((item) => {
-      const { doorModelName } = item;
+  //   itemArr.forEach((item) => {
+  //     const { doorModelName } = item;
 
-      if (!list[doorModelName]) {
-        list[doorModelName] = {
-          doorTypeName: doorModelName,
-          qty: 0,
+  //     if (!list[doorModelName]) {
+  //       list[doorModelName] = {
+  //         doorTypeName: doorModelName,
+  //         qty: 0,
+  //       };
+  //     }
+
+  //     list[doorModelName].qty = list[doorModelName].qty + 1;
+  //   });
+
+  //   return {
+  //     qtyTotal,
+  //     list: list,
+  //   };
+  // }, []);
+
+  const { itemTokenList, itemIdArrList, itemList, doorQtySubTotal, doorQtyTotal } = useMemo(() => {
+    if (!worksheet?.contractProductItems) {
+      return {};
+    }
+
+    const itemList: TproductItemList = {};
+    const doorQtySubTotal: { [key: string]: number } = {};
+    let doorQtyTotal = 0;
+
+    const { itemTokenList, itemIdArrList } = workSheetReducer({ worksheet });
+
+    Object.keys(itemIdArrList).forEach((idKey, index) => {
+      const list = itemTokenList[idKey];
+
+      for (const [key, value] of Object.entries(list)) {
+        if (key === 'originalItem') {
+          continue;
+        }
+
+        const qty = itemIdArrList[idKey][key].length;
+
+        const doorType = value.doorModelName;
+
+        if (!doorQtySubTotal[doorType]) {
+          doorQtySubTotal[doorType] = qty;
+        } else {
+          doorQtySubTotal[doorType] += qty;
+        }
+
+        doorQtyTotal += qty;
+
+        itemList[key] = {
+          productItem: value,
+          qty,
         };
       }
-
-      list[doorModelName].qty = list[doorModelName].qty + 1;
     });
 
     return {
-      qtyTotal,
-      list: list,
+      itemTokenList,
+      itemIdArrList,
+      itemList,
+      doorQtySubTotal,
+      doorQtyTotal,
     };
-  }, []);
+  }, [worksheet]);
 
   // ------------------------------------------------------------------
 
@@ -111,17 +168,13 @@ export default function ElectronicSupplies() {
   // ------------------------------------------------------------------
 
   const Info = () => {
-    const list = doorsInfo.list;
-
     const Content = (
       <ul>
-        {Object.values(list).map((item, index) => {
-          const { doorTypeName, qty } = item;
-
+        {Object.keys(doorQtySubTotal ?? {}).map((key, index) => {
           return (
             <li key={index} className="flex gap-3">
-              <span>{doorTypeName}</span>
-              <span>{qty}樘</span>
+              <span>{key}</span>
+              <span>{doorQtySubTotal![key]}樘</span>
             </li>
           );
         })}
@@ -175,7 +228,7 @@ export default function ElectronicSupplies() {
             wrapperStyle={{ gap: '25px' }}
             inputProps={{
               props: {
-                value: doorsInfo.qtyTotal,
+                value: doorQtyTotal,
                 readOnly: true,
               },
             }}
