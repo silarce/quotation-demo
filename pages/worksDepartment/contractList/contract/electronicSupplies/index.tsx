@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
@@ -10,6 +10,8 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 import { Popover } from 'antd';
 
 // component
+import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
+import Table01, { Trow, Tcell, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -32,16 +34,6 @@ type Tquery = {
   contractId: string;
 };
 
-type TdoorInfo = {
-  qtyTotal: number;
-  list: {
-    [key: string]: {
-      doorTypeName: string;
-      qty: number;
-    };
-  };
-};
-
 type TproductItemList = {
   [key: string]: {
     productItem: TquotationProductItemDto;
@@ -49,9 +41,9 @@ type TproductItemList = {
   };
 };
 
-// ------------------------------------------------------------------
+type TtabName = 'itemList' | 'supplyList' | 'receiveHistory' | 'demandHistory';
 
-// engineeringContact
+// ------------------------------------------------------------------
 
 export default function ElectronicSupplies() {
   const router = useRouter();
@@ -59,8 +51,12 @@ export default function ElectronicSupplies() {
 
   // ------------------------------------------------------------------
 
+  const [activeTab, setActiveTab] = useState<TtabName>('itemList');
+
+  // ------------------------------------------------------------------
+
   const { data: contract, update } = useGetContract_id(contractId, {
-    customPopulate: ['engineeringContact', 'worksheet.contractProductItems'],
+    customPopulate: ['engineeringContact', 'worksheet.contractProductItems.accessories'],
   });
   // const engineeringContactId = contract?.engineeringContactId ?? '';
 
@@ -74,32 +70,12 @@ export default function ElectronicSupplies() {
   } = contract?.engineeringContact ?? {};
   // ------------------------------------------------------------------
 
-  // const doorsInfo: TdoorInfo = useMemo(() => {
-  //   const list: TdoorInfo['list'] = {};
-
-  //   const itemArr = contract?.worksheet?.contractProductItems ?? [];
-  //   const qtyTotal = itemArr?.length ?? 0;
-
-  //   itemArr.forEach((item) => {
-  //     const { doorModelName } = item;
-
-  //     if (!list[doorModelName]) {
-  //       list[doorModelName] = {
-  //         doorTypeName: doorModelName,
-  //         qty: 0,
-  //       };
-  //     }
-
-  //     list[doorModelName].qty = list[doorModelName].qty + 1;
-  //   });
-
-  //   return {
-  //     qtyTotal,
-  //     list: list,
-  //   };
-  // }, []);
-
-  const { itemTokenList, itemIdArrList, itemList, doorQtySubTotal, doorQtyTotal } = useMemo(() => {
+  const {
+    // itemTokenList, itemIdArrList,
+    itemList,
+    doorQtySubTotal,
+    doorQtyTotal,
+  } = useMemo(() => {
     if (!worksheet?.contractProductItems) {
       return {};
     }
@@ -164,6 +140,107 @@ export default function ElectronicSupplies() {
         }),
     },
   ];
+
+  // ------------------------------------------------------------------
+
+  const tabArr: Ttab[] = [
+    {
+      label: '送電備品列表',
+      isActive: activeTab === 'itemList',
+      onClick: () => setActiveTab('itemList'),
+    },
+    {
+      label: '送電備品總料單',
+      isActive: activeTab === 'supplyList',
+      onClick: () => setActiveTab('supplyList'),
+    },
+    {
+      label: '送電備品料單領取歷程',
+      isActive: activeTab === 'receiveHistory',
+      onClick: () => setActiveTab('receiveHistory'),
+    },
+    {
+      label: '送電備品料單需求歷程',
+      isActive: activeTab === 'demandHistory',
+      onClick: () => setActiveTab('demandHistory'),
+    },
+  ];
+
+  // ------------------------------------------------------------------
+
+  const control_table: Ttable = useMemo(() => {
+    // Trow, Tcell, Ttable
+
+    const thead: Ttable['thead'] = {
+      cellArr: keysArr.map((key) => {
+        return {
+          ...configList[key],
+          children: configList[key].label,
+        };
+      }),
+    };
+
+    const tbodyRowArr: Ttable['tbody']['rowArr'] = Object.values(itemList ?? {}).map((item, pIndex) => {
+      const { productItem, qty } = item;
+      const { itemName, itemNumber, doorModelName, motorVendor, motorVoltage, horsepower } = productItem;
+
+      return {
+        cellArr: [
+          {
+            ...configList.itemName,
+            children: itemName,
+          },
+          {
+            ...configList.itemNumber,
+            children: itemNumber,
+          },
+          {
+            ...configList.qty,
+            children: qty,
+          },
+          {
+            ...configList.doorModelName,
+            children: doorModelName,
+          },
+          {
+            ...configList.motorVendor,
+            children: motorVendor,
+          },
+          {
+            ...configList.motorVoltage,
+            children: motorVoltage,
+          },
+          {
+            ...configList.horsepower,
+            children: horsepower,
+          },
+          {
+            ...configList.obstacleSensor,
+            children: <CheckBox_readonly />,
+          },
+          {
+            ...configList.infrared,
+            children: <CheckBox_readonly value={true} />,
+          },
+          {
+            ...configList.remoteControl,
+            children: <CheckBox_readonly value={true} />,
+          },
+          {
+            ...configList.bounceDoor,
+            children: <CheckBox_readonly />,
+          },
+        ],
+      };
+    });
+
+    const tbody: Ttable['tbody'] = {
+      // rowArr: tbodyRowArr,
+      rowArr: [...tbodyRowArr, ...tbodyRowArr, ...tbodyRowArr],
+    };
+
+    return { thead, tbody };
+  }, [worksheet]);
 
   // ------------------------------------------------------------------
 
@@ -248,10 +325,117 @@ export default function ElectronicSupplies() {
             }}
           />
         </div>
-        <div className={scss.list}></div>
+
+        <Wrapper_tab tabArr={tabArr} className={classNames('mt-10', 'w-full')}>
+          <Table01
+            {...control_table}
+            // style={{ width: '100%' }}
+            className={classNames(scss.table, 'w-[100%]')}
+          />
+        </Wrapper_tab>
       </div>
     </SubLayer>
   );
 }
 
 // =============================================================
+// =============================================================
+// =============================================================
+
+const CheckBox_readonly = ({ value }: { value?: boolean }) => {
+  return (
+    <div>
+      <InputSel
+        showBaseline="invisible"
+        disabled={true}
+        checkBoxProps={{
+          propsArr: [
+            {
+              props: {
+                className: classNames(scss.checkBox, scss.plus),
+              },
+              key: 'notNeed',
+              value: value,
+            },
+          ],
+        }}
+      />
+    </div>
+  );
+};
+
+// =============================================================
+// =============================================================
+// =============================================================
+
+const keysArr = [
+  'itemName', // 名稱
+  'itemNumber', // 編號
+  'qty', // 樘數
+  'doorModelName', // 門型
+  'motorVendor', // 馬達
+  'motorVoltage', // 電壓
+  'horsepower', // 馬力數
+  'obstacleSensor', // 障感器
+  'infrared', // 紅外線
+  'remoteControl', // 遙控器(1:2)
+  'bounceDoor', // 彈射門
+];
+
+const configList: { [key: string]: Tconfig_table } = {
+  itemName: {
+    label: '名稱',
+    width: 200,
+    justifyContent: 'center',
+  },
+  itemNumber: {
+    label: '編號',
+    width: 200,
+    justifyContent: 'center',
+  },
+  qty: {
+    label: '樘數',
+    width: 200,
+    justifyContent: 'center',
+  },
+  doorModelName: {
+    label: '門型',
+    width: 200,
+    justifyContent: 'center',
+  },
+  motorVendor: {
+    label: '馬達',
+    width: 200,
+    justifyContent: 'center',
+  },
+  motorVoltage: {
+    label: '電壓',
+    width: 200,
+    justifyContent: 'center',
+  },
+  horsepower: {
+    label: '馬力數',
+    width: 200,
+    justifyContent: 'center',
+  },
+  obstacleSensor: {
+    label: '障感器',
+    width: 200,
+    justifyContent: 'center',
+  },
+  infrared: {
+    label: '紅外線',
+    width: 200,
+    justifyContent: 'center',
+  },
+  remoteControl: {
+    label: '遙控器(1:2)',
+    width: 200,
+    justifyContent: 'center',
+  },
+  bounceDoor: {
+    label: '彈射門',
+    width: 200,
+    justifyContent: 'center',
+  },
+};
