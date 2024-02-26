@@ -1,5 +1,5 @@
 .table {
-  width: theme("width.table");
+  // width: theme("width.table");
   &.haveBorder {
     border: solid 1px theme("colors.border");
     border-top: 0;
@@ -7,11 +7,15 @@
 }
 
 .thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   .row {
     border-top: solid 1px theme("colors.border");
     background-color: theme("colors.bgc01");
   }
   .cell {
+    background-color: theme("colors.bgc01");
     border: none;
     // background-color: theme("colors.bgc01");
     > span {
@@ -20,6 +24,12 @@
   }
 }
 .tbody {
+  .row {
+    .cell {
+      background-color: #fff;
+    }
+  }
+
   .rowWrapper:nth-last-of-type(1) {
     .row {
       border: none;
@@ -35,6 +45,10 @@
   }
   > * {
     flex: none;
+  }
+  .cell:nth-of-type(1) {
+    position: sticky;
+    left: 0;
   }
 }
 

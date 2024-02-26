@@ -81,14 +81,14 @@ export default function Table01({
   haveBorder = true,
 }: Ttable) {
   return (
-    <div className={classNames(scss.table, haveBorder && scss.haveBorder, className)} style={style}>
+    <div className={classNames('w-table', scss.table, haveBorder && scss.haveBorder, className)} style={style}>
       <div
         //
         className={classNames(scss.thead)}
         style={{
-          position: thead.stickyTop ? 'sticky' : undefined,
+          // position: thead.stickyTop ? 'sticky' : undefined,
           top: thead.stickyTop?.top,
-          zIndex: thead.stickyTop?.zIndex ?? '2',
+          zIndex: thead.stickyTop?.zIndex,
           ...thead.style,
         }}
       >
