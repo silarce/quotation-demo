@@ -207,6 +207,17 @@ export function Selector_component<Tdata extends TapiData>(
     onStateChange && onStateChange({ dataArr });
   }, [selectedList]);
 
+  useEffect(() => {
+    if (defaultSelectedArr) {
+      const list: { [id: string]: Tdata } = {};
+      defaultSelectedArr.forEach((item) => {
+        list[item.id] = item;
+      });
+
+      setSelectedList(list);
+    }
+  }, [defaultSelectedArr]);
+
   // ----------------------------------------------------------------------
 
   return (

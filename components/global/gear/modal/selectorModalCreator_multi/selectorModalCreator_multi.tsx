@@ -55,12 +55,17 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     onConfirm,
     onCancel,
     isCancelOnConfirm = true,
+    defaultSeletedDataArrArr,
+    caption,
+    tip,
   }: {
     showModal: boolean;
     onConfirm: (v: TdataArrArr) => void;
     onCancel: () => void;
     isCancelOnConfirm?: boolean;
-
+    defaultSeletedDataArrArr?: Partial<TdataArrArr>;
+    caption?: string;
+    tip?: string;
     //
   }) => {
     // ------------------------------------------------------------------------
@@ -94,6 +99,13 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
         footer={null}
       >
         <div className={classNames(scss.body)}>
+          {(caption || tip) && (
+            <div>
+              <span className={scss.caption}>{caption}</span>
+              <span className={classNames(scss.tip, caption && 'ml-3')}>{tip}</span>
+            </div>
+          )}
+
           {/*  */}
           {selectorArr.map((item, index) => {
             const { key, clearOther, limit, forbiddenCheck_dataList } = item;
@@ -152,6 +164,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
                       return copy;
                     });
                   }}
+                  defaultSelectedArr={defaultSeletedDataArrArr?.[index]}
                 />
                 {index !== selectorArr.length - 1 && <hr />}
               </Fragment>
