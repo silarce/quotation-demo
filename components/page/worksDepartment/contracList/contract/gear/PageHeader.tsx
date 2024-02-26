@@ -117,6 +117,16 @@ export default function PageHeader({
       },
     },
     {
+      label: '送電備品列表-new',
+      href: {
+        pathname: `${pathHead}/electronicSupplies`,
+        query: {
+          contractId,
+          version,
+        },
+      },
+    },
+    {
       label: '會議記錄',
       href: {
         pathname: `${pathHead}/meetingMinutes`,
