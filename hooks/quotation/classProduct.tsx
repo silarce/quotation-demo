@@ -93,6 +93,7 @@ import { apiGetQuotationProducts } from 'js/api/api_quotation';
 // =============================================================================
 
 import { prodCellConfig, getInstallationFee } from './prodCellConfig';
+
 import { lookup_distributionBoxPrice, lookup_horsePowerToNumber, lookup_hpToGapAGapC } from 'config/product/lookup';
 
 // utils
@@ -2307,6 +2308,16 @@ class Class_product {
 
   set doorType(v) {
     this._prodData.doorType = v;
+
+    const isMaterailInOptions = check_isValueInOptions(this.material, this.options_material ?? []);
+    const is304InOptions = check_isValueInOptions('SST#304', this.options_material ?? []);
+
+    if (is304InOptions) {
+      this.material = 'SST#304';
+    } else if (!isMaterailInOptions && this.options_material) {
+      this.material = this.options_material?.[0]?.value ?? '';
+    }
+
     this.clearProd_all();
 
     if (v === 'SJ-312') {
@@ -2643,7 +2654,7 @@ class Class_product {
   set surface(v) {
     this._prodData.surface = v;
 
-    if (this.comList) {
+    if (this.comList?.slat) {
       this.comList.slat.surface_withCheckOptions = v;
     }
 
@@ -3915,6 +3926,10 @@ const calcDefaultMotor = ({ doorGeneralSpecs }: { doorGeneralSpecs: TdoorGeneral
     defaultBoxB,
     defaultMotorBox,
   };
+};
+
+const check_isValueInOptions = (value: string, options: Toption[]) => {
+  return options.some((item) => item.value === value);
 };
 
 // ===========================================================
