@@ -778,7 +778,7 @@ const comCellConfig: TcellConfig = {
   material: {
     label: '材料',
     inputSelProps: {
-      wrapperStyle: { width: '150px' },
+      wrapperStyle: { width: '190px' },
       selectProps: {
         props: {
           // options 不同種類有不同的選項，寫在class裡面
@@ -800,7 +800,7 @@ const comCellConfig: TcellConfig = {
   density: {
     label: '重量基重',
     inputSelProps: {
-      wrapperStyle: { width: '90px' },
+      wrapperStyle: { width: '80px' },
       showBaseline: 'invisible',
       inputProps: {
         props: {
