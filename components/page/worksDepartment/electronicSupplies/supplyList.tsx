@@ -1,209 +1,32 @@
-import { useMemo } from 'react';
-import classNames from 'classnames';
-
 // component
-import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
-import Table01, {
-  Trow,
-  Tcell,
-  Ttable,
-  Tconfig_table,
-  //
-  Row,
-  Cell,
-} from 'components/global/gear/table/table01';
-
-// gear
-import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import SupplyTable, { Tcontrol_nestedRow } from './ui/supplyTable';
 
 // css
 import scss from './supplyList.module.scss';
-import scss_p from './_public.module.scss';
 
 // ==================================================================
 
 export default function SupplyList() {
-  const control_table = useMemo(() => {
-    //
-    const thead: Ttable['thead'] = {
-      cellArr: keyArr.map((key) => {
-        return {
-          ...configList[key],
-          children: configList[key].label,
-        };
-      }),
-    };
-
-    //
-    const tbody: Ttable['tbody'] = {
-      rowArr: [],
-    };
-
-    return { thead, tbody };
-    //
-  }, []);
-
   return (
     <div className={scss.supplyList}>
-      <Table01 {...control_table} className={classNames(scss_p.table)}>
-        <Row_nested {...fakeData_lockbox} />
-        <Row_nested {...fakeData_key} />
-        <Row_nested {...fakeData_panel} />
-        <Row_nested {...fakeData_pressButton} />
-        <Row_nested {...fakeData_firefightingSupplies} />
-        <Row_nested {...fakeData_host} />
-        <Row_nested {...fakeData_infrared} />
-      </Table01>
+      <SupplyTable
+        rowArr={[
+          fakeData_lockbox,
+          fakeData_key,
+          fakeData_panel,
+          fakeData_pressButton,
+          fakeData_firefightingSupplies,
+          fakeData_host,
+          fakeData_infrared,
+        ]}
+      />
     </div>
   );
 }
 
 // ==================================================================
-// ==================================================================
 
-const Cell_name = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Cell
-      //
-      {...configList.name}
-      className={classNames(scss.cell)}
-    >
-      {children}
-    </Cell>
-  );
-};
-
-type TsubType = {
-  name: React.ReactNode;
-  unclaimedQty?: React.ReactNode;
-  receivedQty?: React.ReactNode;
-  needQty?: React.ReactNode;
-  editReceivedQty?: React.ReactNode;
-};
-
-const Cell_type = ({
-  //
-  typeName,
-  subTypeArr,
-}: {
-  typeName?: React.ReactNode;
-  subTypeArr?: TsubType[];
-}) => {
-  return (
-    <Cell
-      //
-      {...{ ...configList.typeGroup }}
-      className={(scss.cell, scss.cell_type)}
-    >
-      {typeName !== undefined && <div className={scss.type}>{typeName}</div>}
-      <div className={scss.subTypeGroup}>
-        {subTypeArr?.map((item, index) => {
-          const { name, unclaimedQty, receivedQty, needQty, editReceivedQty } = item;
-
-          return (
-            <CellWithBar key={index} className={scss.subTypeRow}>
-              <div className={scss.subType}>{name}</div>
-              {unclaimedQty !== undefined && <div className={scss.qtyCell}>{unclaimedQty}</div>}
-              {receivedQty !== undefined && <div className={scss.qtyCell}>{receivedQty}</div>}
-              {needQty !== undefined && <div className={scss.qtyCell}>{needQty}</div>}
-              {editReceivedQty !== undefined && <div className={scss.qtyCell}>{editReceivedQty}</div>}
-            </CellWithBar>
-          );
-        })}
-      </div>
-    </Cell>
-  );
-};
-
-const Cell_qty = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Cell {...qtyConfig} className={scss.cell}>
-      {children}
-    </Cell>
-  );
-};
-
-// ==================================================================
-
-const Row_nested = ({
-  name,
-  typeName,
-  subTypeArr,
-}: {
-  name: React.ReactNode;
-  typeName?: React.ReactNode;
-  subTypeArr?: TsubType[];
-}) => {
-  return (
-    <Row wrapperClassName={scss.row_nested}>
-      <Cell_name>{name}</Cell_name>
-      <Cell_type typeName={typeName} subTypeArr={subTypeArr} />
-    </Row>
-  );
-};
-
-// ==================================================================
-// ==================================================================
-
-const keyArr = ['name', 'type', 'unclaimedQty', 'receivedQty', 'needQty'];
-
-const qtyConfig: Tconfig_table = {
-  width: 100,
-  justifyContent: 'center',
-};
-
-const configList: { [key: string]: Tconfig_table } = {
-  name: {
-    label: '名稱',
-    width: 200,
-    justifyContent: 'center',
-  },
-  type: {
-    label: '種類',
-    flex: 'auto',
-    justifyContent: 'center',
-    tbody: {
-      width: 180,
-      flex: 'unset',
-      justifyContent: 'flex-start',
-    },
-  },
-  subType: {
-    // label: '種類',
-    flex: 'auto',
-    justifyContent: 'center',
-    tbody: {
-      justifyContent: 'flex-start',
-    },
-  },
-
-  typeGroup: {
-    flex: 'auto',
-  },
-
-  unclaimedQty: {
-    label: '未領數量',
-    ...qtyConfig,
-  },
-  receivedQty: {
-    label: '已領數量',
-    ...qtyConfig,
-  },
-  needQty: {
-    label: '需求總數量',
-    ...qtyConfig,
-  },
-} as const;
-
-// ==================================================================
-
-type TfakeData = {
-  name: React.ReactNode;
-  typeName?: React.ReactNode;
-  subTypeArr: TsubType[];
-};
-
-const fakeData_lockbox: TfakeData = {
+const fakeData_lockbox: Tcontrol_nestedRow = {
   name: '鎖盒',
   subTypeArr: [
     {
@@ -251,7 +74,7 @@ const fakeData_lockbox: TfakeData = {
   ],
 };
 
-const fakeData_key: TfakeData = {
+const fakeData_key: Tcontrol_nestedRow = {
   name: '鎖匙',
   subTypeArr: [
     {
@@ -269,7 +92,7 @@ const fakeData_key: TfakeData = {
   ],
 };
 
-const fakeData_panel: TfakeData = {
+const fakeData_panel: Tcontrol_nestedRow = {
   name: '控制箱/盤',
   typeName: '捲門/水閘門',
   subTypeArr: [
@@ -306,7 +129,7 @@ const fakeData_panel: TfakeData = {
   ],
 };
 
-const fakeData_pressButton: TfakeData = {
+const fakeData_pressButton: Tcontrol_nestedRow = {
   name: '押扣',
   subTypeArr: [
     {
@@ -317,7 +140,7 @@ const fakeData_pressButton: TfakeData = {
     },
   ],
 };
-const fakeData_firefightingSupplies: TfakeData = {
+const fakeData_firefightingSupplies: Tcontrol_nestedRow = {
   name: '消防備品',
   subTypeArr: [
     {
@@ -341,7 +164,7 @@ const fakeData_firefightingSupplies: TfakeData = {
   ],
 };
 
-const fakeData_host: TfakeData = {
+const fakeData_host: Tcontrol_nestedRow = {
   name: '主機',
   subTypeArr: [
     {
@@ -364,7 +187,7 @@ const fakeData_host: TfakeData = {
     },
   ],
 };
-const fakeData_infrared: TfakeData = {
+const fakeData_infrared: Tcontrol_nestedRow = {
   name: '紅外線',
   subTypeArr: [
     {
