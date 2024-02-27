@@ -12,6 +12,8 @@ import { Popover } from 'antd';
 // component
 import SupplyList from 'components/page/worksDepartment/electronicSupplies/supplyList';
 import ItemList from 'components/page/worksDepartment/electronicSupplies/itemList';
+import ReceivedHistory from 'components/page/worksDepartment/electronicSupplies/receivedHistory';
+import DemandHistory from 'components/page/worksDepartment/electronicSupplies/demandHistory';
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
@@ -259,6 +261,8 @@ export default function ElectronicSupplies() {
         >
           {activeTab === 'itemList' && <ItemList itemList={itemList} />}
           {activeTab === 'supplyList' && <SupplyList />}
+          {activeTab === 'receiveHistory' && <ReceivedHistory />}
+          {activeTab === 'demandHistory' && <DemandHistory />}
         </Wrapper_tab>
       </div>
     </SubLayer>
