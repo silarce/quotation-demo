@@ -63,6 +63,7 @@ import {
   optionsCreator_boxB_SJ302,
   optionsCreator_boxB_SJ303A,
   optionsCreator_horsePower,
+  lookup_options_bottomBarAngleIronAndPlate,
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
@@ -2161,22 +2162,28 @@ class Class_product {
       return optionsCreator_bottomBarAngleIron_303AS();
     }
 
-    return [];
+    const doorType = this._prodData.doorType as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
+
+    return lookup_options_bottomBarAngleIronAndPlate[doorType]?.angleIron() ?? [];
   }
   get options_bottomBarPlate() {
-    if (this._prodData.doorType === 'SJ-302') {
-      return optionsCreator_bottomBarPlate();
-    }
+    const doorType = this._prodData.doorType as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
 
-    if (this._prodData.doorType === 'SJ-303A') {
-      return optionsCreator_bottomBarPlate_303A();
-    }
+    return lookup_options_bottomBarAngleIronAndPlate[doorType]?.plate() ?? [];
 
-    if (this._prodData.doorType === 'SJ-303AS') {
-      return optionsCreator_bottomBarPlate_303AS();
-    }
+    // if (this._prodData.doorType === 'SJ-302') {
+    //   return optionsCreator_bottomBarPlate();
+    // }
 
-    return [];
+    // if (this._prodData.doorType === 'SJ-303A') {
+    //   return optionsCreator_bottomBarPlate_303A();
+    // }
+
+    // if (this._prodData.doorType === 'SJ-303AS') {
+    //   return optionsCreator_bottomBarPlate_303AS();
+    // }
+
+    // return [];
   }
 
   get options_boxB() {
