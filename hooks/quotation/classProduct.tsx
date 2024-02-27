@@ -897,7 +897,7 @@ class Class_product {
         rollerDiameter: this._doorGeneralSpecs.diameter,
         sidePlateSizeB: Number(this.boxB_mm),
         hp: this.horsepower,
-        motorVendor: this.horsepower,
+        motorVendor: this.motor,
       });
       this.isLoading = false;
 
