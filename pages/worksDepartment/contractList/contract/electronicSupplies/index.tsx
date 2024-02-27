@@ -131,17 +131,19 @@ export default function ElectronicSupplies() {
   }, []);
 
   // ------------------------------------------------------------------
-  const panelList: TpanelList = [
+  const panelList_receiveHistory: TpanelList = [
     {
       type: 'addButton',
-      label: '建立料單',
+      label: '新增',
       onClick: () =>
         router.push({
-          pathname: `${router.pathname}/edit`,
+          pathname: `${router.pathname}/editReceivedHistory`,
           query: { ...router.query },
         }),
     },
   ];
+
+  const panelList = activeTab === 'receiveHistory' ? panelList_receiveHistory : [];
 
   // ------------------------------------------------------------------
 
@@ -167,31 +169,6 @@ export default function ElectronicSupplies() {
       onClick: () => setActiveTab('demandHistory'),
     },
   ];
-
-  // ------------------------------------------------------------------
-
-  const Info = () => {
-    const Content = (
-      <ul>
-        {Object.keys(doorQtySubTotal ?? {}).map((key, index) => {
-          return (
-            <li key={index} className="flex gap-3">
-              <span>{key}</span>
-              <span>{doorQtySubTotal![key]}樘</span>
-            </li>
-          );
-        })}
-      </ul>
-    );
-
-    return (
-      <Popover content={Content} trigger={'hover'} placement="right">
-        <div>
-          <Icon_info />
-        </div>
-      </Popover>
-    );
-  };
 
   // ------------------------------------------------------------------
 
@@ -235,7 +212,7 @@ export default function ElectronicSupplies() {
                 readOnly: true,
               },
             }}
-            suffix={<Info />}
+            suffix={<Info doorQtySubTotal={doorQtySubTotal} />}
           />
           <InputSel
             caption="領料狀態"
@@ -268,7 +245,27 @@ export default function ElectronicSupplies() {
     </SubLayer>
   );
 }
+// ===========================================================
 
-// =============================================================
-// =============================================================
-// =============================================================
+const Info = ({ doorQtySubTotal }: { doorQtySubTotal: { [key: string]: number } | undefined }) => {
+  const Content = (
+    <ul>
+      {Object.keys(doorQtySubTotal ?? {}).map((key, index) => {
+        return (
+          <li key={index} className="flex gap-3">
+            <span>{key}</span>
+            <span>{doorQtySubTotal![key]}樘</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+
+  return (
+    <Popover content={Content} trigger={'hover'} placement="right">
+      <div>
+        <Icon_info />
+      </div>
+    </Popover>
+  );
+};
