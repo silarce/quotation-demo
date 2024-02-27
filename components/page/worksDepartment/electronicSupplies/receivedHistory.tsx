@@ -123,11 +123,11 @@ const configList: { [key: string]: Tconfig_table } = {
     flex: '20%',
   },
   doorModelName: {
-    label: '門型名稱',
+    label: '門型',
     flex: '20%',
   },
   qty: {
-    label: '數量',
+    label: '樘數',
     flex: '20%',
   },
   materialHandler: {

@@ -15,6 +15,7 @@ import Table01, {
 
 // css
 import scss from './supplyList.module.scss';
+import scss_p from './_public.module.scss';
 
 // ==================================================================
 
@@ -41,7 +42,7 @@ export default function SupplyList() {
 
   return (
     <div className={scss.supplyList}>
-      <Table01 {...control_table} className={classNames(scss.table)}>
+      <Table01 {...control_table} className={classNames(scss_p.table)}>
         <Row_nested {...fakeData_lockbox} />
         <Row_nested {...fakeData_key} />
         <Row_nested {...fakeData_panel} />

@@ -10,6 +10,7 @@ import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/tab
 import { TquotationProductItemDto } from 'js/utils/worksheet/reducer';
 
 import scss from './itemList.module.scss';
+import scss_p from './_public.module.scss';
 
 // =============================================================
 type TproductItemList = {
@@ -95,13 +96,7 @@ export default function ItemList({ itemList }: { itemList: TproductItemList | un
     return { thead, tbody };
   }, [itemList]);
 
-  return (
-    <Table01
-      {...control_table}
-      // style={{ width: '100%' }}
-      className={classNames(scss.table, 'w-[100%]')}
-    />
-  );
+  return <Table01 {...control_table} className={classNames(scss_p.table)} />;
 }
 
 // ==================================================================
