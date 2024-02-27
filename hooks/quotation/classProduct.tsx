@@ -63,6 +63,7 @@ import {
   optionsCreator_boxB_SJ302,
   optionsCreator_boxB_SJ303A,
   optionsCreator_horsePower,
+  lookup_options_bottomBarAngleIronAndPlate,
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
@@ -92,6 +93,7 @@ import { apiGetQuotationProducts } from 'js/api/api_quotation';
 // =============================================================================
 
 import { prodCellConfig, getInstallationFee } from './prodCellConfig';
+
 import { lookup_distributionBoxPrice, lookup_horsePowerToNumber, lookup_hpToGapAGapC } from 'config/product/lookup';
 
 // utils
@@ -896,7 +898,7 @@ class Class_product {
         rollerDiameter: this._doorGeneralSpecs.diameter,
         sidePlateSizeB: Number(this.boxB_mm),
         hp: this.horsepower,
-        motorVendor: this.horsepower,
+        motorVendor: this.motor,
       });
       this.isLoading = false;
 
@@ -2161,22 +2163,28 @@ class Class_product {
       return optionsCreator_bottomBarAngleIron_303AS();
     }
 
-    return [];
+    const doorType = this._prodData.doorType as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
+
+    return lookup_options_bottomBarAngleIronAndPlate[doorType]?.angleIron() ?? [];
   }
   get options_bottomBarPlate() {
-    if (this._prodData.doorType === 'SJ-302') {
-      return optionsCreator_bottomBarPlate();
-    }
+    const doorType = this._prodData.doorType as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
 
-    if (this._prodData.doorType === 'SJ-303A') {
-      return optionsCreator_bottomBarPlate_303A();
-    }
+    return lookup_options_bottomBarAngleIronAndPlate[doorType]?.plate() ?? [];
 
-    if (this._prodData.doorType === 'SJ-303AS') {
-      return optionsCreator_bottomBarPlate_303AS();
-    }
+    // if (this._prodData.doorType === 'SJ-302') {
+    //   return optionsCreator_bottomBarPlate();
+    // }
 
-    return [];
+    // if (this._prodData.doorType === 'SJ-303A') {
+    //   return optionsCreator_bottomBarPlate_303A();
+    // }
+
+    // if (this._prodData.doorType === 'SJ-303AS') {
+    //   return optionsCreator_bottomBarPlate_303AS();
+    // }
+
+    // return [];
   }
 
   get options_boxB() {
@@ -2300,6 +2308,16 @@ class Class_product {
 
   set doorType(v) {
     this._prodData.doorType = v;
+
+    const isMaterailInOptions = check_isValueInOptions(this.material, this.options_material ?? []);
+    const is304InOptions = check_isValueInOptions('SST#304', this.options_material ?? []);
+
+    if (is304InOptions) {
+      this.material = 'SST#304';
+    } else if (!isMaterailInOptions && this.options_material) {
+      this.material = this.options_material?.[0]?.value ?? '';
+    }
+
     this.clearProd_all();
 
     if (v === 'SJ-312') {
@@ -2636,7 +2654,7 @@ class Class_product {
   set surface(v) {
     this._prodData.surface = v;
 
-    if (this.comList) {
+    if (this.comList?.slat) {
       this.comList.slat.surface_withCheckOptions = v;
     }
 
@@ -3908,6 +3926,10 @@ const calcDefaultMotor = ({ doorGeneralSpecs }: { doorGeneralSpecs: TdoorGeneral
     defaultBoxB,
     defaultMotorBox,
   };
+};
+
+const check_isValueInOptions = (value: string, options: Toption[]) => {
+  return options.some((item) => item.value === value);
 };
 
 // ===========================================================

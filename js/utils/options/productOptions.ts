@@ -305,6 +305,36 @@ export const optionsCreator_bottomBarPlate_303AS = createOptionsCreator({
   ],
 });
 
+export const optionsCreator_bottomBarAngleIron_305D = createOptionsCreator({
+  optionsArr: [
+    { value: '不鏽鋼#304 50*50*3T', label: '不鏽鋼#304 50*50*3T', material: 'SST#304' },
+    { value: '不鏽鋼#316 50*50*3T', label: '不鏽鋼#316 50*50*3T', material: 'SST#316' },
+  ],
+});
+
+export const optionsCreator_bottomBarPlate_305D = createOptionsCreator({
+  optionsArr: [
+    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: 'SST#304' },
+    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: 'SST#316' },
+  ],
+});
+
+export const optionsCreator_bottomBarAngleIron_312 = createOptionsCreator({
+  optionsArr: [
+    { value: '鍍鋅 75*75*6T', label: '鍍鋅 75*75*6T', material: '鍍鋅鋼板' },
+    { value: '不鏽鋼#304 75*75*6T', label: '不鏽鋼#304 75*75*6T', material: 'SST#304' },
+    { value: '不鏽鋼#316 75*75*6T', label: '不鏽鋼#316 75*75*6T', material: 'SST#316' },
+  ],
+});
+
+export const optionsCreator_bottomBarPlate_312 = createOptionsCreator({
+  optionsArr: [
+    { value: '鍍鋅 1.5T', label: '鍍鋅 1.5T', material: '鍍鋅鋼板' },
+    { value: '不鏽鋼#304 1.5T', label: '不鏽鋼#304 1.5T', material: 'SST#304' },
+    { value: '不鏽鋼#316 1.5T', label: '不鏽鋼#316 1.5T', material: 'SST#316' },
+  ],
+});
+
 export const optionsCreator_surface = createOptionsCreator({
   optionsArr: [
     { value: '2B', label: '2B' },
@@ -354,3 +384,30 @@ export const optionsCreator_boxB_SJ303A = createOptionsCreator({
 
 //   return arr;
 // };
+
+// ===================================================================
+
+const lookup_options_bottomBarAngleIronAndPlate = {
+  'SJ-302': {
+    angleIron: optionsCreator_bottomBarAngleIron,
+    plate: optionsCreator_bottomBarPlate,
+  },
+  'SJ-303A': {
+    angleIron: optionsCreator_bottomBarAngleIron_303A,
+    plate: optionsCreator_bottomBarPlate_303A,
+  },
+  'SJ-303AS': {
+    angleIron: optionsCreator_bottomBarAngleIron_303AS,
+    plate: optionsCreator_bottomBarPlate_303AS,
+  },
+  'SJ-305D': {
+    angleIron: optionsCreator_bottomBarAngleIron_305D,
+    plate: optionsCreator_bottomBarPlate_305D,
+  },
+  'SJ-312': {
+    angleIron: optionsCreator_bottomBarAngleIron_312,
+    plate: optionsCreator_bottomBarPlate_312,
+  },
+} as const;
+
+export { lookup_options_bottomBarAngleIronAndPlate };

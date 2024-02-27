@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -6,7 +6,11 @@ import scss from './outboundOrder.module.scss';
 
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
+// import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
+import { TemployeeDto, ToutsourcingDto } from 'js/api/dtoTypes';
+import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // icon
 import { IconAddCircle, IconEdit, IconDelete01, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
@@ -45,10 +49,10 @@ type TstaticData = {
 
 type TdeliveryStatusItem = {
   value: string;
-  empolyee?: undefined;
+  installer?: undefined;
   onChange?: (str: string) => void;
   onChange_date?: undefined;
-  onChange_employee?: undefined;
+  onChange_installer?: undefined;
   hidden?: boolean;
   disabled?: boolean;
   forbidden?: boolean;
@@ -60,10 +64,10 @@ type TdeliveryStatusItem = {
 };
 type TdeliveryStatusItem_date = {
   value: string;
-  empolyee?: undefined;
+  installer?: undefined;
   onChange?: undefined;
   onChange_date?: (date: string | null) => void;
-  onChange_employee?: undefined;
+  onChange_installer?: undefined;
   hidden?: boolean;
   disabled?: boolean;
   forbidden?: boolean;
@@ -74,12 +78,13 @@ type TdeliveryStatusItem_date = {
   onCancelClick?: undefined;
 };
 
-type TdeliveryStatusItem_employee = {
+type TdeliveryStatusItem_installer = {
   value?: string | undefined;
-  empolyee: ToutsourcingDto | undefined | null;
+  installer: ToutsourcingDto | TemployeeDto | undefined | null;
   onChange?: undefined;
   onChange_date?: undefined;
-  onChange_employee?: (emp: ToutsourcingDto | null) => void;
+  // onChange_installer?: (installer: ToutsourcingDto | TemployeeDto | null) => void;
+  onChange_installer?: (props: { outsourcing?: ToutsourcingDto; employee?: TemployeeDto }) => void;
   hidden?: boolean;
   disabled?: boolean;
   forbidden?: boolean;
@@ -92,10 +97,10 @@ type TdeliveryStatusItem_employee = {
 
 type TdeliveryStatusItem_btnPanel = {
   value?: undefined;
-  empolyee?: undefined;
+  installer?: undefined;
   onChange?: undefined;
   onChange_date?: undefined;
-  onChange_employee?: undefined;
+  onChange_installer?: undefined;
   hidden?: boolean;
   disabled?: boolean;
   forbidden?: boolean;
@@ -121,7 +126,9 @@ type Tgroup = {
       groupList: {
         btnPanelArr: TdeliveryStatusItem_btnPanel[];
         installDateArr: TdeliveryStatusItem_date[];
-        installerArr: TdeliveryStatusItem_employee[];
+
+        installerArr: TdeliveryStatusItem_installer[];
+
         itemNameArr: TdeliveryStatusItem[];
         notesArr: TdeliveryStatusItem[];
       };
@@ -138,7 +145,29 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
   const configList = creConfigList();
 
   // const [targetRow, setTargetRow] = useState<Tgroup['rowArr'][number]['deliveryStatus'] | undefined>();
-  const [targetEmpControl, setTargetEmpControl] = useState<TdeliveryStatusItem_employee | undefined>();
+  const [targetEmpControl, setTargetEmpControl] = useState<TdeliveryStatusItem_installer | undefined>();
+
+  console.log(targetEmpControl);
+
+  // 決定簡單處理就好
+  const defaultSeletedDataArrArr = useMemo(() => {
+    const installer = targetEmpControl?.installer;
+
+    if (!installer) {
+      return undefined;
+    }
+
+    type TdefaultSeletedDataArrArr = [TemployeeDto[] | undefined, ToutsourcingDto[] | undefined];
+    let arr: TdefaultSeletedDataArrArr = [[], []];
+
+    if ('name' in installer) {
+      arr = [undefined, [installer]] as TdefaultSeletedDataArrArr;
+    } else if ('chName' in installer) {
+      arr = [[installer], undefined] as TdefaultSeletedDataArrArr;
+    }
+
+    return arr;
+  }, [targetEmpControl]);
 
   return (
     <div className={scss.orderTable}>
@@ -362,10 +391,10 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                               disabled,
                               forbidden,
                               value,
-                              empolyee,
+                              installer,
                               onChange,
                               onChange_date,
-                              onChange_employee,
+                              onChange_installer,
                               onAddClick,
                               onEditClick,
                               onDeleteClick,
@@ -401,10 +430,20 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
                             }
 
                             //
-                            if (onChange_employee) {
+                            if (onChange_installer) {
+                              let name = '';
+
+                              if (installer) {
+                                if ('name' in installer) {
+                                  name = installer.name;
+                                } else if ('chName' in installer) {
+                                  name = installer.chName;
+                                }
+                              }
+
                               theProps.inputProps = {
                                 props: {
-                                  value: value || empolyee?.name || '',
+                                  value: name || '',
                                   placeholder: '',
                                 },
                               };
@@ -476,26 +515,36 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
           );
         })}
       </div>
-      {/* <EmployeeSelector
-        showModal={!!targetEmpControl}
-        onConfirm={(arr) => {
-          targetEmpControl?.onChange_employee?.(arr[0] ?? null);
-        }}
-        onCancel={() => {
-          setTargetEmpControl(undefined);
-        }}
-        selLimit={1}
-      /> */}
 
-      <OutsourcingSelector
+      <SelectorGroup
         showModal={!!targetEmpControl}
-        onConfirm={(arr) => {
-          targetEmpControl?.onChange_employee?.(arr[0] ?? null);
+        caption="選擇員工或外包廠商"
+        tip="員工或外包擇一"
+        onConfirm={(dataArr) => {
+          const employeeArr = dataArr[0];
+          const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
+
+          const outsourcingArr = dataArr[1];
+          const outsourcing = outsourcingArr[0] as (typeof outsourcingArr)[0] | undefined;
+
+          if (!employee && !outsourcing) {
+            myAlert.info({ title: '必須選擇安裝人員' });
+
+            return;
+          }
+
+          targetEmpControl?.onChange_installer &&
+            targetEmpControl.onChange_installer({
+              employee,
+              outsourcing,
+            });
+          setTargetEmpControl(undefined);
         }}
         onCancel={() => {
           setTargetEmpControl(undefined);
         }}
-        selLimit={1}
+        isCancelOnConfirm={false}
+        defaultSeletedDataArrArr={defaultSeletedDataArrArr}
       />
     </div>
   );
@@ -740,7 +789,7 @@ const creCellConfig_staticData2 = (): TcellConfigList => ({
     position: '',
   },
   installer: {
-    label: '外包人員',
+    label: '安裝人員',
     width: '85px',
     type: 'employee',
     position: '',
@@ -773,7 +822,7 @@ const creCellConfig_subGroup = (): TcellConfigList => ({
     position: '',
   },
   installerArr: {
-    label: '外包人員',
+    label: '安裝人員',
     width: '85px',
     type: 'input',
     position: '',
@@ -798,4 +847,25 @@ const creConfigList = (): TcellConfigList => ({
   ...creCellConfig_static(),
   ...creCellConfig_staticData2(),
   ...creCellConfig_subGroup(),
+});
+
+// =============================================================
+
+const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
+  selectorArr: [
+    {
+      key: 'employee',
+      caption: '員工',
+      tip: '單選',
+      limit: 1,
+      clearOther: [1],
+    },
+    {
+      key: 'outsourcing',
+      caption: '外包廠商',
+      tip: '單選',
+      limit: 1,
+      clearOther: [0],
+    },
+  ],
 });

@@ -133,6 +133,10 @@ export function Selector_component<Tdata extends TapiData>(
 
     let isRemove = false;
 
+    if (limit === 1) {
+      setSelectedList({ [id]: data });
+    }
+
     if (selectedList[id]) {
       setSelectedList((list) => {
         delete list[id];
@@ -202,6 +206,17 @@ export function Selector_component<Tdata extends TapiData>(
     const dataArr = Object.values(selectedList);
     onStateChange && onStateChange({ dataArr });
   }, [selectedList]);
+
+  useEffect(() => {
+    if (defaultSelectedArr) {
+      const list: { [id: string]: Tdata } = {};
+      defaultSelectedArr.forEach((item) => {
+        list[item.id] = item;
+      });
+
+      setSelectedList(list);
+    }
+  }, [defaultSelectedArr]);
 
   // ----------------------------------------------------------------------
 

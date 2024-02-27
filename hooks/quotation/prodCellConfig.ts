@@ -189,7 +189,7 @@ const prodCellConfig: TcellConfig = {
   material: {
     label: '材料',
     inputSelProps: {
-      wrapperStyle: { width: '150px' },
+      wrapperStyle: { width: '190px' },
       selectProps: {
         props: {
           // options由api取得

@@ -1,28 +1,21 @@
-// .container {
-//   :global(.ant-modal-content) {
-//     width: unset;
-//     height: fit-content;
-//     padding: 19px 30px;
-//     padding-top: 19px;
-//   }
-//   @screen laptop {
-//     :global(.ant-modal-content) {
-//       width: 80vw;
-//       height: 80vh;
-//     }
-//   }
-// }
-
 .container {
+  .caption {
+    font-size: 22px;
+    font-weight: 500;
+    color: theme("colors.main");
+  }
+  .tip {
+    font-size: 18px;
+    font-weight: 500;
+    color: red;
+    // margin-left: 10px;
+  }
+
   :global(.ant-modal-content) {
     :global(.ant-modal-body) {
       padding: 0;
     }
   }
-  // hr {
-  //   border-style: dashed;
-  //   border-color: black;
-  // }
 }
 .body {
   padding: 20px;
@@ -35,41 +28,3 @@
 }
 
 // =====================================================
-
-// .row {
-//   display: flex;
-//   height: 54px;
-//   padding: 0 46px;
-//   gap: 60px;
-//   border-bottom: solid 1px theme("colors.border");
-//   cursor: pointer;
-
-//   > div {
-//     flex: 0 0 1;
-//     // margin: auto;
-//     margin-left: 0;
-//     > span {
-//       font-weight: 400;
-//       font-size: 16px;
-//       line-height: 19px;
-//       color: theme("colors.text");
-//     }
-//   }
-
-//   &.except {
-//     background-color: #ddd;
-//     cursor: auto;
-//   }
-
-//   @screen laptop {
-//     gap: 0px 60px;
-//     height: 70px;
-//     padding: 10px 12px;
-//     > div {
-//       > span {
-//         font-size: 14px;
-//         line-height: unset;
-//       }
-//     }
-//   }
-// }
