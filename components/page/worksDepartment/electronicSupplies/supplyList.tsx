@@ -13,6 +13,9 @@ import Table01, {
   Cell,
 } from 'components/global/gear/table/table01';
 
+// gear
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
+
 // css
 import scss from './supplyList.module.scss';
 import scss_p from './_public.module.scss';
@@ -93,19 +96,18 @@ const Cell_type = ({
       className={(scss.cell, scss.cell_type)}
     >
       {typeName !== undefined && <div className={scss.type}>{typeName}</div>}
-
       <div className={scss.subTypeGroup}>
         {subTypeArr?.map((item, index) => {
           const { name, unclaimedQty, receivedQty, needQty, editReceivedQty } = item;
 
           return (
-            <div key={index} className={scss.subTypeRow}>
+            <CellWithBar key={index} className={scss.subTypeRow}>
               <div className={scss.subType}>{name}</div>
               {unclaimedQty !== undefined && <div className={scss.qtyCell}>{unclaimedQty}</div>}
               {receivedQty !== undefined && <div className={scss.qtyCell}>{receivedQty}</div>}
               {needQty !== undefined && <div className={scss.qtyCell}>{needQty}</div>}
               {editReceivedQty !== undefined && <div className={scss.qtyCell}>{editReceivedQty}</div>}
-            </div>
+            </CellWithBar>
           );
         })}
       </div>
