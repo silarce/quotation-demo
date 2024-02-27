@@ -10,11 +10,12 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 import { Popover } from 'antd';
 
 // component
-import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
-import Table01, { Trow, Tcell, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
+import SupplyList from 'components/page/worksDepartment/electronicSupplies/supplyList';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
+import Table01, { Trow, Tcell, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 // api
 import { useGetContract_id } from 'js/api/api_quotation';
@@ -326,12 +327,22 @@ export default function ElectronicSupplies() {
           />
         </div>
 
-        <Wrapper_tab tabArr={tabArr} className={classNames('mt-10', 'w-full')}>
-          <Table01
-            {...control_table}
-            // style={{ width: '100%' }}
-            className={classNames(scss.table, 'w-[100%]')}
-          />
+        <Wrapper_tab
+          tabArr={tabArr}
+          className={classNames('mt-10', 'w-full')}
+          // stickyTop={{
+          //   top: '50px',
+          // }}
+        >
+          {activeTab === 'itemList' && (
+            <Table01
+              {...control_table}
+              // style={{ width: '100%' }}
+              className={classNames(scss.table, 'w-[100%]')}
+            />
+          )}
+
+          {activeTab === 'supplyList' && <SupplyList />}
         </Wrapper_tab>
       </div>
     </SubLayer>
@@ -439,3 +450,5 @@ const configList: { [key: string]: Tconfig_table } = {
     justifyContent: 'center',
   },
 };
+
+// =======================================================================
