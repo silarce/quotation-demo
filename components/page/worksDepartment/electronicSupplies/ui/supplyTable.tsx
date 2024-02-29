@@ -31,7 +31,8 @@ type TsubType = {
   unclaimedQty?: React.ReactNode;
   receivedQty?: React.ReactNode;
   needQty?: React.ReactNode;
-  editReceivedQty?: React.ReactNode;
+  receivedQty_inputAttr?: React.HTMLAttributes<HTMLInputElement>;
+  needQty_inputAttr?: React.HTMLAttributes<HTMLInputElement>;
 };
 
 export type { Tcontrol_nestedRow, TsubType };
@@ -40,21 +41,25 @@ export type { Tcontrol_nestedRow, TsubType };
 // supplyTable
 export default function SupplyTable({
   rowArr,
-  isEdit = 'readOnly',
+  qtyType = 'normal',
+  disabled,
+  className,
 }: {
   rowArr?: Tcontrol_nestedRow[];
-  isEdit?: 'receive' | 'request' | 'readOnly';
+  qtyType?: 'receive' | 'request' | 'normal';
+  disabled?: boolean;
+  className?: string;
 }) {
   // const keyArr = ['name', 'subType', 'unclaimedQty', 'receivedQty', 'needQty'];
 
   // 這個只會影響到thead
   const keyArr = ['name', 'subType'];
 
-  if (isEdit === 'readOnly') {
+  if (qtyType === 'normal') {
     keyArr.push('unclaimedQty', 'receivedQty', 'needQty');
-  } else if (isEdit === 'receive') {
+  } else if (qtyType === 'receive') {
     keyArr.push('receivedQty_input');
-  } else if (isEdit === 'request') {
+  } else if (qtyType === 'request') {
     keyArr.push('needQty_input');
   }
 
@@ -79,10 +84,10 @@ export default function SupplyTable({
   }, []);
 
   return (
-    <div className={scss.supplyList}>
+    <div className={classNames(scss.supplyList, className)}>
       <Table01 {...control_table} className={classNames(scss_p.table)}>
         {rowArr?.map((row, index) => {
-          return <Row_nested key={index} {...row} />;
+          return <Row_nested key={index} disabled={disabled} {...row} />;
         })}
       </Table01>
     </div>
@@ -95,15 +100,17 @@ const Row_nested = ({
   name,
   typeName,
   subTypeArr,
+  disabled,
 }: {
   name: React.ReactNode;
   typeName?: React.ReactNode;
   subTypeArr?: TsubType[];
+  disabled?: boolean;
 }) => {
   return (
     <Row wrapperClassName={scss.row_nested}>
       <Cell_name>{name}</Cell_name>
-      <Cell_group typeName={typeName} subTypeArr={subTypeArr} />
+      <Cell_group typeName={typeName} subTypeArr={subTypeArr} disabled={disabled} />
     </Row>
   );
 };
@@ -124,9 +131,11 @@ const Cell_group = ({
   //
   typeName,
   subTypeArr,
+  disabled,
 }: {
   typeName?: React.ReactNode;
   subTypeArr?: TsubType[];
+  disabled?: boolean;
 }) => {
   return (
     <Cell
@@ -141,15 +150,54 @@ const Cell_group = ({
       )}
       <div className={scss.subTypeGroup}>
         {subTypeArr?.map((item, index) => {
-          const { name, unclaimedQty, receivedQty, needQty, editReceivedQty } = item;
+          const {
+            //
+            name,
+            unclaimedQty,
+            receivedQty,
+            needQty,
+            receivedQty_inputAttr,
+            needQty_inputAttr,
+          } = item;
 
           return (
             <CellWithBar key={index} className={scss.subTypeRow}>
               <div className={scss.subType}>{name}</div>
-              {unclaimedQty !== undefined && <div className={scss.qtyCell}>{unclaimedQty}</div>}
-              {receivedQty !== undefined && <div className={scss.qtyCell}>{receivedQty}</div>}
-              {needQty !== undefined && <div className={scss.qtyCell}>{needQty}</div>}
-              {editReceivedQty !== undefined && <div className={scss.qtyCell}>{editReceivedQty}</div>}
+              {unclaimedQty !== undefined && (
+                <div style={{ ...configList.unclaimedQty }} className={scss.qtyCell}>
+                  {unclaimedQty}
+                </div>
+              )}
+              {receivedQty !== undefined && (
+                <div style={{ ...configList.receivedQty }} className={scss.qtyCell}>
+                  {receivedQty}
+                </div>
+              )}
+              {needQty !== undefined && (
+                <div style={{ ...configList.needQty }} className={scss.qtyCell}>
+                  {needQty}
+                </div>
+              )}
+              {receivedQty_inputAttr !== undefined && (
+                <div style={{ ...configList.receivedQty_input }} className={scss.qtyCell}>
+                  <input
+                    type="number"
+                    readOnly={disabled}
+                    {...receivedQty_inputAttr}
+                    className={classNames(disabled && scss.disabled, receivedQty_inputAttr.className)}
+                  />
+                </div>
+              )}
+              {needQty_inputAttr !== undefined && (
+                <div style={{ ...configList.receivedQty_input }} className={scss.qtyCell}>
+                  <input
+                    type="number"
+                    readOnly={disabled}
+                    {...needQty_inputAttr}
+                    className={classNames(disabled && scss.disabled, needQty_inputAttr.className)}
+                  />
+                </div>
+              )}
             </CellWithBar>
           );
         })}
@@ -206,6 +254,7 @@ const configList: { [key: string]: Tconfig_table } = {
     label: '需求總數量',
     ...qtyConfig,
   },
+  //
   receivedQty_input: {
     label: '領取數量',
     ...qtyConfig,
