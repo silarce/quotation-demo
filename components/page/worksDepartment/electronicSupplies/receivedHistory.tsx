@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import classNames from 'classnames';
 
 // gear
@@ -52,16 +53,25 @@ export default function ReceivedHistory() {
           },
           {
             children: (
-              <IconDetail
-                onClick={() =>
-                  router.push({
-                    pathname: router.pathname + '/editReceivedHistory',
-                    query: {
-                      historyId: 'id9999999',
-                    },
-                  })
-                }
-              />
+              <Link
+                href={{
+                  pathname: router.pathname + '/editReceivedHistory',
+                  query: {
+                    historyId: 'id9999999',
+                  },
+                }}
+              >
+                <IconDetail
+                // onClick={() =>
+                //   router.push({
+                //     pathname: router.pathname + '/editReceivedHistory',
+                //     query: {
+                //       historyId: 'id9999999',
+                //     },
+                //   })
+                // }
+                />
+              </Link>
             ),
             width: 100,
           },

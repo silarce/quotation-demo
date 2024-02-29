@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import classNames from 'classnames';
 
 // gear
@@ -53,16 +54,16 @@ export default function DemandHistory() {
           },
           {
             children: (
-              <IconDetail
-                onClick={() =>
-                  router.push({
-                    pathname: router.pathname + '/editDemandHistory',
-                    query: {
-                      historyId: 'id9999999',
-                    },
-                  })
-                }
-              />
+              <Link
+                href={{
+                  pathname: router.pathname + '/editDemandHistory',
+                  query: {
+                    historyId: 'id9999999',
+                  },
+                }}
+              >
+                <IconDetail />
+              </Link>
             ),
             width: 100,
           },
