@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
 // gear
@@ -11,6 +12,9 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import scss_p from './_public.module.scss';
 
 export default function ReceivedHistory() {
+  const router = useRouter();
+  // ------------------------------------------------------------------
+
   const control_table = useMemo(() => {
     //
     const thead: Ttable['thead'] = {
@@ -47,7 +51,18 @@ export default function ReceivedHistory() {
             children: '無敵鐵金剛',
           },
           {
-            children: <IconDetail onClick={() => alert('肚子餓')} />,
+            children: (
+              <IconDetail
+                onClick={() =>
+                  router.push({
+                    pathname: router.pathname + '/editReceivedHistory',
+                    query: {
+                      historyId: 'id9999999',
+                    },
+                  })
+                }
+              />
+            ),
             width: 100,
           },
         ],
@@ -55,7 +70,6 @@ export default function ReceivedHistory() {
     ];
 
     const tbody: Ttable['tbody'] = {
-      // rowArr: tbodyRowArr,
       rowArr: [
         ...tbodyRowArr,
         ...tbodyRowArr,
@@ -94,9 +108,8 @@ export default function ReceivedHistory() {
     };
 
     return { thead, tbody };
-
-    //
   }, []);
+  // ------------------------------------------------------------------
 
   return <Table01 {...control_table} className={classNames(scss_p.table)} />;
 }
