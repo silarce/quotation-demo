@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef, useImperativeHandle, ForwardedRef } from 'react';
+import { useState, useEffect, useMemo, forwardRef, useImperativeHandle, ForwardedRef } from 'react';
 import classNames from 'classnames';
 
 import SearchBar, {
@@ -39,7 +39,7 @@ type Tconfig = {
   tbody?: {
     className?: string;
     style?: React.CSSProperties;
-    reducer?: (value: unknown) => string;
+    reducer?: (value: unknown) => React.ReactNode;
   };
 };
 
@@ -68,9 +68,17 @@ type TselectorProps<Tdata extends TapiData> = {
   defaultSelectedArr?: Tdata[];
   onStateChange?: (props: { dataArr: Tdata[] }) => void;
   limit?: number;
+  //
+  //
+  filter_extends?: (searchStrArr: string[]) => Tparams['filter'];
 };
 
-export type { TimperativeHandle, TsearchInputSelProps, TselectorProps };
+type TselectorProps_dyna<Tdata extends TapiData> = Pick<
+  TselectorProps<Tdata>,
+  'params' | 'filter' | 'caption' | 'tip' | 'filter' | 'filter_extends'
+>;
+
+export type { TimperativeHandle, TsearchInputSelProps, TselectorProps, TselectorProps_dyna };
 
 // ==============================================================================
 
@@ -92,6 +100,7 @@ export function Selector_component<Tdata extends TapiData>(
     searchInputSelPropsArr,
     onRowClick: onRowClick_callback,
     filter: filter_callback,
+    filter_extends: filter_extends_callback,
     caption,
     tip,
     defaultSelectedArr,
@@ -105,7 +114,17 @@ export function Selector_component<Tdata extends TapiData>(
 
   // ----------------------------------------------------------------------
 
-  const filter = filter_callback && filter_callback(searchStrArr);
+  const filter = useMemo(() => {
+    let filter = filter_callback && filter_callback(searchStrArr);
+    const filter_extends = filter_extends_callback && filter_extends_callback(searchStrArr);
+
+    filter = {
+      ...filter,
+      ...filter_extends,
+    };
+
+    return filter;
+  }, [searchStrArr, filter_callback, filter_extends_callback]);
 
   const params: Tparams = {
     filter,
@@ -187,7 +206,7 @@ export function Selector_component<Tdata extends TapiData>(
 
   useEffect(() => {
     reset();
-  }, [searchStrArr]);
+  }, [filter]);
 
   useEffect(() => {
     // defaultSelectedArr
@@ -203,8 +222,8 @@ export function Selector_component<Tdata extends TapiData>(
   }, [defaultSelectedArr]);
 
   useEffect(() => {
-    const dataArr = Object.values(selectedList);
-    onStateChange && onStateChange({ dataArr });
+    const selectedDataArr = Object.values(selectedList);
+    onStateChange && onStateChange({ dataArr: selectedDataArr });
   }, [selectedList]);
 
   useEffect(() => {
@@ -238,7 +257,7 @@ export function Selector_component<Tdata extends TapiData>(
       {/*  */}
       <div className={scss.selectedList}>
         <div className={scss.caption}>已選擇</div>
-        <ul className={scss.list}>
+        <ul>
           {Object.values(selectedList).map((item, index) => {
             return (
               <li key={index} onClick={() => onRowClick(item)}>
@@ -391,15 +410,20 @@ function DataList_table_row<Tdata extends TapiData>({
             ...style,
           };
 
-          let value = apiData[key] as string | number;
+          let node: React.ReactNode = null;
+          const value = apiData[key];
 
           if (reducer) {
-            value = reducer(value);
+            node = reducer(value);
+          } else if (typeof value === 'string' || typeof value === 'number') {
+            node = value;
+          } else {
+            node = 'error: value is invalid';
           }
 
           return (
             <div key={index} className={classNames(scss.cell, className)} style={theStyle}>
-              <span>{value}</span>
+              <span>{node}</span>
             </div>
           );
         })}

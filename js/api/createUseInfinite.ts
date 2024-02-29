@@ -36,7 +36,7 @@ export function createUseInfinite<TapiReq extends Tres>({
     customParams,
   }: {
     customParams?: Tparams;
-  }) => {
+  } = {}) => {
     /**resetCount就只是用來使呼叫reset後，若page沒有改變的話，還是可以觸發update*/
     const [resetCount, setResetCount] = useState(0);
     const [isLoadingPage1, setIsLoadingPage1] = useState(false);

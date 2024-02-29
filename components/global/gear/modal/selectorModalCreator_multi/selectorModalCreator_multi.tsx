@@ -6,10 +6,13 @@ import _ from 'lodash';
 import { Modal } from 'antd';
 
 // composition
-import { Selector, TimperativeHandle, TselectorProps } from './selector/selector';
+import { Selector, TimperativeHandle, TselectorProps, TselectorProps_dyna } from './selector/selector';
 
 // gear
 import TwoBtnFooter from '../footer/twoBtnFooter';
+
+// options
+import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 
 // css
 import scss from './selectorModalCreator_multi.module.scss';
@@ -17,8 +20,7 @@ import scss from './selectorModalCreator_multi.module.scss';
 // api
 import { useGetOutsourcing, ToutsourcingDto } from 'js/api/api_outsourcing';
 import { useEmployee_infinite_2, TemployeeDto } from 'js/api/api_employee';
-
-import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
+import { useGetDailyReports_items, TdailyReportItem_my } from 'js/api/api_dailyReport';
 
 // ======================================================================
 
@@ -37,6 +39,10 @@ type TselectorArrItem<Tkey extends keyof TtypeLookup> = {
 // };
 type TselectorArr<TkeyArr extends (keyof TtypeLookup)[]> = {
   [index in keyof TkeyArr]: TselectorArrItem<TkeyArr[index]>;
+};
+
+type TselectorPropsArr<TkeyArr extends (keyof TtypeLookup)[]> = {
+  [index in keyof TkeyArr]: TselectorProps_dyna<TtypeLookup[TkeyArr[index]]> | undefined;
 };
 
 // ======================================================================
@@ -58,7 +64,10 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     defaultSeletedDataArrArr,
     caption,
     tip,
-  }: {
+    //
+    dynaSelectorPropsArr: dynaSelectorPropsArr,
+  }: //
+  {
     showModal: boolean;
     onConfirm: (v: TdataArrArr) => void;
     onCancel: () => void;
@@ -66,6 +75,8 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     defaultSeletedDataArrArr?: Partial<TdataArrArr>;
     caption?: string;
     tip?: string;
+    //
+    dynaSelectorPropsArr: TselectorPropsArr<TkeyArr>;
     //
   }) => {
     // ------------------------------------------------------------------------
@@ -85,8 +96,6 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
     // ------------------------------------------------------------------------
 
-    //
-    //
     return (
       <Modal
         visible={showModal}
@@ -97,6 +106,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
         centered={true}
         destroyOnClose={true}
         footer={null}
+        onCancel={onCancel}
       >
         <div className={classNames(scss.body)}>
           {(caption || tip) && (
@@ -108,8 +118,12 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
           {/*  */}
           {selectorArr.map((item, index) => {
+            // 建立時送進來的
             const { key, clearOther, limit, forbiddenCheck_dataList } = item;
+            //在下面寫好的，props會送進Selector
             const props = propsLookup[key]();
+            // 動態的
+            const dynaProps = dynaSelectorPropsArr[index];
 
             if (item.caption === null) {
               props.caption = null;
@@ -117,11 +131,22 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
               props.caption = item.caption;
             }
 
+            if (dynaProps?.caption) {
+              props.caption = dynaProps.caption;
+            }
+
+            //
+
             if (item.tip === null) {
               props.tip = null;
             } else if (item.tip) {
               props.tip = item.tip;
             }
+
+            if (dynaProps?.tip) {
+              props.tip = dynaProps.tip;
+            }
+            //
 
             if (clearOther) {
               const theOnRowClick = props.onRowClick;
@@ -142,6 +167,12 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
             if (forbiddenCheck_dataList) {
               props.forbiddenCheck_dataList = forbiddenCheck_dataList;
+            }
+
+            props.filter_extends = dynaProps?.filter_extends;
+
+            if (dynaProps?.filter) {
+              props.filter = dynaProps.filter;
             }
 
             return (
@@ -252,6 +283,8 @@ const props_employee: TselectorProps<TemployeeDto> = {
   selectedKey: 'chName',
   caption: '員工',
   params: {
+    sort: 'createdAt',
+    order: 'ASC',
     populate: ['jobs.department'],
   },
   configArr: [
@@ -342,6 +375,42 @@ const props_employee: TselectorProps<TemployeeDto> = {
   },
 };
 
+const props_dailyReport_item: TselectorProps<TdailyReportItem_my> = {
+  useInfinit: useGetDailyReports_items,
+  selectedKey: 'description',
+  caption: '日報表回報',
+  configArr: [
+    {
+      key: 'employeeChName',
+      width: 100,
+      thead: {
+        label: '員工姓名',
+      },
+    },
+    {
+      key: 'customerName',
+      width: 100,
+      thead: {
+        label: '客戶/工程',
+      },
+    },
+    {
+      key: 'contactName',
+      width: 100,
+      thead: {
+        label: '接洽人',
+      },
+    },
+    {
+      key: 'description',
+      flex: 'auto',
+      thead: {
+        label: '內容',
+      },
+    },
+  ],
+};
+
 // ---
 // w   propsLookup 與 TtypeLookup的key必須一致
 // w   propsLookup 與 TtypeLookup的key必須一致
@@ -352,6 +421,9 @@ const propsLookup = {
   },
   employee: () => {
     return _.cloneDeep(props_employee);
+  },
+  dailyReport_item: () => {
+    return _.cloneDeep(props_dailyReport_item);
   },
   // test: () => {
   //   return _.cloneDeep(props_outsourcing);
@@ -364,6 +436,7 @@ const propsLookup = {
 type TtypeLookup = {
   outsourcing: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   employee: Exclude<(typeof props_employee)['dataType'], undefined>;
+  dailyReport_item: Exclude<(typeof props_dailyReport_item)['dataType'], undefined>;
   // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
 };
