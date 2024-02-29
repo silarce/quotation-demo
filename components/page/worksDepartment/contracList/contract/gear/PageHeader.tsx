@@ -106,18 +106,18 @@ export default function PageHeader({
         },
       },
     },
+    // {
+    //   label: '送電備品列表_old',
+    //   href: {
+    //     pathname: `${pathHead}/powerTransmissionSpareList`,
+    //     query: {
+    //       contractId,
+    //       version,
+    //     },
+    //   },
+    // },
     {
       label: '送電備品列表',
-      href: {
-        pathname: `${pathHead}/powerTransmissionSpareList`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
-    {
-      label: '送電備品列表-new',
       href: {
         pathname: `${pathHead}/electronicSupplies`,
         query: {
