@@ -24,10 +24,12 @@ export function createUseInfinite<TapiReq extends Tres>({
   apiClient,
   errTitle,
   errContent,
+  defaultParams,
 }: {
   apiClient: Tapi<TapiReq>;
   errTitle: string;
   errContent?: (error: AxiosError) => string;
+  defaultParams?: Omit<Tparams, 'page'>;
 }) {
   const useApi_infinite = ({
     //
@@ -52,14 +54,17 @@ export function createUseInfinite<TapiReq extends Tres>({
     const [hasNextPage, setHasNextPage] = useState<boolean>();
 
     // ----------------------------------------------------------------
-    const defaultParams = {
+    const theDefaultParams = {
       page,
-    };
+      sort: 'createdAt',
+      order: 'DESC',
+      ...defaultParams,
+    } as const;
     // ----------------------------------------------------------------
 
     const update = async (dynaParams?: Tparams) => {
       const params = {
-        ...defaultParams,
+        ...theDefaultParams,
         ...customParams,
         ...dynaParams,
       };
