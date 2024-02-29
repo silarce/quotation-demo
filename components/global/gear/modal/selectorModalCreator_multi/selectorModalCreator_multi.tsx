@@ -1,4 +1,4 @@
-import { useState, useRef, Fragment } from 'react';
+import { useState, useRef, Fragment, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 
@@ -21,6 +21,7 @@ import scss from './selectorModalCreator_multi.module.scss';
 import { useGetOutsourcing, ToutsourcingDto } from 'js/api/api_outsourcing';
 import { useEmployee_infinite_2, TemployeeDto } from 'js/api/api_employee';
 import { useGetDailyReports_items, TdailyReportItem_my } from 'js/api/api_dailyReport';
+import { useDepartments } from 'js/api/api_department';
 
 // ======================================================================
 
@@ -89,10 +90,56 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
     // ------------------------------------------------------------------------
 
+    const { data: data_department, update: update_department, isLoading } = useDepartments();
+
+    const options_department = useMemo(() => {
+      if (!data_department) {
+        return undefined;
+      }
+
+      const options = data_department?.data.map((item) => {
+        return {
+          label: item.name,
+          value: item.name,
+        };
+      });
+
+      options.unshift({
+        label: '不拘',
+        value: '',
+      });
+
+      return options;
+    }, [data_department]);
+
+    // ------------------------------------------------------------------------
+
     const theOnConfirm = () => {
       onConfirm(dataArrArr);
       isCancelOnConfirm && onCancel();
     };
+
+    const updateDepartment = () => {
+      if (isLoading || data_department) {
+        return;
+      }
+
+      update_department();
+    };
+
+    // ------------------------------------------------------------------------
+
+    // useEffect(() => {
+    //   update_department();
+    // }, []);
+
+    useEffect(() => {
+      const keyArr = selectorArr.map((item) => item.key);
+
+      if (keyArr.includes('employee')) {
+        updateDepartment();
+      }
+    }, [selectorArr]);
 
     // ------------------------------------------------------------------------
 
@@ -175,6 +222,14 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
               props.filter = dynaProps.filter;
             }
 
+            if (key === 'employee' && props.searchInputSelPropsArr?.[0]) {
+              const searchInputSelProps = props.searchInputSelPropsArr[0];
+
+              if ('selectProps' in searchInputSelProps && searchInputSelProps.selectProps?.props) {
+                searchInputSelProps.selectProps.props.options = options_department;
+              }
+            }
+
             return (
               <Fragment key={index}>
                 {/* // FIXME 型別錯誤 */}
@@ -211,6 +266,16 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
   return SelectModal;
 }
 
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
 // ======================================================================
 
 const props_outsourcing: TselectorProps<ToutsourcingDto> = {
@@ -353,6 +418,19 @@ const props_employee: TselectorProps<TemployeeDto> = {
   searchInputSelPropsArr: [
     {
       wrapperStyle: { width: 150 },
+      selectProps: {
+        props: {
+          menuPortalTarget: undefined, // select元件做壞了，這個必須要有
+          options: undefined,
+          placeholder: '部門',
+        },
+      },
+    },
+    {
+      pilarAttr: {},
+    },
+    {
+      wrapperStyle: { width: 150 },
       inputProps: {
         props: {
           placeholder: '完整編號、姓名...',
@@ -363,12 +441,13 @@ const props_employee: TselectorProps<TemployeeDto> = {
 
   filter: (strArr) => {
     return {
+      'jobs.department.name': { $eq: strArr[0] },
       $or: [
         {
-          idNumber: { $eq: strArr[0] },
+          idNumber: { $eq: strArr[1] },
         },
         {
-          chName: { $contains: strArr[0] },
+          chName: { $contains: strArr[1] },
         },
       ],
     };

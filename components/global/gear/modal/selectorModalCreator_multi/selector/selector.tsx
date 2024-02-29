@@ -189,11 +189,12 @@ export function Selector_component<Tdata extends TapiData>(
   // ----------------------------------------------------------------------
 
   const searcbBarProps: TsearcbBarProps | undefined = searchInputSelPropsArr && {
+    inputSelPropsArr: searchInputSelPropsArr ?? [],
+
     onClick: (strArr) => {
       setSearchStrArr(strArr);
     },
     onChange: () => {},
-    inputSelPropsArr: searchInputSelPropsArr ?? [],
   };
 
   // ----------------------------------------------------------------------
