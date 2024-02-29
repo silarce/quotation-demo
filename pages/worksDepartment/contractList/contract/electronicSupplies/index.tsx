@@ -142,8 +142,24 @@ export default function ElectronicSupplies() {
         }),
     },
   ];
+  const panelList_demandHistory: TpanelList = [
+    {
+      type: 'addButton',
+      label: '新增',
+      onClick: () =>
+        router.push({
+          pathname: `${router.pathname}/editDemandHistory`,
+          query: { ...router.query },
+        }),
+    },
+  ];
 
-  const panelList = activeTab === 'receiveHistory' ? panelList_receiveHistory : [];
+  const panelList =
+    activeTab === 'receiveHistory'
+      ? panelList_receiveHistory
+      : activeTab === 'demandHistory'
+      ? panelList_demandHistory
+      : [];
 
   // ------------------------------------------------------------------
 
