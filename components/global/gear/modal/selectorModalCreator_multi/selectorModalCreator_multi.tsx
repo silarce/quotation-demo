@@ -46,6 +46,8 @@ type TselectorPropsArr<TkeyArr extends (keyof TtypeLookup)[]> = {
   [index in keyof TkeyArr]: TselectorProps_dyna<TtypeLookup[TkeyArr[index]]> | undefined;
 };
 
+export type { TselectorProps_dyna };
+
 // ======================================================================
 
 export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>({
@@ -229,6 +231,15 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
                 searchInputSelProps.selectProps.props.options = options_department;
               }
             }
+
+            // if (dynaProps?.searchInputSelPropsArr) {
+            //   props.searchInputSelPropsArr = dynaProps.searchInputSelPropsArr;
+            // }
+            if (dynaProps && 'searchInputSelPropsArr' in dynaProps) {
+              props.searchInputSelPropsArr = dynaProps.searchInputSelPropsArr;
+            }
+
+            // console.log(dynaProps);
 
             return (
               <Fragment key={index}>

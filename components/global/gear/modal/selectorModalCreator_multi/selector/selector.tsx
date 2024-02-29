@@ -75,7 +75,7 @@ type TselectorProps<Tdata extends TapiData> = {
 
 type TselectorProps_dyna<Tdata extends TapiData> = Pick<
   TselectorProps<Tdata>,
-  'params' | 'filter' | 'caption' | 'tip' | 'filter' | 'filter_extends'
+  'params' | 'filter' | 'caption' | 'tip' | 'filter' | 'filter_extends' | 'searchInputSelPropsArr'
 >;
 
 export type { TimperativeHandle, TsearchInputSelProps, TselectorProps, TselectorProps_dyna };
