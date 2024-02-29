@@ -20,7 +20,7 @@ import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_ta
 
 // api
 import { useGetContract_id } from 'js/api/api_quotation';
-import { useGetEngineeringContact, useGetElectronicSupplies } from 'js/api/api_engineering';
+// import { useGetEngineeringContact, useGetElectronicSupplies } from 'js/api/api_engineering';
 
 import { Icon_info } from 'public/image/icon/svgComponent/svgIcons';
 
@@ -34,6 +34,7 @@ import { workSheetReducer, TquotationProductItemDto } from 'js/utils/worksheet/r
 
 type Tquery = {
   contractId: string;
+  listName: 'itemList' | 'supplyList' | 'receiveHistory' | 'demandHistory' | undefined;
 };
 
 type TproductItemList = {
@@ -43,17 +44,11 @@ type TproductItemList = {
   };
 };
 
-type TtabName = 'itemList' | 'supplyList' | 'receiveHistory' | 'demandHistory';
-
 // ------------------------------------------------------------------
 
 export default function ElectronicSupplies() {
   const router = useRouter();
-  const { contractId } = router.query as Tquery;
-
-  // ------------------------------------------------------------------
-
-  const [activeTab, setActiveTab] = useState<TtabName>('itemList');
+  const { contractId, listName = 'itemList' } = router.query as Tquery;
 
   // ------------------------------------------------------------------
 
@@ -72,12 +67,7 @@ export default function ElectronicSupplies() {
   } = contract?.engineeringContact ?? {};
   // ------------------------------------------------------------------
 
-  const {
-    // itemTokenList, itemIdArrList,
-    itemList,
-    doorQtySubTotal,
-    doorQtyTotal,
-  } = useMemo(() => {
+  const { itemList, doorQtySubTotal, doorQtyTotal } = useMemo(() => {
     if (!worksheet?.contractProductItems) {
       return {};
     }
@@ -88,7 +78,7 @@ export default function ElectronicSupplies() {
 
     const { itemTokenList, itemIdArrList } = workSheetReducer({ worksheet });
 
-    Object.keys(itemIdArrList).forEach((idKey, index) => {
+    Object.keys(itemIdArrList).forEach((idKey) => {
       const list = itemTokenList[idKey];
 
       for (const [key, value] of Object.entries(list)) {
@@ -155,9 +145,9 @@ export default function ElectronicSupplies() {
   ];
 
   const panelList =
-    activeTab === 'receiveHistory'
+    listName === 'receiveHistory'
       ? panelList_receiveHistory
-      : activeTab === 'demandHistory'
+      : listName === 'demandHistory'
       ? panelList_demandHistory
       : [];
 
@@ -166,23 +156,39 @@ export default function ElectronicSupplies() {
   const tabArr: Ttab[] = [
     {
       label: '送電備品列表',
-      isActive: activeTab === 'itemList',
-      onClick: () => setActiveTab('itemList'),
+      isActive: listName === 'itemList',
+      onClick: () => {
+        router.push({
+          query: { ...router.query, listName: 'itemList' },
+        });
+      },
     },
     {
       label: '送電備品總料單',
-      isActive: activeTab === 'supplyList',
-      onClick: () => setActiveTab('supplyList'),
+      isActive: listName === 'supplyList',
+      onClick: () => {
+        router.push({
+          query: { ...router.query, listName: 'supplyList' },
+        });
+      },
     },
     {
       label: '送電備品料單領取歷程',
-      isActive: activeTab === 'receiveHistory',
-      onClick: () => setActiveTab('receiveHistory'),
+      isActive: listName === 'receiveHistory',
+      onClick: () => {
+        router.push({
+          query: { ...router.query, listName: 'receiveHistory' },
+        });
+      },
     },
     {
       label: '送電備品料單需求歷程',
-      isActive: activeTab === 'demandHistory',
-      onClick: () => setActiveTab('demandHistory'),
+      isActive: listName === 'demandHistory',
+      onClick: () => {
+        router.push({
+          query: { ...router.query, listName: 'demandHistory' },
+        });
+      },
     },
   ];
 
@@ -252,10 +258,10 @@ export default function ElectronicSupplies() {
           //   top: '50px',
           // }}
         >
-          {activeTab === 'itemList' && <ItemList itemList={itemList} />}
-          {activeTab === 'supplyList' && <SupplyList />}
-          {activeTab === 'receiveHistory' && <ReceivedHistory />}
-          {activeTab === 'demandHistory' && <DemandHistory />}
+          {listName === 'itemList' && <ItemList itemList={itemList} />}
+          {listName === 'supplyList' && <SupplyList />}
+          {listName === 'receiveHistory' && <ReceivedHistory />}
+          {listName === 'demandHistory' && <DemandHistory />}
         </Wrapper_tab>
       </div>
     </SubLayer>
