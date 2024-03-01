@@ -38,3 +38,9 @@
     // height: 1px;
   }
 }
+
+.svgEdit {
+  &.enabled {
+    color: red;
+  }
+}

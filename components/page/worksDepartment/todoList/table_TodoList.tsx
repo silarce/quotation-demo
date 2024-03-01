@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import classNames from 'classnames';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -6,7 +7,7 @@ import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/tab
 import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
 
 // icon
-import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
+import { IconRemoveCircle, IconEdit, IconCheck01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './table_TodoList.module.scss';
@@ -102,7 +103,7 @@ export default function Table_todoList() {
               <SubRow
                 onRemoveClick={() => alert('foooo')}
                 // onCheck={(arr) => alert(arr)}
-                content={
+                defaultContent={
                   '好想睡覺好想睡覺好想睡覺\n好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺\n好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺'
                 }
               />
@@ -119,7 +120,7 @@ export default function Table_todoList() {
                 onRemoveClick={() => alert('foooo')}
                 // onCheck={(arr) => alert(arr)}
                 isChecked={true}
-                content={
+                defaultContent={
                   '好想睡覺好想睡覺好想睡覺\n好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺\n好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺'
                 }
               />
@@ -135,7 +136,7 @@ export default function Table_todoList() {
               <SubRow
                 onRemoveClick={() => alert('foooo')}
                 // onCheck={(arr) => alert(arr)}
-                content={
+                defaultContent={
                   '好想睡覺好想睡覺好想睡覺\n好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺\n好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺好想睡覺'
                 }
               />
@@ -179,18 +180,49 @@ const SubRow = ({
   onRemoveClick,
   onCheck,
   isChecked,
-  content,
+  defaultContent,
+  onOk,
 }: {
   onRemoveClick?: () => void;
   onCheck?: (strArr: string[]) => void;
   isChecked?: boolean;
-  content?: string;
+  defaultContent?: string;
+  onOk?: (str: string) => void;
 }) => {
+  const [disabled, setDisabled] = useState(true);
+
+  const [content, setContent] = useState(defaultContent ?? '');
+
+  const switchDisabled = () => {
+    setDisabled((prev) => !prev);
+  };
+
+  const theOnOk = () => {
+    onOk && onOk(content ?? '');
+    setDisabled(true);
+  };
+
+  useEffect(() => {
+    if (disabled) {
+      setContent(defaultContent ?? '');
+    }
+  }, [defaultContent, disabled]);
+
   return (
     <div className={scss.subRow}>
-      <div>
-        <IconRemoveCircle onClick={onRemoveClick} />
-      </div>
+      <IconRemoveCircle onClick={onRemoveClick} />
+
+      <IconEdit
+        //
+        className={classNames(scss.svgEdit, !disabled && scss.enabled)}
+        onClick={switchDisabled}
+      />
+      <IconCheck01
+        //
+        className={classNames(disabled && 'invisible')}
+        onClick={theOnOk}
+      />
+
       <div>
         <InputSel
           className={scss.inputSel}
@@ -206,7 +238,18 @@ const SubRow = ({
           }}
         />
       </div>
-      <div>{content}</div>
+      {/* <div>{content}</div> */}
+
+      <InputSel
+        disabled={disabled}
+        showBaseline="auto"
+        inputProps={{
+          props: {
+            value: content,
+            onChange: (e) => setContent(e.target.value),
+          },
+        }}
+      />
     </div>
   );
 };
