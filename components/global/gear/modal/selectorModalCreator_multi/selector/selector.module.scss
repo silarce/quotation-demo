@@ -69,6 +69,11 @@
   }
 }
 
+.cell {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
 // ----------------------------------------------
 .selectedList {
   .caption {
@@ -88,10 +93,7 @@
       .liContent {
         padding-left: 10px;
         display: flex;
-        align-items: center;
         gap: 5px;
-        // height: fit-content;
-
         cursor: pointer;
         .dot {
           width: 7px;
@@ -99,6 +101,7 @@
           border-radius: 999px;
           background-color: theme("colors.main");
           flex: none;
+          margin-top: 7px;
         }
         .value {
           transform: translateY(-2px);

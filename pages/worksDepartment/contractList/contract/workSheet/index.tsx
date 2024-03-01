@@ -205,6 +205,7 @@ import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/us
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { workSheetReducer } from 'js/utils/worksheet/reducer';
 
 // css
 import scss from './workSheet.module.scss';
@@ -315,59 +316,7 @@ export default function WorkSheet({
       return {};
     }
 
-    const contractProductItems = _.sortBy(workSheet.contractProductItems, 'createdAt');
-
-    type TitemTokenList = {
-      [key: string]: {
-        originalItem: TquotationProductItemDto;
-        [key: string]: TquotationProductItemDto;
-      };
-    };
-
-    type TitemIdArrList = { [key: string]: { [key: string]: string[] } };
-
-    const itemTokenList: TitemTokenList = {};
-    const itemIdArrList: TitemIdArrList = {};
-
-    contractProductItems.forEach((item) => {
-      const { productId, adjustedItem, adjustedItemId } = item;
-
-      let theItem: typeof item;
-      let theId: string;
-
-      if (adjustedItem && adjustedItemId) {
-        theItem = adjustedItem;
-        theItem.adjustedItemId = adjustedItemId;
-        theId = adjustedItemId;
-      } else {
-        theItem = item;
-        theId = productId;
-      }
-
-      if (!itemTokenList[productId]) {
-        itemTokenList[productId] = {
-          originalItem: item,
-          [productId]: item, //itemTokenList[productId][productId] 為原始資料
-        };
-      }
-
-      itemTokenList[productId][theId] = theItem;
-
-      //
-      if (!itemIdArrList[productId]) {
-        itemIdArrList[productId] = {
-          [productId]: [], //itemIdArrList[productId][productId] 為原始資料代表的itemId陣列
-        };
-      }
-
-      if (!itemIdArrList[productId][theId]) {
-        itemIdArrList[productId][theId] = [];
-      }
-
-      itemIdArrList[productId][theId].push(item.id);
-
-      //
-    }); //  forEach close
+    const { itemTokenList, itemIdArrList } = workSheetReducer({ worksheet: workSheet });
 
     return {
       itemTokenList,

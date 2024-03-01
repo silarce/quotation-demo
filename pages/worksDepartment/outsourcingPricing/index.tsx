@@ -610,8 +610,8 @@ const cellCofig: TcellConfig = {
   },
   phoneNumber: {
     label: '連絡電話',
-    width: '180px',
-    // flex: 'auto',
+    // width: '180px',
+    flex: 'auto',
   },
 };
 

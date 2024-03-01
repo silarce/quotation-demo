@@ -4,6 +4,7 @@ import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi } from './_axiosCreator';
+import { createUseInfinite } from './createUseInfinite';
 
 import {
   TdailyReportDto,
@@ -19,6 +20,16 @@ import {
   TreviewerPresets,
 } from './dtoTypes';
 
+type TdailyReportItem_my = TdailyReportDto['items'][number] & {
+  employee: TemployeeDto;
+  employeeChName: string;
+};
+
+type TgetDailyReportItem_my = {
+  data: TdailyReportItem_my[];
+  meta: TpageMetaDto;
+};
+
 export type {
   TcreateDailyReportItemDto,
   TdailyReportDto,
@@ -27,6 +38,7 @@ export type {
   TemployeeDto,
   TaccountingReportDto,
   TdailyReportItemDto,
+  TdailyReportItem_my,
 };
 // =================================================================
 
@@ -36,7 +48,7 @@ type TgetDailyReports = {
 };
 
 // 取得指定月份所有日報表
-const apiDailyReports = (customParams?: Tparams, controller?: AbortController) => {
+const apiDailyReports_old = (customParams?: Tparams, controller?: AbortController) => {
   const api = `/daily-reports`;
   const params = {
     populate: [
@@ -52,10 +64,66 @@ const apiDailyReports = (customParams?: Tparams, controller?: AbortController) =
   };
 
   return axi
-    .get(api, { params, signal: controller?.signal })
-    .then(({ data }) => data as TgetDailyReports)
+    .get<TgetDailyReports>(api, { params, signal: controller?.signal })
+    .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
+
+const apiDailyReports = (params?: Tparams, controller?: AbortController) => {
+  const api = `/daily-reports`;
+
+  return axi
+    .get<TgetDailyReports>(api, { params, signal: controller?.signal })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+const apiDailyReports_reducer_items = (params?: Tparams) => {
+  const api = `/daily-reports`;
+  params = {
+    ...params,
+    populate: ['employee', 'items.workers', ...(params?.populate ?? [])],
+  };
+
+  return axi
+    .get<TgetDailyReports>(api, { params })
+    .then(({ data: res }) => {
+      const dataArr = res.data;
+      const reduceDataArr: TdailyReportItem_my[] = [];
+
+      dataArr.forEach((data) => {
+        const { employee, items } = data;
+        items.forEach((item) => {
+          reduceDataArr.push({ ...item, employee, employeeChName: employee.chName });
+        });
+      });
+
+      return {
+        data: reduceDataArr,
+        meta: res.meta,
+      };
+    })
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetDailyReports = createUseInfinite<TgetDailyReports>({
+  apiClient: apiDailyReports,
+  errTitle: '取得日報表失敗',
+  defaultParams: {
+    populate: [
+      //
+      'employee',
+      'reviewStatus.reviewerEmployee.jobs',
+      'isReviewCompleted',
+      'items.workers',
+    ],
+  },
+});
+
+export const useGetDailyReports_items = createUseInfinite<TgetDailyReportItem_my>({
+  apiClient: apiDailyReports_reducer_items,
+  errTitle: '取得日報表失敗',
+});
 
 export const useApiDailyReports = (params?: Tparams) => {
   /**用來取消請求 */
@@ -72,7 +140,7 @@ export const useApiDailyReports = (params?: Tparams) => {
         ...dynamicFilter,
       },
     };
-    const data = await apiDailyReports(theParams, newController);
+    const data = await apiDailyReports_old(theParams, newController);
 
     if (data) {
       setRes(data);
@@ -118,7 +186,7 @@ export const useApiDailyReports_v2 = (customParams?: Tparams) => {
     }
 
     setIsloading(true);
-    const res = await apiDailyReports(params);
+    const res = await apiDailyReports_old(params);
     setIsloading(false);
     const dataArrQueueCopy = [...dataArrQueue];
     dataArrQueueCopy[page - 1] = res.data;

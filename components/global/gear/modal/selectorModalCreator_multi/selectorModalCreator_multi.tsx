@@ -1,4 +1,4 @@
-import { useState, useRef, Fragment } from 'react';
+import { useState, useRef, Fragment, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 
@@ -6,10 +6,13 @@ import _ from 'lodash';
 import { Modal } from 'antd';
 
 // composition
-import { Selector, TimperativeHandle, TselectorProps } from './selector/selector';
+import { Selector, TimperativeHandle, TselectorProps, TselectorProps_simple } from './selector/selector';
 
 // gear
 import TwoBtnFooter from '../footer/twoBtnFooter';
+
+// options
+import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 
 // css
 import scss from './selectorModalCreator_multi.module.scss';
@@ -17,8 +20,8 @@ import scss from './selectorModalCreator_multi.module.scss';
 // api
 import { useGetOutsourcing, ToutsourcingDto } from 'js/api/api_outsourcing';
 import { useEmployee_infinite_2, TemployeeDto } from 'js/api/api_employee';
-
-import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
+import { useGetDailyReports_items, TdailyReportItem_my } from 'js/api/api_dailyReport';
+import { useDepartments } from 'js/api/api_department';
 
 // ======================================================================
 
@@ -39,6 +42,12 @@ type TselectorArr<TkeyArr extends (keyof TtypeLookup)[]> = {
   [index in keyof TkeyArr]: TselectorArrItem<TkeyArr[index]>;
 };
 
+// type TselectorPropsArr<TkeyArr extends (keyof TtypeLookup)[]> = {
+//   [index in keyof TkeyArr]: TselectorProps_dyna<TtypeLookup[TkeyArr[index]]> | undefined;
+// };
+
+export type { TselectorProps_simple };
+
 // ======================================================================
 
 export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>({
@@ -58,7 +67,10 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     defaultSeletedDataArrArr,
     caption,
     tip,
-  }: {
+    //
+    dynaSelectorPropsArr: dynaSelectorPropsArr,
+  }: //
+  {
     showModal: boolean;
     onConfirm: (v: TdataArrArr) => void;
     onCancel: () => void;
@@ -66,6 +78,9 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     defaultSeletedDataArrArr?: Partial<TdataArrArr>;
     caption?: string;
     tip?: string;
+    //
+    // dynaSelectorPropsArr: TselectorPropsArr<TkeyArr>;
+    dynaSelectorPropsArr?: TselectorProps_simple[];
     //
   }) => {
     // ------------------------------------------------------------------------
@@ -78,15 +93,59 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
     // ------------------------------------------------------------------------
 
+    const { data: data_department, update: update_department, isLoading } = useDepartments();
+
+    const options_department = useMemo(() => {
+      if (!data_department) {
+        return undefined;
+      }
+
+      const options = data_department?.data.map((item) => {
+        return {
+          label: item.name,
+          value: item.name,
+        };
+      });
+
+      options.unshift({
+        label: '不拘',
+        value: '',
+      });
+
+      return options;
+    }, [data_department]);
+
+    // ------------------------------------------------------------------------
+
     const theOnConfirm = () => {
       onConfirm(dataArrArr);
       isCancelOnConfirm && onCancel();
     };
 
+    const updateDepartment = () => {
+      if (isLoading || data_department) {
+        return;
+      }
+
+      update_department();
+    };
+
     // ------------------------------------------------------------------------
 
-    //
-    //
+    // useEffect(() => {
+    //   update_department();
+    // }, []);
+
+    useEffect(() => {
+      const keyArr = selectorArr.map((item) => item.key);
+
+      if (keyArr.includes('employee')) {
+        updateDepartment();
+      }
+    }, [selectorArr]);
+
+    // ------------------------------------------------------------------------
+
     return (
       <Modal
         visible={showModal}
@@ -97,6 +156,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
         centered={true}
         destroyOnClose={true}
         footer={null}
+        onCancel={onCancel}
       >
         <div className={classNames(scss.body)}>
           {(caption || tip) && (
@@ -108,8 +168,12 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
           {/*  */}
           {selectorArr.map((item, index) => {
+            // 建立時送進來的
             const { key, clearOther, limit, forbiddenCheck_dataList } = item;
+            //在下面寫好的，props會送進Selector
             const props = propsLookup[key]();
+            // 動態的
+            const dynaProps = dynaSelectorPropsArr?.[index];
 
             if (item.caption === null) {
               props.caption = null;
@@ -117,11 +181,22 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
               props.caption = item.caption;
             }
 
+            if (dynaProps?.caption) {
+              props.caption = dynaProps.caption;
+            }
+
+            //
+
             if (item.tip === null) {
               props.tip = null;
             } else if (item.tip) {
               props.tip = item.tip;
             }
+
+            if (dynaProps?.tip) {
+              props.tip = dynaProps.tip;
+            }
+            //
 
             if (clearOther) {
               const theOnRowClick = props.onRowClick;
@@ -143,6 +218,29 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
             if (forbiddenCheck_dataList) {
               props.forbiddenCheck_dataList = forbiddenCheck_dataList;
             }
+
+            props.filter_extends = dynaProps?.filter_extends;
+
+            if (dynaProps?.filter) {
+              props.filter = dynaProps.filter;
+            }
+
+            if (key === 'employee' && props.searchInputSelPropsArr?.[0]) {
+              const searchInputSelProps = props.searchInputSelPropsArr[0];
+
+              if ('selectProps' in searchInputSelProps && searchInputSelProps.selectProps?.props) {
+                searchInputSelProps.selectProps.props.options = options_department;
+              }
+            }
+
+            // if (dynaProps?.searchInputSelPropsArr) {
+            //   props.searchInputSelPropsArr = dynaProps.searchInputSelPropsArr;
+            // }
+            if (dynaProps && 'searchInputSelPropsArr' in dynaProps) {
+              props.searchInputSelPropsArr = dynaProps.searchInputSelPropsArr;
+            }
+
+            // console.log(dynaProps);
 
             return (
               <Fragment key={index}>
@@ -180,6 +278,16 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
   return SelectModal;
 }
 
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
 // ======================================================================
 
 const props_outsourcing: TselectorProps<ToutsourcingDto> = {
@@ -252,6 +360,8 @@ const props_employee: TselectorProps<TemployeeDto> = {
   selectedKey: 'chName',
   caption: '員工',
   params: {
+    sort: 'createdAt',
+    order: 'ASC',
     populate: ['jobs.department'],
   },
   configArr: [
@@ -320,6 +430,19 @@ const props_employee: TselectorProps<TemployeeDto> = {
   searchInputSelPropsArr: [
     {
       wrapperStyle: { width: 150 },
+      selectProps: {
+        props: {
+          menuPortalTarget: undefined, // select元件做壞了，這個必須要有
+          options: undefined,
+          placeholder: '部門',
+        },
+      },
+    },
+    {
+      pilarAttr: {},
+    },
+    {
+      wrapperStyle: { width: 150 },
       inputProps: {
         props: {
           placeholder: '完整編號、姓名...',
@@ -330,16 +453,53 @@ const props_employee: TselectorProps<TemployeeDto> = {
 
   filter: (strArr) => {
     return {
+      'jobs.department.name': { $eq: strArr[0] },
       $or: [
         {
-          idNumber: { $eq: strArr[0] },
+          idNumber: { $eq: strArr[1] },
         },
         {
-          chName: { $contains: strArr[0] },
+          chName: { $contains: strArr[1] },
         },
       ],
     };
   },
+};
+
+const props_dailyReport_item: TselectorProps<TdailyReportItem_my> = {
+  useInfinit: useGetDailyReports_items,
+  selectedKey: 'description',
+  caption: '日報表回報',
+  configArr: [
+    {
+      key: 'employeeChName',
+      width: 100,
+      thead: {
+        label: '員工姓名',
+      },
+    },
+    {
+      key: 'customerName',
+      width: 100,
+      thead: {
+        label: '客戶/工程',
+      },
+    },
+    {
+      key: 'contactName',
+      width: 100,
+      thead: {
+        label: '接洽人',
+      },
+    },
+    {
+      key: 'description',
+      flex: 'auto',
+      thead: {
+        label: '內容',
+      },
+    },
+  ],
 };
 
 // ---
@@ -353,6 +513,9 @@ const propsLookup = {
   employee: () => {
     return _.cloneDeep(props_employee);
   },
+  dailyReport_item: () => {
+    return _.cloneDeep(props_dailyReport_item);
+  },
   // test: () => {
   //   return _.cloneDeep(props_outsourcing);
   // },
@@ -364,6 +527,7 @@ const propsLookup = {
 type TtypeLookup = {
   outsourcing: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   employee: Exclude<(typeof props_employee)['dataType'], undefined>;
+  dailyReport_item: Exclude<(typeof props_dailyReport_item)['dataType'], undefined>;
   // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
 };

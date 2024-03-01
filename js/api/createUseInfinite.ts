@@ -24,17 +24,19 @@ export function createUseInfinite<TapiReq extends Tres>({
   apiClient,
   errTitle,
   errContent,
+  defaultParams,
 }: {
   apiClient: Tapi<TapiReq>;
   errTitle: string;
   errContent?: (error: AxiosError) => string;
+  defaultParams?: Omit<Tparams, 'page'>;
 }) {
   const useApi_infinite = ({
     //
     customParams,
   }: {
     customParams?: Tparams;
-  }) => {
+  } = {}) => {
     /**resetCount就只是用來使呼叫reset後，若page沒有改變的話，還是可以觸發update*/
     const [resetCount, setResetCount] = useState(0);
     const [isLoadingPage1, setIsLoadingPage1] = useState(false);
@@ -52,14 +54,17 @@ export function createUseInfinite<TapiReq extends Tres>({
     const [hasNextPage, setHasNextPage] = useState<boolean>();
 
     // ----------------------------------------------------------------
-    const defaultParams = {
+    const theDefaultParams = {
       page,
-    };
+      sort: 'createdAt',
+      order: 'DESC',
+      ...defaultParams,
+    } as const;
     // ----------------------------------------------------------------
 
     const update = async (dynaParams?: Tparams) => {
       const params = {
-        ...defaultParams,
+        ...theDefaultParams,
         ...customParams,
         ...dynaParams,
       };

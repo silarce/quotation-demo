@@ -40,7 +40,7 @@ const Wrapper_tab = ({
 
   //
   return (
-    <div className={classNames(scss.wrapper_tab, className)}>
+    <div className={classNames('w-fit', scss.wrapper_tab, className)}>
       <div
         className={classNames(scss.stickyCover, !stickyTop && 'hidden')}
         style={{
