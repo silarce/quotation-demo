@@ -3182,6 +3182,7 @@ export type TcreateTodoDto = {
   pointContactPerson: ''; // 目前用不到，但是必須要送
   pointContactNumber: ''; // 目前用不到，但是必須要送
   content: string;
+  isAlreadyDisPatching?: boolean;
 };
 
 // =============================================================================
