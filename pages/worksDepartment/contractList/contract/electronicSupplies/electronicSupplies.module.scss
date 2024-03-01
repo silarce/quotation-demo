@@ -1,0 +1,26 @@
+.container {
+  padding: 50px;
+}
+
+.info {
+  display: grid;
+  grid-template-columns: 230px auto;
+  gap: 20px 134px;
+}
+
+.supplyStatus {
+  color: theme("colors.danger");
+  &.isDone {
+    color: theme("colors.pass");
+  }
+}
+
+.checkBox.plus {
+  cursor: unset;
+  :global(.ant-checkbox-inner) {
+    cursor: unset;
+  }
+  :global(.ant-checkbox) {
+    cursor: unset;
+  }
+}

@@ -14,6 +14,7 @@ type Trow = {
   minHeight?: React.CSSProperties['minHeight'];
   maxHeight?: React.CSSProperties['maxHeight'];
   className?: string;
+  wrapperClassName?: string;
   style?: React.CSSProperties;
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   viewRef?: (node?: Element | null | undefined) => void;
@@ -50,6 +51,7 @@ type Ttable = {
     className?: string;
     style?: React.CSSProperties;
   };
+  children?: React.ReactNode;
 };
 
 type Tconfig_table = {
@@ -79,16 +81,17 @@ export default function Table01({
   className,
   style,
   haveBorder = true,
+  children,
 }: Ttable) {
   return (
-    <div className={classNames(scss.table, haveBorder && scss.haveBorder, className)} style={style}>
+    <div className={classNames('w-table', scss.table, haveBorder && scss.haveBorder, className)} style={style}>
       <div
         //
         className={classNames(scss.thead)}
         style={{
-          position: thead.stickyTop ? 'sticky' : undefined,
+          // position: thead.stickyTop ? 'sticky' : undefined,
           top: thead.stickyTop?.top,
-          zIndex: thead.stickyTop?.zIndex ?? '2',
+          zIndex: thead.stickyTop?.zIndex,
           ...thead.style,
         }}
       >
@@ -147,14 +150,25 @@ export default function Table01({
             </Row>
           );
         })}
+        {children}
       </div>
     </div>
   );
 }
 
-const Row = ({ children, height, minHeight, maxHeight, className, style, onClick, viewRef }: Trow) => {
+const Row = ({
+  children,
+  height,
+  minHeight,
+  maxHeight,
+  className,
+  wrapperClassName,
+  style,
+  onClick,
+  viewRef,
+}: Trow) => {
   return (
-    <CellWithBar className={scss.rowWrapper}>
+    <CellWithBar className={classNames(scss.rowWrapper, wrapperClassName)}>
       <div
         //
         ref={viewRef}
@@ -273,4 +287,4 @@ const CellSelect = ({
   );
 };
 
-export { CellInput, CellSelect };
+export { CellInput, CellSelect, Row, Cell };
