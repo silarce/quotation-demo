@@ -62,19 +62,23 @@ const apiGetDepartments = (params: Tparams) => {
 
 export const useDepartments = (params: Tparams = {}) => {
   const [data, setData] = useState<TgetDepartments | null | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const update = async () => {
     try {
+      setIsLoading(true);
       const data = await apiGetDepartments(params);
       setData(data);
     } catch (error) {
       setData(null);
+    } finally {
+      setIsLoading(false);
     }
 
     return data;
   };
 
-  return { data, setData, update };
+  return { data, setData, update, isLoading };
 };
 
 /**

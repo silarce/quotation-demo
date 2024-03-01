@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef, useImperativeHandle, ForwardedRef } from 'react';
+import { useState, useEffect, useMemo, forwardRef, useImperativeHandle, ForwardedRef } from 'react';
 import classNames from 'classnames';
 
 import SearchBar, {
@@ -39,7 +39,7 @@ type Tconfig = {
   tbody?: {
     className?: string;
     style?: React.CSSProperties;
-    reducer?: (value: unknown) => string;
+    reducer?: (value: unknown) => React.ReactNode;
   };
 };
 
@@ -53,24 +53,41 @@ type TselectorProps<Tdata extends TapiData> = {
   useInfinit: TuseInfinite;
   configArr: readonly Tconfig[];
   selectedKey: keyof Tdata;
-  params?: Tparams;
-  searchInputSelPropsArr?: TsearchInputSelProps[];
   onRowClick?: (props: { data: Tdata; isRemove: boolean }) => void;
-  filter?: (searchStrArr: string[]) => Tparams['filter'];
   //
   dataType?: Tdata; // 就只是為了方便取得泛型的型別
   clearOther?: number[]; // 用來清除其他的選擇 // 在父元素使用
-  caption?: string | null;
-  tip?: string | null;
   //
   forbiddenCheck_dataList?: (data: Tdata) => boolean;
   // forbiddenCheck_selectedList?: (data: Tdata) => boolean; // 目前還用不到
   defaultSelectedArr?: Tdata[];
   onStateChange?: (props: { dataArr: Tdata[] }) => void;
   limit?: number;
+  //
+  //
+  // params?: Tparams;
+  // caption?: string | null;
+  // tip?: string | null;
+  // searchInputSelPropsArr?: TsearchInputSelProps[];
+  // filter?: (searchStrArr: string[]) => Tparams['filter'];
+  // filter_extends?: (searchStrArr: string[]) => Tparams['filter'];
+} & TselectorProps_simple;
+
+// type TselectorProps_dyna<Tdata extends TapiData> = Pick<
+//   TselectorProps<Tdata>,
+//   'params' | 'filter' | 'caption' | 'tip' | 'filter' | 'filter_extends' | 'searchInputSelPropsArr'
+// >;
+
+type TselectorProps_simple = {
+  params?: Tparams;
+  filter?: (searchStrArr: string[]) => Tparams['filter'];
+  caption?: string | null;
+  tip?: string | null;
+  filter_extends?: (searchStrArr: string[]) => Tparams['filter'];
+  searchInputSelPropsArr?: TsearchInputSelProps[];
 };
 
-export type { TimperativeHandle, TsearchInputSelProps, TselectorProps };
+export type { TimperativeHandle, TsearchInputSelProps, TselectorProps, TselectorProps_simple };
 
 // ==============================================================================
 
@@ -92,6 +109,7 @@ export function Selector_component<Tdata extends TapiData>(
     searchInputSelPropsArr,
     onRowClick: onRowClick_callback,
     filter: filter_callback,
+    filter_extends: filter_extends_callback,
     caption,
     tip,
     defaultSelectedArr,
@@ -105,7 +123,17 @@ export function Selector_component<Tdata extends TapiData>(
 
   // ----------------------------------------------------------------------
 
-  const filter = filter_callback && filter_callback(searchStrArr);
+  const filter = useMemo(() => {
+    let filter = filter_callback && filter_callback(searchStrArr);
+    const filter_extends = filter_extends_callback && filter_extends_callback(searchStrArr);
+
+    filter = {
+      ...filter,
+      ...filter_extends,
+    };
+
+    return filter;
+  }, [searchStrArr, filter_callback, filter_extends_callback]);
 
   const params: Tparams = {
     filter,
@@ -170,11 +198,12 @@ export function Selector_component<Tdata extends TapiData>(
   // ----------------------------------------------------------------------
 
   const searcbBarProps: TsearcbBarProps | undefined = searchInputSelPropsArr && {
+    inputSelPropsArr: searchInputSelPropsArr ?? [],
+
     onClick: (strArr) => {
       setSearchStrArr(strArr);
     },
     onChange: () => {},
-    inputSelPropsArr: searchInputSelPropsArr ?? [],
   };
 
   // ----------------------------------------------------------------------
@@ -187,7 +216,7 @@ export function Selector_component<Tdata extends TapiData>(
 
   useEffect(() => {
     reset();
-  }, [searchStrArr]);
+  }, [filter]);
 
   useEffect(() => {
     // defaultSelectedArr
@@ -203,8 +232,8 @@ export function Selector_component<Tdata extends TapiData>(
   }, [defaultSelectedArr]);
 
   useEffect(() => {
-    const dataArr = Object.values(selectedList);
-    onStateChange && onStateChange({ dataArr });
+    const selectedDataArr = Object.values(selectedList);
+    onStateChange && onStateChange({ dataArr: selectedDataArr });
   }, [selectedList]);
 
   useEffect(() => {
@@ -238,7 +267,7 @@ export function Selector_component<Tdata extends TapiData>(
       {/*  */}
       <div className={scss.selectedList}>
         <div className={scss.caption}>已選擇</div>
-        <ul className={scss.list}>
+        <ul>
           {Object.values(selectedList).map((item, index) => {
             return (
               <li key={index} onClick={() => onRowClick(item)}>
@@ -391,15 +420,20 @@ function DataList_table_row<Tdata extends TapiData>({
             ...style,
           };
 
-          let value = apiData[key] as string | number;
+          let node: React.ReactNode = null;
+          const value = apiData[key];
 
           if (reducer) {
-            value = reducer(value);
+            node = reducer(value);
+          } else if (typeof value === 'string' || typeof value === 'number') {
+            node = value;
+          } else {
+            node = 'error: value is invalid';
           }
 
           return (
             <div key={index} className={classNames(scss.cell, className)} style={theStyle}>
-              <span>{value}</span>
+              <span>{node}</span>
             </div>
           );
         })}
