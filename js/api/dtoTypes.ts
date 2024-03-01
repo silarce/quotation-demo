@@ -3123,37 +3123,87 @@ export type TcreateMeetingMinutesDto = {
 
 export type TupdateMeetingMinutesDto = Omit<TcreateMeetingMinutesDto, 'id'>;
 
+// ============================================================================
+
+// todoDTO
+
+export type Tpopulate_todoDto = {
+  engineeringContact?: boolean;
+  dispatching?: boolean;
+  agentEmployee?: boolean;
+};
+
+export type TtodoDto<P extends Tpopulate_todoDto = Partial<Tpopulate_todoDto>> = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  // 工程聯絡單Id
+  engineeringContactId: string | null;
+  // 工程聯絡單
+  engineeringContact: P['engineeringContact'] extends true ? TengineeringContactDto | null : undefined;
+  // 派工單Id
+  dispatchingId: string | null;
+  // 派工單
+  dispatching: P['dispatching'] extends true ? TdispatchingDto | null : undefined;
+  // 聯絡人(接洽人欄位)
+  contactPerson: TtodoContactDto[];
+  // 主旨
+  purpose: string | null;
+  // 通知日期
+  notificationDate: string | null;
+  // 預計進場日期
+  entryDate: string | null;
+  // 聯絡電話
+  contactNumber: string | null;
+  // 內容
+  content: string;
+  // 是否已派工
+  isAlreadyDisPatching: boolean;
+  // 經辦人Id
+  agentEmployeeId: string | null;
+  // 經辦人
+  agentEmployee: P['agentEmployee'] extends true ? TemployeeDto : undefined;
+};
+
+export type TtodoContactDto = {
+  contactPerson: string;
+  contactNumber: string;
+};
+
+export type TcreateTodoDto = {
+  // 工程聯絡單Id
+  engineeringContactId: string | null;
+  // 聯絡人(接洽人欄位)
+  contactPerson: TtodoContactDto[];
+  purpose: string;
+  notificationDate: string;
+  entryDate: string;
+  // 接洽人(目前沒用到，接洽人欄位用contactPerson代替)
+  pointContactPerson: ''; // 目前用不到，但是必須要送
+  pointContactNumber: ''; // 目前用不到，但是必須要送
+  content: string;
+};
+
+// =============================================================================
+// =============================================================================
+// =============================================================================
+// =============================================================================
+
 // 依賴populate的泛型寫法
 
-// type Tooo = {
-//   foo?: boolean;
-//   bar?: boolean;
+// type Tbarr = {
+//   engineeringContact?: boolean;
+//   dispatching?: boolean;
+//   agentEmployee?: boolean;
 // };
 
-// export type ToutsourcingPaymentDetailDto_foo<ooo extends Tooo> = {
-//   // 工程聯絡單Id
-//   engineeringContactId: string | null;
-//   // 工程聯絡單
-//   engineeringContact: ooo['foo'] extends true ? TengineeringContactDto : undefined;
-//   // 若為一般工程之一般項，則有此property
-//   installItem: TquotationProductItemDto[];
-//   // 是否為非一般工程之特殊項
-//   isOther: boolean;
-//   // 項目名
-//   itemName: string;
-//   // 安裝內容
-//   installation: string | null;
-//   // 樘數
-//   quantity: number | null;
-//   // 單樘計價
-//   unitPrice: number | null;
-//   // 外包計價合計
-//   outsourcingTotal: number;
-//   // 外包計價單id
-//   outsourcingPaymentId: string | null;
-//   // 外包計價單
-//   // outsourcingPayment: ToutsourcingPaymentDto;
-//   outsourcingPayment: ooo['bar'] extends true ? ToutsourcingPaymentDto : undefined;
+// export type Tfooo<P extends Tbarr = Partial<Tbarr>> = {
+//   id: string;
+//   createdAt: string;
+//   updatedAt: string;
+//   engineeringContact: P['engineeringContact'] extends true ? TengineeringContactDto | null : undefined;
+//   dispatching: P['dispatching'] extends true ? TdispatchingDto | null : undefined;
+//   agentEmployee: P['agentEmployee'] extends true ? TemployeeDto : undefined;
 // };
 
-// type Tpp = ToutsourcingPaymentDetailDto_foo<{ foo: true }>;
+// type Tfoooooooooo = Tfooo<{ engineeringContact: true }>;
