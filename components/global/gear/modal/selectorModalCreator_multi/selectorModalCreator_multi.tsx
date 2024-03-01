@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { Modal } from 'antd';
 
 // composition
-import { Selector, TimperativeHandle, TselectorProps, TselectorProps_dyna } from './selector/selector';
+import { Selector, TimperativeHandle, TselectorProps, TselectorProps_simple } from './selector/selector';
 
 // gear
 import TwoBtnFooter from '../footer/twoBtnFooter';
@@ -42,11 +42,11 @@ type TselectorArr<TkeyArr extends (keyof TtypeLookup)[]> = {
   [index in keyof TkeyArr]: TselectorArrItem<TkeyArr[index]>;
 };
 
-type TselectorPropsArr<TkeyArr extends (keyof TtypeLookup)[]> = {
-  [index in keyof TkeyArr]: TselectorProps_dyna<TtypeLookup[TkeyArr[index]]> | undefined;
-};
+// type TselectorPropsArr<TkeyArr extends (keyof TtypeLookup)[]> = {
+//   [index in keyof TkeyArr]: TselectorProps_dyna<TtypeLookup[TkeyArr[index]]> | undefined;
+// };
 
-export type { TselectorProps_dyna };
+export type { TselectorProps_simple };
 
 // ======================================================================
 
@@ -79,7 +79,8 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     caption?: string;
     tip?: string;
     //
-    dynaSelectorPropsArr: TselectorPropsArr<TkeyArr>;
+    // dynaSelectorPropsArr: TselectorPropsArr<TkeyArr>;
+    dynaSelectorPropsArr?: TselectorProps_simple[];
     //
   }) => {
     // ------------------------------------------------------------------------
@@ -172,7 +173,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
             //在下面寫好的，props會送進Selector
             const props = propsLookup[key]();
             // 動態的
-            const dynaProps = dynaSelectorPropsArr[index];
+            const dynaProps = dynaSelectorPropsArr?.[index];
 
             if (item.caption === null) {
               props.caption = null;

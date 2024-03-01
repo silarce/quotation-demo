@@ -53,15 +53,10 @@ type TselectorProps<Tdata extends TapiData> = {
   useInfinit: TuseInfinite;
   configArr: readonly Tconfig[];
   selectedKey: keyof Tdata;
-  params?: Tparams;
-  searchInputSelPropsArr?: TsearchInputSelProps[];
   onRowClick?: (props: { data: Tdata; isRemove: boolean }) => void;
-  filter?: (searchStrArr: string[]) => Tparams['filter'];
   //
   dataType?: Tdata; // 就只是為了方便取得泛型的型別
   clearOther?: number[]; // 用來清除其他的選擇 // 在父元素使用
-  caption?: string | null;
-  tip?: string | null;
   //
   forbiddenCheck_dataList?: (data: Tdata) => boolean;
   // forbiddenCheck_selectedList?: (data: Tdata) => boolean; // 目前還用不到
@@ -70,15 +65,29 @@ type TselectorProps<Tdata extends TapiData> = {
   limit?: number;
   //
   //
+  // params?: Tparams;
+  // caption?: string | null;
+  // tip?: string | null;
+  // searchInputSelPropsArr?: TsearchInputSelProps[];
+  // filter?: (searchStrArr: string[]) => Tparams['filter'];
+  // filter_extends?: (searchStrArr: string[]) => Tparams['filter'];
+} & TselectorProps_simple;
+
+// type TselectorProps_dyna<Tdata extends TapiData> = Pick<
+//   TselectorProps<Tdata>,
+//   'params' | 'filter' | 'caption' | 'tip' | 'filter' | 'filter_extends' | 'searchInputSelPropsArr'
+// >;
+
+type TselectorProps_simple = {
+  params?: Tparams;
+  filter?: (searchStrArr: string[]) => Tparams['filter'];
+  caption?: string | null;
+  tip?: string | null;
   filter_extends?: (searchStrArr: string[]) => Tparams['filter'];
+  searchInputSelPropsArr?: TsearchInputSelProps[];
 };
 
-type TselectorProps_dyna<Tdata extends TapiData> = Pick<
-  TselectorProps<Tdata>,
-  'params' | 'filter' | 'caption' | 'tip' | 'filter' | 'filter_extends' | 'searchInputSelPropsArr'
->;
-
-export type { TimperativeHandle, TsearchInputSelProps, TselectorProps, TselectorProps_dyna };
+export type { TimperativeHandle, TsearchInputSelProps, TselectorProps, TselectorProps_simple };
 
 // ==============================================================================
 
