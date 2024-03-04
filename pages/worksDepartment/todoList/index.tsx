@@ -1,9 +1,9 @@
-// engineering/engineering-contact 取得所有工程聯絡單
-
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 // conmponent
 import Table_todoList from 'components/page/worksDepartment/todoList/table_TodoList';
+import AddTodoModal from 'components/page/worksDepartment/todoList/addTodoModal';
 
 // global gear
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -43,6 +43,14 @@ export default function TodoList() {
     region,
     keyWord,
   }: Tquery = router.query as Tquery;
+
+  // ----------------------------------------------------------------
+
+  const [showAdd, setShowAdd] = useState(false);
+
+  // ----------------------------------------------------------------
+
+  const onAddSuccess = () => {};
 
   // ----------------------------------------------------------------
 
@@ -131,15 +139,27 @@ export default function TodoList() {
     },
   };
 
-  const panelList: TpanelList = [{ searchGroup }];
+  const panelList: TpanelList = [
+    { searchGroup },
+    {
+      type: 'myButton',
+      label: '新增待辦事項',
+      onClick: () => {
+        setShowAdd(true);
+      },
+    },
+  ];
 
   // ----------------------------------------------------------------
   return (
     <SubLayer>
-      <PageHeader02 tag="代辦事項" customeLeft={customeLeft} panelList={panelList} />
+      <PageHeader02 tag="待辦事項" customeLeft={customeLeft} panelList={panelList} />
       <div className={'py-24 px-10'}>
         <Table_todoList />
+        <AddTodoModal visible={showAdd} onAddSuccess={onAddSuccess} onCancel={() => setShowAdd(false)} />
       </div>
     </SubLayer>
   );
 }
+
+// ===================================================================
