@@ -93,7 +93,14 @@ export type {
 
 type TengineeringContactAttachmentType = 'floor' | 'detail' | 'color' | 'construction' | 'design';
 
+type TgetEngineeringContact = {
+  data: TengineeringContactDto[];
+  meta: TpageMetaDto;
+};
+
 export type { TengineeringContactAttachmentType };
+
+// ===========================================================================]
 
 /**以id取得工程聯絡單 */
 export const apiGetEngineeringContact = async (id: string) => {
@@ -145,6 +152,21 @@ export const apiPatchEngineeringContact = async (id: string, body: TupdateEngine
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
+
+// 取得所有工程聯絡單
+export const apiGetEngineeringContact_all = async (params?: Tparams) => {
+  const api = `/engineering/engineering-contact`;
+
+  return axi
+    .get<TgetEngineeringContact>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetEngineeringContact_all = createUseInfinite<TgetEngineeringContact>({
+  apiClient: apiGetEngineeringContact_all,
+  errTitle: '取得工程聯絡單列表失敗',
+});
 
 /**新增工程聯絡單 */
 export const apiPostEngineeringContact = async (body: TcreateEngineeringContactDto) => {

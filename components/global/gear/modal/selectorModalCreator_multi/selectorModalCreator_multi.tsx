@@ -22,6 +22,7 @@ import { useGetOutsourcing, ToutsourcingDto } from 'js/api/api_outsourcing';
 import { useEmployee_infinite_2, TemployeeDto } from 'js/api/api_employee';
 import { useGetDailyReports_items, TdailyReportItem_my } from 'js/api/api_dailyReport';
 import { useDepartments } from 'js/api/api_department';
+import { useGetEngineeringContact_all, TengineeringContactDto } from 'js/api/api_engineering';
 
 // ======================================================================
 
@@ -46,7 +47,14 @@ type TselectorArr<TkeyArr extends (keyof TtypeLookup)[]> = {
 //   [index in keyof TkeyArr]: TselectorProps_dyna<TtypeLookup[TkeyArr[index]]> | undefined;
 // };
 
-export type { TselectorProps_simple };
+export type {
+  TselectorProps_simple,
+  //
+  ToutsourcingDto,
+  TemployeeDto,
+  TdailyReportItem_my,
+  TengineeringContactDto,
+};
 
 // ======================================================================
 
@@ -502,6 +510,50 @@ const props_dailyReport_item: TselectorProps<TdailyReportItem_my> = {
   ],
 };
 
+// useGetEngineeringContact_all
+// TengineeringContactDto
+
+const props_engineeringContact: TselectorProps<TengineeringContactDto> = {
+  useInfinit: useGetEngineeringContact_all,
+  selectedKey: 'projectName',
+  params: {
+    sort: 'createdAt',
+    order: 'ASC',
+    // populate: ['jobs.department'],
+  },
+  configArr: [
+    {
+      key: 'projectNumber',
+      width: 150,
+      thead: {
+        label: '工程編號',
+      },
+    },
+    {
+      key: 'projectName',
+      // width: 200,
+      flex: 'auto',
+      thead: {
+        label: '工程名稱',
+      },
+    },
+    {
+      key: 'projectPrincipal',
+      width: 150,
+      thead: {
+        label: '工程負責人',
+      },
+    },
+    {
+      key: 'contractor',
+      width: 250,
+      thead: {
+        label: '承包商',
+      },
+    },
+  ],
+};
+
 // ---
 // w   propsLookup 與 TtypeLookup的key必須一致
 // w   propsLookup 與 TtypeLookup的key必須一致
@@ -516,6 +568,9 @@ const propsLookup = {
   dailyReport_item: () => {
     return _.cloneDeep(props_dailyReport_item);
   },
+  engineeringContact: () => {
+    return _.cloneDeep(props_engineeringContact);
+  },
   // test: () => {
   //   return _.cloneDeep(props_outsourcing);
   // },
@@ -528,6 +583,7 @@ type TtypeLookup = {
   outsourcing: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   employee: Exclude<(typeof props_employee)['dataType'], undefined>;
   dailyReport_item: Exclude<(typeof props_dailyReport_item)['dataType'], undefined>;
+  engineeringContact: Exclude<(typeof props_engineeringContact)['dataType'], undefined>;
   // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
 };
