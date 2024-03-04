@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import classNames from 'classnames';
 
 // conmponent
 import Table_todoList from 'components/page/worksDepartment/todoList/table_TodoList';
@@ -15,6 +16,9 @@ import { optionsCreator_year, optionsCreator_month, optionsCreator_region } from
 
 // api
 import { useGetTodo } from 'js/api/api_todo';
+
+// css
+import scss from './index.module.scss';
 
 // ===============================================================================
 
@@ -167,7 +171,7 @@ export default function TodoList() {
 
   // ----------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}>
       <PageHeader02 tag="待辦事項" customeLeft={customeLeft} panelList={panelList} />
       <div className={'py-24 px-10'}>
         <Table_todoList todoListArr={todoArr ?? []} />
