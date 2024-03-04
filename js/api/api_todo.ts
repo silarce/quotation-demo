@@ -42,7 +42,7 @@ async function apiGetTodo<P extends Tpopulate_todoDto = Partial<Tpopulate_todoDt
     .catch((err) => Promise.reject(err));
 }
 
-export async function UseGetTodo<P extends Tpopulate_todoDto = Partial<Tpopulate_todoDto>>(params?: Tparams) {
+export function useGetTodo<P extends Tpopulate_todoDto = Partial<Tpopulate_todoDto>>(params?: Tparams) {
   const [res, setRes] = useState<TgetTodo<P>>();
   const [isLoading, setIsLoading] = useState(false);
 

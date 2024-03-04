@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 // conmponent
@@ -12,6 +12,9 @@ import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 
 // option
 import { optionsCreator_year, optionsCreator_month, optionsCreator_region } from 'js/utils/options/options';
+
+// api
+import { useGetTodo } from 'js/api/api_todo';
 
 // ===============================================================================
 
@@ -50,7 +53,19 @@ export default function TodoList() {
 
   // ----------------------------------------------------------------
 
-  const onAddSuccess = () => {};
+  const { data: todoArr, update: update_todoArr } = useGetTodo();
+
+  // ----------------------------------------------------------------
+
+  const onAddSuccess = async () => {
+    await update_todoArr();
+  };
+
+  // ----------------------------------------------------------------
+
+  useEffect(() => {
+    update_todoArr();
+  }, []);
 
   // ----------------------------------------------------------------
 
@@ -155,7 +170,7 @@ export default function TodoList() {
     <SubLayer>
       <PageHeader02 tag="待辦事項" customeLeft={customeLeft} panelList={panelList} />
       <div className={'py-24 px-10'}>
-        <Table_todoList />
+        <Table_todoList todoListArr={todoArr ?? []} />
         <AddTodoModal visible={showAdd} onAddSuccess={onAddSuccess} onCancel={() => setShowAdd(false)} />
       </div>
     </SubLayer>

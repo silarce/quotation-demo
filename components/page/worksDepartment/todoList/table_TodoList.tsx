@@ -12,10 +12,16 @@ import { IconRemoveCircle, IconEdit, IconCheck01 } from 'public/image/icon/svgCo
 // css
 import scss from './table_TodoList.module.scss';
 
+import { TtodoDto } from 'js/api/dtoTypes';
+
 // =======================================================================
 
 // =======================================================================
-export default function Table_todoList() {
+
+export default function Table_todoList({ todoListArr }: { todoListArr: TtodoDto[] }) {
+  // ===================================================================
+
+  // ===================================================================
   const control_table: Ttable = useMemo(() => {
     const theadCellArr = [
       {

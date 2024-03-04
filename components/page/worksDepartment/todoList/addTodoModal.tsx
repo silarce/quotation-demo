@@ -207,7 +207,7 @@ export default function AddTodoModal({
             }}
           />
         </div>
-        <TwoBtnFooter className="mt-10" isLoading={isLoading} onConfirm={onConfirm} />
+        <TwoBtnFooter className="mt-10" isLoading={isLoading} onConfirm={onConfirm} onCancel={onCancel} />
       </div>
       {/*  */}
       {/*  */}
