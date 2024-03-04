@@ -90,8 +90,8 @@
     grid-auto-rows: min-content;
     gap: 10px;
     svg {
-      height: 20px;
-      width: 20px;
+      height: 25px;
+      width: 25px;
     }
 
     .btn_dispatch {
@@ -118,7 +118,7 @@
 
 .info {
   display: grid;
-  grid-template-columns: auto 200px 200px 230px;
+  grid-template-columns: auto 200px 200px 230px 230px;
 
   > div {
     @extend .cell;

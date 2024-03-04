@@ -15,7 +15,7 @@ import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 import { optionsCreator_year, optionsCreator_month, optionsCreator_region } from 'js/utils/options/options';
 
 // api
-import { useGetTodo } from 'js/api/api_todo';
+import { Tparams, useGetTodo } from 'js/api/api_todo';
 
 // css
 import scss from './index.module.scss';
@@ -57,11 +57,18 @@ export default function TodoList() {
 
   // ----------------------------------------------------------------
 
-  const { data: todoArr, update: update_todoArr } = useGetTodo();
+  const params: Tparams = {
+    populate: ['engineeringContact.contract.worksheet.contractProductItems'],
+    sort: 'engineeringContact.createdAt',
+    order: 'DESC',
+  };
+
+  const { data: todoArr, update: update_todoArr } = useGetTodo<{ engineeringContact: true }>(params);
 
   // ----------------------------------------------------------------
 
   const onAddSuccess = async () => {
+    setShowAdd(false);
     await update_todoArr();
   };
 
@@ -174,7 +181,7 @@ export default function TodoList() {
     <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}>
       <PageHeader02 tag="待辦事項" customeLeft={customeLeft} panelList={panelList} />
       <div className={'py-24 px-10'}>
-        <Table_todoList todoListArr={todoArr ?? []} />
+        <Table_todoList todoArr={todoArr ?? []} onTodoChange={update_todoArr} />
         <AddTodoModal visible={showAdd} onAddSuccess={onAddSuccess} onCancel={() => setShowAdd(false)} />
       </div>
     </SubLayer>

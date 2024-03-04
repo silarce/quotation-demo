@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import moment from 'moment';
 
 import { axi } from './_axiosCreator';
 import { AxiosError } from 'axios';
@@ -17,6 +18,7 @@ import type {
   TtodoDto,
   TtodoContactDto,
   TcreateTodoDto,
+  TupdateTodoDto,
 } from './dtoTypes';
 
 export type {
@@ -27,6 +29,7 @@ export type {
   TtodoDto,
   TtodoContactDto,
   TcreateTodoDto,
+  TupdateTodoDto,
 };
 
 type TgetTodo<P extends Tpopulate_todoDto = Partial<Tpopulate_todoDto>> = TpageResponse<TtodoDto<P>>;
@@ -70,8 +73,31 @@ export function useGetTodo<P extends Tpopulate_todoDto = Partial<Tpopulate_todoD
   };
 }
 
+export async function apiGetTodo_id<P extends Tpopulate_todoDto = Partial<Tpopulate_todoDto>>(
+  id: string,
+  params?: Tparams
+) {
+  const api = `/todo/${id}`;
+
+  return axi
+    .get<TtodoDto<P>>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => {
+      myAlert.err({
+        title: '取得待辦事項失敗',
+        content: err.message,
+      });
+
+      return Promise.reject(err);
+    });
+}
+
 export const apiPostTodo = async (body: TcreateTodoDto[], { callAlert = true }: { callAlert?: boolean } = {}) => {
   const api = '/todo';
+
+  // 後端收的不是ISOstring，送ISOstring的話會因為時區的問題而get錯誤的日期
+  body[0].notificationDate = moment(body[0].notificationDate).format('yyyy-MM-DD');
+  body[0].entryDate = moment(body[0].entryDate).format('yyyy-MM-DD');
 
   return axi
     .post(api, body)
@@ -88,8 +114,12 @@ export const apiPostTodo = async (body: TcreateTodoDto[], { callAlert = true }: 
     });
 };
 
-export const apiPatchTodo = async (body: TcreateTodoDto[], { callAlert = true }: { callAlert?: boolean } = {}) => {
+export const apiPatchTodo = async (body: TupdateTodoDto[], { callAlert = true }: { callAlert?: boolean } = {}) => {
   const api = '/todo';
+
+  // 後端收的不是ISOstring，送ISOstring的話會因為時區的問題而get錯誤的日期
+  body[0].notificationDate = moment(body[0].notificationDate).format('yyyy-MM-DD');
+  body[0].entryDate = moment(body[0].entryDate).format('yyyy-MM-DD');
 
   return axi
     .patch(api, body)
