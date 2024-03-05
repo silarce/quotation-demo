@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -19,6 +19,7 @@ import { apiPostTodo, TcreateTodoDto } from 'js/api/api_todo';
 
 // css
 import scss from './addTodoModal.module.scss';
+import { set } from 'lodash';
 
 // =======================================================================
 
@@ -48,15 +49,9 @@ export default function AddTodoModal({
   const [showSelector, setShowSelector] = useState(false);
   //-------------------------------------------------------------
   const [state_engineeringContact, setState_engineeringContact] = useState<TengineeringContactDto>();
+  const [state_other, setState_other] = useState<Tstate_other>(emptyState());
 
-  const [state_other, setState_other] = useState<Tstate_other>({
-    contactPerson: '',
-    contactPersonPhoneNumber: '',
-    purpose: '',
-    notificationDate: '',
-    entryDate: '',
-    content: '',
-  });
+  //-------------------------------------------------------------
 
   const changeState_other = (key: keyof Tstate_other, value: string) => {
     setState_other((prev) => {
@@ -68,6 +63,10 @@ export default function AddTodoModal({
   };
 
   const onConfirm = async () => {
+    if (isLoading) {
+      return;
+    }
+
     if (!state_engineeringContact) {
       myAlert.info({
         title: '請選擇工程聯絡單',
@@ -105,6 +104,23 @@ export default function AddTodoModal({
     }
   };
 
+  const theOnCancel = () => {
+    if (isLoading) {
+      return;
+    }
+
+    onCancel && onCancel();
+  };
+
+  // -----------------------------------------------------------------------
+
+  useEffect(() => {
+    if (!visible) {
+      setState_engineeringContact(undefined);
+      setState_other(emptyState());
+    }
+  }, []);
+
   return (
     <Modal
       className={classNames(scss.antdModal)}
@@ -113,7 +129,7 @@ export default function AddTodoModal({
       footer={null}
       closable={false}
       width={800}
-      onCancel={onCancel}
+      onCancel={theOnCancel}
     >
       <div className={scss.body}>
         <div>
@@ -207,7 +223,7 @@ export default function AddTodoModal({
             }}
           />
         </div>
-        <TwoBtnFooter className="mt-10" isLoading={isLoading} onConfirm={onConfirm} onCancel={onCancel} />
+        <TwoBtnFooter className="mt-10" isLoading={isLoading} onConfirm={onConfirm} onCancel={theOnCancel} />
       </div>
       {/*  */}
       {/*  */}
@@ -240,4 +256,13 @@ const SelectorGroup = selectModalCreator_multi<['engineeringContact']>({
       limit: 1,
     },
   ],
+});
+
+const emptyState = () => ({
+  contactPerson: '',
+  contactPersonPhoneNumber: '',
+  purpose: '',
+  notificationDate: '',
+  entryDate: '',
+  content: '',
 });
