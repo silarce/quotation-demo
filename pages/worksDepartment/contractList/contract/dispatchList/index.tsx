@@ -6,10 +6,16 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 
-// component
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+
+// component
 import Profile, { Tprofile01 } from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
 import List from 'components/page/worksDepartment/contracList/contract/dispatchList/list';
+
+// gear
+import Table01 from 'components/global/gear/table/table01';
 
 // api
 import { Tparams, useGetEngineeringContact, useGetEngineeringDispatchingList } from 'js/api/api_engineering';
@@ -34,6 +40,7 @@ export default function DispatchList() {
     useGetEngineeringContact(engineeringContactId);
 
   const params: Tparams = {
+    populate: ['todoList', 'workerEmployee'],
     filter: {
       contractId: { $eq: contractId },
     },
@@ -92,7 +99,7 @@ export default function DispatchList() {
           allAddress,
           //
           projectNumber: projectNumber ?? '',
-          badgeNumber: dispatching?.badgeNumber ?? '',
+          // badgeNumber: dispatching?.badgeNumber ?? '',
         };
       });
     }
@@ -106,7 +113,7 @@ export default function DispatchList() {
     dispatchingArr?.map((item) => {
       return {
         dispatchDate: moment(convertDate_reduce1911(item.dispatchDate)).format('yy-MM-DD'),
-        workerName: item.workerEmployee?.chName || item.workerEmployee?.enName || '',
+        workerNameArr: item.workerEmployee.map((worker) => worker.chName || worker.enName),
         tasks: item.tasks,
         href: {
           pathname: `${router.pathname}/edit`,
@@ -135,10 +142,10 @@ export default function DispatchList() {
 
   // ----------------------------------------------------------
   return (
-    <div className={style.container}>
+    <SubLayer>
       <PageHeader panelList={panelList} contractNumber={contract?.content.quotationNumber} />
 
-      <div className={style.mainContainer}>
+      <div>
         {/*  */}
         <div className={style.dispatchList}>
           <Profile profile01={profile01} onProfile01Change={onProfile01Change} disabled={true} />
@@ -146,7 +153,7 @@ export default function DispatchList() {
         </div>
         {/*  */}
       </div>
-    </div>
+    </SubLayer>
   );
 }
 
@@ -159,5 +166,4 @@ const creEmptyProfile = (): Tprofile01 => ({
   constructionSiteContactNumber: '',
   allAddress: '',
   projectNumber: '',
-  badgeNumber: '',
 });

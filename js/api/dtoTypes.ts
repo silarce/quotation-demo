@@ -2211,6 +2211,9 @@ export type TcreateEngineeringContactDto = {
 
 // 派工單
 export type TdispatchingDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
   //  '派工日期'
   dispatchDate: string;
   //  '承包商聯絡人'

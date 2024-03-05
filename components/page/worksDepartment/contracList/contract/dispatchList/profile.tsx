@@ -15,7 +15,6 @@ type Tprofile01 = {
   constructionSiteContactNumber: string;
   allAddress: string;
   projectNumber: string;
-  badgeNumber: string;
 };
 
 type Tprofile02 = {
@@ -120,10 +119,6 @@ export default function Profile({
           //   styleShowUnderline = style.showUnderline;
           // }
 
-          // if (key === 'badgeNumber' && !isAdd) {
-          //   styleShowUnderline = style.showUnderline;
-          // }
-
           // const className = `${style.input02} ${styleShowUnderline}`;
           const className = `${style.input02}`;
 
@@ -205,7 +200,7 @@ type TindexKey01 = keyof Pick<
   Tprofile01,
   'projectName' | 'contractor' | 'contractorContactPerson' | 'constructionSiteContactNumber' | 'allAddress'
 >;
-type TindexKey02 = keyof Pick<Tprofile01, 'projectNumber' | 'badgeNumber'>;
+type TindexKey02 = keyof Pick<Tprofile01, 'projectNumber'>;
 // type TindexKey03 = keyof Pick<Tprofile02, 'workerName' | 'finalContact'>;
 
 const indexKeys01: TindexKey01[] = [
@@ -215,10 +210,7 @@ const indexKeys01: TindexKey01[] = [
   'constructionSiteContactNumber',
   'allAddress',
 ];
-const indexKeys02: TindexKey02[] = [
-  'projectNumber',
-  // 'badgeNumber'
-];
+const indexKeys02: TindexKey02[] = ['projectNumber'];
 // const indexKeys03: TindexKey03[] = ['workerName', 'finalContact'];
 
 type Tconfig<keys extends string> = {
@@ -266,10 +258,7 @@ const config: Tconfig<
     label: '工程編號',
     labelWidth: '100px',
   },
-  badgeNumber: {
-    label: '管制卡編號',
-    labelWidth: '100px',
-  },
+
   // TindexKey03
   // workerName: {
   //   label: '工務人員',

@@ -39,16 +39,21 @@
   border: solid 1px $colorBorder01;
   margin: 35px 17px 0;
   .thead,
-  .row > a {
+  .row {
     display: grid;
-    grid-template-columns: 100px 100px auto;
+    grid-template-columns: 100px 100px auto 20px;
     gap: 22px;
     align-content: center;
+
     > div {
       span {
         font-weight: 400;
         font-size: 16px;
       }
+    }
+    .workerCell {
+      display: grid;
+      gap: 5px;
     }
   }
 
