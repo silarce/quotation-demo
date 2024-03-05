@@ -92,7 +92,7 @@ export default function AddTodoModal({
       content: state_other.content,
       pointContactPerson: '',
       pointContactNumber: '',
-      isAlreadyDisPatching: false,
+      // isAlreadyDisPatching: false,
     });
 
     try {

@@ -64,7 +64,7 @@ export default function Table_todoList({
       pointContactPerson: '',
       pointContactNumber: '',
       content: '',
-      isAlreadyDisPatching: false,
+      // isAlreadyDisPatching: false,
     };
 
     await apiPostTodo([body]);
@@ -149,7 +149,7 @@ export default function Table_todoList({
 
   return (
     <div>
-      <Collapse className={scss.antdCollapse}>
+      <Collapse className={scss.antdCollapse} destroyInactivePanel={true}>
         {Object.values(sortedTodoList).map((item, index) => {
           const { engineeringContact, todoArr, reqPatch, reqDelete } = item;
 
