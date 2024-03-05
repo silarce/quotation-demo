@@ -49,7 +49,6 @@ export default function Table_todoList({
   onTodoChange,
 }: {
   todoArr: Ttodo_engineeringContact[];
-
   onTodoChange: () => void;
 }) {
   const [sortedTodoList, setSortedTodoList] = useState<TsortedTodoList>({});
