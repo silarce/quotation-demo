@@ -1207,7 +1207,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ];
 
-  const Versiontip = () => {
+  const VersionLabel = () => {
     return (
       <div className="ml-2">
         <div>版本 : {version}</div>
@@ -1216,7 +1216,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     );
   };
 
-  const customeLeft: React.ReactNode[] = [<Versiontip key="0" />];
+  const customeLeft: React.ReactNode[] = [<VersionLabel key="0" />];
 
   const history = useMemo(() => {
     let content = quotationData?.contents ?? [];
