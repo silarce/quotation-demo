@@ -48,17 +48,20 @@
 div.panelHeader {
   padding: 17px 30px;
   border: none;
-  display: grid;
-  grid-template-columns: 112px 48px 80px 60px auto 300px 200px 150px 20px;
-  gap: 22px;
-  > span {
-    font-weight: 400;
-    font-size: 16px;
-    &.step {
-      color: #ea1833;
-    }
-    &.clientName {
-      color: $colorMain;
+
+  .info {
+    display: grid;
+    grid-template-columns: 112px 48px 80px 60px auto 300px 200px 150px 20px;
+    gap: 22px;
+    > span {
+      font-weight: 400;
+      font-size: 16px;
+      &.step {
+        color: #ea1833;
+      }
+      &.clientName {
+        color: $colorMain;
+      }
     }
   }
 }
