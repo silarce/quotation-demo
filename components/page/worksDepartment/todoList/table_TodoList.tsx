@@ -20,7 +20,7 @@ import { IconEdit, IconCheck01, IconDelete01 } from 'public/image/icon/svgCompon
 import scss from './table_TodoList.module.scss';
 
 // api
-import { apiPatchTodo, apiGetTodo_id, apiPostTodo } from 'js/api/api_todo';
+import { apiPatchTodo, apiGetTodo_id, apiPostTodo, apiDeleteTodo } from 'js/api/api_todo';
 
 // type
 import { TtodoDto, TcreateTodoDto, TupdateTodoDto } from 'js/api/dtoTypes';
@@ -34,6 +34,7 @@ type TsortedTodoList = {
     engineeringContact: Ttodo_engineeringContact['engineeringContact'];
     todoArr: Ttodo_engineeringContact[];
     reqPatch: (todo: TupdateTodoDto) => Promise<boolean | void>;
+    reqDelete: () => void;
   };
 };
 
@@ -111,13 +112,27 @@ export default function Table_todoList({
           todoArr: [todo],
           reqPatch: async (todo) => {
             try {
-              const res = await reqPatch(todo);
+              await reqPatch(todo);
               await onTodoChange();
 
-              return !!res;
+              return true;
             } catch (error) {
             } finally {
             }
+          },
+          reqDelete: () => {
+            const onOk = async () => {
+              await apiDeleteTodo(todo.id);
+              await onTodoChange();
+            };
+
+            myAlert.confirm({
+              title: '確定刪除待辦事項?',
+              content: todo.purpose,
+              props: {
+                onOk,
+              },
+            });
           },
         };
       }
@@ -137,7 +152,7 @@ export default function Table_todoList({
     <div>
       <Collapse className={scss.antdCollapse}>
         {Object.values(sortedTodoList).map((item, index) => {
-          const { engineeringContact, todoArr, reqPatch } = item;
+          const { engineeringContact, todoArr, reqPatch, reqDelete } = item;
 
           const contact = engineeringContact?.contactInfo?.[0];
           const contactPerson = contact?.contactPerson ?? '';
@@ -166,7 +181,7 @@ export default function Table_todoList({
               }
             >
               {todoArr.map((todo, index) => {
-                return <PanelBody key={todo.id} todo={todo} reqPatch={reqPatch} index={index} />;
+                return <PanelBody key={todo.id} todo={todo} onOkClick={reqPatch} onDeleteClick={reqDelete} />;
               })}
             </Panel>
           );
@@ -226,12 +241,12 @@ const PanelHeader = ({
 
 const PanelBody = ({
   todo,
-  reqPatch,
-  index,
+  onOkClick,
+  onDeleteClick,
 }: {
   todo: Ttodo_engineeringContact;
-  reqPatch: TsortedTodoList[string]['reqPatch'];
-  index: number;
+  onOkClick: TsortedTodoList[string]['reqPatch'];
+  onDeleteClick?: () => void;
 }) => {
   const [disabled, setDisabled] = useState(true);
 
@@ -277,7 +292,7 @@ const PanelBody = ({
       pointContactNumber: '',
     };
 
-    const res = await reqPatch(body);
+    const res = await onOkClick(body);
 
     res && setDisabled(true);
   };
@@ -390,7 +405,7 @@ const PanelBody = ({
         <div className={scss.top}>{BtnBar}</div>
 
         <div className={scss.bottom}>
-          <IconDelete01 className={scss.btn_delete} />
+          <IconDelete01 className={scss.btn_delete} onClick={onDeleteClick} />
         </div>
       </div>
 
