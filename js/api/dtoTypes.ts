@@ -2252,9 +2252,11 @@ export type TdispatchingDto = {
   todoList?: TtodoDto;
   // 是否已完工
   isCompleted: boolean;
+  // 保固日期
+  warrantyDate: string | null;
 };
 
-type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId'>;
+type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId' | 'warrantyDate'>;
 
 export type TcreateDispatchingDto = Pick<
   TcreateDispatchingDto_pre,
