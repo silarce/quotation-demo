@@ -4,7 +4,6 @@
   display: flex;
   justify-content: space-between;
   height: fit-content;
-  margin: 0 50px;
   .left,
   .right {
     height: fit-content;
@@ -35,9 +34,12 @@
 }
 
 .list {
-  padding: 4px 4px 0 4px;
-  border: solid 1px $colorBorder01;
-  margin: 35px 17px 0;
+  .thead {
+    position: sticky;
+    top: 90px;
+    z-index: 2;
+    border-top: solid 1px theme("colors.border");
+  }
   .thead,
   .row {
     display: grid;

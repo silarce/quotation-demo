@@ -31,7 +31,7 @@ import {
 import { useGetContract_id } from 'js/api/api_quotation';
 import { TemployeeDto } from 'js/api/dtoTypes';
 // css
-import scss from './dispatchList.module.scss';
+import scss from './edit.module.scss';
 
 export default function EditDispatchList() {
   const router = useRouter();
