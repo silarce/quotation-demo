@@ -2211,82 +2211,68 @@ export type TcreateEngineeringContactDto = {
 
 // 派工單
 export type TdispatchingDto = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-  // 派工日期
+  //  '派工日期'
   dispatchDate: string;
-  // 工程名稱
-  projectName: string;
-  // 承包商;
-  // contractor: string;
-  // 承包商聯絡人;
+  //  '承包商聯絡人'
   contractorContactPerson: string;
-  // 工地電話;
+  //  '工地電話'
   constructionSiteContactNumber: string;
-  // 工程縣市;
+  //  '工程縣市'
   county: string;
-  // 工程區;
+  //  '工程區'
   district: string;
-  // 工程詳細地址;
+  //  '工程詳細地址'
   address: string;
-  // 工程編號;
-  projectNumber: string;
-  // 管制卡編號;
-  badgeNumber: string;
-  // 工務人員ID
+  //  '工務人員Id'
   workerId: string;
-  // 工務人員
-  workerEmployee: TemployeeDto;
-  // 完工聯絡人;
+  //  '工務人員'
+  workerEmployee: TemployeeDto[];
+  //  '完工聯絡人'
   finalContactPerson: string;
-  // 辦理事項;
+  //  '辦理事項'
   tasks: string;
-  // 派工批價方式;
+  //  '派工批價方式'
   pricingMethod: string;
-  // 備註下次注意事項;
+  //  '備註下次注意事項'
   note: string | null;
-  // 所屬合約Id;
+  //  '所屬合約Id'
   contractId: string | null;
+  // 所屬合約
   contract: TquotationContractDto | null;
+  // 所屬報價單Id
   quotationId: string | null;
+  // 所屬報價單
   quotation?: TquotationDto | null;
+  // 包含的代辦事項id
+  todoListId: string | null;
+  // 包含的代辦事項
+  todoList?: TtodoDto;
+  // 是否已完工
+  isCompleted: boolean;
 };
 
-export type TcreateDispatchingDto = {
-  // 合約id
+type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId'>;
+
+export type TcreateDispatchingDto = Pick<
+  TcreateDispatchingDto_pre,
+  | 'dispatchDate'
+  | 'contractorContactPerson'
+  | 'constructionSiteContactNumber'
+  | 'county'
+  | 'district'
+  | 'address'
+  | 'workerId'
+  | 'finalContactPerson'
+  | 'tasks'
+  | 'pricingMethod'
+  | 'note'
+  // | 'contractId'
+  | 'isCompleted'
+> & {
   contractId: string;
-  // 派工日期;
-  dispatchDate: string;
-  // 工程名稱;
-  projectName: string;
-  // 承包商;
-  // contractor: string;
-  // 承包商聯絡人;
-  contractorContactPerson: string;
-  // 工地電話;
-  constructionSiteContactNumber: string;
-  // 工程縣市;
-  county: string;
-  // 工程區;
-  district: string;
-  // 工程詳細地址;
-  address: string;
-  // 工程編號;
-  projectNumber: string;
-  // 管制卡編號;
-  badgeNumber: string;
-  // 工務人員ID
-  workerId: string;
-  // 完工聯絡人
-  finalContactPerson: string;
-  // 辦理事項
-  tasks: string;
-  // 派工批價方式
-  pricingMethod: string;
-  // 備註下次注意事項
-  note: string | null;
 };
+
+export type TupdateDispatchingDto = Omit<Partial<TcreateDispatchingDto>, 'contractId'>;
 
 export type TelectronicSuppliesRecordDto = {
   id: string;
