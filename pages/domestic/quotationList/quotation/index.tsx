@@ -1211,7 +1211,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     return (
       <div className="ml-2">
         <div>版本 : {version}</div>
-        <div className="w-72 truncate">備註 : {editNotes}</div>
+        <div className="w-64 truncate">備註 : {editNotes}</div>
       </div>
     );
   };
