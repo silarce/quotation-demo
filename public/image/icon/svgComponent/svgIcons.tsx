@@ -1,4 +1,5 @@
 import { SVGProps } from 'react';
+import classNames from 'classnames';
 
 import style from './svgIcons.module.scss';
 
@@ -345,6 +346,26 @@ function IconAdd(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+const Icon_info = (props: SVGProps<SVGSVGElement>) => {
+  const { className } = props;
+
+  return (
+    <svg
+      className={classNames(className, 'text-main')}
+      color="currentColor"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="9" cy="9" r="8.5" stroke="currentColor" />
+      <path d="M9.83333 10.5H8.16667L7.75 7.26923V3.5H10.25V7.26923L9.83333 10.5Z" fill="currentColor" />
+      <circle cx="9" cy="13.25" r="1.25" fill="currentColor" />
+    </svg>
+  );
+};
+
 export {
   IconDelete01, //垃圾桶icon
   IconEdit,
@@ -358,4 +379,5 @@ export {
   IconBreakChain,
   IconTearing,
   IconAdd,
+  Icon_info,
 };

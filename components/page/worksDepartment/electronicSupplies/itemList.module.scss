@@ -1,0 +1,15 @@
+.table {
+  width: 100%;
+  height: 382px;
+  overflow: auto;
+}
+
+.checkBox.plus {
+  cursor: unset;
+  :global(.ant-checkbox-inner) {
+    cursor: unset;
+  }
+  :global(.ant-checkbox) {
+    cursor: unset;
+  }
+}

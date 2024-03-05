@@ -141,6 +141,13 @@ type Tprofile = {
   projectProgress: string;
 };
 
+type Tquery = {
+  id: string | undefined;
+  // 從查詢報價單的展開列表點進來的話query裡就會有contentId
+  contentId: string | undefined;
+  isContract: string | undefined;
+};
+
 // ------------------------------------------------------------------
 export default function Quotation() {
   const router = useRouter();
@@ -160,12 +167,10 @@ export default function Quotation() {
 function TheQuotation({ router }: { router: NextRouter }) {
   const {
     id: quotationId, //報價單id //若為新增報價單則為undefined
-    contentId,
-  } = router.query as {
-    id: string | undefined;
     // 從查詢報價單的展開列表點進來的話query裡就會有contentId
-    contentId: string | undefined;
-  };
+    contentId,
+    isContract,
+  } = router.query as Tquery;
   const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
 
@@ -199,6 +204,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   let isAttach = undefined;
   //
   let isAllReviewedBeforePending = false;
+  //
+  let version: number | undefined = undefined;
+  let editNotes: string | undefined = undefined;
 
   // -----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
@@ -295,7 +303,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
     preBuiltPopulate: ['simple', 'attached'],
   });
   // 沒記錯的話，從查詢報價單點進來會有contentId，就會用quotationContentData
-  const { data: quotationContentData, update: updateContent } = useGetQuotationContent_id(contentId as string);
+  const {
+    data: quotationContentData,
+    update: updateContent,
+    clearData: clearData_content,
+  } = useGetQuotationContent_id(contentId as string);
 
   const latestContent = quotationData?.latestContent ?? quotationContentData;
   const lastestContentId = latestContent?.id;
@@ -322,6 +334,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toManagerAt);
   isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
+
+  version = latestContent?.version;
+  editNotes = latestContent?.editNotes;
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -1192,6 +1207,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ];
 
+  const VersionLabel = () => {
+    return (
+      <div className="ml-2">
+        <div>版本 : {version}</div>
+        <div className="w-64 truncate">備註 : {editNotes}</div>
+      </div>
+    );
+  };
+
+  const customeLeft: React.ReactNode[] = [<VersionLabel key="0" />];
+
   const history = useMemo(() => {
     let content = quotationData?.contents ?? [];
 
@@ -1314,7 +1340,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       : null,
 
     // !contentId && status !== 'Pending' ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
-    !isSendToReview && !contentId && status !== 'Pending'
+    !isSendToReview /*&& !contentId*/ && !isContract && status !== 'Pending'
       ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) }
       : null,
 
@@ -1564,14 +1590,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         await uploadAttachment(res.latestContent.id);
 
+        const query = { ...router.query };
+        delete query.contentId;
+
         router.push({
           query: {
-            ...router.query,
+            ...query,
             status: status,
           },
         });
 
         await Promise.all([update(), updateAttachments()]);
+        clearData_content();
       } else {
         const res = await apiPostQuotation(body);
 
@@ -1933,9 +1963,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   return (
     <div className={classNames(style.container, 'relative')}>
-      <PageHeader02 tagList={tagList} panelList={panelList} />
+      <PageHeader02 tagList={tagList} customeLeft={customeLeft} panelList={panelList} />
 
       <div className={style.mainContainer}>
         <div className={style.quotation}>
@@ -2172,6 +2205,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   );
 }
 
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============

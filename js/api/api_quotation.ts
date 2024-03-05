@@ -310,9 +310,14 @@ export const useGetQuotationContent_id = (id: string | undefined) => {
     }
   };
 
+  const clearData = () => {
+    setRes(undefined);
+  };
+
   return {
     data: res,
     update,
+    clearData,
   };
 };
 
