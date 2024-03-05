@@ -204,6 +204,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   let isAttach = undefined;
   //
   let isAllReviewedBeforePending = false;
+  //
+  let version: number | undefined = undefined;
+  let editNotes: string | undefined = undefined;
 
   // -----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
@@ -331,6 +334,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toManagerAt);
   isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
+
+  version = latestContent?.version;
+  editNotes = latestContent?.editNotes;
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -1201,6 +1207,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ];
 
+  const Versiontip = () => {
+    return (
+      <div className="ml-2">
+        <div>版本 : {version}</div>
+        <div className="w-72 truncate">備註 : {editNotes}</div>
+      </div>
+    );
+  };
+
+  const customeLeft: React.ReactNode[] = [<Versiontip key="0" />];
+
   const history = useMemo(() => {
     let content = quotationData?.contents ?? [];
 
@@ -1946,9 +1963,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   return (
     <div className={classNames(style.container, 'relative')}>
-      <PageHeader02 tagList={tagList} panelList={panelList} />
+      <PageHeader02 tagList={tagList} customeLeft={customeLeft} panelList={panelList} />
 
       <div className={style.mainContainer}>
         <div className={style.quotation}>
@@ -2185,6 +2205,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   );
 }
 
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
+// ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
 // ------------------------------------------------------------------=============
