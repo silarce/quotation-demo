@@ -144,22 +144,23 @@ export default function Budget() {
 
       const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
 
-      const href_head =
-        latestContent.status === 'Contract'
-          ? {
-              pathname: '/domestic/contract/quotation',
-              query: {
-                id: latestContent.contract?.id,
-                version: 1,
-              },
-            }
-          : {
-              pathname: '/domestic/quotationList/quotation',
-              query: {
-                id: id,
-                status: latestContent.status,
-              },
-            };
+      const isContract = latestContent.status === 'Contract';
+
+      const href_head = isContract
+        ? {
+            pathname: '/domestic/contract/quotation',
+            query: {
+              id: latestContent.contract?.id,
+              version: 1,
+            },
+          }
+        : {
+            pathname: '/domestic/quotationList/quotation',
+            query: {
+              id: id,
+              status: latestContent.status,
+            },
+          };
 
       const latestCustomer = sortedContent[0].customer;
 
@@ -179,13 +180,19 @@ export default function Budget() {
       const body = sortedContent.map((content, index) => {
         const { status, updatedAt, county, projectName, customer } = content;
 
+        const query: { [key: string]: string | number | boolean | undefined } = {
+          id: id,
+          status: status,
+          contentId: content.id,
+        };
+
+        if (isContract) {
+          query.isContract = isContract;
+        }
+
         const href_body = {
           pathname: '/domestic/quotationList/quotation',
-          query: {
-            id: id,
-            status: status,
-            contentId: content.id,
-          },
+          query,
         };
 
         return {
