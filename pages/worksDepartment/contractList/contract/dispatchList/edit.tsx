@@ -1,5 +1,5 @@
 // 新增派工單
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 
@@ -26,11 +26,17 @@ import {
   useGetEngineeringContact,
 } from 'js/api/api_engineering';
 import { useGetContract_id } from 'js/api/api_quotation';
-import { TemployeeDto } from 'js/api/dtoTypes';
+import { TemployeeDto, TtodoDto } from 'js/api/dtoTypes';
 // css
 import scss from './edit.module.scss';
 
 // =====================================================================
+
+type Tquery = {
+  contractId: string;
+  dispatchingId: string | undefined;
+  todoIdForDispatch: string | undefined;
+};
 
 type Tstate_profile = {
   dispatchDate: string;
@@ -51,7 +57,7 @@ type Tstate_profile = {
 
 export default function EditDispatchList() {
   const router = useRouter();
-  const { contractId, dispatchingId } = router.query as { contractId: string; dispatchingId: string | undefined };
+  const { contractId, dispatchingId, todoIdForDispatch } = router.query as Tquery;
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
@@ -59,6 +65,12 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
   const [state_profile, setState_profile] = useState<Tstate_profile>(emptyState_profile());
+
+  const [state_dispatch, setState_dispatch] = useState<{
+    tasks: string;
+    note: string;
+    pricingMethod: string;
+  }>();
 
   // ---------------------------------------------------------
 
@@ -69,51 +81,37 @@ export default function EditDispatchList() {
 
   const { data: dispatching, update: update_dispatching } = useGetEngineeringDispatching_id(dispatchingId);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
+  // ---------------------------------------------------------
 
-        if (!contract) {
-          await update_contract();
+  const { todoForDispatch } = useMemo(() => {
+    let todoForDispatch: TtodoDto | null = null;
+
+    if (todoIdForDispatch) {
+      const todoJSON = window.sessionStorage.getItem('todoForDispatch');
+
+      if (todoJSON) {
+        //確保取得的東西是JSON
+        try {
+          const todo = JSON.parse(todoJSON);
+          todo && (todoForDispatch = todo);
+        } catch (error) {
+          myAlert.err({ title: '取得待辦事項失敗' });
+          console.log(error);
         }
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得合約失敗', content: err.message });
       }
+    }
 
-      try {
-        await update_dispatching();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得派工單失敗', content: err.message });
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-
+    return { todoForDispatch };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractId, dispatchingId]);
-
-  useEffect(() => {
-    update_engineeringContact();
-  }, [engineeringContactId]);
+  }, [todoIdForDispatch]);
 
   // ---------------------------------------------------------
-
-  // ---------------------------------------------------------
-
-  const [editDispatch, setEditDispatch] = useState<{
-    tasks: string;
-    note: string;
-    pricingMethod: string;
-  }>();
 
   const controll_editDispatch: Tcontroll_EeditDispatch = {
     tasks: {
-      value: editDispatch?.tasks ?? '',
+      value: state_dispatch?.tasks ?? '',
       onChange: (v: string) => {
-        setEditDispatch((data) => {
+        setState_dispatch((data) => {
           if (!data) {
             return data;
           }
@@ -125,9 +123,9 @@ export default function EditDispatchList() {
       },
     },
     note: {
-      value: editDispatch?.note ?? '',
+      value: state_dispatch?.note ?? '',
       onChange: (v: string) => {
-        setEditDispatch((data) => {
+        setState_dispatch((data) => {
           if (!data) {
             return data;
           }
@@ -139,10 +137,10 @@ export default function EditDispatchList() {
       },
     },
     pricingMethod: {
-      value: editDispatch?.pricingMethod ?? '',
+      value: state_dispatch?.pricingMethod ?? '',
       subValue: (() => {
         // 修理費用
-        const value = editDispatch?.pricingMethod ?? '';
+        const value = state_dispatch?.pricingMethod ?? '';
         let subValue = '';
 
         if (value.includes('修理費用')) {
@@ -152,7 +150,7 @@ export default function EditDispatchList() {
         return subValue;
       })(),
       onChange: (v: string) => {
-        setEditDispatch((data) => {
+        setState_dispatch((data) => {
           if (!data) {
             return data;
           }
@@ -178,7 +176,7 @@ export default function EditDispatchList() {
   // ---------------------------------------------------------
 
   const reqPost = async () => {
-    if (!editDispatch) {
+    if (!state_dispatch) {
       return;
     }
 
@@ -239,13 +237,39 @@ export default function EditDispatchList() {
   // ---------------------------------------------------------
 
   useEffect(() => {
-    if (!disabled || !dispatching || !engineeringContact) {
+    (async () => {
+      try {
+        setIsLoading(true);
+
+        if (!contract) {
+          await update_contract();
+        }
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得合約失敗', content: err.message });
+      }
+
+      try {
+        await update_dispatching();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得派工單失敗', content: err.message });
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractId, dispatchingId]);
+
+  useEffect(() => {
+    update_engineeringContact();
+  }, [engineeringContactId]);
+
+  useEffect(() => {
+    if (!engineeringContact) {
       return;
     }
-
-    // const allAddress = `${engineeringContact.county ?? ''}${engineeringContact.district ?? ''}${
-    //   engineeringContact.address ?? ''
-    // }`;
 
     const {
       dispatchDate,
@@ -254,30 +278,30 @@ export default function EditDispatchList() {
       county = engineeringContact.county,
       district = engineeringContact.district,
       address = engineeringContact.address,
-      workerId,
+      // workerId,
       workerEmployee,
       finalContactPerson,
       tasks,
       pricingMethod,
       note,
-      contractId,
+      // contractId,
       contract,
-      quotationId,
-      quotation,
-      todoListId,
-      todoList,
-      isCompleted,
+      // quotationId,
+      // quotation,
+      // todoListId,
+      // todoList,
+      // isCompleted,
       warrantyDate,
       // constructionSiteContactNumber: projectNumber,
-    } = dispatching;
+    } = dispatching ?? {};
 
     setState_profile({
-      dispatchDate: dispatchDate,
+      dispatchDate: dispatchDate ?? '',
       workerEmployee: workerEmployee ?? [],
       projectName: contract?.content.projectName ?? '',
       projectNumber: contract?.content.quotationNumber ?? '',
       contractor: engineeringContact.contractor,
-      contractorContactPerson: contractorContactPerson,
+      contractorContactPerson: contractorContactPerson ?? '',
       county: county,
       district: district,
       address: address,
@@ -286,14 +310,13 @@ export default function EditDispatchList() {
       finalContactPerson: finalContactPerson ?? '',
     });
 
-    setEditDispatch({
-      tasks: tasks ?? '',
+    setState_dispatch({
+      tasks: tasks ?? todoForDispatch?.content ?? '',
       note: note ?? '',
       pricingMethod: pricingMethod ?? '',
     });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engineeringContact, dispatching, disabled]);
+  }, [engineeringContact, dispatching, disabled, todoForDispatch]);
 
   // ---------------------------------------------------------
 
@@ -398,10 +421,6 @@ export default function EditDispatchList() {
   ];
 
   const panelList = !dispatchingId ? panelList01 : disabled ? panelList02 : panelList03;
-
-  // ---------------------------------------------------------
-
-  console.log('control_profile', control_profile);
 
   // ---------------------------------------------------------
   return (

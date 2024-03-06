@@ -83,9 +83,15 @@
     font-size: 18px;
     color: $colorMain;
   }
+
   .handlingMatters {
     > .subTitle {
-      margin-top: 0;
+      margin: unset;
+      > span {
+        font-size: 20px;
+        font-weight: 500;
+        color: $colorMain;
+      }
     }
   }
 
@@ -93,6 +99,7 @@
     display: flex;
     height: 54px;
     margin-top: 15px;
+    margin-bottom: 15px;
     background-color: $bgc01;
     > * {
       margin: auto;
@@ -134,6 +141,16 @@
         }
       }
     } // radioGroup
+  }
+  .precaution {
+    .subTitle {
+      margin: unset;
+      span {
+        font-size: 20px;
+        font-weight: 500;
+        color: $colorMain;
+      }
+    }
   }
 
   .subTitle {

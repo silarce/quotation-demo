@@ -5,7 +5,7 @@ import { Radio } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 
 // css
-import style from './dispatchList.module.scss';
+import scss from './dispatchList.module.scss';
 
 // ----------------------------------------------------------
 type Tcontroll_item = {
@@ -52,15 +52,15 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
 
   // -----------------------------------------------------------------
   return (
-    <div className={style.editDispatch}>
+    <div className={scss.editDispatch}>
       {/* 辦理事項 */}
-      <div className={style.handlingMatters}>
-        <div className={style.subTitle}>
-          <span>辦理事項</span>
+      <div className={scss.handlingMatters}>
+        <div className={scss.subTitle}>
+          <span>辦理事項 : </span>
         </div>
         <textarea
           disabled={disabled}
-          className={style.textarea}
+          className={scss.textarea}
           placeholder="請輸入辦理事項"
           value={tasks.value}
           onChange={(e) => tasks.onChange(e.target.value)}
@@ -68,16 +68,16 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
       </div>
 
       {/* 派工批價 */}
-      <div className={style.dispatchPrice}>
-        <div className={style.subTitle}>
+      <div className={scss.dispatchPrice}>
+        <div className={scss.subTitle}>
           <span>派工批價</span>
         </div>
-        <Radio.Group disabled={disabled} className={style.radioGroup} onChange={onChange} value={pricingMethod.value}>
+        <Radio.Group disabled={disabled} className={scss.radioGroup} onChange={onChange} value={pricingMethod.value}>
           <Radio value={'合約內'}>合約內</Radio>
           <Radio value={'合約辦理追加'}>合約辦理追加</Radio>
           <Radio value={`修理費用${batchInput}`}>
             <label
-              className={style.myLabel}
+              className={scss.myLabel}
               htmlFor="batchInput"
               onClick={() => {
                 // setBatchType(`修理費用${batchInput}`);
@@ -106,15 +106,14 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
       </div>
 
       {/* 備註下次注意事項 */}
-      <div className={style.precaution}>
-        <div className={style.subTitle}>
-          <span>備註下次注意事項 : </span>
-          <span>預備工具或聯絡、報價事宜、待完成事項</span>
+      <div className={scss.precaution}>
+        <div className={scss.subTitle}>
+          <span>待辦事項 : </span>
         </div>
       </div>
       <textarea
         disabled={disabled}
-        className={style.textarea}
+        className={scss.textarea}
         placeholder="請輸入備註"
         value={note.value}
         onChange={(e) => note.onChange(e.target.value)}
