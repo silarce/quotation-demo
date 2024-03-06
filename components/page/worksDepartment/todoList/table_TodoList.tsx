@@ -35,8 +35,8 @@ type TsortedTodoList = {
     engineeringContact: Ttodo_engineeringContact['engineeringContact'];
     todoArr: Ttodo_engineeringContact[];
     reqPatch: (todo: TupdateTodoDto) => Promise<boolean | void>;
-    reqDelete: () => void;
-    toDispatch: () => void;
+    reqDelete: (index: number) => void;
+    toDispatch: (index: number) => void;
   };
 };
 
@@ -125,7 +125,9 @@ export default function Table_todoList({
             } finally {
             }
           },
-          reqDelete: () => {
+          reqDelete: (index) => {
+            const todo = list[engineeringContactId].todoArr[index];
+
             const onOk = async () => {
               await apiDeleteTodo(todo.id);
               await onTodoChange();
@@ -139,10 +141,10 @@ export default function Table_todoList({
               },
             });
           },
-          toDispatch: () => {
-            const todoForDispatch = todo;
+          toDispatch: (index) => {
+            const todo = list[engineeringContactId].todoArr[index];
 
-            window.sessionStorage.setItem('todoForDispatch', JSON.stringify(todoForDispatch));
+            window.sessionStorage.setItem('todoForDispatch', JSON.stringify(todo));
 
             router.push({
               pathname: '/worksDepartment/contractList/contract/dispatchList/edit',
@@ -205,8 +207,8 @@ export default function Table_todoList({
                     key={todo.id}
                     todo={todo}
                     onOkClick={reqPatch}
-                    onDeleteClick={reqDelete}
-                    onDispatchClick={toDispatch}
+                    onDeleteClick={() => reqDelete(index)}
+                    onDispatchClick={() => toDispatch(index)}
                   />
                 );
               })}
