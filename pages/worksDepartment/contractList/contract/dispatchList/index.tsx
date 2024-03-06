@@ -2,7 +2,7 @@
 // 派工單列表
 // 派工單列表
 
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 
@@ -11,11 +11,11 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
-import Profile, { Tprofile01 } from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
 import List from 'components/page/worksDepartment/contracList/contract/dispatchList/list';
 
 // gear
 import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // api
 import { Tparams, useGetEngineeringContact, useGetEngineeringDispatchingList } from 'js/api/api_engineering';
@@ -58,17 +58,11 @@ export default function DispatchList() {
 
   // ----------------------------------------------------
 
-  const [profile01, setProfile01] = useState<Tprofile01>(creEmptyProfile());
+  const allAddress = `${engineeringContact?.county ?? ''}${engineeringContact?.district ?? ''}${
+    engineeringContact?.address ?? ''
+  }`;
 
-  const onProfile01Change = (key: keyof Tprofile01, v: string) => {
-    if (!profile01) {
-      return;
-    }
-
-    const newProfile = { ...profile01 };
-    newProfile[key] = v;
-    setProfile01(newProfile);
-  };
+  // ----------------------------------------------------
 
   // ----------------------------------------------------
 
@@ -81,41 +75,6 @@ export default function DispatchList() {
     update_engineeringContact();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engineeringContactId]);
-
-  useEffect(() => {
-    if (engineeringContact) {
-      const dispatching = dispatchingArr?.[0];
-
-      setProfile01(() => {
-        const {
-          projectName,
-
-          projectNumber,
-          contractor,
-          constructionSitePrincipalContactNumber,
-
-          county,
-          district,
-          address,
-        } = engineeringContact;
-
-        const allAddress = `${county}${district}${address}`;
-
-        return {
-          projectName: projectName,
-          contractor: contractor ?? '',
-          // 這是承包商的聯絡人
-          contractorContactPerson: dispatching?.contractorContactPerson ?? '',
-          constructionSiteContactNumber: constructionSitePrincipalContactNumber,
-          allAddress,
-          //
-          projectNumber: projectNumber ?? '',
-        };
-      });
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engineeringContact]);
 
   // ----------------------------------------------------
   const dispatch_simpleArr = useMemo(() => {
@@ -187,7 +146,75 @@ export default function DispatchList() {
       <PageHeader panelList={panelList} contractNumber={contract?.content.quotationNumber} />
 
       <div className={scss.body}>
-        {/* <Profile profile01={profile01} onProfile01Change={onProfile01Change} disabled={true} /> */}
+        <div className={scss.profile}>
+          <div className={scss.left}>
+            <InputSel
+              caption="工程名稱"
+              {...config_inputSel}
+              inputProps={{
+                props: {
+                  defaultValue: engineeringContact?.projectName,
+                  readOnly: true,
+                },
+              }}
+            />
+            <InputSel
+              caption="承包商"
+              {...config_inputSel}
+              inputProps={{
+                props: {
+                  defaultValue: engineeringContact?.contractor,
+                  readOnly: true,
+                },
+              }}
+            />
+            <InputSel
+              caption="聯絡人"
+              {...config_inputSel}
+              inputProps={{
+                props: {
+                  defaultValue: dispatchingArr?.[0]?.contractorContactPerson,
+                  readOnly: true,
+                },
+              }}
+            />
+            <InputSel
+              caption="工地電話"
+              {...config_inputSel}
+              inputProps={{
+                props: {
+                  defaultValue: engineeringContact?.constructionSitePrincipalContactNumber,
+                  readOnly: true,
+                },
+              }}
+            />
+            <InputSel
+              caption="工程地點"
+              {...config_inputSel}
+              wrapperStyle={{ width: '600px' }}
+              textareaProps={{
+                props: {
+                  defaultValue: allAddress,
+                  readOnly: true,
+                },
+              }}
+            />
+          </div>
+          {/*  */}
+          <div className={scss.rigth}>
+            <InputSel
+              caption="工程編號"
+              {...config_inputSel}
+              inputProps={{
+                props: {
+                  defaultValue: engineeringContact?.projectNumber,
+                  readOnly: true,
+                },
+              }}
+            />
+          </div>
+        </div>
+
         <Wrapper_tab
           className={scss.wrapper}
           tabArr={tabArr}
@@ -207,11 +234,8 @@ export default function DispatchList() {
 
 // =============================================
 
-const creEmptyProfile = (): Tprofile01 => ({
-  projectName: '',
-  contractor: '',
-  contractorContactPerson: '',
-  constructionSiteContactNumber: '',
-  allAddress: '',
-  projectNumber: '',
-});
+const config_inputSel: TinputSelProps = {
+  captionStyle: { width: '80px' },
+  wrapperStyle: { width: '300px' },
+  showBaseline: 'invisible',
+};
