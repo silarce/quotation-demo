@@ -41,12 +41,21 @@ const SelectGroup = selectModalCreator_multi<['dailyReport_workers_item']>({
   selectorArr: [
     {
       key: 'dailyReport_workers_item',
+      tip: '請先選擇派工日期',
     },
   ],
 });
 
 // ----------------------------------------------------------
-export default function EditDispatch({ controll, disabled }: { controll: Tcontroll; disabled?: boolean }) {
+export default function EditDispatch({
+  controll,
+  disabled,
+  dispatchDate,
+}: {
+  controll: Tcontroll;
+  disabled?: boolean;
+  dispatchDate: string | undefined;
+}) {
   const [showSelector, setShowSelector] = useState(false);
 
   // ---------------------------------------------------------------
@@ -163,6 +172,11 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
           onSelectorConfirm(arr[0]);
         }}
         onCancel={() => setShowSelector(false)}
+        dynaSelectorPropsList={[
+          {
+            useNoMetaProps: { date: dispatchDate || '9999-01-01' },
+          },
+        ]}
       />
     </div>
   );

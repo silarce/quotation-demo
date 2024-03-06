@@ -430,7 +430,13 @@ export default function EditDispatchList() {
       <div className={scss.body}>
         <Profile disabled={theDiasbled} control={control_profile} />
         <br />
-        <EditDispatch controll={controll_editDispatch} disabled={theDiasbled} />
+        <EditDispatch
+          controll={controll_editDispatch}
+          disabled={theDiasbled}
+          dispatchDate={
+            state_profile.dispatchDate ? moment(state_profile.dispatchDate).format('YYYY-MM-DD') : undefined
+          }
+        />
       </div>
     </SubLayer>
   );
