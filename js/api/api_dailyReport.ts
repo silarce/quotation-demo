@@ -6,6 +6,8 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { axi } from './_axiosCreator';
 import { createUseInfinite } from './createUseInfinite';
 
+import { AxiosError } from 'axios';
+
 import {
   TdailyReportDto,
   TcreateDailyReportItemDto,
@@ -132,30 +134,79 @@ export const useGetDailyReports_items = createUseInfinite<TgetDailyReportItem_my
   errTitle: '取得日報表失敗',
 });
 
-const apiDailyReports_worker_reducer_items = (params?: Tparams) => {
-  const api = `/daily-reports/worker`;
-  params = {
-    ...params,
-    populate: ['employee', 'items.workers', ...(params?.populate ?? [])],
-  };
+// const apiDailyReports_worker_reducer_items = (params?: Tparams) => {
+//   const api = `/daily-reports/worker`;
+//   params = {
+//     ...params,
+//     populate: ['employee', 'items.workers', ...(params?.populate ?? [])],
+//   };
+
+//   return axi
+//     .get<TgetDailyReports>(api, { params })
+//     .then(({ data: res }) => {
+//       const reduceDataArr = dailyReportsReducer_items_my(res.data);
+
+//       return {
+//         data: reduceDataArr,
+//         meta: res.meta,
+//       };
+//     })
+//     .catch((err) => Promise.reject(err));
+// };
+
+// export const useGetDaily_worker_items = createUseInfinite<TgetDailyReportItem_my>({
+//   apiClient: apiDailyReports_worker_reducer_items,
+//   errTitle: '取得日報表失敗',
+// });
+
+const apiDailyReport_worker_date = ({ params, date }: { params?: Tparams; date: string }) => {
+  const api = `/daily-reports/worker/${date}`;
 
   return axi
-    .get<TgetDailyReports>(api, { params })
+    .get<TdailyReportDto[]>(api, { params })
     .then(({ data: res }) => {
-      const reduceDataArr = dailyReportsReducer_items_my(res.data);
+      const reduceDataArr: TdailyReportItem_my[] = dailyReportsReducer_items_my(res);
 
-      return {
-        data: reduceDataArr,
-        meta: res.meta,
-      };
+      return reduceDataArr;
     })
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetDaily_worker_items = createUseInfinite<TgetDailyReportItem_my>({
-  apiClient: apiDailyReports_worker_reducer_items,
-  errTitle: '取得日報表失敗',
-});
+export const useGetDaily_worker_date = ({ params, date }: { params?: Tparams; date?: string } = {}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [res, setRes] = useState<TdailyReportItem_my[]>();
+
+  const update = async () => {
+    if (!date) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiDailyReport_worker_date({
+        params: params ?? {},
+        date,
+      });
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '取得日報表失敗',
+        content: err.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    data: res,
+    update,
+    isLoading,
+  };
+};
 
 // // 取得工務人員日報表
 // const apiGetDailyReports_workers = (params?: Tparams) => {

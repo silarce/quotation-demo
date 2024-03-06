@@ -23,12 +23,26 @@ import { useEmployee_infinite_2, TemployeeDto } from 'js/api/api_employee';
 import {
   //  useGetDailyReports_items,
   TdailyReportItem_my,
-  useGetDaily_worker_items,
+  useGetDaily_worker_date,
 } from 'js/api/api_dailyReport';
 import { useDepartments } from 'js/api/api_department';
 import { useGetEngineeringContact_all, TengineeringContactDto } from 'js/api/api_engineering';
 
 // ======================================================================
+
+type TtypeLookup = {
+  outsourcing: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
+  employee: Exclude<(typeof props_employee)['dataType'], undefined>;
+  employee_worksDepartment: Exclude<(typeof props_employee_worksDepartment)['dataType'], undefined>;
+  dailyReport_workers_item: Exclude<(typeof props_dailyReport_workers_item)['dataType'], undefined>;
+  engineeringContact: Exclude<(typeof props_engineeringContact)['dataType'], undefined>;
+  // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
+  // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
+};
+
+type keyTuple_to_dataTuple<TkeyArr extends (keyof TtypeLookup)[]> = {
+  [index in keyof TkeyArr]: TtypeLookup[TkeyArr[index]][];
+};
 
 type TselectorArrItem<Tkey extends keyof TtypeLookup> = {
   // key: keyof typeof propsLookup;
@@ -50,6 +64,24 @@ type TselectorArr<TkeyArr extends (keyof TtypeLookup)[]> = {
 // type TselectorPropsArr<TkeyArr extends (keyof TtypeLookup)[]> = {
 //   [index in keyof TkeyArr]: TselectorProps_dyna<TtypeLookup[TkeyArr[index]]> | undefined;
 // };
+
+// type TdynaSelectorPropsList<TkeyArr extends (keyof TtypeLookup)[]> = {
+//   [index in keyof TkeyArr]: TkeyArr[index] extends 'dailyReport_workers_item'
+//     ? TselectorProps_simple
+//     : TselectorProps_simple | undefined;
+// };
+
+type TuseNoMetaPropsInNeed = {
+  dailyReport_workers_item: { date: true };
+};
+
+// 期望的型別 : 應為object而非array，index的型別為number所以被推斷為array，若為string就會是object了
+// 另外若為string，TkeyArr[index]的型別就會錯誤。
+type TdynaSelectorPropsList<TkeyArr extends (keyof TtypeLookup)[]> = {
+  [index in keyof TkeyArr]: TkeyArr[index] extends keyof TuseNoMetaPropsInNeed
+    ? TselectorProps_simple<TuseNoMetaPropsInNeed[TkeyArr[index]]>
+    : TselectorProps_simple | undefined;
+};
 
 export type {
   TselectorProps_simple,
@@ -80,7 +112,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     caption,
     tip,
     //
-    dynaSelectorPropsArr: dynaSelectorPropsArr,
+    dynaSelectorPropsList,
   }: //
   {
     showModal: boolean;
@@ -91,8 +123,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
     caption?: string;
     tip?: string;
     //
-    // dynaSelectorPropsArr: TselectorPropsArr<TkeyArr>;
-    dynaSelectorPropsArr?: TselectorProps_simple[];
+    dynaSelectorPropsList?: TdynaSelectorPropsList<TkeyArr>;
     //
   }) => {
     // ------------------------------------------------------------------------
@@ -185,7 +216,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
             //在下面寫好的，props會送進Selector
             const props = propsLookup[key]();
             // 動態的
-            const dynaProps = dynaSelectorPropsArr?.[index];
+            const dynaProps = dynaSelectorPropsList?.[index];
 
             if (item.caption === null) {
               props.caption = null;
@@ -193,21 +224,16 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
               props.caption = item.caption;
             }
 
-            if (dynaProps?.caption) {
-              props.caption = dynaProps.caption;
-            }
-
-            //
-
             if (item.tip === null) {
               props.tip = null;
             } else if (item.tip) {
               props.tip = item.tip;
             }
 
-            if (dynaProps?.tip) {
-              props.tip = dynaProps.tip;
-            }
+            dynaProps?.caption && (props.caption = dynaProps.caption);
+            dynaProps?.tip && (props.tip = dynaProps.tip);
+            dynaProps?.useNoMetaProps && (props.useNoMetaProps = dynaProps.useNoMetaProps);
+
             //
 
             if (clearOther) {
@@ -245,14 +271,9 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
               }
             }
 
-            // if (dynaProps?.searchInputSelPropsArr) {
-            //   props.searchInputSelPropsArr = dynaProps.searchInputSelPropsArr;
-            // }
             if (dynaProps && 'searchInputSelPropsArr' in dynaProps) {
               props.searchInputSelPropsArr = dynaProps.searchInputSelPropsArr;
             }
-
-            // console.log(dynaProps);
 
             return (
               <Fragment key={index}>
@@ -506,7 +527,7 @@ const props_employee_worksDepartment: TselectorProps<TemployeeDto> = {
 };
 
 const props_dailyReport_workers_item: TselectorProps<TdailyReportItem_my> = {
-  useInfinit: useGetDaily_worker_items,
+  useNoMeta: useGetDaily_worker_date,
   selectedKey: 'description',
   caption: '日報表回報',
   configArr: [
@@ -539,10 +560,30 @@ const props_dailyReport_workers_item: TselectorProps<TdailyReportItem_my> = {
       },
     },
   ],
-};
 
-// useGetEngineeringContact_all
-// TengineeringContactDto
+  searchInputSelPropsArr: [
+    {
+      wrapperStyle: { width: 150 },
+      inputProps: {
+        props: {
+          placeholder: '姓名...',
+        },
+      },
+    },
+  ],
+
+  filter_client: (data, searchStrArr) => {
+    const name = searchStrArr[0]?.trim();
+
+    const { chName, enName } = data.employee;
+
+    if (!name || chName.includes(name) || enName.includes(name)) {
+      return true;
+    }
+
+    return false;
+  },
+};
 
 const props_engineeringContact: TselectorProps<TengineeringContactDto> = {
   useInfinit: useGetEngineeringContact_all,
@@ -612,20 +653,6 @@ const propsLookup = {
   //   return _.cloneDeep(props_outsourcing);
   // },
 } as const;
-
-type TtypeLookup = {
-  outsourcing: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
-  employee: Exclude<(typeof props_employee)['dataType'], undefined>;
-  employee_worksDepartment: Exclude<(typeof props_employee_worksDepartment)['dataType'], undefined>;
-  dailyReport_workers_item: Exclude<(typeof props_dailyReport_workers_item)['dataType'], undefined>;
-  engineeringContact: Exclude<(typeof props_engineeringContact)['dataType'], undefined>;
-  // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
-  // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
-};
-
-type keyTuple_to_dataTuple<TkeyArr extends (keyof TtypeLookup)[]> = {
-  [index in keyof TkeyArr]: TtypeLookup[TkeyArr[index]][];
-};
 
 // ======================================================================
 
