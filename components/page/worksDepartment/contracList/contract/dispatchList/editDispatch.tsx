@@ -4,6 +4,13 @@ import { useState, useRef, useEffect } from 'react';
 import { Radio } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 
+// gear
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import {
+  selectModalCreator_multi,
+  TdailyReportItem_my,
+} from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+
 // css
 import scss from './dispatchList.module.scss';
 
@@ -29,7 +36,21 @@ type Tcontroll = {
 export type { Tcontroll, TpricingMethodControll };
 
 // ----------------------------------------------------------
+
+const SelectGroup = selectModalCreator_multi<['dailyReport_workers_item']>({
+  selectorArr: [
+    {
+      key: 'dailyReport_workers_item',
+    },
+  ],
+});
+
+// ----------------------------------------------------------
 export default function EditDispatch({ controll, disabled }: { controll: Tcontroll; disabled?: boolean }) {
+  const [showSelector, setShowSelector] = useState(false);
+
+  // ---------------------------------------------------------------
+
   const { tasks, note, pricingMethod } = controll;
 
   const [batchInput, setBatchInput] = useState('');
@@ -45,6 +66,22 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
     }
   };
 
+  const onSelectorConfirm = (arr: TdailyReportItem_my[]) => {
+    const descriptionArr = arr.map((item) => {
+      return item.description;
+    });
+
+    const descriptionStr = descriptionArr.join('\n\n');
+
+    let value = tasks.value;
+
+    if (value) {
+      value += '\n\n';
+    }
+
+    tasks.onChange(value + descriptionStr);
+  };
+
   // -----------------------------------------------------------------
   useEffect(() => {
     setBatchInput(pricingMethod.subValue);
@@ -56,12 +93,13 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
       {/* 辦理事項 */}
       <div className={scss.handlingMatters}>
         <div className={scss.subTitle}>
-          <span>辦理事項 : </span>
+          <span>工作內容 : </span>
+          <MyButton_v2 label="請選擇工務人員日報表" px="px22" py="py4" onClick={() => setShowSelector(true)} />
         </div>
         <textarea
           disabled={disabled}
           className={scss.textarea}
-          placeholder="請輸入辦理事項"
+          placeholder="請輸入工作內容"
           value={tasks.value}
           onChange={(e) => tasks.onChange(e.target.value)}
         />
@@ -117,6 +155,14 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
         placeholder="請輸入備註"
         value={note.value}
         onChange={(e) => note.onChange(e.target.value)}
+      />
+
+      <SelectGroup
+        showModal={showSelector}
+        onConfirm={(arr) => {
+          onSelectorConfirm(arr[0]);
+        }}
+        onCancel={() => setShowSelector(false)}
       />
     </div>
   );

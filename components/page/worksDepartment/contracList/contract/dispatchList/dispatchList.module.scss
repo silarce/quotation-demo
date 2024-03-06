@@ -86,7 +86,11 @@
 
   .handlingMatters {
     > .subTitle {
+      display: flex;
+      gap: 30px;
+      align-items: center;
       margin: unset;
+      margin-bottom: 10px;
       > span {
         font-size: 20px;
         font-weight: 500;
