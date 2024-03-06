@@ -1,17 +1,14 @@
 // 新增派工單
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import moment from 'moment';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
-import Profile, {
-  Tprofile01,
-  Tprofile02,
-  Tprofile03,
-} from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
+import Profile, { Tcontrol_profile } from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
 import EditDispatch, {
   Tcontroll as Tcontroll_EeditDispatch,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
@@ -33,6 +30,25 @@ import { TemployeeDto } from 'js/api/dtoTypes';
 // css
 import scss from './edit.module.scss';
 
+// =====================================================================
+
+type Tstate_profile = {
+  dispatchDate: string;
+  workerEmployee: TemployeeDto[];
+  projectName: string;
+  projectNumber: string;
+  contractor: string;
+  contractorContactPerson: string;
+  county: string;
+  district: string;
+  address: string;
+  constructionSiteContactNumber: string;
+  warrantyDate: string;
+  finalContactPerson: string;
+};
+
+// =====================================================================
+
 export default function EditDispatchList() {
   const router = useRouter();
   const { contractId, dispatchingId } = router.query as { contractId: string; dispatchingId: string | undefined };
@@ -40,6 +56,9 @@ export default function EditDispatchList() {
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const theDiasbled = !dispatchingId ? false : disabled;
+
+  // ---------------------------------------------------------
+  const [state_profile, setState_profile] = useState<Tstate_profile>(emptyState_profile());
 
   // ---------------------------------------------------------
 
@@ -81,39 +100,6 @@ export default function EditDispatchList() {
   }, [engineeringContactId]);
 
   // ---------------------------------------------------------
-  const [profile01, setProfile01] = useState<Tprofile01>();
-  const [profile02, setProfile02] = useState<Tprofile02>();
-  const [profile03, setProfile03] = useState<Tprofile03>();
-
-  const onProfile01Change = (key: keyof Tprofile01, v: string) => {
-    if (!profile01) {
-      return;
-    }
-
-    const newProfile = { ...profile01 };
-    newProfile[key] = v;
-    setProfile01(newProfile);
-  };
-
-  const onProfile02Change = (key: keyof Tprofile02, v: string) => {
-    if (!profile02) {
-      return;
-    }
-
-    const newProfile = { ...profile02 };
-    newProfile[key] = v;
-    setProfile02(newProfile);
-  };
-
-  const onProfile03Change = (key: keyof Tprofile03, v: TemployeeDto) => {
-    if (!profile03) {
-      return;
-    }
-
-    const newProfile = { ...profile03 };
-    newProfile[key] = v;
-    setProfile03(newProfile);
-  };
 
   // ---------------------------------------------------------
 
@@ -181,62 +167,125 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
-  useEffect(() => {
-    if (!disabled || !engineeringContact) {
+  const changeProfile = (key: keyof Omit<Tstate_profile, 'workerEmployee'>, v: string) => {
+    setState_profile((state) => ({ ...state, [key]: v }));
+  };
+
+  const changeProfile_workerEmployee = (v: TemployeeDto[]) => {
+    setState_profile((state) => ({ ...state, workerEmployee: v }));
+  };
+
+  // ---------------------------------------------------------
+
+  const reqPost = async () => {
+    if (!editDispatch) {
       return;
     }
 
-    // const {
-    //   projectName,
-    //   // contactPerson,
-    //   projectNumber,
-    //   contractor,
-    //   constructionSitePrincipalContactNumber,
-    //   // quotationNumber,
+    if (!contractId) {
+      return myAlert.info({ title: '沒有合約ID' });
+    }
 
-    //   county,
-    //   district,
-    //   address,
-    // } = engineeringContact;
+    // if (!profile02.dispatchDate) {
+    //   return myAlert.info({ title: '請選擇派工日期' });
+    // }
 
-    const allAddress = `${engineeringContact.county ?? ''}${engineeringContact.district ?? ''}${
-      engineeringContact.address ?? ''
-    }`;
+    // if (!profile03?.workerEmployee?.id) {
+    //   return myAlert.info({ title: '請選擇工務人員' });
+    // }
+
+    // const body: TcreateDispatchingDto = {
+    //   // 合約id
+    //   contractId,
+
+    //   ...editDispatch,
+    //   county: contract?.content.county ?? '',
+    //   district: contract?.content.district ?? '',
+    //   address: contract?.content.address ?? '',
+    // };
+
+    // try {
+    //   setIsLoading(true);
+
+    //   let res: TdispatchingDto;
+
+    //   if (dispatchingId) {
+    //     res = await apiPatchEngineeringDispatching(dispatchingId, body);
+    //     myAlert.success({ title: '更新派工單成功' });
+    //     await update_dispatching();
+    //   } else {
+    //     res = await apiPostEngineeringDispatching(body);
+    //     myAlert.success({ title: '新增派工單成功' });
+
+    //     if (res) {
+    //       router.push({
+    //         query: {
+    //           ...router.query,
+    //           dispatchingId: res.id,
+    //         },
+    //       });
+    //     }
+    //   }
+
+    //   setDisabled(true);
+    // } catch (error) {
+    //   const err = error as Error;
+    //   myAlert.err({ title: '新增派工單失敗', content: err.message });
+    // } finally {
+    //   setIsLoading(false);
+    // }
+  };
+
+  // ---------------------------------------------------------
+
+  useEffect(() => {
+    if (!disabled || !dispatching || !engineeringContact) {
+      return;
+    }
+
+    // const allAddress = `${engineeringContact.county ?? ''}${engineeringContact.district ?? ''}${
+    //   engineeringContact.address ?? ''
+    // }`;
 
     const {
-      contractorContactPerson,
-      // contractor,
-      projectNumber: engineeringNumber,
-      badgeNumber,
       dispatchDate,
-      finalContactPerson: finalContact,
-      workerEmployee,
-      tasks,
-      note,
-      pricingMethod,
+      contractorContactPerson,
       constructionSiteContactNumber,
+      county = engineeringContact.county,
+      district = engineeringContact.district,
+      address = engineeringContact.address,
+      workerId,
+      workerEmployee,
+      finalContactPerson,
+      tasks,
+      pricingMethod,
+      note,
+      contractId,
+      contract,
+      quotationId,
+      quotation,
+      todoListId,
+      todoList,
+      isCompleted,
+      warrantyDate,
       // constructionSiteContactNumber: projectNumber,
-    } = dispatching ?? {};
+    } = dispatching;
 
-    setProfile01({
-      projectName: engineeringContact.projectName ?? '',
-      // contractor: contractor ?? '',
-      contractor: engineeringContact.contractor ?? '',
-      // 這是承包商的聯絡人
-      contractorContactPerson: contractorContactPerson ?? '',
+    setState_profile({
+      dispatchDate: dispatchDate,
+      workerEmployee: workerEmployee ?? [],
+      projectName: contract?.content.projectName ?? '',
+      projectNumber: contract?.content.quotationNumber ?? '',
+      contractor: engineeringContact.contractor,
+      contractorContactPerson: contractorContactPerson,
+      county: county,
+      district: district,
+      address: address,
       constructionSiteContactNumber: constructionSiteContactNumber ?? '',
-      allAddress,
-      //
-      projectNumber: engineeringContact.projectNumber ?? '',
-      badgeNumber: badgeNumber ?? '',
+      warrantyDate: warrantyDate ?? '',
+      finalContactPerson: finalContactPerson ?? '',
     });
-    setProfile02({
-      dispatchDate: dispatchDate ?? '',
-      finalContactPerson: finalContact ?? '',
-    });
-    setProfile03({
-      workerEmployee: workerEmployee,
-    });
+
     setEditDispatch({
       tasks: tasks ?? '',
       note: note ?? '',
@@ -248,65 +297,51 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
-  const reqPost = async () => {
-    if (!profile01 || !profile02 || !editDispatch) {
-      return;
-    }
-
-    if (!contractId) {
-      return myAlert.info({ title: '沒有合約ID' });
-    }
-
-    if (!profile02.dispatchDate) {
-      return myAlert.info({ title: '請選擇派工日期' });
-    }
-
-    if (!profile03?.workerEmployee?.id) {
-      return myAlert.info({ title: '請選擇工務人員' });
-    }
-
-    const body: TcreateDispatchingDto = {
-      // 合約id
-      contractId,
-      ...profile01,
-      ...profile02,
-      ...editDispatch,
-      county: contract?.content.county ?? '',
-      district: contract?.content.district ?? '',
-      address: contract?.content.address ?? '',
-      workerId: profile03?.workerEmployee?.id ?? '',
-    };
-
-    try {
-      setIsLoading(true);
-
-      let res: TdispatchingDto;
-
-      if (dispatchingId) {
-        res = await apiPatchEngineeringDispatching(dispatchingId, body);
-        myAlert.success({ title: '更新派工單成功' });
-        await update_dispatching();
-      } else {
-        res = await apiPostEngineeringDispatching(body);
-        myAlert.success({ title: '新增派工單成功' });
-
-        if (res) {
-          router.push({
-            query: {
-              ...router.query,
-              dispatchingId: res.id,
-            },
-          });
-        }
-      }
-
-      setDisabled(true);
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '新增派工單失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
-    }
+  const control_profile: Tcontrol_profile = {
+    dispatchDate: {
+      value: state_profile.dispatchDate ? moment(state_profile.dispatchDate) : null,
+      disabled: theDiasbled,
+      onChange: (m) => changeProfile('dispatchDate', m?.toISOString() ?? ''),
+    },
+    workerEmployee: {
+      value: state_profile.workerEmployee,
+      onChange: changeProfile_workerEmployee,
+    },
+    projectName: state_profile.projectName,
+    projectNumber: state_profile.projectNumber,
+    contractor: state_profile.contractor,
+    contractorContactPerson: {
+      value: state_profile.contractorContactPerson,
+      disabled: theDiasbled,
+      onChange: (e) => changeProfile('contractorContactPerson', e.target.value),
+    },
+    // allAddress: state_profile.allAddress,
+    county: {
+      value: state_profile.county,
+      disabled: theDiasbled,
+      onChange: (str) => changeProfile('county', str),
+    },
+    district: {
+      value: state_profile.district,
+      disabled: theDiasbled,
+      onChange: (str) => changeProfile('district', str),
+    },
+    address: {
+      value: state_profile.address,
+      disabled: theDiasbled,
+      onChange: (e) => changeProfile('address', e.target.value),
+    },
+    constructionSiteContactNumber: {
+      value: state_profile.constructionSiteContactNumber,
+      disabled: theDiasbled,
+      onChange: (e) => changeProfile('constructionSiteContactNumber', e.target.value),
+    },
+    warrantyDate: state_profile.warrantyDate,
+    finalContactPerson: {
+      value: state_profile.finalContactPerson,
+      disabled: theDiasbled,
+      onChange: (e) => changeProfile('finalContactPerson', e.target.value),
+    },
   };
 
   // ---------------------------------------------------------
@@ -366,25 +401,35 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
+  console.log('control_profile', control_profile);
+
   // ---------------------------------------------------------
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={contract?.content.quotationNumber} />
-      <div>
-        <div className={scss.add}>
-          <Profile
-            disabled={theDiasbled}
-            profile01={profile01}
-            onProfile01Change={onProfile01Change}
-            profile02={profile02}
-            onProfile02Change={onProfile02Change}
-            profile03={profile03}
-            onProfile03Change={onProfile03Change}
-          />
-          <hr />
-          <EditDispatch controll={controll_editDispatch} disabled={theDiasbled} />
-        </div>
+
+      <div className={scss.body}>
+        <Profile disabled={theDiasbled} control={control_profile} />
+        <br />
+        <EditDispatch controll={controll_editDispatch} disabled={theDiasbled} />
       </div>
     </SubLayer>
   );
 }
+
+// =====================================================================
+
+const emptyState_profile = (): Tstate_profile => ({
+  dispatchDate: '',
+  workerEmployee: [],
+  projectName: '',
+  projectNumber: '',
+  contractor: '',
+  contractorContactPerson: '',
+  county: '',
+  district: '',
+  address: '',
+  constructionSiteContactNumber: '',
+  warrantyDate: '',
+  finalContactPerson: '',
+});

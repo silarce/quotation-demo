@@ -1,37 +1,37 @@
 @use "styles/theme01" as *;
 
-.profile {
-  display: flex;
-  justify-content: space-between;
-  height: fit-content;
-  .left,
-  .right {
-    height: fit-content;
-    display: grid;
-    gap: 20px;
-    .input02 {
-      padding: 0;
-    }
-  }
-  .left {
-    width: 650px;
-    .datePicker {
-      :global(.ant-picker-input) {
-        input {
-          color: theme("colors.text");
-        }
-      }
-    }
-  }
-  .right {
-    width: 300px;
-    .input02.showUnderline {
-      hr {
-        border-color: $colorMain;
-      }
-    }
-  }
-}
+// .profile {
+//   display: flex;
+//   justify-content: space-between;
+//   height: fit-content;
+//   .left,
+//   .right {
+//     height: fit-content;
+//     display: grid;
+//     gap: 20px;
+//     .input02 {
+//       padding: 0;
+//     }
+//   }
+//   .left {
+//     width: 650px;
+//     .datePicker {
+//       :global(.ant-picker-input) {
+//         input {
+//           color: theme("colors.text");
+//         }
+//       }
+//     }
+//   }
+//   .right {
+//     width: 300px;
+//     .input02.showUnderline {
+//       hr {
+//         border-color: $colorMain;
+//       }
+//     }
+//   }
+// }
 
 .list {
   .thead {
@@ -83,7 +83,6 @@
     font-size: 18px;
     color: $colorMain;
   }
-  margin: 0 30px;
   .handlingMatters {
     > .subTitle {
       margin-top: 0;

@@ -2227,7 +2227,7 @@ export type TdispatchingDto = {
   //  '工程詳細地址'
   address: string;
   //  '工務人員Id'
-  workerId: string;
+  workerId: string[];
   //  '工務人員'
   workerEmployee: TemployeeDto[];
   //  '完工聯絡人'

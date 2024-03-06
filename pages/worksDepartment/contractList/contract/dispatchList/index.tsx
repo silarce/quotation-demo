@@ -187,7 +187,7 @@ export default function DispatchList() {
       <PageHeader panelList={panelList} contractNumber={contract?.content.quotationNumber} />
 
       <div className={scss.body}>
-        <Profile profile01={profile01} onProfile01Change={onProfile01Change} disabled={true} />
+        {/* <Profile profile01={profile01} onProfile01Change={onProfile01Change} disabled={true} /> */}
         <Wrapper_tab
           className={scss.wrapper}
           tabArr={tabArr}
