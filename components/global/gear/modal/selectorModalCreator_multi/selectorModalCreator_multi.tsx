@@ -474,6 +474,33 @@ const props_employee: TselectorProps<TemployeeDto> = {
   },
 };
 
+const props_employee_worksDepartment: TselectorProps<TemployeeDto> = {
+  ...props_employee,
+  searchInputSelPropsArr: [
+    {
+      wrapperStyle: { width: 150 },
+      inputProps: {
+        props: {
+          placeholder: '完整編號、姓名...',
+        },
+      },
+    },
+  ],
+  filter: (strArr) => {
+    return {
+      'jobs.department.name': { $eq: '工務部' },
+      $or: [
+        {
+          idNumber: { $eq: strArr[0] },
+        },
+        {
+          chName: { $contains: strArr[0] },
+        },
+      ],
+    };
+  },
+};
+
 const props_dailyReport_item: TselectorProps<TdailyReportItem_my> = {
   useInfinit: useGetDailyReports_items,
   selectedKey: 'description',
@@ -565,6 +592,9 @@ const propsLookup = {
   employee: () => {
     return _.cloneDeep(props_employee);
   },
+  employee_worksDepartment: () => {
+    return _.cloneDeep(props_employee_worksDepartment);
+  },
   dailyReport_item: () => {
     return _.cloneDeep(props_dailyReport_item);
   },
@@ -582,6 +612,7 @@ const propsLookup = {
 type TtypeLookup = {
   outsourcing: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   employee: Exclude<(typeof props_employee)['dataType'], undefined>;
+  employee_worksDepartment: Exclude<(typeof props_employee_worksDepartment)['dataType'], undefined>;
   dailyReport_item: Exclude<(typeof props_dailyReport_item)['dataType'], undefined>;
   engineeringContact: Exclude<(typeof props_engineeringContact)['dataType'], undefined>;
   // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
