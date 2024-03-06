@@ -10,7 +10,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import Profile, { Tcontrol_profile } from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
 import EditDispatch, {
-  Tcontroll as Tcontroll_EeditDispatch,
+  Tcontroll as Tcontroll_editDispatch,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
 
 // gear
@@ -107,7 +107,7 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
-  const controll_editDispatch: Tcontroll_EeditDispatch = {
+  const controll_editDispatch: Tcontroll_editDispatch = {
     tasks: {
       value: state_dispatch?.tasks ?? '',
       onChange: (v: string) => {

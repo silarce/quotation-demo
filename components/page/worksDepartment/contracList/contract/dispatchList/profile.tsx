@@ -67,11 +67,12 @@ export type { Tcontrol as Tcontrol_profile };
 
 // ============================================================================
 
-const SelectorGroup = selectModalCreator_multi<['employee']>({
+const SelectorGroup = selectModalCreator_multi<['employee_worksDepartment']>({
   selectorArr: [
     {
-      key: 'employee',
+      key: 'employee_worksDepartment',
       caption: '工務人員',
+      tip: '只有列出工務部人員。複選',
     },
   ],
 });
