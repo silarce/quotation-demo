@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
+import { useRouter } from 'next/router';
 
 // antd
 import { Collapse } from 'antd';
@@ -35,6 +36,7 @@ type TsortedTodoList = {
     todoArr: Ttodo_engineeringContact[];
     reqPatch: (todo: TupdateTodoDto) => Promise<boolean | void>;
     reqDelete: () => void;
+    toDispatch: () => void;
   };
 };
 
@@ -51,6 +53,9 @@ export default function Table_todoList({
   todoArr: Ttodo_engineeringContact[];
   onTodoChange: () => void;
 }) {
+  const router = useRouter();
+  // -------------------------------------------------------------------
+
   const [sortedTodoList, setSortedTodoList] = useState<TsortedTodoList>({});
   // --------------------------------------------------
 
@@ -88,6 +93,7 @@ export default function Table_todoList({
 
     todoArr.forEach((todo) => {
       const engineeringContactId = todo.engineeringContactId;
+      const contractId = todo.engineeringContact?.contract?.id;
 
       if (todo.isAlreadyDisPatching) {
         return;
@@ -133,6 +139,19 @@ export default function Table_todoList({
               },
             });
           },
+          toDispatch: () => {
+            const todoForDispatch = todo;
+
+            window.sessionStorage.setItem('todoForDispatch', JSON.stringify(todoForDispatch));
+
+            router.push({
+              pathname: '/worksDepartment/contractList/contract/dispatchList/edit',
+              query: {
+                contractId: contractId,
+                todoIdForDispatch: todo.id,
+              },
+            });
+          },
         };
       }
     });
@@ -151,7 +170,7 @@ export default function Table_todoList({
     <div>
       <Collapse className={scss.antdCollapse} destroyInactivePanel={true}>
         {Object.values(sortedTodoList).map((item, index) => {
-          const { engineeringContact, todoArr, reqPatch, reqDelete } = item;
+          const { engineeringContact, todoArr, reqPatch, reqDelete, toDispatch } = item;
 
           const contact = engineeringContact?.contactInfo?.[0];
           const contactPerson = contact?.contactPerson ?? '';
@@ -180,17 +199,20 @@ export default function Table_todoList({
               }
             >
               {todoArr.map((todo, index) => {
-                return <PanelBody key={todo.id} todo={todo} onOkClick={reqPatch} onDeleteClick={reqDelete} />;
+                return (
+                  <PanelBody
+                    //
+                    key={todo.id}
+                    todo={todo}
+                    onOkClick={reqPatch}
+                    onDeleteClick={reqDelete}
+                    onDispatchClick={toDispatch}
+                  />
+                );
               })}
             </Panel>
           );
         })}
-
-        {/* <Panel className={classNames(scss.antdPanel, scss.plus)} key="1" header={<PanelHeader />}>
-          <PanelBody />
-          <PanelBody />
-          <PanelBody />
-        </Panel> */}
       </Collapse>
     </div>
   );
@@ -242,10 +264,12 @@ const PanelBody = ({
   todo,
   onOkClick,
   onDeleteClick,
+  onDispatchClick,
 }: {
   todo: Ttodo_engineeringContact;
   onOkClick: TsortedTodoList[string]['reqPatch'];
   onDeleteClick?: () => void;
+  onDispatchClick: () => void;
 }) => {
   const [disabled, setDisabled] = useState(true);
 
@@ -315,7 +339,9 @@ const PanelBody = ({
   const btnBar_disabled = (
     <>
       <IconEdit onClick={() => setDisabled(false)} />
-      <button className={scss.btn_dispatch}>派工</button>
+      <button className={scss.btn_dispatch} onClick={onDispatchClick}>
+        派工
+      </button>
     </>
   );
 
