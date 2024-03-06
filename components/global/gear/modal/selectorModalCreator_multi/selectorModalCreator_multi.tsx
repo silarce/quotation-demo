@@ -20,7 +20,11 @@ import scss from './selectorModalCreator_multi.module.scss';
 // api
 import { useGetOutsourcing, ToutsourcingDto } from 'js/api/api_outsourcing';
 import { useEmployee_infinite_2, TemployeeDto } from 'js/api/api_employee';
-import { useGetDailyReports_items, TdailyReportItem_my } from 'js/api/api_dailyReport';
+import {
+  //  useGetDailyReports_items,
+  TdailyReportItem_my,
+  useGetDaily_worker_items,
+} from 'js/api/api_dailyReport';
 import { useDepartments } from 'js/api/api_department';
 import { useGetEngineeringContact_all, TengineeringContactDto } from 'js/api/api_engineering';
 
@@ -501,8 +505,8 @@ const props_employee_worksDepartment: TselectorProps<TemployeeDto> = {
   },
 };
 
-const props_dailyReport_item: TselectorProps<TdailyReportItem_my> = {
-  useInfinit: useGetDailyReports_items,
+const props_dailyReport_workers_item: TselectorProps<TdailyReportItem_my> = {
+  useInfinit: useGetDaily_worker_items,
   selectedKey: 'description',
   caption: '日報表回報',
   configArr: [
@@ -595,8 +599,8 @@ const propsLookup = {
   employee_worksDepartment: () => {
     return _.cloneDeep(props_employee_worksDepartment);
   },
-  dailyReport_item: () => {
-    return _.cloneDeep(props_dailyReport_item);
+  dailyReport_workers_item: () => {
+    return _.cloneDeep(props_dailyReport_workers_item);
   },
   engineeringContact: () => {
     return _.cloneDeep(props_engineeringContact);
@@ -613,7 +617,7 @@ type TtypeLookup = {
   outsourcing: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   employee: Exclude<(typeof props_employee)['dataType'], undefined>;
   employee_worksDepartment: Exclude<(typeof props_employee_worksDepartment)['dataType'], undefined>;
-  dailyReport_item: Exclude<(typeof props_dailyReport_item)['dataType'], undefined>;
+  dailyReport_workers_item: Exclude<(typeof props_dailyReport_workers_item)['dataType'], undefined>;
   engineeringContact: Exclude<(typeof props_engineeringContact)['dataType'], undefined>;
   // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
