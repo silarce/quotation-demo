@@ -31,14 +31,14 @@ import scss from './dispatchList.module.scss';
 
 type Tquery = {
   contractId: string;
-  tab: 'complete' | 'notComplete' | undefined;
+  tab: 'completed' | 'notCompleted' | undefined;
 };
 
 // ==============================================================
 
 export default function DispatchList() {
   const router = useRouter();
-  const { contractId, tab = 'notComplete' } = router.query as Tquery;
+  const { contractId, tab = 'notCompleted' } = router.query as Tquery;
 
   // ----------------------------------------------------
 
@@ -51,6 +51,7 @@ export default function DispatchList() {
     populate: ['todoList', 'workerEmployee'],
     filter: {
       contractId: { $eq: contractId },
+      isCompleted: { $eq: tab === 'completed' ? true : false },
     },
   };
 
@@ -67,9 +68,12 @@ export default function DispatchList() {
   // ----------------------------------------------------
 
   useEffect(() => {
-    update();
     update_contract();
   }, []);
+
+  useEffect(() => {
+    update();
+  }, [tab]);
 
   useEffect(() => {
     update_engineeringContact();
@@ -102,24 +106,24 @@ export default function DispatchList() {
   const tabArr = [
     {
       label: '已派工',
-      isActive: tab === 'notComplete',
+      isActive: tab === 'notCompleted',
       onClick: () => {
         router.push({
           query: {
             ...router.query,
-            tab: 'complete',
+            tab: 'notCompleted',
           },
         });
       },
     },
     {
       label: '已完工',
-      isActive: tab === 'complete',
+      isActive: tab === 'completed',
       onClick: () => {
         router.push({
           query: {
             ...router.query,
-            tab: 'notComplete',
+            tab: 'completed',
           },
         });
       },
