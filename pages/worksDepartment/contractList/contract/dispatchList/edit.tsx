@@ -184,54 +184,67 @@ export default function EditDispatchList() {
       return myAlert.info({ title: '沒有合約ID' });
     }
 
-    // if (!profile02.dispatchDate) {
-    //   return myAlert.info({ title: '請選擇派工日期' });
-    // }
+    // console.log('state_profile', state_profile);
+    // console.log('state_dispatch', state_dispatch);
 
-    // if (!profile03?.workerEmployee?.id) {
-    //   return myAlert.info({ title: '請選擇工務人員' });
-    // }
+    const workerId = state_profile.workerEmployee.map((employee) => employee.id);
 
-    // const body: TcreateDispatchingDto = {
-    //   // 合約id
-    //   contractId,
+    if (!state_profile.dispatchDate) {
+      return myAlert.info({ title: '請選擇派工日期' });
+    }
 
-    //   ...editDispatch,
-    //   county: contract?.content.county ?? '',
-    //   district: contract?.content.district ?? '',
-    //   address: contract?.content.address ?? '',
-    // };
+    if (!workerId[0]) {
+      return myAlert.info({ title: '請選擇工務人員' });
+    }
 
-    // try {
-    //   setIsLoading(true);
+    // console.log(state_profile.workerEmployee);
 
-    //   let res: TdispatchingDto;
+    const body: TcreateDispatchingDto = {
+      contractId,
+      dispatchDate: state_profile.dispatchDate,
+      contractorContactPerson: state_profile.contractorContactPerson,
+      constructionSiteContactNumber: state_profile.constructionSiteContactNumber,
+      county: state_profile.county,
+      district: state_profile.district,
+      address: state_profile.address,
+      workerId,
+      finalContactPerson: state_profile.finalContactPerson,
+      tasks: state_dispatch.tasks,
+      pricingMethod: state_dispatch.pricingMethod,
+      note: state_dispatch.note || null,
+      isCompleted: false,
+    };
 
-    //   if (dispatchingId) {
-    //     res = await apiPatchEngineeringDispatching(dispatchingId, body);
-    //     myAlert.success({ title: '更新派工單成功' });
-    //     await update_dispatching();
-    //   } else {
-    //     res = await apiPostEngineeringDispatching(body);
-    //     myAlert.success({ title: '新增派工單成功' });
+    try {
+      setIsLoading(true);
 
-    //     if (res) {
-    //       router.push({
-    //         query: {
-    //           ...router.query,
-    //           dispatchingId: res.id,
-    //         },
-    //       });
-    //     }
-    //   }
+      let res: TdispatchingDto;
 
-    //   setDisabled(true);
-    // } catch (error) {
-    //   const err = error as Error;
-    //   myAlert.err({ title: '新增派工單失敗', content: err.message });
-    // } finally {
-    //   setIsLoading(false);
-    // }
+      if (dispatchingId) {
+        res = await apiPatchEngineeringDispatching(dispatchingId, body);
+        myAlert.success({ title: '更新派工單成功' });
+        await update_dispatching();
+      } else {
+        res = await apiPostEngineeringDispatching(body);
+        myAlert.success({ title: '新增派工單成功' });
+
+        if (res) {
+          router.push({
+            query: {
+              ...router.query,
+              dispatchingId: res.id,
+            },
+          });
+        }
+      }
+
+      setDisabled(true);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增派工單失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // ---------------------------------------------------------
@@ -285,7 +298,7 @@ export default function EditDispatchList() {
       pricingMethod,
       note,
       // contractId,
-      contract,
+      // contract,
       // quotationId,
       // quotation,
       // todoListId,

@@ -161,7 +161,7 @@ export default function EditDispatch({
       <textarea
         disabled={disabled}
         className={scss.textarea}
-        placeholder="請輸入備註"
+        placeholder="請輸入待辦事項"
         value={note.value}
         onChange={(e) => note.onChange(e.target.value)}
       />

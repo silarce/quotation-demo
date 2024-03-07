@@ -105,6 +105,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           disabled={true}
           inputProps={{
             props: {
+              placeholder: '工程名稱',
               defaultValue: control.projectName,
             },
           }}
@@ -114,6 +115,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           {...config_inputSel_readOnly}
           inputProps={{
             props: {
+              placeholder: '工程編號',
               defaultValue: control.projectNumber,
             },
           }}
@@ -123,6 +125,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           {...config_inputSel_readOnly}
           inputProps={{
             props: {
+              placeholder: '承包商',
               defaultValue: control.contractor,
             },
           }}
@@ -161,6 +164,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           {...config_inputSel_readOnly}
           inputProps={{
             props: {
+              placeholder: '建立後系統自動設定',
               defaultValue: control.warrantyDate,
             },
           }}
