@@ -317,7 +317,11 @@ export function Selector_component<Tdata extends TapiData>(
           viewRef_bottom={viewRef_bottom}
           forbiddenCheck={forbiddenCheck_dataList}
           filter_client={(data) => {
-            return !!filter_client && filter_client(data, searchStrArr);
+            if (filter_client) {
+              return filter_client(data, searchStrArr);
+            }
+
+            return true;
           }}
         />
       </DataList>
@@ -390,7 +394,7 @@ function DataList_table<Tdata extends TapiData>({
   selectedList: { [id: string]: Tdata };
   viewRef_bottom?: (node?: Element | null | undefined) => void;
   forbiddenCheck?: (data: Tdata) => boolean;
-  filter_client: (data: Tdata) => boolean;
+  filter_client?: (data: Tdata) => boolean;
 }) {
   return (
     <div className={scss.table}>
@@ -426,7 +430,11 @@ function DataList_table<Tdata extends TapiData>({
 
           const isForbidden = forbiddenCheck && forbiddenCheck(apiData);
 
-          const isSkip = !filter_client(apiData);
+          let isSkip = false;
+
+          if (filter_client) {
+            isSkip = !filter_client(apiData);
+          }
 
           if (isSkip) {
             return null;
