@@ -3137,7 +3137,7 @@ export type TtodoDto<P extends Tpopulate_todoDto = Partial<Tpopulate_todoDto>> =
   // 派工單
   dispatching: P['dispatching'] extends true ? TdispatchingDto | null : undefined;
   // 聯絡人(接洽人欄位)
-  contactPerson: TtodoContactDto[];
+  contactPerson: TtodoContactDto[] | null;
   // 主旨
   purpose: string | null;
   // 通知日期

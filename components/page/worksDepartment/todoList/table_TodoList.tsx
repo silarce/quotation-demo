@@ -327,8 +327,8 @@ const PanelBody = ({
   useEffect(() => {
     if (disabled) {
       setState_todo({
-        contactPerson: todo.contactPerson[0]?.contactPerson ?? '',
-        contactPersonNumber: todo.contactPerson[0]?.contactNumber ?? '',
+        contactPerson: todo.contactPerson?.[0]?.contactPerson ?? '',
+        contactPersonNumber: todo.contactPerson?.[0]?.contactNumber ?? '',
         purpose: todo.purpose ?? '',
         notificationDate: todo.notificationDate ?? '',
         entryDate: todo.entryDate ?? '',
