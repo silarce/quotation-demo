@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import moment from 'moment';
 
 // antd
 import { Radio } from 'antd';
@@ -64,6 +65,9 @@ export default function EditDispatch({
   workerIdArr?: string[];
 }) {
   const [showSelector, setShowSelector] = useState(false);
+
+  const dispatchDate_m = moment(dispatchDate);
+  dispatchDate = dispatchDate_m.isValid() ? dispatchDate_m.format('YYYY-MM-DD') : '9999-01-01';
 
   // ---------------------------------------------------------------
 
@@ -204,17 +208,16 @@ export default function EditDispatch({
           {
             caption: '工務人員日報表回報',
             useNoMetaProps: {
-              date: dispatchDate || '9999-01-01',
+              date: dispatchDate,
             },
             filter_clientSide: (data, searchArr) => {
               const id = data.employee.id;
+              const employeeName = data.employee.chName || data.employee.enName;
 
-              let result = true;
+              const check01 = !!workerIdArr?.includes(id);
+              const check02 = employeeName.includes(searchArr[0] ?? '');
 
-              result = !!workerIdArr?.includes(id);
-              result = data.employee.chName.includes(searchArr[0]);
-
-              return result;
+              return check01 && check02;
             },
           },
         ]}
