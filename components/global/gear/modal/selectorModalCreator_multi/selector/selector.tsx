@@ -202,7 +202,9 @@ export function Selector_component<Tdata extends TapiData>(
     }
 
     return arr;
-  }, [dataArr, dataArr_noMeta, filter_clientSide]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataArr, dataArr_noMeta, searchStrArr, filter_clientSide]);
 
   // --------------------------------------
   // ----------------------------------------------------------------------
@@ -268,7 +270,7 @@ export function Selector_component<Tdata extends TapiData>(
   useEffect(() => {
     reset && reset();
     update_noMeta && update_noMeta();
-  }, [filter]);
+  }, [filter, useNoMetaProps]);
 
   useEffect(() => {
     // defaultSelectedArr
