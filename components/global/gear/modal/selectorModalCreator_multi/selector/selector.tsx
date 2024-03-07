@@ -15,22 +15,9 @@ import scss from './selector.module.scss';
 
 // type
 import { createUseInfinite, Tparams } from 'js/api/createUseInfinite';
+import { TuseNoMeta } from 'js/api/types';
 
 // ==============================================================================
-
-type TuseNoMeta = (props?: {
-  params?: Tparams;
-  id?: string;
-  date?: string;
-  other?: {
-    [key: string]: string | number | undefined;
-  };
-}) => {
-  data: any[] | undefined;
-  isLoading: boolean;
-  // update: Awaited<() => void>;
-  update: () => void;
-};
 
 type TuseInfinite = ReturnType<typeof createUseInfinite>;
 
@@ -97,28 +84,20 @@ type TselectorProps<Tdata extends TapiData> = {
 
 type TuseNoMetaProps<
   P extends {
-    id?: boolean;
-    date?: boolean;
-    other?: boolean;
-  } = object
+    [key: string]: boolean;
+  } = { [key: string]: boolean }
 > = {
   // id?: P['id'] extends true ? string : undefined;
   // date?: P['date'] extends true ? string : undefined;
   // other?: P['other'] extends true ? { [key: string]: string | number | undefined } : undefined;
-  [K in keyof P]: P[K] extends true
-    ? K extends 'other'
-      ? { [key: string]: string | number | undefined }
-      : string
-    : undefined;
+  [K in keyof P]: P[K] extends true ? string | number | undefined : undefined;
 };
 
 // 期望的型別 : 當P為true時，useNoMetaProps為必選。實在不知道怎麼設阿
 type TselectorProps_simple<
   P extends {
-    id?: boolean;
-    date?: boolean;
-    other?: boolean;
-  } = object
+    [key: string]: boolean;
+  } = { [key: string]: boolean }
 > = {
   params?: Tparams;
   filter?: (searchStrArr: string[]) => Tparams['filter'];

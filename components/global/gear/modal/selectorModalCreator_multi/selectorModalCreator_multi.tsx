@@ -20,13 +20,12 @@ import scss from './selectorModalCreator_multi.module.scss';
 // api
 import { useGetOutsourcing, ToutsourcingDto } from 'js/api/api_outsourcing';
 import { useEmployee_infinite_2, TemployeeDto } from 'js/api/api_employee';
-import {
-  //  useGetDailyReports_items,
-  TdailyReportItem_my,
-  useGetDaily_worker_date,
-} from 'js/api/api_dailyReport';
+
 import { useDepartments } from 'js/api/api_department';
 import { useGetEngineeringContact_all, TengineeringContactDto } from 'js/api/api_engineering';
+
+// api useNoMeta // useNoMeta為api回應沒有meta特性的api hook
+import { TdailyReportItem_my, useGetDaily_worker_date } from 'js/api/api_dailyReport';
 
 // ======================================================================
 
@@ -71,8 +70,13 @@ type TselectorArr<TkeyArr extends (keyof TtypeLookup)[]> = {
 //     : TselectorProps_simple | undefined;
 // };
 
+type TkeyofDailyReport_workers_item = keyof Omit<
+  Exclude<Parameters<typeof useGetDaily_worker_date>[0], undefined>,
+  'params'
+>;
+
 type TuseNoMetaPropsInNeed = {
-  dailyReport_workers_item: { date: true };
+  dailyReport_workers_item: { [key in TkeyofDailyReport_workers_item]: true };
 };
 
 // 期望的型別 : 應為object而非array，index的型別為number所以被推斷為array，若為string就會是object了

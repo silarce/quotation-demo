@@ -22,6 +22,8 @@ import {
   TreviewerPresets,
 } from './dtoTypes';
 
+import type { TuseNoMeta } from './types';
+
 type TdailyReportItem_my = TdailyReportDto['items'][number] & {
   employee: TemployeeDto;
   employeeChName: string;
@@ -172,7 +174,7 @@ const apiDailyReport_worker_date = ({ params, date }: { params?: Tparams; date: 
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetDaily_worker_date = ({ params, date }: { params?: Tparams; date?: string } = {}) => {
+export const useGetDaily_worker_date: TuseNoMeta = ({ params, date }: { params?: Tparams; date?: string } = {}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [res, setRes] = useState<TdailyReportItem_my[]>();
 
