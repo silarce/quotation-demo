@@ -1,0 +1,20 @@
+.antdModal {
+  :global(.ant-modal-body) {
+    padding: 0;
+  }
+}
+
+.body {
+  padding: 30px;
+}
+
+.inpurSelContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 50px;
+}
+
+.textarea {
+  border: solid 1px theme("colors.border");
+  padding: 10px;
+}
