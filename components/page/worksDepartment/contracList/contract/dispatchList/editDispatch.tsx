@@ -46,7 +46,7 @@ const SelectGroup = selectModalCreator_multi<['dailyReport_workers_item']>({
   selectorArr: [
     {
       key: 'dailyReport_workers_item',
-      tip: '請先選擇派工日期',
+      tip: '請先選擇派工日期與派工日期',
     },
   ],
 });
@@ -56,10 +56,12 @@ export default function EditDispatch({
   controll,
   disabled,
   dispatchDate,
+  workerIdArr,
 }: {
   controll: Tcontroll;
   disabled?: boolean;
   dispatchDate: string | undefined;
+  workerIdArr?: string[];
 }) {
   const [showSelector, setShowSelector] = useState(false);
 
@@ -200,7 +202,20 @@ export default function EditDispatch({
         onCancel={() => setShowSelector(false)}
         dynaSelectorPropsList={[
           {
-            useNoMetaProps: { date: dispatchDate || '9999-01-01' },
+            caption: '工務人員日報表回報',
+            useNoMetaProps: {
+              date: dispatchDate || '9999-01-01',
+            },
+            filter_clientSide: (data, searchArr) => {
+              const id = data.employee.id;
+
+              let result = true;
+
+              result = !!workerIdArr?.includes(id);
+              result = data.employee.chName.includes(searchArr[0]);
+
+              return result;
+            },
           },
         ]}
       />

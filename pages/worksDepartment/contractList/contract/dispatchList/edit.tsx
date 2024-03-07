@@ -88,6 +88,8 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
+  const workerIdArr = state_profile.workerEmployee.map((employee) => employee.id);
+
   const { todoForDispatch } = useMemo(() => {
     let todoForDispatch: TtodoDto | null = null;
 
@@ -201,7 +203,7 @@ export default function EditDispatchList() {
       return myAlert.info({ title: '沒有合約ID' });
     }
 
-    const workerId = state_profile.workerEmployee.map((employee) => employee.id);
+    const workerId = workerIdArr;
 
     if (!state_profile.dispatchDate) {
       return myAlert.info({ title: '請選擇派工日期' });
@@ -472,6 +474,7 @@ export default function EditDispatchList() {
         <EditDispatch
           controll={controll_editDispatch}
           disabled={theDiasbled}
+          workerIdArr={workerIdArr}
           dispatchDate={
             state_profile.dispatchDate ? moment(state_profile.dispatchDate).format('YYYY-MM-DD') : undefined
           }
