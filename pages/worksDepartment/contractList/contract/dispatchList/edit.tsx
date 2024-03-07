@@ -70,6 +70,7 @@ export default function EditDispatchList() {
     tasks: string;
     note: string;
     pricingMethod: string;
+    isCompleted: boolean;
   }>();
 
   // ---------------------------------------------------------
@@ -161,6 +162,18 @@ export default function EditDispatchList() {
         });
       },
     },
+    isCompleted: {
+      value: state_dispatch?.isCompleted ?? false,
+      onChange: (bool) => {
+        setState_dispatch((state) => {
+          if (!state) {
+            return state;
+          }
+
+          return { ...state, isCompleted: bool };
+        });
+      },
+    },
   };
 
   // ---------------------------------------------------------
@@ -212,7 +225,7 @@ export default function EditDispatchList() {
       tasks: state_dispatch.tasks,
       pricingMethod: state_dispatch.pricingMethod,
       note: state_dispatch.note || null,
-      isCompleted: false,
+      isCompleted: state_dispatch.isCompleted,
     };
 
     try {
@@ -305,6 +318,7 @@ export default function EditDispatchList() {
       // todoList,
       // isCompleted,
       warrantyDate,
+      isCompleted,
       // constructionSiteContactNumber: projectNumber,
     } = dispatching ?? {};
 
@@ -327,6 +341,7 @@ export default function EditDispatchList() {
       tasks: tasks ?? todoForDispatch?.content ?? '',
       note: note ?? '',
       pricingMethod: pricingMethod ?? '',
+      isCompleted: !!isCompleted,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engineeringContact, dispatching, disabled, todoForDispatch]);

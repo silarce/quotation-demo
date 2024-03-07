@@ -10,6 +10,7 @@ import {
   selectModalCreator_multi,
   TdailyReportItem_my,
 } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // css
 import scss from './dispatchList.module.scss';
@@ -31,6 +32,10 @@ type Tcontroll = {
   tasks: Tcontroll_item;
   note: Tcontroll_item;
   pricingMethod: TpricingMethodControll;
+  isCompleted: {
+    value: boolean;
+    onChange: (v: boolean) => void;
+  };
 };
 
 export type { Tcontroll, TpricingMethodControll };
@@ -165,6 +170,27 @@ export default function EditDispatch({
         value={note.value}
         onChange={(e) => note.onChange(e.target.value)}
       />
+      <div className=" w-fit m-auto mt-5 mr-0">
+        <InputSel
+          showBaseline="invisible"
+          disabled={disabled}
+          fontColor="active"
+          checkBoxProps={{
+            onChange: (arr) => {
+              const isCompleted = arr.includes('isCompleted');
+              controll.isCompleted.onChange(isCompleted);
+            },
+            propsArr: [
+              {
+                //
+                key: 'isCompleted',
+                value: controll.isCompleted.value,
+                label: '完工',
+              },
+            ],
+          }}
+        />
+      </div>
 
       <SelectGroup
         showModal={showSelector}
