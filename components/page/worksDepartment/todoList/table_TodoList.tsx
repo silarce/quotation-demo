@@ -95,7 +95,7 @@ export default function Table_todoList({
       const engineeringContactId = todo.engineeringContactId;
       const contractId = todo.engineeringContact?.contract?.id;
 
-      if (todo.isAlreadyDisPatching) {
+      if (todo.isAlreadyDispatching) {
         return;
       }
 

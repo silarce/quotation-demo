@@ -26,7 +26,7 @@ import {
   useGetEngineeringContact,
 } from 'js/api/api_engineering';
 import { useGetContract_id } from 'js/api/api_quotation';
-import { apiPatchTodo } from 'js/api/api_todo';
+import { TupdateTodoDto, apiPatchTodo } from 'js/api/api_todo';
 
 // css
 import scss from './edit.module.scss';
@@ -255,9 +255,9 @@ export default function EditDispatchList() {
       setDisabled(true);
 
       if (todoForDispatch && todoForDispatch.engineeringContactId) {
-        const body = [
+        const body: TupdateTodoDto[] = [
           {
-            isAlreadyDisPatching: true,
+            isAlreadyDispatching: true,
             id: todoForDispatch.id,
           },
         ];

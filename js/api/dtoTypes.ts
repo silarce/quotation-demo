@@ -3150,7 +3150,7 @@ export type TtodoDto<P extends Tpopulate_todoDto = Partial<Tpopulate_todoDto>> =
   // 內容
   content: string;
   // 是否已派工
-  isAlreadyDisPatching: boolean;
+  isAlreadyDispatching: boolean;
   // 經辦人Id
   agentEmployeeId: string | null;
   // 經辦人
@@ -3182,6 +3182,7 @@ export type TcreateTodoDto = {
 // };
 export type TupdateTodoDto = Partial<TcreateTodoDto> & {
   id: string;
+  isAlreadyDispatching?: boolean;
 };
 
 // =============================================================================
