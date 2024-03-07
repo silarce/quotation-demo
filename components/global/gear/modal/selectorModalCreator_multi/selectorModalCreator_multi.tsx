@@ -83,7 +83,7 @@ type TuseNoMetaPropsInNeed = {
 // 另外若為string，TkeyArr[index]的型別就會錯誤。
 type TdynaSelectorPropsList<TkeyArr extends (keyof TtypeLookup)[]> = {
   [index in keyof TkeyArr]: TkeyArr[index] extends keyof TuseNoMetaPropsInNeed
-    ? TselectorProps_simple<TuseNoMetaPropsInNeed[TkeyArr[index]]>
+    ? TselectorProps_simple<TuseNoMetaPropsInNeed[TkeyArr[index]], TtypeLookup[TkeyArr[index]]>
     : TselectorProps_simple | undefined;
 };
 
@@ -237,6 +237,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
             dynaProps?.caption && (props.caption = dynaProps.caption);
             dynaProps?.tip && (props.tip = dynaProps.tip);
             dynaProps?.useNoMetaProps && (props.useNoMetaProps = dynaProps.useNoMetaProps);
+            dynaProps?.filter_clientSide && (props.filter_clientSide = dynaProps.filter_clientSide);
 
             //
 
@@ -505,6 +506,7 @@ const props_employee: TselectorProps<TemployeeDto> = {
 
 const props_employee_worksDepartment: TselectorProps<TemployeeDto> = {
   ...props_employee,
+
   searchInputSelPropsArr: [
     {
       wrapperStyle: { width: 150 },
@@ -530,7 +532,10 @@ const props_employee_worksDepartment: TselectorProps<TemployeeDto> = {
   },
 };
 
-const props_dailyReport_workers_item: TselectorProps<TdailyReportItem_my> = {
+const props_dailyReport_workers_item: TselectorProps<
+  TdailyReportItem_my,
+  TuseNoMetaPropsInNeed['dailyReport_workers_item']
+> = {
   useNoMeta: useGetDaily_worker_date,
   selectedKey: 'description',
   caption: '日報表回報',
@@ -576,7 +581,7 @@ const props_dailyReport_workers_item: TselectorProps<TdailyReportItem_my> = {
     },
   ],
 
-  filter_client: (data, searchStrArr) => {
+  filter_clientSide: (data, searchStrArr) => {
     const name = searchStrArr[0]?.trim();
 
     const { chName, enName } = data.employee;

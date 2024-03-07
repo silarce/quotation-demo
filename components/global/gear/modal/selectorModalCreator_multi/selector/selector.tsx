@@ -50,7 +50,7 @@ type TimperativeHandle = {
 
 type TsearchInputSelProps = TsearcbBarProps['inputSelPropsArr'][number];
 
-type TselectorProps<Tdata extends TapiData> = {
+type TselectorProps<Tdata extends TapiData, P extends { [key: string]: boolean } = { [key: string]: boolean }> = {
   useInfinit?: TuseInfinite;
   useNoMeta?: TuseNoMeta;
   configArr: readonly Tconfig[];
@@ -74,8 +74,9 @@ type TselectorProps<Tdata extends TapiData> = {
   // filter?: (searchStrArr: string[]) => Tparams['filter'];
   // filter_extends?: (searchStrArr: string[]) => Tparams['filter'];
   //
-  filter_client?: (data: Tdata, searchStrArr: string[]) => boolean;
-} & TselectorProps_simple;
+  // filter_client?: (data: Tdata, searchStrArr: string[]) => boolean;
+} & TselectorProps_simple<{ [key: string]: boolean }, Tdata>;
+// } & TselectorProps_simple<{ [key: string]: boolean }, Tdata>;
 
 // type TselectorProps_dyna<Tdata extends TapiData> = Pick<
 //   TselectorProps<Tdata>,
@@ -97,7 +98,8 @@ type TuseNoMetaProps<
 type TselectorProps_simple<
   P extends {
     [key: string]: boolean;
-  } = { [key: string]: boolean }
+  } = { [key: string]: boolean },
+  Tdata extends TapiData = TapiData
 > = {
   params?: Tparams;
   filter?: (searchStrArr: string[]) => Tparams['filter'];
@@ -105,6 +107,8 @@ type TselectorProps_simple<
   tip?: string | null;
   filter_extends?: (searchStrArr: string[]) => Tparams['filter'];
   searchInputSelPropsArr?: TsearchInputSelProps[];
+  // 返回true為通過，要顯示
+  filter_clientSide?: (data: Tdata, searchStrArr: string[]) => boolean;
 
   useNoMetaProps?: TuseNoMetaProps<P>;
 };
@@ -141,7 +145,7 @@ export function Selector_component<Tdata extends TapiData>(
     forbiddenCheck_dataList,
     //
     useNoMetaProps,
-    filter_client,
+    filter_clientSide,
   } = props;
 
   const [selectedList, setSelectedList] = useState<{ [id: string]: Tdata }>({});
@@ -186,6 +190,21 @@ export function Selector_component<Tdata extends TapiData>(
     update: update_noMeta,
   } = useNoMeta?.({ params, ...useNoMetaProps }) ?? {};
 
+  // --------------------------------
+
+  const theDataArr = useMemo(() => {
+    let arr = dataArr ?? dataArr_noMeta ?? [];
+
+    if (filter_clientSide) {
+      arr = arr.filter((data) => {
+        return filter_clientSide(data, searchStrArr);
+      });
+    }
+
+    return arr;
+  }, [dataArr, dataArr_noMeta, filter_clientSide]);
+
+  // --------------------------------------
   // ----------------------------------------------------------------------
 
   const onRowClick = (data: Tdata) => {
@@ -290,18 +309,11 @@ export function Selector_component<Tdata extends TapiData>(
         <DataList_top searcbBarProps={searcbBarProps} caption={caption} tip={tip} />
         <DataList_table<Tdata>
           configArr={configArr}
-          dataArr={dataArr ?? dataArr_noMeta ?? []}
+          dataArr={theDataArr}
           onRowClick={onRowClick}
           selectedList={selectedList}
           viewRef_bottom={viewRef_bottom}
           forbiddenCheck={forbiddenCheck_dataList}
-          filter_client={(data) => {
-            if (filter_client) {
-              return filter_client(data, searchStrArr);
-            }
-
-            return true;
-          }}
         />
       </DataList>
       {/*  */}
@@ -365,7 +377,6 @@ function DataList_table<Tdata extends TapiData>({
   selectedList,
   viewRef_bottom,
   forbiddenCheck,
-  filter_client,
 }: {
   configArr: readonly Tconfig[];
   dataArr: Tdata[];
@@ -373,7 +384,6 @@ function DataList_table<Tdata extends TapiData>({
   selectedList: { [id: string]: Tdata };
   viewRef_bottom?: (node?: Element | null | undefined) => void;
   forbiddenCheck?: (data: Tdata) => boolean;
-  filter_client?: (data: Tdata) => boolean;
 }) {
   return (
     <div className={scss.table}>
@@ -405,19 +415,13 @@ function DataList_table<Tdata extends TapiData>({
         {dataArr.map((apiData, index) => {
           const isActive = selectedList[apiData.id] ? true : false;
 
-          const theViewRef_bottom = dataArr.length - 5 === index ? viewRef_bottom : undefined;
+          let theViewRef_bottom = dataArr.length - 5 === index ? viewRef_bottom : undefined;
+
+          if (dataArr.length < 5 && index === 0) {
+            theViewRef_bottom = viewRef_bottom;
+          }
 
           const isForbidden = forbiddenCheck && forbiddenCheck(apiData);
-
-          let isSkip = false;
-
-          if (filter_client) {
-            isSkip = !filter_client(apiData);
-          }
-
-          if (isSkip) {
-            return null;
-          }
 
           return (
             <DataList_table_row<Tdata>
