@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import moment from 'moment';
+import classNames from 'classnames';
 
 // antd
 import { Radio } from 'antd';
@@ -114,7 +115,13 @@ export default function EditDispatch({
       <div className={scss.handlingMatters}>
         <div className={scss.subTitle}>
           <span>工作內容 : </span>
-          <MyButton_v2 label="請選擇工務人員日報表" px="px22" py="py4" onClick={() => setShowSelector(true)} />
+          <MyButton_v2
+            className={classNames(disabled && 'cursor-not-allowed')}
+            label="請選擇工務人員日報表"
+            px="px22"
+            py="py4"
+            onClick={() => !disabled && setShowSelector(true)}
+          />
         </div>
         <textarea
           disabled={disabled}

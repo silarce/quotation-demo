@@ -119,6 +119,7 @@
 .info {
   display: grid;
   grid-template-columns: auto 200px 200px 230px 230px;
+  align-items: flex-end;
 
   > div {
     @extend .cell;
@@ -142,12 +143,11 @@
     border: 0;
     &:nth-of-type(1) {
       display: grid;
-
       align-items: flex-start;
-      justify-content: center;
       border-right: 0;
       > span {
-        font-size: 18px;
+        font-size: 20px;
+        font-weight: 500;
         color: theme("colors.main");
       }
     }

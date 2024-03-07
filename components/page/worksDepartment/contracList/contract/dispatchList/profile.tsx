@@ -132,6 +132,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
         />
         <InputSel
           caption="承包商聯絡人"
+          disabled={disabled}
           {...config_inputSel}
           inputProps={{
             props: {
@@ -151,6 +152,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
         /> */}
         <InputSel
           caption="工地電話"
+          disabled={disabled}
           {...config_inputSel}
           inputProps={{
             props: {
@@ -171,6 +173,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
         />
         <InputSel
           caption="完工聯絡人"
+          disabled={disabled}
           {...config_inputSel}
           inputProps={{
             props: {
@@ -184,11 +187,13 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           inputSelProps={{
             className: 'col-span-2',
             caption: '地址',
+            disabled: disabled,
             ...config_inputSel,
           }}
           addressProps={{
             county: {
               props: {
+                isDisabled: disabled,
                 value: { label: control.county.value, value: control.county.value },
                 onChange: (option) => {
                   control.county.onChange(option?.value || '');
@@ -197,6 +202,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             },
             district: {
               props: {
+                isDisabled: disabled,
                 value: { label: control.district.value, value: control.district.value },
                 onChange: (option) => {
                   control.district.onChange(option?.value || '');
@@ -205,6 +211,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             },
             address: {
               props: {
+                disabled: disabled,
                 value: control.address.value,
                 onChange: (e) => {
                   control.address.onChange(e);
