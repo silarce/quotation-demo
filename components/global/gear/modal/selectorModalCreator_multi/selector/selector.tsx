@@ -15,6 +15,7 @@ import scss from './selector.module.scss';
 
 // type
 import { createUseInfinite, Tparams } from 'js/api/createUseInfinite';
+import { TuseNoMeta } from 'js/api/types';
 
 // ==============================================================================
 
@@ -49,8 +50,9 @@ type TimperativeHandle = {
 
 type TsearchInputSelProps = TsearcbBarProps['inputSelPropsArr'][number];
 
-type TselectorProps<Tdata extends TapiData> = {
-  useInfinit: TuseInfinite;
+type TselectorProps<Tdata extends TapiData, P extends { [key: string]: boolean } = { [key: string]: boolean }> = {
+  useInfinit?: TuseInfinite;
+  useNoMeta?: TuseNoMeta;
   configArr: readonly Tconfig[];
   selectedKey: keyof Tdata;
   onRowClick?: (props: { data: Tdata; isRemove: boolean }) => void;
@@ -71,20 +73,44 @@ type TselectorProps<Tdata extends TapiData> = {
   // searchInputSelPropsArr?: TsearchInputSelProps[];
   // filter?: (searchStrArr: string[]) => Tparams['filter'];
   // filter_extends?: (searchStrArr: string[]) => Tparams['filter'];
-} & TselectorProps_simple;
+  //
+  // filter_client?: (data: Tdata, searchStrArr: string[]) => boolean;
+} & TselectorProps_simple<{ [key: string]: boolean }, Tdata>;
+// } & TselectorProps_simple<{ [key: string]: boolean }, Tdata>;
 
 // type TselectorProps_dyna<Tdata extends TapiData> = Pick<
 //   TselectorProps<Tdata>,
 //   'params' | 'filter' | 'caption' | 'tip' | 'filter' | 'filter_extends' | 'searchInputSelPropsArr'
 // >;
 
-type TselectorProps_simple = {
+type TuseNoMetaProps<
+  P extends {
+    [key: string]: boolean;
+  } = { [key: string]: boolean }
+> = {
+  // id?: P['id'] extends true ? string : undefined;
+  // date?: P['date'] extends true ? string : undefined;
+  // other?: P['other'] extends true ? { [key: string]: string | number | undefined } : undefined;
+  [K in keyof P]: P[K] extends true ? string | number | undefined : undefined;
+};
+
+// 期望的型別 : 當P為true時，useNoMetaProps為必選。實在不知道怎麼設阿
+type TselectorProps_simple<
+  P extends {
+    [key: string]: boolean;
+  } = { [key: string]: boolean },
+  Tdata extends TapiData = TapiData
+> = {
   params?: Tparams;
   filter?: (searchStrArr: string[]) => Tparams['filter'];
   caption?: string | null;
   tip?: string | null;
   filter_extends?: (searchStrArr: string[]) => Tparams['filter'];
   searchInputSelPropsArr?: TsearchInputSelProps[];
+  // 返回true為通過，要顯示
+  filter_clientSide?: (data: Tdata, searchStrArr: string[]) => boolean;
+
+  useNoMetaProps?: TuseNoMetaProps<P>;
 };
 
 export type { TimperativeHandle, TsearchInputSelProps, TselectorProps, TselectorProps_simple };
@@ -103,6 +129,7 @@ export function Selector_component<Tdata extends TapiData>(
   const {
     //
     useInfinit,
+    useNoMeta,
     configArr,
     selectedKey,
     params: params_out,
@@ -116,6 +143,9 @@ export function Selector_component<Tdata extends TapiData>(
     onStateChange,
     limit,
     forbiddenCheck_dataList,
+    //
+    useNoMetaProps,
+    filter_clientSide,
   } = props;
 
   const [selectedList, setSelectedList] = useState<{ [id: string]: Tdata }>({});
@@ -152,8 +182,31 @@ export function Selector_component<Tdata extends TapiData>(
     // init,
     reset,
     // nextPage,
-  } = useInfinit({ customParams: params });
+  } = useInfinit?.({ customParams: params }) ?? {};
 
+  const {
+    data: dataArr_noMeta,
+    // isLoading: isLoading_noMeta,
+    update: update_noMeta,
+  } = useNoMeta?.({ params, ...useNoMetaProps }) ?? {};
+
+  // --------------------------------
+
+  const theDataArr = useMemo(() => {
+    let arr = dataArr ?? dataArr_noMeta ?? [];
+
+    if (filter_clientSide) {
+      arr = arr.filter((data) => {
+        return filter_clientSide(data, searchStrArr);
+      });
+    }
+
+    return arr;
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataArr, dataArr_noMeta, searchStrArr, filter_clientSide]);
+
+  // --------------------------------------
   // ----------------------------------------------------------------------
 
   const onRowClick = (data: Tdata) => {
@@ -215,8 +268,9 @@ export function Selector_component<Tdata extends TapiData>(
   // ----------------------------------------------------------------------
 
   useEffect(() => {
-    reset();
-  }, [filter]);
+    reset && reset();
+    update_noMeta && update_noMeta();
+  }, [filter, useNoMetaProps]);
 
   useEffect(() => {
     // defaultSelectedArr
@@ -257,7 +311,7 @@ export function Selector_component<Tdata extends TapiData>(
         <DataList_top searcbBarProps={searcbBarProps} caption={caption} tip={tip} />
         <DataList_table<Tdata>
           configArr={configArr}
-          dataArr={dataArr}
+          dataArr={theDataArr}
           onRowClick={onRowClick}
           selectedList={selectedList}
           viewRef_bottom={viewRef_bottom}
@@ -363,7 +417,11 @@ function DataList_table<Tdata extends TapiData>({
         {dataArr.map((apiData, index) => {
           const isActive = selectedList[apiData.id] ? true : false;
 
-          const theViewRef_bottom = dataArr.length - 5 === index ? viewRef_bottom : undefined;
+          let theViewRef_bottom = dataArr.length - 5 === index ? viewRef_bottom : undefined;
+
+          if (dataArr.length < 5 && index === 0) {
+            theViewRef_bottom = viewRef_bottom;
+          }
 
           const isForbidden = forbiddenCheck && forbiddenCheck(apiData);
 

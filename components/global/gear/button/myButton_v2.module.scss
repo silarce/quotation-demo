@@ -10,6 +10,10 @@
     border: solid 1px $colorBorder01;
     background-color: $hoverBgc01;
   }
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px $colorBorder01;
+  }
   @media (max-width: 1440px) {
     padding: 10px 20px;
   }

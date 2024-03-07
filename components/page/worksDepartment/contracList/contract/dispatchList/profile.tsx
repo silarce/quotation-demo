@@ -1,53 +1,84 @@
 import { useState } from 'react';
 import classNames from 'classnames';
+import moment, { Moment } from 'moment';
 
 // global gear
-import InputSel from 'components/global/gear/inputAndSel/inputSel';
-import EmployeeSelector, { TemployeeDto } from 'components/global/gear/modal/employeeSelector';
+// import InputSel from 'components/global/gear/inputAndSel/inputSel';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import AddressBar, {
+  TinputSelProps_noProps,
+  TaddressProps,
+} from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+
+import {
+  selectModalCreator_multi,
+  TemployeeDto,
+} from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // css
-import style from './dispatchList.module.scss';
-
-type Tprofile01 = {
-  projectName: string;
-  contractor: string;
-  contractorContactPerson: string;
-  constructionSiteContactNumber: string;
-  allAddress: string;
-  projectNumber: string;
-  badgeNumber: string;
-};
-
-type Tprofile02 = {
-  dispatchDate: string;
-  // workerName: string;
-  finalContactPerson: string;
-};
-
-type Tprofile03 = {
-  workerEmployee: TemployeeDto | undefined;
-};
-
-export type { Tprofile01, Tprofile02, Tprofile03 };
+import scss from './profile.module.scss';
 
 // ============================================================================
-export default function Profile({
-  profile01,
-  onProfile01Change,
-  profile02,
-  onProfile02Change,
-  profile03,
-  onProfile03Change,
-  disabled,
-}: {
-  profile01: Tprofile01 | undefined;
-  onProfile01Change: (key: keyof Tprofile01, v: string) => void;
-  profile02?: Tprofile02;
-  onProfile02Change?: (key: keyof Tprofile02, v: string) => void;
-  profile03?: Tprofile03;
-  onProfile03Change?: (key: keyof Tprofile03, v: TemployeeDto) => void;
+type TcontrolItem = {
+  value: string;
   disabled?: boolean;
-}) {
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+};
+
+type TcontrolItem_str = {
+  value: string;
+  disabled?: boolean;
+  onChange: (str: string) => void;
+};
+
+type TcontrolItem_moment = {
+  value: Moment | null;
+  disabled?: boolean;
+  onChange: (e: Moment | null) => void;
+};
+
+type Tcontrol = {
+  // 派工日期
+  dispatchDate: TcontrolItem_moment;
+  // 工務人員
+  workerEmployee: {
+    value: TemployeeDto[];
+    onChange: (arr: TemployeeDto[]) => void;
+  };
+  projectName: string;
+  projectNumber: string;
+  // 承包商
+  contractor: string;
+  // 承包商聯絡人
+  contractorContactPerson: TcontrolItem;
+  // allAddress: string;
+  county: TcontrolItem_str;
+  district: TcontrolItem_str;
+  address: TcontrolItem;
+  // 工地電話
+  constructionSiteContactNumber: TcontrolItem;
+  // 保固日期
+  warrantyDate: string;
+  // 完工聯絡人
+  finalContactPerson: TcontrolItem;
+};
+
+export type { Tcontrol as Tcontrol_profile };
+
+// ============================================================================
+
+const SelectorGroup = selectModalCreator_multi<['employee_worksDepartment']>({
+  selectorArr: [
+    {
+      key: 'employee_worksDepartment',
+      caption: '工務人員',
+      tip: '只有列出工務部人員。複選',
+    },
+  ],
+});
+
+// ============================================================================
+export default function Profile({ control, disabled }: { control: Tcontrol; disabled?: boolean }) {
   // ------------------------------------------------
 
   const [showSelector, setShowSelector] = useState(false);
@@ -55,230 +86,181 @@ export default function Profile({
   // ------------------------------------------------
 
   return (
-    <div className={style.profile}>
-      {/* left */}
-      <div className={style.left}>
-        {profile02 && (
-          <InputSel
-            disabled={disabled}
-            // className={`${style.input02}`}
-            className={classNames(style.input02)}
-            datePickerProps={{
-              datePickerClassName: style.datePicker,
-              value: profile02.dispatchDate ?? '',
-              onChange02: (m) => {
-                onProfile02Change?.('dispatchDate', m?.toISOString() ?? '');
-              },
-            }}
-            label={'派工日期'}
-            width={'255px'}
-            captionWidth={'80px'}
-            gap={'24px'}
-            captionClassName={style.caption}
-            captionColor="main"
-          />
-        )}
-
-        {indexKeys01.map((key, index) => {
-          const value = profile01?.[key] ?? '';
-          const { label, labelWidth, disabled: disabled_2, showBaseline } = config[key];
-
-          const onChange = (v: string) => {
-            onProfile01Change(key, v);
-          };
-
-          return (
-            <InputSel
-              className={`${style.input02}`}
-              key={index}
-              inputProps={{ value, onChange }}
-              label={label}
-              captionWidth={labelWidth}
-              captionColor="main"
-              gap={'24px'}
-              disabled={disabled || disabled_2}
-              // showBaseline="invisible"
-              showBaseline={showBaseline ?? 'invisible'}
-            />
-          );
-        })}
-      </div>
-
-      {/* right */}
-      <div className={style.right}>
-        {indexKeys02.map((key, index) => {
-          const value = profile01?.[key] ?? '';
-          const { label, labelWidth } = config[key];
-
-          const onChange = (v: string) => {
-            onProfile01Change(key, v);
-          };
-
-          // let styleShowUnderline = '';
-
-          // if (key === 'projectNumber') {
-          //   styleShowUnderline = style.showUnderline;
-          // }
-
-          // if (key === 'badgeNumber' && !isAdd) {
-          //   styleShowUnderline = style.showUnderline;
-          // }
-
-          // const className = `${style.input02} ${styleShowUnderline}`;
-          const className = `${style.input02}`;
-
-          return (
-            <InputSel
-              className={className}
-              key={index}
-              disabled={disabled}
-              inputProps={{ value, onChange }}
-              label={label}
-              captionWidth={labelWidth}
-              captionColor="main"
-              gap={'24px'}
-              // disabled={styleShowUnderline ? true : false}
-            />
-          );
-        })}
+    <div className={scss.profile}>
+      <div className={scss.info}>
+        <InputSel
+          caption="派工日期"
+          disabled={disabled}
+          {...config_inputSel}
+          datePickerProps={{
+            props: {
+              value: control.dispatchDate.value,
+              onChange: control.dispatchDate.onChange,
+            },
+          }}
+        />
+        <InputSel
+          caption="工程名稱"
+          {...config_inputSel_readOnly}
+          disabled={true}
+          inputProps={{
+            props: {
+              placeholder: '工程名稱',
+              defaultValue: control.projectName,
+            },
+          }}
+        />
+        <InputSel
+          caption="工程編號"
+          {...config_inputSel_readOnly}
+          inputProps={{
+            props: {
+              placeholder: '工程編號',
+              defaultValue: control.projectNumber,
+            },
+          }}
+        />
+        <InputSel
+          caption="承包商"
+          {...config_inputSel_readOnly}
+          inputProps={{
+            props: {
+              placeholder: '承包商',
+              defaultValue: control.contractor,
+            },
+          }}
+        />
+        <InputSel
+          caption="承包商聯絡人"
+          disabled={disabled}
+          {...config_inputSel}
+          inputProps={{
+            props: {
+              value: control.contractorContactPerson.value,
+              onChange: control.contractorContactPerson.onChange,
+            },
+          }}
+        />
+        {/* <InputSel
+          caption="地址"
+          {...config_inputSel_readOnly}
+          inputProps={{
+            props: {
+              defaultValue: control.allAddress,
+            },
+          }}
+        /> */}
+        <InputSel
+          caption="工地電話"
+          disabled={disabled}
+          {...config_inputSel}
+          inputProps={{
+            props: {
+              value: control.constructionSiteContactNumber.value,
+              onChange: control.constructionSiteContactNumber.onChange,
+            },
+          }}
+        />
+        <InputSel
+          caption="保固日期"
+          {...config_inputSel_readOnly}
+          inputProps={{
+            props: {
+              placeholder: '建立後系統自動設定',
+              defaultValue: control.warrantyDate,
+            },
+          }}
+        />
+        <InputSel
+          caption="完工聯絡人"
+          disabled={disabled}
+          {...config_inputSel}
+          inputProps={{
+            props: {
+              value: control.finalContactPerson.value,
+              onChange: control.finalContactPerson.onChange,
+            },
+          }}
+        />
         {/*  */}
-
-        {profile03 && (
-          <div
-            onClick={() => {
-              if (!disabled) {
-                setShowSelector(true);
-              }
-            }}
-          >
-            <InputSel
-              disabled={disabled}
-              className={`${style.input02}`}
-              inputProps={{
-                value: profile03?.workerEmployee?.chName ?? '',
-                // onChange: (v) => {
-                //   onProfile02Change?.('workerName', v);
-                // },
-              }}
-              label={'工務人員'}
-              captionWidth={'100px'}
-              captionColor="main"
-              gap={'24px'}
-            />
-          </div>
-        )}
-
-        {profile02 && (
-          <InputSel
-            className={`${style.input02}`}
-            disabled={disabled}
-            inputProps={{
-              value: profile02?.finalContactPerson ?? '',
-              onChange: (v) => {
-                onProfile02Change?.('finalContactPerson', v);
+        <AddressBar
+          inputSelProps={{
+            className: 'col-span-2',
+            caption: '地址',
+            disabled: disabled,
+            ...config_inputSel,
+          }}
+          addressProps={{
+            county: {
+              props: {
+                isDisabled: disabled,
+                value: { label: control.county.value, value: control.county.value },
+                onChange: (option) => {
+                  control.county.onChange(option?.value || '');
+                },
               },
-            }}
-            label={'完工聯絡人'}
-            captionWidth={'100px'}
-            captionColor="main"
-            gap={'24px'}
-          />
-        )}
+            },
+            district: {
+              props: {
+                isDisabled: disabled,
+                value: { label: control.district.value, value: control.district.value },
+                onChange: (option) => {
+                  control.district.onChange(option?.value || '');
+                },
+              },
+            },
+            address: {
+              props: {
+                disabled: disabled,
+                value: control.address.value,
+                onChange: (e) => {
+                  control.address.onChange(e);
+                },
+              },
+            },
+          }}
+        />
+        <InputSel
+          caption="工務人員"
+          {...config_inputSel}
+          className="col-span-2"
+          disabled={disabled}
+          onClick={() => !disabled && setShowSelector(true)}
+          textareaProps={{
+            props: {
+              value: control.workerEmployee.value.map((item) => item.chName || item.enName).join(', '),
+            },
+          }}
+        />
       </div>
 
-      <EmployeeSelector
+      <SelectorGroup
         showModal={showSelector}
-        selLimit={1}
         onConfirm={(arr) => {
-          onProfile03Change?.('workerEmployee', arr[0]);
+          const employeeArr = arr[0];
+          control.workerEmployee.onChange(employeeArr);
         }}
         onCancel={() => {
           setShowSelector(false);
         }}
+        defaultSeletedDataArrArr={[control.workerEmployee.value]}
       />
     </div>
   );
 }
 // ============================================================
 
-type TindexKey01 = keyof Pick<
-  Tprofile01,
-  'projectName' | 'contractor' | 'contractorContactPerson' | 'constructionSiteContactNumber' | 'allAddress'
->;
-type TindexKey02 = keyof Pick<Tprofile01, 'projectNumber' | 'badgeNumber'>;
-// type TindexKey03 = keyof Pick<Tprofile02, 'workerName' | 'finalContact'>;
-
-const indexKeys01: TindexKey01[] = [
-  'projectName',
-  'contractor',
-  'contractorContactPerson',
-  'constructionSiteContactNumber',
-  'allAddress',
-];
-const indexKeys02: TindexKey02[] = [
-  'projectNumber',
-  // 'badgeNumber'
-];
-// const indexKeys03: TindexKey03[] = ['workerName', 'finalContact'];
-
-type Tconfig<keys extends string> = {
-  [key in keys]: {
-    label: string;
-    labelWidth: string;
-    disabled?: boolean;
-    showBaseline?: 'invisible' | 'auto';
-  };
+const config_inputSel: TinputSelProps = {
+  captionColor: 'main',
+  captionStyle: { width: 120 },
+  showBaseline: 'auto',
 };
 
-const config: Tconfig<
-  TindexKey01 | TindexKey02
-  // | TindexKey03
-> = {
-  projectName: {
-    label: '工程名稱',
-    labelWidth: '80px',
-    disabled: true,
-  },
-  contractor: {
-    label: '承包商',
-    labelWidth: '80px',
-    showBaseline: 'auto',
-    // disabled: true,
-  },
-  contractorContactPerson: {
-    label: '聯絡人',
-    labelWidth: '80px',
-    showBaseline: 'auto',
-  },
-  constructionSiteContactNumber: {
-    label: '工地電話',
-    labelWidth: '80px',
-    showBaseline: 'auto',
-    // disabled: true,
-  },
-  allAddress: {
-    label: '工程地點',
-    labelWidth: '80px',
-    disabled: true,
-  },
-  // TindexKey02
-  projectNumber: {
-    label: '工程編號',
-    labelWidth: '100px',
-  },
-  badgeNumber: {
-    label: '管制卡編號',
-    labelWidth: '100px',
-  },
-  // TindexKey03
-  // workerName: {
-  //   label: '工務人員',
-  //   labelWidth: '100px',
-  // },
-  // finalContact: {
-  //   label: '完工聯絡人',
-  //   labelWidth: '100px',
-  // },
+const config_inputSel_readOnly: TinputSelProps = {
+  captionColor: 'main',
+  captionStyle: { width: 120 },
+  showBaseline: 'invisible',
+  disabled: true,
 };
 
 // ==========================================

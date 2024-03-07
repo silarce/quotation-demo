@@ -1,11 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
+import moment from 'moment';
+import classNames from 'classnames';
 
 // antd
 import { Radio } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 
+// gear
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import {
+  selectModalCreator_multi,
+  TdailyReportItem_my,
+} from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+
 // css
-import style from './dispatchList.module.scss';
+import scss from './dispatchList.module.scss';
 
 // ----------------------------------------------------------
 type Tcontroll_item = {
@@ -24,12 +34,44 @@ type Tcontroll = {
   tasks: Tcontroll_item;
   note: Tcontroll_item;
   pricingMethod: TpricingMethodControll;
+  isCompleted: {
+    value: boolean;
+    onChange: (v: boolean) => void;
+  };
 };
 
 export type { Tcontroll, TpricingMethodControll };
 
 // ----------------------------------------------------------
-export default function EditDispatch({ controll, disabled }: { controll: Tcontroll; disabled?: boolean }) {
+
+const SelectGroup = selectModalCreator_multi<['dailyReport_workers_item']>({
+  selectorArr: [
+    {
+      key: 'dailyReport_workers_item',
+      tip: '請先選擇派工日期與派工日期',
+    },
+  ],
+});
+
+// ----------------------------------------------------------
+export default function EditDispatch({
+  controll,
+  disabled,
+  dispatchDate,
+  workerIdArr,
+}: {
+  controll: Tcontroll;
+  disabled?: boolean;
+  dispatchDate: string | undefined;
+  workerIdArr?: string[];
+}) {
+  const [showSelector, setShowSelector] = useState(false);
+
+  const dispatchDate_m = moment(dispatchDate);
+  dispatchDate = dispatchDate_m.isValid() ? dispatchDate_m.format('YYYY-MM-DD') : '9999-01-01';
+
+  // ---------------------------------------------------------------
+
   const { tasks, note, pricingMethod } = controll;
 
   const [batchInput, setBatchInput] = useState('');
@@ -45,6 +87,22 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
     }
   };
 
+  const onSelectorConfirm = (arr: TdailyReportItem_my[]) => {
+    const descriptionArr = arr.map((item) => {
+      return item.description;
+    });
+
+    const descriptionStr = descriptionArr.join('\n\n');
+
+    let value = tasks.value;
+
+    if (value) {
+      value += '\n\n';
+    }
+
+    tasks.onChange(value + descriptionStr);
+  };
+
   // -----------------------------------------------------------------
   useEffect(() => {
     setBatchInput(pricingMethod.subValue);
@@ -52,32 +110,39 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
 
   // -----------------------------------------------------------------
   return (
-    <div className={style.editDispatch}>
+    <div className={scss.editDispatch}>
       {/* 辦理事項 */}
-      <div className={style.handlingMatters}>
-        <div className={style.subTitle}>
-          <span>辦理事項</span>
+      <div className={scss.handlingMatters}>
+        <div className={scss.subTitle}>
+          <span>工作內容 : </span>
+          <MyButton_v2
+            className={classNames(disabled && 'cursor-not-allowed')}
+            label="請選擇工務人員日報表"
+            px="px22"
+            py="py4"
+            onClick={() => !disabled && setShowSelector(true)}
+          />
         </div>
         <textarea
           disabled={disabled}
-          className={style.textarea}
-          placeholder="請輸入辦理事項"
+          className={scss.textarea}
+          placeholder="請輸入工作內容"
           value={tasks.value}
           onChange={(e) => tasks.onChange(e.target.value)}
         />
       </div>
 
       {/* 派工批價 */}
-      <div className={style.dispatchPrice}>
-        <div className={style.subTitle}>
+      <div className={scss.dispatchPrice}>
+        <div className={scss.subTitle}>
           <span>派工批價</span>
         </div>
-        <Radio.Group disabled={disabled} className={style.radioGroup} onChange={onChange} value={pricingMethod.value}>
+        <Radio.Group disabled={disabled} className={scss.radioGroup} onChange={onChange} value={pricingMethod.value}>
           <Radio value={'合約內'}>合約內</Radio>
           <Radio value={'合約辦理追加'}>合約辦理追加</Radio>
           <Radio value={`修理費用${batchInput}`}>
             <label
-              className={style.myLabel}
+              className={scss.myLabel}
               htmlFor="batchInput"
               onClick={() => {
                 // setBatchType(`修理費用${batchInput}`);
@@ -106,18 +171,63 @@ export default function EditDispatch({ controll, disabled }: { controll: Tcontro
       </div>
 
       {/* 備註下次注意事項 */}
-      <div className={style.precaution}>
-        <div className={style.subTitle}>
-          <span>備註下次注意事項 : </span>
-          <span>預備工具或聯絡、報價事宜、待完成事項</span>
+      <div className={scss.precaution}>
+        <div className={scss.subTitle}>
+          <span>待辦事項 : </span>
         </div>
       </div>
       <textarea
         disabled={disabled}
-        className={style.textarea}
-        placeholder="請輸入備註"
+        className={scss.textarea}
+        placeholder="請輸入待辦事項"
         value={note.value}
         onChange={(e) => note.onChange(e.target.value)}
+      />
+      <div className=" w-fit m-auto mt-5 mr-0">
+        <InputSel
+          showBaseline="invisible"
+          disabled={disabled}
+          fontColor="active"
+          checkBoxProps={{
+            onChange: (arr) => {
+              const isCompleted = arr.includes('isCompleted');
+              controll.isCompleted.onChange(isCompleted);
+            },
+            propsArr: [
+              {
+                //
+                key: 'isCompleted',
+                value: controll.isCompleted.value,
+                label: '完工',
+              },
+            ],
+          }}
+        />
+      </div>
+
+      <SelectGroup
+        showModal={showSelector}
+        onConfirm={(arr) => {
+          onSelectorConfirm(arr[0]);
+        }}
+        onCancel={() => setShowSelector(false)}
+        dynaSelectorPropsList={[
+          {
+            caption: '工務人員日報表回報',
+            useNoMetaProps: {
+              date: dispatchDate,
+            },
+            filter_clientSide: (data, searchArr) => {
+              const id = data.employee.id;
+              const employeeName = data.employee.chName || data.employee.enName;
+
+              const check01 = !!workerIdArr?.includes(id);
+              const check02 = employeeName.includes(searchArr[0] ?? '');
+
+              return check01 && check02;
+            },
+          },
+        ]}
       />
     </div>
   );

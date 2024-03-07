@@ -421,6 +421,11 @@ const sidePathList: TsidePathList = {
           path: path01 + '/outsourcingPricing',
           erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
+        {
+          label: '待辦事項',
+          path: path01 + '/todoList',
+          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
+        },
         // {
         //   label: '新增派工單',
         //   path: path01 + '/addDispatch',
