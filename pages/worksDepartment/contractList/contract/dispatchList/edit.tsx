@@ -26,9 +26,13 @@ import {
   useGetEngineeringContact,
 } from 'js/api/api_engineering';
 import { useGetContract_id } from 'js/api/api_quotation';
-import { TemployeeDto, TtodoDto } from 'js/api/dtoTypes';
+import { apiPatchTodo } from 'js/api/api_todo';
+
 // css
 import scss from './edit.module.scss';
+
+// type
+import { TemployeeDto, TtodoDto } from 'js/api/dtoTypes';
 
 // =====================================================================
 
@@ -197,9 +201,6 @@ export default function EditDispatchList() {
       return myAlert.info({ title: '沒有合約ID' });
     }
 
-    // console.log('state_profile', state_profile);
-    // console.log('state_dispatch', state_dispatch);
-
     const workerId = state_profile.workerEmployee.map((employee) => employee.id);
 
     if (!state_profile.dispatchDate) {
@@ -209,8 +210,6 @@ export default function EditDispatchList() {
     if (!workerId[0]) {
       return myAlert.info({ title: '請選擇工務人員' });
     }
-
-    // console.log(state_profile.workerEmployee);
 
     const body: TcreateDispatchingDto = {
       contractId,
@@ -252,6 +251,18 @@ export default function EditDispatchList() {
       }
 
       setDisabled(true);
+
+      if (todoForDispatch && todoForDispatch.engineeringContactId) {
+        const body = [
+          {
+            isAlreadyDisPatching: true,
+            id: todoForDispatch.id,
+          },
+        ];
+
+        await apiPatchTodo(body);
+        window.sessionStorage.removeItem('todoForDispatch');
+      }
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '新增派工單失敗', content: err.message });

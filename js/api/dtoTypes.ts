@@ -2256,7 +2256,7 @@ export type TdispatchingDto = {
   warrantyDate: string | null;
 };
 
-type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId' | 'warrantyDate'>;
+type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId' | 'warrantyDate' | 'note'>;
 
 export type TcreateDispatchingDto = Pick<
   TcreateDispatchingDto_pre,
@@ -2270,11 +2270,12 @@ export type TcreateDispatchingDto = Pick<
   | 'finalContactPerson'
   | 'tasks'
   | 'pricingMethod'
-  | 'note'
+  // | 'note'
   // | 'contractId'
   | 'isCompleted'
 > & {
   contractId: string;
+  note?: string | null;
 };
 
 export type TupdateDispatchingDto = Omit<Partial<TcreateDispatchingDto>, 'contractId'>;
@@ -3176,7 +3177,10 @@ export type TcreateTodoDto = {
   // isAlreadyDisPatching?: boolean;
 };
 
-export type TupdateTodoDto = TcreateTodoDto & {
+// export type TupdateTodoDto = TcreateTodoDto & {
+//   id: string;
+// };
+export type TupdateTodoDto = Partial<TcreateTodoDto> & {
   id: string;
 };
 
