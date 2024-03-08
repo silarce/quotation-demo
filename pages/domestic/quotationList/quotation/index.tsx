@@ -1340,7 +1340,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       : null,
 
     // !contentId && status !== 'Pending' ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
-    !isSendToReview /*&& !contentId*/ && !isContract && status !== 'Pending'
+    /*!isSendToReview && */ /*!contentId &&*/ !isContract && status !== 'Pending'
       ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) }
       : null,
 
