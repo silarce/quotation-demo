@@ -381,6 +381,7 @@ const PanelBody = ({
             caption="接洽人"
             inputProps={{
               props: {
+                placeholder: '接洽人...',
                 value: state_todo.contactPerson,
                 onChange: (e) => changeState_todo('contactPerson', e.target.value),
               },
@@ -394,6 +395,7 @@ const PanelBody = ({
             caption="接洽人電話"
             inputProps={{
               props: {
+                placeholder: '接洽人電話...',
                 value: state_todo.contactPersonNumber,
                 onChange: (e) => changeState_todo('contactPersonNumber', e.target.value),
               },
