@@ -3,12 +3,15 @@ import Link from 'next/link';
 // global
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
+// icon
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+
 // css
 import style from './dispatchList.module.scss';
 
 type Tdispatch_simple = {
   dispatchDate: string;
-  workerName: string;
+  workerNameArr: string[];
   tasks: string;
   href: Parameters<typeof Link>[0]['href'];
 };
@@ -20,31 +23,38 @@ export default function List({ list }: { list: Tdispatch_simple[] }) {
   return (
     <div className={style.list}>
       <div className={style.thead}>
-        {indexKeys01.map((key, index) => {
-          const { label } = config01[key];
-
-          return (
-            <div key={index}>
-              <span>{label}</span>
-            </div>
-          );
-        })}
+        <div>
+          <span>{'日期'}</span>
+        </div>
+        <div>
+          <span>{'工務人員'}</span>
+        </div>
+        <div>
+          <span>{'辦理事項'}</span>
+        </div>
       </div>
       <div className={style.tbody}>
         {list.map((item, index) => {
+          const { dispatchDate, workerNameArr, tasks, href } = item;
+
           return (
             <CellWithBar className={style.row} key={index}>
-              <Link href={item.href}>
-                {indexKeys01.map((key, index) => {
-                  const value = item[key];
-
-                  return (
-                    <div key={index}>
-                      <span>{value}</span>
-                    </div>
-                  );
+              <div>
+                <span>{dispatchDate}</span>
+              </div>
+              <div className={style.workerCell}>
+                {workerNameArr.map((name, index) => {
+                  return <span key={index}>{name}</span>;
                 })}
-              </Link>
+              </div>
+              <div>
+                <span>{tasks}</span>
+              </div>
+              <div>
+                <Link href={href}>
+                  <IconDetail />
+                </Link>
+              </div>
             </CellWithBar>
           );
         })}
@@ -52,27 +62,3 @@ export default function List({ list }: { list: Tdispatch_simple[] }) {
     </div>
   );
 }
-
-// ==================================================
-
-type TindexKey01 = keyof Pick<Tdispatch_simple, 'dispatchDate' | 'workerName' | 'tasks'>;
-
-const indexKeys01: TindexKey01[] = ['dispatchDate', 'workerName', 'tasks'];
-
-type Tconfig<keys extends string> = {
-  [key in keys]: {
-    label: string;
-  };
-};
-
-const config01: Tconfig<TindexKey01> = {
-  dispatchDate: {
-    label: '日期',
-  },
-  workerName: {
-    label: '工務人員',
-  },
-  tasks: {
-    label: '辦理事項',
-  },
-};

@@ -1,54 +1,29 @@
 @use "styles/theme01" as *;
 
-.profile {
-  display: flex;
-  justify-content: space-between;
-  height: fit-content;
-  margin: 0 50px;
-  .left,
-  .right {
-    height: fit-content;
-    display: grid;
-    gap: 20px;
-    .input02 {
-      padding: 0;
-    }
-  }
-  .left {
-    width: 650px;
-    .datePicker {
-      :global(.ant-picker-input) {
-        input {
-          color: theme("colors.text");
-        }
-      }
-    }
-  }
-  .right {
-    width: 300px;
-    .input02.showUnderline {
-      hr {
-        border-color: $colorMain;
-      }
-    }
-  }
-}
-
 .list {
-  padding: 4px 4px 0 4px;
-  border: solid 1px $colorBorder01;
-  margin: 35px 17px 0;
+  .thead {
+    position: sticky;
+    top: 90px;
+    z-index: 2;
+    border-top: solid 1px theme("colors.border");
+  }
   .thead,
-  .row > a {
+  .row {
     display: grid;
-    grid-template-columns: 100px 100px auto;
+    grid-template-columns: 100px 100px auto 20px;
     gap: 22px;
     align-content: center;
+
     > div {
       span {
         font-weight: 400;
         font-size: 16px;
       }
+    }
+    .workerCell {
+      display: grid;
+      gap: 5px;
+      align-content: flex-start;
     }
   }
 
@@ -76,10 +51,19 @@
     font-size: 18px;
     color: $colorMain;
   }
-  margin: 0 30px;
+
   .handlingMatters {
     > .subTitle {
-      margin-top: 0;
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      margin: unset;
+      margin-bottom: 10px;
+      > span {
+        font-size: 20px;
+        font-weight: 500;
+        color: $colorMain;
+      }
     }
   }
 
@@ -87,6 +71,7 @@
     display: flex;
     height: 54px;
     margin-top: 15px;
+    margin-bottom: 15px;
     background-color: $bgc01;
     > * {
       margin: auto;
@@ -129,6 +114,16 @@
       }
     } // radioGroup
   }
+  .precaution {
+    .subTitle {
+      margin: unset;
+      span {
+        font-size: 20px;
+        font-weight: 500;
+        color: $colorMain;
+      }
+    }
+  }
 
   .subTitle {
     display: inline-block;
@@ -150,5 +145,12 @@
     font-size: 18px;
     border: solid 1px $colorMain;
     resize: none;
+  }
+}
+
+.checkBoxfont {
+  color: red !important;
+  span {
+    color: red !important;
   }
 }

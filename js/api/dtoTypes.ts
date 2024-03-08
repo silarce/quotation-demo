@@ -1287,6 +1287,8 @@ type TquotationContentDto_copy = {
   products: TquotationProductDto[];
 
   verifyForm: TquotationVerifyFormDto;
+  // 失件
+  isLost: boolean;
 };
 
 // 報價單狀態: 預算 投標 發包 合約 準合約
@@ -1374,6 +1376,8 @@ export type TquotationContentDto = {
 
   // 為了避免check壞掉，暫時先這樣
   rootContract?: TquotationContentDto_copy;
+  // 失件
+  isLost: boolean;
 };
 
 export type TquotationDto = {
@@ -1563,6 +1567,9 @@ export type TcreateQuotationContentDto = {
   others: TcreateQuotationContentOtherDto[];
   products: TcreateQuotationProductDto[];
   productsOrder?: string[] | null; // 已棄用
+
+  // 失件
+  isLost: boolean;
 };
 
 /**合約 */
@@ -2214,79 +2221,71 @@ export type TdispatchingDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  // 派工日期
+  //  '派工日期'
   dispatchDate: string;
-  // 工程名稱
-  projectName: string;
-  // 承包商;
-  // contractor: string;
-  // 承包商聯絡人;
+  //  '承包商聯絡人'
   contractorContactPerson: string;
-  // 工地電話;
+  //  '工地電話'
   constructionSiteContactNumber: string;
-  // 工程縣市;
+  //  '工程縣市'
   county: string;
-  // 工程區;
+  //  '工程區'
   district: string;
-  // 工程詳細地址;
+  //  '工程詳細地址'
   address: string;
-  // 工程編號;
-  projectNumber: string;
-  // 管制卡編號;
-  badgeNumber: string;
-  // 工務人員ID
-  workerId: string;
-  // 工務人員
-  workerEmployee: TemployeeDto;
-  // 完工聯絡人;
+  //  '工務人員Id'
+  workerId: string[];
+  //  '工務人員'
+  workerEmployee: TemployeeDto[];
+  //  '完工聯絡人'
   finalContactPerson: string;
-  // 辦理事項;
+  //  '辦理事項'
   tasks: string;
-  // 派工批價方式;
+  //  '派工批價方式'
   pricingMethod: string;
-  // 備註下次注意事項;
+  //  '備註下次注意事項'
   note: string | null;
-  // 所屬合約Id;
+  //  '所屬合約Id'
   contractId: string | null;
+  // 所屬合約
   contract: TquotationContractDto | null;
+  // 所屬報價單Id
   quotationId: string | null;
+  // 所屬報價單
   quotation?: TquotationDto | null;
+  // 包含的代辦事項id
+  todoListId: string | null;
+  // 包含的代辦事項
+  todoList?: TtodoDto;
+  // 是否已完工
+  isCompleted: boolean;
+  // 保固日期
+  warrantyDate: string | null;
 };
 
-export type TcreateDispatchingDto = {
-  // 合約id
+type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId' | 'warrantyDate' | 'note'>;
+
+export type TcreateDispatchingDto = Pick<
+  TcreateDispatchingDto_pre,
+  | 'dispatchDate'
+  | 'contractorContactPerson'
+  | 'constructionSiteContactNumber'
+  | 'county'
+  | 'district'
+  | 'address'
+  | 'workerId'
+  | 'finalContactPerson'
+  | 'tasks'
+  | 'pricingMethod'
+  // | 'note'
+  // | 'contractId'
+  | 'isCompleted'
+> & {
   contractId: string;
-  // 派工日期;
-  dispatchDate: string;
-  // 工程名稱;
-  projectName: string;
-  // 承包商;
-  // contractor: string;
-  // 承包商聯絡人;
-  contractorContactPerson: string;
-  // 工地電話;
-  constructionSiteContactNumber: string;
-  // 工程縣市;
-  county: string;
-  // 工程區;
-  district: string;
-  // 工程詳細地址;
-  address: string;
-  // 工程編號;
-  projectNumber: string;
-  // 管制卡編號;
-  badgeNumber: string;
-  // 工務人員ID
-  workerId: string;
-  // 完工聯絡人
-  finalContactPerson: string;
-  // 辦理事項
-  tasks: string;
-  // 派工批價方式
-  pricingMethod: string;
-  // 備註下次注意事項
-  note: string | null;
+  note?: string | null;
 };
+
+export type TupdateDispatchingDto = Omit<Partial<TcreateDispatchingDto>, 'contractId'>;
 
 export type TelectronicSuppliesRecordDto = {
   id: string;
@@ -3123,37 +3122,96 @@ export type TcreateMeetingMinutesDto = {
 
 export type TupdateMeetingMinutesDto = Omit<TcreateMeetingMinutesDto, 'id'>;
 
+// ============================================================================
+
+// todoDTO
+
+export type Tpopulate_todoDto = {
+  engineeringContact?: boolean;
+  dispatching?: boolean;
+  agentEmployee?: boolean;
+};
+
+export type TtodoDto<P extends Tpopulate_todoDto = Partial<Tpopulate_todoDto>> = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  // 工程聯絡單Id
+  engineeringContactId: string | null;
+  // 工程聯絡單
+  engineeringContact: P['engineeringContact'] extends true ? TengineeringContactDto | null : undefined;
+  // 派工單Id
+  dispatchingId: string | null;
+  // 派工單
+  dispatching: P['dispatching'] extends true ? TdispatchingDto | null : undefined;
+  // 聯絡人(接洽人欄位)
+  contactPerson: TtodoContactDto[] | null;
+  // 主旨
+  purpose: string | null;
+  // 通知日期
+  notificationDate: string | null;
+  // 預計進場日期
+  entryDate: string | null;
+  // 聯絡電話
+  contactNumber: string | null;
+  // 內容
+  content: string;
+  // 是否已派工
+  isAlreadyDispatching: boolean;
+  // 經辦人Id
+  agentEmployeeId: string | null;
+  // 經辦人
+  agentEmployee: P['agentEmployee'] extends true ? TemployeeDto : undefined;
+};
+
+export type TtodoContactDto = {
+  contactPerson: string;
+  contactNumber: string;
+};
+
+export type TcreateTodoDto = {
+  // 工程聯絡單Id
+  engineeringContactId: string | null;
+  // 聯絡人(接洽人欄位)
+  contactPerson: TtodoContactDto[];
+  purpose: string;
+  notificationDate: string;
+  entryDate: string;
+  // 接洽人(目前沒用到，接洽人欄位用contactPerson代替)
+  pointContactPerson: ''; // 目前用不到，但是必須要送
+  pointContactNumber: ''; // 目前用不到，但是必須要送
+  content: string;
+  // isAlreadyDisPatching?: boolean;
+};
+
+// export type TupdateTodoDto = TcreateTodoDto & {
+//   id: string;
+// };
+export type TupdateTodoDto = Partial<TcreateTodoDto> & {
+  id: string;
+  isAlreadyDispatching?: boolean;
+};
+
+// =============================================================================
+// =============================================================================
+// =============================================================================
+// =============================================================================
+
 // 依賴populate的泛型寫法
 
-// type Tooo = {
-//   foo?: boolean;
-//   bar?: boolean;
+// type Tbarr = {
+//   engineeringContact?: boolean;
+//   dispatching?: boolean;
+//   agentEmployee?: boolean;
 // };
 
-// export type ToutsourcingPaymentDetailDto_foo<ooo extends Tooo> = {
-//   // 工程聯絡單Id
-//   engineeringContactId: string | null;
-//   // 工程聯絡單
-//   engineeringContact: ooo['foo'] extends true ? TengineeringContactDto : undefined;
-//   // 若為一般工程之一般項，則有此property
-//   installItem: TquotationProductItemDto[];
-//   // 是否為非一般工程之特殊項
-//   isOther: boolean;
-//   // 項目名
-//   itemName: string;
-//   // 安裝內容
-//   installation: string | null;
-//   // 樘數
-//   quantity: number | null;
-//   // 單樘計價
-//   unitPrice: number | null;
-//   // 外包計價合計
-//   outsourcingTotal: number;
-//   // 外包計價單id
-//   outsourcingPaymentId: string | null;
-//   // 外包計價單
-//   // outsourcingPayment: ToutsourcingPaymentDto;
-//   outsourcingPayment: ooo['bar'] extends true ? ToutsourcingPaymentDto : undefined;
+// export type Tfooo<P extends Tbarr = Partial<Tbarr>> = {
+//   id: string;
+//   createdAt: string;
+//   updatedAt: string;
+//   engineeringContact: P['engineeringContact'] extends true ? TengineeringContactDto | null : undefined;
+//   dispatching: P['dispatching'] extends true ? TdispatchingDto | null : undefined;
+//   agentEmployee: P['agentEmployee'] extends true ? TemployeeDto : undefined;
 // };
 
-// type Tpp = ToutsourcingPaymentDetailDto_foo<{ foo: true }>;
+// type Tfoooooooooo = Tfooo<{ engineeringContact: true }>;

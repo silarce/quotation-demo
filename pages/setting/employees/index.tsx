@@ -18,6 +18,7 @@ import { useEmployee, TapiGetEmployeeParams } from 'js/api/api_employee';
 
 // css
 import style from './employees.module.scss';
+import { TuserDto } from 'js/api/dtoTypes';
 // ==================================================
 
 export default function Employees() {
