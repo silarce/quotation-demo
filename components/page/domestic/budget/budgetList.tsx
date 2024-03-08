@@ -10,7 +10,6 @@ import { Collapse } from 'antd';
 // components
 import Thead01 from '../ui/table01/Thead01';
 import TbodyItem01, { TBodyItemContent } from '../ui/table01/TbodyItem01';
-import ReviewChain from '../ui/table01/reviewChain';
 import PanelBody from './budgetList/tableBody';
 
 import { Tcontrol_queryQuotationList } from 'components/page/domestic/queryQuotation/queryQuotationList';
@@ -22,6 +21,7 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // ===========================================
 import { TquotationDto } from 'js/api/api_quotation';
+import ProcessChain from 'components/global/gear/processChain';
 
 // ===========================================
 
@@ -89,83 +89,12 @@ export default function BudgetList({
             viewRef_bottom: index === quotationArr.length - 5 ? viewRef_bottom : undefined,
           };
 
-          const {
-            reviewSalesEmployee,
-            salesReviewedAt,
-            reviewSupervisorEmployee,
-            supervisorReviewedAt,
-            reviewWorkDirectorEmployee,
-            workDirectorReviewedAt,
-            reviewManagerEmployee,
-            managerReviewedAt,
-          } = latestContent;
-          const reviewStatuArr = [
-            {
-              jobName: '經辦',
-              name: latestContent.agentEmployee.chName || latestContent.agentEmployee.enName,
-              isReviewed: true,
-            },
-            {
-              jobName: '業務',
-              name: reviewSalesEmployee?.chName ?? '',
-              isReviewed: reviewSalesEmployee ? !!salesReviewedAt : undefined,
-            },
-            {
-              jobName: '業務主管',
-              name: reviewSupervisorEmployee?.chName ?? '',
-              isReviewed: reviewSupervisorEmployee ? !!supervisorReviewedAt : undefined,
-            },
-            {
-              jobName: '應收帳款',
-              name: reviewWorkDirectorEmployee?.chName ?? '',
-              isReviewed: reviewWorkDirectorEmployee ? !!workDirectorReviewedAt : undefined,
-            },
-            {
-              jobName: '總經理',
-              name: reviewManagerEmployee?.chName ?? '',
-              isReviewed: reviewManagerEmployee ? !!managerReviewedAt : undefined,
-            },
-          ];
-
-          // 在預算與投標階段，不顯示應收帳款
-          if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-            reviewStatuArr.splice(3, 1);
-          }
-
-          // 在準合約階段，不顯示經辦
-          if (status === 'Pending') {
-            reviewStatuArr.shift();
-          }
+          const processChain = reduceProcessChain(latestContent);
 
           const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
-          // sortedContent.shift(); // 不顯示第一筆
 
           const recordArr = sortedContent.map((content) => {
-            const {
-              updatedAt,
-              editNotes,
-              discount,
-              quantity,
-              total,
-
-              agentEmployee,
-
-              reviewSalesEmployee,
-              salesReviewedAt,
-              toSalesAt,
-
-              reviewSupervisorEmployee,
-              supervisorReviewedAt,
-              toSupervisorAt,
-
-              reviewWorkDirectorEmployee,
-              workDirectorReviewedAt,
-              toWorkDirectorAt,
-
-              reviewManagerEmployee,
-              managerReviewedAt,
-              toManagerAt,
-            } = content;
+            const { updatedAt, editNotes, discount, quantity, total } = content;
 
             const href_body = {
               pathname: '/domestic/quotationList/quotation',
@@ -176,50 +105,7 @@ export default function BudgetList({
               },
             };
 
-            type TprocessChain = Tcontrol_queryQuotationList['panelArr'][number]['header']['processChain'];
-            type TdotColor = TprocessChain[number]['dotColor'];
-
-            let dotColor_sales: TdotColor = 'gray';
-            toSalesAt && (dotColor_sales = 'red');
-            salesReviewedAt && (dotColor_sales = 'green');
-
-            let dotColor_supervisor: TdotColor = 'gray';
-            toSupervisorAt && (dotColor_supervisor = 'red');
-            supervisorReviewedAt && (dotColor_supervisor = 'green');
-
-            let dotColor_workDirector: TdotColor = 'gray';
-            toWorkDirectorAt && (dotColor_workDirector = 'red');
-            workDirectorReviewedAt && (dotColor_workDirector = 'green');
-
-            let dotColor_manager: TdotColor = 'gray';
-            toManagerAt && (dotColor_manager = 'red');
-            managerReviewedAt && (dotColor_manager = 'green');
-
-            const processChain: TprocessChain = [
-              {
-                label: `經辦 ${agentEmployee?.chName ?? 'fooo'}`,
-                dotColor: 'green',
-              },
-              {
-                label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
-                dotColor: dotColor_sales,
-              },
-              {
-                label: `業務主管 ${reviewSupervisorEmployee?.chName ?? ''}`,
-                dotColor: dotColor_supervisor,
-              },
-              {
-                label: `應收帳款 ${reviewWorkDirectorEmployee?.chName ?? ''}`,
-                dotColor: dotColor_workDirector,
-              },
-              {
-                label: `經理 ${reviewManagerEmployee?.chName ?? ''}`,
-                dotColor: dotColor_manager,
-              },
-            ];
-
-            (status === 'Budget' || status === 'Bidding' || status === 'Contracting') && processChain.splice(3, 1);
-            status === 'Pending' && processChain.shift();
+            const processChain = reduceProcessChain(content);
 
             return {
               date: moment(convertDate_reduce1911(updatedAt)).format('yy-MM-DD'),
@@ -243,7 +129,14 @@ export default function BudgetList({
                   isActive={isActive}
                   openQuotation={openQuotation}
                 >
-                  <ReviewChain reviewStatuArr={reviewStatuArr} />
+                  {/* <ReviewChain reviewStatuArr={reviewStatuArr} /> */}
+
+                  <ProcessChain
+                    className="mt-3"
+                    control={{
+                      statusArr: processChain,
+                    }}
+                  />
                   <span></span>
                 </TbodyItem01>
               }
@@ -257,3 +150,76 @@ export default function BudgetList({
     </div>
   );
 }
+
+// ===================================================================
+
+const reduceProcessChain = (content: TquotationDto['contents'][number]) => {
+  const {
+    status,
+
+    agentEmployee,
+
+    reviewSalesEmployee,
+    salesReviewedAt,
+    toSalesAt,
+
+    reviewSupervisorEmployee,
+    supervisorReviewedAt,
+    toSupervisorAt,
+
+    reviewWorkDirectorEmployee,
+    workDirectorReviewedAt,
+    toWorkDirectorAt,
+
+    reviewManagerEmployee,
+    managerReviewedAt,
+    toManagerAt,
+  } = content;
+
+  type TprocessChain = Tcontrol_queryQuotationList['panelArr'][number]['header']['processChain'];
+  type TdotColor = TprocessChain[number]['dotColor'];
+
+  let dotColor_sales: TdotColor = 'gray';
+  toSalesAt && (dotColor_sales = 'red');
+  salesReviewedAt && (dotColor_sales = 'green');
+
+  let dotColor_supervisor: TdotColor = 'gray';
+  toSupervisorAt && (dotColor_supervisor = 'red');
+  supervisorReviewedAt && (dotColor_supervisor = 'green');
+
+  let dotColor_workDirector: TdotColor = 'gray';
+  toWorkDirectorAt && (dotColor_workDirector = 'red');
+  workDirectorReviewedAt && (dotColor_workDirector = 'green');
+
+  let dotColor_manager: TdotColor = 'gray';
+  toManagerAt && (dotColor_manager = 'red');
+  managerReviewedAt && (dotColor_manager = 'green');
+
+  const processChain: TprocessChain = [
+    {
+      label: `經辦 ${agentEmployee?.chName ?? 'fooo'}`,
+      dotColor: 'green',
+    },
+    {
+      label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
+      dotColor: dotColor_sales,
+    },
+    {
+      label: `業務主管 ${reviewSupervisorEmployee?.chName ?? ''}`,
+      dotColor: dotColor_supervisor,
+    },
+    {
+      label: `應收帳款 ${reviewWorkDirectorEmployee?.chName ?? ''}`,
+      dotColor: dotColor_workDirector,
+    },
+    {
+      label: `經理 ${reviewManagerEmployee?.chName ?? ''}`,
+      dotColor: dotColor_manager,
+    },
+  ];
+
+  (status === 'Budget' || status === 'Bidding' || status === 'Contracting') && processChain.splice(3, 1);
+  status === 'Pending' && processChain.shift();
+
+  return processChain;
+};
