@@ -113,6 +113,7 @@ type Tprofile = {
   faxNumber: string;
   trackProgress: string;
   projectProgress: string;
+  isLost: boolean;
 };
 
 // ------------------------------------------------------------------
@@ -174,6 +175,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // 是否可編輯
   const [disabled, setDisabled] = useState(true);
   const [disabled_reviewer, setDisabled_reviewer] = useState(true);
+  const disabled_static = true;
+
   // -----------------------------------------------------
   const [reviewFormShow, setReviewFormShow] = useState(false);
   const [reviewModalShow, setReviewModalShow] = useState(false);
@@ -446,13 +449,21 @@ latestContentProdArr為這次追加追減的主產品
       faxNumber: latestContent?.faxNumber ?? '',
       trackProgress: latestContent?.trackProgress ?? '',
       projectProgress: latestContent?.projectProgress ?? '',
+      isLost: !!latestContent?.isLost,
     });
-  }, [quotationData]);
+  }, [quotationData, disabled]);
 
   const control_profile = useMemo(() => {
     const control_profile: Tcontrol_profile = {
       quotationNumber: latestContent?.quotationNumber ?? '',
       quotationDate: latestContent?.quotationDate ?? '',
+      isLost: {
+        value: profile.isLost,
+        onChange: (bool) => {
+          setProfile((state) => ({ ...state, isLost: bool }));
+        },
+        disabled: disabled,
+      },
       customer: {
         value: customer,
         onChange: (customer) => {
@@ -519,7 +530,7 @@ latestContentProdArr為這次追加追減的主產品
     };
 
     return control_profile;
-  }, [profile]);
+  }, [profile, disabled]);
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -747,7 +758,7 @@ latestContentProdArr為這次追加追減的主產品
     payment: {
       discountRate: {
         inputAttr: {
-          disabled: disabled,
+          disabled: disabled_static,
           value: summary.discountRate,
           onChange: (e) => {
             let v = e.target.value;
@@ -775,19 +786,19 @@ latestContentProdArr為這次追加追減的主產品
       },
       subTotal: {
         inputAttr: {
-          disabled: true,
+          disabled: disabled_static,
           value: summary.subTotal,
         },
       },
       salesTax: {
         inputAttr: {
-          disabled: true,
+          disabled: disabled_static,
           value: summary.salesTax,
         },
       },
       total: {
         inputAttr: {
-          disabled: true,
+          disabled: disabled_static,
           value: summary.total,
         },
       },
@@ -1227,6 +1238,8 @@ latestContentProdArr為這次追加追減的主產品
         }
       : null,
 
+    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 
@@ -1378,6 +1391,7 @@ latestContentProdArr為這次追加追減的主產品
       // productsOrder: null,
       //
       //
+      isLost: profile.isLost ?? false,
     };
 
     if (!body.customerId) {
@@ -1707,7 +1721,7 @@ latestContentProdArr為這次追加追減的主產品
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
-          <QuotationProfile disabled={disabled} control={control_profile} />
+          <QuotationProfile disabled={disabled_static} control={control_profile} />
 
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
@@ -1716,8 +1730,8 @@ latestContentProdArr為這次追加追減的主產品
           <div className={style.tableWrapper}>
             {/* 主產品設定 */}
             <Table_prod
-              disabled={isAttach ? true : disabled}
-              exchangeDiabled={disabled}
+              disabled={isAttach ? true : disabled_static}
+              exchangeDiabled={disabled_static}
               prodList={productList}
               prodCellConfig={prodCellConfig}
               prodKeyArr={prodKeyArr}
@@ -1734,7 +1748,7 @@ latestContentProdArr為這次追加追減的主產品
             {/* 材料配件設定 */}
             <div className="relative mt-[14px]">
               <Table_com
-                disabled={true}
+                disabled={disabled_static}
                 // comList={targetProd?.comList}
 
                 // FIXME 之後要把型別處理好
@@ -1753,7 +1767,7 @@ latestContentProdArr為這次追加追減的主產品
           <div className={style.redWrapper}>
             {/* 選配設定 */}
             <Table_accessories
-              disabled={true}
+              disabled={disabled_static}
               list={targetProd?.accessoriesList}
               cellConfig={accessoriesCellConfig}
               keyArr={accessoriesKeyArr}
@@ -1779,7 +1793,7 @@ latestContentProdArr為這次追加追減的主產品
           <div className={style.tableWrapper}>
             {/* 其他設定 */}
             <Table_others
-              disabled={true}
+              disabled={disabled_static}
               list={othersList}
               cellConfig={othersCellConfig}
               keyArr={othersKeyArr}
@@ -1793,8 +1807,8 @@ latestContentProdArr為這次追加追減的主產品
           <div className={style.tableWrapper}>
             {/* 主產品設定 */}
             <Table_prod
-              disabled={isAttach ? true : disabled}
-              disabled_plus={disabled}
+              disabled={isAttach ? true : disabled_static}
+              disabled_plus={disabled_static}
               disabledExceptionArr={['quantity']}
               // exchangeDiabled={disabled}
               prodList={attachProdList}
@@ -1813,7 +1827,7 @@ latestContentProdArr為這次追加追減的主產品
             {/* 材料配件設定 */}
             <div className="relative mt-[14px]">
               <Table_com
-                disabled={true}
+                disabled={disabled_static}
                 // comList={targetProd?.comList}
 
                 // FIXME 之後要把型別處理好
@@ -1830,7 +1844,7 @@ latestContentProdArr為這次追加追減的主產品
 
             <div className="relative mt-[14px]">
               <Table_accessories
-                disabled={true}
+                disabled={disabled_static}
                 list={targetProd_attach?.accessoriesList}
                 cellConfig={accessoriesCellConfig}
                 keyArr={accessoriesKeyArr}
@@ -1853,7 +1867,7 @@ latestContentProdArr為這次追加追減的主產品
 
           {/*  */}
           <Summary
-            disabled={disabled}
+            disabled={disabled_static}
             payInfoControl={payInfoControl}
             control_anno={control_anno}
             control_qr={control_qr}
@@ -2041,4 +2055,5 @@ const creEmptyProfile = (): Tprofile => ({
   faxNumber: '',
   trackProgress: '',
   projectProgress: '',
+  isLost: false,
 });
