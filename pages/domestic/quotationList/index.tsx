@@ -17,7 +17,7 @@ import ContractSelector from 'components/global/gear/modal/contractSelector';
 import scss from './index.module.scss';
 
 // api
-import { Tparams, useGetQuotation_infinite } from 'js/api/api_quotation';
+import { Tparams, useGetQuotation_infinite, useGetQuotation_detail_infinite } from 'js/api/api_quotation';
 
 // option
 import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistrict';
@@ -282,6 +282,23 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
     // sort: 'updatedAt',
     sort: 'latestContent.quotationDate',
     order: 'DESC',
+    populate: [
+      // 'contents.agentEmployee',
+      // 'contents.reviewSalesEmployee',
+      // 'contents.reviewWorkDirectorEmployee',
+      // 'contents.reviewSupervisorEmployee',
+      // 'contents.reviewManagerEmployee',
+
+      // 'contents',
+
+      'latestContent.agentEmployee',
+      'latestContent.reviewSalesEmployee',
+      'latestContent.reviewWorkDirectorEmployee',
+      'latestContent.reviewSupervisorEmployee',
+      'latestContent.reviewManagerEmployee',
+
+      'latestContent.customer',
+    ],
     filter: {
       'latestContent.status': {
         $eq: status,
@@ -306,9 +323,8 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
     viewRef_bottom,
     isLoadingPage1,
     // isLoading,
-    init,
     reset,
-  } = useGetQuotation_infinite({ customParams: params });
+  } = useGetQuotation_detail_infinite({ customParams: params });
 
   useEffect(() => {
     reset();

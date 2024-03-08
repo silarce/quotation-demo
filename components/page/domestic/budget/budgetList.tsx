@@ -4,13 +4,17 @@ import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
 
+// antd
+import { Collapse } from 'antd';
+
 // components
 import Thead01 from '../ui/table01/Thead01';
 import TbodyItem01, { TBodyItemContent } from '../ui/table01/TbodyItem01';
 import ReviewChain from '../ui/table01/reviewChain';
 import PanelBody from './budgetList/tableBody';
-// antd
-import { Collapse } from 'antd';
+
+import { Tcontrol_queryQuotationList } from 'components/page/domestic/queryQuotation/queryQuotationList';
+
 // css
 import scss from './budgetList.module.scss';
 
@@ -137,7 +141,31 @@ export default function BudgetList({
           // sortedContent.shift(); // 不顯示第一筆
 
           const recordArr = sortedContent.map((content) => {
-            const { updatedAt, editNotes, discount, quantity, total } = content;
+            const {
+              updatedAt,
+              editNotes,
+              discount,
+              quantity,
+              total,
+
+              agentEmployee,
+
+              reviewSalesEmployee,
+              salesReviewedAt,
+              toSalesAt,
+
+              reviewSupervisorEmployee,
+              supervisorReviewedAt,
+              toSupervisorAt,
+
+              reviewWorkDirectorEmployee,
+              workDirectorReviewedAt,
+              toWorkDirectorAt,
+
+              reviewManagerEmployee,
+              managerReviewedAt,
+              toManagerAt,
+            } = content;
 
             const href_body = {
               pathname: '/domestic/quotationList/quotation',
@@ -148,6 +176,51 @@ export default function BudgetList({
               },
             };
 
+            type TprocessChain = Tcontrol_queryQuotationList['panelArr'][number]['header']['processChain'];
+            type TdotColor = TprocessChain[number]['dotColor'];
+
+            let dotColor_sales: TdotColor = 'gray';
+            toSalesAt && (dotColor_sales = 'red');
+            salesReviewedAt && (dotColor_sales = 'green');
+
+            let dotColor_supervisor: TdotColor = 'gray';
+            toSupervisorAt && (dotColor_supervisor = 'red');
+            supervisorReviewedAt && (dotColor_supervisor = 'green');
+
+            let dotColor_workDirector: TdotColor = 'gray';
+            toWorkDirectorAt && (dotColor_workDirector = 'red');
+            workDirectorReviewedAt && (dotColor_workDirector = 'green');
+
+            let dotColor_manager: TdotColor = 'gray';
+            toManagerAt && (dotColor_manager = 'red');
+            managerReviewedAt && (dotColor_manager = 'green');
+
+            const processChain: TprocessChain = [
+              {
+                label: `經辦 ${agentEmployee?.chName ?? 'fooo'}`,
+                dotColor: 'green',
+              },
+              {
+                label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
+                dotColor: dotColor_sales,
+              },
+              {
+                label: `業務主管 ${reviewSupervisorEmployee?.chName ?? ''}`,
+                dotColor: dotColor_supervisor,
+              },
+              {
+                label: `應收帳款 ${reviewWorkDirectorEmployee?.chName ?? ''}`,
+                dotColor: dotColor_workDirector,
+              },
+              {
+                label: `經理 ${reviewManagerEmployee?.chName ?? ''}`,
+                dotColor: dotColor_manager,
+              },
+            ];
+
+            (status === 'Budget' || status === 'Bidding' || status === 'Contracting') && processChain.splice(3, 1);
+            status === 'Pending' && processChain.shift();
+
             return {
               date: moment(convertDate_reduce1911(updatedAt)).format('yy-MM-DD'),
               editNotes,
@@ -155,6 +228,7 @@ export default function BudgetList({
               doorQty: String(quantity),
               total: total.toLocaleString(),
               href: href_body,
+              processChain,
             };
           });
 

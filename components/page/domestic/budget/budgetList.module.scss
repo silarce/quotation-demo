@@ -24,16 +24,18 @@
 
 // ===============================================================
 
-
 div.panelBody {
-  .detailRow {
-    display: grid;
-    grid-template-columns: 110px auto 65px 28px 85px 20px;
-    gap: 22px;
+  .wrapper {
     padding: 8px 30px;
-    > span {
-      font-weight: 400;
-      font-size: 16px;
+    .detailRow {
+      display: grid;
+      grid-template-columns: 110px auto 65px 28px 85px 20px;
+      gap: 15px;
+      margin-bottom: 10px;
+      > span {
+        font-weight: 400;
+        font-size: 16px;
+      }
     }
   }
 }
