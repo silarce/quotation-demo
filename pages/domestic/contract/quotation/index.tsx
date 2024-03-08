@@ -656,6 +656,9 @@ version>1 是子合約
     const control_profile: Tcontrol_profile = {
       quotationNumber: content?.quotationNumber ?? '',
       quotationDate: content?.quotationDate ?? '',
+      isLost: {
+        value: content?.isLost ?? false,
+      },
       customer: {
         value: content?.customer,
         // onChange: (customer) => {

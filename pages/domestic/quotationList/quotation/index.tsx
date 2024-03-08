@@ -139,6 +139,7 @@ type Tprofile = {
   faxNumber: string;
   trackProgress: string;
   projectProgress: string;
+  isLost: boolean;
 };
 
 type Tquery = {
@@ -441,7 +442,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [customer, setCustomer] = useState<TcustomerDto | undefined | null>();
   const [profile, setProfile] = useState<Tprofile>(creEmptyProfile());
 
-  const changeProfile = (key: keyof Tprofile, value: string) => {
+  const changeProfile = (key: keyof Omit<Tprofile, 'isLost'>, value: string | boolean) => {
     setProfile((state) => {
       return {
         ...state,
@@ -467,6 +468,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       faxNumber: latestContent?.faxNumber ?? '',
       trackProgress: latestContent?.trackProgress ?? '',
       projectProgress: latestContent?.projectProgress ?? '',
+      isLost: latestContent?.isLost ?? false,
     });
   }, [quotationData, quotationContentData]);
 
@@ -495,6 +497,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
           changeProfile('faxNumber', '');
         },
       },
+
+      isLost: {
+        value: profile.isLost,
+        onChange: (bool) => {
+          setProfile((state) => ({ ...state, isLost: bool }));
+        },
+      },
+
       itemList: {
         validityPeriod: {
           value: profile.validityPeriod,
@@ -1570,6 +1580,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       others: getOthersPostBodyArr(),
       // productsOrder: null,
       //
+      isLost: profile.isLost,
     };
 
     if (!body.customerId) {
@@ -2254,4 +2265,5 @@ const creEmptyProfile = (): Tprofile => ({
   faxNumber: '',
   trackProgress: '',
   projectProgress: '',
+  isLost: false,
 });
