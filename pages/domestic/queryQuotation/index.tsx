@@ -21,6 +21,7 @@ import { Tparams, useGetQuotation, useGetQuotation_infinite } from 'js/api/api_q
 // utils
 import { quotationStatusLookup } from 'config/lookupTable';
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { quotationToReiviewChain } from 'js/utils/quotation/quotationToReiviewChain';
 
 import { Toption, optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 import { optionsCreator_productMaterial, optionsCreator_doorModel_2 } from 'js/utils/options/productOptions';
@@ -141,31 +142,10 @@ export default function Budget() {
   const panelArr: Tcontrol_queryQuotationList['panelArr'] =
     quoatationArr?.map((quotation, index) => {
       const { contents, latestContent, id } = quotation;
-      const {
-        status,
-
-        agentEmployee,
-
-        reviewSalesEmployee,
-        salesReviewedAt,
-        toSalesAt,
-
-        reviewSupervisorEmployee,
-        supervisorReviewedAt,
-        toSupervisorAt,
-
-        reviewWorkDirectorEmployee,
-        workDirectorReviewedAt,
-        toWorkDirectorAt,
-
-        reviewManagerEmployee,
-        managerReviewedAt,
-        toManagerAt,
-      } = latestContent;
-
-      const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
-
       const isContract = latestContent.status === 'Contract';
+
+      const processChain = quotationToReiviewChain(latestContent);
+      const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
 
       const href_head = isContract
         ? {
@@ -184,51 +164,6 @@ export default function Budget() {
           };
 
       const latestCustomer = sortedContent[0].customer;
-
-      type TprocessChain = Tcontrol_queryQuotationList['panelArr'][number]['header']['processChain'];
-      type TdotColor = TprocessChain[number]['dotColor'];
-
-      let dotColor_sales: TdotColor = 'gray';
-      toSalesAt && (dotColor_sales = 'red');
-      salesReviewedAt && (dotColor_sales = 'green');
-
-      let dotColor_supervisor: TdotColor = 'gray';
-      toSupervisorAt && (dotColor_supervisor = 'red');
-      supervisorReviewedAt && (dotColor_supervisor = 'green');
-
-      let dotColor_workDirector: TdotColor = 'gray';
-      toWorkDirectorAt && (dotColor_workDirector = 'red');
-      workDirectorReviewedAt && (dotColor_workDirector = 'green');
-
-      let dotColor_manager: TdotColor = 'gray';
-      toManagerAt && (dotColor_manager = 'red');
-      managerReviewedAt && (dotColor_manager = 'green');
-
-      const processChain: TprocessChain = [
-        {
-          label: `經辦 ${agentEmployee.chName}`,
-          dotColor: 'green',
-        },
-        {
-          label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
-          dotColor: dotColor_sales,
-        },
-        {
-          label: `業務主管 ${reviewSupervisorEmployee?.chName ?? ''}`,
-          dotColor: dotColor_supervisor,
-        },
-        {
-          label: `應收帳款 ${reviewWorkDirectorEmployee?.chName ?? ''}`,
-          dotColor: dotColor_workDirector,
-        },
-        {
-          label: `經理 ${reviewManagerEmployee?.chName ?? ''}`,
-          dotColor: dotColor_manager,
-        },
-      ];
-
-      (status === 'Budget' || status === 'Bidding' || status === 'Contracting') && processChain.splice(3, 1);
-      status === 'Pending' && processChain.shift();
 
       const header = {
         quotationNumber: latestContent.quotationNumber,
