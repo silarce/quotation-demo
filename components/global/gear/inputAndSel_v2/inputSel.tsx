@@ -1,3 +1,5 @@
+// 沒有把name送進去的元件，MyTimePicker_mui、CheckBar、InputSelBar
+
 import { CSSProperties, useState } from 'react';
 
 import classNames from 'classnames';
@@ -11,6 +13,8 @@ import MyTimePicker, { TtimePickerProps } from './cog/myTimePicker';
 import MyTimePicker_mui, { TtimePickerProps_mui } from './cog/myTimePicker_mui';
 import CheckBar, { TcheckboxProps } from './cog/checkBar';
 import InputSelBar, { TinputSelBarProps } from './inputSelBar/inputSelBar';
+import CheckBox_v2, { TcheckBoxProps_v2 } from './cog/checkBox';
+import Radio, { TradioProps } from './cog/radio';
 
 // gear
 import MustTip_simple from '../other/mustTip_simple';
@@ -33,6 +37,7 @@ type TinputPropsAndSelectProps = {
 };
 
 type TinputSelProps = {
+  key?: React.Key;
   disabled?: boolean;
   onClick?: (e: React.MouseEvent) => void;
   //
@@ -45,6 +50,9 @@ type TinputSelProps = {
   checkBoxProps?: TcheckboxProps;
   inputSelBarProps?: Omit<TinputSelBarProps, 'onFocus' | 'onBlur'>;
   inputPropsAndSelectProps?: TinputPropsAndSelectProps;
+  checkBoxProps_v2?: TcheckBoxProps_v2;
+  radioProps?: TradioProps;
+
   //
   className?: string;
   wrapperPreStyle?: 'ps01';
@@ -75,6 +83,9 @@ type TinputSelProps = {
   suffixClassName?: string;
   //
   showAddIcon?: boolean;
+  //
+  // 必須要有前綴或後綴，react-select不能收`${number}`
+  name?: `_${string | number}`;
 };
 
 export type {
@@ -90,11 +101,14 @@ export type {
   TtimePickerProps_mui,
   TinputSelBarProps,
   TinputPropsAndSelectProps,
+  TcheckBoxProps_v2,
+  TradioProps,
 };
 
 // =============================================================================
 
 export default function InputSel({
+  key,
   disabled,
   //
   onClick,
@@ -108,7 +122,8 @@ export default function InputSel({
   checkBoxProps,
   inputSelBarProps,
   inputPropsAndSelectProps,
-
+  checkBoxProps_v2,
+  radioProps,
   //
   className,
   wrapperPreStyle,
@@ -137,6 +152,8 @@ export default function InputSel({
   suffixClassName,
   //
   showAddIcon,
+  //
+  name,
 }: TinputSelProps) {
   const [isFocus, setIsFocus] = useState(false);
 
@@ -176,6 +193,7 @@ export default function InputSel({
 
   return (
     <label
+      key={key}
       className={classNames(scss.label, className, 'w-full')}
       style={wrapperStyle}
       onClick={(e) => {
@@ -203,12 +221,15 @@ export default function InputSel({
 
       {inputProps && (
         <Input
-          wrapperClassName={classNames(fontClassName, inputProps.wrapperClassName)}
           wrapperStyle={inputProps.wrapperStyle}
+          {...inputProps}
+          wrapperClassName={classNames(fontClassName, inputProps.wrapperClassName)}
           props={{
             disabled,
             placeholder: `請輸入${caption ?? ''}`,
             //
+            // name不可以是`${number}`，會不正確的設置input的name
+            name,
             ...inputProps.props,
             //
             onFocus: (e) => {
@@ -229,6 +250,7 @@ export default function InputSel({
           wrapperStyle={textareaProps.wrapperStyle}
           allowNewLineByUser={textareaProps.allowNewLineByUser}
           props={{
+            name,
             disabled,
             placeholder: `請輸入${caption ?? ''}`,
             //
@@ -260,6 +282,7 @@ export default function InputSel({
               arrowType={dealedSelectProps.arrowType}
               fontClassName={fontClassName}
               props={{
+                name,
                 isDisabled: disabled,
                 placeholder: `請輸入${caption ?? ''}`,
                 //
@@ -291,6 +314,7 @@ export default function InputSel({
           wrapperStyle={datePickerProps.wrapperStyle}
           showSuffixIcon={datePickerProps.showSuffixIcon}
           props={{
+            name,
             disabled,
             placeholder: '例 : 100-01-01',
             //
@@ -313,6 +337,7 @@ export default function InputSel({
           wrapperClassName={classNames(fontClassName, timePickerProps.wrapperClassName)}
           wrapperStyle={timePickerProps.wrapperStyle}
           props={{
+            name,
             disabled,
             placeholder: 'HH:mm',
             //
@@ -365,6 +390,53 @@ export default function InputSel({
         />
       )}
 
+      {/* {checkBoxProps_v2 && (
+        <CheckBox_v2
+          //
+          {...checkBoxProps_v2}
+          props={checkBoxProps_v2.props}
+          fontClassName={fontClassName}
+        />
+      )} */}
+      {checkBoxProps_v2 &&
+        (() => {
+          checkBoxProps_v2.props.name = checkBoxProps_v2.props.name || name;
+
+          return (
+            <CheckBox_v2
+              //
+              {...checkBoxProps_v2}
+              props={checkBoxProps_v2.props}
+              fontClassName={fontClassName}
+            />
+          );
+        })()}
+
+      {/* {radioProps && (
+        <Radio
+          {...radioProps}
+          // props={radioProps.props}
+          // radioPropsArr={radioProps.radioPropsArr}
+          // wrapperClassName={radioProps.wrapperClassName}
+          // wrapperStyle={radioProps.wrapperStyle}
+          fontClassName={fontClassName}
+          // onClick={radioProps.onClick}
+        />
+      )} */}
+
+      {radioProps &&
+        (() => {
+          radioProps.props.name = radioProps.props.name || name;
+
+          return (
+            <Radio
+              //
+              {...radioProps}
+              fontClassName={fontClassName}
+            />
+          );
+        })()}
+
       {inputSelBarProps && (
         <InputSelBar
           wrapperClassName={inputSelBarProps.wrapperClassName}
@@ -392,6 +464,7 @@ export default function InputSel({
                   disabled,
                   placeholder: `請輸入${caption ?? ''}`,
                   //
+                  name: `${name}_inputPropsAndSelect_input`,
                   ...inputPropsAndSelectProps.inputProps.props,
                   //
                   onFocus: (e) => {
@@ -411,6 +484,7 @@ export default function InputSel({
                 arrowType={dealedSelectProps.arrowType}
                 fontClassName={fontClassName}
                 props={{
+                  name: `${name}_inputPropsAndSelect_select`,
                   isDisabled: disabled,
                   placeholder: `請輸入${caption ?? ''}`,
                   //
