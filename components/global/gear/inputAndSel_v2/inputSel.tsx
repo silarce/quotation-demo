@@ -84,8 +84,8 @@ type TinputSelProps = {
   //
   showAddIcon?: boolean;
   //
-  // 必須要有前綴或後綴，react-select不能收`${number}`
-  name?: `_${string | number}`;
+  // react-select不能收`${number}`相關處理寫在 return MySelect那邊
+  name?: string;
 };
 
 export type {
@@ -272,6 +272,11 @@ export default function InputSel({
           const { dealedSelectProps, customComponents, easyValue, easyDefaultValue, dynyOptions } = dealSelectProps({
             selectProps: selectProps,
           });
+
+          // 若為無前導零的數字串，必須要有前綴或後綴，react-select不能收`${number}`
+          if (name && /^(0|[1-9]\d*)$/.test(name)) {
+            name = `_${name}`;
+          }
 
           return (
             <MySelect
