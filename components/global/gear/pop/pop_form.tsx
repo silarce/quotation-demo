@@ -57,8 +57,6 @@ export default function Pop_form({
 
 // ======================================================================
 
-const nameArr: string[] = [];
-
 const PopContent = ({
   control,
   confirmText,
@@ -68,6 +66,8 @@ const PopContent = ({
   confirmText?: string;
   setIsShow: React.Dispatch<React.SetStateAction<boolean | undefined>>;
 }) => {
+  const nameArr: string[] = [];
+
   useEffect(() => {
     return () => {
       setIsShow(undefined);
