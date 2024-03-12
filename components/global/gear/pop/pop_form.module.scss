@@ -1,0 +1,12 @@
+.antd_tooltip {
+  cursor: pointer;
+  :global(.ant-tooltip-inner) {
+    padding: 0;
+  }
+}
+
+.container {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+}

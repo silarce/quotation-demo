@@ -171,8 +171,6 @@ export default function QuotationProfile({
     customer.onClear?.();
   };
 
-  console.log(control.isLost);
-
   // ----------------------------------------------------------------------
   return (
     <div className={scss.container}>

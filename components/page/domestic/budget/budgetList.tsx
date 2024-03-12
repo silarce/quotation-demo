@@ -4,20 +4,26 @@ import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
 
+// antd
+import { Collapse } from 'antd';
+
 // components
 import Thead01 from '../ui/table01/Thead01';
 import TbodyItem01, { TBodyItemContent } from '../ui/table01/TbodyItem01';
-import ReviewChain from '../ui/table01/reviewChain';
 import PanelBody from './budgetList/tableBody';
-// antd
-import { Collapse } from 'antd';
+
+import { Tcontrol_queryQuotationList } from 'components/page/domestic/queryQuotation/queryQuotationList';
+
 // css
 import scss from './budgetList.module.scss';
 
+// utils
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { quotationToReiviewChain } from 'js/utils/quotation/quotationToReiviewChain';
 
 // ===========================================
 import { TquotationDto } from 'js/api/api_quotation';
+import ProcessChain from 'components/global/gear/processChain';
 
 // ===========================================
 
@@ -85,59 +91,12 @@ export default function BudgetList({
             viewRef_bottom: index === quotationArr.length - 5 ? viewRef_bottom : undefined,
           };
 
-          const {
-            reviewSalesEmployee,
-            salesReviewedAt,
-            reviewSupervisorEmployee,
-            supervisorReviewedAt,
-            reviewWorkDirectorEmployee,
-            workDirectorReviewedAt,
-            reviewManagerEmployee,
-            managerReviewedAt,
-          } = latestContent;
-          const reviewStatuArr = [
-            {
-              jobName: '經辦',
-              name: latestContent.agentEmployee.chName || latestContent.agentEmployee.enName,
-              isReviewed: true,
-            },
-            {
-              jobName: '業務',
-              name: reviewSalesEmployee?.chName ?? '',
-              isReviewed: reviewSalesEmployee ? !!salesReviewedAt : undefined,
-            },
-            {
-              jobName: '業務主管',
-              name: reviewSupervisorEmployee?.chName ?? '',
-              isReviewed: reviewSupervisorEmployee ? !!supervisorReviewedAt : undefined,
-            },
-            {
-              jobName: '應收帳款',
-              name: reviewWorkDirectorEmployee?.chName ?? '',
-              isReviewed: reviewWorkDirectorEmployee ? !!workDirectorReviewedAt : undefined,
-            },
-            {
-              jobName: '總經理',
-              name: reviewManagerEmployee?.chName ?? '',
-              isReviewed: reviewManagerEmployee ? !!managerReviewedAt : undefined,
-            },
-          ];
+          const processChain = quotationToReiviewChain(latestContent);
 
-          // 在預算與投標階段，不顯示應收帳款
-          if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-            reviewStatuArr.splice(3, 1);
-          }
-
-          // 在準合約階段，不顯示經辦
-          if (status === 'Pending') {
-            reviewStatuArr.shift();
-          }
-
-          const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
-          // sortedContent.shift(); // 不顯示第一筆
+          const sortedContent = _.sortBy(contents, (content) => content.version).reverse();
 
           const recordArr = sortedContent.map((content) => {
-            const { updatedAt, editNotes, discount, quantity, total } = content;
+            const { quotationDate, editNotes, discount, quantity, total } = content;
 
             const href_body = {
               pathname: '/domestic/quotationList/quotation',
@@ -148,13 +107,16 @@ export default function BudgetList({
               },
             };
 
+            const processChain = quotationToReiviewChain(content);
+
             return {
-              date: moment(convertDate_reduce1911(updatedAt)).format('yy-MM-DD'),
+              date: moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD'),
               editNotes,
               discount,
               doorQty: String(quantity),
               total: total.toLocaleString(),
               href: href_body,
+              processChain,
             };
           });
 
@@ -169,7 +131,14 @@ export default function BudgetList({
                   isActive={isActive}
                   openQuotation={openQuotation}
                 >
-                  <ReviewChain reviewStatuArr={reviewStatuArr} />
+                  {/* <ReviewChain reviewStatuArr={reviewStatuArr} /> */}
+
+                  <ProcessChain
+                    className="mt-3"
+                    control={{
+                      statusArr: processChain,
+                    }}
+                  />
                   <span></span>
                 </TbodyItem01>
               }
@@ -183,3 +152,5 @@ export default function BudgetList({
     </div>
   );
 }
+
+// ===================================================================

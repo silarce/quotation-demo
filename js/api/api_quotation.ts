@@ -106,9 +106,53 @@ export const useGetQuotation = (customParams?: Tparams) => {
   };
 };
 
+export const apiGetQuotation_id_detail = async (id: string) => {
+  const api = `/quotation/${id}/detail`;
+
+  return axi
+    .get<TquotationDto>(api)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '取得報價單_detail失敗', content: err.message });
+
+      return Promise.reject(err.message);
+    });
+};
+
+export const apiGetQuotation_reduce_detail = async (params?: Tparams) => {
+  const api = '/quotation';
+
+  return axi
+    .get<TgetQuotation>(api, { params })
+    .then(async ({ data }) => {
+      const { data: arr, meta } = data;
+
+      const newArr = await Promise.all(
+        arr.map(async (q) => {
+          const newQ = await apiGetQuotation_id_detail(q.id);
+
+          return newQ;
+        })
+      );
+
+      return {
+        data: newArr,
+        meta,
+      };
+    })
+    .catch((err) => Promise.reject(err.message));
+};
+
 export const useGetQuotation_infinite = createUseInfinite<TgetQuotation>({
   //
   apiClient: apiGetQuotation,
+  errTitle: '取得報價單失敗',
+});
+
+export const useGetQuotation_detail_infinite = createUseInfinite<TgetQuotation>({
+  //
+  apiClient: apiGetQuotation_reduce_detail,
   errTitle: '取得報價單失敗',
 });
 
