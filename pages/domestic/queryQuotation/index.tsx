@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
 import _ from 'lodash';
@@ -8,6 +8,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
+import { Tcontrol_pop_form } from 'components/global/gear/pop/pop_form';
 
 // components
 // import BudgeList from "components/page/domestic/budget/budgetList"
@@ -26,7 +27,8 @@ import { quotationToReiviewChain } from 'js/utils/quotation/quotationToReiviewCh
 import { Toption, optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 import { optionsCreator_productMaterial, optionsCreator_doorModel_2 } from 'js/utils/options/productOptions';
 
-const options_productMaterial = optionsCreator_productMaterial({ haveEmpty: true });
+// type
+import type { Thead_popFormList } from 'components/page/domestic/queryQuotation/queryQuotationList/thead';
 
 // ===========================================
 
@@ -35,29 +37,59 @@ type Tquery = {
   // customerName: string | undefined;
   // keyWord: string | undefined;
   // keyWord_prod: string | undefined;
+  status: string | undefined;
   county: string | undefined;
   prodMaterial: string | undefined;
   doorModel: string | undefined;
   customerName: string | undefined;
-  keyWord: string | undefined;
+  contactPerson: string | undefined;
+  //
+  dateStart: string | undefined;
+  dateEnd: string | undefined;
+  projectName: string | undefined;
+  projectNumber: string | undefined;
+  //
+  order: 'ASC' | 'DESC' | undefined;
 };
+
+// ===========================================
+
+const options_productMaterial = optionsCreator_productMaterial({ haveEmpty: true });
 
 // ===========================================
 
 export default function Budget() {
   const router = useRouter();
-  let { county, prodMaterial, doorModel, customerName, keyWord } = router.query as Tquery;
-  county = county || undefined;
-  prodMaterial = prodMaterial || undefined;
-  doorModel = doorModel || undefined;
-  customerName = customerName || undefined;
-  keyWord = keyWord || undefined;
+  const query = router.query as Tquery;
+  const {
+    //
+    status = undefined,
+    county = undefined,
+    prodMaterial = undefined,
+    doorModel = undefined,
+    customerName = undefined,
+    contactPerson = undefined,
+    dateStart = undefined,
+    dateEnd = undefined,
+    projectName = undefined,
+    projectNumber = undefined,
+    order = undefined,
+  } = query;
+  // county = county || undefined;
+  // prodMaterial = prodMaterial || undefined;
+  // doorModel = doorModel || undefined;
+  // customerName = customerName || undefined;
+
+  const dateStart_moment = dateStart ? moment(dateStart) : undefined;
+  dateStart_moment && (dateStart_moment.add(1911, 'year') as moment.Moment);
+  const dateEnd_moment = dateEnd ? moment(dateEnd) : undefined;
+  dateEnd_moment && (dateEnd_moment.add(1911, 'year') as moment.Moment);
 
   // ----------------------------------------------------------------------
 
   const params: Tparams = {
     sort: 'latestContent.quotationDate',
-    order: 'DESC',
+    order: order || 'DESC',
     populate: [
       'contents.customer',
       // 'latestContent.customer',
@@ -75,48 +107,20 @@ export default function Budget() {
     ],
 
     filter: {
-      // 需求提到 材料配件 目前沒有取product.item，沒有配件資料所以不能搜尋
-      // 真的要取product.item的話，回應要等很久很久吧
-
+      // 狀態
+      'latestContent.status': { $eq: status },
       // 工程地點
       'latestContent.county': { $eq: county },
       // 客戶名稱
       'contents.customer.name': { $contains: customerName },
-      // $and: [
-      //   // 工程名稱、聯絡人、完整報價單編號
-      //   {
-      //     $or: [
-      //       {
-      //         quotationNumber: { $eq: keyWord },
-      //       },
-      //       {
-      //         'latestContent.projectName': { $contains: keyWord },
-      //       },
-      //       {
-      //         'latestContent.contactPerson': { $contains: keyWord },
-      //       },
-      //     ],
-      //   },
-      //   // 主產品門型、材質
-      //   {
-      //     $or: [
-      //       // { 'latestContent.products.doorModelName': { $eq: doorModel } },
-      //       // { 'latestContent.products.materialName': { $eq: prodMaterial } },
-      //     ],
-      //   },
-      // ],
-      $or: [
-        {
-          quotationNumber: { $eq: keyWord },
-        },
-        {
-          'latestContent.projectName': { $contains: keyWord },
-        },
-        {
-          'latestContent.contactPerson': { $contains: keyWord },
-        },
-      ],
+      // 日期起訖 quoteDate
+      'latestContent.quotationDate': { $gte: dateStart_moment?.toISOString(), $lte: dateEnd_moment?.toISOString() },
+      // 工程名稱
+      'latestContent.projectName': { $contains: projectName },
+      // 報價編號
+      'latestContent.quotationNumber': { $eq: projectNumber },
 
+      'latestContent.contactPerson': { $contains: contactPerson },
       'latestContent.products.doorModelName': { $eq: doorModel },
       'latestContent.products.materialName': { $eq: prodMaterial },
     },
@@ -128,14 +132,13 @@ export default function Budget() {
     dataArr: quoatationArr,
     viewRef_bottom,
     isLoadingPage1,
-    // isLoading,
-    init,
     reset,
   } = useGetQuotation_infinite({ customParams: params });
 
   useEffect(() => {
     reset();
-  }, [county, prodMaterial, doorModel, customerName, keyWord]);
+    // }, [county, prodMaterial, doorModel, customerName, keyWord]);
+  }, [query]);
 
   // ----------------------------------------------------------------------
 
@@ -226,11 +229,6 @@ export default function Budget() {
 
   const searchTargetList: TsearchGroup['searchTargetList'] = [
     {
-      options: optionsCreator_county({ emptyOption: true }),
-      placeholder: '選擇地區',
-      defaultValue: county,
-    },
-    {
       placeholder: '主產品門型',
       options: optionsCreator_doorModel_2({ haveEmpty: true }),
     },
@@ -239,30 +237,22 @@ export default function Budget() {
       options: options_productMaterial,
     },
     {
-      placeholder: '客戶名稱',
-      defaultValue: customerName,
-    },
-    {
-      placeholder: '工程名稱、聯絡人、完整報價單編號',
-      width: '340px',
-      defaultValue: keyWord,
+      placeholder: '聯絡人',
+      width: '100px',
+      defaultValue: contactPerson,
     },
   ];
 
   const doSearch: TsearchGroup['doSearch'] = (vArr) => {
-    const countyOption = vArr[0] as Toption;
-    const doorModelOption = vArr[1] as Toption;
-    const prodMaterialOption = vArr[2] as Toption;
+    const doorModelOption = vArr[0] as Toption;
+    const prodMaterialOption = vArr[1] as Toption;
+    const contactPerson = vArr[2] as string;
 
-    const customerName = vArr[3] as string;
-    const keyWord = vArr[4] as string;
-
-    const county = countyOption.value;
     const prodMaterial = prodMaterialOption.value;
     const doorModel = doorModelOption.value;
 
     router.push({
-      query: { county, customerName, keyWord, prodMaterial, doorModel },
+      query: { contactPerson, prodMaterial, doorModel },
     });
   };
 
@@ -270,7 +260,11 @@ export default function Budget() {
     searchTargetList,
     doSearch,
   };
-  // -----------------------
+  // -----------------------------------------------------------------------
+
+  const popFormList = usePopFormListCreator();
+
+  // -----------------------------------------------------------------------
 
   const panelList: TpanelList = [{ searchGroup }];
 
@@ -282,8 +276,186 @@ export default function Budget() {
       <PageHeader02 tag="報價單列表" panelList={panelList} />
       {/*  */}
       <div>
-        <QueryQuotationList control={control} />
+        <QueryQuotationList control={control} popFormList={popFormList} />
       </div>
     </SubLayer>
   );
 }
+
+// ===================================================================
+
+const usePopFormListCreator = () => {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const { status, county, customerName, projectName, dateStart, dateEnd, projectNumber, order } = query;
+
+  const popFormList = useMemo(() => {
+    const dateStart_moment = dateStart ? moment(dateStart) : undefined;
+    dateStart_moment && (dateStart_moment.add(1911, 'year') as moment.Moment);
+    const dateEnd_moment = dateEnd ? moment(dateEnd) : undefined;
+    dateEnd_moment && (dateEnd_moment.add(1911, 'year') as moment.Moment);
+
+    const popFormList: Thead_popFormList = {
+      quotationNumber: {
+        onConfirm: (list) => {
+          const { _projectNumber } = list;
+          router.push({
+            query: { ...query, projectNumber: _projectNumber },
+          });
+        },
+        inputSelArr: [
+          {
+            caption: '報價編號',
+            name: '_projectNumber',
+            inputProps: {
+              props: {
+                defaultValue: projectNumber,
+              },
+            },
+          },
+        ],
+      },
+
+      status: {
+        onConfirm: (list) => {
+          const { _status } = list;
+          router.push({
+            query: { ...query, status: _status },
+          });
+        },
+        inputSelArr: [
+          {
+            caption: '狀態',
+            name: '_status',
+            radioProps: {
+              props: {
+                defaultValue: status,
+                options: [
+                  { label: '預算', value: 'Budget' },
+                  { label: '投標', value: 'Bidding' },
+                  { label: '發包', value: 'Contracting' },
+                  { label: '合約', value: 'Contract' },
+                  { label: '準合約', value: 'Pending' },
+                  { label: '不拘', value: '' },
+                ],
+              },
+            },
+          },
+        ],
+      },
+      //
+      quoteDate: {
+        onConfirm: (list) => {
+          const { _dateStart, _dateEnd, _order } = list;
+          router.push({
+            query: {
+              ...query,
+              //
+              dateStart: _dateStart,
+              dateEnd: _dateEnd,
+              order: _order,
+            },
+          });
+        },
+        inputSelArr: [
+          {
+            caption: '日期(起)',
+            name: '_dateStart',
+            datePickerProps: {
+              props: {
+                defaultValue: dateStart_moment,
+                popupStyle: { zIndex: 1070 },
+              },
+            },
+          },
+          {
+            caption: '日期(訖)',
+            name: '_dateEnd',
+            datePickerProps: {
+              props: {
+                defaultValue: dateEnd_moment,
+                popupStyle: { zIndex: 1070 },
+              },
+            },
+          },
+          {
+            caption: '以日期排序',
+            name: '_order',
+            radioProps: {
+              props: {
+                defaultValue: order,
+                options: [
+                  { label: '正序', value: 'ASC' },
+                  { label: '逆序', value: 'DESC' },
+                ],
+              },
+            },
+          },
+        ],
+      },
+      //
+      county: {
+        onConfirm: (list) => {
+          const { _county } = list;
+          router.push({
+            query: { ...query, county: _county },
+          });
+        },
+        inputSelArr: [
+          {
+            caption: '地區',
+            name: '_county',
+            selectProps: {
+              props: {
+                options: optionsCreator_county({ emptyOption: true }),
+                defaultValue: county ? { label: county, value: county } : null,
+              },
+            },
+          },
+        ],
+      },
+      projectName: {
+        onConfirm: (list) => {
+          const { _projectName } = list;
+          router.push({
+            query: { ...query, projectName: _projectName },
+          });
+        },
+        inputSelArr: [
+          {
+            caption: '工程名稱',
+            name: '_projectName',
+            inputProps: {
+              props: {
+                defaultValue: projectName,
+              },
+            },
+          },
+        ],
+      },
+      customerName: {
+        onConfirm: (list) => {
+          const { _customerName } = list;
+          router.push({
+            query: { ...query, customerName: _customerName },
+          });
+        },
+        inputSelArr: [
+          {
+            caption: '客戶名稱',
+            name: '_customerName',
+            inputProps: {
+              props: {
+                defaultValue: customerName,
+              },
+            },
+          },
+        ],
+      },
+    };
+
+    return popFormList;
+  }, [query]);
+
+  return popFormList;
+};

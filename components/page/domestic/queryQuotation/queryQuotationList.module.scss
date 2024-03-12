@@ -31,17 +31,24 @@
   height: 40px;
   padding: 0 30px;
   background-color: $bgc01;
-  > * {
+  .cell {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     margin: auto;
     margin-left: 0;
+    cursor: pointer;
     &:nth-last-of-type(1) {
       margin-left: auto;
     }
-  }
-  > span {
-    font-weight: 400;
-    font-size: 14px;
-    color: #979797;
+    > span {
+      font-weight: 400;
+      font-size: 14px;
+      color: #979797;
+      > svg {
+        color: black;
+      }
+    }
   }
 }
 
