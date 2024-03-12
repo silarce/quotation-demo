@@ -298,15 +298,15 @@ const usePopFormListCreator = () => {
     const popFormList: Thead_popFormList = {
       quotationNumber: {
         onConfirm: (list) => {
-          const { _projectNumber } = list;
+          const { projectNumber } = list;
           router.push({
-            query: { ...query, projectNumber: _projectNumber },
+            query: { ...query, projectNumber: projectNumber },
           });
         },
         inputSelArr: [
           {
             caption: '報價編號',
-            name: '_projectNumber',
+            name: 'projectNumber',
             inputProps: {
               props: {
                 defaultValue: projectNumber,
@@ -318,15 +318,15 @@ const usePopFormListCreator = () => {
 
       status: {
         onConfirm: (list) => {
-          const { _status } = list;
+          const { status } = list;
           router.push({
-            query: { ...query, status: _status },
+            query: { ...query, status: status },
           });
         },
         inputSelArr: [
           {
             caption: '狀態',
-            name: '_status',
+            name: 'status',
             radioProps: {
               props: {
                 defaultValue: status,
@@ -346,21 +346,21 @@ const usePopFormListCreator = () => {
       //
       quoteDate: {
         onConfirm: (list) => {
-          const { _dateStart, _dateEnd, _order } = list;
+          const { dateStart, dateEnd, order } = list;
           router.push({
             query: {
               ...query,
               //
-              dateStart: _dateStart,
-              dateEnd: _dateEnd,
-              order: _order,
+              dateStart: dateStart,
+              dateEnd: dateEnd,
+              order: order,
             },
           });
         },
         inputSelArr: [
           {
             caption: '日期(起)',
-            name: '_dateStart',
+            name: 'dateStart',
             datePickerProps: {
               props: {
                 defaultValue: dateStart_moment,
@@ -370,7 +370,7 @@ const usePopFormListCreator = () => {
           },
           {
             caption: '日期(訖)',
-            name: '_dateEnd',
+            name: 'dateEnd',
             datePickerProps: {
               props: {
                 defaultValue: dateEnd_moment,
@@ -380,7 +380,7 @@ const usePopFormListCreator = () => {
           },
           {
             caption: '以日期排序',
-            name: '_order',
+            name: 'order',
             radioProps: {
               props: {
                 defaultValue: order,
@@ -396,15 +396,15 @@ const usePopFormListCreator = () => {
       //
       county: {
         onConfirm: (list) => {
-          const { _county } = list;
+          const { county } = list;
           router.push({
-            query: { ...query, county: _county },
+            query: { ...query, county: county },
           });
         },
         inputSelArr: [
           {
             caption: '地區',
-            name: '_county',
+            name: 'county',
 
             selectProps: {
               props: {
@@ -417,15 +417,15 @@ const usePopFormListCreator = () => {
       },
       projectName: {
         onConfirm: (list) => {
-          const { _projectName } = list;
+          const { projectName } = list;
           router.push({
-            query: { ...query, projectName: _projectName },
+            query: { ...query, projectName: projectName },
           });
         },
         inputSelArr: [
           {
             caption: '工程名稱',
-            name: '_projectName',
+            name: 'projectName',
             inputProps: {
               props: {
                 defaultValue: projectName,
@@ -436,15 +436,15 @@ const usePopFormListCreator = () => {
       },
       customerName: {
         onConfirm: (list) => {
-          const { _customerName } = list;
+          const { customerName } = list;
           router.push({
-            query: { ...query, customerName: _customerName },
+            query: { ...query, customerName: customerName },
           });
         },
         inputSelArr: [
           {
             caption: '客戶名稱',
-            name: '_customerName',
+            name: 'customerName',
             inputProps: {
               props: {
                 defaultValue: customerName,
