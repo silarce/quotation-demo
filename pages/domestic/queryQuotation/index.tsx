@@ -37,20 +37,20 @@ type Tquery = {
   // customerName: string | undefined;
   // keyWord: string | undefined;
   // keyWord_prod: string | undefined;
-  status: string | undefined;
-  county: string | undefined;
-  prodMaterial: string | undefined;
-  doorModel: string | undefined;
-  customerName: string | undefined;
-  contactPerson: string | undefined;
+  status?: string | undefined;
+  county?: string | undefined;
+  prodMaterial?: string | undefined;
+  doorModel?: string | undefined;
+  customerName?: string | undefined;
+  contactPerson?: string | undefined;
   //
-  dateStart: string | undefined;
-  dateEnd: string | undefined;
-  projectName: string | undefined;
-  projectNumber: string | undefined;
+  dateStart?: string | undefined;
+  dateEnd?: string | undefined;
+  projectName?: string | undefined;
+  projectNumber?: string | undefined;
   //
-  order: 'ASC' | 'DESC' | undefined;
-  isLost: 'true' | 'false' | undefined;
+  order?: 'ASC' | 'DESC' | undefined;
+  isLost?: 'true' | 'false' | undefined;
 };
 
 // ===========================================
@@ -64,26 +64,21 @@ export default function Budget() {
   const query = router.query as Tquery;
   const {
     //
-    status = undefined,
-    county = undefined,
-    prodMaterial = undefined,
-    doorModel = undefined,
-    customerName = undefined,
-    contactPerson = undefined,
-    dateStart = undefined,
-    dateEnd = undefined,
-    projectName = undefined,
-    projectNumber = undefined,
-    order = undefined,
-    isLost: isLost_str = undefined,
+    status,
+    county,
+    prodMaterial,
+    doorModel,
+    customerName,
+    contactPerson,
+    dateStart,
+    dateEnd,
+    projectName,
+    projectNumber,
+    order,
+    isLost: isLost_str,
   } = query;
 
   const isLost = isLost_str === 'true' ? true : isLost_str === 'false' ? false : undefined;
-
-  // county = county || undefined;
-  // prodMaterial = prodMaterial || undefined;
-  // doorModel = doorModel || undefined;
-  // customerName = customerName || undefined;
 
   const dateStart_moment = dateStart ? moment(dateStart) : undefined;
   dateStart_moment && (dateStart_moment.add(1911, 'year') as moment.Moment);
@@ -259,7 +254,7 @@ export default function Budget() {
     const doorModel = doorModelOption.value;
 
     router.push({
-      query: { contactPerson, prodMaterial, doorModel },
+      query: clearEmptyProperty({ ...query, contactPerson, prodMaterial, doorModel }),
     });
   };
 
@@ -317,8 +312,9 @@ const usePopFormListCreator = () => {
       quotationNumber: {
         onConfirm: (list) => {
           const { projectNumber } = list;
+
           router.push({
-            query: { ...query, projectNumber: projectNumber },
+            query: clearEmptyProperty({ ...query, projectNumber: projectNumber }),
           });
         },
         inputSelArr: [
@@ -337,11 +333,10 @@ const usePopFormListCreator = () => {
       status: {
         onConfirm: (list) => {
           const { status, isLost: isLost_str } = list;
-
           const isLost = isLost_str === 'undefined' ? undefined : isLost_str;
-
+          const theQuery = clearEmptyProperty({ ...query, status, isLost });
           router.push({
-            query: { ...query, status, isLost },
+            query: theQuery,
           });
         },
         inputSelArr: [
@@ -350,7 +345,7 @@ const usePopFormListCreator = () => {
             name: 'status',
             radioProps: {
               props: {
-                defaultValue: status,
+                defaultValue: status ?? '',
                 options: [
                   { label: '預算', value: 'Budget' },
                   { label: '投標', value: 'Bidding' },
@@ -389,13 +384,12 @@ const usePopFormListCreator = () => {
         onConfirm: (list) => {
           const { dateStart, dateEnd, order } = list;
           router.push({
-            query: {
+            query: clearEmptyProperty({
               ...query,
-              //
               dateStart: dateStart,
               dateEnd: dateEnd,
               order: order,
-            },
+            }),
           });
         },
         inputSelArr: [
@@ -439,7 +433,7 @@ const usePopFormListCreator = () => {
         onConfirm: (list) => {
           const { county } = list;
           router.push({
-            query: { ...query, county: county },
+            query: clearEmptyProperty({ ...query, county: county }),
           });
         },
         inputSelArr: [
@@ -460,7 +454,7 @@ const usePopFormListCreator = () => {
         onConfirm: (list) => {
           const { projectName } = list;
           router.push({
-            query: { ...query, projectName: projectName },
+            query: clearEmptyProperty({ ...query, projectName: projectName }),
           });
         },
         inputSelArr: [
@@ -479,7 +473,7 @@ const usePopFormListCreator = () => {
         onConfirm: (list) => {
           const { customerName } = list;
           router.push({
-            query: { ...query, customerName: customerName },
+            query: clearEmptyProperty({ ...query, customerName: customerName }),
           });
         },
         inputSelArr: [
@@ -516,4 +510,10 @@ const Status = ({ status, isLost }: { status: string; isLost: boolean }) => {
       )}
     </>
   );
+};
+
+const clearEmptyProperty = (obj: { [key: string]: any }) => {
+  return _.omitBy(obj, (item) => {
+    return item === undefined || item === '';
+  });
 };
