@@ -93,10 +93,10 @@ export default function BudgetList({
 
           const processChain = quotationToReiviewChain(latestContent);
 
-          const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
+          const sortedContent = _.sortBy(contents, (content) => content.version).reverse();
 
           const recordArr = sortedContent.map((content) => {
-            const { updatedAt, editNotes, discount, quantity, total } = content;
+            const { quotationDate, editNotes, discount, quantity, total } = content;
 
             const href_body = {
               pathname: '/domestic/quotationList/quotation',
@@ -110,7 +110,7 @@ export default function BudgetList({
             const processChain = quotationToReiviewChain(content);
 
             return {
-              date: moment(convertDate_reduce1911(updatedAt)).format('yy-MM-DD'),
+              date: moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD'),
               editNotes,
               discount,
               doorQty: String(quantity),
