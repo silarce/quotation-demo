@@ -107,6 +107,12 @@ const PopContent = ({
             value = target?.value ?? '不正確的name';
           }
 
+          if (targetType === 'checkbox' && !isNodeList) {
+            if (!target.checked) {
+              value = [];
+            }
+          }
+
           if (targetType === 'radio' && Array.isArray(value) && value.length === 1) {
             value = value[0];
           }
