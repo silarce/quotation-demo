@@ -1287,6 +1287,8 @@ type TquotationContentDto_copy = {
   products: TquotationProductDto[];
 
   verifyForm: TquotationVerifyFormDto;
+  // 失件
+  isLost: boolean;
 };
 
 // 報價單狀態: 預算 投標 發包 合約 準合約
@@ -1374,6 +1376,8 @@ export type TquotationContentDto = {
 
   // 為了避免check壞掉，暫時先這樣
   rootContract?: TquotationContentDto_copy;
+  // 失件
+  isLost: boolean;
 };
 
 export type TquotationDto = {
@@ -1563,6 +1567,9 @@ export type TcreateQuotationContentDto = {
   others: TcreateQuotationContentOtherDto[];
   products: TcreateQuotationProductDto[];
   productsOrder?: string[] | null; // 已棄用
+
+  // 失件
+  isLost: boolean;
 };
 
 /**合約 */

@@ -67,6 +67,12 @@ type Tcontrol = {
     trackProgress: TcontrolItem;
     projectProgress: TcontrolItem;
   };
+
+  isLost: {
+    value: boolean;
+    onChange?: (bool: boolean) => void;
+    disabled?: boolean;
+  };
 };
 
 export type { Tcontrol as Tcontrol_profile };
@@ -354,6 +360,24 @@ export default function QuotationProfile({
                 value: quotationDate ?? '',
                 placeholder: '系統自動設定',
               },
+            }}
+          />
+        </div>
+        <div>
+          <InputSel
+            // disabled={disabled}
+            disabled={control.isLost.disabled ?? disabled}
+            caption="失單"
+            showBaseline="invisible"
+            captionClassName={scss.caption}
+            captionStyle={{ width: '72px' }}
+            wrapperStyle={{ gap: wrapperStyle.gap }}
+            checkBoxProps={{
+              onChange: (arr) => {
+                const isLost = arr.includes('isLost');
+                control.isLost.onChange?.(isLost);
+              },
+              propsArr: [{ key: 'isLost', value: control.isLost.value }],
             }}
           />
         </div>

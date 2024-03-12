@@ -1,12 +1,13 @@
 import Link from 'next/link';
 
-// global gear
+//  gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
-import style from '../budgetList.module.scss';
+import scss from '../budgetList.module.scss';
 
 type Trecord = {
   date: string;
@@ -15,6 +16,7 @@ type Trecord = {
   doorQty: string;
   total: string;
   href: Parameters<typeof Link>[0]['href'];
+  processChain?: Tcontrol_processChain['statusArr'];
 };
 
 export default function PanelBody({
@@ -25,21 +27,30 @@ export default function PanelBody({
   // openQuotation: (e: MouseEvent) => void;
 }) {
   return (
-    <div className={style.panelBody}>
+    <div className={scss.panelBody}>
       {recordArr.map((item, index) => {
-        const { date, editNotes, discount, doorQty, total, href } = item;
+        const { date, editNotes, discount, doorQty, total, href, processChain = [] } = item;
 
         return (
-          <CellWithBar className={style.detailRow} key={index}>
-            <span>{date}</span>
-            <span>{editNotes}</span>
-            <span>{discount}</span>
-            <span>{doorQty}</span>
-            <span>{total}</span>
+          <CellWithBar key={index} className={scss.wrapper}>
+            <div className={scss.detailRow}>
+              <span>{date}</span>
+              <span>{editNotes}</span>
+              <span>{discount}</span>
+              <span>{doorQty}</span>
+              <span>{total}</span>
+              <div>
+                <Link href={href}>
+                  <IconDetail />
+                </Link>
+              </div>
+            </div>
             <div>
-              <Link href={href}>
-                <IconDetail />
-              </Link>
+              <ProcessChain
+                control={{
+                  statusArr: processChain,
+                }}
+              />
             </div>
           </CellWithBar>
         );
