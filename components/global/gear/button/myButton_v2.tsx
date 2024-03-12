@@ -29,6 +29,7 @@ type TmyBtn = {
   href?: string;
   target?: string;
   buttonProps?: ButtonProps;
+  children?: React.ReactNode;
 };
 
 export type { TmyBtn };
@@ -47,6 +48,7 @@ export default function MyButton_v2({
   href,
   target,
   buttonProps,
+  children,
 }: TmyBtn) {
   if (!img && preImg) {
     img = preImgList[preImg].src;
@@ -74,6 +76,7 @@ export default function MyButton_v2({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {img && <img src={img} alt="" />}
           {label && <span>{label}</span>}
+          {children}
         </Button>
       )}
       {href && (
@@ -86,6 +89,7 @@ export default function MyButton_v2({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {img && <img src={img} alt="" />}
           {label && <span>{label}</span>}
+          {children}
         </Link>
       )}
     </>
