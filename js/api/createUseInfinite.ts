@@ -166,6 +166,7 @@ export function createUseInfinite<TapiReq extends Tres>({
       init,
       reset,
       nextPage,
+      setDataList,
     };
   };
 

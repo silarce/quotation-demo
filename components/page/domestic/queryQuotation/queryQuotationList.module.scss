@@ -68,6 +68,26 @@ div.panelHeader {
       }
     }
   }
+
+  .progress {
+    display: grid;
+    grid-template-columns: 1fr 1fr 20px;
+    gap: 50px;
+    margin-top: 10px;
+    .panel {
+      display: grid;
+      gap: 5px;
+      .btn_edit.enabled {
+        color: theme("colors.danger");
+      }
+    }
+    .textarea {
+      border: solid 1px transparent;
+      &.enabled {
+        border-color: theme("colors.border");
+      }
+    }
+  }
 }
 
 div.panelBody {

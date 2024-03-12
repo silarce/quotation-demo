@@ -8,7 +8,6 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { Tcontrol_pop_form } from 'components/global/gear/pop/pop_form';
 
 // components
 // import BudgeList from "components/page/domestic/budget/budgetList"
@@ -17,7 +16,12 @@ import QueryQuotationList, {
 } from 'components/page/domestic/queryQuotation/queryQuotationList';
 
 // api
-import { Tparams, useGetQuotation, useGetQuotation_infinite } from 'js/api/api_quotation';
+import {
+  Tparams,
+  useGetQuotation,
+  useGetQuotation_infinite,
+  apiPatchQuotationContent_id_progress,
+} from 'js/api/api_quotation';
 
 // utils
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -132,9 +136,11 @@ export default function Budget() {
   const {
     //
     dataArr: quoatationArr,
+    dataList,
     viewRef_bottom,
     isLoadingPage1,
     reset,
+    setDataList,
   } = useGetQuotation_infinite({ customParams: params });
 
   useEffect(() => {
@@ -144,83 +150,118 @@ export default function Budget() {
 
   // ----------------------------------------------------------------------
 
-  const panelArr: Tcontrol_queryQuotationList['panelArr'] =
-    quoatationArr?.map((quotation, index) => {
-      const { contents, latestContent, id } = quotation;
-      const isContract = latestContent.status === 'Contract';
+  const panelArr = useMemo(() => {
+    const panelArr: Tcontrol_queryQuotationList['panelArr'] = [];
 
-      const processChain = quotationToReiviewChain(latestContent);
-      const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
+    Object.keys(dataList).forEach((key) => {
+      const arr = dataList[key as keyof typeof dataList];
 
-      const href_head = isContract
-        ? {
-            pathname: '/domestic/contract/quotation',
-            query: {
-              id: latestContent.contract?.id,
-              version: 1,
-            },
-          }
-        : {
-            pathname: '/domestic/quotationList/quotation',
-            query: {
-              id: id,
-              status: latestContent.status,
-            },
+      arr.forEach((quotation, index) => {
+        const { contents, latestContent, id } = quotation;
+        const isContract = latestContent.status === 'Contract';
+
+        const processChain = quotationToReiviewChain(latestContent);
+        const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
+
+        const href_head = isContract
+          ? {
+              pathname: '/domestic/contract/quotation',
+              query: {
+                id: latestContent.contract?.id,
+                version: 1,
+              },
+            }
+          : {
+              pathname: '/domestic/quotationList/quotation',
+              query: {
+                id: id,
+                status: latestContent.status,
+              },
+            };
+
+        const latestCustomer = sortedContent[0].customer;
+
+        const header: Tcontrol_queryQuotationList['panelArr'][number]['header'] = {
+          quotationNumber: latestContent.quotationNumber,
+          status: <Status status={quotationStatusLookup[latestContent.status]} isLost={latestContent.isLost} />,
+          quoteDate: moment(convertDate_reduce1911(latestContent.updatedAt)).format('yy-MM-DD'),
+          county: latestContent.county,
+          projectName: latestContent.projectName,
+          customerName: latestCustomer?.name,
+          contactPerson: latestContent.contactPerson,
+          contactPhoneNumber: latestContent.contactNumber,
+          href: href_head,
+          viewRef_bottom: quoatationArr.length - 10 === index ? viewRef_bottom : undefined,
+          //
+          processChain: processChain,
+          trackProgress: latestContent.trackProgress,
+          projectProgress: latestContent.projectProgress,
+          onEditConfirm: async ({ trackProgress, projectProgress }) => {
+            const body = { trackProgress, projectProgress };
+
+            try {
+              const res = await apiPatchQuotationContent_id_progress(latestContent.id, body);
+
+              if (res) {
+                setDataList((list) => {
+                  const latestContent = _.cloneDeep(list[key as keyof typeof dataList][index].latestContent);
+                  latestContent.trackProgress = trackProgress;
+                  latestContent.projectProgress = projectProgress;
+                  list[key as keyof typeof dataList][index].latestContent = latestContent;
+
+                  return {
+                    ...list,
+                  };
+                });
+              }
+
+              return !!res;
+            } catch (error) {}
+
+            return false;
+          },
+        };
+
+        const body = sortedContent.map((content, index) => {
+          const { status, updatedAt, county, projectName, customer, isLost } = content;
+
+          const query: { [key: string]: string | number | boolean | undefined } = {
+            id: id,
+            status: status,
+            contentId: content.id,
           };
 
-      const latestCustomer = sortedContent[0].customer;
+          if (isContract) {
+            query.isContract = isContract;
+          }
 
-      const header = {
-        quotationNumber: latestContent.quotationNumber,
-        status: <Status status={quotationStatusLookup[latestContent.status]} isLost={latestContent.isLost} />,
-        quoteDate: moment(convertDate_reduce1911(latestContent.updatedAt)).format('yy-MM-DD'),
-        county: latestContent.county,
-        projectName: latestContent.projectName,
-        customerName: latestCustomer?.name,
-        contactPerson: latestContent.contactPerson,
-        contactPhoneNumber: latestContent.contactNumber,
-        href: href_head,
-        viewRef_bottom: quoatationArr.length - 10 === index ? viewRef_bottom : undefined,
-        //
-        processChain: processChain,
-      };
+          const href_body = {
+            pathname: '/domestic/quotationList/quotation',
+            query,
+          };
 
-      const body = sortedContent.map((content, index) => {
-        const { status, updatedAt, county, projectName, customer, isLost } = content;
+          return {
+            status: <Status status={quotationStatusLookup[status]} isLost={content.isLost} />,
+            quoteDate: moment(convertDate_reduce1911(updatedAt)).format('yy-MM-DD'),
+            county: county,
+            projectName: projectName,
+            customerName: customer?.name,
+            href: href_body,
+          };
+        });
 
-        const query: { [key: string]: string | number | boolean | undefined } = {
-          id: id,
-          status: status,
-          contentId: content.id,
-        };
+        // body.reverse();
+        body.shift();
 
-        if (isContract) {
-          query.isContract = isContract;
-        }
-
-        const href_body = {
-          pathname: '/domestic/quotationList/quotation',
-          query,
-        };
-
-        return {
-          status: <Status status={quotationStatusLookup[status]} isLost={content.isLost} />,
-          quoteDate: moment(convertDate_reduce1911(updatedAt)).format('yy-MM-DD'),
-          county: county,
-          projectName: projectName,
-          customerName: customer?.name,
-          href: href_body,
-        };
+        panelArr.push({
+          header,
+          body,
+        });
       });
+    });
 
-      // body.reverse();
-      body.shift();
-
-      return {
-        header,
-        body,
-      };
-    }) ?? [];
+    return panelArr;
+  }, [quoatationArr]);
 
   const control: Tcontrol_queryQuotationList = {
     panelArr: panelArr,
