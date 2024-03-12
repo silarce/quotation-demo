@@ -55,6 +55,8 @@ type Tquery = {
   //
   order?: 'ASC' | 'DESC' | undefined;
   isLost?: 'true' | 'false' | undefined;
+  agentName: string | undefined;
+  salesName: string | undefined;
 };
 
 // ===========================================
@@ -80,6 +82,8 @@ export default function Budget() {
     projectNumber,
     order,
     isLost: isLost_str,
+    agentName,
+    salesName,
   } = query;
 
   const isLost = isLost_str === 'true' ? true : isLost_str === 'false' ? false : undefined;
@@ -125,6 +129,9 @@ export default function Budget() {
       'latestContent.quotationNumber': { $eq: projectNumber },
       // 失件
       'latestContent.isLost': { $eq: isLost },
+
+      'latestContent.agentEmployee.chName': { $contains: agentName },
+      'latestContent.reviewSalesEmployee.chName': { $contains: salesName },
 
       'latestContent.contactPerson': { $contains: contactPerson },
       'latestContent.products.doorModelName': { $eq: doorModel },
@@ -284,18 +291,37 @@ export default function Budget() {
       width: '100px',
       defaultValue: contactPerson,
     },
+    {
+      placeholder: '經辦',
+      width: '100px',
+      defaultValue: '',
+    },
+    {
+      placeholder: '業務',
+      width: '100px',
+      defaultValue: '',
+    },
   ];
 
   const doSearch: TsearchGroup['doSearch'] = (vArr) => {
     const doorModelOption = vArr[0] as Toption;
     const prodMaterialOption = vArr[1] as Toption;
     const contactPerson = vArr[2] as string;
+    const agentName = vArr[3] as string;
+    const salesName = vArr[4] as string;
 
     const prodMaterial = prodMaterialOption.value;
     const doorModel = doorModelOption.value;
 
     router.push({
-      query: clearEmptyProperty({ ...query, contactPerson, prodMaterial, doorModel }),
+      query: clearEmptyProperty({
+        ...query,
+        contactPerson,
+        prodMaterial,
+        doorModel,
+        agentName,
+        salesName,
+      }),
     });
   };
 
