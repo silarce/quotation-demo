@@ -50,6 +50,7 @@ type Tquery = {
   projectNumber: string | undefined;
   //
   order: 'ASC' | 'DESC' | undefined;
+  isLost: 'true' | 'false' | undefined;
 };
 
 // ===========================================
@@ -74,7 +75,11 @@ export default function Budget() {
     projectName = undefined,
     projectNumber = undefined,
     order = undefined,
+    isLost: isLost_str = undefined,
   } = query;
+
+  const isLost = isLost_str === 'true' ? true : isLost_str === 'false' ? false : undefined;
+
   // county = county || undefined;
   // prodMaterial = prodMaterial || undefined;
   // doorModel = doorModel || undefined;
@@ -119,6 +124,8 @@ export default function Budget() {
       'latestContent.projectName': { $contains: projectName },
       // 報價編號
       'latestContent.quotationNumber': { $eq: projectNumber },
+      // 失件
+      'latestContent.isLost': { $eq: isLost },
 
       'latestContent.contactPerson': { $contains: contactPerson },
       'latestContent.products.doorModelName': { $eq: doorModel },
@@ -287,7 +294,18 @@ export default function Budget() {
 const usePopFormListCreator = () => {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { status, county, customerName, projectName, dateStart, dateEnd, projectNumber, order } = query;
+  const {
+    //
+    status,
+    county,
+    customerName,
+    projectName,
+    dateStart,
+    dateEnd,
+    projectNumber,
+    order,
+    isLost,
+  } = query;
 
   const popFormList = useMemo(() => {
     const dateStart_moment = dateStart ? moment(dateStart) : undefined;
@@ -318,9 +336,12 @@ const usePopFormListCreator = () => {
 
       status: {
         onConfirm: (list) => {
-          const { status } = list;
+          const { status, isLost: isLost_str } = list;
+
+          const isLost = isLost_str === 'undefined' ? undefined : isLost_str;
+
           router.push({
-            query: { ...query, status: status },
+            query: { ...query, status, isLost },
           });
         },
         inputSelArr: [
@@ -337,6 +358,26 @@ const usePopFormListCreator = () => {
                   { label: '合約', value: 'Contract' },
                   { label: '準合約', value: 'Pending' },
                   { label: '不拘', value: '' },
+                ],
+              },
+            },
+          },
+          {
+            caption: '失件',
+            name: 'isLost',
+            // checkBoxProps_v2: {
+            //   props: {
+            //     defaultValue: isLost ? ['isLost'] : undefined,
+            //     options: [{ label: '失件', value: 'isLost' }],
+            //   },
+            // },
+            radioProps: {
+              props: {
+                defaultValue: isLost || 'undefined',
+                options: [
+                  { label: '是', value: 'true' },
+                  { label: '否', value: 'false' },
+                  { label: '不拘', value: 'undefined' },
                 ],
               },
             },
