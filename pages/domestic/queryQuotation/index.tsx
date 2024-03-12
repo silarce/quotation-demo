@@ -161,7 +161,7 @@ export default function Budget() {
         const isContract = latestContent.status === 'Contract';
 
         const processChain = quotationToReiviewChain(latestContent);
-        const sortedContent = _.sortBy(contents, (content) => content.updatedAt).reverse();
+        const sortedContent = _.sortBy(contents, (content) => content.version).reverse();
 
         const href_head = isContract
           ? {
@@ -184,7 +184,7 @@ export default function Budget() {
         const header: Tcontrol_queryQuotationList['panelArr'][number]['header'] = {
           quotationNumber: latestContent.quotationNumber,
           status: <Status status={quotationStatusLookup[latestContent.status]} isLost={latestContent.isLost} />,
-          quoteDate: moment(convertDate_reduce1911(latestContent.updatedAt)).format('yy-MM-DD'),
+          quoteDate: moment(convertDate_reduce1911(latestContent.quotationDate)).format('yy-MM-DD'),
           county: latestContent.county,
           projectName: latestContent.projectName,
           customerName: latestCustomer?.name,
@@ -222,8 +222,8 @@ export default function Budget() {
           },
         };
 
-        const body = sortedContent.map((content, index) => {
-          const { status, updatedAt, county, projectName, customer, isLost } = content;
+        const body = sortedContent.map((content) => {
+          const { status, quotationDate, county, projectName, customer } = content;
 
           const query: { [key: string]: string | number | boolean | undefined } = {
             id: id,
@@ -242,7 +242,7 @@ export default function Budget() {
 
           return {
             status: <Status status={quotationStatusLookup[status]} isLost={content.isLost} />,
-            quoteDate: moment(convertDate_reduce1911(updatedAt)).format('yy-MM-DD'),
+            quoteDate: moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD'),
             county: county,
             projectName: projectName,
             customerName: customer?.name,
