@@ -117,6 +117,10 @@ const PopContent = ({
             value = value[0];
           }
 
+          if (typeof value === 'string') {
+            value = value.trim();
+          }
+
           list[name] = value;
         });
 
