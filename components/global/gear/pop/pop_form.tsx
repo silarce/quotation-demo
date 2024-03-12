@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // antd
-import { Tooltip } from 'antd';
+import { Tooltip, TooltipProps } from 'antd';
 
 // gear
 import MyButton_v2 from '../button/myButton_v2';
@@ -26,10 +26,16 @@ export default function Pop_form({
   children,
   control,
   confirmText,
+  placement,
 }: {
   children: React.ReactNode;
   control: Tcontrol;
   confirmText?: string;
+  withWrapper?: boolean;
+  wrapperClassName?: string;
+  // TooltipProps是複合型別，使用時發生型別錯誤
+  // props?: TooltipProps;
+  placement?: TooltipProps['placement'];
 }) {
   const [show, setIsShow] = useState<boolean | undefined>(undefined);
 
@@ -42,6 +48,7 @@ export default function Pop_form({
       color={theme.colors_bgc02}
       destroyTooltipOnHide={true}
       visible={show}
+      placement={placement}
     >
       {children}
     </Tooltip>
@@ -80,29 +87,31 @@ const PopContent = ({
         nameArr.forEach((name) => {
           const target = e.currentTarget[name];
 
-          if (target.length && target.length > 1) {
-            const strArr: string[] = [];
+          // 目前已知 text checkbox radio hidden // 可能還有 textarea
+          const targetType: 'text' | 'checkbox' | 'radio' | 'hidden' | undefined = target?.type ?? target[0].type;
+          const isNodeList = target instanceof NodeList;
 
-            for (const ele of target) {
+          let value: string | string[] = '';
+
+          if (isNodeList) {
+            value = [];
+
+            for (const element of target) {
+              const ele = element as HTMLInputElement;
+
               if (ele.checked) {
-                strArr.push(ele.value);
+                value.push(ele.value);
               }
             }
-
-            list[name] = strArr;
           } else {
-            if (target.type === 'checkbox' && !target.checked) {
-              list[name] = [];
-            } else {
-              list[name] = target?.value ?? '不支援name的inputSel';
-
-              if (target?.value === undefined) {
-                console.log(name, '不支援name的inputSel');
-              }
-            }
+            value = target?.value ?? '不正確的name';
           }
 
-          //
+          if (targetType === 'radio' && Array.isArray(value) && value.length === 1) {
+            value = value[0];
+          }
+
+          list[name] = value;
         });
 
         control.onConfirm?.(list);

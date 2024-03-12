@@ -108,7 +108,6 @@ export type {
 // =============================================================================
 
 export default function InputSel({
-  key,
   disabled,
   //
   onClick,
@@ -193,7 +192,6 @@ export default function InputSel({
 
   return (
     <label
-      key={key}
       className={classNames(scss.label, className, 'w-full')}
       style={wrapperStyle}
       onClick={(e) => {
