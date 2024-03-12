@@ -14,7 +14,7 @@ import scss from '../queryQuotationList.module.scss';
 
 type Tcontrol_panelHeader = {
   quotationNumber: string;
-  status: string;
+  status: React.ReactNode;
   quoteDate: string;
   county: string;
   projectName: string;
@@ -74,18 +74,3 @@ export default function PanelHeader({ control, isActive }: { control: Tcontrol_p
     </CellWithBar>
   );
 }
-
-const foo: Tcontrol_processChain['statusArr'] = [
-  {
-    label: 'fooo',
-    dotColor: 'green',
-  },
-  {
-    label: 'fooo',
-    dotColor: 'green',
-  },
-  {
-    label: 'fooo',
-    dotColor: 'green',
-  },
-];

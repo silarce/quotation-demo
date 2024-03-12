@@ -11,7 +11,7 @@ import style from '../queryQuotationList.module.scss';
 // =======================================================================
 
 type Tcontrol_panelBody = {
-  status: string;
+  status: React.ReactNode;
   quoteDate: string;
   county: string;
   projectName: string;
