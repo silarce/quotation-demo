@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 // components
-import Thead from './queryQuotationList/thead';
+import Thead, { Thead_popFormList } from './queryQuotationList/thead';
 import PanelHeader, { Tcontrol_panelHeader } from './queryQuotationList/panelHeader';
 import PanelBody, { Tcontrol_panelBody } from './queryQuotationList/panelBody';
 
@@ -29,8 +29,10 @@ const { Panel } = Collapse;
 export default function QueryQuotationList({
   //
   control,
+  popFormList,
 }: {
   control: Tcontrol;
+  popFormList: Thead_popFormList;
 }) {
   // panelHeader點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -42,7 +44,7 @@ export default function QueryQuotationList({
 
   return (
     <div className={style.container}>
-      <Thead />
+      <Thead popFormList={popFormList} />
 
       <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
         {control.panelArr.map((item, index) => {
