@@ -491,6 +491,20 @@ version>1 是子合約
       label: '追加追減報價單',
       onClick: () => setSwitch02(() => true),
     },
+    {
+      type: 'myButton',
+      label: '追加追減',
+      onClick: () => {
+        if (data) {
+          router.push({
+            pathname: '/domestic/contract/attachContract',
+            query: {
+              contractId: data.id,
+            },
+          });
+        }
+      },
+    },
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
 

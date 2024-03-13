@@ -61,7 +61,7 @@ const quotationToReiviewChain = (content: TquotationDto['contents'][number]) => 
       dotColor: dotColor_workDirector,
     },
     {
-      label: `經理 ${reviewManagerEmployee?.chName ?? ''}`,
+      label: `總經理 ${reviewManagerEmployee?.chName ?? ''}`,
       dotColor: dotColor_manager,
     },
   ];

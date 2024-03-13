@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, Fragment } from 'react';
+import classNames from 'classnames';
 
 // global gear
 import MyButton from 'components/global/gear/button/myButton';
@@ -99,15 +100,15 @@ export default function PanelList({ panelList }: { panelList: TpanelList }) {
         return (
           <Fragment key={index}>
             {type === 'myButton' ? (
-              <MyButton label={label} onClick={onClick} className={className} img={img} />
+              <MyButton label={label} onClick={onClick} className={classNames(scss.btn, className)} img={img} />
             ) : type === 'redButton' ? (
-              <RedButton label={label} onClick={onClick} className={className} img={img} />
+              <RedButton label={label} onClick={onClick} className={classNames(scss.btn, className)} img={img} />
             ) : type === 'addButton' ? (
-              <AddButton label={label} onClick={onClick} className={className} />
+              <AddButton label={label} onClick={onClick} className={classNames(scss.btn, className)} />
             ) : type === 'exportButton' ? (
-              <ExportButton label={label} onClick={onClick} className={className} />
+              <ExportButton label={label} onClick={onClick} className={classNames(scss.btn, className)} />
             ) : type === 'inputSearch' ? (
-              <InputSearch placeholder={placeholder} onClick={onClick} className={className} />
+              <InputSearch placeholder={placeholder} onClick={onClick} className={classNames(scss.btn, className)} />
             ) : null}
           </Fragment>
         );

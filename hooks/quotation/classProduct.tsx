@@ -1,3 +1,6 @@
+// 注意事項目錄 (用法:ctrl+f 搜尋關鍵字)
+// warning01
+
 /**
  *prodCellConfig
  
@@ -400,6 +403,8 @@ class Class_product {
   private isWgChanged = false;
   private isDontClearProd = false;
 
+  private isEditW_noGapA = false;
+
   // ---------------------------------------------------------
   // 追加追減用的
   private parentProd: Class_product | undefined = undefined;
@@ -454,7 +459,7 @@ class Class_product {
   // ---------------------------------------------------------
   // req呼叫控制
   // 防抖
-  callAllTimeoutId: NodeJS.Timeout | null = null;
+  callAllTimeoutId: NodeJS.Timeout | undefined = undefined;
 
   shouldCall_cgs = false; //req_calcGeneralSpec
   shouldCall_pac = false; //req_getProdAvailableComponents
@@ -892,7 +897,6 @@ class Class_product {
       this._prodData.boxB = theBoxB;
       this._defaultBoxB = theBoxB;
 
-      this.isLoading = true;
       const res_boxD = await reqGetBoxD({
         modelName: this.doorType,
         rollerDiameter: this._doorGeneralSpecs.diameter,
@@ -900,7 +904,6 @@ class Class_product {
         hp: this.horsepower,
         motorVendor: this.motor,
       });
-      this.isLoading = false;
 
       const boxD = res_boxD?.sidePlateSizeD ?? '0';
       this._prodData.boxD = new Decimal(boxD).div(1000).toString();
@@ -975,26 +978,6 @@ class Class_product {
     } else {
       return false;
     }
-
-    // try {
-    //   const res = await apiGetProdAvailableComponents({
-    //     modelName: this.doorType as TpacParams['modelName'],
-    //     weight: this.weight,
-    //     isAntiTyphoon: this.typhoonProtection,
-    //     rollerDiameter: rollerDiameter,
-    //   });
-    //   this._availableComponents = res;
-
-    //   this.retrieveOptions();
-    //   this.callRetrieveCreProdCom();
-
-    //   return true;
-    // } catch (error) {
-    //   const err = error as AxiosError<{ message: string }>;
-    //   myAlert.err({ title: '取得材料配件失敗', content: err.response?.data.message });
-
-    //   return false;
-    // }
   } //  req_getProdAvailableComponents
 
   async reqProdGenerateDoorProductBom() {
@@ -1134,7 +1117,7 @@ class Class_product {
     let res3: boolean | undefined;
 
     try {
-      this.isLoading = true;
+      // this.isLoading = true;
       this.reRender();
 
       // 預期_availableComponents會更新，在_availableComponents更新前
@@ -1160,12 +1143,13 @@ class Class_product {
       }
     } catch (error) {
     } finally {
-      this.isLoading = false;
+      // this.isLoading = false;
 
       //如果res1或res2呼叫了，就呼叫takeDefaultDynaValue
       if (res1 || res2) {
         this.takeDefaultDynaValue();
       }
+
       // 呼叫reqProdGenerateDoorProductBom後取得的資料
       // 只有comList(材料配件)會用到
       // 那就根本不需要呼叫takeDefaultDynaValue
@@ -1195,6 +1179,16 @@ class Class_product {
     this.shouldCall_pac = false;
     this.shouldCall_pgpb = false;
 
+    // ! warning01
+    // 若是在沒有gapA的情況計算出fulllWidth(以下稱舊L)並執行req_calcGeneralSpec
+    // 取得的doorGeneralSpecs會是錯誤的
+    // 因此必須再取得 新L 後執行fullWidth的setter，再執行一次呼叫鏈，取得新L的doorGeneralSpec
+    // 但是若舊L與新L在後端算出的重量剛好對應到不同馬達，將會導致新L時的W與舊L時的W不相符
+    if (this.isEditW_noGapA) {
+      this.fullWidth = this.fullWidth;
+      this.isEditW_noGapA = false;
+    }
+
     this.reRender();
   }
 
@@ -1202,10 +1196,23 @@ class Class_product {
   callAllReq() {
     if (this.callAllTimeoutId) {
       clearTimeout(this.callAllTimeoutId);
+      this.callAllTimeoutId = undefined;
     }
 
-    this.callAllTimeoutId = setTimeout(() => {
-      this.reqChain();
+    this.callAllTimeoutId = setTimeout(async () => {
+      this.isLoading = true;
+
+      clearTimeout(this.callAllTimeoutId);
+      this.callAllTimeoutId = undefined;
+
+      await this.reqChain();
+
+      // 在reqChain中，可能會間接的再次呼叫callAllReq
+      // 於是this.callAllTimeoutId就不會為undefined
+      // 只有在reqChain中沒有再次呼叫callAllReq時，this.isLoading才會被設為false
+      if (!this.callAllTimeoutId) {
+        this.isLoading = false;
+      }
     }, 800);
   }
 
@@ -2427,6 +2434,10 @@ class Class_product {
     });
 
     this.WG = String(WG);
+
+    if (!this._doorGeneralSpecs?.gapA) {
+      this.isEditW_noGapA = true;
+    }
 
     this.reRender;
   }
