@@ -1,3 +1,6 @@
+// 注意事項目錄 (用法:ctrl+f 搜尋關鍵字)
+// warning01
+
 /**
  *prodCellConfig
  
@@ -399,6 +402,8 @@ class Class_product {
 
   private isWgChanged = false;
   private isDontClearProd = false;
+
+  private isEditW_noGapA = false;
 
   // ---------------------------------------------------------
   // 追加追減用的
@@ -1194,6 +1199,16 @@ class Class_product {
     this.shouldCall_cgs = false;
     this.shouldCall_pac = false;
     this.shouldCall_pgpb = false;
+
+    // ! warning01
+    // 若是在沒有gapA的情況計算出fulllWidth(以下稱舊L)並執行req_calcGeneralSpec
+    // 取得的doorGeneralSpecs會是錯誤的
+    // 因此必須再取得 新L 後執行fullWidth的setter，再執行一次呼叫鏈，取得新L的doorGeneralSpec
+    // 但是若舊L與新L在後端算出的重量剛好對應到不同馬達，將會導致新L時的W與舊L時的W不相符
+    if (this.isEditW_noGapA) {
+      this.fullWidth = this.fullWidth;
+      this.isEditW_noGapA = false;
+    }
 
     this.reRender();
   }
@@ -2427,6 +2442,10 @@ class Class_product {
     });
 
     this.WG = String(WG);
+
+    if (!this._doorGeneralSpecs?.gapA) {
+      this.isEditW_noGapA = true;
+    }
 
     this.reRender;
   }
