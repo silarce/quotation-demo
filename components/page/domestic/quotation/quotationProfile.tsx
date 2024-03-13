@@ -82,9 +82,11 @@ export default function QuotationProfile({
   //
   disabled = false,
   control,
+  editNotes,
 }: {
   disabled: boolean;
   control: Tcontrol;
+  editNotes?: string;
 }) {
   // ----------------------------------------------------------------
 
@@ -175,9 +177,13 @@ export default function QuotationProfile({
   return (
     <div className={scss.container}>
       <div className={scss.profile}>
-        <span className={classNames(scss.clientState, styleHaveState)}>
-          客戶類別 : {customerTypes || '尚未選擇客戶'}
-        </span>
+        <div className={classNames(scss.topBox, 'truncate')}>
+          <span className={classNames(scss.clientState, styleHaveState)}>
+            客戶類別 : {customerTypes || '尚未選擇客戶'}
+          </span>
+          <span>報價單備註 :{editNotes}</span>
+        </div>
+
         <InputSel
           caption="工程名稱"
           disabled={disabled}

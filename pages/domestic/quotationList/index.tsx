@@ -49,7 +49,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
     userId = undefined;
   }
 
-  const [contractSelectShow, setContractSelectShow] = useState(false);
+  // const [contractSelectShow, setContractSelectShow] = useState(false);
 
   // ----------------------------------------------------
   //
@@ -381,17 +381,17 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
 
   // ----------------------------------------------------------
 
-  const attatchBtn = {
-    type: 'myButton',
-    label: '追加追減',
-    onClick: () => {
-      setContractSelectShow(true);
-    },
-  } as const;
+  // const attatchBtn = {
+  //   type: 'myButton',
+  //   label: '追加追減',
+  //   onClick: () => {
+  //     setContractSelectShow(true);
+  //   },
+  // } as const;
 
   const panelList: TpanelList = [
     { searchGroup },
-    status === 'Contracting' ? attatchBtn : null,
+    // status === 'Contracting' ? attatchBtn : null,
     {
       type: 'addButton',
       label: '新增報價單',
@@ -415,7 +415,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
         <ApprovalsBar router={router} />
         <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} viewRef_bottom={viewRef_bottom} />
       </div>
-      <ContractSelector
+      {/* <ContractSelector
         showModal={contractSelectShow}
         onConfirm={(v) => {
           if (!v[0]) {
@@ -430,7 +430,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
           });
         }}
         onCancel={() => setContractSelectShow(false)}
-      />
+      /> */}
     </SubLayer>
   );
 }
