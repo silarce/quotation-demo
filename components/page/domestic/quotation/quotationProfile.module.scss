@@ -13,14 +13,18 @@
   // background-color: #ddd;
 }
 
-.clientState {
-  padding: 4px 10px;
-  color: #fff;
-  font-weight: 400;
-  font-size: 16px;
-  background-color: $colorBorder01;
-  &.haveState {
-    background-color: $colorMain;
+.topBox {
+  .clientState {
+    flex: none;
+    padding: 4px 10px;
+    margin-right: 10px;
+    color: #fff;
+    font-weight: 400;
+    font-size: 16px;
+    background-color: $colorBorder01;
+    &.haveState {
+      background-color: $colorMain;
+    }
   }
 }
 

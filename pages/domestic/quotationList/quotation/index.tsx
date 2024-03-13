@@ -1219,9 +1219,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const VersionLabel = () => {
     return (
-      <div className="ml-2">
+      <div className="ml-2 mb-1 mt-auto">
         <div>版本 : {version}</div>
-        <div className="w-64 truncate">備註 : {editNotes}</div>
       </div>
     );
   };
@@ -1984,7 +1983,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
-          <QuotationProfile disabled={disabled} control={control_profile} />
+          <QuotationProfile disabled={disabled} control={control_profile} editNotes={editNotes} />
 
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
