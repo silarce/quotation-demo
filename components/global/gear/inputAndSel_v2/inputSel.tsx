@@ -405,6 +405,10 @@ export default function InputSel({
         (() => {
           checkBoxProps_v2.props.name = checkBoxProps_v2.props.name || name;
 
+          if (checkBoxProps_v2.props.disabled === undefined) {
+            checkBoxProps_v2.props.disabled = disabled;
+          }
+
           return (
             <CheckBox_v2
               //
