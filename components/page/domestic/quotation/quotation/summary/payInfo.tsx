@@ -18,6 +18,10 @@ type TinputCell = {
 
 export type Tcontrol = {
   payment: {
+    haveTax: {
+      value: boolean;
+      onChange?: (v: boolean) => void;
+    };
     discountRate: TinputCell;
     subTotal: TinputCell;
     salesTax: TinputCell;
@@ -60,6 +64,28 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
   return (
     <div className={classNames(scss.container, scss.legacy)}>
       <div className={scss.payBox}>
+        <InputSel
+          className="m-auto mr-0 mb-5 "
+          wrapperStyle={{ width: '97px' }}
+          showBaseline="invisible"
+          disabled={disabled}
+          checkBoxProps_v2={{
+            props: {
+              value: payment.haveTax.value ? ['haveTax'] : [],
+              onChange: (e) => {
+                const haveTax = e.includes('haveTax');
+                payment.haveTax.onChange?.(haveTax);
+              },
+            },
+            checkBoxPropsArr: [
+              {
+                value: 'haveTax',
+                children: '是否含稅',
+              },
+            ],
+          }}
+        />
+
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className="relative">
             {'總折數'}

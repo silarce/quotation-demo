@@ -359,7 +359,36 @@ div.selControl {
         // top: 1px;
         top: unset;
         font-size: inherit;
+        &:nth-of-type(2) {
+          padding-right: 0;
+          color: theme("colors.sub");
+        }
       }
+      //
+      //
+      //
+      //
+      :global(.ant-checkbox) {
+        :global(.ant-checkbox-inner) {
+          // width: 15px;
+          // height: 15px;
+          border-color: $colorBorder01;
+        }
+      }
+      :global(.ant-checkbox-checked) {
+        :global(.ant-checkbox-inner) {
+          background-color: $colorMain;
+        }
+      }
+      :global(.ant-checkbox-disabled) {
+        :global(.ant-checkbox-inner) {
+          &::after {
+            border-color: #fff;
+          }
+        }
+      }
+      //
+      //
     }
   }
 }

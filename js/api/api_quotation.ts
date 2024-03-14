@@ -132,7 +132,10 @@ export const apiGetQuotation_reduce_detail = async (params?: Tparams) => {
         arr.map(async (q) => {
           const newQ = await apiGetQuotation_id_detail(q.id);
 
-          return newQ;
+          return {
+            ...q,
+            ...newQ,
+          };
         })
       );
 

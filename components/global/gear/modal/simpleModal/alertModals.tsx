@@ -133,13 +133,13 @@ export const ModalConfirm = ({
   const theClassName = classNames(className01, style.confirm, className);
 
   return Modal.confirm({
+    icon: <></>,
+    ...modalProps,
     title,
     content,
-    ...modalProps,
-    ...props,
-    className: theClassName,
     cancelText: '取消',
-    icon: <></>,
+    ...props,
+    className: classNames(theClassName, props?.className),
   });
 };
 

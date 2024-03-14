@@ -300,6 +300,16 @@ version>1 是子合約
 
   const payInfoControl: TpayInfoControl = {
     payment: {
+      haveTax: {
+        value: !!data?.salesTax,
+        onChange: (v) => {
+          // if (quotationProdSubTotal === '') {
+          //   calcSubTotalPrice();
+          // }
+          // setTaxRate(v ? 0.05 : 0);
+        },
+      },
+
       discountRate: {
         inputAttr: {
           disabled: true,
