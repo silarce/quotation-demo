@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext } from 'react';
+import { useState, useEffect, createContext, useCallback } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 import _ from 'lodash';
 
@@ -17,6 +17,7 @@ import Layer from 'components/Layer/Layer';
 // global gear
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // api
 import { TuserDto, apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth';
@@ -54,39 +55,25 @@ export const AppContext = createContext<TappContext>(null!);
 
 // =============================================================================
 function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
+  const router = appProps.router;
   const [ready, setReady] = useState(false);
-
   const rwd1023 = useMediaQuery({ query: '(max-width: 1023px)' });
   const rwd1439 = useMediaQuery({ query: '(max-width: 1439px)' });
 
-  const router = appProps.router;
-
-  // ----------------------------------------------------------------------------
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe();
   const { erpFeature: userErpFeature, setErpFeature, updateErpFeature: updateUserErpFeature } = useApiErpFeaturesMe();
 
-  // const userGrade = _.sortBy(userInfo?.employee?.jobs, 'grade')?.reverse()[0]?.grade;
+  useGlobalErrorCatcher();
+
+  // ----------------------------------------------------------------------------
+
   let userGrade = 0;
 
   if (userInfo && !userInfo.employee) {
-    userGrade = 16;
+    userGrade = 16; // 代表admin // 實際上grade只到15
   } else if (userInfo && userInfo.employee) {
     userGrade = _.sortBy(userInfo?.employee?.jobs, 'grade')?.reverse()[0]?.grade;
   }
-
-  useEffect(() => {
-    (async () => {
-      // 檢查是否已登入
-      try {
-        await updateUserInfo();
-        await updateUserErpFeature();
-      } catch {
-      } finally {
-        setReady(true);
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // ----------------------------------------------------------------------------
 
@@ -111,6 +98,22 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       myAlert.err({ title: '登出失敗' });
     }
   };
+
+  // -----------------------------------------------------------------------
+
+  useEffect(() => {
+    (async () => {
+      // 檢查是否已登入
+      try {
+        await updateUserInfo();
+        await updateUserErpFeature();
+      } catch {
+      } finally {
+        setReady(true);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // -----------------------------------------------------------------------
   const appContextValue = {
@@ -185,3 +188,71 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 }
 
 export default MyApp;
+
+// =============================================================
+
+const useGlobalErrorCatcher = () => {
+  const erroEventHandler = useCallback((event: ErrorEvent) => {
+    // const errorJson = JSON.stringify(event.error, Object.getOwnPropertyNames(event.error));
+
+    // event幾乎都是不可枚舉property，所以要手動把需要的東西取出來
+    const obj = {
+      colno: event.colno,
+      lineno: event.lineno,
+      filename: event.filename,
+      // currentTarget: event.currentTarget, // 全都是不可枚舉property，無法取得
+      // target: event.target, // 全都是不可枚舉property，無法取得
+      error: {
+        message: event.error.message,
+        stack: event.error.stack,
+      },
+    };
+
+    const onBtnClick = async () => {
+      try {
+        const objJson = JSON.stringify(obj);
+
+        await navigator.clipboard.writeText(objJson);
+      } catch (error) {
+        myAlert.err({ title: '複製錯誤資訊失敗' });
+      }
+    };
+
+    myAlert.err({
+      title: '發生非預期錯誤',
+      props: {
+        okText: '關閉',
+        maskClosable: false,
+        content: <Foo onBtnClick={onBtnClick} />,
+        closable: true,
+      },
+    });
+  }, []);
+
+  useEffect(() => {
+    window.removeEventListener('error', erroEventHandler);
+    window.addEventListener('error', erroEventHandler);
+  }, []);
+};
+
+const Foo = ({ onBtnClick }: { onBtnClick?: () => void }) => {
+  return (
+    <div>
+      <p className="whitespace-pre-wrap text-left">
+        {`
+請依以下步驟操作
+1. 點擊"複製錯誤訊息"按鈕
+2. 回到電腦桌面，右鍵新增文字文件
+3. 右鍵貼上並儲存
+4. 請關閉這個提示，然後將整個畫面截圖
+5. 將截圖與文字文件一起傳給開發人員
+        `}
+      </p>
+      <p>感謝您的配合</p>
+      <br />
+      <MyButton_v2 onClick={onBtnClick} label="複製錯誤訊息" />
+      <br />
+      <br />
+    </div>
+  );
+};
