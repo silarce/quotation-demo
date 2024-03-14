@@ -291,6 +291,9 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
 
       // 'contents',
 
+      'quotationList',
+      'attachedToContract',
+
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewWorkDirectorEmployee',

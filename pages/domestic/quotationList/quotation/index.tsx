@@ -225,6 +225,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [inputModalConfig, setInputModalConfig] = useState<TinputModalProps>();
 
+  const [taxRate, setTaxRate] = useState(0.05);
+
   // -----------------------------------------------------
 
   // 複製報價單之客戶狀態
@@ -702,6 +704,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         quotationRanges,
       } = latestContent;
 
+      const haveTax = !!salesTax;
+
       setAnnotation(annotations ?? []);
       setQr(quotationRanges ?? []);
       setPaymentMethod(paymentMethods);
@@ -714,6 +718,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         deliveryLocation,
         deliveryDate,
       });
+
+      setTaxRate(haveTax ? 0.05 : 0);
     } else {
       setAnnotation([]);
       setQr([]);
@@ -744,6 +750,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         deliveryLocation: '',
         deliveryDate: '',
       });
+      setTaxRate(0.05);
     }
   }, [quotationData, quotationContentData, disabled]);
 
@@ -765,6 +772,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const { subTotal, salesTax, total } = countPayInfoValue({
       // discount: summary.discountRate,
       prodSubTotal: quotationProdSubTotal,
+      taxRate,
     });
 
     setSummary((state) => {
@@ -775,11 +783,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
         total,
       };
     });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     // summary.discountRate,
     // 現在summary.discountRate改變時就會改變quotationProdSubTotal
     // 其實現在quotationProdSubTotal === ''也不會造成問題了
     quotationProdSubTotal,
+    taxRate,
   ]);
 
   //
@@ -861,6 +872,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // ----------------------------------------------------------------------
   const payInfoControl: TpayInfoControl = {
     payment: {
+      haveTax: {
+        value: !!taxRate,
+        onChange: (v) => {
+          if (quotationProdSubTotal === '') {
+            calcSubTotalPrice();
+          }
+
+          setTaxRate(v ? 0.05 : 0);
+        },
+      },
+
       discountRate: {
         inputAttr: {
           disabled: disabled,
@@ -2226,15 +2248,17 @@ const countPayInfoValue = ({
   // discount,
   //
   prodSubTotal,
+  taxRate,
 }: {
   // discount: string | number;
   prodSubTotal: string | number;
+  taxRate: number;
 }) => {
   // const discountRate = new Decimal(discount || 0).div(100);
 
   // const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
   const subTotal = prodSubTotal || 0;
-  const tax = Decimal.mul(subTotal || 0, 0.05);
+  const tax = Decimal.mul(subTotal || 0, taxRate);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
   // const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();

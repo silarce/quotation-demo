@@ -756,6 +756,17 @@ latestContentProdArr為這次追加追減的主產品
   // ----------------------------------------------------------------------
   const payInfoControl: TpayInfoControl = {
     payment: {
+      haveTax: {
+        // value: !!taxRate,
+        value: !!summary.salesTax,
+        onChange: (v) => {
+          // if (quotationProdSubTotal === '') {
+          //   calcSubTotalPrice();
+          // }
+          // setTaxRate(v ? 0.05 : 0);
+        },
+      },
+
       discountRate: {
         inputAttr: {
           disabled: disabled_static,

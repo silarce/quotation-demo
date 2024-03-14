@@ -62,8 +62,13 @@ export default function AttachContract({
   const userEmp = userInfo?.employee;
   const userId = userEmp?.id;
 
+  let taxRate: number | undefined;
+
   // ----------------------------------------------------
   const { data, update } = useGetContract_id_forAttach(contractId);
+
+  taxRate = data?.salesTax ? 0.05 : 0;
+
   useEffect(() => {
     (async () => {
       try {
@@ -165,10 +170,11 @@ export default function AttachContract({
   }, [targetProd]);
 
   // ------------------------------------------------------------------
+  taxRate = 0.05;
 
   const subTotal_ori = attachTotal ?? 0;
   const subTotal_calced = subTotal_ori;
-  const salesTax_calced = Number(new Decimal(subTotal_calced).mul(0.05).toFixed(0));
+  const salesTax_calced = Number(new Decimal(subTotal_calced).mul(taxRate).toFixed(0));
   const total_calced = subTotal_calced + salesTax_calced;
 
   const control_anno: TsummaryControl = {
@@ -189,6 +195,17 @@ export default function AttachContract({
 
   const payInfoControl: TpayInfoControl = {
     payment: {
+      haveTax: {
+        // value: !!data?.salesTax,
+        value: taxRate === 0.05,
+        onChange: (v) => {
+          // if (quotationProdSubTotal === '') {
+          //   calcSubTotalPrice();
+          // }
+          // setTaxRate(v ? 0.05 : 0);
+        },
+      },
+
       discountRate: {
         inputAttr: {
           disabled: true,
