@@ -427,6 +427,8 @@ function DndRow({
     // transition,
   };
 
+  const isLoading = item.isLoading;
+
   return (
     <div style={itemStyle} onClick={onRowClick} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
       <LoadingCover01 isLoading={item?.isLoading} size={40} />
@@ -533,6 +535,10 @@ function DndRow({
               // 因此要做防抖(做在class裡面了);
 
               inputProps.props.onChange = (e) => {
+                if (isLoading) {
+                  return;
+                }
+
                 (item[key] as string) = e.target.value;
               };
             }
@@ -570,7 +576,7 @@ function DndRow({
               selectProps.props = {
                 options,
                 ...selectProps.props,
-                isDisabled: isDisabled || theDisabled,
+                isDisabled: isDisabled || theDisabled || isLoading,
                 placeholder,
                 onChange: (option) => {
                   if (isOptionValue) {

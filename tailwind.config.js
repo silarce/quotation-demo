@@ -27,6 +27,7 @@ module.exports = {
       // xxl: { max: "1535px" },
       // => @media (max-width: 1535px) { ... }
       // xl: { max: "1279px" },
+      notebook: { max: "1440px" },
       // => @media (max-width: 1279px) { ... }
       laptop: { max: "1023px" },
       // => @media (max-width: 1023px) { ... }

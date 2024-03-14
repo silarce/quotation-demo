@@ -64,6 +64,9 @@
 .panelList {
   display: flex;
   min-height: fit-content;
+  .btn {
+    padding: 10px 22px;
+  }
   > * {
     // display: inline-block;
     margin: auto;
@@ -72,5 +75,11 @@
     font-weight: 500;
     font-size: 16px;
     line-height: 19px;
+  }
+
+  @screen notebook {
+    .btn {
+      padding: 10px 10px;
+    }
   }
 }
