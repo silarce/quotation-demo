@@ -303,7 +303,8 @@ version>1 是子合約
   const payInfoControl: TpayInfoControl = {
     payment: {
       haveTax: {
-        value: !!data?.salesTax,
+        // value: !!data?.salesTax,
+        value: Boolean(data?.salesTax),
         onChange: (v) => {
           // if (quotationProdSubTotal === '') {
           //   calcSubTotalPrice();
