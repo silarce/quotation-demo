@@ -131,8 +131,8 @@ export default function Edit() {
           router.push({
             pathname: '/domestic/customer',
             query: {
-              id: undefined,
               ...router.query,
+              id: undefined,
             },
           });
 
