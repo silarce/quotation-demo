@@ -60,7 +60,7 @@ type TtopPathListConfig = {
   //   };
   // };
   href: Thref;
-  //
+  // 在Nav.tsx會依序檢查hrefList的key與erpFeature，決定點進去的連結
   hrefList?: {
     [key: string]: Thref;
   };
@@ -223,7 +223,7 @@ const sidePathList: TsidePathList = {
         {
           label: '報價',
           // erpFeature: devPass,
-          erpFeature: [domestic],
+          erpFeature: [domestic, accountsReceivable],
           list: [
             {
               label: '預算',
@@ -255,18 +255,18 @@ const sidePathList: TsidePathList = {
               query: {
                 status: 'Pending',
               },
-              erpFeature: [domestic],
+              erpFeature: [domestic, accountsReceivable],
             },
             {
               label: '合約',
               path: path01 + '/contract',
-              erpFeature: [domestic],
+              erpFeature: [domestic, accountsReceivable],
             },
 
             {
               label: '查詢報價單',
               path: path01 + '/queryQuotation',
-              erpFeature: devPass,
+              erpFeature: [domestic],
             },
             // {
             //   label: '歷史紀錄',
@@ -336,7 +336,7 @@ const sidePathList: TsidePathList = {
           label: '客戶列表',
           path: path01 + '/customer',
           // erpFeature: allPass,
-          erpFeature: 'allPass',
+          erpFeature: [domestic],
         },
         {
           label: '備註列表',
@@ -594,10 +594,15 @@ const topPathList: TtopPathListConfig[] = [
       statisticsTable: {
         pathname: sidePathList['/domestic'].path01 + '/legacyContractIntegration',
       },
+      accountsReceivable: {
+        pathname: sidePathList['/domestic'].path01 + '/quotationList',
+        query: {
+          status: 'Pending',
+        },
+      },
     },
 
-    // erpFeature: 'allPass',
-    erpFeature: [domestic, legacyContractIntegration, statisticsTable],
+    erpFeature: [domestic, legacyContractIntegration, statisticsTable, accountsReceivable],
   },
   // {
   //   icon: icon_foreign,
