@@ -36,6 +36,7 @@ import WorkContactDoc_component, {
   TimperativeHandle,
   TonStateChange,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/workContactDoc_component';
+import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 
 import Summary, {
   TsummaryControl,
@@ -97,6 +98,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   const [isLoading, setIsLoading] = useState(false);
+  const [reviewFormShow, setReviewFormShow] = useState(false);
 
   // -----------------------------------------------------------\
   const [isShowContract, setIsShowContract] = useState(true);
@@ -144,8 +146,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
 
-  const { data, update } = useGetContract_id_noItems_2(id as string | undefined);
-  const engineeringContactId = data?.engineeringContactId;
+  const { data: contract, update } = useGetContract_id_noItems_2(id as string | undefined);
+  const engineeringContactId = contract?.engineeringContactId;
 
   useEffect(() => {
     update();
@@ -172,11 +174,11 @@ version>1 是子合約
  */
 
   const { content, rootContent, subContracts, totalInfo } = useMemo(() => {
-    if (!data) {
+    if (!contract) {
       return {};
     }
 
-    let subContracts = data.subContracts.filter((item) => {
+    let subContracts = contract.subContracts.filter((item) => {
       if (version === '1') {
         return true;
       } else {
@@ -190,7 +192,7 @@ version>1 是子合約
 
     const content = (() => {
       if (version === '1') {
-        return data?.content;
+        return contract?.content;
       } else if (version) {
         const index = Number(version) - 1;
         const contract = subContracts[index];
@@ -221,7 +223,7 @@ version>1 是子合約
       subContracts,
       totalInfo,
     };
-  }, [data, version]);
+  }, [contract, version]);
 
   // 合約項目
   const {
@@ -283,7 +285,7 @@ version>1 是子合約
 
   // -----------------------------------------------------------------
   const control_anno: TsummaryControl = {
-    stringArr: data?.annotations ?? [],
+    stringArr: contract?.annotations ?? [],
     editString: () => {},
     addString: () => {},
     delString: () => {},
@@ -291,7 +293,7 @@ version>1 是子合約
   };
 
   const control_qr: TsummaryControl = {
-    stringArr: data?.quotationRanges ?? [],
+    stringArr: contract?.quotationRanges ?? [],
     editString: () => {},
     addString: () => {},
     delString: () => {},
@@ -313,7 +315,7 @@ version>1 是子合約
       discountRate: {
         inputAttr: {
           disabled: true,
-          value: data?.discount ?? '',
+          value: contract?.discount ?? '',
           onChange: () => {},
         },
       },
@@ -339,17 +341,17 @@ version>1 是子合約
 
     delivery: {
       deliveryLocation: {
-        value: data?.deliveryLocation ?? '',
+        value: contract?.deliveryLocation ?? '',
         onChange: () => {},
       },
       deliveryDate: {
-        value: data?.deliveryDate ?? '',
+        value: contract?.deliveryDate ?? '',
         onChange: () => {},
       },
     },
     paymentMethod: {
       arr:
-        data?.paymentMethods.map((item) => {
+        contract?.paymentMethods.map((item) => {
           const { milestone, totalPaymentRatio } = item;
 
           return {
@@ -369,7 +371,7 @@ version>1 是子合約
       label: '總經理',
       inputProps: {
         props: {
-          value: data?.content?.reviewManagerEmployee?.chName ?? '',
+          value: contract?.content?.reviewManagerEmployee?.chName ?? '',
         },
       },
     },
@@ -377,7 +379,7 @@ version>1 是子合約
       label: '工務主管',
       inputProps: {
         props: {
-          value: data?.content?.reviewWorkDirectorEmployee?.chName ?? '',
+          value: contract?.content?.reviewWorkDirectorEmployee?.chName ?? '',
         },
       },
     },
@@ -385,7 +387,7 @@ version>1 是子合約
       label: '主管',
       inputProps: {
         props: {
-          value: data?.content?.reviewSupervisorEmployee?.chName ?? '',
+          value: contract?.content?.reviewSupervisorEmployee?.chName ?? '',
         },
       },
     },
@@ -393,7 +395,7 @@ version>1 是子合約
       label: '業務',
       inputProps: {
         props: {
-          value: data?.content?.reviewSalesEmployee?.chName ?? '',
+          value: contract?.content?.reviewSalesEmployee?.chName ?? '',
         },
       },
     },
@@ -401,7 +403,7 @@ version>1 是子合約
       label: '經辦',
       inputProps: {
         props: {
-          value: data?.content?.agentEmployee?.chName ?? '',
+          value: contract?.content?.agentEmployee?.chName ?? '',
         },
       },
     },
@@ -442,7 +444,7 @@ version>1 是子合約
 
   const tagList: TtagList = [
     {
-      label: `合約編號 ${data?.contractNumber ?? ''}`,
+      label: `合約編號 ${contract?.contractNumber ?? ''}`,
       onClick: () => {
         clearShow();
         setIsShowContract(true);
@@ -498,6 +500,11 @@ version>1 是子合約
         : null)(),
     {
       type: 'myButton',
+      label: '合約審核表',
+      onClick: () => setReviewFormShow(true),
+    },
+    {
+      type: 'myButton',
       label: '追加追減報價單',
       onClick: () => setSwitch02(() => true),
     },
@@ -505,11 +512,11 @@ version>1 是子合約
       type: 'myButton',
       label: '追加追減',
       onClick: () => {
-        if (data) {
+        if (contract) {
           router.push({
             pathname: '/domestic/contract/attachContract',
             query: {
-              contractId: data.id,
+              contractId: contract.id,
             },
           });
         }
@@ -960,7 +967,7 @@ version>1 是子合約
           <div>
             <WorkContactDoc_component
               ref={ref_workContact}
-              contract={data}
+              contract={contract}
               engineeringContactId={engineeringContactId}
               onStateChange={onWorkContactStateChange}
             />
@@ -982,6 +989,22 @@ version>1 是子合約
           onCancel={inputModalConfig?.onCancel}
           title={inputModalConfig?.title ?? ''}
           placeholder={inputModalConfig?.placeholder}
+        />
+
+        <ContractReviewForm
+          showModal={reviewFormShow}
+          forbidden={true}
+          close={() => setReviewFormShow(false)}
+          contractIdNumber={content?.quotationNumber ?? ''}
+          contractName={content?.projectName ?? ''}
+          contractPrice={Number(content?.total ?? '')}
+          lastestContentId={content?.id}
+          verifyForm={content?.verifyForm}
+          onConfirm={async () => {
+            setIsLoading(true);
+            await update();
+            setIsLoading(false);
+          }}
         />
       </div>
     </SubLayer>

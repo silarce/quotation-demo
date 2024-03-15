@@ -60,7 +60,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
   // reviewManager 總經理
 
   // 待審核
-  const foo = (() => {
+  const filter = (() => {
     if (!reviewStatus || reviewStatus === '待審核') {
       if (status === 'Pending') {
         return {
@@ -221,6 +221,9 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
                 'latestContent.managerReviewedAt': { $notNull: true },
               },
             },
+            '3': {
+              'latestContent.isLost': { $eq: false },
+            },
           },
         };
       }
@@ -270,6 +273,9 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
               'latestContent.managerReviewedAt': { $notNull: true },
             },
           },
+          '3': {
+            'latestContent.isLost': { $eq: false },
+          },
         },
       };
     }
@@ -316,7 +322,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
         $contains: projectName || undefined,
       },
       // ...reviewStatusFilter,
-      ...foo,
+      ...filter,
     },
   };
 
