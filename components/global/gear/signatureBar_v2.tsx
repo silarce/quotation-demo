@@ -31,20 +31,43 @@ export default function SignatureBar({
   control,
   className,
   style,
+  disabled,
 }: {
   control: Tcontrol;
   className?: string;
   style?: React.CSSProperties;
+  disabled?: boolean;
 }) {
   const { signatureArr, onClick } = control;
 
   return (
     <div className={classNames(scss.signatureBar, className)} style={style} onClick={onClick}>
       {signatureArr.map((item, index) => {
-        const { label, value, icon, iconWrapperClassName, className, style, isReviewed, onClick, inputProps } = item;
+        const { label, value, icon, iconWrapperClassName, className, style, isReviewed, onClick } = item;
+        let { inputProps } = item;
+
+        if (inputProps) {
+          inputProps = {
+            readOnly: disabled,
+            ...inputProps,
+          };
+        }
+
+        let showBorderBottom = false;
+
+        if (inputProps) {
+          !disabled && (showBorderBottom = true);
+        } else if (!value) {
+          showBorderBottom = true;
+        }
 
         return (
-          <div key={index} className={classNames(scss.box, className)} style={style} onClick={onClick}>
+          <div
+            key={index}
+            className={classNames(scss.box, className, showBorderBottom && scss.noValue, scss.plus)}
+            style={style}
+            onClick={onClick}
+          >
             <p className={scss.label}>{label}</p>
             <div className={scss.signature}>
               {inputProps && <input type="text" className={scss.text} {...inputProps} />}

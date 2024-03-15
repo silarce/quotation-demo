@@ -9,6 +9,7 @@
   padding-bottom: 5px;
   display: grid;
   align-content: space-between;
+  border-bottom: solid 1px transparent;
   .label {
     color: theme("colors.main");
     font-size: 20px;
@@ -26,5 +27,8 @@
       width: 26px;
     }
   }
-  border-bottom: solid 1px black;
+
+  &.noValue.plus {
+    border-bottom: solid 1px black;
+  }
 }
