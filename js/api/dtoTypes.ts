@@ -1255,6 +1255,10 @@ type TquotationContentDto_copy = {
   workDirectorReviewedAt: string | null;
   toWorkDirectorAt: string | null; // date
 
+  toCashierAt: string | null;
+  reviewCashierEmployee: TemployeeDto | null;
+  cashierReviewedAt: string | null;
+
   reviewManagerEmployee: TemployeeDto | null;
   managerReviewedAt: string | null;
   toManagerAt: string | null; // date
@@ -1329,6 +1333,10 @@ export type TquotationContentDto = {
   reviewWorkDirectorEmployee: TemployeeDto | null;
   workDirectorReviewedAt: string | null;
   toWorkDirectorAt: string | null; // date
+
+  toCashierAt: string | null;
+  reviewCashierEmployee: TemployeeDto | null;
+  cashierReviewedAt: string | null;
 
   reviewManagerEmployee: TemployeeDto | null;
   managerReviewedAt: string | null;
@@ -2095,6 +2103,7 @@ export type TreviewQuotationContentDto = {
   reviewSalesEmployeeId?: string | null;
   reviewSupervisorEmployeeId?: string | null;
   reviewWorkDirectorEmployeeId?: string | null;
+  reviewCashierEmployeeId?: string | null;
   reviewManagerEmployeeId?: string | null;
   reviewResult: boolean;
 };
@@ -2103,6 +2112,7 @@ export type TsubmitReviewQotuationContentDto = {
   reviewSalesEmployeeId?: string | null;
   reviewSupervisorEmployeeId?: string | null;
   reviewWorkDirectorEmployeeId?: string | null;
+  reviewCashierEmployeeId?: string | null;
 };
 
 // =========================================================================
