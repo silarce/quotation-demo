@@ -35,7 +35,7 @@ import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 import { AxiosError } from 'axios';
 
 // components

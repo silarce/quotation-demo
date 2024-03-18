@@ -53,6 +53,7 @@ import PageHeader02, { TtagList, TpanelList, Tlink, TlinkArr } from 'components/
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
+import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 
 // css
 import scss from './quotation.module.scss';
@@ -409,6 +410,48 @@ version>1 是子合約
       },
     },
   ];
+
+  const { control_signature } = useMemo(() => {
+    const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
+      {
+        label: '總經理',
+        value: contract?.content?.reviewManagerEmployee?.chName ?? '',
+        style: { width: '200px' },
+      },
+      {
+        label: '應收帳款',
+        value: contract?.content?.reviewCashierEmployee?.chName ?? '',
+        style: { width: '200px' },
+      },
+      {
+        label: '應收帳款',
+        value: contract?.content?.reviewWorkDirectorEmployee?.chName ?? '',
+        style: { width: '200px' },
+      },
+      {
+        label: '業務主管',
+        value: contract?.content?.reviewSupervisorEmployee?.chName ?? '',
+        style: { width: '200px' },
+      },
+      {
+        label: '業務',
+        value: contract?.content?.reviewSalesEmployee?.chName ?? '',
+        style: { width: '200px' },
+      },
+      {
+        label: '經辦',
+        value: contract?.content?.agentEmployee?.chName ?? '',
+        style: { width: '200px' },
+      },
+    ];
+
+    const control_signature = {
+      signatureArr,
+    };
+
+    return { control_signature };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract?.content]);
 
   // 附件
   const { attachments, updateAttachments, domain } = useQuotation_id_attachments(content?.id);
@@ -957,7 +1000,7 @@ version>1 是子合約
             />
 
             {/* 簽名 */}
-            <QuotationSinature signatureArr={signatureArr} disabled={true} />
+            <SignatureBar control={control_signature} className="mx-[50px] mt-[120px] mb-[40px]" />
           </div>
         )}
 
