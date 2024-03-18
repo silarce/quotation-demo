@@ -223,7 +223,7 @@ import {
 } from 'js/utils/options/productOptions';
 
 // type
-import type { TquotationProductItemDto, TerpFeatureDto } from 'js/api/dtoTypes';
+import type { TquotationProductItemDto, TerpFeatureDto, TworksheetDto_legacy } from 'js/api/dtoTypes';
 
 // ====================================================================
 
@@ -280,8 +280,11 @@ export default function WorkSheet({
   const { engineeringContactId, worksheetId } = contract ?? {};
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
-  const { workSheet, update_workSheet } = useGetWorkSheet(worksheetId);
+  const { workSheet: workSheet_new, update_workSheet } = useGetWorkSheet(worksheetId);
   const { res: doorModelArr, update: update_doorModelArr, doorModelList } = useApiGetProdDoorModels();
+
+  //api還沒更新，先帶入舊的型別方便繼續開發
+  const workSheet = workSheet_new as unknown as TworksheetDto_legacy;
 
   useEffect(() => {
     (async () => {
@@ -312,7 +315,7 @@ export default function WorkSheet({
 送給後端時，只可以送有更改過的prod
 用useWorkSheet裡的changedList配合forceUpdate紀錄 */
 
-    if (!workSheet?.latestRecord.contractProductItems) {
+    if (!workSheet?.contractProductItems) {
       return {};
     }
 
@@ -1084,7 +1087,10 @@ export default function WorkSheet({
   // -------------------------------------------------------------------------
 
   const reqPatch = async () => {
-    if (!worksheetId || !workSheet?.latestRecord.contractProductItems || !havePermissionToEdit) {
+    // if (!worksheetId || !workSheet?.latestRecord.contractProductItems || !havePermissionToEdit) {
+    //   return;
+    // }
+    if (!worksheetId || !workSheet?.contractProductItems || !havePermissionToEdit) {
       return;
     }
 

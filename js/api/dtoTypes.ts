@@ -2473,6 +2473,18 @@ export type TworksheetDto = {
   isAbandoned: boolean;
 };
 
+export type TworksheetDto_legacy = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  contractProductItems: TquotationProductItemDto[];
+  legacyProductItems: TlegacyContractProductItemDto[];
+  contractId: string | null;
+  contract?: TquotationContentDto;
+  legacyContractId: string | null;
+  legacyContract?: TlegacyContractDto;
+};
+
 export type TcreateWorksheetDto = {
   //  出貨日
   shipDay?: Date | null;

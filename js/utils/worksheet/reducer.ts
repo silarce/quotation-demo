@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 // type
-import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
+import { TworksheetDto, TquotationProductItemDto, TworksheetDto_legacy } from 'js/api/dtoTypes';
 
 type TitemTokenList = {
   [key: string]: {
@@ -15,8 +15,13 @@ type TitemIdArrList = { [key: string]: { [key: string]: string[] } };
 export type { TworksheetDto as TworkSheetDto, TquotationProductItemDto, TitemTokenList, TitemIdArrList };
 
 // =============================================================
-const workSheetReducer = ({ worksheet }: { worksheet: TworksheetDto }) => {
-  const latestContractProductItems = worksheet?.latestRecord.contractProductItems;
+const workSheetReducer = ({
+  worksheet,
+}: {
+  // worksheet: TworksheetDto
+  worksheet: TworksheetDto_legacy; //api還沒更新，先帶入舊的型別方便繼續開發
+}) => {
+  const latestContractProductItems = worksheet?.contractProductItems;
 
   const contractProductItems = _.sortBy(latestContractProductItems, 'createdAt');
 
