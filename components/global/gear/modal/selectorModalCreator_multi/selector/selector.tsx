@@ -109,6 +109,7 @@ type TselectorProps_simple<
   searchInputSelPropsArr?: TsearchInputSelProps[];
   // 返回true為通過，要顯示
   filter_clientSide?: (data: Tdata, searchStrArr: string[]) => boolean;
+  isSkip?: boolean;
 
   useNoMetaProps?: TuseNoMetaProps<P>;
 };
@@ -146,6 +147,7 @@ export function Selector_component<Tdata extends TapiData>(
     //
     useNoMetaProps,
     filter_clientSide,
+    isSkip,
   } = props;
 
   const [selectedList, setSelectedList] = useState<{ [id: string]: Tdata }>({});
@@ -302,6 +304,10 @@ export function Selector_component<Tdata extends TapiData>(
   }, [defaultSelectedArr]);
 
   // ----------------------------------------------------------------------
+
+  if (isSkip) {
+    return null;
+  }
 
   return (
     <div className={scss.container}>

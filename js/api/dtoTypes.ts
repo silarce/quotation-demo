@@ -2111,8 +2111,8 @@ export type TreviewQuotationContentDto = {
 export type TsubmitReviewQotuationContentDto = {
   reviewSalesEmployeeId?: string | null;
   reviewSupervisorEmployeeId?: string | null;
-  reviewWorkDirectorEmployeeId?: string | null;
-  reviewCashierEmployeeId?: string | null;
+  // reviewWorkDirectorEmployeeId?: string | null; // 改為固定人
+  // reviewCashierEmployeeId?: string | null;
 };
 
 // =========================================================================

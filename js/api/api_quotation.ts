@@ -316,9 +316,11 @@ const apiGetQuotationContent_Id = async (id: string) => {
       'agentEmployee',
       'supervisorEmployee',
       'managerEmployee',
+
       'reviewSalesEmployee',
-      'reviewWorkDirectorEmployee',
       'reviewSupervisorEmployee',
+      'reviewCashierEmployee',
+      'reviewWorkDirectorEmployee',
       'reviewManagerEmployee',
 
       'products.items.accessories',
@@ -1245,8 +1247,9 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
     'latestContent.managerEmployee',
 
     'latestContent.reviewSalesEmployee',
-    'latestContent.reviewWorkDirectorEmployee',
     'latestContent.reviewSupervisorEmployee',
+    'latestContent.reviewWorkDirectorEmployee',
+    'latestContent.reviewCashierEmployee',
     'latestContent.reviewManagerEmployee',
 
     'latestContent.products',
