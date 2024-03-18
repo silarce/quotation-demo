@@ -204,11 +204,11 @@ export default function OutboundOrder({
   const worksheet = deliveryList?.contract.worksheet;
 
   useEffect(() => {
-    if (!deliveryList?.contract.worksheet?.contractProductItems) {
+    if (!deliveryList?.contract.worksheet?.latestRecord.contractProductItems) {
       return;
     }
 
-    const contractProductItems = deliveryList.contract.worksheet.contractProductItems;
+    const contractProductItems = deliveryList.contract.worksheet.latestRecord.contractProductItems;
 
     const myDeleveryList: TmyDeleveryList = {};
 

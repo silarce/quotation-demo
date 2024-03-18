@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 // type
-import { TworkSheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
+import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
 
 type TitemTokenList = {
   [key: string]: {
@@ -12,11 +12,13 @@ type TitemTokenList = {
 
 type TitemIdArrList = { [key: string]: { [key: string]: string[] } };
 
-export type { TworkSheetDto, TquotationProductItemDto, TitemTokenList, TitemIdArrList };
+export type { TworksheetDto as TworkSheetDto, TquotationProductItemDto, TitemTokenList, TitemIdArrList };
 
 // =============================================================
-const workSheetReducer = ({ worksheet }: { worksheet: TworkSheetDto }) => {
-  const contractProductItems = _.sortBy(worksheet.contractProductItems, 'createdAt');
+const workSheetReducer = ({ worksheet }: { worksheet: TworksheetDto }) => {
+  const latestContractProductItems = worksheet?.latestRecord.contractProductItems;
+
+  const contractProductItems = _.sortBy(latestContractProductItems, 'createdAt');
 
   const itemTokenList: TitemTokenList = {};
   const itemIdArrList: TitemIdArrList = {};

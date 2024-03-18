@@ -616,7 +616,7 @@ export default function Edit({ isAdmin, userInfo }: { isAdmin: boolean; userInfo
 
     const list: TdoorTypeQtyList = {};
 
-    const itemArr = contract?.worksheet?.contractProductItems ?? [];
+    const itemArr = contract?.worksheet?.latestRecord.contractProductItems ?? [];
     itemArr.forEach((item) => {
       const { doorModelName } = item;
 
@@ -642,7 +642,7 @@ export default function Edit({ isAdmin, userInfo }: { isAdmin: boolean; userInfo
 
     return {
       arr,
-      totalQty: String(contract?.worksheet?.contractProductItems.length ?? 0) + '樘',
+      totalQty: String(contract?.worksheet?.latestRecord.contractProductItems.length ?? 0) + '樘',
     };
   }, [contract]);
 

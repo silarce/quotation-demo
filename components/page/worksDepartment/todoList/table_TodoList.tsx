@@ -176,8 +176,10 @@ export default function Table_todoList({
 
           const contact = engineeringContact?.contactInfo?.[0];
           const contactPerson = contact?.contactPerson ?? '';
+          const latestRecord = engineeringContact?.contract?.worksheet?.latestRecord;
 
-          const itemArr = engineeringContact?.contract?.worksheet?.contractProductItems;
+          const itemArr = latestRecord?.contractProductItems;
+
           const qty = itemArr?.length ?? 0;
 
           const onAddclick = engineeringContact?.id

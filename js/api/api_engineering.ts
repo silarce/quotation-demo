@@ -25,8 +25,8 @@ import type {
   TexchangeDto,
   TcreateExchgangeDto,
   TcreateElectronicSuppliesRecordDto,
-  TworkSheetDto,
-  TcreateWorkSheetDto,
+  TworksheetDto,
+  TcreateWorksheetDto,
   TupdateWorkSheetItem,
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
@@ -683,13 +683,13 @@ export const apiGetWorkSheet = (id: string) => {
   };
 
   return axi
-    .get<TworkSheetDto>(api, { params })
+    .get<TworksheetDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
 export const useGetWorkSheet = (id: string | undefined | null) => {
-  const [res, setRes] = useState<TworkSheetDto>();
+  const [res, setRes] = useState<TworksheetDto>();
 
   const update = async () => {
     if (!id) {
@@ -718,7 +718,7 @@ export const useGetWorkSheet = (id: string | undefined | null) => {
   };
 };
 
-export const apiPostWorkSheet = (body: TcreateWorkSheetDto) => {
+export const apiPostWorkSheet = (body: TcreateWorksheetDto) => {
   const api = '/engineering/worksheet';
 
   return axi

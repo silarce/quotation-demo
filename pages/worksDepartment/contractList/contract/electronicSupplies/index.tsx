@@ -68,7 +68,7 @@ export default function ElectronicSupplies() {
   // ------------------------------------------------------------------
 
   const { itemList, doorQtySubTotal, doorQtyTotal } = useMemo(() => {
-    if (!worksheet?.contractProductItems) {
+    if (!worksheet?.latestRecord.contractProductItems) {
       return {};
     }
 

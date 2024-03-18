@@ -23,6 +23,11 @@ export type TpageResponse<Tdata> = {
   meta: TpageMetaDto;
 };
 
+export type TdoorModel = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
+type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null; // 表面處理
+
+// =============================================================
+
 export type TfileDto = {
   id: string;
   createdAt: string;
@@ -833,13 +838,11 @@ export type TquotationProductAccessoriesDto = {
   quantity: number; // 數量
   unitPrice: number; // 單價
   totalPrice: number; // 複價
+  originalPrice?: number | undefined;
   price: number; // 牌價
   dualPrice: number; // 牌價複價
   order: number;
-  //
   referenceSpec: string | null;
-  // originalPrice: number;
-  originalPrice?: number | undefined;
 };
 // 但是後端有建立這個型別
 export type TcreateQuotationProductAccessoriesDto = Omit<
@@ -847,21 +850,26 @@ export type TcreateQuotationProductAccessoriesDto = Omit<
   'id' | 'createdAt' | 'updatedAt'
 > & { id?: string };
 
+export type TupdateQuotationProductAccessoryDto = Partial<
+  Omit<TquotationProductAccessoriesDto, 'createdAt' | 'updatedAt'>
+>;
+
+type TdoorComponentType =
+  | 'slat'
+  | 'bottomBar'
+  | 'guideRail'
+  | 'sidePlate'
+  | 'roller'
+  | 'motor'
+  | 'motorAccessories'
+  | 'headBox';
+
 // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
 export type TquotationProductComponentsDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  type:
-    | 'slat'
-    | 'bottomBar'
-    //
-    | 'guideRail'
-    | 'sidePlate'
-    | 'roller'
-    | 'motor'
-    | 'motorAccessories'
-    | 'headBox';
+  type: TdoorComponentType;
   number: string;
   componentId: string;
   // TODO 有空要調整型別
@@ -880,6 +888,7 @@ export type TquotationProductComponentsDto = {
    */
   bom: any; // 前端不會直接用到，先直接設object
   material: string;
+  // materialSurface: TmaterialSurface | null | undefined;
   materialSurface: string | null | undefined;
   isPainted: boolean;
   price: number;
@@ -894,6 +903,10 @@ export type TquotationProductComponentsDto = {
 export type TcreateQuotationProductComponentDto = Omit<
   TquotationProductComponentsDto,
   'id' | 'createdAt' | 'updatedAt'
+>;
+
+export type TupdateQuotationProductComponentDto = Partial<
+  Omit<TquotationProductComponentsDto, 'createdAt' | 'updatedAt'>
 >;
 
 export type TquotationProductDto = {
@@ -1608,7 +1621,7 @@ export type TquotationContractDto = {
   engineeringContactId: string | null;
   engineeringContact?: TengineeringContactDto | null;
   /**工作表 */
-  worksheet?: TworkSheetDto; // populate
+  worksheet?: TworksheetDto; // populate
   /**工作表ID */
   worksheetId: string | null;
   /**出庫單ID */
@@ -1743,7 +1756,6 @@ export type TquotationAccounting_modifyContract = {
 // ========================================================================
 // ========================================================================
 // ========================================================================
-export type TdoorModelName = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
 
 export type TdoorMaterialDto = {
   id: string;
@@ -1754,7 +1766,7 @@ export type TdoorMaterialDto = {
 };
 
 export type TdoorModelInfoDto = {
-  name: TdoorModelName;
+  name: TdoorModel;
   density: number; // 密度?
   guideRails: {
     imgSrc: string;
@@ -1954,13 +1966,13 @@ export type TdoorComponentListDto = {
 export type TgenerateDoorProductBomDto_ComponentInfo = {
   id: string;
   material: string; // 材質
-  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null; // 表面處理
+  materialSurface?: TmaterialSurface;
   isPainted: boolean; // 烤漆
   thickness?: string; // 厚度
 };
 
 export type TgenerateDoorProductBomDto_DoorSpec = {
-  modelName: TdoorModelName;
+  modelName: TdoorModel;
   weight: number;
   height: number;
   B: number;
@@ -2015,7 +2027,7 @@ export type TdoorAccessoryDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  doorModelName: TdoorModelName;
+  doorModelName: TdoorModel;
   name: string;
   unit: string | null;
   referenceSpec: string | null;
@@ -2436,74 +2448,229 @@ export type TcreateExchgangeDto = {
   legacyContractId?: string | null;
 };
 
-export type TworkSheetDto = {
+export type TworksheetDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  contractProductItems: TquotationProductItemDto[];
-  legacyProductItems: TlegacyContractProductItemDto[];
+
+  // 出貨日;
+  shipDay: Date | null;
+  // 合約Id
   contractId: string | null;
-  contract?: TquotationContentDto;
+  // 合約
+  contract?: TquotationContractDto;
+  // 舊合約Id
   legacyContractId: string | null;
+  // 舊合約
   legacyContract?: TlegacyContractDto;
+  // 所有紀錄
+  records: TworksheetRecordDto[];
+  // 最新紀錄id
+  latestRecordId: string;
+  // 最新紀錄
+  latestRecord: TworksheetRecordDto;
+  // 已捨棄
+  isAbandoned: boolean;
 };
 
-export type TcreateWorkSheetDto = {
+export type TcreateWorksheetDto = {
+  //  出貨日
+  shipDay?: Date | null;
+  //  合約id
   contractId?: string | null;
+  //  舊合約id
   legacyContractId?: string | null;
+  // 一般合約 productItem
+  contractProductItems?: TupdateContractProductItemDto[];
 };
 
-// export type TupdateWorkSheet = {
-//   id: string;
-//   // createdAt: string;
-//   // updatedAt: string;
-//   // createdBy: string;
-//   // updatedBy: string;
-//   // deletedBy: string;
-//   itemNumber: string;
-//   itemName: string;
-//   discount: string;
-//   quoteType: string;
-//   doorModelName: string;
-//   fullWidth: number;
-//   WG: number;
-//   height: number;
-//   boxB: number;
-//   area: string;
-//   volume: string;
-//   materialName: string;
-//   materialSurface: string;
-//   guideRail: string;
-//   horsepower: string;
-//   motorVendor: string;
-//   motorVoltage: number;
-//   hasMotorSupportStand: boolean;
-//   bottomBar: string;
-//   motorLockBox: string;
-//   guideRailThickness: string;
-//   rollerSpec: string;
-//   hasSilencingStrip: boolean;
-//   isIntegratedHeadBox: boolean;
-//   headBoxThickness: string;
-//   unitPrice: number;
-//   totalPrice: number;
-//   price: number;
-//   dualPrice: number;
-//   isAntiTyphoon: boolean;
-//   bounceDoor: boolean;
-//   closingType: string;
-//   notes: string;
-//   motorPhase: number;
-//   bottomBarAngleIron: string;
-//   bottomBarPlate: string;
-//   productId: string;
-//   worksheetId: string;
-//   others: null;
-//   components: TquotationProductComponentsDto[];
-//   accessories: TcreateQuotationProductAccessoriesDto[];
-//   adjustedItem: undefined;
-//   adjustedItemId: undefined;
-// };
+export type TworksheetRecordDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 所屬工作主表Id
+  worksheetId: string | null;
+  // 所屬工作主表
+  worksheet: TworksheetDto;
+  // 合約產品
+  contractProductItems: TquotationProductItemDto[];
+  // 舊合約產品
+  legacyProductItems: TlegacyContractProductItemDto[];
+  // 審核狀態
+  status: TworksheetStatus | null;
+  // 審核業務Id
+  reviewSalesEmployeeId: string | null;
+  // 審核業務
+  reviewSalesEmployee: TemployeeDto;
+  // 送審給業務審核時間
+  toReviewSales: Date | null;
+  // 業務審核時間
+  salesReviewAt: Date | null;
+  // 審核總經理Id
+  reviewManagerEmployeeId: string | null;
+  // 審核總經理
+  reviewManagerEmployee: TemployeeDto;
+  // 送審給總經理審核時間
+  toReviewManager: Date | null;
+  // 總經理審核時間
+  managerReviewAt: Date | null;
+  // 版本
+  version: number;
+};
+
+type TworksheetStatus = 'edit' | 'reviewing' | 'conform';
+
+// UpdateContractProductItemDto
+
+type TupdateContractProductItemDto = {
+  /** 調整工作表產品時使用的dto */
+  // 產品item id
+  id: string;
+  // 個別產品編號
+  itemNumber: string;
+  // 折數
+  discount: string;
+  // 項目名
+  itemName: string;
+  // 報價別
+  quoteType: string;
+  // 門型
+  doorModelName: TdoorModel;
+  // L(mm)全寬
+  fullWidth: number;
+  // W(mm)
+  WG: number;
+  // h(mm)
+  height: number;
+  // B(mm)
+  boxB: number;
+  // D(mm)
+  boxD: number;
+  // 面積
+  area: string;
+  // 才數
+  volume: string;
+  // 材料
+  materialName: string;
+  // 表面
+  materialSurface: TmaterialSurface | null;
+  // 門軌
+  guideRail: string;
+  // 馬力
+  horsepower: string;
+  // 馬達廠商
+  motorVendor: string;
+  // 電壓
+  motorVoltage: number;
+  // 馬達支撐架
+  hasMotorSupportStand: boolean;
+  // 底座類型
+  bottomBar: string;
+  // 馬達鎖盒
+  motorLockBox: string;
+  // 門軌厚度
+  guideRailThickness: string;
+  // 捲軸規格
+  rollerSpec: string;
+  // 門軌消音條
+  hasSilencingStrip: boolean;
+  // 一體式捲箱
+  isIntegratedHeadBox: boolean;
+  // 捲箱厚度
+  headBoxThickness: string;
+  // 單價
+  unitPrice: number;
+  // 牌價
+  price: number;
+  // 牌價複價
+  dualPrice: number;
+  // 複價
+  totalPrice: number;
+  // 防颱
+  isAntiTyphoon: boolean;
+  // 彈射門
+  bounceDoor: boolean;
+  // 彈射門寬度
+  bounceDoorWidth?: number | null;
+  // 彈射門高度
+  bounceDoorHeight?: number | null;
+  // 彈射門長度
+  bounceDoorLength?: number | null;
+  // 關閉方式
+  closingType: string;
+  // 備註
+  notes: string;
+  // 相數
+  motorPhase: number;
+  // 底座角鐵
+  bottomBarAngleIron: string;
+  // 底座板
+  bottomBarPlate: string;
+  // 門片厚度
+  thickness: string;
+  // 門片 - 捲片支數
+  slatCount?: string | null;
+  // 鏈齒輪 - 鏈齒輪番號
+  sprocketWheelModel?: string | null;
+  //可能為鍊條數量
+  sprocketWheelChains?: string | null;
+  // 鏈齒輪 - 大鏈輪
+  sprocketWheelTeethNumber?: string | null;
+  // 鏈齒輪/捲軸 - 孔徑/軸徑
+  bearingInnerDiameter?: string | null;
+  // 捲軸 - 尺寸
+  diameter?: string | null;
+  // 捲軸 - 總長
+  bearingHousingTotalLength?: string | null;
+  // 底座 - 開口
+  guideRailsOpening?: string | null;
+  // 門片長度
+  slatLength?: number | null;
+  // 門軌長度
+  guideRailLength?: number | null;
+  // 捲箱長度
+  headBoxLength?: number | null;
+  // 軸承座寸法
+  bearingHousingSize?: number | null;
+  // 軸承
+  bearingName?: string | null;
+
+  gapA?: string | null;
+
+  gapC: string | null;
+
+  gearNumber?: string | null;
+
+  weight?: string | null;
+  // 捲箱 - 正面
+  headBoxFront?: string | null;
+  // 捲箱 - 有無凸
+  headBoxProtruding?: string | null;
+  // 捲箱 - 角鐵數量
+  headBoxAngleIronQuantity?: number | null;
+  // 支板 - 鏈條
+  sidePlateChain?: string | null;
+  // 支板 - 方向
+  sidePlateDirection?: string | null;
+  // 電動機 - 鍊條形式'
+  electricMotorChainType?: string | null;
+  // 電動機 - 方向
+  electricMotorDirection?: string | null;
+  // 門軌 - 型式
+  guideRailType?: string | null;
+
+  guideRailG?: number | null;
+  // 國外認證防火規範
+  isULGuideRail?: boolean | null;
+  // 主產品
+  product: TquotationProductDto;
+  // 選配設定
+  accessories: TupdateQuotationProductAccessoryDto[];
+  // 產品元件
+  components: TupdateQuotationProductComponentDto[];
+};
+
 export type TupdateWorkSheetItem = {
   id: string;
   itemNumber: string;

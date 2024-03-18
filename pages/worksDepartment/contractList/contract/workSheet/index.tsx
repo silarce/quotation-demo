@@ -312,7 +312,7 @@ export default function WorkSheet({
 送給後端時，只可以送有更改過的prod
 用useWorkSheet裡的changedList配合forceUpdate紀錄 */
 
-    if (!workSheet?.contractProductItems) {
+    if (!workSheet?.latestRecord.contractProductItems) {
       return {};
     }
 
@@ -1084,7 +1084,7 @@ export default function WorkSheet({
   // -------------------------------------------------------------------------
 
   const reqPatch = async () => {
-    if (!worksheetId || !workSheet?.contractProductItems || !havePermissionToEdit) {
+    if (!worksheetId || !workSheet?.latestRecord.contractProductItems || !havePermissionToEdit) {
       return;
     }
 
