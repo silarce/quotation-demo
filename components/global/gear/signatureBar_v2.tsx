@@ -7,6 +7,8 @@ import iconReview from 'public/image/icon/review.svg';
 // css
 import scss from './signatureBar_v2.module.scss';
 
+import { TemployeeDto } from './modal/employeeSelector';
+
 // =======================================================================
 
 type Titem = {
@@ -26,7 +28,7 @@ type Tcontrol = {
   onClick?: () => void;
 };
 
-export type { Tcontrol as Tcontrol_signatureBar, Titem as TsignatureBarItem };
+export type { Tcontrol as Tcontrol_signatureBar, Titem as TsignatureBarItem, TemployeeDto };
 
 // =======================================================================
 export default function SignatureBar({

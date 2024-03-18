@@ -20,7 +20,8 @@ import Summary, {
   TsummaryControl,
   TpayInfoControl,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
-import Signature, { Tcontroll_signature } from 'components/page/domestic/quotation/quotationSinature_3';
+// import Signature, { Tcontroll_signature } from 'components/page/domestic/quotation/quotationSinature_3';
+import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -260,12 +261,22 @@ export default function AttachContract({
     },
   };
 
-  const control_signature: Tcontroll_signature = {
-    agent: {
-      employee: userEmp,
-      forbidden: true,
-    },
-  };
+  const { control_signature } = useMemo(() => {
+    const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
+      {
+        label: '經辦',
+        value: userEmp?.chName ?? '',
+        style: { width: '200px' },
+      },
+    ];
+
+    const control_signature = {
+      signatureArr,
+    };
+
+    return { control_signature };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userEmp]);
 
   // 附件
   const { attachments, updateAttachments, domain } = useQuotation_id_attachments(formatedContent?.id);
@@ -601,8 +612,10 @@ export default function AttachContract({
         />
 
         {/* 簽名 */}
-        {/* control_signature */}
-        <Signature controll={control_signature} />
+        <SignatureBar
+          control={control_signature}
+          className={classNames('mx-[50px] mt-[130px] mb-[40px]', scss.signatureBar)}
+        />
       </div>
     </SubLayer>
   );
