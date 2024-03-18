@@ -1539,7 +1539,7 @@ latestContentProdArr為這次追加追減的主產品
       setIsLoading(true);
       await apiQuotationSubmitReview(quotationId, {
         reviewSalesEmployeeId: sales?.emp?.id ?? null,
-        reviewWorkDirectorEmployeeId: workDirector?.emp?.id ?? null,
+        // reviewWorkDirectorEmployeeId: workDirector?.emp?.id ?? null,
         reviewSupervisorEmployeeId: supervisor?.emp?.id ?? null,
       });
       await update();
