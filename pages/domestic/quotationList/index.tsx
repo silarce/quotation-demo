@@ -304,6 +304,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewWorkDirectorEmployee',
       'latestContent.reviewSupervisorEmployee',
+      'latestContent.reviewCashierEmployee',
       'latestContent.reviewManagerEmployee',
 
       'latestContent.customer',

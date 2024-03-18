@@ -1,0 +1,34 @@
+.signatureBar {
+  display: flex;
+  justify-content: space-between;
+
+  gap: 10px;
+}
+
+.box {
+  padding-bottom: 5px;
+  display: grid;
+  align-content: space-between;
+  border-bottom: solid 1px transparent;
+  .label {
+    color: theme("colors.main");
+    font-size: 20px;
+    margin-bottom: 5px;
+  }
+  .signature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    .text {
+      font-size: 18px;
+    }
+    .iconWrapper {
+      height: 26px;
+      width: 26px;
+    }
+  }
+
+  &.noValue.plus {
+    border-bottom: solid 1px black;
+  }
+}

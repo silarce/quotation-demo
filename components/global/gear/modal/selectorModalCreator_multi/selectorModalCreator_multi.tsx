@@ -238,6 +238,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
             dynaProps?.tip && (props.tip = dynaProps.tip);
             dynaProps?.useNoMetaProps && (props.useNoMetaProps = dynaProps.useNoMetaProps);
             dynaProps?.filter_clientSide && (props.filter_clientSide = dynaProps.filter_clientSide);
+            dynaProps?.isSkip && (props.isSkip = dynaProps.isSkip);
 
             //
 
@@ -280,6 +281,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
               props.searchInputSelPropsArr = dynaProps.searchInputSelPropsArr;
             }
 
+            // dynaProps
             return (
               <Fragment key={index}>
                 {/* // FIXME 型別錯誤 */}
