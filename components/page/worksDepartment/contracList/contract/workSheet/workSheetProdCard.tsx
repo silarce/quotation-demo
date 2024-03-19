@@ -2,6 +2,7 @@ import classNames from 'classnames';
 
 // gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import StatusLabel, { TstatusLabelProps } from 'components/global/gear/button/statusLabel';
 
 // icon
 import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
@@ -23,8 +24,8 @@ type Tcontrol = {
     qty: string;
     onClick: (e: React.MouseEvent) => void;
     isActive?: boolean;
-    onDivideClick: () => void;
     onDeleteClick: () => void;
+    status: TstatusLabelProps;
   }[];
 };
 
@@ -34,11 +35,14 @@ export type { Tcontrol as Tcontrol_prodCard };
 export default function WorkSheetProdCard({ control, disabled }: { control: Tcontrol; disabled?: boolean }) {
   return (
     <div className={classNames(scss.card)} onClick={control.onClick}>
-      <div className={scss.leftRight}>
+      <div className={scss.info}>
         <div className={scss.left}>
           <span>{control.itemName}</span>
           <span>{control.doorType}</span>
           <span>數量 : {control.qty}樘</span>
+          <button className={classNames(scss.btn)} onClick={undefined}>
+            分堆
+          </button>
         </div>
         {/*  */}
         <div className={scss.right}>
@@ -46,7 +50,7 @@ export default function WorkSheetProdCard({ control, disabled }: { control: Tcon
             <div className={scss.height}>
               <div>{control.height}</div>
             </div>
-            <DoorIcon />
+            <DoorIcon className={scss.doorIcon} />
           </div>
           <div>
             <div className={scss.width}>
@@ -58,17 +62,16 @@ export default function WorkSheetProdCard({ control, disabled }: { control: Tcon
       </div>
       <div className={scss.list}>
         {control.list.map((item, index) => {
-          const { isOriginal, itemName, qty, onClick, isActive, onDivideClick, onDeleteClick } = item;
+          const { isOriginal, itemName, qty, isActive, status, onClick, onDeleteClick } = item;
 
           return (
             <CellWithBar key={index} isActive={isActive}>
               <div className={classNames(scss.row)} onClick={onClick}>
                 <span>{itemName}</span>
                 <span>{qty}樘</span>
-                <button className={classNames(disabled && scss.hidden)} onClick={onDivideClick}>
-                  分堆
-                </button>
+                <StatusLabel {...status} className={classNames(scss.statusLabel, status.className)} />
                 <IconDelete01 className={classNames((disabled || isOriginal) && scss.hidden)} onClick={onDeleteClick} />
+                {/* <IconDelete01 className={classNames()} onClick={onDeleteClick} /> */}
               </div>
             </CellWithBar>
           );
@@ -80,9 +83,9 @@ export default function WorkSheetProdCard({ control, disabled }: { control: Tcon
 
 // =========================================================================
 
-const DoorIcon = () => {
+const DoorIcon = (props: React.SVGProps<SVGSVGElement>) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="44" height="54" viewBox="0 0 44 54" fill="none">
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="44" height="54" viewBox="0 0 44 54" fill="none">
       <path
         d="M20.8005 0L1.15371 1.53024e-05C0.810609 0.27901 0.519271 0.731208 0.314627 1.30218C0.109983 1.87315 0.000784885 2.53878 0 3.21926V52.2313C0 52.7004 0.103089 53.1503 0.286458 53.482C0.469827 53.8137 0.718455 54 0.977778 54H6.84444V7H37.1556V54H43.0222C43.2815 54 43.5302 53.8137 43.7135 53.482C43.8969 53.1503 44 52.7004 44 52.2313V3.21926C43.9992 2.53878 43.89 1.87315 43.6854 1.30218C43.4807 0.731208 43.1894 0.27901 42.8463 1.53024e-05L24 1.8315e-05C22.2344 3.69767e-05 22.2764 0 22 0C21.7236 0 22 1.50573e-05 20.8005 0Z"
         fill="#14256A"

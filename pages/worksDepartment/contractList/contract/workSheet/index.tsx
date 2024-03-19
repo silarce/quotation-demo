@@ -243,6 +243,15 @@ type Tprofile = {
 };
 
 // ====================================================================
+
+// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
+// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
+// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
+// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
+// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
+// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
+// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
+
 export default function WorkSheet({
   isAdmin,
   userErpFeature,
@@ -1380,20 +1389,24 @@ export default function WorkSheet({
                   isOriginal: item.isOriginal,
                   itemName: itemName,
                   qty: quantity,
+                  isActive,
+                  status: {
+                    label: '總經理',
+                    dotColor: 'green',
+                  },
                   onClick: (e) => {
                     e.stopPropagation();
                     setTargetSheetKey([pKey, cKey]);
                   },
-                  isActive,
-                  onDivideClick: () => {
-                    setTargetDivideItem(() => {
-                      return (qty: number) => {
-                        item.divideItem(qty, `-${String(length)}`);
-                        setTargetDivideItem(undefined);
-                      };
-                    });
-                  },
                   onDeleteClick: () => item.clearSheet(),
+                  // onDivideClick: () => {
+                  //   setTargetDivideItem(() => {
+                  //     return (qty: number) => {
+                  //       item.divideItem(qty, `-${String(length)}`);
+                  //       setTargetDivideItem(undefined);
+                  //     };
+                  //   });
+                  // },
                 });
               });
 
@@ -1427,7 +1440,7 @@ export default function WorkSheet({
 
           {/* right */}
           {/* targetSheet */}
-          <div className={classNames(scss.right, !targetSheet && 'hidden')}>
+          {/* <div className={classNames(scss.right, !targetSheet && 'hidden')}>
             <WorkSheetProductOutline
               control={control_product}
               oldProductOutline={oldProductOutline}
@@ -1451,7 +1464,7 @@ export default function WorkSheet({
             />
             <hr />
             <WorkSheetProductDetail02 control={control_detail02} />
-          </div>
+          </div> */}
           {/* right */}
         </div>
         {/* main */}

@@ -1,7 +1,5 @@
-@use "styles/theme01" as *;
-
 .card {
-  width: 186px;
+  width: 260px;
   padding: 10px;
   padding-bottom: 5px;
   border-radius: 4px;
@@ -11,7 +9,7 @@
     background-color: #fee;
   }
 
-  .leftRight {
+  .info {
     display: grid;
     grid-template-columns: auto 80px;
     justify-content: space-between;
@@ -19,7 +17,7 @@
     .left {
       display: grid;
       justify-content: space-between;
-      gap: 12px;
+      gap: 6px;
       > span {
         font-size: 12px;
         font-weight: 400;
@@ -30,6 +28,12 @@
           font-weight: 700;
         }
       }
+      .btn {
+        height: fit-content;
+        padding: 2px 3px;
+        border: solid 1px theme("colors.main");
+        font-size: 12px;
+      }
     }
     .right {
       margin: auto;
@@ -38,6 +42,13 @@
       width: fit-content;
       > div:nth-of-type(1) {
         display: flex;
+
+        .doorIcon {
+          width: 66px;
+          height: 81px;
+          // 44/54;
+        }
+
         .height {
           position: relative;
           width: 9px;
@@ -89,19 +100,23 @@
     border-top: solid 1px theme("colors.border");
     .row {
       display: grid;
-      grid-template-columns: auto 30px fit-content(100%) 20px;
+      // grid-template-columns: auto 30px fit-content(100%) 20px;
+      grid-template-columns: auto 30px max-content 20px;
       align-items: center;
-      gap: 10px;
+      gap: 5px;
       padding: 5px;
       > span {
         white-space: pre-wrap;
         word-break: break-all;
       }
-      > button {
-        height: fit-content;
-        padding: 2px 3px;
-        border: solid 1px theme("colors.main");
-        font-size: 12px;
+      // > button {
+      //   height: fit-content;
+      //   padding: 2px 3px;
+      //   border: solid 1px theme("colors.main");
+      //   font-size: 12px;
+      // }
+      .statusLabel {
+        padding: 4px 8px;
       }
     }
 
