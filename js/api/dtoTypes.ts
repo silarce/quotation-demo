@@ -940,7 +940,7 @@ export type TquotationProductDto = {
   materialSurface: string | null;
   // 門軌
   guideRail: string;
-  // 門軌G
+  // 門軌G // guideRailG是指單邊門軌的寬度。但是在工務部，G其實是指兩邊門軌寬度的總和。
   guideRailG: number | null;
   // 馬力
   horsepower: string;
@@ -1440,7 +1440,7 @@ export type TcreateQuotationProductDto = {
   materialSurface: string | null;
   // 門軌
   guideRail: string;
-  // 門軌G
+  // 門軌G // guideRailG是指單邊門軌的寬度。但是在工務部，G其實是指兩邊門軌寬度的總和。
   guideRailG: number | null;
   // 馬力
   horsepower: string;
@@ -2454,7 +2454,7 @@ export type TworksheetDto = {
   updatedAt: string;
 
   // 出貨日;
-  shipDay: Date | null;
+  shipDay: string | null;
   // 合約Id
   contractId: string | null;
   // 合約
@@ -2487,7 +2487,7 @@ export type TworksheetDto_legacy = {
 
 export type TcreateWorksheetDto = {
   //  出貨日
-  shipDay?: Date | null;
+  shipDay?: string | null;
   //  合約id
   contractId?: string | null;
   //  舊合約id
@@ -2516,17 +2516,17 @@ export type TworksheetRecordDto = {
   // 審核業務
   reviewSalesEmployee: TemployeeDto;
   // 送審給業務審核時間
-  toReviewSales: Date | null;
+  toReviewSales: string | null;
   // 業務審核時間
-  salesReviewAt: Date | null;
+  salesReviewAt: string | null;
   // 審核總經理Id
   reviewManagerEmployeeId: string | null;
   // 審核總經理
   reviewManagerEmployee: TemployeeDto;
   // 送審給總經理審核時間
-  toReviewManager: Date | null;
+  toReviewManager: string | null;
   // 總經理審核時間
-  managerReviewAt: Date | null;
+  managerReviewAt: string | null;
   // 版本
   version: number;
 };
@@ -2671,7 +2671,7 @@ type TupdateContractProductItemDto = {
   electricMotorDirection?: string | null;
   // 門軌 - 型式
   guideRailType?: string | null;
-
+  // 門軌G // guideRailG是指單邊門軌的寬度。但是在工務部，G其實是指兩邊門軌寬度的總和。
   guideRailG?: number | null;
   // 國外認證防火規範
   isULGuideRail?: boolean | null;
@@ -2778,7 +2778,7 @@ export type TupdateWorkSheetItem = {
   // 門軌 - 表面
   guideRailSurface: string | null; // 可以記錄在component裡面，這個property應該就不需要了
   //
-  //
+  // 門軌G // guideRailG是指單邊門軌的寬度。但是在工務部，G其實是指兩邊門軌寬度的總和。
   guideRailG: number | null;
 };
 

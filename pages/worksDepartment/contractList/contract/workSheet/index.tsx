@@ -179,10 +179,10 @@ import WorkSheetProductDetail02, {
 import WorkSheetPDF, {
   Tcontrol_workSheetPDF_01,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
-
 import WorkSheetPDF_02, {
   Tcontrol_workSheetPDF_02,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF_02';
+import RecordList, { Trecord } from 'components/page/worksDepartment/worksheet.tsx/recordList';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -252,7 +252,7 @@ type Tprofile = {
 // w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
 // w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
 
-export default function WorkSheet({
+export default function Worksheet({
   isAdmin,
   userErpFeature,
 }: {
@@ -1347,15 +1347,15 @@ export default function WorkSheet({
 
   const forbidden = targetSheet?.isOriginal;
 
+  // -----------------------------------------------------------------------
+
+  // -----------------------------------------------------------------------
+
   return (
     <SubLayer isLoading_all={isLoading || isHookLoading || targetSheet?.isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
-      >
+      <div>
         <WorkSheetProfile control={control_profile} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
         <div className={scss.main}>
@@ -1440,8 +1440,15 @@ export default function WorkSheet({
 
           {/* right */}
           {/* targetSheet */}
-          {/* <div className={classNames(scss.right, !targetSheet && 'hidden')}>
-            <WorkSheetProductOutline
+          <div
+            className={classNames(
+              scss.right
+              // , !targetSheet && 'hidden'
+            )}
+          >
+            <RecordList control={{ recordArr: fakeRecordArr }} />
+
+            {/* <WorkSheetProductOutline
               control={control_product}
               oldProductOutline={oldProductOutline}
               onCalcClick={onCalcClick}
@@ -1463,12 +1470,12 @@ export default function WorkSheet({
               disabled={forbidden || disabled}
             />
             <hr />
-            <WorkSheetProductDetail02 control={control_detail02} />
-          </div> */}
+            <WorkSheetProductDetail02 control={control_detail02} /> */}
+          </div>
           {/* right */}
         </div>
         {/* main */}
-      </form>
+      </div>
       <InputModal
         visible={!!targetDivideItem}
         title="分堆"
@@ -1521,6 +1528,41 @@ const creEmptyProfile = (): Tprofile => ({
   contactNumber: '',
   faxNumber: '',
 });
+
+// ============================================================================
+
+const fakeRecordArr: Trecord[] = [
+  {
+    itemName: 'NNAAMMEE',
+    doorModel: 'aaa',
+    fullWidth: '2',
+    height: '2',
+    qty: '5',
+    material: 'aaa',
+    isAntyTyphoon: true,
+
+    reviewSalesName: 'AAAA',
+    reviewSalesStatus: 'green',
+
+    reviewManagerName: 'BBBB',
+    reveiwManagerStatus: 'red',
+  },
+  {
+    itemName: 'NNAAMMEE',
+    doorModel: 'aaa',
+    fullWidth: '2',
+    height: '2',
+    qty: '5',
+    material: 'aaa',
+    isAntyTyphoon: false,
+
+    reviewSalesName: 'AAAA',
+    reviewSalesStatus: 'green',
+
+    reviewManagerName: 'BBBB',
+    reveiwManagerStatus: 'red',
+  },
+];
 
 // ============================================================================
 

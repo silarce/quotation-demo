@@ -16,7 +16,7 @@ type Tcontrol = {
   statusArr: TstatusLabelProps[];
 };
 
-export type { Tcontrol as Tcontrol_processChain };
+export type { Tcontrol as Tcontrol_processChain, TstatusLabelProps };
 
 // -------------------------------------------------------------------------
 export default function ProcessChain(
