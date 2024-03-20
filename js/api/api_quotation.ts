@@ -69,6 +69,7 @@ export const apiGetQuotation = async (params?: Tparams) => {
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewWorkDirectorEmployee',
+      'latestContent.reviewCahierEmployee',
       'latestContent.reviewSupervisorEmployee',
       'latestContent.reviewManagerEmployee',
       'latestContent.managerReviewedAt',
@@ -132,7 +133,10 @@ export const apiGetQuotation_reduce_detail = async (params?: Tparams) => {
         arr.map(async (q) => {
           const newQ = await apiGetQuotation_id_detail(q.id);
 
-          return newQ;
+          return {
+            ...q,
+            ...newQ,
+          };
         })
       );
 
@@ -170,6 +174,7 @@ export const apiGetQuotation_Id = async (id: string) => {
 
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewWorkDirectorEmployee',
+      'latestContent.reviewCashierEmployee',
       'latestContent.reviewSupervisorEmployee',
       'latestContent.reviewManagerEmployee',
 
@@ -313,9 +318,12 @@ const apiGetQuotationContent_Id = async (id: string) => {
       'agentEmployee',
       'supervisorEmployee',
       'managerEmployee',
+
       'reviewSalesEmployee',
-      'reviewWorkDirectorEmployee',
       'reviewSupervisorEmployee',
+      'reviewCashierEmployee',
+      'reviewWorkDirectorEmployee',
+      'reviewCashierEmployee',
       'reviewManagerEmployee',
 
       'products.items.accessories',
@@ -464,6 +472,7 @@ export const useGetContract = (customParams?: Tparams) => {
       'content.agentEmployee',
       'content.reviewSalesEmployee',
       'content.reviewWorkDirectorEmployee',
+      'content.reviewCashierEmployee',
       'content.reviewSupervisorEmployee',
       'content.products.quantity',
       'content.products.options',
@@ -515,6 +524,7 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
       'content.agentEmployee',
       'content.reviewSalesEmployee',
       'content.reviewWorkDirectorEmployee',
+      'content.reviewCashierEmployee',
       'content.reviewSupervisorEmployee',
       'content.products.quantity',
       'content.products.options',
@@ -1195,6 +1205,7 @@ const lookpu_contractPopulate = {
     'content.managerEmployee',
     'content.reviewSalesEmployee',
     'content.reviewWorkDirectorEmployee',
+    'content.reviewCashierEmployee',
     'content.reviewSupervisorEmployee',
     'content.reviewManagerEmployee',
     'content.products',
@@ -1212,6 +1223,7 @@ const lookpu_contractPopulate = {
     'content.managerEmployee',
     'content.reviewSalesEmployee',
     'content.reviewWorkDirectorEmployee',
+    'content.reviewCashierEmployee',
     'content.reviewSupervisorEmployee',
     'content.products.items.accessories',
     'content.products.items.components',
@@ -1242,8 +1254,9 @@ class class_quotationPopulate implements Tclass_quotationPopulate {
     'latestContent.managerEmployee',
 
     'latestContent.reviewSalesEmployee',
-    'latestContent.reviewWorkDirectorEmployee',
     'latestContent.reviewSupervisorEmployee',
+    'latestContent.reviewWorkDirectorEmployee',
+    'latestContent.reviewCashierEmployee',
     'latestContent.reviewManagerEmployee',
 
     'latestContent.products',

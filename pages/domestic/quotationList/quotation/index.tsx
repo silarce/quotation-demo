@@ -77,6 +77,8 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import CustomerSelector from 'components/global/gear/modal/customerSelector';
+import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
+import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -125,6 +127,23 @@ import { useProductList } from 'hooks/quotation/useProduct';
 // type
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 import { TcreateQuotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
+
+// ------------------------------------------------------------------
+
+const EmployeeSelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
+  selectorArr: [
+    {
+      key: 'employee',
+      caption: '業務',
+      limit: 1,
+    },
+    {
+      key: 'employee',
+      caption: '業務主管',
+      limit: 1,
+    },
+  ],
+});
 
 // ------------------------------------------------------------------
 
@@ -179,23 +198,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   let reviewSalesEmployeeId: string | undefined = undefined;
   let reviewWorkDirectorEmployeeId: string | undefined = undefined;
+  let reviewCashierEmployeeId: string | undefined = undefined;
   let reviewSupervisorEmployeeId: string | undefined = undefined;
   let reviewManagerEmployeeId: string | undefined = undefined;
 
   let isReviewer = false;
   let isSales = false;
   let isWorkDirector = false;
+  let isCashier = false;
   let isSupervisor = false;
   let isManager = false;
 
   let salesReviewedAt: string | null | undefined = undefined;
   let supervisorReviewedAt: string | null | undefined = undefined;
   let workDirectorReviewedAt: string | null | undefined = undefined;
+  let cashierReviewedAt: string | null | undefined = undefined;
   let managerReviewedAt: string | null | undefined = undefined;
 
   let toSalesAt: string | null | undefined = undefined;
   let toSupervisorAt: string | null | undefined = undefined;
   let toWorkDirectorAt: string | null | undefined = undefined;
+  let toCashierAt: string | null | undefined = undefined;
   let toManagerAt: string | null | undefined = undefined;
 
   let isSendToReview = false;
@@ -213,10 +236,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [isLoading, setIsLoading] = useState(false);
   // 是否可編輯
   const [disabled, setDisabled] = useState(true);
-  const [disabled_reviewer, setDisabled_reviewer] = useState(true);
+  // const [disabled_reviewer, setDisabled_reviewer] = useState(true);
   // -----------------------------------------------------
   const [reviewFormShow, setReviewFormShow] = useState(false);
   const [reviewModalShow, setReviewModalShow] = useState(false);
+  const [showEmployeSelector, setShowEmployeSelector] = useState(false);
 
   const [showPdf, setShowPdf] = useState(false);
   const [showPdf_part, setShowPdf_part] = useState(false);
@@ -224,6 +248,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [showMemoModal, setShowMemoModal] = useState(false);
 
   const [inputModalConfig, setInputModalConfig] = useState<TinputModalProps>();
+
+  const [taxRate, setTaxRate] = useState(0.05);
 
   // -----------------------------------------------------
 
@@ -299,7 +325,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
   // 資料
-  // const { data: quotationData, update } = useGetQuotation_id(quotationId as string);
+
   const { data: quotationData, update } = useGetQuotation_id_2(quotationId as string, {
     preBuiltPopulate: ['simple', 'attached'],
   });
@@ -320,24 +346,35 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   reviewSalesEmployeeId = latestContent?.reviewSalesEmployee?.id;
   reviewWorkDirectorEmployeeId = latestContent?.reviewWorkDirectorEmployee?.id;
+  reviewCashierEmployeeId = latestContent?.reviewCashierEmployee?.id;
   reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
   reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
 
   salesReviewedAt = latestContent?.salesReviewedAt;
   supervisorReviewedAt = latestContent?.supervisorReviewedAt;
   workDirectorReviewedAt = latestContent?.workDirectorReviewedAt;
+  cashierReviewedAt = latestContent?.cashierReviewedAt;
   managerReviewedAt = latestContent?.managerReviewedAt;
 
   toSalesAt = latestContent?.toSalesAt;
   toSupervisorAt = latestContent?.toSupervisorAt;
   toWorkDirectorAt = latestContent?.toWorkDirectorAt;
+  toCashierAt = latestContent?.toCashierAt;
   toManagerAt = latestContent?.toManagerAt;
 
-  isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toManagerAt);
-  isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toManagerAt);
+  isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+  isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
 
   version = latestContent?.version;
   editNotes = latestContent?.editNotes;
+
+  let agentEmployee: TemployeeDto | undefined | null;
+
+  if (!quotationId) {
+    agentEmployee = userInfo?.employee;
+  } else {
+    agentEmployee = latestContent?.agentEmployee;
+  }
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -428,13 +465,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   // -----------------------------------------------------
-  let agentEmployee: TemployeeDto | undefined | null;
 
-  if (!quotationId) {
-    agentEmployee = userInfo?.employee;
-  } else {
-    agentEmployee = latestContent?.agentEmployee;
-  }
   // -----------------------------------------------------
 
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
@@ -702,6 +733,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         quotationRanges,
       } = latestContent;
 
+      const haveTax = !!salesTax;
+
       setAnnotation(annotations ?? []);
       setQr(quotationRanges ?? []);
       setPaymentMethod(paymentMethods);
@@ -714,6 +747,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         deliveryLocation,
         deliveryDate,
       });
+
+      setTaxRate(haveTax ? 0.05 : 0);
     } else {
       setAnnotation([]);
       setQr([]);
@@ -744,6 +779,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         deliveryLocation: '',
         deliveryDate: '',
       });
+      setTaxRate(0.05);
     }
   }, [quotationData, quotationContentData, disabled]);
 
@@ -765,6 +801,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const { subTotal, salesTax, total } = countPayInfoValue({
       // discount: summary.discountRate,
       prodSubTotal: quotationProdSubTotal,
+      taxRate,
     });
 
     setSummary((state) => {
@@ -775,11 +812,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
         total,
       };
     });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     // summary.discountRate,
     // 現在summary.discountRate改變時就會改變quotationProdSubTotal
     // 其實現在quotationProdSubTotal === ''也不會造成問題了
     quotationProdSubTotal,
+    taxRate,
   ]);
 
   //
@@ -861,6 +901,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // ----------------------------------------------------------------------
   const payInfoControl: TpayInfoControl = {
     payment: {
+      haveTax: {
+        value: !!taxRate,
+        onChange: (v) => {
+          if (quotationProdSubTotal === '') {
+            calcSubTotalPrice();
+          }
+
+          setTaxRate(v ? 0.05 : 0);
+        },
+      },
+
       discountRate: {
         inputAttr: {
           disabled: disabled,
@@ -1018,10 +1069,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isWorkDirector = true;
         isReviewer = true;
       }
-    }
-    //  else if (userGrade >= 14) {
-    // else if (userId === reviewManagerEmployeeId) {
-    else if (
+    } else if (userId === reviewCashierEmployeeId && toCashierAt) {
+      if (salesReviewedAt && supervisorReviewedAt && toWorkDirectorAt) {
+        isCashier = true;
+        isReviewer = true;
+      }
+    } else if (
       userId === reviewManagerEmployeeId ||
       // 總經理ID
       userId === '01f55698-49bb-4501-b432-1157a5109554'
@@ -1029,7 +1082,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
-      } else if (salesReviewedAt && workDirectorReviewedAt && supervisorReviewedAt) {
+      } else if (salesReviewedAt && workDirectorReviewedAt && cashierReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
       }
@@ -1085,119 +1138,68 @@ function TheQuotation({ router }: { router: NextRouter }) {
     })();
   }, [lastestContentId]);
 
-  const [workDirector, setworkDirector] = useState<{
-    emp: TemployeeDto | null;
-    workDirectorReviewedAt: string | null | undefined; // 好像是多餘的
-    toWorkDirectorAt: string | null | undefined; // 好像是多餘的
-  }>();
-  const [supervisor, setSupervisor] = useState<{
-    emp: TemployeeDto | null;
-    supervisorReviewedAt: string | null | undefined; // 好像是多餘的
-    toSupervisorAt: string | null | undefined; // 好像是多餘的
-  }>();
-  const [sales, setSales] = useState<{
-    emp: TemployeeDto | null;
-    salesReviewedAt: string | null | undefined; // 好像是多餘的
-    toSalesAt: string | null | undefined; // 好像是多餘的
-  }>();
-
-  useEffect(() => {
-    const {
-      //
-      reviewSalesEmployee,
-      salesReviewedAt,
-      toSalesAt,
-
-      reviewSupervisorEmployee,
-      supervisorReviewedAt,
-      toSupervisorAt,
-
-      reviewWorkDirectorEmployee,
-      workDirectorReviewedAt,
-      toWorkDirectorAt,
-    } = quotationData?.latestContent ?? {};
-
-    setworkDirector({
-      emp: reviewWorkDirectorEmployee ?? null,
-      workDirectorReviewedAt: workDirectorReviewedAt ?? null,
-      toWorkDirectorAt: toWorkDirectorAt ?? null,
-    });
-    setSupervisor({
-      emp: reviewSupervisorEmployee ?? null,
-      supervisorReviewedAt: supervisorReviewedAt ?? null,
-      toSupervisorAt: toSupervisorAt ?? null,
-    });
-
-    setSales({
-      emp: reviewSalesEmployee ?? null,
-      salesReviewedAt: salesReviewedAt ?? null,
-      toSalesAt: toSalesAt ?? null,
-    });
-  }, [quotationData, disabled_reviewer]);
-
-  // 已經在後端紀錄的審核人員不可以改變
-  const control_signature: Tcontroll_signature = {
-    manager: {
-      employee: quotationData?.latestContent.reviewManagerEmployee,
-      forbidden: true,
-    },
-    workDirector: {
-      employee: workDirector?.emp ?? null,
-      onChange: (emp) => {
-        setworkDirector((workDirector) => {
-          if (!workDirector) {
-            return workDirector;
-          }
-
-          return { ...workDirector, emp: emp ?? null };
-        });
+  const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useMemo(() => {
+    const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
+      {
+        label: '總經理',
+        value: quotationData?.latestContent.reviewManagerEmployee?.chName,
+        style: { width: '200px' },
       },
-      // forbidden: !!quotationData?.latestContent.reviewWorkDirectorEmployee,
-      forbidden: !!quotationData?.latestContent.toWorkDirectorAt,
-    },
-    supervisor: {
-      employee: supervisor?.emp ?? null,
-      onChange: (emp) => {
-        setSupervisor((supervisor) => {
-          if (!supervisor) {
-            return supervisor;
-          }
-
-          return { ...supervisor, emp: emp ?? null };
-        });
+      {
+        label: '應收帳款',
+        value: quotationData?.latestContent.reviewCashierEmployee?.chName,
+        style: { width: '200px' },
       },
-      // forbidden: !!quotationData?.latestContent.reviewSupervisorEmployee,
-      forbidden: !!quotationData?.latestContent.toSupervisorAt,
-    },
-    sales: {
-      employee: sales?.emp ?? null,
-      onChange: (emp) => {
-        setSales((sales) => {
-          if (!sales) {
-            return sales;
-          }
-
-          return { ...sales, emp: emp ?? null };
-        });
+      {
+        label: '應收帳款',
+        value: quotationData?.latestContent.reviewWorkDirectorEmployee?.chName,
+        style: { width: '200px' },
       },
-      // forbidden: !!quotationData?.latestContent.reviewSalesEmployee,
-      forbidden: !!quotationData?.latestContent.toSalesAt,
-    },
-    agent: {
-      employee: quotationData?.latestContent.agentEmployee,
-      forbidden: true,
-    },
-  };
+      {
+        label: '業務主管',
+        value: quotationData?.latestContent.reviewSupervisorEmployee?.chName,
+        style: { width: '200px' },
+      },
+      {
+        label: '業務',
+        value: quotationData?.latestContent.reviewSalesEmployee?.chName,
+        style: { width: '200px' },
+      },
+      {
+        label: '經辦',
+        value: agentEmployee?.chName,
+        style: { width: '200px' },
+      },
+    ];
 
-  // 在預算、投標、發包 不顯示應收帳款
-  if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-    delete control_signature.workDirector;
-  }
+    if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+      signatureArr.splice(1, 2);
+    }
 
-  // 在準合約階段不顯示經辦
-  if (status === 'Pending') {
-    delete control_signature.agent;
-  }
+    if (status === 'Pending') {
+      signatureArr.splice(5, 1);
+    }
+
+    const control_signature = {
+      signatureArr,
+    };
+
+    const defaultSeletedDataArrArr: Parameters<typeof EmployeeSelectorGroup>[0]['defaultSeletedDataArrArr'] = [
+      quotationData?.latestContent.reviewSalesEmployee ? [quotationData.latestContent.reviewSalesEmployee] : undefined,
+      quotationData?.latestContent.reviewSupervisorEmployee
+        ? [quotationData.latestContent.reviewSupervisorEmployee]
+        : undefined,
+    ];
+
+    const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
+
+    if (status === 'Pending' && dynaSelectorPropsList[0]) {
+      dynaSelectorPropsList[0].isSkip = true;
+    }
+
+    return { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, quotationData?.latestContent]);
 
   // --------------------------------------------------------------------------
 
@@ -1315,22 +1317,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
     !contentId && quotationId
       ? {
           type: 'myButton',
-          label: '編輯審核人員',
+          label: '送審',
           onClick: () => {
-            const toSalesAt = sales?.toSalesAt;
-            const toSupervisorAt = supervisor?.toSupervisorAt;
-            const toWorkDirectorAt = workDirector?.toWorkDirectorAt;
-
             if (status === 'Pending' && !verifyForm) {
               return myAlert.warning({ title: '請先送出合約審核表' });
             }
 
-            if (status === 'Pending' && (toSupervisorAt || toWorkDirectorAt)) {
+            if (status === 'Pending' && toSupervisorAt) {
               myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
             } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
               myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
             } else {
-              setDisabled_reviewer(false);
+              setShowEmployeSelector(true);
             }
 
             if (status === 'Pending') {
@@ -1407,18 +1405,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
     },
   ];
 
-  const panel_editReviewer: TpanelList = [
-    {
-      type: 'redButton',
-      label: '送審',
-      onClick: () => reqPatchReviewer(),
-    },
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: () => setDisabled_reviewer(true),
-    },
-  ];
+  // const panel_editReviewer: TpanelList = [
+  //   {
+  //     type: 'redButton',
+  //     label: '送審',
+  //     onClick: () => reqPatchReviewer(),
+  //   },
+  //   {
+  //     type: 'myButton',
+  //     label: '取消',
+  //     onClick: () => setDisabled_reviewer(true),
+  //   },
+  // ];
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -1646,6 +1644,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       reviewSalesEmployeeId: isSales ? userId : null,
       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
       reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
+      reviewCashierEmployeeId: isCashier ? userId : null,
       reviewManagerEmployeeId: isManager ? userId : null,
       reviewResult: isPass,
     };
@@ -1657,7 +1656,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     if (status === 'Pending') {
-      if (!reviewSalesEmployeeId || !reviewWorkDirectorEmployeeId || !reviewSupervisorEmployeeId) {
+      if (
+        !reviewSalesEmployeeId ||
+        !reviewWorkDirectorEmployeeId ||
+        !reviewCashierEmployeeId ||
+        !reviewSupervisorEmployeeId
+      ) {
         return myAlert.warning({ title: '請先設定所有審核人員' });
       }
     }
@@ -1669,6 +1673,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
     } else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
+      return myAlert.warning({ title: '您已經審核過此報價單' });
+    } else if (isCashier && cashierReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
     } else if (isManager && managerReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
@@ -1720,37 +1726,37 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   // 送審
-  const reqPatchReviewer = async () => {
+  const reqPatchReviewer = async ({
+    sales,
+    supervisor,
+  }: {
+    sales: TemployeeDto | undefined;
+    supervisor: TemployeeDto | undefined;
+  }) => {
     if (!quotationId) {
       return;
     }
 
-    const reviewSalesEmployeeId = sales?.emp?.id ?? null;
-    const reviewWorkDirectorEmployeeId = workDirector?.emp?.id ?? null;
-    const reviewSupervisorEmployeeId = supervisor?.emp?.id ?? null;
+    const reviewSalesEmployeeId = sales?.id ?? null;
+    const reviewSupervisorEmployeeId = supervisor?.id ?? null;
 
-    if (
-      status === 'Pending' &&
-      (!reviewSalesEmployeeId || !reviewWorkDirectorEmployeeId || !reviewSupervisorEmployeeId)
-    ) {
-      myAlert.info({ title: '請選擇所有審核人員' });
+    if (status === 'Pending' && !reviewSalesEmployeeId) {
+      return myAlert.err({ title: '沒有業務' });
+    }
 
-      return;
-    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
-      myAlert.info({ title: '請選擇所有審核人員' });
-
-      return;
+    if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
+      return myAlert.info({ title: '請選擇所有審核人員' });
     }
 
     try {
       setIsLoading(true);
       await apiQuotationSubmitReview(quotationId, {
         reviewSalesEmployeeId,
-        reviewWorkDirectorEmployeeId,
         reviewSupervisorEmployeeId,
       });
       await update();
-      setDisabled_reviewer(true);
+      // setDisabled_reviewer(true);
+      setShowEmployeSelector(false);
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新審核人員失敗', content: err.message });
@@ -1959,9 +1965,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   });
 
   const panelList = (() => {
-    if (!disabled_reviewer) {
-      return panel_editReviewer;
-    }
+    // if (!disabled_reviewer) {
+    //   return panel_editReviewer;
+    // }
 
     if (disabled) {
       return panel_noEditable;
@@ -1984,11 +1990,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <div className={style.quotation}>
           {/* 基本資料 */}
           <QuotationProfile disabled={disabled} control={control_profile} editNotes={editNotes} />
-
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
           </div>
-
           <div className={style.tableWrapper}>
             {/* 主產品設定 */}
             <Table_prod
@@ -2023,7 +2027,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
               <LoadingCover01 isLoading={!!targetProd?.isLoading} />
             </div>
           </div>
-
           <div className={style.redWrapper}>
             {/* 選配設定 */}
             <Table_accessories
@@ -2049,7 +2052,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
               }}
             />
           </div>
-
           <div className={style.tableWrapper}>
             {/* 其他設定 */}
             <Table_others
@@ -2062,7 +2064,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
             />
           </div>
           {/* 備註/報價範圍/付款資訊 */}
-
           <Summary
             disabled={disabled}
             payInfoControl={payInfoControl}
@@ -2070,11 +2071,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
             control_qr={control_qr}
             appendixParams={appendixParams}
           />
-
           {/* 簽名 */}
           {/*  */}
           {/*  */}
-          <QuotationSinature_3 controll={control_signature} disabled={disabled_reviewer} />
+          {/* <QuotationSinature_3 controll={control_signature} disabled={disabled_reviewer} /> */}
+          <SignatureBar className={'mx-[50px] mt-[130px] mb-[40px]'} control={control_signature} />
           {/*  */}
           {/*  */}
         </div>
@@ -2188,7 +2189,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           },
         ]}
       />
-      {/*  */}
+      {/*  客戶選擇器 */}
       <CustomerSelector
         showModal={customerSelectorShow}
         label="複製報價單之客戶"
@@ -2211,6 +2212,34 @@ function TheQuotation({ router }: { router: NextRouter }) {
         title={inputModalConfig?.title ?? ''}
         placeholder={inputModalConfig?.placeholder}
       />
+      {/* 審核人員選擇器 */}
+      <EmployeeSelectorGroup
+        showModal={showEmployeSelector}
+        caption="請選擇審核人員"
+        isCancelOnConfirm={false}
+        defaultSeletedDataArrArr={defaultSeletedDataArrArr}
+        dynaSelectorPropsList={dynaSelectorPropsList}
+        onConfirm={(arr) => {
+          // 在Pedding，sales的選擇器會被跳過不顯示，但是arr結構不會變
+          const sales = arr[0][0] as TemployeeDto | undefined;
+          const supervisor = arr[1][0] as TemployeeDto | undefined;
+
+          myAlert.confirm({
+            title: '確定送審',
+            props: {
+              onOk: () => {
+                reqPatchReviewer({
+                  sales,
+                  supervisor,
+                });
+              },
+            },
+          });
+        }}
+        onCancel={() => {
+          setShowEmployeSelector(false);
+        }}
+      />
     </div>
   );
 }
@@ -2226,15 +2255,17 @@ const countPayInfoValue = ({
   // discount,
   //
   prodSubTotal,
+  taxRate,
 }: {
   // discount: string | number;
   prodSubTotal: string | number;
+  taxRate: number;
 }) => {
   // const discountRate = new Decimal(discount || 0).div(100);
 
   // const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
   const subTotal = prodSubTotal || 0;
-  const tax = Decimal.mul(subTotal || 0, 0.05);
+  const tax = Decimal.mul(subTotal || 0, taxRate);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
   // const subTotalStr = Number(subTotal.toFixed(0)).toLocaleString();

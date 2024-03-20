@@ -37,8 +37,8 @@ export default function PanelHeader({
     router.push({
       pathname: '/domestic/customer/edit',
       query: {
-        id: customersData.id,
         ...router.query,
+        id: customersData.id,
       },
     });
   };

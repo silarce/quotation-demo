@@ -154,6 +154,7 @@ export default function Tbody({
             return (
               <DndRow
                 key={key}
+                vKey={key}
                 id={key}
                 isActive={activeKey === key}
                 pIndex={pIndex}
@@ -377,6 +378,7 @@ const NoItem = ({
 
 // --------------------------------------------------------
 function DndRow({
+  vKey,
   id,
   pIndex,
   item,
@@ -396,6 +398,7 @@ function DndRow({
   showAttatchModal,
   clearAttach,
 }: {
+  vKey: string;
   id: string;
   pIndex: number;
   // prod: Class_product;
@@ -467,6 +470,10 @@ function DndRow({
           {keyArr.map((key) => {
             if (!item) {
               return null;
+            }
+
+            if (vKey === 'slat' && key === 'desc' && item.optionalComponentAction === 'slat_SJ-302') {
+              key = 'desc_select';
             }
 
             let theDisabled = disabled;

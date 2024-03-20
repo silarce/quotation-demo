@@ -104,6 +104,7 @@ export default function Budget() {
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewWorkDirectorEmployee',
+      'latestContent.reviewCashierEmployee',
       'latestContent.reviewSupervisorEmployee',
       'latestContent.reviewManagerEmployee',
       'latestContent.managerReviewedAt',
@@ -160,8 +161,11 @@ export default function Budget() {
   const panelArr = useMemo(() => {
     const panelArr: Tcontrol_queryQuotationList['panelArr'] = [];
 
-    Object.keys(dataList).forEach((key) => {
+    const pageArr = Object.keys(dataList);
+
+    pageArr.forEach((key, pageIndex) => {
       const arr = dataList[key as keyof typeof dataList];
+      const isLastPage = pageArr.length - 1 === pageIndex;
 
       arr.forEach((quotation, index) => {
         const { contents, latestContent, id } = quotation;
@@ -198,7 +202,7 @@ export default function Budget() {
           contactPerson: latestContent.contactPerson,
           contactPhoneNumber: latestContent.contactNumber,
           href: href_head,
-          viewRef_bottom: quoatationArr.length - 10 === index ? viewRef_bottom : undefined,
+          viewRef_bottom: isLastPage && arr.length - 5 === index ? viewRef_bottom : undefined,
           //
           processChain: processChain,
           trackProgress: latestContent.trackProgress,

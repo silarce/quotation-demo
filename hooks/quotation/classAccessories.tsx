@@ -338,7 +338,9 @@ const accessoriesCellConfig: TcellConfig = {
     inputSelProps: {
       wrapperStyle: { width: '60px' },
       inputProps: {
-        props: {},
+        props: {
+          type: 'number',
+        },
       },
     },
   },

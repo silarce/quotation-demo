@@ -90,12 +90,12 @@ export default function WorkContactDoc() {
   // ----------------------------------------------------------------------------
   const panelList_01: TpanelList = [
     contract?.worksheetId ? null : { type: 'myButton', label: '產生工作表', onClick: reqCreateWorkSheet },
-    { type: 'myButton', label: '編輯', onClick: () => ref_workContact.current.setDisabled(false) },
+    { type: 'myButton', label: '編輯聯絡人', onClick: () => ref_workContact.current.setDisabled(false) },
   ];
   const panelList_02: TpanelList = [
     {
       type: 'redButton',
-      label: '上傳',
+      label: '確認',
       onClick: () => {
         ref_workContact.current.reqPatch();
       },

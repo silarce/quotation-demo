@@ -36,12 +36,13 @@ import WorkContactDoc_component, {
   TimperativeHandle,
   TonStateChange,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/workContactDoc_component';
+import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 
 import Summary, {
   TsummaryControl,
   TpayInfoControl,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
-import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
+// import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
 
 // antd
 import { Collapse } from 'antd';
@@ -52,6 +53,7 @@ import PageHeader02, { TtagList, TpanelList, Tlink, TlinkArr } from 'components/
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
+import SignatureBar, { Tcontrol_signatureBar } from 'components/global/gear/signatureBar_v2';
 
 // css
 import scss from './quotation.module.scss';
@@ -97,6 +99,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   const [isLoading, setIsLoading] = useState(false);
+  const [reviewFormShow, setReviewFormShow] = useState(false);
 
   // -----------------------------------------------------------\
   const [isShowContract, setIsShowContract] = useState(true);
@@ -144,8 +147,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
 
-  const { data, update } = useGetContract_id_noItems_2(id as string | undefined);
-  const engineeringContactId = data?.engineeringContactId;
+  const { data: contract, update } = useGetContract_id_noItems_2(id as string | undefined);
+  const engineeringContactId = contract?.engineeringContactId;
 
   useEffect(() => {
     update();
@@ -172,11 +175,11 @@ version>1 是子合約
  */
 
   const { content, rootContent, subContracts, totalInfo } = useMemo(() => {
-    if (!data) {
+    if (!contract) {
       return {};
     }
 
-    let subContracts = data.subContracts.filter((item) => {
+    let subContracts = contract.subContracts.filter((item) => {
       if (version === '1') {
         return true;
       } else {
@@ -190,7 +193,7 @@ version>1 是子合約
 
     const content = (() => {
       if (version === '1') {
-        return data?.content;
+        return contract?.content;
       } else if (version) {
         const index = Number(version) - 1;
         const contract = subContracts[index];
@@ -221,7 +224,7 @@ version>1 是子合約
       subContracts,
       totalInfo,
     };
-  }, [data, version]);
+  }, [contract, version]);
 
   // 合約項目
   const {
@@ -283,7 +286,7 @@ version>1 是子合約
 
   // -----------------------------------------------------------------
   const control_anno: TsummaryControl = {
-    stringArr: data?.annotations ?? [],
+    stringArr: contract?.annotations ?? [],
     editString: () => {},
     addString: () => {},
     delString: () => {},
@@ -291,7 +294,7 @@ version>1 是子合約
   };
 
   const control_qr: TsummaryControl = {
-    stringArr: data?.quotationRanges ?? [],
+    stringArr: contract?.quotationRanges ?? [],
     editString: () => {},
     addString: () => {},
     delString: () => {},
@@ -300,10 +303,21 @@ version>1 是子合約
 
   const payInfoControl: TpayInfoControl = {
     payment: {
+      // haveTax: {
+      //   // value: !!data?.salesTax,
+      //   value: Boolean(data?.salesTax),
+      //   onChange: (v) => {
+      //     // if (quotationProdSubTotal === '') {
+      //     //   calcSubTotalPrice();
+      //     // }
+      //     // setTaxRate(v ? 0.05 : 0);
+      //   },
+      // },
+
       discountRate: {
         inputAttr: {
           disabled: true,
-          value: data?.discount ?? '',
+          value: contract?.discount ?? '',
           onChange: () => {},
         },
       },
@@ -329,17 +343,17 @@ version>1 是子合約
 
     delivery: {
       deliveryLocation: {
-        value: data?.deliveryLocation ?? '',
+        value: contract?.deliveryLocation ?? '',
         onChange: () => {},
       },
       deliveryDate: {
-        value: data?.deliveryDate ?? '',
+        value: contract?.deliveryDate ?? '',
         onChange: () => {},
       },
     },
     paymentMethod: {
       arr:
-        data?.paymentMethods.map((item) => {
+        contract?.paymentMethods.map((item) => {
           const { milestone, totalPaymentRatio } = item;
 
           return {
@@ -354,48 +368,47 @@ version>1 是子合約
     },
   };
 
-  const signatureArr = [
-    {
-      label: '總經理',
-      inputProps: {
-        props: {
-          value: data?.content?.reviewManagerEmployee?.chName ?? '',
-        },
+  const { control_signature } = useMemo(() => {
+    const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
+      {
+        label: '總經理',
+        value: contract?.content?.reviewManagerEmployee?.chName ?? '',
+        style: { width: '200px' },
       },
-    },
-    {
-      label: '工務主管',
-      inputProps: {
-        props: {
-          value: data?.content?.reviewWorkDirectorEmployee?.chName ?? '',
-        },
+      {
+        label: '應收帳款',
+        value: contract?.content?.reviewCashierEmployee?.chName ?? '',
+        style: { width: '200px' },
       },
-    },
-    {
-      label: '主管',
-      inputProps: {
-        props: {
-          value: data?.content?.reviewSupervisorEmployee?.chName ?? '',
-        },
+      {
+        label: '應收帳款',
+        value: contract?.content?.reviewWorkDirectorEmployee?.chName ?? '',
+        style: { width: '200px' },
       },
-    },
-    {
-      label: '業務',
-      inputProps: {
-        props: {
-          value: data?.content?.reviewSalesEmployee?.chName ?? '',
-        },
+      {
+        label: '業務主管',
+        value: contract?.content?.reviewSupervisorEmployee?.chName ?? '',
+        style: { width: '200px' },
       },
-    },
-    {
-      label: '經辦',
-      inputProps: {
-        props: {
-          value: data?.content?.agentEmployee?.chName ?? '',
-        },
+      {
+        label: '業務',
+        value: contract?.content?.reviewSalesEmployee?.chName ?? '',
+        style: { width: '200px' },
       },
-    },
-  ];
+      {
+        label: '經辦',
+        value: contract?.content?.agentEmployee?.chName ?? '',
+        style: { width: '200px' },
+      },
+    ];
+
+    const control_signature = {
+      signatureArr,
+    };
+
+    return { control_signature };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contract?.content]);
 
   // 附件
   const { attachments, updateAttachments, domain } = useQuotation_id_attachments(content?.id);
@@ -432,7 +445,7 @@ version>1 是子合約
 
   const tagList: TtagList = [
     {
-      label: `合約編號 ${data?.contractNumber ?? ''}`,
+      label: `合約編號 ${contract?.contractNumber ?? ''}`,
       onClick: () => {
         clearShow();
         setIsShowContract(true);
@@ -488,6 +501,11 @@ version>1 是子合約
         : null)(),
     {
       type: 'myButton',
+      label: '合約審核表',
+      onClick: () => setReviewFormShow(true),
+    },
+    {
+      type: 'myButton',
       label: '追加追減報價單',
       onClick: () => setSwitch02(() => true),
     },
@@ -495,11 +513,11 @@ version>1 是子合約
       type: 'myButton',
       label: '追加追減',
       onClick: () => {
-        if (data) {
+        if (contract) {
           router.push({
             pathname: '/domestic/contract/attachContract',
             query: {
-              contractId: data.id,
+              contractId: contract.id,
             },
           });
         }
@@ -939,7 +957,7 @@ version>1 是子合約
             />
 
             {/* 簽名 */}
-            <QuotationSinature signatureArr={signatureArr} disabled={true} />
+            <SignatureBar control={control_signature} className="mx-[50px] mt-[120px] mb-[40px]" />
           </div>
         )}
 
@@ -950,7 +968,7 @@ version>1 是子合約
           <div>
             <WorkContactDoc_component
               ref={ref_workContact}
-              contract={data}
+              contract={contract}
               engineeringContactId={engineeringContactId}
               onStateChange={onWorkContactStateChange}
             />
@@ -972,6 +990,22 @@ version>1 是子合約
           onCancel={inputModalConfig?.onCancel}
           title={inputModalConfig?.title ?? ''}
           placeholder={inputModalConfig?.placeholder}
+        />
+
+        <ContractReviewForm
+          showModal={reviewFormShow}
+          forbidden={true}
+          close={() => setReviewFormShow(false)}
+          contractIdNumber={content?.quotationNumber ?? ''}
+          contractName={content?.projectName ?? ''}
+          contractPrice={Number(content?.total ?? '')}
+          lastestContentId={content?.id}
+          verifyForm={content?.verifyForm}
+          onConfirm={async () => {
+            setIsLoading(true);
+            await update();
+            setIsLoading(false);
+          }}
         />
       </div>
     </SubLayer>
