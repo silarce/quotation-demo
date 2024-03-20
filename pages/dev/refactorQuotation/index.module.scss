@@ -1,0 +1,132 @@
+.tableContainer {
+  border: solid 1px theme("colors.border");
+}
+
+.topPanel {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 20px;
+  > div:nth-of-type(1) {
+    color: theme("colors.main");
+    font-size: 20px;
+  }
+}
+
+.table {
+  overflow: auto;
+  border: solid 3px transparent;
+  border-width: 0 3px;
+  max-height: 500px;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  /* gap: 16px; */
+  width: fit-content;
+  height: 60px;
+  > * {
+    margin-right: 16px;
+    &:nth-last-of-type(1) {
+      margin-right: 0;
+    }
+  }
+}
+
+.sidePanel {
+  position: sticky;
+  left: 0;
+  flex: none;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  width: fit-content;
+  /* next.js的Image有設置max-width:100%，不知為何這會造成跑版 */
+  img {
+    max-width: unset;
+  }
+}
+
+.thead {
+  @extend .row;
+
+  position: sticky;
+  top: 0;
+  height: 45px;
+
+  background-color: theme("colors.bgc01");
+  border-bottom: solid 5px white;
+  z-index: 1;
+  .sidePanel {
+    > * {
+      visibility: hidden;
+    }
+    margin-right: 0;
+    background-color: theme("colors.bgc01");
+    border-right: solid 16px theme("colors.bgc01");
+  }
+}
+
+.bodyRow {
+  @extend .row;
+
+  background-color: #fff;
+
+  &:hover {
+    --bgc: theme("colors.chosenBgc");
+
+    background-color: var(--bgc);
+    .sidePanel {
+      background-color: var(--bgc);
+      border-right: solid 16px var(--bgc);
+    }
+  }
+
+  &.active {
+    --bgc: theme("colors.chosenBgc");
+
+    // position: sticky;
+    // top: 45px;
+    // z-index: 1;
+
+    background-color: var(--bgc);
+
+    .sidePanel {
+      background-color: var(--bgc);
+      border-right: solid 16px var(--bgc);
+    }
+  }
+}
+
+.cell {
+}
+
+.attachcell {
+  @extend .cell;
+}
+.attachcell_thead {
+  @extend .attachcell;
+}
+
+.totalBottom {
+}
+
+.normalPanel {
+}
+
+.attachPanel {
+  position: sticky;
+  right: 0;
+
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 5px;
+
+  height: 100%;
+  background-color: #dddd;
+  border-left: solid 5px white;
+}
