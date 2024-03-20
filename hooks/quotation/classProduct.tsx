@@ -1053,6 +1053,7 @@ class Class_product {
       generateBomObj_pre[key] = {
         id: componentId,
         material,
+        // materialSurface: materialSurface || undefined,
         materialSurface: materialSurface || undefined,
         isPainted,
       };
@@ -1091,7 +1092,16 @@ class Class_product {
       return true;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
-      myAlert.err({ title: '取得bom資料失敗', content: err.response?.data.message });
+
+      let message = '';
+
+      if (typeof err.response?.data.message === 'string') {
+        message = err.response?.data.message;
+      } else {
+        message = JSON.stringify(err.response?.data.message);
+      }
+
+      myAlert.err({ title: '取得bom資料失敗', content: message });
     }
   } // reqProdGenerateDoorProductBom
 
