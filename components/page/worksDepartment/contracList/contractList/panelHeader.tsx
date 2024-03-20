@@ -12,7 +12,7 @@ import iconPlace from 'public/image/icon/place.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 type TtheadInfo = {
-  quotationNumber: string;
+  contractNumber: string;
   customerName: string;
   contactName: string;
   contactNumber: string;
@@ -46,7 +46,7 @@ export default function PanelHeader({
 }) {
   const {
     //
-    quotationNumber: quotationId,
+    contractNumber,
     customerName: clientName,
     contactName,
     contactNumber: contactPhone,
@@ -62,7 +62,7 @@ export default function PanelHeader({
   return (
     <CellWithBar className={scss.panelHeader} isActive={isActive} onClick={onClick}>
       <div ref={viewRef} className={scss.row01}>
-        <span>{quotationId}</span>
+        <span>{contractNumber}</span>
         <span className={scss.clientName}>{clientName}</span>
         <span>{contactName}</span>
         <span>{contactPhone}</span>
