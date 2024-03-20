@@ -981,6 +981,7 @@ version>1 是子合約
             ref={ref_meetingMinutes}
             onStateChange={setState_meeting}
             contractIdFromProps={id}
+            quotationNumber={contract?.content.quotationNumber}
           />
         )}
 
