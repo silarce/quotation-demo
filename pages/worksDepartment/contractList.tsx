@@ -182,7 +182,7 @@ export default function WdContractList() {
     const obj: Tcontract = {
       contractId: item.id,
       // quotationNumber: content.quotationNumber,
-      quotationNumber: contractNumber ?? '',
+      contractNumber: contractNumber ?? '',
       customerName: content.customer.name,
       contactName: content.contactPerson,
       contactNumber: content.contactNumber,

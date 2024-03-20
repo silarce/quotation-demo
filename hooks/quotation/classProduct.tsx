@@ -1053,6 +1053,7 @@ class Class_product {
       generateBomObj_pre[key] = {
         id: componentId,
         material,
+        // materialSurface: materialSurface || undefined,
         materialSurface: materialSurface || undefined,
         isPainted,
       };
@@ -1091,7 +1092,16 @@ class Class_product {
       return true;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
-      myAlert.err({ title: '取得bom資料失敗', content: err.response?.data.message });
+
+      let message = '';
+
+      if (typeof err.response?.data.message === 'string') {
+        message = err.response?.data.message;
+      } else {
+        message = JSON.stringify(err.response?.data.message);
+      }
+
+      myAlert.err({ title: '取得bom資料失敗', content: message });
     }
   } // reqProdGenerateDoorProductBom
 
@@ -2147,13 +2157,21 @@ class Class_product {
       return undefined;
     }
 
+    let options = options_surface_onlyPaint;
+
     const isSST = checkIsSST(this.material);
 
     if (isSST) {
-      return options_surface;
+      options = options_surface;
     }
 
-    return options_surface_onlyPaint;
+    if (this.doorType !== 'SJ-305D') {
+      options = options.filter((item) => {
+        return item.value !== '無烤漆';
+      });
+    }
+
+    return options;
   }
 
   /**底座角鐵 */
@@ -3622,7 +3640,15 @@ const emptyProdOri = (): Tprod => {
 // ======================================================================
 
 const checkIsSST = (material: string) => {
-  return material.startsWith('SST#');
+  let isSST = false;
+
+  if (material.startsWith('SST')) {
+    isSST = true;
+  } else if (material.includes('外SST')) {
+    isSST = true;
+  }
+
+  return isSST;
 };
 
 const creOptions_surface: () => Toption[] = () => optionsCreator_surface();

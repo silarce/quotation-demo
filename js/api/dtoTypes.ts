@@ -1954,7 +1954,7 @@ export type TdoorComponentListDto = {
 export type TgenerateDoorProductBomDto_ComponentInfo = {
   id: string;
   material: string; // 材質
-  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null; // 表面處理
+  materialSurface?: '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | '無烤漆' | null; // 表面處理
   isPainted: boolean; // 烤漆
   thickness?: string; // 厚度
 };
