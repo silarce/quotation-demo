@@ -2157,13 +2157,21 @@ class Class_product {
       return undefined;
     }
 
+    let options = options_surface_onlyPaint;
+
     const isSST = checkIsSST(this.material);
 
     if (isSST) {
-      return options_surface;
+      options = options_surface;
     }
 
-    return options_surface_onlyPaint;
+    if (this.doorType !== 'SJ-305D') {
+      options = options.filter((item) => {
+        return item.value !== '無烤漆';
+      });
+    }
+
+    return options;
   }
 
   /**底座角鐵 */
