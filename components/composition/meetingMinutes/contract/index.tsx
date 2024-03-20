@@ -13,6 +13,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import {
+  Tparams,
   AxiosError,
   //
   TcreateMeetingMinutesDto,
@@ -58,9 +59,11 @@ function MeetingMinutes_contract_component(
   {
     onStateChange,
     contractIdFromProps,
+    quotationNumber,
   }: {
     onStateChange?: (state: Tstate) => void;
     contractIdFromProps?: string;
+    quotationNumber?: string;
   },
   ref: React.ForwardedRef<unknown>
 ) {
@@ -84,6 +87,12 @@ function MeetingMinutes_contract_component(
 
   // ------------------------------------------------------------------------
 
+  const params: Tparams = {
+    filter: {
+      contractId: { $eq: contractId },
+    },
+  };
+
   const {
     data: meetingMinutesArr,
     update: update_meetingMinutesArr,
@@ -93,7 +102,7 @@ function MeetingMinutes_contract_component(
     chairmanEmployee: true;
     attendeesEmployee: true;
     minuteTakerEmployee: true;
-  }>();
+  }>(params);
 
   // ------------------------------------------------------------------------
   const isAdd = !disabled && !meetingMinutesId;
@@ -258,7 +267,7 @@ function MeetingMinutes_contract_component(
   useEffect(() => {
     update_meetingMinutesArr();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [contractId]);
 
   useEffect(() => {
     return () => {
@@ -314,6 +323,7 @@ function MeetingMinutes_contract_component(
           setIsLoading_edit(isLoading_meetingMinute || isLoading_attachments);
         }}
         onFilesChange={onFilesChange}
+        quotationNumber={quotationNumber}
       />
     </div>
   );

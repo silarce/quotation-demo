@@ -75,8 +75,8 @@ export function useGetMeetingMinutes<Tpopulate extends Tpopulate_meetingMinutesD
 export const apiGetMeetingMinutes_id = async (id: string, params?: Tparams) => {
   const api = `/meeting-minutes/${id}`;
 
-  const populate: (keyof Tpopulate_meetingMinutesDto)[] = [
-    'contract',
+  const populate = [
+    'contract.content',
     'chairmanEmployee',
     'attendeesEmployee',
     'minuteTakerEmployee',
