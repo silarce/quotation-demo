@@ -221,9 +221,6 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
                 'latestContent.managerReviewedAt': { $notNull: true },
               },
             },
-            '3': {
-              'latestContent.isLost': { $eq: false },
-            },
           },
         };
       }
@@ -273,9 +270,6 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
               'latestContent.managerReviewedAt': { $notNull: true },
             },
           },
-          '3': {
-            'latestContent.isLost': { $eq: false },
-          },
         },
       };
     }
@@ -322,6 +316,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       'latestContent.projectName': {
         $contains: projectName || undefined,
       },
+      'latestContent.isLost': { $eq: false },
       // ...reviewStatusFilter,
       ...filter,
     },
