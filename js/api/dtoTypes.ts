@@ -1621,7 +1621,7 @@ export type TquotationContractDto = {
   engineeringContactId: string | null;
   engineeringContact?: TengineeringContactDto | null;
   /**工作表 */
-  worksheet?: TworksheetDto; // populate
+  worksheet?: TworksheetDto[]; // populate
   /**工作表ID */
   worksheetId: string | null;
   /**出庫單ID */
