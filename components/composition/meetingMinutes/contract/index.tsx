@@ -59,9 +59,11 @@ function MeetingMinutes_contract_component(
   {
     onStateChange,
     contractIdFromProps,
+    quotationNumber,
   }: {
     onStateChange?: (state: Tstate) => void;
     contractIdFromProps?: string;
+    quotationNumber?: string;
   },
   ref: React.ForwardedRef<unknown>
 ) {
@@ -321,6 +323,7 @@ function MeetingMinutes_contract_component(
           setIsLoading_edit(isLoading_meetingMinute || isLoading_attachments);
         }}
         onFilesChange={onFilesChange}
+        quotationNumber={quotationNumber}
       />
     </div>
   );
