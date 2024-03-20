@@ -771,11 +771,16 @@ export const apiGetEngineeringDeliveryList = (id: string) => {
 
   const params = {
     populate: [
-      'contract.worksheet.contractProductItems.deliveryStatus.installerEmployees',
-      'contract.worksheet.contractProductItems.deliveryStatus.installerOutsourcing',
-      'contract.worksheet.contractProductItems.adjustedItem.accessories',
-      'contract.worksheet.contractProductItems.accessories',
-      'contract.worksheet.contractProductItems.rootproductId',
+      // 'contract.worksheet.contractProductItems.deliveryStatus.installerEmployees',
+      // 'contract.worksheet.contractProductItems.deliveryStatus.installerOutsourcing',
+      // 'contract.worksheet.contractProductItems.adjustedItem.accessories',
+      // 'contract.worksheet.contractProductItems.accessories',
+      // 'contract.worksheet.contractProductItems.rootproductId',
+      'contract.worksheet.latestRecord.contractProductItems.deliveryStatus.installerEmployees',
+      'contract.worksheet.latestRecord.contractProductItems.deliveryStatus.installerOutsourcing',
+      'contract.worksheet.latestRecord.contractProductItems.adjustedItem.accessories',
+      'contract.worksheet.latestRecord.contractProductItems.accessories',
+      'contract.worksheet.latestRecord.contractProductItems.rootproductId',
     ],
   };
 
