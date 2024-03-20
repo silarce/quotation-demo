@@ -3632,7 +3632,15 @@ const emptyProdOri = (): Tprod => {
 // ======================================================================
 
 const checkIsSST = (material: string) => {
-  return material.startsWith('SST#');
+  let isSST = false;
+
+  if (material.startsWith('SST')) {
+    isSST = true;
+  } else if (material.includes('外SST')) {
+    isSST = true;
+  }
+
+  return isSST;
 };
 
 const creOptions_surface: () => Toption[] = () => optionsCreator_surface();
