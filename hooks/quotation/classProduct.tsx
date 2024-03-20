@@ -2220,6 +2220,11 @@ class Class_product {
 
   // ---------------------------------------------------------
   // ---------------------------------------------------------
+
+  get avalibleComponent() {
+    return this._availableComponents;
+  }
+
   // 來自_doorGeneralSpecs
   get weight() {
     return this._doorGeneralSpecs?.weight;

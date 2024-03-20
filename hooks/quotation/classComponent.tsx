@@ -70,6 +70,10 @@ class Class_component {
       this.calcAllPrice({ calcProdTotal: false });
     }
 
+    if (key === 'slat' && prod.doorType === 'SJ-305D') {
+      this.optionalComponentAction = 'slat_SJ-302';
+    }
+
     // =constructor
   } // =constructor
 
@@ -95,6 +99,8 @@ class Class_component {
   //
   //
   makeFormatValueDontTriggerTwice = false;
+
+  optionalComponentAction: undefined | 'slat_SJ-302' = undefined;
 
   // ---------------------------------------------------------
 
@@ -228,6 +234,14 @@ class Class_component {
     return optionsCreator_surface_onlyPaint();
   }
 
+  get options_desc_select() {
+    if (this.optionalComponentAction === 'slat_SJ-302') {
+      const slatArr = this._prod.avalibleComponent?.slats ?? [];
+
+      return slatArr.map((item) => ({ value: item.name, label: item.name }));
+    }
+  }
+
   // ---------------------------------------------------------
   get comName() {
     return comLookUp[this.key].typeName;
@@ -244,6 +258,35 @@ class Class_component {
 
   set desc(v) {
     this._com.desc = v;
+    this.reRender();
+  }
+
+  get desc_select() {
+    return this._com.desc ?? '';
+  }
+
+  set desc_select(v: string) {
+    if (this.optionalComponentAction === 'slat_SJ-302') {
+      const targetComponent = this._prod.avalibleComponent?.slats.find((slat) => {
+        return slat.name.includes(v);
+      });
+
+      if (targetComponent) {
+        const comId = this._com.id;
+
+        this._com = {
+          //
+          ...this._com,
+          ...targetComponent,
+          componentId: targetComponent.id,
+          id: comId,
+        };
+
+        this.desc = comLookUp[this.key].creDesc(this);
+        this.material = this.material; // 只是為了觸發prod的reqProdGenerateDoorProductBom
+      }
+    }
+
     this.reRender();
   }
 
@@ -834,6 +877,18 @@ const comCellConfig: TcellConfig = {
       },
     },
   },
+  desc_select: {
+    label: '說明',
+    inputSelProps: {
+      wrapperStyle: { width: '200px' },
+      selectProps: {
+        props: {
+          placeholder: '',
+        },
+      },
+    },
+  },
+
   quantity: {
     label: '數量',
     inputSelProps: {
