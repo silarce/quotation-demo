@@ -343,12 +343,14 @@ export const optionsCreator_surface = createOptionsCreator({
     { value: 'NO.4', label: 'NO.4' },
     { value: '烤漆', label: '烤漆' },
     { value: '氟碳', label: '氟碳' },
+    { value: '無烤漆', label: '無烤漆' },
   ],
 });
 export const optionsCreator_surface_onlyPaint = createOptionsCreator({
   optionsArr: [
     { value: '烤漆', label: '烤漆' },
     { value: '氟碳', label: '氟碳' },
+    { value: '無烤漆', label: '無烤漆' },
   ],
 });
 
