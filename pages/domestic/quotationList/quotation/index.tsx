@@ -936,7 +936,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             setSummary((state) => {
               const copy = { ...state };
 
-              if (v.split('.')[1]?.length > 2) {
+              if (v.split('.')[1]?.length > 3) {
                 return copy;
               }
 
