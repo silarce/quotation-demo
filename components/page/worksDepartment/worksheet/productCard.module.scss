@@ -92,6 +92,7 @@
     .worksheet {
       padding: 5px 8px;
       border-bottom: solid 1px theme("colors.border");
+      cursor: pointer;
       span,
       p {
         white-space: pre-wrap;

@@ -266,6 +266,8 @@ export default function Worksheet({
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
 
+  const [activeWorksheetid, setActiveWorksheetid] = useState<string | undefined>(undefined);
+
   // const [isShowPdf, setIsShowPdf] = useState(false);
   // const [isShowPdf02, setIsShowPdf02] = useState(false);
 
@@ -301,8 +303,9 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  console.log(finalProduct);
-  console.log(worksheetArr);
+  // console.log(activeWorksheetid);
+  // console.log(finalProduct);
+  // console.log(worksheetArr);
   // -------------------------------------------------------------------------
   const control_profile = useControl_profile(engineeringContact);
 
@@ -317,8 +320,6 @@ export default function Worksheet({
     });
 
     finalProduct.forEach((prod) => {
-      // const { id, itemName, doorModelName, items } = prod;
-
       const prodQty = String(prod.items?.length ?? 0);
       const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
       const pridHeight = new Decimal(prod.height).div(1000).toString();
@@ -374,9 +375,11 @@ export default function Worksheet({
           width: width_m,
           height: height_m,
           qty: String(contractProductItems.length),
-          isActive: false,
+          isActive: activeWorksheetid === worksheet.id,
           reviewStatus,
-          onClick: () => {},
+          onClick: () => {
+            setActiveWorksheetid(worksheet.id);
+          },
           onDeleteClick: () => {},
         };
 
@@ -399,7 +402,7 @@ export default function Worksheet({
 
     return { control_productCardArr };
     //
-  }, [finalProduct]);
+  }, [finalProduct, activeWorksheetid]);
 
   // -------------------------------------------------------------------------
 

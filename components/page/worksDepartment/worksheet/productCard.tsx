@@ -107,7 +107,7 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
           );
         })}
 
-        <CellWithBar isActive={false} className={scss.worksheet}>
+        {/* <CellWithBar isActive={false} className={scss.worksheet}>
           <p>B2F.B3F_梯廳(四)-RD16</p>
           <p className="mt-2">SJ-303AS</p>
           <div className={scss.info}>
@@ -129,7 +129,7 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
               // ,status.className
             )}
           />
-        </CellWithBar>
+        </CellWithBar> */}
       </div>
 
       {/* <div className={scss.list}>
