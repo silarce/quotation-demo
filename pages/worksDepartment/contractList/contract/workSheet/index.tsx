@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import _ from 'lodash';
+import _, { update } from 'lodash';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 
@@ -57,11 +57,13 @@ import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/ap
 import {
   TupdateWorkSheetItem,
   TcreateWorksheetDto,
+  TupdateWorkSheet,
   useGetEngineeringContact,
   useGetWorkSheet,
-  apiPatchWorkSheet,
+  apiPatchWorkSheetProducts,
   apiDeleteWorkSheetItem,
   apiPostWorkSheet,
+  apiDeleteWorksheet,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
@@ -189,6 +191,22 @@ export default function Worksheet({
     }
   };
 
+  const reqAbandonWorkSheet = async (worksheetId: string) => {
+    if (!contractId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiDeleteWorksheet(worksheetId);
+      await update_contract();
+      await update_finalProduce();
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // -------------------------------------------------------------------------
   const control_profile = useControl_profile(engineeringContact);
 
@@ -199,6 +217,10 @@ export default function Worksheet({
     const worksheetList: { [id: string]: TworkSheetDto } = {};
 
     worksheetArr.forEach((worksheet) => {
+      if (worksheet.isAbandoned) {
+        return;
+      }
+
       worksheetList[worksheet.id] = worksheet;
     });
 
@@ -214,7 +236,7 @@ export default function Worksheet({
       prod.items?.forEach((item) => {
         const worksheetId = item.worksheetId;
 
-        if (worksheetId) {
+        if (worksheetId && worksheetList[worksheetId]) {
           prodWorkSheetList[worksheetId] = worksheetList[worksheetId];
         } else {
           itemsNoWorksheet.push(item);
@@ -266,7 +288,17 @@ export default function Worksheet({
           onClick: () => {
             setActiveWorksheetid(worksheet.id);
           },
-          onDeleteClick: () => {},
+          onDeleteClick: () => {
+            myAlert.confirm({
+              title: '確定刪除工作表?',
+
+              props: {
+                onOk: async () => {
+                  await reqAbandonWorkSheet(worksheet.id);
+                },
+              },
+            });
+          },
         };
 
         return intro;
@@ -286,17 +318,23 @@ export default function Worksheet({
             title: `可分配數量${itemsNoWorksheet.length}`,
             onConfirm: async (str) => {
               const qty = Number(str);
+
+              if (qty > itemsNoWorksheet.length) {
+                return myAlert.info({ title: '分配數量超過可分配數量' });
+              }
+
               const pre_contractProductItems = itemsNoWorksheet.slice(0, qty);
 
-              const contractProductItems = pre_contractProductItems.map((item) => {
-                return {
-                  ...item,
-                  gapA: item.gapA ?? '0',
-                  gapC: item.gapC ?? '0',
-                  boxD: item.boxD ?? 0,
-                  thickness: item.thickness ?? '0',
-                };
-              });
+              // const contractProductItems = pre_contractProductItems.map((item) => {
+              //   return {
+              //     ...item,
+              //     gapA: item.gapA ?? '0',
+              //     gapC: item.gapC ?? '0',
+              //     boxD: item.boxD ?? 0,
+              //     thickness: item.thickness ?? '0',
+              //   };
+              // });
+              const contractProductItems = pollyfillContractProductItems(pre_contractProductItems);
 
               const body: TcreateWorksheetDto = {
                 contractId,
@@ -705,4 +743,18 @@ const useControl_profile = (engineeringContact: TengineeringContactDto | undefin
   }, [engineeringContact]);
 
   return control_profile;
+};
+
+const pollyfillContractProductItems = (pre_contractProductItems: TquotationProductItemDto[]) => {
+  const contractProductItems = pre_contractProductItems.map((item) => {
+    return {
+      ...item,
+      gapA: item.gapA ?? '0',
+      gapC: item.gapC ?? '0',
+      boxD: item.boxD ?? 0,
+      thickness: item.thickness ?? '0',
+    };
+  });
+
+  return contractProductItems;
 };

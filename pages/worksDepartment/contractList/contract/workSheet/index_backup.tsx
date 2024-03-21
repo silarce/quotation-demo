@@ -194,7 +194,7 @@ import {
   TupdateWorkSheetItem,
   useGetEngineeringContact,
   useGetWorkSheet,
-  apiPatchWorkSheet,
+  apiPatchWorkSheetProducts,
   apiDeleteWorkSheetItem,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
@@ -1145,7 +1145,7 @@ export default function Worksheet({
       const body = changedSheetList[key].bodyItemArr;
 
       try {
-        await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
+        await apiPatchWorkSheetProducts(worksheetId, { contractProductItems: body });
       } catch (error) {
         const err = error as Error;
         myAlert.err({ title: '更新工作表失敗', content: err.message });

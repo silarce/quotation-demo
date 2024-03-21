@@ -733,7 +733,16 @@ export const apiPostWorkSheet = (body: TcreateWorksheetDto) => {
     });
 };
 
-export const apiPatchWorkSheet = (id: string, body: TupdateWorkSheet) => {
+export const apiDeleteWorksheet = async (worksheetId: string) => {
+  const api = `/engineering/worksheet/${worksheetId}`;
+
+  return axi
+    .delete(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiPatchWorkSheetProducts = (id: string, body: TupdateWorkSheet) => {
   const api = `/engineering/worksheet/${id}/products`;
 
   return axi
@@ -741,7 +750,7 @@ export const apiPatchWorkSheet = (id: string, body: TupdateWorkSheet) => {
     .then(({ data }) => data)
     .catch((err) => {
       const error = err as AxiosError;
-      myAlert.err({ title: '更新工作表失敗', content: error.message });
+      myAlert.err({ title: '更新工作表產品失敗', content: error.message });
 
       return Promise.reject(err);
     });
