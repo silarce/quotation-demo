@@ -67,7 +67,7 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
         {/*  */}
       </div>
 
-      <div className={classNames(scss.worksheetList, ' mt-3')}>
+      <div className={classNames(scss.worksheetList)}>
         {control.worksheetIntroArr.map((worksheet) => {
           const {
             //
