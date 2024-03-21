@@ -996,6 +996,9 @@ export type TquotationProductDto = {
     components: TquotationProductComponentsDto[];
     // 選配設定
     accessories: TquotationProductAccessoriesDto[];
+    worksheetId: string | null;
+    worksheetRecordId: string | null; // 棄用
+
     // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
   }[];
 
@@ -1188,7 +1191,7 @@ export type TquotationProductItemDto = Omit<
   productId: string;
   itemNumber: string;
   itemName: string;
-  worksheetId: string;
+  worksheetId: string; // 可能已經沒有這個property了，待確認
   others: null;
   deliveryStatus?: TengineeringDeliveryStatusDto[] | null;
   adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
@@ -1623,7 +1626,8 @@ export type TquotationContractDto = {
   /**工作表 */
   worksheet?: TworksheetDto[]; // populate
   /**工作表ID */
-  worksheetId: string | null;
+  // worksheetId: string | null;
+  worksheetId?: undefined | null; // 已經沒有這個property了，未來有空要把它刪掉並處理型別錯誤
   /**出庫單ID */
   engineeringDeliveryListId: string | null;
   /**應收帳款明細 */
@@ -2510,7 +2514,7 @@ export type TworksheetRecordDto = {
   // 舊合約產品
   legacyProductItems: TlegacyContractProductItemDto[];
   // 審核狀態
-  status: TworksheetStatus | null;
+  status: TworksheetStatus | null; // 棄用
   // 審核業務Id
   reviewSalesEmployeeId: string | null;
   // 審核業務

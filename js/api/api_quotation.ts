@@ -746,6 +746,49 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
   };
 };
 
+export const apiGetContract_id_finalProductItem = async (contractId: string) => {
+  const api = `/quotation/contracts/${contractId}/final-product-item`;
+
+  return axi
+    .get<TquotationProductDto[]>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetContract_id_finalProductItem = (contractId: string | undefined) => {
+  const [res, setRes] = useState<TquotationProductDto[]>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const update = async () => {
+    if (!contractId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const newRes = await apiGetContract_id_finalProductItem(contractId);
+
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得合約最終產品資料失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    isLoading,
+    data: res,
+    update,
+  };
+};
+
 /**取得主產品資料 */
 export const apiGetQuotationProducts = async (productId: string) => {
   const api = `/quotation/products/${productId}`;

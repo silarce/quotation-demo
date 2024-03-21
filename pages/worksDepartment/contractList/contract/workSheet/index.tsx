@@ -159,37 +159,44 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import WorkSheetProfile, {
   Tcontrol_profile,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProfile';
-import WorkSheetProdCard, {
-  Tcontrol_prodCard,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProdCard';
-import WorkSheetProductOutline, {
-  Tcontrol_productOutline,
-  ToldProductOutline,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
-import WorkSheetProductDetail01, {
-  Tcontrol_detail,
-  Tcontrol_ABCD,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
-import WorkSheetOptional, {
-  Tcontrol_optional,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
-import WorkSheetProductDetail02, {
-  Tcontrol_detail02,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
+
+// import WorkSheetProdCard, {
+//   Tcontrol_prodCard,
+// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProdCard';
+
+import ProductCard, {
+  Tcontrol_productCard,
+  TworksheetIntro,
+} from 'components/page/worksDepartment/worksheet/productCard';
+
+// import WorkSheetProductOutline, {
+//   Tcontrol_productOutline,
+//   ToldProductOutline,
+// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
+// import WorkSheetProductDetail01, {
+//   Tcontrol_detail,
+//   Tcontrol_ABCD,
+// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
+// import WorkSheetOptional, {
+//   Tcontrol_optional,
+// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
+// import WorkSheetProductDetail02, {
+//   Tcontrol_detail02,
+// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
 import WorkSheetPDF, {
   Tcontrol_workSheetPDF_01,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
 import WorkSheetPDF_02, {
   Tcontrol_workSheetPDF_02,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF_02';
-import RecordList, { Trecord } from 'components/page/worksDepartment/worksheet.tsx/recordList';
+import RecordList, { Trecord } from 'components/page/worksDepartment/worksheet/recordList';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // api
-import { useGetContract_id } from 'js/api/api_quotation';
+import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 import {
   TupdateWorkSheetItem,
   useGetEngineeringContact,
@@ -205,7 +212,7 @@ import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/us
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import { workSheetReducer } from 'js/utils/worksheet/reducer';
+import { TworkSheetDto, workSheetReducer } from 'js/utils/worksheet/reducer';
 
 // css
 import scss from './workSheet.module.scss';
@@ -223,34 +230,20 @@ import {
 } from 'js/utils/options/productOptions';
 
 // type
-import type { TquotationProductItemDto, TerpFeatureDto, TworksheetDto_legacy } from 'js/api/dtoTypes';
+import type {
+  TengineeringContactDto,
+  TquotationProductItemDto,
+  TerpFeatureDto,
+  TworksheetDto_legacy,
+} from 'js/api/dtoTypes';
 
 // ====================================================================
 
-type Tprofile = {
-  projectName: string;
-  projectContent: string;
-  projectNumber: string;
-  projectFaxNumber: string;
-  projectPerson: string;
-  projectPersonNumber: string;
-  allAddress: string;
-  engineeringNumber: string;
-  contractor: string;
-  principal: string;
-  contactNumber: string;
-  faxNumber: string;
+type Tquery = {
+  contractId: string | undefined;
 };
 
 // ====================================================================
-
-// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
-// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
-// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
-// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
-// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
-// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
-// w 因為api還沒更新，所以worksheet先帶入舊的型別方便繼續開發
 
 export default function Worksheet({
   isAdmin,
@@ -259,1059 +252,295 @@ export default function Worksheet({
   isAdmin: boolean;
   userErpFeature: TerpFeatureDto[] | undefined;
 }) {
-  const havePermissionToEdit = useMemo(() => {
-    if (isAdmin) {
-      return true;
-    }
-
-    const isHave = userErpFeature?.some((item) => {
-      return item.name === '工務部-工作表編輯';
-    });
-
-    return !!isHave;
-  }, [userErpFeature]);
   // ----------------------------------------------------------------
+  let havePermissionToEdit = false;
+  isAdmin && (havePermissionToEdit = true);
+  userErpFeature?.some((item) => {
+    return item.name === '工務部-工作表編輯';
+  }) && (havePermissionToEdit = true);
 
+  // ----------------------------------------------------------------
   const router = useRouter();
-  const { contractId } = router.query as { contractId: string | undefined };
+  const { contractId } = router.query as Tquery;
 
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
 
-  const [isShowPdf, setIsShowPdf] = useState(false);
-  const [isShowPdf02, setIsShowPdf02] = useState(false);
+  // const [isShowPdf, setIsShowPdf] = useState(false);
+  // const [isShowPdf02, setIsShowPdf02] = useState(false);
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
-    customPopulate: ['content.customer'],
+    customPopulate: [
+      //
+      'content.customer',
+      'engineeringContact',
+      'worksheet.records',
+      'worksheet.latestRecord.reviewSalesEmployee',
+      'worksheet.latestRecord.reviewManagerEmployee',
+    ],
   });
-  // const engineeringContactId = contract?.engineeringContactId;
-  const { engineeringContactId, worksheetId } = contract ?? {};
-  const { data: engineeringContact, update: update_engineeringContact } =
-    useGetEngineeringContact(engineeringContactId);
-  const { workSheet: workSheet_new, update_workSheet } = useGetWorkSheet(worksheetId);
+  const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
+
   const { res: doorModelArr, update: update_doorModelArr, doorModelList } = useApiGetProdDoorModels();
 
-  //api還沒更新，先帶入舊的型別方便繼續開發
-  const workSheet = workSheet_new as unknown as TworksheetDto_legacy;
+  const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
 
   useEffect(() => {
     (async () => {
-      try {
-        setIsLoading(true);
-        await update_contract();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得合約失敗', content: err.message });
-        setIsLoading(false);
-      }
-
-      update_doorModelArr();
+      setIsLoading(true);
+      await Promise.all([
+        //
+        update_contract(),
+        update_finalProduce(),
+        update_doorModelArr(),
+      ]);
+      setIsLoading(false);
     })();
-  }, []);
-
-  // --------------------------------------------------------
-  // --------------------------------------------------------
-  const { itemTokenList, itemIdArrList } = useMemo(() => {
-    /**
-送給後端的item必須要有id，
-
-要將同一類的所有id，以arr的形式紀錄，就叫itemIdArr好了，然後送進class裡面
-未來要分堆的時候，就切割itemIdArr，送到另一堆的class就可以了
-
-送給後端時，依照itemIdArr的length產生item，並把id放進去
-
-送給後端時，只可以送有更改過的prod
-用useWorkSheet裡的changedList配合forceUpdate紀錄 */
-
-    if (!workSheet?.contractProductItems) {
-      return {};
-    }
-
-    const { itemTokenList, itemIdArrList } = workSheetReducer({ worksheet: workSheet });
-
-    return {
-      itemTokenList,
-      itemIdArrList,
-    };
-  }, [workSheet]);
-
-  // --------------------------------------------------------
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        const res01 = update_engineeringContact();
-        const res02 = update_workSheet();
-        await Promise.all([res01, res02]);
-      } catch (error) {
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract]);
-
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-  const {
-    sheetList,
-    changedSheetList,
-    reset,
-    isHookLoading,
-    doorModelList: doorModelList_hook,
-    options_doorModel,
-  } = useWorkSheet({
-    itemTokenList: _.cloneDeep(itemTokenList) ?? {},
-    itemIdArrList: _.cloneDeep(itemIdArrList) ?? {},
-  });
-
-  const [targetSheetKey, setTargetSheetKey] = useState<[string, string]>();
-
-  const targetSheetKey_p = targetSheetKey?.[0];
-  const targetSheetKey_c = targetSheetKey?.[1];
-  const firstSheetKey_p = Object.keys(sheetList ?? {})[0] ?? undefined;
-
-  const [targetDivideItem, setTargetDivideItem] = useState<(qty: number) => void>();
-
-  const targetSheet: Class_workSheet | undefined =
-    targetSheetKey_p && targetSheetKey_c
-      ? sheetList[targetSheetKey_p]?.[targetSheetKey_c]
-      : sheetList[firstSheetKey_p]?.[firstSheetKey_p];
-
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-
-  const [profile, setProfile] = useState<Tprofile>(creEmptyProfile());
-
-  const changeProfile = (key: keyof Tprofile, value: string) => {
-    setProfile((state) => ({ ...state, [key]: value }));
-  };
+  }, [contractId]);
 
   // -------------------------------------------------------------------------
 
-  useEffect(() => {
-    if (!engineeringContact) {
-      return;
-    }
+  console.log(finalProduct);
+  console.log(worksheetArr);
+  // -------------------------------------------------------------------------
+  const control_profile = useControl_profile(engineeringContact);
 
-    const {
-      //
-      projectName,
-      projectContent,
-      projectNumber,
-      projectPrincipal,
-      constructionSitePrincipalContactNumber,
-      constructionSiteFaxNumber,
-      constructionSiteContactNumber,
-      contractor,
-      contractorPrincipal,
-      contractorContactNumber,
-      contractorFaxNumber,
+  // -------------------------------------------------------------------------
+  const { control_productCardArr } = useMemo(() => {
+    const control_productCardArr: (Tcontrol_productCard & { id: string })[] = [];
 
-      //
-      county,
-      district,
-      address,
-    } = engineeringContact;
+    const worksheetList: { [id: string]: TworkSheetDto } = {};
 
-    setProfile({
-      projectName: projectName,
-      projectContent,
-      // projectNumber: contract?.content.quotationNumber ?? '',
-      // 有空時把key改成projectPhoneNumber
-      projectNumber: constructionSiteContactNumber ?? '',
-      projectFaxNumber: constructionSiteFaxNumber,
-      projectPerson: projectPrincipal,
-      projectPersonNumber: constructionSitePrincipalContactNumber,
-      allAddress: `${county}${district}${address}`,
-      engineeringNumber: projectNumber,
-      contractor: contractor,
-      principal: contractorPrincipal,
-      contactNumber: contractorContactNumber,
-      faxNumber: contractorFaxNumber,
+    worksheetArr.forEach((worksheet) => {
+      worksheetList[worksheet.id] = worksheet;
     });
 
-    //
-  }, [engineeringContact]);
+    finalProduct.forEach((prod) => {
+      // const { id, itemName, doorModelName, items } = prod;
 
-  //
-  useEffect(() => {
-    if (!doorModelList) {
-      return;
-    }
+      const prodQty = String(prod.items?.length ?? 0);
+      const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
+      const pridHeight = new Decimal(prod.height).div(1000).toString();
 
-    if (disabled) {
-      reset();
+      const prodWorkSheetList: { [key: string]: TworkSheetDto } = {};
 
-      if (targetSheet) {
-        targetSheet.getInitData();
-      }
-    }
-  }, [disabled, itemTokenList, doorModelList_hook]);
-  //
+      // ----------------------------------------------
+      prod.items?.forEach((item) => {
+        const worksheetId = item.worksheetId;
 
-  useEffect(() => {
-    if (!targetSheet) {
-      return;
-    }
-
-    targetSheet.getInitData();
-  }, [targetSheet]);
-
-  // -------------------------------------------------------------------------
-  // -------------------------------------------------------------------------
-  const control_profile: Tcontrol_profile = {
-    projectName: {
-      value: profile.projectName,
-      onChange: (v) => {
-        changeProfile('projectName', v);
-      },
-    },
-    projectContent: {
-      value: profile.projectContent,
-      onChange: (v) => {
-        changeProfile('projectContent', v);
-      },
-    },
-    // 有空時把key改成projectPhoneNumber
-    projectNumber: {
-      // value: profile.projectNumber,
-      value: profile.projectNumber,
-      onChange: (v) => {
-        changeProfile('projectNumber', v);
-      },
-    },
-    projectFaxNumber: {
-      value: profile.projectFaxNumber,
-      onChange: (v) => {
-        changeProfile('projectFaxNumber', v);
-      },
-    },
-    projectPerson: {
-      value: profile.projectPerson,
-      onChange: (v) => {
-        changeProfile('projectPerson', v);
-      },
-    },
-    projectPersonNumber: {
-      value: profile.projectPersonNumber,
-      onChange: (v) => {
-        changeProfile('projectPersonNumber', v);
-      },
-    },
-    allAddress: {
-      value: profile.allAddress,
-      onChange: (v) => {
-        changeProfile('allAddress', v);
-      },
-    },
-    engineeringNumber: {
-      value: profile.engineeringNumber,
-      onChange: (v) => {
-        changeProfile('engineeringNumber', v);
-      },
-    },
-    contractor: {
-      value: profile.contractor,
-      onChange: (v) => {
-        changeProfile('contractor', v);
-      },
-    },
-    principal: {
-      value: profile.principal,
-      onChange: (v) => {
-        changeProfile('principal', v);
-      },
-    },
-    contactNumber: {
-      value: profile.contactNumber,
-      onChange: (v) => {
-        changeProfile('contactNumber', v);
-      },
-    },
-    faxNumber: {
-      value: profile.faxNumber,
-      onChange: (v) => {
-        changeProfile('faxNumber', v);
-      },
-    },
-  };
-
-  // -------------------------------------------------------------------------
-
-  const oldProductOutline = {
-    itemName: targetSheet?.oldProd.itemName ?? '',
-    doorType: targetSheet?.oldProd.doorModelName ?? '',
-    fullWidth: String(targetSheet?.oldProd.fullWidth ?? ''),
-    height: String(targetSheet?.oldProd.height ?? ''),
-    boxB: String(targetSheet?.oldProd.boxB ?? ''),
-    quantity: targetSheet?.quantity ?? '',
-    material: targetSheet?.oldProd.materialName ?? '',
-    isAntiTyphoon: !!targetSheet?.oldProd.isAntiTyphoon,
-  };
-
-  // -------------------------------------------------------------------------
-
-  const control_product: Tcontrol_productOutline = {
-    itemName: {
-      inputProps: {
-        value: targetSheet?.itemName ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.itemName = v;
-          }
-        },
-      },
-    },
-    doorType: {
-      selectProps: {
-        value: targetSheet?.doorModelName ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.doorModelName = v?.value ?? '';
-          }
-        },
-        options: options_doorModel,
-      },
-    },
-    fullWidth: {
-      inputProps: {
-        value: targetSheet?.fullWidth ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.fullWidth = v;
-          }
-        },
-        inputType: 'number',
-      },
-    },
-    height: {
-      inputProps: {
-        value: targetSheet?.height ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.height = v;
-          }
-        },
-        inputType: 'number',
-      },
-    },
-    // boxB: {
-    //   selectProps: {
-    //     value: targetSheet?.boxB ?? '',
-    //     onChange: (v) => {
-    //       if (targetSheet) {
-    //         targetSheet.boxB = v?.value ?? '';
-    //       }
-    //     },
-    //     options: targetSheet?.options_boxB ?? [],
-    //   },
-    // },
-    quantity: {
-      inputProps: {
-        value: targetSheet?.quantity ?? '',
-      },
-      disabled: true,
-    },
-    material: {
-      selectProps: {
-        value: targetSheet?.materialName ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.materialName = v?.value ?? '';
-          }
-        },
-        // options: doorModelMaterialOptionArr,
-        options: targetSheet?.options_material ?? null,
-      },
-    },
-    isAntiTyphoon: {
-      value: !!targetSheet?.isAntiTyphoon,
-      onChange: (v) => {
-        if (targetSheet) {
-          targetSheet.isAntiTyphoon = v;
+        if (worksheetId) {
+          prodWorkSheetList[worksheetId] = worksheetList[worksheetId];
         }
-      },
-    },
-  };
+      });
 
-  const onCalcClick = () => {
-    if (!disabled) {
-      targetSheet?.calcProd();
-    }
-  };
+      const worksheetIntroArr: TworksheetIntro[] = Object.values(prodWorkSheetList).map((worksheet) => {
+        const { records, latestRecord } = worksheet;
+        const {
+          contractProductItems,
 
-  // -------------------------------------------------------------------------
+          // reviewSalesEmployeeId,
+          reviewSalesEmployee,
+          toReviewSales,
+          salesReviewAt,
 
-  const control_detail_ABCD: Tcontrol_ABCD = {
-    gapA: {
-      value: targetSheet?.gapA ?? '',
-      onChange: (str) => {
-        if (targetSheet) {
-          targetSheet.gapA = str;
-        }
-      },
-      inputType: 'number',
-      placeholder: '機械縫 A',
-    },
-    boxB: {
-      value: targetSheet?.boxB_mm ?? '',
-      onChange: (str) => {
-        if (targetSheet) {
-          targetSheet.boxB_mm = str;
-        }
-      },
-      inputType: 'number',
-      placeholder: '支版尺寸 B',
-    },
-    gapC: {
-      value: targetSheet?.gapC ?? '',
-      onChange: (str) => {
-        if (targetSheet) {
-          targetSheet.gapC = str;
-        }
-      },
-      inputType: 'number',
-      placeholder: '機械縫 C',
-    },
-    boxD: {
-      value: targetSheet?.boxD_mm ?? '',
-      onChange: (str) => {
-        if (targetSheet) {
-          targetSheet.boxD_mm = str;
-        }
-      },
-      inputType: 'number',
-      placeholder: '支版尺寸 D',
-    },
-  };
+          // reviewManagerEmployeeId,
+          reviewManagerEmployee,
+          toReviewManager,
+          managerReviewAt,
+        } = latestRecord;
 
-  const control_detail: Tcontrol_detail = {
-    // 捲軸
-    reel: {
-      size: {
-        // value: targetSheet?.com_roller_size ?? '',
-        value: targetSheet?.diameter ? `${targetSheet.diameter}"` : '',
-        disabled: true,
-      },
-      hasConvex: {
-        value: targetSheet?.rollerSpec ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.rollerSpec = v;
-          }
-        },
-        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
-      },
-    },
-    // ______________________________________________________________
-    // 捲箱
-    reelBox: {
-      material: {
-        value: targetSheet?.com_headBox_material ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_headBox_material = v;
-          }
-        },
-        optionArr: optionsCreator_componentMaterial_01(),
-      },
-      thickness: {
-        value: targetSheet?.headBoxThickness ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.headBoxThickness = v;
-          }
-        },
-        optionArr: targetSheet?.options_rollUpBoxThick ?? [],
-      },
-      surface: {
-        value: targetSheet?.com_headBox_surface ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_headBox_surface = v;
-          }
-        },
-        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
-      },
-      //
-      front: {
-        value: targetSheet?.headBoxFront ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.headBoxFront = v;
-          }
-        },
-      },
-      //
-      hasConvex: {
-        value: targetSheet?.headBoxProtruding ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.headBoxProtruding = v;
-          }
-        },
-        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_rollerSpec() }),
-      },
-      //
-      type: {
-        value: String(targetSheet?.headBoxForm),
-        onChange: (v) => {
-          if (targetSheet) {
-            const bool = v === 'true' ? true : false;
-            targetSheet.headBoxForm = bool;
-          }
-        },
-        optionArr: [
-          { value: 'false', label: '捲箱 + 機箱' },
-          { value: 'true', label: '方形捲箱' },
-        ],
-      },
-      // 角鐵數量
-      angleIronQuantity: {
-        value: targetSheet?.headBoxAngleIronQuantity ?? '',
-        onChange: (str) => {
-          if (targetSheet) {
-            targetSheet.headBoxAngleIronQuantity = str;
-          }
-        },
-        inputType: 'number',
-      },
-    },
-    // ______________________________________________________________
-    // 底座
-    base: {
-      material: {
-        value: targetSheet?.com_bottomBar_material ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_bottomBar_material = v;
-          }
-        },
-        optionArr: optionsCreator_componentMaterial_01(),
-      },
-      angleMaterial: {
-        value: targetSheet?.bottomBarAngleIron ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.bottomBarAngleIron = v;
-          }
-        },
-        optionArr: optionsCreator_bottomBarAngleIron(),
-      },
-      baseMaterial: {
-        value: targetSheet?.bottomBarPlate ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.bottomBarPlate = v;
-          }
-        },
-        optionArr: optionsCreator_bottomBarPlate(),
-      },
-      type: {
-        value: targetSheet?.bottomBar ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.bottomBar = v;
-          }
-        },
-        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_bottomBar() }),
-      },
-      surface: {
-        value: targetSheet?.com_bottomBar_surface ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_bottomBar_surface = v;
-          }
-        },
-        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
-      },
-    },
-    // _________________________________________________
-    // 支板
-    support: {
-      bearing: {
-        value: targetSheet?.prodSpec?.bearingName ?? '',
-        disabled: true,
-      },
-      chain: {
-        value: targetSheet?.sprocketWheelModel ?? '',
-        disabled: true,
-      },
-      // 方向
-      direction: {
-        value: targetSheet?.sidePlateDirection ?? '',
-        onChange: (str) => {
-          if (targetSheet) {
-            targetSheet.sidePlateDirection = str;
-          }
-        },
-      },
-    },
-    // _____________________________________________________
-    // 門片
+        const contractProductItem = contractProductItems[0];
 
-    doorPiece: {
-      material: {
-        value: targetSheet?.com_slat_material ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_slat_material = v;
-          }
-        },
-        optionArr: targetSheet?.options_material ?? null,
-      },
-      surface: {
-        value: targetSheet?.com_slat_surface ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_slat_surface = v;
-          }
-        },
-        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
-      },
-    },
-    // _____________________________________________________________
-    motor: {
-      horsepower: {
-        value: targetSheet?.horsepower ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.horsepower = v;
-          }
-        },
-        optionArr: targetSheet?.options_horsepower ?? [],
-      },
-      manufacturer: {
-        value: targetSheet?.motorVendor ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.motorVendor = v;
-          }
-        },
-        optionArr: targetSheet?.options_motor ?? [],
-      },
-      powerSupply: {
-        value: targetSheet?.motorPhase ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.motorPhase = v;
-          }
-        },
-        optionArr: targetSheet?.options_phase ?? [],
-      },
-      voltage: {
-        value: targetSheet?.motorVoltage ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.motorVoltage = v;
-          }
-        },
-        optionArr: targetSheet?.options_voltage ?? [],
-      },
-      support: {
-        value: (() => {
-          const spec = targetSheet?.hasMotorSupportStand;
+        const width_m = new Decimal(contractProductItem.fullWidth).div(1000).toString();
+        const height_m = new Decimal(contractProductItem.height).div(1000).toString();
 
-          if (!spec) {
-            return 'no';
-          } else {
-            return 'yes';
-          }
-        })(),
-        onChange: (v) => {
-          if (targetSheet) {
-            if (v === 'no') {
-              targetSheet.hasMotorSupportStand = false;
-            } else if (v === 'yes') {
-              targetSheet.hasMotorSupportStand = true;
-            }
-          }
-        },
-      },
-      chainType: {
-        value: targetSheet?.electricMotorChainType ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.electricMotorChainType = v;
-          }
-        },
-      },
-      lockBox: {
-        value: targetSheet?.motorLockBox ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.motorLockBox = v;
-          }
-        },
-        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_motorLockBox() }),
-      },
-      // 方向
-      direction: {
-        value: targetSheet?.electricMotorDirection ?? '',
-        onChange: (str) => {
-          if (targetSheet) {
-            targetSheet.electricMotorDirection = str;
-          }
-        },
-      },
-    },
-    // ________________________________________________________________
-    doorTrack: {
-      material: {
-        value: targetSheet?.com_guideRail_material ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_guideRail_material = v;
-          }
-        },
-        optionArr: optionsCreator_componentMaterial_01(),
-      },
-      thickness: {
-        value: targetSheet?.guideRailThickness ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.guideRailThickness = v;
-          }
-        },
-        optionArr: targetSheet?.options_doorTrackThick ?? [],
-      },
-      surface: {
-        value: targetSheet?.com_guideRail_surface ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.com_guideRail_surface = v;
-          }
-        },
-        checkBarOptionArr: creCheckBarOptionArr({ optionArr: optionsCreator_surface() }),
-      },
-      silencer: {
-        value: (() => {
-          const spec = targetSheet?.hasSilencingStrip;
-
-          if (!spec) {
-            return 'no';
-          } else {
-            return 'yes';
-          }
-        })(),
-        onChange: (v) => {
-          if (targetSheet) {
-            if (v === 'no') {
-              targetSheet.hasSilencingStrip = false;
-            } else if (v === 'yes') {
-              targetSheet.hasSilencingStrip = true;
-            }
-          }
-        },
-      },
-      doorTrackType: {
-        value: targetSheet?.guideRailType ?? '',
-        onChange: (v) => {
-          if (targetSheet) {
-            targetSheet.guideRailType = v;
-          }
-        },
-      },
-      doorTrackName: {
-        value: targetSheet?.guideRailName ?? '',
-        // onChange: (v) => {
-        //   if (targetSheet) {
-        //     targetSheet.guideRail = v;
-        //   }
-        // },
-        onChange_select: (option) => {
-          if (targetSheet) {
-            targetSheet.guideRail = option;
-          }
-        },
-
-        icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRailName}`,
-        // optionArr: targetSheet?.isAntiTyphoon ? guideRailOptionArr_withHook : guideRailOptionArr_noHook,
-        optionArr: targetSheet?.options_guideRail ?? [],
-      },
-    },
-  };
-
-  // -------------------------------------------------------------------------
-
-  const control_detail02: Tcontrol_detail02 = {
-    size01: {
-      doorType: targetSheet?.doorModelName ?? '',
-      fullWidth: targetSheet?.fullWidth_mm ?? '',
-      淨高: targetSheet?.height_mm ?? '',
-      WG: targetSheet?.WG_mm ?? '',
-      gapA: numToStr(targetSheet?.prodSpec?.gapA),
-      gapC: numToStr(targetSheet?.prodSpec?.gapC),
-      支板尺寸: `${targetSheet?.boxB_mm ?? ''}*${targetSheet?.boxD_mm ?? ''}`,
-      捲門全高: targetSheet?.fullHeight ?? '',
-    },
-    size02: {
-      捲軸尺寸: targetSheet?.diameter ? `${targetSheet.diameter}"` : '',
-      軸徑: targetSheet?.bearingInnerDiameter ?? '',
-      軸承: targetSheet?.prodSpec?.bearingName ?? '',
-      總長: targetSheet?.bearingHousingTotalLength ?? '',
-      寸法: numToStr(targetSheet?.prodSpec?.bearingHousingSize), //  軸承座寸法
-    },
-    rollBox: {
-      角鐵數量: targetSheet?.headBoxAngleIronQuantity ?? '',
-      捲箱角鐵尺寸: targetSheet?.angleIronSize ?? '',
-      捲箱資訊: targetSheet?.headBoxForm_str ?? '',
-    },
-    doorPiece: {
-      門片材質: targetSheet?.com_slat_material ?? '',
-      門片厚度: targetSheet?.thickness ?? '',
-      門片長度: numToStr(targetSheet?.prodSpec?.slatLength),
-      捲片支數: targetSheet?.slatCount ?? '',
-      防颱勾: !targetSheet ? '' : targetSheet?.isAntiTyphoon ? '是' : '否',
-    },
-    motor: {
-      vendor: targetSheet?.motorVendor ?? '',
-      電供: targetSheet?.motorPhaseVoltage ?? '',
-      馬力: targetSheet?.horsepower ?? '',
-    },
-    doorTrack: {
-      門軌材質: targetSheet?.com_guideRail_material ?? '',
-      門軌長度: numToStr(targetSheet?.prodSpec?.guideRailLength),
-      門軌形式: {
-        value: targetSheet?.guideRailName ?? '',
-        img: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${targetSheet?.guideRailName}`,
-      },
-    },
-    chainCog: {
-      鏈齒輪番號: targetSheet?.sprocketWheelModel ?? '',
-      大鏈輪: targetSheet?.sprocketWheelTeethNumber ?? '',
-      孔徑: targetSheet?.bearingInnerDiameter ?? '',
-    },
-    base: {
-      底座材質: targetSheet?.com_bottomBar_material ?? '',
-      底座開口: targetSheet?.guideRailsOpening ?? '',
-    },
-  };
-
-  // -------------------------------------------------------------------------
-
-  const reqPatch = async () => {
-    // if (!worksheetId || !workSheet?.latestRecord.contractProductItems || !havePermissionToEdit) {
-    //   return;
-    // }
-    if (!worksheetId || !workSheet?.contractProductItems || !havePermissionToEdit) {
-      return;
-    }
-
-    let deleteIdList: { [key: string]: string[] } = {};
-    let body: TupdateWorkSheetItem[] = [];
-
-    Object.values(changedSheetList).forEach((sheet) => {
-      if (sheet.isOriginal) {
-        deleteIdList = { ...deleteIdList, ...sheet.idListShouldDelete };
-        // deleteIdArr = [...deleteIdArr, ...sheet.idListShouldDelete];
-      } else {
-        const bodyItemArr = sheet.bodyItemArr;
-        body = [...body, ...bodyItemArr];
-      }
-    });
-
-    setIsLoading(true);
-
-    //
-
-    for (const key in deleteIdList) {
-      const deleteIdArr = deleteIdList[key];
-
-      try {
-        await apiDeleteWorkSheetItem(worksheetId, { contractProductItemsId: deleteIdArr });
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '清除工作表項目失敗', content: err.message });
-        setDisabled(true);
-      }
-    }
-
-    //
-
-    for (const key in changedSheetList) {
-      const sheet = changedSheetList[key];
-
-      if (sheet.isOriginal) {
-        continue;
-      }
-
-      // 必須先執行確保accessories的name都有值的步驟才可以取body
-      const body = changedSheetList[key].bodyItemArr;
-
-      try {
-        await apiPatchWorkSheet(worksheetId, { contractProductItems: body });
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '更新工作表失敗', content: err.message });
-        setDisabled(true);
-        break;
-      }
-    } // for
-
-    await update_workSheet();
-    setIsLoading(false);
-    setDisabled(true);
-
-    //
-  };
-
-  // -------------------------------------------------------------------------
-
-  const control_optional: Tcontrol_optional = {
-    value: targetSheet?.acceIdArr ?? [],
-    onChange: (arr: string[]) => {
-      if (targetSheet) {
-        targetSheet.acceIdArr = arr;
-      }
-    },
-  };
-
-  // -------------------------------------------------------------------------
-
-  const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
-    const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
-
-    Object.values(sheetList).forEach((subList) => {
-      Object.values(subList).forEach((sheet) => {
-        const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
-          itemName: sheet.itemName,
-          size: {
-            qty: sheet.quantity,
-            doorModelName: sheet.doorModelName,
-            fullWidth: sheet.fullWidth_mm,
-            height: sheet.height_mm,
-            WG: sheet.WG_mm,
-            gapA: numToStr(sheet.prodSpec?.gapA),
-            gapC: numToStr(sheet.prodSpec?.gapC),
-            /**支版尺寸 boxB*boxD */
-            BD: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
-            /**捲門全高 */
-            fullHeight: sheet.fullHeight,
-            weightConversion: '', // 未知 // 重量換算 沒有在任一表單顯示
-          },
-          roller: {
-            diameter: `${sheet.diameter}"` ?? '', // 要有 " 符號，代表吋
-            bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
-            bearingName: sheet.prodSpec?.bearingName ?? '',
-            bearingHousingTotalLength: sheet.bearingHousingTotalLength ?? '',
-            bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
-          },
-          headBox: {
-            angleIronQty: sheet.headBoxAngleIronQuantity,
-            angleIronSize: sheet.angleIronSize,
-            form: sheet.headBoxForm_str,
-            surface: '',
-          },
-          doorPiece: {
-            material: sheet.com_slat_material,
-            surface: sheet.com_slat_surface ?? '',
-            thickness: sheet.thickness,
-            slatLength: numToStr(sheet.prodSpec?.slatLength),
-            slatCount: sheet.slatCount,
-            antyTyphoonHook: sheet.isAntiTyphoon ? '有' : '無',
-          },
-          motor: {
-            vendor: sheet.motorVendor,
-            /**相數加電壓 */
-            phaseVoltage: sheet.motorPhaseVoltage,
-            horsepower: sheet.horsepower,
-            direction: '', // 未知 // 在廠務部工作表 電動機方向
-          },
-          guideRail: {
-            form: sheet.isAntiTyphoon ? '防颱' : '一般',
-            material: sheet.com_guideRail_material,
-            guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
-            guideRailName: sheet.guideRailName,
-            icon: sheet?.guideRailName
-              ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
-              : undefined,
-            antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
-            bendStraight: sheet.guideRailType ?? '',
-          },
-          chainCog: {
-            sprocketWheelModel: sheet.sprocketWheelModel ?? '',
-            sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber ?? '',
-            bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
-            teethQuantity: '', // 未知 // 在廠務部工作表 齒數
-            centerDistance: '', // 未知 // 在廠務部工作表 中心距
-            eyesQuantity: '', // 未知 // 在廠務部工作表 目數
-          },
-          base: {
-            material: sheet.com_bottomBar_material,
-            guideRailsOpening: sheet.guideRailsOpening,
-            surface: '', // 未知 在廠務部工作表
-          },
-          sidePlate: {
-            direction: '', // 未知 在廠務部工作表
-            bigSidePlate: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
-            smallSidePlate: `${sheet.boxB_mm}*${sheet.boxB_mm}`,
-          },
-          memo: sheet.acceNameArr.length > 0 ? sheet.acceNameArr.join('、') : '',
+        let reviewStatus: TworksheetIntro['reviewStatus'] = {
+          label: reviewSalesEmployee.chName,
+          dotColor: salesReviewAt ? 'green' : toReviewSales ? 'red' : 'gray',
         };
-        workSheetPDF_01_itemArr.push(control_item);
+
+        if (managerReviewAt) {
+          reviewStatus = {
+            label: reviewManagerEmployee.chName,
+            dotColor: 'green',
+          };
+        }
+
+        const intro: TworksheetIntro = {
+          worksheetId: worksheet.id,
+          itemName: contractProductItem.itemName,
+          doorModelName: contractProductItem.doorModelName,
+          width: width_m,
+          height: height_m,
+          qty: String(contractProductItems.length),
+          isActive: false,
+          reviewStatus,
+          onClick: () => {},
+          onDeleteClick: () => {},
+        };
+
+        return intro;
+      });
+
+      // ----------------------
+
+      control_productCardArr.push({
+        id: prod.id,
+        itemName: prod.itemName,
+        doorModelName: prod.doorModelName,
+        qty: prodQty,
+        width: prodWidth,
+        height: pridHeight,
+        onSeparateClick: () => {},
+        worksheetIntroArr: worksheetIntroArr,
       });
     });
 
-    const control_workSheetPDF_01: Tcontrol_workSheetPDF_01 = {
-      info: {
-        contractNumber: profile.projectNumber,
-        projectName: profile.projectName,
-        projectAddress: profile.allAddress,
-        customerName: contract?.content.customer.name ?? '',
-        contactPerson: engineeringContact?.contactInfo?.[0]?.contactPerson ?? '',
-        // 開單日
-        billingDate: workSheet?.createdAt ? getTaiwanDateStr(workSheet.createdAt) ?? '' : '', // 未知
-        // 出貨日
-        shippingDate: '', // 未知
-      },
-      itemArr: workSheetPDF_01_itemArr,
-      // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
-    };
+    return { control_productCardArr };
+    //
+  }, [finalProduct]);
 
-    let totalQty_PDF_02 = 0;
-    workSheetPDF_01_itemArr.forEach((item) => {
-      totalQty_PDF_02 = totalQty_PDF_02 + Number(item.size.qty);
-    });
-    const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
-      info: {
-        projectName: profile.projectName,
-        totalQty: String(totalQty_PDF_02),
-      },
-      itemArr: workSheetPDF_01_itemArr,
-      // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
-    };
+  // -------------------------------------------------------------------------
 
-    return {
-      control_workSheetPDF_01,
-      control_workSheetPDF_02,
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sheetList]);
+  // const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
+  //   const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
+
+  //   Object.values(sheetList).forEach((subList) => {
+  //     Object.values(subList).forEach((sheet) => {
+  //       const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
+  //         itemName: sheet.itemName,
+  //         size: {
+  //           qty: sheet.quantity,
+  //           doorModelName: sheet.doorModelName,
+  //           fullWidth: sheet.fullWidth_mm,
+  //           height: sheet.height_mm,
+  //           WG: sheet.WG_mm,
+  //           gapA: numToStr(sheet.prodSpec?.gapA),
+  //           gapC: numToStr(sheet.prodSpec?.gapC),
+  //           /**支版尺寸 boxB*boxD */
+  //           BD: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
+  //           /**捲門全高 */
+  //           fullHeight: sheet.fullHeight,
+  //           weightConversion: '', // 未知 // 重量換算 沒有在任一表單顯示
+  //         },
+  //         roller: {
+  //           diameter: `${sheet.diameter}"` ?? '', // 要有 " 符號，代表吋
+  //           bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
+  //           bearingName: sheet.prodSpec?.bearingName ?? '',
+  //           bearingHousingTotalLength: sheet.bearingHousingTotalLength ?? '',
+  //           bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
+  //         },
+  //         headBox: {
+  //           angleIronQty: sheet.headBoxAngleIronQuantity,
+  //           angleIronSize: sheet.angleIronSize,
+  //           form: sheet.headBoxForm_str,
+  //           surface: '',
+  //         },
+  //         doorPiece: {
+  //           material: sheet.com_slat_material,
+  //           surface: sheet.com_slat_surface ?? '',
+  //           thickness: sheet.thickness,
+  //           slatLength: numToStr(sheet.prodSpec?.slatLength),
+  //           slatCount: sheet.slatCount,
+  //           antyTyphoonHook: sheet.isAntiTyphoon ? '有' : '無',
+  //         },
+  //         motor: {
+  //           vendor: sheet.motorVendor,
+  //           /**相數加電壓 */
+  //           phaseVoltage: sheet.motorPhaseVoltage,
+  //           horsepower: sheet.horsepower,
+  //           direction: '', // 未知 // 在廠務部工作表 電動機方向
+  //         },
+  //         guideRail: {
+  //           form: sheet.isAntiTyphoon ? '防颱' : '一般',
+  //           material: sheet.com_guideRail_material,
+  //           guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
+  //           guideRailName: sheet.guideRailName,
+  //           icon: sheet?.guideRailName
+  //             ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
+  //             : undefined,
+  //           antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
+  //           bendStraight: sheet.guideRailType ?? '',
+  //         },
+  //         chainCog: {
+  //           sprocketWheelModel: sheet.sprocketWheelModel ?? '',
+  //           sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber ?? '',
+  //           bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
+  //           teethQuantity: '', // 未知 // 在廠務部工作表 齒數
+  //           centerDistance: '', // 未知 // 在廠務部工作表 中心距
+  //           eyesQuantity: '', // 未知 // 在廠務部工作表 目數
+  //         },
+  //         base: {
+  //           material: sheet.com_bottomBar_material,
+  //           guideRailsOpening: sheet.guideRailsOpening,
+  //           surface: '', // 未知 在廠務部工作表
+  //         },
+  //         sidePlate: {
+  //           direction: '', // 未知 在廠務部工作表
+  //           bigSidePlate: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
+  //           smallSidePlate: `${sheet.boxB_mm}*${sheet.boxB_mm}`,
+  //         },
+  //         memo: sheet.acceNameArr.length > 0 ? sheet.acceNameArr.join('、') : '',
+  //       };
+  //       workSheetPDF_01_itemArr.push(control_item);
+  //     });
+  //   });
+
+  //   const control_workSheetPDF_01: Tcontrol_workSheetPDF_01 = {
+  //     info: {
+  //       contractNumber: profile.projectNumber,
+  //       projectName: profile.projectName,
+  //       projectAddress: profile.allAddress,
+  //       customerName: contract?.content.customer.name ?? '',
+  //       contactPerson: engineeringContact?.contactInfo?.[0]?.contactPerson ?? '',
+  //       // 開單日
+  //       billingDate: workSheet?.createdAt ? getTaiwanDateStr(workSheet.createdAt) ?? '' : '', // 未知
+  //       // 出貨日
+  //       shippingDate: '', // 未知
+  //     },
+  //     itemArr: workSheetPDF_01_itemArr,
+  //     // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+  //   };
+
+  //   let totalQty_PDF_02 = 0;
+  //   workSheetPDF_01_itemArr.forEach((item) => {
+  //     totalQty_PDF_02 = totalQty_PDF_02 + Number(item.size.qty);
+  //   });
+  //   const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
+  //     info: {
+  //       projectName: profile.projectName,
+  //       totalQty: String(totalQty_PDF_02),
+  //     },
+  //     itemArr: workSheetPDF_01_itemArr,
+  //     // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+  //   };
+
+  //   return {
+  //     control_workSheetPDF_01,
+  //     control_workSheetPDF_02,
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [sheetList]);
 
   // -------------------------------------------------------------------------
 
   const panelList_allow: TpanelList = [
-    {
-      type: 'myButton',
-      label: '匯出EXCEL',
-      onClick: () => downloadExcel(control_workSheetPDF_01, `工作表_${profile.projectName}`),
-    },
-    {
-      type: 'myButton',
-      label: '匯出廠務部工作表',
-      onClick: () => setIsShowPdf02(true),
-    },
-    {
-      type: 'myButton',
-      label: '匯出工作表',
-      onClick: () => setIsShowPdf(true),
-    },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出EXCEL',
+    //   onClick: () => downloadExcel(control_workSheetPDF_01, `工作表_${profile.projectName}`),
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出廠務部工作表',
+    //   onClick: () => setIsShowPdf02(true),
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出工作表',
+    //   onClick: () => setIsShowPdf(true),
+    // },
     {
       type: 'myButton',
       label: havePermissionToEdit ? '編輯' : '沒有編輯權限',
@@ -1323,15 +552,11 @@ export default function Worksheet({
     },
   ];
 
-  // if (!havePermissionToEdit) {
-  //   panelList_allow.pop();
-  // }
-
   const panelList_notAllow: TpanelList = [
     {
       type: 'redButton',
       label: '更新',
-      onClick: reqPatch,
+      onClick: () => {},
     },
     {
       type: 'myButton',
@@ -1345,14 +570,12 @@ export default function Worksheet({
   const panelList = disabled ? panelList_allow : panelList_notAllow;
   // -----------------------------------------------------------------
 
-  const forbidden = targetSheet?.isOriginal;
-
   // -----------------------------------------------------------------------
 
   // -----------------------------------------------------------------------
 
   return (
-    <SubLayer isLoading_all={isLoading || isHookLoading || targetSheet?.isLoading}>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>
@@ -1361,78 +584,10 @@ export default function Worksheet({
         <div className={scss.main}>
           {/* left */}
           <div className={scss.left}>
-            {Object.keys(sheetList).map((pKey) => {
-              const list: Tcontrol_prodCard['list'] = [];
-
-              let qty = 0;
-
-              Object.keys(sheetList[pKey]).forEach((cKey) => {
-                const item = sheetList[pKey][cKey];
-                qty += Number(item.quantity);
-
-                const {
-                  itemName,
-                  // doorModelName,
-                  //  quantity
-                  quantity,
-                } = item;
-
-                let isActive = false;
-
-                if (targetSheetKey_p === pKey && targetSheetKey_c === cKey) {
-                  isActive = true;
-                }
-
-                const length = Object.keys(sheetList[pKey]).length;
-
-                list.push({
-                  isOriginal: item.isOriginal,
-                  itemName: itemName,
-                  qty: quantity,
-                  isActive,
-                  status: {
-                    label: '總經理',
-                    dotColor: 'green',
-                  },
-                  onClick: (e) => {
-                    e.stopPropagation();
-                    setTargetSheetKey([pKey, cKey]);
-                  },
-                  onDeleteClick: () => item.clearSheet(),
-                  // onDivideClick: () => {
-                  //   setTargetDivideItem(() => {
-                  //     return (qty: number) => {
-                  //       item.divideItem(qty, `-${String(length)}`);
-                  //       setTargetDivideItem(undefined);
-                  //     };
-                  //   });
-                  // },
-                });
-              });
-
-              const originalItem = itemTokenList?.[pKey].originalItem;
-
-              let width = originalItem?.fullWidth ?? 0;
-              width = new Decimal(width).div(1000).toNumber();
-
-              let height = originalItem?.height ?? 0;
-              height = new Decimal(height).div(1000).toNumber();
-
-              const control: Tcontrol_prodCard = {
-                itemName: originalItem?.itemName ?? '',
-                doorType: originalItem?.doorModelName ?? '',
-                qty: String(qty),
-                width: String(width),
-                height: String(height),
-                onClick: (e) => {
-                  setTargetSheetKey([pKey, pKey]);
-                },
-                list,
-              };
-
+            {control_productCardArr.map((control_productCard, index) => {
               return (
-                <div key={pKey}>
-                  <WorkSheetProdCard disabled={disabled} control={control} />
+                <div key={control_productCard.id}>
+                  <ProductCard control={control_productCard} />
                 </div>
               );
             })}
@@ -1440,43 +595,14 @@ export default function Worksheet({
 
           {/* right */}
           {/* targetSheet */}
-          <div
-            className={classNames(
-              scss.right
-              // , !targetSheet && 'hidden'
-            )}
-          >
+          <div className={classNames(scss.right)}>
             <RecordList control={{ recordArr: fakeRecordArr }} />
-
-            {/* <WorkSheetProductOutline
-              control={control_product}
-              oldProductOutline={oldProductOutline}
-              onCalcClick={onCalcClick}
-              disabled={forbidden || disabled}
-            />
-
-            <hr />
-            <WorkSheetProductDetail01
-              control_ABCD={control_detail_ABCD}
-              control={control_detail}
-              disabled={forbidden || disabled}
-              // supportTip={`馬達荷重(max:${9999},min:${9999}),馬力數:${9999}Hp`}
-            />
-
-            <hr />
-            <WorkSheetOptional
-              control={control_optional}
-              optionArr={targetSheet?.accessoriesOptionArr_easy ?? []}
-              disabled={forbidden || disabled}
-            />
-            <hr />
-            <WorkSheetProductDetail02 control={control_detail02} /> */}
           </div>
           {/* right */}
         </div>
         {/* main */}
       </div>
-      <InputModal
+      {/* <InputModal
         visible={!!targetDivideItem}
         title="分堆"
         placeholder="請輸入數量"
@@ -1487,9 +613,9 @@ export default function Worksheet({
         inputAttr={{
           type: 'number',
         }}
-      />
-      <WorkSheetPDF isShow={isShowPdf} onCancel={() => setIsShowPdf(false)} control={control_workSheetPDF_01} />
-      <WorkSheetPDF_02 isShow={isShowPdf02} onCancel={() => setIsShowPdf02(false)} control={control_workSheetPDF_02} />
+      /> */}
+      {/* <WorkSheetPDF isShow={isShowPdf} onCancel={() => setIsShowPdf(false)} control={control_workSheetPDF_01} />
+      <WorkSheetPDF_02 isShow={isShowPdf02} onCancel={() => setIsShowPdf02(false)} control={control_workSheetPDF_02} /> */}
     </SubLayer>
   );
 }
@@ -1513,21 +639,6 @@ const creCheckBarOptionArr = ({ optionArr }: { optionArr: Toption[] }) => {
 };
 
 // ============================================================================
-
-const creEmptyProfile = (): Tprofile => ({
-  projectName: '',
-  projectContent: '',
-  projectNumber: '',
-  projectFaxNumber: '',
-  projectPerson: '',
-  projectPersonNumber: '',
-  allAddress: '',
-  engineeringNumber: '',
-  contractor: '',
-  principal: '',
-  contactNumber: '',
-  faxNumber: '',
-});
 
 // ============================================================================
 
@@ -1615,3 +726,70 @@ const fakeRecordArr: Trecord[] = [
 馬達荷重怎麼算
  
  */
+
+const useControl_profile = (engineeringContact: TengineeringContactDto | undefined | null): Tcontrol_profile => {
+  const control_profile = useMemo(() => {
+    const {
+      //
+      projectName = '',
+      projectContent = '',
+      projectNumber = '',
+      projectPrincipal = '',
+      constructionSitePrincipalContactNumber = '',
+      constructionSiteFaxNumber = '',
+      constructionSiteContactNumber = '',
+      contractor = '',
+      contractorPrincipal = '',
+      contractorContactNumber = '',
+      contractorFaxNumber = '',
+      county = '',
+      district = '',
+      address = '',
+    } = engineeringContact ?? {};
+
+    const control_profile: Tcontrol_profile = {
+      projectName: {
+        value: projectName,
+      },
+      projectContent: {
+        value: projectContent,
+      },
+      // 有空時把key改成projectPhoneNumber
+      projectNumber: {
+        // value: profile.projectNumber,
+        value: constructionSiteContactNumber,
+      },
+      projectFaxNumber: {
+        value: constructionSiteFaxNumber,
+      },
+      projectPerson: {
+        value: projectPrincipal,
+      },
+      projectPersonNumber: {
+        value: constructionSitePrincipalContactNumber,
+      },
+      allAddress: {
+        value: `${county}${district}${address}`,
+      },
+      engineeringNumber: {
+        value: projectNumber,
+      },
+      contractor: {
+        value: contractor,
+      },
+      principal: {
+        value: contractorPrincipal,
+      },
+      contactNumber: {
+        value: contractorContactNumber,
+      },
+      faxNumber: {
+        value: contractorFaxNumber,
+      },
+    };
+
+    return control_profile;
+  }, [engineeringContact]);
+
+  return control_profile;
+};
