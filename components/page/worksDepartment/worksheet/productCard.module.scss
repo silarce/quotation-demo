@@ -2,14 +2,22 @@
   width: 260px;
   padding: 10px;
   padding-bottom: 5px;
+  padding-top: 0;
   border-radius: 4px;
   background-color: #e5e5e5;
 
-  .info {
+  > .info {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: #e5e5e5;
+
     display: grid;
     grid-template-columns: auto 80px;
     justify-content: space-between;
     gap: 5px;
+    border-top: solid 10px #e5e5e5;
+
     .left {
       display: grid;
       justify-content: space-between;
