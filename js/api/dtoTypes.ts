@@ -991,16 +991,27 @@ export type TquotationProductDto = {
   // 彈射門尺寸
   bounceDoorWidth?: number | null;
 
-  items?: {
-    // 材料配件
-    components: TquotationProductComponentsDto[];
-    // 選配設定
-    accessories: TquotationProductAccessoriesDto[];
-    worksheetId: string | null;
-    worksheetRecordId: string | null; // 棄用
+  // items?: {
+  //   // 材料配件
+  //   components: TquotationProductComponentsDto[];
+  //   // 選配設定
+  //   accessories: TquotationProductAccessoriesDto[];
+  //   worksheetId: string | null;
+  //   worksheetRecordId: string | null; // 棄用
 
-    // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
-  }[];
+  //   // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
+  // }[];
+  // items?: {
+  //   // 材料配件
+  //   components: TquotationProductComponentsDto[];
+  //   // 選配設定
+  //   accessories: TquotationProductAccessoriesDto[];
+  //   worksheetId: string | null;
+  //   worksheetRecordId: string | null; // 棄用
+
+  //   // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
+  // }[];
+  items?: TquotationProductItemDto[];
 
   quantity: number;
 
@@ -1191,7 +1202,6 @@ export type TquotationProductItemDto = Omit<
   productId: string;
   itemNumber: string;
   itemName: string;
-  worksheetId: string; // 可能已經沒有這個property了，待確認
   others: null;
   deliveryStatus?: TengineeringDeliveryStatusDto[] | null;
   adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
@@ -1233,6 +1243,9 @@ export type TquotationProductItemDto = Omit<
   guideRailSurface: string | null;
   //
   itemPrice: number | null; // 每一才的價格
+
+  worksheetId: string | null;
+  worksheetRecordId: string | null; // 棄用
 };
 
 type TquotationContentDto_copy = {
