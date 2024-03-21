@@ -174,6 +174,10 @@ export default function Worksheet({
   // console.log(worksheetArr);
   // -------------------------------------------------------------------------
 
+  const refreshData = async () => {
+    return Promise.all([update_contract(), update_finalProduce()]);
+  };
+
   // apiPostWorkSheet
   const reqPostWorkSheet = async (body: TcreateWorksheetDto) => {
     if (isLoading) {
@@ -183,8 +187,7 @@ export default function Worksheet({
     try {
       setIsLoading(true);
       await apiPostWorkSheet(body);
-
-      await Promise.all([update_contract(), update_finalProduce()]);
+      await refreshData();
     } catch (error) {
     } finally {
       setIsLoading(false);
@@ -199,8 +202,7 @@ export default function Worksheet({
     try {
       setIsLoading(true);
       await apiDeleteWorksheet(worksheetId);
-      await update_contract();
-      await update_finalProduce();
+      await refreshData();
     } catch (error) {
     } finally {
       setIsLoading(false);
