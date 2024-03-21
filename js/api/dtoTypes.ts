@@ -920,7 +920,7 @@ export type TquotationProductDto = {
   // 報價別
   quoteType: string;
   // 門型
-  doorModelName: string;
+  doorModelName: TdoorModel;
   // L(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
   fullWidth: number;
   // W(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
@@ -929,7 +929,7 @@ export type TquotationProductDto = {
   height: number;
   // B(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
   boxB: number;
-  boxD: number;
+  boxD: number | null;
   // 面積
   area: string;
   // 才數
@@ -937,7 +937,7 @@ export type TquotationProductDto = {
   // 材料
   materialName: string;
   // 表面
-  materialSurface: string | null;
+  materialSurface: TmaterialSurface | null;
   // 門軌
   guideRail: string;
   // 門軌G // guideRailG是指單邊門軌的寬度。但是在工務部，G其實是指兩邊門軌寬度的總和。
@@ -955,7 +955,7 @@ export type TquotationProductDto = {
   // 馬達鎖盒
   motorLockBox: string;
   // 門軌厚度
-  guideRailThickness: number;
+  guideRailThickness: string;
   // 捲軸規格
   rollerSpec: string; // 雙凸|無凸
   // 門軌消音條
@@ -963,7 +963,7 @@ export type TquotationProductDto = {
   // 一體式捲箱
   isIntegratedHeadBox: boolean;
   // 捲箱厚度
-  headBoxThickness: number;
+  headBoxThickness: string;
   // 單價
   unitPrice: number;
   // 牌價
@@ -1050,8 +1050,8 @@ export type TquotationProductDto = {
   bearingInnerDiameter?: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
   bearingName?: string | null; //軸承
   diameter?: string | null; //捲軸 - 尺寸
-  gapA?: string | null; //
-  gapC?: string | null; //
+  gapA?: string | null;
+  gapC?: string | null;
   gearNumber?: string | null; //
   sprocketWheelModel?: string | null; //鏈齒輪 - 鏈齒輪番號
   sprocketWheelTeethNumber?: string | null; //鏈齒輪 - 大鏈輪
@@ -1060,7 +1060,7 @@ export type TquotationProductDto = {
   slatLength?: number | null; //門片長度
   guideRailLength?: number | null; //門軌長度
   headBoxLength?: number | null; //捲箱長度
-  thickness: string; // 門片厚度
+  thickness: string | null; // 門片厚度
 
   //
   // 前端用的，後端沒有
@@ -2521,17 +2521,17 @@ export type TworksheetRecordDto = {
   // 所屬工作主表Id
   worksheetId: string | null;
   // 所屬工作主表
-  worksheet: TworksheetDto;
+  worksheet?: TworksheetDto;
   // 合約產品
-  contractProductItems: TquotationProductItemDto[];
+  contractProductItems?: TquotationProductItemDto[];
   // 舊合約產品
-  legacyProductItems: TlegacyContractProductItemDto[];
+  legacyProductItems?: TlegacyContractProductItemDto[];
   // 審核狀態
   status: TworksheetStatus | null; // 棄用
   // 審核業務Id
   reviewSalesEmployeeId: string | null;
   // 審核業務
-  reviewSalesEmployee: TemployeeDto;
+  reviewSalesEmployee?: TemployeeDto;
   // 送審給業務審核時間
   toReviewSales: string | null;
   // 業務審核時間
@@ -2539,7 +2539,7 @@ export type TworksheetRecordDto = {
   // 審核總經理Id
   reviewManagerEmployeeId: string | null;
   // 審核總經理
-  reviewManagerEmployee: TemployeeDto;
+  reviewManagerEmployee?: TemployeeDto;
   // 送審給總經理審核時間
   toReviewManager: string | null;
   // 總經理審核時間
