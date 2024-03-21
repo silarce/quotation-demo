@@ -34,21 +34,28 @@
   max-height: 500px;
 }
 
-.row {
+.basicRow {
   position: relative;
   display: flex;
   flex-wrap: nowrap;
-  align-items: center;
-  /* gap: 16px; */
+  // align-items: center;
+  align-items: flex-end;
   width: fit-content;
   height: 60px;
-  // padding-left: 22px;
   > * {
     margin-right: 16px;
-    &:nth-of-type(1) {
+    &:nth-last-of-type(1) {
       margin-right: 0;
     }
-    &:nth-last-of-type(1) {
+  }
+}
+
+.row {
+  @extend .basicRow;
+  /* gap: 16px; */
+  // padding-left: 22px;
+  > * {
+    &:nth-of-type(1) {
       margin-right: 0;
     }
   }
@@ -122,22 +129,24 @@
 }
 
 .cell {
+  padding: 0 5px;
 }
 
-.attachcell {
+.rightCell {
   @extend .cell;
 }
-.attachcell_thead {
-  @extend .attachcell;
-}
+// .rightCell_thead {
+//   @extend .rightcell;
+// }
 
 .bottomBtnRow {
   position: sticky;
-  left: 22px;
+  left: 0px;
   bottom: 0;
   width: 100%;
   text-align: start;
   background-color: #fff;
+  border-left: solid 22px #fff;
   .bottomBtn.plus {
     padding: 10px 20px;
     padding-left: 0px;
@@ -147,16 +156,17 @@
   }
 }
 
-.attachPanel {
+.rightPanel {
+  @extend .basicRow;
   position: sticky;
   right: 0;
 
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 5px;
+  // display: flex;
+  // flex-wrap: nowrap;
+  // align-items: center;
+  // gap: 5px;
 
-  height: 100%;
-  background-color: #dddd;
+  // height: 100%;
+  background-color: #ddd;
   border-left: solid 5px white;
 }

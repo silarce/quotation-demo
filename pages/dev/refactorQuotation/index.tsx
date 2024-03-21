@@ -100,11 +100,7 @@ const Thead = () => {
         );
       })}
 
-      <div className={scss.attachPanel}>
-        <div className={scss.AttachCell}>attach</div>
-        <div className={scss.AttachCell}>attach</div>
-        <div className={scss.AttachCell}>attach</div>
-      </div>
+      <RightPanel />
     </div>
   );
 };
@@ -120,7 +116,15 @@ const Row = ({
   return (
     <div className={classNames(scss.bodyRow, isActive && scss.active)} onClick={onRowClick}>
       <SidePanel_mdc />
+      <RowMain />
+      <RightPanel />
+    </div>
+  );
+};
 
+const RowMain = () => {
+  return (
+    <>
       {arr.map((item, index) => {
         return (
           <div key={index} className={scss.cell}>
@@ -128,11 +132,16 @@ const Row = ({
           </div>
         );
       })}
-      <div className={scss.attachPanel}>
-        <div className={scss.attachCell}>attach</div>
-        <div className={scss.attachCell}>attach</div>
-        <div className={scss.attachCell}>attach</div>
-      </div>
+    </>
+  );
+};
+
+const RightPanel = () => {
+  return (
+    <div className={scss.rightPanel}>
+      <div className={scss.rightCell}>attach</div>
+      <div className={scss.rightCell}>attach</div>
+      <div className={scss.rightCell}>attach</div>
     </div>
   );
 };
@@ -142,14 +151,24 @@ const SidePanel_mdc = ({
   onDeleteClick,
   onCopyClick,
 }: {
-  onDeleteClick?: () => void;
-  onCopyClick?: () => void;
+  onDeleteClick?: (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
+  onCopyClick?: (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
 }) => {
   return (
     <div className={scss.sidePanel}>
       <IconMove />
-      <IconDelete01 onClick={onDeleteClick} />
-      <IconCopy onClick={onCopyClick} />
+      <IconDelete01
+        onClick={(e) => {
+          e.stopPropagation();
+          onDeleteClick?.(e);
+        }}
+      />
+      <IconCopy
+        onClick={(e) => {
+          e.stopPropagation();
+          onCopyClick?.(e);
+        }}
+      />
     </div>
   );
 };
