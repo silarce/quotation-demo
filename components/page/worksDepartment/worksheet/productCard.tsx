@@ -13,12 +13,12 @@ import scss from './productCard.module.scss';
 // =================================================================
 
 type TworksheetIntro = {
-  worksheetId: string;
-  itemName: string;
-  doorModelName: string;
-  width: string;
-  height: string;
-  qty: string;
+  worksheetId: string | undefined;
+  itemName: string | undefined;
+  doorModelName: string | undefined;
+  width: string | undefined;
+  height: string | undefined;
+  qty: string | undefined;
   isActive?: boolean;
   reviewStatus: TstatusLabelProps;
   onClick: (e: React.MouseEvent) => void;
@@ -84,7 +84,7 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
           } = worksheet;
 
           return (
-            <CellWithBar key={id} isActive={isActive}>
+            <CellWithBar key={id} isActive={isActive} className={scss.worksheetWrapper}>
               <div className={scss.worksheet} onClick={onClick}>
                 <p>{itemName}</p>
                 <p className="mt-2">{doorModelName}</p>
@@ -107,29 +107,7 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
           );
         })}
 
-        {/* <CellWithBar isActive={false} className={scss.worksheet}>
-          <p>B2F.B3F_梯廳(四)-RD16</p>
-          <p className="mt-2">SJ-303AS</p>
-          <div className={scss.info}>
-            <div>
-              <span>{`全寬(L):6.72`}</span>
-              <br />
-              <span>{`淨高(h):3.02`}</span>
-            </div>
-            <span>{'99'}樘</span>
-            <IconDelete01 />
-          </div>
-
-          <StatusLabel
-            // {...status}
-            label="總經理"
-            className={classNames(
-              scss.statusLabel,
-              'mt-2'
-              // ,status.className
-            )}
-          />
-        </CellWithBar> */}
+   
       </div>
 
       {/* <div className={scss.list}>

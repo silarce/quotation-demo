@@ -2,149 +2,6 @@
 
 // 按下計算按鈕會呼叫targetSheet.calcProd()
 
-/*
-
-
-捲軸
-捲箱
-底座
-支版
-門片
-電動機
-門軌
-這七個區塊的內容"大多"是對應的component
-沒有馬達配件區塊
-
-
-呼叫get /products/door/available-components
-是為了取得材料配件資料，並顯出來
-顯示出來的欄位有代號、說明、材料、表面、烤漆、單位、數量、牌價、牌價複價、單價、複價
-這些欄位中，只有材料與表面會在工作表顯示出來
-而材料與表面的選項目前是固定的，
-所以應該是不需要呼叫 get /products/door/available-components
-況且component換掉就是整個主產品換掉，這應該不是工作表這邊要做的事
-component不變的話
-get /products/door/generate-door-product-bom 也不需要呼叫了
-
-在工作表甚至工務部這邊，不需要 componentId
-所以即使componentId對應的規格與使用者編輯後的規格不搭配也沒關係
-工作表就是讓使用者依現場的情況編輯規格，然後交給相關部門(例如業務部)參考用的
-
-_________________________________________________________________
-
-
-get /products/door/calc-general-spec // 用來取得經過計算才能知道的規格(不可以隨意編輯)
-get /products/door/calc-detail-spec // 用來取得門片數量
-這兩個api的呼叫已經放進Class_workSheet.calcProd了
-
-get /products/door/calc-side-plate-size-d // 用來取得boxD
-這個不需要在init呼叫，按下計算按鈕時呼叫就好了
-
-Class_workSheet.getInitData
-會呼叫 getAccessoriesArr與getProdAvailableComponents
-
-
-如果工作表的是到現場實作後，修改主產品規格的紀錄
-那麼是不是厚度、馬力數的選項就不應該是從後端取得的資料
-而是應該包含所有可能的選項?
-在主產品
-options_horsepower
-options_motor
-options_phase
-options_voltage
-options_rollUpBoxThick
-options_doorTrackThick
-都是從_availableComponents拿的
-先用主產品的作法吧，只是取得availableComponents後不把component換掉
-只取得options
-
-
------------------------------------------------------------------
-
-選擇門型的時候就會更新可選門軌與可選材質(上面的，非選配)
-並更新門軌，重置防颱
-
------------------------------------------------------------------
-目前計算按鈕的功能
-
-1. 呼叫 getProdSpec
-getProdSpec會呼叫api取得規格並帶入新的規格
-被改變的東西包括
-_prodSpec.bearingHousingSize
-_prodSpec.bearingHousingTotalLength
-_prodSpec.bearingInnerDiameter
-_prodSpec.bearingName
-_prodSpec.defaultMotorIndex
-_prodSpec.density
-_prodSpec.diameter
-_prodSpec.gapA
-_prodSpec.gapC
-_prodSpec.motors
-_prodSpec.gearNumber
-_prodSpec.sprocketWheelModel
-_prodSpec.sprocketWheelTeethNumber
-_prodSpec.sprocketWheelChains
-_prodSpec.weight
-_prodSpec.slatLength
-_prodSpec.guideRailLength
-_prodSpec.headBoxLength
-_prodSpec.thickness
-另外還有
-_prod.sprocketWheelModel
-_prod.sprocketWheelTeethNumber
-_prod.bearingInnerDiameter
-_prod.diameter
-_prod.bearingHousingTotalLength
-以及
-boxD
-
-2.
-再用getProdSpec的回應
-計算WG
-取得預設馬達、預設馬力、預設boxB
-更新this._prod.thickness   this._prod.thickness = prodSpec.thickness
-
-3.
-產生boxB下拉選單選項options_boxB this.findBoxBoptions()
-
-4.
-變更所有材料配件的材質 this.changeComMaterial()
-
-5.
-呼叫getProdDetailSepc()取得捲門片數量 _prod.slatCount 
-
-6.
-呼叫getProdAvailableComponents()
-然後呼叫retrieveOptions()
-
-6.1
-retrieveOptions會更新以下下拉式選單的選項
-options_horsepower
-options_motor
-options_phase
-options_voltage
-options_rollUpBoxThick
-options_doorTrackThick
-
-7.
-如果
-if(this._doorModelName_state !== this._prod.doorModelName){
-  更新this._doorModelName_state
-  清空已選的選配
-  呼叫並更新可選選配列表
-}
-
------------------------------------------------------------------
-
-
-
------------------------------
-
-工作表更新後
-被更新的item會產生adjustedItem這個property
-型別同item，內容是更新後的item
-*/
-
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -193,16 +50,18 @@ import RecordList, { Trecord } from 'components/page/worksDepartment/worksheet/r
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
+import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // api
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 import {
   TupdateWorkSheetItem,
+  TcreateWorksheetDto,
   useGetEngineeringContact,
   useGetWorkSheet,
   apiPatchWorkSheet,
   apiDeleteWorkSheetItem,
+  apiPostWorkSheet,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
@@ -268,8 +127,12 @@ export default function Worksheet({
 
   const [activeWorksheetid, setActiveWorksheetid] = useState<string | undefined>(undefined);
 
+  // const [reqPostWorkSheet_dyna, setReqPostWorkSheet_dyna] = useState<(num: number) => void>();
+  const [inputModalProps, setInputModalProps] = useState<Pick<TinputModalProps, 'onConfirm' | 'title'>>();
   // const [isShowPdf, setIsShowPdf] = useState(false);
   // const [isShowPdf02, setIsShowPdf02] = useState(false);
+
+  // -------------------------------------------------------------------------
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
@@ -280,6 +143,7 @@ export default function Worksheet({
       'worksheet.records',
       'worksheet.latestRecord.reviewSalesEmployee',
       'worksheet.latestRecord.reviewManagerEmployee',
+      'worksheet.latestRecord.contractProductItems',
     ],
   });
   const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
@@ -307,6 +171,25 @@ export default function Worksheet({
   // console.log(finalProduct);
   // console.log(worksheetArr);
   // -------------------------------------------------------------------------
+
+  // apiPostWorkSheet
+  const reqPostWorkSheet = async (body: TcreateWorksheetDto) => {
+    if (isLoading) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPostWorkSheet(body);
+
+      await Promise.all([update_contract(), update_finalProduce()]);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // -------------------------------------------------------------------------
   const control_profile = useControl_profile(engineeringContact);
 
   // -------------------------------------------------------------------------
@@ -325,6 +208,7 @@ export default function Worksheet({
       const pridHeight = new Decimal(prod.height).div(1000).toString();
 
       const prodWorkSheetList: { [key: string]: TworkSheetDto } = {};
+      const itemsNoWorksheet: TquotationProductItemDto[] = [];
 
       // ----------------------------------------------
       prod.items?.forEach((item) => {
@@ -332,6 +216,8 @@ export default function Worksheet({
 
         if (worksheetId) {
           prodWorkSheetList[worksheetId] = worksheetList[worksheetId];
+        } else {
+          itemsNoWorksheet.push(item);
         }
       });
 
@@ -351,30 +237,30 @@ export default function Worksheet({
           managerReviewAt,
         } = latestRecord;
 
-        const contractProductItem = contractProductItems[0];
+        const contractProductItem = contractProductItems?.[0];
 
-        const width_m = new Decimal(contractProductItem.fullWidth).div(1000).toString();
-        const height_m = new Decimal(contractProductItem.height).div(1000).toString();
+        const width_m = new Decimal(contractProductItem?.fullWidth ?? 0).div(1000).toString();
+        const height_m = new Decimal(contractProductItem?.height ?? 0).div(1000).toString();
 
         let reviewStatus: TworksheetIntro['reviewStatus'] = {
-          label: reviewSalesEmployee.chName,
+          label: `業務 ${reviewSalesEmployee?.chName ?? ''}`, // 後端沒給reviewSalesEmployee，先應急處理
           dotColor: salesReviewAt ? 'green' : toReviewSales ? 'red' : 'gray',
         };
 
         if (managerReviewAt) {
           reviewStatus = {
-            label: reviewManagerEmployee.chName,
+            label: `總經理 ${reviewManagerEmployee?.chName}`,
             dotColor: 'green',
           };
         }
 
         const intro: TworksheetIntro = {
           worksheetId: worksheet.id,
-          itemName: contractProductItem.itemName,
-          doorModelName: contractProductItem.doorModelName,
+          itemName: contractProductItem?.itemName,
+          doorModelName: contractProductItem?.doorModelName,
           width: width_m,
           height: height_m,
-          qty: String(contractProductItems.length),
+          qty: String(contractProductItems?.length),
           isActive: activeWorksheetid === worksheet.id,
           reviewStatus,
           onClick: () => {
@@ -395,7 +281,33 @@ export default function Worksheet({
         qty: prodQty,
         width: prodWidth,
         height: pridHeight,
-        onSeparateClick: () => {},
+        onSeparateClick: () => {
+          setInputModalProps({
+            title: `可分配數量${itemsNoWorksheet.length}`,
+            onConfirm: async (str) => {
+              const qty = Number(str);
+              const pre_contractProductItems = itemsNoWorksheet.slice(0, qty);
+
+              const contractProductItems = pre_contractProductItems.map((item) => {
+                return {
+                  ...item,
+                  gapA: item.gapA ?? '0',
+                  gapC: item.gapC ?? '0',
+                  boxD: item.boxD ?? 0,
+                  thickness: item.thickness ?? '0',
+                };
+              });
+
+              const body: TcreateWorksheetDto = {
+                contractId,
+                contractProductItems,
+              };
+
+              await reqPostWorkSheet(body);
+              setInputModalProps(undefined);
+            },
+          });
+        },
         worksheetIntroArr: worksheetIntroArr,
       });
     });
@@ -605,18 +517,16 @@ export default function Worksheet({
         </div>
         {/* main */}
       </div>
-      {/* <InputModal
-        visible={!!targetDivideItem}
-        title="分堆"
-        placeholder="請輸入數量"
-        onConfirm={(str) => {
-          targetDivideItem?.(Number(str));
-        }}
-        onCancel={() => setTargetDivideItem(undefined)}
+      <InputModal
+        visible={!!inputModalProps}
+        title={inputModalProps?.title ?? ''}
+        onConfirm={inputModalProps?.onConfirm}
+        placeholder="請輸入分配數量"
+        onCancel={() => setInputModalProps(undefined)}
         inputAttr={{
           type: 'number',
         }}
-      /> */}
+      />
       {/* <WorkSheetPDF isShow={isShowPdf} onCancel={() => setIsShowPdf(false)} control={control_workSheetPDF_01} />
       <WorkSheetPDF_02 isShow={isShowPdf02} onCancel={() => setIsShowPdf02(false)} control={control_workSheetPDF_02} /> */}
     </SubLayer>
@@ -625,21 +535,21 @@ export default function Worksheet({
 
 // ===========================================================================
 
-const numToStr = (num: number | undefined) => {
-  if (num === undefined) {
-    return '';
-  }
+// const numToStr = (num: number | undefined) => {
+//   if (num === undefined) {
+//     return '';
+//   }
 
-  return String(num);
-};
+//   return String(num);
+// };
 
-const creCheckBarOptionArr = ({ optionArr }: { optionArr: Toption[] }) => {
-  const arr = optionArr.map((item) => {
-    return { key: item.value, label: item.label };
-  });
+// const creCheckBarOptionArr = ({ optionArr }: { optionArr: Toption[] }) => {
+//   const arr = optionArr.map((item) => {
+//     return { key: item.value, label: item.label };
+//   });
 
-  return arr;
-};
+//   return arr;
+// };
 
 // ============================================================================
 

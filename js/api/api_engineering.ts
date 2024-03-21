@@ -89,6 +89,7 @@ export type {
   TaccountsReceivableProductPaymentDto,
   TcreateAccountReceivableProductPaymentDto,
   TupdateAccountReceivableProductPaymentDto,
+  TcreateWorksheetDto,
 } from './dtoTypes';
 
 type TengineeringContactAttachmentType = 'floor' | 'detail' | 'color' | 'construction' | 'design';
@@ -724,7 +725,12 @@ export const apiPostWorkSheet = (body: TcreateWorksheetDto) => {
   return axi
     .post(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      const error = err as AxiosError;
+      myAlert.err({ title: '建立工作表失敗', content: error.message });
+
+      return Promise.reject(err);
+    });
 };
 
 export const apiPatchWorkSheet = (id: string, body: TupdateWorkSheet) => {
@@ -733,7 +739,12 @@ export const apiPatchWorkSheet = (id: string, body: TupdateWorkSheet) => {
   return axi
     .patch(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      const error = err as AxiosError;
+      myAlert.err({ title: '更新工作表失敗', content: error.message });
+
+      return Promise.reject(err);
+    });
 };
 
 export const apiDeleteWorkSheetItem = async (

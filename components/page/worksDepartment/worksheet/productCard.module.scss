@@ -89,9 +89,14 @@
   }
   .worksheetList {
     background-color: white;
+    .worksheetWrapper {
+      border-bottom: solid 1px theme("colors.border");
+      &:nth-last-of-type(1) {
+        border-bottom: none;
+      }
+    }
     .worksheet {
       padding: 5px 8px;
-      border-bottom: solid 1px theme("colors.border");
       cursor: pointer;
       span,
       p {
@@ -114,10 +119,6 @@
         span {
           color: theme("colors.main");
         }
-      }
-
-      &:nth-last-of-type(1) {
-        border-bottom: none;
       }
     }
 
