@@ -752,9 +752,10 @@ export const useGetWorksheet_id = (id: string | undefined | null, { params }: { 
       'records.contractProductItems',
       'records.reviewSalesEmployee',
       'records.reviewManagerEmployee',
-      'latestRecord.contractProductItems',
       'latestRecord.reviewSalesEmployee',
       'latestRecord.reviewManagerEmployee',
+      'latestRecord.contractProductItems.components',
+      'latestRecord.contractProductItems.accessories',
     ],
     ...params,
   };

@@ -82,7 +82,7 @@ import {
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
 // hook
-import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
+// import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
 
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
@@ -177,6 +177,8 @@ export default function Worksheet({
   // console.log(activeWorksheetid);
   // console.log(finalProduct);
   // console.log(worksheetArr);
+  // console.log(worksheetData);
+
   // -------------------------------------------------------------------------
 
   const refreshData = async () => {
