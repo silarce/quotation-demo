@@ -27,7 +27,17 @@ import ProductCard, {
 } from 'components/page/worksDepartment/worksheet/productCard';
 import RecordList, { Tcontrol_recordList, Trecord } from 'components/page/worksDepartment/worksheet/recordList';
 
-import { Form_Product_basic } from 'components/page/worksDepartment/worksheet/productForm/productForm';
+import {
+  Form_product_basic,
+  Form_product_ABCD,
+  Form_product_motor,
+  Form_product_headBox,
+  Form_product_roller,
+  Form_product_slat,
+  Form_product_guideRail,
+  Form_product_bottomBar,
+  Form_product_sidePlate,
+} from 'components/page/worksDepartment/worksheet/productForm/productForm';
 
 // import WorkSheetProductOutline, {
 //   Tcontrol_productOutline,
@@ -53,6 +63,7 @@ import WorkSheetPDF_02, {
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // api
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
@@ -66,19 +77,6 @@ import {
   apiDeleteWorkSheetItem,
   apiPostWorkSheet,
   apiDeleteWorksheet,
-
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
-  // 接著要做歷程記錄
   useGetWorksheet_id,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
@@ -524,9 +522,25 @@ export default function Worksheet({
 
             <form className={scss.productForm}>
               <div>
-                <Form_Product_basic />
+                <p className={'mb-8 text-main text-xl font-bold'}>設定產品基本規格：</p>
+                <Form_product_basic />
+                <MyButton_v2 preImg="upload" px="px32" className="block m-auto mr-0 mt-5">
+                  計算
+                </MyButton_v2>
               </div>
-              <div></div>
+              <div>
+                <p className={'mb-8 text-main text-xl font-bold'}>設定產品細部規格：</p>
+                <div className={scss.formGrid}>
+                  <Form_product_ABCD />
+                  <Form_product_motor />
+                  <Form_product_headBox />
+                  <Form_product_roller />
+                  <Form_product_slat />
+                  <Form_product_guideRail />
+                  <Form_product_bottomBar />
+                  <Form_product_sidePlate />
+                </div>
+              </div>
               <div></div>
             </form>
           </div>
@@ -701,6 +715,11 @@ const polyfillContractProductItems = (pre_contractProductItems: TquotationProduc
   return contractProductItems;
 };
 
+// ===========================================================================
+// 角鐵尺吋
+// String(Number(this.WG_mm) + Number(this._prod.gapA) + Number(this._prod.gapC) - 10);
+
+// 門片厚度 _prod.thickness
 // ===========================================================================
 // ===========================================================================
 // ===========================================================================
