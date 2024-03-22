@@ -30,7 +30,7 @@ import {
   TquotationProductDto,
   TupdateWorkSheetItem,
   TquotationProductItemDto,
-  TquotationProductComponentsDto,
+  TquotationProductComponentDto,
 } from 'js/api/dtoTypes';
 
 // config
@@ -106,7 +106,7 @@ class Class_workSheet {
     this._height_str = String(this._prod.height / 1000);
 
     //
-    const comKeyArr: TquotationProductComponentsDto['type'][] = [
+    const comKeyArr: TquotationProductComponentDto['type'][] = [
       'slat',
       'bottomBar',
       'guideRail',
@@ -117,7 +117,7 @@ class Class_workSheet {
       'headBox',
     ];
     // const comList: { [key: string]: TquotationProductComponentsDto } = {};
-    const comList: { [key in TquotationProductComponentsDto['type']]?: TquotationProductComponentsDto } = {};
+    const comList: { [key in TquotationProductComponentDto['type']]?: TquotationProductComponentDto } = {};
 
     this._prod.components.forEach((com) => {
       comList[com.type] = com;
@@ -129,7 +129,7 @@ class Class_workSheet {
       }
     });
 
-    this.comList = comList as { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
+    this.comList = comList as { [key in TquotationProductComponentDto['type']]: TquotationProductComponentDto };
 
     this._acceIdArr = this._prod.accessories.map((item) => item.codeName);
 
@@ -187,7 +187,7 @@ class Class_workSheet {
 
   // ---------------------------------------------------------------------
 
-  private comList: { [key in TquotationProductComponentsDto['type']]: TquotationProductComponentsDto };
+  private comList: { [key in TquotationProductComponentDto['type']]: TquotationProductComponentDto };
   private _acceIdArr: string[];
 
   private _accessoriesOptionArr: TdoorAccessoryDto[] = [];
@@ -1529,7 +1529,7 @@ class Class_workSheet {
 
 // ======================================================================
 
-const creEmptyCom = (type: TquotationProductComponentsDto['type']): TquotationProductComponentsDto => ({
+const creEmptyCom = (type: TquotationProductComponentDto['type']): TquotationProductComponentDto => ({
   id: '',
   createdAt: '',
   updatedAt: '',

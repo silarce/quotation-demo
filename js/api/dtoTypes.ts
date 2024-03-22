@@ -26,6 +26,8 @@ export type TpageResponse<Tdata> = {
 export type TdoorModel = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
 type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null; // 表面處理
 
+export type TdeliveryStatus = '未安裝' | '已安裝' | '已結清';
+
 // =============================================================
 
 export type TfileDto = {
@@ -828,7 +830,7 @@ export type TquotationContentOtherDto = {
 export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
 
 /**選配設定 */
-export type TquotationProductAccessoriesDto = {
+export type TquotationProductAccessoryDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -846,12 +848,12 @@ export type TquotationProductAccessoriesDto = {
 };
 // 但是後端有建立這個型別
 export type TcreateQuotationProductAccessoriesDto = Omit<
-  TquotationProductAccessoriesDto,
+  TquotationProductAccessoryDto,
   'id' | 'createdAt' | 'updatedAt'
 > & { id?: string };
 
 export type TupdateQuotationProductAccessoryDto = Partial<
-  Omit<TquotationProductAccessoriesDto, 'createdAt' | 'updatedAt'>
+  Omit<TquotationProductAccessoryDto, 'createdAt' | 'updatedAt'>
 >;
 
 type TdoorComponentType =
@@ -865,7 +867,7 @@ type TdoorComponentType =
   | 'headBox';
 
 // 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
-export type TquotationProductComponentsDto = {
+export type TquotationProductComponentDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -900,13 +902,10 @@ export type TquotationProductComponentsDto = {
   //
 };
 // 但是後端有建立這個型別
-export type TcreateQuotationProductComponentDto = Omit<
-  TquotationProductComponentsDto,
-  'id' | 'createdAt' | 'updatedAt'
->;
+export type TcreateQuotationProductComponentDto = Omit<TquotationProductComponentDto, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type TupdateQuotationProductComponentDto = Partial<
-  Omit<TquotationProductComponentsDto, 'createdAt' | 'updatedAt'>
+  Omit<TquotationProductComponentDto, 'createdAt' | 'updatedAt'>
 >;
 
 export type TquotationProductDto = {
@@ -1179,73 +1178,267 @@ export type TupdateDeliveryStatus = {
   completeAppend: string | null;
 };
 
-export type TquotationProductItemDto = Omit<
-  TquotationProductDto,
-  | 'order'
-  | 'items'
-  | 'distributionBoxPrice'
-  | 'distributionBoxUnitPrice'
-  | 'installationFeePrice'
-  | 'installationFeeDualPrice'
-  | 'installationFeeQuantity'
-  | 'installationFeeUnitPrice'
-  | 'installationFeeTotalPrice'
-  | 'attachedToProductId'
-  | 'attachedToProduct'
-  | 'rootProductId'
-  | 'reduceQty'
-  | 'quantity'
-> & {
-  components: TquotationProductComponentsDto[];
-  accessories: TquotationProductAccessoriesDto[];
-  product: TquotationProductDto;
-  productId: string;
+// export type TquotationProductItemDto = Omit<
+//   TquotationProductDto,
+//   | 'order'
+//   | 'items'
+//   | 'distributionBoxPrice'
+//   | 'distributionBoxUnitPrice'
+//   | 'installationFeePrice'
+//   | 'installationFeeDualPrice'
+//   | 'installationFeeQuantity'
+//   | 'installationFeeUnitPrice'
+//   | 'installationFeeTotalPrice'
+//   | 'attachedToProductId'
+//   | 'attachedToProduct'
+//   | 'rootProductId'
+//   | 'reduceQty'
+//   | 'quantity'
+// > & {
+//   components: TquotationProductComponentsDto[];
+//   accessories: TquotationProductAccessoriesDto[];
+//   product: TquotationProductDto;
+//   productId: string;
+//   itemNumber: string;
+//   itemName: string;
+//   others: null;
+//   deliveryStatus?: TengineeringDeliveryStatusDto[] | null;
+//   adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
+//   adjustedItemId?: string | null;
+//   //
+//   // 門片捲片支數
+//   slatCount: string;
+//   // 練齒輪番號
+//   sprocketWheelModel: string;
+//   // 練齒輪大鏈輪
+//   sprocketWheelTeethNumber: string;
+//   // 孔徑 軸徑
+//   bearingInnerDiameter: string;
+//   // 卷軸尺寸
+//   diameter: string;
+//   // 捲軸總長
+//   bearingHousingTotalLength: string;
+//   // 底座開口
+//   guideRailsOpening: string;
+//   //  '捲箱 - 正面'
+//   headBoxFront: string | null;
+//   //  '捲箱 - 有無凸'
+//   headBoxProtruding: string | null;
+//   //  '捲箱 - 角鐵數量'
+//   headBoxAngleIronQuantity: number | null;
+//   //  '支板 - 鏈條'
+//   sidePlateChain: string | null;
+//   //  '支板 - 方向'
+//   sidePlateDirection: string | null;
+//   //  '電動機 - 鍊條形式'
+//   electricMotorChainType: string | null;
+//   //  '電動機 - 方向'
+//   electricMotorDirection: string | null;
+//   //  '門軌 - 型式'
+//   guideRailType: string | null;
+//   // 底座 - 表面
+//   bottomBarSurface: string | null;
+//   // 門軌 - 表面
+//   guideRailSurface: string | null;
+//   //
+//   itemPrice: number | null; // 每一才的價格
+
+//   worksheetId: string | null;
+//   worksheetRecordId: string | null; // 棄用
+// };
+
+export type TquotationProductItemDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 個別產品編號
   itemNumber: string;
+  // 項目名
   itemName: string;
-  others: null;
-  deliveryStatus?: TengineeringDeliveryStatusDto[] | null;
-  adjustedItem?: Omit<TquotationProductItemDto, 'adjustedItem'> | null;
-  adjustedItemId?: string | null;
-  //
-  // 門片捲片支數
-  slatCount: string;
-  // 練齒輪番號
-  sprocketWheelModel: string;
-  // 練齒輪大鏈輪
-  sprocketWheelTeethNumber: string;
-  // 孔徑 軸徑
-  bearingInnerDiameter: string;
-  // 卷軸尺寸
-  diameter: string;
-  // 捲軸總長
-  bearingHousingTotalLength: string;
-  // 底座開口
-  guideRailsOpening: string;
-  //  '捲箱 - 正面'
+  // 折數
+  discount: string;
+  // 報價別
+  quoteType: string;
+  // 門型
+  doorModelName: TdoorModel;
+  // L(mm)全寬
+  fullWidth: number;
+  // W(mm)
+  WG: number;
+  // h(mm)
+  height: number;
+  // B(mm)
+  boxB: number;
+  // D(mm)
+  boxD: number | null;
+  // 面積
+  area: string;
+  // 才數
+  volume: string;
+  // 材料
+  materialName: string;
+  // 表面
+  materialSurface: TmaterialSurface | null;
+  // 門軌
+  guideRail: string;
+  // 馬力
+  horsepower: string;
+  // 馬達廠商
+  motorVendor: string;
+  // 電壓
+  motorVoltage: number;
+  // 馬達支撐架
+  hasMotorSupportStand: boolean;
+  // 底座類型
+  bottomBar: string;
+  // 馬達鎖盒
+  motorLockBox: string;
+  // 門軌厚度
+  guideRailThickness: string;
+  // 捲軸規格
+  rollerSpec: string;
+  // 門軌消音條
+  hasSilencingStrip: boolean;
+  // 一體式捲箱
+  isIntegratedHeadBox: boolean;
+  // 捲箱厚度
+  headBoxThickness: string;
+  // 單價
+  unitPrice: number;
+  // 複價
+  totalPrice: number;
+  // 牌價
+  price: number;
+  // 牌價複價
+  dualPrice: number;
+  // 防颱
+  isAntiTyphoon: boolean;
+  // 彈射門
+  bounceDoor: boolean;
+  // 彈射門寬度
+  bounceDoorWidth: number | null;
+  // 彈射門高度
+  bounceDoorHeight: number | null;
+  // 彈射門長度
+  bounceDoorLength: number | null;
+  // 關閉方式
+  closingType: string;
+  // 備註
+  notes: string;
+  // 相數
+  motorPhase: number;
+  // 底座角鐵
+  bottomBarAngleIron: string;
+  // 底座板
+  bottomBarPlate: string;
+  // 主產品Id
+  productId: string | null;
+  // 門片厚度
+  thickness: string | null;
+  // 配電箱牌價
+  distributionBoxPrice: number | null;
+  // 配電箱單價
+  distributionBoxUnitPrice: number | null;
+  // 配電箱數量
+  distributionBoxQuantity: number | null;
+  // 配電箱牌價複價
+  distributionBoxDualPrice: number | null;
+  // 配電箱複價
+  distributionBoxTotalPrice: number | null;
+  // 安裝費牌價
+  installationFeePrice: number | null;
+  // 安裝費牌價複價
+  installationFeeDualPrice: string | null;
+  // 安裝費數量
+  installationFeeQuantity: string | null;
+  // 安裝費單價
+  installationFeeUnitPrice: number | null;
+  // 安裝費複價
+  installationFeeTotalPrice: string | null;
+  // 門片 - 捲片支數
+  slatCount: string | null;
+  // 鏈齒輪 - 鏈齒輪番號
+  sprocketWheelModel: string | null;
+  // 鏈齒輪 - 大鏈輪
+  sprocketWheelTeethNumber: string | null;
+  // 可能為鍊條數量
+  sprocketWheelChains: string | null;
+  // 鏈齒輪/捲軸 - 孔徑/軸徑
+  bearingInnerDiameter: string | null;
+  // 捲軸 - 尺寸
+  diameter: string | null;
+  // 捲軸 - 總長
+  bearingHousingTotalLength: string | null;
+  // 底座 - 開口
+  guideRailsOpening: string | null;
+  // 門片長度
+  slatLength: number | null;
+  // 門軌長度
+  guideRailLength: number | null;
+  // 捲箱長度
+  headBoxLength: number | null;
+  // 軸承座寸法
+  bearingHousingSize: number | null;
+  // 軸承
+  bearingName: string | null;
+  gapA: string | null;
+  gapC: string | null;
+  gearNumber: string | null;
+  weight: string | null;
+  // 捲箱 - 正面
   headBoxFront: string | null;
-  //  '捲箱 - 有無凸'
+  // 捲箱 - 有無凸
   headBoxProtruding: string | null;
-  //  '捲箱 - 角鐵數量'
+  // 捲箱 - 角鐵數量
   headBoxAngleIronQuantity: number | null;
-  //  '支板 - 鏈條'
+  // 支板 - 鏈條
   sidePlateChain: string | null;
-  //  '支板 - 方向'
+  // 支板 - 方向
   sidePlateDirection: string | null;
-  //  '電動機 - 鍊條形式'
+  // 電動機 - 鍊條形式
   electricMotorChainType: string | null;
-  //  '電動機 - 方向'
+  // 電動機 - 方向
   electricMotorDirection: string | null;
-  //  '門軌 - 型式'
+  // 門軌 - 型式
   guideRailType: string | null;
   // 底座 - 表面
   bottomBarSurface: string | null;
   // 門軌 - 表面
   guideRailSurface: string | null;
-  //
-  itemPrice: number | null; // 每一才的價格
-
+  guideRailG: number | null;
+  isULGuideRail: boolean | null;
+  // 選配設定
+  // accessories: QuotationProductAccessoryDto[];
+  accessories: TquotationProductAccessoryDto[];
+  // 主產品
+  product: TquotationProductDto;
+  // 產品元件
+  // components: QuotationProductComponentDto[];
+  components: TquotationProductComponentDto[];
+  // 請款比例(完成數量)
+  productPayment: TaccountsReceivableProductPaymentDto[];
+  // 出庫狀態詳情
+  deliveryStatus: TengineeringDeliveryStatusDto[];
+  // 審核狀態類別
+  // deliveryStatusType: DeliveryStatus;
+  deliveryStatusType: TdeliveryStatus;
+  // 外包單堂計價
+  itemPrice: number | null;
+  // 工作表id
   worksheetId: string | null;
-  worksheetRecordId: string | null; // 棄用
+  // 工作表紀錄id
+  worksheetRecordId: string | null;
+  // 修正後最新的itemId
+  latestWorksheetItemId: string | null;
+  // 修正後最新的item
+  latestWorksheetItem: TquotationProductItemDto;
+  // 修正後最新的item
+  adjustedWorksheetItems: TquotationProductItemDto[];
+  // 修正後最新的item
+  rootWorksheetItemId: string | null;
+  // 修正後最新的item
+  rootWorksheetItem: TquotationProductItemDto;
 };
 
 type TquotationContentDto_copy = {
@@ -2743,7 +2936,7 @@ export type TupdateWorkSheetItem = {
   productId: string;
   worksheetId: string;
   others: null;
-  components: TquotationProductComponentsDto[];
+  components: TquotationProductComponentDto[];
   accessories: TcreateQuotationProductAccessoriesDto[];
   adjustedItem: undefined;
   adjustedItemId: undefined;
