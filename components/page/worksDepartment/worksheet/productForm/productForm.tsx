@@ -40,6 +40,7 @@ type Tcontrol_basic = {
   material: Tselect;
   height: Tinput;
   isAntiTyphoon: TcheckBox_single;
+  onCalcClick: () => void;
 };
 
 // =====================================================================
@@ -97,7 +98,7 @@ export function Form_Product_basic({
           }}
         />
       </div>
-      <MyButton_v2 preImg="upload" className="block m-auto mr-0 mt-5">
+      <MyButton_v2 preImg="upload" px="px32" className="block m-auto mr-0 mt-5">
         計算
       </MyButton_v2>
     </div>
