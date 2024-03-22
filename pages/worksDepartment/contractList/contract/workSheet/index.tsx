@@ -25,6 +25,9 @@ import ProductCard, {
   Tcontrol_productCard,
   TworksheetIntro,
 } from 'components/page/worksDepartment/worksheet/productCard';
+import RecordList, { Tcontrol_recordList, Trecord } from 'components/page/worksDepartment/worksheet/recordList';
+
+import { Form_Product_basic } from 'components/page/worksDepartment/worksheet/productForm/productForm';
 
 // import WorkSheetProductOutline, {
 //   Tcontrol_productOutline,
@@ -46,7 +49,6 @@ import WorkSheetPDF, {
 import WorkSheetPDF_02, {
   Tcontrol_workSheetPDF_02,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF_02';
-import RecordList, { Tcontrol_recordList, Trecord } from 'components/page/worksDepartment/worksheet/recordList';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -167,7 +169,8 @@ export default function Worksheet({
   const { res: doorModelArr, update: update_doorModelArr, doorModelList } = useApiGetProdDoorModels();
   const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
 
-  // _______________________________________
+  // ________________________________________________________________________
+  // ________________________________________________________________________
 
   const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId);
 
@@ -348,7 +351,7 @@ export default function Worksheet({
 
               const pre_contractProductItems = itemsNoWorksheet.slice(0, qty);
 
-              const contractProductItems = pollyfillContractProductItems(pre_contractProductItems);
+              const contractProductItems = polyfillContractProductItems(pre_contractProductItems);
 
               const body: TcreateWorksheetDto = {
                 contractId,
@@ -368,6 +371,7 @@ export default function Worksheet({
     //
   }, [finalProduct, activeWorksheetId]);
 
+  // ___________________________________________________________________________
   // ___________________________________________________________________________
 
   const control_recordList: Tcontrol_recordList = useMemo(() => {
@@ -443,126 +447,6 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  // const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
-  //   const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
-
-  //   Object.values(sheetList).forEach((subList) => {
-  //     Object.values(subList).forEach((sheet) => {
-  //       const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
-  //         itemName: sheet.itemName,
-  //         size: {
-  //           qty: sheet.quantity,
-  //           doorModelName: sheet.doorModelName,
-  //           fullWidth: sheet.fullWidth_mm,
-  //           height: sheet.height_mm,
-  //           WG: sheet.WG_mm,
-  //           gapA: numToStr(sheet.prodSpec?.gapA),
-  //           gapC: numToStr(sheet.prodSpec?.gapC),
-  //           /**支版尺寸 boxB*boxD */
-  //           BD: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
-  //           /**捲門全高 */
-  //           fullHeight: sheet.fullHeight,
-  //           weightConversion: '', // 未知 // 重量換算 沒有在任一表單顯示
-  //         },
-  //         roller: {
-  //           diameter: `${sheet.diameter}"` ?? '', // 要有 " 符號，代表吋
-  //           bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
-  //           bearingName: sheet.prodSpec?.bearingName ?? '',
-  //           bearingHousingTotalLength: sheet.bearingHousingTotalLength ?? '',
-  //           bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
-  //         },
-  //         headBox: {
-  //           angleIronQty: sheet.headBoxAngleIronQuantity,
-  //           angleIronSize: sheet.angleIronSize,
-  //           form: sheet.headBoxForm_str,
-  //           surface: '',
-  //         },
-  //         doorPiece: {
-  //           material: sheet.com_slat_material,
-  //           surface: sheet.com_slat_surface ?? '',
-  //           thickness: sheet.thickness,
-  //           slatLength: numToStr(sheet.prodSpec?.slatLength),
-  //           slatCount: sheet.slatCount,
-  //           antyTyphoonHook: sheet.isAntiTyphoon ? '有' : '無',
-  //         },
-  //         motor: {
-  //           vendor: sheet.motorVendor,
-  //           /**相數加電壓 */
-  //           phaseVoltage: sheet.motorPhaseVoltage,
-  //           horsepower: sheet.horsepower,
-  //           direction: '', // 未知 // 在廠務部工作表 電動機方向
-  //         },
-  //         guideRail: {
-  //           form: sheet.isAntiTyphoon ? '防颱' : '一般',
-  //           material: sheet.com_guideRail_material,
-  //           guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
-  //           guideRailName: sheet.guideRailName,
-  //           icon: sheet?.guideRailName
-  //             ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
-  //             : undefined,
-  //           antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
-  //           bendStraight: sheet.guideRailType ?? '',
-  //         },
-  //         chainCog: {
-  //           sprocketWheelModel: sheet.sprocketWheelModel ?? '',
-  //           sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber ?? '',
-  //           bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
-  //           teethQuantity: '', // 未知 // 在廠務部工作表 齒數
-  //           centerDistance: '', // 未知 // 在廠務部工作表 中心距
-  //           eyesQuantity: '', // 未知 // 在廠務部工作表 目數
-  //         },
-  //         base: {
-  //           material: sheet.com_bottomBar_material,
-  //           guideRailsOpening: sheet.guideRailsOpening,
-  //           surface: '', // 未知 在廠務部工作表
-  //         },
-  //         sidePlate: {
-  //           direction: '', // 未知 在廠務部工作表
-  //           bigSidePlate: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
-  //           smallSidePlate: `${sheet.boxB_mm}*${sheet.boxB_mm}`,
-  //         },
-  //         memo: sheet.acceNameArr.length > 0 ? sheet.acceNameArr.join('、') : '',
-  //       };
-  //       workSheetPDF_01_itemArr.push(control_item);
-  //     });
-  //   });
-
-  //   const control_workSheetPDF_01: Tcontrol_workSheetPDF_01 = {
-  //     info: {
-  //       contractNumber: profile.projectNumber,
-  //       projectName: profile.projectName,
-  //       projectAddress: profile.allAddress,
-  //       customerName: contract?.content.customer.name ?? '',
-  //       contactPerson: engineeringContact?.contactInfo?.[0]?.contactPerson ?? '',
-  //       // 開單日
-  //       billingDate: workSheet?.createdAt ? getTaiwanDateStr(workSheet.createdAt) ?? '' : '', // 未知
-  //       // 出貨日
-  //       shippingDate: '', // 未知
-  //     },
-  //     itemArr: workSheetPDF_01_itemArr,
-  //     // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
-  //   };
-
-  //   let totalQty_PDF_02 = 0;
-  //   workSheetPDF_01_itemArr.forEach((item) => {
-  //     totalQty_PDF_02 = totalQty_PDF_02 + Number(item.size.qty);
-  //   });
-  //   const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
-  //     info: {
-  //       projectName: profile.projectName,
-  //       totalQty: String(totalQty_PDF_02),
-  //     },
-  //     itemArr: workSheetPDF_01_itemArr,
-  //     // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
-  //   };
-
-  //   return {
-  //     control_workSheetPDF_01,
-  //     control_workSheetPDF_02,
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [sheetList]);
-
   // -------------------------------------------------------------------------
 
   const panelList_allow: TpanelList = [
@@ -636,7 +520,15 @@ export default function Worksheet({
           {/* right */}
           {/* targetSheet */}
           <div className={classNames(scss.right)}>
-            <RecordList control={control_recordList} />
+            {false && <RecordList control={control_recordList} />}
+
+            <form className={scss.productForm}>
+              <div>
+                <Form_Product_basic />
+              </div>
+              <div></div>
+              <div></div>
+            </form>
           </div>
           {/* right */}
         </div>
@@ -795,7 +687,7 @@ const useControl_profile = (engineeringContact: TengineeringContactDto | undefin
   return control_profile;
 };
 
-const pollyfillContractProductItems = (pre_contractProductItems: TquotationProductItemDto[]) => {
+const polyfillContractProductItems = (pre_contractProductItems: TquotationProductItemDto[]) => {
   const contractProductItems = pre_contractProductItems.map((item) => {
     return {
       ...item,
@@ -808,3 +700,137 @@ const pollyfillContractProductItems = (pre_contractProductItems: TquotationProdu
 
   return contractProductItems;
 };
+
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+
+// const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
+//   const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
+
+//   Object.values(sheetList).forEach((subList) => {
+//     Object.values(subList).forEach((sheet) => {
+//       const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
+//         itemName: sheet.itemName,
+//         size: {
+//           qty: sheet.quantity,
+//           doorModelName: sheet.doorModelName,
+//           fullWidth: sheet.fullWidth_mm,
+//           height: sheet.height_mm,
+//           WG: sheet.WG_mm,
+//           gapA: numToStr(sheet.prodSpec?.gapA),
+//           gapC: numToStr(sheet.prodSpec?.gapC),
+//           /**支版尺寸 boxB*boxD */
+//           BD: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
+//           /**捲門全高 */
+//           fullHeight: sheet.fullHeight,
+//           weightConversion: '', // 未知 // 重量換算 沒有在任一表單顯示
+//         },
+//         roller: {
+//           diameter: `${sheet.diameter}"` ?? '', // 要有 " 符號，代表吋
+//           bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
+//           bearingName: sheet.prodSpec?.bearingName ?? '',
+//           bearingHousingTotalLength: sheet.bearingHousingTotalLength ?? '',
+//           bearingHousingSize: numToStr(sheet.prodSpec?.bearingHousingSize),
+//         },
+//         headBox: {
+//           angleIronQty: sheet.headBoxAngleIronQuantity,
+//           angleIronSize: sheet.angleIronSize,
+//           form: sheet.headBoxForm_str,
+//           surface: '',
+//         },
+//         doorPiece: {
+//           material: sheet.com_slat_material,
+//           surface: sheet.com_slat_surface ?? '',
+//           thickness: sheet.thickness,
+//           slatLength: numToStr(sheet.prodSpec?.slatLength),
+//           slatCount: sheet.slatCount,
+//           antyTyphoonHook: sheet.isAntiTyphoon ? '有' : '無',
+//         },
+//         motor: {
+//           vendor: sheet.motorVendor,
+//           /**相數加電壓 */
+//           phaseVoltage: sheet.motorPhaseVoltage,
+//           horsepower: sheet.horsepower,
+//           direction: '', // 未知 // 在廠務部工作表 電動機方向
+//         },
+//         guideRail: {
+//           form: sheet.isAntiTyphoon ? '防颱' : '一般',
+//           material: sheet.com_guideRail_material,
+//           guideRailLength: numToStr(sheet.prodSpec?.guideRailLength),
+//           guideRailName: sheet.guideRailName,
+//           icon: sheet?.guideRailName
+//             ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${sheet?.guideRailName}`
+//             : undefined,
+//           antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
+//           bendStraight: sheet.guideRailType ?? '',
+//         },
+//         chainCog: {
+//           sprocketWheelModel: sheet.sprocketWheelModel ?? '',
+//           sprocketWheelTeethNumber: sheet.sprocketWheelTeethNumber ?? '',
+//           bearingInnerDiameter: sheet.bearingInnerDiameter ?? '',
+//           teethQuantity: '', // 未知 // 在廠務部工作表 齒數
+//           centerDistance: '', // 未知 // 在廠務部工作表 中心距
+//           eyesQuantity: '', // 未知 // 在廠務部工作表 目數
+//         },
+//         base: {
+//           material: sheet.com_bottomBar_material,
+//           guideRailsOpening: sheet.guideRailsOpening,
+//           surface: '', // 未知 在廠務部工作表
+//         },
+//         sidePlate: {
+//           direction: '', // 未知 在廠務部工作表
+//           bigSidePlate: `${sheet.boxB_mm}*${sheet.boxD_mm}`,
+//           smallSidePlate: `${sheet.boxB_mm}*${sheet.boxB_mm}`,
+//         },
+//         memo: sheet.acceNameArr.length > 0 ? sheet.acceNameArr.join('、') : '',
+//       };
+//       workSheetPDF_01_itemArr.push(control_item);
+//     });
+//   });
+
+//   const control_workSheetPDF_01: Tcontrol_workSheetPDF_01 = {
+//     info: {
+//       contractNumber: profile.projectNumber,
+//       projectName: profile.projectName,
+//       projectAddress: profile.allAddress,
+//       customerName: contract?.content.customer.name ?? '',
+//       contactPerson: engineeringContact?.contactInfo?.[0]?.contactPerson ?? '',
+//       // 開單日
+//       billingDate: workSheet?.createdAt ? getTaiwanDateStr(workSheet.createdAt) ?? '' : '', // 未知
+//       // 出貨日
+//       shippingDate: '', // 未知
+//     },
+//     itemArr: workSheetPDF_01_itemArr,
+//     // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+//   };
+
+//   let totalQty_PDF_02 = 0;
+//   workSheetPDF_01_itemArr.forEach((item) => {
+//     totalQty_PDF_02 = totalQty_PDF_02 + Number(item.size.qty);
+//   });
+//   const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
+//     info: {
+//       projectName: profile.projectName,
+//       totalQty: String(totalQty_PDF_02),
+//     },
+//     itemArr: workSheetPDF_01_itemArr,
+//     // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
+//   };
+
+//   return {
+//     control_workSheetPDF_01,
+//     control_workSheetPDF_02,
+//   };
+//   // eslint-disable-next-line react-hooks/exhaustive-deps
+// }, [sheetList]);

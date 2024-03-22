@@ -1,0 +1,20 @@
+.caption01 {
+  // margin-left: 10px;
+  margin-bottom: 30px;
+  color: theme("colors.main");
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px 100px;
+  margin: 0 100px;
+}
+
+// =========================================================
+
+.inputSel_hr.plus {
+  border-color: theme("colors.main");
+}
