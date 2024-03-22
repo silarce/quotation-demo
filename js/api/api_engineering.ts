@@ -733,6 +733,63 @@ export const apiPostWorkSheet = (body: TcreateWorksheetDto) => {
     });
 };
 
+const apiGetWorksheet_id = async (id: string, params?: Tparams) => {
+  const api = `/engineering/worksheet/${id}`;
+
+  return axi
+    .get<TworksheetDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetWorksheet_id = (id: string | undefined | null, { params }: { params?: Tparams } = {}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [res, setRes] = useState<TworksheetDto>();
+
+  params = {
+    populate: [
+      //
+      'records.contractProductItems',
+      'records.reviewSalesEmployee',
+      'records.reviewManagerEmployee',
+      'latestRecord.contractProductItems',
+      'latestRecord.reviewSalesEmployee',
+      'latestRecord.reviewManagerEmployee',
+    ],
+    ...params,
+  };
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiGetWorksheet_id(id, params);
+
+      if (res) {
+        setRes(res);
+      }
+
+      return res;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得工作表失敗', content: err.message });
+    } finally {
+      setIsLoading(true);
+
+      return;
+    }
+  };
+
+  return {
+    isLoading,
+    data: res,
+    update,
+  };
+};
+
 export const apiDeleteWorksheet = async (worksheetId: string) => {
   const api = `/engineering/worksheet/${worksheetId}`;
 

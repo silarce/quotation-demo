@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import _, { update } from 'lodash';
+import _, { set, update } from 'lodash';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 
@@ -46,7 +46,7 @@ import WorkSheetPDF, {
 import WorkSheetPDF_02, {
   Tcontrol_workSheetPDF_02,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF_02';
-import RecordList, { Trecord } from 'components/page/worksDepartment/worksheet/recordList';
+import RecordList, { Tcontrol_recordList, Trecord } from 'components/page/worksDepartment/worksheet/recordList';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -64,6 +64,20 @@ import {
   apiDeleteWorkSheetItem,
   apiPostWorkSheet,
   apiDeleteWorksheet,
+
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  // 接著要做歷程記錄
+  useGetWorksheet_id,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
@@ -127,14 +141,15 @@ export default function Worksheet({
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
 
-  const [activeWorksheetid, setActiveWorksheetid] = useState<string | undefined>(undefined);
-
-  // const [reqPostWorkSheet_dyna, setReqPostWorkSheet_dyna] = useState<(num: number) => void>();
+  const [activeWorksheetId, setActiveWorksheetId] = useState<string | undefined>(undefined);
   const [inputModalProps, setInputModalProps] = useState<Pick<TinputModalProps, 'onConfirm' | 'title'>>();
+
   // const [isShowPdf, setIsShowPdf] = useState(false);
   // const [isShowPdf02, setIsShowPdf02] = useState(false);
 
   // -------------------------------------------------------------------------
+
+  const [activeRecord, setActiveRecord] = useState<TworkSheetDto['records'][number] | undefined>(undefined);
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
@@ -142,30 +157,19 @@ export default function Worksheet({
       //
       'content.customer',
       'engineeringContact',
-      'worksheet.records',
+      // 'worksheet.records',
       'worksheet.latestRecord.reviewSalesEmployee',
       'worksheet.latestRecord.reviewManagerEmployee',
       'worksheet.latestRecord.contractProductItems',
     ],
   });
   const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
-
   const { res: doorModelArr, update: update_doorModelArr, doorModelList } = useApiGetProdDoorModels();
-
   const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
 
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      await Promise.all([
-        //
-        update_contract(),
-        update_finalProduce(),
-        update_doorModelArr(),
-      ]);
-      setIsLoading(false);
-    })();
-  }, [contractId]);
+  // _______________________________________
+
+  const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId);
 
   // -------------------------------------------------------------------------
 
@@ -180,7 +184,7 @@ export default function Worksheet({
 
   // apiPostWorkSheet
   const reqPostWorkSheet = async (body: TcreateWorksheetDto) => {
-    if (isLoading) {
+    if (isLoading || !body.contractProductItems || body.contractProductItems.length === 0) {
       return;
     }
 
@@ -208,6 +212,25 @@ export default function Worksheet({
       setIsLoading(false);
     }
   };
+
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      await Promise.all([
+        //
+        update_contract(),
+        update_finalProduce(),
+        update_doorModelArr(),
+      ]);
+      setIsLoading(false);
+    })();
+  }, [contractId]);
+
+  useEffect(() => {
+    update_worksheetData();
+  }, [activeWorksheetId]);
 
   // -------------------------------------------------------------------------
   const control_profile = useControl_profile(engineeringContact);
@@ -246,18 +269,16 @@ export default function Worksheet({
       });
 
       const worksheetIntroArr: TworksheetIntro[] = Object.values(prodWorkSheetList).map((worksheet) => {
-        const { records, latestRecord } = worksheet;
+        const { latestRecord } = worksheet;
         const {
           contractProductItems,
 
-          // reviewSalesEmployeeId,
           reviewSalesEmployee,
           toReviewSales,
           salesReviewAt,
 
-          // reviewManagerEmployeeId,
           reviewManagerEmployee,
-          toReviewManager,
+          // toReviewManager,
           managerReviewAt,
         } = latestRecord;
 
@@ -285,10 +306,10 @@ export default function Worksheet({
           width: width_m,
           height: height_m,
           qty: String(contractProductItems?.length),
-          isActive: activeWorksheetid === worksheet.id,
+          isActive: activeWorksheetId === worksheet.id,
           reviewStatus,
           onClick: () => {
-            setActiveWorksheetid(worksheet.id);
+            setActiveWorksheetId(worksheet.id);
           },
           onDeleteClick: () => {
             myAlert.confirm({
@@ -327,15 +348,6 @@ export default function Worksheet({
 
               const pre_contractProductItems = itemsNoWorksheet.slice(0, qty);
 
-              // const contractProductItems = pre_contractProductItems.map((item) => {
-              //   return {
-              //     ...item,
-              //     gapA: item.gapA ?? '0',
-              //     gapC: item.gapC ?? '0',
-              //     boxD: item.boxD ?? 0,
-              //     thickness: item.thickness ?? '0',
-              //   };
-              // });
               const contractProductItems = pollyfillContractProductItems(pre_contractProductItems);
 
               const body: TcreateWorksheetDto = {
@@ -354,7 +366,80 @@ export default function Worksheet({
 
     return { control_productCardArr };
     //
-  }, [finalProduct, activeWorksheetid]);
+  }, [finalProduct, activeWorksheetId]);
+
+  // ___________________________________________________________________________
+
+  const control_recordList: Tcontrol_recordList = useMemo(() => {
+    const records = _.sortBy(worksheetData?.records, 'version').reverse();
+
+    const recordArr: Trecord[] = records.map((record) => {
+      const {
+        contractProductItems,
+        reviewSalesEmployee,
+        toReviewSales,
+        salesReviewAt,
+        reviewManagerEmployee,
+        toReviewManager,
+        managerReviewAt,
+      } = record;
+
+      const contractProductItem = contractProductItems?.[0];
+      const {
+        //
+        itemName = '',
+        doorModelName = '',
+        fullWidth = '0',
+        height = '0',
+        materialName = '',
+        isAntiTyphoon = false,
+      } = contractProductItem ?? {};
+
+      const qty = contractProductItems?.length ?? 0;
+
+      const fullWidth_m = new Decimal(fullWidth).div(1000).toString();
+      const height_m = new Decimal(height).div(1000).toString();
+
+      let reviewSalesStatus: Trecord['reviewSalesStatus'] = 'gray';
+
+      if (salesReviewAt) {
+        reviewSalesStatus = 'green';
+      } else if (toReviewSales) {
+        reviewSalesStatus = 'red';
+      }
+
+      let reveiwManagerStatus: Trecord['reveiwManagerStatus'] = 'gray';
+
+      if (managerReviewAt) {
+        reveiwManagerStatus = 'green';
+      } else if (toReviewManager) {
+        reveiwManagerStatus = 'red';
+      }
+
+      const control_record: Trecord = {
+        itemName,
+        doorModel: doorModelName ?? '',
+        fullWidth: fullWidth_m,
+        height: height_m,
+        qty: String(qty),
+        material: materialName,
+        isAntiTyphoon: isAntiTyphoon,
+
+        reviewSalesName: reviewSalesEmployee?.chName ?? '',
+        reviewSalesStatus,
+        reviewManagerName: reviewManagerEmployee?.chName ?? '',
+        reveiwManagerStatus,
+
+        onDetailClick: () => {
+          setActiveRecord(record);
+        },
+      };
+
+      return control_record;
+    });
+
+    return { recordArr };
+  }, [worksheetData]);
 
   // -------------------------------------------------------------------------
 
@@ -551,7 +636,7 @@ export default function Worksheet({
           {/* right */}
           {/* targetSheet */}
           <div className={classNames(scss.right)}>
-            <RecordList control={{ recordArr: fakeRecordArr }} />
+            <RecordList control={control_recordList} />
           </div>
           {/* right */}
         </div>
@@ -590,43 +675,6 @@ export default function Worksheet({
 
 //   return arr;
 // };
-
-// ============================================================================
-
-// ============================================================================
-
-const fakeRecordArr: Trecord[] = [
-  {
-    itemName: 'NNAAMMEE',
-    doorModel: 'aaa',
-    fullWidth: '2',
-    height: '2',
-    qty: '5',
-    material: 'aaa',
-    isAntyTyphoon: true,
-
-    reviewSalesName: 'AAAA',
-    reviewSalesStatus: 'green',
-
-    reviewManagerName: 'BBBB',
-    reveiwManagerStatus: 'red',
-  },
-  {
-    itemName: 'NNAAMMEE',
-    doorModel: 'aaa',
-    fullWidth: '2',
-    height: '2',
-    qty: '5',
-    material: 'aaa',
-    isAntyTyphoon: false,
-
-    reviewSalesName: 'AAAA',
-    reviewSalesStatus: 'green',
-
-    reviewManagerName: 'BBBB',
-    reveiwManagerStatus: 'red',
-  },
-];
 
 // ============================================================================
 

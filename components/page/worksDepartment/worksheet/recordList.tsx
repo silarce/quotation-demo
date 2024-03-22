@@ -9,9 +9,6 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 // icon
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
-// type
-import { TemployeeDto } from 'js/api/dtoTypes';
-
 // ===========================================================================
 
 type Trecord = {
@@ -21,13 +18,15 @@ type Trecord = {
   height: string;
   qty: string;
   material: string;
-  isAntyTyphoon: boolean;
+  isAntiTyphoon: boolean;
 
   reviewSalesName: string;
   reviewSalesStatus: TstatusLabelProps['dotColor'];
 
   reviewManagerName: string;
   reveiwManagerStatus: TstatusLabelProps['dotColor'];
+
+  onDetailClick?: (e: React.MouseEvent) => void;
 };
 
 type Tcontrol = {
@@ -41,17 +40,6 @@ export default function RecordList({ control }: { control: Tcontrol }) {
   const { recordArr } = control;
 
   // ------------------------------------------------------
-
-  const control_processChain_fake: Tcontrol_processChain['statusArr'] = [
-    {
-      label: '業務',
-      dotColor: 'green',
-    },
-    {
-      label: '總經理',
-      dotColor: 'green',
-    },
-  ];
 
   // ------------------------------------------------------
 
@@ -68,7 +56,7 @@ export default function RecordList({ control }: { control: Tcontrol }) {
           <span>{'全寬(L)'}</span>
         </div>
         <div className={scss.cell} style={config.height.style}>
-          <span>{'淨高(Ｈ)'}</span>
+          <span>{'淨高(h)'}</span>
         </div>
         <div className={scss.cell} style={config.qty.style}>
           <span>{'數量'}</span>
@@ -90,11 +78,12 @@ export default function RecordList({ control }: { control: Tcontrol }) {
           height,
           qty,
           material,
-          isAntyTyphoon,
+          isAntiTyphoon: isAntyTyphoon,
           reviewSalesName,
           reviewSalesStatus,
           reviewManagerName,
           reveiwManagerStatus,
+          onDetailClick,
         } = record;
 
         const control_processChain: Tcontrol_processChain['statusArr'] = [
@@ -142,7 +131,7 @@ export default function RecordList({ control }: { control: Tcontrol }) {
                 />
               </div>
               <div className={scss.cell} style={config.btn.style}>
-                <IconDetail />
+                <IconDetail onClick={onDetailClick} />
               </div>
             </div>
             <ProcessChain className={scss.processChain} control={{ statusArr: control_processChain }} />

@@ -1539,7 +1539,7 @@ const fakeRecordArr: Trecord[] = [
     height: '2',
     qty: '5',
     material: 'aaa',
-    isAntyTyphoon: true,
+    isAntiTyphoon: true,
 
     reviewSalesName: 'AAAA',
     reviewSalesStatus: 'green',
@@ -1554,7 +1554,7 @@ const fakeRecordArr: Trecord[] = [
     height: '2',
     qty: '5',
     material: 'aaa',
-    isAntyTyphoon: false,
+    isAntiTyphoon: false,
 
     reviewSalesName: 'AAAA',
     reviewSalesStatus: 'green',
