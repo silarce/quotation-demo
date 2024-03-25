@@ -232,18 +232,66 @@ type Tcontrol_ABCD = {
   boxD: Tinput;
 };
 
-function Form_product_ABCD({
-  //
-  control,
-}: {
-  control?: Tcontrol_ABCD;
-}) {
+function Form_product_ABCD() {
+  const { ABCD, setABCD } = useWorksheet((state) => ({
+    ABCD: state.ABCD,
+    setABCD: state.setABCD,
+  }));
+
   return (
     <div className={scss.grid}>
-      <InputSel {...basicConfig} caption="機械縫 A" inputProps={{}} />
-      <InputSel {...basicConfig} caption="機械縫 C" inputProps={{}} />
-      <InputSel {...basicConfig} caption="支板尺寸 B" inputProps={{}} />
-      <InputSel {...basicConfig} caption="支板尺寸 D" inputProps={{}} />
+      <InputSel
+        {...basicConfig}
+        caption="機械縫 A"
+        inputProps={{
+          props: {
+            type: 'number',
+            value: ABCD.gapA,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setABCD({ key: 'gapA', value: e.target.value });
+            },
+          },
+        }}
+      />
+      <InputSel
+        {...basicConfig}
+        caption="機械縫 C"
+        inputProps={{
+          props: {
+            type: 'number',
+            value: ABCD.gapC,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setABCD({ key: 'gapC', value: e.target.value });
+            },
+          },
+        }}
+      />
+      <InputSel
+        {...basicConfig}
+        caption="支板尺寸 B"
+        inputProps={{
+          props: {
+            type: 'number',
+            value: ABCD.boxB,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setABCD({ key: 'boxB', value: e.target.value });
+            },
+          },
+        }}
+      />
+      <InputSel
+        {...basicConfig}
+        caption="支板尺寸 D"
+        inputProps={{
+          props: {
+            type: 'number',
+            value: ABCD.boxD,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setABCD({ key: 'boxD', value: e.target.value });
+            },
+          },
+        }}
+      />
     </div>
   );
 }

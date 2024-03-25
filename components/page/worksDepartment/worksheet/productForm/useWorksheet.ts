@@ -13,6 +13,9 @@ import { checkIsFloat } from 'js/utils/checkValue';
 
 // =====================================================================
 
+// 簡略set目錄
+// setBasicSpec
+
 type Tworksheet = {
   readonly contractProductItem_ori: TquotationProductItemDto | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
@@ -29,6 +32,12 @@ type Tworksheet = {
     height: string;
     material: string;
     isAntiTyphoon: boolean;
+  };
+  ABCD: {
+    gapA: string;
+    gapC: string;
+    boxB: string;
+    boxD: string;
   };
   //
   init: (props: {
@@ -63,6 +72,9 @@ type Tworksheet = {
   setBasicSpec_bool: (props: { key: 'isAntiTyphoon'; value: boolean }) => void;
 
   //
+  setABCD: (props: { key: keyof Tworksheet['ABCD']; value: string }) => void;
+
+  //
 };
 
 const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
@@ -74,6 +86,7 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       itemIdArr: [],
       qty: 0,
       //
+
       basicSpec: {
         itemName: '',
         doorModelName: '',
@@ -84,6 +97,14 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
         material: '',
         isAntiTyphoon: false,
       },
+
+      ABCD: {
+        gapA: '',
+        gapC: '',
+        boxB: '',
+        boxD: '',
+      },
+
       //
       init: ({ itemIdArr, contractProductItem, qty }) =>
         set((state) => {
@@ -99,6 +120,13 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
             height: new Decimal(contractProductItem?.height || 0).div(1000).toFixed(2),
             material: contractProductItem?.materialName ?? '',
             isAntiTyphoon: contractProductItem?.isAntiTyphoon ?? false,
+          };
+
+          state.ABCD = {
+            gapA: contractProductItem?.gapA ?? '',
+            gapC: contractProductItem?.gapC ?? '',
+            boxB: String(contractProductItem?.boxB ?? ''),
+            boxD: String(contractProductItem?.boxD ?? ''),
           };
         }), // inite
       //
@@ -148,6 +176,13 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       setBasicSpec_material: (str) => {
         set((state) => {
           state.basicSpec.material = str;
+        });
+      },
+
+      //
+      setABCD: ({ key, value }) => {
+        set((state) => {
+          state.ABCD[key] = value;
         });
       },
       //
