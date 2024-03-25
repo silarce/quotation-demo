@@ -404,16 +404,6 @@ function Form_product_motor() {
 
 // =====================================================================
 
-type Tcontrol_headBox = {
-  material: Tselect; // 材質  comList.headBox.material
-  headBoxThickness: Tselect; // 厚度
-  surface: Tselect; // 表面 comList.headBox.materialSurface
-  headBoxFront: Tselect; //正面 // 正雲白 正乳白
-  headBoxProtruding: Tselect; // 有無凸 //  雙凸 無凸
-  isIntegratedHeadBox: Tselect; // 形式 // 一體式捲箱 捲箱加機箱
-  headBoxAngleIronQuantity: Tinput; // 角鐵數量
-};
-
 function Form_product_headBox() {
   const {
     //
@@ -544,12 +534,37 @@ function Form_product_roller({
 }: {
   control?: Tcontrol_roller;
 }) {
+  const { roller, setRoller_str } = useWorksheet((state) => ({
+    roller: state.roller,
+    setRoller_str: state.setRoller_str,
+  }));
+
   return (
     <div>
       <p className={scss.caption}>●捲軸</p>
       <div className={scss.grid}>
-        <InputSel {...basicConfig} caption="尺寸" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="有無凸" inputProps={{}} />
+        <InputSel
+          {...basicConfig}
+          caption="尺寸"
+          selectProps={{
+            props: {
+              value: { value: roller.diameter, label: roller.diameter },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="有無凸"
+          selectProps={{
+            props: {
+              value: { value: roller.rollerSpec, label: roller.rollerSpec },
+              options: optionsCreator_rollerSpec(),
+              onChange: (option) => {
+                setRoller_str({ key: 'rollerSpec', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
       </div>
     </div>
   );

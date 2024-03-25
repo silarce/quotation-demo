@@ -62,6 +62,15 @@ type Tworksheet = {
     getElectricSupply: () => string;
   };
 
+  // | 'slat'
+  // | 'bottomBar'
+  // | 'guideRail'
+  // | 'sidePlate'
+  // | 'roller'
+  // | 'motor'
+  // | 'motorAccessories'
+  // | 'headBox';
+
   headBox: {
     material: string;
     headBoxThickness: string;
@@ -71,6 +80,11 @@ type Tworksheet = {
     isIntegratedHeadBox: boolean;
     headBoxAngleIronQuantity: string;
     getIsIntegratedHeadBox: () => string;
+  };
+
+  roller: {
+    diameter: string;
+    rollerSpec: string;
   };
 
   //
@@ -125,6 +139,10 @@ type Tworksheet = {
   }) => void;
 
   setHeadBox_bool: (props: { key: 'isIntegratedHeadBox'; value: boolean }) => void;
+
+  // -----------------------------------------------------------------------------
+
+  setRoller_str: (props: { key: 'diameter' | 'rollerSpec'; value: string }) => void;
 
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
@@ -189,6 +207,11 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
 
           return isIntegratedHeadBox ? '一體式捲箱' : '捲箱加機箱';
         },
+      },
+
+      roller: {
+        diameter: '',
+        rollerSpec: '',
       },
 
       // ---------------------------------------------------------------------
@@ -261,6 +284,11 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
             isIntegratedHeadBox: !!contractProductItem?.isIntegratedHeadBox,
             headBoxAngleIronQuantity: String(contractProductItem?.headBoxAngleIronQuantity ?? '0'),
             getIsIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox,
+          };
+
+          state.roller = {
+            diameter: contractProductItem?.diameter ?? '',
+            rollerSpec: contractProductItem?.rollerSpec ?? '',
           };
         }), // inite
       //
@@ -344,6 +372,14 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       setHeadBox_bool: ({ key, value }) => {
         set((state) => {
           state.headBox[key] = value;
+        });
+      },
+
+      // ---------------------------------------------------------------------
+
+      setRoller_str: ({ key, value }) => {
+        set((state) => {
+          state.roller[key] = value;
         });
       },
 
