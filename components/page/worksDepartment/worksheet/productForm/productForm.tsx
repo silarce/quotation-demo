@@ -19,6 +19,15 @@ import { useApiGetProdDoorModels } from 'js/api/api_product';
 // zustand
 import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 
+import {
+  optionsCreator_motorSupply,
+  optionsCreator_horsePower,
+  optionsCreator_motorSupportStand,
+  optionsCreator_motorLockBox,
+  optionsCreator_chainType,
+  optionsCreator_direction,
+} from 'js/utils/options/productOptions';
+
 // =====================================================================
 
 // | 'slat'
@@ -225,13 +234,6 @@ function Form_product_basic() {
 
 // =====================================================================
 
-type Tcontrol_ABCD = {
-  gapA: Tinput;
-  gapC: Tinput;
-  boxB: Tinput;
-  boxD: Tinput;
-};
-
 function Form_product_ABCD() {
   const { ABCD, setABCD } = useWorksheet((state) => ({
     ABCD: state.ABCD,
@@ -298,33 +300,110 @@ function Form_product_ABCD() {
 
 // =====================================================================
 
-type Tcontrol_motor = {
-  horsepower: Tselect; // 馬力
-  electricSupply: Tselect; // 電供 下拉是選單 同時選擇電壓與電相
-  vendor: Tselect; // 廠商
-  hasMotorSupportStand: Tselect; // 馬達支撐架
-  electricMotorChainType: Tselect; // 鏈條型式 // 單排 雙排
-  motorLockBox: Tselect; // 馬達鎖盒 // 防盜式 外露式
-  electricMotorDirection: Tselect; // 方向 // 左右
-};
+function Form_product_motor() {
+  const { motor, setMotor_supply, setMotor_str } = useWorksheet((state) => ({
+    motor: state.motor,
+    setMotor_supply: state.setMotor_supply,
+    setMotor_str: state.setMotor_str,
+  }));
 
-function Form_product_motor({
-  //
-  control,
-}: {
-  control?: Tcontrol_motor;
-}) {
   return (
     <div>
       <p className={scss.caption}>●電動機</p>
       <div className={scss.grid}>
-        <InputSel {...basicConfig} caption="馬力" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="電供" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="廠商" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="馬達支撐架" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="鏈條型式" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="馬達鎖盒" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="方向" selectProps={selectPropsAccessor()} />
+        {/* motor */}
+        <InputSel
+          {...basicConfig}
+          caption="電供"
+          selectProps={{
+            props: {
+              options: optionsCreator_motorSupply(),
+              value: { value: motor.getElectricSupply(), label: motor.getElectricSupply() },
+              onChange: (option) => {
+                const phase = option?.phase as string | undefined;
+                const voltage = option?.voltage as string | undefined;
+
+                if (phase && voltage) {
+                  setMotor_supply({ phase, voltage });
+                }
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="馬力"
+          selectProps={{
+            props: {
+              options: optionsCreator_horsePower(),
+              value: { value: motor.horsepower, label: motor.horsepower },
+              onChange: (option) => {
+                // setMotor_horsepower(option?.value ?? '');
+                setMotor_str({ key: 'horsepower', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="廠商"
+          selectProps={{ props: { value: { value: motor.vendor, label: motor.vendor } } }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="馬達支撐架"
+          selectProps={{
+            props: {
+              options: optionsCreator_motorSupportStand(),
+              value: { value: motor.hasMotorSupportStand, label: motor.hasMotorSupportStand },
+              onChange: (option) => {
+                setMotor_str({ key: 'hasMotorSupportStand', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="鏈條型式"
+          selectProps={{
+            props: {
+              options: optionsCreator_chainType(),
+              value: { value: motor.electricMotorChainType, label: motor.electricMotorChainType },
+              onChange: (option) => {
+                setMotor_str({ key: 'electricMotorChainType', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="馬達鎖盒"
+          selectProps={{
+            props: {
+              options: optionsCreator_motorLockBox(),
+              value: { value: motor.motorLockBox, label: motor.motorLockBox },
+              onChange: (option) => {
+                setMotor_str({ key: 'motorLockBox', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="方向"
+          selectProps={{
+            props: {
+              options: optionsCreator_direction(),
+              value: {
+                value: motor.electricMotorDirection,
+                label: motor.electricMotorDirection,
+              },
+              onChange: (option) => {
+                setMotor_str({ key: 'electricMotorDirection', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
       </div>
     </div>
   );
@@ -545,5 +624,3 @@ export {
   Form_product_sidePlate,
   //
 };
-
-export type { Tcontrol_ABCD };

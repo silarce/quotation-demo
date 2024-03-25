@@ -10,6 +10,7 @@ import { TquotationProductItemDto, TupdateWorkSheetItem, TdoorModelInfoDto } fro
 import { Toption } from 'js/utils/options/options';
 
 import { checkIsFloat } from 'js/utils/checkValue';
+import { lookup_motorPhase } from 'config/product/lookup';
 
 // =====================================================================
 
@@ -33,12 +34,29 @@ type Tworksheet = {
     material: string;
     isAntiTyphoon: boolean;
   };
+
   ABCD: {
     gapA: string;
     gapC: string;
     boxB: string;
     boxD: string;
   };
+
+  motor: {
+    horsepower: string;
+
+    motorVoltage: string;
+    motorPhase: string;
+
+    vendor: string;
+    hasMotorSupportStand: string;
+    electricMotorChainType: string;
+    motorLockBox: string;
+    electricMotorDirection: string;
+
+    getElectricSupply: () => string;
+  };
+
   //
   init: (props: {
     itemIdArr: Tworksheet['itemIdArr'];
@@ -50,10 +68,9 @@ type Tworksheet = {
 
   getOptions_material: () => Toption[];
 
-  //
+  // -----------------------------------------------------------------------------
 
   setBasicSpec_str: (props: {
-    //
     key: keyof Omit<
       Exclude<Tworksheet['basicSpec'], undefined>,
       'isAntiTyphoon' | 'fullWidth' | 'WG' | 'height' | 'doorModelName'
@@ -71,9 +88,20 @@ type Tworksheet = {
 
   setBasicSpec_bool: (props: { key: 'isAntiTyphoon'; value: boolean }) => void;
 
-  //
+  // -----------------------------------------------------------------------------
+
   setABCD: (props: { key: keyof Tworksheet['ABCD']; value: string }) => void;
 
+  // -----------------------------------------------------------------------------
+
+  setMotor_supply: (props: { phase: string; voltage: string }) => void;
+
+  setMotor_str: (props: {
+    key: 'horsepower' | 'electricMotorChainType' | 'hasMotorSupportStand' | 'motorLockBox' | 'electricMotorDirection';
+    value: string;
+  }) => void;
+
+  // -----------------------------------------------------------------------------
   //
 };
 
@@ -82,10 +110,10 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
     (set, get) => ({
       contractProductItem_ori: undefined,
       doorModelInfo: undefined,
-      //
+      // ---------------------------------------------------------------------
       itemIdArr: [],
       qty: 0,
-      //
+      // ---------------------------------------------------------------------
 
       basicSpec: {
         itemName: '',
@@ -105,6 +133,26 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
         boxD: '',
       },
 
+      motor: {
+        horsepower: '',
+
+        motorVoltage: '',
+        motorPhase: '',
+
+        vendor: '',
+        hasMotorSupportStand: '',
+        electricMotorChainType: '',
+        motorLockBox: '',
+        electricMotorDirection: '',
+        getElectricSupply: () => {
+          const { motorVoltage, motorPhase } = get().motor;
+
+          return `${lookup_motorPhase[motorPhase as '1' | '3'] ?? ''} ${motorVoltage}V`;
+        },
+      },
+
+      // ---------------------------------------------------------------------
+      // ---------------------------------------------------------------------
       //
       init: ({ itemIdArr, contractProductItem, qty }) =>
         set((state) => {
@@ -128,6 +176,18 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
             boxB: String(contractProductItem?.boxB ?? ''),
             boxD: String(contractProductItem?.boxD ?? ''),
           };
+
+          state.motor = {
+            horsepower: String(contractProductItem?.horsepower ?? ''),
+            motorVoltage: String(contractProductItem?.motorVoltage ?? ''),
+            motorPhase: String(contractProductItem?.motorPhase ?? ''),
+            vendor: contractProductItem?.motorVendor ?? '',
+            hasMotorSupportStand: contractProductItem?.hasMotorSupportStand ? '有' : '無',
+            electricMotorChainType: contractProductItem?.electricMotorChainType ?? '',
+            motorLockBox: contractProductItem?.motorLockBox ?? '',
+            electricMotorDirection: contractProductItem?.electricMotorDirection ?? '',
+            getElectricSupply: state.motor.getElectricSupply,
+          };
         }), // inite
       //
       //
@@ -149,6 +209,8 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       },
 
       //
+      // ---------------------------------------------------------------------
+
       setBasicSpec_str: ({ key, value }) => {
         set((state) => {
           if (state.basicSpec) {
@@ -175,12 +237,29 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
         });
       },
 
-      //
+      // ---------------------------------------------------------------------
+
       setABCD: ({ key, value }) => {
         set((state) => {
           state.ABCD[key] = value;
         });
       },
+
+      // ---------------------------------------------------------------------
+
+      setMotor_supply: ({ phase, voltage }) => {
+        set((state) => {
+          state.motor.motorVoltage = voltage;
+          state.motor.motorPhase = phase;
+        });
+      },
+
+      setMotor_str: ({ key, value }) => {
+        set((state) => {
+          state.motor[key] = value;
+        });
+      },
+
       //
     }) // set get
   ) //immer
