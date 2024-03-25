@@ -87,6 +87,11 @@ type Tworksheet = {
     rollerSpec: string;
   };
 
+  slat: {
+    material: string;
+    surface: string;
+  };
+
   //
   init: (props: {
     itemIdArr: Tworksheet['itemIdArr'];
@@ -143,6 +148,10 @@ type Tworksheet = {
   // -----------------------------------------------------------------------------
 
   setRoller_str: (props: { key: 'diameter' | 'rollerSpec'; value: string }) => void;
+
+  // -----------------------------------------------------------------------------
+
+  setSlat_str: (props: { key: 'material' | 'surface'; value: string }) => void;
 
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
@@ -212,6 +221,11 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       roller: {
         diameter: '',
         rollerSpec: '',
+      },
+
+      slat: {
+        material: '',
+        surface: '',
       },
 
       // ---------------------------------------------------------------------
@@ -290,6 +304,14 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
             diameter: contractProductItem?.diameter ?? '',
             rollerSpec: contractProductItem?.rollerSpec ?? '',
           };
+
+          state.slat = {
+            material: componentList?.slat?.material ?? '',
+            surface: componentList?.slat?.materialSurface ?? '',
+          };
+
+          //
+          //
         }), // inite
       //
       //
@@ -380,6 +402,14 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       setRoller_str: ({ key, value }) => {
         set((state) => {
           state.roller[key] = value;
+        });
+      },
+
+      // ---------------------------------------------------------------------
+
+      setSlat_str: ({ key, value }) => {
+        set((state) => {
+          state.slat[key] = value;
         });
       },
 

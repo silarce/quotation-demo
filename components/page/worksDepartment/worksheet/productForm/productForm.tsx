@@ -523,17 +523,7 @@ function Form_product_headBox() {
 
 // =====================================================================
 
-type Tcontrol_roller = {
-  diameter: Tselect; // 直徑
-  rollerSpec: Tselect; // 有無凸 //  雙凸 無凸
-};
-
-function Form_product_roller({
-  //
-  control,
-}: {
-  control?: Tcontrol_roller;
-}) {
+function Form_product_roller() {
   const { roller, setRoller_str } = useWorksheet((state) => ({
     roller: state.roller,
     setRoller_str: state.setRoller_str,
@@ -583,12 +573,42 @@ function Form_product_slat({
 }: {
   control?: Tcontrol_slat;
 }) {
+  const { slat, setSlat_str, getOptions_material } = useWorksheet((state) => ({
+    slat: state.slat,
+    setSlat_str: state.setSlat_str,
+    getOptions_material: state.getOptions_material,
+  }));
+
   return (
     <div>
       <p className={scss.caption}>●門片</p>
       <div className={scss.grid}>
-        <InputSel {...basicConfig} caption="材質`" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="表面" selectProps={selectPropsAccessor()} />
+        <InputSel
+          {...basicConfig}
+          caption="材質`"
+          selectProps={{
+            props: {
+              value: { value: slat.material, label: slat.material },
+              options: getOptions_material(),
+              onChange: (option) => {
+                setSlat_str({ key: 'material', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="表面"
+          selectProps={{
+            props: {
+              value: { value: slat.surface, label: slat.surface },
+              options: optionsCreator_surface(),
+              onChange: (option) => {
+                setSlat_str({ key: 'surface', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
       </div>
     </div>
   );
