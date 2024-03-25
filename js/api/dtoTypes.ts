@@ -24,7 +24,7 @@ export type TpageResponse<Tdata> = {
 };
 
 export type TdoorModel = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
-type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null; // 表面處理
+export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null; // 表面處理
 
 export type TdeliveryStatus = '未安裝' | '已安裝' | '已結清';
 
@@ -846,7 +846,7 @@ export type TquotationProductAccessoryDto = {
   order: number;
   referenceSpec: string | null;
 };
-// 但是後端有建立這個型別
+
 export type TcreateQuotationProductAccessoriesDto = Omit<
   TquotationProductAccessoryDto,
   'id' | 'createdAt' | 'updatedAt'
@@ -866,7 +866,6 @@ type TdoorComponentType =
   | 'motorAccessories'
   | 'headBox';
 
-// 後端其實沒有建立這個型別 // 後端其實沒有建立這個型別
 export type TquotationProductComponentDto = {
   id: string;
   createdAt: string;
@@ -901,7 +900,7 @@ export type TquotationProductComponentDto = {
   density: string | null;
   //
 };
-// 但是後端有建立這個型別
+
 export type TcreateQuotationProductComponentDto = Omit<TquotationProductComponentDto, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type TupdateQuotationProductComponentDto = Partial<
@@ -920,13 +919,13 @@ export type TquotationProductDto = {
   quoteType: string;
   // 門型
   doorModelName: TdoorModel;
-  // L(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
+  // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
   fullWidth: number;
-  // W(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
+  // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
   WG: number;
-  // h(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
+  // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
   height: number;
-  // B(m) // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm，所以要換算
+  // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
   boxB: number;
   boxD: number | null;
   // 面積
