@@ -149,8 +149,6 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       },
 
       //
-      //
-      //
       setBasicSpec_str: ({ key, value }) => {
         set((state) => {
           if (state.basicSpec) {
@@ -160,9 +158,7 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       },
       setBasicSpec_strNum: ({ key, value }) => {
         set((state) => {
-          if (checkIsFloat(value) || value === '') {
-            state.basicSpec[key] = value;
-          }
+          state.basicSpec[key] = value;
         });
       },
       setBasicSpec_bool: ({ key, value }) => {
