@@ -6,7 +6,14 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
 // type
-import { TquotationProductItemDto, TupdateWorkSheetItem, TdoorModelInfoDto } from 'js/api/dtoTypes';
+import {
+  //
+  TquotationProductItemDto,
+  TupdateWorkSheetItem,
+  TdoorModelInfoDto,
+  TquotationProductComponentDto,
+  TdoorComponentType,
+} from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
 import { checkIsFloat } from 'js/utils/checkValue';
@@ -20,6 +27,7 @@ import { lookup_motorPhase } from 'config/product/lookup';
 type Tworksheet = {
   readonly contractProductItem_ori: TquotationProductItemDto | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
+  componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
   //
   itemIdArr: string[];
   qty: number;
@@ -44,17 +52,25 @@ type Tworksheet = {
 
   motor: {
     horsepower: string;
-
     motorVoltage: string;
     motorPhase: string;
-
     vendor: string;
     hasMotorSupportStand: string;
     electricMotorChainType: string;
     motorLockBox: string;
     electricMotorDirection: string;
-
     getElectricSupply: () => string;
+  };
+
+  headBox: {
+    material: string;
+    headBoxThickness: string;
+    surface: string;
+    headBoxFront: string;
+    headBoxProtruding: string;
+    isIntegratedHeadBox: boolean;
+    headBoxAngleIronQuantity: string;
+    getIsIntegratedHeadBox: () => string;
   };
 
   //
@@ -102,6 +118,16 @@ type Tworksheet = {
   }) => void;
 
   // -----------------------------------------------------------------------------
+
+  setHeadBox_str: (props: {
+    key: Exclude<keyof Tworksheet['headBox'], 'isIntegratedHeadBox' | 'getIsIntegratedHeadBox'>;
+    value: string;
+  }) => void;
+
+  setHeadBox_bool: (props: { key: 'isIntegratedHeadBox'; value: boolean }) => void;
+
+  // -----------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------
   //
 };
 
@@ -110,6 +136,7 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
     (set, get) => ({
       contractProductItem_ori: undefined,
       doorModelInfo: undefined,
+      componentList: undefined,
       // ---------------------------------------------------------------------
       itemIdArr: [],
       qty: 0,
@@ -135,10 +162,8 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
 
       motor: {
         horsepower: '',
-
         motorVoltage: '',
         motorPhase: '',
-
         vendor: '',
         hasMotorSupportStand: '',
         electricMotorChainType: '',
@@ -151,14 +176,52 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
         },
       },
 
+      headBox: {
+        material: '',
+        headBoxThickness: '',
+        surface: '',
+        headBoxFront: '',
+        headBoxProtruding: '',
+        isIntegratedHeadBox: false,
+        headBoxAngleIronQuantity: '0',
+        getIsIntegratedHeadBox: () => {
+          const isIntegratedHeadBox = get().headBox.isIntegratedHeadBox;
+
+          return isIntegratedHeadBox ? '一體式捲箱' : '捲箱加機箱';
+        },
+      },
+
       // ---------------------------------------------------------------------
       // ---------------------------------------------------------------------
       //
       init: ({ itemIdArr, contractProductItem, qty }) =>
         set((state) => {
+          // ____________________________________________________________________
+          // ____________________________________________________________________
+
+          const componentArr = contractProductItem?.components;
+
+          const componentList = (() => {
+            if (!componentArr) {
+              return undefined;
+            }
+
+            const list: Partial<Tworksheet['componentList']> = {};
+            componentArr?.forEach((component) => {
+              list[component.type] = component;
+            });
+
+            return list as Required<Tworksheet['componentList']>;
+          })();
+
+          // ____________________________________________________________________
+          // ____________________________________________________________________
           state.itemIdArr = itemIdArr;
           state.qty = qty;
           state.contractProductItem_ori = contractProductItem;
+          state.componentList = componentList;
+          // ____________________________________________________________________
+          // ____________________________________________________________________
           state.basicSpec = {
             itemName: contractProductItem?.itemName ?? '',
             doorModelName: contractProductItem?.doorModelName ?? '',
@@ -187,6 +250,17 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
             motorLockBox: contractProductItem?.motorLockBox ?? '',
             electricMotorDirection: contractProductItem?.electricMotorDirection ?? '',
             getElectricSupply: state.motor.getElectricSupply,
+          };
+
+          state.headBox = {
+            material: componentList?.headBox?.material ?? '',
+            headBoxThickness: String(contractProductItem?.thickness ?? ''),
+            surface: componentList?.headBox?.materialSurface ?? '',
+            headBoxFront: contractProductItem?.headBoxFront ?? '',
+            headBoxProtruding: contractProductItem?.headBoxProtruding ?? '',
+            isIntegratedHeadBox: !!contractProductItem?.isIntegratedHeadBox,
+            headBoxAngleIronQuantity: String(contractProductItem?.headBoxAngleIronQuantity ?? '0'),
+            getIsIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox,
           };
         }), // inite
       //
@@ -259,6 +333,23 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
           state.motor[key] = value;
         });
       },
+      // ---------------------------------------------------------------------
+
+      setHeadBox_str: ({ key, value }) => {
+        set((state) => {
+          state.headBox[key] = value;
+        });
+      },
+
+      setHeadBox_bool: ({ key, value }) => {
+        set((state) => {
+          state.headBox[key] = value;
+        });
+      },
+
+      // ---------------------------------------------------------------------
+      // ---------------------------------------------------------------------
+      // ---------------------------------------------------------------------
 
       //
     }) // set get

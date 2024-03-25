@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { use, useEffect, useMemo } from 'react';
 
 import classNames from 'classnames';
 
@@ -26,6 +26,10 @@ import {
   optionsCreator_motorLockBox,
   optionsCreator_chainType,
   optionsCreator_direction,
+  optionsCreator_isIntegratedHeadBox,
+  optionsCreator_surface,
+  optionsCreator_front,
+  optionsCreator_rollerSpec,
 } from 'js/utils/options/productOptions';
 
 // =====================================================================
@@ -60,17 +64,6 @@ type TcheckBox_single = {
 };
 
 // =====================================================================
-// type Tcontrol_basic = {
-//   itemName: Tinput;
-//   doorModel: Tselect;
-//   fullWidth: Tinput;
-//   qty: string;
-//   WG: Tinput;
-//   material: Tselect;
-//   height: Tinput;
-//   isAntiTyphoon: TcheckBox_single;
-//   onCalcClick: () => void;
-// };
 
 function Form_product_basic() {
   const { res: doorModelArr, update: update_doorModel, doorModelList } = useApiGetProdDoorModels();
@@ -421,23 +414,118 @@ type Tcontrol_headBox = {
   headBoxAngleIronQuantity: Tinput; // 角鐵數量
 };
 
-function Form_product_headBox({
-  //
-  control,
-}: {
-  control?: Tcontrol_headBox;
-}) {
+function Form_product_headBox() {
+  const {
+    //
+    headBox,
+    getOptions_material,
+    setHeadBox_str,
+    setHeadBox_bool,
+    getIsIntegratedHeadBox,
+  } = useWorksheet((state) => ({
+    headBox: state.headBox,
+    getOptions_material: state.getOptions_material,
+    setHeadBox_str: state.setHeadBox_str,
+    setHeadBox_bool: state.setHeadBox_bool,
+    getIsIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox,
+  }));
+
   return (
     <div>
       <p className={scss.caption}>●捲箱</p>
       <div className={scss.grid}>
-        <InputSel {...basicConfig} caption="材質" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="厚度" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="表面" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="正面" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="有無凸" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="形式" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="角鐵數量" inputProps={{}} />
+        <InputSel
+          {...basicConfig}
+          caption="材質"
+          selectProps={{
+            props: {
+              options: getOptions_material(),
+              value: { value: headBox.material, label: headBox.material },
+              onChange: (option) => {
+                setHeadBox_str({ key: 'material', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="厚度"
+          selectProps={{
+            props: {
+              value: { value: headBox.headBoxThickness, label: headBox.headBoxThickness },
+              onChange: (options) => {
+                setHeadBox_str({ key: 'headBoxThickness', value: options?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="表面"
+          selectProps={{
+            props: {
+              value: { value: headBox.surface, label: headBox.surface },
+              options: optionsCreator_surface(),
+              onChange: (options) => {
+                setHeadBox_str({ key: 'surface', value: options?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="正面"
+          selectProps={{
+            props: {
+              value: { value: headBox.headBoxFront, label: headBox.headBoxFront },
+              options: optionsCreator_front(),
+              onChange: (options) => {
+                setHeadBox_str({ key: 'headBoxFront', value: options?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="有無凸"
+          selectProps={{
+            props: {
+              value: { value: headBox.headBoxProtruding, label: headBox.headBoxProtruding },
+              options: optionsCreator_rollerSpec(),
+              onChange: (options) => {
+                setHeadBox_str({ key: 'headBoxProtruding', value: options?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="形式"
+          selectProps={{
+            props: {
+              options: optionsCreator_isIntegratedHeadBox(),
+              value: { value: getIsIntegratedHeadBox(), label: getIsIntegratedHeadBox() },
+              onChange: (option) => {
+                const value = option?.value;
+                const bool = value === 'true';
+                setHeadBox_bool({ key: 'isIntegratedHeadBox', value: bool });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="角鐵數量"
+          inputProps={{
+            props: {
+              value: headBox.headBoxAngleIronQuantity,
+              type: 'number',
+              onChange: (e) => {
+                setHeadBox_str({ key: 'headBoxAngleIronQuantity', value: e.target.value });
+              },
+            },
+          }}
+        />
       </div>
     </div>
   );

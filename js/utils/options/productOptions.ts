@@ -222,6 +222,13 @@ export const optionsCreator_direction = createOptionsCreator({
   ],
 });
 
+export const optionsCreator_isIntegratedHeadBox = createOptionsCreator({
+  optionsArr: [
+    { value: 'true', label: '一體式捲箱' },
+    { value: 'false', label: '捲箱加機箱' },
+  ],
+});
+
 export const optionsCreator_horsePower = createOptionsCreator({
   optionsArr: [
     { value: '1/4HP', label: '1/4HP', hpValue: '0.25' },

@@ -856,7 +856,7 @@ export type TupdateQuotationProductAccessoryDto = Partial<
   Omit<TquotationProductAccessoryDto, 'createdAt' | 'updatedAt'>
 >;
 
-type TdoorComponentType =
+export type TdoorComponentType =
   | 'slat'
   | 'bottomBar'
   | 'guideRail'
