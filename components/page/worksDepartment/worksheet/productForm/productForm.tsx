@@ -1,3 +1,5 @@
+import { useEffect, useMemo } from 'react';
+
 import classNames from 'classnames';
 
 // gear
@@ -9,6 +11,13 @@ import scss from './productForm.module.scss';
 
 // type
 import { Toption } from 'js/utils/options/options';
+import { TdoorModelInfoDto } from 'js/api/dtoTypes';
+
+// api
+import { useApiGetProdDoorModels } from 'js/api/api_product';
+
+// zustand
+import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 
 // =====================================================================
 
@@ -42,57 +51,171 @@ type TcheckBox_single = {
 };
 
 // =====================================================================
-type Tcontrol_basic = {
-  itemName: Tinput;
-  doorModel: Tselect;
-  fullWidth: Tinput;
-  qty: string;
-  WG: Tinput;
-  material: Tselect;
-  height: Tinput;
-  isAntiTyphoon: TcheckBox_single;
-  onCalcClick: () => void;
-};
+// type Tcontrol_basic = {
+//   itemName: Tinput;
+//   doorModel: Tselect;
+//   fullWidth: Tinput;
+//   qty: string;
+//   WG: Tinput;
+//   material: Tselect;
+//   height: Tinput;
+//   isAntiTyphoon: TcheckBox_single;
+//   onCalcClick: () => void;
+// };
 
-function Form_product_basic({
-  //
-  control,
-}: {
-  control?: Tcontrol_basic;
-}) {
+function Form_product_basic() {
+  const { res: doorModelArr, update: update_doorModel, doorModelList } = useApiGetProdDoorModels();
+
+  // --------------------------------------------------
+  const {
+    doorModelInfo,
+    basicSpec,
+    setBasicSpec_str,
+    setBasicSpec_bool,
+    setBasicSpec_strNum,
+    setDoorModelInfo,
+    getOptions_material,
+    setBasicSpec_material,
+  } = useWorksheet((state) => ({
+    doorModelInfo: state.doorModelInfo,
+    basicSpec: state.basicSpec,
+    setBasicSpec_str: state.setBasicSpec_str,
+    setBasicSpec_bool: state.setBasicSpec_bool,
+    setBasicSpec_strNum: state.setBasicSpec_strNum,
+    setDoorModelInfo: state.setDoorModelInfo,
+    getOptions_material: state.getOptions_material,
+    setBasicSpec_material: state.setBasicSpec_material,
+  }));
+
+  // ---------------------------------------------------------------------
+
+  const options_doorModel: Toption[] = useMemo(() => {
+    return (doorModelArr ?? []).map((doorModel) => {
+      const { name } = doorModel;
+
+      return { label: name, value: name, obj: doorModel };
+    });
+  }, [doorModelArr]);
+
+  // ---------------------------------------------------------------------
+
+  useEffect(() => {
+    update_doorModel();
+  }, []);
+
+  useEffect(() => {
+    if (!doorModelInfo && doorModelList) {
+      const doorModelName = basicSpec.doorModelName;
+      const doorModelInfo = doorModelList[doorModelName];
+      setDoorModelInfo(doorModelInfo);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [doorModelList, basicSpec]);
+
+  // ---------------------------------------------------------------------
+
   return (
     <div className={scss.grid}>
-      <InputSel {...basicConfig} caption="項目" inputProps={{}} />
+      <InputSel
+        {...basicConfig}
+        caption="項目"
+        inputProps={{
+          props: {
+            value: basicSpec.itemName,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setBasicSpec_str({ key: 'itemName', value: e.target.value });
+            },
+          },
+        }}
+      />
       <InputSel
         {...basicConfig}
         caption="門型"
         selectProps={{
           props: {
-            options: fakeOptions,
+            value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
+            options: options_doorModel,
+            onChange: (option) => {
+              const obj = option?.obj as TdoorModelInfoDto;
+              setDoorModelInfo(obj);
+            },
           },
         }}
       />
-      <InputSel {...basicConfig} caption="全寬(L)" inputProps={{}} />
+      <InputSel
+        {...basicConfig}
+        caption="全寬(L)"
+        inputProps={{
+          props: {
+            type: 'number',
+            value: basicSpec.fullWidth,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setBasicSpec_strNum({ key: 'fullWidth', value: e.target.value });
+            },
+          },
+        }}
+      />
       <InputSel
         {...basicConfig}
         caption="數量"
         inputProps={{
           props: {
-            value: '999',
+            value: basicSpec.qty,
             readOnly: true,
           },
         }}
       />
-      <InputSel {...basicConfig} caption="W+G" inputProps={{}} />
-      <InputSel {...basicConfig} caption="材質" selectProps={selectPropsAccessor()} />
-      <InputSel {...basicConfig} caption="淨高(h)" inputProps={{}} />
+      <InputSel
+        {...basicConfig}
+        caption="W+G"
+        inputProps={{
+          props: {
+            type: 'number',
+            value: basicSpec.WG,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setBasicSpec_strNum({ key: 'WG', value: e.target.value });
+            },
+          },
+        }}
+      />
+      <InputSel
+        {...basicConfig}
+        caption="材質"
+        selectProps={{
+          props: {
+            value: { value: basicSpec.material, label: basicSpec.material },
+            options: getOptions_material(),
+            onChange: (option) => {
+              setBasicSpec_material(option?.value ?? '');
+            },
+          },
+        }}
+      />
+      <InputSel
+        {...basicConfig}
+        caption="淨高(h)"
+        inputProps={{
+          props: {
+            type: 'number',
+            value: basicSpec.height,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setBasicSpec_strNum({ key: 'height', value: e.target.value });
+            },
+          },
+        }}
+      />
       <InputSel
         {...basicConfig}
         caption="防颱"
         wrapperStyle={{ width: '140px' }}
         checkBoxProps_v2={{
           props: {
+            value: basicSpec.isAntiTyphoon ? ['isAntiTyphoon'] : [],
             options: [{ label: null, value: 'isAntiTyphoon' }],
+            onChange: (strArr) => {
+              const isAntiTyphoon = strArr.includes('isAntiTyphoon');
+              setBasicSpec_bool({ key: 'isAntiTyphoon', value: isAntiTyphoon });
+            },
           },
         }}
       />
@@ -375,4 +498,4 @@ export {
   //
 };
 
-export type { Tcontrol_basic, Tcontrol_ABCD };
+export type { Tcontrol_ABCD };

@@ -112,6 +112,9 @@ import type {
   TworksheetDto_legacy,
 } from 'js/api/dtoTypes';
 
+// zustand
+import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
+
 // ====================================================================
 
 type Tquery = {
@@ -173,6 +176,18 @@ export default function Worksheet({
   const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId);
 
   // -------------------------------------------------------------------------
+
+  const init = useWorksheet((state) => state.init);
+
+  useEffect(() => {
+    const contractProductItems = worksheetData?.latestRecord.contractProductItems;
+
+    init({
+      itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
+      contractProductItem: contractProductItems?.[0],
+      qty: contractProductItems?.length ?? 0,
+    });
+  }, [worksheetData]);
 
   // console.log(activeWorksheetid);
   // console.log(finalProduct);
