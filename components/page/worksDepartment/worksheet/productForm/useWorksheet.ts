@@ -3,7 +3,9 @@ import _ from 'lodash';
 import Decimal from 'decimal.js';
 
 import { create } from 'zustand';
-import { immer } from 'zustand/middleware/immer';
+// 使用 immer middleware會使typescript不正確的判斷型別，導致型別錯誤(實際上沒錯)
+// import { immer } from 'zustand/middleware/immer';
+import { produce } from 'immer';
 
 // type
 import {
@@ -224,109 +226,109 @@ type Tworksheet = {
   //
 };
 
-const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
-  immer(
-    (set, get) => ({
-      contractProductItem_ori: undefined,
-      doorModelInfo: undefined,
-      componentList: undefined,
-      // ---------------------------------------------------------------------
-      itemIdArr: [],
-      qty: 0,
-      // ---------------------------------------------------------------------
+const useWorksheet = create<Tworksheet>(
+  (set, get) => ({
+    contractProductItem_ori: undefined,
+    doorModelInfo: undefined,
+    componentList: undefined,
+    // ---------------------------------------------------------------------
+    itemIdArr: [],
+    qty: 0,
+    // ---------------------------------------------------------------------
 
-      basicSpec: {
-        itemName: '',
-        doorModelName: '',
-        qty: '0',
-        fullWidth: '',
-        WG: '',
-        height: '',
-        material: '',
-        isAntiTyphoon: false,
+    basicSpec: {
+      itemName: '',
+      doorModelName: '',
+      qty: '0',
+      fullWidth: '',
+      WG: '',
+      height: '',
+      material: '',
+      isAntiTyphoon: false,
+    },
+
+    ABCD: {
+      gapA: '',
+      gapC: '',
+      boxB: '',
+      boxD: '',
+    },
+
+    motor: {
+      horsepower: '',
+      motorVoltage: '',
+      motorPhase: '',
+      vendor: '',
+      hasMotorSupportStand: '',
+      electricMotorChainType: '',
+      motorLockBox: '',
+      electricMotorDirection: '',
+      getElectricSupply: () => {
+        const { motorVoltage, motorPhase } = get().motor;
+
+        return `${lookup_motorPhase[motorPhase as '1' | '3'] ?? ''} ${motorVoltage}V`;
       },
+    },
 
-      ABCD: {
-        gapA: '',
-        gapC: '',
-        boxB: '',
-        boxD: '',
+    headBox: {
+      material: '',
+      headBoxThickness: '',
+      surface: '',
+      headBoxFront: '',
+      headBoxProtruding: '',
+      isIntegratedHeadBox: false,
+      headBoxAngleIronQuantity: '0',
+      getIsIntegratedHeadBox: () => {
+        const isIntegratedHeadBox = get().headBox.isIntegratedHeadBox;
+
+        return isIntegratedHeadBox ? '一體式捲箱' : '捲箱加機箱';
       },
+    },
 
-      motor: {
-        horsepower: '',
-        motorVoltage: '',
-        motorPhase: '',
-        vendor: '',
-        hasMotorSupportStand: '',
-        electricMotorChainType: '',
-        motorLockBox: '',
-        electricMotorDirection: '',
-        getElectricSupply: () => {
-          const { motorVoltage, motorPhase } = get().motor;
+    roller: {
+      diameter: '',
+      rollerSpec: '',
+    },
 
-          return `${lookup_motorPhase[motorPhase as '1' | '3'] ?? ''} ${motorVoltage}V`;
-        },
+    slat: {
+      material: '',
+      surface: '',
+    },
+
+    guideRail: {
+      material: '',
+      guideRailThickness: '',
+      surface: '',
+      hasSilencingStrip: false,
+      guideRailType: '',
+      guideRail: '',
+      getHasSilencingStrip: () => {
+        const hasSilencingStrip = get().guideRail.hasSilencingStrip;
+
+        return hasSilencingStrip ? '有' : '無';
       },
+    },
 
-      headBox: {
-        material: '',
-        headBoxThickness: '',
-        surface: '',
-        headBoxFront: '',
-        headBoxProtruding: '',
-        isIntegratedHeadBox: false,
-        headBoxAngleIronQuantity: '0',
-        getIsIntegratedHeadBox: () => {
-          const isIntegratedHeadBox = get().headBox.isIntegratedHeadBox;
+    bottomBar: {
+      material: '',
+      bottomBarAngleIron: '',
+      bottomBarPlate: '',
+      bottomBar: '',
+      surface: '',
+    },
 
-          return isIntegratedHeadBox ? '一體式捲箱' : '捲箱加機箱';
-        },
-      },
+    sidePlate: {
+      bearingName: '',
+      sprocketWheelModel: '',
+      sidePlateDirection: '',
+    },
 
-      roller: {
-        diameter: '',
-        rollerSpec: '',
-      },
-
-      slat: {
-        material: '',
-        surface: '',
-      },
-
-      guideRail: {
-        material: '',
-        guideRailThickness: '',
-        surface: '',
-        hasSilencingStrip: false,
-        guideRailType: '',
-        guideRail: '',
-        getHasSilencingStrip: () => {
-          const hasSilencingStrip = get().guideRail.hasSilencingStrip;
-
-          return hasSilencingStrip ? '有' : '無';
-        },
-      },
-
-      bottomBar: {
-        material: '',
-        bottomBarAngleIron: '',
-        bottomBarPlate: '',
-        bottomBar: '',
-        surface: '',
-      },
-
-      sidePlate: {
-        bearingName: '',
-        sprocketWheelModel: '',
-        sidePlateDirection: '',
-      },
-
-      // ---------------------------------------------------------------------
-      // ---------------------------------------------------------------------
-      //
-      init: ({ itemIdArr, contractProductItem, qty }) =>
-        set((state) => {
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    //
+    init: ({ itemIdArr, contractProductItem, qty }) =>
+      set(
+        produce((state) => {
           // ____________________________________________________________________
           // ____________________________________________________________________
 
@@ -430,163 +432,195 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
 
           //
           //
-        }), // inite
-      //
-      //
-      setDoorModelInfo: (doorModelInfo) =>
-        set((state) => {
+        })
+      ), // inite
+    //
+    //
+    setDoorModelInfo: (doorModelInfo) =>
+      set(
+        produce((state) => {
           state.doorModelInfo = doorModelInfo;
           state.basicSpec.doorModelName = doorModelInfo?.name ?? '';
-        }),
+        })
+      ),
 
-      getOptions_material: () => {
-        const optiions_material = get().doorModelInfo?.slatMaterials.map((item) => {
-          return {
-            value: item.name,
-            label: item.name,
-          };
-        });
-
-        return optiions_material ?? [];
-      },
-
-      getOptions_bottomBarAngleIronAndPlate: () => {
-        const basicSpec = get().basicSpec;
-        const doorModelName = basicSpec?.doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
-
-        if (!doorModelName) {
-          return {
-            options_angleIron: [],
-            options_plate: [],
-          };
-        }
-
-        const { angleIron, plate } = lookup_options_bottomBarAngleIronAndPlate[doorModelName];
-
+    getOptions_material: () => {
+      const optiions_material = get().doorModelInfo?.slatMaterials.map((item) => {
         return {
-          options_angleIron: angleIron() ?? [],
-          options_plate: plate() ?? [],
+          value: item.name,
+          label: item.name,
         };
-      },
+      });
 
-      //
-      // ---------------------------------------------------------------------
+      return optiions_material ?? [];
+    },
 
-      setBasicSpec_str: ({ key, value }) => {
-        set((state) => {
+    getOptions_bottomBarAngleIronAndPlate: () => {
+      const basicSpec = get().basicSpec;
+      const doorModelName = basicSpec?.doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
+
+      if (!doorModelName) {
+        return {
+          options_angleIron: [],
+          options_plate: [],
+        };
+      }
+
+      const { angleIron, plate } = lookup_options_bottomBarAngleIronAndPlate[doorModelName];
+
+      return {
+        options_angleIron: angleIron() ?? [],
+        options_plate: plate() ?? [],
+      };
+    },
+
+    //
+    // ---------------------------------------------------------------------
+
+    setBasicSpec_str: ({ key, value }) => {
+      set(
+        produce((state) => {
           if (state.basicSpec) {
             state.basicSpec[key] = value;
           }
-        });
-      },
-      setBasicSpec_strNum: ({ key, value }) => {
-        set((state) => {
+        })
+      );
+    },
+    setBasicSpec_strNum: ({ key, value }) => {
+      set(
+        produce((state) => {
           state.basicSpec[key] = value;
-        });
-      },
-      setBasicSpec_bool: ({ key, value }) => {
-        set((state) => {
+        })
+      );
+    },
+    setBasicSpec_bool: ({ key, value }) => {
+      set(
+        produce((state) => {
           if (state.basicSpec) {
             state.basicSpec[key] = value;
           }
-        });
-      },
+        })
+      );
+    },
 
-      setBasicSpec_material: (str) => {
-        set((state) => {
+    setBasicSpec_material: (str) => {
+      set(
+        produce((state) => {
           state.basicSpec.material = str;
-        });
-      },
+        })
+      );
+    },
 
-      // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-      setABCD: ({ key, value }) => {
-        set((state) => {
+    setABCD: ({ key, value }) => {
+      set(
+        produce((state) => {
           state.ABCD[key] = value;
-        });
-      },
+        })
+      );
+    },
 
-      // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-      setMotor_supply: ({ phase, voltage }) => {
-        set((state) => {
+    setMotor_supply: ({ phase, voltage }) => {
+      set(
+        produce((state) => {
           state.motor.motorVoltage = voltage;
           state.motor.motorPhase = phase;
-        });
-      },
+        })
+      );
+    },
 
-      setMotor_str: ({ key, value }) => {
-        set((state) => {
+    setMotor_str: ({ key, value }) => {
+      set(
+        produce((state) => {
           state.motor[key] = value;
-        });
-      },
-      // ---------------------------------------------------------------------
+        })
+      );
+    },
+    // ---------------------------------------------------------------------
 
-      setHeadBox_str: ({ key, value }) => {
-        set((state) => {
+    setHeadBox_str: ({ key, value }) => {
+      set(
+        produce((state) => {
           state.headBox[key] = value;
-        });
-      },
+        })
+      );
+    },
 
-      setHeadBox_bool: ({ key, value }) => {
-        set((state) => {
+    setHeadBox_bool: ({ key, value }) => {
+      set(
+        produce((state) => {
           state.headBox[key] = value;
-        });
-      },
+        })
+      );
+    },
 
-      // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-      setRoller_str: ({ key, value }) => {
-        set((state) => {
+    setRoller_str: ({ key, value }) => {
+      set(
+        produce((state) => {
           state.roller[key] = value;
-        });
-      },
+        })
+      );
+    },
 
-      // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-      setSlat_str: ({ key, value }) => {
-        set((state) => {
+    setSlat_str: ({ key, value }) => {
+      set(
+        produce((state) => {
           state.slat[key] = value;
-        });
-      },
+        })
+      );
+    },
 
-      // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-      setGuideRail_str: ({ key, value }) => {
-        set((state) => {
+    setGuideRail_str: ({ key, value }) => {
+      set(
+        produce((state) => {
           state.guideRail[key] = value;
-        });
-      },
+        })
+      );
+    },
 
-      setGuideRail_hasSilencingStrip: (value) => {
-        set((state) => {
+    setGuideRail_hasSilencingStrip: (value) => {
+      set(
+        produce((state) => {
           state.guideRail.hasSilencingStrip = value;
-        });
-      },
+        })
+      );
+    },
 
-      // ---------------------------------------------------------------------
-      // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-      setBottomBar_str: ({ key, value }) => {
-        set((state) => {
+    setBottomBar_str: ({ key, value }) => {
+      set(
+        produce((state) => {
           state.bottomBar[key] = value;
-        });
-      },
+        })
+      );
+    },
 
-      // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-      setSidePlate_str: ({ key, value }) => {
-        set((state) => {
+    setSidePlate_str: ({ key, value }) => {
+      set(
+        produce((state) => {
           state.sidePlate[key] = value;
-        });
-      },
+        })
+      );
+    },
 
-      // ---------------------------------------------------------------------
-      // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
-      //
-    }) // set get
-  ) //immer
+    //
+  }) // set get
 );
 
 // =====================================================================
