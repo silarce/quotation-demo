@@ -75,21 +75,21 @@ function Form_product_basic() {
   const {
     doorModelInfo,
     basicSpec,
-    setBasicSpec_str,
-    setBasicSpec_bool,
-    setBasicSpec_strNum,
+    // setBasicSpec_str,
+    // setBasicSpec_bool,
+    // setBasicSpec_strNum,
     setDoorModelInfo,
     getOptions_material,
-    setBasicSpec_material,
+    // setBasicSpec_material,
   } = useWorksheet((state) => ({
     doorModelInfo: state.doorModelInfo,
     basicSpec: state.basicSpec,
-    setBasicSpec_str: state.setBasicSpec_str,
-    setBasicSpec_bool: state.setBasicSpec_bool,
-    setBasicSpec_strNum: state.setBasicSpec_strNum,
+    // setBasicSpec_str: state.setBasicSpec_str,
+    // setBasicSpec_bool: state.setBasicSpec_bool,
+    // setBasicSpec_strNum: state.setBasicSpec_strNum,
     setDoorModelInfo: state.setDoorModelInfo,
     getOptions_material: state.getOptions_material,
-    setBasicSpec_material: state.setBasicSpec_material,
+    // setBasicSpec_material: state.setBasicSpec_material,
   }));
 
   // ---------------------------------------------------------------------
@@ -128,7 +128,7 @@ function Form_product_basic() {
           props: {
             value: basicSpec.itemName,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setBasicSpec_str({ key: 'itemName', value: e.target.value });
+              basicSpec.setBasicSpec_str({ key: 'itemName', value: e.target.value });
             },
           },
         }}
@@ -155,7 +155,7 @@ function Form_product_basic() {
             type: 'number',
             value: basicSpec.fullWidth,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setBasicSpec_strNum({ key: 'fullWidth', value: e.target.value });
+              basicSpec.setBasicSpec_strNum({ key: 'fullWidth', value: e.target.value });
             },
           },
         }}
@@ -178,7 +178,7 @@ function Form_product_basic() {
             type: 'number',
             value: basicSpec.WG,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setBasicSpec_strNum({ key: 'WG', value: e.target.value });
+              basicSpec.setBasicSpec_strNum({ key: 'WG', value: e.target.value });
             },
           },
         }}
@@ -191,7 +191,7 @@ function Form_product_basic() {
             value: { value: basicSpec.material, label: basicSpec.material },
             options: getOptions_material(),
             onChange: (option) => {
-              setBasicSpec_material(option?.value ?? '');
+              basicSpec.setBasicSpec_material(option?.value ?? '');
             },
           },
         }}
@@ -204,7 +204,7 @@ function Form_product_basic() {
             type: 'number',
             value: basicSpec.height,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setBasicSpec_strNum({ key: 'height', value: e.target.value });
+              basicSpec.setBasicSpec_strNum({ key: 'height', value: e.target.value });
             },
           },
         }}
@@ -219,7 +219,7 @@ function Form_product_basic() {
             options: [{ label: null, value: 'isAntiTyphoon' }],
             onChange: (strArr) => {
               const isAntiTyphoon = strArr.includes('isAntiTyphoon');
-              setBasicSpec_bool({ key: 'isAntiTyphoon', value: isAntiTyphoon });
+              basicSpec.setBasicSpec_bool({ key: 'isAntiTyphoon', value: isAntiTyphoon });
             },
           },
         }}
@@ -231,15 +231,9 @@ function Form_product_basic() {
 // =====================================================================
 
 function Form_product_ABCD() {
-  const { ABCD, setGapA, setGapC, setBoxB, setBoxD } = useWorksheet((state) => ({
+  const { ABCD } = useWorksheet((state) => ({
     ABCD: state.ABCD,
-    setGapA: state.setGapA,
-    setGapC: state.setGapC,
-    setBoxB: state.setBoxB,
-    setBoxD: state.setBoxD,
   }));
-
-  console.log(ABCD);
 
   return (
     <div className={scss.grid}>
@@ -251,7 +245,7 @@ function Form_product_ABCD() {
             type: 'number',
             value: ABCD.getGapA(),
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setGapA(e.target.value);
+              ABCD.setGapA(e.target.value);
             },
           },
         }}
@@ -264,7 +258,7 @@ function Form_product_ABCD() {
             type: 'number',
             value: ABCD.getGapC(),
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setGapC(e.target.value);
+              ABCD.setGapC(e.target.value);
             },
           },
         }}
@@ -277,7 +271,7 @@ function Form_product_ABCD() {
             type: 'number',
             value: ABCD.boxB,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setBoxB(e.target.value);
+              ABCD.setBoxB(e.target.value);
             },
           },
         }}
@@ -290,7 +284,7 @@ function Form_product_ABCD() {
             type: 'number',
             value: ABCD.boxD,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setBoxD(e.target.value);
+              ABCD.setBoxD(e.target.value);
             },
           },
         }}
@@ -302,10 +296,8 @@ function Form_product_ABCD() {
 // =====================================================================
 
 function Form_product_motor() {
-  const { motor, setMotor_supply, setMotor_str } = useWorksheet((state) => ({
+  const { motor } = useWorksheet((state) => ({
     motor: state.motor,
-    setMotor_supply: state.setMotor_supply,
-    setMotor_str: state.setMotor_str,
   }));
 
   return (
@@ -325,7 +317,7 @@ function Form_product_motor() {
                 const voltage = option?.voltage as string | undefined;
 
                 if (phase && voltage) {
-                  setMotor_supply({ phase, voltage });
+                  motor.setMotor_supply({ phase, voltage });
                 }
               },
             },
@@ -339,8 +331,7 @@ function Form_product_motor() {
               options: optionsCreator_horsePower(),
               value: { value: motor.horsepower, label: motor.horsepower },
               onChange: (option) => {
-                // setMotor_horsepower(option?.value ?? '');
-                setMotor_str({ key: 'horsepower', value: option?.value ?? '' });
+                motor.setMotor_str({ key: 'horsepower', value: option?.value ?? '' });
               },
             },
           }}
@@ -358,7 +349,7 @@ function Form_product_motor() {
               options: optionsCreator_motorSupportStand(),
               value: { value: motor.hasMotorSupportStand, label: motor.hasMotorSupportStand },
               onChange: (option) => {
-                setMotor_str({ key: 'hasMotorSupportStand', value: option?.value ?? '' });
+                motor.setMotor_str({ key: 'hasMotorSupportStand', value: option?.value ?? '' });
               },
             },
           }}
@@ -371,7 +362,7 @@ function Form_product_motor() {
               options: optionsCreator_chainType(),
               value: { value: motor.electricMotorChainType, label: motor.electricMotorChainType },
               onChange: (option) => {
-                setMotor_str({ key: 'electricMotorChainType', value: option?.value ?? '' });
+                motor.setMotor_str({ key: 'electricMotorChainType', value: option?.value ?? '' });
               },
             },
           }}
@@ -384,7 +375,7 @@ function Form_product_motor() {
               options: optionsCreator_motorLockBox(),
               value: { value: motor.motorLockBox, label: motor.motorLockBox },
               onChange: (option) => {
-                setMotor_str({ key: 'motorLockBox', value: option?.value ?? '' });
+                motor.setMotor_str({ key: 'motorLockBox', value: option?.value ?? '' });
               },
             },
           }}
@@ -400,7 +391,7 @@ function Form_product_motor() {
                 label: motor.electricMotorDirection,
               },
               onChange: (option) => {
-                setMotor_str({ key: 'electricMotorDirection', value: option?.value ?? '' });
+                motor.setMotor_str({ key: 'electricMotorDirection', value: option?.value ?? '' });
               },
             },
           }}
@@ -417,14 +408,10 @@ function Form_product_headBox() {
     //
     headBox,
     getOptions_material,
-    setHeadBox_str,
-    setHeadBox_bool,
     getIsIntegratedHeadBox,
   } = useWorksheet((state) => ({
     headBox: state.headBox,
     getOptions_material: state.getOptions_material,
-    setHeadBox_str: state.setHeadBox_str,
-    setHeadBox_bool: state.setHeadBox_bool,
     getIsIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox,
   }));
 
@@ -440,7 +427,7 @@ function Form_product_headBox() {
               options: getOptions_material(),
               value: { value: headBox.material, label: headBox.material },
               onChange: (option) => {
-                setHeadBox_str({ key: 'material', value: option?.value ?? '' });
+                headBox.setHeadBox_str({ key: 'material', value: option?.value ?? '' });
               },
             },
           }}
@@ -452,7 +439,7 @@ function Form_product_headBox() {
             props: {
               value: { value: headBox.headBoxThickness, label: headBox.headBoxThickness },
               onChange: (options) => {
-                setHeadBox_str({ key: 'headBoxThickness', value: options?.value ?? '' });
+                headBox.setHeadBox_str({ key: 'headBoxThickness', value: options?.value ?? '' });
               },
             },
           }}
@@ -465,7 +452,7 @@ function Form_product_headBox() {
               value: { value: headBox.surface, label: headBox.surface },
               options: optionsCreator_surface(),
               onChange: (options) => {
-                setHeadBox_str({ key: 'surface', value: options?.value ?? '' });
+                headBox.setHeadBox_str({ key: 'surface', value: options?.value ?? '' });
               },
             },
           }}
@@ -478,7 +465,7 @@ function Form_product_headBox() {
               value: { value: headBox.headBoxFront, label: headBox.headBoxFront },
               options: optionsCreator_front(),
               onChange: (options) => {
-                setHeadBox_str({ key: 'headBoxFront', value: options?.value ?? '' });
+                headBox.setHeadBox_str({ key: 'headBoxFront', value: options?.value ?? '' });
               },
             },
           }}
@@ -491,7 +478,7 @@ function Form_product_headBox() {
               value: { value: headBox.headBoxProtruding, label: headBox.headBoxProtruding },
               options: optionsCreator_rollerSpec(),
               onChange: (options) => {
-                setHeadBox_str({ key: 'headBoxProtruding', value: options?.value ?? '' });
+                headBox.setHeadBox_str({ key: 'headBoxProtruding', value: options?.value ?? '' });
               },
             },
           }}
@@ -506,7 +493,7 @@ function Form_product_headBox() {
               onChange: (option) => {
                 const value = option?.value;
                 const bool = value === 'true';
-                setHeadBox_bool({ key: 'isIntegratedHeadBox', value: bool });
+                headBox.setHeadBox_bool({ key: 'isIntegratedHeadBox', value: bool });
               },
             },
           }}
@@ -519,7 +506,7 @@ function Form_product_headBox() {
               value: headBox.headBoxAngleIronQuantity,
               type: 'number',
               onChange: (e) => {
-                setHeadBox_str({ key: 'headBoxAngleIronQuantity', value: e.target.value });
+                headBox.setHeadBox_str({ key: 'headBoxAngleIronQuantity', value: e.target.value });
               },
             },
           }}
@@ -532,9 +519,8 @@ function Form_product_headBox() {
 // =====================================================================
 
 function Form_product_roller() {
-  const { roller, setRoller_str } = useWorksheet((state) => ({
+  const { roller } = useWorksheet((state) => ({
     roller: state.roller,
-    setRoller_str: state.setRoller_str,
   }));
 
   return (
@@ -558,7 +544,7 @@ function Form_product_roller() {
               value: { value: roller.rollerSpec, label: roller.rollerSpec },
               options: optionsCreator_rollerSpec(),
               onChange: (option) => {
-                setRoller_str({ key: 'rollerSpec', value: option?.value ?? '' });
+                roller.setRoller_str({ key: 'rollerSpec', value: option?.value ?? '' });
               },
             },
           }}
@@ -571,9 +557,8 @@ function Form_product_roller() {
 // =====================================================================
 
 function Form_product_slat() {
-  const { slat, setSlat_str, getOptions_material } = useWorksheet((state) => ({
+  const { slat, getOptions_material } = useWorksheet((state) => ({
     slat: state.slat,
-    setSlat_str: state.setSlat_str,
     getOptions_material: state.getOptions_material,
   }));
 
@@ -589,7 +574,7 @@ function Form_product_slat() {
               value: { value: slat.material, label: slat.material },
               options: getOptions_material(),
               onChange: (option) => {
-                setSlat_str({ key: 'material', value: option?.value ?? '' });
+                slat.setSlat_str({ key: 'material', value: option?.value ?? '' });
               },
             },
           }}
@@ -602,7 +587,7 @@ function Form_product_slat() {
               value: { value: slat.surface, label: slat.surface },
               options: optionsCreator_surface(),
               onChange: (option) => {
-                setSlat_str({ key: 'surface', value: option?.value ?? '' });
+                slat.setSlat_str({ key: 'surface', value: option?.value ?? '' });
               },
             },
           }}

@@ -172,59 +172,6 @@ type Tworksheet = {
 
   // -----------------------------------------------------------------------------
 
-  // setBasicSpec_str: (props: {
-  //   key: keyof Omit<
-  //     Exclude<Tworksheet['basicSpec'], undefined>,
-  //     'isAntiTyphoon' | 'fullWidth' | 'WG' | 'height' | 'doorModelName'
-  //   >;
-  //   value: string;
-  // }) => void;
-
-  // setBasicSpec_material: (str: string) => void;
-
-  // setBasicSpec_strNum: (props: {
-  //   //
-  //   key: keyof Pick<Exclude<Tworksheet['basicSpec'], undefined>, 'fullWidth' | 'WG' | 'height'>;
-  //   value: string;
-  // }) => void;
-
-  // setBasicSpec_bool: (props: { key: 'isAntiTyphoon'; value: boolean }) => void;
-
-  // ___________________________________________________________
-
-  // setGapA: (value: string) => void;
-  // setGapC: (value: string) => void;
-  // setBoxB: (value: string) => void;
-  // setBoxD: (value: string) => void;
-
-  // ___________________________________________________________
-
-  // setMotor_supply: (props: { phase: string; voltage: string }) => void;
-
-  // setMotor_str: (props: {
-  //   key: 'horsepower' | 'electricMotorChainType' | 'hasMotorSupportStand' | 'motorLockBox' | 'electricMotorDirection';
-  //   value: string;
-  // }) => void;
-
-  // ___________________________________________________________
-
-  // setHeadBox_str: (props: {
-  //   key: Exclude<keyof Tworksheet['headBox'], 'isIntegratedHeadBox' | 'getIsIntegratedHeadBox'>;
-  //   value: string;
-  // }) => void;
-
-  // setHeadBox_bool: (props: { key: 'isIntegratedHeadBox'; value: boolean }) => void;
-
-  // ___________________________________________________________
-
-  // setRoller_str: (props: { key: 'diameter' | 'rollerSpec'; value: string }) => void;
-
-  // ___________________________________________________________
-
-  // setSlat_str: (props: { key: 'material' | 'surface'; value: string }) => void;
-
-  // ___________________________________________________________
-
   setGuideRail_str: (props: {
     key: //
     'material' | 'guideRailThickness' | 'surface' | 'guideRailType' | 'guideRail';
