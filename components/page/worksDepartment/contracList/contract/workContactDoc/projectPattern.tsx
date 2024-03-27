@@ -268,6 +268,7 @@ export default function ProjectPattern({
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'floor'),
     isUploading: isUploading.floor,
     isImage: checkFileIsImage_str(fileInfo_floor?.mime ?? ''),
+    fileName: fileInfo_floor?.name ?? '',
   };
   const props_design: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.design.src,
@@ -275,6 +276,7 @@ export default function ProjectPattern({
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'design'),
     isUploading: isUploading.design,
     isImage: checkFileIsImage_str(fileInfo_design?.mime ?? ''),
+    fileName: fileInfo_design?.name ?? '',
   };
   const props_color: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.color.src,
@@ -282,6 +284,7 @@ export default function ProjectPattern({
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'color'),
     isUploading: isUploading.color,
     isImage: checkFileIsImage_str(fileInfo_color?.mime ?? ''),
+    fileName: fileInfo_color?.name ?? '',
   };
   const props_construction: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.construction.src,
@@ -289,6 +292,7 @@ export default function ProjectPattern({
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'construction'),
     isUploading: isUploading.construction,
     isImage: checkFileIsImage_str(fileInfo_construction?.mime ?? ''),
+    fileName: fileInfo_construction?.name ?? '',
   };
   const props_detail: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.detail.src,
@@ -296,6 +300,7 @@ export default function ProjectPattern({
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'detail'),
     isUploading: isUploading.detail,
     isImage: checkFileIsImage_str(fileInfo_detail?.mime ?? ''),
+    fileName: fileInfo_detail?.name ?? '',
   };
 
   return (
@@ -368,19 +373,21 @@ const ImageDragger = ({
   onRemoveClick,
   onDraggerChange,
   isUploading,
+  fileName,
 }: {
   fileSrc?: string | undefined;
   isImage: boolean;
   onRemoveClick: () => void;
   onDraggerChange: (e: UploadChangeParam) => void;
   isUploading: boolean;
+  fileName: string;
 }) => {
   return (
     <>
       <div className={classNames('relative w-fit', !fileSrc && 'hidden')}>
-        {isImage && <AntdImage className={scss.antdImage} src={fileSrc ?? ''} alt="顯示圖片失敗" />}
+        {isImage && <AntdImage className={scss.antdImage} src={fileSrc ?? ''} alt={fileName} />}
 
-        {!isImage && <Link href={fileSrc ?? ''}>{fileSrc}</Link>}
+        {!isImage && <Link href={fileSrc ?? ''}>{fileName}</Link>}
 
         <IconRemove02 className="global_absoluteRightTop" onClick={() => onRemoveClick()} />
       </div>
