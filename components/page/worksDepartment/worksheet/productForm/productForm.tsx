@@ -609,14 +609,13 @@ function Form_product_guideRail({
 }: {
   control?: Tcontrol_guideRail;
 }) {
-  const { guideRail, getHasSilencingStrip, getOptions_material, setGuideRail_str, setGuideRail_hasSilencingStrip } =
-    useWorksheet((state) => ({
-      guideRail: state.guideRail,
-      getHasSilencingStrip: state.guideRail.getHasSilencingStrip,
-      getOptions_material: state.getOptions_material,
-      setGuideRail_str: state.setGuideRail_str,
-      setGuideRail_hasSilencingStrip: state.setGuideRail_hasSilencingStrip,
-    }));
+  const { guideRail, getHasSilencingStrip, getOptions_material } = useWorksheet((state) => ({
+    guideRail: state.guideRail,
+    getHasSilencingStrip: state.guideRail.getHasSilencingStrip,
+    getOptions_material: state.getOptions_material,
+    // setGuideRail_str: state.setGuideRail_str,
+    // setGuideRail_hasSilencingStrip: state.setGuideRail_hasSilencingStrip,
+  }));
 
   return (
     <div>
@@ -633,7 +632,7 @@ function Form_product_guideRail({
                 label: guideRail.material,
               },
               onChange: (option) => {
-                setGuideRail_str({ key: 'material', value: option?.value ?? '' });
+                guideRail.setGuideRail_str({ key: 'material', value: option?.value ?? '' });
               },
             },
           }}
@@ -648,7 +647,7 @@ function Form_product_guideRail({
                 label: guideRail.guideRailThickness,
               },
               onChange: (option) => {
-                setGuideRail_str({ key: 'guideRailThickness', value: option?.value ?? '' });
+                guideRail.setGuideRail_str({ key: 'guideRailThickness', value: option?.value ?? '' });
               },
             },
           }}
@@ -664,7 +663,7 @@ function Form_product_guideRail({
                 label: guideRail.surface,
               },
               onChange: (option) => {
-                setGuideRail_str({ key: 'surface', value: option?.value ?? '' });
+                guideRail.setGuideRail_str({ key: 'surface', value: option?.value ?? '' });
               },
             },
           }}
@@ -682,7 +681,7 @@ function Form_product_guideRail({
               onChange: (option) => {
                 const bool = !!(option?.value === 'true');
 
-                setGuideRail_hasSilencingStrip(bool);
+                guideRail.setGuideRail_hasSilencingStrip(bool);
               },
             },
           }}
@@ -698,7 +697,7 @@ function Form_product_guideRail({
                 label: guideRail.guideRailType,
               },
               onChange: (option) => {
-                setGuideRail_str({ key: 'guideRailType', value: option?.value ?? '' });
+                guideRail.setGuideRail_str({ key: 'guideRailType', value: option?.value ?? '' });
               },
             },
           }}
@@ -713,7 +712,7 @@ function Form_product_guideRail({
                 label: guideRail.guideRail,
               },
               onChange: (option) => {
-                setGuideRail_str({ key: 'guideRail', value: option?.value ?? '' });
+                guideRail.setGuideRail_str({ key: 'guideRail', value: option?.value ?? '' });
               },
             },
           }}
@@ -726,14 +725,12 @@ function Form_product_guideRail({
 // =====================================================================
 
 function Form_product_bottomBar() {
-  const { bottomBar, getOptions_material, setBottomBar_str, getOptions_bottomBarAngleIronAndPlate } = useWorksheet(
-    (state) => ({
-      bottomBar: state.bottomBar,
-      getOptions_material: state.getOptions_material,
-      setBottomBar_str: state.setBottomBar_str,
-      getOptions_bottomBarAngleIronAndPlate: state.getOptions_bottomBarAngleIronAndPlate,
-    })
-  );
+  const { bottomBar, getOptions_material, getOptions_bottomBarAngleIronAndPlate } = useWorksheet((state) => ({
+    bottomBar: state.bottomBar,
+    getOptions_material: state.getOptions_material,
+
+    getOptions_bottomBarAngleIronAndPlate: state.getOptions_bottomBarAngleIronAndPlate,
+  }));
 
   const { options_angleIron, options_plate } = getOptions_bottomBarAngleIronAndPlate();
 
@@ -749,7 +746,7 @@ function Form_product_bottomBar() {
               value: { value: bottomBar.material, label: bottomBar.material },
               options: getOptions_material(),
               onChange: (option) => {
-                setBottomBar_str({ key: 'material', value: option?.value ?? '' });
+                bottomBar.setBottomBar_str({ key: 'material', value: option?.value ?? '' });
               },
             },
           }}
@@ -762,7 +759,7 @@ function Form_product_bottomBar() {
               value: { value: bottomBar.bottomBarAngleIron, label: bottomBar.bottomBarAngleIron },
               options: options_angleIron,
               onChange: (option) => {
-                setBottomBar_str({ key: 'bottomBarAngleIron', value: option?.value ?? '' });
+                bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value: option?.value ?? '' });
               },
             },
           }}
@@ -776,7 +773,7 @@ function Form_product_bottomBar() {
               value: { value: bottomBar.bottomBarPlate, label: bottomBar.bottomBarPlate },
               options: options_plate,
               onChange: (option) => {
-                setBottomBar_str({ key: 'bottomBarPlate', value: option?.value ?? '' });
+                bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value: option?.value ?? '' });
               },
             },
           }}
@@ -789,7 +786,7 @@ function Form_product_bottomBar() {
               value: { value: bottomBar.bottomBar, label: bottomBar.bottomBar },
               options: optionsCreator_bottomBar_2(),
               onChange: (option) => {
-                setBottomBar_str({ key: 'bottomBar', value: option?.value ?? '' });
+                bottomBar.setBottomBar_str({ key: 'bottomBar', value: option?.value ?? '' });
               },
             },
           }}
@@ -802,7 +799,7 @@ function Form_product_bottomBar() {
               value: { value: bottomBar.surface, label: bottomBar.surface },
               options: optionsCreator_surface(),
               onChange: (option) => {
-                setBottomBar_str({ key: 'surface', value: option?.value ?? '' });
+                bottomBar.setBottomBar_str({ key: 'surface', value: option?.value ?? '' });
               },
             },
           }}
@@ -815,9 +812,8 @@ function Form_product_bottomBar() {
 // =====================================================================
 
 function Form_product_sidePlate() {
-  const { sidePlate, setSidePlate_str } = useWorksheet((state) => ({
+  const { sidePlate } = useWorksheet((state) => ({
     sidePlate: state.sidePlate,
-    setSidePlate_str: state.setSidePlate_str,
   }));
 
   return (
@@ -852,7 +848,7 @@ function Form_product_sidePlate() {
               value: { value: sidePlate.sidePlateDirection, label: sidePlate.sidePlateDirection },
               options: optionsCreator_direction(),
               onChange: (option) => {
-                setSidePlate_str({ key: 'sidePlateDirection', value: option?.value ?? '' });
+                sidePlate.setSidePlate_str({ key: 'sidePlateDirection', value: option?.value ?? '' });
               },
             },
           }}

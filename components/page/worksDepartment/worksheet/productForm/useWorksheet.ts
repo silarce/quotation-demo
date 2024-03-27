@@ -30,9 +30,6 @@ import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api
 
 // =====================================================================
 
-// 簡略set目錄
-// setBasicSpec
-
 type Tworksheet = {
   readonly contractProductItem_ori: TquotationProductItemDto | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
@@ -135,6 +132,13 @@ type Tworksheet = {
     guideRailType: string;
     guideRail: string;
     getHasSilencingStrip: () => string;
+    setGuideRail_str: (props: {
+      key: //
+      'material' | 'guideRailThickness' | 'surface' | 'guideRailType' | 'guideRail';
+      value: string;
+    }) => void;
+
+    setGuideRail_hasSilencingStrip: (value: boolean) => void;
   };
 
   bottomBar: {
@@ -143,12 +147,20 @@ type Tworksheet = {
     bottomBarPlate: string;
     bottomBar: string;
     surface: string;
+    setBottomBar_str: (props: {
+      key: 'material' | 'bottomBarAngleIron' | 'bottomBarPlate' | 'bottomBar' | 'surface';
+      value: string;
+    }) => void;
   };
 
   sidePlate: {
     getBearingName: () => string;
     getSprocketWheelModel: () => string;
     sidePlateDirection: string;
+    setSidePlate_str: (props: {
+      key: 'bearingName' | 'sprocketWheelModel' | 'sidePlateDirection';
+      value: string;
+    }) => void;
   };
   //
   init: (props: {
@@ -173,34 +185,6 @@ type Tworksheet = {
 
   // -----------------------------------------------------------------------------
   calcData: () => Promise<void>;
-
-  // -----------------------------------------------------------------------------
-
-  setGuideRail_str: (props: {
-    key: //
-    'material' | 'guideRailThickness' | 'surface' | 'guideRailType' | 'guideRail';
-    value: string;
-  }) => void;
-
-  setGuideRail_hasSilencingStrip: (value: boolean) => void;
-
-  // ___________________________________________________________
-
-  setBottomBar_str: (props: {
-    key: 'material' | 'bottomBarAngleIron' | 'bottomBarPlate' | 'bottomBar' | 'surface';
-    value: string;
-  }) => void;
-
-  // ___________________________________________________________
-
-  setSidePlate_str: (props: {
-    key: 'bearingName' | 'sprocketWheelModel' | 'sidePlateDirection';
-    value: string;
-  }) => void;
-
-  // -----------------------------------------------------------------------------
-
-  // getABCD: () => Tworksheet['ABCD'];
 
   // -----------------------------------------------------------------------------
 
@@ -398,6 +382,20 @@ const useWorksheet = create<Tworksheet>(
 
         return hasSilencingStrip ? '有' : '無';
       },
+      setGuideRail_str: ({ key, value }) => {
+        set(
+          produce((state) => {
+            state.guideRail[key] = value;
+          })
+        );
+      },
+      setGuideRail_hasSilencingStrip: (value) => {
+        set(
+          produce((state) => {
+            state.guideRail.hasSilencingStrip = value;
+          })
+        );
+      },
     },
 
     bottomBar: {
@@ -406,12 +404,26 @@ const useWorksheet = create<Tworksheet>(
       bottomBarPlate: '',
       bottomBar: '',
       surface: '',
+      setBottomBar_str: ({ key, value }) => {
+        set(
+          produce((state) => {
+            state.bottomBar[key] = value;
+          })
+        );
+      },
     },
 
     sidePlate: {
       getBearingName: () => get().generalSpec?.bearingName ?? '',
       getSprocketWheelModel: () => get().generalSpec?.sprocketWheelModel ?? '',
       sidePlateDirection: '',
+      setSidePlate_str: ({ key, value }) => {
+        set(
+          produce((state) => {
+            state.sidePlate[key] = value;
+          })
+        );
+      },
     },
 
     // ---------------------------------------------------------------------
@@ -653,46 +665,6 @@ const useWorksheet = create<Tworksheet>(
     // ________________________________________________________________________
     calcData: async () => {
       await get().update_generalSpec();
-    },
-
-    // ---------------------------------------------------------------------
-
-    // ___________________________________________________________
-
-    setGuideRail_str: ({ key, value }) => {
-      set(
-        produce((state) => {
-          state.guideRail[key] = value;
-        })
-      );
-    },
-
-    setGuideRail_hasSilencingStrip: (value) => {
-      set(
-        produce((state) => {
-          state.guideRail.hasSilencingStrip = value;
-        })
-      );
-    },
-
-    // ___________________________________________________________
-
-    setBottomBar_str: ({ key, value }) => {
-      set(
-        produce((state) => {
-          state.bottomBar[key] = value;
-        })
-      );
-    },
-
-    // ___________________________________________________________
-
-    setSidePlate_str: ({ key, value }) => {
-      set(
-        produce((state) => {
-          state.sidePlate[key] = value;
-        })
-      );
     },
 
     // ---------------------------------------------------------------------
