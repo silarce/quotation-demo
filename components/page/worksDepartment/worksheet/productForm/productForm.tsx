@@ -290,8 +290,9 @@ function Form_product_ABCD() {
 // =====================================================================
 
 function Form_product_motor() {
-  const { motor } = useWorksheet((state) => ({
+  const { motor, getOptions_horsepower } = useWorksheet((state) => ({
     motor: state.motor,
+    getOptions_horsepower: state.getOptions_horsepower,
   }));
 
   return (
@@ -322,7 +323,7 @@ function Form_product_motor() {
           caption="馬力"
           selectProps={{
             props: {
-              options: optionsCreator_horsePower(),
+              options: getOptions_horsepower(),
               value: { value: motor.horsepower, label: motor.horsepower },
               onChange: (option) => {
                 motor.setMotor_str({ key: 'horsepower', value: option?.value ?? '' });

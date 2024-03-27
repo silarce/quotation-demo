@@ -258,6 +258,20 @@ export const optionsCreator_horsePower = createOptionsCreator({
   ],
 });
 
+const options_horsePower = optionsCreator_horsePower();
+
+export const lookup_horsePowerToToptions = {
+  '1/4HP': options_horsePower[0],
+  '1/3HP': options_horsePower[1],
+  '1/2HP': options_horsePower[2],
+  '3/4HP': options_horsePower[3],
+  '1HP': options_horsePower[4],
+  '1 1/2HP': options_horsePower[5],
+  '2HP': options_horsePower[6],
+  '3HP': options_horsePower[7],
+  '5HP': options_horsePower[8],
+} as const;
+
 export const optionsCreator_productMaterial = createOptionsCreator({
   optionsArr: [
     { value: '黑鐵', label: '鐵材烤漆' },

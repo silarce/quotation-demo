@@ -18,13 +18,17 @@ import {
   TdoorGeneralSpecsDto,
   TdoorModel,
   TdoorComponentListDto,
+  TdoorMotorDto,
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
 import { checkIsFloat } from 'js/utils/checkValue';
 import { lookup_motorPhase } from 'config/product/lookup';
 
-import { lookup_options_bottomBarAngleIronAndPlate } from 'js/utils/options/productOptions';
+import {
+  lookup_options_bottomBarAngleIronAndPlate,
+  lookup_horsePowerToToptions,
+} from 'js/utils/options/productOptions';
 
 import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
 
@@ -177,6 +181,8 @@ type Tworksheet = {
     options_plate: Toption[];
   };
 
+  getOptions_horsepower: () => Toption[];
+
   // -----------------------------------------------------------------------------
   reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
   update_generalSpec: () => Promise<void>;
@@ -193,8 +199,9 @@ type Tworksheet = {
   getHeight_mm: () => number;
 
   // -----------------------------------------------------------------------------
-
   // -----------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------
+  test: () => void;
   // -----------------------------------------------------------------------------
   //
 };
@@ -456,6 +463,7 @@ const useWorksheet = create<Tworksheet>(
           state.qty = qty;
           state.contractProductItem_ori = contractProductItem;
           state.componentList = componentList;
+
           // ____________________________________________________________________
           // ____________________________________________________________________
           state.basicSpec = {
@@ -570,6 +578,7 @@ const useWorksheet = create<Tworksheet>(
             state.generalSpec = generalSpec;
           })
         );
+        get().update_availableComponents();
       }
     }, // init
     //
@@ -612,6 +621,10 @@ const useWorksheet = create<Tworksheet>(
       };
     },
 
+    getOptions_horsepower: () => {
+      return getOptions_horsepower(get().avalibleComponents?.motors ?? []);
+    },
+
     //
     // ---------------------------------------------------------------------
 
@@ -632,6 +645,19 @@ const useWorksheet = create<Tworksheet>(
       set(
         produce((state) => {
           state.generalSpec = generalSpec;
+          const defaultMotor = generalSpec.motors[generalSpec.defaultMotorIndex];
+          const box = defaultMotor.box?.東元 || defaultMotor.box?.default || defaultMotor.box?.大同;
+
+          const { boxB, boxD } = box ?? {};
+          let defaultHp = defaultMotor.hp;
+
+          if (defaultHp === '1.5') {
+            defaultHp = '1 1/2';
+          }
+
+          state.motor.horsepower = defaultHp;
+          state.ABCD.boxB = boxB ?? '';
+          state.ABCD.boxD = boxD ?? '';
         })
       );
       get().update_availableComponents();
@@ -662,7 +688,6 @@ const useWorksheet = create<Tworksheet>(
 
     // ---------------------------------------------------------------------
 
-    // ________________________________________________________________________
     calcData: async () => {
       await get().update_generalSpec();
     },
@@ -682,13 +707,48 @@ const useWorksheet = create<Tworksheet>(
     },
 
     // ---------------------------------------------------------------------
-
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
 
+    test: () => {
+      console.log(get().avalibleComponents);
+    },
+    // ---------------------------------------------------------------------
     //
   }) // set get
 );
+
+// =====================================================================
+
+const getOptions_horsepower = (motorArr: TdoorMotorDto[]) => {
+  let horseposerArr = motorArr.map((motor) => {
+    if (motor.horsePower === '1.5') {
+      return '1 1/2HP';
+    }
+
+    return motor.horsePower;
+  });
+
+  horseposerArr = _.uniq(horseposerArr);
+
+  let options = horseposerArr.map((item) => {
+    if (item === '1.5HP') {
+      item = '1 1/2HP';
+    }
+
+    const option = lookup_horsePowerToToptions[item as keyof typeof lookup_horsePowerToToptions];
+
+    if (!option) {
+      alert(`options_horsepower轉換錯誤，item:${item}`);
+    }
+
+    return option;
+  });
+
+  options = _.sortBy(options, 'hpValue');
+
+  return options;
+};
 
 // =====================================================================
 export { useWorksheet };

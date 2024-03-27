@@ -63,18 +63,18 @@ import WorkSheetPDF_02, {
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
-import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+// import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // api
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 import {
-  TupdateWorkSheetItem,
+  // TupdateWorkSheetItem,
   TcreateWorksheetDto,
-  TupdateWorkSheet,
-  useGetEngineeringContact,
-  useGetWorkSheet,
-  apiPatchWorkSheetProducts,
-  apiDeleteWorkSheetItem,
+  // TupdateWorkSheet,
+  // useGetEngineeringContact,
+  // useGetWorkSheet,
+  // apiPatchWorkSheetProducts,
+  // apiDeleteWorkSheetItem,
   apiPostWorkSheet,
   apiDeleteWorksheet,
   useGetWorksheet_id,
@@ -93,16 +93,16 @@ import { TworkSheetDto, workSheetReducer } from 'js/utils/worksheet/reducer';
 import scss from './workSheet.module.scss';
 
 // options
-import {
-  Toption,
-  optionsCreator_bottomBar,
-  optionsCreator_motorLockBox,
-  optionsCreator_rollerSpec,
-  optionsCreator_bottomBarAngleIron,
-  optionsCreator_bottomBarPlate,
-  optionsCreator_surface,
-  optionsCreator_componentMaterial_01,
-} from 'js/utils/options/productOptions';
+// import {
+//   Toption,
+//   optionsCreator_bottomBar,
+//   optionsCreator_motorLockBox,
+//   optionsCreator_rollerSpec,
+//   optionsCreator_bottomBarAngleIron,
+//   optionsCreator_bottomBarPlate,
+//   optionsCreator_surface,
+//   optionsCreator_componentMaterial_01,
+// } from 'js/utils/options/productOptions';
 
 // type
 import type {
@@ -177,7 +177,11 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  const init = useWorksheet((state) => state.init);
+  const { init, test } = useWorksheet((state) => ({
+    //
+    init: state.init,
+    test: state.test,
+  }));
 
   useEffect(() => {
     const contractProductItems = worksheetData?.latestRecord.contractProductItems;
@@ -520,6 +524,9 @@ export default function Worksheet({
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
+
+        <button onClick={test}>test</button>
+
         <div className={scss.main}>
           {/* left */}
           <div className={scss.left}>
