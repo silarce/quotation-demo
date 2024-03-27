@@ -740,20 +740,7 @@ function Form_product_guideRail({
 
 // =====================================================================
 
-type Tcontrol_bottomBar = {
-  material: Tselect; // 材質 // comList.bottomBar.material
-  bottomBarAngleIron: Tselect; // 角鐵材質 // 底座角鐵
-  bottomBarPlate: Tselect; // 底座鈑材質
-  bottomBar: Tselect; // 類型 // 鋁障感型 止水型
-  surface: Tselect; // 表面 //comList.bottomBar.materialSurface
-};
-
-function Form_product_bottomBar({
-  //
-  control,
-}: {
-  control?: Tcontrol_bottomBar;
-}) {
+function Form_product_bottomBar() {
   const { bottomBar, getOptions_material, setBottomBar_str, getOptions_bottomBarAngleIronAndPlate } = useWorksheet(
     (state) => ({
       bottomBar: state.bottomBar,
@@ -854,13 +841,48 @@ function Form_product_sidePlate({
 }: {
   control?: Tcontrol_sidePlate;
 }) {
+  const { sidePlate, setSidePlate_str } = useWorksheet((state) => ({
+    sidePlate: state.sidePlate,
+    setSidePlate_str: state.setSidePlate_str,
+  }));
+
   return (
     <div>
       <p className={scss.caption}>●支鈑</p>
       <div className={scss.grid}>
-        <InputSel {...basicConfig} caption="軸承" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="鍊條" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="方向" selectProps={selectPropsAccessor()} />
+        <InputSel
+          {...basicConfig}
+          caption="軸承"
+          selectProps={{
+            props: {
+              isDisabled: true,
+              value: { value: sidePlate.bearingName, label: sidePlate.bearingName },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="鍊條"
+          selectProps={{
+            props: {
+              isDisabled: true,
+              value: { value: sidePlate.sprocketWheelModel, label: sidePlate.sprocketWheelModel },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="方向"
+          selectProps={{
+            props: {
+              value: { value: sidePlate.sidePlateDirection, label: sidePlate.sidePlateDirection },
+              options: optionsCreator_direction(),
+              onChange: (option) => {
+                setSidePlate_str({ key: 'sidePlateDirection', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
       </div>
     </div>
   );

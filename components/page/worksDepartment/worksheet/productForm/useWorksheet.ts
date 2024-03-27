@@ -124,6 +124,11 @@ type Tworksheet = {
     surface: string;
   };
 
+  sidePlate: {
+    bearingName: string;
+    sprocketWheelModel: string;
+    sidePlateDirection: string;
+  };
   //
   init: (props: {
     itemIdArr: Tworksheet['itemIdArr'];
@@ -204,6 +209,13 @@ type Tworksheet = {
 
   setBottomBar_str: (props: {
     key: 'material' | 'bottomBarAngleIron' | 'bottomBarPlate' | 'bottomBar' | 'surface';
+    value: string;
+  }) => void;
+
+  // -----------------------------------------------------------------------------
+
+  setSidePlate_str: (props: {
+    key: 'bearingName' | 'sprocketWheelModel' | 'sidePlateDirection';
     value: string;
   }) => void;
 
@@ -304,6 +316,12 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
         surface: '',
       },
 
+      sidePlate: {
+        bearingName: '',
+        sprocketWheelModel: '',
+        sidePlateDirection: '',
+      },
+
       // ---------------------------------------------------------------------
       // ---------------------------------------------------------------------
       //
@@ -402,6 +420,12 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
             bottomBarPlate: contractProductItem?.bottomBarPlate ?? '',
             bottomBar: contractProductItem?.bottomBar ?? '',
             surface: componentList?.bottomBar.materialSurface ?? '',
+          };
+
+          state.sidePlate = {
+            bearingName: contractProductItem?.bearingName ?? '',
+            sprocketWheelModel: contractProductItem?.sprocketWheelModel ?? '',
+            sidePlateDirection: contractProductItem?.sidePlateDirection ?? '',
           };
 
           //
@@ -550,6 +574,12 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       },
 
       // ---------------------------------------------------------------------
+
+      setSidePlate_str: ({ key, value }) => {
+        set((state) => {
+          state.sidePlate[key] = value;
+        });
+      },
 
       // ---------------------------------------------------------------------
       // ---------------------------------------------------------------------
