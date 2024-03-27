@@ -19,6 +19,7 @@ import {
   TdoorModel,
   TdoorComponentListDto,
   TdoorMotorDto,
+  TdoorGeneralSpecsMotorDto,
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
@@ -664,21 +665,17 @@ const useWorksheet = create<Tworksheet>(
       const generalSpec = await get().reqGeneralSpec();
 
       set(
-        produce((state) => {
+        produce<Tworksheet>((state) => {
           state.generalSpec = generalSpec;
-          const defaultMotor = generalSpec.motors[generalSpec.defaultMotorIndex];
-          const box = defaultMotor.box?.東元 || defaultMotor.box?.default || defaultMotor.box?.大同;
 
-          const { boxB, boxD } = box ?? {};
-          let defaultHp = defaultMotor.hp;
-
-          if (defaultHp === '1.5') {
-            defaultHp = '1 1/2';
-          }
+          const { defaultHp, defaultVendor, defaultBoxB, defaultBoxD } = produceMotor(
+            generalSpec.motors[generalSpec.defaultMotorIndex]
+          );
 
           state.motor.horsepower = defaultHp;
-          state.ABCD.boxB = boxB ?? '';
-          state.ABCD.boxD = boxD ?? '';
+          state.motor.vendor = defaultVendor;
+          state.ABCD.boxB = String(defaultBoxB ?? '');
+          state.ABCD.boxD = String(defaultBoxD ?? '');
         })
       );
       get().update_availableComponents();
@@ -769,6 +766,28 @@ const getOptions_horsepower = (motorArr: TdoorMotorDto[]) => {
   options = _.sortBy(options, 'hpValue');
 
   return options;
+};
+
+const produceMotor = (defaultMotor: TdoorGeneralSpecsMotorDto) => {
+  const boxList = defaultMotor.box;
+
+  const defaultVendor = !boxList ? '東元' : '東元' in boxList || 'default' in boxList ? '東元' : '大同';
+
+  const box = boxList?.東元 || boxList?.default || boxList?.大同;
+
+  const { boxB, boxD } = box ?? {};
+  let defaultHp = defaultMotor.hp;
+
+  if (defaultHp === '1.5') {
+    defaultHp = '1 1/2';
+  }
+
+  return {
+    defaultHp,
+    defaultVendor,
+    defaultBoxB: String(boxB ?? ''),
+    defaultBoxD: String(boxD ?? ''),
+  };
 };
 
 // =====================================================================
