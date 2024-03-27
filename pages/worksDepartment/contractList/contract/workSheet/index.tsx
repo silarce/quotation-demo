@@ -177,10 +177,8 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  const { init, test } = useWorksheet((state) => ({
-    init: state.init,
-    test: state.test,
-  }));
+  const init = useWorksheet((state) => state.init);
+  const test = useWorksheet((state) => state.test);
 
   useEffect(() => {
     const contractProductItems = worksheetData?.latestRecord.contractProductItems;
@@ -523,8 +521,9 @@ export default function Worksheet({
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
-
-        <button onClick={test}>test</button>
+        <button onClick={test} className=" text-9xl">
+          test
+        </button>
 
         <div className={scss.main}>
           {/* left */}

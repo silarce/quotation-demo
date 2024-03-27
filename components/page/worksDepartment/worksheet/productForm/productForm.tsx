@@ -18,6 +18,7 @@ import { useApiGetProdDoorModels } from 'js/api/api_product';
 
 // zustand
 import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
+import { useShallow } from 'zustand/react/shallow';
 
 import {
   optionsCreator_motorSupply,
@@ -71,13 +72,18 @@ function Form_product_basic() {
   const { res: doorModelArr, update: update_doorModel, doorModelList } = useApiGetProdDoorModels();
 
   // --------------------------------------------------
-  const { doorModelInfo, basicSpec, setDoorModelInfo, getOptions_material, calcData } = useWorksheet((state) => ({
-    doorModelInfo: state.doorModelInfo,
-    basicSpec: state.basicSpec,
-    setDoorModelInfo: state.setDoorModelInfo,
-    getOptions_material: state.getOptions_material,
-    calcData: state.calcData,
-  }));
+
+  const { doorModelInfo, basicSpec, setDoorModelInfo, getOptions_material, calcData } = useWorksheet(
+    useShallow((state) => ({
+      doorModelInfo: state.doorModelInfo,
+      basicSpec: state.basicSpec,
+      setDoorModelInfo: state.setDoorModelInfo,
+      getOptions_material: state.getOptions_material,
+      calcData: state.calcData,
+      generalSpec: state.generalSpec, // 用於更新getOptions
+      // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+    }))
+  );
 
   // ---------------------------------------------------------------------
 
@@ -224,9 +230,18 @@ function Form_product_basic() {
 // =====================================================================
 
 function Form_product_ABCD() {
-  const { ABCD } = useWorksheet((state) => ({
-    ABCD: state.ABCD,
-  }));
+  const ABCD = useWorksheet(
+    useShallow((state) => ({
+      gapA: state.ABCD.getGapA(),
+      gapC: state.ABCD.getGapC(),
+      boxB: state.ABCD.boxB,
+      boxD: state.ABCD.boxD,
+      setGapA: state.ABCD.setGapA,
+      setGapC: state.ABCD.setGapC,
+      setBoxB: state.ABCD.setBoxB,
+      setBoxD: state.ABCD.setBoxD,
+    }))
+  );
 
   return (
     <div className={scss.grid}>
@@ -236,7 +251,7 @@ function Form_product_ABCD() {
         inputProps={{
           props: {
             type: 'number',
-            value: ABCD.getGapA(),
+            value: ABCD.gapA,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
               ABCD.setGapA(e.target.value);
             },
@@ -249,7 +264,7 @@ function Form_product_ABCD() {
         inputProps={{
           props: {
             type: 'number',
-            value: ABCD.getGapC(),
+            value: ABCD.gapC,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
               ABCD.setGapC(e.target.value);
             },
@@ -289,12 +304,16 @@ function Form_product_ABCD() {
 // =====================================================================
 
 function Form_product_motor() {
-  const { motor, getOptions_horsepower, getOptions_motorVendor, getOptions_electricSupply } = useWorksheet((state) => ({
-    motor: state.motor,
-    getOptions_horsepower: state.getOptions_horsepower,
-    getOptions_motorVendor: state.getOptions_motorVendor,
-    getOptions_electricSupply: state.getOptions_electricSupply,
-  }));
+  const { motor, getOptions_horsepower, getOptions_motorVendor, getOptions_electricSupply } = useWorksheet(
+    useShallow((state) => ({
+      motor: state.motor,
+      getOptions_horsepower: state.getOptions_horsepower,
+      getOptions_motorVendor: state.getOptions_motorVendor,
+      getOptions_electricSupply: state.getOptions_electricSupply,
+      generalSpec: state.generalSpec, // 用於更新getOptions
+      avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+    }))
+  );
 
   return (
     <div>
@@ -412,14 +431,18 @@ function Form_product_headBox() {
     //
     headBox,
     getOptions_material,
-    getIsIntegratedHeadBox,
+    isIntegratedHeadBox,
     getOptions_headBoxThickness,
-  } = useWorksheet((state) => ({
-    headBox: state.headBox,
-    getOptions_material: state.getOptions_material,
-    getIsIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox,
-    getOptions_headBoxThickness: state.getOptions_headBoxThickness,
-  }));
+  } = useWorksheet(
+    useShallow((state) => ({
+      headBox: state.headBox,
+      isIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox(),
+      getOptions_material: state.getOptions_material,
+      getOptions_headBoxThickness: state.getOptions_headBoxThickness,
+      generalSpec: state.generalSpec, // 用於更新getOptions
+      avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+    }))
+  );
 
   return (
     <div>
@@ -496,7 +519,7 @@ function Form_product_headBox() {
           selectProps={{
             props: {
               options: optionsCreator_isIntegratedHeadBox(),
-              value: { value: getIsIntegratedHeadBox(), label: getIsIntegratedHeadBox() },
+              value: { value: isIntegratedHeadBox, label: isIntegratedHeadBox },
               onChange: (option) => {
                 const value = option?.value;
                 const bool = value === 'true';
@@ -526,9 +549,7 @@ function Form_product_headBox() {
 // =====================================================================
 
 function Form_product_roller() {
-  const { roller } = useWorksheet((state) => ({
-    roller: state.roller,
-  }));
+  const roller = useWorksheet((state) => state.roller);
 
   return (
     <div>
@@ -564,10 +585,14 @@ function Form_product_roller() {
 // =====================================================================
 
 function Form_product_slat() {
-  const { slat, getOptions_material } = useWorksheet((state) => ({
-    slat: state.slat,
-    getOptions_material: state.getOptions_material,
-  }));
+  const { slat, getOptions_material } = useWorksheet(
+    useShallow((state) => ({
+      slat: state.slat,
+      getOptions_material: state.getOptions_material,
+      generalSpec: state.generalSpec, // 用於更新getOptions
+      // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+    }))
+  );
 
   return (
     <div>
@@ -606,29 +631,16 @@ function Form_product_slat() {
 
 // =====================================================================
 
-type Tcontrol_guideRail = {
-  material: Tselect; // 材質 comList.guideRail.material;
-  guideRailThickness: Tselect; // 厚度 prod.guideRailThickness
-  surface: Tselect; // 表面 comList.guideRail.materialSurface;
-  hasSilencingStrip: Tselect; // 消音條 // 有 無 _prod.hasSilencingStrip;
-  guideRailType: Tselect; // 彎直 // 彎 直 _prod.guideRailType;
-  // 編輯guideRail要同時編輯 guideRailsOpening guideRailG
-  guideRail: Tselect; // 形式  // 門軌的name，下拉式選單的label為門軌的icon _prod.guideRail
-};
-
-function Form_product_guideRail({
-  //
-  control,
-}: {
-  control?: Tcontrol_guideRail;
-}) {
-  const { guideRail, getHasSilencingStrip, getOptions_material } = useWorksheet((state) => ({
-    guideRail: state.guideRail,
-    getHasSilencingStrip: state.guideRail.getHasSilencingStrip,
-    getOptions_material: state.getOptions_material,
-    // setGuideRail_str: state.setGuideRail_str,
-    // setGuideRail_hasSilencingStrip: state.setGuideRail_hasSilencingStrip,
-  }));
+function Form_product_guideRail() {
+  const { guideRail, hasSilencingStrip, getOptions_material } = useWorksheet(
+    useShallow((state) => ({
+      guideRail: state.guideRail,
+      hasSilencingStrip: state.guideRail.getHasSilencingStrip(),
+      getOptions_material: state.getOptions_material,
+      generalSpec: state.generalSpec, // 用於更新getOptions
+      avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+    }))
+  );
 
   return (
     <div>
@@ -688,8 +700,8 @@ function Form_product_guideRail({
             props: {
               options: optionsCreator_boolean(),
               value: {
-                value: getHasSilencingStrip(),
-                label: getHasSilencingStrip(),
+                value: hasSilencingStrip,
+                label: hasSilencingStrip,
               },
               onChange: (option) => {
                 const bool = !!(option?.value === 'true');
@@ -738,12 +750,15 @@ function Form_product_guideRail({
 // =====================================================================
 
 function Form_product_bottomBar() {
-  const { bottomBar, getOptions_material, getOptions_bottomBarAngleIronAndPlate } = useWorksheet((state) => ({
-    bottomBar: state.bottomBar,
-    getOptions_material: state.getOptions_material,
-
-    getOptions_bottomBarAngleIronAndPlate: state.getOptions_bottomBarAngleIronAndPlate,
-  }));
+  const { bottomBar, getOptions_material, getOptions_bottomBarAngleIronAndPlate } = useWorksheet(
+    useShallow((state) => ({
+      bottomBar: state.bottomBar,
+      getOptions_material: state.getOptions_material,
+      getOptions_bottomBarAngleIronAndPlate: state.getOptions_bottomBarAngleIronAndPlate,
+      generalSpec: state.generalSpec, // 用於更新getOptions
+      // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+    }))
+  );
 
   const { options_angleIron, options_plate } = getOptions_bottomBarAngleIronAndPlate();
 
@@ -825,9 +840,7 @@ function Form_product_bottomBar() {
 // =====================================================================
 
 function Form_product_sidePlate() {
-  const { sidePlate } = useWorksheet((state) => ({
-    sidePlate: state.sidePlate,
-  }));
+  const sidePlate = useWorksheet((state) => state.sidePlate);
 
   return (
     <div>
