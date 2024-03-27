@@ -72,24 +72,12 @@ function Form_product_basic() {
   const { res: doorModelArr, update: update_doorModel, doorModelList } = useApiGetProdDoorModels();
 
   // --------------------------------------------------
-  const {
-    doorModelInfo,
-    basicSpec,
-    // setBasicSpec_str,
-    // setBasicSpec_bool,
-    // setBasicSpec_strNum,
-    setDoorModelInfo,
-    getOptions_material,
-    // setBasicSpec_material,
-  } = useWorksheet((state) => ({
+  const { doorModelInfo, basicSpec, setDoorModelInfo, getOptions_material, calcData } = useWorksheet((state) => ({
     doorModelInfo: state.doorModelInfo,
     basicSpec: state.basicSpec,
-    // setBasicSpec_str: state.setBasicSpec_str,
-    // setBasicSpec_bool: state.setBasicSpec_bool,
-    // setBasicSpec_strNum: state.setBasicSpec_strNum,
     setDoorModelInfo: state.setDoorModelInfo,
     getOptions_material: state.getOptions_material,
-    // setBasicSpec_material: state.setBasicSpec_material,
+    calcData: state.calcData,
   }));
 
   // ---------------------------------------------------------------------
@@ -120,110 +108,116 @@ function Form_product_basic() {
   // ---------------------------------------------------------------------
 
   return (
-    <div className={scss.grid}>
-      <InputSel
-        {...basicConfig}
-        caption="項目"
-        inputProps={{
-          props: {
-            value: basicSpec.itemName,
-            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              basicSpec.setBasicSpec_str({ key: 'itemName', value: e.target.value });
+    <div>
+      <div className={scss.grid}>
+        <InputSel
+          {...basicConfig}
+          caption="項目"
+          inputProps={{
+            props: {
+              value: basicSpec.itemName,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                basicSpec.setBasicSpec_str({ key: 'itemName', value: e.target.value });
+              },
             },
-          },
-        }}
-      />
-      <InputSel
-        {...basicConfig}
-        caption="門型"
-        selectProps={{
-          props: {
-            value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
-            options: options_doorModel,
-            onChange: (option) => {
-              const obj = option?.obj as TdoorModelInfoDto;
-              setDoorModelInfo(obj);
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="門型"
+          selectProps={{
+            props: {
+              value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
+              options: options_doorModel,
+              onChange: (option) => {
+                const obj = option?.obj as TdoorModelInfoDto;
+                setDoorModelInfo(obj);
+              },
             },
-          },
-        }}
-      />
-      <InputSel
-        {...basicConfig}
-        caption="全寬(L)"
-        inputProps={{
-          props: {
-            type: 'number',
-            value: basicSpec.fullWidth,
-            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              basicSpec.setBasicSpec_strNum({ key: 'fullWidth', value: e.target.value });
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="全寬(L)"
+          inputProps={{
+            props: {
+              type: 'number',
+              value: basicSpec.fullWidth,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                basicSpec.setBasicSpec_strNum({ key: 'fullWidth', value: e.target.value });
+              },
             },
-          },
-        }}
-      />
-      <InputSel
-        {...basicConfig}
-        caption="數量"
-        inputProps={{
-          props: {
-            value: basicSpec.qty,
-            readOnly: true,
-          },
-        }}
-      />
-      <InputSel
-        {...basicConfig}
-        caption="W+G"
-        inputProps={{
-          props: {
-            type: 'number',
-            value: basicSpec.WG,
-            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              basicSpec.setBasicSpec_strNum({ key: 'WG', value: e.target.value });
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="數量"
+          inputProps={{
+            props: {
+              value: basicSpec.qty,
+              readOnly: true,
             },
-          },
-        }}
-      />
-      <InputSel
-        {...basicConfig}
-        caption="材質"
-        selectProps={{
-          props: {
-            value: { value: basicSpec.material, label: basicSpec.material },
-            options: getOptions_material(),
-            onChange: (option) => {
-              basicSpec.setBasicSpec_material(option?.value ?? '');
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="W+G"
+          inputProps={{
+            props: {
+              readOnly: true,
+              type: 'number',
+              value: basicSpec.WG,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                basicSpec.setBasicSpec_strNum({ key: 'WG', value: e.target.value });
+              },
             },
-          },
-        }}
-      />
-      <InputSel
-        {...basicConfig}
-        caption="淨高(h)"
-        inputProps={{
-          props: {
-            type: 'number',
-            value: basicSpec.height,
-            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              basicSpec.setBasicSpec_strNum({ key: 'height', value: e.target.value });
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="材質"
+          selectProps={{
+            props: {
+              value: { value: basicSpec.material, label: basicSpec.material },
+              options: getOptions_material(),
+              onChange: (option) => {
+                basicSpec.setBasicSpec_material(option?.value ?? '');
+              },
             },
-          },
-        }}
-      />
-      <InputSel
-        {...basicConfig}
-        caption="防颱"
-        wrapperStyle={{ width: '140px' }}
-        checkBoxProps_v2={{
-          props: {
-            value: basicSpec.isAntiTyphoon ? ['isAntiTyphoon'] : [],
-            options: [{ label: null, value: 'isAntiTyphoon' }],
-            onChange: (strArr) => {
-              const isAntiTyphoon = strArr.includes('isAntiTyphoon');
-              basicSpec.setBasicSpec_bool({ key: 'isAntiTyphoon', value: isAntiTyphoon });
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="淨高(h)"
+          inputProps={{
+            props: {
+              type: 'number',
+              value: basicSpec.height,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                basicSpec.setBasicSpec_strNum({ key: 'height', value: e.target.value });
+              },
             },
-          },
-        }}
-      />
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="防颱"
+          wrapperStyle={{ width: '140px' }}
+          checkBoxProps_v2={{
+            props: {
+              value: basicSpec.isAntiTyphoon ? ['isAntiTyphoon'] : [],
+              options: [{ label: null, value: 'isAntiTyphoon' }],
+              onChange: (strArr) => {
+                const isAntiTyphoon = strArr.includes('isAntiTyphoon');
+                basicSpec.setBasicSpec_bool({ key: 'isAntiTyphoon', value: isAntiTyphoon });
+              },
+            },
+          }}
+        />
+      </div>
+      <MyButton_v2 preImg="upload" px="px32" className="block m-auto mr-0 mt-5" onClick={calcData}>
+        計算
+      </MyButton_v2>
     </div>
   );
 }

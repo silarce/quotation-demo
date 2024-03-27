@@ -17,6 +17,7 @@ import {
   TdoorComponentType,
   TdoorGeneralSpecsDto,
   TdoorModel,
+  TdoorComponentListDto,
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
@@ -25,7 +26,7 @@ import { lookup_motorPhase } from 'config/product/lookup';
 
 import { lookup_options_bottomBarAngleIronAndPlate } from 'js/utils/options/productOptions';
 
-import { apiGetProdCalcGeneralSpec } from 'js/api/api_product';
+import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
 
 // =====================================================================
 
@@ -38,7 +39,7 @@ type Tworksheet = {
   componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
 
   generalSpec: TdoorGeneralSpecsDto | undefined;
-
+  avalibleComponents: TdoorComponentListDto | undefined;
   //
   itemIdArr: string[];
   qty: number;
@@ -168,6 +169,9 @@ type Tworksheet = {
   reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
   update_generalSpec: () => Promise<void>;
 
+  update_availableComponents: () => Promise<void>;
+
+  // -----------------------------------------------------------------------------
   calcData: () => Promise<void>;
 
   // -----------------------------------------------------------------------------
@@ -228,6 +232,7 @@ const useWorksheet = create<Tworksheet>(
     doorModelInfo: undefined,
     componentList: undefined,
     generalSpec: undefined,
+    avalibleComponents: undefined,
     // ---------------------------------------------------------------------
     itemIdArr: [],
     qty: 0,
@@ -615,6 +620,30 @@ const useWorksheet = create<Tworksheet>(
       set(
         produce((state) => {
           state.generalSpec = generalSpec;
+        })
+      );
+      get().update_availableComponents();
+    },
+
+    // _________________________________________________________________
+    update_availableComponents: async () => {
+      const generalSpec = get().generalSpec;
+      const basicSpec = get().basicSpec;
+
+      if (!generalSpec) {
+        return alert('執行update_availableComponents時generalSpec為undefined');
+      }
+
+      const avalibleComponents = await apiGetProdAvailableComponents({
+        modelName: basicSpec.doorModelName as TdoorModel,
+        weight: generalSpec.weight,
+        isAntiTyphoon: basicSpec.isAntiTyphoon,
+        rollerDiameter: generalSpec.diameter,
+      });
+
+      set(
+        produce((state) => {
+          state.avalibleComponents = avalibleComponents;
         })
       );
     },

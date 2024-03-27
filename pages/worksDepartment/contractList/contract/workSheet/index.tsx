@@ -541,9 +541,6 @@ export default function Worksheet({
               <div>
                 <p className={'mb-8 text-main text-xl font-bold'}>設定產品基本規格：</p>
                 <Form_product_basic />
-                <MyButton_v2 preImg="upload" px="px32" className="block m-auto mr-0 mt-5">
-                  計算
-                </MyButton_v2>
               </div>
               <div>
                 <p className={'mb-8 text-main text-xl font-bold'}>設定產品細部規格：</p>
