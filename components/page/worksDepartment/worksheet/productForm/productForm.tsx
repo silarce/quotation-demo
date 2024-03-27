@@ -30,6 +30,7 @@ import {
   optionsCreator_surface,
   optionsCreator_front,
   optionsCreator_rollerSpec,
+  optionsCreator_boolean,
 } from 'js/utils/options/productOptions';
 
 // =====================================================================
@@ -562,17 +563,7 @@ function Form_product_roller() {
 
 // =====================================================================
 
-type Tcontrol_slat = {
-  material: Tselect; // 材質 comList.slat.material;
-  surface: Tselect; // 表面 comList.slat.materialSurface;
-};
-
-function Form_product_slat({
-  //
-  control,
-}: {
-  control?: Tcontrol_slat;
-}) {
+function Form_product_slat() {
   const { slat, setSlat_str, getOptions_material } = useWorksheet((state) => ({
     slat: state.slat,
     setSlat_str: state.setSlat_str,
@@ -585,7 +576,7 @@ function Form_product_slat({
       <div className={scss.grid}>
         <InputSel
           {...basicConfig}
-          caption="材質`"
+          caption="材質"
           selectProps={{
             props: {
               value: { value: slat.material, label: slat.material },
@@ -632,16 +623,115 @@ function Form_product_guideRail({
 }: {
   control?: Tcontrol_guideRail;
 }) {
+  const { guideRail, getHasSilencingStrip, getOptions_material, setGuideRail_str, setGuideRail_hasSilencingStrip } =
+    useWorksheet((state) => ({
+      guideRail: state.guideRail,
+      getHasSilencingStrip: state.guideRail.getHasSilencingStrip,
+      getOptions_material: state.getOptions_material,
+      setGuideRail_str: state.setGuideRail_str,
+      setGuideRail_hasSilencingStrip: state.setGuideRail_hasSilencingStrip,
+    }));
+
   return (
     <div>
       <p className={scss.caption}>●門軌</p>
       <div className={scss.grid}>
-        <InputSel {...basicConfig} caption="材質" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="厚度" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="表面" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="消音條" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="彎直" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="形式" selectProps={selectPropsAccessor()} />
+        <InputSel
+          {...basicConfig}
+          caption="材質"
+          selectProps={{
+            props: {
+              options: getOptions_material(),
+              value: {
+                value: guideRail.material,
+                label: guideRail.material,
+              },
+              onChange: (option) => {
+                setGuideRail_str({ key: 'material', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="厚度"
+          selectProps={{
+            props: {
+              value: {
+                value: guideRail.guideRailThickness,
+                label: guideRail.guideRailThickness,
+              },
+              onChange: (option) => {
+                setGuideRail_str({ key: 'guideRailThickness', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="表面"
+          selectProps={{
+            props: {
+              options: optionsCreator_surface(),
+              value: {
+                value: guideRail.surface,
+                label: guideRail.surface,
+              },
+              onChange: (option) => {
+                setGuideRail_str({ key: 'surface', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="消音條"
+          selectProps={{
+            props: {
+              options: optionsCreator_boolean(),
+              value: {
+                value: getHasSilencingStrip(),
+                label: getHasSilencingStrip(),
+              },
+              onChange: (option) => {
+                const bool = !!(option?.value === 'true');
+
+                setGuideRail_hasSilencingStrip(bool);
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="彎直"
+          selectProps={{
+            props: {
+              options: optionsCreator_direction(),
+              value: {
+                value: guideRail.guideRailType,
+                label: guideRail.guideRailType,
+              },
+              onChange: (option) => {
+                setGuideRail_str({ key: 'guideRailType', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="形式"
+          selectProps={{
+            props: {
+              value: {
+                value: guideRail.guideRail,
+                label: guideRail.guideRail,
+              },
+              onChange: (option) => {
+                setGuideRail_str({ key: 'guideRail', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
       </div>
     </div>
   );

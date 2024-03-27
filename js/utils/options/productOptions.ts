@@ -229,6 +229,13 @@ export const optionsCreator_isIntegratedHeadBox = createOptionsCreator({
   ],
 });
 
+export const optionsCreator_boolean = createOptionsCreator({
+  optionsArr: [
+    { value: 'true', label: '有' },
+    { value: 'false', label: '無' },
+  ],
+});
+
 export const optionsCreator_horsePower = createOptionsCreator({
   optionsArr: [
     { value: '1/4HP', label: '1/4HP', hpValue: '0.25' },

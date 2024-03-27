@@ -92,6 +92,16 @@ type Tworksheet = {
     surface: string;
   };
 
+  guideRail: {
+    material: string;
+    guideRailThickness: string;
+    surface: string;
+    hasSilencingStrip: boolean;
+    guideRailType: string;
+    guideRail: string;
+    getHasSilencingStrip: () => string;
+  };
+
   //
   init: (props: {
     itemIdArr: Tworksheet['itemIdArr'];
@@ -152,6 +162,16 @@ type Tworksheet = {
   // -----------------------------------------------------------------------------
 
   setSlat_str: (props: { key: 'material' | 'surface'; value: string }) => void;
+
+  // -----------------------------------------------------------------------------
+
+  setGuideRail_str: (props: {
+    key: //
+    'material' | 'guideRailThickness' | 'surface' | 'guideRailType' | 'guideRail';
+    value: string;
+  }) => void;
+
+  setGuideRail_hasSilencingStrip: (value: boolean) => void;
 
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
@@ -226,6 +246,20 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       slat: {
         material: '',
         surface: '',
+      },
+
+      guideRail: {
+        material: '',
+        guideRailThickness: '',
+        surface: '',
+        hasSilencingStrip: false,
+        guideRailType: '',
+        guideRail: '',
+        getHasSilencingStrip: () => {
+          const hasSilencingStrip = get().guideRail.hasSilencingStrip;
+
+          return hasSilencingStrip ? '有' : '無';
+        },
       },
 
       // ---------------------------------------------------------------------
@@ -308,6 +342,16 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
           state.slat = {
             material: componentList?.slat?.material ?? '',
             surface: componentList?.slat?.materialSurface ?? '',
+          };
+
+          state.guideRail = {
+            material: componentList?.guideRail?.material ?? '',
+            guideRailThickness: String(contractProductItem?.guideRailThickness ?? ''),
+            surface: componentList?.guideRail?.materialSurface ?? '',
+            hasSilencingStrip: !!contractProductItem?.hasSilencingStrip,
+            guideRailType: contractProductItem?.guideRailType ?? '',
+            guideRail: contractProductItem?.guideRail ?? '',
+            getHasSilencingStrip: state.guideRail.getHasSilencingStrip,
           };
 
           //
@@ -410,6 +454,20 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       setSlat_str: ({ key, value }) => {
         set((state) => {
           state.slat[key] = value;
+        });
+      },
+
+      // ---------------------------------------------------------------------
+
+      setGuideRail_str: ({ key, value }) => {
+        set((state) => {
+          state.guideRail[key] = value;
+        });
+      },
+
+      setGuideRail_hasSilencingStrip: (value) => {
+        set((state) => {
+          state.guideRail.hasSilencingStrip = value;
         });
       },
 
