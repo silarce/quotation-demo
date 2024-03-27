@@ -33,7 +33,6 @@ import {
   optionsCreator_boolean,
   optionsCreator_bottomBar_2,
 } from 'js/utils/options/productOptions';
-import { set } from 'lodash';
 
 // =====================================================================
 
@@ -290,10 +289,11 @@ function Form_product_ABCD() {
 // =====================================================================
 
 function Form_product_motor() {
-  const { motor, getOptions_horsepower, getOptions_motorVendor } = useWorksheet((state) => ({
+  const { motor, getOptions_horsepower, getOptions_motorVendor, getOptions_electricSupply } = useWorksheet((state) => ({
     motor: state.motor,
     getOptions_horsepower: state.getOptions_horsepower,
     getOptions_motorVendor: state.getOptions_motorVendor,
+    getOptions_electricSupply: state.getOptions_electricSupply,
   }));
 
   return (
@@ -306,7 +306,7 @@ function Form_product_motor() {
           caption="電供"
           selectProps={{
             props: {
-              options: optionsCreator_motorSupply(),
+              options: getOptions_electricSupply(),
               value: { value: motor.getElectricSupply(), label: motor.getElectricSupply() },
               onChange: (option) => {
                 const phase = option?.phase as string | undefined;

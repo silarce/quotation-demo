@@ -190,6 +190,7 @@ type Tworksheet = {
 
   getOptions_horsepower: () => Toption[];
   getOptions_motorVendor: () => Toption[];
+  getOptions_electricSupply: () => Toption[];
 
   // -----------------------------------------------------------------------------
   reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
@@ -629,9 +630,7 @@ const useWorksheet = create<Tworksheet>(
       };
     },
 
-    getOptions_horsepower: () => {
-      return getOptions_horsepower(get().avalibleComponents?.motors ?? []);
-    },
+    getOptions_horsepower: () => getOptions_horsepower(get().avalibleComponents?.motors ?? []),
 
     getOptions_motorVendor: () => {
       const motors = get().avalibleComponents?.motors ?? [];
@@ -646,6 +645,8 @@ const useWorksheet = create<Tworksheet>(
 
       return options;
     },
+
+    getOptions_electricSupply: () => getOptions_electricSupply(get().avalibleComponents?.motors ?? []),
 
     //
     // ---------------------------------------------------------------------
@@ -664,6 +665,8 @@ const useWorksheet = create<Tworksheet>(
     update_generalSpec: async () => {
       const generalSpec = await get().reqGeneralSpec();
 
+      const option_electricSupply = get().getOptions_electricSupply()[0];
+
       set(
         produce<Tworksheet>((state) => {
           state.generalSpec = generalSpec;
@@ -676,6 +679,9 @@ const useWorksheet = create<Tworksheet>(
           state.motor.vendor = defaultVendor;
           state.ABCD.boxB = String(defaultBoxB ?? '');
           state.ABCD.boxD = String(defaultBoxD ?? '');
+
+          state.motor.motorVoltage = (option_electricSupply.voltage ?? '') as string;
+          state.motor.motorPhase = (option_electricSupply.phase ?? '') as string;
         })
       );
       get().update_availableComponents();
@@ -738,6 +744,7 @@ const useWorksheet = create<Tworksheet>(
 
 // =====================================================================
 
+// 取得馬力選項
 const getOptions_horsepower = (motorArr: TdoorMotorDto[]) => {
   let horseposerArr = motorArr.map((motor) => {
     if (motor.horsePower === '1.5') {
@@ -768,6 +775,29 @@ const getOptions_horsepower = (motorArr: TdoorMotorDto[]) => {
   return options;
 };
 
+// 取得電供選項
+const getOptions_electricSupply = (motorArr: TdoorMotorDto[]) => {
+  let isValtage220 = false;
+  let isValtage380 = false;
+  let isPhase1 = false;
+  let isPhase3 = false;
+  motorArr.forEach((motor) => {
+    const { voltage, phase } = motor;
+    voltage === 220 && (isValtage220 = true);
+    voltage === 380 && (isValtage380 = true);
+    phase === 1 && (isPhase1 = true);
+    phase === 3 && (isPhase3 = true);
+  });
+
+  const options: Toption[] = [];
+  isValtage220 && isPhase1 && options.push({ value: '單相 220V', label: '單相 220V', voltage: '220', phase: '1' });
+  isValtage220 && isPhase3 && options.push({ value: '三相 220V', label: '三相 220V', voltage: '220', phase: '3' });
+  isValtage380 && isPhase3 && options.push({ value: '三相 380V', label: '三相 380V', voltage: '380', phase: '3' });
+
+  return options;
+};
+
+// 取得各項馬達預設值
 const produceMotor = (defaultMotor: TdoorGeneralSpecsMotorDto) => {
   const boxList = defaultMotor.box;
 
