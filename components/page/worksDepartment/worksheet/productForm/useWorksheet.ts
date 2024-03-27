@@ -52,6 +52,20 @@ type Tworksheet = {
     height: string;
     material: string;
     isAntiTyphoon: boolean;
+    setBasicSpec_str: (props: {
+      key: keyof Omit<
+        Exclude<Tworksheet['basicSpec'], undefined>,
+        'isAntiTyphoon' | 'fullWidth' | 'WG' | 'height' | 'doorModelName'
+      >;
+      value: string;
+    }) => void;
+    setBasicSpec_material: (str: string) => void;
+    setBasicSpec_strNum: (props: {
+      //
+      key: keyof Pick<Exclude<Tworksheet['basicSpec'], undefined>, 'fullWidth' | 'WG' | 'height'>;
+      value: string;
+    }) => void;
+    setBasicSpec_bool: (props: { key: 'isAntiTyphoon'; value: boolean }) => void;
   };
 
   ABCD: {
@@ -59,6 +73,10 @@ type Tworksheet = {
     getGapC: () => string;
     boxB: string;
     boxD: string;
+    setGapA: (value: string) => void;
+    setGapC: (value: string) => void;
+    setBoxB: (value: string) => void;
+    setBoxD: (value: string) => void;
   };
 
   motor: {
@@ -71,6 +89,12 @@ type Tworksheet = {
     motorLockBox: string;
     electricMotorDirection: string;
     getElectricSupply: () => string;
+    setMotor_supply: (props: { phase: string; voltage: string }) => void;
+
+    setMotor_str: (props: {
+      key: 'horsepower' | 'electricMotorChainType' | 'hasMotorSupportStand' | 'motorLockBox' | 'electricMotorDirection';
+      value: string;
+    }) => void;
   };
 
   headBox: {
@@ -82,16 +106,24 @@ type Tworksheet = {
     isIntegratedHeadBox: boolean;
     headBoxAngleIronQuantity: string;
     getIsIntegratedHeadBox: () => string;
+    setHeadBox_str: (props: {
+      key: Exclude<keyof Tworksheet['headBox'], 'isIntegratedHeadBox' | 'getIsIntegratedHeadBox'>;
+      value: string;
+    }) => void;
+
+    setHeadBox_bool: (props: { key: 'isIntegratedHeadBox'; value: boolean }) => void;
   };
 
   roller: {
     getDiameter: () => string;
     rollerSpec: string;
+    setRoller_str: (props: { key: 'diameter' | 'rollerSpec'; value: string }) => void;
   };
 
   slat: {
     material: string;
     surface: string;
+    setSlat_str: (props: { key: 'material' | 'surface'; value: string }) => void;
   };
 
   guideRail: {
@@ -140,56 +172,56 @@ type Tworksheet = {
 
   // -----------------------------------------------------------------------------
 
-  setBasicSpec_str: (props: {
-    key: keyof Omit<
-      Exclude<Tworksheet['basicSpec'], undefined>,
-      'isAntiTyphoon' | 'fullWidth' | 'WG' | 'height' | 'doorModelName'
-    >;
-    value: string;
-  }) => void;
+  // setBasicSpec_str: (props: {
+  //   key: keyof Omit<
+  //     Exclude<Tworksheet['basicSpec'], undefined>,
+  //     'isAntiTyphoon' | 'fullWidth' | 'WG' | 'height' | 'doorModelName'
+  //   >;
+  //   value: string;
+  // }) => void;
 
-  setBasicSpec_material: (str: string) => void;
+  // setBasicSpec_material: (str: string) => void;
 
-  setBasicSpec_strNum: (props: {
-    //
-    key: keyof Pick<Exclude<Tworksheet['basicSpec'], undefined>, 'fullWidth' | 'WG' | 'height'>;
-    value: string;
-  }) => void;
+  // setBasicSpec_strNum: (props: {
+  //   //
+  //   key: keyof Pick<Exclude<Tworksheet['basicSpec'], undefined>, 'fullWidth' | 'WG' | 'height'>;
+  //   value: string;
+  // }) => void;
 
-  setBasicSpec_bool: (props: { key: 'isAntiTyphoon'; value: boolean }) => void;
-
-  // ___________________________________________________________
-
-  setGapA: (value: string) => void;
-  setGapC: (value: string) => void;
-  setBoxB: (value: string) => void;
-  setBoxD: (value: string) => void;
+  // setBasicSpec_bool: (props: { key: 'isAntiTyphoon'; value: boolean }) => void;
 
   // ___________________________________________________________
 
-  setMotor_supply: (props: { phase: string; voltage: string }) => void;
-
-  setMotor_str: (props: {
-    key: 'horsepower' | 'electricMotorChainType' | 'hasMotorSupportStand' | 'motorLockBox' | 'electricMotorDirection';
-    value: string;
-  }) => void;
+  // setGapA: (value: string) => void;
+  // setGapC: (value: string) => void;
+  // setBoxB: (value: string) => void;
+  // setBoxD: (value: string) => void;
 
   // ___________________________________________________________
 
-  setHeadBox_str: (props: {
-    key: Exclude<keyof Tworksheet['headBox'], 'isIntegratedHeadBox' | 'getIsIntegratedHeadBox'>;
-    value: string;
-  }) => void;
+  // setMotor_supply: (props: { phase: string; voltage: string }) => void;
 
-  setHeadBox_bool: (props: { key: 'isIntegratedHeadBox'; value: boolean }) => void;
-
-  // ___________________________________________________________
-
-  setRoller_str: (props: { key: 'diameter' | 'rollerSpec'; value: string }) => void;
+  // setMotor_str: (props: {
+  //   key: 'horsepower' | 'electricMotorChainType' | 'hasMotorSupportStand' | 'motorLockBox' | 'electricMotorDirection';
+  //   value: string;
+  // }) => void;
 
   // ___________________________________________________________
 
-  setSlat_str: (props: { key: 'material' | 'surface'; value: string }) => void;
+  // setHeadBox_str: (props: {
+  //   key: Exclude<keyof Tworksheet['headBox'], 'isIntegratedHeadBox' | 'getIsIntegratedHeadBox'>;
+  //   value: string;
+  // }) => void;
+
+  // setHeadBox_bool: (props: { key: 'isIntegratedHeadBox'; value: boolean }) => void;
+
+  // ___________________________________________________________
+
+  // setRoller_str: (props: { key: 'diameter' | 'rollerSpec'; value: string }) => void;
+
+  // ___________________________________________________________
+
+  // setSlat_str: (props: { key: 'material' | 'surface'; value: string }) => void;
 
   // ___________________________________________________________
 
@@ -263,6 +295,38 @@ const useWorksheet = create<Tworksheet>(
       height: '',
       material: '',
       isAntiTyphoon: false,
+      setBasicSpec_str: ({ key, value }) => {
+        set(
+          produce((state) => {
+            if (state.basicSpec) {
+              state.basicSpec[key] = value;
+            }
+          })
+        );
+      },
+      setBasicSpec_strNum: ({ key, value }) => {
+        set(
+          produce((state) => {
+            state.basicSpec[key] = value;
+          })
+        );
+      },
+      setBasicSpec_bool: ({ key, value }) => {
+        set(
+          produce((state) => {
+            if (state.basicSpec) {
+              state.basicSpec[key] = value;
+            }
+          })
+        );
+      },
+      setBasicSpec_material: (str) => {
+        set(
+          produce((state) => {
+            state.basicSpec.material = str;
+          })
+        );
+      },
     },
 
     ABCD: {
@@ -270,6 +334,18 @@ const useWorksheet = create<Tworksheet>(
       getGapC: () => String(get().generalSpec?.gapC ?? ''),
       boxB: '',
       boxD: '',
+      setGapA: (value) => {
+        set(produce((state) => (state.generalSpec.gapA = value)));
+      },
+      setGapC: (value) => {
+        set(produce((state) => (state.generalSpec.gapC = value)));
+      },
+      setBoxB: (value) => {
+        set(produce((state) => (state.ABCD.boxB = value)));
+      },
+      setBoxD: (value) => {
+        set(produce((state) => (state.ABCD.boxD = value)));
+      },
     },
 
     motor: {
@@ -286,6 +362,22 @@ const useWorksheet = create<Tworksheet>(
 
         return `${lookup_motorPhase[motorPhase as '1' | '3'] ?? ''} ${motorVoltage}V`;
       },
+      setMotor_supply: ({ phase, voltage }) => {
+        set(
+          produce((state) => {
+            state.motor.motorVoltage = voltage;
+            state.motor.motorPhase = phase;
+          })
+        );
+      },
+
+      setMotor_str: ({ key, value }) => {
+        set(
+          produce((state) => {
+            state.motor[key] = value;
+          })
+        );
+      },
     },
 
     headBox: {
@@ -301,16 +393,45 @@ const useWorksheet = create<Tworksheet>(
 
         return isIntegratedHeadBox ? '一體式捲箱' : '捲箱加機箱';
       },
+      setHeadBox_str: ({ key, value }) => {
+        set(
+          produce((state) => {
+            state.headBox[key] = value;
+          })
+        );
+      },
+
+      setHeadBox_bool: ({ key, value }) => {
+        set(
+          produce((state) => {
+            state.headBox[key] = value;
+          })
+        );
+      },
     },
 
     roller: {
       getDiameter: () => String(get().generalSpec?.diameter ?? ''),
       rollerSpec: '',
+      setRoller_str: ({ key, value }) => {
+        set(
+          produce((state) => {
+            state.roller[key] = value;
+          })
+        );
+      },
     },
 
     slat: {
       material: '',
       surface: '',
+      setSlat_str: ({ key, value }) => {
+        set(
+          produce((state) => {
+            state.slat[key] = value;
+          })
+        );
+      },
     },
 
     guideRail: {
@@ -374,6 +495,7 @@ const useWorksheet = create<Tworksheet>(
           // ____________________________________________________________________
           // ____________________________________________________________________
           state.basicSpec = {
+            ...state.basicSpec,
             itemName: contractProductItem?.itemName ?? '',
             doorModelName: contractProductItem?.doorModelName ?? '',
             qty: String(qty),
@@ -391,6 +513,7 @@ const useWorksheet = create<Tworksheet>(
           };
 
           state.motor = {
+            ...state.motor,
             horsepower: String(contractProductItem?.horsepower ?? ''),
             motorVoltage: String(contractProductItem?.motorVoltage ?? ''),
             motorPhase: String(contractProductItem?.motorPhase ?? ''),
@@ -403,6 +526,7 @@ const useWorksheet = create<Tworksheet>(
           };
 
           state.headBox = {
+            ...state.headBox,
             material: componentList?.headBox?.material ?? '',
             headBoxThickness: String(contractProductItem?.thickness ?? ''),
             surface: componentList?.headBox?.materialSurface ?? '',
@@ -419,11 +543,13 @@ const useWorksheet = create<Tworksheet>(
           };
 
           state.slat = {
+            ...state.slat,
             material: componentList?.slat?.material ?? '',
             surface: componentList?.slat?.materialSurface ?? '',
           };
 
           state.guideRail = {
+            ...state.guideRail,
             material: componentList?.guideRail?.material ?? '',
             guideRailThickness: String(contractProductItem?.guideRailThickness ?? ''),
             surface: componentList?.guideRail?.materialSurface ?? '',
@@ -434,6 +560,7 @@ const useWorksheet = create<Tworksheet>(
           };
 
           state.bottomBar = {
+            ...state.bottomBar,
             material: componentList?.bottomBar?.material ?? '',
             bottomBarAngleIron: String(contractProductItem?.bottomBarAngleIron ?? ''),
             bottomBarPlate: contractProductItem?.bottomBarPlate ?? '',
@@ -553,111 +680,6 @@ const useWorksheet = create<Tworksheet>(
     },
 
     // ---------------------------------------------------------------------
-
-    setBasicSpec_str: ({ key, value }) => {
-      set(
-        produce((state) => {
-          if (state.basicSpec) {
-            state.basicSpec[key] = value;
-          }
-        })
-      );
-    },
-    setBasicSpec_strNum: ({ key, value }) => {
-      set(
-        produce((state) => {
-          state.basicSpec[key] = value;
-        })
-      );
-    },
-    setBasicSpec_bool: ({ key, value }) => {
-      set(
-        produce((state) => {
-          if (state.basicSpec) {
-            state.basicSpec[key] = value;
-          }
-        })
-      );
-    },
-
-    setBasicSpec_material: (str) => {
-      set(
-        produce((state) => {
-          state.basicSpec.material = str;
-        })
-      );
-    },
-
-    // ___________________________________________________________
-
-    setGapA: (value) => {
-      set(produce((state) => (state.generalSpec.gapA = value)));
-    },
-    setGapC: (value) => {
-      set(produce((state) => (state.generalSpec.gapC = value)));
-    },
-    setBoxB: (value) => {
-      set(produce((state) => (state.ABCD.boxB = value)));
-    },
-    setBoxD: (value) => {
-      set(produce((state) => (state.ABCD.boxD = value)));
-    },
-
-    // ___________________________________________________________
-
-    setMotor_supply: ({ phase, voltage }) => {
-      set(
-        produce((state) => {
-          state.motor.motorVoltage = voltage;
-          state.motor.motorPhase = phase;
-        })
-      );
-    },
-
-    setMotor_str: ({ key, value }) => {
-      set(
-        produce((state) => {
-          state.motor[key] = value;
-        })
-      );
-    },
-    // ___________________________________________________________
-
-    setHeadBox_str: ({ key, value }) => {
-      set(
-        produce((state) => {
-          state.headBox[key] = value;
-        })
-      );
-    },
-
-    setHeadBox_bool: ({ key, value }) => {
-      set(
-        produce((state) => {
-          state.headBox[key] = value;
-        })
-      );
-    },
-
-    // ___________________________________________________________
-
-    setRoller_str: ({ key, value }) => {
-      set(
-        produce((state) => {
-          state.roller[key] = value;
-        })
-      );
-    },
-
-    // ___________________________________________________________
-
-    setSlat_str: ({ key, value }) => {
-      set(
-        produce((state) => {
-          state.slat[key] = value;
-        })
-      );
-    },
 
     // ___________________________________________________________
 
