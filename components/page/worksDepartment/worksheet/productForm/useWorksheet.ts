@@ -15,25 +15,17 @@ import {
   TdoorModelInfoDto,
   TquotationProductComponentDto,
   TdoorComponentType,
+  TdoorGeneralSpecsDto,
+  TdoorModel,
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
 import { checkIsFloat } from 'js/utils/checkValue';
 import { lookup_motorPhase } from 'config/product/lookup';
 
-import {
-  optionsCreator_bottomBarAngleIron,
-  optionsCreator_bottomBarPlate,
-  optionsCreator_bottomBarAngleIron_303A,
-  optionsCreator_bottomBarPlate_303A,
-  optionsCreator_bottomBarAngleIron_303AS,
-  optionsCreator_bottomBarPlate_303AS,
-  optionsCreator_bottomBarAngleIron_305D,
-  optionsCreator_bottomBarPlate_305D,
-  optionsCreator_bottomBarAngleIron_312,
-  optionsCreator_bottomBarPlate_312,
-  lookup_options_bottomBarAngleIronAndPlate,
-} from 'js/utils/options/productOptions';
+import { lookup_options_bottomBarAngleIronAndPlate } from 'js/utils/options/productOptions';
+
+import { apiGetProdCalcGeneralSpec } from 'js/api/api_product';
 
 // =====================================================================
 
@@ -44,6 +36,9 @@ type Tworksheet = {
   readonly contractProductItem_ori: TquotationProductItemDto | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
   componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
+
+  generalSpec: TdoorGeneralSpecsDto | undefined;
+
   //
   itemIdArr: string[];
   qty: number;
@@ -60,8 +55,8 @@ type Tworksheet = {
   };
 
   ABCD: {
-    gapA: string;
-    gapC: string;
+    getGapA: () => string;
+    getGapC: () => string;
     boxB: string;
     boxD: string;
   };
@@ -78,15 +73,6 @@ type Tworksheet = {
     getElectricSupply: () => string;
   };
 
-  // | 'slat'
-  // | 'bottomBar'
-  // | 'guideRail'
-  // | 'sidePlate'
-  // | 'roller'
-  // | 'motor'
-  // | 'motorAccessories'
-  // | 'headBox';
-
   headBox: {
     material: string;
     headBoxThickness: string;
@@ -99,7 +85,7 @@ type Tworksheet = {
   };
 
   roller: {
-    diameter: string;
+    getDiameter: () => string;
     rollerSpec: string;
   };
 
@@ -127,8 +113,8 @@ type Tworksheet = {
   };
 
   sidePlate: {
-    bearingName: string;
-    sprocketWheelModel: string;
+    getBearingName: () => string;
+    getSprocketWheelModel: () => string;
     sidePlateDirection: string;
   };
   //
@@ -145,7 +131,12 @@ type Tworksheet = {
     options_angleIron: Toption[];
     options_plate: Toption[];
   };
-  // getOptions_bottomBarPlate: () => Toption[];
+
+  // -----------------------------------------------------------------------------
+  reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
+  update_generalSpec: () => Promise<void>;
+
+  calcData: () => Promise<void>;
 
   // -----------------------------------------------------------------------------
 
@@ -167,11 +158,14 @@ type Tworksheet = {
 
   setBasicSpec_bool: (props: { key: 'isAntiTyphoon'; value: boolean }) => void;
 
-  // -----------------------------------------------------------------------------
+  // ___________________________________________________________
 
-  setABCD: (props: { key: keyof Tworksheet['ABCD']; value: string }) => void;
+  setGapA: (value: string) => void;
+  setGapC: (value: string) => void;
+  setBoxB: (value: string) => void;
+  setBoxD: (value: string) => void;
 
-  // -----------------------------------------------------------------------------
+  // ___________________________________________________________
 
   setMotor_supply: (props: { phase: string; voltage: string }) => void;
 
@@ -180,7 +174,7 @@ type Tworksheet = {
     value: string;
   }) => void;
 
-  // -----------------------------------------------------------------------------
+  // ___________________________________________________________
 
   setHeadBox_str: (props: {
     key: Exclude<keyof Tworksheet['headBox'], 'isIntegratedHeadBox' | 'getIsIntegratedHeadBox'>;
@@ -189,15 +183,15 @@ type Tworksheet = {
 
   setHeadBox_bool: (props: { key: 'isIntegratedHeadBox'; value: boolean }) => void;
 
-  // -----------------------------------------------------------------------------
+  // ___________________________________________________________
 
   setRoller_str: (props: { key: 'diameter' | 'rollerSpec'; value: string }) => void;
 
-  // -----------------------------------------------------------------------------
+  // ___________________________________________________________
 
   setSlat_str: (props: { key: 'material' | 'surface'; value: string }) => void;
 
-  // -----------------------------------------------------------------------------
+  // ___________________________________________________________
 
   setGuideRail_str: (props: {
     key: //
@@ -207,14 +201,14 @@ type Tworksheet = {
 
   setGuideRail_hasSilencingStrip: (value: boolean) => void;
 
-  // -----------------------------------------------------------------------------
+  // ___________________________________________________________
 
   setBottomBar_str: (props: {
     key: 'material' | 'bottomBarAngleIron' | 'bottomBarPlate' | 'bottomBar' | 'surface';
     value: string;
   }) => void;
 
-  // -----------------------------------------------------------------------------
+  // ___________________________________________________________
 
   setSidePlate_str: (props: {
     key: 'bearingName' | 'sprocketWheelModel' | 'sidePlateDirection';
@@ -222,15 +216,39 @@ type Tworksheet = {
   }) => void;
 
   // -----------------------------------------------------------------------------
+
+  // getABCD: () => Tworksheet['ABCD'];
+
+  // -----------------------------------------------------------------------------
+
+  getFullWidth_mm: () => number;
+  getWG_mm: () => number;
+  getHeight_mm: () => number;
+
+  // -----------------------------------------------------------------------------
+
+  // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
   //
 };
+
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
 
 const useWorksheet = create<Tworksheet>(
   (set, get) => ({
     contractProductItem_ori: undefined,
     doorModelInfo: undefined,
     componentList: undefined,
+    generalSpec: undefined,
     // ---------------------------------------------------------------------
     itemIdArr: [],
     qty: 0,
@@ -248,8 +266,8 @@ const useWorksheet = create<Tworksheet>(
     },
 
     ABCD: {
-      gapA: '',
-      gapC: '',
+      getGapA: () => String(get().generalSpec?.gapA ?? ''),
+      getGapC: () => String(get().generalSpec?.gapC ?? ''),
       boxB: '',
       boxD: '',
     },
@@ -286,7 +304,7 @@ const useWorksheet = create<Tworksheet>(
     },
 
     roller: {
-      diameter: '',
+      getDiameter: () => String(get().generalSpec?.diameter ?? ''),
       rollerSpec: '',
     },
 
@@ -318,17 +336,17 @@ const useWorksheet = create<Tworksheet>(
     },
 
     sidePlate: {
-      bearingName: '',
-      sprocketWheelModel: '',
+      getBearingName: () => get().generalSpec?.bearingName ?? '',
+      getSprocketWheelModel: () => get().generalSpec?.sprocketWheelModel ?? '',
       sidePlateDirection: '',
     },
 
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
     //
-    init: ({ itemIdArr, contractProductItem, qty }) =>
+    init: async ({ itemIdArr, contractProductItem, qty }) => {
       set(
-        produce((state) => {
+        produce<Tworksheet>((state) => {
           // ____________________________________________________________________
           // ____________________________________________________________________
 
@@ -367,8 +385,7 @@ const useWorksheet = create<Tworksheet>(
           };
 
           state.ABCD = {
-            gapA: contractProductItem?.gapA ?? '',
-            gapC: contractProductItem?.gapC ?? '',
+            ...state.ABCD,
             boxB: String(contractProductItem?.boxB ?? ''),
             boxD: String(contractProductItem?.boxD ?? ''),
           };
@@ -397,7 +414,7 @@ const useWorksheet = create<Tworksheet>(
           };
 
           state.roller = {
-            diameter: contractProductItem?.diameter ?? '',
+            ...state.roller,
             rollerSpec: contractProductItem?.rollerSpec ?? '',
           };
 
@@ -425,15 +442,45 @@ const useWorksheet = create<Tworksheet>(
           };
 
           state.sidePlate = {
-            bearingName: contractProductItem?.bearingName ?? '',
-            sprocketWheelModel: contractProductItem?.sprocketWheelModel ?? '',
+            ...state.sidePlate,
             sidePlateDirection: contractProductItem?.sidePlateDirection ?? '',
           };
 
           //
           //
         })
-      ), // inite
+      ); // set
+
+      if (contractProductItem) {
+        const generalSpec = await get().reqGeneralSpec();
+
+        generalSpec.bearingHousingSize = contractProductItem.bearingHousingSize ?? -1;
+        generalSpec.bearingHousingTotalLength = Number(contractProductItem.bearingHousingTotalLength ?? -1);
+        generalSpec.bearingInnerDiameter = contractProductItem.bearingInnerDiameter ?? '';
+        generalSpec.bearingName = contractProductItem.bearingName ?? '';
+        // generalSpec.defaultMotorIndex = contractProductItem.defaultMotorIndex;
+        // generalSpec.density = contractProductItem.density;
+        generalSpec.diameter = Number(contractProductItem.diameter ?? 0);
+        generalSpec.gapA = Number(contractProductItem.gapA);
+        generalSpec.gapC = Number(contractProductItem.gapC);
+        // generalSpec.motors = contractProductItem.motors;
+        generalSpec.gearNumber = contractProductItem.gearNumber ?? '';
+        generalSpec.sprocketWheelModel = contractProductItem.sprocketWheelModel ?? '';
+        generalSpec.sprocketWheelTeethNumber = contractProductItem.sprocketWheelTeethNumber ?? '';
+        generalSpec.sprocketWheelChains = Number(contractProductItem.sprocketWheelChains ?? 0);
+        generalSpec.weight = Number(contractProductItem.weight ?? 0);
+        generalSpec.slatLength = Number(contractProductItem.slatLength ?? 0);
+        generalSpec.guideRailLength = Number(contractProductItem.guideRailLength ?? 0);
+        generalSpec.headBoxLength = Number(contractProductItem.headBoxLength ?? 0);
+        generalSpec.thickness = contractProductItem.thickness ?? '';
+
+        set(
+          produce((state) => {
+            state.generalSpec = generalSpec;
+          })
+        );
+      }
+    }, // init
     //
     //
     setDoorModelInfo: (doorModelInfo) =>
@@ -477,6 +524,36 @@ const useWorksheet = create<Tworksheet>(
     //
     // ---------------------------------------------------------------------
 
+    reqGeneralSpec: async () => {
+      const generalSpec = await apiGetProdCalcGeneralSpec({
+        modelName: get().basicSpec.doorModelName as TdoorModel,
+        fullWidth: get().getFullWidth_mm(),
+        height: get().getHeight_mm(),
+        isAntiTyphoon: get().basicSpec.isAntiTyphoon,
+      });
+
+      return generalSpec;
+    },
+
+    update_generalSpec: async () => {
+      const generalSpec = await get().reqGeneralSpec();
+
+      set(
+        produce((state) => {
+          state.generalSpec = generalSpec;
+        })
+      );
+    },
+
+    // ---------------------------------------------------------------------
+
+    // ________________________________________________________________________
+    calcData: async () => {
+      await get().update_generalSpec();
+    },
+
+    // ---------------------------------------------------------------------
+
     setBasicSpec_str: ({ key, value }) => {
       set(
         produce((state) => {
@@ -511,17 +588,22 @@ const useWorksheet = create<Tworksheet>(
       );
     },
 
-    // ---------------------------------------------------------------------
+    // ___________________________________________________________
 
-    setABCD: ({ key, value }) => {
-      set(
-        produce((state) => {
-          state.ABCD[key] = value;
-        })
-      );
+    setGapA: (value) => {
+      set(produce((state) => (state.generalSpec.gapA = value)));
+    },
+    setGapC: (value) => {
+      set(produce((state) => (state.generalSpec.gapC = value)));
+    },
+    setBoxB: (value) => {
+      set(produce((state) => (state.ABCD.boxB = value)));
+    },
+    setBoxD: (value) => {
+      set(produce((state) => (state.ABCD.boxD = value)));
     },
 
-    // ---------------------------------------------------------------------
+    // ___________________________________________________________
 
     setMotor_supply: ({ phase, voltage }) => {
       set(
@@ -539,7 +621,7 @@ const useWorksheet = create<Tworksheet>(
         })
       );
     },
-    // ---------------------------------------------------------------------
+    // ___________________________________________________________
 
     setHeadBox_str: ({ key, value }) => {
       set(
@@ -557,7 +639,7 @@ const useWorksheet = create<Tworksheet>(
       );
     },
 
-    // ---------------------------------------------------------------------
+    // ___________________________________________________________
 
     setRoller_str: ({ key, value }) => {
       set(
@@ -567,7 +649,7 @@ const useWorksheet = create<Tworksheet>(
       );
     },
 
-    // ---------------------------------------------------------------------
+    // ___________________________________________________________
 
     setSlat_str: ({ key, value }) => {
       set(
@@ -577,7 +659,7 @@ const useWorksheet = create<Tworksheet>(
       );
     },
 
-    // ---------------------------------------------------------------------
+    // ___________________________________________________________
 
     setGuideRail_str: ({ key, value }) => {
       set(
@@ -595,8 +677,7 @@ const useWorksheet = create<Tworksheet>(
       );
     },
 
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
+    // ___________________________________________________________
 
     setBottomBar_str: ({ key, value }) => {
       set(
@@ -606,7 +687,7 @@ const useWorksheet = create<Tworksheet>(
       );
     },
 
-    // ---------------------------------------------------------------------
+    // ___________________________________________________________
 
     setSidePlate_str: ({ key, value }) => {
       set(
@@ -615,6 +696,22 @@ const useWorksheet = create<Tworksheet>(
         })
       );
     },
+
+    // ---------------------------------------------------------------------
+
+    getFullWidth_mm: () => {
+      return new Decimal(get().basicSpec.fullWidth || 0).mul(1000).toNumber();
+    },
+
+    getWG_mm: () => {
+      return new Decimal(get().basicSpec.WG || 0).mul(1000).toNumber();
+    },
+
+    getHeight_mm: () => {
+      return new Decimal(get().basicSpec.height || 0).mul(1000).toNumber();
+    },
+
+    // ---------------------------------------------------------------------
 
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------

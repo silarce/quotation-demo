@@ -33,6 +33,7 @@ import {
   optionsCreator_boolean,
   optionsCreator_bottomBar_2,
 } from 'js/utils/options/productOptions';
+import { set } from 'lodash';
 
 // =====================================================================
 
@@ -230,10 +231,15 @@ function Form_product_basic() {
 // =====================================================================
 
 function Form_product_ABCD() {
-  const { ABCD, setABCD } = useWorksheet((state) => ({
+  const { ABCD, setGapA, setGapC, setBoxB, setBoxD } = useWorksheet((state) => ({
     ABCD: state.ABCD,
-    setABCD: state.setABCD,
+    setGapA: state.setGapA,
+    setGapC: state.setGapC,
+    setBoxB: state.setBoxB,
+    setBoxD: state.setBoxD,
   }));
+
+  console.log(ABCD);
 
   return (
     <div className={scss.grid}>
@@ -243,9 +249,9 @@ function Form_product_ABCD() {
         inputProps={{
           props: {
             type: 'number',
-            value: ABCD.gapA,
+            value: ABCD.getGapA(),
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setABCD({ key: 'gapA', value: e.target.value });
+              setGapA(e.target.value);
             },
           },
         }}
@@ -256,9 +262,9 @@ function Form_product_ABCD() {
         inputProps={{
           props: {
             type: 'number',
-            value: ABCD.gapC,
+            value: ABCD.getGapC(),
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setABCD({ key: 'gapC', value: e.target.value });
+              setGapC(e.target.value);
             },
           },
         }}
@@ -271,7 +277,7 @@ function Form_product_ABCD() {
             type: 'number',
             value: ABCD.boxB,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setABCD({ key: 'boxB', value: e.target.value });
+              setBoxB(e.target.value);
             },
           },
         }}
@@ -284,7 +290,7 @@ function Form_product_ABCD() {
             type: 'number',
             value: ABCD.boxD,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              setABCD({ key: 'boxD', value: e.target.value });
+              setBoxD(e.target.value);
             },
           },
         }}
@@ -540,7 +546,7 @@ function Form_product_roller() {
           caption="尺寸"
           selectProps={{
             props: {
-              value: { value: roller.diameter, label: roller.diameter },
+              value: { value: roller.getDiameter(), label: roller.getDiameter() },
             },
           }}
         />
@@ -829,18 +835,7 @@ function Form_product_bottomBar() {
 
 // =====================================================================
 
-type Tcontrol_sidePlate = {
-  bearingName: Tselect; // 軸承 // spec.bearingName
-  sprocketWheelModel: Tselect; // 鍊條 // spec.sprocketWheelModel
-  sidePlateDirection: Tselect; // 方向
-};
-
-function Form_product_sidePlate({
-  //
-  control,
-}: {
-  control?: Tcontrol_sidePlate;
-}) {
+function Form_product_sidePlate() {
   const { sidePlate, setSidePlate_str } = useWorksheet((state) => ({
     sidePlate: state.sidePlate,
     setSidePlate_str: state.setSidePlate_str,
@@ -856,7 +851,7 @@ function Form_product_sidePlate({
           selectProps={{
             props: {
               isDisabled: true,
-              value: { value: sidePlate.bearingName, label: sidePlate.bearingName },
+              value: { value: sidePlate.getBearingName(), label: sidePlate.getBearingName() },
             },
           }}
         />
@@ -866,7 +861,7 @@ function Form_product_sidePlate({
           selectProps={{
             props: {
               isDisabled: true,
-              value: { value: sidePlate.sprocketWheelModel, label: sidePlate.sprocketWheelModel },
+              value: { value: sidePlate.getSprocketWheelModel(), label: sidePlate.getSprocketWheelModel() },
             },
           }}
         />

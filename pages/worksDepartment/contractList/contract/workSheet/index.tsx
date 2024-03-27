@@ -112,7 +112,7 @@ import type {
   TworksheetDto_legacy,
 } from 'js/api/dtoTypes';
 
-// zustand
+// zustand // hook
 import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 
 // ====================================================================
