@@ -23,7 +23,7 @@ export type TpageResponse<Tdata> = {
   meta: TpageMetaDto;
 };
 
-export type TdoorModel = 'SJ-302' | 'SJ-312' | ' SJ-305D' | ' SJ-303A' | 'SJ-303AS' | 'SJ-120A' | ' SJ-303S';
+export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
 export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null; // 表面處理
 
 export type TdeliveryStatus = '未安裝' | '已安裝' | '已結清';

@@ -1,4 +1,4 @@
-import { use, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import classNames from 'classnames';
 
@@ -31,6 +31,7 @@ import {
   optionsCreator_front,
   optionsCreator_rollerSpec,
   optionsCreator_boolean,
+  optionsCreator_bottomBar_2,
 } from 'js/utils/options/productOptions';
 
 // =====================================================================
@@ -742,7 +743,7 @@ function Form_product_guideRail({
 type Tcontrol_bottomBar = {
   material: Tselect; // 材質 // comList.bottomBar.material
   bottomBarAngleIron: Tselect; // 角鐵材質 // 底座角鐵
-  baseMaterial: Tselect; // 底座鈑材質
+  bottomBarPlate: Tselect; // 底座鈑材質
   bottomBar: Tselect; // 類型 // 鋁障感型 止水型
   surface: Tselect; // 表面 //comList.bottomBar.materialSurface
 };
@@ -753,15 +754,87 @@ function Form_product_bottomBar({
 }: {
   control?: Tcontrol_bottomBar;
 }) {
+  const { bottomBar, getOptions_material, setBottomBar_str, getOptions_bottomBarAngleIronAndPlate } = useWorksheet(
+    (state) => ({
+      bottomBar: state.bottomBar,
+      getOptions_material: state.getOptions_material,
+      setBottomBar_str: state.setBottomBar_str,
+      getOptions_bottomBarAngleIronAndPlate: state.getOptions_bottomBarAngleIronAndPlate,
+    })
+  );
+
+  const { options_angleIron, options_plate } = getOptions_bottomBarAngleIronAndPlate();
+
   return (
     <div>
       <p className={scss.caption}>●底座</p>
       <div className={scss.grid}>
-        <InputSel {...basicConfig} caption="材質" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="角鐵材質" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="底座鈑材質" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="類型" selectProps={selectPropsAccessor()} />
-        <InputSel {...basicConfig} caption="表面" selectProps={selectPropsAccessor()} />
+        <InputSel
+          {...basicConfig}
+          caption="材質"
+          selectProps={{
+            props: {
+              value: { value: bottomBar.material, label: bottomBar.material },
+              options: getOptions_material(),
+              onChange: (option) => {
+                setBottomBar_str({ key: 'material', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="角鐵材質"
+          selectProps={{
+            props: {
+              value: { value: bottomBar.bottomBarAngleIron, label: bottomBar.bottomBarAngleIron },
+              options: options_angleIron,
+              onChange: (option) => {
+                setBottomBar_str({ key: 'bottomBarAngleIron', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="底座鈑材質"
+          selectProps={{
+            props: {
+              value: { value: bottomBar.bottomBarPlate, label: bottomBar.bottomBarPlate },
+              options: options_plate,
+              onChange: (option) => {
+                setBottomBar_str({ key: 'bottomBarPlate', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="類型"
+          selectProps={{
+            props: {
+              value: { value: bottomBar.bottomBar, label: bottomBar.bottomBar },
+              options: optionsCreator_bottomBar_2(),
+              onChange: (option) => {
+                setBottomBar_str({ key: 'bottomBar', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="表面"
+          selectProps={{
+            props: {
+              value: { value: bottomBar.surface, label: bottomBar.surface },
+              options: optionsCreator_surface(),
+              onChange: (option) => {
+                setBottomBar_str({ key: 'surface', value: option?.value ?? '' });
+              },
+            },
+          }}
+        />
       </div>
     </div>
   );

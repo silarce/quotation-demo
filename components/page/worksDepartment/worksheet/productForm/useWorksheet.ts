@@ -19,6 +19,20 @@ import { Toption } from 'js/utils/options/options';
 import { checkIsFloat } from 'js/utils/checkValue';
 import { lookup_motorPhase } from 'config/product/lookup';
 
+import {
+  optionsCreator_bottomBarAngleIron,
+  optionsCreator_bottomBarPlate,
+  optionsCreator_bottomBarAngleIron_303A,
+  optionsCreator_bottomBarPlate_303A,
+  optionsCreator_bottomBarAngleIron_303AS,
+  optionsCreator_bottomBarPlate_303AS,
+  optionsCreator_bottomBarAngleIron_305D,
+  optionsCreator_bottomBarPlate_305D,
+  optionsCreator_bottomBarAngleIron_312,
+  optionsCreator_bottomBarPlate_312,
+  lookup_options_bottomBarAngleIronAndPlate,
+} from 'js/utils/options/productOptions';
+
 // =====================================================================
 
 // 簡略set目錄
@@ -102,6 +116,14 @@ type Tworksheet = {
     getHasSilencingStrip: () => string;
   };
 
+  bottomBar: {
+    material: string;
+    bottomBarAngleIron: string;
+    bottomBarPlate: string;
+    bottomBar: string;
+    surface: string;
+  };
+
   //
   init: (props: {
     itemIdArr: Tworksheet['itemIdArr'];
@@ -112,6 +134,11 @@ type Tworksheet = {
   setDoorModelInfo: (doorModelInfo: TdoorModelInfoDto | undefined) => void;
 
   getOptions_material: () => Toption[];
+  getOptions_bottomBarAngleIronAndPlate: () => {
+    options_angleIron: Toption[];
+    options_plate: Toption[];
+  };
+  // getOptions_bottomBarPlate: () => Toption[];
 
   // -----------------------------------------------------------------------------
 
@@ -172,6 +199,13 @@ type Tworksheet = {
   }) => void;
 
   setGuideRail_hasSilencingStrip: (value: boolean) => void;
+
+  // -----------------------------------------------------------------------------
+
+  setBottomBar_str: (props: {
+    key: 'material' | 'bottomBarAngleIron' | 'bottomBarPlate' | 'bottomBar' | 'surface';
+    value: string;
+  }) => void;
 
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
@@ -260,6 +294,14 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
 
           return hasSilencingStrip ? '有' : '無';
         },
+      },
+
+      bottomBar: {
+        material: '',
+        bottomBarAngleIron: '',
+        bottomBarPlate: '',
+        bottomBar: '',
+        surface: '',
       },
 
       // ---------------------------------------------------------------------
@@ -354,6 +396,14 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
             getHasSilencingStrip: state.guideRail.getHasSilencingStrip,
           };
 
+          state.bottomBar = {
+            material: componentList?.bottomBar?.material ?? '',
+            bottomBarAngleIron: String(contractProductItem?.bottomBarAngleIron ?? ''),
+            bottomBarPlate: contractProductItem?.bottomBarPlate ?? '',
+            bottomBar: contractProductItem?.bottomBar ?? '',
+            surface: componentList?.bottomBar.materialSurface ?? '',
+          };
+
           //
           //
         }), // inite
@@ -374,6 +424,25 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
         });
 
         return optiions_material ?? [];
+      },
+
+      getOptions_bottomBarAngleIronAndPlate: () => {
+        const basicSpec = get().basicSpec;
+        const doorModelName = basicSpec?.doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
+
+        if (!doorModelName) {
+          return {
+            options_angleIron: [],
+            options_plate: [],
+          };
+        }
+
+        const { angleIron, plate } = lookup_options_bottomBarAngleIronAndPlate[doorModelName];
+
+        return {
+          options_angleIron: angleIron() ?? [],
+          options_plate: plate() ?? [],
+        };
       },
 
       //
@@ -472,6 +541,16 @@ const useWorksheet = create<Tworksheet, [['zustand/immer', never]]>(
       },
 
       // ---------------------------------------------------------------------
+      // ---------------------------------------------------------------------
+
+      setBottomBar_str: ({ key, value }) => {
+        set((state) => {
+          state.bottomBar[key] = value;
+        });
+      },
+
+      // ---------------------------------------------------------------------
+
       // ---------------------------------------------------------------------
       // ---------------------------------------------------------------------
 

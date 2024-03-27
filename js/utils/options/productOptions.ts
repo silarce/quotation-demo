@@ -187,6 +187,14 @@ export const optionsCreator_bottomBar = createOptionsCreator({
   ],
 });
 
+export const optionsCreator_bottomBar_2 = createOptionsCreator({
+  optionsArr: [
+    { value: '', label: '無' },
+    { value: '鋁障感型', label: '鋁障感型' },
+    { value: '止水型', label: '止水型' },
+  ],
+});
+
 export const optionsCreator_motorLockBox = createOptionsCreator({
   optionsArr: [
     { value: '外露', label: '外露' },
