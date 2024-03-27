@@ -549,7 +549,13 @@ function Form_product_headBox() {
 // =====================================================================
 
 function Form_product_roller() {
-  const roller = useWorksheet((state) => state.roller);
+  const { roller, getOptions_diameter } = useWorksheet(
+    useShallow((state) => ({
+      roller: state.roller,
+      getOptions_diameter: state.getOptions_diameter,
+      avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+    }))
+  );
 
   return (
     <div>
@@ -561,6 +567,7 @@ function Form_product_roller() {
           selectProps={{
             props: {
               value: { value: roller.getDiameter(), label: roller.getDiameter() },
+              options: getOptions_diameter(),
             },
           }}
         />

@@ -20,6 +20,7 @@ import {
   TdoorComponentListDto,
   TdoorMotorDto,
   TdoorGeneralSpecsMotorDto,
+  TdoorRollerDto,
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
@@ -192,6 +193,7 @@ type Tworksheet = {
   getOptions_motorVendor: () => Toption[];
   getOptions_electricSupply: () => Toption[];
   getOptions_headBoxThickness: () => Toption[];
+  getOptions_diameter: () => Toption[];
 
   // -----------------------------------------------------------------------------
   reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
@@ -664,8 +666,8 @@ const useWorksheet = create<Tworksheet>(
     },
 
     getOptions_electricSupply: () => getOptions_electricSupply(get().avalibleComponents?.motors ?? []),
-
     getOptions_headBoxThickness: () => getOptions_headBoxThickness(get().avalibleComponents?.headBoxes ?? []),
+    getOptions_diameter: () => getOptions_diameter(get().avalibleComponents?.rollers ?? []),
 
     //
     // ---------------------------------------------------------------------
@@ -829,6 +831,19 @@ const getOptions_headBoxThickness = (headBoxArr: TdoorComponentListDto['headBoxe
     return {
       value: thickness,
       label: thickness + 'T',
+    };
+  });
+
+  return options;
+};
+
+const getOptions_diameter = (rollerArr: TdoorRollerDto[]) => {
+  let diameterArr = rollerArr.map((roller) => roller.diameter);
+  diameterArr = _.uniq(diameterArr);
+  const options = diameterArr.map((diameter) => {
+    return {
+      value: diameter,
+      label: diameter,
     };
   });
 
