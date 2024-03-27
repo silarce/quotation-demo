@@ -94,7 +94,13 @@ type Tworksheet = {
     setMotor_supply: (props: { phase: string; voltage: string }) => void;
 
     setMotor_str: (props: {
-      key: 'horsepower' | 'electricMotorChainType' | 'hasMotorSupportStand' | 'motorLockBox' | 'electricMotorDirection';
+      key:
+        | 'horsepower'
+        | 'vendor'
+        | 'electricMotorChainType'
+        | 'hasMotorSupportStand'
+        | 'motorLockBox'
+        | 'electricMotorDirection';
       value: string;
     }) => void;
   };
@@ -182,6 +188,7 @@ type Tworksheet = {
   };
 
   getOptions_horsepower: () => Toption[];
+  getOptions_motorVendor: () => Toption[];
 
   // -----------------------------------------------------------------------------
   reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
@@ -623,6 +630,20 @@ const useWorksheet = create<Tworksheet>(
 
     getOptions_horsepower: () => {
       return getOptions_horsepower(get().avalibleComponents?.motors ?? []);
+    },
+
+    getOptions_motorVendor: () => {
+      const motors = get().avalibleComponents?.motors ?? [];
+      const vendors = motors.map((motor) => motor.motorVendor);
+      const theVendors = _.uniq(vendors).filter((vendor) => !!vendor) as string[];
+      const options = theVendors.map((vendor) => {
+        return {
+          value: vendor,
+          label: vendor,
+        };
+      });
+
+      return options;
     },
 
     //

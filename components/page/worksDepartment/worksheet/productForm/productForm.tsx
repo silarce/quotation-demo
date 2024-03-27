@@ -290,9 +290,10 @@ function Form_product_ABCD() {
 // =====================================================================
 
 function Form_product_motor() {
-  const { motor, getOptions_horsepower } = useWorksheet((state) => ({
+  const { motor, getOptions_horsepower, getOptions_motorVendor } = useWorksheet((state) => ({
     motor: state.motor,
     getOptions_horsepower: state.getOptions_horsepower,
+    getOptions_motorVendor: state.getOptions_motorVendor,
   }));
 
   return (
@@ -334,7 +335,15 @@ function Form_product_motor() {
         <InputSel
           {...basicConfig}
           caption="廠商"
-          selectProps={{ props: { value: { value: motor.vendor, label: motor.vendor } } }}
+          selectProps={{
+            props: {
+              options: getOptions_motorVendor(),
+              value: { value: motor.vendor, label: motor.vendor },
+              onChange: (option) => {
+                motor.setMotor_str({ key: 'vendor', value: option?.value ?? '' });
+              },
+            },
+          }}
         />
         <InputSel
           {...basicConfig}
