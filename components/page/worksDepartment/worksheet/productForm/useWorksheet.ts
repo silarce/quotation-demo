@@ -191,6 +191,7 @@ type Tworksheet = {
   getOptions_horsepower: () => Toption[];
   getOptions_motorVendor: () => Toption[];
   getOptions_electricSupply: () => Toption[];
+  getOptions_headBoxThickness: () => Toption[];
 
   // -----------------------------------------------------------------------------
   reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
@@ -287,16 +288,32 @@ const useWorksheet = create<Tworksheet>(
       boxB: '',
       boxD: '',
       setGapA: (value) => {
-        set(produce((state) => (state.generalSpec.gapA = value)));
+        set(
+          produce<Tworksheet>((state) => {
+            state.generalSpec && (state.generalSpec.gapA = Number(value));
+          })
+        );
       },
       setGapC: (value) => {
-        set(produce((state) => (state.generalSpec.gapC = value)));
+        set(
+          produce<Tworksheet>((state) => {
+            state.generalSpec && (state.generalSpec.gapC = Number(value));
+          })
+        );
       },
       setBoxB: (value) => {
-        set(produce((state) => (state.ABCD.boxB = value)));
+        set(
+          produce((state) => {
+            state.ABCD.boxB = value;
+          })
+        );
       },
       setBoxD: (value) => {
-        set(produce((state) => (state.ABCD.boxD = value)));
+        set(
+          produce((state) => {
+            state.ABCD.boxD = value;
+          })
+        );
       },
     },
 
@@ -648,6 +665,8 @@ const useWorksheet = create<Tworksheet>(
 
     getOptions_electricSupply: () => getOptions_electricSupply(get().avalibleComponents?.motors ?? []),
 
+    getOptions_headBoxThickness: () => getOptions_headBoxThickness(get().avalibleComponents?.headBoxes ?? []),
+
     //
     // ---------------------------------------------------------------------
 
@@ -665,8 +684,6 @@ const useWorksheet = create<Tworksheet>(
     update_generalSpec: async () => {
       const generalSpec = await get().reqGeneralSpec();
 
-      const option_electricSupply = get().getOptions_electricSupply()[0];
-
       set(
         produce<Tworksheet>((state) => {
           state.generalSpec = generalSpec;
@@ -679,12 +696,20 @@ const useWorksheet = create<Tworksheet>(
           state.motor.vendor = defaultVendor;
           state.ABCD.boxB = String(defaultBoxB ?? '');
           state.ABCD.boxD = String(defaultBoxD ?? '');
-
-          state.motor.motorVoltage = (option_electricSupply.voltage ?? '') as string;
-          state.motor.motorPhase = (option_electricSupply.phase ?? '') as string;
         })
       );
       get().update_availableComponents();
+
+      const option_electricSupply = get().getOptions_electricSupply()[0];
+      const option_headBoxThickness = get().getOptions_headBoxThickness()[0];
+
+      set(
+        produce((state) => {
+          state.motor.motorVoltage = (option_electricSupply.voltage ?? '') as string;
+          state.motor.motorPhase = (option_electricSupply.phase ?? '') as string;
+          state.headBox.headBoxThickness = option_headBoxThickness.value;
+        })
+      );
     },
 
     // _________________________________________________________________
@@ -793,6 +818,19 @@ const getOptions_electricSupply = (motorArr: TdoorMotorDto[]) => {
   isValtage220 && isPhase1 && options.push({ value: '單相 220V', label: '單相 220V', voltage: '220', phase: '1' });
   isValtage220 && isPhase3 && options.push({ value: '三相 220V', label: '三相 220V', voltage: '220', phase: '3' });
   isValtage380 && isPhase3 && options.push({ value: '三相 380V', label: '三相 380V', voltage: '380', phase: '3' });
+
+  return options;
+};
+
+const getOptions_headBoxThickness = (headBoxArr: TdoorComponentListDto['headBoxes']) => {
+  let thicknessArr = headBoxArr.map((headBox) => headBox.thickness);
+  thicknessArr = _.uniq(thicknessArr);
+  const options = thicknessArr.map((thickness) => {
+    return {
+      value: thickness,
+      label: thickness + 'T',
+    };
+  });
 
   return options;
 };

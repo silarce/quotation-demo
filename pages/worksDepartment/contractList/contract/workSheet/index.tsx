@@ -178,7 +178,6 @@ export default function Worksheet({
   // -------------------------------------------------------------------------
 
   const { init, test } = useWorksheet((state) => ({
-    //
     init: state.init,
     test: state.test,
   }));

@@ -413,10 +413,12 @@ function Form_product_headBox() {
     headBox,
     getOptions_material,
     getIsIntegratedHeadBox,
+    getOptions_headBoxThickness,
   } = useWorksheet((state) => ({
     headBox: state.headBox,
     getOptions_material: state.getOptions_material,
     getIsIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox,
+    getOptions_headBoxThickness: state.getOptions_headBoxThickness,
   }));
 
   return (
@@ -441,7 +443,8 @@ function Form_product_headBox() {
           caption="厚度"
           selectProps={{
             props: {
-              value: { value: headBox.headBoxThickness, label: headBox.headBoxThickness },
+              value: { value: headBox.headBoxThickness, label: headBox.headBoxThickness + 'T' },
+              options: getOptions_headBoxThickness(),
               onChange: (options) => {
                 headBox.setHeadBox_str({ key: 'headBoxThickness', value: options?.value ?? '' });
               },
