@@ -772,31 +772,9 @@ const useWorksheet = create<Tworksheet>(
 
     update_generalSpec: async () => {
       const generalSpec = await get().reqGeneralSpec();
-
       set(
         produce<Tworksheet>((state) => {
           state.generalSpec = generalSpec;
-
-          const { defaultHp, defaultVendor, defaultBoxB, defaultBoxD } = produceMotor(
-            generalSpec.motors[generalSpec.defaultMotorIndex]
-          );
-
-          state.motor.horsepower = defaultHp;
-          state.motor.vendor = defaultVendor;
-          state.ABCD.boxB = String(defaultBoxB ?? '');
-          state.ABCD.boxD = String(defaultBoxD ?? '');
-        })
-      );
-      get().update_availableComponents();
-
-      const option_electricSupply = get().getOptions_electricSupply()[0];
-      const option_headBoxThickness = get().getOptions_headBoxThickness()[0];
-
-      set(
-        produce((state) => {
-          state.motor.motorVoltage = (option_electricSupply.voltage ?? '') as string;
-          state.motor.motorPhase = (option_electricSupply.phase ?? '') as string;
-          state.headBox.headBoxThickness = option_headBoxThickness.value;
         })
       );
     },
@@ -828,6 +806,31 @@ const useWorksheet = create<Tworksheet>(
 
     calcData: async () => {
       await get().update_generalSpec();
+
+      set(
+        produce((state) => {
+          const { defaultHp, defaultVendor, defaultBoxB, defaultBoxD } = produceMotor(
+            state.generalSpec.motors[state.generalSpec.defaultMotorIndex]
+          );
+
+          state.motor.horsepower = defaultHp;
+          state.motor.vendor = defaultVendor;
+          state.ABCD.boxB = String(defaultBoxB ?? '');
+          state.ABCD.boxD = String(defaultBoxD ?? '');
+        })
+      );
+
+      await get().update_availableComponents();
+      const option_electricSupply = get().getOptions_electricSupply()[0];
+      const option_headBoxThickness = get().getOptions_headBoxThickness()[0];
+
+      set(
+        produce((state) => {
+          state.motor.motorVoltage = (option_electricSupply.voltage ?? '') as string;
+          state.motor.motorPhase = (option_electricSupply.phase ?? '') as string;
+          state.headBox.headBoxThickness = option_headBoxThickness.value;
+        })
+      );
     },
 
     // ---------------------------------------------------------------------
