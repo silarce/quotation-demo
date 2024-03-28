@@ -53,6 +53,7 @@ type Tworksheet = {
   itemIdArr: string[];
   qty: number;
   isAntiTyphoonLock: boolean;
+  shouldCalcData: boolean;
   //
   basicSpec: {
     itemName: string;
@@ -64,10 +65,7 @@ type Tworksheet = {
     material: string;
     isAntiTyphoon: boolean;
 
-    setBasicSpec_str: (props: {
-      key: keyof Omit<Exclude<Tworksheet['basicSpec'], undefined>, 'isAntiTyphoon' | 'fullWidth' | 'WG' | 'height'>;
-      value: string;
-    }) => void;
+    setBasicSpec_itemName: (props: { key: 'itemName'; value: string }) => void;
     setBasicSpec_material: (str: string) => void;
     setBasicSpec_strNum: (props: {
       //
@@ -260,6 +258,7 @@ const useWorksheet = create<Tworksheet>(
     itemIdArr: [],
     qty: 0,
     isAntiTyphoonLock: true,
+    shouldCalcData: false,
     // ---------------------------------------------------------------------
 
     basicSpec: {
@@ -271,7 +270,7 @@ const useWorksheet = create<Tworksheet>(
       height: '',
       material: '',
       isAntiTyphoon: false,
-      setBasicSpec_str: ({ key, value }) => {
+      setBasicSpec_itemName: ({ key, value }) => {
         set(
           produce((state) => {
             if (state.basicSpec) {
@@ -284,6 +283,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.basicSpec[key] = value;
+            state.shouldCalcData = true;
           })
         );
       },
@@ -292,6 +292,7 @@ const useWorksheet = create<Tworksheet>(
           produce((state) => {
             if (state.basicSpec) {
               state.basicSpec[key] = value;
+              state.shouldCalcData = true;
             }
           })
         );
@@ -300,6 +301,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.basicSpec.material = str;
+            state.shouldCalcData = true;
           })
         );
       },
@@ -548,7 +550,7 @@ const useWorksheet = create<Tworksheet>(
           state.qty = qty;
           state.contractProductItem_ori = contractProductItem;
           state.componentList = componentList;
-
+          state.shouldCalcData = false;
           // ____________________________________________________________________
           // ____________________________________________________________________
           state.basicSpec = {
@@ -871,6 +873,8 @@ const useWorksheet = create<Tworksheet>(
           state.motor.motorPhase = (option_electricSupply.phase ?? '') as string;
           state.headBox.headBoxThickness = option_headBoxThickness.value;
           state.guideRail.guideRailThickness = option_guideRailThickness.value;
+
+          state.shouldCalcData = false;
         })
       );
     },

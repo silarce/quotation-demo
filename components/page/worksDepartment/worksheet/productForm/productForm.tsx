@@ -85,7 +85,7 @@ function Form_product_basic() {
             props: {
               value: basicSpec.itemName,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                basicSpec.setBasicSpec_str({ key: 'itemName', value: e.target.value });
+                basicSpec.setBasicSpec_itemName({ key: 'itemName', value: e.target.value });
               },
             },
           }}

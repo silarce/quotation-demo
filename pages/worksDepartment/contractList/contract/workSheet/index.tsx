@@ -2,7 +2,7 @@
 
 // 按下計算按鈕會呼叫targetSheet.calcProd()
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, use } from 'react';
 import classNames from 'classnames';
 import _, { set, update } from 'lodash';
 import { useRouter } from 'next/router';
@@ -179,6 +179,7 @@ export default function Worksheet({
 
   const init = useWorksheet((state) => state.init);
   const test = useWorksheet((state) => state.test);
+  const shouldCalcData = useWorksheet((state) => state.shouldCalcData);
 
   useEffect(() => {
     const contractProductItems = worksheetData?.latestRecord.contractProductItems;
@@ -542,7 +543,7 @@ export default function Worksheet({
                 <p className={'mb-8 text-main text-xl font-bold'}>設定產品基本規格：</p>
                 <Form_product_basic />
               </div>
-              <div>
+              <div className={scss.mainFormWrapper}>
                 <p className={'mb-8 text-main text-xl font-bold'}>設定產品細部規格：</p>
                 <div className={scss.formGrid}>
                   <Form_product_ABCD />
@@ -554,6 +555,7 @@ export default function Worksheet({
                   <Form_product_bottomBar />
                   <Form_product_sidePlate />
                 </div>
+                {shouldCalcData && <div className={scss.cover}></div>}
               </div>
               <div></div>
             </form>
