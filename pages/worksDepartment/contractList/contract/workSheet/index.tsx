@@ -38,6 +38,8 @@ import {
   Form_product_bottomBar,
   Form_product_sidePlate,
   Form_product_accessories,
+  //
+  WorksheetTable,
 } from 'components/page/worksDepartment/worksheet/productForm/productForm';
 
 import WorkSheetProductOutline, {
@@ -568,6 +570,9 @@ export default function Worksheet({
               </div>
               <div>
                 <Form_product_accessories />
+              </div>
+              <div>
+                <WorksheetTable />
               </div>
             </form>
           </div>

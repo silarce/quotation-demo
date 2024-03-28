@@ -899,7 +899,7 @@ function Form_product_accessories() {
 
   return (
     <div className={scss.form_product_accessories}>
-      <p className={scss.title}>選配 : </p>
+      <p className={scss.title}>選配 ： </p>
       <div>
         <Checkbox.Group
           className={scss.checkGroup}
@@ -918,7 +918,259 @@ function Form_product_accessories() {
 // =====================================================================
 // =====================================================================
 // =====================================================================
+// =====================================================================
 
+const aaa = 'aaa';
+
+const WorksheetTable = () => {
+  return (
+    <div>
+      <p className={scss.title}>產品規格表單： </p>
+      <Table_size />
+      <Table_motor />
+      <Table_headBox />
+      <Table_roller />
+      <Table_slat />
+      <Table_guideRail />
+      <Table_gear />
+      <Table_bottomBar />
+    </div>
+  );
+};
+
+const Table_size = () => {
+  const { basicSpec, ABCD, fullWidth_mm, height_mm, WG_mm } = useWorksheet(
+    useShallow((state) => ({
+      basicSpec: state.basicSpec,
+      ABCD: state.ABCD,
+      fullWidth_mm: state.getFullWidth_mm(),
+      height_mm: state.getHeight_mm(),
+      WG_mm: state.getWG_mm(),
+    }))
+  );
+
+  return (
+    <div className={scss.worksheetTable}>
+      <div className={scss.cell}>尺寸</div>
+
+      <div className={scss.cell}>型號</div>
+      <div className={scss.cell}>{basicSpec.doorModelName}</div>
+
+      <div className={scss.cell}>全寬</div>
+      <div className={scss.cell}>{fullWidth_mm}</div>
+
+      <div className={scss.cell}>淨高</div>
+      <div className={scss.cell}>{height_mm}</div>
+
+      <div className={scss.cell}>W+G</div>
+      <div className={scss.cell}>{WG_mm}</div>
+
+      <div className={scss.cell}>機械縫A</div>
+      <div className={scss.cell}>{ABCD.getGapA()}</div>
+
+      <div className={scss.cell}>機械縫C</div>
+      <div className={scss.cell}>{ABCD.getGapC()}</div>
+
+      <div className={scss.cell}>支板尺寸 B*D(右)</div>
+      <div className={scss.cell}>{`${ABCD.boxB}*${ABCD.boxD}`}</div>
+
+      <div className={scss.cell}>捲門全高 H</div>
+      <div className={scss.cell}>{aaa}</div>
+    </div>
+  );
+};
+
+const Table_motor = () => {
+  const { motor } = useWorksheet(
+    useShallow((state) => ({
+      motor: state.motor,
+    }))
+  );
+
+  return (
+    <div className={scss.worksheetTable}>
+      <div className={scss.cell}>{`電動機(${'大同'})`}</div>
+
+      <div className={scss.cell}>電供</div>
+      <div className={scss.cell}>{motor.getElectricSupply()}</div>
+
+      <div className={scss.cell}>馬力數</div>
+      <div className={scss.cell}>{motor.horsepower}</div>
+    </div>
+  );
+};
+
+const Table_headBox = () => {
+  const { headBox } = useWorksheet(
+    useShallow((state) => ({
+      headBox: state.headBox,
+    }))
+  );
+
+  return (
+    <div className={scss.worksheetTable}>
+      <div className={scss.cell}>捲箱</div>
+
+      <div className={scss.cell}>角鐵數量</div>
+      <div className={scss.cell}>{headBox.headBoxAngleIronQuantity}</div>
+
+      <div className={scss.cell}>捲箱角鐵尺寸</div>
+      <div className={scss.cell}>{aaa}</div>
+
+      <div className={scss.cell}>捲箱資訊</div>
+      <div className={classNames(scss.cell, ' col-span-3')}>{headBox.getIsIntegratedHeadBox()}</div>
+    </div>
+  );
+};
+
+const Table_roller = () => {
+  const { roller } = useWorksheet(
+    useShallow((state) => ({
+      roller: state.roller,
+    }))
+  );
+
+  return (
+    <div className={scss.worksheetTable}>
+      <div className={scss.cell}>捲軸</div>
+
+      <div className={scss.cell}>捲軸尺寸</div>
+      <div className={scss.cell}>{aaa}</div>
+
+      <div className={scss.cell}>軸徑</div>
+      <div className={scss.cell}>{aaa}</div>
+
+      <div className={scss.cell}>軸承</div>
+      <div className={scss.cell}>{aaa}</div>
+
+      <div className={scss.cell}>總長</div>
+      <div className={scss.cell}>{aaa}</div>
+
+      <div className={scss.cell}></div>
+      <div className={scss.cell}></div>
+
+      <div className={scss.cell}>寸法</div>
+      <div className={scss.cell}>{aaa}</div>
+    </div>
+  );
+};
+
+const Table_slat = () => {
+  const { slat, generalSpec, antiTyphoonHook } = useWorksheet(
+    useShallow((state) => ({
+      slat: state.slat,
+      generalSpec: state.generalSpec,
+      antiTyphoonHook: state.basicSpec.isAntiTyphoon ? '有' : '無',
+    }))
+  );
+
+  return (
+    <div className={scss.worksheetTable}>
+      <div className={scss.cell}>門片</div>
+
+      <div className={scss.cell}>門片材質</div>
+      <div className={scss.cell}>{slat.material}</div>
+
+      <div className={scss.cell}>門片厚度</div>
+      <div className={scss.cell}>{generalSpec?.thickness}</div>
+
+      <div className={scss.cell}>門片長度</div>
+      <div className={scss.cell}>{aaa}</div>
+
+      <div className={scss.cell}>捲片支數</div>
+      <div className={scss.cell}>{aaa}</div>
+
+      <div className={scss.cell}></div>
+      <div className={scss.cell}></div>
+
+      <div className={scss.cell}>防颱勾</div>
+      <div className={scss.cell}>{antiTyphoonHook}</div>
+    </div>
+  );
+};
+
+const Table_guideRail = () => {
+  const { guideRail } = useWorksheet(
+    useShallow((state) => ({
+      guideRail: state.guideRail,
+    }))
+  );
+
+  return (
+    <div className={scss.worksheetTable}>
+      <div className={scss.cell}>門軌</div>
+
+      <div className={scss.cell}>門軌材質</div>
+      <div className={scss.cell}>{guideRail.material}</div>
+
+      <div className={scss.cell}>門軌長度</div>
+      <div className={scss.cell}>{aaa}</div>
+
+      <div className={scss.cell}></div>
+      <div className={scss.cell}></div>
+
+      <div className={scss.cell}>{`門軌形式(${guideRail.guideRailType})`}</div>
+      <div className={scss.cell}>
+        {/*  eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail.guideRail}`}
+          alt="door-track"
+          className=" h-20"
+        />
+      </div>
+    </div>
+  );
+};
+
+const Table_gear = () => {
+  const { generalSpec } = useWorksheet(
+    useShallow((state) => ({
+      generalSpec: state.generalSpec,
+    }))
+  );
+
+  return (
+    <div className={scss.worksheetTable}>
+      <div className={scss.cell}>鏈齒輪</div>
+
+      <div className={scss.cell}>鏈齒輪番號</div>
+      <div className={scss.cell}>{aaa}</div>
+
+      <div className={scss.cell}>大鏈輪</div>
+      <div className={scss.cell}>{aaa}</div>
+
+      <div className={scss.cell}></div>
+      <div className={scss.cell}></div>
+
+      <div className={scss.cell}>孔徑</div>
+      <div className={scss.cell}>{aaa}</div>
+    </div>
+  );
+};
+
+const Table_bottomBar = () => {
+  const { bottomBar, guideRail } = useWorksheet(
+    useShallow((state) => ({
+      bottomBar: state.bottomBar,
+      guideRail: state.guideRail,
+    }))
+  );
+
+  return (
+    <div className={scss.worksheetTable}>
+      <div className={scss.cell}>底座</div>
+
+      <div className={scss.cell}>底座材質</div>
+      <div className={scss.cell}>{bottomBar.material}</div>
+
+      <div className={scss.cell}>底座開口</div>
+      <div className={scss.cell}>{guideRail.guideRailsOpening}</div>
+    </div>
+  );
+};
+
+// =====================================================================
+// =====================================================================
 // =====================================================================
 
 const basicConfig: TinputSelProps = {
@@ -946,3 +1198,5 @@ export {
   Form_product_accessories,
   //
 };
+
+export { WorksheetTable };
