@@ -69,11 +69,23 @@ type TcheckBox_single = {
 // =====================================================================
 
 function Form_product_basic() {
-  const { res: doorModelArr, update: update_doorModel, doorModelList } = useApiGetProdDoorModels();
+  const {
+    //
+    res: doorModelArr,
+    update: update_doorModel,
+    doorModelList,
+  } = useApiGetProdDoorModels();
 
   // --------------------------------------------------
 
-  const { doorModelInfo, basicSpec, setDoorModelInfo, getOptions_material, calcData } = useWorksheet(
+  const {
+    //
+    doorModelInfo,
+    basicSpec,
+    setDoorModelInfo,
+    getOptions_material,
+    calcData,
+  } = useWorksheet(
     useShallow((state) => ({
       doorModelInfo: state.doorModelInfo,
       basicSpec: state.basicSpec,
@@ -102,13 +114,13 @@ function Form_product_basic() {
   }, []);
 
   useEffect(() => {
-    if (!doorModelInfo && doorModelList) {
+    if (doorModelList) {
       const doorModelName = basicSpec.doorModelName;
       const doorModelInfo = doorModelList[doorModelName];
       setDoorModelInfo(doorModelInfo);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doorModelList, basicSpec]);
+  }, [doorModelList, basicSpec.doorModelName]);
 
   // ---------------------------------------------------------------------
 
@@ -647,10 +659,9 @@ function Form_product_guideRail() {
         getOptions_material: state.getOptions_material,
         getOptions_guideRailThickness: state.getOptions_guideRailThickness,
         getOptions_guideRail: state.getOptions_guideRail,
-
         generalSpec: state.generalSpec, // 用於更新getOptions
         avalibleComponent: state.avalibleComponents, // 用於更新getOptions
-        // doorModelInfo: state.doorModelInfo,
+        doorModelInfo: state.doorModelInfo, // 用於更新getOptions
       }))
     );
 
