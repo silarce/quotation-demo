@@ -143,6 +143,9 @@ type Tworksheet = {
     hasSilencingStrip: boolean;
     guideRailType: string;
     guideRail: string;
+    guideRailsOpening: string;
+    guideRailG: number;
+
     getHasSilencingStrip: () => string;
     setGuideRail_str: (props: {
       key: //
@@ -155,7 +158,7 @@ type Tworksheet = {
       //
       guideRail: string;
       hasSilencingStrip: boolean;
-      width: string;
+      width: number;
       opening: string;
       thickness: string;
     }) => void;
@@ -422,6 +425,9 @@ const useWorksheet = create<Tworksheet>(
       hasSilencingStrip: false,
       guideRailType: '',
       guideRail: '',
+      guideRailsOpening: '',
+      guideRailG: 0,
+
       getHasSilencingStrip: () => {
         const hasSilencingStrip = get().guideRail.hasSilencingStrip;
 
@@ -453,6 +459,8 @@ const useWorksheet = create<Tworksheet>(
           produce<Tworksheet>((state) => {
             state.guideRail.guideRail = guideRail;
             state.guideRail.hasSilencingStrip = hasSilencingStrip;
+            state.guideRail.guideRailsOpening = opening;
+            state.guideRail.guideRailG = width;
             // state.guideRail.guideRailThickness = thickness;
           })
         );
@@ -582,6 +590,8 @@ const useWorksheet = create<Tworksheet>(
             hasSilencingStrip: !!contractProductItem?.hasSilencingStrip,
             guideRailType: contractProductItem?.guideRailType ?? '',
             guideRail: contractProductItem?.guideRail ?? '',
+            guideRailsOpening: contractProductItem?.guideRailsOpening ?? '',
+            guideRailG: contractProductItem?.guideRailG ?? 0,
             getHasSilencingStrip: state.guideRail.getHasSilencingStrip,
           };
 

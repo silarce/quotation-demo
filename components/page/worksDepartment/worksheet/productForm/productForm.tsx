@@ -757,7 +757,7 @@ function Form_product_guideRail() {
                 const value = option?.value ?? '';
                 const hasSilencingStrip = option?.hasSilencingStrip as boolean;
                 let thickness = (option?.thickness ?? '') as string;
-                const width = String((option?.width ?? 0) as number);
+                const width = (option?.width ?? 0) as number;
                 const opening = option?.opening as string;
 
                 thickness = thickness.replace('t', '');
