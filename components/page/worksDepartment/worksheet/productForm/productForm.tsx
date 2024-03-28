@@ -920,8 +920,6 @@ function Form_product_accessories() {
 // =====================================================================
 // =====================================================================
 
-const aaa = 'aaa';
-
 const WorksheetTable = () => {
   return (
     <div>
@@ -939,13 +937,15 @@ const WorksheetTable = () => {
 };
 
 const Table_size = () => {
-  const { basicSpec, ABCD, fullWidth_mm, height_mm, WG_mm } = useWorksheet(
+  const { basicSpec, ABCD, fullWidth_mm, height_mm, WG_mm, fullHeight_mm } = useWorksheet(
     useShallow((state) => ({
       basicSpec: state.basicSpec,
       ABCD: state.ABCD,
       fullWidth_mm: state.getFullWidth_mm(),
       height_mm: state.getHeight_mm(),
       WG_mm: state.getWG_mm(),
+      fullHeight_mm: state.getFullHeight_mm(),
+      generalSpec: state.generalSpec,
     }))
   );
 
@@ -975,7 +975,7 @@ const Table_size = () => {
       <div className={scss.cell}>{`${ABCD.boxB}*${ABCD.boxD}`}</div>
 
       <div className={scss.cell}>捲門全高 H</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{fullHeight_mm}</div>
     </div>
   );
 };
@@ -989,7 +989,7 @@ const Table_motor = () => {
 
   return (
     <div className={scss.worksheetTable}>
-      <div className={scss.cell}>{`電動機(${'大同'})`}</div>
+      <div className={scss.cell}>{`電動機(${motor.vendor})`}</div>
 
       <div className={scss.cell}>電供</div>
       <div className={scss.cell}>{motor.getElectricSupply()}</div>
@@ -1001,9 +1001,10 @@ const Table_motor = () => {
 };
 
 const Table_headBox = () => {
-  const { headBox } = useWorksheet(
+  const { headBox, angleIronSize_mm } = useWorksheet(
     useShallow((state) => ({
       headBox: state.headBox,
+      angleIronSize_mm: state.getAngleIronSize_mm(),
     }))
   );
 
@@ -1015,7 +1016,7 @@ const Table_headBox = () => {
       <div className={scss.cell}>{headBox.headBoxAngleIronQuantity}</div>
 
       <div className={scss.cell}>捲箱角鐵尺寸</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{angleIronSize_mm}</div>
 
       <div className={scss.cell}>捲箱資訊</div>
       <div className={classNames(scss.cell, ' col-span-3')}>{headBox.getIsIntegratedHeadBox()}</div>
@@ -1024,9 +1025,10 @@ const Table_headBox = () => {
 };
 
 const Table_roller = () => {
-  const { roller } = useWorksheet(
+  const { roller, generalSpec } = useWorksheet(
     useShallow((state) => ({
       roller: state.roller,
+      generalSpec: state.generalSpec,
     }))
   );
 
@@ -1035,22 +1037,22 @@ const Table_roller = () => {
       <div className={scss.cell}>捲軸</div>
 
       <div className={scss.cell}>捲軸尺寸</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{roller.getDiameter()}</div>
 
       <div className={scss.cell}>軸徑</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{generalSpec?.bearingInnerDiameter}</div>
 
       <div className={scss.cell}>軸承</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{generalSpec?.bearingName}</div>
 
       <div className={scss.cell}>總長</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{generalSpec?.bearingHousingTotalLength}</div>
 
       <div className={scss.cell}></div>
       <div className={scss.cell}></div>
 
       <div className={scss.cell}>寸法</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{generalSpec?.bearingHousingSize}</div>
     </div>
   );
 };
@@ -1075,10 +1077,10 @@ const Table_slat = () => {
       <div className={scss.cell}>{generalSpec?.thickness}</div>
 
       <div className={scss.cell}>門片長度</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{generalSpec?.slatLength}</div>
 
       <div className={scss.cell}>捲片支數</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{'99999 呼叫api算'}</div>
 
       <div className={scss.cell}></div>
       <div className={scss.cell}></div>
@@ -1090,9 +1092,10 @@ const Table_slat = () => {
 };
 
 const Table_guideRail = () => {
-  const { guideRail } = useWorksheet(
+  const { guideRail, generalSpec } = useWorksheet(
     useShallow((state) => ({
       guideRail: state.guideRail,
+      generalSpec: state.generalSpec,
     }))
   );
 
@@ -1104,7 +1107,7 @@ const Table_guideRail = () => {
       <div className={scss.cell}>{guideRail.material}</div>
 
       <div className={scss.cell}>門軌長度</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{generalSpec?.guideRailLength}</div>
 
       <div className={scss.cell}></div>
       <div className={scss.cell}></div>
@@ -1134,16 +1137,16 @@ const Table_gear = () => {
       <div className={scss.cell}>鏈齒輪</div>
 
       <div className={scss.cell}>鏈齒輪番號</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{generalSpec?.sprocketWheelModel}</div>
 
       <div className={scss.cell}>大鏈輪</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{generalSpec?.sprocketWheelTeethNumber}</div>
 
       <div className={scss.cell}></div>
       <div className={scss.cell}></div>
 
       <div className={scss.cell}>孔徑</div>
-      <div className={scss.cell}>{aaa}</div>
+      <div className={scss.cell}>{generalSpec?.bearingInnerDiameter}</div>
     </div>
   );
 };

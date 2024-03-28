@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
 import { create } from 'zustand';
 // 使用 immer middleware會使typescript不正確的判斷型別，導致型別錯誤(實際上沒錯)
 // import { immer } from 'zustand/middleware/immer';
@@ -257,6 +259,8 @@ type Tworksheet = {
   getFullWidth_mm: () => number;
   getWG_mm: () => number;
   getHeight_mm: () => number;
+  getFullHeight_mm: () => number;
+  getAngleIronSize_mm: () => string;
 
   // -----------------------------------------------------------------------------
 
@@ -947,6 +951,22 @@ const useWorksheet = create<Tworksheet>(
 
     getHeight_mm: () => {
       return new Decimal(get().basicSpec.height || 0).mul(1000).toNumber();
+    },
+
+    // 全高
+    getFullHeight_mm: () => {
+      const height = get().getHeight_mm();
+      const boxB = Number(get().ABCD.boxB);
+
+      return new Decimal(height).add(boxB).toNumber();
+    },
+
+    getAngleIronSize_mm: () => {
+      const gapA = get().ABCD.getGapA() || 0;
+      const gapC = get().ABCD.getGapC() || 0;
+      const WG = get().getWG_mm() || 0;
+
+      return new Decimal(gapA).add(gapC).add(WG).minus(10).toString();
     },
 
     // ---------------------------------------------------------------------
