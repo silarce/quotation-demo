@@ -35,6 +35,9 @@ import {
   optionsCreator_bottomBar_2,
 } from 'js/utils/options/productOptions';
 
+// utils
+import { findOption } from 'js/utils/options/findOption';
+
 // =====================================================================
 
 // | 'slat'
@@ -854,7 +857,7 @@ function Form_product_bottomBar() {
           caption="類型"
           selectProps={{
             props: {
-              value: { value: bottomBar.bottomBar, label: bottomBar.bottomBar },
+              value: findOption({ value: bottomBar.bottomBar, options: optionsCreator_bottomBar_2() }),
               options: optionsCreator_bottomBar_2(),
               onChange: (option) => {
                 bottomBar.setBottomBar_str({ key: 'bottomBar', value: option?.value ?? '' });
