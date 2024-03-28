@@ -189,7 +189,7 @@ export const optionsCreator_bottomBar = createOptionsCreator({
 
 export const optionsCreator_bottomBar_2 = createOptionsCreator({
   optionsArr: [
-    { value: '', label: '無' },
+    { value: 'null', label: '無' },
     { value: '鋁障感型', label: '鋁障感型' },
     { value: '止水型', label: '止水型' },
   ],
