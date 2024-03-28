@@ -24,3 +24,52 @@
     height: 60px;
   }
 }
+// ========================================================
+
+.form_product_accessories {
+  margin-left: 57px;
+  .title {
+    font-size: 20px;
+    color: theme("colors.main");
+    margin-bottom: 25px;
+  }
+  .checkGroup {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 25px 0;
+
+    :global(.ant-checkbox-wrapper) {
+      > span {
+        font-size: 18px;
+      }
+      &:global(.ant-checkbox-wrapper-disabled) {
+        > span {
+          color: theme("colors.sub");
+        }
+      }
+    }
+
+    :global(.ant-checkbox) {
+      top: 1px;
+      :global(.ant-checkbox-inner) {
+        // width: 15px;
+        // height: 15px;
+        border-color: theme("colors.border");
+      }
+    }
+
+    :global(.ant-checkbox-checked) {
+      :global(.ant-checkbox-inner) {
+        background-color: theme("colors.main");
+      }
+    }
+
+    :global(.ant-checkbox-disabled) {
+      :global(.ant-checkbox-inner) {
+        &::after {
+          border-color: #fff;
+        }
+      }
+    }
+  }
+}

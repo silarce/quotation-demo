@@ -880,6 +880,42 @@ function Form_product_sidePlate() {
 }
 
 // =====================================================================
+
+// antd
+import { Checkbox } from 'antd';
+
+function Form_product_accessories() {
+  const { accessories, getOptions_accessories, setAccessories } = useWorksheet(
+    useShallow((state) => ({
+      accessories: state.accessories,
+      getOptions_accessories: state.getOptions_accessories,
+      setAccessories: state.setAccessories,
+    }))
+  );
+
+  const foo = accessories.map((item) => {
+    return item.name;
+  });
+
+  return (
+    <div className={scss.form_product_accessories}>
+      <p className={scss.title}>選配 : </p>
+      <div>
+        <Checkbox.Group
+          className={scss.checkGroup}
+          // disabled={disabled}
+          options={getOptions_accessories()}
+          value={foo}
+          onChange={(arr) => {
+            setAccessories(arr as string[]);
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// =====================================================================
 // =====================================================================
 // =====================================================================
 
@@ -907,5 +943,6 @@ export {
   Form_product_guideRail,
   Form_product_bottomBar,
   Form_product_sidePlate,
+  Form_product_accessories,
   //
 };

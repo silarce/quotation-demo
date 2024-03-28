@@ -37,22 +37,23 @@ import {
   Form_product_guideRail,
   Form_product_bottomBar,
   Form_product_sidePlate,
+  Form_product_accessories,
 } from 'components/page/worksDepartment/worksheet/productForm/productForm';
 
-// import WorkSheetProductOutline, {
-//   Tcontrol_productOutline,
-//   ToldProductOutline,
-// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
-// import WorkSheetProductDetail01, {
-//   Tcontrol_detail,
-//   Tcontrol_ABCD,
-// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
-// import WorkSheetOptional, {
-//   Tcontrol_optional,
-// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
-// import WorkSheetProductDetail02, {
-//   Tcontrol_detail02,
-// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
+import WorkSheetProductOutline, {
+  Tcontrol_productOutline,
+  ToldProductOutline,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
+import WorkSheetProductDetail01, {
+  Tcontrol_detail,
+  Tcontrol_ABCD,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
+import WorkSheetOptional, {
+  Tcontrol_optional,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
+import WorkSheetProductDetail02, {
+  Tcontrol_detail02,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
 import WorkSheetPDF, {
   Tcontrol_workSheetPDF_01,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
@@ -110,6 +111,7 @@ import type {
   TquotationProductItemDto,
   TerpFeatureDto,
   TworksheetDto_legacy,
+  TquotationProductAccessoryDto,
 } from 'js/api/dtoTypes';
 
 // zustand // hook
@@ -146,6 +148,10 @@ export default function Worksheet({
 
   const [activeWorksheetId, setActiveWorksheetId] = useState<string | undefined>(undefined);
   const [inputModalProps, setInputModalProps] = useState<Pick<TinputModalProps, 'onConfirm' | 'title'>>();
+
+  const [activeWorksheetOriginalAccessories, setActiveWorksheetOriginalAccessories] = useState<
+    TquotationProductAccessoryDto[]
+  >([]);
 
   // const [isShowPdf, setIsShowPdf] = useState(false);
   // const [isShowPdf02, setIsShowPdf02] = useState(false);
@@ -188,6 +194,7 @@ export default function Worksheet({
       itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
       contractProductItem: contractProductItems?.[0],
       qty: contractProductItems?.length ?? 0,
+      originalAccessories: activeWorksheetOriginalAccessories,
     });
   }, [worksheetData]);
 
@@ -325,6 +332,8 @@ export default function Worksheet({
           reviewStatus,
           onClick: () => {
             setActiveWorksheetId(worksheet.id);
+            // setActiveWorksheetOriginalAccessories(accessories);
+            setActiveWorksheetOriginalAccessories(prod.items?.[0].accessories ?? []);
           },
           onDeleteClick: () => {
             myAlert.confirm({
@@ -557,7 +566,9 @@ export default function Worksheet({
                 </div>
                 {shouldCalcData && <div className={scss.cover}></div>}
               </div>
-              <div></div>
+              <div>
+                <Form_product_accessories />
+              </div>
             </form>
           </div>
           {/* right */}

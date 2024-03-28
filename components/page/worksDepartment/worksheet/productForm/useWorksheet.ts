@@ -21,6 +21,7 @@ import {
   TdoorMotorDto,
   TdoorGeneralSpecsMotorDto,
   TdoorRollerDto,
+  TquotationProductAccessoryDto,
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
@@ -41,14 +42,42 @@ import {
 
 // =====================================================================
 
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+// component的過濾與取得bom資料晚點記得要做
+
+// =====================================================================
+
 type Tworksheet = {
   readonly contractProductItem_ori: TquotationProductItemDto | undefined;
   doorModelInfoList: { [key: string]: TdoorModelInfoDto } | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
   componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
+  accessories: TquotationProductAccessoryDto[];
 
   generalSpec: TdoorGeneralSpecsDto | undefined;
+  //
   avalibleComponents: TdoorComponentListDto | undefined;
+  // options_accessories: Toption[];
+  originalAccessories: TquotationProductAccessoryDto[];
   //
   itemIdArr: string[];
   qty: number;
@@ -193,6 +222,7 @@ type Tworksheet = {
     itemIdArr: Tworksheet['itemIdArr'];
     contractProductItem: Tworksheet['contractProductItem_ori'];
     qty: Tworksheet['qty'];
+    originalAccessories: TquotationProductAccessoryDto[];
   }) => void;
 
   setDoorModelInfo: (doorModelInfo: TdoorModelInfoDto | undefined) => void;
@@ -211,6 +241,7 @@ type Tworksheet = {
   getOptions_guideRailThickness: () => Toption[];
   getOptions_guideRail: () => Toption[];
   getOptions_doorModelInfo: () => Toption[];
+  getOptions_accessories: () => Toption[];
 
   // -----------------------------------------------------------------------------
   reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
@@ -226,6 +257,10 @@ type Tworksheet = {
   getFullWidth_mm: () => number;
   getWG_mm: () => number;
   getHeight_mm: () => number;
+
+  // -----------------------------------------------------------------------------
+
+  setAccessories: (acceNameArr: string[]) => void;
 
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
@@ -252,8 +287,11 @@ const useWorksheet = create<Tworksheet>(
     doorModelInfoList: undefined,
     doorModelInfo: undefined,
     componentList: undefined,
+    accessories: [],
     generalSpec: undefined,
+    // ---------------------------------------------------------------------
     avalibleComponents: undefined,
+    originalAccessories: [],
     // ---------------------------------------------------------------------
     itemIdArr: [],
     qty: 0,
@@ -508,7 +546,7 @@ const useWorksheet = create<Tworksheet>(
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
     //
-    init: async ({ itemIdArr, contractProductItem, qty }) => {
+    init: async ({ itemIdArr, contractProductItem, qty, originalAccessories }) => {
       const doorModelInfo = get().doorModelInfoList;
 
       if (!doorModelInfo) {
@@ -544,6 +582,8 @@ const useWorksheet = create<Tworksheet>(
             state.doorModelInfo = state.doorModelInfoList![contractProductItem?.doorModelName];
           }
 
+          const accessories = contractProductItem?.accessories ?? [];
+
           // ____________________________________________________________________
           // ____________________________________________________________________
           state.itemIdArr = itemIdArr;
@@ -551,6 +591,8 @@ const useWorksheet = create<Tworksheet>(
           state.contractProductItem_ori = contractProductItem;
           state.componentList = componentList;
           state.shouldCalcData = false;
+          state.originalAccessories = originalAccessories;
+          state.accessories = accessories;
           // ____________________________________________________________________
           // ____________________________________________________________________
           state.basicSpec = {
@@ -800,6 +842,18 @@ const useWorksheet = create<Tworksheet>(
       return options;
     },
 
+    getOptions_accessories: () => {
+      const originalAccessories = get().originalAccessories;
+      const options = originalAccessories.map((acce) => {
+        return {
+          value: acce.name,
+          label: acce.name,
+        };
+      });
+
+      return options;
+    },
+
     //
     // ---------------------------------------------------------------------
 
@@ -896,11 +950,33 @@ const useWorksheet = create<Tworksheet>(
     },
 
     // ---------------------------------------------------------------------
+
+    setAccessories: (acceNameArr) => {
+      const originalAccessories = get().originalAccessories;
+
+      const newAccessories: TquotationProductAccessoryDto[] = [];
+
+      acceNameArr.forEach((name) => {
+        const target = originalAccessories.find((acce) => acce.name === name);
+
+        if (target) {
+          newAccessories.push(target);
+        }
+      });
+
+      set(
+        produce((state) => {
+          state.accessories = newAccessories;
+        })
+      );
+    },
+
+    // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
 
     test: () => {
-      console.log(get().avalibleComponents);
+      console.log(get());
     },
     // ---------------------------------------------------------------------
     //
