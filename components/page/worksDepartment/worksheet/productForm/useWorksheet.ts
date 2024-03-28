@@ -32,12 +32,18 @@ import {
   lookup_horsePowerToToptions,
 } from 'js/utils/options/productOptions';
 
-import { apiGetProdCalcGeneralSpec, apiGetProdAvailableComponents } from 'js/api/api_product';
+import {
+  //
+  apiGetProdDoorModels,
+  apiGetProdCalcGeneralSpec,
+  apiGetProdAvailableComponents,
+} from 'js/api/api_product';
 
 // =====================================================================
 
 type Tworksheet = {
   readonly contractProductItem_ori: TquotationProductItemDto | undefined;
+  doorModelInfoList: { [key: string]: TdoorModelInfoDto } | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
   componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
 
@@ -206,6 +212,7 @@ type Tworksheet = {
   getOptions_diameter: () => Toption[];
   getOptions_guideRailThickness: () => Toption[];
   getOptions_guideRail: () => Toption[];
+  getOptions_doorModelInfo: () => Toption[];
 
   // -----------------------------------------------------------------------------
   reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
@@ -244,6 +251,7 @@ type Tworksheet = {
 const useWorksheet = create<Tworksheet>(
   (set, get) => ({
     contractProductItem_ori: undefined,
+    doorModelInfoList: undefined,
     doorModelInfo: undefined,
     componentList: undefined,
     generalSpec: undefined,
@@ -499,11 +507,22 @@ const useWorksheet = create<Tworksheet>(
     // ---------------------------------------------------------------------
     //
     init: async ({ itemIdArr, contractProductItem, qty }) => {
+      const doorModelInfo = get().doorModelInfoList;
+
+      if (!doorModelInfo) {
+        const doorModelArr = await apiGetProdDoorModels();
+        set(
+          produce<Tworksheet>((state) => {
+            state.doorModelInfoList = {};
+            doorModelArr.forEach((doorModel) => {
+              state.doorModelInfoList![doorModel.name] = doorModel;
+            });
+          })
+        );
+      }
+
       set(
         produce<Tworksheet>((state) => {
-          // ____________________________________________________________________
-          // ____________________________________________________________________
-
           const componentArr = contractProductItem?.components;
 
           const componentList = (() => {
@@ -518,6 +537,10 @@ const useWorksheet = create<Tworksheet>(
 
             return list as Required<Tworksheet['componentList']>;
           })();
+
+          if (contractProductItem?.doorModelName) {
+            state.doorModelInfo = state.doorModelInfoList![contractProductItem?.doorModelName];
+          }
 
           // ____________________________________________________________________
           // ____________________________________________________________________
@@ -756,6 +779,23 @@ const useWorksheet = create<Tworksheet>(
 
       return options;
     },
+
+    getOptions_doorModelInfo: () => {
+      const doorModelInfoList = get().doorModelInfoList;
+      const doorModelInfoArr = Object.values(doorModelInfoList ?? {});
+      const options = doorModelInfoArr.map((doorModel) => {
+        const { name } = doorModel;
+
+        return {
+          label: name,
+          value: name,
+          obj: doorModel,
+        };
+      });
+
+      return options;
+    },
+
     //
     // ---------------------------------------------------------------------
 

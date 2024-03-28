@@ -190,11 +190,6 @@ export default function Worksheet({
     });
   }, [worksheetData]);
 
-  // console.log(activeWorksheetid);
-  // console.log(finalProduct);
-  // console.log(worksheetArr);
-  // console.log(worksheetData);
-
   // -------------------------------------------------------------------------
 
   const refreshData = async () => {

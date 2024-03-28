@@ -40,55 +40,24 @@ import { findOption } from 'js/utils/options/findOption';
 
 // =====================================================================
 
-// | 'slat'
-// | 'bottomBar'
-// | 'guideRail'
-// | 'sidePlate'
-// | 'roller'
-// | 'motor'
-// | 'motorAccessories'
-// | 'headBox';
-
-type Tinput = {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  inputProps: TinputSelProps['inputProps'];
-};
-
-type Tselect = {
-  value: string | null;
-  value_option?: Toption;
-  options: Toption[];
-  onChange: (option: Toption) => void;
-  selectProps: TinputSelProps['selectProps'];
-};
-
-type TcheckBox_single = {
-  value: boolean;
-  onChange: (bool: boolean) => void;
-  checkboxProps: TinputSelProps['checkBoxProps_v2'];
-};
-
-// =====================================================================
-
 function Form_product_basic() {
-  const {
-    //
-    res: doorModelArr,
-    update: update_doorModel,
-    doorModelList,
-  } = useApiGetProdDoorModels();
+  // const {
+  //   //
+  //   res: doorModelArr,
+  //   update: update_doorModel,
+  //   doorModelList,
+  // } = useApiGetProdDoorModels();
 
   // --------------------------------------------------
 
   const {
     //
-    doorModelInfo,
     basicSpec,
     setDoorModelInfo,
     getOptions_material,
     calcData,
     isAntiTyphoonLock,
+    getOptions_doorModelInfo,
   } = useWorksheet(
     useShallow((state) => ({
       doorModelInfo: state.doorModelInfo,
@@ -97,35 +66,12 @@ function Form_product_basic() {
       getOptions_material: state.getOptions_material,
       calcData: state.calcData,
       isAntiTyphoonLock: state.isAntiTyphoonLock,
+      getOptions_doorModelInfo: state.getOptions_doorModelInfo,
+
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
     }))
   );
-
-  // ---------------------------------------------------------------------
-
-  const options_doorModel: Toption[] = useMemo(() => {
-    return (doorModelArr ?? []).map((doorModel) => {
-      const { name } = doorModel;
-
-      return { label: name, value: name, obj: doorModel };
-    });
-  }, [doorModelArr]);
-
-  // ---------------------------------------------------------------------
-
-  useEffect(() => {
-    update_doorModel();
-  }, []);
-
-  useEffect(() => {
-    if (doorModelList) {
-      const doorModelName = basicSpec.doorModelName;
-      const doorModelInfo = doorModelList[doorModelName];
-      setDoorModelInfo(doorModelInfo);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doorModelList, basicSpec.doorModelName]);
 
   // ---------------------------------------------------------------------
 
@@ -150,7 +96,7 @@ function Form_product_basic() {
           selectProps={{
             props: {
               value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
-              options: options_doorModel,
+              options: getOptions_doorModelInfo(),
               onChange: (option) => {
                 const obj = option?.obj as TdoorModelInfoDto;
                 setDoorModelInfo(obj);
@@ -937,14 +883,6 @@ function Form_product_sidePlate() {
 // =====================================================================
 // =====================================================================
 
-const selectPropsAccessor = (simpleSelectProps?: Tselect): TselectProps => {
-  return {
-    props: {
-      options: fakeOptions,
-    },
-  };
-};
-
 // =====================================================================
 
 const basicConfig: TinputSelProps = {
@@ -958,12 +896,6 @@ const basicConfig: TinputSelProps = {
 };
 
 // ======================================================================
-
-const fakeOptions = [
-  { value: '1', label: '選項1' },
-  { value: '2', label: '選項2' },
-  { value: '3', label: '選項3' },
-];
 
 export {
   Form_product_basic,
