@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { use, useEffect, useMemo } from 'react';
 
 import classNames from 'classnames';
 
@@ -67,7 +67,6 @@ function Form_product_basic() {
       calcData: state.calcData,
       isAntiTyphoonLock: state.isAntiTyphoonLock,
       getOptions_doorModelInfo: state.getOptions_doorModelInfo,
-
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
     }))
@@ -922,7 +921,7 @@ function Form_product_accessories() {
 
 const WorksheetTable = () => {
   return (
-    <div>
+    <div className="relative">
       <p className={scss.title}>產品規格表單： </p>
       <Table_size />
       <Table_motor />
@@ -1080,7 +1079,7 @@ const Table_slat = () => {
       <div className={scss.cell}>{generalSpec?.slatLength}</div>
 
       <div className={scss.cell}>捲片支數</div>
-      <div className={scss.cell}>{'99999 呼叫api算'}</div>
+      <div className={scss.cell}>{slat.slatCount}</div>
 
       <div className={scss.cell}></div>
       <div className={scss.cell}></div>

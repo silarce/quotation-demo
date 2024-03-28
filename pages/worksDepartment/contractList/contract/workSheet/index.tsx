@@ -2,9 +2,9 @@
 
 // 按下計算按鈕會呼叫targetSheet.calcProd()
 
-import { useState, useEffect, useMemo, use } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import _, { set, update } from 'lodash';
+import _ from 'lodash';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 
@@ -66,7 +66,7 @@ import WorkSheetPDF_02, {
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
-// import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // api
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
@@ -118,6 +118,7 @@ import type {
 
 // zustand // hook
 import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
+import { useShallow } from 'zustand/react/shallow';
 
 // ====================================================================
 
@@ -187,7 +188,14 @@ export default function Worksheet({
 
   const init = useWorksheet((state) => state.init);
   const test = useWorksheet((state) => state.test);
-  const shouldCalcData = useWorksheet((state) => state.shouldCalcData);
+
+  const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
+    useShallow((state) => ({
+      shouldCalcData: state.shouldCalcData,
+      shouldCalcData2: state.shouldCalcData2,
+      calcData_2: state.calcData_2,
+    }))
+  );
 
   useEffect(() => {
     const contractProductItems = worksheetData?.latestRecord.contractProductItems;
@@ -572,7 +580,19 @@ export default function Worksheet({
                 <Form_product_accessories />
               </div>
               <div>
+                <MyButton_v2
+                  //
+                  preImg="upload"
+                  px="px32"
+                  className="block m-auto "
+                  onClick={calcData_2}
+                >
+                  取得剩餘資料
+                </MyButton_v2>
+              </div>
+              <div className="relative">
                 <WorksheetTable />
+                {shouldCalcData2 && <div className={scss.cover}></div>}
               </div>
             </form>
           </div>

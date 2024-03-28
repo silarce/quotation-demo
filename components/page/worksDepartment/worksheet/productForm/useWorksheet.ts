@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
+import { AxiosError } from 'axios';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -40,6 +41,7 @@ import {
   apiGetProdDoorModels,
   apiGetProdCalcGeneralSpec,
   apiGetProdAvailableComponents,
+  apiGetProdCalcDetailSpec,
 } from 'js/api/api_product';
 
 // =====================================================================
@@ -85,6 +87,7 @@ type Tworksheet = {
   qty: number;
   isAntiTyphoonLock: boolean;
   shouldCalcData: boolean;
+  shouldCalcData2: boolean;
   //
   basicSpec: {
     itemName: string;
@@ -168,6 +171,7 @@ type Tworksheet = {
     material: string;
     surface: string;
     setSlat_str: (props: { key: 'material' | 'surface'; value: string }) => void;
+    slatCount: string;
   };
 
   guideRail: {
@@ -248,11 +252,13 @@ type Tworksheet = {
   // -----------------------------------------------------------------------------
   reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
   update_generalSpec: () => Promise<void>;
-
   update_availableComponents: () => Promise<void>;
+
+  updateSlatCount: () => Promise<void>;
 
   // -----------------------------------------------------------------------------
   calcData: () => Promise<void>;
+  calcData_2: () => Promise<void>;
 
   // -----------------------------------------------------------------------------
 
@@ -301,6 +307,7 @@ const useWorksheet = create<Tworksheet>(
     qty: 0,
     isAntiTyphoonLock: true,
     shouldCalcData: false,
+    shouldCalcData2: false,
     // ---------------------------------------------------------------------
 
     basicSpec: {
@@ -368,7 +375,7 @@ const useWorksheet = create<Tworksheet>(
           })
         );
       },
-      setBoxB: (value) => {
+      setBoxB: async (value) => {
         set(
           produce((state) => {
             state.ABCD.boxB = value;
@@ -468,6 +475,7 @@ const useWorksheet = create<Tworksheet>(
           })
         );
       },
+      slatCount: '',
     },
 
     guideRail: {
@@ -651,6 +659,7 @@ const useWorksheet = create<Tworksheet>(
             ...state.slat,
             material: componentList?.slat?.material ?? '',
             surface: componentList?.slat?.materialSurface ?? '',
+            slatCount: contractProductItem?.slatCount ?? '0',
           };
 
           state.guideRail = {
@@ -904,6 +913,31 @@ const useWorksheet = create<Tworksheet>(
       );
     },
 
+    updateSlatCount: async () => {
+      const doorModelName = get().basicSpec.doorModelName as TdoorModel;
+      const boxB = Number(get().ABCD.boxB);
+      const height = get().getHeight_mm();
+
+      try {
+        const res = await apiGetProdCalcDetailSpec({
+          modelName: doorModelName,
+          B: boxB,
+          height,
+        });
+
+        const count = res.slatCount;
+
+        set(
+          produce((state) => {
+            state.slat.slatCount = String(count);
+          })
+        );
+      } catch (error) {
+        const err = error as AxiosError;
+        myAlert.err({ title: '取得取得捲片數量失敗', content: err.message });
+      }
+    },
+
     // ---------------------------------------------------------------------
 
     calcData: async () => {
@@ -935,6 +969,18 @@ const useWorksheet = create<Tworksheet>(
           state.guideRail.guideRailThickness = option_guideRailThickness.value;
 
           state.shouldCalcData = false;
+        })
+      );
+    },
+
+    calcData_2: async () => {
+      const { updateSlatCount } = get();
+
+      await updateSlatCount();
+
+      set(
+        produce((state) => {
+          state.shouldCalcData2 = true;
         })
       );
     },
