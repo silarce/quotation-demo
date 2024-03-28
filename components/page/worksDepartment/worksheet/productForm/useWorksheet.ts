@@ -692,6 +692,8 @@ const useWorksheet = create<Tworksheet>(
           } else if (doorModelInfo?.name !== 'SJ-302') {
             state.basicSpec.isAntiTyphoon = false;
           }
+
+          state.shouldCalcData = true;
         })
       );
     },
