@@ -88,6 +88,7 @@ function Form_product_basic() {
     setDoorModelInfo,
     getOptions_material,
     calcData,
+    isAntiTyphoonLock,
   } = useWorksheet(
     useShallow((state) => ({
       doorModelInfo: state.doorModelInfo,
@@ -95,6 +96,7 @@ function Form_product_basic() {
       setDoorModelInfo: state.setDoorModelInfo,
       getOptions_material: state.getOptions_material,
       calcData: state.calcData,
+      isAntiTyphoonLock: state.isAntiTyphoonLock,
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
     }))
@@ -225,6 +227,7 @@ function Form_product_basic() {
           wrapperStyle={{ width: '140px' }}
           checkBoxProps_v2={{
             props: {
+              disabled: isAntiTyphoonLock,
               value: basicSpec.isAntiTyphoon ? ['isAntiTyphoon'] : [],
               options: [{ label: null, value: 'isAntiTyphoon' }],
               onChange: (strArr) => {

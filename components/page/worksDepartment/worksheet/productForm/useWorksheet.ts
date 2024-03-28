@@ -46,6 +46,7 @@ type Tworksheet = {
   //
   itemIdArr: string[];
   qty: number;
+  isAntiTyphoonLock: boolean;
   //
   basicSpec: {
     itemName: string;
@@ -56,11 +57,9 @@ type Tworksheet = {
     height: string;
     material: string;
     isAntiTyphoon: boolean;
+
     setBasicSpec_str: (props: {
-      key: keyof Omit<
-        Exclude<Tworksheet['basicSpec'], undefined>,
-        'isAntiTyphoon' | 'fullWidth' | 'WG' | 'height' | 'doorModelName'
-      >;
+      key: keyof Omit<Exclude<Tworksheet['basicSpec'], undefined>, 'isAntiTyphoon' | 'fullWidth' | 'WG' | 'height'>;
       value: string;
     }) => void;
     setBasicSpec_material: (str: string) => void;
@@ -252,6 +251,7 @@ const useWorksheet = create<Tworksheet>(
     // ---------------------------------------------------------------------
     itemIdArr: [],
     qty: 0,
+    isAntiTyphoonLock: true,
     // ---------------------------------------------------------------------
 
     basicSpec: {
@@ -647,13 +647,29 @@ const useWorksheet = create<Tworksheet>(
     }, // init
     //
     //
-    setDoorModelInfo: (doorModelInfo) =>
+    setDoorModelInfo: (doorModelInfo) => {
       set(
         produce((state) => {
           state.doorModelInfo = doorModelInfo;
           state.basicSpec.doorModelName = doorModelInfo?.name ?? '';
+
+          // 除了SJ-302，防颱選項都要鎖住
+          if (doorModelInfo?.name === 'SJ-302') {
+            state.isAntiTyphoonLock = false;
+          } else {
+            state.isAntiTyphoonLock = true;
+          }
+
+          // SJ-312固定防颱
+          if (doorModelInfo?.name === 'SJ-312') {
+            state.basicSpec.isAntiTyphoon = true;
+            // 非SJ-312且非SJ-302，固定不防颱
+          } else if (doorModelInfo?.name !== 'SJ-302') {
+            state.basicSpec.isAntiTyphoon = false;
+          }
         })
-      ),
+      );
+    },
 
     getOptions_material: () => {
       const optiions_material = get().doorModelInfo?.slatMaterials.map((item) => {
