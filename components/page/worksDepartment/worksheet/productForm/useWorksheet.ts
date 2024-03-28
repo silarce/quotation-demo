@@ -823,12 +823,14 @@ const useWorksheet = create<Tworksheet>(
       await get().update_availableComponents();
       const option_electricSupply = get().getOptions_electricSupply()[0];
       const option_headBoxThickness = get().getOptions_headBoxThickness()[0];
+      const option_guideRailThickness = get().getOptions_guideRailThickness()[0];
 
       set(
         produce((state) => {
           state.motor.motorVoltage = (option_electricSupply.voltage ?? '') as string;
           state.motor.motorPhase = (option_electricSupply.phase ?? '') as string;
           state.headBox.headBoxThickness = option_headBoxThickness.value;
+          state.guideRail.guideRailThickness = option_guideRailThickness.value;
         })
       );
     },
