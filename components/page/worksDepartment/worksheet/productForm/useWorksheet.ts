@@ -151,6 +151,14 @@ type Tworksheet = {
     }) => void;
 
     setGuideRail_hasSilencingStrip: (value: boolean) => void;
+    setGuideRail: (props: {
+      //
+      guideRail: string;
+      hasSilencingStrip: boolean;
+      width: string;
+      opening: string;
+      thickness: string;
+    }) => void;
   };
 
   bottomBar: {
@@ -194,6 +202,8 @@ type Tworksheet = {
   getOptions_electricSupply: () => Toption[];
   getOptions_headBoxThickness: () => Toption[];
   getOptions_diameter: () => Toption[];
+  getOptions_guideRailThickness: () => Toption[];
+  getOptions_guideRail: () => Toption[];
 
   // -----------------------------------------------------------------------------
   reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
@@ -428,6 +438,22 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.guideRail.hasSilencingStrip = value;
+          })
+        );
+      },
+      setGuideRail: ({
+        //
+        guideRail,
+        hasSilencingStrip,
+        width,
+        opening,
+        thickness,
+      }) => {
+        set(
+          produce<Tworksheet>((state) => {
+            state.guideRail.guideRail = guideRail;
+            state.guideRail.hasSilencingStrip = hasSilencingStrip;
+            // state.guideRail.guideRailThickness = thickness;
           })
         );
       },
@@ -669,6 +695,41 @@ const useWorksheet = create<Tworksheet>(
     getOptions_headBoxThickness: () => getOptions_headBoxThickness(get().avalibleComponents?.headBoxes ?? []),
     getOptions_diameter: () => getOptions_diameter(get().avalibleComponents?.rollers ?? []),
 
+    getOptions_guideRailThickness: () => {
+      const guideRails = get().avalibleComponents?.guideRails ?? [];
+      let thicknessArr = guideRails.map((guideRail) => guideRail.thickness);
+      thicknessArr = _.uniq(thicknessArr);
+      const options = thicknessArr.map((thickness) => {
+        return {
+          value: thickness ?? '',
+          label: thickness + 'T',
+        };
+      });
+
+      return options;
+    },
+
+    getOptions_guideRail: () => {
+      const doorModelInfo = get().doorModelInfo;
+      const guideRails = doorModelInfo?.guideRails ?? [];
+
+      const options = guideRails.map((item) => {
+        const { hasSilencingStrip, imgSrc, opening, thickness, width, withHook } = item;
+
+        return {
+          value: item.imgSrc,
+          label: '',
+          icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
+          hasSilencingStrip,
+          opening,
+          thickness,
+          width,
+          withHook,
+        };
+      });
+
+      return options;
+    },
     //
     // ---------------------------------------------------------------------
 

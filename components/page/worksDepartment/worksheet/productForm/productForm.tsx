@@ -639,15 +639,20 @@ function Form_product_slat() {
 // =====================================================================
 
 function Form_product_guideRail() {
-  const { guideRail, hasSilencingStrip, getOptions_material } = useWorksheet(
-    useShallow((state) => ({
-      guideRail: state.guideRail,
-      hasSilencingStrip: state.guideRail.getHasSilencingStrip(),
-      getOptions_material: state.getOptions_material,
-      generalSpec: state.generalSpec, // 用於更新getOptions
-      avalibleComponent: state.avalibleComponents, // 用於更新getOptions
-    }))
-  );
+  const { guideRail, hasSilencingStrip, getOptions_material, getOptions_guideRailThickness, getOptions_guideRail } =
+    useWorksheet(
+      useShallow((state) => ({
+        guideRail: state.guideRail,
+        hasSilencingStrip: state.guideRail.getHasSilencingStrip(),
+        getOptions_material: state.getOptions_material,
+        getOptions_guideRailThickness: state.getOptions_guideRailThickness,
+        getOptions_guideRail: state.getOptions_guideRail,
+
+        generalSpec: state.generalSpec, // 用於更新getOptions
+        avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+        // doorModelInfo: state.doorModelInfo,
+      }))
+    );
 
   return (
     <div>
@@ -669,6 +674,7 @@ function Form_product_guideRail() {
             },
           }}
         />
+
         <InputSel
           {...basicConfig}
           caption="厚度"
@@ -676,14 +682,16 @@ function Form_product_guideRail() {
             props: {
               value: {
                 value: guideRail.guideRailThickness,
-                label: guideRail.guideRailThickness,
+                label: guideRail.guideRailThickness + 'T',
               },
+              options: getOptions_guideRailThickness(),
               onChange: (option) => {
                 guideRail.setGuideRail_str({ key: 'guideRailThickness', value: option?.value ?? '' });
               },
             },
           }}
         />
+
         <InputSel
           {...basicConfig}
           caption="表面"
@@ -700,24 +708,18 @@ function Form_product_guideRail() {
             },
           }}
         />
+
         <InputSel
           {...basicConfig}
           caption="消音條"
-          selectProps={{
+          inputProps={{
             props: {
-              options: optionsCreator_boolean(),
-              value: {
-                value: hasSilencingStrip,
-                label: hasSilencingStrip,
-              },
-              onChange: (option) => {
-                const bool = !!(option?.value === 'true');
-
-                guideRail.setGuideRail_hasSilencingStrip(bool);
-              },
+              readOnly: true,
+              value: hasSilencingStrip,
             },
           }}
         />
+
         <InputSel
           {...basicConfig}
           caption="彎直"
@@ -734,17 +736,40 @@ function Form_product_guideRail() {
             },
           }}
         />
+
+        <div>{/* 這個div是為了將下一個InputSel推到下一行 */}</div>
         <InputSel
           {...basicConfig}
           caption="形式"
+          // wrapperStyle={{ height: '60px' }}
           selectProps={{
+            withIcon: true,
             props: {
+              className: scss.inputSelWithIcon,
+              options: getOptions_guideRail(),
               value: {
                 value: guideRail.guideRail,
-                label: guideRail.guideRail,
+                // label: guideRail.guideRail,
+                label: '',
+                icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail.guideRail}`,
               },
               onChange: (option) => {
-                guideRail.setGuideRail_str({ key: 'guideRail', value: option?.value ?? '' });
+                const value = option?.value ?? '';
+                const hasSilencingStrip = option?.hasSilencingStrip as boolean;
+                let thickness = (option?.thickness ?? '') as string;
+                const width = String((option?.width ?? 0) as number);
+                const opening = option?.opening as string;
+
+                thickness = thickness.replace('t', '');
+
+                guideRail.setGuideRail({
+                  //
+                  guideRail: value,
+                  opening,
+                  thickness,
+                  width,
+                  hasSilencingStrip,
+                });
               },
             },
           }}

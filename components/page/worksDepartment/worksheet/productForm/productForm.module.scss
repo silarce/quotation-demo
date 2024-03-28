@@ -18,3 +18,9 @@
 .inputSel_hr.plus {
   border-color: theme("colors.main");
 }
+
+.inputSelWithIcon {
+  img {
+    height: 60px;
+  }
+}
