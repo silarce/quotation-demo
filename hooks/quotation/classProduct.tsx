@@ -829,9 +829,11 @@ class Class_product {
     }
 
     const body = (() => {
-      const fullWidth = Number(this.fullWidth || 0) * 1000;
+      // const fullWidth = Number(this.fullWidth || 0) * 1000;
+      const fullWidth = new Decimal(this.fullWidth || 0).mul(1000).toNumber();
       const modelName = this.doorType as TpcgsPrams['modelName'];
-      const height = Number(this.height) * 1000;
+      // const height = Number(this.height) * 1000;
+      const height = new Decimal(this.height).mul(1000).toNumber();
       const isAntiTyphoon = this.typhoonProtection;
 
       const hp = this.horsepower.replaceAll('HP', '') as Thp;
@@ -864,13 +866,20 @@ class Class_product {
 
     const oldW = this.W;
 
-    this._prodData.WG = String(
-      calcProductWG({
-        fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
-        gapA: this._doorGeneralSpecs.gapA,
-        gapC: this._doorGeneralSpecs.gapC,
-      }) / 1000
-    );
+    // this._prodData.WG = String(
+    //   calcProductWG({
+    //     fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
+    //     gapA: this._doorGeneralSpecs.gapA,
+    //     gapC: this._doorGeneralSpecs.gapC,
+    //   }) / 1000
+    // );
+
+    const theWG = calcProductWG({
+      fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
+      gapA: this._doorGeneralSpecs.gapA,
+      gapC: this._doorGeneralSpecs.gapC,
+    });
+    this._prodData.WG = new Decimal(theWG).div(1000).toString();
 
     if (!this.doorTrack) {
       // 必須要有門軌才會有guildRailG才能計算正確的W
