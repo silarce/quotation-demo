@@ -24,7 +24,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx", "js/utils/downloadPdf.js",
+    "**/*.tsx", "js/utils/downloadPdf.js", "components/page/worksDepartment/worksheet",
     // "js/pdf-worker.js"
     // "/pdf-worker.js"
   ],

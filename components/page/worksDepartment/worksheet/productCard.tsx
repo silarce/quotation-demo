@@ -7,40 +7,46 @@ import StatusLabel, { TstatusLabelProps } from 'components/global/gear/button/st
 // icon
 import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
-import scss from './workSheetProdCard.module.scss';
+// css
+import scss from './productCard.module.scss';
 
 // =================================================================
+
+type TworksheetIntro = {
+  worksheetId: string | undefined;
+  itemName: string | undefined;
+  doorModelName: string | undefined;
+  width: string | undefined;
+  height: string | undefined;
+  qty: string | undefined;
+  isActive?: boolean;
+  reviewStatus: TstatusLabelProps;
+  onClick: (e: React.MouseEvent) => void;
+  onDeleteClick: () => void;
+};
 
 type Tcontrol = {
   itemName: string;
-  doorType: string;
+  doorModelName: string;
   qty: string;
   width: string;
   height: string;
-  onClick: (e: React.MouseEvent) => void;
-  list: {
-    isOriginal: boolean;
-    itemName: string;
-    qty: string;
-    onClick: (e: React.MouseEvent) => void;
-    isActive?: boolean;
-    onDeleteClick: () => void;
-    status: TstatusLabelProps;
-  }[];
+  onSeparateClick: (e: React.MouseEvent) => void;
+  worksheetIntroArr: TworksheetIntro[];
 };
 
-export type { Tcontrol as Tcontrol_prodCard };
+export type { Tcontrol as Tcontrol_productCard, TworksheetIntro };
 
 // =================================================================
-export default function WorkSheetProdCard({ control, disabled }: { control: Tcontrol; disabled?: boolean }) {
+export default function ProductCard({ control }: { control: Tcontrol }) {
   return (
-    <div className={classNames(scss.card)} onClick={control.onClick}>
+    <div className={classNames(scss.card)}>
       <div className={scss.info}>
         <div className={scss.left}>
           <span>{control.itemName}</span>
-          <span>{control.doorType}</span>
+          <span>{control.doorModelName}</span>
           <span>數量 : {control.qty}樘</span>
-          <button className={classNames(scss.btn)} onClick={undefined}>
+          <button className={classNames(scss.btn)} onClick={control.onSeparateClick}>
             分堆
           </button>
         </div>
@@ -60,7 +66,51 @@ export default function WorkSheetProdCard({ control, disabled }: { control: Tcon
         </div>
         {/*  */}
       </div>
-      <div className={scss.list}>
+
+      <div className={classNames(scss.worksheetList)}>
+        {control.worksheetIntroArr.map((worksheet) => {
+          const {
+            //
+            worksheetId: id,
+            itemName,
+            doorModelName,
+            width,
+            height,
+            qty,
+            isActive,
+            reviewStatus,
+            onClick,
+            onDeleteClick,
+          } = worksheet;
+
+          return (
+            <CellWithBar key={id} isActive={isActive} className={scss.worksheetWrapper}>
+              <div className={scss.worksheet} onClick={onClick}>
+                <p>{itemName}</p>
+                <p className="mt-2">{doorModelName}</p>
+                <div className={scss.info}>
+                  <div>
+                    <span>{`全寬(L):${width}`}</span>
+                    <br />
+                    <span>{`淨高(h):${height}`}</span>
+                  </div>
+                  <span>{qty}樘</span>
+                  <IconDelete01 onClick={onDeleteClick} />
+                </div>
+
+                <StatusLabel
+                  {...reviewStatus}
+                  className={classNames(scss.statusLabel, 'mt-2', reviewStatus.className)}
+                />
+              </div>
+            </CellWithBar>
+          );
+        })}
+
+   
+      </div>
+
+      {/* <div className={scss.list}>
         {control.list.map((item, index) => {
           const { isOriginal, itemName, qty, isActive, status, onClick, onDeleteClick } = item;
 
@@ -70,18 +120,19 @@ export default function WorkSheetProdCard({ control, disabled }: { control: Tcon
                 <span>{itemName}</span>
                 <span>{qty}樘</span>
                 <StatusLabel {...status} className={classNames(scss.statusLabel, status.className)} />
-                <IconDelete01 className={classNames((disabled || isOriginal) && scss.hidden)} onClick={onDeleteClick} />
-                {/* <IconDelete01 className={classNames()} onClick={onDeleteClick} /> */}
+                <IconDelete01 onClick={onDeleteClick} />
               </div>
             </CellWithBar>
           );
         })}
-      </div>
+      </div> */}
     </div>
   );
 }
 
-// =========================================================================
+// =================================================================
+// =================================================================
+// =================================================================
 
 const DoorIcon = (props: React.SVGProps<SVGSVGElement>) => {
   return (

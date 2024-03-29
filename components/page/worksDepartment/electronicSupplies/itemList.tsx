@@ -6,8 +6,7 @@ import classNames from 'classnames';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
-// utils
-import { TquotationProductItemDto } from 'js/utils/worksheet/reducer';
+import { TquotationProductItemDto } from 'js/api/dtoTypes';
 
 import scss from './itemList.module.scss';
 import scss_p from './_public.module.scss';
