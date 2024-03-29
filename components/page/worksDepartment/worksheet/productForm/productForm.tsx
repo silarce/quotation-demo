@@ -40,14 +40,7 @@ import { findOption } from 'js/utils/options/findOption';
 
 // =====================================================================
 
-function Form_product_basic() {
-  // const {
-  //   //
-  //   res: doorModelArr,
-  //   update: update_doorModel,
-  //   doorModelList,
-  // } = useApiGetProdDoorModels();
-
+function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
   // --------------------------------------------------
 
   const {
@@ -79,6 +72,7 @@ function Form_product_basic() {
       <div className={scss.grid}>
         <InputSel
           {...basicConfig}
+          disabled={disabled}
           caption="項目"
           inputProps={{
             props: {
@@ -92,6 +86,7 @@ function Form_product_basic() {
         <InputSel
           {...basicConfig}
           caption="門型"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
@@ -106,6 +101,7 @@ function Form_product_basic() {
         <InputSel
           {...basicConfig}
           caption="全寬(L)"
+          disabled={disabled}
           inputProps={{
             props: {
               type: 'number',
@@ -119,6 +115,7 @@ function Form_product_basic() {
         <InputSel
           {...basicConfig}
           caption="數量"
+          disabled={disabled}
           inputProps={{
             props: {
               value: basicSpec.qty,
@@ -129,6 +126,7 @@ function Form_product_basic() {
         <InputSel
           {...basicConfig}
           caption="W+G"
+          disabled={disabled}
           inputProps={{
             props: {
               readOnly: true,
@@ -143,6 +141,7 @@ function Form_product_basic() {
         <InputSel
           {...basicConfig}
           caption="材質"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: basicSpec.material, label: basicSpec.material },
@@ -156,6 +155,7 @@ function Form_product_basic() {
         <InputSel
           {...basicConfig}
           caption="淨高(h)"
+          disabled={disabled}
           inputProps={{
             props: {
               type: 'number',
@@ -169,6 +169,7 @@ function Form_product_basic() {
         <InputSel
           {...basicConfig}
           caption="防颱"
+          disabled={disabled}
           wrapperStyle={{ width: '140px' }}
           checkBoxProps_v2={{
             props: {
@@ -183,7 +184,13 @@ function Form_product_basic() {
           }}
         />
       </div>
-      <MyButton_v2 preImg="upload" px="px32" className="block m-auto mr-0 mt-5" onClick={calcData}>
+      <MyButton_v2
+        //
+        className={classNames('block m-auto mr-0 mt-5', disabled && 'invisible')}
+        preImg="upload"
+        px="px32"
+        onClick={calcData}
+      >
         計算
       </MyButton_v2>
     </div>
@@ -192,7 +199,7 @@ function Form_product_basic() {
 
 // =====================================================================
 
-function Form_product_ABCD() {
+function Form_product_ABCD({ disabled }: { disabled: boolean | undefined }) {
   const ABCD = useWorksheet(
     useShallow((state) => ({
       gapA: state.ABCD.getGapA(),
@@ -211,6 +218,7 @@ function Form_product_ABCD() {
       <InputSel
         {...basicConfig}
         caption="機械縫 A"
+        disabled={disabled}
         inputProps={{
           props: {
             type: 'number',
@@ -224,6 +232,7 @@ function Form_product_ABCD() {
       <InputSel
         {...basicConfig}
         caption="機械縫 C"
+        disabled={disabled}
         inputProps={{
           props: {
             type: 'number',
@@ -237,6 +246,7 @@ function Form_product_ABCD() {
       <InputSel
         {...basicConfig}
         caption="支板尺寸 B"
+        disabled={disabled}
         inputProps={{
           props: {
             type: 'number',
@@ -250,6 +260,7 @@ function Form_product_ABCD() {
       <InputSel
         {...basicConfig}
         caption="支板尺寸 D"
+        disabled={disabled}
         inputProps={{
           props: {
             type: 'number',
@@ -266,7 +277,7 @@ function Form_product_ABCD() {
 
 // =====================================================================
 
-function Form_product_motor() {
+function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
   const { motor, getOptions_horsepower, getOptions_motorVendor, getOptions_electricSupply } = useWorksheet(
     useShallow((state) => ({
       motor: state.motor,
@@ -286,6 +297,7 @@ function Form_product_motor() {
         <InputSel
           {...basicConfig}
           caption="電供"
+          disabled={disabled}
           selectProps={{
             props: {
               options: getOptions_electricSupply(),
@@ -304,6 +316,7 @@ function Form_product_motor() {
         <InputSel
           {...basicConfig}
           caption="馬力"
+          disabled={disabled}
           selectProps={{
             props: {
               options: getOptions_horsepower(),
@@ -317,6 +330,7 @@ function Form_product_motor() {
         <InputSel
           {...basicConfig}
           caption="廠商"
+          disabled={disabled}
           selectProps={{
             props: {
               options: getOptions_motorVendor(),
@@ -330,6 +344,7 @@ function Form_product_motor() {
         <InputSel
           {...basicConfig}
           caption="馬達支撐架"
+          disabled={disabled}
           selectProps={{
             props: {
               options: optionsCreator_motorSupportStand(),
@@ -343,6 +358,7 @@ function Form_product_motor() {
         <InputSel
           {...basicConfig}
           caption="鏈條型式"
+          disabled={disabled}
           selectProps={{
             props: {
               options: optionsCreator_chainType(),
@@ -356,6 +372,7 @@ function Form_product_motor() {
         <InputSel
           {...basicConfig}
           caption="馬達鎖盒"
+          disabled={disabled}
           selectProps={{
             props: {
               options: optionsCreator_motorLockBox(),
@@ -369,6 +386,7 @@ function Form_product_motor() {
         <InputSel
           {...basicConfig}
           caption="方向"
+          disabled={disabled}
           selectProps={{
             props: {
               options: optionsCreator_direction(),
@@ -389,7 +407,7 @@ function Form_product_motor() {
 
 // =====================================================================
 
-function Form_product_headBox() {
+function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
   const {
     //
     headBox,
@@ -414,6 +432,7 @@ function Form_product_headBox() {
         <InputSel
           {...basicConfig}
           caption="材質"
+          disabled={disabled}
           selectProps={{
             props: {
               options: getOptions_material(),
@@ -427,6 +446,7 @@ function Form_product_headBox() {
         <InputSel
           {...basicConfig}
           caption="厚度"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: headBox.headBoxThickness, label: headBox.headBoxThickness + 'T' },
@@ -440,6 +460,7 @@ function Form_product_headBox() {
         <InputSel
           {...basicConfig}
           caption="表面"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: headBox.surface, label: headBox.surface },
@@ -453,6 +474,7 @@ function Form_product_headBox() {
         <InputSel
           {...basicConfig}
           caption="正面"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: headBox.headBoxFront, label: headBox.headBoxFront },
@@ -466,6 +488,7 @@ function Form_product_headBox() {
         <InputSel
           {...basicConfig}
           caption="有無凸"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: headBox.headBoxProtruding, label: headBox.headBoxProtruding },
@@ -479,6 +502,7 @@ function Form_product_headBox() {
         <InputSel
           {...basicConfig}
           caption="形式"
+          disabled={disabled}
           selectProps={{
             props: {
               options: optionsCreator_isIntegratedHeadBox(),
@@ -494,6 +518,7 @@ function Form_product_headBox() {
         <InputSel
           {...basicConfig}
           caption="角鐵數量"
+          disabled={disabled}
           inputProps={{
             props: {
               value: headBox.headBoxAngleIronQuantity,
@@ -511,7 +536,7 @@ function Form_product_headBox() {
 
 // =====================================================================
 
-function Form_product_roller() {
+function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
   const { roller, getOptions_diameter } = useWorksheet(
     useShallow((state) => ({
       roller: state.roller,
@@ -527,6 +552,7 @@ function Form_product_roller() {
         <InputSel
           {...basicConfig}
           caption="尺寸"
+          disabled={disabled}
           selectProps={{
             props: {
               isDisabled: true,
@@ -538,6 +564,7 @@ function Form_product_roller() {
         <InputSel
           {...basicConfig}
           caption="有無凸"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: roller.rollerSpec, label: roller.rollerSpec },
@@ -555,7 +582,7 @@ function Form_product_roller() {
 
 // =====================================================================
 
-function Form_product_slat() {
+function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
   const { slat, getOptions_material } = useWorksheet(
     useShallow((state) => ({
       slat: state.slat,
@@ -572,6 +599,7 @@ function Form_product_slat() {
         <InputSel
           {...basicConfig}
           caption="材質"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: slat.material, label: slat.material },
@@ -585,6 +613,7 @@ function Form_product_slat() {
         <InputSel
           {...basicConfig}
           caption="表面"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: slat.surface, label: slat.surface },
@@ -602,7 +631,7 @@ function Form_product_slat() {
 
 // =====================================================================
 
-function Form_product_guideRail() {
+function Form_product_guideRail({ disabled }: { disabled: boolean | undefined }) {
   const {
     //
     guideRail,
@@ -630,6 +659,7 @@ function Form_product_guideRail() {
         <InputSel
           {...basicConfig}
           caption="材質"
+          disabled={disabled}
           selectProps={{
             props: {
               options: getOptions_material(),
@@ -647,6 +677,7 @@ function Form_product_guideRail() {
         <InputSel
           {...basicConfig}
           caption="厚度"
+          disabled={disabled}
           selectProps={{
             props: {
               value: {
@@ -664,6 +695,7 @@ function Form_product_guideRail() {
         <InputSel
           {...basicConfig}
           caption="表面"
+          disabled={disabled}
           selectProps={{
             props: {
               options: optionsCreator_surface(),
@@ -681,6 +713,7 @@ function Form_product_guideRail() {
         <InputSel
           {...basicConfig}
           caption="消音條"
+          disabled={disabled}
           inputProps={{
             props: {
               readOnly: true,
@@ -692,6 +725,7 @@ function Form_product_guideRail() {
         <InputSel
           {...basicConfig}
           caption="彎直"
+          disabled={disabled}
           selectProps={{
             props: {
               options: optionsCreator_direction(),
@@ -710,6 +744,7 @@ function Form_product_guideRail() {
         <InputSel
           {...basicConfig}
           caption="形式"
+          disabled={disabled}
           // wrapperStyle={{ height: '60px' }}
           selectProps={{
             withIcon: true,
@@ -750,7 +785,7 @@ function Form_product_guideRail() {
 
 // =====================================================================
 
-function Form_product_bottomBar() {
+function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined }) {
   const { bottomBar, getOptions_material, getOptions_bottomBarAngleIronAndPlate } = useWorksheet(
     useShallow((state) => ({
       bottomBar: state.bottomBar,
@@ -770,6 +805,7 @@ function Form_product_bottomBar() {
         <InputSel
           {...basicConfig}
           caption="材質"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: bottomBar.material, label: bottomBar.material },
@@ -783,6 +819,7 @@ function Form_product_bottomBar() {
         <InputSel
           {...basicConfig}
           caption="角鐵材質"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: bottomBar.bottomBarAngleIron, label: bottomBar.bottomBarAngleIron },
@@ -797,6 +834,7 @@ function Form_product_bottomBar() {
         <InputSel
           {...basicConfig}
           caption="底座鈑材質"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: bottomBar.bottomBarPlate, label: bottomBar.bottomBarPlate },
@@ -810,6 +848,7 @@ function Form_product_bottomBar() {
         <InputSel
           {...basicConfig}
           caption="類型"
+          disabled={disabled}
           selectProps={{
             props: {
               value: findOption({ value: bottomBar.bottomBar, options: optionsCreator_bottomBar_2() }),
@@ -823,6 +862,7 @@ function Form_product_bottomBar() {
         <InputSel
           {...basicConfig}
           caption="表面"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: bottomBar.surface, label: bottomBar.surface },
@@ -840,7 +880,7 @@ function Form_product_bottomBar() {
 
 // =====================================================================
 
-function Form_product_sidePlate() {
+function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined }) {
   const { sidePlate, bearingName, sprocketWheelModel } = useWorksheet(
     useShallow((state) => ({
       sidePlate: state.sidePlate,
@@ -856,6 +896,7 @@ function Form_product_sidePlate() {
         <InputSel
           {...basicConfig}
           caption="軸承"
+          disabled={disabled}
           selectProps={{
             props: {
               isDisabled: true,
@@ -866,6 +907,7 @@ function Form_product_sidePlate() {
         <InputSel
           {...basicConfig}
           caption="鍊條"
+          disabled={disabled}
           selectProps={{
             props: {
               isDisabled: true,
@@ -876,6 +918,7 @@ function Form_product_sidePlate() {
         <InputSel
           {...basicConfig}
           caption="方向"
+          disabled={disabled}
           selectProps={{
             props: {
               value: { value: sidePlate.sidePlateDirection, label: sidePlate.sidePlateDirection },
@@ -896,7 +939,7 @@ function Form_product_sidePlate() {
 // antd
 import { Checkbox } from 'antd';
 
-function Form_product_accessories() {
+function Form_product_accessories({ disabled }: { disabled: boolean | undefined }) {
   const { accessories, getOptions_accessories, setAccessories } = useWorksheet(
     useShallow((state) => ({
       accessories: state.accessories,
@@ -914,6 +957,7 @@ function Form_product_accessories() {
       <p className={scss.title}>選配 ： </p>
       <div>
         <Checkbox.Group
+          disabled={disabled}
           className={scss.checkGroup}
           // disabled={disabled}
           options={getOptions_accessories()}

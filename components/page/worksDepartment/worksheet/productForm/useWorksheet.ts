@@ -632,6 +632,7 @@ const useWorksheet = create<Tworksheet>(
           state.contractProductItem_ori = contractProductItem;
           state.componentList = componentList;
           state.shouldCalcData = false;
+          state.shouldCalcData2 = false;
           state.originalAccessories = originalAccessories;
           state.accessories = accessories;
           // ____________________________________________________________________

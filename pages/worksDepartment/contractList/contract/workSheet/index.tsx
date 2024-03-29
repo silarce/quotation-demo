@@ -194,16 +194,18 @@ export default function Worksheet({
   );
 
   useEffect(() => {
-    const contractProductItems = worksheetData?.latestRecord.contractProductItems;
+    if (disabled) {
+      const contractProductItems = worksheetData?.latestRecord.contractProductItems;
 
-    init({
-      worksheetId: activeWorksheetId!,
-      itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
-      contractProductItem: contractProductItems?.[0],
-      qty: contractProductItems?.length ?? 0,
-      originalAccessories: activeWorksheetOriginalAccessories,
-    });
-  }, [worksheetData]);
+      init({
+        worksheetId: activeWorksheetId!,
+        itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
+        contractProductItem: contractProductItems?.[0],
+        qty: contractProductItems?.length ?? 0,
+        originalAccessories: activeWorksheetOriginalAccessories,
+      });
+    }
+  }, [worksheetData, disabled]);
 
   // -------------------------------------------------------------------------
 
@@ -253,6 +255,7 @@ export default function Worksheet({
       try {
         await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
         await update_worksheetData();
+        setDisabled(true);
       } catch (error) {}
     }
   };
@@ -521,11 +524,6 @@ export default function Worksheet({
 
   const panelList_notAllow: TpanelList = [
     {
-      type: 'redButton',
-      label: '更新',
-      onClick: () => {},
-    },
-    {
       type: 'myButton',
       label: '取消',
       onClick: () => {
@@ -569,7 +567,15 @@ export default function Worksheet({
           <div className={classNames(scss.right)}>
             {false && <RecordList control={control_recordList} />}
 
-            <form className={scss.productForm}>
+            <WorksheetForm
+              shouldCalcData={shouldCalcData}
+              shouldCalcData2={shouldCalcData2}
+              calcData_2={calcData_2}
+              reqPatchWorkSheet={reqPatchWorkSheet}
+              disabled={disabled}
+            />
+
+            {/* <form className={scss.productForm}>
               <div>
                 <p className={'mb-8 text-main text-xl font-bold'}>設定產品基本規格：</p>
                 <Form_product_basic />
@@ -606,7 +612,7 @@ export default function Worksheet({
                 </MyButton_v2>
                 {shouldCalcData2 && <div className={scss.cover}></div>}
               </div>
-            </form>
+            </form> */}
           </div>
           {/* right */}
         </div>
@@ -628,6 +634,67 @@ export default function Worksheet({
   );
 }
 
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+
+const WorksheetForm = ({
+  //
+  shouldCalcData,
+  shouldCalcData2,
+  calcData_2,
+  reqPatchWorkSheet,
+  disabled,
+}: {
+  shouldCalcData: boolean;
+  shouldCalcData2: boolean;
+  calcData_2: () => void;
+  reqPatchWorkSheet: () => void;
+  disabled?: boolean;
+}) => {
+  return (
+    <form className={scss.productForm}>
+      <div>
+        <p className={'mb-8 text-main text-xl font-bold'}>設定產品基本規格：</p>
+        <Form_product_basic disabled={disabled} />
+      </div>
+      <div className={scss.mainFormWrapper}>
+        <p className={'mb-8 text-main text-xl font-bold'}>設定產品細部規格：</p>
+        <div className={scss.formGrid}>
+          <Form_product_ABCD disabled={disabled} />
+          <Form_product_motor disabled={disabled} />
+          <Form_product_headBox disabled={disabled} />
+          <Form_product_roller disabled={disabled} />
+          <Form_product_slat disabled={disabled} />
+          <Form_product_guideRail disabled={disabled} />
+          <Form_product_bottomBar disabled={disabled} />
+          <Form_product_sidePlate disabled={disabled} />
+        </div>
+        {shouldCalcData && <div className={scss.cover}></div>}
+      </div>
+      <div>
+        <Form_product_accessories disabled={disabled} />
+      </div>
+      <div className={classNames(disabled && 'hidden')}>
+        <MyButton_v2 px="px32" className="block m-auto " onClick={calcData_2}>
+          取得剩餘資料
+        </MyButton_v2>
+      </div>
+      <div className="relative">
+        <WorksheetTable />
+        {shouldCalcData2 && <div className={scss.cover}></div>}
+      </div>
+      <div className={classNames('relative', disabled && 'hidden')}>
+        <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
+          確認上傳
+        </MyButton_v2>
+        {shouldCalcData2 && <div className={scss.cover}></div>}
+      </div>
+    </form>
+  );
+};
+
+// ===========================================================================
 // ===========================================================================
 
 // const numToStr = (num: number | undefined) => {
