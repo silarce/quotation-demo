@@ -176,7 +176,6 @@ export default function Worksheet({
   // -------------------------------------------------------------------------
 
   const init = useWorksheet((state) => state.init);
-  const test = useWorksheet((state) => state.test);
 
   const worksheetExport = useWorksheet(
     useShallow((state) => ({
@@ -253,10 +252,14 @@ export default function Worksheet({
       };
 
       try {
+        setIsLoading(true);
         await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
         await update_worksheetData();
         setDisabled(true);
-      } catch (error) {}
+      } catch (error) {
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -546,10 +549,6 @@ export default function Worksheet({
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
-        <button onClick={test} className=" text-9xl">
-          test
-        </button>
-
         <div className={scss.main}>
           {/* left */}
           <div className={scss.left}>
@@ -574,45 +573,6 @@ export default function Worksheet({
               reqPatchWorkSheet={reqPatchWorkSheet}
               disabled={disabled}
             />
-
-            {/* <form className={scss.productForm}>
-              <div>
-                <p className={'mb-8 text-main text-xl font-bold'}>設定產品基本規格：</p>
-                <Form_product_basic />
-              </div>
-              <div className={scss.mainFormWrapper}>
-                <p className={'mb-8 text-main text-xl font-bold'}>設定產品細部規格：</p>
-                <div className={scss.formGrid}>
-                  <Form_product_ABCD />
-                  <Form_product_motor />
-                  <Form_product_headBox />
-                  <Form_product_roller />
-                  <Form_product_slat />
-                  <Form_product_guideRail />
-                  <Form_product_bottomBar />
-                  <Form_product_sidePlate />
-                </div>
-                {shouldCalcData && <div className={scss.cover}></div>}
-              </div>
-              <div>
-                <Form_product_accessories />
-              </div>
-              <div>
-                <MyButton_v2 px="px32" className="block m-auto " onClick={calcData_2}>
-                  取得剩餘資料
-                </MyButton_v2>
-              </div>
-              <div className="relative">
-                <WorksheetTable />
-                {shouldCalcData2 && <div className={scss.cover}></div>}
-              </div>
-              <div className="relative">
-                <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
-                  確認上傳
-                </MyButton_v2>
-                {shouldCalcData2 && <div className={scss.cover}></div>}
-              </div>
-            </form> */}
           </div>
           {/* right */}
         </div>
