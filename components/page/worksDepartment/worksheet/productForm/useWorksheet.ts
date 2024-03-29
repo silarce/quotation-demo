@@ -88,6 +88,45 @@ type Tworksheet = {
   isAntiTyphoonLock: boolean;
   shouldCalcData: boolean;
   shouldCalcData2: boolean;
+
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+  // 接著做shouldCalcData2的狀態處理
+
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+  // 或著先處理PDF?
+
   //
   basicSpec: {
     itemName: string;
@@ -333,6 +372,7 @@ const useWorksheet = create<Tworksheet>(
           produce((state) => {
             state.basicSpec[key] = value;
             state.shouldCalcData = true;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -342,6 +382,7 @@ const useWorksheet = create<Tworksheet>(
             if (state.basicSpec) {
               state.basicSpec[key] = value;
               state.shouldCalcData = true;
+              state.shouldCalcData2 = true;
             }
           })
         );
@@ -351,6 +392,7 @@ const useWorksheet = create<Tworksheet>(
           produce((state) => {
             state.basicSpec.material = str;
             state.shouldCalcData = true;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -365,6 +407,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce<Tworksheet>((state) => {
             state.generalSpec && (state.generalSpec.gapA = Number(value));
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -372,6 +415,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce<Tworksheet>((state) => {
             state.generalSpec && (state.generalSpec.gapC = Number(value));
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -379,6 +423,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.ABCD.boxB = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -386,6 +431,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.ABCD.boxD = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -410,6 +456,7 @@ const useWorksheet = create<Tworksheet>(
           produce((state) => {
             state.motor.motorVoltage = voltage;
             state.motor.motorPhase = phase;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -418,6 +465,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.motor[key] = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -440,6 +488,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.headBox[key] = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -448,6 +497,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.headBox[key] = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -460,6 +510,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.roller[key] = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -472,6 +523,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.slat[key] = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -497,6 +549,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.guideRail[key] = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -504,6 +557,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.guideRail.hasSilencingStrip = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -521,6 +575,8 @@ const useWorksheet = create<Tworksheet>(
             state.guideRail.hasSilencingStrip = hasSilencingStrip;
             state.guideRail.guideRailsOpening = opening;
             state.guideRail.guideRailG = width;
+
+            state.shouldCalcData2 = true;
             // state.guideRail.guideRailThickness = thickness;
           })
         );
@@ -537,6 +593,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.bottomBar[key] = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -550,6 +607,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.sidePlate[key] = value;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -749,6 +807,7 @@ const useWorksheet = create<Tworksheet>(
           }
 
           state.shouldCalcData = true;
+          state.shouldCalcData2 = true;
         })
       );
     },
@@ -980,7 +1039,7 @@ const useWorksheet = create<Tworksheet>(
 
       set(
         produce((state) => {
-          state.shouldCalcData2 = true;
+          state.shouldCalcData2 = false;
         })
       );
     },

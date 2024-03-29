@@ -602,19 +602,25 @@ function Form_product_slat() {
 // =====================================================================
 
 function Form_product_guideRail() {
-  const { guideRail, hasSilencingStrip, getOptions_material, getOptions_guideRailThickness, getOptions_guideRail } =
-    useWorksheet(
-      useShallow((state) => ({
-        guideRail: state.guideRail,
-        hasSilencingStrip: state.guideRail.getHasSilencingStrip(),
-        getOptions_material: state.getOptions_material,
-        getOptions_guideRailThickness: state.getOptions_guideRailThickness,
-        getOptions_guideRail: state.getOptions_guideRail,
-        generalSpec: state.generalSpec, // 用於更新getOptions
-        avalibleComponent: state.avalibleComponents, // 用於更新getOptions
-        doorModelInfo: state.doorModelInfo, // 用於更新getOptions
-      }))
-    );
+  const {
+    //
+    guideRail,
+    hasSilencingStrip,
+    getOptions_material,
+    getOptions_guideRailThickness,
+    getOptions_guideRail,
+  } = useWorksheet(
+    useShallow((state) => ({
+      guideRail: state.guideRail,
+      hasSilencingStrip: state.guideRail.getHasSilencingStrip(),
+      getOptions_material: state.getOptions_material,
+      getOptions_guideRailThickness: state.getOptions_guideRailThickness,
+      getOptions_guideRail: state.getOptions_guideRail,
+      generalSpec: state.generalSpec, // 用於更新getOptions
+      avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+      doorModelInfo: state.doorModelInfo, // 用於更新getOptions
+    }))
+  );
 
   return (
     <div>
