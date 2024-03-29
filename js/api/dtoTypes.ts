@@ -2284,6 +2284,14 @@ export type TcreateEngineeringContactDto = {
   contractId?: string | null; // 合約ID
 };
 
+export type TsubmitEngineeringContactDto = {
+  attachmentType: TengineeringContactAttachmentType;
+};
+
+export type TreviewEngineeringContactDto = {
+  isPass: boolean;
+};
+
 // 派工單
 export type TdispatchingDto = {
   id: string;
