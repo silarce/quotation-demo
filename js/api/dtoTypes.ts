@@ -2180,11 +2180,11 @@ export type TengineeringContactDto = {
   // 工務 ID
   reviewWorkerEmployeeId: string | null;
   // 工務
-  reviewWorkerEmployee: TemployeeDto;
+  reviewWorkerEmployee?: TemployeeDto;
   // 總經理 ID
   reviewManagerEmployeeId: string | null;
   // 總經理
-  reviewManagerEmployee: TemployeeDto;
+  reviewManagerEmployee?: TemployeeDto;
 
   // 簽認圖送審給工務的時間
   detailToWorkerAt: string | null;

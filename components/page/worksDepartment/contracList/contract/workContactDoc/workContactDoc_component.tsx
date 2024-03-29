@@ -14,6 +14,8 @@ import Profile, {
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import ProjectPattern, {
   ThasPattern,
+  TpatternReviewProcessGroup,
+  TpatternReviewProcess,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
 
 // gear
@@ -239,6 +241,38 @@ function PreWorkContactDoc_component(
       construction: shouldHasConstruction ?? false,
       design: shouldHasDesign ?? false,
     });
+  }, [engineeringContact]);
+
+  const foo = useMemo(() => {
+    const {
+      reviewWorkerEmployee,
+      reviewManagerEmployee,
+
+      detailToWorkerAt,
+      detailWorkerReviewedAt,
+      detailToManagerAt,
+      detailManagerReviewedAt,
+
+      designToWorkerAt,
+      designWorkerReviewedAt,
+      designToManagerAt,
+      designManagerReviewedAt,
+
+      floorToWorkerAt,
+      floorWorkerReviewedAt,
+      floorToManagerAt,
+      floorManagerReviewedAt,
+
+      constructionToWorkerAt,
+      constructionWorkerReviewedAt,
+      constructionToManagerAt,
+      constructionManagerReviewedAt,
+
+      colorToWorkerAt,
+      colorWorkerReviewedAt,
+      colorToManagerAt,
+      colorManagerReviewedAt,
+    } = engineeringContact ?? {};
   }, [engineeringContact]);
 
   // ---------------------------------------------------------------------------

@@ -10,6 +10,7 @@ import { UploadChangeParam } from 'antd/lib/upload';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
 
 import scss from './projectPattern.module.scss';
 
@@ -24,6 +25,10 @@ import {
   useEngineeringContactAttachments,
   TengineeringContactAttachmentType,
   TfileDto,
+  // 送審
+  apiPatchEngineeringContactSubmitAttachment,
+  // 審核
+  apiPatchEngineeringContactReviewAttachment,
 } from 'js/api/api_engineering';
 
 // =======================================================================
@@ -53,7 +58,21 @@ type ThasPattern = {
   hasDesign: boolean;
 };
 
-export type { ThasPattern };
+type TpatternReviewProcess = {
+  sales: Tcontrol_processChain;
+  worker: Tcontrol_processChain;
+  manager: Tcontrol_processChain;
+};
+
+type TpatternReviewProcessGroup = {
+  color: TpatternReviewProcess;
+  construction: TpatternReviewProcess;
+  detail: TpatternReviewProcess;
+  floor: TpatternReviewProcess;
+  design: TpatternReviewProcess;
+};
+
+export type { ThasPattern, TpatternReviewProcessGroup, TpatternReviewProcess };
 
 // =======================================================================
 export default function ProjectPattern({
@@ -218,6 +237,15 @@ export default function ProjectPattern({
     await reqUploadPattern(preUploadFile, patternType);
   };
 
+  // ---------------------------------------------------------------------
+  // 送審
+  const reqSubmitPattern = async (patternType: TpatternType) => {
+    if (engineeringContactId) {
+      await apiPatchEngineeringContactSubmitAttachment(engineeringContactId, { attachmentType: patternType });
+    }
+  };
+
+  // ---------------------------------------------------------------------
   //
   const onDraggerChange = async (e: UploadChangeParam, patternType: TpatternType) => {
     const {
@@ -346,10 +374,27 @@ export default function ProjectPattern({
         // onChange={(v) => {console.log(v);}}
       >
         <Panel header="簽認圖" key="detail" className={scss.panel}>
-          <ImageDragger {...props_detail} />
+          <div>
+            <BtnBar
+              onSubmitClick={() => {
+                myAlert.confirm({
+                  title: '確定送審?',
+                  props: {
+                    onOk: () => {
+                      reqSubmitPattern('detail');
+                    },
+                  },
+                });
+              }}
+            />
+            <ImageDragger {...props_detail} />
+          </div>
         </Panel>
         <Panel header="平面圖" key="floor" className={scss.panel}>
-          <ImageDragger {...props_floor} />
+          <div>
+            <BtnBar />
+            <ImageDragger {...props_floor} />
+          </div>
         </Panel>
         <Panel header="設計圖" key="design" className={scss.panel}>
           <ImageDragger {...props_design} />
@@ -410,6 +455,17 @@ const ImageDragger = ({
         </Spin>
       </div>
     </>
+  );
+};
+
+const BtnBar = ({ onReviewClick, onSubmitClick }: { onReviewClick?: () => void; onSubmitClick?: () => void }) => {
+  return (
+    <div className={scss.btnBar}>
+      <MyButton_v2 onClick={onReviewClick}>審核</MyButton_v2>
+      <MyButton_v2 onClick={onSubmitClick} theme="danger">
+        送審
+      </MyButton_v2>
+    </div>
   );
 };
 

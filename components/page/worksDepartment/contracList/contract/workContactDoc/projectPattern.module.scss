@@ -100,3 +100,10 @@
 .antdImage {
   max-height: 500px;
 }
+
+.btnBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  padding: 10px;
+}

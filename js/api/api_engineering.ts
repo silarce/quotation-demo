@@ -108,8 +108,12 @@ type TgetEngineeringContact = {
 export const apiGetEngineeringContact = async (id: string) => {
   const api = `/engineering/engineering-contact/${id}`;
 
+  const params = {
+    populate: ['reviewWorkerEmployee', 'reviewManagerEmployee'],
+  };
+
   return axi
-    .get<TengineeringContactDto>(api)
+    .get<TengineeringContactDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1463,7 +1467,7 @@ export const apiPatchEngineeringContactSubmitAttachment = async (id: string, bod
   const api = `/engineering/engineering-contact/${id}/submit-attachment/`;
 
   return axi
-    .patch(api, { body })
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
       myAlert.err({ title: '送審工程聯絡單附件失敗', content: err.message });
@@ -1477,7 +1481,7 @@ export const apiPatchEngineeringContactReviewAttachment = async (id: string, bod
   const api = `/engineering/engineering-contact/${id}/review-attachment/`;
 
   return axi
-    .patch(api, { body })
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
       myAlert.err({ title: '審核工程聯絡單附件失敗', content: err.message });
