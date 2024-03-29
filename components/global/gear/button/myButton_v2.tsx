@@ -62,6 +62,7 @@ export default function MyButton_v2({
           className={classNames(
             //
             scss.button,
+            scss.plus,
             theme && scss[theme],
             px && scss[px],
             py && scss[py],

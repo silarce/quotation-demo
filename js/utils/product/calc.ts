@@ -104,3 +104,11 @@ export const findBDoptions = (doorModelName: string) => {
     options_boxD,
   };
 };
+
+export const calcFullHeight = ({ height, boxB }: { height: number; boxB: number }) => {
+  return new Decimal(height).add(boxB).toNumber();
+};
+
+export const calcAngleIronSize = ({ gapA, gapC, WG }: { gapA: number; gapC: number; WG: number }) => {
+  return new Decimal(gapA).add(gapC).add(WG).minus(10).toNumber();
+};

@@ -187,6 +187,14 @@ export const optionsCreator_bottomBar = createOptionsCreator({
   ],
 });
 
+export const optionsCreator_bottomBar_2 = createOptionsCreator({
+  optionsArr: [
+    { value: 'null', label: '無' },
+    { value: '鋁障感型', label: '鋁障感型' },
+    { value: '止水型', label: '止水型' },
+  ],
+});
+
 export const optionsCreator_motorLockBox = createOptionsCreator({
   optionsArr: [
     { value: '外露', label: '外露' },
@@ -208,6 +216,34 @@ export const optionsCreator_closingType = createOptionsCreator({
   ],
 });
 
+export const optionsCreator_chainType = createOptionsCreator({
+  optionsArr: [
+    { value: '單排', label: '單排' },
+    { value: '雙排', label: '雙排' },
+  ],
+});
+
+export const optionsCreator_direction = createOptionsCreator({
+  optionsArr: [
+    { value: '左', label: '左' },
+    { value: '右', label: '右' },
+  ],
+});
+
+export const optionsCreator_isIntegratedHeadBox = createOptionsCreator({
+  optionsArr: [
+    { value: 'true', label: '一體式捲箱' },
+    { value: 'false', label: '捲箱加機箱' },
+  ],
+});
+
+export const optionsCreator_boolean = createOptionsCreator({
+  optionsArr: [
+    { value: 'true', label: '有' },
+    { value: 'false', label: '無' },
+  ],
+});
+
 export const optionsCreator_horsePower = createOptionsCreator({
   optionsArr: [
     { value: '1/4HP', label: '1/4HP', hpValue: '0.25' },
@@ -221,6 +257,20 @@ export const optionsCreator_horsePower = createOptionsCreator({
     { value: '5HP', label: '5HP', hpValue: '5' },
   ],
 });
+
+const options_horsePower = optionsCreator_horsePower();
+
+export const lookup_horsePowerToToptions = {
+  '1/4HP': options_horsePower[0],
+  '1/3HP': options_horsePower[1],
+  '1/2HP': options_horsePower[2],
+  '3/4HP': options_horsePower[3],
+  '1HP': options_horsePower[4],
+  '1 1/2HP': options_horsePower[5],
+  '2HP': options_horsePower[6],
+  '3HP': options_horsePower[7],
+  '5HP': options_horsePower[8],
+} as const;
 
 export const optionsCreator_productMaterial = createOptionsCreator({
   optionsArr: [
@@ -375,6 +425,47 @@ export const optionsCreator_boxB_SJ303A = createOptionsCreator({
     { value: '0.88', label: '0.88' },
     { value: '0.95', label: '0.95' },
     { value: '1.02', label: '1.02' },
+  ],
+});
+
+// 電供
+export const optionsCreator_motorSupply = createOptionsCreator({
+  optionsArr: [
+    {
+      value: '單相 220V',
+      label: '單相 220V',
+      phase: '1',
+      voltage: '220',
+    },
+    {
+      value: '三相 220V',
+      label: '三相 220V',
+      phase: '3',
+      voltage: '220',
+    },
+    {
+      value: '三相 380V',
+      label: '三相 380V',
+      phase: '3',
+      voltage: '380',
+    },
+  ],
+});
+
+// 馬達支撐架
+export const optionsCreator_motorSupportStand = createOptionsCreator({
+  optionsArr: [
+    { value: '有', label: '有' },
+    { value: '無', label: '無' },
+  ],
+});
+
+// 正面
+export const optionsCreator_front = createOptionsCreator({
+  optionsArr: [
+    { value: '無', label: '無' },
+    { value: '正雲白', label: '正雲白' },
+    { value: '正乳白', label: '正乳白' },
   ],
 });
 
