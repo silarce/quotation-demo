@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
+import Link from 'next/link';
 
 // antd
 import { Select, Collapse, Upload, Image as AntdImage, Spin } from 'antd';
@@ -161,11 +162,11 @@ export default function ProjectPattern({
 
     const isImage = checkFileIsImage(file);
 
-    if (!isImage) {
-      myAlert.info({ title: '該檔案非圖片，只能上傳圖片' });
+    // if (!isImage) {
+    //   myAlert.info({ title: '該檔案非圖片，只能上傳圖片' });
 
-      return;
-    }
+    //   return;
+    // }
 
     const theFile = file;
     const formData = new FormData();
@@ -250,11 +251,11 @@ export default function ProjectPattern({
     const file = e.target.files[0];
     const isImage = checkFileIsImage(file);
 
-    if (!isImage) {
-      myAlert.info({ title: '該檔案非圖片，只能上傳圖片' });
+    // if (!isImage) {
+    //   myAlert.info({ title: '該檔案非圖片，只能上傳圖片' });
 
-      return;
-    }
+    //   return;
+    // }
 
     setPreUploadFile(file);
   };
@@ -266,30 +267,40 @@ export default function ProjectPattern({
     onRemoveClick: () => onRemoveClick('floor'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'floor'),
     isUploading: isUploading.floor,
+    isImage: checkFileIsImage_str(fileInfo_floor?.mime ?? ''),
+    fileName: fileInfo_floor?.name ?? '',
   };
   const props_design: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.design.src,
     onRemoveClick: () => onRemoveClick('design'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'design'),
     isUploading: isUploading.design,
+    isImage: checkFileIsImage_str(fileInfo_design?.mime ?? ''),
+    fileName: fileInfo_design?.name ?? '',
   };
   const props_color: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.color.src,
     onRemoveClick: () => onRemoveClick('color'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'color'),
     isUploading: isUploading.color,
+    isImage: checkFileIsImage_str(fileInfo_color?.mime ?? ''),
+    fileName: fileInfo_color?.name ?? '',
   };
   const props_construction: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.construction.src,
     onRemoveClick: () => onRemoveClick('construction'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'construction'),
     isUploading: isUploading.construction,
+    isImage: checkFileIsImage_str(fileInfo_construction?.mime ?? ''),
+    fileName: fileInfo_construction?.name ?? '',
   };
   const props_detail: Parameters<typeof ImageDragger>[0] = {
     fileSrc: patternList.detail.src,
     onRemoveClick: () => onRemoveClick('detail'),
     onDraggerChange: (e: UploadChangeParam) => onDraggerChange(e, 'detail'),
     isUploading: isUploading.detail,
+    isImage: checkFileIsImage_str(fileInfo_detail?.mime ?? ''),
+    fileName: fileInfo_detail?.name ?? '',
   };
 
   return (
@@ -358,19 +369,26 @@ export default function ProjectPattern({
 
 const ImageDragger = ({
   fileSrc,
+  isImage,
   onRemoveClick,
   onDraggerChange,
   isUploading,
+  fileName,
 }: {
   fileSrc?: string | undefined;
+  isImage: boolean;
   onRemoveClick: () => void;
   onDraggerChange: (e: UploadChangeParam) => void;
   isUploading: boolean;
+  fileName: string;
 }) => {
   return (
     <>
       <div className={classNames('relative w-fit', !fileSrc && 'hidden')}>
-        <AntdImage className={scss.antdImage} src={fileSrc ?? ''} alt="" />
+        {isImage && <AntdImage className={scss.antdImage} src={fileSrc ?? ''} alt={fileName} />}
+
+        {!isImage && <Link href={fileSrc ?? ''}>{fileName}</Link>}
+
         <IconRemove02 className="global_absoluteRightTop" onClick={() => onRemoveClick()} />
       </div>
       <div className={classNames(scss.draggerContainer, fileSrc && 'hidden')}>
@@ -400,6 +418,13 @@ const ImageDragger = ({
 const checkFileIsImage = (file: File) => {
   const imageReg = /^image/;
   const isImage = imageReg.test(file.type);
+
+  return isImage;
+};
+
+const checkFileIsImage_str = (str: string) => {
+  const imageReg = /^image/;
+  const isImage = imageReg.test(str);
 
   return isImage;
 };
