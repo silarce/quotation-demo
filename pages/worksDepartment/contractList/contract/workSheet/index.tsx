@@ -200,6 +200,7 @@ export default function Worksheet({
         worksheetId: activeWorksheetId!,
         itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
         contractProductItem: contractProductItems?.[0],
+        contractProductItemArr: contractProductItems ?? [],
         qty: contractProductItems?.length ?? 0,
         originalAccessories: activeWorksheetOriginalAccessories,
       });

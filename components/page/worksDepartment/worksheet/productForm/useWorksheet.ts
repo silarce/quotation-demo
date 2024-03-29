@@ -73,6 +73,7 @@ import {
 
 type Tworksheet = {
   contractProductItem_ori: TquotationProductItemDto | undefined;
+  contractProductItemArr_ori: TquotationProductItemDto[] | undefined;
   doorModelInfoList: { [key: string]: TdoorModelInfoDto } | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
   componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
@@ -231,6 +232,7 @@ type Tworksheet = {
     worksheetId: string;
     itemIdArr: Tworksheet['itemIdArr'];
     contractProductItem: Tworksheet['contractProductItem_ori'];
+    contractProductItemArr: Tworksheet['contractProductItemArr_ori'];
     qty: Tworksheet['qty'];
     originalAccessories: TquotationProductAccessoryDto[];
   }) => void;
@@ -298,6 +300,7 @@ type Tworksheet = {
 const useWorksheet = create<Tworksheet>(
   (set, get) => ({
     contractProductItem_ori: undefined,
+    contractProductItemArr_ori: undefined,
     doorModelInfoList: undefined,
     doorModelInfo: undefined,
     componentList: undefined,
@@ -582,7 +585,15 @@ const useWorksheet = create<Tworksheet>(
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
     //
-    init: async ({ worksheetId, itemIdArr, contractProductItem, qty, originalAccessories }) => {
+    init: async ({
+      //
+      worksheetId,
+      itemIdArr,
+      contractProductItem,
+      contractProductItemArr,
+      qty,
+      originalAccessories,
+    }) => {
       const doorModelInfo = get().doorModelInfoList;
 
       if (!doorModelInfo) {
@@ -626,6 +637,7 @@ const useWorksheet = create<Tworksheet>(
           state.itemIdArr = itemIdArr;
           state.qty = qty;
           state.contractProductItem_ori = contractProductItem;
+          state.contractProductItemArr_ori = contractProductItemArr;
           state.componentList = componentList;
           state.shouldCalcData = false;
           state.shouldCalcData2 = false;
@@ -980,6 +992,7 @@ const useWorksheet = create<Tworksheet>(
       const {
         //
         contractProductItem_ori,
+        contractProductItemArr_ori,
         componentList: componentList_ori,
         accessories,
         itemIdArr,
@@ -1039,9 +1052,6 @@ const useWorksheet = create<Tworksheet>(
 
       componentList.bottomBar.material = bottomBar.material;
       componentList.bottomBar.materialSurface = bottomBar.surface;
-
-      item.components = Object.values(componentList);
-      item.accessories = accessories;
 
       const updateWorkSheetItem: TupdateContractProductItemDto = {
         ...item,
@@ -1119,10 +1129,31 @@ const useWorksheet = create<Tworksheet>(
         thickness: generalSpec!.thickness,
       };
 
-      const updateWorkSheetArr = itemIdArr.map((id) => {
+      updateWorkSheetItem.components = Object.values(componentList);
+      updateWorkSheetItem.accessories = accessories.map((acce) => {
+        return {
+          ...acce,
+          id: undefined,
+        };
+      });
+
+      const updateWorkSheetArr = (contractProductItemArr_ori ?? []).map((item) => {
+        const { id: itemId, components } = item;
+
+        const newComponents = components.map((component) => {
+          const { type, id } = component;
+          const com = componentList[type];
+
+          return {
+            ...com,
+            id,
+          };
+        });
+
         return {
           ...updateWorkSheetItem,
-          id,
+          id: itemId,
+          components: newComponents,
         };
       });
 
