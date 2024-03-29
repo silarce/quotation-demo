@@ -14,7 +14,7 @@ import { produce } from 'immer';
 import {
   //
   TquotationProductItemDto,
-  TupdateWorkSheetItem,
+  TupdateContractProductItemDto,
   TdoorModelInfoDto,
   TquotationProductComponentDto,
   TdoorComponentType,
@@ -276,7 +276,7 @@ type Tworksheet = {
 
   // -----------------------------------------------------------------------------
 
-  getUpdateWorkSheetItemArr: () => TupdateWorkSheetItem[] | null;
+  getUpdateWorkSheetItemArr: () => TupdateContractProductItemDto[] | null;
 
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
@@ -1016,20 +1016,8 @@ const useWorksheet = create<Tworksheet>(
         return null;
       }
 
-      if (!item.productId) {
-        myAlert.warning({ title: '錯誤:productId為空', content: '請聯絡資訊部前端工程師' });
-
-        return null;
-      }
-
       if (generalSpec) {
         myAlert.warning({ title: '錯誤:generalSpec為空', content: '請聯絡資訊部前端工程師' });
-
-        return null;
-      }
-
-      if (!item.worksheetId) {
-        myAlert.warning({ title: '錯誤:worksheetId為空', content: '請聯絡資訊部前端工程師' });
 
         return null;
       }
@@ -1054,14 +1042,12 @@ const useWorksheet = create<Tworksheet>(
       item.components = Object.values(componentList);
       item.accessories = accessories;
 
-      const updateWorkSheetItem: TupdateWorkSheetItem = {
+      const updateWorkSheetItem: TupdateContractProductItemDto = {
         ...item,
-        productId: item.productId,
-        worksheetId: item.worksheetId,
         //
         // basicSpec
         itemName: basicSpec.itemName,
-        doorModelName: basicSpec.doorModelName,
+        doorModelName: basicSpec.doorModelName as TdoorModel,
         fullWidth: getFullWidth_mm(),
         WG: getWG_mm(),
         height: getHeight_mm(),
