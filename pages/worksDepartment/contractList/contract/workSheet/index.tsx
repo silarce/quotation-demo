@@ -2,6 +2,21 @@
 
 // 按下計算按鈕會呼叫targetSheet.calcProd()
 
+// 為了使用useControl_pdf，在useGetContract_id的populate中
+// 設置了
+// 'worksheet.latestRecord.contractProductItems.components'
+// 'worksheet.latestRecord.contractProductItems.accessories'
+// 未來可能會有效能的問題，之後要找時間處理
+
+// TODO component的過濾與取得bom資料還沒做
+// !!! component的過濾與取得bom資料還沒做 !!!
+// !!! component的過濾與取得bom資料還沒做 !!!
+// !!! component的過濾與取得bom資料還沒做 !!!
+// !!! component的過濾與取得bom資料還沒做 !!!
+// !!! component的過濾與取得bom資料還沒做 !!!
+// !!! component的過濾與取得bom資料還沒做 !!!
+// !!! component的過濾與取得bom資料還沒做 !!!
+
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -285,7 +300,11 @@ export default function Worksheet({
   }, [contractId]);
 
   useEffect(() => {
-    update_worksheetData();
+    (async () => {
+      setIsLoading(true);
+      await update_worksheetData();
+      setIsLoading(false);
+    })();
   }, [activeWorksheetId]);
 
   // -------------------------------------------------------------------------
@@ -583,14 +602,15 @@ export default function Worksheet({
           {/* targetSheet */}
           <div className={classNames(scss.right)}>
             {false && <RecordList control={control_recordList} />}
-
-            <WorksheetForm
-              shouldCalcData={shouldCalcData}
-              shouldCalcData2={shouldCalcData2}
-              calcData_2={calcData_2}
-              reqPatchWorkSheet={reqPatchWorkSheet}
-              disabled={disabled}
-            />
+            {activeWorksheetId && (
+              <WorksheetForm
+                shouldCalcData={shouldCalcData}
+                shouldCalcData2={shouldCalcData2}
+                calcData_2={calcData_2}
+                reqPatchWorkSheet={reqPatchWorkSheet}
+                disabled={disabled}
+              />
+            )}
           </div>
           {/* right */}
         </div>
