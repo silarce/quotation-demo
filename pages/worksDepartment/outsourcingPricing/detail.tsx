@@ -703,7 +703,11 @@ const useTable02 = ({
                 onChange: (_, option) => {
                   const theOption = option as Toption;
                   editState_otherWorkItem(index, 'installItemId', theOption.value);
-                  editState_otherWorkItem(index, 'quotationItemStatusId', theOption.quotationItemStatusId ?? '');
+                  editState_otherWorkItem(
+                    index,
+                    'quotationItemStatusId',
+                    (theOption.quotationItemStatusId as string | undefined) ?? ''
+                  );
                   // editState_otherWorkItem(index, 'installItemName', theOption.label);
                 },
               }}

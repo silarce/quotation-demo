@@ -28,7 +28,9 @@ import { Icon_info } from 'public/image/icon/svgComponent/svgIcons';
 import scss from './electronicSupplies.module.scss';
 
 // utils
-import { workSheetReducer, TquotationProductItemDto } from 'js/utils/worksheet/reducer';
+// import { workSheetReducer, TquotationProductItemDto } from 'js/utils/worksheet/reducer';
+
+import { TquotationProductItemDto } from 'js/api/dtoTypes';
 
 // ------------------------------------------------------------------
 
@@ -67,52 +69,54 @@ export default function ElectronicSupplies() {
   } = contract?.engineeringContact ?? {};
   // ------------------------------------------------------------------
 
-  const { itemList, doorQtySubTotal, doorQtyTotal } = useMemo(() => {
-    if (!worksheet?.latestRecord.contractProductItems) {
-      return {};
-    }
+  // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
 
-    const itemList: TproductItemList = {};
-    const doorQtySubTotal: { [key: string]: number } = {};
-    let doorQtyTotal = 0;
+  // const { itemList, doorQtySubTotal, doorQtyTotal } = useMemo(() => {
+  //   if (!worksheet?.latestRecord.contractProductItems) {
+  //     return {};
+  //   }
 
-    const { itemTokenList, itemIdArrList } = workSheetReducer({ worksheet });
+  //   const itemList: TproductItemList = {};
+  //   const doorQtySubTotal: { [key: string]: number } = {};
+  //   let doorQtyTotal = 0;
 
-    Object.keys(itemIdArrList).forEach((idKey) => {
-      const list = itemTokenList[idKey];
+  //   const { itemTokenList, itemIdArrList } = workSheetReducer({ worksheet });
 
-      for (const [key, value] of Object.entries(list)) {
-        if (key === 'originalItem') {
-          continue;
-        }
+  //   Object.keys(itemIdArrList).forEach((idKey) => {
+  //     const list = itemTokenList[idKey];
 
-        const qty = itemIdArrList[idKey][key].length;
+  //     for (const [key, value] of Object.entries(list)) {
+  //       if (key === 'originalItem') {
+  //         continue;
+  //       }
 
-        const doorType = value.doorModelName;
+  //       const qty = itemIdArrList[idKey][key].length;
 
-        if (!doorQtySubTotal[doorType]) {
-          doorQtySubTotal[doorType] = qty;
-        } else {
-          doorQtySubTotal[doorType] += qty;
-        }
+  //       const doorType = value.doorModelName;
 
-        doorQtyTotal += qty;
+  //       if (!doorQtySubTotal[doorType]) {
+  //         doorQtySubTotal[doorType] = qty;
+  //       } else {
+  //         doorQtySubTotal[doorType] += qty;
+  //       }
 
-        itemList[key] = {
-          productItem: value,
-          qty,
-        };
-      }
-    });
+  //       doorQtyTotal += qty;
 
-    return {
-      itemTokenList,
-      itemIdArrList,
-      itemList,
-      doorQtySubTotal,
-      doorQtyTotal,
-    };
-  }, [worksheet]);
+  //       itemList[key] = {
+  //         productItem: value,
+  //         qty,
+  //       };
+  //     }
+  //   });
+
+  //   return {
+  //     itemTokenList,
+  //     itemIdArrList,
+  //     itemList,
+  //     doorQtySubTotal,
+  //     doorQtyTotal,
+  //   };
+  // }, [worksheet]);
 
   // ------------------------------------------------------------------
 
@@ -223,7 +227,8 @@ export default function ElectronicSupplies() {
               },
             }}
           />
-          <InputSel
+          {/* // !因為worksheet資料結構改變，這段程式碼不能用了，先註解 */}
+          {/* <InputSel
             caption="門型數量"
             showBaseline="invisible"
             captionStyle={{ width: '80px' }}
@@ -235,7 +240,7 @@ export default function ElectronicSupplies() {
               },
             }}
             suffix={<Info doorQtySubTotal={doorQtySubTotal} />}
-          />
+          /> */}
           <InputSel
             caption="領料狀態"
             showBaseline="invisible"
@@ -258,7 +263,8 @@ export default function ElectronicSupplies() {
           //   top: '50px',
           // }}
         >
-          {listName === 'itemList' && <ItemList itemList={itemList} />}
+          {/* // !因為worksheet資料結構改變，這段程式碼不能用了，先註解 */}
+          {/* {listName === 'itemList' && <ItemList itemList={itemList} />} */}
           {listName === 'supplyList' && <SupplyList />}
           {listName === 'receiveHistory' && <ReceivedHistory />}
           {listName === 'demandHistory' && <DemandHistory />}

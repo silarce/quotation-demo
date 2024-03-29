@@ -203,49 +203,50 @@ export default function OutboundOrder({
 
   const worksheet = deliveryList?.contract.worksheet;
 
-  useEffect(() => {
-    if (!deliveryList?.contract.worksheet?.latestRecord.contractProductItems) {
-      return;
-    }
+  // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
+  // useEffect(() => {
+  //   if (!deliveryList?.contract.worksheet?.latestRecord.contractProductItems) {
+  //     return;
+  //   }
 
-    const contractProductItems = deliveryList.contract.worksheet.latestRecord.contractProductItems;
+  //   const contractProductItems = deliveryList.contract.worksheet.latestRecord.contractProductItems;
 
-    const myDeleveryList: TmyDeleveryList = {};
+  //   const myDeleveryList: TmyDeleveryList = {};
 
-    contractProductItems.forEach((item) => {
-      const { productId, adjustedItem, adjustedItemId } = item;
+  //   contractProductItems.forEach((item) => {
+  //     const { productId, adjustedItem, adjustedItemId } = item;
 
-      let theItem: typeof item;
-      // 現在只以productId分類，theId用不到了
-      // let theId: string;
+  //     let theItem: typeof item;
+  //     // 現在只以productId分類，theId用不到了
+  //     // let theId: string;
 
-      if (adjustedItem && adjustedItemId) {
-        theItem = adjustedItem;
-        // theId = adjustedItemId;
-      } else {
-        theItem = item;
-        // theId = productId;
-      }
+  //     if (adjustedItem && adjustedItemId) {
+  //       theItem = adjustedItem;
+  //       // theId = adjustedItemId;
+  //     } else {
+  //       theItem = item;
+  //       // theId = productId;
+  //     }
 
-      theItem.deliveryStatus = item.deliveryStatus;
-      // issue#198 // 改送item.id
-      theItem.id = item.id;
+  //     theItem.deliveryStatus = item.deliveryStatus;
+  //     // issue#198 // 改送item.id
+  //     theItem.id = item.id;
 
-      if (!myDeleveryList?.[productId]) {
-        myDeleveryList[productId] = {
-          originalItem: item,
-          itemName: theItem.itemName,
-          itemArr: [],
-        };
-      }
+  //     if (!myDeleveryList?.[productId]) {
+  //       myDeleveryList[productId] = {
+  //         originalItem: item,
+  //         itemName: theItem.itemName,
+  //         itemArr: [],
+  //       };
+  //     }
 
-      myDeleveryList[productId].itemArr.push(theItem);
-    });
+  //     myDeleveryList[productId].itemArr.push(theItem);
+  //   });
 
-    setMyDeleveryList(myDeleveryList);
+  //   setMyDeleveryList(myDeleveryList);
 
-    // ---------------------
-  }, [deliveryList]);
+  //   // ---------------------
+  // }, [deliveryList]);
 
   // --------------------------------------------------------------------------
 
@@ -755,7 +756,9 @@ export default function OutboundOrder({
               forbidden: true,
             },
             orderCreatedDate: {
-              value: worksheet ? moment(convertDate_reduce1911(worksheet.createdAt)).format('yy-MM-DD') : '',
+              // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
+              // value: worksheet ? moment(convertDate_reduce1911(worksheet.createdAt)).format('yy-MM-DD') : '',
+              value: '',
               forbidden: true,
             },
           },

@@ -176,11 +176,12 @@ export default function Table_todoList({
 
           const contact = engineeringContact?.contactInfo?.[0];
           const contactPerson = contact?.contactPerson ?? '';
-          const latestRecord = engineeringContact?.contract?.worksheet?.latestRecord;
 
-          const itemArr = latestRecord?.contractProductItems;
-
-          const qty = itemArr?.length ?? 0;
+          // !!! 因為worksheet結構改變，這段程式碼已不能使用
+          // const latestRecord = engineeringContact?.contract?.worksheet?.latestRecord;
+          // const itemArr = latestRecord?.contractProductItems;
+          // const qty = itemArr?.length ?? 0;
+          const qty = '';
 
           const onAddclick = engineeringContact?.id
             ? () => {
