@@ -1010,6 +1010,12 @@ const useWorksheet = create<Tworksheet>(
         return null;
       }
 
+      if (shouldCalcData || shouldCalcData2) {
+        myAlert.warning({ title: '請先計算資料', content: '請先按下計算按鈕/取得剩餘資料按鈕' });
+
+        return null;
+      }
+
       if (!item.productId) {
         myAlert.warning({ title: '錯誤:productId為空', content: '請聯絡資訊部前端工程師' });
 

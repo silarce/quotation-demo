@@ -580,13 +580,7 @@ export default function Worksheet({
                 <Form_product_accessories />
               </div>
               <div>
-                <MyButton_v2
-                  //
-                  preImg="upload"
-                  px="px32"
-                  className="block m-auto "
-                  onClick={calcData_2}
-                >
+                <MyButton_v2 px="px32" className="block m-auto " onClick={calcData_2}>
                   取得剩餘資料
                 </MyButton_v2>
               </div>
