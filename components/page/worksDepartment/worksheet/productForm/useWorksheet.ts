@@ -84,6 +84,7 @@ type Tworksheet = {
   // options_accessories: Toption[];
   originalAccessories: TquotationProductAccessoryDto[];
   //
+  worksheetId: string;
   itemIdArr: string[];
   qty: number;
   isAntiTyphoonLock: boolean;
@@ -227,6 +228,7 @@ type Tworksheet = {
   };
   //
   init: (props: {
+    worksheetId: string;
     itemIdArr: Tworksheet['itemIdArr'];
     contractProductItem: Tworksheet['contractProductItem_ori'];
     qty: Tworksheet['qty'];
@@ -309,6 +311,7 @@ const useWorksheet = create<Tworksheet>(
     avalibleComponents: undefined,
     originalAccessories: [],
     // ---------------------------------------------------------------------
+    worksheetId: '',
     itemIdArr: [],
     qty: 0,
     isAntiTyphoonLock: true,
@@ -583,7 +586,7 @@ const useWorksheet = create<Tworksheet>(
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
     //
-    init: async ({ itemIdArr, contractProductItem, qty, originalAccessories }) => {
+    init: async ({ worksheetId, itemIdArr, contractProductItem, qty, originalAccessories }) => {
       const doorModelInfo = get().doorModelInfoList;
 
       if (!doorModelInfo) {
@@ -623,6 +626,7 @@ const useWorksheet = create<Tworksheet>(
 
           // ____________________________________________________________________
           // ____________________________________________________________________
+          state.worksheetId = worksheetId;
           state.itemIdArr = itemIdArr;
           state.qty = qty;
           state.contractProductItem_ori = contractProductItem;
@@ -1016,7 +1020,7 @@ const useWorksheet = create<Tworksheet>(
         return null;
       }
 
-      if (generalSpec) {
+      if (!generalSpec) {
         myAlert.warning({ title: '錯誤:generalSpec為空', content: '請聯絡資訊部前端工程師' });
 
         return null;

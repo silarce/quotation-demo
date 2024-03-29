@@ -81,6 +81,7 @@ import {
   apiPostWorkSheet,
   apiDeleteWorksheet,
   useGetWorksheet_id,
+  apiPatchWorkSheetProducts,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
@@ -94,18 +95,6 @@ import { TworkSheetDto, workSheetReducer } from 'js/utils/worksheet/reducer';
 
 // css
 import scss from './workSheet.module.scss';
-
-// options
-// import {
-//   Toption,
-//   optionsCreator_bottomBar,
-//   optionsCreator_motorLockBox,
-//   optionsCreator_rollerSpec,
-//   optionsCreator_bottomBarAngleIron,
-//   optionsCreator_bottomBarPlate,
-//   optionsCreator_surface,
-//   optionsCreator_componentMaterial_01,
-// } from 'js/utils/options/productOptions';
 
 // type
 import type {
@@ -189,6 +178,13 @@ export default function Worksheet({
   const init = useWorksheet((state) => state.init);
   const test = useWorksheet((state) => state.test);
 
+  const worksheetExport = useWorksheet(
+    useShallow((state) => ({
+      worksheetId: state.worksheetId,
+      getUpdateWorkSheetItemArr: state.getUpdateWorkSheetItemArr,
+    }))
+  );
+
   const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
     useShallow((state) => ({
       shouldCalcData: state.shouldCalcData,
@@ -201,6 +197,7 @@ export default function Worksheet({
     const contractProductItems = worksheetData?.latestRecord.contractProductItems;
 
     init({
+      worksheetId: activeWorksheetId!,
       itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
       contractProductItem: contractProductItems?.[0],
       qty: contractProductItems?.length ?? 0,
@@ -242,6 +239,21 @@ export default function Worksheet({
     } catch (error) {
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const reqPatchWorkSheet = async () => {
+    const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
+
+    if (contractProductItems) {
+      const body = {
+        contractProductItems,
+      };
+
+      try {
+        await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
+        await update_worksheetData();
+      } catch (error) {}
     }
   };
 
@@ -586,6 +598,12 @@ export default function Worksheet({
               </div>
               <div className="relative">
                 <WorksheetTable />
+                {shouldCalcData2 && <div className={scss.cover}></div>}
+              </div>
+              <div className="relative">
+                <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
+                  確認上傳
+                </MyButton_v2>
                 {shouldCalcData2 && <div className={scss.cover}></div>}
               </div>
             </form>
