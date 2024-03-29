@@ -529,8 +529,9 @@ function Form_product_roller() {
           caption="尺寸"
           selectProps={{
             props: {
+              isDisabled: true,
               value: { value: roller.getDiameter(), label: roller.getDiameter() },
-              options: getOptions_diameter(),
+              // options: getOptions_diameter(),
             },
           }}
         />
