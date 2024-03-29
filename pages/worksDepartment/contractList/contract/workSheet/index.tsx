@@ -106,7 +106,7 @@ import { useApiGetProdDoorModels } from 'js/api/api_product';
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import { TworkSheetDto, workSheetReducer } from 'js/utils/worksheet/reducer';
+// import { TworkSheetDto, workSheetReducer } from 'js/utils/worksheet/reducer';
 import { calcFullHeight, calcAngleIronSize } from 'js/utils/product/calc';
 import { lookup_motorPhase } from 'config/product/lookup';
 
@@ -122,6 +122,7 @@ import type {
   TquotationProductAccessoryDto,
   TworksheetRecordDto,
   TquotationProductComponentDto,
+  TworksheetDto,
 } from 'js/api/dtoTypes';
 
 // zustand // hook
@@ -169,7 +170,7 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  const [activeRecord, setActiveRecord] = useState<TworkSheetDto['records'][number] | undefined>(undefined);
+  const [activeRecord, setActiveRecord] = useState<TworksheetDto['records'][number] | undefined>(undefined);
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
@@ -315,7 +316,7 @@ export default function Worksheet({
     const control_productCardArr: (Tcontrol_productCard & { id: string })[] = [];
     const latestRecordArr: TworksheetRecordDto[] = [];
 
-    const worksheetList: { [id: string]: TworkSheetDto } = {};
+    const worksheetList: { [id: string]: TworksheetDto } = {};
 
     worksheetArr.forEach((worksheet) => {
       if (worksheet.isAbandoned) {
@@ -330,7 +331,7 @@ export default function Worksheet({
       const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
       const pridHeight = new Decimal(prod.height).div(1000).toString();
 
-      const prodWorkSheetList: { [key: string]: TworkSheetDto } = {};
+      const prodWorkSheetList: { [key: string]: TworksheetDto } = {};
       const itemsNoWorksheet: TquotationProductItemDto[] = [];
 
       // ----------------------------------------------
