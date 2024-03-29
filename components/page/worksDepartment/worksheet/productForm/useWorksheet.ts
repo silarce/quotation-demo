@@ -72,7 +72,7 @@ import {
 // =====================================================================
 
 type Tworksheet = {
-  readonly contractProductItem_ori: TquotationProductItemDto | undefined;
+  contractProductItem_ori: TquotationProductItemDto | undefined;
   doorModelInfoList: { [key: string]: TdoorModelInfoDto } | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
   componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
@@ -276,7 +276,7 @@ type Tworksheet = {
 
   // -----------------------------------------------------------------------------
 
-  // getUpdateWorkSheetItem: () => TupdateWorkSheetItem[];
+  getUpdateWorkSheetItemArr: () => TupdateWorkSheetItem[] | null;
 
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
@@ -975,9 +975,166 @@ const useWorksheet = create<Tworksheet>(
 
     // ---------------------------------------------------------------------
 
-    // getUpdateWorkSheetItem: () => {
-    //   return [];
-    // },
+    getUpdateWorkSheetItemArr: () => {
+      const {
+        //
+        contractProductItem_ori,
+        componentList: componentList_ori,
+        accessories,
+        itemIdArr,
+        shouldCalcData,
+        shouldCalcData2,
+
+        generalSpec,
+
+        basicSpec,
+        ABCD,
+        motor,
+        headBox,
+        roller,
+        slat,
+        guideRail,
+        bottomBar,
+        sidePlate,
+
+        getFullWidth_mm,
+        getWG_mm,
+        getHeight_mm,
+        getFullHeight_mm,
+        getAngleIronSize_mm,
+      } = get();
+
+      const item = _.cloneDeep(contractProductItem_ori);
+
+      if (!item) {
+        return null;
+      }
+
+      if (!item.productId) {
+        myAlert.warning({ title: '錯誤:productId為空', content: '請聯絡資訊部前端工程師' });
+
+        return null;
+      }
+
+      if (generalSpec) {
+        myAlert.warning({ title: '錯誤:generalSpec為空', content: '請聯絡資訊部前端工程師' });
+
+        return null;
+      }
+
+      if (!item.worksheetId) {
+        myAlert.warning({ title: '錯誤:worksheetId為空', content: '請聯絡資訊部前端工程師' });
+
+        return null;
+      }
+
+      // slat bottomBar guideRail sidePlate
+      // roller motor motorAccessories headBox
+
+      const componentList = _.cloneDeep(componentList_ori!);
+
+      componentList.headBox.material = headBox.material;
+      componentList.headBox.materialSurface = headBox.surface;
+
+      componentList.slat.material = slat.material;
+      componentList.slat.materialSurface = slat.surface;
+
+      componentList.guideRail.material = guideRail.material;
+      componentList.guideRail.materialSurface = guideRail.surface;
+
+      componentList.bottomBar.material = bottomBar.material;
+      componentList.bottomBar.materialSurface = bottomBar.surface;
+
+      item.components = Object.values(componentList);
+      item.accessories = accessories;
+
+      const updateWorkSheetItem: TupdateWorkSheetItem = {
+        ...item,
+        productId: item.productId,
+        worksheetId: item.worksheetId,
+        //
+        // basicSpec
+        itemName: basicSpec.itemName,
+        doorModelName: basicSpec.doorModelName,
+        fullWidth: getFullWidth_mm(),
+        WG: getWG_mm(),
+        height: getHeight_mm(),
+        materialName: basicSpec.material,
+        isAntiTyphoon: basicSpec.isAntiTyphoon,
+        //
+        // ABCD
+        gapA: ABCD.getGapA() || '0',
+        gapC: ABCD.getGapC() || '0',
+        boxB: Number(ABCD.boxB || 0),
+        boxD: Number(ABCD.boxD || 0),
+        //
+        // motor
+        horsepower: motor.horsepower,
+        motorVendor: motor.vendor,
+        motorVoltage: Number(motor.motorVoltage),
+        motorPhase: Number(motor.motorPhase),
+        hasMotorSupportStand: motor.hasMotorSupportStand === '有',
+        electricMotorChainType: motor.electricMotorChainType,
+        motorLockBox: motor.motorLockBox,
+        electricMotorDirection: motor.electricMotorDirection,
+        //
+        // headBox
+        headBoxThickness: headBox.headBoxThickness,
+        headBoxFront: headBox.headBoxFront,
+        headBoxProtruding: headBox.headBoxProtruding,
+        isIntegratedHeadBox: headBox.isIntegratedHeadBox,
+        headBoxAngleIronQuantity: Number(headBox.headBoxAngleIronQuantity),
+        //
+        // roller
+        rollerSpec: roller.rollerSpec,
+        //
+        // slat
+        slatCount: slat.slatCount || '0',
+        //
+        // guideRail
+        guideRailThickness: guideRail.guideRailThickness,
+        hasSilencingStrip: guideRail.hasSilencingStrip,
+        guideRailType: guideRail.guideRailType,
+        guideRail: guideRail.guideRail,
+        guideRailsOpening: guideRail.guideRailsOpening,
+        guideRailG: guideRail.guideRailG,
+        //
+        // bottomBar
+        bottomBarAngleIron: bottomBar.bottomBarAngleIron,
+        bottomBarPlate: bottomBar.bottomBarPlate,
+        bottomBar: bottomBar.bottomBar,
+        //
+        // sidePlate
+        sidePlateDirection: sidePlate.sidePlateDirection,
+        //
+        // generalSpec
+        bearingHousingSize: generalSpec!.bearingHousingSize,
+        bearingHousingTotalLength: String(generalSpec!.bearingHousingTotalLength),
+        bearingInnerDiameter: generalSpec!.bearingInnerDiameter,
+        bearingName: generalSpec!.bearingName,
+        diameter: String(generalSpec!.diameter),
+        // gapA: generalSpec!.gapA,
+        // gapC: generalSpec!.gapC,
+        gearNumber: generalSpec!.gearNumber,
+        sprocketWheelModel: generalSpec!.sprocketWheelModel,
+        sprocketWheelTeethNumber: generalSpec!.sprocketWheelTeethNumber,
+        sprocketWheelChains: String(generalSpec!.sprocketWheelChains),
+        weight: String(generalSpec!.weight),
+        slatLength: generalSpec!.slatLength,
+        guideRailLength: generalSpec!.guideRailLength,
+        headBoxLength: generalSpec!.headBoxLength,
+        thickness: generalSpec!.thickness,
+      };
+
+      const updateWorkSheetArr = itemIdArr.map((id) => {
+        return {
+          ...updateWorkSheetItem,
+          id,
+        };
+      });
+
+      return updateWorkSheetArr;
+    },
 
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
@@ -990,6 +1147,16 @@ const useWorksheet = create<Tworksheet>(
   }) // set get
 );
 
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
 // =====================================================================
 
 // 取得材質選項

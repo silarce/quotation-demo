@@ -840,7 +840,13 @@ function Form_product_bottomBar() {
 // =====================================================================
 
 function Form_product_sidePlate() {
-  const sidePlate = useWorksheet((state) => state.sidePlate);
+  const { sidePlate, bearingName, sprocketWheelModel } = useWorksheet(
+    useShallow((state) => ({
+      sidePlate: state.sidePlate,
+      bearingName: state.sidePlate.getBearingName(),
+      sprocketWheelModel: state.sidePlate.getSprocketWheelModel(),
+    }))
+  );
 
   return (
     <div>
@@ -852,7 +858,7 @@ function Form_product_sidePlate() {
           selectProps={{
             props: {
               isDisabled: true,
-              value: { value: sidePlate.getBearingName(), label: sidePlate.getBearingName() },
+              value: { value: bearingName, label: bearingName },
             },
           }}
         />
@@ -862,7 +868,7 @@ function Form_product_sidePlate() {
           selectProps={{
             props: {
               isDisabled: true,
-              value: { value: sidePlate.getSprocketWheelModel(), label: sidePlate.getSprocketWheelModel() },
+              value: { value: sprocketWheelModel, label: sprocketWheelModel },
             },
           }}
         />

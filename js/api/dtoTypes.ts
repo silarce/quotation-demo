@@ -2934,11 +2934,11 @@ export type TupdateWorkSheetItem = {
   bottomBarPlate: string;
   productId: string;
   worksheetId: string;
-  others: null;
+  // others: null;
   components: TquotationProductComponentDto[];
   accessories: TcreateQuotationProductAccessoriesDto[];
-  adjustedItem: undefined;
-  adjustedItemId: undefined;
+  // adjustedItem: undefined;
+  // adjustedItemId: undefined;
   //
   // 門片捲片支數
   slatCount: string;
