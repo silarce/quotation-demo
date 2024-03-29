@@ -1,0 +1,49 @@
+.step {
+  padding: 6px 13px 6px 13px;
+  background-color: theme("colors.bgc01");
+  width: fit-content;
+  border-radius: 17px;
+  > * {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  > .spot {
+    width: 10px;
+    height: 10px;
+    margin-right: 10px;
+    background-color: theme("colors.border");
+    border-radius: 50%;
+  }
+  > span {
+    font-size: 16px;
+    font-weight: 400;
+    color: theme("colors.border");
+  }
+
+  &.gray {
+    .spot {
+      background-color: theme("colors.border");
+    }
+    span {
+      color: theme("colors.border");
+    }
+  }
+
+  &.green {
+    .spot {
+      background-color: green;
+    }
+    span {
+      color: theme("colors.main");
+    }
+  }
+
+  &.red {
+    .spot {
+      background-color: red;
+    }
+    span {
+      color: theme("colors.main");
+    }
+  }
+}

@@ -181,3 +181,13 @@ export const lookup_hpToGapAGapC = {
     gapC: 10,
   },
 };
+
+export const lookup_motorPhase = {
+  '1': '單相',
+  '3': '三相',
+} as const;
+
+export const lookup_motorPhase_reverse = {
+  單相: '1',
+  三相: '3',
+} as const;

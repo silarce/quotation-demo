@@ -13,8 +13,8 @@ import {
   TcreateAnnotationDto,
   TcreateQuotationRangeDto,
   TquotationRangeDto,
-  TworkSheetDto,
-  TcreateWorkSheetDto,
+  TworksheetDto,
+  TcreateWorksheetDto,
 } from './dtoTypes';
 
 type TgetAnnotation = {
@@ -33,8 +33,8 @@ export type {
   TgetQuotataionRanges,
   TcreateAnnotationDto,
   TcreateQuotationRangeDto,
-  TworkSheetDto,
-  TcreateWorkSheetDto,
+  TworksheetDto as TworkSheetDto,
+  TcreateWorksheetDto as TcreateWorkSheetDto,
 };
 
 // ==========================================================================

@@ -1,0 +1,108 @@
+.caption {
+  margin-left: 35px;
+  margin-bottom: 32px;
+  font-size: 20px;
+  font-weight: 700;
+  color: theme("colors.main");
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px 100px;
+  margin: 0 100px;
+}
+
+// =========================================================
+
+.inputSel_hr.plus {
+  border-color: theme("colors.main");
+}
+
+.inputSelWithIcon {
+  img {
+    height: 60px;
+  }
+}
+// ========================================================
+.title {
+  font-size: 20px;
+  color: theme("colors.main");
+  margin-bottom: 25px;
+}
+
+.form_product_accessories {
+  margin-left: 57px;
+
+  .checkGroup {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 25px 0;
+
+    :global(.ant-checkbox-wrapper) {
+      > span {
+        font-size: 18px;
+      }
+      &:global(.ant-checkbox-wrapper-disabled) {
+        > span {
+          color: theme("colors.sub");
+        }
+      }
+    }
+
+    :global(.ant-checkbox) {
+      top: 1px;
+      :global(.ant-checkbox-inner) {
+        // width: 15px;
+        // height: 15px;
+        border-color: theme("colors.border");
+      }
+    }
+
+    :global(.ant-checkbox-checked) {
+      :global(.ant-checkbox-inner) {
+        background-color: theme("colors.main");
+      }
+    }
+
+    :global(.ant-checkbox-disabled) {
+      :global(.ant-checkbox-inner) {
+        &::after {
+          border-color: #fff;
+        }
+      }
+    }
+  }
+}
+
+// =========================================================================
+
+.worksheetTable {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  border: solid 1px theme("colors.border");
+  border-width: 0px 1px 1px 0px;
+
+  .cell {
+    padding: 15px 20px;
+    border: solid 1px theme("colors.border");
+    border-width: 1px 0 0 1px;
+    font-size: 16px;
+  }
+
+  > .cell:nth-of-type(1) {
+    grid-column: span 4;
+    color: theme("colors.main");
+    font-weight: 600;
+    text-align: center;
+    background-color: theme("colors.bgc01");
+  }
+
+  > .cell:nth-of-type(even) {
+    font-weight: 700;
+  }
+
+  > .cell:nth-of-type(odd) {
+  }
+}

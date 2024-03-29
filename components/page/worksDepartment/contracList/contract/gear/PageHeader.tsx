@@ -106,6 +106,7 @@ export default function PageHeader({
         },
       },
     },
+    // 已送入deprecated
     // {
     //   label: '送電備品列表_old',
     //   href: {
