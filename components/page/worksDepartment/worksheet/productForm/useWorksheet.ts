@@ -25,6 +25,7 @@ import {
   TdoorGeneralSpecsMotorDto,
   TdoorRollerDto,
   TquotationProductAccessoryDto,
+  TdoorMaterialDto,
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
@@ -88,44 +89,6 @@ type Tworksheet = {
   isAntiTyphoonLock: boolean;
   shouldCalcData: boolean;
   shouldCalcData2: boolean;
-
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-  // 接著做shouldCalcData2的狀態處理
-
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
-  // 或著先處理PDF?
 
   //
   basicSpec: {
@@ -310,6 +273,10 @@ type Tworksheet = {
   // -----------------------------------------------------------------------------
 
   setAccessories: (acceNameArr: string[]) => void;
+
+  // -----------------------------------------------------------------------------
+
+  // getUpdateWorkSheetItem: () => TupdateWorkSheetItem[];
 
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
@@ -812,121 +779,31 @@ const useWorksheet = create<Tworksheet>(
       );
     },
 
-    getOptions_material: () => {
-      const optiions_material = get().doorModelInfo?.slatMaterials.map((item) => {
-        return {
-          value: item.name,
-          label: item.name,
-        };
-      });
+    // ---------------------------------------------------------------------
+    getOptions_material: () => getOptions_material(get().doorModelInfo?.slatMaterials ?? []),
 
-      return optiions_material ?? [];
-    },
-
-    getOptions_bottomBarAngleIronAndPlate: () => {
-      const basicSpec = get().basicSpec;
-      const doorModelName = basicSpec?.doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
-
-      if (!doorModelName) {
-        return {
-          options_angleIron: [],
-          options_plate: [],
-        };
-      }
-
-      const { angleIron, plate } = lookup_options_bottomBarAngleIronAndPlate[doorModelName];
-
-      return {
-        options_angleIron: angleIron() ?? [],
-        options_plate: plate() ?? [],
-      };
-    },
+    getOptions_bottomBarAngleIronAndPlate: () =>
+      getOptions_bottomBarAngleIronAndPlate(get().basicSpec.doorModelName as TdoorModel),
 
     getOptions_horsepower: () => getOptions_horsepower(get().avalibleComponents?.motors ?? []),
 
-    getOptions_motorVendor: () => {
-      const motors = get().avalibleComponents?.motors ?? [];
-      const vendors = motors.map((motor) => motor.motorVendor);
-      const theVendors = _.uniq(vendors).filter((vendor) => !!vendor) as string[];
-      const options = theVendors.map((vendor) => {
-        return {
-          value: vendor,
-          label: vendor,
-        };
-      });
-
-      return options;
-    },
+    getOptions_motorVendor: () => getOptions_motorVendor(get().avalibleComponents?.motors ?? []),
 
     getOptions_electricSupply: () => getOptions_electricSupply(get().avalibleComponents?.motors ?? []),
+
     getOptions_headBoxThickness: () => getOptions_headBoxThickness(get().avalibleComponents?.headBoxes ?? []),
+
     getOptions_diameter: () => getOptions_diameter(get().avalibleComponents?.rollers ?? []),
 
-    getOptions_guideRailThickness: () => {
-      const guideRails = get().avalibleComponents?.guideRails ?? [];
-      let thicknessArr = guideRails.map((guideRail) => guideRail.thickness);
-      thicknessArr = _.uniq(thicknessArr);
-      const options = thicknessArr.map((thickness) => {
-        return {
-          value: thickness ?? '',
-          label: thickness + 'T',
-        };
-      });
+    getOptions_guideRailThickness: () => getOptions_guideRailThickness(get().avalibleComponents?.guideRails ?? []),
 
-      return options;
-    },
+    getOptions_guideRail: () => getOptions_guideRail(get().doorModelInfo?.guideRails ?? []),
 
-    getOptions_guideRail: () => {
-      const doorModelInfo = get().doorModelInfo;
-      const guideRails = doorModelInfo?.guideRails ?? [];
+    getOptions_doorModelInfo: () => getOptions_doorModelInfo(get().doorModelInfoList),
 
-      const options = guideRails.map((item) => {
-        const { hasSilencingStrip, imgSrc, opening, thickness, width, withHook } = item;
+    getOptions_accessories: () => getOptions_accessories(get().originalAccessories),
+    // ---------------------------------------------------------------------
 
-        return {
-          value: item.imgSrc,
-          label: '',
-          icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
-          hasSilencingStrip,
-          opening,
-          thickness,
-          width,
-          withHook,
-        };
-      });
-
-      return options;
-    },
-
-    getOptions_doorModelInfo: () => {
-      const doorModelInfoList = get().doorModelInfoList;
-      const doorModelInfoArr = Object.values(doorModelInfoList ?? {});
-      const options = doorModelInfoArr.map((doorModel) => {
-        const { name } = doorModel;
-
-        return {
-          label: name,
-          value: name,
-          obj: doorModel,
-        };
-      });
-
-      return options;
-    },
-
-    getOptions_accessories: () => {
-      const originalAccessories = get().originalAccessories;
-      const options = originalAccessories.map((acce) => {
-        return {
-          value: acce.name,
-          label: acce.name,
-        };
-      });
-
-      return options;
-    },
-
-    //
     // ---------------------------------------------------------------------
 
     reqGeneralSpec: async () => {
@@ -1097,6 +974,11 @@ const useWorksheet = create<Tworksheet>(
     },
 
     // ---------------------------------------------------------------------
+
+    // getUpdateWorkSheetItem: () => {
+    //   return [];
+    // },
+
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
 
@@ -1109,6 +991,120 @@ const useWorksheet = create<Tworksheet>(
 );
 
 // =====================================================================
+
+// 取得材質選項
+const getOptions_material = (materialArr: TdoorMaterialDto[]) => {
+  const optiions_material = materialArr.map((item) => {
+    return {
+      value: item.name,
+      label: item.name,
+    };
+  });
+
+  return optiions_material ?? [];
+};
+
+// 取得底座角鐵選項與底座版選項
+const getOptions_bottomBarAngleIronAndPlate = (doorModelName: TdoorModel | undefined) => {
+  if (doorModelName && doorModelName in lookup_options_bottomBarAngleIronAndPlate) {
+    const { angleIron, plate } =
+      lookup_options_bottomBarAngleIronAndPlate[
+        doorModelName as keyof typeof lookup_options_bottomBarAngleIronAndPlate
+      ];
+
+    return {
+      options_angleIron: angleIron() ?? [],
+      options_plate: plate() ?? [],
+    };
+  }
+
+  return {
+    options_angleIron: [],
+    options_plate: [],
+  };
+};
+
+// 取得馬達廠商選項
+const getOptions_motorVendor = (motorArr: TdoorMotorDto[]) => {
+  const vendors = motorArr.map((motor) => motor.motorVendor);
+  const theVendors = _.uniq(vendors).filter((vendor) => !!vendor) as string[];
+  const options = theVendors.map((vendor) => {
+    return {
+      value: vendor,
+      label: vendor,
+    };
+  });
+
+  return options;
+};
+
+//取得門軌厚度選項
+const getOptions_guideRailThickness = (guideRailArr: TdoorComponentListDto['guideRails']) => {
+  let thicknessArr = guideRailArr.map((guideRail) => guideRail.thickness);
+  thicknessArr = _.uniq(thicknessArr);
+  const options = thicknessArr.map((thickness) => {
+    return {
+      value: thickness ?? '',
+      label: thickness + 'T',
+    };
+  });
+
+  return options;
+};
+
+// 取得門軌選項
+const getOptions_guideRail = (guideRailArr: TdoorModelInfoDto['guideRails']) => {
+  const options = guideRailArr.map((guideRail) => {
+    const { imgSrc, hasSilencingStrip, opening, thickness, width, withHook } = guideRail;
+
+    return {
+      value: imgSrc,
+      label: '',
+      icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${imgSrc}`,
+      hasSilencingStrip,
+      opening,
+      thickness,
+      width,
+      withHook,
+    };
+  });
+
+  return options;
+};
+
+// 取得門型選項
+const getOptions_doorModelInfo = (
+  doorModelInfoList:
+    | {
+        [key: string]: TdoorModelInfoDto;
+      }
+    | undefined
+) => {
+  const doorModelInfoArr = Object.values(doorModelInfoList ?? {});
+  const options = doorModelInfoArr.map((doorModel) => {
+    const { name } = doorModel;
+
+    return {
+      label: name,
+      value: name,
+      obj: doorModel,
+    };
+  });
+
+  return options;
+};
+
+// 取得配件選項
+const getOptions_accessories = (accessories: TquotationProductAccessoryDto[]) => {
+  const options = accessories.map((acce) => {
+    return {
+      value: acce.name,
+      label: acce.name,
+    };
+  });
+
+  return options;
+};
 
 // 取得馬力選項
 const getOptions_horsepower = (motorArr: TdoorMotorDto[]) => {
