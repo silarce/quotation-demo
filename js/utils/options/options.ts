@@ -21,7 +21,11 @@ interface Toption {
   label: string;
   seriesType?: string;
   icon?: string;
-  [key: string]: string | undefined;
+  grade?: string;
+  zipCode?: string;
+  [key: string]: string | undefined | unknown | object;
+
+  obj?: unknown;
 }
 
 interface ToptionPlus {

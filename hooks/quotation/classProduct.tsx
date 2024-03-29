@@ -128,12 +128,12 @@ import type {
   // TlegacyContractProductDto,
   // TcreateLegacyContractProductDto,
   TdoorComponentListDto,
-  TquotationProductAccessoriesDto,
+  TquotationProductAccessoryDto,
   TgenerateDoorProductBomDto_DoorSpec,
   // TgenerateDoorProductBomDto_ComponentInfo,
   TcreateQuotationProductAccessoriesDto,
   TcreateQuotationProductComponentDto,
-  TquotationProductComponentsDto,
+  TquotationProductComponentDto,
   TquotationProductDto,
   TdoorAccessoryDto,
   TcreateQuotationProductDto,
@@ -201,8 +201,8 @@ type Tprod = {
   // components: TcreateQuotationProductComponentDto[];
   // accessories: TquotationProductAccessoriesDto[];
   // components: TquotationProductComponentsDto[];
-  accessories: (Omit<TquotationProductAccessoriesDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
-  components: (Omit<TquotationProductComponentsDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
+  accessories: (Omit<TquotationProductAccessoryDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
+  components: (Omit<TquotationProductComponentDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
   boxD: string;
   //
   bottomBarAngleIron: string;
@@ -510,7 +510,7 @@ class Class_product {
     this.reRender();
   }
   /**配合apiGetQuotationProducts使用 */
-  creComList_dyna({ componentsArr }: { componentsArr: TquotationProductComponentsDto[] }) {
+  creComList_dyna({ componentsArr }: { componentsArr: TquotationProductComponentDto[] }) {
     const sortedComponent = sortComponent(componentsArr);
 
     const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
@@ -617,7 +617,7 @@ class Class_product {
     this.reRender();
   }
   /**配合apiGetQuotationProducts使用 */
-  creAcceList_dyna({ acceArr }: { acceArr: TquotationProductAccessoriesDto[] }) {
+  creAcceList_dyna({ acceArr }: { acceArr: TquotationProductAccessoryDto[] }) {
     // const optionArr = _.sortBy(this._prodData.accessories, 'order');
     const list: { [key: string]: Class_accessories } = {};
 
