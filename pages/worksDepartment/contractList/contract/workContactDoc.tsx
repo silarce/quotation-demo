@@ -69,27 +69,27 @@ export default function WorkContactDoc() {
 
   // ---------------------------------------------------------------------------
 
-  const reqCreateWorkSheet = async () => {
-    if (!contractId) {
-      return myAlert.info({ title: '無合約id', content: '請回到工務部合約列表再次選擇合約' });
-    }
+  // const reqCreateWorkSheet = async () => {
+  //   if (!contractId) {
+  //     return myAlert.info({ title: '無合約id', content: '請回到工務部合約列表再次選擇合約' });
+  //   }
 
-    try {
-      setIsLoading(true);
-      await apiPostWorkSheet({ contractId });
-      myAlert.success({ title: '產生工作表成功' });
-    } catch (error) {
-      const err = error as Error;
+  //   try {
+  //     setIsLoading(true);
+  //     await apiPostWorkSheet({ contractId });
+  //     myAlert.success({ title: '產生工作表成功' });
+  //   } catch (error) {
+  //     const err = error as Error;
 
-      myAlert.info({ title: '產生工作表失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     myAlert.info({ title: '產生工作表失敗', content: err.message });
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // ----------------------------------------------------------------------------
   const panelList_01: TpanelList = [
-    contract?.worksheetId ? null : { type: 'myButton', label: '產生工作表', onClick: reqCreateWorkSheet },
+    // contract?.worksheetId ? null : { type: 'myButton', label: '產生工作表', onClick: reqCreateWorkSheet },
     { type: 'myButton', label: '編輯聯絡人', onClick: () => ref_workContact.current.setDisabled(false) },
   ];
   const panelList_02: TpanelList = [
