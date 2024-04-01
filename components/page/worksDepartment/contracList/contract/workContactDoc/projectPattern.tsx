@@ -471,7 +471,7 @@ export default function ProjectPattern({
       </div>
       {/* 簽認圖 */}
       <Collapse className={scss.antdCollapse} defaultActiveKey={['detail']}>
-        <Panel header="簽認圖" key="detail" className={scss.panel}>
+        <MyPanel header="簽認圖" key="detail" shouldRender={shouldHasPattern.shouldHasDetail}>
           <Pattern
             patternType={'detail'}
             props={props_detail}
@@ -481,9 +481,9 @@ export default function ProjectPattern({
             reqReviewPattern={reqReviewPattern}
             setReviewConfirm={setReviewConfirm}
           />
-        </Panel>
+        </MyPanel>
         {/* 平面圖 */}
-        <Panel header="平面圖" key="floor" className={scss.panel}>
+        <MyPanel header="平面圖" key="floor" shouldRender={shouldHasPattern.shouldHasFloor}>
           <Pattern
             patternType={'floor'}
             props={props_floor}
@@ -493,9 +493,9 @@ export default function ProjectPattern({
             reqReviewPattern={reqReviewPattern}
             setReviewConfirm={setReviewConfirm}
           />
-        </Panel>
+        </MyPanel>
         {/* 設計圖 */}
-        <Panel header="設計圖" key="design" className={scss.panel}>
+        <MyPanel header="設計圖" key="design" shouldRender={shouldHasPattern.shouldHasDesign}>
           <Pattern
             patternType={'design'}
             props={props_design}
@@ -505,9 +505,9 @@ export default function ProjectPattern({
             reqReviewPattern={reqReviewPattern}
             setReviewConfirm={setReviewConfirm}
           />
-        </Panel>
+        </MyPanel>
         {/* 施工圖 */}
-        <Panel header="施工圖" key="construction" className={scss.panel}>
+        <MyPanel header="施工圖" key="construction" shouldRender={shouldHasPattern.shouldHasConstruction}>
           <Pattern
             patternType={'construction'}
             props={props_construction}
@@ -517,9 +517,9 @@ export default function ProjectPattern({
             reqReviewPattern={reqReviewPattern}
             setReviewConfirm={setReviewConfirm}
           />
-        </Panel>
+        </MyPanel>
         {/* 色卡 */}
-        <Panel header="色卡" key="color" className={scss.panel}>
+        <MyPanel header="色卡" key="color" shouldRender={shouldHasPattern.shouldHasColor}>
           <Pattern
             patternType={'color'}
             props={props_color}
@@ -529,7 +529,7 @@ export default function ProjectPattern({
             reqReviewPattern={reqReviewPattern}
             setReviewConfirm={setReviewConfirm}
           />
-        </Panel>
+        </MyPanel>
       </Collapse>
 
       <MultButtonModal
@@ -655,7 +655,6 @@ const Pattern = ({
   return (
     <div>
       <BtnBar
-        // shouldRender={!!props.fileSrc}
         shouldRender={!!props.fileSrc}
         onSubmitClick={checkAndReturnMethod({
           check: !isDetailSubmit,
@@ -686,6 +685,30 @@ const Pattern = ({
         />
       )}
     </div>
+  );
+};
+
+// -----------------------------------------------------------------------
+
+const MyPanel = ({
+  shouldRender = true,
+  header,
+  key,
+  children,
+}: {
+  shouldRender?: boolean;
+  header: React.ReactNode;
+  key: string;
+  children: React.ReactNode;
+}) => {
+  if (!shouldRender) {
+    return null;
+  }
+
+  return (
+    <Panel header={header} key={key} className={scss.panel}>
+      {children}
+    </Panel>
   );
 };
 
