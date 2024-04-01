@@ -639,21 +639,21 @@ export default function Worksheet({
   // -------------------------------------------------------------------------
 
   let panelList_notAllow: TpanelList = [
-    {
-      type: 'myButton',
-      label: '匯出EXCEL',
-      onClick: () => downloadExcel(control_workSheetPDF_01, `工作表_${control_profile.projectName.value}`),
-    },
-    {
-      type: 'myButton',
-      label: '匯出廠務部工作表',
-      onClick: () => setIsShowPdf02(true),
-    },
-    {
-      type: 'myButton',
-      label: '匯出工作表',
-      onClick: () => setIsShowPdf(true),
-    },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出EXCEL',
+    //   onClick: () => downloadExcel(control_workSheetPDF_01, `工作表_${control_profile.projectName.value}`),
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出廠務部工作表',
+    //   onClick: () => setIsShowPdf02(true),
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '匯出工作表',
+    //   onClick: () => setIsShowPdf(true),
+    // },
     {
       type: 'redButton',
       label: '送審',
@@ -701,7 +701,23 @@ export default function Worksheet({
   }
 
   if (!activeRecordData) {
-    panelList_notAllow = [];
+    panelList_notAllow = [
+      {
+        type: 'myButton',
+        label: '匯出EXCEL',
+        onClick: () => downloadExcel(control_workSheetPDF_01, `工作表_${control_profile.projectName.value}`),
+      },
+      {
+        type: 'myButton',
+        label: '匯出廠務部工作表',
+        onClick: () => setIsShowPdf02(true),
+      },
+      {
+        type: 'myButton',
+        label: '匯出工作表',
+        onClick: () => setIsShowPdf(true),
+      },
+    ];
   }
 
   const panelList_allow: TpanelList = [
