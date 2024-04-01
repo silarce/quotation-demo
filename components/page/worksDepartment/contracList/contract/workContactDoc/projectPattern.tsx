@@ -349,6 +349,13 @@ export default function ProjectPattern({
   const onRemoveClick = (pattern: TpatternType) => {
     myAlert.confirm({
       title: '確定移除?',
+      content: (
+        <span>
+          移除後無法復原
+          <br />
+          重新上傳需要重新審核
+        </span>
+      ),
       props: {
         onOk: () => reqDeletePattern(pattern),
       },
