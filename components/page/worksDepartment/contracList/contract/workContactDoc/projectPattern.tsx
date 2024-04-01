@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import { UploadChangeParam } from 'antd/lib/upload';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
+import ProcessChain, { Tcontrol_processChain, TstatusLabelProps } from 'components/global/gear/processChain';
 
 import scss from './projectPattern.module.scss';
 
@@ -72,15 +72,61 @@ type TpatternReviewProcessGroup = {
   design: TpatternReviewProcess;
 };
 
-export type { ThasPattern, TpatternReviewProcessGroup, TpatternReviewProcess };
+type TpatternReviewStatus = {
+  salesName: string;
+  workerName: string;
+  managerName: string;
+  pattern: {
+    color: {
+      colorToWorkerAt: string | null;
+      colorWorkerReviewedAt: string | null;
+      colorToManagerAt: string | null;
+      colorManagerReviewedAt: string | null;
+    };
+    construction: {
+      constructionToWorkerAt: string | null;
+      constructionWorkerReviewedAt: string | null;
+      constructionToManagerAt: string | null;
+      constructionManagerReviewedAt: string | null;
+    };
+    detail: {
+      detailToWorkerAt: string | null;
+      detailWorkerReviewedAt: string | null;
+      detailToManagerAt: string | null;
+      detailManagerReviewedAt: string | null;
+    };
+    floor: {
+      floorToWorkerAt: string | null;
+      floorWorkerReviewedAt: string | null;
+      floorToManagerAt: string | null;
+      floorManagerReviewedAt: string | null;
+    };
+    design: {
+      designToWorkerAt: string | null;
+      designWorkerReviewedAt: string | null;
+      designToManagerAt: string | null;
+      designManagerReviewedAt: string | null;
+    };
+  };
+};
+
+export type {
+  //
+  ThasPattern,
+  TpatternReviewProcessGroup,
+  TpatternReviewProcess,
+  TpatternReviewStatus,
+};
 
 // =======================================================================
 export default function ProjectPattern({
   engineeringContactId,
   onPatternChange,
+  patternReviewStatus,
 }: {
   engineeringContactId: string | null | undefined;
   onPatternChange: (hasPattern: ThasPattern) => void;
+  patternReviewStatus: TpatternReviewStatus;
 }) {
   const [isUploading, setIsUploading] = useState<TisUploading>({
     floor: false,
@@ -330,6 +376,13 @@ export default function ProjectPattern({
     isImage: checkFileIsImage_str(fileInfo_detail?.mime ?? ''),
     fileName: fileInfo_detail?.name ?? '',
   };
+  // -----------------------------------------------------------------------
+
+  const controlList = useControl_review({
+    patternReviewStatus: patternReviewStatus,
+  });
+
+  // -----------------------------------------------------------------------
 
   return (
     <div className={scss.container}>
@@ -388,22 +441,67 @@ export default function ProjectPattern({
               }}
             />
             <ImageDragger {...props_detail} />
+
+            {controlList.isDetailSubmit && (
+              <ProcessChain
+                className="mt-5"
+                control={{
+                  statusArr: controlList.detail,
+                }}
+              />
+            )}
           </div>
         </Panel>
         <Panel header="平面圖" key="floor" className={scss.panel}>
           <div>
             <BtnBar />
             <ImageDragger {...props_floor} />
+
+            {controlList.isFloorSubmit && (
+              <ProcessChain
+                className="mt-5"
+                control={{
+                  statusArr: controlList.floor,
+                }}
+              />
+            )}
           </div>
         </Panel>
         <Panel header="設計圖" key="design" className={scss.panel}>
           <ImageDragger {...props_design} />
+
+          {controlList.isDesignSubmit && (
+            <ProcessChain
+              className="mt-5"
+              control={{
+                statusArr: controlList.design,
+              }}
+            />
+          )}
         </Panel>
         <Panel header="施工圖" key="construction" className={scss.panel}>
           <ImageDragger {...props_construction} />
+
+          {controlList.isConstructionSubmit && (
+            <ProcessChain
+              className="mt-5"
+              control={{
+                statusArr: controlList.construction,
+              }}
+            />
+          )}
         </Panel>
         <Panel header="色卡" key="color" className={scss.panel}>
           <ImageDragger {...props_color} />
+
+          {controlList.isColorSubmit && (
+            <ProcessChain
+              className="mt-5"
+              control={{
+                statusArr: controlList.color,
+              }}
+            />
+          )}
         </Panel>
       </Collapse>
     </div>
@@ -467,6 +565,134 @@ const BtnBar = ({ onReviewClick, onSubmitClick }: { onReviewClick?: () => void; 
       </MyButton_v2>
     </div>
   );
+};
+
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+
+const useControl_review = ({ patternReviewStatus }: { patternReviewStatus: TpatternReviewStatus }) => {
+  const controlList = useMemo(() => {
+    const { salesName, workerName, managerName, pattern } = patternReviewStatus;
+
+    const {
+      color: { colorToWorkerAt, colorWorkerReviewedAt, colorToManagerAt, colorManagerReviewedAt },
+      construction: {
+        constructionToWorkerAt,
+        constructionWorkerReviewedAt,
+        constructionToManagerAt,
+        constructionManagerReviewedAt,
+      },
+      detail: { detailToWorkerAt, detailWorkerReviewedAt, detailToManagerAt, detailManagerReviewedAt },
+      floor: { floorToWorkerAt, floorWorkerReviewedAt, floorToManagerAt, floorManagerReviewedAt },
+      design: { designToWorkerAt, designWorkerReviewedAt, designToManagerAt, designManagerReviewedAt },
+    } = pattern;
+
+    const checkStatus = ({ toAt, reviewedAt }: { toAt: string | null; reviewedAt: string | null }) => {
+      if (reviewedAt) {
+        return 'green';
+      } else if (toAt) {
+        return 'red';
+      } else {
+        return 'gray';
+      }
+    };
+
+    const statusArr_design: TstatusLabelProps[] = [
+      {
+        label: `業務 ${salesName}`,
+        dotColor: 'green',
+      },
+      {
+        label: `工務主管 ${workerName}`,
+        dotColor: checkStatus({
+          toAt: designToWorkerAt,
+          reviewedAt: designWorkerReviewedAt,
+        }),
+      },
+      {
+        label: `經理 ${managerName}`,
+        dotColor: checkStatus({
+          toAt: designToManagerAt,
+          reviewedAt: designManagerReviewedAt,
+        }),
+      },
+    ];
+
+    const statusArr_floor: TstatusLabelProps[] = [
+      { label: `業務 ${salesName}`, dotColor: 'green' },
+      {
+        label: `工務主管 ${workerName}`,
+        dotColor: checkStatus({ toAt: floorToWorkerAt, reviewedAt: floorWorkerReviewedAt }),
+      },
+      {
+        label: `經理 ${managerName}`,
+        dotColor: checkStatus({ toAt: floorToManagerAt, reviewedAt: floorManagerReviewedAt }),
+      },
+    ];
+
+    const statusArr_color: TstatusLabelProps[] = [
+      { label: `業務 ${salesName}`, dotColor: 'green' },
+      {
+        label: `工務主管 ${workerName}`,
+        dotColor: checkStatus({ toAt: colorToWorkerAt, reviewedAt: colorWorkerReviewedAt }),
+      },
+      {
+        label: `經理 ${managerName}`,
+        dotColor: checkStatus({ toAt: colorToManagerAt, reviewedAt: colorManagerReviewedAt }),
+      },
+    ];
+
+    const statusArr_construction: TstatusLabelProps[] = [
+      { label: `業務 ${salesName}`, dotColor: 'green' },
+      {
+        label: `工務主管 ${workerName}`,
+        dotColor: checkStatus({
+          toAt: constructionToWorkerAt,
+          reviewedAt: constructionWorkerReviewedAt,
+        }),
+      },
+      {
+        label: `經理 ${managerName}`,
+        dotColor: checkStatus({
+          toAt: constructionToManagerAt,
+          reviewedAt: constructionManagerReviewedAt,
+        }),
+      },
+    ];
+
+    const statusArr_detail: TstatusLabelProps[] = [
+      { label: `業務 ${salesName}`, dotColor: 'green' },
+      {
+        label: `工務主管 ${workerName}`,
+        dotColor: checkStatus({ toAt: detailToWorkerAt, reviewedAt: detailWorkerReviewedAt }),
+      },
+      {
+        label: `經理 ${managerName}`,
+        dotColor: checkStatus({ toAt: detailToManagerAt, reviewedAt: detailManagerReviewedAt }),
+      },
+    ];
+
+    return {
+      color: statusArr_color,
+      construction: statusArr_construction,
+      detail: statusArr_detail,
+      floor: statusArr_floor,
+      design: statusArr_design,
+
+      isColorSubmit: !!colorToWorkerAt,
+      isConstructionSubmit: !!constructionToWorkerAt,
+      isDetailSubmit: !!detailToWorkerAt,
+      isFloorSubmit: !!floorToWorkerAt,
+      isDesignSubmit: !!designToWorkerAt,
+    };
+
+    //
+  }, [patternReviewStatus]);
+
+  return controlList;
 };
 
 // ==================================================

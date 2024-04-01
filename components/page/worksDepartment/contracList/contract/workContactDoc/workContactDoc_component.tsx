@@ -16,6 +16,7 @@ import ProjectPattern, {
   ThasPattern,
   TpatternReviewProcessGroup,
   TpatternReviewProcess,
+  TpatternReviewStatus,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
 
 // gear
@@ -243,36 +244,74 @@ function PreWorkContactDoc_component(
     });
   }, [engineeringContact]);
 
-  const foo = useMemo(() => {
+  const patternReviewStatus: TpatternReviewStatus = useMemo(() => {
     const {
       reviewWorkerEmployee,
       reviewManagerEmployee,
 
-      detailToWorkerAt,
-      detailWorkerReviewedAt,
-      detailToManagerAt,
-      detailManagerReviewedAt,
+      detailToWorkerAt = null,
+      detailWorkerReviewedAt = null,
+      detailToManagerAt = null,
+      detailManagerReviewedAt = null,
 
-      designToWorkerAt,
-      designWorkerReviewedAt,
-      designToManagerAt,
-      designManagerReviewedAt,
+      designToWorkerAt = null,
+      designWorkerReviewedAt = null,
+      designToManagerAt = null,
+      designManagerReviewedAt = null,
 
-      floorToWorkerAt,
-      floorWorkerReviewedAt,
-      floorToManagerAt,
-      floorManagerReviewedAt,
+      floorToWorkerAt = null,
+      floorWorkerReviewedAt = null,
+      floorToManagerAt = null,
+      floorManagerReviewedAt = null,
 
-      constructionToWorkerAt,
-      constructionWorkerReviewedAt,
-      constructionToManagerAt,
-      constructionManagerReviewedAt,
+      constructionToWorkerAt = null,
+      constructionWorkerReviewedAt = null,
+      constructionToManagerAt = null,
+      constructionManagerReviewedAt = null,
 
-      colorToWorkerAt,
-      colorWorkerReviewedAt,
-      colorToManagerAt,
-      colorManagerReviewedAt,
+      colorToWorkerAt = null,
+      colorWorkerReviewedAt = null,
+      colorToManagerAt = null,
+      colorManagerReviewedAt = null,
     } = engineeringContact ?? {};
+
+    return {
+      salesName: contract?.content.reviewSalesEmployee?.chName ?? '',
+      workerName: reviewWorkerEmployee?.chName ?? '',
+      managerName: reviewManagerEmployee?.chName ?? '',
+      pattern: {
+        color: {
+          colorToWorkerAt,
+          colorWorkerReviewedAt,
+          colorToManagerAt,
+          colorManagerReviewedAt,
+        },
+        construction: {
+          constructionToWorkerAt,
+          constructionWorkerReviewedAt,
+          constructionToManagerAt,
+          constructionManagerReviewedAt,
+        },
+        detail: {
+          detailToWorkerAt,
+          detailWorkerReviewedAt,
+          detailToManagerAt,
+          detailManagerReviewedAt,
+        },
+        floor: {
+          floorToWorkerAt,
+          floorWorkerReviewedAt,
+          floorToManagerAt,
+          floorManagerReviewedAt,
+        },
+        design: {
+          designToWorkerAt,
+          designWorkerReviewedAt,
+          designToManagerAt,
+          designManagerReviewedAt,
+        },
+      },
+    };
   }, [engineeringContact]);
 
   // ---------------------------------------------------------------------------
@@ -737,7 +776,11 @@ function PreWorkContactDoc_component(
         </div>
         {/* 工程圖表資料 */}
         <div className={classNames(!isShowPattern && 'hidden')}>
-          <ProjectPattern engineeringContactId={engineeringContactId} onPatternChange={onPatternChange} />
+          <ProjectPattern
+            engineeringContactId={engineeringContactId}
+            onPatternChange={onPatternChange}
+            patternReviewStatus={patternReviewStatus}
+          />
         </div>
       </div>
 
