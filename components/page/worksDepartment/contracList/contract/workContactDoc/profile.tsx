@@ -125,16 +125,9 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
             {...inputStyle01}
           />
           <div className={classNames(scss.projectPatternBtnBox)}>
-            <div className={scss.inputSelBox} onClick={controll.projectPattern.onCaptionClick}>
-              <InputSel
-                className={scss.inputSel}
-                disabled={projectContent.disabled || disabled}
-                label="工程圖表資料"
-                // inputProps={{ ...projectContent }}
-                {...inputStyle01}
-                captionWidth={'110px'}
-              />
-            </div>
+            <button className={scss.btn} onClick={controll.projectPattern.onCaptionClick}>
+              <span>工程圖表資料</span>
+            </button>
 
             <div className={scss.statusBar}>
               {controll.projectPattern.statusArr.map((item, index) => {
