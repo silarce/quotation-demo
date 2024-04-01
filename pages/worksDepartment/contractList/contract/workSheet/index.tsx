@@ -465,14 +465,14 @@ export default function Worksheet({
         const height_m = new Decimal(contractProductItem?.height ?? 0).div(1000).toString();
 
         let reviewStatus: TworksheetIntro['reviewStatus'] = {
-          label: `業務 ${reviewSalesEmployee?.chName ?? ''}`, // 後端沒給reviewSalesEmployee，先應急處理
+          label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
           dotColor: salesReviewAt ? 'green' : toReviewSales ? 'red' : 'gray',
         };
 
-        if (managerReviewAt) {
+        if (toReviewManager) {
           reviewStatus = {
             label: `總經理 ${reviewManagerEmployee?.chName}`,
-            dotColor: 'green',
+            dotColor: managerReviewAt ? 'green' : 'red',
           };
         }
 
