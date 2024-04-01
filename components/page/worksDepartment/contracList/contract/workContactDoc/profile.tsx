@@ -11,6 +11,8 @@ import AddressBar, {
   TaddressProps,
   TinputSelProps_noProps,
 } from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+// import StatusLabel, { TstatusLabelProps } from './button/statusLabel';
+import StatusLabel from 'components/global/gear/button/statusLabel';
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
@@ -142,18 +144,26 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
                 const status = haveData ? 'success' : 'error';
 
                 return (
-                  <label key={index}>
-                    <Checkbox
-                      checked={shouldHaveData}
-                      onChange={(e) => {
-                        onCheck(e.target.checked);
-                      }}
-                      disabled={disabled || controll.projectPattern.disabled}
+                  <div key={index}>
+                    <label className={scss.label}>
+                      <Checkbox
+                        checked={shouldHaveData}
+                        onChange={(e) => {
+                          onCheck(e.target.checked);
+                        }}
+                        disabled={disabled || controll.projectPattern.disabled}
+                      />
+                      <span>
+                        <Badge status={status} text={label} dot={true} />
+                      </span>
+                    </label>
+                    <StatusLabel
+                      label={`總經理 XXX`}
+                      dotColor="green"
+                      className={'mt-2'}
+                      // className={scss.status}
                     />
-                    <span>
-                      <Badge status={status} text={label} dot={true} />
-                    </span>
-                  </label>
+                  </div>
                 );
               })}
             </div>

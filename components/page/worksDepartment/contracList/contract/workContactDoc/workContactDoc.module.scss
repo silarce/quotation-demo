@@ -7,7 +7,7 @@
   padding: 40px 50px;
 
   .leftBlock {
-    width: 800px;
+    width: 900px;
     .leftUpBlock {
       margin-top: 24px;
       display: grid;
@@ -120,11 +120,24 @@
     align-items: center;
     gap: 15px;
 
-    > label {
+    span {
+      font-size: 18px;
+    }
+
+    .label {
       display: flex;
       gap: 5px;
       cursor: pointer;
     }
+    // .status {
+    //   > div {
+    //     // width: 7px;
+    //     // height: 7px;
+    //   }
+    //   > span {
+    //     // font-size: 14px;
+    //   }
+    // }
   }
 }
 

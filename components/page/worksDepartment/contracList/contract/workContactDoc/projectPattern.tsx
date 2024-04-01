@@ -11,7 +11,6 @@ import {
   Upload,
   Image as AntdImage,
   Spin,
-  CollapsePanelProps,
 } from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload';
 
