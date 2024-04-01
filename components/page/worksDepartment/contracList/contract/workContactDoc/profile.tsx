@@ -11,6 +11,7 @@ import AddressBar, {
   TaddressProps,
   TinputSelProps_noProps,
 } from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+import StatusLabel, { TstatusLabelProps } from 'components/global/gear/button/statusLabel';
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
@@ -35,7 +36,10 @@ type TprojectPatternStatus = {
   haveData: boolean; // Badge status
   shouldHaveData: boolean; // checkBoxValue
   onCheck: (bool: boolean) => void;
-  // onLabelClick: () => void;
+  reviewStatus: {
+    label: TstatusLabelProps['label'];
+    dotColor: TstatusLabelProps['dotColor'];
+  };
 };
 
 type Tcontroll = {
@@ -81,7 +85,7 @@ type Tcontroll = {
   };
 };
 
-export type { Tcontroll };
+export type { Tcontroll, TprojectPatternStatus };
 
 // ==================================================
 export default function Profile({ disabled, controll }: { disabled?: boolean; controll: Tcontroll }) {
@@ -123,37 +127,40 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
             {...inputStyle01}
           />
           <div className={classNames(scss.projectPatternBtnBox)}>
-            <div className={scss.inputSelBox} onClick={controll.projectPattern.onCaptionClick}>
-              <InputSel
-                className={scss.inputSel}
-                disabled={projectContent.disabled || disabled}
-                label="工程圖表資料"
-                // inputProps={{ ...projectContent }}
-                {...inputStyle01}
-                captionWidth={'110px'}
-              />
-            </div>
+            <button className={scss.btn} onClick={controll.projectPattern.onCaptionClick}>
+              <span>工程圖表資料</span>
+            </button>
 
             <div className={scss.statusBar}>
               {controll.projectPattern.statusArr.map((item, index) => {
-                const { haveData, shouldHaveData, onCheck } = item;
+                const { haveData, shouldHaveData, onCheck, reviewStatus } = item;
                 let label = item.label;
                 label = shouldHaveData ? label : `此案無${label}`;
                 const status = haveData ? 'success' : 'error';
 
                 return (
-                  <label key={index}>
-                    <Checkbox
-                      checked={shouldHaveData}
-                      onChange={(e) => {
-                        onCheck(e.target.checked);
-                      }}
-                      disabled={disabled || controll.projectPattern.disabled}
-                    />
-                    <span>
-                      <Badge status={status} text={label} dot={true} />
-                    </span>
-                  </label>
+                  <div key={index}>
+                    <label className={scss.label}>
+                      <Checkbox
+                        checked={shouldHaveData}
+                        onChange={(e) => {
+                          onCheck(e.target.checked);
+                        }}
+                        disabled={disabled || controll.projectPattern.disabled}
+                      />
+                      <span>
+                        <Badge status={status} text={label} dot={true} />
+                      </span>
+                    </label>
+                    {shouldHaveData && (
+                      <StatusLabel
+                        label={reviewStatus.label}
+                        dotColor={reviewStatus.dotColor}
+                        className={'mt-2'}
+                        // className={scss.status}
+                      />
+                    )}
+                  </div>
                 );
               })}
             </div>

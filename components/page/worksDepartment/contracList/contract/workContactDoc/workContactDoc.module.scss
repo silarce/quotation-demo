@@ -7,7 +7,7 @@
   padding: 40px 50px;
 
   .leftBlock {
-    width: 800px;
+    width: 1000px;
     .leftUpBlock {
       margin-top: 24px;
       display: grid;
@@ -103,28 +103,42 @@
 .projectPatternBtnBox {
   display: flex;
   justify-content: flex-start;
+  align-items: center;
   gap: 18px;
-  .inputSelBox {
+  .btn {
+    height: fit-content;
     border: solid 1px black;
     border-radius: 5px;
     padding: 5px;
-
-    .inputSel {
-      cursor: pointer;
-      width: unset;
+    span {
+      font-size: 18px;
+      color: theme("colors.main");
     }
   }
 
   .statusBar {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 15px;
 
-    > label {
+    span {
+      font-size: 18px;
+    }
+
+    .label {
       display: flex;
       gap: 5px;
       cursor: pointer;
     }
+    // .status {
+    //   > div {
+    //     // width: 7px;
+    //     // height: 7px;
+    //   }
+    //   > span {
+    //     // font-size: 14px;
+    //   }
+    // }
   }
 }
 

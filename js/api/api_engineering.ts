@@ -49,6 +49,9 @@ import type {
   TaccountsReceivableProductPaymentDto,
   TcreateAccountReceivableProductPaymentDto,
   TupdateAccountReceivableProductPaymentDto,
+  TsubmitEngineeringContactDto,
+  TengineeringContactAttachmentType,
+  TreviewEngineeringContactDto,
 } from './dtoTypes';
 
 export type {
@@ -90,16 +93,15 @@ export type {
   TcreateAccountReceivableProductPaymentDto,
   TupdateAccountReceivableProductPaymentDto,
   TcreateWorksheetDto,
+  TsubmitEngineeringContactDto,
+  TengineeringContactAttachmentType,
+  TreviewEngineeringContactDto,
 } from './dtoTypes';
-
-type TengineeringContactAttachmentType = 'floor' | 'detail' | 'color' | 'construction' | 'design';
 
 type TgetEngineeringContact = {
   data: TengineeringContactDto[];
   meta: TpageMetaDto;
 };
-
-export type { TengineeringContactAttachmentType };
 
 // ===========================================================================]
 
@@ -107,8 +109,12 @@ export type { TengineeringContactAttachmentType };
 export const apiGetEngineeringContact = async (id: string) => {
   const api = `/engineering/engineering-contact/${id}`;
 
+  const params = {
+    populate: ['reviewWorkerEmployee', 'reviewManagerEmployee'],
+  };
+
   return axi
-    .get<TengineeringContactDto>(api)
+    .get<TengineeringContactDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1537,4 +1543,32 @@ export const useEngineeringContactAttachments = (id: string | undefined | null) 
     update,
     updateAll,
   };
+};
+
+// 送審工程聯絡單附件
+export const apiPatchEngineeringContactSubmitAttachment = async (id: string, body: TsubmitEngineeringContactDto) => {
+  const api = `/engineering/engineering-contact/${id}/submit-attachment/`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '送審工程聯絡單附件失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 審核工程聯絡單附件
+export const apiPatchEngineeringContactReviewAttachment = async (id: string, body: TreviewEngineeringContactDto) => {
+  const api = `/engineering/engineering-contact/${id}/review-attachment/`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '審核工程聯絡單附件失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };

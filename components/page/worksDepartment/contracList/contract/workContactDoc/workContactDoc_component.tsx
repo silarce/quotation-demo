@@ -10,10 +10,14 @@ import classNames from 'classnames';
 // component
 import Profile, {
   Tcontroll as Tcontroll_profile,
+  TprojectPatternStatus,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import ProjectPattern, {
   ThasPattern,
+  TpatternReviewProcessGroup,
+  TpatternReviewProcess,
+  TpatternReviewStatus,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
 
 // gear
@@ -241,6 +245,76 @@ function PreWorkContactDoc_component(
     });
   }, [engineeringContact]);
 
+  const patternReviewStatus: TpatternReviewStatus = useMemo(() => {
+    const {
+      reviewWorkerEmployee,
+      reviewManagerEmployee,
+
+      detailToWorkerAt = null,
+      detailWorkerReviewedAt = null,
+      detailToManagerAt = null,
+      detailManagerReviewedAt = null,
+
+      designToWorkerAt = null,
+      designWorkerReviewedAt = null,
+      designToManagerAt = null,
+      designManagerReviewedAt = null,
+
+      floorToWorkerAt = null,
+      floorWorkerReviewedAt = null,
+      floorToManagerAt = null,
+      floorManagerReviewedAt = null,
+
+      constructionToWorkerAt = null,
+      constructionWorkerReviewedAt = null,
+      constructionToManagerAt = null,
+      constructionManagerReviewedAt = null,
+
+      colorToWorkerAt = null,
+      colorWorkerReviewedAt = null,
+      colorToManagerAt = null,
+      colorManagerReviewedAt = null,
+    } = engineeringContact ?? {};
+
+    return {
+      salesName: contract?.content.reviewSalesEmployee?.chName ?? '',
+      workerName: reviewWorkerEmployee?.chName ?? '',
+      managerName: reviewManagerEmployee?.chName ?? '',
+      pattern: {
+        color: {
+          colorToWorkerAt,
+          colorWorkerReviewedAt,
+          colorToManagerAt,
+          colorManagerReviewedAt,
+        },
+        construction: {
+          constructionToWorkerAt,
+          constructionWorkerReviewedAt,
+          constructionToManagerAt,
+          constructionManagerReviewedAt,
+        },
+        detail: {
+          detailToWorkerAt,
+          detailWorkerReviewedAt,
+          detailToManagerAt,
+          detailManagerReviewedAt,
+        },
+        floor: {
+          floorToWorkerAt,
+          floorWorkerReviewedAt,
+          floorToManagerAt,
+          floorManagerReviewedAt,
+        },
+        design: {
+          designToWorkerAt,
+          designWorkerReviewedAt,
+          designToManagerAt,
+          designManagerReviewedAt,
+        },
+      },
+    };
+  }, [engineeringContact]);
+
   // ---------------------------------------------------------------------------
 
   const [profile, setProfile] = useState<Tprofile>();
@@ -462,6 +536,14 @@ function PreWorkContactDoc_component(
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'detail');
           },
+          reviewStatus: checkStatus({
+            workerName: engineeringContact?.reviewWorkerEmployee?.chName ?? '',
+            managerName: engineeringContact?.reviewManagerEmployee?.chName ?? '',
+            toWorkerAt: engineeringContact?.detailToWorkerAt,
+            workerReviewedAt: engineeringContact?.detailWorkerReviewedAt,
+            toManagerAt: engineeringContact?.detailToManagerAt,
+            managerReviewedAt: engineeringContact?.detailManagerReviewedAt,
+          }),
         },
         {
           label: '平面圖',
@@ -470,6 +552,14 @@ function PreWorkContactDoc_component(
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'floor');
           },
+          reviewStatus: checkStatus({
+            workerName: engineeringContact?.reviewWorkerEmployee?.chName ?? '',
+            managerName: engineeringContact?.reviewManagerEmployee?.chName ?? '',
+            toWorkerAt: engineeringContact?.floorToWorkerAt,
+            workerReviewedAt: engineeringContact?.floorWorkerReviewedAt,
+            toManagerAt: engineeringContact?.floorToManagerAt,
+            managerReviewedAt: engineeringContact?.floorManagerReviewedAt,
+          }),
         },
         {
           label: '設計圖',
@@ -478,14 +568,30 @@ function PreWorkContactDoc_component(
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'design');
           },
+          reviewStatus: checkStatus({
+            workerName: engineeringContact?.reviewWorkerEmployee?.chName ?? '',
+            managerName: engineeringContact?.reviewManagerEmployee?.chName ?? '',
+            toWorkerAt: engineeringContact?.designToWorkerAt,
+            workerReviewedAt: engineeringContact?.designWorkerReviewedAt,
+            toManagerAt: engineeringContact?.designToManagerAt,
+            managerReviewedAt: engineeringContact?.designManagerReviewedAt,
+          }),
         },
         {
-          label: '工程圖',
+          label: '施工圖',
           haveData: hasPattern.hasConstruction,
           shouldHaveData: shouldHasPattern.construction,
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'construction');
           },
+          reviewStatus: checkStatus({
+            workerName: engineeringContact?.reviewWorkerEmployee?.chName ?? '',
+            managerName: engineeringContact?.reviewManagerEmployee?.chName ?? '',
+            toWorkerAt: engineeringContact?.constructionToWorkerAt,
+            workerReviewedAt: engineeringContact?.constructionWorkerReviewedAt,
+            toManagerAt: engineeringContact?.constructionToManagerAt,
+            managerReviewedAt: engineeringContact?.constructionManagerReviewedAt,
+          }),
         },
         {
           label: '色卡',
@@ -494,6 +600,14 @@ function PreWorkContactDoc_component(
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'color');
           },
+          reviewStatus: checkStatus({
+            workerName: engineeringContact?.reviewWorkerEmployee?.chName ?? '',
+            managerName: engineeringContact?.reviewManagerEmployee?.chName ?? '',
+            toWorkerAt: engineeringContact?.colorToWorkerAt,
+            workerReviewedAt: engineeringContact?.colorWorkerReviewedAt,
+            toManagerAt: engineeringContact?.colorToManagerAt,
+            managerReviewedAt: engineeringContact?.colorManagerReviewedAt,
+          }),
         },
       ],
     },
@@ -703,7 +817,21 @@ function PreWorkContactDoc_component(
         </div>
         {/* 工程圖表資料 */}
         <div className={classNames(!isShowPattern && 'hidden')}>
-          <ProjectPattern engineeringContactId={engineeringContactId} onPatternChange={onPatternChange} />
+          <ProjectPattern
+            engineeringContactId={engineeringContactId}
+            onPatternChange={onPatternChange}
+            patternReviewStatus={patternReviewStatus}
+            onSubmitSuccess={update_engineeringContact}
+            onReviewSuccess={update_engineeringContact}
+            onDeleteSuccess={update_engineeringContact}
+            shouldHasPattern={{
+              shouldHasColor: !!engineeringContact?.shouldHasColor,
+              shouldHasConstruction: !!engineeringContact?.shouldHasConstruction,
+              shouldHasDetail: !!engineeringContact?.shouldHasDetail,
+              shouldHasFloor: !!engineeringContact?.shouldHasFloor,
+              shouldHasDesign: !!engineeringContact?.shouldHasDesign,
+            }}
+          />
         </div>
       </div>
 
@@ -718,5 +846,62 @@ function PreWorkContactDoc_component(
     </div>
   );
 }
+
+const checkStatus = ({
+  //
+  workerName,
+  managerName,
+  toWorkerAt,
+  workerReviewedAt,
+  toManagerAt,
+  managerReviewedAt,
+}: {
+  workerName: string;
+  managerName: string;
+  toWorkerAt: string | null | undefined;
+  workerReviewedAt: string | null | undefined;
+  toManagerAt: string | null | undefined;
+  managerReviewedAt: string | null | undefined;
+}) => {
+  let label: TprojectPatternStatus['reviewStatus']['label'] = `未送審`;
+  let dotColor: TprojectPatternStatus['reviewStatus']['dotColor'] = 'gray';
+
+  if (managerReviewedAt || toManagerAt) {
+    label = `總經理 ${managerName}`;
+
+    if (managerReviewedAt) {
+      dotColor = 'green';
+    } else {
+      dotColor = 'red';
+    }
+  } else if (workerReviewedAt || toWorkerAt) {
+    label = `工務 ${workerName}`;
+
+    if (workerReviewedAt) {
+      dotColor = 'green';
+    } else {
+      dotColor = 'red';
+    }
+  }
+
+  return {
+    label,
+    dotColor,
+  };
+
+  // if (managerReviewedAt || workerReviewedAt) {
+  //   dot = 'green';
+  // } else if (toManagerAt || toWorkerAt) {
+  //   dot = 'red';
+  // }
+
+  // if (reviewedAt) {
+  //   return 'green';
+  // } else if (toAt) {
+  //   return 'red';
+  // } else {
+  //   return 'gray';
+  // }
+};
 
 export default WorkContactDoc_component;
