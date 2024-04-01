@@ -57,20 +57,20 @@ import {
   WorksheetTable,
 } from 'components/page/worksDepartment/worksheet/productForm/productForm';
 
-import WorkSheetProductOutline, {
-  Tcontrol_productOutline,
-  ToldProductOutline,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
-import WorkSheetProductDetail01, {
-  Tcontrol_detail,
-  Tcontrol_ABCD,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
-import WorkSheetOptional, {
-  Tcontrol_optional,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
-import WorkSheetProductDetail02, {
-  Tcontrol_detail02,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
+// import WorkSheetProductOutline, {
+//   Tcontrol_productOutline,
+//   ToldProductOutline,
+// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
+// import WorkSheetProductDetail01, {
+//   Tcontrol_detail,
+//   Tcontrol_ABCD,
+// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
+// import WorkSheetOptional, {
+//   Tcontrol_optional,
+// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
+// import WorkSheetProductDetail02, {
+//   Tcontrol_detail02,
+// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
 import WorkSheetPDF, {
   Tcontrol_workSheetPDF_01,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
@@ -123,7 +123,7 @@ import type {
   TengineeringContactDto,
   TquotationProductItemDto,
   TerpFeatureDto,
-  TworksheetDto_legacy,
+  // TworksheetDto_legacy,
   TquotationProductAccessoryDto,
   TworksheetRecordDto,
   TquotationProductComponentDto,
@@ -192,7 +192,6 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  // const [activeRecord, setActiveRecord] = useState<TworksheetDto['records'][number] | undefined>(undefined);
   const [activeRecordId, setActiveRecordId] = useState<string | undefined>(undefined);
   const [isLastestRecord, setIsLastestRecord] = useState<boolean>(false);
 
@@ -210,7 +209,6 @@ export default function Worksheet({
       //
       'content.customer',
       'engineeringContact',
-      // 'worksheet.records',
       'worksheet.latestRecord.reviewSalesEmployee',
       'worksheet.latestRecord.reviewManagerEmployee',
       'worksheet.latestRecord.contractProductItems.components',
@@ -222,7 +220,6 @@ export default function Worksheet({
     ],
   });
   const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
-  const { res: doorModelArr, update: update_doorModelArr, doorModelList } = useApiGetProdDoorModels();
   const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
 
   // ________________________________________________________________________
@@ -372,7 +369,6 @@ export default function Worksheet({
         //
         update_contract(),
         update_finalProduce(),
-        update_doorModelArr(),
       ]);
       setIsLoading(false);
     })();
@@ -551,12 +547,7 @@ export default function Worksheet({
 
     return { control_productCardArr, latestRecordArr };
     //
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    finalProduct,
-    // activeWorksheetId
-    worksheetData,
-  ]);
+  }, [activeWorksheetId, finalProduct, worksheetArr]);
 
   // ___________________________________________________________________________
   // ___________________________________________________________________________
@@ -890,7 +881,6 @@ const WorksheetForm = ({
 
 // ===========================================================================
 // ===========================================================================
-
 // ============================================================================
 
 /**
