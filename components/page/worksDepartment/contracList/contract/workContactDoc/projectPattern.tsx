@@ -145,6 +145,8 @@ export default function ProjectPattern({
   onReviewSuccess,
   onDeleteSuccess,
   shouldHasPattern,
+  isReviewer_worker,
+  isReviewer_manager,
 }: {
   engineeringContactId: string | null | undefined;
   onPatternChange: (hasPattern: ThasPattern) => void;
@@ -153,7 +155,10 @@ export default function ProjectPattern({
   onReviewSuccess: () => void;
   onDeleteSuccess: () => void;
   shouldHasPattern: TshouldHasPattern;
+  isReviewer_worker: boolean;
+  isReviewer_manager: boolean;
 }) {
+  // -----------------------------------------------------------------------
   const [isUploading, setIsUploading] = useState<TisUploading>({
     floor: false,
     detail: false,
@@ -442,6 +447,8 @@ export default function ProjectPattern({
 
   const controlList = useControl_review({
     patternReviewStatus: patternReviewStatus,
+    isReviewer_worker,
+    isReviewer_manager,
   });
 
   // -----------------------------------------------------------------------
@@ -492,6 +499,7 @@ export default function ProjectPattern({
               patternType={'detail'}
               props={props_detail}
               isDetailSubmit={!!controlList.isDetailSubmit}
+              isReviewer={controlList.isReviewer_detail}
               statusArr={controlList.detail}
               confirmReqSubmitPattern={confirmReqSubmitPattern}
               reqReviewPattern={reqReviewPattern}
@@ -507,6 +515,7 @@ export default function ProjectPattern({
               patternType={'floor'}
               props={props_floor}
               isDetailSubmit={!!controlList.isFloorSubmit}
+              isReviewer={controlList.isReviewer_floor}
               statusArr={controlList.floor}
               confirmReqSubmitPattern={confirmReqSubmitPattern}
               reqReviewPattern={reqReviewPattern}
@@ -522,6 +531,7 @@ export default function ProjectPattern({
               patternType={'design'}
               props={props_design}
               isDetailSubmit={!!controlList.isDesignSubmit}
+              isReviewer={controlList.isReviewer_design}
               statusArr={controlList.design}
               confirmReqSubmitPattern={confirmReqSubmitPattern}
               reqReviewPattern={reqReviewPattern}
@@ -537,6 +547,7 @@ export default function ProjectPattern({
               patternType={'construction'}
               props={props_construction}
               isDetailSubmit={!!controlList.isConstructionSubmit}
+              isReviewer={controlList.isReviewer_construction}
               statusArr={controlList.construction}
               confirmReqSubmitPattern={confirmReqSubmitPattern}
               reqReviewPattern={reqReviewPattern}
@@ -552,6 +563,7 @@ export default function ProjectPattern({
               patternType={'color'}
               props={props_color}
               isDetailSubmit={!!controlList.isColorSubmit}
+              isReviewer={controlList.isReviewer_color}
               statusArr={controlList.color}
               confirmReqSubmitPattern={confirmReqSubmitPattern}
               reqReviewPattern={reqReviewPattern}
@@ -669,6 +681,7 @@ const Pattern = ({
   props,
   isDetailSubmit,
   statusArr,
+  isReviewer,
   confirmReqSubmitPattern,
   reqReviewPattern,
   setReviewConfirm,
@@ -676,6 +689,7 @@ const Pattern = ({
   patternType: TpatternType;
   props: Parameters<typeof ImageDragger>[0];
   isDetailSubmit: boolean;
+  isReviewer: boolean;
   confirmReqSubmitPattern: (patternType: TpatternType) => void;
   reqReviewPattern: (props: { attachmentType: string; isPass: boolean }) => void;
   setReviewConfirm: (confirm: (isPass: boolean) => void) => void;
@@ -690,7 +704,7 @@ const Pattern = ({
           method: () => confirmReqSubmitPattern(patternType),
         })}
         onReviewClick={checkAndReturnMethod({
-          check: isDetailSubmit,
+          check: isDetailSubmit && isReviewer,
           method: () => {
             const theReviewconfirm = (isPass: boolean) => {
               reqReviewPattern({
@@ -725,8 +739,22 @@ const Pattern = ({
 // ======================================================================
 // ======================================================================
 
-const useControl_review = ({ patternReviewStatus }: { patternReviewStatus: TpatternReviewStatus }) => {
+const useControl_review = ({
+  isReviewer_worker,
+  isReviewer_manager,
+  patternReviewStatus,
+}: {
+  patternReviewStatus: TpatternReviewStatus;
+  isReviewer_worker: boolean;
+  isReviewer_manager: boolean;
+}) => {
   const controlList = useMemo(() => {
+    let isReviewer_design = false;
+    let isReviewer_color = false;
+    let isReviewer_construction = false;
+    let isReviewer_detail = false;
+    let isReviewer_floor = false;
+
     const { salesName, workerName, managerName, pattern } = patternReviewStatus;
 
     const {
@@ -752,20 +780,21 @@ const useControl_review = ({ patternReviewStatus }: { patternReviewStatus: Tpatt
       }
     };
 
+    //
     const statusArr_design: TstatusLabelProps[] = [
       {
         label: `業務 ${salesName}`,
         dotColor: 'green',
       },
       {
-        label: `工務主管 ${workerName}`,
+        label: `工務 ${workerName}`,
         dotColor: checkStatus({
           toAt: designToWorkerAt,
           reviewedAt: designWorkerReviewedAt,
         }),
       },
       {
-        label: `經理 ${managerName}`,
+        label: `總經理 ${managerName}`,
         dotColor: checkStatus({
           toAt: designToManagerAt,
           reviewedAt: designManagerReviewedAt,
@@ -776,11 +805,11 @@ const useControl_review = ({ patternReviewStatus }: { patternReviewStatus: Tpatt
     const statusArr_floor: TstatusLabelProps[] = [
       { label: `業務 ${salesName}`, dotColor: 'green' },
       {
-        label: `工務主管 ${workerName}`,
+        label: `工務 ${workerName}`,
         dotColor: checkStatus({ toAt: floorToWorkerAt, reviewedAt: floorWorkerReviewedAt }),
       },
       {
-        label: `經理 ${managerName}`,
+        label: `總經理 ${managerName}`,
         dotColor: checkStatus({ toAt: floorToManagerAt, reviewedAt: floorManagerReviewedAt }),
       },
     ];
@@ -788,11 +817,11 @@ const useControl_review = ({ patternReviewStatus }: { patternReviewStatus: Tpatt
     const statusArr_color: TstatusLabelProps[] = [
       { label: `業務 ${salesName}`, dotColor: 'green' },
       {
-        label: `工務主管 ${workerName}`,
+        label: `工務 ${workerName}`,
         dotColor: checkStatus({ toAt: colorToWorkerAt, reviewedAt: colorWorkerReviewedAt }),
       },
       {
-        label: `經理 ${managerName}`,
+        label: `總經理 ${managerName}`,
         dotColor: checkStatus({ toAt: colorToManagerAt, reviewedAt: colorManagerReviewedAt }),
       },
     ];
@@ -800,14 +829,14 @@ const useControl_review = ({ patternReviewStatus }: { patternReviewStatus: Tpatt
     const statusArr_construction: TstatusLabelProps[] = [
       { label: `業務 ${salesName}`, dotColor: 'green' },
       {
-        label: `工務主管 ${workerName}`,
+        label: `工務 ${workerName}`,
         dotColor: checkStatus({
           toAt: constructionToWorkerAt,
           reviewedAt: constructionWorkerReviewedAt,
         }),
       },
       {
-        label: `經理 ${managerName}`,
+        label: `總經理 ${managerName}`,
         dotColor: checkStatus({
           toAt: constructionToManagerAt,
           reviewedAt: constructionManagerReviewedAt,
@@ -818,14 +847,65 @@ const useControl_review = ({ patternReviewStatus }: { patternReviewStatus: Tpatt
     const statusArr_detail: TstatusLabelProps[] = [
       { label: `業務 ${salesName}`, dotColor: 'green' },
       {
-        label: `工務主管 ${workerName}`,
+        label: `工務 ${workerName}`,
         dotColor: checkStatus({ toAt: detailToWorkerAt, reviewedAt: detailWorkerReviewedAt }),
       },
       {
-        label: `經理 ${managerName}`,
+        label: `總經理 ${managerName}`,
         dotColor: checkStatus({ toAt: detailToManagerAt, reviewedAt: detailManagerReviewedAt }),
       },
     ];
+    //
+
+    // if (designToManagerAt && isReviewer_manager) {
+    //   isReviewer_design = true;
+    // } else if (designToWorkerAt && isReviewer_worker) {
+    //   isReviewer_design = true;
+    // }
+
+    // if (colorToManagerAt && isReviewer_manager) {
+    //   isReviewer_color = true;
+    // } else if (colorToWorkerAt && isReviewer_worker) {
+    //   isReviewer_color = true;
+    // }
+
+    // if (constructionToManagerAt && isReviewer_manager) {
+    //   isReviewer_construction = true;
+    // } else if (constructionToWorkerAt && isReviewer_worker) {
+    //   isReviewer_construction = true;
+    // }
+
+    // if (detailToManagerAt && isReviewer_manager) {
+    //   isReviewer_detail = true;
+    // } else if (detailToWorkerAt && isReviewer_worker) {
+    //   isReviewer_detail = true;
+    // }
+
+    // if (floorToManagerAt && isReviewer_manager) {
+    //   isReviewer_floor = true;
+    // } else if (floorToWorkerAt && isReviewer_worker) {
+    //   isReviewer_floor = true;
+    // }
+
+    if ((designToManagerAt && isReviewer_manager) || (designToWorkerAt && isReviewer_worker)) {
+      isReviewer_design = true;
+    }
+
+    if ((colorToManagerAt && isReviewer_manager) || (colorToWorkerAt && isReviewer_worker)) {
+      isReviewer_color = true;
+    }
+
+    if ((constructionToManagerAt && isReviewer_manager) || (constructionToWorkerAt && isReviewer_worker)) {
+      isReviewer_construction = true;
+    }
+
+    if ((detailToManagerAt && isReviewer_manager) || (detailToWorkerAt && isReviewer_worker)) {
+      isReviewer_detail = true;
+    }
+
+    if ((floorToManagerAt && isReviewer_manager) || (floorToWorkerAt && isReviewer_worker)) {
+      isReviewer_floor = true;
+    }
 
     return {
       color: statusArr_color,
@@ -839,6 +919,12 @@ const useControl_review = ({ patternReviewStatus }: { patternReviewStatus: Tpatt
       isDetailSubmit: !!detailToWorkerAt,
       isFloorSubmit: !!floorToWorkerAt,
       isDesignSubmit: !!designToWorkerAt,
+
+      isReviewer_design,
+      isReviewer_color,
+      isReviewer_construction,
+      isReviewer_detail,
+      isReviewer_floor,
     };
 
     //

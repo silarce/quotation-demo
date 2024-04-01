@@ -2,7 +2,7 @@
 // 工程聯絡單
 // 工程聯絡單
 
-import { useEffect, useState, useMemo, useImperativeHandle, forwardRef } from 'react';
+import { useEffect, useState, useMemo, useImperativeHandle, forwardRef, useContext } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
 import classNames from 'classnames';
@@ -45,6 +45,8 @@ import scss from './workContactDoc.module.scss';
 
 // type
 import { TgetAnnotation } from 'js/api/api_workSheet';
+
+import { AppContext } from 'pages/_app';
 
 // ============================================================================
 type Tquery = {
@@ -108,6 +110,13 @@ function PreWorkContactDoc_component(
   },
   ref: React.ForwardedRef<unknown>
 ) {
+  const { userInfo } = useContext(AppContext);
+
+  let isReviewer_worker = false;
+  let isReviewer_manager = false;
+
+  // ---------------------------------------------------------------------------
+
   const router = useRouter();
   const { contractId } = router.query as Tquery;
 
@@ -128,6 +137,25 @@ function PreWorkContactDoc_component(
     closePattern: () => setIsShowPattern(false),
     setDisabled,
   }));
+
+  // ---------------------------------------------------------------------------
+
+  /**data裡只會有一筆資料 */
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
+  useEffect(() => {
+    (async () => {
+      try {
+        await update_engineeringContact();
+      } catch (error) {
+        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
+      }
+    })();
+  }, [contractId, engineeringContactId]);
+
+  engineeringContact?.reviewWorkerEmployee?.id === userInfo?.employee?.id && (isReviewer_worker = true);
+
+  engineeringContact?.reviewManagerEmployee?.id === userInfo?.employee?.id && (isReviewer_manager = true);
 
   // ---------------------------------------------------------------------------
 
@@ -167,19 +195,6 @@ function PreWorkContactDoc_component(
   });
 
   // ---------------------------------------------------------------------------
-
-  /**data裡只會有一筆資料 */
-  const { data: engineeringContact, update: update_engineeringContact } =
-    useGetEngineeringContact(engineeringContactId);
-  useEffect(() => {
-    (async () => {
-      try {
-        await update_engineeringContact();
-      } catch (error) {
-        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
-      }
-    })();
-  }, [contractId, engineeringContactId]);
 
   // ---------------------------------------------------------------------------
 
@@ -831,6 +846,8 @@ function PreWorkContactDoc_component(
               shouldHasFloor: !!engineeringContact?.shouldHasFloor,
               shouldHasDesign: !!engineeringContact?.shouldHasDesign,
             }}
+            isReviewer_worker={isReviewer_worker}
+            isReviewer_manager={isReviewer_manager}
           />
         </div>
       </div>
@@ -888,20 +905,6 @@ const checkStatus = ({
     label,
     dotColor,
   };
-
-  // if (managerReviewedAt || workerReviewedAt) {
-  //   dot = 'green';
-  // } else if (toManagerAt || toWorkerAt) {
-  //   dot = 'red';
-  // }
-
-  // if (reviewedAt) {
-  //   return 'green';
-  // } else if (toAt) {
-  //   return 'red';
-  // } else {
-  //   return 'gray';
-  // }
 };
 
 export default WorkContactDoc_component;
