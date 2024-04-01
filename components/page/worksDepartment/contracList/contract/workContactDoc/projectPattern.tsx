@@ -59,6 +59,14 @@ type ThasPattern = {
   hasDesign: boolean;
 };
 
+type TshouldHasPattern = {
+  shouldHasColor: boolean;
+  shouldHasConstruction: boolean;
+  shouldHasDesign: boolean;
+  shouldHasDetail: boolean;
+  shouldHasFloor: boolean;
+};
+
 type TpatternReviewProcess = {
   sales: Tcontrol_processChain;
   worker: Tcontrol_processChain;
@@ -126,12 +134,14 @@ export default function ProjectPattern({
   patternReviewStatus,
   onSubmitSuccess,
   onReviewSuccess,
+  shouldHasPattern,
 }: {
   engineeringContactId: string | null | undefined;
   onPatternChange: (hasPattern: ThasPattern) => void;
   patternReviewStatus: TpatternReviewStatus;
   onSubmitSuccess: () => void;
   onReviewSuccess: () => void;
+  shouldHasPattern: TshouldHasPattern;
 }) {
   const [isUploading, setIsUploading] = useState<TisUploading>({
     floor: false,
@@ -455,169 +465,63 @@ export default function ProjectPattern({
       {/* 簽認圖 */}
       <Collapse className={scss.antdCollapse} defaultActiveKey={['detail']}>
         <Panel header="簽認圖" key="detail" className={scss.panel}>
-          <div>
-            <BtnBar
-              shouldRender={!!props_detail.fileSrc}
-              onSubmitClick={checkAndReturnMethod({
-                check: !controlList.isDetailSubmit,
-                method: () => confirmReqSubmitPattern('detail'),
-              })}
-              onReviewClick={checkAndReturnMethod({
-                check: controlList.isDetailSubmit,
-                method: () => {
-                  const theReviewconfirm = (isPass: boolean) => {
-                    reqReviewPattern({
-                      attachmentType: 'detail',
-                      isPass,
-                    });
-                  };
-
-                  setReviewConfirm(() => theReviewconfirm);
-                },
-              })}
-            />
-            <ImageDragger {...props_detail} />
-
-            {controlList.isDetailSubmit && (
-              <ProcessChain
-                className="mt-5"
-                control={{
-                  statusArr: controlList.detail,
-                }}
-              />
-            )}
-          </div>
+          <Pattern
+            patternType={'detail'}
+            props={props_detail}
+            isDetailSubmit={!!controlList.isDetailSubmit}
+            statusArr={controlList.detail}
+            confirmReqSubmitPattern={confirmReqSubmitPattern}
+            reqReviewPattern={reqReviewPattern}
+            setReviewConfirm={setReviewConfirm}
+          />
         </Panel>
         {/* 平面圖 */}
         <Panel header="平面圖" key="floor" className={scss.panel}>
-          <div>
-            <BtnBar
-              shouldRender={!!props_floor.fileSrc}
-              onSubmitClick={checkAndReturnMethod({
-                check: !controlList.isFloorSubmit,
-                method: () => confirmReqSubmitPattern('floor'),
-              })}
-              onReviewClick={checkAndReturnMethod({
-                check: controlList.isFloorSubmit,
-                method: () => {
-                  const theReviewconfirm = (isPass: boolean) => {
-                    reqReviewPattern({
-                      attachmentType: 'floor',
-                      isPass,
-                    });
-                  };
-
-                  setReviewConfirm(() => theReviewconfirm);
-                },
-              })}
-            />
-            <ImageDragger {...props_floor} />
-            {controlList.isFloorSubmit && (
-              <ProcessChain
-                className="mt-5"
-                control={{
-                  statusArr: controlList.floor,
-                }}
-              />
-            )}
-          </div>
+          <Pattern
+            patternType={'floor'}
+            props={props_floor}
+            isDetailSubmit={!!controlList.isFloorSubmit}
+            statusArr={controlList.floor}
+            confirmReqSubmitPattern={confirmReqSubmitPattern}
+            reqReviewPattern={reqReviewPattern}
+            setReviewConfirm={setReviewConfirm}
+          />
         </Panel>
         {/* 設計圖 */}
         <Panel header="設計圖" key="design" className={scss.panel}>
-          <BtnBar
-            shouldRender={!!props_design.fileSrc}
-            onSubmitClick={checkAndReturnMethod({
-              check: !controlList.isDesignSubmit,
-              method: () => confirmReqSubmitPattern('design'),
-            })}
-            onReviewClick={checkAndReturnMethod({
-              check: controlList.isDesignSubmit,
-              method: () => {
-                const theReviewconfirm = (isPass: boolean) => {
-                  reqReviewPattern({
-                    attachmentType: 'design',
-                    isPass,
-                  });
-                };
-
-                setReviewConfirm(() => theReviewconfirm);
-              },
-            })}
+          <Pattern
+            patternType={'design'}
+            props={props_design}
+            isDetailSubmit={!!controlList.isDesignSubmit}
+            statusArr={controlList.design}
+            confirmReqSubmitPattern={confirmReqSubmitPattern}
+            reqReviewPattern={reqReviewPattern}
+            setReviewConfirm={setReviewConfirm}
           />
-          <ImageDragger {...props_design} />
-          {controlList.isDesignSubmit && (
-            <ProcessChain
-              className="mt-5"
-              control={{
-                statusArr: controlList.design,
-              }}
-            />
-          )}
         </Panel>
         {/* 施工圖 */}
         <Panel header="施工圖" key="construction" className={scss.panel}>
-          <BtnBar
-            shouldRender={!!props_construction.fileSrc}
-            onSubmitClick={checkAndReturnMethod({
-              check: !controlList.isConstructionSubmit,
-              method: () => confirmReqSubmitPattern('construction'),
-            })}
-            onReviewClick={checkAndReturnMethod({
-              check: controlList.isConstructionSubmit,
-              method: () => {
-                const theReviewconfirm = (isPass: boolean) => {
-                  reqReviewPattern({
-                    attachmentType: 'construction',
-                    isPass,
-                  });
-                };
-
-                setReviewConfirm(() => theReviewconfirm);
-              },
-            })}
+          <Pattern
+            patternType={'construction'}
+            props={props_construction}
+            isDetailSubmit={!!controlList.isConstructionSubmit}
+            statusArr={controlList.construction}
+            confirmReqSubmitPattern={confirmReqSubmitPattern}
+            reqReviewPattern={reqReviewPattern}
+            setReviewConfirm={setReviewConfirm}
           />
-
-          <ImageDragger {...props_construction} />
-          {controlList.isConstructionSubmit && (
-            <ProcessChain
-              className="mt-5"
-              control={{
-                statusArr: controlList.construction,
-              }}
-            />
-          )}
         </Panel>
         {/* 色卡 */}
         <Panel header="色卡" key="color" className={scss.panel}>
-          <BtnBar
-            shouldRender={!!props_color.fileSrc}
-            onSubmitClick={checkAndReturnMethod({
-              check: !controlList.isColorSubmit,
-              method: () => confirmReqSubmitPattern('color'),
-            })}
-            onReviewClick={checkAndReturnMethod({
-              check: controlList.isColorSubmit,
-              method: () => {
-                const theReviewconfirm = (isPass: boolean) => {
-                  reqReviewPattern({
-                    attachmentType: 'color',
-                    isPass,
-                  });
-                };
-
-                setReviewConfirm(() => theReviewconfirm);
-              },
-            })}
+          <Pattern
+            patternType={'color'}
+            props={props_color}
+            isDetailSubmit={!!controlList.isColorSubmit}
+            statusArr={controlList.color}
+            confirmReqSubmitPattern={confirmReqSubmitPattern}
+            reqReviewPattern={reqReviewPattern}
+            setReviewConfirm={setReviewConfirm}
           />
-          <ImageDragger {...props_color} />
-          {controlList.isColorSubmit && (
-            <ProcessChain
-              className="mt-5"
-              control={{
-                statusArr: controlList.color,
-              }}
-            />
-          )}
         </Panel>
       </Collapse>
 
@@ -694,6 +598,8 @@ const ImageDragger = ({
   );
 };
 
+// -----------------------------------------------------------------------
+
 const BtnBar = ({
   //
   onReviewClick,
@@ -715,6 +621,62 @@ const BtnBar = ({
         <MyButton_v2 onClick={onSubmitClick} theme="danger">
           送審
         </MyButton_v2>
+      )}
+    </div>
+  );
+};
+// -----------------------------------------------------------------------
+
+const Pattern = ({
+  //
+  patternType,
+  props,
+  isDetailSubmit,
+  statusArr,
+  confirmReqSubmitPattern,
+  reqReviewPattern,
+  setReviewConfirm,
+}: {
+  patternType: TpatternType;
+  props: Parameters<typeof ImageDragger>[0];
+  isDetailSubmit: boolean;
+  confirmReqSubmitPattern: (patternType: TpatternType) => void;
+  reqReviewPattern: (props: { attachmentType: string; isPass: boolean }) => void;
+  setReviewConfirm: (confirm: (isPass: boolean) => void) => void;
+  statusArr: TstatusLabelProps[];
+}) => {
+  return (
+    <div>
+      <BtnBar
+        // shouldRender={!!props.fileSrc}
+        shouldRender={!!props.fileSrc}
+        onSubmitClick={checkAndReturnMethod({
+          check: !isDetailSubmit,
+          method: () => confirmReqSubmitPattern(patternType),
+        })}
+        onReviewClick={checkAndReturnMethod({
+          check: isDetailSubmit,
+          method: () => {
+            const theReviewconfirm = (isPass: boolean) => {
+              reqReviewPattern({
+                attachmentType: patternType,
+                isPass,
+              });
+            };
+
+            setReviewConfirm(() => theReviewconfirm);
+          },
+        })}
+      />
+      <ImageDragger {...props} />
+
+      {isDetailSubmit && (
+        <ProcessChain
+          className="mt-5"
+          control={{
+            statusArr: statusArr,
+          }}
+        />
       )}
     </div>
   );
