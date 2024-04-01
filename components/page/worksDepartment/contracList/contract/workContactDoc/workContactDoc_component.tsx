@@ -553,7 +553,7 @@ function PreWorkContactDoc_component(
           },
         },
         {
-          label: '工程圖',
+          label: '施工圖',
           haveData: hasPattern.hasConstruction,
           shouldHaveData: shouldHasPattern.construction,
           onCheck: (bool) => {
