@@ -82,6 +82,8 @@ import WorkSheetPDF_02, {
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import MultButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
 // api
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
@@ -98,6 +100,8 @@ import {
   useGetWorksheet_id,
   apiPatchWorkSheetProducts,
   useApiGetWorksheetRecord_id,
+  apiPatchWorksheetRecordSubmit,
+  apiPatchWorksheetRecordReview,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
@@ -124,6 +128,7 @@ import type {
   TworksheetRecordDto,
   TquotationProductComponentDto,
   TworksheetDto,
+  TuserDto,
 } from 'js/api/dtoTypes';
 
 // zustand // hook
@@ -138,12 +143,26 @@ type Tquery = {
 
 // ====================================================================
 
+const SelectorGroup = selectModalCreator_multi<['employee']>({
+  selectorArr: [
+    {
+      key: 'employee',
+      caption: '請選擇審核業務',
+      limit: 1,
+    },
+  ],
+});
+
+// ====================================================================
+
 export default function Worksheet({
   isAdmin,
   userErpFeature,
+  userInfo,
 }: {
   isAdmin: boolean;
   userErpFeature: TerpFeatureDto[] | undefined;
+  userInfo: TuserDto;
 }) {
   // ----------------------------------------------------------------
   let havePermissionToEdit = false;
@@ -151,6 +170,8 @@ export default function Worksheet({
   userErpFeature?.some((item) => {
     return item.name === '工務部-工作表編輯';
   }) && (havePermissionToEdit = true);
+
+  const userId = userInfo?.employee?.id;
 
   // ----------------------------------------------------------------
   const router = useRouter();
@@ -174,6 +195,14 @@ export default function Worksheet({
   // const [activeRecord, setActiveRecord] = useState<TworksheetDto['records'][number] | undefined>(undefined);
   const [activeRecordId, setActiveRecordId] = useState<string | undefined>(undefined);
   const [isLastestRecord, setIsLastestRecord] = useState<boolean>(false);
+
+  const [showReviewerSelector, setShowReviewerSelector] = useState(false);
+
+  const [showReviewModal, setShowReviewModal] = useState<boolean>();
+
+  // -------------------------------------------------------------------------
+
+  let isReviewer = false;
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
@@ -210,6 +239,26 @@ export default function Worksheet({
     clear: clear_activeRecord,
   } = useApiGetWorksheetRecord_id(activeRecordId);
 
+  const {
+    // reviewSalesEmployeeId = null,
+    reviewSalesEmployee = null,
+    toReviewSales = null,
+    // salesReviewAt = null,
+
+    // reviewManagerEmployeeId = null,
+    reviewManagerEmployee = null,
+    toReviewManager = null,
+    // managerReviewAt = null,
+  } = activeRecordData ?? {};
+
+  if (toReviewManager && reviewManagerEmployee?.id === userId) {
+    isReviewer = true;
+  }
+
+  if (toReviewSales && reviewSalesEmployee?.id === userId) {
+    isReviewer = true;
+  }
+
   // -------------------------------------------------------------------------
 
   const init = useWorksheet((state) => state.init);
@@ -229,25 +278,10 @@ export default function Worksheet({
     }))
   );
 
-  // useEffect(() => {
-  //   if (disabled) {
-  //     const contractProductItems = worksheetData?.latestRecord.contractProductItems;
-
-  //     init({
-  //       worksheetId: activeWorksheetId!,
-  //       itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
-  //       contractProductItem: contractProductItems?.[0],
-  //       contractProductItemArr: contractProductItems ?? [],
-  //       qty: contractProductItems?.length ?? 0,
-  //       originalAccessories: activeWorksheetOriginalAccessories,
-  //     });
-  //   }
-  // }, [worksheetData, disabled]);
-
   // -------------------------------------------------------------------------
 
   const refreshData = async () => {
-    return Promise.all([update_contract(), update_finalProduce()]);
+    return Promise.all([update_contract(), update_finalProduce(), update_worksheetData(), update_activeRecord()]);
   };
 
   // apiPostWorkSheet
@@ -292,13 +326,41 @@ export default function Worksheet({
       try {
         setIsLoading(true);
         await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
-        await update_worksheetData();
+        await refreshData();
         setDisabled(true);
       } catch (error) {
       } finally {
         setIsLoading(false);
       }
     }
+  };
+
+  // 送審
+  const rewSubmitWorksheet = async (employeeId: string) => {
+    if (!activeRecordId) {
+      return;
+    }
+
+    try {
+      await apiPatchWorksheetRecordSubmit(activeRecordId, {
+        reviewSalesEmployeeId: employeeId,
+      });
+      setShowReviewerSelector(false);
+      await refreshData();
+    } catch (error) {}
+  };
+
+  // 審核
+  const reqReviewWorksheet = async (isPass: boolean) => {
+    if (!activeRecordId) {
+      return;
+    }
+
+    try {
+      await apiPatchWorksheetRecordReview(activeRecordId, { isPass });
+      await refreshData();
+      setShowReviewModal(false);
+    } catch (error) {}
   };
 
   // -------------------------------------------------------------------------
@@ -603,14 +665,19 @@ export default function Worksheet({
       onClick: () => setIsShowPdf(true),
     },
     {
-      type: 'myButton',
-      label: havePermissionToEdit ? '編輯工作表' : '沒有編輯權限',
+      type: 'redButton',
+      label: '送審',
       onClick: () => {
-        if (havePermissionToEdit) {
-          setDisabled(false);
-        }
+        setShowReviewerSelector(true);
       },
     },
+    // {
+    //   type: 'myButton',
+    //   label: '審核',
+    //   onClick: () => {
+    //     setShowReviewModal(true);
+    //   },
+    // },
     {
       type: 'myButton',
       label: '關閉工作表',
@@ -621,8 +688,26 @@ export default function Worksheet({
     },
   ];
 
-  if (!isLastestRecord) {
-    panelList_notAllow.splice(3, 1);
+  if (isReviewer) {
+    panelList_notAllow.splice(-1, 0, {
+      type: 'myButton',
+      label: '審核',
+      onClick: () => {
+        setShowReviewModal(true);
+      },
+    });
+  }
+
+  if (isLastestRecord) {
+    panelList_notAllow.splice(-1, 0, {
+      type: 'myButton',
+      label: havePermissionToEdit ? '編輯工作表' : '沒有編輯權限',
+      onClick: () => {
+        if (havePermissionToEdit) {
+          setDisabled(false);
+        }
+      },
+    });
   }
 
   if (!activeRecordData) {
@@ -692,10 +777,57 @@ export default function Worksheet({
       />
       <WorkSheetPDF isShow={isShowPdf} onCancel={() => setIsShowPdf(false)} control={control_workSheetPDF_01} />
       <WorkSheetPDF_02 isShow={isShowPdf02} onCancel={() => setIsShowPdf02(false)} control={control_workSheetPDF_02} />
+
+      <SelectorGroup
+        showModal={showReviewerSelector}
+        onConfirm={(arr) => {
+          const employee = arr[0][0];
+
+          if (employee) {
+            rewSubmitWorksheet(employee.id);
+          } else {
+            myAlert.info({ title: '請選擇審核人員' });
+          }
+        }}
+        onCancel={() => setShowReviewerSelector(false)}
+      />
+
+      <MultButtonModal
+        visible={!!showReviewModal}
+        text={'是否通過審核?'}
+        onCancel={() => setShowReviewModal(undefined)}
+        modalWidth={600}
+        btnPropsArr={[
+          {
+            label: '通過審核',
+            theme: 'danger',
+            onClick: () => reqReviewWorksheet(true),
+          },
+          {
+            label: '不通過審核',
+            onClick: () => reqReviewWorksheet(false),
+          },
+          {
+            label: '取消',
+            onClick: () => setShowReviewModal(undefined),
+          },
+        ]}
+      />
     </SubLayer>
   );
 }
 
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
 // ===========================================================================
 // ===========================================================================
 // ===========================================================================

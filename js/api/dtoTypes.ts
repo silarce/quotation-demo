@@ -2962,6 +2962,15 @@ export type TupdateWorkSheet = {
   contractProductItems: TupdateContractProductItemDto[];
 };
 
+// 送審工作表用的
+export type TsubmitWorksheetProductsItemsDto = {
+  reviewSalesEmployeeId: string;
+};
+// 審核工作表用的
+export type TreviewWorksheetProductsItemsDto = {
+  isPass: boolean;
+};
+
 // 出庫單
 
 export type TengineeringDeliveryListDto = {

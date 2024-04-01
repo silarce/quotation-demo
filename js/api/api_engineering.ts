@@ -53,6 +53,8 @@ import type {
   TengineeringContactAttachmentType,
   TreviewEngineeringContactDto,
   TworksheetRecordDto,
+  TsubmitWorksheetProductsItemsDto,
+  TreviewWorksheetProductsItemsDto,
 } from './dtoTypes';
 
 export type {
@@ -98,6 +100,8 @@ export type {
   TengineeringContactAttachmentType,
   TreviewEngineeringContactDto,
   TworksheetRecordDto,
+  TsubmitWorksheetProductsItemsDto,
+  TreviewWorksheetProductsItemsDto,
 } from './dtoTypes';
 
 type TgetEngineeringContact = {
@@ -885,6 +889,44 @@ export const useApiGetWorksheetRecord_id = (recordId: string | undefined) => {
     update,
     clear: () => setRes(undefined),
   };
+};
+
+// 工作表送審
+export const apiPatchWorksheetRecordSubmit = async (recordId: string, body: TsubmitWorksheetProductsItemsDto) => {
+  const api = `/engineering/worksheet/worksheet-record/${recordId}/submit`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => {
+      myAlert.success({ title: '送審成功' });
+
+      return data;
+    })
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '送審工作表失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 工作表審核
+export const apiPatchWorksheetRecordReview = async (recordId: string, body: TreviewWorksheetProductsItemsDto) => {
+  const api = `/engineering/worksheet/worksheet-record/${recordId}/review`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => {
+      myAlert.success({ title: '審核成功' });
+
+      return data;
+    })
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '審核工作表失敗', content: err.message });
+
+      return Promise.reject(error);
+    });
 };
 
 // =============================================================================
