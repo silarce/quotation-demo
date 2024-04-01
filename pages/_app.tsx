@@ -38,6 +38,8 @@ export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
 
+export const AppContext = createContext<TappContext>(null!);
+
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
@@ -50,8 +52,6 @@ type TappContext = {
   userGrade: number;
   erpFeature: TerpFeatureDto[] | undefined;
 };
-
-export const AppContext = createContext<TappContext>(null!);
 
 // =============================================================================
 function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
