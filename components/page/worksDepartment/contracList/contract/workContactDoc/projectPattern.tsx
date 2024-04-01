@@ -142,6 +142,7 @@ export default function ProjectPattern({
   patternReviewStatus,
   onSubmitSuccess,
   onReviewSuccess,
+  onDeleteSuccess,
   shouldHasPattern,
 }: {
   engineeringContactId: string | null | undefined;
@@ -149,6 +150,7 @@ export default function ProjectPattern({
   patternReviewStatus: TpatternReviewStatus;
   onSubmitSuccess: () => void;
   onReviewSuccess: () => void;
+  onDeleteSuccess: () => void;
   shouldHasPattern: TshouldHasPattern;
 }) {
   const [isUploading, setIsUploading] = useState<TisUploading>({
@@ -283,6 +285,7 @@ export default function ProjectPattern({
     try {
       await apiDeleteEngineeringContactAttachments(engineeringContactId, patternType, id);
       await update(patternType);
+      await onDeleteSuccess();
     } catch (error) {}
   };
 

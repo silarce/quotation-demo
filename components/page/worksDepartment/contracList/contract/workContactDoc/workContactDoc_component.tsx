@@ -782,6 +782,7 @@ function PreWorkContactDoc_component(
             patternReviewStatus={patternReviewStatus}
             onSubmitSuccess={update_engineeringContact}
             onReviewSuccess={update_engineeringContact}
+            onDeleteSuccess={update_engineeringContact}
             shouldHasPattern={{
               shouldHasColor: !!engineeringContact?.shouldHasColor,
               shouldHasConstruction: !!engineeringContact?.shouldHasConstruction,
