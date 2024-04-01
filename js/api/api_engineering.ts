@@ -809,7 +809,12 @@ export const apiDeleteWorksheet = async (worksheetId: string) => {
   return axi
     .delete(api)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      const error = err as AxiosError;
+      myAlert.err({ title: '刪除工作表失敗', content: error.message });
+
+      return Promise.reject(err);
+    });
 };
 
 export const apiPatchWorkSheetProducts = (id: string, body: TupdateWorkSheet) => {
