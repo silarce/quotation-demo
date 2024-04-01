@@ -52,6 +52,7 @@ import type {
   TsubmitEngineeringContactDto,
   TengineeringContactAttachmentType,
   TreviewEngineeringContactDto,
+  TworksheetRecordDto,
 } from './dtoTypes';
 
 export type {
@@ -96,6 +97,7 @@ export type {
   TsubmitEngineeringContactDto,
   TengineeringContactAttachmentType,
   TreviewEngineeringContactDto,
+  TworksheetRecordDto,
 } from './dtoTypes';
 
 type TgetEngineeringContact = {
@@ -834,6 +836,58 @@ export const apiDeleteWorkSheetItem = async (
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
+
+const apiGetWorksheetRecord_id = async (id: string, params?: Tparams) => {
+  const api = `/engineering/worksheet/record/${id}`;
+
+  params = {
+    populate: [
+      //
+      'reviewSalesEmployee',
+      'reviewManagerEmployee',
+      'contractProductItems.components',
+      'contractProductItems.accessories',
+    ],
+    ...params,
+  };
+
+  return axi
+    .get(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useApiGetWorksheetRecord_id = (recordId: string | undefined) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [res, setRes] = useState<TworksheetRecordDto>();
+
+  const update = async () => {
+    if (!recordId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiGetWorksheetRecord_id(recordId);
+      setRes(res);
+    } catch (error) {
+      const err = error as AxiosError;
+
+      myAlert.err({ title: '取得工作表歷程記錄失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    isLoading,
+    data: res,
+    update,
+    clear: () => setRes(undefined),
+  };
+};
+
+// =============================================================================
 
 // 出庫單
 

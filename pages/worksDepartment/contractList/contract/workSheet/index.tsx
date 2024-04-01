@@ -97,6 +97,7 @@ import {
   apiDeleteWorksheet,
   useGetWorksheet_id,
   apiPatchWorkSheetProducts,
+  useApiGetWorksheetRecord_id,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
@@ -170,7 +171,9 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  const [activeRecord, setActiveRecord] = useState<TworksheetDto['records'][number] | undefined>(undefined);
+  // const [activeRecord, setActiveRecord] = useState<TworksheetDto['records'][number] | undefined>(undefined);
+  const [activeRecordId, setActiveRecordId] = useState<string | undefined>(undefined);
+  const [isLastestRecord, setIsLastestRecord] = useState<boolean>(false);
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
@@ -183,6 +186,10 @@ export default function Worksheet({
       'worksheet.latestRecord.reviewManagerEmployee',
       'worksheet.latestRecord.contractProductItems.components',
       'worksheet.latestRecord.contractProductItems.accessories',
+      // 'worksheet.records.reviewSalesEmployee',
+      // 'worksheet.records.reviewManagerEmployee',
+      // 'worksheet.records.contractProductItems.components',
+      // 'worksheet.records.contractProductItems.accessories',
     ],
   });
   const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
@@ -193,6 +200,15 @@ export default function Worksheet({
   // ________________________________________________________________________
 
   const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId);
+
+  // -------------------------------------------------------------------------
+
+  const {
+    data: activeRecordData,
+    update: update_activeRecord,
+    isLoading: isLoading_activeRecord,
+    clear: clear_activeRecord,
+  } = useApiGetWorksheetRecord_id(activeRecordId);
 
   // -------------------------------------------------------------------------
 
@@ -213,20 +229,20 @@ export default function Worksheet({
     }))
   );
 
-  useEffect(() => {
-    if (disabled) {
-      const contractProductItems = worksheetData?.latestRecord.contractProductItems;
+  // useEffect(() => {
+  //   if (disabled) {
+  //     const contractProductItems = worksheetData?.latestRecord.contractProductItems;
 
-      init({
-        worksheetId: activeWorksheetId!,
-        itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
-        contractProductItem: contractProductItems?.[0],
-        contractProductItemArr: contractProductItems ?? [],
-        qty: contractProductItems?.length ?? 0,
-        originalAccessories: activeWorksheetOriginalAccessories,
-      });
-    }
-  }, [worksheetData, disabled]);
+  //     init({
+  //       worksheetId: activeWorksheetId!,
+  //       itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
+  //       contractProductItem: contractProductItems?.[0],
+  //       contractProductItemArr: contractProductItems ?? [],
+  //       qty: contractProductItems?.length ?? 0,
+  //       originalAccessories: activeWorksheetOriginalAccessories,
+  //     });
+  //   }
+  // }, [worksheetData, disabled]);
 
   // -------------------------------------------------------------------------
 
@@ -307,6 +323,30 @@ export default function Worksheet({
       setIsLoading(false);
     })();
   }, [activeWorksheetId]);
+
+  useEffect(() => {
+    if (activeRecordId) {
+      update_activeRecord();
+    } else {
+      clear_activeRecord();
+    }
+  }, [activeRecordId]);
+
+  // zustand 狀態
+  useEffect(() => {
+    if (disabled && activeRecordData) {
+      const contractProductItems = activeRecordData.contractProductItems;
+
+      init({
+        worksheetId: activeWorksheetId!,
+        itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
+        contractProductItem: contractProductItems?.[0],
+        contractProductItemArr: contractProductItems ?? [],
+        qty: contractProductItems?.length ?? 0,
+        originalAccessories: activeWorksheetOriginalAccessories,
+      });
+    }
+  }, [activeRecordData, disabled]);
 
   // -------------------------------------------------------------------------
   const control_profile = useControl_profile(engineeringContact);
@@ -390,8 +430,9 @@ export default function Worksheet({
           reviewStatus,
           onClick: () => {
             setActiveWorksheetId(worksheet.id);
-            // setActiveWorksheetOriginalAccessories(accessories);
             setActiveWorksheetOriginalAccessories(prod.items?.[0].accessories ?? []);
+            setActiveRecordId(undefined);
+            setDisabled(true);
           },
           onDeleteClick: () => {
             myAlert.confirm({
@@ -448,7 +489,12 @@ export default function Worksheet({
 
     return { control_productCardArr, latestRecordArr };
     //
-  }, [finalProduct, activeWorksheetId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    finalProduct,
+    // activeWorksheetId
+    worksheetData,
+  ]);
 
   // ___________________________________________________________________________
   // ___________________________________________________________________________
@@ -456,7 +502,7 @@ export default function Worksheet({
   const control_recordList: Tcontrol_recordList = useMemo(() => {
     const records = _.sortBy(worksheetData?.records, 'version').reverse();
 
-    const recordArr: Trecord[] = records.map((record) => {
+    const recordArr: Trecord[] = records.map((record, index) => {
       const {
         contractProductItems,
         reviewSalesEmployee,
@@ -514,7 +560,11 @@ export default function Worksheet({
         reveiwManagerStatus,
 
         onDetailClick: () => {
-          setActiveRecord(record);
+          setActiveRecordId(record.id);
+
+          if (index === 0) {
+            setIsLastestRecord(true);
+          }
         },
       };
 
@@ -536,7 +586,7 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  const panelList_allow: TpanelList = [
+  let panelList_notAllow: TpanelList = [
     {
       type: 'myButton',
       label: '匯出EXCEL',
@@ -554,16 +604,32 @@ export default function Worksheet({
     },
     {
       type: 'myButton',
-      label: havePermissionToEdit ? '編輯' : '沒有編輯權限',
+      label: havePermissionToEdit ? '編輯工作表' : '沒有編輯權限',
       onClick: () => {
         if (havePermissionToEdit) {
           setDisabled(false);
         }
       },
     },
+    {
+      type: 'myButton',
+      label: '關閉工作表',
+      onClick: () => {
+        setActiveRecordId(undefined);
+        setIsLastestRecord(false);
+      },
+    },
   ];
 
-  const panelList_notAllow: TpanelList = [
+  if (!isLastestRecord) {
+    panelList_notAllow.splice(3, 1);
+  }
+
+  if (!activeRecordData) {
+    panelList_notAllow = [];
+  }
+
+  const panelList_allow: TpanelList = [
     {
       type: 'myButton',
       label: '取消',
@@ -573,11 +639,8 @@ export default function Worksheet({
     },
   ];
 
-  const panelList = disabled ? panelList_allow : panelList_notAllow;
+  const panelList = disabled ? panelList_notAllow : panelList_allow;
   // -----------------------------------------------------------------
-
-  // -----------------------------------------------------------------------
-
   // -----------------------------------------------------------------------
 
   return (
@@ -602,8 +665,8 @@ export default function Worksheet({
           {/* right */}
           {/* targetSheet */}
           <div className={classNames(scss.right)}>
-            {false && <RecordList control={control_recordList} />}
-            {activeWorksheetId && (
+            {activeWorksheetId && !activeRecordData && <RecordList control={control_recordList} />}
+            {activeRecordData && (
               <WorksheetForm
                 shouldCalcData={shouldCalcData}
                 shouldCalcData2={shouldCalcData2}
@@ -870,8 +933,6 @@ const useControl_pdf = ({
     const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
 
     latestRecordArr.forEach((record) => {
-      console.log(record);
-
       if (!record.contractProductItems) {
         return;
       }
