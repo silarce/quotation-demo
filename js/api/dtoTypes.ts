@@ -2510,6 +2510,7 @@ export type TsubmitEngineeringContactDto = {
 };
 
 export type TreviewEngineeringContactDto = {
+  attachmentType: string;
   isPass: boolean;
 };
 

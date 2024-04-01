@@ -780,6 +780,8 @@ function PreWorkContactDoc_component(
             engineeringContactId={engineeringContactId}
             onPatternChange={onPatternChange}
             patternReviewStatus={patternReviewStatus}
+            onSubmitSuccess={update_engineeringContact}
+            onReviewSuccess={update_engineeringContact}
           />
         </div>
       </div>

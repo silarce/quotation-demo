@@ -11,6 +11,7 @@ import { UploadChangeParam } from 'antd/lib/upload';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import ProcessChain, { Tcontrol_processChain, TstatusLabelProps } from 'components/global/gear/processChain';
+import MultButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
 import scss from './projectPattern.module.scss';
 
@@ -123,10 +124,14 @@ export default function ProjectPattern({
   engineeringContactId,
   onPatternChange,
   patternReviewStatus,
+  onSubmitSuccess,
+  onReviewSuccess,
 }: {
   engineeringContactId: string | null | undefined;
   onPatternChange: (hasPattern: ThasPattern) => void;
   patternReviewStatus: TpatternReviewStatus;
+  onSubmitSuccess: () => void;
+  onReviewSuccess: () => void;
 }) {
   const [isUploading, setIsUploading] = useState<TisUploading>({
     floor: false,
@@ -137,6 +142,8 @@ export default function ProjectPattern({
   });
 
   const isUploading_any = Object.values(isUploading).some((v) => v);
+
+  const [reviewConfirm, setReviewConfirm] = useState<(isPass: boolean) => void>();
 
   // -----------------------------------------------------------------------
 
@@ -283,11 +290,37 @@ export default function ProjectPattern({
     await reqUploadPattern(preUploadFile, patternType);
   };
 
-  // ---------------------------------------------------------------------
+  // ---------------------------------------------------------------------0
   // 送審
+  const confirmReqSubmitPattern = async (patternType: TpatternType) => {
+    myAlert.confirm({
+      title: '確定送審?',
+      props: {
+        onOk: () => {
+          reqSubmitPattern(patternType);
+        },
+      },
+    });
+  };
+
   const reqSubmitPattern = async (patternType: TpatternType) => {
     if (engineeringContactId) {
-      await apiPatchEngineeringContactSubmitAttachment(engineeringContactId, { attachmentType: patternType });
+      try {
+        await apiPatchEngineeringContactSubmitAttachment(engineeringContactId, { attachmentType: patternType });
+        await onSubmitSuccess();
+      } catch (error) {}
+    }
+  };
+
+  // 審核
+
+  const reqReviewPattern = async ({ attachmentType, isPass }: { attachmentType: string; isPass: boolean }) => {
+    if (engineeringContactId) {
+      try {
+        await apiPatchEngineeringContactReviewAttachment(engineeringContactId, { attachmentType, isPass });
+        setReviewConfirm(undefined);
+        await onReviewSuccess();
+      } catch (error) {}
     }
   };
 
@@ -419,26 +452,29 @@ export default function ProjectPattern({
           isLoading={isUploading_any}
         />
       </div>
-      {/*  */}
-
-      <Collapse
-        className={scss.antdCollapse}
-        defaultActiveKey={['detail']}
-        // onChange={(v) => {console.log(v);}}
-      >
+      {/* 簽認圖 */}
+      <Collapse className={scss.antdCollapse} defaultActiveKey={['detail']}>
         <Panel header="簽認圖" key="detail" className={scss.panel}>
           <div>
             <BtnBar
-              onSubmitClick={() => {
-                myAlert.confirm({
-                  title: '確定送審?',
-                  props: {
-                    onOk: () => {
-                      reqSubmitPattern('detail');
-                    },
-                  },
-                });
-              }}
+              shouldRender={!!props_detail.fileSrc}
+              onSubmitClick={checkAndReturnMethod({
+                check: !controlList.isDetailSubmit,
+                method: () => confirmReqSubmitPattern('detail'),
+              })}
+              onReviewClick={checkAndReturnMethod({
+                check: controlList.isDetailSubmit,
+                method: () => {
+                  const theReviewconfirm = (isPass: boolean) => {
+                    reqReviewPattern({
+                      attachmentType: 'detail',
+                      isPass,
+                    });
+                  };
+
+                  setReviewConfirm(() => theReviewconfirm);
+                },
+              })}
             />
             <ImageDragger {...props_detail} />
 
@@ -452,11 +488,30 @@ export default function ProjectPattern({
             )}
           </div>
         </Panel>
+        {/* 平面圖 */}
         <Panel header="平面圖" key="floor" className={scss.panel}>
           <div>
-            <BtnBar />
-            <ImageDragger {...props_floor} />
+            <BtnBar
+              shouldRender={!!props_floor.fileSrc}
+              onSubmitClick={checkAndReturnMethod({
+                check: !controlList.isFloorSubmit,
+                method: () => confirmReqSubmitPattern('floor'),
+              })}
+              onReviewClick={checkAndReturnMethod({
+                check: controlList.isFloorSubmit,
+                method: () => {
+                  const theReviewconfirm = (isPass: boolean) => {
+                    reqReviewPattern({
+                      attachmentType: 'floor',
+                      isPass,
+                    });
+                  };
 
+                  setReviewConfirm(() => theReviewconfirm);
+                },
+              })}
+            />
+            <ImageDragger {...props_floor} />
             {controlList.isFloorSubmit && (
               <ProcessChain
                 className="mt-5"
@@ -467,9 +522,29 @@ export default function ProjectPattern({
             )}
           </div>
         </Panel>
+        {/* 設計圖 */}
         <Panel header="設計圖" key="design" className={scss.panel}>
-          <ImageDragger {...props_design} />
+          <BtnBar
+            shouldRender={!!props_design.fileSrc}
+            onSubmitClick={checkAndReturnMethod({
+              check: !controlList.isDesignSubmit,
+              method: () => confirmReqSubmitPattern('design'),
+            })}
+            onReviewClick={checkAndReturnMethod({
+              check: controlList.isDesignSubmit,
+              method: () => {
+                const theReviewconfirm = (isPass: boolean) => {
+                  reqReviewPattern({
+                    attachmentType: 'design',
+                    isPass,
+                  });
+                };
 
+                setReviewConfirm(() => theReviewconfirm);
+              },
+            })}
+          />
+          <ImageDragger {...props_design} />
           {controlList.isDesignSubmit && (
             <ProcessChain
               className="mt-5"
@@ -479,9 +554,30 @@ export default function ProjectPattern({
             />
           )}
         </Panel>
+        {/* 施工圖 */}
         <Panel header="施工圖" key="construction" className={scss.panel}>
-          <ImageDragger {...props_construction} />
+          <BtnBar
+            shouldRender={!!props_construction.fileSrc}
+            onSubmitClick={checkAndReturnMethod({
+              check: !controlList.isConstructionSubmit,
+              method: () => confirmReqSubmitPattern('construction'),
+            })}
+            onReviewClick={checkAndReturnMethod({
+              check: controlList.isConstructionSubmit,
+              method: () => {
+                const theReviewconfirm = (isPass: boolean) => {
+                  reqReviewPattern({
+                    attachmentType: 'construction',
+                    isPass,
+                  });
+                };
 
+                setReviewConfirm(() => theReviewconfirm);
+              },
+            })}
+          />
+
+          <ImageDragger {...props_construction} />
           {controlList.isConstructionSubmit && (
             <ProcessChain
               className="mt-5"
@@ -491,9 +587,29 @@ export default function ProjectPattern({
             />
           )}
         </Panel>
+        {/* 色卡 */}
         <Panel header="色卡" key="color" className={scss.panel}>
-          <ImageDragger {...props_color} />
+          <BtnBar
+            shouldRender={!!props_color.fileSrc}
+            onSubmitClick={checkAndReturnMethod({
+              check: !controlList.isColorSubmit,
+              method: () => confirmReqSubmitPattern('color'),
+            })}
+            onReviewClick={checkAndReturnMethod({
+              check: controlList.isColorSubmit,
+              method: () => {
+                const theReviewconfirm = (isPass: boolean) => {
+                  reqReviewPattern({
+                    attachmentType: 'color',
+                    isPass,
+                  });
+                };
 
+                setReviewConfirm(() => theReviewconfirm);
+              },
+            })}
+          />
+          <ImageDragger {...props_color} />
           {controlList.isColorSubmit && (
             <ProcessChain
               className="mt-5"
@@ -504,8 +620,30 @@ export default function ProjectPattern({
           )}
         </Panel>
       </Collapse>
+
+      <MultButtonModal
+        visible={!!reviewConfirm}
+        text={'是否通過審核?'}
+        onCancel={() => setReviewConfirm(undefined)}
+        modalWidth={600}
+        btnPropsArr={[
+          {
+            label: '通過審核',
+            theme: 'danger',
+            onClick: () => reviewConfirm?.(true),
+          },
+          {
+            label: '不通過審核',
+            onClick: () => reviewConfirm?.(false),
+          },
+          {
+            label: '取消',
+            onClick: () => setReviewConfirm(undefined),
+          },
+        ]}
+      />
     </div>
-  );
+  ); // return
 }
 
 // ==================================================
@@ -556,13 +694,28 @@ const ImageDragger = ({
   );
 };
 
-const BtnBar = ({ onReviewClick, onSubmitClick }: { onReviewClick?: () => void; onSubmitClick?: () => void }) => {
+const BtnBar = ({
+  //
+  onReviewClick,
+  onSubmitClick,
+  shouldRender = true,
+}: {
+  onReviewClick?: (() => void) | null;
+  onSubmitClick?: (() => void) | null;
+  shouldRender?: boolean;
+}) => {
+  if (!shouldRender) {
+    return null;
+  }
+
   return (
     <div className={scss.btnBar}>
-      <MyButton_v2 onClick={onReviewClick}>審核</MyButton_v2>
-      <MyButton_v2 onClick={onSubmitClick} theme="danger">
-        送審
-      </MyButton_v2>
+      {onReviewClick && <MyButton_v2 onClick={onReviewClick}>審核</MyButton_v2>}
+      {onSubmitClick && (
+        <MyButton_v2 onClick={onSubmitClick} theme="danger">
+          送審
+        </MyButton_v2>
+      )}
     </div>
   );
 };
@@ -718,3 +871,11 @@ const options = [
   { value: 'construction', label: '施工圖' },
   { value: 'color', label: '色卡' },
 ];
+
+const checkAndReturnMethod = ({ check, method }: { check: boolean; method: () => void }) => {
+  if (check) {
+    return method;
+  } else {
+    return null;
+  }
+};
