@@ -38,7 +38,8 @@ import {
   // 審核
   apiPatchEngineeringContactReviewAttachment,
 } from 'js/api/api_engineering';
-import { has } from 'lodash';
+
+import { Toption } from 'js/utils/options/options';
 
 // =======================================================================
 const { Panel } = Collapse;
@@ -68,11 +69,11 @@ type ThasPattern = {
 };
 
 type TshouldHasPattern = {
-  shouldHasColor: boolean;
-  shouldHasConstruction: boolean;
-  shouldHasDesign: boolean;
   shouldHasDetail: boolean;
   shouldHasFloor: boolean;
+  shouldHasDesign: boolean;
+  shouldHasConstruction: boolean;
+  shouldHasColor: boolean;
 };
 
 type TpatternReviewProcess = {
@@ -450,7 +451,7 @@ export default function ProjectPattern({
       <div className={scss.controlBar}>
         <Select
           className={classNames(scss.antdSelect, scss.plus)}
-          options={options}
+          options={createOptions(shouldHasPattern)}
           // onChange={(v) => console.log(v)}
           onChange={(v) => setPatternType(v)}
           placeholder="選擇要上傳工程圖表項目"
@@ -862,13 +863,26 @@ const checkFileIsImage_str = (str: string) => {
   return isImage;
 };
 
-const options = [
-  { value: 'detail', label: '簽認圖' },
-  { value: 'floor', label: '平面圖' },
-  { value: 'design', label: '設計圖' },
-  { value: 'construction', label: '施工圖' },
-  { value: 'color', label: '色卡' },
-];
+const createOptions = (shouldHasPattern: TshouldHasPattern) => {
+  const list = {
+    shouldHasDetail: { value: 'detail', label: '簽認圖' },
+    shouldHasFloor: { value: 'floor', label: '平面圖' },
+    shouldHasDesign: { value: 'design', label: '設計圖' },
+    shouldHasConstruction: { value: 'construction', label: '施工圖' },
+    shouldHasColor: { value: 'color', label: '色卡' },
+  };
+
+  const options: Toption[] = [];
+  const keyArr = Object.keys(shouldHasPattern) as (keyof TshouldHasPattern)[];
+
+  keyArr.forEach((key) => {
+    if (shouldHasPattern[key]) {
+      options.push(list[key]);
+    }
+  });
+
+  return options;
+};
 
 const checkAndReturnMethod = ({ check, method }: { check: boolean; method: () => void }) => {
   if (check) {
