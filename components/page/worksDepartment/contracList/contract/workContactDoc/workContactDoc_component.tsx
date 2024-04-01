@@ -10,6 +10,7 @@ import classNames from 'classnames';
 // component
 import Profile, {
   Tcontroll as Tcontroll_profile,
+  TprojectPatternStatus,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/profile';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import ProjectPattern, {
@@ -535,6 +536,14 @@ function PreWorkContactDoc_component(
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'detail');
           },
+          reviewStatus: checkStatus({
+            workerName: engineeringContact?.reviewWorkerEmployee?.chName ?? '',
+            managerName: engineeringContact?.reviewManagerEmployee?.chName ?? '',
+            toWorkerAt: engineeringContact?.detailToWorkerAt,
+            workerReviewedAt: engineeringContact?.detailWorkerReviewedAt,
+            toManagerAt: engineeringContact?.detailToManagerAt,
+            managerReviewedAt: engineeringContact?.detailManagerReviewedAt,
+          }),
         },
         {
           label: '平面圖',
@@ -543,6 +552,14 @@ function PreWorkContactDoc_component(
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'floor');
           },
+          reviewStatus: checkStatus({
+            workerName: engineeringContact?.reviewWorkerEmployee?.chName ?? '',
+            managerName: engineeringContact?.reviewManagerEmployee?.chName ?? '',
+            toWorkerAt: engineeringContact?.floorToWorkerAt,
+            workerReviewedAt: engineeringContact?.floorWorkerReviewedAt,
+            toManagerAt: engineeringContact?.floorToManagerAt,
+            managerReviewedAt: engineeringContact?.floorManagerReviewedAt,
+          }),
         },
         {
           label: '設計圖',
@@ -551,6 +568,14 @@ function PreWorkContactDoc_component(
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'design');
           },
+          reviewStatus: checkStatus({
+            workerName: engineeringContact?.reviewWorkerEmployee?.chName ?? '',
+            managerName: engineeringContact?.reviewManagerEmployee?.chName ?? '',
+            toWorkerAt: engineeringContact?.designToWorkerAt,
+            workerReviewedAt: engineeringContact?.designWorkerReviewedAt,
+            toManagerAt: engineeringContact?.designToManagerAt,
+            managerReviewedAt: engineeringContact?.designManagerReviewedAt,
+          }),
         },
         {
           label: '施工圖',
@@ -559,6 +584,14 @@ function PreWorkContactDoc_component(
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'construction');
           },
+          reviewStatus: checkStatus({
+            workerName: engineeringContact?.reviewWorkerEmployee?.chName ?? '',
+            managerName: engineeringContact?.reviewManagerEmployee?.chName ?? '',
+            toWorkerAt: engineeringContact?.constructionToWorkerAt,
+            workerReviewedAt: engineeringContact?.constructionWorkerReviewedAt,
+            toManagerAt: engineeringContact?.constructionToManagerAt,
+            managerReviewedAt: engineeringContact?.constructionManagerReviewedAt,
+          }),
         },
         {
           label: '色卡',
@@ -567,6 +600,14 @@ function PreWorkContactDoc_component(
           onCheck: (bool) => {
             editShouldHasPattern(bool, 'color');
           },
+          reviewStatus: checkStatus({
+            workerName: engineeringContact?.reviewWorkerEmployee?.chName ?? '',
+            managerName: engineeringContact?.reviewManagerEmployee?.chName ?? '',
+            toWorkerAt: engineeringContact?.colorToWorkerAt,
+            workerReviewedAt: engineeringContact?.colorWorkerReviewedAt,
+            toManagerAt: engineeringContact?.colorToManagerAt,
+            managerReviewedAt: engineeringContact?.colorManagerReviewedAt,
+          }),
         },
       ],
     },
@@ -805,5 +846,62 @@ function PreWorkContactDoc_component(
     </div>
   );
 }
+
+const checkStatus = ({
+  //
+  workerName,
+  managerName,
+  toWorkerAt,
+  workerReviewedAt,
+  toManagerAt,
+  managerReviewedAt,
+}: {
+  workerName: string;
+  managerName: string;
+  toWorkerAt: string | null | undefined;
+  workerReviewedAt: string | null | undefined;
+  toManagerAt: string | null | undefined;
+  managerReviewedAt: string | null | undefined;
+}) => {
+  let label: TprojectPatternStatus['reviewStatus']['label'] = `未送審`;
+  let dotColor: TprojectPatternStatus['reviewStatus']['dotColor'] = 'gray';
+
+  if (managerReviewedAt || toManagerAt) {
+    label = `總經理 ${managerName}`;
+
+    if (managerReviewedAt) {
+      dotColor = 'green';
+    } else {
+      dotColor = 'red';
+    }
+  } else if (workerReviewedAt || toWorkerAt) {
+    label = `工務 ${workerName}`;
+
+    if (workerReviewedAt) {
+      dotColor = 'green';
+    } else {
+      dotColor = 'red';
+    }
+  }
+
+  return {
+    label,
+    dotColor,
+  };
+
+  // if (managerReviewedAt || workerReviewedAt) {
+  //   dot = 'green';
+  // } else if (toManagerAt || toWorkerAt) {
+  //   dot = 'red';
+  // }
+
+  // if (reviewedAt) {
+  //   return 'green';
+  // } else if (toAt) {
+  //   return 'red';
+  // } else {
+  //   return 'gray';
+  // }
+};
 
 export default WorkContactDoc_component;
