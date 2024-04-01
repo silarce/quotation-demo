@@ -4,7 +4,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 // antd
-import { Select, Collapse, Upload, Image as AntdImage, Spin } from 'antd';
+import {
+  //
+  Select,
+  Collapse,
+  Upload,
+  Image as AntdImage,
+  Spin,
+  CollapsePanelProps,
+} from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload';
 
 // gear
@@ -31,6 +39,7 @@ import {
   // 審核
   apiPatchEngineeringContactReviewAttachment,
 } from 'js/api/api_engineering';
+import { has } from 'lodash';
 
 // =======================================================================
 const { Panel } = Collapse;
@@ -469,67 +478,84 @@ export default function ProjectPattern({
           isLoading={isUploading_any}
         />
       </div>
-      {/* 簽認圖 */}
-      <Collapse className={scss.antdCollapse} defaultActiveKey={['detail']}>
-        <MyPanel header="簽認圖" key="detail" shouldRender={shouldHasPattern.shouldHasDetail}>
-          <Pattern
-            patternType={'detail'}
-            props={props_detail}
-            isDetailSubmit={!!controlList.isDetailSubmit}
-            statusArr={controlList.detail}
-            confirmReqSubmitPattern={confirmReqSubmitPattern}
-            reqReviewPattern={reqReviewPattern}
-            setReviewConfirm={setReviewConfirm}
-          />
-        </MyPanel>
+      <Collapse
+        className={scss.antdCollapse}
+        // defaultActiveKey={['detail']}
+      >
+        {/* 簽認圖 */}
+        {shouldHasPattern.shouldHasDetail && (
+          <Panel header="簽認圖" key="detail" className={scss.panel}>
+            <Pattern
+              patternType={'detail'}
+              props={props_detail}
+              isDetailSubmit={!!controlList.isDetailSubmit}
+              statusArr={controlList.detail}
+              confirmReqSubmitPattern={confirmReqSubmitPattern}
+              reqReviewPattern={reqReviewPattern}
+              setReviewConfirm={setReviewConfirm}
+            />
+          </Panel>
+        )}
+
         {/* 平面圖 */}
-        <MyPanel header="平面圖" key="floor" shouldRender={shouldHasPattern.shouldHasFloor}>
-          <Pattern
-            patternType={'floor'}
-            props={props_floor}
-            isDetailSubmit={!!controlList.isFloorSubmit}
-            statusArr={controlList.floor}
-            confirmReqSubmitPattern={confirmReqSubmitPattern}
-            reqReviewPattern={reqReviewPattern}
-            setReviewConfirm={setReviewConfirm}
-          />
-        </MyPanel>
+        {shouldHasPattern.shouldHasFloor && (
+          <Panel header="平面圖" key="floor" className={scss.panel}>
+            <Pattern
+              patternType={'floor'}
+              props={props_floor}
+              isDetailSubmit={!!controlList.isFloorSubmit}
+              statusArr={controlList.floor}
+              confirmReqSubmitPattern={confirmReqSubmitPattern}
+              reqReviewPattern={reqReviewPattern}
+              setReviewConfirm={setReviewConfirm}
+            />
+          </Panel>
+        )}
+
         {/* 設計圖 */}
-        <MyPanel header="設計圖" key="design" shouldRender={shouldHasPattern.shouldHasDesign}>
-          <Pattern
-            patternType={'design'}
-            props={props_design}
-            isDetailSubmit={!!controlList.isDesignSubmit}
-            statusArr={controlList.design}
-            confirmReqSubmitPattern={confirmReqSubmitPattern}
-            reqReviewPattern={reqReviewPattern}
-            setReviewConfirm={setReviewConfirm}
-          />
-        </MyPanel>
+        {shouldHasPattern.shouldHasDesign && (
+          <Panel header="設計圖" key="design" className={scss.panel}>
+            <Pattern
+              patternType={'design'}
+              props={props_design}
+              isDetailSubmit={!!controlList.isDesignSubmit}
+              statusArr={controlList.design}
+              confirmReqSubmitPattern={confirmReqSubmitPattern}
+              reqReviewPattern={reqReviewPattern}
+              setReviewConfirm={setReviewConfirm}
+            />
+          </Panel>
+        )}
+
         {/* 施工圖 */}
-        <MyPanel header="施工圖" key="construction" shouldRender={shouldHasPattern.shouldHasConstruction}>
-          <Pattern
-            patternType={'construction'}
-            props={props_construction}
-            isDetailSubmit={!!controlList.isConstructionSubmit}
-            statusArr={controlList.construction}
-            confirmReqSubmitPattern={confirmReqSubmitPattern}
-            reqReviewPattern={reqReviewPattern}
-            setReviewConfirm={setReviewConfirm}
-          />
-        </MyPanel>
+        {shouldHasPattern.shouldHasConstruction && (
+          <Panel header="施工圖" key="construction" className={scss.panel}>
+            <Pattern
+              patternType={'construction'}
+              props={props_construction}
+              isDetailSubmit={!!controlList.isConstructionSubmit}
+              statusArr={controlList.construction}
+              confirmReqSubmitPattern={confirmReqSubmitPattern}
+              reqReviewPattern={reqReviewPattern}
+              setReviewConfirm={setReviewConfirm}
+            />
+          </Panel>
+        )}
+
         {/* 色卡 */}
-        <MyPanel header="色卡" key="color" shouldRender={shouldHasPattern.shouldHasColor}>
-          <Pattern
-            patternType={'color'}
-            props={props_color}
-            isDetailSubmit={!!controlList.isColorSubmit}
-            statusArr={controlList.color}
-            confirmReqSubmitPattern={confirmReqSubmitPattern}
-            reqReviewPattern={reqReviewPattern}
-            setReviewConfirm={setReviewConfirm}
-          />
-        </MyPanel>
+        {shouldHasPattern.shouldHasColor && (
+          <Panel header="色卡" key="color" className={scss.panel}>
+            <Pattern
+              patternType={'color'}
+              props={props_color}
+              isDetailSubmit={!!controlList.isColorSubmit}
+              statusArr={controlList.color}
+              confirmReqSubmitPattern={confirmReqSubmitPattern}
+              reqReviewPattern={reqReviewPattern}
+              setReviewConfirm={setReviewConfirm}
+            />
+          </Panel>
+        )}
       </Collapse>
 
       <MultButtonModal
@@ -689,28 +715,6 @@ const Pattern = ({
 };
 
 // -----------------------------------------------------------------------
-
-const MyPanel = ({
-  shouldRender = true,
-  header,
-  key,
-  children,
-}: {
-  shouldRender?: boolean;
-  header: React.ReactNode;
-  key: string;
-  children: React.ReactNode;
-}) => {
-  if (!shouldRender) {
-    return null;
-  }
-
-  return (
-    <Panel header={header} key={key} className={scss.panel}>
-      {children}
-    </Panel>
-  );
-};
 
 // ======================================================================
 // ======================================================================
