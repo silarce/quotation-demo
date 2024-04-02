@@ -237,6 +237,7 @@ const DateList = ({ className, onCardClick }: { className?: string; onCardClick:
     // pageSize: 999999,
   };
 
+  // 只是為了取得最早的日期，並從該日期開始
   const { dataArr, reset } = useGetOutsourcingPayment({ customParams: params });
   // console.log(dataArr);
 
@@ -247,6 +248,8 @@ const DateList = ({ className, onCardClick }: { className?: string; onCardClick:
   }, []);
 
   // ----------------------------------------------------------------------
+  // 產生的年月表會包括沒有資料的年月，這是符合預期的
+  // 另外預期每個月都會有資料，在正式環境應該是不會有點下去沒資料的情況
   const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
     const yearMonthList = getAllyearMonthListByRange({
       start: oldestDate,
