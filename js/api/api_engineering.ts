@@ -966,6 +966,8 @@ export const apiGetEngineeringDeliveryList = (id: string) => {
       'contract.worksheet.latestRecord.contractProductItems.adjustedItem.accessories',
       'contract.worksheet.latestRecord.contractProductItems.accessories',
       'contract.worksheet.latestRecord.contractProductItems.rootproductId',
+      'contract.worksheet.latestRecord.contractProductItems.rootWorksheetItem',
+      'contract.worksheet.latestRecord.contractProductItems.latestWorksheetItem ',
     ],
   };
 
