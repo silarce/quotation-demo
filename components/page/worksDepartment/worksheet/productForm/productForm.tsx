@@ -107,7 +107,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
               type: 'number',
               value: basicSpec.fullWidth,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                basicSpec.setBasicSpec_strNum({ key: 'fullWidth', value: e.target.value });
+                basicSpec.setBasicSpec_fullWidth(e.target.value);
               },
             },
           }}
@@ -129,11 +129,10 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           inputProps={{
             props: {
-              readOnly: true,
               type: 'number',
               value: basicSpec.WG,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                basicSpec.setBasicSpec_strNum({ key: 'WG', value: e.target.value });
+                basicSpec.setBasicSpec_WG(e.target.value);
               },
             },
           }}
@@ -161,7 +160,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
               type: 'number',
               value: basicSpec.height,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                basicSpec.setBasicSpec_strNum({ key: 'height', value: e.target.value });
+                basicSpec.setBasicSpec_height(e.target.value);
               },
             },
           }}

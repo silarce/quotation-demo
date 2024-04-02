@@ -38,6 +38,7 @@ import {
 } from 'js/utils/options/productOptions';
 
 import {
+  TpcgsPrams,
   //
   apiGetProdDoorModels,
   apiGetProdCalcGeneralSpec,
@@ -105,12 +106,12 @@ type Tworksheet = {
 
     setBasicSpec_itemName: (props: { key: 'itemName'; value: string }) => void;
     setBasicSpec_material: (str: string) => void;
-    setBasicSpec_strNum: (props: {
-      //
-      key: keyof Pick<Exclude<Tworksheet['basicSpec'], undefined>, 'fullWidth' | 'WG' | 'height'>;
-      value: string;
-    }) => void;
     setBasicSpec_bool: (props: { key: 'isAntiTyphoon'; value: boolean }) => void;
+    setBasicSpec_fullWidth: (value: string) => void;
+    setBasicSpec_WG: (value: string) => void;
+    setBasicSpec_height: (value: string) => void;
+    setBasicSpec_fullWidth_simple: (value: string) => void;
+    setBasicSpec_WG_simple: (value: string) => void;
   };
 
   ABCD: {
@@ -336,10 +337,10 @@ const useWorksheet = create<Tworksheet>(
           })
         );
       },
-      setBasicSpec_strNum: ({ key, value }) => {
+      setBasicSpec_height: (value) => {
         set(
           produce((state) => {
-            state.basicSpec[key] = value;
+            state.basicSpec.height = value;
             state.shouldCalcData = true;
             state.shouldCalcData2 = true;
           })
@@ -362,6 +363,36 @@ const useWorksheet = create<Tworksheet>(
             state.basicSpec.material = str;
             state.shouldCalcData = true;
             state.shouldCalcData2 = true;
+          })
+        );
+      },
+      setBasicSpec_fullWidth: (str) => {
+        set(
+          produce((state) => {
+            state.basicSpec.fullWidth = str;
+            state.basicSpec.WG = '';
+          })
+        );
+      },
+      setBasicSpec_WG: (str) => {
+        set(
+          produce((state) => {
+            state.basicSpec.WG = str;
+            state.basicSpec.fullWidth = '';
+          })
+        );
+      },
+      setBasicSpec_fullWidth_simple: (str) => {
+        set(
+          produce((state) => {
+            state.basicSpec.fullWidth = str;
+          })
+        );
+      },
+      setBasicSpec_WG_simple: (str) => {
+        set(
+          produce((state) => {
+            state.basicSpec.WG = str;
           })
         );
       },
@@ -820,12 +851,31 @@ const useWorksheet = create<Tworksheet>(
     // ---------------------------------------------------------------------
 
     reqGeneralSpec: async () => {
-      const generalSpec = await apiGetProdCalcGeneralSpec({
+      type Tbody = {
+        modelName: string;
+        fullWidth: number | undefined;
+        WG: number | undefined;
+        height: number;
+        isAntiTyphoon: boolean;
+      };
+
+      const body: Tbody = {
         modelName: get().basicSpec.doorModelName as TdoorModel,
         fullWidth: get().getFullWidth_mm(),
+        WG: get().getWG_mm(),
         height: get().getHeight_mm(),
         isAntiTyphoon: get().basicSpec.isAntiTyphoon,
-      });
+      };
+
+      if (body.fullWidth) {
+        body.WG = undefined;
+      } else if (body.WG) {
+        body.fullWidth = undefined;
+      } else if (!body.fullWidth && !body.WG) {
+        body.fullWidth = 0;
+      }
+
+      const generalSpec = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
 
       return generalSpec;
     },
