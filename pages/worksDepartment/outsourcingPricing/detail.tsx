@@ -187,7 +187,7 @@ export default function OutsourcingPricingDetail() {
     const body: TupdateOutsourcingPaymentDetailDto = {
       engineeringContactId: engineeringContact.id,
       installItems: Object.values(installItemList),
-      outsourcing: new Decimal(subTotal01).add(subTotal02).toNumber(),
+      outsourcingTotal: new Decimal(subTotal01).add(subTotal02).toNumber(),
     };
 
     try {
