@@ -234,9 +234,11 @@ const DateList = ({ className, onCardClick }: { className?: string; onCardClick:
   const params: Tparams = {
     sort: 'date',
     order: 'ASC',
+    // pageSize: 999999,
   };
 
   const { dataArr, reset } = useGetOutsourcingPayment({ customParams: params });
+  // console.log(dataArr);
 
   const oldestDate = dataArr[0]?.date;
 
@@ -274,7 +276,7 @@ const DateList = ({ className, onCardClick }: { className?: string; onCardClick:
     return {
       panelArr,
     };
-  }, []);
+  }, [oldestDate]);
 
   return <DateCollapse className={classNames(className)} control={control_dateCollapse} />;
 };
