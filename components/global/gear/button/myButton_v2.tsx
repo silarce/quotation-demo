@@ -82,7 +82,7 @@ export default function MyButton_v2({
       )}
       {href && (
         <Link
-          className={classNames(scss.button, theme && scss[theme], px && scss[px], className)}
+          className={classNames(scss.button, scss.plus, theme && scss[theme], px && scss[px], className)}
           onClick={onClick}
           href={href}
           target={target}
