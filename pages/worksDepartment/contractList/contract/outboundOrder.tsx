@@ -2,8 +2,6 @@
 // !!!!!!!!!!
 // !!!!!!!!!!
 // !!!!!!!!!!
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 
 // 工程管理單
 // 工程管理單
@@ -221,7 +219,14 @@ export default function OutboundOrder({
         } = item;
 
         if (rootWorksheetItemId) {
+          // !應急的忽略型別檢查
+          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           list[rootWorksheetItemId] = rootWorksheetItem;
+          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         }
       });
     });
@@ -288,6 +293,7 @@ export default function OutboundOrder({
         // let theId: string;
 
         if (adjustedItem && adjustedItemId) {
+          // theItem = adjustedItem;
           theItem = adjustedItem;
           // theId = adjustedItemId;
         } else {
@@ -301,7 +307,7 @@ export default function OutboundOrder({
 
         if (rootWorksheetItemId && !myDeleveryList?.[rootWorksheetItemId]) {
           myDeleveryList[rootWorksheetItemId] = {
-            originalItem: item,
+            originalItem: rootWorksheetItem,
             itemName: theItem.itemName,
             itemArr: [],
           };
@@ -509,17 +515,17 @@ export default function OutboundOrder({
       const firstRow: Tgroup['rowArr'][0] = {
         contractData: {
           project: prod.itemName,
-          L: new Decimal(theOriginalContractContent.fullWidth).div(1000).toString(),
-          W: new Decimal(theOriginalContractContent.WG).div(1000).toString(),
-          B: new Decimal(theOriginalContractContent.boxB).div(1000).toString(),
+          L: new Decimal(theOriginalContractContent?.fullWidth || 0).div(1000).toString(),
+          W: new Decimal(theOriginalContractContent?.WG || 0).div(1000).toString(),
+          B: new Decimal(theOriginalContractContent?.boxB || 0).div(1000).toString(),
           qty: String(prod.itemArr.length),
           implementQty: '',
-          cai: theOriginalContractContent.volume ?? '',
-          totalCai: new Decimal(theOriginalContractContent.volume || 0).mul(arrLength).toString(),
-          doorType: theOriginalContractContent.doorModelName,
-          material: theOriginalContractContent.materialName,
-          horsepower: theOriginalContractContent.horsepower,
-          surface: theOriginalContractContent.materialSurface ?? '',
+          cai: theOriginalContractContent?.volume ?? '',
+          totalCai: new Decimal(theOriginalContractContent?.volume || 0).mul(arrLength).toString(),
+          doorType: theOriginalContractContent?.doorModelName ?? '',
+          material: theOriginalContractContent?.materialName ?? '',
+          horsepower: theOriginalContractContent?.horsepower ?? '',
+          surface: theOriginalContractContent?.materialSurface ?? '',
         },
         staticData: {
           project: prod.itemName,
