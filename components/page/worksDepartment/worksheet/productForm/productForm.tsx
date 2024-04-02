@@ -104,6 +104,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           inputProps={{
             props: {
+              placeholder: '全寬與WG擇一輸入',
               type: 'number',
               value: basicSpec.fullWidth,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,6 +130,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           inputProps={{
             props: {
+              placeholder: '全寬與WG擇一輸入',
               type: 'number',
               value: basicSpec.WG,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -370,7 +370,13 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.basicSpec.fullWidth = str;
-            state.basicSpec.WG = '';
+
+            if (str) {
+              state.basicSpec.WG = '';
+            }
+
+            state.shouldCalcData = true;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -378,7 +384,13 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.basicSpec.WG = str;
-            state.basicSpec.fullWidth = '';
+
+            if (str) {
+              state.basicSpec.fullWidth = '';
+            }
+
+            state.shouldCalcData = true;
+            state.shouldCalcData2 = true;
           })
         );
       },
@@ -940,6 +952,16 @@ const useWorksheet = create<Tworksheet>(
     // ---------------------------------------------------------------------
 
     calcData: async () => {
+      set(
+        produce((state) => {
+          const basicSpec = state.basicSpec;
+
+          if (basicSpec.fullWidth) {
+            basicSpec.WG = '';
+          }
+        })
+      );
+
       await get().update_generalSpec();
 
       set(
