@@ -1172,7 +1172,7 @@ const useControl_pdf = ({
           surface: componentList.bottomBar.materialSurface ?? '', // 未知 在廠務部工作表
         },
         sidePlate: {
-          direction: '', // 未知 在廠務部工作表
+          direction: item.sidePlateDirection ?? '',
           bigSidePlate: `${item.boxB}*${item.boxD}`,
           smallSidePlate: `${item.boxB}*${item.boxB}`,
         },
