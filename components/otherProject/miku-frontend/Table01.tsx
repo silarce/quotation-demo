@@ -55,6 +55,7 @@ type Tcontrol = {
     dangerSvg?: string;
     antiTyphoonHook: string;
     bendStraight: string; // 彎直
+    surface: string;
   };
   chainCog: {
     sprocketWheelModel: string;
@@ -92,6 +93,7 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
     guideRail,
     chainCog,
     base,
+    sidePlate,
   } = control;
 
   return (
@@ -111,7 +113,7 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
             <C.TableContent2 label="W+G" value={`${size.WG} mm`} />
             <C.TableContent2 label="機械縫 A" value={`${size.gapA} mm`} />
             <C.TableContent2 label="機械縫 C" value={`${size.gapC} mm`} />
-            <C.TableContent2 label={'支板尺寸 B*D'} value={size.BD} />
+            <C.TableContent2 label={`支板尺寸 B*D (${sidePlate.direction})`} value={size.BD} />
             <C.TableContent2 label="捲門全高 H" value={`${size.fullHeight} mm`} />
 
             <C.TableHeader2 title="捲軸" />
@@ -120,7 +122,7 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
             <C.TableContent2 label="軸承" value={`${roller.bearingName}`} />
             <C.TableContent2 label="總長" value={`${roller.bearingHousingTotalLength}`} />
             <C.TableContent2 label="寸法" value={`${roller.bearingHousingSize}`} />
-            <C.TableHeader2 title={'捲箱'} />
+            <C.TableHeader2 title={`捲箱(${headBox.surface})`} />
             <C.TableContent2 label="捲箱角鐵數量" value={`${headBox.angleIronQty}`} />
             <C.TableContent2 label="捲箱角鐵尺寸" value={headBox.angleIronSize} />
             <C.TableContent2 value={'捲箱資訊：' + headBox.form} height={69} />
@@ -129,9 +131,9 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
 
         <div>
           <section className="border-l-0 border-r-4 border-b-4 border-black">
-            <C.TableHeader2 title={'門片'} />
+            <C.TableHeader2 title={`門片(${doorPiece.surface})`} />
             <C.TableContent2 label="門片材質" value={doorPiece.material} />
-            <C.TableContent2 label="門片厚度" value={doorPiece.thickness} />
+            <C.TableContent2 label="門片厚度" value={doorPiece.thickness + 'mm'} />
             <C.TableContent2 label="門片長度" value={doorPiece.slatLength} />
             <C.TableContent2 label="捲片支數" value={doorPiece.slatCount} />
             <C.TableContent2 label="防颱勾" value={doorPiece.antyTyphoonHook} />
@@ -141,7 +143,7 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
 
             <C.TableContent2 label="馬力數" value={motor.horsepower} />
 
-            <C.TableHeader2 title={'門軌'} />
+            <C.TableHeader2 title={`門軌(${guideRail.surface})`} />
             <C.TableContent2 label="門軌材質" value={guideRail.material} />
             <C.TableContent2 label="門軌長度" value={guideRail.guideRailLength} />
             <C.TableContentWithImage2
@@ -158,7 +160,7 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
 
             <C.TableContent2 label="孔徑" value={chainCog.bearingInnerDiameter} />
 
-            <C.TableHeader2 title={'底座'} />
+            <C.TableHeader2 title={`底座(${base.surface})`} />
             <C.TableContent2 label="底座材質" value={base.material} />
             <C.TableContent2 label="底座開口" value={base.guideRailsOpening} />
           </section>

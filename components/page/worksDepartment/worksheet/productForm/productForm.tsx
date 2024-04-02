@@ -1079,8 +1079,11 @@ const Table_headBox = () => {
       <div className={scss.cell}>捲箱角鐵尺寸</div>
       <div className={scss.cell}>{angleIronSize_mm}</div>
 
+      <div className={scss.cell}>表面</div>
+      <div className={scss.cell}>{headBox.surface}</div>
+
       <div className={scss.cell}>捲箱資訊</div>
-      <div className={classNames(scss.cell, ' col-span-3')}>{headBox.getIsIntegratedHeadBox()}</div>
+      <div className={classNames(scss.cell)}>{headBox.getIsIntegratedHeadBox()}</div>
     </div>
   );
 };
@@ -1109,11 +1112,11 @@ const Table_roller = () => {
       <div className={scss.cell}>總長</div>
       <div className={scss.cell}>{generalSpec?.bearingHousingTotalLength}</div>
 
-      <div className={scss.cell}></div>
-      <div className={scss.cell}></div>
-
       <div className={scss.cell}>寸法</div>
       <div className={scss.cell}>{generalSpec?.bearingHousingSize}</div>
+
+      <div className={scss.cell}></div>
+      <div className={scss.cell}></div>
     </div>
   );
 };
@@ -1143,8 +1146,8 @@ const Table_slat = () => {
       <div className={scss.cell}>捲片支數</div>
       <div className={scss.cell}>{slat.slatCount}</div>
 
-      <div className={scss.cell}></div>
-      <div className={scss.cell}></div>
+      <div className={scss.cell}>表面</div>
+      <div className={scss.cell}>{slat.surface}</div>
 
       <div className={scss.cell}>防颱勾</div>
       <div className={scss.cell}>{antiTyphoonHook}</div>
@@ -1170,8 +1173,8 @@ const Table_guideRail = () => {
       <div className={scss.cell}>門軌長度</div>
       <div className={scss.cell}>{generalSpec?.guideRailLength}</div>
 
-      <div className={scss.cell}></div>
-      <div className={scss.cell}></div>
+      <div className={scss.cell}>表面</div>
+      <div className={scss.cell}>{guideRail.surface}</div>
 
       <div className={scss.cell}>{`門軌形式(${guideRail.guideRailType})`}</div>
       <div className={scss.cell}>
@@ -1203,11 +1206,11 @@ const Table_gear = () => {
       <div className={scss.cell}>大鏈輪</div>
       <div className={scss.cell}>{generalSpec?.sprocketWheelTeethNumber}</div>
 
-      <div className={scss.cell}></div>
-      <div className={scss.cell}></div>
-
       <div className={scss.cell}>孔徑</div>
       <div className={scss.cell}>{generalSpec?.bearingInnerDiameter}</div>
+
+      <div className={scss.cell}></div>
+      <div className={scss.cell}></div>
     </div>
   );
 };
@@ -1229,6 +1232,12 @@ const Table_bottomBar = () => {
 
       <div className={scss.cell}>底座開口</div>
       <div className={scss.cell}>{guideRail.guideRailsOpening}</div>
+
+      <div className={scss.cell}>表面</div>
+      <div className={scss.cell}>{guideRail.surface}</div>
+
+      <div className={scss.cell}></div>
+      <div className={scss.cell}></div>
     </div>
   );
 };
