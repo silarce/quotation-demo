@@ -368,9 +368,15 @@ const VendorMonthPanel = ({
       const twYear = String(Number(year) - 1911);
 
       const cardList = Object.entries(monthList).map(([month, paymentInfo]) => {
+        const forbidden = !paymentInfo;
+
         return {
           label: `${month}月`,
           onClick: () => {
+            if (forbidden) {
+              return;
+            }
+
             router.push({
               pathname: router.pathname + '/edit',
               query: {
@@ -378,7 +384,7 @@ const VendorMonthPanel = ({
               },
             });
           },
-          forbidden: !paymentInfo,
+          forbidden,
         };
       });
 
