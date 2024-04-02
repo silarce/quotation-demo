@@ -234,9 +234,12 @@ const DateList = ({ className, onCardClick }: { className?: string; onCardClick:
   const params: Tparams = {
     sort: 'date',
     order: 'ASC',
+    // pageSize: 999999,
   };
 
+  // 只是為了取得最早的日期，並從該日期開始
   const { dataArr, reset } = useGetOutsourcingPayment({ customParams: params });
+  // console.log(dataArr);
 
   const oldestDate = dataArr[0]?.date;
 
@@ -245,6 +248,8 @@ const DateList = ({ className, onCardClick }: { className?: string; onCardClick:
   }, []);
 
   // ----------------------------------------------------------------------
+  // 產生的年月表會包括沒有資料的年月，這是符合預期的
+  // 另外預期每個月都會有資料，在正式環境應該是不會有點下去沒資料的情況
   const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
     const yearMonthList = getAllyearMonthListByRange({
       start: oldestDate,
@@ -366,9 +371,15 @@ const VendorMonthPanel = ({
       const twYear = String(Number(year) - 1911);
 
       const cardList = Object.entries(monthList).map(([month, paymentInfo]) => {
+        const forbidden = !paymentInfo;
+
         return {
           label: `${month}月`,
           onClick: () => {
+            if (forbidden) {
+              return;
+            }
+
             router.push({
               pathname: router.pathname + '/edit',
               query: {
@@ -376,7 +387,7 @@ const VendorMonthPanel = ({
               },
             });
           },
-          forbidden: !paymentInfo,
+          forbidden,
         };
       });
 
@@ -637,8 +648,9 @@ const getPaymentDateList = (paymentArr: ToutsourcingPaymentDto[]) => {
 
   paymentArr.forEach((payment) => {
     const date = moment(payment.date);
+
     const year = date.year().toString();
-    const month = date.month().toString();
+    const month = (date.month() + 1).toString();
 
     if (!result[year]) {
       result[year] = {
