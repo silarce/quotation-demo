@@ -637,8 +637,9 @@ const getPaymentDateList = (paymentArr: ToutsourcingPaymentDto[]) => {
 
   paymentArr.forEach((payment) => {
     const date = moment(payment.date);
+
     const year = date.year().toString();
-    const month = date.month().toString();
+    const month = (date.month() + 1).toString();
 
     if (!result[year]) {
       result[year] = {
