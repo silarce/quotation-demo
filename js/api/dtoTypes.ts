@@ -1135,7 +1135,8 @@ export type TengineeringDeliveryStatusDto = {
   // 單樘計價
   unitPrice: number | null;
   // 其他特殊工作項目
-  otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
+  // otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
+  otherWorkItems: ToutsourcingPaymentDetailItemDto | null;
   // 其他特殊工作項目合計
   otherWorkItemTotal: number | null;
 };
@@ -3397,7 +3398,7 @@ export type TcreateOutsourcingPaymentDetailItemDto = {
 
 export type TupdateOutsourcingPaymentDetailDto = {
   engineeringContactId: string; // 工程聯落單id
-  installItem: TcreateOutsourcingPaymentDetailItemDto[]; // 項目
+  installItems: TcreateOutsourcingPaymentDetailItemDto[]; // 項目
   outsourcing: number; // 外包計價明細總計
 };
 
