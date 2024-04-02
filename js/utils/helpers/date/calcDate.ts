@@ -20,8 +20,8 @@ type TyearMonthList = {
 
 function getAllyearMonthListByRange({ start, end }: { start: MomentInput; end: MomentInput }) {
   const startDate = moment(start);
-  const endDate = moment(end);
-  // const currentDate = startDate.clone();
+  const endDate = end ? moment(end) : moment();
+
   const dateObj: TyearMonthList = {};
 
   while (startDate <= endDate) {
