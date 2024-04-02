@@ -1388,8 +1388,8 @@ export type TquotationProductItemDto = {
   weight: string | null;
   // 捲箱 - 正面
   headBoxFront: string | null;
-  // 捲箱 - 有無凸
-  headBoxProtruding: string | null;
+  // 捲箱 - 有無凸 // 棄用
+  headBoxProtruding: string | null; // 棄用
   // 捲箱 - 角鐵數量
   headBoxAngleIronQuantity: number | null;
   // 支板 - 鏈條
@@ -2931,8 +2931,8 @@ export type TupdateContractProductItemDto = {
   weight?: string | null;
   // 捲箱 - 正面
   headBoxFront?: string | null;
-  // 捲箱 - 有無凸
-  headBoxProtruding?: string | null;
+  // 捲箱 - 有無凸 // 棄用
+  headBoxProtruding?: string | null; // 棄用
   // 捲箱 - 角鐵數量
   headBoxAngleIronQuantity?: number | null;
   // 支板 - 鏈條
