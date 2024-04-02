@@ -33,6 +33,7 @@ import {
   optionsCreator_rollerSpec,
   optionsCreator_boolean,
   optionsCreator_bottomBar_2,
+  optionsCreator_bendStright,
 } from 'js/utils/options/productOptions';
 
 // utils
@@ -486,7 +487,8 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
             },
           }}
         />
-        <InputSel
+        {/* 棄用 */}
+        {/* <InputSel
           {...basicConfig}
           caption="有無凸"
           disabled={disabled}
@@ -499,7 +501,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
               },
             },
           }}
-        />
+        /> */}
         <InputSel
           {...basicConfig}
           caption="形式"
@@ -562,7 +564,8 @@ function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
             },
           }}
         />
-        <InputSel
+        {/* 棄用 */}
+        {/* <InputSel
           {...basicConfig}
           caption="有無凸"
           disabled={disabled}
@@ -575,7 +578,7 @@ function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
               },
             },
           }}
-        />
+        /> */}
       </div>
     </div>
   );
@@ -729,7 +732,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           disabled={disabled}
           selectProps={{
             props: {
-              options: optionsCreator_direction(),
+              options: optionsCreator_bendStright(),
               value: {
                 value: guideRail.guideRailType,
                 label: guideRail.guideRailType,
@@ -834,7 +837,7 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
 
         <InputSel
           {...basicConfig}
-          caption="底座鈑材質"
+          caption="底座板材質"
           disabled={disabled}
           selectProps={{
             props: {
@@ -892,7 +895,7 @@ function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined })
 
   return (
     <div>
-      <p className={scss.caption}>●支鈑</p>
+      <p className={scss.caption}>●支板</p>
       <div className={scss.grid}>
         <InputSel
           {...basicConfig}
