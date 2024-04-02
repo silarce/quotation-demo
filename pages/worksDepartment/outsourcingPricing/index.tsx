@@ -253,7 +253,7 @@ const DateList = ({ className, onCardClick }: { className?: string; onCardClick:
   const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
     const yearMonthList = getAllyearMonthListByRange({
       start: oldestDate,
-      end: undefined,
+      end: new Date().toISOString(),
     });
 
     let panelArr: Tcontrol_dateCollapse['panelArr'] = Object.entries(yearMonthList).map(([year, monthArr]) => {

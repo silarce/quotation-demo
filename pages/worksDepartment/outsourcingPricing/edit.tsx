@@ -717,7 +717,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       {
         label: (
           <>
-            <span className="inline-block mr-2">主管</span>
+            <span className="inline-block mr-2">工務</span>
             <span className="inline-block">{paymentOri?.reviewSupervisorEmployee.chName}</span>
           </>
         ),
@@ -779,7 +779,7 @@ export default function OutsourcingPricingEdit({ userInfo }: { userInfo: TuserDt
       disabled: true,
     },
     {
-      label: '主管',
+      label: '工務',
       employee: supervisor,
       onChange: (employee) => {
         setSupervisor(employee);
