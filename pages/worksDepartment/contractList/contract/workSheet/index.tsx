@@ -490,6 +490,7 @@ export default function Worksheet({
             setActiveWorksheetOriginalAccessories(prod.items?.[0].accessories ?? []);
             setActiveRecordId(undefined);
             setDisabled(true);
+            setIsLastestRecord(false);
           },
           onDeleteClick: () => {
             myAlert.confirm({
@@ -639,35 +640,6 @@ export default function Worksheet({
   // -------------------------------------------------------------------------
 
   let panelList_notAllow: TpanelList = [
-    // {
-    //   type: 'myButton',
-    //   label: '匯出EXCEL',
-    //   onClick: () => downloadExcel(control_workSheetPDF_01, `工作表_${control_profile.projectName.value}`),
-    // },
-    // {
-    //   type: 'myButton',
-    //   label: '匯出廠務部工作表',
-    //   onClick: () => setIsShowPdf02(true),
-    // },
-    // {
-    //   type: 'myButton',
-    //   label: '匯出工作表',
-    //   onClick: () => setIsShowPdf(true),
-    // },
-    {
-      type: 'redButton',
-      label: '送審',
-      onClick: () => {
-        setShowReviewerSelector(true);
-      },
-    },
-    // {
-    //   type: 'myButton',
-    //   label: '審核',
-    //   onClick: () => {
-    //     setShowReviewModal(true);
-    //   },
-    // },
     {
       type: 'myButton',
       label: '關閉工作表',
@@ -678,7 +650,17 @@ export default function Worksheet({
     },
   ];
 
-  if (isReviewer) {
+  if (isLastestRecord) {
+    panelList_notAllow.splice(-1, 0, {
+      type: 'redButton',
+      label: '送審',
+      onClick: () => {
+        setShowReviewerSelector(true);
+      },
+    });
+  }
+
+  if (isLastestRecord && isReviewer) {
     panelList_notAllow.splice(-1, 0, {
       type: 'myButton',
       label: '審核',
@@ -852,6 +834,18 @@ const WorksheetForm = ({
   reqPatchWorkSheet: () => void;
   disabled?: boolean;
 }) => {
+  // // 這個做法畫面會閃一下 不理想
+  // const [isMounted, setIsMounted] = useState(false);
+  // useEffect(() => {
+  //   setIsMounted(true);
+
+  //   return () => {
+  //     if (isMounted) {
+  //       onUnMount?.();
+  //     }
+  //   };
+  // }, []);
+
   return (
     <form className={scss.productForm}>
       <div>
@@ -1129,7 +1123,7 @@ const useControl_pdf = ({
           ),
           // form: sheet.headBoxForm_str,
           form: item.isIntegratedHeadBox ? '一體式捲箱' : '捲箱 + 機箱',
-          surface: '',
+          surface: componentList.headBox.materialSurface ?? '',
         },
         doorPiece: {
           material: componentList.slat.material,
@@ -1156,6 +1150,7 @@ const useControl_pdf = ({
             : undefined,
           antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
           bendStraight: item.guideRailType ?? '',
+          surface: componentList.guideRail.materialSurface ?? '',
         },
         chainCog: {
           sprocketWheelModel: item.sprocketWheelModel ?? '',
@@ -1168,10 +1163,10 @@ const useControl_pdf = ({
         base: {
           material: componentList.bottomBar.material,
           guideRailsOpening: String(item.guideRailsOpening ?? ''),
-          surface: '', // 未知 在廠務部工作表
+          surface: componentList.bottomBar.materialSurface ?? '', // 未知 在廠務部工作表
         },
         sidePlate: {
-          direction: '', // 未知 在廠務部工作表
+          direction: item.sidePlateDirection ?? '',
           bigSidePlate: `${item.boxB}*${item.boxD}`,
           smallSidePlate: `${item.boxB}*${item.boxB}`,
         },
