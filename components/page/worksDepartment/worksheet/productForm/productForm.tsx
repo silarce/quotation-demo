@@ -754,6 +754,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
             withIcon: true,
             props: {
               className: scss.inputSelWithIcon,
+
               options: getOptions_guideRail(),
               value: {
                 value: guideRail.guideRail,
