@@ -1,15 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
 
 // antd
-import { Select, Collapse, Upload, Image as AntdImage, Spin } from 'antd';
+import {
+  //
+  Select,
+  Collapse,
+  Upload,
+  Image as AntdImage,
+  Spin,
+} from 'antd';
 import { UploadChangeParam } from 'antd/lib/upload';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import ProcessChain, { Tcontrol_processChain, TstatusLabelProps } from 'components/global/gear/processChain';
+import MultButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
 import scss from './projectPattern.module.scss';
 
@@ -24,7 +33,13 @@ import {
   useEngineeringContactAttachments,
   TengineeringContactAttachmentType,
   TfileDto,
+  // 送審
+  apiPatchEngineeringContactSubmitAttachment,
+  // 審核
+  apiPatchEngineeringContactReviewAttachment,
 } from 'js/api/api_engineering';
+
+import { Toption } from 'js/utils/options/options';
 
 // =======================================================================
 const { Panel } = Collapse;
@@ -53,16 +68,97 @@ type ThasPattern = {
   hasDesign: boolean;
 };
 
-export type { ThasPattern };
+type TshouldHasPattern = {
+  shouldHasDetail: boolean;
+  shouldHasFloor: boolean;
+  shouldHasDesign: boolean;
+  shouldHasConstruction: boolean;
+  shouldHasColor: boolean;
+};
+
+type TpatternReviewProcess = {
+  sales: Tcontrol_processChain;
+  worker: Tcontrol_processChain;
+  manager: Tcontrol_processChain;
+};
+
+type TpatternReviewProcessGroup = {
+  color: TpatternReviewProcess;
+  construction: TpatternReviewProcess;
+  detail: TpatternReviewProcess;
+  floor: TpatternReviewProcess;
+  design: TpatternReviewProcess;
+};
+
+type TpatternReviewStatus = {
+  salesName: string;
+  workerName: string;
+  managerName: string;
+  pattern: {
+    color: {
+      colorToWorkerAt: string | null;
+      colorWorkerReviewedAt: string | null;
+      colorToManagerAt: string | null;
+      colorManagerReviewedAt: string | null;
+    };
+    construction: {
+      constructionToWorkerAt: string | null;
+      constructionWorkerReviewedAt: string | null;
+      constructionToManagerAt: string | null;
+      constructionManagerReviewedAt: string | null;
+    };
+    detail: {
+      detailToWorkerAt: string | null;
+      detailWorkerReviewedAt: string | null;
+      detailToManagerAt: string | null;
+      detailManagerReviewedAt: string | null;
+    };
+    floor: {
+      floorToWorkerAt: string | null;
+      floorWorkerReviewedAt: string | null;
+      floorToManagerAt: string | null;
+      floorManagerReviewedAt: string | null;
+    };
+    design: {
+      designToWorkerAt: string | null;
+      designWorkerReviewedAt: string | null;
+      designToManagerAt: string | null;
+      designManagerReviewedAt: string | null;
+    };
+  };
+};
+
+export type {
+  //
+  ThasPattern,
+  TpatternReviewProcessGroup,
+  TpatternReviewProcess,
+  TpatternReviewStatus,
+};
 
 // =======================================================================
 export default function ProjectPattern({
   engineeringContactId,
   onPatternChange,
+  patternReviewStatus,
+  onSubmitSuccess,
+  onReviewSuccess,
+  onDeleteSuccess,
+  shouldHasPattern,
+  isReviewer_worker,
+  isReviewer_manager,
 }: {
   engineeringContactId: string | null | undefined;
   onPatternChange: (hasPattern: ThasPattern) => void;
+  patternReviewStatus: TpatternReviewStatus;
+  onSubmitSuccess: () => void;
+  onReviewSuccess: () => void;
+  onDeleteSuccess: () => void;
+  shouldHasPattern: TshouldHasPattern;
+  isReviewer_worker: boolean;
+  isReviewer_manager: boolean;
 }) {
+  // -----------------------------------------------------------------------
   const [isUploading, setIsUploading] = useState<TisUploading>({
     floor: false,
     detail: false,
@@ -72,6 +168,8 @@ export default function ProjectPattern({
   });
 
   const isUploading_any = Object.values(isUploading).some((v) => v);
+
+  const [reviewConfirm, setReviewConfirm] = useState<(isPass: boolean) => void>();
 
   // -----------------------------------------------------------------------
 
@@ -193,6 +291,7 @@ export default function ProjectPattern({
     try {
       await apiDeleteEngineeringContactAttachments(engineeringContactId, patternType, id);
       await update(patternType);
+      await onDeleteSuccess();
     } catch (error) {}
   };
 
@@ -218,6 +317,41 @@ export default function ProjectPattern({
     await reqUploadPattern(preUploadFile, patternType);
   };
 
+  // ---------------------------------------------------------------------0
+  // 送審
+  const confirmReqSubmitPattern = async (patternType: TpatternType) => {
+    myAlert.confirm({
+      title: '確定送審?',
+      props: {
+        onOk: () => {
+          reqSubmitPattern(patternType);
+        },
+      },
+    });
+  };
+
+  const reqSubmitPattern = async (patternType: TpatternType) => {
+    if (engineeringContactId) {
+      try {
+        await apiPatchEngineeringContactSubmitAttachment(engineeringContactId, { attachmentType: patternType });
+        await onSubmitSuccess();
+      } catch (error) {}
+    }
+  };
+
+  // 審核
+
+  const reqReviewPattern = async ({ attachmentType, isPass }: { attachmentType: string; isPass: boolean }) => {
+    if (engineeringContactId) {
+      try {
+        await apiPatchEngineeringContactReviewAttachment(engineeringContactId, { attachmentType, isPass });
+        setReviewConfirm(undefined);
+        await onReviewSuccess();
+      } catch (error) {}
+    }
+  };
+
+  // ---------------------------------------------------------------------
   //
   const onDraggerChange = async (e: UploadChangeParam, patternType: TpatternType) => {
     const {
@@ -232,6 +366,13 @@ export default function ProjectPattern({
   const onRemoveClick = (pattern: TpatternType) => {
     myAlert.confirm({
       title: '確定移除?',
+      content: (
+        <span>
+          移除後無法復原
+          <br />
+          重新上傳需要重新審核
+        </span>
+      ),
       props: {
         onOk: () => reqDeletePattern(pattern),
       },
@@ -302,13 +443,22 @@ export default function ProjectPattern({
     isImage: checkFileIsImage_str(fileInfo_detail?.mime ?? ''),
     fileName: fileInfo_detail?.name ?? '',
   };
+  // -----------------------------------------------------------------------
+
+  const controlList = useControl_review({
+    patternReviewStatus: patternReviewStatus,
+    isReviewer_worker,
+    isReviewer_manager,
+  });
+
+  // -----------------------------------------------------------------------
 
   return (
     <div className={scss.container}>
       <div className={scss.controlBar}>
         <Select
           className={classNames(scss.antdSelect, scss.plus)}
-          options={options}
+          options={createOptions(shouldHasPattern)}
           // onChange={(v) => console.log(v)}
           onChange={(v) => setPatternType(v)}
           placeholder="選擇要上傳工程圖表項目"
@@ -338,31 +488,114 @@ export default function ProjectPattern({
           isLoading={isUploading_any}
         />
       </div>
-      {/*  */}
-
       <Collapse
         className={scss.antdCollapse}
-        defaultActiveKey={['detail']}
-        // onChange={(v) => {console.log(v);}}
+        // defaultActiveKey={['detail']}
       >
-        <Panel header="簽認圖" key="detail" className={scss.panel}>
-          <ImageDragger {...props_detail} />
-        </Panel>
-        <Panel header="平面圖" key="floor" className={scss.panel}>
-          <ImageDragger {...props_floor} />
-        </Panel>
-        <Panel header="設計圖" key="design" className={scss.panel}>
-          <ImageDragger {...props_design} />
-        </Panel>
-        <Panel header="施工圖" key="construction" className={scss.panel}>
-          <ImageDragger {...props_construction} />
-        </Panel>
-        <Panel header="色卡" key="color" className={scss.panel}>
-          <ImageDragger {...props_color} />
-        </Panel>
+        {/* 簽認圖 */}
+        {shouldHasPattern.shouldHasDetail && (
+          <Panel header="簽認圖" key="detail" className={scss.panel}>
+            <Pattern
+              patternType={'detail'}
+              props={props_detail}
+              isDetailSubmit={!!controlList.isDetailSubmit}
+              isReviewer={controlList.isReviewer_detail}
+              statusArr={controlList.detail}
+              confirmReqSubmitPattern={confirmReqSubmitPattern}
+              reqReviewPattern={reqReviewPattern}
+              setReviewConfirm={setReviewConfirm}
+            />
+          </Panel>
+        )}
+
+        {/* 平面圖 */}
+        {shouldHasPattern.shouldHasFloor && (
+          <Panel header="平面圖" key="floor" className={scss.panel}>
+            <Pattern
+              patternType={'floor'}
+              props={props_floor}
+              isDetailSubmit={!!controlList.isFloorSubmit}
+              isReviewer={controlList.isReviewer_floor}
+              statusArr={controlList.floor}
+              confirmReqSubmitPattern={confirmReqSubmitPattern}
+              reqReviewPattern={reqReviewPattern}
+              setReviewConfirm={setReviewConfirm}
+            />
+          </Panel>
+        )}
+
+        {/* 設計圖 */}
+        {shouldHasPattern.shouldHasDesign && (
+          <Panel header="設計圖" key="design" className={scss.panel}>
+            <Pattern
+              patternType={'design'}
+              props={props_design}
+              isDetailSubmit={!!controlList.isDesignSubmit}
+              isReviewer={controlList.isReviewer_design}
+              statusArr={controlList.design}
+              confirmReqSubmitPattern={confirmReqSubmitPattern}
+              reqReviewPattern={reqReviewPattern}
+              setReviewConfirm={setReviewConfirm}
+            />
+          </Panel>
+        )}
+
+        {/* 施工圖 */}
+        {shouldHasPattern.shouldHasConstruction && (
+          <Panel header="施工圖" key="construction" className={scss.panel}>
+            <Pattern
+              patternType={'construction'}
+              props={props_construction}
+              isDetailSubmit={!!controlList.isConstructionSubmit}
+              isReviewer={controlList.isReviewer_construction}
+              statusArr={controlList.construction}
+              confirmReqSubmitPattern={confirmReqSubmitPattern}
+              reqReviewPattern={reqReviewPattern}
+              setReviewConfirm={setReviewConfirm}
+            />
+          </Panel>
+        )}
+
+        {/* 色卡 */}
+        {shouldHasPattern.shouldHasColor && (
+          <Panel header="色卡" key="color" className={scss.panel}>
+            <Pattern
+              patternType={'color'}
+              props={props_color}
+              isDetailSubmit={!!controlList.isColorSubmit}
+              isReviewer={controlList.isReviewer_color}
+              statusArr={controlList.color}
+              confirmReqSubmitPattern={confirmReqSubmitPattern}
+              reqReviewPattern={reqReviewPattern}
+              setReviewConfirm={setReviewConfirm}
+            />
+          </Panel>
+        )}
       </Collapse>
+
+      <MultButtonModal
+        visible={!!reviewConfirm}
+        text={'是否通過審核?'}
+        onCancel={() => setReviewConfirm(undefined)}
+        modalWidth={600}
+        btnPropsArr={[
+          {
+            label: '通過審核',
+            theme: 'danger',
+            onClick: () => reviewConfirm?.(true),
+          },
+          {
+            label: '不通過審核',
+            onClick: () => reviewConfirm?.(false),
+          },
+          {
+            label: '取消',
+            onClick: () => setReviewConfirm(undefined),
+          },
+        ]}
+      />
     </div>
-  );
+  ); // return
 }
 
 // ==================================================
@@ -413,6 +646,293 @@ const ImageDragger = ({
   );
 };
 
+// -----------------------------------------------------------------------
+
+const BtnBar = ({
+  //
+  onReviewClick,
+  onSubmitClick,
+  shouldRender = true,
+}: {
+  onReviewClick?: (() => void) | null;
+  onSubmitClick?: (() => void) | null;
+  shouldRender?: boolean;
+}) => {
+  if (!shouldRender) {
+    return null;
+  }
+
+  return (
+    <div className={scss.btnBar}>
+      {onReviewClick && <MyButton_v2 onClick={onReviewClick}>審核</MyButton_v2>}
+      {onSubmitClick && (
+        <MyButton_v2 onClick={onSubmitClick} theme="danger">
+          送審
+        </MyButton_v2>
+      )}
+    </div>
+  );
+};
+// -----------------------------------------------------------------------
+
+const Pattern = ({
+  //
+  patternType,
+  props,
+  isDetailSubmit,
+  statusArr,
+  isReviewer,
+  confirmReqSubmitPattern,
+  reqReviewPattern,
+  setReviewConfirm,
+}: {
+  patternType: TpatternType;
+  props: Parameters<typeof ImageDragger>[0];
+  isDetailSubmit: boolean;
+  isReviewer: boolean;
+  confirmReqSubmitPattern: (patternType: TpatternType) => void;
+  reqReviewPattern: (props: { attachmentType: string; isPass: boolean }) => void;
+  setReviewConfirm: (confirm: (isPass: boolean) => void) => void;
+  statusArr: TstatusLabelProps[];
+}) => {
+  return (
+    <div>
+      <BtnBar
+        shouldRender={!!props.fileSrc}
+        onSubmitClick={checkAndReturnMethod({
+          check: !isDetailSubmit,
+          method: () => confirmReqSubmitPattern(patternType),
+        })}
+        onReviewClick={checkAndReturnMethod({
+          check: isDetailSubmit && isReviewer,
+          method: () => {
+            const theReviewconfirm = (isPass: boolean) => {
+              reqReviewPattern({
+                attachmentType: patternType,
+                isPass,
+              });
+            };
+
+            setReviewConfirm(() => theReviewconfirm);
+          },
+        })}
+      />
+      <ImageDragger {...props} />
+
+      {isDetailSubmit && (
+        <ProcessChain
+          className="mt-5"
+          control={{
+            statusArr: statusArr,
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+// -----------------------------------------------------------------------
+
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+// ======================================================================
+
+const useControl_review = ({
+  isReviewer_worker,
+  isReviewer_manager,
+  patternReviewStatus,
+}: {
+  patternReviewStatus: TpatternReviewStatus;
+  isReviewer_worker: boolean;
+  isReviewer_manager: boolean;
+}) => {
+  const controlList = useMemo(() => {
+    let isReviewer_design = false;
+    let isReviewer_color = false;
+    let isReviewer_construction = false;
+    let isReviewer_detail = false;
+    let isReviewer_floor = false;
+
+    const { salesName, workerName, managerName, pattern } = patternReviewStatus;
+
+    const {
+      color: { colorToWorkerAt, colorWorkerReviewedAt, colorToManagerAt, colorManagerReviewedAt },
+      construction: {
+        constructionToWorkerAt,
+        constructionWorkerReviewedAt,
+        constructionToManagerAt,
+        constructionManagerReviewedAt,
+      },
+      detail: { detailToWorkerAt, detailWorkerReviewedAt, detailToManagerAt, detailManagerReviewedAt },
+      floor: { floorToWorkerAt, floorWorkerReviewedAt, floorToManagerAt, floorManagerReviewedAt },
+      design: { designToWorkerAt, designWorkerReviewedAt, designToManagerAt, designManagerReviewedAt },
+    } = pattern;
+
+    const checkStatus = ({ toAt, reviewedAt }: { toAt: string | null; reviewedAt: string | null }) => {
+      if (reviewedAt) {
+        return 'green';
+      } else if (toAt) {
+        return 'red';
+      } else {
+        return 'gray';
+      }
+    };
+
+    //
+    const statusArr_design: TstatusLabelProps[] = [
+      {
+        label: `業務 ${salesName}`,
+        dotColor: 'green',
+      },
+      {
+        label: `工務 ${workerName}`,
+        dotColor: checkStatus({
+          toAt: designToWorkerAt,
+          reviewedAt: designWorkerReviewedAt,
+        }),
+      },
+      {
+        label: `總經理 ${managerName}`,
+        dotColor: checkStatus({
+          toAt: designToManagerAt,
+          reviewedAt: designManagerReviewedAt,
+        }),
+      },
+    ];
+
+    const statusArr_floor: TstatusLabelProps[] = [
+      { label: `業務 ${salesName}`, dotColor: 'green' },
+      {
+        label: `工務 ${workerName}`,
+        dotColor: checkStatus({ toAt: floorToWorkerAt, reviewedAt: floorWorkerReviewedAt }),
+      },
+      {
+        label: `總經理 ${managerName}`,
+        dotColor: checkStatus({ toAt: floorToManagerAt, reviewedAt: floorManagerReviewedAt }),
+      },
+    ];
+
+    const statusArr_color: TstatusLabelProps[] = [
+      { label: `業務 ${salesName}`, dotColor: 'green' },
+      {
+        label: `工務 ${workerName}`,
+        dotColor: checkStatus({ toAt: colorToWorkerAt, reviewedAt: colorWorkerReviewedAt }),
+      },
+      {
+        label: `總經理 ${managerName}`,
+        dotColor: checkStatus({ toAt: colorToManagerAt, reviewedAt: colorManagerReviewedAt }),
+      },
+    ];
+
+    const statusArr_construction: TstatusLabelProps[] = [
+      { label: `業務 ${salesName}`, dotColor: 'green' },
+      {
+        label: `工務 ${workerName}`,
+        dotColor: checkStatus({
+          toAt: constructionToWorkerAt,
+          reviewedAt: constructionWorkerReviewedAt,
+        }),
+      },
+      {
+        label: `總經理 ${managerName}`,
+        dotColor: checkStatus({
+          toAt: constructionToManagerAt,
+          reviewedAt: constructionManagerReviewedAt,
+        }),
+      },
+    ];
+
+    const statusArr_detail: TstatusLabelProps[] = [
+      { label: `業務 ${salesName}`, dotColor: 'green' },
+      {
+        label: `工務 ${workerName}`,
+        dotColor: checkStatus({ toAt: detailToWorkerAt, reviewedAt: detailWorkerReviewedAt }),
+      },
+      {
+        label: `總經理 ${managerName}`,
+        dotColor: checkStatus({ toAt: detailToManagerAt, reviewedAt: detailManagerReviewedAt }),
+      },
+    ];
+    //
+
+    // if (designToManagerAt && isReviewer_manager) {
+    //   isReviewer_design = true;
+    // } else if (designToWorkerAt && isReviewer_worker) {
+    //   isReviewer_design = true;
+    // }
+
+    // if (colorToManagerAt && isReviewer_manager) {
+    //   isReviewer_color = true;
+    // } else if (colorToWorkerAt && isReviewer_worker) {
+    //   isReviewer_color = true;
+    // }
+
+    // if (constructionToManagerAt && isReviewer_manager) {
+    //   isReviewer_construction = true;
+    // } else if (constructionToWorkerAt && isReviewer_worker) {
+    //   isReviewer_construction = true;
+    // }
+
+    // if (detailToManagerAt && isReviewer_manager) {
+    //   isReviewer_detail = true;
+    // } else if (detailToWorkerAt && isReviewer_worker) {
+    //   isReviewer_detail = true;
+    // }
+
+    // if (floorToManagerAt && isReviewer_manager) {
+    //   isReviewer_floor = true;
+    // } else if (floorToWorkerAt && isReviewer_worker) {
+    //   isReviewer_floor = true;
+    // }
+
+    if ((designToManagerAt && isReviewer_manager) || (designToWorkerAt && isReviewer_worker)) {
+      isReviewer_design = true;
+    }
+
+    if ((colorToManagerAt && isReviewer_manager) || (colorToWorkerAt && isReviewer_worker)) {
+      isReviewer_color = true;
+    }
+
+    if ((constructionToManagerAt && isReviewer_manager) || (constructionToWorkerAt && isReviewer_worker)) {
+      isReviewer_construction = true;
+    }
+
+    if ((detailToManagerAt && isReviewer_manager) || (detailToWorkerAt && isReviewer_worker)) {
+      isReviewer_detail = true;
+    }
+
+    if ((floorToManagerAt && isReviewer_manager) || (floorToWorkerAt && isReviewer_worker)) {
+      isReviewer_floor = true;
+    }
+
+    return {
+      color: statusArr_color,
+      construction: statusArr_construction,
+      detail: statusArr_detail,
+      floor: statusArr_floor,
+      design: statusArr_design,
+
+      isColorSubmit: !!colorToWorkerAt,
+      isConstructionSubmit: !!constructionToWorkerAt,
+      isDetailSubmit: !!detailToWorkerAt,
+      isFloorSubmit: !!floorToWorkerAt,
+      isDesignSubmit: !!designToWorkerAt,
+
+      isReviewer_design,
+      isReviewer_color,
+      isReviewer_construction,
+      isReviewer_detail,
+      isReviewer_floor,
+    };
+
+    //
+  }, [patternReviewStatus]);
+
+  return controlList;
+};
+
 // ==================================================
 
 const checkFileIsImage = (file: File) => {
@@ -429,10 +949,31 @@ const checkFileIsImage_str = (str: string) => {
   return isImage;
 };
 
-const options = [
-  { value: 'detail', label: '簽認圖' },
-  { value: 'floor', label: '平面圖' },
-  { value: 'design', label: '設計圖' },
-  { value: 'construction', label: '施工圖' },
-  { value: 'color', label: '色卡' },
-];
+const createOptions = (shouldHasPattern: TshouldHasPattern) => {
+  const list = {
+    shouldHasDetail: { value: 'detail', label: '簽認圖' },
+    shouldHasFloor: { value: 'floor', label: '平面圖' },
+    shouldHasDesign: { value: 'design', label: '設計圖' },
+    shouldHasConstruction: { value: 'construction', label: '施工圖' },
+    shouldHasColor: { value: 'color', label: '色卡' },
+  };
+
+  const options: Toption[] = [];
+  const keyArr = Object.keys(shouldHasPattern) as (keyof TshouldHasPattern)[];
+
+  keyArr.forEach((key) => {
+    if (shouldHasPattern[key]) {
+      options.push(list[key]);
+    }
+  });
+
+  return options;
+};
+
+const checkAndReturnMethod = ({ check, method }: { check: boolean; method: () => void }) => {
+  if (check) {
+    return method;
+  } else {
+    return null;
+  }
+};

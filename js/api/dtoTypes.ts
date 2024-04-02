@@ -1135,7 +1135,8 @@ export type TengineeringDeliveryStatusDto = {
   // 單樘計價
   unitPrice: number | null;
   // 其他特殊工作項目
-  otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
+  // otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
+  otherWorkItems: ToutsourcingPaymentDetailItemDto | null;
   // 其他特殊工作項目合計
   otherWorkItemTotal: number | null;
 };
@@ -2338,6 +2339,8 @@ export type TsubmitReviewQotuationContentDto = {
 
 // =========================================================================
 
+export type TengineeringContactAttachmentType = 'color' | 'construction' | 'detail' | 'floor' | 'design';
+
 // engineering
 // 工程聯絡單
 export type TengineeringContactDto = {
@@ -2393,6 +2396,62 @@ export type TengineeringContactDto = {
   shouldHasDetail: boolean | null; // 大樣詳圖、簽認圖
   shouldHasFloor: boolean | null; // 平面圖
   shouldHasDesign: boolean | null; // 設計圖
+
+  // 20240329新增
+
+  // 工務 ID
+  reviewWorkerEmployeeId: string | null;
+  // 工務
+  reviewWorkerEmployee?: TemployeeDto;
+  // 總經理 ID
+  reviewManagerEmployeeId: string | null;
+  // 總經理
+  reviewManagerEmployee?: TemployeeDto;
+
+  // 簽認圖送審給工務的時間
+  detailToWorkerAt: string | null;
+  // 工務審核簽認圖時間
+  detailWorkerReviewedAt: string | null;
+  // 簽認送審給總經理的時間
+  detailToManagerAt: string | null;
+  // 總經理審核簽認圖時間
+  detailManagerReviewedAt: string | null;
+
+  // 設計圖送審給工務的時間
+  designToWorkerAt: string | null;
+  // 工務審核設計圖時間
+  designWorkerReviewedAt: string | null;
+  // 設計圖送審給總經理的時間
+  designToManagerAt: string | null;
+  // 總經理審核設計圖時間
+  designManagerReviewedAt: string | null;
+
+  // 平面圖送審給工務的時間
+  floorToWorkerAt: string | null;
+  // 工務審核平面圖時間
+  floorWorkerReviewedAt: string | null;
+  // 平面圖送審給總經理的時間
+  floorToManagerAt: string | null;
+  // 總經理審核平面圖時間
+  floorManagerReviewedAt: string | null;
+
+  // 施工圖(工程圖)送審給工務的時間
+  constructionToWorkerAt: string | null;
+  // 工務審核施工圖(工程圖)時間
+  constructionWorkerReviewedAt: string | null;
+  // 施工圖(工程圖)送審給總經理的時間
+  constructionToManagerAt: string | null;
+  // 總經理審核施工圖(工程圖)時間
+  constructionManagerReviewedAt: string | null;
+
+  // 色卡送審給工務的時間
+  colorToWorkerAt: string | null;
+  // 工務審核色卡時間
+  colorWorkerReviewedAt: string | null;
+  // 色卡送審給總經理的時間
+  colorToManagerAt: string | null;
+  // 總經理審核色卡時間
+  colorManagerReviewedAt: string | null;
 };
 
 export type TupdateEngineeringContactDto = {
@@ -2445,6 +2504,15 @@ export type TupdateEngineeringContactDto = {
 export type TcreateEngineeringContactDto = {
   quotationId?: string | null; // 報價單ID
   contractId?: string | null; // 合約ID
+};
+
+export type TsubmitEngineeringContactDto = {
+  attachmentType: TengineeringContactAttachmentType;
+};
+
+export type TreviewEngineeringContactDto = {
+  attachmentType: string;
+  isPass: boolean;
 };
 
 // 派工單
@@ -2895,6 +2963,15 @@ export type TupdateWorkSheet = {
   contractProductItems: TupdateContractProductItemDto[];
 };
 
+// 送審工作表用的
+export type TsubmitWorksheetProductsItemsDto = {
+  reviewSalesEmployeeId: string;
+};
+// 審核工作表用的
+export type TreviewWorksheetProductsItemsDto = {
+  isPass: boolean;
+};
+
 // 出庫單
 
 export type TengineeringDeliveryListDto = {
@@ -3321,8 +3398,9 @@ export type TcreateOutsourcingPaymentDetailItemDto = {
 
 export type TupdateOutsourcingPaymentDetailDto = {
   engineeringContactId: string; // 工程聯落單id
-  installItem: TcreateOutsourcingPaymentDetailItemDto[]; // 項目
-  outsourcing: number; // 外包計價明細總計
+  installItems: TcreateOutsourcingPaymentDetailItemDto[]; // 項目
+  // outsourcing: number; // 外包計價明細總計
+  outsourcingTotal: number; // 外包計價明細總計
 };
 
 export type ToutsourcingPaymentDetailItemDto = {

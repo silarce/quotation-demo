@@ -39,7 +39,7 @@ export const TableContentWithImage2 = ({
           //   height={90}
           //   alt=""
           // />
-          <div dangerouslySetInnerHTML={{ __html: dangerSvg }} style={{ width: 90, height: 90 }} />
+          <div dangerouslySetInnerHTML={{ __html: dangerSvg }} style={{ width: 75, height: 75 }} />
         )}
 
         {value === '客製' && <div>{value}</div>}

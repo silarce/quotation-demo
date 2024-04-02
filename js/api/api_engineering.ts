@@ -49,6 +49,12 @@ import type {
   TaccountsReceivableProductPaymentDto,
   TcreateAccountReceivableProductPaymentDto,
   TupdateAccountReceivableProductPaymentDto,
+  TsubmitEngineeringContactDto,
+  TengineeringContactAttachmentType,
+  TreviewEngineeringContactDto,
+  TworksheetRecordDto,
+  TsubmitWorksheetProductsItemsDto,
+  TreviewWorksheetProductsItemsDto,
 } from './dtoTypes';
 
 export type {
@@ -90,16 +96,18 @@ export type {
   TcreateAccountReceivableProductPaymentDto,
   TupdateAccountReceivableProductPaymentDto,
   TcreateWorksheetDto,
+  TsubmitEngineeringContactDto,
+  TengineeringContactAttachmentType,
+  TreviewEngineeringContactDto,
+  TworksheetRecordDto,
+  TsubmitWorksheetProductsItemsDto,
+  TreviewWorksheetProductsItemsDto,
 } from './dtoTypes';
-
-type TengineeringContactAttachmentType = 'floor' | 'detail' | 'color' | 'construction' | 'design';
 
 type TgetEngineeringContact = {
   data: TengineeringContactDto[];
   meta: TpageMetaDto;
 };
-
-export type { TengineeringContactAttachmentType };
 
 // ===========================================================================]
 
@@ -107,8 +115,12 @@ export type { TengineeringContactAttachmentType };
 export const apiGetEngineeringContact = async (id: string) => {
   const api = `/engineering/engineering-contact/${id}`;
 
+  const params = {
+    populate: ['reviewWorkerEmployee', 'reviewManagerEmployee'],
+  };
+
   return axi
-    .get<TengineeringContactDto>(api)
+    .get<TengineeringContactDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -797,7 +809,12 @@ export const apiDeleteWorksheet = async (worksheetId: string) => {
   return axi
     .delete(api)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      const error = err as AxiosError;
+      myAlert.err({ title: '刪除工作表失敗', content: error.message });
+
+      return Promise.reject(err);
+    });
 };
 
 export const apiPatchWorkSheetProducts = (id: string, body: TupdateWorkSheet) => {
@@ -829,6 +846,96 @@ export const apiDeleteWorkSheetItem = async (
     .catch((err) => Promise.reject(err));
 };
 
+const apiGetWorksheetRecord_id = async (id: string, params?: Tparams) => {
+  const api = `/engineering/worksheet/record/${id}`;
+
+  params = {
+    populate: [
+      //
+      'reviewSalesEmployee',
+      'reviewManagerEmployee',
+      'contractProductItems.components',
+      'contractProductItems.accessories',
+    ],
+    ...params,
+  };
+
+  return axi
+    .get(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useApiGetWorksheetRecord_id = (recordId: string | undefined) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [res, setRes] = useState<TworksheetRecordDto>();
+
+  const update = async () => {
+    if (!recordId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await apiGetWorksheetRecord_id(recordId);
+      setRes(res);
+    } catch (error) {
+      const err = error as AxiosError;
+
+      myAlert.err({ title: '取得工作表歷程記錄失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    isLoading,
+    data: res,
+    update,
+    clear: () => setRes(undefined),
+  };
+};
+
+// 工作表送審
+export const apiPatchWorksheetRecordSubmit = async (recordId: string, body: TsubmitWorksheetProductsItemsDto) => {
+  const api = `/engineering/worksheet/worksheet-record/${recordId}/submit`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => {
+      myAlert.success({ title: '送審成功' });
+
+      return data;
+    })
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '送審工作表失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 工作表審核
+export const apiPatchWorksheetRecordReview = async (recordId: string, body: TreviewWorksheetProductsItemsDto) => {
+  const api = `/engineering/worksheet/worksheet-record/${recordId}/review`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => {
+      myAlert.success({ title: '審核成功' });
+
+      return data;
+    })
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '審核工作表失敗', content: err.message });
+
+      return Promise.reject(error);
+    });
+};
+
+// =============================================================================
+
 // 出庫單
 
 // 產生出庫單，後端已移除這個api
@@ -859,6 +966,8 @@ export const apiGetEngineeringDeliveryList = (id: string) => {
       'contract.worksheet.latestRecord.contractProductItems.adjustedItem.accessories',
       'contract.worksheet.latestRecord.contractProductItems.accessories',
       'contract.worksheet.latestRecord.contractProductItems.rootproductId',
+      'contract.worksheet.latestRecord.contractProductItems.rootWorksheetItem',
+      'contract.worksheet.latestRecord.contractProductItems.latestWorksheetItem ',
     ],
   };
 
@@ -1537,4 +1646,32 @@ export const useEngineeringContactAttachments = (id: string | undefined | null) 
     update,
     updateAll,
   };
+};
+
+// 送審工程聯絡單附件
+export const apiPatchEngineeringContactSubmitAttachment = async (id: string, body: TsubmitEngineeringContactDto) => {
+  const api = `/engineering/engineering-contact/${id}/submit-attachment/`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '送審工程聯絡單附件失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 審核工程聯絡單附件
+export const apiPatchEngineeringContactReviewAttachment = async (id: string, body: TreviewEngineeringContactDto) => {
+  const api = `/engineering/engineering-contact/${id}/review-attachment/`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError) => {
+      myAlert.err({ title: '審核工程聯絡單附件失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };
