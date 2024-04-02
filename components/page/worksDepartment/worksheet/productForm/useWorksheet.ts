@@ -1000,8 +1000,6 @@ const useWorksheet = create<Tworksheet>(
       const option_guideRailThickness = get().getOptions_guideRailThickness()[0];
       const options_guideRail = get().getOptions_guideRail()[0];
 
-      console.log(options_guideRail);
-
       get().guideRail.setGuideRail({
         guideRail: options_guideRail.value,
         hasSilencingStrip: options_guideRail.hasSilencingStrip as boolean,

@@ -1129,7 +1129,7 @@ const useControl_pdf = ({
           ),
           // form: sheet.headBoxForm_str,
           form: item.isIntegratedHeadBox ? '一體式捲箱' : '捲箱 + 機箱',
-          surface: '',
+          surface: componentList.headBox.materialSurface ?? '',
         },
         doorPiece: {
           material: componentList.slat.material,
@@ -1156,6 +1156,7 @@ const useControl_pdf = ({
             : undefined,
           antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
           bendStraight: item.guideRailType ?? '',
+          surface: componentList.guideRail.materialSurface ?? '',
         },
         chainCog: {
           sprocketWheelModel: item.sprocketWheelModel ?? '',
@@ -1168,7 +1169,7 @@ const useControl_pdf = ({
         base: {
           material: componentList.bottomBar.material,
           guideRailsOpening: String(item.guideRailsOpening ?? ''),
-          surface: '', // 未知 在廠務部工作表
+          surface: componentList.bottomBar.materialSurface ?? '', // 未知 在廠務部工作表
         },
         sidePlate: {
           direction: '', // 未知 在廠務部工作表
