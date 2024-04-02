@@ -230,6 +230,13 @@ export const optionsCreator_direction = createOptionsCreator({
   ],
 });
 
+export const optionsCreator_bendStright = createOptionsCreator({
+  optionsArr: [
+    { value: '彎', label: '彎' },
+    { value: '直', label: '直' },
+  ],
+});
+
 export const optionsCreator_isIntegratedHeadBox = createOptionsCreator({
   optionsArr: [
     { value: 'true', label: '一體式捲箱' },
