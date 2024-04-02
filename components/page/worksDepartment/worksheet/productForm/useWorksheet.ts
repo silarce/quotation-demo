@@ -994,8 +994,30 @@ const useWorksheet = create<Tworksheet>(
       );
     },
 
+    // 預計把取得component與bom的處理寫在這邊
     calcData_2: async () => {
-      const { updateSlatCount } = get();
+      const updateSlatCount = get().updateSlatCount;
+
+      set(
+        produce<Tworksheet>((state) => {
+          const { basicSpec, ABCD, getFullWidth_mm, getWG_mm } = state;
+
+          if (basicSpec.fullWidth) {
+            const WG_mm = new Decimal(getFullWidth_mm()) //
+              .minus(ABCD.getGapA())
+              .minus(ABCD.getGapC())
+              .toNumber();
+            basicSpec.WG = new Decimal(WG_mm).div(1000).toString();
+          } else if (basicSpec.WG) {
+            const fullWidth_mm = new Decimal(getWG_mm()) //
+              .add(ABCD.getGapA())
+              .add(ABCD.getGapC())
+              .toNumber();
+            basicSpec.fullWidth = new Decimal(fullWidth_mm).div(1000).toString();
+          }
+          //
+        }) //produce
+      ); // set
 
       await updateSlatCount();
 
