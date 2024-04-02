@@ -138,7 +138,11 @@ export default function OutboundOrder({
 
   const { deliveryList, update_deliveryList } = useGetEngineeringDeliveryList(engineeringDeliveryListId);
 
-  const worksheetArr = deliveryList?.contract.worksheet;
+  const worksheetArr = useMemo(() => {
+    return (deliveryList?.contract.worksheet ?? []).filter((worksheet) => {
+      return worksheet.isAbandoned === false;
+    });
+  }, [deliveryList?.contract.worksheet]);
 
   useEffect(() => {
     (async () => {
