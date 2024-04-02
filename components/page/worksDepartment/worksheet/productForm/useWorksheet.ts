@@ -854,7 +854,13 @@ const useWorksheet = create<Tworksheet>(
 
     getOptions_guideRailThickness: () => getOptions_guideRailThickness(get().avalibleComponents?.guideRails ?? []),
 
-    getOptions_guideRail: () => getOptions_guideRail(get().doorModelInfo?.guideRails ?? []),
+    getOptions_guideRail: () =>
+      getOptions_guideRail({
+        //
+        guideRailArr: get().doorModelInfo?.guideRails ?? [],
+        doorModelName: get().basicSpec.doorModelName as TdoorModel,
+        isAntiTyphoon: get().basicSpec.isAntiTyphoon,
+      }),
 
     getOptions_doorModelInfo: () => getOptions_doorModelInfo(get().doorModelInfoList),
 
@@ -1346,8 +1352,17 @@ const getOptions_guideRailThickness = (guideRailArr: TdoorComponentListDto['guid
 };
 
 // 取得門軌選項
-const getOptions_guideRail = (guideRailArr: TdoorModelInfoDto['guideRails']) => {
-  const options = guideRailArr.map((guideRail) => {
+const getOptions_guideRail = ({
+  //
+  guideRailArr,
+  doorModelName,
+  isAntiTyphoon,
+}: {
+  guideRailArr: TdoorModelInfoDto['guideRails'];
+  doorModelName: string;
+  isAntiTyphoon: boolean;
+}) => {
+  let options = guideRailArr.map((guideRail) => {
     const { imgSrc, hasSilencingStrip, opening, thickness, width, withHook } = guideRail;
 
     return {
@@ -1361,6 +1376,14 @@ const getOptions_guideRail = (guideRailArr: TdoorModelInfoDto['guideRails']) => 
       withHook,
     };
   });
+
+  if (doorModelName === 'SJ-302') {
+    if (isAntiTyphoon) {
+      options = options.filter((option) => option.withHook === true);
+    } else {
+      options = options.filter((option) => option.withHook === false);
+    }
+  }
 
   return options;
 };
