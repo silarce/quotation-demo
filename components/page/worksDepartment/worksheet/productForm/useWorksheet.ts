@@ -854,7 +854,13 @@ const useWorksheet = create<Tworksheet>(
 
     getOptions_guideRailThickness: () => getOptions_guideRailThickness(get().avalibleComponents?.guideRails ?? []),
 
-    getOptions_guideRail: () => getOptions_guideRail(get().doorModelInfo?.guideRails ?? []),
+    getOptions_guideRail: () =>
+      getOptions_guideRail({
+        //
+        guideRailArr: get().doorModelInfo?.guideRails ?? [],
+        doorModelName: get().basicSpec.doorModelName as TdoorModel,
+        isAntiTyphoon: get().basicSpec.isAntiTyphoon,
+      }),
 
     getOptions_doorModelInfo: () => getOptions_doorModelInfo(get().doorModelInfoList),
 
@@ -992,6 +998,15 @@ const useWorksheet = create<Tworksheet>(
       const option_electricSupply = get().getOptions_electricSupply()[0];
       const option_headBoxThickness = get().getOptions_headBoxThickness()[0];
       const option_guideRailThickness = get().getOptions_guideRailThickness()[0];
+      const options_guideRail = get().getOptions_guideRail()[0];
+
+      get().guideRail.setGuideRail({
+        guideRail: options_guideRail.value,
+        hasSilencingStrip: options_guideRail.hasSilencingStrip as boolean,
+        width: options_guideRail.width as number,
+        opening: options_guideRail.opening as string,
+        thickness: options_guideRail.thickness as string,
+      });
 
       set(
         produce((state) => {
@@ -999,6 +1014,7 @@ const useWorksheet = create<Tworksheet>(
           state.motor.motorPhase = (option_electricSupply.phase ?? '') as string;
           state.headBox.headBoxThickness = option_headBoxThickness.value;
           state.guideRail.guideRailThickness = option_guideRailThickness.value;
+          // state.guideRail.guideRail = options_guideRail.value;
 
           state.shouldCalcData = false;
         })
@@ -1346,8 +1362,17 @@ const getOptions_guideRailThickness = (guideRailArr: TdoorComponentListDto['guid
 };
 
 // 取得門軌選項
-const getOptions_guideRail = (guideRailArr: TdoorModelInfoDto['guideRails']) => {
-  const options = guideRailArr.map((guideRail) => {
+const getOptions_guideRail = ({
+  //
+  guideRailArr,
+  doorModelName,
+  isAntiTyphoon,
+}: {
+  guideRailArr: TdoorModelInfoDto['guideRails'];
+  doorModelName: string;
+  isAntiTyphoon: boolean;
+}) => {
+  let options = guideRailArr.map((guideRail) => {
     const { imgSrc, hasSilencingStrip, opening, thickness, width, withHook } = guideRail;
 
     return {
@@ -1361,6 +1386,14 @@ const getOptions_guideRail = (guideRailArr: TdoorModelInfoDto['guideRails']) => 
       withHook,
     };
   });
+
+  if (doorModelName === 'SJ-302') {
+    if (isAntiTyphoon) {
+      options = options.filter((option) => option.withHook === true);
+    } else {
+      options = options.filter((option) => option.withHook === false);
+    }
+  }
 
   return options;
 };
