@@ -59,7 +59,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       setDoorModelInfo: state.setDoorModelInfo,
       getOptions_material: state.getOptions_material,
       calcData: state.calcData,
-      isAntiTyphoonLock: state.isAntiTyphoonLock,
+      isAntiTyphoonLock: state.getIsAntiTyphoonLock(),
       getOptions_doorModelInfo: state.getOptions_doorModelInfo,
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions

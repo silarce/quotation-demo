@@ -89,7 +89,8 @@ type Tworksheet = {
   worksheetId: string;
   itemIdArr: string[];
   qty: number;
-  isAntiTyphoonLock: boolean;
+  // isAntiTyphoonLock: boolean;
+  getIsAntiTyphoonLock: () => boolean;
   shouldCalcData: boolean;
   shouldCalcData2: boolean;
 
@@ -314,7 +315,7 @@ const useWorksheet = create<Tworksheet>(
     worksheetId: '',
     itemIdArr: [],
     qty: 0,
-    isAntiTyphoonLock: true,
+    // isAntiTyphoonLock: true,
     shouldCalcData: false,
     shouldCalcData2: false,
     // ---------------------------------------------------------------------
@@ -859,6 +860,16 @@ const useWorksheet = create<Tworksheet>(
 
     getOptions_accessories: () => getOptions_accessories(get().originalAccessories),
     // ---------------------------------------------------------------------
+
+    getIsAntiTyphoonLock: () => {
+      const doorModelName = get().doorModelInfo?.name;
+
+      if (doorModelName === 'SJ-302') {
+        return false;
+      } else {
+        return true;
+      }
+    },
 
     // ---------------------------------------------------------------------
 
