@@ -2071,6 +2071,10 @@ class Class_product {
 
   /**門型 options */
   get options_doorType() {
+    if (this.isSpecialProd) {
+      return [{ value: '', label: '請直接輸入' }];
+    }
+
     return Object.values(this._doorModelList).map((item) => {
       const theIndex = options_doorModel.findIndex((model) => {
         return item.name === model.value;
@@ -2089,6 +2093,10 @@ class Class_product {
 
   /**門片材質 主產品設定的材質 */
   get options_material() {
+    if (this.isSpecialProd) {
+      return [{ value: '', label: '請直接輸入' }];
+    }
+
     const doorModel = this._doorModelList[this.doorType];
 
     if (!doorModel) {
@@ -2158,6 +2166,10 @@ class Class_product {
 
   /**表面 */
   get options_surface() {
+    if (this.isSpecialProd) {
+      return [{ value: '', label: '請直接輸入' }];
+    }
+
     if (!this.material) {
       return undefined;
     }
@@ -2222,6 +2234,10 @@ class Class_product {
   }
 
   get options_boxB() {
+    if (this.isSpecialProd) {
+      return [{ value: '', label: '請直接輸入' }];
+    }
+
     if (!this._prodData.doorType) {
       return undefined;
     }
@@ -3096,6 +3112,7 @@ class Class_product {
       return bounceDoorWidth_m;
     }
   }
+
   // 輸入的單位預期為公尺
   set bounceDoorWidth(str) {
     if (!str) {
