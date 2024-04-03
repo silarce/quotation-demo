@@ -144,24 +144,15 @@ export default function WdContractList() {
     };
 
     dataArr.forEach((contract) => {
-      const { content, accountReceivable } = contract;
+      const { content, accountReceivable, contractNumber } = contract;
 
-      const {
-        quotationNumber,
-        customer,
-        contactPerson,
-        contactNumber,
-        agentEmployee,
-        quotationDate,
-        county,
-        projectName,
-      } = content;
+      const { customer, contactPerson, contactNumber, agentEmployee, quotationDate, county, projectName } = content;
 
       const { hasNoContract, hasUncollectedAmounts } = accountReceivable ?? {};
 
       const obj: Tcontract = {
         contractId: contract.id,
-        quotationNumber,
+        contractNumber: contractNumber ?? '',
         customerName: customer.name,
         contactName: contactPerson,
         contactNumber: contactNumber,

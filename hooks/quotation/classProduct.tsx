@@ -128,12 +128,12 @@ import type {
   // TlegacyContractProductDto,
   // TcreateLegacyContractProductDto,
   TdoorComponentListDto,
-  TquotationProductAccessoriesDto,
+  TquotationProductAccessoryDto,
   TgenerateDoorProductBomDto_DoorSpec,
   // TgenerateDoorProductBomDto_ComponentInfo,
   TcreateQuotationProductAccessoriesDto,
   TcreateQuotationProductComponentDto,
-  TquotationProductComponentsDto,
+  TquotationProductComponentDto,
   TquotationProductDto,
   TdoorAccessoryDto,
   TcreateQuotationProductDto,
@@ -201,8 +201,8 @@ type Tprod = {
   // components: TcreateQuotationProductComponentDto[];
   // accessories: TquotationProductAccessoriesDto[];
   // components: TquotationProductComponentsDto[];
-  accessories: (Omit<TquotationProductAccessoriesDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
-  components: (Omit<TquotationProductComponentsDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
+  accessories: (Omit<TquotationProductAccessoryDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
+  components: (Omit<TquotationProductComponentDto, 'id' | 'createdAt' | 'updatedAt'> & { id?: string })[];
   boxD: string;
   //
   bottomBarAngleIron: string;
@@ -510,7 +510,7 @@ class Class_product {
     this.reRender();
   }
   /**配合apiGetQuotationProducts使用 */
-  creComList_dyna({ componentsArr }: { componentsArr: TquotationProductComponentsDto[] }) {
+  creComList_dyna({ componentsArr }: { componentsArr: TquotationProductComponentDto[] }) {
     const sortedComponent = sortComponent(componentsArr);
 
     const comPreList: Partial<{ [key in TcomponentKey]: Tcomponent }> = {};
@@ -617,7 +617,7 @@ class Class_product {
     this.reRender();
   }
   /**配合apiGetQuotationProducts使用 */
-  creAcceList_dyna({ acceArr }: { acceArr: TquotationProductAccessoriesDto[] }) {
+  creAcceList_dyna({ acceArr }: { acceArr: TquotationProductAccessoryDto[] }) {
     // const optionArr = _.sortBy(this._prodData.accessories, 'order');
     const list: { [key: string]: Class_accessories } = {};
 
@@ -829,9 +829,11 @@ class Class_product {
     }
 
     const body = (() => {
-      const fullWidth = Number(this.fullWidth || 0) * 1000;
+      // const fullWidth = Number(this.fullWidth || 0) * 1000;
+      const fullWidth = new Decimal(this.fullWidth || 0).mul(1000).toNumber();
       const modelName = this.doorType as TpcgsPrams['modelName'];
-      const height = Number(this.height) * 1000;
+      // const height = Number(this.height) * 1000;
+      const height = new Decimal(this.height).mul(1000).toNumber();
       const isAntiTyphoon = this.typhoonProtection;
 
       const hp = this.horsepower.replaceAll('HP', '') as Thp;
@@ -864,13 +866,20 @@ class Class_product {
 
     const oldW = this.W;
 
-    this._prodData.WG = String(
-      calcProductWG({
-        fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
-        gapA: this._doorGeneralSpecs.gapA,
-        gapC: this._doorGeneralSpecs.gapC,
-      }) / 1000
-    );
+    // this._prodData.WG = String(
+    //   calcProductWG({
+    //     fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
+    //     gapA: this._doorGeneralSpecs.gapA,
+    //     gapC: this._doorGeneralSpecs.gapC,
+    //   }) / 1000
+    // );
+
+    const theWG = calcProductWG({
+      fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
+      gapA: this._doorGeneralSpecs.gapA,
+      gapC: this._doorGeneralSpecs.gapC,
+    });
+    this._prodData.WG = new Decimal(theWG).div(1000).toString();
 
     if (!this.doorTrack) {
       // 必須要有門軌才會有guildRailG才能計算正確的W
@@ -1053,6 +1062,7 @@ class Class_product {
       generateBomObj_pre[key] = {
         id: componentId,
         material,
+        // materialSurface: materialSurface || undefined,
         materialSurface: materialSurface || undefined,
         isPainted,
       };
@@ -1091,7 +1101,16 @@ class Class_product {
       return true;
     } catch (error) {
       const err = error as AxiosError<{ message: string }>;
-      myAlert.err({ title: '取得bom資料失敗', content: err.response?.data.message });
+
+      let message = '';
+
+      if (typeof err.response?.data.message === 'string') {
+        message = err.response?.data.message;
+      } else {
+        message = JSON.stringify(err.response?.data.message);
+      }
+
+      myAlert.err({ title: '取得bom資料失敗', content: message });
     }
   } // reqProdGenerateDoorProductBom
 
@@ -2147,13 +2166,21 @@ class Class_product {
       return undefined;
     }
 
+    let options = options_surface_onlyPaint;
+
     const isSST = checkIsSST(this.material);
 
     if (isSST) {
-      return options_surface;
+      options = options_surface;
     }
 
-    return options_surface_onlyPaint;
+    if (this.doorType !== 'SJ-305D') {
+      options = options.filter((item) => {
+        return item.value !== '無烤漆';
+      });
+    }
+
+    return options;
   }
 
   /**底座角鐵 */
@@ -3622,7 +3649,15 @@ const emptyProdOri = (): Tprod => {
 // ======================================================================
 
 const checkIsSST = (material: string) => {
-  return material.startsWith('SST#');
+  let isSST = false;
+
+  if (material.startsWith('SST')) {
+    isSST = true;
+  } else if (material.includes('外SST')) {
+    isSST = true;
+  }
+
+  return isSST;
 };
 
 const creOptions_surface: () => Toption[] = () => optionsCreator_surface();

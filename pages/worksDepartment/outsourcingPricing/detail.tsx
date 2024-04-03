@@ -66,6 +66,7 @@ type Tstate_otherWorkItem = {
 type Tstate_installItem = {
   itemId: string;
   itemPrice: number;
+  firstDeliveryStatusId: string;
 };
 
 // =======================================================================
@@ -133,15 +134,19 @@ export default function OutsourcingPricingDetail() {
 
     let isOtherWorkItemError = false;
 
-    const installItemList: { [key: string]: TcreateOutsourcingPaymentDetailItemDto } = {};
+    // const installItemList: { [key: string]: TcreateOutsourcingPaymentDetailItemDto } = {};
+    const installItemList: {
+      [key: string]: TcreateOutsourcingPaymentDetailItemDto & { firstDeliveryStatusId: string };
+    } = {};
 
     state_installItem.forEach((item) => {
-      const { itemId, itemPrice } = item;
+      const { itemId, itemPrice, firstDeliveryStatusId } = item;
       installItemList[item.itemId] = {
         itemId,
         itemPrice,
         otherWorkItems: [],
         otherWorkItemTotal: 0,
+        firstDeliveryStatusId,
       };
     });
 
@@ -164,6 +169,8 @@ export default function OutsourcingPricingDetail() {
           otherQuantity: Number(otherQuantity),
           otherUnitPrice: Number(otherUnitPrice),
           otherSubTotalPrice: otherSubTotalPrice,
+          // quotationItemStatusId: null,
+          quotationItemStatusId: installItem.firstDeliveryStatusId,
         });
       }
     });
@@ -179,8 +186,8 @@ export default function OutsourcingPricingDetail() {
 
     const body: TupdateOutsourcingPaymentDetailDto = {
       engineeringContactId: engineeringContact.id,
-      installItem: Object.values(installItemList),
-      outsourcing: new Decimal(subTotal01).add(subTotal02).toNumber(),
+      installItems: Object.values(installItemList),
+      outsourcingTotal: new Decimal(subTotal01).add(subTotal02).toNumber(),
     };
 
     try {
@@ -380,6 +387,7 @@ const useTable01 = ({
       return {
         itemId: item.id,
         itemPrice: item.itemPrice || 0,
+        firstDeliveryStatusId: item.deliveryStatus[0].id,
       };
     });
 
@@ -612,18 +620,43 @@ const useTable02 = ({
         });
       }
 
-      const otherWorkItems = firstDeliveryStatus?.otherWorkItems || [];
-      otherWorkItems.forEach((owi) => {
+      // const otherWorkItems = firstDeliveryStatus?.otherWorkItems || [];
+      // otherWorkItems.forEach((owi) => {
+      //   arr.push({
+      //     installItemId: item.id,
+      //     // installItemName: item.itemName,
+      //     otherInstallation: owi.otherInstallation ?? '',
+      //     otherQuantity: String(owi.otherQuantity || 0),
+      //     otherUnitPrice: String(owi.otherUnitPrice || 0),
+      //     otherSubTotalPrice: String(owi.otherSubTotalPrice || 0),
+      //     quotationItemStatusId: owi.quotationItemStatusId,
+      //   });
+      // });
+      const otherWorkItems = firstDeliveryStatus?.otherWorkItems;
+
+      if (otherWorkItems) {
         arr.push({
           installItemId: item.id,
           // installItemName: item.itemName,
-          otherInstallation: owi.otherInstallation ?? '',
-          otherQuantity: String(owi.otherQuantity || 0),
-          otherUnitPrice: String(owi.otherUnitPrice || 0),
-          otherSubTotalPrice: String(owi.otherSubTotalPrice || 0),
-          quotationItemStatusId: owi.quotationItemStatusId,
+          otherInstallation: otherWorkItems.otherInstallation ?? '',
+          otherQuantity: String(otherWorkItems.otherQuantity || 0),
+          otherUnitPrice: String(otherWorkItems.otherUnitPrice || 0),
+          otherSubTotalPrice: String(otherWorkItems.otherSubTotalPrice || 0),
+          quotationItemStatusId: otherWorkItems.quotationItemStatusId,
         });
-      });
+      }
+
+      // otherWorkItems.forEach((owi) => {
+      //   arr.push({
+      //     installItemId: item.id,
+      //     // installItemName: item.itemName,
+      //     otherInstallation: owi.otherInstallation ?? '',
+      //     otherQuantity: String(owi.otherQuantity || 0),
+      //     otherUnitPrice: String(owi.otherUnitPrice || 0),
+      //     otherSubTotalPrice: String(owi.otherSubTotalPrice || 0),
+      //     quotationItemStatusId: owi.quotationItemStatusId,
+      //   });
+      // });
 
       // deliveryStatusArr?.forEach((ds) => {
       //   const otherWorkItems = ds.otherWorkItems || [];
@@ -703,7 +736,11 @@ const useTable02 = ({
                 onChange: (_, option) => {
                   const theOption = option as Toption;
                   editState_otherWorkItem(index, 'installItemId', theOption.value);
-                  editState_otherWorkItem(index, 'quotationItemStatusId', theOption.quotationItemStatusId ?? '');
+                  editState_otherWorkItem(
+                    index,
+                    'quotationItemStatusId',
+                    (theOption.quotationItemStatusId as string | undefined) ?? ''
+                  );
                   // editState_otherWorkItem(index, 'installItemName', theOption.label);
                 },
               }}

@@ -90,6 +90,7 @@ function MeetingMinuteEdit_component(
     disabled,
     // formMakerName,
     className,
+    quotationNumber,
   }: {
     meetingMinuteId: string | undefined;
     onStateChange: (states: {
@@ -101,6 +102,7 @@ function MeetingMinuteEdit_component(
     disabled?: boolean;
     // formMakerName?: string;
     className?: string;
+    quotationNumber?: string;
   },
   ref: React.ForwardedRef<unknown>
 ) {
@@ -202,15 +204,13 @@ function MeetingMinuteEdit_component(
   }, [meetingMinuteId]);
 
   useEffect(() => {
-    if (disabled) {
-      if (!meeingMinute) {
-        const empty = employeeMeetingMinute();
-        empty.formMakerEmployee = userInfo?.employee;
-        setState_meetingMinutes(empty);
-        setAttachments(undefined);
-      } else {
-        setState_meetingMinutes(meeingMinute);
-      }
+    if (!meeingMinute) {
+      const empty = employeeMeetingMinute();
+      empty.formMakerEmployee = userInfo?.employee;
+      setState_meetingMinutes(empty);
+      setAttachments(undefined);
+    } else {
+      setState_meetingMinutes(meeingMinute);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled, meeingMinute]);
@@ -345,7 +345,8 @@ function MeetingMinuteEdit_component(
             disabled={true}
             inputProps={{
               props: {
-                value: 'M-999999',
+                // value: 'M-999999',
+                value: meeingMinute?.contract.content.quotationNumber ?? quotationNumber ?? '',
               },
             }}
           />

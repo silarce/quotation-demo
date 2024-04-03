@@ -1,3 +1,8 @@
+// !!!!!!!!!!
+// !!!!!!!!!!
+// !!!!!!!!!!
+// !!!!!!!!!!
+
 // 工程管理單
 // 工程管理單
 // 工程管理單
@@ -65,9 +70,9 @@ type TmyDeleveryList = {
 
 // 爛程式，應該在根目錄把目標物件與路徑分離出來才對
 type TdeliveryStatusInEdit = {
-  [key: string /*prodKey */]: {
-    [key: string /*itemId */]: {
-      [key: string /*statusId */]: Omit<TcreateEngineeringDeliveryStatusDto, 'installerEmployees' | 'productItemId'> & {
+  [prodKey: string]: {
+    [itemId: string]: {
+      [statusId: string]: Omit<TcreateEngineeringDeliveryStatusDto, 'installerEmployees' | 'productItemId'> & {
         id?: string;
         installerOutsourcing?: ToutsourcingDto | null;
         installerEmployees?: TemployeeDto[];
@@ -133,6 +138,12 @@ export default function OutboundOrder({
 
   const { deliveryList, update_deliveryList } = useGetEngineeringDeliveryList(engineeringDeliveryListId);
 
+  const worksheetArr = useMemo(() => {
+    return (deliveryList?.contract.worksheet ?? []).filter((worksheet) => {
+      return worksheet.isAbandoned === false;
+    });
+  }, [deliveryList?.contract.worksheet]);
+
   useEffect(() => {
     (async () => {
       try {
@@ -161,35 +172,88 @@ export default function OutboundOrder({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
 
+  // const contractProdList = useMemo(() => {
+  //   if (!contract) {
+  //     return undefined;
+  //   }
+
+  //   let subContracts = contract.subContracts;
+
+  //   subContracts = _.sortBy(subContracts, 'version');
+
+  //   const list: { [key: string]: TquotationProductDto } = {};
+
+  //   subContracts.forEach((contract) => {
+  //     const prodArr = contract.content.products;
+  //     prodArr.forEach((prod) => {
+  //       list[prod.rootProductId] = prod;
+  //     });
+  //   });
+
+  //   Object.keys(list).forEach((key) => {
+  //     const item = list[key];
+
+  //     if (key !== item.id) {
+  //       list[item.id] = item;
+  //       delete list[key];
+  //     }
+  //   });
+
+  //   return list;
+  // }, [contract]);
+
   const contractProdList = useMemo(() => {
-    if (!contract) {
+    if (!worksheetArr) {
       return undefined;
     }
 
-    let subContracts = contract.subContracts;
-
-    subContracts = _.sortBy(subContracts, 'version');
-
     const list: { [key: string]: TquotationProductDto } = {};
 
-    subContracts.forEach((contract) => {
-      const prodArr = contract.content.products;
-      prodArr.forEach((prod) => {
-        list[prod.rootProductId] = prod;
+    worksheetArr.forEach((worksheet) => {
+      const { latestRecord } = worksheet;
+      const contractProductItems = latestRecord.contractProductItems ?? [];
+      const latestRecordId = latestRecord.id;
+
+      contractProductItems.forEach((item) => {
+        const {
+          // productId,
+          // rootWorksheetItemId,
+          rootWorksheetItem,
+          // latestWorksheetItem: adjustedItem,
+          // latestWorksheetItemId: adjustedItemId,
+        } = item;
+
+        if (latestRecordId) {
+          // !應急的忽略型別檢查
+          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          list[latestRecordId] = rootWorksheetItem;
+          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        }
       });
     });
 
-    Object.keys(list).forEach((key) => {
-      const item = list[key];
+    // subContracts.forEach((contract) => {
+    //   const prodArr = contract.content.products;
+    //   prodArr.forEach((prod) => {
+    //     list[prod.rootProductId] = prod;
+    //   });
+    // });
 
-      if (key !== item.id) {
-        list[item.id] = item;
-        delete list[key];
-      }
-    });
+    // Object.keys(list).forEach((key) => {
+    //   const item = list[key];
+
+    //   if (key !== item.id) {
+    //     list[item.id] = item;
+    //     delete list[key];
+    //   }
+    // });
 
     return list;
-  }, [contract]);
+  }, [deliveryList]);
 
   // --------------------------------------------------------------------------
 
@@ -201,51 +265,149 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
-  const worksheet = deliveryList?.contract.worksheet;
+  // const worksheet = deliveryList?.contract.worksheet;
+  // const worksheetArr = deliveryList?.contract.worksheet;
 
+  // console.log(worksheetArr);
+
+  // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
   useEffect(() => {
-    if (!deliveryList?.contract.worksheet?.contractProductItems) {
+    if (!deliveryList?.contract.worksheet) {
       return;
     }
 
-    const contractProductItems = deliveryList.contract.worksheet.contractProductItems;
+    // const contractProductItems = deliveryList.contract.worksheet.latestRecord.contractProductItems;
 
     const myDeleveryList: TmyDeleveryList = {};
 
-    contractProductItems.forEach((item) => {
-      const { productId, adjustedItem, adjustedItemId } = item;
+    worksheetArr?.forEach((worksheet) => {
+      const { latestRecord } = worksheet;
+      const contractProductItems = latestRecord.contractProductItems ?? [];
+      const latestRecordId = latestRecord.id;
 
-      let theItem: typeof item;
-      // 現在只以productId分類，theId用不到了
-      // let theId: string;
+      contractProductItems.forEach((item) => {
+        const {
+          // productId,
+          // rootWorksheetItemId,
+          rootWorksheetItem,
+          // latestWorksheetItem: latestWorksheetItem,
+          // latestWorksheetItemId: latestWorksheetItemId,
+        } = item;
 
-      if (adjustedItem && adjustedItemId) {
-        theItem = adjustedItem;
-        // theId = adjustedItemId;
-      } else {
-        theItem = item;
-        // theId = productId;
-      }
+        const theItem = item;
 
-      theItem.deliveryStatus = item.deliveryStatus;
-      // issue#198 // 改送item.id
-      theItem.id = item.id;
+        // let theItem: typeof item;
+        // 現在只以productId分類，theId用不到了
+        // let theId: string;
 
-      if (!myDeleveryList?.[productId]) {
-        myDeleveryList[productId] = {
-          originalItem: item,
-          itemName: theItem.itemName,
-          itemArr: [],
-        };
-      }
+        // if (latestWorksheetItem && latestWorksheetItemId) {
+        //   // theItem = adjustedItem;
+        //   theItem = latestWorksheetItem;
+        //   // theId = adjustedItemId;
+        // } else {
+        //   theItem = item;
+        //   // theId = productId;
+        // }
 
-      myDeleveryList[productId].itemArr.push(theItem);
+        theItem.deliveryStatus = item.deliveryStatus;
+        // issue#198 // 改送item.id
+        theItem.id = item.id;
+
+        if (latestRecordId && !myDeleveryList?.[latestRecordId]) {
+          myDeleveryList[latestRecordId] = {
+            originalItem: rootWorksheetItem,
+            itemName: theItem.itemName,
+            itemArr: [],
+          };
+        }
+
+        if (latestRecordId) {
+          myDeleveryList[latestRecordId].itemArr.push(theItem);
+        }
+      });
     });
+
+    // worksheetArr.forEach((item) => {
+    //   const { productId, adjustedItem, adjustedItemId } = item;
+
+    //   let theItem: typeof item;
+    //   // 現在只以productId分類，theId用不到了
+    //   // let theId: string;
+
+    //   if (adjustedItem && adjustedItemId) {
+    //     theItem = adjustedItem;
+    //     // theId = adjustedItemId;
+    //   } else {
+    //     theItem = item;
+    //     // theId = productId;
+    //   }
+
+    //   theItem.deliveryStatus = item.deliveryStatus;
+    //   // issue#198 // 改送item.id
+    //   theItem.id = item.id;
+
+    //   if (!myDeleveryList?.[productId]) {
+    //     myDeleveryList[productId] = {
+    //       originalItem: item,
+    //       itemName: theItem.itemName,
+    //       itemArr: [],
+    //     };
+    //   }
+
+    //   myDeleveryList[productId].itemArr.push(theItem);
+    // });
 
     setMyDeleveryList(myDeleveryList);
 
     // ---------------------
   }, [deliveryList]);
+
+  // console.log(myDeleveryList, myDeleveryList);
+
+  // // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
+  // useEffect(() => {
+  //   if (!deliveryList?.contract.worksheet?.latestRecord.contractProductItems) {
+  //     return;
+  //   }
+
+  //   const contractProductItems = deliveryList.contract.worksheet.latestRecord.contractProductItems;
+
+  //   const myDeleveryList: TmyDeleveryList = {};
+
+  //   contractProductItems.forEach((item) => {
+  //     const { productId, adjustedItem, adjustedItemId } = item;
+
+  //     let theItem: typeof item;
+  //     // 現在只以productId分類，theId用不到了
+  //     // let theId: string;
+
+  //     if (adjustedItem && adjustedItemId) {
+  //       theItem = adjustedItem;
+  //       // theId = adjustedItemId;
+  //     } else {
+  //       theItem = item;
+  //       // theId = productId;
+  //     }
+
+  //     theItem.deliveryStatus = item.deliveryStatus;
+  //     // issue#198 // 改送item.id
+  //     theItem.id = item.id;
+
+  //     if (!myDeleveryList?.[productId]) {
+  //       myDeleveryList[productId] = {
+  //         originalItem: item,
+  //         itemName: theItem.itemName,
+  //         itemArr: [],
+  //       };
+  //     }
+
+  //     myDeleveryList[productId].itemArr.push(theItem);
+  //   });
+
+  //   setMyDeleveryList(myDeleveryList);
+
+  //   // ---------------------
+  // }, [deliveryList]);
 
   // --------------------------------------------------------------------------
 
@@ -351,7 +513,9 @@ export default function OutboundOrder({
 
       const prod = myDeleveryList![prodKey];
 
-      const theOriginalContractContent = contractProdList![prodKey];
+      const theOriginalContractContent: TquotationProductDto | undefined = contractProdList![prodKey] as
+        | TquotationProductDto
+        | undefined;
 
       // 取哪一個item都無所謂，如果程式沒有寫錯，每個item都是一樣的
       const firstItem = prod.itemArr[0];
@@ -359,17 +523,17 @@ export default function OutboundOrder({
       const firstRow: Tgroup['rowArr'][0] = {
         contractData: {
           project: prod.itemName,
-          L: new Decimal(theOriginalContractContent.fullWidth).div(1000).toString(),
-          W: new Decimal(theOriginalContractContent.WG).div(1000).toString(),
-          B: new Decimal(theOriginalContractContent.boxB).div(1000).toString(),
+          L: new Decimal(theOriginalContractContent?.fullWidth || 0).div(1000).toString(),
+          W: new Decimal(theOriginalContractContent?.WG || 0).div(1000).toString(),
+          B: new Decimal(theOriginalContractContent?.boxB || 0).div(1000).toString(),
           qty: String(prod.itemArr.length),
           implementQty: '',
-          cai: theOriginalContractContent.volume ?? '',
-          totalCai: new Decimal(theOriginalContractContent.volume || 0).mul(arrLength).toString(),
-          doorType: theOriginalContractContent.doorModelName,
-          material: theOriginalContractContent.materialName,
-          horsepower: theOriginalContractContent.horsepower,
-          surface: theOriginalContractContent.materialSurface ?? '',
+          cai: theOriginalContractContent?.volume ?? '',
+          totalCai: new Decimal(theOriginalContractContent?.volume || 0).mul(arrLength).toString(),
+          doorType: theOriginalContractContent?.doorModelName ?? '',
+          material: theOriginalContractContent?.materialName ?? '',
+          horsepower: theOriginalContractContent?.horsepower ?? '',
+          surface: theOriginalContractContent?.materialSurface ?? '',
         },
         staticData: {
           project: prod.itemName,
@@ -755,7 +919,9 @@ export default function OutboundOrder({
               forbidden: true,
             },
             orderCreatedDate: {
-              value: worksheet ? moment(convertDate_reduce1911(worksheet.createdAt)).format('yy-MM-DD') : '',
+              // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
+              // value: worksheet ? moment(convertDate_reduce1911(worksheet.createdAt)).format('yy-MM-DD') : '',
+              value: '',
               forbidden: true,
             },
           },

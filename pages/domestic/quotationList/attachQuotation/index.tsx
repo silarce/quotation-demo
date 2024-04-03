@@ -886,7 +886,7 @@ latestContentProdArr為這次追加追減的主產品
                 v = '500';
               }
 
-              if (v.split('.')[1]?.length > 2) {
+              if (v.split('.')[1]?.length > 3) {
                 return copy;
               }
 
