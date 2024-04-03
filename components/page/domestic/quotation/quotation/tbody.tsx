@@ -511,6 +511,16 @@ function DndRow({
             const { inputSelProps, isSuffixOnly } = _.cloneDeep(prodCellConfig[key]);
             const { inputProps, selectProps, checkBoxProps } = inputSelProps;
 
+            if (item.isSpecialProd && item.ignoreKeyArr_prod?.includes(key)) {
+              return (
+                <div
+                  key={key}
+                  className={classNames(scss.column, isHidden && scss.hidden)}
+                  style={{ width: inputSelProps.wrapperStyle?.width }}
+                ></div>
+              );
+            }
+
             if (isSuffixOnly) {
               if (stateValue === 'm2') {
                 stateValue = (
@@ -556,7 +566,7 @@ function DndRow({
                 selectProps.props = {};
               }
 
-              if (item.isSpecial && key !== 'quoteType') {
+              if (item.isSpecialProd && key !== 'quoteType') {
                 selectProps.props.isSearchable = true;
               }
 

@@ -2334,12 +2334,29 @@ class Class_product {
   }
   //
 
-  get isSpecial() {
+  get isSpecialProd() {
     if (this._prodData.quoteType === '特殊門') {
       return true;
     }
 
     return false;
+  }
+
+  get ignoreKeyArr_prod() {
+    return [
+      'doorTrack',
+      'typhoonProtection',
+      'doorTrackSilencerStrip',
+      'thickness',
+      'area',
+      'volume',
+      'bounceDoorWidth',
+      'doorTrackThick',
+      'rollUpBoxThick',
+      'close',
+      'onePieceRollUpBox',
+      'isULGuideRail',
+    ];
   }
 
   get quoteType() {
@@ -2349,7 +2366,7 @@ class Class_product {
     this._prodData.quoteType = v;
     this.clearProd_all();
 
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.subComList = {};
     }
 
@@ -2364,7 +2381,7 @@ class Class_product {
     this._prodData.doorType = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -2415,7 +2432,7 @@ class Class_product {
     this._prodData.fullWidth = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -2450,7 +2467,7 @@ class Class_product {
     this._prodData.WG = str;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -2508,7 +2525,7 @@ class Class_product {
     this.WG = String(WG);
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -2532,7 +2549,7 @@ class Class_product {
     this._prodData.height = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -2566,7 +2583,7 @@ class Class_product {
       this._prodData.boxB = v;
 
       // ________________________
-      if (this.isSpecial) {
+      if (this.isSpecialProd) {
         this.reRender();
 
         return;
@@ -2615,7 +2632,7 @@ class Class_product {
       this._prodData.boxB = v;
 
       // ________________________
-      if (this.isSpecial) {
+      if (this.isSpecialProd) {
         this.reRender();
 
         return;
@@ -2694,7 +2711,7 @@ class Class_product {
   }
   set boxD(v) {
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -2725,7 +2742,7 @@ class Class_product {
     this._prodData.area = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -2762,7 +2779,7 @@ class Class_product {
   }
   set material(v) {
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this._prodData.material = v;
       this.reRender();
 
@@ -2796,7 +2813,7 @@ class Class_product {
     this._prodData.surface = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -2817,7 +2834,7 @@ class Class_product {
     this._prodData.doorTrack = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -2849,7 +2866,7 @@ class Class_product {
     this._prodData.horsepower = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -2902,7 +2919,7 @@ class Class_product {
     this.calcProdAllprice_timeout();
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3001,7 +3018,7 @@ class Class_product {
   }
   set typhoonProtection(v) {
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this._prodData.typhoonProtection = v;
       this.reRender();
 
@@ -3118,7 +3135,7 @@ class Class_product {
     this._prodData.motor = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3137,7 +3154,7 @@ class Class_product {
     this._prodData.voltage = str;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3156,7 +3173,7 @@ class Class_product {
     this._prodData.phase = Number(str);
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3175,7 +3192,7 @@ class Class_product {
     this._prodData.motorSupport = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3193,7 +3210,7 @@ class Class_product {
     this._prodData.bottomBar = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3220,7 +3237,7 @@ class Class_product {
     this._prodData.doorTrackThick = str;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3252,7 +3269,7 @@ class Class_product {
     this._prodData.doorTrackSilencerStrip = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3283,7 +3300,7 @@ class Class_product {
     this._prodData.onePieceRollUpBox = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3302,7 +3319,7 @@ class Class_product {
     this._prodData.rollUpBoxThick = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3329,7 +3346,7 @@ class Class_product {
     this._prodData.isULGuideRail = bool;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3350,7 +3367,7 @@ class Class_product {
     this._prodData.bottomBarAngleIron = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
@@ -3370,7 +3387,7 @@ class Class_product {
     this._prodData.bottomBarPlate = v;
 
     // ________________________
-    if (this.isSpecial) {
+    if (this.isSpecialProd) {
       this.reRender();
 
       return;
