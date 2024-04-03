@@ -212,23 +212,24 @@ export default function OutboundOrder({
     worksheetArr.forEach((worksheet) => {
       const { latestRecord } = worksheet;
       const contractProductItems = latestRecord.contractProductItems ?? [];
+      const latestRecordId = latestRecord.id;
 
       contractProductItems.forEach((item) => {
         const {
           // productId,
-          rootWorksheetItemId,
+          // rootWorksheetItemId,
           rootWorksheetItem,
-          latestWorksheetItem: adjustedItem,
-          latestWorksheetItemId: adjustedItemId,
+          // latestWorksheetItem: adjustedItem,
+          // latestWorksheetItemId: adjustedItemId,
         } = item;
 
-        if (rootWorksheetItemId) {
+        if (latestRecordId) {
           // !應急的忽略型別檢查
           // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          list[rootWorksheetItemId] = rootWorksheetItem;
+          list[latestRecordId] = rootWorksheetItem;
           // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         }
@@ -282,43 +283,46 @@ export default function OutboundOrder({
     worksheetArr?.forEach((worksheet) => {
       const { latestRecord } = worksheet;
       const contractProductItems = latestRecord.contractProductItems ?? [];
+      const latestRecordId = latestRecord.id;
 
       contractProductItems.forEach((item) => {
         const {
           // productId,
-          rootWorksheetItemId,
+          // rootWorksheetItemId,
           rootWorksheetItem,
-          latestWorksheetItem: adjustedItem,
-          latestWorksheetItemId: adjustedItemId,
+          // latestWorksheetItem: latestWorksheetItem,
+          // latestWorksheetItemId: latestWorksheetItemId,
         } = item;
 
-        let theItem: typeof item;
+        const theItem = item;
+
+        // let theItem: typeof item;
         // 現在只以productId分類，theId用不到了
         // let theId: string;
 
-        if (adjustedItem && adjustedItemId) {
-          // theItem = adjustedItem;
-          theItem = adjustedItem;
-          // theId = adjustedItemId;
-        } else {
-          theItem = item;
-          // theId = productId;
-        }
+        // if (latestWorksheetItem && latestWorksheetItemId) {
+        //   // theItem = adjustedItem;
+        //   theItem = latestWorksheetItem;
+        //   // theId = adjustedItemId;
+        // } else {
+        //   theItem = item;
+        //   // theId = productId;
+        // }
 
         theItem.deliveryStatus = item.deliveryStatus;
         // issue#198 // 改送item.id
         theItem.id = item.id;
 
-        if (rootWorksheetItemId && !myDeleveryList?.[rootWorksheetItemId]) {
-          myDeleveryList[rootWorksheetItemId] = {
+        if (latestRecordId && !myDeleveryList?.[latestRecordId]) {
+          myDeleveryList[latestRecordId] = {
             originalItem: rootWorksheetItem,
             itemName: theItem.itemName,
             itemArr: [],
           };
         }
 
-        if (rootWorksheetItemId) {
-          myDeleveryList[rootWorksheetItemId].itemArr.push(theItem);
+        if (latestRecordId) {
+          myDeleveryList[latestRecordId].itemArr.push(theItem);
         }
       });
     });
