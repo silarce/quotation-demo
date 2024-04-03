@@ -2333,11 +2333,26 @@ class Class_product {
     this.reRender();
   }
   //
+
+  get isSpecial() {
+    if (this._prodData.quoteType === '特殊門') {
+      return true;
+    }
+
+    return false;
+  }
+
   get quoteType() {
     return this._prodData.quoteType;
   }
   set quoteType(v) {
     this._prodData.quoteType = v;
+    this.clearProd_all();
+
+    if (this.isSpecial) {
+      this.subComList = {};
+    }
+
     this.reRender();
   }
   //
@@ -2347,6 +2362,14 @@ class Class_product {
 
   set doorType(v) {
     this._prodData.doorType = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
 
     const isMaterailInOptions = check_isValueInOptions(this.material, this.options_material ?? []);
     const is304InOptions = check_isValueInOptions('SST#304', this.options_material ?? []);
@@ -2390,6 +2413,15 @@ class Class_product {
     this.isWgChanged = false;
 
     this._prodData.fullWidth = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     // this._prodData.WG = '0';
     this.area = this.calcArea();
     // this.calcChangeAccePrice();
@@ -2416,6 +2448,14 @@ class Class_product {
     }
 
     this._prodData.WG = str;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
 
     // 沒有horsepower就沒有gapA與gapC就無法計算正確的L
     // 沒有boxB，呼叫api會錯誤
@@ -2467,6 +2507,14 @@ class Class_product {
 
     this.WG = String(WG);
 
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     if (!this._doorGeneralSpecs?.gapA) {
       this.isEditW_noGapA = true;
     }
@@ -2482,6 +2530,16 @@ class Class_product {
   }
   set height(v) {
     this._prodData.height = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.area = this.calcArea();
     // this.clearProd();
 
@@ -2506,6 +2564,14 @@ class Class_product {
       }
 
       this._prodData.boxB = v;
+
+      // ________________________
+      if (this.isSpecial) {
+        this.reRender();
+
+        return;
+      }
+      // ________________________
 
       const reqBody: TgetBoxDParams = {
         modelName: this.doorType,
@@ -2547,6 +2613,14 @@ class Class_product {
   set boxB_noCall(v: string) {
     const setBoxB = async () => {
       this._prodData.boxB = v;
+
+      // ________________________
+      if (this.isSpecial) {
+        this.reRender();
+
+        return;
+      }
+      // ________________________
 
       const reqBody: TgetBoxDParams = {
         modelName: this.doorType,
@@ -2619,6 +2693,13 @@ class Class_product {
     return this._prodData.boxD;
   }
   set boxD(v) {
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
     // this._prodData.boxD = v;
     // this._prodData.boxB = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB[v] ?? '';
     // this.area = this.calcArea();
@@ -2642,6 +2723,14 @@ class Class_product {
   }
   set area(v) {
     this._prodData.area = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
 
     if (this.comList?.slat) {
       this.comList.slat.quantity = v;
@@ -2672,6 +2761,15 @@ class Class_product {
     return this._prodData.material;
   }
   set material(v) {
+    // ________________________
+    if (this.isSpecial) {
+      this._prodData.material = v;
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     Object.values(this.comList || {}).forEach((com) => {
       if (com) {
         com.changeFindedMaterial(v);
@@ -2697,6 +2795,14 @@ class Class_product {
   set surface(v) {
     this._prodData.surface = v;
 
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     if (this.comList?.slat) {
       this.comList.slat.surface_withCheckOptions = v;
     }
@@ -2709,6 +2815,15 @@ class Class_product {
   }
   set doorTrack(v) {
     this._prodData.doorTrack = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     const theGuideRail = this.options_doorTrack?.find((item) => {
       return item?.value === v;
     });
@@ -2732,6 +2847,14 @@ class Class_product {
   }
   set horsepower(v) {
     this._prodData.horsepower = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
 
     const { gapA, gapC } = lookup_hpToGapAGapC[v as keyof typeof lookup_hpToGapAGapC];
 
@@ -2777,6 +2900,14 @@ class Class_product {
     this._quantity = v;
 
     this.calcProdAllprice_timeout();
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
 
     if (originallyIsZero) {
       // 呼叫callAllReq後就會再自動算金額了
@@ -2869,6 +3000,15 @@ class Class_product {
     return this._prodData.typhoonProtection;
   }
   set typhoonProtection(v) {
+    // ________________________
+    if (this.isSpecial) {
+      this._prodData.typhoonProtection = v;
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     if (this.doorType === 'SJ-312') {
       if ((v = true)) {
         return;
@@ -2976,6 +3116,15 @@ class Class_product {
   }
   set motor(v) {
     this._prodData.motor = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
     // this.toSetDefaultBoxB();
     this.callRetrieveCreProdCom();
     this.reRender();
@@ -2986,6 +3135,15 @@ class Class_product {
   }
   set voltage(str) {
     this._prodData.voltage = str;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -2996,6 +3154,15 @@ class Class_product {
   }
   set phase(str) {
     this._prodData.phase = Number(str);
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3006,6 +3173,15 @@ class Class_product {
   }
   set motorSupport(v) {
     this._prodData.motorSupport = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3015,6 +3191,16 @@ class Class_product {
   }
   set bottomBar(v) {
     this._prodData.bottomBar = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3032,6 +3218,16 @@ class Class_product {
   }
   set doorTrackThick(str) {
     this._prodData.doorTrackThick = str;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3054,6 +3250,16 @@ class Class_product {
   // 基本上與防颱一樣
   set doorTrackSilencerStrip(v) {
     this._prodData.doorTrackSilencerStrip = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.isDontClearProd = true;
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
@@ -3075,6 +3281,16 @@ class Class_product {
   }
   set onePieceRollUpBox(v) {
     this._prodData.onePieceRollUpBox = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3084,6 +3300,16 @@ class Class_product {
   }
   set rollUpBoxThick(v) {
     this._prodData.rollUpBoxThick = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3101,6 +3327,16 @@ class Class_product {
   }
   set isULGuideRail(bool) {
     this._prodData.isULGuideRail = bool;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.callRetrieveCreProdCom();
 
     this.reRender();
@@ -3112,6 +3348,16 @@ class Class_product {
   }
   set bottomBarAngleIron(v) {
     this._prodData.bottomBarAngleIron = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.shouldCall_pgpb = true;
     this.callAllReq();
     this.reRender();
@@ -3122,6 +3368,16 @@ class Class_product {
   }
   set bottomBarPlate(v) {
     this._prodData.bottomBarPlate = v;
+
+    // ________________________
+    if (this.isSpecial) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.shouldCall_pgpb = true;
     this.callAllReq();
     this.reRender();

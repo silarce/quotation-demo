@@ -556,6 +556,10 @@ function DndRow({
                 selectProps.props = {};
               }
 
+              if (item.isSpecial && key !== 'quoteType') {
+                selectProps.props.isSearchable = true;
+              }
+
               const isOptionValue = prodCellConfig[key].isOptionValue;
 
               // if (key === 'doorTrack') {
