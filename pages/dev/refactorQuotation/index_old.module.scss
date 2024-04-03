@@ -1,3 +1,17 @@
+.antdPanel.plus {
+  :global(.ant-collapse-header) {
+    padding: 0;
+  }
+
+  :global(.ant-collapse-content) {
+    :global(.ant-collapse-content-box) {
+      padding: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+}
+
 .tableContainer {
   border: solid 1px theme("colors.border");
 }
@@ -14,21 +28,20 @@
 }
 
 .table {
-  max-height: 500px;
-  padding-bottom: 10px;
   overflow: auto;
   border: solid 3px transparent;
   border-width: 0 3px;
+  max-height: 500px;
 }
 
 .basicRow {
   position: relative;
   display: flex;
   flex-wrap: nowrap;
+  // align-items: center;
   align-items: flex-end;
   width: fit-content;
   height: 60px;
-
   > * {
     margin-right: 16px;
     &:nth-last-of-type(1) {
@@ -48,61 +61,55 @@
   }
 }
 
+.sidePanel {
+  position: sticky;
+  left: 0px;
+  flex: none;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  width: fit-content;
+
+  border-right: solid 16px;
+  border-left: solid 22px;
+
+  /* next.js的Image有設置max-width:100%，不知為何這會造成跑版 */
+  img {
+    max-width: unset;
+  }
+}
+
 .thead {
   @extend .row;
 
   position: sticky;
   top: 0;
-  box-sizing: content-box;
   height: 45px;
-  align-items: center;
+
   background-color: theme("colors.bgc01");
   border-bottom: solid 5px white;
   z-index: 1;
-
-  .label {
-    font-size: 18px;
-    color: theme("colors.main");
-  }
-
-  .leftPanel {
-    // 設置內部不可見並且加上背景色與border色
-    // 是為了使sticky的leftPanel可以蓋住滾過來的其他元素
+  .sidePanel {
     > * {
       visibility: hidden;
     }
     background-color: theme("colors.bgc01");
     border-color: theme("colors.bgc01");
-    height: inherit;
-    padding-bottom: 0px;
-  }
-
-  .mainPanel {
-    align-items: center;
-    height: inherit;
-    padding-bottom: 0px;
-  }
-
-  .rightPanel {
-    align-items: center;
-    height: inherit;
-    padding-bottom: 0px;
   }
 }
 
 .bodyRow {
   @extend .row;
-  ---bodyRowBgc: #fff;
-  background-color: var(---bodyRowBgc);
-  .leftPanel {
-    background-color: var(---bodyRowBgc);
-    border-color: var(---bodyRowBgc);
+  background-color: #fff;
+  .sidePanel {
+    background-color: #fff;
+    border-color: #fff;
   }
 
   &:hover {
     --bgc: theme("colors.hoverBgc");
     background-color: var(--bgc);
-    .leftPanel {
+    .sidePanel {
       background-color: var(--bgc);
       border-color: var(--bgc);
     }
@@ -114,7 +121,7 @@
     // top: 45px;
     // z-index: 1;
     background-color: var(--bgc);
-    .leftPanel {
+    .sidePanel {
       background-color: var(--bgc);
       border-color: var(--bgc);
     }
@@ -123,12 +130,11 @@
 
 .cell {
   padding: 0 5px;
-  font-size: 16px;
 }
 
-// .rightCell {
-//   @extend .cell;
-// }
+.rightCell {
+  @extend .cell;
+}
 // .rightCell_thead {
 //   @extend .rightcell;
 // }
@@ -150,36 +156,11 @@
   }
 }
 
-// ====================================================================
-.leftPanel {
-  position: sticky;
-  left: 0px;
-  flex: none;
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  width: fit-content;
-  padding-bottom: 5px;
-
-  border-right: solid 16px;
-  border-left: solid 22px;
-
-  /* next.js的Image有設置max-width:100%，不知為何這會造成跑版 */
-  img {
-    max-width: unset;
-  }
-}
-
-.mainPanel {
-  @extend .basicRow;
-  padding-bottom: 5px;
-}
-
 .rightPanel {
   @extend .basicRow;
   position: sticky;
   right: 0;
-  padding-bottom: 5px;
+
   // display: flex;
   // flex-wrap: nowrap;
   // align-items: center;
