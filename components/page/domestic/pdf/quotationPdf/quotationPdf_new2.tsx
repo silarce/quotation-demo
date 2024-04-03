@@ -314,8 +314,10 @@ export default function QuotationPdf({
       { width: 1 }, // A // 0.56
       { width: 7.6 }, // B // 6.33
       { width: 14.25 }, // C // 12.33
-      { width: 10.9 }, // D // 9.33
-      { width: 6.7 }, // E // 5.33
+      // { width: 10.9 }, // D // 9.33
+      // { width: 6.7 }, // E // 5.33
+      { width: 8.9 }, // D // 8.14
+      { width: 8.7 }, // E // 8
       { width: 6.1 }, // F // 4.89
       { width: 6.1 }, // G // 4.89
       { width: 6.1 }, // H // 4.89
@@ -569,13 +571,21 @@ export default function QuotationPdf({
         let { size, material } = prod;
 
         size = size.replaceAll('Ｘ', ' x ');
+        size = size.replaceAll('＋', ' + ');
 
         if (material.includes('鍍鋅')) {
           material = '鍍鋅';
-        }
-
-        if (material.includes('SST')) {
-          material = 'SST';
+        } else if (material.includes('#304')) {
+          material = 'SST304#';
+        } else if (material.includes('#316')) {
+          material = 'SST316#';
+        } else if (
+          //
+          material.includes('SST') &&
+          !material.includes('304') &&
+          !material.includes('316')
+        ) {
+          material = 'SST304#';
         }
 
         const qty_num = Number(qty.replaceAll(',', ''));
@@ -621,7 +631,9 @@ export default function QuotationPdf({
         cellF.alignment.horizontal = 'center';
         cellG.alignment.horizontal = 'center';
         cellH.alignment.horizontal = 'center';
+        cellI.alignment.horizontal = 'center';
         cellJ.alignment.horizontal = 'center';
+        cellO.alignment.horizontal = 'center';
 
         cellH.font = { size: 10 };
 
