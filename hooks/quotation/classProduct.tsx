@@ -66,12 +66,14 @@ import {
   optionsCreator_boxB_SJ302,
   optionsCreator_boxB_SJ303A,
   optionsCreator_horsePower,
+  optionsCreator_quoteType,
   lookup_options_bottomBarAngleIronAndPlate,
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
 const options_surface_onlyPaint = optionsCreator_surface_onlyPaint();
 const options_doorModel = optionsCreator_doorModel();
+const options_doorType = optionsCreator_quoteType();
 
 // ===========================================================
 // child class
@@ -131,7 +133,7 @@ import type {
   TquotationProductAccessoryDto,
   TgenerateDoorProductBomDto_DoorSpec,
   // TgenerateDoorProductBomDto_ComponentInfo,
-  TcreateQuotationProductAccessoriesDto,
+  TcreateQuotationProductAccessoryDto,
   TcreateQuotationProductComponentDto,
   TquotationProductComponentDto,
   TquotationProductDto,
@@ -139,6 +141,7 @@ import type {
   TcreateQuotationProductDto,
   TdoorGeneralSpecsMotorDto,
   TdoorGeneralSpecsMotorBoxDto,
+  TmaterialSurface,
 } from 'js/api/dtoTypes';
 
 import type { TreRender, TcomponentKey } from './useProduct';
@@ -328,7 +331,7 @@ class Class_product {
     // 報價單折數，也就是TquotationContentDto[discount]
     this._quotationDiscount = quotationDiscount;
 
-    if (!this._prodData.material) {
+    if (!this._prodData.material && !this.isSpecialProd) {
       this._prodData.material = 'SST#304';
       this._prodData.surface = '2B';
     }
@@ -336,17 +339,22 @@ class Class_product {
     // __________________________________________________________;
 
     // 建立材料配件
-    const sortedComList = sortComponent(this._prodData.components);
-    this.creComList({
-      dataList: sortedComList as { [key in TcomponentKey]: Tcomponent },
-      isNew: false,
-    });
+    if (!this.isSpecialProd) {
+      const sortedComList = sortComponent(this._prodData.components);
+      this.creComList({
+        dataList: sortedComList as { [key in TcomponentKey]: Tcomponent },
+        isNew: false,
+      });
+    }
 
     // ___________________________________________________________
     // 建立選配設定
     this.creAcceList();
+
     //建立 配電箱與按裝費
-    this.creSubComList({ isNew: false });
+    if (!this.isSpecialProd) {
+      this.creSubComList({ isNew: false });
+    }
 
     // ___________________________________________________________
     if (this._prodData.reduceQty) {
@@ -1116,7 +1124,7 @@ class Class_product {
 
   /**取得細部規格(取得slatCount) */
   async reqGetDetailSpec() {
-    if (!this.doorType) {
+    if (!this.doorType || this.isSpecialProd) {
       return;
     }
 
@@ -1239,7 +1247,7 @@ class Class_product {
 
   // 在一開始取得下拉式選單的選項
   async callApiAndGetOptions() {
-    if (this._availableComponents) {
+    if (this._availableComponents || this.isSpecialProd) {
       return;
     }
 
@@ -2071,6 +2079,10 @@ class Class_product {
 
   /**門型 options */
   get options_doorType() {
+    if (this.isSpecialProd) {
+      return [{ value: '', label: '請直接輸入' }];
+    }
+
     return Object.values(this._doorModelList).map((item) => {
       const theIndex = options_doorModel.findIndex((model) => {
         return item.name === model.value;
@@ -2089,6 +2101,10 @@ class Class_product {
 
   /**門片材質 主產品設定的材質 */
   get options_material() {
+    if (this.isSpecialProd) {
+      return [{ value: '', label: '請直接輸入' }];
+    }
+
     const doorModel = this._doorModelList[this.doorType];
 
     if (!doorModel) {
@@ -2158,6 +2174,10 @@ class Class_product {
 
   /**表面 */
   get options_surface() {
+    if (this.isSpecialProd) {
+      return [{ value: '', label: '請直接輸入' }];
+    }
+
     if (!this.material) {
       return undefined;
     }
@@ -2222,6 +2242,10 @@ class Class_product {
   }
 
   get options_boxB() {
+    if (this.isSpecialProd) {
+      return [{ value: '', label: '請直接輸入' }];
+    }
+
     if (!this._prodData.doorType) {
       return undefined;
     }
@@ -2256,6 +2280,7 @@ class Class_product {
   get weight() {
     return this._doorGeneralSpecs?.weight;
   }
+
   // ---------------------------------------------------------
 
   // 報價單折數，也就是TquotationContentDto[discount]
@@ -2333,11 +2358,50 @@ class Class_product {
     this.reRender();
   }
   //
+
+  get isSpecialProd() {
+    const isSpecial = !options_doorType.some((option) => option.value === this._prodData.quoteType);
+
+    return isSpecial;
+  }
+
+  get ignoreKeyArr_prod() {
+    return [
+      'doorTrack',
+      'typhoonProtection',
+      'doorTrackSilencerStrip',
+      'thickness',
+      'area',
+      'volume',
+      'bounceDoorWidth',
+      'doorTrackThick',
+      'rollUpBoxThick',
+      'close',
+      'onePieceRollUpBox',
+      'isULGuideRail',
+    ];
+  }
+
   get quoteType() {
     return this._prodData.quoteType;
   }
   set quoteType(v) {
+    const isSame = this._prodData.quoteType === v;
+
+    if (isSame) {
+      return;
+    }
+
     this._prodData.quoteType = v;
+    this.doorType = '';
+    this.clearProd_all();
+
+    if (this.isSpecialProd) {
+      this.subComList = {};
+      this.material = '';
+      this.surface = '';
+    }
+
     this.reRender();
   }
   //
@@ -2347,6 +2411,14 @@ class Class_product {
 
   set doorType(v) {
     this._prodData.doorType = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
 
     const isMaterailInOptions = check_isValueInOptions(this.material, this.options_material ?? []);
     const is304InOptions = check_isValueInOptions('SST#304', this.options_material ?? []);
@@ -2390,6 +2462,15 @@ class Class_product {
     this.isWgChanged = false;
 
     this._prodData.fullWidth = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     // this._prodData.WG = '0';
     this.area = this.calcArea();
     // this.calcChangeAccePrice();
@@ -2416,6 +2497,14 @@ class Class_product {
     }
 
     this._prodData.WG = str;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
 
     // 沒有horsepower就沒有gapA與gapC就無法計算正確的L
     // 沒有boxB，呼叫api會錯誤
@@ -2467,6 +2556,14 @@ class Class_product {
 
     this.WG = String(WG);
 
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     if (!this._doorGeneralSpecs?.gapA) {
       this.isEditW_noGapA = true;
     }
@@ -2482,6 +2579,16 @@ class Class_product {
   }
   set height(v) {
     this._prodData.height = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.area = this.calcArea();
     // this.clearProd();
 
@@ -2505,7 +2612,21 @@ class Class_product {
         v = this._defaultBoxB;
       }
 
+      const v_num = Number(v);
+
+      if (typeof v_num !== 'number' || Number.isNaN(v_num)) {
+        return;
+      }
+
       this._prodData.boxB = v;
+
+      // ________________________
+      if (this.isSpecialProd) {
+        this.reRender();
+
+        return;
+      }
+      // ________________________
 
       const reqBody: TgetBoxDParams = {
         modelName: this.doorType,
@@ -2547,6 +2668,14 @@ class Class_product {
   set boxB_noCall(v: string) {
     const setBoxB = async () => {
       this._prodData.boxB = v;
+
+      // ________________________
+      if (this.isSpecialProd) {
+        this.reRender();
+
+        return;
+      }
+      // ________________________
 
       const reqBody: TgetBoxDParams = {
         modelName: this.doorType,
@@ -2619,6 +2748,14 @@ class Class_product {
     return this._prodData.boxD;
   }
   set boxD(v) {
+    // ________________________
+    if (this.isSpecialProd) {
+      this._prodData.boxD = v;
+      this.reRender();
+
+      return;
+    }
+    // ________________________
     // this._prodData.boxD = v;
     // this._prodData.boxB = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB[v] ?? '';
     // this.area = this.calcArea();
@@ -2642,6 +2779,14 @@ class Class_product {
   }
   set area(v) {
     this._prodData.area = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
 
     if (this.comList?.slat) {
       this.comList.slat.quantity = v;
@@ -2672,6 +2817,15 @@ class Class_product {
     return this._prodData.material;
   }
   set material(v) {
+    // ________________________
+    if (this.isSpecialProd) {
+      this._prodData.material = v;
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     Object.values(this.comList || {}).forEach((com) => {
       if (com) {
         com.changeFindedMaterial(v);
@@ -2697,6 +2851,14 @@ class Class_product {
   set surface(v) {
     this._prodData.surface = v;
 
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     if (this.comList?.slat) {
       this.comList.slat.surface_withCheckOptions = v;
     }
@@ -2709,6 +2871,15 @@ class Class_product {
   }
   set doorTrack(v) {
     this._prodData.doorTrack = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     const theGuideRail = this.options_doorTrack?.find((item) => {
       return item?.value === v;
     });
@@ -2732,6 +2903,14 @@ class Class_product {
   }
   set horsepower(v) {
     this._prodData.horsepower = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
 
     const { gapA, gapC } = lookup_hpToGapAGapC[v as keyof typeof lookup_hpToGapAGapC];
 
@@ -2777,6 +2956,14 @@ class Class_product {
     this._quantity = v;
 
     this.calcProdAllprice_timeout();
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
 
     if (originallyIsZero) {
       // 呼叫callAllReq後就會再自動算金額了
@@ -2869,6 +3056,15 @@ class Class_product {
     return this._prodData.typhoonProtection;
   }
   set typhoonProtection(v) {
+    // ________________________
+    if (this.isSpecialProd) {
+      this._prodData.typhoonProtection = v;
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     if (this.doorType === 'SJ-312') {
       if ((v = true)) {
         return;
@@ -2939,6 +3135,7 @@ class Class_product {
       return bounceDoorWidth_m;
     }
   }
+
   // 輸入的單位預期為公尺
   set bounceDoorWidth(str) {
     if (!str) {
@@ -2976,6 +3173,15 @@ class Class_product {
   }
   set motor(v) {
     this._prodData.motor = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
     // this.toSetDefaultBoxB();
     this.callRetrieveCreProdCom();
     this.reRender();
@@ -2986,6 +3192,15 @@ class Class_product {
   }
   set voltage(str) {
     this._prodData.voltage = str;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -2996,6 +3211,15 @@ class Class_product {
   }
   set phase(str) {
     this._prodData.phase = Number(str);
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3006,6 +3230,15 @@ class Class_product {
   }
   set motorSupport(v) {
     this._prodData.motorSupport = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+    // ________________________
+
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3015,6 +3248,16 @@ class Class_product {
   }
   set bottomBar(v) {
     this._prodData.bottomBar = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3032,6 +3275,16 @@ class Class_product {
   }
   set doorTrackThick(str) {
     this._prodData.doorTrackThick = str;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3054,6 +3307,16 @@ class Class_product {
   // 基本上與防颱一樣
   set doorTrackSilencerStrip(v) {
     this._prodData.doorTrackSilencerStrip = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.isDontClearProd = true;
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
@@ -3075,6 +3338,16 @@ class Class_product {
   }
   set onePieceRollUpBox(v) {
     this._prodData.onePieceRollUpBox = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3084,6 +3357,16 @@ class Class_product {
   }
   set rollUpBoxThick(v) {
     this._prodData.rollUpBoxThick = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.callRetrieveCreProdCom();
     this.reRender();
   }
@@ -3101,6 +3384,16 @@ class Class_product {
   }
   set isULGuideRail(bool) {
     this._prodData.isULGuideRail = bool;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.callRetrieveCreProdCom();
 
     this.reRender();
@@ -3112,6 +3405,16 @@ class Class_product {
   }
   set bottomBarAngleIron(v) {
     this._prodData.bottomBarAngleIron = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.shouldCall_pgpb = true;
     this.callAllReq();
     this.reRender();
@@ -3122,6 +3425,16 @@ class Class_product {
   }
   set bottomBarPlate(v) {
     this._prodData.bottomBarPlate = v;
+
+    // ________________________
+    if (this.isSpecialProd) {
+      this.reRender();
+
+      return;
+    }
+
+    // ________________________
+
     this.shouldCall_pgpb = true;
     this.callAllReq();
     this.reRender();
@@ -3266,7 +3579,7 @@ class Class_product {
     const componentBodyArr = this.comBodyArr;
     let isComponentBreak = false;
 
-    if (componentBodyArr.length !== 8) {
+    if (componentBodyArr.length !== 8 && !this.isSpecialProd) {
       isComponentBreak = true;
     }
 
@@ -3310,7 +3623,7 @@ class Class_product {
 
     const arrForCreate = checkOptionsKey ? this.accessoriesVKeyArr : Object.keys(this.accessoriesList);
 
-    const accessories: TcreateQuotationProductAccessoriesDto[] =
+    const accessories: TcreateQuotationProductAccessoryDto[] =
       arrForCreate?.map((key, index) => {
         const item = this.accessoriesList[key];
 
@@ -3326,17 +3639,15 @@ class Class_product {
   get body() {
     const copy = _.cloneDeep(this._prodData);
 
-    const body: TcreateQuotationProductDto & {
-      id: string | undefined;
-    } = {
+    let body: TcreateQuotationProductDto = {
       ...copy,
       id: copy.id,
       doorModelName: this.doorType,
       materialName: this.material,
-      materialSurface: this.surface || null,
+      materialSurface: this.surface,
       guideRail: this.doorTrack,
       motorVendor: this.motor,
-      guideRailThickness: Number(this.doorTrackThick),
+      guideRailThickness: this.doorTrackThick,
       hasSilencingStrip: this.doorTrackSilencerStrip,
       isIntegratedHeadBox: this.onePieceRollUpBox,
       isAntiTyphoon: this.typhoonProtection,
@@ -3344,19 +3655,17 @@ class Class_product {
       motorPhase: Number(this.phase),
 
       // 送去後端要轉為要從m轉為mm
-      WG: new Decimal(this._prodData.WG).mul(1000).toNumber(),
-      fullWidth: new Decimal(this._prodData.fullWidth).mul(1000).toNumber(),
-      height: new Decimal(this._prodData.height).mul(1000).toNumber(),
-      boxB: new Decimal(this._prodData.boxB).mul(1000).toNumber(),
-      boxD: new Decimal(this._prodData.boxD).mul(1000).toNumber(),
+      WG: new Decimal(this._prodData.WG || 0).mul(1000).toNumber(),
+      fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
+      height: new Decimal(this._prodData.height || 0).mul(1000).toNumber(),
+      boxB: new Decimal(this._prodData.boxB || 0).mul(1000).toNumber(),
+      boxD: new Decimal(this._prodData.boxD || 0).mul(1000).toNumber(),
       volume: this._prodData.volume || '0',
       area: this._prodData.area || '0',
 
-      headBoxThickness: Number(this._prodData.rollUpBoxThick),
+      headBoxThickness: this._prodData.rollUpBoxThick,
       motorVoltage: Number(this._prodData.voltage),
       hasMotorSupportStand: this._prodData.motorSupport,
-
-      isPainted: false,
 
       price: Number(this._price),
       dualPrice: Number(this._dualPrice),
@@ -3369,17 +3678,17 @@ class Class_product {
 
       thickness: this._prodData.thickness || '0',
 
-      distributionBoxPrice: Number(this.subComList.distributionBox.price),
-      distributionBoxUnitPrice: Number(this.subComList.distributionBox.unitPrice),
-      distributionBoxQuantity: Number(this.subComList.distributionBox.quantity),
-      distributionBoxDualPrice: Number(this.subComList.distributionBox.dualPrice),
-      distributionBoxTotalPrice: Number(this.subComList.distributionBox.totalPrice),
+      distributionBoxPrice: Number(this.subComList.distributionBox?.price ?? 0),
+      distributionBoxUnitPrice: Number(this.subComList.distributionBox?.unitPrice ?? 0),
+      distributionBoxQuantity: Number(this.subComList.distributionBox?.quantity ?? 0),
+      distributionBoxDualPrice: Number(this.subComList.distributionBox?.dualPrice ?? 0),
+      distributionBoxTotalPrice: Number(this.subComList.distributionBox?.totalPrice ?? 0),
 
-      installationFeePrice: Number(this.subComList.installationFee.price),
-      installationFeeDualPrice: Number(this.subComList.installationFee.dualPrice),
-      installationFeeQuantity: Number(this.subComList.installationFee.quantity),
-      installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
-      installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
+      installationFeePrice: Number(this.subComList.installationFee?.price) ?? 0,
+      installationFeeDualPrice: this.subComList.installationFee?.dualPrice ?? 0,
+      installationFeeQuantity: this.subComList.installationFee?.quantity ?? 0,
+      installationFeeUnitPrice: Number(this.subComList.installationFee?.unitPrice ?? 0),
+      installationFeeTotalPrice: this.subComList.installationFee?.totalPrice ?? 0,
 
       bottomBar: this._prodData.bottomBar === 'none' ? '' : this._prodData.bottomBar,
 
@@ -3402,6 +3711,66 @@ class Class_product {
       bounceDoorWidth: this._prodData.bounceDoorWidth || null,
       bounceDoor: !!(this._prodData.bounceDoorWidth || null),
     };
+
+    if (this.isSpecialProd) {
+      body = {
+        ...body,
+
+        area: null,
+        volume: null,
+        guideRail: null,
+        motorVendor: null,
+        motorVoltage: null,
+        bottomBar: null,
+        motorLockBox: null,
+        guideRailThickness: null,
+        rollerSpec: null,
+        hasSilencingStrip: null,
+        isIntegratedHeadBox: null,
+        headBoxThickness: null,
+        isAntiTyphoon: null,
+        bounceDoor: null,
+        bounceDoorWidth: null,
+        bounceDoorHeight: null,
+        bounceDoorLength: null,
+        closingType: null,
+        motorPhase: null,
+        bottomBarAngleIron: null,
+        bottomBarPlate: null,
+        thickness: null,
+        distributionBoxPrice: null,
+        distributionBoxUnitPrice: null,
+        distributionBoxQuantity: null,
+        distributionBoxDualPrice: null,
+        distributionBoxTotalPrice: null,
+        installationFeePrice: null,
+        installationFeeDualPrice: null,
+        installationFeeQuantity: null,
+        installationFeeUnitPrice: null,
+        installationFeeTotalPrice: null,
+        slatCount: null,
+        sprocketWheelModel: null,
+        sprocketWheelTeethNumber: null,
+        sprocketWheelChains: null,
+        bearingInnerDiameter: null,
+        diameter: null,
+        bearingHousingTotalLength: null,
+        guideRailsOpening: null,
+        slatLength: null,
+        guideRailLength: null,
+        headBoxLength: null,
+        bearingHousingSize: null,
+        bearingName: null,
+        gapA: null,
+        gapC: null,
+        gearNumber: null,
+        weight: null,
+        guideRailG: null,
+        isULGuideRail: null,
+        hasMotorSupportStand: null,
+        components: [],
+      };
+    }
 
     if ('items' in body) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

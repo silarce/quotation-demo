@@ -511,6 +511,16 @@ function DndRow({
             const { inputSelProps, isSuffixOnly } = _.cloneDeep(prodCellConfig[key]);
             const { inputProps, selectProps, checkBoxProps } = inputSelProps;
 
+            if (item.isSpecialProd && item.ignoreKeyArr_prod?.includes(key)) {
+              return (
+                <div
+                  key={key}
+                  className={classNames(scss.column, isHidden && scss.hidden)}
+                  style={{ width: inputSelProps.wrapperStyle?.width }}
+                ></div>
+              );
+            }
+
             if (isSuffixOnly) {
               if (stateValue === 'm2') {
                 stateValue = (
@@ -535,6 +545,12 @@ function DndRow({
             if (inputProps?.props) {
               inputProps.props.value = (stateValue as string) ?? '';
 
+              if (item.isSpecialProd && key === 'boxD') {
+                inputSelProps.showBaseline = 'auto';
+                inputSelProps.disabled = disabled;
+                delete inputProps.props.disabled;
+              }
+
               // 在中文輸入法(或許其他的輸入法都是)
               // 若有對輸出的值做格式化，例如輸入1234，但格式化為123 4
               // 那麼在輸入4的時候，會觸發onChange兩次
@@ -554,6 +570,10 @@ function DndRow({
             if (selectProps) {
               if (!selectProps.props) {
                 selectProps.props = {};
+              }
+
+              if (item.isSpecialProd || key === 'quoteType') {
+                selectProps.props.isSearchable = true;
               }
 
               const isOptionValue = prodCellConfig[key].isOptionValue;

@@ -24,7 +24,9 @@ export type TpageResponse<Tdata> = {
 };
 
 export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
-export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null; // 表面處理
+
+// 表面處理
+export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null;
 
 export type TdeliveryStatus = '未安裝' | '已安裝' | '已結清';
 
@@ -847,7 +849,7 @@ export type TquotationProductAccessoryDto = {
   referenceSpec: string | null;
 };
 
-export type TcreateQuotationProductAccessoriesDto = Omit<
+export type TcreateQuotationProductAccessoryDto = Omit<
   TquotationProductAccessoryDto,
   'id' | 'createdAt' | 'updatedAt'
 > & { id?: string };
@@ -911,57 +913,57 @@ export type TquotationProductDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  /**折數 */
-  discount: string;
+
+  // 折數
+  discount: string; // `${number}`
   // 項目名
   itemName: string;
   // 報價別
   quoteType: string;
   // 門型
-  doorModelName: TdoorModel;
-  // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
+  doorModelName: string;
+  // L(mm)全寬 // 單位為mm
   fullWidth: number;
-  // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
+  // WG(mm) // 單位為mm
   WG: number;
-  // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
+  // h(mm) // 單位為mm
   height: number;
-  // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
+  // B(mm) // 單位為mm
   boxB: number;
-  boxD: number | null;
+  // D(mm) // 單位為mm
+  boxD: number;
   // 面積
-  area: string;
+  area: string | null;
   // 才數
-  volume: string;
+  volume: string | null;
   // 材料
   materialName: string;
   // 表面
-  materialSurface: TmaterialSurface | null;
+  materialSurface: string | null;
   // 門軌
-  guideRail: string;
-  // 門軌G // guideRailG是指單邊門軌的寬度。但是在工務部，G其實是指兩邊門軌寬度的總和。
-  guideRailG: number | null;
+  guideRail: string | null;
   // 馬力
   horsepower: string;
   // 馬達廠商
-  motorVendor: string;
+  motorVendor: string | null;
   // 電壓
-  motorVoltage: number;
+  motorVoltage: number | null;
   // 馬達支撐架
-  hasMotorSupportStand: boolean;
+  hasMotorSupportStand: boolean | null;
   // 底座類型
-  bottomBar: string; // 鋁障感 | 止水型 | ''
+  bottomBar: string | null; // 鋁障感 | 止水型 | ''
   // 馬達鎖盒
-  motorLockBox: string;
+  motorLockBox: string | null;
   // 門軌厚度
-  guideRailThickness: string;
-  // 捲軸規格
-  rollerSpec: string; // 雙凸|無凸
+  guideRailThickness: string | null;
+  // 捲軸規格  // 棄用
+  rollerSpec: string | null; // 無凸 | 雙凸
   // 門軌消音條
-  hasSilencingStrip: boolean;
+  hasSilencingStrip: boolean | null;
   // 一體式捲箱
-  isIntegratedHeadBox: boolean;
+  isIntegratedHeadBox: boolean | null;
   // 捲箱厚度
-  headBoxThickness: string;
+  headBoxThickness: string | null;
   // 單價
   unitPrice: number;
   // 牌價
@@ -971,100 +973,261 @@ export type TquotationProductDto = {
   // 複價
   totalPrice: number;
   // 防颱
-  isAntiTyphoon: boolean;
+  isAntiTyphoon: boolean | null;
   // 彈射門
-  bounceDoor: boolean;
-  // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
-  closingType: string;
+  bounceDoor: boolean | null;
+  // 彈射門寬度
+  bounceDoorWidth: number | null;
+  // 彈射門高度
+  bounceDoorHeight: number | null;
+  // 彈射門長度
+  bounceDoorLength: number | null;
+  // 關閉方式 // 在前端顯示的label為開閉方式
+  closingType: string | null;
   // 備註
   notes: string;
+  // 相數
+  motorPhase: number | null;
+  // 底座角鐵
+  bottomBarAngleIron: string | null;
+  // 底座板
+  bottomBarPlate: string | null;
+  // 排序
   order: number;
-
-  motorPhase: number;
-
-  bottomBarAngleIron: string; // 底座角鐵
-  bottomBarPlate: string; // 底座板
-
-  isULGuideRail?: boolean | null;
-  // 彈射門尺寸
-  bounceDoorWidth?: number | null;
-
-  // items?: {
-  //   // 材料配件
-  //   components: TquotationProductComponentsDto[];
-  //   // 選配設定
-  //   accessories: TquotationProductAccessoriesDto[];
-  //   worksheetId: string | null;
-  //   worksheetRecordId: string | null; // 棄用
-
-  //   // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
-  // }[];
-  // items?: {
-  //   // 材料配件
-  //   components: TquotationProductComponentsDto[];
-  //   // 選配設定
-  //   accessories: TquotationProductAccessoriesDto[];
-  //   worksheetId: string | null;
-  //   worksheetRecordId: string | null; // 棄用
-
-  //   // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
-  // }[];
-  items?: TquotationProductItemDto[];
-
+  // 數量
   quantity: number;
-
-  // 配電箱數量;
+  // 門片厚度
+  thickness: string | null;
+  // 配電箱牌價
+  distributionBoxPrice: number | null;
+  // 配電箱單價
+  distributionBoxUnitPrice: number | null;
+  // 配電箱數量
   distributionBoxQuantity: number | null;
-  // 配電箱牌價;
-  distributionBoxPrice: number;
-  // 配電箱牌價複價;
+  // 配電箱牌價複價
   distributionBoxDualPrice: number | null;
-  // 配電箱單價;
-  distributionBoxUnitPrice: number;
-  // 配電箱複價;
+  // 配電箱複價
   distributionBoxTotalPrice: number | null;
-  //
-  // 安裝費數量;
-  installationFeeQuantity: number;
-  // 安裝費牌價;
-  installationFeePrice: number;
-  // 安裝費牌價複價;
-  installationFeeDualPrice: number;
-  // 安裝費單價;
-  installationFeeUnitPrice: number;
-  // 安裝費複價;
-  installationFeeTotalPrice: number;
-
+  // 安裝費牌價
+  installationFeePrice: number | null;
+  // 安裝費牌價複價
+  installationFeeDualPrice: string | null;
+  // 安裝費數量
+  installationFeeQuantity: string | null;
+  // 安裝費單價
+  installationFeeUnitPrice: number | null;
+  // 安裝費複價
+  installationFeeTotalPrice: string | null;
+  // 門片 - 捲片支數
+  slatCount: string | null;
+  // 鏈齒輪 - 鏈齒輪番號
+  sprocketWheelModel: string | null;
+  // 鏈齒輪 - 大鏈輪
+  sprocketWheelTeethNumber: string | null;
+  // 不確定這個property的意義，可能為鍊條數量
+  sprocketWheelChains: string | null;
+  // 鏈齒輪/捲軸 - 孔徑/軸徑
+  bearingInnerDiameter: string | null;
+  // 捲軸 - 尺寸
+  diameter: string | null;
+  // 捲軸 - 總長
+  bearingHousingTotalLength: string | null;
+  // 底座 - 開口
+  guideRailsOpening: string | null;
+  // 門片長度
+  slatLength: number | null;
+  // 門軌長度
+  guideRailLength: number | null;
+  // 捲箱長度
+  headBoxLength: number | null;
+  // 軸承座寸法
+  bearingHousingSize: number | null;
+  // 軸承
+  bearingName: string | null;
+  gapA: string | null;
+  gapC: string | null;
+  gearNumber: string | null;
+  weight: string | null;
+  // guideRailG為門軌的width
+  // guideRailG是指單邊門軌的寬度。要注意，在工務部，G是指兩邊門軌寬度的總和。
+  guideRailG: number | null;
+  // 門軌UL
+  isULGuideRail: boolean | null;
+  // 個別產品
+  items: TquotationProductItemDto[];
+  // 來源產品Id
   attachedToProductId?: string | null;
-  attachedToProduct?: TquotationProductDto | null;
+  // 來源產品
+  attachedToProduct?: TquotationProductDto;
 
+  // 源頭產品
+  // 實際上可能為null，運作正常的話預期不會為null。若為null代表有問題，要跟後端討論
   rootProductId: string;
-
-  guideRailsOpening?: string | null; //底座 - 開口
-  slatCount: string | null; //門片 - 捲片支數
-
-  bearingHousingSize?: number | null; //軸承座寸法
-  bearingHousingTotalLength?: string | null; //捲軸 - 總長
-  bearingInnerDiameter?: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
-  bearingName?: string | null; //軸承
-  diameter?: string | null; //捲軸 - 尺寸
-  gapA?: string | null;
-  gapC?: string | null;
-  gearNumber?: string | null; //
-  sprocketWheelModel?: string | null; //鏈齒輪 - 鏈齒輪番號
-  sprocketWheelTeethNumber?: string | null; //鏈齒輪 - 大鏈輪
-  sprocketWheelChains?: string | null; //
-  weight?: string | null; //
-  slatLength?: number | null; //門片長度
-  guideRailLength?: number | null; //門軌長度
-  headBoxLength?: number | null; //捲箱長度
-  thickness: string | null; // 門片厚度
 
   //
   // 前端用的，後端沒有
   // 只是為了方便才寫在這邊
   reduceQty?: number;
 };
+
+// export type TquotationProductDto = {
+//   id: string;
+//   createdAt: string;
+//   updatedAt: string;
+//   /**折數 */
+//   discount: string;
+//   // 項目名
+//   itemName: string;
+//   // 報價別
+//   quoteType: string;
+//   // 門型
+//   doorModelName: TdoorModel;
+//   // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
+//   fullWidth: number;
+//   // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
+//   WG: number;
+//   // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
+//   height: number;
+//   // 已跟後端討論好所有送去後端或後端送來的 l w h b 單位都是mm
+//   boxB: number;
+//   boxD: number | null;
+//   // 面積
+//   area: string;
+//   // 才數
+//   volume: string;
+//   // 材料
+//   materialName: string;
+//   // 表面
+//   materialSurface: TmaterialSurface | null;
+//   // 門軌
+//   guideRail: string;
+//   // 門軌G // guideRailG是指單邊門軌的寬度。但是在工務部，G其實是指兩邊門軌寬度的總和。
+//   guideRailG: number | null;
+//   // 馬力
+//   horsepower: string;
+//   // 馬達廠商
+//   motorVendor: string;
+//   // 電壓
+//   motorVoltage: number;
+//   // 馬達支撐架
+//   hasMotorSupportStand: boolean;
+//   // 底座類型
+//   bottomBar: string; // 鋁障感 | 止水型 | ''
+//   // 馬達鎖盒
+//   motorLockBox: string;
+//   // 門軌厚度
+//   guideRailThickness: string;
+//   // 捲軸規格
+//   rollerSpec: string; // 雙凸|無凸
+//   // 門軌消音條
+//   hasSilencingStrip: boolean;
+//   // 一體式捲箱
+//   isIntegratedHeadBox: boolean;
+//   // 捲箱厚度
+//   headBoxThickness: string;
+//   // 單價
+//   unitPrice: number;
+//   // 牌價
+//   price: number;
+//   // 牌價複價
+//   dualPrice: number;
+//   // 複價
+//   totalPrice: number;
+//   // 防颱
+//   isAntiTyphoon: boolean;
+//   // 彈射門
+//   bounceDoor: boolean;
+//   // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
+//   closingType: string;
+//   // 備註
+//   notes: string;
+//   order: number;
+
+//   motorPhase: number;
+
+//   bottomBarAngleIron: string; // 底座角鐵
+//   bottomBarPlate: string; // 底座板
+
+//   isULGuideRail?: boolean | null;
+//   // 彈射門尺寸
+//   bounceDoorWidth?: number | null;
+
+//   // items?: {
+//   //   // 材料配件
+//   //   components: TquotationProductComponentsDto[];
+//   //   // 選配設定
+//   //   accessories: TquotationProductAccessoriesDto[];
+//   //   worksheetId: string | null;
+//   //   worksheetRecordId: string | null; // 棄用
+
+//   //   // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
+//   // }[];
+//   // items?: {
+//   //   // 材料配件
+//   //   components: TquotationProductComponentsDto[];
+//   //   // 選配設定
+//   //   accessories: TquotationProductAccessoriesDto[];
+//   //   worksheetId: string | null;
+//   //   worksheetRecordId: string | null; // 棄用
+
+//   //   // TODO 還有其他很多有的沒有的，用不到，以後有空再補上
+//   // }[];
+//   items?: TquotationProductItemDto[];
+
+//   quantity: number;
+
+//   // 配電箱數量;
+//   distributionBoxQuantity: number | null;
+//   // 配電箱牌價;
+//   distributionBoxPrice: number;
+//   // 配電箱牌價複價;
+//   distributionBoxDualPrice: number | null;
+//   // 配電箱單價;
+//   distributionBoxUnitPrice: number;
+//   // 配電箱複價;
+//   distributionBoxTotalPrice: number | null;
+//   //
+//   // 安裝費數量;
+//   installationFeeQuantity: number;
+//   // 安裝費牌價;
+//   installationFeePrice: number;
+//   // 安裝費牌價複價;
+//   installationFeeDualPrice: number;
+//   // 安裝費單價;
+//   installationFeeUnitPrice: number;
+//   // 安裝費複價;
+//   installationFeeTotalPrice: number;
+
+//   attachedToProductId?: string | null;
+//   attachedToProduct?: TquotationProductDto | null;
+
+//   rootProductId: string;
+
+//   guideRailsOpening?: string | null; //底座 - 開口
+//   slatCount: string | null; //門片 - 捲片支數
+
+//   bearingHousingSize?: number | null; //軸承座寸法
+//   bearingHousingTotalLength?: string | null; //捲軸 - 總長
+//   bearingInnerDiameter?: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
+//   bearingName?: string | null; //軸承
+//   diameter?: string | null; //捲軸 - 尺寸
+//   gapA?: string | null;
+//   gapC?: string | null;
+//   gearNumber?: string | null; //
+//   sprocketWheelModel?: string | null; //鏈齒輪 - 鏈齒輪番號
+//   sprocketWheelTeethNumber?: string | null; //鏈齒輪 - 大鏈輪
+//   sprocketWheelChains?: string | null; //
+//   weight?: string | null; //
+//   slatLength?: number | null; //門片長度
+//   guideRailLength?: number | null; //門軌長度
+//   headBoxLength?: number | null; //捲箱長度
+//   thickness: string | null; // 門片厚度
+
+//   //
+//   // 前端用的，後端沒有
+//   // 只是為了方便才寫在這邊
+//   reduceQty?: number;
+// };
 
 // 棄用
 // export type TdeliveryStatusDto = {
@@ -1622,143 +1785,302 @@ export type TquotationDto = {
 };
 
 export type TcreateQuotationProductDto = {
-  /**折數 */
-  discount: string;
+  // 產品id
+  id?: string;
+  // 折數
+  discount: string; // `${number}`
   // 項目名
   itemName: string;
   // 報價別
   quoteType: string;
   // 門型
   doorModelName: string;
-  // L(m)
+  // L(mm)全寬 // 單位為mm
   fullWidth: number;
-  // W(m)
+  // W(mm) // 單位為mm
   WG: number;
-  // h(m)
+  // h(mm) // 單位為mm
   height: number;
-  // B(m)
+  // B(mm) // 單位為mm
   boxB: number;
+  // D(mm) // 單位為mm
   boxD: number;
   // 面積
-  area: string;
+  area: string | null;
   // 才數
-  volume: string;
+  volume: string | null;
   // 材料
   materialName: string;
   // 表面
   materialSurface: string | null;
   // 門軌
-  guideRail: string;
-  // 門軌G // guideRailG是指單邊門軌的寬度。但是在工務部，G其實是指兩邊門軌寬度的總和。
-  guideRailG: number | null;
+  guideRail: string | null;
   // 馬力
   horsepower: string;
   // 馬達廠商
-  motorVendor: string;
+  motorVendor: string | null;
   // 電壓
-  motorVoltage: number;
+  motorVoltage: number | null;
   // 馬達支撐架
-  hasMotorSupportStand: boolean;
+  hasMotorSupportStand: boolean | null;
   // 底座類型
-  bottomBar: string; // 鋁障感 | 止水型 | ''
+  bottomBar: string | null; // 鋁障感 | 止水型 | ''
   // 馬達鎖盒
-  motorLockBox: string;
+  motorLockBox: string | null;
   // 門軌厚度
-  guideRailThickness: number;
-  // 捲軸規格
-  rollerSpec: string; // 雙凸|無凸
+  guideRailThickness: string | null;
+  // 捲軸規格  // 棄用
+  rollerSpec: string | null; // 無凸 | 雙凸
   // 門軌消音條
-  hasSilencingStrip: boolean;
+  hasSilencingStrip: boolean | null;
   // 一體式捲箱
-  isIntegratedHeadBox: boolean;
+  isIntegratedHeadBox: boolean | null;
   // 捲箱厚度
-  headBoxThickness: number;
+  headBoxThickness: string | null;
   // 數量
   quantity: number;
   // 單價
   unitPrice: number;
   // 牌價
   price: number;
-  // 牌價複價
-  dualPrice: number;
   // 複價
   totalPrice: number;
+  // 牌價複價
+  dualPrice: number;
   // 防颱
-  isAntiTyphoon: boolean;
+  isAntiTyphoon: boolean | null;
   // 彈射門
-  bounceDoor: boolean;
-  // 彈射門尺寸
-  bounceDoorWidth: number | null;
-  // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
-  closingType: string;
+  bounceDoor: boolean | null;
+  // 彈射門寬度
+  bounceDoorWidth?: number | null;
+  // 彈射門高度
+  bounceDoorHeight?: number | null;
+  // 彈射門長度
+  bounceDoorLength?: number | null;
+  // 關閉方式 // 在前端顯示的label為開閉方式
+  closingType: string | null;
   // 備註
   notes: string;
-
-  motorPhase: number;
-
-  // 選配設定
-  accessories: {
-    codeName: string; //代號
-    name: string; //名稱
-    unit: string; // 單位
-    quantity: number; // 數量
-    unitPrice: number; // 單價
-    totalPrice: number; // 複價
-    price: number; // 牌價
-    dualPrice: number; // 牌價複價
-    order: number;
-  }[];
-  components: TcreateQuotationProductComponentDto[];
-  //
-  // materialSurface: string;
-  isPainted: boolean;
+  // 相數
+  motorPhase: number | null;
+  // 底座角鐵
+  bottomBarAngleIron: string | null;
+  // 底座板
+  bottomBarPlate: string | null;
+  // 排序
   order: number;
-  bottomBarAngleIron: string; // 底座角鐵
-  bottomBarPlate: string; // 底座板
-
   // 門片厚度
-  thickness: string;
-
-  // 配電箱數量;
-  distributionBoxQuantity: number;
-  // 配電箱牌價;
-  distributionBoxPrice: number;
-  // 配電箱牌價複價;
-  distributionBoxDualPrice: number;
-  // 配電箱單價;
-  distributionBoxUnitPrice: number;
-  // 配電箱複價;
-  distributionBoxTotalPrice: number;
-  //
-  // 安裝費數量;
-  installationFeeQuantity: number;
-  // 安裝費牌價;
-  installationFeePrice: number;
-  // 安裝費牌價複價;
-  installationFeeDualPrice: number;
-  // 安裝費單價;
-  installationFeeUnitPrice: number;
-  // 安裝費複價;
-  installationFeeTotalPrice: number;
-
-  slatCount: string | null; //門片 - 捲片支數
-  sprocketWheelModel: string | null; //鏈齒輪 - 鏈齒輪番號
-  sprocketWheelTeethNumber: string | null; //鏈齒輪 - 大鏈輪
-  sprocketWheelChains: string | null; //
-  bearingInnerDiameter: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
-  diameter: string | null; //捲軸 - 尺寸
-  bearingHousingTotalLength: string | null; //捲軸 - 總長
-  guideRailsOpening: string | null; //底座 - 開口
-  slatLength: number | null; //門片長度
-  guideRailLength: number | null; //門軌長度
-  headBoxLength: number | null; //捲箱長度
-  bearingHousingSize: number | null; //軸承座寸法
-  bearingName: string | null; //軸承
-  gapA: string | null; //
-  gapC: string | null; //
-  gearNumber: string | null; //
-  weight: string | null; //
+  thickness: string | null;
+  // 配電箱牌價
+  distributionBoxPrice: number | null;
+  // 配電箱單價
+  distributionBoxUnitPrice: number | null;
+  // 配電箱數量
+  distributionBoxQuantity: number | null;
+  // 配電箱牌價複價
+  distributionBoxDualPrice: number | null;
+  // 配電箱複價
+  distributionBoxTotalPrice: number | null;
+  // 安裝費牌價
+  installationFeePrice: number | null;
+  // 安裝費牌價複價
+  installationFeeDualPrice: string | null;
+  // 安裝費數量
+  installationFeeQuantity: string | null;
+  // 安裝費單價
+  installationFeeUnitPrice: number | null;
+  // 安裝費複價
+  installationFeeTotalPrice: string | null;
+  // 門片 - 捲片支數
+  slatCount?: string | null;
+  // 鏈齒輪 - 鏈齒輪番號
+  sprocketWheelModel?: string | null;
+  // 鏈齒輪 - 大鏈輪
+  sprocketWheelTeethNumber?: string | null;
+  // 不確定這個property的意義，可能為鍊條數量
+  sprocketWheelChains?: string | null;
+  // 鏈齒輪/捲軸 - 孔徑/軸徑
+  bearingInnerDiameter?: string | null;
+  // 捲軸 - 尺寸
+  diameter?: string | null;
+  // 捲軸 - 總長
+  bearingHousingTotalLength?: string | null;
+  // 底座 - 開口
+  guideRailsOpening?: string | null;
+  // 門片長度
+  slatLength?: number | null;
+  // 門軌長度
+  guideRailLength?: number | null;
+  // 捲箱長度
+  headBoxLength?: number | null;
+  // 軸承座寸法
+  bearingHousingSize?: number | null;
+  // 軸承
+  bearingName?: string | null;
+  gapA?: string | null;
+  gapC?: string | null;
+  gearNumber?: string | null;
+  weight?: string | null;
+  // guideRailG為門軌的width
+  // guideRailG是指單邊門軌的寬度。要注意，在工務部，G是指兩邊門軌寬度的總和。
+  guideRailG?: number | null;
+  // 門軌UL
+  isULGuideRail?: boolean | null;
+  // 材料/配件設定
+  components: TcreateQuotationProductComponentDto[];
+  // 選配設定
+  accessories: TcreateQuotationProductAccessoryDto[];
+  // 來源產品
+  attachedToProductId?: string | null;
 };
+
+export type TupdateQuotationProductDto = TcreateQuotationProductDto & {
+  // 主產品id
+  id?: string;
+  // 源頭產品id
+  rootProductId?: string;
+  // 來源產品id
+  attachedToProductId?: string | null;
+};
+
+// export type TcreateQuotationProductDto = {
+//   /**折數 */
+//   discount: string;
+//   // 項目名
+//   itemName: string;
+//   // 報價別
+//   quoteType: string;
+//   // 門型
+//   doorModelName: string;
+//   // L(m)
+//   fullWidth: number;
+//   // W(m)
+//   WG: number;
+//   // h(m)
+//   height: number;
+//   // B(m)
+//   boxB: number;
+//   boxD: number;
+//   // 面積
+//   area: string;
+//   // 才數
+//   volume: string;
+//   // 材料
+//   materialName: string;
+//   // 表面
+//   materialSurface: string | null;
+//   // 門軌
+//   guideRail: string;
+//   // 門軌G // guideRailG是指單邊門軌的寬度。但是在工務部，G其實是指兩邊門軌寬度的總和。
+//   guideRailG: number | null;
+//   // 馬力
+//   horsepower: string;
+//   // 馬達廠商
+//   motorVendor: string;
+//   // 電壓
+//   motorVoltage: number;
+//   // 馬達支撐架
+//   hasMotorSupportStand: boolean;
+//   // 底座類型
+//   bottomBar: string; // 鋁障感 | 止水型 | ''
+//   // 馬達鎖盒
+//   motorLockBox: string;
+//   // 門軌厚度
+//   guideRailThickness: number;
+//   // 捲軸規格
+//   rollerSpec: string; // 雙凸|無凸
+//   // 門軌消音條
+//   hasSilencingStrip: boolean;
+//   // 一體式捲箱
+//   isIntegratedHeadBox: boolean;
+//   // 捲箱厚度
+//   headBoxThickness: number;
+//   // 數量
+//   quantity: number;
+//   // 單價
+//   unitPrice: number;
+//   // 牌價
+//   price: number;
+//   // 牌價複價
+//   dualPrice: number;
+//   // 複價
+//   totalPrice: number;
+//   // 防颱
+//   isAntiTyphoon: boolean;
+//   // 彈射門
+//   bounceDoor: boolean;
+//   // 彈射門尺寸
+//   bounceDoorWidth: number | null;
+//   // 關閉方式 //(實際上前端顯示的文字為"開"閉方式)
+//   closingType: string;
+//   // 備註
+//   notes: string;
+
+//   motorPhase: number;
+
+//   // 選配設定
+//   accessories: {
+//     codeName: string; //代號
+//     name: string; //名稱
+//     unit: string; // 單位
+//     quantity: number; // 數量
+//     unitPrice: number; // 單價
+//     totalPrice: number; // 複價
+//     price: number; // 牌價
+//     dualPrice: number; // 牌價複價
+//     order: number;
+//   }[];
+//   components: TcreateQuotationProductComponentDto[];
+//   //
+//   // materialSurface: string;
+//   isPainted: boolean;
+//   order: number;
+//   bottomBarAngleIron: string; // 底座角鐵
+//   bottomBarPlate: string; // 底座板
+
+//   // 門片厚度
+//   thickness: string;
+
+//   // 配電箱數量;
+//   distributionBoxQuantity: number;
+//   // 配電箱牌價;
+//   distributionBoxPrice: number;
+//   // 配電箱牌價複價;
+//   distributionBoxDualPrice: number;
+//   // 配電箱單價;
+//   distributionBoxUnitPrice: number;
+//   // 配電箱複價;
+//   distributionBoxTotalPrice: number;
+//   //
+//   // 安裝費數量;
+//   installationFeeQuantity: number;
+//   // 安裝費牌價;
+//   installationFeePrice: number;
+//   // 安裝費牌價複價;
+//   installationFeeDualPrice: number;
+//   // 安裝費單價;
+//   installationFeeUnitPrice: number;
+//   // 安裝費複價;
+//   installationFeeTotalPrice: number;
+
+//   slatCount: string | null; //門片 - 捲片支數
+//   sprocketWheelModel: string | null; //鏈齒輪 - 鏈齒輪番號
+//   sprocketWheelTeethNumber: string | null; //鏈齒輪 - 大鏈輪
+//   sprocketWheelChains: string | null; //
+//   bearingInnerDiameter: string | null; //鏈齒輪/捲軸 - 孔徑/軸徑
+//   diameter: string | null; //捲軸 - 尺寸
+//   bearingHousingTotalLength: string | null; //捲軸 - 總長
+//   guideRailsOpening: string | null; //底座 - 開口
+//   slatLength: number | null; //門片長度
+//   guideRailLength: number | null; //門軌長度
+//   headBoxLength: number | null; //捲箱長度
+//   bearingHousingSize: number | null; //軸承座寸法
+//   bearingName: string | null; //軸承
+//   gapA: string | null; //
+//   gapC: string | null; //
+//   gearNumber: string | null; //
+//   weight: string | null; //
+// };
 
 export type TcreateQuotationContentDto = {
   quotationDate: string; // 報價日期
@@ -2954,7 +3276,7 @@ export type TupdateContractProductItemDto = {
   // product: QuotationProductDto;
 
   // 選配設定
-  accessories: TcreateQuotationProductAccessoriesDto[]; // 不用送id
+  accessories: TcreateQuotationProductAccessoryDto[]; // 不用送id
   // 產品元件
   components: TupdateQuotationProductComponentDto[];
 };
