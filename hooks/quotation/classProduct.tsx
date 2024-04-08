@@ -337,17 +337,22 @@ class Class_product {
     // __________________________________________________________;
 
     // 建立材料配件
-    const sortedComList = sortComponent(this._prodData.components);
-    this.creComList({
-      dataList: sortedComList as { [key in TcomponentKey]: Tcomponent },
-      isNew: false,
-    });
+    if (!this.isSpecialProd) {
+      const sortedComList = sortComponent(this._prodData.components);
+      this.creComList({
+        dataList: sortedComList as { [key in TcomponentKey]: Tcomponent },
+        isNew: false,
+      });
+    }
 
     // ___________________________________________________________
     // 建立選配設定
     this.creAcceList();
+
     //建立 配電箱與按裝費
-    this.creSubComList({ isNew: false });
+    if (!this.isSpecialProd) {
+      this.creSubComList({ isNew: false });
+    }
 
     // ___________________________________________________________
     if (this._prodData.reduceQty) {
@@ -1240,7 +1245,7 @@ class Class_product {
 
   // 在一開始取得下拉式選單的選項
   async callApiAndGetOptions() {
-    if (this._availableComponents) {
+    if (this._availableComponents || this.isSpecialProd) {
       return;
     }
 
@@ -3754,6 +3759,7 @@ class Class_product {
         weight: null,
         guideRailG: null,
         isULGuideRail: null,
+        hasMotorSupportStand: null,
         components: [],
       };
     }
