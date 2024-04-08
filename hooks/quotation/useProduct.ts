@@ -863,7 +863,7 @@ const quotationProductToProd = ({ quotationProduct }: { quotationProduct: Tquota
     ...quotationProduct,
     phase: quotationProduct.motorPhase ?? -1,
     voltage: String(quotationProduct.motorVoltage),
-    motorSupport: quotationProduct.hasMotorSupportStand,
+    motorSupport: quotationProduct.hasMotorSupportStand ?? false,
     doorTrackThick: String(quotationProduct.guideRailThickness),
     rollUpBoxThick: String(quotationProduct.headBoxThickness),
     // 取得時是mm，要轉成m
