@@ -1059,7 +1059,9 @@ export type TquotationProductDto = {
   attachedToProductId?: string | null;
   // 來源產品
   attachedToProduct?: TquotationProductDto;
+
   // 源頭產品
+  // 實際上可能為null，運作正常的話預期不會為null。若為null代表有問題，要跟後端討論
   rootProductId: string;
 
   //
