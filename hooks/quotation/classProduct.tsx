@@ -331,7 +331,7 @@ class Class_product {
     // 報價單折數，也就是TquotationContentDto[discount]
     this._quotationDiscount = quotationDiscount;
 
-    if (!this._prodData.material) {
+    if (!this._prodData.material && !this.isSpecialProd) {
       this._prodData.material = 'SST#304';
       this._prodData.surface = '2B';
     }
