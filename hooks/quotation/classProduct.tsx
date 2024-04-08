@@ -131,7 +131,7 @@ import type {
   TquotationProductAccessoryDto,
   TgenerateDoorProductBomDto_DoorSpec,
   // TgenerateDoorProductBomDto_ComponentInfo,
-  TcreateQuotationProductAccessoriesDto,
+  TcreateQuotationProductAccessoryDto,
   TcreateQuotationProductComponentDto,
   TquotationProductComponentDto,
   TquotationProductDto,
@@ -139,6 +139,7 @@ import type {
   TcreateQuotationProductDto,
   TdoorGeneralSpecsMotorDto,
   TdoorGeneralSpecsMotorBoxDto,
+  TmaterialSurface,
 } from 'js/api/dtoTypes';
 
 import type { TreRender, TcomponentKey } from './useProduct';
@@ -2728,6 +2729,7 @@ class Class_product {
   set boxD(v) {
     // ________________________
     if (this.isSpecialProd) {
+      this._prodData.boxD = v;
       this.reRender();
 
       return;
@@ -3600,7 +3602,7 @@ class Class_product {
 
     const arrForCreate = checkOptionsKey ? this.accessoriesVKeyArr : Object.keys(this.accessoriesList);
 
-    const accessories: TcreateQuotationProductAccessoriesDto[] =
+    const accessories: TcreateQuotationProductAccessoryDto[] =
       arrForCreate?.map((key, index) => {
         const item = this.accessoriesList[key];
 
@@ -3616,17 +3618,15 @@ class Class_product {
   get body() {
     const copy = _.cloneDeep(this._prodData);
 
-    const body: TcreateQuotationProductDto & {
-      id: string | undefined;
-    } = {
+    let body: TcreateQuotationProductDto = {
       ...copy,
       id: copy.id,
       doorModelName: this.doorType,
       materialName: this.material,
-      materialSurface: this.surface || null,
+      materialSurface: (this.surface as TmaterialSurface) || null,
       guideRail: this.doorTrack,
       motorVendor: this.motor,
-      guideRailThickness: Number(this.doorTrackThick),
+      guideRailThickness: this.doorTrackThick,
       hasSilencingStrip: this.doorTrackSilencerStrip,
       isIntegratedHeadBox: this.onePieceRollUpBox,
       isAntiTyphoon: this.typhoonProtection,
@@ -3642,11 +3642,9 @@ class Class_product {
       volume: this._prodData.volume || '0',
       area: this._prodData.area || '0',
 
-      headBoxThickness: Number(this._prodData.rollUpBoxThick),
+      headBoxThickness: this._prodData.rollUpBoxThick,
       motorVoltage: Number(this._prodData.voltage),
       hasMotorSupportStand: this._prodData.motorSupport,
-
-      isPainted: false,
 
       price: Number(this._price),
       dualPrice: Number(this._dualPrice),
@@ -3666,10 +3664,10 @@ class Class_product {
       distributionBoxTotalPrice: Number(this.subComList.distributionBox.totalPrice),
 
       installationFeePrice: Number(this.subComList.installationFee.price),
-      installationFeeDualPrice: Number(this.subComList.installationFee.dualPrice),
-      installationFeeQuantity: Number(this.subComList.installationFee.quantity),
+      installationFeeDualPrice: this.subComList.installationFee.dualPrice,
+      installationFeeQuantity: this.subComList.installationFee.quantity,
       installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
-      installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
+      installationFeeTotalPrice: this.subComList.installationFee.totalPrice,
 
       bottomBar: this._prodData.bottomBar === 'none' ? '' : this._prodData.bottomBar,
 
@@ -3692,6 +3690,65 @@ class Class_product {
       bounceDoorWidth: this._prodData.bounceDoorWidth || null,
       bounceDoor: !!(this._prodData.bounceDoorWidth || null),
     };
+
+    if (this.isSpecialProd) {
+      body = {
+        ...body,
+
+        area: null,
+        volume: null,
+        guideRail: null,
+        motorVendor: null,
+        motorVoltage: null,
+        bottomBar: null,
+        motorLockBox: null,
+        guideRailThickness: null,
+        rollerSpec: null,
+        hasSilencingStrip: null,
+        isIntegratedHeadBox: null,
+        headBoxThickness: null,
+        isAntiTyphoon: null,
+        bounceDoor: null,
+        bounceDoorWidth: null,
+        bounceDoorHeight: null,
+        bounceDoorLength: null,
+        closingType: null,
+        motorPhase: null,
+        bottomBarAngleIron: null,
+        bottomBarPlate: null,
+        thickness: null,
+        distributionBoxPrice: null,
+        distributionBoxUnitPrice: null,
+        distributionBoxQuantity: null,
+        distributionBoxDualPrice: null,
+        distributionBoxTotalPrice: null,
+        installationFeePrice: null,
+        installationFeeDualPrice: null,
+        installationFeeQuantity: null,
+        installationFeeUnitPrice: null,
+        installationFeeTotalPrice: null,
+        slatCount: null,
+        sprocketWheelModel: null,
+        sprocketWheelTeethNumber: null,
+        sprocketWheelChains: null,
+        bearingInnerDiameter: null,
+        diameter: null,
+        bearingHousingTotalLength: null,
+        guideRailsOpening: null,
+        slatLength: null,
+        guideRailLength: null,
+        headBoxLength: null,
+        bearingHousingSize: null,
+        bearingName: null,
+        gapA: null,
+        gapC: null,
+        gearNumber: null,
+        weight: null,
+        guideRailG: null,
+        isULGuideRail: null,
+        components: [],
+      };
+    }
 
     if ('items' in body) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
