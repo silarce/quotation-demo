@@ -3638,14 +3638,13 @@ class Class_product {
 
   get body() {
     const copy = _.cloneDeep(this._prodData);
-    console.log(this._prodData);
 
     let body: TcreateQuotationProductDto = {
       ...copy,
       id: copy.id,
       doorModelName: this.doorType,
       materialName: this.material,
-      materialSurface: (this.surface as TmaterialSurface) || null,
+      materialSurface: this.surface,
       guideRail: this.doorTrack,
       motorVendor: this.motor,
       guideRailThickness: this.doorTrackThick,

@@ -24,7 +24,9 @@ export type TpageResponse<Tdata> = {
 };
 
 export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
-export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null; // 表面處理
+
+// 表面處理
+export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null;
 
 export type TdeliveryStatus = '未安裝' | '已安裝' | '已結清';
 
@@ -937,7 +939,7 @@ export type TquotationProductDto = {
   // 材料
   materialName: string;
   // 表面
-  materialSurface: TmaterialSurface | null;
+  materialSurface: string | null;
   // 門軌
   guideRail: string | null;
   // 馬力
@@ -1808,7 +1810,7 @@ export type TcreateQuotationProductDto = {
   // 材料
   materialName: string;
   // 表面
-  materialSurface: TmaterialSurface | null;
+  materialSurface: string | null;
   // 門軌
   guideRail: string | null;
   // 馬力
