@@ -2273,6 +2273,7 @@ class Class_product {
   get weight() {
     return this._doorGeneralSpecs?.weight;
   }
+
   // ---------------------------------------------------------
 
   // 報價單折數，也就是TquotationContentDto[discount]
@@ -2595,6 +2596,12 @@ class Class_product {
     const setBoxB = async () => {
       if (v === 'auto') {
         v = this._defaultBoxB;
+      }
+
+      const v_num = Number(v);
+
+      if (typeof v_num !== 'number' || Number.isNaN(v_num)) {
+        return;
       }
 
       this._prodData.boxB = v;

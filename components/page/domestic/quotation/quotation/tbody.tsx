@@ -545,6 +545,12 @@ function DndRow({
             if (inputProps?.props) {
               inputProps.props.value = (stateValue as string) ?? '';
 
+              if (item.isSpecialProd && key === 'boxD') {
+                inputSelProps.showBaseline = 'auto';
+                inputSelProps.disabled = disabled;
+                delete inputProps.props.disabled;
+              }
+
               // 在中文輸入法(或許其他的輸入法都是)
               // 若有對輸出的值做格式化，例如輸入1234，但格式化為123 4
               // 那麼在輸入4的時候，會觸發onChange兩次
