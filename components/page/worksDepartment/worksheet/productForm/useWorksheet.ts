@@ -35,6 +35,7 @@ import { lookup_motorPhase } from 'config/product/lookup';
 import {
   lookup_options_bottomBarAngleIronAndPlate,
   lookup_horsePowerToToptions,
+  optionsCreator_quoteType,
 } from 'js/utils/options/productOptions';
 
 import {
@@ -46,6 +47,8 @@ import {
   apiGetProdCalcDetailSpec,
 } from 'js/api/api_product';
 
+// =====================================================================
+const options_doorType = optionsCreator_quoteType();
 // =====================================================================
 
 // component的過濾與取得bom資料晚點記得要做
@@ -91,6 +94,9 @@ type Tworksheet = {
   qty: number;
   // isAntiTyphoonLock: boolean;
   getIsAntiTyphoonLock: () => boolean;
+
+  getIsSpecialProd: () => boolean;
+
   shouldCalcData: boolean;
   shouldCalcData2: boolean;
 
@@ -318,6 +324,12 @@ const useWorksheet = create<Tworksheet>(
     // isAntiTyphoonLock: true,
     shouldCalcData: false,
     shouldCalcData2: false,
+
+    getIsSpecialProd: () => {
+      const isSpecial = !options_doorType.some((option) => option.value === get().basicSpec.doorModelName);
+
+      return isSpecial;
+    },
     // ---------------------------------------------------------------------
 
     basicSpec: {
