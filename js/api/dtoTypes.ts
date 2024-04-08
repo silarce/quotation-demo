@@ -1424,7 +1424,7 @@ export type TquotationProductItemDto = {
   // 報價別
   quoteType: string;
   // 門型
-  doorModelName: TdoorModel;
+  doorModelName: string;
   // L(mm)全寬
   fullWidth: number;
   // W(mm)
@@ -3145,7 +3145,7 @@ export type TupdateContractProductItemDto = {
   // 報價別
   quoteType: string;
   // 門型
-  doorModelName: TdoorModel;
+  doorModelName: string;
   // L(mm)全寬
   fullWidth: number;
   // W(mm)

@@ -605,7 +605,7 @@ export default function Worksheet({
         height: height_m,
         qty: String(qty),
         material: materialName,
-        isAntiTyphoon: isAntiTyphoon,
+        isAntiTyphoon: isAntiTyphoon ?? false,
 
         reviewSalesName: reviewSalesEmployee?.chName ?? '',
         reviewSalesStatus,
@@ -1148,7 +1148,7 @@ const useControl_pdf = ({
           antyTyphoonHook: item.isAntiTyphoon ? '有' : '無',
         },
         motor: {
-          vendor: item.motorVendor,
+          vendor: item.motorVendor ?? '',
           /**相數加電壓 */
           phaseVoltage: phaseVoltage,
           horsepower: item.horsepower,
@@ -1158,7 +1158,7 @@ const useControl_pdf = ({
           form: item.isAntiTyphoon ? '防颱' : '一般',
           material: componentList.guideRail.material,
           guideRailLength: String(item.guideRailLength ?? ''),
-          guideRailName: item.guideRail,
+          guideRailName: item.guideRail ?? '',
           icon: item?.guideRail
             ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item?.guideRail}`
             : undefined,
