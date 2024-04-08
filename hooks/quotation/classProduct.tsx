@@ -66,12 +66,14 @@ import {
   optionsCreator_boxB_SJ302,
   optionsCreator_boxB_SJ303A,
   optionsCreator_horsePower,
+  optionsCreator_quoteType,
   lookup_options_bottomBarAngleIronAndPlate,
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
 const options_surface_onlyPaint = optionsCreator_surface_onlyPaint();
 const options_doorModel = optionsCreator_doorModel();
+const options_doorType = optionsCreator_quoteType();
 
 // ===========================================================
 // child class
@@ -2358,11 +2360,9 @@ class Class_product {
   //
 
   get isSpecialProd() {
-    if (this._prodData.quoteType === '特殊門') {
-      return true;
-    }
+    const isSpecial = !options_doorType.some((option) => option.value === this._prodData.quoteType);
 
-    return false;
+    return isSpecial;
   }
 
   get ignoreKeyArr_prod() {
@@ -2386,11 +2386,20 @@ class Class_product {
     return this._prodData.quoteType;
   }
   set quoteType(v) {
+    const isSame = this._prodData.quoteType === v;
+
+    if (isSame) {
+      return;
+    }
+
     this._prodData.quoteType = v;
+    this.doorType = '';
     this.clearProd_all();
 
     if (this.isSpecialProd) {
       this.subComList = {};
+      this.material = '';
+      this.surface = '';
     }
 
     this.reRender();

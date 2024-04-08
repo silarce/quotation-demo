@@ -572,7 +572,7 @@ function DndRow({
                 selectProps.props = {};
               }
 
-              if (item.isSpecialProd && key !== 'quoteType') {
+              if (item.isSpecialProd || key === 'quoteType') {
                 selectProps.props.isSearchable = true;
               }
 
