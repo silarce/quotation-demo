@@ -1117,7 +1117,7 @@ class Class_product {
 
   /**取得細部規格(取得slatCount) */
   async reqGetDetailSpec() {
-    if (!this.doorType) {
+    if (!this.doorType || this.isSpecialProd) {
       return;
     }
 
@@ -3565,7 +3565,7 @@ class Class_product {
     const componentBodyArr = this.comBodyArr;
     let isComponentBreak = false;
 
-    if (componentBodyArr.length !== 8) {
+    if (componentBodyArr.length !== 8 && !this.isSpecialProd) {
       isComponentBreak = true;
     }
 
@@ -3624,6 +3624,7 @@ class Class_product {
 
   get body() {
     const copy = _.cloneDeep(this._prodData);
+    console.log(this._prodData);
 
     let body: TcreateQuotationProductDto = {
       ...copy,
@@ -3641,11 +3642,11 @@ class Class_product {
       motorPhase: Number(this.phase),
 
       // 送去後端要轉為要從m轉為mm
-      WG: new Decimal(this._prodData.WG).mul(1000).toNumber(),
-      fullWidth: new Decimal(this._prodData.fullWidth).mul(1000).toNumber(),
-      height: new Decimal(this._prodData.height).mul(1000).toNumber(),
-      boxB: new Decimal(this._prodData.boxB).mul(1000).toNumber(),
-      boxD: new Decimal(this._prodData.boxD).mul(1000).toNumber(),
+      WG: new Decimal(this._prodData.WG || 0).mul(1000).toNumber(),
+      fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
+      height: new Decimal(this._prodData.height || 0).mul(1000).toNumber(),
+      boxB: new Decimal(this._prodData.boxB || 0).mul(1000).toNumber(),
+      boxD: new Decimal(this._prodData.boxD || 0).mul(1000).toNumber(),
       volume: this._prodData.volume || '0',
       area: this._prodData.area || '0',
 
@@ -3664,17 +3665,17 @@ class Class_product {
 
       thickness: this._prodData.thickness || '0',
 
-      distributionBoxPrice: Number(this.subComList.distributionBox.price),
-      distributionBoxUnitPrice: Number(this.subComList.distributionBox.unitPrice),
-      distributionBoxQuantity: Number(this.subComList.distributionBox.quantity),
-      distributionBoxDualPrice: Number(this.subComList.distributionBox.dualPrice),
-      distributionBoxTotalPrice: Number(this.subComList.distributionBox.totalPrice),
+      distributionBoxPrice: Number(this.subComList.distributionBox?.price ?? 0),
+      distributionBoxUnitPrice: Number(this.subComList.distributionBox?.unitPrice ?? 0),
+      distributionBoxQuantity: Number(this.subComList.distributionBox?.quantity ?? 0),
+      distributionBoxDualPrice: Number(this.subComList.distributionBox?.dualPrice ?? 0),
+      distributionBoxTotalPrice: Number(this.subComList.distributionBox?.totalPrice ?? 0),
 
-      installationFeePrice: Number(this.subComList.installationFee.price),
-      installationFeeDualPrice: this.subComList.installationFee.dualPrice,
-      installationFeeQuantity: this.subComList.installationFee.quantity,
-      installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
-      installationFeeTotalPrice: this.subComList.installationFee.totalPrice,
+      installationFeePrice: Number(this.subComList.installationFee?.price) ?? 0,
+      installationFeeDualPrice: this.subComList.installationFee?.dualPrice ?? 0,
+      installationFeeQuantity: this.subComList.installationFee?.quantity ?? 0,
+      installationFeeUnitPrice: Number(this.subComList.installationFee?.unitPrice ?? 0),
+      installationFeeTotalPrice: this.subComList.installationFee?.totalPrice ?? 0,
 
       bottomBar: this._prodData.bottomBar === 'none' ? '' : this._prodData.bottomBar,
 
