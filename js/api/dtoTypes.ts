@@ -947,7 +947,7 @@ export type TquotationProductDto = {
   // 電壓
   motorVoltage: number | null;
   // 馬達支撐架
-  hasMotorSupportStand: boolean;
+  hasMotorSupportStand: boolean | null;
   // 底座類型
   bottomBar: string | null; // 鋁障感 | 止水型 | ''
   // 馬達鎖盒
@@ -1818,7 +1818,7 @@ export type TcreateQuotationProductDto = {
   // 電壓
   motorVoltage: number | null;
   // 馬達支撐架
-  hasMotorSupportStand: boolean;
+  hasMotorSupportStand: boolean | null;
   // 底座類型
   bottomBar: string | null; // 鋁障感 | 止水型 | ''
   // 馬達鎖盒
