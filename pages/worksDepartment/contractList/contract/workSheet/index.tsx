@@ -716,11 +716,25 @@ export default function Worksheet({
   // -----------------------------------------------------------------
   // -----------------------------------------------------------------------
 
+  const [foo, setFoo] = useState('foo');
+
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>
+        <div>
+          <p>foo</p>
+          <input
+            type="text"
+            value={foo}
+            onChange={(e) => {
+              setFoo(e.target.value);
+            }}
+          />
+          <p>foo</p>
+        </div>
+
         <WorkSheetProfile control={control_profile} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
         <div className={scss.main}>

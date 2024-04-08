@@ -136,7 +136,12 @@ const prodCellConfig: TcellConfig = {
       showBaseline: 'invisible',
       wrapperStyle: { width: '80px' },
       inputProps: {
-        props: { disabled: true, className: 'text-center' },
+        props: {
+          //
+          type: 'number',
+          disabled: true,
+          className: 'text-center',
+        },
       },
       // selectProps: {
       //   props: {},

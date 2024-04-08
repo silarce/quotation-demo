@@ -146,7 +146,7 @@ export const optionsCreator_doorForm = (props: { haveEmpty?: boolean } = {}): To
 export const optionsCreator_quoteType = (props: { haveEmpty?: boolean } = {}): Toption[] => {
   const { haveEmpty } = props;
   const arr = [
-    { value: '捲門' as const, label: '捲門' },
+    { value: '捲門', label: '捲門' },
     // { value: '伸縮大門' as const, label: '伸縮大門' },
     // { value: '水閘門' as const, label: '水閘門' },
     // { value: '上折門' as const, label: '上折門' },

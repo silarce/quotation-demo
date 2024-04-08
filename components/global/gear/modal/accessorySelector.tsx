@@ -57,9 +57,11 @@ export default function AccessorySelector({
 
   const getReq = async () => {
     if (modelName) {
-      const res = await apiGetProdAccessories({ modelName });
-      const arr = _.sortBy(res, 'name');
-      setAcceArr(arr);
+      try {
+        const res = await apiGetProdAccessories({ modelName });
+        const arr = _.sortBy(res, 'name');
+        setAcceArr(arr);
+      } catch (error) {}
     }
   };
 
@@ -74,6 +76,7 @@ export default function AccessorySelector({
     if (!showModal) {
       setSearchValue([]);
       setSelAcceArr([]);
+      setAcceArr([]);
 
       return;
     }

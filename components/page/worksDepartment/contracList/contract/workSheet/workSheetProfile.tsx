@@ -37,6 +37,8 @@ type Tcontrol = {
 export type { Tcontrol as Tcontrol_profile };
 
 export default function WorkSheetProfile({ disabled, control }: { control: Tcontrol; disabled: boolean }) {
+  console.log('WorkSheetProfile');
+
   return (
     <div className={scss.profile}>
       <div className={scss.left}>
