@@ -822,11 +822,10 @@ const WorksheetForm = ({
 }) => {
   // // 這個做法畫面會閃一下 不理想
 
-  const { calcData_2, shouldCalcData, shouldCalcData2, isSpecialProd } = useWorksheet(
+  const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
     useShallow((state) => ({
       shouldCalcData: state.shouldCalcData,
       shouldCalcData2: state.shouldCalcData2,
-      isSpecialProd: state.getIsSpecialProd(),
       calcData_2: state.calcData_2,
     }))
   );
@@ -849,15 +848,16 @@ const WorksheetForm = ({
           <Form_product_bottomBar disabled={disabled} />
           <Form_product_sidePlate disabled={disabled} />
         </div>
-        <div className={classNames(scss.cover, (!shouldCalcData || isSpecialProd) && 'hidden')}></div>
+        <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
       </div>
       <div>
         <Form_product_accessories disabled={disabled} />
       </div>
-      <div className={classNames(disabled && 'hidden')}>
+      <div className={classNames('relative', disabled && 'hidden')}>
         <MyButton_v2 px="px32" className={classNames('block m-auto')} onClick={calcData_2}>
           取得剩餘資料
         </MyButton_v2>
+        <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
       </div>
       <div className="relative">
         <WorksheetTable />
@@ -867,7 +867,7 @@ const WorksheetForm = ({
         <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
           確認上傳
         </MyButton_v2>
-        <div className={classNames(scss.cover, (!shouldCalcData2 || isSpecialProd) && 'hidden')}></div>
+        <div className={classNames(scss.cover, !shouldCalcData2 && 'hidden')}></div>
       </div>
     </form>
   );

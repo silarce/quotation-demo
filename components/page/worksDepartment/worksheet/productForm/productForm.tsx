@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 // gear
-import InputSel, { TinputSelProps, TselectProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputSelProps, TinputProps, TselectProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // css
@@ -28,10 +28,18 @@ import {
   // optionsCreator_boolean,
   optionsCreator_bottomBar_2,
   optionsCreator_bendStright,
+  optionsCreator_quoteType,
+  optionsCreator_boolean,
 } from 'js/utils/options/productOptions';
 
 // utils
 import { findOption } from 'js/utils/options/findOption';
+
+import { Toption } from 'js/utils/options/options';
+
+// =====================================================================
+
+const options_doorType = optionsCreator_quoteType();
 
 // =====================================================================
 
@@ -45,8 +53,8 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
     getOptions_material,
     calcData,
     isAntiTyphoonLock,
-    isSpecialProd,
     getOptions_doorModelInfo,
+    isSpecialProd,
   } = useWorksheet(
     useShallow((state) => ({
       doorModelInfo: state.doorModelInfo,
@@ -57,7 +65,6 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       isAntiTyphoonLock: state.getIsAntiTyphoonLock(),
       getOptions_doorModelInfo: state.getOptions_doorModelInfo,
       isSpecialProd: state.getIsSpecialProd(),
-
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
     }))
@@ -70,14 +77,16 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       <div className={scss.grid}>
         <InputSel
           {...basicConfig}
-          disabled={true}
+          disabled={disabled}
           caption="報價別"
-          inputProps={{
+          selectProps={{
             props: {
-              value: basicSpec.quoteType,
-              // onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-              //   basicSpec.setBasicSpec_itemName({ key: 'itemName', value: e.target.value });
-              // },
+              value: { value: basicSpec.quoteType, label: basicSpec.quoteType },
+              options: options_doorType,
+              isSearchable: true,
+              onChange: (options) => {
+                basicSpec.setBasicSpec_quoteType(options?.value ?? '');
+              },
             },
           }}
         />
@@ -90,7 +99,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
             props: {
               value: basicSpec.itemName,
               onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                basicSpec.setBasicSpec_itemName({ key: 'itemName', value: e.target.value });
+                basicSpec.setBasicSpec_itemName(e.target.value);
               },
             },
           }}
@@ -101,11 +110,24 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           selectProps={{
             props: {
+              options: isSpecialProd ? [] : getOptions_doorModelInfo(),
+              isSearchable: isSpecialProd,
+              menuIsOpen: isSpecialProd ? false : undefined,
+
               value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
-              options: getOptions_doorModelInfo(),
               onChange: (option) => {
-                const obj = option?.obj as TdoorModelInfoDto;
-                setDoorModelInfo(obj);
+                if (isSpecialProd) {
+                  // setDoorModelInfo(undefined);
+                  basicSpec.setBasicSpec_doorModelName(option?.value ?? '');
+                } else {
+                  const obj = option?.obj as TdoorModelInfoDto;
+                  setDoorModelInfo(obj);
+                }
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  basicSpec.setBasicSpec_doorModelName(value);
+                }
               },
             },
           }}
@@ -157,10 +179,17 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           selectProps={{
             props: {
+              options: isSpecialProd ? [] : getOptions_material(),
+              isSearchable: isSpecialProd,
+              menuIsOpen: isSpecialProd ? false : undefined,
               value: { value: basicSpec.material, label: basicSpec.material },
-              options: getOptions_material(),
               onChange: (option) => {
                 basicSpec.setBasicSpec_material(option?.value ?? '');
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  basicSpec.setBasicSpec_material(value);
+                }
               },
             },
           }}
@@ -199,7 +228,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       </div>
       <MyButton_v2
         //
-        className={classNames('block m-auto mr-0 mt-5', (disabled || isSpecialProd) && 'invisible')}
+        className={classNames('block m-auto mr-0 mt-5', disabled && 'invisible')}
         preImg="upload"
         px="px32"
         onClick={calcData}
@@ -334,10 +363,19 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           selectProps={{
             props: {
+              // menuIsOpen: true,
+
               options: getOptions_horsepower(),
+              isSearchable: isSpecialProd,
+
               value: { value: motor.horsepower, label: motor.horsepower },
               onChange: (option) => {
                 motor.setMotor_str({ key: 'horsepower', value: option?.value ?? '' });
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  motor.setMotor_str({ key: 'horsepower', value });
+                }
               },
             },
           }}
@@ -349,9 +387,19 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
           selectProps={{
             props: {
               options: getOptions_motorVendor(),
+              isSearchable: isSpecialProd,
+              // menuIsOpen: false,
+
               value: { value: motor.vendor, label: motor.vendor },
               onChange: (option) => {
                 motor.setMotor_str({ key: 'vendor', value: option?.value ?? '' });
+              },
+
+              // inputValue: motor.vendor,
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  motor.setMotor_str({ key: 'vendor', value });
+                }
               },
             },
           }}
@@ -378,6 +426,7 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
             props: {
               options: optionsCreator_chainType(),
               value: { value: motor.electricMotorChainType, label: motor.electricMotorChainType },
+              isSearchable: isSpecialProd,
               onChange: (option) => {
                 motor.setMotor_str({ key: 'electricMotorChainType', value: option?.value ?? '' });
               },
@@ -392,6 +441,7 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
             props: {
               options: optionsCreator_motorLockBox(),
               value: { value: motor.motorLockBox, label: motor.motorLockBox },
+              isSearchable: isSpecialProd,
               onChange: (option) => {
                 motor.setMotor_str({ key: 'motorLockBox', value: option?.value ?? '' });
               },
@@ -467,10 +517,24 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           selectProps={{
             props: {
-              value: { value: headBox.headBoxThickness, label: headBox.headBoxThickness + 'T' },
               options: getOptions_headBoxThickness(),
+              isSearchable: isSpecialProd,
+              menuIsOpen: isSpecialProd ? false : undefined,
+
+              value: { value: headBox.headBoxThickness, label: headBox.headBoxThickness + 'T' },
               onChange: (options) => {
                 headBox.setHeadBox_str({ key: 'headBoxThickness', value: options?.value ?? '' });
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  const value_num = parseFloat(value);
+
+                  if (Number.isNaN(value_num)) {
+                    return;
+                  }
+
+                  headBox.setHeadBox_str({ key: 'headBoxThickness', value: String(value_num) });
+                }
               },
             },
           }}
@@ -496,10 +560,17 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           selectProps={{
             props: {
-              value: { value: headBox.headBoxFront, label: headBox.headBoxFront },
               options: optionsCreator_front(),
+              isSearchable: isSpecialProd,
+
+              value: { value: headBox.headBoxFront, label: headBox.headBoxFront },
               onChange: (options) => {
                 headBox.setHeadBox_str({ key: 'headBoxFront', value: options?.value ?? '' });
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  headBox.setHeadBox_str({ key: 'headBoxFront', value });
+                }
               },
             },
           }}
@@ -557,11 +628,13 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
 // =====================================================================
 
 function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
-  const { roller, getOptions_diameter } = useWorksheet(
+  const { roller, getOptions_diameter, diameter, isSpecialProd } = useWorksheet(
     useShallow((state) => ({
       roller: state.roller,
       getOptions_diameter: state.getOptions_diameter,
+      isSpecialProd: state.getIsSpecialProd(),
       avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+      diameter: state.roller.getDiameter(),
     }))
   );
 
@@ -575,9 +648,19 @@ function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           selectProps={{
             props: {
-              isDisabled: true,
-              value: { value: roller.getDiameter(), label: roller.getDiameter() },
-              // options: getOptions_diameter(),
+              options: getOptions_diameter(),
+              isSearchable: isSpecialProd,
+              menuIsOpen: isSpecialProd ? false : undefined,
+
+              value: { value: diameter, label: diameter },
+              onChange: (option) => {
+                roller.setDiameter(option?.value ?? '');
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  roller.setDiameter(value);
+                }
+              },
             },
           }}
         />
@@ -678,6 +761,32 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
     }))
   );
 
+  const props_hasSilencingStrip: TinputSelProps = (() => {
+    if (!isSpecialProd) {
+      const inputProps: TinputProps = {
+        props: {
+          readOnly: true,
+          value: hasSilencingStrip,
+        },
+      };
+
+      return { inputProps };
+    } else {
+      const selectProps: TselectProps = {
+        props: {
+          value: { value: '_', label: hasSilencingStrip },
+          options: optionsCreator_boolean(),
+          onChange: (option) => {
+            const value_bool = option?.value === 'true';
+            guideRail.setGuideRail_hasSilencingStrip(value_bool);
+          },
+        },
+      };
+
+      return { selectProps };
+    }
+  })();
+
   return (
     <div>
       <p className={scss.caption}>●門軌</p>
@@ -707,13 +816,27 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           disabled={disabled}
           selectProps={{
             props: {
+              options: getOptions_guideRailThickness(),
+              isSearchable: isSpecialProd,
+              menuIsOpen: isSpecialProd ? false : undefined,
+
               value: {
                 value: guideRail.guideRailThickness,
                 label: guideRail.guideRailThickness + 'T',
               },
-              options: getOptions_guideRailThickness(),
               onChange: (option) => {
                 guideRail.setGuideRail_str({ key: 'guideRailThickness', value: option?.value ?? '' });
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  const value_num = parseFloat(value);
+
+                  if (Number.isNaN(value_num)) {
+                    return;
+                  }
+
+                  guideRail.setGuideRail_str({ key: 'guideRailThickness', value: String(value_num) });
+                }
               },
             },
           }}
@@ -739,15 +862,11 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
         />
 
         <InputSel
+          //
           {...basicConfig}
           caption="消音條"
           disabled={disabled}
-          inputProps={{
-            props: {
-              readOnly: true,
-              value: hasSilencingStrip,
-            },
-          }}
+          {...props_hasSilencingStrip}
         />
 
         <InputSel
@@ -757,6 +876,8 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           selectProps={{
             props: {
               options: optionsCreator_bendStright(),
+              // isSearchable: isSpecialProd,
+
               value: {
                 value: guideRail.guideRailType,
                 label: guideRail.guideRailType,
@@ -764,6 +885,11 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
               onChange: (option) => {
                 guideRail.setGuideRail_str({ key: 'guideRailType', value: option?.value ?? '' });
               },
+              // onInputChange: (value, action) => {
+              //   if (action.action === 'input-change') {
+              //     guideRail.setGuideRail_str({ key: 'guideRailType', value });
+              //   }
+              // },
             },
           }}
         />
@@ -854,10 +980,18 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
           disabled={disabled}
           selectProps={{
             props: {
-              value: { value: bottomBar.bottomBarAngleIron, label: bottomBar.bottomBarAngleIron },
               options: options_angleIron,
+              isSearchable: isSpecialProd,
+              menuIsOpen: isSpecialProd ? false : undefined,
+
+              value: { value: bottomBar.bottomBarAngleIron, label: bottomBar.bottomBarAngleIron },
               onChange: (option) => {
                 bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value: option?.value ?? '' });
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value });
+                }
               },
             },
           }}
@@ -869,10 +1003,18 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
           disabled={disabled}
           selectProps={{
             props: {
-              value: { value: bottomBar.bottomBarPlate, label: bottomBar.bottomBarPlate },
               options: options_plate,
+              isSearchable: isSpecialProd,
+              menuIsOpen: isSpecialProd ? false : undefined,
+
+              value: { value: bottomBar.bottomBarPlate, label: bottomBar.bottomBarPlate },
               onChange: (option) => {
                 bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value: option?.value ?? '' });
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value });
+                }
               },
             },
           }}
@@ -883,10 +1025,17 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
           disabled={disabled}
           selectProps={{
             props: {
-              value: findOption({ value: bottomBar.bottomBar, options: optionsCreator_bottomBar_2() }),
               options: optionsCreator_bottomBar_2(),
+              isSearchable: isSpecialProd,
+
+              value: findOption({ value: bottomBar.bottomBar, options: optionsCreator_bottomBar_2() }),
               onChange: (option) => {
                 bottomBar.setBottomBar_str({ key: 'bottomBar', value: option?.value ?? '' });
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  bottomBar.setBottomBar_str({ key: 'bottomBar', value });
+                }
               },
             },
           }}
@@ -914,11 +1063,12 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
 // =====================================================================
 
 function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined }) {
-  const { sidePlate, bearingName, sprocketWheelModel } = useWorksheet(
+  const { sidePlate, bearingName, sprocketWheelModel, isSpecialProd } = useWorksheet(
     useShallow((state) => ({
       sidePlate: state.sidePlate,
       bearingName: state.sidePlate.getBearingName(),
       sprocketWheelModel: state.sidePlate.getSprocketWheelModel(),
+      isSpecialProd: state.getIsSpecialProd(),
     }))
   );
 
@@ -929,22 +1079,34 @@ function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined })
         <InputSel
           {...basicConfig}
           caption="軸承"
-          disabled={disabled}
+          disabled={disabled || !isSpecialProd}
           selectProps={{
             props: {
-              isDisabled: true,
+              isSearchable: isSpecialProd,
+              menuIsOpen: isSpecialProd ? false : undefined,
               value: { value: bearingName, label: bearingName },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  sidePlate.setBearingName(value);
+                }
+              },
             },
           }}
         />
         <InputSel
           {...basicConfig}
           caption="鍊條"
-          disabled={disabled}
+          disabled={disabled || !isSpecialProd}
           selectProps={{
             props: {
-              isDisabled: true,
+              isSearchable: isSpecialProd,
+              menuIsOpen: isSpecialProd ? false : undefined,
               value: { value: sprocketWheelModel, label: sprocketWheelModel },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  sidePlate.setSprocketWheelModel(value);
+                }
+              },
             },
           }}
         />
@@ -957,7 +1119,7 @@ function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined })
               value: { value: sidePlate.sidePlateDirection, label: sidePlate.sidePlateDirection },
               options: optionsCreator_direction(),
               onChange: (option) => {
-                sidePlate.setSidePlate_str({ key: 'sidePlateDirection', value: option?.value ?? '' });
+                sidePlate.setSidePlate_sidePlateDirection(option?.value ?? '');
               },
             },
           }}

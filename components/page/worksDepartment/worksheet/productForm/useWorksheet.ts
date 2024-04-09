@@ -5,6 +5,8 @@ import { AxiosError } from 'axios';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
+import { optionsCreator_motorVender, optionsCreator_horsePower } from 'js/utils/options/productOptions';
+
 import { create } from 'zustand';
 // 使用 immer middleware會使typescript不正確的判斷型別，導致型別錯誤(實際上沒錯)
 // import { immer } from 'zustand/middleware/immer';
@@ -112,7 +114,9 @@ type Tworksheet = {
     material: string;
     isAntiTyphoon: boolean;
 
-    setBasicSpec_itemName: (props: { key: 'itemName'; value: string }) => void;
+    setBasicSpec_quoteType: (value: string) => void;
+    setBasicSpec_doorModelName: (value: string) => void;
+    setBasicSpec_itemName: (value: string) => void;
     setBasicSpec_material: (str: string) => void;
     setBasicSpec_bool: (props: { key: 'isAntiTyphoon'; value: boolean }) => void;
     setBasicSpec_fullWidth: (value: string) => void;
@@ -177,7 +181,7 @@ type Tworksheet = {
   roller: {
     getDiameter: () => string;
     rollerSpec: string;
-    setRoller_str: (props: { key: 'diameter' | 'rollerSpec'; value: string }) => void;
+    setDiameter: (value: string) => void;
   };
 
   slat: {
@@ -231,10 +235,9 @@ type Tworksheet = {
     getBearingName: () => string;
     getSprocketWheelModel: () => string;
     sidePlateDirection: string;
-    setSidePlate_str: (props: {
-      key: 'bearingName' | 'sprocketWheelModel' | 'sidePlateDirection';
-      value: string;
-    }) => void;
+    setSidePlate_sidePlateDirection: (value: string) => void;
+    setBearingName: (value: string) => void;
+    setSprocketWheelModel: (value: string) => void;
   };
   //
   init: (props: {
@@ -343,11 +346,34 @@ const useWorksheet = create<Tworksheet>(
       height: '',
       material: '',
       isAntiTyphoon: false,
-      setBasicSpec_itemName: ({ key, value }) => {
+      setBasicSpec_quoteType: (value) => {
+        get().setDoorModelInfo(undefined);
         set(
           produce((state) => {
             if (state.basicSpec) {
-              state.basicSpec[key] = value;
+              state.basicSpec.quoteType = value;
+              state.basicSpec.material = '';
+              state.shouldCalcData = true;
+              state.shouldCalcData2 = true;
+            }
+          })
+        );
+      },
+      setBasicSpec_doorModelName: (value) => {
+        set(
+          produce<Tworksheet>((state) => {
+            state.basicSpec.doorModelName = value;
+            state.shouldCalcData = true;
+            state.shouldCalcData2 = true;
+          })
+        );
+        console.log(get().basicSpec);
+      },
+      setBasicSpec_itemName: (value) => {
+        set(
+          produce((state) => {
+            if (state.basicSpec) {
+              state.basicSpec.itemName = value;
             }
           })
         );
@@ -386,7 +412,7 @@ const useWorksheet = create<Tworksheet>(
           produce((state) => {
             state.basicSpec.fullWidth = str;
 
-            if (str) {
+            if (str && !state.getIsSpecialProd()) {
               state.basicSpec.WG = '';
             }
 
@@ -400,7 +426,7 @@ const useWorksheet = create<Tworksheet>(
           produce((state) => {
             state.basicSpec.WG = str;
 
-            if (str) {
+            if (str && !state.getIsSpecialProd()) {
               state.basicSpec.fullWidth = '';
             }
 
@@ -533,11 +559,19 @@ const useWorksheet = create<Tworksheet>(
     roller: {
       getDiameter: () => String(get().generalSpec?.diameter ?? ''),
       rollerSpec: '',
-      setRoller_str: ({ key, value }) => {
+      setDiameter: (value) => {
+        const value_num = Number(value);
+
+        if (Number.isNaN(value_num)) {
+          return;
+        }
+
         set(
-          produce((state) => {
-            state.roller[key] = value;
-            state.shouldCalcData2 = true;
+          produce<Tworksheet>((state) => {
+            if (state.generalSpec) {
+              state.generalSpec.diameter = value_num;
+              state.shouldCalcData2 = true;
+            }
           })
         );
       },
@@ -630,11 +664,31 @@ const useWorksheet = create<Tworksheet>(
       getBearingName: () => get().generalSpec?.bearingName ?? '',
       getSprocketWheelModel: () => get().generalSpec?.sprocketWheelModel ?? '',
       sidePlateDirection: '',
-      setSidePlate_str: ({ key, value }) => {
+      setSidePlate_sidePlateDirection: (value) => {
         set(
           produce((state) => {
-            state.sidePlate[key] = value;
+            state.sidePlate.sidePlateDirection = value;
             state.shouldCalcData2 = true;
+          })
+        );
+      },
+      setBearingName: (value) => {
+        set(
+          produce((state) => {
+            if (state.generalSpec) {
+              state.generalSpec.bearingName = value;
+              state.shouldCalcData2 = true;
+            }
+          })
+        );
+      },
+      setSprocketWheelModel: (value) => {
+        set(
+          produce((state) => {
+            if (state.generalSpec) {
+              state.generalSpec.sprocketWheelModel = value;
+              state.shouldCalcData2 = true;
+            }
           })
         );
       },
@@ -652,9 +706,9 @@ const useWorksheet = create<Tworksheet>(
       qty,
       originalAccessories,
     }) => {
-      const doorModelInfo = get().doorModelInfoList;
+      const doorModelInfoList = get().doorModelInfoList;
 
-      if (!doorModelInfo) {
+      if (!doorModelInfoList) {
         const doorModelArr = await apiGetProdDoorModels();
         set(
           produce<Tworksheet>((state) => {
@@ -826,16 +880,9 @@ const useWorksheet = create<Tworksheet>(
     //
     setDoorModelInfo: (doorModelInfo) => {
       set(
-        produce((state) => {
+        produce<Tworksheet>((state) => {
           state.doorModelInfo = doorModelInfo;
           state.basicSpec.doorModelName = doorModelInfo?.name ?? '';
-
-          // 除了SJ-302，防颱選項都要鎖住
-          if (doorModelInfo?.name === 'SJ-302') {
-            state.isAntiTyphoonLock = false;
-          } else {
-            state.isAntiTyphoonLock = true;
-          }
 
           // SJ-312固定防颱
           if (doorModelInfo?.name === 'SJ-312') {
@@ -857,9 +904,21 @@ const useWorksheet = create<Tworksheet>(
     getOptions_bottomBarAngleIronAndPlate: () =>
       getOptions_bottomBarAngleIronAndPlate(get().basicSpec.doorModelName as TdoorModel),
 
-    getOptions_horsepower: () => getOptions_horsepower(get().avalibleComponents?.motors ?? []),
+    getOptions_horsepower: () => {
+      if (get().getIsSpecialProd()) {
+        return optionsCreator_horsePower();
+      }
 
-    getOptions_motorVendor: () => getOptions_motorVendor(get().avalibleComponents?.motors ?? []),
+      return getOptions_horsepower(get().avalibleComponents?.motors ?? []);
+    },
+
+    getOptions_motorVendor: () => {
+      if (get().getIsSpecialProd()) {
+        return optionsCreator_motorVender();
+      }
+
+      return getOptions_motorVendor(get().avalibleComponents?.motors ?? []);
+    },
 
     getOptions_electricSupply: () => getOptions_electricSupply(get().avalibleComponents?.motors ?? []),
 
@@ -984,6 +1043,19 @@ const useWorksheet = create<Tworksheet>(
     // ---------------------------------------------------------------------
 
     calcData: async () => {
+      console.log(get());
+
+      if (get().getIsSpecialProd()) {
+        set(
+          produce((state) => {
+            state.shouldCalcData = false;
+            state.headBox.headBoxThickness = '';
+          })
+        );
+
+        return;
+      }
+
       set(
         produce((state) => {
           const basicSpec = state.basicSpec;
@@ -1038,6 +1110,16 @@ const useWorksheet = create<Tworksheet>(
 
     // 預計把取得component與bom的處理寫在這邊
     calcData_2: async () => {
+      if (get().getIsSpecialProd()) {
+        set(
+          produce((state) => {
+            state.shouldCalcData2 = false;
+          })
+        );
+
+        return;
+      }
+
       const updateSlatCount = get().updateSlatCount;
 
       set(
