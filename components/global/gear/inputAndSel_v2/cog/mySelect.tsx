@@ -100,13 +100,14 @@ export default function MySelect<
           menu: (state) => classNames(scss.selMenu, props?.classNames?.menu?.(state)),
           menuList: (state) => classNames(scss.selMenuList, props?.classNames?.menuList?.(state)),
           option: (state) => {
-            const isSelected = state.isSelected;
+            const { isSelected, isFocused } = state;
 
             return classNames(
               // fontClassName, // 優先級蓋不過去
               scss.selOption,
               scss.plus,
-              { [scss.isSelected]: isSelected },
+              isSelected && scss.isSelected,
+              isFocused && scss.isFocused,
               props?.classNames?.option?.(state)
             );
           },
