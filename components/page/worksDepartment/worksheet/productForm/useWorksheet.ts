@@ -102,6 +102,7 @@ type Tworksheet = {
 
   //
   basicSpec: {
+    quoteType: string;
     itemName: string;
     doorModelName: string;
     qty: string;
@@ -326,13 +327,14 @@ const useWorksheet = create<Tworksheet>(
     shouldCalcData2: false,
 
     getIsSpecialProd: () => {
-      const isSpecial = !options_doorType.some((option) => option.value === get().basicSpec.doorModelName);
+      const isSpecial = !options_doorType.some((option) => option.value === get().basicSpec.quoteType);
 
       return isSpecial;
     },
     // ---------------------------------------------------------------------
 
     basicSpec: {
+      quoteType: '',
       itemName: '',
       doorModelName: '',
       qty: '0',
@@ -703,6 +705,7 @@ const useWorksheet = create<Tworksheet>(
           // ____________________________________________________________________
           state.basicSpec = {
             ...state.basicSpec,
+            quoteType: contractProductItem?.quoteType ?? '',
             itemName: contractProductItem?.itemName ?? '',
             doorModelName: contractProductItem?.doorModelName ?? '',
             qty: String(qty),

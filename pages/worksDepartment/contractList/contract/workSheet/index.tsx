@@ -266,13 +266,13 @@ export default function Worksheet({
     }))
   );
 
-  const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
-    useShallow((state) => ({
-      shouldCalcData: state.shouldCalcData,
-      shouldCalcData2: state.shouldCalcData2,
-      calcData_2: state.calcData_2,
-    }))
-  );
+  // const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
+  //   useShallow((state) => ({
+  //     shouldCalcData: state.shouldCalcData,
+  //     shouldCalcData2: state.shouldCalcData2,
+  //     calcData_2: state.calcData_2,
+  //   }))
+  // );
 
   // -------------------------------------------------------------------------
 
@@ -716,25 +716,11 @@ export default function Worksheet({
   // -----------------------------------------------------------------
   // -----------------------------------------------------------------------
 
-  const [foo, setFoo] = useState('foo');
-
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>
-        <div>
-          <p>foo</p>
-          <input
-            type="text"
-            value={foo}
-            onChange={(e) => {
-              setFoo(e.target.value);
-            }}
-          />
-          <p>foo</p>
-        </div>
-
         <WorkSheetProfile control={control_profile} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
         <div className={scss.main}>
@@ -753,15 +739,7 @@ export default function Worksheet({
           {/* targetSheet */}
           <div className={classNames(scss.right)}>
             {activeWorksheetId && !activeRecordData && <RecordList control={control_recordList} />}
-            {activeRecordData && (
-              <WorksheetForm
-                shouldCalcData={shouldCalcData}
-                shouldCalcData2={shouldCalcData2}
-                calcData_2={calcData_2}
-                reqPatchWorkSheet={reqPatchWorkSheet}
-                disabled={disabled}
-              />
-            )}
+            {activeRecordData && <WorksheetForm reqPatchWorkSheet={reqPatchWorkSheet} disabled={disabled} />}
           </div>
           {/* right */}
         </div>
@@ -836,29 +814,22 @@ export default function Worksheet({
 
 const WorksheetForm = ({
   //
-  shouldCalcData,
-  shouldCalcData2,
-  calcData_2,
   reqPatchWorkSheet,
   disabled,
 }: {
-  shouldCalcData: boolean;
-  shouldCalcData2: boolean;
-  calcData_2: () => void;
   reqPatchWorkSheet: () => void;
   disabled?: boolean;
 }) => {
   // // 這個做法畫面會閃一下 不理想
-  // const [isMounted, setIsMounted] = useState(false);
-  // useEffect(() => {
-  //   setIsMounted(true);
 
-  //   return () => {
-  //     if (isMounted) {
-  //       onUnMount?.();
-  //     }
-  //   };
-  // }, []);
+  const { calcData_2, shouldCalcData, shouldCalcData2, isSpecialProd } = useWorksheet(
+    useShallow((state) => ({
+      shouldCalcData: state.shouldCalcData,
+      shouldCalcData2: state.shouldCalcData2,
+      isSpecialProd: state.getIsSpecialProd(),
+      calcData_2: state.calcData_2,
+    }))
+  );
 
   return (
     <form className={scss.productForm}>
@@ -878,13 +849,13 @@ const WorksheetForm = ({
           <Form_product_bottomBar disabled={disabled} />
           <Form_product_sidePlate disabled={disabled} />
         </div>
-        {shouldCalcData && <div className={scss.cover}></div>}
+        <div className={classNames(scss.cover, (!shouldCalcData || isSpecialProd) && 'hidden')}></div>
       </div>
       <div>
         <Form_product_accessories disabled={disabled} />
       </div>
       <div className={classNames(disabled && 'hidden')}>
-        <MyButton_v2 px="px32" className="block m-auto " onClick={calcData_2}>
+        <MyButton_v2 px="px32" className={classNames('block m-auto')} onClick={calcData_2}>
           取得剩餘資料
         </MyButton_v2>
       </div>
@@ -896,7 +867,7 @@ const WorksheetForm = ({
         <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
           確認上傳
         </MyButton_v2>
-        {shouldCalcData2 && <div className={scss.cover}></div>}
+        <div className={classNames(scss.cover, (!shouldCalcData2 || isSpecialProd) && 'hidden')}></div>
       </div>
     </form>
   );

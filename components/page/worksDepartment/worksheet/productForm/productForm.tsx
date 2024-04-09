@@ -1,5 +1,3 @@
-import { use, useEffect, useMemo } from 'react';
-
 import classNames from 'classnames';
 
 // gear
@@ -10,19 +8,15 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import scss from './productForm.module.scss';
 
 // type
-import { Toption } from 'js/utils/options/options';
 import { TdoorModelInfoDto } from 'js/api/dtoTypes';
-
-// api
-import { useApiGetProdDoorModels } from 'js/api/api_product';
 
 // zustand
 import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 import { useShallow } from 'zustand/react/shallow';
 
 import {
-  optionsCreator_motorSupply,
-  optionsCreator_horsePower,
+  // optionsCreator_motorSupply,
+  // optionsCreator_horsePower,
   optionsCreator_motorSupportStand,
   optionsCreator_motorLockBox,
   optionsCreator_chainType,
@@ -30,8 +24,8 @@ import {
   optionsCreator_isIntegratedHeadBox,
   optionsCreator_surface,
   optionsCreator_front,
-  optionsCreator_rollerSpec,
-  optionsCreator_boolean,
+  // optionsCreator_rollerSpec,
+  // optionsCreator_boolean,
   optionsCreator_bottomBar_2,
   optionsCreator_bendStright,
 } from 'js/utils/options/productOptions';
@@ -51,6 +45,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
     getOptions_material,
     calcData,
     isAntiTyphoonLock,
+    isSpecialProd,
     getOptions_doorModelInfo,
   } = useWorksheet(
     useShallow((state) => ({
@@ -61,6 +56,8 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       calcData: state.calcData,
       isAntiTyphoonLock: state.getIsAntiTyphoonLock(),
       getOptions_doorModelInfo: state.getOptions_doorModelInfo,
+      isSpecialProd: state.getIsSpecialProd(),
+
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
     }))
@@ -71,6 +68,20 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
   return (
     <div>
       <div className={scss.grid}>
+        <InputSel
+          {...basicConfig}
+          disabled={true}
+          caption="報價別"
+          inputProps={{
+            props: {
+              value: basicSpec.quoteType,
+              // onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              //   basicSpec.setBasicSpec_itemName({ key: 'itemName', value: e.target.value });
+              // },
+            },
+          }}
+        />
+        <div></div>
         <InputSel
           {...basicConfig}
           disabled={disabled}
@@ -188,7 +199,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       </div>
       <MyButton_v2
         //
-        className={classNames('block m-auto mr-0 mt-5', disabled && 'invisible')}
+        className={classNames('block m-auto mr-0 mt-5', (disabled || isSpecialProd) && 'invisible')}
         preImg="upload"
         px="px32"
         onClick={calcData}
@@ -280,16 +291,18 @@ function Form_product_ABCD({ disabled }: { disabled: boolean | undefined }) {
 // =====================================================================
 
 function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
-  const { motor, getOptions_horsepower, getOptions_motorVendor, getOptions_electricSupply } = useWorksheet(
-    useShallow((state) => ({
-      motor: state.motor,
-      getOptions_horsepower: state.getOptions_horsepower,
-      getOptions_motorVendor: state.getOptions_motorVendor,
-      getOptions_electricSupply: state.getOptions_electricSupply,
-      generalSpec: state.generalSpec, // 用於更新getOptions
-      avalibleComponent: state.avalibleComponents, // 用於更新getOptions
-    }))
-  );
+  const { motor, getOptions_horsepower, getOptions_motorVendor, getOptions_electricSupply, isSpecialProd } =
+    useWorksheet(
+      useShallow((state) => ({
+        motor: state.motor,
+        getOptions_horsepower: state.getOptions_horsepower,
+        getOptions_motorVendor: state.getOptions_motorVendor,
+        getOptions_electricSupply: state.getOptions_electricSupply,
+        isSpecialProd: state.getIsSpecialProd(),
+        generalSpec: state.generalSpec, // 用於更新getOptions
+        avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+      }))
+    );
 
   return (
     <div>
@@ -416,12 +429,14 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
     getOptions_material,
     isIntegratedHeadBox,
     getOptions_headBoxThickness,
+    isSpecialProd,
   } = useWorksheet(
     useShallow((state) => ({
       headBox: state.headBox,
       isIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox(),
       getOptions_material: state.getOptions_material,
       getOptions_headBoxThickness: state.getOptions_headBoxThickness,
+      isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       avalibleComponent: state.avalibleComponents, // 用於更新getOptions
     }))
@@ -435,6 +450,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           {...basicConfig}
           caption="材質"
           disabled={disabled}
+          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               options: getOptions_material(),
@@ -463,6 +479,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           {...basicConfig}
           caption="表面"
           disabled={disabled}
+          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               value: { value: headBox.surface, label: headBox.surface },
@@ -587,10 +604,11 @@ function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
 // =====================================================================
 
 function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
-  const { slat, getOptions_material } = useWorksheet(
+  const { slat, getOptions_material, isSpecialProd } = useWorksheet(
     useShallow((state) => ({
       slat: state.slat,
       getOptions_material: state.getOptions_material,
+      isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
     }))
@@ -604,6 +622,7 @@ function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
           {...basicConfig}
           caption="材質"
           disabled={disabled}
+          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               value: { value: slat.material, label: slat.material },
@@ -618,6 +637,7 @@ function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
           {...basicConfig}
           caption="表面"
           disabled={disabled}
+          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               value: { value: slat.surface, label: slat.surface },
@@ -643,6 +663,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
     getOptions_material,
     getOptions_guideRailThickness,
     getOptions_guideRail,
+    isSpecialProd,
   } = useWorksheet(
     useShallow((state) => ({
       guideRail: state.guideRail,
@@ -650,6 +671,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
       getOptions_material: state.getOptions_material,
       getOptions_guideRailThickness: state.getOptions_guideRailThickness,
       getOptions_guideRail: state.getOptions_guideRail,
+      isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       avalibleComponent: state.avalibleComponents, // 用於更新getOptions
       doorModelInfo: state.doorModelInfo, // 用於更新getOptions
@@ -664,6 +686,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           {...basicConfig}
           caption="材質"
           disabled={disabled}
+          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               options: getOptions_material(),
@@ -700,6 +723,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           {...basicConfig}
           caption="表面"
           disabled={disabled}
+          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               options: optionsCreator_surface(),
@@ -749,6 +773,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           {...basicConfig}
           caption="形式"
           disabled={disabled}
+          className={classNames(isSpecialProd && scss.forbidden)}
           // wrapperStyle={{ height: '60px' }}
           selectProps={{
             withIcon: true,
@@ -791,11 +816,12 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
 // =====================================================================
 
 function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined }) {
-  const { bottomBar, getOptions_material, getOptions_bottomBarAngleIronAndPlate } = useWorksheet(
+  const { bottomBar, getOptions_material, getOptions_bottomBarAngleIronAndPlate, isSpecialProd } = useWorksheet(
     useShallow((state) => ({
       bottomBar: state.bottomBar,
       getOptions_material: state.getOptions_material,
       getOptions_bottomBarAngleIronAndPlate: state.getOptions_bottomBarAngleIronAndPlate,
+      isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
     }))
@@ -811,6 +837,7 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
           {...basicConfig}
           caption="材質"
           disabled={disabled}
+          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               value: { value: bottomBar.material, label: bottomBar.material },
@@ -868,6 +895,7 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
           {...basicConfig}
           caption="表面"
           disabled={disabled}
+          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               value: { value: bottomBar.surface, label: bottomBar.surface },
