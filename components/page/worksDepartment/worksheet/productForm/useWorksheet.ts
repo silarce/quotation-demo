@@ -931,10 +931,8 @@ const useWorksheet = create<Tworksheet>(
 
     // ---------------------------------------------------------------------
     getOptions_material: () => getOptions_material(get().doorModelInfo?.slatMaterials ?? []),
-
     getOptions_bottomBarAngleIronAndPlate: () =>
       getOptions_bottomBarAngleIronAndPlate(get().basicSpec.doorModelName as TdoorModel),
-
     getOptions_horsepower: () => {
       if (get().getIsSpecialProd()) {
         return optionsCreator_horsePower();
@@ -942,7 +940,6 @@ const useWorksheet = create<Tworksheet>(
 
       return getOptions_horsepower(get().avalibleComponents?.motors ?? []);
     },
-
     getOptions_motorVendor: () => {
       if (get().getIsSpecialProd()) {
         return optionsCreator_motorVender();
@@ -950,15 +947,10 @@ const useWorksheet = create<Tworksheet>(
 
       return getOptions_motorVendor(get().avalibleComponents?.motors ?? []);
     },
-
     getOptions_electricSupply: () => getOptions_electricSupply(get().avalibleComponents?.motors ?? []),
-
     getOptions_headBoxThickness: () => getOptions_headBoxThickness(get().avalibleComponents?.headBoxes ?? []),
-
     getOptions_diameter: () => getOptions_diameter(get().avalibleComponents?.rollers ?? []),
-
     getOptions_guideRailThickness: () => getOptions_guideRailThickness(get().avalibleComponents?.guideRails ?? []),
-
     getOptions_guideRail: () =>
       getOptions_guideRail({
         //
@@ -966,9 +958,7 @@ const useWorksheet = create<Tworksheet>(
         doorModelName: get().basicSpec.doorModelName as TdoorModel,
         isAntiTyphoon: get().basicSpec.isAntiTyphoon,
       }),
-
     getOptions_doorModelInfo: () => getOptions_doorModelInfo(get().doorModelInfoList),
-
     getOptions_accessories: () => getOptions_accessories(get().originalAccessories),
     // ---------------------------------------------------------------------
 
@@ -1081,6 +1071,7 @@ const useWorksheet = create<Tworksheet>(
 
     calcData: async () => {
       const {
+        basicSpec,
         getIsSpecialProd,
         update_generalSpec,
         update_availableComponents,
@@ -1092,6 +1083,41 @@ const useWorksheet = create<Tworksheet>(
         guideRail,
       } = get();
 
+      const isSpecialProd = getIsSpecialProd();
+
+      if (!basicSpec.material || !basicSpec.doorModelName || !basicSpec.quoteType) {
+        myAlert.warning({
+          title: '請確認已輸入以下資料',
+          content: '報價別、門型、材質',
+        });
+
+        return;
+      }
+
+      set(
+        produce<Tworksheet>((state) => {
+          if (!isSpecialProd) {
+            state.headBox.material = basicSpec.material;
+            state.slat.material = basicSpec.material;
+            state.guideRail.material = basicSpec.material;
+            state.bottomBar.material = basicSpec.material;
+          } else {
+            state.headBox.material = '';
+            state.slat.material = '';
+            state.guideRail.material = '';
+            state.bottomBar.material = '';
+            state.headBox.surface = '';
+            state.slat.surface = '';
+            state.guideRail.surface = '';
+            state.bottomBar.surface = '';
+            state.guideRail.guideRail = '';
+          }
+        })
+      );
+
+      // _____________________________________________________________________
+      // _____________________________________________________________________
+
       if (getIsSpecialProd()) {
         set(
           produce((state) => {
@@ -1102,6 +1128,9 @@ const useWorksheet = create<Tworksheet>(
 
         return;
       }
+
+      // _____________________________________________________________________
+      // _____________________________________________________________________
 
       set(
         produce((state) => {
@@ -1133,7 +1162,6 @@ const useWorksheet = create<Tworksheet>(
       const option_headBoxThickness = getOptions_headBoxThickness()[0];
       const option_guideRailThickness = getOptions_guideRailThickness()[0];
       const options_guideRail = getOptions_guideRail()[0];
-      // const options_
       const { options_angleIron, options_plate } = getOptions_bottomBarAngleIronAndPlate();
 
       guideRail.setGuideRail({
@@ -1188,14 +1216,15 @@ const useWorksheet = create<Tworksheet>(
       // headBox, slat, guideRail, bottomBar
 
       if (
-        !headBox.material ||
-        !headBox.surface ||
-        !slat.material ||
-        !slat.surface ||
-        !guideRail.material ||
-        !guideRail.surface ||
-        !bottomBar.material ||
-        !bottomBar.surface
+        !isSpecialProd &&
+        (!headBox.material ||
+          !headBox.surface ||
+          !slat.material ||
+          !slat.surface ||
+          !guideRail.material ||
+          !guideRail.surface ||
+          !bottomBar.material ||
+          !bottomBar.surface)
       ) {
         myAlert.warning({ title: '請確認所有的材質與表面都已選取' });
 
