@@ -1080,7 +1080,19 @@ const useWorksheet = create<Tworksheet>(
     // ---------------------------------------------------------------------
 
     calcData: async () => {
-      if (get().getIsSpecialProd()) {
+      const {
+        getIsSpecialProd,
+        update_generalSpec,
+        update_availableComponents,
+        getOptions_electricSupply,
+        getOptions_headBoxThickness,
+        getOptions_guideRailThickness,
+        getOptions_guideRail,
+        getOptions_bottomBarAngleIronAndPlate,
+        guideRail,
+      } = get();
+
+      if (getIsSpecialProd()) {
         set(
           produce((state) => {
             state.shouldCalcData = false;
@@ -1101,7 +1113,7 @@ const useWorksheet = create<Tworksheet>(
         })
       );
 
-      await get().update_generalSpec();
+      await update_generalSpec();
 
       set(
         produce((state) => {
@@ -1116,13 +1128,15 @@ const useWorksheet = create<Tworksheet>(
         })
       );
 
-      await get().update_availableComponents();
-      const option_electricSupply = get().getOptions_electricSupply()[0];
-      const option_headBoxThickness = get().getOptions_headBoxThickness()[0];
-      const option_guideRailThickness = get().getOptions_guideRailThickness()[0];
-      const options_guideRail = get().getOptions_guideRail()[0];
+      await update_availableComponents();
+      const option_electricSupply = getOptions_electricSupply()[0];
+      const option_headBoxThickness = getOptions_headBoxThickness()[0];
+      const option_guideRailThickness = getOptions_guideRailThickness()[0];
+      const options_guideRail = getOptions_guideRail()[0];
+      // const options_
+      const { options_angleIron, options_plate } = getOptions_bottomBarAngleIronAndPlate();
 
-      get().guideRail.setGuideRail({
+      guideRail.setGuideRail({
         guideRail: options_guideRail.value,
         hasSilencingStrip: options_guideRail.hasSilencingStrip as boolean,
         width: options_guideRail.width as number,
@@ -1136,7 +1150,8 @@ const useWorksheet = create<Tworksheet>(
           state.motor.motorPhase = (option_electricSupply.phase ?? '') as string;
           state.headBox.headBoxThickness = option_headBoxThickness.value;
           state.guideRail.guideRailThickness = option_guideRailThickness.value;
-          // state.guideRail.guideRail = options_guideRail.value;
+          state.bottomBar.bottomBarAngleIron = options_angleIron[0].value;
+          state.bottomBar.bottomBarPlate = options_plate[0].value;
 
           state.shouldCalcData = false;
         })
@@ -1146,11 +1161,13 @@ const useWorksheet = create<Tworksheet>(
     // 預計把取得component與bom的處理寫在這邊
     // 過濾出適配的component並帶入，然後取得bom資料後帶入
     calcData_2: async () => {
+      const worksheet = get();
+
       const {
         //
         getIsSpecialProd,
         updateSlatCount,
-        componentList,
+        // componentList,
         avalibleComponents,
         //
         generalSpec,
@@ -1163,10 +1180,27 @@ const useWorksheet = create<Tworksheet>(
         slat,
         guideRail,
         bottomBar,
-        sidePlate,
+        // sidePlate,
         //
-      } = get();
+      } = worksheet;
       const isSpecialProd = getIsSpecialProd();
+
+      // headBox, slat, guideRail, bottomBar
+
+      if (
+        !headBox.material ||
+        !headBox.surface ||
+        !slat.material ||
+        !slat.surface ||
+        !guideRail.material ||
+        !guideRail.surface ||
+        !bottomBar.material ||
+        !bottomBar.surface
+      ) {
+        myAlert.warning({ title: '請確認所有的材質與表面都已選取' });
+
+        return;
+      }
 
       // ______________________________________________________________________
 
@@ -1275,19 +1309,32 @@ const useWorksheet = create<Tworksheet>(
 
       // ______________________________________________________________________
       // ______________________________________________________________________
+
       const generateDoorProductBom = takeGenerateDoorProductBom({
-        worksheet: get(),
+        worksheet: worksheet,
         avalibleComponentIdList,
       });
 
       let doorProductBom: TdoorProductBomDto | undefined = undefined;
 
+      // if()
+
       if (generateDoorProductBom) {
         try {
           doorProductBom = await apiPostProdGenerateDoorProductBom(generateDoorProductBom);
         } catch (error) {
-          const err = error as AxiosError;
-          myAlert.err({ title: '取得BOM失敗', content: err.message });
+          const err = error as AxiosError<
+            | {
+                error: string;
+                message: string;
+                statusCode: number;
+              }
+            | undefined
+          >;
+
+          const message = err.response?.data?.message ?? err.message;
+
+          myAlert.err({ title: '取得BOM失敗', content: message });
         }
       }
 
@@ -1403,9 +1450,9 @@ const useWorksheet = create<Tworksheet>(
         //
         contractProductItem_ori,
         contractProductItemArr_ori,
-        componentList: componentList_ori,
+        componentList,
         accessories,
-        itemIdArr,
+        // itemIdArr,
         shouldCalcData,
         shouldCalcData2,
 
@@ -1424,13 +1471,13 @@ const useWorksheet = create<Tworksheet>(
         getFullWidth_mm,
         getWG_mm,
         getHeight_mm,
-        getFullHeight_mm,
-        getAngleIronSize_mm,
+        // getFullHeight_mm,
+        // getAngleIronSize_mm,
       } = get();
 
-      const item = _.cloneDeep(contractProductItem_ori);
+      const itemOri_copy = _.cloneDeep(contractProductItem_ori);
 
-      if (!item) {
+      if (!itemOri_copy) {
         return null;
       }
 
@@ -1446,10 +1493,10 @@ const useWorksheet = create<Tworksheet>(
         return null;
       }
 
-      const componentList = _.cloneDeep(componentList_ori);
+      const componentList_copy = _.cloneDeep(componentList);
 
       const updateWorkSheetItem: TupdateContractProductItemDto = {
-        ...item,
+        ...itemOri_copy,
         //
         // basicSpec
         quoteType: basicSpec.quoteType,
@@ -1525,7 +1572,7 @@ const useWorksheet = create<Tworksheet>(
         thickness: generalSpec.thickness,
       };
 
-      updateWorkSheetItem.components = Object.values(componentList ?? {});
+      updateWorkSheetItem.components = Object.values(componentList_copy ?? {});
       updateWorkSheetItem.accessories = accessories.map((acce) => {
         return {
           ...acce,
@@ -1538,17 +1585,17 @@ const useWorksheet = create<Tworksheet>(
 
         const newComponent = (() => {
           if (oldComponentArr.length === 0) {
-            return Object.values(componentList ?? {});
-          } else {
-            return oldComponentArr.map((oldComponent) => {
-              const { type, id } = oldComponent;
-
-              return {
-                ...componentList?.[type],
-                id,
-              };
-            });
+            return Object.values(componentList_copy ?? {});
           }
+
+          return oldComponentArr.map((oldComponent) => {
+            const { type, id } = oldComponent;
+
+            return {
+              ...componentList_copy?.[type],
+              id,
+            };
+          });
         })();
 
         return {
