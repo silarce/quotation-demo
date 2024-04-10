@@ -873,8 +873,9 @@ export type TquotationProductComponentDto = {
   createdAt: string;
   updatedAt: string;
   type: TdoorComponentType;
-  number: string;
-  componentId: string;
+  // 從get /products/door/generate-door-product-bom 取得的number
+  number: string; // TdoorBomDto_Component['number']
+  componentId: string; // 從avalibleComponent過濾出來的component的id，會與rawData的id相同
   // TODO 有空要調整型別
   rawData: object; // 裡面裝的其實是TdoorComponentListDto裡面的property之一
   // rawData:
@@ -886,9 +887,9 @@ export type TquotationProductComponentDto = {
   //   | TdoorMotorDto
   //   | TdoorMotorAccessoriesDto
   //   | TdoorHeadBoxDto;
-  /**
-  從TdoorBomDto_Component取得的bom要直接送進來這個bom
-   */
+
+  // 從TdoorBomDto_Component取得的bom要直接送進來這個bom
+
   bom: any; // 前端不會直接用到，先直接設object
   material: string;
   // materialSurface: TmaterialSurface | null | undefined;

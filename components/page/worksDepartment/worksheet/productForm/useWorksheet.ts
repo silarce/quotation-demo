@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+// getUpdateWorkSheetItemArr
+
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import { AxiosError } from 'axios';
@@ -11,6 +12,17 @@ import { create } from 'zustand';
 // 使用 immer middleware會使typescript不正確的判斷型別，導致型別錯誤(實際上沒錯)
 // import { immer } from 'zustand/middleware/immer';
 import { produce } from 'immer';
+
+// api
+import {
+  TpcgsPrams,
+  //
+  apiGetProdDoorModels,
+  apiGetProdCalcGeneralSpec,
+  apiGetProdAvailableComponents,
+  apiGetProdCalcDetailSpec,
+  apiPostProdGenerateDoorProductBom,
+} from 'js/api/api_product';
 
 // type
 import {
@@ -28,66 +40,79 @@ import {
   TdoorRollerDto,
   TquotationProductAccessoryDto,
   TdoorMaterialDto,
+  TcreateQuotationProductComponentDto,
+  TgenerateDoorProductBomDto,
+  TgenerateDoorProductBomDto_DoorSpec,
+  TgenerateDoorProductBomDto_ComponentInfo,
+  TmaterialSurface,
+  TdoorProductBomDto,
+  TupdateQuotationProductComponentDto,
 } from 'js/api/dtoTypes';
+
+// utils
 import { Toption } from 'js/utils/options/options';
-
-import { checkIsFloat } from 'js/utils/checkValue';
-import { lookup_motorPhase } from 'config/product/lookup';
-
 import {
   lookup_options_bottomBarAngleIronAndPlate,
   lookup_horsePowerToToptions,
   optionsCreator_quoteType,
 } from 'js/utils/options/productOptions';
+import { lookup_motorPhase } from 'config/product/lookup';
 
 import {
-  TpcgsPrams,
-  //
-  apiGetProdDoorModels,
-  apiGetProdCalcGeneralSpec,
-  apiGetProdAvailableComponents,
-  apiGetProdCalcDetailSpec,
-} from 'js/api/api_product';
+  filter_slats,
+  filter_bottomBars,
+  filter_guideRails,
+  filter_sidePlates,
+  filter_rollers,
+  filter_motors,
+  filter_motorAccessories,
+  filter_headBoxes,
+  lookup_errorTip,
+} from 'hooks/quotation/componentFilters';
 
 // =====================================================================
 const options_doorType = optionsCreator_quoteType();
 // =====================================================================
 
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
-// component的過濾與取得bom資料晚點記得要做
+type TavalibleComponentIdList = {
+  slat: string;
+  bottomBar: string;
+  guideRail: string;
+  sidePlate: string;
+  roller: string;
+  motor: string;
+  motorAccessories: string;
+  headBox: string;
+};
 
-// =====================================================================
+type TcreateComponentList = {
+  slat: TcreateQuotationProductComponentDto;
+  bottomBar: TcreateQuotationProductComponentDto;
+  guideRail: TcreateQuotationProductComponentDto;
+  sidePlate: TcreateQuotationProductComponentDto;
+  roller: TcreateQuotationProductComponentDto;
+  motor: TcreateQuotationProductComponentDto;
+  motorAccessories: TcreateQuotationProductComponentDto;
+  headBox: TcreateQuotationProductComponentDto;
+};
 
 type Tworksheet = {
   contractProductItem_ori: TquotationProductItemDto | undefined;
   contractProductItemArr_ori: TquotationProductItemDto[] | undefined;
   doorModelInfoList: { [key: string]: TdoorModelInfoDto } | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
-  componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
+  // componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
+  componentList: { [key in TdoorComponentType]: TupdateQuotationProductComponentDto } | undefined;
   accessories: TquotationProductAccessoryDto[];
 
+  // 從後端取得，在init與calcData取得
+  // 在init，若為特殊門，會帶入空的generalSpec
   generalSpec: TdoorGeneralSpecsDto | undefined;
-  //
+
+  // 從後端取得的avalibleComponents，用於產生options以及在calcData_2過濾出適配的component
+  // 會在init與calcData取得
   avalibleComponents: TdoorComponentListDto | undefined;
+
   // options_accessories: Toption[];
   originalAccessories: TquotationProductAccessoryDto[];
   //
@@ -268,7 +293,7 @@ type Tworksheet = {
   getOptions_accessories: () => Toption[];
 
   // -----------------------------------------------------------------------------
-  reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto>;
+  reqGeneralSpec: () => Promise<TdoorGeneralSpecsDto | undefined>;
   update_generalSpec: () => Promise<void>;
   update_availableComponents: () => Promise<void>;
 
@@ -792,7 +817,7 @@ const useWorksheet = create<Tworksheet>(
           state.headBox = {
             ...state.headBox,
             material: componentList?.headBox?.material ?? '',
-            headBoxThickness: String(contractProductItem?.thickness ?? ''),
+            headBoxThickness: String(contractProductItem?.headBoxThickness ?? ''),
             surface: componentList?.headBox?.materialSurface ?? '',
             headBoxFront: contractProductItem?.headBoxFront ?? '',
             headBoxProtruding: contractProductItem?.headBoxProtruding ?? '',
@@ -832,7 +857,7 @@ const useWorksheet = create<Tworksheet>(
             bottomBarAngleIron: String(contractProductItem?.bottomBarAngleIron ?? ''),
             bottomBarPlate: contractProductItem?.bottomBarPlate ?? '',
             bottomBar: contractProductItem?.bottomBar ?? '',
-            surface: componentList?.bottomBar.materialSurface ?? '',
+            surface: componentList?.bottomBar?.materialSurface ?? '',
           };
 
           state.sidePlate = {
@@ -846,7 +871,10 @@ const useWorksheet = create<Tworksheet>(
       ); // set
 
       if (contractProductItem) {
-        const generalSpec = await get().reqGeneralSpec();
+        // const generalSpec = await get().reqGeneralSpec();
+        const generalSpec = get().getIsSpecialProd()
+          ? cre_EmptyGeneralSpec()
+          : (await get().reqGeneralSpec()) ?? cre_EmptyGeneralSpec();
 
         generalSpec.bearingHousingSize = contractProductItem.bearingHousingSize ?? -1;
         generalSpec.bearingHousingTotalLength = Number(contractProductItem.bearingHousingTotalLength ?? -1);
@@ -873,7 +901,10 @@ const useWorksheet = create<Tworksheet>(
             state.generalSpec = generalSpec;
           })
         );
-        get().update_availableComponents();
+
+        if (!get().getIsSpecialProd()) {
+          get().update_availableComponents();
+        }
       }
     }, // init
     //
@@ -978,9 +1009,15 @@ const useWorksheet = create<Tworksheet>(
         body.fullWidth = 0;
       }
 
-      const generalSpec = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
+      try {
+        const generalSpec = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
 
-      return generalSpec;
+        return generalSpec;
+      } catch (error) {
+        const err = error as Error;
+
+        myAlert.err({ title: '取得產品規格失敗', content: err.message });
+      }
     },
 
     update_generalSpec: async () => {
@@ -1043,8 +1080,6 @@ const useWorksheet = create<Tworksheet>(
     // ---------------------------------------------------------------------
 
     calcData: async () => {
-      console.log(get());
-
       if (get().getIsSpecialProd()) {
         set(
           produce((state) => {
@@ -1109,19 +1144,33 @@ const useWorksheet = create<Tworksheet>(
     },
 
     // 預計把取得component與bom的處理寫在這邊
+    // 過濾出適配的component並帶入，然後取得bom資料後帶入
     calcData_2: async () => {
-      if (get().getIsSpecialProd()) {
-        set(
-          produce((state) => {
-            state.shouldCalcData2 = false;
-          })
-        );
+      const {
+        //
+        getIsSpecialProd,
+        updateSlatCount,
+        componentList,
+        avalibleComponents,
+        //
+        generalSpec,
+        //
+        ABCD,
+        basicSpec,
+        motor,
+        headBox,
+        roller,
+        slat,
+        guideRail,
+        bottomBar,
+        sidePlate,
+        //
+      } = get();
+      const isSpecialProd = getIsSpecialProd();
 
-        return;
-      }
+      // ______________________________________________________________________
 
-      const updateSlatCount = get().updateSlatCount;
-
+      // 計算fullWidth或WG
       set(
         produce<Tworksheet>((state) => {
           const { basicSpec, ABCD, getFullWidth_mm, getWG_mm } = state;
@@ -1140,9 +1189,151 @@ const useWorksheet = create<Tworksheet>(
             basicSpec.fullWidth = new Decimal(fullWidth_mm).div(1000).toString();
           }
           //
-        }) //produce
-      ); // set
+        })
+      );
 
+      // ______________________________________________________________________
+      // ______________________________________________________________________
+      // 特殊門的處理
+      if (isSpecialProd) {
+        set(
+          produce((state) => {
+            state.shouldCalcData2 = false;
+          })
+        );
+
+        return;
+      }
+
+      // ______________________________________________________________________
+      // ______________________________________________________________________
+
+      // 一般門的處理
+      const avalibleComponentIdList: TavalibleComponentIdList | null = (() => {
+        // ______________________________________________________________________
+        // ______________________________________________________________________
+        if (avalibleComponents) {
+          return avalibleComponentFilter({
+            avalibleComponentList: avalibleComponents,
+            //
+            isAntiTyphoon: basicSpec.isAntiTyphoon,
+            //
+            isWaterProof: bottomBar.bottomBar === '止水型',
+            hasAluminumBarrier: bottomBar.bottomBar === '鋁障感型',
+            //
+            guideRailThickness: guideRail.guideRailThickness as `${number}`,
+            hasSilencingStrip: guideRail.hasSilencingStrip,
+            guideRail: guideRail.guideRail,
+            // warning =======================================================
+            isUL: false, // 要新增isUL的欄位
+            // warning =======================================================
+            //
+            horsepower: motor.horsepower,
+            gearNumber: generalSpec?.gearNumber ?? 'undefined',
+            motorVendor: motor.vendor,
+            phase: Number(motor.motorPhase),
+            voltage: Number(motor.motorVoltage),
+            weight: generalSpec?.weight ?? 99999999,
+            hasSupportStand: motor.hasMotorSupportStand === '有',
+            //
+            bearingType: generalSpec?.bearingName ?? 'undefined',
+            isIntegrated: headBox.isIntegratedHeadBox,
+            boxB_mm: Number(ABCD.boxB),
+            //
+            diameter: roller.getDiameter() as `${number}`,
+            //
+            chains: generalSpec?.sprocketWheelChains ?? -1,
+            //
+            headBoxThickness: headBox.headBoxThickness as `${number}`,
+          });
+        } // if
+
+        return null;
+      })();
+
+      if (!avalibleComponentIdList) {
+        return;
+      }
+
+      const componentIdListEntries = Object.entries(avalibleComponentIdList ?? {});
+
+      // ______________________________________________________________________
+      // ______________________________________________________________________
+      let isComponentOk = true;
+
+      componentIdListEntries.forEach(([key, value]) => {
+        if (!value) {
+          const message = lookup_errorTip[key] ?? { title: '無資料', content: '無資料' };
+          myAlert.warning({ ...message });
+          isComponentOk = false;
+        }
+      });
+
+      if (!isComponentOk) {
+        return;
+      }
+
+      // ______________________________________________________________________
+      // ______________________________________________________________________
+      const generateDoorProductBom = takeGenerateDoorProductBom({
+        worksheet: get(),
+        avalibleComponentIdList,
+      });
+
+      let doorProductBom: TdoorProductBomDto | undefined = undefined;
+
+      if (generateDoorProductBom) {
+        try {
+          doorProductBom = await apiPostProdGenerateDoorProductBom(generateDoorProductBom);
+        } catch (error) {
+          const err = error as AxiosError;
+          myAlert.err({ title: '取得BOM失敗', content: err.message });
+        }
+      }
+
+      if (!doorProductBom) {
+        return;
+      }
+      // ______________________________________________________________________
+      // ______________________________________________________________________
+
+      const createComponentList_partial: Partial<TcreateComponentList> = {};
+
+      componentIdListEntries.forEach(([theKey, value]) => {
+        const key = theKey as TdoorComponentType;
+
+        const bom = doorProductBom![key];
+
+        createComponentList_partial[key] = {
+          type: key,
+          number: bom.number,
+          componentId: value,
+          rawData: { foo: 'foo' },
+          bom,
+          material: generateDoorProductBom![key].material,
+          materialSurface: generateDoorProductBom![key].materialSurface,
+          isPainted: generateDoorProductBom![key].isPainted,
+          price: new Decimal(bom.unitPrice).mul(bom.quantity).round().toNumber(),
+          quantity: String(bom.quantity),
+          order: 0,
+
+          desc: '',
+          density: generalSpec?.density ? String(generalSpec.density) : null,
+        };
+      });
+
+      const createComponentList = createComponentList_partial as TcreateComponentList;
+
+      set(
+        produce<Tworksheet>((state) => {
+          state.componentList = createComponentList;
+        })
+      );
+
+      // ______________________________________________________________________
+      // ______________________________________________________________________
+
+      // 更新門片數量
       await updateSlatCount();
 
       set(
@@ -1205,6 +1396,7 @@ const useWorksheet = create<Tworksheet>(
     },
 
     // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
 
     getUpdateWorkSheetItemArr: () => {
       const {
@@ -1254,27 +1446,13 @@ const useWorksheet = create<Tworksheet>(
         return null;
       }
 
-      // slat bottomBar guideRail sidePlate
-      // roller motor motorAccessories headBox
-
-      const componentList = _.cloneDeep(componentList_ori!);
-
-      componentList.headBox.material = headBox.material;
-      componentList.headBox.materialSurface = headBox.surface;
-
-      componentList.slat.material = slat.material;
-      componentList.slat.materialSurface = slat.surface;
-
-      componentList.guideRail.material = guideRail.material;
-      componentList.guideRail.materialSurface = guideRail.surface;
-
-      componentList.bottomBar.material = bottomBar.material;
-      componentList.bottomBar.materialSurface = bottomBar.surface;
+      const componentList = _.cloneDeep(componentList_ori);
 
       const updateWorkSheetItem: TupdateContractProductItemDto = {
         ...item,
         //
         // basicSpec
+        quoteType: basicSpec.quoteType,
         itemName: basicSpec.itemName,
         doorModelName: basicSpec.doorModelName as TdoorModel,
         fullWidth: getFullWidth_mm(),
@@ -1329,25 +1507,25 @@ const useWorksheet = create<Tworksheet>(
         sidePlateDirection: sidePlate.sidePlateDirection,
         //
         // generalSpec
-        bearingHousingSize: generalSpec!.bearingHousingSize,
-        bearingHousingTotalLength: String(generalSpec!.bearingHousingTotalLength),
-        bearingInnerDiameter: generalSpec!.bearingInnerDiameter,
-        bearingName: generalSpec!.bearingName,
-        diameter: String(generalSpec!.diameter),
-        // gapA: generalSpec!.gapA,
-        // gapC: generalSpec!.gapC,
-        gearNumber: generalSpec!.gearNumber,
-        sprocketWheelModel: generalSpec!.sprocketWheelModel,
-        sprocketWheelTeethNumber: generalSpec!.sprocketWheelTeethNumber,
-        sprocketWheelChains: String(generalSpec!.sprocketWheelChains),
-        weight: String(generalSpec!.weight),
-        slatLength: generalSpec!.slatLength,
-        guideRailLength: generalSpec!.guideRailLength,
-        headBoxLength: generalSpec!.headBoxLength,
-        thickness: generalSpec!.thickness,
+        bearingHousingSize: generalSpec.bearingHousingSize,
+        bearingHousingTotalLength: String(generalSpec.bearingHousingTotalLength),
+        bearingInnerDiameter: generalSpec.bearingInnerDiameter,
+        bearingName: generalSpec.bearingName,
+        diameter: String(generalSpec.diameter),
+        // gapA: generalSpec.gapA,
+        // gapC: generalSpec.gapC,
+        gearNumber: generalSpec.gearNumber,
+        sprocketWheelModel: generalSpec.sprocketWheelModel,
+        sprocketWheelTeethNumber: generalSpec.sprocketWheelTeethNumber,
+        sprocketWheelChains: String(generalSpec.sprocketWheelChains),
+        weight: String(generalSpec.weight),
+        slatLength: generalSpec.slatLength,
+        guideRailLength: generalSpec.guideRailLength,
+        headBoxLength: generalSpec.headBoxLength,
+        thickness: generalSpec.thickness,
       };
 
-      updateWorkSheetItem.components = Object.values(componentList);
+      updateWorkSheetItem.components = Object.values(componentList ?? {});
       updateWorkSheetItem.accessories = accessories.map((acce) => {
         return {
           ...acce,
@@ -1356,31 +1534,32 @@ const useWorksheet = create<Tworksheet>(
       });
 
       const updateWorkSheetArr = (contractProductItemArr_ori ?? []).map((item) => {
-        const { id: itemId, components } = item;
+        const { id: itemId, components: oldComponentArr } = item;
 
-        const newComponents = components.map((component) => {
-          const { type, id } = component;
-          const com = componentList[type];
+        const newComponent = (() => {
+          if (oldComponentArr.length === 0) {
+            return Object.values(componentList ?? {});
+          } else {
+            return oldComponentArr.map((oldComponent) => {
+              const { type, id } = oldComponent;
 
-          return {
-            ...com,
-            id,
-          };
-        });
+              return {
+                ...componentList?.[type],
+                id,
+              };
+            });
+          }
+        })();
 
         return {
           ...updateWorkSheetItem,
           id: itemId,
-          components: newComponents,
+          components: Object.values(newComponent),
         };
       });
 
       return updateWorkSheetArr;
     },
-
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
-
     // ---------------------------------------------------------------------
     //
   }) // set get
@@ -1629,6 +1808,323 @@ const produceMotor = (defaultMotor: TdoorGeneralSpecsMotorDto) => {
     defaultBoxB: String(boxB ?? ''),
     defaultBoxD: String(boxD ?? ''),
   };
+};
+
+const avalibleComponentFilter = (
+  //
+  {
+    avalibleComponentList,
+    //
+    isAntiTyphoon,
+    //
+    isWaterProof,
+    hasAluminumBarrier,
+    //
+    guideRailThickness,
+    hasSilencingStrip,
+    guideRail,
+    isUL,
+    //
+    horsepower,
+    gearNumber,
+    motorVendor,
+    phase,
+    voltage,
+    weight,
+    hasSupportStand,
+    //
+    bearingType,
+    isIntegrated,
+    boxB_mm,
+    //
+    diameter,
+    //
+    chains,
+    //
+    headBoxThickness,
+  }: {
+    avalibleComponentList: TdoorComponentListDto;
+    //
+    isAntiTyphoon: boolean;
+    isIntegrated: boolean; // 一體式捲箱
+    bearingType: string; // 軸承
+    gearNumber: string;
+    // bottomBar
+    isWaterProof: boolean; // '止水型'
+    hasAluminumBarrier: boolean; // 鋁障感型
+    // guideRail
+    guideRailThickness: `${number}`;
+    hasSilencingStrip: boolean;
+    guideRail: string;
+    isUL: boolean;
+    // motor
+    horsepower: string;
+    motorVendor: string;
+    phase: number;
+    voltage: number;
+    weight: number;
+    hasSupportStand: boolean;
+    // sidePlates
+    boxB_mm: number;
+    // roller
+    diameter: `${number}`;
+    // motorAccessories
+    chains: number; // 鍊條排數
+    // heaxBox
+    headBoxThickness: `${number}`;
+  }
+) => {
+  //
+  const com_slat: TdoorComponentListDto['slats'][number] | null = filter_slats({
+    //
+    dataArr: avalibleComponentList.slats,
+    filterParams: { isAntiTyphoon },
+  });
+  //
+  const com_bottomBar: TdoorComponentListDto['bottomBars'][number] | null = filter_bottomBars({
+    dataArr: avalibleComponentList.bottomBars,
+    filterParams: {
+      isAntiTyphoon,
+      isWaterProof,
+      hasAluminumBarrier,
+    },
+  });
+  //
+  const com_guideRail: TdoorComponentListDto['guideRails'][number] | null = filter_guideRails({
+    dataArr: avalibleComponentList.guideRails,
+    filterParams: {
+      thickness: String(guideRailThickness),
+      isAntiTyphoon,
+      hasSilencingStrip,
+      imageName: guideRail,
+      isUL,
+    },
+  });
+  //
+  const com_motor: TdoorComponentListDto['motors'][number] | null = filter_motors({
+    dataArr: avalibleComponentList.motors,
+    filterParams: {
+      horsePower: horsepower,
+      gearNumber: gearNumber, // 那時好像是因為沒有鍊齒輪番號的資料所以才先略過
+      motorVendor,
+      phase,
+      voltage,
+      weight,
+      hasSupportStand,
+    },
+  });
+  //
+  const com_sidePlate: TdoorComponentListDto['sidePlates'][number] | null = filter_sidePlates({
+    dataArr: avalibleComponentList.sidePlates,
+    filterParams: {
+      bearingType, // 從doorGeneralSpecs取得
+      gearNumber,
+      isIntegrated,
+      motorVendor,
+      weight,
+      sizeB: boxB_mm,
+    },
+  });
+  //
+  const com_roller: TdoorComponentListDto['rollers'][number] | null = filter_rollers({
+    dataArr: avalibleComponentList.rollers,
+    filterParams: {
+      diameter,
+    },
+  });
+  //
+  const com_motorAccessories: TdoorComponentListDto['motorAccessories'][number] | null = filter_motorAccessories({
+    dataArr: avalibleComponentList.motorAccessories,
+    filterParams: {
+      chains, //鍊條排數
+      bearingType,
+      gearNumber,
+    },
+  });
+  //
+  const com_headBox: TdoorComponentListDto['headBoxes'][number] | null = filter_headBoxes({
+    dataArr: avalibleComponentList.headBoxes,
+    filterParams: {
+      thickness: headBoxThickness, // 捲箱厚度
+      isIntegrated,
+    },
+  });
+  //
+
+  return {
+    slat: com_slat?.id,
+    bottomBar: com_bottomBar?.id,
+    guideRail: com_guideRail?.id,
+    sidePlate: com_sidePlate?.id,
+    roller: com_roller?.id,
+    motor: com_motor?.id,
+    motorAccessories: com_motorAccessories?.id,
+    headBox: com_headBox?.id,
+  };
+
+  //
+  //
+}; // componentFilter
+
+const cre_EmptyGeneralSpec = (): TdoorGeneralSpecsDto => {
+  return {
+    bearingHousingSize: 0, // 軸承座寸法
+    bearingHousingTotalLength: 0, // 軸承座總長(=捲軸長度)
+    bearingInnerDiameter: '', // 軸承內徑
+    bearingName: '', // 軸承
+    defaultMotorIndex: 0,
+    density: 0, // 密度
+    diameter: 0, // 捲軸直徑
+    gapA: 0,
+    gapC: 0,
+    motors: [],
+    gearNumber: '',
+    sprocketWheelModel: '',
+    sprocketWheelTeethNumber: '',
+    sprocketWheelChains: 0,
+    weight: 0,
+    slatLength: 0, // 門片長度
+    guideRailLength: 0, // 門軌長度
+    headBoxLength: 0, //  捲箱長度
+    thickness: '', // 門片厚度
+  };
+};
+
+const takeGenerateDoorProductBom = ({
+  worksheet,
+  avalibleComponentIdList,
+}: {
+  worksheet: Tworksheet;
+  avalibleComponentIdList: TavalibleComponentIdList;
+}): TgenerateDoorProductBomDto | null => {
+  const {
+    generalSpec,
+    //
+    basicSpec,
+    ABCD,
+    // motor,
+    headBox,
+    // roller,
+    slat,
+    guideRail,
+    bottomBar,
+    // sidePlate,
+    //
+    getHeight_mm,
+    getFullWidth_mm,
+  } = worksheet;
+
+  if (!generalSpec) {
+    return null;
+  }
+
+  const {
+    slatLength,
+    guideRailLength,
+    headBoxLength,
+    bearingHousingTotalLength,
+    diameter,
+    bearingName,
+    gearNumber,
+    sprocketWheelChains,
+  } = generalSpec;
+
+  const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
+    modelName: basicSpec.doorModelName as TdoorModel,
+    weight: generalSpec.weight,
+    height: getHeight_mm(),
+    B: Number(ABCD.boxB),
+    D: Number(ABCD.boxD),
+    slatLength,
+    guideRailLength,
+    rollerLength: bearingHousingTotalLength,
+    headBoxLength,
+    isAntiTyphoon: basicSpec.isAntiTyphoon,
+    rollerDiameter: diameter,
+    bearingType: bearingName,
+    gearNumber,
+    chains: sprocketWheelChains,
+    fullWidth: getFullWidth_mm(),
+    bottomBarAngleIron: bottomBar.bottomBarAngleIron,
+    bottomBarPlate: bottomBar.bottomBarPlate,
+  };
+
+  const body_slat: TgenerateDoorProductBomDto_ComponentInfo = {
+    id: avalibleComponentIdList.slat,
+    material: slat.material || '',
+    materialSurface: (reduceMaterialSurface(slat.surface) || null) as TmaterialSurface,
+    isPainted: false,
+  };
+
+  const body_guideRail: TgenerateDoorProductBomDto_ComponentInfo = {
+    id: avalibleComponentIdList.guideRail,
+    material: guideRail.material || '',
+    materialSurface: (reduceMaterialSurface(guideRail.surface) || null) as TmaterialSurface,
+    isPainted: false,
+    thickness: guideRail.guideRailThickness,
+  };
+
+  const body_headBox: TgenerateDoorProductBomDto_ComponentInfo = {
+    id: avalibleComponentIdList.headBox,
+    material: headBox.material || '',
+    materialSurface: (reduceMaterialSurface(headBox.surface) || null) as TmaterialSurface,
+    isPainted: false,
+  };
+
+  const body_bottomBar: TgenerateDoorProductBomDto_ComponentInfo = {
+    id: avalibleComponentIdList.bottomBar,
+    material: bottomBar.material || '',
+    // 在報價單的classProduct特別把bottomBar的表面拿掉，因此這邊做一樣的處理
+    // 只是不知道是為什麼
+    // materialSurface: (reduceMaterialSurface(bottomBar.surface) || null) as TmaterialSurface,
+    isPainted: false,
+  };
+
+  const body_sidePlate: TgenerateDoorProductBomDto_ComponentInfo = {
+    id: avalibleComponentIdList.sidePlate,
+    material: '黑鐵',
+    isPainted: false,
+  };
+
+  const body_roller: TgenerateDoorProductBomDto_ComponentInfo = {
+    id: avalibleComponentIdList.roller,
+    material: '黑鐵',
+    isPainted: false,
+  };
+
+  const body_motor: TgenerateDoorProductBomDto_ComponentInfo = {
+    id: avalibleComponentIdList.motor,
+    material: '黑鐵',
+    isPainted: false,
+  };
+
+  const body_motorAccessory: TgenerateDoorProductBomDto_ComponentInfo = {
+    id: avalibleComponentIdList.motorAccessories,
+    material: '其他',
+    isPainted: false,
+  };
+
+  return {
+    doorSpec,
+    slat: body_slat,
+    guideRail: body_guideRail,
+    headBox: body_headBox,
+    bottomBar: body_bottomBar,
+    sidePlate: body_sidePlate,
+    roller: body_roller,
+    motor: body_motor,
+    motorAccessories: body_motorAccessory,
+  };
+
+  //
+};
+
+const reduceMaterialSurface = (materialSurface: string) => {
+  if (materialSurface === '烤漆' || materialSurface === '氟碳') {
+    materialSurface = '2B';
+  }
+
+  return materialSurface;
 };
 
 // =====================================================================

@@ -1028,7 +1028,7 @@ const polyfillContractProductItems = (pre_contractProductItems: TquotationProduc
 // ===========================================================================
 
 type TcomponentList = {
-  [key: string]: TquotationProductComponentDto;
+  [key: string]: TquotationProductComponentDto | undefined;
 };
 
 const useControl_pdf = ({
@@ -1108,11 +1108,11 @@ const useControl_pdf = ({
           ),
           // form: sheet.headBoxForm_str,
           form: item.isIntegratedHeadBox ? '一體式捲箱' : '捲箱 + 機箱',
-          surface: componentList.headBox.materialSurface ?? '',
+          surface: componentList.headBox?.materialSurface ?? '',
         },
         doorPiece: {
-          material: componentList.slat.material,
-          surface: componentList.slat.materialSurface ?? '',
+          material: componentList.slat?.material ?? '',
+          surface: componentList.slat?.materialSurface ?? '',
           thickness: item.thickness ?? '',
           slatLength: String(item.slatLength ?? '0'),
           slatCount: String(item.slatCount ?? '0'),
@@ -1127,7 +1127,7 @@ const useControl_pdf = ({
         },
         guideRail: {
           form: item.isAntiTyphoon ? '防颱' : '一般',
-          material: componentList.guideRail.material,
+          material: componentList.guideRail?.material ?? '',
           guideRailLength: String(item.guideRailLength ?? ''),
           guideRailName: item.guideRail ?? '',
           icon: item?.guideRail
@@ -1135,7 +1135,7 @@ const useControl_pdf = ({
             : undefined,
           antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
           bendStraight: item.guideRailType ?? '',
-          surface: componentList.guideRail.materialSurface ?? '',
+          surface: componentList.guideRail?.materialSurface ?? '',
         },
         chainCog: {
           sprocketWheelModel: item.sprocketWheelModel ?? '',
@@ -1146,9 +1146,9 @@ const useControl_pdf = ({
           eyesQuantity: '', // 未知 // 在廠務部工作表 目數
         },
         base: {
-          material: componentList.bottomBar.material,
+          material: componentList.bottomBar?.material ?? '',
           guideRailsOpening: String(item.guideRailsOpening ?? ''),
-          surface: componentList.bottomBar.materialSurface ?? '', // 未知 在廠務部工作表
+          surface: componentList.bottomBar?.materialSurface ?? '', // 未知 在廠務部工作表
         },
         sidePlate: {
           direction: item.sidePlateDirection ?? '',

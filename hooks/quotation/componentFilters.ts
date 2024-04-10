@@ -1,5 +1,6 @@
 // type
 import type { TdoorComponentListDto } from 'js/api/dtoTypes';
+import { title } from 'process';
 
 // slats
 // bottomBars
@@ -294,6 +295,62 @@ const filter_headBoxes = ({
   return filteredArr[0] || null;
 };
 
+// ================================================================================
+
+type TerrorTip = {
+  title: string;
+  content: string;
+};
+
+type Tlookup_errorTip = {
+  slat: TerrorTip;
+  bottomBar: TerrorTip;
+  guideRail: TerrorTip;
+  sidePlate: TerrorTip;
+  roller: TerrorTip;
+  motor: TerrorTip;
+  motorAccessory: TerrorTip;
+  headBox: TerrorTip;
+  [key: string]: TerrorTip | undefined;
+};
+
+const lookup_errorTip: Tlookup_errorTip = {
+  slat: {
+    title: '沒有適配的門片，請檢查相關參數是否正確',
+    content: '相關參數: 防颱',
+  },
+  bottomBar: {
+    title: '沒有適配的底座，請檢查相關參數是否正確',
+    content: '相關參數: 防颱、底座類型(止水型、鋁障感型)',
+  },
+  guideRail: {
+    title: '沒有適配的門軌，請檢查相關參數是否正確',
+    content: '相關參數: 防颱、厚度、消音條、UL、形式(圖片選項)',
+  },
+  sidePlate: {
+    title: '沒有適配的支板，請檢查相關參數是否正確',
+    content: '相關參數: 軸承、齒輪、捲箱形式(一體式或捲加機)、馬達廠商、重量(由門型、寬、高、防颱計算而出)、支板尺寸B',
+  },
+  roller: {
+    title: '沒有適配的捲軸，請檢查相關參數是否正確',
+    content: '相關參數: 捲軸直徑',
+  },
+  motor: {
+    title: '沒有適配的馬達，請檢查相關參數是否正確',
+    content: '相關參數: 馬力、齒輪、馬達廠商、電相、電壓、馬達支撐架、重量(由門型、寬、高、防颱計算而出)',
+  },
+  motorAccessory: {
+    title: '沒有適配的馬達配件，請檢查相關參數是否正確',
+    content: '相關參數: 鍊條排數、軸承、齒輪',
+  },
+  headBox: {
+    title: '沒有適配的捲箱，請檢查相關參數是否正確',
+    content: '相關參數: 捲箱厚度、捲箱形式(一體式或捲加機)',
+  },
+};
+
+// ================================================================================
+
 export {
   filter_slats,
   filter_bottomBars,
@@ -303,4 +360,6 @@ export {
   filter_motors,
   filter_motorAccessories,
   filter_headBoxes,
+  //
+  lookup_errorTip,
 };
