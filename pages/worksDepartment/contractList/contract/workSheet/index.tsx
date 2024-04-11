@@ -17,7 +17,7 @@
 // !!! component的過濾與取得bom資料還沒做 !!!
 // !!! component的過濾與取得bom資料還沒做 !!!
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
@@ -164,6 +164,8 @@ export default function Worksheet({
   userErpFeature: TerpFeatureDto[] | undefined;
   userInfo: TuserDto;
 }) {
+  // ----------------------------------------------------------------
+  const ref_main = useRef<HTMLDivElement>(null!);
   // ----------------------------------------------------------------
   let havePermissionToEdit = false;
   isAdmin && (havePermissionToEdit = true);
@@ -325,6 +327,7 @@ export default function Worksheet({
         await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
         await refreshData();
         setDisabled(true);
+        ref_main.current.scrollIntoView();
       } catch (error) {
       } finally {
         setIsLoading(false);
@@ -724,7 +727,7 @@ export default function Worksheet({
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
-        <div className={scss.main}>
+        <div ref={ref_main} className={scss.main}>
           {/* left */}
           <div className={scss.left}>
             {control_productCardArr.map((control_productCard, index) => {
