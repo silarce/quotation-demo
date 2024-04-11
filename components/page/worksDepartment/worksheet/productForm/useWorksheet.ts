@@ -1526,9 +1526,11 @@ const useWorksheet = create<Tworksheet>(
         getHeight_mm,
         // getFullHeight_mm,
         // getAngleIronSize_mm,
+        getIsSpecialProd,
       } = get();
 
       const itemOri_copy = _.cloneDeep(contractProductItem_ori);
+      const isSpecialProd = getIsSpecialProd();
 
       if (!itemOri_copy) {
         return null;
@@ -1578,14 +1580,14 @@ const useWorksheet = create<Tworksheet>(
         electricMotorDirection: motor.electricMotorDirection,
         //
         // headBox
-        headBoxThickness: headBox.headBoxThickness,
+        headBoxThickness: headBox.headBoxThickness || null,
         headBoxFront: headBox.headBoxFront,
-        headBoxProtruding: headBox.headBoxProtruding,
+        headBoxProtruding: headBox.headBoxProtruding || null,
         isIntegratedHeadBox: headBox.isIntegratedHeadBox,
         headBoxAngleIronQuantity: Number(headBox.headBoxAngleIronQuantity),
         //
         // roller
-        rollerSpec: roller.rollerSpec,
+        rollerSpec: roller.rollerSpec || null,
         //
         // slat
         slatCount: slat.slatCount || '0',
@@ -1594,7 +1596,7 @@ const useWorksheet = create<Tworksheet>(
         guideRailThickness: guideRail.guideRailThickness,
         hasSilencingStrip: guideRail.hasSilencingStrip,
         guideRailType: guideRail.guideRailType,
-        guideRail: guideRail.guideRail,
+        guideRail: guideRail.guideRail || null,
         guideRailsOpening: guideRail.guideRailsOpening,
         guideRailG: guideRail.guideRailG,
         //
@@ -1607,22 +1609,22 @@ const useWorksheet = create<Tworksheet>(
         sidePlateDirection: sidePlate.sidePlateDirection,
         //
         // generalSpec
-        bearingHousingSize: generalSpec.bearingHousingSize,
-        bearingHousingTotalLength: String(generalSpec.bearingHousingTotalLength),
-        bearingInnerDiameter: generalSpec.bearingInnerDiameter,
-        bearingName: generalSpec.bearingName,
-        diameter: String(generalSpec.diameter),
+        bearingHousingSize: generalSpec.bearingHousingSize || null,
+        bearingHousingTotalLength: String(generalSpec.bearingHousingTotalLength) || null,
+        bearingInnerDiameter: generalSpec.bearingInnerDiameter || null,
+        bearingName: generalSpec.bearingName || null,
+        diameter: String(generalSpec.diameter) || null,
         // gapA: generalSpec.gapA,
         // gapC: generalSpec.gapC,
-        gearNumber: generalSpec.gearNumber,
-        sprocketWheelModel: generalSpec.sprocketWheelModel,
-        sprocketWheelTeethNumber: generalSpec.sprocketWheelTeethNumber,
-        sprocketWheelChains: String(generalSpec.sprocketWheelChains),
-        weight: String(generalSpec.weight),
-        slatLength: generalSpec.slatLength,
-        guideRailLength: generalSpec.guideRailLength,
-        headBoxLength: generalSpec.headBoxLength,
-        thickness: generalSpec.thickness,
+        gearNumber: generalSpec.gearNumber || null,
+        sprocketWheelModel: generalSpec.sprocketWheelModel || null,
+        sprocketWheelTeethNumber: generalSpec.sprocketWheelTeethNumber || null,
+        sprocketWheelChains: String(generalSpec.sprocketWheelChains) || null,
+        weight: String(generalSpec.weight) || null,
+        slatLength: generalSpec.slatLength || null,
+        guideRailLength: generalSpec.guideRailLength || null,
+        headBoxLength: generalSpec.headBoxLength || null,
+        thickness: generalSpec.thickness || null,
         //
         isULGuideRail: other.isULGuideRail,
       };
@@ -1639,6 +1641,10 @@ const useWorksheet = create<Tworksheet>(
         const { id: itemId, components: oldComponentArr } = item;
 
         const newComponent = (() => {
+          if (isSpecialProd) {
+            return [];
+          }
+
           if (oldComponentArr.length === 0) {
             return Object.values(componentList_copy ?? {});
           }
