@@ -2863,6 +2863,18 @@ class Class_product {
       this.comList.slat.surface_withCheckOptions = v;
     }
 
+    if (this.comList?.headBox) {
+      this.comList.headBox.surface_withCheckOptions = v;
+    }
+
+    if (this.comList?.guideRail) {
+      this.comList.guideRail.surface_withCheckOptions = v;
+    }
+
+    // if (this.comList?.bottomBar) {
+    //   this.comList.bottomBar.surface_withCheckOptions = v;
+    // }
+
     this.reRender();
   }
 
