@@ -476,6 +476,14 @@ export const optionsCreator_front = createOptionsCreator({
   ],
 });
 
+// 馬達品牌
+export const optionsCreator_motorVender = createOptionsCreator({
+  optionsArr: [
+    { value: '東元', label: '東元' },
+    { value: '大同', label: '大同' },
+  ],
+});
+
 // const optionsCreator_foooooo = (props: { haveEmpty?: boolean } = {}): Toption[] => {
 //   const { haveEmpty } = props;
 //   const arr = [{ value: 'foooo' as const, label: 'fooooo' }];

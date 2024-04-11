@@ -873,8 +873,9 @@ export type TquotationProductComponentDto = {
   createdAt: string;
   updatedAt: string;
   type: TdoorComponentType;
-  number: string;
-  componentId: string;
+  // 從get /products/door/generate-door-product-bom 取得的number
+  number: string; // TdoorBomDto_Component['number']
+  componentId: string; // 從avalibleComponent過濾出來的component的id，會與rawData的id相同
   // TODO 有空要調整型別
   rawData: object; // 裡面裝的其實是TdoorComponentListDto裡面的property之一
   // rawData:
@@ -886,9 +887,9 @@ export type TquotationProductComponentDto = {
   //   | TdoorMotorDto
   //   | TdoorMotorAccessoriesDto
   //   | TdoorHeadBoxDto;
-  /**
-  從TdoorBomDto_Component取得的bom要直接送進來這個bom
-   */
+
+  // 從TdoorBomDto_Component取得的bom要直接送進來這個bom
+
   bom: any; // 前端不會直接用到，先直接設object
   material: string;
   // materialSurface: TmaterialSurface | null | undefined;
@@ -1424,7 +1425,7 @@ export type TquotationProductItemDto = {
   // 報價別
   quoteType: string;
   // 門型
-  doorModelName: TdoorModel;
+  doorModelName: string;
   // L(mm)全寬
   fullWidth: number;
   // W(mm)
@@ -1436,37 +1437,37 @@ export type TquotationProductItemDto = {
   // D(mm)
   boxD: number | null;
   // 面積
-  area: string;
+  area: string | null;
   // 才數
-  volume: string;
+  volume: string | null;
   // 材料
   materialName: string;
   // 表面
-  materialSurface: TmaterialSurface | null;
+  materialSurface: string | null;
   // 門軌
-  guideRail: string;
+  guideRail: string | null;
   // 馬力
   horsepower: string;
   // 馬達廠商
-  motorVendor: string;
+  motorVendor: string | null;
   // 電壓
-  motorVoltage: number;
+  motorVoltage: number | null;
   // 馬達支撐架
-  hasMotorSupportStand: boolean;
+  hasMotorSupportStand: boolean | null;
   // 底座類型
-  bottomBar: string;
+  bottomBar: string | null;
   // 馬達鎖盒
-  motorLockBox: string;
+  motorLockBox: string | null;
   // 門軌厚度
-  guideRailThickness: string;
-  // 捲軸規格
-  rollerSpec: string;
+  guideRailThickness: string | null;
+  // 捲軸規格 // 棄用
+  rollerSpec: string | null; // 無凸 | 雙凸
   // 門軌消音條
-  hasSilencingStrip: boolean;
+  hasSilencingStrip: boolean | null;
   // 一體式捲箱
-  isIntegratedHeadBox: boolean;
+  isIntegratedHeadBox: boolean | null;
   // 捲箱厚度
-  headBoxThickness: string;
+  headBoxThickness: string | null;
   // 單價
   unitPrice: number;
   // 複價
@@ -1476,9 +1477,9 @@ export type TquotationProductItemDto = {
   // 牌價複價
   dualPrice: number;
   // 防颱
-  isAntiTyphoon: boolean;
+  isAntiTyphoon: boolean | null;
   // 彈射門
-  bounceDoor: boolean;
+  bounceDoor: boolean | null;
   // 彈射門寬度
   bounceDoorWidth: number | null;
   // 彈射門高度
@@ -1486,15 +1487,15 @@ export type TquotationProductItemDto = {
   // 彈射門長度
   bounceDoorLength: number | null;
   // 關閉方式
-  closingType: string;
+  closingType: string | null;
   // 備註
   notes: string;
   // 相數
-  motorPhase: number;
+  motorPhase: number | null;
   // 底座角鐵
-  bottomBarAngleIron: string;
+  bottomBarAngleIron: string | null;
   // 底座板
-  bottomBarPlate: string;
+  bottomBarPlate: string | null;
   // 主產品Id
   productId: string | null;
   // 門片厚度
@@ -3145,7 +3146,7 @@ export type TupdateContractProductItemDto = {
   // 報價別
   quoteType: string;
   // 門型
-  doorModelName: TdoorModel;
+  doorModelName: string;
   // L(mm)全寬
   fullWidth: number;
   // W(mm)
@@ -3157,37 +3158,37 @@ export type TupdateContractProductItemDto = {
   // D(mm)
   boxD: number;
   // 面積
-  area: string;
+  area: string | null;
   // 才數
-  volume: string;
+  volume: string | null;
   // 材料
   materialName: string;
   // 表面
-  materialSurface: TmaterialSurface | null;
+  materialSurface: string | null;
   // 門軌
-  guideRail: string;
+  guideRail: string | null;
   // 馬力
   horsepower: string;
   // 馬達廠商
-  motorVendor: string;
+  motorVendor: string | null;
   // 電壓
-  motorVoltage: number;
+  motorVoltage: number | null;
   // 馬達支撐架
-  hasMotorSupportStand: boolean;
+  hasMotorSupportStand: boolean | null;
   // 底座類型
-  bottomBar: string;
+  bottomBar: string | null; // 鋁障感 | 止水型 | ''
   // 馬達鎖盒
-  motorLockBox: string;
+  motorLockBox: string | null;
   // 門軌厚度
-  guideRailThickness: string;
-  // 捲軸規格
-  rollerSpec: string;
+  guideRailThickness: string | null;
+  // 捲軸規格 // 棄用
+  rollerSpec: string | null; // 無凸 | 雙凸
   // 門軌消音條
-  hasSilencingStrip: boolean;
+  hasSilencingStrip: boolean | null;
   // 一體式捲箱
-  isIntegratedHeadBox: boolean;
+  isIntegratedHeadBox: boolean | null;
   // 捲箱厚度
-  headBoxThickness: string;
+  headBoxThickness: string | null;
   // 單價
   unitPrice: number;
   // 牌價
@@ -3197,9 +3198,9 @@ export type TupdateContractProductItemDto = {
   // 複價
   totalPrice: number;
   // 防颱
-  isAntiTyphoon: boolean;
+  isAntiTyphoon: boolean | null;
   // 彈射門
-  bounceDoor: boolean;
+  bounceDoor: boolean | null;
   // 彈射門寬度
   bounceDoorWidth?: number | null;
   // 彈射門高度
@@ -3207,17 +3208,17 @@ export type TupdateContractProductItemDto = {
   // 彈射門長度
   bounceDoorLength?: number | null;
   // 關閉方式
-  closingType: string;
+  closingType: string | null;
   // 備註
   notes: string;
   // 相數
-  motorPhase: number;
+  motorPhase: number | null;
   // 底座角鐵
-  bottomBarAngleIron: string;
+  bottomBarAngleIron: string | null;
   // 底座板
-  bottomBarPlate: string;
+  bottomBarPlate: string | null;
   // 門片厚度
-  thickness: string;
+  thickness: string | null;
   // 門片 - 捲片支數
   slatCount?: string | null;
   // 鏈齒輪 - 鏈齒輪番號
