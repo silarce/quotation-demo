@@ -1,21 +1,10 @@
 // 工作表
 
-// 按下計算按鈕會呼叫targetSheet.calcProd()
-
 // 為了使用useControl_pdf，在useGetContract_id的populate中
 // 設置了
 // 'worksheet.latestRecord.contractProductItems.components'
 // 'worksheet.latestRecord.contractProductItems.accessories'
 // 未來可能會有效能的問題，之後要找時間處理
-
-// TODO component的過濾與取得bom資料還沒做
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
@@ -882,56 +871,6 @@ const WorksheetForm = ({
 // ===========================================================================
 // ============================================================================
 
-/**
- *
- * 一體式捲箱 true === 方形捲箱
- * false ==="捲箱 + 機箱"
- *
- * 方向 數量加方向 2右 6左 8左   這樣
- * 捲箱的角鐵尺寸為 WG + gapA + gapC - 10
- *
- * 門軌的防颱先全部放-50
- * 捲箱角鐵數量由使用者輸入
- *
- *
- * 電動機與支版的方向是一樣的
- * 所以記錄在product就好了
- *
- *
- *
-根據PDF缺的欄位而需要新增的property
-方向 角鐵數量 彎直
-另外要新增的欄位
-
-開單日 date string
-出貨日 date string
-
-捲箱
-正面 string
-有無凸 string
-角鐵數量 number
-
-支版
-鍊條 string 應該是不可編輯的欄位
-方向 string
-
-電動機
-鍊條型式 string
-方向 string
-
-門軌
-型式 string
-
-
-
-
-
-另外開單日期與出貨日期還不知道要帶入什麼值
- 
-馬達荷重怎麼算
- 
- */
-
 const useControl_profile = (engineeringContact: TengineeringContactDto | undefined | null): Tcontrol_profile => {
   const control_profile = useMemo(() => {
     const {
@@ -1013,11 +952,6 @@ const polyfillContractProductItems = (pre_contractProductItems: TquotationProduc
   return contractProductItems;
 };
 
-// ===========================================================================
-// 角鐵尺吋
-// String(Number(this.WG_mm) + Number(this._prod.gapA) + Number(this._prod.gapC) - 10);
-
-// 門片厚度 _prod.thickness
 // ===========================================================================
 // ===========================================================================
 // ===========================================================================
