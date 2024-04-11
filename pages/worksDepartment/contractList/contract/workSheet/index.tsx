@@ -53,6 +53,7 @@ import {
   Form_product_bottomBar,
   Form_product_sidePlate,
   Form_product_accessories,
+  Form_product_other,
   //
   WorksheetTable,
 } from 'components/page/worksDepartment/worksheet/productForm/productForm';
@@ -847,6 +848,7 @@ const WorksheetForm = ({
           <Form_product_guideRail disabled={disabled} />
           <Form_product_bottomBar disabled={disabled} />
           <Form_product_sidePlate disabled={disabled} />
+          <Form_product_other disabled={disabled} />
         </div>
         <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
       </div>

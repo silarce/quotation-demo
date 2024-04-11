@@ -1131,6 +1131,38 @@ function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined })
 
 // =====================================================================
 
+function Form_product_other({ disabled }: { disabled: boolean | undefined }) {
+  const { other } = useWorksheet(useShallow((state) => ({ other: state.other })));
+
+  const isULGuideRail = other.isULGuideRail;
+  const value_isULGuideRail = isULGuideRail ? { value: 'true', label: '有' } : { value: 'false', label: '無' };
+
+  return (
+    <div>
+      <p className={scss.caption}>●其他</p>
+      <div className={scss.grid}>
+        <InputSel
+          {...basicConfig}
+          caption="UL"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              value: value_isULGuideRail,
+              options: optionsCreator_boolean(),
+              onChange: (option) => {
+                const value = option?.value === 'true';
+                other.setIsULGuideRail(value);
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// =====================================================================
+
 // antd
 import { Checkbox } from 'antd';
 
@@ -1459,6 +1491,7 @@ export {
   Form_product_bottomBar,
   Form_product_sidePlate,
   Form_product_accessories,
+  Form_product_other,
   //
 };
 

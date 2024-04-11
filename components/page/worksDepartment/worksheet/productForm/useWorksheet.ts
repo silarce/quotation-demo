@@ -264,6 +264,12 @@ type Tworksheet = {
     setBearingName: (value: string) => void;
     setSprocketWheelModel: (value: string) => void;
   };
+
+  other: {
+    isULGuideRail: boolean;
+    setIsULGuideRail: (value: boolean) => void;
+  };
+
   //
   init: (props: {
     worksheetId: string;
@@ -719,6 +725,18 @@ const useWorksheet = create<Tworksheet>(
       },
     },
 
+    other: {
+      isULGuideRail: false,
+      setIsULGuideRail: (value) => {
+        set(
+          produce((state) => {
+            state.other.isULGuideRail = value;
+            state.shouldCalcData2 = true;
+          })
+        );
+      },
+    },
+
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
     //
@@ -863,6 +881,11 @@ const useWorksheet = create<Tworksheet>(
           state.sidePlate = {
             ...state.sidePlate,
             sidePlateDirection: contractProductItem?.sidePlateDirection ?? '',
+          };
+
+          state.other = {
+            ...state.other,
+            isULGuideRail: !!contractProductItem?.isULGuideRail,
           };
 
           //
@@ -1496,6 +1519,7 @@ const useWorksheet = create<Tworksheet>(
         guideRail,
         bottomBar,
         sidePlate,
+        other,
 
         getFullWidth_mm,
         getWG_mm,
@@ -1599,6 +1623,8 @@ const useWorksheet = create<Tworksheet>(
         guideRailLength: generalSpec.guideRailLength,
         headBoxLength: generalSpec.headBoxLength,
         thickness: generalSpec.thickness,
+        //
+        isULGuideRail: other.isULGuideRail,
       };
 
       updateWorkSheetItem.components = Object.values(componentList_copy ?? {});
