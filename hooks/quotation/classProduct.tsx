@@ -124,6 +124,8 @@ import {
   findBDoptions,
 } from 'js/utils/product/calc';
 
+import { checkIsFloat } from 'js/utils/checkValue';
+
 // =============================================================================
 // type
 import type {
@@ -322,6 +324,8 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
+    this._bounceDoorWidth = new Decimal(this._prodData.bounceDoorWidth).div(1000).toString();
+
     this.parentProd = parentProd;
 
     // this.findBDoptions();
@@ -398,6 +402,8 @@ class Class_product {
   private _dualPrice;
   private _unitPrice;
   private _totalPrice;
+
+  private _bounceDoorWidth;
 
   private defaultMotorSpecs: TdoorGeneralSpecsMotorDto | undefined = undefined;
 
@@ -3143,23 +3149,18 @@ class Class_product {
 
   // 單位為公尺
   get bounceDoorWidth() {
-    if (!this._prodData.bounceDoorWidth) {
-      return '';
-    } else {
-      const bounceDoorWidth_m = new Decimal(this._prodData.bounceDoorWidth).div(1000).toString();
-
-      return bounceDoorWidth_m;
-    }
+    return this._bounceDoorWidth || '';
   }
 
   // 輸入的單位預期為公尺
   set bounceDoorWidth(str) {
-    if (!str) {
-      this._prodData.bounceDoorWidth = 0;
-    } else {
-      const bounceDoorWidth_mm = new Decimal(str).mul(1000).toNumber();
-      this._prodData.bounceDoorWidth = bounceDoorWidth_mm;
+    if (str && !checkIsFloat(str, 3)) {
+      return;
     }
+
+    this._bounceDoorWidth = str;
+    const bounceDoorWidth_mm = new Decimal(this._bounceDoorWidth || 0).mul(1000).toNumber();
+    this._prodData.bounceDoorWidth = bounceDoorWidth_mm;
 
     this.reRender();
   }
