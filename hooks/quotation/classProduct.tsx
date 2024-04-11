@@ -1995,15 +1995,38 @@ class Class_product {
   /**變更角鐵與底座版 */
 
   changeBottomBarAngleIronAndBottomBarPlate(
-    // v: '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
-    v: string
+    v: string // '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
   ) {
     const list_bottomBarAngleIron = _.keyBy<Toption>(this.options_bottomBarAngleIron, 'material');
     const list_bottomBarPlate = _.keyBy<Toption>(this.options_bottomBarPlate, 'material');
 
-    const bottomBarAngleIron = list_bottomBarAngleIron[v]?.value || '';
-    const bottomBarPlate = list_bottomBarPlate[v]?.value || '';
+    // _________________________________________________________________
+    const bottomBarAngleIron = list_bottomBarAngleIron[v]?.value ?? '';
+    const bottomBarPlate = list_bottomBarPlate[v]?.value ?? '';
 
+    // // _________________________________________________________________
+    // if (v === '高耐鍍鋅鋼板') {
+    //   const v2 = '鍍鋅鋼板';
+
+    //   if (!bottomBarAngleIron) {
+    //     bottomBarAngleIron = list_bottomBarAngleIron[v2]?.value ?? '';
+    //   }
+
+    //   if (!bottomBarPlate) {
+    //     bottomBarPlate = list_bottomBarPlate[v2]?.value ?? '';
+    //   }
+    // }
+
+    // // _________________________________________________________________
+    // if (!bottomBarAngleIron) {
+    //   bottomBarAngleIron = list_bottomBarAngleIron['SST#304'].value ?? '';
+    // }
+
+    // if (!bottomBarPlate) {
+    //   bottomBarPlate = list_bottomBarPlate['SST#304'].value ?? '';
+    // }
+
+    // // _________________________________________________________________
     this.bottomBarAngleIron = bottomBarAngleIron;
     this.bottomBarPlate = bottomBarPlate;
   }
@@ -2189,34 +2212,29 @@ class Class_product {
     let options = options_surface_onlyPaint;
 
     const isSST = checkIsSST(this.material);
+    const isGalvanized = checkIsGalvanized(this.material); // 是否鍍鋅
 
     if (isSST) {
       options = options_surface;
     }
 
-    if (this.doorType !== 'SJ-305D') {
+    if (!isGalvanized && this.doorType !== 'SJ-305D') {
       options = options.filter((item) => {
         return item.value !== '無烤漆';
       });
     }
+
+    // if (this.doorType !== 'SJ-305D') {
+    //   options = options.filter((item) => {
+    //     return item.value !== '無烤漆';
+    //   });
+    // }
 
     return options;
   }
 
   /**底座角鐵 */
   get options_bottomBarAngleIron() {
-    if (this._prodData.doorType === 'SJ-302') {
-      return optionsCreator_bottomBarAngleIron();
-    }
-
-    if (this._prodData.doorType === 'SJ-303A') {
-      return optionsCreator_bottomBarAngleIron_303A();
-    }
-
-    if (this._prodData.doorType === 'SJ-303AS') {
-      return optionsCreator_bottomBarAngleIron_303AS();
-    }
-
     const doorType = this._prodData.doorType as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
 
     return lookup_options_bottomBarAngleIronAndPlate[doorType]?.angleIron() ?? [];
@@ -2225,20 +2243,6 @@ class Class_product {
     const doorType = this._prodData.doorType as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
 
     return lookup_options_bottomBarAngleIronAndPlate[doorType]?.plate() ?? [];
-
-    // if (this._prodData.doorType === 'SJ-302') {
-    //   return optionsCreator_bottomBarPlate();
-    // }
-
-    // if (this._prodData.doorType === 'SJ-303A') {
-    //   return optionsCreator_bottomBarPlate_303A();
-    // }
-
-    // if (this._prodData.doorType === 'SJ-303AS') {
-    //   return optionsCreator_bottomBarPlate_303AS();
-    // }
-
-    // return [];
   }
 
   get options_boxB() {
@@ -4039,6 +4043,17 @@ const checkIsSST = (material: string) => {
   }
 
   return isSST;
+};
+
+// 檢查是否鍍鋅
+const checkIsGalvanized = (material: string) => {
+  let isGalvanized = false;
+
+  if (material.includes('鍍鋅')) {
+    isGalvanized = true;
+  }
+
+  return isGalvanized;
 };
 
 const creOptions_surface: () => Toption[] = () => optionsCreator_surface();
