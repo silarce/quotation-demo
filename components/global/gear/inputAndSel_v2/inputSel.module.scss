@@ -259,15 +259,19 @@ div.selControl {
       display: none;
     }
   }
-  &:hover {
-    // color: $colorMain;
-    background-color: $bgc01;
-  }
+
+  // &:hover {
+  //   // color: $colorMain;
+  //   background-color: $bgc01;
+  // }
   &.isSelected {
     color: $colorActive01;
     > span {
       color: $colorActive01;
     }
+  }
+  &.isFocused {
+    background-color: $bgc01;
   }
 }
 
