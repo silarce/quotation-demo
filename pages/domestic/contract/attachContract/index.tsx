@@ -184,6 +184,7 @@ export default function AttachContract({
     addString: () => {},
     delString: () => {},
     addStrArr: () => {},
+    replaceStrArr: () => {},
   };
 
   const control_qr: TsummaryControl = {
@@ -192,6 +193,7 @@ export default function AttachContract({
     addString: () => {},
     delString: () => {},
     addStrArr: () => {},
+    replaceStrArr: () => {},
   };
 
   const payInfoControl: TpayInfoControl = {
