@@ -19,7 +19,8 @@
  * 
  * calcProdAllprice_timeout
  *
- *
+ * callAllReq
+ * reqChain
  * req_calcGeneralSpec
  * req_getProdAvailableComponents
  * reqProdGenerateDoorProductBom
@@ -27,8 +28,8 @@
  * 
 
   WG = fullWidth-gapA-gapC
-  G = guideRailG
-  W = WG - G -G // 沒有多打，要減掉兩個G
+  G = guideRailG + guideRailG
+  W = WG - guideRailG -guideRailG 
 
  */
 
@@ -1246,7 +1247,7 @@ class Class_product {
       if (!this.callAllTimeoutId) {
         this.isLoading = false;
       }
-    }, 800);
+    }, 150);
   }
 
   // ---------------------------------------------------------
@@ -1521,7 +1522,7 @@ class Class_product {
 
     this.timeoutId_retrieveCreProdCom = setTimeout(() => {
       this.retrieveCreProdCom();
-    }, 100);
+    }, 150);
   }
 
   takeDefaultDynaValue() {
@@ -2458,13 +2459,14 @@ class Class_product {
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
-    this.callAllReq();
+    // this.callAllReq();
     // onDoorTypeChange必須放在賦值之後再執行
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
     this.reRender();
   }
-  /**全寬 */
+
+  // 全寬
   get fullWidth() {
     return this._prodData.fullWidth;
   }
@@ -2486,7 +2488,7 @@ class Class_product {
     // this.calcChangeAccePrice();
     // this.clearProd();
     this.shouldCall_cgs = true;
-    this.callAllReq();
+    // this.callAllReq();
 
     this.reRender();
   }
@@ -2604,7 +2606,7 @@ class Class_product {
 
     this.shouldCall_cgs = true;
     this.shouldCall_pgpb = true;
-    this.callAllReq();
+    // this.callAllReq();
 
     this.reRender();
   }
@@ -2638,36 +2640,41 @@ class Class_product {
       }
       // ________________________
 
-      const reqBody: TgetBoxDParams = {
-        modelName: this.doorType,
-        rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
-        sidePlateSizeB: Number(this.boxB_mm),
-        hp: this.horsepower,
-        motorVendor: this.motor,
-      };
+      // const reqBody: TgetBoxDParams = {
+      //   modelName: this.doorType,
+      //   rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
+      //   sidePlateSizeB: Number(this.boxB_mm),
+      //   hp: this.horsepower,
+      //   motorVendor: this.motor,
+      // };
 
-      try {
-        this.isLoading = true;
-        const res = await apiGetboxD(reqBody);
+      // try {
+      //   this.isLoading = true;
+      //   const res = await apiGetboxD(reqBody);
 
-        if (res) {
-          const sidePlateSizeD = res?.sidePlateSizeD;
-          this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
-        }
-      } catch (error) {
-        // const err = error as Error;
-        // myAlert.err({ title: '取得boxD失敗', content: err.message });
-        this._prodData.boxD = '0';
-      } finally {
-        this.isLoading = false;
-      }
+      //   if (res) {
+      //     const sidePlateSizeD = res?.sidePlateSizeD;
+      //     this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+      //   }
+      // } catch (error) {
+      //   // const err = error as Error;
+      //   // myAlert.err({ title: '取得boxD失敗', content: err.message });
+      //   this._prodData.boxD = '0';
+      // } finally {
+      //   this.isLoading = false;
+      // }
+
+      // await this.updateBoxD();
+      await this.updateBoxD();
 
       this.area = this.calcArea();
 
-      this.callRetrieveCreProdCom();
+      // this.callRetrieveCreProdCom();
 
       this.shouldCall_pgpb = true;
+
       this.callAllReq();
+      this.callRetrieveCreProdCom();
 
       this.reRender();
     };
@@ -2687,29 +2694,31 @@ class Class_product {
       }
       // ________________________
 
-      const reqBody: TgetBoxDParams = {
-        modelName: this.doorType,
-        rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
-        sidePlateSizeB: Number(this.boxB_mm),
-        hp: this.horsepower,
-        motorVendor: this.motor,
-      };
+      // const reqBody: TgetBoxDParams = {
+      //   modelName: this.doorType,
+      //   rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
+      //   sidePlateSizeB: Number(this.boxB_mm),
+      //   hp: this.horsepower,
+      //   motorVendor: this.motor,
+      // };
 
-      try {
-        this.isLoading = true;
-        const res = await apiGetboxD(reqBody);
+      // try {
+      //   this.isLoading = true;
+      //   const res = await apiGetboxD(reqBody);
 
-        if (res) {
-          const sidePlateSizeD = res?.sidePlateSizeD;
-          this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
-        }
-      } catch (error) {
-        // const err = error as Error;
-        // myAlert.err({ title: '取得boxD失敗', content: err.message });
-        this._prodData.boxD = '0';
-      } finally {
-        this.isLoading = false;
-      }
+      //   if (res) {
+      //     const sidePlateSizeD = res?.sidePlateSizeD;
+      //     this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+      //   }
+      // } catch (error) {
+      //   // const err = error as Error;
+      //   // myAlert.err({ title: '取得boxD失敗', content: err.message });
+      //   this._prodData.boxD = '0';
+      // } finally {
+      //   this.isLoading = false;
+      // }
+
+      await this.updateBoxD();
 
       this.area = this.calcArea();
       this.reRender();
@@ -2915,6 +2924,7 @@ class Class_product {
       })
     );
 
+    this.callAllReq();
     this.callRetrieveCreProdCom();
 
     this.reRender();
@@ -2955,8 +2965,10 @@ class Class_product {
 
     this.changeDistributionBoxPrice_byHorsepower();
     this.changePhase_byHorsepower();
-    // this.toSetDefaultBoxB();
+
+    this.callAllReq();
     this.callRetrieveCreProdCom();
+
     this.reRender();
   }
 
@@ -2992,7 +3004,7 @@ class Class_product {
       this.shouldCall_cgs = true;
       this.shouldCall_pac = true;
       this.shouldCall_pgpb = true;
-      this.callAllReq();
+      // this.callAllReq();
     }
 
     this.reRender();
@@ -3115,12 +3127,14 @@ class Class_product {
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
 
+    // onDoorTypeChange必須放在賦值之後再執行
+    this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
+
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
     this.callAllReq();
-    // onDoorTypeChange必須放在賦值之後再執行
-    this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
+
     this.reRender();
   }
 
@@ -3341,12 +3355,14 @@ class Class_product {
 
     // this.callRetrieveCreProdCom();
     // this.reRender();
+    // onDoorTypeChange必須放在賦值之後再執行
+    // this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
+
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
     this.callAllReq();
-    // onDoorTypeChange必須放在賦值之後再執行
-    // this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
+
     this.reRender();
   }
   //
@@ -3869,6 +3885,102 @@ class Class_product {
 
     return body;
   }
+
+  //-----------------------------------------
+
+  async updateBoxD() {
+    const reqBody: TgetBoxDParams = {
+      modelName: this.doorType,
+      rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
+      sidePlateSizeB: Number(this.boxB_mm),
+      hp: this.horsepower,
+      motorVendor: this.motor,
+    };
+
+    try {
+      this.isLoading = true;
+      const res = await apiGetboxD(reqBody);
+
+      if (res) {
+        const sidePlateSizeD = res?.sidePlateSizeD;
+        this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+      }
+    } catch (error) {
+      // const err = error as Error;
+      // myAlert.err({ title: '取得boxD失敗', content: err.message });
+      this._prodData.boxD = '0';
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async callSideEffect(
+    action:
+      | 'fullWidth'
+      | 'height'
+      | 'W'
+      | 'boxB'
+      | 'quantity'
+      | 'typhoonProtection'
+      | 'doorTrackSilencerStrip'
+      | 'bottomBarAngleIron'
+      | 'bottomBarPlate'
+    // | string
+  ) {
+    if (this.isSpecialProd) {
+      // this.reRender();
+
+      return;
+    }
+
+    switch (action) {
+      case 'fullWidth':
+        this.callAllReq();
+        break;
+
+      case 'W':
+        this.callAllReq();
+        break;
+
+      case 'height':
+        this.callAllReq();
+        break;
+
+      // case 'boxB':
+      //   await this.updateBoxD();
+      //   this.callAllReq();
+      //   this.callRetrieveCreProdCom();
+      //   break;
+
+      // case 'doorTrack':
+      //   this.callAllReq();
+      //   this.callRetrieveCreProdCom();
+      //   break;
+
+      // case 'horsepower':
+      //   this.callAllReq();
+      //   this.callRetrieveCreProdCom();
+      //   break;
+
+      case 'quantity':
+        this._quantity === '0' && this.callAllReq();
+
+        break;
+
+      // case 'typhoonProtection':
+      //   this.callAllReq();
+      //   break;
+
+      // case 'doorTrackSilencerStrip':
+      //   this.callAllReq();
+      //   break;
+
+      default:
+        break;
+    }
+
+    this.reRender();
+  } // callSideEffect
 
   //-----------------------------------------
 } // Class_product close

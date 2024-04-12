@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import classNames from 'classnames';
 import Image from 'next/image';
-import _ from 'lodash';
+import _, { inRange } from 'lodash';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -631,12 +631,33 @@ function DndRow({
               };
             }
 
+            // const productReqChain = () => {
+            //   if (
+            //     key === 'fullWidth' ||
+            //     key === 'height' ||
+            //     key === 'W' ||
+            //     key === 'boxB' ||
+            //     key === 'quantity' ||
+            //     key === 'typhoonProtection' ||
+            //     key === 'doorTrackSilencerStrip' ||
+            //     key === 'bottomBarAngleIron' ||
+            //     key === 'bottomBarPlate'
+            //   ) {
+            //     item.reqChain?.();
+            //   }
+            // };
+
             //____
             return (
               <div
                 key={key}
                 className={classNames(scss.column, isHidden && scss.hidden)}
                 style={{ width: inputSelProps.wrapperStyle?.width }}
+                onBlur={() => {
+                  console.log('onBlur', key);
+
+                  item.callSideEffect?.(key);
+                }}
               >
                 <InputSel disabled={theDisabled} showBaseline="auto" {...inputSelProps} />
               </div>
