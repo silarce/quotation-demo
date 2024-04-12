@@ -19,7 +19,8 @@
  * 
  * calcProdAllprice_timeout
  *
- *
+ * callAllReq
+ * reqChain
  * req_calcGeneralSpec
  * req_getProdAvailableComponents
  * reqProdGenerateDoorProductBom
@@ -27,8 +28,8 @@
  * 
 
   WG = fullWidth-gapA-gapC
-  G = guideRailG
-  W = WG - G -G // 沒有多打，要減掉兩個G
+  G = guideRailG + guideRailG
+  W = WG - guideRailG -guideRailG 
 
  */
 
@@ -123,6 +124,8 @@ import {
   calcProductWG_withWAndG,
   findBDoptions,
 } from 'js/utils/product/calc';
+
+import { checkIsFloat } from 'js/utils/checkValue';
 
 // =============================================================================
 // type
@@ -322,6 +325,8 @@ class Class_product {
     this._unitPrice = String(this._prodData.unitPrice);
     this._totalPrice = String(this._prodData.totalPrice);
 
+    this._bounceDoorWidth = new Decimal(this._prodData.bounceDoorWidth).div(1000).toString();
+
     this.parentProd = parentProd;
 
     // this.findBDoptions();
@@ -398,6 +403,8 @@ class Class_product {
   private _dualPrice;
   private _unitPrice;
   private _totalPrice;
+
+  private _bounceDoorWidth;
 
   private defaultMotorSpecs: TdoorGeneralSpecsMotorDto | undefined = undefined;
 
@@ -1240,7 +1247,7 @@ class Class_product {
       if (!this.callAllTimeoutId) {
         this.isLoading = false;
       }
-    }, 800);
+    }, 150);
   }
 
   // ---------------------------------------------------------
@@ -1515,7 +1522,7 @@ class Class_product {
 
     this.timeoutId_retrieveCreProdCom = setTimeout(() => {
       this.retrieveCreProdCom();
-    }, 100);
+    }, 0);
   }
 
   takeDefaultDynaValue() {
@@ -1995,15 +2002,38 @@ class Class_product {
   /**變更角鐵與底座版 */
 
   changeBottomBarAngleIronAndBottomBarPlate(
-    // v: '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
-    v: string
+    v: string // '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
   ) {
     const list_bottomBarAngleIron = _.keyBy<Toption>(this.options_bottomBarAngleIron, 'material');
     const list_bottomBarPlate = _.keyBy<Toption>(this.options_bottomBarPlate, 'material');
 
-    const bottomBarAngleIron = list_bottomBarAngleIron[v]?.value || '';
-    const bottomBarPlate = list_bottomBarPlate[v]?.value || '';
+    // _________________________________________________________________
+    const bottomBarAngleIron = list_bottomBarAngleIron[v]?.value ?? '';
+    const bottomBarPlate = list_bottomBarPlate[v]?.value ?? '';
 
+    // // _________________________________________________________________
+    // if (v === '高耐鍍鋅鋼板') {
+    //   const v2 = '鍍鋅鋼板';
+
+    //   if (!bottomBarAngleIron) {
+    //     bottomBarAngleIron = list_bottomBarAngleIron[v2]?.value ?? '';
+    //   }
+
+    //   if (!bottomBarPlate) {
+    //     bottomBarPlate = list_bottomBarPlate[v2]?.value ?? '';
+    //   }
+    // }
+
+    // // _________________________________________________________________
+    // if (!bottomBarAngleIron) {
+    //   bottomBarAngleIron = list_bottomBarAngleIron['SST#304'].value ?? '';
+    // }
+
+    // if (!bottomBarPlate) {
+    //   bottomBarPlate = list_bottomBarPlate['SST#304'].value ?? '';
+    // }
+
+    // // _________________________________________________________________
     this.bottomBarAngleIron = bottomBarAngleIron;
     this.bottomBarPlate = bottomBarPlate;
   }
@@ -2189,34 +2219,29 @@ class Class_product {
     let options = options_surface_onlyPaint;
 
     const isSST = checkIsSST(this.material);
+    const isGalvanized = checkIsGalvanized(this.material); // 是否鍍鋅
 
     if (isSST) {
       options = options_surface;
     }
 
-    if (this.doorType !== 'SJ-305D') {
+    if (!isGalvanized && this.doorType !== 'SJ-305D') {
       options = options.filter((item) => {
         return item.value !== '無烤漆';
       });
     }
+
+    // if (this.doorType !== 'SJ-305D') {
+    //   options = options.filter((item) => {
+    //     return item.value !== '無烤漆';
+    //   });
+    // }
 
     return options;
   }
 
   /**底座角鐵 */
   get options_bottomBarAngleIron() {
-    if (this._prodData.doorType === 'SJ-302') {
-      return optionsCreator_bottomBarAngleIron();
-    }
-
-    if (this._prodData.doorType === 'SJ-303A') {
-      return optionsCreator_bottomBarAngleIron_303A();
-    }
-
-    if (this._prodData.doorType === 'SJ-303AS') {
-      return optionsCreator_bottomBarAngleIron_303AS();
-    }
-
     const doorType = this._prodData.doorType as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
 
     return lookup_options_bottomBarAngleIronAndPlate[doorType]?.angleIron() ?? [];
@@ -2225,20 +2250,6 @@ class Class_product {
     const doorType = this._prodData.doorType as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
 
     return lookup_options_bottomBarAngleIronAndPlate[doorType]?.plate() ?? [];
-
-    // if (this._prodData.doorType === 'SJ-302') {
-    //   return optionsCreator_bottomBarPlate();
-    // }
-
-    // if (this._prodData.doorType === 'SJ-303A') {
-    //   return optionsCreator_bottomBarPlate_303A();
-    // }
-
-    // if (this._prodData.doorType === 'SJ-303AS') {
-    //   return optionsCreator_bottomBarPlate_303AS();
-    // }
-
-    // return [];
   }
 
   get options_boxB() {
@@ -2448,13 +2459,14 @@ class Class_product {
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
-    this.callAllReq();
+    // this.callAllReq();
     // onDoorTypeChange必須放在賦值之後再執行
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
     this.reRender();
   }
-  /**全寬 */
+
+  // 全寬
   get fullWidth() {
     return this._prodData.fullWidth;
   }
@@ -2476,7 +2488,7 @@ class Class_product {
     // this.calcChangeAccePrice();
     // this.clearProd();
     this.shouldCall_cgs = true;
-    this.callAllReq();
+    // this.callAllReq();
 
     this.reRender();
   }
@@ -2594,7 +2606,7 @@ class Class_product {
 
     this.shouldCall_cgs = true;
     this.shouldCall_pgpb = true;
-    this.callAllReq();
+    // this.callAllReq();
 
     this.reRender();
   }
@@ -2628,36 +2640,41 @@ class Class_product {
       }
       // ________________________
 
-      const reqBody: TgetBoxDParams = {
-        modelName: this.doorType,
-        rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
-        sidePlateSizeB: Number(this.boxB_mm),
-        hp: this.horsepower,
-        motorVendor: this.motor,
-      };
+      // const reqBody: TgetBoxDParams = {
+      //   modelName: this.doorType,
+      //   rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
+      //   sidePlateSizeB: Number(this.boxB_mm),
+      //   hp: this.horsepower,
+      //   motorVendor: this.motor,
+      // };
 
-      try {
-        this.isLoading = true;
-        const res = await apiGetboxD(reqBody);
+      // try {
+      //   this.isLoading = true;
+      //   const res = await apiGetboxD(reqBody);
 
-        if (res) {
-          const sidePlateSizeD = res?.sidePlateSizeD;
-          this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
-        }
-      } catch (error) {
-        // const err = error as Error;
-        // myAlert.err({ title: '取得boxD失敗', content: err.message });
-        this._prodData.boxD = '0';
-      } finally {
-        this.isLoading = false;
-      }
+      //   if (res) {
+      //     const sidePlateSizeD = res?.sidePlateSizeD;
+      //     this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+      //   }
+      // } catch (error) {
+      //   // const err = error as Error;
+      //   // myAlert.err({ title: '取得boxD失敗', content: err.message });
+      //   this._prodData.boxD = '0';
+      // } finally {
+      //   this.isLoading = false;
+      // }
+
+      // await this.updateBoxD();
+      await this.updateBoxD();
 
       this.area = this.calcArea();
 
-      this.callRetrieveCreProdCom();
+      // this.callRetrieveCreProdCom();
 
       this.shouldCall_pgpb = true;
+
       this.callAllReq();
+      this.callRetrieveCreProdCom();
 
       this.reRender();
     };
@@ -2677,29 +2694,31 @@ class Class_product {
       }
       // ________________________
 
-      const reqBody: TgetBoxDParams = {
-        modelName: this.doorType,
-        rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
-        sidePlateSizeB: Number(this.boxB_mm),
-        hp: this.horsepower,
-        motorVendor: this.motor,
-      };
+      // const reqBody: TgetBoxDParams = {
+      //   modelName: this.doorType,
+      //   rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
+      //   sidePlateSizeB: Number(this.boxB_mm),
+      //   hp: this.horsepower,
+      //   motorVendor: this.motor,
+      // };
 
-      try {
-        this.isLoading = true;
-        const res = await apiGetboxD(reqBody);
+      // try {
+      //   this.isLoading = true;
+      //   const res = await apiGetboxD(reqBody);
 
-        if (res) {
-          const sidePlateSizeD = res?.sidePlateSizeD;
-          this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
-        }
-      } catch (error) {
-        // const err = error as Error;
-        // myAlert.err({ title: '取得boxD失敗', content: err.message });
-        this._prodData.boxD = '0';
-      } finally {
-        this.isLoading = false;
-      }
+      //   if (res) {
+      //     const sidePlateSizeD = res?.sidePlateSizeD;
+      //     this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+      //   }
+      // } catch (error) {
+      //   // const err = error as Error;
+      //   // myAlert.err({ title: '取得boxD失敗', content: err.message });
+      //   this._prodData.boxD = '0';
+      // } finally {
+      //   this.isLoading = false;
+      // }
+
+      await this.updateBoxD();
 
       this.area = this.calcArea();
       this.reRender();
@@ -2863,6 +2882,18 @@ class Class_product {
       this.comList.slat.surface_withCheckOptions = v;
     }
 
+    if (this.comList?.headBox) {
+      this.comList.headBox.surface_withCheckOptions = v;
+    }
+
+    if (this.comList?.guideRail) {
+      this.comList.guideRail.surface_withCheckOptions = v;
+    }
+
+    // if (this.comList?.bottomBar) {
+    //   this.comList.bottomBar.surface_withCheckOptions = v;
+    // }
+
     this.reRender();
   }
 
@@ -2893,6 +2924,7 @@ class Class_product {
       })
     );
 
+    this.callAllReq();
     this.callRetrieveCreProdCom();
 
     this.reRender();
@@ -2933,8 +2965,10 @@ class Class_product {
 
     this.changeDistributionBoxPrice_byHorsepower();
     this.changePhase_byHorsepower();
-    // this.toSetDefaultBoxB();
+
+    this.callAllReq();
     this.callRetrieveCreProdCom();
+
     this.reRender();
   }
 
@@ -2970,7 +3004,7 @@ class Class_product {
       this.shouldCall_cgs = true;
       this.shouldCall_pac = true;
       this.shouldCall_pgpb = true;
-      this.callAllReq();
+      // this.callAllReq();
     }
 
     this.reRender();
@@ -3093,12 +3127,14 @@ class Class_product {
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
 
+    // onDoorTypeChange必須放在賦值之後再執行
+    this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
+
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
     this.callAllReq();
-    // onDoorTypeChange必須放在賦值之後再執行
-    this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
+
     this.reRender();
   }
 
@@ -3127,23 +3163,18 @@ class Class_product {
 
   // 單位為公尺
   get bounceDoorWidth() {
-    if (!this._prodData.bounceDoorWidth) {
-      return '';
-    } else {
-      const bounceDoorWidth_m = new Decimal(this._prodData.bounceDoorWidth).div(1000).toString();
-
-      return bounceDoorWidth_m;
-    }
+    return this._bounceDoorWidth || '';
   }
 
   // 輸入的單位預期為公尺
   set bounceDoorWidth(str) {
-    if (!str) {
-      this._prodData.bounceDoorWidth = 0;
-    } else {
-      const bounceDoorWidth_mm = new Decimal(str).mul(1000).toNumber();
-      this._prodData.bounceDoorWidth = bounceDoorWidth_mm;
+    if (str && !checkIsFloat(str, 3)) {
+      return;
     }
+
+    this._bounceDoorWidth = str;
+    const bounceDoorWidth_mm = new Decimal(this._bounceDoorWidth || 0).mul(1000).toNumber();
+    this._prodData.bounceDoorWidth = bounceDoorWidth_mm;
 
     this.reRender();
   }
@@ -3324,12 +3355,14 @@ class Class_product {
 
     // this.callRetrieveCreProdCom();
     // this.reRender();
+    // onDoorTypeChange必須放在賦值之後再執行
+    // this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
+
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
     this.callAllReq();
-    // onDoorTypeChange必須放在賦值之後再執行
-    // this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
+
     this.reRender();
   }
   //
@@ -3854,6 +3887,102 @@ class Class_product {
   }
 
   //-----------------------------------------
+
+  async updateBoxD() {
+    const reqBody: TgetBoxDParams = {
+      modelName: this.doorType,
+      rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
+      sidePlateSizeB: Number(this.boxB_mm),
+      hp: this.horsepower,
+      motorVendor: this.motor,
+    };
+
+    try {
+      this.isLoading = true;
+      const res = await apiGetboxD(reqBody);
+
+      if (res) {
+        const sidePlateSizeD = res?.sidePlateSizeD;
+        this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+      }
+    } catch (error) {
+      // const err = error as Error;
+      // myAlert.err({ title: '取得boxD失敗', content: err.message });
+      this._prodData.boxD = '0';
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async callSideEffect(
+    action:
+      | 'fullWidth'
+      | 'height'
+      | 'W'
+      | 'boxB'
+      | 'quantity'
+      | 'typhoonProtection'
+      | 'doorTrackSilencerStrip'
+      | 'bottomBarAngleIron'
+      | 'bottomBarPlate'
+    // | string
+  ) {
+    if (this.isSpecialProd) {
+      // this.reRender();
+
+      return;
+    }
+
+    switch (action) {
+      case 'fullWidth':
+        this.callAllReq();
+        break;
+
+      case 'W':
+        this.callAllReq();
+        break;
+
+      case 'height':
+        this.callAllReq();
+        break;
+
+      // case 'boxB':
+      //   await this.updateBoxD();
+      //   this.callAllReq();
+      //   this.callRetrieveCreProdCom();
+      //   break;
+
+      // case 'doorTrack':
+      //   this.callAllReq();
+      //   this.callRetrieveCreProdCom();
+      //   break;
+
+      // case 'horsepower':
+      //   this.callAllReq();
+      //   this.callRetrieveCreProdCom();
+      //   break;
+
+      case 'quantity':
+        this._quantity === '0' && this.callAllReq();
+
+        break;
+
+      // case 'typhoonProtection':
+      //   this.callAllReq();
+      //   break;
+
+      // case 'doorTrackSilencerStrip':
+      //   this.callAllReq();
+      //   break;
+
+      default:
+        break;
+    }
+
+    this.reRender();
+  } // callSideEffect
+
+  //-----------------------------------------
 } // Class_product close
 
 // ===========================================================
@@ -4027,6 +4156,17 @@ const checkIsSST = (material: string) => {
   }
 
   return isSST;
+};
+
+// 檢查是否鍍鋅
+const checkIsGalvanized = (material: string) => {
+  let isGalvanized = false;
+
+  if (material.includes('鍍鋅')) {
+    isGalvanized = true;
+  }
+
+  return isGalvanized;
 };
 
 const creOptions_surface: () => Toption[] = () => optionsCreator_surface();

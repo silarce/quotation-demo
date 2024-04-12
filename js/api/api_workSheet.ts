@@ -4,6 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { axi } from './_axiosCreator';
 
 import { createUseApi_array_infinite } from './apiClientHookCreator';
+import { createUseInfinite } from './createUseInfinite';
 
 // type
 import {
@@ -35,6 +36,8 @@ export type {
   TcreateQuotationRangeDto,
   TworksheetDto as TworkSheetDto,
   TcreateWorksheetDto as TcreateWorkSheetDto,
+  TannotationDto,
+  TquotationRangeDto,
 };
 
 // ==========================================================================
@@ -90,6 +93,11 @@ export const useGetAnnotation_v2 = createUseApi_array_infinite({
   defaultParams: defaultParams_anno,
 });
 
+export const useGetAnnotation_infinite = createUseInfinite({
+  apiClient: apiGetAnnotation,
+  errTitle: '取得報價單備註列表失敗',
+});
+
 export const apiPostAnnotation = ({ body }: { body: TcreateAnnotationDto }) => {
   const api = '/work-sheet/presets/annotations';
 
@@ -137,6 +145,11 @@ const defaultParams_qr: Tparams = {
 export const useGetQuotationRanges_v2 = createUseApi_array_infinite({
   apiClient: apiGetQuotationRanges,
   defaultParams: defaultParams_qr,
+});
+
+export const useGetQuotationRanges_infinite = createUseInfinite({
+  apiClient: apiGetQuotationRanges,
+  errTitle: '取得報價單報價範圍列表失敗',
 });
 
 export const apiPostQuotationRanges = ({ body }: { body: TcreateAnnotationDto }) => {

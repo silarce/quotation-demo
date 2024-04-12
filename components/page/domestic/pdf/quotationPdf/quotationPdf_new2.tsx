@@ -11,7 +11,7 @@ import Header from './header';
 import Profile, { Tprofile } from './profile';
 import Table, { TtableProdList, TtableProdListItem } from './table';
 import Table_quoteTypeSum, { TquoteTypeSumList } from './table_quoteTypeSum';
-import Total from './total';
+import Total, { TmemoArr, Tsettlement } from './total';
 import Other from './other';
 
 // global gear
@@ -973,7 +973,7 @@ export default function QuotationPdf({
 }
 
 // ========================================================================
-// typeA 用在只有一頁的情況
+
 const PdfTypeA = ({
   refPdf,
   productArr,
@@ -984,7 +984,11 @@ const PdfTypeA = ({
   refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>;
   productArr: TtableProdList;
   profilePram: Tprofile;
-  totalPram: Parameters<typeof Total>[0];
+  totalPram: {
+    memoArr: TmemoArr;
+    settlement: Tsettlement;
+  };
+  //
   otherPram: Parameters<typeof Other>[0];
 }) => {
   const chunkedList: TtableProdList[] = [[]];
@@ -1071,6 +1075,14 @@ const PdfTypeA = ({
     <>
       {/* 每一頁 */}
       {chunkedList.map((chunk, index) => {
+        let subTotal_page_Decimal = new Decimal(0);
+        chunk.forEach((item) => {
+          const priceTotal = item.priceTotal.replaceAll(',', '');
+          subTotal_page_Decimal = subTotal_page_Decimal.add(priceTotal);
+        });
+
+        const subTotal_page = subTotal_page_Decimal.toNumber().toLocaleString(undefined, { maximumFractionDigits: 2 });
+
         return (
           <Fragment key={index}>
             {index !== 0 && <hr className={scss.hr} />}
@@ -1081,7 +1093,14 @@ const PdfTypeA = ({
                 <Table productList={chunk} />
               </div>
               <div>
-                <Total memoArr={totalPram.memoArr} settlement={totalPram.settlement} />
+                <Total
+                  //
+                  memoArr={totalPram.memoArr}
+                  settlement={totalPram.settlement}
+                  page={index + 1}
+                  totalPage={pageCount}
+                  subTotal_page={subTotal_page}
+                />
                 <Other quoteRangeArr={otherPram.quoteRangeArr} payInfo={otherPram.payInfo} attn={otherPram.attn} />
               </div>
             </div>
@@ -1093,10 +1112,16 @@ const PdfTypeA = ({
           <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[0] = ele)}>
             <div>
               <Header />
-              <Profile profileData={profilePram} index={1} pageCount={1} />
+              <Profile profileData={profilePram} index={1} pageCount={pageCount} />
             </div>
             <div>
-              <Total memoArr={totalPram.memoArr} settlement={totalPram.settlement} />
+              <Total
+                //
+                memoArr={totalPram.memoArr}
+                settlement={totalPram.settlement}
+                page={1}
+                totalPage={pageCount}
+              />
               <Other quoteRangeArr={otherPram.quoteRangeArr} payInfo={otherPram.payInfo} attn={otherPram.attn} />
             </div>
           </div>
@@ -1106,7 +1131,7 @@ const PdfTypeA = ({
   );
 };
 
-// typeB 用在多頁的情況
+// ========================================================================
 const PdfTypeB = ({
   refPdf,
   productArr,
@@ -1117,7 +1142,10 @@ const PdfTypeB = ({
   refPdf: React.MutableRefObject<(HTMLDivElement | null)[]>;
   productArr: TtableProdList_series;
   profilePram: Tprofile;
-  totalPram: Parameters<typeof Total>[0];
+  totalPram: {
+    memoArr: TmemoArr;
+    settlement: Tsettlement;
+  };
   otherPram: Parameters<typeof Other>[0];
 }) => {
   const chunkedList = chunkProdArr({ productArr, rowLimit: 35 });
@@ -1161,7 +1189,13 @@ const PdfTypeB = ({
           <Table_quoteTypeSum quoteTypeSumArr={quoteTypeSumArr} />
         </div>
         <div>
-          <Total memoArr={totalPram.memoArr} settlement={totalPram.settlement} />
+          <Total
+            //
+            memoArr={totalPram.memoArr}
+            settlement={totalPram.settlement}
+            page={1}
+            totalPage={pageCount}
+          />
           <Other quoteRangeArr={otherPram.quoteRangeArr} payInfo={otherPram.payInfo} attn={otherPram.attn} />
         </div>
       </div>
