@@ -49,9 +49,23 @@ axi.interceptors.response.use(
           });
           console.log('401，沒有權限');
           break;
+
         case 404:
           console.log('404錯誤');
           break;
+
+        case 429:
+          // myAlert.warning({ title: '短時間內呼叫太多次請求', content: '請兩分鐘後再次嘗試' });
+
+          const pathname = window.location.pathname;
+          const origin = window.location.origin;
+
+          if (pathname !== '/errorProcess/429') {
+            window.location.href = `${origin}/errorProcess/429`;
+          }
+
+          break;
+
         case 500:
           console.log('500錯誤');
           break;

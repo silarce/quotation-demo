@@ -129,7 +129,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     return null;
   }
 
-  if ((!userInfo || !userErpFeature) && router.route !== '/login') {
+  if ((!userInfo || !userErpFeature) && router.route !== '/login' && router.route !== '/errorProcess/429') {
     router.push('/login');
 
     return null;

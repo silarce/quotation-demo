@@ -120,13 +120,13 @@ export default function Contract() {
         id: item.id,
         // quotationId: content.quotationNumber,
         quotationId: item.contractNumber ?? '',
-        clientName: content.customer.name,
+        clientName: content.customer?.name ?? '',
         quotationName: content.projectName,
         discount: item.discount,
         priceTotal: String(item.total),
         contactPerson: content.contactPerson,
         contactPhone: content.contactNumber,
-        attn: content.agentEmployee.chName,
+        attn: content.agentEmployee?.chName ?? '',
         viewRef_bottom: index === dataArr.length - 5 ? viewRef_bottom : undefined,
       };
     }) ?? [];

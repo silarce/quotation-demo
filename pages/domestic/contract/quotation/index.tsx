@@ -291,6 +291,7 @@ version>1 是子合約
     addString: () => {},
     delString: () => {},
     addStrArr: () => {},
+    replaceStrArr: () => {},
   };
 
   const control_qr: TsummaryControl = {
@@ -299,6 +300,7 @@ version>1 是子合約
     addString: () => {},
     delString: () => {},
     addStrArr: () => {},
+    replaceStrArr: () => {},
   };
 
   const payInfoControl: TpayInfoControl = {

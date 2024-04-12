@@ -271,7 +271,7 @@ const RowArr = ({
                 <span>{date}</span>
               </div>
               <div className={scss.right}>
-                <span>{customer.name}</span>
+                <span>{customer?.name}</span>
                 <div>
                   <Image src={iconPlace} alt="" className="mr-[5px]" />
                   <span>{county}</span>

@@ -11,10 +11,11 @@ import scss from './summary.module.scss';
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
 // gear
-import WorkSheetSelector from 'components/global/gear/modal/workSheetSelector';
+// import WorkSheetSelector from 'components/global/gear/modal/workSheetSelector';
+import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // type
-import { TgetAnnotation, TgetQuotataionRanges } from 'js/api/api_workSheet';
+// import { TgetAnnotation, TgetQuotataionRanges } from 'js/api/api_workSheet';
 
 type Tcontrol = {
   stringArr: string[];
@@ -22,8 +23,32 @@ type Tcontrol = {
   addString: (v: string) => void;
   delString: (index: number) => void;
   addStrArr: (vArr: string[]) => void;
+  replaceStrArr: (vArr: string[]) => void;
 };
 
+// ===============================================================================
+
+const AnnoSelectorGroup = selectModalCreator_multi<['annotation']>({
+  selectorArr: [
+    {
+      key: 'annotation',
+      caption: '備註',
+      // limit: 1,
+    },
+  ],
+});
+
+const RangeSelectorGroup = selectModalCreator_multi<['quotationRange']>({
+  selectorArr: [
+    {
+      key: 'quotationRange',
+      caption: '報價範圍',
+      // limit: 1,
+    },
+  ],
+});
+
+// ===============================================================================
 export default function Summary({
   // legacyContract,
   appendixParams,
@@ -56,14 +81,25 @@ export default function Summary({
     setShow_anno(false);
   };
 
-  const onConfirm_anno = (v: TgetAnnotation['data']) => {
-    const vArr = v.map((item) => item.description);
+  // const onConfirm_anno = (v: TgetAnnotation['data']) => {
+  //   const vArr = v.map((item) => item.description);
+
+  //   if (!vArr[0]) {
+  //     vArr[0] = '';
+  //   }
+
+  //   control_anno.addStrArr(vArr);
+  // };
+
+  const onConfirm_anno = (arr: { description: string }[]) => {
+    const vArr = arr.map((item) => item.description);
 
     if (!vArr[0]) {
       vArr[0] = '';
     }
 
-    control_anno.addStrArr(vArr);
+    // control_anno.addStrArr(vArr);
+    control_anno.replaceStrArr(vArr);
   };
 
   const showQrSelector = () => {
@@ -74,14 +110,14 @@ export default function Summary({
     setShow_qr(false);
   };
 
-  const onConfirm_qr = (v: TgetQuotataionRanges['data']) => {
-    const vArr = v.map((item) => item.description);
+  const onConfirm_qr = (arr: { description: string }[]) => {
+    const vArr = arr.map((item) => item.description);
 
     if (!vArr[0]) {
       vArr[0] = '';
     }
 
-    control_qr.addStrArr(vArr);
+    control_qr.replaceStrArr(vArr);
   };
 
   // --------------------
@@ -95,6 +131,22 @@ export default function Summary({
     showSelector: showQrSelector,
   };
 
+  const defalutAnno = annoObj.stringArr.map((str, index) => {
+    return {
+      // 選擇器需要id建立list
+      id: String(index),
+      description: str,
+    };
+  });
+
+  const defaultQrArr = quoteRangeObj.stringArr.map((str, index) => {
+    return {
+      // 選擇器需要id建立list
+      id: String(index),
+      description: str,
+    };
+  });
+
   // ====================================================
   return (
     <div className={scss.container}>
@@ -107,21 +159,45 @@ export default function Summary({
         <PayInfo disabled={disabled} control={payInfoControl} />
       </div>
 
-      <WorkSheetSelector
+      {/* <WorkSheetSelector
         label="備註"
         tip="可複選、可不選(按確定即可)"
         showModal={show_anno}
         onConfirm={onConfirm_anno}
         onCancel={cancelAnnoSelector}
         apiFamily="annotation"
-      />
-      <WorkSheetSelector
+      /> */}
+      {/* <WorkSheetSelector
         label="報價範圍"
         tip="可複選、可不選(按確定即可)"
         showModal={show_qr}
         onConfirm={onConfirm_qr}
         onCancel={cancelQrSelector}
         apiFamily="quotationRanges"
+      /> */}
+      <AnnoSelectorGroup
+        //
+        showModal={show_anno}
+        onConfirm={(arr) => {
+          onConfirm_anno(arr[0]);
+        }}
+        onCancel={cancelAnnoSelector}
+        // TODO 以後再處理型別問題，selectModalCreator_multi
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        defaultSeletedDataArrArr={[defalutAnno]}
+      />
+
+      <RangeSelectorGroup
+        showModal={show_qr}
+        onConfirm={(arr) => {
+          onConfirm_qr(arr[0]);
+        }}
+        onCancel={cancelQrSelector}
+        // TODO 以後再處理型別問題，selectModalCreator_multi
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        defaultSeletedDataArrArr={[defaultQrArr]}
       />
     </div>
   );
