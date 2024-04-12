@@ -85,7 +85,7 @@ export default function BudgetList({
           const quotationContent: TBodyItemContent = {
             ...latestContent,
             customerName: latestContent.customer?.name ?? '',
-            agentEmployeeName: latestContent.agentEmployee.chName || latestContent.agentEmployee.enName,
+            agentEmployeeName: (latestContent.agentEmployee?.chName || latestContent.agentEmployee?.enName) ?? '',
             totalPrice: latestContent.total,
             // viewRef_bottom: viewRef_bottom,
             viewRef_bottom: index === quotationArr.length - 5 ? viewRef_bottom : undefined,

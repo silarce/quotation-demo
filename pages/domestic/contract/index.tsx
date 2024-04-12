@@ -126,7 +126,7 @@ export default function Contract() {
         priceTotal: String(item.total),
         contactPerson: content.contactPerson,
         contactPhone: content.contactNumber,
-        attn: content.agentEmployee.chName,
+        attn: content.agentEmployee?.chName ?? '',
         viewRef_bottom: index === dataArr.length - 5 ? viewRef_bottom : undefined,
       };
     }) ?? [];

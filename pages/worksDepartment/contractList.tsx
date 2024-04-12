@@ -186,7 +186,7 @@ export default function WdContractList() {
       customerName: content.customer?.name ?? '',
       contactName: content.contactPerson,
       contactNumber: content.contactNumber,
-      agentName: content.agentEmployee.chName,
+      agentName: content.agentEmployee?.chName ?? '',
       date: content.quotationDate,
       county: content.county,
       projectName: content.projectName,
