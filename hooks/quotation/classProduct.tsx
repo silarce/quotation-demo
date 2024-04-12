@@ -1522,7 +1522,7 @@ class Class_product {
 
     this.timeoutId_retrieveCreProdCom = setTimeout(() => {
       this.retrieveCreProdCom();
-    }, 150);
+    }, 0);
   }
 
   takeDefaultDynaValue() {
