@@ -153,7 +153,7 @@ export default function WdContractList() {
       const obj: Tcontract = {
         contractId: contract.id,
         contractNumber: contractNumber ?? '',
-        customerName: customer.name,
+        customerName: customer?.name ?? '',
         contactName: contactPerson,
         contactNumber: contactNumber,
         agentName: agentEmployee.chName || agentEmployee.enName || '',

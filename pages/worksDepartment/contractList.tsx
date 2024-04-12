@@ -183,7 +183,7 @@ export default function WdContractList() {
       contractId: item.id,
       // quotationNumber: content.quotationNumber,
       contractNumber: contractNumber ?? '',
-      customerName: content.customer.name,
+      customerName: content.customer?.name ?? '',
       contactName: content.contactPerson,
       contactNumber: content.contactNumber,
       agentName: content.agentEmployee.chName,

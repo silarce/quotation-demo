@@ -1693,7 +1693,7 @@ export type TquotationContentDto = {
 
   quotationDate: string; // 報價日期
   validityPeriod: string; // 報價時效
-  customer: TcustomerDto;
+  customer?: TcustomerDto;
   projectName: string; // 工程名稱
   county: string; // 縣市
   district: string; // 區

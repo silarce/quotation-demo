@@ -50,7 +50,7 @@ type TquotationProfile = {
   contactPerson: string; //  聯絡人
   contactNumber: string; //  聯絡電話
   faxNumber: string; // 傳真號碼
-  customer: TcustomerDto;
+  customer?: TcustomerDto;
   trackProgress: string;
   projectProgress: string;
 };
