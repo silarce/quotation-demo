@@ -11,11 +11,11 @@ import scss from './summary.module.scss';
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
 // gear
-import WorkSheetSelector from 'components/global/gear/modal/workSheetSelector';
+// import WorkSheetSelector from 'components/global/gear/modal/workSheetSelector';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // type
-import { TgetAnnotation, TgetQuotataionRanges } from 'js/api/api_workSheet';
+// import { TgetAnnotation, TgetQuotataionRanges } from 'js/api/api_workSheet';
 
 type Tcontrol = {
   stringArr: string[];
@@ -167,14 +167,14 @@ export default function Summary({
         onCancel={cancelAnnoSelector}
         apiFamily="annotation"
       /> */}
-      <WorkSheetSelector
+      {/* <WorkSheetSelector
         label="報價範圍"
         tip="可複選、可不選(按確定即可)"
         showModal={show_qr}
         onConfirm={onConfirm_qr}
         onCancel={cancelQrSelector}
         apiFamily="quotationRanges"
-      />
+      /> */}
       <AnnoSelectorGroup
         //
         showModal={show_anno}
