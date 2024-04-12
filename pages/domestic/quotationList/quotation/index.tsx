@@ -261,67 +261,67 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [anno, setAnnotation] = useState<string[]>([]);
   const [qr, setQr] = useState<string[]>([]);
 
-  const onDoorTypeChange = ({
-    annoShouldRemove,
-    annoArr,
-    qrShouldRemove,
-    qrArr,
-  }: {
-    annoShouldRemove: string[] | undefined;
-    annoArr: string[] | undefined;
-    qrShouldRemove: string[] | undefined;
-    qrArr: string[] | undefined;
-  }) => {
-    setAnnotation((anno) => {
-      let annoCopy = [...anno];
+  // const onDoorTypeChange = ({
+  //   annoShouldRemove,
+  //   annoArr,
+  //   qrShouldRemove,
+  //   qrArr,
+  // }: {
+  //   annoShouldRemove: string[] | undefined;
+  //   annoArr: string[] | undefined;
+  //   qrShouldRemove: string[] | undefined;
+  //   qrArr: string[] | undefined;
+  // }) => {
+  //   setAnnotation((anno) => {
+  //     let annoCopy = [...anno];
 
-      // 把應該被移除拿掉
-      if (annoShouldRemove) {
-        annoShouldRemove.forEach((asmStr) => {
-          const delIndex = annoCopy.findIndex((str) => asmStr === str);
+  //     // 把應該被移除拿掉
+  //     if (annoShouldRemove) {
+  //       annoShouldRemove.forEach((asmStr) => {
+  //         const delIndex = annoCopy.findIndex((str) => asmStr === str);
 
-          if (delIndex > -1) {
-            annoCopy.splice(delIndex, 1);
-          }
-        });
-      }
+  //         if (delIndex > -1) {
+  //           annoCopy.splice(delIndex, 1);
+  //         }
+  //       });
+  //     }
 
-      // 把新的放進去，並拿掉重複的值
-      if (annoArr) {
-        annoCopy = [...annoCopy, ...annoArr];
-        // annoCopy = [...new Set(annoCopy)];
-        annoCopy = _.uniq(annoCopy);
-      }
+  //     // 把新的放進去，並拿掉重複的值
+  //     if (annoArr) {
+  //       annoCopy = [...annoCopy, ...annoArr];
+  //       // annoCopy = [...new Set(annoCopy)];
+  //       annoCopy = _.uniq(annoCopy);
+  //     }
 
-      return annoCopy;
-    });
+  //     return annoCopy;
+  //   });
 
-    setQr((qr) => {
-      let qrCopy = [...qr];
+  //   setQr((qr) => {
+  //     let qrCopy = [...qr];
 
-      // 把應該被移除拿掉
-      if (qrShouldRemove) {
-        qrShouldRemove.forEach((asmStr) => {
-          const delIndex = qrCopy.findIndex((str) => asmStr === str);
+  //     // 把應該被移除拿掉
+  //     if (qrShouldRemove) {
+  //       qrShouldRemove.forEach((asmStr) => {
+  //         const delIndex = qrCopy.findIndex((str) => asmStr === str);
 
-          if (delIndex > -1) {
-            qrCopy.splice(delIndex, 1);
-          }
-        });
-      }
+  //         if (delIndex > -1) {
+  //           qrCopy.splice(delIndex, 1);
+  //         }
+  //       });
+  //     }
 
-      // 把新的放進去，並拿掉重複的值
-      if (qrArr) {
-        qrCopy = [...qrCopy, ...qrArr];
-        // qrCopy = [...new Set(qrCopy)];
-        qrCopy = _.uniq(qrCopy);
-      }
+  //     // 把新的放進去，並拿掉重複的值
+  //     if (qrArr) {
+  //       qrCopy = [...qrCopy, ...qrArr];
+  //       // qrCopy = [...new Set(qrCopy)];
+  //       qrCopy = _.uniq(qrCopy);
+  //     }
 
-      return qrCopy;
-    });
+  //     return qrCopy;
+  //   });
 
-    // setAnnotation(annoCopy);
-  };
+  //   // setAnnotation(annoCopy);
+  // };
 
   // -----------------------------------------------------
   // 資料
@@ -705,7 +705,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     productArr: latestContent?.products,
     others: latestContent?.others,
     resetTrigger: quotationData ?? quotationContentData,
-    onDoorTypeChange: onDoorTypeChange,
+    // onDoorTypeChange: onDoorTypeChange, // 棄用
     quotationDiscount: Number(summary.discountRate || '100'),
   });
 
@@ -860,6 +860,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
         return copy;
       });
     },
+    replaceStrArr: (strArr: string[]) => {
+      setAnnotation(strArr);
+    },
   };
 
   const control_qr: TsummaryControl = {
@@ -895,6 +898,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         return copy;
       });
+    },
+    replaceStrArr: (strArr: string[]) => {
+      setQr(strArr);
     },
   };
 
@@ -1689,7 +1695,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           pathname: '/domestic/contract',
         });
       } else {
-        await update();
+        // await update();
       }
     } catch (error) {
       const err = error as Error;
@@ -1982,6 +1988,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
+
   return (
     <div className={classNames(style.container, 'relative')}>
       <PageHeader02 tagList={tagList} customeLeft={customeLeft} panelList={panelList} />

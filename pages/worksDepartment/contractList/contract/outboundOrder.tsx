@@ -906,7 +906,7 @@ export default function OutboundOrder({
             B: new Decimal(item.boxB).div(1000).toString(),
             qty: '1',
             implementQty: '???',
-            cai: item.volume,
+            cai: item.volume ?? '',
             totalCai: '',
             doorType: item.doorModelName,
             material: item.materialName,

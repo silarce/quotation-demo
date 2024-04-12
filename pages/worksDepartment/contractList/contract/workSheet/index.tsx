@@ -1,23 +1,12 @@
 // 工作表
 
-// 按下計算按鈕會呼叫targetSheet.calcProd()
-
 // 為了使用useControl_pdf，在useGetContract_id的populate中
 // 設置了
 // 'worksheet.latestRecord.contractProductItems.components'
 // 'worksheet.latestRecord.contractProductItems.accessories'
 // 未來可能會有效能的問題，之後要找時間處理
 
-// TODO component的過濾與取得bom資料還沒做
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-// !!! component的過濾與取得bom資料還沒做 !!!
-
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
@@ -53,6 +42,7 @@ import {
   Form_product_bottomBar,
   Form_product_sidePlate,
   Form_product_accessories,
+  Form_product_other,
   //
   WorksheetTable,
 } from 'components/page/worksDepartment/worksheet/productForm/productForm';
@@ -164,6 +154,8 @@ export default function Worksheet({
   userInfo: TuserDto;
 }) {
   // ----------------------------------------------------------------
+  const ref_main = useRef<HTMLDivElement>(null!);
+  // ----------------------------------------------------------------
   let havePermissionToEdit = false;
   isAdmin && (havePermissionToEdit = true);
   userErpFeature?.some((item) => {
@@ -266,13 +258,13 @@ export default function Worksheet({
     }))
   );
 
-  const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
-    useShallow((state) => ({
-      shouldCalcData: state.shouldCalcData,
-      shouldCalcData2: state.shouldCalcData2,
-      calcData_2: state.calcData_2,
-    }))
-  );
+  // const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
+  //   useShallow((state) => ({
+  //     shouldCalcData: state.shouldCalcData,
+  //     shouldCalcData2: state.shouldCalcData2,
+  //     calcData_2: state.calcData_2,
+  //   }))
+  // );
 
   // -------------------------------------------------------------------------
 
@@ -324,6 +316,7 @@ export default function Worksheet({
         await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
         await refreshData();
         setDisabled(true);
+        ref_main.current.scrollIntoView();
       } catch (error) {
       } finally {
         setIsLoading(false);
@@ -605,7 +598,7 @@ export default function Worksheet({
         height: height_m,
         qty: String(qty),
         material: materialName,
-        isAntiTyphoon: isAntiTyphoon,
+        isAntiTyphoon: isAntiTyphoon ?? false,
 
         reviewSalesName: reviewSalesEmployee?.chName ?? '',
         reviewSalesStatus,
@@ -723,7 +716,7 @@ export default function Worksheet({
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />
         <div className={scss.subTitle}>工程項目</div>
-        <div className={scss.main}>
+        <div ref={ref_main} className={scss.main}>
           {/* left */}
           <div className={scss.left}>
             {control_productCardArr.map((control_productCard, index) => {
@@ -739,15 +732,7 @@ export default function Worksheet({
           {/* targetSheet */}
           <div className={classNames(scss.right)}>
             {activeWorksheetId && !activeRecordData && <RecordList control={control_recordList} />}
-            {activeRecordData && (
-              <WorksheetForm
-                shouldCalcData={shouldCalcData}
-                shouldCalcData2={shouldCalcData2}
-                calcData_2={calcData_2}
-                reqPatchWorkSheet={reqPatchWorkSheet}
-                disabled={disabled}
-              />
-            )}
+            {activeRecordData && <WorksheetForm reqPatchWorkSheet={reqPatchWorkSheet} disabled={disabled} />}
           </div>
           {/* right */}
         </div>
@@ -822,29 +807,21 @@ export default function Worksheet({
 
 const WorksheetForm = ({
   //
-  shouldCalcData,
-  shouldCalcData2,
-  calcData_2,
   reqPatchWorkSheet,
   disabled,
 }: {
-  shouldCalcData: boolean;
-  shouldCalcData2: boolean;
-  calcData_2: () => void;
   reqPatchWorkSheet: () => void;
   disabled?: boolean;
 }) => {
   // // 這個做法畫面會閃一下 不理想
-  // const [isMounted, setIsMounted] = useState(false);
-  // useEffect(() => {
-  //   setIsMounted(true);
 
-  //   return () => {
-  //     if (isMounted) {
-  //       onUnMount?.();
-  //     }
-  //   };
-  // }, []);
+  const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
+    useShallow((state) => ({
+      shouldCalcData: state.shouldCalcData,
+      shouldCalcData2: state.shouldCalcData2,
+      calcData_2: state.calcData_2,
+    }))
+  );
 
   return (
     <form className={scss.productForm}>
@@ -863,16 +840,18 @@ const WorksheetForm = ({
           <Form_product_guideRail disabled={disabled} />
           <Form_product_bottomBar disabled={disabled} />
           <Form_product_sidePlate disabled={disabled} />
+          <Form_product_other disabled={disabled} />
         </div>
-        {shouldCalcData && <div className={scss.cover}></div>}
+        <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
       </div>
       <div>
         <Form_product_accessories disabled={disabled} />
       </div>
-      <div className={classNames(disabled && 'hidden')}>
-        <MyButton_v2 px="px32" className="block m-auto " onClick={calcData_2}>
+      <div className={classNames('relative', disabled && 'hidden')}>
+        <MyButton_v2 px="px32" className={classNames('block m-auto')} onClick={calcData_2}>
           取得剩餘資料
         </MyButton_v2>
+        <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
       </div>
       <div className="relative">
         <WorksheetTable />
@@ -882,7 +861,7 @@ const WorksheetForm = ({
         <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
           確認上傳
         </MyButton_v2>
-        {shouldCalcData2 && <div className={scss.cover}></div>}
+        <div className={classNames(scss.cover, !shouldCalcData2 && 'hidden')}></div>
       </div>
     </form>
   );
@@ -891,56 +870,6 @@ const WorksheetForm = ({
 // ===========================================================================
 // ===========================================================================
 // ============================================================================
-
-/**
- *
- * 一體式捲箱 true === 方形捲箱
- * false ==="捲箱 + 機箱"
- *
- * 方向 數量加方向 2右 6左 8左   這樣
- * 捲箱的角鐵尺寸為 WG + gapA + gapC - 10
- *
- * 門軌的防颱先全部放-50
- * 捲箱角鐵數量由使用者輸入
- *
- *
- * 電動機與支版的方向是一樣的
- * 所以記錄在product就好了
- *
- *
- *
-根據PDF缺的欄位而需要新增的property
-方向 角鐵數量 彎直
-另外要新增的欄位
-
-開單日 date string
-出貨日 date string
-
-捲箱
-正面 string
-有無凸 string
-角鐵數量 number
-
-支版
-鍊條 string 應該是不可編輯的欄位
-方向 string
-
-電動機
-鍊條型式 string
-方向 string
-
-門軌
-型式 string
-
-
-
-
-
-另外開單日期與出貨日期還不知道要帶入什麼值
- 
-馬達荷重怎麼算
- 
- */
 
 const useControl_profile = (engineeringContact: TengineeringContactDto | undefined | null): Tcontrol_profile => {
   const control_profile = useMemo(() => {
@@ -1024,11 +953,6 @@ const polyfillContractProductItems = (pre_contractProductItems: TquotationProduc
 };
 
 // ===========================================================================
-// 角鐵尺吋
-// String(Number(this.WG_mm) + Number(this._prod.gapA) + Number(this._prod.gapC) - 10);
-
-// 門片厚度 _prod.thickness
-// ===========================================================================
 // ===========================================================================
 // ===========================================================================
 // ===========================================================================
@@ -1043,7 +967,7 @@ const polyfillContractProductItems = (pre_contractProductItems: TquotationProduc
 // ===========================================================================
 
 type TcomponentList = {
-  [key: string]: TquotationProductComponentDto;
+  [key: string]: TquotationProductComponentDto | undefined;
 };
 
 const useControl_pdf = ({
@@ -1123,18 +1047,18 @@ const useControl_pdf = ({
           ),
           // form: sheet.headBoxForm_str,
           form: item.isIntegratedHeadBox ? '一體式捲箱' : '捲箱 + 機箱',
-          surface: componentList.headBox.materialSurface ?? '',
+          surface: componentList.headBox?.materialSurface ?? '',
         },
         doorPiece: {
-          material: componentList.slat.material,
-          surface: componentList.slat.materialSurface ?? '',
+          material: componentList.slat?.material ?? '',
+          surface: componentList.slat?.materialSurface ?? '',
           thickness: item.thickness ?? '',
           slatLength: String(item.slatLength ?? '0'),
           slatCount: String(item.slatCount ?? '0'),
           antyTyphoonHook: item.isAntiTyphoon ? '有' : '無',
         },
         motor: {
-          vendor: item.motorVendor,
+          vendor: item.motorVendor ?? '',
           /**相數加電壓 */
           phaseVoltage: phaseVoltage,
           horsepower: item.horsepower,
@@ -1142,15 +1066,15 @@ const useControl_pdf = ({
         },
         guideRail: {
           form: item.isAntiTyphoon ? '防颱' : '一般',
-          material: componentList.guideRail.material,
+          material: componentList.guideRail?.material ?? '',
           guideRailLength: String(item.guideRailLength ?? ''),
-          guideRailName: item.guideRail,
+          guideRailName: item.guideRail ?? '',
           icon: item?.guideRail
             ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item?.guideRail}`
             : undefined,
           antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
           bendStraight: item.guideRailType ?? '',
-          surface: componentList.guideRail.materialSurface ?? '',
+          surface: componentList.guideRail?.materialSurface ?? '',
         },
         chainCog: {
           sprocketWheelModel: item.sprocketWheelModel ?? '',
@@ -1161,9 +1085,9 @@ const useControl_pdf = ({
           eyesQuantity: '', // 未知 // 在廠務部工作表 目數
         },
         base: {
-          material: componentList.bottomBar.material,
+          material: componentList.bottomBar?.material ?? '',
           guideRailsOpening: String(item.guideRailsOpening ?? ''),
-          surface: componentList.bottomBar.materialSurface ?? '', // 未知 在廠務部工作表
+          surface: componentList.bottomBar?.materialSurface ?? '', // 未知 在廠務部工作表
         },
         sidePlate: {
           direction: item.sidePlateDirection ?? '',

@@ -817,6 +817,9 @@ latestContentProdArr為這次追加追減的主產品
         return copy;
       });
     },
+    replaceStrArr: (strArr: string[]) => {
+      setAnnotation(strArr);
+    },
   };
 
   const control_qr: TsummaryControl = {
@@ -852,6 +855,9 @@ latestContentProdArr為這次追加追減的主產品
 
         return copy;
       });
+    },
+    replaceStrArr: (strArr: string[]) => {
+      setQr(strArr);
     },
   };
 

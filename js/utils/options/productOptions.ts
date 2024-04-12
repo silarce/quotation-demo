@@ -43,18 +43,18 @@ export const optionsCreator_category = (props: { haveEmpty?: boolean } = {}): To
 export const optionsCreator_doorModel = (props: { haveEmpty?: boolean } = {}): Toption[] => {
   const { haveEmpty } = props;
   const arr = [
-    { quoteType: '捲門', value: 'SJ-302' as const, label: 'SJ-302 電動防火捲門P:110', name: '電動防火捲門P:110' },
-    { quoteType: '捲門', value: 'SJ-312' as const, label: 'SJ-312 重型防颱捲門P:120', name: '重型防颱捲門P:120' },
+    { quoteType: '捲門', value: 'SJ-302' as const, label: 'SJ-302 電動防火捲門', name: '電動防火捲門' },
+    { quoteType: '捲門', value: 'SJ-312' as const, label: 'SJ-312 重型防颱捲門', name: '重型防颱捲門' },
     { quoteType: '捲門', value: 'SJ-303S' as const, label: 'SJ-303S 遮煙捲簾', name: '遮煙捲簾' },
     { quoteType: '捲門', value: 'SJ-305D' as const, label: 'SJ-305D 花格型捲門', name: '花格型捲門' },
-    { quoteType: '捲門', value: 'SJ-120A' as const, label: 'SJ-120A 120A葉片式阻熱捲門', name: '120A葉片式阻熱捲門' },
-    { quoteType: '捲門', value: 'SJ-303A' as const, label: 'SJ-303A 60A葉片式阻熱捲門', name: '60A葉片式阻熱捲門' },
-    { quoteType: '捲門', value: 'SJ-303F' as const, label: 'SJ-303F 60A折疊式阻熱捲門', name: '60A折疊式阻熱捲門' },
+    { quoteType: '捲門', value: 'SJ-120A' as const, label: 'SJ-120A 葉片式阻熱捲門', name: '葉片式阻熱捲門' },
+    { quoteType: '捲門', value: 'SJ-303A' as const, label: 'SJ-303A 葉片式阻熱捲門', name: '葉片式阻熱捲門' },
+    { quoteType: '捲門', value: 'SJ-303F' as const, label: 'SJ-303F 折疊式阻熱捲門', name: '折疊式阻熱捲門' },
     {
       quoteType: '捲門',
       value: 'SJ-303AS' as const,
-      label: 'SJ-303AS 60A葉片式阻熱具遮煙性',
-      name: '60A葉片式阻熱具遮煙性',
+      label: 'SJ-303AS 葉片式阻熱具遮煙性',
+      name: '葉片式阻熱具遮煙性',
     },
     { quoteType: '捲門', value: 'SJ-PVC' as const, label: 'SJ-PVC PVC飛迅門', name: 'PVC飛迅門' },
     { quoteType: '捲門', value: 'SJ-OSD' as const, label: 'SJ-OSD 滑升門', name: '滑升門' },
@@ -86,7 +86,7 @@ export const optionsCreator_doorModel = (props: { haveEmpty?: boolean } = {}): T
     // //
     // { quoteType: '機庫門', value: '無資料' as const, label: '無資料', name: '柔性門' },
     // { quoteType: '機庫門', value: '無資料' as const, label: '無資料', name: '橫移式機庫門' },
-    { quoteType: '上折門', value: '重型防颱捲門P:120' as const, label: '重型防颱捲門P:120', name: '重型防颱捲門P:120' },
+    { quoteType: '上折門', value: '重型防颱捲門P:120' as const, label: '重型防颱捲門', name: '重型防颱捲門' },
     { quoteType: '上折門', value: '輕型' as const, label: '輕型', name: '輕型' },
     { quoteType: '上折門', value: '中型' as const, label: '中型', name: '中型' },
     //
@@ -100,6 +100,66 @@ export const optionsCreator_doorModel = (props: { haveEmpty?: boolean } = {}): T
 
   return arr;
 };
+// export const optionsCreator_doorModel = (props: { haveEmpty?: boolean } = {}): Toption[] => {
+//   const { haveEmpty } = props;
+//   const arr = [
+//     { quoteType: '捲門', value: 'SJ-302' as const, label: 'SJ-302 電動防火捲門P:110', name: '電動防火捲門P:110' },
+//     { quoteType: '捲門', value: 'SJ-312' as const, label: 'SJ-312 重型防颱捲門P:120', name: '重型防颱捲門P:120' },
+//     { quoteType: '捲門', value: 'SJ-303S' as const, label: 'SJ-303S 遮煙捲簾', name: '遮煙捲簾' },
+//     { quoteType: '捲門', value: 'SJ-305D' as const, label: 'SJ-305D 花格型捲門', name: '花格型捲門' },
+//     { quoteType: '捲門', value: 'SJ-120A' as const, label: 'SJ-120A 120A葉片式阻熱捲門', name: '120A葉片式阻熱捲門' },
+//     { quoteType: '捲門', value: 'SJ-303A' as const, label: 'SJ-303A 60A葉片式阻熱捲門', name: '60A葉片式阻熱捲門' },
+//     { quoteType: '捲門', value: 'SJ-303F' as const, label: 'SJ-303F 60A折疊式阻熱捲門', name: '60A折疊式阻熱捲門' },
+//     {
+//       quoteType: '捲門',
+//       value: 'SJ-303AS' as const,
+//       label: 'SJ-303AS 60A葉片式阻熱具遮煙性',
+//       name: '60A葉片式阻熱具遮煙性',
+//     },
+//     { quoteType: '捲門', value: 'SJ-PVC' as const, label: 'SJ-PVC PVC飛迅門', name: 'PVC飛迅門' },
+//     { quoteType: '捲門', value: 'SJ-OSD' as const, label: 'SJ-OSD 滑升門', name: '滑升門' },
+//     { quoteType: '捲門', value: 'SJ-HSD' as const, label: 'SJ-HSD 快速捲門', name: '快速捲門' },
+//     { quoteType: '捲門', value: 'SJ-FDS' as const, label: 'SJ-FDS 電動防水捲門', name: '電動防水捲門' },
+//     { quoteType: '捲門', value: 'SJ-60BS' as const, label: 'SJ-60BS 防火遮煙捲簾', name: '防火遮煙捲簾' },
+//     //
+//     { quoteType: '伸縮大門', value: 'L' as const, label: 'L L型電動大門', name: 'L型電動大門' },
+//     { quoteType: '伸縮大門', value: 'S' as const, label: 'S S型電動大門', name: 'S型電動大門' },
+//     { quoteType: '伸縮大門', value: 'SL1' as const, label: 'SL1 1300伸縮', name: '1300伸縮' },
+//     { quoteType: '伸縮大門', value: 'SL2' as const, label: 'SL2 1500伸縮', name: '1500伸縮' },
+//     { quoteType: '伸縮大門', value: 'SM' as const, label: 'SM 1750伸縮', name: '1750伸縮' },
+//     { quoteType: '伸縮大門', value: 'SH' as const, label: 'SH 1950伸縮', name: '1950伸縮' },
+//     { quoteType: '伸縮大門', value: 'SX' as const, label: 'SX 伸縮大門', name: '伸縮大門' },
+//     { quoteType: '伸縮大門', value: 'SS' as const, label: 'SS S型小門', name: 'S型小門' },
+//     //
+//     { quoteType: '水閘門', value: 'W1' as const, label: 'W1 扇形水閘門', name: '扇形水閘門' },
+//     { quoteType: '水閘門', value: 'W2' as const, label: 'W2 插板水閘門', name: '插板水閘門' },
+//     { quoteType: '水閘門', value: 'W3' as const, label: 'W3 電動油壓水閘門', name: '電動油壓水閘門' },
+//     { quoteType: '水閘門', value: 'W4' as const, label: 'W4 水密門', name: '水密門' },
+//     { quoteType: '水閘門', value: 'W5' as const, label: 'W5 無框水閘門', name: '無框水閘門' },
+//     { quoteType: '水閘門', value: 'W6' as const, label: 'W6 溝渠式水閘門', name: '溝渠式水閘門' },
+//     //
+//     { quoteType: '客製化', value: 'SP' as const, label: 'SP 特殊大門', name: '特殊大門' },
+//     //
+//     // { quoteType: '上折門', value: '無資料' as const, label: '無資料', name: '重型防颱捲門P:120' },
+//     // { quoteType: '上折門', value: '無資料' as const, label: '無資料', name: '輕型' },
+//     // { quoteType: '上折門', value: '無資料' as const, label: '無資料', name: '中型' },
+//     // //
+//     // { quoteType: '機庫門', value: '無資料' as const, label: '無資料', name: '柔性門' },
+//     // { quoteType: '機庫門', value: '無資料' as const, label: '無資料', name: '橫移式機庫門' },
+//     { quoteType: '上折門', value: '重型防颱捲門P:120' as const, label: '重型防颱捲門P:120', name: '重型防颱捲門P:120' },
+//     { quoteType: '上折門', value: '輕型' as const, label: '輕型', name: '輕型' },
+//     { quoteType: '上折門', value: '中型' as const, label: '中型', name: '中型' },
+//     //
+//     { quoteType: '機庫門', value: '柔性門' as const, label: '柔性門', name: '柔性門' },
+//     { quoteType: '機庫門', value: '橫移式機庫門' as const, label: '橫移式機庫門', name: '橫移式機庫門' },
+//   ];
+
+//   if (haveEmpty) {
+//     addEmpty(arr);
+//   }
+
+//   return arr;
+// };
 
 /**後端可以接收的門型 */
 export const optionsCreator_doorModel_2 = (props: { haveEmpty?: boolean } = {}): Toption[] => {
@@ -146,7 +206,7 @@ export const optionsCreator_doorForm = (props: { haveEmpty?: boolean } = {}): To
 export const optionsCreator_quoteType = (props: { haveEmpty?: boolean } = {}): Toption[] => {
   const { haveEmpty } = props;
   const arr = [
-    { value: '捲門' as const, label: '捲門' },
+    { value: '捲門', label: '捲門' },
     // { value: '伸縮大門' as const, label: '伸縮大門' },
     // { value: '水閘門' as const, label: '水閘門' },
     // { value: '上折門' as const, label: '上折門' },
@@ -473,6 +533,14 @@ export const optionsCreator_front = createOptionsCreator({
     { value: '無', label: '無' },
     { value: '正雲白', label: '正雲白' },
     { value: '正乳白', label: '正乳白' },
+  ],
+});
+
+// 馬達品牌
+export const optionsCreator_motorVender = createOptionsCreator({
+  optionsArr: [
+    { value: '東元', label: '東元' },
+    { value: '大同', label: '大同' },
   ],
 });
 
