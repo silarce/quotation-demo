@@ -198,7 +198,7 @@ export default function Budget() {
           quoteDate: moment(convertDate_reduce1911(latestContent.quotationDate)).format('yy-MM-DD'),
           county: latestContent.county,
           projectName: latestContent.projectName,
-          customerName: latestCustomer?.name,
+          customerName: latestCustomer?.name ?? '',
           contactPerson: latestContent.contactPerson,
           contactPhoneNumber: latestContent.contactNumber,
           href: href_head,
@@ -256,7 +256,7 @@ export default function Budget() {
             quoteDate: moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD'),
             county: county,
             projectName: projectName,
-            customerName: customer?.name,
+            customerName: customer?.name ?? '',
             href: href_body,
           };
         });

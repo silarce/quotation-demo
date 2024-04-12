@@ -1314,8 +1314,8 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | un
 
   // const quotationStatus = quotationStatusLookup[status] ?? '';
 
-  const customerName = customer.name;
-  const agentName = agentEmployee.chName;
+  const customerName = customer?.name ?? '';
+  const agentName = agentEmployee?.chName ?? '';
 
   const allAddress = county + district + address;
 

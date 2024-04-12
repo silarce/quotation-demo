@@ -1693,7 +1693,7 @@ export type TquotationContentDto = {
 
   quotationDate: string; // 報價日期
   validityPeriod: string; // 報價時效
-  customer: TcustomerDto;
+  customer?: TcustomerDto;
   projectName: string; // 工程名稱
   county: string; // 縣市
   district: string; // 區
@@ -1705,7 +1705,7 @@ export type TquotationContentDto = {
   status: TquotationStatus; // 報價單狀態: 預算 投標 發包 合約 準合約
   managerEmployee: TemployeeDto | null;
   supervisorEmployee: TemployeeDto | null;
-  agentEmployee: TemployeeDto;
+  agentEmployee?: TemployeeDto;
 
   //審核相關
   reviewSalesEmployee: TemployeeDto | null;

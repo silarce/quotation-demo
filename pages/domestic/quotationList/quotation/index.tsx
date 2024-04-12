@@ -1689,7 +1689,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           pathname: '/domestic/contract',
         });
       } else {
-        await update();
+        // await update();
       }
     } catch (error) {
       const err = error as Error;
