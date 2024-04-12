@@ -27,6 +27,14 @@ import { useGetEngineeringContact_all, TengineeringContactDto } from 'js/api/api
 // api useNoMeta // useNoMeta為api回應沒有meta特性的api hook
 import { TdailyReportItem_my, useGetDaily_worker_date } from 'js/api/api_dailyReport';
 
+import {
+  //
+  useGetAnnotation_infinite,
+  TannotationDto,
+  useGetQuotationRanges_infinite,
+  TquotationRangeDto,
+} from 'js/api/api_workSheet';
+
 // ======================================================================
 
 type TtypeLookup = {
@@ -35,6 +43,8 @@ type TtypeLookup = {
   employee_worksDepartment: Exclude<(typeof props_employee_worksDepartment)['dataType'], undefined>;
   dailyReport_workers_item: Exclude<(typeof props_dailyReport_workers_item)['dataType'], undefined>;
   engineeringContact: Exclude<(typeof props_engineeringContact)['dataType'], undefined>;
+  annotation: Exclude<(typeof props_annotation)['dataType'], undefined>;
+  quotationRange: Exclude<(typeof props_quotationRange)['dataType'], undefined>;
   // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
 };
@@ -637,7 +647,124 @@ const props_engineeringContact: TselectorProps<TengineeringContactDto> = {
   ],
 };
 
+const props_annotation: TselectorProps<TannotationDto> = {
+  useInfinit: useGetAnnotation_infinite,
+  selectedKey: 'description',
+  caption: '報價單備註',
+  configArr: [
+    {
+      key: 'category',
+      width: 150,
+      thead: {
+        label: '類別',
+      },
+    },
+    {
+      key: 'doorModelName',
+      width: 150,
+      thead: {
+        label: '門型',
+      },
+    },
+    // {
+    //   key: 'type',
+    //   width: 150,
+    //   thead: {
+    //     label: '型式',
+    //   },
+    // },
+    {
+      key: 'description',
+      flex: 'auto',
+      thead: {
+        label: '內容',
+      },
+    },
+  ],
+  searchInputSelPropsArr: [
+    {
+      inputProps: {
+        props: {
+          placeholder: '門型',
+        },
+      },
+    },
+    {
+      inputProps: {
+        props: {
+          placeholder: '內容',
+        },
+      },
+    },
+  ],
+  filter: (strArr) => {
+    return {
+      doorModelName: { $contains: strArr[0] },
+      description: { $contains: strArr[1] },
+    };
+  },
+};
+
+const props_quotationRange: TselectorProps<TannotationDto> = {
+  useInfinit: useGetAnnotation_infinite,
+  selectedKey: 'description',
+  caption: '報價單報價範圍',
+  configArr: [
+    {
+      key: 'category',
+      width: 150,
+      thead: {
+        label: '類別',
+      },
+    },
+    {
+      key: 'doorModelName',
+      width: 150,
+      thead: {
+        label: '門型',
+      },
+    },
+    // {
+    //   key: 'type',
+    //   width: 150,
+    //   thead: {
+    //     label: '型式',
+    //   },
+    // },
+    {
+      key: 'description',
+      flex: 'auto',
+      thead: {
+        label: '內容',
+      },
+    },
+  ],
+  searchInputSelPropsArr: [
+    {
+      inputProps: {
+        props: {
+          placeholder: '門型',
+        },
+      },
+    },
+    {
+      inputProps: {
+        props: {
+          placeholder: '內容',
+        },
+      },
+    },
+  ],
+  filter: (strArr) => {
+    return {
+      doorModelName: { $contains: strArr[0] },
+      description: { $contains: strArr[1] },
+    };
+  },
+};
+
 // ---
+// w   記得要上去修改TtypeLookup
 // w   propsLookup 與 TtypeLookup的key必須一致
 // w   propsLookup 與 TtypeLookup的key必須一致
 // w   propsLookup 與 TtypeLookup的key必須一致
@@ -657,6 +784,13 @@ const propsLookup = {
   engineeringContact: () => {
     return _.cloneDeep(props_engineeringContact);
   },
+  annotation: () => {
+    return _.cloneDeep(props_annotation);
+  },
+  quotationRange: () => {
+    return _.cloneDeep(props_quotationRange);
+  },
+
   // test: () => {
   //   return _.cloneDeep(props_outsourcing);
   // },
