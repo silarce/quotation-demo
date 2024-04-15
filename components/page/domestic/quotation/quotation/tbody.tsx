@@ -654,8 +654,6 @@ function DndRow({
                 className={classNames(scss.column, isHidden && scss.hidden)}
                 style={{ width: inputSelProps.wrapperStyle?.width }}
                 onBlur={() => {
-                  console.log('onBlur', key);
-
                   item.callSideEffect?.(key);
                 }}
               >

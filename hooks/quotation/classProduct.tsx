@@ -2444,7 +2444,15 @@ class Class_product {
     const isMaterailInOptions = check_isValueInOptions(this.material, this.options_material ?? []);
     const is304InOptions = check_isValueInOptions('SST#304', this.options_material ?? []);
 
-    if (is304InOptions) {
+    if (v === 'SJ-305D') {
+      const theOption = this.options_material?.find((option) => {
+        if (option.value.includes('內SST') && option.value.includes('外SST')) {
+          return true;
+        }
+      });
+
+      this.material = theOption?.value ?? '';
+    } else if (is304InOptions) {
       this.material = 'SST#304';
     } else if (!isMaterailInOptions && this.options_material) {
       this.material = this.options_material?.[0]?.value ?? '';
