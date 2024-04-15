@@ -2301,7 +2301,7 @@ class Class_product {
       return;
     }
 
-    if ((v as string) === '') {
+    if (v === '') {
       v = '0';
     }
 
@@ -2309,11 +2309,15 @@ class Class_product {
       v = '500';
     }
 
-    if (v.split('.')[1]?.length > 3) {
+    // if (v.split('.')[1]?.length > 3) {
+    //   return;
+    // }
+
+    if (!checkIsFloat(v, 3)) {
       return;
     }
 
-    this._prodData.discount = `${Number(v)}`;
+    this._prodData.discount = v;
 
     // 因為折數改變了，所以選配設定的價格要重新計算
     this.calcAllPrice_comAndSubComAndAcce();
