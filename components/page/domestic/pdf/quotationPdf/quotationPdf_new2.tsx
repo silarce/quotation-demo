@@ -587,6 +587,9 @@ export default function QuotationPdf({
         ) {
           material = 'SST304#';
         }
+        // else if (material === '黑鐵') {
+        //   material = '鍍鋅';
+        // }
 
         const qty_num = Number(qty.replaceAll(',', ''));
         const unitPrice_num = Number(unitPrice.replaceAll(',', ''));
@@ -1411,7 +1414,8 @@ const quotationProdToTableProdList = ({
       });
 
       // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
-      if (material === '高耐鍍鋅鋼板') {
+      // 21204-04-12 材料為鐵材烤漆(value為黑鐵)時，也視為鍍鋅鋼板
+      if (material === '高耐鍍鋅鋼板' || material === '黑鐵') {
         material = '鍍鋅鋼板';
       }
 
