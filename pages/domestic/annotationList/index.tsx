@@ -33,13 +33,13 @@ import { Tparams } from 'js/api/dtoTypes';
 import {
   Toption,
   optionsCreator_category,
-  optionsCreator_doorModel_2,
+  optionsCreator_doorModelName,
   optionsCreator_doorForm,
 } from 'js/utils/options/productOptions';
 
 // ==========================================================================
 const optionsCategory = optionsCreator_category({ haveEmpty: true });
-const optionsDoorModel = optionsCreator_doorModel_2({ haveEmpty: true });
+const optionsDoorModel = optionsCreator_doorModelName({ haveEmpty: true });
 const optionsDoorForm = optionsCreator_doorForm({ haveEmpty: true });
 
 type Tfilter = Partial<Pick<TannotationDto, 'category' | 'doorModelName' | 'type' | 'description'>>;

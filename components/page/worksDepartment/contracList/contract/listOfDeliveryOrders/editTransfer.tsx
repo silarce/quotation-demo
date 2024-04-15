@@ -13,8 +13,8 @@ import style from './listOfDeliveryOrders.module.scss';
 import { Toption } from 'js/utils/options/options';
 
 // other
-import { optionsCreator_doorModel_2 } from 'js/utils/options/productOptions';
-const optionMaterial = optionsCreator_doorModel_2();
+import { optionsCreator_doorModelName } from 'js/utils/options/productOptions';
+const optionMaterial = optionsCreator_doorModelName();
 
 // ========================================================
 
