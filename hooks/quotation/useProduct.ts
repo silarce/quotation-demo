@@ -63,6 +63,7 @@ const useProductList = ({
   onDoorTypeChange,
   productArr_attach,
   quotationDiscount,
+  onDiscountChange,
 }: {
   productArr: TquotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
@@ -75,6 +76,7 @@ const useProductList = ({
   }) => void;
   productArr_attach?: TquotationProductDto[] | undefined;
   quotationDiscount: number;
+  onDiscountChange?: (avgDiscount: number) => void;
 }) => {
   const [render, setRender] = useState(0);
 
@@ -153,134 +155,6 @@ const useProductList = ({
 
       const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
 
-      // const prodData: Tprod = {
-      //   ...prod,
-      //   phase: prod.motorPhase ?? -1,
-      //   voltage: String(prod.motorVoltage),
-      //   motorSupport: prod.hasMotorSupportStand,
-      //   doorTrackThick: String(prod.guideRailThickness),
-      //   rollUpBoxThick: String(prod.headBoxThickness),
-      //   // 取得時是mm，要轉成m
-      //   WG: String(Number(prod.WG) / 1000),
-      //   fullWidth: String(Number(prod.fullWidth) / 1000),
-      //   height: String(Number(prod.height) / 1000),
-      //   boxB: String(Number(prod.boxB) / 1000),
-      //   boxD: String(Number(prod.boxD) / 1000),
-      //   // guideRailG: prod.guideRailG || 0,
-      //   // options: prod.options ?? [],
-
-      //   // quantity: prod.items?.length ?? 0,
-      //   // quantity: prod.quantity ?? 0,
-      //   // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
-      //   accessories: prod.items?.[0]?.accessories ?? [],
-      //   components: prod.items?.[0]?.components ?? [],
-      //   //
-
-      //   doorType: prod.doorModelName,
-      //   material: prod.materialName,
-      //   surface: prod.materialSurface ?? '',
-      //   close: prod.closingType ?? '',
-      //   doorTrack: prod.guideRail ?? '',
-      //   typhoonProtection: prod.isAntiTyphoon ?? false,
-      //   motor: prod.motorVendor ?? '',
-      //   doorTrackSilencerStrip: prod.hasSilencingStrip ?? false,
-      //   onePieceRollUpBox: prod.isIntegratedHeadBox ?? false,
-      //   // thickness: String(prod.thickness ?? ''),
-      //   // bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
-
-      //   // sprocketWheelModel: prod.sprocketWheelModel ?? '',
-      //   // sprocketWheelTeethNumber: prod.sprocketWheelTeethNumber ?? '',
-      //   // sprocketWheelChains: prod.sprocketWheelChains ?? '',
-      //   // bearingInnerDiameter: prod.bearingInnerDiameter ?? '',
-      //   // diameter: prod.diameter ?? '',
-      //   // bearingHousingTotalLength: prod.bearingHousingTotalLength ?? '',
-      //   // guideRailsOpening: prod.guideRailsOpening ?? '',
-      //   // slatLength: prod.slatLength ?? 0,
-      //   // guideRailLength: prod.guideRailLength ?? 0,
-      //   // headBoxLength: prod.headBoxLength ?? 0,
-      //   // bearingHousingSize: prod.bearingHousingSize ?? 0,
-      //   // bearingName: prod.bearingName ?? '',
-      //   // gapA: prod.gapA ?? '',
-      //   // gapC: prod.gapC ?? '',
-      //   // gearNumber: prod.gearNumber ?? '',
-      //   // weight: prod.weight ?? '',
-      //   // isULGuideRail: prod.isULGuideRail ?? false,
-
-      //   // bounceDoorWidth: prod.bounceDoorWidth || 0,
-      //   //
-      //   // distributionBoxQuantity: prod.distributionBoxQuantity ?? 1,
-      //   // distributionBoxDualPrice: prod.distributionBoxDualPrice ?? prod.distributionBoxPrice ?? 0,
-      //   // distributionBoxTotalPrice: prod.distributionBoxTotalPrice ?? prod.distributionBoxUnitPrice ?? 0,
-      //   //
-      //   //
-      //   // area: prod.area ?? '',
-      //   // volume: prod.volume ?? '',
-      //   // bounceDoor: prod.bounceDoor ?? false,
-      //   // motorLockBox: prod.motorLockBox ?? '',
-      //   // rollerSpec: prod.rollerSpec ?? '',
-      //   // bottomBarAngleIron: prod.bottomBarAngleIron ?? '',
-      //   // bottomBarPlate: prod.bottomBarPlate ?? '',
-      //   // distributionBoxPrice: prod.distributionBoxPrice ?? 0,
-      //   // distributionBoxUnitPrice: prod.distributionBoxUnitPrice ?? 0,
-
-      //   //
-      //   //
-      //   //
-      //   area: prod.area ?? '',
-      //   volume: prod.volume ?? '',
-      //   // guideRail: prod.guideRail ?? '',
-      //   // motorVendor: prod.motorVendor ?? '',
-      //   // motorVoltage: prod.motorVoltage ?? '',
-      //   bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
-      //   motorLockBox: prod.motorLockBox ?? '',
-      //   // guideRailThickness: prod.guideRailThickness ?? '',
-      //   rollerSpec: prod.rollerSpec ?? '',
-      //   // hasSilencingStrip: prod.hasSilencingStrip ?? '',
-      //   // isIntegratedHeadBox: prod.isIntegratedHeadBox ?? '',
-      //   // headBoxThickness: prod.headBoxThickness ?? '',
-      //   // isAntiTyphoon: prod.isAntiTyphoon ?? '',
-      //   bounceDoor: prod.bounceDoor ?? false,
-      //   bounceDoorWidth: prod.bounceDoorWidth ?? 0,
-      //   // bounceDoorHeight: prod.bounceDoorHeight ?? '',
-      //   // bounceDoorLength: prod.bounceDoorLength ?? '',
-      //   // closingType: prod.closingType ?? '',
-      //   // motorPhase: prod.motorPhase ?? '',
-      //   bottomBarAngleIron: prod.bottomBarAngleIron ?? '',
-      //   bottomBarPlate: prod.bottomBarPlate ?? '',
-      //   thickness: String(prod.thickness ?? ''),
-      //   distributionBoxPrice: prod.distributionBoxPrice ?? 0,
-      //   distributionBoxUnitPrice: prod.distributionBoxUnitPrice ?? 0,
-      //   distributionBoxQuantity: prod.distributionBoxQuantity ?? 0,
-      //   distributionBoxDualPrice: prod.distributionBoxDualPrice ?? 0,
-      //   distributionBoxTotalPrice: prod.distributionBoxTotalPrice ?? 0,
-      //   installationFeePrice: prod.installationFeePrice ?? 0,
-      //   installationFeeDualPrice: Number(prod.installationFeeDualPrice ?? 0),
-      //   installationFeeQuantity: Number(prod.installationFeeQuantity ?? 0),
-      //   installationFeeUnitPrice: prod.installationFeeUnitPrice ?? 0,
-      //   installationFeeTotalPrice: Number(prod.installationFeeTotalPrice ?? 0),
-      //   // slatCount: prod.slatCount,
-      //   // sprocketWheelModel: prod.sprocketWheelModel,
-      //   // sprocketWheelTeethNumber: prod.sprocketWheelTeethNumber,
-      //   // sprocketWheelChains: prod.sprocketWheelChains,
-      //   // bearingInnerDiameter: prod.bearingInnerDiameter,
-      //   // diameter: prod.diameter,
-      //   // bearingHousingTotalLength: prod.bearingHousingTotalLength,
-      //   // guideRailsOpening: prod.guideRailsOpening,
-      //   // slatLength: prod.slatLength,
-      //   guideRailLength: prod.guideRailLength,
-      //   headBoxLength: prod.headBoxLength,
-      //   bearingHousingSize: prod.bearingHousingSize,
-      //   bearingName: prod.bearingName,
-      //   gapA: prod.gapA,
-      //   gapC: prod.gapC,
-      //   gearNumber: prod.gearNumber,
-      //   weight: prod.weight,
-      //   guideRailG: prod.guideRailG ?? 0,
-      //   isULGuideRail: prod.isULGuideRail ?? false,
-
-      //   //
-      // }; // prodData
-
       list[key] = new Class_product({
         reRender,
         prodData,
@@ -291,6 +165,7 @@ const useProductList = ({
         originProd: prod,
         onDoorTypeChange: onClassDoorTypeChange,
         quotationDiscount: quotationDiscount,
+        onDiscountChange: () => onDiscountChange?.(calcAvgDiscount({ productList: list })),
       });
     });
 
@@ -355,6 +230,7 @@ const useProductList = ({
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
       quotationDiscount: quotationDiscount,
+      onDiscountChange: () => onDiscountChange?.(calcAvgDiscount({ productList: productList })),
     });
     productList[newKey] = classProd;
 
@@ -513,7 +389,7 @@ const useProductList = ({
     }
   }, [calcTrigger]);
 
-  /**修改所有class_product的quotationDiscount */
+  // 修改所有class_product的quotationDiscount
   const changeAllProdQuotationDiscount = (v: number) => {
     Object.values(productList).forEach((prod) => {
       prod.quotationDiscount = v;
@@ -527,8 +403,23 @@ const useProductList = ({
     // component裡面只有紀錄牌價，其他金額都是算出來的
     // 因此即使沒有要變更主產品或總折數，也必須要執行changeAllProdQuotationDiscount
     // 否則若quotationDiscount不是100，component的單價就會錯誤
+
     changeAllProdQuotationDiscount(quotationDiscount);
   }, [quotationDiscount]);
+
+  const calcAvgDiscount = ({ productList }: { productList: TproductList }) => {
+    let discountTotal = new Decimal(0);
+
+    const prodArr = Object.values(productList);
+
+    Object.values(productList).forEach((prod) => {
+      discountTotal = discountTotal.add(prod.discount);
+    });
+
+    const avgDiscount = discountTotal.div(prodArr.length).toDecimalPlaces(3).toNumber();
+
+    return avgDiscount;
+  };
 
   // ---------------------------------------------------------
   /**回到編輯前的狀態，就是以一開始取得的資料重新建立list */
@@ -561,6 +452,7 @@ const useProductList = ({
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
       quotationDiscount: quotationDiscount,
+      onDiscountChange: () => onDiscountChange?.(calcAvgDiscount({ productList: productList_attach })),
     });
     productList_attach[newKey] = classProd;
 
@@ -580,66 +472,6 @@ const useProductList = ({
 
         const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
 
-        // const prodData: Tprod = {
-        //   ...prod,
-        //   phase: prod.motorPhase,
-        //   voltage: String(prod.motorVoltage),
-        //   motorSupport: prod.hasMotorSupportStand,
-        //   doorTrackThick: String(prod.guideRailThickness),
-        //   rollUpBoxThick: String(prod.headBoxThickness),
-        //   // 取得時是mm，要轉成m
-        //   WG: String(Number(prod.WG) / 1000),
-        //   fullWidth: String(Number(prod.fullWidth) / 1000),
-        //   height: String(Number(prod.height) / 1000),
-        //   boxB: String(Number(prod.boxB) / 1000),
-        //   boxD: String(Number(prod.boxD) / 1000),
-        //   guideRailG: prod.guideRailG || 0,
-        //   // options: prod.options ?? [],
-
-        //   // quantity: prod.items?.length ?? 0,
-        //   // quantity: prod.quantity ?? 0,
-        //   // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
-        //   accessories: prod.items?.[0].accessories ?? [],
-        //   components: prod.items?.[0].components ?? [],
-        //   //
-
-        //   doorType: prod.doorModelName,
-        //   material: prod.materialName,
-        //   surface: prod.materialSurface ?? '',
-        //   close: prod.closingType,
-        //   doorTrack: prod.guideRail,
-        //   typhoonProtection: prod.isAntiTyphoon,
-        //   motor: prod.motorVendor,
-        //   doorTrackSilencerStrip: prod.hasSilencingStrip,
-        //   onePieceRollUpBox: prod.isIntegratedHeadBox,
-        //   thickness: String(prod.thickness ?? ''),
-        //   bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
-
-        //   slatCount: prod.slatCount ?? '',
-        //   sprocketWheelModel: prod.sprocketWheelModel ?? '',
-        //   sprocketWheelTeethNumber: prod.sprocketWheelTeethNumber ?? '',
-        //   sprocketWheelChains: prod.sprocketWheelChains ?? '',
-        //   bearingInnerDiameter: prod.bearingInnerDiameter ?? '',
-        //   diameter: prod.diameter ?? '',
-        //   bearingHousingTotalLength: prod.bearingHousingTotalLength ?? '',
-        //   guideRailsOpening: prod.guideRailsOpening ?? '',
-        //   slatLength: prod.slatLength ?? 0,
-        //   guideRailLength: prod.guideRailLength ?? 0,
-        //   headBoxLength: prod.headBoxLength ?? 0,
-        //   bearingHousingSize: prod.bearingHousingSize ?? 0,
-        //   bearingName: prod.bearingName ?? '',
-        //   gapA: prod.gapA ?? '',
-        //   gapC: prod.gapC ?? '',
-        //   gearNumber: prod.gearNumber ?? '',
-        //   weight: prod.weight ?? '',
-        //   isULGuideRail: prod.isULGuideRail ?? false,
-        //   bounceDoorWidth: prod.bounceDoorWidth || 0,
-        //   //
-        //   distributionBoxQuantity: prod.distributionBoxQuantity ?? 1,
-        //   distributionBoxDualPrice: prod.distributionBoxDualPrice ?? prod.distributionBoxPrice,
-        //   distributionBoxTotalPrice: prod.distributionBoxTotalPrice ?? prod.distributionBoxUnitPrice,
-        // };
-
         list[key] = new Class_product({
           reRender,
           prodData,
@@ -649,6 +481,7 @@ const useProductList = ({
           doorModelList,
           originProd: prod,
           onDoorTypeChange: onClassDoorTypeChange,
+          onDiscountChange: () => onDiscountChange?.(calcAvgDiscount({ productList: list })),
           disabled_quantity: true,
           quotationDiscount: quotationDiscount,
         });
@@ -1012,49 +845,46 @@ export type {
   TothersList,
 };
 
-/**
- * get /products/door/models
- * 報價別下拉式選單用這個api給的name，其他都不要給人選
- * 下面這兩個是下拉式選單的選項
- * guideRails.withHook, 這是防颱勾 true必須有防颱才能選 false就是必須非防颱 null就是都可以
- * slatMaterials 這是門片材質(英文的意思不要管)
- *
- *
- * /products/door/calc-general-spec
- * 會用到的似乎只有weight與motors
- * defaultMotorIndex的意思是系統算出來最合適的馬達的index
- *
- * motors.box 裡面有default 東元 大同 如果只有default，那就是東元跟大同都可以，我自己隨便預設一個
- * 如果同時有東元與大同我自己隨便預設一個
- * 如果只有東元或只有大同，那就是東元或大同
- * motors.box..boxB就是 B(m)，選擇馬達後要同步改變B(m)
- * 基本上只有defaultMotorIndex指定的motors.box會有boxB
- * boxD用不到先不管
- *
- * diameter就是卷軸直徑
- * 作為/products/door/available-components 的rollerDiameter引數
- *
- *
- *
- * /products/door/available-components
- * slats就是門片
- * botomBar底座
- *
- * sidePlates 這是支版
- * 軸承跟齒輪先跳過不判定
- *
- * motors.loadWeight 門重不可以大於這個值
- * phase與voltage 如果可以讓使用者選擇就要檢查
- * gearNumber先不管，理論上馬達的gearNumber要跟支版的gearNumber一樣
- *
- * bearingType對應calc-general-spec的bearing name
- *
- */
-
-/**
-目前用於計算價格的方法
-useProducts
-calcSubTotalPrice 計算productlist與otehrs totalPrice的總和`
-這個方法會送到Class_prod與Class_otehrs，於需要時呼叫
-
- */
+//
+// get /products/door/models
+// 報價別下拉式選單用這個api給的name，其他都不要給人選
+// 下面這兩個是下拉式選單的選項
+// guideRails.withHook, 這是防颱勾 true必須有防颱才能選 false就是必須非防颱 null就是都可以
+// slatMaterials 這是門片材質(英文的意思不要管)
+//
+//
+// /products/door/calc-general-spec
+// 會用到的似乎只有weight與motors
+// defaultMotorIndex的意思是系統算出來最合適的馬達的index
+//
+// motors.box 裡面有default 東元 大同 如果只有default，那就是東元跟大同都可以，我自己隨便預設一個
+// 如果同時有東元與大同我自己隨便預設一個
+// 如果只有東元或只有大同，那就是東元或大同
+// motors.box..boxB就是 B(m)，選擇馬達後要同步改變B(m)
+// 基本上只有defaultMotorIndex指定的motors.box會有boxB
+// boxD用不到先不管
+//
+// diameter就是卷軸直徑
+// 作為/products/door/available-components 的rollerDiameter引數
+//
+//
+//
+// /products/door/available-components
+// slats就是門片
+// botomBar底座
+//
+// sidePlates 這是支版
+// 軸承跟齒輪先跳過不判定
+//
+// motors.loadWeight 門重不可以大於這個值
+// phase與voltage 如果可以讓使用者選擇就要檢查
+// gearNumber先不管，理論上馬達的gearNumber要跟支版的gearNumber一樣
+//
+// bearingType對應calc-general-spec的bearing name
+//
+//
+//
+// 目前用於計算價格的方法
+// useProducts
+// calcSubTotalPrice 計算productlist與otehrs totalPrice的總和`
+// 這個方法會送到Class_prod與Class_otehrs，於需要時呼叫

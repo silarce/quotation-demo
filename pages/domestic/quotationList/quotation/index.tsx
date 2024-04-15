@@ -707,6 +707,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
     resetTrigger: quotationData ?? quotationContentData,
     // onDoorTypeChange: onDoorTypeChange, // 棄用
     quotationDiscount: Number(summary.discountRate || '100'),
+    onDiscountChange: (avgDiscount) => {
+      setSummary((state) => {
+        return {
+          ...state,
+          discountRate: String(avgDiscount),
+        };
+      });
+    },
   });
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
