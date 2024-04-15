@@ -2319,8 +2319,13 @@ class Class_product {
 
     this._prodData.discount = v;
 
-    // 因為折數改變了，所以選配設定的價格要重新計算
-    this.calcAllPrice_comAndSubComAndAcce();
+    if (this.isSpecialProd) {
+      this.calcProdAllprice_simple();
+      this.callCalcSubTotal();
+    } else {
+      // 因為折數改變了，所以選配設定的價格要重新計算
+      this.calcAllPrice_comAndSubComAndAcce();
+    }
 
     this.reRender();
 
@@ -2994,15 +2999,17 @@ class Class_product {
     this._prodData.quantity = Number(v);
     this._quantity = v;
 
-    this.calcProdAllprice_timeout();
-
     // ________________________
     if (this.isSpecialProd) {
+      this.calcProdAllprice_simple();
+      this.callCalcSubTotal();
       this.reRender();
 
       return;
     }
     // ________________________
+
+    this.calcProdAllprice_timeout();
 
     if (originallyIsZero) {
       // 呼叫callAllReq後就會再自動算金額了
