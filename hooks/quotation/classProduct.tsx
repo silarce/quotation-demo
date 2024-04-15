@@ -2392,7 +2392,7 @@ class Class_product {
       'bounceDoorWidth',
       'doorTrackThick',
       'rollUpBoxThick',
-      'close',
+      // 'close',
       'onePieceRollUpBox',
       'isULGuideRail',
     ];
@@ -3771,7 +3771,7 @@ class Class_product {
         bounceDoorWidth: null,
         bounceDoorHeight: null,
         bounceDoorLength: null,
-        closingType: null,
+        // closingType: null,
         motorPhase: null,
         bottomBarAngleIron: null,
         bottomBarPlate: null,
