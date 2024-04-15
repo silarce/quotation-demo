@@ -147,7 +147,7 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
   // const [targetRow, setTargetRow] = useState<Tgroup['rowArr'][number]['deliveryStatus'] | undefined>();
   const [targetEmpControl, setTargetEmpControl] = useState<TdeliveryStatusItem_installer | undefined>();
 
-  console.log(targetEmpControl);
+  // -------------------------------------------------------------------------------
 
   // 決定簡單處理就好
   const defaultSeletedDataArrArr = useMemo(() => {
@@ -168,6 +168,8 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
 
     return arr;
   }, [targetEmpControl]);
+
+  // -------------------------------------------------------------------------------
 
   return (
     <div className={scss.orderTable}>
@@ -516,9 +518,10 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
         })}
       </div>
 
+      {/* 安裝人員欄位 */}
       <SelectorGroup
         showModal={!!targetEmpControl}
-        caption="選擇員工或外包廠商"
+        caption="安裝人員，選擇員工或外包廠商"
         tip="員工或外包擇一"
         onConfirm={(dataArr) => {
           const employeeArr = dataArr[0];

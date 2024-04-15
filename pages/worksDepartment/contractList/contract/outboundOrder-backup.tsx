@@ -1,6 +1,13 @@
+// !!!!!!!!!!
+// !!!!!!!!!!
+// !!!!!!!!!!
+// !!!!!!!!!!
+
 // 工程管理單
 // 工程管理單
 // 工程管理單
+
+// setMyDeleveryList
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
@@ -85,81 +92,57 @@ export default function OutboundOrder({
   isAdmin: boolean;
   userErpFeature: TerpFeatureDto[] | undefined;
 }) {
-  // ___________________________________________________________________________
-  let havePermissionToEdit = isAdmin;
+  const havePermissionToEdit = useMemo(() => {
+    if (isAdmin) {
+      return true;
+    }
 
-  if (!isAdmin) {
-    havePermissionToEdit = !!userErpFeature?.some((item) => {
+    const isHave = userErpFeature?.some((item) => {
       return item.name === '工務部-工作表編輯';
     });
-  }
+
+    return !!isHave;
+  }, [userErpFeature]);
+
+  // --------------------------------------------------------------------------
 
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
 
-  // --------------------------------------------------------------------------
-
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
-    customPopulate: ['subContracts.content.products.rootProdductId'],
-  });
-
-  const { engineeringContactId, engineeringDeliveryListId } = contract ?? {};
-
-  const { data: engineeringContact, update: update_engineeringContact } =
-    useGetEngineeringContact(engineeringContactId);
-
-  const { deliveryList, update_deliveryList } = useGetEngineeringDeliveryList(engineeringDeliveryListId);
-
-  // --------------------------------------------------------------------------
-
-  const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
-
-  const [notes, setNotes] = useState<string>();
-  const [notesDiasbled, setNotesDiasbled] = useState(true);
-
-  const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
-
-  // _____________________________________________________________________________
   const [isLoading, setIsLoading] = useState(false);
-  const [isReqing, setIsReqing] = useState(false);
   // const [disabled, setDisabled] = useState(true);
+  const [isReqing, setIsReqing] = useState(false);
 
   // 外包廠商選擇器的onConfirm
   const [selectorConfirm, setSelectorConfirm] = useState<TselectorConfirm>();
 
   // --------------------------------------------------------------------------
 
+  const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
+
+  // console.log(deleveryStatusInEdit);
+
+  const [notes, setNotes] = useState<string>();
+  const [notesDiasbled, setNotesDiasbled] = useState(true);
+
+  const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
+
+  // --------------------------------------------------------------------------
+
+  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+    customPopulate: ['subContracts.content.products.rootProdductId'],
+  });
+  const { engineeringContactId, engineeringDeliveryListId } = contract ?? {};
+  const { data: engineeringContact, update: update_engineeringContact } =
+    useGetEngineeringContact(engineeringContactId);
+
+  const { deliveryList, update_deliveryList } = useGetEngineeringDeliveryList(engineeringDeliveryListId);
+
   const worksheetArr = useMemo(() => {
     return (deliveryList?.contract.worksheet ?? []).filter((worksheet) => {
       return worksheet.isAbandoned === false;
     });
   }, [deliveryList?.contract.worksheet]);
-
-  const contractProdList = useMemo(() => {
-    if (!worksheetArr) {
-      return undefined;
-    }
-
-    const list: { [key: string]: TquotationProductDto } = {};
-
-    worksheetArr.forEach((worksheet) => {
-      const { latestRecord } = worksheet;
-      const contractProductItems = latestRecord.contractProductItems ?? [];
-      const latestRecordId = latestRecord.id;
-
-      contractProductItems.forEach((item) => {
-        const { rootWorksheetItem } = item;
-
-        if (latestRecordId) {
-          list[latestRecordId] = rootWorksheetItem;
-        }
-      });
-    });
-
-    return list;
-  }, [deliveryList]);
-
-  // --------------------------------------------------------------------------
 
   useEffect(() => {
     (async () => {
@@ -189,10 +172,98 @@ export default function OutboundOrder({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract]);
 
+  // const contractProdList = useMemo(() => {
+  //   if (!contract) {
+  //     return undefined;
+  //   }
+
+  //   let subContracts = contract.subContracts;
+
+  //   subContracts = _.sortBy(subContracts, 'version');
+
+  //   const list: { [key: string]: TquotationProductDto } = {};
+
+  //   subContracts.forEach((contract) => {
+  //     const prodArr = contract.content.products;
+  //     prodArr.forEach((prod) => {
+  //       list[prod.rootProductId] = prod;
+  //     });
+  //   });
+
+  //   Object.keys(list).forEach((key) => {
+  //     const item = list[key];
+
+  //     if (key !== item.id) {
+  //       list[item.id] = item;
+  //       delete list[key];
+  //     }
+  //   });
+
+  //   return list;
+  // }, [contract]);
+
+  const contractProdList = useMemo(() => {
+    if (!worksheetArr) {
+      return undefined;
+    }
+
+    const list: { [key: string]: TquotationProductDto } = {};
+
+    worksheetArr.forEach((worksheet) => {
+      const { latestRecord } = worksheet;
+      const contractProductItems = latestRecord.contractProductItems ?? [];
+      const latestRecordId = latestRecord.id;
+
+      contractProductItems.forEach((item) => {
+        const {
+          // productId,
+          // rootWorksheetItemId,
+          rootWorksheetItem,
+          // latestWorksheetItem: adjustedItem,
+          // latestWorksheetItemId: adjustedItemId,
+        } = item;
+
+        if (latestRecordId) {
+          list[latestRecordId] = rootWorksheetItem;
+        }
+      });
+    });
+
+    // subContracts.forEach((contract) => {
+    //   const prodArr = contract.content.products;
+    //   prodArr.forEach((prod) => {
+    //     list[prod.rootProductId] = prod;
+    //   });
+    // });
+
+    // Object.keys(list).forEach((key) => {
+    //   const item = list[key];
+
+    //   if (key !== item.id) {
+    //     list[item.id] = item;
+    //     delete list[key];
+    //   }
+    // });
+
+    return list;
+  }, [deliveryList]);
+
+  // --------------------------------------------------------------------------
+
   useEffect(() => {
     setNotes(deliveryList?.notes);
   }, [deliveryList, notesDiasbled]);
 
+  // --------------------------------------------------------------------------
+
+  // --------------------------------------------------------------------------
+
+  // const worksheet = deliveryList?.contract.worksheet;
+  // const worksheetArr = deliveryList?.contract.worksheet;
+
+  // console.log(worksheetArr);
+
+  // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
   useEffect(() => {
     if (!deliveryList?.contract.worksheet) {
       return;
@@ -208,9 +279,28 @@ export default function OutboundOrder({
       const latestRecordId = latestRecord.id;
 
       contractProductItems.forEach((item) => {
-        const { rootWorksheetItem } = item;
+        const {
+          // productId,
+          // rootWorksheetItemId,
+          rootWorksheetItem,
+          // latestWorksheetItem: latestWorksheetItem,
+          // latestWorksheetItemId: latestWorksheetItemId,
+        } = item;
 
         const theItem = item;
+
+        // let theItem: typeof item;
+        // 現在只以productId分類，theId用不到了
+        // let theId: string;
+
+        // if (latestWorksheetItem && latestWorksheetItemId) {
+        //   // theItem = adjustedItem;
+        //   theItem = latestWorksheetItem;
+        //   // theId = adjustedItemId;
+        // } else {
+        //   theItem = item;
+        //   // theId = productId;
+        // }
 
         theItem.deliveryStatus = item.deliveryStatus;
         // issue#198 // 改送item.id
@@ -230,12 +320,88 @@ export default function OutboundOrder({
       });
     });
 
+    // worksheetArr.forEach((item) => {
+    //   const { productId, adjustedItem, adjustedItemId } = item;
+
+    //   let theItem: typeof item;
+    //   // 現在只以productId分類，theId用不到了
+    //   // let theId: string;
+
+    //   if (adjustedItem && adjustedItemId) {
+    //     theItem = adjustedItem;
+    //     // theId = adjustedItemId;
+    //   } else {
+    //     theItem = item;
+    //     // theId = productId;
+    //   }
+
+    //   theItem.deliveryStatus = item.deliveryStatus;
+    //   // issue#198 // 改送item.id
+    //   theItem.id = item.id;
+
+    //   if (!myDeleveryList?.[productId]) {
+    //     myDeleveryList[productId] = {
+    //       originalItem: item,
+    //       itemName: theItem.itemName,
+    //       itemArr: [],
+    //     };
+    //   }
+
+    //   myDeleveryList[productId].itemArr.push(theItem);
+    // });
+
     setMyDeleveryList(myDeleveryList);
+
+    // ---------------------
   }, [deliveryList]);
 
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
+  // console.log(myDeleveryList, myDeleveryList);
+
+  // // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
+  // useEffect(() => {
+  //   if (!deliveryList?.contract.worksheet?.latestRecord.contractProductItems) {
+  //     return;
+  //   }
+
+  //   const contractProductItems = deliveryList.contract.worksheet.latestRecord.contractProductItems;
+
+  //   const myDeleveryList: TmyDeleveryList = {};
+
+  //   contractProductItems.forEach((item) => {
+  //     const { productId, adjustedItem, adjustedItemId } = item;
+
+  //     let theItem: typeof item;
+  //     // 現在只以productId分類，theId用不到了
+  //     // let theId: string;
+
+  //     if (adjustedItem && adjustedItemId) {
+  //       theItem = adjustedItem;
+  //       // theId = adjustedItemId;
+  //     } else {
+  //       theItem = item;
+  //       // theId = productId;
+  //     }
+
+  //     theItem.deliveryStatus = item.deliveryStatus;
+  //     // issue#198 // 改送item.id
+  //     theItem.id = item.id;
+
+  //     if (!myDeleveryList?.[productId]) {
+  //       myDeleveryList[productId] = {
+  //         originalItem: item,
+  //         itemName: theItem.itemName,
+  //         itemArr: [],
+  //       };
+  //     }
+
+  //     myDeleveryList[productId].itemArr.push(theItem);
+  //   });
+
+  //   setMyDeleveryList(myDeleveryList);
+
+  //   // ---------------------
+  // }, [deliveryList]);
+
   // --------------------------------------------------------------------------
 
   const reqPost = async (
@@ -260,6 +426,7 @@ export default function OutboundOrder({
           notes: null,
           itemName: null,
           shippingDate: null,
+          // installerEmployeeId: outsouctingId,
 
           installerOutsourcingId: outsourcingId ?? null,
           installerEmployees: employeeId ? [employeeId] : null,
@@ -328,24 +495,6 @@ export default function OutboundOrder({
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '刪除失敗', content: err.message });
-    }
-  };
-
-  const reqPatchNotes = async () => {
-    if (!engineeringDeliveryListId || !havePermissionToEdit) {
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, { notes: notes ?? '' });
-      await update_deliveryList();
-      setNotesDiasbled(true);
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '更新備註失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -809,28 +958,62 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
+  const reqPatchNotes = async () => {
+    if (!engineeringDeliveryListId || !havePermissionToEdit) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, { notes: notes ?? '' });
+      await update_deliveryList();
+      setNotesDiasbled(true);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新備註失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // --------------------------------------------------------------------------
 
-  // const panelList_noPromission: TpanelList = [
+  // const panelList01: TpanelList = [
   //   {
   //     type: 'myButton',
-  //     label: '沒有權限編輯',
-  //     onClick: () => {},
+  //     label: '編輯',
+  //     onClick: () => {
+  //       setDisabled(false);
+  //     },
+  //   },
+  // ];
+  // const panelList02: TpanelList = [
+  //   {
+  //     type: 'redButton',
+  //     label: '更新',
+  //     onClick: reqUpdate,
+  //   },
+  //   {
+  //     type: 'myButton',
+  //     label: '取消',
+  //     onClick: () => {
+  //       setDisabled(true);
+  //     },
   //   },
   // ];
 
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
+  const panelList_noPromission: TpanelList = [
+    {
+      type: 'myButton',
+      label: '沒有權限編輯',
+      onClick: () => {},
+    },
+  ];
 
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader
-        // panelList={!havePermissionToEdit ? panelList_noPromission : undefined}
+        panelList={!havePermissionToEdit ? panelList_noPromission : undefined}
         // panelList={disabled ? panelList01 : panelList02}
         contractNumber={engineeringContact?.contractNumber ?? ''}
       />
@@ -890,7 +1073,6 @@ export default function OutboundOrder({
         </div>
       </div>
 
-      {/* 呼叫apiPostDeliveryStatus 新增 deliveryStatus */}
       <SelectorGroup
         showModal={!!selectorConfirm}
         caption="選擇員工或外包廠商"
