@@ -69,7 +69,7 @@ type TinputSelProps = {
   fontWeight?: '400' | '500' | '600' | '700';
   fontColor?: 'main' | 'sub' | 'text' | 'active';
   //
-  /*invisible總是不可見(不渲染) always總是可見 auto disable時不可見*/
+  //invisible總是不可見(不渲染) always總是可見 auto disable時不可見
   showBaseline?: 'invisible' | 'always' | 'auto';
   hrClassName?: string;
   hrStyle?: CSSProperties;

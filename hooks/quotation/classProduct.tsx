@@ -1,51 +1,44 @@
 // 注意事項目錄 (用法:ctrl+f 搜尋關鍵字)
 // warning01
 
-/**
- *prodCellConfig
- 
- * retrieveOptions 下拉式選單產生器
- * 下拉式選單的選項
-  
+// prodCellConfig
 
- * callRetrieveCreProdCom
- * Class_product
- * AcceList
- * retrieveCreProdAcce
- * createOptionsList
- * creAcceList
- * accessoriesList
- * takeDefaultDynaValue
- * 
- * calcProdAllprice_timeout
- *
- * callAllReq
- * reqChain
- * req_calcGeneralSpec
- * req_getProdAvailableComponents
- * reqProdGenerateDoorProductBom
- * toGetInstallationFee // 計算材料配件的 按裝及製造費用 的金額
- * 
+//  retrieveOptions 下拉式選單產生器
+//  下拉式選單的選項
 
-  WG = fullWidth-gapA-gapC
-  G = guideRailG + guideRailG
-  W = WG - guideRailG -guideRailG 
+//  callRetrieveCreProdCom
+//  Class_product
+//  AcceList
+//  retrieveCreProdAcce
+//  createOptionsList
+//  creAcceList
+//  accessoriesList
+//  takeDefaultDynaValue
+//
+//  calcProdAllprice_timeout
+//
+//  callAllReq
+//  reqChain
+//  req_calcGeneralSpec
+//  req_getProdAvailableComponents
+//  reqProdGenerateDoorProductBom
+//  toGetInstallationFee // 計算材料配件的 按裝及製造費用 的金額
+//
 
- */
+// WG = fullWidth-gapA-gapC
+// G = guideRailG + guideRailG
+// W = WG - guideRailG -guideRailG
 
-/**
-關於馬達
-營業部現行的做法是
-以東元的單價計算
-2HP以上的馬達自動取三相馬達
-不管伏特數
-
-因此取得預設馬達時要以東元優先
-馬力1.5HP以上時要相數要自動改為三相
-低於1.5HP時要相數要自動改為單相
-馬達過濾器先以原本的伏特數過濾，沒有符合的馬達的話就改伏特數再過濾一次
-
- */
+// 關於馬達
+// 營業部現行的做法是
+// 以東元的單價計算
+// 2HP以上的馬達自動取三相馬達
+// 不管伏特數
+//
+// 因此取得預設馬達時要以東元優先
+// 馬力1.5HP以上時要相數要自動改為三相
+// 低於1.5HP時要相數要自動改為單相
+// 馬達過濾器先以原本的伏特數過濾，沒有符合的馬達的話就改伏特數再過濾一次
 
 import _ from 'lodash';
 import Decimal from 'decimal.js';
@@ -69,12 +62,15 @@ import {
   optionsCreator_horsePower,
   optionsCreator_quoteType,
   lookup_options_bottomBarAngleIronAndPlate,
+  optionsCreator_doorModelName,
+  lookup_quoteType_doorModelName,
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
 const options_surface_onlyPaint = optionsCreator_surface_onlyPaint();
-const options_doorModel = optionsCreator_doorModel();
-const options_doorType = optionsCreator_quoteType();
+// const options_doorModel = optionsCreator_doorModel();
+const options_doorModelName = optionsCreator_doorModelName();
+const options_quoteType = optionsCreator_quoteType();
 
 // ===========================================================
 // child class
@@ -524,7 +520,7 @@ class Class_product {
     // });
     this.reRender();
   }
-  /**配合apiGetQuotationProducts使用 */
+  // 配合apiGetQuotationProducts使用
   creComList_dyna({ componentsArr }: { componentsArr: TquotationProductComponentDto[] }) {
     const sortedComponent = sortComponent(componentsArr);
 
@@ -578,7 +574,7 @@ class Class_product {
     this.reRender();
   }
 
-  /**acceDataArr會來自acce選擇器 */
+  // acceDataArr會來自acce選擇器
   addAcce(acceDataArr: TdoorAccessoryDto[]) {
     acceDataArr.forEach((acceData) => {
       const newKey = `new-${nanoid()}`;
@@ -631,7 +627,7 @@ class Class_product {
     this.accessoriesList = list;
     this.reRender();
   }
-  /**配合apiGetQuotationProducts使用 */
+  // 配合apiGetQuotationProducts使用
   creAcceList_dyna({ acceArr }: { acceArr: TquotationProductAccessoryDto[] }) {
     // const optionArr = _.sortBy(this._prodData.accessories, 'order');
     const list: { [key: string]: Class_accessories } = {};
@@ -1129,7 +1125,7 @@ class Class_product {
     }
   } // reqProdGenerateDoorProductBom
 
-  /**取得細部規格(取得slatCount) */
+  // 取得細部規格(取得slatCount)
   async reqGetDetailSpec() {
     if (!this.doorType || this.isSpecialProd) {
       return;
@@ -1414,9 +1410,9 @@ class Class_product {
     let motorAccessories: Tcomponent | null = filter_motorAccessories({
       dataArr: availableComponents.motorAccessories,
       filterParams: {
-        /**鍊條排數 */
+        //鍊條排數
         chains: this._doorGeneralSpecs?.sprocketWheelChains ?? 0,
-        /**軸承 */ // 從doorGeneralSpecs取資料
+        //軸承 // 從doorGeneralSpecs取資料
         bearingType: this._doorGeneralSpecs?.bearingName || '',
         gearNumber: this._doorGeneralSpecs?.gearNumber || '',
       },
@@ -1426,7 +1422,7 @@ class Class_product {
       dataArr: availableComponents.headBoxes,
       filterParams: {
         thickness: this.rollUpBoxThick, // 捲箱厚度
-        /**一體式捲箱 */
+        //一體式捲箱
         isIntegrated: this.onePieceRollUpBox, // 一體式捲箱
       },
     });
@@ -1612,7 +1608,7 @@ class Class_product {
 
   private timeoutId_calcProdAllprice: NodeJS.Timeout | null = null;
 
-  /**計算prod所有的價格 防抖*/
+  //計算prod所有的價格 防抖
   calcProdAllprice_timeout() {
     if (this.timeoutId_calcProdAllprice) {
       clearTimeout(this.timeoutId_calcProdAllprice);
@@ -1636,7 +1632,7 @@ class Class_product {
     this.totalPrice = new Decimal(unitPrice).mul(qty).toFixed(0);
   }
 
-  /**計算prod所有的價格 */
+  //計算prod所有的價格
   private calcProdAllprice() {
     this.calcAccessoriesAllprice();
     this.calcComAllPrice();
@@ -1670,7 +1666,7 @@ class Class_product {
     this.reRender();
   }
 
-  /**計算Accessories所有的價格 */
+  //計算Accessories所有的價格
   calcAccessoriesAllprice() {
     let d_price = new Decimal(0);
     let d_dualPrice = new Decimal(0);
@@ -1790,14 +1786,14 @@ class Class_product {
     return area;
   }
 
-  /**所有acce執行calcPrice */
+  // 所有acce執行calcPrice
   calcChangeAccePrice() {
     Object.values(this.accessoriesList)?.forEach((acce) => {
       acce.calcPrice();
     });
   }
 
-  /**計算才數 */
+  // 計算才數
   private calcVolume() {
     return calcProductVolume(Number(this.area || 0));
     // return Decimal.mul(this.area || 0, 10.89)
@@ -1999,7 +1995,7 @@ class Class_product {
   //   }
   // }
 
-  /**變更角鐵與底座版 */
+  // 變更角鐵與底座版
 
   changeBottomBarAngleIronAndBottomBarPlate(
     v: string // '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
@@ -2107,29 +2103,18 @@ class Class_product {
   // options_bottomBarAngleIron: Toption[] | undefined = undefined;
   // options_bottomBarPlate: Toption[] | undefined = undefined;
 
-  /**門型 options */
+  // 門型 options
   get options_doorType() {
-    if (this.isSpecialProd) {
+    const list = lookup_quoteType_doorModelName[this.quoteType];
+
+    if (!list) {
       return [{ value: '', label: '請直接輸入' }];
     }
 
-    return Object.values(this._doorModelList).map((item) => {
-      const theIndex = options_doorModel.findIndex((model) => {
-        return item.name === model.value;
-      });
-
-      if (options_doorModel[theIndex]) {
-        return options_doorModel[theIndex];
-      } else {
-        return {
-          value: item.name,
-          label: item.name,
-        };
-      }
-    });
+    return Object.values(list);
   }
 
-  /**門片材質 主產品設定的材質 */
+  // 門片材質 主產品設定的材質
   get options_material() {
     if (this.isSpecialProd) {
       return [{ value: '', label: '請直接輸入' }];
@@ -2159,7 +2144,7 @@ class Class_product {
     return arr;
   }
 
-  /**門軌 options */
+  // 門軌 options
   get options_doorTrack() {
     const doorModel = this._doorModelList[this.doorType];
 
@@ -2202,7 +2187,7 @@ class Class_product {
     return arr;
   } // options_doorTrack
 
-  /**表面 */
+  // 表面
   get options_surface() {
     if (this.isSpecialProd) {
       return [{ value: '', label: '請直接輸入' }];
@@ -2240,7 +2225,7 @@ class Class_product {
     return options;
   }
 
-  /**底座角鐵 */
+  // 底座角鐵
   get options_bottomBarAngleIron() {
     const doorType = this._prodData.doorType as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
 
@@ -2371,9 +2356,25 @@ class Class_product {
   //
 
   get isSpecialProd() {
-    const isSpecial = !options_doorType.some((option) => option.value === this._prodData.quoteType);
+    // const isSpecial = !options_doorType.some((option) => option.value === this._prodData.quoteType);
 
-    return isSpecial;
+    // const isSpecial =
+    //   !options_quoteType.some((option) => option.value === this._prodData.quoteType) ||
+    //   !options_doorModelName.some((option) => option.value === this._prodData.doorType);
+
+    // if (options_quoteType.some((option) => option.value === this._prodData.quoteType)) {
+    //   return false;
+    // }
+
+    if (
+      Object.values(this._doorModelList).some((doorModel) => {
+        return doorModel.name === this._prodData.doorType;
+      })
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
   get ignoreKeyArr_prod() {
@@ -2614,7 +2615,7 @@ class Class_product {
     return String(Number(this._prodData.height) * 1000);
   }
 
-  /**B(m) */
+  // B(m)
   get boxB() {
     return this._prodData.boxB;
   }
@@ -2762,7 +2763,7 @@ class Class_product {
   //   this.reRender();
   // }
 
-  /**D(m) */
+  // D(m)
   get boxD() {
     return this._prodData.boxD;
   }
@@ -2823,7 +2824,7 @@ class Class_product {
     this.reRender();
   }
   //
-  /** 才數*/
+  //  才數
   get volume() {
     return this._prodData.volume;
   }
@@ -3432,7 +3433,7 @@ class Class_product {
     this.reRender();
   }
 
-  /**底座角鐵 */
+  // 底座角鐵
   get bottomBarAngleIron() {
     return this._prodData.bottomBarAngleIron;
   }
@@ -3452,7 +3453,7 @@ class Class_product {
     this.callAllReq();
     this.reRender();
   }
-  /**底座版 */
+  // 底座版
   get bottomBarPlate() {
     return this._prodData.bottomBarPlate;
   }
@@ -3473,7 +3474,7 @@ class Class_product {
     this.reRender();
   }
 
-  /**門片厚度 */
+  // 門片厚度
   get thickness() {
     if (!this._prodData.thickness) {
       return '';
@@ -4509,48 +4510,45 @@ export type { Tprod, TprodKey, TcellConfig };
 // 每個主產品的折數都不會總折數
 // 是獨立的
 
-/**
- 
-不鏽鋼材質表面：
-2B
-HL
-BA
-NO.4
- 
-非不鏽鋼材質就不能選表面
+//
 
-
-只有門片有重量
-資料來自/products/door/calc-general-spec
-
-
-材料配件設定
-第一個代號不需要，拿掉
-
-主產品設定裡的材質應該是指門片材質
-
-送給後端，從後端收到的 長度相關的單位 都是mm
-包過 L W h B
-所以要再自己換算
-
-
-過濾材料配件時，如果條件是null就表示不限制
-
-要有烤漆欄位
-除了馬達跟配件都要有
-用checkBox表示
-
-
-主產品設定的材質是指門片材質
-變更主產品的材質時，材料配件設定裡面的材質也要跟著變
-如果沒有對應的材質，就用SST#304
-支板 捲軸 馬達 馬達配件 的材質是固定
-
-主產品設定裡的表面更動時，連帶更動材料配件設定的表面
-材料配件設定的材質選項來自 /products/door/models
-
-
- */
+// 不鏽鋼材質表面：
+// 2B
+// HL
+// BA
+// NO.4
+//
+// 非不鏽鋼材質就不能選表面
+//
+//
+// 只有門片有重量
+// 資料來自/products/door/calc-general-spec
+//
+//
+// 材料配件設定
+// 第一個代號不需要，拿掉
+//
+// 主產品設定裡的材質應該是指門片材質
+//
+// 送給後端，從後端收到的 長度相關的單位 都是mm
+// 包過 L W h B
+// 所以要再自己換算
+//
+//
+// 過濾材料配件時，如果條件是null就表示不限制
+//
+// 要有烤漆欄位
+// 除了馬達跟配件都要有
+// 用checkBox表示
+//
+//
+// 主產品設定的材質是指門片材質
+// 變更主產品的材質時，材料配件設定裡面的材質也要跟著變
+// 如果沒有對應的材質，就用SST#304
+// 支板 捲軸 馬達 馬達配件 的材質是固定
+//
+// 主產品設定裡的表面更動時，連帶更動材料配件設定的表面
+// 材料配件設定的材質選項來自 /products/door/models
 
 // ## 材質規則
 
@@ -4562,9 +4560,6 @@ NO.4
 // - 馬達: 黑鐵
 // - 馬達配件: 其他
 
-/**
+//
 
-主產品的材料改變後 下面沒有相應的材料話就帶入SST304
-
-
- */
+// 主產品的材料改變後 下面沒有相應的材料話就帶入SST304
