@@ -29,8 +29,10 @@
     }
   }
   > .avgDiscount {
+    grid-template-columns: 130px auto;
     > div {
       > input {
+        width: 150px;
         color: $colorMain;
         font-weight: 400;
         font-size: 16px;
