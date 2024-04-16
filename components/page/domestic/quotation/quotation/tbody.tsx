@@ -125,6 +125,7 @@ export default function Tbody({
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
   // onVKeyChange
+
   return (
     <div>
       <DndContext
@@ -523,11 +524,7 @@ function DndRow({
 
             if (isSuffixOnly) {
               if (stateValue === 'm2') {
-                stateValue = (
-                  <span>
-                    m<sup>2</sup>
-                  </span>
-                );
+                stateValue = 'm\u00B2';
               }
 
               return (

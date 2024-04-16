@@ -281,9 +281,9 @@ class Class_product {
     onDoorTypeChange,
     onDiscountChange,
     disabled_quantity,
-    //
-    quotationDiscount,
-  }: {
+  }: //
+  // quotationDiscount,
+  {
     reRender: TreRender;
     prodData?: Tprod;
     delSelf: () => void;
@@ -300,7 +300,7 @@ class Class_product {
     disabled_quantity?: boolean;
     //
     // 報價單折數，也就是TquotationContentDto[discount]
-    quotationDiscount: number;
+    // quotationDiscount: number;
   }) {
     this.reRender = reRender;
     // this.setIsLoading = setIsLoading;
@@ -333,7 +333,7 @@ class Class_product {
     this.disabled_quantity = disabled_quantity;
 
     // 報價單折數，也就是TquotationContentDto[discount]
-    this._quotationDiscount = quotationDiscount;
+    // this._quotationDiscount = quotationDiscount;
 
     if (!this._prodData.material && !this.isSpecialProd) {
       this._prodData.material = 'SST#304';
@@ -411,7 +411,7 @@ class Class_product {
   // readonly options_doorTrack_normal = options_doorTrack_normal;
   // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
 
-  private _quotationDiscount = 100;
+  // private _quotationDiscount = 100;
 
   private makeFormatValueDontTriggerTwice = false;
 
@@ -687,12 +687,7 @@ class Class_product {
         totalPrice: this._prodData.installationFeeTotalPrice,
         quantity: this._prodData.installationFeeQuantity,
         comName: '按裝及製造費用',
-        // unit: 'M',
-        unit: (
-          <span>
-            m<sup>2</sup>
-          </span>
-        ),
+        unit: 'm\u00B2', // m2 平方公尺
         desc: '(含送電及試車)',
       },
       prod: this,
@@ -1627,8 +1622,10 @@ class Class_product {
   calcProdAllprice_simple() {
     const price = new Decimal(this._prodData.price);
     const qty = this._prodData.quantity;
+
     const discount = new Decimal(this._prodData.discount || '0').div(100);
-    const quotationDiscount = new Decimal(this._quotationDiscount || '0').div(100);
+    // const quotationDiscount = new Decimal(this._quotationDiscount || '0').div(100);
+    const quotationDiscount = 1;
 
     this.dualPrice = price.mul(qty).toFixed(0);
     const unitPrice = price.mul(discount).mul(quotationDiscount).toFixed(0);
@@ -2284,18 +2281,18 @@ class Class_product {
   // ---------------------------------------------------------
 
   // 報價單折數，也就是TquotationContentDto[discount]
-  get quotationDiscount() {
-    return this._quotationDiscount;
-  }
+  // get quotationDiscount() {
+  //   return this._quotationDiscount;
+  // }
 
-  set quotationDiscount(v) {
-    this._quotationDiscount = v;
-    // 因為折數改變了，所以選配設定的價格要重新計算
-    this.calcAllPrice_comAndSubComAndAcce();
+  // set quotationDiscount(v) {
+  //   this._quotationDiscount = v;
+  //   // 因為折數改變了，所以選配設定的價格要重新計算
+  //   this.calcAllPrice_comAndSubComAndAcce();
 
-    // this.calcProdAllprice_timeout();
-    this.reRender();
-  }
+  //   // this.calcProdAllprice_timeout();
+  //   this.reRender();
+  // }
 
   // 主產品的折數，與報價單折數不同
   get discount() {
@@ -2326,7 +2323,7 @@ class Class_product {
 
     this._prodData.discount = v;
 
-    this.onDiscountChange?.();
+    this.onDiscountChange();
 
     if (this.isSpecialProd) {
       this.calcProdAllprice_simple();
@@ -2342,6 +2339,42 @@ class Class_product {
     setTimeout(() => {
       this.makeFormatValueDontTriggerTwice = false;
     }, 0);
+  }
+
+  set discount_noTimeout(v: string) {
+    if (this.makeFormatValueDontTriggerTwice) {
+      return;
+    }
+
+    if (v === '') {
+      v = '0';
+    }
+
+    if (Number(v) > 500) {
+      v = '500';
+    }
+
+    // if (v.split('.')[1]?.length > 3) {
+    //   return;
+    // }
+
+    if (!checkIsFloat(v, 3)) {
+      return;
+    }
+
+    this._prodData.discount = v;
+
+    this.onDiscountChange();
+
+    if (this.isSpecialProd) {
+      this.calcProdAllprice_simple();
+      this.callCalcSubTotal();
+    } else {
+      // 因為折數改變了，所以選配設定的價格要重新計算
+      this.calcAllPrice_comAndSubComAndAcce();
+    }
+
+    this.reRender();
   }
 
   clearId() {
@@ -3605,6 +3638,7 @@ class Class_product {
 
     const delSelf = () => {
       delete this._exchangeProdList[exId];
+      this.onDiscountChange();
       this.reRender();
     };
 
@@ -3617,9 +3651,8 @@ class Class_product {
       doorModelList: this._doorModelList,
       parentProd: this,
       disabled_quantity: true,
-      quotationDiscount: this._quotationDiscount,
-      // TODO 等重構再處理
-      onDiscountChange: () => {},
+      // quotationDiscount: this._quotationDiscount,
+      onDiscountChange: this.onDiscountChange,
     });
 
     this.reRender();
@@ -3632,6 +3665,7 @@ class Class_product {
   clearAttach() {
     this._exchangeProdList = {};
     this._reduceQty = '0';
+    this.onDiscountChange();
     this.reRender();
   }
 

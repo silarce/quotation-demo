@@ -698,6 +698,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //
     calcSubTotalPrice,
     // changeAllProdQuotationDiscount,
+    changeAllProductDiscount,
     //
   } = useProductList({
     // productArr: quotationData?.latestContent.products,
@@ -956,6 +957,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
               copy.discountRate = v;
               // changeAllProdQuotationDiscount(Number(v));
+
+              changeAllProductDiscount(Number(v));
 
               return copy;
             });
