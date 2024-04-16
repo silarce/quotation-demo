@@ -1222,7 +1222,13 @@ class Class_product {
   }
 
   // 注意 retrieveProdComponent裡面也有呼叫 callAllReq
-  callAllReq() {
+  callAllReq(
+    //這個key只是在找bug時查找是哪些地方在呼叫callAllReq
+    // 可以刪掉沒關係
+    key: string
+  ) {
+    // console.log('callAllReq', key);
+
     if (this.callAllTimeoutId) {
       clearTimeout(this.callAllTimeoutId);
       this.callAllTimeoutId = undefined;
@@ -1503,7 +1509,9 @@ class Class_product {
     this.material = this.material;
 
     this.shouldCall_pgpb = true;
-    this.callAllReq();
+
+    this.callAllReq('retrieveCreProcom');
+    // this.reqChain();
 
     this.reRender();
 
@@ -2733,7 +2741,7 @@ class Class_product {
 
       this.shouldCall_pgpb = true;
 
-      this.callAllReq();
+      this.callAllReq('boxB');
       this.callRetrieveCreProdCom();
 
       this.reRender();
@@ -2984,7 +2992,7 @@ class Class_product {
       })
     );
 
-    this.callAllReq();
+    this.callAllReq('doorTrack');
     this.callRetrieveCreProdCom();
 
     this.reRender();
@@ -2994,6 +3002,10 @@ class Class_product {
     return this._prodData.horsepower;
   }
   set horsepower(v) {
+    if (this._prodData.horsepower === v) {
+      return;
+    }
+
     this._prodData.horsepower = v;
 
     // ________________________
@@ -3026,7 +3038,7 @@ class Class_product {
     this.changeDistributionBoxPrice_byHorsepower();
     this.changePhase_byHorsepower();
 
-    this.callAllReq();
+    this.callAllReq('horsepower');
     this.callRetrieveCreProdCom();
 
     this.reRender();
@@ -3195,7 +3207,7 @@ class Class_product {
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
-    this.callAllReq();
+    this.callAllReq('typhoonProtection');
 
     this.reRender();
   }
@@ -3423,7 +3435,7 @@ class Class_product {
     this.shouldCall_cgs = true;
     this.shouldCall_pac = true;
     this.shouldCall_pgpb = true;
-    this.callAllReq();
+    this.callAllReq('doorTrackSilencerStrip');
 
     this.reRender();
   }
@@ -3511,7 +3523,7 @@ class Class_product {
     // ________________________
 
     this.shouldCall_pgpb = true;
-    this.callAllReq();
+    this.callAllReq('bottomBarAngleIron');
     this.reRender();
   }
   // 底座版
@@ -3531,7 +3543,7 @@ class Class_product {
     // ________________________
 
     this.shouldCall_pgpb = true;
-    this.callAllReq();
+    this.callAllReq('bottomBarPlate');
     this.reRender();
   }
 
@@ -4000,15 +4012,18 @@ class Class_product {
 
     switch (action) {
       case 'fullWidth':
-        this.callAllReq();
+        this.callAllReq('callSideEffect-fullWidth');
+        // await this.reqChain();
         break;
 
       case 'W':
-        this.callAllReq();
+        this.callAllReq('callSideEffect-W');
+        // await this.reqChain();
         break;
 
       case 'height':
-        this.callAllReq();
+        this.callAllReq('callSideEffect-height');
+        // await this.reqChain();
         break;
 
       // case 'boxB':
@@ -4028,7 +4043,7 @@ class Class_product {
       //   break;
 
       case 'quantity':
-        this._quantity === '0' && this.callAllReq();
+        this._quantity === '0' && this.callAllReq('callSideEffect-quantity');
 
         break;
 
