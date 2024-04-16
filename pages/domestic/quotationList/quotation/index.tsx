@@ -698,6 +698,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     //
     calcSubTotalPrice,
     // changeAllProdQuotationDiscount,
+    changeAllProductDiscount,
     //
   } = useProductList({
     // productArr: quotationData?.latestContent.products,
@@ -707,6 +708,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
     resetTrigger: quotationData ?? quotationContentData,
     // onDoorTypeChange: onDoorTypeChange, // 棄用
     quotationDiscount: Number(summary.discountRate || '100'),
+    onDiscountChange: (avgDiscount) => {
+      setSummary((state) => {
+        return {
+          ...state,
+          discountRate: String(avgDiscount),
+        };
+      });
+    },
   });
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
@@ -948,6 +957,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
               copy.discountRate = v;
               // changeAllProdQuotationDiscount(Number(v));
+
+              changeAllProductDiscount(Number(v));
 
               return copy;
             });
