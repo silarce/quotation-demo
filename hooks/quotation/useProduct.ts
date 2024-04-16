@@ -63,8 +63,8 @@ const useProductList = ({
   onDoorTypeChange,
   productArr_attach,
   quotationDiscount,
-  onDiscountChange,
-}: {
+}: // onDiscountChange,
+{
   productArr: TquotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
   resetTrigger: any;
@@ -76,7 +76,7 @@ const useProductList = ({
   }) => void;
   productArr_attach?: TquotationProductDto[] | undefined;
   quotationDiscount: number;
-  onDiscountChange?: (avgDiscount: number) => void;
+  // onDiscountChange?: (avgDiscount: number) => void;
 }) => {
   const [render, setRender] = useState(0);
 
@@ -87,6 +87,9 @@ const useProductList = ({
   const callCalcSubTotal = () => {
     setCalcTrigger((state) => ++state);
   };
+
+  const [avgDiscount, setAvgDiscount] = useState(0);
+  const [avgDiscount_withQty, setAvgDiscount_withQty] = useState(0);
 
   // ---------------------------------------------------------
 
@@ -124,7 +127,7 @@ const useProductList = ({
   const [subTotal, setSubTotal] = useState('');
   const [prodVKeyArr, setProdVKeyArr] = useState<string[]>();
 
-  const { createProdList, addProd, onClassDiscountChange } = useMemo(() => {
+  const { createProdList, addProd, calcDiscount_two } = useMemo(() => {
     //
     const list: TproductList = {};
     //
@@ -132,8 +135,6 @@ const useProductList = ({
     const calcAvgDiscount = () => {
       let discountTotal = new Decimal(0);
       let count = 0;
-
-      // const prodArr = Object.values(productList);
 
       Object.values(list).forEach((prod) => {
         discountTotal = discountTotal.add(prod.discount);
@@ -155,11 +156,47 @@ const useProductList = ({
 
       const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
 
-      return avgDiscount;
+      setAvgDiscount(avgDiscount);
     };
 
-    const onClassDiscountChange = () => {
-      onDiscountChange?.(calcAvgDiscount());
+    const calcAvgDiscount_withQty = () => {
+      let discountTotal = new Decimal(0);
+      let count = 0;
+
+      Object.values(list).forEach((prod) => {
+        for (let i = 0; i < +prod.quantity; i++) {
+          discountTotal = discountTotal.add(prod.discount);
+          count = count + 1;
+        }
+
+        const exchangeProdList = prod.exchangeProdList;
+
+        Object.values(exchangeProdList).forEach((exchangeProd) => {
+          for (let i = 0; i < +exchangeProd.quantity; i++) {
+            discountTotal = discountTotal.add(exchangeProd.discount);
+            count = count + 1;
+          }
+        });
+      });
+
+      // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+      Object.values(productList_attach).forEach((prod_attach) => {
+        for (let i = 0; i < +prod_attach.quantity; i++) {
+          discountTotal = discountTotal.add(prod_attach.discount);
+          count = count + 1;
+        }
+      });
+
+      const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+
+      setAvgDiscount_withQty(avgDiscount_withQty);
+
+      return avgDiscount_withQty;
+    };
+
+    const calcDiscount_two = () => {
+      calcAvgDiscount_withQty();
+      calcAvgDiscount();
     };
 
     const addProd = () => {
@@ -172,22 +209,23 @@ const useProductList = ({
         reRender,
         delSelf: () => {
           delSelf_prod(list, newKey);
-          onClassDiscountChange();
+          calcDiscount_two();
         },
         copySelf: () => {
           copySelf_prod(list, newKey);
-          onClassDiscountChange();
+          calcDiscount_two();
         },
         callCalcSubTotal,
         // calcSubTotalPrice,
         doorModelList,
         onDoorTypeChange: onClassDoorTypeChange,
         // quotationDiscount: quotationDiscount,
-        onDiscountChange: onClassDiscountChange,
+        onDiscountChange: calcDiscount_two,
+        onQtyChange: calcDiscount_two,
       });
       list[newKey] = classProd;
 
-      onClassDiscountChange();
+      calcDiscount_two();
 
       reRender();
     };
@@ -224,18 +262,19 @@ const useProductList = ({
           prodData,
           delSelf: () => {
             delSelf_prod(list, key);
-            onClassDiscountChange();
+            calcDiscount_two();
           },
           copySelf: () => {
             copySelf_prod(list, key);
-            onClassDiscountChange();
+            calcDiscount_two();
           },
           callCalcSubTotal,
           doorModelList,
           originProd: prod,
           onDoorTypeChange: onClassDoorTypeChange,
           // quotationDiscount: quotationDiscount,
-          onDiscountChange: onClassDiscountChange,
+          onDiscountChange: calcDiscount_two,
+          onQtyChange: calcDiscount_two,
         });
       });
 
@@ -248,11 +287,11 @@ const useProductList = ({
 
       // Object.assign(productList, list);
 
-      onClassDiscountChange();
+      calcDiscount_two();
       setProductList(list);
     };
 
-    return { createProdList, addProd, onClassDiscountChange };
+    return { createProdList, addProd, calcDiscount_two, calcAvgDiscount };
 
     // reRender();
   }, [resetTrigger, doorModelList]);
@@ -353,12 +392,12 @@ const useProductList = ({
 
     copy.delSelf = () => {
       delSelf_prod(list, newKey);
-      onClassDiscountChange();
+      calcDiscount_two();
     };
 
     copy.copySelf = () => {
       copySelf_prod(list, newKey);
-      onClassDiscountChange();
+      calcDiscount_two();
     };
 
     if (!shouldKeepId) {
@@ -633,21 +672,22 @@ const useProductList = ({
       reRender,
       delSelf: () => {
         delSelf_prod(productList_attach, newKey);
-        onClassDiscountChange();
+        calcDiscount_two();
       },
       copySelf: () => {
         copySelf_prod(productList_attach, newKey);
-        onClassDiscountChange();
+        calcDiscount_two();
       },
       callCalcSubTotal,
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
       // quotationDiscount: quotationDiscount,
-      onDiscountChange: onClassDiscountChange,
+      onDiscountChange: calcDiscount_two,
+      onQtyChange: calcDiscount_two,
     });
     productList_attach[newKey] = classProd;
 
-    onClassDiscountChange();
+    calcDiscount_two();
 
     reRender();
   };
@@ -675,17 +715,18 @@ const useProductList = ({
           prodData,
           delSelf: () => {
             delSelf_prod(productList_attach, key);
-            onClassDiscountChange();
+            calcDiscount_two();
           },
           copySelf: () => {
             copySelf_prod(productList_attach, key);
-            onClassDiscountChange();
+            calcDiscount_two();
           },
           callCalcSubTotal,
           doorModelList,
           originProd: prod,
           onDoorTypeChange: onClassDoorTypeChange,
-          onDiscountChange: onClassDiscountChange,
+          onDiscountChange: calcDiscount_two,
+          onQtyChange: calcDiscount_two,
           disabled_quantity: true,
           // quotationDiscount: quotationDiscount,
         });
@@ -693,7 +734,7 @@ const useProductList = ({
 
       // setProductList_attach(list);
 
-      onClassDiscountChange();
+      calcDiscount_two();
       reRender();
     }
   }, [productArr_attach]);
@@ -831,6 +872,8 @@ const useProductList = ({
     calcSubTotalPrice,
     // changeAllProdQuotationDiscount, // 修改所有class_product的quotationDiscount
     changeAllProductDiscount,
+    avgDiscount,
+    avgDiscount_withQty,
   };
 };
 
