@@ -1145,8 +1145,6 @@ class Class_product {
     let res2: boolean | undefined;
     let res3: boolean | undefined;
 
-    console.log('reqChain');
-
     try {
       // this.isLoading = true;
       this.reRender();
@@ -1511,7 +1509,7 @@ class Class_product {
     this.material = this.material;
 
     this.shouldCall_pgpb = true;
-    console.log('retrieveCreProcom');
+
     this.callAllReq('retrieveCreProcom');
     // this.reqChain();
 
