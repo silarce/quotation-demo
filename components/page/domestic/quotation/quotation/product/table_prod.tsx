@@ -71,7 +71,7 @@ export default function Table_prod({
   exchangeDiabled?: boolean;
   isShowDndBtn?: boolean;
   changeAllProductDiscount?: (v: number) => void;
-  avgDiscount: number | string;
+  avgDiscount?: number | string;
 }) {
   const [allowMove, setAllowMove] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -119,21 +119,23 @@ export default function Table_prod({
           {allowMove ? '確定排序' : '設定排序'}
         </button>
 
-        <InputSel
-          //
-          caption="總折數"
-          captionSize="18"
-          className={scss.totalDiscountChange}
-          inputProps={{
-            props: {
-              value: isNaN(+avgDiscount) ? '' : avgDiscount,
-              onChange: (e) => {
-                changeAllProductDiscount?.(Number(e.target.value));
+        {changeAllProductDiscount && (
+          <InputSel
+            //
+            caption="總折數"
+            captionSize="18"
+            className={scss.totalDiscountChange}
+            inputProps={{
+              props: {
+                value: isNaN(+(avgDiscount ?? 0)) ? '' : avgDiscount,
+                onChange: (e) => {
+                  changeAllProductDiscount?.(Number(e.target.value));
+                },
+                placeholder: '',
               },
-              placeholder: '',
-            },
-          }}
-        />
+            }}
+          />
+        )}
       </div>
 
       {/*  */}
