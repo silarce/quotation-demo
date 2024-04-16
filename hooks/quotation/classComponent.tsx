@@ -84,7 +84,7 @@ class Class_component {
 
   callReqGetCodeNumber() {
     this._prod.shouldCall_pgpb = true;
-    this._prod.callAllReq();
+    this._prod.callAllReq(`component-${this.key}`);
   }
   //
   //
