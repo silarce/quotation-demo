@@ -280,6 +280,7 @@ class Class_product {
     //
     onDoorTypeChange,
     onDiscountChange,
+    onQtyChange,
     disabled_quantity,
   }: //
   // quotationDiscount,
@@ -297,6 +298,7 @@ class Class_product {
     //
     onDoorTypeChange?: (obj: { newDoorType: string; newIsAntiTyphoon: boolean }) => void;
     onDiscountChange: () => void;
+    onQtyChange: () => void;
     disabled_quantity?: boolean;
     //
     // 報價單折數，也就是TquotationContentDto[discount]
@@ -310,6 +312,7 @@ class Class_product {
     this.callCalcSubTotal = callCalcSubTotal;
     this.onDoorTypeChange = onDoorTypeChange;
     this.onDiscountChange = onDiscountChange;
+    this.onQtyChange = onQtyChange;
 
     this.originProd = originProd;
 
@@ -376,6 +379,7 @@ class Class_product {
   readonly callCalcSubTotal;
   readonly onDoorTypeChange;
   readonly onDiscountChange;
+  readonly onQtyChange;
 
   //  用來比對是否有變動用的
   readonly originProd;
@@ -3061,6 +3065,8 @@ class Class_product {
     this._prodData.quantity = Number(v);
     this._quantity = v;
 
+    this.onQtyChange();
+
     // ________________________
     if (this.isSpecialProd) {
       this.calcProdAllprice_simple();
@@ -3665,6 +3671,7 @@ class Class_product {
       disabled_quantity: true,
       // quotationDiscount: this._quotationDiscount,
       onDiscountChange: this.onDiscountChange,
+      onQtyChange: this.onQtyChange,
     });
 
     this.reRender();
