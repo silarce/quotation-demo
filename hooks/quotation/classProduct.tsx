@@ -1,51 +1,44 @@
 // 注意事項目錄 (用法:ctrl+f 搜尋關鍵字)
 // warning01
 
-/**
- *prodCellConfig
- 
- * retrieveOptions 下拉式選單產生器
- * 下拉式選單的選項
-  
+// prodCellConfig
 
- * callRetrieveCreProdCom
- * Class_product
- * AcceList
- * retrieveCreProdAcce
- * createOptionsList
- * creAcceList
- * accessoriesList
- * takeDefaultDynaValue
- * 
- * calcProdAllprice_timeout
- *
- * callAllReq
- * reqChain
- * req_calcGeneralSpec
- * req_getProdAvailableComponents
- * reqProdGenerateDoorProductBom
- * toGetInstallationFee // 計算材料配件的 按裝及製造費用 的金額
- * 
+//  retrieveOptions 下拉式選單產生器
+//  下拉式選單的選項
 
-  WG = fullWidth-gapA-gapC
-  G = guideRailG + guideRailG
-  W = WG - guideRailG -guideRailG 
+//  callRetrieveCreProdCom
+//  Class_product
+//  AcceList
+//  retrieveCreProdAcce
+//  createOptionsList
+//  creAcceList
+//  accessoriesList
+//  takeDefaultDynaValue
+//
+//  calcProdAllprice_timeout
+//
+//  callAllReq
+//  reqChain
+//  req_calcGeneralSpec
+//  req_getProdAvailableComponents
+//  reqProdGenerateDoorProductBom
+//  toGetInstallationFee // 計算材料配件的 按裝及製造費用 的金額
+//
 
- */
+// WG = fullWidth-gapA-gapC
+// G = guideRailG + guideRailG
+// W = WG - guideRailG -guideRailG
 
-/**
-關於馬達
-營業部現行的做法是
-以東元的單價計算
-2HP以上的馬達自動取三相馬達
-不管伏特數
-
-因此取得預設馬達時要以東元優先
-馬力1.5HP以上時要相數要自動改為三相
-低於1.5HP時要相數要自動改為單相
-馬達過濾器先以原本的伏特數過濾，沒有符合的馬達的話就改伏特數再過濾一次
-
- */
+// 關於馬達
+// 營業部現行的做法是
+// 以東元的單價計算
+// 2HP以上的馬達自動取三相馬達
+// 不管伏特數
+//
+// 因此取得預設馬達時要以東元優先
+// 馬力1.5HP以上時要相數要自動改為三相
+// 低於1.5HP時要相數要自動改為單相
+// 馬達過濾器先以原本的伏特數過濾，沒有符合的馬達的話就改伏特數再過濾一次
 
 import _ from 'lodash';
 import Decimal from 'decimal.js';
@@ -69,12 +62,15 @@ import {
   optionsCreator_horsePower,
   optionsCreator_quoteType,
   lookup_options_bottomBarAngleIronAndPlate,
+  optionsCreator_doorModelName,
+  lookup_quoteType_doorModelName,
 } from 'js/utils/options/productOptions';
 
 const options_surface = optionsCreator_surface();
 const options_surface_onlyPaint = optionsCreator_surface_onlyPaint();
-const options_doorModel = optionsCreator_doorModel();
-const options_doorType = optionsCreator_quoteType();
+// const options_doorModel = optionsCreator_doorModel();
+const options_doorModelName = optionsCreator_doorModelName();
+const options_quoteType = optionsCreator_quoteType();
 
 // ===========================================================
 // child class
@@ -283,10 +279,11 @@ class Class_product {
     parentProd,
     //
     onDoorTypeChange,
+    onDiscountChange,
     disabled_quantity,
-    //
-    quotationDiscount,
-  }: {
+  }: //
+  // quotationDiscount,
+  {
     reRender: TreRender;
     prodData?: Tprod;
     delSelf: () => void;
@@ -299,10 +296,11 @@ class Class_product {
     parentProd?: Class_product;
     //
     onDoorTypeChange?: (obj: { newDoorType: string; newIsAntiTyphoon: boolean }) => void;
+    onDiscountChange: () => void;
     disabled_quantity?: boolean;
     //
     // 報價單折數，也就是TquotationContentDto[discount]
-    quotationDiscount: number;
+    // quotationDiscount: number;
   }) {
     this.reRender = reRender;
     // this.setIsLoading = setIsLoading;
@@ -311,6 +309,7 @@ class Class_product {
     this.copySelf = copySelf;
     this.callCalcSubTotal = callCalcSubTotal;
     this.onDoorTypeChange = onDoorTypeChange;
+    this.onDiscountChange = onDiscountChange;
 
     this.originProd = originProd;
 
@@ -334,7 +333,7 @@ class Class_product {
     this.disabled_quantity = disabled_quantity;
 
     // 報價單折數，也就是TquotationContentDto[discount]
-    this._quotationDiscount = quotationDiscount;
+    // this._quotationDiscount = quotationDiscount;
 
     if (!this._prodData.material && !this.isSpecialProd) {
       this._prodData.material = 'SST#304';
@@ -376,6 +375,7 @@ class Class_product {
   copySelf;
   readonly callCalcSubTotal;
   readonly onDoorTypeChange;
+  readonly onDiscountChange;
 
   //  用來比對是否有變動用的
   readonly originProd;
@@ -411,7 +411,7 @@ class Class_product {
   // readonly options_doorTrack_normal = options_doorTrack_normal;
   // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
 
-  private _quotationDiscount = 100;
+  // private _quotationDiscount = 100;
 
   private makeFormatValueDontTriggerTwice = false;
 
@@ -524,7 +524,7 @@ class Class_product {
     // });
     this.reRender();
   }
-  /**配合apiGetQuotationProducts使用 */
+  // 配合apiGetQuotationProducts使用
   creComList_dyna({ componentsArr }: { componentsArr: TquotationProductComponentDto[] }) {
     const sortedComponent = sortComponent(componentsArr);
 
@@ -578,7 +578,7 @@ class Class_product {
     this.reRender();
   }
 
-  /**acceDataArr會來自acce選擇器 */
+  // acceDataArr會來自acce選擇器
   addAcce(acceDataArr: TdoorAccessoryDto[]) {
     acceDataArr.forEach((acceData) => {
       const newKey = `new-${nanoid()}`;
@@ -631,7 +631,7 @@ class Class_product {
     this.accessoriesList = list;
     this.reRender();
   }
-  /**配合apiGetQuotationProducts使用 */
+  // 配合apiGetQuotationProducts使用
   creAcceList_dyna({ acceArr }: { acceArr: TquotationProductAccessoryDto[] }) {
     // const optionArr = _.sortBy(this._prodData.accessories, 'order');
     const list: { [key: string]: Class_accessories } = {};
@@ -687,12 +687,7 @@ class Class_product {
         totalPrice: this._prodData.installationFeeTotalPrice,
         quantity: this._prodData.installationFeeQuantity,
         comName: '按裝及製造費用',
-        // unit: 'M',
-        unit: (
-          <span>
-            m<sup>2</sup>
-          </span>
-        ),
+        unit: 'm\u00B2', // m2 平方公尺
         desc: '(含送電及試車)',
       },
       prod: this,
@@ -1129,7 +1124,7 @@ class Class_product {
     }
   } // reqProdGenerateDoorProductBom
 
-  /**取得細部規格(取得slatCount) */
+  // 取得細部規格(取得slatCount)
   async reqGetDetailSpec() {
     if (!this.doorType || this.isSpecialProd) {
       return;
@@ -1414,9 +1409,9 @@ class Class_product {
     let motorAccessories: Tcomponent | null = filter_motorAccessories({
       dataArr: availableComponents.motorAccessories,
       filterParams: {
-        /**鍊條排數 */
+        //鍊條排數
         chains: this._doorGeneralSpecs?.sprocketWheelChains ?? 0,
-        /**軸承 */ // 從doorGeneralSpecs取資料
+        //軸承 // 從doorGeneralSpecs取資料
         bearingType: this._doorGeneralSpecs?.bearingName || '',
         gearNumber: this._doorGeneralSpecs?.gearNumber || '',
       },
@@ -1426,7 +1421,7 @@ class Class_product {
       dataArr: availableComponents.headBoxes,
       filterParams: {
         thickness: this.rollUpBoxThick, // 捲箱厚度
-        /**一體式捲箱 */
+        //一體式捲箱
         isIntegrated: this.onePieceRollUpBox, // 一體式捲箱
       },
     });
@@ -1612,7 +1607,7 @@ class Class_product {
 
   private timeoutId_calcProdAllprice: NodeJS.Timeout | null = null;
 
-  /**計算prod所有的價格 防抖*/
+  //計算prod所有的價格 防抖
   calcProdAllprice_timeout() {
     if (this.timeoutId_calcProdAllprice) {
       clearTimeout(this.timeoutId_calcProdAllprice);
@@ -1627,8 +1622,10 @@ class Class_product {
   calcProdAllprice_simple() {
     const price = new Decimal(this._prodData.price);
     const qty = this._prodData.quantity;
+
     const discount = new Decimal(this._prodData.discount || '0').div(100);
-    const quotationDiscount = new Decimal(this._quotationDiscount || '0').div(100);
+    // const quotationDiscount = new Decimal(this._quotationDiscount || '0').div(100);
+    const quotationDiscount = 1;
 
     this.dualPrice = price.mul(qty).toFixed(0);
     const unitPrice = price.mul(discount).mul(quotationDiscount).toFixed(0);
@@ -1636,7 +1633,7 @@ class Class_product {
     this.totalPrice = new Decimal(unitPrice).mul(qty).toFixed(0);
   }
 
-  /**計算prod所有的價格 */
+  //計算prod所有的價格
   private calcProdAllprice() {
     this.calcAccessoriesAllprice();
     this.calcComAllPrice();
@@ -1670,7 +1667,7 @@ class Class_product {
     this.reRender();
   }
 
-  /**計算Accessories所有的價格 */
+  //計算Accessories所有的價格
   calcAccessoriesAllprice() {
     let d_price = new Decimal(0);
     let d_dualPrice = new Decimal(0);
@@ -1790,14 +1787,14 @@ class Class_product {
     return area;
   }
 
-  /**所有acce執行calcPrice */
+  // 所有acce執行calcPrice
   calcChangeAccePrice() {
     Object.values(this.accessoriesList)?.forEach((acce) => {
       acce.calcPrice();
     });
   }
 
-  /**計算才數 */
+  // 計算才數
   private calcVolume() {
     return calcProductVolume(Number(this.area || 0));
     // return Decimal.mul(this.area || 0, 10.89)
@@ -1999,7 +1996,7 @@ class Class_product {
   //   }
   // }
 
-  /**變更角鐵與底座版 */
+  // 變更角鐵與底座版
 
   changeBottomBarAngleIronAndBottomBarPlate(
     v: string // '鍍鋅鋼板' | '高耐鍍鋅鋼板' | 'SST#304' | 'SST#316'
@@ -2107,29 +2104,18 @@ class Class_product {
   // options_bottomBarAngleIron: Toption[] | undefined = undefined;
   // options_bottomBarPlate: Toption[] | undefined = undefined;
 
-  /**門型 options */
+  // 門型 options
   get options_doorType() {
-    if (this.isSpecialProd) {
+    const list = lookup_quoteType_doorModelName[this.quoteType];
+
+    if (!list) {
       return [{ value: '', label: '請直接輸入' }];
     }
 
-    return Object.values(this._doorModelList).map((item) => {
-      const theIndex = options_doorModel.findIndex((model) => {
-        return item.name === model.value;
-      });
-
-      if (options_doorModel[theIndex]) {
-        return options_doorModel[theIndex];
-      } else {
-        return {
-          value: item.name,
-          label: item.name,
-        };
-      }
-    });
+    return Object.values(list);
   }
 
-  /**門片材質 主產品設定的材質 */
+  // 門片材質 主產品設定的材質
   get options_material() {
     if (this.isSpecialProd) {
       return [{ value: '', label: '請直接輸入' }];
@@ -2159,7 +2145,7 @@ class Class_product {
     return arr;
   }
 
-  /**門軌 options */
+  // 門軌 options
   get options_doorTrack() {
     const doorModel = this._doorModelList[this.doorType];
 
@@ -2202,7 +2188,7 @@ class Class_product {
     return arr;
   } // options_doorTrack
 
-  /**表面 */
+  // 表面
   get options_surface() {
     if (this.isSpecialProd) {
       return [{ value: '', label: '請直接輸入' }];
@@ -2240,7 +2226,7 @@ class Class_product {
     return options;
   }
 
-  /**底座角鐵 */
+  // 底座角鐵
   get options_bottomBarAngleIron() {
     const doorType = this._prodData.doorType as keyof typeof lookup_options_bottomBarAngleIronAndPlate;
 
@@ -2295,20 +2281,23 @@ class Class_product {
   // ---------------------------------------------------------
 
   // 報價單折數，也就是TquotationContentDto[discount]
-  get quotationDiscount() {
-    return this._quotationDiscount;
-  }
+  // get quotationDiscount() {
+  //   return this._quotationDiscount;
+  // }
 
-  set quotationDiscount(v) {
-    this._quotationDiscount = v;
-    // 因為折數改變了，所以選配設定的價格要重新計算
-    this.calcAllPrice_comAndSubComAndAcce();
+  // set quotationDiscount(v) {
+  //   this._quotationDiscount = v;
+  //   // 因為折數改變了，所以選配設定的價格要重新計算
+  //   this.calcAllPrice_comAndSubComAndAcce();
 
-    // this.calcProdAllprice_timeout();
-    this.reRender();
-  }
+  //   // this.calcProdAllprice_timeout();
+  //   this.reRender();
+  // }
 
+  // 主產品的折數，與報價單折數不同
   get discount() {
+    // console.log(this._prodData.discount);
+
     return this._prodData.discount;
   }
   set discount(v) {
@@ -2316,7 +2305,7 @@ class Class_product {
       return;
     }
 
-    if ((v as string) === '') {
+    if (v === '') {
       v = '0';
     }
 
@@ -2324,14 +2313,25 @@ class Class_product {
       v = '500';
     }
 
-    if (v.split('.')[1]?.length > 3) {
+    // if (v.split('.')[1]?.length > 3) {
+    //   return;
+    // }
+
+    if (!checkIsFloat(v, 3)) {
       return;
     }
 
-    this._prodData.discount = `${Number(v)}`;
+    this._prodData.discount = v;
 
-    // 因為折數改變了，所以選配設定的價格要重新計算
-    this.calcAllPrice_comAndSubComAndAcce();
+    this.onDiscountChange();
+
+    if (this.isSpecialProd) {
+      this.calcProdAllprice_simple();
+      this.callCalcSubTotal();
+    } else {
+      // 因為折數改變了，所以選配設定的價格要重新計算
+      this.calcAllPrice_comAndSubComAndAcce();
+    }
 
     this.reRender();
 
@@ -2339,6 +2339,42 @@ class Class_product {
     setTimeout(() => {
       this.makeFormatValueDontTriggerTwice = false;
     }, 0);
+  }
+
+  set discount_noTimeout(v: string) {
+    if (this.makeFormatValueDontTriggerTwice) {
+      return;
+    }
+
+    if (v === '') {
+      v = '0';
+    }
+
+    if (Number(v) > 500) {
+      v = '500';
+    }
+
+    // if (v.split('.')[1]?.length > 3) {
+    //   return;
+    // }
+
+    if (!checkIsFloat(v, 3)) {
+      return;
+    }
+
+    this._prodData.discount = v;
+
+    this.onDiscountChange();
+
+    if (this.isSpecialProd) {
+      this.calcProdAllprice_simple();
+      this.callCalcSubTotal();
+    } else {
+      // 因為折數改變了，所以選配設定的價格要重新計算
+      this.calcAllPrice_comAndSubComAndAcce();
+    }
+
+    this.reRender();
   }
 
   clearId() {
@@ -2371,9 +2407,25 @@ class Class_product {
   //
 
   get isSpecialProd() {
-    const isSpecial = !options_doorType.some((option) => option.value === this._prodData.quoteType);
+    // const isSpecial = !options_doorType.some((option) => option.value === this._prodData.quoteType);
 
-    return isSpecial;
+    // const isSpecial =
+    //   !options_quoteType.some((option) => option.value === this._prodData.quoteType) ||
+    //   !options_doorModelName.some((option) => option.value === this._prodData.doorType);
+
+    // if (options_quoteType.some((option) => option.value === this._prodData.quoteType)) {
+    //   return false;
+    // }
+
+    if (
+      Object.values(this._doorModelList).some((doorModel) => {
+        return doorModel.name === this._prodData.doorType;
+      })
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
   get ignoreKeyArr_prod() {
@@ -2387,7 +2439,7 @@ class Class_product {
       'bounceDoorWidth',
       'doorTrackThick',
       'rollUpBoxThick',
-      'close',
+      // 'close',
       'onePieceRollUpBox',
       'isULGuideRail',
     ];
@@ -2434,7 +2486,15 @@ class Class_product {
     const isMaterailInOptions = check_isValueInOptions(this.material, this.options_material ?? []);
     const is304InOptions = check_isValueInOptions('SST#304', this.options_material ?? []);
 
-    if (is304InOptions) {
+    if (v === 'SJ-305D') {
+      const theOption = this.options_material?.find((option) => {
+        if (option.value.includes('內SST') && option.value.includes('外SST')) {
+          return true;
+        }
+      });
+
+      this.material = theOption?.value ?? '';
+    } else if (is304InOptions) {
       this.material = 'SST#304';
     } else if (!isMaterailInOptions && this.options_material) {
       this.material = this.options_material?.[0]?.value ?? '';
@@ -2614,7 +2674,7 @@ class Class_product {
     return String(Number(this._prodData.height) * 1000);
   }
 
-  /**B(m) */
+  // B(m)
   get boxB() {
     return this._prodData.boxB;
   }
@@ -2762,7 +2822,7 @@ class Class_product {
   //   this.reRender();
   // }
 
-  /**D(m) */
+  // D(m)
   get boxD() {
     return this._prodData.boxD;
   }
@@ -2823,7 +2883,7 @@ class Class_product {
     this.reRender();
   }
   //
-  /** 才數*/
+  //  才數
   get volume() {
     return this._prodData.volume;
   }
@@ -2989,15 +3049,17 @@ class Class_product {
     this._prodData.quantity = Number(v);
     this._quantity = v;
 
-    this.calcProdAllprice_timeout();
-
     // ________________________
     if (this.isSpecialProd) {
+      this.calcProdAllprice_simple();
+      this.callCalcSubTotal();
       this.reRender();
 
       return;
     }
     // ________________________
+
+    this.calcProdAllprice_timeout();
 
     if (originallyIsZero) {
       // 呼叫callAllReq後就會再自動算金額了
@@ -3432,7 +3494,7 @@ class Class_product {
     this.reRender();
   }
 
-  /**底座角鐵 */
+  // 底座角鐵
   get bottomBarAngleIron() {
     return this._prodData.bottomBarAngleIron;
   }
@@ -3452,7 +3514,7 @@ class Class_product {
     this.callAllReq();
     this.reRender();
   }
-  /**底座版 */
+  // 底座版
   get bottomBarPlate() {
     return this._prodData.bottomBarPlate;
   }
@@ -3473,7 +3535,7 @@ class Class_product {
     this.reRender();
   }
 
-  /**門片厚度 */
+  // 門片厚度
   get thickness() {
     if (!this._prodData.thickness) {
       return '';
@@ -3576,6 +3638,7 @@ class Class_product {
 
     const delSelf = () => {
       delete this._exchangeProdList[exId];
+      this.onDiscountChange();
       this.reRender();
     };
 
@@ -3588,7 +3651,8 @@ class Class_product {
       doorModelList: this._doorModelList,
       parentProd: this,
       disabled_quantity: true,
-      quotationDiscount: this._quotationDiscount,
+      // quotationDiscount: this._quotationDiscount,
+      onDiscountChange: this.onDiscountChange,
     });
 
     this.reRender();
@@ -3601,6 +3665,7 @@ class Class_product {
   clearAttach() {
     this._exchangeProdList = {};
     this._reduceQty = '0';
+    this.onDiscountChange();
     this.reRender();
   }
 
@@ -3766,7 +3831,7 @@ class Class_product {
         bounceDoorWidth: null,
         bounceDoorHeight: null,
         bounceDoorLength: null,
-        closingType: null,
+        // closingType: null,
         motorPhase: null,
         bottomBarAngleIron: null,
         bottomBarPlate: null,
@@ -4509,48 +4574,45 @@ export type { Tprod, TprodKey, TcellConfig };
 // 每個主產品的折數都不會總折數
 // 是獨立的
 
-/**
- 
-不鏽鋼材質表面：
-2B
-HL
-BA
-NO.4
- 
-非不鏽鋼材質就不能選表面
+//
 
-
-只有門片有重量
-資料來自/products/door/calc-general-spec
-
-
-材料配件設定
-第一個代號不需要，拿掉
-
-主產品設定裡的材質應該是指門片材質
-
-送給後端，從後端收到的 長度相關的單位 都是mm
-包過 L W h B
-所以要再自己換算
-
-
-過濾材料配件時，如果條件是null就表示不限制
-
-要有烤漆欄位
-除了馬達跟配件都要有
-用checkBox表示
-
-
-主產品設定的材質是指門片材質
-變更主產品的材質時，材料配件設定裡面的材質也要跟著變
-如果沒有對應的材質，就用SST#304
-支板 捲軸 馬達 馬達配件 的材質是固定
-
-主產品設定裡的表面更動時，連帶更動材料配件設定的表面
-材料配件設定的材質選項來自 /products/door/models
-
-
- */
+// 不鏽鋼材質表面：
+// 2B
+// HL
+// BA
+// NO.4
+//
+// 非不鏽鋼材質就不能選表面
+//
+//
+// 只有門片有重量
+// 資料來自/products/door/calc-general-spec
+//
+//
+// 材料配件設定
+// 第一個代號不需要，拿掉
+//
+// 主產品設定裡的材質應該是指門片材質
+//
+// 送給後端，從後端收到的 長度相關的單位 都是mm
+// 包過 L W h B
+// 所以要再自己換算
+//
+//
+// 過濾材料配件時，如果條件是null就表示不限制
+//
+// 要有烤漆欄位
+// 除了馬達跟配件都要有
+// 用checkBox表示
+//
+//
+// 主產品設定的材質是指門片材質
+// 變更主產品的材質時，材料配件設定裡面的材質也要跟著變
+// 如果沒有對應的材質，就用SST#304
+// 支板 捲軸 馬達 馬達配件 的材質是固定
+//
+// 主產品設定裡的表面更動時，連帶更動材料配件設定的表面
+// 材料配件設定的材質選項來自 /products/door/models
 
 // ## 材質規則
 
@@ -4562,9 +4624,6 @@ NO.4
 // - 馬達: 黑鐵
 // - 馬達配件: 其他
 
-/**
+//
 
-主產品的材料改變後 下面沒有相應的材料話就帶入SST304
-
-
- */
+// 主產品的材料改變後 下面沒有相應的材料話就帶入SST304

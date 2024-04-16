@@ -90,7 +90,7 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
 
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className="relative">
-            {'總折數'}
+            {'總折數(平均折數)'}
             <MustTip_simple preStyle="minimal" />
           </span>
           <div>
