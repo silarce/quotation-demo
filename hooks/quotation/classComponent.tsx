@@ -84,7 +84,7 @@ class Class_component {
 
   callReqGetCodeNumber() {
     this._prod.shouldCall_pgpb = true;
-    this._prod.callAllReq();
+    this._prod.callAllReq(`component-${this.key}`);
   }
   //
   //
@@ -136,7 +136,8 @@ class Class_component {
 
   calcAllPrice({ calcProdTotal = true }: { calcProdTotal?: boolean } = {}) {
     const discount = new Decimal(this._prod.discount).div(100);
-    const quotationDiscount = new Decimal(this._prod.quotationDiscount).div(100);
+    // const quotationDiscount = new Decimal(this._prod.quotationDiscount).div(100);
+    const quotationDiscount = 1;
 
     const quantity = Number(this._com.quantity || 0);
 
@@ -1204,11 +1205,12 @@ const comLookUp: { [key in TcomponentKey]: Tkit } = {
     creDesc: creDesc_slats,
     options: [],
     hiddenKeyArr: [],
-    unit: (
-      <span>
-        m<sup>2</sup>
-      </span>
-    ),
+    // unit: (
+    //   <span>
+    //     m<sup>2</sup>
+    //   </span>
+    // ),
+    unit: 'm\u00B2',
   },
   bottomBar: {
     typeName: '底座',

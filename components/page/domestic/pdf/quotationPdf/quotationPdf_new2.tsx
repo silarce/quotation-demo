@@ -587,6 +587,9 @@ export default function QuotationPdf({
         ) {
           material = 'SST304#';
         }
+        // else if (material === '黑鐵') {
+        //   material = '鍍鋅';
+        // }
 
         const qty_num = Number(qty.replaceAll(',', ''));
         const unitPrice_num = Number(unitPrice.replaceAll(',', ''));
@@ -1388,7 +1391,7 @@ const quotationProdToTableProdList = ({
 }): Tcontrol_prodArr => {
   const productArr: TtableProdList_series = (() => {
     return classProductArr.map((prod) => {
-      const { typhoonProtection, doorTrackSilencerStrip } = prod;
+      const { typhoonProtection, doorTrackSilencerStrip, doorType } = prod;
 
       const fullWidth = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
       const height = new Decimal(prod.height || 0).mul(100).toNumber();
@@ -1405,13 +1408,17 @@ const quotationProdToTableProdList = ({
 
       let material = prod.material;
 
-      const doorRailForExcel = findGuideRailUnicode({
-        isAntiTyphoon: typhoonProtection,
-        isSilencing: doorTrackSilencerStrip,
-      });
+      const doorRailForExcel =
+        doorType !== 'SJ-302'
+          ? ''
+          : findGuideRailUnicode({
+              isAntiTyphoon: typhoonProtection,
+              isSilencing: doorTrackSilencerStrip,
+            });
 
       // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
-      if (material === '高耐鍍鋅鋼板') {
+      // 21204-04-12 材料為鐵材烤漆(value為黑鐵)時，也視為鍍鋅鋼板
+      if (material === '高耐鍍鋅鋼板' || material === '黑鐵') {
         material = '鍍鋅鋼板';
       }
 

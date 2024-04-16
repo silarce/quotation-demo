@@ -13,7 +13,7 @@ import scss from './table_annotation.module.scss';
 // options
 import {
   optionsCreator_category,
-  optionsCreator_doorModel_2,
+  optionsCreator_doorModelName,
   optionsCreator_doorForm,
 } from 'js/utils/options/productOptions';
 
@@ -35,7 +35,7 @@ import { annotationAndQuotationRangeTypeLookup } from 'config/lookupTable';
 
 // =======================================================================
 const optionArr_category = optionsCreator_category();
-const optionArr_doorModel = optionsCreator_doorModel_2();
+const optionArr_doorModel = optionsCreator_doorModelName();
 const optionArr_doorForm = optionsCreator_doorForm();
 
 // =======================================================================
