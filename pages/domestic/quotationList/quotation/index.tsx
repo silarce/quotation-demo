@@ -699,6 +699,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     calcSubTotalPrice,
     // changeAllProdQuotationDiscount,
     changeAllProductDiscount,
+    avgDiscount,
+    avgDiscount_withQty,
     //
   } = useProductList({
     // productArr: quotationData?.latestContent.products,
@@ -708,14 +710,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     resetTrigger: quotationData ?? quotationContentData,
     // onDoorTypeChange: onDoorTypeChange, // 棄用
     quotationDiscount: Number(summary.discountRate || '100'),
-    onDiscountChange: (avgDiscount) => {
-      setSummary((state) => {
-        return {
-          ...state,
-          discountRate: String(avgDiscount),
-        };
-      });
-    },
   });
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
@@ -831,6 +825,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
     taxRate,
   ]);
 
+  useEffect(() => {
+    setSummary((state) => {
+      return {
+        ...state,
+        discountRate: String(avgDiscount_withQty),
+      };
+    });
+  }, [avgDiscount_withQty]);
+
   //
   //
   //
@@ -929,7 +932,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       discountRate: {
         inputAttr: {
-          disabled: disabled,
+          // disabled: disabled,
+          disabled: true,
           value: summary.discountRate,
           onChange: (e) => {
             // 如果quotationProdSubTotal為空字串會算出錯誤的值，
@@ -958,7 +962,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
               copy.discountRate = v;
               // changeAllProdQuotationDiscount(Number(v));
 
-              changeAllProductDiscount(Number(v));
+              // changeAllProductDiscount(Number(v));
 
               return copy;
             });
@@ -2025,6 +2029,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
               onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
               rowHeight="h60"
               isAttach={isAttach}
+              changeAllProductDiscount={changeAllProductDiscount}
+              avgDiscount={avgDiscount}
             />
 
             {/* 材料配件設定 */}

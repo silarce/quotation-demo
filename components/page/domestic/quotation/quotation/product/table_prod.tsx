@@ -8,15 +8,20 @@ import ExchangePanel, {
   ExchangeRow,
 } from 'components/page/domestic/quotation/legacyContract/exchangePanel/exchangePanel';
 
+// antd
+import { Popover } from 'antd';
+
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
+// import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import { Class_product, TprodKey, TproductList } from 'hooks/quotation/useProduct';
 
-import scss from '../table.module.scss';
+import scss from './table_prod.module.scss';
+import scss_table from '../table.module.scss';
 
 export default function Table_prod({
   disabled,
@@ -41,6 +46,8 @@ export default function Table_prod({
   isRedBorder,
   exchangeDiabled,
   isShowDndBtn = true,
+  changeAllProductDiscount,
+  avgDiscount,
 }: {
   disabled: boolean;
   disabled_plus?: boolean;
@@ -63,6 +70,8 @@ export default function Table_prod({
   isRedBorder?: boolean;
   exchangeDiabled?: boolean;
   isShowDndBtn?: boolean;
+  changeAllProductDiscount?: (v: number) => void;
+  avgDiscount: number | string;
 }) {
   const [allowMove, setAllowMove] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -95,29 +104,45 @@ export default function Table_prod({
   // -----------------------------------------------------------------------
 
   return (
-    <div className={classNames(scss.tableContainer, isRedBorder && scss.redBorder)}>
-      <div className={scss.header}>
+    <div className={classNames(scss_table.tableContainer, isRedBorder && scss_table.redBorder)}>
+      <div className={classNames(scss_table.header)}>
         <h2>主產品設定</h2>
         {/* <button className={(allowMove && scss.active) || ''} onClick={() => setAllowMove((state) => !state)}> */}
         <button
           className={classNames(
             //
-            allowMove && scss.active,
+            allowMove && scss_table.active,
             !isShowDndBtn && 'invisible'
           )}
           onClick={() => setAllowMove((state) => !state)}
         >
           {allowMove ? '確定排序' : '設定排序'}
         </button>
+
+        <InputSel
+          //
+          caption="總折數"
+          captionSize="18"
+          className={scss.totalDiscountChange}
+          inputProps={{
+            props: {
+              value: isNaN(+avgDiscount) ? '' : avgDiscount,
+              onChange: (e) => {
+                changeAllProductDiscount?.(Number(e.target.value));
+              },
+              placeholder: '',
+            },
+          }}
+        />
       </div>
 
       {/*  */}
-      <div className={classNames(scss.main, scss.mainProduct)} ref={ref}>
-        <div className={scss.listContainer}>
+      <div className={classNames(scss_table.main, scss_table.mainProduct)} ref={ref}>
+        <div className={scss_table.listContainer}>
           {/*  */}
 
-          <div className={scss.left}>
-            <div className={scss.theadContainer}>
+          <div className={scss_table.left}>
+            <div className={scss_table.theadContainer}>
               <DndThead
                 keyArr={prodKeyArr}
                 cellConfigList={prodCellConfig}
@@ -159,9 +184,9 @@ export default function Table_prod({
             />
 
             {!disabled && (
-              <div className={classNames(scss.addBtnWrapper)}>
+              <div className={classNames(scss_table.addBtnWrapper)}>
                 <MyButton_v2
-                  className={scss.addBtn}
+                  className={scss_table.addBtn}
                   label="新增產品"
                   onClick={() => {
                     addProd();
@@ -203,7 +228,7 @@ export default function Table_prod({
         {/* main close */}
       </div>
       {attachTotal !== undefined && (
-        <div className={classNames(scss.total)}>
+        <div className={classNames(scss_table.total)}>
           <span>合計</span>
           {/* <span>- {prodSubPriceTotal.toLocaleString()}</span> */}
           <span>{attachTotal}</span>
