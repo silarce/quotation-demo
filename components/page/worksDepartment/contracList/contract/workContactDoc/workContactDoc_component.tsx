@@ -820,6 +820,8 @@ function PreWorkContactDoc_component(
             emptyBlockWidth="40px"
             rowHeight="h60"
             isShowDndBtn={false}
+            discountRate={''} // 報價單總折數
+            changeDiscountRate={(v) => {}}
           />
           {/* <Remark /> */}
           <div className={scss.textListContainer}>
