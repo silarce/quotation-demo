@@ -125,6 +125,7 @@ export default function Tbody({
   // ---------------------------------------------------------------
   // ---------------------------------------------------------------
   // onVKeyChange
+
   return (
     <div>
       <DndContext
@@ -523,11 +524,7 @@ function DndRow({
 
             if (isSuffixOnly) {
               if (stateValue === 'm2') {
-                stateValue = (
-                  <span>
-                    m<sup>2</sup>
-                  </span>
-                );
+                stateValue = 'm\u00B2';
               }
 
               return (
@@ -572,7 +569,7 @@ function DndRow({
                 selectProps.props = {};
               }
 
-              if (item.isSpecialProd || key === 'quoteType') {
+              if (item.isSpecialProd || key === 'quoteType' || key === 'doorType') {
                 selectProps.props.isSearchable = true;
               }
 
@@ -654,8 +651,6 @@ function DndRow({
                 className={classNames(scss.column, isHidden && scss.hidden)}
                 style={{ width: inputSelProps.wrapperStyle?.width }}
                 onBlur={() => {
-                  console.log('onBlur', key);
-
                   item.callSideEffect?.(key);
                 }}
               >

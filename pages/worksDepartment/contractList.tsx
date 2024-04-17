@@ -19,10 +19,10 @@ import { Toption } from 'js/utils/options/options';
 
 // option
 import { optionsCreator_county, districtOptionsSelector } from 'js/utils/options/countryAndDistrict';
-import { optionsCreator_doorModel_2 } from 'js/utils/options/productOptions';
+import { optionsCreator_doorModelName } from 'js/utils/options/productOptions';
 
 // ===========================================
-const optionDoorModel = optionsCreator_doorModel_2({ haveEmpty: true });
+const optionDoorModel = optionsCreator_doorModelName({ haveEmpty: true });
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
 // ===========================================

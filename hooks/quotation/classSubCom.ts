@@ -49,7 +49,8 @@ class Class_SubCom {
 
   calcAllPrice() {
     const discount = new Decimal(this._prod.discount).div(100);
-    const quotationDiscount = new Decimal(this._prod.quotationDiscount).div(100);
+    // const quotationDiscount = new Decimal(this._prod.quotationDiscount).div(100);
+    const quotationDiscount = 1;
 
     const quantity = Number(this._data.quantity || 0);
 

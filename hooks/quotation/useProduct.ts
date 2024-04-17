@@ -1,6 +1,6 @@
 // comVKeyArr 材料配件垂直排序的key
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import moment from 'moment';
@@ -63,7 +63,8 @@ const useProductList = ({
   onDoorTypeChange,
   productArr_attach,
   quotationDiscount,
-}: {
+}: // onDiscountChange,
+{
   productArr: TquotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
   resetTrigger: any;
@@ -75,6 +76,7 @@ const useProductList = ({
   }) => void;
   productArr_attach?: TquotationProductDto[] | undefined;
   quotationDiscount: number;
+  // onDiscountChange?: (avgDiscount: number) => void;
 }) => {
   const [render, setRender] = useState(0);
 
@@ -85,6 +87,9 @@ const useProductList = ({
   const callCalcSubTotal = () => {
     setCalcTrigger((state) => ++state);
   };
+
+  const [avgDiscount, setAvgDiscount] = useState(0);
+  const [avgDiscount_withQty, setAvgDiscount_withQty] = useState(0);
 
   // ---------------------------------------------------------
 
@@ -122,180 +127,245 @@ const useProductList = ({
   const [subTotal, setSubTotal] = useState('');
   const [prodVKeyArr, setProdVKeyArr] = useState<string[]>();
 
-  useEffect(() => {
-    createProdList();
-  }, [resetTrigger, doorModelList]);
-
-  const createProdList = () => {
-    // if (!productArr || !doorModelList) {
-    //   return;
-    // }
-    if (!doorModelList) {
-      return;
-    }
-
-    const copyArr = _.cloneDeep(productArr ?? []);
-
-    // TODO 之後要改為以productOrder排序
-    // 考慮到不同的追加追減合約裡的主產品的order可能會重複
-    // 所以要用productOrder排序
-    const sortedProdArr = _.sortBy(copyArr, 'order');
+  const { createProdList, addProd, calcDiscount_two } = useMemo(() => {
+    //
     const list: TproductList = {};
+    //
 
-    // 每次上傳前會將prod的order依照當時的排序重新設定
-    // 所以理論上order不會重複
-    sortedProdArr.forEach((prod) => {
-      let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+    const calcAvgDiscount = () => {
+      let discountTotal = new Decimal(0);
+      let count = 0;
 
-      if (key in list) {
-        key = nanoid();
+      Object.values(list).forEach((prod) => {
+        discountTotal = discountTotal.add(prod.discount);
+        count = count + 1;
+
+        const exchangeProdList = prod.exchangeProdList;
+
+        Object.values(exchangeProdList).forEach((exchangeProd) => {
+          discountTotal = discountTotal.add(exchangeProd.discount);
+          count = count + 1;
+        });
+      });
+
+      // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+      Object.values(productList_attach).forEach((prod_attach) => {
+        discountTotal = discountTotal.add(prod_attach.discount);
+        count = count + 1;
+      });
+
+      const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+
+      setAvgDiscount(avgDiscount);
+    };
+
+    const calcAvgDiscount_withQty = () => {
+      let discountTotal = new Decimal(0);
+      let count = 0;
+
+      Object.values(list).forEach((prod) => {
+        for (let i = 0; i < +prod.quantity; i++) {
+          discountTotal = discountTotal.add(prod.discount);
+          count = count + 1;
+        }
+
+        const exchangeProdList = prod.exchangeProdList;
+
+        Object.values(exchangeProdList).forEach((exchangeProd) => {
+          for (let i = 0; i < +exchangeProd.quantity; i++) {
+            discountTotal = discountTotal.add(exchangeProd.discount);
+            count = count + 1;
+          }
+        });
+      });
+
+      // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+      Object.values(productList_attach).forEach((prod_attach) => {
+        for (let i = 0; i < +prod_attach.quantity; i++) {
+          discountTotal = discountTotal.add(prod_attach.discount);
+          count = count + 1;
+        }
+      });
+
+      const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+
+      setAvgDiscount_withQty(avgDiscount_withQty);
+
+      return avgDiscount_withQty;
+    };
+
+    const calcDiscount_two = () => {
+      calcAvgDiscount_withQty();
+      calcAvgDiscount();
+    };
+
+    const addProd = () => {
+      if (!doorModelList) {
+        return myAlert.info({ title: '尚未取得門型資料' });
       }
 
-      const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
-
-      // const prodData: Tprod = {
-      //   ...prod,
-      //   phase: prod.motorPhase ?? -1,
-      //   voltage: String(prod.motorVoltage),
-      //   motorSupport: prod.hasMotorSupportStand,
-      //   doorTrackThick: String(prod.guideRailThickness),
-      //   rollUpBoxThick: String(prod.headBoxThickness),
-      //   // 取得時是mm，要轉成m
-      //   WG: String(Number(prod.WG) / 1000),
-      //   fullWidth: String(Number(prod.fullWidth) / 1000),
-      //   height: String(Number(prod.height) / 1000),
-      //   boxB: String(Number(prod.boxB) / 1000),
-      //   boxD: String(Number(prod.boxD) / 1000),
-      //   // guideRailG: prod.guideRailG || 0,
-      //   // options: prod.options ?? [],
-
-      //   // quantity: prod.items?.length ?? 0,
-      //   // quantity: prod.quantity ?? 0,
-      //   // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
-      //   accessories: prod.items?.[0]?.accessories ?? [],
-      //   components: prod.items?.[0]?.components ?? [],
-      //   //
-
-      //   doorType: prod.doorModelName,
-      //   material: prod.materialName,
-      //   surface: prod.materialSurface ?? '',
-      //   close: prod.closingType ?? '',
-      //   doorTrack: prod.guideRail ?? '',
-      //   typhoonProtection: prod.isAntiTyphoon ?? false,
-      //   motor: prod.motorVendor ?? '',
-      //   doorTrackSilencerStrip: prod.hasSilencingStrip ?? false,
-      //   onePieceRollUpBox: prod.isIntegratedHeadBox ?? false,
-      //   // thickness: String(prod.thickness ?? ''),
-      //   // bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
-
-      //   // sprocketWheelModel: prod.sprocketWheelModel ?? '',
-      //   // sprocketWheelTeethNumber: prod.sprocketWheelTeethNumber ?? '',
-      //   // sprocketWheelChains: prod.sprocketWheelChains ?? '',
-      //   // bearingInnerDiameter: prod.bearingInnerDiameter ?? '',
-      //   // diameter: prod.diameter ?? '',
-      //   // bearingHousingTotalLength: prod.bearingHousingTotalLength ?? '',
-      //   // guideRailsOpening: prod.guideRailsOpening ?? '',
-      //   // slatLength: prod.slatLength ?? 0,
-      //   // guideRailLength: prod.guideRailLength ?? 0,
-      //   // headBoxLength: prod.headBoxLength ?? 0,
-      //   // bearingHousingSize: prod.bearingHousingSize ?? 0,
-      //   // bearingName: prod.bearingName ?? '',
-      //   // gapA: prod.gapA ?? '',
-      //   // gapC: prod.gapC ?? '',
-      //   // gearNumber: prod.gearNumber ?? '',
-      //   // weight: prod.weight ?? '',
-      //   // isULGuideRail: prod.isULGuideRail ?? false,
-
-      //   // bounceDoorWidth: prod.bounceDoorWidth || 0,
-      //   //
-      //   // distributionBoxQuantity: prod.distributionBoxQuantity ?? 1,
-      //   // distributionBoxDualPrice: prod.distributionBoxDualPrice ?? prod.distributionBoxPrice ?? 0,
-      //   // distributionBoxTotalPrice: prod.distributionBoxTotalPrice ?? prod.distributionBoxUnitPrice ?? 0,
-      //   //
-      //   //
-      //   // area: prod.area ?? '',
-      //   // volume: prod.volume ?? '',
-      //   // bounceDoor: prod.bounceDoor ?? false,
-      //   // motorLockBox: prod.motorLockBox ?? '',
-      //   // rollerSpec: prod.rollerSpec ?? '',
-      //   // bottomBarAngleIron: prod.bottomBarAngleIron ?? '',
-      //   // bottomBarPlate: prod.bottomBarPlate ?? '',
-      //   // distributionBoxPrice: prod.distributionBoxPrice ?? 0,
-      //   // distributionBoxUnitPrice: prod.distributionBoxUnitPrice ?? 0,
-
-      //   //
-      //   //
-      //   //
-      //   area: prod.area ?? '',
-      //   volume: prod.volume ?? '',
-      //   // guideRail: prod.guideRail ?? '',
-      //   // motorVendor: prod.motorVendor ?? '',
-      //   // motorVoltage: prod.motorVoltage ?? '',
-      //   bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
-      //   motorLockBox: prod.motorLockBox ?? '',
-      //   // guideRailThickness: prod.guideRailThickness ?? '',
-      //   rollerSpec: prod.rollerSpec ?? '',
-      //   // hasSilencingStrip: prod.hasSilencingStrip ?? '',
-      //   // isIntegratedHeadBox: prod.isIntegratedHeadBox ?? '',
-      //   // headBoxThickness: prod.headBoxThickness ?? '',
-      //   // isAntiTyphoon: prod.isAntiTyphoon ?? '',
-      //   bounceDoor: prod.bounceDoor ?? false,
-      //   bounceDoorWidth: prod.bounceDoorWidth ?? 0,
-      //   // bounceDoorHeight: prod.bounceDoorHeight ?? '',
-      //   // bounceDoorLength: prod.bounceDoorLength ?? '',
-      //   // closingType: prod.closingType ?? '',
-      //   // motorPhase: prod.motorPhase ?? '',
-      //   bottomBarAngleIron: prod.bottomBarAngleIron ?? '',
-      //   bottomBarPlate: prod.bottomBarPlate ?? '',
-      //   thickness: String(prod.thickness ?? ''),
-      //   distributionBoxPrice: prod.distributionBoxPrice ?? 0,
-      //   distributionBoxUnitPrice: prod.distributionBoxUnitPrice ?? 0,
-      //   distributionBoxQuantity: prod.distributionBoxQuantity ?? 0,
-      //   distributionBoxDualPrice: prod.distributionBoxDualPrice ?? 0,
-      //   distributionBoxTotalPrice: prod.distributionBoxTotalPrice ?? 0,
-      //   installationFeePrice: prod.installationFeePrice ?? 0,
-      //   installationFeeDualPrice: Number(prod.installationFeeDualPrice ?? 0),
-      //   installationFeeQuantity: Number(prod.installationFeeQuantity ?? 0),
-      //   installationFeeUnitPrice: prod.installationFeeUnitPrice ?? 0,
-      //   installationFeeTotalPrice: Number(prod.installationFeeTotalPrice ?? 0),
-      //   // slatCount: prod.slatCount,
-      //   // sprocketWheelModel: prod.sprocketWheelModel,
-      //   // sprocketWheelTeethNumber: prod.sprocketWheelTeethNumber,
-      //   // sprocketWheelChains: prod.sprocketWheelChains,
-      //   // bearingInnerDiameter: prod.bearingInnerDiameter,
-      //   // diameter: prod.diameter,
-      //   // bearingHousingTotalLength: prod.bearingHousingTotalLength,
-      //   // guideRailsOpening: prod.guideRailsOpening,
-      //   // slatLength: prod.slatLength,
-      //   guideRailLength: prod.guideRailLength,
-      //   headBoxLength: prod.headBoxLength,
-      //   bearingHousingSize: prod.bearingHousingSize,
-      //   bearingName: prod.bearingName,
-      //   gapA: prod.gapA,
-      //   gapC: prod.gapC,
-      //   gearNumber: prod.gearNumber,
-      //   weight: prod.weight,
-      //   guideRailG: prod.guideRailG ?? 0,
-      //   isULGuideRail: prod.isULGuideRail ?? false,
-
-      //   //
-      // }; // prodData
-
-      list[key] = new Class_product({
+      const newKey = nanoid();
+      const classProd = new Class_product({
         reRender,
-        prodData,
-        delSelf: () => delSelf_prod(list, key),
-        copySelf: () => copySelf_prod(list, key),
+        delSelf: () => {
+          delSelf_prod(list, newKey);
+          calcDiscount_two();
+        },
+        copySelf: () => {
+          copySelf_prod(list, newKey);
+          calcDiscount_two();
+        },
         callCalcSubTotal,
+        // calcSubTotalPrice,
         doorModelList,
-        originProd: prod,
         onDoorTypeChange: onClassDoorTypeChange,
-        quotationDiscount: quotationDiscount,
+        // quotationDiscount: quotationDiscount,
+        onDiscountChange: calcDiscount_two,
+        onQtyChange: calcDiscount_two,
       });
-    });
+      list[newKey] = classProd;
 
-    setProductList(list);
-  };
+      calcDiscount_two();
+
+      reRender();
+    };
+
+    const createProdList = () => {
+      if (!doorModelList) {
+        return;
+      }
+
+      const listKeyArr = Object.keys(list);
+      listKeyArr.forEach((key) => {
+        delete list[key];
+      });
+
+      const copyArr = _.cloneDeep(productArr ?? []);
+      // TODO 之後要改為以productOrder排序
+      // 考慮到不同的追加追減合約裡的主產品的order可能會重複
+      // 所以要用productOrder排序
+      const sortedProdArr = _.sortBy(copyArr, 'order');
+
+      // 每次上傳前會將prod的order依照當時的排序重新設定
+      // 所以理論上order不會重複
+      sortedProdArr.forEach((prod) => {
+        let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+
+        if (key in list) {
+          key = nanoid();
+        }
+
+        const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
+
+        list[key] = new Class_product({
+          reRender,
+          prodData,
+          delSelf: () => {
+            delSelf_prod(list, key);
+            calcDiscount_two();
+          },
+          copySelf: () => {
+            copySelf_prod(list, key);
+            calcDiscount_two();
+          },
+          callCalcSubTotal,
+          doorModelList,
+          originProd: prod,
+          onDoorTypeChange: onClassDoorTypeChange,
+          // quotationDiscount: quotationDiscount,
+          onDiscountChange: calcDiscount_two,
+          onQtyChange: calcDiscount_two,
+        });
+      });
+
+      // setProductList(list);
+      // setProductList((state) => {
+      //   const keyArr = Object.keys(state);
+
+      //   return state;
+      // });
+
+      // Object.assign(productList, list);
+
+      calcDiscount_two();
+      setProductList(list);
+    };
+
+    return { createProdList, addProd, calcDiscount_two, calcAvgDiscount };
+
+    // reRender();
+  }, [resetTrigger, doorModelList]);
+
+  useEffect(() => {
+    createProdList();
+  }, [createProdList]);
+
+  // const createProdList = () => {
+  //   // if (!productArr || !doorModelList) {
+  //   //   return;
+  //   // }
+  //   if (!doorModelList) {
+  //     return;
+  //   }
+
+  //   // 先清除原本的list
+  //   const keyArr = Object.keys(productList);
+  //   keyArr.forEach((key) => {
+  //     delete productList[key];
+  //   });
+
+  //   const copyArr = _.cloneDeep(productArr ?? []);
+
+  //   // TODO 之後要改為以productOrder排序
+  //   // 考慮到不同的追加追減合約裡的主產品的order可能會重複
+  //   // 所以要用productOrder排序
+  //   const sortedProdArr = _.sortBy(copyArr, 'order');
+  //   // const list: TproductList = {};
+
+  //   // 每次上傳前會將prod的order依照當時的排序重新設定
+  //   // 所以理論上order不會重複
+  //   sortedProdArr.forEach((prod) => {
+  //     const key = prod.order !== undefined ? `${prod.order}` : nanoid();
+
+  //     // if (key in productList) {
+  //     //   key = nanoid();
+  //     // }
+
+  //     const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
+
+  //     productList[key] = new Class_product({
+  //       reRender,
+  //       prodData,
+  //       delSelf: () => {
+  //         delSelf_prod(productList, key);
+  //         onClassDiscountChange();
+  //       },
+  //       copySelf: () => {
+  //         copySelf_prod(productList, key);
+  //         onClassDiscountChange();
+  //       },
+  //       callCalcSubTotal,
+  //       doorModelList,
+  //       originProd: prod,
+  //       onDoorTypeChange: onClassDoorTypeChange,
+  //       // quotationDiscount: quotationDiscount,
+  //       onDiscountChange: onClassDiscountChange,
+  //     });
+  //   });
+
+  //   // setProductList(list);
+  //   // setProductList((state) => {
+  //   //   const keyArr = Object.keys(state);
+
+  //   //   return state;
+  //   // });
+
+  //   // Object.assign(productList, list);
+
+  //   onClassDiscountChange();
+
+  //   reRender();
+  // };
 
   //
 
@@ -320,8 +390,15 @@ const useProductList = ({
     const copy = _.cloneDeep(list[copyKey]);
     // copy.rootProductId = undefined;
 
-    copy.delSelf = () => delSelf_prod(list, newKey);
-    copy.copySelf = () => copySelf_prod(list, newKey);
+    copy.delSelf = () => {
+      delSelf_prod(list, newKey);
+      calcDiscount_two();
+    };
+
+    copy.copySelf = () => {
+      copySelf_prod(list, newKey);
+      calcDiscount_two();
+    };
 
     if (!shouldKeepId) {
       copy.clearId();
@@ -340,26 +417,35 @@ const useProductList = ({
     reRender();
   };
 
-  const addProd = () => {
-    if (!doorModelList) {
-      return myAlert.info({ title: '尚未取得門型資料' });
-    }
+  // const addProd = () => {
+  //   if (!doorModelList) {
+  //     return myAlert.info({ title: '尚未取得門型資料' });
+  //   }
 
-    const newKey = nanoid();
-    const classProd = new Class_product({
-      reRender,
-      delSelf: () => delSelf_prod(productList, newKey),
-      copySelf: () => copySelf_prod(productList, newKey),
-      callCalcSubTotal,
-      // calcSubTotalPrice,
-      doorModelList,
-      onDoorTypeChange: onClassDoorTypeChange,
-      quotationDiscount: quotationDiscount,
-    });
-    productList[newKey] = classProd;
+  //   const newKey = nanoid();
+  //   const classProd = new Class_product({
+  //     reRender,
+  //     delSelf: () => {
+  //       delSelf_prod(productList, newKey);
+  //       onClassDiscountChange();
+  //     },
+  //     copySelf: () => {
+  //       copySelf_prod(productList, newKey);
+  //       onClassDiscountChange();
+  //     },
+  //     callCalcSubTotal,
+  //     // calcSubTotalPrice,
+  //     doorModelList,
+  //     onDoorTypeChange: onClassDoorTypeChange,
+  //     // quotationDiscount: quotationDiscount,
+  //     onDiscountChange: onClassDiscountChange,
+  //   });
+  //   productList[newKey] = classProd;
 
-    reRender();
-  };
+  //   onClassDiscountChange();
+
+  //   reRender();
+  // };
 
   useEffect(() => {
     const prodKeyArr = (() => {
@@ -513,30 +599,61 @@ const useProductList = ({
     }
   }, [calcTrigger]);
 
-  /**修改所有class_product的quotationDiscount */
-  const changeAllProdQuotationDiscount = (v: number) => {
-    Object.values(productList).forEach((prod) => {
-      prod.quotationDiscount = v;
-    });
-    Object.values(attachProdList).forEach((prod) => {
-      prod.quotationDiscount = v;
-    });
-  };
+  // 修改所有class_product的quotationDiscount
+  // const changeAllProdQuotationDiscount = (v: number) => {
+  //   Object.values(productList).forEach((prod) => {
+  //     prod.quotationDiscount = v;
+  //   });
+  //   Object.values(attachProdList).forEach((prod) => {
+  //     prod.quotationDiscount = v;
+  //   });
+  // };
 
-  useEffect(() => {
-    // component裡面只有紀錄牌價，其他金額都是算出來的
-    // 因此即使沒有要變更主產品或總折數，也必須要執行changeAllProdQuotationDiscount
-    // 否則若quotationDiscount不是100，component的單價就會錯誤
-    changeAllProdQuotationDiscount(quotationDiscount);
-  }, [quotationDiscount]);
+  // useEffect(() => {
+  //   // component裡面只有紀錄牌價，其他金額都是算出來的
+  //   // 因此即使沒有要變更主產品或總折數，也必須要執行changeAllProdQuotationDiscount
+  //   // 否則若quotationDiscount不是100，component的單價就會錯誤
+
+  //   changeAllProdQuotationDiscount(quotationDiscount);
+  // }, [quotationDiscount]);
+
+  // const calcAvgDiscount = () => {
+  //   let discountTotal = new Decimal(0);
+  //   let count = 0;
+
+  //   // const prodArr = Object.values(productList);
+
+  //   Object.values(productList).forEach((prod) => {
+  //     discountTotal = discountTotal.add(prod.discount);
+  //     count = count + 1;
+
+  //     const exchangeProdList = prod.exchangeProdList;
+
+  //     Object.values(exchangeProdList).forEach((exchangeProd) => {
+  //       discountTotal = discountTotal.add(exchangeProd.discount);
+  //       count = count + 1;
+  //     });
+  //   });
+
+  //   Object.values(productList_attach).forEach((prod_attach) => {
+  //     discountTotal = discountTotal.add(prod_attach.discount);
+  //     count = count + 1;
+  //   });
+
+  //   const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+
+  //   return avgDiscount;
+  // };
 
   // ---------------------------------------------------------
-  /**回到編輯前的狀態，就是以一開始取得的資料重新建立list */
+  // 回到編輯前的狀態，就是以一開始取得的資料重新建立list
+
   const reset = () => {
     createProdList();
     createOthersList();
     setSubTotal('');
   };
+
   // ---------------------------------------------------------
 
   // 追加追減
@@ -553,108 +670,72 @@ const useProductList = ({
     const newKey = nanoid();
     const classProd = new Class_product({
       reRender,
-      delSelf: () => delSelf_prod(productList_attach, newKey),
+      delSelf: () => {
+        delSelf_prod(productList_attach, newKey);
+        calcDiscount_two();
+      },
       copySelf: () => {
         copySelf_prod(productList_attach, newKey);
+        calcDiscount_two();
       },
       callCalcSubTotal,
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
-      quotationDiscount: quotationDiscount,
+      // quotationDiscount: quotationDiscount,
+      onDiscountChange: calcDiscount_two,
+      onQtyChange: calcDiscount_two,
     });
     productList_attach[newKey] = classProd;
+
+    calcDiscount_two();
 
     reRender();
   };
 
   useEffect(() => {
     if (productArr_attach && doorModelList) {
-      const list: TproductList = {};
+      // const list: TproductList = {};
+
+      const keyArr_productList_attach = Object.keys(productList_attach);
+      keyArr_productList_attach.forEach((key) => {
+        delete productList_attach[key];
+      });
 
       productArr_attach.forEach((prod) => {
-        let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+        const key = prod.order !== undefined ? `${prod.order}` : nanoid();
 
-        if (key in list) {
-          key = nanoid();
-        }
+        // if (key in productList_attach) {
+        //   key = nanoid();
+        // }
 
         const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
 
-        // const prodData: Tprod = {
-        //   ...prod,
-        //   phase: prod.motorPhase,
-        //   voltage: String(prod.motorVoltage),
-        //   motorSupport: prod.hasMotorSupportStand,
-        //   doorTrackThick: String(prod.guideRailThickness),
-        //   rollUpBoxThick: String(prod.headBoxThickness),
-        //   // 取得時是mm，要轉成m
-        //   WG: String(Number(prod.WG) / 1000),
-        //   fullWidth: String(Number(prod.fullWidth) / 1000),
-        //   height: String(Number(prod.height) / 1000),
-        //   boxB: String(Number(prod.boxB) / 1000),
-        //   boxD: String(Number(prod.boxD) / 1000),
-        //   guideRailG: prod.guideRailG || 0,
-        //   // options: prod.options ?? [],
-
-        //   // quantity: prod.items?.length ?? 0,
-        //   // quantity: prod.quantity ?? 0,
-        //   // 後端說現階段每個items都長的一樣，隨便挑一個出來用就好了
-        //   accessories: prod.items?.[0].accessories ?? [],
-        //   components: prod.items?.[0].components ?? [],
-        //   //
-
-        //   doorType: prod.doorModelName,
-        //   material: prod.materialName,
-        //   surface: prod.materialSurface ?? '',
-        //   close: prod.closingType,
-        //   doorTrack: prod.guideRail,
-        //   typhoonProtection: prod.isAntiTyphoon,
-        //   motor: prod.motorVendor,
-        //   doorTrackSilencerStrip: prod.hasSilencingStrip,
-        //   onePieceRollUpBox: prod.isIntegratedHeadBox,
-        //   thickness: String(prod.thickness ?? ''),
-        //   bottomBar: prod.bottomBar ? prod.bottomBar : 'none',
-
-        //   slatCount: prod.slatCount ?? '',
-        //   sprocketWheelModel: prod.sprocketWheelModel ?? '',
-        //   sprocketWheelTeethNumber: prod.sprocketWheelTeethNumber ?? '',
-        //   sprocketWheelChains: prod.sprocketWheelChains ?? '',
-        //   bearingInnerDiameter: prod.bearingInnerDiameter ?? '',
-        //   diameter: prod.diameter ?? '',
-        //   bearingHousingTotalLength: prod.bearingHousingTotalLength ?? '',
-        //   guideRailsOpening: prod.guideRailsOpening ?? '',
-        //   slatLength: prod.slatLength ?? 0,
-        //   guideRailLength: prod.guideRailLength ?? 0,
-        //   headBoxLength: prod.headBoxLength ?? 0,
-        //   bearingHousingSize: prod.bearingHousingSize ?? 0,
-        //   bearingName: prod.bearingName ?? '',
-        //   gapA: prod.gapA ?? '',
-        //   gapC: prod.gapC ?? '',
-        //   gearNumber: prod.gearNumber ?? '',
-        //   weight: prod.weight ?? '',
-        //   isULGuideRail: prod.isULGuideRail ?? false,
-        //   bounceDoorWidth: prod.bounceDoorWidth || 0,
-        //   //
-        //   distributionBoxQuantity: prod.distributionBoxQuantity ?? 1,
-        //   distributionBoxDualPrice: prod.distributionBoxDualPrice ?? prod.distributionBoxPrice,
-        //   distributionBoxTotalPrice: prod.distributionBoxTotalPrice ?? prod.distributionBoxUnitPrice,
-        // };
-
-        list[key] = new Class_product({
+        productList_attach[key] = new Class_product({
           reRender,
           prodData,
-          delSelf: () => delSelf_prod(list, key),
-          copySelf: () => copySelf_prod(list, key),
+          delSelf: () => {
+            delSelf_prod(productList_attach, key);
+            calcDiscount_two();
+          },
+          copySelf: () => {
+            copySelf_prod(productList_attach, key);
+            calcDiscount_two();
+          },
           callCalcSubTotal,
           doorModelList,
           originProd: prod,
           onDoorTypeChange: onClassDoorTypeChange,
+          onDiscountChange: calcDiscount_two,
+          onQtyChange: calcDiscount_two,
           disabled_quantity: true,
-          quotationDiscount: quotationDiscount,
+          // quotationDiscount: quotationDiscount,
         });
       });
 
-      setProductList_attach(list);
+      // setProductList_attach(list);
+
+      calcDiscount_two();
+      reRender();
     }
   }, [productArr_attach]);
 
@@ -732,6 +813,20 @@ const useProductList = ({
     //
   };
 
+  // const onClassDiscountChange = () => {
+  //   onDiscountChange?.(calcAvgDiscount());
+  // };
+
+  const changeAllProductDiscount = (num: number) => {
+    Object.values(productList).forEach((prod) => {
+      prod.discount_noTimeout = String(num);
+    });
+
+    Object.values(productList_attach).forEach((prod) => {
+      prod.discount_noTimeout = String(num);
+    });
+  };
+
   // ---------------------------------------------------------
 
   return {
@@ -767,18 +862,31 @@ const useProductList = ({
     attachProdList,
     // attachProdList: productList_attach,
     addProd_attach,
-    /**追加總金額 */
+    // 追加總金額
     attachAddTotal,
-    /**追減總金額 */
+    // 追減總金額
     attachDivTotal,
-    /**追加追減總金額 */
+    // 追加追減總金額
     attachTotal,
     //
     calcSubTotalPrice,
     // changeAllProdQuotationDiscount, // 修改所有class_product的quotationDiscount
+    changeAllProductDiscount,
+    avgDiscount,
+    avgDiscount_withQty,
   };
 };
 
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
 const getAnno = async ({
   //
   doorModelName,
@@ -1012,49 +1120,46 @@ export type {
   TothersList,
 };
 
-/**
- * get /products/door/models
- * 報價別下拉式選單用這個api給的name，其他都不要給人選
- * 下面這兩個是下拉式選單的選項
- * guideRails.withHook, 這是防颱勾 true必須有防颱才能選 false就是必須非防颱 null就是都可以
- * slatMaterials 這是門片材質(英文的意思不要管)
- *
- *
- * /products/door/calc-general-spec
- * 會用到的似乎只有weight與motors
- * defaultMotorIndex的意思是系統算出來最合適的馬達的index
- *
- * motors.box 裡面有default 東元 大同 如果只有default，那就是東元跟大同都可以，我自己隨便預設一個
- * 如果同時有東元與大同我自己隨便預設一個
- * 如果只有東元或只有大同，那就是東元或大同
- * motors.box..boxB就是 B(m)，選擇馬達後要同步改變B(m)
- * 基本上只有defaultMotorIndex指定的motors.box會有boxB
- * boxD用不到先不管
- *
- * diameter就是卷軸直徑
- * 作為/products/door/available-components 的rollerDiameter引數
- *
- *
- *
- * /products/door/available-components
- * slats就是門片
- * botomBar底座
- *
- * sidePlates 這是支版
- * 軸承跟齒輪先跳過不判定
- *
- * motors.loadWeight 門重不可以大於這個值
- * phase與voltage 如果可以讓使用者選擇就要檢查
- * gearNumber先不管，理論上馬達的gearNumber要跟支版的gearNumber一樣
- *
- * bearingType對應calc-general-spec的bearing name
- *
- */
-
-/**
-目前用於計算價格的方法
-useProducts
-calcSubTotalPrice 計算productlist與otehrs totalPrice的總和`
-這個方法會送到Class_prod與Class_otehrs，於需要時呼叫
-
- */
+//
+// get /products/door/models
+// 報價別下拉式選單用這個api給的name，其他都不要給人選
+// 下面這兩個是下拉式選單的選項
+// guideRails.withHook, 這是防颱勾 true必須有防颱才能選 false就是必須非防颱 null就是都可以
+// slatMaterials 這是門片材質(英文的意思不要管)
+//
+//
+// /products/door/calc-general-spec
+// 會用到的似乎只有weight與motors
+// defaultMotorIndex的意思是系統算出來最合適的馬達的index
+//
+// motors.box 裡面有default 東元 大同 如果只有default，那就是東元跟大同都可以，我自己隨便預設一個
+// 如果同時有東元與大同我自己隨便預設一個
+// 如果只有東元或只有大同，那就是東元或大同
+// motors.box..boxB就是 B(m)，選擇馬達後要同步改變B(m)
+// 基本上只有defaultMotorIndex指定的motors.box會有boxB
+// boxD用不到先不管
+//
+// diameter就是卷軸直徑
+// 作為/products/door/available-components 的rollerDiameter引數
+//
+//
+//
+// /products/door/available-components
+// slats就是門片
+// botomBar底座
+//
+// sidePlates 這是支版
+// 軸承跟齒輪先跳過不判定
+//
+// motors.loadWeight 門重不可以大於這個值
+// phase與voltage 如果可以讓使用者選擇就要檢查
+// gearNumber先不管，理論上馬達的gearNumber要跟支版的gearNumber一樣
+//
+// bearingType對應calc-general-spec的bearing name
+//
+//
+//
+// 目前用於計算價格的方法
+// useProducts
+// calcSubTotalPrice 計算productlist與otehrs totalPrice的總和`
+// 這個方法會送到Class_prod與Class_otehrs，於需要時呼叫

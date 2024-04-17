@@ -2,10 +2,13 @@ import { useState } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
+// antd
+import { Popover } from 'antd';
+
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal';
-import MustTip_simple from 'components/global/gear/other/mustTip_simple';
+// import MustTip_simple from 'components/global/gear/other/mustTip_simple';
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
@@ -89,10 +92,21 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
         )}
 
         <div className={classNames(scss.avgDiscount, 'relative')}>
-          <span className="relative">
-            {'總折數'}
-            <MustTip_simple preStyle="minimal" />
-          </span>
+          <Popover
+            content={
+              <>
+                <span>平均折數計算方式</span>
+                <br />
+                <span>{`(所有主產品各自的折數*數量 的加總) / 總數量`}</span>
+              </>
+            }
+            trigger="hover"
+          >
+            <span className="relative">
+              {'平均折數'}
+              {/* <MustTip_simple preStyle="minimal" /> */}
+            </span>
+          </Popover>
           <div>
             <input
               type="number"
@@ -120,7 +134,7 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
             <div key={index} className={classNames(scss.avgDiscount, 'relative')}>
               <span className="relative">
                 {label}
-                <MustTip_simple preStyle="minimal" />
+                {/* <MustTip_simple preStyle="minimal" /> */}
               </span>
               <div>
                 <input

@@ -29,7 +29,7 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 import { quotationToReiviewChain } from 'js/utils/quotation/quotationToReiviewChain';
 
 import { Toption, optionsCreator_county } from 'js/utils/options/countryAndDistrict';
-import { optionsCreator_productMaterial, optionsCreator_doorModel_2 } from 'js/utils/options/productOptions';
+import { optionsCreator_productMaterial, optionsCreator_doorModelName } from 'js/utils/options/productOptions';
 
 // type
 import type { Thead_popFormList } from 'components/page/domestic/queryQuotation/queryQuotationList/thead';
@@ -284,7 +284,7 @@ export default function Budget() {
   const searchTargetList: TsearchGroup['searchTargetList'] = [
     {
       placeholder: '主產品門型',
-      options: optionsCreator_doorModel_2({ haveEmpty: true }),
+      options: optionsCreator_doorModelName({ haveEmpty: true }),
     },
     {
       placeholder: '主產品材質',
