@@ -52,7 +52,16 @@ export type Tcontrol = {
   };
 };
 
-export default function PayInfo({ disabled, control }: { disabled: boolean; control: Tcontrol }) {
+export default function PayInfo({
+  //
+  disabled,
+  control,
+  avgDiscount_withQty,
+}: {
+  disabled: boolean;
+  control: Tcontrol;
+  avgDiscount_withQty: string | number;
+}) {
   const [modalIsShow, setModalIsShow] = useState(false);
   // -----------------------------------------------------------------------
   const { payment, delivery, paymentMethod } = control;
@@ -98,15 +107,32 @@ export default function PayInfo({ disabled, control }: { disabled: boolean; cont
                 <span>平均折數計算方式</span>
                 <br />
                 <span>{`(所有主產品各自的折數*數量 的加總) / 總數量`}</span>
+                <br />
+                <span>例如有兩個主產品A與B，A的數量為兩個、折數為100，B的數量為一個、折數50</span>
+                <br />
+                <span>{'平均折數的計算就是 (100*2 + 50*1) / 3'}</span>
               </>
             }
             trigger="hover"
           >
             <span className="relative">
-              {'平均折數'}
+              {'主產品平均折數'}
               {/* <MustTip_simple preStyle="minimal" /> */}
             </span>
           </Popover>
+
+          <div>
+            <span>{avgDiscount_withQty}</span>
+            <span>%</span>
+          </div>
+        </div>
+
+        <div className={classNames(scss.avgDiscount, 'relative')}>
+          <span className="relative">
+            {'總折數'}
+            {/* <MustTip_simple preStyle="minimal" /> */}
+          </span>
+
           <div>
             <input
               type="number"

@@ -705,8 +705,8 @@ const props_annotation: TselectorProps<TannotationDto> = {
   },
 };
 
-const props_quotationRange: TselectorProps<TannotationDto> = {
-  useInfinit: useGetAnnotation_infinite,
+const props_quotationRange: TselectorProps<TquotationRangeDto> = {
+  useInfinit: useGetQuotationRanges_infinite,
   selectedKey: 'description',
   caption: '報價單報價範圍',
   configArr: [
