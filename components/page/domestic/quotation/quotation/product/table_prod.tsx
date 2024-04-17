@@ -74,7 +74,7 @@ export default function Table_prod({
   isShowDndBtn?: boolean;
   // changeAllProductDiscount?: (v: `${number}`) => void;
   // avgDiscount?: number | string;
-  discountRate: string | number;
+  discountRate: string | number | undefined;
   changeDiscountRate?: (v: string) => void;
 }) {
   const [allowMove, setAllowMove] = useState(false);
