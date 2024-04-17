@@ -136,8 +136,8 @@ class Class_component {
 
   calcAllPrice({ calcProdTotal = true }: { calcProdTotal?: boolean } = {}) {
     const discount = new Decimal(this._prod.discount).div(100);
-    // const quotationDiscount = new Decimal(this._prod.quotationDiscount).div(100);
-    const quotationDiscount = 1;
+    const quotationDiscount = new Decimal(this._prod.quotationDiscount).div(100);
+    // const quotationDiscount = 1;
 
     const quantity = Number(this._com.quantity || 0);
 

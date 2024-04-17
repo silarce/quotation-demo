@@ -46,8 +46,10 @@ export default function Table_prod({
   isRedBorder,
   exchangeDiabled,
   isShowDndBtn = true,
-  changeAllProductDiscount,
-  avgDiscount,
+  // changeAllProductDiscount,
+  // avgDiscount,
+  discountRate,
+  changeDiscountRate,
 }: {
   disabled: boolean;
   disabled_plus?: boolean;
@@ -70,8 +72,10 @@ export default function Table_prod({
   isRedBorder?: boolean;
   exchangeDiabled?: boolean;
   isShowDndBtn?: boolean;
-  changeAllProductDiscount?: (v: `${number}`) => void;
-  avgDiscount?: number | string;
+  // changeAllProductDiscount?: (v: `${number}`) => void;
+  // avgDiscount?: number | string;
+  discountRate: string | number;
+  changeDiscountRate?: (v: string) => void;
 }) {
   const [allowMove, setAllowMove] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -119,24 +123,24 @@ export default function Table_prod({
           {allowMove ? '確定排序' : '設定排序'}
         </button>
 
-        {changeAllProductDiscount && (
-          <InputSel
-            //
-            caption="總折數"
-            captionSize="18"
-            className={scss.totalDiscountChange}
-            inputProps={{
-              props: {
-                type: 'number',
-                value: isNaN(+(avgDiscount ?? 0)) ? '' : avgDiscount,
-                onChange: (e) => {
-                  changeAllProductDiscount?.(e.target.value as `${number}`);
-                },
-                placeholder: '',
+        <InputSel
+          //
+          caption="總折數"
+          captionSize="18"
+          className={scss.totalDiscountChange}
+          disabled={disabled}
+          showBaseline="auto"
+          inputProps={{
+            props: {
+              type: 'number',
+              value: discountRate,
+              onChange: (e) => {
+                changeDiscountRate?.(e.target.value);
               },
-            }}
-          />
-        )}
+              placeholder: '',
+            },
+          }}
+        />
       </div>
 
       {/*  */}

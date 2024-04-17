@@ -282,9 +282,8 @@ class Class_product {
     onDiscountChange,
     onQtyChange,
     disabled_quantity,
-  }: //
-  // quotationDiscount,
-  {
+    quotationDiscount,
+  }: {
     reRender: TreRender;
     prodData?: Tprod;
     delSelf: () => void;
@@ -302,7 +301,7 @@ class Class_product {
     disabled_quantity?: boolean;
     //
     // 報價單折數，也就是TquotationContentDto[discount]
-    // quotationDiscount: number;
+    quotationDiscount: number;
   }) {
     this.reRender = reRender;
     // this.setIsLoading = setIsLoading;
@@ -336,7 +335,7 @@ class Class_product {
     this.disabled_quantity = disabled_quantity;
 
     // 報價單折數，也就是TquotationContentDto[discount]
-    // this._quotationDiscount = quotationDiscount;
+    this._quotationDiscount = quotationDiscount;
 
     if (!this._prodData.material && !this.isSpecialProd) {
       this._prodData.material = 'SST#304';
@@ -415,7 +414,7 @@ class Class_product {
   // readonly options_doorTrack_normal = options_doorTrack_normal;
   // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
 
-  // private _quotationDiscount = 100;
+  private _quotationDiscount = 100;
 
   private makeFormatValueDontTriggerTwice = false;
 
@@ -1647,8 +1646,7 @@ class Class_product {
     const qty = this._prodData.quantity;
 
     const discount = new Decimal(this._prodData.discount || '0').div(100);
-    // const quotationDiscount = new Decimal(this._quotationDiscount || '0').div(100);
-    const quotationDiscount = 1;
+    const quotationDiscount = new Decimal(this._quotationDiscount || '0').div(100);
 
     this.dualPrice = price.mul(qty).toFixed(0);
     const unitPrice = price.mul(discount).mul(quotationDiscount).toFixed(0);
@@ -2304,18 +2302,18 @@ class Class_product {
   // ---------------------------------------------------------
 
   // 報價單折數，也就是TquotationContentDto[discount]
-  // get quotationDiscount() {
-  //   return this._quotationDiscount;
-  // }
+  get quotationDiscount() {
+    return this._quotationDiscount;
+  }
 
-  // set quotationDiscount(v) {
-  //   this._quotationDiscount = v;
-  //   // 因為折數改變了，所以選配設定的價格要重新計算
-  //   this.calcAllPrice_comAndSubComAndAcce();
+  set quotationDiscount(v) {
+    this._quotationDiscount = v;
+    // 因為折數改變了，所以選配設定的價格要重新計算
+    this.calcAllPrice_comAndSubComAndAcce();
 
-  //   // this.calcProdAllprice_timeout();
-  //   this.reRender();
-  // }
+    // this.calcProdAllprice_timeout();
+    this.reRender();
+  }
 
   // 主產品的折數，與報價單折數不同
   get discount() {
@@ -3680,7 +3678,7 @@ class Class_product {
       doorModelList: this._doorModelList,
       parentProd: this,
       disabled_quantity: true,
-      // quotationDiscount: this._quotationDiscount,
+      quotationDiscount: this._quotationDiscount,
       onDiscountChange: this.onDiscountChange,
       onQtyChange: this.onQtyChange,
     });
