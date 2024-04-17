@@ -389,7 +389,9 @@ export default function QuotationPdf({
       const r8 = beginRow + 8;
       const r9 = beginRow + 9;
       const r10 = beginRow + 10;
-      const rThead = beginRow + 11;
+      const r11 = r10 + 1;
+      // const rThead = beginRow + 11;
+      const rThead = r11 + 1;
       const rTbody = rThead + 1;
       const rTbodyLatest = rTbody + prodQtyPerPage - 1;
       // const r12 = beginRow + 12;
@@ -401,7 +403,7 @@ export default function QuotationPdf({
       const rTotal = rSubToTal + 2;
       const rOther = rTotal + 1;
       const rQuotationRange = rOther + 1;
-      const rQuotationRangeLatest = rQuotationRange + quotaionRangeRowQty - 1;
+      const rQuotationRangeLatest = rQuotationRange + quotaionRangeRowQty - 2;
 
       const rPayWay = rOther + 4;
       const rAgent = rPayWay + 6;
@@ -473,7 +475,9 @@ export default function QuotationPdf({
       const B9 = sheet.getCell(`B${r9}`);
       B9.value = `電　　話： ${contactNumber}`;
       const B10 = sheet.getCell(`B${r10}`);
-      B10.value = `工程名稱地點：${projectName}  ${allAddress}`;
+      B10.value = `工程名稱：${projectName}`;
+      const B11 = sheet.getCell(`B${r11}`);
+      B11.value = `工程地點：${allAddress}`;
 
       const E9 = sheet.getCell(`E${r9}`);
       E9.value = `傳　　真：${faxNumber}`;
