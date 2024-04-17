@@ -71,7 +71,7 @@ class Class_component {
     }
 
     if (key === 'slat' && prod.doorType === 'SJ-305D') {
-      this.optionalComponentAction = 'slat_SJ-302';
+      this.optionalComponentAction = 'slat_SJ-305D';
     }
 
     // =constructor
@@ -100,7 +100,7 @@ class Class_component {
   //
   makeFormatValueDontTriggerTwice = false;
 
-  optionalComponentAction: undefined | 'slat_SJ-302' = undefined;
+  optionalComponentAction: undefined | 'slat_SJ-305D' = undefined;
 
   // ---------------------------------------------------------
 
@@ -236,7 +236,7 @@ class Class_component {
   }
 
   get options_desc_select() {
-    if (this.optionalComponentAction === 'slat_SJ-302') {
+    if (this.optionalComponentAction === 'slat_SJ-305D') {
       const slatArr = this._prod.avalibleComponent?.slats ?? [];
 
       return slatArr.map((item) => ({ value: item.name, label: item.name }));
@@ -267,7 +267,7 @@ class Class_component {
   }
 
   set desc_select(v: string) {
-    if (this.optionalComponentAction === 'slat_SJ-302') {
+    if (this.optionalComponentAction === 'slat_SJ-305D') {
       const targetComponent = this._prod.avalibleComponent?.slats.find((slat) => {
         return slat.name.includes(v);
       });

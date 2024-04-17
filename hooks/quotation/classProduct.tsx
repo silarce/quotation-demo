@@ -1442,6 +1442,17 @@ class Class_product {
     // 正確的金額之後會在 post /products/door/generate-door-product-bom 取得
 
     slat = _.cloneDeep(slat);
+
+    if (this.doorType === 'SJ-305D' && slat) {
+      const standardSlat_sj305D = availableComponents.slats.find((ac) => {
+        return ac.name.includes('標準');
+      });
+
+      if (standardSlat_sj305D) {
+        slat = standardSlat_sj305D;
+      }
+    }
+
     roller = _.cloneDeep(roller);
     headBox = _.cloneDeep(headBox);
     bottomBar = _.cloneDeep(bottomBar);
