@@ -22,6 +22,8 @@ import { Class_other, Tothers, TothersKey, othersCellConfig, othersKeyArrOri, em
 // type
 import { TcreateQuotationContentOtherDto, TquotationProductDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
 
+import { checkIsFloat } from 'js/utils/checkValue';
+
 // =======================================================================
 
 type TreRender = () => void;
@@ -817,13 +819,19 @@ const useProductList = ({
   //   onDiscountChange?.(calcAvgDiscount());
   // };
 
-  const changeAllProductDiscount = (num: number) => {
+  const changeAllProductDiscount = (str: `${number}`) => {
+    const isValid = checkIsFloat(str, 3);
+
+    if (!isValid) {
+      return;
+    }
+
     Object.values(productList).forEach((prod) => {
-      prod.discount_noTimeout = String(num);
+      prod.discount_noTimeout = String(str);
     });
 
     Object.values(productList_attach).forEach((prod) => {
-      prod.discount_noTimeout = String(num);
+      prod.discount_noTimeout = String(str);
     });
   };
 

@@ -70,7 +70,7 @@ export default function Table_prod({
   isRedBorder?: boolean;
   exchangeDiabled?: boolean;
   isShowDndBtn?: boolean;
-  changeAllProductDiscount?: (v: number) => void;
+  changeAllProductDiscount?: (v: `${number}`) => void;
   avgDiscount?: number | string;
 }) {
   const [allowMove, setAllowMove] = useState(false);
@@ -127,9 +127,10 @@ export default function Table_prod({
             className={scss.totalDiscountChange}
             inputProps={{
               props: {
+                type: 'number',
                 value: isNaN(+(avgDiscount ?? 0)) ? '' : avgDiscount,
                 onChange: (e) => {
-                  changeAllProductDiscount?.(Number(e.target.value));
+                  changeAllProductDiscount?.(e.target.value as `${number}`);
                 },
                 placeholder: '',
               },
