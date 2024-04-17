@@ -1,29 +1,20 @@
-/**
- 送了合約審核表就會被鎖定
- */
+// 送了合約審核表就會被鎖定
 
 // 常用變數目錄
-/**
- * useProductList
- * reqUpdateQuotation
- * useGetQuotation_id
- * fileInfoArr
- * reqReview 審核
- * reqPatchReviewer 送審
- * 編輯審核人員
- */
+
+// useProductList
+// reqUpdateQuotation
+// useGetQuotation_id
+// fileInfoArr
+// reqReview 審核
+// reqPatchReviewer 送審
+// 編輯審核人員
 
 // 業務與業務主管審核過後，status就會自動轉為Pending
 
-/**
- * 只是送審，不會被後端鎖住
- * 有人審核過了就會被後端鎖住
- * 在Pending狀態會被後端鎖住
- *
- *
- *
- *
- */
+//只是送審，不會被後端鎖住
+//有人審核過了就會被後端鎖住
+//在Pending狀態會被後端鎖住
 
 // =============================================================
 // =============================================================
