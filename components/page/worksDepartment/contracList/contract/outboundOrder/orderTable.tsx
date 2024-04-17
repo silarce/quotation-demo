@@ -62,7 +62,8 @@ type TdeliveryStatusItem = {
   onConfirmClick?: undefined;
   onCancelClick?: undefined;
 };
-type TdeliveryStatusItem_date = {
+
+type TdeliveryStatusItem_data = {
   value: string;
   installer?: undefined;
   onChange?: undefined;
@@ -125,7 +126,7 @@ type Tgroup = {
       // disabled?: boolean;
       groupList: {
         btnPanelArr: TdeliveryStatusItem_btnPanel[];
-        installDateArr: TdeliveryStatusItem_date[];
+        installDateArr: TdeliveryStatusItem_data[];
 
         installerArr: TdeliveryStatusItem_installer[];
 

@@ -28,7 +28,7 @@ import { selectModalCreator_multi } from 'components/global/gear/modal/selectorM
 import style from './contract.module.scss';
 
 // api
-import { TquotationProductDto, useGetContract_id } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 import {
   // TupdateEngineeringDeliveryList,
   // TupdateDeliveryStatus,
@@ -42,12 +42,22 @@ import {
   apiDeleteDeliveryStatus,
 } from 'js/api/api_engineering';
 
+import { useGetContract_id_finalProductItem } from 'js/api/api_quotation';
+
 // utils
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 // import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { ToutsourcingDto, TerpFeatureDto, TquotationProductItemDto, TemployeeDto } from 'js/api/dtoTypes';
+import {
+  //
+  ToutsourcingDto,
+  TerpFeatureDto,
+  TquotationProductItemDto,
+  TemployeeDto,
+  TquotationProductDto,
+  TworksheetRecordDto,
+} from 'js/api/dtoTypes';
 
 // =====================================================================
 
@@ -77,6 +87,34 @@ type TdeliveryStatusInEdit = {
 
 type TselectorConfirm = (props: { outsourcingId?: string; employeeId?: string }) => void;
 
+type TworksheetList = {
+  [worksheetId: string]: {
+    worksheetId: string;
+    rootProduct: TquotationProductDto;
+    latestRecord: TworksheetRecordDto;
+  };
+};
+
+type TproductWorksheetList = {
+  [finalProductId: string]: {
+    product: TquotationProductDto;
+    worksheetList: {
+      // 以worksheetRecordId分類
+      [worksheetRecordId: string]: {
+        worksheetRecordId: string;
+        latestRecord: TworksheetRecordDto;
+        itemName: string;
+        totalQty: string; // 總數
+        totalVolume: string; // 總才數
+        // worksheetItemArr 裡放的是finalProduct的items.latestWorksheetItem
+        // 呼叫 apiPostDeliveryStatus或 apiPatchDeliveryStatus時
+        // body中的productItemId要放worksheetItemArr[number].id
+        worksheetItemArr: TquotationProductItemDto[];
+      };
+    };
+  };
+};
+
 // =====================================================================
 export default function OutboundOrder({
   isAdmin,
@@ -99,19 +137,6 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
-    customPopulate: ['subContracts.content.products.rootProdductId'],
-  });
-
-  const { engineeringContactId, engineeringDeliveryListId } = contract ?? {};
-
-  const { data: engineeringContact, update: update_engineeringContact } =
-    useGetEngineeringContact(engineeringContactId);
-
-  const { deliveryList, update_deliveryList } = useGetEngineeringDeliveryList(engineeringDeliveryListId);
-
-  // --------------------------------------------------------------------------
-
   const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
 
   const [notes, setNotes] = useState<string>();
@@ -129,11 +154,73 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
+  // 合約
+  const {
+    //
+    data: contract,
+    update: update_contract,
+  } = useGetContract_id(contractId, {
+    customPopulate: [
+      //
+      'subContracts.content.products.rootProdductId',
+      'engineeringDeliveryList',
+      'worksheet.latestRecord.contractProductItems.deliveryStatus.installerEmployees',
+      'worksheet.latestRecord.contractProductItems.deliveryStatus.installerOutsourcing',
+      'worksheet.latestRecord.contractProductItems.adjustedItem.accessories',
+      'worksheet.latestRecord.contractProductItems.accessories',
+      'worksheet.latestRecord.contractProductItems.rootproductId',
+      'worksheet.latestRecord.contractProductItems.rootWorksheetItem',
+      'worksheet.latestRecord.contractProductItems.latestWorksheetItem',
+      'engineeringContact',
+    ],
+  });
+
+  const {
+    //
+    engineeringDeliveryListId,
+    engineeringDeliveryList: deliveryList,
+    engineeringContact,
+    worksheet,
+  } = contract ?? {};
+
+  // 工程聯絡單
+  // const { data: engineeringContact, update: update_engineeringContact } =
+  //   useGetEngineeringContact(engineeringContactId);
+
+  const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
+  // deliveryList
+  // const { deliveryList, update_deliveryList } = useGetEngineeringDeliveryList(engineeringDeliveryListId);
+
+  // --------------------------------------------------------------------------
+
+  const foo = useMemo(() => {
+    console.log(finalProduct);
+    console.log(worksheet);
+
+    const productWorksheetList: TproductWorksheetList = {};
+
+    finalProduct.forEach((fp) => {
+      const { id, items } = fp;
+
+      productWorksheetList[id] = {
+        product: fp,
+        worksheetList: {},
+      };
+
+      items.forEach((item) => {
+        const { latestWorksheetItem } = item;
+        const worksheetRecordId = latestWorksheetItem?.worksheetRecordId;
+      });
+    });
+
+    //
+  }, [finalProduct, worksheet]);
+
   const worksheetArr = useMemo(() => {
-    return (deliveryList?.contract.worksheet ?? []).filter((worksheet) => {
+    return (contract?.worksheet ?? []).filter((worksheet) => {
       return worksheet.isAbandoned === false;
     });
-  }, [deliveryList?.contract.worksheet]);
+  }, [contract?.worksheet]);
 
   const contractProdList = useMemo(() => {
     if (!worksheetArr) {
@@ -159,6 +246,23 @@ export default function OutboundOrder({
     return list;
   }, [deliveryList]);
 
+  const defaultSelectorSelected = useMemo(() => {
+    if (!deleveryStatusInEdit) {
+      return undefined;
+    }
+
+    const a = Object.values(deleveryStatusInEdit)[0];
+    const b = Object.values(a)[0];
+    const deleveryStatus = Object.values(b)[0];
+
+    const { installerOutsourcing, installerEmployees } = deleveryStatus;
+
+    const outsourcingArr = installerOutsourcing ? [installerOutsourcing] : [];
+    const employeeArr = installerEmployees ?? [];
+
+    return [employeeArr, outsourcingArr] as [typeof employeeArr, typeof outsourcingArr];
+  }, [deleveryStatusInEdit]);
+
   // --------------------------------------------------------------------------
 
   useEffect(() => {
@@ -166,6 +270,7 @@ export default function OutboundOrder({
       try {
         setIsLoading(true);
         await update_contract();
+        await update_finalProduce();
       } catch (error) {
         const err = error as Error;
         myAlert.err({ title: '取得合約失敗', content: err.message });
@@ -178,8 +283,9 @@ export default function OutboundOrder({
     (async () => {
       try {
         setIsLoading(true);
-        await update_engineeringContact();
-        await update_deliveryList();
+        await update_contract();
+        // await update_engineeringContact();
+        // await update_deliveryList();
       } catch (error) {
       } finally {
         setIsLoading(false);
@@ -187,14 +293,14 @@ export default function OutboundOrder({
     })();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract]);
+  }, []);
 
   useEffect(() => {
     setNotes(deliveryList?.notes);
   }, [deliveryList, notesDiasbled]);
 
   useEffect(() => {
-    if (!deliveryList?.contract.worksheet) {
+    if (!contract?.worksheet) {
       return;
     }
 
@@ -339,7 +445,8 @@ export default function OutboundOrder({
     try {
       setIsLoading(true);
       await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, { notes: notes ?? '' });
-      await update_deliveryList();
+      // await update_deliveryList();
+      await update_contract();
       setNotesDiasbled(true);
     } catch (error) {
       const err = error as Error;
@@ -790,35 +897,7 @@ export default function OutboundOrder({
       };
     }) ?? [];
 
-  const defaultSelectorSelected = useMemo(() => {
-    if (!deleveryStatusInEdit) {
-      return undefined;
-    }
-
-    const a = Object.values(deleveryStatusInEdit)[0];
-    const b = Object.values(a)[0];
-    const deleveryStatus = Object.values(b)[0];
-
-    const { installerOutsourcing, installerEmployees } = deleveryStatus;
-
-    const outsourcingArr = installerOutsourcing ? [installerOutsourcing] : [];
-    const employeeArr = installerEmployees ?? [];
-
-    return [employeeArr, outsourcingArr] as [typeof employeeArr, typeof outsourcingArr];
-  }, [deleveryStatusInEdit]);
-
   // --------------------------------------------------------------------------
-
-  // --------------------------------------------------------------------------
-
-  // const panelList_noPromission: TpanelList = [
-  //   {
-  //     type: 'myButton',
-  //     label: '沒有權限編輯',
-  //     onClick: () => {},
-  //   },
-  // ];
-
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------

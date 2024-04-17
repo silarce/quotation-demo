@@ -1327,7 +1327,7 @@ export type TcreateEngineeringDeliveryStatusDto = {
   append: string | null;
   // 完成追加
   completeAppend: string | null;
-  // 所屬產品id
+  // 所屬產品id // 預期要放latestWorksheetItemId
   productItemId: string;
 };
 
@@ -1593,15 +1593,16 @@ export type TquotationProductItemDto = {
   worksheetId: string | null;
   // 工作表紀錄id
   worksheetRecordId: string | null;
-  // 修正後最新的itemId
+
+  // 最新的worksheetItemId
   latestWorksheetItemId: string | null;
-  // 修正後最新的item
+  // 最新的worksheetItem
   latestWorksheetItem: TquotationProductItemDto;
-  // 修正後最新的item
+  // 每次修改worksheet的紀錄
   adjustedWorksheetItems: TquotationProductItemDto[];
-  // 修正後最新的item
+  //
   rootWorksheetItemId: string | null;
-  // 修正後最新的item
+  // worksheet修改紀錄中第一個worksheetItem
   rootWorksheetItem: TquotationProductItemDto;
 };
 
@@ -2162,6 +2163,10 @@ export type TquotationContractDto = {
   /**應收帳款明細 */
   accountReceivable?: TaccountReceivableDto; // populate
   accountReceivableId: string | null;
+  //
+  //
+
+  engineeringDeliveryList?: TengineeringDeliveryListDto;
 };
 
 export type TcreateModifyQuotationDto = {
