@@ -97,19 +97,21 @@ type TworksheetList = {
 
 type TproductWorksheetList = {
   [finalProductId: string]: {
-    product: TquotationProductDto;
+    product: TquotationProductDto; // 最左邊的資料
     worksheetList: {
+      // 中間的資料
       // 以worksheetRecordId分類
       [worksheetRecordId: string]: {
-        worksheetRecordId: string;
-        latestRecord: TworksheetRecordDto;
-        itemName: string;
-        totalQty: string; // 總數
-        totalVolume: string; // 總才數
+        // worksheetRecordId: string;
+        // latestRecord: TworksheetRecordDto;
+        // itemName: string;
+        totalQty: number; // 總數
+        totalVolume: number; // 總才數
+        worksheetItem: TquotationProductItemDto; // 預期每一個worksheetItem都是一樣的，從worksheetItemArr裡隨便取一個
         // worksheetItemArr 裡放的是finalProduct的items.latestWorksheetItem
         // 呼叫 apiPostDeliveryStatus或 apiPatchDeliveryStatus時
         // body中的productItemId要放worksheetItemArr[number].id
-        worksheetItemArr: TquotationProductItemDto[];
+        worksheetItemArr: TquotationProductItemDto[]; // 裡面的deliveryStatus是右邊的資料
       };
     };
   };
@@ -193,10 +195,7 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
-  const foo = useMemo(() => {
-    console.log(finalProduct);
-    console.log(worksheet);
-
+  const productWorksheetList = useMemo(() => {
     const productWorksheetList: TproductWorksheetList = {};
 
     finalProduct.forEach((fp) => {
@@ -207,44 +206,81 @@ export default function OutboundOrder({
         worksheetList: {},
       };
 
+      const { worksheetList } = productWorksheetList[id];
+
       items.forEach((item) => {
         const { latestWorksheetItem } = item;
-        const worksheetRecordId = latestWorksheetItem?.worksheetRecordId;
-      });
-    });
 
-    //
-  }, [finalProduct, worksheet]);
+        if (latestWorksheetItem) {
+          const { worksheetRecordId, volume } = latestWorksheetItem;
 
-  const worksheetArr = useMemo(() => {
-    return (contract?.worksheet ?? []).filter((worksheet) => {
-      return worksheet.isAbandoned === false;
-    });
-  }, [contract?.worksheet]);
-
-  const contractProdList = useMemo(() => {
-    if (!worksheetArr) {
-      return undefined;
-    }
-
-    const list: { [key: string]: TquotationProductDto } = {};
-
-    worksheetArr.forEach((worksheet) => {
-      const { latestRecord } = worksheet;
-      const contractProductItems = latestRecord.contractProductItems ?? [];
-      const latestRecordId = latestRecord.id;
-
-      contractProductItems.forEach((item) => {
-        const { rootWorksheetItem } = item;
-
-        if (latestRecordId) {
-          list[latestRecordId] = rootWorksheetItem;
+          if (worksheetRecordId) {
+            if (!worksheetList[worksheetRecordId]) {
+              worksheetList[worksheetRecordId] = {
+                totalQty: 1,
+                totalVolume: Number(volume ?? 0),
+                worksheetItem: latestWorksheetItem,
+                worksheetItemArr: [latestWorksheetItem],
+              };
+            } else {
+              worksheetList[worksheetRecordId].totalQty += 1;
+              worksheetList[worksheetRecordId].totalVolume += Number(volume ?? 0);
+              worksheetList[worksheetRecordId].worksheetItemArr.push(latestWorksheetItem);
+            }
+          }
         }
       });
     });
 
-    return list;
-  }, [deliveryList]);
+    return productWorksheetList;
+
+    //
+  }, [finalProduct]);
+
+  console.log(productWorksheetList);
+
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+  // 接著把productWorksheetList帶進去
+
+  // const worksheetArr = useMemo(() => {
+  //   return (contract?.worksheet ?? []).filter((worksheet) => {
+  //     return worksheet.isAbandoned === false;
+  //   });
+  // }, [contract?.worksheet]);
+
+  // const contractProdList = useMemo(() => {
+  //   if (!worksheetArr) {
+  //     return undefined;
+  //   }
+
+  //   const list: { [key: string]: TquotationProductDto } = {};
+
+  //   worksheetArr.forEach((worksheet) => {
+  //     const { latestRecord } = worksheet;
+  //     const contractProductItems = latestRecord.contractProductItems ?? [];
+  //     const latestRecordId = latestRecord.id;
+
+  //     contractProductItems.forEach((item) => {
+  //       const { rootWorksheetItem } = item;
+
+  //       if (latestRecordId) {
+  //         list[latestRecordId] = rootWorksheetItem;
+  //       }
+  //     });
+  //   });
+
+  //   return list;
+  // }, [deliveryList]);
 
   const defaultSelectorSelected = useMemo(() => {
     if (!deleveryStatusInEdit) {
@@ -299,45 +335,45 @@ export default function OutboundOrder({
     setNotes(deliveryList?.notes);
   }, [deliveryList, notesDiasbled]);
 
-  useEffect(() => {
-    if (!contract?.worksheet) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (!contract?.worksheet) {
+  //     return;
+  //   }
 
-    // const contractProductItems = deliveryList.contract.worksheet.latestRecord.contractProductItems;
+  //   // const contractProductItems = deliveryList.contract.worksheet.latestRecord.contractProductItems;
 
-    const myDeleveryList: TmyDeleveryList = {};
+  //   const myDeleveryList: TmyDeleveryList = {};
 
-    worksheetArr?.forEach((worksheet) => {
-      const { latestRecord } = worksheet;
-      const contractProductItems = latestRecord.contractProductItems ?? [];
-      const latestRecordId = latestRecord.id;
+  //   worksheetArr?.forEach((worksheet) => {
+  //     const { latestRecord } = worksheet;
+  //     const contractProductItems = latestRecord.contractProductItems ?? [];
+  //     const latestRecordId = latestRecord.id;
 
-      contractProductItems.forEach((item) => {
-        const { rootWorksheetItem } = item;
+  //     contractProductItems.forEach((item) => {
+  //       const { rootWorksheetItem } = item;
 
-        const theItem = item;
+  //       const theItem = item;
 
-        theItem.deliveryStatus = item.deliveryStatus;
-        // issue#198 // 改送item.id
-        theItem.id = item.id;
+  //       theItem.deliveryStatus = item.deliveryStatus;
+  //       // issue#198 // 改送item.id
+  //       theItem.id = item.id;
 
-        if (latestRecordId && !myDeleveryList?.[latestRecordId]) {
-          myDeleveryList[latestRecordId] = {
-            originalItem: rootWorksheetItem,
-            itemName: theItem.itemName,
-            itemArr: [],
-          };
-        }
+  //       if (latestRecordId && !myDeleveryList?.[latestRecordId]) {
+  //         myDeleveryList[latestRecordId] = {
+  //           originalItem: rootWorksheetItem,
+  //           itemName: theItem.itemName,
+  //           itemArr: [],
+  //         };
+  //       }
 
-        if (latestRecordId) {
-          myDeleveryList[latestRecordId].itemArr.push(theItem);
-        }
-      });
-    });
+  //       if (latestRecordId) {
+  //         myDeleveryList[latestRecordId].itemArr.push(theItem);
+  //       }
+  //     });
+  //   });
 
-    setMyDeleveryList(myDeleveryList);
-  }, [deliveryList]);
+  //   setMyDeleveryList(myDeleveryList);
+  // }, [deliveryList]);
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -464,7 +500,11 @@ export default function OutboundOrder({
 
       const prod = myDeleveryList![prodKey];
 
-      const theOriginalContractContent: TquotationProductDto | undefined = contractProdList![prodKey] as
+      // const theOriginalContractContent: TquotationProductDto | undefined = contractProdList![prodKey] as
+      // const theOriginalContractContent: TquotationProductDto | undefined = contractProdList![prodKey] as
+      //   | TquotationProductDto
+      //   | undefined;
+      const theOriginalContractContent: TquotationProductDto | undefined = undefined as
         | TquotationProductDto
         | undefined;
 

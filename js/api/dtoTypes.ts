@@ -1597,13 +1597,13 @@ export type TquotationProductItemDto = {
   // 最新的worksheetItemId
   latestWorksheetItemId: string | null;
   // 最新的worksheetItem
-  latestWorksheetItem: TquotationProductItemDto;
+  latestWorksheetItem?: TquotationProductItemDto;
   // 每次修改worksheet的紀錄
-  adjustedWorksheetItems: TquotationProductItemDto[];
+  adjustedWorksheetItems?: TquotationProductItemDto[];
   //
   rootWorksheetItemId: string | null;
   // worksheet修改紀錄中第一個worksheetItem
-  rootWorksheetItem: TquotationProductItemDto;
+  rootWorksheetItem?: TquotationProductItemDto;
 };
 
 type TquotationContentDto_copy = {
