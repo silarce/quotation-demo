@@ -749,8 +749,16 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
 export const apiGetContract_id_finalProductItem = async (contractId: string) => {
   const api = `/quotation/contracts/${contractId}/final-product-item`;
 
+  const params = {
+    propulate: [
+      // 'items.latestWorksheetItem'
+      // 'items.latestWorksheetItem.deliveryStatus',
+      // 'items.latestWorksheetItem.deliveryStatus',
+    ],
+  };
+
   return axi
-    .get<TquotationProductDto[]>(api)
+    .get<TquotationProductDto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };
