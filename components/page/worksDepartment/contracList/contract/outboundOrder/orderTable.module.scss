@@ -1,3 +1,5 @@
+$gap: 16px;
+
 .tableContainer {
   border: solid 1px theme("colors.border");
 }
@@ -5,16 +7,16 @@
 .orderTable {
   border: solid 4px white;
   overflow: auto;
+  max-height: 500px;
 }
 
 .row {
   --bgcWhite: white;
   --bgcGray: theme("colors.bgc01");
-  --gap: 16px;
 
   position: relative;
   display: flex;
-  gap: var(--gap);
+  gap: $gap;
   width: max-content;
   padding: 11px 0px;
   background-color: var(--bgcWhite);
@@ -24,7 +26,7 @@
   > div,
   > form {
     display: inline-flex;
-    gap: var(--gap);
+    gap: $gap;
     font-size: 16px;
   }
 
@@ -32,6 +34,10 @@
     background-color: var(--bgcWhite);
     border-left-width: 22px;
     border-color: var(--bgcWhite);
+  }
+  > .rightPanel {
+    display: grid;
+    gap: 16px;
   }
 
   // > .firstDivider {
@@ -99,4 +105,11 @@
       stroke: red;
     }
   }
+}
+
+.panel {
+  display: flex;
+  gap: $gap;
+  align-items: center;
+  font-size: 16px;
 }

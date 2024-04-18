@@ -752,7 +752,8 @@ export const apiGetContract_id_finalProductItem = async (contractId: string) => 
   const params = {
     propulate: [
       // 'items.latestWorksheetItem'
-      'items.latestWorksheetItem.deliveryStatus',
+      // 'items.latestWorksheetItem.deliveryStatus',
+      // 'items.latestWorksheetItem.deliveryStatus',
     ],
   };
 

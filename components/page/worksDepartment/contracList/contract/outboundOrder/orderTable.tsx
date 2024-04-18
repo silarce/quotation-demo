@@ -60,6 +60,7 @@ import { IconAddCircle, IconEdit, IconDelete01, IconCheck02 } from 'public/image
 // }[];
 
 type TrowProps = {
+  key?: string | number;
   className?: string;
   isHeadRow?: boolean;
   side?: {
@@ -99,10 +100,12 @@ type TrowProps = {
     itemName?: React.ReactNode;
     notes?: React.ReactNode;
   };
-  rightPanel?: Tpanel;
+  rightPanelArr?: Tpanel[];
 };
 
 type Tpanel = {
+  key?: string | number;
+  isUndefined?: boolean;
   accessorie: React.ReactNode; // 選配
   installationDate: string; // 施工日期
   installer_employee?: TemployeeDto | undefined | null; // 安裝人員 員工
@@ -317,13 +320,13 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
         <Thead />
 
         {rowPropsArr.map((rowProps, index) => {
-          const { isHeadRow } = rowProps;
+          const { isHeadRow, key } = rowProps;
 
           if (isHeadRow) {
-            return <HeadRow key={index} {...rowProps} />;
+            return <HeadRow key={key || index} {...rowProps} />;
           }
 
-          return <Row key={index} {...rowProps} />;
+          return <Row key={key || index} {...rowProps} />;
         })}
 
         {/* <HeadRow
@@ -457,7 +460,7 @@ const Row = ({
   left,
   center,
   right,
-  rightPanel,
+  rightPanelArr: rightPanelArr,
 }: TrowProps) => {
   return (
     <div className={classNames(scss.row, className)}>
@@ -509,9 +512,16 @@ const Row = ({
         </div>
       )}
 
-      {rightPanel && <Panel {...rightPanel} />}
+      {/* {rightPanelArr && <Panel {...rightPanelArr} />} */}
+      {rightPanelArr && (
+        <div className={scss.rightPanel}>
+          {rightPanelArr.map((rightPanel, index) => {
+            return <Panel key={rightPanel.key || index} {...rightPanel} />;
+          })}
+        </div>
+      )}
 
-      {!right && !rightPanel && (
+      {!right && !rightPanelArr && (
         <div className={scss.right}>
           <div className={classNames(scss.cell, 'w-52')} />
           <div className={classNames(scss.cell, 'w-24')} />
@@ -577,6 +587,7 @@ const HeadRow = (rowProps: TrowProps) => {
 // ------------------------------------------------------------------------
 
 const Panel = ({
+  isUndefined,
   accessorie,
   installationDate,
   installer_employee,
@@ -629,7 +640,11 @@ const Panel = ({
       <div className={classNames(scss.cell, scss.btnBar, 'w-24')}>
         <IconAddCircle onClick={onAddClick} />
         <IconEdit
-          className={classNames(!disabled && scss.active, !onDeleteClick && 'invisible')}
+          className={classNames(
+            //
+            !disabled && scss.active,
+            (!onDeleteClick || isUndefined) && 'invisible'
+          )}
           onClick={async () => {
             if (disabled) {
               setDisabled(false);
@@ -639,7 +654,15 @@ const Panel = ({
             }
           }}
         />
-        {disabled && <IconDelete01 className={classNames(!onDeleteClick && 'invisible')} />}
+        {disabled && (
+          <IconDelete01
+            onClick={onDeleteClick}
+            className={classNames(
+              //
+              (!onDeleteClick || isUndefined) && 'invisible'
+            )}
+          />
+        )}
         {!disabled && (
           <IconCheck02
             className={classNames(!onConfirmClick && 'invisible')}
@@ -658,7 +681,7 @@ const Panel = ({
         )}
       </div>
 
-      <div className={classNames(scss.cell, 'w-28')}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-28')}>
         <InputSel
           name="installationDate"
           disabled={disabled}
@@ -675,7 +698,7 @@ const Panel = ({
           }}
         />
       </div>
-      <div className={classNames(scss.cell, 'w-24')}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-24')}>
         <InputSel
           name="installerEmployees"
           disabled={disabled}
@@ -687,7 +710,7 @@ const Panel = ({
           }}
         />
       </div>
-      <div className={classNames(scss.cell, 'w-24')}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-24')}>
         <InputSel
           name="itemName"
           disabled={disabled}
@@ -704,13 +727,13 @@ const Panel = ({
           }}
         />
       </div>
-      <div className={classNames(scss.cell, 'w-52')}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-52')}>
         <InputSel
           name="notes"
           disabled={disabled}
           inputProps={{
             props: {
-              value: notes,
+              value: state.notes,
               onChange: (e) => {
                 setState((state) => ({
                   ...state,
