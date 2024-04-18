@@ -132,3 +132,10 @@
 .hidden {
   visibility: hidden;
 }
+
+.avgDiscount {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 2px;
+}
