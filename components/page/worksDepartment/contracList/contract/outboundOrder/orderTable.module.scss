@@ -1,0 +1,115 @@
+$gap: 16px;
+
+.tableContainer {
+  border: solid 1px theme("colors.border");
+}
+
+.orderTable {
+  border: solid 4px white;
+  overflow: auto;
+  max-height: 500px;
+}
+
+.row {
+  --bgcWhite: white;
+  --bgcGray: theme("colors.bgc01");
+
+  position: relative;
+  display: flex;
+  gap: $gap;
+  width: max-content;
+  padding: 11px 0px;
+  background-color: var(--bgcWhite);
+  border-right-width: 22px;
+  border-color: var(--bgcWhite);
+
+  > div,
+  > form {
+    display: inline-flex;
+    gap: $gap;
+    font-size: 16px;
+  }
+
+  > .side {
+    background-color: var(--bgcWhite);
+    border-left-width: 22px;
+    border-color: var(--bgcWhite);
+  }
+  > .rightPanel {
+    display: grid;
+    gap: 16px;
+  }
+
+  // > .firstDivider {
+  //   visibility: hidden;
+  // }
+
+  &.thead {
+    background-color: var(--bgcGray);
+    border-color: var(--bgcGray);
+    > .side {
+      background-color: var(--bgcGray);
+      border-color: var(--bgcGray);
+    }
+  }
+
+  &.headRow {
+    background-color: var(--bgcGray);
+    border-color: var(--bgcGray);
+    > .side {
+      background-color: var(--bgcGray);
+      border-color: var(--bgcGray);
+      // > div {
+      //   visibility: unset;
+      // }
+    }
+    // > .firstDivider {
+    //   visibility: unset;
+    // }
+  }
+}
+
+.side {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  // > div {
+  //   visibility: hidden;
+  // }
+}
+
+.divider {
+  position: relative;
+  display: block;
+  align-self: stretch;
+  padding: 2px 0px;
+  margin-left: 10px;
+  margin-right: 6px;
+  width: 1px;
+  background-color: theme("colors.border");
+}
+
+.btnBar {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+  .active {
+    path:nth-of-type(1) {
+      fill: red;
+    }
+    path:nth-of-type(2) {
+      stroke: red;
+    }
+  }
+}
+
+.panel {
+  display: flex;
+  gap: $gap;
+  align-items: center;
+  font-size: 16px;
+}

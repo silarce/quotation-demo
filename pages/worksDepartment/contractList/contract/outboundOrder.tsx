@@ -1,13 +1,6 @@
-// !!!!!!!!!!
-// !!!!!!!!!!
-// !!!!!!!!!!
-// !!!!!!!!!!
-
 // 工程管理單
 // 工程管理單
 // 工程管理單
-
-// setMyDeleveryList
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
@@ -23,7 +16,8 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 // component
 import OrderTable, {
   Tcontrol_orderTable,
-  Tgroup,
+  TrowProps,
+  Tpanel,
 } from 'components/page/worksDepartment/contracList/contract/outboundOrder/orderTable';
 
 // gear
@@ -35,7 +29,7 @@ import { selectModalCreator_multi } from 'components/global/gear/modal/selectorM
 import style from './contract.module.scss';
 
 // api
-import { TquotationProductDto, useGetContract_id } from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 import {
   // TupdateEngineeringDeliveryList,
   // TupdateDeliveryStatus,
@@ -49,12 +43,22 @@ import {
   apiDeleteDeliveryStatus,
 } from 'js/api/api_engineering';
 
+import { useGetContract_id_finalProductItem } from 'js/api/api_quotation';
+
 // utils
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // type
 // import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { ToutsourcingDto, TerpFeatureDto, TquotationProductItemDto, TemployeeDto } from 'js/api/dtoTypes';
+import {
+  //
+  ToutsourcingDto,
+  TerpFeatureDto,
+  TquotationProductItemDto,
+  TemployeeDto,
+  TquotationProductDto,
+  TworksheetRecordDto,
+} from 'js/api/dtoTypes';
 
 // =====================================================================
 
@@ -84,6 +88,36 @@ type TdeliveryStatusInEdit = {
 
 type TselectorConfirm = (props: { outsourcingId?: string; employeeId?: string }) => void;
 
+// type TworksheetList = {
+//   [worksheetId: string]: {
+//     worksheetId: string;
+//     rootProduct: TquotationProductDto;
+//     latestRecord: TworksheetRecordDto;
+//   };
+// };
+
+type TproductWorksheetList = {
+  [finalProductId: string]: {
+    product: TquotationProductDto; // 最左邊的資料
+    worksheetList: {
+      // 中間的資料
+      // 以worksheetRecordId分類
+      [worksheetRecordId: string]: {
+        // worksheetRecordId: string;
+        // latestRecord: TworksheetRecordDto;
+        // itemName: string;
+        totalQty: number; // 總數
+        totalVolume: number; // 總才數
+        worksheetItem: TquotationProductItemDto; // 預期每一個worksheetItem都是一樣的，從worksheetItemArr裡隨便取一個
+        // worksheetItemArr 裡放的是finalProduct的items.latestWorksheetItem
+        // 呼叫 apiPostDeliveryStatus或 apiPatchDeliveryStatus時
+        // body中的productItemId要放worksheetItemArr[number].id
+        worksheetItemArr: TquotationProductItemDto[]; // 裡面的deliveryStatus是右邊的資料
+      };
+    };
+  };
+};
+
 // =====================================================================
 export default function OutboundOrder({
   isAdmin,
@@ -92,63 +126,131 @@ export default function OutboundOrder({
   isAdmin: boolean;
   userErpFeature: TerpFeatureDto[] | undefined;
 }) {
-  const havePermissionToEdit = useMemo(() => {
-    if (isAdmin) {
-      return true;
-    }
+  // ___________________________________________________________________________
+  let havePermissionToEdit = isAdmin;
 
-    const isHave = userErpFeature?.some((item) => {
+  if (!isAdmin) {
+    havePermissionToEdit = !!userErpFeature?.some((item) => {
       return item.name === '工務部-工作表編輯';
     });
-
-    return !!isHave;
-  }, [userErpFeature]);
-
-  // --------------------------------------------------------------------------
+  }
 
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
-
-  const [isLoading, setIsLoading] = useState(false);
-  // const [disabled, setDisabled] = useState(true);
-  const [isReqing, setIsReqing] = useState(false);
-
-  // 外包廠商選擇器的onConfirm
-  const [selectorConfirm, setSelectorConfirm] = useState<TselectorConfirm>();
 
   // --------------------------------------------------------------------------
 
   const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
 
-  // console.log(deleveryStatusInEdit);
-
   const [notes, setNotes] = useState<string>();
   const [notesDiasbled, setNotesDiasbled] = useState(true);
 
-  const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
+  // const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
+
+  // _____________________________________________________________________________
+  const [isLoading, setIsLoading] = useState(false);
+  const [isReqing, setIsReqing] = useState(false);
+  // const [disabled, setDisabled] = useState(true);
+
+  // 外包廠商選擇器的onConfirm
+  const [selectorConfirm, setSelectorConfirm] = useState<TselectorConfirm>();
+
+  const [targetWorksheetItemId, setTargetWorksheetItemId] = useState<string>();
 
   // --------------------------------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
-    customPopulate: ['subContracts.content.products.rootProdductId'],
+  // 合約
+  const {
+    //
+    data: contract,
+    update: update_contract,
+  } = useGetContract_id(contractId, {
+    customPopulate: [
+      //
+      'subContracts.content.products.rootProdductId',
+      'engineeringDeliveryList',
+      // 'worksheet.latestRecord.contractProductItems.deliveryStatus.installerEmployees',
+      // 'worksheet.latestRecord.contractProductItems.deliveryStatus.installerOutsourcing',
+      // 'worksheet.latestRecord.contractProductItems.adjustedItem.accessories',
+      // 'worksheet.latestRecord.contractProductItems.accessories',
+      // 'worksheet.latestRecord.contractProductItems.rootproductId',
+      // 'worksheet.latestRecord.contractProductItems.rootWorksheetItem',
+      // 'worksheet.latestRecord.contractProductItems.latestWorksheetItem',
+      'engineeringContact',
+    ],
   });
-  const { engineeringContactId, engineeringDeliveryListId } = contract ?? {};
-  const { data: engineeringContact, update: update_engineeringContact } =
-    useGetEngineeringContact(engineeringContactId);
 
-  const { deliveryList, update_deliveryList } = useGetEngineeringDeliveryList(engineeringDeliveryListId);
+  const {
+    //
+    engineeringDeliveryListId,
+    engineeringDeliveryList: deliveryList,
+    engineeringContact,
+    // worksheet,
+  } = contract ?? {};
 
-  const worksheetArr = useMemo(() => {
-    return (deliveryList?.contract.worksheet ?? []).filter((worksheet) => {
-      return worksheet.isAbandoned === false;
+  // 工程聯絡單
+  // const { data: engineeringContact, update: update_engineeringContact } =
+  //   useGetEngineeringContact(engineeringContactId);
+
+  const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
+  // deliveryList
+  // const { deliveryList: deliveryList_2, update_deliveryList } =
+  //   useGetEngineeringDeliveryList(engineeringDeliveryListId);
+
+  // --------------------------------------------------------------------------
+
+  const productWorksheetList = useMemo(() => {
+    const productWorksheetList: TproductWorksheetList = {};
+
+    finalProduct.forEach((fp) => {
+      const { id, items } = fp;
+
+      productWorksheetList[id] = {
+        product: fp,
+        worksheetList: {},
+      };
+
+      const { worksheetList } = productWorksheetList[id];
+
+      items.forEach((item) => {
+        const { latestWorksheetItem } = item;
+
+        if (latestWorksheetItem) {
+          const { worksheetRecordId, volume } = latestWorksheetItem;
+
+          if (worksheetRecordId) {
+            if (!worksheetList[worksheetRecordId]) {
+              worksheetList[worksheetRecordId] = {
+                totalQty: 1,
+                totalVolume: Number(volume ?? 0),
+                worksheetItem: latestWorksheetItem,
+                worksheetItemArr: [latestWorksheetItem],
+              };
+            } else {
+              worksheetList[worksheetRecordId].totalQty += 1;
+              worksheetList[worksheetRecordId].totalVolume += Number(volume ?? 0);
+              worksheetList[worksheetRecordId].worksheetItemArr.push(latestWorksheetItem);
+            }
+          }
+        }
+      });
     });
-  }, [deliveryList?.contract.worksheet]);
+
+    return productWorksheetList;
+
+    //
+  }, [finalProduct]);
+
+  console.log(productWorksheetList);
+
+  // --------------------------------------------------------------------------
 
   useEffect(() => {
     (async () => {
       try {
         setIsLoading(true);
         await update_contract();
+        await update_finalProduce();
       } catch (error) {
         const err = error as Error;
         myAlert.err({ title: '取得合約失敗', content: err.message });
@@ -161,8 +263,9 @@ export default function OutboundOrder({
     (async () => {
       try {
         setIsLoading(true);
-        await update_engineeringContact();
-        await update_deliveryList();
+        await update_contract();
+        // await update_engineeringContact();
+        // await update_deliveryList();
       } catch (error) {
       } finally {
         setIsLoading(false);
@@ -170,245 +273,15 @@ export default function OutboundOrder({
     })();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contract]);
-
-  // const contractProdList = useMemo(() => {
-  //   if (!contract) {
-  //     return undefined;
-  //   }
-
-  //   let subContracts = contract.subContracts;
-
-  //   subContracts = _.sortBy(subContracts, 'version');
-
-  //   const list: { [key: string]: TquotationProductDto } = {};
-
-  //   subContracts.forEach((contract) => {
-  //     const prodArr = contract.content.products;
-  //     prodArr.forEach((prod) => {
-  //       list[prod.rootProductId] = prod;
-  //     });
-  //   });
-
-  //   Object.keys(list).forEach((key) => {
-  //     const item = list[key];
-
-  //     if (key !== item.id) {
-  //       list[item.id] = item;
-  //       delete list[key];
-  //     }
-  //   });
-
-  //   return list;
-  // }, [contract]);
-
-  const contractProdList = useMemo(() => {
-    if (!worksheetArr) {
-      return undefined;
-    }
-
-    const list: { [key: string]: TquotationProductDto } = {};
-
-    worksheetArr.forEach((worksheet) => {
-      const { latestRecord } = worksheet;
-      const contractProductItems = latestRecord.contractProductItems ?? [];
-      const latestRecordId = latestRecord.id;
-
-      contractProductItems.forEach((item) => {
-        const {
-          // productId,
-          // rootWorksheetItemId,
-          rootWorksheetItem,
-          // latestWorksheetItem: adjustedItem,
-          // latestWorksheetItemId: adjustedItemId,
-        } = item;
-
-        if (latestRecordId) {
-          // !應急的忽略型別檢查
-          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          list[latestRecordId] = rootWorksheetItem;
-          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-          // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        }
-      });
-    });
-
-    // subContracts.forEach((contract) => {
-    //   const prodArr = contract.content.products;
-    //   prodArr.forEach((prod) => {
-    //     list[prod.rootProductId] = prod;
-    //   });
-    // });
-
-    // Object.keys(list).forEach((key) => {
-    //   const item = list[key];
-
-    //   if (key !== item.id) {
-    //     list[item.id] = item;
-    //     delete list[key];
-    //   }
-    // });
-
-    return list;
-  }, [deliveryList]);
-
-  // --------------------------------------------------------------------------
+  }, []);
 
   useEffect(() => {
     setNotes(deliveryList?.notes);
   }, [deliveryList, notesDiasbled]);
 
   // --------------------------------------------------------------------------
-
   // --------------------------------------------------------------------------
-
-  // const worksheet = deliveryList?.contract.worksheet;
-  // const worksheetArr = deliveryList?.contract.worksheet;
-
-  // console.log(worksheetArr);
-
-  // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
-  useEffect(() => {
-    if (!deliveryList?.contract.worksheet) {
-      return;
-    }
-
-    // const contractProductItems = deliveryList.contract.worksheet.latestRecord.contractProductItems;
-
-    const myDeleveryList: TmyDeleveryList = {};
-
-    worksheetArr?.forEach((worksheet) => {
-      const { latestRecord } = worksheet;
-      const contractProductItems = latestRecord.contractProductItems ?? [];
-      const latestRecordId = latestRecord.id;
-
-      contractProductItems.forEach((item) => {
-        const {
-          // productId,
-          // rootWorksheetItemId,
-          rootWorksheetItem,
-          // latestWorksheetItem: latestWorksheetItem,
-          // latestWorksheetItemId: latestWorksheetItemId,
-        } = item;
-
-        const theItem = item;
-
-        // let theItem: typeof item;
-        // 現在只以productId分類，theId用不到了
-        // let theId: string;
-
-        // if (latestWorksheetItem && latestWorksheetItemId) {
-        //   // theItem = adjustedItem;
-        //   theItem = latestWorksheetItem;
-        //   // theId = adjustedItemId;
-        // } else {
-        //   theItem = item;
-        //   // theId = productId;
-        // }
-
-        theItem.deliveryStatus = item.deliveryStatus;
-        // issue#198 // 改送item.id
-        theItem.id = item.id;
-
-        if (latestRecordId && !myDeleveryList?.[latestRecordId]) {
-          myDeleveryList[latestRecordId] = {
-            originalItem: rootWorksheetItem,
-            itemName: theItem.itemName,
-            itemArr: [],
-          };
-        }
-
-        if (latestRecordId) {
-          myDeleveryList[latestRecordId].itemArr.push(theItem);
-        }
-      });
-    });
-
-    // worksheetArr.forEach((item) => {
-    //   const { productId, adjustedItem, adjustedItemId } = item;
-
-    //   let theItem: typeof item;
-    //   // 現在只以productId分類，theId用不到了
-    //   // let theId: string;
-
-    //   if (adjustedItem && adjustedItemId) {
-    //     theItem = adjustedItem;
-    //     // theId = adjustedItemId;
-    //   } else {
-    //     theItem = item;
-    //     // theId = productId;
-    //   }
-
-    //   theItem.deliveryStatus = item.deliveryStatus;
-    //   // issue#198 // 改送item.id
-    //   theItem.id = item.id;
-
-    //   if (!myDeleveryList?.[productId]) {
-    //     myDeleveryList[productId] = {
-    //       originalItem: item,
-    //       itemName: theItem.itemName,
-    //       itemArr: [],
-    //     };
-    //   }
-
-    //   myDeleveryList[productId].itemArr.push(theItem);
-    // });
-
-    setMyDeleveryList(myDeleveryList);
-
-    // ---------------------
-  }, [deliveryList]);
-
-  // console.log(myDeleveryList, myDeleveryList);
-
-  // // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
-  // useEffect(() => {
-  //   if (!deliveryList?.contract.worksheet?.latestRecord.contractProductItems) {
-  //     return;
-  //   }
-
-  //   const contractProductItems = deliveryList.contract.worksheet.latestRecord.contractProductItems;
-
-  //   const myDeleveryList: TmyDeleveryList = {};
-
-  //   contractProductItems.forEach((item) => {
-  //     const { productId, adjustedItem, adjustedItemId } = item;
-
-  //     let theItem: typeof item;
-  //     // 現在只以productId分類，theId用不到了
-  //     // let theId: string;
-
-  //     if (adjustedItem && adjustedItemId) {
-  //       theItem = adjustedItem;
-  //       // theId = adjustedItemId;
-  //     } else {
-  //       theItem = item;
-  //       // theId = productId;
-  //     }
-
-  //     theItem.deliveryStatus = item.deliveryStatus;
-  //     // issue#198 // 改送item.id
-  //     theItem.id = item.id;
-
-  //     if (!myDeleveryList?.[productId]) {
-  //       myDeleveryList[productId] = {
-  //         originalItem: item,
-  //         itemName: theItem.itemName,
-  //         itemArr: [],
-  //       };
-  //     }
-
-  //     myDeleveryList[productId].itemArr.push(theItem);
-  //   });
-
-  //   setMyDeleveryList(myDeleveryList);
-
-  //   // ---------------------
-  // }, [deliveryList]);
-
+  // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
   const reqPost = async (
@@ -433,7 +306,6 @@ export default function OutboundOrder({
           notes: null,
           itemName: null,
           shippingDate: null,
-          // installerEmployeeId: outsouctingId,
 
           installerOutsourcingId: outsourcingId ?? null,
           installerEmployees: employeeId ? [employeeId] : null,
@@ -445,9 +317,8 @@ export default function OutboundOrder({
         },
       });
 
-      if (res) {
-        return res;
-      }
+      update_finalProduce();
+      // return res
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '新增失敗', content: err.message });
@@ -480,7 +351,9 @@ export default function OutboundOrder({
         body,
       });
 
-      return res;
+      update_finalProduce();
+
+      // return res;
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新失敗', content: err.message });
@@ -498,453 +371,155 @@ export default function OutboundOrder({
         statusId,
       });
 
-      return true;
+      update_finalProduce();
+
+      // return true;
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '刪除失敗', content: err.message });
     }
   };
 
+  const reqPatchNotes = async () => {
+    if (!engineeringDeliveryListId || !havePermissionToEdit) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, { notes: notes ?? '' });
+      // await update_deliveryList();
+      await update_contract();
+      setNotesDiasbled(true);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新備註失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // --------------------------------------------------------------------------
 
-  const control_orderTable: Tcontrol_orderTable =
-    Object.keys(myDeleveryList ?? {}).map((prodKey, index, arr) => {
-      const arrLength = arr.length;
+  const rowPropsArr: TrowProps[] = useMemo(() => {
+    const rowPropsArr: TrowProps[] = [];
 
-      const prod = myDeleveryList![prodKey];
-
-      const theOriginalContractContent: TquotationProductDto | undefined = contractProdList![prodKey] as
-        | TquotationProductDto
+    Object.values(productWorksheetList).forEach((productWorksheet, index) => {
+      const { product, worksheetList } = productWorksheet;
+      const worksheetArr = Object.values(worksheetList) as
+        | TproductWorksheetList[string]['worksheetList'][string][]
         | undefined;
 
-      // 取哪一個item都無所謂，如果程式沒有寫錯，每個item都是一樣的
-      const firstItem = prod.itemArr[0];
-
-      const firstRow: Tgroup['rowArr'][0] = {
-        contractData: {
-          project: prod.itemName,
-          L: new Decimal(theOriginalContractContent?.fullWidth || 0).div(1000).toString(),
-          W: new Decimal(theOriginalContractContent?.WG || 0).div(1000).toString(),
-          B: new Decimal(theOriginalContractContent?.boxB || 0).div(1000).toString(),
-          qty: String(prod.itemArr.length),
-          implementQty: '',
-          cai: theOriginalContractContent?.volume ?? '',
-          totalCai: new Decimal(theOriginalContractContent?.volume || 0).mul(arrLength).toString(),
-          doorType: theOriginalContractContent?.doorModelName ?? '',
-          material: theOriginalContractContent?.materialName ?? '',
-          horsepower: theOriginalContractContent?.horsepower ?? '',
-          surface: theOriginalContractContent?.materialSurface ?? '',
-        },
-        staticData: {
-          project: prod.itemName,
-          L: new Decimal(firstItem.fullWidth).div(1000).toString(),
-          W: new Decimal(firstItem.WG).div(1000).toString(),
-          B: new Decimal(firstItem.boxB).div(1000).toString(),
-          qty: String(prod.itemArr.length),
-          implementQty: '',
-          // cai: firstItem.volume,
-          cai: '',
-          totalCai: '0',
-          doorType: firstItem.doorModelName,
-          material: firstItem.materialName,
-          horsepower: firstItem.horsepower,
-          surface: firstItem.materialSurface ?? '',
-        },
-        staticData2: {
-          remark01: {
-            value: '',
-            hidden: true,
-          },
-          orderCreatedDate: {
-            value: '',
-            hidden: true,
-          },
-        },
-        deliveryStatus: {
-          groupList: {
-            btnPanelArr: [],
-            installDateArr: [],
-            installerArr: [],
-            itemNameArr: [],
-            notesArr: [],
-          },
-        },
-      };
-
-      let totalCai_total = new Decimal(0);
-
-      const rowArr: Tgroup['rowArr'] = prod.itemArr.map((item, itemIndex) => {
-        const itemId = item.id;
-
-        totalCai_total = totalCai_total.add(item.volume || '0');
-
-        const accessories = item.accessories;
-        const acceNameArr =
-          accessories?.map((acce) => {
-            return acce.name;
-          }) ?? [];
-
-        const btnPanelArr: Tgroup['rowArr'][number]['deliveryStatus']['groupList']['btnPanelArr'] = [];
-        const installDateArr: Tgroup['rowArr'][number]['deliveryStatus']['groupList']['installDateArr'] = [];
-        const installerArr: Tgroup['rowArr'][number]['deliveryStatus']['groupList']['installerArr'] = [];
-        const itemNameArr: Tgroup['rowArr'][number]['deliveryStatus']['groupList']['itemNameArr'] = [];
-        const notesArr: Tgroup['rowArr'][number]['deliveryStatus']['groupList']['notesArr'] = [];
-
-        const deliveryStatusArr = item.deliveryStatus;
-
-        deliveryStatusArr?.forEach((status, statusIndex) => {
-          const statusId = status.id;
-          const deleveryStatus_singleState = deleveryStatusInEdit?.[prodKey]?.[itemId]?.[statusId];
-          const disabled = !deleveryStatus_singleState;
-
-          const edit = ({
-            //
-            key,
-            value,
-          }: {
-            key: Exclude<
-              keyof TdeliveryStatusInEdit[string][string][string],
-              'installerOutsourcing' | 'installerEmployees_obj' | 'installerEmployees'
-            >;
-            value?: string;
-          }) => {
-            if (!deleveryStatus_singleState || !havePermissionToEdit) {
-              return;
-            }
-
-            setDeleveryStatusInEdit((state) => {
-              if (!state) {
-                return state;
-              }
-
-              const copy = { ...state };
-
-              copy[prodKey][itemId][statusId][key] = value ?? '';
-
-              return copy;
-              //
-            });
-          };
-
-          const editInstaller = ({
-            employee,
-            outsourcing,
-          }: {
-            employee?: TemployeeDto | null;
-            outsourcing?: ToutsourcingDto | null;
-          }) => {
-            setDeleveryStatusInEdit((state) => {
-              if (!state) {
-                return state;
-              }
-
-              const copy = { ...state };
-
-              copy[prodKey][itemId][statusId].installerOutsourcing = outsourcing || null;
-
-              if (!copy[prodKey][itemId][statusId].installerOutsourcing) {
-                copy[prodKey][itemId][statusId].installerOutsourcingId = null;
-              }
-
-              copy[prodKey][itemId][statusId].installerEmployees = employee ? [employee] : [];
-
-              return copy;
-              //
-            });
-          };
-
-          //
-          btnPanelArr.push({
-            disabled,
-            forbidden: !havePermissionToEdit,
-            onEditClick: () => {
-              if (!havePermissionToEdit) {
-                return;
-              }
-
-              const copy = _.cloneDeep(status);
-
-              setDeleveryStatusInEdit({
-                [prodKey]: {
-                  [itemId]: {
-                    [statusId]: copy,
-                  },
-                },
-              });
-            },
-            onCancelClick: () => {
-              if (!havePermissionToEdit) {
-                return;
-              }
-
-              setDeleveryStatusInEdit(undefined);
-            },
-            onDeleteClick: async () => {
-              if (!havePermissionToEdit) {
-                return;
-              }
-
-              const res = await reqDelete(statusId);
-
-              if (res) {
-                setMyDeleveryList((state) => {
-                  const copy = { ...state };
-                  const theIndex = copy[prodKey].itemArr[itemIndex].deliveryStatus?.findIndex((item) => {
-                    return item.id === statusId;
-                  });
-
-                  if (theIndex !== undefined && theIndex > -1) {
-                    copy[prodKey].itemArr[itemIndex].deliveryStatus?.splice(theIndex, 1);
-                  }
-
-                  return copy;
-                });
-              }
-            },
-            onAddClick: async () => {
-              if (!havePermissionToEdit) {
-                return;
-              }
-
-              const onSelectorConfirm: TselectorConfirm = async ({ employeeId, outsourcingId }) => {
-                const res = await reqPost(itemId, { employeeId, outsourcingId });
-
-                if (res) {
-                  setMyDeleveryList((state) => {
-                    const copy = { ...state };
-                    copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
-
-                    return copy;
-                  });
-                }
-              };
-
-              setSelectorConfirm(() => {
-                return onSelectorConfirm;
-              });
-            },
-            onConfirmClick: async () => {
-              if (!deleveryStatus_singleState || !havePermissionToEdit) {
-                return;
-              }
-
-              const body = {
-                ...deleveryStatus_singleState,
-                installerEmployeeId: deleveryStatus_singleState.installerOutsourcing?.id ?? null,
-              };
-
-              if (!body.productItemId) {
-                myAlert.err({ title: '更新失敗', content: 'productItemId不存在' });
-                console.log(body);
-
-                return;
-              }
-
-              const installerEmployees = (body.installerEmployees ?? []).map((item) => item.id);
-
-              const reqBody: TcreateEngineeringDeliveryStatusDto = {
-                notes: body.notes,
-                itemName: body.itemName,
-                shippingDate: body.shippingDate,
-                // installerOutsourcingId: body.installerOutsourcingId,
-                installerOutsourcingId: body.installerOutsourcing?.id ?? null,
-                installerEmployees,
-                installationDate: body.installationDate,
-                append: body.append,
-                completeAppend: body.completeAppend,
-                productItemId: body.productItemId,
-              };
-
-              const res = await reqPatch({
-                statusId,
-                body: reqBody,
-              });
-
-              if (res) {
-                setDeleveryStatusInEdit(undefined);
-
-                setMyDeleveryList((state) => {
-                  const copy = { ...state };
-
-                  const theIndex = copy[prodKey].itemArr[itemIndex].deliveryStatus?.findIndex((item) => {
-                    return item.id === statusId;
-                  });
-
-                  if (theIndex !== undefined && theIndex > -1) {
-                    if (copy[prodKey].itemArr[itemIndex].deliveryStatus) {
-                      copy[prodKey].itemArr[itemIndex].deliveryStatus![theIndex] = res;
-                    }
-                  }
-
-                  return copy;
-                });
-              }
-            },
-          });
-
-          installDateArr.push({
-            disabled,
-            value: deleveryStatus_singleState?.installationDate ?? status.installationDate ?? '',
-            onChange_date: (v) => {
-              if (!deleveryStatus_singleState || !havePermissionToEdit) {
-                return;
-              }
-
-              edit({
-                key: 'installationDate',
-                value: v ?? '',
-              });
-            },
-          });
-
-          installerArr.push({
-            disabled,
-            installer:
-              deleveryStatus_singleState?.installerOutsourcing ??
-              deleveryStatus_singleState?.installerEmployees?.[0] ??
-              (status.installerOutsourcing || null) ??
-              (status.installerEmployees?.[0] || null),
-            onChange_installer: (installer) => {
-              if (!deleveryStatus_singleState || !havePermissionToEdit) {
-                return;
-              }
-
-              const { employee, outsourcing } = installer;
-              editInstaller({
-                employee,
-                outsourcing,
-              });
-            },
-          });
-
-          itemNameArr.push({
-            disabled,
-            value: deleveryStatus_singleState?.itemName ?? status.itemName ?? '',
-            onChange: (v) => {
-              if (!deleveryStatus_singleState || !havePermissionToEdit) {
-                return;
-              }
-
-              edit({
-                key: 'itemName',
-                value: v ?? '',
-              });
-            },
-          });
-
-          notesArr.push({
-            disabled,
-            value: deleveryStatus_singleState?.notes ?? status.notes ?? '',
-            onChange: (v) => {
-              if (!deleveryStatus_singleState || !havePermissionToEdit) {
-                return;
-              }
-
-              edit({
-                key: 'notes',
-                value: v ?? '',
-              });
-            },
-          });
-          //
-        });
-
-        if (btnPanelArr.length === 0) {
-          btnPanelArr.push({
-            disabled: true,
-            forbidden: !havePermissionToEdit,
-            onConfirmClick: () => {},
-            onCancelClick: () => {},
-            onAddClick: async () => {
-              if (!havePermissionToEdit) {
-                return;
-              }
-
-              const onSelectorConfirm: TselectorConfirm = async ({ outsourcingId, employeeId }) => {
-                const res = await reqPost(itemId, { employeeId, outsourcingId });
-
-                if (res) {
-                  setMyDeleveryList((state) => {
-                    const copy = { ...state };
-                    copy[prodKey].itemArr[itemIndex].deliveryStatus?.push(res);
-
-                    return copy;
-                  });
-                }
-              };
-
-              setSelectorConfirm(() => {
-                return onSelectorConfirm;
-              });
-            },
-          });
-        }
-
-        return {
-          contractData: {
-            // 這裡的東西不需要顯示，所以空字串就好了
-            project: '',
-            // project: prod.itemName,
-            L: '',
-            W: '',
-            B: '',
-            qty: '',
-            implementQty: '',
-            cai: '',
-            totalCai: '',
-            doorType: '',
-            material: '',
-            horsepower: '',
-            surface: '',
-          },
-          staticData: {
-            // 現在orderTable的orderKeyArr_static沒有project，所以不會顯示這個欄位
-            // 但應該是顯示了會比較清楚
-            project: item.itemName,
-            L: new Decimal(item.fullWidth).div(1000).toString(),
-            W: new Decimal(item.WG).div(1000).toString(),
-            B: new Decimal(item.boxB).div(1000).toString(),
-            qty: '1',
-            implementQty: '???',
-            cai: item.volume ?? '',
-            totalCai: '',
-            doorType: item.doorModelName,
-            material: item.materialName,
-            horsepower: item.horsepower,
-            surface: item.materialSurface ?? '',
-          },
-          staticData2: {
-            remark01: {
-              value: acceNameArr.join('\n'),
-              forbidden: true,
-            },
-            orderCreatedDate: {
-              // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
-              // value: worksheet ? moment(convertDate_reduce1911(worksheet.createdAt)).format('yy-MM-DD') : '',
-              value: '',
-              forbidden: true,
-            },
-          },
-          deliveryStatus: {
-            groupList: {
-              btnPanelArr,
-              installDateArr,
-              installerArr,
-              itemNameArr,
-              notesArr,
-            },
-          },
-        };
+      // ____________________________________________________________________
+      const prodRow = createRowProps_prodRow({
+        prod: product,
+        serialNumber: index,
+        worksheetItem: worksheetArr?.[0]?.worksheetItem,
+        worksheetItemQty: worksheetArr?.[0]?.worksheetItemArr.length,
       });
 
-      firstRow.staticData.totalCai = totalCai_total.toString();
-      rowArr.unshift(firstRow);
+      rowPropsArr.push(prodRow);
+      // ____________________________________________________________________
+      worksheetArr?.[0]?.worksheetItemArr.forEach((item) => {
+        const itemRow = createRowProps_itemRow({
+          worksheetItem: item,
+          onAddClick: () => {
+            setTargetWorksheetItemId(item.id);
+          },
+          onDeleteClick: (deleverStatusId) => {
+            reqDelete(deleverStatusId);
+          },
+          onConfirmClick: async ({
+            deliveryStatusId,
+            employeeId,
+            outsourcingId,
+            installationDate,
+            itemName,
+            notes,
+          }) => {
+            const reqBody: TcreateEngineeringDeliveryStatusDto = {
+              notes: notes,
+              itemName: itemName,
+              shippingDate: null,
+              installerOutsourcingId: outsourcingId ?? null,
+              installerEmployees: employeeId ? [employeeId] : null,
+              installationDate: installationDate,
+              append: null,
+              completeAppend: null,
+              productItemId: item.id,
+            };
 
-      return {
-        itemName: prod.itemName,
-        rowArr,
-      };
-    }) ?? [];
+            await reqPatch({
+              statusId: deliveryStatusId,
+              body: reqBody,
+            });
+          },
+        });
+
+        rowPropsArr.push(itemRow);
+      });
+
+      // ____________________________________________________________________
+
+      worksheetArr?.forEach((worksheet, index) => {
+        if (index === 0) {
+          return;
+        }
+
+        const { worksheetItem, worksheetItemArr } = worksheet;
+
+        const headRow = createRowProps_headRow({
+          worksheetItem: worksheetItem,
+          worksheetItemQty: worksheetItemArr.length,
+        });
+
+        rowPropsArr.push(headRow);
+
+        worksheetItemArr.forEach((item) => {
+          const itemRow = createRowProps_itemRow({
+            worksheetItem: item,
+            onAddClick: () => {
+              setTargetWorksheetItemId(item.id);
+            },
+            onDeleteClick: (deleverStatusId) => {
+              reqDelete(deleverStatusId);
+            },
+            onConfirmClick: async ({
+              deliveryStatusId,
+              employeeId,
+              outsourcingId,
+              installationDate,
+              itemName,
+              notes,
+            }) => {
+              const reqBody: TcreateEngineeringDeliveryStatusDto = {
+                notes: notes,
+                itemName: itemName,
+                shippingDate: null,
+                installerOutsourcingId: outsourcingId ?? null,
+                installerEmployees: employeeId ? [employeeId] : null,
+                installationDate: installationDate,
+                append: null,
+                completeAppend: null,
+                productItemId: item.id,
+              };
+
+              await reqPatch({
+                statusId: deliveryStatusId,
+                body: reqBody,
+              });
+            },
+          });
+
+          rowPropsArr.push(itemRow);
+        });
+      });
+
+      // ____________________________________________________________________
+    }); // productWorksheetList
+
+    return rowPropsArr;
+  }, [productWorksheetList]);
 
   const defaultSelectorSelected = useMemo(() => {
     if (!deleveryStatusInEdit) {
@@ -964,63 +539,18 @@ export default function OutboundOrder({
   }, [deleveryStatusInEdit]);
 
   // --------------------------------------------------------------------------
-
-  const reqPatchNotes = async () => {
-    if (!engineeringDeliveryListId || !havePermissionToEdit) {
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, { notes: notes ?? '' });
-      await update_deliveryList();
-      setNotesDiasbled(true);
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '更新備註失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // --------------------------------------------------------------------------
-
-  // const panelList01: TpanelList = [
-  //   {
-  //     type: 'myButton',
-  //     label: '編輯',
-  //     onClick: () => {
-  //       setDisabled(false);
-  //     },
-  //   },
-  // ];
-  // const panelList02: TpanelList = [
-  //   {
-  //     type: 'redButton',
-  //     label: '更新',
-  //     onClick: reqUpdate,
-  //   },
-  //   {
-  //     type: 'myButton',
-  //     label: '取消',
-  //     onClick: () => {
-  //       setDisabled(true);
-  //     },
-  //   },
-  // ];
-
-  const panelList_noPromission: TpanelList = [
-    {
-      type: 'myButton',
-      label: '沒有權限編輯',
-      onClick: () => {},
-    },
-  ];
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader
-        panelList={!havePermissionToEdit ? panelList_noPromission : undefined}
+        // panelList={!havePermissionToEdit ? panelList_noPromission : undefined}
         // panelList={disabled ? panelList01 : panelList02}
         contractNumber={engineeringContact?.contractNumber ?? ''}
       />
@@ -1038,7 +568,7 @@ export default function OutboundOrder({
             </div>
           </div>
 
-          <OrderTable control={control_orderTable} />
+          <OrderTable control={{ rowPropsArr: rowPropsArr }} />
 
           <div className={style.remark}>
             <div className={style.title}>
@@ -1080,7 +610,38 @@ export default function OutboundOrder({
         </div>
       </div>
 
+      {/* 呼叫apiPostDeliveryStatus 新增 deliveryStatus */}
       <SelectorGroup
+        showModal={!!targetWorksheetItemId}
+        caption="選擇員工或外包廠商"
+        tip="員工或外包擇一"
+        defaultSeletedDataArrArr={defaultSelectorSelected}
+        onConfirm={(arr) => {
+          const employeeArr = arr[0];
+          const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
+
+          const outsourcingArr = arr[1];
+          const outsourcing = outsourcingArr[0] as (typeof outsourcingArr)[0] | undefined;
+
+          // selectorConfirm &&
+          //   selectorConfirm({
+          //     employeeId: employee?.id,
+          //     outsourcingId: outsourcing?.id,
+          //   });
+
+          if (targetWorksheetItemId) {
+            reqPost(targetWorksheetItemId, {
+              employeeId: employee?.id,
+              outsourcingId: outsourcing?.id,
+            });
+          }
+        }}
+        onCancel={() => {
+          setTargetWorksheetItemId(undefined);
+        }}
+      />
+
+      {/* <SelectorGroup
         showModal={!!selectorConfirm}
         caption="選擇員工或外包廠商"
         tip="員工或外包擇一"
@@ -1101,7 +662,7 @@ export default function OutboundOrder({
         onCancel={() => {
           setSelectorConfirm(undefined);
         }}
-      />
+      /> */}
     </SubLayer>
   );
 }
@@ -1127,3 +688,245 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
 });
 
 // ======================================================================
+
+const createRowProps_prodRow = ({
+  prod,
+  serialNumber,
+  worksheetItem,
+  worksheetItemQty,
+}: {
+  prod: TquotationProductDto;
+  serialNumber: React.ReactNode;
+  worksheetItem: TquotationProductItemDto | undefined;
+  worksheetItemQty: number | undefined;
+}): TrowProps => {
+  const total_volume_prod = new Decimal(prod.quantity).mul(prod.volume || 0).toNumber();
+
+  const total_volume_worksheet =
+    worksheetItemQty && worksheetItem ? new Decimal(worksheetItemQty).mul(worksheetItem.volume || 0).toNumber() : '';
+
+  const center = worksheetItem && {
+    projectName: worksheetItem.itemName,
+    L: new Decimal(worksheetItem.fullWidth).div(1000).toNumber(),
+    WG: new Decimal(worksheetItem.WG).div(1000).toNumber(),
+    B: worksheetItem.boxB,
+    qty: worksheetItemQty,
+    volume: worksheetItem.volume,
+    total_volume: total_volume_worksheet,
+    doorModelName: worksheetItem.doorModelName,
+    material: worksheetItem.materialName,
+    horsepower: worksheetItem.horsepower,
+    surface: worksheetItem.materialSurface,
+    establishmentDate: '1111-11-11',
+  };
+
+  return {
+    // key: prod.id,
+    isHeadRow: true,
+    side: {
+      serialNumber,
+      projectName: prod.itemName,
+    },
+    left: {
+      L: new Decimal(prod.fullWidth).div(1000).toNumber(),
+      WG: new Decimal(prod.WG).div(1000).toNumber(),
+      B: prod.boxB,
+      qty: prod.quantity,
+      volume: prod.volume,
+      total_volume: total_volume_prod,
+      doorModelName: prod.doorModelName,
+      material: prod.materialName,
+      horsepower: prod.horsepower,
+      surface: prod.materialSurface,
+    },
+    center: center,
+  };
+};
+
+const createRowProps_headRow = ({
+  worksheetItem,
+  worksheetItemQty,
+}: {
+  worksheetItem: TquotationProductItemDto;
+  worksheetItemQty: number;
+}): TrowProps => {
+  const total_volume_worksheet =
+    worksheetItemQty && worksheetItem ? new Decimal(worksheetItemQty).mul(worksheetItem.volume || 0).toNumber() : '';
+
+  const center = worksheetItem && {
+    projectName: worksheetItem.itemName,
+    L: new Decimal(worksheetItem.fullWidth).div(1000).toNumber(),
+    WG: new Decimal(worksheetItem.WG).div(1000).toNumber(),
+    B: worksheetItem.boxB,
+    qty: worksheetItemQty,
+    volume: worksheetItem.volume,
+    total_volume: total_volume_worksheet,
+    doorModelName: worksheetItem.doorModelName,
+    material: worksheetItem.materialName,
+    horsepower: worksheetItem.horsepower,
+    surface: worksheetItem.materialSurface,
+    establishmentDate: '1111-11-11',
+  };
+
+  return {
+    // key: `headRow-${worksheetItem.id}`,
+    isHeadRow: true,
+    center,
+  };
+};
+
+const createRowProps_itemRow = ({
+  //
+  worksheetItem,
+  onAddClick,
+  onConfirmClick,
+  onDeleteClick,
+}: {
+  worksheetItem: TquotationProductItemDto;
+  onAddClick: () => void;
+  onConfirmClick: (parameters: {
+    deliveryStatusId: string;
+    employeeId: string | undefined;
+    outsourcingId: string | undefined;
+    installationDate: string;
+    itemName: string;
+    notes: string;
+  }) => Promise<void>;
+  onDeleteClick: (deleverStatuId: string) => void;
+
+  // onConfirmClick: Tpanel['onConfirmClick'];
+}): TrowProps => {
+  const { deliveryStatus, accessories } = worksheetItem;
+
+  const accessoriesStr = accessories?.map((a) => a.name).join('、');
+
+  const deliveryStatus_sorted = _.sortBy(deliveryStatus, 'createdAt');
+
+  const rightPanelArr: Tpanel[] = (deliveryStatus_sorted ?? []).map((ds) => {
+    const {
+      id,
+      // 所屬產品Id
+      productItemId,
+      // 備註
+      notes,
+      // 出貨日
+      // 項目名稱
+      itemName,
+      // 安裝人員(外包)ID
+      installerOutsourcingId,
+      // 安裝人員(外包)
+      installerOutsourcing,
+      // 安裝人員(員工)
+      installerEmployees, // 這是陣列
+      // 安裝日期
+      installationDate,
+    } = ds;
+
+    const panelProps: Tpanel = {
+      key: id,
+      accessorie: accessoriesStr,
+      installationDate: installationDate ?? '',
+      installer_employee: installerEmployees[0],
+      installer_outsourcing: installerOutsourcing,
+      itemName: itemName ?? '',
+      notes: notes ?? '',
+      onAddClick,
+      onDeleteClick: () => {
+        onDeleteClick(id);
+      },
+      onConfirmClick: async (parameters) => {
+        const { employeeId, outsourcingId, installationDate, itemName, notes } = parameters;
+
+        await onConfirmClick({
+          deliveryStatusId: id,
+          employeeId,
+          outsourcingId,
+          installationDate,
+          itemName,
+          notes,
+        });
+      },
+    };
+
+    return panelProps;
+  });
+
+  if (!rightPanelArr[0]) {
+    rightPanelArr.push({
+      key: 'undefined',
+      isUndefined: true,
+      accessorie: '',
+      installationDate: '',
+      installer_employee: undefined,
+      installer_outsourcing: undefined,
+      itemName: '',
+      notes: '',
+      onAddClick,
+      onDeleteClick: () => {},
+      onConfirmClick: async () => {},
+    });
+  }
+
+  return {
+    // key: worksheetItem.id,
+    center: {
+      projectName: worksheetItem.itemName,
+      L: new Decimal(worksheetItem.fullWidth).div(1000).toNumber(),
+      WG: new Decimal(worksheetItem.WG).div(1000).toNumber(),
+      B: worksheetItem.boxB,
+      // qty: worksheetItemQty,
+      volume: worksheetItem.volume,
+      // total_volume: total_volume_worksheet,
+      doorModelName: worksheetItem.doorModelName,
+      material: worksheetItem.materialName,
+      horsepower: worksheetItem.horsepower,
+      surface: worksheetItem.materialSurface,
+      establishmentDate: '1111-11-11',
+    },
+    rightPanelArr: rightPanelArr,
+    // rightPanelArr: foo,
+  };
+};
+
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+const rightPanelArrTest = [
+  {
+    key: '1',
+    accessorie: 'testtesttesttest',
+    installationDate: '',
+    installer_employee: undefined,
+    installer_outsourcing: undefined,
+    itemName: '',
+    notes: '',
+    onAddClick: () => {},
+    onDeleteClick: () => {},
+    onConfirmClick: async () => {},
+  },
+  {
+    key: '2',
+    accessorie: 'testtesttesttest',
+    installationDate: '',
+    installer_employee: undefined,
+    installer_outsourcing: undefined,
+    itemName: '',
+    notes: '',
+    onAddClick: () => {},
+    onDeleteClick: () => {},
+    onConfirmClick: async () => {},
+  },
+  {
+    key: '3',
+    accessorie: 'testtesttesttest',
+    installationDate: '',
+    installer_employee: undefined,
+    installer_outsourcing: undefined,
+    itemName: '',
+    notes: '',
+    onAddClick: () => {},
+    onDeleteClick: () => {},
+    onConfirmClick: async () => {},
+  },
+];
