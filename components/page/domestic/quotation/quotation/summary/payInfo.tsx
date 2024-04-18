@@ -4,6 +4,7 @@ import moment from 'moment';
 
 // antd
 import { Popover } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -101,33 +102,6 @@ export default function PayInfo({
         )}
 
         <div className={classNames(scss.avgDiscount, 'relative')}>
-          <Popover
-            content={
-              <>
-                <span>平均折數計算方式</span>
-                <br />
-                <span>{`(所有主產品各自的折數*數量 的加總) / 總數量`}</span>
-                <br />
-                <span>例如有兩個主產品A與B，A的數量為兩個、折數為100，B的數量為一個、折數50</span>
-                <br />
-                <span>{'平均折數的計算就是 (100*2 + 50*1) / 3'}</span>
-              </>
-            }
-            trigger="hover"
-          >
-            <span className="relative">
-              {'主產品平均折數'}
-              {/* <MustTip_simple preStyle="minimal" /> */}
-            </span>
-          </Popover>
-
-          <div>
-            <span>{avgDiscount_withQty}</span>
-            <span>%</span>
-          </div>
-        </div>
-
-        <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className="relative">
             {'總折數'}
             {/* <MustTip_simple preStyle="minimal" /> */}
@@ -149,6 +123,34 @@ export default function PayInfo({
               // onChange={(e) => payment.discountRate.onChange?.(e.target.value)}
               // disabled={disabled}
             />
+            <span>%</span>
+          </div>
+        </div>
+
+        <div className={classNames(scss.avgDiscount, 'relative')}>
+          <span className={scss.avgDiscount}>
+            {'平均折數'}
+            {/* <MustTip_simple preStyle="minimal" /> */}
+            <Popover
+              content={
+                <>
+                  <span>平均折數計算方式</span>
+                  <br />
+                  <span>{`(所有主產品各自的折數*數量 的加總) / 總數量 * 總折數/100`}</span>
+                  <br />
+                  <span>例如有兩個主產品A與B，A的數量為兩個、折數為100，B的數量為一個、折數50，總折數75</span>
+                  <br />
+                  <span>{'平均折數的計算就是 (100*2 + 50*1) / 3 * 75 / 100'}</span>
+                </>
+              }
+              trigger="hover"
+            >
+              <InfoCircleOutlined />
+            </Popover>
+          </span>
+
+          <div>
+            <span>{avgDiscount_withQty}</span>
             <span>%</span>
           </div>
         </div>
