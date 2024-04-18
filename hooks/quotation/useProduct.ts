@@ -184,7 +184,8 @@ const useProductList = ({
         }
       });
 
-      const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+      // const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+      const avgDiscount_withQty = discountTotal.div(count).toNumber();
 
       setAvgDiscount_withQty(avgDiscount_withQty);
 
@@ -846,7 +847,8 @@ const useProductList = ({
     // changeAllProdQuotationDiscount, // 修改所有class_product的quotationDiscount
     // changeAllProductDiscount,
     // avgDiscount,
-    avgDiscount_withQty,
+    // avgDiscount_withQty,
+    avgDiscount_withQty: new Decimal(avgDiscount_withQty).mul(quotationDiscount).div(100).toDecimalPlaces(3).toString(),
   };
 };
 
