@@ -4,6 +4,9 @@ import moment from 'moment';
 
 import scss from './orderTable.module.scss';
 
+// antd
+import { Popover } from 'antd';
+
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 // import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
@@ -15,7 +18,16 @@ import { selectModalCreator_multi } from 'components/global/gear/modal/selectorM
 // icon
 import { IconAddCircle, IconEdit, IconDelete01, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
 
+// import { VerticalLeftOutlined, VerticalRightOutlined } from '@ant-design/icons';
+import * as antdIcon from '@ant-design/icons';
+
 // ================================================================================
+
+type TrowProps_other = {
+  showLeft?: boolean | undefined;
+  changeShowLeft?: () => void;
+  isThead?: boolean;
+};
 
 type TrowProps = {
   key?: string | number;
@@ -115,6 +127,12 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
 export default function OrderTable({ control }: { control: Tcontrol }) {
   const { rowPropsArr } = control;
 
+  const [showLeft, setShowLeft] = useState(true);
+
+  const changeShowLeft = () => {
+    setShowLeft((state) => !state);
+  };
+
   // -------------------------------------------------------------------------------
 
   return (
@@ -122,16 +140,16 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
       <div className={scss.orderTable}>
         {/*  */}
 
-        <Thead />
+        <Thead showLeft={showLeft} changeShowLeft={changeShowLeft} isThead={true} />
 
         {rowPropsArr.map((rowProps, index) => {
           const { isHeadRow, key } = rowProps;
 
           if (isHeadRow) {
-            return <HeadRow key={key || index} {...rowProps} />;
+            return <HeadRow key={key || index} showLeft={showLeft} changeShowLeft={changeShowLeft} {...rowProps} />;
           }
 
-          return <Row key={key || index} {...rowProps} />;
+          return <Row key={key || index} showLeft={showLeft} changeShowLeft={changeShowLeft} {...rowProps} />;
         })}
       </div>
     </div>
@@ -147,20 +165,30 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
 const Row = ({
   //
   className,
+  showLeft = true,
+  changeShowLeft,
+  isThead,
   side,
   left,
   center,
   right,
   rightPanelArr: rightPanelArr,
-}: TrowProps) => {
+}: TrowProps & TrowProps_other) => {
   return (
     <div className={classNames(scss.row, className)}>
       <div className={classNames(scss.side)}>
         <div className={classNames(scss.cell, !side && 'invisible', 'w-8')}>{side?.serialNumber}</div>
         <div className={classNames(scss.cell, !side && 'invisible', 'w-32')}>{side?.projectName}</div>
+        <div className={classNames(scss.cell, scss.showLeftBtnCell, !isThead && 'invisible', 'w-8')}>
+          <Popover content="顯示/不顯示源頭產品" trigger="hover" mouseEnterDelay={0.5}>
+            {showLeft && <antdIcon.StepBackwardOutlined className={scss.showLeftBtn} onClick={changeShowLeft} />}
+            {!showLeft && <antdIcon.StepForwardOutlined className={scss.showLeftBtn} onClick={changeShowLeft} />}
+          </Popover>
+        </div>
       </div>
 
-      <div className={scss.left}>
+      {/* <div className={classNames(scss.left, !showLeft && scss.hidden, scss.plus)}> */}
+      <div className={classNames(scss.left, !showLeft && scss.notShow, scss.plus)}>
         <div className={classNames(scss.cell, 'w-14')}>{left?.L}</div>
         <div className={classNames(scss.cell, 'w-14')}>{left?.WG}</div>
         <div className={classNames(scss.cell, 'w-14')}>{left?.B}</div>
@@ -226,10 +254,13 @@ const Row = ({
   );
 };
 
-const Thead = () => {
+const Thead = (rowProps_other: TrowProps_other) => {
   return (
     <Row
       className={scss.thead}
+      {...rowProps_other}
+      // showLeft={showLeft}
+      // changeShowLeft={changeShowLeft}
       side={{
         serialNumber: '序號',
         projectName: '工程名稱',
@@ -271,9 +302,16 @@ const Thead = () => {
   );
 };
 
-const HeadRow = (rowProps: TrowProps) => {
+const HeadRow = (rowProps: TrowProps & TrowProps_other) => {
   // return <Row {...rowProps} className={(scss.headRow, rowProps.isProdRow && scss.prodRow)} />;
-  return <Row {...rowProps} className={classNames(scss.headRow, rowProps.isProdRow && scss.prodRow)} />;
+  return (
+    <Row
+      {...rowProps}
+      showLeft={rowProps.showLeft}
+      changeShowLeft={rowProps.changeShowLeft}
+      className={classNames(scss.headRow, rowProps.isProdRow && scss.prodRow)}
+    />
+  );
 };
 
 // ------------------------------------------------------------------------

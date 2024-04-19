@@ -35,6 +35,19 @@ $gap: 16px;
     border-left-width: 22px;
     border-color: var(--bgcGray);
   }
+
+  > .left {
+    transition: 0.3s;
+    // background-color: pink;
+    // width: 928px;
+    width: 928px;
+    overflow: hidden;
+    // display: none;
+    &.notShow {
+      width: 0;
+    }
+  }
+
   > .rightPanel {
     display: grid;
     gap: 16px;
@@ -115,5 +128,35 @@ $gap: 16px;
   font-size: 16px;
   .accessorie {
     white-space: pre-wrap;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.hidden.plus {
+  display: none;
+}
+
+.cell {
+  white-space: nowrap;
+}
+
+.showLeftBtnCell {
+  max-height: 24px;
+  display: flex;
+  align-items: center;
+  > span {
+    display: flex;
+    align-items: center;
+  }
+  .showLeftBtn {
+    --foo: 22px;
+    color: theme("colors.danger");
+    svg {
+      height: var(--foo);
+      width: var(--foo);
+    }
   }
 }
