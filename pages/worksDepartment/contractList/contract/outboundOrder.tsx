@@ -373,7 +373,7 @@ export default function OutboundOrder({
       // ____________________________________________________________________
       const prodRow = createRowProps_prodRow({
         prod: product,
-        serialNumber: index,
+        serialNumber: index + 1,
         worksheetItem: worksheetArr?.[0]?.worksheetItem,
         worksheetItemQty: worksheetArr?.[0]?.worksheetItemArr.length,
         worksheetCreatedAt: worksheetArr?.[0]?.worksheetCreatedAt || null,
@@ -727,7 +727,7 @@ const createRowProps_itemRow = ({
 }): TrowProps => {
   const { deliveryStatus, accessories } = worksheetItem;
 
-  const accessoriesStr = accessories?.map((a) => a.name).join('、');
+  const accessoriesStr = accessories?.map((a) => a.name).join('\n');
 
   const deliveryStatus_sorted = _.sortBy(deliveryStatus, 'createdAt');
 

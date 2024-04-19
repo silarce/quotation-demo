@@ -325,7 +325,7 @@ const Panel = ({
 
   return (
     <div className={scss.panel}>
-      <div className={classNames(scss.cell, 'w-52')}>{accessorie}</div>
+      <div className={classNames(scss.cell, scss.accessorie, 'w-52')}>{accessorie}</div>
 
       <div className={classNames(scss.cell, scss.btnBar, 'w-24')}>
         <IconAddCircle onClick={onAddClick} />

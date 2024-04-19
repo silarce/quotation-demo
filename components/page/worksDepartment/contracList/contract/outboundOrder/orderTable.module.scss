@@ -19,9 +19,9 @@ $gap: 16px;
   gap: $gap;
   width: max-content;
   padding: 11px 0px;
-  background-color: var(--bgcWhite);
+  background-color: var(--bgcGray);
   border-right-width: 22px;
-  border-color: var(--bgcWhite);
+  border-color: var(--bgcGray);
 
   > div,
   > form {
@@ -31,18 +31,14 @@ $gap: 16px;
   }
 
   > .side {
-    background-color: var(--bgcWhite);
+    background-color: var(--bgcGray);
     border-left-width: 22px;
-    border-color: var(--bgcWhite);
+    border-color: var(--bgcGray);
   }
   > .rightPanel {
     display: grid;
     gap: 16px;
   }
-
-  // > .firstDivider {
-  //   visibility: hidden;
-  // }
 
   &.thead {
     background-color: var(--bgcGray);
@@ -54,18 +50,12 @@ $gap: 16px;
   }
 
   &.headRow {
-    background-color: var(--bgcGray);
-    border-color: var(--bgcGray);
+    background-color: var(--bgcWhite);
+    border-color: var(--bgcWhite);
     > .side {
-      background-color: var(--bgcGray);
-      border-color: var(--bgcGray);
-      // > div {
-      //   visibility: unset;
-      // }
+      background-color: var(--bgcWhite);
+      border-color: var(--bgcWhite);
     }
-    // > .firstDivider {
-    //   visibility: unset;
-    // }
   }
 }
 
@@ -73,9 +63,6 @@ $gap: 16px;
   position: sticky;
   left: 0;
   z-index: 1;
-  // > div {
-  //   visibility: hidden;
-  // }
 }
 
 .divider {
@@ -112,4 +99,7 @@ $gap: 16px;
   gap: $gap;
   align-items: center;
   font-size: 16px;
+  .accessorie {
+    white-space: pre-wrap;
+  }
 }
