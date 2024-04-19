@@ -1014,14 +1014,18 @@ class Class_product {
     }
 
     // const fullWidth = Number(this.fullWidth || 0) * 1000 + this._doorGeneralSpecs.gapA + this._doorGeneralSpecs.gapC;
-    const fullWidth = Number(this.fullWidth || 0) * 1000;
+    // const fullWidth = Number(this.fullWidth || 0) * 1000;
+    const fullWidth = new Decimal(this.fullWidth).mul(1000).toNumber();
 
     const doorSpec: TgenerateDoorProductBomDto_DoorSpec = {
       modelName: this.doorType as TgenerateDoorProductBomDto_DoorSpec['modelName'],
       weight: this.weight ?? -1,
-      height: Number(this.height) * 1000,
-      B: Number(this.boxB) * 1000,
-      D: Number(this._prodData.boxD) * 1000,
+      // height: Number(this.height) * 1000,
+      height: new Decimal(this.height).mul(1000).toNumber(),
+      // B: Number(this.boxB) * 1000,
+      // D: Number(this._prodData.boxD) * 1000,
+      B: new Decimal(this.boxB).mul(1000).toNumber(),
+      D: new Decimal(this._prodData.boxD).mul(1000).toNumber(),
       slatLength: this._doorGeneralSpecs.slatLength,
       guideRailLength: this._doorGeneralSpecs.guideRailLength,
       rollerLength: this._doorGeneralSpecs.bearingHousingTotalLength,
@@ -1271,9 +1275,11 @@ class Class_product {
 
     const res_spec = await reqGetCalcGeneralSpec({
       modelName: this.doorType as TpcgsPrams['modelName'],
-      height: Number(this.height) * 1000,
+      // height: Number(this.height) * 1000,
+      height: new Decimal(this.height).mul(1000).toNumber(),
       isAntiTyphoon: this.typhoonProtection,
-      fullWidth: Number(this.fullWidth || 0) * 1000,
+      // fullWidth: Number(this.fullWidth || 0) * 1000,
+      fullWidth: new Decimal(this.fullWidth || 0).mul(1000).toNumber(),
       WG: undefined,
     });
 
@@ -2709,7 +2715,8 @@ class Class_product {
     this.reRender();
   }
   get height_mm() {
-    return String(Number(this._prodData.height) * 1000);
+    // return String(Number(this._prodData.height) * 1000);
+    return new Decimal(this._prodData.height || 0).mul(1000).toString();
   }
 
   // B(m)
@@ -2836,7 +2843,8 @@ class Class_product {
   }
 
   get boxB_mm() {
-    return String(Number(this._prodData.boxB) * 1000);
+    // return String(Number(this._prodData.boxB) * 1000);
+    return new Decimal(this._prodData.boxB || 0).mul(1000).toString();
   }
 
   // async reqGetBoxD({ str, diameter }: { str: string; diameter: number }) {
@@ -3089,7 +3097,8 @@ class Class_product {
   }
   set quantity(v) {
     if (this.parentProd) {
-      const remain = this.parentProd.remainQty + Number(this._quantity);
+      // const remain = this.parentProd.remainQty + Number(this._quantity);
+      const remain = new Decimal(this.parentProd.remainQty || 0).add(this._quantity || 0).toNumber();
 
       if (Number(v) > remain) {
         return;
@@ -3624,7 +3633,11 @@ class Class_product {
   }
 
   get remainQty() {
-    return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
+    // return Number(this._quantity) - Number(this._reduceQty) - Number(this.exchangeQty);
+    return new Decimal(this._quantity || 0)
+      .minus(this._reduceQty || 0)
+      .minus(this.exchangeQty || 0)
+      .toNumber();
   }
 
   // 追減數量
@@ -3634,7 +3647,10 @@ class Class_product {
   set reduceQty(v) {
     const nv = Number(v);
 
-    if (nv > this.remainQty + Number(this.reduceQty)) {
+    // if (nv > this.remainQty + Number(this.reduceQty)) {
+    //   return;
+    // }
+    if (nv > new Decimal(this.remainQty || 0).add(this.reduceQty || 0).toNumber()) {
       return;
     }
 
@@ -3653,17 +3669,20 @@ class Class_product {
 
   // 變更數量
   get exchangeQty() {
-    let qty = 0;
+    // let qty = 0;
+    let qty = new Decimal(0);
     Object.values(this._exchangeProdList).forEach((item) => {
-      qty = qty + Number(item.quantity || 0);
+      // qty = qty + Number(item.quantity || 0);
+      qty = qty.add(item.quantity || 0);
     });
 
-    return qty;
+    return qty.toNumber();
   }
 
   // 追減/變更金額
   get reduceExchangePrice() {
-    const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
+    // const qty = Number(this.reduceQty || 0) + Number(this.exchangeQty || 0);
+    const qty = Decimal.add(this.reduceQty || 0, this.exchangeQty || 0).toNumber();
     const reducePrice = Decimal.mul(qty, this._unitPrice || 0).toString();
 
     return reducePrice;
@@ -3986,10 +4005,12 @@ class Class_product {
 
   get body_attachDiv() {
     // const body = this.body;
-    const divQty = Number(this.reduceQty) + this.exchangeQty;
+    // const divQty = Number(this.reduceQty) + this.exchangeQty;
+    const divQty = new Decimal(this.reduceQty || 0).add(this.exchangeQty || 0).toNumber();
     const theBody = this.body;
 
-    const quantity = theBody.quantity - divQty;
+    // const quantity = theBody.quantity - divQty;
+    const quantity = new Decimal(theBody.quantity).minus(divQty).toNumber();
 
     const body = {
       ...this.body,
