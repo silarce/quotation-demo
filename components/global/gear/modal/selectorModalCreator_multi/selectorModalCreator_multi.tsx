@@ -11,9 +11,6 @@ import { Selector, TimperativeHandle, TselectorProps, TselectorProps_simple } fr
 // gear
 import TwoBtnFooter from '../footer/twoBtnFooter';
 
-// options
-import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
-
 // css
 import scss from './selectorModalCreator_multi.module.scss';
 
@@ -35,6 +32,13 @@ import {
   TquotationRangeDto,
 } from 'js/api/api_workSheet';
 
+import { useGetCustomers_infinite_2, TcustomerDto } from 'js/api/api_customer';
+
+// lookup and options
+import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
+import { customerTypesLookup } from 'js/api/api_customer';
+import { Toption } from 'js/utils/options/options';
+
 // ======================================================================
 
 type TtypeLookup = {
@@ -45,6 +49,7 @@ type TtypeLookup = {
   engineeringContact: Exclude<(typeof props_engineeringContact)['dataType'], undefined>;
   annotation: Exclude<(typeof props_annotation)['dataType'], undefined>;
   quotationRange: Exclude<(typeof props_quotationRange)['dataType'], undefined>;
+  customer: Exclude<(typeof props_customer)['dataType'], undefined>;
   // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
 };
@@ -104,6 +109,7 @@ export type {
   TemployeeDto,
   TdailyReportItem_my,
   TengineeringContactDto,
+  TcustomerDto,
 };
 
 // ======================================================================
@@ -405,6 +411,8 @@ const props_outsourcing: TselectorProps<ToutsourcingDto> = {
   },
 };
 
+// -------------------------------------------------------------------------
+
 const props_employee: TselectorProps<TemployeeDto> = {
   useInfinit: useEmployee_infinite_2,
   selectedKey: 'chName',
@@ -544,6 +552,8 @@ const props_employee_worksDepartment: TselectorProps<TemployeeDto> = {
   },
 };
 
+// -------------------------------------------------------------------------
+
 const props_dailyReport_workers_item: TselectorProps<
   TdailyReportItem_my,
   TuseNoMetaPropsInNeed['dailyReport_workers_item']
@@ -606,6 +616,8 @@ const props_dailyReport_workers_item: TselectorProps<
   },
 };
 
+// -------------------------------------------------------------------------
+
 const props_engineeringContact: TselectorProps<TengineeringContactDto> = {
   useInfinit: useGetEngineeringContact_all,
   selectedKey: 'projectName',
@@ -646,6 +658,8 @@ const props_engineeringContact: TselectorProps<TengineeringContactDto> = {
     },
   ],
 };
+
+// -------------------------------------------------------------------------
 
 const props_annotation: TselectorProps<TannotationDto> = {
   useInfinit: useGetAnnotation_infinite,
@@ -705,6 +719,8 @@ const props_annotation: TselectorProps<TannotationDto> = {
   },
 };
 
+// -------------------------------------------------------------------------
+
 const props_quotationRange: TselectorProps<TquotationRangeDto> = {
   useInfinit: useGetQuotationRanges_infinite,
   selectedKey: 'description',
@@ -763,33 +779,140 @@ const props_quotationRange: TselectorProps<TquotationRangeDto> = {
   },
 };
 
+// -------------------------------------------------------------------------
+
+const props_customer: TselectorProps<TcustomerDto> = {
+  useInfinit: useGetCustomers_infinite_2,
+  params: {
+    populate: ['types'],
+  },
+  selectedKey: 'name',
+  caption: '客戶',
+  configArr: [
+    {
+      key: 'customerNumber',
+      width: 150,
+      thead: {
+        label: '客戶編號',
+      },
+      tbody: {},
+    },
+    {
+      key: 'name',
+      flex: 'auto',
+      thead: {
+        label: '全稱',
+      },
+      tbody: {},
+    },
+    {
+      key: 'types',
+      width: 200,
+      thead: {
+        label: '類型',
+      },
+      tbody: {
+        reducer: (value) => {
+          const types = value as TcustomerDto['types'];
+          const typeStr = types.map((type) => customerTypesLookup[type.name]).join(' / ');
+
+          return typeStr;
+        },
+      },
+    },
+    {
+      key: 'county',
+      width: 150,
+      thead: {
+        label: '地區',
+      },
+      tbody: {},
+    },
+  ],
+  searchInputSelPropsArr: [
+    {
+      wrapperStyle: { width: 100 },
+      selectProps: {
+        props: {
+          menuPortalTarget: undefined, // select元件做壞了，這個必須要有
+          options: (() => {
+            const options: Toption[] = Object.entries(customerTypesLookup).map(([key, value]) => {
+              return {
+                label: value,
+                value: key,
+              };
+            });
+
+            options.unshift({
+              label: '不拘',
+              value: '',
+            });
+
+            return options;
+          })(),
+          placeholder: '類型',
+        },
+      },
+    },
+    {
+      wrapperStyle: { width: 100 },
+      selectProps: {
+        props: {
+          menuPortalTarget: undefined, // select元件做壞了，這個必須要有
+          options: optionsCreator_county({ emptyOption: true }),
+          placeholder: '地區',
+        },
+      },
+    },
+    {
+      pilarAttr: {},
+    },
+    {
+      wrapperStyle: { width: 100 },
+      inputProps: {
+        props: {
+          placeholder: '完整客戶編號',
+        },
+      },
+    },
+    {
+      pilarAttr: {},
+    },
+    {
+      wrapperStyle: { width: 150 },
+      inputProps: {
+        props: {
+          placeholder: '全稱',
+        },
+      },
+    },
+  ],
+  filter: (strArr) => {
+    return {
+      'types.name': { $eq: strArr[0] },
+      county: { $eq: strArr[1] },
+      customerNumber: { $eq: strArr[2] },
+      name: { $contains: strArr[3] },
+    };
+  },
+};
+
+// -------------------------------------------------------------------------
+
 // ---
 // w   記得要上去修改TtypeLookup
 // w   propsLookup 與 TtypeLookup的key必須一致
 // w   propsLookup 與 TtypeLookup的key必須一致
 // w   propsLookup 與 TtypeLookup的key必須一致
 const propsLookup = {
-  outsourcing: () => {
-    return _.cloneDeep(props_outsourcing);
-  },
-  employee: () => {
-    return _.cloneDeep(props_employee);
-  },
-  employee_worksDepartment: () => {
-    return _.cloneDeep(props_employee_worksDepartment);
-  },
-  dailyReport_workers_item: () => {
-    return _.cloneDeep(props_dailyReport_workers_item);
-  },
-  engineeringContact: () => {
-    return _.cloneDeep(props_engineeringContact);
-  },
-  annotation: () => {
-    return _.cloneDeep(props_annotation);
-  },
-  quotationRange: () => {
-    return _.cloneDeep(props_quotationRange);
-  },
+  outsourcing: () => _.cloneDeep(props_outsourcing),
+  employee: () => _.cloneDeep(props_employee),
+  employee_worksDepartment: () => _.cloneDeep(props_employee_worksDepartment),
+  dailyReport_workers_item: () => _.cloneDeep(props_dailyReport_workers_item),
+  engineeringContact: () => _.cloneDeep(props_engineeringContact),
+  annotation: () => _.cloneDeep(props_annotation),
+  quotationRange: () => _.cloneDeep(props_quotationRange),
+  customer: () => _.cloneDeep(props_customer),
 
   // test: () => {
   //   return _.cloneDeep(props_outsourcing);
