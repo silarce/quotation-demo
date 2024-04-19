@@ -107,9 +107,9 @@ export default function RegionalPerformanceStatistics() {
           count: 1,
         };
       } else {
-        list[county][quotetype].totalsum = String(Number(list[county][quotetype].totalsum) + Number(totalsum));
-        list[county][quotetype].pricesum = String(Number(list[county][quotetype].pricesum) + Number(pricesum));
-        list[county][quotetype].percentage = String(Number(list[county][quotetype].percentage) + percentage);
+        list[county][quotetype].totalsum = new Decimal(list[county][quotetype].totalsum).add(totalsum).toString();
+        list[county][quotetype].pricesum = new Decimal(list[county][quotetype].pricesum).add(pricesum).toString();
+        list[county][quotetype].percentage = new Decimal(list[county][quotetype].percentage).add(percentage).toString();
         countList[county][quotetype].count += 1;
       }
     });
@@ -119,30 +119,34 @@ export default function RegionalPerformanceStatistics() {
     Object.keys(list).forEach((key_c) => {
       const item_c = list[key_c];
 
-      let totalsumTotal = 0;
-      let pricesumTotal = 0;
-      let percentageTotal = 0;
+      let totalsumTotal = new Decimal(0);
+      let pricesumTotal = new Decimal(0);
+      let percentageTotal = new Decimal(0);
 
       Object.keys(item_c).forEach((key_q) => {
         const item_q = item_c[key_q];
         const count = countList[key_c][key_q].count;
         //
-        totalsumTotal += Number(item_q.totalsum);
-        pricesumTotal += Number(item_q.pricesum);
+
+        totalsumTotal = totalsumTotal.add(item_q.totalsum);
+        pricesumTotal = pricesumTotal.add(item_q.pricesum);
         //
         item_q.totalsum = Number(item_q.totalsum).toLocaleString();
         item_q.pricesum = Number(item_q.pricesum).toLocaleString();
         //
-        item_q.percentage = new Decimal(item_q.percentage).div(count).toString();
-        percentageTotal += Number(item_q.percentage);
+        item_q.percentage = new Decimal(item_q.percentage).div(count).toDecimalPlaces(2).toString();
+
+        percentageTotal = percentageTotal.add(item_q.percentage);
+
+        //
       });
 
       const length = Object.keys(item_c).length;
-      const percentageAve = new Decimal(percentageTotal).div(length).toNumber();
+      const percentageAve = new Decimal(percentageTotal).div(length).toDecimalPlaces(2).toNumber();
 
       item_c['total'] = {
-        totalsum: totalsumTotal.toLocaleString(),
-        pricesum: pricesumTotal.toLocaleString(),
+        totalsum: totalsumTotal.toDecimalPlaces(2).toLocaleString(),
+        pricesum: pricesumTotal.toDecimalPlaces(2).toLocaleString(),
         percentage: String(percentageAve),
       };
 
@@ -160,6 +164,9 @@ export default function RegionalPerformanceStatistics() {
 
     return { formatedList: list, quotetypeArr };
   }, [data]);
+
+  console.log('formatedList', formatedList);
+  console.log('quotetypeArr', quotetypeArr);
 
   // ------------------------------------------------------------------
 
