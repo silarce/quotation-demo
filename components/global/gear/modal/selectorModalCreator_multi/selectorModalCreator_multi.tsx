@@ -785,6 +785,8 @@ const props_customer: TselectorProps<TcustomerDto> = {
   useInfinit: useGetCustomers_infinite_2,
   params: {
     populate: ['types'],
+    sort: 'customerNumber',
+    order: 'ASC',
   },
   selectedKey: 'name',
   caption: '客戶',
