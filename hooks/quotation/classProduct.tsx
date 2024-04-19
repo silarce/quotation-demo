@@ -2552,6 +2552,10 @@ class Class_product {
     return this._prodData.fullWidth;
   }
   set fullWidth(v) {
+    if (!checkIsFloat(v, 3)) {
+      return;
+    }
+
     this.isWgChanged = false;
 
     this._prodData.fullWidth = v;
@@ -2588,6 +2592,11 @@ class Class_product {
     if (str === '') {
       str = '0';
     }
+
+    // 現在使用者不可以操作WG，應該是不會有問題
+    // if (!checkIsFloat(str, 3)) {
+    //   return;
+    // }
 
     this._prodData.WG = str;
 
@@ -2642,6 +2651,10 @@ class Class_product {
       v = '0';
     }
 
+    if (!checkIsFloat(v, 3)) {
+      return;
+    }
+
     const WG = calcProductWG_withWAndG({
       W: Number(v || 0),
       G: Number(this.guildRailG || 0),
@@ -2671,6 +2684,10 @@ class Class_product {
     return this._prodData.height;
   }
   set height(v) {
+    if (!checkIsFloat(v, 3)) {
+      return;
+    }
+
     this._prodData.height = v;
 
     // ________________________
@@ -2711,15 +2728,20 @@ class Class_product {
         return;
       }
 
-      this._prodData.boxB = v;
-
       // ________________________
       if (this.isSpecialProd) {
+        if (!checkIsFloat(v, 3)) {
+          return;
+        }
+
+        this._prodData.boxB = v;
         this.reRender();
 
         return;
       }
       // ________________________
+
+      this._prodData.boxB = v;
 
       // const reqBody: TgetBoxDParams = {
       //   modelName: this.doorType,
@@ -2765,15 +2787,20 @@ class Class_product {
 
   set boxB_noCall(v: string) {
     const setBoxB = async () => {
-      this._prodData.boxB = v;
-
       // ________________________
       if (this.isSpecialProd) {
+        if (!checkIsFloat(v, 3)) {
+          return;
+        }
+
+        this._prodData.boxB = v;
         this.reRender();
 
         return;
       }
       // ________________________
+
+      this._prodData.boxB = v;
 
       // const reqBody: TgetBoxDParams = {
       //   modelName: this.doorType,
