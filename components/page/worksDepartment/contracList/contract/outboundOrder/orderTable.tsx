@@ -21,6 +21,7 @@ type TrowProps = {
   key?: string | number;
   className?: string;
   isHeadRow?: boolean;
+  isProdRow?: boolean;
   side?: {
     serialNumber: React.ReactNode;
     projectName: React.ReactNode;
@@ -271,7 +272,8 @@ const Thead = () => {
 };
 
 const HeadRow = (rowProps: TrowProps) => {
-  return <Row {...rowProps} className={scss.headRow} />;
+  // return <Row {...rowProps} className={(scss.headRow, rowProps.isProdRow && scss.prodRow)} />;
+  return <Row {...rowProps} className={classNames(scss.headRow, rowProps.isProdRow && scss.prodRow)} />;
 };
 
 // ------------------------------------------------------------------------

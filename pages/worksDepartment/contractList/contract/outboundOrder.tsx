@@ -650,6 +650,7 @@ const createRowProps_prodRow = ({
   return {
     // key: prod.id,
     isHeadRow: true,
+    isProdRow: true,
     side: {
       serialNumber,
       projectName: prod.itemName,
