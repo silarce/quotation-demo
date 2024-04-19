@@ -473,7 +473,7 @@ function DndRow({
               return null;
             }
 
-            if (vKey === 'slat' && key === 'desc' && item.optionalComponentAction === 'slat_SJ-302') {
+            if (vKey === 'slat' && key === 'desc' && item.optionalComponentAction === 'slat_SJ-305D') {
               key = 'desc_select';
             }
 

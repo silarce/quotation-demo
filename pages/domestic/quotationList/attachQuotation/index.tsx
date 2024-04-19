@@ -103,6 +103,8 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 
 import { TcreateQuotationProductDto, TquotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
+import { checkIsFloat } from 'js/utils/checkValue';
+
 // ------------------------------------------------------------------
 
 const EmployeeSelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
@@ -691,6 +693,7 @@ latestContentProdArr為這次追加追減的主產品
     attachAddTotal,
     attachDivTotal,
     attachTotal,
+    avgDiscount_withQty,
   } = useProductList({
     productArr: contractArr,
     others: quotationData?.latestContent.others,
@@ -1729,6 +1732,29 @@ latestContentProdArr為這次追加追減的主產品
               rowHeight="h60"
               isAttach={isAttach}
               attachTotal={attachDivTotal}
+              discountRate={summary.discountRate} // 報價單總折數
+              changeDiscountRate={(v) => {
+                if (v === '') {
+                  v = '0';
+                }
+
+                if (Number(v) > 500) {
+                  v = '500';
+                }
+
+                const isValid = checkIsFloat(v, 3);
+
+                if (!isValid) {
+                  return;
+                }
+
+                setSummary((state) => {
+                  return {
+                    ...state,
+                    discountRate: v,
+                  };
+                });
+              }}
             />
 
             {/* 材料配件設定 */}
@@ -1808,6 +1834,29 @@ latestContentProdArr為這次追加追減的主產品
               onVKeyChange={() => {}}
               rowHeight="h60"
               attachTotal={attachAddTotal}
+              discountRate={summary.discountRate} // 報價單總折數
+              changeDiscountRate={(v) => {
+                if (v === '') {
+                  v = '0';
+                }
+
+                if (Number(v) > 500) {
+                  v = '500';
+                }
+
+                const isValid = checkIsFloat(v, 3);
+
+                if (!isValid) {
+                  return;
+                }
+
+                setSummary((state) => {
+                  return {
+                    ...state,
+                    discountRate: v,
+                  };
+                });
+              }}
             />
 
             {/* 材料配件設定 */}
@@ -1858,6 +1907,7 @@ latestContentProdArr為這次追加追減的主產品
             control_anno={control_anno}
             control_qr={control_qr}
             appendixParams={appendixParams}
+            avgDiscount_withQty={avgDiscount_withQty}
           />
 
           {/* 簽名 */}

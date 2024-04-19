@@ -153,6 +153,7 @@ export default function AttachContract({
     attachAddTotal,
     attachDivTotal,
     attachTotal,
+    avgDiscount_withQty,
   } = useProductList({
     productArr: formatedContent?.products,
     others: formatedContent?.others,
@@ -491,6 +492,8 @@ export default function AttachContract({
               panelBox="resetChangeBox"
               targetProd={targetProd}
               attachTotal={attachDivTotal.toLocaleString()}
+              discountRate={data?.discount ?? ''} // 報價單總折數
+              changeDiscountRate={(v) => {}}
             />
 
             <br />
@@ -560,6 +563,8 @@ export default function AttachContract({
               // targetProd={targetProd}
               attachTotal={attachAddTotal}
               isRedBorder={true}
+              discountRate={data?.discount ?? ''} // 報價單總折數
+              changeDiscountRate={(v) => {}}
             />
 
             <br />
@@ -611,6 +616,7 @@ export default function AttachContract({
           control_anno={control_anno}
           control_qr={control_qr}
           appendixParams={appendixParams}
+          avgDiscount_withQty={avgDiscount_withQty}
         />
 
         {/* 簽名 */}

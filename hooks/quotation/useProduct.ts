@@ -22,6 +22,8 @@ import { Class_other, Tothers, TothersKey, othersCellConfig, othersKeyArrOri, em
 // type
 import { TcreateQuotationContentOtherDto, TquotationProductDto, TquotationContentOtherDto } from 'js/api/dtoTypes';
 
+import { checkIsFloat } from 'js/utils/checkValue';
+
 // =======================================================================
 
 type TreRender = () => void;
@@ -88,7 +90,7 @@ const useProductList = ({
     setCalcTrigger((state) => ++state);
   };
 
-  const [avgDiscount, setAvgDiscount] = useState(0);
+  // const [avgDiscount, setAvgDiscount] = useState(0);
   const [avgDiscount_withQty, setAvgDiscount_withQty] = useState(0);
 
   // ---------------------------------------------------------
@@ -133,30 +135,25 @@ const useProductList = ({
     //
 
     const calcAvgDiscount = () => {
-      let discountTotal = new Decimal(0);
-      let count = 0;
-
-      Object.values(list).forEach((prod) => {
-        discountTotal = discountTotal.add(prod.discount);
-        count = count + 1;
-
-        const exchangeProdList = prod.exchangeProdList;
-
-        Object.values(exchangeProdList).forEach((exchangeProd) => {
-          discountTotal = discountTotal.add(exchangeProd.discount);
-          count = count + 1;
-        });
-      });
-
-      // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
-      Object.values(productList_attach).forEach((prod_attach) => {
-        discountTotal = discountTotal.add(prod_attach.discount);
-        count = count + 1;
-      });
-
-      const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
-
-      setAvgDiscount(avgDiscount);
+      // 棄用
+      // let discountTotal = new Decimal(0);
+      // let count = 0;
+      // Object.values(list).forEach((prod) => {
+      //   discountTotal = discountTotal.add(prod.discount);
+      //   count = count + 1;
+      //   const exchangeProdList = prod.exchangeProdList;
+      //   Object.values(exchangeProdList).forEach((exchangeProd) => {
+      //     discountTotal = discountTotal.add(exchangeProd.discount);
+      //     count = count + 1;
+      //   });
+      // });
+      // // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+      // Object.values(productList_attach).forEach((prod_attach) => {
+      //   discountTotal = discountTotal.add(prod_attach.discount);
+      //   count = count + 1;
+      // });
+      // const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+      // setAvgDiscount(avgDiscount);
     };
 
     const calcAvgDiscount_withQty = () => {
@@ -187,7 +184,8 @@ const useProductList = ({
         }
       });
 
-      const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+      // const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+      const avgDiscount_withQty = discountTotal.div(count).toNumber();
 
       setAvgDiscount_withQty(avgDiscount_withQty);
 
@@ -219,7 +217,7 @@ const useProductList = ({
         // calcSubTotalPrice,
         doorModelList,
         onDoorTypeChange: onClassDoorTypeChange,
-        // quotationDiscount: quotationDiscount,
+        quotationDiscount: quotationDiscount,
         onDiscountChange: calcDiscount_two,
         onQtyChange: calcDiscount_two,
       });
@@ -272,7 +270,7 @@ const useProductList = ({
           doorModelList,
           originProd: prod,
           onDoorTypeChange: onClassDoorTypeChange,
-          // quotationDiscount: quotationDiscount,
+          quotationDiscount: quotationDiscount,
           onDiscountChange: calcDiscount_two,
           onQtyChange: calcDiscount_two,
         });
@@ -600,50 +598,24 @@ const useProductList = ({
   }, [calcTrigger]);
 
   // 修改所有class_product的quotationDiscount
-  // const changeAllProdQuotationDiscount = (v: number) => {
-  //   Object.values(productList).forEach((prod) => {
-  //     prod.quotationDiscount = v;
-  //   });
-  //   Object.values(attachProdList).forEach((prod) => {
-  //     prod.quotationDiscount = v;
-  //   });
-  // };
+  const changeAllProdQuotationDiscount = (v: number) => {
+    Object.values(productList).forEach((prod) => {
+      prod.quotationDiscount = v;
+      Object.values(prod.exchangeProdList).forEach((exProd) => {
+        exProd.quotationDiscount = v;
+      });
+    });
+    Object.values(attachProdList).forEach((prod) => {
+      prod.quotationDiscount = v;
+    });
+  };
 
-  // useEffect(() => {
-  //   // component裡面只有紀錄牌價，其他金額都是算出來的
-  //   // 因此即使沒有要變更主產品或總折數，也必須要執行changeAllProdQuotationDiscount
-  //   // 否則若quotationDiscount不是100，component的單價就會錯誤
-
-  //   changeAllProdQuotationDiscount(quotationDiscount);
-  // }, [quotationDiscount]);
-
-  // const calcAvgDiscount = () => {
-  //   let discountTotal = new Decimal(0);
-  //   let count = 0;
-
-  //   // const prodArr = Object.values(productList);
-
-  //   Object.values(productList).forEach((prod) => {
-  //     discountTotal = discountTotal.add(prod.discount);
-  //     count = count + 1;
-
-  //     const exchangeProdList = prod.exchangeProdList;
-
-  //     Object.values(exchangeProdList).forEach((exchangeProd) => {
-  //       discountTotal = discountTotal.add(exchangeProd.discount);
-  //       count = count + 1;
-  //     });
-  //   });
-
-  //   Object.values(productList_attach).forEach((prod_attach) => {
-  //     discountTotal = discountTotal.add(prod_attach.discount);
-  //     count = count + 1;
-  //   });
-
-  //   const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
-
-  //   return avgDiscount;
-  // };
+  useEffect(() => {
+    // component裡面只有紀錄牌價，其他金額都是算出來的
+    // 因此即使沒有要變更主產品或總折數，也必須要執行changeAllProdQuotationDiscount
+    // 否則若quotationDiscount不是100，component的單價就會錯誤
+    changeAllProdQuotationDiscount(quotationDiscount);
+  }, [quotationDiscount]);
 
   // ---------------------------------------------------------
   // 回到編輯前的狀態，就是以一開始取得的資料重新建立list
@@ -681,7 +653,7 @@ const useProductList = ({
       callCalcSubTotal,
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
-      // quotationDiscount: quotationDiscount,
+      quotationDiscount: quotationDiscount,
       onDiscountChange: calcDiscount_two,
       onQtyChange: calcDiscount_two,
     });
@@ -728,7 +700,7 @@ const useProductList = ({
           onDiscountChange: calcDiscount_two,
           onQtyChange: calcDiscount_two,
           disabled_quantity: true,
-          // quotationDiscount: quotationDiscount,
+          quotationDiscount: quotationDiscount,
         });
       });
 
@@ -813,19 +785,21 @@ const useProductList = ({
     //
   };
 
-  // const onClassDiscountChange = () => {
-  //   onDiscountChange?.(calcAvgDiscount());
+  // const changeAllProductDiscount = (str: `${number}`) => {
+  //   const isValid = checkIsFloat(str, 3);
+
+  //   if (!isValid) {
+  //     return;
+  //   }
+
+  //   Object.values(productList).forEach((prod) => {
+  //     prod.discount_noTimeout = String(str);
+  //   });
+
+  //   Object.values(productList_attach).forEach((prod) => {
+  //     prod.discount_noTimeout = String(str);
+  //   });
   // };
-
-  const changeAllProductDiscount = (num: number) => {
-    Object.values(productList).forEach((prod) => {
-      prod.discount_noTimeout = String(num);
-    });
-
-    Object.values(productList_attach).forEach((prod) => {
-      prod.discount_noTimeout = String(num);
-    });
-  };
 
   // ---------------------------------------------------------
 
@@ -871,9 +845,10 @@ const useProductList = ({
     //
     calcSubTotalPrice,
     // changeAllProdQuotationDiscount, // 修改所有class_product的quotationDiscount
-    changeAllProductDiscount,
-    avgDiscount,
-    avgDiscount_withQty,
+    // changeAllProductDiscount,
+    // avgDiscount,
+    // avgDiscount_withQty,
+    avgDiscount_withQty: new Decimal(avgDiscount_withQty).mul(quotationDiscount).div(100).toDecimalPlaces(3).toString(),
   };
 };
 

@@ -256,6 +256,7 @@ version>1 是子合約
     // changeOthersKeyArr,
     // addOthers,
     // getOthersPostBodyArr,
+    avgDiscount_withQty,
   } = useProductList({
     productArr: content?.products ?? [],
     others: content?.others ?? [],
@@ -891,6 +892,8 @@ version>1 是子合約
                   panelBox="easyBox"
                   emptyBlockWidth="80px"
                   rowHeight={'h60'}
+                  discountRate={contract?.discount ?? ''} // 報價單總折數
+                  changeDiscountRate={(v) => {}}
                 />
                 {/* 原報價項目 */}
 
@@ -956,6 +959,7 @@ version>1 是子合約
               control_anno={control_anno}
               control_qr={control_qr}
               appendixParams={appendixParams}
+              avgDiscount_withQty={avgDiscount_withQty}
             />
 
             {/* 簽名 */}
@@ -1070,6 +1074,7 @@ const OldQuotationProduction = ({
     // changeOthersKeyArr,
     // addOthers,
     // getOthersPostBodyArr,
+    avgDiscount_withQty,
   } = useProductList({
     productArr: rootContent?.products ?? [],
     others: [],
@@ -1096,6 +1101,7 @@ const OldQuotationProduction = ({
           changeProdKeyArr={changeProdKeyArr}
           addProd={() => {}}
           setTargetProd={setTargetProdKey}
+          discountRate={undefined}
         />
 
         {/* <Table_com
