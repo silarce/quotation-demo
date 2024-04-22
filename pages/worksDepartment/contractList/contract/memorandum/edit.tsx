@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
@@ -19,7 +19,11 @@ import {
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import CustomerSelector, { TcustomerDto } from 'components/global/gear/modal/customerSelector';
+
+import {
+  selectModalCreator_multi,
+  TcustomerDto,
+} from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 import scss from './edit.module.scss';
 
@@ -27,30 +31,45 @@ import scss from './edit.module.scss';
 
 type Tquery = {
   id: string | undefined;
+  memorandumId: string | undefined;
 };
+
+// ====================================================================
+
+const Selector_customer = selectModalCreator_multi<['customer']>({
+  selectorArr: [
+    {
+      key: 'customer',
+      tip: '請選擇客戶',
+      limit: 1,
+    },
+  ],
+});
 
 // ====================================================================
 export default function Edit() {
   const router = useRouter();
-  const { id } = router.query as Tquery;
+  const { id, memorandumId } = router.query as Tquery;
 
   // ---------------------------------------------------------------------------
 
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(!!memorandumId);
 
   // ---------------------------------------------------------------------------
 
-  const [selectorTarget, setSelectorTarget] = useState<'reciver' | 'sender'>();
+  const [selectorAction, setSelectorAction] = useState<'reciver' | 'sender'>();
   const [reciver, setReciver] = useState<TcustomerDto>();
   const [sender, setSender] = useState<TcustomerDto>();
 
   const onSelectorConfirm = (customer: TcustomerDto) => {
-    if (selectorTarget === 'reciver') {
+    if (selectorAction === 'reciver') {
       setReciver(customer);
-    } else if (selectorTarget === 'sender') {
+    } else if (selectorAction === 'sender') {
       setSender(customer);
     }
   };
+
+  // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
   const panelList_disabled: TpanelList = [
@@ -120,7 +139,7 @@ export default function Edit() {
               caption="受文者"
               showBaseline="auto"
               disabled={disabled}
-              onClick={() => setSelectorTarget('reciver')}
+              onClick={() => setSelectorAction('reciver')}
               //
               inputProps={{
                 props: {
@@ -142,7 +161,7 @@ export default function Edit() {
               caption="發文者"
               showBaseline="auto"
               disabled={disabled}
-              onClick={() => setSelectorTarget('sender')}
+              onClick={() => setSelectorAction('sender')}
               //
               inputProps={{
                 props: {
@@ -179,27 +198,25 @@ export default function Edit() {
             </div>
 
             <div className={scss.uploadPanel}></div>
-            {/* <div className={scss.imgList}>
+            <div className={scss.imgList}>
               <Image src="https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg" />
               <Image src="https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg" />
               <Image src="https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg" />
               <Image src="https://www.alleycat.org/wp-content/uploads/2019/03/FELV-cat.jpg" />
-            </div> */}
+            </div>
           </div>
 
           {/*  */}
         </Wrapper>
       </div>
-      <CustomerSelector
-        showModal={!!selectorTarget}
-        onConfirm={(arr) => {
-          const customer = arr[0];
 
-          if (customer) {
-            onSelectorConfirm(customer);
-          }
+      <Selector_customer
+        showModal={!!selectorAction}
+        onConfirm={(arr) => {
+          const customer = arr[0][0];
+          onSelectorConfirm(customer);
         }}
-        onCancel={() => setSelectorTarget(undefined)}
+        onCancel={() => setSelectorAction(undefined)}
       />
     </SubLayer>
   );
