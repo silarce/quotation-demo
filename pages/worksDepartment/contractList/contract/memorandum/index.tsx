@@ -13,20 +13,22 @@ import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_ta
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
+// icon
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+
 // api
 import { useGetContract_id } from 'js/api/api_quotation';
-import {
-  // TupdateEngineeringDeliveryList,
-  // TupdateDeliveryStatus,
-  TupdateEngineeringDeliveryStatusDto,
-  TcreateEngineeringDeliveryStatusDto,
-  useGetEngineeringContact,
-  useGetEngineeringDeliveryList,
-  apiPatchEngineeringDeliveryList,
-  apiPostDeliveryStatus,
-  apiPatchDeliveryStatus,
-  apiDeleteDeliveryStatus,
-} from 'js/api/api_engineering';
+import // TupdateEngineeringDeliveryList,
+// TupdateDeliveryStatus,
+// TupdateEngineeringDeliveryStatusDto,
+// TcreateEngineeringDeliveryStatusDto,
+// useGetEngineeringContact,
+// useGetEngineeringDeliveryList,
+// apiPatchEngineeringDeliveryList,
+// apiPostDeliveryStatus,
+// apiPatchDeliveryStatus,
+// apiDeleteDeliveryStatus,
+'js/api/api_engineering';
 
 // type
 import { TmemorandumDto, TcustomerDto } from 'js/api/dtoTypes';
@@ -132,6 +134,8 @@ export default function Memorandum() {
         return null;
       }
 
+      // IconDetail
+
       const props: Ttable['tbody']['rowArr'][number] = {
         minHeight: tableConfig.row.minHeight,
         cellArr: [
@@ -152,47 +156,36 @@ export default function Memorandum() {
             children: purpose,
             flex: cellCofig.subject.flex,
           },
+          {
+            // children: `${getTaiwanDateStr(replyDate || null)} ${poster?.name}`,
+            children: (
+              <>
+                <span>{getTaiwanDateStr(replyDate || null)}</span>
+                <br />
+                <span>{poster?.name}</span>
+              </>
+            ),
+            width: cellCofig.reply.width,
+            className: 'text-center',
+          },
+          {
+            children: (
+              <IconDetail
+                onClick={() => {
+                  router.push({
+                    pathname: '/worksDepartment/contractList/contract/memorandum/edit',
+                    query: {
+                      contractId,
+                      memorandumId: id,
+                    },
+                  });
+                }}
+              />
+            ),
+            width: cellCofig.detail.width,
+          },
         ],
       };
-
-      if (data.replyDate) {
-        const str = `${getTaiwanDateStr(replyDate || null)} ${poster?.name}`;
-        props.cellArr.push({
-          children: str,
-          width: cellCofig.reply.width,
-          className: 'text-center',
-        });
-
-        props.onClick = () => {
-          router.push({
-            pathname: '/worksDepartment/contractList/contract/memorandum/edit',
-            query: {
-              contractId,
-              memorandumId: id,
-            },
-          });
-        };
-      } else {
-        props.cellArr.push({
-          children: (
-            <MyButton_v2
-              label="回簽"
-              px="px28"
-              py="py6"
-              onClick={() => {
-                router.push({
-                  pathname: '/worksDepartment/contractList/contract/memorandum/edit',
-                  query: {
-                    contractId,
-                    memorandumId: id,
-                  },
-                });
-              }}
-            />
-          ),
-          width: cellCofig.reply.width,
-        });
-      }
 
       return props;
     });
@@ -327,8 +320,12 @@ const cellCofig: TcellConfig = {
     flex: 'auto',
   },
   reply: {
-    label: '回簽',
+    label: '回簽日期',
     width: '150px',
+  },
+  detail: {
+    label: '',
+    width: '50px',
   },
 };
 
@@ -525,11 +522,12 @@ const fake_memorandumArr: TmemorandumDto_whole[] = [
     id: '002',
     createdAt: '2022-08-01T00:00:00.000Z',
     updatedAt: '2022-08-01T00:00:00.000Z',
-    posterId: 'p002',
-    poster: { id: 'p002', name: 'poster002' } as TcustomerDto,
+    posterId: null,
+    poster: undefined,
     recipientId: 'recipient002',
     recipient: { id: 'r002', name: '受文者22222222' } as TcustomerDto,
     // replyDate: '2022-08-01T00:00:00.000Z',
+    replyDate: null,
     issueNumber: 'IN-002',
     purpose: '主旨2222222',
     description: 'bbbbbb',
