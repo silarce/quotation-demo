@@ -11,8 +11,15 @@
     }
   }
   .imgList {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
+    display: grid;
+    gap: 20px;
+  }
+}
+
+.btn_attachment.plus {
+  padding: 0;
+  > label {
+    cursor: pointer;
+    padding: 11px 44px;
   }
 }
