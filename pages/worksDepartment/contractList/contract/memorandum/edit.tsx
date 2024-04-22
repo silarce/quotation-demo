@@ -94,10 +94,12 @@ export default function Edit() {
 
   const [state_dealedFile, setState_dealedFile] = useState<{
     img: {
+      fileIndex: number;
       key: string;
       base64: string;
     }[];
     other: {
+      fileIndex: number;
       key: string;
       name: string;
       src: string;
@@ -145,6 +147,15 @@ export default function Edit() {
 
   const init_mrmorandum = async () => {
     Promise.all([update_memorandum(), update_attachment()]);
+  };
+
+  const deleteFile = (index: number) => {
+    setState_fileArr((state) => {
+      const arr = [...state];
+      arr.splice(index, 1);
+
+      return arr;
+    });
   };
 
   // ---------------------------------------------------------------------------
@@ -209,6 +220,8 @@ export default function Edit() {
       const arr_img = [];
       const arr_other = [];
 
+      let index = 0;
+
       for (const file of state_fileArr) {
         const { name, type, size } = file;
         const key = name + String(size) + type;
@@ -217,11 +230,13 @@ export default function Edit() {
           const base64 = await getBase64(file);
 
           arr_img.push({
+            fileIndex: index++,
             key,
             base64,
           });
         } else {
           arr_other.push({
+            fileIndex: index++,
             key,
             name: file.name,
             src: URL.createObjectURL(file),
@@ -374,7 +389,14 @@ export default function Edit() {
                 return (
                   <div key={id}>
                     <label>
-                      <a href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${id}`}>{name}</a>
+                      <a
+                        href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${id}`}
+                        // 似乎可以請後端
+                        // target="_blank"
+                        // rel="noreferrer"
+                      >
+                        {name}
+                      </a>
                     </label>
                   </div>
                 );
@@ -397,29 +419,32 @@ export default function Edit() {
                 );
               })}
               {/*  */}
+              {/*  */}
+              {/*  */}
               {/* state_dealedFile */}
               {state_dealedFile.other.map((other) => {
-                const { key, name, src } = other;
+                const { fileIndex, key, name, src } = other;
 
                 return (
                   <div key={key} className="relative w-fit max-w-full">
                     <label>
-                      <a href={src}>{name}</a>
-                      {/* <input type="file" value={file} /> */}
+                      <a href={src} target="_blank" rel="noreferrer">
+                        {name}
+                      </a>
                     </label>
-                    <IconRemove02 className="global_absoluteRightTopRight" onClick={() => alert('test')} />
+                    <IconRemove02 className="global_absoluteRightTopRight" onClick={() => deleteFile(fileIndex)} />
                   </div>
                 );
               })}
 
               {state_dealedFile.img?.map((file) => {
-                const { key, base64 } = file;
+                const { fileIndex, key, base64 } = file;
 
                 return (
                   <div key={key} className="relative w-fit max-w-full">
                     <Image src={base64} alt={key} className="max-w-full max-h-[600px]" />
                     {isNew && <IconRemove02 className="global_absoluteRightTop" onClick={() => alert('req delete')} />}
-                    <IconRemove02 className="global_absoluteRightTop" onClick={() => alert('test')} />
+                    <IconRemove02 className="global_absoluteRightTop" onClick={() => deleteFile(fileIndex)} />
                   </div>
                 );
               })}
