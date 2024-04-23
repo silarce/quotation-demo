@@ -653,6 +653,7 @@ export const useGetContract_id = (
     populate,
   };
 
+  const [isFetching, setIsFetching] = useState(false);
   const [res, setRes] = useState<TquotationContractDto>();
 
   const update = async () => {
@@ -661,6 +662,7 @@ export const useGetContract_id = (
     }
 
     try {
+      setIsFetching(true);
       const newRes = await apiGetContract_Id(id, params);
 
       if (newRes) {
@@ -671,6 +673,8 @@ export const useGetContract_id = (
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '取得合約資料失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
     }
   };
 
@@ -678,6 +682,7 @@ export const useGetContract_id = (
     data: res,
     update,
     clear: () => setRes(undefined),
+    isFetching,
   };
 };
 

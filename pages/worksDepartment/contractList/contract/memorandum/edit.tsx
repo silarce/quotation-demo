@@ -1,8 +1,20 @@
-import { useState, useEffect, useMemo, forwardRef, useRef, useImperativeHandle, Fragment } from 'react';
+import {
+  //
+  useState,
+  useEffect,
+  useMemo,
+  forwardRef,
+  useRef,
+  useImperativeHandle,
+  Fragment,
+  useCallback,
+} from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import { useInView } from 'react-intersection-observer';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { AxiosError } from 'axios';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -32,9 +44,20 @@ import scss from './edit.module.scss';
 
 // api
 import { useGetContract_id } from 'js/api/api_quotation';
+import {
+  //
+  TmemorandumDto,
+  TfileDto,
+  TcreateMemorandumDto,
+  useGetMemorandum_id,
+  useGetMemorandumAttachments,
+  apiPostMemorandum,
+  apiPostMemorandumAttachments,
+  apiPostMemorandumEmail,
+} from 'js/api/api_memorandum';
 
 //  type
-import { TmemorandumDto, TcustomerDto, TfileDto } from 'js/api/dtoTypes';
+import { TcustomerDto } from 'js/api/dtoTypes';
 
 // utils
 import { getBase64 } from 'js/utils/helpers/getBase64';
@@ -44,6 +67,7 @@ import { getBase64 } from 'js/utils/helpers/getBase64';
 type Tquery = {
   contractId: string | undefined;
   memorandumId: string | undefined;
+  memotype: string | undefined;
 };
 
 type TmemorandumDto_whole = TmemorandumDto<{
@@ -53,7 +77,15 @@ type TmemorandumDto_whole = TmemorandumDto<{
 
 type TstateMemorandum = Pick<
   TmemorandumDto_whole,
-  'poster' | 'recipient' | 'replyDate' | 'issueNumber' | 'purpose' | 'description'
+  | 'poster'
+  | 'recipient'
+  | 'postDate'
+  | 'issueNumber'
+  | 'purpose'
+  | 'description'
+  //
+  | 'posterEmail'
+  | 'recipientEmail'
 >;
 
 type TfetchControlItem = {
@@ -90,8 +122,8 @@ const Selector_customer = selectModalCreator_multi<['customer']>({
 
 export default function Edit() {
   const router = useRouter();
-  const { contractId, memorandumId } = router.query as Tquery;
-  const isNew = !memorandumId;
+  const { contractId, memorandumId: rootMemorandumId, memotype } = router.query as Tquery;
+  const isNew = !rootMemorandumId;
 
   // ---------------------------------------------------------------------------
 
@@ -102,8 +134,9 @@ export default function Edit() {
   const [isReply, setIsReply] = useState(isNew);
 
   // ---------------------------------------------------------------------------
+  const [isFectching, setIsFectching] = useState(false);
 
-  const [fetchControl, setFetchControl] = useState<TfetchControlItem[]>([]);
+  const [fetchControl, setFetchControl] = useState<TfetchControlItem[]>();
 
   // ---------------------------------------------------------------------------
   // 合約
@@ -111,20 +144,135 @@ export default function Edit() {
     //
     data: contract,
     update: update_contract,
+    isFetching: isFetching_contract,
   } = useGetContract_id(contractId, {
     customPopulate: ['engineeringContact'],
   });
 
   const { engineeringContact } = contract ?? {};
 
-  const { data: data_memorandumIdArr, update: update_memorandumIdArr } = useGetmemorandumId_fake();
+  const {
+    data: data_rootMemorandum,
+    update: update_rootMemorandum,
+    isFetching: isFetching_rootMemorandum,
+  } = useGetMemorandum_id(rootMemorandumId);
 
   // ---------------------------------------------------------------------------
 
-  // ---------------------------------------------------------------------------
-  const reqPostReply = () => {
-    const replyMemorandumData = ref_replyMemorandum.current.getData();
+  // ██████  ███████  ██████  ███████ ███████ ████████
+  // ██   ██ ██      ██    ██ ██      ██         ██
+  // ██████  █████   ██    ██ █████   ███████    ██
+  // ██   ██ ██      ██ ▄▄ ██ ██           ██    ██
+  // ██   ██ ███████  ██████  ███████ ███████    ██
+  //                     ▀▀
+
+  const reqPostReply = async () => {
+    const {
+      memorandum: {
+        //
+        poster,
+        recipient,
+        // postDate,
+        issueNumber,
+        purpose,
+        description,
+        posterEmail,
+        recipientEmail,
+      },
+      attachmentArr,
+    } = ref_replyMemorandum.current.getData();
+
+    if (!contractId) {
+      return;
+    }
+
+    if (!poster || !recipient) {
+      myAlert.warning({ title: '必須選擇發文者與受文者' });
+
+      return;
+    }
+
+    if (!posterEmail || !recipientEmail) {
+      myAlert.warning({ title: '必須填寫發文者與受文者的Email' });
+
+      return;
+    }
+
+    const body: TcreateMemorandumDto = {
+      posterId: poster.id,
+      posterEmail,
+      recipientId: recipient.id,
+      recipientEmail,
+      issueNumber,
+      purpose,
+      description,
+      rootMailId: rootMemorandumId ?? null,
+    };
+
+    setIsFectching(true);
+    await apiPostMemorandum(contractId, body)
+      //
+      .then(async (res) => {
+        const newMemorandumId = res.id;
+
+        for (const file of attachmentArr) {
+          const formData = new FormData();
+          formData.append('file', file);
+
+          let shouldBreak = false;
+          await apiPostMemorandumAttachments(newMemorandumId, formData).catch((error) => {
+            const err = error as AxiosError;
+            myAlert.err({ title: '新增附件失敗，新增流程中止', content: err.message });
+            shouldBreak = true;
+          });
+
+          if (shouldBreak) {
+            break;
+          }
+        }
+
+        return newMemorandumId;
+      })
+      .then(async (newMemorandumId) => {
+        await apiPostMemorandumEmail(newMemorandumId);
+
+        return newMemorandumId;
+      })
+      .then((newMemorandumId) => {
+        if (!rootMemorandumId) {
+          router.push({
+            query: {
+              ...router.query,
+              memorandumId: newMemorandumId,
+            },
+          });
+        } else {
+          update_rootMemorandum();
+          setFetchControl((state) => [
+            ...(state ?? []),
+            {
+              id: newMemorandumId,
+              status: 'allow',
+            },
+          ]);
+        }
+      })
+      .then(() => {
+        setIsReply(false);
+      })
+      .finally(() => {
+        setIsFectching(false);
+      });
   };
+  // ---------------------------------------------------------------------------
+
+  const data_memorandumIdArr = useMemo(() => {
+    const arr = [...(data_rootMemorandum?.mailThread ?? [])];
+    data_rootMemorandum && arr.unshift(data_rootMemorandum.id);
+
+    return arr;
+  }, [data_rootMemorandum]);
+
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
@@ -133,11 +281,11 @@ export default function Edit() {
   }, [contractId]);
 
   useEffect(() => {
-    update_memorandumIdArr();
-  }, []);
+    update_rootMemorandum();
+  }, [rootMemorandumId]);
 
   useEffect(() => {
-    if (isReply) {
+    if (isReply && fetchControl) {
       return;
     }
 
@@ -147,17 +295,26 @@ export default function Edit() {
     }));
 
     arr[0] && (arr[0].status = 'allow');
+
     setFetchControl(arr);
   }, [data_memorandumIdArr, isReply]);
 
   // ---------------------------------------------------------------------------
 
   const panelList = panelListSwitcher({
-    router,
     isReply: isReply,
     setIsReply: setIsReply,
     isNew,
     reqPostReply,
+    turnBack: () => {
+      router.push({
+        pathname: '/worksDepartment/contractList/contract/memorandum',
+        query: {
+          contractId,
+          memotype,
+        },
+      });
+    },
   });
 
   // ---------------------------------------------------------------------------
@@ -169,7 +326,7 @@ export default function Edit() {
   // ██   ██ ███████ ██   ████ ██████  ███████ ██   ██
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_all={isFectching} isLoading_subLayer={isFetching_contract || isFetching_rootMemorandum}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>
@@ -185,7 +342,7 @@ export default function Edit() {
                     allowFetch={isAllow}
                     onFetchOver={({ isSuccess }) => {
                       setFetchControl((state) => {
-                        const arr = [...state];
+                        const arr = [...(state ?? [])];
                         arr[index].status = isSuccess ? 'done' : 'error';
                         arr[index + 1] && (arr[index + 1].status = 'allow');
 
@@ -231,6 +388,10 @@ const Info = ({
   issueNumber_value,
   purpose_value,
   purpose_onChange,
+  posterEmail_value,
+  // posterEmail_onChange,
+  recipientEmail_value,
+  recipientEmail_onChange,
 }: {
   //
   disabled?: boolean;
@@ -238,7 +399,7 @@ const Info = ({
   recipient_value: string;
   recipient_onClick?: (() => void) | undefined;
 
-  replyDate_value: Moment;
+  replyDate_value: Moment | null;
 
   poster_value: string;
   poster_onClick?: (() => void) | undefined;
@@ -247,11 +408,18 @@ const Info = ({
 
   purpose_value: string;
   purpose_onChange?: (value: string) => void;
+
+  posterEmail_value?: string;
+  // posterEmail_onChange?: (value: string) => void;
+
+  recipientEmail_value?: string;
+  recipientEmail_onChange?: (value: string) => void;
 }) => {
   return (
     <>
       <InputSel
         {...inputSelProps}
+        {...config_inputSel}
         caption="受文者"
         showBaseline="auto"
         disabled={disabled}
@@ -261,11 +429,65 @@ const Info = ({
           props: {
             value: recipient_value,
             placeholder: '請選擇受文者',
+            readOnly: true,
+            onChange: () => {},
           },
         }}
       />
       <InputSel
         {...inputSelProps}
+        {...config_inputSel}
+        caption="受文者Email"
+        showBaseline="auto"
+        disabled={disabled}
+        //
+        inputProps={{
+          props: {
+            value: recipientEmail_value,
+            onChange: (e) => {
+              recipientEmail_onChange && recipientEmail_onChange(e.target.value);
+            },
+          },
+        }}
+      />
+
+      <InputSel
+        {...inputSelProps}
+        {...config_inputSel}
+        caption="發文者"
+        showBaseline="auto"
+        disabled={disabled}
+        onClick={poster_onClick}
+        //
+        inputProps={{
+          props: {
+            value: poster_value,
+            placeholder: '請選擇發文者',
+            readOnly: true,
+            onChange: () => {},
+          },
+        }}
+      />
+      <InputSel
+        {...inputSelProps}
+        {...config_inputSel}
+        caption="發文者Email"
+        showBaseline="auto"
+        disabled={true}
+        //
+        inputProps={{
+          props: {
+            value: posterEmail_value,
+            onChange: (e) => {
+              // posterEmail_onChange && posterEmail_onChange(e.target.value);
+            },
+          },
+        }}
+      />
+
+      <InputSel
+        {...inputSelProps}
+        {...config_inputSel}
         caption="日期"
         showBaseline="auto"
         disabled={true}
@@ -276,22 +498,10 @@ const Info = ({
           },
         }}
       />
+
       <InputSel
         {...inputSelProps}
-        caption="發文者"
-        showBaseline="auto"
-        disabled={disabled}
-        onClick={poster_onClick}
-        //
-        inputProps={{
-          props: {
-            value: poster_value,
-            placeholder: '請選擇發文者',
-          },
-        }}
-      />
-      <InputSel
-        {...inputSelProps}
+        {...config_inputSel}
         caption="發文字號"
         showBaseline="auto"
         disabled={true}
@@ -304,6 +514,7 @@ const Info = ({
       />
       <InputSel
         {...inputSelProps}
+        {...config_inputSel}
         caption="主旨"
         showBaseline="auto"
         disabled={disabled}
@@ -334,8 +545,8 @@ const OneMemorandum = ({
 }) => {
   const [viewRef, isView] = useInView();
 
-  const { data: data_memorandum, update: update_memorandum } = useGetMemorandum_fake({ id: memorandumId });
-  const { data: data_attachmentArr, update: update_attachment } = useGetMemorandumAttachment_fake({ id: memorandumId });
+  const { data: data_memorandum, update: update_memorandum } = useGetMemorandum_id(memorandumId);
+  const { data: data_attachmentArr, update: update_attachment } = useGetMemorandumAttachments(memorandumId);
 
   const {
     //
@@ -344,14 +555,20 @@ const OneMemorandum = ({
     // updatedAt,
     // posterId,
     poster,
+    postDate,
     // recipientId,
     recipient,
-    replyDate,
+    recipientDate,
+    // replyDate,
     issueNumber,
     purpose,
     description,
     // isPoster,
+    posterEmail,
+    recipientEmail,
   } = data_memorandum ?? {};
+
+  const memorandumDate = postDate || recipientDate;
 
   const { attachmentArr_image, attachmentArr_other } = useSortAttachment({ data_attachmentArr });
   const [status, setStatus] = useState<'notReady' | 'done' | 'error'>('notReady');
@@ -371,10 +588,6 @@ const OneMemorandum = ({
   // -------------------------------------------------------------------------------
 
   useEffect(() => {
-    // if (data_memorandum && data_attachmentArr) {
-    //   return;
-    // }
-
     if (isView && allowFetch && status === 'notReady') {
       init();
     }
@@ -398,10 +611,12 @@ const OneMemorandum = ({
             <Info
               disabled={true}
               recipient_value={recipient?.name ?? ''}
-              replyDate_value={moment(replyDate)}
+              replyDate_value={memorandumDate ? moment(memorandumDate) : null}
               poster_value={poster?.name ?? ''}
               issueNumber_value={issueNumber ?? ''}
               purpose_value={purpose ?? ''}
+              posterEmail_value={posterEmail ?? ''}
+              recipientEmail_value={recipientEmail ?? ''}
             />
           </Wrapper_inpuSel_01>
           {/* 備註 */}
@@ -500,7 +715,7 @@ const ReplyMemorandum_pre = (
 
   // ------------------------------------------------------------------------
 
-  const editStateMemorandum = (key: 'purpose' | 'description', value: string) => {
+  const editStateMemorandum = (key: 'purpose' | 'description' | 'recipientEmail' | 'posterEmail', value: string) => {
     setState_memorandum({ ...state_memorandum, [key]: value });
   };
 
@@ -566,9 +781,6 @@ const ReplyMemorandum_pre = (
   }, [state_fileArr]);
   // ------------------------------------------------------------------------
 
-  // state_memorandum
-  // state_fileArr
-
   useImperativeHandle(
     ref,
     (): TreplyMemorandumHandler => ({
@@ -588,12 +800,16 @@ const ReplyMemorandum_pre = (
         <Info
           recipient_value={state_memorandum.recipient?.name ?? ''}
           recipient_onClick={() => setSelectorAction('reciver')}
-          replyDate_value={moment(state_memorandum.replyDate)}
+          replyDate_value={moment(state_memorandum.postDate)}
           poster_value={state_memorandum.poster?.name ?? ''}
           poster_onClick={() => setSelectorAction('sender')}
           issueNumber_value={state_memorandum.issueNumber ?? ''}
           purpose_value={state_memorandum.purpose ?? ''}
           purpose_onChange={(value) => editStateMemorandum('purpose', value)}
+          posterEmail_value={state_memorandum.posterEmail ?? ''}
+          // posterEmail_onChange={(value) => editStateMemorandum('posterEmail', value)}
+          recipientEmail_value={state_memorandum.recipientEmail ?? ''}
+          recipientEmail_onChange={(value) => editStateMemorandum('recipientEmail', value)}
         />
       </Wrapper_inpuSel_01>
 
@@ -689,17 +905,17 @@ const ReplyMemorandum = forwardRef(ReplyMemorandum_pre);
 // ██   ██ ███████ ██████   ██████   ██████ ███████ ██   ██
 
 const panelListSwitcher = ({
-  router,
   isReply,
   setIsReply,
   isNew,
   reqPostReply,
+  turnBack,
 }: {
-  router: NextRouter;
   isReply: boolean;
   setIsReply: React.Dispatch<React.SetStateAction<boolean>>;
   isNew: boolean;
   reqPostReply: () => void;
+  turnBack: () => void;
 }) => {
   const panelList_new: TpanelList = [
     {
@@ -710,9 +926,7 @@ const panelListSwitcher = ({
     {
       type: 'myButton',
       label: '返回',
-      onClick: () => {
-        router.back();
-      },
+      onClick: turnBack,
     },
   ];
 
@@ -741,9 +955,7 @@ const panelListSwitcher = ({
     {
       type: 'myButton',
       label: '返回',
-      onClick: () => {
-        router.back();
-      },
+      onClick: turnBack,
     },
   ];
 
@@ -805,97 +1017,13 @@ const useSortAttachment = ({ data_attachmentArr }: { data_attachmentArr: TfileDt
   return { attachmentArr_image: arr_image, attachmentArr_other: arr_other };
 };
 
-// const useMemorandumInfinite = ({
-//   //
-//   memorandumIdArr,
-// }: {
-//   memorandumIdArr: string[] | undefined;
-// }) => {
-//   const count = memorandumIdArr?.length ?? 0;
-
-//   const [viewRef, isView] = useInView();
-//   const [isFetching, setIsFetching] = useState(false);
-//   const [index, setIndex] = useState<number>(-1);
-
-//   const isLast = index === count - 1;
-
-//   const [memorandumArr, setMemorandumArr] = useState<
-//     ({
-//       memorandum: TmemorandumDto_whole;
-//       attachment: TfileDto[];
-//     } | null)[]
-//   >([]);
-
-//   const updateByIndex = async () => {
-//     const id = memorandumIdArr?.[index];
-
-//     if (!id) {
-//       return;
-//     }
-
-//     setIsFetching(true);
-//     await Promise.all([fakeApi_getMemorandum(id), fakeApi_getMemorandumAttachment(id)])
-//       .then(([fakeM, fakeA]) => {
-//         if (fakeM) {
-//           setMemorandumArr((state) => {
-//             const arr = [...state];
-//             arr.push({ memorandum: fakeM, attachment: fakeA ?? [] });
-
-//             return arr;
-//           });
-//         } else {
-//           setMemorandumArr((state) => {
-//             const arr = [...state];
-//             arr.push(null);
-
-//             return arr;
-//           });
-//         }
-//       })
-//       .finally(() => {
-//         setIsFetching(false);
-//       });
-//   };
-
-//   const reset = () => {
-//     setMemorandumArr([]);
-//     setIndex(0);
-//     setIsFetching(false);
-//   };
-//   // ----------------------------------------------------------
-
-//   useEffect(() => {
-//     if (isLast || isFetching) {
-//       return;
-//     }
-
-//     if (isView) {
-//       setIndex((state) => state + 1);
-//     }
-//   }, [isView, isFetching]);
-
-//   useEffect(() => {
-//     updateByIndex();
-//   }, [index]);
-
-//   // ----------------------------------------------------------
-//   return {
-//     viewRef,
-//     isFetching,
-//     memorandumArr,
-//     reset,
-//   };
-
-//   //
-// }; // useMemorandumInfinite
-
 // ===========================================================================
 
-// ███████  █████  ██   ██ ███████     ██████   █████  ████████  █████
-// ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
-// █████   ███████ █████   █████       ██   ██ ███████    ██    ███████
-// ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
-// ██      ██   ██ ██   ██ ███████     ██████  ██   ██    ██    ██   ██
+//  ██████  ██████  ███    ██ ███████ ██  ██████
+// ██      ██    ██ ████   ██ ██      ██ ██
+// ██      ██    ██ ██ ██  ██ █████   ██ ██   ███
+// ██      ██    ██ ██  ██ ██ ██      ██ ██    ██
+//  ██████  ██████  ██   ████ ██      ██  ██████
 
 const emptyForm: TstateMemorandum = {
   recipient: undefined, // 受文者
@@ -903,122 +1031,11 @@ const emptyForm: TstateMemorandum = {
   issueNumber: '', // 發文字號
   purpose: '', // 主旨
   description: '', // 備註
-  replyDate: new Date().toISOString(), // 回覆日期
+  postDate: new Date().toISOString(), // 日期
+  posterEmail: process.env.NEXT_PUBLIC_SANJEOU_EMAIL ?? '',
+  recipientEmail: '',
 };
 
-const fakeData: TmemorandumDto_whole = {
-  id: '003',
-  createdAt: '2025-02-01T00:00:00.000Z',
-  updatedAt: '2025-02-01T00:00:00.000Z',
-  posterId: 'p003',
-  poster: { id: 'p003', name: 'poster003' } as TcustomerDto,
-  recipientId: 'recipient003',
-  recipient: { id: 'r003', name: '受文者33333333' } as TcustomerDto,
-  replyDate: '2025-02-01T00:00:00.000Z',
-  issueNumber: 'IN-003',
-  purpose: '主旨3333333',
-  description: 'ccccccc',
-  isPoster: false,
-};
-
-const fakeAttachment01: TfileDto = {
-  id: '0c2b571b-0914-4013-83c0-c088f3a2c1e4',
-  createdAt: '2024-04-22T03:55:45.520Z',
-  updatedAt: '2024-04-22T03:55:45.520Z',
-  parent: 'engineering-contact/3d2b1109-8463-41e7-80cd-f2a0b18ee270/construction/',
-  name: 'PXL_20240117_230923815.jpg',
-  size: 2713717,
-  mime: 'image/jpeg',
-  etag: '980ded8790adb278828173583e011890',
-  isDir: false,
-  isWritable: true,
-  isDeletable: true,
-};
-const fakeAttachment02: TfileDto = {
-  id: 'f98c560c-2215-43bf-8b0b-760713bb0d1e',
-  createdAt: '2024-04-22T03:58:15.551Z',
-  updatedAt: '2024-04-22T03:58:15.551Z',
-  parent: 'engineering-contact/3d2b1109-8463-41e7-80cd-f2a0b18ee270/color/',
-  name: 'cat01.jpg',
-  size: 7733,
-  mime: 'image/jpeg',
-  etag: '61d390f31ddd0621d8bd0dcd9d675aff',
-  isDir: false,
-  isWritable: true,
-  isDeletable: true,
-};
-const fakeAttachment03: TfileDto = {
-  id: '66c03706-febf-4514-8d8c-24a11b7e256e',
-  createdAt: '2024-04-02T06:08:36.307Z',
-  updatedAt: '2024-04-02T06:08:36.307Z',
-  parent: 'engineering-contact/3d2b1109-8463-41e7-80cd-f2a0b18ee270/design/',
-  name: '2023南港世貿國際建材展_展覽效益檢討報告｜三久建材.pdf',
-  size: 4609403,
-  mime: 'application/pdf',
-  etag: '9565cf5abbedabef305df7e4a8123d96',
-  isDir: false,
-  isWritable: true,
-  isDeletable: true,
-};
-
-// const fake_memorandumIdArr = ['fakeId_001', 'fakeId_002', 'fakeId_003'];
-const fake_memorandumIdArr = ['fakeId_001'];
-
-const useGetmemorandumId_fake = () => {
-  const [res, setRes] = useState<string[]>();
-
-  const update = async () => {
-    setRes(fake_memorandumIdArr);
-  };
-
-  return {
-    data: res,
-    update,
-  };
-};
-
-const useGetMemorandum_fake = ({ id }: { id: string | null | undefined }) => {
-  const [res, setRes] = useState<TmemorandumDto_whole>();
-
-  const update = async () => {
-    if (!id) {
-      return;
-    }
-
-    fakeApi_getMemorandum(id).then((fakeData) => {
-      fakeData && setRes(fakeData);
-    });
-  };
-
-  return {
-    data: res,
-    update,
-  };
-};
-
-const useGetMemorandumAttachment_fake = ({ id }: { id: string | null | undefined }) => {
-  const [res, setRes] = useState<TfileDto[]>();
-
-  const update = async () => {
-    if (!id) {
-      return;
-    }
-
-    fakeApi_getMemorandumAttachment(id).then((fakeAttachment) => {
-      fakeAttachment && setRes(fakeAttachment);
-    });
-  };
-
-  return {
-    data: res,
-    update,
-  };
-};
-
-const fakeApi_getMemorandum = async (id: string): Promise<TmemorandumDto_whole | null> => {
-  return fakeData;
-};
-
-const fakeApi_getMemorandumAttachment = async (id: string): Promise<TfileDto[] | null> => {
-  return [fakeAttachment01, fakeAttachment02, fakeAttachment03];
+const config_inputSel = {
+  captionStyle: { width: '110px' },
 };

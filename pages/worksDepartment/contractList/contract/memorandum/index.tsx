@@ -199,6 +199,7 @@ export default function Memorandum() {
                     query: {
                       contractId,
                       memorandumId: id,
+                      memotype,
                     },
                   });
                 }}
@@ -274,6 +275,7 @@ export default function Memorandum() {
           pathname: '/worksDepartment/contractList/contract/memorandum/edit',
           query: {
             contractId,
+            memotype,
           },
         });
       },
