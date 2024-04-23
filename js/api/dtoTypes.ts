@@ -3900,7 +3900,7 @@ export type TupdateTodoDto = Partial<TcreateTodoDto> & {
 
 // 工務部 備忘錄
 
-type Tpopulate_memorandumDto = {
+export type Tpopulate_memorandumDto = {
   poster?: boolean;
   recipient?: boolean;
 };
@@ -3914,14 +3914,22 @@ export type TmemorandumDto<P extends Tpopulate_memorandumDto = Tpopulate_memoran
   posterId: string | null;
   // 發文者
   poster: P['poster'] extends true ? TcustomerDto | undefined : undefined;
+  posterEmail: string;
+
   // 收件者id
   recipientId: string | null;
   // 收件者
   recipient: P['recipient'] extends true ? TcustomerDto | undefined : undefined;
+  recipientEmail: string;
+  // 發文日期
+  postDate: string | null;
+  // 收件日期
+  recipientDate: string | null;
+
   // 日期
   // date: string;
   // 回簽日期 // 待後端修改型別後，要確認property是否正確
-  replyDate?: string | null;
+  // replyDate?: string | null;
   // 發文字號
   issueNumber: string;
   // 主旨
@@ -3930,6 +3938,21 @@ export type TmemorandumDto<P extends Tpopulate_memorandumDto = Tpopulate_memoran
   description: string;
   // 是否為發文者
   isPoster: boolean;
+  // 是否為源發文/回文
+  isRootMail: boolean;
+  // 信件串 // memorandumId陣列 // 不含rootMail
+  mailThread: string[] | null;
+};
+
+export type TcreateMemorandumDto = {
+  posterId: string;
+  posterEmail: string | null;
+  recipientId: string;
+  recipientEmail: string | null;
+  issueNumber: string;
+  purpose: string;
+  description: string;
+  rootMailId: string | null;
 };
 
 // =============================================================================

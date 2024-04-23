@@ -14,20 +14,23 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // api
 import { useGetContract_id } from 'js/api/api_quotation';
-import // TupdateEngineeringDeliveryList,
-// TupdateDeliveryStatus,
-// TupdateEngineeringDeliveryStatusDto,
-// TcreateEngineeringDeliveryStatusDto,
-// useGetEngineeringContact,
-// useGetEngineeringDeliveryList,
-// apiPatchEngineeringDeliveryList,
-// apiPostDeliveryStatus,
-// apiPatchDeliveryStatus,
-// apiDeleteDeliveryStatus,
-'js/api/api_engineering';
+// import {
+//   TupdateEngineeringDeliveryList,
+//   TupdateDeliveryStatus,
+//   TupdateEngineeringDeliveryStatusDto,
+//   TcreateEngineeringDeliveryStatusDto,
+//   useGetEngineeringContact,
+//   useGetEngineeringDeliveryList,
+//   apiPatchEngineeringDeliveryList,
+//   apiPostDeliveryStatus,
+//   apiPatchDeliveryStatus,
+//   apiDeleteDeliveryStatus,
+// } from 'js/api/api_engineering';
+
+import { useGetMemorandum, TmemorandumDto } from 'js/api/api_memorandum';
 
 // type
-import { TmemorandumDto, TcustomerDto } from 'js/api/dtoTypes';
+import { TcustomerDto, Tparams } from 'js/api/dtoTypes';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
@@ -41,10 +44,10 @@ type Tquery = {
     | 'sent'; // 寄件
 };
 
-type TmemorandumDto_whole = TmemorandumDto<{
-  poster: true;
-  recipient: true;
-}>;
+// type TmemorandumDto_whole = TmemorandumDto<{
+//   poster: true;
+//   recipient: true;
+// }>;
 
 // ============================================================================
 export default function Memorandum() {
@@ -65,12 +68,30 @@ export default function Memorandum() {
 
   const { engineeringContact } = contract ?? {};
 
-  const [data_memorandum] = useState<TmemorandumDto_whole[]>(fake_memorandumArr);
+  const params: Tparams = {
+    populate: ['poster', 'recipient'],
+    filter: {
+      isPoster: { $eq: memotype === 'sent' ? true : memotype === 'recived' ? false : undefined },
+      isRootMail: { $eq: true },
+    },
+  };
+
+  const { data: data_memorandum, update: update_memorandum } = useGetMemorandum<{
+    poster: true;
+    recipient: true;
+  }>(contractId, { customParams: params });
+
+  // const [data_memorandum] = useState<TmemorandumDto_whole[]>(fake_memorandumArr);
 
   // ---------------------------------------------------------------------------
   useEffect(() => {
     update_contract();
-  }, []);
+  }, [contractId]);
+
+  useEffect(() => {
+    update_memorandum();
+  }, [contractId, memotype]);
+
   // ---------------------------------------------------------------------------
 
   const control_table = useMemo(() => {
@@ -105,17 +126,18 @@ export default function Memorandum() {
       ],
     };
 
-    const bodyRowArr = data_memorandum.map((data) => {
+    const bodyRowArr = (data_memorandum ?? []).map((data) => {
       const {
         id,
         // createdAt,
         // updatedAt,
         // posterId,
         poster,
+        postDate,
         // recipientId,
         recipient,
         // date,
-        replyDate,
+        // replyDate,
         issueNumber,
         purpose,
         // description,
@@ -130,7 +152,11 @@ export default function Memorandum() {
         return null;
       }
 
-      // IconDetail
+      let replyDate: string | null = null;
+
+      if (isPoster) {
+        replyDate = postDate;
+      }
 
       const props: Ttable['tbody']['rowArr'][number] = {
         minHeight: tableConfig.row.minHeight,
@@ -326,48 +352,48 @@ const cellCofig: TcellConfig = {
 
 // ============================================================================
 
-const fake_memorandumArr: TmemorandumDto_whole[] = [
-  {
-    id: '001',
-    createdAt: '2021-09-01T00:00:00.000Z',
-    updatedAt: '2021-09-01T00:00:00.000Z',
-    posterId: 'p001',
-    poster: { id: 'p001', name: 'poster001' } as TcustomerDto,
-    recipientId: 'r001',
-    recipient: { id: 'r001', name: '受文者11111111111' } as TcustomerDto,
-    replyDate: '2021-09-01T00:00:00.000Z',
-    issueNumber: 'IN-001',
-    purpose: '主旨11111111',
-    description: 'aaaaaaaa',
-    isPoster: true,
-  },
-  {
-    id: '002',
-    createdAt: '2022-08-01T00:00:00.000Z',
-    updatedAt: '2022-08-01T00:00:00.000Z',
-    posterId: null,
-    poster: undefined,
-    recipientId: 'recipient002',
-    recipient: { id: 'r002', name: '受文者22222222' } as TcustomerDto,
-    // replyDate: '2022-08-01T00:00:00.000Z',
-    replyDate: null,
-    issueNumber: 'IN-002',
-    purpose: '主旨2222222',
-    description: 'bbbbbb',
-    isPoster: false,
-  },
-  {
-    id: '003',
-    createdAt: '2025-02-01T00:00:00.000Z',
-    updatedAt: '2025-02-01T00:00:00.000Z',
-    posterId: 'p003',
-    poster: { id: 'p003', name: 'poster003' } as TcustomerDto,
-    recipientId: 'recipient003',
-    recipient: { id: 'r003', name: '受文者33333333' } as TcustomerDto,
-    replyDate: '2025-02-01T00:00:00.000Z',
-    issueNumber: 'IN-003',
-    purpose: '主旨3333333',
-    description: 'ccccccc',
-    isPoster: false,
-  },
-];
+// const fake_memorandumArr: TmemorandumDto_whole[] = [
+//   {
+//     id: '001',
+//     createdAt: '2021-09-01T00:00:00.000Z',
+//     updatedAt: '2021-09-01T00:00:00.000Z',
+//     posterId: 'p001',
+//     poster: { id: 'p001', name: 'poster001' } as TcustomerDto,
+//     recipientId: 'r001',
+//     recipient: { id: 'r001', name: '受文者11111111111' } as TcustomerDto,
+//     replyDate: '2021-09-01T00:00:00.000Z',
+//     issueNumber: 'IN-001',
+//     purpose: '主旨11111111',
+//     description: 'aaaaaaaa',
+//     isPoster: true,
+//   },
+//   {
+//     id: '002',
+//     createdAt: '2022-08-01T00:00:00.000Z',
+//     updatedAt: '2022-08-01T00:00:00.000Z',
+//     posterId: null,
+//     poster: undefined,
+//     recipientId: 'recipient002',
+//     recipient: { id: 'r002', name: '受文者22222222' } as TcustomerDto,
+//     // replyDate: '2022-08-01T00:00:00.000Z',
+//     replyDate: null,
+//     issueNumber: 'IN-002',
+//     purpose: '主旨2222222',
+//     description: 'bbbbbb',
+//     isPoster: false,
+//   },
+//   {
+//     id: '003',
+//     createdAt: '2025-02-01T00:00:00.000Z',
+//     updatedAt: '2025-02-01T00:00:00.000Z',
+//     posterId: 'p003',
+//     poster: { id: 'p003', name: 'poster003' } as TcustomerDto,
+//     recipientId: 'recipient003',
+//     recipient: { id: 'r003', name: '受文者33333333' } as TcustomerDto,
+//     replyDate: '2025-02-01T00:00:00.000Z',
+//     issueNumber: 'IN-003',
+//     purpose: '主旨3333333',
+//     description: 'ccccccc',
+//     isPoster: false,
+//   },
+// ];
