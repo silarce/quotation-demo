@@ -713,6 +713,7 @@ const ReplyMemorandum_pre = (
   };
 
   console.log('in-NEXT_PUBLIC_SANJEOU_EMAIL', process.env.NEXT_PUBLIC_SANJEOU_EMAIL);
+  console.log('in-NEXT_PUBLIC_API_BASE_URL', process.env.NEXT_PUBLIC_API_BASE_URL);
 
   // -----------------------------------------------------------------------
   // 點擊受文者或發文者時切換，然後會打開選擇器
@@ -1061,6 +1062,7 @@ const useSortAttachment = ({ data_attachmentArr }: { data_attachmentArr: TfileDt
 //   recipientEmail: '',
 // };
 console.log('out-NEXT_PUBLIC_SANJEOU_EMAIL', process.env.NEXT_PUBLIC_SANJEOU_EMAIL);
+console.log('out-NEXT_PUBLIC_API_BASE_URL', process.env.NEXT_PUBLIC_API_BASE_URL);
 
 const config_inputSel = {
   captionStyle: { width: '110px' },
