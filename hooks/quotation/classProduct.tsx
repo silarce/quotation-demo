@@ -2314,8 +2314,13 @@ class Class_product {
 
   set quotationDiscount(v) {
     this._quotationDiscount = v;
-    // 因為折數改變了，所以選配設定的價格要重新計算
-    this.calcAllPrice_comAndSubComAndAcce();
+
+    if (this.isSpecialProd) {
+      this.price = this.price;
+    } else {
+      // 因為折數改變了，所以選配設定的價格要重新計算
+      this.calcAllPrice_comAndSubComAndAcce();
+    }
 
     // this.calcProdAllprice_timeout();
     this.reRender();
