@@ -44,11 +44,6 @@ type Tquery = {
     | 'sent'; // 寄件
 };
 
-// type TmemorandumDto_whole = TmemorandumDto<{
-//   poster: true;
-//   recipient: true;
-// }>;
-
 // ============================================================================
 export default function Memorandum() {
   const router = useRouter();
@@ -123,6 +118,10 @@ export default function Memorandum() {
           children: cellCofig.reply.label,
           width: cellCofig.reply.width,
         },
+        {
+          children: null,
+          width: cellCofig.detail.width,
+        },
       ],
     };
 
@@ -179,7 +178,6 @@ export default function Memorandum() {
             flex: cellCofig.subject.flex,
           },
           {
-            // children: `${getTaiwanDateStr(replyDate || null)} ${poster?.name}`,
             children: (
               <>
                 <span>{getTaiwanDateStr(replyDate || null)}</span>
@@ -353,49 +351,3 @@ const cellCofig: TcellConfig = {
 };
 
 // ============================================================================
-
-// const fake_memorandumArr: TmemorandumDto_whole[] = [
-//   {
-//     id: '001',
-//     createdAt: '2021-09-01T00:00:00.000Z',
-//     updatedAt: '2021-09-01T00:00:00.000Z',
-//     posterId: 'p001',
-//     poster: { id: 'p001', name: 'poster001' } as TcustomerDto,
-//     recipientId: 'r001',
-//     recipient: { id: 'r001', name: '受文者11111111111' } as TcustomerDto,
-//     replyDate: '2021-09-01T00:00:00.000Z',
-//     issueNumber: 'IN-001',
-//     purpose: '主旨11111111',
-//     description: 'aaaaaaaa',
-//     isPoster: true,
-//   },
-//   {
-//     id: '002',
-//     createdAt: '2022-08-01T00:00:00.000Z',
-//     updatedAt: '2022-08-01T00:00:00.000Z',
-//     posterId: null,
-//     poster: undefined,
-//     recipientId: 'recipient002',
-//     recipient: { id: 'r002', name: '受文者22222222' } as TcustomerDto,
-//     // replyDate: '2022-08-01T00:00:00.000Z',
-//     replyDate: null,
-//     issueNumber: 'IN-002',
-//     purpose: '主旨2222222',
-//     description: 'bbbbbb',
-//     isPoster: false,
-//   },
-//   {
-//     id: '003',
-//     createdAt: '2025-02-01T00:00:00.000Z',
-//     updatedAt: '2025-02-01T00:00:00.000Z',
-//     posterId: 'p003',
-//     poster: { id: 'p003', name: 'poster003' } as TcustomerDto,
-//     recipientId: 'recipient003',
-//     recipient: { id: 'r003', name: '受文者33333333' } as TcustomerDto,
-//     replyDate: '2025-02-01T00:00:00.000Z',
-//     issueNumber: 'IN-003',
-//     purpose: '主旨3333333',
-//     description: 'ccccccc',
-//     isPoster: false,
-//   },
-// ];

@@ -8,6 +8,7 @@ import {
   useImperativeHandle,
   Fragment,
   useCallback,
+  memo,
 } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import classNames from 'classnames';
@@ -126,6 +127,9 @@ export default function Edit() {
   const isNew = !rootMemorandumId;
 
   // ---------------------------------------------------------------------------
+
+  // 用來在新增備忘錄後，滾動到最上面
+  const ref_anchor = useRef<HTMLDivElement>(null!);
 
   const ref_replyMemorandum = useRef<TreplyMemorandumHandler>(null!);
 
@@ -259,6 +263,7 @@ export default function Edit() {
       })
       .then(() => {
         setIsReply(false);
+        ref_anchor.current.scrollIntoView({ behavior: 'smooth' });
       })
       .finally(() => {
         setIsFectching(false);
@@ -285,7 +290,7 @@ export default function Edit() {
   }, [rootMemorandumId]);
 
   useEffect(() => {
-    if (isReply && fetchControl) {
+    if (isReply || fetchControl || data_memorandumIdArr.length === 0) {
       return;
     }
 
@@ -317,6 +322,7 @@ export default function Edit() {
     },
   });
 
+  console.log(fetchControl);
   // ---------------------------------------------------------------------------
 
   // ██████  ███████ ███    ██ ██████  ███████ ██████
@@ -328,11 +334,12 @@ export default function Edit() {
   return (
     <SubLayer isLoading_all={isFectching} isLoading_subLayer={isFetching_contract || isFetching_rootMemorandum}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
-
-      <div>
+      {/* pt-[1px]是為了處理 margin collapse */}
+      <div className={'pt-[1px]'}>
+        <div ref={ref_anchor} />
         <Wrapper>
-          {!isReply &&
-            data_memorandumIdArr?.map((id, index) => {
+          <div className={classNames(isReply && 'hidden')}>
+            {data_memorandumIdArr?.map((id, index) => {
               const isAllow = fetchControl?.[index]?.status === 'allow';
 
               return (
@@ -354,6 +361,7 @@ export default function Edit() {
                 </Fragment>
               );
             })}
+          </div>
 
           {isReply && <ReplyMemorandum ref={ref_replyMemorandum} />}
 
@@ -676,6 +684,10 @@ const OneMemorandum = ({
     </div>
   );
 };
+
+const OneMemorandum_memo = memo(OneMemorandum, (pre, next) => {
+  return pre.memorandumId === next.memorandumId && pre.allowFetch === next.allowFetch;
+});
 
 // ================================================================
 // ================================================================
