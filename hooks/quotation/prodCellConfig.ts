@@ -121,7 +121,7 @@ const prodCellConfig: TcellConfig = {
   boxB: {
     label: 'B(m)',
     inputSelProps: {
-      wrapperStyle: { width: '60px' },
+      wrapperStyle: { width: '80px' },
       selectProps: {
         props: {
           placeholder: '',
