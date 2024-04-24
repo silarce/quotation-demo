@@ -343,7 +343,7 @@ export default function Edit() {
 
               return (
                 <Fragment key={id}>
-                  <OneMemorandum
+                  <OneMemorandum_memo
                     memorandumId={id}
                     allowFetch={isAllow}
                     onFetchOver={({ isSuccess }) => {
