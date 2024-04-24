@@ -577,7 +577,20 @@ const useProductList = ({
   // ---------------------------------------------------------
 
   /**計算報價單小計，由calcTrigger觸發 */
-  const calcSubTotalPrice = () => {
+  // const calcSubTotalPrice = () => {
+  //   let subTotal = new Decimal(0);
+
+  //   Object.values(productList).forEach((prod) => {
+  //     subTotal = subTotal.add(prod.totalPrice_num);
+  //   });
+  //   Object.values(othersList).forEach((item) => {
+  //     subTotal = subTotal.add(item.totalPrice);
+  //   });
+
+  //   // setSubTotal(subTotal.toFixed(0));
+  //   setSubTotal(new Decimal(subTotal).toFixed(0));
+  // };
+  const calcSubTotalPrice = useCallback(() => {
     let subTotal = new Decimal(0);
 
     Object.values(productList).forEach((prod) => {
@@ -589,7 +602,7 @@ const useProductList = ({
 
     // setSubTotal(subTotal.toFixed(0));
     setSubTotal(new Decimal(subTotal).toFixed(0));
-  };
+  }, [othersList, productList]);
 
   useEffect(() => {
     if (calcTrigger) {

@@ -21,7 +21,12 @@ class Class_other {
     copySelf: () => void;
     callCalcSubTotal: () => void;
   }) {
-    this.reRender = reRender;
+    // this.reRender = reRender;
+    this.reRender = function () {
+      this.renderCount++;
+      reRender();
+    };
+
     this._data = data;
     this.delSelf = delSelf;
     this.copySelf = copySelf;
@@ -30,6 +35,7 @@ class Class_other {
   } // constructor
 
   private reRender;
+  private renderCount = 0;
   private _data;
   readonly delSelf;
   readonly copySelf;
