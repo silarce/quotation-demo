@@ -45,9 +45,15 @@ type Ttable = {
     };
   };
   tbody: {
-    rowArr: ({
-      cellArr: Tcell[];
-    } & Omit<Trow, 'children'>)[];
+    // rowArr: ({
+    //   cellArr: Tcell[];
+    // } & Omit<Trow, 'children'>)[];
+    rowArr: (
+      | ({
+          cellArr: Tcell[];
+        } & Omit<Trow, 'children'>)
+      | null
+    )[];
     className?: string;
     style?: React.CSSProperties;
   };
@@ -118,6 +124,10 @@ export default function Table01({
       {/*  */}
       <div className={classNames(scss.tbody)}>
         {tbody.rowArr.map((row, rIndex) => {
+          if (!row) {
+            return null;
+          }
+
           const { cellArr, height, minHeight, maxHeight, className, style, onClick, viewRef } = row;
 
           return (

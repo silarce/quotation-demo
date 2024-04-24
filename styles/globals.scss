@@ -180,3 +180,10 @@ input:focus-visible {
   right: 0;
   transform: translate(50%, -50%);
 }
+
+.global_absoluteRightTopRight {
+  position: absolute;
+  top: 0;
+  right: -15px;
+  transform: translate(50%, -50%);
+}

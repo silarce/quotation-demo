@@ -126,9 +126,9 @@ export default function QuoteStatistics() {
         };
       }
 
-      totalList[quotetype].listPrice += Number(pricesum || 0);
-      totalList[quotetype].bearPrice += Number(totalsum || 0);
-      totalList[quotetype].percent = new Decimal(totalList[quotetype].percent).add(percentage ?? 0).toNumber();
+      totalList[quotetype].listPrice = new Decimal(totalList[quotetype].listPrice).add(totalsum || 0).toNumber();
+      totalList[quotetype].bearPrice = new Decimal(totalList[quotetype].bearPrice).add(pricesum || 0).toNumber();
+      totalList[quotetype].percent = new Decimal(totalList[quotetype].percent).add(percentage || 0).toNumber();
 
       // _______________________
 
@@ -156,8 +156,8 @@ export default function QuoteStatistics() {
       }
 
       list[quotation_number].subRowArr[subRowIndex].groupList[quotetype] = {
-        listPrice: Number(item.pricesum).toLocaleString(),
-        bearPrice: Number(item.totalsum).toLocaleString(),
+        listPrice: Number(item.totalsum).toLocaleString(),
+        bearPrice: Number(item.pricesum).toLocaleString(),
         percent: `${item.percentage ?? ''}%`,
       };
     });
@@ -167,7 +167,7 @@ export default function QuoteStatistics() {
     groupListKeyArr.forEach((key) => {
       const qty = quoteTypeQtyList[key];
       const percent = totalList[key].percent;
-      totalList[key].percent = Number(new Decimal(percent).div(qty).toFixed(2));
+      totalList[key].percent = new Decimal(percent).div(qty).toDecimalPlaces(2).toNumber();
     });
 
     const control_totalList: TcontrolTotalList = {};

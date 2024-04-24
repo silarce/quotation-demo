@@ -5,17 +5,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
-import moment from 'moment';
+// import moment from 'moment';
 import _ from 'lodash';
 import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
 import OrderTable, {
-  Tcontrol_orderTable,
+  // Tcontrol_orderTable,
   TrowProps,
   Tpanel,
 } from 'components/page/worksDepartment/contracList/contract/outboundOrder/orderTable';
@@ -35,8 +35,8 @@ import {
   // TupdateDeliveryStatus,
   TupdateEngineeringDeliveryStatusDto,
   TcreateEngineeringDeliveryStatusDto,
-  useGetEngineeringContact,
-  useGetEngineeringDeliveryList,
+  // useGetEngineeringContact,
+  // useGetEngineeringDeliveryList,
   apiPatchEngineeringDeliveryList,
   apiPostDeliveryStatus,
   apiPatchDeliveryStatus,
@@ -46,55 +46,16 @@ import {
 import { useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
 // utils
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-// type
-// import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import {
   //
-  ToutsourcingDto,
   TerpFeatureDto,
   TquotationProductItemDto,
-  TemployeeDto,
   TquotationProductDto,
-  TworksheetRecordDto,
 } from 'js/api/dtoTypes';
 
 // =====================================================================
-
-type Tdelevery = {
-  originalItem: TquotationProductItemDto;
-  itemName: string;
-  itemArr: TquotationProductItemDto[];
-};
-
-type TmyDeleveryList = {
-  [key: string]: Tdelevery;
-};
-
-// 爛程式，應該在根目錄把目標物件與路徑分離出來才對
-type TdeliveryStatusInEdit = {
-  [prodKey: string]: {
-    [itemId: string]: {
-      [statusId: string]: Omit<TcreateEngineeringDeliveryStatusDto, 'installerEmployees' | 'productItemId'> & {
-        id?: string;
-        installerOutsourcing?: ToutsourcingDto | null;
-        installerEmployees?: TemployeeDto[];
-        productItemId: string | null;
-      };
-    };
-  };
-};
-
-type TselectorConfirm = (props: { outsourcingId?: string; employeeId?: string }) => void;
-
-// type TworksheetList = {
-//   [worksheetId: string]: {
-//     worksheetId: string;
-//     rootProduct: TquotationProductDto;
-//     latestRecord: TworksheetRecordDto;
-//   };
-// };
 
 type TproductWorksheetList = {
   [finalProductId: string]: {
@@ -106,6 +67,7 @@ type TproductWorksheetList = {
         // worksheetRecordId: string;
         // latestRecord: TworksheetRecordDto;
         // itemName: string;
+        worksheetCreatedAt: string | null; // 工作表開立日期，是工作表，不是工作表的record
         totalQty: number; // 總數
         totalVolume: number; // 總才數
         worksheetItem: TquotationProductItemDto; // 預期每一個worksheetItem都是一樣的，從worksheetItemArr裡隨便取一個
@@ -140,20 +102,14 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
-  const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
+  // const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
 
   const [notes, setNotes] = useState<string>();
   const [notesDiasbled, setNotesDiasbled] = useState(true);
 
-  // const [myDeleveryList, setMyDeleveryList] = useState<TmyDeleveryList>();
-
   // _____________________________________________________________________________
   const [isLoading, setIsLoading] = useState(false);
   const [isReqing, setIsReqing] = useState(false);
-  // const [disabled, setDisabled] = useState(true);
-
-  // 外包廠商選擇器的onConfirm
-  const [selectorConfirm, setSelectorConfirm] = useState<TselectorConfirm>();
 
   const [targetWorksheetItemId, setTargetWorksheetItemId] = useState<string>();
 
@@ -169,6 +125,7 @@ export default function OutboundOrder({
       //
       'subContracts.content.products.rootProdductId',
       'engineeringDeliveryList',
+      'worksheet',
       // 'worksheet.latestRecord.contractProductItems.deliveryStatus.installerEmployees',
       // 'worksheet.latestRecord.contractProductItems.deliveryStatus.installerOutsourcing',
       // 'worksheet.latestRecord.contractProductItems.adjustedItem.accessories',
@@ -185,7 +142,7 @@ export default function OutboundOrder({
     engineeringDeliveryListId,
     engineeringDeliveryList: deliveryList,
     engineeringContact,
-    // worksheet,
+    worksheet: worksheetArr,
   } = contract ?? {};
 
   // 工程聯絡單
@@ -202,7 +159,9 @@ export default function OutboundOrder({
   const productWorksheetList = useMemo(() => {
     const productWorksheetList: TproductWorksheetList = {};
 
-    finalProduct.forEach((fp) => {
+    const finalProduct_sorted = _.sortBy(finalProduct, 'createdAt');
+
+    finalProduct_sorted.forEach((fp) => {
       const { id, items } = fp;
 
       productWorksheetList[id] = {
@@ -213,7 +172,9 @@ export default function OutboundOrder({
       const { worksheetList } = productWorksheetList[id];
 
       items.forEach((item) => {
-        const { latestWorksheetItem } = item;
+        const { latestWorksheetItem, worksheetId } = item;
+
+        const worksheetCreatedAt = worksheetArr?.find((ws) => ws.id === worksheetId)?.createdAt ?? null;
 
         if (latestWorksheetItem) {
           const { worksheetRecordId, volume } = latestWorksheetItem;
@@ -221,6 +182,7 @@ export default function OutboundOrder({
           if (worksheetRecordId) {
             if (!worksheetList[worksheetRecordId]) {
               worksheetList[worksheetRecordId] = {
+                worksheetCreatedAt,
                 totalQty: 1,
                 totalVolume: Number(volume ?? 0),
                 worksheetItem: latestWorksheetItem,
@@ -240,8 +202,6 @@ export default function OutboundOrder({
 
     //
   }, [finalProduct]);
-
-  console.log(productWorksheetList);
 
   // --------------------------------------------------------------------------
 
@@ -413,9 +373,10 @@ export default function OutboundOrder({
       // ____________________________________________________________________
       const prodRow = createRowProps_prodRow({
         prod: product,
-        serialNumber: index,
+        serialNumber: index + 1,
         worksheetItem: worksheetArr?.[0]?.worksheetItem,
         worksheetItemQty: worksheetArr?.[0]?.worksheetItemArr.length,
+        worksheetCreatedAt: worksheetArr?.[0]?.worksheetCreatedAt || null,
       });
 
       rowPropsArr.push(prodRow);
@@ -423,6 +384,7 @@ export default function OutboundOrder({
       worksheetArr?.[0]?.worksheetItemArr.forEach((item) => {
         const itemRow = createRowProps_itemRow({
           worksheetItem: item,
+          worksheetCreatedAt: worksheetArr?.[0].worksheetCreatedAt,
           onAddClick: () => {
             setTargetWorksheetItemId(item.id);
           },
@@ -466,11 +428,12 @@ export default function OutboundOrder({
           return;
         }
 
-        const { worksheetItem, worksheetItemArr } = worksheet;
+        const { worksheetItem, worksheetItemArr, worksheetCreatedAt } = worksheet;
 
         const headRow = createRowProps_headRow({
           worksheetItem: worksheetItem,
           worksheetItemQty: worksheetItemArr.length,
+          worksheetCreatedAt,
         });
 
         rowPropsArr.push(headRow);
@@ -478,6 +441,7 @@ export default function OutboundOrder({
         worksheetItemArr.forEach((item) => {
           const itemRow = createRowProps_itemRow({
             worksheetItem: item,
+            worksheetCreatedAt,
             onAddClick: () => {
               setTargetWorksheetItemId(item.id);
             },
@@ -521,39 +485,29 @@ export default function OutboundOrder({
     return rowPropsArr;
   }, [productWorksheetList]);
 
-  const defaultSelectorSelected = useMemo(() => {
-    if (!deleveryStatusInEdit) {
-      return undefined;
-    }
+  // const defaultSelectorSelected = useMemo(() => {
+  //   if (!deleveryStatusInEdit) {
+  //     return undefined;
+  //   }
 
-    const a = Object.values(deleveryStatusInEdit)[0];
-    const b = Object.values(a)[0];
-    const deleveryStatus = Object.values(b)[0];
+  //   const a = Object.values(deleveryStatusInEdit)[0];
+  //   const b = Object.values(a)[0];
+  //   const deleveryStatus = Object.values(b)[0];
 
-    const { installerOutsourcing, installerEmployees } = deleveryStatus;
+  //   const { installerOutsourcing, installerEmployees } = deleveryStatus;
 
-    const outsourcingArr = installerOutsourcing ? [installerOutsourcing] : [];
-    const employeeArr = installerEmployees ?? [];
+  //   const outsourcingArr = installerOutsourcing ? [installerOutsourcing] : [];
+  //   const employeeArr = installerEmployees ?? [];
 
-    return [employeeArr, outsourcingArr] as [typeof employeeArr, typeof outsourcingArr];
-  }, [deleveryStatusInEdit]);
+  //   return [employeeArr, outsourcingArr] as [typeof employeeArr, typeof outsourcingArr];
+  // }, [deleveryStatusInEdit]);
 
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader
-        // panelList={!havePermissionToEdit ? panelList_noPromission : undefined}
-        // panelList={disabled ? panelList01 : panelList02}
-        contractNumber={engineeringContact?.contractNumber ?? ''}
-      />
+      <PageHeader contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>
         <div className={style.outboundOrder}>
@@ -615,19 +569,13 @@ export default function OutboundOrder({
         showModal={!!targetWorksheetItemId}
         caption="選擇員工或外包廠商"
         tip="員工或外包擇一"
-        defaultSeletedDataArrArr={defaultSelectorSelected}
+        // defaultSeletedDataArrArr={defaultSelectorSelected}
         onConfirm={(arr) => {
           const employeeArr = arr[0];
           const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
 
           const outsourcingArr = arr[1];
           const outsourcing = outsourcingArr[0] as (typeof outsourcingArr)[0] | undefined;
-
-          // selectorConfirm &&
-          //   selectorConfirm({
-          //     employeeId: employee?.id,
-          //     outsourcingId: outsourcing?.id,
-          //   });
 
           if (targetWorksheetItemId) {
             reqPost(targetWorksheetItemId, {
@@ -640,29 +588,6 @@ export default function OutboundOrder({
           setTargetWorksheetItemId(undefined);
         }}
       />
-
-      {/* <SelectorGroup
-        showModal={!!selectorConfirm}
-        caption="選擇員工或外包廠商"
-        tip="員工或外包擇一"
-        defaultSeletedDataArrArr={defaultSelectorSelected}
-        onConfirm={(arr) => {
-          const employeeArr = arr[0];
-          const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
-
-          const outsourcingArr = arr[1];
-          const outsourcing = outsourcingArr[0] as (typeof outsourcingArr)[0] | undefined;
-
-          selectorConfirm &&
-            selectorConfirm({
-              employeeId: employee?.id,
-              outsourcingId: outsourcing?.id,
-            });
-        }}
-        onCancel={() => {
-          setSelectorConfirm(undefined);
-        }}
-      /> */}
     </SubLayer>
   );
 }
@@ -694,18 +619,20 @@ const createRowProps_prodRow = ({
   serialNumber,
   worksheetItem,
   worksheetItemQty,
+  worksheetCreatedAt,
 }: {
   prod: TquotationProductDto;
   serialNumber: React.ReactNode;
   worksheetItem: TquotationProductItemDto | undefined;
   worksheetItemQty: number | undefined;
+  worksheetCreatedAt: string | null;
 }): TrowProps => {
   const total_volume_prod = new Decimal(prod.quantity).mul(prod.volume || 0).toNumber();
 
   const total_volume_worksheet =
     worksheetItemQty && worksheetItem ? new Decimal(worksheetItemQty).mul(worksheetItem.volume || 0).toNumber() : '';
 
-  const center = worksheetItem && {
+  const center: TrowProps['center'] = worksheetItem && {
     projectName: worksheetItem.itemName,
     L: new Decimal(worksheetItem.fullWidth).div(1000).toNumber(),
     WG: new Decimal(worksheetItem.WG).div(1000).toNumber(),
@@ -717,12 +644,13 @@ const createRowProps_prodRow = ({
     material: worksheetItem.materialName,
     horsepower: worksheetItem.horsepower,
     surface: worksheetItem.materialSurface,
-    establishmentDate: '1111-11-11',
+    establishmentDate: getTaiwanDateStr(worksheetCreatedAt),
   };
 
   return {
     // key: prod.id,
     isHeadRow: true,
+    isProdRow: true,
     side: {
       serialNumber,
       projectName: prod.itemName,
@@ -746,9 +674,11 @@ const createRowProps_prodRow = ({
 const createRowProps_headRow = ({
   worksheetItem,
   worksheetItemQty,
+  worksheetCreatedAt,
 }: {
   worksheetItem: TquotationProductItemDto;
   worksheetItemQty: number;
+  worksheetCreatedAt: string | null;
 }): TrowProps => {
   const total_volume_worksheet =
     worksheetItemQty && worksheetItem ? new Decimal(worksheetItemQty).mul(worksheetItem.volume || 0).toNumber() : '';
@@ -765,7 +695,7 @@ const createRowProps_headRow = ({
     material: worksheetItem.materialName,
     horsepower: worksheetItem.horsepower,
     surface: worksheetItem.materialSurface,
-    establishmentDate: '1111-11-11',
+    establishmentDate: getTaiwanDateStr(worksheetCreatedAt),
   };
 
   return {
@@ -781,6 +711,7 @@ const createRowProps_itemRow = ({
   onAddClick,
   onConfirmClick,
   onDeleteClick,
+  worksheetCreatedAt,
 }: {
   worksheetItem: TquotationProductItemDto;
   onAddClick: () => void;
@@ -793,12 +724,11 @@ const createRowProps_itemRow = ({
     notes: string;
   }) => Promise<void>;
   onDeleteClick: (deleverStatuId: string) => void;
-
-  // onConfirmClick: Tpanel['onConfirmClick'];
+  worksheetCreatedAt: string | null;
 }): TrowProps => {
   const { deliveryStatus, accessories } = worksheetItem;
 
-  const accessoriesStr = accessories?.map((a) => a.name).join('、');
+  const accessoriesStr = accessories?.map((a) => a.name).join('\n');
 
   const deliveryStatus_sorted = _.sortBy(deliveryStatus, 'createdAt');
 
@@ -881,7 +811,7 @@ const createRowProps_itemRow = ({
       material: worksheetItem.materialName,
       horsepower: worksheetItem.horsepower,
       surface: worksheetItem.materialSurface,
-      establishmentDate: '1111-11-11',
+      establishmentDate: getTaiwanDateStr(worksheetCreatedAt),
     },
     rightPanelArr: rightPanelArr,
     // rightPanelArr: foo,
@@ -892,41 +822,3 @@ const createRowProps_itemRow = ({
 // ========================================================================
 // ========================================================================
 // ========================================================================
-const rightPanelArrTest = [
-  {
-    key: '1',
-    accessorie: 'testtesttesttest',
-    installationDate: '',
-    installer_employee: undefined,
-    installer_outsourcing: undefined,
-    itemName: '',
-    notes: '',
-    onAddClick: () => {},
-    onDeleteClick: () => {},
-    onConfirmClick: async () => {},
-  },
-  {
-    key: '2',
-    accessorie: 'testtesttesttest',
-    installationDate: '',
-    installer_employee: undefined,
-    installer_outsourcing: undefined,
-    itemName: '',
-    notes: '',
-    onAddClick: () => {},
-    onDeleteClick: () => {},
-    onConfirmClick: async () => {},
-  },
-  {
-    key: '3',
-    accessorie: 'testtesttesttest',
-    installationDate: '',
-    installer_employee: undefined,
-    installer_outsourcing: undefined,
-    itemName: '',
-    notes: '',
-    onAddClick: () => {},
-    onDeleteClick: () => {},
-    onConfirmClick: async () => {},
-  },
-];
