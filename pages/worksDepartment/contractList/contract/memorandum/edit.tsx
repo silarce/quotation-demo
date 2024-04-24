@@ -322,7 +322,6 @@ export default function Edit() {
     },
   });
 
-  console.log(fetchControl);
   // ---------------------------------------------------------------------------
 
   // ██████  ███████ ███    ██ ██████  ███████ ██████
@@ -702,6 +701,20 @@ const ReplyMemorandum_pre = (
   },
   ref: React.ForwardedRef<unknown>
 ) => {
+  const emptyForm: TstateMemorandum = {
+    recipient: undefined, // 受文者
+    poster: undefined, // 發文者
+    issueNumber: '', // 發文字號
+    purpose: '', // 主旨
+    description: '', // 備註
+    postDate: new Date().toISOString(), // 日期
+    posterEmail: process.env.NEXT_PUBLIC_SANJEOU_EMAIL ?? 'sanjeouit@gmail.com',
+    recipientEmail: '',
+  };
+
+  console.log('in-NEXT_PUBLIC_SANJEOU_EMAIL', process.env.NEXT_PUBLIC_SANJEOU_EMAIL);
+
+  // -----------------------------------------------------------------------
   // 點擊受文者或發文者時切換，然後會打開選擇器
   const [selectorAction, setSelectorAction] = useState<'reciver' | 'sender'>();
 
@@ -1037,16 +1050,17 @@ const useSortAttachment = ({ data_attachmentArr }: { data_attachmentArr: TfileDt
 // ██      ██    ██ ██  ██ ██ ██      ██ ██    ██
 //  ██████  ██████  ██   ████ ██      ██  ██████
 
-const emptyForm: TstateMemorandum = {
-  recipient: undefined, // 受文者
-  poster: undefined, // 發文者
-  issueNumber: '', // 發文字號
-  purpose: '', // 主旨
-  description: '', // 備註
-  postDate: new Date().toISOString(), // 日期
-  posterEmail: process.env.NEXT_PUBLIC_SANJEOU_EMAIL ?? '',
-  recipientEmail: '',
-};
+// const emptyForm: TstateMemorandum = {
+//   recipient: undefined, // 受文者
+//   poster: undefined, // 發文者
+//   issueNumber: '', // 發文字號
+//   purpose: '', // 主旨
+//   description: '', // 備註
+//   postDate: new Date().toISOString(), // 日期
+//   posterEmail: process.env.NEXT_PUBLIC_SANJEOU_EMAIL ?? 'sanjeouit@gmail.com',
+//   recipientEmail: '',
+// };
+console.log('out-NEXT_PUBLIC_SANJEOU_EMAIL', process.env.NEXT_PUBLIC_SANJEOU_EMAIL);
 
 const config_inputSel = {
   captionStyle: { width: '110px' },
