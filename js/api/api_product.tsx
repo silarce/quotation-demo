@@ -133,7 +133,41 @@ export const apiGetProdCalcGeneralSpec = async (params: TpcgsPrams) => {
 
   return axi
     .get<TdoorGeneralSpecsDto>(api, { params })
-    .then(({ data }) => data)
+    .then((res) => {
+      const { data } = res;
+
+      const report = { res, params };
+
+      if (
+        !Number.isInteger(data.slatLength) ||
+        !Number.isInteger(data.guideRailLength) ||
+        !Number.isInteger(data.headBoxLength) ||
+        !Number.isInteger(data.bearingHousingTotalLength) ||
+        !Number.isInteger(data.bearingHousingSize)
+      ) {
+        const onBtnClick = async () => {
+          try {
+            const objJson = JSON.stringify(report);
+
+            await navigator.clipboard.writeText(objJson);
+          } catch (error) {
+            myAlert.err({ title: '複製錯誤資訊失敗' });
+          }
+        };
+
+        myAlert.err({
+          title: '後端回應非預期的值',
+          props: {
+            okText: '關閉',
+            maskClosable: false,
+            content: <Foo onBtnClick={onBtnClick} />,
+            closable: true,
+          },
+        });
+      }
+
+      return data;
+    })
     .catch((err) => Promise.reject(err));
 };
 
@@ -205,4 +239,30 @@ export const apiGetboxD = (params: TgetBoxDParams) => {
     .get<{ sidePlateSizeD: number }>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+// ========================================================================
+
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+
+const Foo = ({ onBtnClick }: { onBtnClick?: () => void }) => {
+  return (
+    <div>
+      <p className="whitespace-pre-wrap text-left">
+        {`
+請依以下步驟操作
+1. 點擊"複製錯誤訊息"按鈕
+2. 回到電腦桌面，右鍵新增文字文件
+3. 右鍵貼上並儲存
+4. 請關閉這個提示，然後將整個畫面截圖
+5. 將截圖與文字文件一起傳給開發人員
+        `}
+      </p>
+      <p>感謝您的配合</p>
+      <br />
+      <MyButton_v2 onClick={onBtnClick} label="複製錯誤訊息" />
+      <br />
+      <br />
+    </div>
+  );
 };

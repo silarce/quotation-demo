@@ -653,6 +653,7 @@ export const useGetContract_id = (
     populate,
   };
 
+  const [isFetching, setIsFetching] = useState(false);
   const [res, setRes] = useState<TquotationContractDto>();
 
   const update = async () => {
@@ -661,6 +662,7 @@ export const useGetContract_id = (
     }
 
     try {
+      setIsFetching(true);
       const newRes = await apiGetContract_Id(id, params);
 
       if (newRes) {
@@ -671,6 +673,8 @@ export const useGetContract_id = (
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '取得合約資料失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
     }
   };
 
@@ -678,6 +682,7 @@ export const useGetContract_id = (
     data: res,
     update,
     clear: () => setRes(undefined),
+    isFetching,
   };
 };
 
@@ -749,8 +754,16 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
 export const apiGetContract_id_finalProductItem = async (contractId: string) => {
   const api = `/quotation/contracts/${contractId}/final-product-item`;
 
+  const params = {
+    propulate: [
+      // 'items.latestWorksheetItem'
+      // 'items.latestWorksheetItem.deliveryStatus',
+      // 'items.latestWorksheetItem.deliveryStatus',
+    ],
+  };
+
   return axi
-    .get<TquotationProductDto[]>(api)
+    .get<TquotationProductDto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };

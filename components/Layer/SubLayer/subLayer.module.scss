@@ -20,5 +20,14 @@
     //   overflow: auto;
     //   scroll-behavior: smooth;
     // }
+    &.overflow_hidden {
+      overflow: hidden;
+    }
+    &.overflow_auto {
+      overflow: auto;
+    }
+    &.overflow_scroll {
+      overflow: scroll;
+    }
   }
 }

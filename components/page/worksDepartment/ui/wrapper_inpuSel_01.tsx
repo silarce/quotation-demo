@@ -27,9 +27,11 @@ const Emo_Wrapper = styled.div`
   margin-left: 62px;
 `;
 
-const Wrapper = ({ children }: { children: React.ReactNode }) => {
-  return <Emo_Wrapper>{children}</Emo_Wrapper>;
-};
+// const Wrapper = ({ children }: { children: React.ReactNode }) => {
+//   return <Emo_Wrapper>{children}</Emo_Wrapper>;
+// };
+
+const Wrapper = Emo_Wrapper;
 
 // ========================================================================
 
