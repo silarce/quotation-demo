@@ -396,13 +396,14 @@ export default function OutboundOrder({
             employeeId,
             outsourcingId,
             installationDate,
+            shippingDate,
             itemName,
             notes,
           }) => {
             const reqBody: TcreateEngineeringDeliveryStatusDto = {
               notes: notes,
               itemName: itemName,
-              shippingDate: null,
+              shippingDate: shippingDate,
               installerOutsourcingId: outsourcingId ?? null,
               installerEmployees: employeeId ? [employeeId] : null,
               installationDate: installationDate,
@@ -453,6 +454,7 @@ export default function OutboundOrder({
               employeeId,
               outsourcingId,
               installationDate,
+              shippingDate,
               itemName,
               notes,
             }) => {
@@ -484,23 +486,6 @@ export default function OutboundOrder({
 
     return rowPropsArr;
   }, [productWorksheetList]);
-
-  // const defaultSelectorSelected = useMemo(() => {
-  //   if (!deleveryStatusInEdit) {
-  //     return undefined;
-  //   }
-
-  //   const a = Object.values(deleveryStatusInEdit)[0];
-  //   const b = Object.values(a)[0];
-  //   const deleveryStatus = Object.values(b)[0];
-
-  //   const { installerOutsourcing, installerEmployees } = deleveryStatus;
-
-  //   const outsourcingArr = installerOutsourcing ? [installerOutsourcing] : [];
-  //   const employeeArr = installerEmployees ?? [];
-
-  //   return [employeeArr, outsourcingArr] as [typeof employeeArr, typeof outsourcingArr];
-  // }, [deleveryStatusInEdit]);
 
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -720,6 +705,7 @@ const createRowProps_itemRow = ({
     employeeId: string | undefined;
     outsourcingId: string | undefined;
     installationDate: string;
+    shippingDate: string;
     itemName: string;
     notes: string;
   }) => Promise<void>;
@@ -750,12 +736,14 @@ const createRowProps_itemRow = ({
       installerEmployees, // 這是陣列
       // 安裝日期
       installationDate,
+      shippingDate, // 出貨日
     } = ds;
 
     const panelProps: Tpanel = {
       key: id,
       accessorie: accessoriesStr,
       installationDate: installationDate ?? '',
+      shippingDate: shippingDate ?? '',
       installer_employee: installerEmployees[0],
       installer_outsourcing: installerOutsourcing,
       itemName: itemName ?? '',
@@ -765,13 +753,14 @@ const createRowProps_itemRow = ({
         onDeleteClick(id);
       },
       onConfirmClick: async (parameters) => {
-        const { employeeId, outsourcingId, installationDate, itemName, notes } = parameters;
+        const { employeeId, outsourcingId, installationDate, shippingDate, itemName, notes } = parameters;
 
         await onConfirmClick({
           deliveryStatusId: id,
           employeeId,
           outsourcingId,
           installationDate,
+          shippingDate,
           itemName,
           notes,
         });
@@ -787,6 +776,7 @@ const createRowProps_itemRow = ({
       isUndefined: true,
       accessorie: '',
       installationDate: '',
+      shippingDate: '',
       installer_employee: undefined,
       installer_outsourcing: undefined,
       itemName: '',
