@@ -1,23 +1,35 @@
 import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
-
 import { axi } from './_axiosCreator';
-
-// config
-import { customerTypesLookup } from 'config/lookupTable';
+import { createUseInfinite } from './createUseInfinite';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { customerTypesLookup } from 'config/lookupTable';
 
 // type
-import type { Tparams, TcustomerDto, TcustomerDto_Populate, TpageMetaDto, Tcontact } from './dtoTypes';
+import type {
+  //
+  Tparams,
+  TcustomerDto,
+  TcustomerDto_Populate,
+  TpageMetaDto,
+  Tcontact,
+} from './dtoTypes';
 
 /**
  * "types"、"contacts"為必須
  */
 type TcustomerDto_TC = TcustomerDto_Populate<['types', 'contacts']>;
 
-export type { Tparams, TcustomerDto, TcustomerDto_Populate, TcustomerDto_TC, Tcontact as Tcontacts };
+export type {
+  //
+  Tparams,
+  TcustomerDto,
+  TcustomerDto_Populate,
+  TcustomerDto_TC,
+  Tcontact as Tcontacts,
+};
 // ===============================================================
 export { customerTypesLookup };
 // ===============================================================
@@ -256,7 +268,13 @@ export const useGetCustomers_infinite = ({ customParams }: { customParams?: Tpar
   };
 };
 
+export const useGetCustomers_infinite_2 = createUseInfinite({
+  apiClient: apiGetCustomers,
+  errTitle: '取得報價單備註列表失敗',
+});
+
 // ============================================================
+
 const apiCustomersNameExist = (name: string) => {
   const api = `/customers/name-exist/${name}`;
 
