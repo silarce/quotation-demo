@@ -282,7 +282,7 @@ export default function Memorandum() {
 
   // ---------------------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer bodyOverflowY="scroll">
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
       <div>
         <Wrapper_tab

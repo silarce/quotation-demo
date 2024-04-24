@@ -21,6 +21,7 @@ export default function SubLayer({
   isLoading_subLayer = false,
   isLoading_all = false,
   scrollToTopTrigger,
+  bodyOverflowY,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -29,6 +30,7 @@ export default function SubLayer({
   isLoading_subLayer?: boolean;
   isLoading_all?: boolean;
   scrollToTopTrigger?: unknown;
+  bodyOverflowY?: 'hidden' | 'auto' | 'scroll';
 }) {
   const ref_body = useRef<HTMLDivElement>(null!);
 
@@ -41,7 +43,10 @@ export default function SubLayer({
   return (
     <div className={classNames(scss.container, className)}>
       {childredArr[0]}
-      <div ref={ref_body} className={classNames(scss.body, bodyClassName)}>
+      <div
+        ref={ref_body}
+        className={classNames(scss.body, bodyClassName, bodyOverflowY && scss[`overflow_${bodyOverflowY}`])}
+      >
         {childredArr[1]}
         {/*把剩下的childredArr的item放進來*/}
         {childredArr.slice(2)}
