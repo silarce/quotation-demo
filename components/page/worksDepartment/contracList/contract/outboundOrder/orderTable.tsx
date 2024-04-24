@@ -67,6 +67,7 @@ type TrowProps = {
   right?: {
     accessorie?: React.ReactNode;
     installationDate?: React.ReactNode;
+    shippingDate?: React.ReactNode;
     installerEmployeesName?: React.ReactNode;
     itemName?: React.ReactNode;
     notes?: React.ReactNode;
@@ -79,6 +80,7 @@ type Tpanel = {
   isUndefined?: boolean;
   accessorie: React.ReactNode; // 選配
   installationDate: string; // 施工日期
+  shippingDate: string; // 出貨日
   installer_employee?: TemployeeDto | undefined | null; // 安裝人員 員工
   installer_outsourcing?: ToutsourcingDto | undefined | null; // 安裝人員 外包廠商
   itemName: string; //項目
@@ -90,6 +92,7 @@ type Tpanel = {
         employeeId?: string;
         outsourcingId?: string;
         installationDate: string;
+        shippingDate: string;
         itemName: string;
         notes: string;
       }) => Promise<void>)
@@ -225,6 +228,7 @@ const Row = ({
           <div className={classNames(scss.cell, 'w-52')}>{right.accessorie}</div>
           <div className={classNames(scss.cell, 'w-24')}></div>
           <div className={classNames(scss.cell, 'w-28')}>{right.installationDate}</div>
+          <div className={classNames(scss.cell, 'w-28')}>{right.shippingDate}</div>
           <div className={classNames(scss.cell, 'w-24')}>{right.installerEmployeesName}</div>
           <div className={classNames(scss.cell, 'w-24')}>{right.itemName}</div>
           <div className={classNames(scss.cell, 'w-52')}>{right.notes}</div>
@@ -244,6 +248,7 @@ const Row = ({
         <div className={scss.right}>
           <div className={classNames(scss.cell, 'w-52')} />
           <div className={classNames(scss.cell, 'w-24')} />
+          <div className={classNames(scss.cell, 'w-28')} />
           <div className={classNames(scss.cell, 'w-28')} />
           <div className={classNames(scss.cell, 'w-24')} />
           <div className={classNames(scss.cell, 'w-24')} />
@@ -294,6 +299,7 @@ const Thead = (rowProps_other: TrowProps_other) => {
       right={{
         accessorie: '選配',
         installationDate: '施工日期',
+        shippingDate: '出貨日期',
         installerEmployeesName: '安裝人員',
         itemName: '項目',
         notes: '備註',
@@ -320,6 +326,7 @@ const Panel = ({
   isUndefined,
   accessorie,
   installationDate,
+  shippingDate,
   installer_employee,
   installer_outsourcing,
   itemName,
@@ -336,6 +343,7 @@ const Panel = ({
 
   const [state, setState] = useState({
     installationDate,
+    shippingDate,
     itemName,
     notes,
   });
@@ -356,6 +364,7 @@ const Panel = ({
   const reset = () => {
     setState({
       installationDate,
+      shippingDate,
       itemName,
       notes,
     });
@@ -401,6 +410,7 @@ const Panel = ({
                 employeeId: state_employee?.id,
                 outsourcingId: state_outsourcing?.id,
                 installationDate: state.installationDate,
+                shippingDate: state.shippingDate,
                 itemName: state.itemName,
                 notes: state.notes,
               }).then(() => {
@@ -428,6 +438,25 @@ const Panel = ({
           }}
         />
       </div>
+
+      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-28')}>
+        <InputSel
+          name="shippingDate"
+          disabled={disabled}
+          datePickerProps={{
+            props: {
+              value: state.shippingDate ? moment(state.shippingDate) : undefined,
+              onChange: (v) => {
+                setState((state) => ({
+                  ...state,
+                  shippingDate: v?.toISOString() ?? '',
+                }));
+              },
+            },
+          }}
+        />
+      </div>
+
       <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-24')}>
         <InputSel
           name="installerEmployees"
