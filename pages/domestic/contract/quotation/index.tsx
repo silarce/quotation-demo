@@ -20,6 +20,8 @@ import MeetingMinutes_contract, {
   Tstate as Tstate_meetingMinutes,
 } from 'components/composition/meetingMinutes/contract';
 
+import CertifiedDocument from 'components/composition/certifiedDocument';
+
 // components
 // import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
 import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
@@ -981,6 +983,8 @@ version>1 是子合約
             quotationNumber={contract?.content.quotationNumber}
           />
         )}
+
+        {state_tab === 'certifiedDocument' && <CertifiedDocument />}
 
         <InputModal
           visible={!!inputModalConfig?.visible}
