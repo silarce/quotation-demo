@@ -540,6 +540,17 @@ export const optionsCreator_motorVender = createOptionsCreator({
   ],
 });
 
+export const optionsCreator_certifyType = createOptionsCreator({
+  optionsArr: [
+    { value: '防火證明預先開立保證書', label: '防火證明預先開立保證書' },
+    { value: '防火證明影本預先開立保證書', label: '防火證明影本預先開立保證書' },
+    { value: '出廠證明預先開立保證書', label: '出廠證明預先開立保證書' },
+    { value: '出廠證明影本預先開立保證書', label: '出廠證明影本預先開立保證書' },
+    { value: '保固證明影本開立保證書', label: '保固證明影本開立保證書' },
+    { value: '保固證明影本預先開立保證書', label: '保固證明影本預先開立保證書' },
+  ],
+});
+
 // const optionsCreator_foooooo = (props: { haveEmpty?: boolean } = {}): Toption[] => {
 //   const { haveEmpty } = props;
 //   const arr = [{ value: 'foooo' as const, label: 'fooooo' }];

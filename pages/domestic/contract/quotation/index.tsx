@@ -13,6 +13,12 @@ import classNames from 'classnames';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
+import PageHeader02, {
+  TtagList as TtabList,
+  TpanelList,
+  Tlink,
+  TlinkArr,
+} from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // composition
 import MeetingMinutes_contract, {
@@ -51,12 +57,7 @@ import { Collapse } from 'antd';
 const { Panel } = Collapse;
 
 // gear
-import PageHeader02, {
-  TtagList as TtabList,
-  TpanelList,
-  Tlink,
-  TlinkArr,
-} from 'components/PageHeader/PageHeader02/PageHeader02';
+
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
@@ -112,9 +113,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [isLoading, setIsLoading] = useState(false);
   const [reviewFormShow, setReviewFormShow] = useState(false);
 
-  // -----------------------------------------------------------\
+  // -----------------------------------------------------------
 
   const [state_tab, setState_tab] = useState<Tstate_tab>('contract');
+  const [dynaPanelList, setDynaPanelList] = useState<TpanelList | null | undefined>(null);
+
+  // -----------------------------------------------------------
 
   // 合約項目 追加/追減項目的開關
   // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
@@ -846,7 +850,7 @@ version>1 是子合約
     >
       <PageHeader02
         tagList={tabList}
-        panelList={panelList}
+        panelList={dynaPanelList || panelList}
         //  linkList={linkArr}
       />
       {/*  */}
@@ -984,7 +988,7 @@ version>1 是子合約
           />
         )}
 
-        {state_tab === 'certifiedDocument' && <CertifiedDocument />}
+        {state_tab === 'certifiedDocument' && <CertifiedDocument onPanelListChange={setDynaPanelList} />}
 
         <InputModal
           visible={!!inputModalConfig?.visible}

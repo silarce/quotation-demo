@@ -9,17 +9,17 @@ import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/tab
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
-// =============================================================================
+// ===================================== ========================================
 
 type Tquery = {
-  documentType: undefined | 'fireproof' | 'factory' | 'warranty';
+  certifyType: undefined | 'fireproof' | 'factory' | 'warranty';
 };
 
 // =============================================================================
 export default function CertifiedDocumentList({ className }: { className?: string }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { documentType = 'fireproof' } = query;
+  const { certifyType = 'fireproof' } = query;
 
   // ========================================================================
 
@@ -42,8 +42,8 @@ export default function CertifiedDocumentList({ className }: { className?: strin
           ...cellConfig.createdAt,
         },
         {
-          children: cellConfig.documentType.label,
-          ...cellConfig.documentType,
+          children: cellConfig.certifyType.label,
+          ...cellConfig.certifyType,
         },
         {
           children: cellConfig.itemName.label,
@@ -83,7 +83,7 @@ export default function CertifiedDocumentList({ className }: { className?: strin
           },
           {
             children: '防火影本開立證明文件',
-            ...cellConfig.documentType,
+            ...cellConfig.certifyType,
           },
           {
             children: 'SD-111',
@@ -124,7 +124,7 @@ export default function CertifiedDocumentList({ className }: { className?: strin
   const tabArr: Ttab[] = [
     {
       label: '防火證明',
-      isActive: documentType === 'fireproof',
+      isActive: certifyType === 'fireproof',
       // className: ,
       // style: ,
       onClick: () => {
@@ -138,7 +138,7 @@ export default function CertifiedDocumentList({ className }: { className?: strin
     },
     {
       label: '出廠證明',
-      isActive: documentType === 'factory',
+      isActive: certifyType === 'factory',
       // className: ,
       // style: ,
       onClick: () => {
@@ -152,7 +152,7 @@ export default function CertifiedDocumentList({ className }: { className?: strin
     },
     {
       label: '保固證明',
-      isActive: documentType === 'warranty',
+      isActive: certifyType === 'warranty',
       // className: ,
       // style: ,
       onClick: () => {
@@ -188,7 +188,7 @@ type TcellKeyArr =
   | 'reviewStatus'
   //
   | 'createdAt'
-  | 'documentType'
+  | 'certifyType'
   | 'itemName'
   | 'size'
   | 'doorModel'
@@ -212,7 +212,7 @@ const cellConfig: { [key in TcellKeyArr]: Tconfig_table } = {
     width: 150,
     justifyContent: 'center',
   },
-  documentType: {
+  certifyType: {
     label: '開立項目',
     width: 'auto',
     flex: 'auto',
