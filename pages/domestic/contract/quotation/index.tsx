@@ -49,7 +49,12 @@ import { Collapse } from 'antd';
 const { Panel } = Collapse;
 
 // gear
-import PageHeader02, { TtagList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, {
+  TtagList as TtabList,
+  TpanelList,
+  Tlink,
+  TlinkArr,
+} from 'components/PageHeader/PageHeader02/PageHeader02';
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
@@ -73,6 +78,10 @@ import { useProductList } from 'hooks/quotation/useProduct';
 // type
 import type { TquotationContentDto } from 'js/api/api_quotation';
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
+
+// =============================================================
+
+type Tstate_tab = 'contract' | 'contactDoc' | 'meetingMinutes' | 'certifiedDocument';
 
 // =============================================================
 // =============================================================
@@ -102,9 +111,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [reviewFormShow, setReviewFormShow] = useState(false);
 
   // -----------------------------------------------------------\
-  const [isShowContract, setIsShowContract] = useState(true);
-  const [isShowWorkContactDoc, setIsShowWorkContactDoc] = useState(false);
-  const [isShowMeetingMinutes, setIsShowMeetingMinutes] = useState(false);
+
+  const [state_tab, setState_tab] = useState<Tstate_tab>('contract');
 
   // 合約項目 追加/追減項目的開關
   // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
@@ -130,11 +138,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------------
 
-  const clearShow = () => {
-    setIsShowContract(false);
-    setIsShowWorkContactDoc(false);
-    setIsShowMeetingMinutes(false);
-  };
+  // const clearShow = () => {
+  //   setIsShowContract(false);
+  //   setIsShowWorkContactDoc(false);1
+  //   setIsShowMeetingMinutes(false);
+  // };
 
   const ref_workContact = useRef<TimperativeHandle>(null!);
   const ref_meetingMinutes = useRef<TimperativeHandle_meetingMinutes>(null!);
@@ -446,32 +454,35 @@ version>1 是子合約
 
   // =========================================================
 
-  const tagList: TtagList = [
+  const tabList: TtabList = [
     {
       label: `合約編號 ${contract?.contractNumber ?? ''}`,
       onClick: () => {
-        clearShow();
-        setIsShowContract(true);
+        setState_tab('contract');
       },
     },
     {
       label: `工程聯絡單`,
       onClick: () => {
-        clearShow();
-        setIsShowWorkContactDoc(true);
+        setState_tab('contactDoc');
       },
     },
     {
       label: `會議記錄`,
       onClick: () => {
-        clearShow();
-        setIsShowMeetingMinutes(true);
+        setState_tab('meetingMinutes');
+      },
+    },
+    {
+      label: `證明文件`,
+      onClick: () => {
+        setState_tab('certifiedDocument');
       },
     },
   ];
 
   if (!engineeringContactId) {
-    tagList.pop();
+    tabList.pop();
   }
 
   const panel_quotation01: TpanelList = [
@@ -635,22 +646,6 @@ version>1 是子合約
     },
   ];
 
-  // const panelList = (() => {
-  //   if (isShowWorkContactDoc) {
-  //     if (isShowPattern) {
-  //       return panel_workContack_pattern;
-  //     }
-
-  //     return disabed_workContactDoc ? panel_workContack_disabled : panel_workContack;
-  //   }
-
-  //   if (switch02) {
-  //     return panel_quotation03;
-  //   } else {
-  //     return panel_quotation01;
-  //   }
-  // })();
-
   const panelListList: TpanelListList = {
     panel_quotation01,
     panel_quotation03,
@@ -665,15 +660,10 @@ version>1 是子合約
 
   const panelList = panelListRouter({
     panelListList,
-
-    isShowContract,
-    switch02,
-
-    isShowWorkContactDoc,
+    state_tab,
     isShowPattern,
+    switch02,
     disabed_workContactDoc,
-
-    isShowMeetingMinutes,
     isMeetingAdd: state_meeting.isAdd,
     isMeetingEdit: state_meeting.isEdit,
     isMeetingRead: state_meeting.isRead,
@@ -849,10 +839,11 @@ version>1 是子合約
     <SubLayer
       //
       isLoading_all={isLoading || isLoading_workContact}
-      scrollToTopTrigger={[isShowWorkContactDoc, isShowPattern]}
+      // scrollToTopTrigger={[isShowWorkContactDoc, isShowPattern]}
+      scrollToTopTrigger={[state_tab === 'contactDoc', isShowPattern]}
     >
       <PageHeader02
-        tagList={tagList}
+        tagList={tabList}
         panelList={panelList}
         //  linkList={linkArr}
       />
@@ -860,7 +851,7 @@ version>1 是子合約
       <div>
         {/* <ContractNode /> */}
 
-        {isShowContract && (
+        {state_tab === 'contract' && (
           <div className={classNames(scss.quotation)}>
             {/* 報價單基本資料 */}
             <QuotationProfile disabled={true} control={control_profile} />
@@ -970,7 +961,7 @@ version>1 是子合約
         {/*  */}
         {/*  */}
         {/*  */}
-        {isShowWorkContactDoc && engineeringContactId && (
+        {state_tab === 'contactDoc' && engineeringContactId && (
           <div>
             <WorkContactDoc_component
               ref={ref_workContact}
@@ -981,7 +972,7 @@ version>1 是子合約
           </div>
         )}
 
-        {isShowMeetingMinutes && (
+        {state_tab === 'meetingMinutes' && (
           <MeetingMinutes_contract
             //
             ref={ref_meetingMinutes}
@@ -1168,29 +1159,19 @@ type TpanelListList = {
 
 const panelListRouter = ({
   panelListList,
-
-  isShowContract,
-  switch02,
-
-  isShowWorkContactDoc,
+  state_tab,
   isShowPattern,
+  switch02,
   disabed_workContactDoc,
-
-  isShowMeetingMinutes,
   isMeetingAdd,
   isMeetingRead,
   isMeetingEdit,
 }: {
   panelListList: TpanelListList;
-
-  isShowContract: boolean;
-  switch02: boolean;
-
-  isShowWorkContactDoc: boolean;
+  state_tab: Tstate_tab;
   isShowPattern: boolean;
+  switch02: boolean;
   disabed_workContactDoc: boolean;
-
-  isShowMeetingMinutes: boolean;
   isMeetingAdd: boolean;
   isMeetingRead: boolean;
   isMeetingEdit: boolean;
@@ -1203,7 +1184,7 @@ const panelListRouter = ({
     panel_workContack_pattern,
   } = panelListList;
 
-  if (isShowContract) {
+  if (state_tab === 'contract') {
     if (switch02) {
       return panel_quotation03;
     } else {
@@ -1211,7 +1192,7 @@ const panelListRouter = ({
     }
   }
 
-  if (isShowWorkContactDoc) {
+  if (state_tab === 'contactDoc') {
     if (isShowPattern) {
       return panel_workContack_pattern;
     } else if (disabed_workContactDoc) {
@@ -1221,7 +1202,7 @@ const panelListRouter = ({
     }
   }
 
-  if (isShowMeetingMinutes) {
+  if (state_tab === 'meetingMinutes') {
     if (isMeetingAdd) {
       return panelListList.panel_meeting_add;
     } else if (isMeetingEdit) {
