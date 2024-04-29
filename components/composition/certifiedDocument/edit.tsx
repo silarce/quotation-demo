@@ -10,6 +10,15 @@ import { Wrapper, Wrapper_inpuSel_01, WrappedTextarea } from 'components/page/wo
 
 // ui
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import SignatureBar, {
+  Tcontrol_signatureBar,
+  TsignatureBarItem,
+  TemployeeDto,
+} from 'components/global/gear/signatureBar_v2';
+import {
+  selectModalCreator_multi,
+  TselectorProps_simple,
+} from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // component
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
@@ -23,6 +32,23 @@ type Tquery = {
   editCertifiedDocument: 'true' | undefined;
   certifiedDocumentId: string | undefined;
 };
+
+// =========================================================================
+
+const Selector = selectModalCreator_multi<['employee', 'employee']>({
+  selectorArr: [
+    {
+      key: 'employee',
+      caption: '擔保人',
+      limit: 1,
+    },
+    {
+      key: 'employee',
+      caption: '製表人',
+      limit: 1,
+    },
+  ],
+});
 
 // =========================================================================
 
@@ -50,6 +76,17 @@ export default function Edit({
   // ---------------------------------------------------------------------------
 
   const [disabled, setDisabled] = useState(!isNew);
+  const [state_showSelector, setState_showSelector] = useState(false);
+
+  // ---------------------------------------------------------------------------
+
+  const [state_activeReviewer, setState_activeReviewer] = useState<{
+    guarantor: TemployeeDto | undefined;
+    tabulator: TemployeeDto | undefined;
+  }>({
+    guarantor: undefined,
+    tabulator: undefined,
+  });
 
   // ---------------------------------------------------------------------------
 
@@ -98,6 +135,41 @@ export default function Edit({
 
     return undefined;
   }, [disabled, isNew]);
+
+  const { control_signature, defaultSeletedDataArrArr } = useMemo(() => {
+    const fakeArr = [
+      {
+        label: '總經理',
+        className: 'w-[210px]',
+      },
+      {
+        label: '擔保人',
+        className: 'w-[210px]',
+        value: state_activeReviewer.guarantor?.chName,
+        onClick: () => setState_showSelector(true),
+      },
+      {
+        label: '製表人',
+        className: 'w-[210px]',
+        value: state_activeReviewer.tabulator?.chName,
+        onClick: () => setState_showSelector(true),
+      },
+    ];
+
+    const defaultSeletedDataArrArr: Parameters<typeof Selector>[0]['defaultSeletedDataArrArr'] = [
+      state_activeReviewer.guarantor ? [state_activeReviewer.guarantor] : [],
+      state_activeReviewer.tabulator ? [state_activeReviewer.tabulator] : [],
+    ];
+
+    const control_signature = {
+      signatureArr: fakeArr,
+    };
+
+    return {
+      control_signature,
+      defaultSeletedDataArrArr,
+    };
+  }, [state_activeReviewer]);
 
   // --------------------------------------------------------------------------
 
@@ -183,7 +255,29 @@ export default function Edit({
             },
           }}
         />
+
+        <SignatureBar
+          className="mt-10 mb-10 w-fit"
+          control={control_signature}
+          style={{ justifyContent: 'flex-start', gap: '50px' }}
+        />
       </form>
+      <Selector
+        showModal={state_showSelector}
+        defaultSeletedDataArrArr={defaultSeletedDataArrArr}
+        onConfirm={(arr) => {
+          const guarantor = arr[0][0];
+          const tabulator = arr[1][0];
+
+          setState_activeReviewer({
+            guarantor,
+            tabulator,
+          });
+        }}
+        onCancel={() => {
+          setState_showSelector(false);
+        }}
+      />
     </div>
   );
 }
