@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, memo } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
-import { useRouter } from 'next/router';
+import { useRouter, NextRouter } from 'next/router';
 import { nanoid } from 'nanoid';
 
 // layout
@@ -15,16 +15,14 @@ import SignatureBar, {
   TsignatureBarItem,
   TemployeeDto,
 } from 'components/global/gear/signatureBar_v2';
-import {
-  selectModalCreator_multi,
-  TselectorProps_simple,
-} from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // component
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 // options
 import { optionsCreator_certifyType } from 'js/utils/options/productOptions';
+import { set } from 'lodash';
 
 // =========================================================================
 
@@ -32,6 +30,24 @@ type Tquery = {
   editCertifiedDocument: 'true' | undefined;
   certifiedDocumentId: string | undefined;
 };
+
+type Tstate_info = {
+  documentType: string;
+  applicationDate: Moment | null;
+  projectNumber: string;
+  projectName: string;
+  contractor: string;
+  thisPeriodPrice: string;
+  thisPeriodPayment: string;
+  retainage: string; // 保留款
+  askForPaymentDate: Moment | null;
+  loanDate: Moment | null;
+};
+type Tstate_itemList = {
+  [key: string]: string;
+};
+type Tstate_description = string;
+type Tstate_remark = string;
 
 // =========================================================================
 
@@ -48,6 +64,10 @@ const Selector = selectModalCreator_multi<['employee', 'employee']>({
       limit: 1,
     },
   ],
+});
+
+const Selector_memo = memo(Selector, (preState, nextState) => {
+  return preState.showModal === nextState.showModal;
 });
 
 // =========================================================================
@@ -71,14 +91,16 @@ export default function Edit({
 
   // ---------------------------------------------------------------------------
 
-  const ref_form = useRef<HTMLFormElement>(null!);
-
-  // ---------------------------------------------------------------------------
-
   const [disabled, setDisabled] = useState(!isNew);
   const [state_showSelector, setState_showSelector] = useState(false);
 
   // ---------------------------------------------------------------------------
+
+  const [state_info, setState_info] = useState<Tstate_info>(emptyState_info);
+
+  const [state_itemList, setState_itemList] = useState<Tstate_itemList>({});
+  const [state_description, setState_description] = useState<Tstate_description>('');
+  const [state_remark, setState_remark] = useState<Tstate_remark>('');
 
   const [state_activeReviewer, setState_activeReviewer] = useState<{
     guarantor: TemployeeDto | undefined;
@@ -90,51 +112,41 @@ export default function Edit({
 
   // ---------------------------------------------------------------------------
 
-  const inputGroupDefaultData = useMemo(() => {
-    return {
-      id: nanoid(),
-      documentType: '',
-      applicationDate: undefined,
-      projectNumber: '',
-      projectName: '',
-      contractor: '',
-      thisPeriodPrice: '',
-      thisPeriodPayment: '',
-      retainage: '',
-      askForPaymentDate: undefined,
-      loanDate: undefined,
-    };
-  }, [disabled]);
+  const { data: data_certifiedDocument, update: update_data_CertifiedDocument } = useFakeGetApi(certifiedDocumentId);
 
-  const panelList = useMemo(() => {
-    const panelList_new: TpanelList = [
-      {
-        type: 'redButton',
-        label: '確定',
-        onClick: () => {
-          setDisabled((state) => !state);
-        },
-      },
-      {
-        type: 'myButton',
-        label: '返回',
-        onClick: () => {
-          const query_copy = { ...query };
-          delete query_copy.editCertifiedDocument;
-          delete query_copy.certifiedDocumentId;
-          router.replace({
-            query: query_copy,
-          });
-        },
-      },
-    ];
+  // ---------------------------------------------------------------------------
 
-    if (isNew) {
-      return panelList_new;
-    }
+  const editInfo = (
+    key: keyof Omit<Tstate_info, 'applicationDate' | 'askForPaymentDate' | 'loanDate'>,
+    value: string
+  ) => {
+    setState_info((state) => {
+      return {
+        ...state,
+        [key]: value,
+      };
+    });
+  };
 
-    return undefined;
-  }, [disabled, isNew]);
+  const editDate = (key: 'applicationDate' | 'askForPaymentDate' | 'loanDate', value: Moment | null) => {
+    setState_info((state) => {
+      return {
+        ...state,
+        [key]: value,
+      };
+    });
+  };
+
+  const editItem = (key: string, value: string) => {
+    setState_itemList((state) => {
+      return {
+        ...state,
+        [key]: value,
+      };
+    });
+  };
+
+  // ---------------------------------------------------------------------------
 
   const { control_signature, defaultSeletedDataArrArr } = useMemo(() => {
     const fakeArr = [
@@ -146,13 +158,13 @@ export default function Edit({
         label: '擔保人',
         className: 'w-[210px]',
         value: state_activeReviewer.guarantor?.chName,
-        onClick: () => setState_showSelector(true),
+        onClick: () => !disabled && setState_showSelector(true),
       },
       {
         label: '製表人',
         className: 'w-[210px]',
         value: state_activeReviewer.tabulator?.chName,
-        onClick: () => setState_showSelector(true),
+        onClick: () => !disabled && setState_showSelector(true),
       },
     ];
 
@@ -169,11 +181,23 @@ export default function Edit({
       control_signature,
       defaultSeletedDataArrArr,
     };
-  }, [state_activeReviewer]);
+  }, [state_activeReviewer, disabled]);
+
+  const panelList = usePanelList({
+    disabled,
+    isNew,
+    query,
+    router,
+    setDisabled,
+  });
 
   // --------------------------------------------------------------------------
 
-  const control_table = useControl_table();
+  const control_table = useControl_table({
+    disabled,
+    data: state_itemList,
+    editItem,
+  });
 
   // --------------------------------------------------------------------------
 
@@ -185,6 +209,47 @@ export default function Edit({
     };
   }, [panelList]);
 
+  useEffect(() => {
+    update_data_CertifiedDocument();
+  }, []);
+
+  useEffect(() => {
+    if (!data_certifiedDocument) {
+      setState_info(emptyState_info);
+      setState_itemList({});
+      setState_description('');
+      setState_remark('');
+    } else {
+      setState_info({
+        documentType: data_certifiedDocument.documentType,
+        applicationDate: data_certifiedDocument.applicationDate ? moment(data_certifiedDocument.applicationDate) : null,
+        projectNumber: data_certifiedDocument.projectNumber,
+        projectName: data_certifiedDocument.projectName,
+        contractor: data_certifiedDocument.contractor,
+        thisPeriodPrice: String(data_certifiedDocument.thisPeriodPrice),
+        thisPeriodPayment: String(data_certifiedDocument.thisPeriodPayment),
+        retainage: String(data_certifiedDocument.retainage),
+        askForPaymentDate: data_certifiedDocument.askForPaymentDate
+          ? moment(data_certifiedDocument.askForPaymentDate)
+          : null,
+        loanDate: data_certifiedDocument.loanDate ? moment(data_certifiedDocument.loanDate) : null,
+      });
+
+      setState_itemList(() => {
+        const list: Tstate_itemList = {};
+
+        data_certifiedDocument.itemArr.forEach((item) => {
+          list[item.id] = String(item.needToCreatedQty);
+        });
+
+        return list;
+      });
+
+      setState_description(data_certifiedDocument.description);
+      setState_remark(data_certifiedDocument.remark);
+    }
+  }, [disabled, data_certifiedDocument]);
+
   // ---------------------------------------------------------------------------
 
   // ██████  ███████ ███    ██ ██████  ███████ ██████
@@ -194,75 +259,51 @@ export default function Edit({
   // ██   ██ ███████ ██   ████ ██████  ███████ ██   ██
   return (
     <div className={classNames(className)}>
-      {/* <button
-        onClick={() => {
-          const {
-            documentType,
-            applicationDate,
-            projectNumber,
-            projectName,
-            contractor,
-            thisPeriodPrice,
-            thisPeriodPayment,
-            retainage,
-            askForPaymentDate,
-            loanDate,
-            //
-            needToCreatedQty, //
-            //
-            description,
-          } = ref_form.current;
+      <div className="w-[1100px] ml-10">
+        <InputGroup disabled={disabled} data={state_info} editInfo={editInfo} editDate={editDate} />
 
-          //
-
-          // const list: { [key: string]: string } = {};
-
-          // for (const value of needToCreatedQty) {
-          //   list[value.id] = value.value;
-          // }
-        }}
-      >
-        test
-      </button> */}
-
-      <form ref={ref_form} className="w-[1100px] ml-10">
-        {/* key 是為了重置元件，以替換進新的預設值 */}
-        <InputGroup key={inputGroupDefaultData.id} defaultData={inputGroupDefaultData} />
         <Table01 className="mt-10" style={{ width: '100%' }} {...control_table} />
 
         <WrappedTextarea
+          disabled={disabled}
           inputSelProps={{ caption: '說明' }}
           textareaProps={{
             props: {
               name: 'description',
-              maxRows: 4,
-              minRows: 4,
-              // value: state_memorandum.description,
-              // onChange: (e) => editStateMemorandum('description', e.target.value),
+              maxRows: 6,
+              minRows: 6,
+              value: state_description,
+              onChange: (e) => {
+                setState_description(e.target.value);
+              },
             },
           }}
         />
 
         <WrappedTextarea
+          disabled={disabled}
           inputSelProps={{ caption: '備註' }}
           textareaProps={{
             props: {
               name: 'remark',
-              maxRows: 6,
-              minRows: 6,
-              // value: state_memorandum.description,
-              // onChange: (e) => editStateMemorandum('description', e.target.value),
+              maxRows: 4,
+              minRows: 4,
+              value: state_remark,
+              onChange: (e) => {
+                setState_remark(e.target.value);
+              },
             },
           }}
         />
 
         <SignatureBar
           className="mt-10 mb-10 w-fit"
+          disabled={disabled}
           control={control_signature}
           style={{ justifyContent: 'flex-start', gap: '50px' }}
         />
-      </form>
-      <Selector
+      </div>
+      <Selector_memo
         showModal={state_showSelector}
         defaultSeletedDataArrArr={defaultSeletedDataArrArr}
         onConfirm={(arr) => {
@@ -301,137 +342,159 @@ export default function Edit({
 //  ██████  ██████  ██      ██ ██       ██████  ██   ████ ███████ ██   ████    ██
 
 const InputGroup = ({
-  defaultData,
+  disabled,
+  data,
+  editInfo,
+  editDate,
 }: {
-  defaultData: {
+  disabled?: boolean;
+  data: {
     documentType: string;
-    applicationDate: Moment | undefined;
+    applicationDate: Moment | null;
     projectNumber: string;
     projectName: string;
     contractor: string;
     thisPeriodPrice: string;
     thisPeriodPayment: string;
-    retainage: string;
-    askForPaymentDate: Moment | undefined;
-    loanDate: Moment | undefined;
+    retainage: string; // 保留款
+    askForPaymentDate: Moment | null;
+    loanDate: Moment | null;
   };
+  editInfo: (key: keyof Omit<Tstate_info, 'applicationDate' | 'askForPaymentDate' | 'loanDate'>, value: string) => void;
+  editDate: (key: 'applicationDate' | 'askForPaymentDate' | 'loanDate', value: Moment | null) => void;
 }) => {
   return (
     <Wrapper_inpuSel_01 className="w-[845px]">
       <InputSel
-        name="documentType"
         caption="文件種類"
+        disabled={disabled}
         selectProps={{
           props: {
+            menuPortalTarget: undefined,
+            styles: {
+              menuPortal: (base) => ({
+                ...base,
+                zIndex: 3,
+              }),
+            },
             options: optionsCreator_certifyType(),
-            defaultValue: defaultData.documentType
+            value: data.documentType
               ? {
-                  value: defaultData.documentType,
-                  label: defaultData.documentType,
+                  value: data.documentType,
+                  label: data.documentType,
                 }
               : null,
-            value: undefined,
-            onChange: undefined,
+            onChange: (option) => {
+              editInfo('documentType', option?.value ?? '');
+            },
           },
         }}
       />
       <InputSel
-        name="applicationDate"
         caption="申請日期"
+        disabled={disabled}
         datePickerProps={{
           props: {
-            defaultValue: defaultData.applicationDate,
-            // defaultValue: defaultData.applicationDate,
-            // value: undefined,
-            // onChange: undefined,
+            value: data.applicationDate,
+            onChange: (m) => {
+              editDate('applicationDate', m);
+            },
           },
         }}
       />
       <InputSel
-        name="projectNumber"
         caption="工程編號"
+        disabled={disabled}
         inputProps={{
           props: {
-            defaultValue: defaultData.projectNumber,
-            value: undefined,
-            onChange: undefined,
+            value: data.projectNumber,
+            onChange: (e) => {
+              editInfo('projectNumber', e.target.value);
+            },
           },
         }}
       />
       <InputSel
-        name="projectName"
         caption="工程名稱"
+        disabled={disabled}
         inputProps={{
           props: {
-            defaultValue: defaultData.projectName,
-            value: undefined,
-            onChange: undefined,
+            value: data.projectName,
+            onChange: (e) => {
+              editInfo('projectName', e.target.value);
+            },
           },
         }}
       />
       <InputSel
-        name="contractor"
         caption="承包商"
+        disabled={disabled}
         inputProps={{
           props: {
-            defaultValue: defaultData.contractor,
-            value: undefined,
-            onChange: undefined,
+            value: data.contractor,
+            onChange: (e) => {
+              editInfo('contractor', e.target.value);
+            },
           },
         }}
       />
       <InputSel
-        name="thisPeriodPrice"
         caption="本期計價"
+        disabled={disabled}
         inputProps={{
           props: {
-            defaultValue: defaultData.thisPeriodPrice,
-            value: undefined,
-            onChange: undefined,
+            value: data.thisPeriodPrice,
+            onChange: (e) => {
+              editInfo('thisPeriodPrice', e.target.value);
+            },
           },
         }}
       />
       <InputSel
-        name="thisPeriodPayment"
         caption="本期請款"
+        disabled={disabled}
         inputProps={{
           props: {
-            defaultValue: defaultData.thisPeriodPayment,
-            value: undefined,
-            onChange: undefined,
+            value: data.thisPeriodPayment,
+            onChange: (e) => {
+              editInfo('thisPeriodPayment', e.target.value);
+            },
           },
         }}
       />
       <InputSel
-        name="retainage"
         caption="保留款"
+        disabled={disabled}
         inputProps={{
           props: {
-            defaultValue: defaultData.retainage,
-            value: undefined,
-            onChange: undefined,
+            value: data.retainage,
+            onChange: (e) => {
+              editInfo('retainage', e.target.value);
+            },
           },
         }}
       />
       <InputSel
-        name="askForPaymentDate"
         caption="請款日"
+        disabled={disabled}
         datePickerProps={{
           props: {
-            defaultValue: defaultData.askForPaymentDate,
-            value: undefined,
-            onChange: undefined,
+            value: data.askForPaymentDate,
+            onChange: (m) => {
+              editDate('askForPaymentDate', m);
+            },
           },
         }}
       />
       <InputSel
-        name="loanDate"
         caption="放款日"
+        disabled={disabled}
         datePickerProps={{
           props: {
-            defaultValue: defaultData.loanDate,
-            value: undefined,
-            onChange: undefined,
+            value: data.loanDate,
+            onChange: (m) => {
+              editDate('loanDate', m);
+            },
           },
         }}
       />
@@ -447,7 +510,16 @@ const InputGroup = ({
 // ██   ██ ██    ██ ██    ██ ██  ██
 // ██   ██  ██████   ██████  ██   ██
 
-const useControl_table = (): Ttable => {
+const useControl_table = ({
+  disabled,
+  data,
+  editItem,
+}: {
+  disabled?: boolean;
+  data: Tstate_itemList;
+  editItem: (key: string, value: string) => void;
+}): Ttable => {
+  //
   const control_table: Ttable = useMemo(() => {
     const thead: Ttable['thead'] = {
       // stickyTop: {
@@ -484,41 +556,44 @@ const useControl_table = (): Ttable => {
       ],
     };
 
-    const rowArr = [
-      {
+    const rowArr = Object.entries(data).map(([key, value], index) => {
+      return {
         minHeight: tableConfig.row.minHeight,
         onClick: () => {},
         cellArr: [
           {
-            children: 'aaa',
+            children: 'SD-1',
             ...cellConfig.itemName,
           },
           {
-            children: 'aaa',
+            children: '99*99+99',
             ...cellConfig.size,
           },
           {
-            children: 'aaa',
+            children: 'SJ-302',
             ...cellConfig.doorModel,
           },
           {
-            children: 'aaa',
+            children: 99,
             ...cellConfig.contractProdQty,
           },
           {
-            children: 'aaa',
+            children: 88,
             ...cellConfig.createdQty,
           },
           {
             children: (
               <InputSel
-                name="needToCreatedQty"
+                disabled={disabled}
+                showBaseline="auto"
                 inputProps={{
                   props: {
-                    id: '0001',
-                    defaultValue: undefined,
-                    value: undefined,
-                    onChange: undefined,
+                    value: value,
+                    onChange: (e) => {
+                      editItem(key, e.target.value);
+                    },
+                    type: 'number',
+                    className: 'text-center',
                   },
                 }}
               />
@@ -526,8 +601,8 @@ const useControl_table = (): Ttable => {
             ...cellConfig.needToCreatedQty,
           },
         ],
-      },
-    ];
+      };
+    });
 
     const control_table: Ttable = {
       thead,
@@ -539,9 +614,101 @@ const useControl_table = (): Ttable => {
 
     return control_table;
     //
-  }, []);
+  }, [data, disabled]);
 
   return control_table;
+};
+
+// ---------------------------------------------------------------
+const usePanelList = ({
+  //
+  disabled,
+  isNew,
+  query,
+  router,
+  setDisabled,
+}: {
+  disabled: boolean;
+  isNew: boolean;
+  query: Tquery;
+  router: NextRouter;
+  setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const panelList = useMemo(() => {
+    // const turnBack = () => {
+    //   // const query_copy = { ...query };
+    //   // delete query_copy.editCertifiedDocument;
+    //   // delete query_copy.certifiedDocumentId;
+    //   // router.replace({
+    //   //   query: query_copy,
+    //   // });
+    //   router.back();
+    // };
+
+    const panelList_new: TpanelList = [
+      {
+        type: 'redButton',
+        label: '確定',
+        onClick: () => {
+          setDisabled((state) => !state);
+        },
+      },
+      {
+        type: 'myButton',
+        label: '返回',
+        onClick: router.back,
+      },
+    ];
+
+    const panelList_disabled: TpanelList = [
+      {
+        type: 'redButton',
+        label: '送審',
+        onClick: () => {
+          alert('送審');
+        },
+      },
+      {
+        type: 'myButton',
+        label: '編輯',
+        onClick: () => {
+          setDisabled(false);
+        },
+      },
+      {
+        type: 'myButton',
+        label: '返回',
+        onClick: router.back,
+      },
+    ];
+
+    const panelList_abled: TpanelList = [
+      {
+        type: 'redButton',
+        label: '確定',
+        onClick: () => {
+          setDisabled(false);
+        },
+      },
+      {
+        type: 'myButton',
+        label: '取消',
+        onClick: () => {
+          setDisabled(true);
+        },
+      },
+    ];
+
+    if (isNew) {
+      return panelList_new;
+    } else if (disabled) {
+      return panelList_disabled;
+    } else {
+      return panelList_abled;
+    }
+  }, [disabled, isNew]);
+
+  return panelList;
 };
 
 // ==============================================================================
@@ -589,8 +756,8 @@ const cellConfig: { [key in TcellKeyArr]: Tconfig_table } = {
     justifyContent: 'center',
   },
   createdQty: {
-    label: '總數量',
-    width: 70,
+    label: '總開立數量',
+    width: 130,
     justifyContent: 'center',
   },
   needToCreatedQty: {
@@ -598,4 +765,117 @@ const cellConfig: { [key in TcellKeyArr]: Tconfig_table } = {
     flex: 'auto',
     justifyContent: 'center',
   },
+};
+
+// ███████  █████  ██   ██ ███████     ██████   █████  ████████  █████
+// ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
+// █████   ███████ █████   █████       ██   ██ ███████    ██    ███████
+// ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
+// ██      ██   ██ ██   ██ ███████     ██████  ██   ██    ██    ██   ██
+
+type TfakeCertifiedDocument = {
+  id?: string | undefined;
+  documentType: string;
+  applicationDate: string;
+  projectNumber: string;
+  projectName: string;
+  contractor: string;
+  thisPeriodPrice: number;
+  thisPeriodPayment: number;
+  retainage: number; // 保留款
+  askForPaymentDate: string;
+  loanDate: string;
+  description: string;
+  remark: string;
+  itemArr: {
+    id: string;
+    itemName: string;
+    size: string;
+    doorModel: string;
+    contractProdQty: number;
+    createdQty: number;
+    needToCreatedQty: number;
+  }[];
+};
+
+const fakeCertifiedDocument: TfakeCertifiedDocument = {
+  id: nanoid(),
+  documentType: '防火證明預先開立保證書',
+  applicationDate: '2011-01-01',
+  projectNumber: 'P-001',
+  projectName: '喵喵工程計畫',
+  contractor: '阿喵喵',
+  thisPeriodPrice: 99999,
+  thisPeriodPayment: 88888,
+  retainage: 77777,
+  askForPaymentDate: '2011-01-01',
+  loanDate: '2011-01-01',
+  description: '喵喵喵',
+  remark: '喵喵喵',
+  itemArr: [
+    {
+      id: 'i-001',
+      itemName: 'SD-1',
+      size: '99*99+99',
+      doorModel: 'SJ-302',
+      contractProdQty: 99,
+      createdQty: 88,
+      needToCreatedQty: 8,
+    },
+    {
+      id: 'i-002',
+      itemName: 'SD-1',
+      size: '99*99+99',
+      doorModel: 'SJ-302',
+      contractProdQty: 99,
+      createdQty: 88,
+      needToCreatedQty: 10,
+    },
+  ],
+};
+
+// const emptyCertifiedDocument: TfakeCertifiedDocument = {
+//   documentType: '',
+//   applicationDate: '',
+//   projectNumber: '',
+//   projectName: '',
+//   contractor: '',
+//   thisPeriodPrice: 0,
+//   thisPeriodPayment: 0,
+//   retainage: 0,
+//   askForPaymentDate: '',
+//   loanDate: '',
+//   description: '',
+//   remark: '',
+//   itemArr: [],
+// };
+
+const emptyState_info: Tstate_info = {
+  documentType: '',
+  applicationDate: null,
+  projectNumber: '',
+  projectName: '',
+  contractor: '',
+  thisPeriodPrice: '',
+  thisPeriodPayment: '',
+  retainage: '',
+  askForPaymentDate: null,
+  loanDate: null,
+};
+
+const useFakeGetApi = (id: string | undefined) => {
+  const [res, setRes] = useState<TfakeCertifiedDocument | undefined>(undefined);
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    setRes(fakeCertifiedDocument);
+  };
+
+  return {
+    data: res,
+    update,
+  };
 };
