@@ -10,7 +10,7 @@ import CertifiedDocumentList from './certifiedDocumentList';
 import Edit from './edit';
 
 type Tquery = {
-  certifyType?: string;
+  documentType?: string;
   editCertifiedDocument?: 'true';
   certifiedDocumentId?: string;
 };
@@ -22,7 +22,7 @@ export default function CertifiedDocument({
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { certifyType, editCertifiedDocument, certifiedDocumentId } = query;
+  const { documentType, editCertifiedDocument, certifiedDocumentId } = query;
   const isListShow = !editCertifiedDocument;
 
   // ---------------------------------------------------------------------------
@@ -31,10 +31,11 @@ export default function CertifiedDocument({
 
   // ---------------------------------------------------------------------------
 
+  // 卸載元件時將documentType從query中移除
   useEffect(() => {
     return () => {
       const query_copy = { ...query };
-      delete query_copy.certifyType;
+      delete query_copy.documentType;
       router.push({
         query: query_copy,
       });
@@ -47,7 +48,7 @@ export default function CertifiedDocument({
         type: 'myButton',
         label: '新增',
         onClick: () => {
-          router.replace({
+          router.push({
             query: {
               ...query,
               editCertifiedDocument: 'true',
