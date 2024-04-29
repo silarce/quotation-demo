@@ -12,14 +12,14 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 // ===================================== ========================================
 
 type Tquery = {
-  certifyType: undefined | 'fireproof' | 'factory' | 'warranty';
+  documentType: undefined | 'fireproof' | 'factory' | 'warranty';
 };
 
 // =============================================================================
 export default function CertifiedDocumentList({ className }: { className?: string }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { certifyType = 'fireproof' } = query;
+  const { documentType = 'fireproof' } = query;
 
   // ========================================================================
 
@@ -71,7 +71,7 @@ export default function CertifiedDocumentList({ className }: { className?: strin
     const rowArr = [
       {
         minHeight: tableConfig.row.minHeight,
-        onClick: () => {},
+        // onClick: () => {},
         cellArr: [
           {
             children: '已審核',
@@ -102,7 +102,19 @@ export default function CertifiedDocumentList({ className }: { className?: strin
             ...cellConfig.qty,
           },
           {
-            children: <IconDetail />,
+            children: (
+              <IconDetail
+                onClick={() => {
+                  router.push({
+                    query: {
+                      ...query,
+                      editCertifiedDocument: 'true',
+                      certifiedDocumentId: 'foo001',
+                    },
+                  });
+                }}
+              />
+            ),
             ...cellConfig.btn,
           },
         ],
@@ -124,7 +136,7 @@ export default function CertifiedDocumentList({ className }: { className?: strin
   const tabArr: Ttab[] = [
     {
       label: '防火證明',
-      isActive: certifyType === 'fireproof',
+      isActive: documentType === 'fireproof',
       // className: ,
       // style: ,
       onClick: () => {
@@ -138,7 +150,7 @@ export default function CertifiedDocumentList({ className }: { className?: strin
     },
     {
       label: '出廠證明',
-      isActive: certifyType === 'factory',
+      isActive: documentType === 'factory',
       // className: ,
       // style: ,
       onClick: () => {
@@ -152,7 +164,7 @@ export default function CertifiedDocumentList({ className }: { className?: strin
     },
     {
       label: '保固證明',
-      isActive: certifyType === 'warranty',
+      isActive: documentType === 'warranty',
       // className: ,
       // style: ,
       onClick: () => {
