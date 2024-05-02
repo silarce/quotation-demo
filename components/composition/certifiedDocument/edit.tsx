@@ -300,7 +300,7 @@ export default function Edit({
         />
 
         <SignatureBar
-          className="mt-10 mb-10 w-fit"
+          className="mt-10 w-fit"
           disabled={disabled}
           control={control_signature}
           style={{ justifyContent: 'flex-start', gap: '50px' }}

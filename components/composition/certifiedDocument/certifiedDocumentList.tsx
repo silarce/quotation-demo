@@ -7,7 +7,14 @@ import classNames from 'classnames';
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
+// gear
+import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
+
+// icon
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+
+// css
+import scss from './certifiedDocumentList.module.scss';
 
 // ===================================== ========================================
 
@@ -26,9 +33,9 @@ export default function CertifiedDocumentList({ className }: { className?: strin
   const control_table: Ttable = useMemo(() => {
     //
     const thead: Ttable['thead'] = {
-      // stickyTop: {
-      //   top: '40px',
-      // },
+      stickyTop: {
+        top: '90px',
+      },
       rowProps: {
         minHeight: tableConfig.row.minHeight,
       },
@@ -68,10 +75,38 @@ export default function CertifiedDocumentList({ className }: { className?: strin
       ],
     };
 
-    const rowArr = [
-      {
+    const fooArr = Array(20).fill('foo');
+
+    const tbodyRowArr: Ttable['tbody']['rowArr'] = fooArr.map(() => {
+      const control_processChain: Tcontrol_processChain = {
+        statusArr: [
+          {
+            label: `製表 ${'fooo'}`,
+            dotColor: 'gray',
+          },
+          {
+            label: `擔保 ${'fooo'}`,
+            dotColor: 'gray',
+          },
+          {
+            label: `會計 ${'fooo'}`,
+            dotColor: 'gray',
+          },
+          {
+            label: `審核 ${'fooo'}`,
+            dotColor: 'gray',
+          },
+          {
+            label: `總經理 ${'foooo'}`,
+            dotColor: 'gray',
+          },
+        ],
+      };
+
+      return {
         minHeight: tableConfig.row.minHeight,
         // onClick: () => {},
+        className: scss.row,
         cellArr: [
           {
             children: '已審核',
@@ -117,12 +152,19 @@ export default function CertifiedDocumentList({ className }: { className?: strin
             ),
             ...cellConfig.btn,
           },
+          {
+            children: <ProcessChain control={control_processChain} />,
+            className: classNames(scss.processChainCell, scss.plus),
+            style: {
+              flex: '0 0 100%',
+            },
+          },
         ],
-      },
-    ];
+      };
+    });
 
     const tbody = {
-      rowArr: [...rowArr, ...rowArr, ...rowArr, ...rowArr, ...rowArr],
+      rowArr: tbodyRowArr,
     };
 
     return {
@@ -179,20 +221,24 @@ export default function CertifiedDocumentList({ className }: { className?: strin
   ];
 
   return (
-    <Wrapper_tab
-      className={classNames(className)}
-      tabArr={tabArr}
-      childrenOption={{
-        noBorderTop: true,
-      }}
-      stickyTop={{
-        top: 40,
-      }}
-    >
-      <Table01 {...control_table} />
-    </Wrapper_tab>
+    <div>
+      <Wrapper_tab
+        className={classNames(className)}
+        tabArr={tabArr}
+        childrenOption={{
+          noBorderTop: true,
+        }}
+        stickyTop={{
+          top: 40,
+        }}
+      >
+        <Table01 {...control_table} />
+      </Wrapper_tab>
+    </div>
   );
 }
+
+// ====================================================================
 
 // ====================================================================
 

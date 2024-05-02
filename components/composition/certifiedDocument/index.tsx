@@ -74,7 +74,7 @@ export default function CertifiedDocument({
   }, [panelList]);
 
   return (
-    <div className="ml-10 mr-10">
+    <div className="ml-10 mr-10 pb-10">
       {/*  */}
       {isListShow && <CertifiedDocumentList />}
       {editCertifiedDocument && <Edit className="mt-10" onPanelChange={setDynPanelList} />}

@@ -313,7 +313,7 @@ export default function Certificate({
   // ██   ██ ███████ ██   ████ ██████  ███████ ██   ██
 
   return (
-    <div ref={refPdf} className={scss.container}>
+    <div ref={refPdf} className={classNames(scss.container, 'mt-10')}>
       <h1 className={classNames(scss.title)}>{'防火證明書'}</h1>
 
       <div className={scss.infoList}>
