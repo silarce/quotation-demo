@@ -116,7 +116,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------------
 
   const [state_tab, setState_tab] = useState<Tstate_tab>('contract');
+
   const [dynaPanelList, setDynaPanelList] = useState<TpanelList | null | undefined>(null);
+
+  const dynaPanelListReducer = (value: TpanelList | null | undefined) => {
+    if (!value) {
+      setDynaPanelList(null);
+    } else {
+      value = [...value];
+
+      if (!value.find((item) => item?.label === '返回')) {
+        value.push({ type: 'myButton', label: '返回', onClick: router.back });
+      }
+
+      setDynaPanelList(value);
+    }
+  };
 
   // -----------------------------------------------------------
 
@@ -562,7 +577,7 @@ version>1 是子合約
         ref_workContact.current.setDisabled(false);
       },
     },
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
+    { type: 'myButton', label: '返回', onClick: router.back },
   ];
   const panel_workContack: TpanelList = [
     {
@@ -599,6 +614,7 @@ version>1 是子合約
         ref_meetingMinutes.current?.add();
       },
     },
+    { type: 'myButton', label: '返回', onClick: router.back },
   ];
 
   const panel_meeting_read: TpanelList = [
@@ -988,7 +1004,7 @@ version>1 是子合約
           />
         )}
 
-        {state_tab === 'certifiedDocument' && <CertifiedDocument onPanelListChange={setDynaPanelList} />}
+        {state_tab === 'certifiedDocument' && <CertifiedDocument onPanelListChange={dynaPanelListReducer} />}
 
         <InputModal
           visible={!!inputModalConfig?.visible}

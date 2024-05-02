@@ -271,7 +271,7 @@ function MeetingMinutes_contract_component(
 
   useEffect(() => {
     return () => {
-      router.push({
+      router.replace({
         query: {
           ...router.query,
           meetingMinutesId: undefined,
