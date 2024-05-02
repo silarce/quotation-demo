@@ -2,14 +2,13 @@
 
 .container {
   position: relative;
+  display: grid;
+  //                  title       infoList     table       textarea_autosize footer
+  grid-template-rows: max-content max-content max-content auto max-content;
   padding: 100px;
   aspect-ratio: 210/297;
   border: solid 1px black;
-
-  display: grid;
-
-  //                  title       infoList     table       textarea_autosize footer
-  grid-template-rows: max-content max-content max-content auto max-content;
+  transform: scale(0.8) translateY(-10%);
 }
 
 .title {

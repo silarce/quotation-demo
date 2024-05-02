@@ -313,7 +313,7 @@ export default function Certificate({
   // ██   ██ ███████ ██   ████ ██████  ███████ ██   ██
 
   return (
-    <div ref={refPdf} className={classNames(scss.container, 'mt-10')}>
+    <div ref={refPdf} className={classNames(scss.container)}>
       <h1 className={classNames(scss.title)}>{'防火證明書'}</h1>
 
       <div className={scss.infoList}>
@@ -391,9 +391,9 @@ export default function Certificate({
 
       <div className={scss.footer}>
         <div>台中總公司：台中市霧峰區峰北路666號</div>
-        <div>TEL:04-2406-9939</div>
+        <div>TEL：04-2406-9939</div>
         <div>台北分公司：台北市內湖路一段387巷5號2F之2</div>
-        <div>TEL:02-2658-1508</div>
+        <div>TEL：02-2658-1508</div>
         <div className={scss.footerDate}>
           中華民國 {999} 年 {99} 月 {99} 日
         </div>
