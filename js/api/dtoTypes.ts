@@ -3991,7 +3991,7 @@ export type TcertificatedDocDto = {
   // 狀態(審核中/審核完成尚未用印/已印出)
   status: boolean;
   // 開立產品
-  product: TcertificatedProductDto[];
+  products: TcertificatedProductDto[];
   // 送審給擔保人的時間 //Date
   toGuarantorAt?: string | null;
   // 擔保人
@@ -4038,7 +4038,7 @@ export type TcertificatedDocDto = {
   //   contract: QuotationContractDto;
 };
 
-type TcertificatedProductDto = {
+export type TcertificatedProductDto = {
   // 項目名
   itemName: string;
   // L(mm)全寬
@@ -4061,7 +4061,7 @@ type TcertificatedProductDto = {
   settleProduct: TsettleProductDto;
 };
 
-type TsettleProductDto = {
+export type TsettleProductDto = {
   // 項目名
   itemName: string;
   // L(mm)全寬
@@ -4083,6 +4083,56 @@ type TsettleProductDto = {
 
   contentId: string | null;
   content: TquotationContentDto;
+};
+
+export type TcreateCertificatedDocDto = Pick<
+  TcertificatedDocDto,
+  | 'projectNumber'
+  | 'contractor'
+  | 'payment'
+  | 'paymentDate'
+  | 'applicationDate'
+  | 'projectName'
+  | 'valuation'
+  | 'retainage'
+  | 'disbursementDate'
+  | 'warrantyDate'
+  | 'description'
+  | 'docStyle'
+  | 'status'
+> & {
+  products: TcreateCertificatedProductDto[];
+};
+
+export type TupdateCertificatedDocDto = Pick<
+  TcertificatedDocDto,
+  | 'projectNumber'
+  | 'contractor'
+  | 'payment'
+  | 'paymentDate'
+  | 'applicationDate'
+  | 'projectName'
+  | 'valuation'
+  | 'retainage'
+  | 'disbursementDate'
+  | 'warrantyDate'
+  | 'description'
+  | 'note'
+  | 'docStyle'
+  | 'status'
+  | 'snapShot'
+> & {
+  products: TupdateCertificatedProductDto[];
+};
+
+export type TcreateCertificatedProductDto = {
+  settleProductId: string; // 最終產品ID
+  quantity: number;
+};
+
+export type TupdateCertificatedProductDto = {
+  settleProductId: string; // 最終產品ID
+  quantity: number;
 };
 
 // =============================================================================
