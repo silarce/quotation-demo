@@ -59,6 +59,8 @@ import {
   optionsCreator_bottomBarPlate_303AS,
   optionsCreator_boxB_SJ302,
   optionsCreator_boxB_SJ303A,
+  optionsCreator_boxB_SJ312,
+  optionsCreator_boxB_SJ305D,
   optionsCreator_horsePower,
   optionsCreator_quoteType,
   lookup_options_bottomBarAngleIronAndPlate,
@@ -1446,8 +1448,6 @@ class Class_product {
     // get /products/door/available-components取得的金額不是正確的金額
     // 正確的金額之後會在 post /products/door/generate-door-product-bom 取得
 
-    slat = _.cloneDeep(slat);
-
     if (this.doorType === 'SJ-305D' && slat) {
       const standardSlat_sj305D = availableComponents.slats.find((ac) => {
         return ac.name.includes('標準');
@@ -1458,6 +1458,7 @@ class Class_product {
       }
     }
 
+    slat = _.cloneDeep(slat);
     roller = _.cloneDeep(roller);
     headBox = _.cloneDeep(headBox);
     bottomBar = _.cloneDeep(bottomBar);
@@ -2276,11 +2277,14 @@ class Class_product {
 
     let options: Toption[] | undefined = undefined;
 
-    if (this.doorType === 'SJ-302') {
-      options = _.cloneDeep(optionsCreator_boxB_SJ302());
-    } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
-      options = _.cloneDeep(optionsCreator_boxB_SJ303A());
-    }
+    options = lookup_options_boxB[this.doorType];
+    options = _.cloneDeep(options);
+
+    // if (this.doorType === 'SJ-302') {
+    //   options = _.cloneDeep(optionsCreator_boxB_SJ302());
+    // } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
+    //   options = _.cloneDeep(optionsCreator_boxB_SJ303A());
+    // }
 
     // if (options) {
     //   options.unshift({
@@ -4639,6 +4643,16 @@ const calcDefaultMotor = ({ doorGeneralSpecs }: { doorGeneralSpecs: TdoorGeneral
 
 const check_isValueInOptions = (value: string, options: Toption[]) => {
   return options.some((item) => item.value === value);
+};
+
+const lookup_options_boxB: {
+  [doorType: string]: Toption[] | undefined;
+} = {
+  'SJ-302': optionsCreator_boxB_SJ302(),
+  'SJ-303A': optionsCreator_boxB_SJ303A(),
+  'SJ-303AS': optionsCreator_boxB_SJ303A(),
+  'SJ-305D': optionsCreator_boxB_SJ305D(),
+  'SJ-312': optionsCreator_boxB_SJ312(),
 };
 
 // ===========================================================
