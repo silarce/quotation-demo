@@ -55,18 +55,18 @@ type Tstate_remark = string;
 
 // =========================================================================
 
-const Selector = selectModalCreator_multi<['employee', 'employee']>({
+const Selector = selectModalCreator_multi<['employee']>({
   selectorArr: [
     {
       key: 'employee',
       caption: '擔保人',
       limit: 1,
     },
-    {
-      key: 'employee',
-      caption: '製表人',
-      limit: 1,
-    },
+    // {
+    //   key: 'employee',
+    //   caption: '製表人',
+    //   limit: 1,
+    // },
   ],
 });
 
@@ -106,13 +106,16 @@ export default function Edit({
   const [state_description, setState_description] = useState<Tstate_description>('');
   const [state_remark, setState_remark] = useState<Tstate_remark>('');
 
-  const [state_activeReviewer, setState_activeReviewer] = useState<{
-    guarantor: TemployeeDto | undefined;
-    tabulator: TemployeeDto | undefined;
-  }>({
-    guarantor: undefined,
-    tabulator: undefined,
-  });
+  // 擔保人
+  const [state_guarantor, setState_guarantor] = useState<TemployeeDto | undefined>(undefined);
+
+  // const [state_activeReviewer, setState_activeReviewer] = useState<{
+  //   guarantor: TemployeeDto | undefined;
+  //   tabulator: TemployeeDto | undefined;
+  // }>({
+  //   guarantor: undefined,
+  //   tabulator: undefined,
+  // });
 
   // ---------------------------------------------------------------------------
 
@@ -164,20 +167,18 @@ export default function Edit({
       {
         label: '擔保人',
         className: 'w-[210px]',
-        value: state_activeReviewer.guarantor?.chName,
-        onClick: () => !disabled && setState_showSelector(true),
+        value: state_guarantor?.chName,
       },
       {
         label: '製表人',
         className: 'w-[210px]',
-        value: state_activeReviewer.tabulator?.chName,
-        onClick: () => !disabled && setState_showSelector(true),
+        // value: state_activeReviewer.tabulator?.chName,
       },
     ];
 
     const defaultSeletedDataArrArr: Parameters<typeof Selector>[0]['defaultSeletedDataArrArr'] = [
-      state_activeReviewer.guarantor ? [state_activeReviewer.guarantor] : [],
-      state_activeReviewer.tabulator ? [state_activeReviewer.tabulator] : [],
+      state_guarantor ? [state_guarantor] : [],
+      // state_activeReviewer.tabulator ? [state_activeReviewer.tabulator] : [],
     ];
 
     const control_signature = {
@@ -188,7 +189,7 @@ export default function Edit({
       control_signature,
       defaultSeletedDataArrArr,
     };
-  }, [state_activeReviewer, disabled]);
+  }, [state_guarantor, disabled]);
 
   const panelList = usePanelList({
     disabled,
@@ -196,6 +197,7 @@ export default function Edit({
     query,
     router,
     setDisabled,
+    setState_showSelector,
   });
 
   // --------------------------------------------------------------------------
@@ -316,12 +318,8 @@ export default function Edit({
         defaultSeletedDataArrArr={defaultSeletedDataArrArr}
         onConfirm={(arr) => {
           const guarantor = arr[0][0];
-          const tabulator = arr[1][0];
 
-          setState_activeReviewer({
-            guarantor,
-            tabulator,
-          });
+          setState_guarantor(guarantor);
         }}
         onCancel={() => {
           setState_showSelector(false);
@@ -657,12 +655,14 @@ const usePanelList = ({
   query,
   router,
   setDisabled,
+  setState_showSelector,
 }: {
   disabled: boolean;
   isNew: boolean;
   query: Tquery;
   router: NextRouter;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
+  setState_showSelector: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const panelList = useMemo(() => {
     // const turnBack = () => {
@@ -695,7 +695,7 @@ const usePanelList = ({
         type: 'redButton',
         label: '送審',
         onClick: () => {
-          alert('送審');
+          setState_showSelector(true);
         },
       },
       {
