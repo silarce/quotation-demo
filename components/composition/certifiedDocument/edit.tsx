@@ -21,6 +21,12 @@ import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/tab
 // options
 import { optionsCreator_certifyType } from 'js/utils/options/productOptions';
 
+// icon
+import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
+
+// css
+import scss from './edit.module.scss';
+
 // =========================================================================
 
 type Tquery = {
@@ -527,6 +533,10 @@ const useControl_table = ({
       },
       cellArr: [
         {
+          children: <IconAddCircle className={classNames(scss.btn_svg, scss.btn_add, disabled && 'hidden')} />,
+          ...cellConfig.btn,
+        },
+        {
           children: cellConfig.itemName.label,
           ...cellConfig.itemName,
         },
@@ -558,6 +568,10 @@ const useControl_table = ({
         minHeight: tableConfig.row.minHeight,
         onClick: () => {},
         cellArr: [
+          {
+            children: <IconRemoveCircle className={classNames(scss.btn_svg, disabled && 'hidden')} />,
+            ...cellConfig.btn,
+          },
           {
             children: 'SD-1',
             ...cellConfig.itemName,
@@ -736,8 +750,9 @@ const usePanelList = ({
 //  ██████  ██████  ██   ████ ██      ██  ██████
 
 type TcellKeyArr =
-  | 'itemName'
+  | 'btn'
   //
+  | 'itemName'
   | 'size'
   | 'doorModel'
   | 'contractProdQty'
@@ -751,6 +766,11 @@ const tableConfig = {
 };
 
 const cellConfig: { [key in TcellKeyArr]: Tconfig_table } = {
+  btn: {
+    label: '',
+    width: 60,
+    justifyContent: 'center',
+  },
   itemName: {
     label: '項目',
     width: 150,
