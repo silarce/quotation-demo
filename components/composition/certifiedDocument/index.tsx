@@ -78,7 +78,7 @@ export default function CertifiedDocument({
       {/*  */}
       {isListShow && <CertifiedDocumentList />}
       {editCertifiedDocument && <Edit className="mt-10" onPanelChange={setDynPanelList} />}
-      {certificateId && <Certificate />}
+      {certificateId && <Certificate onPanelChange={setDynPanelList} />}
     </div>
   );
 }

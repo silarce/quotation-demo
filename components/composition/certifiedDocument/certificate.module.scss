@@ -1,7 +1,8 @@
 // 210 * 297
 
 .container {
-  padding: 40px;
+  position: relative;
+  padding: 100px;
   aspect-ratio: 210/297;
   border: solid 1px black;
 
@@ -13,7 +14,7 @@
 
 .title {
   text-align: center;
-  font-size: 60px;
+  font-size: 100px;
   font-weight: 600;
 }
 
@@ -30,7 +31,7 @@
   .infoBar {
     position: relative;
     display: grid;
-    grid-template-columns: 350px;
+    // grid-template-columns: 350px;
     gap: 10px;
     align-items: center;
     // margin-bottom: 20px;
@@ -53,20 +54,26 @@
   .table {
     width: auto;
     height: fit-content;
+    div,
+    span {
+      font-size: 20px;
+    }
   }
 }
 
-.textarea_autosize {
+.textarea {
   display: block;
-  width: 600px;
+  width: 800px;
+  height: 200px;
   margin: auto;
   margin-top: 50px;
   border: solid 1px theme("colors.border");
   resize: none;
   text-align: center;
-  font-size: 16px;
+  font-size: 30px;
   font-weight: 500;
-  &.disabled {
+  white-space: pre-wrap;
+  &.div {
     border: none;
   }
 }
@@ -74,15 +81,17 @@
 .footer {
   display: grid;
   // grid-template-columns: 3fr 2.5fr;
-  grid-template-columns: 450px 450px;
+  grid-template-columns: 650px 450px;
   grid-template-rows: max-content;
-  gap: 10px 450px;
-  justify-content: center;
-  font-size: 18px;
+  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
+
+  font-size: 30px;
 
   .footerDate {
     grid-column: span 2;
-    font-size: 18px;
+    font-size: 30px;
     text-align: center;
     margin-top: 25px;
     // margin-bottom: 50px;
@@ -96,4 +105,16 @@
   &:hover {
     fill: #14256a10;
   }
+}
+
+.seal {
+  position: absolute;
+  opacity: 0.5;
+  bottom: 300px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.suffix {
+  font-size: 30px;
 }
