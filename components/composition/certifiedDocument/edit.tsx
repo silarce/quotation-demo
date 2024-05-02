@@ -11,18 +11,15 @@ import { Wrapper, Wrapper_inpuSel_01, WrappedTextarea } from 'components/page/wo
 // ui
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import SignatureBar, {
-  Tcontrol_signatureBar,
-  TsignatureBarItem,
+  // Tcontrol_signatureBar,
+  // TsignatureBarItem,
   TemployeeDto,
 } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
-
-// component
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 // options
 import { optionsCreator_certifyType } from 'js/utils/options/productOptions';
-import { set } from 'lodash';
 
 // =========================================================================
 
@@ -96,7 +93,7 @@ export default function Edit({
 
   // ---------------------------------------------------------------------------
 
-  const [state_info, setState_info] = useState<Tstate_info>(emptyState_info);
+  const [state_info, setState_info] = useState<Tstate_info>(createEmptyState_info);
 
   const [state_itemList, setState_itemList] = useState<Tstate_itemList>({});
   const [state_description, setState_description] = useState<Tstate_description>('');
@@ -215,7 +212,7 @@ export default function Edit({
 
   useEffect(() => {
     if (!data_certifiedDocument) {
-      setState_info(emptyState_info);
+      setState_info(createEmptyState_info);
       setState_itemList({});
       setState_description('');
       setState_remark('');
@@ -620,6 +617,7 @@ const useControl_table = ({
 };
 
 // ---------------------------------------------------------------
+
 const usePanelList = ({
   //
   disabled,
@@ -666,6 +664,24 @@ const usePanelList = ({
         label: '送審',
         onClick: () => {
           alert('送審');
+        },
+      },
+      {
+        type: 'redButton',
+        label: '審核',
+        onClick: () => {
+          alert('審核');
+        },
+      },
+      {
+        type: 'myButton',
+        label: '開立證明書',
+        onClick: () => {
+          router.push({
+            query: {
+              certificateId: 'c-001',
+            },
+          });
         },
       },
       {
@@ -850,7 +866,7 @@ const fakeCertifiedDocument: TfakeCertifiedDocument = {
 //   itemArr: [],
 // };
 
-const emptyState_info: Tstate_info = {
+const createEmptyState_info = (): Tstate_info => ({
   documentType: '',
   applicationDate: null,
   projectNumber: '',
@@ -861,7 +877,7 @@ const emptyState_info: Tstate_info = {
   retainage: '',
   askForPaymentDate: null,
   loanDate: null,
-};
+});
 
 const useFakeGetApi = (id: string | undefined) => {
   const [res, setRes] = useState<TfakeCertifiedDocument | undefined>(undefined);

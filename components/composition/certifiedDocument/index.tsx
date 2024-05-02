@@ -8,11 +8,13 @@ import { TtagList as TtabList, TpanelList, Tlink, TlinkArr } from 'components/Pa
 // conmponent
 import CertifiedDocumentList from './certifiedDocumentList';
 import Edit from './edit';
+import Certificate from './certificate';
 
 type Tquery = {
   documentType?: string;
   editCertifiedDocument?: 'true';
   certifiedDocumentId?: string;
+  certificateId?: string;
 };
 
 export default function CertifiedDocument({
@@ -22,8 +24,8 @@ export default function CertifiedDocument({
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { documentType, editCertifiedDocument, certifiedDocumentId } = query;
-  const isListShow = !editCertifiedDocument;
+  const { documentType, editCertifiedDocument, certifiedDocumentId, certificateId } = query;
+  const isListShow = !editCertifiedDocument && !certificateId;
 
   // ---------------------------------------------------------------------------
 
@@ -72,10 +74,11 @@ export default function CertifiedDocument({
   }, [panelList]);
 
   return (
-    <div className="ml-10">
+    <div className="ml-10 mr-10">
       {/*  */}
       {isListShow && <CertifiedDocumentList />}
       {editCertifiedDocument && <Edit className="mt-10" onPanelChange={setDynPanelList} />}
+      {certificateId && <Certificate />}
     </div>
   );
 }
