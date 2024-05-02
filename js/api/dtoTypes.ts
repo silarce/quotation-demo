@@ -4020,6 +4020,9 @@ export type TcertificatedDocDto = {
   // 經辦
   agentEmployee?: TemployeeDto | null;
 
+  // 保固日
+  warrantyDate: string | null;
+
   // _____________
   // 所屬合約Id
   contractId: string | null;

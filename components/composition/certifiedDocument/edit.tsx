@@ -45,6 +45,7 @@ type Tstate_info = {
   retainage: string; // 保留款
   askForPaymentDate: Moment | null;
   loanDate: Moment | null;
+  warrantyDate: Moment | null; // 保固日
 };
 type Tstate_itemList = {
   [key: string]: string;
@@ -131,7 +132,10 @@ export default function Edit({
     });
   };
 
-  const editDate = (key: 'applicationDate' | 'askForPaymentDate' | 'loanDate', value: Moment | null) => {
+  const editDate = (
+    key: 'applicationDate' | 'askForPaymentDate' | 'loanDate' | 'warrantyDate',
+    value: Moment | null
+  ) => {
     setState_info((state) => {
       return {
         ...state,
@@ -236,6 +240,7 @@ export default function Edit({
           ? moment(data_certifiedDocument.askForPaymentDate)
           : null,
         loanDate: data_certifiedDocument.loanDate ? moment(data_certifiedDocument.loanDate) : null,
+        warrantyDate: data_certifiedDocument.warrantyDate ? moment(data_certifiedDocument.warrantyDate) : null,
       });
 
       setState_itemList(() => {
@@ -364,7 +369,7 @@ const InputGroup = ({
     loanDate: Moment | null;
   };
   editInfo: (key: keyof Omit<Tstate_info, 'applicationDate' | 'askForPaymentDate' | 'loanDate'>, value: string) => void;
-  editDate: (key: 'applicationDate' | 'askForPaymentDate' | 'loanDate', value: Moment | null) => void;
+  editDate: (key: 'applicationDate' | 'askForPaymentDate' | 'loanDate' | 'warrantyDate', value: Moment | null) => void;
 }) => {
   return (
     <Wrapper_inpuSel_01 className="w-[845px]">
@@ -497,6 +502,19 @@ const InputGroup = ({
             value: data.loanDate,
             onChange: (m) => {
               editDate('loanDate', m);
+            },
+          },
+        }}
+      />
+
+      <InputSel
+        caption="保固日"
+        disabled={disabled}
+        datePickerProps={{
+          props: {
+            value: data.loanDate,
+            onChange: (m) => {
+              editDate('warrantyDate', m);
             },
           },
         }}
@@ -823,6 +841,7 @@ type TfakeCertifiedDocument = {
   loanDate: string;
   description: string;
   remark: string;
+  warrantyDate: string;
   itemArr: {
     id: string;
     itemName: string;
@@ -848,6 +867,7 @@ const fakeCertifiedDocument: TfakeCertifiedDocument = {
   loanDate: '2011-01-01',
   description: '喵喵喵',
   remark: '喵喵喵',
+  warrantyDate: '2022-02-02',
   itemArr: [
     {
       id: 'i-001',
@@ -897,6 +917,7 @@ const createEmptyState_info = (): Tstate_info => ({
   retainage: '',
   askForPaymentDate: null,
   loanDate: null,
+  warrantyDate: null,
 });
 
 const useFakeGetApi = (id: string | undefined) => {
