@@ -20,6 +20,9 @@ import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/tab
 
 import scss from './certificate.module.scss';
 
+// config
+import { companyInfo } from 'config/companyInfo';
+
 // ===============================================================================
 
 // ===============================================================================
@@ -390,10 +393,10 @@ export default function Certificate({
       {disabled && <div className={classNames(scss.textarea, scss.div)}>{state_description}</div>}
 
       <div className={scss.footer}>
-        <div>台中總公司：台中市霧峰區峰北路666號</div>
-        <div>TEL：04-2406-9939</div>
-        <div>台北分公司：台北市內湖路一段387巷5號2F之2</div>
-        <div>TEL：02-2658-1508</div>
+        <div>台中總公司：{companyInfo.headOffice.wholeAddress}</div>
+        <div>TEL：{companyInfo.headOffice.tel}</div>
+        <div>台北分公司：{companyInfo.taipeiOffice.wholeAddress}</div>
+        <div>TEL：{companyInfo.taipeiOffice.tel}</div>
         <div className={scss.footerDate}>
           中華民國 {999} 年 {99} 月 {99} 日
         </div>
