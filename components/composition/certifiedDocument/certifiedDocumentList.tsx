@@ -13,6 +13,9 @@ import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/proc
 // icon
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
+// type
+import { TdocType } from 'js/api/dtoTypes';
+
 // css
 import scss from './certifiedDocumentList.module.scss';
 
@@ -23,7 +26,13 @@ type Tquery = {
 };
 
 // =============================================================================
-export default function CertifiedDocumentList({ className }: { className?: string }) {
+export default function CertifiedDocumentList({
+  showDocType,
+  className,
+}: {
+  showDocType?: TdocType[];
+  className?: string;
+}) {
   const router = useRouter();
   const query = router.query as Tquery;
   const { documentType = 'fireproof' } = query;
@@ -175,7 +184,7 @@ export default function CertifiedDocumentList({ className }: { className?: strin
   }, []);
 
   // ========================================================================
-  const tabArr: Ttab[] = [
+  let tabArr: Ttab[] = [
     {
       label: '防火證明',
       isActive: documentType === 'fireproof',
@@ -205,7 +214,7 @@ export default function CertifiedDocumentList({ className }: { className?: strin
       },
     },
     {
-      label: '保固證明',
+      label: '保固書',
       isActive: documentType === 'warranty',
       // className: ,
       // style: ,
@@ -219,6 +228,10 @@ export default function CertifiedDocumentList({ className }: { className?: strin
       },
     },
   ];
+
+  if (showDocType) {
+    tabArr = tabArr.filter((tab) => showDocType.includes(tab.label as TdocType));
+  }
 
   return (
     <div>

@@ -160,6 +160,16 @@ export default function PageHeader({
       },
     },
     {
+      label: '保固書',
+      href: {
+        pathname: `${pathHead}/certifiedDocument`,
+        query: {
+          contractId,
+          version,
+        },
+      },
+    },
+    {
       label: '修繕報價',
       disabled: true,
       href: {
@@ -170,6 +180,7 @@ export default function PageHeader({
         },
       },
     },
+
     {
       label: '證明書/保固書',
       disabled: true,

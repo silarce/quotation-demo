@@ -4016,6 +4016,11 @@ export type TcertificatedDocDto = {
   reviewManagerEmployee?: TemployeeDto | null;
   // 總經理審核時間 // Date
   managerReviewedAt?: string | null;
+
+  // 經辦
+  agentEmployee?: TemployeeDto | null;
+
+  // _____________
   // 所屬合約Id
   contractId: string | null;
   // 所屬合約

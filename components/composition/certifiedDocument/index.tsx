@@ -10,6 +10,11 @@ import CertifiedDocumentList from './certifiedDocumentList';
 import Edit from './edit';
 import Certificate from './certificate';
 
+// type
+import { TdocType } from 'js/api/dtoTypes';
+
+// ======================================================================
+
 type Tquery = {
   documentType?: string;
   editCertifiedDocument?: 'true';
@@ -17,10 +22,14 @@ type Tquery = {
   certificateId?: string;
 };
 
+// ======================================================================
+
 export default function CertifiedDocument({
   onPanelListChange,
+  showDocType,
 }: {
-  onPanelListChange: (panelList: TpanelList | undefined) => void;
+  onPanelListChange?: (panelList: TpanelList | undefined) => void;
+  showDocType?: TdocType[];
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -66,17 +75,17 @@ export default function CertifiedDocument({
   }, [dynyPanelList]);
 
   useEffect(() => {
-    onPanelListChange(panelList);
+    onPanelListChange?.(panelList);
 
     return () => {
-      onPanelListChange(undefined);
+      onPanelListChange?.(undefined);
     };
   }, [panelList]);
 
   return (
     <div className="ml-10 mr-10 pb-10">
       {/*  */}
-      {isListShow && <CertifiedDocumentList />}
+      {isListShow && <CertifiedDocumentList showDocType={showDocType} />}
       {editCertifiedDocument && <Edit className="mt-10" onPanelChange={setDynPanelList} />}
       {certificateId && <Certificate onPanelChange={setDynPanelList} />}
     </div>
