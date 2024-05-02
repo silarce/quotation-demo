@@ -30,6 +30,8 @@ export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳'
 
 export type TdeliveryStatus = '未安裝' | '已安裝' | '已結清';
 
+export type TdocType = '防火證明' | '出廠證明' | '保固書';
+
 // =============================================================
 
 export type TfileDto = {
@@ -3953,6 +3955,126 @@ export type TcreateMemorandumDto = {
   purpose: string;
   description: string;
   rootMailId: string | null;
+};
+
+// =============================================================================
+
+// 證明文件
+
+export type TcertificatedDocDto = {
+  // 工程編號
+  projectNumber: string | null;
+  // 承包商
+  contractor: string | null;
+  // 本期請款
+  payment: number | null;
+  // 請款日
+  paymentDate: string | null;
+  // 申請日期
+  applicationDate: Date | null;
+  // 工程名稱
+  projectName: string | null;
+  // 本期計價
+  valuation: number | null;
+  // 保留款
+  retainage: number | null;
+  // 放款日
+  disbursementDate: string | null;
+  // 說明
+  description: string | null;
+  // 備註
+  note: string | null;
+  // 文件種類
+  docStyle: TdocType;
+  // 證明書開立快照
+  snapShot: string | null;
+  // 狀態(審核中/審核完成尚未用印/已印出)
+  status: boolean;
+  // 開立產品
+  product: TcertificatedProductDto[];
+  // 送審給擔保人的時間 //Date
+  toGuarantorAt?: string | null;
+  // 擔保人
+  reviewGuarantorEmployee?: TemployeeDto | null;
+  // 擔保人審核時間 // Date
+  guarantorReviewedAt?: string | null;
+  // 送審給會計的時間 // Date
+  toAccountingAt?: string | null;
+  // 會計
+  reviewAccountingEmployee?: TemployeeDto | null;
+  // 會計審核時間 // Date
+  accountingReviewedAt?: string | null;
+  // 送審給"審核"的時間 // Date
+  toAuditorAt?: string | null;
+  // "審核"人
+  reviewAuditorEmployee?: TemployeeDto | null;
+  // "審核"人審核時間 // Date
+  auditorReviewedAt?: string | null;
+  // 送審給總經理的時間 // Date
+  toManagerAt?: string | null;
+  // 總經理
+  reviewManagerEmployee?: TemployeeDto | null;
+  // 總經理審核時間 // Date
+  managerReviewedAt?: string | null;
+  // 所屬合約Id
+  contractId: string | null;
+  // 所屬合約
+  contract: TquotationContractDto;
+
+  // 以上的最後這兩個 可能會改成content 還沒決定
+
+  // @ApiProperty({ description: '所屬合約Id' })
+  //   contractId: string | null;
+
+  //   @ApiProperty({ description: '所屬合約' })
+  //   contract: QuotationContractDto;
+};
+
+type TcertificatedProductDto = {
+  // 項目名
+  itemName: string;
+  // L(mm)全寬
+  fullWidth: number;
+  // h(mm)高
+  height: number;
+  // B(mm)
+  boxB: number | null;
+  // 門型
+  doorModelName: string;
+  // 數量(應皆為1)
+  quantity: number;
+  // 防火證明已開立
+  firePreventionCertificated: boolean;
+  // 出廠證明已開立
+  factoryCertificated: boolean;
+  // 保固證明已開立
+  warrantyCertificated: boolean;
+  settleProductId: string | null;
+  settleProduct: TsettleProductDto;
+};
+
+type TsettleProductDto = {
+  // 項目名
+  itemName: string;
+  // L(mm)全寬
+  fullWidth: number;
+  // h(mm)高
+  height: number;
+  // B(mm)
+  boxB: number | null;
+  // 門型
+  doorModelName: string;
+  // 合約最終數量
+  quantity: number;
+  // 防火證明已開立數量
+  firePreventionCertificatedQuantity: number | null;
+  // 出廠證明已開立數量
+  factoryCertificatedQuantity: number | null;
+  // 保固證明已開立數量
+  warrantyCertificatedQuantity: number | null;
+
+  contentId: string | null;
+  content: TquotationContentDto;
 };
 
 // =============================================================================
