@@ -202,6 +202,8 @@ export default function Certificate({
     };
 
     const bodyRowArr: Ttable['tbody']['rowArr'] = state_itemArr.map((item, index) => {
+      // html2canvas在擷取HTML時textarea與input會跑版
+      // 因此要匯出時要將input與textarea的value顯示在suffix
       const inputProps_itemName: TinputProps | undefined = disabled
         ? undefined
         : {
@@ -234,7 +236,6 @@ export default function Certificate({
         minHeight: tableConfig.row.minHeight,
         cellArr: [
           {
-            // children: item.itemName,
             children: (
               <InputSel
                 //
@@ -372,6 +373,10 @@ export default function Certificate({
         <Table01 className={scss.table} {...tableProps} />
       </div>
 
+      {/*     
+      // html2canvas在擷取HTML時textarea與input會跑版
+      // 因此要匯出時要將input與textarea的value放在非input與textarea的元素
+       */}
       {!disabled && (
         <Textarea_autosize
           //
@@ -382,7 +387,6 @@ export default function Certificate({
           }}
         />
       )}
-
       {disabled && <div className={classNames(scss.textarea, scss.div)}>{state_description}</div>}
 
       <div className={scss.footer}>
