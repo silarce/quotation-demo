@@ -11,7 +11,10 @@ import Edit from './edit';
 import Certificate from './certificate';
 
 // type
-import { TdocType } from 'js/api/dtoTypes';
+import { TdocType, TquotationContractDto } from 'js/api/dtoTypes';
+
+// api
+import { useGetContract_id } from 'js/api/api_quotation';
 
 // ======================================================================
 
@@ -20,6 +23,7 @@ type Tquery = {
   editCertifiedDocument?: 'true';
   certifiedDocumentId?: string;
   certificateId?: string;
+  contractId?: string | undefined;
 };
 
 // ======================================================================
@@ -27,32 +31,31 @@ type Tquery = {
 export default function CertifiedDocument({
   onPanelListChange,
   showDocType,
+  contractFromParent,
 }: {
   onPanelListChange?: (panelList: TpanelList | undefined) => void;
   showDocType?: TdocType[];
+  contractFromParent?: TquotationContractDto;
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { documentType, editCertifiedDocument, certifiedDocumentId, certificateId } = query;
+  const { contractId, documentType, editCertifiedDocument, certifiedDocumentId, certificateId } = query;
   const isListShow = !editCertifiedDocument && !certificateId;
+
+  // ---------------------------------------------------------------------------
+
+  const { data: data_contract = contractFromParent, update: update_contract } = useGetContract_id(contractId, {
+    customPopulate: [
+      // 'certificatedDoc',
+      'content.settleProducts',
+    ],
+  });
 
   // ---------------------------------------------------------------------------
 
   const [dynyPanelList, setDynPanelList] = useState<TpanelList | undefined>();
 
   // ---------------------------------------------------------------------------
-
-  // 卸載元件時將documentType從query中移除
-  useEffect(() => {
-    return () => {
-      const query_copy = { ...query };
-      delete query_copy.documentType;
-      router.push({
-        query: query_copy,
-      });
-    };
-  }, []);
-
   const panelList: TpanelList = useMemo(() => {
     const panelList_list: TpanelList = [
       {
@@ -74,6 +77,8 @@ export default function CertifiedDocument({
     return dynyPanelList || defaultPanelList;
   }, [dynyPanelList]);
 
+  // ---------------------------------------------------------------------------
+
   useEffect(() => {
     onPanelListChange?.(panelList);
 
@@ -82,11 +87,36 @@ export default function CertifiedDocument({
     };
   }, [panelList]);
 
+  // 卸載元件時將documentType從query中移除
+  useEffect(() => {
+    return () => {
+      const query_copy = { ...query };
+      delete query_copy.documentType;
+      router.push({
+        query: query_copy,
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!contractFromParent) {
+      update_contract();
+    }
+  }, [contractId, contractFromParent]);
+
+  // ---------------------------------------------------------------------------
   return (
     <div className="ml-10 mr-10 pb-10">
       {/*  */}
       {isListShow && <CertifiedDocumentList showDocType={showDocType} />}
-      {editCertifiedDocument && <Edit className="mt-10" onPanelChange={setDynPanelList} />}
+      {editCertifiedDocument && (
+        <Edit
+          //
+          className="mt-10"
+          onPanelChange={setDynPanelList}
+          contract={data_contract}
+        />
+      )}
       {certificateId && <Certificate onPanelChange={setDynPanelList} />}
     </div>
   );

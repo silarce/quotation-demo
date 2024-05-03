@@ -24,6 +24,9 @@ import { optionsCreator_certifyType } from 'js/utils/options/productOptions';
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
+// type
+import { TdocType, TquotationContractDto } from 'js/api/dtoTypes';
+
 // css
 import scss from './edit.module.scss';
 
@@ -32,6 +35,7 @@ import scss from './edit.module.scss';
 type Tquery = {
   editCertifiedDocument: 'true' | undefined;
   certifiedDocumentId: string | undefined;
+  contractId: string | undefined;
 };
 
 type Tstate_info = {
@@ -84,13 +88,15 @@ const Selector_memo = memo(Selector, (preState, nextState) => {
 export default function Edit({
   className,
   onPanelChange,
+  contract,
 }: {
   className?: string;
   onPanelChange: (panel: TpanelList | undefined) => void;
+  contract?: TquotationContractDto;
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { editCertifiedDocument, certifiedDocumentId } = query;
+  const { contractId, editCertifiedDocument, certifiedDocumentId } = query;
   const isNew = !certifiedDocumentId;
 
   // ---------------------------------------------------------------------------
