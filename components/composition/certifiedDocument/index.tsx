@@ -62,9 +62,14 @@ export default function CertifiedDocument({
         type: 'myButton',
         label: '新增',
         onClick: () => {
+          const query_copy = { ...query };
+          // delete query_copy.documentType;
+
+          // router.push({ query });
+
           router.push({
             query: {
-              ...query,
+              ...query_copy,
               editCertifiedDocument: 'true',
             },
           });
@@ -75,7 +80,7 @@ export default function CertifiedDocument({
     const defaultPanelList = panelList_list;
 
     return dynyPanelList || defaultPanelList;
-  }, [dynyPanelList]);
+  }, [dynyPanelList, query]);
 
   // ---------------------------------------------------------------------------
 
@@ -87,12 +92,15 @@ export default function CertifiedDocument({
     };
   }, [panelList]);
 
-  // 卸載元件時將documentType從query中移除
+  //
   useEffect(() => {
     return () => {
       const query_copy = { ...query };
       delete query_copy.documentType;
-      router.push({
+      delete query_copy.editCertifiedDocument;
+      delete query_copy.certifiedDocumentId;
+
+      router.replace({
         query: query_copy,
       });
     };

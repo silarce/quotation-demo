@@ -267,7 +267,7 @@ export default function CertifiedDocumentList({
       // className: ,
       // style: ,
       onClick: () => {
-        router.push({
+        router.replace({
           query: {
             ...query,
             documentType: '防火證明',
@@ -281,7 +281,7 @@ export default function CertifiedDocumentList({
       // className: ,
       // style: ,
       onClick: () => {
-        router.push({
+        router.replace({
           query: {
             ...query,
             documentType: '出廠證明',
@@ -295,7 +295,7 @@ export default function CertifiedDocumentList({
       // className: ,
       // style: ,
       onClick: () => {
-        router.push({
+        router.replace({
           query: {
             ...query,
             documentType: '保固書',

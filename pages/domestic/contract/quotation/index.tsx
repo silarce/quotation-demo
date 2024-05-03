@@ -1004,7 +1004,9 @@ version>1 是子合約
           />
         )}
 
-        {state_tab === 'certifiedDocument' && <CertifiedDocument onPanelListChange={dynaPanelListReducer} />}
+        {state_tab === 'certifiedDocument' && (
+          <CertifiedDocument onPanelListChange={dynaPanelListReducer} contractFromParent={contract} />
+        )}
 
         <InputModal
           visible={!!inputModalConfig?.visible}

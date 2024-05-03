@@ -51,15 +51,17 @@ type Tstate_info = {
   loanDate: Moment | null;
   warrantyDate: Moment | null; // 保固日
 };
+
 type Tstate_itemList = {
   [key: string]: string;
 };
+
 type Tstate_description = string;
 type Tstate_remark = string;
 
 // =========================================================================
 
-const Selector = selectModalCreator_multi<['employee']>({
+const Selector_employee = selectModalCreator_multi<['employee']>({
   selectorArr: [
     {
       key: 'employee',
@@ -74,7 +76,20 @@ const Selector = selectModalCreator_multi<['employee']>({
   ],
 });
 
-const Selector_memo = memo(Selector, (preState, nextState) => {
+const Selector_settleProduct = selectModalCreator_multi<['settleProduct']>({
+  selectorArr: [
+    {
+      key: 'settleProduct',
+      caption: '結算產品',
+    },
+  ],
+});
+
+const Selector_employee_memo = memo(Selector_employee, (preState, nextState) => {
+  return preState.showModal === nextState.showModal;
+});
+
+const Selector_settleProduct_memo = memo(Selector_settleProduct, (preState, nextState) => {
   return preState.showModal === nextState.showModal;
 });
 
@@ -102,7 +117,8 @@ export default function Edit({
   // ---------------------------------------------------------------------------
 
   const [disabled, setDisabled] = useState(!isNew);
-  const [state_showSelector, setState_showSelector] = useState(false);
+  const [state_showSelector_employee, setState_showSelector_employee] = useState(false);
+  const [state_showSelector_settleProduct, setState_showSelector_settleProduct] = useState(false);
 
   // ---------------------------------------------------------------------------
 
@@ -182,7 +198,7 @@ export default function Edit({
       },
     ];
 
-    const defaultSeletedDataArrArr: Parameters<typeof Selector>[0]['defaultSeletedDataArrArr'] = [
+    const defaultSeletedDataArrArr: Parameters<typeof Selector_employee>[0]['defaultSeletedDataArrArr'] = [
       state_guarantor ? [state_guarantor] : [],
       // state_activeReviewer.tabulator ? [state_activeReviewer.tabulator] : [],
     ];
@@ -203,7 +219,7 @@ export default function Edit({
     query,
     router,
     setDisabled,
-    setState_showSelector,
+    setState_showSelector: setState_showSelector_employee,
   });
 
   // --------------------------------------------------------------------------
@@ -212,6 +228,7 @@ export default function Edit({
     disabled,
     data: state_itemList,
     editItem,
+    setState_showSelector_settleProduct,
   });
 
   // --------------------------------------------------------------------------
@@ -223,6 +240,20 @@ export default function Edit({
       onPanelChange(undefined);
     };
   }, [panelList]);
+
+  useEffect(() => {
+    // router.replace({
+    //   query,
+    // });
+    // return () => {
+    //   const query_copy = { ...query };
+    //   delete query_copy.editCertifiedDocument;
+    //   // delete query_copy.certifiedDocumentId;
+    //   router.replace({
+    //     query: query_copy,
+    //   });
+    // };
+  }, []);
 
   useEffect(() => {
     update_data_CertifiedDocument();
@@ -319,8 +350,8 @@ export default function Edit({
           style={{ justifyContent: 'flex-start', gap: '50px' }}
         />
       </div>
-      <Selector_memo
-        showModal={state_showSelector}
+      <Selector_employee_memo
+        showModal={state_showSelector_employee}
         defaultSeletedDataArrArr={defaultSeletedDataArrArr}
         onConfirm={(arr) => {
           const guarantor = arr[0][0];
@@ -328,8 +359,24 @@ export default function Edit({
           setState_guarantor(guarantor);
         }}
         onCancel={() => {
-          setState_showSelector(false);
+          setState_showSelector_employee(false);
         }}
+      />
+
+      <Selector_settleProduct_memo
+        //
+        showModal={state_showSelector_settleProduct}
+        onConfirm={() => {}}
+        onCancel={() => {
+          setState_showSelector_settleProduct(false);
+        }}
+        dynaSelectorPropsList={[
+          {
+            useNoMetaProps: {
+              id: contract?.content.id ?? '',
+            },
+          },
+        ]}
       />
     </div>
   );
@@ -539,10 +586,12 @@ const useControl_table = ({
   disabled,
   data,
   editItem,
+  setState_showSelector_settleProduct,
 }: {
   disabled?: boolean;
   data: Tstate_itemList;
   editItem: (key: string, value: string) => void;
+  setState_showSelector_settleProduct: React.Dispatch<React.SetStateAction<boolean>>;
 }): Ttable => {
   //
   const control_table: Ttable = useMemo(() => {
@@ -555,7 +604,12 @@ const useControl_table = ({
       },
       cellArr: [
         {
-          children: <IconAddCircle className={classNames(scss.btn_svg, scss.btn_add, disabled && 'hidden')} />,
+          children: (
+            <IconAddCircle
+              className={classNames(scss.btn_svg, scss.btn_add, disabled && 'hidden')}
+              onClick={() => setState_showSelector_settleProduct(true)}
+            />
+          ),
           ...cellConfig.btn,
         },
         {
@@ -591,7 +645,12 @@ const useControl_table = ({
         onClick: () => {},
         cellArr: [
           {
-            children: <IconRemoveCircle className={classNames(scss.btn_svg, disabled && 'hidden')} />,
+            children: (
+              <IconRemoveCircle
+                className={classNames(scss.btn_svg, disabled && 'hidden')}
+                onClick={() => alert('test')}
+              />
+            ),
             ...cellConfig.btn,
           },
           {
@@ -732,6 +791,7 @@ const usePanelList = ({
       {
         type: 'myButton',
         label: '返回',
+        // onClick: router.back,
         onClick: router.back,
       },
     ];
