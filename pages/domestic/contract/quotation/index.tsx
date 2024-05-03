@@ -176,7 +176,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
 
-  const { data: contract, update } = useGetContract_id_noItems_2(id as string | undefined);
+  const { data: contract, update } = useGetContract_id_noItems_2(id, { populate: ['content.settleProducts'] });
   const engineeringContactId = contract?.engineeringContactId;
 
   useEffect(() => {

@@ -4047,6 +4047,10 @@ export type TcertificatedDocDto = {
 };
 
 export type TcertificatedProductDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 項目名
   itemName: string;
   // L(mm)全寬

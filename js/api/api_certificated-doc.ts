@@ -257,9 +257,9 @@ const useGetQuotationContentSettleProduct_pseudoMeta = createUseInfinite<TpageRe
 // ========================================================================
 export {
   //
+  useGetCertificatedDoc,
   useGetCertificatedDoc_infinite,
   useGetCertificatedDoc_id,
-  useGetCertificatedDoc,
   apiPostCertificatedDoc,
   apiPatchCertificatedDoc,
   apiDeleteCertificatedDoc,
