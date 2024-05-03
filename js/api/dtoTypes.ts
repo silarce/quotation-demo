@@ -3962,6 +3962,10 @@ export type TcreateMemorandumDto = {
 // 證明文件
 
 export type TcertificatedDocDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 工程編號
   projectNumber: string | null;
   // 承包商
@@ -3986,7 +3990,7 @@ export type TcertificatedDocDto = {
   note: string | null;
   // 文件種類
   docStyle: TdocType;
-  // 證明書開立快照
+  // 證明書開立快照 // 就是證明書內的資料，是JSON，資料結構與內容全由前端決定
   snapShot: string | null;
   // 狀態(審核中/審核完成尚未用印/已印出)
   status: boolean;

@@ -49,6 +49,42 @@ const useGetCertificatedDoc_infinite = createUseInfinite<TpageResponse<Tcertific
   errTitle: '取得證明文件列表失敗',
 });
 
+const useGetCertificatedDoc = (params?: Tparams) => {
+  const [res, setRes] = useState<TpageResponse<TcertificatedDocDto> | undefined>(undefined);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+
+  params = {
+    pageSize: 99999,
+    ...params,
+  };
+
+  const update = async () => {
+    setIsFetching(true);
+
+    return await apiGetCertificatedDoc(params)
+      .then((res) => {
+        setRes(res);
+
+        return res;
+      })
+      .catch((err: AxiosError) => {
+        myAlert.err({ title: '取得證明文件列表失敗', content: err.message });
+
+        return Promise.reject(err);
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+    isFetching,
+  };
+};
+
 // --------------------------------------------------------------------
 const apiGetCertificatedDoc_id = async (id: string) => {
   const api = `/certificated-doc/${id}`;
@@ -134,6 +170,7 @@ export {
   //
   useGetCertificatedDoc_infinite,
   useGetCertificatedDoc_id,
+  useGetCertificatedDoc,
   apiPostCertificatedDoc,
   apiPatchCertificatedDoc,
   apiDeleteCertificatedDoc,

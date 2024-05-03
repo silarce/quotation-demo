@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import classNames from 'classnames';
@@ -13,29 +13,53 @@ import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/proc
 // icon
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
-// type
-import { TdocType } from 'js/api/dtoTypes';
-
 // css
 import scss from './certifiedDocumentList.module.scss';
+
+// utils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+// api
+import { Tparams, TdocType, useGetCertificatedDoc } from 'js/api/api_certificated-doc';
 
 // ===================================== ========================================
 
 type Tquery = {
-  documentType: undefined | 'fireproof' | 'factory' | 'warranty';
+  documentType: undefined | TdocType;
 };
 
 // =============================================================================
 export default function CertifiedDocumentList({
   showDocType,
   className,
+  defaultDocumentType = '防火證明',
 }: {
   showDocType?: TdocType[];
   className?: string;
+  defaultDocumentType?: TdocType;
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { documentType = 'fireproof' } = query;
+  const { documentType = defaultDocumentType } = query;
+
+  // ========================================================================
+
+  const params: Tparams = {
+    populate: [
+      'products',
+      'reviewGuarantorEmployee',
+      'reviewAccountingEmployee',
+      'reviewAuditorEmployee',
+      'reviewManagerEmployee',
+      'agentEmployee',
+    ],
+
+    filter: {
+      docStyle: { $eq: documentType },
+    },
+  };
+
+  const { data: data_certificatedDocArr = [], update: update_certificatedDoc } = useGetCertificatedDoc(params);
 
   // ========================================================================
 
@@ -61,18 +85,18 @@ export default function CertifiedDocumentList({
           children: cellConfig.certifyType.label,
           ...cellConfig.certifyType,
         },
-        {
-          children: cellConfig.itemName.label,
-          ...cellConfig.itemName,
-        },
-        {
-          children: cellConfig.size.label,
-          ...cellConfig.size,
-        },
-        {
-          children: cellConfig.doorModel.label,
-          ...cellConfig.doorModel,
-        },
+        // {
+        //   children: cellConfig.itemName.label,
+        //   ...cellConfig.itemName,
+        // },
+        // {
+        //   children: cellConfig.size.label,
+        //   ...cellConfig.size,
+        // },
+        // {
+        //   children: cellConfig.doorModel.label,
+        //   ...cellConfig.doorModel,
+        // },
         {
           children: cellConfig.qty.label,
           ...cellConfig.qty,
@@ -84,30 +108,76 @@ export default function CertifiedDocumentList({
       ],
     };
 
-    const fooArr = Array(20).fill('foo');
+    const tbodyRowArr: Ttable['tbody']['rowArr'] = data_certificatedDocArr.map((data) => {
+      const {
+        id,
+        createdAt,
 
-    const tbodyRowArr: Ttable['tbody']['rowArr'] = fooArr.map(() => {
+        // projectNumber,
+        // contractor, // 承包商
+        // payment, // 本期請款
+        // paymentDate,
+        // applicationDate, // 申請日期
+        // projectName,
+        // valuation, // 本期計價
+        // retainage, // 保留款
+        // disbursementDate, // 放款日
+        // warrantyDate, // 保固日
+        // description,
+        // note,
+
+        docStyle, // 文件種類
+        // snapShot, // 證明書開立快照
+
+        // status, // 狀態(審核中/審核完成尚未用印/已印出)
+
+        products, // 開立產品
+
+        toGuarantorAt,
+        reviewGuarantorEmployee,
+        guarantorReviewedAt,
+
+        toAccountingAt,
+        reviewAccountingEmployee,
+        accountingReviewedAt,
+
+        toAuditorAt,
+        reviewAuditorEmployee,
+        auditorReviewedAt,
+
+        toManagerAt,
+        reviewManagerEmployee,
+        managerReviewedAt,
+
+        agentEmployee,
+
+        // contractId,
+        // contract,
+      } = data;
+
+      const qty = products.length;
+
       const control_processChain: Tcontrol_processChain = {
         statusArr: [
           {
-            label: `製表 ${'fooo'}`,
-            dotColor: 'gray',
+            label: `製表 ${agentEmployee?.chName ?? ''}`,
+            dotColor: 'green',
           },
           {
-            label: `擔保 ${'fooo'}`,
-            dotColor: 'gray',
+            label: `擔保 ${reviewGuarantorEmployee?.chName ?? ''}`,
+            dotColor: checkReview(toGuarantorAt, guarantorReviewedAt),
           },
           {
-            label: `會計 ${'fooo'}`,
-            dotColor: 'gray',
+            label: `會計 ${reviewAccountingEmployee?.chName ?? ''}`,
+            dotColor: checkReview(toAccountingAt, accountingReviewedAt),
           },
           {
-            label: `審核 ${'fooo'}`,
-            dotColor: 'gray',
+            label: `審核 ${reviewAuditorEmployee?.chName ?? ''}`,
+            dotColor: checkReview(toAuditorAt, auditorReviewedAt),
           },
           {
-            label: `總經理 ${'foooo'}`,
-            dotColor: 'gray',
+            label: `總經理 ${reviewManagerEmployee?.chName ?? ''}`,
+            dotColor: checkReview(toManagerAt, managerReviewedAt),
           },
         ],
       };
@@ -118,31 +188,31 @@ export default function CertifiedDocumentList({
         className: scss.row,
         cellArr: [
           {
-            children: '已審核',
+            children: 'status',
             width: cellConfig.reviewStatus.width,
           },
           {
-            children: '2021-09-01',
+            children: getTaiwanDateStr(createdAt),
             ...cellConfig.createdAt,
           },
           {
-            children: '防火影本開立證明文件',
+            children: docStyle,
             ...cellConfig.certifyType,
           },
+          // {
+          //   children: 'SD-111',
+          //   ...cellConfig.itemName,
+          // },
+          // {
+          //   children: '200 * 200 + 200',
+          //   ...cellConfig.size,
+          // },
+          // {
+          //   children: 'SJ-305D',
+          //   ...cellConfig.doorModel,
+          // },
           {
-            children: 'SD-111',
-            ...cellConfig.itemName,
-          },
-          {
-            children: '200 * 200 + 200',
-            ...cellConfig.size,
-          },
-          {
-            children: 'SJ-305D',
-            ...cellConfig.doorModel,
-          },
-          {
-            children: '99',
+            children: qty,
             ...cellConfig.qty,
           },
           {
@@ -153,7 +223,7 @@ export default function CertifiedDocumentList({
                     query: {
                       ...query,
                       editCertifiedDocument: 'true',
-                      certifiedDocumentId: 'foo001',
+                      certifiedDocumentId: id,
                     },
                   });
                 }}
@@ -184,45 +254,51 @@ export default function CertifiedDocumentList({
   }, []);
 
   // ========================================================================
+
+  useEffect(() => {
+    update_certificatedDoc();
+  }, [documentType]);
+
+  // ========================================================================
   let tabArr: Ttab[] = [
     {
       label: '防火證明',
-      isActive: documentType === 'fireproof',
+      isActive: documentType === '防火證明',
       // className: ,
       // style: ,
       onClick: () => {
         router.push({
           query: {
             ...query,
-            documentType: 'fireproof',
+            documentType: '防火證明',
           },
         });
       },
     },
     {
       label: '出廠證明',
-      isActive: documentType === 'factory',
+      isActive: documentType === '出廠證明',
       // className: ,
       // style: ,
       onClick: () => {
         router.push({
           query: {
             ...query,
-            documentType: 'factory',
+            documentType: '出廠證明',
           },
         });
       },
     },
     {
       label: '保固書',
-      isActive: documentType === 'warranty',
+      isActive: documentType === '保固書',
       // className: ,
       // style: ,
       onClick: () => {
         router.push({
           query: {
             ...query,
-            documentType: 'warranty',
+            documentType: '保固書',
           },
         });
       },
@@ -252,6 +328,18 @@ export default function CertifiedDocumentList({
 }
 
 // ====================================================================
+
+const checkReview = (toAt: string | null | undefined, reviewedAt: string | null | undefined) => {
+  if (reviewedAt) {
+    return 'green';
+  }
+
+  if (!reviewedAt && toAt) {
+    return 'red';
+  }
+
+  return 'gray';
+};
 
 // ====================================================================
 
