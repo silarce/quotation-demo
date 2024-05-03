@@ -15,6 +15,7 @@ import TwoBtnFooter from '../footer/twoBtnFooter';
 import scss from './selectorModalCreator_multi.module.scss';
 
 // api
+import { Tparams } from 'js/api/dtoTypes';
 import { useGetOutsourcing, ToutsourcingDto } from 'js/api/api_outsourcing';
 import { useEmployee_infinite_2, TemployeeDto } from 'js/api/api_employee';
 
@@ -34,6 +35,8 @@ import {
 
 import { useGetCustomers_infinite_2, TcustomerDto } from 'js/api/api_customer';
 
+import { TsettleProductDto, useGetQuotationContentSettleProduct } from 'js/api/api_certificated-doc';
+
 // lookup and options
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 import { customerTypesLookup } from 'js/api/api_customer';
@@ -50,6 +53,7 @@ type TtypeLookup = {
   annotation: Exclude<(typeof props_annotation)['dataType'], undefined>;
   quotationRange: Exclude<(typeof props_quotationRange)['dataType'], undefined>;
   customer: Exclude<(typeof props_customer)['dataType'], undefined>;
+  settleProduct: Exclude<(typeof props_settleProduct)['dataType'], undefined>;
   // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
 };
@@ -66,6 +70,7 @@ type TselectorArrItem<Tkey extends keyof TtypeLookup> = {
   clearOther?: number[];
   limit?: number;
   forbiddenCheck_dataList?: TselectorProps<TtypeLookup[Tkey]>['forbiddenCheck_dataList'];
+  customParams?: Tparams;
 };
 
 // type TselectorArr<TkeyArr extends (keyof TtypeLookup)[]> = {
@@ -90,8 +95,14 @@ type TkeyofDailyReport_workers_item = keyof Omit<
   'params'
 >;
 
+type TpropsKey_settleProduct = keyof Omit<
+  Exclude<Parameters<typeof useGetQuotationContentSettleProduct>[0], undefined>,
+  'params'
+>;
+
 type TuseNoMetaPropsInNeed = {
   dailyReport_workers_item: { [key in TkeyofDailyReport_workers_item]: true };
+  settleProduct: { [key in TpropsKey_settleProduct]: true };
 };
 
 // 期望的型別 : 應為object而非array，index的型別為number所以被推斷為array，若為string就會是object了
@@ -232,9 +243,11 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
           {/*  */}
           {selectorArr.map((item, index) => {
             // 建立時送進來的
-            const { key, clearOther, limit, forbiddenCheck_dataList } = item;
+            const { key, clearOther, limit, forbiddenCheck_dataList, customParams } = item;
             //在下面寫好的，props會送進Selector
             const props = propsLookup[key]();
+            props.params = { ...props.params, ...customParams };
+
             // 動態的
             const dynaProps = dynaSelectorPropsList?.[index];
 
@@ -899,6 +912,28 @@ const props_customer: TselectorProps<TcustomerDto> = {
   },
 };
 
+const props_settleProduct: TselectorProps<TsettleProductDto, TuseNoMetaPropsInNeed['settleProduct']> = {
+  useNoMeta: useGetQuotationContentSettleProduct,
+  selectedKey: 'itemName',
+  caption: '主產品',
+  configArr: [
+    {
+      key: 'itemName',
+      width: 100,
+      thead: {
+        label: '項目名',
+      },
+    },
+    {
+      key: 'fullWidth',
+      width: 100,
+      thead: {
+        label: '全寬',
+      },
+    },
+  ],
+};
+
 // -------------------------------------------------------------------------
 
 // ---
@@ -915,6 +950,7 @@ const propsLookup = {
   annotation: () => _.cloneDeep(props_annotation),
   quotationRange: () => _.cloneDeep(props_quotationRange),
   customer: () => _.cloneDeep(props_customer),
+  settleProduct: () => _.cloneDeep(props_settleProduct),
 
   // test: () => {
   //   return _.cloneDeep(props_outsourcing);
