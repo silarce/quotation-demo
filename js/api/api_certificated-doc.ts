@@ -17,6 +17,7 @@ import type {
   TupdateCertificatedDocDto,
   TcreateCertificatedProductDto,
   TupdateCertificatedProductDto,
+  TquotationContentDto,
 } from './dtoTypes';
 
 export type {
@@ -165,6 +166,94 @@ const apiDeleteCertificatedDoc = async (id: string) => {
     .catch((err) => Promise.reject(err));
 };
 
+// --------------------------------------------------------------------
+
+const apiGetQuotationContentSettleProduct = (id?: string) => {
+  const api = `/quotation/content/${id}`;
+
+  const params = {
+    populate: ['settleProducts'],
+  };
+
+  return axi
+    .get<TquotationContentDto>(api, { params })
+    .then(({ data }) => {
+      return data.settleProducts;
+    })
+    .catch((err) => Promise.reject(err));
+};
+
+const apiGetQuotationContentSettleProduct_pseudoMeta = (
+  // 在修改好createUseInfinite之前，params與id先這樣處理
+  params?: Tparams,
+  { id }: { id?: string } = {}
+) => {
+  const api = `/quotation/content/${id}`;
+
+  params = {
+    populate: ['settleProducts'],
+    ...params,
+  };
+
+  return axi
+    .get<TquotationContentDto>(api, { params })
+    .then(({ data }) => {
+      const res: TpageResponse<TsettleProductDto> = {
+        data: data.settleProducts,
+        meta: {
+          page: 1,
+          pageSize: 99999,
+          itemCount: 99999,
+          pageCount: 1,
+          hasPreviousPage: false,
+          hasNextPage: false,
+        },
+      };
+
+      return res;
+    })
+    .catch((err) => Promise.reject(err));
+};
+
+const useGetQuotationContentSettleProduct = ({ params, id }: { params?: Tparams; id?: string } = {}) => {
+  const [res, setRes] = useState<TsettleProductDto[] | undefined>(undefined);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetQuotationContentSettleProduct(id)
+      .then((res) => {
+        setRes(res);
+
+        return res;
+      })
+      .catch((err: AxiosError) => {
+        myAlert.err({ title: '取得產品列表失敗', content: err.message });
+
+        return Promise.reject(err);
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  return {
+    data: res,
+    update,
+    isLoading: isFetching,
+  };
+};
+
+const useGetQuotationContentSettleProduct_pseudoMeta = createUseInfinite<TpageResponse<TsettleProductDto>>({
+  apiClient: apiGetQuotationContentSettleProduct_pseudoMeta,
+  errTitle: '取得產品列表失敗',
+});
+
 // ========================================================================
 export {
   //
@@ -174,4 +263,7 @@ export {
   apiPostCertificatedDoc,
   apiPatchCertificatedDoc,
   apiDeleteCertificatedDoc,
+  //
+  useGetQuotationContentSettleProduct_pseudoMeta,
+  useGetQuotationContentSettleProduct,
 };

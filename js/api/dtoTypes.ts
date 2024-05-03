@@ -3979,7 +3979,7 @@ export type TcertificatedDocDto = {
   // 請款日
   paymentDate: string | null;
   // 申請日期
-  applicationDate: Date | null;
+  applicationDate: string | null;
   // 工程名稱
   projectName: string | null;
   // 本期計價
@@ -4070,6 +4070,10 @@ export type TcertificatedProductDto = {
 };
 
 export type TsettleProductDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 項目名
   itemName: string;
   // L(mm)全寬
