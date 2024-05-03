@@ -504,11 +504,17 @@ export const optionsCreator_boxB_SJ312 = createOptionsCreator({
 
 export const optionsCreator_boxB_SJ305D = createOptionsCreator({
   optionsArr: [
-    { value: '0.35', label: '0.35' },
+    // { value: '0.35', label: '0.35' },
     { value: '0.40', label: '0.40' },
     { value: '0.45', label: '0.45' },
     { value: '0.50', label: '0.50' },
     { value: '0.55', label: '0.55' },
+    { value: '0.60', label: '0.60' },
+    { value: '0.63', label: '0.63' },
+    { value: '0.65', label: '0.65' },
+    { value: '0.70', label: '0.70' },
+    { value: '0.73', label: '0.73' },
+    { value: '0.77', label: '0.77' },
   ],
 });
 
