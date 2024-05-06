@@ -3997,7 +3997,7 @@ export type TcertificatedDocDto = {
   // 證明書開立快照 // 就是證明書內的資料，是JSON，資料結構與內容全由前端決定
   snapShot: string | null;
   // 狀態(審核中/審核完成尚未用印/已印出)
-  status: '審核中' | '審核完成尚未用印' | '已印出';
+  status: '編輯中' | '審核中' | '審核完成尚未用印' | '已用印';
   // 開立產品
   products: TcertificatedProductDto[];
   // 送審給擔保人的時間 //Date

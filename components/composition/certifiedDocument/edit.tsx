@@ -967,7 +967,8 @@ const usePanelList = ({
         onClick: () => {
           router.push({
             query: {
-              certificateId: certificateId,
+              certifiedDocumentId: query.certifiedDocumentId,
+              showCertificate: 'true',
             },
           });
         },

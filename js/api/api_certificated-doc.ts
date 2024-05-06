@@ -158,7 +158,11 @@ const apiPatchCertificatedDoc = async (id: string, body: TupdateCertificatedDocD
   return axi
     .post(api, body)
     .then((res) => res.data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      myAlert.err({ title: '更新證明文件失敗' });
+
+      return Promise.reject(err);
+    });
 };
 
 const apiDeleteCertificatedDoc = async (id: string) => {
@@ -167,7 +171,11 @@ const apiDeleteCertificatedDoc = async (id: string) => {
   return axi
     .delete(api)
     .then((res) => res.data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      myAlert.err({ title: '刪除證明文件失敗' });
+
+      return Promise.reject(err);
+    });
 };
 
 // --------------------------------------------------------------------

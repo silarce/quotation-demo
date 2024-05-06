@@ -73,7 +73,7 @@
   font-weight: 500;
   white-space: pre-wrap;
   &.div {
-    border: none;
+    border-color: transparent;
   }
 }
 
@@ -116,4 +116,10 @@
 
 .suffix {
   font-size: 30px;
+}
+
+.datePicker {
+  input {
+    font-size: 30px !important;
+  }
 }
