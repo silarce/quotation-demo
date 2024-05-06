@@ -180,7 +180,7 @@ export const apiGetQuotation_Id = async (id: string) => {
 
       'latestContent.products.items.accessories',
       'latestContent.products.items.components',
-      'latestContent.products.items.rootProdductId',
+      'latestContent.products.items.rootProductId',
       'latestContent.others',
       'latestContent.verifyForm',
 
@@ -328,7 +328,7 @@ const apiGetQuotationContent_Id = async (id: string) => {
 
       'products.items.accessories',
       'products.items.components',
-      'products.items.rootProdductId',
+      'products.items.rootProductId',
       'others',
       'verifyForm',
     ],
@@ -1248,7 +1248,7 @@ const lookpu_contractPopulate = {
 
   //   // 'attachedToContract',
   //   // 'attachedContract',
-  //   'subContracts.content.products.rootProdductId',
+  //   'subContracts.content.products.rootProductId',
   //   'subContracts.content.customer',
   //   'subContracts.content.verifyForm',
 
@@ -1267,7 +1267,7 @@ const lookpu_contractPopulate = {
     'content.products',
     'content.others',
     'content.verifyForm',
-    'subContracts.content.products.rootProdductId',
+    'subContracts.content.products.rootProductId',
     'subContracts.content.customer',
     'subContracts.content.verifyForm',
     'products',
@@ -1284,11 +1284,11 @@ const lookpu_contractPopulate = {
     'content.products.items.accessories',
     'content.products.items.components',
     'content.others',
-    'subContracts.content.products.rootProdductId',
+    'subContracts.content.products.rootProductId',
   ],
 
   worksDepartment: ['content', 'accountReceivable', 'content.verifyForm'],
-  worksDepartment02: ['content', 'subContracts.content.products.rootProdductId'],
+  worksDepartment02: ['content', 'subContracts.content.products.rootProductId'],
   worksDepartment03: ['content', 'subContracts.content'],
 } as const;
 
