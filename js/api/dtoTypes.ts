@@ -4116,11 +4116,12 @@ export type TcreateCertificatedDocDto = Pick<
   | 'description'
   | 'docStyle'
   | 'status'
+  | 'note'
 > & {
   products: TcreateCertificatedProductDto[];
 };
 
-export type TupdateCertificatedDocDto = Pick<
+export type TupdateCertificatedDocDto_pre = Pick<
   TcertificatedDocDto,
   | 'projectNumber'
   | 'contractor'
@@ -4140,6 +4141,8 @@ export type TupdateCertificatedDocDto = Pick<
 > & {
   products: TupdateCertificatedProductDto[];
 };
+
+export type TupdateCertificatedDocDto = Partial<TupdateCertificatedDocDto_pre>;
 
 export type TcreateCertificatedProductDto = {
   settleProductId: string; // 最終產品ID

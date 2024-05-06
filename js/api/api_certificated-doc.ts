@@ -145,7 +145,11 @@ const apiPostCertificatedDoc = async (body: TcreateCertificatedDocDto) => {
   return axi
     .post(api, body)
     .then((res) => res.data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      myAlert.err({ title: '新增證明文件失敗' });
+
+      return Promise.reject(err);
+    });
 };
 
 const apiPatchCertificatedDoc = async (id: string, body: TupdateCertificatedDocDto) => {

@@ -5,6 +5,8 @@ import { useRouter, NextRouter } from 'next/router';
 import { nanoid } from 'nanoid';
 import Decimal from 'decimal.js';
 
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
 // layout
 import { TtagList as TtabList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { Wrapper, Wrapper_inpuSel_01, WrappedTextarea } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
@@ -32,7 +34,14 @@ import { TdocType, TquotationContractDto } from 'js/api/dtoTypes';
 import scss from './edit.module.scss';
 
 // api
-import { TsettleProductDto, useGetCertificatedDoc_id } from 'js/api/api_certificated-doc';
+import {
+  TsettleProductDto,
+  TcreateCertificatedDocDto,
+  TupdateCertificatedDocDto,
+  useGetCertificatedDoc_id,
+  apiPostCertificatedDoc,
+  apiPatchCertificatedDoc,
+} from 'js/api/api_certificated-doc';
 
 // =========================================================================
 
@@ -138,6 +147,8 @@ export default function Edit({
   // ---------------------------------------------------------------------------
 
   const [disabled, setDisabled] = useState(!isNew);
+  const [isFetching, setIsFetching] = useState(false);
+
   const [state_showSelector_employee, setState_showSelector_employee] = useState(false);
   const [state_showSelector_settleProduct, setState_showSelector_settleProduct] = useState(false);
 
@@ -198,6 +209,115 @@ export default function Edit({
 
   // ---------------------------------------------------------------------------
 
+  // ██████  ███████  ██████  ███████ ███████ ████████
+  // ██   ██ ██      ██    ██ ██      ██         ██
+  // ██████  █████   ██    ██ █████   ███████    ██
+  // ██   ██ ██      ██ ▄▄ ██ ██           ██    ██
+  // ██   ██ ███████  ██████  ███████ ███████    ██
+
+  const reqPostCertificatedDoc = async () => {
+    const {
+      applicationDate,
+      projectNumber,
+      projectName,
+      contractor,
+      valuation,
+      payment,
+      retainage,
+      paymentDate,
+      disbursementDate,
+      warrantyDate,
+    } = state_info;
+
+    if (!state_docStyle) {
+      return myAlert.info({ title: '請選擇文件種類' });
+    }
+
+    const products = Object.entries(state_itemList).map(([key, item]) => {
+      return {
+        settleProductId: key,
+        quantity: item.qty,
+      };
+    });
+
+    const body: TcreateCertificatedDocDto = {
+      projectNumber,
+      contractor,
+      payment: payment ? Number(payment) : null,
+      paymentDate: paymentDate ? paymentDate.toISOString() : null,
+      applicationDate: applicationDate ? applicationDate.toISOString() : null,
+      projectName,
+      valuation: valuation ? Number(valuation) : null,
+      retainage: retainage ? Number(retainage) : null,
+      disbursementDate: disbursementDate ? disbursementDate.toISOString() : null,
+      warrantyDate: warrantyDate ? warrantyDate.toISOString() : null,
+      description: state_description,
+      docStyle: state_docStyle,
+      status: '審核中',
+      products,
+      note: state_note,
+    };
+
+    setIsFetching(true);
+    await apiPostCertificatedDoc(body).then(() => update_data_CertifiedDocument());
+    setIsFetching(false);
+  };
+
+  const reqPatchCertificatedDoc = async () => {
+    const {
+      applicationDate,
+      projectNumber,
+      projectName,
+      contractor,
+      valuation,
+      payment,
+      retainage,
+      paymentDate,
+      disbursementDate,
+      warrantyDate,
+    } = state_info;
+
+    if (!certifiedDocumentId) {
+      return console.log('certifiedDocumentId為空');
+    }
+
+    if (!state_docStyle) {
+      return myAlert.info({ title: '請選擇文件種類' });
+    }
+
+    const products = Object.entries(state_itemList).map(([key, item]) => {
+      return {
+        settleProductId: key,
+        quantity: item.qty,
+      };
+    });
+
+    const body: TupdateCertificatedDocDto = {
+      projectNumber,
+      contractor,
+      payment: payment ? Number(payment) : null,
+      paymentDate: paymentDate ? paymentDate.toISOString() : null,
+      applicationDate: applicationDate ? applicationDate.toISOString() : null,
+      projectName,
+      valuation: valuation ? Number(valuation) : null,
+      retainage: retainage ? Number(retainage) : null,
+      disbursementDate: disbursementDate ? disbursementDate.toISOString() : null,
+      warrantyDate: warrantyDate ? warrantyDate.toISOString() : null,
+      description: state_description,
+      docStyle: state_docStyle,
+      status: '審核中',
+      products,
+      note: state_note,
+      // snapShot
+    };
+
+    setIsFetching(true);
+    await apiPatchCertificatedDoc(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
+    setIsFetching(false);
+  };
+
+  // ---------------------------------------------------------------------------
+
   const { control_signature, defaultSeletedDataArrArr } = useMemo(() => {
     const fakeArr = [
       {
@@ -231,6 +351,9 @@ export default function Edit({
     };
   }, [state_guarantor, disabled]);
 
+  // _________________________________________________________________________
+  // _________________________________________________________________________
+
   const panelList = usePanelList({
     disabled,
     isNew,
@@ -238,9 +361,13 @@ export default function Edit({
     router,
     setDisabled,
     setState_showSelector: setState_showSelector_employee,
+    reqPostCertificatedDoc,
+    reqPatchCertificatedDoc,
+    certificateId: certifiedDocumentId ?? '',
   });
 
-  // --------------------------------------------------------------------------
+  // _________________________________________________________________________
+  // _________________________________________________________________________
 
   const control_table = useControl_table({
     disabled,
@@ -781,6 +908,9 @@ const usePanelList = ({
   router,
   setDisabled,
   setState_showSelector,
+  reqPostCertificatedDoc,
+  reqPatchCertificatedDoc,
+  certificateId,
 }: {
   disabled: boolean;
   isNew: boolean;
@@ -788,6 +918,9 @@ const usePanelList = ({
   router: NextRouter;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
   setState_showSelector: React.Dispatch<React.SetStateAction<boolean>>;
+  reqPostCertificatedDoc: () => void;
+  reqPatchCertificatedDoc: () => void;
+  certificateId: string;
 }) => {
   const panelList = useMemo(() => {
     // const turnBack = () => {
@@ -804,9 +937,7 @@ const usePanelList = ({
       {
         type: 'redButton',
         label: '確定',
-        onClick: () => {
-          setDisabled((state) => !state);
-        },
+        onClick: reqPostCertificatedDoc,
       },
       {
         type: 'myButton',
@@ -836,7 +967,7 @@ const usePanelList = ({
         onClick: () => {
           router.push({
             query: {
-              certificateId: 'c-001',
+              certificateId: certificateId,
             },
           });
         },
@@ -860,9 +991,7 @@ const usePanelList = ({
       {
         type: 'redButton',
         label: '確定',
-        onClick: () => {
-          setDisabled(false);
-        },
+        onClick: reqPatchCertificatedDoc,
       },
       {
         type: 'myButton',
