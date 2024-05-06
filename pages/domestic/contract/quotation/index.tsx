@@ -176,7 +176,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
 
-  const { data: contract, update } = useGetContract_id_noItems_2(id, { populate: ['content.settleProducts'] });
+  // const { data: contract, update } = useGetContract_id_noItems_2(id, { populate: ['content.settleProducts'] });
+  const { data: contract, update } = useGetContract_id_noItems_2(id);
   const engineeringContactId = contract?.engineeringContactId;
 
   useEffect(() => {
@@ -482,12 +483,12 @@ version>1 是子合約
         setState_tab('contract');
       },
     },
-    {
-      label: `工程聯絡單`,
-      onClick: () => {
-        setState_tab('contactDoc');
-      },
-    },
+    // {
+    //   label: `工程聯絡單`,
+    //   onClick: () => {
+    //     setState_tab('contactDoc');
+    //   },
+    // },
     {
       label: `會議記錄`,
       onClick: () => {
@@ -502,8 +503,16 @@ version>1 是子合約
     },
   ];
 
-  if (!engineeringContactId) {
-    tabList.pop();
+  // if (!engineeringContactId) {
+  //   tabList.pop();
+  // }
+  if (engineeringContactId) {
+    tabList.splice(1, 0, {
+      label: `工程聯絡單`,
+      onClick: () => {
+        setState_tab('contactDoc');
+      },
+    });
   }
 
   const panel_quotation01: TpanelList = [
@@ -1004,9 +1013,7 @@ version>1 是子合約
           />
         )}
 
-        {state_tab === 'certifiedDocument' && (
-          <CertifiedDocument onPanelListChange={dynaPanelListReducer} contractFromParent={contract} />
-        )}
+        {state_tab === 'certifiedDocument' && <CertifiedDocument onPanelListChange={dynaPanelListReducer} />}
 
         <InputModal
           visible={!!inputModalConfig?.visible}

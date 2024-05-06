@@ -19,11 +19,11 @@ import { useGetContract_id } from 'js/api/api_quotation';
 // ======================================================================
 
 type Tquery = {
+  id?: string | undefined;
   documentType?: string;
   editCertifiedDocument?: 'true';
   certifiedDocumentId?: string;
-  certificateId?: string;
-  contractId?: string | undefined;
+  showCertificate?: 'true' | undefined;
 };
 
 // ======================================================================
@@ -31,20 +31,18 @@ type Tquery = {
 export default function CertifiedDocument({
   onPanelListChange,
   showDocType,
-  contractFromParent,
 }: {
   onPanelListChange?: (panelList: TpanelList | undefined) => void;
   showDocType?: TdocType[];
-  contractFromParent?: TquotationContractDto;
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { contractId, documentType, editCertifiedDocument, certifiedDocumentId, certificateId } = query;
-  const isListShow = !editCertifiedDocument && !certificateId;
+  const { id: contractId, documentType, editCertifiedDocument, certifiedDocumentId } = query;
+  const isListShow = !editCertifiedDocument && !certifiedDocumentId;
 
   // ---------------------------------------------------------------------------
 
-  const { data: data_contract = contractFromParent, update: update_contract } = useGetContract_id(contractId, {
+  const { data: data_contract, update: update_contract } = useGetContract_id(contractId, {
     customPopulate: [
       // 'certificatedDoc',
       'content.settleProducts',
@@ -53,7 +51,7 @@ export default function CertifiedDocument({
 
   // ---------------------------------------------------------------------------
 
-  const [dynyPanelList, setDynPanelList] = useState<TpanelList | undefined>();
+  const [dynyPanelList, setDynaPanelList] = useState<TpanelList | undefined>();
 
   // ---------------------------------------------------------------------------
   const panelList: TpanelList = useMemo(() => {
@@ -75,6 +73,18 @@ export default function CertifiedDocument({
           });
         },
       },
+      // {
+      //   type: 'myButton',
+      //   label: '開立證明書(test)',
+      //   onClick: () => {
+      //     router.push({
+      //       query: {
+      //         certifiedDocumentId: 'fooo',
+      //         showCertificate: 'true',
+      //       },
+      //     });
+      //   },
+      // },
     ];
 
     const defaultPanelList = panelList_list;
@@ -107,10 +117,8 @@ export default function CertifiedDocument({
   }, []);
 
   useEffect(() => {
-    if (!contractFromParent) {
-      update_contract();
-    }
-  }, [contractId, contractFromParent]);
+    update_contract();
+  }, [contractId]);
 
   // ---------------------------------------------------------------------------
   return (
@@ -121,11 +129,11 @@ export default function CertifiedDocument({
         <Edit
           //
           className="mt-10"
-          onPanelChange={setDynPanelList}
+          onPanelChange={setDynaPanelList}
           contract={data_contract}
         />
       )}
-      {certificateId && <Certificate onPanelChange={setDynPanelList} />}
+      {!editCertifiedDocument && certifiedDocumentId && <Certificate onPanelChange={setDynaPanelList} />}
     </div>
   );
 }
