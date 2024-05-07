@@ -924,8 +924,16 @@ const props_settleProduct: TselectorProps<TsettleProductDto, TuseNoMetaPropsInNe
     {
       key: 'itemName',
       width: 100,
+      // flex: 'auto',
       thead: {
         label: '項目名',
+      },
+    },
+    {
+      key: 'doorModelName',
+      width: 100,
+      thead: {
+        label: '門型',
       },
     },
     {
@@ -933,6 +941,38 @@ const props_settleProduct: TselectorProps<TsettleProductDto, TuseNoMetaPropsInNe
       width: 100,
       thead: {
         label: '全寬',
+      },
+    },
+    {
+      key: 'height',
+      width: 100,
+      thead: {
+        label: '高',
+      },
+    },
+    {
+      key: 'boxB',
+      width: 100,
+      thead: {
+        label: 'B',
+      },
+      tbody: {
+        reducer: (value) => {
+          const boxB = value as TsettleProductDto['boxB'];
+
+          if (typeof boxB === 'number') {
+            return '';
+          }
+
+          return boxB;
+        },
+      },
+    },
+    {
+      key: 'quantity',
+      width: 100,
+      thead: {
+        label: '數量',
       },
     },
   ],
