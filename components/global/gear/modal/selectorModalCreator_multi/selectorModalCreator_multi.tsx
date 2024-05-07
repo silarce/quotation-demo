@@ -292,6 +292,10 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
               props.forbiddenCheck_dataList = forbiddenCheck_dataList;
             }
 
+            if (dynaProps?.forbiddenCheck_dataList) {
+              props.forbiddenCheck_dataList = dynaProps.forbiddenCheck_dataList;
+            }
+
             props.filter_extends = dynaProps?.filter_extends;
 
             if (dynaProps?.filter) {
