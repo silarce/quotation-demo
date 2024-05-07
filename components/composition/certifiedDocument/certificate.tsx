@@ -94,7 +94,7 @@ export default function Certificate({
   //
   onPanelChange,
 }: {
-  onPanelChange: (panelList: TpanelList) => void;
+  onPanelChange: (panelList: TpanelList | undefined) => void;
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -437,6 +437,10 @@ export default function Certificate({
 
   useEffect(() => {
     onPanelChange(panelList);
+
+    return () => {
+      onPanelChange(undefined);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panelList]);
 
