@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, memo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import { useRouter, NextRouter } from 'next/router';
@@ -12,7 +12,7 @@ import { TtagList as TtabList, TpanelList, Tlink, TlinkArr } from 'components/Pa
 import { Wrapper, Wrapper_inpuSel_01, WrappedTextarea } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 
 // ui
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import SignatureBar, {
   // Tcontrol_signatureBar,
   // TsignatureBarItem,
@@ -41,6 +41,8 @@ import {
   useGetCertificatedDoc_id,
   apiPostCertificatedDoc,
   apiPatchCertificatedDoc,
+  apiPatchCertificatedDoc_submit,
+  apiPatchCertificatedDoc_review,
 } from 'js/api/api_certificated-doc';
 
 // =========================================================================
@@ -161,22 +163,14 @@ export default function Edit({
   const [state_note, setState_note] = useState<Tstate_note>('');
 
   // 擔保人
-  const [state_guarantor, setState_guarantor] = useState<TemployeeDto | undefined>(undefined);
+  // const [state_guarantor, setState_guarantor] = useState<TemployeeDto | undefined>(undefined);
 
   // ---------------------------------------------------------------------------
 
-  const settleProductList = useMemo(() => {
-    const list: { [key: string]: TsettleProductDto } = {};
-
-    contract?.content.settleProducts.forEach((item) => {
-      list[item.id] = item;
-    });
-
-    return list;
-  }, [contract?.content.settleProducts]);
-
   const { data: data_certifiedDocument, update: update_data_CertifiedDocument } =
     useGetCertificatedDoc_id(certifiedDocumentId);
+
+  const { agentEmployee, reviewGuarantorEmployee, reviewManagerEmployee } = data_certifiedDocument ?? {};
 
   // ---------------------------------------------------------------------------
 
@@ -201,7 +195,24 @@ export default function Edit({
   const editItem = (key: string, value: string) => {
     setState_itemList((state) => {
       const copy = { ...state };
-      copy[key].qty = Number(value);
+
+      const item = copy[key];
+      const { contractProdQty, certificatedAllQty } = item;
+
+      const allowQty = new Decimal(contractProdQty).minus(certificatedAllQty).toNumber();
+
+      if (Number(value) <= allowQty) {
+        copy[key].qty = Number(value);
+      }
+
+      return copy;
+    });
+  };
+
+  const removeItem = (key: string) => {
+    setState_itemList((state) => {
+      const copy = { ...state };
+      delete copy[key];
 
       return copy;
     });
@@ -215,7 +226,7 @@ export default function Edit({
   // ██   ██ ██      ██ ▄▄ ██ ██           ██    ██
   // ██   ██ ███████  ██████  ███████ ███████    ██
 
-  const reqPostCertificatedDoc = async () => {
+  const reqPostCertificatedDoc = useCallback(async () => {
     const {
       applicationDate,
       projectNumber,
@@ -261,9 +272,9 @@ export default function Edit({
     setIsFetching(true);
     await apiPostCertificatedDoc(body).then(() => update_data_CertifiedDocument());
     setIsFetching(false);
-  };
+  }, [state_description, state_docStyle, state_info, state_itemList, state_note, update_data_CertifiedDocument]);
 
-  const reqPatchCertificatedDoc = async () => {
+  const reqPatchCertificatedDoc = useCallback(async () => {
     const {
       applicationDate,
       projectNumber,
@@ -314,42 +325,102 @@ export default function Edit({
     setIsFetching(true);
     await apiPatchCertificatedDoc(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
     setIsFetching(false);
-  };
+  }, [
+    certifiedDocumentId,
+    state_description,
+    state_docStyle,
+    state_info,
+    state_itemList,
+    state_note,
+    update_data_CertifiedDocument,
+  ]);
+
+  const reqPatchCertificatedDoc_submit = useCallback(
+    async (guarantor: TemployeeDto) => {
+      if (!certifiedDocumentId) {
+        return console.log('certifiedDocumentId為空');
+      }
+
+      // if (!state_guarantor) {
+      //   return myAlert.info({ title: '請選擇擔保人' });
+      // }
+
+      setIsFetching(true);
+      await apiPatchCertificatedDoc_submit(certifiedDocumentId, {
+        reviewGuarantorEmployeeId: guarantor.id,
+      }).then(() => update_data_CertifiedDocument());
+      setIsFetching(false);
+    },
+    [certifiedDocumentId, update_data_CertifiedDocument]
+  );
+
+  // 審核
+  const reqPatchCertificatedDoc_review = useCallback(
+    async (reviewResult: boolean) => {
+      if (!certifiedDocumentId) {
+        return console.log('certifiedDocumentId為空');
+      }
+
+      setIsFetching(true);
+      await apiPatchCertificatedDoc_review(certifiedDocumentId, { reviewResult }).then(() =>
+        update_data_CertifiedDocument()
+      );
+      setIsFetching(false);
+    },
+    [certifiedDocumentId, update_data_CertifiedDocument]
+  );
 
   // ---------------------------------------------------------------------------
 
+  // ███    ███ ███████ ███    ███  ██████
+  // ████  ████ ██      ████  ████ ██    ██
+  // ██ ████ ██ █████   ██ ████ ██ ██    ██
+  // ██  ██  ██ ██      ██  ██  ██ ██    ██
+  // ██      ██ ███████ ██      ██  ██████
+
+  const settleProductList = useMemo(() => {
+    const list: { [key: string]: TsettleProductDto } = {};
+
+    contract?.content.settleProducts.forEach((item) => {
+      list[item.id] = item;
+    });
+
+    return list;
+  }, [contract?.content.settleProducts]);
+
   const { control_signature, defaultSeletedDataArrArr } = useMemo(() => {
-    const fakeArr = [
+    const signatureArr = [
       {
         label: '總經理',
         className: 'w-[210px]',
+        value: reviewManagerEmployee?.chName ?? '',
       },
       {
         label: '擔保人',
         className: 'w-[210px]',
-        value: state_guarantor?.chName,
+        value: reviewGuarantorEmployee?.chName ?? '',
       },
       {
         label: '製表人',
         className: 'w-[210px]',
-        // value: state_activeReviewer.tabulator?.chName,
+        value: agentEmployee?.chName ?? '',
       },
     ];
 
     const defaultSeletedDataArrArr: Parameters<typeof Selector_employee>[0]['defaultSeletedDataArrArr'] = [
-      state_guarantor ? [state_guarantor] : [],
+      reviewGuarantorEmployee ? [reviewGuarantorEmployee] : [],
       // state_activeReviewer.tabulator ? [state_activeReviewer.tabulator] : [],
     ];
 
     const control_signature = {
-      signatureArr: fakeArr,
+      signatureArr,
     };
 
     return {
       control_signature,
       defaultSeletedDataArrArr,
     };
-  }, [state_guarantor, disabled]);
+  }, [reviewGuarantorEmployee, disabled]);
 
   // _________________________________________________________________________
   // _________________________________________________________________________
@@ -360,10 +431,11 @@ export default function Edit({
     query,
     router,
     setDisabled,
-    setState_showSelector: setState_showSelector_employee,
+    setState_showSelector_employee,
     reqPostCertificatedDoc,
     reqPatchCertificatedDoc,
-    certificateId: certifiedDocumentId ?? '',
+    reqPatchCertificatedDoc_review,
+    // certificateId: certifiedDocumentId ?? '',
   });
 
   // _________________________________________________________________________
@@ -373,10 +445,34 @@ export default function Edit({
     disabled,
     state_itemList,
     editItem,
+    removeItem,
     setState_showSelector_settleProduct,
   });
 
+  // _________________________________________________________________________
+  // _________________________________________________________________________
+
+  // const selectedSettleProduct = useMemo(() => {
+  //   const settleProducts = contract?.content.settleProducts;
+
+  //   const arr: TsettleProductDto[] = [];
+
+  //   settleProducts?.forEach((prod) => {
+  //     if (state_itemList[prod.id]) {
+  //       arr.push(prod);
+  //     }
+  //   });
+
+  //   return arr;
+  // }, [contract, state_itemList]);
+
   // --------------------------------------------------------------------------
+
+  // ███████ ███████ ███████ ███████  ██████ ████████
+  // ██      ██      ██      ██      ██         ██
+  // █████   █████   █████   █████   ██         ██
+  // ██      ██      ██      ██      ██         ██
+  // ███████ ██      ██      ███████  ██████    ██
 
   useEffect(() => {
     onPanelChange(panelList);
@@ -388,7 +484,33 @@ export default function Edit({
 
   useEffect(() => {
     update_data_CertifiedDocument();
-  }, []);
+  }, [certifiedDocumentId]);
+
+  useEffect(() => {
+    let projectNumber = '';
+    let projectName = '';
+    let contractor = '';
+
+    if (data_certifiedDocument) {
+      projectNumber = data_certifiedDocument.projectNumber ?? '';
+      projectName = data_certifiedDocument.projectName ?? '';
+      contractor = data_certifiedDocument.contractor ?? '';
+    } else if (contract?.engineeringContact) {
+      const engineeringContact = contract.engineeringContact;
+      projectNumber = engineeringContact.projectNumber;
+      projectName = engineeringContact.projectName;
+      contractor = engineeringContact.contractor;
+    }
+
+    setState_info((state) => {
+      return {
+        ...state,
+        projectNumber,
+        projectName,
+        contractor,
+      };
+    });
+  }, [contract?.engineeringContact, data_certifiedDocument]);
 
   useEffect(() => {
     if (!data_certifiedDocument) {
@@ -397,7 +519,6 @@ export default function Edit({
       setState_itemList({});
       setState_description('');
       setState_note('');
-      setState_guarantor(undefined);
     } else {
       const { products, reviewGuarantorEmployee } = data_certifiedDocument;
 
@@ -405,15 +526,15 @@ export default function Edit({
 
       products.forEach((prod) => {
         const {
-          itemName,
-          fullWidth,
-          height,
-          boxB,
-          doorModelName,
+          // itemName,
+          // fullWidth,
+          // height,
+          // boxB,
+          // doorModelName,
           // quantity,
-          firePreventionCertificated,
-          factoryCertificated,
-          warrantyCertificated,
+          // firePreventionCertificated,
+          // factoryCertificated,
+          // warrantyCertificated,
           settleProductId,
           // settleProduct, // 為了優化後端效能，不拿這邊的settleProduct
         } = prod;
@@ -431,16 +552,28 @@ export default function Edit({
             boxB,
             doorModelName,
             quantity,
-            firePreventionCertificatedQuantity,
             factoryCertificatedQuantity,
+            firePreventionCertificatedQuantity,
+            preFactoryCertificatedQuantity,
+            preFirePreventionCertificatedQuantity,
+            preWarrantyCertificatedQuantity,
             warrantyCertificatedQuantity,
           } = settleProduct;
 
-          const size = `${fullWidth}*${height}+${boxB}`;
-          const certificatedAllQty =
-            (firePreventionCertificatedQuantity || 0) +
-            (factoryCertificatedQuantity || 0) +
-            (warrantyCertificatedQuantity || 0);
+          const size = calcSize({
+            fullWidth,
+            height,
+            boxB: boxB ?? '',
+          });
+
+          const certificatedAllQty = calcCertificatedAllQty({
+            factoryCertificatedQuantity: factoryCertificatedQuantity ?? 0,
+            firePreventionCertificatedQuantity: firePreventionCertificatedQuantity ?? 0,
+            preFactoryCertificatedQuantity: preFactoryCertificatedQuantity ?? 0,
+            preFirePreventionCertificatedQuantity: preFirePreventionCertificatedQuantity ?? 0,
+            preWarrantyCertificatedQuantity: preWarrantyCertificatedQuantity ?? 0,
+            warrantyCertificatedQuantity: warrantyCertificatedQuantity ?? 0,
+          });
 
           list[settleProductId] = {
             itemName,
@@ -475,9 +608,10 @@ export default function Edit({
         warrantyDate: data_certifiedDocument.warrantyDate ? moment(data_certifiedDocument.warrantyDate) : null,
       });
 
+      setState_itemList(list);
+
       setState_description(data_certifiedDocument.description ?? '');
       setState_note(data_certifiedDocument.note ?? '');
-      setState_guarantor(reviewGuarantorEmployee || undefined);
     }
   }, [disabled, data_certifiedDocument, settleProductList]);
 
@@ -548,7 +682,8 @@ export default function Edit({
         onConfirm={(arr) => {
           const guarantor = arr[0][0];
 
-          setState_guarantor(guarantor);
+          // setState_guarantor(guarantor);
+          reqPatchCertificatedDoc_submit(guarantor);
         }}
         onCancel={() => {
           setState_showSelector_employee(false);
@@ -558,7 +693,60 @@ export default function Edit({
       <Selector_settleProduct_memo
         //
         showModal={state_showSelector_settleProduct}
-        onConfirm={() => {}}
+        onConfirm={(arr) => {
+          const settleProductArr = arr[0];
+
+          const itemList: Tstate_itemList = {};
+
+          settleProductArr.forEach((prod) => {
+            const {
+              fullWidth,
+              height,
+              boxB,
+              id,
+              itemName,
+              doorModelName,
+              factoryCertificatedQuantity,
+              firePreventionCertificatedQuantity,
+              preFactoryCertificatedQuantity,
+              preFirePreventionCertificatedQuantity,
+              preWarrantyCertificatedQuantity,
+              warrantyCertificatedQuantity,
+              quantity,
+            } = prod;
+
+            const certificatedAllQty = calcCertificatedAllQty({
+              factoryCertificatedQuantity: factoryCertificatedQuantity ?? 0,
+              firePreventionCertificatedQuantity: firePreventionCertificatedQuantity ?? 0,
+              preFactoryCertificatedQuantity: preFactoryCertificatedQuantity ?? 0,
+              preFirePreventionCertificatedQuantity: preFirePreventionCertificatedQuantity ?? 0,
+              preWarrantyCertificatedQuantity: preWarrantyCertificatedQuantity ?? 0,
+              warrantyCertificatedQuantity: warrantyCertificatedQuantity ?? 0,
+            });
+
+            const size = calcSize({
+              fullWidth,
+              height,
+              boxB: boxB ?? '',
+            });
+
+            itemList[id] = {
+              itemName,
+              size,
+              doorModelName,
+              contractProdQty: quantity,
+              certificatedAllQty,
+              qty: 0,
+            };
+          }); // foreach
+
+          setState_itemList((state) => {
+            return {
+              ...state,
+              ...itemList,
+            };
+          });
+        }} // confirm
         onCancel={() => {
           setState_showSelector_settleProduct(false);
         }}
@@ -567,8 +755,12 @@ export default function Edit({
             useNoMetaProps: {
               id: contract?.content.id ?? '',
             },
+            forbiddenCheck_dataList: (data) => {
+              return !!state_itemList[data.id];
+            },
           },
         ]}
+        // defaultSeletedDataArrArr={[selectedSettleProduct]}
       />
     </div>
   );
@@ -610,6 +802,7 @@ const InputGroup = ({
   return (
     <Wrapper_inpuSel_01 className="w-[845px]">
       <InputSel
+        {...infoConfig}
         caption="文件種類"
         disabled={disabled}
         selectProps={{
@@ -637,6 +830,7 @@ const InputGroup = ({
         }}
       />
       <InputSel
+        {...infoConfig}
         caption="申請日期"
         disabled={disabled}
         datePickerProps={{
@@ -649,46 +843,57 @@ const InputGroup = ({
         }}
       />
       <InputSel
+        {...infoConfig}
         caption="工程編號"
-        disabled={disabled}
+        disabled={true}
+        showBaseline="invisible"
         inputProps={{
           props: {
             value: state_info.projectNumber,
             onChange: (e) => {
-              editInfo('projectNumber', e.target.value);
+              // editInfo('projectNumber', e.target.value);
             },
+            placeholder: '無資料',
           },
         }}
       />
       <InputSel
+        {...infoConfig}
         caption="工程名稱"
-        disabled={disabled}
+        disabled={true}
+        showBaseline="invisible"
         inputProps={{
           props: {
             value: state_info.projectName,
             onChange: (e) => {
-              editInfo('projectName', e.target.value);
+              // editInfo('projectName', e.target.value);
             },
+            placeholder: '無資料',
           },
         }}
       />
       <InputSel
+        {...infoConfig}
         caption="承包商"
-        disabled={disabled}
+        disabled={true}
+        showBaseline="invisible"
         inputProps={{
           props: {
             value: state_info.contractor,
             onChange: (e) => {
-              editInfo('contractor', e.target.value);
+              // editInfo('contractor', e.target.value);
             },
+            placeholder: '無資料',
           },
         }}
       />
       <InputSel
+        {...infoConfig}
         caption="本期計價"
         disabled={disabled}
         inputProps={{
           props: {
+            type: 'number',
             value: state_info.valuation,
             onChange: (e) => {
               editInfo('valuation', e.target.value);
@@ -697,10 +902,12 @@ const InputGroup = ({
         }}
       />
       <InputSel
+        {...infoConfig}
         caption="本期請款"
         disabled={disabled}
         inputProps={{
           props: {
+            type: 'number',
             value: state_info.payment,
             onChange: (e) => {
               editInfo('payment', e.target.value);
@@ -709,10 +916,12 @@ const InputGroup = ({
         }}
       />
       <InputSel
+        {...infoConfig}
         caption="保留款"
         disabled={disabled}
         inputProps={{
           props: {
+            type: 'number',
             value: state_info.retainage,
             onChange: (e) => {
               editInfo('retainage', e.target.value);
@@ -721,6 +930,7 @@ const InputGroup = ({
         }}
       />
       <InputSel
+        {...infoConfig}
         caption="請款日"
         disabled={disabled}
         datePickerProps={{
@@ -733,6 +943,7 @@ const InputGroup = ({
         }}
       />
       <InputSel
+        {...infoConfig}
         caption="放款日"
         disabled={disabled}
         datePickerProps={{
@@ -746,6 +957,7 @@ const InputGroup = ({
       />
 
       <InputSel
+        {...infoConfig}
         caption="保固日"
         disabled={disabled}
         datePickerProps={{
@@ -774,10 +986,12 @@ const useControl_table = ({
   state_itemList,
   editItem,
   setState_showSelector_settleProduct,
+  removeItem,
 }: {
   disabled?: boolean;
   state_itemList: Tstate_itemList;
   editItem: (key: string, value: string) => void;
+  removeItem: (key: string) => void;
   setState_showSelector_settleProduct: React.Dispatch<React.SetStateAction<boolean>>;
 }): Ttable => {
   //
@@ -835,7 +1049,7 @@ const useControl_table = ({
             children: (
               <IconRemoveCircle
                 className={classNames(scss.btn_svg, disabled && 'hidden')}
-                onClick={() => alert('test')}
+                onClick={() => removeItem(key)}
               />
             ),
             ...cellConfig.btn,
@@ -907,32 +1121,24 @@ const usePanelList = ({
   query,
   router,
   setDisabled,
-  setState_showSelector,
+  setState_showSelector_employee: setState_showSelector,
   reqPostCertificatedDoc,
   reqPatchCertificatedDoc,
-  certificateId,
-}: {
+  reqPatchCertificatedDoc_review,
+}: // certificateId,
+{
   disabled: boolean;
   isNew: boolean;
   query: Tquery;
   router: NextRouter;
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
-  setState_showSelector: React.Dispatch<React.SetStateAction<boolean>>;
+  setState_showSelector_employee: React.Dispatch<React.SetStateAction<boolean>>;
   reqPostCertificatedDoc: () => void;
   reqPatchCertificatedDoc: () => void;
-  certificateId: string;
+  reqPatchCertificatedDoc_review: (reviewResult: boolean) => void;
+  // certificateId: string;
 }) => {
   const panelList = useMemo(() => {
-    // const turnBack = () => {
-    //   // const query_copy = { ...query };
-    //   // delete query_copy.editCertifiedDocument;
-    //   // delete query_copy.certifiedDocumentId;
-    //   // router.replace({
-    //   //   query: query_copy,
-    //   // });
-    //   router.back();
-    // };
-
     const panelList_new: TpanelList = [
       {
         type: 'redButton',
@@ -958,7 +1164,26 @@ const usePanelList = ({
         type: 'redButton',
         label: '審核',
         onClick: () => {
-          alert('審核');
+          const modal = myAlert.btnBar({
+            title: '是否通過審核',
+            btnPropsArr: [
+              {
+                label: '審核通過',
+                onClick: () => reqPatchCertificatedDoc_review(true),
+                theme: 'danger',
+              },
+              {
+                label: '審核不通過',
+                onClick: () => reqPatchCertificatedDoc_review(false),
+              },
+              {
+                label: '取消',
+                onClick: () => {
+                  modal.destroy();
+                },
+              },
+            ],
+          });
         },
       },
       {
@@ -1010,10 +1235,40 @@ const usePanelList = ({
     } else {
       return panelList_abled;
     }
-  }, [disabled, isNew]);
+  }, [
+    disabled,
+    isNew,
+    query.certifiedDocumentId,
+    reqPatchCertificatedDoc,
+    reqPostCertificatedDoc,
+    router,
+    setDisabled,
+    setState_showSelector,
+  ]);
 
   return panelList;
 };
+
+// const useSelecotr_settleProduct = () => {
+//   const Selector = useMemo(() => {
+//     const Selector_settleProduct = selectModalCreator_multi<['settleProduct']>({
+//       selectorArr: [
+//         {
+//           key: 'settleProduct',
+//           caption: '結算產品',
+//         },
+//       ],
+//     });
+
+//     const Selector_settleProduct_memo = memo(Selector_settleProduct, (preState, nextState) => {
+//       return preState.showModal === nextState.showModal;
+//     });
+
+//     return Selector_settleProduct_memo;
+//   }, []);
+
+//   return Selector;
+// };
 
 // ==============================================================================
 
@@ -1022,6 +1277,11 @@ const usePanelList = ({
 // ██      ██    ██ ██ ██  ██ █████   ██ ██   ███
 // ██      ██    ██ ██  ██ ██ ██      ██ ██    ██
 //  ██████  ██████  ██   ████ ██      ██  ██████
+
+const infoConfig: TinputSelProps = {
+  showBaseline: 'auto',
+  captionStyle: { width: 80 },
+};
 
 type TcellKeyArr =
   | 'btn'
@@ -1089,3 +1349,43 @@ const createEmptyState_info = (): Tstate_info => ({
   disbursementDate: null,
   warrantyDate: null,
 });
+
+const calcSize = ({
+  fullWidth,
+  height,
+  boxB,
+}: {
+  fullWidth: number | string;
+  height: number | string;
+  boxB: number | string;
+}) => {
+  const size = `${fullWidth}*${height}+${boxB}`;
+
+  return size;
+};
+
+const calcCertificatedAllQty = ({
+  firePreventionCertificatedQuantity,
+  factoryCertificatedQuantity,
+  warrantyCertificatedQuantity,
+  preFirePreventionCertificatedQuantity,
+  preFactoryCertificatedQuantity,
+  preWarrantyCertificatedQuantity,
+}: {
+  firePreventionCertificatedQuantity: number;
+  factoryCertificatedQuantity: number;
+  warrantyCertificatedQuantity: number;
+  preFirePreventionCertificatedQuantity?: number;
+  preFactoryCertificatedQuantity: number;
+  preWarrantyCertificatedQuantity: number;
+}) => {
+  const certificatedAllQty = new Decimal(firePreventionCertificatedQuantity ?? 0)
+    .add(factoryCertificatedQuantity ?? 0)
+    .add(warrantyCertificatedQuantity ?? 0)
+    .add(preFirePreventionCertificatedQuantity ?? 0)
+    .add(preFactoryCertificatedQuantity ?? 0)
+    .add(preWarrantyCertificatedQuantity ?? 0)
+    .toNumber();
+
+  return certificatedAllQty;
+};

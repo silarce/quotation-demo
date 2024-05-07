@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { axi } from './_axiosCreator';
 import { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -18,6 +18,8 @@ import type {
   TcreateCertificatedProductDto,
   TupdateCertificatedProductDto,
   TquotationContentDto,
+  TsubmitCertificatedDocDto,
+  TreviewCertificatedDocDto,
 } from './dtoTypes';
 
 export type {
@@ -32,6 +34,8 @@ export type {
   TupdateCertificatedDocDto,
   TcreateCertificatedProductDto,
   TupdateCertificatedProductDto,
+  TsubmitCertificatedDocDto,
+  TreviewCertificatedDocDto,
 };
 
 // ===========================================================================
@@ -90,8 +94,18 @@ const useGetCertificatedDoc = (params?: Tparams) => {
 const apiGetCertificatedDoc_id = async (id: string) => {
   const api = `/certificated-doc/${id}`;
 
+  const params = {
+    populate: [
+      //
+      'products',
+      'reviewGuarantorEmployee',
+      'reviewManagerEmployee',
+      'agentEmployee',
+    ],
+  };
+
   return axi
-    .get<TcertificatedDocDto>(api)
+    .get<TcertificatedDocDto>(api, { params })
     .then((res) => res.data)
     .catch((err) => Promise.reject(err));
 };
@@ -107,7 +121,7 @@ const useGetCertificatedDoc_id = (
   const [res, setRes] = useState<TcertificatedDocDto | undefined>(undefined);
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
-  const update = async () => {
+  const update = useCallback(async () => {
     if (!id) {
       return;
     }
@@ -128,7 +142,7 @@ const useGetCertificatedDoc_id = (
       .finally(() => {
         setIsFetching(false);
       });
-  };
+  }, [callAlert, id]);
 
   return {
     data: res,
@@ -266,6 +280,36 @@ const useGetQuotationContentSettleProduct_pseudoMeta = createUseInfinite<TpageRe
   errTitle: '取得產品列表失敗',
 });
 
+// --------------------------------------------------------------------
+
+// 送審
+const apiPatchCertificatedDoc_submit = async (id: string, body: TsubmitCertificatedDocDto) => {
+  const api = `/certificated-doc/${id}/submit`;
+
+  return axi
+    .patch(api, body)
+    .then((res) => res.data)
+    .catch((err) => {
+      myAlert.err({ title: '送審失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 審核
+const apiPatchCertificatedDoc_review = async (id: string, body: TreviewCertificatedDocDto) => {
+  const api = `/certificated-doc/${id}/review`;
+
+  return axi
+    .patch(api, body)
+    .then((res) => res.data)
+    .catch((err) => {
+      myAlert.err({ title: '審核失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
 // ========================================================================
 export {
   //
@@ -275,6 +319,8 @@ export {
   apiPostCertificatedDoc,
   apiPatchCertificatedDoc,
   apiDeleteCertificatedDoc,
+  apiPatchCertificatedDoc_submit,
+  apiPatchCertificatedDoc_review,
   //
   useGetQuotationContentSettleProduct_pseudoMeta,
   useGetQuotationContentSettleProduct,

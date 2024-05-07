@@ -46,6 +46,7 @@ export default function CertifiedDocument({
     customPopulate: [
       // 'certificatedDoc',
       'content.settleProducts',
+      'engineeringContact',
     ],
   });
 

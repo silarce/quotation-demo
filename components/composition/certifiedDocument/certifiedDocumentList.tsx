@@ -251,7 +251,7 @@ export default function CertifiedDocumentList({
       tbody,
       haveBorder: false,
     };
-  }, []);
+  }, [data_certificatedDocArr, query, router]);
 
   // ========================================================================
 

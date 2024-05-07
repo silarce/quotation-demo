@@ -4097,6 +4097,10 @@ export type TsettleProductDto = {
   // 保固證明已開立數量
   warrantyCertificatedQuantity: number | null;
 
+  preFactoryCertificatedQuantity: number | null;
+  preFirePreventionCertificatedQuantity: number | null;
+  preWarrantyCertificatedQuantity: number | null;
+
   contentId: string | null;
   content: TquotationContentDto;
 };
@@ -4152,6 +4156,14 @@ export type TcreateCertificatedProductDto = {
 export type TupdateCertificatedProductDto = {
   settleProductId: string; // 最終產品ID
   quantity: number;
+};
+
+export type TsubmitCertificatedDocDto = {
+  reviewGuarantorEmployeeId: string; // 擔保人id
+};
+
+export type TreviewCertificatedDocDto = {
+  reviewResult: boolean;
 };
 
 // =============================================================================
