@@ -4122,7 +4122,7 @@ export type TcreateCertificatedDocDto = Pick<
   | 'status'
   | 'note'
 > & {
-  products: TcreateCertificatedProductDto[];
+  products: TcreateCertificatedProductDto[]; // 不可以是空陣列
 };
 
 export type TupdateCertificatedDocDto_pre = Pick<
@@ -4143,7 +4143,7 @@ export type TupdateCertificatedDocDto_pre = Pick<
   | 'status'
   | 'snapShot'
 > & {
-  products: TupdateCertificatedProductDto[];
+  products: TupdateCertificatedProductDto[]; // 不可以是空陣列
 };
 
 export type TupdateCertificatedDocDto = Partial<TupdateCertificatedDocDto_pre>;

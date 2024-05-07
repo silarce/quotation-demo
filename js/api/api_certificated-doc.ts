@@ -211,7 +211,7 @@ const apiPostCertificatedDoc = async (body: TcreateCertificatedDocDto) => {
   const api = '/certificated-doc';
 
   return axi
-    .post(api, body)
+    .post<TcertificatedDocDto>(api, body)
     .then((res) => res.data)
     .catch((err) => {
       myAlert.err({ title: '新增證明文件失敗' });

@@ -14,7 +14,7 @@ import Certificate from './certificate';
 import { TdocType, TquotationContractDto } from 'js/api/dtoTypes';
 
 // api
-import { useGetContract_id } from 'js/api/api_quotation';
+import { useGetContract_id_strict } from 'js/api/api_quotation';
 
 // ======================================================================
 
@@ -27,6 +27,12 @@ type Tquery = {
 };
 
 // ======================================================================
+
+const customPopulate = [
+  // 'certificatedDoc',
+  'content.settleProducts',
+  'engineeringContact',
+];
 
 export default function CertifiedDocument({
   onPanelListChange,
@@ -42,12 +48,8 @@ export default function CertifiedDocument({
 
   // ---------------------------------------------------------------------------
 
-  const { data: data_contract, update: update_contract } = useGetContract_id(contractId, {
-    customPopulate: [
-      // 'certificatedDoc',
-      'content.settleProducts',
-      'engineeringContact',
-    ],
+  const { data: data_contract, update: update_contract } = useGetContract_id_strict(contractId, {
+    customPopulate: customPopulate,
   });
 
   // ---------------------------------------------------------------------------
@@ -132,6 +134,7 @@ export default function CertifiedDocument({
           className="mt-10"
           onPanelChange={setDynaPanelList}
           contract={data_contract}
+          update_contract={update_contract}
         />
       )}
       {!editCertifiedDocument && certifiedDocumentId && <Certificate onPanelChange={setDynaPanelList} />}

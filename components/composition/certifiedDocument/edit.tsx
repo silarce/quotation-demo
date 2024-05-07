@@ -36,6 +36,7 @@ import scss from './edit.module.scss';
 // api
 import {
   TsettleProductDto,
+  TcertificatedDocDto,
   TcreateCertificatedDocDto,
   TupdateCertificatedDocDto,
   useGetCertificatedDoc_id,
@@ -136,10 +137,12 @@ export default function Edit({
   className,
   onPanelChange,
   contract,
+  update_contract,
 }: {
   className?: string;
   onPanelChange: (panel: TpanelList | undefined) => void;
-  contract?: TquotationContractDto;
+  contract: TquotationContractDto | undefined;
+  update_contract: () => Promise<unknown>;
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -251,6 +254,14 @@ export default function Edit({
       };
     });
 
+    // _______________________________________________________________
+    const isPass = checkProduct(products);
+
+    if (!isPass) {
+      return;
+    }
+    // _______________________________________________________________
+
     const body: TcreateCertificatedDocDto = {
       projectNumber,
       contractor,
@@ -268,11 +279,33 @@ export default function Edit({
       products,
       note: state_note,
     };
-
+    // certifiedDocumentId
     setIsFetching(true);
-    await apiPostCertificatedDoc(body).then(() => update_data_CertifiedDocument());
+    await apiPostCertificatedDoc(body).then(async (res) => {
+      const id = res.id;
+      router.replace({
+        query: {
+          ...query,
+          certifiedDocumentId: id,
+        },
+      });
+      await update_contract();
+      await update_data_CertifiedDocument();
+    });
+    setDisabled(true);
     setIsFetching(false);
-  }, [state_description, state_docStyle, state_info, state_itemList, state_note, update_data_CertifiedDocument]);
+  }, [
+    //
+    query,
+    router,
+    state_description,
+    state_docStyle,
+    state_info,
+    state_itemList,
+    state_note,
+    update_contract,
+    update_data_CertifiedDocument,
+  ]);
 
   const reqPatchCertificatedDoc = useCallback(async () => {
     const {
@@ -303,6 +336,14 @@ export default function Edit({
       };
     });
 
+    // ______________________________________________________________
+    const isPass = checkProduct(products);
+
+    if (!isPass) {
+      return;
+    }
+    // ______________________________________________________________
+
     const body: TupdateCertificatedDocDto = {
       projectNumber,
       contractor,
@@ -324,6 +365,7 @@ export default function Edit({
 
     setIsFetching(true);
     await apiPatchCertificatedDoc(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
+    setDisabled(true);
     setIsFetching(false);
   }, [
     certifiedDocumentId,
@@ -475,6 +517,12 @@ export default function Edit({
   // ███████ ██      ██      ███████  ██████    ██
 
   useEffect(() => {
+    if (state_docStyle !== '保固書') {
+      editDate('warrantyDate', null);
+    }
+  }, [state_docStyle]);
+
+  useEffect(() => {
     onPanelChange(panelList);
 
     return () => {
@@ -563,7 +611,7 @@ export default function Edit({
           const size = calcSize({
             fullWidth,
             height,
-            boxB: boxB ?? '',
+            boxB: boxB,
           });
 
           const certificatedAllQty = calcCertificatedAllQty({
@@ -727,7 +775,7 @@ export default function Edit({
             const size = calcSize({
               fullWidth,
               height,
-              boxB: boxB ?? '',
+              boxB: boxB,
             });
 
             itemList[id] = {
@@ -958,6 +1006,7 @@ const InputGroup = ({
 
       <InputSel
         {...infoConfig}
+        className={classNames(state_docStyle !== '保固書' && 'invisible')}
         caption="保固日"
         disabled={disabled}
         datePickerProps={{
@@ -1190,8 +1239,12 @@ const usePanelList = ({
         type: 'myButton',
         label: '開立證明書',
         onClick: () => {
+          const query_copy = { ...query };
+          delete query_copy.editCertifiedDocument;
+
           router.push({
             query: {
+              ...query_copy,
               certifiedDocumentId: query.certifiedDocumentId,
               showCertificate: 'true',
             },
@@ -1238,8 +1291,9 @@ const usePanelList = ({
   }, [
     disabled,
     isNew,
-    query.certifiedDocumentId,
+    query,
     reqPatchCertificatedDoc,
+    reqPatchCertificatedDoc_review,
     reqPostCertificatedDoc,
     router,
     setDisabled,
@@ -1357,9 +1411,13 @@ const calcSize = ({
 }: {
   fullWidth: number | string;
   height: number | string;
-  boxB: number | string;
+  boxB: number | string | null;
 }) => {
-  const size = `${fullWidth}*${height}+${boxB}`;
+  let size = `${fullWidth} x ${height}`;
+
+  if (boxB !== null) {
+    size = `${size} + ${boxB}`;
+  }
 
   return size;
 };
@@ -1388,4 +1446,32 @@ const calcCertificatedAllQty = ({
     .toNumber();
 
   return certificatedAllQty;
+};
+
+const checkProduct = (
+  products: Exclude<TcreateCertificatedDocDto['products'] | TupdateCertificatedDocDto['products'], undefined>
+) => {
+  if (products.length === 0) {
+    myAlert.info({ title: '必須選擇產品' });
+
+    return false;
+  }
+
+  const zeroIndexArr: number[] = [];
+
+  products.forEach((prod, index) => {
+    if (prod.quantity === 0) {
+      zeroIndexArr.push(index + 1);
+    }
+  });
+
+  if (zeroIndexArr.length > 0) {
+    const str = zeroIndexArr.map((item) => item).join(', ');
+
+    myAlert.info({ title: '產品開立數量不可為0', content: `請檢查第${str}項` });
+
+    return false;
+  }
+
+  return true;
 };
