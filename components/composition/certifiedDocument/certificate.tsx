@@ -204,9 +204,8 @@ export default function Certificate({
       snapShot: JSON.stringify(sanpShot),
     };
 
-    setDisabled(true);
     await apiPatchCertificatedDoc_spanShot(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
-    setDisabled(false);
+    setDisabled(true);
   }, [
     //
     certifiedDocumentId,
@@ -221,9 +220,7 @@ export default function Certificate({
     const body: TupdateCertificatedDocDto = {
       status: '已用印',
     };
-    setDisabled(true);
     await apiPatchCertificatedDoc(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
-    setDisabled(false);
   }, [certifiedDocumentId, update_data_CertifiedDocument]);
 
   // ---------------------------------------------------------------------
