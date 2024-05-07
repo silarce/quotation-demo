@@ -1,9 +1,10 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { NextRouter, useRouter } from 'next/router';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import moment, { Moment } from 'moment';
+import Decimal from 'decimal.js';
 
 // layout
 import { TtagList as TtabList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -147,13 +148,13 @@ export default function Certificate({
   const editItem = (id: string, key: keyof Titem, value: string) => {
     setState_itemList((state) => {
       const copy = { ...state };
-      copy[id].qty = value;
+      copy[id][key] = value;
 
       return copy;
     });
   };
 
-  const dlPdf = async () => {
+  const dlPdf = useCallback(async () => {
     // showRootLoading(true, '正在處理PDF');
 
     const doc = new jsPDF('p', 'px', 'a4');
@@ -178,7 +179,7 @@ export default function Certificate({
 
     doc.save(`${'foooo'}.pdf`);
     // showRootLoading(false);
-  };
+  }, []);
 
   // ---------------------------------------------------------------------
 
@@ -189,7 +190,7 @@ export default function Certificate({
   // ██   ██ ███████  ██████  ███████ ███████    ██
   //                     ▀▀
 
-  const reqPatchCertificatedDoc = async () => {
+  const reqPatchCertificatedDoc = useCallback(async () => {
     const sanpShot: Tdata = {
       infoList: state_infoList,
       itemList: state_itemList,
@@ -199,19 +200,27 @@ export default function Certificate({
     const body: TupdateCertificatedDocDto = {
       snapShot: JSON.stringify(sanpShot),
     };
+
     setDisabled(true);
     await apiPatchCertificatedDoc(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
     setDisabled(false);
-  };
+  }, [
+    //
+    certifiedDocumentId,
+    state_description,
+    state_infoList,
+    state_itemList,
+    update_data_CertifiedDocument,
+  ]);
 
-  const reqSealCertificatedDoc = async () => {
+  const reqSealCertificatedDoc = useCallback(async () => {
     const body: TupdateCertificatedDocDto = {
       status: '已用印',
     };
     setDisabled(true);
     await apiPatchCertificatedDoc(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
     setDisabled(false);
-  };
+  }, [certifiedDocumentId, update_data_CertifiedDocument]);
 
   // ---------------------------------------------------------------------
 
@@ -254,6 +263,8 @@ export default function Certificate({
     const bodyRowArr: Ttable['tbody']['rowArr'] = Object.entries(state_itemList).map(([id, item], index) => {
       // html2canvas在擷取HTML時textarea與input會跑版
       // 因此要匯出時要將input與textarea的value顯示在suffix
+      // _________________________________________________________________________
+      // _________________________________________________________________________
       const inputProps_itemName: TinputProps | undefined = disabled
         ? undefined
         : {
@@ -265,9 +276,10 @@ export default function Certificate({
               },
             },
           };
-
       const suffix_itemName = disabled ? item.itemName : undefined;
 
+      // _________________________________________________________________________
+      // _________________________________________________________________________
       const inputProps_size: TinputProps | undefined = disabled
         ? undefined
         : {
@@ -279,8 +291,25 @@ export default function Certificate({
               },
             },
           };
+      const suffix_size = disabled ? item.size : undefined;
+      // _________________________________________________________________________
+      // _________________________________________________________________________
 
-      const suffix_size = item.size;
+      const inputSize_note: TinputProps | undefined = disabled
+        ? undefined
+        : {
+            props: {
+              className: cellConfig.note.className,
+              value: item.note,
+              onChange: (e) => {
+                editItem(id, 'note', e.target.value);
+              },
+            },
+          };
+      const suffix_note = disabled ? item.note : undefined;
+
+      // _________________________________________________________________________
+      // _________________________________________________________________________
 
       return {
         minHeight: tableConfig.row.minHeight,
@@ -314,7 +343,15 @@ export default function Certificate({
             ...cellConfig.qty,
           },
           {
-            children: item.note,
+            children: (
+              <InputSel
+                //
+                disabled={disabled}
+                showBaseline="auto"
+                inputProps={inputSize_note}
+                suffix={suffix_note}
+              />
+            ),
             ...cellConfig.note,
           },
         ],
@@ -332,8 +369,8 @@ export default function Certificate({
   // ---------------------------------------------------------------------
 
   useEffect(() => {
-    // update_data_CertifiedDocument();
-  }, []);
+    update_data_CertifiedDocument();
+  }, [certifiedDocumentId]);
 
   useEffect(() => {
     const {
@@ -365,7 +402,11 @@ export default function Certificate({
       const { id: prodId } = prod;
       const { itemName, size, note = '' } = data_certificate?.itemList[prodId] ?? {};
 
-      const size_ori = `${prod.fullWidth} * ${prod.height} + ${prod.boxB}`;
+      const size_ori = calcSize({
+        fullWidth: prod.fullWidth,
+        height: prod.height,
+        boxB: prod.boxB,
+      });
 
       list[prod.id] = {
         itemName: itemName || prod.itemName,
@@ -376,26 +417,20 @@ export default function Certificate({
     });
 
     setState_docType(docType || '　');
+    setState_itemList(list);
 
     if (data_certificate) {
-      let infoList = data_certificate.infoList;
-
-      if (Object.keys(infoList).length === 0) {
-        infoList = defaultInfo();
-      }
-
       const issuanceDate = data_certificate.issuanceDate ? moment(data_certificate.issuanceDate) : null;
 
-      setState_infoList(infoList);
-      setState_itemList(list);
+      setState_infoList(data_certificate.infoList);
       setState_description(data_certificate.description);
       setState_issuanceDate(issuanceDate);
     } else {
-      setState_infoList({});
-      setState_itemList({});
+      setState_infoList(defaultInfo());
       setState_description(descriptionTemp());
       setState_issuanceDate(null);
     }
+
     //
   }, [data_certifiedDocument, disabled]);
 
@@ -633,7 +668,15 @@ const usePanelList = ({
     } else {
       return panelList_abled;
     }
-  }, [disabled]);
+  }, [
+    //
+    disabled,
+    dlPdf,
+    reqPatchCertificatedDoc,
+    reqSealCertificatedDoc,
+    router.back,
+    setDiasbled,
+  ]);
 
   return panelList;
 };
@@ -723,76 +766,6 @@ const defaultInfo = () => ({
 // ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
 // ██      ██   ██ ██   ██ ███████     ██████  ██   ██    ██    ██   ██
 
-// const createFakeData = () => ({
-//   infoList: {
-//     工程名稱: {
-//       caption: '工程名稱',
-//       value: '華新楊梅高校工廠新建工程',
-//     },
-//     建築地號: {
-//       caption: '建築地號',
-//       value: '桃園市楊梅區高獅段852地號',
-//     },
-//     建照號碼: {
-//       caption: '建照號碼',
-//       value: '（108）桃市都建執照',
-//     },
-//     業主名稱: {
-//       caption: '業主名稱',
-//       value: '華新麗華股份有限公司',
-//     },
-//     承造人: {
-//       caption: '承造人',
-//       value: '中鹿營造股份有限公司',
-//     },
-//     施工廠商: {
-//       caption: '施工廠商',
-//       value: '三久建材工業股份有限公司',
-//     },
-//   },
-//   itemInfoArr: [
-//     {
-//       itemName: 'SD-1',
-//       size: '999 * 999 + 999',
-//       qty: '99',
-//       remark: '防颱',
-//     },
-//     {
-//       itemName: 'SD-2',
-//       size: '977 * 999 + 999',
-//       qty: '88',
-//       remark:
-//         '很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註很長的備註',
-//     },
-//     {
-//       itemName: 'SD-3',
-//       size: '988 * 999 + 999',
-//       qty: '77',
-//       remark: '防颱',
-//     },
-//   ],
-//   description: `
-//   共計 6 樘之製造及按裝，特立此書以茲證明
-//   ＊本證明書無公司章及影印均無效！
-//   三久建材工業股份有限公司
-//   `,
-//   isSealed: false,
-// });
-
-// const useFakeApiGetCertificate = (id: string | undefined) => {
-//   const [data, setData] = useState<Tdata>();
-
-//   const update = async () => {
-//     if (!id) {
-//       return;
-//     }
-
-//     setData(createFakeData);
-//   };
-
-//   return { data, update };
-// };
-
 const FakeSeal = ({ className }: { className?: string }) => {
   return (
     <div className={classNames(className)}>
@@ -820,4 +793,18 @@ const FakeSeal = ({ className }: { className?: string }) => {
       </svg>
     </div>
   );
+};
+
+const calcSize = ({ fullWidth, height, boxB }: { fullWidth: number; height: number; boxB: number | null }) => {
+  const fullWidth_cm = new Decimal(fullWidth).div(10).toNumber();
+  const height_cm = new Decimal(height).div(10).toNumber();
+
+  let size = `${fullWidth_cm} * ${height_cm}`;
+
+  if (boxB !== null) {
+    const boxB_cm = new Decimal(boxB).div(10).toNumber();
+    size = `${size} + ${boxB_cm}`;
+  }
+
+  return size;
 };
