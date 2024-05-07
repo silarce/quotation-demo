@@ -485,6 +485,7 @@ version>1 是子合約
   const tabList: TtabList = [
     {
       label: `合約編號 ${contract?.contractNumber ?? ''}`,
+      isActive: tab === 'contract',
       onClick: () => {
         router.push({
           query: {
@@ -503,6 +504,7 @@ version>1 是子合約
     // },
     {
       label: `會議記錄`,
+      isActive: tab === 'meetingMinutes',
       onClick: () => {
         router.push({
           query: {
@@ -521,6 +523,7 @@ version>1 是子合約
       0,
       {
         label: `工程聯絡單`,
+        isActive: tab === 'contactDoc',
         onClick: () => {
           router.push({
             query: {
@@ -533,6 +536,7 @@ version>1 是子合約
       },
       {
         label: `證明文件`,
+        isActive: tab === 'certifiedDocument',
         onClick: () => {
           router.push({
             query: {
