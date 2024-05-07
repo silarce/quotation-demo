@@ -90,6 +90,58 @@ const useGetCertificatedDoc = (params?: Tparams) => {
   };
 };
 
+const useGetCertificatedDoc_contractId = (contractId: string | undefined, params: Tparams) => {
+  const [res, setRes] = useState<TpageResponse<TcertificatedDocDto> | undefined>(undefined);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
+
+  params = {
+    pageSize: 99999,
+    populate: [
+      'products',
+      'reviewGuarantorEmployee',
+      'reviewAccountingEmployee',
+      'reviewAuditorEmployee',
+      'reviewManagerEmployee',
+      'agentEmployee',
+    ],
+    ...params,
+    filter: {
+      ...params.filter,
+      contractId: { $eq: contractId },
+    },
+  };
+
+  const update = async () => {
+    if (!contractId) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    return await apiGetCertificatedDoc(params)
+      .then((res) => {
+        setRes(res);
+
+        return res;
+      })
+      .catch((err: AxiosError) => {
+        myAlert.err({ title: '取得證明文件列表失敗', content: err.message });
+
+        return Promise.reject(err);
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+    isFetching,
+  };
+};
+
 // --------------------------------------------------------------------
 const apiGetCertificatedDoc_id = async (id: string) => {
   const api = `/certificated-doc/${id}`;
@@ -170,7 +222,7 @@ const apiPatchCertificatedDoc = async (id: string, body: TupdateCertificatedDocD
   const api = `/certificated-doc/${id}`;
 
   return axi
-    .post(api, body)
+    .patch(api, body)
     .then((res) => res.data)
     .catch((err) => {
       myAlert.err({ title: '更新證明文件失敗' });
@@ -316,6 +368,7 @@ export {
   useGetCertificatedDoc,
   useGetCertificatedDoc_infinite,
   useGetCertificatedDoc_id,
+  useGetCertificatedDoc_contractId,
   apiPostCertificatedDoc,
   apiPatchCertificatedDoc,
   apiDeleteCertificatedDoc,

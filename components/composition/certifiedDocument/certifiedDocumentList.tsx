@@ -20,7 +20,12 @@ import scss from './certifiedDocumentList.module.scss';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // api
-import { Tparams, TdocType, useGetCertificatedDoc } from 'js/api/api_certificated-doc';
+import {
+  Tparams,
+  TdocType,
+  useGetCertificatedDoc,
+  useGetCertificatedDoc_contractId,
+} from 'js/api/api_certificated-doc';
 
 // ===================================== ========================================
 
@@ -33,10 +38,12 @@ export default function CertifiedDocumentList({
   showDocType,
   className,
   defaultDocumentType = '防火證明',
+  contractId,
 }: {
   showDocType?: TdocType[];
   className?: string;
   defaultDocumentType?: TdocType;
+  contractId: string | undefined;
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -45,21 +52,15 @@ export default function CertifiedDocumentList({
   // ========================================================================
 
   const params: Tparams = {
-    populate: [
-      'products',
-      'reviewGuarantorEmployee',
-      'reviewAccountingEmployee',
-      'reviewAuditorEmployee',
-      'reviewManagerEmployee',
-      'agentEmployee',
-    ],
-
     filter: {
       docStyle: { $eq: documentType },
     },
   };
 
-  const { data: data_certificatedDocArr = [], update: update_certificatedDoc } = useGetCertificatedDoc(params);
+  const { data: data_certificatedDocArr = [], update: update_certificatedDoc } = useGetCertificatedDoc_contractId(
+    contractId,
+    params
+  );
 
   // ========================================================================
 
@@ -257,7 +258,7 @@ export default function CertifiedDocumentList({
 
   useEffect(() => {
     update_certificatedDoc();
-  }, [documentType]);
+  }, [contractId, documentType]);
 
   // ========================================================================
   let tabArr: Ttab[] = [

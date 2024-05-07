@@ -125,7 +125,7 @@ export default function CertifiedDocument({
   return (
     <div className="ml-10 mr-10 pb-10">
       {/*  */}
-      {isListShow && <CertifiedDocumentList showDocType={showDocType} />}
+      {isListShow && <CertifiedDocumentList showDocType={showDocType} contractId={data_contract?.id} />}
       {editCertifiedDocument && (
         <Edit
           //
