@@ -859,6 +859,12 @@ version>1 是子合約
     }
   };
 
+  // --------------------------Z---------------------------------------------
+
+  const scrollToTopTrigger = useMemo(() => {
+    return [state_tab === 'contactDoc', isShowPattern];
+  }, [isShowPattern, state_tab]);
+
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -870,8 +876,7 @@ version>1 是子合約
     <SubLayer
       //
       isLoading_all={isLoading || isLoading_workContact}
-      // scrollToTopTrigger={[isShowWorkContactDoc, isShowPattern]}
-      scrollToTopTrigger={[state_tab === 'contactDoc', isShowPattern]}
+      scrollToTopTrigger={scrollToTopTrigger}
     >
       <PageHeader02
         tagList={tabList}
