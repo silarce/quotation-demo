@@ -20,6 +20,7 @@ import type {
   TquotationContentDto,
   TsubmitCertificatedDocDto,
   TreviewCertificatedDocDto,
+  TcreateCertificatedDocSnapShotDto,
 } from './dtoTypes';
 
 export type {
@@ -36,6 +37,7 @@ export type {
   TupdateCertificatedProductDto,
   TsubmitCertificatedDocDto,
   TreviewCertificatedDocDto,
+  TcreateCertificatedDocSnapShotDto,
 };
 
 // ===========================================================================
@@ -334,6 +336,22 @@ const useGetQuotationContentSettleProduct_pseudoMeta = createUseInfinite<TpageRe
 
 // --------------------------------------------------------------------
 
+const apiPatchCertificatedDoc_spanShot = async (id: string, body: TcreateCertificatedDocSnapShotDto) => {
+  const api = `/certificated-doc/${id}/snap-shot`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '更新證明書失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// --------------------------------------------------------------------
+
 // 送審
 const apiPatchCertificatedDoc_submit = async (id: string, body: TsubmitCertificatedDocDto) => {
   const api = `/certificated-doc/${id}/submit`;
@@ -374,6 +392,7 @@ export {
   apiDeleteCertificatedDoc,
   apiPatchCertificatedDoc_submit,
   apiPatchCertificatedDoc_review,
+  apiPatchCertificatedDoc_spanShot,
   //
   useGetQuotationContentSettleProduct_pseudoMeta,
   useGetQuotationContentSettleProduct,

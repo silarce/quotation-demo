@@ -32,9 +32,11 @@ import {
   TupdateCertificatedDocDto,
   TdocType,
   TcertificatedProductDto,
+  TcreateCertificatedDocSnapShotDto,
   useGetCertificatedDoc_id,
   apiPostCertificatedDoc,
   apiPatchCertificatedDoc,
+  apiPatchCertificatedDoc_spanShot,
 } from 'js/api/api_certificated-doc';
 
 // ===============================================================================
@@ -75,7 +77,7 @@ type Tdata = {
       note: string;
     };
   };
-  issuanceDate?: string; // 發行時間
+  issuanceDate: string | null; // 發行時間
 };
 
 // ==================================================================================
@@ -195,14 +197,15 @@ export default function Certificate({
       infoList: state_infoList,
       itemList: state_itemList,
       description: state_description,
+      issuanceDate: state_issuanceDate?.toISOString() || null,
     };
 
-    const body: TupdateCertificatedDocDto = {
+    const body: TcreateCertificatedDocSnapShotDto = {
       snapShot: JSON.stringify(sanpShot),
     };
 
     setDisabled(true);
-    await apiPatchCertificatedDoc(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
+    await apiPatchCertificatedDoc_spanShot(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
     setDisabled(false);
   }, [
     //
@@ -210,6 +213,7 @@ export default function Certificate({
     state_description,
     state_infoList,
     state_itemList,
+    state_issuanceDate,
     update_data_CertifiedDocument,
   ]);
 
