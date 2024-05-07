@@ -25,7 +25,10 @@ import MeetingMinutes_contract, {
   TimperativeHandle as TimperativeHandle_meetingMinutes,
   Tstate as Tstate_meetingMinutes,
 } from 'components/composition/meetingMinutes/contract';
-
+import WorkContactDoc_component, {
+  TimperativeHandle,
+  TonStateChange,
+} from 'components/page/worksDepartment/contracList/contract/workContactDoc/workContactDoc_component';
 import CertifiedDocument from 'components/composition/certifiedDocument';
 
 // components
@@ -40,10 +43,7 @@ import Table_prod from 'components/page/domestic/quotation/quotation/product/tab
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/contract/table/table_accessories';
 import Table_others from 'components/page/domestic/contract/table/table_others';
-import WorkContactDoc_component, {
-  TimperativeHandle,
-  TonStateChange,
-} from 'components/page/worksDepartment/contracList/contract/workContactDoc/workContactDoc_component';
+
 import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 
 import Summary, {
@@ -84,7 +84,13 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 
 // =============================================================
 
-type Tstate_tab = 'contract' | 'contactDoc' | 'meetingMinutes' | 'certifiedDocument';
+// type Tstate_tab = 'contract' | 'contactDoc' | 'meetingMinutes' | 'certifiedDocument';
+
+type Tquery = {
+  id: string | undefined;
+  version: string | undefined;
+  tab: 'contract' | 'contactDoc' | 'meetingMinutes' | 'certifiedDocument';
+};
 
 // =============================================================
 // =============================================================
@@ -102,20 +108,20 @@ export default function Quotation() {
 
 // ===========================================================
 function TheQuotation({ router }: { router: NextRouter }) {
+  const query = router.query as Tquery;
+
   const {
     id, //報價單id
     version,
-  } = router.query as {
-    id: string | undefined;
-    version: string | undefined;
-  };
+    tab = 'contract',
+  } = query;
 
   const [isLoading, setIsLoading] = useState(false);
   const [reviewFormShow, setReviewFormShow] = useState(false);
 
   // -----------------------------------------------------------
 
-  const [state_tab, setState_tab] = useState<Tstate_tab>('contract');
+  // const [state_tab, setState_tab] = useState<Tstate_tab>('contract');
 
   const [dynaPanelList, setDynaPanelList] = useState<TpanelList | null | undefined>(null);
 
@@ -480,7 +486,13 @@ version>1 是子合約
     {
       label: `合約編號 ${contract?.contractNumber ?? ''}`,
       onClick: () => {
-        setState_tab('contract');
+        router.push({
+          query: {
+            id,
+            version,
+            tab: 'contract',
+          },
+        });
       },
     },
     // {
@@ -492,27 +504,46 @@ version>1 是子合約
     {
       label: `會議記錄`,
       onClick: () => {
-        setState_tab('meetingMinutes');
-      },
-    },
-    {
-      label: `證明文件`,
-      onClick: () => {
-        setState_tab('certifiedDocument');
+        router.push({
+          query: {
+            id,
+            version,
+            tab: 'meetingMinutes',
+          },
+        });
       },
     },
   ];
 
-  // if (!engineeringContactId) {
-  //   tabList.pop();
-  // }
   if (engineeringContactId) {
-    tabList.splice(1, 0, {
-      label: `工程聯絡單`,
-      onClick: () => {
-        setState_tab('contactDoc');
+    tabList.splice(
+      1,
+      0,
+      {
+        label: `工程聯絡單`,
+        onClick: () => {
+          router.push({
+            query: {
+              id,
+              version,
+              tab: 'contactDoc',
+            },
+          });
+        },
       },
-    });
+      {
+        label: `證明文件`,
+        onClick: () => {
+          router.push({
+            query: {
+              id,
+              version,
+              tab: 'certifiedDocument',
+            },
+          });
+        },
+      }
+    );
   }
 
   const panel_quotation01: TpanelList = [
@@ -691,7 +722,7 @@ version>1 是子合約
 
   const panelList = panelListRouter({
     panelListList,
-    state_tab,
+    tab,
     isShowPattern,
     switch02,
     disabed_workContactDoc,
@@ -862,8 +893,8 @@ version>1 是子合約
   // --------------------------Z---------------------------------------------
 
   const scrollToTopTrigger = useMemo(() => {
-    return [state_tab === 'contactDoc', isShowPattern];
-  }, [isShowPattern, state_tab]);
+    return [tab === 'contactDoc', isShowPattern];
+  }, [isShowPattern, tab]);
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -887,7 +918,7 @@ version>1 是子合約
       <div>
         {/* <ContractNode /> */}
 
-        {state_tab === 'contract' && (
+        {tab === 'contract' && (
           <div className={classNames(scss.quotation)}>
             {/* 報價單基本資料 */}
             <QuotationProfile disabled={true} control={control_profile} />
@@ -997,7 +1028,7 @@ version>1 是子合約
         {/*  */}
         {/*  */}
         {/*  */}
-        {state_tab === 'contactDoc' && engineeringContactId && (
+        {tab === 'contactDoc' && engineeringContactId && (
           <div>
             <WorkContactDoc_component
               ref={ref_workContact}
@@ -1008,7 +1039,7 @@ version>1 是子合約
           </div>
         )}
 
-        {state_tab === 'meetingMinutes' && (
+        {tab === 'meetingMinutes' && (
           <MeetingMinutes_contract
             //
             ref={ref_meetingMinutes}
@@ -1018,7 +1049,7 @@ version>1 是子合約
           />
         )}
 
-        {state_tab === 'certifiedDocument' && <CertifiedDocument onPanelListChange={dynaPanelListReducer} />}
+        {tab === 'certifiedDocument' && <CertifiedDocument onPanelListChange={dynaPanelListReducer} />}
 
         <InputModal
           visible={!!inputModalConfig?.visible}
@@ -1197,7 +1228,7 @@ type TpanelListList = {
 
 const panelListRouter = ({
   panelListList,
-  state_tab,
+  tab,
   isShowPattern,
   switch02,
   disabed_workContactDoc,
@@ -1206,7 +1237,7 @@ const panelListRouter = ({
   isMeetingEdit,
 }: {
   panelListList: TpanelListList;
-  state_tab: Tstate_tab;
+  tab: Tquery['tab'];
   isShowPattern: boolean;
   switch02: boolean;
   disabed_workContactDoc: boolean;
@@ -1222,7 +1253,7 @@ const panelListRouter = ({
     panel_workContack_pattern,
   } = panelListList;
 
-  if (state_tab === 'contract') {
+  if (tab === 'contract') {
     if (switch02) {
       return panel_quotation03;
     } else {
@@ -1230,7 +1261,7 @@ const panelListRouter = ({
     }
   }
 
-  if (state_tab === 'contactDoc') {
+  if (tab === 'contactDoc') {
     if (isShowPattern) {
       return panel_workContack_pattern;
     } else if (disabed_workContactDoc) {
@@ -1240,7 +1271,7 @@ const panelListRouter = ({
     }
   }
 
-  if (state_tab === 'meetingMinutes') {
+  if (tab === 'meetingMinutes') {
     if (isMeetingAdd) {
       return panelListList.panel_meeting_add;
     } else if (isMeetingEdit) {

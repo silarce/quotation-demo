@@ -104,18 +104,18 @@ export default function CertifiedDocument({
   }, [panelList]);
 
   //
-  useEffect(() => {
-    return () => {
-      const query_copy = { ...query };
-      delete query_copy.documentType;
-      delete query_copy.editCertifiedDocument;
-      delete query_copy.certifiedDocumentId;
+  // useEffect(() => {
+  //   return () => {
+  //     const query_copy = { ...query };
+  //     delete query_copy.documentType;
+  //     delete query_copy.editCertifiedDocument;
+  //     delete query_copy.certifiedDocumentId;
 
-      router.replace({
-        query: query_copy,
-      });
-    };
-  }, []);
+  //     router.replace({
+  //       query: query_copy,
+  //     });
+  //   };
+  // }, []);
 
   useEffect(() => {
     update_contract();
