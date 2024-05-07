@@ -5,10 +5,17 @@
   display: grid;
   //                  title       infoList     table       textarea_autosize footer
   grid-template-rows: max-content max-content max-content auto max-content;
-  padding: 100px;
+
+  width: 1500px;
   aspect-ratio: 210/297;
+  // height: max-content;
+  // overflow: hidden;
+
+  margin: auto;
+  padding: 100px;
   border: solid 1px black;
-  transform: scale(0.8) translateY(-10%);
+  // transform: scale(0.8) translateY(-10%);
+  // box-sizing: content-box;
 }
 
 .title {
@@ -63,9 +70,10 @@
 .textarea {
   display: block;
   width: 800px;
-  height: 200px;
+  // height: 200px;
   margin: auto;
   margin-top: 50px;
+  margin-bottom: 50px;
   border: solid 1px theme("colors.border");
   resize: none;
   text-align: center;
@@ -122,4 +130,16 @@
   input {
     font-size: 30px !important;
   }
+}
+
+.inputsel {
+  width: 290px;
+  text-align: center;
+}
+
+.infoSuffix {
+  display: inline-block;
+  width: 290px;
+  white-space: pre-wrap;
+  word-break: break-all;
 }

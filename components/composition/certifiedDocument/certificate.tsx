@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, MutableRefObject, forwardRef } from 'react';
 import classNames from 'classnames';
 import { NextRouter, useRouter } from 'next/router';
 import html2canvas from 'html2canvas';
@@ -12,7 +12,7 @@ import { TtagList as TtabList, TpanelList, Tlink, TlinkArr } from 'components/Pa
 
 // gear
 // import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import InputSel, { TinputProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputProps, TtextareaProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import Textarea_autosize from 'react-textarea-autosize';
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
@@ -38,6 +38,7 @@ import {
   apiPatchCertificatedDoc,
   apiPatchCertificatedDoc_spanShot,
 } from 'js/api/api_certificated-doc';
+import { set } from 'lodash';
 
 // ===============================================================================
 
@@ -102,6 +103,14 @@ export default function Certificate({
   // const isNew = !certificateId;
 
   const refPdf = useRef<HTMLDivElement>(null!);
+
+  const ref_container = useRef<HTMLDivElement>(null!);
+  const ref_title = useRef<HTMLDivElement>(null!);
+  const ref_info = useRef<HTMLDivElement>(null!);
+  const ref_table = useRef<HTMLDivElement>(null!);
+  const ref_description = useRef<HTMLDivElement>(null!);
+  const ref_footer = useRef<HTMLDivElement>(null!);
+  const ref_tableTitle = useRef<HTMLDivElement>(null!);
 
   // ---------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
@@ -266,7 +275,7 @@ export default function Certificate({
       // 因此要匯出時要將input與textarea的value顯示在suffix
       // _________________________________________________________________________
       // _________________________________________________________________________
-      const inputProps_itemName: TinputProps | undefined = disabled
+      const inputProps_itemName: TtextareaProps | undefined = disabled
         ? undefined
         : {
             props: {
@@ -296,7 +305,7 @@ export default function Certificate({
       // _________________________________________________________________________
       // _________________________________________________________________________
 
-      const inputSize_note: TinputProps | undefined = disabled
+      const inputSize_note: TtextareaProps | undefined = disabled
         ? undefined
         : {
             props: {
@@ -314,15 +323,21 @@ export default function Certificate({
 
       return {
         minHeight: tableConfig.row.minHeight,
+        props: {
+          id,
+        },
         cellArr: [
           {
             children: (
               <InputSel
                 //
+                className={cellConfig.itemName.className}
                 disabled={disabled}
+                fontSize={'20'}
                 showBaseline="auto"
-                inputProps={inputProps_itemName}
+                textareaProps={inputProps_itemName}
                 suffix={suffix_itemName}
+                suffixClassName={scss.infoSuffix}
               />
             ),
             ...cellConfig.itemName,
@@ -331,10 +346,13 @@ export default function Certificate({
             children: (
               <InputSel
                 //
+                className={cellConfig.size.className}
                 disabled={disabled}
+                fontSize={'20'}
                 showBaseline="auto"
                 inputProps={inputProps_size}
                 suffix={suffix_size}
+                suffixClassName={scss.infoSuffix}
               />
             ),
             ...cellConfig.size,
@@ -347,10 +365,13 @@ export default function Certificate({
             children: (
               <InputSel
                 //
+                className={cellConfig.note.className}
+                fontSize={'20'}
                 disabled={disabled}
                 showBaseline="auto"
-                inputProps={inputSize_note}
+                textareaProps={inputSize_note}
                 suffix={suffix_note}
+                suffixClassName={scss.infoSuffix}
               />
             ),
             ...cellConfig.note,
@@ -453,127 +474,174 @@ export default function Certificate({
   // ██   ██ ███████ ██   ████ ██████  ███████ ██   ██
 
   return (
-    <div ref={refPdf} className={classNames(scss.container)}>
-      <h1 className={classNames(scss.title)}>{state_docType}</h1>
+    <div>
+      <div ref={ref_container} className={classNames(scss.container)}>
+        <h1 ref={ref_title} className={classNames(scss.title)}>
+          {state_docType}
+        </h1>
 
-      <div className={scss.infoList}>
-        <div className={classNames(scss.infoBar)}>
-          <div />
-          <IconAddCircle
-            className={classNames(scss.addBtn, disabled && 'invisible')}
-            onClick={() => setShowModal(true)}
-          />
+        <div ref={ref_info} className={scss.infoList}>
+          <div className={classNames(scss.infoBar)}>
+            <div />
+            <IconAddCircle
+              className={classNames(scss.addBtn, disabled && 'invisible')}
+              onClick={() => setShowModal(true)}
+            />
+          </div>
+          {Object.entries(state_infoList).map(([key, info]) => {
+            const inputProps: TinputProps | undefined = disabled
+              ? undefined
+              : {
+                  props: {
+                    value: info.value,
+                    onChange: (e) => {
+                      editInfo(key, e.target.value);
+                    },
+                    style: {
+                      fontSize: '30px',
+                    },
+                  },
+                };
+
+            const suffix = disabled ? info.value : undefined;
+
+            return (
+              <div key={key} className={classNames(scss.infoBar, 'mb-3')}>
+                <IconRemoveCircle
+                  className={classNames(scss.removeBtn, disabled && 'invisible')}
+                  onClick={() => removeInfo(key)}
+                />
+                <InputSel
+                  disabled={disabled}
+                  showBaseline="auto"
+                  caption={info.caption}
+                  captionStyle={{ width: '120px', fontSize: '30px' }}
+                  inputProps={inputProps}
+                  suffix={suffix}
+                  suffixClassName={scss.suffix}
+                />
+              </div>
+            );
+          })}
         </div>
-        {Object.entries(state_infoList).map(([key, info]) => {
-          const inputProps: TinputProps | undefined = disabled
-            ? undefined
-            : {
-                props: {
-                  value: info.value,
-                  onChange: (e) => {
-                    editInfo(key, e.target.value);
-                  },
-                  style: {
-                    fontSize: '30px',
-                  },
-                },
-              };
 
-          const suffix = disabled ? info.value : undefined;
+        <div ref={ref_table} className={scss.tableWrapper}>
+          <div ref={ref_tableTitle}>
+            <InputSel
+              //
+              className={scss.tableCaption}
+              captionStyle={{ width: '120px', fontSize: '30px' }}
+              disabled={disabled}
+              caption={'承攬項目'}
+              showBaseline="invisible"
+            />
+          </div>
+          <Table01 className={scss.table} {...tableProps} />
+        </div>
 
-          return (
-            <div key={key} className={classNames(scss.infoBar, 'mb-3')}>
-              <IconRemoveCircle
-                className={classNames(scss.removeBtn, disabled && 'invisible')}
-                onClick={() => removeInfo(key)}
-              />
-              <InputSel
-                disabled={disabled}
-                showBaseline="auto"
-                caption={info.caption}
-                captionStyle={{ width: '120px', fontSize: '30px' }}
-                inputProps={inputProps}
-                suffix={suffix}
-                suffixClassName={scss.suffix}
-              />
-            </div>
-          );
-        })}
-      </div>
-
-      <div className={scss.tableWrapper}>
-        <InputSel
-          //
-          className={scss.tableCaption}
-          captionStyle={{ width: '120px', fontSize: '30px' }}
-          disabled={disabled}
-          caption={'承攬項目'}
-          showBaseline="invisible"
-        />
-        <Table01 className={scss.table} {...tableProps} />
-      </div>
-
-      {/*     
+        {/*     
       // html2canvas在擷取HTML時textarea與input會跑版
       // 因此要匯出時要將input與textarea的value放在非input與textarea的元素
        */}
-      {!disabled && (
-        <Textarea_autosize
-          //
-          className={classNames(scss.textarea)}
-          value={state_description}
-          onChange={(e) => {
-            setState_description(e.target.value);
-          }}
-        />
-      )}
-      {disabled && <div className={classNames(scss.textarea, scss.div)}>{state_description}</div>}
+        {!disabled && (
+          <Textarea_autosize
+            //
+            className={classNames(scss.textarea)}
+            value={state_description}
+            onChange={(e) => {
+              setState_description(e.target.value);
+            }}
+          />
+        )}
+        {disabled && (
+          <div ref={ref_description} className={classNames(scss.textarea, scss.div)}>
+            {state_description}
+          </div>
+        )}
 
-      <div className={scss.footer}>
-        <div>台中總公司：{companyInfo.headOffice.wholeAddress}</div>
-        <div>TEL：{companyInfo.headOffice.tel}</div>
-        <div>台北分公司：{companyInfo.taipeiOffice.wholeAddress}</div>
-        <div>TEL：{companyInfo.taipeiOffice.tel}</div>
-        <div className={scss.footerDate}>
-          {disabled && (
-            <span>
-              中華民國 {year} 年 {month} 月 {date} 日
-            </span>
-          )}
+        <div ref={ref_footer} className={scss.footer}>
+          <div>台中總公司：{companyInfo.headOffice.wholeAddress}</div>
+          <div>TEL：{companyInfo.headOffice.tel}</div>
+          <div>台北分公司：{companyInfo.taipeiOffice.wholeAddress}</div>
+          <div>TEL：{companyInfo.taipeiOffice.tel}</div>
+          <div className={scss.footerDate}>
+            {disabled && (
+              <span>
+                中華民國 {year} 年 {month} 月 {date} 日
+              </span>
+            )}
 
-          {!disabled && (
-            <InputSel
-              caption="中華民國年月日"
-              //
-              captionStyle={{ fontSize: '30px' }}
-              wrapperStyle={{ width: '500px', margin: 'auto' }}
-              datePickerProps={{
-                props: {
-                  className: scss.datePicker,
-                  value: state_issuanceDate,
-                  onChange: (m) => {
-                    setState_issuanceDate(m);
+            {!disabled && (
+              <InputSel
+                caption="中華民國年月日"
+                //
+                captionStyle={{ fontSize: '30px' }}
+                wrapperStyle={{ width: '500px', margin: 'auto' }}
+                datePickerProps={{
+                  props: {
+                    className: scss.datePicker,
+                    value: state_issuanceDate,
+                    onChange: (m) => {
+                      setState_issuanceDate(m);
+                    },
                   },
-                },
-              }}
-            />
-          )}
+                }}
+              />
+            )}
+          </div>
         </div>
-      </div>
 
-      {isSealed && <FakeSeal className={scss.seal} />}
-
-      {/*  */}
-      <InputModal
+        {/* <VirtualCertificate
+        ref_container={ref_container}
+        ref_title={ref_title}
+        ref_info={ref_info}
+        ref_description={ref_description}
+        ref_footer={ref_footer}
+        ref_table={ref_table}
+        ref_tableTitle={ref_tableTitle}
         //
-        visible={showModal}
-        title="新增資訊"
-        onConfirm={(str) => {
-          setState_infoList((prev) => ({ ...prev, [str]: { caption: str, value: '' } }));
-          setShowModal(false);
-        }}
-        onCancel={() => setShowModal(false)}
-      />
+        state_itemList={state_itemList}
+        state_docType={state_docType}
+        state_infoList={state_infoList}
+        state_description={state_description}
+        year={year}
+        month={month}
+        date={date}
+        isSealed={isSealed}
+      /> */}
+
+        {isSealed && <FakeSeal className={scss.seal} />}
+
+        {/*  */}
+        <InputModal
+          //
+          visible={showModal}
+          title="新增資訊"
+          onConfirm={(str) => {
+            setState_infoList((prev) => ({ ...prev, [str]: { caption: str, value: '' } }));
+            setShowModal(false);
+          }}
+          onCancel={() => setShowModal(false)}
+        />
+      </div>
+      {/* <VirtualCertificate
+        ref_container={ref_container}
+        ref_title={ref_title}
+        ref_info={ref_info}
+        ref_description={ref_description}
+        ref_footer={ref_footer}
+        ref_table={ref_table}
+        ref_tableTitle={ref_tableTitle}
+        //
+        state_itemList={state_itemList}
+        state_docType={state_docType}
+        state_infoList={state_infoList}
+        state_description={state_description}
+        year={year}
+        month={month}
+        date={date}
+        isSealed={isSealed}
+      /> */}
     </div>
   );
 }
@@ -609,21 +677,6 @@ const usePanelList = ({
   reqSealCertificatedDoc: () => void;
 }) => {
   const panelList: TpanelList = useMemo(() => {
-    // const panelList_new: TpanelList = [
-    //   {
-    //     type: 'redButton',
-    //     label: '確認',
-    //     onClick: () => {
-    //       alert('確認');
-    //     },
-    //   },
-    //   {
-    //     type: 'myButton',
-    //     label: '返回',
-    //     onClick: router.back,
-    //   },
-    // ];
-
     const panelList_disabled: TpanelList = [
       {
         type: 'redButton',
@@ -688,6 +741,371 @@ const usePanelList = ({
 
 // ===============================================================================
 
+//  ██████  ██████  ███    ███ ██████   ██████  ███    ██ ███████ ███    ██ ████████
+// ██      ██    ██ ████  ████ ██   ██ ██    ██ ████   ██ ██      ████   ██    ██
+// ██      ██    ██ ██ ████ ██ ██████  ██    ██ ██ ██  ██ █████   ██ ██  ██    ██
+// ██      ██    ██ ██  ██  ██ ██      ██    ██ ██  ██ ██ ██      ██  ██ ██    ██
+//  ██████  ██████  ██      ██ ██       ██████  ██   ████ ███████ ██   ████    ██
+
+const VirtualContainer_pre = (
+  {
+    //
+    state_docType,
+    state_infoListArr,
+    state_description,
+    state_itemArr,
+    year,
+    month,
+    date,
+    isSealed,
+  }: {
+    state_docType: React.ReactNode;
+    state_infoListArr: Tinfo[];
+    state_description: React.ReactNode;
+    state_itemArr: Titem[];
+    year: React.ReactNode;
+    month: React.ReactNode;
+    date: React.ReactNode;
+    isSealed: boolean;
+  },
+  ref: React.ForwardedRef<HTMLDivElement>
+) => {
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+
+  const tableProps: Ttable = useMemo(() => {
+    const thead: Ttable['thead'] = {
+      rowProps: {
+        minHeight: tableConfig.row.minHeight,
+      },
+      cellArr: [
+        {
+          children: cellConfig.itemName.label,
+          ...cellConfig.itemName,
+        },
+        {
+          children: cellConfig.size.label,
+          ...cellConfig.size,
+        },
+        {
+          children: cellConfig.qty.label,
+          ...cellConfig.qty,
+        },
+        {
+          children: cellConfig.note.label,
+          ...cellConfig.note,
+        },
+      ],
+    };
+
+    const bodyRowArr: Ttable['tbody']['rowArr'] = state_itemArr.map((item, index) => {
+      const suffix_itemName = item.itemName;
+      const suffix_size = item.size;
+      const suffix_note = item.note;
+
+      return {
+        minHeight: tableConfig.row.minHeight,
+        cellArr: [
+          {
+            children: (
+              <InputSel
+                //
+                disabled={true}
+                showBaseline="auto"
+                // inputProps={inputProps_itemName}
+                suffix={suffix_itemName}
+              />
+            ),
+            ...cellConfig.itemName,
+          },
+          {
+            children: (
+              <InputSel
+                //
+                disabled={true}
+                showBaseline="auto"
+                // inputProps={inputProps_size}
+                suffix={suffix_size}
+              />
+            ),
+            ...cellConfig.size,
+          },
+          {
+            children: `${item.qty}樘`,
+            ...cellConfig.qty,
+          },
+          {
+            children: (
+              <InputSel
+                //
+                disabled={true}
+                showBaseline="auto"
+                // inputProps={inputSize_note}
+                suffix={suffix_note}
+              />
+            ),
+            ...cellConfig.note,
+          },
+        ],
+      };
+    });
+
+    return {
+      thead,
+      tbody: {
+        rowArr: bodyRowArr,
+      },
+    };
+  }, [state_itemArr]);
+
+  // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
+  return (
+    <div ref={ref} className={classNames(scss.container)}>
+      <h1 className={classNames(scss.title)}>{state_docType}</h1>
+
+      <div className={scss.infoList}>
+        <div className={classNames(scss.infoBar)}>
+          <div />
+          <IconAddCircle className={classNames(scss.addBtn, 'invisible')} />
+        </div>
+        {state_infoListArr.map((info, index) => {
+          const suffix = info.value;
+
+          return (
+            <div key={index} className={classNames(scss.infoBar, 'mb-3')}>
+              <IconRemoveCircle className={classNames(scss.removeBtn, 'invisible')} />
+              <InputSel
+                disabled={true}
+                showBaseline="auto"
+                caption={info.caption}
+                captionStyle={{ width: '120px', fontSize: '30px' }}
+                // inputProps={inputProps}
+                suffix={suffix}
+                suffixClassName={scss.suffix}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      <div className={scss.tableWrapper}>
+        <div>
+          <InputSel
+            //
+            className={scss.tableCaption}
+            captionStyle={{ width: '120px', fontSize: '30px' }}
+            disabled={true}
+            caption={'承攬項目'}
+            showBaseline="invisible"
+          />
+        </div>
+        <Table01 className={scss.table} {...tableProps} />
+      </div>
+
+      <div className={classNames(scss.textarea, scss.div)}>{state_description}</div>
+
+      <div className={scss.footer}>
+        <div>台中總公司：{companyInfo.headOffice.wholeAddress}</div>
+        <div>TEL：{companyInfo.headOffice.tel}</div>
+        <div>台北分公司：{companyInfo.taipeiOffice.wholeAddress}</div>
+        <div>TEL：{companyInfo.taipeiOffice.tel}</div>
+        <div className={scss.footerDate}>
+          <span>
+            中華民國 {year} 年 {month} 月 {date} 日
+          </span>
+        </div>
+      </div>
+
+      {isSealed && <FakeSeal className={scss.seal} />}
+
+      {/*  */}
+    </div>
+  );
+};
+
+const VirtualContainer = forwardRef(VirtualContainer_pre);
+
+// ██    ██ ██ ██████  ████████ ██    ██  █████  ██       ██████ ███████ ██████  ████████ ██ ███████ ██  ██████  █████  ████████ ███████
+// ██    ██ ██ ██   ██    ██    ██    ██ ██   ██ ██      ██      ██      ██   ██    ██    ██ ██      ██ ██      ██   ██    ██    ██
+// ██    ██ ██ ██████     ██    ██    ██ ███████ ██      ██      █████   ██████     ██    ██ █████   ██ ██      ███████    ██    █████
+//  ██  ██  ██ ██   ██    ██    ██    ██ ██   ██ ██      ██      ██      ██   ██    ██    ██ ██      ██ ██      ██   ██    ██    ██
+//   ████   ██ ██   ██    ██     ██████  ██   ██ ███████  ██████ ███████ ██   ██    ██    ██ ██      ██  ██████ ██   ██    ██    ███████
+
+const VirtualCertificate = ({
+  //
+  ref_container,
+  ref_title,
+  ref_info,
+  ref_description,
+  ref_footer,
+  ref_table,
+  ref_tableTitle,
+  state_itemList,
+  //
+  state_docType,
+  state_infoList,
+  state_description,
+  year,
+  month,
+  date,
+  isSealed,
+}: {
+  ref_container: MutableRefObject<HTMLDivElement>;
+  ref_title: MutableRefObject<HTMLDivElement>;
+  ref_info: MutableRefObject<HTMLDivElement>;
+  ref_description: MutableRefObject<HTMLDivElement>;
+  ref_footer: MutableRefObject<HTMLDivElement>;
+  ref_table: MutableRefObject<HTMLDivElement>;
+  ref_tableTitle: MutableRefObject<HTMLDivElement>;
+  state_itemList: TitemList;
+  //
+  state_docType: React.ReactNode;
+  state_infoList: TinfoList;
+  state_description: React.ReactNode;
+  year: React.ReactNode;
+  month: React.ReactNode;
+  date: React.ReactNode;
+  isSealed: boolean;
+}) => {
+  const [state_itemArrArr, setState_itemArrArr] = useState<Titem[][]>([]);
+
+  // const width = 1500; // 寬度，設定在css裡
+  // const fullHeight = width / (210 / 297); // A4比例
+  // const height_container = fullHeight - 100 - 100 - 1 - 1; // 上下的padding與border 設定在css裡
+  // 改用Decimal.js處理
+  const width = new Decimal(1500);
+  const fullHeight = width.div(210).times(297);
+  const height_container = fullHeight.minus(100).minus(100).minus(1).minus(1).toNumber();
+
+  useEffect(() => {
+    const calcChopedItemArr = () => {
+      const style_description = window.getComputedStyle(ref_description.current);
+      const style_table = window.getComputedStyle(ref_table.current);
+      const style_tableTitle = window.getComputedStyle(ref_tableTitle.current);
+
+      const height_title = ref_title.current.offsetHeight;
+
+      const height_info = ref_info.current.offsetHeight;
+
+      const marginTop_table = parseFloat(style_table.marginTop);
+      const height_thead = ref_table.current.querySelector('thead')?.offsetHeight || 0;
+
+      // const height_tableTitle = ref_tableTitle.current.offsetHeight;
+      const height_tableTitle = parseFloat(style_tableTitle.height);
+      const marginBottom_tableTitle = parseFloat(style_tableTitle.marginBottom);
+
+      const marginTop_description = parseFloat(style_description.marginTop);
+      const marginBottom_description = parseFloat(style_description.marginBottom);
+      const height_description = parseFloat(style_description.height);
+
+      const height_footer = ref_footer.current.offsetHeight;
+
+      // const height_table = parseFloat(style_table.height);
+
+      const allowHeight = new Decimal(height_container)
+        .minus(height_title)
+        .minus(height_info)
+        .minus(marginTop_table)
+        .minus(height_tableTitle)
+        .minus(marginBottom_tableTitle)
+        .minus(height_thead)
+        .minus(marginTop_description)
+        .minus(marginBottom_description)
+        .minus(height_description)
+        .minus(height_footer)
+        .toNumber();
+
+      // console.log(height_table);
+
+      // console.log('height_container', height_container);
+      // console.log('height_title', height_title);
+      // console.log('height_info', height_info);
+      // console.log('marginTop_table', marginTop_table);
+      // console.log('height_tableTitle', height_tableTitle);
+      // console.log('height_thead', height_thead);
+      // console.log('marginTop_description', marginTop_description);
+      // console.log('height_description', height_description);
+      // console.log('height_footer', height_footer);
+      // console.log('allowHeight', allowHeight);
+
+      const rowEleArr = ref_table.current.querySelectorAll("[data-component='Row'") as NodeListOf<HTMLDivElement>;
+      const chopedRowArr: Titem[][] = [];
+      let tempArr: Titem[] = [];
+      let countHeight = 0;
+
+      rowEleArr.forEach((ele, index) => {
+        const item = state_itemList[ele.id];
+
+        tempArr.push(item);
+        const height = ele.offsetHeight;
+        countHeight = countHeight + height;
+
+        if (countHeight > allowHeight) {
+          tempArr.pop();
+          chopedRowArr.push(tempArr);
+          // tempArr = [];
+          // countHeight = 0;
+          // tempArr.push(ele);
+          // countHeight = countHeight + height;
+          tempArr = [item];
+          countHeight = height;
+        }
+
+        if (index === rowEleArr.length - 1) {
+          chopedRowArr.push(tempArr);
+        }
+      }); // foreach
+
+      setState_itemArrArr(chopedRowArr);
+    }; // calcChopedItemArr
+
+    if (window) {
+      calcChopedItemArr();
+    }
+
+    //
+  }, [
+    //
+    height_container,
+    ref_description,
+    ref_footer,
+    ref_info,
+    ref_table,
+    ref_tableTitle,
+    ref_title,
+    state_itemList,
+  ]);
+
+  const state_infoListArr = useMemo(() => {
+    return Object.values(state_infoList);
+  }, [state_infoList]);
+
+  return (
+    <div>
+      {/* <button onClick={calcChopedItemArr}>test</button> */}
+
+      {state_itemArrArr.map((arr, index) => {
+        return (
+          <VirtualContainer
+            key={index}
+            state_docType={state_docType}
+            state_infoListArr={state_infoListArr}
+            state_description={state_description}
+            state_itemArr={arr}
+            year={year}
+            month={month}
+            date={date}
+            isSealed={isSealed}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+// ===============================================================================
+
 //  ██████  ██████  ███    ██ ███████ ██  ██████
 // ██      ██    ██ ████   ██ ██      ██ ██
 // ██      ██    ██ ██ ██  ██ █████   ██ ██   ███
@@ -707,13 +1125,13 @@ const cellConfig: { [key in TcellKeyArr]: Tconfig_table } = {
     label: '項目',
     flex: '0 0 25%',
     justifyContent: 'center',
-    className: 'text-center',
+    className: classNames('text-center', scss.inputsel),
   },
   size: {
     label: '尺寸',
     flex: '0 0 25%',
     justifyContent: 'center',
-    className: 'text-center',
+    className: classNames('text-center', scss.inputsel),
   },
   qty: {
     label: '數量',
@@ -724,7 +1142,7 @@ const cellConfig: { [key in TcellKeyArr]: Tconfig_table } = {
     label: '備註',
     flex: '0 0 25%',
     justifyContent: 'center',
-    className: 'break-all',
+    className: classNames(scss.inputsel),
   },
 };
 
