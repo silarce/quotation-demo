@@ -178,7 +178,7 @@ export const ModalBtnBar = ({
   props,
   className,
   btnPropsArr,
-  width,
+  width = 'auto',
 }: {
   title?: string | number;
   content?: React.ReactNode;
