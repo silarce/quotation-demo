@@ -1,15 +1,12 @@
-import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo, useContext } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import { useRouter, NextRouter } from 'next/router';
-import { nanoid } from 'nanoid';
 import Decimal from 'decimal.js';
 
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
 // layout
-import { TtagList as TtabList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
-import { Wrapper, Wrapper_inpuSel_01, WrappedTextarea } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
+import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import { Wrapper_inpuSel_01, WrappedTextarea } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 
 // ui
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -21,6 +18,9 @@ import SignatureBar, {
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
+// gear
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
 // options
 import { optionsCreator_certifyType } from 'js/utils/options/productOptions';
 
@@ -28,7 +28,7 @@ import { optionsCreator_certifyType } from 'js/utils/options/productOptions';
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // type
-import { TdocType, TquotationContractDto } from 'js/api/dtoTypes';
+import { TdocType, TquotationContractDto, TuserDto } from 'js/api/dtoTypes';
 
 // css
 import scss from './edit.module.scss';
@@ -45,6 +45,9 @@ import {
   apiPatchCertificatedDoc_submit,
   apiPatchCertificatedDoc_review,
 } from 'js/api/api_certificated-doc';
+
+// context
+import { AppContext } from 'pages/_app';
 
 // =========================================================================
 
@@ -165,15 +168,33 @@ export default function Edit({
   const [state_description, setState_description] = useState<Tstate_description>('');
   const [state_note, setState_note] = useState<Tstate_note>('');
 
-  // 擔保人
-  // const [state_guarantor, setState_guarantor] = useState<TemployeeDto | undefined>(undefined);
+  // ---------------------------------------------------------------------------
+
+  const { userInfo } = useContext(AppContext);
 
   // ---------------------------------------------------------------------------
 
   const { data: data_certifiedDocument, update: update_data_CertifiedDocument } =
     useGetCertificatedDoc_id(certifiedDocumentId);
 
-  const { agentEmployee, reviewGuarantorEmployee, reviewManagerEmployee } = data_certifiedDocument ?? {};
+  const {
+    //
+    agentEmployee,
+
+    reviewGuarantorEmployee,
+    // guarantorReviewedAt,
+
+    // reviewAccountingEmployee,
+    // accountingReviewedAt,
+
+    // reviewAuditorEmployee,
+    // auditorReviewedAt,
+
+    reviewManagerEmployee,
+    // managerReviewedAt,
+  } = data_certifiedDocument ?? {};
+
+  const isReviewer = checkReviewer(userInfo, data_certifiedDocument);
 
   // ---------------------------------------------------------------------------
 
@@ -478,6 +499,7 @@ export default function Edit({
     reqPatchCertificatedDoc,
     reqPatchCertificatedDoc_review,
     // certificateId: certifiedDocumentId ?? '',
+    isReviewer,
   });
 
   // _________________________________________________________________________
@@ -1174,6 +1196,7 @@ const usePanelList = ({
   reqPostCertificatedDoc,
   reqPatchCertificatedDoc,
   reqPatchCertificatedDoc_review,
+  isReviewer,
 }: // certificateId,
 {
   disabled: boolean;
@@ -1185,6 +1208,7 @@ const usePanelList = ({
   reqPostCertificatedDoc: () => void;
   reqPatchCertificatedDoc: () => void;
   reqPatchCertificatedDoc_review: (reviewResult: boolean) => void;
+  isReviewer: boolean;
   // certificateId: string;
 }) => {
   const panelList = useMemo(() => {
@@ -1281,6 +1305,10 @@ const usePanelList = ({
       },
     ];
 
+    if (!isReviewer) {
+      panelList_disabled.splice(1, 1);
+    }
+
     if (isNew) {
       return panelList_new;
     } else if (disabled) {
@@ -1298,6 +1326,7 @@ const usePanelList = ({
     router,
     setDisabled,
     setState_showSelector,
+    isReviewer,
   ]);
 
   return panelList;
@@ -1474,4 +1503,74 @@ const checkProduct = (
   }
 
   return true;
+};
+
+const checkReviewer = (userInfo: TuserDto | undefined, data_certifiedDocument: TcertificatedDocDto | undefined) => {
+  if (!userInfo || !userInfo.employee) {
+    return false;
+  }
+
+  // type Tstep = 'guarantor' | 'accounting' | 'auditor' | 'manager';
+
+  // type TcheckObj = {
+  //   [key in Tstep]: {
+  //     reviewerId: string | undefined;
+  //     reviewedAt: string | null | undefined;
+  //   };
+  // };
+
+  const empId = userInfo.employee?.id;
+
+  const {
+    reviewGuarantorEmployee,
+    guarantorReviewedAt,
+
+    reviewAccountingEmployee,
+    accountingReviewedAt,
+
+    reviewAuditorEmployee,
+    auditorReviewedAt,
+
+    reviewManagerEmployee,
+    managerReviewedAt,
+  } = data_certifiedDocument ?? {};
+
+  const checkObj = {
+    guarantor: {
+      reviewerId: reviewGuarantorEmployee?.id,
+      reviewedAt: guarantorReviewedAt,
+    },
+    accounting: {
+      reviewerId: reviewAccountingEmployee?.id,
+      reviewedAt: accountingReviewedAt,
+    },
+    auditor: {
+      reviewerId: reviewAuditorEmployee?.id,
+      reviewedAt: auditorReviewedAt,
+    },
+    manager: {
+      reviewerId: reviewManagerEmployee?.id,
+      reviewedAt: managerReviewedAt,
+    },
+  } as const;
+
+  let isReviewer = false;
+  let stopChecking = false;
+
+  Object.entries(checkObj).forEach(([key, obj]) => {
+    if (stopChecking) {
+      return;
+    }
+
+    // 如果這筆未審核過，之後的不用再檢查
+    if (!obj.reviewedAt) {
+      stopChecking = true;
+    }
+
+    if (obj.reviewerId === empId) {
+      isReviewer = true;
+    }
+  });
+
+  return isReviewer;
 };

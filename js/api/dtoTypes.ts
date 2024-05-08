@@ -4000,24 +4000,28 @@ export type TcertificatedDocDto = {
   status: '編輯中' | '審核中' | '審核完成尚未用印' | '已用印';
   // 開立產品
   products: TcertificatedProductDto[];
+
   // 送審給擔保人的時間 //Date
   toGuarantorAt?: string | null;
   // 擔保人
   reviewGuarantorEmployee?: TemployeeDto | null;
   // 擔保人審核時間 // Date
   guarantorReviewedAt?: string | null;
+
   // 送審給會計的時間 // Date
   toAccountingAt?: string | null;
   // 會計
   reviewAccountingEmployee?: TemployeeDto | null;
   // 會計審核時間 // Date
   accountingReviewedAt?: string | null;
+
   // 送審給"審核"的時間 // Date
   toAuditorAt?: string | null;
   // "審核"人
   reviewAuditorEmployee?: TemployeeDto | null;
   // "審核"人審核時間 // Date
   auditorReviewedAt?: string | null;
+
   // 送審給總經理的時間 // Date
   toManagerAt?: string | null;
   // 總經理
