@@ -5,6 +5,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
+import TextareaAutosize from 'react-textarea-autosize';
 
 // layout
 import { TtagList as TtabList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -205,7 +206,7 @@ export default function Certificate({
     const sanpShot: Tdata = {
       infoList: state_infoList,
       itemList: state_itemList,
-      description: state_description,
+      description: state_description.trimEnd(),
       issuanceDate: state_issuanceDate?.toISOString() || null,
     };
 
@@ -279,7 +280,7 @@ export default function Certificate({
         ? undefined
         : {
             props: {
-              className: cellConfig.itemName.className,
+              className: scss.inputTeactArea,
               value: item.itemName,
               onChange: (e) => {
                 editItem(id, 'itemName', e.target.value);
@@ -309,7 +310,7 @@ export default function Certificate({
         ? undefined
         : {
             props: {
-              className: cellConfig.note.className,
+              className: scss.inputTeactArea,
               value: item.note,
               onChange: (e) => {
                 editItem(id, 'note', e.target.value);
@@ -331,7 +332,7 @@ export default function Certificate({
             children: (
               <InputSel
                 //
-                className={cellConfig.itemName.className}
+                className={classNames(scss.inputSel)}
                 disabled={disabled}
                 fontSize={'20'}
                 showBaseline="auto"
@@ -346,7 +347,7 @@ export default function Certificate({
             children: (
               <InputSel
                 //
-                className={cellConfig.size.className}
+                className={classNames(scss.inputSel)}
                 disabled={disabled}
                 fontSize={'20'}
                 showBaseline="auto"
@@ -365,7 +366,7 @@ export default function Certificate({
             children: (
               <InputSel
                 //
-                className={cellConfig.note.className}
+                className={classNames(scss.inputSel)}
                 fontSize={'20'}
                 disabled={disabled}
                 showBaseline="auto"
@@ -1125,24 +1126,24 @@ const cellConfig: { [key in TcellKeyArr]: Tconfig_table } = {
     label: '項目',
     flex: '0 0 25%',
     justifyContent: 'center',
-    className: classNames('text-center', scss.inputsel),
+    className: classNames('text-center', scss.cellspan, scss.plus),
   },
   size: {
     label: '尺寸',
     flex: '0 0 25%',
     justifyContent: 'center',
-    className: classNames('text-center', scss.inputsel),
+    className: classNames('text-center', scss.cellspan, scss.plus),
   },
   qty: {
     label: '數量',
     flex: '0 0 25%',
-    justifyContent: 'center',
+    justifyContent: classNames('center', scss.cellspan, scss.plus),
   },
   note: {
     label: '備註',
     flex: '0 0 25%',
     justifyContent: 'center',
-    className: classNames(scss.inputsel),
+    className: classNames('text-center', scss.cellspan, scss.plus),
   },
 };
 

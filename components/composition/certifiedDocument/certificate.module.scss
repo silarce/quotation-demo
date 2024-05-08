@@ -82,6 +82,7 @@
   white-space: pre-wrap;
   &.div {
     border-color: transparent;
+    white-space: pre-wrap;
   }
 }
 
@@ -132,14 +133,33 @@
   }
 }
 
+$width: 290px;
+
 .inputsel {
-  width: 290px;
+  width: $width;
   text-align: center;
 }
 
 .infoSuffix {
-  display: inline-block;
-  width: 290px;
-  white-space: pre-wrap;
+  > span {
+    display: block;
+    width: $width;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+}
+
+.cellspan.plus {
+  > span {
+    font-size: 0;
+  }
+}
+
+.inputSel {
+  width: $width;
+}
+
+.inputTeactArea {
+  text-align: center;
   word-break: break-all;
 }
