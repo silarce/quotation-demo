@@ -176,8 +176,6 @@ export default function AdditionalEngineeringStatistics() {
         quotetype = '無資料';
       }
 
-      listKeyQty[quotetype] = (listKeyQty[quotetype] ?? 0) + 1;
-
       if (!subTotalList[quotetype]) {
         subTotalList[quotetype] = {
           totalsum: 0,
@@ -186,7 +184,12 @@ export default function AdditionalEngineeringStatistics() {
         };
       }
 
+      if (listKeyQty[quotetype] === undefined) {
+        listKeyQty[quotetype] = 0;
+      }
+
       if (isValid) {
+        listKeyQty[quotetype] = listKeyQty[quotetype] + 1;
         subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalsum).toNumber();
         subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(pricesum).toNumber();
         subTotalList[quotetype].percentage = new Decimal(subTotalList[quotetype].percentage)
@@ -232,20 +235,35 @@ export default function AdditionalEngineeringStatistics() {
     const theSubTotalList: Tcontrol_subTotalList = {};
 
     Object.keys(subTotalList).forEach((key) => {
-      const percent = new Decimal(subTotalList[key].percentage).div(listKeyQty[key]).toNumber();
+      // const percent = new Decimal(subTotalList[key].percentage).div(listKeyQty[key]).toNumber();
 
-      theSubTotalList[key] = {
-        ...subTotalList[key],
-        totalsum: Number(subTotalList[key].totalsum).toLocaleString(),
-        pricesum: Number(subTotalList[key].pricesum).toLocaleString(),
-        percentage: `${percent}%`,
-      };
+      const isValid = !!listKeyQty[key];
+
+      if (isValid) {
+        const percent = new Decimal(subTotalList[key].percentage).div(listKeyQty[key]).toDecimalPlaces(2).toNumber();
+
+        theSubTotalList[key] = {
+          ...subTotalList[key],
+          totalsum: Number(subTotalList[key].totalsum).toLocaleString(),
+          pricesum: Number(subTotalList[key].pricesum).toLocaleString(),
+          percentage: `${percent}%`,
+        };
+      } else {
+        theSubTotalList[key] = {
+          ...subTotalList[key],
+          totalsum: 'n/a',
+          pricesum: 'n/a',
+          percentage: `n/a`,
+        };
+      }
     });
+
+    const validDataQty = data.filter((item) => typeof item.percentage === 'number').length;
 
     const theTotal = {
       totalsum: Number(total.totalsum).toLocaleString(),
       pricesum: Number(total.pricesum).toLocaleString(),
-      percentage: `${new Decimal(total.percentage).div(data.length).toNumber()}%`,
+      percentage: `${new Decimal(total.percentage).div(validDataQty).toDecimalPlaces(2).toNumber()}%`,
     };
 
     const listKeyArr = Object.keys(listKeyQty);
