@@ -1,15 +1,17 @@
-import { useState, useEffect, useCallback, useMemo, useRef, MutableRefObject, forwardRef } from 'react';
+import { Fragment, useState, useEffect, useCallback, useMemo, useRef, MutableRefObject, forwardRef, memo } from 'react';
 import classNames from 'classnames';
 import { NextRouter, useRouter } from 'next/router';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
-import TextareaAutosize from 'react-textarea-autosize';
 
 // layout
 import { TtagList as TtabList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
 // import { Wrapper, Wrapper_inpuSel_01, WrappedTextarea } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
+
+// antd
+import { Modal } from 'antd';
 
 // gear
 // import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -17,6 +19,7 @@ import InputSel, { TinputProps, TtextareaProps } from 'components/global/gear/in
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import Textarea_autosize from 'react-textarea-autosize';
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
@@ -116,6 +119,8 @@ export default function Certificate({
   // ---------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
+
+  const [showPdfPreview, setShowPdfPreview] = useState(false);
 
   // ---------------------------------------------------------------------
   const [state_docType, setState_docType] = useState('　');
@@ -242,6 +247,7 @@ export default function Certificate({
     dlPdf,
     reqPatchCertificatedDoc,
     reqSealCertificatedDoc,
+    setShowPdfPreview,
   });
 
   // ---------------------------------------------------------------------
@@ -592,6 +598,28 @@ export default function Certificate({
           </div>
         </div>
 
+        <PdfPreview_pre
+          visible={showPdfPreview}
+          closeModal={() => setShowPdfPreview(false)}
+          //
+          ref_container={ref_container}
+          ref_title={ref_title}
+          ref_info={ref_info}
+          ref_description={ref_description}
+          ref_footer={ref_footer}
+          ref_table={ref_table}
+          ref_tableTitle={ref_tableTitle}
+          //
+          state_itemList={state_itemList}
+          state_docType={state_docType}
+          state_infoList={state_infoList}
+          state_description={state_description}
+          year={year}
+          month={month}
+          date={date}
+          isSealed={isSealed}
+        />
+
         {/* <VirtualCertificate
         ref_container={ref_container}
         ref_title={ref_title}
@@ -625,24 +653,35 @@ export default function Certificate({
           onCancel={() => setShowModal(false)}
         />
       </div>
-      <VirtualCertificate
-        ref_container={ref_container}
-        ref_title={ref_title}
-        ref_info={ref_info}
-        ref_description={ref_description}
-        ref_footer={ref_footer}
-        ref_table={ref_table}
-        ref_tableTitle={ref_tableTitle}
+
+      {/* <Modal
         //
-        state_itemList={state_itemList}
-        state_docType={state_docType}
-        state_infoList={state_infoList}
-        state_description={state_description}
-        year={year}
-        month={month}
-        date={date}
-        isSealed={isSealed}
-      />
+        visible={showPdfPreview}
+        footer={null}
+        onCancel={() => setShowPdfPreview(false)}
+        width={'fit-content'}
+      >
+        <div>
+          <PdfPreview
+            ref_container={ref_container}
+            ref_title={ref_title}
+            ref_info={ref_info}
+            ref_description={ref_description}
+            ref_footer={ref_footer}
+            ref_table={ref_table}
+            ref_tableTitle={ref_tableTitle}
+            //
+            state_itemList={state_itemList}
+            state_docType={state_docType}
+            state_infoList={state_infoList}
+            state_description={state_description}
+            year={year}
+            month={month}
+            date={date}
+            isSealed={isSealed}
+          />
+        </div>
+      </Modal> */}
     </div>
   );
 }
@@ -669,6 +708,7 @@ const usePanelList = ({
   dlPdf,
   reqPatchCertificatedDoc,
   reqSealCertificatedDoc,
+  setShowPdfPreview,
 }: {
   router: NextRouter;
   disabled: boolean;
@@ -676,6 +716,7 @@ const usePanelList = ({
   dlPdf: () => void;
   reqPatchCertificatedDoc: () => void;
   reqSealCertificatedDoc: () => void;
+  setShowPdfPreview: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const panelList: TpanelList = useMemo(() => {
     const panelList_disabled: TpanelList = [
@@ -687,7 +728,9 @@ const usePanelList = ({
       {
         type: 'redButton',
         label: '匯出',
-        onClick: dlPdf,
+        onClick: () => {
+          setShowPdfPreview(true);
+        },
       },
       {
         type: 'myButton',
@@ -762,7 +805,7 @@ const VirtualContainer_pre = (
   }: {
     state_docType: React.ReactNode;
     state_infoListArr: Tinfo[];
-    state_description: React.ReactNode;
+    state_description: string;
     state_itemArr: Titem[];
     year: React.ReactNode;
     month: React.ReactNode;
@@ -868,6 +911,17 @@ const VirtualContainer_pre = (
     };
   }, [state_itemArr]);
 
+  const description = useMemo(() => {
+    let qty = 0;
+    state_itemArr.forEach((item) => {
+      qty = qty + Number(item.qty);
+    });
+
+    const description = state_description?.replaceAll('${qty}', String(qty));
+
+    return description;
+  }, [state_itemArr]);
+
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   return (
@@ -913,7 +967,7 @@ const VirtualContainer_pre = (
         <Table01 className={scss.table} {...tableProps} />
       </div>
 
-      <div className={classNames(scss.textarea, scss.div)}>{state_description}</div>
+      <div className={classNames(scss.textarea, scss.div)}>{description}</div>
 
       <div className={scss.footer}>
         <div>台中總公司：{companyInfo.headOffice.wholeAddress}</div>
@@ -936,13 +990,15 @@ const VirtualContainer_pre = (
 
 const VirtualContainer = forwardRef(VirtualContainer_pre);
 
-// ██    ██ ██ ██████  ████████ ██    ██  █████  ██       ██████ ███████ ██████  ████████ ██ ███████ ██  ██████  █████  ████████ ███████
-// ██    ██ ██ ██   ██    ██    ██    ██ ██   ██ ██      ██      ██      ██   ██    ██    ██ ██      ██ ██      ██   ██    ██    ██
-// ██    ██ ██ ██████     ██    ██    ██ ███████ ██      ██      █████   ██████     ██    ██ █████   ██ ██      ███████    ██    █████
-//  ██  ██  ██ ██   ██    ██    ██    ██ ██   ██ ██      ██      ██      ██   ██    ██    ██ ██      ██ ██      ██   ██    ██    ██
-//   ████   ██ ██   ██    ██     ██████  ██   ██ ███████  ██████ ███████ ██   ██    ██    ██ ██      ██  ██████ ██   ██    ██    ███████
+// ██████  ██████  ███████ ██████  ██████  ███████ ██    ██ ██ ███████ ██     ██
+// ██   ██ ██   ██ ██      ██   ██ ██   ██ ██      ██    ██ ██ ██      ██     ██
+// ██████  ██   ██ █████   ██████  ██████  █████   ██    ██ ██ █████   ██  █  ██
+// ██      ██   ██ ██      ██      ██   ██ ██       ██  ██  ██ ██      ██ ███ ██
+// ██      ██████  ██      ██      ██   ██ ███████   ████   ██ ███████  ███ ███
 
-const VirtualCertificate = ({
+const PdfPreview_pre = ({
+  visible,
+  closeModal,
   //
   ref_container,
   ref_title,
@@ -961,6 +1017,9 @@ const VirtualCertificate = ({
   date,
   isSealed,
 }: {
+  visible: boolean;
+  closeModal: () => void;
+  //
   ref_container: MutableRefObject<HTMLDivElement>;
   ref_title: MutableRefObject<HTMLDivElement>;
   ref_info: MutableRefObject<HTMLDivElement>;
@@ -972,14 +1031,65 @@ const VirtualCertificate = ({
   //
   state_docType: React.ReactNode;
   state_infoList: TinfoList;
-  state_description: React.ReactNode;
+  state_description: string;
   year: React.ReactNode;
   month: React.ReactNode;
   date: React.ReactNode;
   isSealed: boolean;
 }) => {
+  //
+  const refPdf = useRef<(HTMLDivElement | null)[]>([]);
+
   const [state_itemArrArr, setState_itemArrArr] = useState<Titem[][]>([]);
 
+  // ----------------------------------------------------------------------------
+
+  const dlPdf = async () => {
+    if (!refPdf.current[0]) {
+      return;
+    }
+
+    // showRootLoading(true, '正在處理PDF');
+
+    const doc = new jsPDF('p', 'px', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    let isFirst = true;
+    let item;
+
+    for (item of refPdf.current) {
+      if (!item) {
+        continue;
+      }
+
+      const image = await html2canvas(item, {
+        scale: 3,
+        // useCORS: true,
+        // allowTaint: true,
+      }).then((canvas) => {
+        const image = canvas.toDataURL('image/JPEG');
+
+        return image;
+      });
+
+      if (!isFirst) {
+        doc.addPage();
+      }
+
+      isFirst = false;
+      // 留作參考
+      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+      doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
+    }
+
+    doc.save(`${'fooo'}.pdf`);
+    // showRootLoading(false);
+  };
+
+  // ----------------------------------------------------------------------------
   // const width = 1500; // 寬度，設定在css裡
   // const fullHeight = width / (210 / 297); // A4比例
   // const height_container = fullHeight - 100 - 100 - 1 - 1; // 上下的padding與border 設定在css裡
@@ -1092,27 +1202,43 @@ const VirtualCertificate = ({
   }, [state_infoList]);
 
   return (
-    <div>
-      {/* <button onClick={calcChopedItemArr}>test</button> */}
-
-      {state_itemArrArr.map((arr, index) => {
-        return (
-          <VirtualContainer
-            key={index}
-            state_docType={state_docType}
-            state_infoListArr={state_infoListArr}
-            state_description={state_description}
-            state_itemArr={arr}
-            year={year}
-            month={month}
-            date={date}
-            isSealed={isSealed}
-          />
-        );
-      })}
-    </div>
+    <Modal
+      visible={visible}
+      footer={null}
+      onCancel={closeModal}
+      //
+      width={'fit-content'}
+    >
+      <div>
+        <MyButton_v2 onClick={dlPdf}>下載PDF</MyButton_v2>
+        <br />
+        <br />
+        {state_itemArrArr.map((arr, index) => {
+          return (
+            <Fragment key={index}>
+              <VirtualContainer
+                ref={(ele) => (refPdf.current[index] = ele)}
+                state_docType={state_docType}
+                state_infoListArr={state_infoListArr}
+                state_description={state_description}
+                state_itemArr={arr}
+                year={year}
+                month={month}
+                date={date}
+                isSealed={isSealed}
+              />
+              <br />
+            </Fragment>
+          );
+        })}
+      </div>
+    </Modal>
   );
 };
+
+const PdfPreview = memo(PdfPreview_pre, (preState, nextState) => {
+  return preState.visible === nextState.visible;
+});
 
 // ===============================================================================
 
