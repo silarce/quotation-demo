@@ -1,6 +1,9 @@
 import { Toption, addEmpty } from './options';
 import { annotationAndQuotationRangeType } from 'js/api/dtoTypes';
 import { annotationAndQuotationRangeTypeLookup } from 'config/lookupTable';
+// type
+import { TdocType } from 'js/api/dtoTypes';
+import _ from 'lodash';
 
 export type { Toption };
 
@@ -479,6 +482,7 @@ export const optionsCreator_boxB_SJ302 = createOptionsCreator({
     { value: '0.75', label: '0.75' },
   ],
 });
+
 export const optionsCreator_boxB_SJ303A = createOptionsCreator({
   optionsArr: [
     { value: '0.63', label: '0.63' },
@@ -488,6 +492,32 @@ export const optionsCreator_boxB_SJ303A = createOptionsCreator({
     { value: '0.88', label: '0.88' },
     { value: '0.95', label: '0.95' },
     { value: '1.02', label: '1.02' },
+  ],
+});
+
+export const optionsCreator_boxB_SJ312 = createOptionsCreator({
+  optionsArr: [
+    { value: '0.40', label: '0.40' },
+    { value: '0.45', label: '0.45' },
+    { value: '0.50', label: '0.50' },
+    { value: '0.55', label: '0.55' },
+    { value: '0.60', label: '0.60' },
+  ],
+});
+
+export const optionsCreator_boxB_SJ305D = createOptionsCreator({
+  optionsArr: [
+    // { value: '0.35', label: '0.35' },
+    { value: '0.40', label: '0.40' },
+    { value: '0.45', label: '0.45' },
+    { value: '0.50', label: '0.50' },
+    { value: '0.55', label: '0.55' },
+    { value: '0.60', label: '0.60' },
+    { value: '0.63', label: '0.63' },
+    { value: '0.65', label: '0.65' },
+    { value: '0.70', label: '0.70' },
+    { value: '0.73', label: '0.73' },
+    { value: '0.77', label: '0.77' },
   ],
 });
 
@@ -538,6 +568,20 @@ export const optionsCreator_motorVender = createOptionsCreator({
     { value: '東元', label: '東元' },
     { value: '大同', label: '大同' },
   ],
+});
+
+export const optionsCreator_certifyType = createOptionsCreator({
+  optionsArr: (() => {
+    // 只是要確保value的型別正確，所以這樣寫
+    type Toption_TdocType = { value: TdocType; label: string };
+    const optionsArr_docType: Toption_TdocType[] = [
+      { value: '防火證明', label: '防火證明' },
+      { value: '出廠證明', label: '出廠證明' },
+      { value: '保固書', label: '保固書' },
+    ];
+
+    return optionsArr_docType;
+  })(),
 });
 
 // const optionsCreator_foooooo = (props: { haveEmpty?: boolean } = {}): Toption[] => {

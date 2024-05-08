@@ -21,7 +21,7 @@
 // =============================================================
 
 // 報價單
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useMemo, memo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
 import classNames from 'classnames';
@@ -160,6 +160,11 @@ type Tquery = {
   contentId: string | undefined;
   isContract: string | undefined;
 };
+
+// ------------------------------------------------------------------
+
+const QuotationProfile_memo = memo(QuotationProfile);
+const Summary_memo = memo(Summary);
 
 // ------------------------------------------------------------------
 export default function Quotation() {
@@ -398,16 +403,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachments]);
 
-  const removeFileInfo = (index: number) => {
-    fileInfoArr[index].willDelete = true;
-    setFileInfoArr([...fileInfoArr]);
-    // removeFile(index)
-  };
-
-  const toSetFileInfo = (newImgInfoArr: TfileInfo[]) => {
-    setFileInfoArr([...newImgInfoArr]);
-  };
-
   const uploadAttachment = async (newContentId: string) => {
     // 移除附件
     const theFileInfoArr = fileInfoArr.filter((info) => {
@@ -451,11 +446,23 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   };
 
-  const appendixParams = {
-    fileInfoArr,
-    removeFileInfo,
-    toSetFileInfo,
-  };
+  const appendixParams = useMemo(() => {
+    const removeFileInfo = (index: number) => {
+      fileInfoArr[index].willDelete = true;
+      setFileInfoArr([...fileInfoArr]);
+      // removeFile(index)
+    };
+
+    const toSetFileInfo = (newImgInfoArr: TfileInfo[]) => {
+      setFileInfoArr([...newImgInfoArr]);
+    };
+
+    return {
+      fileInfoArr,
+      removeFileInfo,
+      toSetFileInfo,
+    };
+  }, [fileInfoArr]);
 
   // -----------------------------------------------------
 
@@ -831,227 +838,474 @@ function TheQuotation({ router }: { router: NextRouter }) {
   //
   //
 
-  const control_anno: TsummaryControl = {
-    stringArr: anno,
-    editString: (index, v) => {
-      setAnnotation((state) => {
-        const copy = [...state];
-        copy[index] = v;
-
-        return copy;
-      });
-    },
-    addString: (v: string) => {
-      setAnnotation((state) => {
-        const copy = [...state];
-        copy.push(v);
-
-        return copy;
-      });
-    },
-    delString: (index: number) => {
-      setAnnotation((state) => {
-        const copy = [...state];
-        copy.splice(index, 1);
-
-        return copy;
-      });
-    },
-    addStrArr: (vArr: string[]) => {
-      setAnnotation((state) => {
-        const copy = [...state];
-        copy.push(...vArr);
-
-        return copy;
-      });
-    },
-    replaceStrArr: (strArr: string[]) => {
-      setAnnotation(strArr);
-    },
-  };
-
-  const control_qr: TsummaryControl = {
-    stringArr: qr,
-    editString: (index, v) => {
-      setQr((state) => {
-        const copy = [...state];
-        copy[index] = v;
-
-        return copy;
-      });
-    },
-    addString: (v: string) => {
-      setQr((state) => {
-        const copy = [...state];
-        copy.push(v);
-
-        return copy;
-      });
-    },
-    delString: (index: number) => {
-      setQr((state) => {
-        const copy = [...state];
-        copy.splice(index, 1);
-
-        return copy;
-      });
-    },
-    addStrArr: (vArr: string[]) => {
-      setQr((state) => {
-        const copy = [...state];
-        copy.push(...vArr);
-
-        return copy;
-      });
-    },
-    replaceStrArr: (strArr: string[]) => {
-      setQr(strArr);
-    },
-  };
-
-  // ----------------------------------------------------------------------
-  const payInfoControl: TpayInfoControl = {
-    payment: {
-      haveTax: {
-        value: !!taxRate,
-        onChange: (v) => {
-          if (quotationProdSubTotal === '') {
-            calcSubTotalPrice();
-          }
-
-          setTaxRate(v ? 0.05 : 0);
-        },
-      },
-
-      discountRate: {
-        inputAttr: {
-          // disabled: disabled,
-          disabled: true,
-          value: summary.discountRate,
-          onChange: (e) => {
-            // // 如果quotationProdSubTotal為空字串會算出錯誤的值，
-            // // 所以必須先計算出quotationProdSubTotal
-            // if (quotationProdSubTotal === '') {
-            //   calcSubTotalPrice();
-            // }
-            // let v = e.target.value;
-            // if ((v as string) === '') {
-            //   v = '0';
-            // }
-            // if (Number(v) > 500) {
-            //   v = '500';
-            // }
-            // setSummary((state) => {
-            //   const copy = { ...state };
-            //   if (v.split('.')[1]?.length > 3) {
-            //     return copy;
-            //   }
-            //   copy.discountRate = v;
-            //   // changeAllProdQuotationDiscount(Number(v));
-            //   // changeAllProductDiscount(Number(v));
-            //   return copy;
-            // });
-          },
-        },
-      },
-      subTotal: {
-        inputAttr: {
-          disabled: true,
-          value: summary.subTotal,
-        },
-      },
-      salesTax: {
-        inputAttr: {
-          disabled: true,
-          value: summary.salesTax,
-        },
-      },
-      total: {
-        inputAttr: {
-          disabled: true,
-          value: summary.total,
-        },
-      },
-    },
-
-    delivery: {
-      deliveryLocation: {
-        value: summary.deliveryLocation,
-        onChange: (v) => {
-          setSummary((state) => {
-            const copy = { ...state };
-            copy.deliveryLocation = v;
-
-            return copy;
-          });
-        },
-      },
-      deliveryDate: {
-        value: summary.deliveryDate,
-        onChange: (v) => {
-          setSummary((state) => {
-            const copy = { ...state };
-            copy.deliveryDate = v;
-
-            return copy;
-          });
-        },
-      },
-    },
-    paymentMethod: {
-      arr: paymentMethod.map((item, index) => {
-        const { milestone, totalPaymentRatio } = item;
-
-        const onChangeMilestone = (v: string) => {
-          setPaymentMethod((state) => {
-            const copy = [...state];
-            copy[index].milestone = v;
-
-            return copy;
-          });
-        };
-
-        const onChange = (v: string) => {
-          if (v === '') {
-            v = '0';
-          }
-
-          setPaymentMethod((state) => {
-            const copy = [...state];
-            copy[index].totalPaymentRatio = v;
-
-            return copy;
-          });
-        };
-
-        const delSelf = () => {
-          setPaymentMethod((state) => {
-            const copy = [...state];
-            copy.splice(index, 1);
-
-            return copy;
-          });
-        };
-
-        return {
-          label: milestone,
-          value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
-          onChange,
-          onChangeMilestone,
-          delSelf,
-        };
-        //
-      }),
-      addMethod: (v) => {
-        setPaymentMethod((state) => {
+  const control_anno: TsummaryControl = useMemo(() => {
+    const control_anno: TsummaryControl = {
+      stringArr: anno,
+      editString: (index, v) => {
+        setAnnotation((state) => {
           const copy = [...state];
-          copy.push({ milestone: v, totalPaymentRatio: '' });
+          copy[index] = v;
 
           return copy;
         });
       },
-    },
-  };
+      addString: (v: string) => {
+        setAnnotation((state) => {
+          const copy = [...state];
+          copy.push(v);
+
+          return copy;
+        });
+      },
+      delString: (index: number) => {
+        setAnnotation((state) => {
+          const copy = [...state];
+          copy.splice(index, 1);
+
+          return copy;
+        });
+      },
+      addStrArr: (vArr: string[]) => {
+        setAnnotation((state) => {
+          const copy = [...state];
+          copy.push(...vArr);
+
+          return copy;
+        });
+      },
+      replaceStrArr: (strArr: string[]) => {
+        setAnnotation(strArr);
+      },
+    };
+
+    return control_anno;
+  }, [anno]);
+
+  // const control_anno: TsummaryControl = {
+  //   stringArr: anno,
+  //   editString: (index, v) => {
+  //     setAnnotation((state) => {
+  //       const copy = [...state];
+  //       copy[index] = v;
+
+  //       return copy;
+  //     });
+  //   },
+  //   addString: (v: string) => {
+  //     setAnnotation((state) => {
+  //       const copy = [...state];
+  //       copy.push(v);
+
+  //       return copy;
+  //     });
+  //   },
+  //   delString: (index: number) => {
+  //     setAnnotation((state) => {
+  //       const copy = [...state];
+  //       copy.splice(index, 1);
+
+  //       return copy;
+  //     });
+  //   },
+  //   addStrArr: (vArr: string[]) => {
+  //     setAnnotation((state) => {
+  //       const copy = [...state];
+  //       copy.push(...vArr);
+
+  //       return copy;
+  //     });
+  //   },
+  //   replaceStrArr: (strArr: string[]) => {
+  //     setAnnotation(strArr);
+  //   },
+  // };
+
+  const control_qr: TsummaryControl = useMemo(() => {
+    const control_qr: TsummaryControl = {
+      stringArr: qr,
+      editString: (index, v) => {
+        setQr((state) => {
+          const copy = [...state];
+          copy[index] = v;
+
+          return copy;
+        });
+      },
+      addString: (v: string) => {
+        setQr((state) => {
+          const copy = [...state];
+          copy.push(v);
+
+          return copy;
+        });
+      },
+      delString: (index: number) => {
+        setQr((state) => {
+          const copy = [...state];
+          copy.splice(index, 1);
+
+          return copy;
+        });
+      },
+      addStrArr: (vArr: string[]) => {
+        setQr((state) => {
+          const copy = [...state];
+          copy.push(...vArr);
+
+          return copy;
+        });
+      },
+      replaceStrArr: (strArr: string[]) => {
+        setQr(strArr);
+      },
+    };
+
+    return control_qr;
+  }, [qr]);
+
+  // const control_qr: TsummaryControl = {
+  //   stringArr: qr,
+  //   editString: (index, v) => {
+  //     setQr((state) => {
+  //       const copy = [...state];
+  //       copy[index] = v;
+
+  //       return copy;
+  //     });
+  //   },
+  //   addString: (v: string) => {
+  //     setQr((state) => {
+  //       const copy = [...state];
+  //       copy.push(v);
+
+  //       return copy;
+  //     });
+  //   },
+  //   delString: (index: number) => {
+  //     setQr((state) => {
+  //       const copy = [...state];
+  //       copy.splice(index, 1);
+
+  //       return copy;
+  //     });
+  //   },
+  //   addStrArr: (vArr: string[]) => {
+  //     setQr((state) => {
+  //       const copy = [...state];
+  //       copy.push(...vArr);
+
+  //       return copy;
+  //     });
+  //   },
+  //   replaceStrArr: (strArr: string[]) => {
+  //     setQr(strArr);
+  //   },
+  // };
+
+  // ----------------------------------------------------------------------
+
+  const payInfoControl: TpayInfoControl = useMemo(() => {
+    const payInfoControl: TpayInfoControl = {
+      payment: {
+        haveTax: {
+          value: !!taxRate,
+          onChange: (v) => {
+            if (quotationProdSubTotal === '') {
+              calcSubTotalPrice();
+            }
+
+            setTaxRate(v ? 0.05 : 0);
+          },
+        },
+
+        discountRate: {
+          inputAttr: {
+            // disabled: disabled,
+            disabled: true,
+            value: summary.discountRate,
+            onChange: (e) => {
+              // // 如果quotationProdSubTotal為空字串會算出錯誤的值，
+              // // 所以必須先計算出quotationProdSubTotal
+              // if (quotationProdSubTotal === '') {
+              //   calcSubTotalPrice();
+              // }
+              // let v = e.target.value;
+              // if ((v as string) === '') {
+              //   v = '0';
+              // }
+              // if (Number(v) > 500) {
+              //   v = '500';
+              // }
+              // setSummary((state) => {
+              //   const copy = { ...state };
+              //   if (v.split('.')[1]?.length > 3) {
+              //     return copy;
+              //   }
+              //   copy.discountRate = v;
+              //   // changeAllProdQuotationDiscount(Number(v));
+              //   // changeAllProductDiscount(Number(v));
+              //   return copy;
+              // });
+            },
+          },
+        },
+        subTotal: {
+          inputAttr: {
+            disabled: true,
+            value: summary.subTotal,
+          },
+        },
+        salesTax: {
+          inputAttr: {
+            disabled: true,
+            value: summary.salesTax,
+          },
+        },
+        total: {
+          inputAttr: {
+            disabled: true,
+            value: summary.total,
+          },
+        },
+      },
+
+      delivery: {
+        deliveryLocation: {
+          value: summary.deliveryLocation,
+          onChange: (v) => {
+            setSummary((state) => {
+              const copy = { ...state };
+              copy.deliveryLocation = v;
+
+              return copy;
+            });
+          },
+        },
+        deliveryDate: {
+          value: summary.deliveryDate,
+          onChange: (v) => {
+            setSummary((state) => {
+              const copy = { ...state };
+              copy.deliveryDate = v;
+
+              return copy;
+            });
+          },
+        },
+      },
+      paymentMethod: {
+        arr: paymentMethod.map((item, index) => {
+          const { milestone, totalPaymentRatio } = item;
+
+          const onChangeMilestone = (v: string) => {
+            setPaymentMethod((state) => {
+              const copy = [...state];
+              copy[index].milestone = v;
+
+              return copy;
+            });
+          };
+
+          const onChange = (v: string) => {
+            if (v === '') {
+              v = '0';
+            }
+
+            setPaymentMethod((state) => {
+              const copy = [...state];
+              copy[index].totalPaymentRatio = v;
+
+              return copy;
+            });
+          };
+
+          const delSelf = () => {
+            setPaymentMethod((state) => {
+              const copy = [...state];
+              copy.splice(index, 1);
+
+              return copy;
+            });
+          };
+
+          return {
+            label: milestone,
+            value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
+            onChange,
+            onChangeMilestone,
+            delSelf,
+          };
+          //
+        }),
+        addMethod: (v) => {
+          setPaymentMethod((state) => {
+            const copy = [...state];
+            copy.push({ milestone: v, totalPaymentRatio: '' });
+
+            return copy;
+          });
+        },
+      },
+    };
+
+    return payInfoControl;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    calcSubTotalPrice,
+    paymentMethod,
+    quotationProdSubTotal,
+    // summary.deliveryDate,
+    // summary.deliveryLocation,
+    // summary.discountRate,
+    // summary.salesTax,
+    // summary.subTotal,
+    // summary.total,
+    summary,
+    taxRate,
+  ]);
+
+  // const payInfoControl_old: TpayInfoControl = {
+  //   payment: {
+  //     haveTax: {
+  //       value: !!taxRate,
+  //       onChange: (v) => {
+  //         if (quotationProdSubTotal === '') {
+  //           calcSubTotalPrice();
+  //         }
+
+  //         setTaxRate(v ? 0.05 : 0);
+  //       },
+  //     },
+
+  //     discountRate: {
+  //       inputAttr: {
+  //         // disabled: disabled,
+  //         disabled: true,
+  //         value: summary.discountRate,
+  //         onChange: (e) => {
+  //           // // 如果quotationProdSubTotal為空字串會算出錯誤的值，
+  //           // // 所以必須先計算出quotationProdSubTotal
+  //           // if (quotationProdSubTotal === '') {
+  //           //   calcSubTotalPrice();
+  //           // }
+  //           // let v = e.target.value;
+  //           // if ((v as string) === '') {
+  //           //   v = '0';
+  //           // }
+  //           // if (Number(v) > 500) {
+  //           //   v = '500';
+  //           // }
+  //           // setSummary((state) => {
+  //           //   const copy = { ...state };
+  //           //   if (v.split('.')[1]?.length > 3) {
+  //           //     return copy;
+  //           //   }
+  //           //   copy.discountRate = v;
+  //           //   // changeAllProdQuotationDiscount(Number(v));
+  //           //   // changeAllProductDiscount(Number(v));
+  //           //   return copy;
+  //           // });
+  //         },
+  //       },
+  //     },
+  //     subTotal: {
+  //       inputAttr: {
+  //         disabled: true,
+  //         value: summary.subTotal,
+  //       },
+  //     },
+  //     salesTax: {
+  //       inputAttr: {
+  //         disabled: true,
+  //         value: summary.salesTax,
+  //       },
+  //     },
+  //     total: {
+  //       inputAttr: {
+  //         disabled: true,
+  //         value: summary.total,
+  //       },
+  //     },
+  //   },
+
+  //   delivery: {
+  //     deliveryLocation: {
+  //       value: summary.deliveryLocation,
+  //       onChange: (v) => {
+  //         setSummary((state) => {
+  //           const copy = { ...state };
+  //           copy.deliveryLocation = v;
+
+  //           return copy;
+  //         });
+  //       },
+  //     },
+  //     deliveryDate: {
+  //       value: summary.deliveryDate,
+  //       onChange: (v) => {
+  //         setSummary((state) => {
+  //           const copy = { ...state };
+  //           copy.deliveryDate = v;
+
+  //           return copy;
+  //         });
+  //       },
+  //     },
+  //   },
+  //   paymentMethod: {
+  //     arr: paymentMethod.map((item, index) => {
+  //       const { milestone, totalPaymentRatio } = item;
+
+  //       const onChangeMilestone = (v: string) => {
+  //         setPaymentMethod((state) => {
+  //           const copy = [...state];
+  //           copy[index].milestone = v;
+
+  //           return copy;
+  //         });
+  //       };
+
+  //       const onChange = (v: string) => {
+  //         if (v === '') {
+  //           v = '0';
+  //         }
+
+  //         setPaymentMethod((state) => {
+  //           const copy = [...state];
+  //           copy[index].totalPaymentRatio = v;
+
+  //           return copy;
+  //         });
+  //       };
+
+  //       const delSelf = () => {
+  //         setPaymentMethod((state) => {
+  //           const copy = [...state];
+  //           copy.splice(index, 1);
+
+  //           return copy;
+  //         });
+  //       };
+
+  //       return {
+  //         label: milestone,
+  //         value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
+  //         onChange,
+  //         onChangeMilestone,
+  //         delSelf,
+  //       };
+  //       //
+  //     }),
+  //     addMethod: (v) => {
+  //       setPaymentMethod((state) => {
+  //         const copy = [...state];
+  //         copy.push({ milestone: v, totalPaymentRatio: '' });
+
+  //         return copy;
+  //       });
+  //     },
+  //   },
+  // };
 
   // ---------------------------------------------------------
 
@@ -1989,6 +2243,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
+  const comList = useMemo(() => {
+    return { ...targetProd?.comList, ...targetProd?.subComList };
+  }, [targetProd?.comList, targetProd?.subComList]);
+
+  // --------------------------------------------------------------------------
+
   return (
     <div className={classNames(style.container, 'relative')}>
       <PageHeader02 tagList={tagList} customeLeft={customeLeft} panelList={panelList} />
@@ -1996,7 +2256,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
-          <QuotationProfile disabled={disabled} control={control_profile} editNotes={editNotes} />
+          <QuotationProfile_memo disabled={disabled} control={control_profile} editNotes={editNotes} />
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
           </div>
@@ -2058,7 +2318,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
                 // FIXME 之後要把型別處理好
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
+                // comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
+                comList={comList}
                 comCellConfig={comCellConfig}
                 comKeyArr={comKeyArr}
                 changeComKeyArr={() => {}}
@@ -2104,7 +2365,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             />
           </div>
           {/* 備註/報價範圍/付款資訊 */}
-          <Summary
+          <Summary_memo
             disabled={disabled}
             payInfoControl={payInfoControl}
             control_anno={control_anno}
@@ -2113,12 +2374,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             avgDiscount_withQty={avgDiscount_withQty}
           />
           {/* 簽名 */}
-          {/*  */}
-          {/*  */}
-          {/* <QuotationSinature_3 controll={control_signature} disabled={disabled_reviewer} /> */}
           <SignatureBar className={'mx-[50px] mt-[130px] mb-[40px]'} control={control_signature} />
-          {/*  */}
-          {/*  */}
         </div>
       </div>
       <LoadingCover01 isLoading={isLoading} />
@@ -2184,6 +2440,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       */}
 
       {/*  */}
+
       <QuotationPdf_part
         isVisable={showPdf_part}
         onCancel={() => {
@@ -2192,6 +2449,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         mainProductArr={pdfPartProps}
         quotationId={latestContent?.quotationNumber ?? ''}
       />
+
       {/*  */}
       {/* 合約審核表 */}
       <ContractReviewForm

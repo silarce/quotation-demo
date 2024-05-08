@@ -270,7 +270,7 @@ export const useGetCustomers_infinite = ({ customParams }: { customParams?: Tpar
 
 export const useGetCustomers_infinite_2 = createUseInfinite({
   apiClient: apiGetCustomers,
-  errTitle: '取得報價單備註列表失敗',
+  errTitle: '取得客戶列表失敗',
 });
 
 // ============================================================

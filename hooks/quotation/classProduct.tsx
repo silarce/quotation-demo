@@ -59,6 +59,8 @@ import {
   optionsCreator_bottomBarPlate_303AS,
   optionsCreator_boxB_SJ302,
   optionsCreator_boxB_SJ303A,
+  optionsCreator_boxB_SJ312,
+  optionsCreator_boxB_SJ305D,
   optionsCreator_horsePower,
   optionsCreator_quoteType,
   lookup_options_bottomBarAngleIronAndPlate,
@@ -303,7 +305,17 @@ class Class_product {
     // 報價單折數，也就是TquotationContentDto[discount]
     quotationDiscount: number;
   }) {
-    this.reRender = reRender;
+    this.reRender_ori = reRender;
+
+    // this.reRender = () => {
+    //   this.renderCount++;
+    //   reRender();
+    // };
+    this.reRender = function () {
+      this.renderCount++;
+      reRender();
+    };
+
     // this.setIsLoading = setIsLoading;
     this._prodData = _.cloneDeep(prodData);
     this.delSelf = delSelf;
@@ -371,7 +383,9 @@ class Class_product {
     this.resetDoorGeneralSpacs();
   } //  constructor close ===========================================================
 
+  private reRender_ori;
   private reRender;
+  renderCount = 0;
   // readonly setIsLoading;
   delSelf;
   copySelf;
@@ -511,7 +525,7 @@ class Class_product {
       }
 
       const theClass = new Class_component({
-        reRender: this.reRender,
+        reRender: this.reRender_ori,
         data: _.cloneDeep(com),
         key: key,
         prod: this,
@@ -572,7 +586,7 @@ class Class_product {
     const copyData = _.cloneDeep(this.accessoriesList[targetKey].body);
 
     this.accessoriesList[newKey] = new Class_accessories({
-      reRender: this.reRender,
+      reRender: this.reRender_ori,
       data: copyData,
       prod: this,
       key: newKey,
@@ -600,7 +614,7 @@ class Class_product {
       };
 
       this.accessoriesList[newKey] = new Class_accessories({
-        reRender: this.reRender,
+        reRender: this.reRender_ori,
         data: acceClassData,
         prod: this,
         key: newKey,
@@ -624,7 +638,7 @@ class Class_product {
       }
 
       list[key] = new Class_accessories({
-        reRender: this.reRender,
+        reRender: this.reRender_ori,
         data: _.cloneDeep(item),
         prod: this,
         isNew: false,
@@ -647,7 +661,7 @@ class Class_product {
       }
 
       list[key] = new Class_accessories({
-        reRender: this.reRender,
+        reRender: this.reRender_ori,
         data: _.cloneDeep(item),
         prod: this,
         isNew: false,
@@ -665,7 +679,7 @@ class Class_product {
     // 配電箱
 
     const distributionBox = new Class_SubCom({
-      reRender: this.reRender,
+      reRender: this.reRender_ori,
       data: {
         price: this._prodData.distributionBoxPrice,
         unitPrice: this._prodData.distributionBoxUnitPrice,
@@ -682,7 +696,7 @@ class Class_product {
 
     // 安裝費
     const installationFee = new Class_SubCom({
-      reRender: this.reRender,
+      reRender: this.reRender_ori,
       data: {
         price: this._prodData.installationFeePrice,
         unitPrice: this._prodData.installationFeeUnitPrice,
@@ -1446,8 +1460,6 @@ class Class_product {
     // get /products/door/available-components取得的金額不是正確的金額
     // 正確的金額之後會在 post /products/door/generate-door-product-bom 取得
 
-    slat = _.cloneDeep(slat);
-
     if (this.doorType === 'SJ-305D' && slat) {
       const standardSlat_sj305D = availableComponents.slats.find((ac) => {
         return ac.name.includes('標準');
@@ -1458,6 +1470,7 @@ class Class_product {
       }
     }
 
+    slat = _.cloneDeep(slat);
     roller = _.cloneDeep(roller);
     headBox = _.cloneDeep(headBox);
     bottomBar = _.cloneDeep(bottomBar);
@@ -2276,11 +2289,14 @@ class Class_product {
 
     let options: Toption[] | undefined = undefined;
 
-    if (this.doorType === 'SJ-302') {
-      options = _.cloneDeep(optionsCreator_boxB_SJ302());
-    } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
-      options = _.cloneDeep(optionsCreator_boxB_SJ303A());
-    }
+    options = lookup_options_boxB[this.doorType];
+    options = _.cloneDeep(options);
+
+    // if (this.doorType === 'SJ-302') {
+    //   options = _.cloneDeep(optionsCreator_boxB_SJ302());
+    // } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
+    //   options = _.cloneDeep(optionsCreator_boxB_SJ303A());
+    // }
 
     // if (options) {
     //   options.unshift({
@@ -2314,8 +2330,13 @@ class Class_product {
 
   set quotationDiscount(v) {
     this._quotationDiscount = v;
-    // 因為折數改變了，所以選配設定的價格要重新計算
-    this.calcAllPrice_comAndSubComAndAcce();
+
+    if (this.isSpecialProd) {
+      this.price = this.price;
+    } else {
+      // 因為折數改變了，所以選配設定的價格要重新計算
+      this.calcAllPrice_comAndSubComAndAcce();
+    }
 
     // this.calcProdAllprice_timeout();
     this.reRender();
@@ -3716,7 +3737,7 @@ class Class_product {
     };
 
     this._exchangeProdList[exId] = new Class_product({
-      reRender: this.reRender,
+      reRender: this.reRender_ori,
       prodData: copy,
       delSelf,
       copySelf: () => {},
@@ -4634,6 +4655,16 @@ const calcDefaultMotor = ({ doorGeneralSpecs }: { doorGeneralSpecs: TdoorGeneral
 
 const check_isValueInOptions = (value: string, options: Toption[]) => {
   return options.some((item) => item.value === value);
+};
+
+const lookup_options_boxB: {
+  [doorType: string]: Toption[] | undefined;
+} = {
+  'SJ-302': optionsCreator_boxB_SJ302(),
+  'SJ-303A': optionsCreator_boxB_SJ303A(),
+  'SJ-303AS': optionsCreator_boxB_SJ303A(),
+  'SJ-305D': optionsCreator_boxB_SJ305D(),
+  'SJ-312': optionsCreator_boxB_SJ312(),
 };
 
 // ===========================================================

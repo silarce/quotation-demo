@@ -42,9 +42,11 @@ const Emo_Wrapper_inpuSel_01 = styled.div`
   gap: 15px;
 `;
 
-const Wrapper_inpuSel_01 = ({ children }: { children: React.ReactNode }) => {
-  return <Emo_Wrapper_inpuSel_01>{children}</Emo_Wrapper_inpuSel_01>;
-};
+// const Wrapper_inpuSel_01 = ({ children }: { children: React.ReactNode }) => {
+//   return <Emo_Wrapper_inpuSel_01>{children}</Emo_Wrapper_inpuSel_01>;
+// };
+
+const Wrapper_inpuSel_01 = Emo_Wrapper_inpuSel_01;
 
 // ========================================================================
 

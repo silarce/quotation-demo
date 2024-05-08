@@ -4,6 +4,9 @@ import classNames from 'classnames';
 import { Modal, ModalFuncProps } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 
+// gear
+import MyButton_v2, { TmyBtn } from '../../button/myButton_v2';
+
 // css
 import style from './alertModals.module.scss';
 
@@ -169,6 +172,64 @@ export const ModalLoading = (
 };
 // ====================================================
 
+export const ModalBtnBar = ({
+  title,
+  content,
+  props,
+  className,
+  btnPropsArr,
+  width = 'auto',
+}: {
+  title?: string | number;
+  content?: React.ReactNode;
+  props?: ModalFuncProps;
+  className?: string;
+  btnPropsArr?: TmyBtn[];
+  width?: React.CSSProperties['width'];
+}) => {
+  // const { className: className01 } = modalProps;
+  // const theClassName = classNames(className01, style.confirm, className);
+  content = (
+    <>
+      {content}
+      {btnPropsArr && <BtnBar btnPropsArr={btnPropsArr} />}
+    </>
+  );
+
+  return Modal.confirm({
+    icon: <></>,
+    ...modalProps,
+    title,
+    content,
+    // cancelText: '取消',
+    // footer: null,
+
+    cancelButtonProps: {
+      style: { display: 'none' },
+    },
+    okButtonProps: {
+      style: { display: 'none' },
+    },
+    width,
+    ...props,
+    className: classNames(style.confirm, modalProps.className, props?.className, className),
+  });
+};
+
+// ====================================================
+
+const BtnBar = ({ btnPropsArr }: { btnPropsArr: TmyBtn[] }) => {
+  return (
+    <div className={style.btnBar}>
+      {btnPropsArr.map((props, index) => {
+        return <MyButton_v2 key={index} {...props} />;
+      })}
+    </div>
+  );
+};
+
+// ====================================================
+
 const myAlert = {
   info: ModalInfo02,
   success: ModalSuccess,
@@ -177,6 +238,7 @@ const myAlert = {
   confirm: ModalConfirm,
   loading: ModalLoading,
   destroyAll: Modal.destroyAll,
+  btnBar: ModalBtnBar,
 };
 
 export default myAlert;
