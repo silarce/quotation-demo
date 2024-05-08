@@ -8,9 +8,6 @@ import ExchangePanel, {
   ExchangeRow,
 } from 'components/page/domestic/quotation/legacyContract/exchangePanel/exchangePanel';
 
-// antd
-import { Popover } from 'antd';
-
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 // import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';

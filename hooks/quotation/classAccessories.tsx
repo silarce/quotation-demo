@@ -37,7 +37,11 @@ class Class_accessories {
     isNew?: boolean;
     key: string;
   }) {
-    this.reRender = reRender;
+    this.reRender = function () {
+      this.renderCount++;
+      reRender();
+    };
+
     this._acceData = data;
     this._prod = prod;
     this.key = key;
@@ -60,6 +64,7 @@ class Class_accessories {
   } // =constructor=============================
 
   private reRender;
+  renderCount = 0;
   private _acceData;
   readonly key;
   private _prod;
