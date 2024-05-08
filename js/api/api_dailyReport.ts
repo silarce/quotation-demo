@@ -88,11 +88,20 @@ const apiDailyReports_old = (customParams?: Tparams, controller?: AbortControlle
     .catch((err) => Promise.reject(err));
 };
 
-const apiDailyReports = (params?: Tparams, controller?: AbortController) => {
+// const apiDailyReports = (params?: Tparams, { controller }: { controller?: AbortController } = {}) => {
+//   const api = `/daily-reports`;
+
+//   return axi
+//     .get<TgetDailyReports>(api, { params, signal: controller?.signal })
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
+
+const apiDailyReports = (params?: Tparams) => {
   const api = `/daily-reports`;
 
   return axi
-    .get<TgetDailyReports>(api, { params, signal: controller?.signal })
+    .get<TgetDailyReports>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

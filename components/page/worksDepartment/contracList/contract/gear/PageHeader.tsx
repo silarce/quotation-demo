@@ -8,8 +8,17 @@ import PageHeaderFlex01 from 'components/PageHeader/pageHeaderFlex01';
 
 import { AppContext } from 'pages/_app';
 
+// ========================================================
+
+import { TdocType } from 'js/api/dtoTypes';
+
 export type { TpanelList };
 
+// ========================================================
+
+const documentType: TdocType = '保固書';
+
+// ========================================================
 export default function PageHeader({
   tagCallback,
   panelList,
@@ -160,6 +169,17 @@ export default function PageHeader({
       },
     },
     {
+      label: '保固書',
+      href: {
+        pathname: `${pathHead}/certifiedDocument`,
+        query: {
+          contractId,
+          version,
+          documentType,
+        },
+      },
+    },
+    {
       label: '修繕報價',
       disabled: true,
       href: {
@@ -170,17 +190,17 @@ export default function PageHeader({
         },
       },
     },
-    {
-      label: '證明書/保固書',
-      disabled: true,
-      href: {
-        pathname: `${pathHead}/undefined`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
+    // {
+    //   label: '證明書/保固書',
+    //   disabled: true,
+    //   href: {
+    //     pathname: `${pathHead}/undefined`,
+    //     query: {
+    //       contractId,
+    //       version,
+    //     },
+    //   },
+    // },
   ];
 
   return (

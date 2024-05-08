@@ -39,8 +39,6 @@ export default function PageHeader02({
 
   panelList?: TpanelList; //右邊的一排按鈕
 }) {
-  const [active, setActive] = useState(0);
-
   const router = useRouter();
   const { pathname } = router;
 
@@ -51,7 +49,7 @@ export default function PageHeader02({
         <div className={scss.prebuilt}>
           <Tag tag={tag} className={tagClassName} onClick={tagOnClick} />
           {/* 單一tag */}
-          <TagList tagList={tagList} active={active} setActive={setActive} />
+          <TagList tagList={tagList} />
           {/* 多個tag 附帶onClick */}
           <LinkList linkList={linkList} pathname={pathname} />
           {/* 超連結 */}

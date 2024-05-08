@@ -1,0 +1,169 @@
+// 210 * 297
+
+.container {
+  position: relative;
+  display: grid;
+  //                  title       infoList     table       textarea_autosize footer
+  grid-template-rows: max-content max-content max-content auto max-content;
+
+  width: 1500px;
+  aspect-ratio: 210/297;
+  // height: max-content;
+  // overflow: hidden;
+
+  margin: auto;
+  padding: 100px;
+  border: solid 1px black;
+  // transform: scale(0.8) translateY(-10%);
+  // box-sizing: content-box;
+  &.pdfContainer {
+    overflow: hidden;
+  }
+}
+
+.title {
+  text-align: center;
+  font-size: 100px;
+  font-weight: 600;
+}
+
+.infoList {
+  // display: grid;
+  // gap: 20px;
+  > div {
+    margin-top: 25px;
+    &:nth-of-type(1) {
+      margin-top: 0;
+    }
+  }
+
+  .infoBar {
+    position: relative;
+    display: grid;
+    // grid-template-columns: 350px;
+    gap: 10px;
+    align-items: center;
+    // margin-bottom: 20px;
+    .removeBtn {
+      position: absolute;
+      left: -30px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.tableWrapper {
+  margin-top: 30px;
+  .tableCaption {
+    margin-bottom: 15px;
+  }
+  .table {
+    width: auto;
+    height: fit-content;
+    div,
+    span {
+      font-size: 20px;
+    }
+  }
+}
+
+.textarea {
+  display: block;
+  width: 800px;
+  // height: 200px;
+  margin: auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  border: solid 1px theme("colors.border");
+  resize: none;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 500;
+  white-space: pre-wrap;
+  &.div {
+    border-color: transparent;
+    white-space: pre-wrap;
+  }
+}
+
+.footer {
+  display: grid;
+  // grid-template-columns: 3fr 2.5fr;
+  grid-template-columns: 650px 450px;
+  grid-template-rows: max-content;
+  gap: 10px;
+  justify-content: space-between;
+  width: 100%;
+
+  font-size: 30px;
+
+  .footerDate {
+    grid-column: span 2;
+    font-size: 30px;
+    text-align: center;
+    margin-top: 25px;
+    // margin-bottom: 50px;
+  }
+}
+
+.addBtn {
+  width: 20px;
+  height: 20px;
+  stroke: theme("colors.main");
+  &:hover {
+    fill: #14256a10;
+  }
+}
+
+.seal {
+  position: absolute;
+  opacity: 0.5;
+  bottom: 300px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.suffix {
+  font-size: 30px;
+}
+
+.datePicker {
+  input {
+    font-size: 30px !important;
+  }
+}
+
+$width: 290px;
+
+.inputsel {
+  width: $width;
+  text-align: center;
+}
+
+.infoSuffix {
+  > span {
+    display: block;
+    width: $width;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+}
+
+.cellspan.plus {
+  > span {
+    font-size: 0;
+  }
+}
+
+.inputSel {
+  width: $width;
+}
+
+.inputTextArea {
+  text-align: center;
+  word-break: break-all;
+}
