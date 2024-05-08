@@ -177,14 +177,17 @@ export default function AdditionalEngineeringStatistics() {
     },
   ];
 
-  const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
+  // const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
 
   // ------------------------------------------------------------------
   return (
     <SubLayer isLoading_subLayer={isLoading}>
-      <PageHeader02 tag="個人業績統計表" customeLeft={customeLeft} />
+      <PageHeader02 tag="個人業績統計表" />
 
-      <Table control={control_table} />
+      <div>
+        <SelectBar className="ml-5 mt-5 mb-5" selectPropsArr={selectPropsArr} />
+        <Table control={control_table} />
+      </div>
     </SubLayer>
   );
 }
