@@ -20,6 +20,7 @@ import { useGetContract_id_strict } from 'js/api/api_quotation';
 
 type Tquery = {
   id?: string | undefined;
+  contractId?: string | undefined;
   documentType?: string;
   editCertifiedDocument?: 'true';
   certifiedDocumentId?: string;
@@ -43,7 +44,16 @@ export default function CertifiedDocument({
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { id: contractId, documentType, editCertifiedDocument, certifiedDocumentId } = query;
+  const {
+    //
+    // id: contractId,
+    documentType,
+    editCertifiedDocument,
+    certifiedDocumentId,
+  } = query;
+
+  const contractId = query.id || query.contractId;
+
   const isListShow = !editCertifiedDocument && !certifiedDocumentId;
 
   // ---------------------------------------------------------------------------
