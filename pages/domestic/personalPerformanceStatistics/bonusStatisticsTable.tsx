@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
+import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -8,7 +9,9 @@ import PageHeader02, { TpanelList, TtagList } from 'components/PageHeader/PageHe
 
 // gaer
 import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar/selectBar';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import myAlert, { TbtnPropsArr } from 'components/global/gear/modal/simpleModal/alertModals';
+import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // option
 import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
@@ -99,9 +102,114 @@ export default function BonusStatisticsTable() {
   return (
     <SubLayer>
       <PageHeader02 tagList={tagList} />
-      <div>
-        <SelectBar className="ml-5 mt-5 mb-5" selectPropsArr={selectPropsArr} />
+      <div className="ml-5 mb-5">
+        <div className={scss.selectBarWrapper}>
+          <SelectBar selectPropsArr={selectPropsArr} />
+        </div>
+        <div className={classNames(scss.table)}>
+          <Thead />
+          <div className={classNames(scss.tbody)}>
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+            <Row />
+          </div>
+        </div>
       </div>
     </SubLayer>
   );
 }
+
+// ====================================================================
+
+//  ██████  ██████  ███    ███ ██████   ██████  ███    ██ ███████ ███    ██ ████████
+// ██      ██    ██ ████  ████ ██   ██ ██    ██ ████   ██ ██      ████   ██    ██
+// ██      ██    ██ ██ ████ ██ ██████  ██    ██ ██ ██  ██ █████   ██ ██  ██    ██
+// ██      ██    ██ ██  ██  ██ ██      ██    ██ ██  ██ ██ ██      ██  ██ ██    ██
+//  ██████  ██████  ██      ██ ██       ██████  ██   ████ ███████ ██   ████    ██
+
+const Thead = () => {
+  return (
+    <div className={classNames(scss.thead)}>
+      <div className={scss.cell}>員工姓名</div>
+      <div className={scss.cell}>當月業績</div>
+      <div className={scss.cell}>當月獎金</div>
+      <div className={scss.cell}>備註</div>
+    </div>
+  );
+};
+
+const Row = () => {
+  const statusArr: Tcontrol_processChain['statusArr'] = [
+    {
+      label: `課長 ${''}`,
+      dotColor: 'green',
+    },
+    {
+      label: `經理 ${''}`,
+      dotColor: 'red',
+    },
+    {
+      label: `總經理 ${''}`,
+      dotColor: 'gray',
+    },
+  ];
+
+  return (
+    <div className={scss.row}>
+      <div className={scss.cell}>阿喵</div>
+      <div className={scss.cell}>999,999</div>
+      <div className={scss.cell}>999,999</div>
+      <div className={scss.cell}>喵喵喵</div>
+      {/*  */}
+      <div className={classNames(scss.cell, scss.cell_processChain, 'col-span-4')}>
+        <ProcessChain className={scss.processChain} control={{ statusArr }} />
+        <MyButton_v2
+          py="py4"
+          px="px22"
+          onClick={() => {
+            const modal = myAlert.btnBar({
+              title: '是否通過審核?',
+              btnPropsArr: [
+                {
+                  label: '通過審核',
+                  theme: 'danger',
+                  onClick: () => {},
+                },
+                {
+                  label: '不通過審核',
+                  onClick: () => {},
+                },
+                {
+                  label: '取消',
+                  onClick: () => {
+                    modal.destroy();
+                  },
+                },
+              ],
+            });
+          }}
+        >
+          審核
+        </MyButton_v2>
+        {/* cell_processChain close*/}
+      </div>
+      {/*  */}
+    </div>
+  );
+};
