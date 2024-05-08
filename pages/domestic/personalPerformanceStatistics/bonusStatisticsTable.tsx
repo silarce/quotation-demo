@@ -19,11 +19,14 @@ import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/opti
 // css
 import scss from './bonusStatisticsTable.module.scss';
 
+import { TbonusDto, useGetQuotationAccounting_bonus } from 'js/api/api_quotation';
+import { TemployeeDto } from 'js/api/dtoTypes';
+
 // ========================================================================
 
 type Tquery = {
-  year: string | number;
-  month: string | number;
+  year: string | undefined;
+  month: string | undefined;
 };
 
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
@@ -40,9 +43,22 @@ export default function BonusStatisticsTable() {
   const query = router.query as Tquery;
   const {
     //
-    year = new Date().getFullYear() - 1911,
+    year = String(new Date().getFullYear() - 1911),
     month,
   } = query;
+
+  // --------------------------------------------------------------------
+
+  const params = {
+    year: Number(year) + 1911,
+    month: month ? Number(month) : undefined,
+  };
+
+  const {
+    data: data_bonus,
+    // update: update_bonus,
+    isFetching,
+  } = useGetQuotationAccounting_bonus(params, { isAutoUpdate: false });
 
   // --------------------------------------------------------------------
   const selectPropsArr: TselectPropsArr = [
@@ -99,8 +115,10 @@ export default function BonusStatisticsTable() {
   ];
 
   // --------------------------------------------------------------------
+
+  // --------------------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isFetching}>
       <PageHeader02 tagList={tagList} />
       <div className="ml-5 mb-5">
         <div className={scss.selectBarWrapper}>
@@ -213,3 +231,54 @@ const Row = () => {
     </div>
   );
 };
+
+// ███████  █████  ██   ██ ███████     ██████   █████  ████████  █████
+// ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
+// █████   ███████ █████   █████       ██   ██ ███████    ██    ███████
+// ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
+// ██      ██   ██ ██   ██ ███████     ██████  ██   ██    ██    ██   ██
+
+// const fakeData_bonus: TbonusDto = {
+//   id: "fgsdffgasdgasdfgasdf",
+//   createdAt: "2011-01-01",
+//   updatedAt: "2011-01-01",
+
+//   // 獎金年份
+//   bonusYear: "1911";
+//   // 獎金月份
+//   bonusMonth: "2";
+//   // 業績總額
+//   totalSales: 99999;
+//   // 獎金總額
+//   totalBonus: 99999;
+//   // 備註
+//   note: null;
+//   // 業務id
+//   salesEmployeeId:  null;
+//   // 業務
+//   salesEmployee: {id:"dsfasfasdf",chName:"foooo"} as TemployeeDto;
+//   // 課長Id
+//   reviewTeamLeaderEmployeeId: "dfsdfsdfsdf";
+//   // 審核課長
+//   reviewTeamLeaderEmployee: TemployeeDto;
+//   // 送審給課長審核時間
+//   toReviewTeamLeader: string | null;
+//   // 課長審核時間
+//   teamLeaderReviewAt: string | null;
+//   // 審核主管Id
+//   reviewSupervisorEmployeeId: string | null;
+//   // 審核主管
+//   reviewSupervisorEmployee: TemployeeDto;
+//   // 送審給主管審核時間
+//   toReviewSupervisor: string | null;
+//   // 主管審核時間
+//   supervisorReviewAt: string | null;
+//   // 審核總經理Id
+//   reviewManagerEmployeeId: string | null;
+//   // 審核總經理
+//   reviewManagerEmployee: TemployeeDto;
+//   // 送審給總經理審核時間
+//   toReviewManager: string | null;
+//   // 總經理審核時間
+//   managerReviewAt: string | null;
+// }
