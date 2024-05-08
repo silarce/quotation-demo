@@ -155,6 +155,7 @@ const apiGetCertificatedDoc_id = async (id: string) => {
       'reviewGuarantorEmployee',
       'reviewManagerEmployee',
       'agentEmployee',
+      'contract.content',
     ],
   };
 

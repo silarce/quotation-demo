@@ -16,6 +16,9 @@
   border: solid 1px black;
   // transform: scale(0.8) translateY(-10%);
   // box-sizing: content-box;
+  &.pdfContainer {
+    overflow: hidden;
+  }
 }
 
 .title {
@@ -121,6 +124,7 @@
   bottom: 300px;
   left: 50%;
   transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .suffix {

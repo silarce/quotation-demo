@@ -20,6 +20,7 @@ import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 import Textarea_autosize from 'react-textarea-autosize';
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
@@ -42,7 +43,7 @@ import {
   apiPatchCertificatedDoc,
   apiPatchCertificatedDoc_spanShot,
 } from 'js/api/api_certificated-doc';
-import { set } from 'lodash';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // ===============================================================================
 
@@ -139,7 +140,11 @@ export default function Certificate({
 
   const { data: data_certifiedDocument, update: update_data_CertifiedDocument } =
     useGetCertificatedDoc_id(certifiedDocumentId);
+
   const isSealed = data_certifiedDocument?.status === '已用印';
+  const docStyle = data_certifiedDocument?.docStyle ?? '';
+
+  const projectName = data_certifiedDocument?.contract.content.projectName ?? '';
 
   // ---------------------------------------------------------------------
 
@@ -618,6 +623,8 @@ export default function Certificate({
           month={month}
           date={date}
           isSealed={isSealed}
+          projectName={projectName}
+          docStyle={docStyle}
         />
       </div>
     </div>
@@ -861,7 +868,7 @@ const VirtualContainer_pre = (
   // -------------------------------------------------------------------------
   // -------------------------------------------------------------------------
   return (
-    <div ref={ref} className={classNames(scss.container)}>
+    <div ref={ref} className={classNames(scss.container, scss.pdfContainer)}>
       <h1 className={classNames(scss.title)}>{state_docType}</h1>
 
       <div className={scss.infoList}>
@@ -952,6 +959,8 @@ const PdfPreview_pre = ({
   month,
   date,
   isSealed,
+  projectName,
+  docStyle,
 }: {
   visible: boolean;
   closeModal: () => void;
@@ -972,6 +981,8 @@ const PdfPreview_pre = ({
   month: React.ReactNode;
   date: React.ReactNode;
   isSealed: boolean;
+  projectName: string;
+  docStyle: string;
 }) => {
   //
   const refPdf = useRef<(HTMLDivElement | null)[]>([]);
@@ -985,7 +996,7 @@ const PdfPreview_pre = ({
       return;
     }
 
-    // showRootLoading(true, '正在處理PDF');
+    showRootLoading(true, '正在處理PDF');
 
     const doc = new jsPDF('p', 'px', 'a4');
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -1021,8 +1032,8 @@ const PdfPreview_pre = ({
       doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
     }
 
-    doc.save(`${'fooo'}.pdf`);
-    // showRootLoading(false);
+    doc.save(`${docStyle}證明書_${projectName}.pdf`);
+    showRootLoading(false);
   };
 
   // ----------------------------------------------------------------------------
@@ -1035,7 +1046,13 @@ const PdfPreview_pre = ({
   const height_container = fullHeight.minus(100).minus(100).minus(1).minus(1).toNumber();
 
   useEffect(() => {
+    if (!visible) {
+      return;
+    }
+
     const calcChopedItemArr = () => {
+      let hadAlert = false;
+      //
       const style_description = window.getComputedStyle(ref_description.current);
       const style_table = window.getComputedStyle(ref_table.current);
       const style_tableTitle = window.getComputedStyle(ref_tableTitle.current);
@@ -1072,19 +1089,6 @@ const PdfPreview_pre = ({
         .minus(height_footer)
         .toNumber();
 
-      // console.log(height_table);
-
-      // console.log('height_container', height_container);
-      // console.log('height_title', height_title);
-      // console.log('height_info', height_info);
-      // console.log('marginTop_table', marginTop_table);
-      // console.log('height_tableTitle', height_tableTitle);
-      // console.log('height_thead', height_thead);
-      // console.log('marginTop_description', marginTop_description);
-      // console.log('height_description', height_description);
-      // console.log('height_footer', height_footer);
-      // console.log('allowHeight', allowHeight);
-
       const rowEleArr = ref_table.current.querySelectorAll("[data-component='Row'") as NodeListOf<HTMLDivElement>;
       const chopedRowArr: Titem[][] = [];
       let tempArr: Titem[] = [];
@@ -1106,6 +1110,11 @@ const PdfPreview_pre = ({
           // countHeight = countHeight + height;
           tempArr = [item];
           countHeight = height;
+
+          if (height > allowHeight && !hadAlert) {
+            myAlert.warning({ title: '注意，有資料過高超出可處理範圍，請調整資料內容' });
+            hadAlert = true;
+          }
         }
 
         if (index === rowEleArr.length - 1) {
@@ -1121,16 +1130,17 @@ const PdfPreview_pre = ({
     }
 
     //
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    //
-    height_container,
-    ref_description,
-    ref_footer,
-    ref_info,
-    ref_table,
-    ref_tableTitle,
-    ref_title,
-    state_itemList,
+    // height_container,
+    // ref_description,
+    // ref_footer,
+    // ref_info,
+    // ref_table,
+    // ref_tableTitle,
+    // ref_title,
+    // state_itemList,
+    visible,
   ]);
 
   const state_infoListArr = useMemo(() => {
