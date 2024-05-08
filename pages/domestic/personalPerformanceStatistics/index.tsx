@@ -22,7 +22,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
 
 // api
-import { useQuotationAccounting_personalContract } from 'js/api/api_quotation';
+import { useQuotationAccounting_personalContract, TquotationAccounting_personal_contract } from 'js/api/api_quotation';
 import { useEmployee, Tparams } from 'js/api/api_employee';
 
 // ==================================================================
@@ -40,25 +40,26 @@ const yearOptionArr = optionsCreator_year();
 const monthOptionArr = optionsCreator_month({ emptyOption: true });
 
 // ==================================================================
+
+const empParams: Tparams = {
+  pageSize: 99999,
+  populate: ['jobs.department'],
+  filter: {
+    'jobs.department.name': { $eq: '業務部' },
+  },
+};
+
+// ==================================================================
 // 個人業績統計表
 export default function AdditionalEngineeringStatistics() {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { year, month, emp } = query;
-
-  useEffect(() => {
-    const now = new Date();
-    const theYear = year || now.getFullYear() - 1911;
-    const theMonth = month;
-
-    router.push({
-      query: {
-        ...query,
-        year: theYear,
-        month: theMonth,
-      },
-    });
-  }, []);
+  const {
+    //
+    year = new Date().getFullYear() - 1911,
+    month,
+    emp,
+  } = query;
 
   // ------------------------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
@@ -91,14 +92,6 @@ export default function AdditionalEngineeringStatistics() {
 
   // ------------------------------------------------------------------
 
-  const empParams: Tparams = {
-    pageSize: 99999,
-    populate: ['jobs.department'],
-    filter: {
-      'jobs.department.name': { $eq: '業務部' },
-    },
-  };
-
   const { data: data_emp, update: update_emp } = useEmployee(empParams);
 
   useEffect(() => {
@@ -124,6 +117,81 @@ export default function AdditionalEngineeringStatistics() {
 
   // ------------------------------------------------------------------
 
+  const control_table = useControl_personalPerformanceStatistics(data);
+
+  // ------------------------------------------------------------------
+  const selectPropsArr: TselectPropsArr = [
+    {
+      selectProps: {
+        value: emp,
+        options: empOptionArr,
+        onChange: (option) => {
+          if (typeof option?.value === 'string') {
+            router.push({
+              query: {
+                ...router.query,
+                emp: option.value,
+              },
+            });
+          }
+        },
+      },
+      placeholder: '選擇員工',
+      boxStyle: { width: '140px' },
+    },
+    {
+      selectProps: {
+        value: year,
+        options: yearOptionArr,
+        onChange: (option) => {
+          if (typeof option?.value === 'string') {
+            router.push({
+              query: {
+                ...router.query,
+                year: option.value,
+              },
+            });
+          }
+        },
+      },
+      placeholder: '選擇年份',
+      boxStyle: { width: '140px' },
+    },
+    {
+      selectProps: {
+        value: month,
+        options: monthOptionArr,
+        onChange: (option) => {
+          if (typeof option?.value === 'string') {
+            router.push({
+              query: {
+                ...router.query,
+                month: option.value,
+              },
+            });
+          }
+        },
+      },
+      placeholder: '選擇月份',
+      boxStyle: { width: '140px' },
+    },
+  ];
+
+  const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
+
+  // ------------------------------------------------------------------
+  return (
+    <SubLayer isLoading_subLayer={isLoading}>
+      <PageHeader02 tag="個人業績統計表" customeLeft={customeLeft} />
+
+      <Table control={control_table} />
+    </SubLayer>
+  );
+}
+
+// ===========================================================
+
+const useControl_personalPerformanceStatistics = (data: TquotationAccounting_personal_contract[] | undefined) => {
   const control: Tcontrol_personalPerformanceStatistics = useMemo(() => {
     if (!data) {
       return {
@@ -281,74 +349,5 @@ export default function AdditionalEngineeringStatistics() {
     //
   }, [data]);
 
-  // ------------------------------------------------------------------
-  const selectPropsArr: TselectPropsArr = [
-    {
-      selectProps: {
-        value: emp,
-        options: empOptionArr,
-        onChange: (option) => {
-          if (typeof option?.value === 'string') {
-            router.push({
-              query: {
-                ...router.query,
-                emp: option.value,
-              },
-            });
-          }
-        },
-      },
-      placeholder: '選擇員工',
-      boxStyle: { width: '140px' },
-    },
-    {
-      selectProps: {
-        value: year,
-        options: yearOptionArr,
-        onChange: (option) => {
-          if (typeof option?.value === 'string') {
-            router.push({
-              query: {
-                ...router.query,
-                year: option.value,
-              },
-            });
-          }
-        },
-      },
-      placeholder: '選擇年份',
-      boxStyle: { width: '140px' },
-    },
-    {
-      selectProps: {
-        value: month,
-        options: monthOptionArr,
-        onChange: (option) => {
-          if (typeof option?.value === 'string') {
-            router.push({
-              query: {
-                ...router.query,
-                month: option.value,
-              },
-            });
-          }
-        },
-      },
-      placeholder: '選擇月份',
-      boxStyle: { width: '140px' },
-    },
-  ];
-
-  const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
-
-  // ------------------------------------------------------------------
-  return (
-    <SubLayer isLoading_subLayer={isLoading}>
-      <PageHeader02 tag="個人業績統計表" customeLeft={customeLeft} />
-
-      <Table control={control} />
-    </SubLayer>
-  );
-}
-
-// ===========================================================
+  return control;
+};
