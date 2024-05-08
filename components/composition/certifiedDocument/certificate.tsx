@@ -234,6 +234,7 @@ export default function Certificate({
     reqPatchCertificatedDoc,
     reqSealCertificatedDoc,
     setShowPdfPreview,
+    isSealed,
   });
 
   // ___________________________________________________________________________
@@ -653,6 +654,7 @@ const usePanelList = ({
   reqPatchCertificatedDoc,
   reqSealCertificatedDoc,
   setShowPdfPreview,
+  isSealed,
 }: {
   router: NextRouter;
   disabled: boolean;
@@ -660,14 +662,32 @@ const usePanelList = ({
   reqPatchCertificatedDoc: () => void;
   reqSealCertificatedDoc: () => void;
   setShowPdfPreview: React.Dispatch<React.SetStateAction<boolean>>;
+  isSealed: boolean;
 }) => {
   const panelList: TpanelList = useMemo(() => {
-    const panelList_disabled: TpanelList = [
-      {
-        type: 'redButton',
-        label: '用印',
-        onClick: reqSealCertificatedDoc,
+    //
+    const btn_toSeal: TpanelList[number] = {
+      type: 'redButton',
+      label: '用印',
+      onClick: reqSealCertificatedDoc,
+    };
+
+    const btn_edit: TpanelList[number] = {
+      type: 'myButton',
+      label: '編輯',
+      onClick: () => {
+        setDiasbled(false);
       },
+    };
+
+    const btn_isSealed: TpanelList[number] = {
+      type: 'redButton',
+      label: '已用印',
+      onClick: () => {},
+    };
+
+    const panelList_disabled: TpanelList = [
+      !isSealed ? btn_toSeal : btn_isSealed,
       {
         type: 'redButton',
         label: '匯出',
@@ -675,13 +695,7 @@ const usePanelList = ({
           setShowPdfPreview(true);
         },
       },
-      {
-        type: 'myButton',
-        label: '編輯',
-        onClick: () => {
-          setDiasbled(false);
-        },
-      },
+      !isSealed ? btn_edit : null,
       {
         type: 'myButton',
         label: '返回',
@@ -721,6 +735,7 @@ const usePanelList = ({
     router.back,
     setDiasbled,
     setShowPdfPreview,
+    isSealed,
   ]);
 
   return panelList;

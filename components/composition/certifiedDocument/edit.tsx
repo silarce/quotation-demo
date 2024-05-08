@@ -192,9 +192,13 @@ export default function Edit({
 
     reviewManagerEmployee,
     // managerReviewedAt,
+
+    status,
   } = data_certifiedDocument ?? {};
 
   const isReviewer = checkReviewer(userInfo, data_certifiedDocument);
+
+  const isSealed = status === '已用印';
 
   // ---------------------------------------------------------------------------
 
@@ -500,6 +504,7 @@ export default function Edit({
     reqPatchCertificatedDoc_review,
     // certificateId: certifiedDocumentId ?? '',
     isReviewer,
+    isSealed,
   });
 
   // _________________________________________________________________________
@@ -1197,6 +1202,7 @@ const usePanelList = ({
   reqPatchCertificatedDoc,
   reqPatchCertificatedDoc_review,
   isReviewer,
+  isSealed,
 }: // certificateId,
 {
   disabled: boolean;
@@ -1209,9 +1215,61 @@ const usePanelList = ({
   reqPatchCertificatedDoc: () => void;
   reqPatchCertificatedDoc_review: (reviewResult: boolean) => void;
   isReviewer: boolean;
+  isSealed: boolean;
   // certificateId: string;
 }) => {
   const panelList = useMemo(() => {
+    const isSealedBtn: TpanelList[number] = {
+      type: 'redButton',
+      label: '已用印',
+      onClick: () => {},
+    };
+
+    const submitBtn: TpanelList[number] = {
+      type: 'redButton',
+      label: '送審',
+      onClick: () => {
+        setState_showSelector(true);
+      },
+    };
+
+    const reviewBtn: TpanelList[number] = {
+      type: 'redButton',
+      label: '審核',
+      onClick: () => {
+        const modal = myAlert.btnBar({
+          title: '是否通過審核',
+          btnPropsArr: [
+            {
+              label: '審核通過',
+              onClick: () => reqPatchCertificatedDoc_review(true),
+              theme: 'danger',
+            },
+            {
+              label: '審核不通過',
+              onClick: () => reqPatchCertificatedDoc_review(false),
+            },
+            {
+              label: '取消',
+              onClick: () => {
+                modal.destroy();
+              },
+            },
+          ],
+        });
+      },
+    };
+
+    const editBtn: TpanelList[number] = {
+      type: 'myButton',
+      label: '編輯',
+      onClick: () => {
+        setDisabled(false);
+      },
+    };
+
+    // -------------------------
+
     const panelList_new: TpanelList = [
       {
         type: 'redButton',
@@ -1226,39 +1284,10 @@ const usePanelList = ({
     ];
 
     const panelList_disabled: TpanelList = [
-      {
-        type: 'redButton',
-        label: '送審',
-        onClick: () => {
-          setState_showSelector(true);
-        },
-      },
-      {
-        type: 'redButton',
-        label: '審核',
-        onClick: () => {
-          const modal = myAlert.btnBar({
-            title: '是否通過審核',
-            btnPropsArr: [
-              {
-                label: '審核通過',
-                onClick: () => reqPatchCertificatedDoc_review(true),
-                theme: 'danger',
-              },
-              {
-                label: '審核不通過',
-                onClick: () => reqPatchCertificatedDoc_review(false),
-              },
-              {
-                label: '取消',
-                onClick: () => {
-                  modal.destroy();
-                },
-              },
-            ],
-          });
-        },
-      },
+      isSealed ? isSealedBtn : null,
+      !isSealed ? submitBtn : null,
+      !isSealed && isReviewer ? reviewBtn : null,
+
       {
         type: 'myButton',
         label: '開立證明書',
@@ -1275,13 +1304,9 @@ const usePanelList = ({
           });
         },
       },
-      {
-        type: 'myButton',
-        label: '編輯',
-        onClick: () => {
-          setDisabled(false);
-        },
-      },
+
+      !isSealed ? editBtn : null,
+
       {
         type: 'myButton',
         label: '返回',
@@ -1305,10 +1330,6 @@ const usePanelList = ({
       },
     ];
 
-    if (!isReviewer) {
-      panelList_disabled.splice(1, 1);
-    }
-
     if (isNew) {
       return panelList_new;
     } else if (disabled) {
@@ -1327,6 +1348,7 @@ const usePanelList = ({
     setDisabled,
     setState_showSelector,
     isReviewer,
+    isSealed,
   ]);
 
   return panelList;
