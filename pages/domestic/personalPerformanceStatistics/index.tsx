@@ -168,6 +168,8 @@ export default function AdditionalEngineeringStatistics() {
         percentage,
       } = item;
 
+      const isValid = typeof percentage === 'number';
+
       let quotetype = item.quotetype;
 
       if (!quotetype) {
@@ -184,13 +186,17 @@ export default function AdditionalEngineeringStatistics() {
         };
       }
 
-      subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalsum).toNumber();
-      subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(pricesum).toNumber();
-      subTotalList[quotetype].percentage = new Decimal(subTotalList[quotetype].percentage).add(percentage).toNumber();
+      if (isValid) {
+        subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalsum).toNumber();
+        subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(pricesum).toNumber();
+        subTotalList[quotetype].percentage = new Decimal(subTotalList[quotetype].percentage)
+          .add(percentage ?? 0)
+          .toNumber();
 
-      total.totalsum = new Decimal(total.totalsum).add(totalsum).toNumber();
-      total.pricesum = new Decimal(total.pricesum).add(pricesum).toNumber();
-      total.percentage = new Decimal(total.percentage).add(percentage).toNumber();
+        total.totalsum = new Decimal(total.totalsum).add(totalsum).toNumber();
+        total.pricesum = new Decimal(total.pricesum).add(pricesum).toNumber();
+        total.percentage = new Decimal(total.percentage).add(percentage ?? 0).toNumber();
+      }
 
       if (!list[quotationnumber]) {
         list[quotationnumber] = {
@@ -203,12 +209,16 @@ export default function AdditionalEngineeringStatistics() {
         };
       }
 
+      // 格子裡的文字
       list[quotationnumber].list[quotetype] = {
-        totalsum: Number(totalsum).toLocaleString(),
-        pricesum: Number(pricesum).toLocaleString(),
-        percentage: `${percentage}%`,
+        totalsum: isValid ? Number(totalsum).toLocaleString() : 'n/a',
+        pricesum: isValid ? Number(pricesum).toLocaleString() : 'n/a',
+        percentage: isValid ? `${percentage}%` : 'n/a',
       };
-      list[quotationnumber].total = new Decimal(list[quotationnumber].total).add(pricesum).toNumber();
+
+      if (isValid) {
+        list[quotationnumber].total = new Decimal(list[quotationnumber].total).add(pricesum).toNumber();
+      }
     });
     //
     //
