@@ -127,7 +127,7 @@ export default function AdditionalEngineeringStatistics() {
         options: empOptionArr,
         onChange: (option) => {
           if (typeof option?.value === 'string') {
-            router.push({
+            router.replace({
               query: {
                 ...router.query,
                 emp: option.value,
@@ -145,7 +145,7 @@ export default function AdditionalEngineeringStatistics() {
         options: yearOptionArr,
         onChange: (option) => {
           if (typeof option?.value === 'string') {
-            router.push({
+            router.replace({
               query: {
                 ...router.query,
                 year: option.value,
@@ -163,7 +163,7 @@ export default function AdditionalEngineeringStatistics() {
         options: monthOptionArr,
         onChange: (option) => {
           if (typeof option?.value === 'string') {
-            router.push({
+            router.replace({
               query: {
                 ...router.query,
                 month: option.value,
