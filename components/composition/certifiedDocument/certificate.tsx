@@ -171,33 +171,6 @@ export default function Certificate({
     });
   };
 
-  const dlPdf = useCallback(async () => {
-    // showRootLoading(true, '正在處理PDF');
-
-    const doc = new jsPDF('p', 'px', 'a4');
-    const pageWidth = doc.internal.pageSize.getWidth();
-
-    const pageHeight = doc.internal.pageSize.getHeight();
-
-    const image = await html2canvas(refPdf.current, {
-      scale: 3,
-      // useCORS: true,
-      // allowTaint: true,
-    }).then((canvas) => {
-      const image = canvas.toDataURL('image/JPEG');
-
-      return image;
-    });
-
-    // 留作參考
-    // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-    // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-    doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
-
-    doc.save(`${'foooo'}.pdf`);
-    // showRootLoading(false);
-  }, []);
-
   // ---------------------------------------------------------------------
 
   // ██████  ███████  ██████  ███████ ███████ ████████
@@ -240,17 +213,26 @@ export default function Certificate({
 
   // ---------------------------------------------------------------------
 
+  // ---------------------------------------------------------------------
+
+  // ███    ███ ███████ ███    ███  ██████
+  // ████  ████ ██      ████  ████ ██    ██
+  // ██ ████ ██ █████   ██ ████ ██ ██    ██
+  // ██  ██  ██ ██      ██  ██  ██ ██    ██
+  // ██      ██ ███████ ██      ██  ██████
+
   const panelList = usePanelList({
     router,
     disabled,
     setDiasbled: setDisabled,
-    dlPdf,
+    // dlPdf,
     reqPatchCertificatedDoc,
     reqSealCertificatedDoc,
     setShowPdfPreview,
   });
 
-  // ---------------------------------------------------------------------
+  // ___________________________________________________________________________
+  // ___________________________________________________________________________
 
   const tableProps: Ttable = useMemo(() => {
     const thead: Ttable['thead'] = {
@@ -286,7 +268,7 @@ export default function Certificate({
         ? undefined
         : {
             props: {
-              className: scss.inputTeactArea,
+              className: scss.inputTextArea,
               value: item.itemName,
               onChange: (e) => {
                 editItem(id, 'itemName', e.target.value);
@@ -316,7 +298,7 @@ export default function Certificate({
         ? undefined
         : {
             props: {
-              className: scss.inputTeactArea,
+              className: scss.inputTextArea,
               value: item.note,
               onChange: (e) => {
                 editItem(id, 'note', e.target.value);
@@ -348,6 +330,7 @@ export default function Certificate({
               />
             ),
             ...cellConfig.itemName,
+            ...cellConfig.itemName.tbody,
           },
           {
             children: (
@@ -363,10 +346,12 @@ export default function Certificate({
               />
             ),
             ...cellConfig.size,
+            ...cellConfig.size.tbody,
           },
           {
             children: `${item.qty}樘`,
             ...cellConfig.qty,
+            ...cellConfig.qty.tbody,
           },
           {
             children: (
@@ -382,6 +367,7 @@ export default function Certificate({
               />
             ),
             ...cellConfig.note,
+            ...cellConfig.note.tbody,
           },
         ],
       };
@@ -598,11 +584,25 @@ export default function Certificate({
           </div>
         </div>
 
-        <PdfPreview_pre
+        {isSealed && <FakeSeal className={scss.seal} />}
+
+        {/*  */}
+        <InputModal
+          //
+          visible={showModal}
+          title="新增資訊"
+          onConfirm={(str) => {
+            setState_infoList((prev) => ({ ...prev, [str]: { caption: str, value: '' } }));
+            setShowModal(false);
+          }}
+          onCancel={() => setShowModal(false)}
+        />
+
+        <PdfPreview
           visible={showPdfPreview}
           closeModal={() => setShowPdfPreview(false)}
           //
-          ref_container={ref_container}
+          // ref_container={ref_container}
           ref_title={ref_title}
           ref_info={ref_info}
           ref_description={ref_description}
@@ -619,69 +619,7 @@ export default function Certificate({
           date={date}
           isSealed={isSealed}
         />
-
-        {/* <VirtualCertificate
-        ref_container={ref_container}
-        ref_title={ref_title}
-        ref_info={ref_info}
-        ref_description={ref_description}
-        ref_footer={ref_footer}
-        ref_table={ref_table}
-        ref_tableTitle={ref_tableTitle}
-        //
-        state_itemList={state_itemList}
-        state_docType={state_docType}
-        state_infoList={state_infoList}
-        state_description={state_description}
-        year={year}
-        month={month}
-        date={date}
-        isSealed={isSealed}
-      /> */}
-
-        {isSealed && <FakeSeal className={scss.seal} />}
-
-        {/*  */}
-        <InputModal
-          //
-          visible={showModal}
-          title="新增資訊"
-          onConfirm={(str) => {
-            setState_infoList((prev) => ({ ...prev, [str]: { caption: str, value: '' } }));
-            setShowModal(false);
-          }}
-          onCancel={() => setShowModal(false)}
-        />
       </div>
-
-      {/* <Modal
-        //
-        visible={showPdfPreview}
-        footer={null}
-        onCancel={() => setShowPdfPreview(false)}
-        width={'fit-content'}
-      >
-        <div>
-          <PdfPreview
-            ref_container={ref_container}
-            ref_title={ref_title}
-            ref_info={ref_info}
-            ref_description={ref_description}
-            ref_footer={ref_footer}
-            ref_table={ref_table}
-            ref_tableTitle={ref_tableTitle}
-            //
-            state_itemList={state_itemList}
-            state_docType={state_docType}
-            state_infoList={state_infoList}
-            state_description={state_description}
-            year={year}
-            month={month}
-            date={date}
-            isSealed={isSealed}
-          />
-        </div>
-      </Modal> */}
     </div>
   );
 }
@@ -705,7 +643,6 @@ const usePanelList = ({
   router,
   disabled,
   setDiasbled,
-  dlPdf,
   reqPatchCertificatedDoc,
   reqSealCertificatedDoc,
   setShowPdfPreview,
@@ -713,7 +650,6 @@ const usePanelList = ({
   router: NextRouter;
   disabled: boolean;
   setDiasbled: React.Dispatch<React.SetStateAction<boolean>>;
-  dlPdf: () => void;
   reqPatchCertificatedDoc: () => void;
   reqSealCertificatedDoc: () => void;
   setShowPdfPreview: React.Dispatch<React.SetStateAction<boolean>>;
@@ -773,11 +709,11 @@ const usePanelList = ({
   }, [
     //
     disabled,
-    dlPdf,
     reqPatchCertificatedDoc,
     reqSealCertificatedDoc,
     router.back,
     setDiasbled,
+    setShowPdfPreview,
   ]);
 
   return panelList;
@@ -1000,7 +936,7 @@ const PdfPreview_pre = ({
   visible,
   closeModal,
   //
-  ref_container,
+  // ref_container,
   ref_title,
   ref_info,
   ref_description,
@@ -1020,7 +956,7 @@ const PdfPreview_pre = ({
   visible: boolean;
   closeModal: () => void;
   //
-  ref_container: MutableRefObject<HTMLDivElement>;
+  // ref_container: MutableRefObject<HTMLDivElement>;
   ref_title: MutableRefObject<HTMLDivElement>;
   ref_info: MutableRefObject<HTMLDivElement>;
   ref_description: MutableRefObject<HTMLDivElement>;
@@ -1261,24 +1197,37 @@ const cellConfig: { [key in TcellKeyArr]: Tconfig_table } = {
     label: '項目',
     flex: '0 0 25%',
     justifyContent: 'center',
-    className: classNames('text-center', scss.cellspan, scss.plus),
+    className: classNames('text-center'),
+    tbody: {
+      className: classNames('text-center', scss.cellspan, scss.plus),
+    },
   },
   size: {
     label: '尺寸',
     flex: '0 0 25%',
     justifyContent: 'center',
-    className: classNames('text-center', scss.cellspan, scss.plus),
+    className: classNames('text-center'),
+    tbody: {
+      className: classNames('text-center', scss.cellspan, scss.plus),
+    },
   },
   qty: {
     label: '數量',
     flex: '0 0 25%',
-    justifyContent: classNames('center', scss.cellspan, scss.plus),
+    justifyContent: 'center',
+    className: classNames('center'),
+    tbody: {
+      className: classNames('text-center'),
+    },
   },
   note: {
     label: '備註',
     flex: '0 0 25%',
     justifyContent: 'center',
-    className: classNames('text-center', scss.cellspan, scss.plus),
+    className: classNames('text-center'),
+    tbody: {
+      className: classNames('text-center', scss.cellspan, scss.plus),
+    },
   },
 };
 
