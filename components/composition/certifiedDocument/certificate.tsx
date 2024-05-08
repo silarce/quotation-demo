@@ -625,7 +625,7 @@ export default function Certificate({
           onCancel={() => setShowModal(false)}
         />
       </div>
-      {/* <VirtualCertificate
+      <VirtualCertificate
         ref_container={ref_container}
         ref_title={ref_title}
         ref_info={ref_info}
@@ -642,7 +642,7 @@ export default function Certificate({
         month={month}
         date={date}
         isSealed={isSealed}
-      /> */}
+      />
     </div>
   );
 }
@@ -811,6 +811,9 @@ const VirtualContainer_pre = (
             children: (
               <InputSel
                 //
+                className={classNames(scss.inputSel)}
+                fontSize={'20'}
+                suffixClassName={scss.infoSuffix}
                 disabled={true}
                 showBaseline="auto"
                 // inputProps={inputProps_itemName}
@@ -823,6 +826,9 @@ const VirtualContainer_pre = (
             children: (
               <InputSel
                 //
+                className={classNames(scss.inputSel)}
+                fontSize={'20'}
+                suffixClassName={scss.infoSuffix}
                 disabled={true}
                 showBaseline="auto"
                 // inputProps={inputProps_size}
@@ -839,6 +845,9 @@ const VirtualContainer_pre = (
             children: (
               <InputSel
                 //
+                className={classNames(scss.inputSel)}
+                fontSize={'20'}
+                suffixClassName={scss.infoSuffix}
                 disabled={true}
                 showBaseline="auto"
                 // inputProps={inputSize_note}
