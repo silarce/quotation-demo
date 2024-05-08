@@ -43,7 +43,8 @@ const monthOptionArr = optionsCreator_month({ emptyOption: true });
 // 個人業績統計表
 export default function AdditionalEngineeringStatistics() {
   const router = useRouter();
-  const { year, month, emp } = router.query as Tquery;
+  const query = router.query as Tquery;
+  const { year, month, emp } = query;
 
   useEffect(() => {
     const now = new Date();
@@ -52,6 +53,7 @@ export default function AdditionalEngineeringStatistics() {
 
     router.push({
       query: {
+        ...query,
         year: theYear,
         month: theMonth,
       },
