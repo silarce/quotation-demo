@@ -4,6 +4,7 @@ import Decimal from 'decimal.js';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
+import PageHeader02, { TpanelList, TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import Table, {
@@ -14,7 +15,6 @@ import Table, {
 } from 'components/page/domestic/personalPerformanceStatistics/Table';
 
 // gaer
-import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar/selectBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -51,7 +51,7 @@ const empParams: Tparams = {
 
 // ==================================================================
 // 個人業績統計表
-export default function AdditionalEngineeringStatistics() {
+export default function PersonalPerformanceStatistics() {
   const router = useRouter();
   const query = router.query as Tquery;
   const {
@@ -177,12 +177,29 @@ export default function AdditionalEngineeringStatistics() {
     },
   ];
 
+  const tagList: TtagList = [
+    {
+      label: '個人業績統計表',
+      // onClick: () => {
+      //   router.replace('/domestic/personalPerformanceStatistics');
+      // },
+      // isActive: route === '/domestic/personalPerformanceStatistics',
+      isActive: true,
+    },
+    {
+      label: '獎金統計表',
+      onClick: () => {
+        router.replace('/domestic/personalPerformanceStatistics/bonusStatisticsTable');
+      },
+    },
+  ];
+
   // const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
 
   // ------------------------------------------------------------------
   return (
     <SubLayer isLoading_subLayer={isLoading}>
-      <PageHeader02 tag="個人業績統計表" />
+      <PageHeader02 tagList={tagList} />
 
       <div>
         <SelectBar className="ml-5 mt-5 mb-5" selectPropsArr={selectPropsArr} />
