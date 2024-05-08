@@ -39,7 +39,11 @@ class Class_component {
     prod: Class_product;
     isNew?: boolean;
   }) {
-    this.reRender = reRender;
+    this.reRender = function () {
+      this.renderCount++;
+      reRender();
+    };
+
     this._prod = prod;
     this._com = data;
     this.key = key;
@@ -78,6 +82,7 @@ class Class_component {
   } // =constructor
 
   private reRender;
+  renderCount = 0;
   private _prod;
   private _com;
   readonly key;

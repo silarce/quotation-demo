@@ -1,6 +1,6 @@
 // apiGetQuotationProducts
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -180,7 +180,7 @@ export const apiGetQuotation_Id = async (id: string) => {
 
       'latestContent.products.items.accessories',
       'latestContent.products.items.components',
-      'latestContent.products.items.rootProdductId',
+      'latestContent.products.items.rootProductId',
       'latestContent.others',
       'latestContent.verifyForm',
 
@@ -328,7 +328,7 @@ const apiGetQuotationContent_Id = async (id: string) => {
 
       'products.items.accessories',
       'products.items.components',
-      'products.items.rootProdductId',
+      'products.items.rootProductId',
       'others',
       'verifyForm',
     ],
@@ -677,6 +677,57 @@ export const useGetContract_id = (
       setIsFetching(false);
     }
   };
+
+  return {
+    data: res,
+    update,
+    clear: () => setRes(undefined),
+    isFetching,
+  };
+};
+
+export const useGetContract_id_strict = (
+  id: string | undefined,
+  option?: {
+    customPopulate?: string[];
+    preBuiltPopulate?: keyof typeof lookpu_contractPopulate;
+  }
+) => {
+  const preBuiltPopulate = lookpu_contractPopulate[option?.preBuiltPopulate ?? 'basic'];
+  const customPopulate = option?.customPopulate ?? [];
+
+  let populate = [...preBuiltPopulate, ...customPopulate];
+  populate = _.uniq(populate);
+
+  const params: Tparams = {
+    populate,
+  };
+
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TquotationContractDto>();
+
+  const update = useCallback(async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      setIsFetching(true);
+      const newRes = await apiGetContract_Id(id, params);
+
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得合約資料失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, customPopulate, preBuiltPopulate]);
 
   return {
     data: res,
@@ -1248,7 +1299,7 @@ const lookpu_contractPopulate = {
 
   //   // 'attachedToContract',
   //   // 'attachedContract',
-  //   'subContracts.content.products.rootProdductId',
+  //   'subContracts.content.products.rootProductId',
   //   'subContracts.content.customer',
   //   'subContracts.content.verifyForm',
 
@@ -1267,7 +1318,7 @@ const lookpu_contractPopulate = {
     'content.products',
     'content.others',
     'content.verifyForm',
-    'subContracts.content.products.rootProdductId',
+    'subContracts.content.products.rootProductId',
     'subContracts.content.customer',
     'subContracts.content.verifyForm',
     'products',
@@ -1284,11 +1335,11 @@ const lookpu_contractPopulate = {
     'content.products.items.accessories',
     'content.products.items.components',
     'content.others',
-    'subContracts.content.products.rootProdductId',
+    'subContracts.content.products.rootProductId',
   ],
 
   worksDepartment: ['content', 'accountReceivable', 'content.verifyForm'],
-  worksDepartment02: ['content', 'subContracts.content.products.rootProdductId'],
+  worksDepartment02: ['content', 'subContracts.content.products.rootProductId'],
   worksDepartment03: ['content', 'subContracts.content'],
 } as const;
 

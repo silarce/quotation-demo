@@ -305,7 +305,17 @@ class Class_product {
     // 報價單折數，也就是TquotationContentDto[discount]
     quotationDiscount: number;
   }) {
-    this.reRender = reRender;
+    this.reRender_ori = reRender;
+
+    // this.reRender = () => {
+    //   this.renderCount++;
+    //   reRender();
+    // };
+    this.reRender = function () {
+      this.renderCount++;
+      reRender();
+    };
+
     // this.setIsLoading = setIsLoading;
     this._prodData = _.cloneDeep(prodData);
     this.delSelf = delSelf;
@@ -373,7 +383,9 @@ class Class_product {
     this.resetDoorGeneralSpacs();
   } //  constructor close ===========================================================
 
+  private reRender_ori;
   private reRender;
+  renderCount = 0;
   // readonly setIsLoading;
   delSelf;
   copySelf;
@@ -513,7 +525,7 @@ class Class_product {
       }
 
       const theClass = new Class_component({
-        reRender: this.reRender,
+        reRender: this.reRender_ori,
         data: _.cloneDeep(com),
         key: key,
         prod: this,
@@ -574,7 +586,7 @@ class Class_product {
     const copyData = _.cloneDeep(this.accessoriesList[targetKey].body);
 
     this.accessoriesList[newKey] = new Class_accessories({
-      reRender: this.reRender,
+      reRender: this.reRender_ori,
       data: copyData,
       prod: this,
       key: newKey,
@@ -602,7 +614,7 @@ class Class_product {
       };
 
       this.accessoriesList[newKey] = new Class_accessories({
-        reRender: this.reRender,
+        reRender: this.reRender_ori,
         data: acceClassData,
         prod: this,
         key: newKey,
@@ -626,7 +638,7 @@ class Class_product {
       }
 
       list[key] = new Class_accessories({
-        reRender: this.reRender,
+        reRender: this.reRender_ori,
         data: _.cloneDeep(item),
         prod: this,
         isNew: false,
@@ -649,7 +661,7 @@ class Class_product {
       }
 
       list[key] = new Class_accessories({
-        reRender: this.reRender,
+        reRender: this.reRender_ori,
         data: _.cloneDeep(item),
         prod: this,
         isNew: false,
@@ -667,7 +679,7 @@ class Class_product {
     // 配電箱
 
     const distributionBox = new Class_SubCom({
-      reRender: this.reRender,
+      reRender: this.reRender_ori,
       data: {
         price: this._prodData.distributionBoxPrice,
         unitPrice: this._prodData.distributionBoxUnitPrice,
@@ -684,7 +696,7 @@ class Class_product {
 
     // 安裝費
     const installationFee = new Class_SubCom({
-      reRender: this.reRender,
+      reRender: this.reRender_ori,
       data: {
         price: this._prodData.installationFeePrice,
         unitPrice: this._prodData.installationFeeUnitPrice,
@@ -3725,7 +3737,7 @@ class Class_product {
     };
 
     this._exchangeProdList[exId] = new Class_product({
-      reRender: this.reRender,
+      reRender: this.reRender_ori,
       prodData: copy,
       delSelf,
       copySelf: () => {},

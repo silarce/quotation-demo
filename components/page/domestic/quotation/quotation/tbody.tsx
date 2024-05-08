@@ -1,8 +1,8 @@
-import { useState } from 'react';
-
+import React, { useState, memo } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
-import _, { inRange } from 'lodash';
+import _ from 'lodash';
+import { useInView } from 'react-intersection-observer';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -153,7 +153,7 @@ export default function Tbody({
             }
 
             return (
-              <DndRow
+              <DndRow_memo
                 key={key}
                 vKey={key}
                 id={key}
@@ -177,6 +177,8 @@ export default function Tbody({
                 rowHeight={rowHeight}
                 showAttatchModal={showAttatchModal}
                 clearAttach={item.clearAttach}
+                reRenderTrigger={item.renderCount}
+                alwaysShow={pIndex < 7}
               />
             );
           })}
@@ -398,6 +400,7 @@ function DndRow({
   rowHeight,
   showAttatchModal,
   clearAttach,
+  alwaysShow,
 }: {
   vKey: string;
   id: string;
@@ -421,7 +424,11 @@ function DndRow({
   rowHeight?: 'h60';
   showAttatchModal?: () => void;
   clearAttach?: () => void;
+  reRenderTrigger?: any;
+  alwaysShow?: boolean;
 }) {
+  const [viewRef, isView] = useInView();
+
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id,
   });
@@ -434,236 +441,281 @@ function DndRow({
   const isLoading = item.isLoading;
 
   return (
-    <div style={itemStyle} onClick={onRowClick} ref={setNodeRef} className={classNames(isMoving && 'z-10', 'relative')}>
+    <div
+      //
+      style={itemStyle}
+      onClick={onRowClick}
+      ref={setNodeRef}
+      className={classNames(isMoving && 'z-10', 'relative')}
+    >
+      <div ref={viewRef} />
       <LoadingCover01 isLoading={item?.isLoading} size={40} />
+
       <CellWithBar isActive={isActive} className="z-0">
         <div className={classNames(scss.row, rowHeight && scss[rowHeight])} onClick={undefined}>
-          {/*  */}
-          {panelBox === 'copyDelBtnBox' && (
-            <CopyDelBtnBox
-              disabled={disabled}
-              del={item.delSelf}
-              copy={item.copySelf}
-              indexNum={pIndex + 1}
-              dndAttr={attributes}
-              dndListener={listeners}
-              hiddenDelCopy={item.parentProd}
-            />
-          )}
-          {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}
-          {panelBox === 'emptyBox' && <EmptyBox indexNum={pIndex + 1} />}
-          {panelBox === 'comBox' && (
-            <ComBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} comName={item.comName} />
-          )}
+          {(isView || alwaysShow) && (
+            <>
+              {panelBox === 'copyDelBtnBox' && (
+                <CopyDelBtnBox
+                  disabled={disabled}
+                  del={item.delSelf}
+                  copy={item.copySelf}
+                  indexNum={pIndex + 1}
+                  dndAttr={attributes}
+                  dndListener={listeners}
+                  hiddenDelCopy={item.parentProd}
+                />
+              )}
+              {panelBox === 'easyBox' && <EasyBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} />}
+              {panelBox === 'emptyBox' && <EmptyBox indexNum={pIndex + 1} />}
+              {panelBox === 'comBox' && (
+                <ComBox indexNum={pIndex + 1} dndAttr={attributes} dndListener={listeners} comName={item.comName} />
+              )}
 
-          {panelBox === 'resetChangeBox' && (
-            <ResetChangeBtnBox
-              toSetTargetIndex={showAttatchModal}
-              clearExchange={clearAttach}
-              dndAttr={attributes}
-              dndListener={listeners}
-              indexNum={pIndex}
-              isLatestBatch={true}
-            />
-          )}
+              {panelBox === 'resetChangeBox' && (
+                <ResetChangeBtnBox
+                  toSetTargetIndex={showAttatchModal}
+                  clearExchange={clearAttach}
+                  dndAttr={attributes}
+                  dndListener={listeners}
+                  indexNum={pIndex}
+                  isLatestBatch={true}
+                />
+              )}
 
-          {/*  */}
-          {keyArr.map((key) => {
-            if (!item) {
-              return null;
-            }
-
-            if (vKey === 'slat' && key === 'desc' && item.optionalComponentAction === 'slat_SJ-305D') {
-              key = 'desc_select';
-            }
-
-            let theDisabled = disabled;
-
-            if (key === 'typhoonProtection' && item.isTyphoonProtectionDisabled) {
-              theDisabled = item.isTyphoonProtectionDisabled;
-            }
-
-            if (key === 'isULGuideRail' && item.isIsULDisabled) {
-              theDisabled = item.isIsULDisabled;
-            }
-
-            // if (key === 'quantity') {
-            //   // item.disabled_quantity === true ? (theDisabled = true) : undefined;
-            //   item.disabled_quantity === true
-            //     ? (theDisabled = true)
-            //     : item.disabled_quantity === false
-            //     ? (theDisabled = false)
-            //     : undefined;
-            // }
-
-            // if (disabledExceptionArr?.includes(key)) {
-            //   theDisabled = false;
-            // }
-
-            // if (disabled_plus) {
-            //   theDisabled = true;
-            // }
-
-            const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;
-            const isHidden = hiddenKeyArr?.includes(key);
-
-            let stateValue = item[key];
-
-            const { inputSelProps, isSuffixOnly } = _.cloneDeep(prodCellConfig[key]);
-            const { inputProps, selectProps, checkBoxProps } = inputSelProps;
-
-            if (item.isSpecialProd && item.ignoreKeyArr_prod?.includes(key)) {
-              return (
-                <div
-                  key={key}
-                  className={classNames(scss.column, isHidden && scss.hidden)}
-                  style={{ width: inputSelProps.wrapperStyle?.width }}
-                ></div>
-              );
-            }
-
-            if (isSuffixOnly) {
-              if (stateValue === 'm2') {
-                stateValue = 'm\u00B2';
-              }
-
-              return (
-                <div
-                  key={key}
-                  className={classNames(scss.column, isHidden && scss.hidden)}
-                  style={{ width: inputSelProps.wrapperStyle?.width }}
-                >
-                  <InputSel disabled={theDisabled} suffix={stateValue} suffixClassName="m-auto" {...inputSelProps} />
-                </div>
-              );
-            }
-
-            //____
-            if (inputProps?.props) {
-              inputProps.props.value = (stateValue as string) ?? '';
-
-              if (item.isSpecialProd && key === 'boxD') {
-                inputSelProps.showBaseline = 'auto';
-                inputSelProps.disabled = disabled;
-                delete inputProps.props.disabled;
-              }
-
-              // 在中文輸入法(或許其他的輸入法都是)
-              // 若有對輸出的值做格式化，例如輸入1234，但格式化為123 4
-              // 那麼在輸入4的時候，會觸發onChange兩次
-              // 使的值變成123 44
-              // 因此要做防抖(做在class裡面了);
-
-              inputProps.props.onChange = (e) => {
-                if (isLoading) {
-                  return;
+              {/*  */}
+              {keyArr.map((key) => {
+                if (!item) {
+                  return null;
                 }
 
-                (item[key] as string) = e.target.value;
-              };
-            }
+                if (vKey === 'slat' && key === 'desc' && item.optionalComponentAction === 'slat_SJ-305D') {
+                  key = 'desc_select';
+                }
 
-            //_____________________
-            if (selectProps) {
-              if (!selectProps.props) {
-                selectProps.props = {};
-              }
+                let theDisabled = disabled;
 
-              if (item.isSpecialProd || key === 'quoteType' || key === 'doorType') {
-                selectProps.props.isSearchable = true;
-              }
+                if (key === 'typhoonProtection' && item.isTyphoonProtectionDisabled) {
+                  theDisabled = item.isTyphoonProtectionDisabled;
+                }
 
-              const isOptionValue = prodCellConfig[key].isOptionValue;
+                if (key === 'isULGuideRail' && item.isIsULDisabled) {
+                  theDisabled = item.isIsULDisabled;
+                }
 
-              // if (key === 'doorTrack') {
-              //   selectProps.dynaOptionsKey = item.typhoonProtection ? 'typhoonProtection' : 'normal';
-              // }
-              const options = item[`options_${key}`] as Toption[] | undefined;
-              const staticOptions = selectProps.props.options;
-              // ___________________
+                // if (key === 'quantity') {
+                //   // item.disabled_quantity === true ? (theDisabled = true) : undefined;
+                //   item.disabled_quantity === true
+                //     ? (theDisabled = true)
+                //     : item.disabled_quantity === false
+                //     ? (theDisabled = false)
+                //     : undefined;
+                // }
 
-              if (isOptionValue) {
-                selectProps.props.value = stateValue || null;
-              } else {
-                selectProps.easyValue = (stateValue as string) ?? '';
-              }
-              // ___________________
+                // if (disabledExceptionArr?.includes(key)) {
+                //   theDisabled = false;
+                // }
 
-              let isDisabled: boolean | undefined = undefined;
+                // if (disabled_plus) {
+                //   theDisabled = true;
+                // }
 
-              if ((!options || options.length === 0) && (!staticOptions || staticOptions.length === 0)) {
-                isDisabled = true;
-              }
+                const hiddenKeyArr = item.hiddenKeyArr as string[] | undefined;
+                const isHidden = hiddenKeyArr?.includes(key);
 
-              const placeholder = isDisabled ? 'X' : selectProps.props.placeholder ?? '請輸入';
+                let stateValue = item[key];
 
-              selectProps.props = {
-                options,
-                ...selectProps.props,
-                isDisabled: isDisabled || theDisabled || isLoading,
-                placeholder,
-                onChange: (option) => {
-                  if (isOptionValue) {
-                    item[key] = option;
-                  } else {
-                    item[key] = option?.value ?? '';
+                const { inputSelProps, isSuffixOnly } = _.cloneDeep(prodCellConfig[key]);
+                const { inputProps, selectProps, checkBoxProps } = inputSelProps;
+
+                if (item.isSpecialProd && item.ignoreKeyArr_prod?.includes(key)) {
+                  return (
+                    <div
+                      key={key}
+                      className={classNames(scss.column, isHidden && scss.hidden)}
+                      style={{ width: inputSelProps.wrapperStyle?.width }}
+                    ></div>
+                  );
+                }
+
+                if (isSuffixOnly) {
+                  if (stateValue === 'm2') {
+                    stateValue = 'm\u00B2';
                   }
-                },
-              };
-            }
 
-            //____
+                  return (
+                    <div
+                      key={key}
+                      className={classNames(scss.column, isHidden && scss.hidden)}
+                      style={{ width: inputSelProps.wrapperStyle?.width }}
+                    >
+                      <InputSel
+                        disabled={theDisabled}
+                        suffix={stateValue}
+                        suffixClassName="m-auto"
+                        {...inputSelProps}
+                      />
+                    </div>
+                  );
+                }
 
-            if (checkBoxProps?.propsArr[0]) {
-              checkBoxProps.propsArr[0].value = !!stateValue as boolean;
-              checkBoxProps.onClick = onRowClick;
+                //____
+                if (inputProps?.props) {
+                  inputProps.props.value = (stateValue as string) ?? '';
 
-              checkBoxProps.onChange = (arr) => {
-                (item[key] as boolean) = !!arr[0];
-              };
+                  if (item.isSpecialProd && key === 'boxD') {
+                    inputSelProps.showBaseline = 'auto';
+                    inputSelProps.disabled = disabled;
+                    delete inputProps.props.disabled;
+                  }
 
-              inputSelProps.wrapperStyle = {
-                justifyContent: 'center',
-                ...inputSelProps.wrapperStyle,
-              };
-            }
+                  // 在中文輸入法(或許其他的輸入法都是)
+                  // 若有對輸出的值做格式化，例如輸入1234，但格式化為123 4
+                  // 那麼在輸入4的時候，會觸發onChange兩次
+                  // 使的值變成123 44
+                  // 因此要做防抖(做在class裡面了);
 
-            // const productReqChain = () => {
-            //   if (
-            //     key === 'fullWidth' ||
-            //     key === 'height' ||
-            //     key === 'W' ||
-            //     key === 'boxB' ||
-            //     key === 'quantity' ||
-            //     key === 'typhoonProtection' ||
-            //     key === 'doorTrackSilencerStrip' ||
-            //     key === 'bottomBarAngleIron' ||
-            //     key === 'bottomBarPlate'
-            //   ) {
-            //     item.reqChain?.();
-            //   }
-            // };
+                  inputProps.props.onChange = (e) => {
+                    if (isLoading) {
+                      return;
+                    }
 
-            //____
-            return (
-              <div
-                key={key}
-                className={classNames(scss.column, isHidden && scss.hidden)}
-                style={{ width: inputSelProps.wrapperStyle?.width }}
-                onBlur={() => {
-                  item.callSideEffect?.(key);
-                }}
-              >
-                <InputSel disabled={theDisabled} showBaseline="auto" {...inputSelProps} />
-              </div>
-            );
-          })}
-          {/* column */}
+                    (item[key] as string) = e.target.value;
+                  };
+                }
+
+                //_____________________
+                if (selectProps) {
+                  if (!selectProps.props) {
+                    selectProps.props = {};
+                  }
+
+                  if (item.isSpecialProd || key === 'quoteType' || key === 'doorType') {
+                    selectProps.props.isSearchable = true;
+                  }
+
+                  const isOptionValue = prodCellConfig[key].isOptionValue;
+
+                  // if (key === 'doorTrack') {
+                  //   selectProps.dynaOptionsKey = item.typhoonProtection ? 'typhoonProtection' : 'normal';
+                  // }
+                  const options = item[`options_${key}`] as Toption[] | undefined;
+                  const staticOptions = selectProps.props.options;
+                  // ___________________
+
+                  if (isOptionValue) {
+                    selectProps.props.value = stateValue || null;
+                  } else {
+                    selectProps.easyValue = (stateValue as string) ?? '';
+                  }
+                  // ___________________
+
+                  let isDisabled: boolean | undefined = undefined;
+
+                  if ((!options || options.length === 0) && (!staticOptions || staticOptions.length === 0)) {
+                    isDisabled = true;
+                  }
+
+                  const placeholder = isDisabled ? 'X' : selectProps.props.placeholder ?? '請輸入';
+
+                  selectProps.props = {
+                    options,
+                    ...selectProps.props,
+                    isDisabled: isDisabled || theDisabled || isLoading,
+                    placeholder,
+                    onChange: (option) => {
+                      if (isOptionValue) {
+                        item[key] = option;
+                      } else {
+                        item[key] = option?.value ?? '';
+                      }
+                    },
+                  };
+                }
+
+                //____
+
+                if (checkBoxProps?.propsArr[0]) {
+                  checkBoxProps.propsArr[0].value = !!stateValue as boolean;
+                  checkBoxProps.onClick = onRowClick;
+
+                  checkBoxProps.onChange = (arr) => {
+                    (item[key] as boolean) = !!arr[0];
+                  };
+
+                  inputSelProps.wrapperStyle = {
+                    justifyContent: 'center',
+                    ...inputSelProps.wrapperStyle,
+                  };
+                }
+
+                // const productReqChain = () => {
+                //   if (
+                //     key === 'fullWidth' ||
+                //     key === 'height' ||
+                //     key === 'W' ||
+                //     key === 'boxB' ||
+                //     key === 'quantity' ||
+                //     key === 'typhoonProtection' ||
+                //     key === 'doorTrackSilencerStrip' ||
+                //     key === 'bottomBarAngleIron' ||
+                //     key === 'bottomBarPlate'
+                //   ) {
+                //     item.reqChain?.();
+                //   }
+                // };
+
+                //____
+                return (
+                  <div
+                    key={key}
+                    className={classNames(scss.column, isHidden && scss.hidden)}
+                    style={{ width: inputSelProps.wrapperStyle?.width }}
+                    onBlur={() => {
+                      item.callSideEffect?.(key);
+                    }}
+                  >
+                    <InputSel disabled={theDisabled} showBaseline="auto" {...inputSelProps} />
+                  </div>
+                );
+              })}
+              {/* column */}
+            </>
+          )}
+          {/*  */}
         </div>
         {/* row */}
       </CellWithBar>
     </div>
   );
 }
+
+const DndRow_memo = memo(DndRow, (oldProps, newProps) => {
+  let isEqual = true;
+
+  const arr: (keyof typeof oldProps)[] = [
+    'vKey',
+    'id',
+    'isActive',
+    'pIndex',
+    'isMoving',
+    'disabled',
+    'disabled_plus',
+    'panelBox',
+    'rowHeight',
+    'reRenderTrigger',
+    'keyArr',
+    'alwaysShow',
+  ];
+
+  for (const key of arr) {
+    if (oldProps[key] !== newProps[key]) {
+      isEqual = false;
+      break;
+    }
+  }
+
+  return isEqual;
+});
 
 export type { Titem, TitemList, TcellConfig };

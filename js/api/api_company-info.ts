@@ -10,7 +10,6 @@ export { domain };
 
 // =============================================
 // 取得公司資訊
-
 const apiCompanyInfo = () => {
   const api = '/company-info';
 
@@ -33,7 +32,11 @@ export const useCompanyInfo = () => {
     }
   };
 
-  return { data, setData, update } as const;
+  const { county = '', district = '', address = '' } = data || {};
+
+  const wholeAddress = `${county}${district}${address}`;
+
+  return { data, wholeAddress, setData, update } as const;
 };
 
 // =============================================

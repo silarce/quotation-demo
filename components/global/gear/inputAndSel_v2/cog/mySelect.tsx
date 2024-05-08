@@ -25,6 +25,7 @@ import iconArrowRed from 'public/image/icon/arrow_down_red.svg';
 import iconArrowBlack from 'public/image/icon/arrow_down.svg';
 // css
 import scss from '../inputSel.module.scss';
+import React from 'react';
 
 // type Tprops = Props<Toption, false, GroupBase<Toption>>
 export type { Toption };
@@ -58,20 +59,33 @@ export default function MySelect<
   Option = Toption,
   IsMulti extends boolean = false,
   Group extends GroupBase<Option> = GroupBase<Option>
->({ props, wrapperClassName, wrapperStyle, arrowType, fontClassName }: TselectProps<Option, IsMulti, Group>) {
+>({ props, wrapperClassName, wrapperStyle, arrowType = 'black', fontClassName }: TselectProps<Option, IsMulti, Group>) {
   // 客製化元件
   // 箭頭
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const DropdownIndicator = (indicatorProps: DropdownIndicatorProps<Option, IsMulti, Group>) => {
-    if (props?.isDisabled) {
+    if (indicatorProps?.isDisabled) {
       return null;
     }
 
-    const arrowImg =
-      arrowType === 'red' ? iconArrowRed.src : arrowType === 'black' ? iconArrowBlack.src : iconArrowRed.src;
+    if (arrowType === 'black') {
+      return (
+        <div {...indicatorProps.innerProps}>
+          <Arrow_selectOrigin />
+        </div>
+      );
+    }
 
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={arrowImg} alt="下拉箭頭" />;
+    // const arrowImg =
+    //   arrowType === 'red' ? iconArrowRed.src : arrowType === 'black' ? iconArrowBlack.src : iconArrowRed.src;
+    const arrowImg = iconArrowRed.src;
+
+    return (
+      <div {...indicatorProps.innerProps}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={arrowImg} alt="下拉箭頭" />
+      </div>
+    );
   };
 
   // -------------------------------------------------------------------------
@@ -79,12 +93,6 @@ export default function MySelect<
   return (
     <div className={classNames(scss.selectBox, wrapperClassName)} style={wrapperStyle}>
       <CreatableSelect
-        components={{
-          DropdownIndicator,
-          //
-
-          ...props?.components,
-        }}
         unstyled={true}
         menuPortalTarget={document.getElementById('__next')}
         // menuPortalTarget={document.getElementsByTagName('body')[0]}
@@ -93,6 +101,11 @@ export default function MySelect<
         // menuIsOpen={true} // 需要調整選單的CSS時就使用menuIsOpen
         //
         {...props}
+        components={{
+          DropdownIndicator,
+          //
+          ...props?.components,
+        }}
         //
         classNames={{
           container: (state) => classNames(scss.selContainer, props?.classNames?.container?.(state)),
@@ -212,3 +225,19 @@ export default function MySelect<
 //   SingleValue?: Tcomponent
 //   ValueContainer?: Tcomponent
 // }
+
+const Arrow_selectOrigin = (props?: React.SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      height="20"
+      width="20"
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+      focusable="false"
+      // className="css-tj5bde-Svg"
+      {...props}
+    >
+      <path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path>
+    </svg>
+  );
+};

@@ -1,0 +1,11 @@
+.btn_svg {
+  width: 20px;
+  height: 20px;
+}
+
+.btn_add {
+  stroke: theme("colors.main");
+  &:hover {
+    fill: #14256a10;
+  }
+}
