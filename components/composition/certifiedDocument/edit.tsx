@@ -1398,6 +1398,7 @@ const usePanelList = ({
     setState_showSelector,
     isReviewer,
     isSealed,
+    isDoneReview,
   ]);
 
   return panelList;
