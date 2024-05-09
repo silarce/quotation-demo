@@ -7,7 +7,6 @@ import InputSel from 'components/global/gear/inputAndSel/inputSel';
 
 // option
 import { optionsCreator_quotationStatus, Toption } from 'js/utils/options/options';
-const optionQuotationState = optionsCreator_quotationStatus({ onlyNotContract: true });
 
 // css
 import scss from './quotationStateSel.module.scss';
@@ -19,15 +18,21 @@ type TquotationStateHistory = {
 };
 
 // =====================================================================
+
+const optionQuotationState = optionsCreator_quotationStatus({ need: 'editQuotation' });
+
+// =====================================================================
 // 報價/歷史狀態狀態
 export default function QuotationStateSel({
   quotationState,
   setQuotationState,
   history,
+  isNew,
 }: {
   quotationState: Toption;
   setQuotationState: (v: Toption) => void;
   history: TquotationStateHistory[];
+  isNew?: boolean;
 }) {
   // -------------------------------------------------------------------------
   // 報價狀態

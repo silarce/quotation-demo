@@ -30,7 +30,7 @@ import { TquotationStatus } from 'js/api/dtoTypes';
 const yearOptionArr = optionsCreator_year();
 const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const regionOptionArr = optionsCreator_region({ emptyOption: true });
-const quotationStatusArr = optionsCreator_quotationStatus({ emptyOption: true, onlyNotContract: true });
+const quotationStatusArr = optionsCreator_quotationStatus({ emptyOption: true, need: 'basic' });
 
 type Tquery = {
   year: string | undefined;

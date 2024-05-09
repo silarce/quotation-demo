@@ -1,4 +1,4 @@
-import { annotationAndQuotationRangeType } from 'js/api/dtoTypes';
+import { annotationAndQuotationRangeType, TquotationStatus } from 'js/api/dtoTypes';
 
 export const customerTypesLookup = Object.freeze({
   // construction: '營造',
@@ -11,12 +11,17 @@ export const customerTypesLookup = Object.freeze({
   contractor: '事務所',
 } as const);
 
-export const quotationStatusLookup = Object.freeze({
+// Pending與TempPending是不一樣的東西，但是因為業務部的需求，顯示出來的文字都是準合約
+export const quotationStatusLookup: {
+  [key in TquotationStatus]: string;
+} = Object.freeze({
   Budget: '預算',
   Bidding: '投標',
   Contracting: '發包',
   Contract: '合約',
   Pending: '準合約',
+  // TempPending: '待審核準合約',
+  TempPending: '準合約',
 } as const);
 
 export const annotationAndQuotationRangeTypeLookup: {

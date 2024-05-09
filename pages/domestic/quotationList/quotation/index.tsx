@@ -191,6 +191,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = router.query as Tquery;
   const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
+  const isNewQuotation = !quotationId && !contentId;
 
   // -----------------------------------------------------
 
@@ -233,7 +234,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // 是否可編輯
-  const [disabled, setDisabled] = useState(true);
+  const [disabled, setDisabled] = useState(!isNewQuotation);
   // const [disabled_reviewer, setDisabled_reviewer] = useState(true);
   // -----------------------------------------------------
   const [reviewFormShow, setReviewFormShow] = useState(false);
@@ -1519,6 +1520,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             setStatus(option.value as TquotationContentDto['status']);
           }}
           history={history}
+          isNew={isNewQuotation}
         />
       ),
     },
