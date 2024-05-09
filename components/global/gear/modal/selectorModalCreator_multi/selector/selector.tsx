@@ -60,7 +60,7 @@ type TselectorProps<Tdata extends TapiData, P extends { [key: string]: boolean }
   dataType?: Tdata; // 就只是為了方便取得泛型的型別
   clearOther?: number[]; // 用來清除其他的選擇 // 在父元素使用
   //
-  forbiddenCheck_dataList?: (data: Tdata) => boolean;
+  // forbiddenCheck_dataList?: (data: Tdata) => boolean;
   // forbiddenCheck_selectedList?: (data: Tdata) => boolean; // 目前還用不到
   defaultSelectedArr?: Tdata[];
   onStateChange?: (props: { dataArr: Tdata[] }) => void;
@@ -110,6 +110,7 @@ type TselectorProps_simple<
   // 返回true為通過，要顯示
   filter_clientSide?: (data: Tdata, searchStrArr: string[]) => boolean;
   isSkip?: boolean;
+  forbiddenCheck_dataList?: (data: Tdata) => boolean;
 
   useNoMetaProps?: TuseNoMetaProps<P>;
 };

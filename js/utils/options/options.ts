@@ -16,6 +16,10 @@ import iconDoorRail_sj302_90_30t from 'public/image/fakeDB/doorRail/antiTyphoon/
 import iconDoorRail_sj302_95_30t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_30t.svg';
 import iconDoorRail_sj302_95_45t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_45t.svg';
 
+import { TquotationStatus } from 'js/api/dtoTypes';
+
+// ============================================================================
+
 interface Toption {
   value: string;
   label: string;
@@ -333,19 +337,49 @@ export const optionsCreator_mealsCost = (): Toption[] => {
 // 報價單狀態
 export const optionsCreator_quotationStatus = ({
   emptyOption,
-  onlyNotContract,
-}: { emptyOption?: boolean; onlyNotContract?: boolean } = {}) => {
-  const arr = [
-    { value: 'Budget', label: '預算' },
-    { value: 'Bidding', label: '投標' },
-    { value: 'Contracting', label: '發包' },
-    { value: 'Contract', label: '合約' },
-    { value: 'Pending', label: '準合約' },
-  ];
+  // onlyNotContract,
+  need = 'all',
+}: {
+  //
+  emptyOption?: boolean;
+  // onlyNotContract?: boolean;
+  need?: 'all' | 'basic' | 'editQuotation';
+} = {}) => {
+  type TquotationStatusOptionList = { [key in TquotationStatus]: { value: key; label: string } };
 
-  if (onlyNotContract) {
-    arr.pop();
-    arr.pop();
+  const quotationStatusOptionList: TquotationStatusOptionList = {
+    Budget: { value: 'Budget', label: '預算' },
+    Bidding: { value: 'Bidding', label: '投標' },
+    Contracting: { value: 'Contracting', label: '發包' },
+    Contract: { value: 'Contract', label: '合約' },
+    Pending: { value: 'Pending', label: '準合約' },
+    // TempPending: { value: 'TempPending', label: '待審核準合約' },
+    TempPending: { value: 'TempPending', label: '準合約' },
+  };
+
+  const budget = quotationStatusOptionList['Budget'];
+  const bidding = quotationStatusOptionList['Bidding'];
+  const contracting = quotationStatusOptionList['Contracting'];
+  const contract = quotationStatusOptionList['Contract'];
+  const pending = quotationStatusOptionList['Pending'];
+  const tempPending = quotationStatusOptionList['TempPending'];
+
+  let arr: Toption[] = [];
+
+  if (need === 'all') {
+    arr = [budget, bidding, contracting, contract, pending];
+  }
+
+  if (need === 'basic') {
+    arr = [budget, bidding, contracting];
+  }
+
+  // if (need === 'notContract') {
+  //   arr = [budget, bidding, contracting, pending];
+  // }
+
+  if (need === 'editQuotation') {
+    arr = [budget, bidding, contracting, tempPending];
   }
 
   if (emptyOption) {

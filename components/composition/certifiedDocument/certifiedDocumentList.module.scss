@@ -1,0 +1,8 @@
+.row {
+  flex-wrap: wrap;
+}
+
+.processChainCell.plus {
+  display: block;
+  border-top: solid 1px theme("colors.border");
+}

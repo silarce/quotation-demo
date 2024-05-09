@@ -30,7 +30,11 @@ class Class_SubCom {
     prod: Class_product;
     isNew?: boolean;
   }) {
-    this.reRender = reRender;
+    this.reRender = function () {
+      this.renderCount++;
+      reRender();
+    };
+
     this._data = data;
     this._prod = prod;
 
@@ -40,6 +44,7 @@ class Class_SubCom {
   } // =constructor
 
   readonly reRender;
+  renderCount = 0;
   private _data;
   private _prod: Class_product;
 

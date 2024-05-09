@@ -18,6 +18,7 @@ type Trow = {
   style?: React.CSSProperties;
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   viewRef?: (node?: Element | null | undefined) => void;
+  props?: React.HTMLAttributes<HTMLDivElement>;
 };
 
 type Tcell = {
@@ -93,6 +94,7 @@ export default function Table01({
     <div className={classNames('w-table', scss.table, haveBorder && scss.haveBorder, className)} style={style}>
       <div
         //
+        data-component="thead"
         className={classNames(scss.thead)}
         style={{
           // position: thead.stickyTop ? 'sticky' : undefined,
@@ -128,7 +130,7 @@ export default function Table01({
             return null;
           }
 
-          const { cellArr, height, minHeight, maxHeight, className, style, onClick, viewRef } = row;
+          const { cellArr, height, minHeight, maxHeight, className, style, onClick, viewRef, props } = row;
 
           return (
             <Row
@@ -140,6 +142,7 @@ export default function Table01({
               style={style}
               onClick={onClick}
               viewRef={viewRef}
+              props={props}
             >
               {cellArr.map((cell, cIndex) => {
                 const { width, flex, justifyContent, className, style, children } = cell;
@@ -176,12 +179,15 @@ const Row = ({
   style,
   onClick,
   viewRef,
+  props,
 }: Trow) => {
   return (
     <CellWithBar className={classNames(scss.rowWrapper, wrapperClassName)}>
       <div
         //
         ref={viewRef}
+        // data-component 不可以改
+        data-component="Row"
         className={classNames(scss.row, className, onClick && scss.clickable)}
         style={{
           height,
@@ -190,6 +196,7 @@ const Row = ({
           ...style,
         }}
         onClick={onClick}
+        {...props}
       >
         {children}
       </div>

@@ -271,13 +271,12 @@ function MeetingMinutes_contract_component(
 
   useEffect(() => {
     return () => {
-      router.push({
-        query: {
-          ...router.query,
-          meetingMinutesId: undefined,
-        },
-      });
-
+      // router.replace({
+      //   query: {
+      //     ...router.query,
+      //     meetingMinutesId: undefined,
+      //   },
+      // });
       onStateChange &&
         onStateChange({
           isAdd: false,

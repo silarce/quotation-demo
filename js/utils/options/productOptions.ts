@@ -1,6 +1,9 @@
 import { Toption, addEmpty } from './options';
 import { annotationAndQuotationRangeType } from 'js/api/dtoTypes';
 import { annotationAndQuotationRangeTypeLookup } from 'config/lookupTable';
+// type
+import { TdocType } from 'js/api/dtoTypes';
+import _ from 'lodash';
 
 export type { Toption };
 
@@ -565,6 +568,20 @@ export const optionsCreator_motorVender = createOptionsCreator({
     { value: '東元', label: '東元' },
     { value: '大同', label: '大同' },
   ],
+});
+
+export const optionsCreator_certifyType = createOptionsCreator({
+  optionsArr: (() => {
+    // 只是要確保value的型別正確，所以這樣寫
+    type Toption_TdocType = { value: TdocType; label: string };
+    const optionsArr_docType: Toption_TdocType[] = [
+      { value: '防火證明', label: '防火證明' },
+      { value: '出廠證明', label: '出廠證明' },
+      { value: '保固書', label: '保固書' },
+    ];
+
+    return optionsArr_docType;
+  })(),
 });
 
 // const optionsCreator_foooooo = (props: { haveEmpty?: boolean } = {}): Toption[] => {
