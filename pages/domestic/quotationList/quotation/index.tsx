@@ -1454,6 +1454,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
 
+    if (status === 'TempPending' && dynaSelectorPropsList[1]) {
+      dynaSelectorPropsList[1].isSkip = true;
+    }
+
     if (status === 'Pending' && dynaSelectorPropsList[0]) {
       dynaSelectorPropsList[0].isSkip = true;
     }
@@ -2006,7 +2010,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return myAlert.err({ title: '沒有業務' });
     }
 
-    if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
+    if (status === 'TempPending') {
+      if (!reviewSalesEmployeeId) {
+        return myAlert.info({ title: '請選擇業務' });
+      }
+    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
       return myAlert.info({ title: '請選擇所有審核人員' });
     }
 
