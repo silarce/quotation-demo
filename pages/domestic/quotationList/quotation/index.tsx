@@ -191,6 +191,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = router.query as Tquery;
   const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
+  const isNewQuotation = !quotationId && !contentId;
 
   // -----------------------------------------------------
 
@@ -233,7 +234,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   const [isLoading, setIsLoading] = useState(false);
   // 是否可編輯
-  const [disabled, setDisabled] = useState(true);
+  const [disabled, setDisabled] = useState(!isNewQuotation);
   // const [disabled_reviewer, setDisabled_reviewer] = useState(true);
   // -----------------------------------------------------
   const [reviewFormShow, setReviewFormShow] = useState(false);
@@ -1436,9 +1437,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       signatureArr.splice(1, 2);
     }
 
-    if (status === 'Pending') {
-      signatureArr.splice(5, 1);
-    }
+    // if (status === 'Pending') {
+    //   signatureArr.splice(5, 1);
+    // }
 
     const control_signature = {
       signatureArr,
@@ -1452,6 +1453,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     ];
 
     const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
+
+    if (status === 'TempPending' && dynaSelectorPropsList[1]) {
+      dynaSelectorPropsList[1].isSkip = true;
+    }
 
     if (status === 'Pending' && dynaSelectorPropsList[0]) {
       dynaSelectorPropsList[0].isSkip = true;
@@ -1519,6 +1524,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
             setStatus(option.value as TquotationContentDto['status']);
           }}
           history={history}
+          isNew={isNewQuotation}
         />
       ),
     },
@@ -2004,7 +2010,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return myAlert.err({ title: '沒有業務' });
     }
 
-    if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
+    if (status === 'TempPending') {
+      if (!reviewSalesEmployeeId) {
+        return myAlert.info({ title: '請選擇業務' });
+      }
+    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
       return myAlert.info({ title: '請選擇所有審核人員' });
     }
 
