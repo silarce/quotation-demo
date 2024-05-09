@@ -1684,8 +1684,8 @@ type TquotationContentDto_copy = {
   isLost: boolean;
 };
 
-// 報價單狀態: 預算 投標 發包 合約 準合約
-export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending';
+// 報價單狀態: 預算 投標 發包 合約 準合約 待審核準合約
+export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending' | 'TempPending';
 
 export type TquotationContentDto = {
   id: string;
