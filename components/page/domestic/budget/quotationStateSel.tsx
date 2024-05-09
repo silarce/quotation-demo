@@ -35,6 +35,10 @@ export default function QuotationStateSel({
   isNew?: boolean;
 }) {
   // -------------------------------------------------------------------------
+
+  const optionQuotationState = optionsCreator_quotationStatus({ need: isNew ? 'editQuotation' : 'basic' });
+
+  // -------------------------------------------------------------------------
   // 報價狀態
   const [isFocus, setIsFocus] = useState('');
   const [selIsOpen, setSelIsOpen] = useState<boolean | undefined>(undefined);
