@@ -55,7 +55,7 @@ export default function BonusStatisticsTable() {
   };
 
   const {
-    data: data_bonus,
+    data: data_bonus = fakeDataArr_bonus,
     // update: update_bonus,
     isFetching,
   } = useGetQuotationAccounting_bonus(params, { isAutoUpdate: false });
@@ -127,25 +127,9 @@ export default function BonusStatisticsTable() {
         <div className={classNames(scss.table)}>
           <Thead />
           <div className={classNames(scss.tbody)}>
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
-            <Row />
+            {data_bonus.map((bonus, index) => {
+              return <Row key={bonus.id || index} data_bonus={fakeData_bonus} />;
+            })}
           </div>
         </div>
       </div>
@@ -172,28 +156,63 @@ const Thead = () => {
   );
 };
 
-const Row = () => {
-  const statusArr: Tcontrol_processChain['statusArr'] = [
-    {
-      label: `課長 ${''}`,
-      dotColor: 'green',
-    },
-    {
-      label: `經理 ${''}`,
-      dotColor: 'red',
-    },
-    {
-      label: `總經理 ${''}`,
-      dotColor: 'gray',
-    },
-  ];
+const Row = ({ data_bonus }: { data_bonus: TbonusDto }) => {
+  //
+  const {
+    // bonusYear,
+    // bonusMonth,
+    totalSales,
+    totalBonus,
+    note,
+
+    // salesEmployeeId,
+    salesEmployee,
+
+    // reviewTeamLeaderEmployeeId,
+    reviewTeamLeaderEmployee,
+    toReviewTeamLeader,
+    teamLeaderReviewAt,
+
+    // reviewSupervisorEmployeeId,
+    reviewSupervisorEmployee,
+    toReviewSupervisor,
+    supervisorReviewAt,
+
+    // reviewManagerEmployeeId,
+    reviewManagerEmployee,
+    toReviewManager,
+    managerReviewAt,
+  } = data_bonus;
+
+  const statusArr: Tcontrol_processChain['statusArr'] = (() => {
+    const statusArr: Tcontrol_processChain['statusArr'] = [
+      // {
+      //   label: `業務 ${salesEmployee?.chName ?? ''}`,
+      //   dotColor: 'green',
+      // },
+      {
+        label: `課長 ${reviewTeamLeaderEmployee?.chName ?? ''}`,
+        dotColor: checkReview(toReviewTeamLeader, teamLeaderReviewAt),
+      },
+      {
+        label: `審核主管 ${reviewSupervisorEmployee?.chName ?? ''}`,
+        dotColor: checkReview(toReviewSupervisor, supervisorReviewAt),
+      },
+      {
+        label: `總經理 ${reviewManagerEmployee?.chName ?? ''}`,
+        dotColor: checkReview(toReviewManager, managerReviewAt),
+      },
+    ];
+
+    return statusArr;
+  })(); // statusArr
 
   return (
     <div className={scss.row}>
-      <div className={scss.cell}>阿喵</div>
-      <div className={scss.cell}>999,999</div>
-      <div className={scss.cell}>999,999</div>
-      <div className={scss.cell}>喵喵喵</div>
+      <div className={scss.cell}>{salesEmployee.chName}</div>
+      <div className={scss.cell}>{totalSales.toLocaleString()}</div>
+      <div className={scss.cell}>{totalBonus.toLocaleString()}</div>
+      <div className={scss.cell}>{note}</div>
       {/*  */}
       <div className={classNames(scss.cell, scss.cell_processChain, 'col-span-4')}>
         <ProcessChain className={scss.processChain} control={{ statusArr }} />
@@ -232,53 +251,88 @@ const Row = () => {
   );
 };
 
+// ====================================================================
+
+const checkReview = (to: string | null, at: string | null) => {
+  if (at) {
+    return 'green';
+  } else if (to) {
+    return 'red';
+  } else {
+    return 'gray';
+  }
+};
+
+// ====================================================================
+
 // ███████  █████  ██   ██ ███████     ██████   █████  ████████  █████
 // ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
 // █████   ███████ █████   █████       ██   ██ ███████    ██    ███████
 // ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
 // ██      ██   ██ ██   ██ ███████     ██████  ██   ██    ██    ██   ██
 
-// const fakeData_bonus: TbonusDto = {
-//   id: "fgsdffgasdgasdfgasdf",
-//   createdAt: "2011-01-01",
-//   updatedAt: "2011-01-01",
+const fakeData_bonus: TbonusDto = {
+  id: '',
+  createdAt: '2011-01-01',
+  updatedAt: '2011-01-01',
 
-//   // 獎金年份
-//   bonusYear: "1911";
-//   // 獎金月份
-//   bonusMonth: "2";
-//   // 業績總額
-//   totalSales: 99999;
-//   // 獎金總額
-//   totalBonus: 99999;
-//   // 備註
-//   note: null;
-//   // 業務id
-//   salesEmployeeId:  null;
-//   // 業務
-//   salesEmployee: {id:"dsfasfasdf",chName:"foooo"} as TemployeeDto;
-//   // 課長Id
-//   reviewTeamLeaderEmployeeId: "dfsdfsdfsdf";
-//   // 審核課長
-//   reviewTeamLeaderEmployee: TemployeeDto;
-//   // 送審給課長審核時間
-//   toReviewTeamLeader: string | null;
-//   // 課長審核時間
-//   teamLeaderReviewAt: string | null;
-//   // 審核主管Id
-//   reviewSupervisorEmployeeId: string | null;
-//   // 審核主管
-//   reviewSupervisorEmployee: TemployeeDto;
-//   // 送審給主管審核時間
-//   toReviewSupervisor: string | null;
-//   // 主管審核時間
-//   supervisorReviewAt: string | null;
-//   // 審核總經理Id
-//   reviewManagerEmployeeId: string | null;
-//   // 審核總經理
-//   reviewManagerEmployee: TemployeeDto;
-//   // 送審給總經理審核時間
-//   toReviewManager: string | null;
-//   // 總經理審核時間
-//   managerReviewAt: string | null;
-// }
+  // 獎金年份
+  bonusYear: '1911',
+  // 獎金月份
+  bonusMonth: '2',
+  // 業績總額
+  totalSales: 99999,
+  // 獎金總額
+  totalBonus: 99999,
+  // 備註
+  note: '喵喵喵喵喵 喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵',
+  // 業務id
+  salesEmployeeId: null,
+  // 業務
+  salesEmployee: { id: 'dsfasfasdf', chName: 'aaaaa' } as TemployeeDto,
+  // 課長Id
+  reviewTeamLeaderEmployeeId: 'dfsdfsdfsdf',
+  // 審核課長
+  reviewTeamLeaderEmployee: { id: 'dsfasfasdf', chName: 'bbbbb' } as TemployeeDto,
+  // 送審給課長審核時間
+  toReviewTeamLeader: '2011-01-01',
+  // 課長審核時間
+  teamLeaderReviewAt: '2011-01-01',
+  // 審核主管Id
+  reviewSupervisorEmployeeId: 'fsdfsdfsdf',
+  // 審核主管
+  reviewSupervisorEmployee: { id: 'dsfasfasdf', chName: 'cccccc' } as TemployeeDto,
+  // 送審給主管審核時間
+  toReviewSupervisor: '2011-01-01',
+  // 主管審核時間
+  supervisorReviewAt: null,
+  // 審核總經理Id
+  reviewManagerEmployeeId: 'fdsdsfasdsfsdfsdfsdf',
+  // 審核總經理
+  reviewManagerEmployee: { id: 'dsfasfasdf', chName: 'ddddd' } as TemployeeDto,
+  // 送審給總經理審核時間
+  toReviewManager: null,
+  // 總經理審核時間
+  managerReviewAt: null,
+};
+
+const fakeDataArr_bonus = [
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+  fakeData_bonus,
+];
