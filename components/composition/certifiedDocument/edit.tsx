@@ -395,7 +395,10 @@ export default function Edit({
     };
 
     setIsFetching(true);
-    await apiPatchCertificatedDoc(certifiedDocumentId, body).then(() => update_data_CertifiedDocument());
+    await apiPatchCertificatedDoc(certifiedDocumentId, body).then(async () => {
+      await update_contract();
+      await update_data_CertifiedDocument();
+    });
     setDisabled(true);
     setIsFetching(false);
   }, [
@@ -406,6 +409,7 @@ export default function Edit({
     state_itemList,
     state_note,
     update_data_CertifiedDocument,
+    update_contract,
   ]);
 
   const reqPatchCertificatedDoc_submit = useCallback(
@@ -449,7 +453,8 @@ export default function Edit({
     }
 
     setIsFetching(true);
-    await apiDeleteCertificatedDoc(certifiedDocumentId).then(() => {
+    await apiDeleteCertificatedDoc(certifiedDocumentId).then(async () => {
+      await update_contract();
       router.back();
     });
     setIsFetching(false);
