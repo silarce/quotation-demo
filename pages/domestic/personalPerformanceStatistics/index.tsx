@@ -25,6 +25,9 @@ import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/opti
 import { useQuotationAccounting_personalContract, TquotationAccounting_personal_contract } from 'js/api/api_quotation';
 import { useEmployee, Tparams } from 'js/api/api_employee';
 
+// css
+import scss from './index.module.scss';
+
 // ==================================================================
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
@@ -197,12 +200,21 @@ export default function PersonalPerformanceStatistics() {
   // const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
 
   // ------------------------------------------------------------------
+
+  // ██████  ███████ ██████  ██    ██  ██████ ███████ ██████
+  // ██   ██ ██      ██   ██ ██    ██ ██      ██      ██   ██
+  // ██████  █████   ██   ██ ██    ██ ██      █████   ██████
+  // ██   ██ ██      ██   ██ ██    ██ ██      ██      ██   ██
+  // ██   ██ ███████ ██████   ██████   ██████ ███████ ██   ██
+
   return (
     <SubLayer isLoading_subLayer={isLoading}>
       <PageHeader02 tagList={tagList} />
 
-      <div>
-        <SelectBar className="ml-5 mt-5 mb-5" selectPropsArr={selectPropsArr} />
+      <div className="w-fit">
+        <div className={scss.selectBarWrapper}>
+          <SelectBar className={''} selectPropsArr={selectPropsArr} />
+        </div>
         <Table control={control_table} />
       </div>
     </SubLayer>
@@ -210,6 +222,12 @@ export default function PersonalPerformanceStatistics() {
 }
 
 // ===========================================================
+
+// ██   ██  ██████   ██████  ██   ██
+// ██   ██ ██    ██ ██    ██ ██  ██
+// ███████ ██    ██ ██    ██ █████
+// ██   ██ ██    ██ ██    ██ ██  ██
+// ██   ██  ██████   ██████  ██   ██
 
 const useControl_personalPerformanceStatistics = (data: TquotationAccounting_personal_contract[] | undefined) => {
   const control: Tcontrol_personalPerformanceStatistics = useMemo(() => {
