@@ -1437,9 +1437,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       signatureArr.splice(1, 2);
     }
 
-    if (status === 'Pending') {
-      signatureArr.splice(5, 1);
-    }
+    // if (status === 'Pending') {
+    //   signatureArr.splice(5, 1);
+    // }
 
     const control_signature = {
       signatureArr,
