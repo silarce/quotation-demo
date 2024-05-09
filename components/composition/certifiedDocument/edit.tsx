@@ -44,6 +44,7 @@ import {
   apiPatchCertificatedDoc,
   apiPatchCertificatedDoc_submit,
   apiPatchCertificatedDoc_review,
+  apiDeleteCertificatedDoc,
 } from 'js/api/api_certificated-doc';
 
 // context
@@ -151,6 +152,9 @@ export default function Edit({
   const query = router.query as Tquery;
   const { contractId, editCertifiedDocument, certifiedDocumentId } = query;
   const isNew = !certifiedDocumentId;
+  // ---------------------------------------------------------------------------
+
+  const { userInfo } = useContext(AppContext);
 
   // ---------------------------------------------------------------------------
 
@@ -170,7 +174,9 @@ export default function Edit({
 
   // ---------------------------------------------------------------------------
 
-  const { userInfo } = useContext(AppContext);
+  let isReviewer = false;
+  let isDoneReview: boolean | undefined = undefined; // 是否已審核完畢
+  let isSealed = false; // 是否已用印
 
   // ---------------------------------------------------------------------------
 
@@ -196,9 +202,9 @@ export default function Edit({
     status,
   } = data_certifiedDocument ?? {};
 
-  const isReviewer = checkReviewer(userInfo, data_certifiedDocument);
-
-  const isSealed = status === '已用印';
+  isReviewer = checkReviewer(userInfo, data_certifiedDocument);
+  isDoneReview = checkIsDoneReview(data_certifiedDocument);
+  isSealed = status === '已用印';
 
   // ---------------------------------------------------------------------------
 
@@ -437,6 +443,18 @@ export default function Edit({
     [certifiedDocumentId, update_data_CertifiedDocument]
   );
 
+  const reqDeleteCertificatedDoc = useCallback(async () => {
+    if (!certifiedDocumentId) {
+      return console.log('certifiedDocumentId為空');
+    }
+
+    setIsFetching(true);
+    await apiDeleteCertificatedDoc(certifiedDocumentId).then(() => {
+      router.back();
+    });
+    setIsFetching(false);
+  }, [certifiedDocumentId, router]);
+
   // ---------------------------------------------------------------------------
 
   // ███    ███ ███████ ███    ███  ██████
@@ -487,7 +505,7 @@ export default function Edit({
       control_signature,
       defaultSeletedDataArrArr,
     };
-  }, [reviewGuarantorEmployee, disabled]);
+  }, [reviewGuarantorEmployee, contract?.content.settleProducts, disabled]);
 
   // _________________________________________________________________________
   // _________________________________________________________________________
@@ -502,9 +520,11 @@ export default function Edit({
     reqPostCertificatedDoc,
     reqPatchCertificatedDoc,
     reqPatchCertificatedDoc_review,
+    reqDeleteCertificatedDoc,
     // certificateId: certifiedDocumentId ?? '',
     isReviewer,
     isSealed,
+    isDoneReview,
   });
 
   // _________________________________________________________________________
@@ -1190,6 +1210,12 @@ const useControl_table = ({
 
 // ---------------------------------------------------------------
 
+// ██    ██ ███████ ███████   ██████   █████  ███    ██ ███████ ██      ██      ██ ███████ ████████
+// ██    ██ ██      ██        ██   ██ ██   ██ ████   ██ ██      ██      ██      ██ ██         ██
+// ██    ██ ███████ █████     ██████  ███████ ██ ██  ██ █████   ██      ██      ██ ███████    ██
+// ██    ██      ██ ██        ██      ██   ██ ██  ██ ██ ██      ██      ██      ██      ██    ██
+//  ██████  ███████ ███████   ██      ██   ██ ██   ████ ███████ ███████ ███████ ██ ███████    ██
+
 const usePanelList = ({
   //
   disabled,
@@ -1201,8 +1227,10 @@ const usePanelList = ({
   reqPostCertificatedDoc,
   reqPatchCertificatedDoc,
   reqPatchCertificatedDoc_review,
+  reqDeleteCertificatedDoc,
   isReviewer,
   isSealed,
+  isDoneReview,
 }: // certificateId,
 {
   disabled: boolean;
@@ -1214,18 +1242,20 @@ const usePanelList = ({
   reqPostCertificatedDoc: () => void;
   reqPatchCertificatedDoc: () => void;
   reqPatchCertificatedDoc_review: (reviewResult: boolean) => void;
+  reqDeleteCertificatedDoc: () => void;
   isReviewer: boolean;
   isSealed: boolean;
+  isDoneReview: boolean | undefined;
   // certificateId: string;
 }) => {
   const panelList = useMemo(() => {
-    const isSealedBtn: TpanelList[number] = {
+    const btn_isSealed: TpanelList[number] = {
       type: 'redButton',
       label: '已用印',
       onClick: () => {},
     };
 
-    const submitBtn: TpanelList[number] = {
+    const btn_submit: TpanelList[number] = {
       type: 'redButton',
       label: '送審',
       onClick: () => {
@@ -1233,7 +1263,7 @@ const usePanelList = ({
       },
     };
 
-    const reviewBtn: TpanelList[number] = {
+    const btn_review: TpanelList[number] = {
       type: 'redButton',
       label: '審核',
       onClick: () => {
@@ -1260,11 +1290,41 @@ const usePanelList = ({
       },
     };
 
-    const editBtn: TpanelList[number] = {
+    const btn_edit: TpanelList[number] = {
       type: 'myButton',
       label: '編輯',
       onClick: () => {
         setDisabled(false);
+      },
+    };
+
+    const btn_deleted: TpanelList[number] = {
+      type: 'redButton',
+      label: '刪除',
+      onClick: () => {
+        myAlert.confirm({
+          title: '確定刪除?',
+          props: {
+            onOk: reqDeleteCertificatedDoc,
+          },
+        });
+      },
+    };
+
+    const btn_issueCertificate: TpanelList[number] = {
+      type: 'myButton',
+      label: '開立證明書',
+      onClick: () => {
+        const query_copy = { ...query };
+        delete query_copy.editCertifiedDocument;
+
+        router.push({
+          query: {
+            ...query_copy,
+            certifiedDocumentId: query.certifiedDocumentId,
+            showCertificate: 'true',
+          },
+        });
       },
     };
 
@@ -1284,29 +1344,12 @@ const usePanelList = ({
     ];
 
     const panelList_disabled: TpanelList = [
-      isSealed ? isSealedBtn : null,
-      !isSealed ? submitBtn : null,
-      !isSealed && isReviewer ? reviewBtn : null,
-
-      {
-        type: 'myButton',
-        label: '開立證明書',
-        onClick: () => {
-          const query_copy = { ...query };
-          delete query_copy.editCertifiedDocument;
-
-          router.push({
-            query: {
-              ...query_copy,
-              certifiedDocumentId: query.certifiedDocumentId,
-              showCertificate: 'true',
-            },
-          });
-        },
-      },
-
-      !isSealed ? editBtn : null,
-
+      isSealed ? btn_isSealed : null,
+      !isSealed ? btn_deleted : null,
+      !isSealed ? btn_submit : null,
+      !isSealed && isReviewer ? btn_review : null,
+      isDoneReview ? btn_issueCertificate : null,
+      !isSealed ? btn_edit : null,
       {
         type: 'myButton',
         label: '返回',
@@ -1344,6 +1387,7 @@ const usePanelList = ({
     reqPatchCertificatedDoc,
     reqPatchCertificatedDoc_review,
     reqPostCertificatedDoc,
+    reqDeleteCertificatedDoc,
     router,
     setDisabled,
     setState_showSelector,
@@ -1532,15 +1576,6 @@ const checkReviewer = (userInfo: TuserDto | undefined, data_certifiedDocument: T
     return false;
   }
 
-  // type Tstep = 'guarantor' | 'accounting' | 'auditor' | 'manager';
-
-  // type TcheckObj = {
-  //   [key in Tstep]: {
-  //     reviewerId: string | undefined;
-  //     reviewedAt: string | null | undefined;
-  //   };
-  // };
-
   const empId = userInfo.employee?.id;
 
   const {
@@ -1595,4 +1630,23 @@ const checkReviewer = (userInfo: TuserDto | undefined, data_certifiedDocument: T
   });
 
   return isReviewer;
+};
+
+const checkIsDoneReview = (data_certifiedDocument: TcertificatedDocDto | undefined) => {
+  if (!data_certifiedDocument) {
+    return undefined;
+  }
+
+  const { guarantorReviewedAt, accountingReviewedAt, auditorReviewedAt, managerReviewedAt } =
+    data_certifiedDocument ?? {};
+
+  // if (managerReviewedAt) {
+  //   return true;
+  // }
+
+  if (guarantorReviewedAt && accountingReviewedAt && auditorReviewedAt && managerReviewedAt) {
+    return true;
+  }
+
+  return false;
 };
