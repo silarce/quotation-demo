@@ -269,7 +269,13 @@ export default function Worksheet({
   // -------------------------------------------------------------------------
 
   const refreshData = async () => {
-    return Promise.all([update_contract(), update_finalProduce(), update_worksheetData(), update_activeRecord()]);
+    return Promise.all([
+      //
+      update_contract(),
+      update_finalProduce(),
+      update_worksheetData(),
+      update_activeRecord(),
+    ]);
   };
 
   // apiPostWorkSheet
@@ -448,7 +454,7 @@ export default function Worksheet({
           salesReviewAt,
 
           reviewManagerEmployee,
-          // toReviewManager,
+          toReviewManager,
           managerReviewAt,
         } = latestRecord;
 
@@ -537,6 +543,8 @@ export default function Worksheet({
         worksheetIntroArr,
       });
     });
+
+    console.log(control_productCardArr);
 
     return { control_productCardArr, latestRecordArr };
     //
