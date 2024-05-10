@@ -1021,6 +1021,19 @@ const useControl_pdf = ({
 
       const phaseVoltage = `${lookup_motorPhase[String(motorPhase) as '1' | '3'] ?? ''} ${motorVoltage}V`;
 
+      const material = (() => {
+        if (item.doorModelName !== 'SJ-305D') {
+          return componentList.slat?.material ?? '';
+        } else if (
+          componentList.slat?.material === 'SST管1.0T' ||
+          componentList.slat?.material === '內SST管外SST管1.0T'
+        ) {
+          return 'SST';
+        } else {
+          return componentList.slat?.material ?? '';
+        }
+      })();
+
       const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
         itemName: item.itemName,
         size: {
@@ -1058,7 +1071,7 @@ const useControl_pdf = ({
           surface: componentList.headBox?.materialSurface ?? '',
         },
         doorPiece: {
-          material: componentList.slat?.material ?? '',
+          material: material,
           surface: componentList.slat?.materialSurface ?? '',
           thickness: item.thickness ?? '',
           slatLength: String(item.slatLength ?? '0'),

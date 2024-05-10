@@ -89,7 +89,8 @@ export default function WorkSheetPDF({
       const image = await html2canvas(
         item,
         {
-          scale: 5,
+          // scale: 5,
+          scale: 3,
         }
         // ,{
         //   useCORS: true,
