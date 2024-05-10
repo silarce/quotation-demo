@@ -200,7 +200,7 @@ const filter_motors = ({
     if (d_horsePower !== horsePoswer) {
       return false;
     }
-    //  else if (data.gearNumber !== filterParams.gearNumber) {
+    // else if (data.gearNumber !== filterParams.gearNumber) {
     //   return false;
     // }
     // else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
@@ -296,6 +296,89 @@ const filter_headBoxes = ({
 };
 
 // ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+// ================================================================================
+
+// ██     ██  ██████  ██████  ██   ██ ███████ ██   ██ ███████ ███████ ████████
+// ██     ██ ██    ██ ██   ██ ██  ██  ██      ██   ██ ██      ██         ██
+// ██  █  ██ ██    ██ ██████  █████   ███████ ███████ █████   █████      ██
+// ██ ███ ██ ██    ██ ██   ██ ██  ██       ██ ██   ██ ██      ██         ██
+//  ███ ███   ██████  ██   ██ ██   ██ ███████ ██   ██ ███████ ███████    ██
+
+// const filter_slats_worksheet = filter_slats;
+
+// const filter_bottomBars_worksheet = filter_bottomBars;
+
+// const filter_guideRails_worksheet = filter_guideRails;
+
+// const filter_sidePlates_worksheet = filter_sidePlates;
+
+// const filter_rollers_worksheet = filter_rollers;
+
+const filter_motors_worksheet = ({
+  dataArr,
+  filterParams,
+}: {
+  dataArr: TdoorComponentListDto['motors'];
+  filterParams: {
+    horsePower: string; // 馬力數
+    // gearNumber: string; // 鍊齒輪番號 // DuST說先略過
+    gearNumber: string; // 齒輪番號 // 那時好像是因為沒有齒輪番號的資料所以才先略過
+    motorVendor: string; // 馬達廠商
+    phase: number; // 相數
+    /**電壓(V) */
+    voltage: number; // 電壓(V)
+    /**荷重(kg) */
+    weight: number; // 荷重(kg) 用weight來比
+    hasSupportStand: boolean; // 有腳 // 馬達支撐架
+  };
+}) => {
+  const filteredArr = dataArr.filter((data) => {
+    let horsePoswer = filterParams.horsePower;
+    let d_horsePower = data.horsePower;
+
+    if (horsePoswer === '1 1/2HP') {
+      horsePoswer = '1.5HP';
+    }
+
+    if (d_horsePower === '1 1/2HP') {
+      d_horsePower = '1.5HP';
+    }
+
+    if (d_horsePower !== horsePoswer) {
+      return false;
+    } else if (data.gearNumber !== filterParams.gearNumber) {
+      return false;
+    } else if (data.motorVendor !== null && data.motorVendor !== filterParams.motorVendor) {
+      return false;
+    } else if (data.phase !== null && data.phase !== filterParams.phase) {
+      return false;
+    } else if (data.voltage !== null && data.voltage !== filterParams.voltage) {
+      return false;
+    } else if (data.loadWeight !== null && data.loadWeight < filterParams.weight) {
+      return false;
+    } else if (data.hasSupportStand !== null && data.hasSupportStand !== filterParams.hasSupportStand) {
+      return false;
+    }
+
+    return true;
+  });
+
+  if (!filteredArr[0]) {
+    console.log('motors', filterParams);
+  }
+
+  return filteredArr[0] || null;
+};
+
+// const filter_motorAccessories_worksheet = filter_motorAccessories;
+
+// const filter_headBoxes_worksheet = filter_headBoxes;
+
+// ================================================================================
 
 type TerrorTip = {
   title: string;
@@ -339,6 +422,10 @@ const lookup_errorTip: Tlookup_errorTip = {
     title: '沒有適配的馬達，請檢查相關參數是否正確',
     content: '相關參數: 馬力、齒輪、馬達廠商、電相、電壓、馬達支撐架、重量(由門型、寬、高、防颱計算而出)',
   },
+  motor_worksheet: {
+    title: '沒有適配的馬達，請檢查相關參數是否正確',
+    content: '相關參數: 馬力、鏈齒輪番號(鏈條)、馬達廠商、電相、電壓、馬達支撐架、重量(由門型、寬、高、防颱計算而出)',
+  },
   motorAccessory: {
     title: '沒有適配的馬達配件，請檢查相關參數是否正確',
     content: '相關參數: 鍊條排數、軸承、齒輪',
@@ -361,5 +448,9 @@ export {
   filter_motorAccessories,
   filter_headBoxes,
   //
+  filter_motors_worksheet,
+  //
   lookup_errorTip,
 };
+
+// _worksheet

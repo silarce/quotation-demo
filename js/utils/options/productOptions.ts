@@ -738,4 +738,78 @@ const lookup_quoteType_doorModelName: Tlookup_quoteType_doorModelName = {
   },
 };
 
+// 軸承
+export const optionsCreator_bearingName = createOptionsCreator({
+  optionsArr: [
+    { value: '6208#', label: '6208#' },
+    { value: '6310#', label: '6310#' },
+    { value: 'UCFS214', label: 'UCFS214' },
+    { value: 'UCFS312', label: 'UCFS312' },
+    { value: 'UCFS316', label: 'UCFS316' },
+  ],
+});
+
+// 鍊齒輪番號
+export const optionsCreator_sprocketWheelModel = createOptionsCreator({
+  optionsArr: [
+    { value: '#50單列', label: '#50單列' },
+    // { value: '#50雙列', label: '#50雙列' },
+    { value: '#60單列', label: '#60單列' },
+    { value: '#60雙列', label: '#60雙列' },
+    { value: '#80單列', label: '#80單列' },
+    { value: '#80雙列', label: '#80雙列' },
+    // { value: '#100單列', label: '#100單列' },
+    { value: '#100雙列', label: '#100雙列' },
+    // { value: '#120單列', label: '#120單列' },
+    // { value: '#120雙列', label: '#120雙列' },
+  ],
+});
+
+export const lookup_sprocketWheelModel_gearNumberAndChainQty = {
+  '#50單列': {
+    gearNumber: '#530',
+    sprocketWheelChains: 1,
+  },
+  '#50雙列': {
+    gearNumber: '#530',
+    sprocketWheelChains: 2,
+  },
+  '#60單列': {
+    gearNumber: '#640',
+    sprocketWheelChains: 1,
+  },
+  '#60雙列': {
+    gearNumber: '#640',
+    sprocketWheelChains: 2,
+  },
+  '#80單列': {
+    gearNumber: '#850',
+    sprocketWheelChains: 1,
+  },
+  '#80雙列': {
+    gearNumber: '#850',
+    sprocketWheelChains: 2,
+  },
+  '#100單列': {
+    gearNumber: '#100',
+    sprocketWheelChains: 1,
+  },
+  '#100雙列': {
+    gearNumber: '#100',
+    sprocketWheelChains: 2,
+  },
+  '#120單列': {
+    // 後端沒有#120，暫時先用#100代替
+    // gearNumber: '#120',
+    gearNumber: '#100',
+    sprocketWheelChains: 1,
+  },
+  '#120雙列': {
+    // 後端沒有#120，暫時先用#100代替
+    // gearNumber: '#120',
+    gearNumber: '#100',
+    sprocketWheelChains: 2,
+  },
+};
+
 export { lookup_options_bottomBarAngleIronAndPlate, lookup_quoteType_doorModelName };
