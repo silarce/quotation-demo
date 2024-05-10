@@ -157,6 +157,8 @@ export default function Tbody({
                 key={key}
                 vKey={key}
                 id={key}
+                // component與accessories才有，只是用來使memo更新狀態
+                identificationId={item.identificationId}
                 isActive={activeKey === key}
                 pIndex={pIndex}
                 item={item}
@@ -383,6 +385,7 @@ const NoItem = ({
 function DndRow({
   vKey,
   id,
+  identificationId,
   pIndex,
   item,
   keyArr: keyArr,
@@ -404,6 +407,7 @@ function DndRow({
 }: {
   vKey: string;
   id: string;
+  identificationId: string | number | undefined | null;
   pIndex: number;
   // prod: Class_product;
   item: Titem;
@@ -706,6 +710,8 @@ const DndRow_memo = memo(DndRow, (oldProps, newProps) => {
     'reRenderTrigger',
     'keyArr',
     'alwaysShow',
+    //
+    'identificationId',
   ];
 
   for (const key of arr) {

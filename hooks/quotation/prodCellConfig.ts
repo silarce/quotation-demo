@@ -560,7 +560,7 @@ const getInstallationFee = ({
     }
   }
 
-  return 0;
+  return 1800;
 };
 
 export { prodCellConfig, getInstallationFee };

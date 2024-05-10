@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js';
+import { nanoid } from 'nanoid';
 
 // type
 import type { TreRender } from './useProduct';
@@ -59,6 +60,8 @@ class Class_accessories {
       }, 0);
     }
 
+    this.identificationId = prod.id || nanoid();
+
     // this.calcOptionsAllprice = calcOptionsAllprice;
     // =constructor=============================
   } // =constructor=============================
@@ -68,6 +71,8 @@ class Class_accessories {
   private _acceData;
   readonly key;
   private _prod;
+  readonly identificationId;
+
   delSelf: () => void;
   copySelf: () => void;
   // readonly calcOptionsAllprice;
