@@ -1,4 +1,5 @@
 import React from 'react';
+import scss from './tableContentWithImage2.module.scss';
 
 export interface TableContentWithImageProps {
   value?: string;
@@ -39,7 +40,11 @@ export const TableContentWithImage2 = ({
           //   height={90}
           //   alt=""
           // />
-          <div dangerouslySetInnerHTML={{ __html: dangerSvg }} style={{ width: 75, height: 75 }} />
+          <div
+            className={scss.svgWrapper}
+            dangerouslySetInnerHTML={{ __html: dangerSvg }}
+            style={{ width: 75, height: 75 }}
+          />
         )}
 
         {value === '客製' && <div>{value}</div>}
