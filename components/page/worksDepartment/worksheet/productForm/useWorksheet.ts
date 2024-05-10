@@ -701,6 +701,7 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.sidePlate.sidePlateDirection = value;
+            state.motor['electricMotorDirection'] = value;
             state.shouldCalcData2 = true;
           })
         );
@@ -719,17 +720,19 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce<Tworksheet>((state) => {
             if (state.generalSpec) {
-              // const key = (value as keyof typeof lookup_sprocketWheelModel_gearNumberAndChainQty) || 'undefined';
-
               if (value in lookup_sprocketWheelModel_gearNumberAndChainQty) {
                 const key = value as keyof typeof lookup_sprocketWheelModel_gearNumberAndChainQty;
                 const { gearNumber, sprocketWheelChains } = lookup_sprocketWheelModel_gearNumberAndChainQty[key];
 
                 state.generalSpec.gearNumber = gearNumber;
                 state.generalSpec.sprocketWheelChains = sprocketWheelChains;
+
+                state.motor['electricMotorChainType'] =
+                  lookup_sprocketWheelChains_electricMotorChainType[sprocketWheelChains] ?? '';
               } else {
                 state.generalSpec.gearNumber = '';
                 state.generalSpec.sprocketWheelChains = 0;
+                state.motor['electricMotorChainType'] = '';
               }
 
               state.generalSpec.sprocketWheelModel = value;
@@ -835,6 +838,9 @@ const useWorksheet = create<Tworksheet>(
             boxD: String(contractProductItem?.boxD ?? ''),
           };
 
+          const sprocketWheelChains =
+            lookup_sprocketWheelChains_electricMotorChainType[+(contractProductItem?.sprocketWheelChains ?? 0)] ?? '';
+
           state.motor = {
             ...state.motor,
             horsepower: String(contractProductItem?.horsepower ?? ''),
@@ -842,7 +848,9 @@ const useWorksheet = create<Tworksheet>(
             motorPhase: String(contractProductItem?.motorPhase ?? ''),
             vendor: contractProductItem?.motorVendor ?? '',
             hasMotorSupportStand: contractProductItem?.hasMotorSupportStand ? '有' : '無',
-            electricMotorChainType: contractProductItem?.electricMotorChainType ?? '',
+
+            electricMotorChainType: sprocketWheelChains,
+
             motorLockBox: contractProductItem?.motorLockBox ?? '',
             electricMotorDirection: contractProductItem?.electricMotorDirection ?? '',
             getElectricSupply: state.motor.getElectricSupply,
@@ -2254,6 +2262,8 @@ const reduceMaterialSurface = (materialSurface: string) => {
 
   return materialSurface;
 };
+
+const lookup_sprocketWheelChains_electricMotorChainType = [undefined, '單排', '雙排'];
 
 // =====================================================================
 export { useWorksheet };

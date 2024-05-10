@@ -419,7 +419,7 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
             },
           }}
         />
-        <InputSel
+        {/* <InputSel
           {...basicConfig}
           caption="鏈條型式"
           disabled={disabled}
@@ -433,7 +433,7 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
               },
             },
           }}
-        />
+        /> */}
         <InputSel
           {...basicConfig}
           caption="馬達鎖盒"
@@ -449,7 +449,7 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
             },
           }}
         />
-        <InputSel
+        {/* <InputSel
           {...basicConfig}
           caption="方向"
           disabled={disabled}
@@ -465,7 +465,7 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
               },
             },
           }}
-        />
+        /> */}
       </div>
     </div>
   );
@@ -1110,7 +1110,7 @@ function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined })
               value: { value: sprocketWheelModel, label: sprocketWheelModel },
               options: optionsCreator_sprocketWheelModel(),
               onChange: (option) => {
-                // w  setSprocketWheelModel會同時改變gearNumber與sprocketWheelChains
+                // w  setSprocketWheelModel會同時改變gearNumber、sprocketWheelChains、electricMotorChainType
                 sidePlate.setSprocketWheelModel(option?.value ?? '');
               },
 
