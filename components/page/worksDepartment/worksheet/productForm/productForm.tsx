@@ -30,12 +30,12 @@ import {
   optionsCreator_bendStright,
   optionsCreator_quoteType,
   optionsCreator_boolean,
+  optionsCreator_sprocketWheelModel,
+  //
 } from 'js/utils/options/productOptions';
 
 // utils
 import { findOption } from 'js/utils/options/findOption';
-
-import { Toption } from 'js/utils/options/options';
 
 // =====================================================================
 
@@ -1095,13 +1095,20 @@ function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined })
         />
         <InputSel
           {...basicConfig}
-          caption="鍊條"
-          disabled={disabled || !isSpecialProd}
+          caption="鏈條"
+          // disabled={disabled || !isSpecialProd}
+          disabled={disabled}
           selectProps={{
             props: {
               isSearchable: isSpecialProd,
               menuIsOpen: isSpecialProd ? false : undefined,
               value: { value: sprocketWheelModel, label: sprocketWheelModel },
+              options: optionsCreator_sprocketWheelModel(),
+              onChange: (option) => {
+                // w  setSprocketWheelModel會同時改變gearNumber與sprocketWheelChains
+                sidePlate.setSprocketWheelModel(option?.value ?? '');
+              },
+
               onInputChange: (value, action) => {
                 if (action.action === 'input-change') {
                   sidePlate.setSprocketWheelModel(value);

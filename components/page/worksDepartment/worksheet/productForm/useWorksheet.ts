@@ -55,6 +55,7 @@ import {
   lookup_options_bottomBarAngleIronAndPlate,
   lookup_horsePowerToToptions,
   optionsCreator_quoteType,
+  lookup_sprocketWheelModel_gearNumberAndChainQty,
 } from 'js/utils/options/productOptions';
 import { lookup_motorPhase } from 'config/product/lookup';
 
@@ -64,7 +65,8 @@ import {
   filter_guideRails,
   filter_sidePlates,
   filter_rollers,
-  filter_motors,
+  // filter_motors,
+  filter_motors_worksheet,
   filter_motorAccessories,
   filter_headBoxes,
   lookup_errorTip,
@@ -715,9 +717,23 @@ const useWorksheet = create<Tworksheet>(
       },
       setSprocketWheelModel: (value) => {
         set(
-          produce((state) => {
+          produce<Tworksheet>((state) => {
             if (state.generalSpec) {
+              // const key = (value as keyof typeof lookup_sprocketWheelModel_gearNumberAndChainQty) || 'undefined';
+
+              if (value in lookup_sprocketWheelModel_gearNumberAndChainQty) {
+                const key = value as keyof typeof lookup_sprocketWheelModel_gearNumberAndChainQty;
+                const { gearNumber, sprocketWheelChains } = lookup_sprocketWheelModel_gearNumberAndChainQty[key];
+
+                state.generalSpec.gearNumber = gearNumber;
+                state.generalSpec.sprocketWheelChains = sprocketWheelChains;
+              } else {
+                state.generalSpec.gearNumber = '';
+                state.generalSpec.sprocketWheelChains = 0;
+              }
+
               state.generalSpec.sprocketWheelModel = value;
+
               state.shouldCalcData2 = true;
             }
           })
@@ -1349,7 +1365,10 @@ const useWorksheet = create<Tworksheet>(
 
       componentIdListEntries.forEach(([key, value]) => {
         if (!value) {
-          const message = lookup_errorTip[key] ?? { title: '無資料', content: '無資料' };
+          let key_worksheet = key;
+          key_worksheet === 'motor' && (key_worksheet = 'motor_worksheet');
+
+          const message = lookup_errorTip[key_worksheet] ?? { title: '無資料', content: '無資料' };
           myAlert.warning({ ...message });
           isComponentOk = false;
         }
@@ -1619,7 +1638,7 @@ const useWorksheet = create<Tworksheet>(
         gearNumber: generalSpec.gearNumber || null,
         sprocketWheelModel: generalSpec.sprocketWheelModel || null,
         sprocketWheelTeethNumber: generalSpec.sprocketWheelTeethNumber || null,
-        sprocketWheelChains: String(generalSpec.sprocketWheelChains) || null,
+        sprocketWheelChains: generalSpec.sprocketWheelChains ? String(generalSpec.sprocketWheelChains) : null,
         weight: String(generalSpec.weight) || null,
         slatLength: generalSpec.slatLength || null,
         guideRailLength: generalSpec.guideRailLength || null,
@@ -2009,7 +2028,7 @@ const avalibleComponentFilter = (
     },
   });
   //
-  const com_motor: TdoorComponentListDto['motors'][number] | null = filter_motors({
+  const com_motor: TdoorComponentListDto['motors'][number] | null = filter_motors_worksheet({
     dataArr: avalibleComponentList.motors,
     filterParams: {
       horsePower: horsepower,
@@ -2021,6 +2040,7 @@ const avalibleComponentFilter = (
       hasSupportStand,
     },
   });
+
   //
   const com_sidePlate: TdoorComponentListDto['sidePlates'][number] | null = filter_sidePlates({
     dataArr: avalibleComponentList.sidePlates,
