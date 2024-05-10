@@ -885,23 +885,38 @@ const checkStatus = ({
   let label: TprojectPatternStatus['reviewStatus']['label'] = `未送審`;
   let dotColor: TprojectPatternStatus['reviewStatus']['dotColor'] = 'gray';
 
-  if (managerReviewedAt || toManagerAt) {
-    label = `總經理 ${managerName}`;
+  // if (managerReviewedAt || toManagerAt) {
+  //   label = `總經理 ${managerName}`;
 
-    if (managerReviewedAt) {
-      dotColor = 'green';
-    } else {
-      dotColor = 'red';
-    }
-  } else if (workerReviewedAt || toWorkerAt) {
-    label = `工務 ${workerName}`;
+  //   if (managerReviewedAt) {
+  //     dotColor = 'green';
+  //   } else {
+  //     dotColor = 'red';
+  //   }
+  // } else if (workerReviewedAt || toWorkerAt) {
+  //   label = `工務 ${workerName}`;
 
-    if (workerReviewedAt) {
-      dotColor = 'green';
-    } else {
-      dotColor = 'red';
-    }
+  //   if (workerReviewedAt) {
+  //     dotColor = 'green';
+  //   } else {
+  //     dotColor = 'red';
+  //   }
+  // }
+
+  // return {
+  //   label,
+  //   dotColor,
+  // };
+
+  // 工務從缺，先另外處理，有工務後再用上面的作法
+  // 工務從缺，先另外處理，有工務後再用上面的作法
+  // 工務從缺，先另外處理，有工務後再用上面的作法
+
+  if (toManagerAt) {
+    label = label = `總經理 ${managerName}`;
   }
+
+  dotColor = managerReviewedAt ? 'green' : toManagerAt ? 'red' : 'gray';
 
   return {
     label,
