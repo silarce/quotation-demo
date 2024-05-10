@@ -56,6 +56,7 @@ import {
   lookup_horsePowerToToptions,
   optionsCreator_quoteType,
   lookup_sprocketWheelModel_gearNumberAndChainQty,
+  optionsCreator_componentMaterial_01,
 } from 'js/utils/options/productOptions';
 import { lookup_motorPhase } from 'config/product/lookup';
 
@@ -285,6 +286,7 @@ type Tworksheet = {
   setDoorModelInfo: (doorModelInfo: TdoorModelInfoDto | undefined) => void;
 
   getOptions_material: () => Toption[];
+  getOptions_material_stable: () => Toption[];
   getOptions_bottomBarAngleIronAndPlate: () => {
     options_angleIron: Toption[];
     options_plate: Toption[];
@@ -978,6 +980,16 @@ const useWorksheet = create<Tworksheet>(
 
     // ---------------------------------------------------------------------
     getOptions_material: () => getOptions_material(get().doorModelInfo?.slatMaterials ?? []),
+    getOptions_material_stable: () => {
+      const doorModelName = get().basicSpec.doorModelName;
+
+      if (doorModelName === 'SJ-305D') {
+        return optionsCreator_componentMaterial_01();
+      }
+
+      return getOptions_material(get().doorModelInfo?.slatMaterials ?? []);
+    },
+
     getOptions_bottomBarAngleIronAndPlate: () =>
       getOptions_bottomBarAngleIronAndPlate(get().basicSpec.doorModelName as TdoorModel),
     getOptions_horsepower: () => {
@@ -1141,13 +1153,25 @@ const useWorksheet = create<Tworksheet>(
         return;
       }
 
+      const material = (() => {
+        if (basicSpec.doorModelName === 'SJ-305D') {
+          const sst304 = optionsCreator_componentMaterial_01().find((option) => {
+            return option.value.includes('304');
+          });
+
+          return sst304?.value ?? '';
+        }
+
+        return basicSpec.material;
+      })();
+
       set(
         produce<Tworksheet>((state) => {
           if (!isSpecialProd) {
-            state.headBox.material = basicSpec.material;
+            state.headBox.material = material;
             state.slat.material = basicSpec.material;
-            state.guideRail.material = basicSpec.material;
-            state.bottomBar.material = basicSpec.material;
+            state.guideRail.material = material;
+            state.bottomBar.material = material;
           } else {
             state.headBox.material = '';
             state.slat.material = '';

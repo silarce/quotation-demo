@@ -32,6 +32,7 @@ import {
   optionsCreator_boolean,
   optionsCreator_sprocketWheelModel,
   optionsCreator_bearingName,
+
   //
 } from 'js/utils/options/productOptions';
 
@@ -477,7 +478,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
   const {
     //
     headBox,
-    getOptions_material,
+    getOptions_material_stable,
     isIntegratedHeadBox,
     getOptions_headBoxThickness,
     isSpecialProd,
@@ -485,7 +486,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
     useShallow((state) => ({
       headBox: state.headBox,
       isIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox(),
-      getOptions_material: state.getOptions_material,
+      getOptions_material_stable: state.getOptions_material_stable,
       getOptions_headBoxThickness: state.getOptions_headBoxThickness,
       isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
@@ -504,7 +505,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
-              options: getOptions_material(),
+              options: getOptions_material_stable(),
               value: { value: headBox.material, label: headBox.material },
               onChange: (option) => {
                 headBox.setHeadBox_str({ key: 'material', value: option?.value ?? '' });
@@ -744,7 +745,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
     //
     guideRail,
     hasSilencingStrip,
-    getOptions_material,
+    getOptions_material_stable,
     getOptions_guideRailThickness,
     getOptions_guideRail,
     isSpecialProd,
@@ -752,7 +753,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
     useShallow((state) => ({
       guideRail: state.guideRail,
       hasSilencingStrip: state.guideRail.getHasSilencingStrip(),
-      getOptions_material: state.getOptions_material,
+      getOptions_material_stable: state.getOptions_material_stable,
       getOptions_guideRailThickness: state.getOptions_guideRailThickness,
       getOptions_guideRail: state.getOptions_guideRail,
       isSpecialProd: state.getIsSpecialProd(),
@@ -799,7 +800,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
-              options: getOptions_material(),
+              options: getOptions_material_stable(),
               value: {
                 value: guideRail.material,
                 label: guideRail.material,
@@ -943,10 +944,10 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
 // =====================================================================
 
 function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined }) {
-  const { bottomBar, getOptions_material, getOptions_bottomBarAngleIronAndPlate, isSpecialProd } = useWorksheet(
+  const { bottomBar, getOptions_material_stable, getOptions_bottomBarAngleIronAndPlate, isSpecialProd } = useWorksheet(
     useShallow((state) => ({
       bottomBar: state.bottomBar,
-      getOptions_material: state.getOptions_material,
+      getOptions_material_stable: state.getOptions_material_stable,
       getOptions_bottomBarAngleIronAndPlate: state.getOptions_bottomBarAngleIronAndPlate,
       isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
@@ -968,7 +969,7 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
           selectProps={{
             props: {
               value: { value: bottomBar.material, label: bottomBar.material },
-              options: getOptions_material(),
+              options: getOptions_material_stable(),
               onChange: (option) => {
                 bottomBar.setBottomBar_str({ key: 'material', value: option?.value ?? '' });
               },
