@@ -738,6 +738,17 @@ const lookup_quoteType_doorModelName: Tlookup_quoteType_doorModelName = {
   },
 };
 
+// 軸承
+export const optionsCreator_bearingName = createOptionsCreator({
+  optionsArr: [
+    { value: '6208#', label: '6208#' },
+    { value: '6310#', label: '6310#' },
+    { value: 'UCFS214', label: 'UCFS214' },
+    { value: 'UCFS312', label: 'UCFS312' },
+    { value: 'UCFS316', label: 'UCFS316' },
+  ],
+});
+
 // 鍊齒輪番號
 export const optionsCreator_sprocketWheelModel = createOptionsCreator({
   optionsArr: [

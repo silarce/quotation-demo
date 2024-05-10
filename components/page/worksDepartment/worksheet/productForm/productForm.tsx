@@ -31,6 +31,7 @@ import {
   optionsCreator_quoteType,
   optionsCreator_boolean,
   optionsCreator_sprocketWheelModel,
+  optionsCreator_bearingName,
   //
 } from 'js/utils/options/productOptions';
 
@@ -1079,12 +1080,16 @@ function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined })
         <InputSel
           {...basicConfig}
           caption="軸承"
-          disabled={disabled || !isSpecialProd}
+          disabled={disabled}
           selectProps={{
             props: {
               isSearchable: isSpecialProd,
               menuIsOpen: isSpecialProd ? false : undefined,
               value: { value: bearingName, label: bearingName },
+              options: optionsCreator_bearingName(),
+              onChange: (option) => {
+                sidePlate.setBearingName(option?.value ?? '');
+              },
               onInputChange: (value, action) => {
                 if (action.action === 'input-change') {
                   sidePlate.setBearingName(value);
