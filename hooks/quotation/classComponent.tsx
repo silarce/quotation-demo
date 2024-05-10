@@ -2,6 +2,7 @@
 
 import Decimal from 'decimal.js';
 import _ from 'lodash';
+import { nanoid } from 'nanoid';
 
 import type { TreRender } from './useProduct';
 import { TcellConfig } from 'components/page/domestic/quotation/quotation/tbody';
@@ -78,6 +79,8 @@ class Class_component {
       this.optionalComponentAction = 'slat_SJ-305D';
     }
 
+    this.identificationId = prod.id || nanoid();
+
     // =constructor
   } // =constructor
 
@@ -86,6 +89,7 @@ class Class_component {
   private _prod;
   private _com;
   readonly key;
+  readonly identificationId;
 
   callReqGetCodeNumber() {
     this._prod.shouldCall_pgpb = true;
