@@ -19,6 +19,7 @@ import ProjectPattern, {
   TpatternReviewProcess,
   TpatternReviewStatus,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
+import PdfModal from './pdfModal_workContactDoc';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -800,8 +801,27 @@ function PreWorkContactDoc_component(
   });
 
   // ----------------------------------------------------------------------------
+
+  const [pdfModalVisible, setPdfModalVisible] = useState(false);
+
+  // ----------------------------------------------------------------------------
   return (
     <div>
+      <button className={'text-9xl'} onClick={() => setPdfModalVisible(true)}>
+        TEST
+      </button>
+      <PdfModal
+        visible={pdfModalVisible}
+        onCancel={() => setPdfModalVisible(false)}
+        engineeringContact={engineeringContact}
+        productArr={productArr}
+      />
+
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {/*  */}
       <div>
         {/* 工程聯絡單 */}
         <div className={classNames(isShowPattern && 'hidden')}>
