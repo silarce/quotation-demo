@@ -90,6 +90,7 @@ export default function WorkContactDoc() {
   // ----------------------------------------------------------------------------
   const panelList_01: TpanelList = [
     // contract?.worksheetId ? null : { type: 'myButton', label: '產生工作表', onClick: reqCreateWorkSheet },
+    { type: 'myButton', label: '匯出工程聯絡單', onClick: () => ref_workContact.current.openPdf() },
     { type: 'myButton', label: '編輯聯絡人', onClick: () => ref_workContact.current.setDisabled(false) },
   ];
   const panelList_02: TpanelList = [

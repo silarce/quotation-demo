@@ -19,6 +19,7 @@ import ProjectPattern, {
   TpatternReviewProcess,
   TpatternReviewStatus,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
+import PdfModal from './pdfModal_workContactDoc';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -83,6 +84,7 @@ type TimperativeHandle = {
   reqPatch: () => Promise<void>;
   closePattern: () => void;
   setDisabled: (state: boolean) => void;
+  openPdf: () => void;
 };
 
 type TshouldPatternList = {
@@ -132,11 +134,15 @@ function PreWorkContactDoc_component(
     setIsShowPattern(true);
   };
 
-  useImperativeHandle(ref, () => ({
-    reqPatch,
-    closePattern: () => setIsShowPattern(false),
-    setDisabled,
-  }));
+  useImperativeHandle(
+    ref,
+    (): TimperativeHandle => ({
+      reqPatch,
+      closePattern: () => setIsShowPattern(false),
+      setDisabled,
+      openPdf: () => setPdfModalVisible(true),
+    })
+  );
 
   // ---------------------------------------------------------------------------
 
@@ -800,13 +806,31 @@ function PreWorkContactDoc_component(
   });
 
   // ----------------------------------------------------------------------------
+
+  const [pdfModalVisible, setPdfModalVisible] = useState(false);
+
+  // ----------------------------------------------------------------------------
   return (
     <div>
+      <PdfModal
+        visible={pdfModalVisible}
+        onCancel={() => setPdfModalVisible(false)}
+        engineeringContact={engineeringContact}
+        productArr={productArr}
+        hasPattern={hasPattern}
+      />
+
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      {/*  */}
       <div>
         {/* 工程聯絡單 */}
-        <div className={classNames(isShowPattern && 'hidden')}>
+        <div className={classNames(isShowPattern && 'hidden', 'px-12')}>
           <Profile controll={controll} disabled={disabled} />
           {/* <WorkProject /> */}
+
           <Table_prod
             disabled={true}
             prodList={productList}
