@@ -642,6 +642,7 @@ latestContentProdArr為這次追加追減的主產品
 
   const [summary, setSummary] = useState<{
     discountRate: string;
+    tuneTotal: string;
     subTotal: string;
     salesTax: string;
     total: string;
@@ -649,6 +650,7 @@ latestContentProdArr為這次追加追減的主產品
     deliveryDate: string;
   }>({
     discountRate: '100',
+    tuneTotal: '',
     subTotal: '',
     salesTax: '',
     total: '',
@@ -736,6 +738,7 @@ latestContentProdArr為這次追加追減的主產品
     const {
       //
       discount,
+      tuneTotal,
       subTotal,
       salesTax,
       total,
@@ -752,6 +755,7 @@ latestContentProdArr為這次追加追減的主產品
 
     setSummary({
       discountRate: discount,
+      tuneTotal,
       subTotal: String(subTotal),
       salesTax: String(salesTax),
       total: String(total),
@@ -766,6 +770,7 @@ latestContentProdArr為這次追加追減的主產品
 
     const { subTotal, salesTax, total } = countPayInfoValue({
       // discount: summary.discountRate,
+      tuneTotal: summary.tuneTotal,
       prodSubTotal: attachTotal,
     });
 
@@ -779,6 +784,7 @@ latestContentProdArr為這次追加追減的主產品
     });
   }, [
     // summary.discountRate,
+    summary.tuneTotal,
     attachTotal,
   ]);
 
@@ -903,6 +909,24 @@ latestContentProdArr為這次追加追減的主產品
 
               return copy;
             });
+          },
+        },
+      },
+      tuneTotal: {
+        inputAttr: {
+          disabled: disabled,
+          value: summary.tuneTotal,
+          onChange: (e) => {
+            const value_num = Number(e.target.value);
+
+            if (Math.abs(value_num) > 10) {
+              return;
+            }
+
+            setSummary((state) => ({
+              ...state,
+              tuneTotal: e.target.value,
+            }));
           },
         },
       },
@@ -1363,6 +1387,7 @@ latestContentProdArr為這次追加追減的主產品
       projectProgress: profile.projectProgress ?? '',
 
       discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
+      tuneTotal: summary.tuneTotal ?? '0',
       subTotal: Number(summary.subTotal.replaceAll(',', '')),
       salesTax: Number(summary.salesTax.replaceAll(',', '')),
       total: Number(summary.total.replaceAll(',', '')),
@@ -2082,15 +2107,17 @@ latestContentProdArr為這次追加追減的主產品
 const countPayInfoValue = ({
   // discount,
   //
+  tuneTotal,
   prodSubTotal,
 }: {
   // discount: string | number;
+  tuneTotal: string | number;
   prodSubTotal: string | number;
 }) => {
   // const discountRate = new Decimal(discount || 0).div(100);
 
   // const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
-  const subTotal = prodSubTotal;
+  const subTotal = Number(prodSubTotal || 0) + Number(tuneTotal || 0);
   const tax = Decimal.mul(subTotal || 0, 0.05);
   const total = Decimal.add(subTotal || 0, tax || 0);
 

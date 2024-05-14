@@ -360,6 +360,12 @@ version>1 是子合約
           onChange: () => {},
         },
       },
+      tuneTotal: {
+        inputAttr: {
+          disabled: true,
+          value: '',
+        },
+      },
       subTotal: {
         inputAttr: {
           disabled: true,

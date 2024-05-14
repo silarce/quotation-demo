@@ -809,7 +809,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const { subTotal, salesTax, total } = countPayInfoValue({
       // discount: summary.discountRate,
-      turnTotal: summary.tuneTotal,
+      tuneTotal: summary.tuneTotal,
       prodSubTotal: quotationProdSubTotal,
       taxRate,
     });
@@ -1857,7 +1857,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       projectProgress: profile.projectProgress ?? '',
 
       discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
-      tuneTotal: `${Number(summary.tuneTotal || 0)}`,
+      tuneTotal: summary.tuneTotal || '0',
       subTotal: Number(summary.subTotal.replaceAll(',', '')),
       salesTax: Number(summary.salesTax.replaceAll(',', '')),
       total: Number(summary.total.replaceAll(',', '')),
@@ -2590,13 +2590,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 const countPayInfoValue = ({
   // discount,
   //
-  turnTotal,
+  tuneTotal,
   prodSubTotal,
   taxRate,
 }: {
   // discount: string | number;
 
-  turnTotal: string | number;
+  tuneTotal: string | number;
   prodSubTotal: string | number;
   taxRate: number;
 }) => {
@@ -2604,7 +2604,7 @@ const countPayInfoValue = ({
 
   // const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
 
-  const subTotal = Number(prodSubTotal || 0) + Number(turnTotal || 0);
+  const subTotal = Number(prodSubTotal || 0) + Number(tuneTotal || 0);
   const tax = Decimal.mul(subTotal || 0, taxRate);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
