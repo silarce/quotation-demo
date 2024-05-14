@@ -414,6 +414,8 @@ export default function Worksheet({
 
     const worksheetList: { [id: string]: TworksheetDto } = {};
 
+    const sortedFinelProd = _.sortBy(finalProduct, 'order');
+
     worksheetArr.forEach((worksheet) => {
       if (worksheet.isAbandoned) {
         return;
@@ -422,7 +424,7 @@ export default function Worksheet({
       worksheetList[worksheet.id] = worksheet;
     });
 
-    finalProduct.forEach((prod) => {
+    sortedFinelProd.forEach((prod) => {
       const prodQty = String(prod.items?.length ?? 0);
       const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
       const pridHeight = new Decimal(prod.height).div(1000).toString();
@@ -543,8 +545,6 @@ export default function Worksheet({
         worksheetIntroArr,
       });
     });
-
-    console.log(control_productCardArr);
 
     return { control_productCardArr, latestRecordArr };
     //
