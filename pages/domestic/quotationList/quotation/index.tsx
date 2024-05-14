@@ -650,6 +650,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [summary, setSummary] = useState<{
     discountRate: string;
+    tuneTotal: string;
     subTotal: string;
     salesTax: string;
     total: string;
@@ -657,6 +658,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     deliveryDate: string;
   }>({
     discountRate: '',
+    tuneTotal: '',
     subTotal: '',
     salesTax: '',
     total: '',
@@ -727,6 +729,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       const {
         //
         discount,
+        tuneTotal,
         subTotal,
         salesTax,
         total,
@@ -745,6 +748,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       setSummary({
         discountRate: discount,
+        tuneTotal: tuneTotal ?? '',
         subTotal: subTotal.toLocaleString(),
         salesTax: salesTax.toLocaleString(),
         total: total.toLocaleString(),
@@ -777,6 +781,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       setSummary({
         discountRate: '100',
+        tuneTotal: '',
         subTotal: '',
         salesTax: '',
         total: '',
@@ -804,6 +809,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     const { subTotal, salesTax, total } = countPayInfoValue({
       // discount: summary.discountRate,
+      turnTotal: summary.tuneTotal,
       prodSubTotal: quotationProdSubTotal,
       taxRate,
     });
@@ -824,6 +830,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // 其實現在quotationProdSubTotal === ''也不會造成問題了
     quotationProdSubTotal,
     taxRate,
+    summary.tuneTotal,
   ]);
 
   // useEffect(() => {
@@ -1047,6 +1054,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
               //   // changeAllProductDiscount(Number(v));
               //   return copy;
               // });
+            },
+          },
+        },
+        tuneTotal: {
+          inputAttr: {
+            disabled,
+            value: summary.tuneTotal,
+            onChange: (e) => {
+              const value_num = Number(e.target.value);
+
+              if (Math.abs(value_num) > 10) {
+                return;
+              }
+
+              setSummary((state) => ({
+                ...state,
+                tuneTotal: e.target.value,
+              }));
             },
           },
         },
@@ -1832,6 +1857,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       projectProgress: profile.projectProgress ?? '',
 
       discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
+      tuneTotal: `${Number(summary.tuneTotal || 0)}`,
       subTotal: Number(summary.subTotal.replaceAll(',', '')),
       salesTax: Number(summary.salesTax.replaceAll(',', '')),
       total: Number(summary.total.replaceAll(',', '')),
@@ -2564,17 +2590,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
 const countPayInfoValue = ({
   // discount,
   //
+  turnTotal,
   prodSubTotal,
   taxRate,
 }: {
   // discount: string | number;
+
+  turnTotal: string | number;
   prodSubTotal: string | number;
   taxRate: number;
 }) => {
   // const discountRate = new Decimal(discount || 0).div(100);
 
   // const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
-  const subTotal = prodSubTotal || 0;
+
+  const subTotal = Number(prodSubTotal || 0) + Number(turnTotal || 0);
   const tax = Decimal.mul(subTotal || 0, taxRate);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
