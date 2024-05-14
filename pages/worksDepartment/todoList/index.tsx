@@ -59,7 +59,8 @@ export default function TodoList() {
 
   const params: Tparams = {
     populate: ['engineeringContact.contract.worksheet.contractProductItems'],
-    sort: 'engineeringContact.createdAt',
+    // sort: 'engineeringContact.createdAt',
+    sort: 'createdAt',
     order: 'DESC',
     pageSize: 999999,
     filter: {
