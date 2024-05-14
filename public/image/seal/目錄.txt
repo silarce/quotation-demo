@@ -1,0 +1,1 @@
+certificateSeal : 證明書用印

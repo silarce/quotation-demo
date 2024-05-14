@@ -1742,6 +1742,8 @@ export type TquotationContentDto = {
   productsOrder?: string[]; // 已棄用
   /** 總折數*/
   discount: string;
+  // 小計微調
+  tuneTotal: string;
   /**小計 */
   subTotal: number;
   /**營業稅 */
@@ -2114,6 +2116,8 @@ export type TcreateQuotationContentDto = {
   // 報價範圍
   quotationRanges: string[];
   discount: `${number}`; // api文件上是string,但送number似乎也行 // 總折數
+  // 小計微調
+  tuneTotal: string;
   subTotal: number;
   salesTax: number;
   total: number;

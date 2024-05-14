@@ -1353,7 +1353,7 @@ const usePanelList = ({
       !isSealed ? btn_deleted : null,
       !isSealed ? btn_submit : null,
       !isSealed && isReviewer ? btn_review : null,
-      isDoneReview ? btn_issueCertificate : null,
+      isSealed || isDoneReview ? btn_issueCertificate : null,
       !isSealed ? btn_edit : null,
       {
         type: 'myButton',

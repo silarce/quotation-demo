@@ -146,6 +146,10 @@ export default function Table_todoList({
 
             window.sessionStorage.setItem('todoForDispatch', JSON.stringify(todo));
 
+            if (!contractId) {
+              myAlert.info({ title: '此工程聯絡單無合約資料', content: '原因可能為這是由後端直接新增的資料' });
+            }
+
             router.push({
               pathname: '/worksDepartment/contractList/contract/dispatchList/edit',
               query: {
