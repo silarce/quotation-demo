@@ -217,6 +217,12 @@ export default function AttachContract({
           onChange: () => {},
         },
       },
+      tuneTotal: {
+        inputAttr: {
+          disabled: true,
+          value: '',
+        },
+      },
       subTotal: {
         inputAttr: {
           disabled: true,
