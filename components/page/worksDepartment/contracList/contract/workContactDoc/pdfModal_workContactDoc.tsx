@@ -410,9 +410,9 @@ const Footer_pre = (
             {/* {engineeringContact?.annotations?.map((str, index) => {
           return <li key={index}>{str}</li>;
         })} */}
-            <li>{'(1)TEST'}</li>
+            {/* <li>{'(1)TEST'}</li>
             <li>{'(2)TEST'}</li>
-            <li>{'(3)TEST'}</li>
+            <li>{'(3)TEST'}</li> */}
           </ul>
         </div>
 
@@ -529,6 +529,8 @@ const PdfTemp_pre = (
     //
   }, [ref_header, ref_body, ref_footer]);
 
+  // 如果要設定container的height、paddingTop、paddingBottome等會影響到高度的樣式
+  // 到上面的a4Style設定
   return (
     <div className={classNames(scss.a4Wrapper, isTemplate && scss.sizeHidden)}>
       <div ref={ref} className={classNames(scss.a4Container, className)} style={{ ...a4Style }}>
