@@ -19,7 +19,6 @@ import { apiPostTodo, TcreateTodoDto } from 'js/api/api_todo';
 
 // css
 import scss from './addTodoModal.module.scss';
-import { set } from 'lodash';
 
 // =======================================================================
 
@@ -119,7 +118,7 @@ export default function AddTodoModal({
       setState_engineeringContact(undefined);
       setState_other(emptyState());
     }
-  }, []);
+  }, [visible]);
 
   return (
     <Modal

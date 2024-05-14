@@ -101,7 +101,14 @@ export const apiPostTodo = async (body: TcreateTodoDto[], { callAlert = true }: 
 
   return axi
     .post(api, body)
-    .then(({ data }) => data)
+    .then(({ data }) => {
+      callAlert &&
+        myAlert.success({
+          title: '新增待辦事項完成',
+        });
+
+      return data;
+    })
     .catch((error) => {
       const err = error as AxiosError;
       callAlert &&
@@ -123,7 +130,14 @@ export const apiPatchTodo = async (body: TupdateTodoDto[], { callAlert = true }:
 
   return axi
     .patch(api, body)
-    .then(({ data }) => data)
+    .then(({ data }) => {
+      callAlert &&
+        myAlert.success({
+          title: '修改待辦事項完成',
+        });
+
+      return data;
+    })
     .catch((error) => {
       const err = error as AxiosError;
       callAlert &&

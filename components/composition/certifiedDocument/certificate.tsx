@@ -5,6 +5,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
+import Image, { StaticImageData } from 'next/image';
 
 // layout
 import { TtagList as TtabList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -25,6 +26,12 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
+// img
+import corporateSeal from 'public/image/seal/corporateSeal.png';
+import factoryCertificate from 'public/image/seal/factoryCertificate.png';
+import fireproofCertificate from 'public/image/seal/fireproofCertificate.png';
+import warrantyCertificate from 'public/image/seal/warrantyCertificate.png';
+
 import scss from './certificate.module.scss';
 
 // config
@@ -32,14 +39,14 @@ import { companyInfo } from 'config/companyInfo';
 
 // api
 import {
-  TsettleProductDto,
-  TcreateCertificatedDocDto,
+  // TsettleProductDto,
+  // TcreateCertificatedDocDto,
   TupdateCertificatedDocDto,
   TdocType,
   TcertificatedProductDto,
   TcreateCertificatedDocSnapShotDto,
   useGetCertificatedDoc_id,
-  apiPostCertificatedDoc,
+  // apiPostCertificatedDoc,
   apiPatchCertificatedDoc,
   apiPatchCertificatedDoc_spanShot,
 } from 'js/api/api_certificated-doc';
@@ -88,6 +95,14 @@ type Tdata = {
 
 // ==================================================================================
 
+const lookup_certificateSeal = {
+  防火證明: fireproofCertificate,
+  出廠證明: factoryCertificate,
+  保固書: warrantyCertificate,
+} as const;
+
+// ==================================================================================
+
 // ███████ ████████  █████  ██████  ████████
 // ██         ██    ██   ██ ██   ██    ██
 // ███████    ██    ███████ ██████     ██
@@ -107,7 +122,7 @@ export default function Certificate({
   const { certifiedDocumentId } = query;
   // const isNew = !certificateId;
 
-  const refPdf = useRef<HTMLDivElement>(null!);
+  // const refPdf = useRef<HTMLDivElement>(null!);
 
   const ref_container = useRef<HTMLDivElement>(null!);
   const ref_title = useRef<HTMLDivElement>(null!);
@@ -145,6 +160,8 @@ export default function Certificate({
   const docStyle = data_certifiedDocument?.docStyle ?? '';
 
   const projectName = data_certifiedDocument?.contract.content.projectName ?? '';
+
+  const certificateSeal = (docStyle && lookup_certificateSeal[docStyle]) || undefined;
 
   // ---------------------------------------------------------------------
 
@@ -590,7 +607,9 @@ export default function Certificate({
           </div>
         </div>
 
-        {isSealed && <FakeSeal className={scss.seal} />}
+        {/* {isSealed && <FakeSeal className={scss.seal} />} */}
+        {isSealed && <Image src={corporateSeal} alt="公司印章" className={scss.seal} />}
+        {isSealed && certificateSeal && <Image src={certificateSeal} alt="證明書章" className={scss.seal2} />}
 
         {/*  */}
         <InputModal
@@ -626,6 +645,7 @@ export default function Certificate({
           isSealed={isSealed}
           projectName={projectName}
           docStyle={docStyle}
+          certificateSeal={certificateSeal}
         />
       </div>
     </div>
@@ -760,6 +780,7 @@ const VirtualContainer_pre = (
     month,
     date,
     isSealed,
+    certificateSeal,
   }: {
     state_docType: React.ReactNode;
     state_infoListArr: Tinfo[];
@@ -769,6 +790,7 @@ const VirtualContainer_pre = (
     month: React.ReactNode;
     date: React.ReactNode;
     isSealed: boolean;
+    certificateSeal: StaticImageData | undefined;
   },
   ref: React.ForwardedRef<HTMLDivElement>
 ) => {
@@ -939,8 +961,9 @@ const VirtualContainer_pre = (
         </div>
       </div>
 
-      {isSealed && <FakeSeal className={scss.seal} />}
-
+      {/* {isSealed && <FakeSeal className={scss.seal} />} */}
+      {isSealed && <Image src={corporateSeal} alt="公司印章" className={scss.seal} />}
+      {isSealed && certificateSeal && <Image src={certificateSeal} alt="證明書章" className={scss.seal2} />}
       {/*  */}
     </div>
   );
@@ -976,6 +999,7 @@ const PdfPreview_pre = ({
   isSealed,
   projectName,
   docStyle,
+  certificateSeal,
 }: {
   visible: boolean;
   closeModal: () => void;
@@ -998,6 +1022,7 @@ const PdfPreview_pre = ({
   isSealed: boolean;
   projectName: string;
   docStyle: string;
+  certificateSeal: StaticImageData | undefined;
 }) => {
   //
   const refPdf = useRef<(HTMLDivElement | null)[]>([]);
@@ -1187,6 +1212,7 @@ const PdfPreview_pre = ({
                 month={month}
                 date={date}
                 isSealed={isSealed}
+                certificateSeal={certificateSeal}
               />
               <br />
             </Fragment>

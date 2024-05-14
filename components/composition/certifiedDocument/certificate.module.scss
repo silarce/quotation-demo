@@ -121,10 +121,20 @@
 .seal {
   position: absolute;
   opacity: 0.5;
-  bottom: 300px;
+  bottom: 400px;
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
+  max-width: 400px;
+}
+
+.seal2 {
+  position: absolute;
+  opacity: 0.5;
+  bottom: 100px;
+  right: 80px;
+  pointer-events: none;
+  max-width: 150px;
 }
 
 .suffix {
