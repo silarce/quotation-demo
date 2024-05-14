@@ -1951,9 +1951,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       await apiQuotationReview({ id: quotationId, body });
 
       if (shouldDirect) {
-        router.push({
-          pathname: '/domestic/contract',
-        });
+        // router.push({
+        //   pathname: '/domestic/contract',
+        // });
+        router.back();
       } else {
         // await update();
       }
