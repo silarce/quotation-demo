@@ -19,6 +19,11 @@ $note: auto;
 
 $infoLeftWidth: calc($itemName + $size + $doorModelName + $material + $thickness + $surface);
 
+.a4Wrapper {
+  border: solid 1px $color;
+  margin-bottom: 50px;
+}
+
 .a4Container {
   display: grid;
   grid-template-rows: fit-content(100%) auto fit-content(100%);
@@ -30,8 +35,8 @@ $infoLeftWidth: calc($itemName + $size + $doorModelName + $material + $thickness
   padding: 0 20px;
   // padding-top: 80px;
 
-  border: solid 1px $color;
   font-size: $fontSize_basic;
+  overflow: hidden;
 }
 
 .header {
@@ -160,4 +165,11 @@ $infoLeftWidth: calc($itemName + $size + $doorModelName + $material + $thickness
   display: grid;
   grid-template-columns: 1fr 1fr 250px 250px;
   line-height: 25px;
+}
+
+.sizeHidden {
+  width: 0;
+  height: 0;
+  border: 0;
+  overflow: hidden;
 }

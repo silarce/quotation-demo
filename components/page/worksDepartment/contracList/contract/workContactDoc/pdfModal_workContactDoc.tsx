@@ -1,13 +1,21 @@
-import { useState, useEffect, useMemo, forwardRef, useRef } from 'react';
+import { useState, useEffect, useMemo, forwardRef, useRef, useCallback } from 'react';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 // antd
 import { Modal, ModalProps } from 'antd';
 
+// gear
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+
+// css
 import scss from './pdfModal_workContactDoc.module.scss';
 
 import { TengineeringContactDto, TquotationProductDto } from 'js/api/dtoTypes';
+import { ThasPattern } from './projectPattern';
 
 // ==============================================================================
 
@@ -16,6 +24,24 @@ type Tprops = {
   onCancel: () => void;
   engineeringContact: TengineeringContactDto | undefined;
   productArr: TquotationProductDto[];
+  hasPattern: ThasPattern;
+};
+
+type Tinfo = {
+  label: React.ReactNode;
+  value: React.ReactNode;
+};
+
+type TinfoList = {
+  projectName: Tinfo;
+  projectNumber: Tinfo;
+  contractor: Tinfo;
+  contractorContactNumber: Tinfo;
+  contractorPrincipal: Tinfo;
+  constructionSiteContactNumber: Tinfo;
+  wholeAddress: Tinfo;
+  projectPrincipal: Tinfo;
+  projectContent: Tinfo;
 };
 
 // ==============================================================================
@@ -37,13 +63,69 @@ export default function PdfModal({
   onCancel,
   engineeringContact,
   productArr,
+  hasPattern,
 }: Tprops) {
   //
 
+  // --------------------------------------------------------------------------
   const ref_pdf = useRef<(HTMLDivElement | null)[]>([]);
+
+  // --------------------------------------------------------------------------
+
+  const [prodArrArr, setProdArrArr] = useState<TquotationProductDto[][]>([]);
+
+  // --------------------------------------------------------------------------
 
   const testProductArr = [...productArr, ...productArr, ...productArr, ...productArr];
 
+  // ========================================================================
+
+  const dlPdf = async () => {
+    if (!ref_pdf.current[0]) {
+      return;
+    }
+
+    showRootLoading(true, '正在處理PDF');
+
+    const doc = new jsPDF('p', 'px', 'a4');
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    let isFirst = true;
+    let item;
+
+    for (item of ref_pdf.current) {
+      if (!item) {
+        continue;
+      }
+
+      const image = await html2canvas(item, {
+        scale: 3,
+        // useCORS: true,
+        // allowTaint: true,
+      }).then((canvas) => {
+        const image = canvas.toDataURL('image/JPEG');
+
+        return image;
+      });
+
+      if (!isFirst) {
+        doc.addPage();
+      }
+
+      isFirst = false;
+      // 留作參考
+      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+      doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
+    }
+
+    doc.save(`工程聯絡單_${engineeringContact?.projectName}.pdf`);
+    showRootLoading(false);
+  };
+
+  // ========================================================================
   const { infoArr } = useMemo(() => {
     if (!engineeringContact) {
       return {};
@@ -130,10 +212,6 @@ export default function PdfModal({
         label: '工程內容：',
         value: projectContent,
       },
-      pageIndex: {
-        label: '頁次：',
-        value: '0',
-      },
     };
     //
 
@@ -155,23 +233,35 @@ export default function PdfModal({
       destroyOnClose={true}
     >
       <div className={scss.body}>
-        {/* <PdfTemp
-          infoArr={infoArr}
-          productArr={productArr}
-          annotations={engineeringContact?.annotations}
-          ref={(ele) => {
-            ref_pdf.current[0] = ele;
-          }}
-        /> */}
+        <MyButton_v2 onClick={dlPdf}>下載</MyButton_v2>
+        <br />
+        <br />
+
         <PdfTemp
+          isTemplate={true}
           infoArr={infoArr}
           productArr={testProductArr}
           annotations={engineeringContact?.annotations}
-          ref={(ele) => {
-            ref_pdf.current[0] = ele;
-          }}
+          onChunkProdArrArrCreated={setProdArrArr}
+          page={0}
+          hasPattern={hasPattern}
         />
-        {/* <PdfTemp infoArr={infoArr} productArr={testProductArr} annotations={engineeringContact?.annotations} /> */}
+
+        {prodArrArr.map((prodArr, index) => {
+          return (
+            <PdfTemp
+              key={index}
+              ref={(ele) => {
+                ref_pdf.current[index] = ele;
+              }}
+              infoArr={infoArr}
+              productArr={prodArr}
+              annotations={engineeringContact?.annotations}
+              page={index + 1}
+              hasPattern={hasPattern}
+            />
+          );
+        })}
       </div>
     </Modal>
   );
@@ -179,31 +269,16 @@ export default function PdfModal({
 
 // ===============================================================================
 
-type Tinfo = {
-  label: React.ReactNode;
-  value: React.ReactNode;
-};
-
-type TinfoList = {
-  projectName: Tinfo;
-  projectNumber: Tinfo;
-  contractor: Tinfo;
-  contractorContactNumber: Tinfo;
-  contractorPrincipal: Tinfo;
-  constructionSiteContactNumber: Tinfo;
-  wholeAddress: Tinfo;
-  projectPrincipal: Tinfo;
-  projectContent: Tinfo;
-  pageIndex: Tinfo;
-};
-
 //  ██████  ██████  ███    ███ ██████   ██████  ███    ██ ███████ ███    ██ ████████
 // ██      ██    ██ ████  ████ ██   ██ ██    ██ ████   ██ ██      ████   ██    ██
 // ██      ██    ██ ██ ████ ██ ██████  ██    ██ ██ ██  ██ █████   ██ ██  ██    ██
 // ██      ██    ██ ██  ██  ██ ██      ██    ██ ██  ██ ██ ██      ██  ██ ██    ██
 //  ██████  ██████  ██      ██ ██       ██████  ██   ████ ███████ ██   ████    ██
 
-const Header_pre = ({ infoArr }: { infoArr: Tinfo[] }, ref: React.ForwardedRef<HTMLDivElement>) => {
+const Header_pre = (
+  { infoArr, page }: { infoArr: Tinfo[]; page: React.ReactNode },
+  ref: React.ForwardedRef<HTMLDivElement>
+) => {
   return (
     <div ref={ref} className={scss.header} id="pdfModal_workContactDoc_top">
       <div className={scss.caption}>
@@ -222,6 +297,11 @@ const Header_pre = ({ infoArr }: { infoArr: Tinfo[] }, ref: React.ForwardedRef<H
             </div>
           );
         })}
+
+        <div>
+          <span>{'頁次：'}</span>
+          <span>{page}</span>
+        </div>
       </div>
 
       <div className={scss.thead}>
@@ -274,7 +354,13 @@ const Body_pre = ({ productArr }: { productArr: TquotationProductDto[] }, ref: R
         const doorTrack = `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail}`;
 
         return (
-          <div key={id + index} className={scss.row}>
+          <div
+            key={id + index}
+            id={id}
+            //  data-id={id}
+            data-component={'row'}
+            className={scss.row}
+          >
             <div>{itemName}</div>
             <div>{boxB_cm}</div>
             <div>{doorModelName}</div>
@@ -296,7 +382,12 @@ const Body_pre = ({ productArr }: { productArr: TquotationProductDto[] }, ref: R
   );
 };
 
-const Footer_pre = ({ annotations }: { annotations: string[] }, ref: React.ForwardedRef<HTMLDivElement>) => {
+const Footer_pre = (
+  { annotations, hasPattern }: { annotations: string[]; hasPattern: ThasPattern },
+  ref: React.ForwardedRef<HTMLDivElement>
+) => {
+  const hasPattern_bool = Object.values(hasPattern).some((bool) => bool);
+
   return (
     <div ref={ref} className={scss.footer}>
       <div className={scss.note}>
@@ -319,9 +410,9 @@ const Footer_pre = ({ annotations }: { annotations: string[] }, ref: React.Forwa
             {/* {engineeringContact?.annotations?.map((str, index) => {
           return <li key={index}>{str}</li>;
         })} */}
-            <li>{'(1)fsdfsdaf'}</li>
-            <li>{'(1)fdfghdfh'}</li>
-            <li>{'(1)fdfdfddd'}</li>
+            <li>{'(1)TEST'}</li>
+            <li>{'(2)TEST'}</li>
+            <li>{'(3)TEST'}</li>
           </ul>
         </div>
 
@@ -329,13 +420,13 @@ const Footer_pre = ({ annotations }: { annotations: string[] }, ref: React.Forwa
         <div>備註</div>
 
         <div>設計圖</div>
-        <div>V</div>
+        <div>{hasPattern.hasDesign && 'V'}</div>
 
         <div>簽認圖</div>
-        <div></div>
+        <div>{hasPattern.hasFloor && 'V'}</div>
 
         <div>無圖面</div>
-        <div></div>
+        <div>{!hasPattern_bool && 'V'}</div>
       </div>
 
       <div className={scss.signature}>
@@ -364,14 +455,25 @@ const Footer_pre = ({ annotations }: { annotations: string[] }, ref: React.Forwa
 
 const PdfTemp_pre = (
   {
-    //
+    className,
+    // style,
+    isTemplate,
     infoArr = [],
     productArr,
     annotations = [],
+    onChunkProdArrArrCreated,
+    page,
+    hasPattern,
   }: {
+    className?: string;
+    isTemplate?: boolean;
+    // style?: React.CSSProperties;
     infoArr: Tinfo[] | undefined;
     productArr: TquotationProductDto[];
     annotations: string[] | undefined | null;
+    onChunkProdArrArrCreated?: (chunkProdArrArr: TquotationProductDto[][]) => void;
+    page: React.ReactNode;
+    hasPattern: ThasPattern;
   },
   ref: React.ForwardedRef<HTMLDivElement>
 ) => {
@@ -380,24 +482,60 @@ const PdfTemp_pre = (
   const ref_footer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log('ref_header', ref_header.current?.offsetHeight);
-    console.log('ref_body', ref_body.current?.offsetHeight);
-    console.log('ref_footer', ref_footer.current?.offsetHeight);
+    if (!onChunkProdArrArrCreated) {
+      return;
+    }
+
+    const prodList: { [id: string]: TquotationProductDto } = {};
+
+    productArr.forEach((prod) => {
+      prodList[prod.id] = prod;
+    });
 
     const headerHeight = ref_header.current?.offsetHeight ?? 0;
-    const bodyHeight = ref_body.current?.offsetHeight ?? 0;
+    // const bodyHeight = ref_body.current?.offsetHeight ?? 0;
     const footerHeight = ref_footer.current?.offsetHeight ?? 0;
-
     const allowHeight = a4ContentHeight - headerHeight - footerHeight;
+
+    const bodyRowsCollection = (ref_body.current?.querySelectorAll('[data-component="row"]') ?? []) as HTMLDivElement[];
+    const rowArr = [...bodyRowsCollection];
+
+    const chunkProdArrArr: TquotationProductDto[][] = [];
+    let tempArr: TquotationProductDto[] = [];
+    let tempHeight = 0;
+
+    rowArr.forEach((ele, index) => {
+      const eleHeight = ele.offsetHeight;
+
+      const id = ele.id;
+      const prod = prodList[id ?? 'undefined'];
+
+      if (tempHeight + eleHeight >= allowHeight) {
+        chunkProdArrArr.push(tempArr);
+        tempArr = [];
+        tempHeight = 0;
+      }
+
+      tempArr.push(prod);
+      tempHeight = tempHeight + eleHeight;
+
+      if (index === rowArr.length - 1) {
+        chunkProdArrArr.push(tempArr);
+      }
+
+      onChunkProdArrArrCreated(chunkProdArrArr);
+    });
 
     //
   }, [ref_header, ref_body, ref_footer]);
 
   return (
-    <div ref={ref} className={scss.a4Container} style={a4Style}>
-      <Header ref={ref_header} infoArr={infoArr} />
-      <Body ref={ref_body} productArr={productArr} />
-      <Footer ref={ref_footer} annotations={annotations ?? []} />
+    <div className={classNames(scss.a4Wrapper, isTemplate && scss.sizeHidden)}>
+      <div ref={ref} className={classNames(scss.a4Container, className)} style={{ ...a4Style }}>
+        <Header ref={ref_header} infoArr={infoArr} page={page} />
+        <Body ref={ref_body} productArr={productArr} />
+        <Footer ref={ref_footer} annotations={annotations ?? []} hasPattern={hasPattern} />
+      </div>
     </div>
   );
 };

@@ -84,6 +84,7 @@ type TimperativeHandle = {
   reqPatch: () => Promise<void>;
   closePattern: () => void;
   setDisabled: (state: boolean) => void;
+  openPdf: () => void;
 };
 
 type TshouldPatternList = {
@@ -133,11 +134,15 @@ function PreWorkContactDoc_component(
     setIsShowPattern(true);
   };
 
-  useImperativeHandle(ref, () => ({
-    reqPatch,
-    closePattern: () => setIsShowPattern(false),
-    setDisabled,
-  }));
+  useImperativeHandle(
+    ref,
+    (): TimperativeHandle => ({
+      reqPatch,
+      closePattern: () => setIsShowPattern(false),
+      setDisabled,
+      openPdf: () => setPdfModalVisible(true),
+    })
+  );
 
   // ---------------------------------------------------------------------------
 
@@ -807,14 +812,12 @@ function PreWorkContactDoc_component(
   // ----------------------------------------------------------------------------
   return (
     <div>
-      <button className={'text-9xl'} onClick={() => setPdfModalVisible(true)}>
-        TEST
-      </button>
       <PdfModal
         visible={pdfModalVisible}
         onCancel={() => setPdfModalVisible(false)}
         engineeringContact={engineeringContact}
         productArr={productArr}
+        hasPattern={hasPattern}
       />
 
       {/*  */}
@@ -824,9 +827,10 @@ function PreWorkContactDoc_component(
       {/*  */}
       <div>
         {/* 工程聯絡單 */}
-        <div className={classNames(isShowPattern && 'hidden')}>
+        <div className={classNames(isShowPattern && 'hidden', 'px-12')}>
           <Profile controll={controll} disabled={disabled} />
           {/* <WorkProject /> */}
+
           <Table_prod
             disabled={true}
             prodList={productList}
