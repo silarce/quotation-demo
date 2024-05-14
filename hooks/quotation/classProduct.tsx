@@ -2456,6 +2456,10 @@ class Class_product {
   }
   //
 
+  // 是否為特殊門
+  // 特殊門會隱藏部分欄位，可以讓使用者在原本為select的欄位手動輸入資料
+  // 並且會跳過大部分的機制，例如呼叫api，材料配件過濾等等
+  // 特殊門沒有材料配件，選配設定的話除非後端有資料，否則沒有選項可選
   get isSpecialProd() {
     // const isSpecial = !options_doorType.some((option) => option.value === this._prodData.quoteType);
 
@@ -2466,6 +2470,10 @@ class Class_product {
     // if (options_quoteType.some((option) => option.value === this._prodData.quoteType)) {
     //   return false;
     // }
+
+    if (this._prodData.doorType === 'W2') {
+      return true;
+    }
 
     if (
       Object.values(this._doorModelList).some((doorModel) => {
