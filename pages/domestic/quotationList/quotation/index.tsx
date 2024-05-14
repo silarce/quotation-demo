@@ -650,6 +650,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const [summary, setSummary] = useState<{
     discountRate: string;
+    tuneTotal: string;
     subTotal: string;
     salesTax: string;
     total: string;
@@ -657,6 +658,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     deliveryDate: string;
   }>({
     discountRate: '',
+    tuneTotal: '',
     subTotal: '',
     salesTax: '',
     total: '',
@@ -727,6 +729,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       const {
         //
         discount,
+        tuneTotal,
         subTotal,
         salesTax,
         total,
@@ -745,6 +748,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       setSummary({
         discountRate: discount,
+        tuneTotal: tuneTotal ?? '',
         subTotal: subTotal.toLocaleString(),
         salesTax: salesTax.toLocaleString(),
         total: total.toLocaleString(),
@@ -777,6 +781,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       setSummary({
         discountRate: '100',
+        tuneTotal: '',
         subTotal: '',
         salesTax: '',
         total: '',
@@ -788,23 +793,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [quotationData, quotationContentData, disabled]);
 
   useEffect(() => {
-    // quotationProdSubTotal 如果是空字串，
-    // 代表剛進入page，還沒有編輯過主產品、材料配件、選配、其他設定或總折數
-    // 就不需要呼叫countPayInfoValue，也不應該呼叫
-    // 這會導致subTotal、salesTax、total計算出為0的值
-    // 既然會改變金額的因素都沒有被編輯過，那麼就不需要計算並帶入新的金額
-    // 後記，因為現在useProductList會收quotationDiscount，
-    // 且有useEffect會依賴quotationDiscount執行變更所有主產品quotationDiscount
-    // 所以若資料的discount不是100，就會再進入page計算出新的quotationProdSubTotal(理論上一樣)
-    // 然後計算出新的subTotal、salesTax、total
-    // 理論上會跟取得的資料一樣
-    if (quotationProdSubTotal === '') {
-      return;
-    }
+    // quotationProdSubTotal或為'' ，代表剛進入page，這時可以用summary.subTotal
+    const prodSubTotal =
+      quotationProdSubTotal || (latestContent?.subTotal ?? 0) - Number(latestContent?.tuneTotal || 0);
 
     const { subTotal, salesTax, total } = countPayInfoValue({
-      // discount: summary.discountRate,
-      prodSubTotal: quotationProdSubTotal,
+      tuneTotal: summary.tuneTotal,
+      prodSubTotal: prodSubTotal,
       taxRate,
     });
 
@@ -824,6 +819,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // 其實現在quotationProdSubTotal === ''也不會造成問題了
     quotationProdSubTotal,
     taxRate,
+    summary.tuneTotal,
   ]);
 
   // useEffect(() => {
@@ -1047,6 +1043,24 @@ function TheQuotation({ router }: { router: NextRouter }) {
               //   // changeAllProductDiscount(Number(v));
               //   return copy;
               // });
+            },
+          },
+        },
+        tuneTotal: {
+          inputAttr: {
+            disabled,
+            value: summary.tuneTotal,
+            onChange: (e) => {
+              const value_num = Number(e.target.value);
+
+              if (Math.abs(value_num) > 10) {
+                return;
+              }
+
+              setSummary((state) => ({
+                ...state,
+                tuneTotal: e.target.value,
+              }));
             },
           },
         },
@@ -1832,6 +1846,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       projectProgress: profile.projectProgress ?? '',
 
       discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
+      tuneTotal: summary.tuneTotal || '0',
       subTotal: Number(summary.subTotal.replaceAll(',', '')),
       salesTax: Number(summary.salesTax.replaceAll(',', '')),
       total: Number(summary.total.replaceAll(',', '')),
@@ -2564,17 +2579,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
 const countPayInfoValue = ({
   // discount,
   //
+  tuneTotal,
   prodSubTotal,
   taxRate,
 }: {
   // discount: string | number;
+
+  tuneTotal: string | number;
   prodSubTotal: string | number;
   taxRate: number;
 }) => {
   // const discountRate = new Decimal(discount || 0).div(100);
 
   // const subTotal = Decimal.mul(prodSubTotal || 0, discountRate);
-  const subTotal = prodSubTotal || 0;
+
+  const subTotal = Number(prodSubTotal || 0) + Number(tuneTotal || 0);
   const tax = Decimal.mul(subTotal || 0, taxRate);
   const total = Decimal.add(subTotal || 0, tax || 0);
 
