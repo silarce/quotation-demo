@@ -262,7 +262,7 @@ export default function EditDispatchList() {
           },
         ];
 
-        await apiPatchTodo(body);
+        await apiPatchTodo(body, { callAlert: false });
         window.sessionStorage.removeItem('todoForDispatch');
       }
     } catch (error) {
