@@ -1703,6 +1703,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
+    if (!userId) {
+      return myAlert.warning({ title: '沒有使用者ID' });
+    }
+
     if (status === 'Pending') {
       return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
     }
@@ -1834,7 +1838,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       editNotes: editNotes ?? '',
       status: status ?? 'Budget',
       //
-      agentId: agentEmployee?.id || '',
+      // agentId: agentEmployee?.id || '',
+      agentId: userId,
       //
       //
       annotations: anno,
