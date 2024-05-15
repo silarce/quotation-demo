@@ -1,5 +1,12 @@
 @use "styles/theme01" as *;
 
+$G1: 112px 60px 95px;
+$G2: 60px auto 300px 200px 150px 20px;
+$G3: 60px auto 300px 80px 100px 20px;
+
+$gridTemplateColumns: $G1 $G2;
+$gridTemplateColumns_panelBody: $G1 $G3;
+
 .container {
   padding: 4px;
   :global(.ant-collapse) {
@@ -26,7 +33,7 @@
 
 .thead {
   display: grid;
-  grid-template-columns: 112px 48px 80px 60px auto 300px 200px 150px 20px;
+  grid-template-columns: $gridTemplateColumns;
   gap: 22px;
   height: 40px;
   padding: 0 30px;
@@ -40,7 +47,7 @@
     cursor: pointer;
     > span {
       font-weight: 400;
-      font-size: 14px;
+      font-size: 18px;
       color: #979797;
       > svg {
         color: black;
@@ -55,7 +62,7 @@ div.panelHeader {
 
   .info {
     display: grid;
-    grid-template-columns: 112px 48px 80px 60px auto 300px 200px 150px 20px;
+    grid-template-columns: $gridTemplateColumns;
     gap: 22px;
     > span {
       font-weight: 400;
@@ -93,7 +100,7 @@ div.panelHeader {
 div.panelBody {
   .row {
     display: grid;
-    grid-template-columns: 112px 48px 80px 60px auto 300px 80px 100px 20px;
+    grid-template-columns: $gridTemplateColumns_panelBody;
     gap: 22px;
     padding: 8px 30px;
     > span {
