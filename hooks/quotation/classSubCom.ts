@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js';
+import { nanoid } from 'nanoid';
 
 import type { TreRender } from './useProduct';
 
@@ -41,12 +42,15 @@ class Class_SubCom {
     if (isNew) {
       this.calcAllPrice();
     }
+
+    this.identificationId = prod.id || nanoid();
   } // =constructor
 
   readonly reRender;
   renderCount = 0;
   private _data;
   private _prod: Class_product;
+  readonly identificationId;
 
   makeFormatValueDontTriggerTwice = false;
 

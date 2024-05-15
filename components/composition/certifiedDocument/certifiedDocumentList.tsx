@@ -130,7 +130,7 @@ export default function CertifiedDocumentList({
         docStyle, // 文件種類
         // snapShot, // 證明書開立快照
 
-        // status, // 狀態(審核中/審核完成尚未用印/已印出)
+        status, // 狀態(審核中/審核完成尚未用印/已印出)
 
         products, // 開立產品
 
@@ -189,7 +189,7 @@ export default function CertifiedDocumentList({
         className: scss.row,
         cellArr: [
           {
-            children: 'status',
+            children: status,
             width: cellConfig.reviewStatus.width,
           },
           {
@@ -364,7 +364,7 @@ const tableConfig = {
 const cellConfig: { [key in TcellKeyArr]: Tconfig_table } = {
   reviewStatus: {
     label: '狀態',
-    width: 100,
+    width: 150,
     justifyContent: 'center',
   },
   createdAt: {

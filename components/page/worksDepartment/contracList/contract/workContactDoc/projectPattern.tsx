@@ -786,13 +786,14 @@ const useControl_review = ({
         label: `業務 ${salesName}`,
         dotColor: 'green',
       },
-      {
-        label: `工務 ${workerName}`,
-        dotColor: checkStatus({
-          toAt: designToWorkerAt,
-          reviewedAt: designWorkerReviewedAt,
-        }),
-      },
+      // 工務從缺，暫時拿掉
+      // {
+      //   label: `工務 ${workerName}`,
+      //   dotColor: checkStatus({
+      //     toAt: designToWorkerAt,
+      //     reviewedAt: designWorkerReviewedAt,
+      //   }),
+      // },
       {
         label: `總經理 ${managerName}`,
         dotColor: checkStatus({
@@ -804,10 +805,11 @@ const useControl_review = ({
 
     const statusArr_floor: TstatusLabelProps[] = [
       { label: `業務 ${salesName}`, dotColor: 'green' },
-      {
-        label: `工務 ${workerName}`,
-        dotColor: checkStatus({ toAt: floorToWorkerAt, reviewedAt: floorWorkerReviewedAt }),
-      },
+      // 工務從缺，暫時拿掉
+      // {
+      //   label: `工務 ${workerName}`,
+      //   dotColor: checkStatus({ toAt: floorToWorkerAt, reviewedAt: floorWorkerReviewedAt }),
+      // },
       {
         label: `總經理 ${managerName}`,
         dotColor: checkStatus({ toAt: floorToManagerAt, reviewedAt: floorManagerReviewedAt }),
@@ -816,10 +818,11 @@ const useControl_review = ({
 
     const statusArr_color: TstatusLabelProps[] = [
       { label: `業務 ${salesName}`, dotColor: 'green' },
-      {
-        label: `工務 ${workerName}`,
-        dotColor: checkStatus({ toAt: colorToWorkerAt, reviewedAt: colorWorkerReviewedAt }),
-      },
+      // 工務從缺，暫時拿掉
+      // {
+      //   label: `工務 ${workerName}`,
+      //   dotColor: checkStatus({ toAt: colorToWorkerAt, reviewedAt: colorWorkerReviewedAt }),
+      // },
       {
         label: `總經理 ${managerName}`,
         dotColor: checkStatus({ toAt: colorToManagerAt, reviewedAt: colorManagerReviewedAt }),
@@ -828,13 +831,14 @@ const useControl_review = ({
 
     const statusArr_construction: TstatusLabelProps[] = [
       { label: `業務 ${salesName}`, dotColor: 'green' },
-      {
-        label: `工務 ${workerName}`,
-        dotColor: checkStatus({
-          toAt: constructionToWorkerAt,
-          reviewedAt: constructionWorkerReviewedAt,
-        }),
-      },
+      // 工務從缺，暫時拿掉
+      // {
+      //   label: `工務 ${workerName}`,
+      //   dotColor: checkStatus({
+      //     toAt: constructionToWorkerAt,
+      //     reviewedAt: constructionWorkerReviewedAt,
+      //   }),
+      // },
       {
         label: `總經理 ${managerName}`,
         dotColor: checkStatus({
@@ -846,46 +850,17 @@ const useControl_review = ({
 
     const statusArr_detail: TstatusLabelProps[] = [
       { label: `業務 ${salesName}`, dotColor: 'green' },
-      {
-        label: `工務 ${workerName}`,
-        dotColor: checkStatus({ toAt: detailToWorkerAt, reviewedAt: detailWorkerReviewedAt }),
-      },
+      // 工務從缺，暫時拿掉
+      // {
+      //   label: `工務 ${workerName}`,
+      //   dotColor: checkStatus({ toAt: detailToWorkerAt, reviewedAt: detailWorkerReviewedAt }),
+      // },
       {
         label: `總經理 ${managerName}`,
         dotColor: checkStatus({ toAt: detailToManagerAt, reviewedAt: detailManagerReviewedAt }),
       },
     ];
     //
-
-    // if (designToManagerAt && isReviewer_manager) {
-    //   isReviewer_design = true;
-    // } else if (designToWorkerAt && isReviewer_worker) {
-    //   isReviewer_design = true;
-    // }
-
-    // if (colorToManagerAt && isReviewer_manager) {
-    //   isReviewer_color = true;
-    // } else if (colorToWorkerAt && isReviewer_worker) {
-    //   isReviewer_color = true;
-    // }
-
-    // if (constructionToManagerAt && isReviewer_manager) {
-    //   isReviewer_construction = true;
-    // } else if (constructionToWorkerAt && isReviewer_worker) {
-    //   isReviewer_construction = true;
-    // }
-
-    // if (detailToManagerAt && isReviewer_manager) {
-    //   isReviewer_detail = true;
-    // } else if (detailToWorkerAt && isReviewer_worker) {
-    //   isReviewer_detail = true;
-    // }
-
-    // if (floorToManagerAt && isReviewer_manager) {
-    //   isReviewer_floor = true;
-    // } else if (floorToWorkerAt && isReviewer_worker) {
-    //   isReviewer_floor = true;
-    // }
 
     if ((designToManagerAt && isReviewer_manager) || (designToWorkerAt && isReviewer_worker)) {
       isReviewer_design = true;
@@ -914,11 +889,16 @@ const useControl_review = ({
       floor: statusArr_floor,
       design: statusArr_design,
 
-      isColorSubmit: !!colorToWorkerAt,
-      isConstructionSubmit: !!constructionToWorkerAt,
-      isDetailSubmit: !!detailToWorkerAt,
-      isFloorSubmit: !!floorToWorkerAt,
-      isDesignSubmit: !!designToWorkerAt,
+      // isColorSubmit: !!colorToWorkerAt,
+      // isConstructionSubmit: !!constructionToWorkerAt,
+      // isDetailSubmit: !!detailToWorkerAt,
+      // isFloorSubmit: !!floorToWorkerAt,
+      // isDesignSubmit: !!designToWorkerAt,
+      isColorSubmit: !!colorToManagerAt,
+      isConstructionSubmit: !!constructionToManagerAt,
+      isDetailSubmit: !!detailToManagerAt,
+      isFloorSubmit: !!floorToManagerAt,
+      isDesignSubmit: !!designToManagerAt,
 
       isReviewer_design,
       isReviewer_color,

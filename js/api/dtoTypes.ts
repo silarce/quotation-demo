@@ -1684,8 +1684,8 @@ type TquotationContentDto_copy = {
   isLost: boolean;
 };
 
-// 報價單狀態: 預算 投標 發包 合約 準合約
-export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending';
+// 報價單狀態: 預算 投標 發包 合約 準合約 待審核準合約
+export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending' | 'TempPending';
 
 export type TquotationContentDto = {
   id: string;
@@ -1742,6 +1742,8 @@ export type TquotationContentDto = {
   productsOrder?: string[]; // 已棄用
   /** 總折數*/
   discount: string;
+  // 小計微調
+  tuneTotal: string;
   /**小計 */
   subTotal: number;
   /**營業稅 */
@@ -2114,6 +2116,8 @@ export type TcreateQuotationContentDto = {
   // 報價範圍
   quotationRanges: string[];
   discount: `${number}`; // api文件上是string,但送number似乎也行 // 總折數
+  // 小計微調
+  tuneTotal: string;
   subTotal: number;
   salesTax: number;
   total: number;
@@ -2465,7 +2469,7 @@ export type TdoorSidePlateDto = {
   name: string;
 
   bearingType: string | null; // 軸承
-  gearNumber: string | null; // 鍊齒輪番號
+  gearNumber: string | null; // 齒輪番號 // 舊稱:鏈齒輪番號
   /**一體式捲箱 */
   isIntegrated: boolean | null; // 一體式捲箱
   motorVendor: string | null; // 馬達廠商
@@ -2501,7 +2505,7 @@ export type TdoorMotorDto = {
   name: string;
 
   horsePower: string; // 馬力數
-  gearNumber: string; // 鍊齒輪番號
+  gearNumber: string; // 齒輪番號 // 舊稱:鏈齒輪番號
   motorVendor: string | null; // 馬達廠商
   phase: number | null; // 相數
   /**電壓(V) */

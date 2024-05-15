@@ -27,6 +27,9 @@ export type Tcontrol = {
       onChange?: (v: boolean) => void;
     };
     discountRate: TinputCell;
+
+    tuneTotal: TinputCell;
+
     subTotal: TinputCell;
     salesTax: TinputCell;
     total: TinputCell;
@@ -66,6 +69,7 @@ export default function PayInfo({
   const [modalIsShow, setModalIsShow] = useState(false);
   // -----------------------------------------------------------------------
   const { payment, delivery, paymentMethod } = control;
+
   // -----------------------------------------------------------------------
   const countList = [
     { label: '小計', key: 'subTotal' },
@@ -152,6 +156,29 @@ export default function PayInfo({
           <div>
             <span>{avgDiscount_withQty}</span>
             <span>%</span>
+          </div>
+        </div>
+
+        <div className={classNames(scss.avgDiscount, 'relative')}>
+          <span className={scss.avgDiscount}>
+            {'小計調整'}
+            <Popover content={'不可以大於10，不可以小於-10'} trigger="hover">
+              <InfoCircleOutlined />
+            </Popover>
+          </span>
+          <div>
+            <input
+              type="number"
+              className={classNames(
+                //
+                'bg-transparent',
+                disabled && scss.noBaseLine
+              )}
+              disabled={disabled}
+              {...payment.tuneTotal.inputAttr}
+              // value={payment[key].inputAttr.value?.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+              // onChange={(e) => payment[key].onChange?.(e.target.value)}
+            />
           </div>
         </div>
 

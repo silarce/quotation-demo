@@ -269,7 +269,13 @@ export default function Worksheet({
   // -------------------------------------------------------------------------
 
   const refreshData = async () => {
-    return Promise.all([update_contract(), update_finalProduce(), update_worksheetData(), update_activeRecord()]);
+    return Promise.all([
+      //
+      update_contract(),
+      update_finalProduce(),
+      update_worksheetData(),
+      update_activeRecord(),
+    ]);
   };
 
   // apiPostWorkSheet
@@ -408,6 +414,8 @@ export default function Worksheet({
 
     const worksheetList: { [id: string]: TworksheetDto } = {};
 
+    const sortedFinelProd = _.sortBy(finalProduct, 'order');
+
     worksheetArr.forEach((worksheet) => {
       if (worksheet.isAbandoned) {
         return;
@@ -416,7 +424,7 @@ export default function Worksheet({
       worksheetList[worksheet.id] = worksheet;
     });
 
-    finalProduct.forEach((prod) => {
+    sortedFinelProd.forEach((prod) => {
       const prodQty = String(prod.items?.length ?? 0);
       const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
       const pridHeight = new Decimal(prod.height).div(1000).toString();
@@ -448,7 +456,7 @@ export default function Worksheet({
           salesReviewAt,
 
           reviewManagerEmployee,
-          // toReviewManager,
+          toReviewManager,
           managerReviewAt,
         } = latestRecord;
 
@@ -1013,6 +1021,19 @@ const useControl_pdf = ({
 
       const phaseVoltage = `${lookup_motorPhase[String(motorPhase) as '1' | '3'] ?? ''} ${motorVoltage}V`;
 
+      const material = (() => {
+        if (item.doorModelName !== 'SJ-305D') {
+          return componentList.slat?.material ?? '';
+        } else if (
+          componentList.slat?.material === 'SST管1.0T' ||
+          componentList.slat?.material === '內SST管外SST管1.0T'
+        ) {
+          return 'SST';
+        } else {
+          return componentList.slat?.material ?? '';
+        }
+      })();
+
       const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
         itemName: item.itemName,
         size: {
@@ -1050,7 +1071,7 @@ const useControl_pdf = ({
           surface: componentList.headBox?.materialSurface ?? '',
         },
         doorPiece: {
-          material: componentList.slat?.material ?? '',
+          material: material,
           surface: componentList.slat?.materialSurface ?? '',
           thickness: item.thickness ?? '',
           slatLength: String(item.slatLength ?? '0'),

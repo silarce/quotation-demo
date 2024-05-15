@@ -71,7 +71,8 @@ export default function WorkSheetPDF({
     const doc = new jsPDF({
       orientation: 'l',
       unit: 'px',
-      format: 'a4',
+      // format: 'a4',
+      format: 'a3',
     });
 
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -88,7 +89,8 @@ export default function WorkSheetPDF({
       const image = await html2canvas(
         item,
         {
-          scale: 5,
+          // scale: 5,
+          scale: 3,
         }
         // ,{
         //   useCORS: true,

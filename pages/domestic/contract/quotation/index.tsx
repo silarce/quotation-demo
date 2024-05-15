@@ -360,6 +360,12 @@ version>1 是子合約
           onChange: () => {},
         },
       },
+      tuneTotal: {
+        inputAttr: {
+          disabled: true,
+          value: '',
+        },
+      },
       subTotal: {
         inputAttr: {
           disabled: true,
@@ -614,6 +620,7 @@ version>1 是子合約
   ];
 
   const panel_workContack_disabled: TpanelList = [
+    { type: 'myButton', label: '匯出工程聯絡單', onClick: () => ref_workContact.current.openPdf() },
     {
       type: 'myButton',
       label: '編輯工程聯絡單',

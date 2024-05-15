@@ -79,7 +79,7 @@ const quotationToReiviewChain = (content: TquotationDto['contents'][number]) => 
   ];
 
   (status === 'Budget' || status === 'Bidding' || status === 'Contracting') && processChain.splice(3, 2);
-  status === 'Pending' && processChain.shift();
+  // status === 'Pending' && processChain.shift();
 
   return processChain;
 };
