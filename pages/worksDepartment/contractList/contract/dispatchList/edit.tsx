@@ -262,7 +262,7 @@ export default function EditDispatchList() {
           },
         ];
 
-        await apiPatchTodo(body);
+        await apiPatchTodo(body, { callAlert: false });
         window.sessionStorage.removeItem('todoForDispatch');
       }
     } catch (error) {
@@ -420,12 +420,13 @@ export default function EditDispatchList() {
       label: '取消',
       // onClick: () => router.back(),
       onClick: () => {
-        router.push({
-          pathname: '/worksDepartment/contractList/contract/dispatchList',
-          query: {
-            contractId,
-          },
-        });
+        router.back();
+        // router.push({
+        //   pathname: '/worksDepartment/contractList/contract/dispatchList',
+        //   query: {
+        //     contractId,
+        //   },
+        // });
       },
     },
   ];
@@ -439,12 +440,13 @@ export default function EditDispatchList() {
       type: 'myButton',
       label: '返回',
       onClick: () => {
-        router.push({
-          pathname: '/worksDepartment/contractList/contract/dispatchList',
-          query: {
-            contractId,
-          },
-        });
+        router.back();
+        // router.push({
+        //   pathname: '/worksDepartment/contractList/contract/dispatchList',
+        //   query: {
+        //     contractId,
+        //   },
+        // });
       },
     },
   ];
