@@ -112,6 +112,12 @@ export default function BonusStatisticsTable() {
       onClick: () => {},
       isActive: true,
     },
+    {
+      label: '獎金週期維護',
+      onClick: () => {
+        router.replace('/domestic/personalPerformanceStatistics/bonusPeriod');
+      },
+    },
   ];
 
   // --------------------------------------------------------------------

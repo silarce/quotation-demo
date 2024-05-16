@@ -183,16 +183,18 @@ export default function PersonalPerformanceStatistics() {
   const tagList: TtagList = [
     {
       label: '個人業績統計表',
-      // onClick: () => {
-      //   router.replace('/domestic/personalPerformanceStatistics');
-      // },
-      // isActive: route === '/domestic/personalPerformanceStatistics',
       isActive: true,
     },
     {
       label: '獎金統計表',
       onClick: () => {
         router.replace('/domestic/personalPerformanceStatistics/bonusStatisticsTable');
+      },
+    },
+    {
+      label: '獎金週期維護',
+      onClick: () => {
+        router.replace('/domestic/personalPerformanceStatistics/bonusPeriod');
       },
     },
   ];

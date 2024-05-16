@@ -1,0 +1,51 @@
+.selectBarWrapper {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 20px 0;
+  background-color: #fff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 150px auto 100px;
+  width: 800px;
+}
+
+.thead {
+  @extend .grid;
+  position: sticky;
+  top: 79px;
+  z-index: 1;
+  background-color: theme("colors.bgc01");
+  .cell {
+    border: solid 1px theme("colors.border");
+    border-right-width: 0px;
+    &:nth-last-of-type(1) {
+      border-right-width: 1px;
+    }
+  }
+}
+
+.row {
+  @extend .grid;
+  border: solid 1px theme("colors.border");
+  border-top: 0;
+}
+.cell {
+  padding: 10px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.activeEdit.plus {
+  color: red;
+}
+
+.btnAdd {
+  width: 20px;
+  height: 20px;
+}
