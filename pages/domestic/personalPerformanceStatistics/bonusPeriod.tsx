@@ -253,6 +253,16 @@ const Row = ({
   const [disabled, setDisabled] = useState(true);
   const [state_period, setState_period] = useState<TstatePeriod>({ startDate: null, dueDate: null });
 
+  const now = moment();
+  const dueDate_m = moment(data_period.dueDate).endOf('day');
+  let periodStatus: '可結算' | '已結算' | '結算週期未結束' = '可結算';
+
+  if (data_period.status !== 'set') {
+    periodStatus = '已結算';
+  } else if (!now.isAfter(dueDate_m)) {
+    periodStatus = '結算週期未結束';
+  }
+
   // ---------------------------------------------------------------------
   const onConfirm = async () => {
     if (!isAllowEdit) {
@@ -283,14 +293,11 @@ const Row = ({
   };
 
   const onSettle = async () => {
-    if (data_period.status !== 'set') {
+    if (periodStatus === '已結算') {
       return myAlert.info({ title: '結算失敗', content: '對應的獎金統計表已結算' });
     }
 
-    const now = moment();
-    const dueDate_m = moment(data_period.dueDate).endOf('day');
-
-    if (!now.isAfter(dueDate_m)) {
+    if (periodStatus === '結算週期未結束') {
       return myAlert.info({ title: '結算失敗', content: '結算週期未結束' });
     }
 
@@ -365,7 +372,8 @@ const Row = ({
         )}
       </div>
       <div className={scss.cell}>
-        <MyButton_v2 onClick={onSettle}>結算獎金</MyButton_v2>
+        {periodStatus === '可結算' && <MyButton_v2 onClick={onSettle}>結算獎金</MyButton_v2>}
+        {periodStatus === '已結算' && <span>已結算</span>}
       </div>
     </div>
   );
