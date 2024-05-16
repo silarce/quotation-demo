@@ -4248,6 +4248,18 @@ export type TcreateSettlementCycleDto = {
   dueDate: string; // ISO
 };
 
+export type TupdateSettlementCycleDto = {
+  settleYear?: string | null; // 結算年份 ex:2021
+  settleMonth?: string | null; // 結算月份 ex: 2
+  startDate?: string; // ISO
+  dueDate?: string; // ISO
+  id: string | undefined; // 不提供時將此筆視為新增資料
+};
+
+export type TsettleBonusDto = {
+  settlementCycleId: string;
+};
+
 // =============================================================================
 // =============================================================================
 // =============================================================================

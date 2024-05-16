@@ -15,11 +15,23 @@ import type {
   TbonusDto,
   TsettlementCycleDto,
   TcreateSettlementCycleDto,
+  TsettleBonusDto,
+  TupdateSettlementCycleDto,
 } from './dtoTypes';
 
-export type { Tparams, TpageMetaDto, TbonusDto, TsettlementCycleDto, TcreateSettlementCycleDto };
+export type {
+  Tparams,
+  TpageMetaDto,
+  TbonusDto,
+  TsettlementCycleDto,
+  TcreateSettlementCycleDto,
+  TsettleBonusDto,
+  TupdateSettlementCycleDto,
+};
 
 // ==================================================================
+// region 獎金統計表
+
 const apiGetReportFormBonus = async (params?: Tparams) => {
   const api = '/report-form/bonus';
 
@@ -61,6 +73,26 @@ const useGetReportFormBonus = (params?: Tparams) => {
     update,
   };
 };
+
+// 結算獎金
+// /report-form/settle
+const apiPostReportFormBonus = async (body: TsettleBonusDto) => {
+  const api = '/report-form/settle';
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      myAlert.err({ title: '結算獎金失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// =========================================================================
+// region 獎金週期
 
 const apiGetReportForm_settlementCycle = async (params?: Tparams) => {
   const api = '/report-form/settlement-cycle';
@@ -129,8 +161,8 @@ const apiPostReportForm_settlementCycle = async (body: TcreateSettlementCycleDto
     });
 };
 
-const apiPatchReportForm_settlementCycle = async (id: string, body: TcreateSettlementCycleDto) => {
-  const api = `/report-form/settlement-cycle/${id}`;
+const apiPatchReportForm_settlementCycle = async (body: TupdateSettlementCycleDto) => {
+  const api = `/report-form/settlement-cycle`;
 
   return axi
     .patch(api, body)
@@ -147,7 +179,7 @@ const apiDeleteReportForm_settlementCycle = async (id: string) => {
   const api = `/report-form/settlement-cycle/${id}`;
 
   return axi
-    .patch(api)
+    .delete(api)
     .then(({ data }) => data)
     .catch((error) => {
       const err = error as AxiosError;
@@ -160,6 +192,8 @@ const apiDeleteReportForm_settlementCycle = async (id: string) => {
 // ==================================================================
 export {
   useGetReportFormBonus,
+  apiPostReportFormBonus,
+  //
   useGetReportForm_settlementCycle,
   apiPostReportForm_settlementCycle,
   apiPatchReportForm_settlementCycle,

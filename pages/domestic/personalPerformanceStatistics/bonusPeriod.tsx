@@ -5,20 +5,19 @@ import moment, { Moment } from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TpanelList, TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // antd
-// import { Popover } from 'antd';
 import { Popover } from 'antd';
 
 // gaer
-import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar/selectBar';
-import myAlert, { TbtnPropsArr } from 'components/global/gear/modal/simpleModal/alertModals';
+import SelectBar from 'components/global/gear/select/selectBar/selectBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // option
-import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
+import { optionsCreator_year } from 'js/utils/options/options';
 
 // icon
 import { IconEdit, IconCheck02, IconAddCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
@@ -31,10 +30,13 @@ import {
   Tparams,
   TsettlementCycleDto,
   TcreateSettlementCycleDto,
+  TsettleBonusDto,
+  TupdateSettlementCycleDto,
   useGetReportForm_settlementCycle,
   apiPostReportForm_settlementCycle,
   apiPatchReportForm_settlementCycle,
   apiDeleteReportForm_settlementCycle,
+  apiPostReportFormBonus,
 } from 'js/api/api_reportForm';
 
 // ========================================================================
@@ -62,7 +64,8 @@ export default function BonusPeriod() {
   const year = Number(twYear) + 1911;
   const thisYear = moment().year();
 
-  const isAllowPost = year === thisYear;
+  let isNewestPeriod1231 = false;
+  let isAllowPost = false;
 
   // ------------------------------------------------------------------------
 
@@ -74,12 +77,18 @@ export default function BonusPeriod() {
       filter: {
         startDate: {
           $gte: moment().year(year).startOf('year').toISOString(),
+          $lte: moment().year(year).endOf('year').toISOString(),
         },
       },
     };
   }, [year]);
 
   const { data: periodArr, update: update_cycle } = useGetReportForm_settlementCycle(params);
+
+  const newestPeriodDueDate_m = periodArr?.[0]?.dueDate ? moment(periodArr[0].dueDate) : null;
+
+  isNewestPeriod1231 = newestPeriodDueDate_m?.month() === 11 && newestPeriodDueDate_m?.date() === 31;
+  isAllowPost = year === thisYear && !isNewestPeriod1231;
 
   // ------------------------------------------------------------------------
   // region request
@@ -89,24 +98,40 @@ export default function BonusPeriod() {
       return myAlert.info({ title: '請先將年分設為今年' });
     }
 
-    let nextStartDate = periodArr?.[0] && moment(periodArr[0].dueDate).add(1, 'day').toISOString();
+    if (isNewestPeriod1231) {
+      return myAlert.info({ title: '最新週期已是12/31，本年不可以再新增週期' });
+    }
+
+    const latesPeriod = periodArr?.[0];
+    const nextStartDate_m = latesPeriod?.dueDate ? moment(latesPeriod.dueDate).add(1, 'day') : null;
+
+    let nextStartDate = nextStartDate_m && nextStartDate_m.toISOString();
     !nextStartDate && (nextStartDate = moment().startOf('year').toISOString());
-    const dueDate = moment(nextStartDate).endOf('month').toISOString();
+
+    const newDueDate = moment(nextStartDate).endOf('month').toISOString();
 
     const body: TcreateSettlementCycleDto = {
       startDate: nextStartDate,
-      dueDate,
+      dueDate: newDueDate,
     };
 
     await apiPostReportForm_settlementCycle(body).then(update_cycle);
   };
 
-  const reqPatchSettlementCycle = async (id: string, body: TcreateSettlementCycleDto) => {
-    await apiPatchReportForm_settlementCycle(id, body).then(update_cycle);
+  const reqPatchSettlementCycle = async (body: TupdateSettlementCycleDto) => {
+    await apiPatchReportForm_settlementCycle(body).then(update_cycle);
   };
 
   const reqDeleteSettlementCycle = async (id: string) => {
     await apiDeleteReportForm_settlementCycle(id).then(update_cycle);
+  };
+
+  // 結算獎金
+  const reqPostReportFormBonus = async (body: TsettleBonusDto) => {
+    await apiPostReportFormBonus(body).then(() => {
+      myAlert.success({ title: '獎金統計表已產生' });
+      update_cycle();
+    });
   };
 
   // ------------------------------------------------------------------------
@@ -173,6 +198,7 @@ export default function BonusPeriod() {
               reqPatchSettlementCycle={reqPatchSettlementCycle}
               reqDeleteSettlementCycle={reqDeleteSettlementCycle}
               year={year}
+              reqPostReportFormBonus={reqPostReportFormBonus}
             />
           ))}
         </div>
@@ -193,16 +219,16 @@ const Thead = ({
 }) => {
   return (
     <div className={classNames(scss.thead)}>
-      {/* <div className={scss.cell}>週期編號</div> */}
       <div className={scss.cell}>週期</div>
       <div className={scss.cell}>
-        <Popover content={!isAllowPost ? '請先將年份設為今年' : undefined}>
+        <Popover content={!isAllowPost ? '請先將年份設為今年或確認週期是否已至12-31' : undefined}>
           <IconAddCircle
             className={classNames(scss.btnAdd, !isAllowPost && scss.disabled)}
             onClick={isAllowPost ? reqPostSettlementCycle : undefined}
           />
         </Popover>
       </div>
+      <div className={scss.cell}></div>
     </div>
   );
 };
@@ -212,12 +238,14 @@ const Row = ({
   isAllowEdit,
   reqPatchSettlementCycle,
   reqDeleteSettlementCycle,
+  reqPostReportFormBonus,
   year,
 }: {
   data_period: TsettlementCycleDto;
   isAllowEdit: boolean;
-  reqPatchSettlementCycle: (id: string, body: TcreateSettlementCycleDto) => Promise<void>;
+  reqPatchSettlementCycle: (body: TupdateSettlementCycleDto) => Promise<void>;
   reqDeleteSettlementCycle: (id: string) => Promise<void>;
+  reqPostReportFormBonus: (body: TsettleBonusDto) => Promise<void>;
   year: number;
 }) => {
   //
@@ -240,9 +268,10 @@ const Row = ({
     const body = {
       startDate: startDate.toISOString(),
       dueDate: dueDate.toISOString(),
+      id: data_period.id,
     };
 
-    await reqPatchSettlementCycle(data_period.id, body).then(() => setDisabled(false));
+    await reqPatchSettlementCycle(body).then(() => setDisabled(true));
   };
 
   const onDelete = async () => {
@@ -251,6 +280,25 @@ const Row = ({
     }
 
     await reqDeleteSettlementCycle(data_period.id);
+  };
+
+  const onSettle = async () => {
+    if (data_period.status !== 'set') {
+      return myAlert.info({ title: '結算失敗', content: '對應的獎金統計表已結算' });
+    }
+
+    const now = moment();
+    const dueDate_m = moment(data_period.dueDate).endOf('day');
+
+    if (!now.isAfter(dueDate_m)) {
+      return myAlert.info({ title: '結算失敗', content: '結算週期未結束' });
+    }
+
+    const body: TsettleBonusDto = {
+      settlementCycleId: data_period.id,
+    };
+
+    await reqPostReportFormBonus(body);
   };
 
   // ---------------------------------------------------------------------
@@ -266,26 +314,14 @@ const Row = ({
 
   return (
     <div className={scss.row}>
-      {/* <div className={scss.cell}>{data_period?.periodNumber}</div> */}
       <div className={scss.cell}>
         <InputSel
-          disabled={disabled}
+          disabled={true}
           showBaseline="auto"
           wrapperStyle={{ width: 110 }}
           datePickerProps={{
             props: {
               value: state_period.startDate,
-              onChange(value) {
-                setState_period((prev) => {
-                  return {
-                    ...prev,
-                    startDate: value,
-                  };
-                });
-              },
-              disabledDate(date) {
-                return date.year() !== year;
-              },
             },
           }}
         />
@@ -306,7 +342,7 @@ const Row = ({
                 });
               },
               disabledDate(date) {
-                return date.year() !== year;
+                return date.year() !== year || date.isBefore(state_period.startDate);
               },
             },
           }}
@@ -327,6 +363,9 @@ const Row = ({
             <IconCheck02 onClick={onConfirm} />
           </>
         )}
+      </div>
+      <div className={scss.cell}>
+        <MyButton_v2 onClick={onSettle}>結算獎金</MyButton_v2>
       </div>
     </div>
   );
