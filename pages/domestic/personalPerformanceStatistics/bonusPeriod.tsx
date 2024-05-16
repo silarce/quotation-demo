@@ -172,6 +172,7 @@ export default function BonusPeriod() {
               isAllowEdit={index === 0 && data.status === 'set'}
               reqPatchSettlementCycle={reqPatchSettlementCycle}
               reqDeleteSettlementCycle={reqDeleteSettlementCycle}
+              year={year}
             />
           ))}
         </div>
@@ -211,11 +212,13 @@ const Row = ({
   isAllowEdit,
   reqPatchSettlementCycle,
   reqDeleteSettlementCycle,
+  year,
 }: {
   data_period: TsettlementCycleDto;
   isAllowEdit: boolean;
   reqPatchSettlementCycle: (id: string, body: TcreateSettlementCycleDto) => Promise<void>;
   reqDeleteSettlementCycle: (id: string) => Promise<void>;
+  year: number;
 }) => {
   //
 
@@ -280,6 +283,9 @@ const Row = ({
                   };
                 });
               },
+              disabledDate(date) {
+                return date.year() !== year;
+              },
             },
           }}
         />
@@ -298,6 +304,9 @@ const Row = ({
                     dueDate: value,
                   };
                 });
+              },
+              disabledDate(date) {
+                return date.year() !== year;
               },
             },
           }}
