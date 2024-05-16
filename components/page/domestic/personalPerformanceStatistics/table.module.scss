@@ -1,9 +1,9 @@
 .table {
-  position: relative;
-  height: calc(100% - 6px);
-  overflow: auto;
+  // position: relative;
+  // height: calc(100% - 6px);
+  // overflow: auto;
   padding: 0 3px;
-  margin: 3px 0;
+  // margin: 3px 0;
   width: fit-content;
 }
 
@@ -33,11 +33,13 @@
 }
 
 .thead {
-  border-bottom: solid 1px theme("colors.sub");
   position: sticky;
-  top: 0px;
-  z-index: 2;
   height: 70px;
+  top: 79px;
+  z-index: 2;
+  border-top: solid 1px theme("colors.border");
+  border-bottom: solid 1px theme("colors.sub");
+
   background-color: theme("colors.bgc01");
   .group02 {
     padding: 0;
@@ -67,6 +69,9 @@
 .tbody {
   .row {
     border-bottom: solid 1px theme("colors.border");
+    &:nth-last-of-type(1) {
+      border-bottom: 0;
+    }
 
     span {
       color: theme("colors.main");

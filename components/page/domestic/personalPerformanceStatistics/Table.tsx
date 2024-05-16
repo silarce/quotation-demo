@@ -76,7 +76,7 @@ const Thead = ({ listKeyArr }: { listKeyArr: string[] }) => {
         return (
           <div key={index} className={classNames(scss.group02)} style={config.group02.style}>
             <div>
-              <span>{'捲門'}</span>
+              <span>{key}</span>
             </div>
 
             <div>
