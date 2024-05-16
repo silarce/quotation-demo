@@ -12,6 +12,10 @@ import style from './alertModals.module.scss';
 
 // ==================================================
 
+type TbtnPropsArr = TmyBtn[];
+
+// ==================================================
+
 const modalProps = {
   className: style.alert,
   okText: '確認',
@@ -184,7 +188,7 @@ export const ModalBtnBar = ({
   content?: React.ReactNode;
   props?: ModalFuncProps;
   className?: string;
-  btnPropsArr?: TmyBtn[];
+  btnPropsArr?: TbtnPropsArr;
   width?: React.CSSProperties['width'];
 }) => {
   // const { className: className01 } = modalProps;
@@ -218,7 +222,7 @@ export const ModalBtnBar = ({
 
 // ====================================================
 
-const BtnBar = ({ btnPropsArr }: { btnPropsArr: TmyBtn[] }) => {
+const BtnBar = ({ btnPropsArr }: { btnPropsArr: TbtnPropsArr }) => {
   return (
     <div className={style.btnBar}>
       {btnPropsArr.map((props, index) => {
@@ -242,6 +246,8 @@ const myAlert = {
 };
 
 export default myAlert;
+
+export type { TbtnPropsArr };
 
 // ====================================================
 // ====================================================

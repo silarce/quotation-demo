@@ -4179,6 +4179,88 @@ export type TcreateCertificatedDocSnapShotDto = {
 };
 
 // =============================================================================
+
+// region report-form
+
+// 獎金統計表
+export type TbonusDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 獎金年份
+  bonusYear: string;
+  // 獎金月份
+  bonusMonth: string;
+  // 業績總額
+  totalSales: number;
+  // 獎金總額
+  totalBonus: number;
+  // 備註
+  note: string | null;
+  // 業務id
+  salesEmployeeId: string | null;
+  // 業務
+  salesEmployee: TemployeeDto;
+  // 課長Id
+  reviewTeamLeaderEmployeeId: string | null;
+  // 審核課長
+  reviewTeamLeaderEmployee: TemployeeDto;
+  // 送審給課長審核時間
+  toReviewTeamLeader: string | null;
+  // 課長審核時間
+  teamLeaderReviewAt: string | null;
+  // 審核主管Id
+  reviewSupervisorEmployeeId: string | null;
+  // 審核主管
+  reviewSupervisorEmployee: TemployeeDto;
+  // 送審給主管審核時間
+  toReviewSupervisor: string | null;
+  // 主管審核時間
+  supervisorReviewAt: string | null;
+  // 審核總經理Id
+  reviewManagerEmployeeId: string | null;
+  // 審核總經理
+  reviewManagerEmployee: TemployeeDto;
+  // 送審給總經理審核時間
+  toReviewManager: string | null;
+  // 總經理審核時間
+  managerReviewAt: string | null;
+};
+
+// 結算週期
+export type TsettlementCycleDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  settleYear: string | null; // 結算年份 ex:2021
+  settleMonth: string | null; // 結算月份 ex: 2
+  startDate: string; // ISO
+  dueDate: string; // ISO
+  status: 'set' | 'lock';
+};
+
+export type TcreateSettlementCycleDto = {
+  settleYear?: string | null; // 結算年份 ex:2021
+  settleMonth?: string | null; // 結算月份 ex: 2
+  startDate: string; // ISO
+  dueDate: string; // ISO
+};
+
+export type TupdateSettlementCycleDto = {
+  settleYear?: string | null; // 結算年份 ex:2021
+  settleMonth?: string | null; // 結算月份 ex: 2
+  startDate?: string; // ISO
+  dueDate?: string; // ISO
+  id: string | undefined; // 不提供時將此筆視為新增資料
+};
+
+export type TsettleBonusDto = {
+  settlementCycleId: string;
+};
+
+// =============================================================================
 // =============================================================================
 // =============================================================================
 // =============================================================================
