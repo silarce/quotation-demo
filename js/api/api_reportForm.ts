@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
-import _, { sortBy } from 'lodash';
+// import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi, domain } from './_axiosCreator';
@@ -8,9 +8,16 @@ import { createUseInfinite } from './createUseInfinite';
 import { AxiosError } from 'axios';
 
 // type
-import type { Tparams, TpageMetaDto, TpageResponse, TbonusDto } from './dtoTypes';
+import type {
+  Tparams,
+  TpageMetaDto,
+  TpageResponse,
+  TbonusDto,
+  TsettlementCycleDto,
+  TcreateSettlementCycleDto,
+} from './dtoTypes';
 
-export type { Tparams, TpageMetaDto, TbonusDto };
+export type { Tparams, TpageMetaDto, TbonusDto, TsettlementCycleDto, TcreateSettlementCycleDto };
 
 // ==================================================================
 const apiGetReportFormBonus = async (params?: Tparams) => {
@@ -21,7 +28,6 @@ const apiGetReportFormBonus = async (params?: Tparams) => {
     .then(({ data }) => data)
     .catch((error) => {
       const err = error as AxiosError;
-      myAlert.err({ title: '取得獎金統計表失敗', content: err.message });
 
       // return err;
       return Promise.reject(err);
@@ -40,6 +46,8 @@ const useGetReportFormBonus = (params?: Tparams) => {
       })
       .catch((error) => {
         setRes(undefined);
+        const err = error as AxiosError;
+        myAlert.err({ title: '取得獎金統計表失敗', content: err.message });
       })
       .finally(() => {
         setIsFetching(false);
@@ -54,5 +62,106 @@ const useGetReportFormBonus = (params?: Tparams) => {
   };
 };
 
+const apiGetReportForm_settlementCycle = async (params?: Tparams) => {
+  const api = '/report-form/settlement-cycle';
+
+  return axi
+    .get<TpageResponse<TsettlementCycleDto>>(api, { params })
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      return Promise.reject(err);
+    });
+};
+
+const useGetReportForm_settlementCycle = (
+  params?: Tparams,
+  {
+    autoUpdate = true,
+  }: {
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [res, setRes] = useState<TpageResponse<TsettlementCycleDto>>();
+  const [isFetching, setIsFetching] = useState(false);
+
+  const update = useCallback(() => {
+    setIsFetching(true);
+    apiGetReportForm_settlementCycle(params)
+      .then((res) => {
+        setRes(res);
+      })
+      .catch((error) => {
+        const err = error as AxiosError;
+        myAlert.err({ title: '取得獎金週期失敗', content: err.message });
+        setRes(undefined);
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  }, [params]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [autoUpdate, update]);
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    isFetching,
+    update,
+  };
+};
+
+const apiPostReportForm_settlementCycle = async (body: TcreateSettlementCycleDto) => {
+  const api = '/report-form/settlement-cycle';
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      myAlert.err({ title: '新增獎金週期失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+const apiPatchReportForm_settlementCycle = async (id: string, body: TcreateSettlementCycleDto) => {
+  const api = `/report-form/settlement-cycle/${id}`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '更新獎金週期失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+const apiDeleteReportForm_settlementCycle = async (id: string) => {
+  const api = `/report-form/settlement-cycle/${id}`;
+
+  return axi
+    .patch(api)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '刪除獎金週期失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
 // ==================================================================
-export { useGetReportFormBonus };
+export {
+  useGetReportFormBonus,
+  useGetReportForm_settlementCycle,
+  apiPostReportForm_settlementCycle,
+  apiPatchReportForm_settlementCycle,
+  apiDeleteReportForm_settlementCycle,
+};

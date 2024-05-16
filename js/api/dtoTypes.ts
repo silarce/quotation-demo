@@ -4228,6 +4228,26 @@ export type TbonusDto = {
   managerReviewAt: string | null;
 };
 
+// 結算週期
+export type TsettlementCycleDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  settleYear: string | null; // 結算年份 ex:2021
+  settleMonth: string | null; // 結算月份 ex: 2
+  startDate: string; // ISO
+  dueDate: string; // ISO
+  status: 'set' | 'lock';
+};
+
+export type TcreateSettlementCycleDto = {
+  settleYear?: string | null; // 結算年份 ex:2021
+  settleMonth?: string | null; // 結算月份 ex: 2
+  startDate: string; // ISO
+  dueDate: string; // ISO
+};
+
 // =============================================================================
 // =============================================================================
 // =============================================================================

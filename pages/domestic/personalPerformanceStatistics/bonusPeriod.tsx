@@ -7,6 +7,10 @@ import moment, { Moment } from 'moment';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList, TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
+// antd
+// import { Popover } from 'antd';
+import { Popover } from 'antd';
+
 // gaer
 import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar/selectBar';
 import myAlert, { TbtnPropsArr } from 'components/global/gear/modal/simpleModal/alertModals';
@@ -22,6 +26,17 @@ import { IconEdit, IconCheck02, IconAddCircle, IconDelete01 } from 'public/image
 // css
 import scss from './bonusPeriod.module.scss';
 
+// api
+import {
+  Tparams,
+  TsettlementCycleDto,
+  TcreateSettlementCycleDto,
+  useGetReportForm_settlementCycle,
+  apiPostReportForm_settlementCycle,
+  apiPatchReportForm_settlementCycle,
+  apiDeleteReportForm_settlementCycle,
+} from 'js/api/api_reportForm';
+
 // ========================================================================
 
 type Tquery = {
@@ -30,16 +45,9 @@ type Tquery = {
 
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
-type Tperiod = {
-  id: string;
-  startAt: string;
-  endAt: string;
-  periodNumber: string;
-};
-
 type TstatePeriod = {
-  startAt: Moment | null;
-  endAt: Moment | null;
+  startDate: Moment | null;
+  dueDate: Moment | null;
 };
 
 // ========================================================================
@@ -50,14 +58,63 @@ const yearOptionArr = optionsCreator_year();
 export default function BonusPeriod() {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { year = String(new Date().getFullYear() - 1911) } = query;
+  const { year: twYear = String(new Date().getFullYear() - 1911) } = query;
+  const year = Number(twYear) + 1911;
+  const thisYear = moment().year();
+
+  const isAllowPost = year === thisYear;
+
+  // ------------------------------------------------------------------------
+
+  const params: Tparams = useMemo(() => {
+    return {
+      pageSize: 99999,
+      sort: 'startDate',
+      order: 'DESC',
+      filter: {
+        startDate: {
+          $gte: moment().year(year).startOf('year').toISOString(),
+        },
+      },
+    };
+  }, [year]);
+
+  const { data: periodArr, update: update_cycle } = useGetReportForm_settlementCycle(params);
+
+  // ------------------------------------------------------------------------
+  // region request
+
+  const reqPostSettlementCycle = async () => {
+    if (!isAllowPost) {
+      return myAlert.info({ title: '請先將年分設為今年' });
+    }
+
+    let nextStartDate = periodArr?.[0] && moment(periodArr[0].dueDate).add(1, 'day').toISOString();
+    !nextStartDate && (nextStartDate = moment().startOf('year').toISOString());
+    const dueDate = moment(nextStartDate).endOf('month').toISOString();
+
+    const body: TcreateSettlementCycleDto = {
+      startDate: nextStartDate,
+      dueDate,
+    };
+
+    await apiPostReportForm_settlementCycle(body).then(update_cycle);
+  };
+
+  const reqPatchSettlementCycle = async (id: string, body: TcreateSettlementCycleDto) => {
+    await apiPatchReportForm_settlementCycle(id, body).then(update_cycle);
+  };
+
+  const reqDeleteSettlementCycle = async (id: string) => {
+    await apiDeleteReportForm_settlementCycle(id).then(update_cycle);
+  };
 
   // ------------------------------------------------------------------------
 
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
-        value: year,
+        value: twYear,
         options: yearOptionArr,
         onChange: (option) => {
           if (typeof option?.value === 'string') {
@@ -95,6 +152,8 @@ export default function BonusPeriod() {
     },
   ];
 
+  // ==========================================================================
+  // region render
   return (
     <SubLayer>
       <PageHeader02 tagList={tagList} />
@@ -104,10 +163,16 @@ export default function BonusPeriod() {
           <SelectBar selectPropsArr={selectPropsArr} />
         </div>
         <div className={classNames(scss.table)}>
-          <Thead />
+          <Thead reqPostSettlementCycle={reqPostSettlementCycle} isAllowPost={isAllowPost} />
 
-          {fakeDataArr.map((data, index) => (
-            <Row key={index} data_period={data} isNewest={index === 0} />
+          {periodArr?.map((data, index) => (
+            <Row
+              key={index}
+              data_period={data}
+              isAllowEdit={index === 0 && data.status === 'set'}
+              reqPatchSettlementCycle={reqPatchSettlementCycle}
+              reqDeleteSettlementCycle={reqDeleteSettlementCycle}
+            />
           ))}
         </div>
       </div>
@@ -118,42 +183,87 @@ export default function BonusPeriod() {
 // ========================================================================
 // region component
 
-const Thead = () => {
+const Thead = ({
+  isAllowPost,
+  reqPostSettlementCycle,
+}: {
+  isAllowPost: boolean;
+  reqPostSettlementCycle: () => void;
+}) => {
   return (
     <div className={classNames(scss.thead)}>
-      <div className={scss.cell}>週期編號</div>
+      {/* <div className={scss.cell}>週期編號</div> */}
       <div className={scss.cell}>週期</div>
       <div className={scss.cell}>
-        <IconAddCircle className={scss.btnAdd} />
+        <Popover content={!isAllowPost ? '請先將年份設為今年' : undefined}>
+          <IconAddCircle
+            className={classNames(scss.btnAdd, !isAllowPost && scss.disabled)}
+            onClick={isAllowPost ? reqPostSettlementCycle : undefined}
+          />
+        </Popover>
       </div>
     </div>
   );
 };
 
-const Row = ({ data_period, isNewest }: { data_period: Tperiod; isNewest?: boolean }) => {
+const Row = ({
+  data_period,
+  isAllowEdit,
+  reqPatchSettlementCycle,
+  reqDeleteSettlementCycle,
+}: {
+  data_period: TsettlementCycleDto;
+  isAllowEdit: boolean;
+  reqPatchSettlementCycle: (id: string, body: TcreateSettlementCycleDto) => Promise<void>;
+  reqDeleteSettlementCycle: (id: string) => Promise<void>;
+}) => {
   //
 
   const [disabled, setDisabled] = useState(true);
+  const [state_period, setState_period] = useState<TstatePeriod>({ startDate: null, dueDate: null });
 
-  const [period, setPeriod] = useState<Tperiod>();
-  const [state_period, setState_period] = useState<TstatePeriod>({ startAt: null, endAt: null });
+  // ---------------------------------------------------------------------
+  const onConfirm = async () => {
+    if (!isAllowEdit) {
+      return myAlert.info({ title: '不可編輯', content: '非最新週期或已產生獎金統計表' });
+    }
+
+    const { startDate, dueDate } = state_period;
+
+    if (!startDate || !dueDate) {
+      return myAlert.info({ title: '請選擇日期' });
+    }
+
+    const body = {
+      startDate: startDate.toISOString(),
+      dueDate: dueDate.toISOString(),
+    };
+
+    await reqPatchSettlementCycle(data_period.id, body).then(() => setDisabled(false));
+  };
+
+  const onDelete = async () => {
+    if (!isAllowEdit) {
+      return myAlert.info({ title: '不可刪除', content: '非最新週期或已產生獎金統計表' });
+    }
+
+    await reqDeleteSettlementCycle(data_period.id);
+  };
+
+  // ---------------------------------------------------------------------
 
   useEffect(() => {
-    setPeriod(data_period);
-  }, [data_period]);
-
-  useEffect(() => {
-    if (period) {
+    if (disabled) {
       setState_period({
-        startAt: period.startAt ? moment(period.startAt) : null,
-        endAt: period.endAt ? moment(period.endAt) : null,
+        startDate: data_period.startDate ? moment(data_period.startDate) : null,
+        dueDate: data_period.dueDate ? moment(data_period.dueDate) : null,
       });
     }
-  }, [period?.endAt, period?.startAt, setPeriod, disabled, period]);
+  }, [data_period, disabled]);
 
   return (
     <div className={scss.row}>
-      <div className={scss.cell}>{period?.periodNumber}</div>
+      {/* <div className={scss.cell}>{data_period?.periodNumber}</div> */}
       <div className={scss.cell}>
         <InputSel
           disabled={disabled}
@@ -161,12 +271,12 @@ const Row = ({ data_period, isNewest }: { data_period: Tperiod; isNewest?: boole
           wrapperStyle={{ width: 110 }}
           datePickerProps={{
             props: {
-              value: state_period.startAt,
+              value: state_period.startDate,
               onChange(value) {
                 setState_period((prev) => {
                   return {
                     ...prev,
-                    startAt: value,
+                    startDate: value,
                   };
                 });
               },
@@ -177,15 +287,15 @@ const Row = ({ data_period, isNewest }: { data_period: Tperiod; isNewest?: boole
         <InputSel
           disabled={disabled}
           showBaseline="auto"
-          wrapperStyle={{ width: 110 }}
+          wrapperStyle={{ width: 110, transform: 'translateX(30px)' }}
           datePickerProps={{
             props: {
-              value: state_period.endAt,
-              onChange(value, dateString) {
+              value: state_period.dueDate,
+              onChange(value) {
                 setState_period((prev) => {
                   return {
                     ...prev,
-                    endAt: value,
+                    dueDate: value,
                   };
                 });
               },
@@ -193,19 +303,19 @@ const Row = ({ data_period, isNewest }: { data_period: Tperiod; isNewest?: boole
           }}
         />
       </div>
-      <div className={classNames(scss.cell, !isNewest && 'invisible')}>
+      <div className={classNames(scss.cell, !isAllowEdit && 'invisible')}>
         <IconEdit
           className={classNames(!disabled && scss.activeEdit, scss.plus)}
           onClick={() => setDisabled((prev) => !prev)}
         />
         {disabled && (
           <>
-            <IconDelete01 />
+            <IconDelete01 onClick={onDelete} />
           </>
         )}
         {!disabled && (
           <>
-            <IconCheck02 />
+            <IconCheck02 onClick={onConfirm} />
           </>
         )}
       </div>
@@ -213,26 +323,3 @@ const Row = ({ data_period, isNewest }: { data_period: Tperiod; isNewest?: boole
   );
 };
 // ======================================================================
-
-// region fake data
-
-const fakeDataArr: Tperiod[] = [
-  {
-    id: '1',
-    startAt: '2021-01-01',
-    endAt: '2021-01-31',
-    periodNumber: '20210101',
-  },
-  {
-    id: '2',
-    startAt: '2021-05-05',
-    endAt: '2021-05-31',
-    periodNumber: '20210501',
-  },
-  {
-    id: '3',
-    startAt: '2022-02-02',
-    endAt: '2022-02-28',
-    periodNumber: '20220201',
-  },
-];
