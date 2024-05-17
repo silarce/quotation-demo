@@ -19,7 +19,7 @@ import style from '../contractList.module.scss';
 import { useGetContract, Tparams } from 'js/api/api_quotation';
 
 // type
-import { Toption } from 'js/utils/options/options';
+import { TnorthernCounty, TcentralCounty, TsouthernCounty, TeasternCounty, Tabroad } from 'js/api/dtoTypes';
 
 // option
 import { optionsCreator_county, districtOptionsSelector } from 'js/utils/options/countryAndDistrict';
@@ -146,7 +146,16 @@ export default function WdContractList() {
     dataArr.forEach((contract) => {
       const { content, accountReceivable, contractNumber } = contract;
 
-      const { customer, contactPerson, contactNumber, agentEmployee, quotationDate, county, projectName } = content;
+      const {
+        //
+        customer,
+        contactPerson,
+        contactNumber,
+        agentEmployee,
+        quotationDate,
+        county,
+        projectName,
+      } = content;
 
       const { hasNoContract, hasUncollectedAmounts } = accountReceivable ?? {};
 
@@ -164,15 +173,15 @@ export default function WdContractList() {
         remindLight: hasUncollectedAmounts,
       };
 
-      if (northernCountyArr.includes(county)) {
+      if (northernCountyArr.includes(county as TnorthernCounty)) {
         list.northernArr.push(obj);
-      } else if (centralCountyArr.includes(county)) {
+      } else if (centralCountyArr.includes(county as TcentralCounty)) {
         list.centralArr.push(obj);
-      } else if (southernCountyArr.includes(county)) {
+      } else if (southernCountyArr.includes(county as TsouthernCounty)) {
         list.southernArr.push(obj);
-      } else if (easternCountyArr.includes(county)) {
+      } else if (easternCountyArr.includes(county as TeasternCounty)) {
         list.easternArr.push(obj);
-      } else if (abroadArr.includes(county)) {
+      } else if (abroadArr.includes(county as Tabroad)) {
         list.abroadArr.push(obj);
       }
     });
@@ -299,8 +308,17 @@ export default function WdContractList() {
 }
 
 // 判斷依據是跟後端要的
-const northernCountyArr = ['臺北市', '新北市', '基隆市', '新竹市', '桃園市', '新竹縣', '宜蘭縣'];
-const centralCountyArr = ['臺中市', '苗栗縣', '彰化縣', '南投縣', '雲林縣'];
-const southernCountyArr = ['高雄市', '臺南市', '嘉義市', '嘉義縣', '屏東縣', '澎湖縣'];
-const easternCountyArr = ['花蓮縣', '臺東縣'];
-const abroadArr = ['海外'];
+const northernCountyArr: TnorthernCounty[] = [
+  '臺北市',
+  '新北市',
+  '基隆市',
+  '新竹市',
+  '桃園市',
+  '新竹縣',
+  '宜蘭縣',
+  '連江縣',
+];
+const centralCountyArr: TcentralCounty[] = ['臺中市', '苗栗縣', '彰化縣', '南投縣', '雲林縣', '金門縣'];
+const southernCountyArr: TsouthernCounty[] = ['高雄市', '臺南市', '嘉義市', '嘉義縣', '屏東縣', '澎湖縣'];
+const easternCountyArr: TeasternCounty[] = ['花蓮縣', '臺東縣'];
+const abroadArr: Tabroad[] = ['海外'];
