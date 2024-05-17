@@ -58,22 +58,21 @@ $rowPadding: $rowPaddingY 0px;
     position: relative;
     transition: 0.3s;
     width: $leftWidth;
-    // overflow: hidden;
     padding: 0 3px;
     box-sizing: border-box;
-    // font-weight: bold;
-
     &.notShow {
       width: 0;
       padding-left: 0;
       padding-right: 0;
       > * {
+        transition: 0.1s;
         opacity: 0;
       }
     }
     > div {
       flex: none;
       z-index: 0;
+      transition: 0.5s;
     }
 
     &::before {
