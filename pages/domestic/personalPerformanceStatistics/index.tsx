@@ -44,8 +44,9 @@ const monthOptionArr = optionsCreator_month({ emptyOption: true });
 // ==================================================================
 
 const empParams: Tparams = {
-  pageSize: 99999,
   populate: ['jobs.department'],
+  pageSize: 99999,
+  sort: 'idNumber',
   filter: {
     'jobs.department.name': { $eq: '業務部' },
   },
