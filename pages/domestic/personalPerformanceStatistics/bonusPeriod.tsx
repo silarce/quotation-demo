@@ -36,7 +36,7 @@ import {
   apiPostReportForm_settlementCycle,
   apiPatchReportForm_settlementCycle,
   apiDeleteReportForm_settlementCycle,
-  apiPostReportFormBonus,
+  apiPostReportForm_bonus,
 } from 'js/api/api_reportForm';
 
 // ========================================================================
@@ -103,7 +103,8 @@ export default function BonusPeriod() {
     }
 
     const latesPeriod = periodArr?.[0];
-    const nextStartDate_m = latesPeriod?.dueDate ? moment(latesPeriod.dueDate).add(1, 'day') : null;
+    // const nextStartDate_m = latesPeriod?.dueDate ? moment(latesPeriod.dueDate).add(1, 'day') : null;
+    const nextStartDate_m = latesPeriod?.dueDate ? moment(latesPeriod.dueDate).add(1, 'day').startOf('day') : null;
 
     let nextStartDate = nextStartDate_m && nextStartDate_m.toISOString();
     !nextStartDate && (nextStartDate = moment().startOf('year').toISOString());
@@ -128,7 +129,7 @@ export default function BonusPeriod() {
 
   // 結算獎金
   const reqPostReportFormBonus = async (body: TsettleBonusDto) => {
-    await apiPostReportFormBonus(body).then(() => {
+    await apiPostReportForm_bonus(body).then(() => {
       myAlert.success({ title: '獎金統計表已產生' });
       update_cycle();
     });

@@ -32,7 +32,7 @@ export type {
 // ==================================================================
 // region 獎金統計表
 
-const apiGetReportFormBonus = async (params?: Tparams) => {
+const apiGetReportForm_bonus = async (params?: Tparams) => {
   const api = '/report-form/bonus';
 
   return axi
@@ -46,13 +46,16 @@ const apiGetReportFormBonus = async (params?: Tparams) => {
     });
 };
 
-const useGetReportFormBonus = (params?: Tparams) => {
+const useGetReportForm_bonus = (
+  params: Tparams | undefined,
+  { isAutoUpdate = true }: { isAutoUpdate?: boolean } = {}
+) => {
   const [res, setRes] = useState<TpageResponse<TbonusDto>>();
   const [isFetching, setIsFetching] = useState(false);
 
   const update = useCallback(() => {
     setIsFetching(true);
-    apiGetReportFormBonus(params)
+    apiGetReportForm_bonus(params)
       .then((res) => {
         setRes(res);
       })
@@ -66,6 +69,10 @@ const useGetReportFormBonus = (params?: Tparams) => {
       });
   }, [params]);
 
+  useEffect(() => {
+    isAutoUpdate && update();
+  }, [isAutoUpdate, update]);
+
   return {
     data: res?.data,
     meta: res?.meta,
@@ -75,8 +82,7 @@ const useGetReportFormBonus = (params?: Tparams) => {
 };
 
 // 結算獎金
-// /report-form/settle
-const apiPostReportFormBonus = async (body: TsettleBonusDto) => {
+const apiPostReportForm_bonus = async (body: TsettleBonusDto) => {
   const api = '/report-form/settle';
 
   return axi
@@ -86,6 +92,38 @@ const apiPostReportFormBonus = async (body: TsettleBonusDto) => {
       const err = error as AxiosError;
 
       myAlert.err({ title: '結算獎金失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 獎金送審
+const apiPatchReportForm_bonus_submit = async (id: string) => {
+  const api = `/report-form/bonus/${id}/submit`;
+
+  return axi
+    .patch(api)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      myAlert.err({ title: '送審獎金失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 獎金審核
+const apiPatchReportForm_bonus_review = async (id: string, body: { isPass: boolean }) => {
+  const api = `/report-form/bonus/${id}/review`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      myAlert.err({ title: '審核獎金失敗', content: err.message });
 
       return Promise.reject(err);
     });
@@ -191,8 +229,10 @@ const apiDeleteReportForm_settlementCycle = async (id: string) => {
 
 // ==================================================================
 export {
-  useGetReportFormBonus,
-  apiPostReportFormBonus,
+  useGetReportForm_bonus,
+  apiPostReportForm_bonus,
+  apiPatchReportForm_bonus_submit,
+  apiPatchReportForm_bonus_review,
   //
   useGetReportForm_settlementCycle,
   apiPostReportForm_settlementCycle,
