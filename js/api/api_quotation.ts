@@ -897,7 +897,7 @@ export const apiQuotationReview = ({ id, body }: { id: string; body: TreviewQuot
   const api = `/quotation/${id}/review`;
 
   return axi
-    .patch<undefined>(api, body)
+    .patch<TquotationContentDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
