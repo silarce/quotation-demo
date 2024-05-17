@@ -1,15 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import Decimal from 'decimal.js';
+
 import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TpanelList, TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // gaer
-import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar/selectBar';
-import myAlert, { TbtnPropsArr } from 'components/global/gear/modal/simpleModal/alertModals';
+import SelectBar from 'components/global/gear/select/selectBar/selectBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import ProcessChain, { Tcontrol_processChain } from 'components/global/gear/processChain';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
@@ -19,8 +19,6 @@ import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/opti
 // css
 import scss from './bonusStatisticsTable.module.scss';
 
-// import { TbonusDto, useGetQuotationAccounting_bonus } from 'js/api/api_quotation';
-import { TemployeeDto } from 'js/api/dtoTypes';
 import {
   TbonusDto,
   useGetReportForm_bonus,
@@ -61,6 +59,8 @@ export default function BonusStatisticsTable() {
 
   const params = useMemo(() => {
     return {
+      populate: ['salesEmployee', 'reviewTeamLeaderEmployee', 'reviewSupervisorEmployee', 'reviewManagerEmployee'],
+
       pageSize: 99999,
       filter: {
         bonusYear: { $eq: String(year) },
@@ -158,9 +158,7 @@ export default function BonusStatisticsTable() {
           <Thead />
           <div className={classNames(scss.tbody)}>
             {data_bonus?.map((bonus, index) => {
-              return (
-                <Row key={bonus.id || index} data_bonus={fakeData_bonus} reqSubmit={reqSubmit} reqReview={reqReview} />
-              );
+              return <Row key={bonus.id || index} data_bonus={bonus} reqSubmit={reqSubmit} reqReview={reqReview} />;
             })}
           </div>
         </div>
@@ -209,7 +207,7 @@ const Row = ({
       <div className={scss.cell}>{totalSales.toLocaleString()}</div>
       <div className={scss.cell}>{totalBonus.toLocaleString()}</div>
       <div className={scss.cell}>{note}</div>
-      {/*  */}
+
       <div className={classNames(scss.cell, scss.cell_processChain, 'col-span-4')}>
         <ProcessChain className={scss.processChain} control={{ statusArr }} />
 
@@ -258,15 +256,14 @@ const Row = ({
             審核
           </MyButton_v2>
         )}
-
-        {/* cell_processChain close*/}
       </div>
-      {/*  */}
     </div>
   );
 };
 
 // ====================================================================
+
+// region function
 
 const checkReview = (to: string | null, at: string | null) => {
   if (at) {
@@ -280,36 +277,20 @@ const checkReview = (to: string | null, at: string | null) => {
 
 const createStatusArr = (data_bonus: TbonusDto): Tcontrol_processChain['statusArr'] => {
   const {
-    // bonusYear,
-    // bonusMonth,
-    totalSales,
-    totalBonus,
-    note,
-
-    // salesEmployeeId,
-    salesEmployee,
-
-    // reviewTeamLeaderEmployeeId,
     reviewTeamLeaderEmployee,
     toReviewTeamLeader,
     teamLeaderReviewAt,
 
-    // reviewSupervisorEmployeeId,
     reviewSupervisorEmployee,
     toReviewSupervisor,
     supervisorReviewAt,
 
-    // reviewManagerEmployeeId,
     reviewManagerEmployee,
     toReviewManager,
     managerReviewAt,
   } = data_bonus;
 
   const statusArr: Tcontrol_processChain['statusArr'] = [
-    // {
-    //   label: `業務 ${salesEmployee?.chName ?? ''}`,
-    //   dotColor: 'green',
-    // },
     {
       label: `課長 ${reviewTeamLeaderEmployee?.chName ?? ''}`,
       dotColor: checkReview(toReviewTeamLeader, teamLeaderReviewAt),
@@ -332,77 +313,3 @@ const checkIsSumbit = (data_bonus: TbonusDto) => {
 
   return !!(toReviewTeamLeader || toReviewSupervisor || toReviewManager);
 };
-
-// ====================================================================
-
-// ███████  █████  ██   ██ ███████     ██████   █████  ████████  █████
-// ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
-// █████   ███████ █████   █████       ██   ██ ███████    ██    ███████
-// ██      ██   ██ ██  ██  ██          ██   ██ ██   ██    ██    ██   ██
-// ██      ██   ██ ██   ██ ███████     ██████  ██   ██    ██    ██   ██
-
-const fakeData_bonus: TbonusDto = {
-  id: '',
-  createdAt: '2011-01-01',
-  updatedAt: '2011-01-01',
-
-  // 獎金年份
-  bonusYear: '1911',
-  // 獎金月份
-  bonusMonth: '2',
-  // 業績總額
-  totalSales: 99999,
-  // 獎金總額
-  totalBonus: 99999,
-  // 備註
-  note: '喵喵喵喵喵 喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵',
-  // 業務id
-  salesEmployeeId: null,
-  // 業務
-  salesEmployee: { id: 'dsfasfasdf', chName: 'aaaaa' } as TemployeeDto,
-  // 課長Id
-  reviewTeamLeaderEmployeeId: 'dfsdfsdfsdf',
-  // 審核課長
-  reviewTeamLeaderEmployee: { id: 'dsfasfasdf', chName: 'bbbbb' } as TemployeeDto,
-  // 送審給課長審核時間
-  toReviewTeamLeader: '2011-01-01',
-  // 課長審核時間
-  teamLeaderReviewAt: '2011-01-01',
-  // 審核主管Id
-  reviewSupervisorEmployeeId: 'fsdfsdfsdf',
-  // 審核主管
-  reviewSupervisorEmployee: { id: 'dsfasfasdf', chName: 'cccccc' } as TemployeeDto,
-  // 送審給主管審核時間
-  toReviewSupervisor: '2011-01-01',
-  // 主管審核時間
-  supervisorReviewAt: null,
-  // 審核總經理Id
-  reviewManagerEmployeeId: 'fdsdsfasdsfsdfsdfsdf',
-  // 審核總經理
-  reviewManagerEmployee: { id: 'dsfasfasdf', chName: 'ddddd' } as TemployeeDto,
-  // 送審給總經理審核時間
-  toReviewManager: null,
-  // 總經理審核時間
-  managerReviewAt: null,
-};
-
-const fakeDataArr_bonus = [
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-  fakeData_bonus,
-];
