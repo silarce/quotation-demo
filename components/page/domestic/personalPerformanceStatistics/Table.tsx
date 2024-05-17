@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 
 // gear
-import CellWithBar from 'components/global/gear/cell/cellWithBar';
+// import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 import scss from './table.module.scss';
 
@@ -45,6 +45,7 @@ export type { Tcontrol as Tcontrol_personalPerformanceStatistics, Tcontrol_row, 
 
 // ==================================================================
 
+// region main
 export default function Table({ control }: { control: Tcontrol }) {
   const { rowArr, subTotalList, total, listKeyArr } = control;
 
@@ -59,10 +60,12 @@ export default function Table({ control }: { control: Tcontrol }) {
 
 // =======================================================================
 
+// region component
+
 const Thead = ({ listKeyArr }: { listKeyArr: string[] }) => {
   return (
     <div className={classNames(scss.row, scss.thead)}>
-      <div style={config.group01.style}>
+      <div className={scss.group01} style={config.group01.style}>
         <span>工程資訊</span>
       </div>
       <div style={config.builder.style}>
@@ -106,7 +109,7 @@ const Tbody = ({ rowArr, listKeyArr }: { rowArr: Tcontrol_row[]; listKeyArr: str
         const { quotationNumber, projectName, builder, designer, list, total } = row;
 
         return (
-          <CellWithBar key={index} className={classNames(scss.row)}>
+          <div key={index} className={classNames(scss.row)}>
             <div className={scss.group01} style={config.group01.style}>
               <div style={config.quotationNumber.style}>
                 <span>編號</span>
@@ -146,7 +149,7 @@ const Tbody = ({ rowArr, listKeyArr }: { rowArr: Tcontrol_row[]; listKeyArr: str
             <div style={config.total.style}>
               <span>{total}</span>
             </div>
-          </CellWithBar>
+          </div>
         );
       })}
     </div>
@@ -224,12 +227,23 @@ const Footer = ({
 
 // =======================================================================
 
+// region config
+
+type Tconfig = {
+  [key: string]: {
+    style: React.CSSProperties;
+  };
+};
+
 const config = {
   quotationNumber: {
     style: { width: '110px' },
   },
+
   group01: {
-    style: { width: '465px' },
+    style: {
+      width: '465px',
+    },
   },
   builder: {
     style: { width: '147px' },
@@ -237,6 +251,7 @@ const config = {
   designer: {
     style: { width: '147px' },
   },
+
   total: {
     style: { width: '147px' },
   },
