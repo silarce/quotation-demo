@@ -1,4 +1,6 @@
 $gap: 14px;
+// $leftWidth: 928px;
+$leftWidth: 595px;
 
 .tableContainer {
   border: solid 1px theme("colors.border");
@@ -38,13 +40,13 @@ $gap: 14px;
 
   > .left {
     transition: 0.3s;
-    // background-color: pink;
-    // width: 928px;
-    width: 595px;
+    width: $leftWidth;
     overflow: hidden;
-    // display: none;
     &.notShow {
       width: 0;
+    }
+    > div {
+      flex: none;
     }
   }
 
