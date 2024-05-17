@@ -103,7 +103,8 @@ export default function BonusPeriod() {
     }
 
     const latesPeriod = periodArr?.[0];
-    const nextStartDate_m = latesPeriod?.dueDate ? moment(latesPeriod.dueDate).add(1, 'day') : null;
+    // const nextStartDate_m = latesPeriod?.dueDate ? moment(latesPeriod.dueDate).add(1, 'day') : null;
+    const nextStartDate_m = latesPeriod?.dueDate ? moment(latesPeriod.dueDate).add(1, 'day').startOf('day') : null;
 
     let nextStartDate = nextStartDate_m && nextStartDate_m.toISOString();
     !nextStartDate && (nextStartDate = moment().startOf('year').toISOString());
