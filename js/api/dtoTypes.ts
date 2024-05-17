@@ -2283,12 +2283,15 @@ export type TquotationAccounting_personal_content = {
 };
 
 // 個人業績統計表_合約
-export type TquotationAccounting_personal_contract = {
-  projectname: string;
-  quotationnumber: string;
-  quotetype: string;
-  totalsum: `${number}`;
-  pricesum: `${number}`;
+export type TcontractAccountingReportFormDto = {
+  projectNumber: string;
+  projectName: string;
+  contractor: string | null; //營造(承包商)
+  designUnit: string | null; // 設計單位
+  quoteType: string | null;
+
+  totalSum: number;
+  priceSum: number;
   percentage: number;
 };
 

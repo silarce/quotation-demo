@@ -4,18 +4,17 @@ import Decimal from 'decimal.js';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TpanelList, TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import Table, {
   Tcontrol_personalPerformanceStatistics,
   Tcontrol_row,
   Tcontrol_subTotalList,
-  Tcontrol_total,
 } from 'components/page/domestic/personalPerformanceStatistics/Table';
 
 // gaer
-import SelectBar, { TselectProps } from 'components/global/gear/select/selectBar/selectBar';
+import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // option
@@ -45,8 +44,9 @@ const monthOptionArr = optionsCreator_month({ emptyOption: true });
 // ==================================================================
 
 const empParams: Tparams = {
-  pageSize: 99999,
   populate: ['jobs.department'],
+  pageSize: 99999,
+  sort: 'idNumber',
   filter: {
     'jobs.department.name': { $eq: '業務部' },
   },
@@ -96,6 +96,7 @@ export default function PersonalPerformanceStatistics() {
   // ------------------------------------------------------------------
 
   const { data: data_emp, update: update_emp } = useEmployee(empParams);
+  const haveData = data && data.length > 0;
 
   useEffect(() => {
     update_emp();
@@ -199,25 +200,22 @@ export default function PersonalPerformanceStatistics() {
     },
   ];
 
-  // const customeLeft = [<SelectBar key="0" className="ml-[6px]" selectPropsArr={selectPropsArr} />];
-
   // ------------------------------------------------------------------
 
-  // ██████  ███████ ██████  ██    ██  ██████ ███████ ██████
-  // ██   ██ ██      ██   ██ ██    ██ ██      ██      ██   ██
-  // ██████  █████   ██   ██ ██    ██ ██      █████   ██████
-  // ██   ██ ██      ██   ██ ██    ██ ██      ██      ██   ██
-  // ██   ██ ███████ ██████   ██████   ██████ ███████ ██   ██
+  // region render
 
   return (
-    <SubLayer isLoading_subLayer={isLoading}>
+    <SubLayer isLoading_subLayer={isLoading} bodyClassName={scss.subLayerBody}>
       <PageHeader02 tagList={tagList} />
 
-      <div className="w-fit">
+      <div className={scss.body}>
         <div className={scss.selectBarWrapper}>
           <SelectBar className={''} selectPropsArr={selectPropsArr} />
         </div>
-        <Table control={control_table} />
+
+        <div className={scss.tableWrapper}>
+          <Table control={control_table} />
+        </div>
       </div>
     </SubLayer>
   );
@@ -225,11 +223,7 @@ export default function PersonalPerformanceStatistics() {
 
 // ===========================================================
 
-// ██   ██  ██████   ██████  ██   ██
-// ██   ██ ██    ██ ██    ██ ██  ██
-// ███████ ██    ██ ██    ██ █████
-// ██   ██ ██    ██ ██    ██ ██  ██
-// ██   ██  ██████   ██████  ██   ██
+// region hook
 
 const useControl_personalPerformanceStatistics = (data: TquotationAccounting_personal_contract[] | undefined) => {
   const control: Tcontrol_personalPerformanceStatistics = useMemo(() => {
@@ -270,17 +264,17 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
     data.forEach((item) => {
       const {
         //
-        projectname,
-        quotationnumber,
+        projectName: projectname,
+        projectNumber: quotationnumber,
         // quotetype,
-        totalsum,
-        pricesum,
+        totalSum,
+        priceSum,
         percentage,
       } = item;
 
       const isValid = typeof percentage === 'number';
 
-      let quotetype = item.quotetype;
+      let quotetype = item.quoteType;
 
       if (!quotetype) {
         quotetype = '無資料';
@@ -300,14 +294,14 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
 
       if (isValid) {
         listKeyQty[quotetype] = listKeyQty[quotetype] + 1;
-        subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalsum).toNumber();
-        subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(pricesum).toNumber();
+        subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalSum).toNumber();
+        subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(priceSum).toNumber();
         subTotalList[quotetype].percentage = new Decimal(subTotalList[quotetype].percentage)
           .add(percentage ?? 0)
           .toNumber();
 
-        total.totalsum = new Decimal(total.totalsum).add(totalsum).toNumber();
-        total.pricesum = new Decimal(total.pricesum).add(pricesum).toNumber();
+        total.totalsum = new Decimal(total.totalsum).add(totalSum).toNumber();
+        total.pricesum = new Decimal(total.pricesum).add(priceSum).toNumber();
         total.percentage = new Decimal(total.percentage).add(percentage ?? 0).toNumber();
       }
 
@@ -324,13 +318,13 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
 
       // 格子裡的文字
       list[quotationnumber].list[quotetype] = {
-        totalsum: isValid ? Number(totalsum).toLocaleString() : 'n/a',
-        pricesum: isValid ? Number(pricesum).toLocaleString() : 'n/a',
+        totalsum: isValid ? Number(totalSum).toLocaleString() : 'n/a',
+        pricesum: isValid ? Number(priceSum).toLocaleString() : 'n/a',
         percentage: isValid ? `${percentage}%` : 'n/a',
       };
 
       if (isValid) {
-        list[quotationnumber].total = new Decimal(list[quotationnumber].total).add(pricesum).toNumber();
+        list[quotationnumber].total = new Decimal(list[quotationnumber].total).add(priceSum).toNumber();
       }
     });
     //
@@ -345,8 +339,6 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
     const theSubTotalList: Tcontrol_subTotalList = {};
 
     Object.keys(subTotalList).forEach((key) => {
-      // const percent = new Decimal(subTotalList[key].percentage).div(listKeyQty[key]).toNumber();
-
       const isValid = !!listKeyQty[key];
 
       if (isValid) {
