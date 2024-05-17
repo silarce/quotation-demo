@@ -1213,64 +1213,6 @@ export const useQuotationAccounting_personalContract = (
   };
 };
 
-// 獎金統計表
-const apiGetQuotationAccounting_bonus = async (params: { year: number; month?: number }) => {
-  type Tparams_bonus = Tparams & {
-    year: number | string;
-    month?: number | string;
-  };
-
-  const api = '/quotation/accounting/bonus';
-
-  const theParams: Tparams_bonus = {
-    ...params,
-    populate: ['salesEmployee', 'reviewTeamLeaderEmployee', 'reviewSupervisorEmployee', 'reviewManagerEmployee'],
-  };
-
-  return axi
-    .get<TbonusDto[]>(api, { params: theParams })
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
-
-export const useGetQuotationAccounting_bonus = (
-  {
-    year,
-    month,
-  }: {
-    year: number | undefined;
-    month: number | undefined;
-  },
-  { isAutoUpdate = true }: { isAutoUpdate?: boolean } = {}
-) => {
-  const [res, setRes] = useState<TbonusDto[]>();
-  const [isFetching, setIsFetching] = useState(false);
-
-  const update = useCallback(async () => {
-    if (!year) {
-      return;
-    }
-
-    setIsFetching(true);
-    const newRes = await apiGetQuotationAccounting_bonus({ year, month }).then((res) => {
-      setRes(res);
-    });
-    setIsFetching(false);
-
-    return newRes;
-  }, [year, month]);
-
-  useEffect(() => {
-    isAutoUpdate && update();
-  }, [update, isAutoUpdate]);
-
-  return {
-    data: res,
-    update,
-    isFetching,
-  };
-};
-
 // ========================================================================
 
 // 轉為準合約

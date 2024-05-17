@@ -19,8 +19,14 @@ import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/opti
 // css
 import scss from './bonusStatisticsTable.module.scss';
 
-import { TbonusDto, useGetQuotationAccounting_bonus } from 'js/api/api_quotation';
+// import { TbonusDto, useGetQuotationAccounting_bonus } from 'js/api/api_quotation';
 import { TemployeeDto } from 'js/api/dtoTypes';
+import {
+  TbonusDto,
+  useGetReportForm_bonus,
+  apiPatchReportForm_bonus_submit,
+  apiPatchReportForm_bonus_review,
+} from 'js/api/api_reportForm';
 
 // ========================================================================
 
@@ -30,6 +36,9 @@ type Tquery = {
 };
 
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
+
+type TreqSubmit = (bonusId: string) => Promise<void>;
+type TreqReview = (bonusId: string, isPass: boolean) => Promise<void>;
 
 // ========================================================================
 
@@ -43,28 +52,44 @@ export default function BonusStatisticsTable() {
   const query = router.query as Tquery;
   const {
     //
-    year = String(new Date().getFullYear() - 1911),
+    year: twYear = String(new Date().getFullYear() - 1911),
     month,
   } = query;
+  const year = Number(twYear) + 1911;
 
   // --------------------------------------------------------------------
 
-  const params = {
-    year: Number(year) + 1911,
-    month: month ? Number(month) : undefined,
+  const params = useMemo(() => {
+    return {
+      pageSize: 99999,
+      filter: {
+        bonusYear: { $eq: String(year) },
+        bonusMonth: { $eq: String(month) },
+      },
+    };
+  }, [year, month]);
+
+  const { data: data_bonus, update: update_bonus, isFetching } = useGetReportForm_bonus(params);
+
+  // --------------------------------------------------------------------
+
+  // region request
+
+  const reqSubmit: TreqSubmit = async (bonusId: string) => {
+    await apiPatchReportForm_bonus_submit(bonusId).then(update_bonus);
   };
 
-  const {
-    data: data_bonus = fakeDataArr_bonus,
-    // update: update_bonus,
-    isFetching,
-  } = useGetQuotationAccounting_bonus(params, { isAutoUpdate: false });
+  const reqReview: TreqReview = async (bonusId: string, isPass: boolean) => {
+    await apiPatchReportForm_bonus_review(bonusId, { isPass }).then(update_bonus);
+  };
 
   // --------------------------------------------------------------------
+
+  // region component props
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
-        value: year,
+        value: twYear,
         options: yearOptionArr,
         onChange: (option) => {
           if (typeof option?.value === 'string') {
@@ -121,8 +146,7 @@ export default function BonusStatisticsTable() {
   ];
 
   // --------------------------------------------------------------------
-
-  // --------------------------------------------------------------------
+  // region render
   return (
     <SubLayer isLoading_subLayer={isFetching}>
       <PageHeader02 tagList={tagList} />
@@ -133,8 +157,10 @@ export default function BonusStatisticsTable() {
         <div className={classNames(scss.table)}>
           <Thead />
           <div className={classNames(scss.tbody)}>
-            {data_bonus.map((bonus, index) => {
-              return <Row key={bonus.id || index} data_bonus={fakeData_bonus} />;
+            {data_bonus?.map((bonus, index) => {
+              return (
+                <Row key={bonus.id || index} data_bonus={fakeData_bonus} reqSubmit={reqSubmit} reqReview={reqReview} />
+              );
             })}
           </div>
         </div>
@@ -144,12 +170,12 @@ export default function BonusStatisticsTable() {
 }
 
 // ====================================================================
-
-//  ██████  ██████  ███    ███ ██████   ██████  ███    ██ ███████ ███    ██ ████████
-// ██      ██    ██ ████  ████ ██   ██ ██    ██ ████   ██ ██      ████   ██    ██
-// ██      ██    ██ ██ ████ ██ ██████  ██    ██ ██ ██  ██ █████   ██ ██  ██    ██
-// ██      ██    ██ ██  ██  ██ ██      ██    ██ ██  ██ ██ ██      ██  ██ ██    ██
-//  ██████  ██████  ██      ██ ██       ██████  ██   ████ ███████ ██   ████    ██
+// ====================================================================
+// ====================================================================
+// ====================================================================
+// ====================================================================
+// ====================================================================
+// region component
 
 const Thead = () => {
   return (
@@ -162,8 +188,97 @@ const Thead = () => {
   );
 };
 
-const Row = ({ data_bonus }: { data_bonus: TbonusDto }) => {
+const Row = ({
+  reqSubmit,
+  reqReview,
+  data_bonus,
+}: {
+  data_bonus: TbonusDto;
+  reqSubmit: TreqSubmit;
+  reqReview: TreqReview;
+}) => {
   //
+  const { id, totalSales, totalBonus, note, salesEmployee } = data_bonus;
+
+  const isSumbit = checkIsSumbit(data_bonus);
+  const statusArr = createStatusArr(data_bonus);
+
+  return (
+    <div className={scss.row}>
+      <div className={scss.cell}>{salesEmployee.chName}</div>
+      <div className={scss.cell}>{totalSales.toLocaleString()}</div>
+      <div className={scss.cell}>{totalBonus.toLocaleString()}</div>
+      <div className={scss.cell}>{note}</div>
+      {/*  */}
+      <div className={classNames(scss.cell, scss.cell_processChain, 'col-span-4')}>
+        <ProcessChain className={scss.processChain} control={{ statusArr }} />
+
+        {!isSumbit && (
+          <MyButton_v2
+            py="py4"
+            px="px22"
+            onClick={() => {
+              reqSubmit(id);
+            }}
+          >
+            送審
+          </MyButton_v2>
+        )}
+        {isSumbit && (
+          <MyButton_v2
+            py="py4"
+            px="px22"
+            onClick={() => {
+              const modal = myAlert.btnBar({
+                title: '是否通過審核?',
+                btnPropsArr: [
+                  {
+                    label: '通過審核',
+                    theme: 'danger',
+                    onClick: () => {
+                      reqReview(id, true);
+                    },
+                  },
+                  {
+                    label: '不通過審核',
+                    onClick: () => {
+                      reqReview(id, false);
+                    },
+                  },
+                  {
+                    label: '取消',
+                    onClick: () => {
+                      modal.destroy();
+                    },
+                  },
+                ],
+              });
+            }}
+          >
+            審核
+          </MyButton_v2>
+        )}
+
+        {/* cell_processChain close*/}
+      </div>
+      {/*  */}
+    </div>
+  );
+};
+
+// ====================================================================
+
+const checkReview = (to: string | null, at: string | null) => {
+  if (at) {
+    return 'green';
+  } else if (to) {
+    return 'red';
+  } else {
+    return 'gray';
+  }
+};
+
+const createStatusArr = (data_bonus: TbonusDto): Tcontrol_processChain['statusArr'] => {
   const {
     // bonusYear,
     // bonusMonth,
@@ -190,83 +305,32 @@ const Row = ({ data_bonus }: { data_bonus: TbonusDto }) => {
     managerReviewAt,
   } = data_bonus;
 
-  const statusArr: Tcontrol_processChain['statusArr'] = (() => {
-    const statusArr: Tcontrol_processChain['statusArr'] = [
-      // {
-      //   label: `業務 ${salesEmployee?.chName ?? ''}`,
-      //   dotColor: 'green',
-      // },
-      {
-        label: `課長 ${reviewTeamLeaderEmployee?.chName ?? ''}`,
-        dotColor: checkReview(toReviewTeamLeader, teamLeaderReviewAt),
-      },
-      {
-        label: `審核主管 ${reviewSupervisorEmployee?.chName ?? ''}`,
-        dotColor: checkReview(toReviewSupervisor, supervisorReviewAt),
-      },
-      {
-        label: `總經理 ${reviewManagerEmployee?.chName ?? ''}`,
-        dotColor: checkReview(toReviewManager, managerReviewAt),
-      },
-    ];
+  const statusArr: Tcontrol_processChain['statusArr'] = [
+    // {
+    //   label: `業務 ${salesEmployee?.chName ?? ''}`,
+    //   dotColor: 'green',
+    // },
+    {
+      label: `課長 ${reviewTeamLeaderEmployee?.chName ?? ''}`,
+      dotColor: checkReview(toReviewTeamLeader, teamLeaderReviewAt),
+    },
+    {
+      label: `審核主管 ${reviewSupervisorEmployee?.chName ?? ''}`,
+      dotColor: checkReview(toReviewSupervisor, supervisorReviewAt),
+    },
+    {
+      label: `總經理 ${reviewManagerEmployee?.chName ?? ''}`,
+      dotColor: checkReview(toReviewManager, managerReviewAt),
+    },
+  ];
 
-    return statusArr;
-  })(); // statusArr
-
-  return (
-    <div className={scss.row}>
-      <div className={scss.cell}>{salesEmployee.chName}</div>
-      <div className={scss.cell}>{totalSales.toLocaleString()}</div>
-      <div className={scss.cell}>{totalBonus.toLocaleString()}</div>
-      <div className={scss.cell}>{note}</div>
-      {/*  */}
-      <div className={classNames(scss.cell, scss.cell_processChain, 'col-span-4')}>
-        <ProcessChain className={scss.processChain} control={{ statusArr }} />
-        <MyButton_v2
-          py="py4"
-          px="px22"
-          onClick={() => {
-            const modal = myAlert.btnBar({
-              title: '是否通過審核?',
-              btnPropsArr: [
-                {
-                  label: '通過審核',
-                  theme: 'danger',
-                  onClick: () => {},
-                },
-                {
-                  label: '不通過審核',
-                  onClick: () => {},
-                },
-                {
-                  label: '取消',
-                  onClick: () => {
-                    modal.destroy();
-                  },
-                },
-              ],
-            });
-          }}
-        >
-          審核
-        </MyButton_v2>
-        {/* cell_processChain close*/}
-      </div>
-      {/*  */}
-    </div>
-  );
+  return statusArr;
 };
 
-// ====================================================================
+const checkIsSumbit = (data_bonus: TbonusDto) => {
+  const { toReviewTeamLeader, toReviewSupervisor, toReviewManager } = data_bonus;
 
-const checkReview = (to: string | null, at: string | null) => {
-  if (at) {
-    return 'green';
-  } else if (to) {
-    return 'red';
-  } else {
-    return 'gray';
-  }
+  return !!(toReviewTeamLeader || toReviewSupervisor || toReviewManager);
 };
 
 // ====================================================================
