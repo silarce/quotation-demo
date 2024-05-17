@@ -1,3 +1,19 @@
+export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
+
+// 表面處理
+export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null;
+
+export type TdeliveryStatus = '未安裝' | '已安裝' | '已結清';
+
+export type TdocType = '防火證明' | '出廠證明' | '保固書';
+
+export type TnorthernCounty = '臺北市' | '新北市' | '基隆市' | '新竹市' | '桃園市' | '新竹縣' | '宜蘭縣' | '連江縣';
+export type TcentralCounty = '臺中市' | '苗栗縣' | '彰化縣' | '南投縣' | '雲林縣' | '金門縣';
+export type TsouthernCounty = '高雄市' | '臺南市' | '嘉義市' | '嘉義縣' | '屏東縣' | '澎湖縣';
+export type TeasternCounty = '花蓮縣' | '臺東縣';
+export type Tabroad = '海外';
+
+// =============================================================================
 export type Tparams = {
   order?: 'ASC' | 'DESC';
   page?: number;
@@ -22,15 +38,6 @@ export type TpageResponse<Tdata> = {
   data: Tdata[];
   meta: TpageMetaDto;
 };
-
-export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
-
-// 表面處理
-export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null;
-
-export type TdeliveryStatus = '未安裝' | '已安裝' | '已結清';
-
-export type TdocType = '防火證明' | '出廠證明' | '保固書';
 
 // =============================================================
 
@@ -2276,12 +2283,15 @@ export type TquotationAccounting_personal_content = {
 };
 
 // 個人業績統計表_合約
-export type TquotationAccounting_personal_contract = {
-  projectname: string;
-  quotationnumber: string;
-  quotetype: string;
-  totalsum: `${number}`;
-  pricesum: `${number}`;
+export type TcontractAccountingReportFormDto = {
+  projectNumber: string;
+  projectName: string;
+  contractor: string | null; //營造(承包商)
+  designUnit: string | null; // 設計單位
+  quoteType: string | null;
+
+  totalSum: number;
+  priceSum: number;
   percentage: number;
 };
 

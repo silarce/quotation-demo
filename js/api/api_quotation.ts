@@ -27,7 +27,7 @@ import type {
   TquotationAccouting_years,
   TquotationAccouting_area,
   TquotationAccounting_personal_content,
-  TquotationAccounting_personal_contract,
+  TcontractAccountingReportFormDto,
   TquotationAccounting_modifyContract,
   TquotationStatus,
   TbonusDto,
@@ -50,7 +50,7 @@ export type {
   TquotationAccouting_years,
   TquotationAccouting_area,
   TquotationAccounting_personal_content,
-  TquotationAccounting_personal_contract,
+  TcontractAccountingReportFormDto as TquotationAccounting_personal_contract,
   TquotationAccounting_modifyContract,
   TbonusDto,
 } from './dtoTypes';
@@ -899,7 +899,7 @@ export const apiQuotationReview = ({ id, body }: { id: string; body: TreviewQuot
   const api = `/quotation/${id}/review`;
 
   return axi
-    .patch<undefined>(api, body)
+    .patch<TquotationContentDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1173,7 +1173,7 @@ const apiQuotationAccounting_personalContract = async (params: Tparam_accounting
   // const api = `/quotation/accounting/personal-quotation/${params.employeeId}`;
 
   return axi
-    .get<TquotationAccounting_personal_contract[]>(api, { params })
+    .get<TcontractAccountingReportFormDto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1185,7 +1185,7 @@ export const useQuotationAccounting_personalContract = (
     year: number | undefined;
   }
 ) => {
-  const [res, setRes] = useState<TquotationAccounting_personal_contract[]>();
+  const [res, setRes] = useState<TcontractAccountingReportFormDto[]>();
 
   const update = async () => {
     if (!params.employeeId || !params.year) {
@@ -1210,64 +1210,6 @@ export const useQuotationAccounting_personalContract = (
   return {
     data: res,
     update,
-  };
-};
-
-// 獎金統計表
-const apiGetQuotationAccounting_bonus = async (params: { year: number; month?: number }) => {
-  type Tparams_bonus = Tparams & {
-    year: number | string;
-    month?: number | string;
-  };
-
-  const api = '/quotation/accounting/bonus';
-
-  const theParams: Tparams_bonus = {
-    ...params,
-    populate: ['salesEmployee', 'reviewTeamLeaderEmployee', 'reviewSupervisorEmployee', 'reviewManagerEmployee'],
-  };
-
-  return axi
-    .get<TbonusDto[]>(api, { params: theParams })
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
-
-export const useGetQuotationAccounting_bonus = (
-  {
-    year,
-    month,
-  }: {
-    year: number | undefined;
-    month: number | undefined;
-  },
-  { isAutoUpdate = true }: { isAutoUpdate?: boolean } = {}
-) => {
-  const [res, setRes] = useState<TbonusDto[]>();
-  const [isFetching, setIsFetching] = useState(false);
-
-  const update = useCallback(async () => {
-    if (!year) {
-      return;
-    }
-
-    setIsFetching(true);
-    const newRes = await apiGetQuotationAccounting_bonus({ year, month }).then((res) => {
-      setRes(res);
-    });
-    setIsFetching(false);
-
-    return newRes;
-  }, [year, month]);
-
-  useEffect(() => {
-    isAutoUpdate && update();
-  }, [update, isAutoUpdate]);
-
-  return {
-    data: res,
-    update,
-    isFetching,
   };
 };
 
