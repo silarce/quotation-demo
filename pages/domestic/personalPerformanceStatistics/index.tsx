@@ -96,6 +96,7 @@ export default function PersonalPerformanceStatistics() {
   // ------------------------------------------------------------------
 
   const { data: data_emp, update: update_emp } = useEmployee(empParams);
+  const haveData = data && data.length > 0;
 
   useEffect(() => {
     update_emp();
@@ -211,6 +212,7 @@ export default function PersonalPerformanceStatistics() {
         <div className={scss.selectBarWrapper}>
           <SelectBar className={''} selectPropsArr={selectPropsArr} />
         </div>
+
         <div className={scss.tableWrapper}>
           <Table control={control_table} />
         </div>
