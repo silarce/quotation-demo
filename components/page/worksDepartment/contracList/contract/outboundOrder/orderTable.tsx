@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
+// css
 import scss from './orderTable.module.scss';
 
 // antd
@@ -192,8 +193,8 @@ const Row = ({
   return (
     <div className={classNames(scss.row, className)}>
       <div className={classNames(scss.side)}>
-        <div className={classNames(scss.cell, !side && 'invisible', 'w-8')}>{side?.serialNumber}</div>
-        <div className={classNames(scss.cell, !side && 'invisible', 'w-32')}>{side?.projectName}</div>
+        <div className={classNames(scss.cell, !side && 'invisible', 'w-7')}>{side?.serialNumber}</div>
+        <div className={classNames(scss.cell, !side && 'invisible', 'w-16')}>{side?.projectName}</div>
         <div className={classNames(scss.cell, scss.showLeftBtnCell, !isThead && 'invisible', 'w-8')}>
           <Popover content="顯示/不顯示源頭產品" trigger="hover" mouseEnterDelay={0.5}>
             {showLeft && <antdIcon.StepBackwardOutlined className={scss.showLeftBtn} onClick={changeShowLeft} />}
@@ -204,33 +205,33 @@ const Row = ({
 
       {/* <div className={classNames(scss.left, !showLeft && scss.hidden, scss.plus)}> */}
       <div className={classNames(scss.left, !showLeft && scss.notShow, scss.plus)}>
-        <div className={classNames(scss.cell, 'w-14')}>{left?.L}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{left?.WG}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{left?.B}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{left?.qty}</div>
-        <div className={classNames(scss.cell, 'w-20')}>{left?.volume}</div>
-        <div className={classNames(scss.cell, 'w-24')}>{left?.total_volume}</div>
-        <div className={classNames(scss.cell, 'w-24')}>{left?.doorModelName}</div>
-        <div className={classNames(scss.cell, 'w-24')}>{left?.material}</div>
-        <div className={classNames(scss.cell, 'w-24')}>{left?.horsepower}</div>
-        <div className={classNames(scss.cell, 'w-24')}>{left?.surface}</div>
+        <div className={classNames(scss.cell, 'w-9')}>{left?.L}</div>
+        <div className={classNames(scss.cell, 'w-9')}>{left?.WG}</div>
+        <div className={classNames(scss.cell, 'w-9')}>{left?.B}</div>
+        <div className={classNames(scss.cell, 'w-8')}>{left?.qty}</div>
+        <div className={classNames(scss.cell, 'w-12')}>{left?.volume}</div>
+        <div className={classNames(scss.cell, 'w-14')}>{left?.total_volume}</div>
+        <div className={classNames(scss.cell, 'w-16')}>{left?.doorModelName}</div>
+        <div className={classNames(scss.cell, 'w-14')}>{left?.material}</div>
+        <div className={classNames(scss.cell, 'w-14')}>{left?.horsepower}</div>
+        <div className={classNames(scss.cell, 'w-8')}>{left?.surface}</div>
       </div>
 
       <div className={classNames(scss.divider, !left && 'invisible')} />
 
       <div className={scss.center}>
-        <div className={classNames(scss.cell, 'w-32')}>{center?.projectName}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{center?.L}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{center?.WG}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{center?.B}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{center?.qty}</div>
-        <div className={classNames(scss.cell, 'w-20')}>{center?.volume}</div>
-        <div className={classNames(scss.cell, 'w-24')}>{center?.total_volume}</div>
-        <div className={classNames(scss.cell, 'w-24')}>{center?.doorModelName}</div>
-        <div className={classNames(scss.cell, 'w-24')}>{center?.material}</div>
-        <div className={classNames(scss.cell, 'w-24')}>{center?.horsepower}</div>
-        <div className={classNames(scss.cell, 'w-24')}>{center?.surface}</div>
-        <div className={classNames(scss.cell, 'w-28')}>{center?.establishmentDate}</div>
+        <div className={classNames(scss.cell, 'w-16')}>{center?.projectName}</div>
+        <div className={classNames(scss.cell, 'w-9')}>{center?.L}</div>
+        <div className={classNames(scss.cell, 'w-9')}>{center?.WG}</div>
+        <div className={classNames(scss.cell, 'w-9')}>{center?.B}</div>
+        <div className={classNames(scss.cell, 'w-8')}>{center?.qty}</div>
+        <div className={classNames(scss.cell, 'w-12')}>{center?.volume}</div>
+        <div className={classNames(scss.cell, 'w-14')}>{center?.total_volume}</div>
+        <div className={classNames(scss.cell, 'w-16')}>{center?.doorModelName}</div>
+        <div className={classNames(scss.cell, 'w-14')}>{center?.material}</div>
+        <div className={classNames(scss.cell, 'w-14')}>{center?.horsepower}</div>
+        <div className={classNames(scss.cell, 'w-8')}>{center?.surface}</div>
+        <div className={classNames(scss.cell, 'w-[98px]')}>{center?.establishmentDate}</div>
       </div>
 
       <div className={scss.divider} />
