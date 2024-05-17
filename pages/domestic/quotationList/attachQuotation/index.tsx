@@ -1274,6 +1274,10 @@ latestContentProdArr為這次追加追減的主產品
 
   // 實際上追加追減報價單目前是不可以編輯的
   const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
+    if (!userId) {
+      return myAlert.warning({ title: '沒有使用者ID' });
+    }
+
     // 總樘數
     const prodQty = 0;
     let isDoorModalNameEmpty = false;
@@ -1375,7 +1379,7 @@ latestContentProdArr為這次追加追減的主產品
       // managerId: latestContent.managerEmployee?.id ?? null,
       // supervisorId: data_watch.supervisorEmployee?.id ?? null,
       //
-      agentId: agentEmployee?.id,
+      agentId: userId,
       //
       //
       annotations: anno,

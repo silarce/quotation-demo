@@ -1,3 +1,19 @@
+export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
+
+// 表面處理
+export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null;
+
+export type TdeliveryStatus = '未安裝' | '已安裝' | '已結清';
+
+export type TdocType = '防火證明' | '出廠證明' | '保固書';
+
+export type TnorthernCounty = '臺北市' | '新北市' | '基隆市' | '新竹市' | '桃園市' | '新竹縣' | '宜蘭縣' | '連江縣';
+export type TcentralCounty = '臺中市' | '苗栗縣' | '彰化縣' | '南投縣' | '雲林縣' | '金門縣';
+export type TsouthernCounty = '高雄市' | '臺南市' | '嘉義市' | '嘉義縣' | '屏東縣' | '澎湖縣';
+export type TeasternCounty = '花蓮縣' | '臺東縣';
+export type Tabroad = '海外';
+
+// =============================================================================
 export type Tparams = {
   order?: 'ASC' | 'DESC';
   page?: number;
@@ -22,15 +38,6 @@ export type TpageResponse<Tdata> = {
   data: Tdata[];
   meta: TpageMetaDto;
 };
-
-export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
-
-// 表面處理
-export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null;
-
-export type TdeliveryStatus = '未安裝' | '已安裝' | '已結清';
-
-export type TdocType = '防火證明' | '出廠證明' | '保固書';
 
 // =============================================================
 
@@ -2276,12 +2283,15 @@ export type TquotationAccounting_personal_content = {
 };
 
 // 個人業績統計表_合約
-export type TquotationAccounting_personal_contract = {
-  projectname: string;
-  quotationnumber: string;
-  quotetype: string;
-  totalsum: `${number}`;
-  pricesum: `${number}`;
+export type TcontractAccountingReportFormDto = {
+  projectNumber: string;
+  projectName: string;
+  contractor: string | null; //營造(承包商)
+  designUnit: string | null; // 設計單位
+  quoteType: string | null;
+
+  totalSum: number;
+  priceSum: number;
   percentage: number;
 };
 
@@ -4176,6 +4186,88 @@ export type TreviewCertificatedDocDto = {
 
 export type TcreateCertificatedDocSnapShotDto = {
   snapShot: string;
+};
+
+// =============================================================================
+
+// region report-form
+
+// 獎金統計表
+export type TbonusDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 獎金年份
+  bonusYear: string;
+  // 獎金月份
+  bonusMonth: string;
+  // 業績總額
+  totalSales: number;
+  // 獎金總額
+  totalBonus: number;
+  // 備註
+  note: string | null;
+  // 業務id
+  salesEmployeeId: string | null;
+  // 業務
+  salesEmployee: TemployeeDto;
+  // 課長Id
+  reviewTeamLeaderEmployeeId: string | null;
+  // 審核課長
+  reviewTeamLeaderEmployee: TemployeeDto;
+  // 送審給課長審核時間
+  toReviewTeamLeader: string | null;
+  // 課長審核時間
+  teamLeaderReviewAt: string | null;
+  // 審核主管Id
+  reviewSupervisorEmployeeId: string | null;
+  // 審核主管
+  reviewSupervisorEmployee: TemployeeDto;
+  // 送審給主管審核時間
+  toReviewSupervisor: string | null;
+  // 主管審核時間
+  supervisorReviewAt: string | null;
+  // 審核總經理Id
+  reviewManagerEmployeeId: string | null;
+  // 審核總經理
+  reviewManagerEmployee: TemployeeDto;
+  // 送審給總經理審核時間
+  toReviewManager: string | null;
+  // 總經理審核時間
+  managerReviewAt: string | null;
+};
+
+// 結算週期
+export type TsettlementCycleDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  settleYear: string | null; // 結算年份 ex:2021
+  settleMonth: string | null; // 結算月份 ex: 2
+  startDate: string; // ISO
+  dueDate: string; // ISO
+  status: 'set' | 'lock';
+};
+
+export type TcreateSettlementCycleDto = {
+  settleYear?: string | null; // 結算年份 ex:2021
+  settleMonth?: string | null; // 結算月份 ex: 2
+  startDate: string; // ISO
+  dueDate: string; // ISO
+};
+
+export type TupdateSettlementCycleDto = {
+  settleYear?: string | null; // 結算年份 ex:2021
+  settleMonth?: string | null; // 結算月份 ex: 2
+  startDate?: string; // ISO
+  dueDate?: string; // ISO
+  id: string | undefined; // 不提供時將此筆視為新增資料
+};
+
+export type TsettleBonusDto = {
+  settlementCycleId: string;
 };
 
 // =============================================================================

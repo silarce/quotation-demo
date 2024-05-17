@@ -27,9 +27,10 @@ import type {
   TquotationAccouting_years,
   TquotationAccouting_area,
   TquotationAccounting_personal_content,
-  TquotationAccounting_personal_contract,
+  TcontractAccountingReportFormDto,
   TquotationAccounting_modifyContract,
   TquotationStatus,
+  TbonusDto,
 } from './dtoTypes';
 
 export type {
@@ -49,8 +50,9 @@ export type {
   TquotationAccouting_years,
   TquotationAccouting_area,
   TquotationAccounting_personal_content,
-  TquotationAccounting_personal_contract,
+  TcontractAccountingReportFormDto as TquotationAccounting_personal_contract,
   TquotationAccounting_modifyContract,
+  TbonusDto,
 } from './dtoTypes';
 
 type TgetQuotation = {
@@ -897,7 +899,7 @@ export const apiQuotationReview = ({ id, body }: { id: string; body: TreviewQuot
   const api = `/quotation/${id}/review`;
 
   return axi
-    .patch<undefined>(api, body)
+    .patch<TquotationContentDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1171,7 +1173,7 @@ const apiQuotationAccounting_personalContract = async (params: Tparam_accounting
   // const api = `/quotation/accounting/personal-quotation/${params.employeeId}`;
 
   return axi
-    .get<TquotationAccounting_personal_contract[]>(api, { params })
+    .get<TcontractAccountingReportFormDto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1183,7 +1185,7 @@ export const useQuotationAccounting_personalContract = (
     year: number | undefined;
   }
 ) => {
-  const [res, setRes] = useState<TquotationAccounting_personal_contract[]>();
+  const [res, setRes] = useState<TcontractAccountingReportFormDto[]>();
 
   const update = async () => {
     if (!params.employeeId || !params.year) {
@@ -1265,6 +1267,15 @@ export const apiPatchQuotationContent_id_progress = (contentId: string, body: Tp
     });
 };
 
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
 // ========================================================================
 
 const lookpu_contractPopulate = {

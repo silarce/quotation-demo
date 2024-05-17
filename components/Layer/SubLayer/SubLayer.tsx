@@ -22,6 +22,7 @@ export default function SubLayer({
   isLoading_all = false,
   scrollToTopTrigger,
   bodyOverflowY,
+  style,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -31,6 +32,7 @@ export default function SubLayer({
   isLoading_all?: boolean;
   scrollToTopTrigger?: unknown;
   bodyOverflowY?: 'hidden' | 'auto' | 'scroll';
+  style?: React.CSSProperties;
 }) {
   const ref_body = useRef<HTMLDivElement>(null!);
 
@@ -41,7 +43,7 @@ export default function SubLayer({
   }, [scrollToTopTrigger]);
 
   return (
-    <div className={classNames(scss.container, className)}>
+    <div className={classNames(scss.container, className)} style={style}>
       {childredArr[0]}
       <div
         ref={ref_body}

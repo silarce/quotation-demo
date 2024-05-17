@@ -1703,6 +1703,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
 
   const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
+    if (!userId) {
+      return myAlert.warning({ title: '沒有使用者ID' });
+    }
+
     if (status === 'Pending') {
       return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
     }
@@ -1834,7 +1838,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       editNotes: editNotes ?? '',
       status: status ?? 'Budget',
       //
-      agentId: agentEmployee?.id || '',
+      // agentId: agentEmployee?.id || '',
+      agentId: userId,
       //
       //
       annotations: anno,
@@ -1947,8 +1952,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     }
 
-    const shouldDirect = isManager && status === 'Pending';
-
     if (isSales && salesReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
     } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
@@ -1963,12 +1966,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     try {
       setIsLoading(true);
-      await apiQuotationReview({ id: quotationId, body });
+      const res = await apiQuotationReview({ id: quotationId, body });
 
-      if (shouldDirect) {
+      if (res.status === 'Contract') {
         // router.push({
         //   pathname: '/domestic/contract',
         // });
+
         router.back();
       } else {
         // await update();
@@ -1993,7 +1997,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       await apiQuotationUnlock(quotationId);
       await update();
       myAlert.success({ title: '解除鎖定成功' });
-      router.push({
+      router.replace({
         query: {
           ...router.query,
           status: 'Contracting',
@@ -2075,7 +2079,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(true);
       await apiPatchQuotationToPending(quotationId);
       await update();
-      router.push({
+      router.replace({
         query: {
           ...router.query,
           status: 'Pending',
@@ -2109,7 +2113,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       });
 
       if (res) {
-        router.push({
+        router.replace({
           query: {
             ...router.query,
             id: res.id,

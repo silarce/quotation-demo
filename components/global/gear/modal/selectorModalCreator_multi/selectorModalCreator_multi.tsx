@@ -674,6 +674,35 @@ const props_engineeringContact: TselectorProps<TengineeringContactDto> = {
       },
     },
   ],
+  searchInputSelPropsArr: [
+    {
+      inputProps: {
+        wrapperStyle: { width: 150 },
+        props: {
+          placeholder: '完整工程編號',
+        },
+      },
+    },
+    {
+      pilarAttr: {},
+    },
+    {
+      inputProps: {
+        wrapperStyle: { width: 230 },
+        props: {
+          placeholder: '工程名稱、工程負責人、承包商',
+        },
+      },
+    },
+  ],
+  filter: ([projectNumber, keyword]) => {
+    return {
+      projectNumber: { $eq: projectNumber },
+      projectName: { $contains: keyword },
+      projectPrincipal: { $contains: keyword },
+      contractor: { $contains: keyword },
+    };
+  },
 };
 
 // -------------------------------------------------------------------------
