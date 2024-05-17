@@ -26,6 +26,8 @@ import {
   apiPatchReportForm_bonus_review,
 } from 'js/api/api_reportForm';
 
+import { TuserDto } from 'js/api/dtoTypes';
+
 // ========================================================================
 
 type Tquery = {
@@ -45,7 +47,8 @@ const monthOptionArr = optionsCreator_month({ emptyOption: true });
 
 // ========================================================================
 
-export default function BonusStatisticsTable() {
+// region main component
+export default function BonusStatisticsTable({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
   const query = router.query as Tquery;
   const {
@@ -158,7 +161,15 @@ export default function BonusStatisticsTable() {
           <Thead />
           <div className={classNames(scss.tbody)}>
             {data_bonus?.map((bonus, index) => {
-              return <Row key={bonus.id || index} data_bonus={bonus} reqSubmit={reqSubmit} reqReview={reqReview} />;
+              return (
+                <Row
+                  key={bonus.id || index}
+                  data_bonus={bonus}
+                  reqSubmit={reqSubmit}
+                  reqReview={reqReview}
+                  userInfo={userInfo}
+                />
+              );
             })}
           </div>
         </div>
@@ -190,16 +201,19 @@ const Row = ({
   reqSubmit,
   reqReview,
   data_bonus,
+  userInfo,
 }: {
   data_bonus: TbonusDto;
   reqSubmit: TreqSubmit;
   reqReview: TreqReview;
+  userInfo: TuserDto;
 }) => {
   //
   const { id, totalSales, totalBonus, note, salesEmployee } = data_bonus;
 
   const isSumbit = checkIsSumbit(data_bonus);
   const statusArr = createStatusArr(data_bonus);
+  const isAllowReivew = checkIsAllowReivew(data_bonus, userInfo);
 
   return (
     <div className={scss.row}>
@@ -222,7 +236,7 @@ const Row = ({
             送審
           </MyButton_v2>
         )}
-        {isSumbit && (
+        {isAllowReivew && (
           <MyButton_v2
             py="py4"
             px="px22"
@@ -233,14 +247,16 @@ const Row = ({
                   {
                     label: '通過審核',
                     theme: 'danger',
-                    onClick: () => {
-                      reqReview(id, true);
+                    onClick: async () => {
+                      await reqReview(id, true);
+                      modal.destroy();
                     },
                   },
                   {
                     label: '不通過審核',
-                    onClick: () => {
-                      reqReview(id, false);
+                    onClick: async () => {
+                      await reqReview(id, false);
+                      modal.destroy();
                     },
                   },
                   {
@@ -267,11 +283,11 @@ const Row = ({
 
 const checkReview = (to: string | null, at: string | null) => {
   if (at) {
-    return 'green';
+    return 'green'; // 已審核通過
   } else if (to) {
-    return 'red';
+    return 'red'; // 已送審未審核
   } else {
-    return 'gray';
+    return 'gray'; //未送審
   }
 };
 
@@ -312,4 +328,48 @@ const checkIsSumbit = (data_bonus: TbonusDto) => {
   const { toReviewTeamLeader, toReviewSupervisor, toReviewManager } = data_bonus;
 
   return !!(toReviewTeamLeader || toReviewSupervisor || toReviewManager);
+};
+
+const checkIsAllowReivew = (data_bonus: TbonusDto, userInfo: TuserDto) => {
+  const id = userInfo.employee?.id;
+
+  const {
+    reviewTeamLeaderEmployee,
+    toReviewTeamLeader,
+    teamLeaderReviewAt,
+
+    reviewSupervisorEmployee,
+    toReviewSupervisor,
+    supervisorReviewAt,
+
+    reviewManagerEmployee,
+    toReviewManager,
+    managerReviewAt,
+  } = data_bonus;
+
+  if (
+    //
+    checkReview(toReviewTeamLeader, teamLeaderReviewAt) === 'red' &&
+    reviewTeamLeaderEmployee.id === id
+  ) {
+    return true;
+  }
+
+  if (
+    //
+    checkReview(toReviewSupervisor, supervisorReviewAt) === 'red' &&
+    reviewSupervisorEmployee.id === id
+  ) {
+    return true;
+  }
+
+  if (
+    //
+    checkReview(toReviewManager, managerReviewAt) === 'red' &&
+    reviewManagerEmployee.id === id
+  ) {
+    return true;
+  }
+
+  return false;
 };
