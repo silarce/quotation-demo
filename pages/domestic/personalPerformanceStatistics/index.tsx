@@ -270,17 +270,17 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
     data.forEach((item) => {
       const {
         //
-        projectname,
-        quotationnumber,
+        projectName: projectname,
+        projectNumber: quotationnumber,
         // quotetype,
-        totalsum,
-        pricesum,
+        totalSum,
+        priceSum,
         percentage,
       } = item;
 
       const isValid = typeof percentage === 'number';
 
-      let quotetype = item.quotetype;
+      let quotetype = item.quoteType;
 
       if (!quotetype) {
         quotetype = '無資料';
@@ -300,14 +300,14 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
 
       if (isValid) {
         listKeyQty[quotetype] = listKeyQty[quotetype] + 1;
-        subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalsum).toNumber();
-        subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(pricesum).toNumber();
+        subTotalList[quotetype].totalsum = new Decimal(subTotalList[quotetype].totalsum).add(totalSum).toNumber();
+        subTotalList[quotetype].pricesum = new Decimal(subTotalList[quotetype].pricesum).add(priceSum).toNumber();
         subTotalList[quotetype].percentage = new Decimal(subTotalList[quotetype].percentage)
           .add(percentage ?? 0)
           .toNumber();
 
-        total.totalsum = new Decimal(total.totalsum).add(totalsum).toNumber();
-        total.pricesum = new Decimal(total.pricesum).add(pricesum).toNumber();
+        total.totalsum = new Decimal(total.totalsum).add(totalSum).toNumber();
+        total.pricesum = new Decimal(total.pricesum).add(priceSum).toNumber();
         total.percentage = new Decimal(total.percentage).add(percentage ?? 0).toNumber();
       }
 
@@ -324,13 +324,13 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
 
       // 格子裡的文字
       list[quotationnumber].list[quotetype] = {
-        totalsum: isValid ? Number(totalsum).toLocaleString() : 'n/a',
-        pricesum: isValid ? Number(pricesum).toLocaleString() : 'n/a',
+        totalsum: isValid ? Number(totalSum).toLocaleString() : 'n/a',
+        pricesum: isValid ? Number(priceSum).toLocaleString() : 'n/a',
         percentage: isValid ? `${percentage}%` : 'n/a',
       };
 
       if (isValid) {
-        list[quotationnumber].total = new Decimal(list[quotationnumber].total).add(pricesum).toNumber();
+        list[quotationnumber].total = new Decimal(list[quotationnumber].total).add(priceSum).toNumber();
       }
     });
     //
