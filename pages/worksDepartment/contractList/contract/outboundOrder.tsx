@@ -81,6 +81,9 @@ type TproductWorksheetList = {
 };
 
 // =====================================================================
+
+// region START
+
 export default function OutboundOrder({
   isAdmin,
   userErpFeature,
@@ -102,12 +105,9 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
-  // const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
-
   const [notes, setNotes] = useState<string>();
   const [notesDiasbled, setNotesDiasbled] = useState(true);
 
-  // _____________________________________________________________________________
   const [isLoading, setIsLoading] = useState(false);
   const [isReqing, setIsReqing] = useState(false);
 
@@ -145,104 +145,11 @@ export default function OutboundOrder({
     worksheet: worksheetArr,
   } = contract ?? {};
 
-  // 工程聯絡單
-  // const { data: engineeringContact, update: update_engineeringContact } =
-  //   useGetEngineeringContact(engineeringContactId);
-
   const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
-  // deliveryList
-  // const { deliveryList: deliveryList_2, update_deliveryList } =
-  //   useGetEngineeringDeliveryList(engineeringDeliveryListId);
 
   // --------------------------------------------------------------------------
 
-  const productWorksheetList = useMemo(() => {
-    const productWorksheetList: TproductWorksheetList = {};
-
-    const finalProduct_sorted = _.sortBy(finalProduct, 'createdAt');
-
-    finalProduct_sorted.forEach((fp) => {
-      const { id, items } = fp;
-
-      productWorksheetList[id] = {
-        product: fp,
-        worksheetList: {},
-      };
-
-      const { worksheetList } = productWorksheetList[id];
-
-      items.forEach((item) => {
-        const { latestWorksheetItem, worksheetId } = item;
-
-        const worksheetCreatedAt = worksheetArr?.find((ws) => ws.id === worksheetId)?.createdAt ?? null;
-
-        if (latestWorksheetItem) {
-          const { worksheetRecordId, volume } = latestWorksheetItem;
-
-          if (worksheetRecordId) {
-            if (!worksheetList[worksheetRecordId]) {
-              worksheetList[worksheetRecordId] = {
-                worksheetCreatedAt,
-                totalQty: 1,
-                totalVolume: Number(volume ?? 0),
-                worksheetItem: latestWorksheetItem,
-                worksheetItemArr: [latestWorksheetItem],
-              };
-            } else {
-              worksheetList[worksheetRecordId].totalQty += 1;
-              worksheetList[worksheetRecordId].totalVolume += Number(volume ?? 0);
-              worksheetList[worksheetRecordId].worksheetItemArr.push(latestWorksheetItem);
-            }
-          }
-        }
-      });
-    });
-
-    return productWorksheetList;
-
-    //
-  }, [finalProduct]);
-
-  // --------------------------------------------------------------------------
-
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        await update_contract();
-        await update_finalProduce();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '取得合約失敗', content: err.message });
-        setIsLoading(false);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        await update_contract();
-        // await update_engineeringContact();
-        // await update_deliveryList();
-      } catch (error) {
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    setNotes(deliveryList?.notes);
-  }, [deliveryList, notesDiasbled]);
-
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
+  // region REQUEST
 
   const reqPost = async (
     productItemId: string,
@@ -360,6 +267,57 @@ export default function OutboundOrder({
   };
 
   // --------------------------------------------------------------------------
+
+  // region COMPONENT PROPS
+
+  const productWorksheetList = useMemo(() => {
+    const productWorksheetList: TproductWorksheetList = {};
+
+    const finalProduct_sorted = _.sortBy(finalProduct, 'createdAt');
+
+    finalProduct_sorted.forEach((fp) => {
+      const { id, items } = fp;
+
+      productWorksheetList[id] = {
+        product: fp,
+        worksheetList: {},
+      };
+
+      const { worksheetList } = productWorksheetList[id];
+
+      items.forEach((item) => {
+        const { latestWorksheetItem, worksheetId } = item;
+
+        const worksheetCreatedAt = worksheetArr?.find((ws) => ws.id === worksheetId)?.createdAt ?? null;
+
+        if (latestWorksheetItem) {
+          const { worksheetRecordId, volume } = latestWorksheetItem;
+
+          if (worksheetRecordId) {
+            if (!worksheetList[worksheetRecordId]) {
+              worksheetList[worksheetRecordId] = {
+                worksheetCreatedAt,
+                totalQty: 1,
+                totalVolume: Number(volume ?? 0),
+                worksheetItem: latestWorksheetItem,
+                worksheetItemArr: [latestWorksheetItem],
+              };
+            } else {
+              worksheetList[worksheetRecordId].totalQty += 1;
+              worksheetList[worksheetRecordId].totalVolume += Number(volume ?? 0);
+              worksheetList[worksheetRecordId].worksheetItemArr.push(latestWorksheetItem);
+            }
+          }
+        }
+      });
+    });
+
+    return productWorksheetList;
+
+    //
+  }, [finalProduct]);
+
+  // ------------------------------------------------------------------------
 
   const rowPropsArr: TrowProps[] = useMemo(() => {
     const rowPropsArr: TrowProps[] = [];
@@ -480,15 +438,53 @@ export default function OutboundOrder({
           rowPropsArr.push(itemRow);
         });
       });
-
-      // ____________________________________________________________________
     }); // productWorksheetList
 
     return rowPropsArr;
   }, [productWorksheetList]);
 
   // --------------------------------------------------------------------------
+  // region  USE EFFECT
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsLoading(true);
+        await update_contract();
+        await update_finalProduce();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '取得合約失敗', content: err.message });
+        setIsLoading(false);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsLoading(true);
+        await update_contract();
+        // await update_engineeringContact();
+        // await update_deliveryList();
+      } catch (error) {
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setNotes(deliveryList?.notes);
+  }, [deliveryList, notesDiasbled]);
+
   // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
+
+  // region RENDER
 
   return (
     <SubLayer isLoading_all={isLoading}>
@@ -577,7 +573,17 @@ export default function OutboundOrder({
   );
 }
 
+// region END
+
 // ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+
+// region component
+
 const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
   selectorArr: [
     {
@@ -598,6 +604,8 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
 });
 
 // ======================================================================
+
+// region function
 
 const createRowProps_prodRow = ({
   prod,
@@ -656,6 +664,8 @@ const createRowProps_prodRow = ({
   };
 };
 
+// ===========================================================================
+
 const createRowProps_headRow = ({
   worksheetItem,
   worksheetItemQty,
@@ -689,6 +699,8 @@ const createRowProps_headRow = ({
     center,
   };
 };
+
+// ==========================================================================
 
 const createRowProps_itemRow = ({
   //
@@ -807,8 +819,3 @@ const createRowProps_itemRow = ({
     // rightPanelArr: foo,
   };
 };
-
-// ========================================================================
-// ========================================================================
-// ========================================================================
-// ========================================================================

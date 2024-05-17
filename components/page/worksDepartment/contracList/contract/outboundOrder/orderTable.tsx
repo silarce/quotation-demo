@@ -127,6 +127,8 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
 });
 
 // ================================================================================
+// region START
+
 export default function OrderTable({ control }: { control: Tcontrol }) {
   const { rowPropsArr } = control;
 
@@ -138,6 +140,7 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
 
   // -------------------------------------------------------------------------------
 
+  // region RENDER
   return (
     <div className={scss.tableContainer}>
       <div className={scss.orderTable}>
@@ -159,12 +162,21 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
   );
 }
 
+// region END
+
 // ===================================================================
 // ===================================================================
 // ===================================================================
 // ===================================================================
 // ===================================================================
 
+// region COMPONENT
+//
+//
+//
+//
+//
+// region Row
 const Row = ({
   //
   className,
@@ -259,6 +271,8 @@ const Row = ({
   );
 };
 
+// ============================================================================
+// region Thead
 const Thead = (rowProps_other: TrowProps_other) => {
   return (
     <Row
@@ -308,6 +322,10 @@ const Thead = (rowProps_other: TrowProps_other) => {
   );
 };
 
+// ============================================================================
+
+// region HeadRow
+
 const HeadRow = (rowProps: TrowProps & TrowProps_other) => {
   // return <Row {...rowProps} className={(scss.headRow, rowProps.isProdRow && scss.prodRow)} />;
   return (
@@ -321,6 +339,8 @@ const HeadRow = (rowProps: TrowProps & TrowProps_other) => {
 };
 
 // ------------------------------------------------------------------------
+
+// region Panel
 
 const Panel = ({
   isUndefined,
