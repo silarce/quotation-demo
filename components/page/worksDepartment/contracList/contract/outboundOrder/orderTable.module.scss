@@ -1,6 +1,8 @@
 $gap: 14px;
 // $leftWidth: 928px;
 $leftWidth: 595px;
+$rowPaddingY: 11px;
+$rowPadding: $rowPaddingY 0px;
 
 .tableContainer {
   border: solid 1px theme("colors.border");
@@ -20,7 +22,7 @@ $leftWidth: 595px;
   display: flex;
   gap: calc($gap - 4px);
   width: max-content;
-  padding: 11px 0px;
+  padding: $rowPadding;
   background-color: var(--bgcGray);
   border-right-width: 22px;
   border-color: var(--bgcGray);
@@ -36,19 +38,60 @@ $leftWidth: 595px;
     background-color: var(--bgcGray);
     border-left-width: 22px;
     border-color: var(--bgcGray);
+    > div {
+      z-index: 1;
+    }
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -22px;
+
+      transform: translateY(-50%);
+      width: calc(100% + 22px + $gap);
+      height: calc(100% + $rowPaddingY * 2);
+      background-color: inherit;
+    }
   }
 
   > .left {
+    position: relative;
     transition: 0.3s;
     width: $leftWidth;
-    overflow: hidden;
+    // overflow: hidden;
+    padding: 0 3px;
+    box-sizing: border-box;
+    // font-weight: bold;
+
     &.notShow {
       width: 0;
+      padding-left: 0;
+      padding-right: 0;
+      > * {
+        opacity: 0;
+      }
     }
     > div {
       flex: none;
+      z-index: 0;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: calc(50% + 8px);
+      transform: translate(-50%, -50%);
+      width: calc(100% + $gap + 2px);
+      height: calc(100% + $rowPaddingY * 2);
+      background-color: inherit;
     }
   }
+
+  // > .center {
+  //   z-index: 1;
+  //   background-color: inherit;
+  // }
 
   > .rightPanel {
     display: grid;
@@ -85,6 +128,15 @@ $leftWidth: 595px;
     box-shadow:
       0px -2px 2px rgba(0, 0, 0, 0.1),
       0px 2px 2px rgba(0, 0, 0, 0.1);
+
+    > .side {
+      background-color: theme("colors.hoverBgc");
+    }
+
+    > .left {
+      // background-color: #ffeeee;
+      background-color: theme("colors.hoverBgc");
+    }
   }
 }
 

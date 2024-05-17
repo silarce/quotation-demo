@@ -24,6 +24,8 @@ import * as antdIcon from '@ant-design/icons';
 
 // ================================================================================
 
+// region type
+
 type TrowProps_other = {
   showLeft?: boolean | undefined;
   changeShowLeft?: () => void;
@@ -328,7 +330,6 @@ const Thead = (rowProps_other: TrowProps_other) => {
 // region HeadRow
 
 const HeadRow = (rowProps: TrowProps & TrowProps_other) => {
-  // return <Row {...rowProps} className={(scss.headRow, rowProps.isProdRow && scss.prodRow)} />;
   return (
     <Row
       {...rowProps}
