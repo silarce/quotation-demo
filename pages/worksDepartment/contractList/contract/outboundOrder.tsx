@@ -211,6 +211,8 @@ export default function OutboundOrder({
       }
     }
 
+    console.log(body);
+
     try {
       const res = await apiPatchDeliveryStatus({
         id: engineeringDeliveryListId,
@@ -419,7 +421,7 @@ export default function OutboundOrder({
               const reqBody: TcreateEngineeringDeliveryStatusDto = {
                 notes: notes,
                 itemName: itemName,
-                shippingDate: null,
+                shippingDate: shippingDate,
                 installerOutsourcingId: outsourcingId ?? null,
                 installerEmployees: employeeId ? [employeeId] : null,
                 installationDate: installationDate,

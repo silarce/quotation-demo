@@ -242,8 +242,8 @@ const Row = ({
         <div className={scss.right}>
           <div className={classNames(scss.cell, 'w-52')}>{right.accessorie}</div>
           <div className={classNames(scss.cell, 'w-24')}></div>
-          <div className={classNames(scss.cell, 'w-28')}>{right.installationDate}</div>
           <div className={classNames(scss.cell, 'w-28')}>{right.shippingDate}</div>
+          <div className={classNames(scss.cell, 'w-28')}>{right.installationDate}</div>
           <div className={classNames(scss.cell, 'w-24')}>{right.installerEmployeesName}</div>
           <div className={classNames(scss.cell, 'w-24')}>{right.itemName}</div>
           <div className={classNames(scss.cell, 'w-52')}>{right.notes}</div>
@@ -445,24 +445,6 @@ const Panel = ({
 
       <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-28')}>
         <InputSel
-          name="installationDate"
-          disabled={disabled}
-          datePickerProps={{
-            props: {
-              value: state.installationDate ? moment(state.installationDate) : undefined,
-              onChange: (v) => {
-                setState((state) => ({
-                  ...state,
-                  installationDate: v?.toISOString() ?? '',
-                }));
-              },
-            },
-          }}
-        />
-      </div>
-
-      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-28')}>
-        <InputSel
           name="shippingDate"
           disabled={disabled}
           datePickerProps={{
@@ -472,6 +454,24 @@ const Panel = ({
                 setState((state) => ({
                   ...state,
                   shippingDate: v?.toISOString() ?? '',
+                }));
+              },
+            },
+          }}
+        />
+      </div>
+
+      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-28')}>
+        <InputSel
+          name="installationDate"
+          disabled={disabled}
+          datePickerProps={{
+            props: {
+              value: state.installationDate ? moment(state.installationDate) : undefined,
+              onChange: (v) => {
+                setState((state) => ({
+                  ...state,
+                  installationDate: v?.toISOString() ?? '',
                 }));
               },
             },
