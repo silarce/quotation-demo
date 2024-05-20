@@ -195,8 +195,12 @@ const Row = ({
   return (
     <div className={classNames(scss.row, className)}>
       <div className={classNames(scss.side)}>
-        <div className={classNames(scss.cell, !side && 'invisible', 'w-7')}>{side?.serialNumber}</div>
-        <div className={classNames(scss.cell, !side && 'invisible', 'w-16')}>{side?.projectName}</div>
+        <div className={classNames(scss.cell, !side && 'invisible', config.serialNumber.className)}>
+          {side?.serialNumber}
+        </div>
+        <div className={classNames(scss.cell, !side && 'invisible', config.projectName.className)}>
+          {side?.projectName}
+        </div>
         <div className={classNames(scss.cell, scss.showLeftBtnCell, !isThead && 'invisible', 'w-8')}>
           <Popover content="顯示/不顯示源頭產品" trigger="hover" mouseEnterDelay={0.5}>
             {showLeft && <antdIcon.StepBackwardOutlined className={scss.showLeftBtn} onClick={changeShowLeft} />}
@@ -205,35 +209,34 @@ const Row = ({
         </div>
       </div>
 
-      {/* <div className={classNames(scss.left, !showLeft && scss.hidden, scss.plus)}> */}
       <div className={classNames(scss.left, !showLeft && scss.notShow, scss.plus)}>
-        <div className={classNames(scss.cell, 'w-9')}>{left?.L}</div>
-        <div className={classNames(scss.cell, 'w-9')}>{left?.WG}</div>
-        <div className={classNames(scss.cell, 'w-9')}>{left?.B}</div>
-        <div className={classNames(scss.cell, 'w-8')}>{left?.qty}</div>
-        <div className={classNames(scss.cell, 'w-12')}>{left?.volume}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{left?.total_volume}</div>
-        <div className={classNames(scss.cell, 'w-16')}>{left?.doorModelName}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{left?.material}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{left?.horsepower}</div>
-        <div className={classNames(scss.cell, 'w-8')}>{left?.surface}</div>
+        <div className={classNames(scss.cell, config.L.className)}>{left?.L}</div>
+        <div className={classNames(scss.cell, config.WG.className)}>{left?.WG}</div>
+        <div className={classNames(scss.cell, config.B.className)}>{left?.B}</div>
+        <div className={classNames(scss.cell, config.qty.className)}>{left?.qty}</div>
+        <div className={classNames(scss.cell, config.volume.className)}>{left?.volume}</div>
+        <div className={classNames(scss.cell, config.total_volume.className)}>{left?.total_volume}</div>
+        <div className={classNames(scss.cell, config.doorModelName.className)}>{left?.doorModelName}</div>
+        <div className={classNames(scss.cell, config.material.className)}>{left?.material}</div>
+        <div className={classNames(scss.cell, config.horsepower.className)}>{left?.horsepower}</div>
+        <div className={classNames(scss.cell, config.surface.className)}>{left?.surface}</div>
       </div>
 
       <div className={classNames(scss.divider, !left && 'invisible')} />
 
       <div className={scss.center}>
-        <div className={classNames(scss.cell, 'w-16')}>{center?.projectName}</div>
-        <div className={classNames(scss.cell, 'w-9')}>{center?.L}</div>
-        <div className={classNames(scss.cell, 'w-9')}>{center?.WG}</div>
-        <div className={classNames(scss.cell, 'w-9')}>{center?.B}</div>
-        <div className={classNames(scss.cell, 'w-8')}>{center?.qty}</div>
-        <div className={classNames(scss.cell, 'w-12')}>{center?.volume}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{center?.total_volume}</div>
-        <div className={classNames(scss.cell, 'w-16')}>{center?.doorModelName}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{center?.material}</div>
-        <div className={classNames(scss.cell, 'w-14')}>{center?.horsepower}</div>
-        <div className={classNames(scss.cell, 'w-8')}>{center?.surface}</div>
-        <div className={classNames(scss.cell, 'w-[98px]')}>{center?.establishmentDate}</div>
+        <div className={classNames(scss.cell, config.projectName.className)}>{center?.projectName}</div>
+        <div className={classNames(scss.cell, config.L.className)}>{center?.L}</div>
+        <div className={classNames(scss.cell, config.WG.className)}>{center?.WG}</div>
+        <div className={classNames(scss.cell, config.B.className)}>{center?.B}</div>
+        <div className={classNames(scss.cell, config.qty.className)}>{center?.qty}</div>
+        <div className={classNames(scss.cell, config.volume.className)}>{center?.volume}</div>
+        <div className={classNames(scss.cell, config.total_volume.className)}>{center?.total_volume}</div>
+        <div className={classNames(scss.cell, config.doorModelName.className)}>{center?.doorModelName}</div>
+        <div className={classNames(scss.cell, config.material.className)}>{center?.material}</div>
+        <div className={classNames(scss.cell, config.horsepower.className)}>{center?.horsepower}</div>
+        <div className={classNames(scss.cell, config.surface.className)}>{center?.surface}</div>
+        <div className={classNames(scss.cell, config.establishmentDate.className)}>{center?.establishmentDate}</div>
       </div>
 
       <div className={scss.divider} />
@@ -285,41 +288,40 @@ const Thead = (rowProps_other: TrowProps_other) => {
       // changeShowLeft={changeShowLeft}
       side={{
         serialNumber: '序號',
-        projectName: '工程名稱',
+        projectName: '項目',
       }}
       left={{
-        L: 'L',
-        WG: 'WG',
-        B: 'B',
-        qty: '數量',
-        volume: '才數',
-        total_volume: '總才數',
-        doorModelName: '門型',
-        material: '材料',
-        horsepower: '馬力',
-        surface: '表面',
+        WG: config.WG.caption,
+        B: config.B.caption,
+        qty: config.qty.caption,
+        volume: config.volume.caption,
+        total_volume: config.total_volume.caption,
+        doorModelName: config.doorModelName.caption,
+        material: config.material.caption,
+        horsepower: config.horsepower.caption,
+        surface: config.surface.caption,
       }}
       center={{
-        projectName: '項目',
-        L: 'L',
-        WG: 'WG',
-        B: 'B',
-        qty: '數量',
-        volume: '才數',
-        total_volume: '總才數',
-        doorModelName: '門型',
-        material: '材料',
-        horsepower: '馬力',
-        surface: '表面',
-        establishmentDate: '工作表開立日期',
+        projectName: config.projectName.caption,
+        L: config.L.caption,
+        WG: config.WG.caption,
+        B: config.B.caption,
+        qty: config.qty.caption,
+        volume: config.volume.caption,
+        total_volume: config.total_volume.caption,
+        doorModelName: config.doorModelName.caption,
+        material: config.material.caption,
+        horsepower: config.horsepower.caption,
+        surface: config.surface.caption,
+        establishmentDate: config.establishmentDate.caption,
       }}
       right={{
-        accessorie: '選配',
-        installationDate: '施工日期',
-        shippingDate: '出貨日期',
-        installerEmployeesName: '安裝人員',
-        itemName: '項目',
-        notes: '備註',
+        accessorie: config.accessorie.caption,
+        shippingDate: config.shippingDate.caption,
+        installationDate: config.installationDate.caption,
+        installerEmployeesName: config.installerEmployeesName.caption,
+        itemName: config.itemName.caption,
+        notes: config.notes.caption,
       }}
     />
   );
@@ -491,6 +493,7 @@ const Panel = ({
           }}
         />
       </div>
+
       <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-24')}>
         <InputSel
           name="itemName"
@@ -564,4 +567,126 @@ const Panel = ({
       )}
     </div>
   );
+};
+
+// region config
+
+type TcellKeys =
+  | 'serialNumber'
+  | 'projectName'
+  //
+  | 'L'
+  | 'WG'
+  | 'B'
+  | 'qty'
+  | 'volume'
+  | 'total_volume'
+  | 'doorModelName'
+  | 'material'
+  | 'horsepower'
+  | 'surface'
+  //
+  | 'projectName'
+  | 'establishmentDate'
+  //
+  | 'accessorie'
+  | 'btnBar'
+  | 'shippingDate'
+  | 'installationDate'
+  | 'installerEmployeesName'
+  | 'itemName'
+  | 'notes';
+
+type TconfigList = {
+  [key in TcellKeys]: {
+    caption: string;
+    className: string;
+    // width: number;
+  };
+};
+
+const config: TconfigList = {
+  serialNumber: {
+    caption: '序號',
+    className: 'w-7',
+  },
+  projectName: {
+    caption: '工程名稱',
+    className: 'w-16',
+  },
+
+  L: {
+    caption: 'L',
+    className: 'w-9',
+  },
+  WG: {
+    caption: 'WG',
+    className: 'w-9',
+  },
+  B: {
+    caption: 'B',
+    className: 'w-9',
+  },
+  qty: {
+    caption: '數量',
+    className: 'w-8',
+  },
+  volume: {
+    caption: '才數',
+    className: 'w-12',
+  },
+  total_volume: {
+    caption: '總才數',
+    className: 'w-14',
+  },
+  doorModelName: {
+    caption: '門型',
+    className: 'w-16',
+  },
+  material: {
+    caption: '材料',
+    className: 'w-14',
+  },
+  horsepower: {
+    caption: '馬力',
+    className: 'w-14',
+  },
+  surface: {
+    caption: '表面',
+    className: 'w-8',
+  },
+
+  establishmentDate: {
+    caption: '工作表開立日期',
+    className: 'w-[98px]',
+  },
+
+  accessorie: {
+    caption: '選配',
+    className: 'w-52',
+  },
+  btnBar: {
+    caption: '',
+    className: 'w-24',
+  },
+  shippingDate: {
+    caption: '出貨日期',
+    className: 'w-28',
+  },
+  installationDate: {
+    caption: '施工日期',
+    className: 'w-28',
+  },
+  installerEmployeesName: {
+    caption: '安裝人員',
+    className: 'w-24',
+  },
+  itemName: {
+    caption: '項目',
+    className: 'w-24',
+  },
+  notes: {
+    caption: '備註',
+    className: 'w-52',
+  },
 };
