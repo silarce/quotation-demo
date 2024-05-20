@@ -322,6 +322,10 @@ export default function OutboundOrder({
   // ------------------------------------------------------------------------
 
   const rowPropsArr: TrowProps[] = useMemo(() => {
+    // 做法是把每一筆worksheetArr.worksheetItemArr裡的item
+    // 依序分析成rowProps然後放進rowPropsArr
+    // 畫面上看起來HTML的元素有父子的關係，但其實每一個row其實都是獨立的，是兄弟關係
+
     const rowPropsArr: TrowProps[] = [];
 
     Object.values(productWorksheetList).forEach((productWorksheet, index) => {
@@ -341,8 +345,11 @@ export default function OutboundOrder({
 
       rowPropsArr.push(prodRow);
       // ____________________________________________________________________
+
+      // 處理第一個worksheetArr的第一筆worksheet
       worksheetArr?.[0]?.worksheetItemArr.forEach((item) => {
         const itemRow = createRowProps_itemRow({
+          contractProductItem: product.items[0],
           worksheetItem: item,
           worksheetCreatedAt: worksheetArr?.[0].worksheetCreatedAt,
           onAddClick: () => {
@@ -383,6 +390,7 @@ export default function OutboundOrder({
       });
 
       // ____________________________________________________________________
+      // 處理第一個worksheetArr的第一筆之外的worksheet
 
       worksheetArr?.forEach((worksheet, index) => {
         if (index === 0) {
@@ -401,6 +409,7 @@ export default function OutboundOrder({
 
         worksheetItemArr.forEach((item) => {
           const itemRow = createRowProps_itemRow({
+            contractProductItem: product.items[0],
             worksheetItem: item,
             worksheetCreatedAt,
             onAddClick: () => {
@@ -706,12 +715,14 @@ const createRowProps_headRow = ({
 
 const createRowProps_itemRow = ({
   //
+  contractProductItem,
   worksheetItem,
   onAddClick,
   onConfirmClick,
   onDeleteClick,
   worksheetCreatedAt,
 }: {
+  contractProductItem: TquotationProductItemDto;
   worksheetItem: TquotationProductItemDto;
   onAddClick: () => void;
   onConfirmClick: (parameters: {
@@ -726,9 +737,19 @@ const createRowProps_itemRow = ({
   onDeleteClick: (deleverStatuId: string) => void;
   worksheetCreatedAt: string | null;
 }): TrowProps => {
+  const accessories_contract = contractProductItem.accessories;
   const { deliveryStatus, accessories } = worksheetItem;
 
-  const accessoriesStr = accessories?.map((a) => a.name).join('\n');
+  // ________________________________________________________
+  // issue#485 選配要列出 工作表與合約有差異的項目
+  // https://github.com/San-Jeou/sanjeou-erp-fe/issues/485
+  // 工作表的選配是合約選配的子集合，所以有差異的項目其實就是合約有而工作表沒有的項目
+  // 在工作表把項目去掉的意思應該是沒有要做吧，為什麼要列出沒有要做的項目?怪怪的
+  const diff = _.differenceBy(accessories_contract, accessories, 'codeName');
+  const accessoriesStr = diff?.map((a) => a.name).join('\n');
+
+  // 原本的 // const accessoriesStr = accessories?.map((a) => a.name).join('\n');
+  // ________________________________________________________
 
   const deliveryStatus_sorted = _.sortBy(deliveryStatus, 'createdAt');
 
