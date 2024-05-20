@@ -211,8 +211,6 @@ export default function OutboundOrder({
       }
     }
 
-    console.log(body);
-
     try {
       const res = await apiPatchDeliveryStatus({
         id: engineeringDeliveryListId,

@@ -584,6 +584,14 @@ export const optionsCreator_certifyType = createOptionsCreator({
   })(),
 });
 
+export const optionsCreator_outboundOrderComponent = createOptionsCreator({
+  optionsArr: [
+    { value: '門片', label: '門片' },
+    { value: '支軌', label: '支軌' },
+    { value: '馬達', label: '馬達' },
+  ],
+});
+
 // const optionsCreator_foooooo = (props: { haveEmpty?: boolean } = {}): Toption[] => {
 //   const { haveEmpty } = props;
 //   const arr = [{ value: 'foooo' as const, label: 'fooooo' }];

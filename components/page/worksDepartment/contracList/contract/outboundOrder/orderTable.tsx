@@ -15,6 +15,8 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { TemployeeDto, ToutsourcingDto } from 'js/api/dtoTypes';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import { Toption } from 'js/utils/options/options';
+import { optionsCreator_outboundOrderComponent } from 'js/utils/options/productOptions';
 
 // icon
 import { IconAddCircle, IconEdit, IconDelete01, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
@@ -69,6 +71,7 @@ type TrowProps = {
   };
   right?: {
     accessorie?: React.ReactNode;
+    component?: React.ReactNode;
     installationDate?: React.ReactNode;
     shippingDate?: React.ReactNode;
     installerEmployeesName?: React.ReactNode;
@@ -82,6 +85,7 @@ type Tpanel = {
   key?: string | number;
   isUndefined?: boolean;
   accessorie: React.ReactNode; // 選配
+  // component: React.ReactNode;
   installationDate: string; // 施工日期
   shippingDate: string; // 出貨日
   installer_employee?: TemployeeDto | undefined | null; // 安裝人員 員工
@@ -243,13 +247,16 @@ const Row = ({
 
       {right && (
         <div className={scss.right}>
-          <div className={classNames(scss.cell, 'w-52')}>{right.accessorie}</div>
-          <div className={classNames(scss.cell, 'w-24')}></div>
-          <div className={classNames(scss.cell, 'w-28')}>{right.shippingDate}</div>
-          <div className={classNames(scss.cell, 'w-28')}>{right.installationDate}</div>
-          <div className={classNames(scss.cell, 'w-24')}>{right.installerEmployeesName}</div>
-          <div className={classNames(scss.cell, 'w-24')}>{right.itemName}</div>
-          <div className={classNames(scss.cell, 'w-52')}>{right.notes}</div>
+          <div className={classNames(scss.cell, config.accessorie.className)}>{right.accessorie}</div>
+          <div className={classNames(scss.cell, config.btnBar.className)}></div>
+          <div className={classNames(scss.cell, config.component.className)}>{right.component}</div>
+          <div className={classNames(scss.cell, config.shippingDate.className)}>{right.shippingDate}</div>
+          <div className={classNames(scss.cell, config.installationDate.className)}>{right.installationDate}</div>
+          <div className={classNames(scss.cell, config.installerEmployeesName.className)}>
+            {right.installerEmployeesName}
+          </div>
+          <div className={classNames(scss.cell, config.itemName.className)}>{right.itemName}</div>
+          <div className={classNames(scss.cell, config.notes.className)}>{right.notes}</div>
         </div>
       )}
 
@@ -264,13 +271,14 @@ const Row = ({
 
       {!right && !rightPanelArr && (
         <div className={scss.right}>
-          <div className={classNames(scss.cell, 'w-52')} />
-          <div className={classNames(scss.cell, 'w-24')} />
-          <div className={classNames(scss.cell, 'w-28')} />
-          <div className={classNames(scss.cell, 'w-28')} />
-          <div className={classNames(scss.cell, 'w-24')} />
-          <div className={classNames(scss.cell, 'w-24')} />
-          <div className={classNames(scss.cell, 'w-52')} />
+          <div className={classNames(scss.cell, config.accessorie.className)} />
+          <div className={classNames(scss.cell, config.btnBar.className)} />
+          <div className={classNames(scss.cell, config.component.className)} />
+          <div className={classNames(scss.cell, config.shippingDate.className)} />
+          <div className={classNames(scss.cell, config.installationDate.className)} />
+          <div className={classNames(scss.cell, config.installerEmployeesName.className)} />
+          <div className={classNames(scss.cell, config.itemName.className)} />
+          <div className={classNames(scss.cell, config.notes.className)} />
         </div>
       )}
     </div>
@@ -317,6 +325,7 @@ const Thead = (rowProps_other: TrowProps_other) => {
       }}
       right={{
         accessorie: config.accessorie.caption,
+        component: config.component.caption,
         shippingDate: config.shippingDate.caption,
         installationDate: config.installationDate.caption,
         installerEmployeesName: config.installerEmployeesName.caption,
@@ -364,6 +373,7 @@ const Panel = ({
 
   const [state_employee, setState_Employee] = useState(installer_employee);
   const [state_outsourcing, setState_Outsourcing] = useState(installer_outsourcing);
+  const [state_component, setState_Component] = useState<Toption | null>(null);
 
   const [state, setState] = useState({
     installationDate,
@@ -372,6 +382,21 @@ const Panel = ({
     notes,
   });
 
+  // ------------------------------------------------------------------------
+
+  const reset = () => {
+    setState({
+      installationDate,
+      shippingDate,
+      itemName,
+      notes,
+    });
+    setState_Employee(installer_employee);
+    setState_Outsourcing(installer_outsourcing);
+    setState_Component(null);
+  };
+
+  // ------------------------------------------------------------------------
   const defaultSeletedDataArrArr = useMemo(() => {
     type TdefaultSeletedDataArrArr = [TemployeeDto[] | undefined, ToutsourcingDto[] | undefined];
     let arr: TdefaultSeletedDataArrArr = [[], []];
@@ -385,16 +410,7 @@ const Panel = ({
     return arr;
   }, [state_outsourcing, state_employee]);
 
-  const reset = () => {
-    setState({
-      installationDate,
-      shippingDate,
-      itemName,
-      notes,
-    });
-    setState_Employee(installer_employee);
-    setState_Outsourcing(installer_outsourcing);
-  };
+  // ------------------------------------------------------------------------
 
   return (
     <div className={scss.panel}>
@@ -443,6 +459,22 @@ const Panel = ({
             }}
           />
         )}
+      </div>
+
+      <div className={classNames(scss.cell, isUndefined && 'invisible', config.component.className)}>
+        <InputSel
+          name="component"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: optionsCreator_outboundOrderComponent(),
+              value: state_component,
+              onChange: (v) => {
+                setState_Component(v);
+              },
+            },
+          }}
+        />
       </div>
 
       <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-28')}>
@@ -591,6 +623,7 @@ type TcellKeys =
   //
   | 'accessorie'
   | 'btnBar'
+  | 'component'
   | 'shippingDate'
   | 'installationDate'
   | 'installerEmployeesName'
@@ -662,12 +695,16 @@ const config: TconfigList = {
   },
 
   accessorie: {
-    caption: '選配',
+    caption: '未用選配',
     className: 'w-52',
   },
   btnBar: {
     caption: '',
     className: 'w-24',
+  },
+  component: {
+    caption: '施工項目',
+    className: 'w-28',
   },
   shippingDate: {
     caption: '出貨日期',
