@@ -122,6 +122,21 @@ export default function OutboundOrder({
   const [isReqing, setIsReqing] = useState(false);
 
   const [targetWorksheetItemId, setTargetWorksheetItemId] = useState<string>();
+  const [seletedWorksheetItem, setSeletedWorksheetItem] = useState<{ [id: string]: TquotationProductItemDto }>({});
+
+  const switchSeletedWorksheetItem = (worksheetItem: TquotationProductItemDto) => {
+    setSeletedWorksheetItem((list) => {
+      const copy = { ...list };
+
+      if (copy[worksheetItem.id]) {
+        delete copy[worksheetItem.id];
+      } else {
+        copy[worksheetItem.id] = worksheetItem;
+      }
+
+      return copy;
+    });
+  };
 
   // --------------------------------------------------------------------------
 
@@ -432,6 +447,11 @@ export default function OutboundOrder({
           onCopyClick: async (params) => {
             await onCopy(item.id, params);
           },
+          //
+          onCenterCheck: () => {
+            switchSeletedWorksheetItem(item);
+          },
+          isCenterCheck: !!seletedWorksheetItem[item.id],
         });
 
         rowPropsArr.push(itemRow);
@@ -472,6 +492,11 @@ export default function OutboundOrder({
             onCopyClick: async (params) => {
               await onCopy(item.id, params);
             },
+            //
+            onCenterCheck: () => {
+              switchSeletedWorksheetItem(item);
+            },
+            isCenterCheck: !!seletedWorksheetItem[item.id],
           });
 
           rowPropsArr.push(itemRow);
@@ -480,7 +505,11 @@ export default function OutboundOrder({
     }); // productWorksheetList
 
     return rowPropsArr;
-  }, [productWorksheetList]);
+  }, [
+    productWorksheetList,
+    seletedWorksheetItem,
+    //  finalProduct
+  ]);
 
   // --------------------------------------------------------------------------
   // region  USE EFFECT
@@ -542,7 +571,13 @@ export default function OutboundOrder({
             </div>
           </div>
 
-          <OrderTable control={{ rowPropsArr: rowPropsArr }} />
+          <OrderTable
+            //
+            rowPropsArr={rowPropsArr}
+            batchWorksheetItem={{
+              onBatchAddChange: () => setSeletedWorksheetItem({}),
+            }}
+          />
 
           <div className={style.remark}>
             <div className={style.title}>
@@ -646,6 +681,7 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
 
 // region function
 
+// 產品資料的row，這個row會包含item的資料，這個row不會包含panel
 const createRowProps_prodRow = ({
   prod,
   serialNumber,
@@ -674,6 +710,7 @@ const createRowProps_prodRow = ({
     total_volume: total_volume_worksheet,
     doorModelName: worksheetItem.doorModelName,
     material: worksheetItem.materialName,
+    // horsepower: worksheetItem.horsepower,
     horsepower: worksheetItem.horsepower,
     surface: worksheetItem.materialSurface,
     establishmentDate: getTaiwanDateStr(worksheetCreatedAt),
@@ -705,14 +742,19 @@ const createRowProps_prodRow = ({
 
 // ===========================================================================
 
+// item資料的row，這個row不會包含panel
 const createRowProps_headRow = ({
   worksheetItem,
   worksheetItemQty,
   worksheetCreatedAt,
-}: {
+}: // onCenterCheck,
+// isCenterCheck,
+{
   worksheetItem: TquotationProductItemDto;
   worksheetItemQty: number;
   worksheetCreatedAt: string | null;
+  // onCenterCheck: null | undefined | (() => void);
+  // isCenterCheck: boolean;
 }): TrowProps => {
   const total_volume_worksheet =
     worksheetItemQty && worksheetItem ? new Decimal(worksheetItemQty).mul(worksheetItem.volume || 0).toNumber() : '';
@@ -750,6 +792,9 @@ const createRowProps_itemRow = ({
   onCopyClick,
   onDeleteClick,
   worksheetCreatedAt,
+  //
+  onCenterCheck,
+  isCenterCheck,
 }: {
   contractProductItem: TquotationProductItemDto;
   worksheetItem: TquotationProductItemDto;
@@ -773,6 +818,9 @@ const createRowProps_itemRow = ({
   }) => Promise<void>;
   onDeleteClick: (deleverStatuId: string) => void;
   worksheetCreatedAt: string | null;
+  //
+  onCenterCheck: null | undefined | (() => void);
+  isCenterCheck: boolean;
 }): TrowProps => {
   const accessories_contract = contractProductItem.accessories;
   const { deliveryStatus, accessories } = worksheetItem;
@@ -873,6 +921,8 @@ const createRowProps_itemRow = ({
       horsepower: worksheetItem.horsepower,
       surface: worksheetItem.materialSurface,
       establishmentDate: getTaiwanDateStr(worksheetCreatedAt),
+      onCheckClick: onCenterCheck,
+      isChecked: isCenterCheck,
     },
     rightPanelArr: rightPanelArr,
     // rightPanelArr: foo,

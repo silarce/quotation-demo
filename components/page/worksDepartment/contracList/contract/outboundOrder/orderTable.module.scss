@@ -4,12 +4,27 @@ $leftWidth: 595px;
 $rowPaddingY: 11px;
 $rowPadding: $rowPaddingY 0px;
 
+$height_topPanel: 60px;
+$height_thead: 44px;
+$top_topPanel: 0px;
+$top_thead: 0px;
+$top_headRow: calc($height_thead);
+
 .tableContainer {
   border: solid 1px theme("colors.border");
 }
 
+.topPanel {
+  display: flex;
+  align-items: center;
+  // width: fit-content;
+  height: $height_topPanel;
+  margin: 0 3px;
+}
+
 .orderTable {
   border: solid 4px white;
+  border-top: 0;
   overflow: auto;
   max-height: 500px;
 }
@@ -22,6 +37,7 @@ $rowPadding: $rowPaddingY 0px;
   display: flex;
   gap: calc($gap - 4px);
   width: max-content;
+
   padding: $rowPadding;
   background-color: var(--bgcGray);
   border-right-width: 22px;
@@ -99,8 +115,9 @@ $rowPadding: $rowPaddingY 0px;
 
   &.thead {
     position: sticky;
-    top: 0;
+    top: $top_thead;
     z-index: 2;
+    height: $height_thead;
     background-color: var(--bgcGray);
     border-color: var(--bgcGray);
     > .side {
@@ -121,12 +138,14 @@ $rowPadding: $rowPaddingY 0px;
 
   &.prodRow {
     position: sticky;
-    top: 46px;
+    top: $top_headRow;
+
     z-index: 2;
     min-height: 70px;
+
     box-shadow:
-      0px -2px 2px rgba(0, 0, 0, 0.1),
-      0px 2px 2px rgba(0, 0, 0, 0.1);
+      inset 0px -2px 2px rgba(0, 0, 0, 0.1),
+      inset 0px 2px 2px rgba(0, 0, 0, 0.1);
 
     > .side {
       background-color: theme("colors.hoverBgc");
@@ -143,6 +162,10 @@ $rowPadding: $rowPaddingY 0px;
   position: sticky;
   left: 0;
   z-index: 1;
+}
+
+.right {
+  position: relative;
 }
 
 .divider {
@@ -211,6 +234,32 @@ $rowPadding: $rowPaddingY 0px;
     svg {
       height: var(--foo);
       width: var(--foo);
+    }
+  }
+}
+
+.batchAdd {
+  $width_add: 94px;
+  $width_confirm: 66px;
+  $gap: 10px;
+
+  display: flex;
+  gap: $gap;
+
+  width: calc($width_add);
+  overflow: hidden;
+  transition: 0.3s;
+  .btn_add {
+    width: $width_add;
+  }
+  .btn_confirm {
+    width: $width_confirm;
+  }
+
+  &.active {
+    width: calc($width_add + $width_confirm + $gap);
+    .btn_add {
+      background-color: #ffeeee;
     }
   }
 }

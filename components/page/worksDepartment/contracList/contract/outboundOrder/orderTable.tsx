@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -6,12 +6,14 @@ import moment from 'moment';
 import scss from './orderTable.module.scss';
 
 // antd
-import { Popover } from 'antd';
+import { Checkbox, Popover, Button } from 'antd';
+import { Switch } from 'antd';
 
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 // import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import MyButton_rounded from 'components/global/gear/button/myButton_rounded';
 
 import { TemployeeDto, ToutsourcingDto } from 'js/api/dtoTypes';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
@@ -41,6 +43,7 @@ type TrowProps_other = {
   showLeft?: boolean | undefined;
   changeShowLeft?: () => void;
   isThead?: boolean;
+  showBatchAdd?: boolean;
 };
 
 type TrowProps = {
@@ -48,6 +51,8 @@ type TrowProps = {
   className?: string;
   isHeadRow?: boolean;
   isProdRow?: boolean;
+  // onCheckClick?: null | (() => void);
+  // isChecked?: boolean;
   side?: {
     serialNumber: React.ReactNode;
     projectName: React.ReactNode;
@@ -77,6 +82,9 @@ type TrowProps = {
     horsepower?: React.ReactNode;
     surface?: React.ReactNode;
     establishmentDate?: string | null; // 工作表開立日期
+    //
+    onCheckClick?: null | (() => void);
+    isChecked?: boolean;
   };
   right?: {
     accessorie?: React.ReactNode;
@@ -107,11 +115,11 @@ type Tpanel = {
   onCopyClick: ((parameters: TpostDeliveryStatusParams) => Promise<void>) | undefined;
 };
 
-type Tcontrol = {
-  rowPropsArr: TrowProps[];
-};
+// type Tcontrol = {
+//   rowPropsArr: TrowProps[];
+// };
 
-export type { Tcontrol as Tcontrol_orderTable, TrowProps, Tpanel, TpostDeliveryStatusParams };
+export type { TrowProps, Tpanel, TpostDeliveryStatusParams };
 
 // ================================================================================
 
@@ -137,23 +145,53 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
 // ================================================================================
 // region START
 
-export default function OrderTable({ control }: { control: Tcontrol }) {
-  const { rowPropsArr } = control;
-
+export default function OrderTable({
+  rowPropsArr,
+  batchWorksheetItem,
+}: {
+  rowPropsArr: TrowProps[];
+  batchWorksheetItem: {
+    onBatchAddChange?: (showBatchAdd: boolean) => void;
+    onBatchAddClick?: () => void;
+  };
+}) {
   const [showLeft, setShowLeft] = useState(true);
+  const [showBatchAdd, setShowBatchAdd] = useState(false);
 
   const changeShowLeft = () => {
     setShowLeft((state) => !state);
   };
 
   // -------------------------------------------------------------------------------
+  useEffect(() => {
+    batchWorksheetItem.onBatchAddChange && batchWorksheetItem.onBatchAddChange(showBatchAdd);
+  }, [showBatchAdd]);
+
+  // -------------------------------------------------------------------------------
 
   // region RENDER
   return (
     <div className={scss.tableContainer}>
+      <div className={scss.topPanel}>
+        <Switch
+          checkedChildren="勾選工作表"
+          unCheckedChildren="勾選工作表"
+          checked={showBatchAdd}
+          // defaultChecked={showBatchAdd}
+          onChange={(bool) => {
+            setShowBatchAdd(bool);
+          }}
+        />
+        <div className={'ml-5'}>
+          <BatchProdPanel
+            className={classNames(!showBatchAdd && 'hidden')}
+            onBatchAddClick={batchWorksheetItem.onBatchAddClick}
+          />
+        </div>
+      </div>
+
       <div className={scss.orderTable}>
         {/*  */}
-
         <Thead showLeft={showLeft} changeShowLeft={changeShowLeft} isThead={true} />
 
         {rowPropsArr.map((rowProps, index) => {
@@ -163,7 +201,15 @@ export default function OrderTable({ control }: { control: Tcontrol }) {
             return <HeadRow key={key || index} showLeft={showLeft} changeShowLeft={changeShowLeft} {...rowProps} />;
           }
 
-          return <Row key={key || index} showLeft={showLeft} changeShowLeft={changeShowLeft} {...rowProps} />;
+          return (
+            <Row
+              key={key || index}
+              showLeft={showLeft}
+              changeShowLeft={changeShowLeft}
+              {...rowProps}
+              showBatchAdd={showBatchAdd}
+            />
+          );
         })}
       </div>
     </div>
@@ -196,6 +242,7 @@ const Row = ({
   center,
   right,
   rightPanelArr: rightPanelArr,
+  showBatchAdd,
 }: TrowProps & TrowProps_other) => {
   return (
     <div className={classNames(scss.row, className)}>
@@ -242,6 +289,16 @@ const Row = ({
         <div className={classNames(scss.cell, config.horsepower.className)}>{center?.horsepower}</div>
         <div className={classNames(scss.cell, config.surface.className)}>{center?.surface}</div>
         <div className={classNames(scss.cell, config.establishmentDate.className)}>{center?.establishmentDate}</div>
+
+        <div className={classNames(scss.cell, config.centerCheckBox.className)}>
+          {center?.onCheckClick && (
+            <Checkbox
+              className={classNames(!showBatchAdd && 'invisible')}
+              onChange={center.onCheckClick}
+              checked={center.isChecked}
+            />
+          )}
+        </div>
       </div>
 
       <div className={scss.divider} />
@@ -618,6 +675,16 @@ const Panel = ({
   );
 };
 
+// region batchProdPanel
+
+const BatchProdPanel = ({ className, onBatchAddClick }: { className?: string; onBatchAddClick?: () => void }) => {
+  return (
+    <div className={classNames(className)}>
+      <Button onClick={onBatchAddClick}>批次新增</Button>
+    </div>
+  );
+};
+
 // region config
 
 type TcellKeys =
@@ -645,7 +712,9 @@ type TcellKeys =
   | 'installationDate'
   | 'installerEmployeesName'
   | 'itemName'
-  | 'notes';
+  | 'notes'
+  //
+  | 'centerCheckBox';
 
 type TconfigList = {
   [key in TcellKeys]: {
@@ -742,5 +811,9 @@ const config: TconfigList = {
   notes: {
     caption: '備註',
     className: 'w-52',
+  },
+  centerCheckBox: {
+    caption: '',
+    className: 'w-8 text-center',
   },
 };
