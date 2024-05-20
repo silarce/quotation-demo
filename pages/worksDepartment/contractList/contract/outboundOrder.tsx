@@ -6,7 +6,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 // import moment from 'moment';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 import classNames from 'classnames';
 
 // layer
@@ -20,6 +20,9 @@ import OrderTable, {
   Tpanel,
   TpostDeliveryStatusParams,
 } from 'components/page/worksDepartment/contracList/contract/outboundOrder/orderTable';
+import Modal_newDeliveryStatu, {
+  TpreCreateEngineeringDeliveryStatusDto,
+} from 'components/page/worksDepartment/contracList/contract/outboundOrder/modal_newDeliveryStatu';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -124,19 +127,7 @@ export default function OutboundOrder({
   const [targetWorksheetItemId, setTargetWorksheetItemId] = useState<string>();
   const [seletedWorksheetItem, setSeletedWorksheetItem] = useState<{ [id: string]: TquotationProductItemDto }>({});
 
-  const switchSeletedWorksheetItem = (worksheetItem: TquotationProductItemDto) => {
-    setSeletedWorksheetItem((list) => {
-      const copy = { ...list };
-
-      if (copy[worksheetItem.id]) {
-        delete copy[worksheetItem.id];
-      } else {
-        copy[worksheetItem.id] = worksheetItem;
-      }
-
-      return copy;
-    });
-  };
+  const [showBatchAddModal, setShowBatchAddModal] = useState(false);
 
   // --------------------------------------------------------------------------
 
@@ -240,6 +231,26 @@ export default function OutboundOrder({
     }
   };
 
+  const reqPost_2 = async (body: TcreateEngineeringDeliveryStatusDto) => {
+    if (!engineeringDeliveryListId || isReqing) {
+      return;
+    }
+
+    try {
+      const res = await apiPostDeliveryStatus({
+        id: engineeringDeliveryListId,
+        body,
+      });
+
+      update_finalProduce();
+
+      // return res;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增失敗', content: err.message });
+    }
+  };
+
   const reqPatch = async ({ statusId, body }: { statusId: string; body: TupdateEngineeringDeliveryStatusDto }) => {
     if (!engineeringDeliveryListId || isReqing) {
       return;
@@ -307,6 +318,38 @@ export default function OutboundOrder({
       myAlert.err({ title: '更新備註失敗', content: err.message });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // --------------------------------------------------------------------------
+
+  // region FUNCTION
+
+  const switchSeletedWorksheetItem = (worksheetItem: TquotationProductItemDto) => {
+    setSeletedWorksheetItem((list) => {
+      const copy = { ...list };
+
+      if (copy[worksheetItem.id]) {
+        delete copy[worksheetItem.id];
+      } else {
+        copy[worksheetItem.id] = worksheetItem;
+      }
+
+      return copy;
+    });
+  };
+
+  const batchPost = async (preBody: TpreCreateEngineeringDeliveryStatusDto) => {
+    for (const item of Object.values(seletedWorksheetItem)) {
+      const worksheetItemId = item.id;
+
+      const body: TcreateEngineeringDeliveryStatusDto = {
+        ...preBody,
+        productItemId: worksheetItemId,
+      };
+
+      await reqPost_2(body);
+      setSeletedWorksheetItem({});
     }
   };
 
@@ -576,6 +619,7 @@ export default function OutboundOrder({
             rowPropsArr={rowPropsArr}
             batchWorksheetItem={{
               onBatchAddChange: () => setSeletedWorksheetItem({}),
+              onBatchAddClick: () => setShowBatchAddModal(true),
             }}
           />
 
@@ -642,6 +686,11 @@ export default function OutboundOrder({
         onCancel={() => {
           setTargetWorksheetItemId(undefined);
         }}
+      />
+      <Modal_newDeliveryStatu
+        visible={showBatchAddModal}
+        onConfirm={batchPost}
+        onCancel={() => setShowBatchAddModal(false)}
       />
     </SubLayer>
   );
