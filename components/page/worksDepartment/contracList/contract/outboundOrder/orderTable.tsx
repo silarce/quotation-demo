@@ -414,9 +414,9 @@ const Panel = ({
 
   return (
     <div className={scss.panel}>
-      <div className={classNames(scss.cell, scss.accessorie, 'w-52')}>{accessorie}</div>
+      <div className={classNames(scss.cell, scss.accessorie, config.accessorie.className)}>{accessorie}</div>
 
-      <div className={classNames(scss.cell, scss.btnBar, 'w-24')}>
+      <div className={classNames(scss.cell, scss.btnBar, config.btnBar.className)}>
         <IconAddCircle onClick={onAddClick} />
         <IconEdit
           className={classNames(
@@ -477,7 +477,7 @@ const Panel = ({
         />
       </div>
 
-      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-28')}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', config.shippingDate.className)}>
         <InputSel
           name="shippingDate"
           disabled={disabled}
@@ -495,7 +495,7 @@ const Panel = ({
         />
       </div>
 
-      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-28')}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', config.installationDate.className)}>
         <InputSel
           name="installationDate"
           disabled={disabled}
@@ -513,7 +513,7 @@ const Panel = ({
         />
       </div>
 
-      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-24')}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', config.installerEmployeesName.className)}>
         <InputSel
           name="installerEmployees"
           disabled={disabled}
@@ -526,7 +526,7 @@ const Panel = ({
         />
       </div>
 
-      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-24')}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', config.itemName.className)}>
         <InputSel
           name="itemName"
           disabled={disabled}
@@ -543,7 +543,7 @@ const Panel = ({
           }}
         />
       </div>
-      <div className={classNames(scss.cell, isUndefined && 'invisible', 'w-52')}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', config.notes.className)}>
         <InputSel
           name="notes"
           disabled={disabled}
