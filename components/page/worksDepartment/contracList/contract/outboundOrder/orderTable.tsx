@@ -19,7 +19,7 @@ import { Toption } from 'js/utils/options/options';
 import { optionsCreator_outboundOrderComponent } from 'js/utils/options/productOptions';
 
 // icon
-import { IconAddCircle, IconEdit, IconDelete01, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
+import { IconAddCircle, IconEdit, IconDelete01, IconCheck02, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 
 // import { VerticalLeftOutlined, VerticalRightOutlined } from '@ant-design/icons';
 import * as antdIcon from '@ant-design/icons';
@@ -27,6 +27,15 @@ import * as antdIcon from '@ant-design/icons';
 // ================================================================================
 
 // region type
+
+type TpostDeliveryStatusParams = {
+  employeeId?: string;
+  outsourcingId?: string;
+  installationDate: string;
+  shippingDate: string;
+  itemName: string;
+  notes: string;
+};
 
 type TrowProps_other = {
   showLeft?: boolean | undefined;
@@ -92,25 +101,17 @@ type Tpanel = {
   installer_outsourcing?: ToutsourcingDto | undefined | null; // 安裝人員 外包廠商
   itemName: string; //項目
   notes: string; // 備註
-  onAddClick: (() => void) | undefined;
+  onAddClick?: (() => void) | undefined;
   onDeleteClick: (() => void) | undefined;
-  onConfirmClick:
-    | ((parameters: {
-        employeeId?: string;
-        outsourcingId?: string;
-        installationDate: string;
-        shippingDate: string;
-        itemName: string;
-        notes: string;
-      }) => Promise<void>)
-    | undefined;
+  onConfirmClick?: (parameters: TpostDeliveryStatusParams) => Promise<void>;
+  onCopyClick: ((parameters: TpostDeliveryStatusParams) => Promise<void>) | undefined;
 };
 
 type Tcontrol = {
   rowPropsArr: TrowProps[];
 };
 
-export type { Tcontrol as Tcontrol_orderTable, TrowProps, Tpanel };
+export type { Tcontrol as Tcontrol_orderTable, TrowProps, Tpanel, TpostDeliveryStatusParams };
 
 // ================================================================================
 
@@ -367,6 +368,7 @@ const Panel = ({
   onAddClick,
   onDeleteClick,
   onConfirmClick,
+  onCopyClick,
 }: Tpanel) => {
   const [disabled, setDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -417,7 +419,22 @@ const Panel = ({
       <div className={classNames(scss.cell, scss.accessorie, config.accessorie.className)}>{accessorie}</div>
 
       <div className={classNames(scss.cell, scss.btnBar, config.btnBar.className)}>
-        <IconAddCircle onClick={onAddClick} />
+        {/* <IconAddCircle onClick={onAddClick} /> */}
+        {isUndefined && <IconAddCircle onClick={onAddClick} />}
+        {!isUndefined && (
+          <IconCopy
+            onClick={() =>
+              onCopyClick?.({
+                employeeId: state_employee?.id,
+                outsourcingId: state_outsourcing?.id,
+                installationDate: state.installationDate,
+                shippingDate: state.shippingDate,
+                itemName: state.itemName,
+                notes: state.notes,
+              })
+            }
+          />
+        )}
         <IconEdit
           className={classNames(
             //

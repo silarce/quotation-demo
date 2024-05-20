@@ -18,6 +18,7 @@ import OrderTable, {
   // Tcontrol_orderTable,
   TrowProps,
   Tpanel,
+  TpostDeliveryStatusParams,
 } from 'components/page/worksDepartment/contracList/contract/outboundOrder/orderTable';
 
 // gear
@@ -79,6 +80,15 @@ type TproductWorksheetList = {
     };
   };
 };
+
+type TonConfirmClick = (
+  productItemId: string,
+  params: {
+    deliveryStatusId: string;
+  } & TpostDeliveryStatusParams
+) => Promise<void>;
+
+type TonCopyClick = (productItemId: string, params: TpostDeliveryStatusParams) => Promise<void>;
 
 // =====================================================================
 
@@ -192,8 +202,27 @@ export default function OutboundOrder({
 
       return undefined;
     }
+  };
 
-    //
+  const reqPost_copy = async (body: TupdateEngineeringDeliveryStatusDto) => {
+    if (!engineeringDeliveryListId || isReqing) {
+      return undefined;
+    }
+
+    try {
+      const res = await apiPostDeliveryStatus({
+        id: engineeringDeliveryListId,
+        body,
+      });
+
+      update_finalProduce();
+      // return res
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增失敗', content: err.message });
+
+      return undefined;
+    }
   };
 
   const reqPatch = async ({ statusId, body }: { statusId: string; body: TupdateEngineeringDeliveryStatusDto }) => {
@@ -344,6 +373,47 @@ export default function OutboundOrder({
       rowPropsArr.push(prodRow);
       // ____________________________________________________________________
 
+      const onConfirm: TonConfirmClick = async (
+        productItemId,
+        { deliveryStatusId, employeeId, outsourcingId, installationDate, shippingDate, itemName, notes }
+      ) => {
+        const reqBody: TcreateEngineeringDeliveryStatusDto = {
+          notes: notes,
+          itemName: itemName,
+          shippingDate: shippingDate,
+          installerOutsourcingId: outsourcingId ?? null,
+          installerEmployees: employeeId ? [employeeId] : null,
+          installationDate: installationDate,
+          append: null,
+          completeAppend: null,
+          productItemId,
+        };
+
+        await reqPatch({
+          statusId: deliveryStatusId,
+          body: reqBody,
+        });
+      };
+
+      const onCopy: TonCopyClick = async (
+        productItemId,
+        { employeeId, outsourcingId, installationDate, shippingDate, itemName, notes }
+      ) => {
+        const reqBody: TcreateEngineeringDeliveryStatusDto = {
+          notes: notes,
+          itemName: itemName,
+          shippingDate: shippingDate,
+          installerOutsourcingId: outsourcingId ?? null,
+          installerEmployees: employeeId ? [employeeId] : null,
+          installationDate: installationDate,
+          append: null,
+          completeAppend: null,
+          productItemId,
+        };
+
+        await reqPost_copy(reqBody);
+      };
+
       // 處理第一個worksheetArr的第一筆worksheet
       worksheetArr?.[0]?.worksheetItemArr.forEach((item) => {
         const itemRow = createRowProps_itemRow({
@@ -356,31 +426,11 @@ export default function OutboundOrder({
           onDeleteClick: (deleverStatusId) => {
             reqDelete(deleverStatusId);
           },
-          onConfirmClick: async ({
-            deliveryStatusId,
-            employeeId,
-            outsourcingId,
-            installationDate,
-            shippingDate,
-            itemName,
-            notes,
-          }) => {
-            const reqBody: TcreateEngineeringDeliveryStatusDto = {
-              notes: notes,
-              itemName: itemName,
-              shippingDate: shippingDate,
-              installerOutsourcingId: outsourcingId ?? null,
-              installerEmployees: employeeId ? [employeeId] : null,
-              installationDate: installationDate,
-              append: null,
-              completeAppend: null,
-              productItemId: item.id,
-            };
-
-            await reqPatch({
-              statusId: deliveryStatusId,
-              body: reqBody,
-            });
+          onConfirmClick: async (params) => {
+            await onConfirm(item.id, params);
+          },
+          onCopyClick: async (params) => {
+            await onCopy(item.id, params);
           },
         });
 
@@ -416,31 +466,11 @@ export default function OutboundOrder({
             onDeleteClick: (deleverStatusId) => {
               reqDelete(deleverStatusId);
             },
-            onConfirmClick: async ({
-              deliveryStatusId,
-              employeeId,
-              outsourcingId,
-              installationDate,
-              shippingDate,
-              itemName,
-              notes,
-            }) => {
-              const reqBody: TcreateEngineeringDeliveryStatusDto = {
-                notes: notes,
-                itemName: itemName,
-                shippingDate: shippingDate,
-                installerOutsourcingId: outsourcingId ?? null,
-                installerEmployees: employeeId ? [employeeId] : null,
-                installationDate: installationDate,
-                append: null,
-                completeAppend: null,
-                productItemId: item.id,
-              };
-
-              await reqPatch({
-                statusId: deliveryStatusId,
-                body: reqBody,
-              });
+            onConfirmClick: async (params) => {
+              await onConfirm(item.id, params);
+            },
+            onCopyClick: async (params) => {
+              await onCopy(item.id, params);
             },
           });
 
@@ -717,6 +747,7 @@ const createRowProps_itemRow = ({
   worksheetItem,
   onAddClick,
   onConfirmClick,
+  onCopyClick,
   onDeleteClick,
   worksheetCreatedAt,
 }: {
@@ -725,8 +756,16 @@ const createRowProps_itemRow = ({
   onAddClick: () => void;
   onConfirmClick: (parameters: {
     deliveryStatusId: string;
-    employeeId: string | undefined;
-    outsourcingId: string | undefined;
+    employeeId?: string | undefined;
+    outsourcingId?: string | undefined;
+    installationDate: string;
+    shippingDate: string;
+    itemName: string;
+    notes: string;
+  }) => Promise<void>;
+  onCopyClick: (parameters: {
+    employeeId?: string | undefined;
+    outsourcingId?: string | undefined;
     installationDate: string;
     shippingDate: string;
     itemName: string;
@@ -786,16 +825,14 @@ const createRowProps_itemRow = ({
         onDeleteClick(id);
       },
       onConfirmClick: async (parameters) => {
-        const { employeeId, outsourcingId, installationDate, shippingDate, itemName, notes } = parameters;
-
         await onConfirmClick({
           deliveryStatusId: id,
-          employeeId,
-          outsourcingId,
-          installationDate,
-          shippingDate,
-          itemName,
-          notes,
+          ...parameters,
+        });
+      },
+      onCopyClick: async (parameters) => {
+        await onCopyClick({
+          ...parameters,
         });
       },
     };
@@ -817,6 +854,7 @@ const createRowProps_itemRow = ({
       onAddClick,
       onDeleteClick: () => {},
       onConfirmClick: async () => {},
+      onCopyClick: undefined,
     });
   }
 
