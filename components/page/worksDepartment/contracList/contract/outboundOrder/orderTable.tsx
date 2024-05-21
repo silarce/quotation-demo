@@ -2,9 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
-// css
-import scss from './orderTable.module.scss';
-
 // antd
 import { Checkbox, Popover, Button } from 'antd';
 import { Switch } from 'antd';
@@ -25,6 +22,9 @@ import { IconAddCircle, IconEdit, IconDelete01, IconCheck02, IconCopy } from 'pu
 
 // import { VerticalLeftOutlined, VerticalRightOutlined } from '@ant-design/icons';
 import * as antdIcon from '@ant-design/icons';
+
+// css
+import scss from './orderTable.module.scss';
 
 // ================================================================================
 
@@ -293,7 +293,7 @@ const Row = ({
         <div className={classNames(scss.cell, config.centerCheckBox.className)}>
           {center?.onCheckClick && (
             <Checkbox
-              className={classNames(!showBatchAdd && 'invisible')}
+              className={classNames(scss.antd_checkBox, !showBatchAdd && 'invisible')}
               onChange={center.onCheckClick}
               checked={center.isChecked}
             />

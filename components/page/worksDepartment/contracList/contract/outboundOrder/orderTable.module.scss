@@ -263,3 +263,9 @@ $top_headRow: calc($height_thead);
     }
   }
 }
+
+.antd_checkBox {
+  :global(.ant-checkbox-inner) {
+    border-color: theme("colors.sub");
+  }
+}
