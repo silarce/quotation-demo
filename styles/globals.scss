@@ -6,13 +6,7 @@
 /* 字體 Noto sans */
 // @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap");
 
-// @tailwind base;
-@layer tailwind-base, antd;
-
-@layer tailwind-base {
-  @tailwind base;
-}
-
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
