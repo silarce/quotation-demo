@@ -76,6 +76,7 @@ $top_headRow: calc($height_thead);
     width: $leftWidth;
     padding: 0 3px;
     box-sizing: border-box;
+
     &.notShow {
       width: 0;
       padding-left: 0;
@@ -111,6 +112,8 @@ $top_headRow: calc($height_thead);
   > .rightPanel {
     display: grid;
     gap: 16px;
+    border-bottom: solid 1px theme("colors.border");
+    padding: 5px 0;
   }
 
   &.thead {
@@ -156,7 +159,7 @@ $top_headRow: calc($height_thead);
       background-color: theme("colors.hoverBgc");
     }
   }
-}
+} // .row
 
 .side {
   position: sticky;
