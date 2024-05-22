@@ -12,10 +12,10 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_rounded from 'components/global/gear/button/myButton_rounded';
 
-import { TemployeeDto, ToutsourcingDto } from 'js/api/dtoTypes';
+import { TemployeeDto, ToutsourcingDto, TdeliveryStatusInstallationItem } from 'js/api/dtoTypes';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 import { Toption } from 'js/utils/options/options';
-import { optionsCreator_outboundOrderComponent } from 'js/utils/options/productOptions';
+import { optionsCreator_deliveryStatusInstallationItem } from 'js/utils/options/productOptions';
 
 // icon
 import { IconAddCircle, IconEdit, IconDelete01, IconCheck02, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
@@ -30,6 +30,10 @@ import scss from './orderTable.module.scss';
 
 // region type
 
+type Toption_generics<E extends string> = { value: E; label: string };
+
+type Toption_installationItem = Toption_generics<TdeliveryStatusInstallationItem>;
+
 type TpostDeliveryStatusParams = {
   employeeId?: string;
   outsourcingId?: string;
@@ -37,6 +41,7 @@ type TpostDeliveryStatusParams = {
   shippingDate: string;
   itemName: string;
   notes: string;
+  installationItem: TdeliveryStatusInstallationItem | null;
 };
 
 type TrowProps_other = {
@@ -109,6 +114,7 @@ type Tpanel = {
   installer_outsourcing?: ToutsourcingDto | undefined | null; // 安裝人員 外包廠商
   itemName: string; //項目
   notes: string; // 備註
+  installationItem: string | null;
   onAddClick?: (() => void) | undefined;
   onDeleteClick: (() => void) | undefined;
   onConfirmClick?: (parameters: TpostDeliveryStatusParams) => Promise<void>;
@@ -429,10 +435,9 @@ const Panel = ({
 }: Tpanel) => {
   const [disabled, setDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
-
   const [state_employee, setState_Employee] = useState(installer_employee);
   const [state_outsourcing, setState_Outsourcing] = useState(installer_outsourcing);
-  const [state_component, setState_Component] = useState<Toption | null>(null);
+  const [state_installationItem, setState_installationItem] = useState<Toption_installationItem | null>(null);
 
   const [state, setState] = useState({
     installationDate,
@@ -452,7 +457,7 @@ const Panel = ({
     });
     setState_Employee(installer_employee);
     setState_Outsourcing(installer_outsourcing);
-    setState_Component(null);
+    setState_installationItem(null);
   };
 
   // ------------------------------------------------------------------------
@@ -488,6 +493,7 @@ const Panel = ({
                 shippingDate: state.shippingDate,
                 itemName: state.itemName,
                 notes: state.notes,
+                installationItem: state_installationItem?.value || null,
               })
             }
           />
@@ -527,6 +533,7 @@ const Panel = ({
                 shippingDate: state.shippingDate,
                 itemName: state.itemName,
                 notes: state.notes,
+                installationItem: state_installationItem?.value || null,
               }).then(() => {
                 setDisabled(true);
               });
@@ -541,10 +548,10 @@ const Panel = ({
           disabled={disabled}
           selectProps={{
             props: {
-              options: optionsCreator_outboundOrderComponent(),
-              value: state_component,
+              options: optionsCreator_deliveryStatusInstallationItem(),
+              value: state_installationItem,
               onChange: (v) => {
-                setState_Component(v);
+                setState_installationItem(v as Toption_installationItem | null);
               },
             },
           }}
@@ -789,7 +796,7 @@ const config: TconfigList = {
     className: 'w-24',
   },
   component: {
-    caption: '施工項目',
+    caption: '安裝項目',
     className: 'w-28',
   },
   shippingDate: {

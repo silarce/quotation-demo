@@ -6,7 +6,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 // import moment from 'moment';
-import _, { set } from 'lodash';
+import _ from 'lodash';
 import classNames from 'classnames';
 
 // layer
@@ -57,6 +57,7 @@ import {
   TerpFeatureDto,
   TquotationProductItemDto,
   TquotationProductDto,
+  TdeliveryStatusInstallationItem,
 } from 'js/api/dtoTypes';
 
 // =====================================================================
@@ -197,6 +198,7 @@ export default function OutboundOrder({
           append: null,
           completeAppend: null,
           productItemId,
+          installationItem: null,
         },
       });
 
@@ -433,7 +435,16 @@ export default function OutboundOrder({
 
       const onConfirm: TonConfirmClick = async (
         productItemId,
-        { deliveryStatusId, employeeId, outsourcingId, installationDate, shippingDate, itemName, notes }
+        {
+          deliveryStatusId,
+          employeeId,
+          outsourcingId,
+          installationDate,
+          shippingDate,
+          itemName,
+          notes,
+          installationItem,
+        }
       ) => {
         const reqBody: TcreateEngineeringDeliveryStatusDto = {
           notes: notes,
@@ -445,6 +456,7 @@ export default function OutboundOrder({
           append: null,
           completeAppend: null,
           productItemId,
+          installationItem,
         };
 
         await reqPatch({
@@ -455,7 +467,7 @@ export default function OutboundOrder({
 
       const onCopy: TonCopyClick = async (
         productItemId,
-        { employeeId, outsourcingId, installationDate, shippingDate, itemName, notes }
+        { employeeId, outsourcingId, installationDate, shippingDate, itemName, notes, installationItem }
       ) => {
         const reqBody: TcreateEngineeringDeliveryStatusDto = {
           notes: notes,
@@ -467,6 +479,7 @@ export default function OutboundOrder({
           append: null,
           completeAppend: null,
           productItemId,
+          installationItem,
         };
 
         await reqPost_copy(reqBody);
@@ -856,6 +869,7 @@ const createRowProps_itemRow = ({
     shippingDate: string;
     itemName: string;
     notes: string;
+    installationItem: TdeliveryStatusInstallationItem | null;
   }) => Promise<void>;
   onCopyClick: (parameters: {
     employeeId?: string | undefined;
@@ -864,6 +878,7 @@ const createRowProps_itemRow = ({
     shippingDate: string;
     itemName: string;
     notes: string;
+    installationItem: TdeliveryStatusInstallationItem | null;
   }) => Promise<void>;
   onDeleteClick: (deleverStatuId: string) => void;
   worksheetCreatedAt: string | null;
@@ -906,6 +921,7 @@ const createRowProps_itemRow = ({
       // 安裝日期
       installationDate,
       shippingDate, // 出貨日
+      installationItem,
     } = ds;
 
     const panelProps: Tpanel = {
@@ -917,6 +933,7 @@ const createRowProps_itemRow = ({
       installer_outsourcing: installerOutsourcing,
       itemName: itemName ?? '',
       notes: notes ?? '',
+      installationItem: installationItem ?? '',
       onAddClick,
       onDeleteClick: () => {
         onDeleteClick(id);
@@ -948,6 +965,7 @@ const createRowProps_itemRow = ({
       installer_outsourcing: undefined,
       itemName: '',
       notes: '',
+      installationItem: '',
       onAddClick,
       onDeleteClick: () => {},
       onConfirmClick: async () => {},

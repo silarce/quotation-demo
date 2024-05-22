@@ -11,7 +11,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 //
-import { Toption, optionsCreator_outboundOrderComponent } from 'js/utils/options/productOptions';
+import { Toption, optionsCreator_deliveryStatusInstallationItem } from 'js/utils/options/productOptions';
 
 // type
 import { TemployeeDto, ToutsourcingDto } from 'js/api/dtoTypes';
@@ -132,7 +132,7 @@ export default function Modal_newDeliveryStatu({
             {...config}
             selectProps={{
               props: {
-                options: optionsCreator_outboundOrderComponent(),
+                options: optionsCreator_deliveryStatusInstallationItem(),
                 menuPortalTarget: undefined,
                 value: state_component,
                 onChange: (v) => {

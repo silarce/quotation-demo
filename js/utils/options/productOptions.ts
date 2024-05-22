@@ -1,5 +1,5 @@
 import { Toption, addEmpty } from './options';
-import { annotationAndQuotationRangeType } from 'js/api/dtoTypes';
+import { annotationAndQuotationRangeType, TdeliveryStatusInstallationItem } from 'js/api/dtoTypes';
 import { annotationAndQuotationRangeTypeLookup } from 'config/lookupTable';
 // type
 import { TdocType } from 'js/api/dtoTypes';
@@ -584,12 +584,18 @@ export const optionsCreator_certifyType = createOptionsCreator({
   })(),
 });
 
-export const optionsCreator_outboundOrderComponent = createOptionsCreator({
-  optionsArr: [
-    { value: '門片', label: '門片' },
-    { value: '支軌', label: '支軌' },
-    { value: '馬達', label: '馬達' },
-  ],
+export const optionsCreator_deliveryStatusInstallationItem = createOptionsCreator({
+  optionsArr: (() => {
+    // 只是要確保value的型別正確，所以這樣寫
+    type Toption_deliveryStatusInstallationItem = { value: TdeliveryStatusInstallationItem; label: string };
+    const optionsArr_docType: Toption_deliveryStatusInstallationItem[] = [
+      { value: '門片', label: '門片' },
+      { value: '支軌', label: '支軌' },
+      { value: '馬達', label: '馬達' },
+    ];
+
+    return optionsArr_docType;
+  })(),
 });
 
 // const optionsCreator_foooooo = (props: { haveEmpty?: boolean } = {}): Toption[] => {

@@ -13,6 +13,8 @@ export type TsouthernCounty = '高雄市' | '臺南市' | '嘉義市' | '嘉義�
 export type TeasternCounty = '花蓮縣' | '臺東縣';
 export type Tabroad = '海外';
 
+export type TdeliveryStatusInstallationItem = '門片' | '馬達' | '支軌';
+
 // =============================================================================
 export type Tparams = {
   order?: 'ASC' | 'DESC';
@@ -1312,6 +1314,8 @@ export type TengineeringDeliveryStatusDto = {
   otherWorkItems: ToutsourcingPaymentDetailItemDto | null;
   // 其他特殊工作項目合計
   otherWorkItemTotal: number | null;
+  // 安裝項目
+  installationItem: TdeliveryStatusInstallationItem | null;
 };
 
 export type TcreateEngineeringDeliveryStatusDto = {
@@ -1338,6 +1342,8 @@ export type TcreateEngineeringDeliveryStatusDto = {
   completeAppend: string | null;
   // 所屬產品id // 預期要放latestWorksheetItemId
   productItemId: string;
+  // 安裝項目
+  installationItem: TdeliveryStatusInstallationItem | null;
 };
 
 export type TupdateEngineeringDeliveryStatusDto = TcreateEngineeringDeliveryStatusDto;
