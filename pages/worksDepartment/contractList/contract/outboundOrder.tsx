@@ -281,6 +281,8 @@ export default function OutboundOrder({
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '更新失敗', content: err.message });
+
+      return Promise.reject(err);
     }
   };
 
@@ -459,7 +461,7 @@ export default function OutboundOrder({
           installationItem,
         };
 
-        await reqPatch({
+        return await reqPatch({
           statusId: deliveryStatusId,
           body: reqBody,
         });

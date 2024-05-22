@@ -31,7 +31,6 @@ import scss from './orderTable.module.scss';
 // region type
 
 type Toption_generics<E extends string> = { value: E; label: string };
-
 type Toption_installationItem = Toption_generics<TdeliveryStatusInstallationItem>;
 
 type TpostDeliveryStatusParams = {

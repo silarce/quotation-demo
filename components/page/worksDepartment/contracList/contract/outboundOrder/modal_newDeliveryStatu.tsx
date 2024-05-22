@@ -14,13 +14,16 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { Toption, optionsCreator_deliveryStatusInstallationItem } from 'js/utils/options/productOptions';
 
 // type
-import { TemployeeDto, ToutsourcingDto } from 'js/api/dtoTypes';
+import { TemployeeDto, ToutsourcingDto, TdeliveryStatusInstallationItem } from 'js/api/dtoTypes';
 import { TcreateEngineeringDeliveryStatusDto } from 'js/api/api_engineering';
 
 // css
 import scss from './modal_newDeliveryStatu.module.scss';
 
 // ======================================================================
+
+type Toption_generics<E extends string> = { value: E; label: string };
+type Toption_installationItem = Toption_generics<TdeliveryStatusInstallationItem>;
 
 type Tstate = {
   installationDate: Moment | null;
@@ -66,7 +69,7 @@ export default function Modal_newDeliveryStatu({
 
   const [state_employee, setState_Employee] = useState<TemployeeDto>();
   const [state_outsourcing, setState_Outsourcing] = useState<ToutsourcingDto>();
-  const [state_component, setState_Component] = useState<Toption | null>(null);
+  const [state_installationItem, setState_installationItem] = useState<Toption_installationItem | null>(null);
 
   const [state, setState] = useState<Tstate>({
     installationDate: null,
@@ -84,7 +87,7 @@ export default function Modal_newDeliveryStatu({
     });
     setState_Employee(undefined);
     setState_Outsourcing(undefined);
-    setState_Component(null);
+    setState_installationItem(null);
   };
 
   const defaultSeletedDataArrArr = useMemo(() => {
@@ -112,6 +115,7 @@ export default function Modal_newDeliveryStatu({
       installationDate: state.installationDate?.toISOString() || null,
       installerOutsourcingId: state_outsourcing?.id || null,
       installerEmployees: state_employee?.id ? [state_employee.id] : null,
+      installationItem: state_installationItem?.value || null,
 
       append: null,
       completeAppend: null,
@@ -128,15 +132,15 @@ export default function Modal_newDeliveryStatu({
         <div className={scss.grid}>
           <InputSel
             name="component"
-            caption="施工項目"
+            caption="安裝項目"
             {...config}
             selectProps={{
               props: {
                 options: optionsCreator_deliveryStatusInstallationItem(),
                 menuPortalTarget: undefined,
-                value: state_component,
+                value: state_installationItem,
                 onChange: (v) => {
-                  setState_Component(v);
+                  setState_installationItem(v as Toption_installationItem | null);
                 },
               },
             }}
