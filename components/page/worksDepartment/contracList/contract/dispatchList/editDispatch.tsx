@@ -1,10 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
 
 // antd
 import { Radio } from 'antd';
-import type { RadioChangeEvent } from 'antd';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -25,8 +24,9 @@ type Tcontroll_item = {
 
 type TpricingMethodControll = {
   value: string;
+  note: string;
   onChange: (v: string) => void;
-  subValue: string;
+  onInputChange: (v: string) => void;
   // subOnChange: (v: string) => void;
 };
 
@@ -66,26 +66,12 @@ export default function EditDispatch({
   workerIdArr?: string[];
 }) {
   const [showSelector, setShowSelector] = useState(false);
+  const { tasks, note, pricingMethod } = controll;
 
   const dispatchDate_m = moment(dispatchDate);
   dispatchDate = dispatchDate_m.isValid() ? dispatchDate_m.format('YYYY-MM-DD') : '9999-01-01';
 
-  // ---------------------------------------------------------------
-
-  const { tasks, note, pricingMethod } = controll;
-
-  const [batchInput, setBatchInput] = useState('');
-  const refInput = useRef<HTMLInputElement>(null!);
-
-  const onChange = (e: RadioChangeEvent) => {
-    const value = e.target.value;
-    // setBatchType(value);
-    pricingMethod.onChange(value);
-
-    if (value.includes('修理費用')) {
-      refInput.current.focus();
-    }
-  };
+  // ----------------------------------------------------------------------
 
   const onSelectorConfirm = (arr: TdailyReportItem_my[]) => {
     const descriptionArr = arr.map((item) => {
@@ -102,11 +88,6 @@ export default function EditDispatch({
 
     tasks.onChange(value + descriptionStr);
   };
-
-  // -----------------------------------------------------------------
-  useEffect(() => {
-    setBatchInput(pricingMethod.subValue);
-  }, [pricingMethod.subValue]);
 
   // -----------------------------------------------------------------
   return (
@@ -137,36 +118,67 @@ export default function EditDispatch({
         <div className={scss.subTitle}>
           <span>派工批價</span>
         </div>
-        <Radio.Group disabled={disabled} className={scss.radioGroup} onChange={onChange} value={pricingMethod.value}>
+        <Radio.Group
+          disabled={disabled}
+          className={scss.radioGroup}
+          onChange={(e) => pricingMethod.onChange(e.target.value)}
+          value={pricingMethod.value}
+        >
           <Radio value={'合約內'}>合約內</Radio>
           <Radio value={'合約辦理追加'}>合約辦理追加</Radio>
-          <Radio value={`修理費用${batchInput}`}>
-            <label
-              className={scss.myLabel}
-              htmlFor="batchInput"
-              onClick={() => {
-                // setBatchType(`修理費用${batchInput}`);
-                if (!disabled) {
-                  pricingMethod.onChange(`修理費用${batchInput}`);
-                }
-              }}
-            >
+          <Radio value={'贈送'}>贈送</Radio>
+
+          <Radio
+            value={`修理費用`}
+            onChange={(e) => {
+              const currentTarget = e.nativeEvent.currentTarget as HTMLDivElement;
+              const fixFee = currentTarget.querySelector('#dispatch-fixFee') as HTMLInputElement;
+              fixFee.focus();
+            }}
+          >
+            <span className={scss.myLabel}>
               <span>修理費用</span>
               <input
+                id="dispatch-fixFee"
                 disabled={disabled}
-                id="batchInput"
                 type="text"
                 autoComplete="off"
-                ref={refInput}
-                value={pricingMethod.subValue ?? ''}
+                value={(pricingMethod.value === '修理費用' && pricingMethod.note) || ''}
                 onChange={(e) => {
-                  setBatchInput(e.target.value);
-                  pricingMethod.onChange(`修理費用${e.target.value}`);
+                  pricingMethod.value === '修理費用' && pricingMethod.onInputChange(e.target.value);
+                }}
+                onClick={() => {
+                  pricingMethod.onChange('修理費用');
                 }}
               />
-            </label>
+            </span>
           </Radio>
-          <Radio value={'贈送'}>贈送</Radio>
+
+          <Radio
+            value={`其他`}
+            onChange={(e) => {
+              const currentTarget = e.nativeEvent.currentTarget as HTMLDivElement;
+              const fixFee = currentTarget.querySelector('#dispatch-other') as HTMLInputElement;
+              fixFee.focus();
+            }}
+          >
+            <span className={scss.myLabel}>
+              <span>其他</span>
+              <input
+                id="dispatch-other"
+                disabled={disabled}
+                type="text"
+                autoComplete="off"
+                value={(pricingMethod.value === '其他' && pricingMethod.note) || ''}
+                onChange={(e) => {
+                  pricingMethod.value === '其他' && pricingMethod.onInputChange(e.target.value);
+                }}
+                onClick={() => {
+                  pricingMethod.onChange('其他');
+                }}
+              />
+            </span>
+          </Radio>
         </Radio.Group>
       </div>
 
