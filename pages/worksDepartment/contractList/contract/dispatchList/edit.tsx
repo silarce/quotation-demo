@@ -12,6 +12,7 @@ import Profile, { Tcontrol_profile } from 'components/page/worksDepartment/contr
 import EditDispatch, {
   Tcontroll as Tcontroll_editDispatch,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
+import ModalPdf from './modalPdf';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -486,6 +487,8 @@ export default function EditDispatchList() {
           }
         />
       </div>
+
+      {/* <ModalPdf visible={true} /> */}
     </SubLayer>
   );
 }
