@@ -268,6 +268,12 @@ export default function OutboundOrder({
       }
     }
 
+    body = {
+      ...body,
+      shippingDate: body.shippingDate || null,
+      installationDate: body.installationDate || null,
+    };
+
     try {
       const res = await apiPatchDeliveryStatus({
         id: engineeringDeliveryListId,
