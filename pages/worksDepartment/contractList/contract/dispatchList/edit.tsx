@@ -353,7 +353,12 @@ export default function EditDispatchList() {
       isCompleted: !!isCompleted,
     });
 
-    pricingMethod && setState_pricingMethod(JSON.parse(pricingMethod) as Tstate_pricingMethod);
+    if (pricingMethod) {
+      try {
+        const thePricingMethod = JSON.parse(pricingMethod) as Tstate_pricingMethod;
+        setState_pricingMethod(thePricingMethod);
+      } catch (error) {}
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engineeringContact, dispatching, disabled, todoForDispatch]);
