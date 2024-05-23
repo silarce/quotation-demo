@@ -6,13 +6,14 @@ import { useRouter } from 'next/router';
 import _ from 'lodash';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
+import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // components
-import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
-// import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
+// import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
+import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
@@ -37,8 +38,9 @@ import {
   TcreateQuotationProductDto,
   TquotationProductDto,
   useQuotation_id_attachments,
+  TquotationContentDto,
 } from 'js/api/api_quotation';
-import { TuserDto } from 'js/api/dtoTypes';
+import { TuserDto, TcustomerDto } from 'js/api/dtoTypes';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
@@ -46,6 +48,22 @@ import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
 import { useProductList } from 'hooks/quotation/useProduct';
 
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
+
+// ===========================================================================
+
+type Tstate_profile = {
+  validityPeriod: string;
+  projectName: string;
+  county: string;
+  district: string;
+  address: string;
+  contactPerson: string;
+  contactNumber: string;
+  faxNumber: string;
+  trackProgress: string;
+  projectProgress: string;
+  isLost: boolean;
+};
 
 // ===========================================================================
 // 合約 追加追減介面
@@ -65,6 +83,44 @@ export default function AttachContract({
   const userId = userEmp?.id;
 
   let taxRate: number | undefined;
+
+  // ----------------------------------------------------
+
+  const reviewSalesEmployeeId: string | undefined = undefined;
+  const reviewWorkDirectorEmployeeId: string | undefined = undefined;
+  const reviewCashierEmployeeId: string | undefined = undefined;
+  const reviewSupervisorEmployeeId: string | undefined = undefined;
+  const reviewManagerEmployeeId: string | undefined = undefined;
+
+  const isReviewer = false;
+  const isSales = false;
+  const isWorkDirector = false;
+  const isCashier = false;
+  const isSupervisor = false;
+  const isManager = false;
+
+  const salesReviewedAt: string | null | undefined = undefined;
+  const supervisorReviewedAt: string | null | undefined = undefined;
+  const workDirectorReviewedAt: string | null | undefined = undefined;
+  const cashierReviewedAt: string | null | undefined = undefined;
+  const managerReviewedAt: string | null | undefined = undefined;
+
+  const toSalesAt: string | null | undefined = undefined;
+  const toSupervisorAt: string | null | undefined = undefined;
+  const toWorkDirectorAt: string | null | undefined = undefined;
+  const toCashierAt: string | null | undefined = undefined;
+  const toManagerAt: string | null | undefined = undefined;
+
+  const isSendToReview = false;
+  const isSendToReview_pending = false;
+
+  //
+  const isAttach = undefined;
+  //
+  const isAllReviewedBeforePending = false;
+  //
+  const version: number | undefined = undefined;
+  const editNotes: string | undefined = undefined;
 
   // ----------------------------------------------------
   const { data: data_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
@@ -319,7 +375,13 @@ export default function AttachContract({
 
   // ------------------------------------------------------------------
 
-  // REQ
+  // region USE PROFILE
+
+  const { control_profile, state_profile, state_customer } = useProfile({ content: data_contract?.content });
+
+  // ------------------------------------------------------------------
+
+  // region REQUEST
 
   const reqModify = async () => {
     try {
@@ -329,10 +391,10 @@ export default function AttachContract({
         return;
       }
 
-      const content = _.cloneDeep(data_contract.content);
-      const theContent = {
+      const content_copy = _.cloneDeep(data_contract.content);
+      const copy_shallow = {
         //
-        ...content,
+        ...content_copy,
         // 根據api文件，後端不收
         // 但是預防萬一，還是把這些資料清掉比較安心
         reviewSalesEmployee: undefined,
@@ -349,7 +411,18 @@ export default function AttachContract({
         toManagerAt: undefined,
       };
 
-      const customerId = content.customer?.id;
+      delete copy_shallow.reviewSalesEmployee;
+      delete copy_shallow.salesReviewedAt;
+      delete copy_shallow.toSalesAt;
+      delete copy_shallow.reviewSupervisorEmployee;
+      delete copy_shallow.supervisorReviewedAt;
+      delete copy_shallow.toSupervisorAt;
+      delete copy_shallow.reviewWorkDirectorEmployee;
+      delete copy_shallow.workDirectorReviewedAt;
+      delete copy_shallow.toWorkDirectorAt;
+      delete copy_shallow.reviewManagerEmployee;
+      delete copy_shallow.managerReviewedAt;
+      delete copy_shallow.toManagerAt;
 
       // 材料配件有問題的主產品
       let breakComponentProdIndex_div = '';
@@ -404,16 +477,18 @@ export default function AttachContract({
         });
       }
 
+      const customerId = state_customer?.id;
+
       if (!customerId) {
         return myAlert.warning({
-          title: '沒有customerId',
+          title: '請選擇客戶',
         });
       }
 
       const body: TcreateModifyQuotationDto = {
-        ...theContent,
+        ...copy_shallow,
         products: [...divProdArr, ...attachProdArr],
-        customerId,
+
         // agentId: content.agentEmployee?.id,
         agentId: userId,
         // managerId: content.managerEmployee?.id,
@@ -425,9 +500,25 @@ export default function AttachContract({
         // 其他設定有金錢，沒有參與追加追減，出現在追加追減報價單裡可能會被誤解
         // 應該不送才是對的
         others: [],
-        annotations: theContent.annotations ?? [],
-        quotationRanges: theContent.quotationRanges ?? [],
-        discount: theContent.discount as `${number}`,
+        annotations: copy_shallow.annotations ?? [],
+        quotationRanges: copy_shallow.quotationRanges ?? [],
+        discount: copy_shallow.discount as `${number}`,
+        //
+
+        validityPeriod: state_profile.validityPeriod ?? '',
+        //
+        customerId,
+        //
+        projectName: state_profile.projectName ?? '',
+        county: state_profile.county ?? '',
+        district: state_profile.district ?? '',
+        address: state_profile.address ?? '',
+        contactPerson: state_profile.contactPerson ?? '',
+        contactNumber: state_profile.contactNumber ?? '',
+        faxNumber: state_profile.faxNumber ?? '',
+        trackProgress: state_profile.trackProgress ?? '',
+        projectProgress: state_profile.projectProgress ?? '',
+
         //
       };
 
@@ -462,19 +553,6 @@ export default function AttachContract({
 
   // ------------------------------------------------------------------
 
-  // region PROPS
-  const props_profile = useMemo(() => {
-    let copy = _.cloneDeep(data_contract?.content);
-
-    copy &&
-      (copy = {
-        ...copy,
-        quotationDate: new Date().toISOString(),
-      });
-
-    return copy;
-  }, [data_contract?.content]);
-
   // ------------------------------------------------------------------
 
   const panel: TpanelList = [
@@ -504,7 +582,7 @@ export default function AttachContract({
       <div>
         <div className={scss.quotation}>
           {/*  */}
-          <QuotationProfile profile={props_profile} disabled={true} onProfileChange={() => {}} />
+          <QuotationProfile control={control_profile} disabled={false} />
           {/*  */}
           <div className={classNames(scss.switchBar)}>
             <div>合約項目</div>
@@ -666,6 +744,175 @@ export default function AttachContract({
     </SubLayer>
   );
 }
+
+// const props_profile = useMemo(() => {
+//   let copy = _.cloneDeep(data_contract?.content);
+
+//   copy &&
+//     (copy = {
+//       ...copy,
+//       quotationDate: new Date().toISOString(),
+//     });
+
+//   return copy;
+// }, [data_contract?.content]);
+
+// region HOOK
+
+const useProfile = ({ content }: { content: TquotationContentDto | undefined }) => {
+  const [state_profile, setState_profile] = useState<Tstate_profile>(creEmptyProfile());
+  const [state_customer, setState_customer] = useState<TcustomerDto | undefined | null>();
+
+  const changeProfile = (key: keyof Omit<Tstate_profile, 'isLost'>, value: string | boolean) => {
+    setState_profile((state) => {
+      return {
+        ...state,
+        [key]: value,
+      };
+    });
+  };
+
+  const control_profile = useMemo(() => {
+    const control_profile: Tcontrol_profile = {
+      quotationNumber: content?.quotationNumber ?? '',
+      quotationDate: moment().format('YYYY-MM-DD'),
+      customer: {
+        value: state_customer,
+        onChange: (customer) => {
+          const customerPhoneNumber = customer.phone || '';
+          const contact = customer.contacts?.[0];
+          const name = contact?.name ?? '';
+          const phone = contact?.phone || customerPhoneNumber || '';
+          const fax = customer.fax || '';
+
+          setState_customer(customer);
+          changeProfile('contactPerson', `${name}`);
+          changeProfile('contactNumber', phone);
+          changeProfile('faxNumber', fax);
+        },
+        onClear: () => {
+          setState_customer(null);
+          changeProfile('contactPerson', '');
+          changeProfile('contactNumber', '');
+          changeProfile('faxNumber', '');
+        },
+      },
+
+      isLost: {
+        value: state_profile.isLost,
+        onChange: (bool) => {
+          setState_profile((state) => ({ ...state, isLost: bool }));
+        },
+      },
+
+      itemList: {
+        validityPeriod: {
+          value: state_profile.validityPeriod,
+          onChange: (v) => changeProfile('validityPeriod', v),
+        },
+        projectName: {
+          value: state_profile.projectName,
+          onChange: (v) => changeProfile('projectName', v),
+        },
+        county: {
+          value: state_profile.county,
+          onChange: (v) => {
+            changeProfile('county', v);
+            changeProfile('district', '');
+          },
+        },
+        district: {
+          value: state_profile.district,
+          onChange: (v) => changeProfile('district', v),
+        },
+        address: {
+          value: state_profile.address,
+          onChange: (v) => changeProfile('address', v),
+        },
+        contactPerson: {
+          value: state_profile.contactPerson,
+          onChange: (v) => changeProfile('contactPerson', v),
+        },
+        contactNumber: {
+          value: state_profile.contactNumber,
+          onChange: (v) => changeProfile('contactNumber', v),
+        },
+        faxNumber: {
+          value: state_profile.faxNumber,
+          onChange: (v) => changeProfile('faxNumber', v),
+        },
+        trackProgress: {
+          value: state_profile.trackProgress,
+
+          onChange: (v) => {
+            changeProfile('trackProgress', v);
+          },
+
+          disabled: false,
+        },
+        projectProgress: {
+          value: state_profile.projectProgress,
+
+          onChange: (v) => {
+            changeProfile('projectProgress', v);
+          },
+
+          disabled: false,
+        },
+      },
+    };
+
+    return control_profile;
+  }, [content?.quotationNumber, state_customer, state_profile]); // memo
+
+  useEffect(() => {
+    setState_customer(content?.customer ?? null);
+
+    setState_profile({
+      validityPeriod: content?.validityPeriod ?? '',
+      projectName: content?.projectName ?? '',
+      county: content?.county ?? '',
+      district: content?.district ?? '',
+      address: content?.address ?? '',
+      contactPerson: content?.contactPerson ?? '',
+      contactNumber: content?.contactNumber ?? '',
+      faxNumber: content?.faxNumber ?? '',
+      trackProgress: content?.trackProgress ?? '',
+      projectProgress: content?.projectProgress ?? '',
+      isLost: content?.isLost ?? false,
+    });
+  }, [content]);
+
+  //
+  return {
+    control_profile,
+    state_profile,
+    state_customer,
+  };
+
+  //
+};
+
+// ==============================================================================
+
+const creEmptyProfile = (): Tstate_profile => ({
+  validityPeriod: '',
+  projectName: '',
+  county: '',
+  district: '',
+  address: '',
+  contactPerson: '',
+  contactNumber: '',
+  faxNumber: '',
+  trackProgress: '',
+  projectProgress: '',
+  isLost: false,
+});
+
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
 
 /**
 
