@@ -33,6 +33,11 @@ import 'slick-carousel/slick/slick-theme.css'; // react-slick
 // 全域moment語系轉換
 import 'moment/locale/zh-tw';
 
+import moment_tz from 'moment-timezone';
+
+// 時區設為台北時間
+moment_tz.tz.setDefault('Asia/Taipei');
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
