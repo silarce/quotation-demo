@@ -29,9 +29,9 @@ export default function ModalPdf({ visible, onCancel }: ModalProps & { foo?: unk
 
         <form className={scss.form}>
           <Row>
-            <Cell01 />
-            <Cell05 />
-            <Cell03 />
+            <Cell01 str="客戶" />
+            <Cell05 str="貓屋" />
+            <Cell03 str="電話" />
             <Cell06 />
             <div className={scss['cell_09-10']}>
               <Cell10 />
@@ -42,20 +42,20 @@ export default function ModalPdf({ visible, onCancel }: ModalProps & { foo?: unk
           </Row>
 
           <Row>
-            <Cell01 />
+            <Cell01 str="接洽人" />
             <Cell05 />
-            <Cell03 />
+            <Cell03 str="住址" />
             <Cell07 />
           </Row>
 
           <Row>
-            <Cell01 />
+            <Cell01 str="交辦內容" />
             <Cell02 />
-            <Cell04 />
+            <Cell04 str="大門修理" />
             <Cell02 />
-            <Cell04 />
+            <Cell04 str="捲門修理" />
             <Cell02 />
-            <Cell04 />
+            <Cell04 str="送電" />
             <Cell08 />
             <Cell09 />
           </Row>
@@ -129,13 +129,15 @@ const Cell00 = ({ children }: { children?: React.ReactNode }) => {
   );
 };
 
-const Cell01 = ({ strArr }: { strArr?: string[] }) => {
+const Cell01 = ({ str }: { str?: string }) => {
+  const letterArr = str ? str.split('') : [];
+
   return (
-    <div className={classNames(scss.cell)} style={{ width: c01 }}>
-      {/* {strArr.map((str, index) => {
-        return <span key={index}>{str}</span>;
-      })} */}
-      cell01
+    <div className={classNames(scss.cell, scss.c01)} style={{ width: c01 }}>
+      {letterArr.map((letter, index) => {
+        return <span key={index}>{letter}</span>;
+      })}
+      {/* cell01 */}
     </div>
   );
 };
@@ -143,31 +145,37 @@ const Cell01 = ({ strArr }: { strArr?: string[] }) => {
 const Cell02 = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className={classNames(scss.cell)} style={{ width: c02 }}>
-      cell02{children}
+      {/* cell02{children} */}
     </div>
   );
 };
 
-const Cell03 = ({ children }: { children?: React.ReactNode }) => {
+const Cell03 = ({ str, children }: { str?: string; children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c03 }}>
-      cell03{children}
+    <div className={classNames(scss.cell, scss.c03)} style={{ width: c03 }}>
+      {str}
+      {children}
+      {/* cell03 */}
     </div>
   );
 };
 
-const Cell04 = ({ children }: { children?: React.ReactNode }) => {
+const Cell04 = ({ str, children }: { str?: string; children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c04 }}>
-      cell04{children}
+    <div className={classNames(scss.cell, scss.c04)} style={{ width: c04 }}>
+      {str}
+      {children}
+      {/* cell04 */}
     </div>
   );
 };
 
-const Cell05 = ({ children }: { children?: React.ReactNode }) => {
+const Cell05 = ({ str, children }: { str?: string; children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c05 }}>
-      cell05{children}
+    <div className={classNames(scss.cell, scss.c05)} style={{ width: c05 }}>
+      {str}
+      {children}
+      {/* cell05 */}
     </div>
   );
 };
@@ -175,7 +183,8 @@ const Cell05 = ({ children }: { children?: React.ReactNode }) => {
 const Cell06 = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className={classNames(scss.cell)} style={{ width: c06 }}>
-      cell06{children}
+      {children}
+      cell06
     </div>
   );
 };
