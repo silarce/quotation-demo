@@ -12,6 +12,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // components
 import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
+// import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
@@ -66,15 +67,15 @@ export default function AttachContract({
   let taxRate: number | undefined;
 
   // ----------------------------------------------------
-  const { data, update } = useGetContract_id_forAttach(contractId);
+  const { data: data_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
 
-  taxRate = data?.salesTax ? 0.05 : 0;
+  taxRate = data_contract?.salesTax ? 0.05 : 0;
 
   useEffect(() => {
     (async () => {
       try {
         setIsLading(true);
-        await update();
+        await update_contract();
       } catch (error) {
         const err = error as Error;
         myAlert.err({ title: '讀取追加追減報價單失敗', content: err.message });
@@ -85,13 +86,13 @@ export default function AttachContract({
   }, [contractId]);
 
   const formatedContent = useMemo(() => {
-    if (!data) {
+    if (!data_contract) {
       return undefined;
     }
 
-    const content_copy = _.cloneDeep(data.content);
+    const content_copy = _.cloneDeep(data_contract.content);
 
-    let subContracts = data.subContracts;
+    let subContracts = data_contract.subContracts;
 
     subContracts = _.sortBy(subContracts, 'version');
 
@@ -117,7 +118,7 @@ export default function AttachContract({
     content_copy.total = total;
 
     return content_copy;
-  }, [data]);
+  }, [data_contract]);
 
   // ------------------------------------------------------------------
   const {
@@ -157,7 +158,7 @@ export default function AttachContract({
   } = useProductList({
     productArr: formatedContent?.products,
     others: formatedContent?.others,
-    resetTrigger: data,
+    resetTrigger: data_contract,
     quotationDiscount: Number(formatedContent?.discount || '100'),
   });
 
@@ -180,7 +181,7 @@ export default function AttachContract({
   const total_calced = subTotal_calced + salesTax_calced;
 
   const control_anno: TsummaryControl = {
-    stringArr: data?.annotations ?? [],
+    stringArr: data_contract?.annotations ?? [],
     editString: () => {},
     addString: () => {},
     delString: () => {},
@@ -189,7 +190,7 @@ export default function AttachContract({
   };
 
   const control_qr: TsummaryControl = {
-    stringArr: data?.quotationRanges ?? [],
+    stringArr: data_contract?.quotationRanges ?? [],
     editString: () => {},
     addString: () => {},
     delString: () => {},
@@ -213,7 +214,7 @@ export default function AttachContract({
       discountRate: {
         inputAttr: {
           disabled: true,
-          value: data?.discount ?? '',
+          value: data_contract?.discount ?? '',
           onChange: () => {},
         },
       },
@@ -245,17 +246,17 @@ export default function AttachContract({
 
     delivery: {
       deliveryLocation: {
-        value: data?.deliveryLocation ?? '',
+        value: data_contract?.deliveryLocation ?? '',
         onChange: () => {},
       },
       deliveryDate: {
-        value: data?.deliveryDate ?? '',
+        value: data_contract?.deliveryDate ?? '',
         onChange: () => {},
       },
     },
     paymentMethod: {
       arr:
-        data?.paymentMethods.map((item) => {
+        data_contract?.paymentMethods.map((item) => {
           const { milestone, totalPaymentRatio } = item;
 
           return {
@@ -318,15 +319,17 @@ export default function AttachContract({
 
   // ------------------------------------------------------------------
 
+  // REQ
+
   const reqModify = async () => {
     try {
       setIsLading(true);
 
-      if (!data || !attachProdList || !contractId) {
+      if (!data_contract || !attachProdList || !contractId) {
         return;
       }
 
-      const content = _.cloneDeep(data.content);
+      const content = _.cloneDeep(data_contract.content);
       const theContent = {
         //
         ...content,
@@ -459,16 +462,20 @@ export default function AttachContract({
 
   // ------------------------------------------------------------------
 
-  const tagList: TtagList = [
-    {
-      label: `合約編號 ${formatedContent?.quotationNumber}`,
-      onClick: () => {},
-    },
-    {
-      label: `追加追減`,
-      onClick: () => {},
-    },
-  ];
+  // region PROPS
+  const props_profile = useMemo(() => {
+    let copy = _.cloneDeep(data_contract?.content);
+
+    copy &&
+      (copy = {
+        ...copy,
+        quotationDate: new Date().toISOString(),
+      });
+
+    return copy;
+  }, [data_contract?.content]);
+
+  // ------------------------------------------------------------------
 
   const panel: TpanelList = [
     //
@@ -488,13 +495,16 @@ export default function AttachContract({
   ];
 
   // ==========================================================================
+
+  // region RENDER
+
   return (
     <SubLayer isLoading_all={isLading}>
-      <PageHeader02 tagList={tagList} panelList={panel} />
+      <PageHeader02 tag={`合約編號 ${data_contract?.contractNumber}　建立追加追減報價單`} panelList={panel} />{' '}
       <div>
         <div className={scss.quotation}>
           {/*  */}
-          <QuotationProfile profile={data?.content} disabled={true} onProfileChange={() => {}} />
+          <QuotationProfile profile={props_profile} disabled={true} onProfileChange={() => {}} />
           {/*  */}
           <div className={classNames(scss.switchBar)}>
             <div>合約項目</div>
@@ -520,7 +530,7 @@ export default function AttachContract({
               panelBox="resetChangeBox"
               targetProd={targetProd}
               attachTotal={attachDivTotal.toLocaleString()}
-              discountRate={data?.discount ?? ''} // 報價單總折數
+              discountRate={data_contract?.discount ?? ''} // 報價單總折數
               changeDiscountRate={(v) => {}}
             />
 
@@ -591,7 +601,7 @@ export default function AttachContract({
               // targetProd={targetProd}
               attachTotal={attachAddTotal}
               isRedBorder={true}
-              discountRate={data?.discount ?? ''} // 報價單總折數
+              discountRate={data_contract?.discount ?? ''} // 報價單總折數
               changeDiscountRate={(v) => {}}
             />
 

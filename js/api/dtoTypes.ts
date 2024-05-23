@@ -2098,6 +2098,7 @@ export type TupdateQuotationProductDto = TcreateQuotationProductDto & {
 // };
 
 export type TcreateQuotationContentDto = {
+  // 送ISOString過去，回來的是YYYY-MM-DD
   quotationDate: string; // 報價日期
   validityPeriod: string; // 報價時效
   customerId: string; // 客戶ID
