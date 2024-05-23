@@ -108,6 +108,8 @@ export default function ContractReviewForm({
         testDrive: verifyForm.testDrive,
         debitItem: verifyForm.debitItem,
         // workDirectorId: verifyForm.workDirectorId,
+        performanceBondNote: verifyForm.performanceBondNote,
+        warrantyPaymentNote: verifyForm.warrantyPaymentNote,
       });
     } else {
       reset({
@@ -123,6 +125,8 @@ export default function ContractReviewForm({
         warranty: undefined,
         testDrive: undefined,
         debitItem: undefined,
+        performanceBondNote: undefined,
+        warrantyPaymentNote: undefined,
       });
     }
 
@@ -200,6 +204,10 @@ export default function ContractReviewForm({
       warrantyPeriod: preBody.warrantyPeriod ?? '',
       note: preBody.note ?? '',
       debitItem: preBody.debitItem ?? '',
+
+      performanceBondNote: preBody.performanceBondNote ?? '',
+      warrantyPaymentNote: preBody.warrantyPaymentNote ?? '',
+
       //
     };
 
@@ -391,6 +399,18 @@ export default function ContractReviewForm({
                 setValue('performanceBond', v);
               }}
             />
+            <InputBox
+              className="mt-1"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: theDisabled,
+                value: watchData.performanceBondNote ?? '',
+                onChange: (e) => {
+                  setValue('performanceBondNote', e.target.value);
+                },
+                placeholder: '請輸入備註',
+              }}
+            />
             <p className="text-[13px] text-[red] m-0">嚴禁使用商業本票</p>
           </div>
           {/*  */}
@@ -437,6 +457,18 @@ export default function ContractReviewForm({
               value={watchData.warrantyPayment}
               onChange={(v) => {
                 setValue('warrantyPayment', v);
+              }}
+            />
+            <InputBox
+              className="mt-1"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: theDisabled,
+                value: watchData.warrantyPaymentNote ?? '',
+                onChange: (e) => {
+                  setValue('warrantyPaymentNote', e.target.value);
+                },
+                placeholder: '請輸入備註',
               }}
             />
           </div>

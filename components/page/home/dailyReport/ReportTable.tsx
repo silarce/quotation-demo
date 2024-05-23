@@ -921,6 +921,8 @@ type Tconfig = {
   );
 };
 
+// bodyClassName 加 ! 是為了使css確實壓過 headerClassName
+
 const config: Tconfig = {
   periodOfDay: {
     eleType: 'select',
@@ -929,7 +931,7 @@ const config: Tconfig = {
     placeholder: '時段',
     headerClassName: classNames('w-[104px] row-span-6'),
     headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('row-span-2'),
+    bodyClassName: classNames('!row-span-2'),
     bodyClassName_mobile: classNames('h-[43px]'),
   },
   workingTime: {
@@ -948,7 +950,7 @@ const config: Tconfig = {
     placeholder_mobile: '客戶名稱',
     headerClassName: classNames('w-[250px] row-span-3', scss.textLeft),
     headerClassName_mobile: classNames('h-[62px]'),
-    bodyClassName: classNames('row-span-1'),
+    bodyClassName: classNames('!row-span-1'),
     bodyClassName_mobile: classNames('h-[62px]'),
   },
   contactName: {
@@ -957,7 +959,7 @@ const config: Tconfig = {
     placeholder: '請輸入接洽人',
     headerClassName: classNames('w-[250px] row-span-3', scss.textLeft),
     headerClassName_mobile: classNames('h-[62px]'),
-    bodyClassName: classNames('row-span-1'),
+    bodyClassName: classNames('!row-span-1'),
     bodyClassName_mobile: classNames('h-[62px]'),
   },
   description: {
@@ -966,7 +968,7 @@ const config: Tconfig = {
     placeholder: '請輸入接洽內容',
     headerClassName: classNames('w-auto row-span-6', scss.textLeft),
     headerClassName_mobile: classNames('h-[300px]'),
-    bodyClassName: classNames('row-span-2'),
+    bodyClassName: classNames('!row-span-2'),
     bodyClassName_mobile: classNames('h-[300px]'),
   },
   workers: {
@@ -975,7 +977,7 @@ const config: Tconfig = {
     placeholder: '接洽人',
     headerClassName: classNames('w-[140px] row-span-6', scss.textLeft),
     headerClassName_mobile: classNames('h-[120px]'),
-    bodyClassName: classNames('row-span-2'),
+    bodyClassName: classNames('!row-span-2'),
     bodyClassName_mobile: classNames('h-[120px]'),
   },
   dispatchOrderId: {
@@ -984,7 +986,7 @@ const config: Tconfig = {
     placeholder: '派工單序號',
     headerClassName: classNames('w-[160px] row-span-3', scss.textLeft),
     headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('row-span-1'),
+    bodyClassName: classNames('!row-span-1'),
     bodyClassName_mobile: classNames('h-[43px]'),
   },
   meals: {
@@ -993,7 +995,7 @@ const config: Tconfig = {
     placeholder: '餐費',
     headerClassName: classNames('w-[100px] row-span-3'),
     headerClassName_mobile: classNames('h-[120px]'),
-    bodyClassName: classNames('row-span-1'),
+    bodyClassName: classNames('!row-span-1'),
     bodyClassName_mobile: classNames('h-[120px]'),
   },
   departureTime: {
@@ -1002,7 +1004,7 @@ const config: Tconfig = {
     placeholder: '時間',
     headerClassName: classNames('w-[85px] row-span-2'),
     headerClassName_mobile: classNames('h-[43px]', scss.single),
-    bodyClassName: classNames('row-span-1', scss.single),
+    bodyClassName: classNames('!row-span-1', scss.single),
     bodyClassName_mobile: classNames('h-[43px]'),
   },
   departureWorksiteTime: {
@@ -1011,7 +1013,7 @@ const config: Tconfig = {
     placeholder: '時間',
     headerClassName: classNames('w-[85px] row-span-4'),
     headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('row-span-2'),
+    bodyClassName: classNames('!row-span-2'),
     bodyClassName_mobile: classNames('h-[43px]'),
   },
   arrivalTime: {
@@ -1020,7 +1022,7 @@ const config: Tconfig = {
     placeholder: '時間',
     headerClassName: classNames('w-[85px] row-span-2'),
     headerClassName_mobile: classNames('h-[43px]', scss.single),
-    bodyClassName: classNames('row-span-1', scss.single),
+    bodyClassName: classNames('!row-span-1', scss.single),
     bodyClassName_mobile: classNames('h-[43px]'),
   },
   licensePlate: {
@@ -1029,7 +1031,7 @@ const config: Tconfig = {
     placeholder: '請選擇',
     headerClassName: classNames('w-[160px] row-span-3', scss.textLeft),
     headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('row-span-1'),
+    bodyClassName: classNames('!row-span-1'),
     bodyClassName_mobile: classNames('h-[43px]'),
   },
   stayLength: {
@@ -1043,7 +1045,7 @@ const config: Tconfig = {
     inputType: 'number',
     headerClassName: classNames('w-[100px] row-span-3'),
     headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('row-span-1', scss.suffix),
+    bodyClassName: classNames('!row-span-1', scss.suffix),
     bodyClassName_mobile: classNames('h-[43px]', scss.stayLength),
     suffix: '天',
   },
@@ -1053,7 +1055,7 @@ const config: Tconfig = {
     placeholder: '',
     headerClassName: classNames('w-[60px] row-span-6', scss.rightEdge),
     headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('row-span-2'),
+    bodyClassName: classNames('!row-span-2'),
     bodyClassName_mobile: classNames('h-[43px]'),
   },
 };
