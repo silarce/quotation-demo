@@ -111,9 +111,12 @@ export default function BonusPeriod() {
 
     const newDueDate = moment(nextStartDate).endOf('month').toISOString();
 
+    const nextStartDateYYMMDD = moment(nextStartDate).format('YYYY/MM/DD');
+    const newDueDateYYMMDD = moment(newDueDate).format('YYYY/MM/DD');
+
     const body: TcreateSettlementCycleDto = {
-      startDate: nextStartDate,
-      dueDate: newDueDate,
+      startDate: nextStartDateYYMMDD,
+      dueDate: newDueDateYYMMDD,
     };
 
     await apiPostReportForm_settlementCycle(body).then(update_cycle);
@@ -277,8 +280,10 @@ const Row = ({
     }
 
     const body = {
-      startDate: startDate.toISOString(),
-      dueDate: dueDate.toISOString(),
+      // startDate: startDate.toISOString(),
+      // dueDate: dueDate.toISOString(),
+      startDate: startDate.format('YYYY/MM/DD'),
+      dueDate: dueDate.format('YYYY/MM/DD'),
       id: data_period.id,
     };
 
