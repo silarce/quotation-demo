@@ -236,24 +236,6 @@ export default function AttachContract({
   const salesTax_calced = Number(new Decimal(subTotal_calced).mul(taxRate).toFixed(0));
   const total_calced = subTotal_calced + salesTax_calced;
 
-  const control_anno: TsummaryControl = {
-    stringArr: data_contract?.annotations ?? [],
-    editString: () => {},
-    addString: () => {},
-    delString: () => {},
-    addStrArr: () => {},
-    replaceStrArr: () => {},
-  };
-
-  const control_qr: TsummaryControl = {
-    stringArr: data_contract?.quotationRanges ?? [],
-    editString: () => {},
-    addString: () => {},
-    delString: () => {},
-    addStrArr: () => {},
-    replaceStrArr: () => {},
-  };
-
   const payInfoControl: TpayInfoControl = {
     payment: {
       haveTax: {
@@ -375,9 +357,11 @@ export default function AttachContract({
 
   // ------------------------------------------------------------------
 
-  // region USE PROFILE
+  // region USE HOOK
 
   const { control_profile, state_profile, state_customer } = useProfile({ content: data_contract?.content });
+
+  const { state_anno, state_qr, control_anno, control_qr } = useAnnoAndQr({ content: data_contract?.content });
 
   // ------------------------------------------------------------------
 
@@ -500,8 +484,6 @@ export default function AttachContract({
         // 其他設定有金錢，沒有參與追加追減，出現在追加追減報價單裡可能會被誤解
         // 應該不送才是對的
         others: [],
-        annotations: copy_shallow.annotations ?? [],
-        quotationRanges: copy_shallow.quotationRanges ?? [],
         discount: copy_shallow.discount as `${number}`,
         //
 
@@ -518,7 +500,9 @@ export default function AttachContract({
         faxNumber: state_profile.faxNumber ?? '',
         trackProgress: state_profile.trackProgress ?? '',
         projectProgress: state_profile.projectProgress ?? '',
-
+        //
+        annotations: state_anno,
+        quotationRanges: state_qr,
         //
       };
 
@@ -727,12 +711,13 @@ export default function AttachContract({
         {/*  */}
         {/*  */}
         <Summary
-          disabled={true}
+          disabled={false}
           payInfoControl={payInfoControl}
           control_anno={control_anno}
           control_qr={control_qr}
           appendixParams={appendixParams}
           avgDiscount_withQty={avgDiscount_withQty}
+          disabled_file={true}
         />
 
         {/* 簽名 */}
@@ -745,20 +730,12 @@ export default function AttachContract({
   );
 }
 
-// const props_profile = useMemo(() => {
-//   let copy = _.cloneDeep(data_contract?.content);
-
-//   copy &&
-//     (copy = {
-//       ...copy,
-//       quotationDate: new Date().toISOString(),
-//     });
-
-//   return copy;
-// }, [data_contract?.content]);
-
 // region HOOK
-
+//
+//
+//
+//
+// region USE Profile
 const useProfile = ({ content }: { content: TquotationContentDto | undefined }) => {
   const [state_profile, setState_profile] = useState<Tstate_profile>(creEmptyProfile());
   const [state_customer, setState_customer] = useState<TcustomerDto | undefined | null>();
@@ -893,7 +870,125 @@ const useProfile = ({ content }: { content: TquotationContentDto | undefined }) 
   //
 };
 
+// region use AnnoAndQr
+
+const useAnnoAndQr = ({ content }: { content: TquotationContentDto | undefined }) => {
+  const [state_anno, setState_anno] = useState<string[]>([]);
+  const [state_qr, setState_qr] = useState<string[]>([]);
+
+  //
+  const control_anno: TsummaryControl = useMemo(() => {
+    const control_anno: TsummaryControl = {
+      stringArr: state_anno,
+      editString: (index, v) => {
+        setState_anno((state) => {
+          const copy = [...state];
+          copy[index] = v;
+
+          return copy;
+        });
+      },
+      addString: (v: string) => {
+        setState_anno((state) => {
+          const copy = [...state];
+          copy.push(v);
+
+          return copy;
+        });
+      },
+      delString: (index: number) => {
+        setState_anno((state) => {
+          const copy = [...state];
+          copy.splice(index, 1);
+
+          return copy;
+        });
+      },
+      addStrArr: (vArr: string[]) => {
+        setState_anno((state) => {
+          const copy = [...state];
+          copy.push(...vArr);
+
+          return copy;
+        });
+      },
+      replaceStrArr: (strArr: string[]) => {
+        setState_anno(strArr);
+      },
+    };
+
+    return control_anno;
+  }, [state_anno]);
+
+  const control_qr: TsummaryControl = useMemo(() => {
+    const control_qr: TsummaryControl = {
+      stringArr: state_qr,
+      editString: (index, v) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy[index] = v;
+
+          return copy;
+        });
+      },
+      addString: (v: string) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy.push(v);
+
+          return copy;
+        });
+      },
+      delString: (index: number) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy.splice(index, 1);
+
+          return copy;
+        });
+      },
+      addStrArr: (vArr: string[]) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy.push(...vArr);
+
+          return copy;
+        });
+      },
+      replaceStrArr: (strArr: string[]) => {
+        setState_qr(strArr);
+      },
+    };
+
+    return control_qr;
+  }, [state_qr]);
+
+  //
+
+  useEffect(() => {
+    if (content) {
+      const { annotations, quotationRanges } = content;
+      setState_anno(annotations ?? []);
+      setState_qr(quotationRanges ?? []);
+    } else {
+      setState_anno([]);
+      setState_qr([]);
+    }
+  }, [content]);
+
+  //
+
+  return {
+    state_anno,
+    state_qr,
+    control_anno,
+    control_qr,
+  };
+};
+
 // ==============================================================================
+
+// region EMPTY
 
 const creEmptyProfile = (): Tstate_profile => ({
   validityPeriod: '',
@@ -916,6 +1011,10 @@ const creEmptyProfile = (): Tstate_profile => ({
 
 /**
 
+// 這段沒過期 2024-05-23
+Gina說product裡面帶id，之後這個product就會有attachedToProductId
+
+// w 以下資訊大部分應該已過期 2024-05-23
 追加追減流程
 在發包列表選擇合約，開始該合約的追加追減
 page url

@@ -57,6 +57,7 @@ export default function Summary({
   control_anno,
   control_qr,
   avgDiscount_withQty,
+  disabled_file,
 }: {
   // legacyContract: Class_legacyContract;
   disabled: boolean;
@@ -71,6 +72,7 @@ export default function Summary({
     toSetFileInfo: (newImgInfoArr: TfileInfo[]) => void;
   };
   avgDiscount_withQty: number | string;
+  disabled_file?: boolean;
 }) {
   const [show_anno, setShow_anno] = useState(false);
   const [show_qr, setShow_qr] = useState(false);
@@ -156,7 +158,7 @@ export default function Summary({
       <div className={scss.block02}>
         <div>
           <TextListEditor_v2 stringObj={quoteRangeObj} label="報價範圍" disabled={disabled} />
-          <Appendix disabled={disabled} appendixParams={appendixParams} />
+          <Appendix disabled={disabled_file === undefined ? disabled : disabled_file} appendixParams={appendixParams} />
         </div>
         <PayInfo disabled={disabled} control={payInfoControl} avgDiscount_withQty={avgDiscount_withQty} />
       </div>
