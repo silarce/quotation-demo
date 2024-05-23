@@ -2626,6 +2626,7 @@ export type TquotationVerifyFormDto = {
   paymentTenor: string;
   //  履約保證票
   performanceBond: boolean;
+  performanceBondNote: string | null;
   //  可否請款訂金
   depositPayment: boolean;
   //  保固期(年)
@@ -2634,6 +2635,7 @@ export type TquotationVerifyFormDto = {
   note: string;
   //  保固金或保固票
   warrantyPayment: boolean;
+  warrantyPaymentNote: string | null;
   //  防火證明
   fireproofCertificate: boolean;
   //  保固書
@@ -2657,6 +2659,7 @@ export type TcreateQuotationVerifyFormDto = {
   paymentTenor: string;
   //  履約保證票
   performanceBond: boolean;
+  performanceBondNote: string | null;
   //  可否請款訂金
   depositPayment: boolean;
   //  保固期(年)
@@ -2665,6 +2668,7 @@ export type TcreateQuotationVerifyFormDto = {
   note: string;
   //  保固金或保固票
   warrantyPayment: boolean;
+  warrantyPaymentNote: string | null;
   //  防火證明
   fireproofCertificate: boolean;
   //  保固書
