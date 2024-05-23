@@ -147,7 +147,7 @@ export default function DispatchList() {
   // ----------------------------------------------------------
   return (
     <SubLayer>
-      <PageHeader panelList={panelList} contractNumber={contract?.content.quotationNumber} />
+      <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? ''} />
 
       <div className={scss.body}>
         <div className={scss.profile}>

@@ -10,11 +10,13 @@ export default function MyButton_rounded({
   buttonProps,
   theme,
   svgIcon = 'undefined',
+  className,
 }: {
   children?: React.ReactNode;
   buttonProps?: ButtonProps;
   theme?: 'danger' | 'success' | undefined;
   svgIcon?: 'add' | 'undefined';
+  className?: string;
 }) {
   const Icon = iconLookup[svgIcon];
 
@@ -22,7 +24,7 @@ export default function MyButton_rounded({
     shape: 'round',
     icon: Icon && <Icon />,
     ...buttonProps,
-    className: classNames(scss.antdBtn, theme && scss[theme], buttonProps?.className),
+    className: classNames(scss.antdBtn, theme && scss[theme], className, buttonProps?.className),
   };
 
   return <Button {...buttonProps}>{children}</Button>;

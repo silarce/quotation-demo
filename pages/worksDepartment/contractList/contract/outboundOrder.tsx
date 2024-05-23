@@ -18,7 +18,11 @@ import OrderTable, {
   // Tcontrol_orderTable,
   TrowProps,
   Tpanel,
+  TpostDeliveryStatusParams,
 } from 'components/page/worksDepartment/contracList/contract/outboundOrder/orderTable';
+import Modal_newDeliveryStatu, {
+  TpreCreateEngineeringDeliveryStatusDto,
+} from 'components/page/worksDepartment/contracList/contract/outboundOrder/modal_newDeliveryStatu';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -53,6 +57,7 @@ import {
   TerpFeatureDto,
   TquotationProductItemDto,
   TquotationProductDto,
+  TdeliveryStatusInstallationItem,
 } from 'js/api/dtoTypes';
 
 // =====================================================================
@@ -80,7 +85,19 @@ type TproductWorksheetList = {
   };
 };
 
+type TonConfirmClick = (
+  productItemId: string,
+  params: {
+    deliveryStatusId: string;
+  } & TpostDeliveryStatusParams
+) => Promise<void>;
+
+type TonCopyClick = (productItemId: string, params: TpostDeliveryStatusParams) => Promise<void>;
+
 // =====================================================================
+
+// region START
+
 export default function OutboundOrder({
   isAdmin,
   userErpFeature,
@@ -102,16 +119,16 @@ export default function OutboundOrder({
 
   // --------------------------------------------------------------------------
 
-  // const [deleveryStatusInEdit, setDeleveryStatusInEdit] = useState<TdeliveryStatusInEdit>();
-
   const [notes, setNotes] = useState<string>();
   const [notesDiasbled, setNotesDiasbled] = useState(true);
 
-  // _____________________________________________________________________________
   const [isLoading, setIsLoading] = useState(false);
   const [isReqing, setIsReqing] = useState(false);
 
   const [targetWorksheetItemId, setTargetWorksheetItemId] = useState<string>();
+  const [seletedWorksheetItem, setSeletedWorksheetItem] = useState<{ [id: string]: TquotationProductItemDto }>({});
+
+  const [showBatchAddModal, setShowBatchAddModal] = useState(false);
 
   // --------------------------------------------------------------------------
 
@@ -145,16 +162,210 @@ export default function OutboundOrder({
     worksheet: worksheetArr,
   } = contract ?? {};
 
-  // 工程聯絡單
-  // const { data: engineeringContact, update: update_engineeringContact } =
-  //   useGetEngineeringContact(engineeringContactId);
-
   const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
-  // deliveryList
-  // const { deliveryList: deliveryList_2, update_deliveryList } =
-  //   useGetEngineeringDeliveryList(engineeringDeliveryListId);
 
   // --------------------------------------------------------------------------
+
+  // region REQUEST
+
+  const reqPost = async (
+    productItemId: string,
+
+    { employeeId, outsourcingId }: { employeeId?: string; outsourcingId?: string }
+  ) => {
+    if (!engineeringDeliveryListId || isReqing) {
+      return undefined;
+    }
+
+    if (!employeeId && !outsourcingId) {
+      myAlert.err({ title: '新增失敗', content: '請選擇員工或外包廠商' });
+
+      return undefined;
+    }
+
+    try {
+      const res = await apiPostDeliveryStatus({
+        id: engineeringDeliveryListId,
+        body: {
+          notes: null,
+          itemName: null,
+          shippingDate: null,
+
+          installerOutsourcingId: outsourcingId ?? null,
+          installerEmployees: employeeId ? [employeeId] : null,
+
+          installationDate: null,
+          append: null,
+          completeAppend: null,
+          productItemId,
+          installationItem: null,
+        },
+      });
+
+      update_finalProduce();
+      // return res
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增失敗', content: err.message });
+
+      return undefined;
+    }
+  };
+
+  const reqPost_copy = async (body: TupdateEngineeringDeliveryStatusDto) => {
+    if (!engineeringDeliveryListId || isReqing) {
+      return undefined;
+    }
+
+    try {
+      const res = await apiPostDeliveryStatus({
+        id: engineeringDeliveryListId,
+        body,
+      });
+
+      update_finalProduce();
+      // return res
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增失敗', content: err.message });
+
+      return undefined;
+    }
+  };
+
+  const reqPost_2 = async (body: TcreateEngineeringDeliveryStatusDto) => {
+    if (!engineeringDeliveryListId || isReqing) {
+      return;
+    }
+
+    try {
+      const res = await apiPostDeliveryStatus({
+        id: engineeringDeliveryListId,
+        body,
+      });
+
+      update_finalProduce();
+
+      // return res;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增失敗', content: err.message });
+    }
+  };
+
+  const reqPatch = async ({ statusId, body }: { statusId: string; body: TupdateEngineeringDeliveryStatusDto }) => {
+    if (!engineeringDeliveryListId || isReqing) {
+      return;
+    }
+
+    if (body.installerEmployees?.length === 0) {
+      body.installerEmployees = null;
+    }
+
+    if (!body.installerOutsourcingId) {
+      {
+        body.installerOutsourcingId = null;
+      }
+    }
+
+    body = {
+      ...body,
+      shippingDate: body.shippingDate || null,
+      installationDate: body.installationDate || null,
+    };
+
+    try {
+      const res = await apiPatchDeliveryStatus({
+        id: engineeringDeliveryListId,
+        statusId,
+        body,
+      });
+
+      update_finalProduce();
+
+      // return res;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新失敗', content: err.message });
+
+      return Promise.reject(err);
+    }
+  };
+
+  const reqDelete = async (statusId: string) => {
+    if (!engineeringDeliveryListId || isReqing) {
+      return;
+    }
+
+    try {
+      const res = await apiDeleteDeliveryStatus({
+        id: engineeringDeliveryListId,
+        statusId,
+      });
+
+      update_finalProduce();
+
+      // return true;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '刪除失敗', content: err.message });
+    }
+  };
+
+  const reqPatchNotes = async () => {
+    if (!engineeringDeliveryListId || !havePermissionToEdit) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, { notes: notes ?? '' });
+      // await update_deliveryList();
+      await update_contract();
+      setNotesDiasbled(true);
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '更新備註失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --------------------------------------------------------------------------
+
+  // region FUNCTION
+
+  const switchSeletedWorksheetItem = (worksheetItem: TquotationProductItemDto) => {
+    setSeletedWorksheetItem((list) => {
+      const copy = { ...list };
+
+      if (copy[worksheetItem.id]) {
+        delete copy[worksheetItem.id];
+      } else {
+        copy[worksheetItem.id] = worksheetItem;
+      }
+
+      return copy;
+    });
+  };
+
+  const batchPost = async (preBody: TpreCreateEngineeringDeliveryStatusDto) => {
+    for (const item of Object.values(seletedWorksheetItem)) {
+      const worksheetItemId = item.id;
+
+      const body: TcreateEngineeringDeliveryStatusDto = {
+        ...preBody,
+        productItemId: worksheetItemId,
+      };
+
+      await reqPost_2(body);
+      setSeletedWorksheetItem({});
+    }
+  };
+
+  // --------------------------------------------------------------------------
+
+  // region COMPONENT PROPS
 
   const productWorksheetList = useMemo(() => {
     const productWorksheetList: TproductWorksheetList = {};
@@ -203,7 +414,169 @@ export default function OutboundOrder({
     //
   }, [finalProduct]);
 
+  // ------------------------------------------------------------------------
+
+  const rowPropsArr: TrowProps[] = useMemo(() => {
+    // 做法是把每一筆worksheetArr.worksheetItemArr裡的item
+    // 依序分析成rowProps然後放進rowPropsArr
+    // 畫面上看起來HTML的元素有父子的關係，但其實每一個row其實都是獨立的，是兄弟關係
+
+    const rowPropsArr: TrowProps[] = [];
+
+    Object.values(productWorksheetList).forEach((productWorksheet, index) => {
+      const { product, worksheetList } = productWorksheet;
+      const worksheetArr = Object.values(worksheetList) as
+        | TproductWorksheetList[string]['worksheetList'][string][]
+        | undefined;
+
+      // ____________________________________________________________________
+      const prodRow = createRowProps_prodRow({
+        prod: product,
+        serialNumber: index + 1,
+        worksheetItem: worksheetArr?.[0]?.worksheetItem,
+        worksheetItemQty: worksheetArr?.[0]?.worksheetItemArr.length,
+        worksheetCreatedAt: worksheetArr?.[0]?.worksheetCreatedAt || null,
+      });
+
+      rowPropsArr.push(prodRow);
+      // ____________________________________________________________________
+
+      const onConfirm: TonConfirmClick = async (
+        productItemId,
+        {
+          deliveryStatusId,
+          employeeId,
+          outsourcingId,
+          installationDate,
+          shippingDate,
+          itemName,
+          notes,
+          installationItem,
+        }
+      ) => {
+        const reqBody: TcreateEngineeringDeliveryStatusDto = {
+          notes: notes,
+          itemName: itemName,
+          shippingDate: shippingDate,
+          installerOutsourcingId: outsourcingId ?? null,
+          installerEmployees: employeeId ? [employeeId] : null,
+          installationDate: installationDate,
+          append: null,
+          completeAppend: null,
+          productItemId,
+          installationItem,
+        };
+
+        return await reqPatch({
+          statusId: deliveryStatusId,
+          body: reqBody,
+        });
+      };
+
+      const onCopy: TonCopyClick = async (
+        productItemId,
+        { employeeId, outsourcingId, installationDate, shippingDate, itemName, notes, installationItem }
+      ) => {
+        const reqBody: TcreateEngineeringDeliveryStatusDto = {
+          notes: notes,
+          itemName: itemName,
+          shippingDate: shippingDate,
+          installerOutsourcingId: outsourcingId ?? null,
+          installerEmployees: employeeId ? [employeeId] : null,
+          installationDate: installationDate,
+          append: null,
+          completeAppend: null,
+          productItemId,
+          installationItem,
+        };
+
+        await reqPost_copy(reqBody);
+      };
+
+      // 處理第一個worksheetArr的第一筆worksheet
+      worksheetArr?.[0]?.worksheetItemArr.forEach((item) => {
+        const itemRow = createRowProps_itemRow({
+          contractProductItem: product.items[0],
+          worksheetItem: item,
+          worksheetCreatedAt: worksheetArr?.[0].worksheetCreatedAt,
+          onAddClick: () => {
+            setTargetWorksheetItemId(item.id);
+          },
+          onDeleteClick: (deleverStatusId) => {
+            reqDelete(deleverStatusId);
+          },
+          onConfirmClick: async (params) => {
+            await onConfirm(item.id, params);
+          },
+          onCopyClick: async (params) => {
+            await onCopy(item.id, params);
+          },
+          //
+          onCenterCheck: () => {
+            switchSeletedWorksheetItem(item);
+          },
+          isCenterCheck: !!seletedWorksheetItem[item.id],
+        });
+
+        rowPropsArr.push(itemRow);
+      });
+
+      // ____________________________________________________________________
+      // 處理第一個worksheetArr的第一筆之外的worksheet
+
+      worksheetArr?.forEach((worksheet, index) => {
+        if (index === 0) {
+          return;
+        }
+
+        const { worksheetItem, worksheetItemArr, worksheetCreatedAt } = worksheet;
+
+        const headRow = createRowProps_headRow({
+          worksheetItem: worksheetItem,
+          worksheetItemQty: worksheetItemArr.length,
+          worksheetCreatedAt,
+        });
+
+        rowPropsArr.push(headRow);
+
+        worksheetItemArr.forEach((item) => {
+          const itemRow = createRowProps_itemRow({
+            contractProductItem: product.items[0],
+            worksheetItem: item,
+            worksheetCreatedAt,
+            onAddClick: () => {
+              setTargetWorksheetItemId(item.id);
+            },
+            onDeleteClick: (deleverStatusId) => {
+              reqDelete(deleverStatusId);
+            },
+            onConfirmClick: async (params) => {
+              await onConfirm(item.id, params);
+            },
+            onCopyClick: async (params) => {
+              await onCopy(item.id, params);
+            },
+            //
+            onCenterCheck: () => {
+              switchSeletedWorksheetItem(item);
+            },
+            isCenterCheck: !!seletedWorksheetItem[item.id],
+          });
+
+          rowPropsArr.push(itemRow);
+        });
+      });
+    }); // productWorksheetList
+
+    return rowPropsArr;
+  }, [
+    productWorksheetList,
+    seletedWorksheetItem,
+    //  finalProduct
+  ]);
+
   // --------------------------------------------------------------------------
+  // region  USE EFFECT
 
   useEffect(() => {
     (async () => {
@@ -242,253 +615,8 @@ export default function OutboundOrder({
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
 
-  const reqPost = async (
-    productItemId: string,
-
-    { employeeId, outsourcingId }: { employeeId?: string; outsourcingId?: string }
-  ) => {
-    if (!engineeringDeliveryListId || isReqing) {
-      return undefined;
-    }
-
-    if (!employeeId && !outsourcingId) {
-      myAlert.err({ title: '新增失敗', content: '請選擇員工或外包廠商' });
-
-      return undefined;
-    }
-
-    try {
-      const res = await apiPostDeliveryStatus({
-        id: engineeringDeliveryListId,
-        body: {
-          notes: null,
-          itemName: null,
-          shippingDate: null,
-
-          installerOutsourcingId: outsourcingId ?? null,
-          installerEmployees: employeeId ? [employeeId] : null,
-
-          installationDate: null,
-          append: null,
-          completeAppend: null,
-          productItemId,
-        },
-      });
-
-      update_finalProduce();
-      // return res
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '新增失敗', content: err.message });
-
-      return undefined;
-    }
-
-    //
-  };
-
-  const reqPatch = async ({ statusId, body }: { statusId: string; body: TupdateEngineeringDeliveryStatusDto }) => {
-    if (!engineeringDeliveryListId || isReqing) {
-      return;
-    }
-
-    if (body.installerEmployees?.length === 0) {
-      body.installerEmployees = null;
-    }
-
-    if (!body.installerOutsourcingId) {
-      {
-        body.installerOutsourcingId = null;
-      }
-    }
-
-    try {
-      const res = await apiPatchDeliveryStatus({
-        id: engineeringDeliveryListId,
-        statusId,
-        body,
-      });
-
-      update_finalProduce();
-
-      // return res;
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '更新失敗', content: err.message });
-    }
-  };
-
-  const reqDelete = async (statusId: string) => {
-    if (!engineeringDeliveryListId || isReqing) {
-      return;
-    }
-
-    try {
-      const res = await apiDeleteDeliveryStatus({
-        id: engineeringDeliveryListId,
-        statusId,
-      });
-
-      update_finalProduce();
-
-      // return true;
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '刪除失敗', content: err.message });
-    }
-  };
-
-  const reqPatchNotes = async () => {
-    if (!engineeringDeliveryListId || !havePermissionToEdit) {
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await apiPatchEngineeringDeliveryList(engineeringDeliveryListId, { notes: notes ?? '' });
-      // await update_deliveryList();
-      await update_contract();
-      setNotesDiasbled(true);
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '更新備註失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // --------------------------------------------------------------------------
-
-  const rowPropsArr: TrowProps[] = useMemo(() => {
-    const rowPropsArr: TrowProps[] = [];
-
-    Object.values(productWorksheetList).forEach((productWorksheet, index) => {
-      const { product, worksheetList } = productWorksheet;
-      const worksheetArr = Object.values(worksheetList) as
-        | TproductWorksheetList[string]['worksheetList'][string][]
-        | undefined;
-
-      // ____________________________________________________________________
-      const prodRow = createRowProps_prodRow({
-        prod: product,
-        serialNumber: index + 1,
-        worksheetItem: worksheetArr?.[0]?.worksheetItem,
-        worksheetItemQty: worksheetArr?.[0]?.worksheetItemArr.length,
-        worksheetCreatedAt: worksheetArr?.[0]?.worksheetCreatedAt || null,
-      });
-
-      rowPropsArr.push(prodRow);
-      // ____________________________________________________________________
-      worksheetArr?.[0]?.worksheetItemArr.forEach((item) => {
-        const itemRow = createRowProps_itemRow({
-          worksheetItem: item,
-          worksheetCreatedAt: worksheetArr?.[0].worksheetCreatedAt,
-          onAddClick: () => {
-            setTargetWorksheetItemId(item.id);
-          },
-          onDeleteClick: (deleverStatusId) => {
-            reqDelete(deleverStatusId);
-          },
-          onConfirmClick: async ({
-            deliveryStatusId,
-            employeeId,
-            outsourcingId,
-            installationDate,
-            shippingDate,
-            itemName,
-            notes,
-          }) => {
-            const reqBody: TcreateEngineeringDeliveryStatusDto = {
-              notes: notes,
-              itemName: itemName,
-              shippingDate: shippingDate,
-              installerOutsourcingId: outsourcingId ?? null,
-              installerEmployees: employeeId ? [employeeId] : null,
-              installationDate: installationDate,
-              append: null,
-              completeAppend: null,
-              productItemId: item.id,
-            };
-
-            await reqPatch({
-              statusId: deliveryStatusId,
-              body: reqBody,
-            });
-          },
-        });
-
-        rowPropsArr.push(itemRow);
-      });
-
-      // ____________________________________________________________________
-
-      worksheetArr?.forEach((worksheet, index) => {
-        if (index === 0) {
-          return;
-        }
-
-        const { worksheetItem, worksheetItemArr, worksheetCreatedAt } = worksheet;
-
-        const headRow = createRowProps_headRow({
-          worksheetItem: worksheetItem,
-          worksheetItemQty: worksheetItemArr.length,
-          worksheetCreatedAt,
-        });
-
-        rowPropsArr.push(headRow);
-
-        worksheetItemArr.forEach((item) => {
-          const itemRow = createRowProps_itemRow({
-            worksheetItem: item,
-            worksheetCreatedAt,
-            onAddClick: () => {
-              setTargetWorksheetItemId(item.id);
-            },
-            onDeleteClick: (deleverStatusId) => {
-              reqDelete(deleverStatusId);
-            },
-            onConfirmClick: async ({
-              deliveryStatusId,
-              employeeId,
-              outsourcingId,
-              installationDate,
-              shippingDate,
-              itemName,
-              notes,
-            }) => {
-              const reqBody: TcreateEngineeringDeliveryStatusDto = {
-                notes: notes,
-                itemName: itemName,
-                shippingDate: null,
-                installerOutsourcingId: outsourcingId ?? null,
-                installerEmployees: employeeId ? [employeeId] : null,
-                installationDate: installationDate,
-                append: null,
-                completeAppend: null,
-                productItemId: item.id,
-              };
-
-              await reqPatch({
-                statusId: deliveryStatusId,
-                body: reqBody,
-              });
-            },
-          });
-
-          rowPropsArr.push(itemRow);
-        });
-      });
-
-      // ____________________________________________________________________
-    }); // productWorksheetList
-
-    return rowPropsArr;
-  }, [productWorksheetList]);
-
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
+  // region RENDER
 
   return (
     <SubLayer isLoading_all={isLoading}>
@@ -507,7 +635,14 @@ export default function OutboundOrder({
             </div>
           </div>
 
-          <OrderTable control={{ rowPropsArr: rowPropsArr }} />
+          <OrderTable
+            //
+            rowPropsArr={rowPropsArr}
+            batchWorksheetItem={{
+              onBatchAddChange: () => setSeletedWorksheetItem({}),
+              onBatchAddClick: () => setShowBatchAddModal(true),
+            }}
+          />
 
           <div className={style.remark}>
             <div className={style.title}>
@@ -573,11 +708,26 @@ export default function OutboundOrder({
           setTargetWorksheetItemId(undefined);
         }}
       />
+      <Modal_newDeliveryStatu
+        visible={showBatchAddModal}
+        onConfirm={batchPost}
+        onCancel={() => setShowBatchAddModal(false)}
+      />
     </SubLayer>
   );
 }
 
+// region END
+
 // ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+
+// region component
+
 const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
   selectorArr: [
     {
@@ -599,6 +749,9 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
 
 // ======================================================================
 
+// region function
+
+// 產品資料的row，這個row會包含item的資料，這個row不會包含panel
 const createRowProps_prodRow = ({
   prod,
   serialNumber,
@@ -627,6 +780,7 @@ const createRowProps_prodRow = ({
     total_volume: total_volume_worksheet,
     doorModelName: worksheetItem.doorModelName,
     material: worksheetItem.materialName,
+    // horsepower: worksheetItem.horsepower,
     horsepower: worksheetItem.horsepower,
     surface: worksheetItem.materialSurface,
     establishmentDate: getTaiwanDateStr(worksheetCreatedAt),
@@ -656,14 +810,21 @@ const createRowProps_prodRow = ({
   };
 };
 
+// ===========================================================================
+
+// item資料的row，這個row不會包含panel
 const createRowProps_headRow = ({
   worksheetItem,
   worksheetItemQty,
   worksheetCreatedAt,
-}: {
+}: // onCenterCheck,
+// isCenterCheck,
+{
   worksheetItem: TquotationProductItemDto;
   worksheetItemQty: number;
   worksheetCreatedAt: string | null;
+  // onCenterCheck: null | undefined | (() => void);
+  // isCenterCheck: boolean;
 }): TrowProps => {
   const total_volume_worksheet =
     worksheetItemQty && worksheetItem ? new Decimal(worksheetItemQty).mul(worksheetItem.volume || 0).toNumber() : '';
@@ -690,31 +851,62 @@ const createRowProps_headRow = ({
   };
 };
 
+// ==========================================================================
+
 const createRowProps_itemRow = ({
   //
+  contractProductItem,
   worksheetItem,
   onAddClick,
   onConfirmClick,
+  onCopyClick,
   onDeleteClick,
   worksheetCreatedAt,
+  //
+  onCenterCheck,
+  isCenterCheck,
 }: {
+  contractProductItem: TquotationProductItemDto;
   worksheetItem: TquotationProductItemDto;
   onAddClick: () => void;
   onConfirmClick: (parameters: {
     deliveryStatusId: string;
-    employeeId: string | undefined;
-    outsourcingId: string | undefined;
+    employeeId?: string | undefined;
+    outsourcingId?: string | undefined;
     installationDate: string;
     shippingDate: string;
     itemName: string;
     notes: string;
+    installationItem: TdeliveryStatusInstallationItem | null;
+  }) => Promise<void>;
+  onCopyClick: (parameters: {
+    employeeId?: string | undefined;
+    outsourcingId?: string | undefined;
+    installationDate: string;
+    shippingDate: string;
+    itemName: string;
+    notes: string;
+    installationItem: TdeliveryStatusInstallationItem | null;
   }) => Promise<void>;
   onDeleteClick: (deleverStatuId: string) => void;
   worksheetCreatedAt: string | null;
+  //
+  onCenterCheck: null | undefined | (() => void);
+  isCenterCheck: boolean;
 }): TrowProps => {
+  const accessories_contract = contractProductItem.accessories;
   const { deliveryStatus, accessories } = worksheetItem;
 
-  const accessoriesStr = accessories?.map((a) => a.name).join('\n');
+  // ________________________________________________________
+  // issue#485 選配要列出 工作表與合約有差異的項目
+  // https://github.com/San-Jeou/sanjeou-erp-fe/issues/485
+  // 工作表的選配是合約選配的子集合，所以有差異的項目其實就是合約有而工作表沒有的項目
+  // 在工作表把項目去掉的意思應該是沒有要做吧，為什麼要列出沒有要做的項目?怪怪的
+  const diff = _.differenceBy(accessories_contract, accessories, 'codeName');
+  const accessoriesStr = diff?.map((a) => a.name).join('\n');
+
+  // 原本的 // const accessoriesStr = accessories?.map((a) => a.name).join('\n');
+  // ________________________________________________________
 
   const deliveryStatus_sorted = _.sortBy(deliveryStatus, 'createdAt');
 
@@ -737,6 +929,7 @@ const createRowProps_itemRow = ({
       // 安裝日期
       installationDate,
       shippingDate, // 出貨日
+      installationItem,
     } = ds;
 
     const panelProps: Tpanel = {
@@ -748,21 +941,20 @@ const createRowProps_itemRow = ({
       installer_outsourcing: installerOutsourcing,
       itemName: itemName ?? '',
       notes: notes ?? '',
+      installationItem: installationItem ?? '',
       onAddClick,
       onDeleteClick: () => {
         onDeleteClick(id);
       },
       onConfirmClick: async (parameters) => {
-        const { employeeId, outsourcingId, installationDate, shippingDate, itemName, notes } = parameters;
-
         await onConfirmClick({
           deliveryStatusId: id,
-          employeeId,
-          outsourcingId,
-          installationDate,
-          shippingDate,
-          itemName,
-          notes,
+          ...parameters,
+        });
+      },
+      onCopyClick: async (parameters) => {
+        await onCopyClick({
+          ...parameters,
         });
       },
     };
@@ -781,9 +973,11 @@ const createRowProps_itemRow = ({
       installer_outsourcing: undefined,
       itemName: '',
       notes: '',
+      installationItem: '',
       onAddClick,
       onDeleteClick: () => {},
       onConfirmClick: async () => {},
+      onCopyClick: undefined,
     });
   }
 
@@ -802,13 +996,10 @@ const createRowProps_itemRow = ({
       horsepower: worksheetItem.horsepower,
       surface: worksheetItem.materialSurface,
       establishmentDate: getTaiwanDateStr(worksheetCreatedAt),
+      onCheckClick: onCenterCheck,
+      isChecked: isCenterCheck,
     },
     rightPanelArr: rightPanelArr,
     // rightPanelArr: foo,
   };
 };
-
-// ========================================================================
-// ========================================================================
-// ========================================================================
-// ========================================================================

@@ -111,6 +111,8 @@ export default function BonusPeriod() {
 
     const newDueDate = moment(nextStartDate).endOf('month').toISOString();
 
+    // 後端取得年月的時候沒有把時區的因素算進去，因此後端取得dueDate的"日"時會少一天
+    // 改送YYYY/MM/DD給後端，方便後端取得正確的台灣時區年月
     const nextStartDateYYMMDD = moment(nextStartDate).format('YYYY/MM/DD');
     const newDueDateYYMMDD = moment(newDueDate).format('YYYY/MM/DD');
 
