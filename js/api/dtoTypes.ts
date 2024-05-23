@@ -2186,59 +2186,61 @@ export type TquotationContractDto = {
   certificatedDoc?: TcertificatedDocDto[];
 };
 
-export type TcreateModifyQuotationDto = {
-  // 報價日期
-  quotationDate?: string;
-  // 報價時效
-  validityPeriod?: string;
-  // 客戶 ID
-  customerId?: string;
-  // 工程名稱
-  projectName?: string;
-  // 縣市
-  county?: string;
-  // 區
-  district?: string;
-  // 詳細地址
-  address?: string;
-  // 聯絡人
-  contactPerson?: string;
-  // 聯絡電話
-  contactNumber?: string;
-  // 傳真電話
-  faxNumber?: string;
-  // 追蹤進度
-  trackProgress?: string;
-  // 工地進度
-  projectProgress?: string;
-  // 樘數
-  quantity?: number;
-  // 編輯備註
-  editNotes?: string;
-  annotations?: string[] | null;
-  quotationRanges?: string[] | null;
-  // 經理
-  managerId?: string | null;
-  // 主管
-  supervisorId?: string | null;
-  // 經辦人
-  agentId?: string;
-  // 總折數
-  discount?: string;
-  // 小計
-  subTotal?: number;
-  // 營業稅
-  salesTax?: number;
-  // 總計
-  total?: number;
-  // 交貨地點
-  deliveryLocation?: string;
-  // 交貨日期
-  deliveryDate?: string | null;
-  paymentMethods?: TpaymentMethodDto[];
-  products?: TcreateQuotationProductDto[];
-  others?: TcreateQuotationContentOtherDto[];
-};
+export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
+
+// export type TcreateModifyQuotationDto = {
+//   // 報價日期
+//   quotationDate?: string;
+//   // 報價時效
+//   validityPeriod?: string;
+//   // 客戶 ID
+//   customerId?: string;
+//   // 工程名稱
+//   projectName?: string;
+//   // 縣市
+//   county?: string;
+//   // 區
+//   district?: string;
+//   // 詳細地址
+//   address?: string;
+//   // 聯絡人
+//   contactPerson?: string;
+//   // 聯絡電話
+//   contactNumber?: string;
+//   // 傳真電話
+//   faxNumber?: string;
+//   // 追蹤進度
+//   trackProgress?: string;
+//   // 工地進度
+//   projectProgress?: string;
+//   // 樘數
+//   quantity?: number;
+//   // 編輯備註
+//   editNotes?: string;
+//   annotations?: string[] | null;
+//   quotationRanges?: string[] | null;
+//   // 經理
+//   managerId?: string | null;
+//   // 主管
+//   supervisorId?: string | null;
+//   // 經辦人
+//   agentId?: string;
+//   // 總折數
+//   discount?: string;
+//   // 小計
+//   subTotal?: number;
+//   // 營業稅
+//   salesTax?: number;
+//   // 總計
+//   total?: number;
+//   // 交貨地點
+//   deliveryLocation?: string;
+//   // 交貨日期
+//   deliveryDate?: string | null;
+//   paymentMethods?: TpaymentMethodDto[];
+//   products?: TcreateQuotationProductDto[];
+//   others?: TcreateQuotationContentOtherDto[];
+// };
 
 export type TquotationAccouting = {
   quotetype: string;

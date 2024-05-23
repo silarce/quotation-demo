@@ -346,6 +346,8 @@ export default function AttachContract({
         toManagerAt: undefined,
       };
 
+      const customerId = content.customer?.id;
+
       // 材料配件有問題的主產品
       let breakComponentProdIndex_div = '';
       let breakComponentProdIndex_attach = '';
@@ -393,9 +395,22 @@ export default function AttachContract({
         });
       }
 
+      if (!userId) {
+        return myAlert.warning({
+          title: '沒有userInfo.employee.id',
+        });
+      }
+
+      if (!customerId) {
+        return myAlert.warning({
+          title: '沒有customerId',
+        });
+      }
+
       const body: TcreateModifyQuotationDto = {
         ...theContent,
         products: [...divProdArr, ...attachProdArr],
+        customerId,
         // agentId: content.agentEmployee?.id,
         agentId: userId,
         // managerId: content.managerEmployee?.id,
@@ -407,6 +422,9 @@ export default function AttachContract({
         // 其他設定有金錢，沒有參與追加追減，出現在追加追減報價單裡可能會被誤解
         // 應該不送才是對的
         others: [],
+        annotations: theContent.annotations ?? [],
+        quotationRanges: theContent.quotationRanges ?? [],
+        discount: theContent.discount as `${number}`,
         //
       };
 
@@ -444,6 +462,10 @@ export default function AttachContract({
   const tagList: TtagList = [
     {
       label: `合約編號 ${formatedContent?.quotationNumber}`,
+      onClick: () => {},
+    },
+    {
+      label: `追加追減`,
       onClick: () => {},
     },
   ];
