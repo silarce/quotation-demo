@@ -3769,6 +3769,8 @@ class Class_product {
 
   // 清空變更prod
   clearAttach() {
+    console.log('this', this);
+
     this._exchangeProdList = {};
     this._reduceQty = '0';
     this.onDiscountChange();
