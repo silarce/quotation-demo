@@ -32,7 +32,7 @@ import 'slick-carousel/slick/slick-theme.css'; // react-slick
 
 // 全域moment語系轉換
 import 'moment/locale/zh-tw';
-
+// moment擴充套件
 import moment_tz from 'moment-timezone';
 
 // 時區設為台北時間
