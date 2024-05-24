@@ -28,10 +28,7 @@ import QuotationSinature_3, {
   Tcontroll_signature,
 } from 'components/page/domestic/quotation/quotationSinature_3';
 // import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
-import QuotationPdf, {
-  quotationContentToBasicInfo,
-  quotationProdToTableProdList,
-} from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new2';
+import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
 
 import QuotationPdf_part, {
   TmainProduct,
@@ -1055,18 +1052,18 @@ latestContentProdArr為這次追加追減的主產品
     },
   ];
   const panel_noEditable: TpanelList = [
-    // {
-    //   type: 'myButton',
-    //   label: '匯出報價單',
-    //   img: iconUpload.src,
-    //   onClick: () => setShowPdf(true),
-    // },
-    // {
-    //   type: 'myButton',
-    //   label: '匯出材料/配件',
-    //   img: iconUpload.src,
-    //   onClick: () => setShowPdf_part(true),
-    // },
+    {
+      type: 'myButton',
+      label: '匯出報價單',
+      img: iconUpload.src,
+      onClick: () => setShowPdf(true),
+    },
+    {
+      type: 'myButton',
+      label: '匯出材料/配件',
+      img: iconUpload.src,
+      onClick: () => setShowPdf_part(true),
+    },
     isAllReviewedBeforePending && quotationId
       ? {
           type: 'redButton',
@@ -1886,20 +1883,20 @@ latestContentProdArr為這次追加追減的主產品
 
       {latestContent && (
         <QuotationPdf
-          isVisable={showPdf}
+          visible={true}
           onCancel={() => {
             setShowPdf(false);
           }}
           // productArr_f={Object.values(productList)}
           // basicInfo={latestContent}
-          noteArr={state_anno}
-          qrArr={state_qr}
-          control_basicInfo={quotationContentToBasicInfo(latestContent)}
-          control_prodArr={quotationProdToTableProdList({
-            classProductArr: Object.values(productList ?? {}),
-            classOthersArr: Object.values(othersList ?? {}),
-          })}
-          isBidding={status === 'Bidding'}
+
+          // isBidding={status === 'Bidding'}
+          // if (isBidding) {
+          //   customerName = '';
+          //   contactPerson = '';
+          //   contactNumber = '';
+          //   faxNumber = '';
+          // }
         />
       )}
 
