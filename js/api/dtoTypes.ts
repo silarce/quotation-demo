@@ -13,6 +13,9 @@ export type TsouthernCounty = '高雄市' | '臺南市' | '嘉義市' | '嘉義�
 export type TeasternCounty = '花蓮縣' | '臺東縣';
 export type Tabroad = '海外';
 
+// 報價單狀態: Budget預算 Bidding投標 Contracting發包 Contract合約 Pending準合約 TempPending待審核準合約
+export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending' | 'TempPending';
+
 // =============================================================================
 export type Tparams = {
   order?: 'ASC' | 'DESC';
@@ -1690,9 +1693,6 @@ type TquotationContentDto_copy = {
   // 失件
   isLost: boolean;
 };
-
-// 報價單狀態: 預算 投標 發包 合約 準合約 待審核準合約
-export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending' | 'TempPending';
 
 export type TquotationContentDto = {
   id: string;
