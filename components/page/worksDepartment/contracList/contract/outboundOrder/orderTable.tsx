@@ -827,3 +827,5 @@ const config: TconfigList = {
     className: 'w-8 text-center',
   },
 };
+
+//
