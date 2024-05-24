@@ -92,7 +92,7 @@ type TrowProps = {
   };
   right?: {
     accessorie?: React.ReactNode;
-    component?: React.ReactNode;
+    installationItem?: React.ReactNode;
     installationDate?: React.ReactNode;
     shippingDate?: React.ReactNode;
     installerEmployeesName?: React.ReactNode;
@@ -311,9 +311,9 @@ const Row = ({
       {right && (
         <div className={scss.right}>
           <div className={classNames(scss.cell, config.accessorie.className)}>{right.accessorie}</div>
-          <div className={classNames(scss.cell, config.btnBar.className)}></div>
-          <div className={classNames(scss.cell, config.component.className)}>{right.component}</div>
           <div className={classNames(scss.cell, config.shippingDate.className)}>{right.shippingDate}</div>
+          <div className={classNames(scss.cell, config.btnBar.className)}></div>
+          <div className={classNames(scss.cell, config.installationItem.className)}>{right.installationItem}</div>
           <div className={classNames(scss.cell, config.installationDate.className)}>{right.installationDate}</div>
           <div className={classNames(scss.cell, config.installerEmployeesName.className)}>
             {right.installerEmployeesName}
@@ -335,9 +335,9 @@ const Row = ({
       {!right && !rightPanelArr && (
         <div className={scss.right}>
           <div className={classNames(scss.cell, config.accessorie.className)} />
-          <div className={classNames(scss.cell, config.btnBar.className)} />
-          <div className={classNames(scss.cell, config.component.className)} />
           <div className={classNames(scss.cell, config.shippingDate.className)} />
+          <div className={classNames(scss.cell, config.btnBar.className)} />
+          <div className={classNames(scss.cell, config.installationItem.className)} />
           <div className={classNames(scss.cell, config.installationDate.className)} />
           <div className={classNames(scss.cell, config.installerEmployeesName.className)} />
           <div className={classNames(scss.cell, config.itemName.className)} />
@@ -388,7 +388,7 @@ const Thead = (rowProps_other: TrowProps_other) => {
       }}
       right={{
         accessorie: config.accessorie.caption,
-        component: config.component.caption,
+        installationItem: config.installationItem.caption,
         shippingDate: config.shippingDate.caption,
         installationDate: config.installationDate.caption,
         installerEmployeesName: config.installerEmployeesName.caption,
@@ -421,6 +421,7 @@ const HeadRow = (rowProps: TrowProps & TrowProps_other) => {
 const Panel = ({
   isUndefined,
   accessorie,
+  installationItem,
   installationDate,
   shippingDate,
   installer_employee,
@@ -436,7 +437,9 @@ const Panel = ({
   const [showModal, setShowModal] = useState(false);
   const [state_employee, setState_Employee] = useState(installer_employee);
   const [state_outsourcing, setState_Outsourcing] = useState(installer_outsourcing);
-  const [state_installationItem, setState_installationItem] = useState<Toption_installationItem | null>(null);
+  const [state_installationItem, setState_installationItem] = useState<Toption_installationItem | null>(
+    installationItem ? { value: installationItem as TdeliveryStatusInstallationItem, label: installationItem } : null
+  );
 
   const [state, setState] = useState({
     installationDate,
@@ -456,7 +459,9 @@ const Panel = ({
     });
     setState_Employee(installer_employee);
     setState_Outsourcing(installer_outsourcing);
-    setState_installationItem(null);
+    setState_installationItem(
+      installationItem ? { value: installationItem as TdeliveryStatusInstallationItem, label: installationItem } : null
+    );
   };
 
   // ------------------------------------------------------------------------
@@ -478,6 +483,24 @@ const Panel = ({
   return (
     <div className={scss.panel}>
       <div className={classNames(scss.cell, scss.accessorie, config.accessorie.className)}>{accessorie}</div>
+
+      <div className={classNames(scss.cell, isUndefined && 'invisible', config.shippingDate.className)}>
+        <InputSel
+          name="shippingDate"
+          disabled={disabled}
+          datePickerProps={{
+            props: {
+              value: state.shippingDate ? moment(state.shippingDate) : undefined,
+              onChange: (v) => {
+                setState((state) => ({
+                  ...state,
+                  shippingDate: v?.toISOString() ?? '',
+                }));
+              },
+            },
+          }}
+        />
+      </div>
 
       <div className={classNames(scss.cell, scss.btnBar, config.btnBar.className)}>
         {/* <IconAddCircle onClick={onAddClick} /> */}
@@ -541,9 +564,9 @@ const Panel = ({
         )}
       </div>
 
-      <div className={classNames(scss.cell, isUndefined && 'invisible', config.component.className)}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', config.installationItem.className)}>
         <InputSel
-          name="component"
+          name="installationItem"
           disabled={disabled}
           selectProps={{
             props: {
@@ -555,24 +578,6 @@ const Panel = ({
               value: state_installationItem,
               onChange: (v) => {
                 setState_installationItem(v as Toption_installationItem | null);
-              },
-            },
-          }}
-        />
-      </div>
-
-      <div className={classNames(scss.cell, isUndefined && 'invisible', config.shippingDate.className)}>
-        <InputSel
-          name="shippingDate"
-          disabled={disabled}
-          datePickerProps={{
-            props: {
-              value: state.shippingDate ? moment(state.shippingDate) : undefined,
-              onChange: (v) => {
-                setState((state) => ({
-                  ...state,
-                  shippingDate: v?.toISOString() ?? '',
-                }));
               },
             },
           }}
@@ -717,7 +722,7 @@ type TcellKeys =
   //
   | 'accessorie'
   | 'btnBar'
-  | 'component'
+  | 'installationItem'
   | 'shippingDate'
   | 'installationDate'
   | 'installerEmployeesName'
@@ -798,7 +803,7 @@ const config: TconfigList = {
     caption: '',
     className: 'w-24',
   },
-  component: {
+  installationItem: {
     caption: '安裝項目',
     className: 'w-28',
   },
