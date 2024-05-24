@@ -1106,13 +1106,6 @@ latestContentProdArr為這次追加追減的主產品
     reqUpdateQuotation({ editNotes: v });
   };
 
-  const tagList: TtagList = [
-    {
-      label: quotationId ? `報價編號 ${quotationData?.latestContent.quotationNumber || ''}` : '新報價單',
-      onClick: () => {},
-    },
-  ];
-
   const history = useMemo(() => {
     let content = quotationData?.contents ?? [];
 
@@ -1734,7 +1727,10 @@ latestContentProdArr為這次追加追減的主產品
   return (
     <div className={classNames(style.container, 'relative')}>
       {/* <PageHeader02 tagList={tagList} panelList={!disabled ? panel_editable : panel_noEditable} /> */}
-      <PageHeader02 tagList={tagList} panelList={panelList} />
+      <PageHeader02
+        tag={`報價編號 ${quotationData?.latestContent.quotationNumber || ''}　追加追減報價單`}
+        panelList={panelList}
+      />
 
       <div className={style.mainContainer}>
         <div className={style.quotation}>
