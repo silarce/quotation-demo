@@ -147,6 +147,7 @@ export default function PdfModal({
       address,
       projectPrincipal,
       projectContent,
+      constructionSitePrincipalContactNumber,
     } = engineeringContact;
 
     const wholeAddress = zipCode + county + district + address;
@@ -169,7 +170,7 @@ export default function PdfModal({
           <>
             <span>公司電話：</span>
             <br />
-            <span>FAX：</span>
+            <span>公司傳真：</span>
           </>
         ),
         value: (
@@ -189,7 +190,7 @@ export default function PdfModal({
           <>
             <span>工地電話：</span>
             <br />
-            <span>FAX：</span>
+            <span>工地傳真：</span>
           </>
         ),
         value: (
@@ -206,7 +207,7 @@ export default function PdfModal({
       },
       projectPrincipal: {
         label: '工程負責人：',
-        value: projectPrincipal,
+        value: projectPrincipal + ' ' + constructionSitePrincipalContactNumber,
       },
       projectContent: {
         label: '工程內容：',
@@ -341,15 +342,19 @@ const Body_pre = ({ productArr }: { productArr: TquotationProductDto[] }, ref: R
           notes,
 
           thickness,
+          bounceDoorWidth,
         } = prod;
 
         // cm
-        const width_cm = new Decimal(fullWidth).div(10).toString();
-        const height_cm = new Decimal(height).div(10).toString();
-        const boxB_cm = new Decimal(boxB).div(10).toString();
+        const width_cm = new Decimal(fullWidth).div(10).toNumber();
+        const height_cm = new Decimal(height).div(10).toNumber();
+        const boxB_cm = new Decimal(boxB).div(10).toNumber();
+        const bounceDoorWidth_cm = new Decimal(bounceDoorWidth ?? 0).div(10).toNumber();
 
-        let size = `${width_cm} x ${height_cm}`;
-        boxB_cm && (size += ` + ${boxB_cm}`);
+        let size = `${width_cm}`;
+        bounceDoorWidth_cm && (size = `${size} + ${bounceDoorWidth_cm}`);
+        size = `${size} x ${height_cm}`;
+        boxB_cm && (size = `${size} + ${boxB_cm}`);
 
         const doorTrack = `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail}`;
 
@@ -362,7 +367,7 @@ const Body_pre = ({ productArr }: { productArr: TquotationProductDto[] }, ref: R
             className={scss.row}
           >
             <div>{itemName}</div>
-            <div>{boxB_cm}</div>
+            <div>{size}</div>
             <div>{doorModelName}</div>
             <div>{materialName}</div>
             <div>{thickness}</div>
