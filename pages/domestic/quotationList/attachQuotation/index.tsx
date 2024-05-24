@@ -96,6 +96,7 @@ import { useProductList } from 'hooks/quotation/useProduct';
 import Summary, {
   TsummaryControl,
   TpayInfoControl,
+  useAnnoAndQr,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
 
 // type
@@ -214,82 +215,82 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
 
-  const [anno, setAnnotation] = useState<string[]>([]);
-  const [qr, setQr] = useState<string[]>([]);
+  // const [anno, setAnnotation] = useState<string[]>([]);
+  // const [qr, setQr] = useState<string[]>([]);
 
-  const onDoorTypeChange = ({
-    annoShouldRemove,
-    annoArr,
-    qrShouldRemove,
-    qrArr,
-  }: {
-    annoShouldRemove: string[] | undefined;
-    annoArr: string[] | undefined;
-    qrShouldRemove: string[] | undefined;
-    qrArr: string[] | undefined;
-  }) => {
-    setAnnotation((anno) => {
-      let annoCopy = [...anno];
+  // const onDoorTypeChange = ({
+  //   annoShouldRemove,
+  //   annoArr,
+  //   qrShouldRemove,
+  //   qrArr,
+  // }: {
+  //   annoShouldRemove: string[] | undefined;
+  //   annoArr: string[] | undefined;
+  //   qrShouldRemove: string[] | undefined;
+  //   qrArr: string[] | undefined;
+  // }) => {
+  //   setAnnotation((anno) => {
+  //     let annoCopy = [...anno];
 
-      // 把應該被移除拿掉
-      if (annoShouldRemove) {
-        annoShouldRemove.forEach((asmStr) => {
-          const delIndex = annoCopy.findIndex((str) => asmStr === str);
+  //     // 把應該被移除拿掉
+  //     if (annoShouldRemove) {
+  //       annoShouldRemove.forEach((asmStr) => {
+  //         const delIndex = annoCopy.findIndex((str) => asmStr === str);
 
-          if (delIndex > -1) {
-            annoCopy.splice(delIndex, 1);
-          }
-        });
-      }
+  //         if (delIndex > -1) {
+  //           annoCopy.splice(delIndex, 1);
+  //         }
+  //       });
+  //     }
 
-      // 先把重複的拿掉，再把新的放進去
-      if (annoArr) {
-        annoArr.forEach((asmStr) => {
-          const delIndex = annoCopy.findIndex((str) => asmStr === str);
+  //     // 先把重複的拿掉，再把新的放進去
+  //     if (annoArr) {
+  //       annoArr.forEach((asmStr) => {
+  //         const delIndex = annoCopy.findIndex((str) => asmStr === str);
 
-          if (delIndex > -1) {
-            annoCopy.splice(delIndex, 1);
-          }
-        });
+  //         if (delIndex > -1) {
+  //           annoCopy.splice(delIndex, 1);
+  //         }
+  //       });
 
-        annoCopy = [...annoCopy, ...annoArr];
-      }
+  //       annoCopy = [...annoCopy, ...annoArr];
+  //     }
 
-      return annoCopy;
-    });
+  //     return annoCopy;
+  //   });
 
-    setQr((qr) => {
-      let qrCopy = [...qr];
+  //   setQr((qr) => {
+  //     let qrCopy = [...qr];
 
-      // 把應該被移除拿掉
-      if (qrShouldRemove) {
-        qrShouldRemove.forEach((asmStr) => {
-          const delIndex = qrCopy.findIndex((str) => asmStr === str);
+  //     // 把應該被移除拿掉
+  //     if (qrShouldRemove) {
+  //       qrShouldRemove.forEach((asmStr) => {
+  //         const delIndex = qrCopy.findIndex((str) => asmStr === str);
 
-          if (delIndex > -1) {
-            qrCopy.splice(delIndex, 1);
-          }
-        });
-      }
+  //         if (delIndex > -1) {
+  //           qrCopy.splice(delIndex, 1);
+  //         }
+  //       });
+  //     }
 
-      // 先把重複的拿掉，再把新的放進去
-      if (qrArr) {
-        qrArr.forEach((asmStr) => {
-          const delIndex = qrCopy.findIndex((str) => asmStr === str);
+  //     // 先把重複的拿掉，再把新的放進去
+  //     if (qrArr) {
+  //       qrArr.forEach((asmStr) => {
+  //         const delIndex = qrCopy.findIndex((str) => asmStr === str);
 
-          if (delIndex > -1) {
-            qrCopy.splice(delIndex, 1);
-          }
-        });
+  //         if (delIndex > -1) {
+  //           qrCopy.splice(delIndex, 1);
+  //         }
+  //       });
 
-        qrCopy = [...qrCopy, ...qrArr];
-      }
+  //       qrCopy = [...qrCopy, ...qrArr];
+  //     }
 
-      return qrCopy;
-    });
+  //     return qrCopy;
+  //   });
 
-    // setAnnotation(annoCopy);
-  };
+  //   // setAnnotation(annoCopy);
+  // };
 
   // -----------------------------------------------------
   // 資料
@@ -531,6 +532,12 @@ latestContentProdArr為這次追加追減的主產品
 
   const { control_profile, state_profile, state_customer } = useProfile({
     quotationContent: quotationData?.latestContent,
+    disabled,
+  });
+
+  const { state_anno, state_qr, control_anno, control_qr } = useAnnoAndQr({
+    quotationContent: quotationData?.latestContent,
+    disabled,
   });
 
   // -----------------------------------------------------
@@ -597,7 +604,7 @@ latestContentProdArr為這次追加追減的主產品
     productArr: contractArr,
     others: quotationData?.latestContent.others,
     resetTrigger: contractArr,
-    onDoorTypeChange: onDoorTypeChange,
+    // onDoorTypeChange: onDoorTypeChange,
     productArr_attach: contentArr,
     quotationDiscount: Number(summary.discountRate || '100'),
   });
@@ -646,8 +653,8 @@ latestContentProdArr為這次追加追減的主產品
       quotationRanges,
     } = quotationData.latestContent;
 
-    setAnnotation(annotations ?? []);
-    setQr(quotationRanges ?? []);
+    // setAnnotation(annotations ?? []);
+    // setQr(quotationRanges ?? []);
     setPaymentMethod(paymentMethods);
 
     setSummary({
@@ -689,83 +696,83 @@ latestContentProdArr為這次追加追減的主產品
   //
   //
 
-  const control_anno: TsummaryControl = {
-    stringArr: anno,
-    editString: (index, v) => {
-      setAnnotation((state) => {
-        const copy = [...state];
-        copy[index] = v;
+  // const control_anno: TsummaryControl = {
+  //   stringArr: anno,
+  //   editString: (index, v) => {
+  //     setAnnotation((state) => {
+  //       const copy = [...state];
+  //       copy[index] = v;
 
-        return copy;
-      });
-    },
-    addString: (v: string) => {
-      setAnnotation((state) => {
-        const copy = [...state];
-        copy.push(v);
+  //       return copy;
+  //     });
+  //   },
+  //   addString: (v: string) => {
+  //     setAnnotation((state) => {
+  //       const copy = [...state];
+  //       copy.push(v);
 
-        return copy;
-      });
-    },
-    delString: (index: number) => {
-      setAnnotation((state) => {
-        const copy = [...state];
-        copy.splice(index, 1);
+  //       return copy;
+  //     });
+  //   },
+  //   delString: (index: number) => {
+  //     setAnnotation((state) => {
+  //       const copy = [...state];
+  //       copy.splice(index, 1);
 
-        return copy;
-      });
-    },
-    addStrArr: (vArr: string[]) => {
-      setAnnotation((state) => {
-        const copy = [...state];
-        copy.push(...vArr);
+  //       return copy;
+  //     });
+  //   },
+  //   addStrArr: (vArr: string[]) => {
+  //     setAnnotation((state) => {
+  //       const copy = [...state];
+  //       copy.push(...vArr);
 
-        return copy;
-      });
-    },
-    replaceStrArr: (strArr: string[]) => {
-      setAnnotation(strArr);
-    },
-  };
+  //       return copy;
+  //     });
+  //   },
+  //   replaceStrArr: (strArr: string[]) => {
+  //     setAnnotation(strArr);
+  //   },
+  // };
 
-  const control_qr: TsummaryControl = {
-    stringArr: qr,
-    editString: (index, v) => {
-      setQr((state) => {
-        const copy = [...state];
-        copy[index] = v;
+  // const control_qr: TsummaryControl = {
+  //   stringArr: qr,
+  //   editString: (index, v) => {
+  //     setQr((state) => {
+  //       const copy = [...state];
+  //       copy[index] = v;
 
-        return copy;
-      });
-    },
-    addString: (v: string) => {
-      setQr((state) => {
-        const copy = [...state];
-        copy.push(v);
+  //       return copy;
+  //     });
+  //   },
+  //   addString: (v: string) => {
+  //     setQr((state) => {
+  //       const copy = [...state];
+  //       copy.push(v);
 
-        return copy;
-      });
-    },
-    delString: (index: number) => {
-      setQr((state) => {
-        const copy = [...state];
-        copy.splice(index, 1);
+  //       return copy;
+  //     });
+  //   },
+  //   delString: (index: number) => {
+  //     setQr((state) => {
+  //       const copy = [...state];
+  //       copy.splice(index, 1);
 
-        return copy;
-      });
-    },
-    addStrArr: (vArr: string[]) => {
-      setQr((state) => {
-        const copy = [...state];
-        copy.push(...vArr);
+  //       return copy;
+  //     });
+  //   },
+  //   addStrArr: (vArr: string[]) => {
+  //     setQr((state) => {
+  //       const copy = [...state];
+  //       copy.push(...vArr);
 
-        return copy;
-      });
-    },
-    replaceStrArr: (strArr: string[]) => {
-      setQr(strArr);
-    },
-  };
+  //       return copy;
+  //     });
+  //   },
+  //   replaceStrArr: (strArr: string[]) => {
+  //     setQr(strArr);
+  //   },
+  // };
 
   // ----------------------------------------------------------------------
   const payInfoControl: TpayInfoControl = {
@@ -1273,8 +1280,8 @@ latestContentProdArr為這次追加追減的主產品
       agentId: userId,
       //
       //
-      annotations: anno,
-      quotationRanges: qr,
+      annotations: state_anno,
+      quotationRanges: state_qr,
       //
       //
       faxNumber: state_profile.faxNumber ?? '',
@@ -1828,12 +1835,13 @@ latestContentProdArr為這次追加追減的主產品
 
           {/*  */}
           <Summary
-            disabled={disabled_static}
+            disabled={disabled}
             payInfoControl={payInfoControl}
             control_anno={control_anno}
             control_qr={control_qr}
             appendixParams={appendixParams}
             avgDiscount_withQty={avgDiscount_withQty}
+            disabled_file={disabled_static}
           />
 
           {/* 簽名 */}
@@ -1884,8 +1892,8 @@ latestContentProdArr為這次追加追減的主產品
           }}
           // productArr_f={Object.values(productList)}
           // basicInfo={latestContent}
-          noteArr={anno}
-          qrArr={qr}
+          noteArr={state_anno}
+          qrArr={state_qr}
           control_basicInfo={quotationContentToBasicInfo(latestContent)}
           control_prodArr={quotationProdToTableProdList({
             classProductArr: Object.values(productList ?? {}),
@@ -2010,120 +2018,6 @@ latestContentProdArr為這次追加追減的主產品
 //
 //
 // region use AnnoAndQr
-
-const useAnnoAndQr = ({ content }: { content: TquotationContentDto | undefined }) => {
-  const [state_anno, setState_anno] = useState<string[]>([]);
-  const [state_qr, setState_qr] = useState<string[]>([]);
-
-  //
-  const control_anno: TsummaryControl = useMemo(() => {
-    const control_anno: TsummaryControl = {
-      stringArr: state_anno,
-      editString: (index, v) => {
-        setState_anno((state) => {
-          const copy = [...state];
-          copy[index] = v;
-
-          return copy;
-        });
-      },
-      addString: (v: string) => {
-        setState_anno((state) => {
-          const copy = [...state];
-          copy.push(v);
-
-          return copy;
-        });
-      },
-      delString: (index: number) => {
-        setState_anno((state) => {
-          const copy = [...state];
-          copy.splice(index, 1);
-
-          return copy;
-        });
-      },
-      addStrArr: (vArr: string[]) => {
-        setState_anno((state) => {
-          const copy = [...state];
-          copy.push(...vArr);
-
-          return copy;
-        });
-      },
-      replaceStrArr: (strArr: string[]) => {
-        setState_anno(strArr);
-      },
-    };
-
-    return control_anno;
-  }, [state_anno]);
-
-  const control_qr: TsummaryControl = useMemo(() => {
-    const control_qr: TsummaryControl = {
-      stringArr: state_qr,
-      editString: (index, v) => {
-        setState_qr((state) => {
-          const copy = [...state];
-          copy[index] = v;
-
-          return copy;
-        });
-      },
-      addString: (v: string) => {
-        setState_qr((state) => {
-          const copy = [...state];
-          copy.push(v);
-
-          return copy;
-        });
-      },
-      delString: (index: number) => {
-        setState_qr((state) => {
-          const copy = [...state];
-          copy.splice(index, 1);
-
-          return copy;
-        });
-      },
-      addStrArr: (vArr: string[]) => {
-        setState_qr((state) => {
-          const copy = [...state];
-          copy.push(...vArr);
-
-          return copy;
-        });
-      },
-      replaceStrArr: (strArr: string[]) => {
-        setState_qr(strArr);
-      },
-    };
-
-    return control_qr;
-  }, [state_qr]);
-
-  //
-
-  useEffect(() => {
-    if (content) {
-      const { annotations, quotationRanges } = content;
-      setState_anno(annotations ?? []);
-      setState_qr(quotationRanges ?? []);
-    } else {
-      setState_anno([]);
-      setState_qr([]);
-    }
-  }, [content]);
-
-  //
-
-  return {
-    state_anno,
-    state_qr,
-    control_anno,
-    control_qr,
-  };
-};
 
 // ===============================================================================
 // region FUNCTION

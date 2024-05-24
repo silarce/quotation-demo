@@ -21,6 +21,7 @@ import Table_others from 'components/page/domestic/quotation/quotation/product/t
 import Summary, {
   TsummaryControl,
   TpayInfoControl,
+  useAnnoAndQr,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
 // import Signature, { Tcontroll_signature } from 'components/page/domestic/quotation/quotationSinature_3';
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
@@ -325,7 +326,9 @@ export default function AttachContract({
     quotationContent: data_contract?.content,
   });
 
-  const { state_anno, state_qr, control_anno, control_qr } = useAnnoAndQr({ content: data_contract?.content });
+  const { state_anno, state_qr, control_anno, control_qr } = useAnnoAndQr({
+    quotationContent: data_contract?.content,
+  });
 
   // ------------------------------------------------------------------
 
@@ -693,146 +696,6 @@ export default function AttachContract({
     </SubLayer>
   );
 }
-
-// region HOOK
-//
-//
-//
-//
-
-// region use AnnoAndQr
-
-const useAnnoAndQr = ({ content }: { content: TquotationContentDto | undefined }) => {
-  const [state_anno, setState_anno] = useState<string[]>([]);
-  const [state_qr, setState_qr] = useState<string[]>([]);
-
-  //
-  const control_anno: TsummaryControl = useMemo(() => {
-    const control_anno: TsummaryControl = {
-      stringArr: state_anno,
-      editString: (index, v) => {
-        setState_anno((state) => {
-          const copy = [...state];
-          copy[index] = v;
-
-          return copy;
-        });
-      },
-      addString: (v: string) => {
-        setState_anno((state) => {
-          const copy = [...state];
-          copy.push(v);
-
-          return copy;
-        });
-      },
-      delString: (index: number) => {
-        setState_anno((state) => {
-          const copy = [...state];
-          copy.splice(index, 1);
-
-          return copy;
-        });
-      },
-      addStrArr: (vArr: string[]) => {
-        setState_anno((state) => {
-          const copy = [...state];
-          copy.push(...vArr);
-
-          return copy;
-        });
-      },
-      replaceStrArr: (strArr: string[]) => {
-        setState_anno(strArr);
-      },
-    };
-
-    return control_anno;
-  }, [state_anno]);
-
-  const control_qr: TsummaryControl = useMemo(() => {
-    const control_qr: TsummaryControl = {
-      stringArr: state_qr,
-      editString: (index, v) => {
-        setState_qr((state) => {
-          const copy = [...state];
-          copy[index] = v;
-
-          return copy;
-        });
-      },
-      addString: (v: string) => {
-        setState_qr((state) => {
-          const copy = [...state];
-          copy.push(v);
-
-          return copy;
-        });
-      },
-      delString: (index: number) => {
-        setState_qr((state) => {
-          const copy = [...state];
-          copy.splice(index, 1);
-
-          return copy;
-        });
-      },
-      addStrArr: (vArr: string[]) => {
-        setState_qr((state) => {
-          const copy = [...state];
-          copy.push(...vArr);
-
-          return copy;
-        });
-      },
-      replaceStrArr: (strArr: string[]) => {
-        setState_qr(strArr);
-      },
-    };
-
-    return control_qr;
-  }, [state_qr]);
-
-  //
-
-  useEffect(() => {
-    if (content) {
-      const { annotations, quotationRanges } = content;
-      setState_anno(annotations ?? []);
-      setState_qr(quotationRanges ?? []);
-    } else {
-      setState_anno([]);
-      setState_qr([]);
-    }
-  }, [content]);
-
-  //
-
-  return {
-    state_anno,
-    state_qr,
-    control_anno,
-    control_qr,
-  };
-};
-
-// ==============================================================================
-
-// region EMPTY
-
-const creEmptyProfile = (): Tstate_profile => ({
-  validityPeriod: '',
-  projectName: '',
-  county: '',
-  district: '',
-  address: '',
-  contactPerson: '',
-  contactNumber: '',
-  faxNumber: '',
-  trackProgress: '',
-  projectProgress: '',
-  isLost: false,
-});
 
 // ==============================================================================
 // ==============================================================================
