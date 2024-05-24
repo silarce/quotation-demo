@@ -547,6 +547,10 @@ const Panel = ({
           disabled={disabled}
           selectProps={{
             props: {
+              menuPortalTarget: undefined,
+              classNames: {
+                menuPortal: (state) => classNames(scss.menuPortal, scss.plus),
+              },
               options: optionsCreator_deliveryStatusInstallationItem(),
               value: state_installationItem,
               onChange: (v) => {

@@ -272,3 +272,7 @@ $top_headRow: calc($height_thead);
     border-color: theme("colors.sub");
   }
 }
+
+.menuPortal.plus {
+  z-index: 3;
+}
