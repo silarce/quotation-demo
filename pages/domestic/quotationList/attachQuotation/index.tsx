@@ -21,7 +21,7 @@ import _ from 'lodash';
 import { AxiosError } from 'axios';
 
 // components
-import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
+import QuotationProfile, { Tcontrol_profile, useProfile } from 'components/page/domestic/quotation/quotationProfile';
 
 import QuotationSinature_3, {
   TemployeeDto,
@@ -213,9 +213,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [showMemoModal, setShowMemoModal] = useState(false);
   // -----------------------------------------------------
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
-
-  const [customer, setCustomer] = useState<TcustomerDto | undefined | null>();
-  const [profile, setProfile] = useState<Tprofile>(creEmptyProfile());
 
   const [anno, setAnnotation] = useState<string[]>([]);
   const [qr, setQr] = useState<string[]>([]);
@@ -527,114 +524,14 @@ latestContentProdArr為這次追加追減的主產品
 
   // -----------------------------------------------------
 
-  const changeProfile = (key: keyof Tprofile, value: string) => {
-    setProfile((state) => {
-      return {
-        ...state,
-        [key]: value,
-      };
-    });
-  };
-
   useEffect(() => {
     setStatus(latestContent?.status ?? 'Budget');
     // setEditNotes(latestContent?.editNotes ?? '');
-
-    setCustomer(latestContent?.customer ?? null);
-
-    setProfile({
-      validityPeriod: latestContent?.validityPeriod ?? '',
-      projectName: latestContent?.projectName ?? '',
-      county: latestContent?.county ?? '',
-      district: latestContent?.district ?? '',
-      address: latestContent?.address ?? '',
-      contactPerson: latestContent?.contactPerson ?? '',
-      contactNumber: latestContent?.contactNumber ?? '',
-      faxNumber: latestContent?.faxNumber ?? '',
-      trackProgress: latestContent?.trackProgress ?? '',
-      projectProgress: latestContent?.projectProgress ?? '',
-      isLost: !!latestContent?.isLost,
-    });
   }, [quotationData, disabled]);
 
-  const control_profile = useMemo(() => {
-    const control_profile: Tcontrol_profile = {
-      quotationNumber: latestContent?.quotationNumber ?? '',
-      quotationDate: latestContent?.quotationDate ?? '',
-      isLost: {
-        value: profile.isLost,
-        onChange: (bool) => {
-          setProfile((state) => ({ ...state, isLost: bool }));
-        },
-        disabled: disabled,
-      },
-      customer: {
-        value: customer,
-        onChange: (customer) => {
-          const customerPhoneNumber = customer.phone || '';
-          const contact = customer.contacts?.[0];
-          const name = contact?.name ?? '';
-          const phone = contact?.phone || customerPhoneNumber || '';
-          const fax = customer.fax || '';
-
-          setCustomer(customer);
-          changeProfile('contactPerson', `${name}${phone}`);
-          changeProfile('contactNumber', customerPhoneNumber);
-          changeProfile('faxNumber', fax);
-        },
-        onClear: () => {
-          setCustomer(null);
-          changeProfile('contactPerson', '');
-          changeProfile('contactNumber', '');
-          changeProfile('faxNumber', '');
-        },
-      },
-      itemList: {
-        validityPeriod: {
-          value: profile.validityPeriod,
-          onChange: (v) => changeProfile('validityPeriod', v),
-        },
-        projectName: {
-          value: profile.projectName,
-          onChange: (v) => changeProfile('projectName', v),
-        },
-        county: {
-          value: profile.county,
-          onChange: (v) => changeProfile('county', v),
-        },
-        district: {
-          value: profile.district,
-          onChange: (v) => changeProfile('district', v),
-        },
-        address: {
-          value: profile.address,
-          onChange: (v) => changeProfile('address', v),
-        },
-        contactPerson: {
-          value: profile.contactPerson,
-          onChange: (v) => changeProfile('contactPerson', v),
-        },
-        contactNumber: {
-          value: profile.contactNumber,
-          onChange: (v) => changeProfile('contactNumber', v),
-        },
-        faxNumber: {
-          value: profile.faxNumber,
-          onChange: (v) => changeProfile('faxNumber', v),
-        },
-        trackProgress: {
-          value: profile.trackProgress,
-          onChange: (v) => changeProfile('trackProgress', v),
-        },
-        projectProgress: {
-          value: profile.projectProgress,
-          onChange: (v) => changeProfile('projectProgress', v),
-        },
-      },
-    };
-
-    return control_profile;
-  }, [profile, disabled]);
+  const { control_profile, state_profile, state_customer } = useProfile({
+    quotationContent: quotationData?.latestContent,
+  });
 
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -1265,7 +1162,8 @@ latestContentProdArr為這次追加追減的主產品
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
-  // 實際上追加追減報價單目前是不可以編輯的
+  // region REQUEST
+
   const reqUpdateQuotation = async ({ editNotes }: { editNotes: string }) => {
     if (!userId) {
       return myAlert.warning({ title: '沒有使用者ID' });
@@ -1355,16 +1253,16 @@ latestContentProdArr為這次追加追減的主產品
 
     const body: TcreateQuotationContentDto = {
       quotationDate: latestContent?.quotationDate ?? '',
-      validityPeriod: profile.validityPeriod ?? '',
+      validityPeriod: state_profile.validityPeriod ?? '',
       //
-      customerId: customer?.id ?? '',
+      customerId: state_customer?.id ?? '',
       //
-      projectName: profile.projectName ?? '',
-      county: profile.county ?? '',
-      district: profile.district ?? '',
-      address: profile.address ?? '',
-      contactPerson: profile.contactPerson ?? '',
-      contactNumber: profile.contactNumber ?? '',
+      projectName: state_profile.projectName ?? '',
+      county: state_profile.county ?? '',
+      district: state_profile.district ?? '',
+      address: state_profile.address ?? '',
+      contactPerson: state_profile.contactPerson ?? '',
+      contactNumber: state_profile.contactNumber ?? '',
       quantity: prodQty ?? 0,
       editNotes: editNotes ?? '',
       status: status ?? 'Budget',
@@ -1379,9 +1277,9 @@ latestContentProdArr為這次追加追減的主產品
       quotationRanges: qr,
       //
       //
-      faxNumber: profile.faxNumber ?? '',
-      trackProgress: profile.trackProgress ?? '',
-      projectProgress: profile.projectProgress ?? '',
+      faxNumber: state_profile.faxNumber ?? '',
+      trackProgress: state_profile.trackProgress ?? '',
+      projectProgress: state_profile.projectProgress ?? '',
 
       discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
       tuneTotal: summary.tuneTotal ?? '0',
@@ -1399,7 +1297,7 @@ latestContentProdArr為這次追加追減的主產品
       // productsOrder: null,
       //
       //
-      isLost: profile.isLost ?? false,
+      isLost: state_profile.isLost ?? false,
     };
 
     if (!body.customerId) {
@@ -1724,6 +1622,9 @@ latestContentProdArr為這次追加追減的主產品
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
+
+  // region RENDER
+
   return (
     <div className={classNames(style.container, 'relative')}>
       {/* <PageHeader02 tagList={tagList} panelList={!disabled ? panel_editable : panel_noEditable} /> */}
@@ -1735,7 +1636,7 @@ latestContentProdArr為這次追加追減的主產品
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
-          <QuotationProfile disabled={disabled_static} control={control_profile} />
+          <QuotationProfile disabled={disabled} control={control_profile} />
 
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
@@ -2095,14 +1996,137 @@ latestContentProdArr為這次追加追減的主產品
   );
 }
 
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
-// ------------------------------------------------------------------=============
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+
+// region HOOK
+//
+//
+//
+//
+// region use AnnoAndQr
+
+const useAnnoAndQr = ({ content }: { content: TquotationContentDto | undefined }) => {
+  const [state_anno, setState_anno] = useState<string[]>([]);
+  const [state_qr, setState_qr] = useState<string[]>([]);
+
+  //
+  const control_anno: TsummaryControl = useMemo(() => {
+    const control_anno: TsummaryControl = {
+      stringArr: state_anno,
+      editString: (index, v) => {
+        setState_anno((state) => {
+          const copy = [...state];
+          copy[index] = v;
+
+          return copy;
+        });
+      },
+      addString: (v: string) => {
+        setState_anno((state) => {
+          const copy = [...state];
+          copy.push(v);
+
+          return copy;
+        });
+      },
+      delString: (index: number) => {
+        setState_anno((state) => {
+          const copy = [...state];
+          copy.splice(index, 1);
+
+          return copy;
+        });
+      },
+      addStrArr: (vArr: string[]) => {
+        setState_anno((state) => {
+          const copy = [...state];
+          copy.push(...vArr);
+
+          return copy;
+        });
+      },
+      replaceStrArr: (strArr: string[]) => {
+        setState_anno(strArr);
+      },
+    };
+
+    return control_anno;
+  }, [state_anno]);
+
+  const control_qr: TsummaryControl = useMemo(() => {
+    const control_qr: TsummaryControl = {
+      stringArr: state_qr,
+      editString: (index, v) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy[index] = v;
+
+          return copy;
+        });
+      },
+      addString: (v: string) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy.push(v);
+
+          return copy;
+        });
+      },
+      delString: (index: number) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy.splice(index, 1);
+
+          return copy;
+        });
+      },
+      addStrArr: (vArr: string[]) => {
+        setState_qr((state) => {
+          const copy = [...state];
+          copy.push(...vArr);
+
+          return copy;
+        });
+      },
+      replaceStrArr: (strArr: string[]) => {
+        setState_qr(strArr);
+      },
+    };
+
+    return control_qr;
+  }, [state_qr]);
+
+  //
+
+  useEffect(() => {
+    if (content) {
+      const { annotations, quotationRanges } = content;
+      setState_anno(annotations ?? []);
+      setState_qr(quotationRanges ?? []);
+    } else {
+      setState_anno([]);
+      setState_qr([]);
+    }
+  }, [content]);
+
+  //
+
+  return {
+    state_anno,
+    state_qr,
+    control_anno,
+    control_qr,
+  };
+};
+
+// ===============================================================================
+// region FUNCTION
 
 const countPayInfoValue = ({
   // discount,
@@ -2136,6 +2160,10 @@ const countPayInfoValue = ({
 };
 
 // ========================================================================
+
+// ========================================================================
+// region EMPTY
+
 const creEmptyProfile = (): Tprofile => ({
   validityPeriod: '',
   projectName: '',
