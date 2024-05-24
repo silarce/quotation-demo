@@ -3722,12 +3722,18 @@ class Class_product {
 
   // 新增變更的prod
   async addExchange(v: string) {
+    // 不可以超過原本的數量
     if (Number(v) > this.remainQty) {
-      return false;
+      return '超過上限';
     }
 
+    // 需求變更 要可以超過上限 issue#501
+    // if (false) {
+    //   return '超過上限';
+    // }
+
     if (this.isLoading_getProd) {
-      return 'isLoading_getProd';
+      return '正在取得產品資料';
     }
 
     await this.getComAndAcce();
@@ -3763,7 +3769,7 @@ class Class_product {
 
     this.reRender();
 
-    return true;
+    // return true;
     //
   }
 

@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import _ from 'lodash';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -49,22 +48,6 @@ import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
 import { useProductList } from 'hooks/quotation/useProduct';
 
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
-
-// ===========================================================================
-
-type Tstate_profile = {
-  validityPeriod: string;
-  projectName: string;
-  county: string;
-  district: string;
-  address: string;
-  contactPerson: string;
-  contactNumber: string;
-  faxNumber: string;
-  trackProgress: string;
-  projectProgress: string;
-  isLost: boolean;
-};
 
 // ===========================================================================
 // 合約 追加追減介面
