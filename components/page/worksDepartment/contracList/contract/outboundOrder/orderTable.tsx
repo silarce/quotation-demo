@@ -311,9 +311,9 @@ const Row = ({
       {right && (
         <div className={scss.right}>
           <div className={classNames(scss.cell, config.accessorie.className)}>{right.accessorie}</div>
+          <div className={classNames(scss.cell, config.shippingDate.className)}>{right.shippingDate}</div>
           <div className={classNames(scss.cell, config.btnBar.className)}></div>
           <div className={classNames(scss.cell, config.component.className)}>{right.component}</div>
-          <div className={classNames(scss.cell, config.shippingDate.className)}>{right.shippingDate}</div>
           <div className={classNames(scss.cell, config.installationDate.className)}>{right.installationDate}</div>
           <div className={classNames(scss.cell, config.installerEmployeesName.className)}>
             {right.installerEmployeesName}
@@ -335,9 +335,9 @@ const Row = ({
       {!right && !rightPanelArr && (
         <div className={scss.right}>
           <div className={classNames(scss.cell, config.accessorie.className)} />
+          <div className={classNames(scss.cell, config.shippingDate.className)} />
           <div className={classNames(scss.cell, config.btnBar.className)} />
           <div className={classNames(scss.cell, config.component.className)} />
-          <div className={classNames(scss.cell, config.shippingDate.className)} />
           <div className={classNames(scss.cell, config.installationDate.className)} />
           <div className={classNames(scss.cell, config.installerEmployeesName.className)} />
           <div className={classNames(scss.cell, config.itemName.className)} />
@@ -421,6 +421,7 @@ const HeadRow = (rowProps: TrowProps & TrowProps_other) => {
 const Panel = ({
   isUndefined,
   accessorie,
+  installationItem,
   installationDate,
   shippingDate,
   installer_employee,
@@ -436,7 +437,9 @@ const Panel = ({
   const [showModal, setShowModal] = useState(false);
   const [state_employee, setState_Employee] = useState(installer_employee);
   const [state_outsourcing, setState_Outsourcing] = useState(installer_outsourcing);
-  const [state_installationItem, setState_installationItem] = useState<Toption_installationItem | null>(null);
+  const [state_installationItem, setState_installationItem] = useState<Toption_installationItem | null>(
+    installationItem ? { value: installationItem as TdeliveryStatusInstallationItem, label: installationItem } : null
+  );
 
   const [state, setState] = useState({
     installationDate,
@@ -456,7 +459,9 @@ const Panel = ({
     });
     setState_Employee(installer_employee);
     setState_Outsourcing(installer_outsourcing);
-    setState_installationItem(null);
+    setState_installationItem(
+      installationItem ? { value: installationItem as TdeliveryStatusInstallationItem, label: installationItem } : null
+    );
   };
 
   // ------------------------------------------------------------------------
@@ -478,6 +483,24 @@ const Panel = ({
   return (
     <div className={scss.panel}>
       <div className={classNames(scss.cell, scss.accessorie, config.accessorie.className)}>{accessorie}</div>
+
+      <div className={classNames(scss.cell, isUndefined && 'invisible', config.shippingDate.className)}>
+        <InputSel
+          name="shippingDate"
+          disabled={disabled}
+          datePickerProps={{
+            props: {
+              value: state.shippingDate ? moment(state.shippingDate) : undefined,
+              onChange: (v) => {
+                setState((state) => ({
+                  ...state,
+                  shippingDate: v?.toISOString() ?? '',
+                }));
+              },
+            },
+          }}
+        />
+      </div>
 
       <div className={classNames(scss.cell, scss.btnBar, config.btnBar.className)}>
         {/* <IconAddCircle onClick={onAddClick} /> */}
@@ -543,7 +566,7 @@ const Panel = ({
 
       <div className={classNames(scss.cell, isUndefined && 'invisible', config.component.className)}>
         <InputSel
-          name="component"
+          name="installationItem"
           disabled={disabled}
           selectProps={{
             props: {
@@ -555,24 +578,6 @@ const Panel = ({
               value: state_installationItem,
               onChange: (v) => {
                 setState_installationItem(v as Toption_installationItem | null);
-              },
-            },
-          }}
-        />
-      </div>
-
-      <div className={classNames(scss.cell, isUndefined && 'invisible', config.shippingDate.className)}>
-        <InputSel
-          name="shippingDate"
-          disabled={disabled}
-          datePickerProps={{
-            props: {
-              value: state.shippingDate ? moment(state.shippingDate) : undefined,
-              onChange: (v) => {
-                setState((state) => ({
-                  ...state,
-                  shippingDate: v?.toISOString() ?? '',
-                }));
               },
             },
           }}
