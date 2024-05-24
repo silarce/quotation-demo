@@ -360,6 +360,7 @@ export default function OutboundOrder({
 
       await reqPost_2(body);
       setSeletedWorksheetItem({});
+      setShowBatchAddModal(false);
     }
   };
 

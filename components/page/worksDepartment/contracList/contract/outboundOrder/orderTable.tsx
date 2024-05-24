@@ -92,7 +92,7 @@ type TrowProps = {
   };
   right?: {
     accessorie?: React.ReactNode;
-    component?: React.ReactNode;
+    installationItem?: React.ReactNode;
     installationDate?: React.ReactNode;
     shippingDate?: React.ReactNode;
     installerEmployeesName?: React.ReactNode;
@@ -313,7 +313,7 @@ const Row = ({
           <div className={classNames(scss.cell, config.accessorie.className)}>{right.accessorie}</div>
           <div className={classNames(scss.cell, config.shippingDate.className)}>{right.shippingDate}</div>
           <div className={classNames(scss.cell, config.btnBar.className)}></div>
-          <div className={classNames(scss.cell, config.component.className)}>{right.component}</div>
+          <div className={classNames(scss.cell, config.installationItem.className)}>{right.installationItem}</div>
           <div className={classNames(scss.cell, config.installationDate.className)}>{right.installationDate}</div>
           <div className={classNames(scss.cell, config.installerEmployeesName.className)}>
             {right.installerEmployeesName}
@@ -337,7 +337,7 @@ const Row = ({
           <div className={classNames(scss.cell, config.accessorie.className)} />
           <div className={classNames(scss.cell, config.shippingDate.className)} />
           <div className={classNames(scss.cell, config.btnBar.className)} />
-          <div className={classNames(scss.cell, config.component.className)} />
+          <div className={classNames(scss.cell, config.installationItem.className)} />
           <div className={classNames(scss.cell, config.installationDate.className)} />
           <div className={classNames(scss.cell, config.installerEmployeesName.className)} />
           <div className={classNames(scss.cell, config.itemName.className)} />
@@ -388,7 +388,7 @@ const Thead = (rowProps_other: TrowProps_other) => {
       }}
       right={{
         accessorie: config.accessorie.caption,
-        component: config.component.caption,
+        installationItem: config.installationItem.caption,
         shippingDate: config.shippingDate.caption,
         installationDate: config.installationDate.caption,
         installerEmployeesName: config.installerEmployeesName.caption,
@@ -564,7 +564,7 @@ const Panel = ({
         )}
       </div>
 
-      <div className={classNames(scss.cell, isUndefined && 'invisible', config.component.className)}>
+      <div className={classNames(scss.cell, isUndefined && 'invisible', config.installationItem.className)}>
         <InputSel
           name="installationItem"
           disabled={disabled}
@@ -722,7 +722,7 @@ type TcellKeys =
   //
   | 'accessorie'
   | 'btnBar'
-  | 'component'
+  | 'installationItem'
   | 'shippingDate'
   | 'installationDate'
   | 'installerEmployeesName'
@@ -803,7 +803,7 @@ const config: TconfigList = {
     caption: '',
     className: 'w-24',
   },
-  component: {
+  installationItem: {
     caption: '安裝項目',
     className: 'w-28',
   },
