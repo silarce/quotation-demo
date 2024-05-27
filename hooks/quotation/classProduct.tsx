@@ -3220,6 +3220,14 @@ class Class_product {
     this.reRender();
   }
 
+  get unitPrice_num() {
+    if (!this._unitPrice) {
+      return 0;
+    }
+
+    return Number(this._unitPrice);
+  }
+
   // 複價
   get totalPrice() {
     if (!this._totalPrice) {

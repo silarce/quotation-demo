@@ -34,6 +34,7 @@ $semiMaring: 0 8px;
   &.template {
     position: absolute;
     opacity: 0;
+    top: -99999px;
   }
 }
 .header {

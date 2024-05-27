@@ -28,7 +28,9 @@ import QuotationSinature_3, {
   Tcontroll_signature,
 } from 'components/page/domestic/quotation/quotationSinature_3';
 // import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new';
-import QuotationPdf from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
+import QuotationPdf, {
+  useModalQuotationPdf,
+} from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
 
 import QuotationPdf_part, {
   TmainProduct,
@@ -205,7 +207,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [reviewModalShow, setReviewModalShow] = useState(false);
   const [showEmployeSelector, setShowEmployeSelector] = useState(false);
 
-  const [showPdf, setShowPdf] = useState(false);
+  // const [showPdf, setShowPdf] = useState(false);
   const [showPdf_part, setShowPdf_part] = useState(false);
 
   const [showMemoModal, setShowMemoModal] = useState(false);
@@ -297,6 +299,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const lastestContentId = quotationData?.latestContent.id;
   const latestContent = quotationData?.latestContent;
   const verifyForm = latestContent?.verifyForm;
+
+  // --------------------------------------------------------------------
+
+  const {
+    visible: pdfModalVisible,
+    setVisible: setPdfModalVisible,
+    pdfData,
+  } = useModalQuotationPdf({
+    quotationContent: quotationData?.latestContent,
+  });
 
   // --------------------------------------------------------------------
   isReviewer = false;
@@ -1056,7 +1068,7 @@ latestContentProdArr為這次追加追減的主產品
       type: 'myButton',
       label: '匯出報價單',
       img: iconUpload.src,
-      onClick: () => setShowPdf(true),
+      onClick: () => setPdfModalVisible(true),
     },
     {
       type: 'myButton',
@@ -1883,10 +1895,12 @@ latestContentProdArr為這次追加追減的主產品
 
       {latestContent && (
         <QuotationPdf
-          visible={true}
+          visible={pdfModalVisible}
           onCancel={() => {
-            setShowPdf(false);
+            setPdfModalVisible(false);
           }}
+          pdfData={pdfData}
+          fileName={`報價單-${latestContent?.quotationNumber}`}
           // productArr_f={Object.values(productList)}
           // basicInfo={latestContent}
 

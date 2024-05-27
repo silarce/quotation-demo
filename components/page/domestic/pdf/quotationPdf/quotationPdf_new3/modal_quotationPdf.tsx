@@ -27,7 +27,8 @@ import Modal, { ModalProps } from 'antd/lib/modal/Modal';
 import scss from './quotationPdf.module.scss';
 
 // type
-import { TquotationContentDto } from 'js/api/api_quotation';
+import { TquotationContentDto, TquotationProductDto } from 'js/api/api_quotation';
+import { TquotationContentOtherDto } from 'js/api/dtoTypes';
 //
 import { Class_product, Class_other } from 'hooks/quotation/useProduct';
 import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
@@ -41,6 +42,8 @@ import { companyInfo } from 'config/companyInfo';
 // utils
 import changeNumberMoneyToChinese from 'js/tools/numToChineseNum';
 
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 // ============================================================================
 
 // region TYPE
@@ -52,7 +55,7 @@ type Tprod = {
   materialName: string;
   thickness: string;
   materialSurface: string;
-  guideRail: string;
+  guideRail: string; // image url
   horsepower: string;
   closingType: string;
   qty: string;
@@ -60,10 +63,14 @@ type Tprod = {
   totalPrice: string;
   notes: string;
   //
+  unitPrice_num: number;
   totalPrice_num: number;
   qty_num: number;
-  unitPrice_num: number;
   guideRailForExcel: string | null;
+  //
+  //
+  // series 在quotationPdf_new2中還有 series
+  // 似乎是用在typeB的
 };
 
 // const guideRailForExcel =
@@ -111,7 +118,7 @@ type Tbottom_c = Tbottom & {
   subTotal_page: string; // 小計
 };
 
-type Tdata = {
+type TpdfData = {
   top: Ttop; // 上
   prodArr: Tprod[]; // 中
   bottom: Tbottom; // 下
@@ -129,10 +136,10 @@ export default function Modal_quotationPdf({
   visible,
   onCancel,
   // data = fakeData,
-  data = fakeData,
+  pdfData,
   fileName = '未命名',
 }: {
-  data?: Tdata;
+  pdfData?: TpdfData;
   fileName: string;
 } & ModalProps) {
   const ref_pdf = useRef<HTMLDivElement[]>([]);
@@ -146,11 +153,12 @@ export default function Modal_quotationPdf({
   };
 
   const handle_dlExcel = () => {
-    dlExcel({
-      fileName,
-      data,
-      chunkedProdArr,
-    });
+    pdfData &&
+      dlExcel({
+        fileName,
+        data: pdfData,
+        chunkedProdArr,
+      });
   };
 
   // --------------------------------------------------------------------------
@@ -163,6 +171,11 @@ export default function Modal_quotationPdf({
 
   // ===============================================================================
   // region RENDER
+
+  if (!pdfData) {
+    return null;
+  }
+
   return (
     <Modal visible={visible} onCancel={onCancel} width="fit-content" footer={null} closable={false}>
       <div className={scss.body}>
@@ -174,7 +187,7 @@ export default function Modal_quotationPdf({
         </div>
 
         {/*  */}
-        <PdfTemplate data={data} getChunkedPropArr={setChunkedProdArr} />
+        <PdfTemplate data={pdfData} getChunkedPropArr={setChunkedProdArr} />
         <br />
         {chunkedProdArr.map((prodArr, index) => {
           return (
@@ -186,7 +199,7 @@ export default function Modal_quotationPdf({
                     ref_pdf.current[index] = ele;
                   }
                 }}
-                data={data}
+                data={pdfData}
                 prodArr={prodArr}
                 page={index + 1}
                 pageTotal={chunkedProdArr.length}
@@ -623,7 +636,7 @@ const Center_pre = (
               let node: React.ReactNode = prod[key];
 
               if (key === 'guideRail' && typeof node === 'string') {
-                const src = `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${node}`;
+                const src = node;
                 node = <Image src={src} alt={node} width={30} height={30} />;
               }
 
@@ -653,7 +666,7 @@ const PdfTemplate = ({
   data,
   getChunkedPropArr,
 }: {
-  data: Tdata;
+  data: TpdfData;
   getChunkedPropArr: (chunkedProdArr: Tprod[][]) => void;
 }) => {
   const { top, prodArr: prodArr, bottom } = data;
@@ -725,7 +738,7 @@ const PdfPage_pre = (
     page,
     pageTotal,
   }: {
-    data: Tdata;
+    data: TpdfData;
     prodArr: Tprod[];
     page: number;
     pageTotal: number;
@@ -894,7 +907,7 @@ const config: Tconfig = {
     label: '單價',
     style: {
       width: 'auto',
-      flex: '1 1 auto',
+      flex: '1 1 0',
     },
     justifyContent_thead: 'center',
     justifyContent_tbody: 'right',
@@ -903,7 +916,7 @@ const config: Tconfig = {
     label: '複價',
     style: {
       width: 'auto',
-      flex: '1 1 auto',
+      flex: '1 1 0',
     },
     justifyContent_thead: 'center',
     justifyContent_tbody: 'right',
@@ -957,7 +970,8 @@ const fakeProd: Tprod = {
   materialName: 'aaa',
   thickness: 'aaa',
   materialSurface: 'aaa',
-  guideRail: 'SJ302_30.svg',
+  // guideRail: 'SJ302_30.svg',
+  guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${'SJ302_30.svg'}`,
   horsepower: 'aaa',
   closingType: 'aaa',
   qty: 'aaa',
@@ -977,7 +991,7 @@ const fakeProd2: Tprod = {
   materialName: 'aaa',
   thickness: 'aaa',
   materialSurface: 'aaa',
-  guideRail: 'SJ302_30.svg',
+  guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${'SJ302_30.svg'}`,
   horsepower: 'aaa',
   closingType: 'aaa',
   qty: 'aaa',
@@ -997,7 +1011,7 @@ const fakeProd3: Tprod = {
   materialName: 'aaa',
   thickness: 'aaa',
   materialSurface: 'aaa',
-  guideRail: 'SJ302_30.svg',
+  guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${'SJ302_30.svg'}`,
   horsepower: 'aaa',
   closingType: 'aaa',
   qty: 'aaa',
@@ -1018,7 +1032,7 @@ const fakeProd_latest: Tprod = {
   materialName: 'aaa',
   thickness: 'aaa',
   materialSurface: 'aaa',
-  guideRail: 'SJ302_30.svg',
+  guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${'SJ302_30.svg'}`,
   horsepower: 'aaa',
   closingType: 'aaa',
   qty: 'aaa',
@@ -1066,7 +1080,7 @@ const fakeProdArr = [
   fakeProd_latest,
 ];
 
-const fakeData: Tdata = {
+const fakeData: TpdfData = {
   top: fakeTop,
   prodArr: fakeProdArr,
   bottom: fakeBottom,
@@ -1121,7 +1135,8 @@ const dlPdf = async ({
     doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
   }
 
-  doc.save(`${fileName}.pdf`);
+  const today = moment().format('yyyy-MM-DD');
+  doc.save(`${fileName}_${today}.pdf`);
   showRootLoading(false);
 };
 
@@ -1140,7 +1155,7 @@ const dlExcel = async ({
   fileName: string;
   chunkedProdArr: Tprod[][];
   // prodArr: Tprod[];
-  data: Tdata;
+  data: TpdfData;
 }) => {
   const {
     top: {
@@ -1792,7 +1807,7 @@ const dlExcel = async ({
     });
 
     const today = moment().format('yyyy-MM-DD');
-    link.download = `${quotationNumber}_${today}.xlsx`;
+    link.download = `${fileName}_${today}.xlsx`;
     link.href = URL.createObjectURL(blobData);
     link.click();
     link.remove();
@@ -1802,3 +1817,309 @@ const dlExcel = async ({
   //
   //
 };
+
+// ===========================================================================
+// region Hook dataImport
+
+// 專門給報價單使用的
+const classProdAndOther_ToProdArr = ({
+  quotationProductArr,
+  quotationOtherArr,
+}: {
+  quotationProductArr: TquotationProductDto[];
+  quotationOtherArr: TquotationContentOtherDto[];
+}): Tprod[] => {
+  const productArr: Tprod[] = (() => {
+    return quotationProductArr.map((pro) => {
+      // const { typhoonProtection, doorTrackSilencerStrip, doorType } = prod;
+      const {
+        //
+        itemName,
+        doorModelName,
+        fullWidth,
+        height,
+        boxB,
+        isAntiTyphoon,
+        hasSilencingStrip,
+        bounceDoorWidth,
+        thickness,
+        materialName,
+        materialSurface,
+        closingType,
+        horsepower,
+        quantity,
+        unitPrice,
+        totalPrice,
+        notes,
+        guideRail,
+      } = pro;
+
+      const fullWidth_cm = new Decimal(fullWidth || 0).div(10).toNumber();
+      const height_cm = new Decimal(height || 0).div(10).toNumber();
+      const boxB_cm = new Decimal(boxB || 0).div(10).toNumber();
+      const bounceDoorWidth_cm = new Decimal(bounceDoorWidth || 0).div(10).toNumber();
+
+      const boxB_formated = boxB_cm ? `＋${boxB_cm}` : '';
+      const bounceDoorWidth_formated = bounceDoorWidth_cm ? `＋${bounceDoorWidth_cm}` : '';
+
+      const size = `${fullWidth_cm}${bounceDoorWidth_formated}Ｘ${height_cm}${boxB_formated}`;
+
+      const thickness_num = Number(thickness || 0);
+      const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
+
+      let material = materialName;
+
+      const doorRailForExcel =
+        doorModelName !== 'SJ-302'
+          ? ''
+          : findGuideRailUnicode({
+              isAntiTyphoon: !!isAntiTyphoon,
+              isSilencing: !!hasSilencingStrip,
+            });
+
+      // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
+      // 21204-04-12 材料為鐵材烤漆(value為黑鐵)時，也視為鍍鋅鋼板
+      if (material === '高耐鍍鋅鋼板' || material === '黑鐵') {
+        material = '鍍鋅鋼板';
+      }
+
+      return {
+        itemName,
+        size,
+        doorModelName,
+        materialName: material,
+        thickness: thickness_str,
+        materialSurface: materialSurface ?? '',
+        guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail}`,
+        horsepower,
+        closingType: closingType ?? '',
+        qty: String(quantity),
+        unitPrice: unitPrice.toLocaleString(),
+        totalPrice: totalPrice.toLocaleString(),
+        notes,
+        //
+        unitPrice_num: unitPrice,
+        totalPrice_num: totalPrice,
+        qty_num: quantity,
+        guideRailForExcel: doorRailForExcel,
+      };
+    });
+  })();
+
+  const othersArr: Tprod[] = quotationOtherArr.map((item, index) => {
+    const { unitPrice, totalPrice } = item;
+
+    return {
+      itemName: String(index + 1),
+      size: item.item,
+      doorModelName: item.description,
+      materialName: '',
+      thickness: '',
+      materialSurface: '',
+      guideRail: '',
+      horsepower: '',
+      closingType: '',
+
+      qty: String(item.quantity),
+      unitPrice: unitPrice.toLocaleString(),
+      totalPrice: totalPrice.toLocaleString(),
+      notes: item.notes,
+      //
+      unitPrice_num: unitPrice,
+      totalPrice_num: totalPrice,
+      qty_num: item.quantity,
+      guideRailForExcel: null,
+    };
+  });
+
+  return [...productArr, ...othersArr];
+};
+
+// classProdAndOther_ToProdArr
+// changeNumberMoneyToChinese
+const useModalQuotationPdf = ({ quotationContent }: { quotationContent: TquotationContentDto | undefined }) => {
+  const [visible, setVisible] = useState(false);
+  const [pdfData, setPdfData] = useState<TpdfData>();
+
+  useEffect(() => {
+    if (!quotationContent) {
+      return;
+    }
+
+    const {
+      quotationNumber,
+      quotationDate,
+      validityPeriod,
+      customer,
+      projectName,
+      county,
+      district,
+      address,
+      contactPerson,
+      contactNumber,
+      faxNumber,
+      //
+      subTotal,
+      salesTax,
+      total,
+      deliveryLocation,
+      deliveryDate,
+      paymentMethods,
+      annotations,
+      quotationRanges,
+      agentEmployee,
+      products,
+      others,
+    } = quotationContent;
+
+    const projectWholeAddress = `${county}${district}${address}`;
+
+    const top: Ttop = {
+      contactPerson,
+      customerName: customer?.name ?? '',
+      contactNumber,
+      faxNumber,
+
+      quotationNumber,
+      validityPeriod,
+      quotationDate: getTaiwanDateStr(quotationDate) ?? '',
+
+      projectName,
+      projectWholeAddress,
+    };
+
+    const paymentMethodsArr = paymentMethods.map((pm) => {
+      return {
+        label: pm.milestone,
+        value: new Decimal(pm.totalPaymentRatio || 0).mul(100).toString(),
+      };
+    });
+
+    const bottom: Tbottom = {
+      subTotal: subTotal.toLocaleString(),
+      tax: salesTax.toLocaleString(),
+      total: total.toLocaleString(),
+      total_chinese: changeNumberMoneyToChinese(total),
+
+      deliveryLocation,
+      deliveryDate: getTaiwanDateStr(deliveryDate) ?? '',
+      paymentMethods: paymentMethodsArr,
+      notesArr: annotations ?? [],
+      qrArr: quotationRanges ?? [],
+      agentName: agentEmployee?.chName ?? '',
+      //
+      subTotal_num: subTotal,
+      tax_num: salesTax,
+      total_num: total,
+    };
+
+    const prodArr = classProdAndOther_ToProdArr({
+      quotationProductArr: products,
+      quotationOtherArr: others,
+    });
+
+    setPdfData({ top, prodArr, bottom });
+  }, [quotationContent]);
+
+  return {
+    visible,
+    setVisible,
+    pdfData,
+  };
+
+  //
+};
+
+// const classProdAndOther_ToProdArr = ({
+//   classProductArr,
+//   classOthersArr,
+// }: {
+//   classProductArr: Class_product[];
+//   classOthersArr: Class_other[];
+// }): Tprod[] => {
+//   const productArr: Tprod[] = (() => {
+//     return classProductArr.map((prod) => {
+//       const { typhoonProtection, doorTrackSilencerStrip, doorType } = prod;
+
+//       const fullWidth = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
+//       const height = new Decimal(prod.height || 0).mul(100).toNumber();
+//       const boxB = new Decimal(prod.boxB || 0).mul(100).toNumber();
+//       const bounceDoorWidth = prod.bounceDoorWidth_cm || '';
+
+//       const boxB_formated = boxB ? `＋${boxB}` : '';
+//       const bounceDoorWidth_formated = bounceDoorWidth ? `＋${bounceDoorWidth}` : '';
+
+//       const size = `${fullWidth}${bounceDoorWidth_formated}Ｘ${height}${boxB_formated}`;
+
+//       const thickness_num = Number(prod.thickness.replaceAll('t', ''));
+//       const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
+
+//       let material = prod.material;
+
+//       const doorRailForExcel =
+//         doorType !== 'SJ-302'
+//           ? ''
+//           : findGuideRailUnicode({
+//               isAntiTyphoon: typhoonProtection,
+//               isSilencing: doorTrackSilencerStrip,
+//             });
+
+//       // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
+//       // 21204-04-12 材料為鐵材烤漆(value為黑鐵)時，也視為鍍鋅鋼板
+//       if (material === '高耐鍍鋅鋼板' || material === '黑鐵') {
+//         material = '鍍鋅鋼板';
+//       }
+
+//       return {
+//         itemName: prod.itemName,
+//         size,
+//         doorModelName: prod.doorType,
+//         materialName: material,
+//         thickness: thickness_str,
+//         materialSurface: prod.surface,
+//         guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,
+//         horsepower: prod.horsepower,
+//         closingType: prod.close,
+//         qty: prod.quantity,
+//         unitPrice: prod.unitPrice,
+//         totalPrice: prod.totalPrice,
+//         notes: prod.notes,
+//         //
+//         unitPrice_num: prod.unitPrice_num,
+//         totalPrice_num: prod.totalPrice_num,
+//         qty_num: Number(prod.quantity || 0),
+//         guideRailForExcel: doorRailForExcel,
+//       };
+//     });
+//   })();
+
+//   const othersArr: Tprod[] = classOthersArr.map((item, index) => {
+//     return {
+//       itemName: String(index + 1),
+//       size: item.item,
+//       doorModelName: item.description,
+//       materialName: '',
+//       thickness: '',
+//       materialSurface: '',
+//       guideRail: '',
+//       horsepower: '',
+//       closingType: '',
+
+//       qty: String(item.quantity),
+//       unitPrice: item.unitPrice_locale,
+//       totalPrice: item.totalPrice_locale,
+//       notes: item.notes,
+//       //
+//       unitPrice_num: item.unitPrice_number,
+//       totalPrice_num: item.totalPrice_num,
+//       qty_num: item.quantity,
+//       guideRailForExcel: null,
+//     };
+//   });
+
+//   return [...productArr, ...othersArr];
+// };
+
+// export {  };
+
+export { useModalQuotationPdf };
