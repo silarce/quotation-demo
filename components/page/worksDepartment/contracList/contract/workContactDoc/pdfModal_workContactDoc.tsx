@@ -147,6 +147,7 @@ export default function PdfModal({
       address,
       projectPrincipal,
       projectContent,
+      constructionSitePrincipalContactNumber,
     } = engineeringContact;
 
     const wholeAddress = zipCode + county + district + address;
@@ -169,7 +170,7 @@ export default function PdfModal({
           <>
             <span>公司電話：</span>
             <br />
-            <span>FAX：</span>
+            <span>公司傳真：</span>
           </>
         ),
         value: (
@@ -189,7 +190,7 @@ export default function PdfModal({
           <>
             <span>工地電話：</span>
             <br />
-            <span>FAX：</span>
+            <span>工地傳真：</span>
           </>
         ),
         value: (
@@ -206,7 +207,7 @@ export default function PdfModal({
       },
       projectPrincipal: {
         label: '工程負責人：',
-        value: projectPrincipal,
+        value: projectPrincipal + ' ' + constructionSitePrincipalContactNumber,
       },
       projectContent: {
         label: '工程內容：',
@@ -244,6 +245,7 @@ export default function PdfModal({
           annotations={engineeringContact?.annotations}
           onChunkProdArrArrCreated={setProdArrArr}
           page={0}
+          allPage={prodArrArr.length}
           hasPattern={hasPattern}
         />
 
@@ -258,6 +260,7 @@ export default function PdfModal({
               productArr={prodArr}
               annotations={engineeringContact?.annotations}
               page={index + 1}
+              allPage={prodArrArr.length}
               hasPattern={hasPattern}
             />
           );
@@ -276,7 +279,7 @@ export default function PdfModal({
 //  ██████  ██████  ██      ██ ██       ██████  ██   ████ ███████ ██   ████    ██
 
 const Header_pre = (
-  { infoArr, page }: { infoArr: Tinfo[]; page: React.ReactNode },
+  { infoArr, page, allPage }: { infoArr: Tinfo[]; page: React.ReactNode; allPage: React.ReactNode },
   ref: React.ForwardedRef<HTMLDivElement>
 ) => {
   return (
@@ -299,8 +302,10 @@ const Header_pre = (
         })}
 
         <div>
+          {/* <span>{'頁次：'}</span>
+          <span>{page}</span> */}
           <span>{'頁次：'}</span>
-          <span>{page}</span>
+          <span>{`${page}/${allPage}`}</span>
         </div>
       </div>
 
@@ -341,15 +346,19 @@ const Body_pre = ({ productArr }: { productArr: TquotationProductDto[] }, ref: R
           notes,
 
           thickness,
+          bounceDoorWidth,
         } = prod;
 
         // cm
-        const width_cm = new Decimal(fullWidth).div(10).toString();
-        const height_cm = new Decimal(height).div(10).toString();
-        const boxB_cm = new Decimal(boxB).div(10).toString();
+        const width_cm = new Decimal(fullWidth).div(10).toNumber();
+        const height_cm = new Decimal(height).div(10).toNumber();
+        const boxB_cm = new Decimal(boxB).div(10).toNumber();
+        const bounceDoorWidth_cm = new Decimal(bounceDoorWidth ?? 0).div(10).toNumber();
 
-        let size = `${width_cm} x ${height_cm}`;
-        boxB_cm && (size += ` + ${boxB_cm}`);
+        let size = `${width_cm}`;
+        bounceDoorWidth_cm && (size = `${size} + ${bounceDoorWidth_cm}`);
+        size = `${size} x ${height_cm}`;
+        boxB_cm && (size = `${size} + ${boxB_cm}`);
 
         const doorTrack = `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail}`;
 
@@ -362,7 +371,7 @@ const Body_pre = ({ productArr }: { productArr: TquotationProductDto[] }, ref: R
             className={scss.row}
           >
             <div>{itemName}</div>
-            <div>{boxB_cm}</div>
+            <div>{size}</div>
             <div>{doorModelName}</div>
             <div>{materialName}</div>
             <div>{thickness}</div>
@@ -463,6 +472,7 @@ const PdfTemp_pre = (
     annotations = [],
     onChunkProdArrArrCreated,
     page,
+    allPage,
     hasPattern,
   }: {
     className?: string;
@@ -473,6 +483,7 @@ const PdfTemp_pre = (
     annotations: string[] | undefined | null;
     onChunkProdArrArrCreated?: (chunkProdArrArr: TquotationProductDto[][]) => void;
     page: React.ReactNode;
+    allPage: React.ReactNode;
     hasPattern: ThasPattern;
   },
   ref: React.ForwardedRef<HTMLDivElement>
@@ -534,7 +545,7 @@ const PdfTemp_pre = (
   return (
     <div className={classNames(scss.a4Wrapper, isTemplate && scss.sizeHidden)}>
       <div ref={ref} className={classNames(scss.a4Container, className)} style={{ ...a4Style }}>
-        <Header ref={ref_header} infoArr={infoArr} page={page} />
+        <Header ref={ref_header} infoArr={infoArr} page={page} allPage={allPage} />
         <Body ref={ref_body} productArr={productArr} />
         <Footer ref={ref_footer} annotations={annotations ?? []} hasPattern={hasPattern} />
       </div>
