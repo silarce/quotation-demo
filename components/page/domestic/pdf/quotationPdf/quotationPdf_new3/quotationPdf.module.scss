@@ -19,21 +19,22 @@ $semiMaring: 0 8px;
   // :global(.ant-modal-body) {
   //   padding: 0;
   // }
-  .hr {
-    border: solid 2px #0008;
-  }
 }
 // ======================================================================
 .pdf {
   display: grid;
   grid-template-rows: min-content auto min-content;
 
-  width: calc(595px * 2);
-  height: calc(842px * 2);
-  padding: 60px 40px;
+  width: calc(595px * 2); // A4比例
+  height: calc(842px * 2); // A4比例
+  // padding: 60px 40px;
   overflow: hidden;
   // line-height:0.5
   border: solid 1px black;
+  &.template {
+    position: absolute;
+    opacity: 0;
+  }
 }
 .header {
   border-bottom: solid 2px black;
@@ -67,7 +68,7 @@ $semiMaring: 0 8px;
   }
   > .grid {
     display: grid;
-    grid-template-columns: 8fr 3fr 1fr;
+    grid-template-columns: 7.8fr 3fr 1.2fr;
     .customer {
       display: grid;
       grid-template-columns: 1fr 1.2fr;
@@ -110,6 +111,8 @@ $semiMaring: 0 8px;
   padding: 5px;
   border: solid 1px black;
   border-width: 0 1px 1px 0;
+  // white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .thead {
