@@ -55,6 +55,7 @@ import type {
   TworksheetRecordDto,
   TsubmitWorksheetProductsItemsDto,
   TreviewWorksheetProductsItemsDto,
+  TdeliveryStatusInstallationItem,
 } from './dtoTypes';
 
 export type {
@@ -102,6 +103,7 @@ export type {
   TworksheetRecordDto,
   TsubmitWorksheetProductsItemsDto,
   TreviewWorksheetProductsItemsDto,
+  TdeliveryStatusInstallationItem,
 } from './dtoTypes';
 
 type TgetEngineeringContact = {

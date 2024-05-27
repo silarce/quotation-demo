@@ -12,6 +12,7 @@ import Profile, { Tcontrol_profile } from 'components/page/worksDepartment/contr
 import EditDispatch, {
   Tcontroll as Tcontroll_editDispatch,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
+import ModalPdf from './modalPdf';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -57,6 +58,11 @@ type Tstate_profile = {
   finalContactPerson: string;
 };
 
+type Tstate_pricingMethod = {
+  pricingMethod: string;
+  note: string;
+};
+
 // =====================================================================
 
 export default function EditDispatchList() {
@@ -73,9 +79,14 @@ export default function EditDispatchList() {
   const [state_dispatch, setState_dispatch] = useState<{
     tasks: string;
     note: string;
-    pricingMethod: string;
+    // pricingMethod: string;
     isCompleted: boolean;
   }>();
+
+  const [state_pricingMethod, setState_pricingMethod] = useState<Tstate_pricingMethod>({
+    pricingMethod: '',
+    note: '',
+  });
 
   // ---------------------------------------------------------
 
@@ -144,28 +155,19 @@ export default function EditDispatchList() {
       },
     },
     pricingMethod: {
-      value: state_dispatch?.pricingMethod ?? '',
-      subValue: (() => {
-        // 修理費用
-        const value = state_dispatch?.pricingMethod ?? '';
-        let subValue = '';
-
-        if (value.includes('修理費用')) {
-          subValue = value.split('修理費用').pop() ?? '';
-        }
-
-        return subValue;
-      })(),
-      onChange: (v: string) => {
-        setState_dispatch((data) => {
-          if (!data) {
-            return data;
-          }
-
-          data.pricingMethod = v;
-
-          return { ...data };
+      value: state_pricingMethod.pricingMethod,
+      note: state_pricingMethod.note,
+      onChange: (str) => {
+        setState_pricingMethod({
+          pricingMethod: str,
+          note: '',
         });
+      },
+      onInputChange: (str) => {
+        setState_pricingMethod((state) => ({
+          ...state,
+          note: str,
+        }));
       },
     },
     isCompleted: {
@@ -194,7 +196,7 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
-  const reqPost = async () => {
+  const reqPostPatch = async () => {
     if (!state_dispatch) {
       return;
     }
@@ -213,6 +215,10 @@ export default function EditDispatchList() {
       return myAlert.info({ title: '請選擇工務人員' });
     }
 
+    if (!state_pricingMethod.pricingMethod) {
+      return myAlert.info({ title: '請選擇派工方式' });
+    }
+
     const body: TcreateDispatchingDto = {
       contractId,
       dispatchDate: state_profile.dispatchDate,
@@ -224,7 +230,8 @@ export default function EditDispatchList() {
       workerId,
       finalContactPerson: state_profile.finalContactPerson,
       tasks: state_dispatch.tasks,
-      pricingMethod: state_dispatch.pricingMethod,
+      // pricingMethod: state_dispatch.pricingMethod,
+      pricingMethod: JSON.stringify(state_pricingMethod),
       note: state_dispatch.note || null,
       isCompleted: state_dispatch.isCompleted,
     };
@@ -317,22 +324,13 @@ export default function EditDispatchList() {
       county = engineeringContact.county,
       district = engineeringContact.district,
       address = engineeringContact.address,
-      // workerId,
       workerEmployee,
       finalContactPerson,
       tasks,
       pricingMethod,
       note,
-      // contractId,
-      // contract,
-      // quotationId,
-      // quotation,
-      // todoListId,
-      // todoList,
-      // isCompleted,
       warrantyDate,
       isCompleted,
-      // constructionSiteContactNumber: projectNumber,
     } = dispatching ?? {};
 
     setState_profile({
@@ -353,9 +351,16 @@ export default function EditDispatchList() {
     setState_dispatch({
       tasks: tasks ?? todoForDispatch?.content ?? '',
       note: note ?? '',
-      pricingMethod: pricingMethod ?? '',
       isCompleted: !!isCompleted,
     });
+
+    if (pricingMethod) {
+      try {
+        const thePricingMethod = JSON.parse(pricingMethod) as Tstate_pricingMethod;
+        setState_pricingMethod(thePricingMethod);
+      } catch (error) {}
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engineeringContact, dispatching, disabled, todoForDispatch]);
 
@@ -413,7 +418,7 @@ export default function EditDispatchList() {
     {
       type: 'redButton',
       label: '建立',
-      onClick: reqPost,
+      onClick: reqPostPatch,
     },
     {
       type: 'myButton',
@@ -454,7 +459,7 @@ export default function EditDispatchList() {
     {
       type: 'redButton',
       label: '更新',
-      onClick: reqPost,
+      onClick: reqPostPatch,
     },
     {
       type: 'myButton',
@@ -468,7 +473,7 @@ export default function EditDispatchList() {
   // ---------------------------------------------------------
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader panelList={panelList} contractNumber={contract?.content.quotationNumber} />
+      <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? ''} />
 
       <div className={scss.body}>
         <Profile disabled={theDiasbled} control={control_profile} />
@@ -482,6 +487,8 @@ export default function EditDispatchList() {
           }
         />
       </div>
+
+      {/* <ModalPdf visible={true} /> */}
     </SubLayer>
   );
 }
