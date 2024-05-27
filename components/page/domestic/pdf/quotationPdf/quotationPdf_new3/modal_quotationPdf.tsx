@@ -120,7 +120,7 @@ type Tdata = {
 // ============================================================================
 
 const paddingY = 40;
-const excelRowMaxQty = 13;
+const excelRowMaxQty = 13; // excel 一頁13列
 
 // ============================================================================
 // region START
@@ -1142,31 +1142,6 @@ const dlExcel = async ({
   // prodArr: Tprod[];
   data: Tdata;
 }) => {
-  // 一頁13列產品
-  const excelRowMaxQty = 13;
-
-  // console.log(control_prodArr);
-
-  // const {
-  //   quotationDate,
-  //   quotationNumber,
-  //   projectName,
-  //   // quotationStatus,
-  //   customerName,
-  //   contactPerson,
-  //   contactNumber,
-  //   faxNumber,
-  //   allAddress,
-  //   subTotal,
-  //   salesTax,
-  //   total,
-  //   agentName,
-  //   tradingDate,
-  //   tradingLocation,
-  //   validityPeriod,
-  //   payWayArr,
-  // } = control_basicInfo;
-
   const {
     top: {
       contactPerson,
