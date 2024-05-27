@@ -27,8 +27,8 @@ import Modal, { ModalProps } from 'antd/lib/modal/Modal';
 import scss from './quotationPdf.module.scss';
 
 // type
-import { TquotationContentDto, TquotationProductDto } from 'js/api/api_quotation';
-import { TquotationContentOtherDto } from 'js/api/dtoTypes';
+
+import { TquotationContentDto, TquotationContentOtherDto, TquotationProductDto } from 'js/api/dtoTypes';
 //
 import { Class_product, Class_other } from 'hooks/quotation/useProduct';
 import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
@@ -1096,7 +1096,7 @@ const config: Tconfig = {
 // region Hook dataImport
 
 // 專門給報價單使用的
-const classProdAndOther_ToProdArr = ({
+const quotationProdAndOther_ToProdArr = ({
   quotationProductArr,
   quotationOtherArr,
 }: {
@@ -1105,7 +1105,6 @@ const classProdAndOther_ToProdArr = ({
 }): Tprod[] => {
   const productArr: Tprod[] = (() => {
     return quotationProductArr.map((pro) => {
-      // const { typhoonProtection, doorTrackSilencerStrip, doorType } = prod;
       const {
         //
         itemName,
@@ -1121,12 +1120,21 @@ const classProdAndOther_ToProdArr = ({
         materialSurface,
         closingType,
         horsepower,
-        quantity,
+        // quantity,
         unitPrice,
-        totalPrice,
+        // totalPrice,
         notes,
         guideRail,
+        //
+        reduceQty,
       } = pro;
+
+      let { quantity, totalPrice } = pro;
+
+      if (reduceQty) {
+        quantity = -reduceQty;
+        totalPrice = new Decimal(unitPrice).mul(-reduceQty).toNumber();
+      }
 
       const fullWidth_cm = new Decimal(fullWidth || 0).div(10).toNumber();
       const height_cm = new Decimal(height || 0).div(10).toNumber();
@@ -1209,9 +1217,16 @@ const classProdAndOther_ToProdArr = ({
   return [...productArr, ...othersArr];
 };
 
-// classProdAndOther_ToProdArr
-// changeNumberMoneyToChinese
-const useModalQuotationPdf = ({ quotationContent }: { quotationContent: TquotationContentDto | undefined }) => {
+// region useModalQuotationPdf
+
+const useModalQuotationPdf = ({
+  //
+  quotationContent,
+  attachedProdArr,
+}: {
+  quotationContent: TquotationContentDto | undefined;
+  attachedProdArr?: TquotationProductDto[];
+}) => {
   const [visible, setVisible] = useState(false);
   const [pdfData, setPdfData] = useState<TpdfData>();
 
@@ -1286,9 +1301,12 @@ const useModalQuotationPdf = ({ quotationContent }: { quotationContent: Tquotati
       tax_num: salesTax,
       total_num: total,
     };
+    // attachedProdArr
 
-    const prodArr = classProdAndOther_ToProdArr({
-      quotationProductArr: products,
+    const quotationProductArr = attachedProdArr || products;
+
+    const prodArr = quotationProdAndOther_ToProdArr({
+      quotationProductArr: quotationProductArr,
       quotationOtherArr: others,
     });
 
@@ -1303,97 +1321,5 @@ const useModalQuotationPdf = ({ quotationContent }: { quotationContent: Tquotati
 
   //
 };
-
-// const classProdAndOther_ToProdArr = ({
-//   classProductArr,
-//   classOthersArr,
-// }: {
-//   classProductArr: Class_product[];
-//   classOthersArr: Class_other[];
-// }): Tprod[] => {
-//   const productArr: Tprod[] = (() => {
-//     return classProductArr.map((prod) => {
-//       const { typhoonProtection, doorTrackSilencerStrip, doorType } = prod;
-
-//       const fullWidth = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
-//       const height = new Decimal(prod.height || 0).mul(100).toNumber();
-//       const boxB = new Decimal(prod.boxB || 0).mul(100).toNumber();
-//       const bounceDoorWidth = prod.bounceDoorWidth_cm || '';
-
-//       const boxB_formated = boxB ? `＋${boxB}` : '';
-//       const bounceDoorWidth_formated = bounceDoorWidth ? `＋${bounceDoorWidth}` : '';
-
-//       const size = `${fullWidth}${bounceDoorWidth_formated}Ｘ${height}${boxB_formated}`;
-
-//       const thickness_num = Number(prod.thickness.replaceAll('t', ''));
-//       const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
-
-//       let material = prod.material;
-
-//       const doorRailForExcel =
-//         doorType !== 'SJ-302'
-//           ? ''
-//           : findGuideRailUnicode({
-//               isAntiTyphoon: typhoonProtection,
-//               isSilencing: doorTrackSilencerStrip,
-//             });
-
-//       // 曉君要求，當材料為高耐鍍鋅鋼板時只要顯示鍍鋅鋼板
-//       // 21204-04-12 材料為鐵材烤漆(value為黑鐵)時，也視為鍍鋅鋼板
-//       if (material === '高耐鍍鋅鋼板' || material === '黑鐵') {
-//         material = '鍍鋅鋼板';
-//       }
-
-//       return {
-//         itemName: prod.itemName,
-//         size,
-//         doorModelName: prod.doorType,
-//         materialName: material,
-//         thickness: thickness_str,
-//         materialSurface: prod.surface,
-//         guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${prod.doorTrack}`,
-//         horsepower: prod.horsepower,
-//         closingType: prod.close,
-//         qty: prod.quantity,
-//         unitPrice: prod.unitPrice,
-//         totalPrice: prod.totalPrice,
-//         notes: prod.notes,
-//         //
-//         unitPrice_num: prod.unitPrice_num,
-//         totalPrice_num: prod.totalPrice_num,
-//         qty_num: Number(prod.quantity || 0),
-//         guideRailForExcel: doorRailForExcel,
-//       };
-//     });
-//   })();
-
-//   const othersArr: Tprod[] = classOthersArr.map((item, index) => {
-//     return {
-//       itemName: String(index + 1),
-//       size: item.item,
-//       doorModelName: item.description,
-//       materialName: '',
-//       thickness: '',
-//       materialSurface: '',
-//       guideRail: '',
-//       horsepower: '',
-//       closingType: '',
-
-//       qty: String(item.quantity),
-//       unitPrice: item.unitPrice_locale,
-//       totalPrice: item.totalPrice_locale,
-//       notes: item.notes,
-//       //
-//       unitPrice_num: item.unitPrice_number,
-//       totalPrice_num: item.totalPrice_num,
-//       qty_num: item.quantity,
-//       guideRailForExcel: null,
-//     };
-//   });
-
-//   return [...productArr, ...othersArr];
-// };
-
-// export {  };
 
 export { useModalQuotationPdf };

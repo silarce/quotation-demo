@@ -302,14 +302,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------
 
-  const {
-    visible: pdfModalVisible,
-    setVisible: setPdfModalVisible,
-    pdfData,
-  } = useModalQuotationPdf({
-    quotationContent: quotationData?.latestContent,
-  });
-
   // --------------------------------------------------------------------
   isReviewer = false;
   isSales = false;
@@ -444,12 +436,29 @@ latestContentProdArr為這次追加追減的主產品
       }
     });
 
+    console.log('contractProdList', contractProdList);
+    console.log('contentProdList', contentProdList);
+    // console.log('contentProdList', contentProdList);
+    console.log('----------------------------------------------');
+
     return {
       contractArr: Object.values(contractProdList),
       contentArr: Object.values(contentProdList),
       contentProdList,
     };
   }, [quotationData]);
+
+  // contractArr;
+  // contentArr;
+
+  const {
+    visible: pdfModalVisible,
+    setVisible: setPdfModalVisible,
+    pdfData,
+  } = useModalQuotationPdf({
+    quotationContent: quotationData?.latestContent,
+    attachedProdArr: [...(contractArr ?? []), ...(contentArr ?? [])],
+  });
 
   // -----------------------------------------------------
   // -----------------------------------------------------
