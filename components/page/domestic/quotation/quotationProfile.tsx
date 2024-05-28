@@ -595,3 +595,4 @@ const useProfile = ({
 };
 
 export { useProfile };
+export type { Tstate_profile };
