@@ -1,9 +1,10 @@
 import _ from 'lodash';
-import Decimal from 'decimal.js';
 import ExcelJs from 'exceljs';
 import moment from 'moment';
 
 import { Tprod, TpdfData } from './modal_quotationPdf';
+
+import { companyInfo } from 'config/companyInfo';
 
 const dlExcel = async ({
   fileName,
@@ -214,22 +215,22 @@ const dlExcel = async ({
     //____________________________________________________
     const B2O2 = sheet.getCell(`B${r2}`);
     sheet.mergeCells(`B${r2}:O${r2}`);
-    B2O2.value = '三久建材工業股份有限公司';
+    B2O2.value = companyInfo.name;
     B2O2.alignment = { horizontal: 'center', vertical: 'top' };
     B2O2.font = { size: 16, bold: true };
     //
     const B3 = sheet.getCell(`B${r3}`);
-    B3.value = '總公司工廠：台中市霧峰區峰北路666號';
+    B3.value = `總公司工廠：${companyInfo.headOffice.wholeAddress}`;
     //
     const B4 = sheet.getCell(`B${r4}`);
-    B4.value = '台北分公司：台北市內湖路一段387巷5號2樓之2';
+    B4.value = `台北分公司：${companyInfo.taipeiOffice.wholeAddress}`;
     //
     const O3 = sheet.getCell(`O${r3}`);
-    O3.value = 'TEL：04-24069939(七線)   FAX：04-24069909';
+    O3.value = `TEL：${companyInfo.headOffice.tel2}   FAX：${companyInfo.headOffice.fax}`;
     O3.alignment = { horizontal: 'right' };
     //
     const O4 = sheet.getCell(`O${r4}`);
-    O4.value = 'TEL：02-26581508(三線)   FAX：02-26581507';
+    O4.value = `TEL：${companyInfo.taipeiOffice.tel2}   FAX：${companyInfo.taipeiOffice.fax}`;
     O4.alignment = { horizontal: 'right' };
     //
 
