@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames';
+import moment from 'moment';
 
 // glogal gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -19,7 +20,7 @@ import scss from './quotationProfile.module.scss';
 import { Toption } from 'js/utils/options/countryAndDistrict';
 
 // ====================================================
-import { TcustomerDto } from 'js/api/dtoTypes';
+import { TquotationContentDto, TcustomerDto } from 'js/api/dtoTypes';
 import { TcustomerDto_TC } from 'js/api/api_customer';
 // ====================================================
 
@@ -400,3 +401,198 @@ export default function QuotationProfile({
     </div>
   );
 }
+
+// region HOOK
+
+type Tstate_profile = {
+  validityPeriod: string;
+  projectName: string;
+  county: string;
+  district: string;
+  address: string;
+  contactPerson: string;
+  contactNumber: string;
+  faxNumber: string;
+  trackProgress: string;
+  projectProgress: string;
+  isLost: boolean;
+};
+
+const creEmptyProfile = (): Tstate_profile => ({
+  validityPeriod: '',
+  projectName: '',
+  county: '',
+  district: '',
+  address: '',
+  contactPerson: '',
+  contactNumber: '',
+  faxNumber: '',
+  trackProgress: '',
+  projectProgress: '',
+  isLost: false,
+});
+
+const useProfile = ({
+  quotationContent,
+  disabled,
+}: {
+  quotationContent: TquotationContentDto | undefined;
+  disabled?: boolean;
+}) => {
+  const [state_profile, setState_profile] = useState<Tstate_profile>(creEmptyProfile());
+  const [state_customer, setState_customer] = useState<TcustomerDto | undefined | null>();
+
+  const changeProfile = (key: keyof Omit<Tstate_profile, 'isLost'>, value: string | boolean) => {
+    setState_profile((state) => {
+      return {
+        ...state,
+        [key]: value,
+      };
+    });
+  };
+
+  const originContent = useMemo(() => quotationContent, [quotationContent]);
+
+  const control_profile = useMemo(() => {
+    const control_profile: Tcontrol = {
+      quotationNumber: originContent?.quotationNumber ?? '',
+      quotationDate: moment().format('YYYY-MM-DD'),
+      customer: {
+        value: state_customer,
+        onChange: (customer) => {
+          const customerPhoneNumber = customer.phone || '';
+          const contact = customer.contacts?.[0];
+          const name = contact?.name ?? '';
+          const phone = contact?.phone || customerPhoneNumber || '';
+          const fax = customer.fax || '';
+
+          setState_customer(customer);
+          changeProfile('contactPerson', `${name}`);
+          changeProfile('contactNumber', phone);
+          changeProfile('faxNumber', fax);
+        },
+        onClear: () => {
+          setState_customer(null);
+          changeProfile('contactPerson', '');
+          changeProfile('contactNumber', '');
+          changeProfile('faxNumber', '');
+        },
+      },
+
+      isLost: {
+        value: state_profile.isLost,
+        onChange: (bool) => {
+          setState_profile((state) => ({ ...state, isLost: bool }));
+        },
+      },
+
+      itemList: {
+        validityPeriod: {
+          value: state_profile.validityPeriod,
+          onChange: (v) => changeProfile('validityPeriod', v),
+        },
+        projectName: {
+          value: state_profile.projectName,
+          onChange: (v) => changeProfile('projectName', v),
+        },
+        county: {
+          value: state_profile.county,
+          onChange: (v) => {
+            changeProfile('county', v);
+            changeProfile('district', '');
+          },
+        },
+        district: {
+          value: state_profile.district,
+          onChange: (v) => changeProfile('district', v),
+        },
+        address: {
+          value: state_profile.address,
+          onChange: (v) => changeProfile('address', v),
+        },
+        contactPerson: {
+          value: state_profile.contactPerson,
+          onChange: (v) => changeProfile('contactPerson', v),
+        },
+        contactNumber: {
+          value: state_profile.contactNumber,
+          onChange: (v) => changeProfile('contactNumber', v),
+        },
+        faxNumber: {
+          value: state_profile.faxNumber,
+          onChange: (v) => changeProfile('faxNumber', v),
+        },
+        trackProgress: {
+          value: state_profile.trackProgress,
+
+          onChange: (v) => {
+            changeProfile('trackProgress', v);
+          },
+
+          // disabled: disabled,
+        },
+        projectProgress: {
+          value: state_profile.projectProgress,
+
+          onChange: (v) => {
+            changeProfile('projectProgress', v);
+          },
+
+          // disabled: disabled,
+        },
+      },
+    };
+
+    return control_profile;
+  }, [originContent?.quotationNumber, state_customer, state_profile]); // memo
+
+  useEffect(() => {
+    if (disabled) {
+      setState_customer(originContent?.customer ?? null);
+
+      setState_profile({
+        validityPeriod: originContent?.validityPeriod ?? '',
+        projectName: originContent?.projectName ?? '',
+        county: originContent?.county ?? '',
+        district: originContent?.district ?? '',
+        address: originContent?.address ?? '',
+        contactPerson: originContent?.contactPerson ?? '',
+        contactNumber: originContent?.contactNumber ?? '',
+        faxNumber: originContent?.faxNumber ?? '',
+        trackProgress: originContent?.trackProgress ?? '',
+        projectProgress: originContent?.projectProgress ?? '',
+        isLost: originContent?.isLost ?? false,
+      });
+    }
+  }, [originContent, disabled]);
+
+  useEffect(() => {
+    setState_customer(originContent?.customer ?? null);
+
+    setState_profile({
+      validityPeriod: originContent?.validityPeriod ?? '',
+      projectName: originContent?.projectName ?? '',
+      county: originContent?.county ?? '',
+      district: originContent?.district ?? '',
+      address: originContent?.address ?? '',
+      contactPerson: originContent?.contactPerson ?? '',
+      contactNumber: originContent?.contactNumber ?? '',
+      faxNumber: originContent?.faxNumber ?? '',
+      trackProgress: originContent?.trackProgress ?? '',
+      projectProgress: originContent?.projectProgress ?? '',
+      isLost: originContent?.isLost ?? false,
+    });
+  }, [originContent]);
+
+  //
+  return {
+    control_profile,
+    state_profile,
+    state_customer,
+  };
+
+  //
+};
+
+export { useProfile };
+export type { Tstate_profile };

@@ -178,7 +178,7 @@ export default function Tbody({
                 defalutVKeyArr={defalutVKeyArr}
                 rowHeight={rowHeight}
                 showAttatchModal={showAttatchModal}
-                clearAttach={item.clearAttach}
+                clearAttach={() => item.clearAttach?.()}
                 reRenderTrigger={item.renderCount}
                 alwaysShow={pIndex < 7}
               />

@@ -33,6 +33,7 @@ type Tcontrol_panelHeader = {
   trackProgress: string;
   projectProgress: string;
   onEditConfirm: (props: { trackProgress: string; projectProgress: string }) => Promise<boolean>;
+  isAttachQuotation?: boolean;
 };
 
 export type { Tcontrol_panelHeader };
@@ -64,6 +65,8 @@ export default function PanelHeader({ control, isActive }: { control: Tcontrol_p
     trackProgress,
     projectProgress,
     onEditConfirm,
+
+    isAttachQuotation,
   } = control;
 
   // -----------------------------------------------------------------
@@ -201,7 +204,10 @@ export default function PanelHeader({ control, isActive }: { control: Tcontrol_p
       </div>
 
       {/*  */}
-      <ProcessChain className="mt-5" control={{ statusArr: processChain }} />
+      <div className={classNames(scss.chainWrapper, 'mt-5')}>
+        <ProcessChain control={{ statusArr: processChain }} />
+        <div>{isAttachQuotation && '追加追減報價單'}</div>
+      </div>
     </CellWithBar>
   );
 }
