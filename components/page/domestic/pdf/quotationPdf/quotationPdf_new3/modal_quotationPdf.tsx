@@ -1225,6 +1225,7 @@ const useModalQuotationPdf = ({
   attachedProdArr,
 }: {
   quotationContent: TquotationContentDto | undefined;
+  // 原本會使用quotationContent裡的products，但如果有attachedProdArr，就會以attachedProdArr替代
   attachedProdArr?: TquotationProductDto[];
 }) => {
   const [visible, setVisible] = useState(false);

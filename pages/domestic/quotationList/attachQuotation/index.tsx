@@ -90,7 +90,7 @@ import {
   apiPatchQuotationToPending,
 } from 'js/api/api_quotation';
 
-import { useProductList } from 'hooks/quotation/useProduct';
+import { Class_product, useProductList } from 'hooks/quotation/useProduct';
 
 import Summary, {
   TsummaryControl,
@@ -452,6 +452,9 @@ latestContentProdArr為這次追加追減的主產品
     attachedProdArr: [...(contractArr ?? []), ...(contentArr ?? [])],
   });
 
+  console.log('contractArr', contractArr);
+  console.log('contentArr', contentArr);
+
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
@@ -575,6 +578,8 @@ latestContentProdArr為這次追加追減的主產品
   const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   // -----------------------------------------------------
+
+  // region useProductList
 
   const {
     productList,
@@ -1535,96 +1540,20 @@ latestContentProdArr為這次追加追減的主產品
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
-  const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
-    // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
-
-    const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
-    const h = new Decimal(prod.height || 0).mul(100).toNumber();
-    const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
-    const bounceDoorWidth = prod.bounceDoorWidth_cm;
-    const bounceDoorWidth_formated = bounceDoorWidth ? `＋${bounceDoorWidth}` : '';
-
-    const size = `${lw}${bounceDoorWidth_formated} X ${h} + ${b}`;
-
-    const list_com = { ...prod.comList, ...prod.subComList };
-
-    if (list_com.sidePlate?.totalPrice === '0') {
-      delete list_com['sidePlate'];
-    }
-
-    delete list_com['motorAccessories'];
-
-    const list_acce = prod.accessoriesList;
-
-    const componentArr = Object.values(list_com ?? {});
-
-    let totalPrice = 0;
-
-    const part: Tpart[] = componentArr.map((com) => {
-      totalPrice += Number(com.totalPrice || 0);
-
-      let unit_str = '';
-
-      if (typeof com.unit === 'object') {
-        unit_str = 'm\u00B2';
-      } else {
-        unit_str = com.unit as string;
-      }
-
-      return {
-        partName: com.comName,
-        material: com.material,
-        unit: com.unit,
-        unit_str,
-        // qty: Number(com.quantity).toFixed(2),
-        qty: new Decimal(com.quantity || 0).toFixed(2),
-        desc: com.desc ?? '',
-        // price: Number(com.price || 0).toLocaleString(),
-        price: com.unitPrice_locale,
-        totalPrice: Number(com.totalPrice || 0).toLocaleString(),
-      };
+  const pdfPartPropsArr = useMemo(() => {
+    const pdfPartPropsArr_productList = extractPdfPartFromClassProduct({
+      quotationNumber: latestContent?.quotationNumber ?? '無報價編號',
+      productList,
     });
 
-    const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
-      totalPrice += Number(acce.totalPrice || 0);
-
-      let unit_str = '';
-
-      if (typeof list_acce.unit === 'object') {
-        unit_str = 'm\u00B2';
-      } else {
-        unit_str = list_acce.unit as string;
-      }
-
-      const partName = acce.name.replaceAll('60A', '');
-
-      return {
-        partName,
-        material: '',
-        unit: acce.unit,
-        unit_str,
-        // FIXME 型別為number，但實際上為string
-        // hooks/quotation/classAccessories.tsx // get quantity
-        // qty: Number(acce.quantity).toFixed(2),
-        qty: new Decimal(acce.quantity || 0).toFixed(2),
-        price: acce.unitPrice_locale,
-        desc: '',
-        totalPrice: acce.totalPrice_locale,
-      };
+    const pdfPartPropsArr_attachProductList = extractPdfPartFromClassProduct({
+      quotationNumber: latestContent?.quotationNumber ?? '無報價編號',
+      productList: attachProdList,
     });
 
-    return {
-      quotationNumber: latestContent?.quotationNumber || '無報價編號',
-      category: prod.itemName,
-      material: prod.material,
-      surface: prod.surface,
-      doorType: prod.doorType,
-      size: size,
-      part: [...part, ...part_acce],
-      // priceTotal: totalPrice.toLocaleString(),
-      priceTotal: totalPrice.toLocaleString(),
-    };
-  });
+    return [...pdfPartPropsArr_productList, ...pdfPartPropsArr_attachProductList];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attachProdList, productList]);
 
   // --------------------------------------------------------------------------
 
@@ -1942,7 +1871,7 @@ latestContentProdArr為這次追加追減的主產品
         onCancel={() => {
           setShowPdf_part(false);
         }}
-        mainProductArr={pdfPartProps}
+        mainProductArr={pdfPartPropsArr}
         quotationId={latestContent?.quotationNumber ?? ''}
       />
 
@@ -2067,19 +1996,103 @@ const countPayInfoValue = ({
 
 // ========================================================================
 
-// ========================================================================
-// region EMPTY
+const extractPdfPartFromClassProduct = ({
+  quotationNumber,
+  productList,
+}: {
+  quotationNumber: string;
+  productList: { [key: string]: Class_product };
+}) => {
+  const pdfPartProps: TmainProduct[] = Object.values(productList).map((prod) => {
+    // const lw = Number(prod.fullWidth || 0) || Number(prod.WG || 0) * 100;
 
-const creEmptyProfile = (): Tprofile => ({
-  validityPeriod: '',
-  projectName: '',
-  county: '',
-  district: '',
-  address: '',
-  contactPerson: '',
-  contactNumber: '',
-  faxNumber: '',
-  trackProgress: '',
-  projectProgress: '',
-  isLost: false,
-});
+    const lw = new Decimal(prod.fullWidth || 0).mul(100).toNumber();
+    const h = new Decimal(prod.height || 0).mul(100).toNumber();
+    const b = new Decimal(prod.boxB || 0).mul(100).toNumber();
+    const bounceDoorWidth = prod.bounceDoorWidth_cm;
+    const bounceDoorWidth_formated = bounceDoorWidth ? `＋${bounceDoorWidth}` : '';
+
+    const size = `${lw}${bounceDoorWidth_formated} X ${h} + ${b}`;
+
+    const list_com = { ...prod.comList, ...prod.subComList };
+
+    if (list_com.sidePlate?.totalPrice === '0') {
+      delete list_com['sidePlate'];
+    }
+
+    delete list_com['motorAccessories'];
+
+    const list_acce = prod.accessoriesList;
+
+    const componentArr = Object.values(list_com ?? {});
+
+    let totalPrice = 0;
+
+    const part: Tpart[] = componentArr.map((com) => {
+      totalPrice += Number(com.totalPrice || 0);
+
+      let unit_str = '';
+
+      if (typeof com.unit === 'object') {
+        unit_str = 'm\u00B2';
+      } else {
+        unit_str = com.unit as string;
+      }
+
+      return {
+        partName: com.comName,
+        material: com.material,
+        unit: com.unit,
+        unit_str,
+        // qty: Number(com.quantity).toFixed(2),
+        qty: new Decimal(com.quantity || 0).toFixed(2),
+        desc: com.desc ?? '',
+        // price: Number(com.price || 0).toLocaleString(),
+        price: com.unitPrice_locale,
+        totalPrice: Number(com.totalPrice || 0).toLocaleString(),
+      };
+    });
+
+    const part_acce: Tpart[] = Object.values(list_acce).map((acce) => {
+      totalPrice += Number(acce.totalPrice || 0);
+
+      let unit_str = '';
+
+      if (typeof list_acce.unit === 'object') {
+        unit_str = 'm\u00B2';
+      } else {
+        unit_str = list_acce.unit as string;
+      }
+
+      const partName = acce.name.replaceAll('60A', '');
+
+      return {
+        partName,
+        material: '',
+        unit: acce.unit,
+        unit_str,
+        // FIXME 型別為number，但實際上為string
+        // hooks/quotation/classAccessories.tsx // get quantity
+        // qty: Number(acce.quantity).toFixed(2),
+        qty: new Decimal(acce.quantity || 0).toFixed(2),
+        price: acce.unitPrice_locale,
+        desc: '',
+        totalPrice: acce.totalPrice_locale,
+      };
+    });
+
+    return {
+      quotationNumber: quotationNumber,
+      category: prod.itemName,
+      material: prod.material,
+      surface: prod.surface,
+      doorType: prod.doorType,
+      size: size,
+      part: [...part, ...part_acce],
+      // priceTotal: totalPrice.toLocaleString(),
+      priceTotal: totalPrice.toLocaleString(),
+    };
+  });
+
+  return pdfPartProps;
+};
