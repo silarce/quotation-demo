@@ -16,6 +16,8 @@ export type Tabroad = '海外';
 // 報價單狀態: Budget預算 Bidding投標 Contracting發包 Contract合約 Pending準合約 TempPending待審核準合約
 export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract' | 'Pending' | 'TempPending';
 
+export type TdeliveryStatusInstallationItem = '門片' | '馬達' | '支軌';
+
 // =============================================================================
 export type Tparams = {
   order?: 'ASC' | 'DESC';
@@ -1316,6 +1318,8 @@ export type TengineeringDeliveryStatusDto = {
   otherWorkItems: ToutsourcingPaymentDetailItemDto | null;
   // 其他特殊工作項目合計
   otherWorkItemTotal: number | null;
+  // 安裝項目
+  installationItem: TdeliveryStatusInstallationItem | null;
 };
 
 export type TcreateEngineeringDeliveryStatusDto = {
@@ -1342,6 +1346,8 @@ export type TcreateEngineeringDeliveryStatusDto = {
   completeAppend: string | null;
   // 所屬產品id // 預期要放latestWorksheetItemId
   productItemId: string;
+  // 安裝項目
+  installationItem: TdeliveryStatusInstallationItem | null;
 };
 
 export type TupdateEngineeringDeliveryStatusDto = TcreateEngineeringDeliveryStatusDto;
