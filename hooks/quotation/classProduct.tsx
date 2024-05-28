@@ -3699,8 +3699,9 @@ class Class_product {
 
     const asyncCall = async () => {
       await this.getComAndAcce();
+      // this.callCalcSubTotal();
 
-      this.calcProdAllprice_timeout();
+      // // this.calcProdAllprice_timeout();
       this.reRender();
     };
 

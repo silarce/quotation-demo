@@ -452,9 +452,6 @@ latestContentProdArr為這次追加追減的主產品
     attachedProdArr: [...(contractArr ?? []), ...(contentArr ?? [])],
   });
 
-  console.log('contractArr', contractArr);
-  console.log('contentArr', contentArr);
-
   // -----------------------------------------------------
   // -----------------------------------------------------
   // -----------------------------------------------------
