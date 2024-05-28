@@ -31,16 +31,20 @@ const dlPdf = async ({
       continue;
     }
 
+    // =====================================================
     const image = await html2canvas(item, {
       scale: 3,
+      // 關於cookie的問題，這三個都沒用
       // useCORS: true,
       // allowTaint: true,
+      // credentials: true,
     }).then((canvas) => {
       const image = canvas.toDataURL('image/JPEG');
 
       return image;
     });
 
+    // =====================================================
     if (!isFirst) {
       doc.addPage();
     }

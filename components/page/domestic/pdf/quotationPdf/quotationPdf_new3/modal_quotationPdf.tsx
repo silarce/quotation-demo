@@ -47,6 +47,9 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { dlExcel } from './dlExcel';
 import { dlPdf } from './dlPdf';
 
+// api
+import { apiGetAssets } from 'js/api/api_product';
+
 // ============================================================================
 
 // region TYPE
@@ -631,6 +634,45 @@ const Center_pre = (
   },
   ref: React.ForwardedRef<HTMLDivElement>
 ) => {
+  // html2canvas與其他將dom轉為image的套件
+  // 在取得發圖片請求時都不會也不能帶cookie，就被401了
+  // 所以要另外取得存在本地
+  const [svgList, setSvgList] = useState<{
+    [fileName: string]: string | undefined | null;
+  }>({});
+
+  const getSvg = async ({ fileName }: { fileName: string }) => {
+    if (svgList[fileName] === null) {
+      return;
+    }
+
+    if (svgList[fileName] === 'isLoading') {
+      return;
+    }
+
+    if (!!svgList[fileName]) {
+      return;
+    }
+
+    try {
+      svgList[fileName] = 'isLoading';
+
+      const svg = await apiGetAssets(fileName);
+
+      if (svg) {
+        setSvgList((list) => ({
+          ...list,
+          [fileName]: svg,
+        }));
+      }
+    } catch (error) {
+      setSvgList((list) => ({
+        ...list,
+        [fileName]: null,
+      }));
+    }
+  };
+
   return (
     <div ref={ref}>
       {prodArr.map((prod, index) => {
@@ -642,8 +684,15 @@ const Center_pre = (
               let node: React.ReactNode = prod[key];
 
               if (key === 'guideRail' && typeof node === 'string') {
-                const src = node;
-                node = <Image src={src} alt={node} width={30} height={30} />;
+                // 若為本地端的圖片，會以/_next開頭，但應該是用不到
+                if (node.startsWith('/_next')) {
+                  node = <Image src={node} alt={node} width={30} height={30} />;
+                } else {
+                  const fileName = node;
+                  getSvg({ fileName });
+                  const src = svgList[fileName] ?? '';
+                  node = <div dangerouslySetInnerHTML={{ __html: src }} className={scss.svgWrapper} />;
+                }
               }
 
               return (
@@ -1172,7 +1221,8 @@ const quotationProdAndOther_ToProdArr = ({
         materialName: material,
         thickness: thickness_str,
         materialSurface: materialSurface ?? '',
-        guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail}`,
+        // guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail}`,
+        guideRail: guideRail ?? '',
         horsepower,
         closingType: closingType ?? '',
         qty: String(quantity),
