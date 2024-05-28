@@ -1223,10 +1223,12 @@ const useModalQuotationPdf = ({
   //
   quotationContent,
   attachedProdArr,
+  emptySomeProperty,
 }: {
   quotationContent: TquotationContentDto | undefined;
   // 原本會使用quotationContent裡的products，但如果有attachedProdArr，就會以attachedProdArr替代
   attachedProdArr?: TquotationProductDto[];
+  emptySomeProperty?: boolean; // 清空 customerName contactPerson contactNumber faxNumber
 }) => {
   const [visible, setVisible] = useState(false);
   const [pdfData, setPdfData] = useState<TpdfData>();
@@ -1245,9 +1247,9 @@ const useModalQuotationPdf = ({
       county,
       district,
       address,
-      contactPerson,
-      contactNumber,
-      faxNumber,
+      // contactPerson,
+      // contactNumber,
+      // faxNumber,
       //
       subTotal,
       salesTax,
@@ -1262,11 +1264,27 @@ const useModalQuotationPdf = ({
       others,
     } = quotationContent;
 
+    let {
+      // customerName,
+      contactPerson,
+      contactNumber,
+      faxNumber,
+    } = quotationContent;
+
+    let customerName = customer?.name ?? '';
+
+    if (emptySomeProperty) {
+      customerName = '';
+      contactPerson = '';
+      contactNumber = '';
+      faxNumber = '';
+    }
+
     const projectWholeAddress = `${county}${district}${address}`;
 
     const top: Ttop = {
       contactPerson,
-      customerName: customer?.name ?? '',
+      customerName: customerName,
       contactNumber,
       faxNumber,
 
