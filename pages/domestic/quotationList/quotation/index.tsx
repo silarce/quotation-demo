@@ -36,13 +36,14 @@ import QuotationSinature_3, {
   Tcontroll_signature,
 } from 'components/page/domestic/quotation/quotationSinature_3';
 
-// 這個元件已不再使用，可以刪掉了
-// 'components/page/domestic/pdf/quotationPdf/quotationPdf_new2'
+// import QuotationPdf, {
+//   quotationContentToBasicInfo,
+//   quotationProdToTableProdList,
+// } from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new2';
 
 import QuotationPdf, {
-  quotationContentToBasicInfo,
-  quotationProdToTableProdList,
-} from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new2';
+  useModalQuotationPdf,
+} from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
 
 import QuotationPdf_part, {
   TmainProduct,
@@ -256,7 +257,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [reviewModalShow, setReviewModalShow] = useState(false);
   const [showEmployeSelector, setShowEmployeSelector] = useState(false);
 
-  const [showPdf, setShowPdf] = useState(false);
+  // const [showPdf, setShowPdf] = useState(false);
   const [showPdf_part, setShowPdf_part] = useState(false);
 
   const [showMemoModal, setShowMemoModal] = useState(false);
@@ -949,6 +950,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
+  // region use Hook
+  //
+  //
+  //
+  //
+
   // region !!! useProductList !!!
 
   const {
@@ -1000,6 +1007,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const comList = useMemo(() => {
     return { ...targetProd?.comList, ...targetProd?.subComList };
   }, [targetProd?.comList, targetProd?.subComList]);
+
+  // __________________________________________________________________________
+  // __________________________________________________________________________
+
+  const {
+    visible: pdfModalVisible,
+    setVisible: setPdfModalVisible,
+    pdfData,
+  } = useModalQuotationPdf({
+    quotationContent: quotationData?.latestContent,
+    emptySomeProperty: status === 'Bidding',
+  });
 
   // --------------------------------------------------------------------------
 
@@ -1691,7 +1710,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
       type: 'myButton',
       label: '匯出報價單',
       img: iconUpload.src,
-      onClick: () => setShowPdf(true),
+      // onClick: () => setShowPdf(true),
+
+      onClick: () => setPdfModalVisible(true),
     },
     {
       type: 'myButton',
@@ -2186,7 +2207,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       金額為0時，不要顯示出來
       */}
 
-      {latestContent && (
+      {/* {latestContent && (
         <QuotationPdf
           isVisable={showPdf}
           onCancel={() => {
@@ -2202,6 +2223,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
             classOthersArr: Object.values(othersList ?? {}),
           })}
           isBidding={status === 'Bidding'}
+        />
+      )} */}
+
+      {latestContent && (
+        <QuotationPdf
+          visible={pdfModalVisible}
+          pdfData={pdfData}
+          onCancel={() => {
+            setPdfModalVisible(false);
+          }}
+          fileName={latestContent.quotationNumber}
         />
       )}
 
