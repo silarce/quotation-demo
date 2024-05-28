@@ -1,0 +1,142 @@
+// css
+import style from './quotationPdf.module.scss';
+
+export type Tprofile = {
+  quotationId: string;
+  // quotationStatus: string;
+  clientName: string;
+  contactPerson: string;
+  contactPhone: string;
+  fax: string;
+  builtDate: string;
+  projectAddress: string;
+  projectName: string;
+  validityPeriod: string;
+};
+
+export default function Profile({
+  profileData,
+  index,
+  pageCount,
+}: {
+  profileData: Tprofile;
+  index: number;
+  pageCount: number;
+}) {
+  const {
+    quotationId,
+    // quotationStatus: quatitionStatus,
+    clientName,
+    contactPerson,
+    contactPhone,
+    fax,
+    builtDate,
+    projectAddress,
+    validityPeriod,
+    projectName,
+  } = profileData;
+
+  const [year, month, day] = builtDate.split('-');
+  // const date = builtDate !== 'Invalid date' ? `${year ?? ''}年${month ?? ''}月${day ?? ''}日` : '';
+  const date = !builtDate || builtDate === 'Invalid date' ? '' : `${year ?? ''}年${month ?? ''}月${day ?? ''}日`;
+
+  return (
+    <div className={style.profile}>
+      <h1>報 價 單</h1>
+      <div className={style.grid}>
+        <div className={style.customer}>
+          <div className={style.info}>
+            <span className={style.flexSpan}>
+              <span>聯</span>
+              <span>絡</span>
+              <span>人</span>
+            </span>
+            <span className={style.semi}>:</span>
+            <span>{contactPerson}</span>
+          </div>
+          <div className={style.info}>
+            <span className={style.flexSpan}>
+              <span>客</span>
+              <span>戶</span>
+              <span>名</span>
+              <span>稱</span>
+            </span>
+            <span className={style.semi}>:</span>
+            <span>{clientName}</span>
+          </div>
+          <div className={style.info}>
+            <span className={style.flexSpan}>
+              <span>電</span>
+              <span>話</span>
+            </span>
+            <span className={style.semi}>:</span>
+            <span>{contactPhone}</span>
+          </div>
+          <div className={style.info}>
+            <span className={style.flexSpan}>
+              <span>傳</span>
+              <span>真</span>
+            </span>
+            <span className={style.semi}>:</span>
+            <span>{fax}</span>
+          </div>
+        </div>
+
+        <div className={style.date}>
+          {/* <div className={style.info}>
+            <span>報價狀態</span>
+            <span className={style.semi}>:</span>
+            <span>{quatitionStatus}</span>
+          </div> */}
+          <div className={style.info}>
+            <span>報價編號</span>
+            <span className={style.semi}>:</span>
+            <span>{quotationId}</span>
+          </div>
+          <div className={style.info}>
+            <span>報價時效</span>
+            <span className={style.semi}>:</span>
+            <span>
+              {validityPeriod ?? ''}
+              {!!validityPeriod && '天內'}
+            </span>
+          </div>
+          <div className={style.info}>
+            <span>報價日期</span>
+            <span className={style.semi}>:</span>
+            <span>{date}</span>
+          </div>
+        </div>
+
+        <div className={style.page}>
+          <div>
+            <span>頁次</span>
+            <span className={style.semi}>:</span>
+            <span>{`${index}/${pageCount}`}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className={style.info2}>
+        <span className={style.flexSpan}>
+          <span>工</span>
+          <span>程</span>
+          <span>名</span>
+          <span>稱</span>
+        </span>
+        <span className={style.semi}>:</span>
+        <span>{projectName}</span>
+      </div>
+      <div className={style.info2}>
+        <span className={style.flexSpan}>
+          <span>工</span>
+          <span>程</span>
+          <span>地</span>
+          <span>點</span>
+        </span>
+        <span className={style.semi}>:</span>
+        <span>{projectAddress}</span>
+      </div>
+    </div>
+  );
+}

@@ -89,6 +89,7 @@ export default function BudgetList({
             totalPrice: latestContent.total,
             // viewRef_bottom: viewRef_bottom,
             viewRef_bottom: index === quotationArr.length - 5 ? viewRef_bottom : undefined,
+            isAttachQuotation: !!attachedToContract,
           };
 
           const processChain = quotationToReiviewChain(latestContent);

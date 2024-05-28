@@ -87,12 +87,10 @@ export default function Table_prod({
       return;
     }
 
-    const ressult = await targetProd.addExchange(v);
+    const result = await targetProd.addExchange(v);
 
-    if (ressult === false) {
-      myAlert.warning({ title: '超過上限' });
-    } else if (ressult === 'isLoading_getProd') {
-      myAlert.warning({ title: '正在取得產品資料' });
+    if (typeof result === 'string') {
+      myAlert.warning({ title: result });
     } else {
       setShowInputModal(false);
     }

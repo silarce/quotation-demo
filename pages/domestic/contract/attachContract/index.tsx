@@ -11,7 +11,13 @@ import Decimal from 'decimal.js';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // components
-import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
+// import QuotationProfile from 'components/page/domestic/quotation/quotationProfile_old';
+
+import QuotationProfile, {
+  Tcontrol_profile,
+  Tstate_profile,
+  useProfile,
+} from 'components/page/domestic/quotation/quotationProfile';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
@@ -19,6 +25,7 @@ import Table_others from 'components/page/domestic/quotation/quotation/product/t
 import Summary, {
   TsummaryControl,
   TpayInfoControl,
+  useAnnoAndQr,
 } from 'components/page/domestic/quotation/quotation/summary/summary';
 // import Signature, { Tcontroll_signature } from 'components/page/domestic/quotation/quotationSinature_3';
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
@@ -36,8 +43,11 @@ import {
   TcreateQuotationProductDto,
   TquotationProductDto,
   useQuotation_id_attachments,
+  TquotationContentDto,
+  TquotationContractDto,
 } from 'js/api/api_quotation';
-import { TuserDto } from 'js/api/dtoTypes';
+import { TuserDto, TcustomerDto } from 'js/api/dtoTypes';
+import { Class_product } from 'hooks/quotation/useProduct';
 
 // css
 import scss from 'pages/domestic/quotationList/quotation/quotation.module.scss';
@@ -47,6 +57,22 @@ import { useProductList } from 'hooks/quotation/useProduct';
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
 // ===========================================================================
+
+type Tstate_paymentMethodItem = { milestone: string; totalPaymentRatio: string };
+type Tstate_summary = {
+  discountRate: string;
+  tuneTotal: string;
+  subTotal: string;
+  salesTax: string;
+  total: string;
+  deliveryLocation: string;
+  deliveryDate: string;
+};
+
+// ===========================================================================
+
+// region START
+
 // 合約 追加追減介面
 export default function AttachContract({
   //
@@ -57,41 +83,51 @@ export default function AttachContract({
   const router = useRouter();
   const contractId = router.query.contractId as string | undefined;
 
-  const [isLading, setIsLading] = useState(false);
-
-  // const userId = userInfo?.employee?.id;
   const userEmp = userInfo?.employee;
   const userId = userEmp?.id;
 
-  let taxRate: number | undefined;
+  let taxRate: number | undefined = undefined;
 
-  // ----------------------------------------------------
-  const { data, update } = useGetContract_id_forAttach(contractId);
+  // ------------------------------------------------------------------------------
+  // region useState
 
-  taxRate = data?.salesTax ? 0.05 : 0;
+  const [isLading, setIsLading] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsLading(true);
-        await update();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '讀取追加追減報價單失敗', content: err.message });
-      } finally {
-        setIsLading(false);
-      }
-    })();
-  }, [contractId]);
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
+
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
+  const [targetProdKey_attach, setTargetProdKey_attach] = useState<string>('n');
+
+  const [state_summary, setState_Summary] = useState<Tstate_summary>({
+    discountRate: '100',
+    tuneTotal: '',
+    subTotal: '',
+    salesTax: '',
+    total: '',
+    deliveryLocation: '',
+    deliveryDate: '',
+  });
+
+  const [state_paymentMethod, setState_paymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>(
+    []
+  );
+
+  // ------------------------------------------------------------------------------
+
+  // region useData
+
+  const { data: data_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
+
+  taxRate = data_contract?.salesTax ? 0.05 : 0;
 
   const formatedContent = useMemo(() => {
-    if (!data) {
+    if (!data_contract) {
       return undefined;
     }
 
-    const content_copy = _.cloneDeep(data.content);
+    const content_copy = _.cloneDeep(data_contract.content);
 
-    let subContracts = data.subContracts;
+    let subContracts = data_contract.subContracts;
 
     subContracts = _.sortBy(subContracts, 'version');
 
@@ -117,9 +153,17 @@ export default function AttachContract({
     content_copy.total = total;
 
     return content_copy;
-  }, [data]);
+  }, [data_contract]);
 
   // ------------------------------------------------------------------
+
+  // region USE HOOK
+  //
+  //
+  //
+  //
+  //
+  // region useProductList
   const {
     productList,
     prodCellConfig,
@@ -157,51 +201,71 @@ export default function AttachContract({
   } = useProductList({
     productArr: formatedContent?.products,
     others: formatedContent?.others,
-    resetTrigger: data,
+    resetTrigger: data_contract,
     quotationDiscount: Number(formatedContent?.discount || '100'),
   });
 
-  const [targetProdKey, setTargetProdKey] = useState<string>('n');
-  const targetProd = productList[targetProdKey];
+  const { control_profile, state_profile, state_customer } = useProfile({
+    quotationContent: data_contract?.content,
+  });
 
-  const [targetProdKey_attach, setTargetProdKey_attach] = useState<string>('n');
-  const targetProd_attach = attachProdList[targetProdKey_attach];
+  const { state_anno, state_qr, control_anno, control_qr } = useAnnoAndQr({
+    quotationContent: data_contract?.content,
+  });
 
-  useEffect(() => {
-    targetProd?.getComAndAcce();
-  }, [targetProd]);
+  // 附件
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(formatedContent?.id);
 
   // ------------------------------------------------------------------
-  taxRate = 0.05;
 
+  // region REQUEST
+
+  const handle_reqModify = () => {
+    reqModify({
+      setIsLading,
+      router,
+      data_contract,
+      attachProdList,
+      contractId,
+      productList,
+      userId,
+      state_customer,
+      subTotal_calced,
+      salesTax_calced,
+      total_calced,
+      state_profile,
+      state_anno,
+      state_qr,
+      //
+      state_paymentMethod,
+      state_summary,
+    });
+  };
+
+  // ------------------------------------------------------------------
+
+  // region props
+
+  const targetProd = productList[targetProdKey];
+  const targetProd_attach = attachProdList[targetProdKey_attach];
+
+  const appendixParams = {
+    fileInfoArr,
+    removeFileInfo: () => {},
+    toSetFileInfo: () => {},
+  };
+
+  // taxRate = 0.05;
   const subTotal_ori = attachTotal ?? 0;
   const subTotal_calced = subTotal_ori;
   const salesTax_calced = Number(new Decimal(subTotal_calced).mul(taxRate).toFixed(0));
   const total_calced = subTotal_calced + salesTax_calced;
 
-  const control_anno: TsummaryControl = {
-    stringArr: data?.annotations ?? [],
-    editString: () => {},
-    addString: () => {},
-    delString: () => {},
-    addStrArr: () => {},
-    replaceStrArr: () => {},
-  };
-
-  const control_qr: TsummaryControl = {
-    stringArr: data?.quotationRanges ?? [],
-    editString: () => {},
-    addString: () => {},
-    delString: () => {},
-    addStrArr: () => {},
-    replaceStrArr: () => {},
-  };
-
   const payInfoControl: TpayInfoControl = {
     payment: {
       haveTax: {
         // value: !!data?.salesTax,
-        value: taxRate === 0.05,
+        value: !!state_summary.salesTax,
         onChange: (v) => {
           // if (quotationProdSubTotal === '') {
           //   calcSubTotalPrice();
@@ -213,7 +277,7 @@ export default function AttachContract({
       discountRate: {
         inputAttr: {
           disabled: true,
-          value: data?.discount ?? '',
+          value: state_summary.discountRate ?? '',
           onChange: () => {},
         },
       },
@@ -245,31 +309,68 @@ export default function AttachContract({
 
     delivery: {
       deliveryLocation: {
-        value: data?.deliveryLocation ?? '',
-        onChange: () => {},
+        // value: data_contract?.deliveryLocation ?? '',
+        value: state_summary.deliveryLocation ?? '',
+        onChange: (v) => {
+          setState_Summary({ ...state_summary, deliveryLocation: v });
+        },
       },
       deliveryDate: {
-        value: data?.deliveryDate ?? '',
-        onChange: () => {},
+        // value: data_contract?.deliveryDate ?? '',
+        value: state_summary.deliveryDate ?? '',
+        onChange: (v) => {
+          setState_Summary({ ...state_summary, deliveryDate: v });
+        },
       },
     },
     paymentMethod: {
       arr:
-        data?.paymentMethods.map((item) => {
+        state_paymentMethod.map((item, index) => {
           const { milestone, totalPaymentRatio } = item;
+
+          const onChange = (v: string) => {
+            if (v === '') {
+              v = '0';
+            }
+
+            setState_paymentMethod((state) => {
+              const copy = [...state];
+              copy[index].totalPaymentRatio = v;
+
+              return copy;
+            });
+          };
+
+          const delSelf = () => {
+            setState_paymentMethod((state) => {
+              const copy = [...state];
+              copy.splice(index, 1);
+
+              return copy;
+            });
+          };
 
           return {
             label: milestone,
             value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
-            onChange: () => {},
-            delSelf: () => {},
+            onChange,
+            delSelf,
           };
           //
         }) ?? [],
-      addMethod: () => {},
+      addMethod: (v) => {
+        setState_paymentMethod((state) => {
+          const copy = [...state];
+          copy.push({ milestone: v, totalPaymentRatio: '' });
+
+          return copy;
+        });
+      },
     },
   };
 
+  // ___________________________________________________________________________
+  // ___________________________________________________________________________
   const { control_signature } = useMemo(() => {
     const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
       {
@@ -287,10 +388,47 @@ export default function AttachContract({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userEmp]);
 
-  // 附件
-  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(formatedContent?.id);
+  // ___________________________________________________________________________
+  // ___________________________________________________________________________
 
-  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
+  const panel: TpanelList = [
+    //
+    {
+      type: 'redButton',
+      label: '上傳',
+      onClick: handle_reqModify,
+    },
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        //
+        router.back();
+      },
+    },
+  ];
+
+  // --------------------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    targetProd?.getComAndAcce();
+  }, [targetProd]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsLading(true);
+        await update_contract();
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '讀取追加追減報價單失敗', content: err.message });
+      } finally {
+        setIsLading(false);
+      }
+    })();
+  }, [contractId]);
 
   useEffect(() => {
     const arr = attachments?.map((item) => {
@@ -310,169 +448,50 @@ export default function AttachContract({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachments]);
 
-  const appendixParams = {
-    fileInfoArr,
-    removeFileInfo: () => {},
-    toSetFileInfo: () => {},
-  };
-
-  // ------------------------------------------------------------------
-
-  const reqModify = async () => {
-    try {
-      setIsLading(true);
-
-      if (!data || !attachProdList || !contractId) {
-        return;
-      }
-
-      const content = _.cloneDeep(data.content);
-      const theContent = {
-        //
-        ...content,
-        // 根據api文件，後端不收
-        // 但是預防萬一，還是把這些資料清掉比較安心
-        reviewSalesEmployee: undefined,
-        salesReviewedAt: undefined,
-        toSalesAt: undefined,
-        reviewSupervisorEmployee: undefined,
-        supervisorReviewedAt: undefined,
-        toSupervisorAt: undefined,
-        reviewWorkDirectorEmployee: undefined,
-        workDirectorReviewedAt: undefined,
-        toWorkDirectorAt: undefined,
-        reviewManagerEmployee: undefined,
-        managerReviewedAt: undefined,
-        toManagerAt: undefined,
-      };
-
-      // 材料配件有問題的主產品
-      let breakComponentProdIndex_div = '';
-      let breakComponentProdIndex_attach = '';
-
-      // 追減，要送給後端的是追減後的資料
-      // 例如原本五個，追減兩個，送給後端的要是三個
-      const divProdArr = (() => {
-        const arr = Object.values(productList).map((item, index) => {
-          if (item.isAttachDiv) {
-            if (item && !item.isComponentOk) {
-              breakComponentProdIndex_div = breakComponentProdIndex_div + `${index + 1} `;
-            }
-
-            return item.body_attachDiv;
-          }
-
-          return undefined;
-        });
-
-        return arr.filter((item) => !!item) as (TcreateQuotationProductDto & {
-          id: string | undefined;
-        })[];
-      })();
-
-      if (breakComponentProdIndex_div) {
-        return myAlert.warning({
-          title: '追減主產品之材料配件有誤',
-          content: `請檢查第${breakComponentProdIndex_div}項主產品是否正確`,
-        });
-      }
-
-      // 追加跟變更
-      const attachProdArr = Object.values(attachProdList).map((prod, index) => {
-        if (!prod.isComponentOk) {
-          breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
-        }
-
-        return prod.body;
-      });
-
-      if (breakComponentProdIndex_attach) {
-        return myAlert.warning({
-          title: '追加/變更主產品之材料配件有誤',
-          content: `請檢查第${breakComponentProdIndex_attach}項主產品是否正確`,
-        });
-      }
-
-      const body: TcreateModifyQuotationDto = {
-        ...theContent,
-        products: [...divProdArr, ...attachProdArr],
-        // agentId: content.agentEmployee?.id,
-        agentId: userId,
-        // managerId: content.managerEmployee?.id,
-        // supervisorId: content.supervisorEmployee?.id,
-        subTotal: subTotal_calced,
-        salesTax: salesTax_calced,
-        total: total_calced,
-        //
-        // 其他設定有金錢，沒有參與追加追減，出現在追加追減報價單裡可能會被誤解
-        // 應該不送才是對的
-        others: [],
-        //
-      };
-
-      let isDoorModalNameEmpty = false;
-      body.products?.forEach((prod) => {
-        if (!prod.doorModelName) {
-          isDoorModalNameEmpty = true;
-        }
-      });
-
-      if (isDoorModalNameEmpty) {
-        myAlert.info({ title: '請確認所有主產品都有門型' });
-
-        return;
-      }
-
-      try {
-        await apiQuotationModify(contractId, body);
-        setIsLading(false);
-        router.back();
-      } catch (error) {
-        const err = error as Error;
-        myAlert.err({ title: '上傳失敗', content: err.message });
-      }
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '上傳失敗', content: err.message });
-    } finally {
-      setIsLading(false);
+  useEffect(() => {
+    if (!data_contract?.content) {
+      return;
     }
-  };
 
-  // ------------------------------------------------------------------
+    const {
+      //
+      discount,
+      tuneTotal,
+      subTotal,
+      salesTax,
+      total,
+      deliveryLocation,
+      deliveryDate,
+      paymentMethods,
+      annotations,
+      quotationRanges,
+    } = data_contract?.content;
 
-  const tagList: TtagList = [
-    {
-      label: `合約編號 ${formatedContent?.quotationNumber}`,
-      onClick: () => {},
-    },
-  ];
+    // setAnnotation(annotations ?? []);
+    // setQr(quotationRanges ?? []);
+    setState_paymentMethod(_.cloneDeep(paymentMethods));
 
-  const panel: TpanelList = [
-    //
-    {
-      type: 'redButton',
-      label: '上傳',
-      onClick: reqModify,
-    },
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: () => {
-        //
-        router.back();
-      },
-    },
-  ];
+    setState_Summary({
+      discountRate: discount,
+      tuneTotal,
+      subTotal: String(subTotal),
+      salesTax: String(salesTax),
+      total: String(total),
+      deliveryLocation,
+      deliveryDate,
+    });
+  }, [data_contract?.content]);
 
-  // ==========================================================================
+  // ---------------------------------------------------------------------------
+  // region RENDER
+
   return (
     <SubLayer isLoading_all={isLading}>
-      <PageHeader02 tagList={tagList} panelList={panel} />
+      <PageHeader02 tag={`合約編號 ${data_contract?.contractNumber}　建立追加追減報價單`} panelList={panel} />{' '}
       <div>
         <div className={scss.quotation}>
           {/*  */}
-          <QuotationProfile profile={data?.content} disabled={true} onProfileChange={() => {}} />
+          <QuotationProfile control={control_profile} disabled={false} />
           {/*  */}
           <div className={classNames(scss.switchBar)}>
             <div>合約項目</div>
@@ -498,7 +517,7 @@ export default function AttachContract({
               panelBox="resetChangeBox"
               targetProd={targetProd}
               attachTotal={attachDivTotal.toLocaleString()}
-              discountRate={data?.discount ?? ''} // 報價單總折數
+              discountRate={data_contract?.discount ?? ''} // 報價單總折數
               changeDiscountRate={(v) => {}}
             />
 
@@ -569,7 +588,7 @@ export default function AttachContract({
               // targetProd={targetProd}
               attachTotal={attachAddTotal}
               isRedBorder={true}
-              discountRate={data?.discount ?? ''} // 報價單總折數
+              discountRate={data_contract?.discount ?? ''} // 報價單總折數
               changeDiscountRate={(v) => {}}
             />
 
@@ -617,12 +636,13 @@ export default function AttachContract({
         {/*  */}
         {/*  */}
         <Summary
-          disabled={true}
+          disabled={false}
           payInfoControl={payInfoControl}
           control_anno={control_anno}
           control_qr={control_qr}
           appendixParams={appendixParams}
           avgDiscount_withQty={avgDiscount_withQty}
+          disabled_file={true}
         />
 
         {/* 簽名 */}
@@ -635,8 +655,234 @@ export default function AttachContract({
   );
 }
 
+// region END
+
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+
+// region reqModify
+
+const reqModify = async ({
+  //
+  setIsLading,
+  router,
+  data_contract,
+  attachProdList,
+  contractId,
+  productList,
+  userId,
+  state_customer,
+  subTotal_calced,
+  salesTax_calced,
+  total_calced,
+  state_profile,
+  state_anno,
+  state_qr,
+  //
+  state_paymentMethod,
+  state_summary,
+}: {
+  router: ReturnType<typeof useRouter>;
+  setIsLading: React.Dispatch<React.SetStateAction<boolean>>;
+  data_contract: TquotationContractDto | undefined;
+  attachProdList: {
+    [key: string]: Class_product;
+  };
+  contractId: string | undefined;
+  productList: {
+    [key: string]: Class_product;
+  };
+  userId: string | undefined;
+  state_customer: TcustomerDto | null | undefined;
+  subTotal_calced: number;
+  salesTax_calced: number;
+  total_calced: number;
+  state_profile: Tstate_profile;
+  state_anno: string[];
+  state_qr: string[];
+  //
+  state_paymentMethod: Tstate_paymentMethodItem[];
+  state_summary: Tstate_summary;
+}) => {
+  try {
+    setIsLading(true);
+
+    if (!data_contract || !attachProdList || !contractId) {
+      return;
+    }
+
+    const content_copy = _.cloneDeep(data_contract.content);
+    const copy_shallow = {
+      //
+      ...content_copy,
+      // 根據api文件，後端不收
+      // 但是預防萬一，還是把這些資料清掉比較安心
+      reviewSalesEmployee: undefined,
+      salesReviewedAt: undefined,
+      toSalesAt: undefined,
+      reviewSupervisorEmployee: undefined,
+      supervisorReviewedAt: undefined,
+      toSupervisorAt: undefined,
+      reviewWorkDirectorEmployee: undefined,
+      workDirectorReviewedAt: undefined,
+      toWorkDirectorAt: undefined,
+      reviewManagerEmployee: undefined,
+      managerReviewedAt: undefined,
+      toManagerAt: undefined,
+    };
+
+    delete copy_shallow.reviewSalesEmployee;
+    delete copy_shallow.salesReviewedAt;
+    delete copy_shallow.toSalesAt;
+    delete copy_shallow.reviewSupervisorEmployee;
+    delete copy_shallow.supervisorReviewedAt;
+    delete copy_shallow.toSupervisorAt;
+    delete copy_shallow.reviewWorkDirectorEmployee;
+    delete copy_shallow.workDirectorReviewedAt;
+    delete copy_shallow.toWorkDirectorAt;
+    delete copy_shallow.reviewManagerEmployee;
+    delete copy_shallow.managerReviewedAt;
+    delete copy_shallow.toManagerAt;
+
+    // 材料配件有問題的主產品
+    let breakComponentProdIndex_div = '';
+    let breakComponentProdIndex_attach = '';
+
+    // 追減，要送給後端的是追減後的資料
+    // 例如原本五個，追減兩個，送給後端的要是三個
+    const divProdArr = (() => {
+      const arr = Object.values(productList).map((item, index) => {
+        if (item.isAttachDiv) {
+          if (item && !item.isComponentOk) {
+            breakComponentProdIndex_div = breakComponentProdIndex_div + `${index + 1} `;
+          }
+
+          return item.body_attachDiv;
+        }
+
+        return undefined;
+      });
+
+      return arr.filter((item) => !!item) as (TcreateQuotationProductDto & {
+        id: string | undefined;
+      })[];
+    })();
+
+    if (breakComponentProdIndex_div) {
+      return myAlert.warning({
+        title: '追減主產品之材料配件有誤',
+        content: `請檢查第${breakComponentProdIndex_div}項主產品是否正確`,
+      });
+    }
+
+    // 追加跟變更
+    const attachProdArr = Object.values(attachProdList).map((prod, index) => {
+      if (!prod.isComponentOk) {
+        breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+      }
+
+      return prod.body;
+    });
+
+    if (breakComponentProdIndex_attach) {
+      return myAlert.warning({
+        title: '追加/變更主產品之材料配件有誤',
+        content: `請檢查第${breakComponentProdIndex_attach}項主產品是否正確`,
+      });
+    }
+
+    if (!userId) {
+      return myAlert.warning({
+        title: '沒有userInfo.employee.id',
+      });
+    }
+
+    const customerId = state_customer?.id;
+
+    if (!customerId) {
+      return myAlert.warning({
+        title: '請選擇客戶',
+      });
+    }
+
+    const body: TcreateModifyQuotationDto = {
+      ...copy_shallow,
+      products: [...divProdArr, ...attachProdArr],
+
+      // agentId: content.agentEmployee?.id,
+      agentId: userId,
+      // managerId: content.managerEmployee?.id,
+      // supervisorId: content.supervisorEmployee?.id,
+      subTotal: subTotal_calced,
+      salesTax: salesTax_calced,
+      total: total_calced,
+      //
+      // 其他設定有金錢，沒有參與追加追減，出現在追加追減報價單裡可能會被誤解
+      // 應該不送才是對的
+      others: [],
+      discount: copy_shallow.discount as `${number}`,
+      //
+
+      validityPeriod: state_profile.validityPeriod ?? '',
+      //
+      customerId,
+      //
+      projectName: state_profile.projectName ?? '',
+      county: state_profile.county ?? '',
+      district: state_profile.district ?? '',
+      address: state_profile.address ?? '',
+      contactPerson: state_profile.contactPerson ?? '',
+      contactNumber: state_profile.contactNumber ?? '',
+      faxNumber: state_profile.faxNumber ?? '',
+      trackProgress: state_profile.trackProgress ?? '',
+      projectProgress: state_profile.projectProgress ?? '',
+      //
+      annotations: state_anno,
+      quotationRanges: state_qr,
+      //
+      deliveryLocation: state_summary.deliveryLocation,
+      deliveryDate: state_summary.deliveryDate,
+      paymentMethods: state_paymentMethod,
+    };
+
+    let isDoorModalNameEmpty = false;
+    body.products?.forEach((prod) => {
+      if (!prod.doorModelName) {
+        isDoorModalNameEmpty = true;
+      }
+    });
+
+    if (isDoorModalNameEmpty) {
+      myAlert.info({ title: '請確認所有主產品都有門型' });
+
+      return;
+    }
+
+    try {
+      await apiQuotationModify(contractId, body);
+      setIsLading(false);
+      router.back();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '上傳失敗', content: err.message });
+    }
+  } catch (error) {
+    const err = error as Error;
+    myAlert.err({ title: '上傳失敗', content: err.message });
+  } finally {
+    setIsLading(false);
+  }
+};
+
+// ==============================================================================
 /**
 
+// 這段沒過期 2024-05-23
+Gina說product裡面帶id，之後這個product就會有attachedToProductId
+
+// w 以下資訊大部分應該已過期 2024-05-23
 追加追減流程
 在發包列表選擇合約，開始該合約的追加追減
 page url

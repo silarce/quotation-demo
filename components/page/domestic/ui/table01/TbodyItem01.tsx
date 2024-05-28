@@ -24,6 +24,7 @@ type TBodyItemContent = {
   customerName: string;
   agentEmployeeName: string;
   viewRef_bottom?: (node?: Element | null | undefined) => void;
+  isAttachQuotation?: boolean;
 };
 
 export type { TBodyItemContent };
@@ -55,6 +56,7 @@ export default function TbodyItem01({
     customerName,
     agentEmployeeName,
     viewRef_bottom,
+    isAttachQuotation,
   } = quotationContent;
 
   // const date = moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD');
@@ -85,7 +87,7 @@ export default function TbodyItem01({
           <span className={scss.country}>{county}</span>
         </div>
         <span>{projectName}</span>
-        <div></div>
+        <div>{isAttachQuotation && '追加追減報價單'}</div>
       </div>
       {children}
     </CellWithBar>

@@ -91,6 +91,11 @@ class Class_other {
     this.calcAllPrice();
     this.reRender();
   }
+
+  get unitPrice_number() {
+    return this._data.unitPrice;
+  }
+
   get unitPrice_locale() {
     return String(this._data.unitPrice || '0');
     // return this._data.unitPrice.toLocaleString();
@@ -113,6 +118,10 @@ class Class_other {
   }
 
   get totalPrice() {
+    return this._data.totalPrice;
+  }
+
+  get totalPrice_num() {
     return this._data.totalPrice;
   }
   // set totalPrice(v) {

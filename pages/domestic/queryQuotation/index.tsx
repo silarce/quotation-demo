@@ -168,27 +168,39 @@ export default function Budget() {
       const isLastPage = pageArr.length - 1 === pageIndex;
 
       arr.forEach((quotation, index) => {
-        const { contents, latestContent, id } = quotation;
+        const { contents, latestContent, id, attachedToContractId } = quotation;
         const isContract = latestContent.status === 'Contract';
+
+        const isAttachtQuotation = !!attachedToContractId;
 
         const processChain = quotationToReiviewChain(latestContent);
         const sortedContent = _.sortBy(contents, (content) => content.version).reverse();
 
-        const href_head = isContract
-          ? {
-              pathname: '/domestic/contract/quotation',
-              query: {
-                id: latestContent.contract?.id,
-                version: 1,
-              },
-            }
-          : {
-              pathname: '/domestic/quotationList/quotation',
-              query: {
-                id: id,
-                status: latestContent.status,
-              },
-            };
+        const href_contract = {
+          pathname: '/domestic/contract/quotation',
+          query: {
+            id: latestContent.contract?.id,
+            version: 1,
+          },
+        };
+
+        const href_quotation = {
+          pathname: '/domestic/quotationList/quotation',
+          query: {
+            id: id,
+            status: latestContent.status,
+          },
+        };
+
+        const href_attachQuotation = {
+          pathname: '/domestic/quotationList/attachQuotation',
+          query: {
+            id: id,
+            status: latestContent.status,
+          },
+        };
+
+        const href_head = isContract ? href_contract : isAttachtQuotation ? href_attachQuotation : href_quotation;
 
         const latestCustomer = sortedContent[0].customer;
 
@@ -207,6 +219,9 @@ export default function Budget() {
           processChain: processChain,
           trackProgress: latestContent.trackProgress,
           projectProgress: latestContent.projectProgress,
+
+          isAttachQuotation: isAttachtQuotation,
+
           onEditConfirm: async ({ trackProgress, projectProgress }) => {
             const body = { trackProgress, projectProgress };
 

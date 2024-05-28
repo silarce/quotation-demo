@@ -3220,6 +3220,14 @@ class Class_product {
     this.reRender();
   }
 
+  get unitPrice_num() {
+    if (!this._unitPrice) {
+      return 0;
+    }
+
+    return Number(this._unitPrice);
+  }
+
   // 複價
   get totalPrice() {
     if (!this._totalPrice) {
@@ -3691,8 +3699,9 @@ class Class_product {
 
     const asyncCall = async () => {
       await this.getComAndAcce();
+      // this.callCalcSubTotal();
 
-      this.calcProdAllprice_timeout();
+      // // this.calcProdAllprice_timeout();
       this.reRender();
     };
 
@@ -3722,12 +3731,18 @@ class Class_product {
 
   // 新增變更的prod
   async addExchange(v: string) {
+    // 不可以超過原本的數量
     if (Number(v) > this.remainQty) {
-      return false;
+      return '超過上限';
     }
 
+    // 需求變更 要可以超過上限 issue#501
+    // if (false) {
+    //   return '超過上限';
+    // }
+
     if (this.isLoading_getProd) {
-      return 'isLoading_getProd';
+      return '正在取得產品資料';
     }
 
     await this.getComAndAcce();
@@ -3763,12 +3778,14 @@ class Class_product {
 
     this.reRender();
 
-    return true;
+    // return true;
     //
   }
 
   // 清空變更prod
   clearAttach() {
+    console.log('this', this);
+
     this._exchangeProdList = {};
     this._reduceQty = '0';
     this.onDiscountChange();
