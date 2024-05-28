@@ -1281,7 +1281,7 @@ const useModalQuotationPdf = ({
     const paymentMethodsArr = paymentMethods.map((pm) => {
       return {
         label: pm.milestone,
-        value: new Decimal(pm.totalPaymentRatio || 0).mul(100).toString(),
+        value: new Decimal(pm.totalPaymentRatio || 0).toString(),
       };
     });
 

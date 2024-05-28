@@ -366,9 +366,10 @@ export type TreviewerPresets = {
 
 /**付款辦法 */
 export type TpaymentMethodDto = {
-  /**付款階段(里程碑) */
+  //付款階段(里程碑)
   milestone: string;
-  /**總付款比例(0.0 - 1.0) */
+  //總付款比例(0.0 - 1.0)
+  // 不知何時變成送1~100了
   totalPaymentRatio: string;
 };
 
