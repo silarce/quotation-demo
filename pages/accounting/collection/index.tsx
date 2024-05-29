@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
+import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -14,22 +15,38 @@ import Table01 from 'components/global/gear/table/table01';
 
 // type
 import type { Toption } from 'js/utils/options/options';
+import type { TaccountantDto } from 'js/api/dtoTypes';
+
+// css
+import scss from './index.module.scss';
 
 // =============================================================================
 
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
-type Tcategory = '匯款' | '票據' | '現金';
+// type paymentType = '匯款' | '票據' | '現金';
+type TpaymentType = TaccountantDto['paymentType'];
 
 type Tquery = {
-  category: Tcategory | undefined;
+  paymentType: TpaymentType | undefined;
   year: string | undefined;
   month: string | undefined;
 };
 
+type Tstate_accountant = {
+  insertDate: Moment;
+  importAccountingNumber: string;
+  noteNumber: string;
+  accountingNumber: string;
+  vendorName: string;
+  price: string;
+  billSerialNumber: string;
+  notes: string;
+};
+
 // =============================================================================
 
-const defaultCategory: Tcategory = '匯款';
+const defaultPaymentType: TpaymentType = '匯款';
 
 // =============================================================================
 
@@ -41,7 +58,7 @@ export default function Collection() {
 
   const router = useRouter();
   const query = router.query as Tquery;
-  const { category = defaultCategory, year = String(thisYear), month = String(thisMonth) } = query;
+  const { paymentType = defaultPaymentType, year = String(thisYear), month = String(thisMonth) } = query;
   const year_tw = Number(year) - 1911;
 
   // ------------------------------------------------------------------------------
@@ -80,10 +97,12 @@ export default function Collection() {
       <div>
         {/*  */}
         <div>
-          <span>{category}</span>
+          <span>{paymentType}</span>
         </div>
 
-        <div></div>
+        <div>
+          <Thead paymentType="匯款" />
+        </div>
 
         {/*  */}
       </div>
@@ -101,9 +120,9 @@ export default function Collection() {
 const useTagList = () => {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { category = defaultCategory } = query;
+  const { paymentType: category = defaultPaymentType } = query;
 
-  const switchCategory = (category: Tcategory) => {
+  const switchCategory = (category: TpaymentType) => {
     router.replace({
       query: {
         ...query,
@@ -261,3 +280,193 @@ const create_panelList = ({
 
 // =========================================================================
 // region component
+
+const Cell = ({
+  //
+  value,
+  onChange,
+  style,
+  className,
+}: {
+  value: string;
+  onChange: (str: string) => void;
+  style: React.CSSProperties;
+  className?: string;
+}) => {
+  return (
+    <div className={classNames(scss.cell, className)} style={style}>
+      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} />
+    </div>
+  );
+};
+
+const Cell_span = ({
+  //
+  children,
+  style,
+  className,
+}: {
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+  className?: string;
+}) => {
+  return (
+    <div className={classNames(scss.cell, className)} style={style}>
+      {children}
+    </div>
+  );
+};
+
+const Thead = ({ paymentType }: { paymentType: TpaymentType }) => {
+  const keyArr = lookup_keyArr[paymentType];
+
+  return (
+    <div className={classNames(scss.row, scss.thead)}>
+      {keyArr.map((key) => {
+        const config = configList[key];
+
+        const label = config?.label ?? config?.labelByPaymentType?.[paymentType] ?? key;
+
+        return (
+          <Cell_span key={key} {...config}>
+            {label}
+          </Cell_span>
+        );
+      })}
+    </div>
+  );
+};
+
+const Row = ({ data_accountant }: { data_accountant: TaccountantDto }) => {
+  return <div></div>;
+};
+
+// =========================================================================
+
+// region config
+
+type TaccountantKey = keyof TaccountantDto | 'btn';
+
+type Tconfig = {
+  label?: string;
+  style: React.CSSProperties;
+  className?: string;
+  labelByPaymentType?: {
+    [key in TpaymentType]?: string;
+  };
+};
+
+type TconfigList = {
+  [key in TaccountantKey]?: Tconfig;
+};
+
+const baseArr: TaccountantKey[] = ['accountingNumber', 'vendorName', 'price', 'billSerialNumber', 'notes'];
+
+const lookup_keyArr: {
+  [key in TpaymentType]: TaccountantKey[];
+} = {
+  匯款: ['btn', 'insertDate', 'importAccountingNumber', ...baseArr],
+  票據: ['btn', 'insertDate', 'noteNumber', ...baseArr],
+  現金: ['btn', 'insertDate', ...baseArr],
+} as const;
+
+const configList: TconfigList = {
+  btn: {
+    label: '',
+    style: {
+      width: 100,
+    },
+    className: '',
+  },
+  insertDate: {
+    style: {
+      width: 100,
+    },
+    className: '',
+    labelByPaymentType: {
+      匯款: '匯入日期',
+      票據: '收票日期',
+      現金: '收現日期',
+    },
+  },
+  accountingNumber: {
+    label: '存入帳號',
+    style: {
+      width: 185,
+    },
+    className: '',
+  },
+  //
+  noteNumber: {
+    label: '票據號碼',
+    style: {
+      width: 185,
+    },
+    className: '',
+  },
+  importAccountingNumber: {
+    label: '匯入帳號',
+    style: {
+      width: 185,
+    },
+    className: '',
+  },
+  //
+  vendorName: {
+    label: '廠商名稱',
+    style: {
+      width: 185,
+    },
+    className: '',
+  },
+  price: {
+    label: '金額',
+    style: {
+      width: 185,
+    },
+    className: '',
+  },
+  billSerialNumber: {
+    label: '收入傳票序號',
+    style: {
+      width: 185,
+    },
+    className: '',
+  },
+  notes: {
+    label: '備註',
+    style: { flex: 'auto' },
+    className: '',
+  },
+};
+
+// =========================================================================
+
+// region fakeData
+
+const fake_accountant: TaccountantDto = {
+  id: '1',
+  createdAt: '2021-09-01T00:00:00',
+  updatedAt: '20221-09-01T00:00:00',
+  paymentType: '匯款',
+  accountingNumber: 'a-55-aa5555-777',
+  insertDate: '101-11-01',
+  vendorName: '八八八有限公司',
+  price: 9999,
+  notes: 'AAAA',
+  noteNumber: null,
+  fee: 9999,
+  noteMaturityDate: null,
+  invoice: null,
+
+  //
+  billSerialNumber: null,
+  importAccountingNumber: 'a-454554-sd55455',
+};
+
+const fake_accountantArr = Array.from({ length: 10 }, (_, i) => {
+  return {
+    ...fake_accountant,
+    id: String(i),
+  };
+});
