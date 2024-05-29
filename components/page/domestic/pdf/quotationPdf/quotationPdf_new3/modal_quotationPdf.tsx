@@ -162,11 +162,15 @@ export default function Modal_quotationPdf({
   };
 
   const handle_dlExcel = () => {
+    const prodArr = pdfData?.prodArr ?? [];
+
+    const chunkedProdArr_excel = _.chunk(prodArr, excelRowMaxQty);
+
     pdfData &&
       dlExcel({
         fileName,
         data: pdfData,
-        chunkedProdArr,
+        chunkedProdArr: chunkedProdArr_excel,
         excelRowMaxQty,
       });
   };
