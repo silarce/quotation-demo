@@ -73,6 +73,7 @@ type Tprod = {
   totalPrice_num: number;
   qty_num: number;
   guideRailForExcel: string | null;
+  unit: string;
   //
   //
   // series 在quotationPdf_new2中還有 series
@@ -986,161 +987,6 @@ const config: Tconfig = {
   },
 };
 
-// region fakedata
-
-// const fakeTop: Ttop = {
-//   contactPerson: 'aaaaaa',
-//   customerName: 'aaaaaa',
-//   contactNumber: 'aaaaaa',
-//   faxNumber: 'aaaaaa',
-//   quotationNumber: 'S-9999',
-//   validityPeriod: '999',
-//   quotationDate: '99年09月09號',
-//   projectName: '種花工程',
-//   projectWholeAddress: '台中市花巷草弄20號',
-// };
-
-// const fakeBottom: Tbottom = {
-//   subTotal: '111',
-//   tax: 'aaaa',
-//   total: 'aaaa',
-//   total_chinese: 'ㄟㄟㄟㄟ',
-//   deliveryLocation: 'aaaa',
-//   deliveryDate: 'aaaa',
-//   paymentMethods: [{ label: 'aaa', value: 'aaa' }],
-//   notesArr: ['aaaa', 'aaaa', 'aaaa'],
-//   qrArr: ['aaaa', 'aaaa', 'aaaa'],
-//   agentName: 'aaaa',
-//   // subTotal_page: 'aaaa',
-//   //
-//   subTotal_num: 999,
-//   tax_num: 999,
-//   total_num: 999,
-// };
-
-// const fakeProd: Tprod = {
-//   itemName: 'aaa',
-//   size: 'aaa',
-//   doorModelName: 'aaa',
-//   materialName: 'aaa',
-//   thickness: 'aaa',
-//   materialSurface: 'aaa',
-//   // guideRail: 'SJ302_30.svg',
-//   guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${'SJ302_30.svg'}`,
-//   horsepower: 'aaa',
-//   closingType: 'aaa',
-//   qty: 'aaa',
-//   unitPrice: 'aaa',
-//   totalPrice: '111',
-//   notes: 'aaa',
-//   //
-//   totalPrice_num: 111,
-//   qty_num: 99,
-//   unitPrice_num: 10,
-//   guideRailForExcel: '\uE010',
-// };
-// const fakeProd2: Tprod = {
-//   itemName: 'aaaaaaaaaaaaaaaaaaa',
-//   size: 'aaa',
-//   doorModelName: 'aaa',
-//   materialName: 'aaa',
-//   thickness: 'aaa',
-//   materialSurface: 'aaa',
-//   guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${'SJ302_30.svg'}`,
-//   horsepower: 'aaa',
-//   closingType: 'aaa',
-//   qty: 'aaa',
-//   unitPrice: 'aaa',
-//   totalPrice: '111',
-//   notes: 'aaa',
-//   //
-//   totalPrice_num: 111,
-//   qty_num: 99,
-//   unitPrice_num: 10,
-//   guideRailForExcel: '\uE010',
-// };
-// const fakeProd3: Tprod = {
-//   itemName: 'aaa',
-//   size: 'aaa',
-//   doorModelName: 'aaa',
-//   materialName: 'aaa',
-//   thickness: 'aaa',
-//   materialSurface: 'aaa',
-//   guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${'SJ302_30.svg'}`,
-//   horsepower: 'aaa',
-//   closingType: 'aaa',
-//   qty: 'aaa',
-//   unitPrice: 'aaa',
-//   totalPrice: '111',
-//   notes: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-//   //
-//   totalPrice_num: 111,
-//   qty_num: 99,
-//   unitPrice_num: 10,
-//   guideRailForExcel: '',
-// };
-
-// const fakeProd_latest: Tprod = {
-//   itemName: 'latest',
-//   size: 'aaa',
-//   doorModelName: 'aaa',
-//   materialName: 'aaa',
-//   thickness: 'aaa',
-//   materialSurface: 'aaa',
-//   guideRail: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${'SJ302_30.svg'}`,
-//   horsepower: 'aaa',
-//   closingType: 'aaa',
-//   qty: 'aaa',
-//   unitPrice: 'aaa',
-//   totalPrice: '111',
-//   notes: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-//   //
-//   totalPrice_num: 111,
-//   qty_num: 99,
-//   unitPrice_num: 10,
-//   guideRailForExcel: '',
-// };
-
-// const fakeProdArr = [
-//   fakeProd,
-//   fakeProd2,
-//   fakeProd,
-//   fakeProd3,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd2,
-//   fakeProd,
-//   fakeProd3,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd2,
-//   fakeProd,
-//   fakeProd3,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd,
-//   fakeProd_latest,
-// ];
-
-// const fakeData: TpdfData = {
-//   top: fakeTop,
-//   prodArr: fakeProdArr,
-//   bottom: fakeBottom,
-// };
-
 // ===========================================================================
 // region Hook dataImport
 
@@ -1214,6 +1060,8 @@ const quotationProdAndOther_ToProdArr = ({
         material = '鍍鋅鋼板';
       }
 
+      const unit = '樘';
+
       return {
         itemName,
         size,
@@ -1225,7 +1073,7 @@ const quotationProdAndOther_ToProdArr = ({
         guideRail: guideRail ?? '',
         horsepower,
         closingType: closingType ?? '',
-        qty: String(quantity),
+        qty: String(quantity) + ' ' + unit,
         unitPrice: unitPrice.toLocaleString(),
         totalPrice: totalPrice.toLocaleString(),
         notes,
@@ -1234,17 +1082,18 @@ const quotationProdAndOther_ToProdArr = ({
         totalPrice_num: totalPrice,
         qty_num: quantity,
         guideRailForExcel: doorRailForExcel,
+        unit,
       };
     });
   })();
 
   const othersArr: Tprod[] = quotationOtherArr.map((item, index) => {
-    const { unitPrice, totalPrice } = item;
+    const { description, unitPrice, totalPrice, spec, unit } = item;
 
     return {
-      itemName: String(index + 1),
-      size: item.item,
-      doorModelName: item.description,
+      itemName: item.item,
+      size: spec ?? '',
+      doorModelName: description,
       materialName: '',
       thickness: '',
       materialSurface: '',
@@ -1252,7 +1101,7 @@ const quotationProdAndOther_ToProdArr = ({
       horsepower: '',
       closingType: '',
 
-      qty: String(item.quantity),
+      qty: String(item.quantity) + ' ' + unit,
       unitPrice: unitPrice.toLocaleString(),
       totalPrice: totalPrice.toLocaleString(),
       notes: item.notes,
@@ -1261,6 +1110,7 @@ const quotationProdAndOther_ToProdArr = ({
       totalPrice_num: totalPrice,
       qty_num: item.quantity,
       guideRailForExcel: null,
+      unit: unit ?? '',
     };
   });
 
@@ -1347,9 +1197,12 @@ const useModalQuotationPdf = ({
     };
 
     const paymentMethodsArr = paymentMethods.map((pm) => {
+      let value: string | number = new Decimal(pm.totalPaymentRatio || 0).toNumber();
+      value = value ? String(value) : '';
+
       return {
         label: pm.milestone,
-        value: new Decimal(pm.totalPaymentRatio || 0).toString(),
+        value: value,
       };
     });
 
