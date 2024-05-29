@@ -3474,9 +3474,9 @@ export type TaccountantDto = {
   updatedAt: string;
 
   paymentType: '匯款' | '票據' | '現金'; // 收款類型
-  accountingNumber: string; // 編號/存入帳號
+  accountingNumber: string | null; // 存入帳號
 
-  insertDate: string | null; // 匯入日期
+  insertDate: string | null; // 匯入日期 // 收款日 // 收票日
   vendorName: string | null; // 廠商名稱
 
   price: number; // 金額
@@ -3487,11 +3487,17 @@ export type TaccountantDto = {
   billSerialNumber: string | null; // 收入傳票序號
   noteMaturityDate: string | null; // 票據到期日
   invoice: TaccountsReceivableInvoiceDto[] | null;
+  //
+  importAccountingNumber: string | null; // 匯入帳號 // 匯款來源帳號
 };
 
-export type TcreateAccountantDto = Omit<TaccountantDto, 'id' | 'createdAt' | 'updatedAt' | 'noteMaturityDate'> & {
+export type TcreateAccountantDto = Extract<
+  TaccountantDto,
+  'paymentType' | 'accountingNumber' | 'insertDate' | 'vendorName' | 'price' | 'notes' | 'fee'
+> & {
   noteMaturityDate?: string | null; // 票據到期日
 };
+
 export type TupdateAccountantDto = Partial<TcreateAccountantDto>;
 
 /**扣款明細 */
