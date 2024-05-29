@@ -94,14 +94,15 @@ export default function Collection() {
         customeLeft={[<SelectBar key="selectBar" className={'ml-5'} selectPropsArr={selectPropsArr} />]}
         panelList={panelList}
       />
-      <div>
+      <div className={scss.body}>
         {/*  */}
-        <div>
-          <span>{paymentType}</span>
+        <div className={scss.cover} />
+        <div className={scss.tabBar}>
+          <div className={scss.tab}>{paymentType}</div>
         </div>
 
         <div>
-          <Thead paymentType="匯款" />
+          <Thead paymentType={paymentType} />
         </div>
 
         {/*  */}
@@ -120,13 +121,13 @@ export default function Collection() {
 const useTagList = () => {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { paymentType: category = defaultPaymentType } = query;
+  const { paymentType = defaultPaymentType } = query;
 
   const switchCategory = (category: TpaymentType) => {
     router.replace({
       query: {
         ...query,
-        category: category,
+        paymentType: category,
       },
     });
   };
@@ -134,17 +135,17 @@ const useTagList = () => {
   const tagList: TtagList = [
     {
       label: '匯款',
-      isActive: category === '匯款',
+      isActive: paymentType === '匯款',
       onClick: () => switchCategory('匯款'),
     },
     {
       label: '票據',
-      isActive: category === '票據',
+      isActive: paymentType === '票據',
       onClick: () => switchCategory('票據'),
     },
     {
       label: '現金',
-      isActive: category === '現金',
+      isActive: paymentType === '現金',
       onClick: () => switchCategory('現金'),
     },
   ];
