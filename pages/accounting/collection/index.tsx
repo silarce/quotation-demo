@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import classNames from 'classnames';
@@ -17,6 +17,9 @@ import Table01 from 'components/global/gear/table/table01';
 import type { Toption } from 'js/utils/options/options';
 import type { TaccountantDto } from 'js/api/dtoTypes';
 
+// icon
+import { IconCheck02, IconEdit, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+
 // css
 import scss from './index.module.scss';
 
@@ -34,7 +37,7 @@ type Tquery = {
 };
 
 type Tstate_accountant = {
-  insertDate: Moment;
+  insertDate: Moment | null;
   importAccountingNumber: string;
   noteNumber: string;
   accountingNumber: string;
@@ -103,6 +106,10 @@ export default function Collection() {
 
         <div>
           <Thead paymentType={paymentType} />
+
+          {fake_accountantArr.map((data, index) => {
+            return <Row key={data.id} data_accountant={data} />;
+          })}
         </div>
 
         {/*  */}
@@ -339,7 +346,39 @@ const Thead = ({ paymentType }: { paymentType: TpaymentType }) => {
 };
 
 const Row = ({ data_accountant }: { data_accountant: TaccountantDto }) => {
-  return <div></div>;
+  const [disabled = !!data_accountant.billSerialNumber, setDisabled] = useState(true);
+  const [state_accountant, setState_accountant] = useState<Tstate_accountant>(cre_emptyStateAccountant());
+
+  const paymentType = data_accountant.paymentType;
+
+  useEffect(() => {
+    if (disabled) {
+      setState_accountant({
+        insertDate: data_accountant.insertDate ? moment(data_accountant.insertDate) : null,
+        importAccountingNumber: data_accountant.importAccountingNumber ?? '',
+        noteNumber: data_accountant.noteNumber ?? '',
+        accountingNumber: data_accountant.accountingNumber ?? ' ',
+        vendorName: data_accountant.vendorName ?? '',
+        price: String(data_accountant.price),
+        billSerialNumber: data_accountant.billSerialNumber ?? '',
+        notes: data_accountant.notes ?? '',
+      });
+    }
+  }, [disabled, data_accountant.id, data_accountant.updatedAt]);
+
+  return (
+    <div className={scss.row}>
+      <div className={classNames(scss.cell, configList?.btn?.className)} style={configList?.btn?.style}>
+        <IconCheck02 className={classNames(disabled && 'invisible')} />
+        <IconEdit
+          //
+          className={classNames(!disabled && scss.active)}
+          onClick={() => setDisabled((state) => !state)}
+        />
+        <IconDelete01 />
+      </div>
+    </div>
+  );
 };
 
 // =========================================================================
@@ -361,14 +400,15 @@ type TconfigList = {
   [key in TaccountantKey]?: Tconfig;
 };
 
-const baseArr: TaccountantKey[] = ['accountingNumber', 'vendorName', 'price', 'billSerialNumber', 'notes'];
+const baseArr_before: TaccountantKey[] = ['btn', 'insertDate'];
+const baseArr_after: TaccountantKey[] = ['accountingNumber', 'vendorName', 'price', 'billSerialNumber', 'notes'];
 
 const lookup_keyArr: {
   [key in TpaymentType]: TaccountantKey[];
 } = {
-  匯款: ['btn', 'insertDate', 'importAccountingNumber', ...baseArr],
-  票據: ['btn', 'insertDate', 'noteNumber', ...baseArr],
-  現金: ['btn', 'insertDate', ...baseArr],
+  匯款: [...baseArr_before, 'importAccountingNumber', ...baseArr_after],
+  票據: [...baseArr_before, 'noteNumber', ...baseArr_after],
+  現金: [...baseArr_before, ...baseArr_after],
 } as const;
 
 const configList: TconfigList = {
@@ -470,4 +510,15 @@ const fake_accountantArr = Array.from({ length: 10 }, (_, i) => {
     ...fake_accountant,
     id: String(i),
   };
+});
+
+const cre_emptyStateAccountant = (): Tstate_accountant => ({
+  insertDate: null,
+  importAccountingNumber: '',
+  noteNumber: '',
+  accountingNumber: '',
+  vendorName: '',
+  price: '',
+  billSerialNumber: '',
+  notes: '',
 });
