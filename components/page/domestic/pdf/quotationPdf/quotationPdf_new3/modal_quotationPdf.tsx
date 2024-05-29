@@ -173,11 +173,11 @@ export default function Modal_quotationPdf({
 
   // --------------------------------------------------------------------------
 
-  useEffect(() => {
-    if (ref_pdf.current.length !== chunkedProdArr?.length) {
-      alert('注意 請檢查是否缺頁');
-    }
-  }, [chunkedProdArr, ref_pdf]);
+  // useEffect(() => {
+  //   if (ref_pdf.current.length !== chunkedProdArr?.length) {
+  //     alert('注意 請檢查是否缺頁');
+  //   }
+  // }, [chunkedProdArr, ref_pdf]);
 
   // ===============================================================================
   // region RENDER
@@ -187,7 +187,14 @@ export default function Modal_quotationPdf({
   }
 
   return (
-    <Modal visible={visible} onCancel={onCancel} width="fit-content" footer={null} closable={false}>
+    <Modal
+      visible={visible}
+      onCancel={onCancel}
+      width="fit-content"
+      footer={null}
+      closable={false}
+      destroyOnClose={true}
+    >
       <div className={scss.body}>
         <div>
           <MyButton_v2 onClick={handle_dlPdf} className="mr-5">
@@ -1225,7 +1232,9 @@ const useModalQuotationPdf = ({
     };
     // attachedProdArr
 
-    const quotationProductArr = attachedProdArr || products;
+    let quotationProductArr = attachedProdArr || products;
+
+    quotationProductArr = _.sortBy(quotationProductArr, 'order');
 
     const prodArr = quotationProdAndOther_ToProdArr({
       quotationProductArr: quotationProductArr,
