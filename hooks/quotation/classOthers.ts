@@ -66,6 +66,14 @@ class Class_other {
     this.reRender();
   }
 
+  get spec() {
+    return this._data.spec ?? '';
+  }
+  set spec(v) {
+    this._data.spec = v;
+    this.reRender();
+  }
+
   get description() {
     return this._data.description;
   }
@@ -165,6 +173,7 @@ class Class_other {
 type Tothers = {
   id?: string;
   item: string;
+  spec: string | null;
   description: string;
   quantity: number;
   unitPrice: number;
@@ -179,6 +188,7 @@ type TothersKey = string;
 const othersKeyArrOri: () => TothersKey[] = () => {
   return [
     'item',
+    'spec',
     'description',
     'quantity',
     'unit',
@@ -195,6 +205,15 @@ const othersCellConfig: TcellConfig = {
     label: '項目',
     inputSelProps: {
       wrapperStyle: { width: '60px' },
+      inputProps: {
+        props: {},
+      },
+    },
+  },
+  spec: {
+    label: '尺寸',
+    inputSelProps: {
+      wrapperStyle: { width: '150px' },
       inputProps: {
         props: {},
       },
@@ -290,6 +309,7 @@ const othersCellConfig: TcellConfig = {
 const emptyOthersOri: () => Tothers = () => {
   return {
     item: '',
+    spec: '',
     description: '',
     quantity: 0,
     unitPrice: 0,
