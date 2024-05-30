@@ -374,6 +374,7 @@ const dlExcel = async ({
         totalPrice_num,
         qty_num,
         guideRailForExcel,
+        unit,
       } = prod;
 
       // const doorRailUnicode
@@ -435,7 +436,7 @@ const dlExcel = async ({
       cellI.value = horsepower;
       cellJ.value = closingType;
       cellK.value = qty_num;
-      cellL.value = '樘';
+      cellL.value = unit;
       cellM.value = unitPrice_num;
       cellN.value = totalPrice_num;
       cellO.value = notes;
