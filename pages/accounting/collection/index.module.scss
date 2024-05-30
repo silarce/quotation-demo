@@ -1,5 +1,7 @@
+$height_top: 80px;
+
 .body {
-  padding: 0 3px;
+  padding: 0 20px;
 }
 
 .cover {
@@ -14,31 +16,52 @@
 }
 
 .tabBar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
   width: 100%;
-  background-color: pink;
+  height: $height_top;
+  background-color: white;
 
   .tab {
     width: fit-content;
     padding: 15px 45px;
     background-color: #fff;
     border: solid 1px theme("colors.border");
+    border-bottom: 0;
     font-size: 16px;
     font-weight: 700;
     color: theme("colors.main");
   }
 }
 
+.table {
+  border: solid 1px theme("colors.border");
+  border-top: 0;
+}
+
 .row {
   display: flex;
   gap: 10px;
-  border: solid 1px black;
+  // border: solid 1px black;
+  border-bottom: solid 1px theme("colors.border");
   > * {
     flex: none;
+  }
+
+  &:nth-last-of-type(1) {
+    border: none;
   }
 }
 
 .thead {
+  position: sticky;
+  top: $height_top;
+  z-index: 1;
   background-color: theme("colors.bgc01");
+  border-top: solid 1px theme("colors.border");
 }
 
 .cell {
@@ -47,7 +70,10 @@
   align-items: center;
   gap: 10px;
   padding: 10px;
-  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.8);
+  // box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.8);
+  > * {
+    width: 100%;
+  }
 }
 
 .cell_btn {

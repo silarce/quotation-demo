@@ -12,6 +12,7 @@ import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
 import Table01 from 'components/global/gear/table/table01';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // type
 import type { Toption } from 'js/utils/options/options';
@@ -99,16 +100,16 @@ export default function Collection() {
       />
       <div className={scss.body}>
         {/*  */}
-        <div className={scss.cover} />
+
         <div className={scss.tabBar}>
           <div className={scss.tab}>{paymentType}</div>
         </div>
 
-        <div>
+        <div className={scss.table}>
           <Thead paymentType={paymentType} />
 
           {fake_accountantArr.map((data, index) => {
-            return <Row key={data.id} data_accountant={data} />;
+            return <Row key={data.id} data_accountant={data} paymentType={paymentType} />;
           })}
         </div>
 
@@ -345,11 +346,16 @@ const Thead = ({ paymentType }: { paymentType: TpaymentType }) => {
   );
 };
 
-const Row = ({ data_accountant }: { data_accountant: TaccountantDto }) => {
+const Row = ({ paymentType, data_accountant }: { paymentType: TpaymentType; data_accountant: TaccountantDto }) => {
   const [disabled = !!data_accountant.billSerialNumber, setDisabled] = useState(true);
   const [state_accountant, setState_accountant] = useState<Tstate_accountant>(cre_emptyStateAccountant());
 
-  const paymentType = data_accountant.paymentType;
+  let keyArr = lookup_keyArr[paymentType];
+  keyArr = [...keyArr];
+  keyArr.shift();
+  keyArr.shift();
+
+  const theKeyArr = keyArr as Exclude<TaccountantKey, 'btn' | 'insertDate'>[];
 
   useEffect(() => {
     if (disabled) {
@@ -375,8 +381,69 @@ const Row = ({ data_accountant }: { data_accountant: TaccountantDto }) => {
           className={classNames(!disabled && scss.active)}
           onClick={() => setDisabled((state) => !state)}
         />
-        <IconDelete01 />
+        <IconDelete01 className={classNames(!disabled && 'invisible')} />
       </div>
+
+      <div className={classNames(scss.cell, configList?.insertDate?.className)} style={configList?.insertDate?.style}>
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          // wrapperStyle={{ width: 85 }}
+          datePickerProps={{
+            props: {
+              // allowClear: false,
+              // suffixIcon: null,
+              value: state_accountant.insertDate,
+              onChange: (date) => {
+                setState_accountant((state) => ({ ...state, insertDate: date }));
+              },
+              disabledDate: (date) => {
+                // 限定為當年當月
+                return (
+                  date.year() !== state_accountant.insertDate?.year() ||
+                  date.month() !== state_accountant.insertDate?.month()
+                );
+              },
+            },
+          }}
+        />
+      </div>
+
+      {theKeyArr.map((key) => {
+        const config = configList[key];
+        let value = state_accountant[key];
+
+        let inputType = 'text';
+
+        if (key === 'price') {
+          inputType = 'number';
+
+          if (disabled) {
+            value = Number(value).toLocaleString();
+            inputType = 'text';
+          }
+        }
+
+        return (
+          <div key={key} className={classNames(scss.cell, config?.className)} style={config?.style}>
+            <InputSel
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  type: inputType,
+                  value: value,
+                  onChange: (e) => {
+                    setState_accountant((state) => ({ ...state, [key]: e.target.value }));
+                  },
+                },
+              }}
+            />
+          </div>
+        );
+      })}
+
+      {/*  */}
     </div>
   );
 };
@@ -385,7 +452,7 @@ const Row = ({ data_accountant }: { data_accountant: TaccountantDto }) => {
 
 // region config
 
-type TaccountantKey = keyof TaccountantDto | 'btn';
+type TaccountantKey = keyof Tstate_accountant | 'btn';
 
 type Tconfig = {
   label?: string;
@@ -421,7 +488,8 @@ const configList: TconfigList = {
   },
   insertDate: {
     style: {
-      width: 100,
+      width: 130,
+      justifyContent: 'center',
     },
     className: '',
     labelByPaymentType: {
@@ -488,10 +556,10 @@ const configList: TconfigList = {
 const fake_accountant: TaccountantDto = {
   id: '1',
   createdAt: '2021-09-01T00:00:00',
-  updatedAt: '20221-09-01T00:00:00',
+  updatedAt: '2021-09-01T00:00:00',
   paymentType: '匯款',
   accountingNumber: 'a-55-aa5555-777',
-  insertDate: '101-11-01',
+  insertDate: '2022-11-01',
   vendorName: '八八八有限公司',
   price: 9999,
   notes: 'AAAA',
@@ -505,7 +573,7 @@ const fake_accountant: TaccountantDto = {
   importAccountingNumber: 'a-454554-sd55455',
 };
 
-const fake_accountantArr = Array.from({ length: 10 }, (_, i) => {
+const fake_accountantArr = Array.from({ length: 50 }, (_, i) => {
   return {
     ...fake_accountant,
     id: String(i),
