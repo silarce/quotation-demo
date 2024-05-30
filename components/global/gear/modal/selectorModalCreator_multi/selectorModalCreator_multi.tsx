@@ -1149,6 +1149,45 @@ const props_contract: TselectorProps<TquotationContractDto> = {
       },
     },
   ],
+  searchInputSelPropsArr: [
+    {
+      inputProps: {
+        wrapperStyle: { width: 150 },
+        props: {
+          placeholder: '完整合約編號',
+        },
+      },
+    },
+    {
+      pilarAttr: {},
+    },
+    {
+      inputProps: {
+        wrapperStyle: { width: 150 },
+        props: {
+          placeholder: '工程名稱',
+        },
+      },
+    },
+    {
+      pilarAttr: {},
+    },
+    {
+      inputProps: {
+        wrapperStyle: { width: 150 },
+        props: {
+          placeholder: '客戶名稱',
+        },
+      },
+    },
+  ],
+  filter: (strArr) => {
+    return {
+      contractNumber: { $eq: strArr[0] },
+      'content.projectName': { $contains: strArr[1] },
+      'content.customer.name': { $contains: strArr[2] },
+    };
+  },
 };
 
 // -------------------------------------------------------------------------
