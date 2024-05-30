@@ -3491,7 +3491,7 @@ export type TaccountantDto = {
   importAccountingNumber: string | null; // 匯入帳號 // 匯款來源帳號
 };
 
-export type TcreateAccountantDto = Extract<
+export type TcreateAccountantDto = Pick<
   TaccountantDto,
   'paymentType' | 'accountingNumber' | 'insertDate' | 'vendorName' | 'price' | 'notes' | 'fee'
 > & {

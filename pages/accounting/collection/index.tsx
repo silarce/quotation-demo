@@ -30,6 +30,18 @@ import {
 // css
 import scss from './index.module.scss';
 
+// api
+import {
+  Tparams,
+  TcreateAccountantDto,
+  TupdateAccountantDto,
+  //
+  apiPostAccountant,
+  apiPatchAccountant,
+  deleteAccountant,
+  useGetAccountant,
+} from 'js/api/api_accountant';
+
 // =============================================================================
 
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
@@ -54,6 +66,10 @@ type Tstate_accountant = {
   notes: string;
 };
 
+type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
+type TreqPatch = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
+type TreqDelete = (id: string) => Promise<void>;
+
 // =============================================================================
 
 const defaultPaymentType: TpaymentType = '匯款';
@@ -77,7 +93,88 @@ export default function Collection() {
   const [showNewRow, setShowNewRow] = useState(false);
 
   // ----------------------------------------------------------------------------
-  // region USE HOOK
+
+  // region get Data
+
+  const {
+    data: data_accountant,
+    update: update_accountant,
+    isFetching,
+  } = useGetAccountant({
+    params: useMemo(() => {
+      const m_date = moment({
+        year: Number(year),
+        month: Number(month) - 1,
+      });
+
+      const params: Tparams = {
+        sort: 'insertDate',
+        filter: {
+          insertDate: {
+            $gte: m_date.startOf('month').toISOString(),
+            $lte: m_date.endOf('month').toISOString(),
+          },
+          paymentType: {
+            $eq: paymentType,
+          },
+        },
+      };
+
+      return params;
+    }, [year, month, paymentType]),
+  });
+
+  // ----------------------------------------------------------------------------
+  // region REQUEST
+
+  const reqPost = async (state_accountant: Tstate_accountant) => {
+    if (!state_accountant.insertDate) {
+      myAlert.info({ title: '請選擇日期' });
+
+      return;
+    }
+
+    const body: TcreateAccountantDto = {
+      ...state_accountant,
+      insertDate: state_accountant.insertDate.toISOString(true),
+      paymentType,
+      price: Number(state_accountant.price),
+      fee: 0,
+    };
+
+    await apiPostAccountant({ body });
+    setShowNewRow(false);
+    await update_accountant();
+  };
+
+  const reqPatch = async (id: string, state_accountant: Tstate_accountant) => {
+    if (!state_accountant.insertDate) {
+      myAlert.info({ title: '請選擇日期' });
+
+      return;
+    }
+
+    const body: TupdateAccountantDto = {
+      ...state_accountant,
+      insertDate: state_accountant.insertDate.toISOString(),
+      paymentType,
+      price: Number(state_accountant.price),
+      fee: 0,
+    };
+
+    await apiPatchAccountant(id, { body });
+    await update_accountant();
+  };
+
+  const reqDelete = async (id: string) => {
+    await deleteAccountant(id);
+    await update_accountant();
+  };
+
+  // ----------------------------------------------------------------------------
+
+  // region PROPS
+
   const tagList = useTagList();
 
   const selectPropsArr = useSelectPropsArr({
@@ -86,10 +183,6 @@ export default function Collection() {
     yearOptionArr,
     monthOptionArr,
   });
-
-  // ----------------------------------------------------------------------------
-
-  // region PROPS
 
   const panelList = create_panelList({
     disabled,
@@ -123,6 +216,7 @@ export default function Collection() {
               postProps={{
                 year: Number(year),
                 month: Number(month),
+                reqPost,
               }}
               className={scss.newRow}
               data_accountant={undefined}
@@ -130,9 +224,20 @@ export default function Collection() {
             />
           )}
 
-          {fake_accountantArr.map((data, index) => {
-            return <Row key={data.id} data_accountant={data} paymentType={paymentType} />;
+          {data_accountant?.map((data, index) => {
+            return (
+              <Row
+                key={data.id}
+                data_accountant={data}
+                paymentType={paymentType}
+                reqPatch={reqPatch}
+                reqDelete={reqDelete}
+              />
+            );
           })}
+          {/* {fake_accountantArr.map((data, index) => {
+            return <Row key={data.id} data_accountant={data} paymentType={paymentType} />;
+          })} */}
         </div>
 
         {/*  */}
@@ -312,25 +417,6 @@ const create_panelList = ({
 // =========================================================================
 // region component
 
-const Cell = ({
-  //
-  value,
-  onChange,
-  style,
-  className,
-}: {
-  value: string;
-  onChange: (str: string) => void;
-  style: React.CSSProperties;
-  className?: string;
-}) => {
-  return (
-    <div className={classNames(scss.cell, className)} style={style}>
-      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} />
-    </div>
-  );
-};
-
 const Cell_span = ({
   //
   children,
@@ -376,6 +462,8 @@ const Row = ({
   data_accountant,
   className,
   postProps,
+  reqPatch,
+  reqDelete,
 }: {
   // children: React.ReactNode;
   paymentType: TpaymentType;
@@ -384,7 +472,10 @@ const Row = ({
   postProps?: {
     year: number;
     month: number;
+    reqPost: TreqPost;
   };
+  reqPatch?: TreqPatch;
+  reqDelete?: TreqDelete;
 }) => {
   const isNew = !!postProps;
 
@@ -405,6 +496,30 @@ const Row = ({
         year: postProps.year,
         month: postProps.month - 1,
       }));
+
+  // ---------------------------------------------------
+
+  const handle_check = async () => {
+    if (postProps) {
+      postProps.reqPost(state_accountant);
+    } else if (data_accountant?.id && reqPatch) {
+      await reqPatch(data_accountant.id, state_accountant);
+      setDisabled(true);
+    } else {
+      alert('錯誤，data_accountant.id或reqPatch為undefined');
+    }
+  };
+
+  const handle_delete = async () => {
+    if (data_accountant?.id && reqDelete) {
+      await reqDelete(data_accountant.id);
+      setDisabled(true);
+    } else {
+      alert('錯誤，data_accountant.id或reqDelete為undefined');
+    }
+  };
+
+  // ---------------------------------------------------
 
   useEffect(() => {
     if (!data_accountant) {
@@ -430,14 +545,14 @@ const Row = ({
   return (
     <div className={classNames(scss.row, className)}>
       {/* {children} */}
-      <div className={classNames(scss.cell, configList?.btn?.className)} style={configList?.btn?.style}>
-        <IconCheck02 className={classNames(disabled && 'invisible')} />
+      <div className={classNames(scss.cell, scss.cell_btn, configList?.btn?.className)} style={configList?.btn?.style}>
+        <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_check} />
         <IconEdit
           //
-          className={classNames(!disabled && scss.active, isNew && 'invisible')}
+          className={classNames(!disabled && scss.active, scss.foo, isNew && 'invisible')}
           onClick={() => setDisabled((state) => !state)}
         />
-        <IconDelete01 className={classNames(!disabled && 'invisible')} />
+        <IconDelete01 className={classNames(!disabled && 'invisible')} onClick={handle_delete} />
       </div>
 
       <div className={classNames(scss.cell, configList?.insertDate?.className)} style={configList?.insertDate?.style}>
@@ -484,7 +599,7 @@ const Row = ({
         return (
           <div key={key} className={classNames(scss.cell, config?.className)} style={config?.style}>
             <InputSel
-              disabled={disabled}
+              disabled={key === 'billSerialNumber' || disabled}
               showBaseline="auto"
               inputProps={{
                 props: {
