@@ -3409,11 +3409,11 @@ export type TcreateAccountReceivableDto = {
   // 已出貨，因故尚未安裝
   hasNotInstall: boolean;
   // 收款明細
-  accountantId: string[] | null;
+  // accountantId: string[] | null;
   // 扣款明細
-  accountReceivableDeduction: TcreateAccountReceivableDeductionDto[] | null;
+  // accountReceivableDeduction: TcreateAccountReceivableDeductionDto[] | null;
   // 發票紀錄
-  invoices: TcreateAccountReceivableInvoiceDto[] | null;
+  // invoices: TcreateAccountReceivableInvoiceDto[] | null;
   // 所屬合約Id;
   contractId: string | null;
   // 所屬合約Id;

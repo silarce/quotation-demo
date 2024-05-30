@@ -13,6 +13,7 @@ import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel, { TinputProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // type
 import type { Toption } from 'js/utils/options/options';
@@ -42,8 +43,7 @@ import {
   useGetAccountant,
 } from 'js/api/api_accountant';
 
-// 匯入的api
-// engineering/account-receivable/:id/accountants
+import { apiPostAccountReceivableAccountant } from 'js/api/api_engineering';
 
 // =============================================================================
 
@@ -77,10 +77,20 @@ type TreqDelete = (id: string) => Promise<void>;
 
 const defaultPaymentType: TpaymentType = '匯款';
 
+const ContractSelector = selectModalCreator_multi<['contract']>({
+  selectorArr: [
+    {
+      key: 'contract',
+      limit: 1,
+      caption: '付款匯入合約',
+    },
+  ],
+});
+
 // =============================================================================
 
 // region START
-export default function Collection({ isReadOnly = false }: { isReadOnly?: boolean }) {
+export default function Collection({ isWorksDepartment = false }: { isWorksDepartment?: boolean }) {
   const { yearOptionArr, monthOptionArr, thisYear, thisMonth } = useYearMonth();
 
   // ------------------------------------------------------------------------------
@@ -91,8 +101,9 @@ export default function Collection({ isReadOnly = false }: { isReadOnly?: boolea
 
   // ------------------------------------------------------------------------------
 
-  const [disabled = isReadOnly, setDisabled] = useState(true);
+  const [disabled = isWorksDepartment, setDisabled] = useState(true);
   const [showNewRow, setShowNewRow] = useState(false);
+  const [accountantId, setAccountantId] = useState<string>();
 
   // ----------------------------------------------------------------------------
 
@@ -130,7 +141,7 @@ export default function Collection({ isReadOnly = false }: { isReadOnly?: boolea
   // region REQUEST
 
   const reqPost = async (state_accountant: Tstate_accountant) => {
-    if (isReadOnly) {
+    if (isWorksDepartment) {
       alert('ReadOnly');
 
       return;
@@ -156,7 +167,7 @@ export default function Collection({ isReadOnly = false }: { isReadOnly?: boolea
   };
 
   const reqPatch = async (id: string, state_accountant: Tstate_accountant) => {
-    if (isReadOnly) {
+    if (isWorksDepartment) {
       alert('ReadOnly');
 
       return;
@@ -183,6 +194,21 @@ export default function Collection({ isReadOnly = false }: { isReadOnly?: boolea
   const reqDelete = async (id: string) => {
     await deleteAccountant(id);
     await update_accountant();
+  };
+
+  const reqPostAccountReceivableAccountant = async (accountReceivableId: string) => {
+    if (!accountantId) {
+      alert('accountantId為undefined');
+
+      return;
+    }
+
+    try {
+      await apiPostAccountReceivableAccountant(accountReceivableId, {
+        accountantId: [accountantId],
+      });
+      await update_accountant();
+    } catch (error) {}
   };
 
   // ----------------------------------------------------------------------------
@@ -224,8 +250,10 @@ export default function Collection({ isReadOnly = false }: { isReadOnly?: boolea
 
         <div className={scss.tabBar}>
           <div className={scss.tab}>{paymentType}</div>
-          {!showNewRow && !isReadOnly && <IconAddCircle className={scss.newBtn} onClick={() => setShowNewRow(true)} />}
-          {showNewRow && !isReadOnly && (
+          {!showNewRow && !isWorksDepartment && (
+            <IconAddCircle className={scss.newBtn} onClick={() => setShowNewRow(true)} />
+          )}
+          {showNewRow && !isWorksDepartment && (
             <IconRemoveCircle className={scss.newBtn} onClick={() => setShowNewRow(false)} />
           )}
         </div>
@@ -245,7 +273,7 @@ export default function Collection({ isReadOnly = false }: { isReadOnly?: boolea
               data_accountant={undefined}
               paymentType={paymentType}
               //
-              isReadOnly={isReadOnly}
+              isReadOnly={isWorksDepartment}
             />
           )}
 
@@ -257,7 +285,8 @@ export default function Collection({ isReadOnly = false }: { isReadOnly?: boolea
                 paymentType={paymentType}
                 reqPatch={reqPatch}
                 reqDelete={reqDelete}
-                isReadOnly={isReadOnly}
+                isReadOnly={isWorksDepartment}
+                setAccountantId={setAccountantId}
               />
             );
           })}
@@ -267,6 +296,25 @@ export default function Collection({ isReadOnly = false }: { isReadOnly?: boolea
           </div>
         </div>
         <div className={scss.cover_bottom}></div>
+
+        <ContractSelector
+          showModal={!!accountantId}
+          onConfirm={(arr) => {
+            const contractArr = arr[0];
+            const accountReceivableId: string | undefined | null = contractArr[0]?.accountReceivableId;
+
+            if (accountReceivableId === null) {
+              myAlert.info({ title: '該合約尚未建立應收帳款' });
+            }
+
+            if (accountReceivableId) {
+              reqPostAccountReceivableAccountant(accountReceivableId);
+            }
+          }}
+          onCancel={() => {
+            setAccountantId(undefined);
+          }}
+        />
 
         {/*  */}
       </div>
@@ -493,6 +541,7 @@ const Row = ({
   reqPatch,
   reqDelete,
   isReadOnly,
+  setAccountantId,
 }: {
   // children: React.ReactNode;
   paymentType: TpaymentType;
@@ -506,6 +555,7 @@ const Row = ({
   reqPatch?: TreqPatch;
   reqDelete?: TreqDelete;
   isReadOnly: boolean;
+  setAccountantId?: (id: string | undefined) => void;
 }) => {
   const isNew = !!postProps;
 
@@ -595,7 +645,7 @@ const Row = ({
           </>
         )}
         {isReadOnly && (
-          <MyButton_v2 px="px22" py="py4">
+          <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant?.id)}>
             匯入
           </MyButton_v2>
         )}
@@ -643,10 +693,6 @@ const Row = ({
             value = Number(value).toLocaleString();
             inputType = 'text';
           }
-        }
-
-        if (key === 'price') {
-          console.log(config);
         }
 
         return (

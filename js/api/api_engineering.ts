@@ -1123,13 +1123,25 @@ export const useGetAccountReceivable_id = (id: string, customeParams: Tparams) =
 };
 
 /**新增 應收帳款明細 account-receivable */
-export const apiPostAccountReceivable = async (body: TcreateAccountReceivableDto) => {
+export const apiPostAccountReceivable = async (
+  body: TcreateAccountReceivableDto,
+  {
+    callAlert = true,
+  }: {
+    callAlert?: boolean;
+  } = {}
+) => {
   const api = `/engineering/account-receivable`;
 
   return axi
     .post<TaccountReceivableDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((error) => {
+      const err = error as AxiosError;
+      callAlert && myAlert.err({ title: '新增應收帳款明細失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };
 
 /**更新 應收帳款明細 account-receivable */
@@ -1294,17 +1306,28 @@ export const useGetAccountReceivableAccountants = (
 
 /**新增 應收帳款 收款紀錄 account-receivable-accountant */
 export const apiPostAccountReceivableAccountant = async (
-  id: string,
+  id: string, // 應收帳款Id 可以在contract下找到accountReceivableId
   body: {
     accountantId: string[]; // 收款明細Id
-  }
+  },
+  {
+    callAlert = true,
+  }: {
+    callAlert?: boolean;
+  } = {}
 ) => {
   const api = `/engineering/account-receivable/${id}/accountants`;
 
   return axi
     .post<TaccountantDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      callAlert && myAlert.err({ title: '匯入收款紀錄失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };
 
 /**刪除 應收帳款 收款紀錄關聯 account-receivable-accountant */
