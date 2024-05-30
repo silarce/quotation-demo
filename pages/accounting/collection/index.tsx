@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -175,6 +176,12 @@ export default function Collection() {
 
   // region PROPS
 
+  let d_totalPrice = new Decimal(0);
+  data_accountant?.forEach((data) => {
+    d_totalPrice = d_totalPrice.add(data.price);
+  });
+  const totalPrice_localString = d_totalPrice.toNumber().toLocaleString();
+
   const tagList = useTagList();
 
   const selectPropsArr = useSelectPropsArr({
@@ -224,7 +231,7 @@ export default function Collection() {
             />
           )}
 
-          {data_accountant?.map((data, index) => {
+          {data_accountant?.map((data) => {
             return (
               <Row
                 key={data.id}
@@ -235,10 +242,12 @@ export default function Collection() {
               />
             );
           })}
-          {/* {fake_accountantArr.map((data, index) => {
-            return <Row key={data.id} data_accountant={data} paymentType={paymentType} />;
-          })} */}
+
+          <div className={scss.totalPriceWrapper}>
+            <span className={scss.totalPrice}>{totalPrice_localString}</span>
+          </div>
         </div>
+        <div className={scss.cover_bottom}></div>
 
         {/*  */}
       </div>
@@ -738,35 +747,6 @@ const configList: TconfigList = {
 };
 
 // =========================================================================
-
-// region fakeData
-
-const fake_accountant: TaccountantDto = {
-  id: '1',
-  createdAt: '2021-09-01T00:00:00',
-  updatedAt: '2021-09-01T00:00:00',
-  paymentType: '匯款',
-  accountingNumber: 'a-55-aa5555-777',
-  insertDate: '2022-11-01',
-  vendorName: '八八八有限公司',
-  price: 9999,
-  notes: 'AAAA',
-  noteNumber: null,
-  fee: 9999,
-  noteMaturityDate: null,
-  invoice: null,
-
-  //
-  billSerialNumber: null,
-  importAccountingNumber: 'a-454554-sd55455',
-};
-
-const fake_accountantArr = Array.from({ length: 50 }, (_, i) => {
-  return {
-    ...fake_accountant,
-    id: String(i),
-  };
-});
 
 const cre_emptyStateAccountant = (): Tstate_accountant => ({
   insertDate: null,
