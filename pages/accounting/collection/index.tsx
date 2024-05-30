@@ -12,7 +12,7 @@ import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
 import Table01 from 'components/global/gear/table/table01';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // type
 import type { Toption } from 'js/utils/options/options';
@@ -582,7 +582,10 @@ const Row = ({
       </div>
 
       {theKeyArr.map((key) => {
+        const isbillSerialNumber = key === 'billSerialNumber';
+
         const config = configList[key];
+
         let value = state_accountant[key];
 
         let inputType = 'text';
@@ -596,13 +599,19 @@ const Row = ({
           }
         }
 
+        if (key === 'price') {
+          console.log(config);
+        }
+
         return (
           <div key={key} className={classNames(scss.cell, config?.className)} style={config?.style}>
             <InputSel
-              disabled={key === 'billSerialNumber' || disabled}
+              disabled={isbillSerialNumber || disabled}
               showBaseline="auto"
               inputProps={{
                 props: {
+                  ...config?.inputProps?.props,
+                  placeholder: isbillSerialNumber ? '系統產生' : '請輸入',
                   type: inputType,
                   value: value,
                   onChange: (e) => {
@@ -633,6 +642,7 @@ type Tconfig = {
   labelByPaymentType?: {
     [key in TpaymentType]?: string;
   };
+  inputProps?: TinputProps;
 };
 
 type TconfigList = {
@@ -661,7 +671,7 @@ const configList: TconfigList = {
   insertDate: {
     style: {
       width: 130,
-      justifyContent: 'center',
+      // justifyContent: 'center',
     },
     className: '',
     labelByPaymentType: {
@@ -696,16 +706,22 @@ const configList: TconfigList = {
   vendorName: {
     label: '廠商名稱',
     style: {
-      width: 185,
+      width: 200,
     },
     className: '',
   },
   price: {
     label: '金額',
     style: {
-      width: 185,
+      width: 135,
+      justifyContent: 'flex-end',
     },
     className: '',
+    inputProps: {
+      props: {
+        style: { textAlign: 'end' },
+      },
+    },
   },
   billSerialNumber: {
     label: '收入傳票序號',
