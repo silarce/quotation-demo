@@ -19,7 +19,13 @@ import type { Toption } from 'js/utils/options/options';
 import type { TaccountantDto } from 'js/api/dtoTypes';
 
 // icon
-import { IconCheck02, IconEdit, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+import {
+  IconAddCircle,
+  IconRemoveCircle,
+  IconCheck02,
+  IconEdit,
+  IconDelete01,
+} from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './index.module.scss';
@@ -68,6 +74,7 @@ export default function Collection() {
   // ------------------------------------------------------------------------------
 
   const [disabled, setDisabled] = useState(true);
+  const [showNewRow, setShowNewRow] = useState(false);
 
   // ----------------------------------------------------------------------------
   // region USE HOOK
@@ -103,10 +110,25 @@ export default function Collection() {
 
         <div className={scss.tabBar}>
           <div className={scss.tab}>{paymentType}</div>
+          {!showNewRow && <IconAddCircle className={scss.newBtn} onClick={() => setShowNewRow(true)} />}
+          {showNewRow && <IconRemoveCircle className={scss.newBtn} onClick={() => setShowNewRow(false)} />}
         </div>
 
         <div className={scss.table}>
           <Thead paymentType={paymentType} />
+
+          {showNewRow && (
+            <Row
+              //
+              postProps={{
+                year: Number(year),
+                month: Number(month),
+              }}
+              className={scss.newRow}
+              data_accountant={undefined}
+              paymentType={paymentType}
+            />
+          )}
 
           {fake_accountantArr.map((data, index) => {
             return <Row key={data.id} data_accountant={data} paymentType={paymentType} />;
@@ -346,8 +368,27 @@ const Thead = ({ paymentType }: { paymentType: TpaymentType }) => {
   );
 };
 
-const Row = ({ paymentType, data_accountant }: { paymentType: TpaymentType; data_accountant: TaccountantDto }) => {
-  const [disabled = !!data_accountant.billSerialNumber, setDisabled] = useState(true);
+// region Row
+
+const Row = ({
+  // children,
+  paymentType,
+  data_accountant,
+  className,
+  postProps,
+}: {
+  // children: React.ReactNode;
+  paymentType: TpaymentType;
+  data_accountant: TaccountantDto | undefined;
+  className?: string;
+  postProps?: {
+    year: number;
+    month: number;
+  };
+}) => {
+  const isNew = !!postProps;
+
+  const [disabled = !!data_accountant?.billSerialNumber, setDisabled] = useState(!isNew);
   const [state_accountant, setState_accountant] = useState<Tstate_accountant>(cre_emptyStateAccountant());
 
   let keyArr = lookup_keyArr[paymentType];
@@ -357,28 +398,43 @@ const Row = ({ paymentType, data_accountant }: { paymentType: TpaymentType; data
 
   const theKeyArr = keyArr as Exclude<TaccountantKey, 'btn' | 'insertDate'>[];
 
+  const limitedDate =
+    state_accountant.insertDate ??
+    (postProps &&
+      moment({
+        year: postProps.year,
+        month: postProps.month - 1,
+      }));
+
   useEffect(() => {
-    if (disabled) {
+    if (!data_accountant) {
       setState_accountant({
-        insertDate: data_accountant.insertDate ? moment(data_accountant.insertDate) : null,
-        importAccountingNumber: data_accountant.importAccountingNumber ?? '',
-        noteNumber: data_accountant.noteNumber ?? '',
-        accountingNumber: data_accountant.accountingNumber ?? ' ',
-        vendorName: data_accountant.vendorName ?? '',
-        price: String(data_accountant.price),
-        billSerialNumber: data_accountant.billSerialNumber ?? '',
-        notes: data_accountant.notes ?? '',
+        ...cre_emptyStateAccountant(),
       });
+
+      return;
     }
-  }, [disabled, data_accountant.id, data_accountant.updatedAt]);
+
+    setState_accountant({
+      insertDate: data_accountant.insertDate ? moment(data_accountant.insertDate) : null,
+      importAccountingNumber: data_accountant.importAccountingNumber ?? '',
+      noteNumber: data_accountant.noteNumber ?? '',
+      accountingNumber: data_accountant.accountingNumber ?? ' ',
+      vendorName: data_accountant.vendorName ?? '',
+      price: String(data_accountant.price),
+      billSerialNumber: data_accountant.billSerialNumber ?? '',
+      notes: data_accountant.notes ?? '',
+    });
+  }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
   return (
-    <div className={scss.row}>
+    <div className={classNames(scss.row, className)}>
+      {/* {children} */}
       <div className={classNames(scss.cell, configList?.btn?.className)} style={configList?.btn?.style}>
         <IconCheck02 className={classNames(disabled && 'invisible')} />
         <IconEdit
           //
-          className={classNames(!disabled && scss.active)}
+          className={classNames(!disabled && scss.active, isNew && 'invisible')}
           onClick={() => setDisabled((state) => !state)}
         />
         <IconDelete01 className={classNames(!disabled && 'invisible')} />
@@ -386,6 +442,10 @@ const Row = ({ paymentType, data_accountant }: { paymentType: TpaymentType; data
 
       <div className={classNames(scss.cell, configList?.insertDate?.className)} style={configList?.insertDate?.style}>
         <InputSel
+          key={
+            // 為了重置defaultPickerValue
+            limitedDate?.toISOString()
+          }
           disabled={disabled}
           showBaseline="auto"
           // wrapperStyle={{ width: 85 }}
@@ -393,16 +453,13 @@ const Row = ({ paymentType, data_accountant }: { paymentType: TpaymentType; data
             props: {
               // allowClear: false,
               // suffixIcon: null,
+              defaultPickerValue: limitedDate,
               value: state_accountant.insertDate,
               onChange: (date) => {
                 setState_accountant((state) => ({ ...state, insertDate: date }));
               },
               disabledDate: (date) => {
-                // 限定為當年當月
-                return (
-                  date.year() !== state_accountant.insertDate?.year() ||
-                  date.month() !== state_accountant.insertDate?.month()
-                );
+                return !date.isSame(limitedDate, 'month');
               },
             },
           }}
