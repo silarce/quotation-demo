@@ -41,6 +41,46 @@ import { customerTypesLookup } from 'js/api/api_customer';
 import { Toption } from 'js/utils/options/options';
 
 // ======================================================================
+// region 建立流程與使用方法
+// 先在TtypeLookup建立型別
+// 後到下面(region PROPS)去建立props_XXX，建立方法見下面的說明
+// 再到propsLookup去建立XXX的property
+// 就可以用了
+
+// 粗略使用方法說明
+// 例
+// const Selector = selectModalCreator_multi<['employee', 'contract']>({
+//   selectorArr: [
+//     {
+//       key: 'employee',
+//       caption: '喵',
+//     },
+//     {
+//       key: 'contract',
+//       caption: '選擇合約',
+//       limit: 1,
+//     },
+//   ],
+// });
+
+// selectModalCreator_multi是泛型HOC，會回應一個選擇器元件
+// 接收參數
+// {
+// modalWidth?: React.CSSProperties['width'];
+// selectorArr: TselectorArr<TkeyArr>;
+// }
+// selectorArr就是TselectorArrItem[]
+
+// selectModalCreator_multi的泛型參數與TselectorArrItem.key對應
+// 如果泛型參數是['employee', 'contract']
+// 則第一個TselectorArrItem.key應為employee，第二個應為contract
+
+// clearOther
+// 一個陣列，裡面裝的是TselectorArrItem的index
+// 當這個selector被選取時，clearOther中對應index的selector會被清空
+//
+// forbiddenCheck_dataList
+// 回調函式，決定特定item不能被選擇
 
 type TtypeLookup = {
   outsourcing: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
@@ -428,6 +468,46 @@ const props_outsourcing: TselectorProps<ToutsourcingDto> = {
 };
 
 // -------------------------------------------------------------------------
+// region PROPS
+
+// 建立說明 簡略說明，詳細用法要自己看型別了解
+
+//
+// 首先要用createUseInfinite建立特定型別的hook
+// 要送進createUseInfinite的函式也必須是特定型別
+// 請參考已經建立好的hook
+//
+// 然後就可以開始建立props
+// props的型別是TselectorProps<資料型別>
+//
+// useInfinit
+// 就是用createUseInfinite建立的hook
+//
+// useNoMeta
+// 有部分的api回應沒有meta特性，這時候就要用useNoMeta而不用useInfinit
+//
+// selectedKey
+// 資料被選中時，選擇器要以什麼key取出資料並顯示
+// 例如selectedKey是name，則右邊就會顯示被選中資料的name
+//
+// configArr
+// 詳見型別TselectorProps['configArr']
+//
+// searchInputSelPropsArr
+// search功能
+// 與filter搭配使用
+//
+// filter
+// 會收到searchInputSelPropsArr的輸入字串陣列
+//
+//
+// 其他詳見型別TselectorProps
+
+// props建立好之ㄏ建立好之後要去propsLookup加入剛建立的props
+//
+//
+
+// region employee
 
 const props_employee: TselectorProps<TemployeeDto> = {
   useInfinit: useEmployee_infinite_2,
@@ -540,6 +620,8 @@ const props_employee: TselectorProps<TemployeeDto> = {
   },
 };
 
+// region employee_worksDepartment
+
 const props_employee_worksDepartment: TselectorProps<TemployeeDto> = {
   ...props_employee,
 
@@ -569,6 +651,8 @@ const props_employee_worksDepartment: TselectorProps<TemployeeDto> = {
 };
 
 // -------------------------------------------------------------------------
+
+// region dailyReport_workers_item
 
 const props_dailyReport_workers_item: TselectorProps<
   TdailyReportItem_my,
@@ -633,6 +717,8 @@ const props_dailyReport_workers_item: TselectorProps<
 };
 
 // -------------------------------------------------------------------------
+
+// region engineeringContact
 
 const props_engineeringContact: TselectorProps<TengineeringContactDto> = {
   useInfinit: useGetEngineeringContact_all,
@@ -706,6 +792,8 @@ const props_engineeringContact: TselectorProps<TengineeringContactDto> = {
 
 // -------------------------------------------------------------------------
 
+// region annotation
+
 const props_annotation: TselectorProps<TannotationDto> = {
   useInfinit: useGetAnnotation_infinite,
   selectedKey: 'description',
@@ -766,6 +854,8 @@ const props_annotation: TselectorProps<TannotationDto> = {
 
 // -------------------------------------------------------------------------
 
+// region quotationRange
+
 const props_quotationRange: TselectorProps<TquotationRangeDto> = {
   useInfinit: useGetQuotationRanges_infinite,
   selectedKey: 'description',
@@ -825,6 +915,8 @@ const props_quotationRange: TselectorProps<TquotationRangeDto> = {
 };
 
 // -------------------------------------------------------------------------
+
+// region customer
 
 const props_customer: TselectorProps<TcustomerDto> = {
   useInfinit: useGetCustomers_infinite_2,
@@ -944,6 +1036,8 @@ const props_customer: TselectorProps<TcustomerDto> = {
   },
 };
 
+// region settleProduct
+
 const props_settleProduct: TselectorProps<TsettleProductDto, TuseNoMetaPropsInNeed['settleProduct']> = {
   useNoMeta: useGetQuotationContentSettleProduct,
   selectedKey: 'itemName',
@@ -1060,6 +1154,8 @@ const props_contract: TselectorProps<TquotationContractDto> = {
 // -------------------------------------------------------------------------
 
 // ---
+// region propsLookup
+
 // w   記得要上去修改TtypeLookup
 // w   propsLookup 與 TtypeLookup的key必須一致
 // w   propsLookup 與 TtypeLookup的key必須一致
