@@ -24,7 +24,6 @@ import { useGetEngineeringContact_all, TengineeringContactDto } from 'js/api/api
 
 // api useNoMeta // useNoMeta為api回應沒有meta特性的api hook
 import { TdailyReportItem_my, useGetDaily_worker_date } from 'js/api/api_dailyReport';
-
 import {
   //
   useGetAnnotation_infinite,
@@ -32,10 +31,9 @@ import {
   useGetQuotationRanges_infinite,
   TquotationRangeDto,
 } from 'js/api/api_workSheet';
-
-import { useGetCustomers_infinite_2, TcustomerDto } from 'js/api/api_customer';
-
+import { TcustomerDto, useGetCustomers_infinite_2 } from 'js/api/api_customer';
 import { TsettleProductDto, useGetQuotationContentSettleProduct } from 'js/api/api_certificated-doc';
+import { TquotationContractDto, useContract_infinite_2 } from 'js/api/api_quotation';
 
 // lookup and options
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
@@ -54,6 +52,7 @@ type TtypeLookup = {
   quotationRange: Exclude<(typeof props_quotationRange)['dataType'], undefined>;
   customer: Exclude<(typeof props_customer)['dataType'], undefined>;
   settleProduct: Exclude<(typeof props_settleProduct)['dataType'], undefined>;
+  contract: Exclude<(typeof props_contract)['dataType'], undefined>;
   // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
 };
@@ -1007,6 +1006,57 @@ const props_settleProduct: TselectorProps<TsettleProductDto, TuseNoMetaPropsInNe
   ],
 };
 
+// region props_contract
+
+const props_contract: TselectorProps<TquotationContractDto> = {
+  useInfinit: useContract_infinite_2,
+  params: {
+    sort: 'contractNumber',
+    order: 'ASC',
+    populate: ['content.customer'],
+  },
+  caption: '合約',
+  selectedKey: 'contractNumber',
+  configArr: [
+    {
+      key: 'contractNumber',
+      width: 150,
+      thead: {
+        label: '合約編號',
+      },
+    },
+    {
+      key: 'content',
+      width: 'auto',
+      flex: 'auto',
+      thead: {
+        label: '工程名稱',
+      },
+      tbody: {
+        reducer: (value) => {
+          const content = value as TquotationContractDto['content'];
+
+          return content.projectName;
+        },
+      },
+    },
+    {
+      key: 'content',
+      width: 200,
+      thead: {
+        label: '客戶名稱',
+      },
+      tbody: {
+        reducer: (value) => {
+          const content = value as TquotationContractDto['content'];
+
+          return content.customer?.name;
+        },
+      },
+    },
+  ],
+};
+
 // -------------------------------------------------------------------------
 
 // ---
@@ -1024,6 +1074,7 @@ const propsLookup = {
   quotationRange: () => _.cloneDeep(props_quotationRange),
   customer: () => _.cloneDeep(props_customer),
   settleProduct: () => _.cloneDeep(props_settleProduct),
+  contract: () => _.cloneDeep(props_contract),
 
   // test: () => {
   //   return _.cloneDeep(props_outsourcing);
