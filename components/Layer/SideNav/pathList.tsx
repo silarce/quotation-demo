@@ -426,6 +426,11 @@ const sidePathList: TsidePathList = {
           path: path01 + '/todoList',
           erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
+        {
+          label: '會計收款管理',
+          path: path01 + '/collection',
+          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
+        },
         // {
         //   label: '新增派工單',
         //   path: path01 + '/addDispatch',
