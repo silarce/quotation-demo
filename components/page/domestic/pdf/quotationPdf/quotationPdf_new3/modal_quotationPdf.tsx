@@ -1242,7 +1242,7 @@ const useModalQuotationPdf = ({
 
     const prodArr = quotationProdAndOther_ToProdArr({
       quotationProductArr: quotationProductArr,
-      quotationOtherArr: others,
+      quotationOtherArr: others ?? [],
     });
 
     setPdfData({ top, prodArr, bottom });
