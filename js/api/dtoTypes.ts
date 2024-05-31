@@ -3526,6 +3526,9 @@ export type TaccountantDto = {
   //
   importAccountingNumber: string | null; // 匯入帳號 // 匯款來源帳號
   order: number; // 排序用的
+  //
+  // 扣款明細
+  accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
 };
 
 export type TcreateAccountantDto = Pick<
