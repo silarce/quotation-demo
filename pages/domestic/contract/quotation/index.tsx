@@ -52,9 +52,15 @@ import Summary, {
 } from 'components/page/domestic/quotation/quotation/summary/summary';
 // import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
 
-// import QuotationPdf, {
-//   useModalQuotationPdf,
-// } from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
+import QuotationPdf, {
+  useModalQuotationPdf,
+} from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
+
+import QuotationPdf_part, {
+  TmainProduct,
+  Tpart,
+  extractPdfPartFromClassProduct,
+} from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 
 // antd
 import { Collapse } from 'antd';
@@ -177,7 +183,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [inputModalConfig, setInputModalConfig] = useState<TinputModalProps>();
 
   // const [showPdf, setShowPdf] = useState(false);
-  // const [showPdf_part, setShowPdf_part] = useState(false);
+  const [showPdf_part, setShowPdf_part] = useState(false);
 
   // =========================================================
 
@@ -185,7 +191,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // const { data: contract, update } = useGetContract_id_noItems_2(id, { populate: ['content.settleProducts'] });
   // const { data: contract, update } = useGetContract_id_noItems_2(id);
-  const { data: contract, update } = useGetContract_id_contentProductItems(id);
+  // 這個技術債以後重構時再還...
+  const { data: contract, update } = useGetContract_id_contentProductItems(id, {}, version);
   const engineeringContactId = contract?.engineeringContactId;
 
   // 合約項目
@@ -259,37 +266,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // =========================================================
 
-  const tabList = useTabList({
-    contract,
-    engineeringContactId,
-    tab,
-    id,
-    version,
-  });
+  // -----------------------------------------------------------------------
 
-  const panelList = usePanelList({
-    id,
-    version,
-    contract,
-    engineeringContactId,
-    setIsLoading,
-    update,
-    setReviewFormShow,
-    setSwitch02,
-    ref_workContact,
-    ref_meetingMinutes,
-
-    tab,
-    isShowPattern,
-    switch02,
-    disabed_workContactDoc,
-    state_meeting,
-  });
-
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
 
   // region REQUEST
@@ -357,6 +335,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
   //
   //
   //
+
+  const {
+    visible: visible_pdf,
+    setVisible: setVisible_pdf,
+    pdfData,
+  } = useModalQuotationPdf({
+    quotationContent: content,
+  });
 
   // region useProductList
 
@@ -665,6 +651,56 @@ function TheQuotation({ router }: { router: NextRouter }) {
     toSetFileInfo: () => {},
   };
 
+  const tabList = useTabList({
+    contract,
+    engineeringContactId,
+    tab,
+    id,
+    version,
+  });
+
+  const panelList = usePanelList({
+    id,
+    version,
+    contract,
+    engineeringContactId,
+    setIsLoading,
+    update,
+    setReviewFormShow,
+    setSwitch02,
+    ref_workContact,
+    ref_meetingMinutes,
+
+    tab,
+    isShowPattern,
+    switch02,
+    disabed_workContactDoc,
+    state_meeting,
+    setVisible_pdf,
+    setShowPdf_part,
+  });
+
+  const pdfPartPropsArr = useMemo(() => {
+    const pdfPartPropsArr_productList = extractPdfPartFromClassProduct({
+      quotationNumber: contract?.contractNumber ?? '無報價編號',
+      productList,
+    });
+
+    // const pdfPartPropsArr_attachProductList = extractPdfPartFromClassProduct({
+    //   quotationNumber: latestContent?.quotationNumber ?? '無報價編號',
+    //   productList: attachProdList,
+    // });
+
+    return [
+      ...pdfPartPropsArr_productList,
+      // ...pdfPartPropsArr_attachProductList
+    ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    // attachProdList,
+    productList,
+  ]);
+
   // --------------------------Z---------------------------------------------
 
   // region useEffect
@@ -709,14 +745,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachments]);
   // -----------------------------------------------------------------------
-
-  // const {
-  //   visible: visible_pdf,
-  //   setVisible: setVisible_pdf,
-  //   pdfData,
-  // } = useModalQuotationPdf({
-  //   quotationContent: content,
-  // });
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -901,13 +929,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
         />
       </div>
 
-      {/* <QuotationPdf
+      <QuotationPdf
         //
         visible={visible_pdf}
         onCancel={() => setVisible_pdf(false)}
         pdfData={pdfData}
         fileName={contract?.contractNumber ?? ''}
-      /> */}
+      />
+
+      <QuotationPdf_part
+        isVisable={showPdf_part}
+        onCancel={() => {
+          setShowPdf_part(false);
+        }}
+        mainProductArr={pdfPartPropsArr}
+        quotationId={contract?.contractNumber ?? ''}
+      />
     </SubLayer>
   );
 }
@@ -1143,6 +1180,8 @@ const usePanelList = ({
   switch02,
   disabed_workContactDoc,
   state_meeting,
+  setVisible_pdf,
+  setShowPdf_part,
 }: {
   id: string | undefined;
   version: string | undefined;
@@ -1160,6 +1199,9 @@ const usePanelList = ({
   switch02: boolean;
   disabed_workContactDoc: boolean;
   state_meeting: Tstate_meetingMinutes;
+  //
+  setVisible_pdf: (value: React.SetStateAction<boolean>) => void;
+  setShowPdf_part: (value: React.SetStateAction<boolean>) => void;
 }) => {
   const router = useRouter();
 
@@ -1191,6 +1233,16 @@ const usePanelList = ({
             },
           }
         : null)(),
+    {
+      type: 'myButton',
+      label: '匯出合約',
+      onClick: () => setVisible_pdf(true),
+    },
+    {
+      type: 'myButton',
+      label: '單價分析',
+      onClick: () => setShowPdf_part(true),
+    },
     {
       type: 'myButton',
       label: '合約審核表',

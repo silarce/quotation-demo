@@ -805,7 +805,11 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
 };
 
 // region useGetContract_id_getItems
-export const useGetContract_id_contentProductItems = (id: string | undefined, customParams?: Tparams) => {
+export const useGetContract_id_contentProductItems = (
+  id: string | undefined,
+  customParams?: Tparams,
+  version?: string
+) => {
   const params: Tparams = {
     ...customParams,
     populate: [
@@ -836,6 +840,28 @@ export const useGetContract_id_contentProductItems = (id: string | undefined, cu
         );
 
         res.content.products = productArr;
+
+        const version_num = Number(version);
+
+        if (version_num && version_num > 1) {
+          const subContracts = res.subContracts;
+
+          const theSubContract = res.subContracts.find((item) => {
+            return item.version === version_num;
+          });
+
+          if (theSubContract) {
+            const productArr = await Promise.all(
+              theSubContract!.content.products.map(async (prod) => {
+                const productId = prod.id;
+
+                return await apiGetQuotationProducts(productId);
+              })
+            );
+            theSubContract!.content.products = productArr;
+          }
+        }
+
         setRes(res);
       }
 
