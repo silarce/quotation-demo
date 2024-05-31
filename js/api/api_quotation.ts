@@ -804,6 +804,55 @@ export const useGetContract_id_forAttach = (id: string | undefined) => {
   };
 };
 
+// region useGetContract_id_getItems
+export const useGetContract_id_contentProductItems = (id: string | undefined, customParams?: Tparams) => {
+  const params: Tparams = {
+    ...customParams,
+    populate: [
+      //
+      ...lookpu_contractPopulate.contract_noItem02,
+      ...(customParams?.populate ?? []),
+    ],
+  };
+
+  const [res, setRes] = useState<TquotationContractDto>();
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    try {
+      const res = await apiGetContract_Id(id, params);
+
+      if (res) {
+        // const productArr = res.content.products;
+        const productArr = await Promise.all(
+          res.content.products.map(async (prod) => {
+            const productId = prod.id;
+
+            return await apiGetQuotationProducts(productId);
+          })
+        );
+
+        res.content.products = productArr;
+        setRes(res);
+      }
+
+      return res;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得合約資料失敗', content: err.message });
+    }
+  };
+
+  return {
+    data: res,
+    update,
+    clear: () => setRes(undefined),
+  };
+};
+
 export const apiGetContract_id_finalProductItem = async (contractId: string) => {
   const api = `/quotation/contracts/${contractId}/final-product-item`;
 
@@ -1332,7 +1381,7 @@ const lookpu_contractPopulate = {
     'subContracts.content.products.rootProductId',
     'subContracts.content.customer',
     'subContracts.content.verifyForm',
-    'products',
+    'products', // contract下好像沒有products
   ],
   forAttach: [
     'content.customer',

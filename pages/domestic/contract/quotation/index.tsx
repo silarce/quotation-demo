@@ -52,6 +52,10 @@ import Summary, {
 } from 'components/page/domestic/quotation/quotation/summary/summary';
 // import QuotationSinature from 'components/page/domestic/quotation/quotationSinature';
 
+// import QuotationPdf, {
+//   useModalQuotationPdf,
+// } from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
+
 // antd
 import { Collapse } from 'antd';
 const { Panel } = Collapse;
@@ -70,6 +74,8 @@ import scss from './quotation.module.scss';
 import {
   useGetContract_id_noItems_2,
   useQuotation_id_attachments,
+  useGetContract_id_contentProductItems,
+  //
   apiGetQuotationProducts,
   apiPatchQuotationContent_id_progress,
 } from 'js/api/api_quotation';
@@ -79,10 +85,12 @@ import { apiPostEngineeringContact } from 'js/api/api_engineering';
 import { useProductList } from 'hooks/quotation/useProduct';
 
 // type
-import type { TquotationContentDto } from 'js/api/api_quotation';
+import type { TquotationContractDto, TquotationContentDto } from 'js/api/api_quotation';
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
 // =============================================================
+
+// region TYPE
 
 // type Tstate_tab = 'contract' | 'contactDoc' | 'meetingMinutes' | 'certifiedDocument';
 
@@ -90,6 +98,18 @@ type Tquery = {
   id: string | undefined;
   version: string | undefined;
   tab: 'contract' | 'contactDoc' | 'meetingMinutes' | 'certifiedDocument';
+};
+
+type TpanelListList = {
+  panel_quotation01: TpanelList;
+  panel_quotation03: TpanelList;
+  panel_workContack_disabled: TpanelList;
+  panel_workContack: TpanelList;
+  panel_workContack_pattern: TpanelList;
+  panel_meeting_list: TpanelList;
+  panel_meeting_read: TpanelList;
+  panel_meeting_edit: TpanelList;
+  panel_meeting_add: TpanelList;
 };
 
 // =============================================================
@@ -116,30 +136,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
     tab = 'contract',
   } = query;
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [reviewFormShow, setReviewFormShow] = useState(false);
+  // -----------------------------------------------------------
+  const ref_workContact = useRef<TimperativeHandle>(null!);
+  const ref_meetingMinutes = useRef<TimperativeHandle_meetingMinutes>(null!);
 
   // -----------------------------------------------------------
+  const [isLoading, setIsLoading] = useState(false);
+  const [reviewFormShow, setReviewFormShow] = useState(false);
 
   // const [state_tab, setState_tab] = useState<Tstate_tab>('contract');
 
   const [dynaPanelList, setDynaPanelList] = useState<TpanelList | null | undefined>(null);
-
-  const dynaPanelListReducer = (value: TpanelList | null | undefined) => {
-    if (!value) {
-      setDynaPanelList(null);
-    } else {
-      value = [...value];
-
-      if (!value.find((item) => item?.label === '返回')) {
-        value.push({ type: 'myButton', label: '返回', onClick: router.back });
-      }
-
-      setDynaPanelList(value);
-    }
-  };
-
-  // -----------------------------------------------------------
 
   // 合約項目 追加/追減項目的開關
   // 按鈕是profile下面的 "合約項目"與 "追加/追減項目"
@@ -163,53 +170,36 @@ function TheQuotation({ router }: { router: NextRouter }) {
     isLoading: false,
   });
 
-  // -----------------------------------------------------------
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
-  // const clearShow = () => {
-  //   setIsShowContract(false);
-  //   setIsShowWorkContactDoc(false);1
-  //   setIsShowMeetingMinutes(false);
-  // };
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
 
-  const ref_workContact = useRef<TimperativeHandle>(null!);
-  const ref_meetingMinutes = useRef<TimperativeHandle_meetingMinutes>(null!);
-
-  const onWorkContactStateChange: TonStateChange = ({ disabled, isLoading, isShowPattern }) => {
-    setIsShowPattern(isShowPattern);
-    setDisabed_workContactDoc(disabled);
-    setIsLoading_workContact(isLoading);
-  };
-
-  // =========================================================
-
-  // const { data: contract, update } = useGetContract_id_noItems_2(id, { populate: ['content.settleProducts'] });
-  const { data: contract, update } = useGetContract_id_noItems_2(id);
-  const engineeringContactId = contract?.engineeringContactId;
-
-  useEffect(() => {
-    update();
-  }, [id]);
-
-  // =========================================================
+  const [inputModalConfig, setInputModalConfig] = useState<TinputModalProps>();
 
   // const [showPdf, setShowPdf] = useState(false);
   // const [showPdf_part, setShowPdf_part] = useState(false);
 
   // =========================================================
 
-  /**
-合約項目
-選中合約版本的contnet
-可以用url的version判斷
-version===1 是根合約
-version>1 是子合約
+  // region get Data
 
-如果是根合約，追加追減項目就取得所有的subContract
-如果是子合約，追加追減項目就取得所有比子合約版本小的subContract (包括這個子合約)
+  // const { data: contract, update } = useGetContract_id_noItems_2(id, { populate: ['content.settleProducts'] });
+  // const { data: contract, update } = useGetContract_id_noItems_2(id);
+  const { data: contract, update } = useGetContract_id_contentProductItems(id);
+  const engineeringContactId = contract?.engineeringContactId;
 
-原報價項目，就是根合約的content
- */
+  // 合約項目
+  // 選中合約版本的contnet
+  // 可以用url的version判斷
+  // version===1 是根合約
+  // version>1 是子合約
+  //
+  // 如果是根合約，追加追減項目就取得所有的subContract
+  // 如果是子合約，追加追減項目就取得所有比子合約版本小的subContract (包括這個子合約)
+  //
+  // 原報價項目，就是根合約的content
 
+  // region 前處理
   const { content, rootContent, subContracts, totalInfo } = useMemo(() => {
     if (!contract) {
       return {};
@@ -262,6 +252,114 @@ version>1 是子合約
     };
   }, [contract, version]);
 
+  // _________________________________________________________________________
+
+  // 附件
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(content?.id);
+
+  // =========================================================
+
+  const tabList = useTabList({
+    contract,
+    engineeringContactId,
+    tab,
+    id,
+    version,
+  });
+
+  const panelList = usePanelList({
+    id,
+    version,
+    contract,
+    engineeringContactId,
+    setIsLoading,
+    update,
+    setReviewFormShow,
+    setSwitch02,
+    ref_workContact,
+    ref_meetingMinutes,
+
+    tab,
+    isShowPattern,
+    switch02,
+    disabed_workContactDoc,
+    state_meeting,
+  });
+
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+
+  // region REQUEST
+  const reqPatchQuotationContent_id_progress = async ({
+    trackProgress,
+    projectProgress,
+  }: {
+    trackProgress?: string | null;
+    projectProgress?: string | null;
+  }) => {
+    const contentId = content?.id;
+
+    if (!contentId) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const res = await apiPatchQuotationContent_id_progress(contentId, {
+        trackProgress,
+        projectProgress,
+      });
+
+      return res;
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --------------------------Z---------------------------------------------
+
+  // region FUNCTION
+
+  const dynaPanelListReducer = (value: TpanelList | null | undefined) => {
+    if (!value) {
+      setDynaPanelList(null);
+    } else {
+      value = [...value];
+
+      if (!value.find((item) => item?.label === '返回')) {
+        value.push({ type: 'myButton', label: '返回', onClick: router.back });
+      }
+
+      setDynaPanelList(value);
+    }
+  };
+
+  const onWorkContactStateChange: TonStateChange = ({ disabled, isLoading, isShowPattern }) => {
+    setIsShowPattern(isShowPattern);
+    setDisabed_workContactDoc(disabled);
+    setIsLoading_workContact(isLoading);
+  };
+
+  // const clearShow = () => {
+  //   setIsShowContract(false);
+  //   setIsShowWorkContactDoc(false);1
+  //   setIsShowMeetingMinutes(false);
+  // };
+  // --------------------------Z---------------------------------------------
+
+  // region PROPS
+  //
+  //
+  //
+  //
+
+  // region useProductList
+
   // 合約項目
   const {
     // reRender,
@@ -300,28 +398,134 @@ version>1 是子合約
     quotationDiscount: Number(content?.discount || '100'),
   }); // 合約項目
 
-  const [targetProdKey, setTargetProdKey] = useState<string>('n');
   const targetProd = productList[targetProdKey];
 
-  useEffect(() => {
-    (async () => {
-      if (targetProd?.id) {
-        try {
-          const res = await apiGetQuotationProducts(targetProd.id);
-          const componentsArr = res.items?.[0].components ?? [];
-          const acceArr = res.items?.[0].accessories ?? [];
-          // creComList_dyna
+  // ______________________________________________________________________
+  // ______________________________________________________________________
 
-          targetProd.creComList_dyna({ componentsArr: componentsArr });
-          targetProd.creAcceList_dyna({ acceArr });
-        } catch (error) {}
-      }
-    })();
+  const control_profile = useMemo(() => {
+    const control_profile: Tcontrol_profile = {
+      quotationNumber: content?.quotationNumber ?? '',
+      quotationDate: content?.quotationDate ?? '',
+      isLost: {
+        value: content?.isLost ?? false,
+      },
+      customer: {
+        value: content?.customer,
+        // onChange: (customer) => {
+        //   const customerPhoneNumber = customer.phone || '';
+        //   const contact = customer.contacts?.[0];
+        //   const name = contact?.name ?? '';
+        //   const phone = contact?.phone || customerPhoneNumber || '';
+        //   const fax = customer.fax || '';
 
-    // apiGetQuotationProducts
-  }, [targetProd]);
+        //   setCustomer(customer);
+        //   changeProfile('contactPerson', `${name}`);
+        //   changeProfile('contactNumber', phone);
+        //   changeProfile('faxNumber', fax);
+        // },
+        // onClear: () => {
+        //   setCustomer(null);
+        //   changeProfile('contactPerson', '');
+        //   changeProfile('contactNumber', '');
+        //   changeProfile('faxNumber', '');
+        // },
+      },
+      itemList: {
+        validityPeriod: {
+          value: content?.validityPeriod ?? '',
+          // onChange: (v) => changeProfile('validityPeriod', v),
+        },
+        projectName: {
+          value: content?.projectName ?? '',
+          // onChange: (v) => changeProfile('projectName', v),
+        },
+        county: {
+          value: content?.county ?? '',
+          // onChange: (v) => {
+          //   changeProfile('county', v);
+          //   changeProfile('district', '');
+          // },
+        },
+        district: {
+          value: content?.district ?? '',
+          // onChange: (v) => changeProfile('district', v),
+        },
+        address: {
+          value: content?.address ?? '',
+          // onChange: (v) => changeProfile('address', v),
+        },
+        contactPerson: {
+          value: content?.contactPerson ?? '',
+          // onChange: (v) => changeProfile('contactPerson', v),
+        },
+        contactNumber: {
+          value: content?.contactNumber ?? '',
+          // onChange: (v) => changeProfile('contactNumber', v),
+        },
+        faxNumber: {
+          value: content?.faxNumber ?? '',
+          // onChange: (v) => changeProfile('faxNumber', v),
+        },
+        trackProgress: {
+          value: content?.trackProgress ?? '',
 
-  // -----------------------------------------------------------------
+          onClick: () => {
+            setInputModalConfig({
+              visible: true,
+              title: '追蹤進度',
+              placeholder: '請輸入追蹤進度',
+              onConfirm: async (v) => {
+                const res = await reqPatchQuotationContent_id_progress({
+                  trackProgress: v,
+                });
+
+                if (res) {
+                  // const trackProgress = res.trackProgress;
+                  // changeProfile('trackProgress', trackProgress);
+                  update();
+                }
+
+                setInputModalConfig(undefined);
+              },
+              onCancel: () => setInputModalConfig(undefined),
+            });
+          },
+          disabled: false,
+        },
+        projectProgress: {
+          value: content?.projectProgress ?? '',
+
+          onClick: () => {
+            setInputModalConfig({
+              visible: true,
+              title: '工程進度',
+              placeholder: '請輸入工程進度',
+              onConfirm: async (v) => {
+                const res = await reqPatchQuotationContent_id_progress({
+                  projectProgress: v,
+                });
+
+                if (res) {
+                  // const projectProgress = res.projectProgress;
+                  // changeProfile('projectProgress', projectProgress);
+                  update();
+                }
+
+                setInputModalConfig(undefined);
+              },
+              onCancel: () => setInputModalConfig(undefined),
+            });
+          },
+          disabled: false,
+        },
+      },
+    };
+
+    return control_profile;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content]);
+
   const control_anno: TsummaryControl = {
     stringArr: contract?.annotations ?? [],
     editString: () => {},
@@ -455,10 +659,37 @@ version>1 是子合約
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract?.content]);
 
-  // 附件
-  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(content?.id);
+  const appendixParams = {
+    fileInfoArr,
+    removeFileInfo: () => {},
+    toSetFileInfo: () => {},
+  };
 
-  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
+  // --------------------------Z---------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    update();
+  }, [id]);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     if (targetProd?.id) {
+  //       try {
+  //         const res = await apiGetQuotationProducts(targetProd.id);
+  //         const componentsArr = res.items?.[0].components ?? [];
+  //         const acceArr = res.items?.[0].accessories ?? [];
+  //         // creComList_dyna
+
+  //         targetProd.creComList_dyna({ componentsArr: componentsArr });
+  //         targetProd.creAcceList_dyna({ acceArr });
+  //       } catch (error) {}
+  //     }
+  //   })();
+
+  //   // apiGetQuotationProducts
+  // }, [targetProd]);
 
   useEffect(() => {
     const arr = attachments?.map((item) => {
@@ -477,84 +708,460 @@ version>1 是子合約
     setFileInfoArr(arr ?? []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachments]);
+  // -----------------------------------------------------------------------
 
-  const appendixParams = {
-    fileInfoArr,
-    removeFileInfo: () => {},
-    toSetFileInfo: () => {},
-  };
+  // const {
+  //   visible: visible_pdf,
+  //   setVisible: setVisible_pdf,
+  //   pdfData,
+  // } = useModalQuotationPdf({
+  //   quotationContent: content,
+  // });
 
-  // -----------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
 
-  // =========================================================
+  // region render
+  return (
+    <SubLayer
+      //
+      isLoading_all={isLoading || isLoading_workContact}
+      scrollToTopTrigger={useMemo(() => {
+        return [tab === 'contactDoc', isShowPattern];
+      }, [isShowPattern, tab])}
+    >
+      <PageHeader02
+        tagList={tabList}
+        panelList={dynaPanelList || panelList}
+        //  linkList={linkArr}
+      />
+      {/*  */}
+      <div>
+        {/* <ContractNode /> */}
 
-  const tabList: TtabList = [
-    {
-      label: `合約編號 ${contract?.contractNumber ?? ''}`,
-      isActive: tab === 'contract',
-      onClick: () => {
-        router.replace({
-          query: {
-            id,
-            version,
-            tab: 'contract',
-          },
-        });
-      },
-    },
-    // {
-    //   label: `工程聯絡單`,
-    //   onClick: () => {
-    //     setState_tab('contactDoc');
-    //   },
-    // },
-    {
-      label: `會議記錄`,
-      isActive: tab === 'meetingMinutes',
-      onClick: () => {
-        router.replace({
-          query: {
-            id,
-            version,
-            tab: 'meetingMinutes',
-          },
-        });
-      },
-    },
-  ];
+        {tab === 'contract' && (
+          <div className={classNames(scss.quotation)}>
+            {/* 報價單基本資料 */}
+            <QuotationProfile disabled={true} control={control_profile} />
 
-  if (engineeringContactId) {
-    tabList.splice(
-      1,
-      0,
-      {
-        label: `工程聯絡單`,
-        isActive: tab === 'contactDoc',
-        onClick: () => {
-          router.replace({
-            query: {
-              id,
-              version,
-              tab: 'contactDoc',
-            },
-          });
-        },
-      },
-      {
-        label: `證明文件`,
-        isActive: tab === 'certifiedDocument',
-        onClick: () => {
-          router.replace({
-            query: {
-              id,
-              version,
-              tab: 'certifiedDocument',
-            },
-          });
-        },
-      }
-    );
+            {/* switch01 */}
+            <div className={scss.switchBar}>
+              {!switch02 && (
+                <div className={(switch01 && scss.active) || ''} onClick={() => setSwitch01(true)}>
+                  合約項目
+                </div>
+              )}
+              <div className={switch02 || !switch01 ? scss.active : ''} onClick={() => setSwitch01(false)}>
+                追加 / 追減項目
+              </div>
+            </div>
+
+            {/* 合約項目 追加/追減項目 */}
+            {switch01 || switch02 ? (
+              <>
+                {/* 主產品設定 */}
+                <Table_prod
+                  disabled={true}
+                  prodList={productList}
+                  prodCellConfig={prodCellConfig}
+                  prodKeyArr={prodKeyArr}
+                  changeProdKeyArr={changeProdKeyArr}
+                  addProd={() => {}}
+                  setTargetProd={setTargetProdKey}
+                  panelBox="easyBox"
+                  emptyBlockWidth="80px"
+                  rowHeight={'h60'}
+                  discountRate={contract?.discount ?? ''} // 報價單總折數
+                  changeDiscountRate={(v) => {}}
+                />
+                {/* 原報價項目 */}
+
+                {switch02 && <OldQuotationProduction rootContent={rootContent} />}
+                <br />
+                <div className={scss.redWrapper}>
+                  {/* 材料配件設定 */}
+                  <Table_com
+                    disabled={true}
+                    // comList={targetProd?.comList}
+                    // FIXME 之後要把型別處理好
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
+                    comCellConfig={comCellConfig}
+                    comKeyArr={comKeyArr}
+                    changeComKeyArr={changeComKeyArr}
+                    defalutVKeyArr={comVKeyArr}
+                  />
+                  <hr />
+                  {/* 選配設定 */}
+                  <br />
+                  <Table_accessories
+                    disabled={true}
+                    list={targetProd?.accessoriesList}
+                    cellConfig={accessoriesCellConfig}
+                    keyArr={accessoriesKeyArr}
+                    changeKeyArr={changeAccessoriesKeyArr}
+                    defalutVKeyArr={targetProd?.accessoriesVKeyArr}
+                    onVKeyChange={(keyArr) => {
+                      if (targetProd) {
+                        targetProd.accessoriesVKeyArr = keyArr;
+                      }
+                    }}
+                    doorModel={targetProd?.doorType}
+                    onSelectorConfirm={(arr) => {}}
+                    panelBox="easyBox"
+                    emptyBlockWidth="80px"
+                  />
+                  <br />
+                  {/* 其他設定 */}
+                  <Table_others
+                    disabled={true}
+                    list={othersList}
+                    cellConfig={othersCellConfig}
+                    keyArr={othersKeyArr}
+                    changeKeyArr={() => {}}
+                    add={() => {}}
+                  />
+                </div>
+              </>
+            ) : (
+              // 追加/追減項目
+              <QuotationProdChangingRecord subContract={subContracts} />
+            )}
+
+            {/* 展開版本的追加追減紀錄 (在很下面)*/}
+            {switch02 && <QuotationRecord subContract={subContracts} />}
+
+            <Summary
+              disabled={true}
+              payInfoControl={payInfoControl}
+              control_anno={control_anno}
+              control_qr={control_qr}
+              appendixParams={appendixParams}
+              avgDiscount_withQty={avgDiscount_withQty}
+            />
+
+            {/* 簽名 */}
+            <SignatureBar control={control_signature} className="mx-[50px] mt-[120px] mb-[40px]" />
+          </div>
+        )}
+
+        {/*  */}
+        {/*  */}
+        {/*  */}
+        {tab === 'contactDoc' && engineeringContactId && (
+          <div>
+            <WorkContactDoc_component
+              ref={ref_workContact}
+              contract={contract}
+              engineeringContactId={engineeringContactId}
+              onStateChange={onWorkContactStateChange}
+            />
+          </div>
+        )}
+
+        {tab === 'meetingMinutes' && (
+          <MeetingMinutes_contract
+            //
+            ref={ref_meetingMinutes}
+            onStateChange={setState_meeting}
+            contractIdFromProps={id}
+            quotationNumber={contract?.content.quotationNumber}
+          />
+        )}
+
+        {tab === 'certifiedDocument' && <CertifiedDocument onPanelListChange={dynaPanelListReducer} />}
+
+        <InputModal
+          visible={!!inputModalConfig?.visible}
+          onConfirm={inputModalConfig?.onConfirm}
+          onCancel={inputModalConfig?.onCancel}
+          title={inputModalConfig?.title ?? ''}
+          placeholder={inputModalConfig?.placeholder}
+        />
+
+        <ContractReviewForm
+          showModal={reviewFormShow}
+          forbidden={true}
+          close={() => setReviewFormShow(false)}
+          contractIdNumber={content?.quotationNumber ?? ''}
+          contractName={content?.projectName ?? ''}
+          contractPrice={Number(content?.total ?? '')}
+          lastestContentId={content?.id}
+          verifyForm={content?.verifyForm}
+          onConfirm={async () => {
+            setIsLoading(true);
+            await update();
+            setIsLoading(false);
+          }}
+        />
+      </div>
+
+      {/* <QuotationPdf
+        //
+        visible={visible_pdf}
+        onCancel={() => setVisible_pdf(false)}
+        pdfData={pdfData}
+        fileName={contract?.contractNumber ?? ''}
+      /> */}
+    </SubLayer>
+  );
+}
+
+// region END
+
+// ====================================================================
+// ====================================================================
+// ====================================================================
+
+// ====================================================================
+// ====================================================================
+// ====================================================================
+
+// region COMPONENT
+
+const OldQuotationProduction = ({
+  // prodList,
+  // prodCellConfig,
+  // prodKeyArr,
+  // changeProdKeyArr,
+  // setTargetProd,
+  rootContent,
+}: {
+  // prodList: Parameters<typeof Table_prod>[0]['prodList'];
+  // prodCellConfig: Parameters<typeof Table_prod>[0]['prodCellConfig'];
+  // prodKeyArr: Parameters<typeof Table_prod>[0]['prodKeyArr'];
+  // changeProdKeyArr: Parameters<typeof Table_prod>[0]['changeProdKeyArr'];
+  // setTargetProd: Parameters<typeof Table_prod>[0]['setTargetProd'];
+  rootContent: TquotationContentDto | undefined;
+}) => {
+  const [isActive, setIsActive] = useState(false);
+  const panelSwitch = () => setIsActive(!isActive);
+
+  const {
+    // reRender,
+    // reset,
+    //
+    productList,
+    prodCellConfig,
+    prodKeyArr,
+    // prodVKeyArr,
+    // setProdVKeyArr,
+    // addProd,
+    changeProdKeyArr,
+    //
+    // subTotal,
+    //
+    // comKeyArr,
+    // comVKeyArr,
+    // comCellConfig,
+    // changeComKeyArr,
+    //
+    // accessoriesKeyArr,
+    // changeAccessoriesKeyArr,
+    // accessoriesCellConfig,
+    //
+    // othersKeyArr,
+    // othersList,
+    // othersCellConfig,
+    // changeOthersKeyArr,
+    // addOthers,
+    // getOthersPostBodyArr,
+    avgDiscount_withQty,
+  } = useProductList({
+    productArr: rootContent?.products ?? [],
+    others: [],
+    resetTrigger: rootContent?.products,
+    quotationDiscount: Number(rootContent?.discount || '100'),
+  });
+
+  const [targetProdKey, setTargetProdKey] = useState<string>('n');
+  const targetProd = productList[targetProdKey];
+
+  return (
+    <Collapse
+      className={`${scss.oldQuotationProduction}`}
+      expandIcon={() => <></>}
+      accordion={false}
+      activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
+    >
+      <Panel key={0} header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}>
+        <Table_prod
+          disabled={true}
+          prodList={productList}
+          prodCellConfig={prodCellConfig}
+          prodKeyArr={prodKeyArr}
+          changeProdKeyArr={changeProdKeyArr}
+          addProd={() => {}}
+          setTargetProd={setTargetProdKey}
+          discountRate={undefined}
+        />
+
+        {/* <Table_com
+          disabled={true}
+          comList={targetProd?.comList}
+          comCellConfig={comCellConfig}
+          comKeyArr={comKeyArr}
+          changeComKeyArr={changeComKeyArr}
+          defalutVKeyArr={comVKeyArr}
+        /> */}
+
+        {/* <Table_accessories
+          disabled={true}
+          list={targetProd?.accessoriesList}
+          cellConfig={accessoriesCellConfig}
+          keyArr={accessoriesKeyArr}
+          changeKeyArr={changeAccessoriesKeyArr}
+          defalutVKeyArr={targetProd?.accessoriesVKeyArr}
+          onVKeyChange={(keyArr) => {
+            if (targetProd) {
+              targetProd.accessoriesVKeyArr = keyArr;
+            }
+          }}
+          doorModel={targetProd?.doorType}
+          onSelectorConfirm={(arr) => {
+            if (targetProd) {
+              targetProd.addAcce(arr);
+            }
+          }}
+        /> */}
+      </Panel>
+    </Collapse>
+  );
+};
+
+// oqp就是OldQuotationProduction
+const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: () => void }) => {
+  const active = isActive ? scss.active : '';
+
+  return (
+    <div className={`${scss.OqpHeader} ${active}`}>
+      <span>原報價項目</span>
+      <button className={scss.panelButton} onClick={panelSwitch}>
+        <span>展開</span>
+        <RotatingArrow01 deg={0} defaultDeg={-180} isActive={!isActive} />
+      </button>
+    </div>
+  );
+};
+
+// =============================================================================
+
+// region FUNCTION
+
+const panelListRouter = ({
+  panelListList,
+  tab,
+  isShowPattern,
+  switch02,
+  disabed_workContactDoc,
+  isMeetingAdd,
+  isMeetingRead,
+  isMeetingEdit,
+}: {
+  panelListList: TpanelListList;
+  tab: Tquery['tab'];
+  isShowPattern: boolean;
+  switch02: boolean;
+  disabed_workContactDoc: boolean;
+  isMeetingAdd: boolean;
+  isMeetingRead: boolean;
+  isMeetingEdit: boolean;
+}): TpanelList => {
+  const {
+    panel_quotation01,
+    panel_quotation03,
+    panel_workContack_disabled,
+    panel_workContack,
+    panel_workContack_pattern,
+  } = panelListList;
+
+  if (tab === 'contract') {
+    if (switch02) {
+      return panel_quotation03;
+    } else {
+      return panel_quotation01;
+    }
   }
+
+  if (tab === 'contactDoc') {
+    if (isShowPattern) {
+      return panel_workContack_pattern;
+    } else if (disabed_workContactDoc) {
+      return panel_workContack_disabled;
+    } else {
+      return panel_workContack;
+    }
+  }
+
+  if (tab === 'meetingMinutes') {
+    if (isMeetingAdd) {
+      return panelListList.panel_meeting_add;
+    } else if (isMeetingEdit) {
+      return panelListList.panel_meeting_edit;
+    } else if (isMeetingRead) {
+      return panelListList.panel_meeting_read;
+    } else {
+      return panelListList.panel_meeting_list;
+    }
+  }
+
+  return [];
+
+  //
+  //
+};
+
+// ===========================================================================
+
+// region hook
+//
+//
+//
+//
+//
+// region usePanelList
+
+const usePanelList = ({
+  id,
+  version,
+  contract,
+  engineeringContactId,
+  setIsLoading,
+  update,
+  setReviewFormShow,
+  setSwitch02,
+  ref_workContact,
+  ref_meetingMinutes,
+  //
+  tab,
+  isShowPattern,
+  switch02,
+  disabed_workContactDoc,
+  state_meeting,
+}: {
+  id: string | undefined;
+  version: string | undefined;
+  contract: TquotationContractDto | undefined;
+  engineeringContactId: string | undefined | null;
+  setIsLoading: (value: React.SetStateAction<boolean>) => void;
+  update: () => void;
+  setReviewFormShow: (value: React.SetStateAction<boolean>) => void;
+  setSwitch02: (value: React.SetStateAction<boolean>) => void;
+  ref_workContact: React.MutableRefObject<TimperativeHandle>;
+  ref_meetingMinutes: React.MutableRefObject<TimperativeHandle_meetingMinutes>;
+  //
+  tab: Tquery['tab'];
+  isShowPattern: boolean;
+  switch02: boolean;
+  disabed_workContactDoc: boolean;
+  state_meeting: Tstate_meetingMinutes;
+}) => {
+  const router = useRouter();
 
   const panel_quotation01: TpanelList = [
     // 現在後端會在合約產生時自動產生工程聯絡單，因此把這個按鈕拿掉
@@ -742,560 +1349,92 @@ version>1 是子合約
     isMeetingRead: state_meeting.isRead,
   });
 
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-
-  const [inputModalConfig, setInputModalConfig] = useState<TinputModalProps>();
-
-  const control_profile = useMemo(() => {
-    const control_profile: Tcontrol_profile = {
-      quotationNumber: content?.quotationNumber ?? '',
-      quotationDate: content?.quotationDate ?? '',
-      isLost: {
-        value: content?.isLost ?? false,
-      },
-      customer: {
-        value: content?.customer,
-        // onChange: (customer) => {
-        //   const customerPhoneNumber = customer.phone || '';
-        //   const contact = customer.contacts?.[0];
-        //   const name = contact?.name ?? '';
-        //   const phone = contact?.phone || customerPhoneNumber || '';
-        //   const fax = customer.fax || '';
-
-        //   setCustomer(customer);
-        //   changeProfile('contactPerson', `${name}`);
-        //   changeProfile('contactNumber', phone);
-        //   changeProfile('faxNumber', fax);
-        // },
-        // onClear: () => {
-        //   setCustomer(null);
-        //   changeProfile('contactPerson', '');
-        //   changeProfile('contactNumber', '');
-        //   changeProfile('faxNumber', '');
-        // },
-      },
-      itemList: {
-        validityPeriod: {
-          value: content?.validityPeriod ?? '',
-          // onChange: (v) => changeProfile('validityPeriod', v),
-        },
-        projectName: {
-          value: content?.projectName ?? '',
-          // onChange: (v) => changeProfile('projectName', v),
-        },
-        county: {
-          value: content?.county ?? '',
-          // onChange: (v) => {
-          //   changeProfile('county', v);
-          //   changeProfile('district', '');
-          // },
-        },
-        district: {
-          value: content?.district ?? '',
-          // onChange: (v) => changeProfile('district', v),
-        },
-        address: {
-          value: content?.address ?? '',
-          // onChange: (v) => changeProfile('address', v),
-        },
-        contactPerson: {
-          value: content?.contactPerson ?? '',
-          // onChange: (v) => changeProfile('contactPerson', v),
-        },
-        contactNumber: {
-          value: content?.contactNumber ?? '',
-          // onChange: (v) => changeProfile('contactNumber', v),
-        },
-        faxNumber: {
-          value: content?.faxNumber ?? '',
-          // onChange: (v) => changeProfile('faxNumber', v),
-        },
-        trackProgress: {
-          value: content?.trackProgress ?? '',
-
-          onClick: () => {
-            setInputModalConfig({
-              visible: true,
-              title: '追蹤進度',
-              placeholder: '請輸入追蹤進度',
-              onConfirm: async (v) => {
-                const res = await reqPatchQuotationContent_id_progress({
-                  trackProgress: v,
-                });
-
-                if (res) {
-                  // const trackProgress = res.trackProgress;
-                  // changeProfile('trackProgress', trackProgress);
-                  update();
-                }
-
-                setInputModalConfig(undefined);
-              },
-              onCancel: () => setInputModalConfig(undefined),
-            });
-          },
-          disabled: false,
-        },
-        projectProgress: {
-          value: content?.projectProgress ?? '',
-
-          onClick: () => {
-            setInputModalConfig({
-              visible: true,
-              title: '工程進度',
-              placeholder: '請輸入工程進度',
-              onConfirm: async (v) => {
-                const res = await reqPatchQuotationContent_id_progress({
-                  projectProgress: v,
-                });
-
-                if (res) {
-                  // const projectProgress = res.projectProgress;
-                  // changeProfile('projectProgress', projectProgress);
-                  update();
-                }
-
-                setInputModalConfig(undefined);
-              },
-              onCancel: () => setInputModalConfig(undefined),
-            });
-          },
-          disabled: false,
-        },
-      },
-    };
-
-    return control_profile;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content]);
-
-  const reqPatchQuotationContent_id_progress = async ({
-    trackProgress,
-    projectProgress,
-  }: {
-    trackProgress?: string | null;
-    projectProgress?: string | null;
-  }) => {
-    const contentId = content?.id;
-
-    if (!contentId) {
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-
-      const res = await apiPatchQuotationContent_id_progress(contentId, {
-        trackProgress,
-        projectProgress,
-      });
-
-      return res;
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // --------------------------Z---------------------------------------------
-
-  const scrollToTopTrigger = useMemo(() => {
-    return [tab === 'contactDoc', isShowPattern];
-  }, [isShowPattern, tab]);
-
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-  // -----------------------------------------------------------------------
-
-  return (
-    <SubLayer
-      //
-      isLoading_all={isLoading || isLoading_workContact}
-      scrollToTopTrigger={scrollToTopTrigger}
-    >
-      <PageHeader02
-        tagList={tabList}
-        panelList={dynaPanelList || panelList}
-        //  linkList={linkArr}
-      />
-      {/*  */}
-      <div>
-        {/* <ContractNode /> */}
-
-        {tab === 'contract' && (
-          <div className={classNames(scss.quotation)}>
-            {/* 報價單基本資料 */}
-            <QuotationProfile disabled={true} control={control_profile} />
-
-            {/* switch01 */}
-            <div className={scss.switchBar}>
-              {!switch02 && (
-                <div className={(switch01 && scss.active) || ''} onClick={() => setSwitch01(true)}>
-                  合約項目
-                </div>
-              )}
-              <div className={switch02 || !switch01 ? scss.active : ''} onClick={() => setSwitch01(false)}>
-                追加 / 追減項目
-              </div>
-            </div>
-
-            {/* 合約項目 追加/追減項目 */}
-            {switch01 || switch02 ? (
-              <>
-                {/* 主產品設定 */}
-                <Table_prod
-                  disabled={true}
-                  prodList={productList}
-                  prodCellConfig={prodCellConfig}
-                  prodKeyArr={prodKeyArr}
-                  changeProdKeyArr={changeProdKeyArr}
-                  addProd={() => {}}
-                  setTargetProd={setTargetProdKey}
-                  panelBox="easyBox"
-                  emptyBlockWidth="80px"
-                  rowHeight={'h60'}
-                  discountRate={contract?.discount ?? ''} // 報價單總折數
-                  changeDiscountRate={(v) => {}}
-                />
-                {/* 原報價項目 */}
-
-                {switch02 && <OldQuotationProduction rootContent={rootContent} />}
-                <br />
-                <div className={scss.redWrapper}>
-                  {/* 材料配件設定 */}
-                  <Table_com
-                    disabled={true}
-                    // comList={targetProd?.comList}
-                    // FIXME 之後要把型別處理好
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    comList={{ ...targetProd?.comList, ...targetProd?.subComList }}
-                    comCellConfig={comCellConfig}
-                    comKeyArr={comKeyArr}
-                    changeComKeyArr={changeComKeyArr}
-                    defalutVKeyArr={comVKeyArr}
-                  />
-                  <hr />
-                  {/* 選配設定 */}
-                  <br />
-                  <Table_accessories
-                    disabled={true}
-                    list={targetProd?.accessoriesList}
-                    cellConfig={accessoriesCellConfig}
-                    keyArr={accessoriesKeyArr}
-                    changeKeyArr={changeAccessoriesKeyArr}
-                    defalutVKeyArr={targetProd?.accessoriesVKeyArr}
-                    onVKeyChange={(keyArr) => {
-                      if (targetProd) {
-                        targetProd.accessoriesVKeyArr = keyArr;
-                      }
-                    }}
-                    doorModel={targetProd?.doorType}
-                    onSelectorConfirm={(arr) => {}}
-                    panelBox="easyBox"
-                    emptyBlockWidth="80px"
-                  />
-                  <br />
-                  {/* 其他設定 */}
-                  <Table_others
-                    disabled={true}
-                    list={othersList}
-                    cellConfig={othersCellConfig}
-                    keyArr={othersKeyArr}
-                    changeKeyArr={() => {}}
-                    add={() => {}}
-                  />
-                </div>
-              </>
-            ) : (
-              // 追加/追減項目
-              <QuotationProdChangingRecord subContract={subContracts} />
-            )}
-
-            {/* 展開版本的追加追減紀錄 (在很下面)*/}
-            {switch02 && <QuotationRecord subContract={subContracts} />}
-
-            <Summary
-              disabled={true}
-              payInfoControl={payInfoControl}
-              control_anno={control_anno}
-              control_qr={control_qr}
-              appendixParams={appendixParams}
-              avgDiscount_withQty={avgDiscount_withQty}
-            />
-
-            {/* 簽名 */}
-            <SignatureBar control={control_signature} className="mx-[50px] mt-[120px] mb-[40px]" />
-          </div>
-        )}
-
-        {/*  */}
-        {/*  */}
-        {/*  */}
-        {tab === 'contactDoc' && engineeringContactId && (
-          <div>
-            <WorkContactDoc_component
-              ref={ref_workContact}
-              contract={contract}
-              engineeringContactId={engineeringContactId}
-              onStateChange={onWorkContactStateChange}
-            />
-          </div>
-        )}
-
-        {tab === 'meetingMinutes' && (
-          <MeetingMinutes_contract
-            //
-            ref={ref_meetingMinutes}
-            onStateChange={setState_meeting}
-            contractIdFromProps={id}
-            quotationNumber={contract?.content.quotationNumber}
-          />
-        )}
-
-        {tab === 'certifiedDocument' && <CertifiedDocument onPanelListChange={dynaPanelListReducer} />}
-
-        <InputModal
-          visible={!!inputModalConfig?.visible}
-          onConfirm={inputModalConfig?.onConfirm}
-          onCancel={inputModalConfig?.onCancel}
-          title={inputModalConfig?.title ?? ''}
-          placeholder={inputModalConfig?.placeholder}
-        />
-
-        <ContractReviewForm
-          showModal={reviewFormShow}
-          forbidden={true}
-          close={() => setReviewFormShow(false)}
-          contractIdNumber={content?.quotationNumber ?? ''}
-          contractName={content?.projectName ?? ''}
-          contractPrice={Number(content?.total ?? '')}
-          lastestContentId={content?.id}
-          verifyForm={content?.verifyForm}
-          onConfirm={async () => {
-            setIsLoading(true);
-            await update();
-            setIsLoading(false);
-          }}
-        />
-      </div>
-    </SubLayer>
-  );
-}
-
-// ====================================================================
-// ====================================================================
-// ====================================================================
-
-// ====================================================================
-// ====================================================================
-// ====================================================================
-
-const OldQuotationProduction = ({
-  // prodList,
-  // prodCellConfig,
-  // prodKeyArr,
-  // changeProdKeyArr,
-  // setTargetProd,
-  rootContent,
-}: {
-  // prodList: Parameters<typeof Table_prod>[0]['prodList'];
-  // prodCellConfig: Parameters<typeof Table_prod>[0]['prodCellConfig'];
-  // prodKeyArr: Parameters<typeof Table_prod>[0]['prodKeyArr'];
-  // changeProdKeyArr: Parameters<typeof Table_prod>[0]['changeProdKeyArr'];
-  // setTargetProd: Parameters<typeof Table_prod>[0]['setTargetProd'];
-  rootContent: TquotationContentDto | undefined;
-}) => {
-  const [isActive, setIsActive] = useState(false);
-  const panelSwitch = () => setIsActive(!isActive);
-
-  const {
-    // reRender,
-    // reset,
-    //
-    productList,
-    prodCellConfig,
-    prodKeyArr,
-    // prodVKeyArr,
-    // setProdVKeyArr,
-    // addProd,
-    changeProdKeyArr,
-    //
-    // subTotal,
-    //
-    // comKeyArr,
-    // comVKeyArr,
-    // comCellConfig,
-    // changeComKeyArr,
-    //
-    // accessoriesKeyArr,
-    // changeAccessoriesKeyArr,
-    // accessoriesCellConfig,
-    //
-    // othersKeyArr,
-    // othersList,
-    // othersCellConfig,
-    // changeOthersKeyArr,
-    // addOthers,
-    // getOthersPostBodyArr,
-    avgDiscount_withQty,
-  } = useProductList({
-    productArr: rootContent?.products ?? [],
-    others: [],
-    resetTrigger: rootContent?.products,
-    quotationDiscount: Number(rootContent?.discount || '100'),
-  });
-
-  const [targetProdKey, setTargetProdKey] = useState<string>('n');
-  const targetProd = productList[targetProdKey];
-
-  return (
-    <Collapse
-      className={`${scss.oldQuotationProduction}`}
-      expandIcon={() => <></>}
-      accordion={false}
-      activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
-    >
-      <Panel key={0} header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}>
-        <Table_prod
-          disabled={true}
-          prodList={productList}
-          prodCellConfig={prodCellConfig}
-          prodKeyArr={prodKeyArr}
-          changeProdKeyArr={changeProdKeyArr}
-          addProd={() => {}}
-          setTargetProd={setTargetProdKey}
-          discountRate={undefined}
-        />
-
-        {/* <Table_com
-          disabled={true}
-          comList={targetProd?.comList}
-          comCellConfig={comCellConfig}
-          comKeyArr={comKeyArr}
-          changeComKeyArr={changeComKeyArr}
-          defalutVKeyArr={comVKeyArr}
-        /> */}
-
-        {/* <Table_accessories
-          disabled={true}
-          list={targetProd?.accessoriesList}
-          cellConfig={accessoriesCellConfig}
-          keyArr={accessoriesKeyArr}
-          changeKeyArr={changeAccessoriesKeyArr}
-          defalutVKeyArr={targetProd?.accessoriesVKeyArr}
-          onVKeyChange={(keyArr) => {
-            if (targetProd) {
-              targetProd.accessoriesVKeyArr = keyArr;
-            }
-          }}
-          doorModel={targetProd?.doorType}
-          onSelectorConfirm={(arr) => {
-            if (targetProd) {
-              targetProd.addAcce(arr);
-            }
-          }}
-        /> */}
-      </Panel>
-    </Collapse>
-  );
+  return panelList;
 };
 
-// oqp就是OldQuotationProduction
-const OqpHeader = ({ isActive, panelSwitch }: { isActive: boolean; panelSwitch: () => void }) => {
-  const active = isActive ? scss.active : '';
-
-  return (
-    <div className={`${scss.OqpHeader} ${active}`}>
-      <span>原報價項目</span>
-      <button className={scss.panelButton} onClick={panelSwitch}>
-        <span>展開</span>
-        <RotatingArrow01 deg={0} defaultDeg={-180} isActive={!isActive} />
-      </button>
-    </div>
-  );
-};
-
-// =============================================================================
-
-type TpanelListList = {
-  panel_quotation01: TpanelList;
-  panel_quotation03: TpanelList;
-  panel_workContack_disabled: TpanelList;
-  panel_workContack: TpanelList;
-  panel_workContack_pattern: TpanelList;
-  panel_meeting_list: TpanelList;
-  panel_meeting_read: TpanelList;
-  panel_meeting_edit: TpanelList;
-  panel_meeting_add: TpanelList;
-};
-
-const panelListRouter = ({
-  panelListList,
+// region useTabList
+const useTabList = ({
+  contract,
+  engineeringContactId,
   tab,
-  isShowPattern,
-  switch02,
-  disabed_workContactDoc,
-  isMeetingAdd,
-  isMeetingRead,
-  isMeetingEdit,
+  id,
+  version,
 }: {
-  panelListList: TpanelListList;
+  id: string | undefined;
+  engineeringContactId: string | undefined | null;
+  version: string | undefined;
+  contract: TquotationContractDto | undefined;
   tab: Tquery['tab'];
-  isShowPattern: boolean;
-  switch02: boolean;
-  disabed_workContactDoc: boolean;
-  isMeetingAdd: boolean;
-  isMeetingRead: boolean;
-  isMeetingEdit: boolean;
-}): TpanelList => {
-  const {
-    panel_quotation01,
-    panel_quotation03,
-    panel_workContack_disabled,
-    panel_workContack,
-    panel_workContack_pattern,
-  } = panelListList;
+}) => {
+  const router = useRouter();
 
-  if (tab === 'contract') {
-    if (switch02) {
-      return panel_quotation03;
-    } else {
-      return panel_quotation01;
-    }
+  const tabList: TtabList = [
+    {
+      label: `合約編號 ${contract?.contractNumber ?? ''}`,
+      isActive: tab === 'contract',
+      onClick: () => {
+        router.replace({
+          query: {
+            id,
+            version,
+            tab: 'contract',
+          },
+        });
+      },
+    },
+    // {
+    //   label: `工程聯絡單`,
+    //   onClick: () => {
+    //     setState_tab('contactDoc');
+    //   },
+    // },
+    {
+      label: `會議記錄`,
+      isActive: tab === 'meetingMinutes',
+      onClick: () => {
+        router.replace({
+          query: {
+            id,
+            version,
+            tab: 'meetingMinutes',
+          },
+        });
+      },
+    },
+  ];
+
+  if (engineeringContactId) {
+    tabList.splice(
+      1,
+      0,
+      {
+        label: `工程聯絡單`,
+        isActive: tab === 'contactDoc',
+        onClick: () => {
+          router.replace({
+            query: {
+              id,
+              version,
+              tab: 'contactDoc',
+            },
+          });
+        },
+      },
+      {
+        label: `證明文件`,
+        isActive: tab === 'certifiedDocument',
+        onClick: () => {
+          router.replace({
+            query: {
+              id,
+              version,
+              tab: 'certifiedDocument',
+            },
+          });
+        },
+      }
+    );
   }
 
-  if (tab === 'contactDoc') {
-    if (isShowPattern) {
-      return panel_workContack_pattern;
-    } else if (disabed_workContactDoc) {
-      return panel_workContack_disabled;
-    } else {
-      return panel_workContack;
-    }
-  }
-
-  if (tab === 'meetingMinutes') {
-    if (isMeetingAdd) {
-      return panelListList.panel_meeting_add;
-    } else if (isMeetingEdit) {
-      return panelListList.panel_meeting_edit;
-    } else if (isMeetingRead) {
-      return panelListList.panel_meeting_read;
-    } else {
-      return panelListList.panel_meeting_list;
-    }
-  }
-
-  return [];
-
-  //
-  //
+  return tabList;
 };
