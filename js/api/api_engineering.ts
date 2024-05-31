@@ -36,7 +36,7 @@ import type {
   TcreateEngineeringDeliveryStatusDto,
   TupdateEngineeringDeliveryListDto,
   TaccountsReceivableInvoiceDto,
-  TaccountReceivableDto,
+  TaccountsReceivableDto,
   TupdateAccountReceivableDto,
   TcreateAccountReceivableInvoiceDto,
   TupdateAccountReceivableInvoiceDto,
@@ -83,7 +83,7 @@ export type {
   TengineeringDeliveryStatusDto as TdeliveryStatusDto,
   TupdateEngineeringDeliveryListDto,
   TaccountsReceivableInvoiceDto,
-  TaccountReceivableDto,
+  TaccountsReceivableDto as TaccountReceivableDto,
   TupdateAccountReceivableDto,
   TcreateAccountReceivableInvoiceDto,
   TupdateAccountReceivableInvoiceDto,
@@ -1068,7 +1068,7 @@ export const apiDeleteDeliveryStatus = ({ id, statusId }: { id: string; statusId
 // 應收帳款明細
 
 type TgetAccountReceivableDto = {
-  data: TaccountReceivableDto[];
+  data: TaccountsReceivableDto[];
   meta: TpageMetaDto;
 };
 
@@ -1092,14 +1092,14 @@ const apiGetAccountReceivable_id = async (id: string, params: Tparams) => {
   const api = `/engineering/account-receivable/${id}`;
 
   return axi
-    .get<TaccountReceivableDto>(api, { params })
+    .get<TaccountsReceivableDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
 /**取得應收帳款明細 by id */
 export const useGetAccountReceivable_id = (id: string, customeParams: Tparams) => {
-  const [res, setRes] = useState<TaccountReceivableDto>();
+  const [res, setRes] = useState<TaccountsReceivableDto>();
 
   const update = async (dynaParams: Tparams) => {
     const params = {
@@ -1134,7 +1134,7 @@ export const apiPostAccountReceivable = async (
   const api = `/engineering/account-receivable`;
 
   return axi
-    .post<TaccountReceivableDto>(api, body)
+    .post<TaccountsReceivableDto>(api, body)
     .then(({ data }) => data)
     .catch((error) => {
       const err = error as AxiosError;

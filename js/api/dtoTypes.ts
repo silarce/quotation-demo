@@ -18,6 +18,8 @@ export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract'
 
 export type TdeliveryStatusInstallationItem = '門片' | '馬達' | '支軌';
 
+export type TinvoiceStatus = '已開立' | '已作廢';
+
 // =============================================================================
 export type Tparams = {
   order?: 'ASC' | 'DESC';
@@ -2184,7 +2186,7 @@ export type TquotationContractDto = {
   /**出庫單ID */
   engineeringDeliveryListId: string | null;
   /**應收帳款明細 */
-  accountReceivable?: TaccountReceivableDto; // populate
+  accountReceivable?: TaccountsReceivableDto; // populate
   accountReceivableId: string | null;
   //
   //
@@ -3354,9 +3356,7 @@ export type TupdateEngineeringDeliveryListDto = {
 };
 
 export type TcompletedProductDto = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
+  // 這個型別不是表，沒有id
   // 產品id
   productId: string;
   // 完成數量
@@ -3366,7 +3366,7 @@ export type TcompletedProductDto = {
 };
 
 // 應收帳款明細
-export type TaccountReceivableDto = {
+export type TaccountsReceivableDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -3450,7 +3450,7 @@ export type TcreateAccountReceivableDto = {
 };
 
 export type TupdateAccountReceivableDto = Pick<
-  TaccountReceivableDto,
+  TaccountsReceivableDto,
   | 'valuationDate'
   | 'payOffDay'
   | 'performanceBond'
@@ -3467,19 +3467,28 @@ export type TaccountsReceivableInvoiceDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-
-  period: number | null; // 期數
-  invoiceDate: string; //發票日期
-  invoiceNumber: string; // 發票號碼
-  price: number; //發票金額
-  invoiceStatus: '已開立' | '已作廢';
-  note: string | null; // 發票備註
-  accountsReceivableId: string | null; // 所屬應收帳款ID
-
-  accountsReceivable?: TaccountReceivableDto | null; // 所屬應收帳款
+  // 期數
+  period: number | null;
+  // 日期
+  invoiceDate: string;
+  // 發票號碼
+  invoiceNumber: string;
+  // 發票金額
+  price: number;
+  // 發票狀態
+  invoiceStatus: TinvoiceStatus;
+  // 發票備註
+  note: string | null;
+  // 發票折讓金額
+  discountPayment: number;
+  // 關聯收款紀錄
   accountantList: TaccountantDto[];
-
-  productPayment: TaccountsReceivableProductPaymentDto;
+  // 所屬應收帳款Id
+  accountsReceivableId: string | null;
+  // 所屬應收帳款
+  accountsReceivable: TaccountsReceivableDto;
+  // 每期完成項目細節 // 後端會以JSON的形式記錄 // 前端在使用上應該沒有差別
+  completedProduct: TcompletedProductDto[] | null;
 };
 
 export type TcreateAccountReceivableInvoiceDto = Pick<
@@ -3537,7 +3546,7 @@ export type TaccountsReceivableDeductionDto = {
   period: number; // 期數
   detailedAmount: number; // 明細金額
   accountsReceivableId: string; // 所屬應收帳款Id
-  accountsReceivable?: TaccountReceivableDto | null; // 所屬應收帳款
+  accountsReceivable?: TaccountsReceivableDto | null; // 所屬應收帳款
 };
 
 export type TcreateAccountReceivableDeductionDto = Pick<

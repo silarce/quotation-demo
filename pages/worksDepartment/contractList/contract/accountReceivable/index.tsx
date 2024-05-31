@@ -91,6 +91,7 @@ export default function AccountReceivable() {
     customPopulate: [
       // 'subContracts.content.verifyForm'
       'engineeringContact',
+      'accountReceivable',
     ],
   });
 
