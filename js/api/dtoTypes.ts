@@ -3353,42 +3353,69 @@ export type TupdateEngineeringDeliveryListDto = {
   notes: string;
 };
 
+export type TcompletedProductDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  // 產品id
+  productId: string;
+  // 完成數量
+  completedQuantity: number;
+  // 完成數量金額
+  completedPayment: number;
+};
+
 // 應收帳款明細
 export type TaccountReceivableDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  // 估價日期
+  // '估價日期'
   valuationDate: string | null;
-  // 付清日期
+  // '付清日期'
   payOffDay: string | null;
-  // 履約保證票
+  // '履約保證票'
   performanceBond: boolean;
-  // 訂金款保證票
+  // '訂金款保證票'
   depositGuaranteeTicket: boolean;
-  // 保固票
+  // '保固票'
   warrantyTicket: boolean;
-  // 異常燈號(工作表已開立，合約尚未簽回)
+  // '異常燈號(工作表已開立，合約尚未簽回)'
   hasNoContract: boolean;
-  // 提醒燈號(已出具證明，尚未收足款項)
+  // '提醒燈號(已出具證明，尚未收足款項)'
   hasUncollectedAmounts: boolean;
-  // 已出貨，因故尚未安裝
+  // '已出貨，因故尚未安裝'
   hasNotInstall: boolean;
-  // 已完工
+  // '已完工'
   isDone: boolean;
-  // 請款比例
-  // paymentRatio: TpaymentRatioDto[];
-  // 放款票期
+  // '放款票期'
   paymentTenor: string | null;
-  // 發票紀錄
-  invoices: TaccountsReceivableInvoiceDto[] | null;
-  // 請款比例
-  payments: TpaymentRatioDto;
-
-  contract: TquotationContractDto;
-  legacyContract: TlegacyContractDto;
+  // 所屬合約
+  contract: TquotationContractDto | null;
+  // 所屬舊合約
+  legacyContract: TlegacyContractDto | null;
+  // 扣款明細
   accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
-  accountant: TaccountantDto | null;
+  // 發票記錄
+  invoices: TaccountsReceivableInvoiceDto[] | null;
+  // 合約總金額(會因為追加而增加)
+  contractTotalPrice: number;
+  // 已收帳款金額(目前總計請款)
+  receivedPayment: number;
+  // 手續費總合計
+  totalFee: number;
+  // 總扣款金額
+  totalDeduction: number;
+  // 未收款金額
+  unpaidPayment: number;
+  // 尾款
+  finalPayment: number | null;
+  // 累計完成項目細節
+  totalCompletedProduct: TcompletedProductDto | null;
+  // 目前請款合計(未稅)
+  totalPayment: number;
+  // 目前合計請款營業稅額
+  totalTax: number;
 };
 
 export type TcreateAccountReceivableDto = {

@@ -750,7 +750,7 @@ const lookup_keyArr: {
   匯款: [...baseArr_before, 'importAccountingNumber', ...baseArr_after],
   票據: [...baseArr_before, 'noteNumber', ...baseArr_after],
   現金: [...baseArr_before, ...baseArr_after],
-} as const;
+};
 
 const configList: TconfigList = {
   btn: {
