@@ -1,6 +1,5 @@
-/**
- * 常用變數 accountReceivableId
- */
+// 設計圖
+// https://www.figma.com/design/9Gix0Odt4g7ahSOQMysmVh/%E4%B8%89%E4%B9%85?node-id=1282-40444&t=bXAfdnwklJLF2pZu-0
 
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
@@ -17,16 +16,17 @@ import Profile, {
   Tprops_profile,
   createValueList_profile_engineeringContact,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/profile';
+import TotalCalc from 'components/page/worksDepartment/contracList/contract/accountReceivable/totalCalc';
 
-import Table_requestPayment, {
-  Tcontrol_table_requestPayment,
-} from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_requestPayment';
-import AccountReceivable_dynaTable, {
-  Tcontrol_dynaTable,
-  Trow,
-} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountReceivable_dynaTable';
-import DeductionDetails from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetails';
-import Table_request from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_request';
+// import Table_requestPayment, {
+//   Tcontrol_table_requestPayment,
+// } from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_requestPayment';
+// import AccountReceivable_dynaTable, {
+//   Tcontrol_dynaTable,
+//   Trow,
+// } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountReceivable_dynaTable';
+// import DeductionDetails from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetails';
+// import Table_request from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_request';
 
 // gear
 import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -130,6 +130,7 @@ export default function AccountReceivable() {
 
       <div className={scss.main}>
         <Profile {...props_profile} />
+        <TotalCalc className="mt-10" />
       </div>
     </SubLayer>
   );
