@@ -3489,6 +3489,7 @@ export type TaccountantDto = {
   invoice: TaccountsReceivableInvoiceDto[] | null;
   //
   importAccountingNumber: string | null; // 匯入帳號 // 匯款來源帳號
+  order: number; // 排序用的
 };
 
 export type TcreateAccountantDto = Pick<
