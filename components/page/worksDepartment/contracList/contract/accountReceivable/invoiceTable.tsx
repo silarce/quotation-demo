@@ -211,6 +211,7 @@ export default function InvoiceTable({
       const copy = [...prev];
       const invoice = copy[invoiceIndex];
       invoice.renderCount++;
+
       invoice.rowArr[rowIndex][key] = value;
 
       const totals_num = calcTotals(invoice.rowArr);
@@ -218,7 +219,6 @@ export default function InvoiceTable({
       invoice.subTotal = totals_num.subTotal;
       invoice.tax = totals_num.tax;
       invoice.contractTotal = totals_num.contractTotal;
-
       invoice.price = calcPrice(invoice);
 
       return copy;
@@ -732,10 +732,6 @@ export default function InvoiceTable({
           return <Center key={index} node_center={center} disabled={disabled} />;
         })}
 
-        {/* <Center node_center={fakeCenter} disabled={disabled} />
-        <Center node_center={fakeCenter} disabled={disabled} />
-        <Center node_center={fakeCenter} disabled={disabled} />
-        <Center node_center={fakeCenter} disabled={disabled} /> */}
         {right && <Right node_center={right} />}
       </div>
     </div>
@@ -810,6 +806,8 @@ const Center = ({
 
           disabled && (donePrice = donePrice_localeString);
 
+          const inputType = disabled ? 'text' : 'number';
+
           return (
             <div key={index} className={classNames(scss.row)}>
               <input
@@ -817,12 +815,14 @@ const Center = ({
                 value={doneQty}
                 onChange={(e) => onDoneQtyChange(e.target.value)}
                 readOnly={disabled}
+                type={inputType}
               />
               <input
                 className={classNames(disabled && scss.readyOnly)}
                 value={donePrice}
                 onChange={(e) => onDonePriceChange(e.target.value)}
                 readOnly={disabled}
+                type={inputType}
               />
             </div>
           );
@@ -989,89 +989,3 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
 };
 
 // ========================================================================
-
-// region fake
-// const fakeLeft: Tleft = {
-//   rowArr: [
-//     {
-//       itemName: '項目1',
-//       size: '尺寸1',
-//       qty: '99',
-//       contractPrice: '9999',
-//       // contractPrice_num: 9999,
-//     },
-//     {
-//       itemName: '項目2',
-//       size: '尺寸2',
-//       qty: '99',
-//       contractPrice: '9999',
-//       // contractPrice_num: 9999,
-//     },
-//     {
-//       itemName: '項目3',
-//       size: '尺寸3',
-//       qty: '99',
-//       contractPrice: '9999',
-//       // contractPrice_num: 9999,
-//     },
-//   ],
-//   totals: {
-//     subTotal: '9999',
-//     tax: '9999',
-//     contractTotal: '9999',
-//   },
-// };
-
-// const fakeCenter: Tcenter = {
-//   renderCount: 0,
-//   caption: '第N期',
-//   rowArr: [
-//     {
-//       doneQty: '99',
-//       donePrice: '9999',
-//       donePrice_localeString: '9,999',
-//       onDoneQtyChange: () => {},
-//       onDonePriceChange: () => {},
-//     },
-//     {
-//       doneQty: '99',
-//       donePrice: '999999',
-//       donePrice_localeString: '999,999',
-//       onDoneQtyChange: () => {},
-//       onDonePriceChange: () => {},
-//     },
-//     {
-//       doneQty: '99',
-//       donePrice: '99',
-//       donePrice_localeString: '99',
-//       onDoneQtyChange: () => {},
-//       onDonePriceChange: () => {},
-//     },
-//   ],
-//   totals: {
-//     subTotal: <span>9999</span>,
-//     tax: <span>9999</span>,
-//     contractTotal: <span>9999</span>,
-//   },
-
-//   other: {
-//     price: '9,999',
-
-//     invoiceNumber: 'I-faa-d757889',
-//     retainage: '9999',
-//     deduction: '',
-//     writeOffDeposit: '99',
-//     retainage_localeString: '9,999',
-//     deduction_localeString: '',
-//     writeOffDeposit_localeString: '99',
-
-//     onChange_invoiceNumber: () => {},
-//     onChange_retainage: () => {},
-//     onChange_deduction: () => {},
-//     onChange_writeOffDeposit: () => {},
-
-//     minusRetainage: true,
-//     minusDeduction: false,
-//     minusWriteOffDeposit: true,
-//   },
-// };
