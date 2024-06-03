@@ -3394,7 +3394,7 @@ export type TaccountsReceivableDto = {
   contract: TquotationContractDto | null;
   // 所屬舊合約
   legacyContract: TlegacyContractDto | null;
-  // 扣款明細
+  // 扣款明細 // 棄用
   accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
   // 發票記錄
   invoices: TaccountsReceivableInvoiceDto[] | null;
@@ -3489,6 +3489,13 @@ export type TaccountsReceivableInvoiceDto = {
   accountsReceivable: TaccountsReceivableDto;
   // 每期完成項目細節 // 後端會以JSON的形式記錄 // 前端在使用上應該沒有差別
   completedProduct: TcompletedProductDto[] | null;
+
+  // 保留款
+  retainage: number | null;
+  // 扣款
+  deduction: number | null;
+  // 沖訂金
+  writeOffDeposit: number | null;
 };
 
 export type TcreateAccountReceivableInvoiceDto = Pick<
@@ -3522,7 +3529,7 @@ export type TaccountantDto = {
 
   billSerialNumber: string | null; // 收入傳票序號
   noteMaturityDate: string | null; // 票據到期日
-  invoice: TaccountsReceivableInvoiceDto[] | null;
+  invoice: TaccountsReceivableInvoiceDto[] | null; // 基本上只會放一個發票
   //
   importAccountingNumber: string | null; // 匯入帳號 // 匯款來源帳號
   order: number; // 排序用的

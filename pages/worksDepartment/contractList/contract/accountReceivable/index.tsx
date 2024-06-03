@@ -17,6 +17,7 @@ import Profile, {
   createValueList_profile_engineeringContact,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/profile';
 import TotalCalc from 'components/page/worksDepartment/contracList/contract/accountReceivable/totalCalc';
+import InvoiceTable from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable';
 
 // import Table_requestPayment, {
 //   Tcontrol_table_requestPayment,
@@ -132,6 +133,7 @@ export default function AccountReceivable() {
       <div className={scss.main}>
         <Profile {...props_profile} />
         <TotalCalc className="mt-10" />
+        <InvoiceTable className="mt-10" />
       </div>
     </SubLayer>
   );

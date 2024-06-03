@@ -1,0 +1,148 @@
+$invoicePadding: 20px;
+$gridTemplateColumns_center: 120px 120px;
+$fontSize: 16px;
+$fontWeight: 500;
+$rowGap: 10px;
+
+.invoiceTable {
+  // width: fit-content;
+  // max-width: 100%;
+  // overflow: auto;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+
+  .tab {
+    width: fit-content;
+    padding: 15px 28px;
+    font-size: 18px;
+    font-weight: 500;
+    color: theme("colors.main");
+    border: solid 1px theme("colors.border");
+    border-bottom: 0;
+  }
+}
+
+.table {
+  position: relative;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  overflow: auto;
+
+  border: solid 1px theme("colors.border");
+}
+
+.thead {
+  background-color: theme("colors.bgc01");
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    font-size: 20px;
+    font-weight: 500;
+  }
+}
+
+.tbody {
+}
+
+.invoice {
+  &:not(:nth-last-of-type(1)) {
+    border-right: solid 1px theme("colors.border");
+  }
+
+  .thead {
+    padding: $invoicePadding;
+    border-bottom: solid 1px theme("colors.border");
+    .row {
+      > span {
+        color: theme("colors.main");
+        font-weight: 500;
+      }
+    }
+  }
+  .tbody {
+    padding: $invoicePadding;
+    border-bottom: solid 1px theme("colors.border");
+  }
+  .tfoot {
+    padding: $invoicePadding;
+  }
+}
+
+.row {
+  display: grid;
+  gap: $rowGap;
+  justify-items: center;
+  height: 30px;
+  font-size: $fontSize;
+}
+
+.left {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  .row {
+    grid-template-columns: 80px 150px 50px 100px;
+  }
+}
+
+.center {
+  .row {
+    grid-template-columns: $gridTemplateColumns_center;
+    input {
+      width: 100%;
+      text-align: center;
+      border-bottom: solid 1px theme("colors.border");
+      &.readyOnly {
+        border-color: transparent;
+      }
+      &:nth-child(2n) {
+        text-align: right;
+      }
+    }
+  }
+}
+
+.totals {
+  display: grid;
+  grid-template-columns: $gridTemplateColumns_center;
+  justify-items: flex-end;
+  gap: $rowGap;
+  width: fit-content;
+  margin: auto;
+  margin-right: 0;
+  margin-top: 50px;
+  font-size: $fontSize;
+  font-weight: $fontWeight;
+
+  > span:nth-child(3) {
+    transform: translateX(8px);
+  }
+}
+
+.tfoot {
+  display: grid;
+  gap: $rowGap;
+  // font-size: $fontSize;
+  font-weight: $fontWeight;
+  .row {
+    justify-items: flex-end;
+  }
+}
+
+.checkBar {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+  > label {
+    cursor: auto;
+    input {
+      cursor: auto;
+    }
+  }
+}
