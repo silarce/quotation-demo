@@ -112,8 +112,8 @@ const Parentheses = ({ turn }: { turn?: boolean }) => {
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Development" transform="translate(-384.000000, -48.000000)" fill-rule="nonzero">
+      <g id="页面-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
+        <g id="Development" transform="translate(-384.000000, -48.000000)" fillRule="nonzero">
           <g id="parentheses_fill" transform="translate(384.000000, 48.000000)">
             <path
               d="M5.67321,3.29316 C6.06362,2.56249 6.97243,2.28665 7.70309,2.67706 C8.43376,3.06747 8.7096,3.97627 8.31919,4.70694 C7.1586,6.87907 6.5,9.36043 6.5,12.0001 C6.5,14.6397 7.1586,17.121 8.31919,19.2932 C8.7096,20.0238 8.43376,20.9326 7.70309,21.323 C6.97243,21.7134 6.06362,21.4376 5.67321,20.7069 C4.28588,18.1105 3.5,15.1448 3.5,12.0001 C3.5,8.85529 4.28588,5.88963 5.67321,3.29316 Z"
