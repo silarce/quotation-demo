@@ -124,7 +124,7 @@ export default function AccountReceivable() {
 
   // region REQUEST
 
-  const reqAddInvoice_請款 = async () => {
+  const reqAddInvoice = async (type: TcreateAccountReceivableInvoiceDto['type']) => {
     if (!accountReceivable?.id) {
       alert('沒有accountReceivable.id');
 
@@ -136,29 +136,17 @@ export default function AccountReceivable() {
       invoiceNumber: '',
       price: 0,
       note: '',
+      type,
+      isRetainage: false,
+      isDeduction: false,
+      isWriteOffDeposit: false,
     };
 
     await apiPostAccountReceivableIncoice(accountReceivable.id, body);
     await update_contract();
   };
 
-  const reqAddInvoice_訂金 = async () => {
-    if (!accountReceivable?.id) {
-      alert('沒有accountReceivable.id');
-
-      return;
-    }
-
-    const body: TcreateAccountReceivableInvoiceDto = {
-      invoiceDate: new Date().toISOString(),
-      invoiceNumber: '',
-      price: 0,
-      note: '',
-    };
-
-    await apiPostAccountReceivableIncoice(accountReceivable.id, body);
-    await update_contract();
-  };
+  // --------------------------------------------------------------------------
 
   // --------------------------------------------------------------------------
 
@@ -204,8 +192,8 @@ export default function AccountReceivable() {
           className="mt-10"
           data_finalProdcut={data_finalProdcut}
           data_invoices={accountReceivable.invoices}
-          reqAddInvoice_請款={reqAddInvoice_請款}
-          reqAddInvoice_訂金={reqAddInvoice_訂金}
+          reqAddInvoice_請款={() => reqAddInvoice('請款')}
+          reqAddInvoice_訂金={() => reqAddInvoice('訂金')}
         />
       </div>
     </SubLayer>
