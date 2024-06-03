@@ -508,9 +508,9 @@ export default function InvoiceTable({
         retainage,
         deduction,
         writeOffDeposit,
-        retainage_localeString: Number(retainage).toLocaleString(),
-        deduction_localeString: Number(deduction).toLocaleString(),
-        writeOffDeposit_localeString: Number(writeOffDeposit).toLocaleString(),
+        retainage_localeString: retainage ? Number(retainage).toLocaleString() : '',
+        deduction_localeString: deduction ? Number(deduction).toLocaleString() : '',
+        writeOffDeposit_localeString: writeOffDeposit ? Number(writeOffDeposit).toLocaleString() : '',
         minusRetainage,
         minusDeduction,
         minusWriteOffDeposit,
@@ -667,9 +667,9 @@ export default function InvoiceTable({
       return {
         renderCount: 0,
         rowArr,
-        retainage: String(retainage),
-        deduction: String(deduction),
-        writeOffDeposit: String(writeOffDeposit),
+        retainage: String(retainage || ''),
+        deduction: String(deduction || ''),
+        writeOffDeposit: String(writeOffDeposit || ''),
         price,
         invoiceNumber,
 
@@ -874,7 +874,7 @@ const Tbody = ({
 };
 
 // =============================================================================
-const Tfoot = ({ readOnly: readOnly, node_other }: { readOnly: boolean; node_other: Tcenter['other'] }) => {
+const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcenter['other'] }) => {
   const {
     invoiceNumber,
     price,
@@ -890,6 +890,10 @@ const Tfoot = ({ readOnly: readOnly, node_other }: { readOnly: boolean; node_oth
     onChange_retainage,
     onChange_deduction,
     onChange_writeOffDeposit,
+
+    onChange_minusRetainage,
+    onChange_minusDeduction,
+    onChange_minusWriteOffDeposit,
   } = node_other;
 
   let { retainage, deduction, writeOffDeposit } = node_other;
@@ -938,9 +942,33 @@ const Tfoot = ({ readOnly: readOnly, node_other }: { readOnly: boolean; node_oth
       </div>
 
       <div className={scss.checkBar}>
-        <Checkbox checked={haveRetainage}>保留款</Checkbox>
-        <Checkbox checked={haveDeduction}>扣款</Checkbox>
-        <Checkbox checked={haveWriteOffDeposit}>沖訂金</Checkbox>
+        <Checkbox
+          disabled={readOnly}
+          checked={haveRetainage}
+          onChange={(e) => {
+            onChange_minusRetainage(e.target.checked);
+          }}
+        >
+          保留款
+        </Checkbox>
+        <Checkbox
+          disabled={readOnly}
+          checked={haveDeduction}
+          onChange={(e) => {
+            onChange_minusDeduction(e.target.checked);
+          }}
+        >
+          扣款
+        </Checkbox>
+        <Checkbox
+          disabled={readOnly}
+          checked={haveWriteOffDeposit}
+          onChange={(e) => {
+            onChange_minusWriteOffDeposit(e.target.checked);
+          }}
+        >
+          沖訂金
+        </Checkbox>
       </div>
 
       <div className={classNames(scss.row)}>
