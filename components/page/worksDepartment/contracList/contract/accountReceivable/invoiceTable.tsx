@@ -37,8 +37,9 @@ type Tleft = {
 };
 
 type Tcenter = {
-  renderCount: number; // 判斷是否要rerender用的，來自Tstate_invoice
+  renderCount?: number; // 判斷是否要rerender用的，來自Tstate_invoice
   readOnly: boolean;
+  caption: string;
   rowArr: {
     doneQty: string;
     donePrice: string;
@@ -98,6 +99,7 @@ export default function InvoiceTable({ className }: { className?: string }) {
         <Center node_center={fakeCenter} />
         <Center node_center={fakeCenter} />
         <Center node_center={fakeCenter} />
+        <Right node_center={fakeCenter} />
       </div>
     </div>
   );
@@ -141,13 +143,13 @@ const Left = ({
 
 const Center = ({
   //
-  node_center: { renderCount, readOnly, rowArr, totals, other },
+  node_center: { renderCount, caption, readOnly, rowArr, totals, other },
 }: {
   node_center: Tcenter;
 }) => {
   return (
     <div className={classNames(scss.invoice, scss.center)}>
-      <Thead caption="第一期">
+      <Thead caption={caption}>
         <span>完成數量</span>
         <span>完成金額</span>
       </Thead>
@@ -181,6 +183,12 @@ const Center = ({
       <Tfoot readOnly={readOnly} node_other={other} />
     </div>
   );
+};
+
+const Right = ({ node_center }: { node_center: Tcenter }) => {
+  node_center.readOnly = true;
+
+  return <Center node_center={node_center} />;
 };
 
 const Thead = ({ caption, children }: { caption?: React.ReactNode; children: React.ReactNode }) => {
@@ -337,6 +345,7 @@ const fakeLeft: Tleft = {
 const fakeCenter: Tcenter = {
   renderCount: 0,
   readOnly: false,
+  caption: '第N期',
   rowArr: [
     {
       doneQty: '99',
