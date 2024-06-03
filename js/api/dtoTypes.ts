@@ -20,6 +20,8 @@ export type TdeliveryStatusInstallationItem = '門片' | '馬達' | '支軌';
 
 export type TinvoiceStatus = '已開立' | '已作廢';
 
+export type TinvoiceType = '請款' | '訂金';
+
 // =============================================================================
 export type Tparams = {
   order?: 'ASC' | 'DESC';
@@ -3467,8 +3469,11 @@ export type TaccountsReceivableInvoiceDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  // 期數
+  type: TinvoiceType; // '請款' | '訂金';
+  // 請款期數
   period: number | null;
+  // 訂金期數
+  depositPeriod: number | null;
   // 日期
   invoiceDate: string;
   // 發票號碼
@@ -3496,6 +3501,13 @@ export type TaccountsReceivableInvoiceDto = {
   deduction: number | null;
   // 沖訂金
   writeOffDeposit: number | null;
+
+  // 是否扣掉保留款
+  isRetainage: boolean;
+  // 是否扣掉扣款
+  isDeduction: boolean;
+  // 是否扣掉沖訂金
+  isWriteOffDeposit: boolean;
 };
 
 export type TcreateAccountReceivableInvoiceDto = Pick<
@@ -3569,12 +3581,11 @@ export type TupdateAccountReceivableDeductionDto = Partial<TcreateAccountReceiva
 };
 
 export type TfinalProduct = {
-  //源合約產品包含item deliveryStatus productPayment(主產品數量已扣追減)
-  // finalRootContractProduct: TquotationProductDto[];
-  // finalRootContractProduct: TquotationProductItemDto[];
-  finalAppendContractProductsItems: TquotationProductItemDto[];
   //追加合約產品包含item deliveryStatus productPayment
-  // finalAppendContractProducts: TquotationProductItemDto[];
+  finalAppendContractProductsItems: TquotationProductItemDto[];
+
+  //源合約產品包含item deliveryStatus productPayment(主產品數量已扣追減)
+  // finalAppendContractProductsItems已經整合進這裡面了
   finalRootContractProductItems: TquotationProductItemDto[];
 };
 

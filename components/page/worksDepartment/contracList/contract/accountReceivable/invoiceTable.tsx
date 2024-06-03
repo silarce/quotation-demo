@@ -1,5 +1,7 @@
-import { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import classNames from 'classnames';
+import _ from 'lodash';
+import Decimal from 'decimal.js';
 
 // antd
 import { Checkbox } from 'antd';
@@ -9,25 +11,50 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 // css
 import scss from './invoiceTable.module.scss';
 
+import type {
+  TfinalProduct,
+  TaccountsReceivableInvoiceDto,
+  TquotationProductItemDto,
+  TquotationProductDto,
+  TcompletedProductDto,
+} from 'js/api/dtoTypes';
+
 // ========================================================================
 // region type
 
 type Tstate_invoice = {
   renderCount: number; // 判斷是否要rerender用的，會送到Tcenter
-  doneQty: number;
-  donePrice: number;
-  subTotal: number;
-  tax: number;
-  contractTotal: number;
+  rowArr: {
+    productId: string;
+    completedQuantity: string;
+    completedPayment: string;
+  }[];
+  subTotal: number; // 自動計算 // 虛值
+  tax: number; // 自動計算 // 虛值
+  contractTotal: number; // 自動計算 // 虛值
+  //
+  retainage: string;
+  deduction: string;
+  writeOffDeposit: string;
+  minusRetainage: boolean;
+  minusDeduction: boolean;
+  minusWriteOffDeposit: boolean;
+
+  price: number; // 發票金額 自動計算
+  invoiceNumber: string;
+
+  type: TaccountsReceivableInvoiceDto['type'];
+  period: number;
+  //
 };
 
 type Tleft = {
   rowArr: {
-    itemName: string;
-    size: string;
-    qty: string;
-    contractPrice: string;
-    contractPrice_num: number;
+    itemName: React.ReactNode;
+    size: React.ReactNode;
+    qty: React.ReactNode;
+    contractPrice: React.ReactNode;
+    // contractPrice_num: number;
   }[];
   totals: {
     subTotal: string;
@@ -38,14 +65,13 @@ type Tleft = {
 
 type Tcenter = {
   renderCount?: number; // 判斷是否要rerender用的，來自Tstate_invoice
-  readOnly: boolean;
   caption: string;
   rowArr: {
-    doneQty: string;
-    donePrice: string;
-    donePrice_localeString: string;
-    onDoneQtyChange: (value: string) => void;
-    onDonePriceChange: (value: string) => void;
+    completedQuantity: string;
+    completedPayment: string;
+    completedPayment_localeString: string;
+    oncompletedQuantityChange: (value: string) => void;
+    oncompletedPaymentChange: (value: string) => void;
   }[];
   totals: {
     subTotal: React.ReactNode;
@@ -55,19 +81,25 @@ type Tcenter = {
   other: {
     price: React.ReactNode; // 發票金額
     invoiceNumber: string; // 發票號碼
+
     retainage: string; // 保留款
     deduction: string; // 扣款
     writeOffDeposit: string; //沖訂金
     retainage_localeString: string;
     deduction_localeString: string;
     writeOffDeposit_localeString: string;
-    haveRetainage: boolean;
-    haveDeduction: boolean;
-    haveWriteOffDeposit: boolean;
+    minusRetainage: boolean;
+    minusDeduction: boolean;
+    minusWriteOffDeposit: boolean;
+
     onChange_invoiceNumber: (value: string) => void;
     onChange_retainage: (value: string) => void;
     onChange_deduction: (value: string) => void;
     onChange_writeOffDeposit: (value: string) => void;
+
+    onChange_minusRetainage: (checked: boolean) => void;
+    onChange_minusDeduction: (checked: boolean) => void;
+    onChange_minusWriteOffDeposit: (checked: boolean) => void;
   };
 };
 
@@ -75,36 +107,645 @@ type Tcenter = {
 
 // region START
 
-export default function InvoiceTable({ className }: { className?: string }) {
+export default function InvoiceTable({
+  //
+  className,
+  data_finalProdcut = [],
+  data_invoices = [],
+  reqAddInvoice_請款,
+  reqAddInvoice_訂金,
+}: {
+  className?: string;
+  data_finalProdcut: TquotationProductDto[] | undefined | null;
+  data_invoices: TaccountsReceivableInvoiceDto[] | undefined | null;
+  reqAddInvoice_請款: () => void;
+  reqAddInvoice_訂金: () => void;
+}) {
+  const [disabled, setDisabled] = useState(true);
+
+  const [state_invoiceArr, setState_invoiceArr] = useState<Tstate_invoice[]>([]);
+
+  // --------------------------------------------------------------------------
+
+  const { finalProdList, finalProdArr } = useMemo(() => {
+    const data_finalProdcut_sorted = _.sortBy(data_finalProdcut, 'order');
+
+    const list: { [id: string]: TquotationProductDto } = {};
+    data_finalProdcut_sorted.forEach((prod) => {
+      list[prod.id] = prod;
+    });
+
+    return {
+      finalProdList: list,
+      finalProdArr: data_finalProdcut_sorted,
+    };
+  }, [data_finalProdcut]);
+
+  const invoiceArr = useMemo(() => {
+    return _.sortBy(data_invoices, 'period');
+  }, [data_invoices]);
+
+  // --------------------------------------------------------------------------
+
+  // --------------------------------------------------------------------------
+
+  // region function
+
+  const calcTotals = (rowArr: { completedPayment: number | string }[]) => {
+    let subTotal_d = new Decimal(0);
+
+    rowArr.forEach((row) => {
+      const completedPayment = Number(row.completedPayment);
+      subTotal_d = subTotal_d.add(completedPayment);
+    });
+
+    const tax_d = subTotal_d.mul(0.05);
+
+    return {
+      subTotal: subTotal_d.toNumber(),
+      tax: tax_d.toNumber(),
+      contractTotal: subTotal_d.add(tax_d).toNumber(),
+    };
+  };
+
+  // ____________________________________________________________________
+  // ____________________________________________________________________
+
+  const calcPrice = (state_invoice: Tstate_invoice) => {
+    const invoice = state_invoice;
+
+    const {
+      //
+      retainage,
+      deduction,
+      writeOffDeposit,
+      minusRetainage,
+      minusDeduction,
+      minusWriteOffDeposit,
+    } = invoice;
+
+    const totals_num = calcTotals(invoice.rowArr);
+    let price_d = new Decimal(totals_num.contractTotal);
+
+    minusRetainage && (price_d = price_d.sub(retainage || 0));
+    minusDeduction && (price_d = price_d.sub(deduction || 0));
+    minusWriteOffDeposit && (price_d = price_d.sub(writeOffDeposit || 0));
+
+    const price = price_d.toNumber();
+
+    return price;
+  };
+
+  const handle_editInvoiceRow = ({
+    invoiceIndex,
+    rowIndex,
+    key,
+    value,
+  }: {
+    invoiceIndex: number;
+    rowIndex: number;
+    key: 'completedQuantity' | 'completedPayment';
+    value: string;
+  }) => {
+    setState_invoiceArr((prev) => {
+      const copy = [...prev];
+      const invoice = copy[invoiceIndex];
+      invoice.renderCount++;
+      invoice.rowArr[rowIndex][key] = value;
+
+      const totals_num = calcTotals(invoice.rowArr);
+
+      invoice.subTotal = totals_num.subTotal;
+      invoice.tax = totals_num.tax;
+      invoice.contractTotal = totals_num.contractTotal;
+
+      invoice.price = calcPrice(invoice);
+
+      return copy;
+    });
+  };
+
+  const handle_editInvoiceOther = ({
+    invoiceIndex,
+    key,
+    value,
+  }: {
+    invoiceIndex: number;
+    key: 'retainage' | 'deduction' | 'writeOffDeposit' | 'invoiceNumber';
+    value: string;
+  }) => {
+    setState_invoiceArr((prev) => {
+      const copy = [...prev];
+      const invoice = copy[invoiceIndex];
+      invoice.renderCount++;
+      invoice[key] = value;
+      invoice.price = calcPrice(invoice);
+
+      return copy;
+    });
+  };
+
+  const handel_editCalcType = ({
+    //
+    invoiceIndex,
+    key,
+    chcked,
+  }: {
+    invoiceIndex: number;
+    key: 'minusRetainage' | 'minusDeduction' | 'minusWriteOffDeposit';
+    chcked: boolean;
+  }) => {
+    setState_invoiceArr((prev) => {
+      const copy = [...prev];
+      const invoice = copy[invoiceIndex];
+      invoice.renderCount++;
+      invoice[key] = chcked;
+      invoice.price = calcPrice(invoice);
+
+      return copy;
+    });
+  };
+
+  // --------------------------------------------------------------------------
+
+  // region total_state_invoiceArr
+
+  const state_invoice_total: Tstate_invoice | null = useMemo(() => {
+    if (!state_invoiceArr[0]) {
+      return null;
+    }
+
+    const {
+      //
+      rowArr: rowArr_total,
+    } = state_invoiceArr[0];
+    let {
+      //
+      subTotal: subTotal_total,
+      tax: tax_total,
+      contractTotal: contractTotal_total,
+      retainage: retainage_total,
+      deduction: deduction_total,
+      writeOffDeposit: writeOffDeposit_total,
+      price: price_total,
+
+      minusRetainage: minusRetainage_total,
+      minusDeduction: minusDeduction_total,
+      minusWriteOffDeposit: minusWriteOffDeposit_total,
+    } = state_invoiceArr[0];
+
+    state_invoiceArr.forEach((invoice, index_invoice) => {
+      if (index_invoice === 0) {
+        return;
+      }
+
+      const {
+        //
+        rowArr,
+        subTotal,
+        tax,
+        contractTotal,
+        retainage,
+        deduction,
+        writeOffDeposit,
+        price,
+
+        minusRetainage,
+        minusDeduction,
+        minusWriteOffDeposit,
+      } = invoice;
+
+      // __________________________________________________________________
+      rowArr.forEach((row, index_row) => {
+        const { completedQuantity, completedPayment } = row;
+
+        const completedQuantity_d = new Decimal(completedQuantity || 0);
+        const completedPayment_d = new Decimal(completedPayment || 0);
+
+        rowArr_total[index_row].completedQuantity = completedQuantity_d
+          .add(rowArr_total[index_row].completedQuantity)
+          .toString();
+        rowArr_total[index_row].completedPayment = completedPayment_d
+          .add(rowArr_total[index_row].completedPayment)
+          .toString();
+      });
+      // __________________________________________________________________
+
+      subTotal_total = new Decimal(subTotal_total).add(subTotal).toNumber();
+      tax_total = new Decimal(tax_total).add(tax).toNumber();
+      contractTotal_total = new Decimal(contractTotal_total).add(contractTotal).toNumber();
+
+      retainage_total = new Decimal(retainage_total).add(retainage).toString();
+      deduction_total = new Decimal(deduction_total).add(deduction).toString();
+      writeOffDeposit_total = new Decimal(writeOffDeposit_total).add(writeOffDeposit).toString();
+
+      price_total = new Decimal(price_total).add(price).toNumber();
+      // __________________________________________________________________
+
+      if (minusRetainage) {
+        minusRetainage_total = minusRetainage;
+      }
+
+      if (minusDeduction) {
+        minusDeduction_total = minusDeduction;
+      }
+
+      if (minusWriteOffDeposit) {
+        minusWriteOffDeposit_total = minusWriteOffDeposit;
+      }
+
+      // __________________________________________________________________
+    }); // state_invoiceArr.forEach
+
+    return {
+      rowArr: rowArr_total,
+      subTotal: subTotal_total,
+      tax: tax_total,
+      contractTotal: contractTotal_total,
+      retainage: retainage_total,
+      deduction: deduction_total,
+      writeOffDeposit: writeOffDeposit_total,
+      price: price_total,
+      minusRetainage: minusRetainage_total,
+      minusDeduction: minusDeduction_total,
+      minusWriteOffDeposit: minusWriteOffDeposit_total,
+
+      renderCount: 0, // 只是為了符合型別，不會用到 // 要用到也是可以
+      invoiceNumber: '', // 只是為了符合型別，不會用到
+      type: '請款', // 只是為了符合型別，不會用到
+      period: 0, // 只是為了符合型別，不會用到
+    };
+
+    //
+  }, [state_invoiceArr]);
+
+  // region LEFT
+  const node_left: Tleft = useMemo(() => {
+    let subTotal_d = new Decimal(0);
+
+    const rowArr: Tleft['rowArr'] = finalProdArr.map((prod) => {
+      const {
+        //
+        itemName,
+        fullWidth,
+        // WG,
+        height,
+        boxB,
+        bounceDoorWidth,
+        unitPrice,
+        quantity,
+      } = prod;
+
+      const fullWidth_cm = new Decimal(fullWidth || 0).div(10).toNumber();
+      const height_cm = new Decimal(height || 0).div(10).toNumber();
+      const boxB_cm = new Decimal(boxB || 0).div(10).toNumber();
+      const bounceDoorWidth_cm = new Decimal(bounceDoorWidth || 0).div(10).toNumber();
+
+      const boxB_formated = boxB_cm ? `＋${boxB_cm}` : '';
+      const bounceDoorWidth_formated = bounceDoorWidth_cm ? `＋${bounceDoorWidth_cm}` : '';
+
+      const size = `${fullWidth_cm}${bounceDoorWidth_formated}Ｘ${height_cm}${boxB_formated}`;
+
+      const prodTotalPrice = new Decimal(unitPrice || 0).mul(quantity || 0);
+
+      subTotal_d = subTotal_d.add(prodTotalPrice);
+
+      return {
+        itemName,
+        size,
+        qty: quantity,
+        contractPrice: unitPrice.toLocaleString(),
+      };
+    });
+
+    const tax_d = subTotal_d.mul(0.05);
+
+    const totals = {
+      subTotal: subTotal_d.toNumber().toLocaleString(),
+      tax: tax_d.toNumber().toLocaleString(),
+      contractTotal: subTotal_d.add(tax_d).toNumber().toLocaleString(),
+    };
+
+    return {
+      rowArr,
+      totals,
+    };
+
+    //
+  }, [finalProdArr]);
+
+  // --------------------------------------------------------------------------
+
+  // region CENTER
+
+  const node_centerArr = useMemo(() => {
+    const arr: Tcenter[] = state_invoiceArr.map((state, invoiceIndex) => {
+      const {
+        //
+        renderCount,
+        rowArr: rowArr_state,
+
+        retainage,
+        deduction,
+        writeOffDeposit,
+        minusRetainage,
+        minusDeduction,
+        minusWriteOffDeposit,
+
+        price,
+        invoiceNumber,
+
+        period,
+        type,
+
+        subTotal,
+        tax,
+        contractTotal,
+      } = state;
+
+      let subTotal_d = new Decimal(0);
+
+      const rowArr: Tcenter['rowArr'] = rowArr_state.map((row, rowIndex) => {
+        const { completedQuantity, completedPayment } = row;
+
+        subTotal_d = subTotal_d.add(completedPayment || 0);
+
+        return {
+          completedQuantity: completedQuantity,
+          completedPayment: completedPayment,
+          completedPayment_localeString: Number(completedPayment).toLocaleString(),
+          oncompletedQuantityChange: (value) => {
+            handle_editInvoiceRow({
+              invoiceIndex,
+              rowIndex,
+              key: 'completedQuantity',
+              value,
+            });
+          },
+          oncompletedPaymentChange: (value) => {
+            handle_editInvoiceRow({
+              invoiceIndex,
+              rowIndex,
+              key: 'completedPayment',
+              value,
+            });
+          },
+        };
+      });
+
+      const totals = {
+        subTotal: subTotal.toLocaleString(),
+        tax: tax.toLocaleString(),
+        contractTotal: contractTotal.toLocaleString(),
+      };
+
+      // _______________________________________________________________________
+      // _______________________________________________________________________
+
+      const other: Tcenter['other'] = {
+        price: price.toLocaleString(),
+        invoiceNumber,
+        retainage,
+        deduction,
+        writeOffDeposit,
+        retainage_localeString: Number(retainage).toLocaleString(),
+        deduction_localeString: Number(deduction).toLocaleString(),
+        writeOffDeposit_localeString: Number(writeOffDeposit).toLocaleString(),
+        minusRetainage,
+        minusDeduction,
+        minusWriteOffDeposit,
+        onChange_invoiceNumber: (value) => {
+          handle_editInvoiceOther({ invoiceIndex, key: 'invoiceNumber', value });
+        },
+        onChange_retainage: (value) => {
+          handle_editInvoiceOther({ invoiceIndex, key: 'retainage', value });
+        },
+        onChange_deduction: (value) => {
+          handle_editInvoiceOther({ invoiceIndex, key: 'deduction', value });
+        },
+        onChange_writeOffDeposit: (value) => {
+          handle_editInvoiceOther({ invoiceIndex, key: 'writeOffDeposit', value });
+        },
+        onChange_minusRetainage: (checked) => {
+          handel_editCalcType({ invoiceIndex, key: 'minusRetainage', chcked: checked });
+        },
+        onChange_minusDeduction: (checked) => {
+          handel_editCalcType({ invoiceIndex, key: 'minusDeduction', chcked: checked });
+        },
+        onChange_minusWriteOffDeposit: (checked) => {
+          handel_editCalcType({ invoiceIndex, key: 'minusWriteOffDeposit', chcked: checked });
+        },
+      };
+
+      // _______________________________________________________________________
+      // _______________________________________________________________________
+
+      return {
+        renderCount,
+        caption: `第${period}期 ${type}`,
+        rowArr,
+        totals,
+        other,
+      };
+    });
+
+    return arr;
+  }, [state_invoiceArr]);
+
+  // --------------------------------------------------------------------------
+
+  // region Right
+
+  const right: Tcenter | null = useMemo(() => {
+    if (!state_invoice_total) {
+      return null;
+    }
+
+    const {
+      //
+      rowArr: rowArr_total,
+      subTotal,
+      tax,
+      contractTotal,
+      retainage,
+      deduction,
+      writeOffDeposit,
+      price,
+      minusRetainage,
+      minusDeduction,
+      minusWriteOffDeposit,
+    } = state_invoice_total;
+
+    const rowArr = rowArr_total.map((row) => {
+      return {
+        completedQuantity: row.completedQuantity,
+        completedPayment: row.completedPayment,
+        completedPayment_localeString: Number(row.completedPayment).toLocaleString(),
+        oncompletedQuantityChange: () => {},
+        oncompletedPaymentChange: () => {},
+      };
+    });
+
+    const right: Tcenter = {
+      caption: '累計',
+      rowArr: rowArr,
+      totals: {
+        subTotal: subTotal.toLocaleString(),
+        tax: tax.toLocaleString(),
+        contractTotal: contractTotal.toLocaleString(),
+      },
+      other: {
+        price: price.toLocaleString(),
+        invoiceNumber: '',
+        retainage: Number(retainage).toLocaleString(),
+        deduction: Number(deduction).toLocaleString(),
+        writeOffDeposit: Number(writeOffDeposit).toLocaleString(),
+        retainage_localeString: Number(retainage).toLocaleString(),
+        deduction_localeString: Number(deduction).toLocaleString(),
+        writeOffDeposit_localeString: Number(writeOffDeposit).toLocaleString(),
+        minusRetainage,
+        minusDeduction,
+        minusWriteOffDeposit,
+
+        onChange_invoiceNumber: () => {},
+        onChange_retainage: () => {},
+        onChange_deduction: () => {},
+        onChange_writeOffDeposit: () => {},
+        onChange_minusRetainage: () => {},
+        onChange_minusDeduction: () => {},
+        onChange_minusWriteOffDeposit: () => {},
+      },
+    };
+
+    return right;
+  }, [state_invoice_total]);
+
+  // --------------------------------------------------------------------------
+
+  // region use Effect
+
+  useEffect(() => {
+    const arr: Tstate_invoice[] = (data_invoices ?? []).map((invoice) => {
+      const {
+        //
+        type,
+        period,
+        invoiceNumber,
+        price,
+        completedProduct = [],
+        retainage,
+        deduction,
+        writeOffDeposit,
+        isRetainage,
+        isDeduction,
+        isWriteOffDeposit,
+      } = invoice;
+
+      const completedProductList: { [id: string]: TcompletedProductDto } = {};
+      completedProduct?.forEach((cp) => {
+        completedProductList[cp.productId] = cp;
+      });
+
+      const rowArr: Tstate_invoice['rowArr'] = finalProdArr.map((fp) => {
+        const fpId = fp.id;
+
+        const cp = completedProductList[fpId] || {
+          productId: fpId,
+          completedQuantity: '',
+          completedPayment: '',
+        };
+
+        return {
+          ...cp,
+          completedQuantity: String(cp.completedQuantity),
+          completedPayment: String(cp.completedPayment),
+        };
+      });
+
+      const totals_num = calcTotals(rowArr);
+
+      return {
+        renderCount: 0,
+        rowArr,
+        retainage: String(retainage),
+        deduction: String(deduction),
+        writeOffDeposit: String(writeOffDeposit),
+        price,
+        invoiceNumber,
+
+        type,
+        period: period ?? 0,
+
+        minusRetainage: isRetainage,
+        minusDeduction: isDeduction,
+        minusWriteOffDeposit: isWriteOffDeposit,
+
+        subTotal: totals_num.subTotal,
+        tax: totals_num.tax,
+        contractTotal: totals_num.contractTotal,
+      };
+    }); // map
+
+    setState_invoiceArr(arr);
+  }, [finalProdArr, invoiceArr, disabled]);
+  // --------------------------------------------------------------------------
+
+  // region RENDER
   return (
     <div className={classNames(scss.invoiceTable, className)}>
       {/*  */}
       <div className={scss.topBar}>
         <div className={scss.tab}>請款明細</div>
         <div className={'ml-5'}>
-          <MyButton_v2 px="px22" py="py4">
+          <MyButton_v2 px="px22" py="py4" onClick={reqAddInvoice_請款}>
             新增請款
           </MyButton_v2>
 
-          <MyButton_v2 className={'ml-5'} px="px22" py="py4">
+          <MyButton_v2 className={'ml-5'} px="px22" py="py4" onClick={reqAddInvoice_訂金}>
             新增訂金
           </MyButton_v2>
+
+          <MyButton_v2
+            className={'ml-5'}
+            px="px22"
+            py="py4"
+            onClick={() => {
+              setDisabled((prev) => !prev);
+            }}
+          >
+            {disabled ? '編輯' : '取消'}
+          </MyButton_v2>
+
+          {!disabled && (
+            <MyButton_v2 className={'ml-5'} px="px22" py="py4" onClick={() => {}}>
+              確認
+            </MyButton_v2>
+          )}
         </div>
       </div>
 
       {/*  */}
       <div className={scss.table}>
-        <Left node_left={fakeLeft} />
-        <Center node_center={fakeCenter} />
-        <Center node_center={fakeCenter} />
-        <Center node_center={fakeCenter} />
-        <Center node_center={fakeCenter} />
-        <Right node_center={fakeCenter} />
+        <Left node_left={node_left} />
+
+        {node_centerArr.map((center, index) => {
+          return <Center key={index} node_center={center} disabled={disabled} />;
+        })}
+
+        {/* <Center node_center={fakeCenter} disabled={disabled} />
+        <Center node_center={fakeCenter} disabled={disabled} />
+        <Center node_center={fakeCenter} disabled={disabled} />
+        <Center node_center={fakeCenter} disabled={disabled} /> */}
+        {right && <Right node_center={right} />}
       </div>
     </div>
   );
 }
 
+// region END
+// ========================================================================
+// ========================================================================
+// ========================================================================
 // ========================================================================
 
 // region component
@@ -141,10 +782,13 @@ const Left = ({
   );
 };
 
+// =============================================================================
 const Center = ({
   //
-  node_center: { renderCount, caption, readOnly, rowArr, totals, other },
+  disabled,
+  node_center: { renderCount, caption, rowArr, totals, other },
 }: {
+  disabled: boolean;
   node_center: Tcenter;
 }) => {
   return (
@@ -156,41 +800,47 @@ const Center = ({
 
       <Tbody totals={totals}>
         {rowArr.map((row, index) => {
-          const { doneQty, donePrice_localeString, onDoneQtyChange, onDonePriceChange } = row;
-          let { donePrice } = row;
+          const {
+            completedQuantity: doneQty,
+            completedPayment_localeString: donePrice_localeString,
+            oncompletedQuantityChange: onDoneQtyChange,
+            oncompletedPaymentChange: onDonePriceChange,
+          } = row;
+          let { completedPayment: donePrice } = row;
 
-          readOnly && (donePrice = donePrice_localeString);
+          disabled && (donePrice = donePrice_localeString);
 
           return (
             <div key={index} className={classNames(scss.row)}>
               <input
-                className={classNames(readOnly && scss.readyOnly)}
+                className={classNames(disabled && scss.readyOnly)}
                 value={doneQty}
                 onChange={(e) => onDoneQtyChange(e.target.value)}
-                readOnly={readOnly}
+                readOnly={disabled}
               />
               <input
-                className={classNames(readOnly && scss.readyOnly)}
+                className={classNames(disabled && scss.readyOnly)}
                 value={donePrice}
                 onChange={(e) => onDonePriceChange(e.target.value)}
-                readOnly={readOnly}
+                readOnly={disabled}
               />
             </div>
           );
         })}
       </Tbody>
 
-      <Tfoot readOnly={readOnly} node_other={other} />
+      <Tfoot readOnly={disabled} node_other={other} />
     </div>
   );
 };
 
-const Right = ({ node_center }: { node_center: Tcenter }) => {
-  node_center.readOnly = true;
+// =============================================================================
 
-  return <Center node_center={node_center} />;
+const Right = ({ node_center }: { node_center: Tcenter }) => {
+  return <Center disabled={true} node_center={node_center} />;
 };
 
+// =============================================================================
 const Thead = ({ caption, children }: { caption?: React.ReactNode; children: React.ReactNode }) => {
   return (
     <div className={scss.thead}>
@@ -200,6 +850,7 @@ const Thead = ({ caption, children }: { caption?: React.ReactNode; children: Rea
   );
 };
 
+// =============================================================================
 const Tbody = ({
   children,
   totals: { subTotal, tax, contractTotal },
@@ -222,6 +873,7 @@ const Tbody = ({
   );
 };
 
+// =============================================================================
 const Tfoot = ({ readOnly: readOnly, node_other }: { readOnly: boolean; node_other: Tcenter['other'] }) => {
   const {
     invoiceNumber,
@@ -231,9 +883,9 @@ const Tfoot = ({ readOnly: readOnly, node_other }: { readOnly: boolean; node_oth
     deduction_localeString,
     writeOffDeposit_localeString,
 
-    haveRetainage,
-    haveDeduction,
-    haveWriteOffDeposit,
+    minusRetainage: haveRetainage,
+    minusDeduction: haveDeduction,
+    minusWriteOffDeposit: haveWriteOffDeposit,
     onChange_invoiceNumber,
     onChange_retainage,
     onChange_deduction,
@@ -311,88 +963,87 @@ const Tfoot = ({ readOnly: readOnly, node_other }: { readOnly: boolean; node_oth
 // ========================================================================
 
 // region fake
-const fakeLeft: Tleft = {
-  rowArr: [
-    {
-      itemName: '項目1',
-      size: '尺寸1',
-      qty: '99',
-      contractPrice: '9999',
-      contractPrice_num: 9999,
-    },
-    {
-      itemName: '項目2',
-      size: '尺寸2',
-      qty: '99',
-      contractPrice: '9999',
-      contractPrice_num: 9999,
-    },
-    {
-      itemName: '項目3',
-      size: '尺寸3',
-      qty: '99',
-      contractPrice: '9999',
-      contractPrice_num: 9999,
-    },
-  ],
-  totals: {
-    subTotal: '9999',
-    tax: '9999',
-    contractTotal: '9999',
-  },
-};
+// const fakeLeft: Tleft = {
+//   rowArr: [
+//     {
+//       itemName: '項目1',
+//       size: '尺寸1',
+//       qty: '99',
+//       contractPrice: '9999',
+//       // contractPrice_num: 9999,
+//     },
+//     {
+//       itemName: '項目2',
+//       size: '尺寸2',
+//       qty: '99',
+//       contractPrice: '9999',
+//       // contractPrice_num: 9999,
+//     },
+//     {
+//       itemName: '項目3',
+//       size: '尺寸3',
+//       qty: '99',
+//       contractPrice: '9999',
+//       // contractPrice_num: 9999,
+//     },
+//   ],
+//   totals: {
+//     subTotal: '9999',
+//     tax: '9999',
+//     contractTotal: '9999',
+//   },
+// };
 
-const fakeCenter: Tcenter = {
-  renderCount: 0,
-  readOnly: false,
-  caption: '第N期',
-  rowArr: [
-    {
-      doneQty: '99',
-      donePrice: '9999',
-      donePrice_localeString: '9,999',
-      onDoneQtyChange: () => {},
-      onDonePriceChange: () => {},
-    },
-    {
-      doneQty: '99',
-      donePrice: '999999',
-      donePrice_localeString: '999,999',
-      onDoneQtyChange: () => {},
-      onDonePriceChange: () => {},
-    },
-    {
-      doneQty: '99',
-      donePrice: '99',
-      donePrice_localeString: '99',
-      onDoneQtyChange: () => {},
-      onDonePriceChange: () => {},
-    },
-  ],
-  totals: {
-    subTotal: <span>9999</span>,
-    tax: <span>9999</span>,
-    contractTotal: <span>9999</span>,
-  },
+// const fakeCenter: Tcenter = {
+//   renderCount: 0,
+//   caption: '第N期',
+//   rowArr: [
+//     {
+//       doneQty: '99',
+//       donePrice: '9999',
+//       donePrice_localeString: '9,999',
+//       onDoneQtyChange: () => {},
+//       onDonePriceChange: () => {},
+//     },
+//     {
+//       doneQty: '99',
+//       donePrice: '999999',
+//       donePrice_localeString: '999,999',
+//       onDoneQtyChange: () => {},
+//       onDonePriceChange: () => {},
+//     },
+//     {
+//       doneQty: '99',
+//       donePrice: '99',
+//       donePrice_localeString: '99',
+//       onDoneQtyChange: () => {},
+//       onDonePriceChange: () => {},
+//     },
+//   ],
+//   totals: {
+//     subTotal: <span>9999</span>,
+//     tax: <span>9999</span>,
+//     contractTotal: <span>9999</span>,
+//   },
 
-  other: {
-    price: '9,999',
+//   other: {
+//     price: '9,999',
 
-    invoiceNumber: 'I-faa-d757889',
-    retainage: '9999',
-    deduction: '',
-    writeOffDeposit: '99',
-    retainage_localeString: '9,999',
-    deduction_localeString: '',
-    writeOffDeposit_localeString: '99',
+//     invoiceNumber: 'I-faa-d757889',
+//     retainage: '9999',
+//     deduction: '',
+//     writeOffDeposit: '99',
+//     retainage_localeString: '9,999',
+//     deduction_localeString: '',
+//     writeOffDeposit_localeString: '99',
 
-    onChange_invoiceNumber: () => {},
-    onChange_retainage: () => {},
-    onChange_deduction: () => {},
-    onChange_writeOffDeposit: () => {},
+//     onChange_invoiceNumber: () => {},
+//     onChange_retainage: () => {},
+//     onChange_deduction: () => {},
+//     onChange_writeOffDeposit: () => {},
 
-    haveRetainage: true,
-    haveDeduction: false,
-    haveWriteOffDeposit: true,
-  },
-};
+//     minusRetainage: true,
+//     minusDeduction: false,
+//     minusWriteOffDeposit: true,
+//   },
+// };

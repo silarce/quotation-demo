@@ -43,25 +43,29 @@ import {
   TupdateEngineeringContactDto,
   TupdateAccountReceivableDto,
   TaccountReceivableDto,
+  TcreateAccountReceivableInvoiceDto,
+  TcreateAccountReceivableDto,
+  TupdateAccountReceivableInvoiceDto,
+  TaccountsReceivableInvoiceDto,
+  //
   useGetEngineeringContact,
+  useGetAccountReceivableAccountants,
+  useGetAccountReceivableIncoices,
+  useGetAccountReceivable_id,
+  // useGetFinalProduct, // 不是這個
+  //
+  apiPatchAccountReceivable,
   apiPatchEngineeringContact,
   apiPostWorkSheet,
-  // useGetFinalProduct,
-  useGetAccountReceivable_id,
-  apiPatchAccountReceivable,
-  useGetAccountReceivableAccountants,
-  apiPostAccountReceivableAccountant,
-  apiDeleteAccountReceivableAccountant,
-  useGetAccountReceivableIncoices,
-  TaccountsReceivableInvoiceDto,
   apiPatchAccountReceivableInvoice,
-  TupdateAccountReceivableInvoiceDto,
   apiPatchAccountReceivableAccountant,
   apiPatchAccountReceivableVoidInvoice,
   apiPostAccountReceivable,
-  TcreateAccountReceivableDto,
+  apiPostAccountReceivableAccountant,
+  apiDeleteAccountReceivableAccountant,
+  apiPostAccountReceivableIncoice, // 新增應收帳款發票
 } from 'js/api/api_engineering';
-import { useGetContract_id } from 'js/api/api_quotation';
+import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 import { TaccountantDto } from 'js/api/api_accountant';
 
 // utils
@@ -76,7 +80,7 @@ export default function AccountReceivable() {
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFetching_req, setIsFetching_req] = useState<boolean>(false);
   const [disabled, setDisabled] = useState(true);
 
   // --------------------------------------------------------------------------
@@ -88,15 +92,73 @@ export default function AccountReceivable() {
 
   // region get data
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+  const {
+    data: contract,
+    update: update_contract,
+    isFetching: isFetching_contract,
+  } = useGetContract_id(contractId, {
     customPopulate: [
       // 'subContracts.content.verifyForm'
       'engineeringContact',
-      'accountReceivable',
+      'accountReceivable.invoices',
     ],
   });
 
-  const { engineeringContact, accountReceivableId } = contract ?? {};
+  const { engineeringContact, accountReceivable } = contract ?? {};
+
+  // const {
+  //   data: data_finalProdcut,
+  //   update: update_finalProduct,
+  //   isFetching: isFetching_finalProduct,
+  // } = useGetFinalProduct(contractId); // 不是這個，這是舊的
+
+  const {
+    data: data_finalProdcut = [],
+    update: update_finalProduct,
+    isLoading: isFetching_finalProduct,
+  } = useGetContract_id_finalProductItem(contractId);
+
+  const isFetching = isFetching_contract || isFetching_finalProduct;
+
+  // --------------------------------------------------------------------------
+
+  // region REQUEST
+
+  const reqAddInvoice_請款 = async () => {
+    if (!accountReceivable?.id) {
+      alert('沒有accountReceivable.id');
+
+      return;
+    }
+
+    const body: TcreateAccountReceivableInvoiceDto = {
+      invoiceDate: new Date().toISOString(),
+      invoiceNumber: '',
+      price: 0,
+      note: '',
+    };
+
+    await apiPostAccountReceivableIncoice(accountReceivable.id, body);
+    await update_contract();
+  };
+
+  const reqAddInvoice_訂金 = async () => {
+    if (!accountReceivable?.id) {
+      alert('沒有accountReceivable.id');
+
+      return;
+    }
+
+    const body: TcreateAccountReceivableInvoiceDto = {
+      invoiceDate: new Date().toISOString(),
+      invoiceNumber: '',
+      price: 0,
+      note: '',
+    };
+
+    await apiPostAccountReceivableIncoice(accountReceivable.id, body);
+    await update_contract();
+  };
 
   // --------------------------------------------------------------------------
 
@@ -112,14 +174,19 @@ export default function AccountReceivable() {
 
   useEffect(() => {
     update_contract();
+    update_finalProduct();
   }, [contractId]);
 
   // --------------------------------------------------------------------------
   // region RENDER
 
-  if (accountReceivableId === null) {
+  if (!contract) {
+    <SubLayer>{null}</SubLayer>;
+  }
+
+  if (!accountReceivable) {
     return (
-      <SubLayer isLoading_all={isLoading}>
+      <SubLayer isLoading_all={isFetching}>
         <PageHeader panelList={[]} contractNumber={engineeringContact?.contractNumber ?? ''} />
         <EmptyMain />
       </SubLayer>
@@ -127,13 +194,19 @@ export default function AccountReceivable() {
   }
 
   return (
-    <SubLayer isLoading_all={isLoading}>
+    <SubLayer isLoading_all={isFetching}>
       <PageHeader panelList={[]} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div className={scss.main}>
         <Profile {...props_profile} />
         <TotalCalc className="mt-10" />
-        <InvoiceTable className="mt-10" />
+        <InvoiceTable
+          className="mt-10"
+          data_finalProdcut={data_finalProdcut}
+          data_invoices={accountReceivable.invoices}
+          reqAddInvoice_請款={reqAddInvoice_請款}
+          reqAddInvoice_訂金={reqAddInvoice_訂金}
+        />
       </div>
     </SubLayer>
   );

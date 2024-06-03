@@ -1446,6 +1446,8 @@ export const apiGetFinalProduct = async (contractId: string) => {
 };
 
 export const useGetFinalProduct = (contractId: string | undefined) => {
+  const [isFetching, setIsFetching] = useState(false);
+
   const [res, setRes] = useState<TfinalProduct>();
 
   const update = async () => {
@@ -1454,6 +1456,7 @@ export const useGetFinalProduct = (contractId: string | undefined) => {
     }
 
     try {
+      setIsFetching(true);
       const newRes = await apiGetFinalProduct(contractId);
 
       if (newRes) {
@@ -1464,6 +1467,8 @@ export const useGetFinalProduct = (contractId: string | undefined) => {
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '取得請款單資料失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
     }
 
     return undefined;
@@ -1472,6 +1477,7 @@ export const useGetFinalProduct = (contractId: string | undefined) => {
   return {
     data: res,
     update,
+    isFetching,
   };
 };
 
