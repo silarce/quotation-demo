@@ -23,6 +23,7 @@ import type {
 // region type
 
 type Tstate_invoice = {
+  id?: string;
   renderCount: number; // 判斷是否要rerender用的，會送到Tcenter
   rowArr: {
     productId: string;
@@ -103,6 +104,8 @@ type Tcenter = {
   };
 };
 
+export type { Tstate_invoice };
+
 // ========================================================================
 
 // region START
@@ -114,12 +117,14 @@ export default function InvoiceTable({
   data_invoices = [],
   reqAddInvoice_請款,
   reqAddInvoice_訂金,
+  reqPatchInvoiceArr,
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
   data_invoices: TaccountsReceivableInvoiceDto[] | undefined | null;
   reqAddInvoice_請款: () => void;
   reqAddInvoice_訂金: () => void;
+  reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
 }) {
   const [disabled, setDisabled] = useState(true);
 
@@ -266,6 +271,11 @@ export default function InvoiceTable({
     });
   };
 
+  const handel_onConfirm = async () => {
+    await reqPatchInvoiceArr(state_invoiceArr);
+    setDisabled(true);
+  };
+
   // --------------------------------------------------------------------------
 
   // region total_state_invoiceArr
@@ -301,6 +311,7 @@ export default function InvoiceTable({
 
       const {
         //
+
         rowArr,
         subTotal,
         tax,
@@ -628,6 +639,7 @@ export default function InvoiceTable({
     const arr: Tstate_invoice[] = (data_invoices ?? []).map((invoice) => {
       const {
         //
+        id,
         type,
         period,
         invoiceNumber,
@@ -665,6 +677,7 @@ export default function InvoiceTable({
       const totals_num = calcTotals(rowArr);
 
       return {
+        id,
         renderCount: 0,
         rowArr,
         retainage: String(retainage || ''),
@@ -717,7 +730,7 @@ export default function InvoiceTable({
           </MyButton_v2>
 
           {!disabled && (
-            <MyButton_v2 className={'ml-5'} px="px22" py="py4" onClick={() => {}}>
+            <MyButton_v2 className={'ml-5'} px="px22" py="py4" onClick={handel_onConfirm}>
               確認
             </MyButton_v2>
           )}

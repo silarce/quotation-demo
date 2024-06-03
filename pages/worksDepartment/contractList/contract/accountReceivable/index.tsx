@@ -17,7 +17,9 @@ import Profile, {
   createValueList_profile_engineeringContact,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/profile';
 import TotalCalc from 'components/page/worksDepartment/contracList/contract/accountReceivable/totalCalc';
-import InvoiceTable from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable';
+import InvoiceTable, {
+  Tstate_invoice,
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable';
 
 // import Table_requestPayment, {
 //   Tcontrol_table_requestPayment,
@@ -118,7 +120,7 @@ export default function AccountReceivable() {
     isLoading: isFetching_finalProduct,
   } = useGetContract_id_finalProductItem(contractId);
 
-  const isFetching = isFetching_contract || isFetching_finalProduct;
+  const isFetching = isFetching_contract || isFetching_finalProduct || isFetching_req;
 
   // --------------------------------------------------------------------------
 
@@ -142,9 +144,87 @@ export default function AccountReceivable() {
       isWriteOffDeposit: false,
     };
 
-    await apiPostAccountReceivableIncoice(accountReceivable.id, body);
-    await update_contract();
+    try {
+      setIsFetching_req(true);
+      await apiPostAccountReceivableIncoice(accountReceivable.id, body);
+      await update_contract();
+    } catch (error) {
+    } finally {
+      setIsFetching_req(false);
+    }
   };
+
+  const reqPatchInvoiceArr = async (state_invoiceArr: Tstate_invoice[]) => {
+    let haveEmptyId = false;
+
+    const bodyArr: {
+      id: string | undefined;
+      body: TupdateAccountReceivableInvoiceDto;
+    }[] = state_invoiceArr.map((state) => {
+      const {
+        id,
+        rowArr,
+        retainage,
+        deduction,
+        writeOffDeposit,
+        minusRetainage,
+        minusDeduction,
+        minusWriteOffDeposit,
+        price,
+        invoiceNumber,
+      } = state;
+
+      !id && (haveEmptyId = true);
+
+      const completedProduct = rowArr.map((row) => {
+        return {
+          productId: row.productId,
+          completedQuantity: Number(row.completedQuantity),
+          completedPayment: Number(row.completedPayment),
+        };
+      });
+
+      const body: TupdateAccountReceivableInvoiceDto = {
+        completedProduct: completedProduct,
+        retainage: Number(retainage),
+        deduction: Number(deduction),
+        writeOffDeposit: Number(writeOffDeposit),
+        isRetainage: minusRetainage,
+        isDeduction: minusDeduction,
+        isWriteOffDeposit: minusWriteOffDeposit,
+        price,
+        invoiceNumber,
+        //
+        // invoiceDate: new Date().toISOString(),
+        // note: '',
+        //
+        // accountants: [],
+      };
+
+      return {
+        id,
+        body,
+      };
+    }); // state_invoiceArr.map
+
+    if (haveEmptyId) {
+      alert('有空的id');
+
+      return;
+    }
+
+    try {
+      setIsFetching_req(true);
+
+      for (const body of bodyArr) {
+        await apiPatchAccountReceivableInvoice(body.id!, body.body);
+      }
+    } catch (error) {
+    } finally {
+      await update_contract();
+      setIsFetching_req(false);
+    }
+  }; //reqPatchInvoiceArr
 
   // --------------------------------------------------------------------------
 
@@ -194,6 +274,7 @@ export default function AccountReceivable() {
           data_invoices={accountReceivable.invoices}
           reqAddInvoice_請款={() => reqAddInvoice('請款')}
           reqAddInvoice_訂金={() => reqAddInvoice('訂金')}
+          reqPatchInvoiceArr={reqPatchInvoiceArr}
         />
       </div>
     </SubLayer>

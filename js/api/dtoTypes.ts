@@ -3515,13 +3515,44 @@ export type TcreateAccountReceivableInvoiceDto = Pick<
   'invoiceDate' | 'invoiceNumber' | 'price' | 'note' | 'type' | 'isRetainage' | 'isDeduction' | 'isWriteOffDeposit'
 >;
 
-export type TupdateAccountReceivableInvoiceDto = Pick<
-  TaccountsReceivableInvoiceDto,
-  'invoiceDate' | 'invoiceNumber' | 'price' | 'note'
-> & {
-  // 關聯的收款紀錄Id
-  accountants: string[];
-};
+// export type TupdateAccountReceivableInvoiceDto = Pick<
+//   TaccountsReceivableInvoiceDto,
+//   | 'invoiceDate'
+//   | 'note'
+//   //
+//   | 'completedProduct'
+//   | 'retainage'
+//   | 'deduction'
+//   | 'writeOffDeposit'
+//   | 'isRetainage'
+//   | 'isDeduction'
+//   | 'isWriteOffDeposit'
+//   | 'price'
+//   | 'invoiceNumber'
+// > & {
+//   // 關聯的收款紀錄Id
+//   accountants: string[];
+// };
+export type TupdateAccountReceivableInvoiceDto = Partial<
+  Pick<
+    TaccountsReceivableInvoiceDto,
+    | 'invoiceDate'
+    | 'note'
+    //
+    | 'completedProduct'
+    | 'retainage'
+    | 'deduction'
+    | 'writeOffDeposit'
+    | 'isRetainage'
+    | 'isDeduction'
+    | 'isWriteOffDeposit'
+    | 'price'
+    | 'invoiceNumber'
+  > & {
+    // 關聯的收款紀錄Id
+    accountants: string[];
+  }
+>;
 
 export type TaccountantDto = {
   id: string;
