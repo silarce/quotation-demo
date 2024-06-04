@@ -3588,7 +3588,11 @@ export type TcreateAccountantDto = Pick<
   noteMaturityDate?: string | null; // 票據到期日
 };
 
-export type TupdateAccountantDto = Partial<TcreateAccountantDto>;
+export type TupdateAccountantDto = Partial<
+  TcreateAccountantDto & {
+    accountsReceivableDeduction: Partial<TaccountsReceivableDeductionDto>[];
+  }
+>;
 
 /**扣款明細 */
 export type TaccountsReceivableDeductionDto = {
@@ -3596,16 +3600,13 @@ export type TaccountsReceivableDeductionDto = {
   createdAt: string;
   updatedAt: string;
   itemName: string; // 項目
-  period: number; // 期數
+  // period: number; // 期數 // 棄用
   detailedAmount: number; // 明細金額
   accountsReceivableId: string; // 所屬應收帳款Id
   accountsReceivable?: TaccountsReceivableDto | null; // 所屬應收帳款
 };
 
-export type TcreateAccountReceivableDeductionDto = Pick<
-  TaccountsReceivableDeductionDto,
-  'itemName' | 'period' | 'detailedAmount'
->;
+export type TcreateAccountReceivableDeductionDto = Pick<TaccountsReceivableDeductionDto, 'itemName' | 'detailedAmount'>;
 
 export type TupdateAccountReceivableDeductionDto = Partial<TcreateAccountReceivableDeductionDto> & {
   id: string; // 不提供時將此筆視為新增資料

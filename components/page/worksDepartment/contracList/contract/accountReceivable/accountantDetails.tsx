@@ -3,9 +3,13 @@ import classNames from 'classnames';
 import Image from 'next/image';
 import Decimal from 'decimal.js';
 
+// component
+import EditDeduction from './editDeduction';
+
 // gear
 import TopBar from 'components/page/worksDepartment/contracList/contract/accountReceivable/ui/topBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import scss from './accountantDetails.module.scss';
@@ -17,8 +21,15 @@ import type { TaccountantDto, TaccountsReceivableDeductionDto } from 'js/api/dto
 import iconEyeOpen from 'public/image/icon/eyeOpen.svg';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { set } from 'lodash';
 
 // ============================================================================
+
+type Tstate_deduction = {
+  id?: string;
+  itemName: string; // 扣款項目
+  detailedAmount: string; // 扣款金額
+};
 
 type Tstate_accountant = {
   id: string;
@@ -31,11 +42,12 @@ type Tstate_accountant = {
   fee: string;
   billSerialNumber: string;
   //
-  accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  // accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  state_deduction: Tstate_deduction[];
   deductionTotal: number; // 後端沒有 accountsReceivableDeduction金額的總和
 };
 
-export type { Tstate_accountant };
+export type { Tstate_accountant, Tstate_deduction };
 
 // ============================================================================
 // region START
@@ -63,6 +75,34 @@ export default function AccountantDetails({
       copy[index].fee = value;
 
       return copy;
+    });
+  };
+
+  const handle_editDeduction = (index: number, state_deduction: Tstate_deduction[]) => {
+    const modal = myAlert.btnBar({});
+
+    const onConfirm = (state_deduction: Tstate_deduction[]) => {
+      const deductionTotal = state_deduction.reduce((acc, cur) => acc + Number(cur.detailedAmount), 0);
+
+      setState_accountantArr((arr) => {
+        const copy = [...arr];
+        copy[index].state_deduction = state_deduction;
+        copy[index].deductionTotal = deductionTotal;
+
+        return copy;
+      });
+      modal.destroy();
+    };
+
+    modal.update({
+      content: (
+        <EditDeduction
+          //
+          state_deduction={state_deduction}
+          onCancel={modal.destroy}
+          onConfirm={onConfirm}
+        />
+      ),
     });
   };
 
@@ -122,6 +162,17 @@ export default function AccountantDetails({
       } = accountant;
 
       const deductionTotal = accountsReceivableDeduction.reduce((acc, cur) => acc + cur.detailedAmount, 0);
+      const state_deduction = accountsReceivableDeduction.map((deduction) => {
+        const { id, itemName, detailedAmount } = deduction;
+
+        const state: Tstate_deduction = {
+          id,
+          itemName,
+          detailedAmount: String(detailedAmount),
+        };
+
+        return state;
+      });
 
       const state: Tstate_accountant = {
         id,
@@ -133,7 +184,7 @@ export default function AccountantDetails({
         noteMaturityDate,
         fee: String(fee),
         billSerialNumber: billSerialNumber ?? '',
-        accountsReceivableDeduction,
+        state_deduction: state_deduction,
         deductionTotal,
       };
 
@@ -184,7 +235,7 @@ export default function AccountantDetails({
             noteMaturityDate,
             fee,
             billSerialNumber,
-            accountsReceivableDeduction,
+            state_deduction,
             deductionTotal,
           } = accountant;
 
@@ -232,7 +283,14 @@ export default function AccountantDetails({
               </div>
 
               <div className={scss.cell} style={configList['btn'].style}>
-                {!disabled && <Image src={iconEyeOpen} alt="編輯扣款" />}
+                {!disabled && (
+                  <Image
+                    className="cursor-pointer"
+                    src={iconEyeOpen}
+                    alt="編輯扣款"
+                    onClick={() => handle_editDeduction(index_state, state_deduction)}
+                  />
+                )}
               </div>
             </Row>
           );

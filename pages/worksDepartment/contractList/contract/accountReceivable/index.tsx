@@ -114,7 +114,7 @@ export default function AccountReceivable() {
     customPopulate: [
       // 'subContracts.content.verifyForm'
       'engineeringContact',
-      'accountReceivable.invoices.accountantList',
+      'accountReceivable.invoices.accountantList.accountsReceivableDeduction',
     ],
   });
 
@@ -278,9 +278,19 @@ export default function AccountReceivable() {
 
   const reqPatchAccountant = async (state_accountant: Tstate_accountant[]) => {
     for (const state of state_accountant) {
+      const state_deduction = state.state_deduction;
+
+      const accountsReceivableDeduction = state_deduction.map((item) => {
+        return {
+          ...item,
+          detailedAmount: Number(item.detailedAmount),
+        };
+      });
+
       await apiPatchAccountant(state.id, {
         body: {
           fee: Number(state.fee),
+          accountsReceivableDeduction,
         },
       });
     }

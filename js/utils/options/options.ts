@@ -470,6 +470,23 @@ export const optionsCreator_otherWorkItems = (): Toption[] => {
   ];
 };
 
+export const optionsCreator_deduction = ({ emptyOption }: { emptyOption?: boolean } = {}): Toption[] => {
+  const optionArr = [
+    { value: '清潔分攤費', label: '清潔分攤費' },
+    { value: '清安費', label: '清安費' },
+    { value: '義交費', label: '義交費' },
+    { value: '點工移料費', label: '點工移料費' },
+    { value: '堆高機租用費', label: '堆高機租用費' },
+    { value: '流動廁所分攤費', label: '流動廁所分攤費' },
+  ];
+
+  if (emptyOption) {
+    optionArr.unshift({ value: '', label: '不拘' });
+  }
+
+  return optionArr;
+};
+
 export type { Toption, ToptionPlus };
 
 export { addEmpty, createNumberRangeOptionArr };
