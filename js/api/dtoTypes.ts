@@ -3396,7 +3396,7 @@ export type TaccountsReceivableDto = {
   contract: TquotationContractDto | null;
   // 所屬舊合約
   legacyContract: TlegacyContractDto | null;
-  // 扣款明細 // 棄用
+  // 扣款明細 // 棄用?
   accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
   // 發票記錄
   invoices: TaccountsReceivableInvoiceDto[] | null;

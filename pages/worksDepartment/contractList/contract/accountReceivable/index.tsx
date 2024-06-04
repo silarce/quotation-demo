@@ -20,6 +20,9 @@ import TotalCalc from 'components/page/worksDepartment/contracList/contract/acco
 import InvoiceTable, {
   Tstate_invoice,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable';
+import AccountantDetails, {
+  Tstate_accountant,
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDetails';
 
 // import Table_requestPayment, {
 //   Tcontrol_table_requestPayment,
@@ -68,7 +71,13 @@ import {
   apiPostAccountReceivableIncoice, // 新增應收帳款發票
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
-import { TaccountantDto } from 'js/api/api_accountant';
+
+import {
+  TaccountantDto,
+  TupdateAccountantDto,
+  //
+  apiPatchAccountant,
+} from 'js/api/api_accountant';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
@@ -85,6 +94,8 @@ export default function AccountReceivable() {
 
   const [isFetching_req, setIsFetching_req] = useState<boolean>(false);
   const [disabled, setDisabled] = useState(true);
+
+  let isFetching = false;
 
   // --------------------------------------------------------------------------
 
@@ -103,7 +114,7 @@ export default function AccountReceivable() {
     customPopulate: [
       // 'subContracts.content.verifyForm'
       'engineeringContact',
-      'accountReceivable.invoices',
+      'accountReceivable.invoices.accountantList',
     ],
   });
 
@@ -121,7 +132,19 @@ export default function AccountReceivable() {
     isLoading: isFetching_finalProduct,
   } = useGetContract_id_finalProductItem(contractId);
 
-  const isFetching = isFetching_contract || isFetching_finalProduct || isFetching_req;
+  const accountantArr = useMemo(() => {
+    if (!accountReceivable?.invoices) {
+      return [];
+    }
+
+    const invoiceArr = accountReceivable.invoices;
+    const arr: TaccountantDto[] = [];
+    invoiceArr.forEach((invoice) => {
+      invoice.accountantList && arr.push(...invoice.accountantList);
+    });
+
+    return arr;
+  }, [accountReceivable]);
 
   // --------------------------------------------------------------------------
 
@@ -253,6 +276,18 @@ export default function AccountReceivable() {
     }
   }; //reqPatchInvoiceArr
 
+  const reqPatchAccountant = async (state_accountant: Tstate_accountant[]) => {
+    for (const state of state_accountant) {
+      await apiPatchAccountant(state.id, {
+        body: {
+          fee: Number(state.fee),
+        },
+      });
+    }
+
+    update_contract();
+  };
+
   // --------------------------------------------------------------------------
 
   // --------------------------------------------------------------------------
@@ -262,6 +297,8 @@ export default function AccountReceivable() {
   const props_profile: Tprops_profile = {
     valueList: createValueList_profile_engineeringContact({ engineeringContact }),
   };
+
+  isFetching = isFetching_contract || isFetching_finalProduct || isFetching_req;
 
   // --------------------------------------------------------------------------
 
@@ -295,6 +332,14 @@ export default function AccountReceivable() {
       <div className={scss.main}>
         <Profile {...props_profile} />
         <TotalCalc className="mt-10" />
+
+        <AccountantDetails
+          //
+          className="mt-10"
+          accountantArr={accountantArr}
+          reqPatchAccountant={reqPatchAccountant}
+        />
+
         <InvoiceTable
           className="mt-10"
           data_finalProdcut={data_finalProdcut}

@@ -1,0 +1,57 @@
+.container {
+}
+
+.table {
+  position: relative;
+  border: solid 1px theme("colors.border");
+  width: fit-content;
+}
+
+.row {
+  display: flex;
+  // justify-items: center;
+  width: fit-content;
+  border-bottom: solid 1px theme("colors.border");
+  > * {
+    flex: none;
+  }
+  &:nth-last-of-type(1) {
+    border: none;
+  }
+}
+
+.cell {
+  font-size: 18px;
+  // border: solid 1px black;
+  text-align: center;
+  padding: 10px;
+}
+
+.thead {
+  position: sticky;
+  top: 0;
+  background-color: theme("colors.bgc01");
+  > .cell {
+    font-weight: 700;
+  }
+}
+
+.tfoot {
+  position: sticky;
+  bottom: 0;
+}
+
+.fee {
+  width: 100%;
+  text-align: right;
+  border-bottom: solid 1px black;
+  background-color: transparent;
+
+  &.disabled {
+    border-color: transparent;
+  }
+}
+
+.price {
+  text-align: right;
+}
