@@ -30,6 +30,8 @@ type Tstate_invoice = {
   renderCount: number; // 判斷是否要rerender用的，會送到Tcenter
   rowArr: {
     productId: string;
+    // baseQty: number;
+    basePrice: number;
     completedQuantity: string;
     completedPayment: string;
   }[];
@@ -165,7 +167,7 @@ export default function InvoiceTable({
       subTotal_d = subTotal_d.add(completedPayment);
     });
 
-    const tax_d = subTotal_d.mul(0.05);
+    const tax_d = subTotal_d.mul(0.05).toDecimalPlaces(0);
 
     return {
       subTotal: subTotal_d.toNumber(),
@@ -217,7 +219,20 @@ export default function InvoiceTable({
       const copy = [...prev];
       const invoice = copy[invoiceIndex];
       invoice.renderCount++;
-      invoice.rowArr[rowIndex][key] = value;
+
+      const row = invoice.rowArr[rowIndex];
+      // const baseQty = row.baseQty;
+      const basePrice = row.basePrice;
+
+      if (key === 'completedQuantity') {
+        row.completedQuantity = value;
+        row.completedPayment = new Decimal(value || 0).mul(basePrice).toDecimalPlaces(0).toString();
+      } else if (key === 'completedPayment') {
+        row.completedPayment = value;
+        row.completedQuantity = new Decimal(value || 0).div(basePrice).toDecimalPlaces(3).toString();
+      }
+
+      // invoice.rowArr[rowIndex][key] = value;
 
       const totals_num = calcTotals(invoice.rowArr);
 
@@ -670,17 +685,21 @@ export default function InvoiceTable({
         completedProductList[cp.productId] = cp;
       });
 
-      const rowArr: Tstate_invoice['rowArr'] = finalProdArr.map((fp) => {
-        const fpId = fp.id;
+      const rowArr: Tstate_invoice['rowArr'] = finalProdArr.map((finalProd) => {
+        const finalProdId = finalProd.id;
 
-        const cp = completedProductList[fpId] || {
-          productId: fpId,
+        const cp = completedProductList[finalProdId] || {
+          productId: finalProdId,
+          // baseQty: finalProd.quantity,
+          basePrice: finalProd.unitPrice,
           completedQuantity: '',
           completedPayment: '',
         };
 
         return {
           ...cp,
+          // baseQty: finalProd.quantity,
+          basePrice: finalProd.unitPrice,
           completedQuantity: String(cp.completedQuantity),
           completedPayment: String(cp.completedPayment),
         };
