@@ -294,9 +294,9 @@ export default function InvoiceTable({
       subTotal: subTotal_total,
       tax: tax_total,
       contractTotal: contractTotal_total,
-      retainage: retainage_total,
-      deduction: deduction_total,
-      writeOffDeposit: writeOffDeposit_total,
+      retainage: retainage_total = '0',
+      deduction: deduction_total = '0',
+      writeOffDeposit: writeOffDeposit_total = '0',
       price: price_total,
 
       minusRetainage: minusRetainage_total,
@@ -316,9 +316,9 @@ export default function InvoiceTable({
         subTotal,
         tax,
         contractTotal,
-        retainage,
-        deduction,
-        writeOffDeposit,
+        retainage = '0',
+        deduction = '0',
+        writeOffDeposit = '0',
         price,
 
         minusRetainage,
@@ -346,9 +346,9 @@ export default function InvoiceTable({
       tax_total = new Decimal(tax_total).add(tax).toNumber();
       contractTotal_total = new Decimal(contractTotal_total).add(contractTotal).toNumber();
 
-      retainage_total = new Decimal(retainage_total).add(retainage).toString();
-      deduction_total = new Decimal(deduction_total).add(deduction).toString();
-      writeOffDeposit_total = new Decimal(writeOffDeposit_total).add(writeOffDeposit).toString();
+      retainage_total = new Decimal(retainage_total).add(retainage || 0).toString();
+      deduction_total = new Decimal(deduction_total).add(deduction || 0).toString();
+      writeOffDeposit_total = new Decimal(writeOffDeposit_total).add(writeOffDeposit || 0).toString();
 
       price_total = new Decimal(price_total).add(price).toNumber();
       // __________________________________________________________________
