@@ -23,6 +23,7 @@ import InvoiceTable, {
 import AccountantDetails, {
   Tstate_accountant,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDetails';
+import DeductionDetail from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetail';
 
 // import Table_requestPayment, {
 //   Tcontrol_table_requestPayment,
@@ -349,6 +350,8 @@ export default function AccountReceivable() {
           accountantArr={accountantArr}
           reqPatchAccountant={reqPatchAccountant}
         />
+
+        <DeductionDetail />
 
         <InvoiceTable
           className="mt-10"

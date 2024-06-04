@@ -21,7 +21,6 @@ import type { TaccountantDto, TaccountsReceivableDeductionDto } from 'js/api/dto
 import iconEyeOpen from 'public/image/icon/eyeOpen.svg';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import { set } from 'lodash';
 
 // ============================================================================
 

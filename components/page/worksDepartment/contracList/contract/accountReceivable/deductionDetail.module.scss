@@ -1,0 +1,42 @@
+.table {
+  position: relative;
+  border: solid 1px theme("colors.border");
+  width: 100%;
+  overflow: auto;
+  // background-color: pink;
+}
+
+.row {
+  display: grid;
+  // grid-template-columns:;
+  grid-auto-columns: fill;
+  // justify-items: center;
+  width: fit-content;
+  border-bottom: solid 1px theme("colors.border");
+  padding: 10px;
+  font-size: 18px;
+  // > * {
+  //   width: 150px;
+  //   flex: none;
+  // }
+
+  // &:nth-last-of-type(1) {
+  //   border: none;
+  // }
+}
+
+// .cell {
+//   font-size: 18px;
+//   // border: solid 1px black;
+//   text-align: center;
+//   padding: 10px;
+// }
+
+.thead {
+  // position: sticky;
+  // top: 0;
+  background-color: theme("colors.bgc01");
+  // > .cell {
+  //   font-weight: 700;
+  // }
+}

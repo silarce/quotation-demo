@@ -8,7 +8,7 @@ export default function TopBar({
 }: {
   className?: string;
   caption?: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   return (
     <div className={classNames(scss.topBar, className)}>
