@@ -146,8 +146,8 @@ export default function InvoiceTable({
     };
   }, [data_finalProdcut]);
 
-  const invoiceArr = useMemo(() => {
-    return _.sortBy(data_invoices, 'period');
+  const invoiceArr_sorted = useMemo(() => {
+    return _.sortBy(data_invoices, 'createdAt');
   }, [data_invoices]);
 
   // --------------------------------------------------------------------------
@@ -345,10 +345,10 @@ export default function InvoiceTable({
         const completedPayment_d = new Decimal(completedPayment || 0);
 
         rowArr_total[index_row].completedQuantity = completedQuantity_d
-          .add(rowArr_total[index_row].completedQuantity)
+          .add(rowArr_total[index_row].completedQuantity || 0)
           .toString();
         rowArr_total[index_row].completedPayment = completedPayment_d
-          .add(rowArr_total[index_row].completedPayment)
+          .add(rowArr_total[index_row].completedPayment || 0)
           .toString();
       });
       // __________________________________________________________________
@@ -647,7 +647,7 @@ export default function InvoiceTable({
   // region use Effect
 
   useEffect(() => {
-    const arr: Tstate_invoice[] = (data_invoices ?? []).map((invoice) => {
+    const arr: Tstate_invoice[] = (invoiceArr_sorted ?? []).map((invoice) => {
       const {
         //
         id,
@@ -711,7 +711,7 @@ export default function InvoiceTable({
     }); // map
 
     setState_invoiceArr(arr);
-  }, [finalProdArr, invoiceArr, disabled]);
+  }, [finalProdArr, invoiceArr_sorted, disabled]);
   // --------------------------------------------------------------------------
 
   // region RENDER
@@ -725,14 +725,6 @@ export default function InvoiceTable({
             新增發票
           </MyButton_v2>
 
-          {/* <MyButton_v2 px="px22" py="py4" onClick={reqAddInvoice_請款}>
-            新增請款
-          </MyButton_v2>
-
-          <MyButton_v2 className={'ml-5'} px="px22" py="py4" onClick={reqAddInvoice_訂金}>
-            新增訂金
-          </MyButton_v2> */}
-
           <MyButton_v2
             className={'ml-5'}
             px="px22"
@@ -743,7 +735,6 @@ export default function InvoiceTable({
           >
             {disabled ? '編輯' : '取消'}
           </MyButton_v2>
-
           {!disabled && (
             <MyButton_v2 className={'ml-5'} px="px22" py="py4" onClick={handel_onConfirm}>
               確認
@@ -1047,10 +1038,11 @@ const AddInovice = ({
       />
       <br />
       <div className="flex gap-5 mt-10">
-        <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
+        <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
           新增請款
         </MyButton_v2>
-        <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
+
+        <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
           新增訂金
         </MyButton_v2>
 
