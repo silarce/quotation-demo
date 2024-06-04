@@ -9,6 +9,7 @@ import { Checkbox } from 'antd';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import TopBar from './ui/topBar';
 
 // css
 import scss from './invoiceTable.module.scss';
@@ -718,30 +719,27 @@ export default function InvoiceTable({
   return (
     <div className={classNames(scss.invoiceTable, className)}>
       {/*  */}
-      <div className={scss.topBar}>
-        <div className={scss.tab}>請款明細</div>
-        <div className={'ml-5'}>
-          <MyButton_v2 px="px22" py="py4" onClick={handel_addInvoice}>
-            新增發票
-          </MyButton_v2>
 
-          <MyButton_v2
-            className={'ml-5'}
-            px="px22"
-            py="py4"
-            onClick={() => {
-              setDisabled((prev) => !prev);
-            }}
-          >
-            {disabled ? '編輯' : '取消'}
+      <TopBar caption="請款明細">
+        <MyButton_v2 px="px22" py="py4" onClick={handel_addInvoice}>
+          新增發票
+        </MyButton_v2>
+
+        <MyButton_v2
+          px="px22"
+          py="py4"
+          onClick={() => {
+            setDisabled((prev) => !prev);
+          }}
+        >
+          {disabled ? '編輯' : '取消'}
+        </MyButton_v2>
+        {!disabled && (
+          <MyButton_v2 px="px22" py="py4" onClick={handel_onConfirm}>
+            確認
           </MyButton_v2>
-          {!disabled && (
-            <MyButton_v2 className={'ml-5'} px="px22" py="py4" onClick={handel_onConfirm}>
-              確認
-            </MyButton_v2>
-          )}
-        </div>
-      </div>
+        )}
+      </TopBar>
 
       {/*  */}
       <div className={scss.table}>
