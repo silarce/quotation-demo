@@ -669,6 +669,7 @@ export default function InvoiceTable({
         id,
         type,
         period,
+        depositPeriod,
         invoiceNumber,
         price,
         completedProduct = [],
@@ -718,7 +719,7 @@ export default function InvoiceTable({
         invoiceNumber,
 
         type,
-        period: period ?? 0,
+        period: period || depositPeriod || 0,
 
         minusRetainage: isRetainage,
         minusDeduction: isDeduction,
