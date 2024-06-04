@@ -18,6 +18,7 @@ import { selectModalCreator_multi } from 'components/global/gear/modal/selectorM
 // type
 import type { Toption } from 'js/utils/options/options';
 import type { TaccountantDto } from 'js/api/dtoTypes';
+import type { AxiosError } from 'axios';
 
 // icon
 import {
@@ -44,6 +45,9 @@ import {
 } from 'js/api/api_accountant';
 
 import { apiPostAccountReceivableAccountant } from 'js/api/api_engineering';
+
+import { TinvoiceType } from 'js/api/dtoTypes';
+import { content } from 'html2canvas/dist/types/css/property-descriptors/content';
 
 // =============================================================================
 
@@ -196,7 +200,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     await update_accountant();
   };
 
-  const reqPostAccountReceivableAccountant = async (accountReceivableId: string) => {
+  // 匯入發票
+  const reqPostAccountReceivableAccountant = async (accountReceivableId: string, type: TinvoiceType) => {
     if (!accountantId) {
       alert('accountantId為undefined');
 
@@ -206,9 +211,27 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     try {
       await apiPostAccountReceivableAccountant(accountReceivableId, {
         accountantId: [accountantId],
+        type,
       });
       await update_accountant();
-    } catch (error) {}
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({ title: '匯入失敗', content: err.message });
+    }
+  };
+
+  const handle_import = (accountReceivableId: string) => {
+    const modal = myAlert.btnBar({});
+    modal.update({
+      title: '請選擇匯入發票類型',
+      content: (
+        <AddInovice
+          onCancel={modal.destroy}
+          accountReceivableId={accountReceivableId}
+          reqPostAccountReceivableAccountant={reqPostAccountReceivableAccountant}
+        />
+      ),
+    });
   };
 
   // ----------------------------------------------------------------------------
@@ -308,7 +331,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
             }
 
             if (accountReceivableId) {
-              reqPostAccountReceivableAccountant(accountReceivableId);
+              handle_import(accountReceivableId);
             }
           }}
           onCancel={() => {
@@ -633,7 +656,7 @@ const Row = ({
         )}
         style={configList?.btn?.style}
       >
-        {!isReadOnly && (
+        {!isReadOnly && !state_accountant.billSerialNumber && (
           <>
             <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_check} />
             <IconEdit
@@ -644,9 +667,9 @@ const Row = ({
             <IconDelete01 className={classNames(!disabled && 'invisible')} onClick={handle_delete} />
           </>
         )}
-        {isReadOnly && (
+        {isReadOnly && !state_accountant.billSerialNumber && (
           <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant?.id)}>
-            匯入
+            匯入發票
           </MyButton_v2>
         )}
       </div>
@@ -721,6 +744,45 @@ const Row = ({
   );
 };
 
+const AddInovice = ({
+  reqPostAccountReceivableAccountant,
+  accountReceivableId,
+  onCancel,
+}: {
+  onCancel: () => void;
+  accountReceivableId: string;
+  reqPostAccountReceivableAccountant: (accountReceivableId: string, type: TinvoiceType) => Promise<void>;
+}) => {
+  const handle_訂金 = async () => {
+    await reqPostAccountReceivableAccountant(accountReceivableId, '訂金');
+    onCancel();
+  };
+
+  const handle_請款 = async () => {
+    await reqPostAccountReceivableAccountant(accountReceivableId, '請款');
+    onCancel();
+  };
+
+  return (
+    <div>
+      <br />
+      <div className="flex gap-5 mt-10">
+        <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
+          新增請款
+        </MyButton_v2>
+
+        <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
+          新增訂金
+        </MyButton_v2>
+
+        <MyButton_v2 theme="danger" px="px22" py="py6" buttonProps={{ htmlType: 'submit' }} onClick={onCancel}>
+          取消
+        </MyButton_v2>
+      </div>
+    </div>
+  );
+};
+
 // =========================================================================
 
 // region config
@@ -756,7 +818,7 @@ const configList: TconfigList = {
   btn: {
     label: '',
     style: {
-      width: 100,
+      width: 150,
     },
     className: '',
   },

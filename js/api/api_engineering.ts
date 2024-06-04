@@ -56,6 +56,7 @@ import type {
   TsubmitWorksheetProductsItemsDto,
   TreviewWorksheetProductsItemsDto,
   TdeliveryStatusInstallationItem,
+  TinvoiceType,
 } from './dtoTypes';
 
 export type {
@@ -1309,6 +1310,7 @@ export const apiPostAccountReceivableAccountant = async (
   id: string, // 應收帳款Id 可以在contract下找到accountReceivableId
   body: {
     accountantId: string[]; // 收款明細Id
+    type: TinvoiceType;
   },
   {
     callAlert = true,
