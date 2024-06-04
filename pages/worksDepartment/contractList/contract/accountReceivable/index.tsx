@@ -75,6 +75,7 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './index.module.scss';
+import { AxiosError } from 'axios';
 
 // ========================================================================
 
@@ -126,16 +127,22 @@ export default function AccountReceivable() {
 
   // region REQUEST
 
-  const reqAddInvoice = async (type: TcreateAccountReceivableInvoiceDto['type']) => {
+  const reqAddInvoice = async (type: TcreateAccountReceivableInvoiceDto['type'], invoiceNumber: string) => {
     if (!accountReceivable?.id) {
       alert('沒有accountReceivable.id');
 
       return;
     }
 
+    if (!invoiceNumber) {
+      myAlert.info({ title: '請輸入發票號碼' });
+
+      return;
+    }
+
     const body: TcreateAccountReceivableInvoiceDto = {
       invoiceDate: new Date().toISOString(),
-      invoiceNumber: '',
+      invoiceNumber: invoiceNumber,
       price: 0,
       note: '',
       type,
@@ -149,6 +156,15 @@ export default function AccountReceivable() {
       await apiPostAccountReceivableIncoice(accountReceivable.id, body);
       await update_contract();
     } catch (error) {
+      const err = error as AxiosError;
+
+      if (err?.response?.status === 409) {
+        myAlert.err({ title: '發票號碼重複' });
+
+        return;
+      }
+
+      myAlert.err({ title: '新增發票失敗' });
     } finally {
       setIsFetching_req(false);
     }
@@ -220,6 +236,17 @@ export default function AccountReceivable() {
         await apiPatchAccountReceivableInvoice(body.id!, body.body);
       }
     } catch (error) {
+      const err = error as AxiosError;
+
+      if (err?.response?.status === 409) {
+        const body = JSON.parse(err.config?.data);
+        const repeatInvoiceNumber = body.invoiceNumber;
+        myAlert.err({ title: '發票號碼重複', content: `重複的號碼為${repeatInvoiceNumber}` });
+
+        return;
+      }
+
+      myAlert.err({ title: '新增發票失敗' });
     } finally {
       await update_contract();
       setIsFetching_req(false);
@@ -272,8 +299,7 @@ export default function AccountReceivable() {
           className="mt-10"
           data_finalProdcut={data_finalProdcut}
           data_invoices={accountReceivable.invoices}
-          reqAddInvoice_請款={() => reqAddInvoice('請款')}
-          reqAddInvoice_訂金={() => reqAddInvoice('訂金')}
+          reqAddInvoice={reqAddInvoice}
           reqPatchInvoiceArr={reqPatchInvoiceArr}
         />
       </div>

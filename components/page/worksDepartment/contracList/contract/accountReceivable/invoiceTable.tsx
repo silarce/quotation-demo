@@ -6,7 +6,9 @@ import Decimal from 'decimal.js';
 // antd
 import { Checkbox } from 'antd';
 
+// gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import scss from './invoiceTable.module.scss';
@@ -115,15 +117,13 @@ export default function InvoiceTable({
   className,
   data_finalProdcut = [],
   data_invoices = [],
-  reqAddInvoice_請款,
-  reqAddInvoice_訂金,
+  reqAddInvoice,
   reqPatchInvoiceArr,
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
   data_invoices: TaccountsReceivableInvoiceDto[] | undefined | null;
-  reqAddInvoice_請款: () => void;
-  reqAddInvoice_訂金: () => void;
+  reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
   reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
 }) {
   const [disabled, setDisabled] = useState(true);
@@ -275,6 +275,15 @@ export default function InvoiceTable({
     setDisabled(true);
   };
 
+  const handel_addInvoice = () => {
+    const modal = myAlert.btnBar({});
+
+    modal.update({
+      title: '新增發票',
+      content: <AddInovice reqAddInvoice={reqAddInvoice} onCancel={modal.destroy} />,
+    });
+  };
+
   // --------------------------------------------------------------------------
 
   // region total_state_invoiceArr
@@ -348,9 +357,9 @@ export default function InvoiceTable({
       tax_total = new Decimal(tax_total).add(tax).toNumber();
       contractTotal_total = new Decimal(contractTotal_total).add(contractTotal).toNumber();
 
-      retainage_total = new Decimal(retainage_total).add(retainage || 0).toString();
-      deduction_total = new Decimal(deduction_total).add(deduction || 0).toString();
-      writeOffDeposit_total = new Decimal(writeOffDeposit_total).add(writeOffDeposit || 0).toString();
+      retainage_total = new Decimal(retainage_total || 0).add(retainage || 0).toString();
+      deduction_total = new Decimal(deduction_total || 0).add(deduction || 0).toString();
+      writeOffDeposit_total = new Decimal(writeOffDeposit_total || 0).add(writeOffDeposit || 0).toString();
 
       price_total = new Decimal(price_total).add(price).toNumber();
       // __________________________________________________________________
@@ -712,13 +721,17 @@ export default function InvoiceTable({
       <div className={scss.topBar}>
         <div className={scss.tab}>請款明細</div>
         <div className={'ml-5'}>
-          <MyButton_v2 px="px22" py="py4" onClick={reqAddInvoice_請款}>
+          <MyButton_v2 px="px22" py="py4" onClick={handel_addInvoice}>
+            新增發票
+          </MyButton_v2>
+
+          {/* <MyButton_v2 px="px22" py="py4" onClick={reqAddInvoice_請款}>
             新增請款
           </MyButton_v2>
 
           <MyButton_v2 className={'ml-5'} px="px22" py="py4" onClick={reqAddInvoice_訂金}>
             新增訂金
-          </MyButton_v2>
+          </MyButton_v2> */}
 
           <MyButton_v2
             className={'ml-5'}
@@ -998,6 +1011,52 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
           onChange={(e) => onChange_invoiceNumber(e.target.value)}
           readOnly={readOnly}
         />
+      </div>
+    </div>
+  );
+};
+
+const AddInovice = ({
+  reqAddInvoice,
+  onCancel,
+}: {
+  reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
+  onCancel: () => void;
+}) => {
+  const [state_invoiceNumber, setState_invoiceNumber] = useState('');
+
+  const handle_訂金 = async () => {
+    await reqAddInvoice('訂金', state_invoiceNumber);
+    onCancel();
+  };
+
+  const handle_請款 = async () => {
+    await reqAddInvoice('請款', state_invoiceNumber);
+    onCancel();
+  };
+
+  return (
+    <div>
+      <br />
+      <p className="text-2xl">請輸入發票號碼</p>
+      <br />
+      <input
+        value={state_invoiceNumber}
+        onChange={(e) => setState_invoiceNumber(e.target.value)}
+        className={'text-xl border'}
+      />
+      <br />
+      <div className="flex gap-5 mt-10">
+        <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
+          新增請款
+        </MyButton_v2>
+        <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
+          新增訂金
+        </MyButton_v2>
+
+        <MyButton_v2 theme="danger" px="px22" py="py6" buttonProps={{ htmlType: 'submit' }} onClick={onCancel}>
+          取消
+        </MyButton_v2>
       </div>
     </div>
   );
