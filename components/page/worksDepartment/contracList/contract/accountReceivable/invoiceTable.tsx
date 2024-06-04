@@ -216,7 +216,6 @@ export default function InvoiceTable({
       const copy = [...prev];
       const invoice = copy[invoiceIndex];
       invoice.renderCount++;
-
       invoice.rowArr[rowIndex][key] = value;
 
       const totals_num = calcTotals(invoice.rowArr);
@@ -285,10 +284,13 @@ export default function InvoiceTable({
       return null;
     }
 
+    const firstInvoice = _.cloneDeep(state_invoiceArr[0]);
+
     const {
       //
       rowArr: rowArr_total,
-    } = state_invoiceArr[0];
+    } = firstInvoice;
+
     let {
       //
       subTotal: subTotal_total,
@@ -302,7 +304,7 @@ export default function InvoiceTable({
       minusRetainage: minusRetainage_total,
       minusDeduction: minusDeduction_total,
       minusWriteOffDeposit: minusWriteOffDeposit_total,
-    } = state_invoiceArr[0];
+    } = firstInvoice;
 
     state_invoiceArr.forEach((invoice, index_invoice) => {
       if (index_invoice === 0) {
