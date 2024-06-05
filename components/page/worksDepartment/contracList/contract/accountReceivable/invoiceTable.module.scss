@@ -1,4 +1,4 @@
-$invoicePadding: 20px;
+$invoicePadding: 10px 20px;
 $gridTemplateColumns_center: 120px 120px;
 $fontSize: 16px;
 $fontWeight: 500;
@@ -117,7 +117,7 @@ $rowGap: 10px;
   width: fit-content;
   margin: auto;
   margin-right: 0;
-  margin-top: 50px;
+  margin-top: 20px;
   font-size: $fontSize;
   font-weight: $fontWeight;
 

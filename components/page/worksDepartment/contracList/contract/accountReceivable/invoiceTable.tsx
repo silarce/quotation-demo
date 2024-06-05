@@ -755,7 +755,7 @@ export default function InvoiceTable({
           {disabled ? '編輯' : '取消'}
         </MyButton_v2>
         {!disabled && (
-          <MyButton_v2 px="px22" py="py4" onClick={handel_onConfirm}>
+          <MyButton_v2 theme="danger" px="px22" py="py4" onClick={handel_onConfirm}>
             確認
           </MyButton_v2>
         )}

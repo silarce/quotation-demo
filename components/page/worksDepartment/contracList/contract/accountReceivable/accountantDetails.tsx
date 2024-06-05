@@ -213,7 +213,7 @@ export default function AccountantDetails({
             <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
               取消
             </MyButton_v2>
-            <MyButton_v2 px="px22" py="py4" onClick={handle_confirm}>
+            <MyButton_v2 theme="danger" px="px22" py="py4" onClick={handle_confirm}>
               確認
             </MyButton_v2>
           </>
