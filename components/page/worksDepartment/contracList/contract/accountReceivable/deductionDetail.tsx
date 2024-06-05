@@ -141,6 +141,7 @@ export default function DeductionDetail({
         })}
       </div>
 
+      {/* 為了取得高度，高度用於展開收起動畫的height */}
       <div ref={ref_table} className={classNames(scss.table, scss.copy)}>
         <Row className={scss.thead}>
           <div>期數</div>
