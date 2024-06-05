@@ -25,6 +25,7 @@ import AccountantDetails, {
   Tstate_accountant,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDetails';
 import DeductionDetail from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetail';
+import AccountantSorting from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantSorting';
 
 // import Table_requestPayment, {
 //   Tcontrol_table_requestPayment,
@@ -346,6 +347,8 @@ export default function AccountReceivable() {
       <div className={scss.main}>
         <Profile {...props_profile} />
         <TotalCalc className="mt-10" />
+
+        <AccountantSorting className="mt-10" />
 
         <AccountantDetails
           //

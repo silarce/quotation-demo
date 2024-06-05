@@ -1,0 +1,66 @@
+// 結構
+// .group {
+//   .left {
+//     .row {
+//     }
+//   }
+//   .right {
+//     .row {
+//     }
+//   }
+// }
+
+.table {
+  border: solid 1px theme("colors.border");
+  width: 1130px;
+}
+
+.group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  .left {
+    .row {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .right {
+    .row {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+  }
+}
+
+.group {
+  border-bottom: solid 1px theme("colors.border");
+}
+
+.group.top {
+  background-color: theme("colors.bgc01");
+  > .left,
+  > .right {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px;
+  }
+  .left {
+    border-right: solid 1px theme("colors.border");
+  }
+}
+
+.group.thead {
+  div,
+  span {
+    font-size: 18px;
+    font-weight: 500;
+  }
+}
+
+.group.tbody {
+  border-bottom-width: 2px;
+}
+
+.row {
+  display: grid;
+}
