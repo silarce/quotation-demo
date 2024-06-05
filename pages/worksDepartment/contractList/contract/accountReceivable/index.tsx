@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -134,19 +135,22 @@ export default function AccountReceivable() {
     isLoading: isFetching_finalProduct,
   } = useGetContract_id_finalProductItem(contractId);
 
+  const invoiceArr = useMemo(() => {
+    return _.sortBy(accountReceivable?.invoices, 'createdAt');
+  }, [accountReceivable?.invoices]);
+
   const accountantArr = useMemo(() => {
-    if (!accountReceivable?.invoices) {
+    if (!invoiceArr) {
       return [];
     }
 
-    const invoiceArr = accountReceivable.invoices;
     const arr: TaccountantDto[] = [];
     invoiceArr.forEach((invoice) => {
       invoice.accountantList && arr.push(...invoice.accountantList);
     });
 
     return arr;
-  }, [accountReceivable]);
+  }, [invoiceArr]);
 
   // --------------------------------------------------------------------------
 
@@ -350,7 +354,7 @@ export default function AccountReceivable() {
           reqPatchAccountant={reqPatchAccountant}
         />
 
-        <DeductionDetail />
+        <DeductionDetail className="mt-10" invoiceArr={invoiceArr} />
 
         <InvoiceTable
           className="mt-10"
