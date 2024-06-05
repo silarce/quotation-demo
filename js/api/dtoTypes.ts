@@ -21,6 +21,7 @@ export type TdeliveryStatusInstallationItem = '門片' | '馬達' | '支軌';
 export type TinvoiceStatus = '已開立' | '已作廢';
 
 export type TinvoiceType = '請款' | '訂金';
+export type TaccountantPaymentType = '匯款' | '票據' | '現金';
 
 // =============================================================================
 export type Tparams = {
@@ -3559,7 +3560,7 @@ export type TaccountantDto = {
   createdAt: string;
   updatedAt: string;
 
-  paymentType: '匯款' | '票據' | '現金'; // 收款類型
+  paymentType: TaccountantPaymentType; // 收款類型
   accountingNumber: string | null; // 存入帳號
 
   insertDate: string | null; // 匯入日期 // 收款日 // 收票日
@@ -3594,6 +3595,12 @@ export type TupdateAccountantDto = Partial<
   }
 >;
 
+export type TupdateAccountantDeductionDto = {
+  fee?: number | null;
+  accountsReceivableDeduction?: TupdateAccountReceivableDeductionDto[];
+  order?: number;
+};
+
 /**扣款明細 */
 export type TaccountsReceivableDeductionDto = {
   id: string;
@@ -3608,8 +3615,10 @@ export type TaccountsReceivableDeductionDto = {
 
 export type TcreateAccountReceivableDeductionDto = Pick<TaccountsReceivableDeductionDto, 'itemName' | 'detailedAmount'>;
 
-export type TupdateAccountReceivableDeductionDto = Partial<TcreateAccountReceivableDeductionDto> & {
-  id: string; // 不提供時將此筆視為新增資料
+export type TupdateAccountReceivableDeductionDto = {
+  id?: string; // ID, 不提供時將此筆視為新增資料
+  itemName: string;
+  detailedAmount: number;
 };
 
 export type TfinalProduct = {

@@ -17,6 +17,7 @@ import type {
   TaccountantDto,
   TcreateAccountantDto,
   TupdateAccountantDto,
+  TupdateAccountantDeductionDto,
 } from './dtoTypes';
 
 export type {
@@ -27,6 +28,7 @@ export type {
   TaccountantDto,
   TcreateAccountantDto,
   TupdateAccountantDto,
+  TupdateAccountantDeductionDto,
 } from './dtoTypes';
 
 type TgetAccountant = TpageResponse<TaccountantDto>;
@@ -155,11 +157,34 @@ const deleteAccountant = async (
     });
 };
 
+// 以 id 更新 手續費和扣款明細
+const apiPatchAccountant_accountReceivable = async (
+  id: string,
+  body: TupdateAccountantDeductionDto,
+  {
+    callAlert = true,
+  }: {
+    callAlert?: boolean;
+  } = {}
+) => {
+  const api = `/accountant/${id}/account-receivable`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      callAlert && myAlert.err({ title: '更新收款紀錄失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
 export {
   apiGetAccountant,
   apiPostAccountant,
   apiPatchAccountant,
   deleteAccountant,
+  apiPatchAccountant_accountReceivable,
   //
   useGetAccountant_infinite,
   useGetAccountant,

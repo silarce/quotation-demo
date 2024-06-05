@@ -77,7 +77,8 @@ import {
   TaccountantDto,
   TupdateAccountantDto,
   //
-  apiPatchAccountant,
+  //  apiPatchAccountant,
+  apiPatchAccountant_accountReceivable,
 } from 'js/api/api_accountant';
 
 // utils
@@ -288,11 +289,9 @@ export default function AccountReceivable() {
         };
       });
 
-      await apiPatchAccountant(state.id, {
-        body: {
-          fee: Number(state.fee),
-          accountsReceivableDeduction,
-        },
+      await apiPatchAccountant_accountReceivable(state.id, {
+        fee: Number(state.fee),
+        accountsReceivableDeduction,
       });
     }
 
