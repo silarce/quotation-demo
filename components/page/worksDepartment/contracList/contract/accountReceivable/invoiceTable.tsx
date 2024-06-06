@@ -44,7 +44,7 @@ type Tstate_invoice = {
   deduction: string;
   writeOffDeposit: string;
 
-  retainageType: TinvoiceRetainageType | 'none'; // 折讓類型
+  retainageType: TinvoiceRetainageType | null; // 折讓類型
   minusRetainage: boolean;
   minusDeduction: boolean;
   minusWriteOffDeposit: boolean;
@@ -101,7 +101,7 @@ type Tcenter = {
     minusDeduction: boolean;
     minusWriteOffDeposit: boolean;
 
-    retainageType: string;
+    retainageType: string | null;
 
     onChange_invoiceNumber: (value: string) => void;
     onChange_retainage: (value: string) => void;
@@ -449,7 +449,7 @@ export default function InvoiceTable({
       type: '請款', // 只是為了符合型別，不會用到
       period: 0, // 只是為了符合型別，不會用到
 
-      retainageType: 'none',
+      retainageType: null,
     };
 
     //
@@ -692,7 +692,7 @@ export default function InvoiceTable({
         minusDeduction,
         minusWriteOffDeposit,
 
-        retainageType: 'none',
+        retainageType: null,
 
         onChange_invoiceNumber: () => {},
         onChange_retainage: () => {},
@@ -778,7 +778,7 @@ export default function InvoiceTable({
         minusDeduction: isDeduction,
         minusWriteOffDeposit: isWriteOffDeposit,
 
-        retainageType: retainageType || 'none',
+        retainageType,
 
         subTotal: totals_num.subTotal,
         tax: totals_num.tax,
@@ -966,6 +966,9 @@ const Tbody = ({
 };
 
 // =============================================================================
+
+// region Tfoot
+
 const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcenter['other'] }) => {
   const {
     invoiceNumber,
@@ -992,6 +995,8 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
 
     onChange_retainageType,
   } = node_other;
+
+  console.log(retainageType);
 
   let { retainage, deduction, writeOffDeposit } = node_other;
 
@@ -1050,7 +1055,7 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
           >
             <Radio value={'含稅' as TinvoiceRetainageType}>含稅</Radio>
             <Radio value={'未稅' as TinvoiceRetainageType}>未稅</Radio>
-            <Radio value={'none'}>無</Radio>
+            <Radio value={null}>無</Radio>
           </Radio.Group>
         </div>
       </div>
