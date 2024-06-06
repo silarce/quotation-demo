@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 // gear
 import TopBar from './ui/topBar';
@@ -10,20 +11,21 @@ import scss from './accountantSorting.module.scss';
 // ================================================================================
 
 type Tinvoice = {
-  id: string;
-
+  id: string; // id 必須唯一
   invoiceNumber: React.ReactNode;
   invoiceDate: React.ReactNode;
   price: React.ReactNode;
 };
 
 type Taccountant = {
-  id: string;
-
+  id: string; // id 必須唯一
+  invoiceId: string; //  同所屬invoice
   insertDate: React.ReactNode;
   importAccountingNumber: React.ReactNode;
   noteMaturityDate: React.ReactNode; // 票據到期日
   price: React.ReactNode;
+  //
+  isChanged: boolean;
 };
 
 type Tstate = {
@@ -31,9 +33,19 @@ type Tstate = {
   accountantArr: Taccountant[];
 };
 
+type TstateList = {
+  [invoiceId: string]: Tstate;
+};
+
 // ================================================================================
 // region START
 export default function AccountantSorting({ className }: { className?: string }) {
+  const [stateList, setStateListArr] = useState<TstateList>({});
+
+  useEffect(() => {
+    setStateListArr(_.cloneDeep(fakeStateList));
+  }, []);
+
   // -----------------------------------------------------------------------------
   // region RENDER
 
@@ -69,7 +81,7 @@ export default function AccountantSorting({ className }: { className?: string })
         </Group>
         {/*  */}
 
-        {fakeStateArr.map((state) => {
+        {Object.values(stateList).map((state) => {
           const { invoice, accountantArr } = state;
           const { id, invoiceNumber, invoiceDate, price } = invoice;
 
@@ -174,79 +186,90 @@ const Row = ({ className, children }: { className?: string; children?: React.Rea
 // ================================================================================
 
 // region fake data
-// length ===3
-// id is random
-const fakeStateArr: Tstate[] = [
-  {
+
+const fakeStateList: TstateList = {
+  'i-1': {
     invoice: {
-      id: 'i-fdsagasdgas',
+      id: 'i-1',
       invoiceNumber: 'A123456',
       invoiceDate: '2021/01/01',
       price: '1000',
     },
     accountantArr: [
       {
-        id: 'a-sdfasfasd',
+        id: 'a-1',
+        invoiceId: 'i-1',
         insertDate: '2021/01/01',
         importAccountingNumber: 'A123456',
         noteMaturityDate: '2021/01/01',
         price: '1000',
+        isChanged: false,
       },
     ],
   },
-  {
+  'i-2': {
     invoice: {
-      id: 'i-fsdfsdbdgefd',
-      invoiceNumber: 'A123456',
+      id: 'i-2',
+      invoiceNumber: 'B11111',
       invoiceDate: '2021/01/01',
       price: '1000',
     },
     accountantArr: [
       {
-        id: 'a-ghhghsd',
+        id: 'a-2',
+        invoiceId: 'i-2',
         insertDate: '2021/01/01',
         importAccountingNumber: 'A123456',
         noteMaturityDate: '2021/01/01',
         price: '1000',
+        isChanged: false,
       },
       {
-        id: 'a-dsdghsdf',
+        id: 'a-3',
+        invoiceId: 'i-2',
         insertDate: '2021/01/01',
         importAccountingNumber: 'A123456',
         noteMaturityDate: '2021/01/01',
         price: '1000',
+        isChanged: false,
       },
     ],
   },
-  {
+  'i-3': {
     invoice: {
-      id: 'i-gjdfgbndfghtr',
-      invoiceNumber: 'A123456',
+      id: 'i-3',
+      invoiceNumber: 'C55555',
       invoiceDate: '2021/01/01',
       price: '1000',
     },
     accountantArr: [
       {
-        id: 'a-gsdfhfghe',
+        id: 'a-4',
+        invoiceId: 'i-3',
         insertDate: '2021/01/01',
         importAccountingNumber: 'A123456',
         noteMaturityDate: '2021/01/01',
         price: '1000',
+        isChanged: false,
       },
       {
-        id: 'a-gdfgsdfgsdjfyjkdfg',
+        id: 'a-5',
+        invoiceId: 'i-3',
         insertDate: '2021/01/01',
         importAccountingNumber: 'A123456',
         noteMaturityDate: '2021/01/01',
         price: '1000',
+        isChanged: false,
       },
       {
-        id: 'a-gdsfytyiygds',
+        id: 'a-6',
+        invoiceId: 'i-3',
         insertDate: '2021/01/01',
         importAccountingNumber: 'A123456',
         noteMaturityDate: '2021/01/01',
         price: '1000',
+        isChanged: false,
       },
     ],
   },
-];
+};
