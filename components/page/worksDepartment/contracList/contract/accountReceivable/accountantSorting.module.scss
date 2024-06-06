@@ -18,6 +18,8 @@
 .group {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  border-bottom: solid 1px theme("colors.border");
+
   .left {
     .row {
       grid-template-columns: 1fr 1fr 1fr;
@@ -29,10 +31,10 @@
       grid-template-columns: 1fr 1fr 1fr 1fr;
     }
   }
-}
 
-.group {
-  border-bottom: solid 1px theme("colors.border");
+  &:nth-last-of-type(1) {
+    border-bottom: 0;
+  }
 }
 
 .group.top {
@@ -54,13 +56,40 @@
   span {
     font-size: 18px;
     font-weight: 500;
+    color: theme("colors.main");
   }
 }
 
 .group.tbody {
   border-bottom-width: 2px;
+
+  div,
+  span {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.group.total {
+  div,
+  span {
+    font-size: 18px;
+    font-weight: 700;
+  }
 }
 
 .row {
   display: grid;
+  justify-items: center;
+  padding: 10px 0;
+}
+
+.footCaption {
+  padding: 15px;
+  background-color: theme("colors.bgc01");
+  border-bottom: solid 1px theme("colors.border");
+
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
 }
