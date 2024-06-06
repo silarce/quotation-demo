@@ -157,7 +157,7 @@ const deleteAccountant = async (
     });
 };
 
-// 以 id 更新 手續費和扣款明細
+// 以 id 更新 手續費和扣款明細與排序
 const apiPatchAccountant_accountReceivable = async (
   id: string,
   body: TupdateAccountantDeductionDto,

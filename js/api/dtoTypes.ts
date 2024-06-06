@@ -3597,7 +3597,8 @@ export type TupdateAccountantDto = Partial<
 
 export type TupdateAccountantDeductionDto = {
   fee?: number | null;
-  accountsReceivableDeduction?: TupdateAccountReceivableDeductionDto[];
+  // 沒有改也必須要送，所以沒有改就是送原本的
+  accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
   order?: number;
 };
 

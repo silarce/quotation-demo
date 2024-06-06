@@ -25,7 +25,9 @@ import AccountantDetails, {
   Tstate_accountant,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDetails';
 import DeductionDetail from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetail';
-import AccountantSorting from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantSorting';
+import AccountantSorting, {
+  Tstate_accountantSorting,
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantSorting';
 
 // import Table_requestPayment, {
 //   Tcontrol_table_requestPayment,
@@ -78,10 +80,14 @@ import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/ap
 import {
   TaccountantDto,
   TupdateAccountantDto,
+  TupdateAccountantDeductionDto,
+
   //
   //  apiPatchAccountant,
   apiPatchAccountant_accountReceivable,
 } from 'js/api/api_accountant';
+
+import type { TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
@@ -303,6 +309,57 @@ export default function AccountReceivable() {
     update_contract();
   };
 
+  const reqPatchAccountant_sorting = async (
+    //
+    stateList: Tstate_accountantSorting
+  ) => {
+    const accountantArr: {
+      id: string;
+      invoiceId: string;
+      order: number;
+      accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
+      isChanged: boolean;
+    }[] = [];
+
+    Object.values(stateList).forEach((state) => {
+      const { isChanged, invoice, accountantArr: state_accountantArr } = state;
+
+      if (isChanged) {
+        state_accountantArr.forEach((accountant, index) => {
+          const { id: accountantId, accountsReceivableDeduction, isChanged } = accountant;
+
+          accountantArr.push({
+            id: String(accountantId),
+            invoiceId: String(invoice.id),
+            order: index + 1,
+            accountsReceivableDeduction: accountsReceivableDeduction,
+            isChanged,
+          });
+        });
+      }
+    });
+
+    for (const accountant of accountantArr) {
+      const { id, invoiceId, order, accountsReceivableDeduction, isChanged } = accountant;
+
+      // 修改accountant的關聯invoice
+      // if (accountReceivable && isChanged) {
+      //   await apifoo({
+      //     accountReceivableId: accountReceivable.id,
+      //     invoiceId,
+      //     accountantId: id,
+      //   });
+      // }
+
+      await apiPatchAccountant_accountReceivable(accountant.id, {
+        order: order,
+        accountsReceivableDeduction: accountsReceivableDeduction,
+      });
+    }
+
+    update_contract();
+  };
+
   // --------------------------------------------------------------------------
 
   // --------------------------------------------------------------------------
@@ -348,7 +405,7 @@ export default function AccountReceivable() {
         <Profile {...props_profile} />
         <TotalCalc className="mt-10" />
 
-        <AccountantSorting className="mt-10" />
+        <AccountantSorting className="mt-10" invoiceArr={invoiceArr} onConfirm={reqPatchAccountant_sorting} />
 
         <AccountantDetails
           //

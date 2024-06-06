@@ -8,6 +8,10 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import scss from './accountantSorting.module.scss';
 
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+import type { TaccountsReceivableInvoiceDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
+
 // DND
 import type { DragEndEvent, DragOverEvent, DragStartEvent, UniqueIdentifier } from '@dnd-kit/core';
 import {
@@ -46,13 +50,14 @@ type Tinvoice = {
 
 type Taccountant = {
   id: UniqueIdentifier; // 就是string | number // id 必須唯一
-  // invoiceId: string; //  同所屬invoice
+  invoiceId: UniqueIdentifier; //  同所屬invoice
   insertDate: React.ReactNode;
   importAccountingNumber: React.ReactNode;
   noteMaturityDate: React.ReactNode; // 票據到期日
   price: React.ReactNode;
   //
-  // isChanged: boolean;
+  isChanged: boolean;
+  accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
 };
 
 type Tstate = {
@@ -76,9 +81,21 @@ type TdndData_group = {
   isEmpty: boolean;
 };
 
+export type { TstateList as Tstate_accountantSorting };
+
 // ================================================================================
 // region START
-export default function AccountantSorting({ className }: { className?: string }) {
+export default function AccountantSorting({
+  className,
+  invoiceArr,
+  onConfirm,
+}: {
+  className?: string;
+  invoiceArr: TaccountsReceivableInvoiceDto[];
+  onConfirm: (stateList: TstateList) => Promise<void>;
+}) {
+  const [disabled, setDisabled] = useState(true);
+
   const [stateList, setStateListArr] = useState<TstateList>({});
   const [activeState, setActiveState] = useState<Taccountant>();
 
@@ -98,6 +115,11 @@ export default function AccountantSorting({ className }: { className?: string })
     handleDragOver(e, stateList, setStateListArr);
   };
 
+  const handle_confirm = async () => {
+    await onConfirm(stateList);
+    setDisabled(true);
+  };
+
   // -----------------------------------------------------------------------------
 
   // region props
@@ -109,8 +131,54 @@ export default function AccountantSorting({ className }: { className?: string })
   // region useEffect
 
   useEffect(() => {
-    setStateListArr(_.cloneDeep(fakeStateList));
-  }, []);
+    if (!disabled) {
+      return;
+    }
+
+    const list: TstateList = {};
+
+    invoiceArr.forEach((invoice) => {
+      const { id: invoiceId, accountantList, invoiceNumber, invoiceDate, price } = invoice;
+
+      const orderedAccountantList = _.sortBy(accountantList, 'order');
+
+      const accountantArr = orderedAccountantList.map((accountant) => {
+        const {
+          //
+          id: accountantId,
+          insertDate,
+          importAccountingNumber,
+          noteMaturityDate,
+          price,
+          accountsReceivableDeduction,
+        } = accountant;
+
+        return {
+          id: accountantId,
+          invoiceId,
+          insertDate: getTaiwanDateStr(insertDate),
+          importAccountingNumber,
+          noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
+          price: price.toLocaleString(),
+          accountsReceivableDeduction,
+          isChanged: false,
+        };
+      });
+
+      list[invoiceId] = {
+        isChanged: false,
+        invoice: {
+          id: invoiceId,
+          invoiceNumber,
+          invoiceDate: getTaiwanDateStr(invoiceDate),
+          price: price.toLocaleString(),
+        },
+        accountantArr: accountantArr,
+      };
+    }); // invoiceArr.forEach
+
+    setStateListArr(list);
+  }, [invoiceArr, disabled]);
 
   // -----------------------------------------------------------------------------
   // region RENDER
@@ -121,7 +189,26 @@ export default function AccountantSorting({ className }: { className?: string })
         <MyButton_v2 px="px22" py="py4">
           新增折讓
         </MyButton_v2>
+
+        {disabled && (
+          <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
+            排序
+          </MyButton_v2>
+        )}
+
+        {!disabled && (
+          <>
+            <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
+              取消
+            </MyButton_v2>
+            <MyButton_v2 theme={'danger'} px="px22" py="py4" onClick={handle_confirm}>
+              確認
+            </MyButton_v2>
+          </>
+        )}
       </TopBar>
+      {/*  */}
+      {/*  */}
       <div className={scss.table}>
         <Group className={classNames(scss.top)}>
           <Left>發票開立資訊</Left>
@@ -160,7 +247,7 @@ export default function AccountantSorting({ className }: { className?: string })
           {Object.values(stateList).map((state) => {
             const invoiceId = state.invoice.id;
 
-            return <Group_Dnd key={invoiceId} state={state} />;
+            return <Group_Dnd key={invoiceId} state={state} disabled={disabled} />;
           })}
 
           <DragOverlay>
@@ -257,8 +344,10 @@ const Row = forwardRef(Row_pre);
 const Group_Dnd = ({
   //
   state,
+  disabled,
 }: {
   state: Tstate;
+  disabled: boolean;
 }) => {
   const { invoice, accountantArr } = state;
   const { id, invoiceNumber, invoiceDate, price } = invoice;
@@ -283,9 +372,13 @@ const Group_Dnd = ({
         </Row>
       </Left>
       <Right>
-        {accountantArr.length === 0 && <div ref={setNodeRef} className=" h-5"></div>}
+        {accountantArr.length === 0 && (
+          <div ref={setNodeRef} className={scss.dropContainer}>
+            無收款
+          </div>
+        )}
 
-        <SortableContext items={accountantArr} strategy={verticalListSortingStrategy}>
+        <SortableContext disabled={disabled} items={accountantArr} strategy={verticalListSortingStrategy}>
           {accountantArr.map((accountant) => {
             const {
               //
@@ -457,6 +550,9 @@ function handleDragOver(
 
     const activeAccountant = (active.data.current as TdndData_row)?.accountant;
 
+    activeAccountant.isChanged = true;
+    activeAccountant.invoiceId = invoiceId_over;
+
     setStateListArr((list) => {
       list = { ...list };
 
@@ -539,112 +635,112 @@ function handleDragOver(
 // ================================================================================
 // ================================================================================
 
-// region fake data
+// // region fake data
 
-const fakeStateList: TstateList = {
-  'i-1': {
-    isChanged: false,
-    invoice: {
-      id: 'i-1',
-      invoiceNumber: 'A123456',
-      invoiceDate: '2021/01/01',
-      price: '1000',
-    },
-    accountantArr: [
-      {
-        id: 'a-1',
-        // invoiceId: 'i-1',
-        insertDate: '2021/01/01',
-        importAccountingNumber: 'A123456',
-        noteMaturityDate: '2021/01/01',
-        price: '1000',
-        // isChanged: false,
-      },
-    ],
-  },
-  'i-2': {
-    isChanged: false,
-    invoice: {
-      id: 'i-2',
-      invoiceNumber: 'B11111',
-      invoiceDate: '2021/01/01',
-      price: '1000',
-    },
-    accountantArr: [
-      {
-        id: 'a-2',
-        // invoiceId: 'i-2',
-        insertDate: '2021/01/01',
-        importAccountingNumber: 'B55555',
-        noteMaturityDate: '2021/01/01',
-        price: '1000',
-        // isChanged: false,
-      },
-      {
-        id: 'a-3',
-        // invoiceId: 'i-2',
-        insertDate: '2021/01/01',
-        importAccountingNumber: 'C455455',
-        noteMaturityDate: '2021/01/01',
-        price: '1000',
-        // isChanged: false,
-      },
-    ],
-  },
-  'i-3': {
-    isChanged: false,
-    invoice: {
-      id: 'i-3',
-      invoiceNumber: 'C55555',
-      invoiceDate: '2021/01/01',
-      price: '1000',
-    },
-    accountantArr: [
-      {
-        id: 'a-4',
-        // invoiceId: 'i-3',
-        insertDate: '2021/01/01',
-        importAccountingNumber: 'D456445',
-        noteMaturityDate: '2021/01/01',
-        price: '1000',
-        // isChanged: false,
-      },
-      {
-        id: 'a-5',
-        // invoiceId: 'i-3',
-        insertDate: '2021/01/01',
-        importAccountingNumber: 'E4521',
-        noteMaturityDate: '2021/01/01',
-        price: '1000',
-        // isChanged: false,
-      },
-      {
-        id: 'a-6',
-        // invoiceId: 'i-3',
-        insertDate: '2021/01/01',
-        importAccountingNumber: 'F47414',
-        noteMaturityDate: '2021/01/01',
-        price: '1000',
-        // isChanged: false,
-      },
-      {
-        id: 'a-7',
-        // invoiceId: 'i-3',
-        insertDate: '2021/01/01',
-        importAccountingNumber: 'G54455462356',
-        noteMaturityDate: '2021/01/01',
-        price: '1000',
-        // isChanged: false,
-      },
-      {
-        id: 'a-8',
-        // invoiceId: 'i-3',
-        insertDate: '2021/01/01',
-        importAccountingNumber: 'H455999',
-        noteMaturityDate: '2021/01/01',
-        price: '1000',
-        // isChanged: false,
-      },
-    ],
-  },
-};
+// const fakeStateList: TstateList = {
+//   'i-1': {
+//     isChanged: false,
+//     invoice: {
+//       id: 'i-1',
+//       invoiceNumber: 'A123456',
+//       invoiceDate: '2021/01/01',
+//       price: '1000',
+//     },
+//     accountantArr: [
+//       {
+//         id: 'a-1',
+//         // invoiceId: 'i-1',
+//         insertDate: '2021/01/01',
+//         importAccountingNumber: 'A123456',
+//         noteMaturityDate: '2021/01/01',
+//         price: '1000',
+//         // isChanged: false,
+//       },
+//     ],
+//   },
+//   'i-2': {
+//     isChanged: false,
+//     invoice: {
+//       id: 'i-2',
+//       invoiceNumber: 'B11111',
+//       invoiceDate: '2021/01/01',
+//       price: '1000',
+//     },
+//     accountantArr: [
+//       {
+//         id: 'a-2',
+//         // invoiceId: 'i-2',
+//         insertDate: '2021/01/01',
+//         importAccountingNumber: 'B55555',
+//         noteMaturityDate: '2021/01/01',
+//         price: '1000',
+//         // isChanged: false,
+//       },
+//       {
+//         id: 'a-3',
+//         // invoiceId: 'i-2',
+//         insertDate: '2021/01/01',
+//         importAccountingNumber: 'C455455',
+//         noteMaturityDate: '2021/01/01',
+//         price: '1000',
+//         // isChanged: false,
+//       },
+//     ],
+//   },
+//   'i-3': {
+//     isChanged: false,
+//     invoice: {
+//       id: 'i-3',
+//       invoiceNumber: 'C55555',
+//       invoiceDate: '2021/01/01',
+//       price: '1000',
+//     },
+//     accountantArr: [
+//       {
+//         id: 'a-4',
+//         // invoiceId: 'i-3',
+//         insertDate: '2021/01/01',
+//         importAccountingNumber: 'D456445',
+//         noteMaturityDate: '2021/01/01',
+//         price: '1000',
+//         // isChanged: false,
+//       },
+//       {
+//         id: 'a-5',
+//         // invoiceId: 'i-3',
+//         insertDate: '2021/01/01',
+//         importAccountingNumber: 'E4521',
+//         noteMaturityDate: '2021/01/01',
+//         price: '1000',
+//         // isChanged: false,
+//       },
+//       {
+//         id: 'a-6',
+//         // invoiceId: 'i-3',
+//         insertDate: '2021/01/01',
+//         importAccountingNumber: 'F47414',
+//         noteMaturityDate: '2021/01/01',
+//         price: '1000',
+//         // isChanged: false,
+//       },
+//       {
+//         id: 'a-7',
+//         // invoiceId: 'i-3',
+//         insertDate: '2021/01/01',
+//         importAccountingNumber: 'G54455462356',
+//         noteMaturityDate: '2021/01/01',
+//         price: '1000',
+//         // isChanged: false,
+//       },
+//       {
+//         id: 'a-8',
+//         // invoiceId: 'i-3',
+//         insertDate: '2021/01/01',
+//         importAccountingNumber: 'H455999',
+//         noteMaturityDate: '2021/01/01',
+//         price: '1000',
+//         // isChanged: false,
+//       },
+//     ],
+//   },
+// };
