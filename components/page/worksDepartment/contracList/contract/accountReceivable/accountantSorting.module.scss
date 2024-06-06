@@ -82,6 +82,9 @@
   display: grid;
   justify-items: center;
   padding: 10px 0;
+  &.active {
+    background-color: theme("colors.hoverBgc");
+  }
 }
 
 .footCaption {
@@ -97,6 +100,9 @@
 .row.activeState {
   background-color: #eee;
   grid-template-columns: 1fr 1fr 1fr 1fr;
+
+  opacity: 0.8;
+
   div,
   span {
     font-size: 16px;

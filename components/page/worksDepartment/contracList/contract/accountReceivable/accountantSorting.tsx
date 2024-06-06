@@ -35,6 +35,8 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 
+import { restrictToHorizontalAxis, restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
+
 import { CSS } from '@dnd-kit/utilities';
 
 // ================================================================================
@@ -97,18 +99,18 @@ export default function AccountantSorting({
   const [disabled, setDisabled] = useState(true);
 
   const [stateList, setStateListArr] = useState<TstateList>({});
-  const [activeState, setActiveState] = useState<Taccountant>();
+  const [activeAccountant, setActiveAccountant] = useState<Taccountant>();
 
   // -----------------------------------------------------------------------------
 
   // region FUNCTION
 
   const handle_onDragStart = (e: DragStartEvent) => {
-    handleDragStart(e, setActiveState);
+    handleDragStart(e, setActiveAccountant);
   };
 
   const handle_onDragEnd = (e: DragEndEvent) => {
-    handleDragEnd(e, stateList, setActiveState, setStateListArr);
+    handleDragEnd(e, stateList, setActiveAccountant, setStateListArr);
   };
 
   const handle_onDragOver = (e: DragOverEvent) => {
@@ -239,6 +241,7 @@ export default function AccountantSorting({
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
           //
           onDragStart={handle_onDragStart}
           onDragEnd={handle_onDragEnd}
@@ -247,15 +250,23 @@ export default function AccountantSorting({
           {Object.values(stateList).map((state) => {
             const invoiceId = state.invoice.id;
 
-            return <Group_Dnd key={invoiceId} state={state} disabled={disabled} />;
+            return (
+              <Group_Dnd
+                key={invoiceId}
+                state={state}
+                disabled={disabled}
+                //
+                activeAccountandId={activeAccountant?.id}
+              />
+            );
           })}
 
           <DragOverlay>
             <Row className={scss.activeState}>
-              <span>{activeState?.insertDate}</span>
-              <span>{activeState?.importAccountingNumber}</span>
-              <span>{activeState?.noteMaturityDate}</span>
-              <span>{activeState?.price}</span>
+              <span>{activeAccountant?.insertDate}</span>
+              <span>{activeAccountant?.importAccountingNumber}</span>
+              <span>{activeAccountant?.noteMaturityDate}</span>
+              <span>{activeAccountant?.price}</span>
             </Row>
           </DragOverlay>
         </DndContext>
@@ -345,9 +356,11 @@ const Group_Dnd = ({
   //
   state,
   disabled,
+  activeAccountandId,
 }: {
   state: Tstate;
   disabled: boolean;
+  activeAccountandId?: UniqueIdentifier | undefined;
 }) => {
   const { invoice, accountantArr } = state;
   const { id, invoiceNumber, invoiceDate, price } = invoice;
@@ -390,7 +403,13 @@ const Group_Dnd = ({
             } = accountant;
 
             return (
-              <Row_Dnd key={accountant.id} id={accountant.id} invoice={invoice} accountant={accountant}>
+              <Row_Dnd
+                className={classNames(activeAccountandId === id && scss.active)}
+                key={accountant.id}
+                id={accountant.id}
+                invoice={invoice}
+                accountant={accountant}
+              >
                 <span>{insertDate}</span>
                 <span>{importAccountingNumber}</span>
                 <span>{noteMaturityDate}</span>
@@ -410,11 +429,13 @@ const Row_Dnd = ({
   children,
   invoice,
   accountant,
+  className,
 }: {
   id: UniqueIdentifier; // accountant id
   children: React.ReactNode;
   invoice: Tinvoice;
   accountant: Taccountant;
+  className?: string;
 }) => {
   const {
     //
@@ -425,6 +446,7 @@ const Row_Dnd = ({
     transition,
   } = useSortable({
     id,
+
     data: {
       invoice,
       accountant,
@@ -437,7 +459,7 @@ const Row_Dnd = ({
   };
 
   return (
-    <Row ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <Row className={className} ref={setNodeRef} style={style} {...attributes} {...listeners}>
       {children}
     </Row>
   );
@@ -484,6 +506,8 @@ function handleDragEnd(
   const { active, over } = e;
 
   if (over?.data.current?.isContainer) {
+    setActiveState(undefined);
+
     return;
   }
 
@@ -502,6 +526,8 @@ function handleDragEnd(
   );
 
   if (invoiceId_active !== invoiceId_over || accountantIndex_old === accountantIndex_new) {
+    setActiveState(undefined);
+
     return;
   }
 
@@ -513,7 +539,6 @@ function handleDragEnd(
 
     return list;
   });
-
   setActiveState(undefined);
 }
 
@@ -521,7 +546,6 @@ function handleDragEnd(
 function handleDragOver(
   e: DragEndEvent,
   stateList: TstateList,
-
   setStateListArr: React.Dispatch<React.SetStateAction<TstateList>>
 ) {
   const { active, over } = e;
