@@ -99,6 +99,8 @@ import { AxiosError } from 'axios';
 
 // ========================================================================
 
+// region START
+
 export default function AccountReceivable() {
   const router = useRouter();
   const { contractId } = router.query as { contractId: string | undefined };
@@ -441,6 +443,8 @@ export default function AccountReceivable() {
     </SubLayer>
   );
 }
+
+// region END
 
 // ========================================================================
 // ========================================================================

@@ -4,7 +4,7 @@ import _ from 'lodash';
 import Decimal from 'decimal.js';
 
 // antd
-import { Checkbox } from 'antd';
+import { Checkbox, Radio } from 'antd';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -20,6 +20,7 @@ import type {
   TquotationProductItemDto,
   TquotationProductDto,
   TcompletedProductDto,
+  TinvoiceRetainageType,
 } from 'js/api/dtoTypes';
 
 // ========================================================================
@@ -42,6 +43,8 @@ type Tstate_invoice = {
   retainage: string;
   deduction: string;
   writeOffDeposit: string;
+
+  retainageType: TinvoiceRetainageType | 'none'; // 折讓類型
   minusRetainage: boolean;
   minusDeduction: boolean;
   minusWriteOffDeposit: boolean;
@@ -98,6 +101,8 @@ type Tcenter = {
     minusDeduction: boolean;
     minusWriteOffDeposit: boolean;
 
+    retainageType: string;
+
     onChange_invoiceNumber: (value: string) => void;
     onChange_retainage: (value: string) => void;
     onChange_deduction: (value: string) => void;
@@ -106,6 +111,8 @@ type Tcenter = {
     onChange_minusRetainage: (checked: boolean) => void;
     onChange_minusDeduction: (checked: boolean) => void;
     onChange_minusWriteOffDeposit: (checked: boolean) => void;
+
+    onChange_retainageType: (value: TinvoiceRetainageType) => void;
   };
 };
 
@@ -286,6 +293,35 @@ export default function InvoiceTable({
     });
   };
 
+  const handle_editTetainageType = ({
+    invoiceIndex,
+    value,
+  }: {
+    invoiceIndex: number;
+    value: Tstate_invoice['retainageType'];
+  }) => {
+    setState_invoiceArr((arr) => {
+      arr = [...arr];
+      const invoice = arr[invoiceIndex];
+      invoice.renderCount++;
+      invoice.retainageType = value;
+
+      const { subTotal, contractTotal, retainage, retainageType } = invoice;
+
+      if (retainageType === '含稅') {
+        invoice.retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
+      } else if (retainageType === '未稅') {
+        invoice.retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
+      } else {
+        invoice.retainage = '';
+      }
+
+      invoice.price = calcPrice(invoice);
+
+      return arr;
+    });
+  };
+
   const handel_onConfirm = async () => {
     await reqPatchInvoiceArr(state_invoiceArr);
     setDisabled(true);
@@ -412,6 +448,8 @@ export default function InvoiceTable({
       invoiceNumber: '', // 只是為了符合型別，不會用到
       type: '請款', // 只是為了符合型別，不會用到
       period: 0, // 只是為了符合型別，不會用到
+
+      retainageType: 'none',
     };
 
     //
@@ -490,6 +528,8 @@ export default function InvoiceTable({
         minusDeduction,
         minusWriteOffDeposit,
 
+        retainageType,
+
         price,
         invoiceNumber,
 
@@ -552,6 +592,9 @@ export default function InvoiceTable({
         minusRetainage,
         minusDeduction,
         minusWriteOffDeposit,
+
+        retainageType,
+
         onChange_invoiceNumber: (value) => {
           handle_editInvoiceOther({ invoiceIndex, key: 'invoiceNumber', value });
         },
@@ -572,6 +615,10 @@ export default function InvoiceTable({
         },
         onChange_minusWriteOffDeposit: (checked) => {
           handel_editCalcType({ invoiceIndex, key: 'minusWriteOffDeposit', chcked: checked });
+        },
+
+        onChange_retainageType: (value) => {
+          handle_editTetainageType({ invoiceIndex, value });
         },
       };
 
@@ -645,6 +692,8 @@ export default function InvoiceTable({
         minusDeduction,
         minusWriteOffDeposit,
 
+        retainageType: 'none',
+
         onChange_invoiceNumber: () => {},
         onChange_retainage: () => {},
         onChange_deduction: () => {},
@@ -652,6 +701,8 @@ export default function InvoiceTable({
         onChange_minusRetainage: () => {},
         onChange_minusDeduction: () => {},
         onChange_minusWriteOffDeposit: () => {},
+
+        onChange_retainageType: () => {},
       },
     };
 
@@ -679,6 +730,8 @@ export default function InvoiceTable({
         isRetainage,
         isDeduction,
         isWriteOffDeposit,
+        //
+        retainageType,
       } = invoice;
 
       const completedProductList: { [id: string]: TcompletedProductDto } = {};
@@ -724,6 +777,8 @@ export default function InvoiceTable({
         minusRetainage: isRetainage,
         minusDeduction: isDeduction,
         minusWriteOffDeposit: isWriteOffDeposit,
+
+        retainageType: retainageType || 'none',
 
         subTotal: totals_num.subTotal,
         tax: totals_num.tax,
@@ -923,6 +978,9 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
     minusRetainage: haveRetainage,
     minusDeduction: haveDeduction,
     minusWriteOffDeposit: haveWriteOffDeposit,
+
+    retainageType,
+
     onChange_invoiceNumber,
     onChange_retainage,
     onChange_deduction,
@@ -931,6 +989,8 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
     onChange_minusRetainage,
     onChange_minusDeduction,
     onChange_minusWriteOffDeposit,
+
+    onChange_retainageType,
   } = node_other;
 
   let { retainage, deduction, writeOffDeposit } = node_other;
@@ -976,6 +1036,23 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
           readOnly={readOnly}
           type={inputType}
         />
+      </div>
+
+      <div>
+        保留款
+        <div className={scss.checkBar}>
+          <Radio.Group
+            disabled={readOnly}
+            onChange={(e) => {
+              onChange_retainageType(e.target.value);
+            }}
+            value={retainageType}
+          >
+            <Radio value={'含稅' as TinvoiceRetainageType}>含稅</Radio>
+            <Radio value={'未稅' as TinvoiceRetainageType}>未稅</Radio>
+            <Radio value={'none'}>無</Radio>
+          </Radio.Group>
+        </div>
       </div>
 
       <div className={scss.checkBar}>

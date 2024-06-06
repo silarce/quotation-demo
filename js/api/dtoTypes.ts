@@ -22,6 +22,7 @@ export type TinvoiceStatus = '已開立' | '已作廢';
 
 export type TinvoiceType = '請款' | '訂金';
 export type TaccountantPaymentType = '匯款' | '票據' | '現金';
+export type TinvoiceRetainageType = '含稅' | '未稅';
 
 // =============================================================================
 export type Tparams = {
@@ -3509,6 +3510,9 @@ export type TaccountsReceivableInvoiceDto = {
   isDeduction: boolean;
   // 是否扣掉沖訂金
   isWriteOffDeposit: boolean;
+
+  // key還未與後端確認
+  retainageType: TinvoiceRetainageType | null;
 };
 
 export type TcreateAccountReceivableInvoiceDto = Pick<
