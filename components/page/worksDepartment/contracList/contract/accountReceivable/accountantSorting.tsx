@@ -56,12 +56,12 @@ type Taccountant = {
   noteMaturityDate: React.ReactNode; // 票據到期日
   price: React.ReactNode;
   //
-  isChanged: boolean;
+  isRelationedInvoiceChanged: boolean;
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
 };
 
 type Tstate = {
-  isChanged: boolean;
+  isAccountantOrderChanged: boolean;
   invoice: Tinvoice;
   accountantArr: Taccountant[];
 };
@@ -161,12 +161,12 @@ export default function AccountantSorting({
           noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
           price: price.toLocaleString(),
           accountsReceivableDeduction,
-          isChanged: false,
-        };
+          isRelationedInvoiceChanged: false,
+        } as Taccountant;
       });
 
       list[invoiceId] = {
-        isChanged: false,
+        isAccountantOrderChanged: false,
         invoice: {
           id: invoiceId,
           invoiceNumber,
@@ -509,7 +509,7 @@ function handleDragEnd(
     list = { ...list };
     const state = list[invoiceId_active];
     state.accountantArr = arrayMove(state.accountantArr, accountantIndex_old, accountantIndex_new);
-    state.isChanged = true;
+    state.isAccountantOrderChanged = true;
 
     return list;
   });
@@ -550,7 +550,7 @@ function handleDragOver(
 
     const activeAccountant = (active.data.current as TdndData_row)?.accountant;
 
-    activeAccountant.isChanged = true;
+    activeAccountant.isRelationedInvoiceChanged = true;
     activeAccountant.invoiceId = invoiceId_over;
 
     setStateListArr((list) => {
@@ -559,8 +559,8 @@ function handleDragOver(
       const state_active = list[invoiceId_active];
       const state_over = list[invoiceId_over];
 
-      state_active.isChanged = true;
-      state_over.isChanged = true;
+      state_active.isAccountantOrderChanged = true;
+      state_over.isAccountantOrderChanged = true;
 
       // 必須更新，送進SortableContext的items才會更新狀態
       state_active.accountantArr = [...state_active.accountantArr];
@@ -601,8 +601,8 @@ function handleDragOver(
     const state_active = list[invoiceId_active];
     const state_over = list[invoiceId_over];
 
-    state_active.isChanged = true;
-    state_over.isChanged = true;
+    state_active.isAccountantOrderChanged = true;
+    state_over.isAccountantOrderChanged = true;
 
     // 必須更新，送進SortableContext的items才會更新狀態
     state_active.accountantArr = [...state_active.accountantArr];
@@ -623,124 +623,3 @@ function handleDragOver(
     return list;
   });
 }
-
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-
-// // region fake data
-
-// const fakeStateList: TstateList = {
-//   'i-1': {
-//     isChanged: false,
-//     invoice: {
-//       id: 'i-1',
-//       invoiceNumber: 'A123456',
-//       invoiceDate: '2021/01/01',
-//       price: '1000',
-//     },
-//     accountantArr: [
-//       {
-//         id: 'a-1',
-//         // invoiceId: 'i-1',
-//         insertDate: '2021/01/01',
-//         importAccountingNumber: 'A123456',
-//         noteMaturityDate: '2021/01/01',
-//         price: '1000',
-//         // isChanged: false,
-//       },
-//     ],
-//   },
-//   'i-2': {
-//     isChanged: false,
-//     invoice: {
-//       id: 'i-2',
-//       invoiceNumber: 'B11111',
-//       invoiceDate: '2021/01/01',
-//       price: '1000',
-//     },
-//     accountantArr: [
-//       {
-//         id: 'a-2',
-//         // invoiceId: 'i-2',
-//         insertDate: '2021/01/01',
-//         importAccountingNumber: 'B55555',
-//         noteMaturityDate: '2021/01/01',
-//         price: '1000',
-//         // isChanged: false,
-//       },
-//       {
-//         id: 'a-3',
-//         // invoiceId: 'i-2',
-//         insertDate: '2021/01/01',
-//         importAccountingNumber: 'C455455',
-//         noteMaturityDate: '2021/01/01',
-//         price: '1000',
-//         // isChanged: false,
-//       },
-//     ],
-//   },
-//   'i-3': {
-//     isChanged: false,
-//     invoice: {
-//       id: 'i-3',
-//       invoiceNumber: 'C55555',
-//       invoiceDate: '2021/01/01',
-//       price: '1000',
-//     },
-//     accountantArr: [
-//       {
-//         id: 'a-4',
-//         // invoiceId: 'i-3',
-//         insertDate: '2021/01/01',
-//         importAccountingNumber: 'D456445',
-//         noteMaturityDate: '2021/01/01',
-//         price: '1000',
-//         // isChanged: false,
-//       },
-//       {
-//         id: 'a-5',
-//         // invoiceId: 'i-3',
-//         insertDate: '2021/01/01',
-//         importAccountingNumber: 'E4521',
-//         noteMaturityDate: '2021/01/01',
-//         price: '1000',
-//         // isChanged: false,
-//       },
-//       {
-//         id: 'a-6',
-//         // invoiceId: 'i-3',
-//         insertDate: '2021/01/01',
-//         importAccountingNumber: 'F47414',
-//         noteMaturityDate: '2021/01/01',
-//         price: '1000',
-//         // isChanged: false,
-//       },
-//       {
-//         id: 'a-7',
-//         // invoiceId: 'i-3',
-//         insertDate: '2021/01/01',
-//         importAccountingNumber: 'G54455462356',
-//         noteMaturityDate: '2021/01/01',
-//         price: '1000',
-//         // isChanged: false,
-//       },
-//       {
-//         id: 'a-8',
-//         // invoiceId: 'i-3',
-//         insertDate: '2021/01/01',
-//         importAccountingNumber: 'H455999',
-//         noteMaturityDate: '2021/01/01',
-//         price: '1000',
-//         // isChanged: false,
-//       },
-//     ],
-//   },
-// };

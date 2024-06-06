@@ -318,29 +318,34 @@ export default function AccountReceivable() {
       invoiceId: string;
       order: number;
       accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
-      isChanged: boolean;
+      isRelationedInvoiceChanged: boolean;
     }[] = [];
 
     Object.values(stateList).forEach((state) => {
-      const { isChanged, invoice, accountantArr: state_accountantArr } = state;
+      const { isAccountantOrderChanged, invoice, accountantArr: state_accountantArr } = state;
 
-      if (isChanged) {
+      if (isAccountantOrderChanged) {
         state_accountantArr.forEach((accountant, index) => {
-          const { id: accountantId, accountsReceivableDeduction, isChanged } = accountant;
+          const {
+            //
+            id: accountantId,
+            accountsReceivableDeduction,
+            isRelationedInvoiceChanged,
+          } = accountant;
 
           accountantArr.push({
             id: String(accountantId),
             invoiceId: String(invoice.id),
             order: index + 1,
             accountsReceivableDeduction: accountsReceivableDeduction,
-            isChanged,
+            isRelationedInvoiceChanged: isRelationedInvoiceChanged,
           });
         });
       }
     });
 
     for (const accountant of accountantArr) {
-      const { id, invoiceId, order, accountsReceivableDeduction, isChanged } = accountant;
+      const { id, invoiceId, order, accountsReceivableDeduction, isRelationedInvoiceChanged: isChanged } = accountant;
 
       // 修改accountant的關聯invoice
       // if (accountReceivable && isChanged) {
