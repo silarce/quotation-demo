@@ -93,3 +93,13 @@
   font-weight: 700;
   text-align: center;
 }
+
+.row.activeState {
+  background-color: #eee;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  div,
+  span {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
