@@ -1708,3 +1708,41 @@ export const apiPatchEngineeringContactReviewAttachment = async (id: string, bod
       return Promise.reject(err);
     });
 };
+
+// ==============================================================================
+
+// region 要找時間整理一下拉
+
+export const apiPatchAccountantInvoice = (
+  {
+    accountReceivableId,
+    invoiceId,
+    accountantId,
+  }: {
+    accountReceivableId: string;
+    invoiceId: string;
+    accountantId: string;
+  },
+  {
+    callAlert,
+  }: {
+    callAlert?: boolean;
+  } = {}
+) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/accountant/${accountantId}`;
+
+  const body = {
+    invoiceId,
+  };
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      if (callAlert) {
+        myAlert.err({ title: '更新收款紀錄與發票關聯失敗', content: err.message });
+      }
+
+      return Promise.reject(err);
+    });
+};

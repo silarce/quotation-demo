@@ -74,6 +74,7 @@ import {
   apiPostAccountReceivableAccountant,
   apiDeleteAccountReceivableAccountant,
   apiPostAccountReceivableIncoice, // 新增應收帳款發票
+  apiPatchAccountantInvoice,
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
@@ -345,17 +346,25 @@ export default function AccountReceivable() {
     });
 
     for (const accountant of accountantArr) {
-      const { id, invoiceId, order, accountsReceivableDeduction, isRelationedInvoiceChanged: isChanged } = accountant;
+      const {
+        //
+        id,
+        invoiceId,
+        order,
+        accountsReceivableDeduction,
+        isRelationedInvoiceChanged,
+      } = accountant;
 
-      // 修改accountant的關聯invoice
-      // if (accountReceivable && isChanged) {
-      //   await apifoo({
-      //     accountReceivableId: accountReceivable.id,
-      //     invoiceId,
-      //     accountantId: id,
-      //   });
-      // }
+      // 修改accountant的關聯invoice;
+      if (accountReceivable && isRelationedInvoiceChanged) {
+        await apiPatchAccountantInvoice({
+          accountReceivableId: accountReceivable.id,
+          invoiceId,
+          accountantId: id,
+        });
+      }
 
+      //修改排序
       await apiPatchAccountant_accountReceivable(accountant.id, {
         order: order,
         accountsReceivableDeduction: accountsReceivableDeduction,

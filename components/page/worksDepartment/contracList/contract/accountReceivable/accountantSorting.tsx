@@ -581,8 +581,6 @@ function handleDragOver(
   // const { invoice: invoice_active, accountant: accountant_active } = (active.data.current as TdndData) ?? {};
   // const { invoice: invoice_over, accountant: accountant_over } = (over?.data.current as TdndData) ?? {};
 
-  const activeAccountant = (active.data.current as TdndData_row)?.accountant;
-
   const { invoiceId: invoiceId_active, accountantIndex: accountantIndex_active } = findIdIndex(
     active.data.current as TdndData_row,
     stateList
@@ -595,6 +593,11 @@ function handleDragOver(
   if (invoiceId_active === invoiceId_over) {
     return;
   }
+
+  const activeAccountant = (active.data.current as TdndData_row)?.accountant;
+
+  activeAccountant.isRelationedInvoiceChanged = true;
+  activeAccountant.invoiceId = invoiceId_over;
 
   setStateListArr((list) => {
     list = { ...list };
