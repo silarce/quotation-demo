@@ -2,6 +2,8 @@ import classNames from 'classnames';
 
 import scss from './totalCalc.module.scss';
 
+import type { TaccountsReceivableDto } from 'js/api/dtoTypes';
+
 // ============================================================================
 
 type TvalueList = {
@@ -15,6 +17,7 @@ type TvalueList = {
 
 type Tprops = {
   className?: string;
+  accountReceivable: TaccountsReceivableDto;
   valueList?: TvalueList;
 };
 
@@ -22,6 +25,7 @@ type Tprops = {
 export default function TotalCalc({
   //
   className,
+  accountReceivable,
   valueList = fakeData,
 }: Tprops) {
   return (
@@ -32,17 +36,17 @@ export default function TotalCalc({
         <div className={scss.grid}>
           <span className={scss.operator}></span>
           <span>合約金額</span>
-          <span>{valueList.contractTotalPrice}</span>
+          <span>{accountReceivable.contractTotalPrice}</span>
         </div>
         <div className={scss.grid}>
           <Minus />
           <span>已收帳款金額</span>
-          <span>{valueList.collectedAmount}</span>
+          <span>{accountReceivable.receivedPayment}</span>
         </div>
         <div className={scss.grid}>
           <Minus />
           <span>扣款金額</span>
-          <span>{valueList.deductionAmount}</span>
+          <span>{accountReceivable.totalDeduction}</span>
         </div>
       </div>
       {/*  */}
@@ -52,18 +56,21 @@ export default function TotalCalc({
         <div className={scss.grid}>
           <Equal />
           <span>未收款金額</span>
-          <span>{valueList.uncollectedAmount}</span>
+          <span>{accountReceivable.unpaidPayment}</span>
         </div>
-        <div className={scss.grid}>
+
+        {/* <div className={scss.grid}>
           <Parentheses />
           <span>10%尾款</span>
-          <span>{valueList.finalPayment}</span>
-        </div>
+          <span>{accountReceivable.finalPayment}</span>
+        </div> */}
+
         <div className={scss.grid}>
-          <span></span>
+          {/* <span></span> */}
+          <Parentheses />
           <span>10%尾款</span>
           <span className={scss.latestCell}>
-            {valueList.finalPayment2}
+            {accountReceivable.finalPayment}
             <Parentheses turn={true} />
           </span>
         </div>

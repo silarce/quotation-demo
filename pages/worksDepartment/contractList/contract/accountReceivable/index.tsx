@@ -428,7 +428,7 @@ export default function AccountReceivable() {
 
       <div className={scss.main}>
         <Profile {...props_profile} />
-        <TotalCalc className="mt-10" />
+        <TotalCalc className="mt-10" accountReceivable={accountReceivable} />
 
         <AccountantSorting className="mt-10" invoiceArr={invoiceArr} onConfirm={reqPatchAccountant_sorting} />
 
