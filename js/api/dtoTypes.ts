@@ -3511,8 +3511,8 @@ export type TaccountsReceivableInvoiceDto = {
   // 是否扣掉沖訂金
   isWriteOffDeposit: boolean;
 
-  // key還未與後端確認
-  retainageType: TinvoiceRetainageType | null;
+  retainageType: TinvoiceRetainageType | null; // 保留款類型
+  allowance: number | null; // 折讓
 };
 
 export type TcreateAccountReceivableInvoiceDto = Pick<
@@ -3553,6 +3553,9 @@ export type TupdateAccountReceivableInvoiceDto = Partial<
     | 'isWriteOffDeposit'
     | 'price'
     | 'invoiceNumber'
+    | 'retainageType'
+    | 'allowance'
+    | 'note'
   > & {
     // 關聯的收款紀錄Id
     accountants: string[];

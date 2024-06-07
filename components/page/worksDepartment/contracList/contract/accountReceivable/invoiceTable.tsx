@@ -44,7 +44,6 @@ type Tstate_invoice = {
   deduction: string;
   writeOffDeposit: string;
 
-  retainageType: TinvoiceRetainageType | null; // 折讓類型
   minusRetainage: boolean;
   minusDeduction: boolean;
   minusWriteOffDeposit: boolean;
@@ -54,6 +53,11 @@ type Tstate_invoice = {
 
   type: TaccountsReceivableInvoiceDto['type'];
   period: number;
+
+  retainageType: TinvoiceRetainageType | 'null'; // 保留款類型
+  allowance: string; // 折讓金額
+  note: string; // 備註
+
   //
 };
 
@@ -101,7 +105,9 @@ type Tcenter = {
     minusDeduction: boolean;
     minusWriteOffDeposit: boolean;
 
-    retainageType: string | null;
+    retainageType: string;
+    allowance: string;
+    note: string;
 
     onChange_invoiceNumber: (value: string) => void;
     onChange_retainage: (value: string) => void;
@@ -113,6 +119,8 @@ type Tcenter = {
     onChange_minusWriteOffDeposit: (checked: boolean) => void;
 
     onChange_retainageType: (value: TinvoiceRetainageType) => void;
+    onChange_allowance: (value: string) => void;
+    onChange_note: (value: string) => void;
   };
 };
 
@@ -258,7 +266,7 @@ export default function InvoiceTable({
     value,
   }: {
     invoiceIndex: number;
-    key: 'retainage' | 'deduction' | 'writeOffDeposit' | 'invoiceNumber';
+    key: 'retainage' | 'deduction' | 'writeOffDeposit' | 'invoiceNumber' | 'allowance' | 'note';
     value: string;
   }) => {
     setState_invoiceArr((prev) => {
@@ -266,7 +274,10 @@ export default function InvoiceTable({
       const invoice = copy[invoiceIndex];
       invoice.renderCount++;
       invoice[key] = value;
-      invoice.price = calcPrice(invoice);
+
+      if (key === 'retainage' || key === 'deduction' || key === 'writeOffDeposit') {
+        invoice.price = calcPrice(invoice);
+      }
 
       return copy;
     });
@@ -365,6 +376,8 @@ export default function InvoiceTable({
       minusRetainage: minusRetainage_total,
       minusDeduction: minusDeduction_total,
       minusWriteOffDeposit: minusWriteOffDeposit_total,
+
+      allowance: allowance_total = '0',
     } = firstInvoice;
 
     state_invoiceArr.forEach((invoice, index_invoice) => {
@@ -387,6 +400,8 @@ export default function InvoiceTable({
         minusRetainage,
         minusDeduction,
         minusWriteOffDeposit,
+
+        allowance = '0',
       } = invoice;
 
       // __________________________________________________________________
@@ -412,6 +427,8 @@ export default function InvoiceTable({
       retainage_total = new Decimal(retainage_total || 0).add(retainage || 0).toString();
       deduction_total = new Decimal(deduction_total || 0).add(deduction || 0).toString();
       writeOffDeposit_total = new Decimal(writeOffDeposit_total || 0).add(writeOffDeposit || 0).toString();
+
+      allowance_total = new Decimal(allowance_total || 0).add(allowance || 0).toString();
 
       price_total = new Decimal(price_total).add(price).toNumber();
       // __________________________________________________________________
@@ -449,7 +466,9 @@ export default function InvoiceTable({
       type: '請款', // 只是為了符合型別，不會用到
       period: 0, // 只是為了符合型別，不會用到
 
-      retainageType: null,
+      retainageType: 'null',
+      allowance: allowance_total,
+      note: '',
     };
 
     //
@@ -529,6 +548,8 @@ export default function InvoiceTable({
         minusWriteOffDeposit,
 
         retainageType,
+        allowance,
+        note,
 
         price,
         invoiceNumber,
@@ -594,6 +615,8 @@ export default function InvoiceTable({
         minusWriteOffDeposit,
 
         retainageType,
+        allowance,
+        note,
 
         onChange_invoiceNumber: (value) => {
           handle_editInvoiceOther({ invoiceIndex, key: 'invoiceNumber', value });
@@ -619,6 +642,12 @@ export default function InvoiceTable({
 
         onChange_retainageType: (value) => {
           handle_editTetainageType({ invoiceIndex, value });
+        },
+        onChange_allowance: (value) => {
+          handle_editInvoiceOther({ invoiceIndex, key: 'allowance', value });
+        },
+        onChange_note: (value) => {
+          handle_editInvoiceOther({ invoiceIndex, key: 'note', value });
         },
       };
 
@@ -659,6 +688,7 @@ export default function InvoiceTable({
       minusRetainage,
       minusDeduction,
       minusWriteOffDeposit,
+      allowance,
     } = state_invoice_total;
 
     const rowArr = rowArr_total.map((row) => {
@@ -692,7 +722,9 @@ export default function InvoiceTable({
         minusDeduction,
         minusWriteOffDeposit,
 
-        retainageType: null,
+        retainageType: 'null',
+        allowance: Number(allowance).toLocaleString(),
+        note: '',
 
         onChange_invoiceNumber: () => {},
         onChange_retainage: () => {},
@@ -703,6 +735,8 @@ export default function InvoiceTable({
         onChange_minusWriteOffDeposit: () => {},
 
         onChange_retainageType: () => {},
+        onChange_allowance: () => {},
+        onChange_note: () => {},
       },
     };
 
@@ -714,7 +748,7 @@ export default function InvoiceTable({
   // region use Effect
 
   useEffect(() => {
-    const arr: Tstate_invoice[] = (invoiceArr_sorted ?? []).map((invoice) => {
+    const arr: Tstate_invoice[] = (invoiceArr_sorted ?? []).map((data_invoice) => {
       const {
         //
         id,
@@ -732,7 +766,9 @@ export default function InvoiceTable({
         isWriteOffDeposit,
         //
         retainageType,
-      } = invoice;
+        allowance,
+        note,
+      } = data_invoice;
 
       const completedProductList: { [id: string]: TcompletedProductDto } = {};
       completedProduct?.forEach((cp) => {
@@ -778,11 +814,13 @@ export default function InvoiceTable({
         minusDeduction: isDeduction,
         minusWriteOffDeposit: isWriteOffDeposit,
 
-        retainageType,
-
         subTotal: totals_num.subTotal,
         tax: totals_num.tax,
         contractTotal: totals_num.contractTotal,
+
+        retainageType: retainageType || 'null',
+        allowance: String(allowance || ''),
+        note: note || '',
       };
     }); // map
 
@@ -983,6 +1021,8 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
     minusWriteOffDeposit: haveWriteOffDeposit,
 
     retainageType,
+    allowance,
+    note,
 
     onChange_invoiceNumber,
     onChange_retainage,
@@ -994,9 +1034,10 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
     onChange_minusWriteOffDeposit,
 
     onChange_retainageType,
-  } = node_other;
 
-  console.log(retainageType);
+    onChange_allowance,
+    onChange_note,
+  } = node_other;
 
   let { retainage, deduction, writeOffDeposit } = node_other;
 
@@ -1055,7 +1096,7 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
           >
             <Radio value={'含稅' as TinvoiceRetainageType}>含稅</Radio>
             <Radio value={'未稅' as TinvoiceRetainageType}>未稅</Radio>
-            <Radio value={null}>無</Radio>
+            <Radio value={'null'}>無</Radio>
           </Radio.Group>
         </div>
       </div>
@@ -1100,6 +1141,27 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
           className={classNames(readOnly && scss.readyOnly)}
           value={invoiceNumber}
           onChange={(e) => onChange_invoiceNumber(e.target.value)}
+          readOnly={readOnly}
+        />
+      </div>
+
+      <div className={classNames(scss.row)}>
+        <span>折讓</span>
+        <input
+          className={classNames(readOnly && scss.readyOnly)}
+          type="number"
+          value={allowance}
+          onChange={(e) => onChange_allowance(e.target.value)}
+          readOnly={readOnly}
+        />
+      </div>
+
+      <div className={classNames(scss.row)}>
+        <span>備註</span>
+        <input
+          className={classNames(readOnly && scss.readyOnly)}
+          value={note}
+          onChange={(e) => onChange_note(e.target.value)}
           readOnly={readOnly}
         />
       </div>

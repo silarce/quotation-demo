@@ -227,7 +227,13 @@ export default function AccountReceivable() {
         minusWriteOffDeposit,
         price,
         invoiceNumber,
+
+        retainageType,
+        allowance,
+        note,
       } = state;
+
+      console.log(state);
 
       !id && (haveEmptyId = true);
 
@@ -249,10 +255,13 @@ export default function AccountReceivable() {
         isWriteOffDeposit: minusWriteOffDeposit,
         price,
         invoiceNumber,
+
+        retainageType: retainageType === 'null' ? null : retainageType,
+        allowance: Number(allowance),
+        note,
+
         //
         // invoiceDate: new Date().toISOString(),
-        // note: '',
-        //
         // accountants: [],
       };
 
