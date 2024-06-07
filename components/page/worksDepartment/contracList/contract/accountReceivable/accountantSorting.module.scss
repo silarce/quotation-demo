@@ -1,0 +1,119 @@
+// 結構
+// .group {
+//   .left {
+//     .row {
+//     }
+//   }
+//   .right {
+//     .row {
+//     }
+//   }
+// }
+
+.table {
+  border: solid 1px theme("colors.border");
+  width: 1130px;
+}
+
+.group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: solid 1px theme("colors.border");
+
+  .left {
+    .row {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  .right {
+    .row {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+  }
+
+  &:nth-last-of-type(1) {
+    border-bottom: 0;
+  }
+}
+
+.group.top {
+  background-color: theme("colors.bgc01");
+  > .left,
+  > .right {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px;
+  }
+  .left {
+    border-right: solid 1px theme("colors.border");
+  }
+}
+
+.group.thead {
+  div,
+  span {
+    font-size: 18px;
+    font-weight: 500;
+    color: theme("colors.main");
+  }
+}
+
+.group.tbody {
+  border-bottom-width: 2px;
+
+  div,
+  span {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.group.total {
+  div,
+  span {
+    font-size: 18px;
+    font-weight: 700;
+  }
+}
+
+.row {
+  display: grid;
+  justify-items: center;
+  padding: 10px 0;
+  &.active {
+    background-color: theme("colors.hoverBgc");
+  }
+}
+
+.footCaption {
+  padding: 15px;
+  background-color: theme("colors.bgc01");
+  border-bottom: solid 1px theme("colors.border");
+
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.row.activeState {
+  background-color: #eee;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+
+  opacity: 0.8;
+
+  div,
+  span {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.dropContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: theme("colors.border");
+}

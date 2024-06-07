@@ -1,0 +1,885 @@
+import React, { useState, useEffect, useMemo, memo, useRef } from 'react';
+import classNames from 'classnames';
+import _ from 'lodash';
+import Decimal from 'decimal.js';
+
+// antd
+import { Checkbox, Radio } from 'antd';
+
+// component
+import InvoicePanel, { Thead, Tbody, Tfoot } from './table';
+import type { TimperativeHandle_panel, Tcenter } from './table';
+
+// gear
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import TopBar from '../ui/topBar';
+
+// css
+import scss from './invoiceTable.module.scss';
+
+import type {
+  TfinalProduct,
+  TaccountsReceivableInvoiceDto,
+  TquotationProductItemDto,
+  TquotationProductDto,
+  TcompletedProductDto,
+  TinvoiceRetainageType,
+} from 'js/api/dtoTypes';
+
+// ========================================================================
+// region type
+
+type Tinvoice_reduce = Pick<
+  TaccountsReceivableInvoiceDto,
+  | 'id'
+  | 'updatedAt'
+  | 'type'
+  | 'period'
+  | 'depositPeriod'
+  | 'invoiceNumber'
+  | 'price'
+  | 'completedProduct'
+  | 'retainage'
+  | 'deduction'
+  | 'writeOffDeposit'
+  | 'isRetainage'
+  | 'isDeduction'
+  | 'isWriteOffDeposit'
+  | 'retainageType'
+  | 'allowance'
+  | 'note'
+  | 'accountantList'
+>;
+
+type Tstate_invoice = {
+  id?: string;
+  renderCount: number; // 判斷是否要rerender用的，會送到Tcenter
+
+  type: TaccountsReceivableInvoiceDto['type'];
+  period: number;
+
+  rowArr: {
+    productId: string;
+    // baseQty: number;
+    basePrice: number;
+    completedQuantity: string;
+    completedPayment: string;
+  }[];
+  subTotal: number; // 自動計算 // 虛值
+  tax: number; // 自動計算 // 虛值
+  contractTotal: number; // 自動計算 // 虛值
+  //
+  retainage: string;
+  deduction: string;
+  writeOffDeposit: string;
+
+  minusRetainage: boolean;
+  minusDeduction: boolean;
+  minusWriteOffDeposit: boolean;
+
+  allowEditDeduction: boolean;
+
+  price: number; // 發票金額 自動計算
+  invoiceNumber: string;
+
+  retainageType: TinvoiceRetainageType | 'null'; // 保留款類型
+  allowance: string; // 折讓金額
+  note: string; // 備註
+
+  //
+};
+
+type Tleft = {
+  rowArr: {
+    itemName: React.ReactNode;
+    size: React.ReactNode;
+    qty: React.ReactNode;
+    contractPrice: React.ReactNode;
+    // contractPrice_num: number;
+  }[];
+  totals: {
+    subTotal: string;
+    tax: string;
+    contractTotal: string;
+  };
+};
+
+export type { Tstate_invoice, Tinvoice_reduce };
+
+// ========================================================================
+
+// region START
+
+export default function InvoiceTable({
+  //
+  className,
+  data_finalProdcut = [],
+  data_invoices = [],
+  // reqAddInvoice,
+  // reqPatchInvoiceArr,
+  onAddConfirm,
+  reqPatchInvoiceAllowance,
+}: {
+  className?: string;
+  data_finalProdcut: TquotationProductDto[] | undefined | null;
+  data_invoices: TaccountsReceivableInvoiceDto[] | undefined | null;
+  // reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
+  // reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
+  onAddConfirm: (state_invoice: Tstate_invoice) => void;
+  reqPatchInvoiceAllowance: (invoiceId: string, allowance: number) => void;
+}) {
+  const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
+  const ref_invoicePanelArr = useRef<(TimperativeHandle_panel | null)[]>([]);
+
+  // const [disabled, setDisabled] = useState(true);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+
+  // const [state_invoiceArr, setState_invoiceArr] = useState<Tstate_invoice[]>([]);
+
+  const [totalsTotal, setTotalsTotal] = useState({
+    subTotal: 0,
+    tax: 0,
+    contractTotal: 0,
+  });
+
+  // --------------------------------------------------------------------------
+
+  const { finalProdList, finalProdArr } = useMemo(() => {
+    const data_finalProdcut_sorted = _.sortBy(data_finalProdcut, 'order');
+
+    const list: { [id: string]: TquotationProductDto } = {};
+    data_finalProdcut_sorted.forEach((prod) => {
+      list[prod.id] = prod;
+    });
+
+    return {
+      finalProdList: list,
+      finalProdArr: data_finalProdcut_sorted,
+    };
+  }, [data_finalProdcut]);
+
+  const invoiceArr_sorted = useMemo(() => {
+    return _.sortBy(data_invoices, 'createdAt');
+  }, [data_invoices]);
+
+  // --------------------------------------------------------------------------
+
+  // --------------------------------------------------------------------------
+
+  // region function
+
+  const handel_onConfirm = async () => {
+    const newInoviceState = ref_newInvoicePanel.current?.getState();
+
+    if (newInoviceState) {
+      await onAddConfirm(newInoviceState);
+      setIsAddingNew(false);
+    }
+
+    // await reqPatchInvoiceArr(state_invoiceArr);
+    // setDisabled(true);
+  };
+
+  const onPanelStateChange = (state_invoice: Tstate_invoice) => {
+    const { subTotal, tax, contractTotal } = state_invoice;
+
+    setTotalsTotal((totalsTotal) => {
+      totalsTotal = { ...totalsTotal };
+
+      totalsTotal.subTotal = new Decimal(totalsTotal.subTotal).add(subTotal).toNumber();
+      totalsTotal.tax = new Decimal(totalsTotal.tax).add(tax).toNumber();
+      totalsTotal.contractTotal = new Decimal(totalsTotal.contractTotal).add(contractTotal).toNumber();
+
+      return totalsTotal;
+    });
+  };
+
+  // --------------------------------------------------------------------------
+
+  // region total_state_invoiceArr
+
+  // const state_invoice_total: Tstate_invoice | null = useMemo(() => {
+  //   if (!state_invoiceArr[0]) {
+  //     return null;
+  //   }
+
+  //   const firstInvoice = _.cloneDeep(state_invoiceArr[0]);
+
+  //   const {
+  //     //
+  //     rowArr: rowArr_total,
+  //   } = firstInvoice;
+
+  //   let {
+  //     //
+  //     subTotal: subTotal_total,
+  //     tax: tax_total,
+  //     contractTotal: contractTotal_total,
+  //     retainage: retainage_total = '0',
+  //     deduction: deduction_total = '0',
+  //     writeOffDeposit: writeOffDeposit_total = '0',
+  //     price: price_total,
+
+  //     minusRetainage: minusRetainage_total,
+  //     minusDeduction: minusDeduction_total,
+  //     minusWriteOffDeposit: minusWriteOffDeposit_total,
+
+  //     allowance: allowance_total = '0',
+  //   } = firstInvoice;
+
+  //   state_invoiceArr.forEach((invoice, index_invoice) => {
+  //     if (index_invoice === 0) {
+  //       return;
+  //     }
+
+  //     const {
+  //       //
+
+  //       rowArr,
+  //       subTotal,
+  //       tax,
+  //       contractTotal,
+  //       retainage = '0',
+  //       deduction = '0',
+  //       writeOffDeposit = '0',
+  //       price,
+
+  //       minusRetainage,
+  //       minusDeduction,
+  //       minusWriteOffDeposit,
+
+  //       allowance = '0',
+  //     } = invoice;
+
+  //     // __________________________________________________________________
+  //     rowArr.forEach((row, index_row) => {
+  //       const { completedQuantity, completedPayment } = row;
+
+  //       const completedQuantity_d = new Decimal(completedQuantity || 0);
+  //       const completedPayment_d = new Decimal(completedPayment || 0);
+
+  //       rowArr_total[index_row].completedQuantity = completedQuantity_d
+  //         .add(rowArr_total[index_row].completedQuantity || 0)
+  //         .toString();
+  //       rowArr_total[index_row].completedPayment = completedPayment_d
+  //         .add(rowArr_total[index_row].completedPayment || 0)
+  //         .toString();
+  //     });
+  //     // __________________________________________________________________
+
+  //     subTotal_total = new Decimal(subTotal_total).add(subTotal).toNumber();
+  //     tax_total = new Decimal(tax_total).add(tax).toNumber();
+  //     contractTotal_total = new Decimal(contractTotal_total).add(contractTotal).toNumber();
+
+  //     retainage_total = new Decimal(retainage_total || 0).add(retainage || 0).toString();
+  //     deduction_total = new Decimal(deduction_total || 0).add(deduction || 0).toString();
+  //     writeOffDeposit_total = new Decimal(writeOffDeposit_total || 0).add(writeOffDeposit || 0).toString();
+
+  //     allowance_total = new Decimal(allowance_total || 0).add(allowance || 0).toString();
+
+  //     price_total = new Decimal(price_total).add(price).toNumber();
+  //     // __________________________________________________________________
+
+  //     if (minusRetainage) {
+  //       minusRetainage_total = minusRetainage;
+  //     }
+
+  //     if (minusDeduction) {
+  //       minusDeduction_total = minusDeduction;
+  //     }
+
+  //     if (minusWriteOffDeposit) {
+  //       minusWriteOffDeposit_total = minusWriteOffDeposit;
+  //     }
+
+  //     // __________________________________________________________________
+  //   }); // state_invoiceArr.forEach
+
+  //   const stateInovie: Tstate_invoice = {
+  //     rowArr: rowArr_total,
+  //     subTotal: subTotal_total,
+  //     tax: tax_total,
+  //     contractTotal: contractTotal_total,
+  //     retainage: retainage_total,
+  //     deduction: deduction_total,
+  //     writeOffDeposit: writeOffDeposit_total,
+  //     price: price_total,
+  //     minusRetainage: minusRetainage_total,
+  //     minusDeduction: minusDeduction_total,
+  //     minusWriteOffDeposit: minusWriteOffDeposit_total,
+
+  //     renderCount: 0, // 只是為了符合型別，不會用到 // 要用到也是可以
+  //     invoiceNumber: '', // 只是為了符合型別，不會用到
+  //     type: '請款', // 只是為了符合型別，不會用到
+  //     period: 0, // 只是為了符合型別，不會用到
+
+  //     retainageType: 'null',
+  //     allowance: allowance_total,
+  //     note: '',
+
+  //     allowEditDeduction: false,
+  //   };
+
+  //   return stateInovie;
+
+  //   //
+  // }, [state_invoiceArr]);
+
+  // region LEFT
+  const node_left: Tleft = useMemo(() => {
+    let subTotal_d = new Decimal(0);
+
+    const rowArr: Tleft['rowArr'] = finalProdArr.map((prod) => {
+      const {
+        //
+        itemName,
+        fullWidth,
+        // WG,
+        height,
+        boxB,
+        bounceDoorWidth,
+        unitPrice,
+        quantity,
+      } = prod;
+
+      const fullWidth_cm = new Decimal(fullWidth || 0).div(10).toNumber();
+      const height_cm = new Decimal(height || 0).div(10).toNumber();
+      const boxB_cm = new Decimal(boxB || 0).div(10).toNumber();
+      const bounceDoorWidth_cm = new Decimal(bounceDoorWidth || 0).div(10).toNumber();
+
+      const boxB_formated = boxB_cm ? `＋${boxB_cm}` : '';
+      const bounceDoorWidth_formated = bounceDoorWidth_cm ? `＋${bounceDoorWidth_cm}` : '';
+
+      const size = `${fullWidth_cm}${bounceDoorWidth_formated}Ｘ${height_cm}${boxB_formated}`;
+
+      const prodTotalPrice = new Decimal(unitPrice || 0).mul(quantity || 0);
+
+      subTotal_d = subTotal_d.add(prodTotalPrice);
+
+      return {
+        itemName,
+        size,
+        qty: quantity,
+        contractPrice: unitPrice.toLocaleString(),
+      };
+    });
+
+    const tax_d = subTotal_d.mul(0.05);
+
+    const totals = {
+      subTotal: subTotal_d.toNumber().toLocaleString(),
+      tax: tax_d.toNumber().toLocaleString(),
+      contractTotal: subTotal_d.add(tax_d).toNumber().toLocaleString(),
+    };
+
+    return {
+      rowArr,
+      totals,
+    };
+
+    //
+  }, [finalProdArr]);
+
+  // --------------------------------------------------------------------------
+
+  // --------------------------------------------------------------------------
+
+  // region Right
+
+  // ref_invoicePanelArr.current.map((handle) => handle?.getState())
+
+  const invoiceTotal = useMemo(() => {
+    const invoiceTotal: Tinvoice_reduce = {
+      id: '',
+      updatedAt: '',
+      type: '請款',
+      period: 0,
+      depositPeriod: 0,
+      invoiceNumber: '',
+      price: 0,
+      completedProduct: [],
+      retainage: 0,
+      deduction: 0,
+      writeOffDeposit: 0,
+      isRetainage: false,
+      isDeduction: false,
+      isWriteOffDeposit: false,
+      retainageType: null,
+      allowance: 0,
+      note: '',
+      accountantList: [],
+    };
+
+    const completedProductList: { [productId: string]: TcompletedProductDto } = {};
+
+    invoiceArr_sorted.forEach((invoice) => {
+      const {
+        //
+        price,
+        completedProduct,
+        retainage,
+        deduction,
+        writeOffDeposit,
+        allowance,
+      } = invoice;
+
+      invoiceTotal.price = new Decimal(price).add(invoiceTotal.price).toNumber();
+      invoiceTotal.retainage = new Decimal(retainage || 0).add(invoiceTotal.retainage || 0).toNumber();
+      invoiceTotal.deduction = new Decimal(deduction || 0).add(invoiceTotal.deduction || 0).toNumber();
+      invoiceTotal.writeOffDeposit = new Decimal(writeOffDeposit || 0)
+        .add(invoiceTotal.writeOffDeposit || 0)
+        .toNumber();
+      invoiceTotal.allowance = new Decimal(allowance || 0).add(invoiceTotal.allowance || 0).toNumber();
+
+      completedProduct?.forEach((prod) => {
+        const {
+          //
+          productId,
+          completedQuantity,
+          completedPayment,
+        } = prod;
+
+        if (!completedProductList[productId]) {
+          completedProductList[productId] = {
+            productId,
+            completedQuantity: 0,
+            completedPayment: 0,
+          };
+        }
+
+        completedProductList[productId].completedQuantity = new Decimal(
+          completedProductList[productId].completedQuantity || 0
+        )
+          .add(completedQuantity)
+          .toNumber();
+
+        completedProductList[productId].completedPayment = new Decimal(
+          completedProductList[productId].completedPayment || 0
+        )
+          .add(completedPayment)
+          .toNumber();
+      }); // completedProduct?.forEach
+      //
+    }); // invoiceArr_sorted.forEach
+
+    invoiceTotal.completedProduct = Object.values(completedProductList);
+
+    return invoiceTotal;
+
+    //
+  }, [invoiceArr_sorted]);
+
+  const refLength = ref_invoicePanelArr.current.length;
+
+  // const totalsTotal = useMemo(() => {
+  //   const stateArr = ref_invoicePanelArr.current.map((handle) => handle?.getState());
+
+  //   let subTotal_d = new Decimal(0);
+  //   let tax_d = new Decimal(0);
+  //   let contractTotal_d = new Decimal(0);
+
+  //   stateArr.forEach((state) => {
+  //     const { subTotal = 0, tax = 0, contractTotal = 0 } = state ?? {};
+
+  //     subTotal_d = subTotal_d.add(subTotal);
+  //     tax_d = tax_d.add(tax);
+  //     contractTotal_d = contractTotal_d.add(contractTotal);
+  //   });
+
+  //   return {
+  //     subTotal: subTotal_d.toNumber(),
+  //     tax: tax_d.toNumber(),
+  //     contractTotal: contractTotal_d.toNumber(),
+  //   };
+  // }, [refLength]);
+
+  // console.log(ref_invoicePanelArr.current.length);
+
+  // const right: Tcenter | null = useMemo(() => {
+  //   if (!state_invoice_total) {
+  //     return null;
+  //   }
+
+  //   const {
+  //     //
+  //     rowArr: rowArr_total,
+  //     subTotal,
+  //     tax,
+  //     contractTotal,
+  //     retainage,
+  //     deduction,
+  //     writeOffDeposit,
+  //     price,
+  //     minusRetainage,
+  //     minusDeduction,
+  //     minusWriteOffDeposit,
+  //     allowance,
+  //   } = state_invoice_total;
+
+  //   const rowArr = rowArr_total.map((row) => {
+  //     return {
+  //       completedQuantity: row.completedQuantity,
+  //       completedPayment: row.completedPayment,
+  //       completedPayment_localeString: Number(row.completedPayment).toLocaleString(),
+  //       oncompletedQuantityChange: () => {},
+  //       oncompletedPaymentChange: () => {},
+  //     };
+  //   });
+
+  //   const right: Tcenter = {
+  //     caption: '累計',
+  //     rowArr: rowArr,
+  //     totals: {
+  //       subTotal: subTotal.toLocaleString(),
+  //       tax: tax.toLocaleString(),
+  //       contractTotal: contractTotal.toLocaleString(),
+  //     },
+  //     other: {
+  //       price: price.toLocaleString(),
+  //       invoiceNumber: '',
+  //       retainage: Number(retainage).toLocaleString(),
+  //       deduction: Number(deduction).toLocaleString(),
+  //       writeOffDeposit: Number(writeOffDeposit).toLocaleString(),
+  //       retainage_localeString: Number(retainage).toLocaleString(),
+  //       deduction_localeString: Number(deduction).toLocaleString(),
+  //       writeOffDeposit_localeString: Number(writeOffDeposit).toLocaleString(),
+  //       minusRetainage,
+  //       minusDeduction,
+  //       minusWriteOffDeposit,
+
+  //       retainageType: 'null',
+  //       allowance: Number(allowance).toLocaleString(),
+  //       note: '',
+
+  //       allowEditDeduction: false,
+
+  //       onChange_invoiceNumber: () => {},
+  //       onChange_retainage: () => {},
+  //       onChange_deduction: () => {},
+  //       onChange_writeOffDeposit: () => {},
+  //       onChange_minusRetainage: () => {},
+  //       onChange_minusDeduction: () => {},
+  //       onChange_minusWriteOffDeposit: () => {},
+
+  //       onChange_retainageType: () => {},
+  //       onChange_allowance: () => {},
+  //       onChange_note: () => {},
+  //     },
+  //   };
+
+  //   return right;
+  // }, [state_invoice_total]);
+
+  // --------------------------------------------------------------------------
+
+  // region use Effect
+
+  // useEffect(() => {
+  //   setDisabled(true);
+  // }, [data_finalProdcut, data_invoices]);
+
+  // useEffect(() => {
+  //   const arr: Tstate_invoice[] = (invoiceArr_sorted ?? []).map((data_invoice) => {
+  //     const {
+  //       //
+  //       id,
+  //       type,
+  //       period,
+  //       depositPeriod,
+  //       invoiceNumber,
+  //       price,
+  //       completedProduct = [],
+  //       retainage,
+  //       deduction,
+  //       writeOffDeposit,
+  //       isRetainage,
+  //       isDeduction,
+  //       isWriteOffDeposit,
+  //       //
+  //       retainageType,
+  //       allowance,
+  //       note,
+  //       //
+  //       accountantList,
+  //     } = data_invoice;
+
+  //     const notAllowEditDeduction = accountantList.some((al) => {
+  //       return al.accountsReceivableDeduction.length > 0;
+  //     });
+
+  //     const completedProductList: { [id: string]: TcompletedProductDto } = {};
+  //     completedProduct?.forEach((cp) => {
+  //       completedProductList[cp.productId] = cp;
+  //     });
+
+  //     const rowArr: Tstate_invoice['rowArr'] = finalProdArr.map((finalProd) => {
+  //       const finalProdId = finalProd.id;
+
+  //       const cp = completedProductList[finalProdId] || {
+  //         productId: finalProdId,
+  //         // baseQty: finalProd.quantity,
+  //         basePrice: finalProd.unitPrice,
+  //         completedQuantity: '',
+  //         completedPayment: '',
+  //       };
+
+  //       return {
+  //         ...cp,
+  //         // baseQty: finalProd.quantity,
+  //         basePrice: finalProd.unitPrice,
+  //         completedQuantity: String(cp.completedQuantity),
+  //         completedPayment: String(cp.completedPayment),
+  //       };
+  //     });
+
+  //     const totals_num = calcTotals(rowArr);
+
+  //     return {
+  //       id,
+  //       renderCount: 0,
+  //       rowArr,
+  //       retainage: String(retainage || ''),
+  //       deduction: String(deduction || ''),
+  //       writeOffDeposit: String(writeOffDeposit || ''),
+  //       price,
+  //       invoiceNumber,
+
+  //       type,
+  //       period: period || depositPeriod || 0,
+
+  //       minusRetainage: isRetainage,
+  //       minusDeduction: isDeduction,
+  //       minusWriteOffDeposit: isWriteOffDeposit,
+
+  //       subTotal: totals_num.subTotal,
+  //       tax: totals_num.tax,
+  //       contractTotal: totals_num.contractTotal,
+
+  //       retainageType: retainageType || 'null',
+  //       allowance: String(allowance || ''),
+  //       note: note || '',
+
+  //       allowEditDeduction: !notAllowEditDeduction,
+  //     };
+  //   }); // map
+
+  //   setState_invoiceArr(arr);
+  // }, [finalProdArr, invoiceArr_sorted, disabled]);
+  // --------------------------------------------------------------------------
+
+  // region RENDER
+  return (
+    <div className={classNames(scss.invoiceTable, className)}>
+      {/*  */}
+
+      <TopBar caption="請款明細">
+        <MyButton_v2
+          px="px22"
+          py="py4"
+          onClick={() => {
+            setIsAddingNew((prev) => !prev);
+          }}
+        >
+          {!isAddingNew ? '新增' : '取消'}
+        </MyButton_v2>
+        {isAddingNew && (
+          <MyButton_v2 theme="danger" px="px22" py="py4" onClick={handel_onConfirm}>
+            確認
+          </MyButton_v2>
+        )}
+      </TopBar>
+
+      {/*  */}
+      <div className={scss.table}>
+        <Left node_left={node_left} />
+
+        {/* {node_centerArr.map((center, index) => {
+          return <Center key={index} node_center={center} disabled={disabled} />;
+        })} */}
+        {isAddingNew && <InvoicePanel ref={ref_newInvoicePanel} finalProdArr={finalProdArr} />}
+
+        {invoiceArr_sorted.map((data_invoice, index) => {
+          return (
+            <InvoicePanel
+              ref={(handle) => {
+                ref_invoicePanelArr.current[index] = handle;
+              }}
+              key={data_invoice.id}
+              data_invoice={data_invoice}
+              finalProdArr={finalProdArr}
+              onPanelStateChange={onPanelStateChange}
+              reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
+            />
+          );
+        })}
+
+        {/* <Right invoiceTotal={invoiceTotal} totalsTotal={totalsTotal} /> */}
+        <InvoicePanel
+          //
+          data_invoice={invoiceTotal}
+          finalProdArr={finalProdArr}
+          totalsTotal={totalsTotal}
+        />
+      </div>
+    </div>
+  );
+}
+
+// region END
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+
+// region component
+
+const Left = ({
+  //
+  node_left: { rowArr, totals },
+}: {
+  node_left: Tleft;
+}) => {
+  return (
+    <div className={classNames(scss.invoice, scss.left)}>
+      <Thead>
+        <div className={scss.top}></div>
+        <div className={classNames(scss.captionBar, scss.row)}>
+          <span>項目</span>
+          <span>尺寸</span>
+          <span>數量</span>
+          <span>合約單價</span>
+        </div>
+      </Thead>
+      <Tbody totals={totals}>
+        {rowArr.map((row, index) => {
+          const { itemName, size, qty, contractPrice } = row;
+
+          return (
+            <div key={index} className={classNames(scss.row)}>
+              <span>{itemName}</span>
+              <span>{size}</span>
+              <span>{qty}</span>
+              <span>{contractPrice}</span>
+            </div>
+          );
+        })}
+      </Tbody>
+    </div>
+  );
+};
+
+// =============================================================================
+// const Center = ({
+//   //
+//   disabled,
+//   node_center: { renderCount, caption, rowArr, totals, other },
+// }: {
+//   disabled: boolean;
+//   node_center: Tcenter;
+// }) => {
+//   return (
+//     <div className={classNames(scss.invoice, scss.center)}>
+//       <Thead caption={caption}>
+//         <span>完成數量</span>
+//         <span>完成金額</span>
+//       </Thead>
+
+//       <Tbody totals={totals}>
+//         {rowArr.map((row, index) => {
+//           const {
+//             completedQuantity: doneQty,
+//             completedPayment_localeString: donePrice_localeString,
+//             oncompletedQuantityChange: onDoneQtyChange,
+//             oncompletedPaymentChange: onDonePriceChange,
+//           } = row;
+//           let { completedPayment: donePrice } = row;
+
+//           disabled && (donePrice = donePrice_localeString);
+
+//           const inputType = disabled ? 'text' : 'number';
+
+//           return (
+//             <div key={index} className={classNames(scss.row)}>
+//               <input
+//                 className={classNames(disabled && scss.readyOnly)}
+//                 value={doneQty}
+//                 onChange={(e) => onDoneQtyChange(e.target.value)}
+//                 readOnly={disabled}
+//                 type={inputType}
+//               />
+//               <input
+//                 className={classNames(disabled && scss.readyOnly)}
+//                 value={donePrice}
+//                 onChange={(e) => onDonePriceChange(e.target.value)}
+//                 readOnly={disabled}
+//                 type={inputType}
+//               />
+//             </div>
+//           );
+//         })}
+//       </Tbody>
+
+//       <Tfoot readOnly={disabled} node_other={other} />
+//     </div>
+//   );
+// };
+
+// --------------------------------------------------
+
+// const Right = ({ node_center }: { node_center: Tcenter }) => {
+//   return <Center disabled={true} node_center={node_center} />;
+// };
+
+// ========================================================================
+
+// region FUNCTION
+
+// const calcTotals = (rowArr: { completedPayment: number | string }[]) => {
+//   let subTotal_d = new Decimal(0);
+
+//   rowArr.forEach((row) => {
+//     const completedPayment = Number(row.completedPayment);
+//     subTotal_d = subTotal_d.add(completedPayment);
+//   });
+
+//   const tax_d = subTotal_d.mul(0.05).toDecimalPlaces(0);
+
+//   return {
+//     subTotal: subTotal_d.toNumber(),
+//     tax: tax_d.toNumber(),
+//     contractTotal: subTotal_d.add(tax_d).toNumber(),
+//   };
+// };
+
+// const calcPrice = (state_invoice: Tstate_invoice) => {
+//   const invoice = state_invoice;
+
+//   const {
+//     //
+//     retainage,
+//     deduction,
+//     writeOffDeposit,
+//     minusRetainage,
+//     minusDeduction,
+//     minusWriteOffDeposit,
+//   } = invoice;
+
+//   const totals_num = calcTotals(invoice.rowArr);
+//   let price_d = new Decimal(totals_num.contractTotal);
+
+//   minusRetainage && (price_d = price_d.sub(retainage || 0));
+//   minusDeduction && (price_d = price_d.sub(deduction || 0));
+//   minusWriteOffDeposit && (price_d = price_d.sub(writeOffDeposit || 0));
+
+//   const price = price_d.toNumber();
+
+//   return price;
+// };
+
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// ========================================================================

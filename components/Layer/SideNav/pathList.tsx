@@ -426,6 +426,11 @@ const sidePathList: TsidePathList = {
           path: path01 + '/todoList',
           erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
+        {
+          label: '會計收款管理',
+          path: path01 + '/collection',
+          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
+        },
         // {
         //   label: '新增派工單',
         //   path: path01 + '/addDispatch',
@@ -520,26 +525,26 @@ const sidePathList: TsidePathList = {
       path01,
       list: [
         {
-          label: '會計',
-          path: path01 + '/undefined',
-          erpFeature: devPass,
+          label: '收款管理',
+          path: path01 + '/collection',
+          erpFeature: [accountingDepartment],
         },
-        {
-          label: 'foo',
-          erpFeature: devPass,
-          list: [
-            {
-              label: 'foo',
-              path: path01 + '/undefined',
-              erpFeature: devPass,
-            },
-            {
-              label: 'foo',
-              path: path01 + '/undefined',
-              erpFeature: devPass,
-            },
-          ],
-        },
+        // {
+        //   label: 'foo',
+        //   erpFeature: devPass,
+        //   list: [
+        //     {
+        //       label: 'foo',
+        //       path: path01 + '/undefined',
+        //       erpFeature: devPass,
+        //     },
+        //     {
+        //       label: 'foo',
+        //       path: path01 + '/undefined',
+        //       erpFeature: devPass,
+        //     },
+        //   ],
+        // },
       ],
     };
   })(),
@@ -623,15 +628,15 @@ const topPathList: TtopPathListConfig[] = [
     },
     erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
   },
-  // {
-  //   icon: icon_project,
-  //   label: '會計部',
-  //   path01: sidePathList['/accounting'].path01,
-  //   href: {
-  //     pathname: sidePathList['/accounting'].path01 + '/contractList',
-  //   },
-  //   erpFeature: [accountsReceivable],
-  // },
+  {
+    icon: icon_project,
+    label: '會計部',
+    path01: sidePathList['/accounting'].path01,
+    href: {
+      pathname: sidePathList['/accounting'].path01 + '/collection',
+    },
+    erpFeature: [accountsReceivable],
+  },
 ];
 
 export default sidePathList;

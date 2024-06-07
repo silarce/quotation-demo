@@ -27,12 +27,12 @@ type TapiData = {
 };
 
 type Tconfig = {
-  key: string;
+  key: string; // 要取出資料的key
   width?: React.CSSProperties['width'];
   flex?: React.CSSProperties['flex'];
 
   thead: {
-    label: React.ReactNode;
+    label: React.ReactNode; // 表頭的文字
     className?: string;
     style?: React.CSSProperties;
   };
@@ -40,6 +40,11 @@ type Tconfig = {
   tbody?: {
     className?: string;
     style?: React.CSSProperties;
+
+    //  reducer
+    //  有時取得的資料需要經過加工再顯示出來
+    //  或是取得的資料有多層，要取得下一層或下下一層的資料並顯示
+    //  就使用reducer，return要顯示的資料
     reducer?: (value: unknown) => React.ReactNode;
   };
 };
@@ -53,8 +58,8 @@ type TsearchInputSelProps = TsearcbBarProps['inputSelPropsArr'][number];
 type TselectorProps<Tdata extends TapiData, P extends { [key: string]: boolean } = { [key: string]: boolean }> = {
   useInfinit?: TuseInfinite;
   useNoMeta?: TuseNoMeta;
-  configArr: readonly Tconfig[];
   selectedKey: keyof Tdata;
+  configArr: readonly Tconfig[];
   onRowClick?: (props: { data: Tdata; isRemove: boolean }) => void;
   //
   dataType?: Tdata; // 就只是為了方便取得泛型的型別

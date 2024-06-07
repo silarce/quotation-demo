@@ -504,6 +504,11 @@ export const useGetContract = (customParams?: Tparams) => {
   };
 };
 
+export const useContract_infinite_2 = createUseInfinite<TgetContracts>({
+  apiClient: apiGetContract,
+  errTitle: '取得合約資料失敗',
+});
+
 export const useContract_infinite = ({ customParams }: { customParams?: Tparams }) => {
   /**resetCount就只是用來使呼叫reset後，若page沒有改變的話，還是可以觸發update*/
   const [resetCount, setResetCount] = useState(0);

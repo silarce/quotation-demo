@@ -18,6 +18,12 @@ export type TquotationStatus = 'Budget' | 'Bidding' | 'Contracting' | 'Contract'
 
 export type TdeliveryStatusInstallationItem = '門片' | '馬達' | '支軌';
 
+export type TinvoiceStatus = '已開立' | '已作廢';
+
+export type TinvoiceType = '請款' | '訂金';
+export type TaccountantPaymentType = '匯款' | '票據' | '現金';
+export type TinvoiceRetainageType = '含稅' | '未稅';
+
 // =============================================================================
 export type Tparams = {
   order?: 'ASC' | 'DESC';
@@ -2186,7 +2192,7 @@ export type TquotationContractDto = {
   /**出庫單ID */
   engineeringDeliveryListId: string | null;
   /**應收帳款明細 */
-  accountReceivable?: TaccountReceivableDto; // populate
+  accountReceivable?: TaccountsReceivableDto; // populate
   accountReceivableId: string | null;
   //
   //
@@ -3355,34 +3361,67 @@ export type TupdateEngineeringDeliveryListDto = {
   notes: string;
 };
 
+export type TcompletedProductDto = {
+  // 這個型別不是表，沒有id
+  // 產品id
+  productId: string;
+  // 完成數量
+  completedQuantity: number;
+  // 完成數量金額
+  completedPayment: number;
+};
+
 // 應收帳款明細
-export type TaccountReceivableDto = {
+export type TaccountsReceivableDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  // 估價日期
+  // '估價日期'
   valuationDate: string | null;
-  // 付清日期
+  // '付清日期'
   payOffDay: string | null;
-  // 履約保證票
+  // '履約保證票'
   performanceBond: boolean;
-  // 訂金款保證票
+  // '訂金款保證票'
   depositGuaranteeTicket: boolean;
-  // 保固票
+  // '保固票'
   warrantyTicket: boolean;
-  // 異常燈號(工作表已開立，合約尚未簽回)
+  // '異常燈號(工作表已開立，合約尚未簽回)'
   hasNoContract: boolean;
-  // 提醒燈號(已出具證明，尚未收足款項)
+  // '提醒燈號(已出具證明，尚未收足款項)'
   hasUncollectedAmounts: boolean;
-  // 已出貨，因故尚未安裝
+  // '已出貨，因故尚未安裝'
   hasNotInstall: boolean;
-  // 請款比例
-  paymentRatio: TpaymentRatioDto[];
-  contract: TquotationContractDto;
-  legacyContract: TlegacyContractDto;
-  accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
-  accountant: TaccountantDto | null;
+  // '已完工'
   isDone: boolean;
+  // '放款票期'
+  paymentTenor: string | null;
+  // 所屬合約
+  contract: TquotationContractDto | null;
+  // 所屬舊合約
+  legacyContract: TlegacyContractDto | null;
+  // 扣款明細 // 棄用?
+  accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
+  // 發票記錄
+  invoices: TaccountsReceivableInvoiceDto[] | null;
+  // 合約總金額(會因為追加而增加)
+  contractTotalPrice: number;
+  // 已收帳款金額(目前總計請款)
+  receivedPayment: number;
+  // 手續費總合計
+  totalFee: number;
+  // 總扣款金額
+  totalDeduction: number;
+  // 未收款金額
+  unpaidPayment: number;
+  // 尾款
+  finalPayment: number | null;
+  // 累計完成項目細節
+  totalCompletedProduct: TcompletedProductDto | null;
+  // 目前請款合計(未稅)
+  totalPayment: number;
+  // 目前合計請款營業稅額
+  totalTax: number;
 };
 
 export type TcreateAccountReceivableDto = {
@@ -3403,11 +3442,11 @@ export type TcreateAccountReceivableDto = {
   // 已出貨，因故尚未安裝
   hasNotInstall: boolean;
   // 收款明細
-  accountantId: string[] | null;
+  // accountantId: string[] | null;
   // 扣款明細
-  accountReceivableDeduction: TcreateAccountReceivableDeductionDto[] | null;
+  // accountReceivableDeduction: TcreateAccountReceivableDeductionDto[] | null;
   // 發票紀錄
-  invoices: TcreateAccountReceivableInvoiceDto[] | null;
+  // invoices: TcreateAccountReceivableInvoiceDto[] | null;
   // 所屬合約Id;
   contractId: string | null;
   // 所屬合約Id;
@@ -3417,7 +3456,7 @@ export type TcreateAccountReceivableDto = {
 };
 
 export type TupdateAccountReceivableDto = Pick<
-  TaccountReceivableDto,
+  TaccountsReceivableDto,
   | 'valuationDate'
   | 'payOffDay'
   | 'performanceBond'
@@ -3434,50 +3473,156 @@ export type TaccountsReceivableInvoiceDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  /** 發票日期 */
-  invoiceDate: string;
-  /** 發票號碼 */
-  invoiceNumber: string;
-  price: number;
-  note: string | null;
-  invoiceStatus: '已開立' | '已作廢';
+  type: TinvoiceType; // '請款' | '訂金';
+  // 請款期數
   period: number | null;
-  /** 所屬應收帳款ID */
-  accountsReceivableId: string | null;
-  accountsReceivable?: TaccountReceivableDto | null;
-
+  // 訂金期數
+  depositPeriod: number | null;
+  // 日期
+  invoiceDate: string;
+  // 發票號碼
+  invoiceNumber: string;
+  // 發票金額
+  price: number;
+  // 發票狀態
+  invoiceStatus: TinvoiceStatus;
+  // 發票備註
+  note: string | null;
+  // 發票折讓金額
+  discountPayment: number;
+  // 關聯收款紀錄
   accountantList: TaccountantDto[];
+  // 所屬應收帳款Id
+  accountsReceivableId: string | null;
+  // 所屬應收帳款
+  accountsReceivable: TaccountsReceivableDto;
+  // 每期完成項目細節 // 後端會以JSON的形式記錄 // 前端在使用上應該沒有差別
+  completedProduct: TcompletedProductDto[] | null;
+
+  // 保留款
+  retainage: number | null;
+  // 扣款
+  deduction: number | null;
+  // 沖訂金
+  writeOffDeposit: number | null;
+
+  // 是否扣掉保留款
+  isRetainage: boolean;
+  // 是否扣掉扣款
+  isDeduction: boolean;
+  // 是否扣掉沖訂金
+  isWriteOffDeposit: boolean;
+
+  retainageType: TinvoiceRetainageType | null; // 保留款類型
+  allowance: number | null; // 折讓
 };
 
 export type TcreateAccountReceivableInvoiceDto = Pick<
   TaccountsReceivableInvoiceDto,
-  'invoiceDate' | 'invoiceNumber' | 'price' | 'note'
+  | 'invoiceDate'
+  //
+  | 'invoiceNumber'
+  | 'price'
+  | 'note'
+  | 'type'
+  | 'isRetainage'
+  | 'isDeduction'
+  | 'isWriteOffDeposit'
+  | 'retainageType'
+  | 'allowance'
+  | 'retainage'
+  | 'deduction'
+  | 'writeOffDeposit'
+  | 'completedProduct'
 >;
 
-export type TupdateAccountReceivableInvoiceDto = Pick<
-  TaccountsReceivableInvoiceDto,
-  'invoiceDate' | 'invoiceNumber' | 'price' | 'note'
-> & {
-  // 關聯的收款紀錄Id
-  accountants: string[];
-};
+// export type TupdateAccountReceivableInvoiceDto = Pick<
+//   TaccountsReceivableInvoiceDto,
+//   | 'invoiceDate'
+//   | 'note'
+//   //
+//   | 'completedProduct'
+//   | 'retainage'
+//   | 'deduction'
+//   | 'writeOffDeposit'
+//   | 'isRetainage'
+//   | 'isDeduction'
+//   | 'isWriteOffDeposit'
+//   | 'price'
+//   | 'invoiceNumber'
+// > & {
+//   // 關聯的收款紀錄Id
+//   accountants: string[];
+// };
+export type TupdateAccountReceivableInvoiceDto = Partial<
+  Pick<
+    TaccountsReceivableInvoiceDto,
+    | 'invoiceDate'
+    | 'note'
+    //
+    | 'completedProduct'
+    | 'retainage'
+    | 'deduction'
+    | 'writeOffDeposit'
+    | 'isRetainage'
+    | 'isDeduction'
+    | 'isWriteOffDeposit'
+    | 'price'
+    | 'invoiceNumber'
+    | 'retainageType'
+    | 'allowance'
+    | 'note'
+  > & {
+    // 關聯的收款紀錄Id
+    accountants: string[];
+  }
+>;
 
 export type TaccountantDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  paymentType: '匯款' | '票據' | '現金'; // 收款類型
-  accountingNumber: string; // 編號/存入帳號
+
+  paymentType: TaccountantPaymentType; // 收款類型
+  accountingNumber: string | null; // 存入帳號
+
+  insertDate: string | null; // 匯入日期 // 收款日 // 收票日
+  vendorName: string | null; // 廠商名稱
+
   price: number; // 金額
   notes: string | null; // 備註
+  noteNumber: string | null; // 票據號碼
+  fee: number; // 手續費
+
   billSerialNumber: string | null; // 收入傳票序號
   noteMaturityDate: string | null; // 票據到期日
-  invoice: TaccountsReceivableInvoiceDto[] | null;
-  noteNumber: string | null; // 票據號碼
+  invoice: TaccountsReceivableInvoiceDto[] | null; // 基本上只會放一個發票
+  //
+  importAccountingNumber: string | null; // 匯入帳號 // 匯款來源帳號
+  order: number; // 排序用的
+  //
+  // 扣款明細
+  accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
 };
 
-export type TcreateAccountantDto = Omit<TaccountantDto, 'id' | 'createdAt' | 'updatedAt' | 'noteMaturityDate'> & {
-  noteMaturityDate?: string | null;
+export type TcreateAccountantDto = Pick<
+  TaccountantDto,
+  'paymentType' | 'accountingNumber' | 'insertDate' | 'vendorName' | 'price' | 'notes' | 'fee'
+> & {
+  noteMaturityDate?: string | null; // 票據到期日
+};
+
+export type TupdateAccountantDto = Partial<
+  TcreateAccountantDto & {
+    accountsReceivableDeduction: Partial<TaccountsReceivableDeductionDto>[];
+  }
+>;
+
+export type TupdateAccountantDeductionDto = {
+  fee?: number | null;
+  // 沒有改也必須要送，所以沒有改就是送原本的
+  accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
+  order?: number;
 };
 
 /**扣款明細 */
@@ -3486,28 +3631,26 @@ export type TaccountsReceivableDeductionDto = {
   createdAt: string;
   updatedAt: string;
   itemName: string; // 項目
-  period: number; // 期數
+  // period: number; // 期數 // 棄用
   detailedAmount: number; // 明細金額
   accountsReceivableId: string; // 所屬應收帳款Id
-  accountsReceivable?: TaccountReceivableDto | null; // 所屬應收帳款
+  accountsReceivable?: TaccountsReceivableDto | null; // 所屬應收帳款
 };
 
-export type TcreateAccountReceivableDeductionDto = Pick<
-  TaccountsReceivableDeductionDto,
-  'itemName' | 'period' | 'detailedAmount'
->;
+export type TcreateAccountReceivableDeductionDto = Pick<TaccountsReceivableDeductionDto, 'itemName' | 'detailedAmount'>;
 
-export type TupdateAccountReceivableDeductionDto = Partial<TcreateAccountReceivableDeductionDto> & {
-  id: string; // 不提供時將此筆視為新增資料
+export type TupdateAccountReceivableDeductionDto = {
+  id?: string; // ID, 不提供時將此筆視為新增資料
+  itemName: string;
+  detailedAmount: number;
 };
 
 export type TfinalProduct = {
-  //源合約產品包含item deliveryStatus productPayment(主產品數量已扣追減)
-  // finalRootContractProduct: TquotationProductDto[];
-  // finalRootContractProduct: TquotationProductItemDto[];
-  finalAppendContractProductsItems: TquotationProductItemDto[];
   //追加合約產品包含item deliveryStatus productPayment
-  // finalAppendContractProducts: TquotationProductItemDto[];
+  finalAppendContractProductsItems: TquotationProductItemDto[];
+
+  //源合約產品包含item deliveryStatus productPayment(主產品數量已扣追減)
+  // finalAppendContractProductsItems已經整合進這裡面了
   finalRootContractProductItems: TquotationProductItemDto[];
 };
 
@@ -3517,40 +3660,16 @@ export type TaccountsReceivableProductPaymentDto = {
   createdAt: string;
   updatedAt: string;
 
-  // //  '期數'
-  // period: number;
-  // //  '請款比例(完成數量)'
-  // paymentRatio: string | null;
-  // //  '發票id'
-  // invoiceId: string | null;
-  // //  '發票' 要用的時候在跟Gina要型別吧
-  // // invoice: AccountsReceivableInvoiceDto;
-  // //  '關聯產品itemId'
-  // productItemId: string | null;
-  // //  '關聯產品itemId'
-  // productItem: TquotationProductItemDto;
-  // //  '完成項目'
-  // // completeItemStatus: EngineeringDeliveryStatusDto[];
-  // completeItemStatus: TdeliveryStatusDto[];
-
-  // @ApiProperty({ description: '請款比例(完成數量)' })
+  // 請款比例(完成數量)
   paymentRatio: string | null;
-
-  // @ApiProperty({ description: '發票id' })
+  // 發票id
   invoiceId: string | null;
-
-  // @ApiProperty({ description: '發票' })
+  // 發票
   invoice: TaccountsReceivableInvoiceDto | undefined;
-
-  // @ApiProperty({ description: '關聯產品itemId' })
+  // 關聯產品itemId
   productItemId: string | null;
-
-  // @ApiProperty({ description: '關聯產品item' })
+  //關聯產品item
   productItem: TquotationProductItemDto | undefined;
-
-  // @ApiProperty({ description: '完成項目' })
-  // completeItemStatus: TengineeringDeliveryStatusDto[];
-  completeItemStatus: TengineeringDeliveryStatusDto[];
 };
 
 export type TcreateAccountReceivableProductPaymentDto = {

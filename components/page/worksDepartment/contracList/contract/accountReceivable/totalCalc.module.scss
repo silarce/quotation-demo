@@ -1,0 +1,41 @@
+.totalCalc {
+  width: 575px;
+  border: solid 1px theme("colors.border");
+  hr {
+    border-color: theme("colors.border");
+    border-width: 2px;
+  }
+}
+
+.caption {
+  padding: 15px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  background-color: theme("colors.bgc01");
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 80px 100px auto;
+  align-items: center;
+  padding: 10px 20px;
+  justify-items: center;
+  > * {
+    font-size: 16px;
+  }
+
+  > *:nth-last-child(1) {
+    justify-self: end;
+  }
+}
+
+.latestCell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  .parentheses {
+    position: absolute;
+    right: -10px;
+  }
+}
