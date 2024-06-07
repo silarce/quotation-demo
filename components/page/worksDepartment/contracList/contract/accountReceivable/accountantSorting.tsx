@@ -238,38 +238,40 @@ export default function AccountantSorting({
         {/*  */}
         {/*  */}
 
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          modifiers={[restrictToVerticalAxis]}
-          //
-          onDragStart={handle_onDragStart}
-          onDragEnd={handle_onDragEnd}
-          onDragOver={handle_onDragOver}
-        >
-          {Object.values(stateList).map((state) => {
-            const invoiceId = state.invoice.id;
+        <div className={scss.dndContainer}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            modifiers={[restrictToVerticalAxis]}
+            //
+            onDragStart={handle_onDragStart}
+            onDragEnd={handle_onDragEnd}
+            onDragOver={handle_onDragOver}
+          >
+            {Object.values(stateList).map((state) => {
+              const invoiceId = state.invoice.id;
 
-            return (
-              <Group_Dnd
-                key={invoiceId}
-                state={state}
-                disabled={disabled}
-                //
-                activeAccountandId={activeAccountant?.id}
-              />
-            );
-          })}
+              return (
+                <Group_Dnd
+                  key={invoiceId}
+                  state={state}
+                  disabled={disabled}
+                  //
+                  activeAccountandId={activeAccountant?.id}
+                />
+              );
+            })}
 
-          <DragOverlay>
-            <Row className={scss.activeState}>
-              <span>{activeAccountant?.insertDate}</span>
-              <span>{activeAccountant?.importAccountingNumber}</span>
-              <span>{activeAccountant?.noteMaturityDate}</span>
-              <span>{activeAccountant?.price}</span>
-            </Row>
-          </DragOverlay>
-        </DndContext>
+            <DragOverlay>
+              <Row className={scss.activeState}>
+                <span>{activeAccountant?.insertDate}</span>
+                <span>{activeAccountant?.importAccountingNumber}</span>
+                <span>{activeAccountant?.noteMaturityDate}</span>
+                <span>{activeAccountant?.price}</span>
+              </Row>
+            </DragOverlay>
+          </DndContext>
+        </div>
         {/*  */}
         {/*  */}
         {/*  */}
