@@ -170,6 +170,41 @@ export default function AccountReceivable() {
   //
   //
   //
+
+  const reaPostAccountReceivable = async () => {
+    if (!contractId) {
+      return myAlert.info({ title: '沒有合約編號' });
+    }
+
+    const emptyBody: TcreateAccountReceivableDto = {
+      valuationDate: null,
+      payOffDay: null,
+      performanceBond: false,
+      depositGuaranteeTicket: false,
+      warrantyTicket: false,
+      hasNoContract: false,
+      hasUncollectedAmounts: false,
+      hasNotInstall: false,
+      // accountantId: [],
+      // accountReceivableDeduction: [],
+      // invoices: [],
+      contractId: contractId,
+      legacyContractId: null,
+      isDone: false,
+    };
+
+    try {
+      setIsFetching_req(true);
+      await apiPostAccountReceivable(emptyBody);
+      update_contract();
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '新增應收帳款明細失敗', content: err.message });
+    } finally {
+      setIsFetching_req(false);
+    }
+  };
+
   // region reqAddInvoice
   // const reqAddInvoice = async (type: TcreateAccountReceivableInvoiceDto['type'], invoiceNumber: string) => {
   //   if (!accountReceivable?.id) {
@@ -507,6 +542,12 @@ export default function AccountReceivable() {
 
   isFetching = isFetching_contract || isFetching_finalProduct || isFetching_req;
 
+  const panelList_01: TpanelList = [
+    { type: 'myButton', label: '建立應收帳款明細', onClick: () => reaPostAccountReceivable() },
+  ];
+
+  const panelList = panelList_01;
+
   // --------------------------------------------------------------------------
 
   // region useEffect
@@ -526,7 +567,7 @@ export default function AccountReceivable() {
   if (!accountReceivable) {
     return (
       <SubLayer isLoading_all={isFetching}>
-        <PageHeader panelList={[]} contractNumber={engineeringContact?.contractNumber ?? ''} />
+        <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
         <EmptyMain />
       </SubLayer>
     );

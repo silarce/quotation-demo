@@ -358,6 +358,7 @@ const Tfoot = ({
       <div className={scss.cell} style={configList['deductionTotal'].style}>
         {deductionTotal.toLocaleString()}
       </div>
+      <div className={scss.cell} style={configList['btn'].style} />
     </Row>
   );
 };
