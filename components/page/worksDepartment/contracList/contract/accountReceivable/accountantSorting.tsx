@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, forwardRef } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
+import Decimal from 'decimal.js';
 
 // gear
 import TopBar from './ui/topBar';
@@ -127,6 +128,27 @@ export default function AccountantSorting({
   // region props
 
   const sensors = useSensors(useSensor(PointerSensor));
+
+  const { total_invoice, total_accountant, amountNotCollected } = useMemo(() => {
+    let total_invoice_d = new Decimal(0);
+    let total_accountant_d = new Decimal(0);
+
+    invoiceArr.forEach((invoice) => {
+      const { price, accountantList } = invoice;
+
+      total_invoice_d = total_invoice_d.add(price || 0);
+
+      accountantList.forEach((accountant) => {
+        total_accountant_d = total_accountant_d.add(accountant.price || 0);
+      });
+    });
+
+    return {
+      total_invoice: total_invoice_d.toNumber().toLocaleString(),
+      total_accountant: total_accountant_d.toNumber().toLocaleString(),
+      amountNotCollected: total_invoice_d.minus(total_accountant_d).toNumber().toLocaleString(),
+    };
+  }, [invoiceArr]);
 
   // -----------------------------------------------------------------------------
 
@@ -281,7 +303,7 @@ export default function AccountantSorting({
             <Row>
               <span></span>
               <span>合計</span>
-              <span>20000</span>
+              <span>{total_invoice}</span>
             </Row>
           </Left>
           <Right>
@@ -289,7 +311,7 @@ export default function AccountantSorting({
               <span></span>
               <span></span>
               <span>合計</span>
-              <span>50000</span>
+              <span>{total_accountant}</span>
             </Row>
           </Right>
         </Group>
@@ -298,18 +320,18 @@ export default function AccountantSorting({
 
         <Group className={scss['total']}>
           <Left>
-            <Row>
+            {/* <Row>
               <span></span>
               <span>合計</span>
               <span>20000</span>
-            </Row>
+            </Row> */}
           </Left>
           <Right>
             <Row>
               <span></span>
               <span></span>
               <span>合計</span>
-              <span>50000</span>
+              <span>{amountNotCollected}</span>
             </Row>
           </Right>
         </Group>
