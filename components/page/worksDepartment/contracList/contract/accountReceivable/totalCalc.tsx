@@ -26,7 +26,6 @@ export default function TotalCalc({
   //
   className,
   accountReceivable,
-  valueList = fakeData,
 }: Tprops) {
   return (
     <div className={classNames(scss.totalCalc, className)}>
@@ -132,15 +131,4 @@ const Parentheses = ({ turn }: { turn?: boolean }) => {
       </g>
     </svg>
   );
-};
-
-// region fakeData
-
-const fakeData: TvalueList = {
-  contractTotalPrice: '111',
-  collectedAmount: '22222',
-  deductionAmount: '5555',
-  uncollectedAmount: '444',
-  finalPayment: '777',
-  finalPayment2: '888',
 };
