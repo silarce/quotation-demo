@@ -1,238 +1,273 @@
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import moment from 'moment';
 
 import scss from './profile.module.scss';
 
-// ========================================================================
-
-type TcontrolItem = {
-  value: string;
-  onChange?: (str: string) => void;
-  onChange_date?: (str: string) => void;
-};
-
-type Tcontrol = {
-  // left
-  projectName: TcontrolItem; // 工程名稱
-  contractor: TcontrolItem; // 承包商
-  companyName: TcontrolItem; // 公司名稱
-  contactPerson: TcontrolItem; // 聯絡人
-  businessIdNumber: TcontrolItem; // 統一編號
-  companyAddress: TcontrolItem; // 公司地址
-  companyPhoneNumber: TcontrolItem; // 公司電話
-  projectAddress: TcontrolItem; // 工程地點
-  projectPhoneNumber: TcontrolItem; // 工地電話
-  // right
-  warrantyPeriod: TcontrolItem; // 保固期間
-  projectNumber: TcontrolItem; // 工程編號
-  valuationDate: TcontrolItem; // 估價日
-  paymentDate: TcontrolItem; // 付清日
-};
-
-export type { Tcontrol as Tcontrol_profile };
+// type
+import type { TengineeringContactDto } from 'js/api/dtoTypes';
 
 // ========================================================================
 
-export default function Profile({
-  //
-  control,
-  disabled,
-}: {
-  control: Tcontrol;
-  disabled?: boolean;
-}) {
+type TvalueList = {
+  projectName: string;
+  projectContent: string;
+
+  constructionSiteContactNumber: string;
+  constructionSiteFaxNumber: string;
+  projectPrincipal: string;
+  constructionSitePrincipalContactNumber: string;
+  wholeAddress: string;
+
+  projectNumber: string;
+  contractor: string;
+  contractorPrincipal: string;
+  contractorContactNumber: string;
+  contractorFaxNumber: string;
+
+  contactInfo: {
+    contactPerson: string;
+    contactNumber: string;
+  }[];
+};
+
+type Tprops = {
+  valueList: TvalueList;
+};
+
+export type { Tprops as Tprops_profile };
+
+// ========================================================================
+
+const config: TinputSelProps = {
+  disabled: true,
+  showBaseline: 'invisible',
+  captionStyle: {
+    width: 100,
+  },
+};
+
+const config2: TinputSelProps = {
+  ...config,
+  captionStyle: {
+    ...config.captionStyle,
+    width: 140,
+  },
+};
+
+// region START
+export default function Profile({ valueList }: Tprops) {
+  const {
+    projectName,
+    projectContent,
+    constructionSiteContactNumber,
+    constructionSiteFaxNumber,
+    projectPrincipal,
+    constructionSitePrincipalContactNumber,
+    wholeAddress,
+    projectNumber,
+    contractor,
+    contractorPrincipal,
+    contractorContactNumber,
+    contractorFaxNumber,
+    contactInfo,
+  } = valueList;
+
+  // region RENDER
   return (
-    <div>
-      <div className={scss.profileGrid}>
-        {/* left */}
-        <div className={scss.left}>
-          {/*  */}
-          {leftTopKeys.map((key, index) => {
-            const { label } = config[key];
+    <div className={scss.container}>
+      {/* // region left */}
+      <div className={scss.left}>
+        <InputSel
+          {...config}
+          caption="工程名稱"
+          className="col-span-2"
+          inputProps={{
+            props: {
+              value: projectName,
+            },
+          }}
+        />
+        <InputSel
+          {...config}
+          caption="工程內容"
+          className="col-span-2"
+          inputProps={{
+            props: {
+              value: projectContent,
+            },
+          }}
+        />
 
-            return (
-              <div key={index} className={scss.span2}>
-                <InputSel
-                  className={scss.inputSel}
-                  wrapperStyle={{ gap }}
-                  caption={label}
-                  captionClassName={scss.caption}
-                  disabled={control[key].onChange ? disabled : true}
-                  showBaseline="auto"
-                  inputProps={{
-                    props: {
-                      value: control[key].value,
-                      placeholder: '',
-                      onChange: (e) => {
-                        control[key].onChange?.(e.target.value);
-                      },
-                    },
-                  }}
-                />
-              </div>
-            );
-          })}
-          {/*  */}
+        <hr className="col-span-2" />
 
-          {leftBottomKeys.map((key, index) => {
-            const { label, textaresProps } = config[key];
+        <InputSel
+          {...config}
+          caption="工地電話"
+          inputProps={{
+            props: {
+              value: constructionSiteContactNumber,
+            },
+          }}
+        />
+        <InputSel
+          {...config2}
+          caption="工地傳真"
+          inputProps={{
+            props: {
+              value: constructionSiteFaxNumber,
+            },
+          }}
+        />
+        <InputSel
+          {...config}
+          caption="工程負責人"
+          inputProps={{
+            props: {
+              value: projectPrincipal,
+            },
+          }}
+        />
+        <InputSel
+          {...config2}
+          caption="工程負責人電話"
+          inputProps={{
+            props: {
+              value: constructionSitePrincipalContactNumber,
+            },
+          }}
+        />
+        <InputSel
+          {...config}
+          caption="工程地點"
+          inputProps={{
+            props: {
+              value: wholeAddress,
+            },
+          }}
+        />
+        <hr className="col-span-2" />
 
-            let props: TinputSelProps = {
-              inputProps: {
+        {contactInfo.map((info, index) => {
+          const indexNumber = String(index + 1).padStart(2, '0');
+
+          return (
+            <InputSel
+              key={index}
+              {...config}
+              caption={`聯絡人${indexNumber}`}
+              className="col-span-2"
+              inputProps={{
                 props: {
-                  value: control[key].value,
-                  placeholder: '',
-                  onChange: (e) => {
-                    control[key].onChange?.(e.target.value);
-                  },
+                  value: `${info.contactPerson} / ${info.contactNumber}`,
                 },
-              },
-            };
+              }}
+            />
+          );
+        })}
 
-            if (textaresProps) {
-              props = {
-                textareaProps: {
-                  props: {
-                    value: control[key].value,
-                    placeholder: '',
-                    onChange: (e) => {
-                      control[key].onChange?.(e.target.value);
-                    },
-                  },
-                  ...textaresProps,
-                },
-              };
-            }
+        {/* left close */}
+      </div>
 
-            return (
-              <div key={index} className={scss.span1}>
-                <InputSel
-                  //
-                  wrapperStyle={{ gap }}
-                  caption={label}
-                  captionClassName={scss.caption}
-                  disabled={control[key].onChange ? disabled : true}
-                  showBaseline="auto"
-                  {...props}
-                />
-              </div>
-            );
-          })}
-
-          {/*  */}
-        </div>
-        {/* right */}
-        <div className={scss.right}>
-          {rightKeys.map((key, index) => {
-            const { label } = config[key];
-
-            const { value, onChange, onChange_date } = control[key];
-
-            return (
-              <div key={index} className={scss.span1}>
-                <InputSel
-                  wrapperStyle={{ gap }}
-                  caption={label}
-                  captionClassName={scss.caption}
-                  disabled={onChange || onChange_date ? disabled : true}
-                  showBaseline="auto"
-                  inputProps={
-                    onChange
-                      ? {
-                          props: {
-                            value: value,
-                            placeholder: '',
-                            onChange: (e) => {
-                              onChange?.(e.target.value);
-                            },
-                          },
-                        }
-                      : undefined
-                  }
-                  datePickerProps={
-                    onChange_date
-                      ? {
-                          props: {
-                            value: value ? moment(value) : null,
-                            onChange: (date) => {
-                              onChange_date(date ? date.toISOString() : '');
-                            },
-                          },
-                        }
-                      : undefined
-                  }
-                />
-              </div>
-            );
-          })}
-        </div>
+      {/* // region right */}
+      <div className={scss.right}>
+        <InputSel
+          {...config}
+          caption="工程編號"
+          inputProps={{
+            props: {
+              value: projectNumber,
+            },
+          }}
+        />
+        <InputSel
+          {...config}
+          caption="承包商"
+          inputProps={{
+            props: {
+              value: contractor,
+            },
+          }}
+        />
+        <InputSel
+          {...config}
+          caption="負責人"
+          inputProps={{
+            props: {
+              value: contractorPrincipal,
+            },
+          }}
+        />
+        <InputSel
+          {...config}
+          caption="公司電話"
+          inputProps={{
+            props: {
+              value: contractorContactNumber,
+            },
+          }}
+        />
+        <InputSel
+          {...config}
+          caption="公司傳真"
+          inputProps={{
+            props: {
+              value: contractorFaxNumber,
+            },
+          }}
+        />
       </div>
     </div>
   );
 }
 
 // ========================================================================
-const gap = '24px';
 
-const leftTopKeys: (keyof Tcontrol)[] = ['projectName', 'contractor', 'companyName'];
-const leftBottomKeys: (keyof Tcontrol)[] = [
-  'contactPerson',
-  'businessIdNumber',
-  'companyAddress',
-  'companyPhoneNumber',
-  'projectAddress',
-  'projectPhoneNumber',
-];
-const rightKeys: (keyof Tcontrol)[] = ['warrantyPeriod', 'projectNumber', 'valuationDate', 'paymentDate'];
+const createValueList_profile_engineeringContact = ({
+  engineeringContact,
+}: {
+  engineeringContact: TengineeringContactDto | undefined | null;
+}): TvalueList => {
+  const {
+    projectName = '',
+    projectContent = '',
+    zipCode = '',
+    county = '',
+    district = '',
+    address = '',
+    projectPrincipal = '',
+    constructionSitePrincipalContactNumber = '',
+    constructionSiteFaxNumber = '',
+    constructionSiteContactNumber = '',
+    projectNumber = '',
+    contractor = '',
+    contractorPrincipal = '',
+    contractorContactNumber = '',
+    contractorFaxNumber = '',
+    contactInfo,
+  } = engineeringContact ?? {};
 
-type Tconfig = {
-  [key: string]: {
-    label: string;
-    textaresProps?: TinputSelProps['textareaProps'];
+  const wholeAddress = `${zipCode} ${county}${district}${address}`;
+
+  const list: TvalueList = {
+    projectName,
+    projectContent,
+
+    constructionSiteContactNumber,
+    constructionSiteFaxNumber,
+    projectPrincipal,
+    constructionSitePrincipalContactNumber,
+    wholeAddress,
+
+    projectNumber,
+    contractor,
+    contractorPrincipal,
+    contractorContactNumber,
+    contractorFaxNumber,
+
+    contactInfo: contactInfo ?? [],
   };
+
+  return list;
 };
 
-const config: Tconfig = {
-  projectName: {
-    label: '工程名稱',
-  },
-  contractor: {
-    label: '承包商',
-  },
-  companyName: {
-    label: '公司名稱',
-  },
-  contactPerson: {
-    label: '聯絡人',
-  },
-  businessIdNumber: {
-    label: '統一編號',
-  },
-  companyAddress: {
-    label: '公司地址',
-    textaresProps: {},
-  },
-  companyPhoneNumber: {
-    label: '公司電話',
-  },
-  projectAddress: {
-    label: '工程地點',
-    textaresProps: {},
-  },
-  projectPhoneNumber: {
-    label: '工地電話',
-  },
-  warrantyPeriod: {
-    label: '保固期間',
-  },
-  projectNumber: {
-    label: '工程編號',
-  },
-  valuationDate: {
-    label: '估價日',
-  },
-  paymentDate: {
-    label: '付清日',
-  },
-};
+export { createValueList_profile_engineeringContact };

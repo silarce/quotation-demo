@@ -17,7 +17,7 @@ import {
   Tparams,
   TaccountantDto,
   //
-  useGetAccountant,
+  useGetAccountant_infinite,
 } from 'js/api/api_accountant';
 
 // utils
@@ -79,7 +79,7 @@ export default function PaymentRecordSelector({
     },
   };
 
-  const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useGetAccountant({ customParams: params });
+  const { dataArr, viewRef_bottom, isLoadingPage1, reset } = useGetAccountant_infinite({ customParams: params });
 
   // ------------------------------------------------------------------
   // ------------------------------------------------------------------

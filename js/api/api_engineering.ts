@@ -36,7 +36,7 @@ import type {
   TcreateEngineeringDeliveryStatusDto,
   TupdateEngineeringDeliveryListDto,
   TaccountsReceivableInvoiceDto,
-  TaccountReceivableDto,
+  TaccountsReceivableDto,
   TupdateAccountReceivableDto,
   TcreateAccountReceivableInvoiceDto,
   TupdateAccountReceivableInvoiceDto,
@@ -56,6 +56,7 @@ import type {
   TsubmitWorksheetProductsItemsDto,
   TreviewWorksheetProductsItemsDto,
   TdeliveryStatusInstallationItem,
+  TinvoiceType,
 } from './dtoTypes';
 
 export type {
@@ -83,7 +84,7 @@ export type {
   TengineeringDeliveryStatusDto as TdeliveryStatusDto,
   TupdateEngineeringDeliveryListDto,
   TaccountsReceivableInvoiceDto,
-  TaccountReceivableDto,
+  TaccountsReceivableDto as TaccountReceivableDto,
   TupdateAccountReceivableDto,
   TcreateAccountReceivableInvoiceDto,
   TupdateAccountReceivableInvoiceDto,
@@ -1068,7 +1069,7 @@ export const apiDeleteDeliveryStatus = ({ id, statusId }: { id: string; statusId
 // 應收帳款明細
 
 type TgetAccountReceivableDto = {
-  data: TaccountReceivableDto[];
+  data: TaccountsReceivableDto[];
   meta: TpageMetaDto;
 };
 
@@ -1092,14 +1093,14 @@ const apiGetAccountReceivable_id = async (id: string, params: Tparams) => {
   const api = `/engineering/account-receivable/${id}`;
 
   return axi
-    .get<TaccountReceivableDto>(api, { params })
+    .get<TaccountsReceivableDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
 /**取得應收帳款明細 by id */
 export const useGetAccountReceivable_id = (id: string, customeParams: Tparams) => {
-  const [res, setRes] = useState<TaccountReceivableDto>();
+  const [res, setRes] = useState<TaccountsReceivableDto>();
 
   const update = async (dynaParams: Tparams) => {
     const params = {
@@ -1123,13 +1124,25 @@ export const useGetAccountReceivable_id = (id: string, customeParams: Tparams) =
 };
 
 /**新增 應收帳款明細 account-receivable */
-export const apiPostAccountReceivable = async (body: TcreateAccountReceivableDto) => {
+export const apiPostAccountReceivable = async (
+  body: TcreateAccountReceivableDto,
+  {
+    callAlert = true,
+  }: {
+    callAlert?: boolean;
+  } = {}
+) => {
   const api = `/engineering/account-receivable`;
 
   return axi
-    .post<TaccountReceivableDto>(api, body)
+    .post<TaccountsReceivableDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((error) => {
+      const err = error as AxiosError;
+      callAlert && myAlert.err({ title: '新增應收帳款明細失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };
 
 /**更新 應收帳款明細 account-receivable */
@@ -1294,17 +1307,29 @@ export const useGetAccountReceivableAccountants = (
 
 /**新增 應收帳款 收款紀錄 account-receivable-accountant */
 export const apiPostAccountReceivableAccountant = async (
-  id: string,
+  id: string, // 應收帳款Id 可以在contract下找到accountReceivableId
   body: {
     accountantId: string[]; // 收款明細Id
-  }
+    type: TinvoiceType;
+  },
+  {
+    callAlert = true,
+  }: {
+    callAlert?: boolean;
+  } = {}
 ) => {
   const api = `/engineering/account-receivable/${id}/accountants`;
 
   return axi
     .post<TaccountantDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      callAlert && myAlert.err({ title: '匯入收款紀錄失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };
 
 /**刪除 應收帳款 收款紀錄關聯 account-receivable-accountant */
@@ -1392,9 +1417,24 @@ export const apiPostAccountReceivableDeduction = async (id: string, body: Tcreat
     .catch((err) => Promise.reject(err));
 };
 
+// 棄用
+// /**批量更新 應收帳款 扣款明細 account-receivable-deduction */
+// export const apiPatchAccountReceivableDeduction = async (id: string, body: TupdateAccountReceivableDeductionDto[]) => {
+//   const api = `/engineering/account-receivable/${id}/deduction`;
+
+//   return axi
+//     .patch(api, body)
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
+
 /**批量更新 應收帳款 扣款明細 account-receivable-deduction */
-export const apiPatchAccountReceivableDeduction = async (id: string, body: TupdateAccountReceivableDeductionDto[]) => {
-  const api = `/engineering/account-receivable/${id}/deduction`;
+export const apiPatchAccountReceivableDeduction_accountant = async (
+  id: string,
+  accountantId: string,
+  body: TupdateAccountReceivableDeductionDto[]
+) => {
+  const api = `/engineering/account-receivable/${id}/deduction/${accountantId}`;
 
   return axi
     .patch(api, body)
@@ -1423,6 +1463,8 @@ export const apiGetFinalProduct = async (contractId: string) => {
 };
 
 export const useGetFinalProduct = (contractId: string | undefined) => {
+  const [isFetching, setIsFetching] = useState(false);
+
   const [res, setRes] = useState<TfinalProduct>();
 
   const update = async () => {
@@ -1431,6 +1473,7 @@ export const useGetFinalProduct = (contractId: string | undefined) => {
     }
 
     try {
+      setIsFetching(true);
       const newRes = await apiGetFinalProduct(contractId);
 
       if (newRes) {
@@ -1441,6 +1484,8 @@ export const useGetFinalProduct = (contractId: string | undefined) => {
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '取得請款單資料失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
     }
 
     return undefined;
@@ -1449,6 +1494,7 @@ export const useGetFinalProduct = (contractId: string | undefined) => {
   return {
     data: res,
     update,
+    isFetching,
   };
 };
 
@@ -1673,6 +1719,44 @@ export const apiPatchEngineeringContactReviewAttachment = async (id: string, bod
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
       myAlert.err({ title: '審核工程聯絡單附件失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// ==============================================================================
+
+// region 要找時間整理一下拉
+
+export const apiPatchAccountantInvoice = (
+  {
+    accountReceivableId,
+    invoiceId,
+    accountantId,
+  }: {
+    accountReceivableId: string;
+    invoiceId: string;
+    accountantId: string;
+  },
+  {
+    callAlert,
+  }: {
+    callAlert?: boolean;
+  } = {}
+) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/accountant/${accountantId}`;
+
+  const body = {
+    invoiceId,
+  };
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      if (callAlert) {
+        myAlert.err({ title: '更新收款紀錄與發票關聯失敗', content: err.message });
+      }
 
       return Promise.reject(err);
     });
