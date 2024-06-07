@@ -188,9 +188,9 @@ export default function AccountantSorting({
   return (
     <div className={classNames(scss.accountantSorting, className)}>
       <TopBar caption="應收帳款管理">
-        <MyButton_v2 px="px22" py="py4">
+        {/* <MyButton_v2 px="px22" py="py4">
           新增折讓
-        </MyButton_v2>
+        </MyButton_v2> */}
 
         {disabled && (
           <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>

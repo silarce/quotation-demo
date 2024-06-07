@@ -198,9 +198,9 @@ export default function AccountantDetails({
   return (
     <div className={classNames(scss.container, className)}>
       <TopBar caption="已收款紀錄">
-        <MyButton_v2 px="px22" py="py4">
+        {/* <MyButton_v2 px="px22" py="py4">
           匯入收款
-        </MyButton_v2>
+        </MyButton_v2> */}
 
         {disabled && (
           <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
