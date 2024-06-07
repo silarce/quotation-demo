@@ -25,6 +25,8 @@ import type {
 
 import { Tinvoice_reduce, Tstate_invoice } from './invoiceTable';
 
+import { IconEdit, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
+
 // ==========================================================================
 
 type Tcenter = {
@@ -94,6 +96,7 @@ function InvoicePanel_pre(
     finalProdArr,
     totalsTotal,
     onPanelStateChange,
+    reqPatchInvoiceAllowance,
   }: {
     data_invoice?: Tinvoice_reduce;
     finalProdArr: TquotationProductDto[];
@@ -103,6 +106,7 @@ function InvoicePanel_pre(
       contractTotal: number;
     };
     onPanelStateChange?: (state_invoice: Tstate_invoice) => void;
+    reqPatchInvoiceAllowance?: (invoiceId: string, allowance: number) => void;
   },
   ref: React.ForwardedRef<TimperativeHandle_panel>
 ) {
@@ -201,6 +205,7 @@ function InvoicePanel_pre(
   // region STATE
 
   const [disabled, setDisabled] = useState(!isNew);
+
   const [state_invoice, setState_invoice] = useState<Tstate_invoice>(defaultState);
 
   // --------------------------------------------------------------------------
@@ -316,6 +321,15 @@ function InvoicePanel_pre(
 
       return invoice;
     });
+  };
+
+  const handle_confirm_allowance = async () => {
+    if (!state_invoice.id) {
+      return;
+    }
+
+    reqPatchInvoiceAllowance &&
+      (await reqPatchInvoiceAllowance(state_invoice.id, Number(state_invoice.allowance || 0)));
   };
 
   // --------------------------------------------------------------------------
@@ -557,7 +571,7 @@ function InvoicePanel_pre(
         })}
       </Tbody>
 
-      <Tfoot readOnly={disabled} node_other={other} isTotal={isTotal} />
+      <Tfoot readOnly={disabled} node_other={other} isTotal={isTotal} onConfirm_allowance={handle_confirm_allowance} />
     </div>
   );
 }
@@ -618,11 +632,23 @@ const Tfoot = ({
   readOnly,
   node_other,
   isTotal,
+  onConfirm_allowance: onConfirm_allowance,
 }: {
   readOnly: boolean;
   node_other: Tcenter['other'];
   isTotal: boolean;
+  onConfirm_allowance: () => void;
 }) => {
+  const [disabled_allowance, setDisabled_allowance] = useState(true);
+
+  // const [state_allowance, setState_allowance] = useState(node_other.allowance);
+
+  const handle_confirm_allowance = async () => {
+    onConfirm_allowance && (await onConfirm_allowance());
+    setDisabled_allowance(true);
+  };
+
+  // ------------------------------------------------------------------
   const {
     invoiceNumber,
     price,
@@ -762,18 +788,36 @@ const Tfoot = ({
           readOnly={readOnly}
         />
       </div>
-
-      <div className={classNames(scss.row)}>
+      {/*  */}
+      {/*  */}
+      {/*  */}
+      <div className={classNames(scss.row, scss.threeCol, scss.plus)}>
+        <div className={classNames(scss.allowanceBtnBar, !readOnly && 'invisible')}>
+          <IconEdit
+            className={classNames(!disabled_allowance && scss.active)}
+            onClick={() => {
+              setDisabled_allowance((bool) => !bool);
+            }}
+          />
+          <IconCheck02
+            //
+            className={classNames(disabled_allowance && 'invisible')}
+            onClick={handle_confirm_allowance}
+          />
+        </div>
         <span>折讓</span>
         <input
-          className={classNames(readOnly && scss.readyOnly)}
+          // readOnly={disabled_allowance}
+          readOnly={readOnly === false ? false : disabled_allowance}
+          className={classNames(readOnly === false ? false : disabled_allowance && scss.readyOnly)}
           type="number"
           value={allowance}
           onChange={(e) => onChange_allowance(e.target.value)}
-          readOnly={readOnly}
         />
       </div>
-
+      {/*  */}
+      {/*  */}
+      {/*  */}
       <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>備註</span>
         <input

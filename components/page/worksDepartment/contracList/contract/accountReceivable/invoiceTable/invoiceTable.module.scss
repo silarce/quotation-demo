@@ -88,6 +88,9 @@ $rowGap: 10px;
   justify-items: center;
   height: 30px;
   font-size: $fontSize;
+  &.threeCol.plus {
+    grid-template-columns: 50px 50px 1fr;
+  }
 }
 
 .left {
@@ -148,4 +151,13 @@ $rowGap: 10px;
   display: flex;
   justify-content: center;
   margin: 10px 0;
+}
+
+.allowanceBtnBar {
+  display: flex;
+  gap: 10px;
+
+  .active {
+    color: red;
+  }
 }

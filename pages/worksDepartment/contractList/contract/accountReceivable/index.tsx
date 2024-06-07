@@ -391,6 +391,21 @@ export default function AccountReceivable() {
     }
   }; //reqPatchInvoiceArr
 
+  const reqPatchInvoiceAllowance = async (invoiceId: string, allowance: number) => {
+    try {
+      setIsFetching_req(true);
+
+      await apiPatchAccountReceivableInvoice(invoiceId, { allowance });
+    } catch (error) {
+      const err = error as AxiosError;
+
+      myAlert.err({ title: '更新發票失敗', content: err.message });
+    } finally {
+      await update_contract();
+      setIsFetching_req(false);
+    }
+  }; //reqPatchInvoiceArr
+
   // region reqPatchAccountant
   const reqPatchAccountant = async (state_accountant: Tstate_accountant[]) => {
     for (const state of state_accountant) {
@@ -548,6 +563,7 @@ export default function AccountReceivable() {
           // reqAddInvoice={reqAddInvoice}
           // reqPatchInvoiceArr={reqPatchInvoiceArr}
           onAddConfirm={reqAddInvoice_whole}
+          reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
         />
       </div>
     </SubLayer>

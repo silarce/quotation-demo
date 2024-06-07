@@ -119,6 +119,7 @@ export default function InvoiceTable({
   // reqAddInvoice,
   // reqPatchInvoiceArr,
   onAddConfirm,
+  reqPatchInvoiceAllowance,
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
@@ -126,6 +127,7 @@ export default function InvoiceTable({
   // reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
   // reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
   onAddConfirm: (state_invoice: Tstate_invoice) => void;
+  reqPatchInvoiceAllowance: (invoiceId: string, allowance: number) => void;
 }) {
   const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
   const ref_invoicePanelArr = useRef<(TimperativeHandle_panel | null)[]>([]);
@@ -707,6 +709,7 @@ export default function InvoiceTable({
               data_invoice={data_invoice}
               finalProdArr={finalProdArr}
               onPanelStateChange={onPanelStateChange}
+              reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
             />
           );
         })}
