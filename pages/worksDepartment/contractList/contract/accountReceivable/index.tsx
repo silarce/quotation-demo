@@ -75,6 +75,7 @@ import {
   apiDeleteAccountReceivableAccountant,
   apiPostAccountReceivableIncoice, // 新增應收帳款發票
   apiPatchAccountantInvoice,
+  apiPatchAccountReceivableDeduction_accountant, // 批量更新 應收帳款 扣款明細
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
@@ -165,7 +166,11 @@ export default function AccountReceivable() {
   // --------------------------------------------------------------------------
 
   // region REQUEST
-
+  //
+  //
+  //
+  //
+  // region reqAddInvoice
   const reqAddInvoice = async (type: TcreateAccountReceivableInvoiceDto['type'], invoiceNumber: string) => {
     if (!accountReceivable?.id) {
       alert('沒有accountReceivable.id');
@@ -209,6 +214,7 @@ export default function AccountReceivable() {
     }
   };
 
+  // region reqPatchInvoiceArr
   const reqPatchInvoiceArr = async (state_invoiceArr: Tstate_invoice[]) => {
     let haveEmptyId = false;
 
@@ -232,8 +238,6 @@ export default function AccountReceivable() {
         allowance,
         note,
       } = state;
-
-      console.log(state);
 
       !id && (haveEmptyId = true);
 
@@ -301,6 +305,7 @@ export default function AccountReceivable() {
     }
   }; //reqPatchInvoiceArr
 
+  // region reqPatchAccountant
   const reqPatchAccountant = async (state_accountant: Tstate_accountant[]) => {
     for (const state of state_accountant) {
       const state_deduction = state.state_deduction;
@@ -321,6 +326,7 @@ export default function AccountReceivable() {
     update_contract();
   };
 
+  // region reqPatchAccountant_sorting
   const reqPatchAccountant_sorting = async (
     //
     stateList: Tstate_accountantSorting
@@ -378,6 +384,9 @@ export default function AccountReceivable() {
       //修改排序
       await apiPatchAccountant_accountReceivable(accountant.id, {
         order: order,
+        // 雖然只是要改order，但是不送accountsReceivableDeduction的話
+        // 原本的accountsReceivableDeduction會被清空
+        // 所以要送跟原本一樣的accountsReceivableDeduction過去
         accountsReceivableDeduction: accountsReceivableDeduction,
       });
     }
@@ -430,7 +439,12 @@ export default function AccountReceivable() {
         <Profile {...props_profile} />
         <TotalCalc className="mt-10" accountReceivable={accountReceivable} />
 
-        <AccountantSorting className="mt-10" invoiceArr={invoiceArr} onConfirm={reqPatchAccountant_sorting} />
+        <AccountantSorting
+          //
+          className="mt-10"
+          invoiceArr={invoiceArr}
+          onConfirm={reqPatchAccountant_sorting}
+        />
 
         <AccountantDetails
           //

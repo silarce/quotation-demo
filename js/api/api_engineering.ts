@@ -1417,9 +1417,24 @@ export const apiPostAccountReceivableDeduction = async (id: string, body: Tcreat
     .catch((err) => Promise.reject(err));
 };
 
+// 棄用
+// /**批量更新 應收帳款 扣款明細 account-receivable-deduction */
+// export const apiPatchAccountReceivableDeduction = async (id: string, body: TupdateAccountReceivableDeductionDto[]) => {
+//   const api = `/engineering/account-receivable/${id}/deduction`;
+
+//   return axi
+//     .patch(api, body)
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
+
 /**批量更新 應收帳款 扣款明細 account-receivable-deduction */
-export const apiPatchAccountReceivableDeduction = async (id: string, body: TupdateAccountReceivableDeductionDto[]) => {
-  const api = `/engineering/account-receivable/${id}/deduction`;
+export const apiPatchAccountReceivableDeduction_accountant = async (
+  id: string,
+  accountantId: string,
+  body: TupdateAccountReceivableDeductionDto[]
+) => {
+  const api = `/engineering/account-receivable/${id}/deduction/${accountantId}`;
 
   return axi
     .patch(api, body)
