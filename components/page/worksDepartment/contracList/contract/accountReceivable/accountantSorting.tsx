@@ -133,10 +133,10 @@ export default function AccountantSorting({
   // region useEffect
 
   useEffect(() => {
-    if (!disabled) {
-      return;
-    }
+    setDisabled(true);
+  }, [invoiceArr]);
 
+  useEffect(() => {
     const list: TstateList = {};
 
     invoiceArr.forEach((invoice) => {

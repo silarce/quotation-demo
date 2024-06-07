@@ -142,10 +142,10 @@ export default function AccountantDetails({
   // region useEffect
 
   useEffect(() => {
-    if (!disabled) {
-      return;
-    }
+    setDisabled(true);
+  }, [accountantArr]);
 
+  useEffect(() => {
     const stateArr: Tstate_accountant[] = accountantArr.map((accountant) => {
       const {
         id,

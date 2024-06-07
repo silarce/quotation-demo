@@ -763,6 +763,10 @@ export default function InvoiceTable({
   // region use Effect
 
   useEffect(() => {
+    setDisabled(true);
+  }, [data_finalProdcut, data_invoices]);
+
+  useEffect(() => {
     const arr: Tstate_invoice[] = (invoiceArr_sorted ?? []).map((data_invoice) => {
       const {
         //
