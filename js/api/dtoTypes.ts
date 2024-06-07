@@ -848,6 +848,8 @@ export type TquotationContentOtherDto = {
   totalPrice: number;
   notes: string;
   unit: string | null;
+  //
+  spec: string | null;
 };
 
 export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
