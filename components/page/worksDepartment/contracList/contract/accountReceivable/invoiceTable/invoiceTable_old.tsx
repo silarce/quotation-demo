@@ -9,7 +9,7 @@ import { Checkbox, Radio } from 'antd';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import TopBar from './ui/topBar';
+import TopBar from '../ui/topBar';
 
 // css
 import scss from './invoiceTable.module.scss';
