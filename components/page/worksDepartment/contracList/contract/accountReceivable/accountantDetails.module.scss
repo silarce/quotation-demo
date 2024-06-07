@@ -5,6 +5,8 @@
   position: relative;
   border: solid 1px theme("colors.border");
   width: fit-content;
+  max-height: 500px;
+  overflow: auto;
 }
 
 .row {
