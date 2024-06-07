@@ -29,6 +29,7 @@ import type {
 type Tstate_invoice = {
   id?: string;
   renderCount: number; // 判斷是否要rerender用的，會送到Tcenter
+
   rowArr: {
     productId: string;
     // baseQty: number;
@@ -47,6 +48,8 @@ type Tstate_invoice = {
   minusRetainage: boolean;
   minusDeduction: boolean;
   minusWriteOffDeposit: boolean;
+
+  allowEditDeduction: boolean;
 
   price: number; // 發票金額 自動計算
   invoiceNumber: string;
@@ -108,6 +111,8 @@ type Tcenter = {
     retainageType: string;
     allowance: string;
     note: string;
+
+    allowEditDeduction: boolean;
 
     onChange_invoiceNumber: (value: string) => void;
     onChange_retainage: (value: string) => void;
@@ -448,7 +453,7 @@ export default function InvoiceTable({
       // __________________________________________________________________
     }); // state_invoiceArr.forEach
 
-    return {
+    const stateInovie: Tstate_invoice = {
       rowArr: rowArr_total,
       subTotal: subTotal_total,
       tax: tax_total,
@@ -469,7 +474,11 @@ export default function InvoiceTable({
       retainageType: 'null',
       allowance: allowance_total,
       note: '',
+
+      allowEditDeduction: false,
     };
+
+    return stateInovie;
 
     //
   }, [state_invoiceArr]);
@@ -560,6 +569,8 @@ export default function InvoiceTable({
         subTotal,
         tax,
         contractTotal,
+
+        allowEditDeduction,
       } = state;
 
       let subTotal_d = new Decimal(0);
@@ -617,6 +628,8 @@ export default function InvoiceTable({
         retainageType,
         allowance,
         note,
+
+        allowEditDeduction,
 
         onChange_invoiceNumber: (value) => {
           handle_editInvoiceOther({ invoiceIndex, key: 'invoiceNumber', value });
@@ -726,6 +739,8 @@ export default function InvoiceTable({
         allowance: Number(allowance).toLocaleString(),
         note: '',
 
+        allowEditDeduction: false,
+
         onChange_invoiceNumber: () => {},
         onChange_retainage: () => {},
         onChange_deduction: () => {},
@@ -768,7 +783,13 @@ export default function InvoiceTable({
         retainageType,
         allowance,
         note,
+        //
+        accountantList,
       } = data_invoice;
+
+      const notAllowEditDeduction = accountantList.some((al) => {
+        return al.accountsReceivableDeduction.length > 0;
+      });
 
       const completedProductList: { [id: string]: TcompletedProductDto } = {};
       completedProduct?.forEach((cp) => {
@@ -821,6 +842,8 @@ export default function InvoiceTable({
         retainageType: retainageType || 'null',
         allowance: String(allowance || ''),
         note: note || '',
+
+        allowEditDeduction: !notAllowEditDeduction,
       };
     }); // map
 
@@ -1024,6 +1047,8 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
     allowance,
     note,
 
+    allowEditDeduction,
+
     onChange_invoiceNumber,
     onChange_retainage,
     onChange_deduction,
@@ -1065,10 +1090,10 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
       <div className={classNames(scss.row)}>
         <span>扣款</span>
         <input
-          className={classNames(readOnly && scss.readyOnly)}
+          className={classNames((readOnly || !allowEditDeduction) && scss.readyOnly)}
           value={deduction}
           onChange={(e) => onChange_deduction(e.target.value)}
-          readOnly={readOnly}
+          readOnly={readOnly || !allowEditDeduction}
           type={inputType}
         />
       </div>
