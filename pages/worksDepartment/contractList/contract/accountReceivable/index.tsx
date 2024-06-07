@@ -20,7 +20,7 @@ import Profile, {
 import TotalCalc from 'components/page/worksDepartment/contracList/contract/accountReceivable/totalCalc';
 import InvoiceTable, {
   Tstate_invoice,
-} from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable';
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable/invoiceTable';
 import AccountantDetails, {
   Tstate_accountant,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDetails';
@@ -171,28 +171,114 @@ export default function AccountReceivable() {
   //
   //
   // region reqAddInvoice
-  const reqAddInvoice = async (type: TcreateAccountReceivableInvoiceDto['type'], invoiceNumber: string) => {
+  // const reqAddInvoice = async (type: TcreateAccountReceivableInvoiceDto['type'], invoiceNumber: string) => {
+  //   if (!accountReceivable?.id) {
+  //     alert('沒有accountReceivable.id');
+
+  //     return;
+  //   }
+
+  //   if (!invoiceNumber) {
+  //     myAlert.info({ title: '請輸入發票號碼' });
+
+  //     return;
+  //   }
+
+  //   const body: TcreateAccountReceivableInvoiceDto = {
+  //     invoiceDate: new Date().toISOString(),
+  //     invoiceNumber: invoiceNumber,
+  //     price: 0,
+  //     note: '',
+  //     type,
+  //     isRetainage: false,
+  //     isDeduction: false,
+  //     isWriteOffDeposit: false,
+  //   };
+
+  //   try {
+  //     setIsFetching_req(true);
+  //     await apiPostAccountReceivableIncoice(accountReceivable.id, body);
+  //     await update_contract();
+  //   } catch (error) {
+  //     const err = error as AxiosError;
+
+  //     if (err?.response?.status === 409) {
+  //       myAlert.err({ title: '發票號碼重複' });
+
+  //       return;
+  //     }
+
+  //     myAlert.err({ title: '新增發票失敗' });
+  //   } finally {
+  //     setIsFetching_req(false);
+  //   }
+  // };
+
+  // region reqAddInvoice_whole
+  const reqAddInvoice_whole = async (state_invoice: Tstate_invoice) => {
     if (!accountReceivable?.id) {
       alert('沒有accountReceivable.id');
 
       return;
     }
 
-    if (!invoiceNumber) {
+    if (!state_invoice.invoiceNumber) {
       myAlert.info({ title: '請輸入發票號碼' });
 
       return;
     }
 
+    const {
+      // renderCount,
+      type,
+      // period,
+      rowArr,
+
+      // subTotal, // 虛的，後端沒有
+      // tax, // 虛的，後端沒有
+      // contractTotal, // 虛的，後端沒有
+
+      retainage,
+      deduction,
+      writeOffDeposit,
+
+      minusRetainage,
+      minusDeduction,
+      minusWriteOffDeposit,
+
+      // allowEditDeduction,
+
+      price,
+      invoiceNumber,
+
+      retainageType,
+      allowance,
+      note,
+    } = state_invoice;
+
+    const completedProduct = rowArr.map((row) => {
+      return {
+        productId: row.productId,
+        completedQuantity: Number(row.completedQuantity),
+        completedPayment: Number(row.completedPayment),
+      };
+    });
+
     const body: TcreateAccountReceivableInvoiceDto = {
       invoiceDate: new Date().toISOString(),
       invoiceNumber: invoiceNumber,
-      price: 0,
-      note: '',
+      price,
+      note,
       type,
-      isRetainage: false,
-      isDeduction: false,
-      isWriteOffDeposit: false,
+      retainage: Number(retainage),
+      deduction: Number(deduction),
+      writeOffDeposit: Number(writeOffDeposit),
+      isRetainage: minusRetainage,
+      isDeduction: minusDeduction,
+      isWriteOffDeposit: minusWriteOffDeposit,
+      retainageType: retainageType === 'null' ? null : retainageType,
+      allowance: Number(allowance),
+      completedProduct,
     };
 
     try {
@@ -459,8 +545,9 @@ export default function AccountReceivable() {
           className="mt-10"
           data_finalProdcut={data_finalProdcut}
           data_invoices={accountReceivable.invoices}
-          reqAddInvoice={reqAddInvoice}
-          reqPatchInvoiceArr={reqPatchInvoiceArr}
+          // reqAddInvoice={reqAddInvoice}
+          // reqPatchInvoiceArr={reqPatchInvoiceArr}
+          onAddConfirm={reqAddInvoice_whole}
         />
       </div>
     </SubLayer>

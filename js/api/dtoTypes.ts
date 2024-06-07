@@ -3517,7 +3517,21 @@ export type TaccountsReceivableInvoiceDto = {
 
 export type TcreateAccountReceivableInvoiceDto = Pick<
   TaccountsReceivableInvoiceDto,
-  'invoiceDate' | 'invoiceNumber' | 'price' | 'note' | 'type' | 'isRetainage' | 'isDeduction' | 'isWriteOffDeposit'
+  | 'invoiceDate'
+  //
+  | 'invoiceNumber'
+  | 'price'
+  | 'note'
+  | 'type'
+  | 'isRetainage'
+  | 'isDeduction'
+  | 'isWriteOffDeposit'
+  | 'retainageType'
+  | 'allowance'
+  | 'retainage'
+  | 'deduction'
+  | 'writeOffDeposit'
+  | 'completedProduct'
 >;
 
 // export type TupdateAccountReceivableInvoiceDto = Pick<
