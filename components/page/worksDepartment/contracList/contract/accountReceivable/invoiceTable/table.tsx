@@ -92,12 +92,22 @@ function InvoicePanel_pre(
   {
     data_invoice,
     finalProdArr,
+    totalsTotal,
+    onPanelStateChange,
   }: {
     data_invoice?: Tinvoice_reduce;
     finalProdArr: TquotationProductDto[];
+    totalsTotal?: {
+      subTotal: number;
+      tax: number;
+      contractTotal: number;
+    };
+    onPanelStateChange?: (state_invoice: Tstate_invoice) => void;
   },
   ref: React.ForwardedRef<TimperativeHandle_panel>
 ) {
+  const isTotal = !!totalsTotal;
+
   const { defaultState, isNew } = useMemo(() => {
     const isNew = !data_invoice;
 
@@ -375,12 +385,23 @@ function InvoicePanel_pre(
       };
     });
 
-    const totals = {
+    let totals = {
       subTotal: subTotal.toLocaleString(),
       tax: tax.toLocaleString(),
       contractTotal: contractTotal.toLocaleString(),
     };
 
+    if (totalsTotal) {
+      totals = {
+        subTotal: totalsTotal.subTotal.toLocaleString(),
+        tax: totalsTotal.tax.toLocaleString(),
+        contractTotal: totalsTotal.contractTotal.toLocaleString(),
+      };
+    }
+
+    if (totalsTotal) {
+      console.log(totalsTotal);
+    }
     // _______________________________________________________________________
     // _______________________________________________________________________
 
@@ -439,20 +460,30 @@ function InvoicePanel_pre(
     // _______________________________________________________________________
     // _______________________________________________________________________
 
+    let caption = `第${period}期 ${type}`;
+
+    if (totalsTotal) {
+      caption = '合計';
+    }
+
     return {
       renderCount,
-      caption: `第${period}期 ${type}`,
+      caption: caption,
       rowArr,
       totals,
       other,
     };
-  }, [state_invoice]);
+  }, [state_invoice, totalsTotal]);
 
   // ==============================================================================
   // region  USE EFFECT
   useEffect(() => {
     setState_invoice(defaultState);
   }, [defaultState]);
+
+  useEffect(() => {
+    onPanelStateChange && onPanelStateChange(state_invoice);
+  }, [state_invoice]);
 
   // ==============================================================================
 
@@ -526,7 +557,7 @@ function InvoicePanel_pre(
         })}
       </Tbody>
 
-      <Tfoot readOnly={disabled} node_other={other} />
+      <Tfoot readOnly={disabled} node_other={other} isTotal={isTotal} />
     </div>
   );
 }
@@ -582,7 +613,16 @@ const Tbody = ({
 
 // region Tfoot
 
-const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcenter['other'] }) => {
+const Tfoot = ({
+  //
+  readOnly,
+  node_other,
+  isTotal,
+}: {
+  readOnly: boolean;
+  node_other: Tcenter['other'];
+  isTotal: boolean;
+}) => {
   const {
     invoiceNumber,
     price,
@@ -661,7 +701,7 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
         />
       </div>
 
-      <div>
+      <div className={classNames(isTotal && 'invisible')}>
         保留款
         <div className={scss.checkBar}>
           <Radio.Group
@@ -678,7 +718,7 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
         </div>
       </div>
 
-      <div className={scss.checkBar}>
+      <div className={classNames(scss.checkBar, isTotal && 'invisible')}>
         <Checkbox
           disabled={readOnly}
           checked={haveRetainage}
@@ -712,7 +752,8 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
         <span>發票金額</span>
         <span>{price}</span>
       </div>
-      <div className={classNames(scss.row)}>
+
+      <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>發票號碼</span>
         <input
           className={classNames(readOnly && scss.readyOnly)}
@@ -733,7 +774,7 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
         />
       </div>
 
-      <div className={classNames(scss.row)}>
+      <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>備註</span>
         <input
           className={classNames(readOnly && scss.readyOnly)}

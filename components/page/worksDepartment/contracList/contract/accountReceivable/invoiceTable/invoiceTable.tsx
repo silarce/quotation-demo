@@ -128,11 +128,18 @@ export default function InvoiceTable({
   onAddConfirm: (state_invoice: Tstate_invoice) => void;
 }) {
   const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
+  const ref_invoicePanelArr = useRef<(TimperativeHandle_panel | null)[]>([]);
 
   // const [disabled, setDisabled] = useState(true);
   const [isAddingNew, setIsAddingNew] = useState(false);
 
   // const [state_invoiceArr, setState_invoiceArr] = useState<Tstate_invoice[]>([]);
+
+  const [totalsTotal, setTotalsTotal] = useState({
+    subTotal: 0,
+    tax: 0,
+    contractTotal: 0,
+  });
 
   // --------------------------------------------------------------------------
 
@@ -172,15 +179,18 @@ export default function InvoiceTable({
     // setDisabled(true);
   };
 
-  const handel_addInvoice = () => {
-    setIsAddingNew(true);
+  const onPanelStateChange = (state_invoice: Tstate_invoice) => {
+    const { subTotal, tax, contractTotal } = state_invoice;
 
-    // const modal = myAlert.btnBar({});
+    setTotalsTotal((totalsTotal) => {
+      totalsTotal = { ...totalsTotal };
 
-    // modal.update({
-    //   title: '新增發票',
-    //   content: <AddInovice reqAddInvoice={reqAddInvoice} onCancel={modal.destroy} />,
-    // });
+      totalsTotal.subTotal = new Decimal(totalsTotal.subTotal).add(subTotal).toNumber();
+      totalsTotal.tax = new Decimal(totalsTotal.tax).add(tax).toNumber();
+      totalsTotal.contractTotal = new Decimal(totalsTotal.contractTotal).add(contractTotal).toNumber();
+
+      return totalsTotal;
+    });
   };
 
   // --------------------------------------------------------------------------
@@ -375,6 +385,115 @@ export default function InvoiceTable({
 
   // region Right
 
+  // ref_invoicePanelArr.current.map((handle) => handle?.getState())
+
+  const invoiceTotal = useMemo(() => {
+    const invoiceTotal: Tinvoice_reduce = {
+      id: '',
+      updatedAt: '',
+      type: '請款',
+      period: 0,
+      depositPeriod: 0,
+      invoiceNumber: '',
+      price: 0,
+      completedProduct: [],
+      retainage: 0,
+      deduction: 0,
+      writeOffDeposit: 0,
+      isRetainage: false,
+      isDeduction: false,
+      isWriteOffDeposit: false,
+      retainageType: null,
+      allowance: 0,
+      note: '',
+      accountantList: [],
+    };
+
+    const completedProductList: { [productId: string]: TcompletedProductDto } = {};
+
+    invoiceArr_sorted.forEach((invoice) => {
+      const {
+        //
+        price,
+        completedProduct,
+        retainage,
+        deduction,
+        writeOffDeposit,
+        allowance,
+      } = invoice;
+
+      invoiceTotal.price = new Decimal(price).add(invoiceTotal.price).toNumber();
+      invoiceTotal.retainage = new Decimal(retainage || 0).add(invoiceTotal.retainage || 0).toNumber();
+      invoiceTotal.deduction = new Decimal(deduction || 0).add(invoiceTotal.deduction || 0).toNumber();
+      invoiceTotal.writeOffDeposit = new Decimal(writeOffDeposit || 0)
+        .add(invoiceTotal.writeOffDeposit || 0)
+        .toNumber();
+      invoiceTotal.allowance = new Decimal(allowance || 0).add(invoiceTotal.allowance || 0).toNumber();
+
+      completedProduct?.forEach((prod) => {
+        const {
+          //
+          productId,
+          completedQuantity,
+          completedPayment,
+        } = prod;
+
+        if (!completedProductList[productId]) {
+          completedProductList[productId] = {
+            productId,
+            completedQuantity: 0,
+            completedPayment: 0,
+          };
+        }
+
+        completedProductList[productId].completedQuantity = new Decimal(
+          completedProductList[productId].completedQuantity || 0
+        )
+          .add(completedQuantity)
+          .toNumber();
+
+        completedProductList[productId].completedPayment = new Decimal(
+          completedProductList[productId].completedPayment || 0
+        )
+          .add(completedPayment)
+          .toNumber();
+      }); // completedProduct?.forEach
+      //
+    }); // invoiceArr_sorted.forEach
+
+    invoiceTotal.completedProduct = Object.values(completedProductList);
+
+    return invoiceTotal;
+
+    //
+  }, [invoiceArr_sorted]);
+
+  const refLength = ref_invoicePanelArr.current.length;
+
+  // const totalsTotal = useMemo(() => {
+  //   const stateArr = ref_invoicePanelArr.current.map((handle) => handle?.getState());
+
+  //   let subTotal_d = new Decimal(0);
+  //   let tax_d = new Decimal(0);
+  //   let contractTotal_d = new Decimal(0);
+
+  //   stateArr.forEach((state) => {
+  //     const { subTotal = 0, tax = 0, contractTotal = 0 } = state ?? {};
+
+  //     subTotal_d = subTotal_d.add(subTotal);
+  //     tax_d = tax_d.add(tax);
+  //     contractTotal_d = contractTotal_d.add(contractTotal);
+  //   });
+
+  //   return {
+  //     subTotal: subTotal_d.toNumber(),
+  //     tax: tax_d.toNumber(),
+  //     contractTotal: contractTotal_d.toNumber(),
+  //   };
+  // }, [refLength]);
+
+  // console.log(ref_invoicePanelArr.current.length);
+
   // const right: Tcenter | null = useMemo(() => {
   //   if (!state_invoice_total) {
   //     return null;
@@ -553,10 +672,6 @@ export default function InvoiceTable({
       {/*  */}
 
       <TopBar caption="請款明細">
-        <MyButton_v2 px="px22" py="py4" onClick={handel_addInvoice}>
-          新增發票
-        </MyButton_v2>
-
         <MyButton_v2
           px="px22"
           py="py4"
@@ -582,11 +697,27 @@ export default function InvoiceTable({
         })} */}
         {isAddingNew && <InvoicePanel ref={ref_newInvoicePanel} finalProdArr={finalProdArr} />}
 
-        {invoiceArr_sorted.map((data_invoice) => {
-          return <InvoicePanel key={data_invoice.id} data_invoice={data_invoice} finalProdArr={finalProdArr} />;
+        {invoiceArr_sorted.map((data_invoice, index) => {
+          return (
+            <InvoicePanel
+              ref={(handle) => {
+                ref_invoicePanelArr.current[index] = handle;
+              }}
+              key={data_invoice.id}
+              data_invoice={data_invoice}
+              finalProdArr={finalProdArr}
+              onPanelStateChange={onPanelStateChange}
+            />
+          );
         })}
 
-        {/* {right && <Right node_center={right} />} */}
+        {/* <Right invoiceTotal={invoiceTotal} totalsTotal={totalsTotal} /> */}
+        <InvoicePanel
+          //
+          data_invoice={invoiceTotal}
+          finalProdArr={finalProdArr}
+          totalsTotal={totalsTotal}
+        />
       </div>
     </div>
   );
@@ -636,66 +767,66 @@ const Left = ({
 };
 
 // =============================================================================
-const Center = ({
-  //
-  disabled,
-  node_center: { renderCount, caption, rowArr, totals, other },
-}: {
-  disabled: boolean;
-  node_center: Tcenter;
-}) => {
-  return (
-    <div className={classNames(scss.invoice, scss.center)}>
-      <Thead caption={caption}>
-        <span>完成數量</span>
-        <span>完成金額</span>
-      </Thead>
+// const Center = ({
+//   //
+//   disabled,
+//   node_center: { renderCount, caption, rowArr, totals, other },
+// }: {
+//   disabled: boolean;
+//   node_center: Tcenter;
+// }) => {
+//   return (
+//     <div className={classNames(scss.invoice, scss.center)}>
+//       <Thead caption={caption}>
+//         <span>完成數量</span>
+//         <span>完成金額</span>
+//       </Thead>
 
-      <Tbody totals={totals}>
-        {rowArr.map((row, index) => {
-          const {
-            completedQuantity: doneQty,
-            completedPayment_localeString: donePrice_localeString,
-            oncompletedQuantityChange: onDoneQtyChange,
-            oncompletedPaymentChange: onDonePriceChange,
-          } = row;
-          let { completedPayment: donePrice } = row;
+//       <Tbody totals={totals}>
+//         {rowArr.map((row, index) => {
+//           const {
+//             completedQuantity: doneQty,
+//             completedPayment_localeString: donePrice_localeString,
+//             oncompletedQuantityChange: onDoneQtyChange,
+//             oncompletedPaymentChange: onDonePriceChange,
+//           } = row;
+//           let { completedPayment: donePrice } = row;
 
-          disabled && (donePrice = donePrice_localeString);
+//           disabled && (donePrice = donePrice_localeString);
 
-          const inputType = disabled ? 'text' : 'number';
+//           const inputType = disabled ? 'text' : 'number';
 
-          return (
-            <div key={index} className={classNames(scss.row)}>
-              <input
-                className={classNames(disabled && scss.readyOnly)}
-                value={doneQty}
-                onChange={(e) => onDoneQtyChange(e.target.value)}
-                readOnly={disabled}
-                type={inputType}
-              />
-              <input
-                className={classNames(disabled && scss.readyOnly)}
-                value={donePrice}
-                onChange={(e) => onDonePriceChange(e.target.value)}
-                readOnly={disabled}
-                type={inputType}
-              />
-            </div>
-          );
-        })}
-      </Tbody>
+//           return (
+//             <div key={index} className={classNames(scss.row)}>
+//               <input
+//                 className={classNames(disabled && scss.readyOnly)}
+//                 value={doneQty}
+//                 onChange={(e) => onDoneQtyChange(e.target.value)}
+//                 readOnly={disabled}
+//                 type={inputType}
+//               />
+//               <input
+//                 className={classNames(disabled && scss.readyOnly)}
+//                 value={donePrice}
+//                 onChange={(e) => onDonePriceChange(e.target.value)}
+//                 readOnly={disabled}
+//                 type={inputType}
+//               />
+//             </div>
+//           );
+//         })}
+//       </Tbody>
 
-      <Tfoot readOnly={disabled} node_other={other} />
-    </div>
-  );
-};
+//       <Tfoot readOnly={disabled} node_other={other} />
+//     </div>
+//   );
+// };
 
 // --------------------------------------------------
 
-const Right = ({ node_center }: { node_center: Tcenter }) => {
-  return <Center disabled={true} node_center={node_center} />;
-};
+// const Right = ({ node_center }: { node_center: Tcenter }) => {
+//   return <Center disabled={true} node_center={node_center} />;
+// };
 
 // ========================================================================
 
