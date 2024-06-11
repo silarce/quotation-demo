@@ -195,11 +195,13 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       accountingNumber: state_accountant.accountingNumber,
       vendorName: state_accountant.vendorName,
       notes: state_accountant.notes,
+      importAccountingNumber: state_accountant.importAccountingNumber,
+      noteNumber: state_accountant.noteNumber,
 
       insertDate: state_accountant.insertDate.toISOString(),
       paymentType,
       price: Number(state_accountant.price),
-      fee: 0,
+      // fee: 0,
     };
 
     await apiPatchAccountant(id, { body });
@@ -501,38 +503,6 @@ const useSelectPropsArr = ({
 
 // ---------------------------------------------------------------------------
 
-// region function
-
-const create_panelList = ({
-  //
-  disabled,
-  setDisabled,
-}: {
-  disabled: boolean;
-  setDisabled: (value: boolean) => void;
-}) => {
-  const panelList_disable: TpanelList = [
-    {
-      type: 'myButton',
-      label: '編輯',
-      onClick: () => setDisabled(false),
-    },
-  ];
-
-  const panelList_able: TpanelList = [
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: () => setDisabled(true),
-    },
-  ];
-
-  const panelList = disabled ? panelList_disable : panelList_able;
-
-  return panelList;
-};
-
-// =========================================================================
 // region component
 
 const Cell_span = ({
@@ -707,7 +677,7 @@ const Row = ({
           key="isImported"
           showBaseline="invisible"
           wrapperStyle={{ width: 16 }}
-          disabled={disabled}
+          disabled={isNew ? true : disabled}
           checkBoxProps_v2={{
             props: {
               value: state_accountant.isImported ? ['true'] : [],

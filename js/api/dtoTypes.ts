@@ -3609,7 +3609,16 @@ export type TaccountantDto = {
 
 export type TcreateAccountantDto = Pick<
   TaccountantDto,
-  'paymentType' | 'accountingNumber' | 'insertDate' | 'vendorName' | 'price' | 'notes' | 'fee'
+  | 'paymentType'
+  //
+  | 'accountingNumber'
+  | 'insertDate'
+  | 'vendorName'
+  | 'price'
+  | 'notes'
+  | 'fee'
+  | 'importAccountingNumber'
+  | 'noteNumber'
 > & {
   noteMaturityDate?: string | null; // 票據到期日
 };
