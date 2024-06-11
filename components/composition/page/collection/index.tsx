@@ -45,6 +45,7 @@ import {
   apiPatchAccountant_accountReceivable,
   //
   useGetAccountant,
+  useGetAccountantPreset,
 } from 'js/api/api_accountant';
 
 import { apiPostAccountReceivableAccountant } from 'js/api/api_engineering';
@@ -147,6 +148,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       return params;
     }, [year, month, paymentType]),
   });
+
+  const { data: data_accountantPreset } = useGetAccountantPreset();
 
   // ----------------------------------------------------------------------------
   // region REQUEST
@@ -274,11 +277,16 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     monthOptionArr,
   });
 
-  // 這個好像沒用
-  // const panelList = create_panelList({
-  //   disabled,
-  //   setDisabled,
-  // });
+  const bankAccountOptionArr = useMemo(() => {
+    const bankAccountOptionArr = (data_accountantPreset ?? []).map((data) => {
+      return {
+        label: data.accountName,
+        value: data.accountName,
+      };
+    });
+
+    return bankAccountOptionArr;
+  }, [data_accountantPreset]);
 
   // ----------------------------------------------------------------------------
   // region RENDER
@@ -287,7 +295,6 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       <PageHeader02
         tagList={tagList}
         customeLeft={[<SelectBar key="selectBar" className={'ml-5'} selectPropsArr={selectPropsArr} />]}
-        // panelList={panelList}
       />
       <div className={scss.body}>
         {/*  */}
@@ -318,6 +325,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
               paymentType={paymentType}
               //
               isReadOnly={isWorksDepartment}
+              bankAccountOptionArr={bankAccountOptionArr}
             />
           )}
 
@@ -331,6 +339,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
                 reqDelete={reqDelete}
                 isReadOnly={isWorksDepartment}
                 setAccountantId={setAccountantId}
+                bankAccountOptionArr={bankAccountOptionArr}
               />
             );
           })}
@@ -554,6 +563,7 @@ const Row = ({
   reqDelete,
   isReadOnly,
   setAccountantId,
+  bankAccountOptionArr,
 }: {
   // children: React.ReactNode;
   paymentType: TpaymentType;
@@ -568,6 +578,7 @@ const Row = ({
   reqDelete?: TreqDelete;
   isReadOnly: boolean;
   setAccountantId?: (id: string | undefined) => void;
+  bankAccountOptionArr: Toption[];
 }) => {
   const isNew = !!postProps;
 
@@ -711,8 +722,6 @@ const Row = ({
           // wrapperStyle={{ width: 85 }}
           datePickerProps={{
             props: {
-              // allowClear: false,
-              // suffixIcon: null,
               defaultPickerValue: limitedDate,
               value: state_accountant.insertDate,
               onChange: (date) => {
@@ -742,6 +751,27 @@ const Row = ({
             value = Number(value).toLocaleString();
             inputType = 'text';
           }
+        }
+
+        if (key === 'accountingNumber') {
+          return (
+            <div key={key} className={classNames(scss.cell, config?.className)} style={config?.style}>
+              <InputSel
+                disabled={disabled}
+                showBaseline="auto"
+                selectProps={{
+                  props: {
+                    isSearchable: true,
+                    options: bankAccountOptionArr,
+                    value: value ? { label: value, value } : null,
+                    onChange: (option) => {
+                      setState_accountant((state) => ({ ...state, [key]: option?.value ?? '' }));
+                    },
+                  },
+                }}
+              />
+            </div>
+          );
         }
 
         return (
@@ -871,7 +901,7 @@ const configList: TconfigList = {
   accountingNumber: {
     label: '存入帳號',
     style: {
-      width: 185,
+      width: 250,
     },
     className: '',
   },

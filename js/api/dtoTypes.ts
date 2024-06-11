@@ -3371,6 +3371,29 @@ export type TcompletedProductDto = {
   completedPayment: number;
 };
 
+// =========================================================================
+// region /accountant
+
+export type TaccountantPresetDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  accountName: string;
+  account: string;
+  bankCode: string;
+  bankName: string;
+};
+
+export type TcreateAccountantPresetDto = Pick<
+  TaccountantPresetDto,
+  'accountName' | 'account' | 'bankCode' | 'bankName'
+>;
+export type TupdateAccountantPresetDto = Pick<
+  TaccountantPresetDto,
+  'accountName' | 'account' | 'bankCode' | 'bankName'
+>;
+
 // 應收帳款明細
 export type TaccountsReceivableDto = {
   id: string;
