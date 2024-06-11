@@ -181,18 +181,32 @@ export default function InvoiceTable({
     // setDisabled(true);
   };
 
-  const onPanelStateChange = (state_invoice: Tstate_invoice) => {
-    const { subTotal, tax, contractTotal } = state_invoice;
+  const calcTotalsTotal = () => {
+    const stateArr = ref_invoicePanelArr.current.map((handle) => handle?.getState());
 
-    setTotalsTotal((totalsTotal) => {
-      totalsTotal = { ...totalsTotal };
+    let subTotal_d = new Decimal(0);
+    let tax_d = new Decimal(0);
+    let contractTotal_d = new Decimal(0);
 
-      totalsTotal.subTotal = new Decimal(totalsTotal.subTotal).add(subTotal).toNumber();
-      totalsTotal.tax = new Decimal(totalsTotal.tax).add(tax).toNumber();
-      totalsTotal.contractTotal = new Decimal(totalsTotal.contractTotal).add(contractTotal).toNumber();
+    stateArr.forEach((state) => {
+      const { subTotal = 0, tax = 0, contractTotal = 0 } = state ?? {};
 
-      return totalsTotal;
+      subTotal_d = subTotal_d.add(subTotal);
+      tax_d = tax_d.add(tax);
+      contractTotal_d = contractTotal_d.add(contractTotal);
     });
+
+    return {
+      subTotal: subTotal_d.toNumber(),
+      tax: tax_d.toNumber(),
+      contractTotal: contractTotal_d.toNumber(),
+    };
+  };
+
+  const onPanelStateChange = (state_invoice: Tstate_invoice) => {
+    const totalsTotal = calcTotalsTotal();
+
+    setTotalsTotal(totalsTotal);
   };
 
   // --------------------------------------------------------------------------
