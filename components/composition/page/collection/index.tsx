@@ -254,10 +254,10 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   });
 
   // 這個好像沒用
-  const panelList = create_panelList({
-    disabled,
-    setDisabled,
-  });
+  // const panelList = create_panelList({
+  //   disabled,
+  //   setDisabled,
+  // });
 
   // ----------------------------------------------------------------------------
   // region RENDER
@@ -266,7 +266,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       <PageHeader02
         tagList={tagList}
         customeLeft={[<SelectBar key="selectBar" className={'ml-5'} selectPropsArr={selectPropsArr} />]}
-        panelList={panelList}
+        // panelList={panelList}
       />
       <div className={scss.body}>
         {/*  */}
