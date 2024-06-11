@@ -18,6 +18,7 @@ import type {
   TcreateAccountantDto,
   TupdateAccountantDto,
   TupdateAccountantDeductionDto,
+  TupdateAccountReceivableDeductionDto,
 } from './dtoTypes';
 
 export type {
@@ -29,6 +30,7 @@ export type {
   TcreateAccountantDto,
   TupdateAccountantDto,
   TupdateAccountantDeductionDto,
+  TupdateAccountReceivableDeductionDto,
 } from './dtoTypes';
 
 type TgetAccountant = TpageResponse<TaccountantDto>;

@@ -3603,6 +3603,8 @@ export type TaccountantDto = {
   //
   // 扣款明細
   accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+
+  isImported: boolean; // 是否已匯入紙本應收帳款
 };
 
 export type TcreateAccountantDto = Pick<
@@ -3623,6 +3625,7 @@ export type TupdateAccountantDeductionDto = {
   // 沒有改也必須要送，所以沒有改就是送原本的
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
   order?: number;
+  isImported?: boolean;
 };
 
 /**扣款明細 */

@@ -37,10 +37,13 @@ import {
   Tparams,
   TcreateAccountantDto,
   TupdateAccountantDto,
+  TupdateAccountReceivableDeductionDto,
   //
   apiPostAccountant,
   apiPatchAccountant,
   deleteAccountant,
+  apiPatchAccountant_accountReceivable,
+  //
   useGetAccountant,
 } from 'js/api/api_accountant';
 
@@ -71,6 +74,9 @@ type Tstate_accountant = {
   price: string;
   billSerialNumber: string;
   notes: string;
+
+  isImported: boolean;
+  accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -125,6 +131,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       });
 
       const params: Tparams = {
+        populate: ['accountsReceivableDeduction'],
         sort: 'insertDate',
         filter: {
           insertDate: {
@@ -184,7 +191,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     }
 
     const body: TupdateAccountantDto = {
-      ...state_accountant,
+      // ...state_accountant,
+      accountingNumber: state_accountant.accountingNumber,
+      vendorName: state_accountant.vendorName,
+      notes: state_accountant.notes,
+
       insertDate: state_accountant.insertDate.toISOString(),
       paymentType,
       price: Number(state_accountant.price),
@@ -192,6 +203,14 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     };
 
     await apiPatchAccountant(id, { body });
+
+    if (state_accountant.isImported) {
+      await apiPatchAccountant_accountReceivable(id, {
+        accountsReceivableDeduction: state_accountant.accountsReceivableDeduction,
+        isImported: state_accountant.isImported,
+      });
+    }
+
     await update_accountant();
   };
 
@@ -587,10 +606,13 @@ const Row = ({
 
   let keyArr = lookup_keyArr[paymentType];
   keyArr = [...keyArr];
-  keyArr.shift();
-  keyArr.shift();
 
-  const theKeyArr = keyArr as Exclude<TaccountantKey, 'btn' | 'insertDate'>[];
+  keyArr = keyArr.slice(baseArr_before.length);
+
+  const theKeyArr = keyArr as Exclude<
+    TaccountantKey,
+    'btn' | 'isImported' | 'insertDate' | 'accountsReceivableDeduction'
+  >[];
 
   const limitedDate =
     state_accountant.insertDate ??
@@ -642,6 +664,8 @@ const Row = ({
       price: String(data_accountant.price),
       billSerialNumber: data_accountant.billSerialNumber ?? '',
       notes: data_accountant.notes ?? '',
+      isImported: data_accountant.isImported,
+      accountsReceivableDeduction: data_accountant.accountsReceivableDeduction,
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -672,6 +696,38 @@ const Row = ({
             匯入發票
           </MyButton_v2>
         )}
+      </div>
+
+      <div
+        //
+        className={classNames(scss.cell, configList?.isImported?.className)}
+        style={configList?.isImported?.style}
+      >
+        <InputSel
+          key="isImported"
+          showBaseline="invisible"
+          wrapperStyle={{ width: 16 }}
+          disabled={disabled}
+          checkBoxProps_v2={{
+            props: {
+              value: state_accountant.isImported ? ['true'] : [],
+              onChange: (arr) => {
+                const isImported = arr[0];
+
+                if (isImported === 'true') {
+                  setState_accountant((state) => ({ ...state, isImported: true }));
+                } else {
+                  setState_accountant((state) => ({ ...state, isImported: false }));
+                }
+              },
+            },
+            checkBoxPropsArr: [
+              {
+                value: 'true',
+              },
+            ],
+          }}
+        />
       </div>
 
       <div className={classNames(scss.cell, configList?.insertDate?.className)} style={configList?.insertDate?.style}>
@@ -787,7 +843,7 @@ const AddInovice = ({
 
 // region config
 
-type TaccountantKey = keyof Tstate_accountant | 'btn';
+type TaccountantKey = keyof Tstate_accountant | 'btn' | 'isImported';
 
 type Tconfig = {
   label?: string;
@@ -803,7 +859,7 @@ type TconfigList = {
   [key in TaccountantKey]?: Tconfig;
 };
 
-const baseArr_before: TaccountantKey[] = ['btn', 'insertDate'];
+const baseArr_before: TaccountantKey[] = ['btn', 'isImported', 'insertDate'];
 const baseArr_after: TaccountantKey[] = ['accountingNumber', 'vendorName', 'price', 'billSerialNumber', 'notes'];
 
 const lookup_keyArr: {
@@ -819,6 +875,14 @@ const configList: TconfigList = {
     label: '',
     style: {
       width: 150,
+    },
+    className: '',
+  },
+  isImported: {
+    label: '已匯入紙本應收帳款',
+    style: {
+      width: 150,
+      justifyContent: 'center',
     },
     className: '',
   },
@@ -902,4 +966,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   price: '',
   billSerialNumber: '',
   notes: '',
+  isImported: false,
+  accountsReceivableDeduction: [],
 });
