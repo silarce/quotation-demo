@@ -635,7 +635,7 @@ const topPathList: TtopPathListConfig[] = [
     href: {
       pathname: sidePathList['/accounting'].path01 + '/collection',
     },
-    erpFeature: [accountsReceivable],
+    erpFeature: [accountsReceivable, accountingDepartment],
   },
 ];
 
