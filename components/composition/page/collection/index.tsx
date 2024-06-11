@@ -37,11 +37,15 @@ import {
   Tparams,
   TcreateAccountantDto,
   TupdateAccountantDto,
+  TupdateAccountReceivableDeductionDto,
   //
   apiPostAccountant,
   apiPatchAccountant,
   deleteAccountant,
+  apiPatchAccountant_accountReceivable,
+  //
   useGetAccountant,
+  useGetAccountantPreset,
 } from 'js/api/api_accountant';
 
 import { apiPostAccountReceivableAccountant } from 'js/api/api_engineering';
@@ -71,10 +75,19 @@ type Tstate_accountant = {
   price: string;
   billSerialNumber: string;
   notes: string;
+
+  isImported: boolean;
+  accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
 type TreqPatch = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
+// type TreqPatchIsImported = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
+type TreqPatchIsImported = (
+  id: string,
+  isImported: boolean,
+  accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
+) => Promise<void>;
 type TreqDelete = (id: string) => Promise<void>;
 
 // =============================================================================
@@ -125,6 +138,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       });
 
       const params: Tparams = {
+        populate: ['accountsReceivableDeduction'],
         sort: 'insertDate',
         filter: {
           insertDate: {
@@ -140,6 +154,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       return params;
     }, [year, month, paymentType]),
   });
+
+  const { data: data_accountantPreset } = useGetAccountantPreset();
 
   // ----------------------------------------------------------------------------
   // region REQUEST
@@ -172,7 +188,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
 
   const reqPatch = async (id: string, state_accountant: Tstate_accountant) => {
     if (isWorksDepartment) {
-      alert('ReadOnly');
+      alert('isWorksDepartment should be true');
 
       return;
     }
@@ -184,16 +200,42 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     }
 
     const body: TupdateAccountantDto = {
-      ...state_accountant,
+      // ...state_accountant,
+      accountingNumber: state_accountant.accountingNumber,
+      vendorName: state_accountant.vendorName,
+      notes: state_accountant.notes,
+      importAccountingNumber: state_accountant.importAccountingNumber,
+      noteNumber: state_accountant.noteNumber,
+
       insertDate: state_accountant.insertDate.toISOString(),
       paymentType,
       price: Number(state_accountant.price),
-      fee: 0,
+      // fee: 0,
     };
 
     await apiPatchAccountant(id, { body });
+
     await update_accountant();
   };
+
+  const reqPatchIsImported = async (
+    //
+    id: string,
+    isImported: boolean,
+    accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
+  ) => {
+    if (!isWorksDepartment) {
+      alert('isWorksDepartment should be false');
+
+      return;
+    }
+
+    await apiPatchAccountant_accountReceivable(id, {
+      accountsReceivableDeduction,
+      isImported,
+    });
+    await update_accountant();
+  }; // reqPatchIsImported
 
   const reqDelete = async (id: string) => {
     await deleteAccountant(id);
@@ -253,11 +295,16 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     monthOptionArr,
   });
 
-  // 這個好像沒用
-  // const panelList = create_panelList({
-  //   disabled,
-  //   setDisabled,
-  // });
+  const bankAccountOptionArr = useMemo(() => {
+    const bankAccountOptionArr = (data_accountantPreset ?? []).map((data) => {
+      return {
+        label: data.accountName,
+        value: data.accountName,
+      };
+    });
+
+    return bankAccountOptionArr;
+  }, [data_accountantPreset]);
 
   // ----------------------------------------------------------------------------
   // region RENDER
@@ -266,7 +313,6 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       <PageHeader02
         tagList={tagList}
         customeLeft={[<SelectBar key="selectBar" className={'ml-5'} selectPropsArr={selectPropsArr} />]}
-        // panelList={panelList}
       />
       <div className={scss.body}>
         {/*  */}
@@ -297,6 +343,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
               paymentType={paymentType}
               //
               isReadOnly={isWorksDepartment}
+              bankAccountOptionArr={bankAccountOptionArr}
+              isWorksDepartment={isWorksDepartment}
             />
           )}
 
@@ -308,8 +356,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
                 paymentType={paymentType}
                 reqPatch={reqPatch}
                 reqDelete={reqDelete}
+                reqPatchIsImported={reqPatchIsImported}
                 isReadOnly={isWorksDepartment}
                 setAccountantId={setAccountantId}
+                bankAccountOptionArr={bankAccountOptionArr}
+                isWorksDepartment={isWorksDepartment}
               />
             );
           })}
@@ -482,38 +533,6 @@ const useSelectPropsArr = ({
 
 // ---------------------------------------------------------------------------
 
-// region function
-
-const create_panelList = ({
-  //
-  disabled,
-  setDisabled,
-}: {
-  disabled: boolean;
-  setDisabled: (value: boolean) => void;
-}) => {
-  const panelList_disable: TpanelList = [
-    {
-      type: 'myButton',
-      label: '編輯',
-      onClick: () => setDisabled(false),
-    },
-  ];
-
-  const panelList_able: TpanelList = [
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: () => setDisabled(true),
-    },
-  ];
-
-  const panelList = disabled ? panelList_disable : panelList_able;
-
-  return panelList;
-};
-
-// =========================================================================
 // region component
 
 const Cell_span = ({
@@ -565,6 +584,9 @@ const Row = ({
   reqDelete,
   isReadOnly,
   setAccountantId,
+  bankAccountOptionArr,
+  reqPatchIsImported,
+  isWorksDepartment,
 }: {
   // children: React.ReactNode;
   paymentType: TpaymentType;
@@ -579,6 +601,9 @@ const Row = ({
   reqDelete?: TreqDelete;
   isReadOnly: boolean;
   setAccountantId?: (id: string | undefined) => void;
+  bankAccountOptionArr: Toption[];
+  reqPatchIsImported?: TreqPatchIsImported;
+  isWorksDepartment: boolean;
 }) => {
   const isNew = !!postProps;
 
@@ -587,10 +612,13 @@ const Row = ({
 
   let keyArr = lookup_keyArr[paymentType];
   keyArr = [...keyArr];
-  keyArr.shift();
-  keyArr.shift();
 
-  const theKeyArr = keyArr as Exclude<TaccountantKey, 'btn' | 'insertDate'>[];
+  keyArr = keyArr.slice(baseArr_before.length);
+
+  const theKeyArr = keyArr as Exclude<
+    TaccountantKey,
+    'btn' | 'isImported' | 'insertDate' | 'accountsReceivableDeduction'
+  >[];
 
   const limitedDate =
     state_accountant.insertDate ??
@@ -615,10 +643,29 @@ const Row = ({
 
   const handle_delete = async () => {
     if (data_accountant?.id && reqDelete) {
-      await reqDelete(data_accountant.id);
-      setDisabled(true);
+      myAlert.confirm({
+        title: '確定刪除',
+        props: {
+          onOk: async () => {
+            await reqDelete(data_accountant.id);
+            setDisabled(true);
+          },
+        },
+      });
     } else {
       alert('錯誤，data_accountant.id或reqDelete為undefined');
+    }
+  };
+
+  const handle_checkIsImported = async (isImported: boolean) => {
+    if (data_accountant?.id && reqPatchIsImported) {
+      await reqPatchIsImported(data_accountant.id, isImported, state_accountant.accountsReceivableDeduction);
+      // if (data_accountant?.id && reqPatchIsImported) {
+      //   await reqPatchIsImported(data_accountant.id, state_accountant);
+      //   setDisabled(true);
+      // } else {
+      //   alert('錯誤，data_accountant.id或reqPatchIsImported為undefined');
+      // }
     }
   };
 
@@ -642,9 +689,19 @@ const Row = ({
       price: String(data_accountant.price),
       billSerialNumber: data_accountant.billSerialNumber ?? '',
       notes: data_accountant.notes ?? '',
+      isImported: data_accountant.isImported,
+      accountsReceivableDeduction: data_accountant.accountsReceivableDeduction,
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
+  // ---------------------------------------------------------------------------
+  let isAllowToEditIsImported = false;
+
+  if (!isNew && isWorksDepartment && !state_accountant.billSerialNumber) {
+    isAllowToEditIsImported = true;
+  }
+
+  // ---------------------------------------------------------------------------
   return (
     <div className={classNames(scss.row, className)}>
       <div
@@ -667,11 +724,45 @@ const Row = ({
             <IconDelete01 className={classNames(!disabled && 'invisible')} onClick={handle_delete} />
           </>
         )}
-        {isReadOnly && !state_accountant.billSerialNumber && (
+        {isReadOnly && !state_accountant.billSerialNumber && !state_accountant.isImported && (
           <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant?.id)}>
             匯入發票
           </MyButton_v2>
         )}
+      </div>
+
+      <div
+        //
+        className={classNames(scss.cell, configList?.isImported?.className)}
+        style={configList?.isImported?.style}
+      >
+        <InputSel
+          key="isImported"
+          showBaseline="invisible"
+          wrapperStyle={{ width: 16 }}
+          disabled={!isAllowToEditIsImported}
+          checkBoxProps_v2={{
+            props: {
+              value: state_accountant.isImported ? ['true'] : [],
+              onChange: (arr) => {
+                const isImported = arr[0];
+
+                if (isImported === 'true') {
+                  handle_checkIsImported(true);
+                  // setState_accountant((state) => ({ ...state, isImported: true }));
+                } else {
+                  handle_checkIsImported(false);
+                  // setState_accountant((state) => ({ ...state, isImported: false }));
+                }
+              },
+            },
+            checkBoxPropsArr: [
+              {
+                value: 'true',
+              },
+            ],
+          }}
+        />
       </div>
 
       <div className={classNames(scss.cell, configList?.insertDate?.className)} style={configList?.insertDate?.style}>
@@ -685,8 +776,6 @@ const Row = ({
           // wrapperStyle={{ width: 85 }}
           datePickerProps={{
             props: {
-              // allowClear: false,
-              // suffixIcon: null,
               defaultPickerValue: limitedDate,
               value: state_accountant.insertDate,
               onChange: (date) => {
@@ -716,6 +805,27 @@ const Row = ({
             value = Number(value).toLocaleString();
             inputType = 'text';
           }
+        }
+
+        if (key === 'accountingNumber') {
+          return (
+            <div key={key} className={classNames(scss.cell, config?.className)} style={config?.style}>
+              <InputSel
+                disabled={disabled}
+                showBaseline="auto"
+                selectProps={{
+                  props: {
+                    isSearchable: true,
+                    options: bankAccountOptionArr,
+                    value: value ? { label: value, value } : null,
+                    onChange: (option) => {
+                      setState_accountant((state) => ({ ...state, [key]: option?.value ?? '' }));
+                    },
+                  },
+                }}
+              />
+            </div>
+          );
         }
 
         return (
@@ -787,7 +897,7 @@ const AddInovice = ({
 
 // region config
 
-type TaccountantKey = keyof Tstate_accountant | 'btn';
+type TaccountantKey = keyof Tstate_accountant | 'btn' | 'isImported';
 
 type Tconfig = {
   label?: string;
@@ -803,7 +913,7 @@ type TconfigList = {
   [key in TaccountantKey]?: Tconfig;
 };
 
-const baseArr_before: TaccountantKey[] = ['btn', 'insertDate'];
+const baseArr_before: TaccountantKey[] = ['btn', 'isImported', 'insertDate'];
 const baseArr_after: TaccountantKey[] = ['accountingNumber', 'vendorName', 'price', 'billSerialNumber', 'notes'];
 
 const lookup_keyArr: {
@@ -822,6 +932,14 @@ const configList: TconfigList = {
     },
     className: '',
   },
+  isImported: {
+    label: '已匯入紙本應收帳款',
+    style: {
+      width: 150,
+      justifyContent: 'center',
+    },
+    className: '',
+  },
   insertDate: {
     style: {
       width: 130,
@@ -837,7 +955,7 @@ const configList: TconfigList = {
   accountingNumber: {
     label: '存入帳號',
     style: {
-      width: 185,
+      width: 250,
     },
     className: '',
   },
@@ -902,4 +1020,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   price: '',
   billSerialNumber: '',
   notes: '',
+  isImported: false,
+  accountsReceivableDeduction: [],
 });

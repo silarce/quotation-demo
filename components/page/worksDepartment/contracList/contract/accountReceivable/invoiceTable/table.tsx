@@ -100,6 +100,7 @@ function InvoicePanel_pre(
   }: {
     data_invoice?: Tinvoice_reduce;
     finalProdArr: TquotationProductDto[];
+    // 用來取代原本的totals，內容為所有totals的總和
     totalsTotal?: {
       subTotal: number;
       tax: number;
@@ -413,9 +414,9 @@ function InvoicePanel_pre(
       };
     }
 
-    if (totalsTotal) {
-      console.log(totalsTotal);
-    }
+    // if (totalsTotal) {
+    //   console.log(totalsTotal);
+    // }
     // _______________________________________________________________________
     // _______________________________________________________________________
 
