@@ -3371,6 +3371,29 @@ export type TcompletedProductDto = {
   completedPayment: number;
 };
 
+// =========================================================================
+// region /accountant
+
+export type TaccountantPresetDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  accountName: string;
+  account: string;
+  bankCode: string;
+  bankName: string;
+};
+
+export type TcreateAccountantPresetDto = Pick<
+  TaccountantPresetDto,
+  'accountName' | 'account' | 'bankCode' | 'bankName'
+>;
+export type TupdateAccountantPresetDto = Pick<
+  TaccountantPresetDto,
+  'accountName' | 'account' | 'bankCode' | 'bankName'
+>;
+
 // 應收帳款明細
 export type TaccountsReceivableDto = {
   id: string;
@@ -3603,11 +3626,22 @@ export type TaccountantDto = {
   //
   // 扣款明細
   accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+
+  isImported: boolean; // 是否已匯入紙本應收帳款
 };
 
 export type TcreateAccountantDto = Pick<
   TaccountantDto,
-  'paymentType' | 'accountingNumber' | 'insertDate' | 'vendorName' | 'price' | 'notes' | 'fee'
+  | 'paymentType'
+  //
+  | 'accountingNumber'
+  | 'insertDate'
+  | 'vendorName'
+  | 'price'
+  | 'notes'
+  | 'fee'
+  | 'importAccountingNumber'
+  | 'noteNumber'
 > & {
   noteMaturityDate?: string | null; // 票據到期日
 };
@@ -3623,6 +3657,7 @@ export type TupdateAccountantDeductionDto = {
   // 沒有改也必須要送，所以沒有改就是送原本的
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
   order?: number;
+  isImported?: boolean;
 };
 
 /**扣款明細 */

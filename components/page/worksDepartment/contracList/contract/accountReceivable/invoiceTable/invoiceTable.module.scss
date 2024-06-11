@@ -93,7 +93,10 @@ $invoiceHeight: 775px; // 沒時間處裡Left的高度問題了，直接設固�
   height: 30px;
   font-size: $fontSize;
   &.threeCol.plus {
-    grid-template-columns: 50px 50px 1fr;
+    grid-template-columns: 50px 50px auto;
+    input {
+      width: 130px;
+    }
   }
 }
 
