@@ -302,14 +302,15 @@ export default function AccountantSorting({
               );
             })}
 
-            <DragOverlay>
+            {/* DragOverlay會無法觸發底下元素的hover */}
+            {/* <DragOverlay>
               <Row className={scss.activeState}>
                 <span>{activeAccountant?.insertDate}</span>
                 <span>{activeAccountant?.importAccountingNumber}</span>
                 <span>{activeAccountant?.noteMaturityDate}</span>
                 <span>{activeAccountant?.price}</span>
               </Row>
-            </DragOverlay>
+            </DragOverlay> */}
           </DndContext>
         </div>
         {/*  */}
@@ -425,17 +426,19 @@ const Group_Dnd = ({
   }
 
   return (
-    <Group className={scss['tbody']}>
+    <Group className={classNames(scss['tbody'], !disabled && scss.abled)}>
       <Left>
         <Row>
           <span>{invoiceNumber}</span>
           <span>{invoiceDate}</span>
-          <span>{price}</span>
+          <span className="justify-self-end mr-5">{price}</span>
         </Row>
 
         <Row className={classNames(scss.allowance, scss.plus, disabled && scss.disabled)}>
-          <p className="ml-20">折讓</p>
+          <div></div>
+          <p>折讓</p>
           <input
+            className="justify-self-end mr-5"
             placeholder="無折讓"
             readOnly={disabled}
             type={disabled ? 'text' : 'number'}

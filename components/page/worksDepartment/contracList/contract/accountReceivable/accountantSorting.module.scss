@@ -133,10 +133,29 @@
   align-items: center;
   height: 45px;
   color: theme("colors.border");
-  background-color: #eee;
+  // background-color: #eee;
+  background-color: #eee5;
 }
 
 .dndContainer {
   max-height: 380px;
   overflow: auto;
+  .group {
+    .row {
+      cursor: auto;
+    }
+
+    &.abled {
+      .row {
+        cursor: pointer;
+      }
+
+      &:hover {
+        background-color: theme("colors.chosenBgc");
+      }
+      .right .row:hover {
+        background-color: theme("colors.hoverBgc");
+      }
+    }
+  }
 }
