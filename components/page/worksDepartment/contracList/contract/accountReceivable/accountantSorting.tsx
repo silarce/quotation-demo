@@ -49,6 +49,7 @@ type Tinvoice = {
   invoiceNumber: React.ReactNode;
   invoiceDate: React.ReactNode;
   price: React.ReactNode;
+  allowance: string;
 };
 
 type Taccountant = {
@@ -65,6 +66,7 @@ type Taccountant = {
 
 type Tstate = {
   isAccountantOrderChanged: boolean;
+  isInvoiceAllowanceChanged: boolean;
   invoice: Tinvoice;
   accountantArr: Taccountant[];
 };
@@ -123,6 +125,19 @@ export default function AccountantSorting({
     setDisabled(true);
   };
 
+  const handle_editAllowance = (invoiceId: string, value: string) => {
+    setStateListArr((list) => {
+      list = { ...list };
+      const state = list[invoiceId];
+      const invoice = state.invoice;
+      invoice.allowance = value;
+
+      state.isInvoiceAllowanceChanged = true;
+
+      return list;
+    });
+  };
+
   // -----------------------------------------------------------------------------
 
   // region props
@@ -162,7 +177,7 @@ export default function AccountantSorting({
     const list: TstateList = {};
 
     invoiceArr.forEach((invoice) => {
-      const { id: invoiceId, accountantList, invoiceNumber, invoiceDate, price } = invoice;
+      const { id: invoiceId, accountantList, invoiceNumber, invoiceDate, price, allowance } = invoice;
 
       const orderedAccountantList = _.sortBy(accountantList, 'order');
 
@@ -191,11 +206,13 @@ export default function AccountantSorting({
 
       list[invoiceId] = {
         isAccountantOrderChanged: false,
+        isInvoiceAllowanceChanged: false,
         invoice: {
           id: invoiceId,
           invoiceNumber,
           invoiceDate: getTaiwanDateStr(invoiceDate),
           price: price.toLocaleString(),
+          allowance: String(allowance || ''),
         },
         accountantArr: accountantArr,
       };
@@ -216,7 +233,7 @@ export default function AccountantSorting({
 
         {disabled && (
           <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
-            排序
+            排序/編輯
           </MyButton_v2>
         )}
 
@@ -280,6 +297,7 @@ export default function AccountantSorting({
                   disabled={disabled}
                   //
                   activeAccountandId={activeAccountant?.id}
+                  handle_editAllowance={handle_editAllowance}
                 />
               );
             })}
@@ -381,13 +399,16 @@ const Group_Dnd = ({
   state,
   disabled,
   activeAccountandId,
+  handle_editAllowance,
 }: {
   state: Tstate;
   disabled: boolean;
   activeAccountandId?: UniqueIdentifier | undefined;
+  handle_editAllowance: (invoiceId: string, value: string) => void;
 }) => {
   const { invoice, accountantArr } = state;
   const { id, invoiceNumber, invoiceDate, price } = invoice;
+  let { allowance } = invoice;
 
   const dndData_group: TdndData_group = {
     isContainer: true,
@@ -399,6 +420,10 @@ const Group_Dnd = ({
     data: dndData_group,
   });
 
+  if (allowance !== '') {
+    allowance = disabled ? Number(allowance).toLocaleString() : allowance;
+  }
+
   return (
     <Group className={scss['tbody']}>
       <Left>
@@ -407,9 +432,23 @@ const Group_Dnd = ({
           <span>{invoiceDate}</span>
           <span>{price}</span>
         </Row>
+
+        <Row className={classNames(scss.allowance, scss.plus, disabled && scss.disabled)}>
+          <p className="ml-20">折讓</p>
+          <input
+            placeholder="無折讓"
+            readOnly={disabled}
+            type={disabled ? 'text' : 'number'}
+            value={allowance}
+            onChange={(e) => {
+              handle_editAllowance(String(invoice.id), e.target.value);
+            }}
+          />
+        </Row>
       </Left>
       <Right>
         {accountantArr.length === 0 && (
+          //  dropContainer必須有固定高度，否則拖拉時會有bug
           <div ref={setNodeRef} className={scss.dropContainer}>
             無收款
           </div>
@@ -576,6 +615,8 @@ function handleDragOver(
 
   //over是否為Droppable container 就是useDroppable處理並綁定的的那個div
   if (over?.data.current?.isContainer) {
+    console.log(e);
+
     const {
       //  isContainer,
       invoice,

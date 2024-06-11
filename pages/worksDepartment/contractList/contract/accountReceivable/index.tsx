@@ -475,8 +475,17 @@ export default function AccountReceivable() {
       isRelationedInvoiceChanged: boolean;
     }[] = [];
 
-    Object.values(stateList).forEach((state) => {
-      const { isAccountantOrderChanged, invoice, accountantArr: state_accountantArr } = state;
+    for (const state of Object.values(stateList)) {
+      const {
+        isAccountantOrderChanged,
+        isInvoiceAllowanceChanged,
+        invoice,
+        accountantArr: state_accountantArr,
+      } = state;
+
+      if (isInvoiceAllowanceChanged) {
+        await apiPatchAccountReceivableInvoice(String(invoice.id), { allowance: Number(invoice.allowance) });
+      }
 
       if (isAccountantOrderChanged) {
         state_accountantArr.forEach((accountant, index) => {
@@ -496,7 +505,7 @@ export default function AccountReceivable() {
           });
         });
       }
-    });
+    }
 
     for (const accountant of accountantArr) {
       const {
