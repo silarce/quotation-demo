@@ -78,15 +78,6 @@
   }
 }
 
-.row {
-  display: grid;
-  justify-items: center;
-  padding: 10px 0;
-  &.active {
-    background-color: theme("colors.hoverBgc");
-  }
-}
-
 .footCaption {
   padding: 15px;
   background-color: theme("colors.bgc01");
@@ -95,6 +86,15 @@
   font-size: 18px;
   font-weight: 700;
   text-align: center;
+}
+
+.row {
+  display: grid;
+  justify-items: center;
+  padding: 10px 0;
+  &.active {
+    background-color: theme("colors.hoverBgc");
+  }
 }
 
 .row.activeState {
@@ -110,15 +110,52 @@
   }
 }
 
+.row.allowance.plus {
+  grid-template-columns: 1fr 1fr 1fr;
+
+  input {
+    border-bottom: solid 1px black;
+    width: 100%;
+    text-align: right;
+    background-color: inherit;
+  }
+
+  &.disabled {
+    input {
+      border-color: transparent;
+    }
+  }
+}
+
 .dropContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  height: 45px;
   color: theme("colors.border");
+  // background-color: #eee;
+  background-color: #eee5;
 }
 
 .dndContainer {
   max-height: 380px;
   overflow: auto;
+  .group {
+    .row {
+      cursor: auto;
+    }
+
+    &.abled {
+      .row {
+        cursor: pointer;
+      }
+
+      &:hover {
+        background-color: theme("colors.chosenBgc");
+      }
+      .right .row:hover {
+        background-color: theme("colors.hoverBgc");
+      }
+    }
+  }
 }

@@ -18,6 +18,10 @@ import type {
   TcreateAccountantDto,
   TupdateAccountantDto,
   TupdateAccountantDeductionDto,
+  TupdateAccountReceivableDeductionDto,
+  TaccountantPresetDto,
+  TcreateAccountantPresetDto,
+  TupdateAccountantPresetDto,
 } from './dtoTypes';
 
 export type {
@@ -29,6 +33,10 @@ export type {
   TcreateAccountantDto,
   TupdateAccountantDto,
   TupdateAccountantDeductionDto,
+  TupdateAccountReceivableDeductionDto,
+  TaccountantPresetDto,
+  TcreateAccountantPresetDto,
+  TupdateAccountantPresetDto,
 } from './dtoTypes';
 
 type TgetAccountant = TpageResponse<TaccountantDto>;
@@ -179,6 +187,62 @@ const apiPatchAccountant_accountReceivable = async (
     });
 };
 
+const apiGetAccountantPreset = async () => {
+  const api = '/accountant-preset';
+
+  return axi
+    .get<TpageResponse<TaccountantPresetDto>>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+const useGetAccountantPreset = ({
+  // params,
+  autoUpdate = true,
+  callAlert,
+}: {
+  // params?: Tparams;
+  autoUpdate?: boolean;
+  callAlert?: boolean;
+} = {}) => {
+  const [res, setRes] = useState<TpageResponse<TaccountantPresetDto>>();
+  const [isFetching, setIsFetching] = useState(false);
+
+  const update = useCallback(async () => {
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetAccountantPreset();
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+      callAlert &&
+        myAlert.err({
+          title: '取得銀行帳戶列表失敗',
+          content: err.message,
+        });
+
+      return err;
+    } finally {
+      setIsFetching(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [update]);
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+    isFetching,
+  };
+};
+
+// ==============================================================================
 export {
   apiGetAccountant,
   apiPostAccountant,
@@ -188,4 +252,5 @@ export {
   //
   useGetAccountant_infinite,
   useGetAccountant,
+  useGetAccountantPreset,
 };

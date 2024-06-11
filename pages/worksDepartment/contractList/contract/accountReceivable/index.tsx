@@ -4,8 +4,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment from 'moment';
-import Decimal from 'decimal.js';
 import _ from 'lodash';
 
 // layer
@@ -40,49 +38,44 @@ import AccountantSorting, {
 // import Table_request from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_request';
 
 // gear
-import InputSel, { TinputSelProps, TcheckboxProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
-import PaymentRecordSelector from 'components/global/gear/modal/paymentRecordSelector';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import TwoButtonModal_free, { TwoBtnFooter } from 'components/global/gear/modal/simpleModal/twoButtonModal_free';
-import InvoiceSelector from 'components/global/gear/modal/invoiceSelector';
 
 // api
 import {
-  Tparams,
-  TupdateEngineeringContactDto,
-  TupdateAccountReceivableDto,
-  TaccountReceivableDto,
+  // Tparams,
+  // TupdateEngineeringContactDto,
+  // TupdateAccountReceivableDto,
+  // TaccountReceivableDto,
   TcreateAccountReceivableInvoiceDto,
   TcreateAccountReceivableDto,
   TupdateAccountReceivableInvoiceDto,
-  TaccountsReceivableInvoiceDto,
+  // TaccountsReceivableInvoiceDto,
   //
-  useGetEngineeringContact,
-  useGetAccountReceivableAccountants,
-  useGetAccountReceivableIncoices,
-  useGetAccountReceivable_id,
+  // useGetEngineeringContact,
+  // useGetAccountReceivableAccountants,
+  // useGetAccountReceivableIncoices,
+  // useGetAccountReceivable_id,
   // useGetFinalProduct, // 不是這個
   //
-  apiPatchAccountReceivable,
-  apiPatchEngineeringContact,
-  apiPostWorkSheet,
+  // apiPatchAccountReceivable,
+  // apiPatchEngineeringContact,
+  // apiPostWorkSheet,
   apiPatchAccountReceivableInvoice,
-  apiPatchAccountReceivableAccountant,
-  apiPatchAccountReceivableVoidInvoice,
+  // apiPatchAccountReceivableAccountant,
+  // apiPatchAccountReceivableVoidInvoice,
   apiPostAccountReceivable,
-  apiPostAccountReceivableAccountant,
-  apiDeleteAccountReceivableAccountant,
+  // apiPostAccountReceivableAccountant,
+  // apiDeleteAccountReceivableAccountant,
   apiPostAccountReceivableIncoice, // 新增應收帳款發票
   apiPatchAccountantInvoice,
-  apiPatchAccountReceivableDeduction_accountant, // 批量更新 應收帳款 扣款明細
+  // apiPatchAccountReceivableDeduction_accountant, // 批量更新 應收帳款 扣款明細
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
 import {
   TaccountantDto,
-  TupdateAccountantDto,
-  TupdateAccountantDeductionDto,
+  // TupdateAccountantDto,
+  // TupdateAccountantDeductionDto,
 
   //
   //  apiPatchAccountant,
@@ -90,9 +83,6 @@ import {
 } from 'js/api/api_accountant';
 
 import type { TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
-
-// utils
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './index.module.scss';
@@ -107,14 +97,8 @@ export default function AccountReceivable() {
   const { contractId } = router.query as { contractId: string | undefined };
 
   const [isFetching_req, setIsFetching_req] = useState<boolean>(false);
-  const [disabled, setDisabled] = useState(true);
 
   let isFetching = false;
-
-  // --------------------------------------------------------------------------
-
-  const [showRecordModal, setShowRecordModal] = useState<boolean>(false);
-  const [showPeriodModal, setShowPeriodModal] = useState<boolean>(false);
 
   // --------------------------------------------------------------------------
 
@@ -475,8 +459,17 @@ export default function AccountReceivable() {
       isRelationedInvoiceChanged: boolean;
     }[] = [];
 
-    Object.values(stateList).forEach((state) => {
-      const { isAccountantOrderChanged, invoice, accountantArr: state_accountantArr } = state;
+    for (const state of Object.values(stateList)) {
+      const {
+        isAccountantOrderChanged,
+        isInvoiceAllowanceChanged,
+        invoice,
+        accountantArr: state_accountantArr,
+      } = state;
+
+      if (isInvoiceAllowanceChanged) {
+        await apiPatchAccountReceivableInvoice(String(invoice.id), { allowance: Number(invoice.allowance) });
+      }
 
       if (isAccountantOrderChanged) {
         state_accountantArr.forEach((accountant, index) => {
@@ -496,7 +489,7 @@ export default function AccountReceivable() {
           });
         });
       }
-    });
+    }
 
     for (const accountant of accountantArr) {
       const {
