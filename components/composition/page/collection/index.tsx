@@ -82,6 +82,12 @@ type Tstate_accountant = {
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
 type TreqPatch = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
+// type TreqPatchIsImported = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
+type TreqPatchIsImported = (
+  id: string,
+  isImported: boolean,
+  accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
+) => Promise<void>;
 type TreqDelete = (id: string) => Promise<void>;
 
 // =============================================================================
@@ -182,7 +188,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
 
   const reqPatch = async (id: string, state_accountant: Tstate_accountant) => {
     if (isWorksDepartment) {
-      alert('ReadOnly');
+      alert('isWorksDepartment should be true');
 
       return;
     }
@@ -209,15 +215,27 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
 
     await apiPatchAccountant(id, { body });
 
-    if (state_accountant.isImported) {
-      await apiPatchAccountant_accountReceivable(id, {
-        accountsReceivableDeduction: state_accountant.accountsReceivableDeduction,
-        isImported: state_accountant.isImported,
-      });
-    }
-
     await update_accountant();
   };
+
+  const reqPatchIsImported = async (
+    //
+    id: string,
+    isImported: boolean,
+    accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
+  ) => {
+    if (!isWorksDepartment) {
+      alert('isWorksDepartment should be false');
+
+      return;
+    }
+
+    await apiPatchAccountant_accountReceivable(id, {
+      accountsReceivableDeduction,
+      isImported,
+    });
+    await update_accountant();
+  }; // reqPatchIsImported
 
   const reqDelete = async (id: string) => {
     await deleteAccountant(id);
@@ -326,6 +344,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
               //
               isReadOnly={isWorksDepartment}
               bankAccountOptionArr={bankAccountOptionArr}
+              isWorksDepartment={isWorksDepartment}
             />
           )}
 
@@ -337,9 +356,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
                 paymentType={paymentType}
                 reqPatch={reqPatch}
                 reqDelete={reqDelete}
+                reqPatchIsImported={reqPatchIsImported}
                 isReadOnly={isWorksDepartment}
                 setAccountantId={setAccountantId}
                 bankAccountOptionArr={bankAccountOptionArr}
+                isWorksDepartment={isWorksDepartment}
               />
             );
           })}
@@ -564,6 +585,8 @@ const Row = ({
   isReadOnly,
   setAccountantId,
   bankAccountOptionArr,
+  reqPatchIsImported,
+  isWorksDepartment,
 }: {
   // children: React.ReactNode;
   paymentType: TpaymentType;
@@ -579,6 +602,8 @@ const Row = ({
   isReadOnly: boolean;
   setAccountantId?: (id: string | undefined) => void;
   bankAccountOptionArr: Toption[];
+  reqPatchIsImported?: TreqPatchIsImported;
+  isWorksDepartment: boolean;
 }) => {
   const isNew = !!postProps;
 
@@ -625,6 +650,18 @@ const Row = ({
     }
   };
 
+  const handle_checkIsImported = async (isImported: boolean) => {
+    if (data_accountant?.id && reqPatchIsImported) {
+      await reqPatchIsImported(data_accountant.id, isImported, state_accountant.accountsReceivableDeduction);
+      // if (data_accountant?.id && reqPatchIsImported) {
+      //   await reqPatchIsImported(data_accountant.id, state_accountant);
+      //   setDisabled(true);
+      // } else {
+      //   alert('錯誤，data_accountant.id或reqPatchIsImported為undefined');
+      // }
+    }
+  };
+
   // ---------------------------------------------------
 
   useEffect(() => {
@@ -650,6 +687,14 @@ const Row = ({
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
+  let isAllowToEditIsImported = false;
+
+  if (isNew) {
+    isAllowToEditIsImported = true;
+  } else if (isWorksDepartment && !state_accountant.billSerialNumber) {
+    isAllowToEditIsImported = true;
+  }
+
   return (
     <div className={classNames(scss.row, className)}>
       <div
@@ -672,7 +717,7 @@ const Row = ({
             <IconDelete01 className={classNames(!disabled && 'invisible')} onClick={handle_delete} />
           </>
         )}
-        {isReadOnly && !state_accountant.billSerialNumber && (
+        {isReadOnly && !state_accountant.billSerialNumber && !state_accountant.isImported && (
           <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant?.id)}>
             匯入發票
           </MyButton_v2>
@@ -688,7 +733,7 @@ const Row = ({
           key="isImported"
           showBaseline="invisible"
           wrapperStyle={{ width: 16 }}
-          disabled={isNew ? true : disabled}
+          disabled={!isAllowToEditIsImported}
           checkBoxProps_v2={{
             props: {
               value: state_accountant.isImported ? ['true'] : [],
@@ -696,9 +741,11 @@ const Row = ({
                 const isImported = arr[0];
 
                 if (isImported === 'true') {
-                  setState_accountant((state) => ({ ...state, isImported: true }));
+                  handle_checkIsImported(true);
+                  // setState_accountant((state) => ({ ...state, isImported: true }));
                 } else {
-                  setState_accountant((state) => ({ ...state, isImported: false }));
+                  handle_checkIsImported(false);
+                  // setState_accountant((state) => ({ ...state, isImported: false }));
                 }
               },
             },
