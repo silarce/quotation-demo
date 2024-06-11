@@ -643,8 +643,15 @@ const Row = ({
 
   const handle_delete = async () => {
     if (data_accountant?.id && reqDelete) {
-      await reqDelete(data_accountant.id);
-      setDisabled(true);
+      myAlert.confirm({
+        title: '確定刪除',
+        props: {
+          onOk: async () => {
+            await reqDelete(data_accountant.id);
+            setDisabled(true);
+          },
+        },
+      });
     } else {
       alert('錯誤，data_accountant.id或reqDelete為undefined');
     }
@@ -687,14 +694,14 @@ const Row = ({
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
+  // ---------------------------------------------------------------------------
   let isAllowToEditIsImported = false;
 
-  if (isNew) {
-    isAllowToEditIsImported = true;
-  } else if (isWorksDepartment && !state_accountant.billSerialNumber) {
+  if (!isNew && isWorksDepartment && !state_accountant.billSerialNumber) {
     isAllowToEditIsImported = true;
   }
 
+  // ---------------------------------------------------------------------------
   return (
     <div className={classNames(scss.row, className)}>
       <div
