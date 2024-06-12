@@ -187,24 +187,29 @@ const apiPatchAccountant_accountReceivable = async (
     });
 };
 
-const apiGetAccountantPreset = async () => {
+const apiGetAccountantPreset = async (params?: Tparams) => {
   const api = '/accountant-preset';
 
   return axi
-    .get<TpageResponse<TaccountantPresetDto>>(api)
+    .get<TpageResponse<TaccountantPresetDto>>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
 const useGetAccountantPreset = ({
-  // params,
+  params,
   autoUpdate = true,
   callAlert,
 }: {
-  // params?: Tparams;
+  params?: Tparams;
   autoUpdate?: boolean;
   callAlert?: boolean;
 } = {}) => {
+  params = {
+    sort: 'createdAt',
+    ...params,
+  };
+
   const [res, setRes] = useState<TpageResponse<TaccountantPresetDto>>();
   const [isFetching, setIsFetching] = useState(false);
 
@@ -212,7 +217,7 @@ const useGetAccountantPreset = ({
     setIsFetching(true);
 
     try {
-      const res = await apiGetAccountantPreset();
+      const res = await apiGetAccountantPreset(params);
       setRes(res);
 
       return res;

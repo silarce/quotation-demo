@@ -12,7 +12,7 @@ import Profile, { Tcontrol_profile } from 'components/page/worksDepartment/contr
 import EditDispatch, {
   Tcontroll as Tcontroll_editDispatch,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
-import ModalPdf from './modalPdf';
+import ModalPdf, { Tdata_pdf } from './modalPdf';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -56,6 +56,9 @@ type Tstate_profile = {
   constructionSiteContactNumber: string;
   warrantyDate: string;
   finalContactPerson: string;
+
+  pointContactPerson: string;
+  pointContactNumber: string;
 };
 
 type Tstate_pricingMethod = {
@@ -72,6 +75,8 @@ export default function EditDispatchList() {
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const theDiasbled = !dispatchingId ? false : disabled;
+
+  const [showPdf, setShowPdf] = useState(false);
 
   // ---------------------------------------------------------
   const [state_profile, setState_profile] = useState<Tstate_profile>(emptyState_profile());
@@ -90,10 +95,13 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId);
-  const engineeringContactId = contract?.engineeringContactId;
-  const { data: engineeringContact, update: update_engineeringContact } =
-    useGetEngineeringContact(engineeringContactId);
+  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+    customPopulate: ['content.customer', 'engineeringContact'],
+  });
+
+  const { engineeringContactId, engineeringContact } = contract ?? {};
+  // const { data: engineeringContact, update: update_engineeringContact } =
+  //   useGetEngineeringContact(engineeringContactId);
 
   const { data: dispatching, update: update_dispatching } = useGetEngineeringDispatching_id(dispatchingId);
 
@@ -234,6 +242,9 @@ export default function EditDispatchList() {
       pricingMethod: JSON.stringify(state_pricingMethod),
       note: state_dispatch.note || null,
       isCompleted: state_dispatch.isCompleted,
+
+      pointContactPerson: state_profile.pointContactPerson,
+      pointContactNumber: state_profile.pointContactNumber,
     };
 
     try {
@@ -308,9 +319,9 @@ export default function EditDispatchList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId, dispatchingId]);
 
-  useEffect(() => {
-    update_engineeringContact();
-  }, [engineeringContactId]);
+  // useEffect(() => {
+  //   update_engineeringContact();
+  // }, [engineeringContactId]);
 
   useEffect(() => {
     if (!engineeringContact) {
@@ -320,10 +331,6 @@ export default function EditDispatchList() {
     const {
       dispatchDate,
       contractorContactPerson,
-      constructionSiteContactNumber,
-      county = engineeringContact.county,
-      district = engineeringContact.district,
-      address = engineeringContact.address,
       workerEmployee,
       finalContactPerson,
       tasks,
@@ -333,6 +340,32 @@ export default function EditDispatchList() {
       isCompleted,
     } = dispatching ?? {};
 
+    let {
+      //
+      constructionSiteContactNumber,
+      county,
+      district,
+      address,
+      pointContactPerson,
+      pointContactNumber,
+    } = dispatching ?? {};
+
+    // 如果dispatching不存在，也就是新增派工單
+    if (!dispatching) {
+      const contactInfo = engineeringContact.contactInfo;
+
+      const defaultPointContactPerson = contactInfo?.[0]?.contactPerson ?? '';
+      const defaultPointContactNumber = contactInfo?.[0]?.contactNumber ?? '';
+
+      constructionSiteContactNumber = engineeringContact.constructionSiteContactNumber;
+      county = engineeringContact.county;
+      district = engineeringContact.district;
+      address = engineeringContact.address;
+
+      pointContactPerson = defaultPointContactPerson ?? '';
+      pointContactNumber = defaultPointContactNumber ?? '';
+    }
+
     setState_profile({
       dispatchDate: dispatchDate ?? '',
       workerEmployee: workerEmployee ?? [],
@@ -340,12 +373,15 @@ export default function EditDispatchList() {
       projectNumber: contract?.content.quotationNumber ?? '',
       contractor: engineeringContact.contractor,
       contractorContactPerson: contractorContactPerson ?? '',
-      county: county,
-      district: district,
-      address: address,
+      county: county ?? '',
+      district: district ?? '',
+      address: address ?? '',
       constructionSiteContactNumber: constructionSiteContactNumber ?? '',
       warrantyDate: warrantyDate ?? '',
       finalContactPerson: finalContactPerson ?? '',
+
+      pointContactPerson: pointContactPerson ?? '',
+      pointContactNumber: pointContactNumber ?? '',
     });
 
     setState_dispatch({
@@ -366,54 +402,116 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
-  const control_profile: Tcontrol_profile = {
-    dispatchDate: {
-      value: state_profile.dispatchDate ? moment(state_profile.dispatchDate) : null,
-      disabled: theDiasbled,
-      onChange: (m) => changeProfile('dispatchDate', m?.toISOString() ?? ''),
-    },
-    workerEmployee: {
-      value: state_profile.workerEmployee,
-      onChange: changeProfile_workerEmployee,
-    },
-    projectName: state_profile.projectName,
-    projectNumber: state_profile.projectNumber,
-    contractor: state_profile.contractor,
-    contractorContactPerson: {
-      value: state_profile.contractorContactPerson,
-      disabled: theDiasbled,
-      onChange: (e) => changeProfile('contractorContactPerson', e.target.value),
-    },
-    // allAddress: state_profile.allAddress,
-    county: {
-      value: state_profile.county,
-      disabled: theDiasbled,
-      onChange: (str) => changeProfile('county', str),
-    },
-    district: {
-      value: state_profile.district,
-      disabled: theDiasbled,
-      onChange: (str) => changeProfile('district', str),
-    },
-    address: {
-      value: state_profile.address,
-      disabled: theDiasbled,
-      onChange: (e) => changeProfile('address', e.target.value),
-    },
-    constructionSiteContactNumber: {
-      value: state_profile.constructionSiteContactNumber,
-      disabled: theDiasbled,
-      onChange: (e) => changeProfile('constructionSiteContactNumber', e.target.value),
-    },
-    warrantyDate: state_profile.warrantyDate,
-    finalContactPerson: {
-      value: state_profile.finalContactPerson,
-      disabled: theDiasbled,
-      onChange: (e) => changeProfile('finalContactPerson', e.target.value),
-    },
-  };
+  const control_profile: Tcontrol_profile = useMemo(() => {
+    const contactInfo = engineeringContact?.contactInfo ?? [];
+
+    const options = contactInfo.map((info) => {
+      return {
+        label: info.contactPerson,
+        value: info.contactPerson,
+        phoneNumber: info.contactNumber,
+      };
+    });
+
+    const control_profile: Tcontrol_profile = {
+      dispatchDate: {
+        value: state_profile.dispatchDate ? moment(state_profile.dispatchDate) : null,
+        disabled: theDiasbled,
+        onChange: (m) => changeProfile('dispatchDate', m?.toISOString() ?? ''),
+      },
+      workerEmployee: {
+        value: state_profile.workerEmployee,
+        onChange: changeProfile_workerEmployee,
+      },
+      projectName: state_profile.projectName,
+      projectNumber: state_profile.projectNumber,
+      contractor: state_profile.contractor,
+      contractorContactPerson: {
+        value: state_profile.contractorContactPerson,
+        disabled: theDiasbled,
+        onChange: (e) => changeProfile('contractorContactPerson', e.target.value),
+      },
+      // allAddress: state_profile.allAddress,
+      county: {
+        value: state_profile.county,
+        disabled: theDiasbled,
+        onChange: (str) => changeProfile('county', str),
+      },
+      district: {
+        value: state_profile.district,
+        disabled: theDiasbled,
+        onChange: (str) => changeProfile('district', str),
+      },
+      address: {
+        value: state_profile.address,
+        disabled: theDiasbled,
+        onChange: (e) => changeProfile('address', e.target.value),
+      },
+      constructionSiteContactNumber: {
+        value: state_profile.constructionSiteContactNumber,
+        disabled: theDiasbled,
+        onChange: (e) => changeProfile('constructionSiteContactNumber', e.target.value),
+      },
+      warrantyDate: state_profile.warrantyDate,
+      finalContactPerson: {
+        value: state_profile.finalContactPerson,
+        disabled: theDiasbled,
+        onChange: (e) => changeProfile('finalContactPerson', e.target.value),
+      },
+
+      pointContactPerson: {
+        value: state_profile.pointContactPerson,
+        disabled: theDiasbled,
+        onChange: (option) => {
+          const { value, phoneNumber } = option ?? {};
+          changeProfile('pointContactPerson', value ?? '');
+          changeProfile('pointContactNumber', phoneNumber ?? '');
+        },
+      },
+
+      pointContactNumber: {
+        value: state_profile.pointContactNumber,
+        disabled: theDiasbled,
+        onChange: (e) => changeProfile('pointContactNumber', e.target.value),
+      },
+      pointContractPersonOptions: options,
+    };
+
+    return control_profile;
+  }, [state_profile, theDiasbled, engineeringContact?.contactInfo]);
 
   // ---------------------------------------------------------
+
+  const data_pdf: Tdata_pdf = useMemo(() => {
+    const {
+      //
+      county = '',
+      district = '',
+      address = '',
+      warrantyDate,
+      tasks = '',
+    } = dispatching ?? {};
+
+    const wholeAddress = `${county}${district}${address}`;
+
+    const data_pdf: Tdata_pdf = {
+      customerName: contract?.content.customer?.name ?? '',
+      phoneNumber: dispatching?.constructionSiteContactNumber ?? '',
+      contactPerson: '------',
+      address: wholeAddress,
+      projectNumber: contract?.contractNumber ?? '',
+      warrantyPeriod: warrantyDate ?? '',
+      content: tasks,
+    };
+
+    return data_pdf;
+  }, [
+    //
+    contract,
+    engineeringContact,
+    dispatching,
+  ]);
+
   const panelList01: TpanelList = [
     {
       type: 'redButton',
@@ -436,6 +534,11 @@ export default function EditDispatchList() {
     },
   ];
   const panelList02: TpanelList = [
+    {
+      type: 'myButton',
+      label: '匯出',
+      onClick: () => setShowPdf(true),
+    },
     {
       type: 'myButton',
       label: '編輯',
@@ -488,7 +591,7 @@ export default function EditDispatchList() {
         />
       </div>
 
-      {/* <ModalPdf visible={true} /> */}
+      <ModalPdf visible={showPdf} onCancel={() => setShowPdf(false)} data={data_pdf} />
     </SubLayer>
   );
 }
@@ -508,4 +611,6 @@ const emptyState_profile = (): Tstate_profile => ({
   constructionSiteContactNumber: '',
   warrantyDate: '',
   finalContactPerson: '',
+  pointContactPerson: '',
+  pointContactNumber: '',
 });
