@@ -11,7 +11,13 @@ import PageHeader02, { TpanelList, TtagList } from 'components/PageHeader/PageHe
 // gaer
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import InputSel, { TinputProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, {
+  TinputProps,
+  TselectProps,
+  TdatePickerProps,
+  TcheckBoxProps_v2,
+  TinputSelProps,
+} from 'components/global/gear/inputAndSel_v2/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
@@ -78,6 +84,8 @@ type Tstate_accountant = {
 
   isImported: boolean;
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
+
+  noteMaturityDate: Moment | null;
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -179,6 +187,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       paymentType,
       price: Number(state_accountant.price),
       fee: 0,
+      noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
     };
 
     await apiPostAccountant({ body });
@@ -211,6 +220,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       paymentType,
       price: Number(state_accountant.price),
       // fee: 0,
+      noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
     };
 
     await apiPatchAccountant(id, { body });
@@ -613,12 +623,10 @@ const Row = ({
   let keyArr = lookup_keyArr[paymentType];
   keyArr = [...keyArr];
 
-  keyArr = keyArr.slice(baseArr_before.length);
+  // keyArr = keyArr.slice(baseArr_before.length);
+  keyArr = keyArr.slice(1);
 
-  const theKeyArr = keyArr as Exclude<
-    TaccountantKey,
-    'btn' | 'isImported' | 'insertDate' | 'accountsReceivableDeduction'
-  >[];
+  const theKeyArr = keyArr as Exclude<TaccountantKey, 'btn' | 'accountsReceivableDeduction'>[];
 
   const limitedDate =
     state_accountant.insertDate ??
@@ -691,6 +699,7 @@ const Row = ({
       notes: data_accountant.notes ?? '',
       isImported: data_accountant.isImported,
       accountsReceivableDeduction: data_accountant.accountsReceivableDeduction,
+      noteMaturityDate: data_accountant.noteMaturityDate ? moment(data_accountant.noteMaturityDate) : null,
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -731,119 +740,36 @@ const Row = ({
         )}
       </div>
 
-      <div
-        //
-        className={classNames(scss.cell, configList?.isImported?.className)}
-        style={configList?.isImported?.style}
-      >
-        <InputSel
-          key="isImported"
-          showBaseline="invisible"
-          wrapperStyle={{ width: 16 }}
-          disabled={!isAllowToEditIsImported}
-          checkBoxProps_v2={{
-            props: {
-              value: state_accountant.isImported ? ['true'] : [],
-              onChange: (arr) => {
-                const isImported = arr[0];
-
-                if (isImported === 'true') {
-                  handle_checkIsImported(true);
-                  // setState_accountant((state) => ({ ...state, isImported: true }));
-                } else {
-                  handle_checkIsImported(false);
-                  // setState_accountant((state) => ({ ...state, isImported: false }));
-                }
-              },
-            },
-            checkBoxPropsArr: [
-              {
-                value: 'true',
-              },
-            ],
-          }}
-        />
-      </div>
-
-      <div className={classNames(scss.cell, configList?.insertDate?.className)} style={configList?.insertDate?.style}>
-        <InputSel
-          key={
-            // 為了重置defaultPickerValue
-            limitedDate?.toISOString()
-          }
-          disabled={disabled}
-          showBaseline="auto"
-          // wrapperStyle={{ width: 85 }}
-          datePickerProps={{
-            props: {
-              defaultPickerValue: limitedDate,
-              value: state_accountant.insertDate,
-              onChange: (date) => {
-                setState_accountant((state) => ({ ...state, insertDate: date }));
-              },
-              disabledDate: (date) => {
-                return !date.isSame(limitedDate, 'month');
-              },
-            },
-          }}
-        />
-      </div>
-
       {theKeyArr.map((key) => {
         const isbillSerialNumber = key === 'billSerialNumber';
 
         const config = configList[key];
 
-        let value = state_accountant[key];
+        const value = state_accountant[key];
 
-        let inputType = 'text';
+        const props = config?.inputSelPropsCreator({
+          disabled,
+          bankAccountOptionArr,
+          limitedDate,
+          value,
+          setState_accountant,
+          handle_checkIsImported,
+        });
 
-        if (key === 'price') {
-          inputType = 'number';
+        let theDiasbled = isbillSerialNumber || disabled;
 
-          if (disabled) {
-            value = Number(value).toLocaleString();
-            inputType = 'text';
-          }
-        }
-
-        if (key === 'accountingNumber') {
-          return (
-            <div key={key} className={classNames(scss.cell, config?.className)} style={config?.style}>
-              <InputSel
-                disabled={disabled}
-                showBaseline="auto"
-                selectProps={{
-                  props: {
-                    isSearchable: true,
-                    options: bankAccountOptionArr,
-                    value: value ? { label: value, value } : null,
-                    onChange: (option) => {
-                      setState_accountant((state) => ({ ...state, [key]: option?.value ?? '' }));
-                    },
-                  },
-                }}
-              />
-            </div>
-          );
+        if (key === 'isImported') {
+          theDiasbled = !isAllowToEditIsImported;
         }
 
         return (
           <div key={key} className={classNames(scss.cell, config?.className)} style={config?.style}>
             <InputSel
-              disabled={isbillSerialNumber || disabled}
+              //
+              disabled={theDiasbled}
               showBaseline="auto"
-              inputProps={{
-                props: {
-                  ...config?.inputProps?.props,
-                  placeholder: isbillSerialNumber ? '系統產生' : '請輸入',
-                  type: inputType,
-                  value: value,
-                  onChange: (e) => {
-                    setState_accountant((state) => ({ ...state, [key]: e.target.value }));
-                  },
-                },
-              }}
+              {...config?.inputSelProps}
+              {...props}
             />
           </div>
         );
@@ -906,7 +832,22 @@ type Tconfig = {
   labelByPaymentType?: {
     [key in TpaymentType]?: string;
   };
-  inputProps?: TinputProps;
+  inputSelProps?: TinputSelProps;
+  // selectProps?:
+  inputSelPropsCreator: (props: {
+    //
+    disabled?: boolean;
+    bankAccountOptionArr?: Toption[];
+    limitedDate?: Moment;
+    value: string | Moment | null | boolean;
+    setState_accountant: React.Dispatch<React.SetStateAction<Tstate_accountant>>;
+    handle_checkIsImported: (isImported: boolean) => void;
+  }) => {
+    inputProps?: TinputProps;
+    selectProps?: TselectProps;
+    datePickerProps?: TdatePickerProps;
+    checkBoxProps_v2?: TcheckBoxProps_v2;
+  };
 };
 
 type TconfigList = {
@@ -920,7 +861,7 @@ const lookup_keyArr: {
   [key in TpaymentType]: TaccountantKey[];
 } = {
   匯款: [...baseArr_before, 'importAccountingNumber', ...baseArr_after],
-  票據: [...baseArr_before, 'noteNumber', ...baseArr_after],
+  票據: [...baseArr_before, 'noteNumber', 'noteMaturityDate', ...baseArr_after],
   現金: [...baseArr_before, ...baseArr_after],
 };
 
@@ -931,6 +872,9 @@ const configList: TconfigList = {
       width: 150,
     },
     className: '',
+    inputSelPropsCreator: () => {
+      return {};
+    },
   },
   isImported: {
     label: '已匯入紙本應收帳款',
@@ -938,7 +882,46 @@ const configList: TconfigList = {
       width: 150,
       justifyContent: 'center',
     },
+    inputSelProps: {
+      wrapperStyle: { width: 16 },
+      showBaseline: 'invisible',
+      // disabled: false,
+    },
     className: '',
+    inputSelPropsCreator: ({
+      disabled,
+      bankAccountOptionArr,
+      handle_checkIsImported,
+      limitedDate,
+      value,
+      setState_accountant,
+    }) => {
+      const value_bool = !!value as boolean;
+
+      const checkBoxProps_v2: TcheckBoxProps_v2 = {
+        props: {
+          value: value_bool ? ['true'] : [],
+          onChange: (arr) => {
+            const isImported = arr[0];
+
+            if (isImported === 'true') {
+              handle_checkIsImported?.(true);
+              // setState_accountant((state) => ({ ...state, isImported: true }));
+            } else {
+              handle_checkIsImported?.(false);
+              // setState_accountant((state) => ({ ...state, isImported: false }));
+            }
+          },
+        },
+        checkBoxPropsArr: [
+          {
+            value: 'true',
+          },
+        ],
+      };
+
+      return { checkBoxProps_v2 };
+    },
   },
   insertDate: {
     style: {
@@ -951,6 +934,50 @@ const configList: TconfigList = {
       票據: '收票日期',
       現金: '收現日期',
     },
+    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, limitedDate, value, setState_accountant }) => {
+      const value_moment = value as Moment | null;
+
+      const datePickerProps: TdatePickerProps = {
+        props: {
+          defaultPickerValue: limitedDate,
+          value: value_moment,
+          onChange: (date) => {
+            setState_accountant((state) => ({ ...state, insertDate: date }));
+          },
+          disabledDate: (date) => {
+            return !date.isSame(limitedDate, 'month');
+          },
+        },
+      };
+
+      return { datePickerProps };
+    },
+  },
+  noteMaturityDate: {
+    label: '票據到期日',
+    style: {
+      width: 130,
+      // justifyContent: 'center',
+    },
+    className: '',
+    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, limitedDate, value, setState_accountant }) => {
+      const value_moment = value as Moment | null;
+
+      const datePickerProps: TdatePickerProps = {
+        props: {
+          defaultPickerValue: limitedDate,
+          value: value_moment,
+          onChange: (date) => {
+            setState_accountant((state) => ({ ...state, noteMaturityDate: date }));
+          },
+          disabledDate: (date) => {
+            return !date.isSame(limitedDate, 'month');
+          },
+        },
+      };
+
+      return { datePickerProps };
+    },
   },
   accountingNumber: {
     label: '存入帳號',
@@ -958,6 +985,22 @@ const configList: TconfigList = {
       width: 250,
     },
     className: '',
+    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, value, setState_accountant }) => {
+      const value_str = (value as string) || '';
+
+      const selectProps: TselectProps = {
+        props: {
+          isSearchable: true,
+          options: bankAccountOptionArr,
+          value: value_str ? { label: value_str, value: value_str } : null,
+          onChange: (option) => {
+            setState_accountant((state) => ({ ...state, ['accountingNumber']: option?.value ?? '' }));
+          },
+        },
+      };
+
+      return { selectProps };
+    },
   },
   //
   noteNumber: {
@@ -966,6 +1009,21 @@ const configList: TconfigList = {
       width: 185,
     },
     className: '',
+    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
+      const value_str = (value as string) || '';
+      const inputProps: TinputProps = {
+        props: {
+          placeholder: '請輸入',
+          type: 'text',
+          value: value_str,
+          onChange: (e) => {
+            setState_accountant((state) => ({ ...state, ['noteNumber']: e.target.value }));
+          },
+        },
+      };
+
+      return { inputProps };
+    },
   },
   importAccountingNumber: {
     label: '匯入帳號',
@@ -973,6 +1031,22 @@ const configList: TconfigList = {
       width: 185,
     },
     className: '',
+    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
+      const value_str = (value as string) || '';
+
+      const inputProps: TinputProps = {
+        props: {
+          placeholder: '請輸入',
+          type: 'text',
+          value: value_str,
+          onChange: (e) => {
+            setState_accountant((state) => ({ ...state, ['importAccountingNumber']: e.target.value }));
+          },
+        },
+      };
+
+      return { inputProps };
+    },
   },
   //
   vendorName: {
@@ -981,6 +1055,22 @@ const configList: TconfigList = {
       width: 200,
     },
     className: '',
+    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
+      const value_str = (value as string) || '';
+
+      const inputProps: TinputProps = {
+        props: {
+          placeholder: '請輸入',
+          type: 'text',
+          value: value_str,
+          onChange: (e) => {
+            setState_accountant((state) => ({ ...state, ['vendorName']: e.target.value }));
+          },
+        },
+      };
+
+      return { inputProps };
+    },
   },
   price: {
     label: '金額',
@@ -989,10 +1079,25 @@ const configList: TconfigList = {
       justifyContent: 'flex-end',
     },
     className: '',
-    inputProps: {
-      props: {
-        style: { textAlign: 'end' },
-      },
+    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
+      const inputType = disabled ? 'text' : 'number';
+
+      const value_str = (value as string) || '';
+      const theValue = disabled ? Number(value_str).toLocaleString() : value_str;
+
+      const inputProps: TinputProps = {
+        props: {
+          style: { textAlign: 'end' },
+          placeholder: '請輸入',
+          type: inputType,
+          value: theValue,
+          onChange: (e) => {
+            !disabled && setState_accountant((state) => ({ ...state, ['price']: e.target.value }));
+          },
+        },
+      };
+
+      return { inputProps };
     },
   },
   billSerialNumber: {
@@ -1001,11 +1106,42 @@ const configList: TconfigList = {
       width: 185,
     },
     className: '',
+    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
+      const value_str = (value as string) || '';
+      const inputProps: TinputProps = {
+        props: {
+          readOnly: true,
+          placeholder: '系統自動產生',
+          type: 'text',
+          value: value_str,
+          onChange: (e) => {
+            // setState_accountant((state) => ({ ...state, ['billSerialNumber']: e.target.value }));
+          },
+        },
+      };
+
+      return { inputProps };
+    },
   },
   notes: {
     label: '備註',
     style: { flex: 'auto' },
     className: '',
+    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
+      const value_str = (value as string) || '';
+      const inputProps: TinputProps = {
+        props: {
+          placeholder: '請輸入',
+          type: 'text',
+          value: value_str,
+          onChange: (e) => {
+            setState_accountant((state) => ({ ...state, ['notes']: e.target.value }));
+          },
+        },
+      };
+
+      return { inputProps };
+    },
   },
 };
 
@@ -1022,4 +1158,5 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   notes: '',
   isImported: false,
   accountsReceivableDeduction: [],
+  noteMaturityDate: null,
 });
