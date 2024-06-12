@@ -1201,7 +1201,7 @@ const useModalQuotationPdf = ({
 
       quotationNumber,
       validityPeriod,
-      quotationDate: getTaiwanDateStr(quotationDate) ?? '',
+      quotationDate: getTaiwanDateStr(quotationDate, { withUnit: true }) ?? '',
 
       projectName,
       projectWholeAddress,
@@ -1224,7 +1224,7 @@ const useModalQuotationPdf = ({
       total_chinese: changeNumberMoneyToChinese(total),
 
       deliveryLocation,
-      deliveryDate: getTaiwanDateStr(deliveryDate) ?? '',
+      deliveryDate: getTaiwanDateStr(deliveryDate, { withUnit: true }) ?? '',
       paymentMethods: paymentMethodsArr,
       notesArr: annotations ?? [],
       qrArr: quotationRanges ?? [],

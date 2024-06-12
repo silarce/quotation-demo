@@ -2930,6 +2930,9 @@ export type TdispatchingDto = {
   isCompleted: boolean;
   // 保固日期
   warrantyDate: string | null;
+
+  pointContactPerson: string | null;
+  pointContactNumber: string | null;
 };
 
 type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId' | 'warrantyDate' | 'note'>;
@@ -2946,6 +2949,8 @@ export type TcreateDispatchingDto = Pick<
   | 'finalContactPerson'
   | 'tasks'
   | 'pricingMethod'
+  | 'pointContactPerson'
+  | 'pointContactNumber'
   // | 'note'
   // | 'contractId'
   | 'isCompleted'
