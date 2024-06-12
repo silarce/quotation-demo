@@ -170,14 +170,23 @@ export default function OutboundOrder({
 
   const reqPost = async (
     productItemId: string,
-
-    { employeeId, outsourcingId }: { employeeId?: string; outsourcingId?: string }
+    {
+      //
+      employeeIdArr,
+      outsourcingId,
+    }: {
+      //
+      employeeIdArr?: string[];
+      outsourcingId?: string;
+    }
   ) => {
     if (!engineeringDeliveryListId || isReqing) {
       return undefined;
     }
 
-    if (!employeeId && !outsourcingId) {
+    const isEmployeeIdArrValid = employeeIdArr && employeeIdArr.length > 0;
+
+    if (!isEmployeeIdArrValid && !outsourcingId) {
       myAlert.err({ title: '新增失敗', content: '請選擇員工或外包廠商' });
 
       return undefined;
@@ -192,7 +201,7 @@ export default function OutboundOrder({
           shippingDate: null,
 
           installerOutsourcingId: outsourcingId ?? null,
-          installerEmployees: employeeId ? [employeeId] : null,
+          installerEmployees: employeeIdArr ? employeeIdArr : null,
 
           installationDate: null,
           append: null,
@@ -216,6 +225,9 @@ export default function OutboundOrder({
     if (!engineeringDeliveryListId || isReqing) {
       return undefined;
     }
+
+    body.installationDate = body.installationDate || null;
+    body.shippingDate = body.shippingDate || null;
 
     try {
       const res = await apiPostDeliveryStatus({
@@ -446,7 +458,7 @@ export default function OutboundOrder({
         productItemId,
         {
           deliveryStatusId,
-          employeeId,
+          employeeIdArr,
           outsourcingId,
           installationDate,
           shippingDate,
@@ -455,12 +467,15 @@ export default function OutboundOrder({
           installationItem,
         }
       ) => {
+        const theEmployeeIdArr = !employeeIdArr ? null : employeeIdArr.length === 0 ? null : employeeIdArr;
+
         const reqBody: TcreateEngineeringDeliveryStatusDto = {
           notes: notes,
           itemName: itemName,
           shippingDate: shippingDate,
           installerOutsourcingId: outsourcingId ?? null,
-          installerEmployees: employeeId ? [employeeId] : null,
+          // installerEmployees: employeeIdArr ? [employeeIdArr] : null,
+          installerEmployees: theEmployeeIdArr,
           installationDate: installationDate,
           append: null,
           completeAppend: null,
@@ -476,14 +491,16 @@ export default function OutboundOrder({
 
       const onCopy: TonCopyClick = async (
         productItemId,
-        { employeeId, outsourcingId, installationDate, shippingDate, itemName, notes, installationItem }
+        { employeeIdArr, outsourcingId, installationDate, shippingDate, itemName, notes, installationItem }
       ) => {
+        const theEmployeeIdArr = !employeeIdArr ? null : employeeIdArr.length === 0 ? null : employeeIdArr;
+
         const reqBody: TcreateEngineeringDeliveryStatusDto = {
           notes: notes,
           itemName: itemName,
           shippingDate: shippingDate,
           installerOutsourcingId: outsourcingId ?? null,
-          installerEmployees: employeeId ? [employeeId] : null,
+          installerEmployees: theEmployeeIdArr,
           installationDate: installationDate,
           append: null,
           completeAppend: null,
@@ -693,14 +710,14 @@ export default function OutboundOrder({
         // defaultSeletedDataArrArr={defaultSelectorSelected}
         onConfirm={(arr) => {
           const employeeArr = arr[0];
-          const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
+          // const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
 
           const outsourcingArr = arr[1];
           const outsourcing = outsourcingArr[0] as (typeof outsourcingArr)[0] | undefined;
 
           if (targetWorksheetItemId) {
             reqPost(targetWorksheetItemId, {
-              employeeId: employee?.id,
+              employeeIdArr: employeeArr.map((emp) => emp.id),
               outsourcingId: outsourcing?.id,
             });
           }
@@ -735,7 +752,7 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
       key: 'employee',
       caption: '員工',
       tip: '單選',
-      limit: 1,
+      // limit: 1,
       clearOther: [1],
     },
     {
@@ -938,7 +955,7 @@ const createRowProps_itemRow = ({
       accessorie: accessoriesStr,
       installationDate: installationDate ?? '',
       shippingDate: shippingDate ?? '',
-      installer_employee: installerEmployees[0],
+      installer_employeeArr: installerEmployees ?? [],
       installer_outsourcing: installerOutsourcing,
       itemName: itemName ?? '',
       notes: notes ?? '',
@@ -970,7 +987,7 @@ const createRowProps_itemRow = ({
       accessorie: '',
       installationDate: '',
       shippingDate: '',
-      installer_employee: undefined,
+      installer_employeeArr: undefined,
       installer_outsourcing: undefined,
       itemName: '',
       notes: '',
