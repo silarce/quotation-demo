@@ -556,7 +556,7 @@ const Cell_span = ({
   className?: string;
 }) => {
   return (
-    <div className={classNames(scss.cell, className)} style={style}>
+    <div className={classNames(scss.cell, scss.cell_span, className)} style={style}>
       {children}
     </div>
   );
@@ -711,6 +711,9 @@ const Row = ({
   }
 
   // ---------------------------------------------------------------------------
+
+  // region ROW RENDER
+
   return (
     <div className={classNames(scss.row, className)}>
       <div
@@ -768,6 +771,7 @@ const Row = ({
               //
               disabled={theDiasbled}
               showBaseline="auto"
+              fontSize="14"
               {...config?.inputSelProps}
               {...props}
             />
@@ -861,7 +865,17 @@ const lookup_keyArr: {
   [key in TpaymentType]: TaccountantKey[];
 } = {
   匯款: [...baseArr_before, 'importAccountingNumber', ...baseArr_after],
-  票據: [...baseArr_before, 'noteNumber', 'noteMaturityDate', ...baseArr_after],
+  // 票據: [...baseArr_before, 'noteNumber', 'noteMaturityDate', ...baseArr_after],
+  票據: [
+    ...baseArr_before,
+    'noteNumber',
+    'accountingNumber',
+    'vendorName',
+    'noteMaturityDate',
+    'price',
+    'billSerialNumber',
+    'notes',
+  ],
   現金: [...baseArr_before, ...baseArr_after],
 };
 
@@ -869,7 +883,7 @@ const configList: TconfigList = {
   btn: {
     label: '',
     style: {
-      width: 150,
+      width: 120,
     },
     className: '',
     inputSelPropsCreator: () => {
@@ -879,7 +893,7 @@ const configList: TconfigList = {
   isImported: {
     label: '已匯入紙本應收帳款',
     style: {
-      width: 150,
+      width: 100,
       justifyContent: 'center',
     },
     inputSelProps: {
@@ -925,7 +939,7 @@ const configList: TconfigList = {
   },
   insertDate: {
     style: {
-      width: 130,
+      width: 110,
       // justifyContent: 'center',
     },
     className: '',
@@ -956,7 +970,7 @@ const configList: TconfigList = {
   noteMaturityDate: {
     label: '票據到期日',
     style: {
-      width: 130,
+      width: 110,
       // justifyContent: 'center',
     },
     className: '',
@@ -982,7 +996,7 @@ const configList: TconfigList = {
   accountingNumber: {
     label: '存入帳號',
     style: {
-      width: 250,
+      width: 200,
     },
     className: '',
     inputSelPropsCreator: ({ disabled, bankAccountOptionArr, value, setState_accountant }) => {
@@ -1006,7 +1020,7 @@ const configList: TconfigList = {
   noteNumber: {
     label: '票據號碼',
     style: {
-      width: 185,
+      width: 120,
     },
     className: '',
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
@@ -1028,7 +1042,7 @@ const configList: TconfigList = {
   importAccountingNumber: {
     label: '匯入帳號',
     style: {
-      width: 185,
+      width: 120,
     },
     className: '',
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
@@ -1075,7 +1089,7 @@ const configList: TconfigList = {
   price: {
     label: '金額',
     style: {
-      width: 135,
+      width: 90,
       justifyContent: 'flex-end',
     },
     className: '',
@@ -1103,7 +1117,7 @@ const configList: TconfigList = {
   billSerialNumber: {
     label: '收入傳票序號',
     style: {
-      width: 185,
+      width: 120,
     },
     className: '',
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
