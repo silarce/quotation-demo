@@ -15,6 +15,8 @@ import {
   TemployeeDto,
 } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
+import type { Toption } from 'js/utils/options/options';
+
 // css
 import scss from './profile.module.scss';
 
@@ -35,6 +37,14 @@ type TcontrolItem_moment = {
   value: Moment | null;
   disabled?: boolean;
   onChange: (e: Moment | null) => void;
+};
+
+type Toption_pointContactPerson = Toption & { phoneNumber: string | undefined };
+
+type TcontrolItem_option = {
+  value: string;
+  disabled?: boolean;
+  onChange: (e: Toption_pointContactPerson | null) => void;
 };
 
 type Tcontrol = {
@@ -61,6 +71,12 @@ type Tcontrol = {
   warrantyDate: string;
   // 完工聯絡人
   finalContactPerson: TcontrolItem;
+
+  pointContactPerson: TcontrolItem_option;
+  pointContactNumber: TcontrolItem;
+  //
+  // pointContractPersonOptions: Toption[];
+  pointContractPersonOptions: (Toption & { phoneNumber: string })[];
 };
 
 export type { Tcontrol as Tcontrol_profile };
@@ -182,6 +198,37 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             },
           }}
         />
+
+        <InputSel
+          caption="接洽人"
+          disabled={disabled}
+          {...config_inputSel}
+          selectProps={{
+            props: {
+              isSearchable: true,
+              options: control.pointContractPersonOptions,
+              value: control.pointContactPerson
+                ? { label: control.pointContactPerson.value, value: control.pointContactPerson.value }
+                : null,
+              onChange: (option) => {
+                control.pointContactPerson.onChange(option as Toption_pointContactPerson | null);
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          caption="接洽人電話"
+          disabled={disabled}
+          {...config_inputSel}
+          inputProps={{
+            props: {
+              value: control.pointContactNumber.value,
+              onChange: control.pointContactNumber.onChange,
+            },
+          }}
+        />
+
         {/*  */}
         <AddressBar
           inputSelProps={{
