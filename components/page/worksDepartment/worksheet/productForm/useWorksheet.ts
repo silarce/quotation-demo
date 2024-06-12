@@ -13,6 +13,8 @@ import { create } from 'zustand';
 // import { immer } from 'zustand/middleware/immer';
 import { produce } from 'immer';
 
+import { calcProductArea, calcProductVolume } from 'js/utils/product/calc';
+
 // api
 import {
   TpcgsPrams,
@@ -76,6 +78,8 @@ import {
 // =====================================================================
 const options_doorType = optionsCreator_quoteType();
 // =====================================================================
+
+// region TYPE
 
 type TavalibleComponentIdList = {
   slat: string;
@@ -141,6 +145,8 @@ type Tworksheet = {
     height: string;
     material: string;
     isAntiTyphoon: boolean;
+    area: string;
+    volume: string; // 才數
 
     setBasicSpec_quoteType: (value: string) => void;
     setBasicSpec_doorModelName: (value: string) => void;
@@ -157,8 +163,8 @@ type Tworksheet = {
   ABCD: {
     getGapA: () => string;
     getGapC: () => string;
-    boxB: string;
-    boxD: string;
+    boxB: string; // 單位為mm
+    boxD: string; // 單位為mm
     setGapA: (value: string) => void;
     setGapC: (value: string) => void;
     setBoxB: (value: string) => void;
@@ -333,17 +339,19 @@ type Tworksheet = {
   //
 };
 
-// ===============================================================================
-// ===============================================================================
-// ===============================================================================
-// ===============================================================================
-// ===============================================================================
-// ===============================================================================
-// ===============================================================================
-// ===============================================================================
-// ===============================================================================
-// ===============================================================================
+// endregion
 
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// MARK: useWorksheet
 const useWorksheet = create<Tworksheet>(
   (set, get) => ({
     contractProductItem_ori: undefined,
@@ -381,6 +389,8 @@ const useWorksheet = create<Tworksheet>(
       height: '',
       material: '',
       isAntiTyphoon: false,
+      area: '',
+      volume: '',
       setBasicSpec_quoteType: (value) => {
         get().setDoorModelInfo(undefined);
         set(
@@ -832,6 +842,8 @@ const useWorksheet = create<Tworksheet>(
             height: new Decimal(contractProductItem?.height || 0).div(1000).toFixed(2),
             material: contractProductItem?.materialName ?? '',
             isAntiTyphoon: contractProductItem?.isAntiTyphoon ?? false,
+            area: contractProductItem?.area ?? '',
+            volume: contractProductItem?.volume ?? '',
           };
 
           state.ABCD = {
@@ -1032,7 +1044,7 @@ const useWorksheet = create<Tworksheet>(
     },
 
     // ---------------------------------------------------------------------
-
+    // MARK: reqGeneralSpec
     reqGeneralSpec: async () => {
       type Tbody = {
         modelName: string;
@@ -1068,7 +1080,7 @@ const useWorksheet = create<Tworksheet>(
         myAlert.err({ title: '取得產品規格失敗', content: err.message });
       }
     },
-
+    // MARK:update_generalSpec
     update_generalSpec: async () => {
       const generalSpec = await get().reqGeneralSpec();
       set(
@@ -1079,6 +1091,7 @@ const useWorksheet = create<Tworksheet>(
     },
 
     // _________________________________________________________________
+    // MARK:update_availableComponents
     update_availableComponents: async () => {
       const generalSpec = get().generalSpec;
       const basicSpec = get().basicSpec;
@@ -1100,7 +1113,7 @@ const useWorksheet = create<Tworksheet>(
         })
       );
     },
-
+    // MARK:updateSlatCount
     updateSlatCount: async () => {
       const doorModelName = get().basicSpec.doorModelName as TdoorModel;
       const boxB = Number(get().ABCD.boxB);
@@ -1127,7 +1140,7 @@ const useWorksheet = create<Tworksheet>(
     },
 
     // ---------------------------------------------------------------------
-
+    //  MARK:calcData
     calcData: async () => {
       const {
         basicSpec,
@@ -1255,8 +1268,9 @@ const useWorksheet = create<Tworksheet>(
           state.shouldCalcData = false;
         })
       );
-    },
+    }, // clacData
 
+    // MARK:calcData_2
     // 預計把取得component與bom的處理寫在這邊
     // 過濾出適配的component並帶入，然後取得bom資料後帶入
     calcData_2: async () => {
@@ -1491,7 +1505,25 @@ const useWorksheet = create<Tworksheet>(
           state.shouldCalcData2 = false;
         })
       );
-    },
+
+      const { fullWidth, height } = basicSpec;
+      const { boxB } = ABCD;
+
+      const area = calcProductArea({
+        height: Number(height),
+        fullWidth: Number(fullWidth),
+        boxb: new Decimal(boxB).div(1000).toNumber(),
+      });
+
+      const volume = calcProductVolume(Number(area));
+
+      set(
+        produce((state) => {
+          state.basicSpec.area = area;
+          state.basicSpec.volume = volume;
+        })
+      );
+    }, // calcData_2
 
     // ---------------------------------------------------------------------
 
@@ -1613,6 +1645,9 @@ const useWorksheet = create<Tworksheet>(
         height: getHeight_mm(),
         materialName: basicSpec.material,
         isAntiTyphoon: basicSpec.isAntiTyphoon,
+        area: basicSpec.area,
+        volume: basicSpec.volume,
+
         //
         // ABCD
         gapA: ABCD.getGapA() || '0',
