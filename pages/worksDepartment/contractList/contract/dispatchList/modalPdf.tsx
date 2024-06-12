@@ -1,12 +1,89 @@
+import { useState, useRef } from 'react';
 import classNames from 'classnames';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 // antd
 import { Modal, ModalProps } from 'antd';
 
+// gear
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+
 // css
 import scss from './modalPdf.module.scss';
 
-export default function ModalPdf({ visible, onCancel }: ModalProps & { foo?: unknown }) {
+// ===============================================================================
+
+type Tdata = {
+  customerName: string; // 其實是工地名稱
+  phoneNumber: string; // 工地電話
+  contactPerson: string; // 接洽人，自動帶工程聯絡單的聯絡人，但必須可以修改
+  address: string; // 工地地址
+  projectNumber: string; // 工程編號
+  warrantyPeriod: string; // 保固日期
+  content: string; // 承辦情形
+};
+
+export type { Tdata as Tdata_pdf };
+
+// ===============================================================================
+
+let isShowCellNumber = false;
+
+// ===============================================================================
+
+// region START
+
+export default function ModalPdf({
+  //
+  visible,
+  onCancel,
+  data,
+}: ModalProps & { data: Tdata }) {
+  const ref_pdf = useRef<HTMLDivElement>(null!);
+
+  const [renderCount, setRenderCount] = useState(0);
+
+  const handleShowCellNumber = () => {
+    isShowCellNumber = !isShowCellNumber;
+    setRenderCount((state) => state + 1);
+  };
+
+  // ------------------------------------------------------------------------
+
+  const dlPdf = async () => {
+    if (!ref_pdf.current) {
+      return;
+    }
+
+    showRootLoading(true, '正在處理PDF');
+
+    const doc = new jsPDF('p', 'px', 'b5');
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    const image = await html2canvas(ref_pdf.current, {
+      scale: 5,
+      // useCORS: true,
+      // allowTaint: true,
+    }).then((canvas) => {
+      const image = canvas.toDataURL('image/JPEG');
+
+      return image;
+    });
+
+    // 留作參考
+    // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+    // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+    doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
+
+    doc.save(`派工單_${''}.pdf`);
+    showRootLoading(false);
+  };
+
+  // ------------------------------------------------------------------------
   // region RENDER
   return (
     <Modal
@@ -16,7 +93,14 @@ export default function ModalPdf({ visible, onCancel }: ModalProps & { foo?: unk
       width={'fit-content'}
       footer={null}
     >
-      <div className={classNames(scss.body)}>
+      {/*  */}
+      {/* 給開發者方便開發用的 */}
+      {/* <MyButton_v2 onClick={handleShowCellNumber}>切換顯示cell編號</MyButton_v2> */}
+      {/*  */}
+
+      <MyButton_v2 onClick={dlPdf}>匯出PDF</MyButton_v2>
+
+      <div ref={ref_pdf} className={classNames(scss.body)}>
         <div className={scss.title}>
           <p>三久建材工業股份有限公司</p>
           <p>派工證明單</p>
@@ -30,41 +114,51 @@ export default function ModalPdf({ visible, onCancel }: ModalProps & { foo?: unk
         <form className={scss.form}>
           <Row>
             <Cell01 str="客戶" />
-            <Cell05 str="貓屋" />
-            <Cell03 str="電話" />
-            <Cell06 />
+            <Cell05>{data.customerName}</Cell05>
+            <Cell03>電話</Cell03>
+            <Cell06 className={scss.noPaddingY}>{data.phoneNumber}</Cell06>
             <div className={scss['cell_09-10']}>
-              <Cell10 />
-              <Cell09 />
-              <Cell10 />
-              <Cell09 />
+              <Cell10 className={scss.noPaddingY}>工程編號</Cell10>
+              <Cell09 className={scss.noPaddingY}>{data.projectNumber}</Cell09>
+              <Cell10 className={scss.noPaddingY}>管制卡編號</Cell10>
+              <Cell09 className={scss.noPaddingY}></Cell09>
             </div>
           </Row>
 
           <Row>
             <Cell01 str="接洽人" />
-            <Cell05 />
-            <Cell03 str="住址" />
-            <Cell07 />
+            <Cell05>{data.contactPerson}</Cell05>
+            <Cell03>住址</Cell03>
+            <Cell07>{data.address}</Cell07>
           </Row>
 
           <Row>
             <Cell01 str="交辦內容" />
             <Cell02 />
-            <Cell04 str="大門修理" />
+            <Cell04>大門修理</Cell04>
             <Cell02 />
-            <Cell04 str="捲門修理" />
+            <Cell04>捲門修理</Cell04>
             <Cell02 />
-            <Cell04 str="送電" />
-            <Cell08 />
-            <Cell09 />
+            <Cell04>送電</Cell04>
+
+            <Cell08 className={scss.cell_08_warranty}>
+              保固
+              <br />
+              期限
+            </Cell08>
+            <Cell09>{data.warrantyPeriod}</Cell09>
           </Row>
 
           <Row>
-            <Cell00 />
-            <Cell11 />
+            <Cell00 className={scss.c00_center}>
+              <span>承</span>
+              <span>辦</span>
+              <span>情</span>
+              <span>形</span>
+            </Cell00>
+            <Cell11 className={scss.c11_content}>{data.content}</Cell11>
             <div className={scss['cell_12-8-9']}>
-              <Cell12 />
+              <Cell12>修理批價</Cell12>
               <Cell08 />
               <Cell09 />
               <Cell08 />
@@ -72,24 +166,70 @@ export default function ModalPdf({ visible, onCancel }: ModalProps & { foo?: unk
               <Cell08 />
               <Cell09 />
               <Cell08 />
-              <Cell09 />
+              {/* <Cell09 /> */}
+              <Cell09></Cell09>
               <Cell08 />
               <Cell09 />
               <Cell08 />
               <Cell09 />
-              <Cell08 />
+              <Cell08 className={scss.noPadding}>合計</Cell08>
               <Cell09 />
             </div>
           </Row>
 
           <Row>
-            <Cell00 />
-            <Cell11 />
-            <Cell08 />
+            <Cell00 className={scss.c00_bottom}>
+              <span>往</span>
+              <span>時</span>
+              <span>返</span>
+              <span>間</span>
+            </Cell00>
+            <Cell11 className={scss.cell_time}>
+              <div className={scss.left}>
+                <span>月</span>
+                <span>日</span>
+                <span>時</span>
+                <span>分</span>
+                {/*  */}
+                <span>月</span>
+                <span>日</span>
+                <span>時</span>
+                <span>分</span>
+              </div>
+              <div className={scss.right}>{'(共計　　分　　秒)'}</div>
+            </Cell11>
+            <Cell08 className={scss.c08_customerSign}>
+              <span>客</span>
+              <span>戶</span>
+              <span>簽</span>
+              <span>章</span>
+            </Cell08>
             <Cell09 />
           </Row>
         </form>
+        {/*  */}
+        <div className={scss.signBar}>
+          <div>
+            <SpanArr str="歸檔" />
+          </div>
+          <div>
+            <SpanArr str="主管" />
+          </div>
+          <div>
+            <SpanArr str="財會" />
+          </div>
+          <div>
+            <SpanArr str="批價" />
+          </div>
+          <div>
+            <SpanArr str="工務承辦" />
+          </div>
+          <div>
+            <SpanArr str="交辦單位" />
+          </div>
+        </div>
       </div>
+      {/* body close */}
     </Modal>
   );
 }
@@ -106,25 +246,28 @@ const Row = ({ children }: { children?: React.ReactNode }) => {
   return <div className={classNames(scss.row)}>{children}</div>;
 };
 
-const c0 = 50;
-const c00 = 50;
+const magnification = 1.2;
+const c6c10Adjust = 40 * magnification;
+
+const c0 = 50 * magnification;
+const c00 = 50 * magnification;
 const c01 = c00 + c0;
-const c02 = 20;
-const c03 = 40;
-const c04 = c03 + 50;
+const c02 = 20 * magnification;
+const c03 = 40 * magnification;
+const c04 = c03 + 50 * magnification;
 const c05 = c02 + c02 + c04;
-const c06 = c04 + c02 - c03;
+const c06 = c04 + c02 - c03 + c6c10Adjust;
 const c07 = 'auto';
-const c08 = 30;
-const c09 = 110;
-const c10 = c04 + c08;
+const c08 = 35 * magnification;
+const c09 = 110 * magnification;
+const c10 = c04 + c08 - c6c10Adjust;
 const c11 = c0 + c02 + c04 + c02 + c04 + c02 + c04;
 const c12 = c08 + c09;
 
-const Cell00 = ({ children }: { children?: React.ReactNode }) => {
+const Cell00 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c00 }}>
-      cell00{children}
+    <div className={classNames(scss.cell, className)} style={{ width: c00 }}>
+      {isShowCellNumber ? 'cell00' : children}
     </div>
   );
 };
@@ -134,10 +277,11 @@ const Cell01 = ({ str }: { str?: string }) => {
 
   return (
     <div className={classNames(scss.cell, scss.c01)} style={{ width: c01 }}>
-      {letterArr.map((letter, index) => {
-        return <span key={index}>{letter}</span>;
-      })}
-      {/* cell01 */}
+      {isShowCellNumber
+        ? 'cell01'
+        : letterArr.map((letter, index) => {
+            return <span key={index}>{letter}</span>;
+          })}
     </div>
   );
 };
@@ -145,94 +289,97 @@ const Cell01 = ({ str }: { str?: string }) => {
 const Cell02 = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className={classNames(scss.cell)} style={{ width: c02 }}>
-      {/* cell02{children} */}
+      {isShowCellNumber ? 'cell02' : children}
     </div>
   );
 };
 
-const Cell03 = ({ str, children }: { str?: string; children?: React.ReactNode }) => {
+const Cell03 = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className={classNames(scss.cell, scss.c03)} style={{ width: c03 }}>
-      {str}
-      {children}
-      {/* cell03 */}
+      {isShowCellNumber ? 'cell03' : children}
     </div>
   );
 };
 
-const Cell04 = ({ str, children }: { str?: string; children?: React.ReactNode }) => {
+const Cell04 = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className={classNames(scss.cell, scss.c04)} style={{ width: c04 }}>
-      {str}
-      {children}
-      {/* cell04 */}
+      {isShowCellNumber ? 'cell04' : children}
     </div>
   );
 };
 
-const Cell05 = ({ str, children }: { str?: string; children?: React.ReactNode }) => {
+const Cell05 = ({ children }: { children?: React.ReactNode }) => {
   return (
     <div className={classNames(scss.cell, scss.c05)} style={{ width: c05 }}>
-      {str}
-      {children}
-      {/* cell05 */}
+      {isShowCellNumber ? 'cell05' : children}
     </div>
   );
 };
 
-const Cell06 = ({ children }: { children?: React.ReactNode }) => {
+const Cell06 = ({ className, children }: { className: string; children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c06 }}>
-      {children}
-      cell06
+    <div className={classNames(scss.cell, className)} style={{ width: c06 }}>
+      {isShowCellNumber ? 'cell06' : children}
     </div>
   );
 };
 
 const Cell07 = ({ children }: { children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c07, flex: 'auto' }}>
-      cell07{children}
+    <div className={classNames(scss.cell, scss.c07)} style={{ width: c07, flex: 'auto' }}>
+      {isShowCellNumber ? 'cell07' : children}
     </div>
   );
 };
 
-const Cell08 = ({ children }: { children?: React.ReactNode }) => {
+const Cell08 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c08 }}>
-      cell08{children}
+    <div className={classNames(scss.cell, className)} style={{ width: c08 }}>
+      {isShowCellNumber ? 'cell08' : children}
     </div>
   );
 };
 
-const Cell09 = ({ children }: { children?: React.ReactNode }) => {
+const Cell09 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c09 }}>
-      cell09{children}
+    <div className={classNames(scss.cell, className)} style={{ width: c09 }}>
+      {isShowCellNumber ? 'cell09' : children}
     </div>
   );
 };
 
-const Cell10 = ({ children }: { children?: React.ReactNode }) => {
+const Cell10 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c10 }}>
-      cell10{children}
+    <div className={classNames(scss.cell, className)} style={{ width: c10 }}>
+      {isShowCellNumber ? 'cell10' : children}
     </div>
   );
 };
 
-const Cell11 = ({ children }: { children?: React.ReactNode }) => {
+const Cell11 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c11 }}>
-      cell11{children}
+    <div className={classNames(scss.cell, className)} style={{ width: c11 }}>
+      {isShowCellNumber ? 'cell11' : children}
     </div>
   );
 };
 
-const Cell12 = ({ children }: { children?: React.ReactNode }) => {
+const Cell12 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (
-    <div className={classNames(scss.cell)} style={{ width: c12 }}>
-      cell12{children}
+    <div className={classNames(scss.cell, className)} style={{ width: c12 }}>
+      {isShowCellNumber ? 'cell12' : children}
     </div>
+  );
+};
+
+const SpanArr = ({ str }: { str: string }) => {
+  return (
+    <>
+      {str.split('').map((letter, index) => {
+        return <span key={index}>{letter}</span>;
+      })}
+    </>
   );
 };
