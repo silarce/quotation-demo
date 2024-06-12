@@ -328,18 +328,9 @@ export default function EditDispatchList() {
       return;
     }
 
-    const contactInfo = engineeringContact.contactInfo;
-
-    const defaultPointContactPerson = contactInfo?.[0]?.contactPerson ?? '';
-    const defaultPointContactNumber = contactInfo?.[0]?.contactNumber ?? '';
-
     const {
       dispatchDate,
       contractorContactPerson,
-      constructionSiteContactNumber = engineeringContact.constructionSiteContactNumber,
-      county = engineeringContact.county,
-      district = engineeringContact.district,
-      address = engineeringContact.address,
       workerEmployee,
       finalContactPerson,
       tasks,
@@ -347,9 +338,33 @@ export default function EditDispatchList() {
       note,
       warrantyDate,
       isCompleted,
+    } = dispatching ?? {};
+
+    let {
+      //
+      constructionSiteContactNumber,
+      county,
+      district,
+      address,
       pointContactPerson,
       pointContactNumber,
     } = dispatching ?? {};
+
+    // 如果dispatching不存在，也就是新增派工單
+    if (!dispatching) {
+      const contactInfo = engineeringContact.contactInfo;
+
+      const defaultPointContactPerson = contactInfo?.[0]?.contactPerson ?? '';
+      const defaultPointContactNumber = contactInfo?.[0]?.contactNumber ?? '';
+
+      constructionSiteContactNumber = engineeringContact.constructionSiteContactNumber;
+      county = engineeringContact.county;
+      district = engineeringContact.district;
+      address = engineeringContact.address;
+
+      pointContactPerson = defaultPointContactPerson ?? '';
+      pointContactNumber = defaultPointContactNumber ?? '';
+    }
 
     setState_profile({
       dispatchDate: dispatchDate ?? '',
@@ -358,15 +373,15 @@ export default function EditDispatchList() {
       projectNumber: contract?.content.quotationNumber ?? '',
       contractor: engineeringContact.contractor,
       contractorContactPerson: contractorContactPerson ?? '',
-      county: county,
-      district: district,
-      address: address,
+      county: county ?? '',
+      district: district ?? '',
+      address: address ?? '',
       constructionSiteContactNumber: constructionSiteContactNumber ?? '',
       warrantyDate: warrantyDate ?? '',
       finalContactPerson: finalContactPerson ?? '',
 
-      pointContactPerson: pointContactPerson ?? defaultPointContactPerson ?? '',
-      pointContactNumber: pointContactNumber ?? defaultPointContactNumber ?? '',
+      pointContactPerson: pointContactPerson ?? '',
+      pointContactNumber: pointContactNumber ?? '',
     });
 
     setState_dispatch({
