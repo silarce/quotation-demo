@@ -336,7 +336,7 @@ export default function EditDispatchList() {
     const {
       dispatchDate,
       contractorContactPerson,
-      constructionSiteContactNumber,
+      constructionSiteContactNumber = engineeringContact.constructionSiteContactNumber,
       county = engineeringContact.county,
       district = engineeringContact.district,
       address = engineeringContact.address,
