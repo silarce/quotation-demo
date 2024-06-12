@@ -34,7 +34,8 @@ type Toption_generics<E extends string> = { value: E; label: string };
 type Toption_installationItem = Toption_generics<TdeliveryStatusInstallationItem>;
 
 type TpostDeliveryStatusParams = {
-  employeeId?: string;
+  // employeeId?: string;
+  employeeIdArr?: string[];
   outsourcingId?: string;
   installationDate: string;
   shippingDate: string;
@@ -109,8 +110,10 @@ type Tpanel = {
   // component: React.ReactNode;
   installationDate: string; // 施工日期
   shippingDate: string; // 出貨日
-  installer_employee?: TemployeeDto | undefined | null; // 安裝人員 員工
+
+  installer_employeeArr?: TemployeeDto[]; // 安裝人員 員工
   installer_outsourcing?: ToutsourcingDto | undefined | null; // 安裝人員 外包廠商
+
   itemName: string; //項目
   notes: string; // 備註
   installationItem: string | null;
@@ -134,7 +137,7 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
       key: 'employee',
       caption: '員工',
       tip: '單選',
-      limit: 1,
+      // limit: 1,
       clearOther: [1],
     },
     {
@@ -424,7 +427,7 @@ const Panel = ({
   installationItem,
   installationDate,
   shippingDate,
-  installer_employee,
+  installer_employeeArr,
   installer_outsourcing,
   itemName,
   notes,
@@ -435,8 +438,12 @@ const Panel = ({
 }: Tpanel) => {
   const [disabled, setDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [state_employee, setState_Employee] = useState(installer_employee);
+
+  // const [state_employee, setState_Employee] = useState(installer_employee);
+  // const [state_outsourcing, setState_Outsourcing] = useState(installer_outsourcing);
+  const [state_employeeArr, setState_EmployeeArr] = useState(installer_employeeArr);
   const [state_outsourcing, setState_Outsourcing] = useState(installer_outsourcing);
+
   const [state_installationItem, setState_installationItem] = useState<Toption_installationItem | null>(
     installationItem ? { value: installationItem as TdeliveryStatusInstallationItem, label: installationItem } : null
   );
@@ -457,7 +464,7 @@ const Panel = ({
       itemName,
       notes,
     });
-    setState_Employee(installer_employee);
+    setState_EmployeeArr(installer_employeeArr);
     setState_Outsourcing(installer_outsourcing);
     setState_installationItem(
       installationItem ? { value: installationItem as TdeliveryStatusInstallationItem, label: installationItem } : null
@@ -471,12 +478,12 @@ const Panel = ({
 
     if (state_outsourcing) {
       arr = [undefined, [state_outsourcing]] as TdefaultSeletedDataArrArr;
-    } else if (state_employee) {
-      arr = [[state_employee], undefined] as TdefaultSeletedDataArrArr;
+    } else if (state_employeeArr) {
+      arr = [state_employeeArr, undefined] as TdefaultSeletedDataArrArr;
     }
 
     return arr;
-  }, [state_outsourcing, state_employee]);
+  }, [state_outsourcing, state_employeeArr]);
 
   // ------------------------------------------------------------------------
 
@@ -509,7 +516,7 @@ const Panel = ({
           <IconCopy
             onClick={() =>
               onCopyClick?.({
-                employeeId: state_employee?.id,
+                employeeIdArr: state_employeeArr?.map((emp) => emp.id),
                 outsourcingId: state_outsourcing?.id,
                 installationDate: state.installationDate,
                 shippingDate: state.shippingDate,
@@ -549,7 +556,7 @@ const Panel = ({
             className={classNames(!onConfirmClick && 'invisible')}
             onClick={async () => {
               await onConfirmClick?.({
-                employeeId: state_employee?.id,
+                employeeIdArr: state_employeeArr?.map((emp) => emp.id),
                 outsourcingId: state_outsourcing?.id,
                 installationDate: state.installationDate,
                 shippingDate: state.shippingDate,
@@ -609,8 +616,28 @@ const Panel = ({
           onClick={() => {
             !disabled && setShowModal(true);
           }}
-          inputProps={{
-            props: { value: state_employee?.chName ?? state_outsourcing?.name ?? '', onChange: () => {} },
+          // inputProps={{
+          //   props: {
+          //     //
+          //     value: state_employeeArr?.chName ?? state_outsourcing?.name ?? '',
+          //     onChange: () => {},
+          //   },
+          // }}
+          textareaProps={{
+            props: {
+              //
+              // value: state_employeeArr?.chName ?? state_outsourcing?.name ?? '',
+              value: (() => {
+                if (state_employeeArr && state_employeeArr.length > 0) {
+                  return state_employeeArr.map((emp) => emp.chName).join('\n');
+                } else if (state_outsourcing) {
+                  return state_outsourcing.name;
+                } else {
+                  return '';
+                }
+              })(),
+              onChange: () => {},
+            },
           }}
         />
       </div>
@@ -656,25 +683,23 @@ const Panel = ({
           tip="員工或外包擇一"
           onConfirm={(dataArr) => {
             const employeeArr = dataArr[0];
-            const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
-
             const outsourcingArr = dataArr[1];
             const outsourcing = outsourcingArr[0] as (typeof outsourcingArr)[0] | undefined;
 
-            if (!employee && !outsourcing) {
-              myAlert.info({ title: '必須選擇安裝人員' });
+            if (employeeArr.length === 0 && !outsourcing) {
+              // myAlert.info({ title: '必須選擇安裝人員' });
+              setState_EmployeeArr([]);
+              setState_Outsourcing(null);
+            } else if (employeeArr.length > 0 && !outsourcing) {
+              setState_EmployeeArr(employeeArr);
+              setState_Outsourcing(null);
+            } else if (outsourcing && employeeArr.length === 0) {
+              setState_EmployeeArr([]);
+              setState_Outsourcing(outsourcing);
+            } else {
+              alert('意外錯誤，employeeArr與outsourcing都有資料');
 
               return;
-            }
-
-            if (employee) {
-              setState_Employee(employee);
-              setState_Outsourcing(undefined);
-            }
-
-            if (outsourcing) {
-              setState_Employee(undefined);
-              setState_Outsourcing(outsourcing);
             }
 
             setShowModal(false);
@@ -817,7 +842,7 @@ const config: TconfigList = {
   },
   installerEmployeesName: {
     caption: '安裝人員',
-    className: 'w-24',
+    className: 'w-28',
   },
   itemName: {
     caption: '項目',

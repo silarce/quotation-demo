@@ -1,5 +1,8 @@
 import classNames from 'classnames';
 
+// antd
+import { Checkbox } from 'antd';
+
 // gear
 import InputSel, { TinputSelProps, TinputProps, TselectProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -44,6 +47,8 @@ import { findOption } from 'js/utils/options/findOption';
 const options_doorType = optionsCreator_quoteType();
 
 // =====================================================================
+
+// MARK: basic
 
 function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
   // --------------------------------------------------
@@ -243,6 +248,8 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
 
 // =====================================================================
 
+// MARK: ABCD
+
 function Form_product_ABCD({ disabled }: { disabled: boolean | undefined }) {
   const ABCD = useWorksheet(
     useShallow((state) => ({
@@ -320,6 +327,8 @@ function Form_product_ABCD({ disabled }: { disabled: boolean | undefined }) {
 }
 
 // =====================================================================
+
+// MARK: motor
 
 function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
   const { motor, getOptions_horsepower, getOptions_motorVendor, getOptions_electricSupply, isSpecialProd } =
@@ -473,7 +482,7 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
 }
 
 // =====================================================================
-
+// MARK:headBox
 function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
   const {
     //
@@ -628,7 +637,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
 }
 
 // =====================================================================
-
+// MARK:roller
 function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
   const { roller, getOptions_diameter, diameter, isSpecialProd } = useWorksheet(
     useShallow((state) => ({
@@ -687,7 +696,7 @@ function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
 }
 
 // =====================================================================
-
+// MARK:slat
 function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
   const { slat, getOptions_material, isSpecialProd } = useWorksheet(
     useShallow((state) => ({
@@ -739,7 +748,7 @@ function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
 }
 
 // =====================================================================
-
+// MARK:guideRail
 function Form_product_guideRail({ disabled }: { disabled: boolean | undefined }) {
   const {
     //
@@ -942,7 +951,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
 }
 
 // =====================================================================
-
+// MARK:bottomBar
 function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined }) {
   const { bottomBar, getOptions_material_stable, getOptions_bottomBarAngleIronAndPlate, isSpecialProd } = useWorksheet(
     useShallow((state) => ({
@@ -1063,7 +1072,7 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
 }
 
 // =====================================================================
-
+// MARK:sidePlate
 function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined }) {
   const { sidePlate, bearingName, sprocketWheelModel, isSpecialProd } = useWorksheet(
     useShallow((state) => ({
@@ -1143,7 +1152,7 @@ function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined })
 }
 
 // =====================================================================
-
+// MARK:other
 function Form_product_other({ disabled }: { disabled: boolean | undefined }) {
   const { other } = useWorksheet(useShallow((state) => ({ other: state.other })));
 
@@ -1176,9 +1185,7 @@ function Form_product_other({ disabled }: { disabled: boolean | undefined }) {
 
 // =====================================================================
 
-// antd
-import { Checkbox } from 'antd';
-
+// MARK:accessories
 function Form_product_accessories({ disabled }: { disabled: boolean | undefined }) {
   const { accessories, getOptions_accessories, setAccessories } = useWorksheet(
     useShallow((state) => ({
@@ -1216,6 +1223,8 @@ function Form_product_accessories({ disabled }: { disabled: boolean | undefined 
 // =====================================================================
 // =====================================================================
 
+// MARK:WorksheetTable
+
 const WorksheetTable = () => {
   return (
     <div className="relative">
@@ -1231,6 +1240,8 @@ const WorksheetTable = () => {
     </div>
   );
 };
+
+// MARK:Table_size
 
 const Table_size = () => {
   const { basicSpec, ABCD, fullWidth_mm, height_mm, WG_mm, fullHeight_mm } = useWorksheet(
@@ -1276,6 +1287,8 @@ const Table_size = () => {
   );
 };
 
+// MARK:Table_motor
+
 const Table_motor = () => {
   const { motor } = useWorksheet(
     useShallow((state) => ({
@@ -1296,6 +1309,7 @@ const Table_motor = () => {
   );
 };
 
+// MARK:Table_headBox
 const Table_headBox = () => {
   const { headBox, angleIronSize_mm } = useWorksheet(
     useShallow((state) => ({
@@ -1323,6 +1337,7 @@ const Table_headBox = () => {
   );
 };
 
+// MARK:Table_roller
 const Table_roller = () => {
   const { roller, generalSpec } = useWorksheet(
     useShallow((state) => ({
@@ -1356,6 +1371,7 @@ const Table_roller = () => {
   );
 };
 
+// MARK:Table_slat
 const Table_slat = () => {
   const { slat, generalSpec, antiTyphoonHook } = useWorksheet(
     useShallow((state) => ({
@@ -1390,6 +1406,7 @@ const Table_slat = () => {
   );
 };
 
+// MARK:Table_guideRail
 const Table_guideRail = () => {
   const { guideRail, generalSpec } = useWorksheet(
     useShallow((state) => ({
@@ -1424,6 +1441,7 @@ const Table_guideRail = () => {
   );
 };
 
+// MARK:Table_gear
 const Table_gear = () => {
   const { generalSpec } = useWorksheet(
     useShallow((state) => ({
@@ -1450,6 +1468,7 @@ const Table_gear = () => {
   );
 };
 
+// MARK:Table_bottomBar
 const Table_bottomBar = () => {
   const { bottomBar, guideRail } = useWorksheet(
     useShallow((state) => ({
@@ -1481,6 +1500,7 @@ const Table_bottomBar = () => {
 // =====================================================================
 // =====================================================================
 
+// MARK:basicConfig
 const basicConfig: TinputSelProps = {
   wrapperStyle: { gap: '10px' },
   captionStyle: { width: '100px' },

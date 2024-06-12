@@ -1311,6 +1311,7 @@ export type TengineeringDeliveryStatusDto = {
   installerOutsourcing: ToutsourcingDto;
   // 安裝人員(員工)
   installerEmployees: TemployeeDto[];
+
   // 安裝日期
   installationDate: string | null;
   // 工作表開立日期

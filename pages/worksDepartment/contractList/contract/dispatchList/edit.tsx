@@ -482,6 +482,8 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
+  // MARK:data_pdf
+
   const data_pdf: Tdata_pdf = useMemo(() => {
     const {
       //
@@ -490,14 +492,16 @@ export default function EditDispatchList() {
       address = '',
       warrantyDate,
       tasks = '',
+      pointContactPerson = '',
     } = dispatching ?? {};
 
     const wholeAddress = `${county}${district}${address}`;
 
     const data_pdf: Tdata_pdf = {
-      customerName: contract?.content.customer?.name ?? '',
+      // customerName: contract?.content.customer?.name ?? '',
+      customerName: contract?.content.projectName ?? '',
       phoneNumber: dispatching?.constructionSiteContactNumber ?? '',
-      contactPerson: '------',
+      contactPerson: pointContactPerson ?? '',
       address: wholeAddress,
       projectNumber: contract?.contractNumber ?? '',
       warrantyPeriod: warrantyDate ?? '',
