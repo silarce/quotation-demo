@@ -250,7 +250,7 @@ export default function InvoiceTable({
       };
     });
 
-    const tax_d = subTotal_d.mul(0.05);
+    const tax_d = subTotal_d.mul(0.05).toDecimalPlaces(0);
 
     const totals = {
       subTotal: subTotal_d.toNumber().toLocaleString(),
