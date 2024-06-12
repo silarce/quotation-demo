@@ -953,7 +953,6 @@ const configList: TconfigList = {
 
       const datePickerProps: TdatePickerProps = {
         props: {
-          defaultPickerValue: limitedDate,
           value: value_moment,
           onChange: (date) => {
             setState_accountant((state) => ({ ...state, insertDate: date }));
@@ -979,13 +978,9 @@ const configList: TconfigList = {
 
       const datePickerProps: TdatePickerProps = {
         props: {
-          defaultPickerValue: limitedDate,
           value: value_moment,
           onChange: (date) => {
             setState_accountant((state) => ({ ...state, noteMaturityDate: date }));
-          },
-          disabledDate: (date) => {
-            return !date.isSame(limitedDate, 'month');
           },
         },
       };
