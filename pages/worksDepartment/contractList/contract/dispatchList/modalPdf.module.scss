@@ -3,9 +3,13 @@
   // width: auto;
   // height: fit-content;
   aspect-ratio: 176/250;
-  padding: 10px;
+  padding: 40px;
 
   overflow: hidden;
+  // background-color: #eee;
+  * {
+    color: black;
+  }
 }
 
 .title {
@@ -25,7 +29,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
-  font-size: 12px;
+  font-size: 14px;
   > div {
     display: flex;
     gap: 10px;
@@ -49,6 +53,8 @@
   border: solid 1px #000;
   border-width: 0 1px 1px 0;
   padding: 5px 5px;
+  font-size: 16px;
+  line-height: 18px;
 }
 
 .c01 {
@@ -75,6 +81,10 @@
   justify-content: flex-start;
 }
 
+.c07 {
+  justify-content: flex-start;
+}
+
 .cell_09-10 {
   display: grid;
   grid-template-columns: max-content max-content;
@@ -83,7 +93,85 @@
 .cell_12-8-9 {
   display: grid;
   grid-template-columns: max-content max-content;
+  // grid-template-rows: repeat(8, 1fr);
+  // grid-template-rows: repeat(8, fit-content(100%));
+  grid-template-rows: repeat(8, minmax(38px, max-content));
   > .cell:nth-of-type(1) {
     grid-column: span 2;
   }
+}
+
+.cell_08_warranty {
+  padding: 0;
+  font-size: 12px;
+}
+
+.c00_center {
+  // height: 265px;
+  display: grid;
+  align-content: space-evenly;
+}
+
+.c00_bottom {
+  display: grid;
+  grid-template-areas:
+    "a b "
+    "c d";
+  align-content: space-evenly;
+  justify-content: space-evenly;
+
+  gap: 20px 0;
+}
+
+.c11_content {
+  display: block;
+  white-space: pre-wrap;
+}
+
+.cell_time {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-evenly;
+  .left {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    gap: 10px 50px;
+  }
+  .right {
+    position: relative;
+    right: -20px;
+  }
+}
+
+.c08_customerSign {
+  writing-mode: vertical-lr;
+  > span {
+    letter-spacing: 10px;
+    // &:not(:nth-last-of-type(1)) {
+    //   letter-spacing: 10px;
+    // }
+  }
+}
+
+.signBar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  padding: 0 20px;
+  font-size: 18px;
+  > div {
+    display: grid;
+    align-content: space-between;
+  }
+}
+
+.noPaddingY {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.noPadding {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
 }

@@ -12,7 +12,7 @@ import Profile, { Tcontrol_profile } from 'components/page/worksDepartment/contr
 import EditDispatch, {
   Tcontroll as Tcontroll_editDispatch,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
-import ModalPdf from './modalPdf';
+import ModalPdf, { Tdata_pdf } from './modalPdf';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -73,6 +73,8 @@ export default function EditDispatchList() {
   const [disabled, setDisabled] = useState(true);
   const theDiasbled = !dispatchingId ? false : disabled;
 
+  const [showPdf, setShowPdf] = useState(false);
+
   // ---------------------------------------------------------
   const [state_profile, setState_profile] = useState<Tstate_profile>(emptyState_profile());
 
@@ -90,7 +92,9 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId);
+  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+    customPopulate: ['content.customer'],
+  });
   const engineeringContactId = contract?.engineeringContactId;
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
@@ -414,6 +418,37 @@ export default function EditDispatchList() {
   };
 
   // ---------------------------------------------------------
+
+  const data_pdf: Tdata_pdf = useMemo(() => {
+    const {
+      //
+      county = '',
+      district = '',
+      address = '',
+      warrantyDate,
+      tasks = '',
+    } = dispatching ?? {};
+
+    const wholeAddress = `${county}${district}${address}`;
+
+    const data_pdf: Tdata_pdf = {
+      customerName: contract?.content.customer?.name ?? '',
+      phoneNumber: dispatching?.constructionSiteContactNumber ?? '',
+      contactPerson: '------',
+      address: wholeAddress,
+      projectNumber: contract?.contractNumber ?? '',
+      warrantyPeriod: warrantyDate ?? '',
+      content: tasks,
+    };
+
+    return data_pdf;
+  }, [
+    //
+    contract,
+    engineeringContact,
+    dispatching,
+  ]);
+
   const panelList01: TpanelList = [
     {
       type: 'redButton',
@@ -436,6 +471,11 @@ export default function EditDispatchList() {
     },
   ];
   const panelList02: TpanelList = [
+    {
+      type: 'myButton',
+      label: '匯出',
+      onClick: () => setShowPdf(true),
+    },
     {
       type: 'myButton',
       label: '編輯',
@@ -488,7 +528,7 @@ export default function EditDispatchList() {
         />
       </div>
 
-      {/* <ModalPdf visible={true} /> */}
+      <ModalPdf visible={showPdf} onCancel={() => setShowPdf(false)} data={data_pdf} />
     </SubLayer>
   );
 }
