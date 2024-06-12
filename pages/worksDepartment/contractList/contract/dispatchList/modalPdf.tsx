@@ -100,136 +100,138 @@ export default function ModalPdf({
 
       <MyButton_v2 onClick={dlPdf}>匯出PDF</MyButton_v2>
 
-      <div ref={ref_pdf} className={classNames(scss.body)}>
-        <div className={scss.title}>
-          <p>三久建材工業股份有限公司</p>
-          <p>派工證明單</p>
-        </div>
-        <div className={scss.dateAndIndex}>
-          <div>{`通知　　年　　月　　日　　時　　分`}</div>
-          <div>序號 ＿＿＿＿＿＿</div>
-        </div>
-        {/*  */}
+      <div className={scss.bodyWrapper}>
+        <div ref={ref_pdf} className={classNames(scss.body)}>
+          <div className={scss.title}>
+            <p>三久建材工業股份有限公司</p>
+            <p>派工證明單</p>
+          </div>
+          <div className={scss.dateAndIndex}>
+            <div>{`通知　　年　　月　　日　　時　　分`}</div>
+            <div>序號 ＿＿＿＿＿＿</div>
+          </div>
+          {/*  */}
 
-        <form className={scss.form}>
-          <Row>
-            <Cell01 str="客戶" />
-            <Cell05>{data.customerName}</Cell05>
-            <Cell03>電話</Cell03>
-            <Cell06 className={scss.noPaddingY}>{data.phoneNumber}</Cell06>
-            <div className={scss['cell_09-10']}>
-              <Cell10 className={scss.noPaddingY}>工程編號</Cell10>
-              <Cell09 className={scss.noPaddingY}>{data.projectNumber}</Cell09>
-              <Cell10 className={scss.noPaddingY}>管制卡編號</Cell10>
-              <Cell09 className={scss.noPaddingY}></Cell09>
-            </div>
-          </Row>
-
-          <Row>
-            <Cell01 str="接洽人" />
-            <Cell05>{data.contactPerson}</Cell05>
-            <Cell03>住址</Cell03>
-            <Cell07>{data.address}</Cell07>
-          </Row>
-
-          <Row>
-            <Cell01 str="交辦內容" />
-            <Cell02 />
-            <Cell04>大門修理</Cell04>
-            <Cell02 />
-            <Cell04>捲門修理</Cell04>
-            <Cell02 />
-            <Cell04>送電</Cell04>
-
-            <Cell08 className={scss.cell_08_warranty}>
-              保固
-              <br />
-              期限
-            </Cell08>
-            <Cell09>{data.warrantyPeriod}</Cell09>
-          </Row>
-
-          <Row>
-            <Cell00 className={scss.c00_center}>
-              <span>承</span>
-              <span>辦</span>
-              <span>情</span>
-              <span>形</span>
-            </Cell00>
-            <Cell11 className={scss.c11_content}>{data.content}</Cell11>
-            <div className={scss['cell_12-8-9']}>
-              <Cell12>修理批價</Cell12>
-              <Cell08 />
-              <Cell09 />
-              <Cell08 />
-              <Cell09 />
-              <Cell08 />
-              <Cell09 />
-              <Cell08 />
-              {/* <Cell09 /> */}
-              <Cell09></Cell09>
-              <Cell08 />
-              <Cell09 />
-              <Cell08 />
-              <Cell09 />
-              <Cell08 className={scss.noPadding}>合計</Cell08>
-              <Cell09 />
-            </div>
-          </Row>
-
-          <Row>
-            <Cell00 className={scss.c00_bottom}>
-              <span>往</span>
-              <span>時</span>
-              <span>返</span>
-              <span>間</span>
-            </Cell00>
-            <Cell11 className={scss.cell_time}>
-              <div className={scss.left}>
-                <span>月</span>
-                <span>日</span>
-                <span>時</span>
-                <span>分</span>
-                {/*  */}
-                <span>月</span>
-                <span>日</span>
-                <span>時</span>
-                <span>分</span>
+          <form className={scss.form}>
+            <Row>
+              <Cell01 str="客戶" />
+              <Cell05>{data.customerName}</Cell05>
+              <Cell03>電話</Cell03>
+              <Cell06 className={scss.noPaddingY}>{data.phoneNumber}</Cell06>
+              <div className={scss['cell_09-10']}>
+                <Cell10 className={scss.noPaddingY}>工程編號</Cell10>
+                <Cell09 className={scss.noPaddingY}>{data.projectNumber}</Cell09>
+                <Cell10 className={scss.noPaddingY}>管制卡編號</Cell10>
+                <Cell09 className={scss.noPaddingY}></Cell09>
               </div>
-              <div className={scss.right}>{'(共計　　分　　秒)'}</div>
-            </Cell11>
-            <Cell08 className={scss.c08_customerSign}>
-              <span>客</span>
-              <span>戶</span>
-              <span>簽</span>
-              <span>章</span>
-            </Cell08>
-            <Cell09 />
-          </Row>
-        </form>
-        {/*  */}
-        <div className={scss.signBar}>
-          <div>
-            <SpanArr str="歸檔" />
-          </div>
-          <div>
-            <SpanArr str="主管" />
-          </div>
-          <div>
-            <SpanArr str="財會" />
-          </div>
-          <div>
-            <SpanArr str="批價" />
-          </div>
-          <div>
-            <SpanArr str="工務承辦" />
-          </div>
-          <div>
-            <SpanArr str="交辦單位" />
+            </Row>
+
+            <Row>
+              <Cell01 str="接洽人" />
+              <Cell05>{data.contactPerson}</Cell05>
+              <Cell03>住址</Cell03>
+              <Cell07>{data.address}</Cell07>
+            </Row>
+
+            <Row>
+              <Cell01 str="交辦內容" />
+              <Cell02 />
+              <Cell04>大門修理</Cell04>
+              <Cell02 />
+              <Cell04>捲門修理</Cell04>
+              <Cell02 />
+              <Cell04>送電</Cell04>
+
+              <Cell08 className={scss.cell_08_warranty}>
+                保固
+                <br />
+                期限
+              </Cell08>
+              <Cell09>{data.warrantyPeriod}</Cell09>
+            </Row>
+
+            <Row>
+              <Cell00 className={scss.c00_center}>
+                <span>承</span>
+                <span>辦</span>
+                <span>情</span>
+                <span>形</span>
+              </Cell00>
+              <Cell11 className={scss.c11_content}>{data.content}</Cell11>
+              <div className={scss['cell_12-8-9']}>
+                <Cell12>修理批價</Cell12>
+                <Cell08 />
+                <Cell09 />
+                <Cell08 />
+                <Cell09 />
+                <Cell08 />
+                <Cell09 />
+                <Cell08 />
+                {/* <Cell09 /> */}
+                <Cell09></Cell09>
+                <Cell08 />
+                <Cell09 />
+                <Cell08 />
+                <Cell09 />
+                <Cell08 className={scss.noPadding}>合計</Cell08>
+                <Cell09 />
+              </div>
+            </Row>
+
+            <Row>
+              <Cell00 className={scss.c00_bottom}>
+                <span>往</span>
+                <span>時</span>
+                <span>返</span>
+                <span>間</span>
+              </Cell00>
+              <Cell11 className={scss.cell_time}>
+                <div className={scss.left}>
+                  <span>月</span>
+                  <span>日</span>
+                  <span>時</span>
+                  <span>分</span>
+                  {/*  */}
+                  <span>月</span>
+                  <span>日</span>
+                  <span>時</span>
+                  <span>分</span>
+                </div>
+                <div className={scss.right}>{'(共計　　分　　秒)'}</div>
+              </Cell11>
+              <Cell08 className={scss.c08_customerSign}>
+                <span>客</span>
+                <span>戶</span>
+                <span>簽</span>
+                <span>章</span>
+              </Cell08>
+              <Cell09 />
+            </Row>
+          </form>
+          {/*  */}
+          <div className={scss.signBar}>
+            <div>
+              <SpanArr str="歸檔" />
+            </div>
+            <div>
+              <SpanArr str="主管" />
+            </div>
+            <div>
+              <SpanArr str="財會" />
+            </div>
+            <div>
+              <SpanArr str="批價" />
+            </div>
+            <div>
+              <SpanArr str="工務承辦" />
+            </div>
+            <div>
+              <SpanArr str="交辦單位" />
+            </div>
           </div>
         </div>
+        {/* body close */}
       </div>
-      {/* body close */}
     </Modal>
   );
 }
