@@ -12,7 +12,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TopBar from '../ui/topBar';
 
 // css
-import scss from './invoiceTable.module.scss';
+import scss from './periodTable.module.scss';
 
 import type {
   TfinalProduct,
@@ -21,9 +21,10 @@ import type {
   TquotationProductDto,
   TcompletedProductDto,
   TretainageType,
+  TaccountsReceivableInvoiceDto,
 } from 'js/api/dtoTypes';
 
-import { Tinvoice_reduce, Tstate_invoice } from './invoiceTable';
+import { Tinvoice_reduce as Tperiod_reduce, Tstate_invoice } from './periodTable';
 
 import { IconEdit, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
 
@@ -65,6 +66,8 @@ type Tcenter = {
 
     allowEditDeduction: boolean;
 
+    actualPrice: string;
+
     onChange_invoiceNumber: (value: string) => void;
     onChange_retainage: (value: string) => void;
     onChange_deduction: (value: string) => void;
@@ -77,6 +80,8 @@ type Tcenter = {
     onChange_retainageType: (value: TretainageType) => void;
     onChange_allowance: (value: string) => void;
     onChange_note: (value: string) => void;
+
+    onChange_acturePrice: (value: string) => void;
   };
 };
 
@@ -90,7 +95,7 @@ export type { Tcenter, TimperativeHandle_panel };
 
 // region START
 
-function InvoicePanel_pre(
+function PeriodPanel_pre(
   {
     data_invoice,
     finalProdArr,
@@ -98,7 +103,7 @@ function InvoicePanel_pre(
     onPanelStateChange,
     reqPatchInvoiceAllowance,
   }: {
-    data_invoice?: Tinvoice_reduce;
+    data_invoice?: Tperiod_reduce;
     finalProdArr: TquotationProductDto[];
     // 用來取代原本的totals，內容為所有totals的總和
     totalsTotal?: {
@@ -122,8 +127,6 @@ function InvoicePanel_pre(
       type,
       period,
       depositPeriod,
-      invoiceNumber,
-      price,
       completedProduct = [],
       retainage,
       deduction,
@@ -133,14 +136,20 @@ function InvoicePanel_pre(
       isWriteOffDeposit,
       //
       retainageType,
-      allowance,
+      // allowance,
       note,
       //
-      accountantList,
-    } = data_invoice ?? create_emptyInvoice();
+      invoices,
+      //
+      // invoiceNumber,
+      // price,
+      // accountantList,
+    } = data_invoice ?? create_emptyPeriod();
 
-    const notAllowEditDeduction = accountantList.some((al) => {
-      return al.accountsReceivableDeduction.length > 0;
+    const notAllowEditDeduction = invoices.some((invoice) => {
+      return invoice.accountantList.some((al) => {
+        return al.accountsReceivableDeduction.length > 0;
+      });
     });
 
     const completedProductList: { [id: string]: TcompletedProductDto } = {};
@@ -170,6 +179,29 @@ function InvoicePanel_pre(
 
     const totals_num = calcTotals(rowArr);
 
+    // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
+    const invoice: TaccountsReceivableInvoiceDto | undefined = invoices[0];
+    const { invoiceDate, invoiceNumber = '' } = invoice ?? {};
+    let { price = 0, actualPrice = 0, allowance = 0 } = invoice ?? {};
+
+    // 如果是最後的totalPanel，invoices會有多項。未來invoices也可能會有多項
+    if (invoices.length > 1) {
+      const totals = invoices.reduce(
+        (acc, cur) => {
+          acc.price += cur.price;
+          acc.actualPrice += cur.actualPrice;
+          acc.allowance += cur.allowance ?? 0;
+
+          return acc;
+        },
+        { price: 0, actualPrice: 0, allowance: 0 }
+      );
+
+      price = totals.price;
+      actualPrice = totals.actualPrice;
+      allowance = totals.allowance;
+    }
+
     const defaultState: Tstate_invoice = {
       id,
       renderCount: 0,
@@ -196,6 +228,8 @@ function InvoicePanel_pre(
       note: note || '',
 
       allowEditDeduction: !notAllowEditDeduction,
+
+      actualPrice: String(actualPrice || ''),
     };
 
     return { defaultState, isNew };
@@ -205,7 +239,7 @@ function InvoicePanel_pre(
 
   // region STATE
 
-  const [disabled, setDisabled] = useState(!isNew);
+  const [disabled, setDisabled] = useState(!isNew || !!totalsTotal);
 
   const [state_invoice, setState_invoice] = useState<Tstate_invoice>(defaultState);
 
@@ -254,7 +288,15 @@ function InvoicePanel_pre(
     key,
     value,
   }: {
-    key: 'retainage' | 'deduction' | 'writeOffDeposit' | 'invoiceNumber' | 'allowance' | 'note';
+    key:
+      | 'retainage'
+      //
+      | 'deduction'
+      | 'writeOffDeposit'
+      | 'invoiceNumber'
+      | 'allowance'
+      | 'note'
+      | 'actualPrice';
     value: string;
   }) => {
     setState_invoice((invoice) => {
@@ -314,11 +356,11 @@ function InvoicePanel_pre(
     });
   };
 
-  const handle_editType = (type: Tinvoice_reduce['type']) => {
+  const handle_editType = (type: Tperiod_reduce['type']) => {
     setState_invoice((invoice) => {
       invoice = { ...invoice };
       invoice.renderCount++;
-      invoice.type = type as Tinvoice_reduce['type'];
+      invoice.type = type as Tperiod_reduce['type'];
 
       return invoice;
     });
@@ -370,6 +412,8 @@ function InvoicePanel_pre(
       contractTotal,
 
       allowEditDeduction,
+
+      actualPrice,
     } = state_invoice;
 
     let subTotal_d = new Decimal(0);
@@ -438,6 +482,7 @@ function InvoicePanel_pre(
       note,
 
       allowEditDeduction,
+      actualPrice,
 
       onChange_invoiceNumber: (value) => {
         handle_editInvoiceOther({ key: 'invoiceNumber', value });
@@ -469,6 +514,10 @@ function InvoicePanel_pre(
       },
       onChange_note: (value) => {
         handle_editInvoiceOther({ key: 'note', value });
+      },
+
+      onChange_acturePrice: (value) => {
+        handle_editInvoiceOther({ key: 'actualPrice', value });
       },
     };
 
@@ -668,6 +717,8 @@ const Tfoot = ({
 
     allowEditDeduction,
 
+    actualPrice,
+
     onChange_invoiceNumber,
     onChange_retainage,
     onChange_deduction,
@@ -681,6 +732,8 @@ const Tfoot = ({
 
     onChange_allowance,
     onChange_note,
+
+    onChange_acturePrice,
   } = node_other;
 
   let { retainage, deduction, writeOffDeposit } = node_other;
@@ -780,6 +833,16 @@ const Tfoot = ({
         <span>{price}</span>
       </div>
 
+      <div className={classNames(scss.row)}>
+        <span>發票實際金額</span>
+        <input
+          className={classNames(readOnly && scss.readyOnly)}
+          value={actualPrice}
+          onChange={(e) => onChange_acturePrice(e.target.value)}
+          readOnly={readOnly}
+        />
+      </div>
+
       <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>發票號碼</span>
         <input
@@ -793,7 +856,7 @@ const Tfoot = ({
       {/*  */}
       {/*  */}
       <div className={classNames(scss.row, scss.threeCol, scss.plus)}>
-        <div className={classNames(scss.allowanceBtnBar, !readOnly && 'invisible')}>
+        <div className={classNames(scss.allowanceBtnBar, (!readOnly || isTotal) && 'invisible')}>
           <IconEdit
             className={classNames(!disabled_allowance && scss.active)}
             onClick={() => {
@@ -879,15 +942,15 @@ const calcPrice = (state_invoice: Tstate_invoice) => {
 };
 
 // ==========================================================================
-const create_emptyInvoice = (): Tinvoice_reduce => {
-  const invoice: Tinvoice_reduce = {
+const create_emptyPeriod = (): Tperiod_reduce => {
+  const invoice: Tperiod_reduce = {
     id: 'undefined',
     updatedAt: 'undefined',
-    invoiceNumber: '', // 發票號碼
+    // invoiceNumber: '', // 發票號碼
     type: '請款',
     period: null,
     depositPeriod: null,
-    price: 0,
+    // price: 0,
     completedProduct: [],
     retainage: 0,
     deduction: 0,
@@ -896,15 +959,16 @@ const create_emptyInvoice = (): Tinvoice_reduce => {
     isDeduction: false,
     isWriteOffDeposit: false,
     retainageType: null,
-    allowance: 0,
+    // allowance: 0,
     note: '',
-    accountantList: [],
+    // accountantList: [],
+    invoices: [],
   };
 
   return invoice;
 };
 
-const InvoicePanel = forwardRef(InvoicePanel_pre);
+const PeriodPanel = forwardRef(PeriodPanel_pre);
 
 export { Thead, Tbody, Tfoot };
-export default InvoicePanel;
+export default PeriodPanel;

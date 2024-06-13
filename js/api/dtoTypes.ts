@@ -20,7 +20,7 @@ export type TdeliveryStatusInstallationItem = '門片' | '馬達' | '支軌';
 
 export type TinvoiceStatus = '已開立' | '已作廢';
 
-export type TinvoiceType = '請款' | '訂金';
+export type TperiodType = '請款' | '訂金';
 export type TaccountantPaymentType = '匯款' | '票據' | '現金';
 export type TretainageType = '含稅' | '未稅';
 
@@ -3431,8 +3431,8 @@ export type TaccountsReceivableDto = {
   legacyContract: TlegacyContractDto | null;
   // 扣款明細 // 棄用?
   accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
-  // 發票記錄
-  period: TaccountsReceivablePeriodDto[] | null;
+  // 收款期
+  periods: TaccountsReceivablePeriodDto[] | null;
   // 合約總金額(會因為追加而增加)
   contractTotalPrice: number;
   // 已收帳款金額(目前總計請款)
@@ -3504,7 +3504,7 @@ export type TaccountsReceivablePeriodDto = {
   updatedAt: string;
 
   //  期數
-  type: TinvoiceType;
+  type: TperiodType;
   // 請款期數
   period: number | null;
   // 訂金期數
@@ -3531,35 +3531,10 @@ export type TaccountsReceivablePeriodDto = {
   isWriteOffDeposit: boolean;
   // 保留款類型
   retainageType: TretainageType | null;
-  // 折讓
+  // 折讓 // 沒用到
   allowance: number | null;
-  // 發票
+  // 發票 // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
   invoices: TaccountsReceivableInvoiceDto[];
-};
-
-type TaccountsReceivableInvoiceDto = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-
-  // 日期
-  invoiceDate: string;
-  // 發票號碼
-  invoiceNumber: string;
-  // 發票金額
-  price: number;
-  // 發票狀態
-  invoiceStatus: TinvoiceStatus;
-  // 發票備註
-  note: string | null;
-  // 關聯收款紀錄
-  accountantList: TaccountantDto[];
-  // 所屬應收帳款Id
-  accountsReceivableId: string | null;
-  // 所屬應收帳款期數
-  accountsReceivablePeriod?: TaccountsReceivablePeriodDto;
-  // 折讓
-  allowance: number | null;
 };
 
 export type TcreateAccountReceivablePeriodDto = Pick<
@@ -3574,7 +3549,7 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   | 'isDeduction'
   | 'isWriteOffDeposit'
   | 'retainageType'
-  | 'allowance'
+  | 'allowance' // 會記錄在invoice
 > & {
   invoiceDate: string | null;
   invoiceNumber: string | null;
@@ -3583,6 +3558,33 @@ export type TcreateAccountReceivablePeriodDto = Pick<
 };
 
 export type TupdateAccountReceivablePeriodDto = Partial<TcreateAccountReceivablePeriodDto>;
+
+export type TaccountsReceivableInvoiceDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 日期
+  invoiceDate: string;
+  // 發票號碼
+  invoiceNumber: string;
+  // 發票金額
+  price: number;
+  // 實際發票金額
+  actualPrice: number;
+  // 發票狀態
+  invoiceStatus: TinvoiceStatus;
+  // 發票備註
+  note: string | null;
+  // 關聯收款紀錄
+  accountantList: TaccountantDto[];
+  // 所屬應收帳款期數Id
+  accountsReceivablePeriodId: string | null;
+  // 所屬應收帳款期數
+  accountsReceivablePeriod: TaccountsReceivablePeriodDto;
+  // 折讓
+  allowance: number | null;
+};
 
 //
 //

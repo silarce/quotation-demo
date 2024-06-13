@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import _ from 'lodash';
+import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -16,9 +17,9 @@ import Profile, {
   createValueList_profile_engineeringContact,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/profile';
 import TotalCalc from 'components/page/worksDepartment/contracList/contract/accountReceivable/totalCalc';
-import InvoiceTable, {
+import PeriodTable, {
   Tstate_invoice,
-} from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable/invoiceTable';
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable/periodTable';
 import AccountantDetails, {
   Tstate_accountant,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDetails';
@@ -112,7 +113,8 @@ export default function AccountReceivable() {
     customPopulate: [
       // 'subContracts.content.verifyForm'
       'engineeringContact',
-      'accountReceivable.invoices.accountantList.accountsReceivableDeduction',
+      'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
+      // 'accountReceivable.periods',
     ],
   });
 
@@ -130,22 +132,25 @@ export default function AccountReceivable() {
     isLoading: isFetching_finalProduct,
   } = useGetContract_id_finalProductItem(contractId);
 
-  const invoiceArr = useMemo(() => {
-    return _.sortBy(accountReceivable?.period, 'createdAt');
-  }, [accountReceivable?.period]);
+  const periodArr = useMemo(() => {
+    return _.sortBy(accountReceivable?.periods, 'createdAt');
+  }, [accountReceivable?.periods]);
 
   const accountantArr = useMemo(() => {
-    if (!invoiceArr) {
+    if (!periodArr) {
       return [];
     }
 
     const arr: TaccountantDto[] = [];
-    invoiceArr.forEach((invoice) => {
-      invoice.accountantList && arr.push(...invoice.accountantList);
+    periodArr.forEach((period) => {
+      const invoiceArr = period.invoices;
+      invoiceArr.forEach((invoice) => {
+        invoice.accountantList && arr.push(...invoice.accountantList);
+      });
     });
 
     return arr;
-  }, [invoiceArr]);
+  }, [periodArr]);
 
   // --------------------------------------------------------------------------
 
@@ -273,6 +278,8 @@ export default function AccountReceivable() {
       retainageType,
       allowance,
       note,
+
+      actualPrice,
     } = state_invoice;
 
     const completedProduct = rowArr.map((row) => {
@@ -284,11 +291,9 @@ export default function AccountReceivable() {
     });
 
     const body: TcreateAccountReceivablePeriodDto = {
-      invoiceDate: new Date().toISOString(),
-      invoiceNumber: invoiceNumber,
-      price,
-      note,
       type,
+      note,
+      completedProduct,
       retainage: Number(retainage),
       deduction: Number(deduction),
       writeOffDeposit: Number(writeOffDeposit),
@@ -297,7 +302,11 @@ export default function AccountReceivable() {
       isWriteOffDeposit: minusWriteOffDeposit,
       retainageType: retainageType === 'null' ? null : retainageType,
       allowance: Number(allowance),
-      completedProduct,
+      //
+      invoiceDate: moment().toISOString(),
+      invoiceNumber: invoiceNumber,
+      price,
+      actualPrice: Number(actualPrice),
     };
 
     try {
@@ -578,7 +587,7 @@ export default function AccountReceivable() {
         <AccountantSorting
           //
           className="mt-10"
-          invoiceArr={invoiceArr}
+          periodArr={periodArr}
           onConfirm={reqPatchAccountant_sorting}
         />
 
@@ -589,12 +598,12 @@ export default function AccountReceivable() {
           reqPatchAccountant={reqPatchAccountant}
         />
 
-        <DeductionDetail className="mt-10" invoiceArr={invoiceArr} />
+        <DeductionDetail className="mt-10" periodArr={periodArr} />
 
-        <InvoiceTable
+        <PeriodTable
           className="mt-10"
           data_finalProdcut={data_finalProdcut}
-          data_invoices={accountReceivable.period}
+          data_period={accountReceivable.periods}
           // reqAddInvoice={reqAddInvoice}
           // reqPatchInvoiceArr={reqPatchInvoiceArr}
           onAddConfirm={reqAddInvoice_whole}

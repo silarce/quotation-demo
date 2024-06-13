@@ -30,10 +30,10 @@ const defaultKeyArr = optionsCreator_deduction().map((option) => option.value);
 
 export default function DeductionDetail({
   className,
-  invoiceArr,
+  periodArr,
 }: {
   className?: string;
-  invoiceArr: TaccountsReceivablePeriodDto[];
+  periodArr: TaccountsReceivablePeriodDto[];
 }) {
   const ref_table = useRef<HTMLDivElement>(null);
 
@@ -49,21 +49,25 @@ export default function DeductionDetail({
     defaultKeyArr.forEach((key) => (deductionTotalList_num[key] = 0));
     let allDeductionTotal = 0;
 
-    const rowArr: Trow[] = invoiceArr.map((invoice) => {
+    const rowArr: Trow[] = periodArr.map((acPeriod) => {
       const {
         //
         type,
         period,
         depositPeriod,
-        accountantList,
-      } = invoice;
+        // accountantList,
+        invoices,
+      } = acPeriod;
 
-      const thePeriod = `第${period || depositPeriod}期 ${type}`;
+      // 把invoices中的accountantList抽出來
+      const accountantArr = invoices.map((invoice) => invoice.accountantList).flat();
+
+      const thePeriod = `第${acPeriod || depositPeriod}期 ${type}`;
       let total = 0;
       const deductionList_num: { [itemName: string]: number } = {};
 
       // 將所有accountantList中的accountsReceivableDeduction抽出來放進同一個陣列中
-      const deductionArr = _.flatMap(accountantList, (acct) => acct.accountsReceivableDeduction);
+      const deductionArr = _.flatMap(accountantArr, (acct) => acct.accountsReceivableDeduction);
 
       deductionArr.forEach((deduction) => {
         const { itemName, detailedAmount } = deduction;
@@ -105,7 +109,7 @@ export default function DeductionDetail({
     const deductionKeyArr = Object.keys(deductionTotalList);
 
     return { rowArr, deductionKeyArr };
-  }, [invoiceArr]);
+  }, [periodArr]);
 
   // ==========================================================================
 

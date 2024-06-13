@@ -92,11 +92,11 @@ export type { TstateList as Tstate_accountantSorting };
 // region START
 export default function AccountantSorting({
   className,
-  invoiceArr,
+  periodArr,
   onConfirm,
 }: {
   className?: string;
-  invoiceArr: TaccountsReceivablePeriodDto[];
+  periodArr: TaccountsReceivablePeriodDto[];
   onConfirm: (stateList: TstateList) => Promise<void>;
 }) {
   const [disabled, setDisabled] = useState(true);
@@ -148,7 +148,9 @@ export default function AccountantSorting({
     let total_invoice_d = new Decimal(0);
     let total_accountant_d = new Decimal(0);
 
-    invoiceArr.forEach((invoice) => {
+    periodArr.forEach((period) => {
+      const invoice = period.invoices[0];
+
       const { price, accountantList } = invoice;
 
       total_invoice_d = total_invoice_d.add(price || 0);
@@ -163,7 +165,7 @@ export default function AccountantSorting({
       total_accountant: total_accountant_d.toNumber().toLocaleString(),
       amountNotCollected: total_invoice_d.minus(total_accountant_d).toNumber().toLocaleString(),
     };
-  }, [invoiceArr]);
+  }, [periodArr]);
 
   // -----------------------------------------------------------------------------
 
@@ -171,13 +173,22 @@ export default function AccountantSorting({
 
   useEffect(() => {
     setDisabled(true);
-  }, [invoiceArr]);
+  }, [periodArr]);
 
   useEffect(() => {
     const list: TstateList = {};
 
-    invoiceArr.forEach((invoice) => {
-      const { id: invoiceId, accountantList, invoiceNumber, invoiceDate, price, allowance } = invoice;
+    periodArr.forEach((period) => {
+      const invoice = period.invoices[0];
+      const {
+        //
+        id: invoiceId,
+        accountantList,
+        invoiceNumber,
+        invoiceDate,
+        price,
+        allowance,
+      } = invoice;
 
       const orderedAccountantList = _.sortBy(accountantList, 'order');
 
@@ -219,7 +230,7 @@ export default function AccountantSorting({
     }); // invoiceArr.forEach
 
     setStateListArr(list);
-  }, [invoiceArr, disabled]);
+  }, [periodArr, disabled]);
 
   // -----------------------------------------------------------------------------
   // region RENDER

@@ -3,6 +3,7 @@ $gridTemplateColumns_center: 120px 120px;
 $fontSize: 16px;
 $fontWeight: 500;
 $rowGap: 10px;
+$invoiceHeight: 775px; // 沒時間處裡Left的高度問題了，直接設固定高度
 
 .invoiceTable {
   // width: fit-content;
@@ -30,13 +31,17 @@ $rowGap: 10px;
   display: flex;
   width: fit-content;
   max-width: 100%;
+  max-height: 550px;
   overflow: auto;
-
   border: solid 1px theme("colors.border");
 }
 
 .thead {
+  position: sticky;
+  top: 0;
   background-color: theme("colors.bgc01");
+  height: 100px;
+  z-index: 1;
   .top {
     display: flex;
     align-items: center;
@@ -51,6 +56,14 @@ $rowGap: 10px;
 }
 
 .invoice {
+  height: $invoiceHeight;
+  &.new {
+    background-color: theme("colors.hoverBgc");
+    input {
+      background-color: theme("colors.hoverBgc");
+    }
+  }
+
   &:not(:nth-last-of-type(1)) {
     border-right: solid 1px theme("colors.border");
   }
@@ -80,6 +93,12 @@ $rowGap: 10px;
   justify-items: center;
   height: 30px;
   font-size: $fontSize;
+  &.threeCol.plus {
+    grid-template-columns: 50px 50px auto;
+    input {
+      width: 130px;
+    }
+  }
 }
 
 .left {
@@ -140,4 +159,13 @@ $rowGap: 10px;
   display: flex;
   justify-content: center;
   margin: 10px 0;
+}
+
+.allowanceBtnBar {
+  display: flex;
+  gap: 10px;
+
+  .active {
+    color: red;
+  }
 }
