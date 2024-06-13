@@ -760,7 +760,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         router.back();
       } else {
-        // await update();
+        await update();
       }
     } catch (error) {
       const err = error as Error;
@@ -847,7 +847,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // 轉為準合約
   const reqToPending = async () => {
-    if (!quotationId) {
+    if (!latestContent) {
       return;
     }
 
@@ -867,7 +867,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     try {
       setIsLoading(true);
-      await apiPatchQuotationToPending(quotationId);
+      await apiPatchQuotationToPending({ contentId: latestContent.id });
       await update();
       router.replace({
         query: {
@@ -1768,7 +1768,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) }
       : null,
 
-    !contentId && status === 'Bidding'
+    // !contentId && status === 'Bidding'
+    !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting')
       ? {
           type: 'myButton',
           label: '複製報價單',
