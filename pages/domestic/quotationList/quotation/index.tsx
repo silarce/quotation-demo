@@ -760,7 +760,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         router.back();
       } else {
-        // await update();
+        await update();
       }
     } catch (error) {
       const err = error as Error;
