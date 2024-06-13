@@ -1499,7 +1499,7 @@ latestContentProdArr為這次追加追減的主產品
 
   // 轉為準合約
   const reqToPending = async () => {
-    if (!quotationId) {
+    if (!lastestContentId) {
       return;
     }
 
@@ -1519,7 +1519,7 @@ latestContentProdArr為這次追加追減的主產品
 
     try {
       setIsLoading(true);
-      await apiPatchQuotationToPending(quotationId);
+      await apiPatchQuotationToPending({ contentId: lastestContentId });
       await update();
       router.push({
         query: {
