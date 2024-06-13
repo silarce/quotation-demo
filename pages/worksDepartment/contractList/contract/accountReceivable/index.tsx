@@ -18,7 +18,7 @@ import Profile, {
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/profile';
 import TotalCalc from 'components/page/worksDepartment/contracList/contract/accountReceivable/totalCalc';
 import PeriodTable, {
-  Tstate_invoice,
+  Tstate_period,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable/periodTable';
 import AccountantDetails, {
   Tstate_accountant,
@@ -61,7 +61,7 @@ import {
   // apiPatchAccountReceivable,
   // apiPatchEngineeringContact,
   // apiPostWorkSheet,
-  apiPatchAccountReceivablePeriod,
+  apiPatchAccountReceivablePeriodInvoiceAllowance,
   // apiPatchAccountReceivableAccountant,
   // apiPatchAccountReceivableVoidInvoice,
   apiPostAccountReceivable,
@@ -239,7 +239,7 @@ export default function AccountReceivable() {
   // };
 
   // region reqAddInvoice_whole
-  const reqAddInvoice_whole = async (state_invoice: Tstate_invoice) => {
+  const reqAddInvoice_whole = async (state_invoice: Tstate_period) => {
     if (!accountReceivable?.id) {
       alert('沒有accountReceivable.id');
 
@@ -424,13 +424,13 @@ export default function AccountReceivable() {
     try {
       setIsFetching_req(true);
 
-      await apiPatchAccountReceivablePeriod(invoiceId, { allowance });
+      await apiPatchAccountReceivablePeriodInvoiceAllowance(invoiceId, { allowance });
+      await update_contract();
     } catch (error) {
       const err = error as AxiosError;
 
       myAlert.err({ title: '更新發票失敗', content: err.message });
     } finally {
-      await update_contract();
       setIsFetching_req(false);
     }
   }; //reqPatchInvoiceArr
@@ -478,7 +478,9 @@ export default function AccountReceivable() {
       } = state;
 
       if (isInvoiceAllowanceChanged) {
-        await apiPatchAccountReceivablePeriod(String(invoice.id), { allowance: Number(invoice.allowance) });
+        await apiPatchAccountReceivablePeriodInvoiceAllowance(String(invoice.id), {
+          allowance: Number(invoice.allowance),
+        });
       }
 
       if (isAccountantOrderChanged) {

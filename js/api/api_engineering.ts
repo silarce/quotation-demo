@@ -1230,16 +1230,24 @@ export const apiPostAccountReceivablePeriod = async (
 };
 
 // 更新 應收帳款收款期數
-export const apiPatchAccountReceivablePeriod = async (
-  accountReceivableId: string,
-  body: TupdateAccountReceivablePeriodDto
+export const apiPatchAccountReceivablePeriodInvoiceAllowance = async (
+  invoiceId: string,
+  body: { allowance: number }
 ) => {
-  const api = `/engineering/account-receivable/period/${accountReceivableId}`;
+  const api = `/engineering/account-receivable/invoice/${invoiceId}`;
 
   return axi
     .patch<TaccountsReceivablePeriodDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+  // return (
+  //   axi
+  //     // 修改allowance會同步改第一個invoice的allowance
+  //     // 型別沒有錯，就是TaccountsReceivablePeriodDto
+  //     .patch<TaccountsReceivablePeriodDto>(api, body)
+  //     .then(({ data }) => data)
+  //     .catch((err) => Promise.reject(err))
+  // );
 };
 
 // 作廢 應收帳款 發票 account-receivable-invoice

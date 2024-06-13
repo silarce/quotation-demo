@@ -3,7 +3,7 @@ $gridTemplateColumns_center: 120px 120px;
 $fontSize: 16px;
 $fontWeight: 500;
 $rowGap: 10px;
-$invoiceHeight: 775px; // 沒時間處裡Left的高度問題了，直接設固定高度
+$invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固定高度
 
 .invoiceTable {
   // width: fit-content;
@@ -114,10 +114,11 @@ $invoiceHeight: 775px; // 沒時間處裡Left的高度問題了，直接設固�
 .center {
   .row {
     grid-template-columns: $gridTemplateColumns_center;
-    input {
+    > input {
       width: 100%;
       text-align: center;
-      border-bottom: solid 1px theme("colors.border");
+      // border-bottom: solid 1px theme("colors.border");
+      border-bottom: solid 1px theme("colors.sub");
       &.readyOnly {
         border-color: transparent;
       }

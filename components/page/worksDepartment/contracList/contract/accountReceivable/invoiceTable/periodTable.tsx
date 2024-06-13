@@ -2,9 +2,7 @@ import React, { useState, useEffect, useMemo, memo, useRef } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-
-// antd
-import { Checkbox, Radio } from 'antd';
+import moment, { Moment } from 'moment';
 
 // component
 import PeriodPanel, { Thead, Tbody, Tfoot } from './table';
@@ -56,8 +54,9 @@ type Tperiod_reduce = Pick<
   // | 'actualPrice'
 >;
 
-type Tstate_invoice = {
+type Tstate_period = {
   id?: string;
+  firstInvoiceId: string | null;
   renderCount: number; // 判斷是否要rerender用的，會送到Tcenter
 
   type: TaccountsReceivablePeriodDto['type'];
@@ -92,6 +91,7 @@ type Tstate_invoice = {
   note: string; // 備註
   //
   actualPrice: string; // 實際金額
+  invoiceDate: Moment | null;
 
   //
 };
@@ -111,7 +111,7 @@ type Tleft = {
   };
 };
 
-export type { Tstate_invoice, Tperiod_reduce as Tinvoice_reduce };
+export type { Tstate_period, Tperiod_reduce as Tinvoice_reduce };
 
 // ========================================================================
 
@@ -132,7 +132,7 @@ export default function PeriodTable({
   data_period: TaccountsReceivablePeriodDto[] | undefined | null;
   // reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
   // reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
-  onAddConfirm: (state_invoice: Tstate_invoice) => void;
+  onAddConfirm: (state_invoice: Tstate_period) => void;
   reqPatchInvoiceAllowance: (invoiceId: string, allowance: number) => void;
 }) {
   const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
@@ -209,7 +209,7 @@ export default function PeriodTable({
     };
   };
 
-  const onPanelStateChange = (state_invoice: Tstate_invoice) => {
+  const onPanelStateChange = (state_invoice: Tstate_period) => {
     const totalsTotal = calcTotalsTotal();
 
     setTotalsTotal(totalsTotal);
@@ -403,7 +403,7 @@ export default function PeriodTable({
                 ref_invoicePanelArr.current[index] = handle;
               }}
               key={data_invoice.id}
-              data_invoice={data_invoice}
+              data_period={data_invoice}
               finalProdArr={finalProdArr}
               onPanelStateChange={onPanelStateChange}
               reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
@@ -414,7 +414,7 @@ export default function PeriodTable({
         {/* <Right invoiceTotal={invoiceTotal} totalsTotal={totalsTotal} /> */}
         <PeriodPanel
           //
-          data_invoice={periodTotal}
+          data_period={periodTotal}
           finalProdArr={finalProdArr}
           totalsTotal={totalsTotal}
         />
