@@ -847,7 +847,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // 轉為準合約
   const reqToPending = async () => {
-    if (!quotationId) {
+    if (!latestContent) {
       return;
     }
 
@@ -866,8 +866,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     try {
+      console.log(latestContent.id);
+
       setIsLoading(true);
-      await apiPatchQuotationToPending(quotationId);
+      await apiPatchQuotationToPending({ contentId: latestContent.id });
       await update();
       router.replace({
         query: {
