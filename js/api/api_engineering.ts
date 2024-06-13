@@ -46,7 +46,7 @@ import type {
   TupdateAccountReceivableDeductionDto,
   TfinalProduct,
   TcreateAccountReceivableDto,
-  TaccountsReceivableProductPaymentDto,
+  // TaccountsReceivableProductPaymentDto,
   TcreateAccountReceivableProductPaymentDto,
   TupdateAccountReceivableProductPaymentDto,
   TsubmitEngineeringContactDto,
@@ -97,7 +97,7 @@ export type {
   TupdateAccountReceivableDeductionDto,
   TfinalProduct,
   TcreateAccountReceivableDto,
-  TaccountsReceivableProductPaymentDto,
+  // TaccountsReceivableProductPaymentDto,
   TcreateAccountReceivableProductPaymentDto,
   TupdateAccountReceivableProductPaymentDto,
   TcreateWorksheetDto,
@@ -1496,81 +1496,81 @@ export const useGetFinalProduct = (contractId: string | undefined) => {
   };
 };
 
-/**取得 所有 應收帳款 主產品請款比例 account-receivable-product-payment */
-
-type TgetAccountReceivableProductPayments = {
-  data: TaccountsReceivableProductPaymentDto[];
-  meta: TpageMetaDto;
-};
+//取得 所有 應收帳款 主產品請款比例 account-receivable-product-payment  棄用
+// 棄用
+// type TgetAccountReceivableProductPayments = {
+//   data: TaccountsReceivableProductPaymentDto[];
+//   meta: TpageMetaDto;
+// };
 
 // /engineering/account-receivable/{id}/product-payments
-const apiGetAccountReceivableProductPayments = async (accountReceivableId: string, params?: Tparams) => {
-  const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
+// const apiGetAccountReceivableProductPayments = async (accountReceivableId: string, params?: Tparams) => {
+//   const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
 
-  return axi
-    .get<TgetAccountReceivableProductPayments>(api, { params })
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
+//   return axi
+//     .get<TgetAccountReceivableProductPayments>(api, { params })
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
+// 棄用
+// export const useGetAccountReceivableProductPayments = (
+//   accountReceivableId: string | undefined | null,
+//   customParams?: Tparams
+// ) => {
+//   const [res, setRes] = useState<TgetAccountReceivableProductPayments>();
 
-export const useGetAccountReceivableProductPayments = (
-  accountReceivableId: string | undefined | null,
-  customParams?: Tparams
-) => {
-  const [res, setRes] = useState<TgetAccountReceivableProductPayments>();
+//   const params: Tparams = {
+//     // populate: [],
+//     pageSize: 9999,
+//     sort: 'period',
+//     order: 'ASC',
+//     ...customParams,
+//   };
 
-  const params: Tparams = {
-    // populate: [],
-    pageSize: 9999,
-    sort: 'period',
-    order: 'ASC',
-    ...customParams,
-  };
+//   const update = async () => {
+//     if (!accountReceivableId) {
+//       return;
+//     }
 
-  const update = async () => {
-    if (!accountReceivableId) {
-      return;
-    }
+//     const newRes = await apiGetAccountReceivableProductPayments(accountReceivableId, params);
 
-    const newRes = await apiGetAccountReceivableProductPayments(accountReceivableId, params);
+//     if (newRes) {
+//       setRes(newRes);
+//     }
 
-    if (newRes) {
-      setRes(newRes);
-    }
+//     return newRes;
+//   };
 
-    return newRes;
-  };
+//   return {
+//     data: res?.data,
+//     meta: res?.meta,
+//     update,
+//   };
+// };
+// 棄用
+// export const apiPostProductPayment = async (
+//   accountReceivableId: string,
+//   body: TcreateAccountReceivableProductPaymentDto[]
+// ) => {
+//   const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
 
-  return {
-    data: res?.data,
-    meta: res?.meta,
-    update,
-  };
-};
+//   return axi
+//     .post<TaccountsReceivableProductPaymentDto[]>(api, body)
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
+// 棄用
+// export const apiPatchProductPayment = async (
+//   accountReceivableId: string,
+//   body: TupdateAccountReceivableProductPaymentDto[]
+// ) => {
+//   const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
 
-export const apiPostProductPayment = async (
-  accountReceivableId: string,
-  body: TcreateAccountReceivableProductPaymentDto[]
-) => {
-  const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
-
-  return axi
-    .post<TaccountsReceivableProductPaymentDto[]>(api, body)
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
-
-export const apiPatchProductPayment = async (
-  accountReceivableId: string,
-  body: TupdateAccountReceivableProductPaymentDto[]
-) => {
-  const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
-
-  return axi
-    .patch<TaccountsReceivableProductPaymentDto[]>(api, body)
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
+//   return axi
+//     .patch<TaccountsReceivableProductPaymentDto[]>(api, body)
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
 
 // =======================================================================
 

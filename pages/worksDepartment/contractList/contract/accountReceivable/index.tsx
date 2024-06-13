@@ -131,8 +131,8 @@ export default function AccountReceivable() {
   } = useGetContract_id_finalProductItem(contractId);
 
   const invoiceArr = useMemo(() => {
-    return _.sortBy(accountReceivable?.invoices, 'createdAt');
-  }, [accountReceivable?.invoices]);
+    return _.sortBy(accountReceivable?.period, 'createdAt');
+  }, [accountReceivable?.period]);
 
   const accountantArr = useMemo(() => {
     if (!invoiceArr) {
@@ -594,7 +594,7 @@ export default function AccountReceivable() {
         <InvoiceTable
           className="mt-10"
           data_finalProdcut={data_finalProdcut}
-          data_invoices={accountReceivable.invoices}
+          data_invoices={accountReceivable.period}
           // reqAddInvoice={reqAddInvoice}
           // reqPatchInvoiceArr={reqPatchInvoiceArr}
           onAddConfirm={reqAddInvoice_whole}

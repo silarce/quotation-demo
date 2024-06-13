@@ -1608,8 +1608,8 @@ export type TquotationProductItemDto = {
   // 產品元件
   // components: QuotationProductComponentDto[];
   components: TquotationProductComponentDto[];
-  // 請款比例(完成數量)
-  productPayment: TaccountsReceivableProductPaymentDto[];
+  // 請款比例(完成數量) 棄用
+  // productPayment: TaccountsReceivableProductPaymentDto[];
   // 出庫狀態詳情
   deliveryStatus: TengineeringDeliveryStatusDto[];
   // 審核狀態類別
@@ -3432,7 +3432,7 @@ export type TaccountsReceivableDto = {
   // 扣款明細 // 棄用?
   accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
   // 發票記錄
-  invoices: TaccountsReceivablePeriodDto[] | null;
+  period: TaccountsReceivablePeriodDto[] | null;
   // 合約總金額(會因為追加而增加)
   contractTotalPrice: number;
   // 已收帳款金額(目前總計請款)
@@ -3675,23 +3675,23 @@ export type TfinalProduct = {
   finalRootContractProductItems: TquotationProductItemDto[];
 };
 
-/**應收帳款明細 主產品請款比例 */
-export type TaccountsReceivableProductPaymentDto = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
+// 應收帳款明細 主產品請款比例  棄用
+// export type TaccountsReceivableProductPaymentDto = {
+//   id: string;
+//   createdAt: string;
+//   updatedAt: string;
 
-  // 請款比例(完成數量)
-  paymentRatio: string | null;
-  // 發票id
-  invoiceId: string | null;
-  // 發票
-  invoice: TaccountsReceivablePeriodDto | undefined;
-  // 關聯產品itemId
-  productItemId: string | null;
-  //關聯產品item
-  productItem: TquotationProductItemDto | undefined;
-};
+//   // 請款比例(完成數量)
+//   paymentRatio: string | null;
+//   // 發票id
+//   invoiceId: string | null;
+//   // 發票
+//   invoice: TaccountsReceivablePeriodDto | undefined;
+//   // 關聯產品itemId
+//   productItemId: string | null;
+//   //關聯產品item
+//   productItem: TquotationProductItemDto | undefined;
+// };
 
 export type TcreateAccountReceivableProductPaymentDto = {
   paymentRatio: string | null;
