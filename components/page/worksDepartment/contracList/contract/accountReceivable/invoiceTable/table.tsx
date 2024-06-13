@@ -914,21 +914,23 @@ const Tfoot = ({
       {/*  */}
       {/*  */}
       {/*  */}
-      <div className={classNames(scss.row, scss.threeCol, scss.plus)}>
-        <div className={classNames(scss.allowanceBtnBar, (!readOnly || isTotal) && 'invisible')}>
-          <IconEdit
-            className={classNames(!disabled_allowance && scss.active)}
-            onClick={() => {
-              setDisabled_allowance((bool) => !bool);
-            }}
-          />
-          <IconCheck02
-            //
-            className={classNames(disabled_allowance && 'invisible')}
-            onClick={handle_confirm_allowance}
-          />
+      <div className={classNames(scss.row)}>
+        <div className={scss.allowancePanel}>
+          <span className={classNames(scss.allowanceBtnBar, (!readOnly || isTotal) && 'invisible')}>
+            <IconEdit
+              className={classNames(!disabled_allowance && scss.active)}
+              onClick={() => {
+                setDisabled_allowance((bool) => !bool);
+              }}
+            />
+            <IconCheck02
+              //
+              className={classNames(disabled_allowance && 'invisible')}
+              onClick={handle_confirm_allowance}
+            />
+          </span>
+          <span>折讓</span>
         </div>
-        <span>折讓</span>
         <input
           // readOnly={disabled_allowance}
           readOnly={readOnly === false ? false : disabled_allowance}

@@ -93,18 +93,12 @@ $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固�
   justify-items: center;
   height: 30px;
   font-size: $fontSize;
-  &.threeCol.plus {
-    grid-template-columns: 50px 50px auto;
-    input {
-      width: 130px;
-    }
-  }
 }
 
 .left {
   position: sticky;
   left: 0;
-  z-index: 1;
+  z-index: 2;
   background-color: white;
   .row {
     grid-template-columns: 80px 150px 50px 100px;
@@ -162,11 +156,15 @@ $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固�
   margin: 10px 0;
 }
 
-.allowanceBtnBar {
+.allowancePanel {
   display: flex;
-  gap: 10px;
-
-  .active {
-    color: red;
+  align-items: center;
+  .allowanceBtnBar {
+    display: inline-flex;
+    gap: 10px;
+    margin-right: 10px;
+    .active {
+      color: red;
+    }
   }
 }
