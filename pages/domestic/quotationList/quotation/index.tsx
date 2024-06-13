@@ -361,7 +361,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
     if (salesReviewedAt && supervisorReviewedAt && managerReviewedAt) {
-      isAllReviewedBeforePending = true;
+      if (!quotationContentData) {
+        isAllReviewedBeforePending = true;
+      }
     }
   }
 
