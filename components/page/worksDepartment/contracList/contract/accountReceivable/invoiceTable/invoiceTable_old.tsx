@@ -16,11 +16,11 @@ import scss from './invoiceTable.module.scss';
 
 import type {
   TfinalProduct,
-  TaccountsReceivableInvoiceDto,
+  TaccountsReceivablePeriodDto,
   TquotationProductItemDto,
   TquotationProductDto,
   TcompletedProductDto,
-  TinvoiceRetainageType,
+  TretainageType,
 } from 'js/api/dtoTypes';
 
 // ========================================================================
@@ -54,10 +54,10 @@ type Tstate_invoice = {
   price: number; // 發票金額 自動計算
   invoiceNumber: string;
 
-  type: TaccountsReceivableInvoiceDto['type'];
+  type: TaccountsReceivablePeriodDto['type'];
   period: number;
 
-  retainageType: TinvoiceRetainageType | 'null'; // 保留款類型
+  retainageType: TretainageType | 'null'; // 保留款類型
   allowance: string; // 折讓金額
   note: string; // 備註
 
@@ -123,7 +123,7 @@ type Tcenter = {
     onChange_minusDeduction: (checked: boolean) => void;
     onChange_minusWriteOffDeposit: (checked: boolean) => void;
 
-    onChange_retainageType: (value: TinvoiceRetainageType) => void;
+    onChange_retainageType: (value: TretainageType) => void;
     onChange_allowance: (value: string) => void;
     onChange_note: (value: string) => void;
   };
@@ -145,8 +145,8 @@ export default function InvoiceTable({
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
-  data_invoices: TaccountsReceivableInvoiceDto[] | undefined | null;
-  reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
+  data_invoices: TaccountsReceivablePeriodDto[] | undefined | null;
+  reqAddInvoice: (type: TaccountsReceivablePeriodDto['type'], invoiceNumber: string) => void;
   reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
 }) {
   const [disabled, setDisabled] = useState(true);
@@ -1123,8 +1123,8 @@ const Tfoot = ({ readOnly, node_other }: { readOnly: boolean; node_other: Tcente
             }}
             value={retainageType}
           >
-            <Radio value={'含稅' as TinvoiceRetainageType}>含稅</Radio>
-            <Radio value={'未稅' as TinvoiceRetainageType}>未稅</Radio>
+            <Radio value={'含稅' as TretainageType}>含稅</Radio>
+            <Radio value={'未稅' as TretainageType}>未稅</Radio>
             <Radio value={'null'}>無</Radio>
           </Radio.Group>
         </div>
@@ -1202,7 +1202,7 @@ const AddInovice = ({
   reqAddInvoice,
   onCancel,
 }: {
-  reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
+  reqAddInvoice: (type: TaccountsReceivablePeriodDto['type'], invoiceNumber: string) => void;
   onCancel: () => void;
 }) => {
   const [state_invoiceNumber, setState_invoiceNumber] = useState('');

@@ -16,11 +16,11 @@ import scss from './invoiceTable.module.scss';
 
 import type {
   TfinalProduct,
-  TaccountsReceivableInvoiceDto,
+  TaccountsReceivablePeriodDto,
   TquotationProductItemDto,
   TquotationProductDto,
   TcompletedProductDto,
-  TinvoiceRetainageType,
+  TretainageType,
 } from 'js/api/dtoTypes';
 
 import { Tinvoice_reduce, Tstate_invoice } from './invoiceTable';
@@ -74,7 +74,7 @@ type Tcenter = {
     onChange_minusDeduction: (checked: boolean) => void;
     onChange_minusWriteOffDeposit: (checked: boolean) => void;
 
-    onChange_retainageType: (value: TinvoiceRetainageType) => void;
+    onChange_retainageType: (value: TretainageType) => void;
     onChange_allowance: (value: string) => void;
     onChange_note: (value: string) => void;
   };
@@ -738,8 +738,8 @@ const Tfoot = ({
             }}
             value={retainageType}
           >
-            <Radio value={'含稅' as TinvoiceRetainageType}>含稅</Radio>
-            <Radio value={'未稅' as TinvoiceRetainageType}>未稅</Radio>
+            <Radio value={'含稅' as TretainageType}>含稅</Radio>
+            <Radio value={'未稅' as TretainageType}>未稅</Radio>
             <Radio value={'null'}>無</Radio>
           </Radio.Group>
         </div>

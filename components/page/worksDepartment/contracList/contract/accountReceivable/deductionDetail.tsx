@@ -8,7 +8,7 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import scss from './deductionDetail.module.scss';
 
-import type { TaccountsReceivableInvoiceDto } from 'js/api/dtoTypes';
+import type { TaccountsReceivablePeriodDto } from 'js/api/dtoTypes';
 import { optionsCreator_deduction } from 'js/utils/options/options';
 
 // =================================================================================
@@ -33,7 +33,7 @@ export default function DeductionDetail({
   invoiceArr,
 }: {
   className?: string;
-  invoiceArr: TaccountsReceivableInvoiceDto[];
+  invoiceArr: TaccountsReceivablePeriodDto[];
 }) {
   const ref_table = useRef<HTMLDivElement>(null);
 

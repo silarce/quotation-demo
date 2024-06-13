@@ -20,18 +20,18 @@ import scss from './invoiceTable.module.scss';
 
 import type {
   TfinalProduct,
-  TaccountsReceivableInvoiceDto,
+  TaccountsReceivablePeriodDto,
   TquotationProductItemDto,
   TquotationProductDto,
   TcompletedProductDto,
-  TinvoiceRetainageType,
+  TretainageType,
 } from 'js/api/dtoTypes';
 
 // ========================================================================
 // region type
 
 type Tinvoice_reduce = Pick<
-  TaccountsReceivableInvoiceDto,
+  TaccountsReceivablePeriodDto,
   | 'id'
   | 'updatedAt'
   | 'type'
@@ -56,7 +56,7 @@ type Tstate_invoice = {
   id?: string;
   renderCount: number; // 判斷是否要rerender用的，會送到Tcenter
 
-  type: TaccountsReceivableInvoiceDto['type'];
+  type: TaccountsReceivablePeriodDto['type'];
   period: number;
 
   rowArr: {
@@ -83,7 +83,7 @@ type Tstate_invoice = {
   price: number; // 發票金額 自動計算
   invoiceNumber: string;
 
-  retainageType: TinvoiceRetainageType | 'null'; // 保留款類型
+  retainageType: TretainageType | 'null'; // 保留款類型
   allowance: string; // 折讓金額
   note: string; // 備註
 
@@ -123,7 +123,7 @@ export default function InvoiceTable({
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
-  data_invoices: TaccountsReceivableInvoiceDto[] | undefined | null;
+  data_invoices: TaccountsReceivablePeriodDto[] | undefined | null;
   // reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
   // reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
   onAddConfirm: (state_invoice: Tstate_invoice) => void;

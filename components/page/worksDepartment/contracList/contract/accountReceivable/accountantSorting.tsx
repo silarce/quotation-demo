@@ -11,7 +11,7 @@ import scss from './accountantSorting.module.scss';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-import type { TaccountsReceivableInvoiceDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
+import type { TaccountsReceivablePeriodDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
 
 // DND
 import type { DragEndEvent, DragOverEvent, DragStartEvent, UniqueIdentifier } from '@dnd-kit/core';
@@ -96,7 +96,7 @@ export default function AccountantSorting({
   onConfirm,
 }: {
   className?: string;
-  invoiceArr: TaccountsReceivableInvoiceDto[];
+  invoiceArr: TaccountsReceivablePeriodDto[];
   onConfirm: (stateList: TstateList) => Promise<void>;
 }) {
   const [disabled, setDisabled] = useState(true);

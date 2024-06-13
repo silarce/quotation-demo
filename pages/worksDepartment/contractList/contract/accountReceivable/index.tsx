@@ -46,9 +46,9 @@ import {
   // TupdateEngineeringContactDto,
   // TupdateAccountReceivableDto,
   // TaccountReceivableDto,
-  TcreateAccountReceivableInvoiceDto,
+  TcreateAccountReceivablePeriodDto,
   TcreateAccountReceivableDto,
-  TupdateAccountReceivableInvoiceDto,
+  TupdateAccountReceivablePeriodDto,
   // TaccountsReceivableInvoiceDto,
   //
   // useGetEngineeringContact,
@@ -60,13 +60,13 @@ import {
   // apiPatchAccountReceivable,
   // apiPatchEngineeringContact,
   // apiPostWorkSheet,
-  apiPatchAccountReceivableInvoice,
+  apiPatchAccountReceivablePeriod,
   // apiPatchAccountReceivableAccountant,
   // apiPatchAccountReceivableVoidInvoice,
   apiPostAccountReceivable,
   // apiPostAccountReceivableAccountant,
   // apiDeleteAccountReceivableAccountant,
-  apiPostAccountReceivableIncoice, // 新增應收帳款發票
+  apiPostAccountReceivablePeriod, // 新增應收帳款發票
   apiPatchAccountantInvoice,
   // apiPatchAccountReceivableDeduction_accountant, // 批量更新 應收帳款 扣款明細
 } from 'js/api/api_engineering';
@@ -283,7 +283,7 @@ export default function AccountReceivable() {
       };
     });
 
-    const body: TcreateAccountReceivableInvoiceDto = {
+    const body: TcreateAccountReceivablePeriodDto = {
       invoiceDate: new Date().toISOString(),
       invoiceNumber: invoiceNumber,
       price,
@@ -302,7 +302,7 @@ export default function AccountReceivable() {
 
     try {
       setIsFetching_req(true);
-      await apiPostAccountReceivableIncoice(accountReceivable.id, body);
+      await apiPostAccountReceivablePeriod(accountReceivable.id, body);
       await update_contract();
     } catch (error) {
       const err = error as AxiosError;
@@ -319,102 +319,103 @@ export default function AccountReceivable() {
     }
   };
 
-  // region reqPatchInvoiceArr
-  const reqPatchInvoiceArr = async (state_invoiceArr: Tstate_invoice[]) => {
-    let haveEmptyId = false;
+  // // region reqPatchInvoiceArr
+  // const reqPatchInvoiceArr = async (state_invoiceArr: Tstate_invoice[]) => {
+  //   let haveEmptyId = false;
 
-    const bodyArr: {
-      id: string | undefined;
-      body: TupdateAccountReceivableInvoiceDto;
-    }[] = state_invoiceArr.map((state) => {
-      const {
-        id,
-        rowArr,
-        retainage,
-        deduction,
-        writeOffDeposit,
-        minusRetainage,
-        minusDeduction,
-        minusWriteOffDeposit,
-        price,
-        invoiceNumber,
+  //   const bodyArr: {
+  //     id: string | undefined;
+  //     body: TupdateAccountReceivableInvoiceDto;
+  //   }[] = state_invoiceArr.map((state) => {
+  //     const {
+  //       id,
+  //       rowArr,
+  //       retainage,
+  //       deduction,
+  //       writeOffDeposit,
+  //       minusRetainage,
+  //       minusDeduction,
+  //       minusWriteOffDeposit,
+  //       price,
+  //       invoiceNumber,
 
-        retainageType,
-        allowance,
-        note,
-      } = state;
+  //       retainageType,
+  //       allowance,
+  //       note,
+  //     } = state;
 
-      !id && (haveEmptyId = true);
+  //     !id && (haveEmptyId = true);
 
-      const completedProduct = rowArr.map((row) => {
-        return {
-          productId: row.productId,
-          completedQuantity: Number(row.completedQuantity),
-          completedPayment: Number(row.completedPayment),
-        };
-      });
+  //     const completedProduct = rowArr.map((row) => {
+  //       return {
+  //         productId: row.productId,
+  //         completedQuantity: Number(row.completedQuantity),
+  //         completedPayment: Number(row.completedPayment),
+  //       };
+  //     });
 
-      const body: TupdateAccountReceivableInvoiceDto = {
-        completedProduct: completedProduct,
-        retainage: Number(retainage),
-        deduction: Number(deduction),
-        writeOffDeposit: Number(writeOffDeposit),
-        isRetainage: minusRetainage,
-        isDeduction: minusDeduction,
-        isWriteOffDeposit: minusWriteOffDeposit,
-        price,
-        invoiceNumber,
+  //     const body: TupdateAccountReceivableInvoiceDto = {
+  //       completedProduct: completedProduct,
+  //       retainage: Number(retainage),
+  //       deduction: Number(deduction),
+  //       writeOffDeposit: Number(writeOffDeposit),
+  //       isRetainage: minusRetainage,
+  //       isDeduction: minusDeduction,
+  //       isWriteOffDeposit: minusWriteOffDeposit,
+  //       price,
+  //       invoiceNumber,
 
-        retainageType: retainageType === 'null' ? null : retainageType,
-        allowance: Number(allowance),
-        note,
+  //       retainageType: retainageType === 'null' ? null : retainageType,
+  //       allowance: Number(allowance),
+  //       note,
 
-        //
-        // invoiceDate: new Date().toISOString(),
-        // accountants: [],
-      };
+  //       //
+  //       // invoiceDate: new Date().toISOString(),
+  //       // accountants: [],
+  //     };
 
-      return {
-        id,
-        body,
-      };
-    }); // state_invoiceArr.map
+  //     return {
+  //       id,
+  //       body,
+  //     };
+  //   }); // state_invoiceArr.map
 
-    if (haveEmptyId) {
-      alert('有空的id');
+  //   if (haveEmptyId) {
+  //     alert('有空的id');
 
-      return;
-    }
+  //     return;
+  //   }
 
-    try {
-      setIsFetching_req(true);
+  //   try {
+  //     setIsFetching_req(true);
 
-      for (const body of bodyArr) {
-        await apiPatchAccountReceivableInvoice(body.id!, body.body);
-      }
-    } catch (error) {
-      const err = error as AxiosError;
+  //     for (const body of bodyArr) {
+  //       await apiPatchAccountReceivableInvoice(body.id!, body.body);
+  //     }
+  //   } catch (error) {
+  //     const err = error as AxiosError;
 
-      if (err?.response?.status === 409) {
-        const body = JSON.parse(err.config?.data);
-        const repeatInvoiceNumber = body.invoiceNumber;
-        myAlert.err({ title: '發票號碼重複', content: `重複的號碼為${repeatInvoiceNumber}` });
+  //     if (err?.response?.status === 409) {
+  //       const body = JSON.parse(err.config?.data);
+  //       const repeatInvoiceNumber = body.invoiceNumber;
+  //       myAlert.err({ title: '發票號碼重複', content: `重複的號碼為${repeatInvoiceNumber}` });
 
-        return;
-      }
+  //       return;
+  //     }
 
-      myAlert.err({ title: '新增發票失敗' });
-    } finally {
-      await update_contract();
-      setIsFetching_req(false);
-    }
-  }; //reqPatchInvoiceArr
+  //     myAlert.err({ title: '新增發票失敗' });
+  //   } finally {
+  //     await update_contract();
+  //     setIsFetching_req(false);
+  //   }
+  // }; //reqPatchInvoiceArr
 
+  // region  reqPatchInvoiceAllowance
   const reqPatchInvoiceAllowance = async (invoiceId: string, allowance: number) => {
     try {
       setIsFetching_req(true);
 
-      await apiPatchAccountReceivableInvoice(invoiceId, { allowance });
+      await apiPatchAccountReceivablePeriod(invoiceId, { allowance });
     } catch (error) {
       const err = error as AxiosError;
 
@@ -468,7 +469,7 @@ export default function AccountReceivable() {
       } = state;
 
       if (isInvoiceAllowanceChanged) {
-        await apiPatchAccountReceivableInvoice(String(invoice.id), { allowance: Number(invoice.allowance) });
+        await apiPatchAccountReceivablePeriod(String(invoice.id), { allowance: Number(invoice.allowance) });
       }
 
       if (isAccountantOrderChanged) {
