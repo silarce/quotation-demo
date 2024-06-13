@@ -35,18 +35,18 @@ import type {
   TupdateEngineeringDeliveryStatusDto,
   TcreateEngineeringDeliveryStatusDto,
   TupdateEngineeringDeliveryListDto,
-  TaccountsReceivableInvoiceDto,
+  TaccountsReceivablePeriodDto,
   TaccountsReceivableDto,
   TupdateAccountReceivableDto,
-  TcreateAccountReceivableInvoiceDto,
-  TupdateAccountReceivableInvoiceDto,
+  TcreateAccountReceivablePeriodDto,
+  TupdateAccountReceivablePeriodDto,
   TaccountantDto,
   TaccountsReceivableDeductionDto,
   TcreateAccountReceivableDeductionDto,
   TupdateAccountReceivableDeductionDto,
   TfinalProduct,
   TcreateAccountReceivableDto,
-  TaccountsReceivableProductPaymentDto,
+  // TaccountsReceivableProductPaymentDto,
   TcreateAccountReceivableProductPaymentDto,
   TupdateAccountReceivableProductPaymentDto,
   TsubmitEngineeringContactDto,
@@ -56,7 +56,8 @@ import type {
   TsubmitWorksheetProductsItemsDto,
   TreviewWorksheetProductsItemsDto,
   TdeliveryStatusInstallationItem,
-  TinvoiceType,
+  TperiodType,
+  TpageResponse,
 } from './dtoTypes';
 
 export type {
@@ -83,18 +84,20 @@ export type {
   TcreateEngineeringDeliveryStatusDto,
   TengineeringDeliveryStatusDto as TdeliveryStatusDto,
   TupdateEngineeringDeliveryListDto,
-  TaccountsReceivableInvoiceDto,
   TaccountsReceivableDto as TaccountReceivableDto,
   TupdateAccountReceivableDto,
-  TcreateAccountReceivableInvoiceDto,
-  TupdateAccountReceivableInvoiceDto,
+  //
+  TaccountsReceivablePeriodDto,
+  TcreateAccountReceivablePeriodDto,
+  TupdateAccountReceivablePeriodDto,
+  //
   TaccountantDto,
   TaccountsReceivableDeductionDto,
   TcreateAccountReceivableDeductionDto,
   TupdateAccountReceivableDeductionDto,
   TfinalProduct,
   TcreateAccountReceivableDto,
-  TaccountsReceivableProductPaymentDto,
+  // TaccountsReceivableProductPaymentDto,
   TcreateAccountReceivableProductPaymentDto,
   TupdateAccountReceivableProductPaymentDto,
   TcreateWorksheetDto,
@@ -1158,7 +1161,7 @@ export const apiPatchAccountReceivable = async (id: string, body: TupdateAccount
 //
 
 type TgetAccountReceivableIncoices = {
-  data: TaccountsReceivableInvoiceDto[];
+  data: TaccountsReceivablePeriodDto[];
   meta: TpageMetaDto;
 };
 
@@ -1213,45 +1216,48 @@ export const useGetAccountReceivableIncoices = (
   };
 };
 
-/**新增 應收帳款發票 account-receivable-invoice */
-export const apiPostAccountReceivableIncoice = async (
+// 新增 應收帳款收款期數
+export const apiPostAccountReceivablePeriod = async (
   accountReceivableId: string,
-  body: TcreateAccountReceivableInvoiceDto
+  body: TcreateAccountReceivablePeriodDto
 ) => {
-  const api = `/engineering/account-receivable/${accountReceivableId}/invoice`;
+  const api = `/engineering/account-receivable/${accountReceivableId}/period`;
 
   return axi
-    .post<TaccountsReceivableInvoiceDto>(api, body)
+    .post<TaccountsReceivablePeriodDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
-/**作廢 應收帳款 發票 account-receivable-invoice */
+// 更新 應收帳款收款期數
+export const apiPatchAccountReceivablePeriodInvoiceAllowance = async (
+  invoiceId: string,
+  body: { allowance: number }
+) => {
+  const api = `/engineering/account-receivable/invoice/${invoiceId}`;
+
+  return axi
+    .patch<TaccountsReceivablePeriodDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+  // return (
+  //   axi
+  //     // 修改allowance會同步改第一個invoice的allowance
+  //     // 型別沒有錯，就是TaccountsReceivablePeriodDto
+  //     .patch<TaccountsReceivablePeriodDto>(api, body)
+  //     .then(({ data }) => data)
+  //     .catch((err) => Promise.reject(err))
+  // );
+};
+
+// 作廢 應收帳款 發票 account-receivable-invoice
 export const apiPatchAccountReceivableVoidInvoice = async (id: string) => {
   const api = `/engineering/account-receivable/void-invoice/${id}`;
 
   return axi
-    .patch<TaccountsReceivableInvoiceDto>(api)
+    .patch<TaccountsReceivablePeriodDto>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
-};
-
-/**更新 應收帳款發票 account-receivable-invoice */
-export const apiPatchAccountReceivableInvoice = async (
-  accountReceivableId: string,
-  body: TupdateAccountReceivableInvoiceDto
-) => {
-  const api = `/engineering/account-receivable/invoice/${accountReceivableId}`;
-
-  return axi
-    .patch<TaccountsReceivableInvoiceDto>(api, body)
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
-
-type TgetAccountant = {
-  data: TaccountantDto[];
-  meta: TpageMetaDto;
 };
 
 /**取得 所有 應收帳款 收款紀錄 account-receivable-accountant */
@@ -1259,7 +1265,7 @@ const apiGetAccountReceivableAccountants = async (id: string, params?: Tparams) 
   const api = `/engineering/account-receivable/${id}/accountants`;
 
   return axi
-    .get<TgetAccountant>(api, { params })
+    .get<TpageResponse<TaccountantDto>>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1269,7 +1275,7 @@ export const useGetAccountReceivableAccountants = (
   accountReceivableId: string | undefined | null,
   customParams?: Tparams
 ) => {
-  const [res, setRes] = useState<TgetAccountant>();
+  const [res, setRes] = useState<TpageResponse<TaccountantDto>>();
 
   const params = {
     populate: ['invoice.accountantList'],
@@ -1310,7 +1316,7 @@ export const apiPostAccountReceivableAccountant = async (
   id: string, // 應收帳款Id 可以在contract下找到accountReceivableId
   body: {
     accountantId: string[]; // 收款明細Id
-    type: TinvoiceType;
+    type: TperiodType;
   },
   {
     callAlert = true,
@@ -1498,81 +1504,81 @@ export const useGetFinalProduct = (contractId: string | undefined) => {
   };
 };
 
-/**取得 所有 應收帳款 主產品請款比例 account-receivable-product-payment */
-
-type TgetAccountReceivableProductPayments = {
-  data: TaccountsReceivableProductPaymentDto[];
-  meta: TpageMetaDto;
-};
+//取得 所有 應收帳款 主產品請款比例 account-receivable-product-payment  棄用
+// 棄用
+// type TgetAccountReceivableProductPayments = {
+//   data: TaccountsReceivableProductPaymentDto[];
+//   meta: TpageMetaDto;
+// };
 
 // /engineering/account-receivable/{id}/product-payments
-const apiGetAccountReceivableProductPayments = async (accountReceivableId: string, params?: Tparams) => {
-  const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
+// const apiGetAccountReceivableProductPayments = async (accountReceivableId: string, params?: Tparams) => {
+//   const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
 
-  return axi
-    .get<TgetAccountReceivableProductPayments>(api, { params })
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
+//   return axi
+//     .get<TgetAccountReceivableProductPayments>(api, { params })
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
+// 棄用
+// export const useGetAccountReceivableProductPayments = (
+//   accountReceivableId: string | undefined | null,
+//   customParams?: Tparams
+// ) => {
+//   const [res, setRes] = useState<TgetAccountReceivableProductPayments>();
 
-export const useGetAccountReceivableProductPayments = (
-  accountReceivableId: string | undefined | null,
-  customParams?: Tparams
-) => {
-  const [res, setRes] = useState<TgetAccountReceivableProductPayments>();
+//   const params: Tparams = {
+//     // populate: [],
+//     pageSize: 9999,
+//     sort: 'period',
+//     order: 'ASC',
+//     ...customParams,
+//   };
 
-  const params: Tparams = {
-    // populate: [],
-    pageSize: 9999,
-    sort: 'period',
-    order: 'ASC',
-    ...customParams,
-  };
+//   const update = async () => {
+//     if (!accountReceivableId) {
+//       return;
+//     }
 
-  const update = async () => {
-    if (!accountReceivableId) {
-      return;
-    }
+//     const newRes = await apiGetAccountReceivableProductPayments(accountReceivableId, params);
 
-    const newRes = await apiGetAccountReceivableProductPayments(accountReceivableId, params);
+//     if (newRes) {
+//       setRes(newRes);
+//     }
 
-    if (newRes) {
-      setRes(newRes);
-    }
+//     return newRes;
+//   };
 
-    return newRes;
-  };
+//   return {
+//     data: res?.data,
+//     meta: res?.meta,
+//     update,
+//   };
+// };
+// 棄用
+// export const apiPostProductPayment = async (
+//   accountReceivableId: string,
+//   body: TcreateAccountReceivableProductPaymentDto[]
+// ) => {
+//   const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
 
-  return {
-    data: res?.data,
-    meta: res?.meta,
-    update,
-  };
-};
+//   return axi
+//     .post<TaccountsReceivableProductPaymentDto[]>(api, body)
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
+// 棄用
+// export const apiPatchProductPayment = async (
+//   accountReceivableId: string,
+//   body: TupdateAccountReceivableProductPaymentDto[]
+// ) => {
+//   const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
 
-export const apiPostProductPayment = async (
-  accountReceivableId: string,
-  body: TcreateAccountReceivableProductPaymentDto[]
-) => {
-  const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
-
-  return axi
-    .post<TaccountsReceivableProductPaymentDto[]>(api, body)
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
-
-export const apiPatchProductPayment = async (
-  accountReceivableId: string,
-  body: TupdateAccountReceivableProductPaymentDto[]
-) => {
-  const api = `/engineering/account-receivable/${accountReceivableId}/product-payments`;
-
-  return axi
-    .patch<TaccountsReceivableProductPaymentDto[]>(api, body)
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
+//   return axi
+//     .patch<TaccountsReceivableProductPaymentDto[]>(api, body)
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
 
 // =======================================================================
 

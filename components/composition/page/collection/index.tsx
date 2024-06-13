@@ -56,7 +56,7 @@ import {
 
 import { apiPostAccountReceivableAccountant } from 'js/api/api_engineering';
 
-import { TinvoiceType } from 'js/api/dtoTypes';
+import { TperiodType } from 'js/api/dtoTypes';
 import { content } from 'html2canvas/dist/types/css/property-descriptors/content';
 
 // =============================================================================
@@ -253,7 +253,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   };
 
   // 匯入發票
-  const reqPostAccountReceivableAccountant = async (accountReceivableId: string, type: TinvoiceType) => {
+  const reqPostAccountReceivableAccountant = async (accountReceivableId: string, type: TperiodType) => {
     if (!accountantId) {
       alert('accountantId為undefined');
 
@@ -791,7 +791,7 @@ const AddInovice = ({
 }: {
   onCancel: () => void;
   accountReceivableId: string;
-  reqPostAccountReceivableAccountant: (accountReceivableId: string, type: TinvoiceType) => Promise<void>;
+  reqPostAccountReceivableAccountant: (accountReceivableId: string, type: TperiodType) => Promise<void>;
 }) => {
   const handle_訂金 = async () => {
     await reqPostAccountReceivableAccountant(accountReceivableId, '訂金');
