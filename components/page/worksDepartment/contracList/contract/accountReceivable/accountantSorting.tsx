@@ -11,7 +11,11 @@ import scss from './accountantSorting.module.scss';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-import type { TaccountsReceivablePeriodDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
+import type {
+  TaccountsReceivablePeriodDto,
+  TupdateAccountReceivableDeductionDto,
+  TaccountsReceivableInvoiceDto,
+} from 'js/api/dtoTypes';
 
 // DND
 import type { DragEndEvent, DragOverEvent, DragStartEvent, UniqueIdentifier } from '@dnd-kit/core';
@@ -149,9 +153,15 @@ export default function AccountantSorting({
     let total_accountant_d = new Decimal(0);
 
     periodArr.forEach((period) => {
-      const invoice = period.invoices[0];
+      const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
+        | TaccountsReceivableInvoiceDto
+        | undefined;
 
-      const { price, accountantList } = invoice;
+      if (!invoice) {
+        return;
+      }
+
+      const { price = 0, accountantList } = invoice;
 
       total_invoice_d = total_invoice_d.add(price || 0);
 
@@ -179,7 +189,14 @@ export default function AccountantSorting({
     const list: TstateList = {};
 
     periodArr.forEach((period) => {
-      const invoice = period.invoices[0];
+      const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
+        | TaccountsReceivableInvoiceDto
+        | undefined;
+
+      if (!invoice) {
+        return;
+      }
+
       const {
         //
         id: invoiceId,
@@ -221,7 +238,7 @@ export default function AccountantSorting({
         invoice: {
           id: invoiceId,
           invoiceNumber,
-          invoiceDate: getTaiwanDateStr(invoiceDate),
+          invoiceDate: invoiceDate ? getTaiwanDateStr(invoiceDate) : '',
           price: price.toLocaleString(),
           allowance: String(allowance || ''),
         },
