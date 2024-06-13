@@ -866,8 +866,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     try {
-      console.log(latestContent.id);
-
       setIsLoading(true);
       await apiPatchQuotationToPending({ contentId: latestContent.id });
       await update();
