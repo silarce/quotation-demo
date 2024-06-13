@@ -1770,7 +1770,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) }
       : null,
 
-    !contentId && status === 'Bidding'
+    // !contentId && status === 'Bidding'
+    !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting')
       ? {
           type: 'myButton',
           label: '複製報價單',
