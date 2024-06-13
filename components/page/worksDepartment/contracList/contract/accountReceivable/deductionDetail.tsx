@@ -62,7 +62,7 @@ export default function DeductionDetail({
       // 把invoices中的accountantList抽出來
       const accountantArr = invoices.map((invoice) => invoice.accountantList).flat();
 
-      const thePeriod = `第${acPeriod || depositPeriod}期 ${type}`;
+      const thePeriod = `第${period || depositPeriod}期 ${type}`;
       let total = 0;
       const deductionList_num: { [itemName: string]: number } = {};
 
