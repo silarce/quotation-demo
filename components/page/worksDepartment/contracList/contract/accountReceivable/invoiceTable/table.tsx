@@ -5,7 +5,7 @@ import Decimal from 'decimal.js';
 import moment, { Moment } from 'moment';
 
 // antd
-import { Checkbox, Radio } from 'antd';
+import { Checkbox, Radio, Spin } from 'antd';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -28,7 +28,11 @@ import type {
 
 import { Tinvoice_reduce as Tperiod_reduce, Tstate_period } from './periodTable';
 
-import { IconEdit, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
+// api
+import { TinvouceCheckResult, useCheckInvoiceNumber } from 'js/api/api_engineering';
+
+// icon
+import { IconEdit, IconCheck01, IconCheck02, IconCross01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // ==========================================================================
 
@@ -69,6 +73,7 @@ type Tcenter = {
     allowEditDeduction: boolean;
 
     actualPrice: string;
+    actualPrice_localeString: string;
     invoiceDate: Moment | null;
 
     onChange_invoiceNumber: (value: string) => void;
@@ -144,6 +149,7 @@ function PeriodPanel_pre(
       note,
       //
       invoices,
+      price,
       //
       // invoiceNumber,
       // price,
@@ -186,22 +192,20 @@ function PeriodPanel_pre(
     // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
     const invoice: TaccountsReceivableInvoiceDto | undefined = invoices[0];
     const { invoiceDate, invoiceNumber = '' } = invoice ?? {};
-    let { price = 0, actualPrice = 0, allowance = 0 } = invoice ?? {};
+    let { actualPrice = 0, allowance = 0 } = invoice ?? {};
 
     // 如果是最後的totalPanel，invoices會有多項。未來invoices也可能會有多項
     if (invoices.length > 1) {
       const totals = invoices.reduce(
         (acc, cur) => {
-          acc.price += cur.price;
           acc.actualPrice += cur.actualPrice;
           acc.allowance += cur.allowance ?? 0;
 
           return acc;
         },
-        { price: 0, actualPrice: 0, allowance: 0 }
+        { actualPrice: 0, allowance: 0 }
       );
 
-      price = totals.price;
       actualPrice = totals.actualPrice;
       allowance = totals.allowance;
     }
@@ -214,7 +218,7 @@ function PeriodPanel_pre(
       retainage: String(retainage || ''),
       deduction: String(deduction || ''),
       writeOffDeposit: String(writeOffDeposit || ''),
-      price,
+      price: price || 0,
       invoiceNumber,
 
       type,
@@ -249,6 +253,14 @@ function PeriodPanel_pre(
 
   const [state_period, setState_period] = useState<Tstate_period>(defaultState);
 
+  const {
+    //
+    isFetching: isCheckingInvoiceNumber,
+    isPass: isInvoiceNumberCheckPass,
+  } = useCheckInvoiceNumber(state_period?.invoiceNumber, { pause: disabled });
+
+  // --------------------------------------------------------------------------
+
   // --------------------------------------------------------------------------
 
   // region FUNCTION
@@ -270,10 +282,10 @@ function PeriodPanel_pre(
     key: 'completedQuantity' | 'completedPayment';
     value: string;
   }) => {
-    setState_period((invoice) => {
-      invoice = { ...invoice };
+    setState_period((period) => {
+      period = { ...period };
 
-      const row = invoice.rowArr[rowIndex];
+      const row = period.rowArr[rowIndex];
       // const baseQty = row.baseQty;
       const basePrice = row.basePrice;
 
@@ -287,14 +299,14 @@ function PeriodPanel_pre(
 
       // invoice.rowArr[rowIndex][key] = value;
 
-      const totals_num = calcTotals(invoice.rowArr);
+      const totals_num = calcTotals(period.rowArr);
 
-      invoice.subTotal = totals_num.subTotal;
-      invoice.tax = totals_num.tax;
-      invoice.contractTotal = totals_num.contractTotal;
-      invoice.price = calcPrice(invoice);
+      period.subTotal = totals_num.subTotal;
+      period.tax = totals_num.tax;
+      period.contractTotal = totals_num.contractTotal;
+      period.price = calcPrice(period);
 
-      return invoice;
+      return period;
     });
   };
 
@@ -486,7 +498,7 @@ function PeriodPanel_pre(
     // _______________________________________________________________________
 
     const other: Tcenter['other'] = {
-      price: price.toLocaleString(),
+      price: price ? price.toLocaleString() : '',
       invoiceNumber,
       retainage,
       deduction,
@@ -504,6 +516,7 @@ function PeriodPanel_pre(
 
       allowEditDeduction,
       actualPrice,
+      actualPrice_localeString: actualPrice ? Number(actualPrice).toLocaleString() : '',
       invoiceDate,
 
       onChange_invoiceNumber: (value) => {
@@ -575,6 +588,34 @@ function PeriodPanel_pre(
   useEffect(() => {
     onPanelStateChange && onPanelStateChange(state_period);
   }, [state_period]);
+
+  // 判斷invoiceNumber是否有效
+  // 若state_period.id存在，為既有發票，不可以編輯invoiceNumber，不需判斷
+  useEffect(() => {
+    if (state_period.id) {
+      return;
+    }
+
+    let isValid = false;
+
+    if (!state_period.invoiceNumber) {
+      isValid = true;
+    } else if (isInvoiceNumberCheckPass === 'pass') {
+      isValid = true;
+    }
+
+    if (isCheckingInvoiceNumber) {
+      isValid = false;
+    }
+
+    setState_period((period) => {
+      return {
+        ...period,
+        renderCount: period.renderCount + 1,
+        isInvoiceNumberValid: isValid,
+      };
+    });
+  }, [state_period.id, isCheckingInvoiceNumber, isInvoiceNumberCheckPass, state_period.invoiceNumber]);
 
   // ==============================================================================
 
@@ -654,6 +695,8 @@ function PeriodPanel_pre(
         isTotal={isTotal}
         onConfirm_allowance={handle_confirm_allowance}
         resetDefault={resetDefault}
+        isCheckingInvoiceNumber={isCheckingInvoiceNumber}
+        isInvoiceNumberCheckPass={isInvoiceNumberCheckPass}
       />
     </div>
   );
@@ -717,27 +760,17 @@ const Tfoot = ({
   isTotal,
   onConfirm_allowance: onConfirm_allowance,
   resetDefault,
+  isCheckingInvoiceNumber,
+  isInvoiceNumberCheckPass,
 }: {
   readOnly: boolean;
   node_other: Tcenter['other'];
   isTotal: boolean;
   onConfirm_allowance: () => void;
   resetDefault: () => void;
+  isCheckingInvoiceNumber: boolean;
+  isInvoiceNumberCheckPass: TinvouceCheckResult;
 }) => {
-  const [disabled_allowance, setDisabled_allowance] = useState(true);
-
-  const handle_confirm_allowance = async () => {
-    onConfirm_allowance && (await onConfirm_allowance());
-    setDisabled_allowance(true);
-  };
-
-  useEffect(() => {
-    if (disabled_allowance) {
-      resetDefault();
-    }
-  }, [disabled_allowance]);
-
-  // ------------------------------------------------------------------
   const {
     invoiceNumber,
     price,
@@ -745,6 +778,7 @@ const Tfoot = ({
     retainage_localeString,
     deduction_localeString,
     writeOffDeposit_localeString,
+    actualPrice_localeString,
 
     minusRetainage: haveRetainage,
     minusDeduction: haveDeduction,
@@ -756,7 +790,6 @@ const Tfoot = ({
 
     allowEditDeduction,
 
-    actualPrice,
     invoiceDate,
 
     onChange_invoiceNumber,
@@ -777,15 +810,45 @@ const Tfoot = ({
     onChange_invoiceDate,
   } = node_other;
 
-  let { retainage, deduction, writeOffDeposit } = node_other;
+  let { retainage, deduction, writeOffDeposit, actualPrice } = node_other;
 
   if (readOnly) {
     retainage = retainage_localeString;
     deduction = deduction_localeString;
     writeOffDeposit = writeOffDeposit_localeString;
+    actualPrice = actualPrice_localeString;
   }
 
+  // ------------------------------------------------------------------
+
+  const [disabled_allowance, setDisabled_allowance] = useState(true);
+
+  let showInvoiceNumberCheck = true;
+
+  // ------------------------------------------------------------------
+
   const inputType = readOnly ? 'text' : 'number';
+
+  if (readOnly) {
+    showInvoiceNumberCheck = false;
+  } else if (!invoiceNumber) {
+    showInvoiceNumberCheck = false;
+  }
+
+  // ------------------------------------------------------------------
+  const handle_confirm_allowance = async () => {
+    onConfirm_allowance && (await onConfirm_allowance());
+    setDisabled_allowance(true);
+  };
+  // ------------------------------------------------------------------
+
+  useEffect(() => {
+    if (disabled_allowance) {
+      resetDefault();
+    }
+  }, [disabled_allowance]);
+
+  // ------------------------------------------------------------------
 
   // region Tfoot Render
 
@@ -883,11 +946,23 @@ const Tfoot = ({
           value={actualPrice}
           onChange={(e) => onChange_acturePrice(e.target.value)}
           readOnly={readOnly}
+          type={inputType}
         />
       </div>
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
-        <span>發票號碼</span>
+        <div className={scss.invoiceNumberSpinWrapper}>
+          <div className={classNames(!showInvoiceNumberCheck && 'invisible')}>
+            {isCheckingInvoiceNumber && <Spin />}
+            {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass === 'pass' && (
+              <IconCheck01 className={classNames(scss.checkIcon, scss.check)} />
+            )}
+            {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass !== 'pass' && (
+              <IconCross01 className={classNames(scss.checkIcon, scss.cross)} />
+            )}
+          </div>
+          <span>發票號碼</span>
+        </div>
         <input
           className={classNames(readOnly && scss.readyOnly)}
           value={invoiceNumber}
@@ -1005,7 +1080,7 @@ const calcPrice = (state_invoice: Tstate_period) => {
 // ==========================================================================
 const create_emptyPeriod = (): Tperiod_reduce => {
   const invoice: Tperiod_reduce = {
-    id: 'undefined',
+    id: '',
     updatedAt: 'undefined',
     // invoiceNumber: '', // 發票號碼
     type: '請款',
@@ -1024,6 +1099,7 @@ const create_emptyPeriod = (): Tperiod_reduce => {
     note: '',
     // accountantList: [],
     invoices: [],
+    price: 0,
   };
 
   return invoice;

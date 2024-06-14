@@ -3535,6 +3535,9 @@ export type TaccountsReceivablePeriodDto = {
   allowance: number | null;
   // 發票 // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
   invoices: TaccountsReceivableInvoiceDto[];
+
+  // 發票金額
+  price: number | null;
 };
 
 export type TcreateAccountReceivablePeriodDto = Pick<
@@ -3550,10 +3553,10 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   | 'isWriteOffDeposit'
   | 'retainageType'
   | 'allowance' // 會記錄在invoice
+  | 'price'
 > & {
   invoiceDate: string | null;
   invoiceNumber: string | null;
-  price: number | null;
   actualPrice: number | null;
 };
 
@@ -3568,8 +3571,7 @@ export type TaccountsReceivableInvoiceDto = {
   invoiceDate: string;
   // 發票號碼
   invoiceNumber: string;
-  // 發票金額
-  price: number;
+
   // 實際發票金額
   actualPrice: number;
   // 發票狀態
