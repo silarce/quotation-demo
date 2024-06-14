@@ -161,7 +161,9 @@ export default function AccountantSorting({
         return;
       }
 
-      const { price = 0, accountantList } = invoice;
+      const price = period.price || 0;
+
+      const { accountantList } = invoice;
 
       total_invoice_d = total_invoice_d.add(price || 0);
 
@@ -189,6 +191,8 @@ export default function AccountantSorting({
     const list: TstateList = {};
 
     periodArr.forEach((period) => {
+      const price = period.price || 0;
+
       const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
         | TaccountsReceivableInvoiceDto
         | undefined;
@@ -203,7 +207,7 @@ export default function AccountantSorting({
         accountantList,
         invoiceNumber,
         invoiceDate,
-        price,
+
         allowance,
       } = invoice;
 

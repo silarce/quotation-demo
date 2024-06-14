@@ -47,6 +47,7 @@ type Tperiod_reduce = Pick<
   | 'note'
   //
   | 'invoices'
+  | 'price'
   //
   // | 'invoiceNumber'
   // | 'price'
@@ -92,6 +93,8 @@ type Tstate_period = {
   //
   actualPrice: string; // 實際金額
   invoiceDate: Moment | null;
+
+  isInvoiceNumberValid?: boolean;
 
   //
 };
@@ -179,12 +182,15 @@ export default function PeriodTable({
     const newInoviceState = ref_newInvoicePanel.current?.getState();
 
     if (newInoviceState) {
+      if (newInoviceState.isInvoiceNumberValid === false) {
+        myAlert.info({ title: '發票號碼已被使用或正在檢查' });
+
+        return;
+      }
+
       await onAddConfirm(newInoviceState);
       setIsAddingNew(false);
     }
-
-    // await reqPatchInvoiceArr(state_invoiceArr);
-    // setDisabled(true);
   };
 
   const calcTotalsTotal = () => {
@@ -301,6 +307,7 @@ export default function PeriodTable({
       note: '',
       // accountantList: [],
       invoices: [],
+      price: 0,
     };
 
     const completedProductList: { [productId: string]: TcompletedProductDto } = {};
@@ -308,7 +315,7 @@ export default function PeriodTable({
     periodArr_sorted.forEach((period) => {
       const {
         //
-        // price,
+        price,
         completedProduct,
         retainage,
         deduction,
@@ -317,7 +324,7 @@ export default function PeriodTable({
         invoices,
       } = period;
 
-      // invoiceTotal.price = new Decimal(price).add(invoiceTotal.price).toNumber();
+      periodTotal.price = new Decimal(price || 0).add(periodTotal.price || 0).toNumber();
       periodTotal.retainage = new Decimal(retainage || 0).add(periodTotal.retainage || 0).toNumber();
       periodTotal.deduction = new Decimal(deduction || 0).add(periodTotal.deduction || 0).toNumber();
       periodTotal.writeOffDeposit = new Decimal(writeOffDeposit || 0).add(periodTotal.writeOffDeposit || 0).toNumber();
@@ -462,6 +469,8 @@ const Left = ({
           );
         })}
       </Tbody>
+
+      <div className={scss.tfoot}></div>
     </div>
   );
 };
