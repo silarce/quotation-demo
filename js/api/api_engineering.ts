@@ -60,6 +60,8 @@ import type {
   TpageResponse,
 } from './dtoTypes';
 
+type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
+
 export type {
   Tparams,
   TpageMetaDto,
@@ -108,7 +110,10 @@ export type {
   TsubmitWorksheetProductsItemsDto,
   TreviewWorksheetProductsItemsDto,
   TdeliveryStatusInstallationItem,
+  //
 } from './dtoTypes';
+
+export type { TinvouceCheckResult };
 
 type TgetEngineeringContact = {
   data: TengineeringContactDto[];
@@ -1766,4 +1771,74 @@ export const apiPatchAccountantInvoice = (
 
       return Promise.reject(err);
     });
+};
+
+// 檢查發票號碼是否存在
+export const apiPostInvoiceNumber = async (invoiceNumber: string) => {
+  const api = `/engineering/account-receivable/invoices/${invoiceNumber}-number`;
+
+  return axi
+    .post<boolean>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useCheckInvoiceNumber = (
+  invoiceNumber: string | undefined | null,
+  {
+    pause = false,
+  }: {
+    pause?: boolean;
+  } = {}
+) => {
+  const [isPass, setIsPass] = useState<TinvouceCheckResult>();
+  const [isFetching, setIsFetching] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | undefined>();
+
+  const checkInvouceNumber = async () => {
+    if (!invoiceNumber) {
+      setIsPass(undefined);
+      setIsFetching(false);
+
+      return;
+    }
+
+    await apiPostInvoiceNumber(invoiceNumber)
+      .then((res) => {
+        if (res) {
+          setIsPass('pass');
+        } else {
+          setIsPass('notPass');
+        }
+      })
+      .catch(() => {
+        setIsPass(undefined);
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
+  useEffect(() => {
+    if (pause) {
+      return;
+    }
+
+    setIsFetching(true);
+    setIsPass(undefined);
+
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    const timeoutId_new = setTimeout(() => {
+      checkInvouceNumber();
+    }, 1000);
+
+    setTimeoutId(timeoutId_new);
+  }, [invoiceNumber]);
+
+  console.log(isFetching);
+
+  return { isFetching, isPass };
 };

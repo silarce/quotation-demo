@@ -168,3 +168,21 @@ $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固�
     }
   }
 }
+
+.invoiceNumberSpinWrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.checkIcon {
+  height: 15px;
+  width: auto;
+  margin-right: 5px;
+  &.check {
+    color: #42ba96;
+  }
+  &.cross {
+    color: red;
+  }
+}

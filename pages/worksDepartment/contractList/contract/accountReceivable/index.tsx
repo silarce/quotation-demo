@@ -195,61 +195,11 @@ export default function AccountReceivable() {
   };
 
   // region reqAddInvoice
-  // const reqAddInvoice = async (type: TcreateAccountReceivableInvoiceDto['type'], invoiceNumber: string) => {
-  //   if (!accountReceivable?.id) {
-  //     alert('沒有accountReceivable.id');
-
-  //     return;
-  //   }
-
-  //   if (!invoiceNumber) {
-  //     myAlert.info({ title: '請輸入發票號碼' });
-
-  //     return;
-  //   }
-
-  //   const body: TcreateAccountReceivableInvoiceDto = {
-  //     invoiceDate: new Date().toISOString(),
-  //     invoiceNumber: invoiceNumber,
-  //     price: 0,
-  //     note: '',
-  //     type,
-  //     isRetainage: false,
-  //     isDeduction: false,
-  //     isWriteOffDeposit: false,
-  //   };
-
-  //   try {
-  //     setIsFetching_req(true);
-  //     await apiPostAccountReceivableIncoice(accountReceivable.id, body);
-  //     await update_contract();
-  //   } catch (error) {
-  //     const err = error as AxiosError;
-
-  //     if (err?.response?.status === 409) {
-  //       myAlert.err({ title: '發票號碼重複' });
-
-  //       return;
-  //     }
-
-  //     myAlert.err({ title: '新增發票失敗' });
-  //   } finally {
-  //     setIsFetching_req(false);
-  //   }
-  // };
-
-  // region reqAddInvoice_whole
-  const reqAddInvoice_whole = async (state_invoice: Tstate_period) => {
+  const reqAddInvoice = async (state_invoice: Tstate_period) => {
     if (!accountReceivable?.id) {
       alert('沒有accountReceivable.id');
 
-      return;
-    }
-
-    if (!state_invoice.invoiceNumber) {
-      myAlert.info({ title: '請輸入發票號碼' });
-
-      return;
+      return Promise.reject();
     }
 
     const {
@@ -270,17 +220,23 @@ export default function AccountReceivable() {
       minusDeduction,
       minusWriteOffDeposit,
 
-      // allowEditDeduction,
-
-      price,
-      invoiceNumber,
-
       retainageType,
       allowance,
       note,
 
-      actualPrice,
+      price, // 發票金額
+      invoiceNumber, // 發票號碼
+      invoiceDate, // 發票日期
+      actualPrice, // 發票實際金額
     } = state_invoice;
+
+    if (invoiceNumber || invoiceDate || actualPrice) {
+      if (!(invoiceNumber && invoiceDate && actualPrice)) {
+        myAlert.info({ title: '請輸入發票實際金額、發票號碼、發票日期，或全部清除' });
+
+        return Promise.reject();
+      }
+    }
 
     const completedProduct = rowArr.map((row) => {
       return {
@@ -302,11 +258,11 @@ export default function AccountReceivable() {
       isWriteOffDeposit: minusWriteOffDeposit,
       retainageType: retainageType === 'null' ? null : retainageType,
       allowance: Number(allowance),
-      //
-      invoiceDate: moment().toISOString(),
-      invoiceNumber: invoiceNumber,
       price,
-      actualPrice: Number(actualPrice),
+      //
+      invoiceDate: invoiceDate ? invoiceDate.toISOString() : null,
+      invoiceNumber: invoiceNumber || null,
+      actualPrice: actualPrice ? Number(actualPrice) : null,
     };
 
     try {
@@ -315,14 +271,7 @@ export default function AccountReceivable() {
       await update_contract();
     } catch (error) {
       const err = error as AxiosError;
-
-      if (err?.response?.status === 409) {
-        myAlert.err({ title: '發票號碼重複' });
-
-        return;
-      }
-
-      myAlert.err({ title: '新增發票失敗' });
+      myAlert.err({ title: '新增發票失敗', content: err.message });
     } finally {
       setIsFetching_req(false);
     }
@@ -517,7 +466,7 @@ export default function AccountReceivable() {
           data_period={accountReceivable.periods}
           // reqAddInvoice={reqAddInvoice}
           // reqPatchInvoiceArr={reqPatchInvoiceArr}
-          onAddConfirm={reqAddInvoice_whole}
+          onAddConfirm={reqAddInvoice}
           reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
         />
       </div>
@@ -543,3 +492,27 @@ const EmptyMain = () => {
 };
 
 // ========================================================================
+
+// 檢查發票金額 發票實際金額 發票日期 發票號碼
+// 檢查發票金額 發票實際金額 發票日期 發票號碼
+// 檢查發票金額 發票實際金額 發票日期 發票號碼
+// 檢查發票金額 發票實際金額 發票日期 發票號碼
+// 檢查發票金額 發票實際金額 發票日期 發票號碼
+// 檢查發票金額 發票實際金額 發票日期 發票號碼
+// 檢查發票金額 發票實際金額 發票日期 發票號碼
+// 檢查發票金額 發票實際金額 發票日期 發票號碼
+// 檢查發票金額 發票實際金額 發票日期 發票號碼
+
+// 處理跑版
+// 處理跑版
+// 處理跑版
+// 處理跑版
+// 處理跑版
+// 處理跑版
+// 處理跑版
+// 處理跑版
+// 處理跑版
+// 處理跑版
+// 處理跑版
+// 處理跑版
+// 處理跑版
