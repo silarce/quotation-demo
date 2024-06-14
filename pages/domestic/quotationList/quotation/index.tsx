@@ -1327,10 +1327,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
           inputAttr: {
             disabled,
             value: state_summary.tuneTotal,
+            placeholder: '範圍正負1000',
             onChange: (e) => {
               const value_num = Number(e.target.value);
 
-              if (Math.abs(value_num) > 10) {
+              if (Math.abs(value_num) > 1000) {
                 return;
               }
 
@@ -1638,6 +1639,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     return (
       <div className="ml-2 mb-1 mt-auto">
         <div>版本 : {version}</div>
+        <div>總計 : {latestContent?.total ? latestContent.total.toLocaleString() : ''}</div>
       </div>
     );
   };
@@ -1940,15 +1942,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
           totalPaymentRatio: '0',
         },
         {
-          milestone: '交貨同時付總金額',
+          milestone: '門軌安裝完成付總金額',
           totalPaymentRatio: '0',
         },
         {
-          milestone: '按裝同時付總金額',
+          milestone: '門扇安裝完成付總金額',
           totalPaymentRatio: '0',
         },
         {
-          milestone: '接電同時付總金額',
+          milestone: '驗收完成(保留款)付總金額',
           totalPaymentRatio: '0',
         },
       ]);
