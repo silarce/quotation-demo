@@ -1941,15 +1941,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
           totalPaymentRatio: '0',
         },
         {
-          milestone: '交貨同時付總金額',
+          milestone: '門軌安裝完成付總金額',
           totalPaymentRatio: '0',
         },
         {
-          milestone: '按裝同時付總金額',
+          milestone: '門扇安裝完成付總金額',
           totalPaymentRatio: '0',
         },
         {
-          milestone: '接電同時付總金額',
+          milestone: '驗收完成(保留款)付總金額',
           totalPaymentRatio: '0',
         },
       ]);
