@@ -443,6 +443,8 @@ export default function OutboundOrder({
         | undefined;
 
       // ____________________________________________________________________
+      // ____________________________________________________________________
+      // MARK: prodRow
       const prodRow = createRowProps_prodRow({
         prod: product,
         serialNumber: index + 1,
@@ -452,6 +454,7 @@ export default function OutboundOrder({
       });
 
       rowPropsArr.push(prodRow);
+      // ____________________________________________________________________
       // ____________________________________________________________________
 
       const onConfirm: TonConfirmClick = async (
@@ -768,7 +771,12 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
 // ======================================================================
 
 // region function
-
+//
+//
+//
+//
+//
+// MARK:createRowProps_prodRow
 // 產品資料的row，這個row會包含item的資料，這個row不會包含panel
 const createRowProps_prodRow = ({
   prod,
@@ -792,6 +800,7 @@ const createRowProps_prodRow = ({
     projectName: worksheetItem.itemName,
     L: new Decimal(worksheetItem.fullWidth).div(1000).toNumber(),
     WG: new Decimal(worksheetItem.WG).div(1000).toNumber(),
+    h: new Decimal(worksheetItem.height).div(1000).toNumber(),
     B: worksheetItem.boxB,
     qty: worksheetItemQty,
     volume: worksheetItem.volume,
@@ -815,6 +824,7 @@ const createRowProps_prodRow = ({
     left: {
       L: new Decimal(prod.fullWidth).div(1000).toNumber(),
       WG: new Decimal(prod.WG).div(1000).toNumber(),
+      h: new Decimal(prod.height).div(1000).toNumber(),
       B: prod.boxB,
       qty: prod.quantity,
       volume: prod.volume,
@@ -851,6 +861,7 @@ const createRowProps_headRow = ({
     projectName: worksheetItem.itemName,
     L: new Decimal(worksheetItem.fullWidth).div(1000).toNumber(),
     WG: new Decimal(worksheetItem.WG).div(1000).toNumber(),
+    h: new Decimal(worksheetItem.height).div(1000).toNumber(),
     B: worksheetItem.boxB,
     qty: worksheetItemQty,
     volume: worksheetItem.volume,
@@ -1005,6 +1016,7 @@ const createRowProps_itemRow = ({
       projectName: worksheetItem.itemName,
       L: new Decimal(worksheetItem.fullWidth).div(1000).toNumber(),
       WG: new Decimal(worksheetItem.WG).div(1000).toNumber(),
+      h: new Decimal(worksheetItem.height).div(1000).toNumber(),
       B: worksheetItem.boxB,
       // qty: worksheetItemQty,
       volume: worksheetItem.volume,

@@ -65,6 +65,7 @@ type TrowProps = {
   left?: {
     L?: React.ReactNode;
     WG?: React.ReactNode;
+    h?: React.ReactNode;
     B?: React.ReactNode;
     qty?: React.ReactNode;
     volume?: React.ReactNode;
@@ -78,6 +79,7 @@ type TrowProps = {
     projectName?: React.ReactNode;
     L?: React.ReactNode;
     WG?: React.ReactNode;
+    h?: React.ReactNode;
     B?: React.ReactNode;
     qty?: React.ReactNode;
     volume?: React.ReactNode;
@@ -272,6 +274,7 @@ const Row = ({
       <div className={classNames(scss.left, !showLeft && scss.notShow, scss.plus)}>
         <div className={classNames(scss.cell, config.L.className)}>{left?.L}</div>
         <div className={classNames(scss.cell, config.WG.className)}>{left?.WG}</div>
+        <div className={classNames(scss.cell, config.h.className)}>{left?.h}</div>
         <div className={classNames(scss.cell, config.B.className)}>{left?.B}</div>
         <div className={classNames(scss.cell, config.qty.className)}>{left?.qty}</div>
         <div className={classNames(scss.cell, config.volume.className)}>{left?.volume}</div>
@@ -288,6 +291,7 @@ const Row = ({
         <div className={classNames(scss.cell, config.projectName.className)}>{center?.projectName}</div>
         <div className={classNames(scss.cell, config.L.className)}>{center?.L}</div>
         <div className={classNames(scss.cell, config.WG.className)}>{center?.WG}</div>
+        <div className={classNames(scss.cell, config.h.className)}>{center?.h}</div>
         <div className={classNames(scss.cell, config.B.className)}>{center?.B}</div>
         <div className={classNames(scss.cell, config.qty.className)}>{center?.qty}</div>
         <div className={classNames(scss.cell, config.volume.className)}>{center?.volume}</div>
@@ -365,7 +369,9 @@ const Thead = (rowProps_other: TrowProps_other) => {
         projectName: '項目',
       }}
       left={{
+        L: config.L.caption,
         WG: config.WG.caption,
+        h: config.h.caption,
         B: config.B.caption,
         qty: config.qty.caption,
         volume: config.volume.caption,
@@ -379,6 +385,7 @@ const Thead = (rowProps_other: TrowProps_other) => {
         projectName: config.projectName.caption,
         L: config.L.caption,
         WG: config.WG.caption,
+        h: config.h.caption,
         B: config.B.caption,
         qty: config.qty.caption,
         volume: config.volume.caption,
@@ -733,6 +740,7 @@ type TcellKeys =
   //
   | 'L'
   | 'WG'
+  | 'h'
   | 'B'
   | 'qty'
   | 'volume'
@@ -780,6 +788,10 @@ const config: TconfigList = {
   },
   WG: {
     caption: 'WG',
+    className: 'w-9',
+  },
+  h: {
+    caption: 'h',
     className: 'w-9',
   },
   B: {
