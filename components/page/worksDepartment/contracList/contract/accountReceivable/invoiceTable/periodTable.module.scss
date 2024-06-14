@@ -3,7 +3,9 @@ $gridTemplateColumns_center: 120px 120px;
 $fontSize: 16px;
 $fontWeight: 500;
 $rowGap: 10px;
-$invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固定高度
+// $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固定高度
+$invoiceHeight: fit-content;
+$tfootHeight: 496px; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
 
 .invoiceTable {
   // width: fit-content;
@@ -100,6 +102,7 @@ $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固�
   left: 0;
   z-index: 2;
   background-color: white;
+  align-self: stretch;
   .row {
     grid-template-columns: 80px 150px 50px 100px;
   }
@@ -145,6 +148,7 @@ $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固�
   gap: $rowGap;
   // font-size: $fontSize;
   font-weight: $fontWeight;
+  height: $tfootHeight;
   .row {
     justify-items: flex-end;
   }

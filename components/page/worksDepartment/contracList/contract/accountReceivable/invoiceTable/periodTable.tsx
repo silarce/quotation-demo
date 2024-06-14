@@ -469,6 +469,8 @@ const Left = ({
           );
         })}
       </Tbody>
+
+      <div className={scss.tfoot}></div>
     </div>
   );
 };
