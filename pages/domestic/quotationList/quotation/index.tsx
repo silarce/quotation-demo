@@ -1639,6 +1639,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     return (
       <div className="ml-2 mb-1 mt-auto">
         <div>版本 : {version}</div>
+        <div>總計 : {latestContent?.total ? latestContent.total.toLocaleString() : ''}</div>
       </div>
     );
   };
