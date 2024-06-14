@@ -162,7 +162,7 @@ export default function PayInfo({
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className={scss.avgDiscount}>
             {'小計調整'}
-            <Popover content={'不可以大於10，不可以小於-10'} trigger="hover">
+            <Popover content={'不可以大於1000，不可以小於-1000'} trigger="hover">
               <InfoCircleOutlined />
             </Popover>
           </span>
