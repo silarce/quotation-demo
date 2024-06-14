@@ -58,6 +58,7 @@ import type {
   TdeliveryStatusInstallationItem,
   TperiodType,
   TpageResponse,
+  TaccountsReceivableInvoiceDto,
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
@@ -110,6 +111,7 @@ export type {
   TsubmitWorksheetProductsItemsDto,
   TreviewWorksheetProductsItemsDto,
   TdeliveryStatusInstallationItem,
+  TaccountsReceivableInvoiceDto,
   //
 } from './dtoTypes';
 
@@ -1773,12 +1775,13 @@ export const apiPatchAccountantInvoice = (
     });
 };
 
-// 檢查發票號碼是否存在
-export const apiPostInvoiceNumber = async (invoiceNumber: string) => {
-  const api = `/engineering/account-receivable/invoices/${invoiceNumber}-number`;
+// 檢查發票號碼是否存在 // 這個api其實是用invoiceNumber找invoice
+export const apiGetInvoiceNumber = async (invoiceNumber: string) => {
+  // const api = `/engineering/account-receivable/invoices/${invoiceNumber}-number`;
+  const api = `/engineering/account-receivable/invoices/${invoiceNumber}`;
 
   return axi
-    .post<boolean>(api)
+    .get<TaccountsReceivableInvoiceDto>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -1803,9 +1806,9 @@ export const useCheckInvoiceNumber = (
       return;
     }
 
-    await apiPostInvoiceNumber(invoiceNumber)
+    await apiGetInvoiceNumber(invoiceNumber)
       .then((res) => {
-        if (res) {
+        if (!res) {
           setIsPass('pass');
         } else {
           setIsPass('notPass');
@@ -1837,8 +1840,6 @@ export const useCheckInvoiceNumber = (
 
     setTimeoutId(timeoutId_new);
   }, [invoiceNumber]);
-
-  console.log(isFetching);
 
   return { isFetching, isPass };
 };

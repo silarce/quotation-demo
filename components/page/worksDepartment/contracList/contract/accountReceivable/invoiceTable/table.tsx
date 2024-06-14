@@ -954,10 +954,10 @@ const Tfoot = ({
         <div className={scss.invoiceNumberSpinWrapper}>
           <div className={classNames(!showInvoiceNumberCheck && 'invisible')}>
             {isCheckingInvoiceNumber && <Spin />}
-            {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass && (
+            {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass === 'pass' && (
               <IconCheck01 className={classNames(scss.checkIcon, scss.check)} />
             )}
-            {!isCheckingInvoiceNumber && !isInvoiceNumberCheckPass && (
+            {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass !== 'pass' && (
               <IconCross01 className={classNames(scss.checkIcon, scss.cross)} />
             )}
           </div>
@@ -1080,7 +1080,7 @@ const calcPrice = (state_invoice: Tstate_period) => {
 // ==========================================================================
 const create_emptyPeriod = (): Tperiod_reduce => {
   const invoice: Tperiod_reduce = {
-    id: 'undefined',
+    id: '',
     updatedAt: 'undefined',
     // invoiceNumber: '', // 發票號碼
     type: '請款',
