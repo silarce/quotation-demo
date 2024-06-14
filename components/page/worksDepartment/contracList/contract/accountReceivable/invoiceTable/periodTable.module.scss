@@ -3,6 +3,9 @@ $gridTemplateColumns_center: 120px 120px;
 $fontSize: 16px;
 $fontWeight: 500;
 $rowGap: 10px;
+// $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固定高度
+$invoiceHeight: fit-content;
+$tfootHeight: 496px; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
 
 .invoiceTable {
   // width: fit-content;
@@ -30,13 +33,17 @@ $rowGap: 10px;
   display: flex;
   width: fit-content;
   max-width: 100%;
+  max-height: 550px;
   overflow: auto;
-
   border: solid 1px theme("colors.border");
 }
 
 .thead {
+  position: sticky;
+  top: 0;
   background-color: theme("colors.bgc01");
+  height: 100px;
+  z-index: 1;
   .top {
     display: flex;
     align-items: center;
@@ -51,6 +58,14 @@ $rowGap: 10px;
 }
 
 .invoice {
+  height: $invoiceHeight;
+  &.new {
+    background-color: theme("colors.hoverBgc");
+    input {
+      background-color: theme("colors.hoverBgc");
+    }
+  }
+
   &:not(:nth-last-of-type(1)) {
     border-right: solid 1px theme("colors.border");
   }
@@ -85,8 +100,9 @@ $rowGap: 10px;
 .left {
   position: sticky;
   left: 0;
-  z-index: 1;
+  z-index: 2;
   background-color: white;
+  align-self: stretch;
   .row {
     grid-template-columns: 80px 150px 50px 100px;
   }
@@ -95,10 +111,11 @@ $rowGap: 10px;
 .center {
   .row {
     grid-template-columns: $gridTemplateColumns_center;
-    input {
+    > input {
       width: 100%;
       text-align: center;
-      border-bottom: solid 1px theme("colors.border");
+      // border-bottom: solid 1px theme("colors.border");
+      border-bottom: solid 1px theme("colors.sub");
       &.readyOnly {
         border-color: transparent;
       }
@@ -131,6 +148,7 @@ $rowGap: 10px;
   gap: $rowGap;
   // font-size: $fontSize;
   font-weight: $fontWeight;
+  height: $tfootHeight;
   .row {
     justify-items: flex-end;
   }
@@ -140,4 +158,35 @@ $rowGap: 10px;
   display: flex;
   justify-content: center;
   margin: 10px 0;
+}
+
+.allowancePanel {
+  display: flex;
+  align-items: center;
+  .allowanceBtnBar {
+    display: inline-flex;
+    gap: 10px;
+    margin-right: 10px;
+    .active {
+      color: red;
+    }
+  }
+}
+
+.invoiceNumberSpinWrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.checkIcon {
+  height: 15px;
+  width: auto;
+  margin-right: 5px;
+  &.check {
+    color: #42ba96;
+  }
+  &.cross {
+    color: red;
+  }
 }

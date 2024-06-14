@@ -9,12 +9,15 @@ import { InfoCircleOutlined } from '@ant-design/icons';
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import InputModal from 'components/global/gear/modal/simpleModal/inputModal';
+
 // import MustTip_simple from 'components/global/gear/other/mustTip_simple';
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './payInfo.module.scss';
+
+import { blurOnWheel } from 'js/utils/helpers/blurOnWheel';
 
 type TinputCell = {
   inputAttr: React.InputHTMLAttributes<HTMLInputElement>;
@@ -162,12 +165,13 @@ export default function PayInfo({
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className={scss.avgDiscount}>
             {'小計調整'}
-            <Popover content={'不可以大於10，不可以小於-10'} trigger="hover">
+            <Popover content={'不可以大於1000，不可以小於-1000'} trigger="hover">
               <InfoCircleOutlined />
             </Popover>
           </span>
           <div>
             <input
+              onWheel={blurOnWheel}
               type="number"
               className={classNames(
                 //

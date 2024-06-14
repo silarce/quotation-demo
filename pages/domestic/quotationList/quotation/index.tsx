@@ -760,7 +760,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         router.back();
       } else {
-        // await update();
+        await update();
       }
     } catch (error) {
       const err = error as Error;
@@ -847,7 +847,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // 轉為準合約
   const reqToPending = async () => {
-    if (!quotationId) {
+    if (!latestContent) {
       return;
     }
 
@@ -867,7 +867,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     try {
       setIsLoading(true);
-      await apiPatchQuotationToPending(quotationId);
+      await apiPatchQuotationToPending({ contentId: latestContent.id });
       await update();
       router.replace({
         query: {
@@ -1327,10 +1327,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
           inputAttr: {
             disabled,
             value: state_summary.tuneTotal,
+            placeholder: '範圍正負1000',
             onChange: (e) => {
               const value_num = Number(e.target.value);
 
-              if (Math.abs(value_num) > 10) {
+              if (Math.abs(value_num) > 1000) {
                 return;
               }
 
@@ -1638,6 +1639,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     return (
       <div className="ml-2 mb-1 mt-auto">
         <div>版本 : {version}</div>
+        <div>總計 : {latestContent?.total ? latestContent.total.toLocaleString() : ''}</div>
       </div>
     );
   };
@@ -1768,7 +1770,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) }
       : null,
 
-    !contentId && status === 'Bidding'
+    // !contentId && status === 'Bidding'
+    !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting')
       ? {
           type: 'myButton',
           label: '複製報價單',
@@ -1939,15 +1942,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
           totalPaymentRatio: '0',
         },
         {
-          milestone: '交貨同時付總金額',
+          milestone: '門軌安裝完成付總金額',
           totalPaymentRatio: '0',
         },
         {
-          milestone: '按裝同時付總金額',
+          milestone: '門扇安裝完成付總金額',
           totalPaymentRatio: '0',
         },
         {
-          milestone: '接電同時付總金額',
+          milestone: '驗收完成(保留款)付總金額',
           totalPaymentRatio: '0',
         },
       ]);

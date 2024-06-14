@@ -11,7 +11,11 @@ import scss from './accountantSorting.module.scss';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-import type { TaccountsReceivableInvoiceDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
+import type {
+  TaccountsReceivablePeriodDto,
+  TupdateAccountReceivableDeductionDto,
+  TaccountsReceivableInvoiceDto,
+} from 'js/api/dtoTypes';
 
 // DND
 import type { DragEndEvent, DragOverEvent, DragStartEvent, UniqueIdentifier } from '@dnd-kit/core';
@@ -92,11 +96,11 @@ export type { TstateList as Tstate_accountantSorting };
 // region START
 export default function AccountantSorting({
   className,
-  invoiceArr,
+  periodArr,
   onConfirm,
 }: {
   className?: string;
-  invoiceArr: TaccountsReceivableInvoiceDto[];
+  periodArr: TaccountsReceivablePeriodDto[];
   onConfirm: (stateList: TstateList) => Promise<void>;
 }) {
   const [disabled, setDisabled] = useState(true);
@@ -148,8 +152,18 @@ export default function AccountantSorting({
     let total_invoice_d = new Decimal(0);
     let total_accountant_d = new Decimal(0);
 
-    invoiceArr.forEach((invoice) => {
-      const { price, accountantList } = invoice;
+    periodArr.forEach((period) => {
+      const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
+        | TaccountsReceivableInvoiceDto
+        | undefined;
+
+      if (!invoice) {
+        return;
+      }
+
+      const price = period.price || 0;
+
+      const { accountantList } = invoice;
 
       total_invoice_d = total_invoice_d.add(price || 0);
 
@@ -163,7 +177,7 @@ export default function AccountantSorting({
       total_accountant: total_accountant_d.toNumber().toLocaleString(),
       amountNotCollected: total_invoice_d.minus(total_accountant_d).toNumber().toLocaleString(),
     };
-  }, [invoiceArr]);
+  }, [periodArr]);
 
   // -----------------------------------------------------------------------------
 
@@ -171,13 +185,31 @@ export default function AccountantSorting({
 
   useEffect(() => {
     setDisabled(true);
-  }, [invoiceArr]);
+  }, [periodArr]);
 
   useEffect(() => {
     const list: TstateList = {};
 
-    invoiceArr.forEach((invoice) => {
-      const { id: invoiceId, accountantList, invoiceNumber, invoiceDate, price, allowance } = invoice;
+    periodArr.forEach((period) => {
+      const price = period.price || 0;
+
+      const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
+        | TaccountsReceivableInvoiceDto
+        | undefined;
+
+      if (!invoice) {
+        return;
+      }
+
+      const {
+        //
+        id: invoiceId,
+        accountantList,
+        invoiceNumber,
+        invoiceDate,
+
+        allowance,
+      } = invoice;
 
       const orderedAccountantList = _.sortBy(accountantList, 'order');
 
@@ -210,7 +242,7 @@ export default function AccountantSorting({
         invoice: {
           id: invoiceId,
           invoiceNumber,
-          invoiceDate: getTaiwanDateStr(invoiceDate),
+          invoiceDate: invoiceDate ? getTaiwanDateStr(invoiceDate) : '',
           price: price.toLocaleString(),
           allowance: String(allowance || ''),
         },
@@ -219,7 +251,7 @@ export default function AccountantSorting({
     }); // invoiceArr.forEach
 
     setStateListArr(list);
-  }, [invoiceArr, disabled]);
+  }, [periodArr, disabled]);
 
   // -----------------------------------------------------------------------------
   // region RENDER

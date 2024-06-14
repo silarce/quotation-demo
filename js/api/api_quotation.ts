@@ -1296,8 +1296,8 @@ export const useQuotationAccounting_personalContract = (
 // ========================================================================
 
 // 轉為準合約
-export const apiPatchQuotationToPending = (id: string) => {
-  const api = `/quotation/${id}/to-pending`;
+export const apiPatchQuotationToPending = ({ contentId }: { contentId: string }) => {
+  const api = `/quotation/content/${contentId}/to-pending`;
 
   return axi
     .patch(api)
@@ -1309,6 +1309,20 @@ export const apiPatchQuotationToPending = (id: string) => {
       return Promise.reject(err);
     });
 };
+// 棄用
+// export const apiPatchQuotationToPending = (id: string) => {
+//   const api = `/quotation/${id}/to-pending`;
+
+//   return axi
+//     .patch(api)
+//     .then(({ data }) => data)
+//     .catch((error) => {
+//       const err = error as AxiosError;
+//       myAlert.err({ title: '轉為準合約失敗', content: err.message });
+
+//       return Promise.reject(err);
+//     });
+// };
 
 // 複製報價單
 export const apiPostCopyQuotation = (body: { quotationId: string; customerId: string }) => {

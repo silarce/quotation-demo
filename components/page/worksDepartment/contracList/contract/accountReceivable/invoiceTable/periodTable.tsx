@@ -2,12 +2,10 @@ import React, { useState, useEffect, useMemo, memo, useRef } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-
-// antd
-import { Checkbox, Radio } from 'antd';
+import moment, { Moment } from 'moment';
 
 // component
-import InvoicePanel, { Thead, Tbody, Tfoot } from './table';
+import PeriodPanel, { Thead, Tbody, Tfoot } from './table';
 import type { TimperativeHandle_panel, Tcenter } from './table';
 
 // gear
@@ -16,29 +14,27 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TopBar from '../ui/topBar';
 
 // css
-import scss from './invoiceTable.module.scss';
+import scss from './periodTable.module.scss';
 
 import type {
   TfinalProduct,
-  TaccountsReceivableInvoiceDto,
+  TaccountsReceivablePeriodDto,
   TquotationProductItemDto,
   TquotationProductDto,
   TcompletedProductDto,
-  TinvoiceRetainageType,
+  TretainageType,
 } from 'js/api/dtoTypes';
 
 // ========================================================================
 // region type
 
-type Tinvoice_reduce = Pick<
-  TaccountsReceivableInvoiceDto,
+type Tperiod_reduce = Pick<
+  TaccountsReceivablePeriodDto,
   | 'id'
   | 'updatedAt'
   | 'type'
   | 'period'
   | 'depositPeriod'
-  | 'invoiceNumber'
-  | 'price'
   | 'completedProduct'
   | 'retainage'
   | 'deduction'
@@ -47,16 +43,24 @@ type Tinvoice_reduce = Pick<
   | 'isDeduction'
   | 'isWriteOffDeposit'
   | 'retainageType'
-  | 'allowance'
+  // | 'allowance'
   | 'note'
-  | 'accountantList'
+  //
+  | 'invoices'
+  | 'price'
+  //
+  // | 'invoiceNumber'
+  // | 'price'
+  // | 'accountantList'
+  // | 'actualPrice'
 >;
 
-type Tstate_invoice = {
+type Tstate_period = {
   id?: string;
+  firstInvoiceId: string | null;
   renderCount: number; // 判斷是否要rerender用的，會送到Tcenter
 
-  type: TaccountsReceivableInvoiceDto['type'];
+  type: TaccountsReceivablePeriodDto['type'];
   period: number;
 
   rowArr: {
@@ -83,9 +87,14 @@ type Tstate_invoice = {
   price: number; // 發票金額 自動計算
   invoiceNumber: string;
 
-  retainageType: TinvoiceRetainageType | 'null'; // 保留款類型
+  retainageType: TretainageType | 'null'; // 保留款類型
   allowance: string; // 折讓金額
   note: string; // 備註
+  //
+  actualPrice: string; // 實際金額
+  invoiceDate: Moment | null;
+
+  isInvoiceNumberValid?: boolean;
 
   //
 };
@@ -105,17 +114,17 @@ type Tleft = {
   };
 };
 
-export type { Tstate_invoice, Tinvoice_reduce };
+export type { Tstate_period, Tperiod_reduce as Tinvoice_reduce };
 
 // ========================================================================
 
 // region START
 
-export default function InvoiceTable({
+export default function PeriodTable({
   //
   className,
   data_finalProdcut = [],
-  data_invoices = [],
+  data_period = [],
   // reqAddInvoice,
   // reqPatchInvoiceArr,
   onAddConfirm,
@@ -123,10 +132,10 @@ export default function InvoiceTable({
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
-  data_invoices: TaccountsReceivableInvoiceDto[] | undefined | null;
+  data_period: TaccountsReceivablePeriodDto[] | undefined | null;
   // reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
   // reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
-  onAddConfirm: (state_invoice: Tstate_invoice) => void;
+  onAddConfirm: (state_invoice: Tstate_period) => void;
   reqPatchInvoiceAllowance: (invoiceId: string, allowance: number) => void;
 }) {
   const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
@@ -159,9 +168,9 @@ export default function InvoiceTable({
     };
   }, [data_finalProdcut]);
 
-  const invoiceArr_sorted = useMemo(() => {
-    return _.sortBy(data_invoices, 'createdAt');
-  }, [data_invoices]);
+  const periodArr_sorted = useMemo(() => {
+    return _.sortBy(data_period, 'createdAt');
+  }, [data_period]);
 
   // --------------------------------------------------------------------------
 
@@ -173,12 +182,15 @@ export default function InvoiceTable({
     const newInoviceState = ref_newInvoicePanel.current?.getState();
 
     if (newInoviceState) {
+      if (newInoviceState.isInvoiceNumberValid === false) {
+        myAlert.info({ title: '發票號碼已被使用或正在檢查' });
+
+        return;
+      }
+
       await onAddConfirm(newInoviceState);
       setIsAddingNew(false);
     }
-
-    // await reqPatchInvoiceArr(state_invoiceArr);
-    // setDisabled(true);
   };
 
   const calcTotalsTotal = () => {
@@ -203,7 +215,7 @@ export default function InvoiceTable({
     };
   };
 
-  const onPanelStateChange = (state_invoice: Tstate_invoice) => {
+  const onPanelStateChange = (state_invoice: Tstate_period) => {
     const totalsTotal = calcTotalsTotal();
 
     setTotalsTotal(totalsTotal);
@@ -274,15 +286,15 @@ export default function InvoiceTable({
 
   // ref_invoicePanelArr.current.map((handle) => handle?.getState())
 
-  const invoiceTotal = useMemo(() => {
-    const invoiceTotal: Tinvoice_reduce = {
+  const periodTotal = useMemo(() => {
+    const periodTotal: Tperiod_reduce = {
       id: '',
       updatedAt: '',
       type: '請款',
       period: 0,
       depositPeriod: 0,
-      invoiceNumber: '',
-      price: 0,
+      // invoiceNumber: '',
+      // price: 0,
       completedProduct: [],
       retainage: 0,
       deduction: 0,
@@ -291,14 +303,16 @@ export default function InvoiceTable({
       isDeduction: false,
       isWriteOffDeposit: false,
       retainageType: null,
-      allowance: 0,
+      // allowance: 0,
       note: '',
-      accountantList: [],
+      // accountantList: [],
+      invoices: [],
+      price: 0,
     };
 
     const completedProductList: { [productId: string]: TcompletedProductDto } = {};
 
-    invoiceArr_sorted.forEach((invoice) => {
+    periodArr_sorted.forEach((period) => {
       const {
         //
         price,
@@ -306,16 +320,17 @@ export default function InvoiceTable({
         retainage,
         deduction,
         writeOffDeposit,
-        allowance,
-      } = invoice;
+        // allowance,
+        invoices,
+      } = period;
 
-      invoiceTotal.price = new Decimal(price).add(invoiceTotal.price).toNumber();
-      invoiceTotal.retainage = new Decimal(retainage || 0).add(invoiceTotal.retainage || 0).toNumber();
-      invoiceTotal.deduction = new Decimal(deduction || 0).add(invoiceTotal.deduction || 0).toNumber();
-      invoiceTotal.writeOffDeposit = new Decimal(writeOffDeposit || 0)
-        .add(invoiceTotal.writeOffDeposit || 0)
-        .toNumber();
-      invoiceTotal.allowance = new Decimal(allowance || 0).add(invoiceTotal.allowance || 0).toNumber();
+      periodTotal.price = new Decimal(price || 0).add(periodTotal.price || 0).toNumber();
+      periodTotal.retainage = new Decimal(retainage || 0).add(periodTotal.retainage || 0).toNumber();
+      periodTotal.deduction = new Decimal(deduction || 0).add(periodTotal.deduction || 0).toNumber();
+      periodTotal.writeOffDeposit = new Decimal(writeOffDeposit || 0).add(periodTotal.writeOffDeposit || 0).toNumber();
+      // periodTotal.allowance = new Decimal(allowance || 0).add(periodTotal.allowance || 0).toNumber();
+      // periodTotal.invoices = [...periodTotal.invoices, ...invoices];
+      periodTotal.invoices.push(...invoices);
 
       completedProduct?.forEach((prod) => {
         const {
@@ -348,12 +363,12 @@ export default function InvoiceTable({
       //
     }); // invoiceArr_sorted.forEach
 
-    invoiceTotal.completedProduct = Object.values(completedProductList);
+    periodTotal.completedProduct = Object.values(completedProductList);
 
-    return invoiceTotal;
+    return periodTotal;
 
     //
-  }, [invoiceArr_sorted]);
+  }, [periodArr_sorted]);
 
   // --------------------------------------------------------------------------
 
@@ -386,16 +401,16 @@ export default function InvoiceTable({
         {/* {node_centerArr.map((center, index) => {
           return <Center key={index} node_center={center} disabled={disabled} />;
         })} */}
-        {isAddingNew && <InvoicePanel ref={ref_newInvoicePanel} finalProdArr={finalProdArr} />}
+        {isAddingNew && <PeriodPanel ref={ref_newInvoicePanel} finalProdArr={finalProdArr} />}
 
-        {invoiceArr_sorted.map((data_invoice, index) => {
+        {periodArr_sorted.map((data_invoice, index) => {
           return (
-            <InvoicePanel
+            <PeriodPanel
               ref={(handle) => {
                 ref_invoicePanelArr.current[index] = handle;
               }}
               key={data_invoice.id}
-              data_invoice={data_invoice}
+              data_period={data_invoice}
               finalProdArr={finalProdArr}
               onPanelStateChange={onPanelStateChange}
               reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
@@ -404,9 +419,9 @@ export default function InvoiceTable({
         })}
 
         {/* <Right invoiceTotal={invoiceTotal} totalsTotal={totalsTotal} /> */}
-        <InvoicePanel
+        <PeriodPanel
           //
-          data_invoice={invoiceTotal}
+          data_period={periodTotal}
           finalProdArr={finalProdArr}
           totalsTotal={totalsTotal}
         />
@@ -454,6 +469,8 @@ const Left = ({
           );
         })}
       </Tbody>
+
+      <div className={scss.tfoot}></div>
     </div>
   );
 };
