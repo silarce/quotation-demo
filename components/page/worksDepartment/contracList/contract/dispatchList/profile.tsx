@@ -77,6 +77,9 @@ type Tcontrol = {
   //
   // pointContractPersonOptions: Toption[];
   pointContractPersonOptions: (Toption & { phoneNumber: string })[];
+
+  projectSiteContactPerson: TcontrolItem_option;
+  projectSiteContactPersonNumber: TcontrolItem;
 };
 
 export type { Tcontrol as Tcontrol_profile };
@@ -200,6 +203,36 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
         />
 
         <InputSel
+          caption="工地現場聯絡人"
+          disabled={disabled}
+          {...config_inputSel}
+          selectProps={{
+            props: {
+              isSearchable: true,
+              options: control.pointContractPersonOptions,
+              value: control.projectSiteContactPerson
+                ? { label: control.projectSiteContactPerson.value, value: control.projectSiteContactPerson.value }
+                : null,
+              onChange: (option) => {
+                control.projectSiteContactPerson.onChange(option as Toption_pointContactPerson | null);
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          caption="工地現場聯絡人電話"
+          disabled={disabled}
+          {...config_inputSel}
+          inputProps={{
+            props: {
+              value: control.projectSiteContactPersonNumber.value,
+              onChange: control.projectSiteContactPersonNumber.onChange,
+            },
+          }}
+        />
+
+        <InputSel
           caption="接洽人"
           disabled={disabled}
           {...config_inputSel}
@@ -299,13 +332,13 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
 
 const config_inputSel: TinputSelProps = {
   captionColor: 'main',
-  captionStyle: { width: 120 },
+  captionStyle: { width: 180 },
   showBaseline: 'auto',
 };
 
 const config_inputSel_readOnly: TinputSelProps = {
   captionColor: 'main',
-  captionStyle: { width: 120 },
+  captionStyle: { width: 180 },
   showBaseline: 'invisible',
   disabled: true,
 };
