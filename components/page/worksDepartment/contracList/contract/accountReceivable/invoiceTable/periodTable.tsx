@@ -418,7 +418,6 @@ export default function PeriodTable({
           );
         })}
 
-        {/* <Right invoiceTotal={invoiceTotal} totalsTotal={totalsTotal} /> */}
         <PeriodPanel
           //
           data_period={periodTotal}
