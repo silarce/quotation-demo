@@ -149,7 +149,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             },
           }}
         />
-        <InputSel
+        {/* <InputSel
           caption="承包商聯絡人"
           disabled={disabled}
           {...config_inputSel}
@@ -159,7 +159,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
               onChange: control.contractorContactPerson.onChange,
             },
           }}
-        />
+        /> */}
         {/* <InputSel
           caption="地址"
           {...config_inputSel_readOnly}
@@ -201,6 +201,9 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             },
           }}
         />
+
+        {/* 佔位 */}
+        <div />
 
         <InputSel
           caption="工地現場聯絡人"
