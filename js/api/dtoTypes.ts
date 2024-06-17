@@ -3714,6 +3714,41 @@ export type TupdateAccountReceivableProductPaymentDto = {
   id?: string; // ID, 不提供時將此筆視為新增資料
 };
 
+export type TincomeBillSerialDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  //  '收入傳票號碼
+  billSerialNumber: string;
+  //  '匯款時間點/收到票據時間點
+  receiveDate: string | null;
+  //  '合約編號
+  contractNumber: string | null;
+  //  '工程名稱
+  projectName: string | null;
+  //  '承攬款
+  contractPayment: number | null;
+  //  '本期計價
+  periodPayment: number | null;
+  //  '前期已收
+  priorPeriodPayment: number | null;
+  //  '票據/匯款 匯入帳號
+  importAccountingNumber: string | null;
+  //  '票據編號
+  noteNumber: string | null;
+  //  '票據到期日
+  noteMaturityDate: string | null;
+  //  '收款金額
+  receivablePayment: number;
+  //  '扣款金額
+  deductionPayment: number;
+  //  '未收款金額
+  unpaidPayment: number;
+};
+
+// MARK: /accountant end
+
 // =========================================================================
 
 // 外包計價
