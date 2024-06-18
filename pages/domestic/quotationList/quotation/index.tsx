@@ -784,7 +784,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       setIsLoading(true);
       await apiQuotationUnlock(quotationId);
       await update();
-      myAlert.success({ title: '解除鎖定成功' });
+      myAlert.success({ title: '解除鎖定成功', content: '該報價單改為發包' });
       router.replace({
         query: {
           ...router.query,
@@ -1788,10 +1788,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }
       : null,
 
-    status === 'Pending'
+    status === 'Pending' || status === 'TempPending'
       ? {
           type: 'myButton',
-          label: '解除鎖定',
+          label: '解除鎖定並退回發包',
           img: iconRedLock.src,
           onClick: () => {
             myAlert.confirm({

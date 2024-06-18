@@ -221,7 +221,17 @@ export default function AccountantDetails({
       </TopBar>
       {/*  */}
       {/*  */}
-      <div className={scss.table}>
+      <div
+        className={scss.table}
+        onWheel={(e) => {
+          const target = e.target as HTMLElement;
+
+          // 修正當input type為number時，避免因為滾輪而意外改變了值
+          if (target.tagName === 'INPUT') {
+            target.blur();
+          }
+        }}
+      >
         <Thead />
         {state_accountantArr.map((accountant, index_state) => {
           const {

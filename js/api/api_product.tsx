@@ -100,10 +100,31 @@ export const useApiGetProdDoorModels = () => {
     return list;
   }, [res]);
 
+  const checkIsSpecialDoor = (doorModelName: string) => {
+    if (!doorModelList) {
+      myAlert.err({ title: '門型列表尚未取得' });
+
+      return undefined;
+    }
+
+    if (doorModelName === 'W2') {
+      return true;
+    }
+
+    const doorModel = doorModelList[doorModelName];
+
+    if (!doorModel) {
+      return true;
+    }
+
+    return false;
+  };
+
   return {
     res,
     update,
     doorModelList,
+    checkIsSpecialDoor,
   };
 };
 

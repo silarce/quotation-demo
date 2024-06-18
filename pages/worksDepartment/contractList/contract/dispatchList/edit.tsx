@@ -59,6 +59,9 @@ type Tstate_profile = {
 
   pointContactPerson: string;
   pointContactNumber: string;
+
+  projectSiteContactPerson: string;
+  projectSiteContactPersonNumber: string;
 };
 
 type Tstate_pricingMethod = {
@@ -67,6 +70,8 @@ type Tstate_pricingMethod = {
 };
 
 // =====================================================================
+
+// MARK: START
 
 export default function EditDispatchList() {
   const router = useRouter();
@@ -132,6 +137,8 @@ export default function EditDispatchList() {
   }, [todoIdForDispatch]);
 
   // ---------------------------------------------------------
+
+  // MARK: controll_editDispatch
 
   const controll_editDispatch: Tcontroll_editDispatch = {
     tasks: {
@@ -204,6 +211,8 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
+  // MARK: REQ
+
   const reqPostPatch = async () => {
     if (!state_dispatch) {
       return;
@@ -245,6 +254,9 @@ export default function EditDispatchList() {
 
       pointContactPerson: state_profile.pointContactPerson,
       pointContactNumber: state_profile.pointContactNumber,
+
+      projectSiteContactPerson: state_profile.projectSiteContactPerson,
+      projectSiteContactPersonNumber: state_profile.projectSiteContactPersonNumber,
     };
 
     try {
@@ -292,6 +304,8 @@ export default function EditDispatchList() {
   };
 
   // ---------------------------------------------------------
+
+  // MARK: useEffect
 
   useEffect(() => {
     (async () => {
@@ -348,6 +362,9 @@ export default function EditDispatchList() {
       address,
       pointContactPerson,
       pointContactNumber,
+
+      projectSiteContactPerson,
+      projectSiteContactPersonNumber,
     } = dispatching ?? {};
 
     // 如果dispatching不存在，也就是新增派工單
@@ -364,6 +381,9 @@ export default function EditDispatchList() {
 
       pointContactPerson = defaultPointContactPerson ?? '';
       pointContactNumber = defaultPointContactNumber ?? '';
+
+      projectSiteContactPerson = defaultPointContactPerson ?? '';
+      projectSiteContactPersonNumber = defaultPointContactNumber ?? '';
     }
 
     setState_profile({
@@ -382,6 +402,9 @@ export default function EditDispatchList() {
 
       pointContactPerson: pointContactPerson ?? '',
       pointContactNumber: pointContactNumber ?? '',
+
+      projectSiteContactPerson: projectSiteContactPerson ?? '',
+      projectSiteContactPersonNumber: projectSiteContactPersonNumber ?? '',
     });
 
     setState_dispatch({
@@ -401,6 +424,8 @@ export default function EditDispatchList() {
   }, [engineeringContact, dispatching, disabled, todoForDispatch]);
 
   // ---------------------------------------------------------
+
+  // MARK: control_profile
 
   const control_profile: Tcontrol_profile = useMemo(() => {
     const contactInfo = engineeringContact?.contactInfo ?? [];
@@ -474,7 +499,24 @@ export default function EditDispatchList() {
         disabled: theDiasbled,
         onChange: (e) => changeProfile('pointContactNumber', e.target.value),
       },
+
       pointContractPersonOptions: options,
+
+      projectSiteContactPerson: {
+        value: state_profile.projectSiteContactPerson,
+        disabled: theDiasbled,
+        onChange: (option) => {
+          const { value, phoneNumber } = option ?? {};
+          changeProfile('projectSiteContactPerson', value ?? '');
+          changeProfile('projectSiteContactPersonNumber', phoneNumber ?? '');
+        },
+      },
+
+      projectSiteContactPersonNumber: {
+        value: state_profile.projectSiteContactPersonNumber,
+        disabled: theDiasbled,
+        onChange: (e) => changeProfile('projectSiteContactPersonNumber', e.target.value),
+      },
     };
 
     return control_profile;
@@ -493,15 +535,18 @@ export default function EditDispatchList() {
       warrantyDate,
       tasks = '',
       pointContactPerson = '',
+      pointContactNumber = '',
+
+      projectSiteContactPerson = '',
+      projectSiteContactPersonNumber = '',
     } = dispatching ?? {};
 
     const wholeAddress = `${county}${district}${address}`;
 
     const data_pdf: Tdata_pdf = {
-      // customerName: contract?.content.customer?.name ?? '',
       customerName: contract?.content.projectName ?? '',
-      phoneNumber: dispatching?.constructionSiteContactNumber ?? '',
-      contactPerson: pointContactPerson ?? '',
+      phoneNumber: (projectSiteContactPerson || '') + '\n' + (projectSiteContactPersonNumber || ''),
+      contactPerson: (pointContactPerson || '') + '\n' + (pointContactNumber || ''),
       address: wholeAddress,
       projectNumber: contract?.contractNumber ?? '',
       warrantyPeriod: warrantyDate ?? '',
@@ -578,6 +623,9 @@ export default function EditDispatchList() {
   const panelList = !dispatchingId ? panelList01 : disabled ? panelList02 : panelList03;
 
   // ---------------------------------------------------------
+
+  // MARK:RENDER
+
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? ''} />
@@ -600,6 +648,8 @@ export default function EditDispatchList() {
   );
 }
 
+// MARK: END
+
 // =====================================================================
 
 const emptyState_profile = (): Tstate_profile => ({
@@ -617,4 +667,6 @@ const emptyState_profile = (): Tstate_profile => ({
   finalContactPerson: '',
   pointContactPerson: '',
   pointContactNumber: '',
+  projectSiteContactPerson: '',
+  projectSiteContactPersonNumber: '',
 });
