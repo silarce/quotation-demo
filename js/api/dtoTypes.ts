@@ -2934,6 +2934,9 @@ export type TdispatchingDto = {
 
   pointContactPerson: string | null;
   pointContactNumber: string | null;
+
+  projectSiteContactPerson: string | null;
+  projectSiteContactPersonNumber: string | null;
 };
 
 type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId' | 'warrantyDate' | 'note'>;
@@ -2952,6 +2955,9 @@ export type TcreateDispatchingDto = Pick<
   | 'pricingMethod'
   | 'pointContactPerson'
   | 'pointContactNumber'
+  | 'projectSiteContactPerson'
+  | 'projectSiteContactPersonNumber'
+
   // | 'note'
   // | 'contractId'
   | 'isCompleted'

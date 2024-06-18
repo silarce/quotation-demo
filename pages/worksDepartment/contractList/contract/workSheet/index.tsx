@@ -94,6 +94,8 @@ import {
   apiPatchWorksheetRecordReview,
 } from 'js/api/api_engineering';
 
+import { useApiGetProdDoorModels } from 'js/api/api_product';
+
 // hook
 // import { Class_workSheet, useWorkSheet } from 'hooks/workDepartment/workSheet/useSheet';
 
@@ -217,6 +219,8 @@ export default function Worksheet({
   // ________________________________________________________________________
 
   const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId);
+
+  const { doorModelList, update: update_doorModel, checkIsSpecialDoor } = useApiGetProdDoorModels();
 
   // -------------------------------------------------------------------------
 
@@ -360,6 +364,8 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
+  // MARK: useEffect
+
   useEffect(() => {
     (async () => {
       setIsLoading(true);
@@ -367,6 +373,7 @@ export default function Worksheet({
         //
         update_contract(),
         update_finalProduce(),
+        update_doorModel(),
       ]);
       setIsLoading(false);
     })();
@@ -409,6 +416,13 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
   const { control_productCardArr, latestRecordArr } = useMemo(() => {
+    if (!doorModelList) {
+      return {
+        control_productCardArr: [],
+        latestRecordArr: [],
+      };
+    }
+
     const control_productCardArr: (Tcontrol_productCard & { id: string })[] = [];
     const latestRecordArr: TworksheetRecordDto[] = [];
 
@@ -543,10 +557,11 @@ export default function Worksheet({
           });
         },
         worksheetIntroArr,
+        isSpecialDoor: checkIsSpecialDoor(prod.doorModelName),
       });
     });
 
-    return { control_productCardArr, latestRecordArr };
+    return { control_productCardArr, latestRecordArr, doorModelList };
     //
   }, [activeWorksheetId, finalProduct, worksheetArr]);
 

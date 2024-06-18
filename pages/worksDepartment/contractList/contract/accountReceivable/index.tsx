@@ -437,7 +437,7 @@ export default function AccountReceivable() {
   }
 
   return (
-    <SubLayer isLoading_all={isFetching}>
+    <SubLayer isLoading_all={isFetching} bodyClassName="snap-y">
       <PageHeader panelList={[]} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div className={scss.main}>
@@ -451,17 +451,12 @@ export default function AccountReceivable() {
           onConfirm={reqPatchAccountant_sorting}
         />
 
-        <AccountantDetails
-          //
-          className="mt-10"
-          accountantArr={accountantArr}
-          reqPatchAccountant={reqPatchAccountant}
-        />
+        <AccountantDetails className="mt-10 " accountantArr={accountantArr} reqPatchAccountant={reqPatchAccountant} />
 
-        <DeductionDetail className="mt-10" periodArr={periodArr} />
+        <DeductionDetail className="mt-10 snap-center" periodArr={periodArr} />
 
         <PeriodTable
-          className="mt-10"
+          className="mt-10 snap-center"
           data_finalProdcut={data_finalProdcut}
           data_period={accountReceivable.periods}
           // reqAddInvoice={reqAddInvoice}
@@ -492,27 +487,3 @@ const EmptyMain = () => {
 };
 
 // ========================================================================
-
-// 檢查發票金額 發票實際金額 發票日期 發票號碼
-// 檢查發票金額 發票實際金額 發票日期 發票號碼
-// 檢查發票金額 發票實際金額 發票日期 發票號碼
-// 檢查發票金額 發票實際金額 發票日期 發票號碼
-// 檢查發票金額 發票實際金額 發票日期 發票號碼
-// 檢查發票金額 發票實際金額 發票日期 發票號碼
-// 檢查發票金額 發票實際金額 發票日期 發票號碼
-// 檢查發票金額 發票實際金額 發票日期 發票號碼
-// 檢查發票金額 發票實際金額 發票日期 發票號碼
-
-// 處理跑版
-// 處理跑版
-// 處理跑版
-// 處理跑版
-// 處理跑版
-// 處理跑版
-// 處理跑版
-// 處理跑版
-// 處理跑版
-// 處理跑版
-// 處理跑版
-// 處理跑版
-// 處理跑版

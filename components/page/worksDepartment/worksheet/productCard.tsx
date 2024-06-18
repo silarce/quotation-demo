@@ -33,6 +33,8 @@ type Tcontrol = {
   height: string;
   onSeparateClick: (e: React.MouseEvent) => void;
   worksheetIntroArr: TworksheetIntro[];
+
+  isSpecialDoor: boolean | undefined;
 };
 
 export type { Tcontrol as Tcontrol_productCard, TworksheetIntro };
@@ -46,7 +48,14 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
           <span>{control.itemName}</span>
           <span>{control.doorModelName}</span>
           <span>數量 : {control.qty}樘</span>
-          <button className={classNames(scss.btn)} onClick={control.onSeparateClick}>
+          <button
+            className={classNames(
+              scss.btn,
+              control.isSpecialDoor && 'invisible',
+              control.isSpecialDoor === undefined && 'invisible'
+            )}
+            onClick={control.onSeparateClick}
+          >
             分堆
           </button>
         </div>
@@ -106,8 +115,6 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
             </CellWithBar>
           );
         })}
-
-   
       </div>
 
       {/* <div className={scss.list}>
