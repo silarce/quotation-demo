@@ -24,6 +24,8 @@ export type TperiodType = '請款' | '訂金';
 export type TaccountantPaymentType = '匯款' | '票據' | '現金';
 export type TretainageType = '含稅' | '未稅';
 
+export type TengineeringContactAttachmentType = 'color' | 'construction' | 'detail' | 'floor' | 'design';
+
 // =============================================================================
 export type Tparams = {
   order?: 'ASC' | 'DESC';
@@ -2710,9 +2712,8 @@ export type TsubmitReviewQotuationContentDto = {
 
 // =========================================================================
 
-export type TengineeringContactAttachmentType = 'color' | 'construction' | 'detail' | 'floor' | 'design';
+// MARK: /engineering
 
-// engineering
 // 工程聯絡單
 export type TengineeringContactDto = {
   id: string;
@@ -3377,6 +3378,59 @@ export type TcompletedProductDto = {
   completedPayment: number;
 };
 
+export type TincomeBillSerialDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 收入傳票號碼
+  billSerialNumber: string;
+  // 匯款時間點/收到票據時間點
+  receiveDate: string | null;
+  // 合約編號
+  contractNumber: string | null;
+  // 工程名稱
+  projectName: string | null;
+  // 承攬款
+  contractPayment: number | null;
+  // 本期計價
+  periodPayment: number | null;
+  // 前期已收
+  priorPeriodPayment: number | null;
+  // 票據/匯款 匯入帳號
+  importAccountingNumber: string | null;
+  // 票據編號
+  noteNumber: string | null;
+  // 票據到期日
+  noteMaturityDate: string | null;
+  // 收款金額
+  receivablePayment: number | null;
+  // 扣款金額
+  deductionPayment: number | null;
+  // 未收款金額
+  unpaidPayment: number | null;
+  // 是否為國外收入傳票
+  isForeign: boolean;
+  // 差額 // 更新accountant的扣款明細、手續費會更新差額
+  difference: string | null;
+};
+
+export type TupdateIncomeBillSerialDto = Pick<
+  TincomeBillSerialDto,
+  | 'receiveDate'
+  | 'contractNumber'
+  | 'projectName'
+  | 'contractPayment'
+  | 'periodPayment'
+  | 'priorPeriodPayment'
+  | 'importAccountingNumber'
+  | 'noteNumber'
+  | 'noteMaturityDate'
+  | 'receivablePayment'
+  | 'deductionPayment'
+  | 'unpaidPayment'
+>;
+
 // =========================================================================
 // region /accountant
 
@@ -3712,39 +3766,6 @@ export type TupdateAccountReceivableProductPaymentDto = {
   productItemId: string | null;
   deliveryStatusId: string[];
   id?: string; // ID, 不提供時將此筆視為新增資料
-};
-
-export type TincomeBillSerialDto = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-
-  //  '收入傳票號碼
-  billSerialNumber: string;
-  //  '匯款時間點/收到票據時間點
-  receiveDate: string | null;
-  //  '合約編號
-  contractNumber: string | null;
-  //  '工程名稱
-  projectName: string | null;
-  //  '承攬款
-  contractPayment: number | null;
-  //  '本期計價
-  periodPayment: number | null;
-  //  '前期已收
-  priorPeriodPayment: number | null;
-  //  '票據/匯款 匯入帳號
-  importAccountingNumber: string | null;
-  //  '票據編號
-  noteNumber: string | null;
-  //  '票據到期日
-  noteMaturityDate: string | null;
-  //  '收款金額
-  receivablePayment: number;
-  //  '扣款金額
-  deductionPayment: number;
-  //  '未收款金額
-  unpaidPayment: number;
 };
 
 // MARK: /accountant end

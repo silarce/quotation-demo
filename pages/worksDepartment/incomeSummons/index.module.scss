@@ -1,27 +1,29 @@
 $topBlockHeight: 50px;
 
 .main {
-  padding: 0 20px;
-  padding-bottom: 50px;
+  // padding: 0 20px;
+  // padding-bottom: 50px;
 }
 
 .tableWrapper {
   position: relative;
-  &::before {
-    content: "";
-    display: block;
-    position: sticky;
-    z-index: 2;
-    top: 0px;
-    width: 100%;
-    height: $topBlockHeight;
-    background-color: white;
-  }
+  // &::before {
+  //   content: "";
+  //   display: block;
+  //   position: sticky;
+  //   z-index: 2;
+  //   top: 0px;
+  //   width: 100%;
+  //   height: $topBlockHeight;
+  //   background-color: white;
+  // }
 }
 
 .table {
-  border: solid 1px theme("colors.border");
+  // border: solid 1px theme("colors.border");
+
   border-top: 0;
+  border-bottom: 0;
 }
 
 .row {
@@ -31,17 +33,22 @@ $topBlockHeight: 50px;
 
   border-bottom: solid 1px theme("colors.border");
   padding: 10px 0;
-  // font-size: 18px;
-  // width: fit-content;
+  width: fit-content;
   background-color: white;
+  font-size: 16px;
 
   > div {
     text-align: center;
     background-color: inherit;
 
-    input {
+    > input {
       width: 100%;
       border-bottom: solid 1px transparent;
+    }
+    > span {
+      display: inline-block;
+      border-bottom: solid 1px transparent;
+      white-space: pre-wrap;
     }
   }
 
@@ -55,11 +62,10 @@ $topBlockHeight: 50px;
 .thead {
   position: sticky;
   // top: $topBlockHeight;
-  top: $topBlockHeight;
+  top: 0;
   z-index: 2;
   background-color: theme("colors.bgc01");
-  border-top: solid 1px theme("colors.border");
-  font-size: 18px;
+  // border-top: solid 1px theme("colors.border");
   font-weight: 500;
 }
 
@@ -71,4 +77,9 @@ $topBlockHeight: 50px;
   .enable {
     color: red;
   }
+}
+
+.billSerialNumber {
+  position: sticky;
+  left: 0;
 }
