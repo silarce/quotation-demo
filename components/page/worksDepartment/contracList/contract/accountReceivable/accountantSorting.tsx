@@ -309,7 +309,17 @@ export default function AccountantSorting({
         {/*  */}
         {/*  */}
 
-        <div className={scss.dndContainer}>
+        <div
+          className={scss.dndContainer}
+          onWheel={(e) => {
+            const target = e.target as HTMLElement;
+
+            // 修正當input type為number時，避免因為滾輪而意外改變了值
+            if (target.tagName === 'INPUT') {
+              target.blur();
+            }
+          }}
+        >
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}

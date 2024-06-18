@@ -14,6 +14,12 @@
   * {
     color: black;
   }
+  span,
+  p,
+  h1,
+  div {
+    white-space: pre-wrap;
+  }
 }
 
 .title {
