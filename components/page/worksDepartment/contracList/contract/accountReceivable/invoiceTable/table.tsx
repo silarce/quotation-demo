@@ -111,6 +111,8 @@ function PeriodPanel_pre(
     totalsTotal,
     onPanelStateChange,
     reqPatchInvoiceAllowance,
+    reqDeleteInvoice,
+    reqDeletePeriod,
   }: {
     data_period?: Tperiod_reduce;
     finalProdArr: TquotationProductDto[];
@@ -122,6 +124,8 @@ function PeriodPanel_pre(
     };
     onPanelStateChange?: (state_invoice: Tstate_period) => void;
     reqPatchInvoiceAllowance?: (invoiceId: string, allowance: number) => void;
+    reqDeleteInvoice?: (invoiceId: string) => void;
+    reqDeletePeriod?: (periodId: string) => void;
   },
   ref: React.ForwardedRef<TimperativeHandle_panel>
 ) {
@@ -156,7 +160,7 @@ function PeriodPanel_pre(
       // accountantList,
     } = data_period ?? create_emptyPeriod();
 
-    const notAllowEditDeduction = invoices.some((invoice) => {
+    const notAllow_EditDeduction_or_deleteInvoice = invoices.some((invoice) => {
       return invoice.accountantList.some((al) => {
         return al.accountsReceivableDeduction.length > 0;
       });
@@ -236,7 +240,7 @@ function PeriodPanel_pre(
       allowance: String(allowance || ''),
       note: note || '',
 
-      allowEditDeduction: !notAllowEditDeduction,
+      allow_EditDeduction_or_deleteInvoice: !notAllow_EditDeduction_or_deleteInvoice,
 
       actualPrice: String(actualPrice || ''),
       invoiceDate: invoiceDate ? moment(invoiceDate) : null,
@@ -250,7 +254,6 @@ function PeriodPanel_pre(
   // region STATE
 
   const [disabled, setDisabled] = useState(!isNew || !!totalsTotal);
-
   const [state_period, setState_period] = useState<Tstate_period>(defaultState);
 
   const {
@@ -411,6 +414,62 @@ function PeriodPanel_pre(
       (await reqPatchInvoiceAllowance(state_period.firstInvoiceId, Number(state_period.allowance || 0)));
   };
 
+  const handle_deleteInvoice = () => {
+    if (!reqDeleteInvoice) {
+      return;
+    }
+
+    if (state_period.firstInvoiceId) {
+      const modal = myAlert.btnBar({});
+      modal.update({
+        title: `確定要刪除發票嗎?`,
+        content: (
+          <BtnConfirm
+            content={`${caption} 發票`}
+            onConfirm={async () => {
+              await reqDeleteInvoice(state_period.firstInvoiceId!);
+              modal.destroy();
+            }}
+            onCancel={modal.destroy}
+          />
+        ),
+      });
+    } else {
+      myAlert.err({ title: '發票不存在' });
+    }
+  };
+
+  const handle_deletePeriod = () => {
+    if (!reqDeletePeriod) {
+      return;
+    }
+
+    if (state_period.firstInvoiceId) {
+      myAlert.err({ title: '請先刪除本期發票' });
+
+      return;
+    }
+
+    if (state_period.id) {
+      const modal = myAlert.btnBar({});
+      modal.update({
+        title: `確定要刪除本期嗎?`,
+        content: (
+          <BtnConfirm
+            content={`${caption}`}
+            onConfirm={async () => {
+              state_period.id && (await reqDeletePeriod(state_period.id));
+              modal.destroy();
+            }}
+            onCancel={modal.destroy}
+          />
+        ),
+      });
+    } else {
+      myAlert.err({ title: `本期 ${caption}不存在` });
+    }
+  };
+
   // --------------------------------------------------------------------------
 
   // region PROPS
@@ -443,7 +502,7 @@ function PeriodPanel_pre(
       tax,
       contractTotal,
 
-      allowEditDeduction,
+      allow_EditDeduction_or_deleteInvoice: allowEditDeduction,
 
       actualPrice,
       invoiceDate,
@@ -708,6 +767,33 @@ function PeriodPanel_pre(
         isCheckingInvoiceNumber={isCheckingInvoiceNumber}
         isInvoiceNumberCheckPass={isInvoiceNumberCheckPass}
       />
+
+      <div className={classNames(scss.deleteBar, isTotal && 'invisible')}>
+        {!state_period.allow_EditDeduction_or_deleteInvoice && <p className="text-xl text-main">已連結收款</p>}
+        {state_period.allow_EditDeduction_or_deleteInvoice && (
+          <>
+            <MyButton_v2
+              className={classNames(!state_period.firstInvoiceId && 'invisible')}
+              theme="danger"
+              px="px22"
+              py="py4"
+              onClick={handle_deleteInvoice}
+            >
+              刪除發票
+            </MyButton_v2>
+
+            <MyButton_v2
+              className={classNames(!state_period.id && 'invisible', state_period.firstInvoiceId && 'invisible')}
+              theme="danger"
+              px="px22"
+              py="py4"
+              onClick={handle_deletePeriod}
+            >
+              刪除本期
+            </MyButton_v2>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -724,6 +810,30 @@ function PeriodPanel_pre(
 //
 //
 //
+
+const BtnConfirm = ({
+  //
+  content,
+  onConfirm,
+  onCancel,
+}: {
+  content?: React.ReactNode;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) => {
+  return (
+    <div>
+      <p className={'mt-5'}>{content}</p>
+      <div className="flex gap-5 mt-10">
+        <MyButton_v2 onClick={onCancel}>取消</MyButton_v2>
+        <MyButton_v2 onClick={onConfirm} theme="danger">
+          確定
+        </MyButton_v2>
+      </div>
+    </div>
+  );
+};
+
 // region Thead
 const Thead = ({ caption, children }: { caption?: React.ReactNode; children: React.ReactNode[] }) => {
   return (
