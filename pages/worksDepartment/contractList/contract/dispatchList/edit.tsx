@@ -606,20 +606,30 @@ export default function EditDispatchList() {
     },
   ];
   const panelList02: TpanelList = [
-    haveTodoList
-      ? null
-      : {
-          type: 'redButton',
-          label: '刪除',
-          onClick: () => {
-            myAlert.confirm({
-              title: '確定刪除此派工單？',
-              props: {
-                onOk: reqDelete,
-              },
-            });
+    {
+      type: 'redButton',
+      label: '刪除',
+      onClick: () => {
+        myAlert.confirm({
+          title: '確定刪除此派工單？',
+          content: (() => {
+            if (haveTodoList) {
+              // return '此派工單已連結待辦事項，\n該待辦事項將會一起被刪除';
+              return (
+                <span>
+                  此派工單已連結待辦事項
+                  <br />
+                  該待辦事項將會一起被刪除
+                </span>
+              );
+            }
+          })(),
+          props: {
+            onOk: reqDelete,
           },
-        },
+        });
+      },
+    },
     {
       type: 'myButton',
       label: '匯出',
