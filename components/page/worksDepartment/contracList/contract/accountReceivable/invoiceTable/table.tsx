@@ -629,7 +629,17 @@ function PeriodPanel_pre(
   // ==============================================================================
   // region RENDER
   return (
-    <div className={classNames(scss.invoice, scss.center, isNew && scss.new)}>
+    <div
+      className={classNames(scss.invoice, scss.center, isNew && scss.new)}
+      onWheel={(e) => {
+        const target = e.target as HTMLElement;
+
+        // 修正當input type為number時，避免因為滾輪而意外改變了值
+        if (target.tagName === 'INPUT') {
+          target.blur();
+        }
+      }}
+    >
       <Thead caption={caption}>
         <div className={scss.top}>
           {isNew && (
