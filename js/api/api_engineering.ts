@@ -306,6 +306,21 @@ export const apiPatchEngineeringDispatching = async (id: string, body: TcreateDi
     .catch((err) => Promise.reject(err));
 };
 
+// 刪除派工單
+export const apiDeleteEngineeringDispatching = async (id: string) => {
+  const api = `/engineering/dispatching/${id}`;
+
+  return axi
+    .delete(api)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '刪除派工單失敗', content: err.message });
+
+      return Promise.reject(error);
+    });
+};
+
 // ------------------------------------------------------------------------
 // 送電備品
 
