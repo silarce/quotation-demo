@@ -111,6 +111,8 @@ export default function EditDispatchList() {
 
   const { data: dispatching, update: update_dispatching } = useGetEngineeringDispatching_id(dispatchingId);
 
+  const haveTodoList = !!dispatching?.todoList;
+
   // ---------------------------------------------------------
 
   const workerIdArr = state_profile.workerEmployee.map((employee) => employee.id);
@@ -604,18 +606,20 @@ export default function EditDispatchList() {
     },
   ];
   const panelList02: TpanelList = [
-    {
-      type: 'redButton',
-      label: '刪除',
-      onClick: () => {
-        myAlert.confirm({
-          title: '確定刪除此派工單？',
-          props: {
-            onOk: reqDelete,
+    haveTodoList
+      ? null
+      : {
+          type: 'redButton',
+          label: '刪除',
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定刪除此派工單？',
+              props: {
+                onOk: reqDelete,
+              },
+            });
           },
-        });
-      },
-    },
+        },
     {
       type: 'myButton',
       label: '匯出',

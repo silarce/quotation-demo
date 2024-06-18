@@ -262,7 +262,7 @@ export const useGetEngineeringDispatching_id = (id: string | undefined, customeP
   const [res, setRes] = useState<TdispatchingDto>();
 
   const params = {
-    populate: ['workerEmployee'],
+    populate: ['workerEmployee', 'todoList'],
     ...customeParams,
   };
 
