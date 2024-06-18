@@ -3665,7 +3665,7 @@ export type TaccountantDto = {
   price: number; // 金額
   notes: string | null; // 備註
   noteNumber: string | null; // 票據號碼
-  fee: number; // 手續費
+  fee: number; // 匯費
 
   billSerialNumber: string | null; // 收入傳票序號
   noteMaturityDate: string | null; // 票據到期日

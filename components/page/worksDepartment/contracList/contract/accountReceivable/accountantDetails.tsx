@@ -387,7 +387,7 @@ type Tkey =
       | 'noteNumber' // 票據編號
       | 'noteMaturityDate' // 票據到期日
       //
-      | 'fee' // 手續費
+      | 'fee' // 匯費
       //
       | 'billSerialNumber' // 收入傳票序號
     >
@@ -449,7 +449,7 @@ const configList: TconfigList = {
     style: { width: '120px' },
   },
   fee: {
-    label: '手續費',
+    label: '匯費',
     style: {
       width: '100px',
     },
