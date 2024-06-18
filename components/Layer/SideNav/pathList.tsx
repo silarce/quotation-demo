@@ -1,3 +1,6 @@
+// import { ParsedUrlQuery } from 'querystring';
+import { NextRouter } from 'next/router';
+
 // icon
 import icon_home from 'public/image/icon/home.svg';
 import icon_setting from 'public/image/icon/setting.svg';
@@ -21,6 +24,7 @@ type TsidePathConfig = {
     otherPermissions?: {
       grade?: number;
     };
+    activeChecker?: (props: { urlQuery: NextRouter['query'] }) => boolean;
     list?: {
       label: string;
       path: string;
@@ -36,6 +40,7 @@ type TsidePathConfig = {
       exception?: {
         idNumber?: string[];
       };
+      activeChecker?: (props: { urlQuery: NextRouter['query'] }) => boolean;
     }[];
   }[];
 };
@@ -256,6 +261,15 @@ const sidePathList: TsidePathList = {
                 status: 'Pending',
               },
               erpFeature: [domestic, accountsReceivable],
+              activeChecker: ({ urlQuery }) => {
+                const { status } = urlQuery;
+
+                if (status === 'Pending' || status === 'TempPending') {
+                  return true;
+                }
+
+                return false;
+              },
             },
             {
               label: '合約',

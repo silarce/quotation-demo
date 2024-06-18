@@ -34,9 +34,13 @@ export default function SideNav() {
   return (
     <div className={classNames(style.container, 'relative')}>
       {linkList?.list.map((item, index) => {
-        const { label, path, list, erpFeature, otherPermissions } = item;
+        const { label, path, list, erpFeature, otherPermissions, activeChecker } = item;
 
-        const isActive = pathname.startsWith(path ?? 'undefined');
+        let isActive = pathname.startsWith(path ?? 'undefined');
+
+        if (activeChecker) {
+          isActive = activeChecker({ urlQuery: routerQuery });
+        }
 
         let isPassed = false;
         isPassed = checkErpFeature({ erpFeature, userErpFeature });
@@ -69,11 +73,22 @@ export default function SideNav() {
               <Panel header={label} key={`${index}`}>
                 <ul>
                   {list.map((item, index) => {
-                    const { label, path, erpFeature, query, otherPermissions, exception } = item;
+                    const {
+                      //
+                      label,
+                      path,
+                      erpFeature,
+                      query,
+                      otherPermissions,
+                      exception,
+                      activeChecker,
+                    } = item;
 
                     let isActive = pathname.startsWith(path);
 
-                    if (query) {
+                    if (activeChecker) {
+                      isActive = activeChecker({ urlQuery: routerQuery });
+                    } else if (query) {
                       isActive = _.isMatch(routerQuery, query ?? {});
                     }
 
