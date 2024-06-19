@@ -15,6 +15,7 @@ import { TquotationStatus } from 'js/api/dtoTypes';
 
 
 
+
 type Tquery = {
     wareHouseId: string | undefined;
 };
@@ -23,6 +24,9 @@ type Tquery = {
 // interface ListType {
 //     type: string;
 // }
+export const setting = {
+    apipath: 'https://localhost:44383/WareHouse/', // 確保這裡包含正確的 API 路徑
+};
 
 
 // export default function WareHouseList({type}:ListType) {
@@ -36,6 +40,8 @@ export default function WareHouseList() {
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
 
+    // wareHouseList/index.js
+   
 
     const searchTargetList = [
         {
@@ -51,7 +57,7 @@ export default function WareHouseList() {
             // console.log("thisthishtishtis:" + keyword + "asdfasdfasdf");
             if (keyword === '' || keyword === undefined) {
                 fetchData();
-            }else{
+            } else {
                 searchData(keyword);
             }
         }
@@ -77,71 +83,74 @@ export default function WareHouseList() {
 
 
 
-        useEffect(() => {
-            fetchData();
-        }, []);
+    useEffect(() => {
+        fetchData();
+    }, []);
 
 
 
-        //call api
-        const fetchData = async () => {
-            try {
-                // const response = await fetch('YOUR_C#_API_ENDPOINT');
-                //erpAPI
-                const response = await fetch('https://localhost:44383/WareHouse/GetWareHouse');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data');
-                }
-                const data = await response.json();
-                setData(data);
-                console.log("vvvvv" + data);
-            } catch (error: any) {
-                setError(error.message);
+    //call api
+    const fetchData = async () => {
+        try {
+            // const response = await fetch('YOUR_C#_API_ENDPOINT');
+            //erpAPI
+            // const response = await fetch('https://localhost:44383/WareHouse/GetWareHouse');
+            const response = await fetch(`${setting.apipath}GetWareHouse`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
             }
-        };
+            const data = await response.json();
+            setData(data);
+            console.log("vvvvv" + data);
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
 
-        const searchData = async (keyword: string) => {
-            try {
-                // 傳給api的參數JSON
-                const conditionModel: { keyword: string | undefined; } = {
-                    keyword: keyword as string | undefined,
-                };
-    
-    
-                var inputModel = {
-                    TypeName: 'ERP',
-                    ServiceName: 'WareHouseService',
-                    FunctionName: 'no',
-                    FilterConditions: JSON.stringify(conditionModel),
-                };
-    
-                const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-    
-                //erpAPI
-                const response = await fetch(`https://localhost:44383/WareHouse/SearchWareHouseByID?${queryParams}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data');
-                }
-                const data = await response.json();
-                setData(data);
-                console.log("GetWHPosition:" + data);
-            } catch (error: any) {
-                setError(error.message);
+    const searchData = async (keyword: string) => {
+        try {
+            // 傳給api的參數JSON
+            const conditionModel: { keyword: string | undefined; } = {
+                keyword: keyword as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            //erpAPI
+            // const response = await fetch(`https://localhost:44383/WareHouse/SearchWareHouseByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}SearchWareHouseByID?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
             }
-        };
+            const data = await response.json();
+            setData(data);
+            console.log("GetWHPosition:" + data);
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
 
 
-        return (
+    return (
 
-            <SubLayer isLoading_subLayer={false}>
-                {/* <> */}
-                <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫'} panelList={panelList} />
-                <div>
-                    <Thead01 type={'WareHouse'} />
-                    <Tbody01 type={'WareHouse'} data={data} error={error} />
-                </div>
-                {/* </> */}
-            </SubLayer>
-        )
+        <SubLayer isLoading_subLayer={false}>
+            {/* <> */}
+            <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫'} panelList={panelList} />
+            <div>
+                {/* {apipath}<br/> */}
+                <Thead01 type={'WareHouse'} />
+                <Tbody01 type={'WareHouse'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} />
+            </div>
+            {/* </> */}
+        </SubLayer>
+    )
 
 }

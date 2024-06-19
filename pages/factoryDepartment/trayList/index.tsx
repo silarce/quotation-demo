@@ -11,7 +11,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import { quotationStatusLookup } from 'config/lookupTable';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { TquotationStatus } from 'js/api/dtoTypes';
-
+import { setting } from '../wareHouseList/index'; // 從 wareHouseList 模組中導入設定
 
 
 type Tquery = {
@@ -22,7 +22,7 @@ type Tquery = {
 // export default function WareHouseList({type}:ListType) {
 export default function TrayList() {
     const router = useRouter();
-    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer } = router.query;
+    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url } = router.query;
 
     const [data, setData] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null); // 将 error 的类型更改为 Error | null
@@ -101,7 +101,8 @@ export default function TrayList() {
             setIsLoading(true);
             // const response = await fetch('YOUR_C#_API_ENDPOINT');
             //erpAPI
-            const response = await fetch(`https://localhost:44383/WareHouse/GetTray?Input=${whid}`);
+            // const response = await fetch(`https://localhost:44383/WareHouse/GetTray?Input=${whid}`);
+            const response = await fetch(`${setting.apipath}GetTray?Input=${whid}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -136,7 +137,7 @@ export default function TrayList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`https://localhost:44383/WareHouse/SearchTrayByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}SearchTrayByID?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -162,7 +163,7 @@ export default function TrayList() {
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname} panelList={panelList} />
             <div>
                 <Thead01 type={'Tray'} />
-                <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} />
+                <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={url} />
             </div>
             {/* </> */}
         </SubLayer>

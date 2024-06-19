@@ -15,12 +15,13 @@ interface TbodyProps {
   traycalled: any;
   traycalledname: any;
   traytransfer: any;
+  url: any;
 }
 
-export default function Tbody01({ data, error, type, traycalled, traycalledname, traytransfer }: TbodyProps) { // Add type to props
+export default function Tbody01({ data, error, type, traycalled, traycalledname, traytransfer, url }: TbodyProps) { // Add type to props
 
 
-  async function getTrayByWareHouse(whid: any, whname: any) {
+  async function getTrayByWareHouse(whid: any, whname: any, url: any) {
 
 
     // alert(whid);
@@ -29,13 +30,14 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       query: {
         type: 'Tray',
         whid: whid,
-        whname: whname
+        whname: whname,
+        url: url
       },
     });
 
   }
 
-  async function getWHPositionByWareHouseAndTray(whid: any, trayname: any, whname: any) {
+  async function getWHPositionByWareHouseAndTray(whid: any, trayname: any, whname: any, url: any) {
     router.push({
       pathname: `/factoryDepartment/whPositionList`,
       query: {
@@ -43,9 +45,10 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         whid: whid,
         trayname: trayname,
         whname: whname,
-        traycalled:traycalled,
-        traycalledname:traycalledname,
-        traytransfer:traytransfer
+        traycalled: traycalled,
+        traycalledname: traycalledname,
+        traytransfer: traytransfer,
+        url: url
       },
     });
 
@@ -60,9 +63,9 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         trayname: trayname,
         whname: whname,
         id: id,
-        traycalled:traycalled,
-        traycalledname:traycalledname,
-        traytransfer:traytransfer
+        traycalled: traycalled,
+        traycalledname: traycalledname,
+        traytransfer: traytransfer
       },
     });
 
@@ -112,7 +115,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.url}</span>
                 <span>{_item.update_by}</span>
                 <span>{convertToYearMonthDay('Datea', _item.update_at)}</span>
-                <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname)} /></span>
+                <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname, _item.url)} /></span>
               </div>
             </CellWithBar>
           ))
@@ -162,7 +165,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span></span>
                 <span></span>
                 <span></span>
-                <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname)} /></span>
+                <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, url)} /></span>
               </div>
             </CellWithBar>
           ))

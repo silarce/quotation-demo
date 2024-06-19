@@ -13,6 +13,7 @@ import { TquotationStatus } from 'js/api/dtoTypes';
 import { quotationStatusLookup } from 'config/lookupTable';
 import PageHeader02, { Toption } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { setting } from '../wareHouseList/index'; // 從 wareHouseList 模組中導入設定'
 
 
 type Tquery = {
@@ -22,7 +23,7 @@ type Tquery = {
 
 export default function WHPositionList() {
     const router = useRouter();
-    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer } = router.query;
+    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url } = router.query;
 
 
     const [data, setData] = useState<any[]>([]);
@@ -120,7 +121,7 @@ export default function WHPositionList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`https://localhost:44383/WareHouse/GetWHPosition?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetWHPosition?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -154,7 +155,7 @@ export default function WHPositionList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`https://localhost:44383/WareHouse/SearchWHPositionByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}SearchWHPositionByID?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -176,7 +177,7 @@ export default function WHPositionList() {
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫名稱：' + whname + '｜托盤名稱：' + trayname} panelList={panelList} />
             <div>
                 <Thead01 type={'WHPosition'} />
-                <Tbody01 type={'WHPosition'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} />
+                <Tbody01 type={'WHPosition'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={url} />
             </div>
         </SubLayer>
     )

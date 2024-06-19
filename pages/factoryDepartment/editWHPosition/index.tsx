@@ -14,7 +14,7 @@ import { ButtonBase } from '@mui/material';
 import MyButton from 'components/global/gear/button/myButton';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
-
+import { setting } from '../wareHouseList/index'; // 從 wareHouseList 模組中導入設定
 
 
 
@@ -50,7 +50,7 @@ export interface WHPositionModel {
 export default function EditWHPosition() {
     // 路由傳進來的
     const router = useRouter();
-    const { type, whid, trayname, whname, id, traycalled, traycalledname, traytransfer } = router.query;
+    const { type, whid, trayname, whname, id, traycalled, traycalledname, traytransfer, url } = router.query;
 
     //備分原本model
     const [data, setData] = useState<WHPositionModel>([]);
@@ -216,7 +216,7 @@ export default function EditWHPosition() {
 
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`https://localhost:44383/WareHouse/EditWHPositionByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}EditWHPositionByID?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -274,7 +274,7 @@ export default function EditWHPosition() {
             console.log(inputModel);
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`https://localhost:44383/WareHouse/UpdateWHPositionByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}UpdateWHPositionByID?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -321,7 +321,7 @@ export default function EditWHPosition() {
 
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`https://localhost:44383/WareHouse/GetTrayLayOutById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetTrayLayOutById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -339,6 +339,42 @@ export default function EditWHPosition() {
         }
     };
     //#region 呼叫托盤
+
+
+    const CallTrayAPI = async () => {
+        try {
+            setIsLoading(true);
+            const deviceName = whname === "101" ? "Device1" : "" || whname === "102" ? "Device2" : "" || whname === "103" ? "Device3" : "";
+
+            const traynumber = trayname;
+
+            const response = await fetch(`http://192.168.1.8/sjwms/Modbus/calltray?deviceName=${deviceName}&traynumber=${traynumber}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                // body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+            // console.log("checkresponse: ", responseData);
+
+            // setData11child(responseData);
+            // setData11(responseData);
+            // setPreTrayLayout(responseData);
+        } catch (error: any) {
+            console.error("Error in AddLayOut: ", error);
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
     const CallTray = async () => {
         try {
             if (traycalledin === true) {
@@ -346,10 +382,10 @@ export default function EditWHPosition() {
             } else {
                 myAlert.confirm({
                     title: `呼叫托盤: ${trayname}`,
-                    content:'!!請勿靠近設備!!',
+                    content: '!!請勿靠近設備!!',
                     props: {
                         onOk: () => {
-                            alert("呼叫中");
+                            CallTrayAPI();
                             setTrayCalled(true);
                             setTrayCalledName(data1.trayname);
                         }
@@ -368,7 +404,7 @@ export default function EditWHPosition() {
         } else {
             myAlert.confirm({
                 title: `收回托盤: ${trayname}`,
-                content:'!!請勿靠近設備!!',
+                content: '!!請勿靠近設備!!',
                 props: {
                     onOk: () => {
                         alert("收回中");
