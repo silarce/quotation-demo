@@ -363,9 +363,9 @@ export default function EditWHPosition() {
             const responseData = await response.json();
             // console.log("checkresponse: ", responseData);
 
-            // setData11child(responseData);
-            // setData11(responseData);
-            // setPreTrayLayout(responseData);
+            setTrayCalled(true);
+            setTrayCalledName(data1.trayname);
+
         } catch (error: any) {
             console.error("Error in AddLayOut: ", error);
             setError(error.message);
@@ -386,8 +386,7 @@ export default function EditWHPosition() {
                     props: {
                         onOk: () => {
                             CallTrayAPI();
-                            setTrayCalled(true);
-                            setTrayCalledName(data1.trayname);
+
                         }
                     }
                 });
