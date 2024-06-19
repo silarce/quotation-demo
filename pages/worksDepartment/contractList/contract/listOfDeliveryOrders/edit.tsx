@@ -45,6 +45,7 @@ import { TuserDto } from 'js/api/dtoTypes';
 
 // -----------------------------------------------------------
 type Tprofile = {
+  sheetNumber: string;
   projectNumber: string;
   projectName: string;
   requirementsDate: string;
@@ -170,6 +171,7 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
   useEffect(() => {
     const { projectName, projectNumber } = engineeringContact ?? {};
     const {
+      sheetNumber,
       // projectName,
       // projectNumber: engineeringNumber,
       requirementsDate,
@@ -183,6 +185,7 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
     } = exchange ?? {};
 
     setProfile({
+      sheetNumber: sheetNumber ?? '',
       projectNumber: projectNumber ?? '',
       projectName: projectName ?? '',
       requirementsDate: requirementsDate ?? '',
@@ -211,6 +214,10 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
 
   const controll_profile: Tcontroll_profile = {
     info: {
+      sheetNumber: {
+        value: profile.sheetNumber,
+        onChange: (v: string) => changeProfile('sheetNumber', v),
+      },
       projectNumber: {
         value: profile.projectNumber,
         onChange: (v: string) => changeProfile('projectNumber', v),
@@ -449,6 +456,7 @@ export default function Edit({ userInfo }: { userInfo: TuserDto }) {
 // ===========================================================
 
 const emptyProfileOri = (): Tprofile => ({
+  sheetNumber: '',
   projectNumber: '',
   projectName: '',
   requirementsDate: '',
