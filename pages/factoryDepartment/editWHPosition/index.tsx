@@ -348,7 +348,7 @@ export default function EditWHPosition() {
 
             const traynumber = trayname;
 
-            const response = await fetch(`http://192.168.1.8/sjwms/Modbus/calltray?deviceName=${deviceName}&traynumber=${traynumber}`, {
+            const response = await fetch(`https://localhost:44383/WareHouse/Modbus/calltray?deviceName=${deviceName}&traynumber=${traynumber}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
