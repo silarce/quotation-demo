@@ -86,6 +86,8 @@ type Tstate_accountant = {
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
 
   noteMaturityDate: Moment | null;
+  託收日: Moment | null;
+  預兌日: Moment | null;
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -188,6 +190,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       price: Number(state_accountant.price),
       fee: 0,
       noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
+      託收日: state_accountant.託收日?.toISOString(true),
+      預兌日: state_accountant.預兌日?.toISOString(true),
     };
 
     await apiPostAccountant({ body });
@@ -374,12 +378,60 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
               />
             );
           })}
+          {data_accountant?.map((data) => {
+            return (
+              <Row
+                key={data.id}
+                data_accountant={data}
+                paymentType={paymentType}
+                reqPatch={reqPatch}
+                reqDelete={reqDelete}
+                reqPatchIsImported={reqPatchIsImported}
+                isReadOnly={isWorksDepartment}
+                setAccountantId={setAccountantId}
+                bankAccountOptionArr={bankAccountOptionArr}
+                isWorksDepartment={isWorksDepartment}
+              />
+            );
+          })}
+          {data_accountant?.map((data) => {
+            return (
+              <Row
+                key={data.id}
+                data_accountant={data}
+                paymentType={paymentType}
+                reqPatch={reqPatch}
+                reqDelete={reqDelete}
+                reqPatchIsImported={reqPatchIsImported}
+                isReadOnly={isWorksDepartment}
+                setAccountantId={setAccountantId}
+                bankAccountOptionArr={bankAccountOptionArr}
+                isWorksDepartment={isWorksDepartment}
+              />
+            );
+          })}
+          {data_accountant?.map((data) => {
+            return (
+              <Row
+                key={data.id}
+                data_accountant={data}
+                paymentType={paymentType}
+                reqPatch={reqPatch}
+                reqDelete={reqDelete}
+                reqPatchIsImported={reqPatchIsImported}
+                isReadOnly={isWorksDepartment}
+                setAccountantId={setAccountantId}
+                bankAccountOptionArr={bankAccountOptionArr}
+                isWorksDepartment={isWorksDepartment}
+              />
+            );
+          })}
 
           <div className={scss.totalPriceWrapper}>
             <span className={scss.totalPrice}>{totalPrice_localString}</span>
           </div>
         </div>
-        <div className={scss.cover_bottom}></div>
+        {/* <div className={scss.cover_bottom}></div> */}
 
         <ContractSelector
           showModal={!!accountantId}
@@ -688,8 +740,10 @@ const Row = ({
       return;
     }
 
+    const { insertDate, noteMaturityDate, 託收日, 預兌日 } = data_accountant;
+
     setState_accountant({
-      insertDate: data_accountant.insertDate ? moment(data_accountant.insertDate) : null,
+      insertDate: insertDate ? moment(insertDate) : null,
       importAccountingNumber: data_accountant.importAccountingNumber ?? '',
       noteNumber: data_accountant.noteNumber ?? '',
       accountingNumber: data_accountant.accountingNumber ?? ' ',
@@ -699,7 +753,9 @@ const Row = ({
       notes: data_accountant.notes ?? '',
       isImported: data_accountant.isImported,
       accountsReceivableDeduction: data_accountant.accountsReceivableDeduction,
-      noteMaturityDate: data_accountant.noteMaturityDate ? moment(data_accountant.noteMaturityDate) : null,
+      noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
+      託收日: 託收日 ? moment(託收日) : null,
+      預兌日: 預兌日 ? moment(預兌日) : null,
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -858,26 +914,29 @@ type TconfigList = {
   [key in TaccountantKey]?: Tconfig;
 };
 
-const baseArr_before: TaccountantKey[] = ['btn', 'isImported', 'insertDate'];
+const baseArr_before: TaccountantKey[] = ['btn', 'isImported'];
 const baseArr_after: TaccountantKey[] = ['accountingNumber', 'vendorName', 'price', 'billSerialNumber', 'notes'];
 
 const lookup_keyArr: {
   [key in TpaymentType]: TaccountantKey[];
 } = {
-  匯款: [...baseArr_before, 'importAccountingNumber', ...baseArr_after],
+  匯款: [...baseArr_before, 'insertDate', 'importAccountingNumber', ...baseArr_after],
   // 票據: [...baseArr_before, 'noteNumber', 'noteMaturityDate', ...baseArr_after],
   票據: [
     ...baseArr_before,
+    'insertDate',
     'noteNumber',
     'importAccountingNumber',
     'accountingNumber',
     'vendorName',
     'noteMaturityDate',
     'price',
+    '託收日',
+    '預兌日',
     'billSerialNumber',
     'notes',
   ],
-  現金: [...baseArr_before, ...baseArr_after],
+  現金: [...baseArr_before, 'insertDate', ...baseArr_after],
 };
 
 const configList: TconfigList = {
@@ -1032,7 +1091,7 @@ const configList: TconfigList = {
     style: {
       width: 120,
     },
-    className: '',
+    className: scss.stickyLeft,
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
       const value_str = (value as string) || '';
       const inputProps: TinputProps = {
@@ -1149,7 +1208,8 @@ const configList: TconfigList = {
   },
   notes: {
     label: '備註',
-    style: { flex: 'auto' },
+    // style: { flex: 'auto' },
+    style: { width: 300 },
     className: '',
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
       const value_str = (value as string) || '';
@@ -1165,6 +1225,50 @@ const configList: TconfigList = {
       };
 
       return { inputProps };
+    },
+  },
+  託收日: {
+    label: '託收日',
+    style: {
+      width: 110,
+      // justifyContent: 'center',
+    },
+    className: '',
+    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, limitedDate, value, setState_accountant }) => {
+      const value_moment = value as Moment | null;
+
+      const datePickerProps: TdatePickerProps = {
+        props: {
+          value: value_moment,
+          onChange: (date) => {
+            setState_accountant((state) => ({ ...state, 託收日: date }));
+          },
+        },
+      };
+
+      return { datePickerProps };
+    },
+  },
+  預兌日: {
+    label: '預兌日',
+    style: {
+      width: 110,
+      // justifyContent: 'center',
+    },
+    className: '',
+    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, limitedDate, value, setState_accountant }) => {
+      const value_moment = value as Moment | null;
+
+      const datePickerProps: TdatePickerProps = {
+        props: {
+          value: value_moment,
+          onChange: (date) => {
+            setState_accountant((state) => ({ ...state, 預兌日: date }));
+          },
+        },
+      };
+
+      return { datePickerProps };
     },
   },
 };
@@ -1183,4 +1287,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   isImported: false,
   accountsReceivableDeduction: [],
   noteMaturityDate: null,
+  託收日: null,
+  預兌日: null,
 });

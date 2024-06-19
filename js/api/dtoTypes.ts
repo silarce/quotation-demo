@@ -3661,26 +3661,24 @@ export type TaccountantDto = {
 
   paymentType: TaccountantPaymentType; // 收款類型
   accountingNumber: string | null; // 存入帳號
-
   insertDate: string | null; // 匯入日期 // 收款日 // 收票日
   vendorName: string | null; // 廠商名稱
-
   price: number; // 金額
   notes: string | null; // 備註
   noteNumber: string | null; // 票據號碼
   fee: number; // 匯費
-
   billSerialNumber: string | null; // 收入傳票序號
   noteMaturityDate: string | null; // 票據到期日
   invoices: TaccountsReceivableInvoiceDto[];
-  //
   importAccountingNumber: string | null; // 匯入帳號 // 匯款來源帳號
   order: number; // 排序用的
-  //
   // 扣款明細
   accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
-
   isImported: boolean; // 是否已匯入紙本應收帳款
+
+  //
+  託收日: string | null;
+  預兌日: string | null;
 };
 
 export type TcreateAccountantDto = Pick<
@@ -3697,6 +3695,8 @@ export type TcreateAccountantDto = Pick<
   | 'noteNumber'
 > & {
   noteMaturityDate?: string | null; // 票據到期日
+  託收日?: string | null; // 託收日
+  預兌日?: string | null; // 預兌日
 };
 
 export type TupdateAccountantDto = Partial<
