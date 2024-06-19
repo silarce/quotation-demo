@@ -1,0 +1,619 @@
+
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
+import scss from './editWHPosition.module.scss';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import { quotationStatusLookup } from 'config/lookupTable';
+import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { TquotationStatus } from 'js/api/dtoTypes';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
+import { PageHeader } from 'antd';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { ButtonBase } from '@mui/material';
+import MyButton from 'components/global/gear/button/myButton';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
+
+
+
+
+
+
+
+type Tquery = {
+    wareHouseId: string | undefined;
+};
+
+export interface WHPositionModel {
+    id?: string;
+    whpname?: string;
+    whid?: string;
+    volume?: number;
+    spec?: string;
+    trayid?: string;
+    length?: number;
+    width?: number;
+    childlength?: number;
+    childwidth?: number;
+    materialnumber?: string;
+    batchnumber?: string;
+    unit?: string;
+    quantity?: number;
+    whname?: string;
+    trayname?: string;
+    canedit?: boolean;
+}
+
+
+
+export default function EditWHPosition() {
+    //備分原本model
+    const [data, setData] = useState<WHPositionModel>([]);
+    const [data1, setData1] = useState<WHPositionModel>([]);
+    const [data11, setData11] = useState<any[]>([]);
+    const [error, setError] = useState<string | null>(null); // 将 error 的类型更改为 Error | null
+    const [hoverInfo, setHoverInfo] = useState<string | null>(null);
+    const [canedit, setCanEdit] = useState<boolean | undefined>(false);
+    const [traycalled, setTrayCalled] = useState<boolean | undefined>(false);
+
+    const [mouseX, setMouseX] = useState('0px');
+    const [mouseY, setMouseY] = useState('0px');
+
+
+    const router = useRouter();
+    const { type, whid, trayname, whname, id } = router.query;
+    const status = router.query.status as TquotationStatus;
+    // const traycode =router.query.whid as TquotationStatus;
+    const { wareHouseId } = router.query as Tquery;
+    // const [disabled, setDisabled] = useState(!!wareHouseId);
+    const [disabled, setDisabled] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+
+    //#region 右側功能按鈕區塊
+    // const panelList: TpanelList = [
+    //還沒編輯前功能紐
+    const panelList_unedit: TpanelList = canedit ? [
+        {
+            type: 'myButton',
+            label: '編輯',
+            onClick: () => {
+                setDisabled(false);
+            },
+        },
+        {
+            type: 'myButton',
+            label: `${!!wareHouseId ? '取消' : '返回'}`,
+            onClick: () => {
+                router.push({
+                    pathname: `/factoryDepartment/whPositionList`,
+                    query: {
+                        type: 'WareHouse',
+                        whid: whid,
+                        trayname: trayname,
+                        whname: whname
+                    }
+                });
+            },
+        },
+    ] : [
+
+        {
+            type: 'myButton',
+            label: `${!!wareHouseId ? '取消' : '返回'}`,
+            onClick: () => {
+                router.push({
+                    pathname: `/factoryDepartment/whPositionList`,
+                    query: {
+                        type: 'WareHouse',
+                        whid: whid,
+                        trayname: trayname,
+                        whname: whname
+                    }
+                });
+            },
+        },
+    ];
+
+
+    //點選編輯後功能紐
+    const panelList_edit: TpanelList = canedit ? [
+        {
+            type: 'myButton',
+            label: '儲存',
+            onClick: () => {
+                if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
+                    data1.whpname === '' || data1.whpname === undefined || data1.whpname === null &&
+                    data1.batchnumber === '' || data1.batchnumber === undefined || data1.batchnumber === null &&
+                    data1.spec === '' || data1.spec === undefined || data1.spec === null &&
+                    data1.quantity === 0 || data1.quantity === undefined || data1.quantity === null
+                ) {
+                    myAlert.warning({ title: '請確實填寫儲位資訊' });
+                } else {
+                    myAlert.confirm({
+                        title: '確定修改?',
+                        content: <>
+                            <h1>修改後無法再編輯</h1>
+                        </>,
+                        props: {
+                            onOk: () => {
+                                setDisabled(true);
+                                handleSave();
+                            }
+                        }
+                    });
+                }
+            },
+        },
+        {
+            type: 'myButton',
+            label: '取消',
+            onClick: () => {
+                setDisabled(true);
+                handleRestore();
+            },
+        },
+    ] : [
+        {
+            type: 'redButton',
+            label: '收回托盤：' + trayname,
+            onClick: () => {
+                setDisabled(false);
+                CallTray();
+            },
+        },
+        {
+            type: 'myButton',
+            label: '返回',
+            onClick: () => {
+                setDisabled(true);
+                handleRestore();
+            },
+        },
+    ];
+
+    //點選呼叫托盤後功能紐
+    const panelList_calltray: TpanelList = [
+
+        {
+            type: 'redButton',
+            label: '收回托盤',
+            onClick: () => {
+                setDisabled(true);
+                // callTrayBack();
+            },
+        },
+        {
+            type: 'myButton',
+            label: `${!!wareHouseId ? '取消' : '返回'}`,
+            onClick: () => {
+                router.push({
+                    pathname: `/factoryDepartment/whPositionList`,
+                    query: {
+                        type: 'WareHouse',
+                        whid: whid,
+                        trayname: trayname,
+                        whname: whname
+                    }
+                });
+            },
+        },
+    ];
+
+
+
+    const panelList = disabled ? panelList_unedit : panelList_edit;
+    //#endregion
+
+    //#region 與api 溝通區塊
+    useEffect(() => {
+        const fetchDataAndLayout = async () => {
+            await fetchData();
+            await GetLayOut();
+
+            // if (!disabled) { // 只有在未編輯狀態下處理滑鼠移動事件
+            const handleMouseMove = (event: MouseEvent) => {
+                setMouseX(`${event.pageX}px`);
+                setMouseY(`${event.pageY}px`);
+            };
+
+            window.addEventListener('mousemove', handleMouseMove);
+
+            return () => {
+                window.removeEventListener('mousemove', handleMouseMove);
+            };
+            // }
+        };
+
+        fetchDataAndLayout();
+    }, [router.query, disabled]); // 當 router.query 或 disabled 改變時觸發
+
+    //撈取儲位資料 api
+    const fetchData = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: { whid: string | undefined; trayname: string | undefined; id: string | undefined } = {
+                whid: whid as string | undefined,
+                trayname: trayname as string | undefined,
+                id: id as string | undefined
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'test',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`https://localhost:44383/WareHouse/EditWHPositionByID?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+            const dataModel: WHPositionModel = {
+                id: responseData.id,
+                whpname: responseData.whpname,
+                whid: responseData.whid,
+                volume: responseData.volume,
+                spec: responseData.spec,
+                trayid: responseData.trayid,
+                length: responseData.length,
+                width: responseData.width,
+                childlength: responseData.childlength,
+                childwidth: responseData.childwidth,
+                materialnumber: responseData.materialnumber,
+                batchnumber: responseData.batchnumber,
+                unit: responseData.unit,
+                quantity: responseData.quantity,
+                whname: responseData.whname,
+                trayname: responseData.trayname,
+                canedit: responseData.canedit
+            };
+
+            setData1(dataModel);
+            setData(dataModel);//備分恢復原本的model
+            console.log(dataModel.canedit);
+            setCanEdit(dataModel.canedit);
+            console.log(canedit);
+
+            // console.log("EditWHPositionByID:" + data1.id);
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    //更新儲位資料 api
+    const updateData = async (updatedData: WHPositionModel) => {
+        try {
+            setIsLoading(true);
+            const check = JSON.stringify(updatedData);
+            console.log(check);
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'test',
+                FilterConditions: JSON.stringify(updatedData),
+            };
+
+            console.log(inputModel);
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`https://localhost:44383/WareHouse/UpdateWHPositionByID?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to update data');
+            }
+
+            router.replace({
+                pathname: `/factoryDepartment/editWHPosition`,
+                query: {
+                    type: 'WHPosition',
+                    whid: whid,
+                    trayname: trayname,
+                    whname: whname,
+                    id: id
+                },
+            });
+
+            // 可以选择处理成功响应的逻辑，比如刷新数据等
+
+        } catch (error) {
+            console.error('Error updating data:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const GetLayOut = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: { whid: string | undefined; trayname: string | undefined; id: string | undefined } = {
+                whid: whid as string | undefined,
+                trayname: trayname as string | undefined,
+                id: id as string | undefined
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'test',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`https://localhost:44383/WareHouse/GetTrayLayOutById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+            console.log(responseData);
+
+            setData11(responseData);
+
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const CallTray = async () => {
+        try {
+            alert("開始呼叫托盤");
+            // const conditionModel: { whid: string | undefined; trayname: string | undefined; id: string | undefined } = {
+            //     whid: whid as string | undefined,
+            //     trayname: trayname as string | undefined,
+            //     id: id as string | undefined
+            // };
+
+            // // const inputModel = {
+            // //     TypeName: 'ERP',
+            // //     ServiceName: 'WareHouseService',
+            // //     FunctionName: 'test',
+            // //     FilterConditions: JSON.stringify(conditionModel),
+            // // };
+            // const DeviceName = 'Device1';
+            // // const Tray
+
+            // const queryParams = new URLSearchParams({ Device: DeviceName }).toString();
+            // const response = await fetch(`https://localhost:44383/WareHouse/GetTrayLayOutById?${queryParams}`);
+            // if (!response.ok) {
+            //     throw new Error('Failed to fetch data');
+            // }
+
+            // const responseData = await response.json();
+            // console.log(responseData);
+
+            // setData11(responseData);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+
+    //#endregion
+
+    //#region model 作動區塊
+    //修改儲位連動model
+    const handleChange = (key: keyof WHPositionModel, value: string | number) => {
+        setData1(prevState => ({
+            ...prevState,
+            [key]: value,
+        }));
+    };
+
+    // 更新儲位
+    const handleSave = () => {
+        updateData(data1);
+    };
+
+    const handleRestore = () => {
+        setData1(data);
+    }
+
+    async function handlechangewhposition(id: any, whid: any, trayname: any, whname: any) {
+
+        // setCanEdit(false);
+        // panelList=panelList_unedit
+        router.replace({
+            pathname: `/factoryDepartment/editWHPosition`,
+            query: {
+                type: 'WHPosition',
+                whid: whid,
+                trayname: trayname,
+                whname: whname,
+                id: id
+            },
+        });
+
+    }
+
+    //#endregion
+
+    return (
+        <SubLayer isLoading_subLayer={false}>
+            {/* <> */}
+            <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫名稱：' + whname + "｜托盤名稱：" + trayname} panelList={panelList} />
+            {/* 左側區塊 */}
+
+            {/* <div style={{ display: !disabled ? 'block' : 'none', position: 'absolute', top: '0', left: '1%', transform: 'translateX(0%)', zIndex: '999' }}>編輯中....</div> */}
+            {/* {hoverInfo && <div style={{ position: 'absolute', top: '55%', left: '50%', transform: 'translateX(0%)', zIndex: '999' }}>{hoverInfo}</div>} */}
+
+
+            <div className={scss.main}>
+                <div className={scss.left}>
+                    <div className={scss.top}>
+                        {/* <div> */}
+                        <InputSel
+                            {...inputSelProps}
+                            caption="物料編碼"
+                            disabled={disabled}
+                            // disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: data1.materialnumber,
+                                    onChange: (e) => handleChange('materialnumber', e.target.value),
+                                },
+                            }}
+                        />
+                        <InputSel
+                            {...inputSelProps}
+                            caption="物料名稱"
+                            disabled={disabled}
+                            // disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: data1.whpname,
+                                    onChange: (e) => handleChange('whpname', e.target.value),
+                                },
+                            }}
+                        />
+                        <InputSel
+                            {...inputSelProps}
+                            caption="批號"
+                            disabled={disabled}
+                            // disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: data1.batchnumber,
+                                    onChange: (e) => handleChange('batchnumber', e.target.value),
+                                },
+                            }}
+                        />
+                        <InputSel
+                            {...inputSelProps}
+                            caption="物料規格"
+                            disabled={disabled}
+                            // disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: data1.spec,
+                                    onChange: (e) => handleChange('spec', e.target.value),
+                                },
+                            }}
+                        />
+                        <InputSel
+                            {...inputSelProps}
+                            caption="數量"
+                            disabled={disabled}
+                            // disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: data1.quantity,
+                                    onChange: (e) => handleChange('quantity', parseInt(e.target.value)),
+                                },
+                            }}
+                        />
+                        <InputSel
+                            {...inputSelProps}
+                            caption="單位"
+                            disabled={disabled}
+                            // disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: data1?.unit ? data1.unit : ' ',  // 如果 data1.unit 為空字串、null 或 undefined，則顯示 '無'
+                                    onChange: (e) => handleChange('unit', e.target.value),
+                                },
+                            }}
+                        />
+                        <InputSel
+                            {...inputSelProps}
+                            caption="托盤編碼"
+                            // disabled={disabled}
+                            disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: data1.trayname,
+                                    // onChange: (e) => handleChange('trayname', e.target.value),
+                                },
+                            }}
+                        />
+                        <div className={scss.top} style={{ display: traycalled === true ? 'none' : '' }}>
+                            <MyButton_v2 disabled={traycalled} theme='danger' className={scss.addBtn} label="呼叫托盤" onClick={() => { alert("呼叫托盤"); setTrayCalled(true); }} />
+                        </div>
+                        <div className={scss.top} style={{ display: traycalled === true ? '' : 'none' }}>
+                            <MyButton_v2 disabled={disabled} theme='danger' className={scss.addBtn} label="收回托盤" onClick={() => { alert("收回托盤"); setTrayCalled(false); }} />
+                        </div>
+                        {/* </div> */}
+                    </div>
+                </div>
+                <div className={scss.right}>
+                    {/* <div className={scss.content}>
+                        這是一個新的區塊，可以用來放其他內容。
+                    </div> */}
+                    <div className={scss.content}>
+                        {/* 測試新的 */}
+                        {data11.map((Data) => (
+                            <table className={scss.traytable} style={{ border: 'solid 1px black' }}>
+                                <tbody>
+                                    <tr className={scss.tr}>
+                                        {Data.widthdata.map((item: any) => (
+                                            <td className={scss.td} style={{ backgroundColor: item.color, color: item.color === '#ea1833' ? '#FFFFFF' : 'black' }}>
+                                                {item.childtraylayoutmodel && item.childtraylayoutmodel.map((childitem: any) => (
+                                                    <table className={scss.childtraytable} key={item.childlengthid}>
+                                                        <tbody>
+                                                            <tr className={scss.childtraytabletr}>
+                                                                {childitem.childwidthdata.map((childDataItem: any) => (
+                                                                    <td className={scss.childtraytabletd} key={childDataItem.id} style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}>
+                                                                        <button className={scss.childtraytabletdButton}
+                                                                            onClick={() => handlechangewhposition(childDataItem.id, childDataItem.whid, childDataItem.trayname, childDataItem.whname)}
+                                                                            style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
+                                                                            onMouseEnter={() => setHoverInfo(`${childDataItem.whpname}\n${childDataItem.spec}\n${childDataItem.quantity}`)}
+                                                                            onMouseLeave={() => setHoverInfo(null)}
+                                                                        >
+                                                                            {childDataItem.width}<br />
+                                                                        </button>
+                                                                    </td>
+                                                                ))}
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                ))}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        ))}
+                        {/* {hoverInfo && <div style={{ backgroundColor:'white',position: 'absolute', top: '55%', left: '50%', transform: 'translateX(0%)', zIndex: '999' }}>{hoverInfo}</div>} */}
+                        {hoverInfo && (
+                            <div
+                                style={{
+                                    backgroundColor: '#dfdcdc',
+                                    position: 'fixed',
+                                    top: mouseY,
+                                    left: mouseX,
+                                    transform: 'translate(10%, 60%)',
+                                    padding: '5px',
+                                    borderRadius: '5px',
+                                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                                    zIndex: '999',
+                                    whiteSpace: 'pre-line', // 控制換行的 CSS 屬性
+                                    fontSize:'16px'
+                                }}
+                            >
+                                {hoverInfo}
+                            </div>
+                        )}
+
+                    </div>
+
+                </div >
+
+            </div >
+        </SubLayer >
+    )
+}
