@@ -869,6 +869,7 @@ const lookup_keyArr: {
   票據: [
     ...baseArr_before,
     'noteNumber',
+    'importAccountingNumber',
     'accountingNumber',
     'vendorName',
     'noteMaturityDate',
@@ -989,7 +990,7 @@ const configList: TconfigList = {
     },
   },
   accountingNumber: {
-    label: '付款帳號',
+    label: '存入帳號',
     style: {
       width: 200,
     },
@@ -1049,7 +1050,7 @@ const configList: TconfigList = {
     },
   },
   importAccountingNumber: {
-    label: '匯入帳號',
+    label: '付款帳號',
     style: {
       width: 120,
     },
