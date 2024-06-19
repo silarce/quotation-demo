@@ -3679,6 +3679,8 @@ export type TaccountantDto = {
   //
   託收日: string | null;
   預兌日: string | null;
+
+  incomeBill?: TincomeBillSerialDto;
 };
 
 export type TcreateAccountantDto = Pick<
