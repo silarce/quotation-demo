@@ -456,15 +456,37 @@ const sidePathList: TsidePathList = {
           path: path01 + '/todoList',
           erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
+
         {
-          label: '會計收款管理',
-          path: path01 + '/collection',
-          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
-        },
-        {
-          label: '收入傳票',
-          path: path01 + '/incomeSummons',
+          label: '收入作業',
           erpFeature: [incomeBill],
+          list: [
+            {
+              label: '會計收款管理',
+              path: path01 + '/collection',
+              erpFeature: [
+                worksDepartment,
+                accountsReceivable,
+                worksDepartment_worksheet,
+                worksDepartment_deliveryList,
+              ],
+            },
+            {
+              label: '收入傳票管理',
+              path: path01 + '/incomeSummons',
+              erpFeature: [incomeBill],
+            },
+            {
+              label: '開立發票管理',
+              path: path01 + '/invoiceIssuanceManagement',
+              erpFeature: [
+                worksDepartment,
+                accountsReceivable,
+                worksDepartment_worksheet,
+                worksDepartment_deliveryList,
+              ],
+            },
+          ],
         },
         // {
         //   label: '新增派工單',
@@ -560,9 +582,25 @@ const sidePathList: TsidePathList = {
       path01,
       list: [
         {
-          label: '收款管理',
-          path: path01 + '/collection',
+          label: '收款作業',
           erpFeature: [accountingDepartment],
+          list: [
+            {
+              label: '收款管理',
+              path: path01 + '/collection',
+              erpFeature: [accountingDepartment],
+            },
+            {
+              label: '收款明細表',
+              path: path01 + '/collectionDetailList',
+              erpFeature: [accountingDepartment],
+            },
+            {
+              label: '票據兌現明細',
+              path: path01 + '/BillCashingDetailList',
+              erpFeature: [accountingDepartment],
+            },
+          ],
         },
         // {
         //   label: 'foo',
