@@ -783,9 +783,21 @@ const props_engineeringContact: TselectorProps<TengineeringContactDto> = {
   filter: ([projectNumber, keyword]) => {
     return {
       projectNumber: { $eq: projectNumber },
-      projectName: { $contains: keyword },
-      projectPrincipal: { $contains: keyword },
-      contractor: { $contains: keyword },
+      $or: [
+        {
+          projectName: { $contains: keyword },
+        },
+        {
+          projectPrincipal: { $contains: keyword },
+        },
+        {
+          contractor: { $contains: keyword },
+        },
+      ],
+
+      // projectName: { $contains: keyword },
+      // projectPrincipal: { $contains: keyword },
+      // contractor: { $contains: keyword },
     };
   },
 };
