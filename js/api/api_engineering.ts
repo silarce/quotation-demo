@@ -59,6 +59,8 @@ import type {
   TperiodType,
   TpageResponse,
   TaccountsReceivableInvoiceDto,
+  TincomeBillSerialDto,
+  TupdateIncomeBillSerialDto,
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
@@ -113,6 +115,8 @@ export type {
   TdeliveryStatusInstallationItem,
   TaccountsReceivableInvoiceDto,
   //
+  TincomeBillSerialDto,
+  TupdateIncomeBillSerialDto,
 } from './dtoTypes';
 
 export type { TinvouceCheckResult };
@@ -262,7 +266,7 @@ export const useGetEngineeringDispatching_id = (id: string | undefined, customeP
   const [res, setRes] = useState<TdispatchingDto>();
 
   const params = {
-    populate: ['workerEmployee'],
+    populate: ['workerEmployee', 'todoList'],
     ...customeParams,
   };
 
@@ -304,6 +308,21 @@ export const apiPatchEngineeringDispatching = async (id: string, body: TcreateDi
     .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+// 刪除派工單
+export const apiDeleteEngineeringDispatching = async (id: string) => {
+  const api = `/engineering/dispatching/${id}`;
+
+  return axi
+    .delete(api)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '刪除派工單失敗', content: err.message });
+
+      return Promise.reject(error);
+    });
 };
 
 // ------------------------------------------------------------------------
@@ -1842,4 +1861,62 @@ export const useCheckInvoiceNumber = (
   }, [invoiceNumber]);
 
   return { isFetching, isPass };
+};
+
+// 刪除發票
+export const apiDeleteAccountReceivableInvoice = async (id: string) => {
+  const api = `/engineering/account-receivable/invoice/${id}`;
+
+  return axi
+    .delete(api)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '刪除發票失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+// 刪除應收帳款期數
+export const apiDeleteAccountReceivablePeriod = async (id: string) => {
+  const api = `/engineering/account-receivable/period/${id}`;
+
+  return axi
+    .delete(api)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '刪除應收帳款期數失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
+};
+
+export const apiGetAccountReceivableIncomeBills = async (params?: Tparams) => {
+  const api = '/engineering/account-receivable/income-bills';
+
+  return axi
+    .get<TpageResponse<TincomeBillSerialDto>>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountReceivableIncomeBills = createUseInfinite<TpageResponse<TincomeBillSerialDto>>({
+  apiClient: apiGetAccountReceivableIncomeBills,
+  errTitle: '取得應收帳款收款明細列表失敗',
+});
+
+export const apiPatchIncomeBill = async (id: string, body: TupdateIncomeBillSerialDto) => {
+  const api = `/engineering/account-receivable/income-bill/${id}`;
+
+  return axi
+    .patch<TincomeBillSerialDto>(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '更新收款明細失敗', content: err.message });
+
+      Promise.reject(error);
+    });
 };

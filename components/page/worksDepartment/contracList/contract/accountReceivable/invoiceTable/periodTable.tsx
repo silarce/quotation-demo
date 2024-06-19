@@ -82,7 +82,7 @@ type Tstate_period = {
   minusDeduction: boolean;
   minusWriteOffDeposit: boolean;
 
-  allowEditDeduction: boolean;
+  allow_EditDeduction_or_deleteInvoice: boolean;
 
   price: number; // 發票金額 自動計算
   invoiceNumber: string;
@@ -129,6 +129,9 @@ export default function PeriodTable({
   // reqPatchInvoiceArr,
   onAddConfirm,
   reqPatchInvoiceAllowance,
+
+  reqDeleteInvoice,
+  reqDeletePeriod,
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
@@ -137,6 +140,8 @@ export default function PeriodTable({
   // reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
   onAddConfirm: (state_invoice: Tstate_period) => void;
   reqPatchInvoiceAllowance: (invoiceId: string, allowance: number) => void;
+  reqDeleteInvoice: (invoiceId: string) => void;
+  reqDeletePeriod: (periodId: string) => void;
 }) {
   const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
   const ref_invoicePanelArr = useRef<(TimperativeHandle_panel | null)[]>([]);
@@ -414,6 +419,8 @@ export default function PeriodTable({
               finalProdArr={finalProdArr}
               onPanelStateChange={onPanelStateChange}
               reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
+              reqDeleteInvoice={reqDeleteInvoice}
+              reqDeletePeriod={reqDeletePeriod}
             />
           );
         })}
@@ -470,6 +477,8 @@ const Left = ({
       </Tbody>
 
       <div className={scss.tfoot}></div>
+      <div className={scss.deleteBar}></div>
+      {/* <div className={scss.tfoot}></div> */}
     </div>
   );
 };
