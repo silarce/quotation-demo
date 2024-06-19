@@ -344,31 +344,108 @@ export default function EditWHPosition() {
     const CallTrayAPI = async () => {
         try {
             setIsLoading(true);
-            const deviceName = whname === "101" ? "Device1" : "" || whname === "102" ? "Device2" : "" || whname === "103" ? "Device3" : "";
 
+            // 根據 whname 設置 deviceName
+            const deviceName = (whname === "101") ? "Device1" :
+                (whname === "102") ? "Device2" :
+                    (whname === "103") ? "Device3" : "";
             const traynumber = trayname;
+            const traycommand = "100";
 
-            const response = await fetch(`https://localhost:44383/WareHouse/Modbus/calltray?deviceName=${deviceName}&traynumber=${traynumber}`, {
+            // execcommand 的參數
+            const regaddress = '253';
+            const cmdvalue = '1';
+
+            // 呼叫 traycommand API
+            const response = await fetch(`${setting.apipath}Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                // body: JSON.stringify(inputModel)
             });
 
+            // 檢查 traycommand API 的回應
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                throw new Error('Failed to call traycommand API');
             }
+            console.log(response);
 
-            const responseData = await response.json();
-            // console.log("checkresponse: ", responseData);
+            // 呼叫 execcommand API
+            const response2 = await fetch(`${setting.apipath}Modbus/execcommand?deviceName=${deviceName}&regaddress=${regaddress}&cmdvalue=${cmdvalue}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
 
+            // 檢查 execcommand API 的回應
+            if (!response2.ok) {
+                throw new Error('Failed to call execcommand API');
+            }
+            console.log(response2);
+
+            // 如果成功，設置 traycalled 和 traycalledname 狀態
             setTrayCalled(true);
-            setTrayCalledName(data1.trayname);
+            setTrayCalledName(data1.trayname); // 假設 trayname 是正確的名稱
 
         } catch (error: any) {
-            console.error("Error in AddLayOut: ", error);
-            setError(error.message);
+            // 處理錯誤，顯示警告
+            myAlert.warning(error.message);
+            console.error;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const CallTrayBackAPI = async () => {
+        try {
+            setIsLoading(true);
+
+            // 根據 whname 設置 deviceName
+            const deviceName = (whname === "101") ? "Device1" :
+                (whname === "102") ? "Device2" :
+                    (whname === "103") ? "Device3" : "";
+            const traynumber = trayname;
+            const traycommand = "200";
+
+            // execcommand 的參數
+            const regaddress = '253';
+            const cmdvalue = '1';
+
+            // 呼叫 traycommand API
+            const response = await fetch(`https://localhost:44383/WareHouse/Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            // 檢查 traycommand API 的回應
+            if (!response.ok) {
+                throw new Error('Failed to call traycommand API');
+            }
+
+            // 呼叫 execcommand API
+            const response2 = await fetch(`https://localhost:44383/WareHouse/Modbus/execcommand?deviceName=${deviceName}&regaddress=${regaddress}&cmdvalue=${cmdvalue}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            // 檢查 execcommand API 的回應
+            if (!response2.ok) {
+                throw new Error('Failed to call execcommand API');
+            }
+
+            // 如果成功，設置 traycalled 和 traycalledname 狀態
+            setTrayCalled(false);
+            setTrayCalledName('');
+
+        } catch (error: any) {
+            // 處理錯誤，顯示警告
+            myAlert.warning(error.message);
+            console.error;
         } finally {
             setIsLoading(false);
         }
@@ -406,9 +483,7 @@ export default function EditWHPosition() {
                 content: '!!請勿靠近設備!!',
                 props: {
                     onOk: () => {
-                        alert("收回中");
-                        setTrayCalledName('');
-                        setTrayCalled(false);
+                        CallTrayBackAPI();
                     }
                 }
             });

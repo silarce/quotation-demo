@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
-
 import scss from './whPositionList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
@@ -13,7 +12,7 @@ import { TquotationStatus } from 'js/api/dtoTypes';
 import { quotationStatusLookup } from 'config/lookupTable';
 import PageHeader02, { Toption } from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import { setting } from '../wareHouseList/index'; // 從 wareHouseList 模組中導入設定'
+import { setting } from '../wareHouseList/index';
 
 
 type Tquery = {
@@ -27,7 +26,7 @@ export default function WHPositionList() {
 
 
     const [data, setData] = useState<any[]>([]);
-    const [error, setError] = useState<string | null>(null); // 将 error 的类型更改为 Error | null
+    const [error, setError] = useState<string | null>(null);
     const [traycalledin, setTrayCalled] = useState<boolean>(traycalled === 'true');
 
 
@@ -56,7 +55,6 @@ export default function WHPositionList() {
         searchTargetList,
         doSearch: (arr: any) => {
             const keyword = arr[0] as string;
-            // console.log("thisthishtishtis:" + keyword + "asdfasdfasdf");
             if (keyword === '' || keyword === undefined) {
                 fetchData();
             } else {
@@ -72,7 +70,6 @@ export default function WHPositionList() {
             type: 'myButton',
             label: '返回',
             onClick: () => {
-                // alert(traycalledin);
                 if (traycalledin === true) {
                     myAlert.warning({ title: '請先收回托盤' });
                 } else {
