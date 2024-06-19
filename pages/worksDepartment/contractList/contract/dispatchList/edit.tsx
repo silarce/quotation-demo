@@ -21,10 +21,11 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import {
   TcreateDispatchingDto,
   TdispatchingDto,
-  apiPostEngineeringDispatching,
-  apiPatchEngineeringDispatching,
   useGetEngineeringDispatching_id,
   useGetEngineeringContact,
+  apiPostEngineeringDispatching,
+  apiPatchEngineeringDispatching,
+  apiDeleteEngineeringDispatching,
 } from 'js/api/api_engineering';
 import { useGetContract_id } from 'js/api/api_quotation';
 import { TupdateTodoDto, apiPatchTodo } from 'js/api/api_todo';
@@ -109,6 +110,8 @@ export default function EditDispatchList() {
   //   useGetEngineeringContact(engineeringContactId);
 
   const { data: dispatching, update: update_dispatching } = useGetEngineeringDispatching_id(dispatchingId);
+
+  const haveTodoList = !!dispatching?.todoList;
 
   // ---------------------------------------------------------
 
@@ -233,7 +236,7 @@ export default function EditDispatchList() {
     }
 
     if (!state_pricingMethod.pricingMethod) {
-      return myAlert.info({ title: '請選擇派工方式' });
+      return myAlert.info({ title: '請選擇派工批價' });
     }
 
     const body: TcreateDispatchingDto = {
@@ -273,7 +276,7 @@ export default function EditDispatchList() {
         myAlert.success({ title: '新增派工單成功' });
 
         if (res) {
-          router.push({
+          router.replace({
             query: {
               ...router.query,
               dispatchingId: res.id,
@@ -298,6 +301,25 @@ export default function EditDispatchList() {
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '新增派工單失敗', content: err.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // apiDeleteEngineeringDispatching
+  const reqDelete = async () => {
+    if (!dispatchingId) {
+      return myAlert.info({ title: '沒有派工單ID' });
+    }
+
+    try {
+      setIsLoading(true);
+
+      await apiDeleteEngineeringDispatching(dispatchingId);
+      myAlert.success({ title: '刪除派工單成功' });
+
+      router.back();
+    } catch (error) {
     } finally {
       setIsLoading(false);
     }
@@ -561,6 +583,7 @@ export default function EditDispatchList() {
     dispatching,
   ]);
 
+  // MARK: panelList
   const panelList01: TpanelList = [
     {
       type: 'redButton',
@@ -583,6 +606,30 @@ export default function EditDispatchList() {
     },
   ];
   const panelList02: TpanelList = [
+    {
+      type: 'redButton',
+      label: '刪除',
+      onClick: () => {
+        myAlert.confirm({
+          title: '確定刪除此派工單？',
+          content: (() => {
+            if (haveTodoList) {
+              // return '此派工單已連結待辦事項，\n該待辦事項將會一起被刪除';
+              return (
+                <span>
+                  此派工單已連結待辦事項
+                  <br />
+                  該待辦事項將會一起被刪除
+                </span>
+              );
+            }
+          })(),
+          props: {
+            onOk: reqDelete,
+          },
+        });
+      },
+    },
     {
       type: 'myButton',
       label: '匯出',

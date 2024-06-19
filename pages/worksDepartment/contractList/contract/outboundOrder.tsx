@@ -305,23 +305,33 @@ export default function OutboundOrder({
   };
 
   const reqDelete = async (statusId: string) => {
-    if (!engineeringDeliveryListId || isReqing) {
-      return;
-    }
+    const call = async () => {
+      if (!engineeringDeliveryListId || isReqing) {
+        return;
+      }
 
-    try {
-      const res = await apiDeleteDeliveryStatus({
-        id: engineeringDeliveryListId,
-        statusId,
-      });
+      try {
+        const res = await apiDeleteDeliveryStatus({
+          id: engineeringDeliveryListId,
+          statusId,
+        });
 
-      update_finalProduce();
+        update_finalProduce();
 
-      // return true;
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '刪除失敗', content: err.message });
-    }
+        // return true;
+      } catch (error) {
+        const err = error as Error;
+        myAlert.err({ title: '刪除失敗', content: err.message });
+      }
+    };
+
+    myAlert.confirm({
+      //
+      title: '確定刪除?',
+      props: {
+        onOk: call,
+      },
+    });
   };
 
   const reqPatchNotes = async () => {

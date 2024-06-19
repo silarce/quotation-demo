@@ -90,6 +90,7 @@ const erpFeaturesLookup = {
   accountingDepartment: '會計部',
   worksDepartment_worksheet: '工務部-工作表編輯',
   worksDepartment_deliveryList: '工務部-出庫單編輯',
+  incomeBill: '收入傳票',
 } as const;
 
 // key:value逆轉版本的erpFeaturesLookup
@@ -113,19 +114,20 @@ const {
   accountingDepartment,
   worksDepartment_worksheet,
   worksDepartment_deliveryList,
+  incomeBill,
 } = erpFeaturesLookup;
 
 /** "allPass" 即使沒有任何權限也pass */
 /** allPass 至少有一個權限就pass */
-const allPass = [
-  BasicDataCreation,
-  HRAuthoritySetup,
-  legacyContractIntegration,
-  domestic,
-  statisticsTable,
-  worksDepartment,
-  accountsReceivable,
-];
+// const allPass = [
+//   BasicDataCreation,
+//   HRAuthoritySetup,
+//   legacyContractIntegration,
+//   domestic,
+//   statisticsTable,
+//   worksDepartment,
+//   accountsReceivable,
+// ];
 
 /**未決定權限的page會放這個，NEXT_PUBLIC_NAV_DEV_PERMISSIONS基本上會是"allPass"" */
 // const devPass: TtopPathListConfig["erpFeature"] = (process.env.NEXT_PUBLIC_NAV_DEV_PERMISSIONS ?? []) as TtopPathListConfig["erpFeature"]
@@ -418,12 +420,26 @@ const sidePathList: TsidePathList = {
         {
           label: '合約',
           path: path01 + '/contractList',
-          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
+          erpFeature: [
+            //
+            worksDepartment,
+            accountsReceivable,
+            worksDepartment_worksheet,
+            worksDepartment_deliveryList,
+            domestic,
+          ],
         },
         {
           label: '合約(年度)',
           path: path01 + '/yearContractList',
-          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
+          erpFeature: [
+            //
+            worksDepartment,
+            accountsReceivable,
+            worksDepartment_worksheet,
+            worksDepartment_deliveryList,
+            domestic,
+          ],
         },
         {
           label: '外包廠商管理',
@@ -444,6 +460,11 @@ const sidePathList: TsidePathList = {
           label: '會計收款管理',
           path: path01 + '/collection',
           erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
+        },
+        {
+          label: '收入傳票',
+          path: path01 + '/incomeSummons',
+          erpFeature: [incomeBill],
         },
         // {
         //   label: '新增派工單',
@@ -640,7 +661,14 @@ const topPathList: TtopPathListConfig[] = [
     href: {
       pathname: sidePathList['/worksDepartment'].path01 + '/contractList',
     },
-    erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
+    erpFeature: [
+      worksDepartment,
+      accountsReceivable,
+      worksDepartment_worksheet,
+      worksDepartment_deliveryList,
+      domestic,
+      incomeBill,
+    ],
   },
   {
     icon: icon_project,

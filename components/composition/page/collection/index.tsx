@@ -869,6 +869,7 @@ const lookup_keyArr: {
   票據: [
     ...baseArr_before,
     'noteNumber',
+    'importAccountingNumber',
     'accountingNumber',
     'vendorName',
     'noteMaturityDate',
@@ -997,18 +998,32 @@ const configList: TconfigList = {
     inputSelPropsCreator: ({ disabled, bankAccountOptionArr, value, setState_accountant }) => {
       const value_str = (value as string) || '';
 
-      const selectProps: TselectProps = {
+      // const selectProps: TselectProps = {
+      //   props: {
+      //     isSearchable: true,
+      //     options: bankAccountOptionArr,
+      //     value: value_str ? { label: value_str, value: value_str } : null,
+      //     onChange: (option) => {
+      //       setState_accountant((state) => ({ ...state, ['accountingNumber']: option?.value ?? '' }));
+      //     },
+      //   },
+      // };
+
+      const inputProps: TinputProps = {
         props: {
-          isSearchable: true,
-          options: bankAccountOptionArr,
-          value: value_str ? { label: value_str, value: value_str } : null,
-          onChange: (option) => {
-            setState_accountant((state) => ({ ...state, ['accountingNumber']: option?.value ?? '' }));
+          placeholder: '請選擇',
+          type: 'text',
+          value: value_str,
+          onChange: (e) => {
+            setState_accountant((state) => ({ ...state, ['accountingNumber']: e.target.value }));
           },
         },
       };
 
-      return { selectProps };
+      return {
+        //  selectProps
+        inputProps,
+      };
     },
   },
   //
@@ -1035,7 +1050,7 @@ const configList: TconfigList = {
     },
   },
   importAccountingNumber: {
-    label: '匯入帳號',
+    label: '付款帳號',
     style: {
       width: 120,
     },

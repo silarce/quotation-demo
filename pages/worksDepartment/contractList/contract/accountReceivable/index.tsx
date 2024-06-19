@@ -70,6 +70,8 @@ import {
   apiPostAccountReceivablePeriod, // 新增應收帳款發票
   apiPatchAccountantInvoice,
   // apiPatchAccountReceivableDeduction_accountant, // 批量更新 應收帳款 扣款明細
+  apiDeleteAccountReceivableInvoice,
+  apiDeleteAccountReceivablePeriod,
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
@@ -393,7 +395,29 @@ export default function AccountReceivable() {
     update_contract();
   };
 
-  // --------------------------------------------------------------------------
+  // MARK: reqDeleteInvoice
+  const reqDeleteInvoice = async (invoiceId: string) => {
+    try {
+      setIsFetching_req(true);
+      await apiDeleteAccountReceivableInvoice(invoiceId);
+      await update_contract();
+    } catch (error) {
+    } finally {
+      setIsFetching_req(false);
+    }
+  };
+
+  // apiDeleteAccountReceivablePeriod
+  const reqDeletePeriod = async (periodId: string) => {
+    try {
+      setIsFetching_req(true);
+      await apiDeleteAccountReceivablePeriod(periodId);
+      await update_contract();
+    } catch (error) {
+    } finally {
+      setIsFetching_req(false);
+    }
+  };
 
   // --------------------------------------------------------------------------
 
@@ -456,13 +480,13 @@ export default function AccountReceivable() {
         <DeductionDetail className="mt-10 snap-center" periodArr={periodArr} />
 
         <PeriodTable
-          className="mt-10 snap-center"
+          className="mt-10 snap-end"
           data_finalProdcut={data_finalProdcut}
           data_period={accountReceivable.periods}
-          // reqAddInvoice={reqAddInvoice}
-          // reqPatchInvoiceArr={reqPatchInvoiceArr}
           onAddConfirm={reqAddInvoice}
           reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
+          reqDeleteInvoice={reqDeleteInvoice}
+          reqDeletePeriod={reqDeletePeriod}
         />
       </div>
     </SubLayer>
