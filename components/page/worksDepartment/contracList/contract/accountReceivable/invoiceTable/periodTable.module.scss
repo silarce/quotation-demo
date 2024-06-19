@@ -6,6 +6,8 @@ $rowGap: 10px;
 // $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固定高度
 $invoiceHeight: fit-content;
 $tfootHeight: 496px; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
+$deleteBarHeight: 36px;
+// $tfootHeight: fit-content; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
 
 .invoiceTable {
   // width: fit-content;
@@ -152,6 +154,15 @@ $tfootHeight: 496px; // left沒有Tfoot，所以直接放一個div然後設高�
   .row {
     justify-items: flex-end;
   }
+}
+
+.deleteBar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  height: $deleteBarHeight;
+  margin-top: 30px;
+  margin-bottom: 20px;
 }
 
 .checkBar {
