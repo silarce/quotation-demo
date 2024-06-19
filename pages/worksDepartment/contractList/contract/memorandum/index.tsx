@@ -71,7 +71,11 @@ export default function Memorandum() {
     },
   };
 
-  const { data: data_memorandum, update: update_memorandum } = useGetMemorandum<{
+  const {
+    isFetching: isFetching_memorandum,
+    data: data_memorandum,
+    update: update_memorandum,
+  } = useGetMemorandum<{
     poster: true;
     recipient: true;
   }>(contractId, { customParams: params });
@@ -282,7 +286,7 @@ export default function Memorandum() {
 
   // ---------------------------------------------------------------------------
   return (
-    <SubLayer bodyOverflowY="scroll">
+    <SubLayer bodyOverflowY="scroll" isLoading_subLayer={isFetching_memorandum}>
       <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
       <div>
         <Wrapper_tab
