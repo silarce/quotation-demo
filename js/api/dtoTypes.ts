@@ -3072,6 +3072,8 @@ export type TexchangeDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
+
+  sheetNumber: string | null; // 調貨單編號
   dispatchDate: string; // date // 填表日期
   requirementsDate: string; // date // 需要日期
   projectNumber: string; // 工程編號
@@ -3094,6 +3096,7 @@ export type TexchangeDto = {
 };
 
 export type TcreateExchgangeDto = {
+  sheetNumber: string; // 調貨單編號
   dispatchDate: string; // date // 填表日期
   requirementsDate: string; // date // 需要日期
   projectNumber: string; // 工程編號
