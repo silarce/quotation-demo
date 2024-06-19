@@ -351,13 +351,16 @@ export default function EditWHPosition() {
                     (whname === "103") ? "Device3" : "";
             const traynumber = trayname;
             const traycommand = "100";
+            const url=(whname === "101") ? "http://192.168.1.8/sjwms/" :
+            (whname === "102") ? "http://192.168.1.9/sjwms/" :
+                (whname === "103") ? "http://192.168.1.10/sjwms/" : "";
 
             // execcommand 的參數
             const regaddress = '253';
             const cmdvalue = '1';
 
             // 呼叫 traycommand API
-            const response = await fetch(`${setting.apipath}Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
+            const response = await fetch(`${url}Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -371,7 +374,7 @@ export default function EditWHPosition() {
             console.log(response);
 
             // 呼叫 execcommand API
-            const response2 = await fetch(`${setting.apipath}Modbus/execcommand?deviceName=${deviceName}&regaddress=${regaddress}&cmdvalue=${cmdvalue}`, {
+            const response2 = await fetch(`${url}Modbus/execcommand?deviceName=${deviceName}&regaddress=${regaddress}&cmdvalue=${cmdvalue}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
