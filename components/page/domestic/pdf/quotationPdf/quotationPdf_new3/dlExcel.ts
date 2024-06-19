@@ -67,9 +67,9 @@ const dlExcel = async ({
     const { value, label } = payway;
 
     if (!value) {
-      return `           ${index + 1}. ${label} ________%`;
+      return `      ${index + 1}. ${label} ________%`;
     } else {
-      return `           ${index + 1}. ${label}      ${value}     %`;
+      return `      ${index + 1}. ${label}      ${value}     %`;
     }
   });
 

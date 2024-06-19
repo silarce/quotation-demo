@@ -59,6 +59,8 @@ import type {
   TperiodType,
   TpageResponse,
   TaccountsReceivableInvoiceDto,
+  TincomeBillSerialDto,
+  TupdateIncomeBillSerialDto,
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
@@ -113,6 +115,8 @@ export type {
   TdeliveryStatusInstallationItem,
   TaccountsReceivableInvoiceDto,
   //
+  TincomeBillSerialDto,
+  TupdateIncomeBillSerialDto,
 } from './dtoTypes';
 
 export type { TinvouceCheckResult };
@@ -1886,5 +1890,33 @@ export const apiDeleteAccountReceivablePeriod = async (id: string) => {
       myAlert.err({ title: '刪除應收帳款期數失敗', content: err.message });
 
       return Promise.reject(err);
+    });
+};
+
+export const apiGetAccountReceivableIncomeBills = async (params?: Tparams) => {
+  const api = '/engineering/account-receivable/income-bills';
+
+  return axi
+    .get<TpageResponse<TincomeBillSerialDto>>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountReceivableIncomeBills = createUseInfinite<TpageResponse<TincomeBillSerialDto>>({
+  apiClient: apiGetAccountReceivableIncomeBills,
+  errTitle: '取得應收帳款收款明細列表失敗',
+});
+
+export const apiPatchIncomeBill = async (id: string, body: TupdateIncomeBillSerialDto) => {
+  const api = `/engineering/account-receivable/income-bill/${id}`;
+
+  return axi
+    .patch<TincomeBillSerialDto>(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '更新收款明細失敗', content: err.message });
+
+      Promise.reject(error);
     });
 };

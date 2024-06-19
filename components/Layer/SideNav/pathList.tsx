@@ -445,6 +445,11 @@ const sidePathList: TsidePathList = {
           path: path01 + '/collection',
           erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
+        {
+          label: '收入傳票',
+          path: path01 + '/incomeSummons',
+          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
+        },
         // {
         //   label: '新增派工單',
         //   path: path01 + '/addDispatch',
