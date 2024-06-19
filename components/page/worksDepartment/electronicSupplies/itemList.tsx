@@ -23,6 +23,7 @@ type TproductItemList = {
 
 export default function ItemList({ itemList }: { itemList: TproductItemList | undefined }) {
   //
+
   const control_table: Ttable = useMemo(() => {
     const thead: Ttable['thead'] = {
       cellArr: keysArr.map((key) => {
@@ -88,8 +89,7 @@ export default function ItemList({ itemList }: { itemList: TproductItemList | un
     });
 
     const tbody: Ttable['tbody'] = {
-      // rowArr: tbodyRowArr,
-      rowArr: [...tbodyRowArr, ...tbodyRowArr, ...tbodyRowArr],
+      rowArr: tbodyRowArr,
     };
 
     return { thead, tbody };

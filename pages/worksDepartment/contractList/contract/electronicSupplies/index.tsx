@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -19,7 +20,7 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
 
 // api
-import { useGetContract_id } from 'js/api/api_quotation';
+import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 // import { useGetEngineeringContact, useGetElectronicSupplies } from 'js/api/api_engineering';
 
 import { Icon_info } from 'public/image/icon/svgComponent/svgIcons';
@@ -46,6 +47,13 @@ type TproductItemList = {
   };
 };
 
+type TdoorQtySubTotalList = {
+  [doorModelName: string]: {
+    doorModelName: string;
+    qty: number;
+  };
+};
+
 // ------------------------------------------------------------------
 
 export default function ElectronicSupplies() {
@@ -67,64 +75,76 @@ export default function ElectronicSupplies() {
     projectContent = '',
     projectNumber = '',
   } = contract?.engineeringContact ?? {};
-  // ------------------------------------------------------------------
 
-  // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
-
-  // const { itemList, doorQtySubTotal, doorQtyTotal } = useMemo(() => {
-  //   if (!worksheet?.latestRecord.contractProductItems) {
-  //     return {};
-  //   }
-
-  //   const itemList: TproductItemList = {};
-  //   const doorQtySubTotal: { [key: string]: number } = {};
-  //   let doorQtyTotal = 0;
-
-  //   const { itemTokenList, itemIdArrList } = workSheetReducer({ worksheet });
-
-  //   Object.keys(itemIdArrList).forEach((idKey) => {
-  //     const list = itemTokenList[idKey];
-
-  //     for (const [key, value] of Object.entries(list)) {
-  //       if (key === 'originalItem') {
-  //         continue;
-  //       }
-
-  //       const qty = itemIdArrList[idKey][key].length;
-
-  //       const doorType = value.doorModelName;
-
-  //       if (!doorQtySubTotal[doorType]) {
-  //         doorQtySubTotal[doorType] = qty;
-  //       } else {
-  //         doorQtySubTotal[doorType] += qty;
-  //       }
-
-  //       doorQtyTotal += qty;
-
-  //       itemList[key] = {
-  //         productItem: value,
-  //         qty,
-  //       };
-  //     }
-  //   });
-
-  //   return {
-  //     itemTokenList,
-  //     itemIdArrList,
-  //     itemList,
-  //     doorQtySubTotal,
-  //     doorQtyTotal,
-  //   };
-  // }, [worksheet]);
+  const { data: data_finalProductItem, update: update_finalProductItem } =
+    useGetContract_id_finalProductItem(contractId);
 
   // ------------------------------------------------------------------
 
-  useEffect(() => {
-    update();
-  }, []);
+  const { worksheetItemList, doorQtySubTotalList, doorQtyTotal } = useMemo(() => {
+    if (!data_finalProductItem) {
+      return {};
+    }
+
+    const doorQtySubTotalList: TdoorQtySubTotalList = {};
+    let doorQtyTotal = 0;
+
+    // 路徑
+    // data_finalProductItem[number].items['number'].latestWorksheetItem
+    // 以items['number'].worksheetId分類，
+    // items['number'].worksheetId一樣的latestWorksheetItem，除了id外內容都是一樣的
+    // const data_finalProductItem_sorted = _.sortBy(data_finalProductItem, 'order');
+
+    const data_finalProductItem_sorted = _.sortBy(data_finalProductItem, 'order');
+    const worksheetItemList: TproductItemList = {};
+
+    const itemArr = data_finalProductItem_sorted
+      .map((prod) => {
+        return prod.items;
+      })
+      .flat();
+
+    itemArr.forEach((item) => {
+      const { latestWorksheetItem, worksheetId } = item;
+
+      if (!worksheetId || !latestWorksheetItem) {
+        return;
+      }
+
+      if (!worksheetItemList[worksheetId]) {
+        worksheetItemList[worksheetId] = {
+          productItem: latestWorksheetItem,
+          qty: 1,
+        };
+      } else {
+        worksheetItemList[worksheetId].qty += 1;
+      }
+
+      const { doorModelName } = latestWorksheetItem;
+
+      if (!doorQtySubTotalList[doorModelName]) {
+        doorQtySubTotalList[doorModelName] = {
+          doorModelName,
+          qty: 1,
+        };
+      } else {
+        doorQtySubTotalList[doorModelName].qty += 1;
+      }
+
+      doorQtyTotal += 1;
+    });
+
+    return {
+      worksheetItemList,
+      doorQtySubTotalList,
+      doorQtyTotal,
+    };
+  }, [data_finalProductItem]);
 
   // ------------------------------------------------------------------
+
+  // MARK: PROPS
+
   const panelList_receiveHistory: TpanelList = [
     {
       type: 'addButton',
@@ -197,11 +217,21 @@ export default function ElectronicSupplies() {
   ];
 
   // ------------------------------------------------------------------
+  // MARK: useEffect
+
+  useEffect(() => {
+    update();
+    update_finalProductItem();
+  }, []);
+
+  // ------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SubLayer>
       <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? '---'} />
-      <div className={scss.container}>
+      <div className={scss.contain1er}>
         <div className={scss.info}>
           <InputSel
             caption="工程編號"
@@ -228,7 +258,7 @@ export default function ElectronicSupplies() {
             }}
           />
           {/* // !因為worksheet資料結構改變，這段程式碼不能用了，先註解 */}
-          {/* <InputSel
+          <InputSel
             caption="門型數量"
             showBaseline="invisible"
             captionStyle={{ width: '80px' }}
@@ -239,8 +269,8 @@ export default function ElectronicSupplies() {
                 readOnly: true,
               },
             }}
-            suffix={<Info doorQtySubTotal={doorQtySubTotal} />}
-          /> */}
+            suffix={<Info doorQtySubTotal={doorQtySubTotalList} />}
+          />
           <InputSel
             caption="領料狀態"
             showBaseline="invisible"
@@ -263,8 +293,7 @@ export default function ElectronicSupplies() {
           //   top: '50px',
           // }}
         >
-          {/* // !因為worksheet資料結構改變，這段程式碼不能用了，先註解 */}
-          {/* {listName === 'itemList' && <ItemList itemList={itemList} />} */}
+          {listName === 'itemList' && <ItemList itemList={worksheetItemList} />}
           {listName === 'supplyList' && <SupplyList />}
           {listName === 'receiveHistory' && <ReceivedHistory />}
           {listName === 'demandHistory' && <DemandHistory />}
@@ -275,14 +304,14 @@ export default function ElectronicSupplies() {
 }
 // ===========================================================
 
-const Info = ({ doorQtySubTotal }: { doorQtySubTotal: { [key: string]: number } | undefined }) => {
+const Info = ({ doorQtySubTotal }: { doorQtySubTotal: TdoorQtySubTotalList | undefined }) => {
   const Content = (
     <ul>
       {Object.keys(doorQtySubTotal ?? {}).map((key, index) => {
         return (
           <li key={index} className="flex gap-3">
             <span>{key}</span>
-            <span>{doorQtySubTotal![key]}樘</span>
+            <span>{doorQtySubTotal![key].qty}樘</span>
           </li>
         );
       })}

@@ -1619,7 +1619,7 @@ export type TquotationProductItemDto = {
   deliveryStatusType: TdeliveryStatus;
   // 外包單堂計價
   itemPrice: number | null;
-  // 工作表id
+  // 工作表id 所屬工作表id 在工作表介面下被分堆後，同一堆的item應該會有同樣的工作表id
   worksheetId: string | null;
   // 工作表紀錄id
   worksheetRecordId: string | null;
