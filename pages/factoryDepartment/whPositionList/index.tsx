@@ -12,6 +12,7 @@ import { TpanelList } from 'components/PageHeader/PageHeader02/PanelList';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import { quotationStatusLookup } from 'config/lookupTable';
 import PageHeader02, { Toption } from 'components/PageHeader/PageHeader02/PageHeader02';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 
 type Tquery = {
@@ -20,13 +21,15 @@ type Tquery = {
 
 
 export default function WHPositionList() {
+    const router = useRouter();
+    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer } = router.query;
+
 
     const [data, setData] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null); // 将 error 的类型更改为 Error | null
+    const [traycalledin, setTrayCalled] = useState<boolean>(traycalled === 'true');
 
 
-    const router = useRouter();
-    const { type, whid, trayname, whname } = router.query;
     const status = router.query.status as TquotationStatus;
     // const traycode =router.query.whid as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
@@ -68,14 +71,23 @@ export default function WHPositionList() {
             type: 'myButton',
             label: '返回',
             onClick: () => {
-                router.push({
-                    pathname: `/factoryDepartment/trayList`,
-                    query: {
-                        type: 'WareHouse',
-                        whid: whid,
-                        whname: whname
-                    }
-                });
+                // alert(traycalledin);
+                if (traycalledin === true) {
+                    myAlert.warning({ title: '請先收回托盤' });
+                } else {
+
+                    router.push({
+                        pathname: `/factoryDepartment/trayList`,
+                        query: {
+                            type: 'WareHouse',
+                            whid: whid,
+                            whname: whname,
+                            traycalled: traycalled,
+                            traycalledname: traycalledname,
+                            traytransfer: traytransfer
+                        }
+                    });
+                }
             },
         },
     ];
@@ -164,7 +176,7 @@ export default function WHPositionList() {
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫名稱：' + whname + '｜托盤名稱：' + trayname} panelList={panelList} />
             <div>
                 <Thead01 type={'WHPosition'} />
-                <Tbody01 type={'WHPosition'} data={data} error={error} />
+                <Tbody01 type={'WHPosition'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} />
             </div>
         </SubLayer>
     )

@@ -21,12 +21,12 @@ type Tquery = {
 
 // export default function WareHouseList({type}:ListType) {
 export default function TrayList() {
+    const router = useRouter();
+    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer } = router.query;
 
     const [data, setData] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null); // 将 error 的类型更改为 Error | null
 
-    const router = useRouter();
-    const { type, whid, whname } = router.query;
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
@@ -162,7 +162,7 @@ export default function TrayList() {
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname} panelList={panelList} />
             <div>
                 <Thead01 type={'Tray'} />
-                <Tbody01 type={'Tray'} data={data} error={error} />
+                <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} />
             </div>
             {/* </> */}
         </SubLayer>

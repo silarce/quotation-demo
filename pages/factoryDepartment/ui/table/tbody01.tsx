@@ -12,9 +12,12 @@ interface TbodyProps {
   data: any[];
   error: any;
   type: string; // Add type here
+  traycalled: any;
+  traycalledname: any;
+  traytransfer: any;
 }
 
-export default function Tbody01({ data, error, type }: TbodyProps) { // Add type to props
+export default function Tbody01({ data, error, type, traycalled, traycalledname, traytransfer }: TbodyProps) { // Add type to props
 
 
   async function getTrayByWareHouse(whid: any, whname: any) {
@@ -39,7 +42,10 @@ export default function Tbody01({ data, error, type }: TbodyProps) { // Add type
         type: 'WHPosition',
         whid: whid,
         trayname: trayname,
-        whname: whname
+        whname: whname,
+        traycalled:traycalled,
+        traycalledname:traycalledname,
+        traytransfer:traytransfer
       },
     });
 
@@ -53,7 +59,10 @@ export default function Tbody01({ data, error, type }: TbodyProps) { // Add type
         whid: whid,
         trayname: trayname,
         whname: whname,
-        id: id
+        id: id,
+        traycalled:traycalled,
+        traycalledname:traycalledname,
+        traytransfer:traytransfer
       },
     });
 

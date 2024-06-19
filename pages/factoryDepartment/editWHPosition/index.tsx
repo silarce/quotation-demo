@@ -48,21 +48,28 @@ export interface WHPositionModel {
 
 
 export default function EditWHPosition() {
+    // 路由傳進來的
+    const router = useRouter();
+    const { type, whid, trayname, whname, id, traycalled, traycalledname, traytransfer } = router.query;
+
     //備分原本model
     const [data, setData] = useState<WHPositionModel>([]);
     const [data1, setData1] = useState<WHPositionModel>([]);
     const [data11, setData11] = useState<any[]>([]);
-    const [error, setError] = useState<string | null>(null); // 将 error 的类型更改为 Error | null
+    const [error, setError] = useState<string | null>(null);
     const [hoverInfo, setHoverInfo] = useState<string | null>(null);
     const [canedit, setCanEdit] = useState<boolean | undefined>(false);
-    const [traycalled, setTrayCalled] = useState<boolean | undefined>(false);
+    // const [traycalledin, setTrayCalled] = useState<boolean | undefined>(false);
+    // const [traycallednamein, setTrayCalledName] = useState<string | undefined>("");
+    // const [traytransferin, setTrayTransfer] = useState<boolean | undefined>(false);
+    const [traycalledin, setTrayCalled] = useState<boolean>(traycalled === 'true');
+    const [traycallednamein, setTrayCalledName] = useState<string | undefined>(traycalledname?.toString() ?? "");
+    const [traytransferin, setTrayTransfer] = useState<boolean>(traytransfer !== trayname ?? false);
 
     const [mouseX, setMouseX] = useState('0px');
     const [mouseY, setMouseY] = useState('0px');
 
 
-    const router = useRouter();
-    const { type, whid, trayname, whname, id } = router.query;
     const status = router.query.status as TquotationStatus;
     // const traycode =router.query.whid as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
@@ -75,7 +82,7 @@ export default function EditWHPosition() {
     //還沒編輯前功能紐
     const panelList_unedit: TpanelList = canedit ? [
         {
-            type: 'myButton',
+            type: 'redButton',
             label: '編輯',
             onClick: () => {
                 setDisabled(false);
@@ -83,7 +90,7 @@ export default function EditWHPosition() {
         },
         {
             type: 'myButton',
-            label: `${!!wareHouseId ? '取消' : '返回'}`,
+            label: '返回',
             onClick: () => {
                 router.push({
                     pathname: `/factoryDepartment/whPositionList`,
@@ -91,7 +98,10 @@ export default function EditWHPosition() {
                         type: 'WareHouse',
                         whid: whid,
                         trayname: trayname,
-                        whname: whname
+                        whname: whname,
+                        traycalled: traycalled,
+                        traycalledname: traycalledname,
+                        traytransfer: traytransfer
                     }
                 });
             },
@@ -100,7 +110,7 @@ export default function EditWHPosition() {
 
         {
             type: 'myButton',
-            label: `${!!wareHouseId ? '取消' : '返回'}`,
+            label: '返回',
             onClick: () => {
                 router.push({
                     pathname: `/factoryDepartment/whPositionList`,
@@ -108,7 +118,10 @@ export default function EditWHPosition() {
                         type: 'WareHouse',
                         whid: whid,
                         trayname: trayname,
-                        whname: whname
+                        whname: whname,
+                        traycalled: traycalledin,
+                        traycalledname: traycallednamein,
+                        traytransfer: traytransferin
                     }
                 });
             },
@@ -117,7 +130,7 @@ export default function EditWHPosition() {
 
 
     //點選編輯後功能紐
-    const panelList_edit: TpanelList = canedit ? [
+    const panelList_edit: TpanelList = [
         {
             type: 'myButton',
             label: '儲存',
@@ -153,52 +166,8 @@ export default function EditWHPosition() {
                 handleRestore();
             },
         },
-    ] : [
-        {
-            type: 'redButton',
-            label: '收回托盤：' + trayname,
-            onClick: () => {
-                setDisabled(false);
-                CallTray();
-            },
-        },
-        {
-            type: 'myButton',
-            label: '返回',
-            onClick: () => {
-                setDisabled(true);
-                handleRestore();
-            },
-        },
     ];
 
-    //點選呼叫托盤後功能紐
-    const panelList_calltray: TpanelList = [
-
-        {
-            type: 'redButton',
-            label: '收回托盤',
-            onClick: () => {
-                setDisabled(true);
-                // callTrayBack();
-            },
-        },
-        {
-            type: 'myButton',
-            label: `${!!wareHouseId ? '取消' : '返回'}`,
-            onClick: () => {
-                router.push({
-                    pathname: `/factoryDepartment/whPositionList`,
-                    query: {
-                        type: 'WareHouse',
-                        whid: whid,
-                        trayname: trayname,
-                        whname: whname
-                    }
-                });
-            },
-        },
-    ];
 
 
 
@@ -369,41 +338,56 @@ export default function EditWHPosition() {
             setIsLoading(false);
         }
     };
-
+    //#region 呼叫托盤
     const CallTray = async () => {
         try {
-            alert("開始呼叫托盤");
-            // const conditionModel: { whid: string | undefined; trayname: string | undefined; id: string | undefined } = {
-            //     whid: whid as string | undefined,
-            //     trayname: trayname as string | undefined,
-            //     id: id as string | undefined
-            // };
+            if (traycalledin === true) {
+                myAlert.warning({ title: '請先收回托盤' });
+            } else {
+                myAlert.confirm({
+                    title: `呼叫托盤: ${trayname}`,
+                    content:'!!請勿靠近設備!!',
+                    props: {
+                        onOk: () => {
+                            alert("呼叫中");
+                            setTrayCalled(true);
+                            setTrayCalledName(data1.trayname);
+                        }
+                    }
+                });
 
-            // // const inputModel = {
-            // //     TypeName: 'ERP',
-            // //     ServiceName: 'WareHouseService',
-            // //     FunctionName: 'test',
-            // //     FilterConditions: JSON.stringify(conditionModel),
-            // // };
-            // const DeviceName = 'Device1';
-            // // const Tray
-
-            // const queryParams = new URLSearchParams({ Device: DeviceName }).toString();
-            // const response = await fetch(`https://localhost:44383/WareHouse/GetTrayLayOutById?${queryParams}`);
-            // if (!response.ok) {
-            //     throw new Error('Failed to fetch data');
-            // }
-
-            // const responseData = await response.json();
-            // console.log(responseData);
-
-            // setData11(responseData);
-
+            }
         } catch (error: any) {
             setError(error.message);
         }
     };
 
+    const CallTrayBack = async () => {
+        if (traycalledin != true) {
+            myAlert.warning({ title: '目前無托盤可收回' });
+        } else {
+            myAlert.confirm({
+                title: `收回托盤: ${trayname}`,
+                content:'!!請勿靠近設備!!',
+                props: {
+                    onOk: () => {
+                        alert("收回中");
+                        setTrayCalledName('');
+                        setTrayCalled(false);
+                    }
+                }
+            });
+        }
+    }
+
+    // 領料才需要
+    const CallTrayChange = async () => {
+        alert("交換托盤");
+        // setTrayCalledName(trayname);
+    }
+
+
+    //#endregion
     //#endregion
 
     //#region model 作動區塊
@@ -435,7 +419,7 @@ export default function EditWHPosition() {
                 whid: whid,
                 trayname: trayname,
                 whname: whname,
-                id: id
+                id: id,
             },
         });
 
@@ -452,7 +436,9 @@ export default function EditWHPosition() {
             {/* <div style={{ display: !disabled ? 'block' : 'none', position: 'absolute', top: '0', left: '1%', transform: 'translateX(0%)', zIndex: '999' }}>編輯中....</div> */}
             {/* {hoverInfo && <div style={{ position: 'absolute', top: '55%', left: '50%', transform: 'translateX(0%)', zIndex: '999' }}>{hoverInfo}</div>} */}
 
-
+            {/* 托盤名稱:{trayname}<br />
+            是否有托盤呼叫中:{traycalledin === true ? 'true' : 'false'}<br />
+            呼叫中的托盤名稱:{traycalledname}<br /> */}
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div className={scss.top}>
@@ -524,7 +510,7 @@ export default function EditWHPosition() {
                             // disabled={true}
                             inputProps={{
                                 props: {
-                                    value: data1?.unit ? data1.unit : ' ',  // 如果 data1.unit 為空字串、null 或 undefined，則顯示 '無'
+                                    value: data1?.unit ? data1.unit : ' ',
                                     onChange: (e) => handleChange('unit', e.target.value),
                                 },
                             }}
@@ -536,26 +522,28 @@ export default function EditWHPosition() {
                             disabled={true}
                             inputProps={{
                                 props: {
-                                    value: data1.trayname,
+                                    value: data1?.trayname ? data1.trayname : ' ',
                                     // onChange: (e) => handleChange('trayname', e.target.value),
                                 },
                             }}
                         />
-                        <div className={scss.top} style={{ display: traycalled === true ? 'none' : '' }}>
-                            <MyButton_v2 disabled={traycalled} theme='danger' className={scss.addBtn} label="呼叫托盤" onClick={() => { alert("呼叫托盤"); setTrayCalled(true); }} />
+                        <div className={scss.top} style={{ display: traycalledin === true ? 'none' : '' }}>
+                            <MyButton_v2 theme='danger' className={scss.addBtn} label="呼叫托盤" onClick={() => { CallTray(); }} />
                         </div>
-                        <div className={scss.top} style={{ display: traycalled === true ? '' : 'none' }}>
-                            <MyButton_v2 disabled={disabled} theme='danger' className={scss.addBtn} label="收回托盤" onClick={() => { alert("收回托盤"); setTrayCalled(false); }} />
+                        <div className={scss.top} style={{ display: traycalledin === true ? '' : 'none' }}>
+                            <MyButton_v2 theme='danger' className={scss.addBtn} label="收回托盤" onClick={() => { CallTrayBack(); }} />
                         </div>
+                        {/* <div className={scss.top} style={{ display: traycalled === true && traytransfer === false ? '' : 'none' }}>
+                            <MyButton_v2 theme='danger' className={scss.addBtn} label="收回托盤" onClick={() => { CallTrayBack(); }} />
+                        </div> */}
+                        {/* <div className={scss.top} style={{ display: traycalled === true && traytransfer === true ? '' : 'none' }}>
+                            <MyButton_v2 theme='danger' className={scss.addBtn} label="交換托盤" onClick={() => { CallTrayChange(); }} />
+                        </div> */}
                         {/* </div> */}
                     </div>
                 </div>
                 <div className={scss.right}>
-                    {/* <div className={scss.content}>
-                        這是一個新的區塊，可以用來放其他內容。
-                    </div> */}
                     <div className={scss.content}>
-                        {/* 測試新的 */}
                         {data11.map((Data) => (
                             <table className={scss.traytable} style={{ border: 'solid 1px black' }}>
                                 <tbody>
@@ -572,8 +560,7 @@ export default function EditWHPosition() {
                                                                             onClick={() => handlechangewhposition(childDataItem.id, childDataItem.whid, childDataItem.trayname, childDataItem.whname)}
                                                                             style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
                                                                             onMouseEnter={() => setHoverInfo(`${childDataItem.whpname}\n${childDataItem.spec}\n${childDataItem.quantity}`)}
-                                                                            onMouseLeave={() => setHoverInfo(null)}
-                                                                        >
+                                                                            onMouseLeave={() => setHoverInfo(null)}>
                                                                             {childDataItem.width}<br />
                                                                         </button>
                                                                     </td>
@@ -588,7 +575,6 @@ export default function EditWHPosition() {
                                 </tbody>
                             </table>
                         ))}
-                        {/* {hoverInfo && <div style={{ backgroundColor:'white',position: 'absolute', top: '55%', left: '50%', transform: 'translateX(0%)', zIndex: '999' }}>{hoverInfo}</div>} */}
                         {hoverInfo && (
                             <div
                                 style={{
@@ -602,17 +588,14 @@ export default function EditWHPosition() {
                                     boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
                                     zIndex: '999',
                                     whiteSpace: 'pre-line', // 控制換行的 CSS 屬性
-                                    fontSize:'16px'
+                                    fontSize: '16px'
                                 }}
                             >
                                 {hoverInfo}
                             </div>
                         )}
-
                     </div>
-
                 </div >
-
             </div >
         </SubLayer >
     )
