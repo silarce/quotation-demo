@@ -200,6 +200,24 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         )}
       </div>
     );
+  } else if (type === "GetMatWarehouseList") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader5}>
+              <div className={scss.row01}>
+                <span>{_item.whname}</span>
+                <span>{_item.trayname}</span>
+                <span> </span>
+                <span ><IconDetail onClick={() => {alert("ok")}}/></span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
   }
 
   return null; // Add default return in case type is not matched

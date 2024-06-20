@@ -33,6 +33,7 @@ export default function MaterialList() {
     const { userInfo } = useContext(AppContext);
 
     const [data, setData] = useState<any[]>([]);
+    const [data1, setData1] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     const status = router.query.status as TquotationStatus;
@@ -61,14 +62,19 @@ export default function MaterialList() {
 
         // alert(keywordWhpname + "-" + keywordMaterialnumber + "-" + keywordSpec);
 
-        if (keywordWhpname === '' || keywordWhpname === undefined &&
-            keywordMaterialnumber === '' || keywordMaterialnumber === undefined &&
-            keywordSpec === '' || keywordSpec === undefined) {
-            fetchData();
-        } else {
-            searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
-        }
-      };
+
+        // alert(keywordWhpname==='');
+
+        // if (keywordWhpname === '' || keywordWhpname === undefined &&
+        //     keywordMaterialnumber === '' || keywordMaterialnumber === undefined &&
+        //     keywordSpec === '' || keywordSpec === undefined) {
+        //     fetchData();
+        // } else {
+        searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
+        // }
+    };
+
+
 
 
     const searchGroup = {
@@ -124,9 +130,10 @@ export default function MaterialList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
+            let data = await response.json();
             setData(data);
-            console.log(userInfo);
+            data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
+            setData1(data);
         } catch (error: any) {
             setError(error.message);
         }
@@ -159,8 +166,10 @@ export default function MaterialList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
+            let data = await response.json();
             setData(data);
+            data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
+            setData1(data);
 
 
         } catch (error: any) {
@@ -174,7 +183,7 @@ export default function MaterialList() {
 
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={quotationStatusLookup[status] ?? '物料查詢'} panelList={panelList} />
-            
+
             <div className={scss.main}>
                 <div className={scss.left}>
                     {/* <div className={scss.top}> */}
@@ -186,42 +195,8 @@ export default function MaterialList() {
                 </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        {/* <InputSel
-                            {...inputSelProps}
-                            caption="物料名稱"
-                            disabled={false}
-                            // disabled={true}
-                            inputProps={{
-                                props: {
-                                    value: '',
-                                    onChange: (e) => {alert("OK")},
-                                },
-                            }}
-                        />
-                                            <InputSel
-                            {...inputSelProps}
-                            caption="物料編碼"
-                            disabled={false}
-                            // disabled={true}
-                            inputProps={{
-                                props: {
-                                    value: '',
-                                    onChange: (e) => {alert("OK")},
-                                },
-                            }}
-                        />
-                                            <InputSel
-                            {...inputSelProps}
-                            caption="物料規格"
-                            disabled={false}
-                            // disabled={true}
-                            inputProps={{
-                                props: {
-                                    value: '',
-                                    onChange: (e) => {alert("OK")},
-                                },
-                            }}
-                        /> */}
+                        <Thead01 type={'GetMatWarehouseList'} />
+                        <Tbody01 type={'GetMatWarehouseList'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
                     </div>
                 </div>
             </div>

@@ -16,7 +16,7 @@
 
 .main {
     display: grid;
-    grid-template-columns: 1000px 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 1100px 1fr; // 左右兩邊比例，可以調整
     gap: 15px;
     width: auto;
     margin-top: 4px;
@@ -30,7 +30,7 @@
     grid-template-columns: 500px; // 左側寬度固定為 350px
     justify-content: space-between;
     gap: 15px;
-// background-color: green;
+    // background-color: green;
 }
 
 
@@ -51,7 +51,8 @@
 // }
 .right {
     position: relative; // 確保子元素可以正確定位
-    position: -webkit-sticky;; // 固定在視窗位置
+    position: -webkit-sticky;
+    ; // 固定在視窗位置
     top: 0; // 距離視窗頂部的距離
     right: 0; // 距離視窗右側的距離
     z-index: 1000; // 確保元素位於其他內容的上層
@@ -59,6 +60,9 @@
     align-items: center; // 垂直居中
     justify-content: flex-start; // 從頂部對齊
     // background-color: blue; // 可選：背景色
+    width: 500px;
+    top: 0; // 距離視窗頂部的距離
+    right: 0; // 距離視窗右側的距離
 }
 
 
@@ -70,15 +74,12 @@
     top: 0; // 距離視窗頂部的距離
     right: 0; // 距離視窗右側的距離
     z-index: 1000; // 確保元素位於其他內容的上層
-    padding: 20px;
-    // box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    width: 100%;
-    /* 讓內容撐滿父元素 */
-    overflow-x: auto;
-    height:500px;
-    /* 如果表格內容過寬，允許水平滾動 */
-
+    width: 500px; // 設定固定寬度
+    height: 500px; // 設定固定高度
+    overflow-x: hidden; // 禁止水平滾動
+    overflow-y: auto; // 垂直滾動（如果需要）
 }
+
 
 
 // .traytable {

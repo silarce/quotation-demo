@@ -61,6 +61,16 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         {/* <span>按鈕格 留白</span> */}
       </div>
     )
+  } else if (type === "GetMatWarehouseList") {
+    return (
+      <div className={style.thead5}>
+        <span>倉庫</span>
+        <span>托盤</span>
+        <span> </span>
+        <span> </span>
+        {/* <span>按鈕格 留白</span> */}
+      </div>
+    )
   }
   else {
     return null;
