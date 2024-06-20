@@ -378,54 +378,6 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
               />
             );
           })}
-          {data_accountant?.map((data) => {
-            return (
-              <Row
-                key={data.id}
-                data_accountant={data}
-                paymentType={paymentType}
-                reqPatch={reqPatch}
-                reqDelete={reqDelete}
-                reqPatchIsImported={reqPatchIsImported}
-                isReadOnly={isWorksDepartment}
-                setAccountantId={setAccountantId}
-                bankAccountOptionArr={bankAccountOptionArr}
-                isWorksDepartment={isWorksDepartment}
-              />
-            );
-          })}
-          {data_accountant?.map((data) => {
-            return (
-              <Row
-                key={data.id}
-                data_accountant={data}
-                paymentType={paymentType}
-                reqPatch={reqPatch}
-                reqDelete={reqDelete}
-                reqPatchIsImported={reqPatchIsImported}
-                isReadOnly={isWorksDepartment}
-                setAccountantId={setAccountantId}
-                bankAccountOptionArr={bankAccountOptionArr}
-                isWorksDepartment={isWorksDepartment}
-              />
-            );
-          })}
-          {data_accountant?.map((data) => {
-            return (
-              <Row
-                key={data.id}
-                data_accountant={data}
-                paymentType={paymentType}
-                reqPatch={reqPatch}
-                reqDelete={reqDelete}
-                reqPatchIsImported={reqPatchIsImported}
-                isReadOnly={isWorksDepartment}
-                setAccountantId={setAccountantId}
-                bankAccountOptionArr={bankAccountOptionArr}
-                isWorksDepartment={isWorksDepartment}
-              />
-            );
-          })}
 
           <div className={scss.totalPriceWrapper}>
             <span className={scss.totalPrice}>{totalPrice_localString}</span>

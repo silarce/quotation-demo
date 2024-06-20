@@ -3443,6 +3443,7 @@ export type TupdateIncomeBillSerialDto = Pick<
 // =========================================================================
 // region /accountant
 
+// 公司銀行帳戶資料
 export type TaccountantPresetDto = {
   id: string;
   createdAt: string;

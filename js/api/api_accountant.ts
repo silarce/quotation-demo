@@ -63,7 +63,7 @@ const useGetAccountant = ({
   params?: Tparams;
   autoUpdate?: boolean;
   callAlert?: boolean;
-}) => {
+} = {}) => {
   const [res, setRes] = useState<TgetAccountant>();
   const [isFetching, setIsFetching] = useState(false);
 
