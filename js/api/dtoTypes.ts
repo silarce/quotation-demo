@@ -3704,9 +3704,11 @@ export type TaccountantDto = {
   // 匯兌單id
   exchangeFromId: string | null;
   // 匯兌單
-  exchangeFrom: TaccountantExchangeFromDto;
+  exchangeFrom?: TaccountantExchangeFromDto | null;
   // 幣別
   currency: Tcurrency;
+  // 票據實際兌現日
+  receiptCashedDate: string | null;
 };
 
 export type TaccountantExchangeFromDto = {

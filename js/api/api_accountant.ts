@@ -22,6 +22,7 @@ import type {
   TaccountantPresetDto,
   TcreateAccountantPresetDto,
   TupdateAccountantPresetDto,
+  TaccountantExchangeFromDto,
 } from './dtoTypes';
 
 export type {
@@ -37,6 +38,7 @@ export type {
   TaccountantPresetDto,
   TcreateAccountantPresetDto,
   TupdateAccountantPresetDto,
+  TaccountantExchangeFromDto,
 } from './dtoTypes';
 
 type TgetAccountant = TpageResponse<TaccountantDto>;
