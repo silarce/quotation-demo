@@ -57,7 +57,6 @@ import {
 import { apiPostAccountReceivableAccountant } from 'js/api/api_engineering';
 
 import { TperiodType } from 'js/api/dtoTypes';
-import { content } from 'html2canvas/dist/types/css/property-descriptors/content';
 
 // =============================================================================
 
