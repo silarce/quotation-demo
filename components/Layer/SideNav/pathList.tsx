@@ -610,8 +610,8 @@ const sidePathList: TsidePathList = {
               },
             },
             {
-              label: '票據兌現明細',
-              path: path01 + '/BillCashingDetailList',
+              label: '票據兌現明細表',
+              path: path01 + '/billCashingDetailList',
               erpFeature: [accountingDepartment],
             },
           ],
