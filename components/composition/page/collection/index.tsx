@@ -54,7 +54,11 @@ import {
   useGetAccountantPreset,
 } from 'js/api/api_accountant';
 
-import { apiPostAccountReceivableAccountant } from 'js/api/api_engineering';
+import {
+  TcreateAccountReceivableAccountsDto,
+  apiPostAccountReceivableAccountant,
+  apiPostAccountReceivableAccounts,
+} from 'js/api/api_engineering';
 
 import { Tcurrency, TperiodType } from 'js/api/dtoTypes';
 
@@ -94,11 +98,7 @@ type Tstate_accountant = {
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
 type TreqPatch = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
 // type TreqPatchIsImported = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
-type TreqPatchIsImported = (
-  id: string,
-  isImported: boolean,
-  accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
-) => Promise<void>;
+type TreqPatchIsImported = (accountantId: string, type: TperiodType) => Promise<void>;
 type TreqDelete = (id: string) => Promise<void>;
 
 // =============================================================================
@@ -256,11 +256,30 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     await update_accountant();
   };
 
+  //
+  // const reqPatchIsImported = async (
+  //   //
+  //   id: string,
+  //   isImported: boolean,
+  //   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
+  // ) => {
+  //   if (!isWorksDepartment) {
+  //     alert('isWorksDepartment should be false');
+
+  //     return;
+  //   }
+
+  //   await apiPatchAccountant_accountReceivable(id, {
+  //     accountsReceivableDeduction,
+  //     isImported,
+  //   });
+  //   await update_accountant();
+  // }; // reqPatchIsImported
+
   const reqPatchIsImported = async (
     //
-    id: string,
-    isImported: boolean,
-    accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
+    accountantId: string,
+    type: TperiodType
   ) => {
     if (!isWorksDepartment) {
       alert('isWorksDepartment should be false');
@@ -268,10 +287,12 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       return;
     }
 
-    await apiPatchAccountant_accountReceivable(id, {
-      accountsReceivableDeduction,
-      isImported,
-    });
+    const body: TcreateAccountReceivableAccountsDto = {
+      type,
+      accountantId: [accountantId],
+    };
+
+    await apiPostAccountReceivableAccounts(body);
     await update_accountant();
   }; // reqPatchIsImported
 
@@ -693,15 +714,20 @@ const Row = ({
     }
   };
 
-  const handle_checkIsImported = async (isImported: boolean) => {
+  const handle_checkIsImported = async () => {
     if (data_accountant?.id && reqPatchIsImported) {
-      await reqPatchIsImported(data_accountant.id, isImported, state_accountant.accountsReceivableDeduction);
-      // if (data_accountant?.id && reqPatchIsImported) {
-      //   await reqPatchIsImported(data_accountant.id, state_accountant);
-      //   setDisabled(true);
-      // } else {
-      //   alert('錯誤，data_accountant.id或reqPatchIsImported為undefined');
-      // }
+      const modal = myAlert.btnBar({});
+
+      modal.update({
+        title: '匯入紙本應收帳款',
+        content: (
+          <MakeIsImported
+            reqPatchIsImported={reqPatchIsImported}
+            accountReceivableId={data_accountant.id}
+            onCancel={modal.destroy}
+          />
+        ),
+      });
     }
   };
 
@@ -796,13 +822,10 @@ const Row = ({
           value,
           setState_accountant,
           handle_checkIsImported,
+          isAllowToEditIsImported,
         });
 
-        let theDiasbled = isbillSerialNumber || disabled;
-
-        if (key === 'isImported') {
-          theDiasbled = !isAllowToEditIsImported;
-        }
+        const theDiasbled = isbillSerialNumber || disabled;
 
         return (
           <div key={key} className={classNames(scss.cell, config?.className)} style={config?.style}>
@@ -862,6 +885,46 @@ const AddInovice = ({
   );
 };
 
+const MakeIsImported = ({
+  reqPatchIsImported,
+  accountReceivableId,
+  onCancel,
+}: {
+  onCancel: () => void;
+  accountReceivableId: string;
+  reqPatchIsImported: TreqPatchIsImported;
+}) => {
+  const handle_訂金 = async () => {
+    await reqPatchIsImported(accountReceivableId, '訂金');
+    onCancel();
+  };
+
+  const handle_請款 = async () => {
+    await reqPatchIsImported(accountReceivableId, '請款');
+    onCancel();
+  };
+
+  return (
+    <div>
+      <br />
+      <p>請選擇付款類型</p>
+      <div className="flex gap-5 mt-10">
+        <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
+          請款
+        </MyButton_v2>
+
+        <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
+          訂金
+        </MyButton_v2>
+
+        <MyButton_v2 theme="danger" px="px22" py="py6" buttonProps={{ htmlType: 'submit' }} onClick={onCancel}>
+          取消
+        </MyButton_v2>
+      </div>
+    </div>
+  );
+};
+
 // =========================================================================
 
 // region config
@@ -884,12 +947,14 @@ type Tconfig = {
     limitedDate?: Moment;
     value: string | Moment | null | boolean;
     setState_accountant: React.Dispatch<React.SetStateAction<Tstate_accountant>>;
-    handle_checkIsImported: (isImported: boolean) => void;
+    handle_checkIsImported: () => void;
+    isAllowToEditIsImported?: boolean;
   }) => {
     inputProps?: TinputProps;
     selectProps?: TselectProps;
     datePickerProps?: TdatePickerProps;
     checkBoxProps_v2?: TcheckBoxProps_v2;
+    reactNode?: React.ReactNode;
   };
 };
 
@@ -954,7 +1019,8 @@ const configList: TconfigList = {
     },
     className: '',
     inputSelPropsCreator: ({
-      disabled,
+      isAllowToEditIsImported,
+      // disabled,
       bankAccountOptionArr,
       handle_checkIsImported,
       limitedDate,
@@ -965,16 +1031,14 @@ const configList: TconfigList = {
 
       const checkBoxProps_v2: TcheckBoxProps_v2 = {
         props: {
+          disabled: !!value_bool || !isAllowToEditIsImported,
           value: value_bool ? ['true'] : [],
           onChange: (arr) => {
             const isImported = arr[0];
 
             if (isImported === 'true') {
-              handle_checkIsImported?.(true);
+              handle_checkIsImported?.();
               // setState_accountant((state) => ({ ...state, isImported: true }));
-            } else {
-              handle_checkIsImported?.(false);
-              // setState_accountant((state) => ({ ...state, isImported: false }));
             }
           },
         },

@@ -2715,7 +2715,7 @@ export type TsubmitReviewQotuationContentDto = {
 
 // =========================================================================
 
-// MARK: /engineering
+// region /engineering
 
 // 工程聯絡單
 export type TengineeringContactDto = {
@@ -3443,6 +3443,13 @@ export type TupdateIncomeBillSerialDto = Pick<
   | 'unpaidPayment'
 >;
 
+export type TcreateAccountReceivableAccountsDto = {
+  type: TperiodType;
+  accountantId: string[];
+};
+
+// endregion /engineering
+
 // =========================================================================
 // region /accountant
 
@@ -3822,7 +3829,7 @@ export type TupdateAccountReceivableProductPaymentDto = {
   id?: string; // ID, 不提供時將此筆視為新增資料
 };
 
-// MARK: /accountant end
+// endregion: /accountant end
 
 // =========================================================================
 
