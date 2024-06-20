@@ -604,7 +604,7 @@ const sidePathList: TsidePathList = {
             },
             {
               label: '領料',
-              path: path01 + '/whPositionList',
+              path: path01 + '/getMaterial/materialList',
               erpFeature: devPass,
             },
             // {

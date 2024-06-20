@@ -8,6 +8,7 @@ import router from 'next/router';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { Transfer } from 'antd';
 
+
 type TBodyItemContent = {};
 
 interface TbodyProps {
@@ -119,7 +120,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 {/* <span>{_item.create_by}</span> */}
                 <span>{_item.url}</span>
                 <span>{_item.update_by}</span>
-                <span>{convertToYearMonthDay('Datea', _item.update_at)}</span>
+                {/* <span>{convertToYearMonthDay('Datea', _item.update_at)}</span> */}
+                <span>{getTaiwanDateStr(_item.update_at)}</span>
                 <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
               </div>
             </CellWithBar>
@@ -171,6 +173,27 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span></span>
                 <span></span>
                 <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "materialList") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader4}>
+              <div className={scss.row01}>
+                <span>{_item.whpname}</span>
+                <span>{_item.materialnumber}</span>
+                <span>{_item.spec}</span>
+                <span>{_item.quantity}</span>
+                <span>{_item.whname}</span>
+                <span>{_item.trayname}</span>
+                {/* <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span> */}
               </div>
             </CellWithBar>
           ))
