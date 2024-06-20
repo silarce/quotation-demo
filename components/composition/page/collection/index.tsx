@@ -85,8 +85,8 @@ type Tstate_accountant = {
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
 
   noteMaturityDate: Moment | null;
-  託收日: Moment | null;
-  預兌日: Moment | null;
+  receiptCollectionDate: Moment | null;
+  receiptEstimatedDate: Moment | null;
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -189,8 +189,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       price: Number(state_accountant.price),
       fee: 0,
       noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
-      託收日: state_accountant.託收日?.toISOString(true),
-      預兌日: state_accountant.預兌日?.toISOString(true),
+      託收日: state_accountant.receiptCollectionDate?.toISOString(true),
+      預兌日: state_accountant.receiptEstimatedDate?.toISOString(true),
     };
 
     await apiPostAccountant({ body });
@@ -691,7 +691,7 @@ const Row = ({
       return;
     }
 
-    const { insertDate, noteMaturityDate, 託收日, 預兌日 } = data_accountant;
+    const { insertDate, noteMaturityDate, receiptCollectionDate, receiptEstimatedDate } = data_accountant;
 
     setState_accountant({
       insertDate: insertDate ? moment(insertDate) : null,
@@ -705,8 +705,8 @@ const Row = ({
       isImported: data_accountant.isImported,
       accountsReceivableDeduction: data_accountant.accountsReceivableDeduction,
       noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
-      託收日: 託收日 ? moment(託收日) : null,
-      預兌日: 預兌日 ? moment(預兌日) : null,
+      receiptCollectionDate: receiptCollectionDate ? moment(receiptCollectionDate) : null,
+      receiptEstimatedDate: receiptEstimatedDate ? moment(receiptEstimatedDate) : null,
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -882,8 +882,8 @@ const lookup_keyArr: {
     'vendorName',
     'noteMaturityDate',
     'price',
-    '託收日',
-    '預兌日',
+    'receiptCollectionDate',
+    'receiptEstimatedDate',
     'billSerialNumber',
     'notes',
   ],
@@ -1178,7 +1178,7 @@ const configList: TconfigList = {
       return { inputProps };
     },
   },
-  託收日: {
+  receiptCollectionDate: {
     label: '託收日',
     style: {
       width: 110,
@@ -1192,7 +1192,7 @@ const configList: TconfigList = {
         props: {
           value: value_moment,
           onChange: (date) => {
-            setState_accountant((state) => ({ ...state, 託收日: date }));
+            setState_accountant((state) => ({ ...state, receiptCollectionDate: date }));
           },
         },
       };
@@ -1200,7 +1200,7 @@ const configList: TconfigList = {
       return { datePickerProps };
     },
   },
-  預兌日: {
+  receiptEstimatedDate: {
     label: '預兌日',
     style: {
       width: 110,
@@ -1214,7 +1214,7 @@ const configList: TconfigList = {
         props: {
           value: value_moment,
           onChange: (date) => {
-            setState_accountant((state) => ({ ...state, 預兌日: date }));
+            setState_accountant((state) => ({ ...state, receiptEstimatedDate: date }));
           },
         },
       };
@@ -1238,6 +1238,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   isImported: false,
   accountsReceivableDeduction: [],
   noteMaturityDate: null,
-  託收日: null,
-  預兌日: null,
+  receiptCollectionDate: null,
+  receiptEstimatedDate: null,
 });

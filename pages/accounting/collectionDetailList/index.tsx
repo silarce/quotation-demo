@@ -222,7 +222,7 @@ export default function CollectionDetailList() {
               invoices,
             } = accountant;
 
-            const invoiceNumber = invoices[0]?.invoiceNumber as string | undefined;
+            const invoiceNumber = invoices?.[0]?.invoiceNumber as string | undefined;
 
             const list = {
               insertDate: getTaiwanDateStr(insertDate),
