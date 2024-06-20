@@ -24,7 +24,7 @@ type TsidePathConfig = {
     otherPermissions?: {
       grade?: number;
     };
-    activeChecker?: (props: { urlQuery: NextRouter['query'] }) => boolean;
+    activeChecker?: (props: { router: NextRouter }) => boolean;
     list?: {
       label: string;
       path: string;
@@ -40,7 +40,7 @@ type TsidePathConfig = {
       exception?: {
         idNumber?: string[];
       };
-      activeChecker?: (props: { urlQuery: NextRouter['query'] }) => boolean;
+      activeChecker?: (props: { router: NextRouter }) => boolean;
     }[];
   }[];
 };
@@ -263,8 +263,8 @@ const sidePathList: TsidePathList = {
                 status: 'Pending',
               },
               erpFeature: [domestic, accountsReceivable],
-              activeChecker: ({ urlQuery }) => {
-                const { status } = urlQuery;
+              activeChecker: ({ router }) => {
+                const { status } = router.query;
 
                 if (status === 'Pending' || status === 'TempPending') {
                   return true;
@@ -589,11 +589,25 @@ const sidePathList: TsidePathList = {
               label: '收款管理',
               path: path01 + '/collection',
               erpFeature: [accountingDepartment],
+              activeChecker: ({ router }) => {
+                if (router.route === '/accounting/collection') {
+                  return true;
+                }
+
+                return false;
+              },
             },
             {
               label: '收款明細表',
               path: path01 + '/collectionDetailList',
               erpFeature: [accountingDepartment],
+              activeChecker: ({ router }) => {
+                if (router.route === '/accounting/collectionDetailList') {
+                  return true;
+                }
+
+                return false;
+              },
             },
             {
               label: '票據兌現明細',
