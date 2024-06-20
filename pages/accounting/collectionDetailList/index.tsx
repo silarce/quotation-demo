@@ -66,64 +66,6 @@ export default function CollectionDetailList() {
             .endOf('month')
             .toISOString(),
         },
-        // $or: [
-        //   {
-        //     vendorName: {
-        //       $contains: keyword,
-        //     },
-        //     importAccountingNumber: {
-        //       $contains: keyword,
-        //     },
-        //     price: {
-        //       $eq: isNaN(Number(keyword)) ? undefined : keyword,
-        //     },
-        //     notes: {
-        //       $contains: keyword,
-        //     },
-        //     noteNumber: {
-        //       $contains: keyword,
-        //     },
-        //     // noteMaturityDate: {
-        //     //   // $contains: keyword,
-        //     //   $contains: (() => {
-        //     //     if (!keyword) {
-        //     //       return undefined;
-        //     //     }
-
-        //     //     const date_m = moment(keyword);
-        //     //     console.log(date_m.toISOString());
-
-        //     //     return date_m.isValid() ? date_m.toISOString() : undefined;
-        //     //   })(),
-        //     // },
-        //     noteMaturityDate: (() => {
-        //       if (!keyword) {
-        //         return;
-        //       }
-
-        //       const data_m = moment(keyword);
-
-        //       if (!data_m.isValid()) {
-        //         return undefined;
-        //       }
-
-        //       const $gte = data_m.startOf('day').toISOString();
-        //       const $lte = data_m.endOf('day').toISOString();
-
-        //       return {
-        //         $gte,
-        //         $lte,
-        //       };
-        //     })(),
-        //     'invoices.invoiceNumber': {
-        //       $contains: keyword,
-        //     },
-        //     billSerialNumber: {
-        //       $contains: keyword,
-        //     },
-        //   },
-        // ],
-
         $or: [
           {
             vendorName: {
@@ -160,7 +102,7 @@ export default function CollectionDetailList() {
                   return undefined;
                 }
 
-                const day = keyword.split('-')[2] as string | undefined;
+                const [_, month, day] = keyword.split('-');
 
                 let year = data_m.year();
 
@@ -170,7 +112,7 @@ export default function CollectionDetailList() {
 
                 data_m.year(year);
 
-                const range = day ? 'day' : 'month';
+                const range = day ? 'day' : month ? 'month' : 'year';
                 const $gte = data_m.startOf(range).toISOString();
                 const $lte = data_m.endOf(range).toISOString();
 
