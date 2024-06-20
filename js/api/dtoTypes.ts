@@ -3718,17 +3718,6 @@ export type TaccountantDto = {
   receiptCashedDate: string | null;
 };
 
-export type TaccountantExchangeFromDto = {
-  // 匯兌單號
-  sheetNumber: string;
-  // 兌現日期
-  cashExchangeDate: Date | null;
-  // 兌現帳戶
-  cashExchangeAccount: string | null;
-  // 包含的accountant
-  accountant: TaccountantDto[];
-};
-
 export type TcreateAccountantDto = Pick<
   TaccountantDto,
   | 'paymentType'
@@ -3829,7 +3818,23 @@ export type TupdateAccountReceivableProductPaymentDto = {
   id?: string; // ID, 不提供時將此筆視為新增資料
 };
 
-// endregion: /accountant end
+export type TaccountantExchangeFromDto = {
+  // 匯兌單號
+  sheetNumber: string;
+  // 兌現日期
+  cashExchangeDate: Date | null;
+  // 兌現帳戶
+  cashExchangeAccount: string | null;
+  // 包含的accountant
+  accountant: TaccountantDto[];
+};
+
+export type TcreateAccountantExchangeFromDto = {
+  accountantId: string[];
+};
+
+// MARK: /accountant end
+// endregion /accountant
 
 // =========================================================================
 

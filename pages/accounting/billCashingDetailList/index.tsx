@@ -33,11 +33,11 @@ import {
   apiPatchAccountant,
   deleteAccountant,
   apiPatchAccountant_accountReceivable,
+  apiPostAccountantExchangeFrom,
   //
   useGetAccountant,
   useGetAccountantPreset,
 } from 'js/api/api_accountant';
-import { set } from 'lodash';
 
 // ============================================================================
 
@@ -74,6 +74,9 @@ export default function BillCashingDetailList() {
         'exchangeFrom',
       ],
       filter: {
+        paymentType: {
+          $eq: '票據',
+        },
         insertDate: {
           $gte: moment()
             .set({ year: Number(year), month: Number(month) - 1 })

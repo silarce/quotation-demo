@@ -23,6 +23,7 @@ import type {
   TcreateAccountantPresetDto,
   TupdateAccountantPresetDto,
   TaccountantExchangeFromDto,
+  TcreateAccountantExchangeFromDto,
 } from './dtoTypes';
 
 export type {
@@ -39,6 +40,7 @@ export type {
   TcreateAccountantPresetDto,
   TupdateAccountantPresetDto,
   TaccountantExchangeFromDto,
+  TcreateAccountantExchangeFromDto,
 } from './dtoTypes';
 
 type TgetAccountant = TpageResponse<TaccountantDto>;
@@ -247,6 +249,73 @@ const useGetAccountantPreset = ({
     update,
     isFetching,
   };
+};
+
+// TaccountantExchangeFromDto
+// get /accountant-exchange-from/{id}
+const apiGetAccountantExchangeFrom = async (id: string) => {
+  const api = `/accountant-exchange-from/${id}`;
+
+  return axi
+    .get<TaccountantExchangeFromDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+const useGetAccountantExchangeFrom = (id: string, { autoUpdate = true }: { autoUpdate: boolean }) => {
+  const [res, setRes] = useState<TaccountantExchangeFromDto>();
+  const [isFetching, setIsFetching] = useState(false);
+
+  const update = useCallback(async () => {
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetAccountantExchangeFrom(id);
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '取得匯費資料失敗',
+        content: err.message,
+      });
+
+      return err;
+    } finally {
+      setIsFetching(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [update]);
+
+  return {
+    data: res,
+    update,
+    isFetching,
+  };
+};
+
+export const apiPostAccountantExchangeFrom = async (
+  body: TcreateAccountantExchangeFromDto,
+  { callAlert = true }: { callAlert: boolean }
+) => {
+  const api = '/accountant-exchange-from';
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      callAlert &&
+        myAlert.err({
+          title: '新增票據兌現失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
 };
 
 // ==============================================================================
