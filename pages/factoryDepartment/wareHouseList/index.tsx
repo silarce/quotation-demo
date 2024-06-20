@@ -25,7 +25,9 @@ type Tquery = {
 //     type: string;
 // }
 export const setting = {
+    
     apipath: 'http://new-erp-api.beta.san-jeou.com.tw/WareHouse/', // 確保這裡包含正確的 API 路徑
+    env:'prod'
 };
 
 

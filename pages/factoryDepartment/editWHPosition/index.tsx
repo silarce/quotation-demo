@@ -346,14 +346,19 @@ export default function EditWHPosition() {
             setIsLoading(true);
 
             // 根據 whname 設置 deviceName
-            const deviceName = (whname === "101") ? "Device1" :
-                (whname === "102") ? "Device2" :
-                    (whname === "103") ? "Device3" : "";
+            const deviceName =
+                (whname === "101") ? "Device1" :
+                    (whname === "102") ? "Device2" :
+                        (whname === "103") ? "Device3" : "";
             const traynumber = trayname;
             const traycommand = "100";
-            const url=(whname === "101") ? "http://192.168.1.8/sjwms/" :
-            (whname === "102") ? "http://192.168.1.9/sjwms/" :
-                (whname === "103") ? "http://192.168.1.10/sjwms/" : "";
+
+            const url = (setting.env === "prod") ? (
+                (whname === "101") ? "http://192.168.1.8/sjwms/" :
+                    (whname === "102") ? "http://192.168.1.9/sjwms/" :
+                        (whname === "103") ? "http://192.168.1.10/sjwms/" : ""
+            ) : "https://localhost:44383/";
+
 
             // execcommand 的參數
             const regaddress = '253';
@@ -405,18 +410,24 @@ export default function EditWHPosition() {
             setIsLoading(true);
 
             // 根據 whname 設置 deviceName
-            const deviceName = (whname === "101") ? "Device1" :
-                (whname === "102") ? "Device2" :
-                    (whname === "103") ? "Device3" : "";
+            const deviceName =
+                (whname === "101") ? "Device1" :
+                    (whname === "102") ? "Device2" :
+                        (whname === "103") ? "Device3" : "";
             const traynumber = trayname;
             const traycommand = "200";
+            const url = (setting.env === "prod") ? (
+                (whname === "101") ? "http://192.168.1.8/sjwms/" :
+                    (whname === "102") ? "http://192.168.1.9/sjwms/" :
+                        (whname === "103") ? "http://192.168.1.10/sjwms/" : ""
+            ) : "https://localhost:44383/";
 
             // execcommand 的參數
             const regaddress = '253';
             const cmdvalue = '1';
 
             // 呼叫 traycommand API
-            const response = await fetch(`https://localhost:44383/WareHouse/Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
+            const response = await fetch(`${url}Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -429,7 +440,7 @@ export default function EditWHPosition() {
             }
 
             // 呼叫 execcommand API
-            const response2 = await fetch(`https://localhost:44383/WareHouse/Modbus/execcommand?deviceName=${deviceName}&regaddress=${regaddress}&cmdvalue=${cmdvalue}`, {
+            const response2 = await fetch(`${url}Modbus/execcommand?deviceName=${deviceName}&regaddress=${regaddress}&cmdvalue=${cmdvalue}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
