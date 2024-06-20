@@ -5,6 +5,8 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import scss from './tbody01.module.scss';
 import scss2 from './tbody02.module.scss';
 import router from 'next/router';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { Transfer } from 'antd';
 
 type TBodyItemContent = {};
 
@@ -16,28 +18,29 @@ interface TbodyProps {
   traycalledname: any;
   traytransfer: any;
   url: any;
+  whnamecalled: any;
 }
 
-export default function Tbody01({ data, error, type, traycalled, traycalledname, traytransfer, url }: TbodyProps) { // Add type to props
+export default function Tbody01({ data, error, type, traycalled, traycalledname, traytransfer, url, whnamecalled }: TbodyProps) {
 
-
-  async function getTrayByWareHouse(whid: any, whname: any, url: any) {
-
-
-    // alert(whid);
+  async function getTrayByWareHouse(whid: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
     router.push({
       pathname: `/factoryDepartment/trayList`,
       query: {
         type: 'Tray',
         whid: whid,
         whname: whname,
-        url: url
+        url: url,
+        traycalled: traycalled,
+        traycalledname: traycalledname,
+        traytransfer: traytransfer,
+        whnamecalled: whnamecalled
       },
     });
 
   }
 
-  async function getWHPositionByWareHouseAndTray(whid: any, trayname: any, whname: any, url: any) {
+  async function getWHPositionByWareHouseAndTray(whid: any, trayname: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
     router.push({
       pathname: `/factoryDepartment/whPositionList`,
       query: {
@@ -48,13 +51,14 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         traycalled: traycalled,
         traycalledname: traycalledname,
         traytransfer: traytransfer,
-        url: url
+        url: url,
+        whnamecalled: whnamecalled
       },
     });
 
   }
 
-  async function editWHPositionById(id: any, whid: any, trayname: any, whname: any) {
+  async function editWHPositionById(id: any, whid: any, trayname: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
     router.push({
       pathname: `/factoryDepartment/editWHPosition`,
       query: {
@@ -65,7 +69,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         id: id,
         traycalled: traycalled,
         traycalledname: traycalledname,
-        traytransfer: traytransfer
+        traytransfer: traytransfer,
+        whnamecalled: whnamecalled
       },
     });
 
@@ -115,7 +120,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.url}</span>
                 <span>{_item.update_by}</span>
                 <span>{convertToYearMonthDay('Datea', _item.update_at)}</span>
-                <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname, _item.url)} /></span>
+                <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
               </div>
             </CellWithBar>
           ))
@@ -140,7 +145,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.whname}</span>
                 <span>{_item.length}-{_item.width}</span>
                 {/* <span>{_item.whpchildid}</span> */}
-                <span ><IconDetail onClick={() => editWHPositionById(_item.id, _item.whid, _item.trayname, _item.whname)} /></span>
+                <span ><IconDetail onClick={() => editWHPositionById(_item.id, _item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
               </div>
             </CellWithBar>
           ))
@@ -165,7 +170,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span></span>
                 <span></span>
                 <span></span>
-                <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, url)} /></span>
+                <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
               </div>
             </CellWithBar>
           ))

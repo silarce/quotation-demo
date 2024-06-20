@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
-
 import scss from './wareHouseList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
@@ -11,7 +10,8 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import { quotationStatusLookup } from 'config/lookupTable';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { TquotationStatus } from 'js/api/dtoTypes';
-import { setting } from '../wareHouseList/index'; // 從 wareHouseList 模組中導入設定
+import { setting } from '../wareHouseList/index';
+import { WhatsAppOutlined } from '@ant-design/icons';
 
 
 type Tquery = {
@@ -21,9 +21,12 @@ type Tquery = {
 
 // export default function WareHouseList({type}:ListType) {
 export default function TrayList() {
+    //#region 路由參數
+    //路由參數
     const router = useRouter();
-    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url } = router.query;
-
+    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
+    //#endregion
+    //#region 參數宣告
     const [data, setData] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null); // 将 error 的类型更改为 Error | null
 
@@ -62,7 +65,7 @@ export default function TrayList() {
                     query: {
                         type: 'Tray',
                         whid: whid,
-                        whname: whname
+                        whname: whname,
                     },
                 });
             },
@@ -75,18 +78,17 @@ export default function TrayList() {
                     pathname: `/factoryDepartment/wareHouseList`,
                     query: {
                         type: 'WareHouse',
-                        whname: whname
+                        whname: whname,
+                        traycalled: traycalled,
+                        traycalledname: traycalledname,
+                        traytransfer: traytransfer,
+                        whnamecalled: whnamecalled
                     }
                 });
-                //   if (!!outsourcingId) {
-                //     setDisabled(true);
-                //   } else {
-                //     router.push('./');
-                //   }
             },
         },
     ];
-
+    //#endregion
 
 
     useEffect(() => {
@@ -159,20 +161,13 @@ export default function TrayList() {
     return (
 
         <SubLayer isLoading_subLayer={isLoading}>
-            {/* <> */}
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname} panelList={panelList} />
             <div>
                 <Thead01 type={'Tray'} />
-                <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={url} />
+                <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={url} whnamecalled={whnamecalled} />
             </div>
-            {/* </> */}
         </SubLayer>
-        // <div>
 
-
-        //     <Thead01 type={'Tray'} />
-        //     <Tbody01 type={'Tray'} data={data} error={error} />
-        // </div>
     )
 
 

@@ -590,21 +590,21 @@ const sidePathList: TsidePathList = {
     return {
       path01,
       list: [
-        // {
-        //   label: '倉庫',
-        //   path: path01 + '/undefined',
-        //   erpFeature: devPass,
-        // },
         {
           label: '倉儲',
           erpFeature: devPass,
           list: [
             {
-              label: '倉庫',
+              label: '入庫',
               path: path01 + '/wareHouseList',
               query: {
                 type: 'WareHouse',
               },
+              erpFeature: devPass,
+            },
+            {
+              label: '領料',
+              path: path01 + '/whPositionList',
               erpFeature: devPass,
             },
             // {

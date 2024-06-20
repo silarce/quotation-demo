@@ -14,7 +14,7 @@ import { ButtonBase } from '@mui/material';
 import MyButton from 'components/global/gear/button/myButton';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
-import { setting } from '../wareHouseList/index'; // 從 wareHouseList 模組中導入設定
+import { setting } from '../wareHouseList/index';
 
 
 
@@ -50,7 +50,7 @@ export interface WHPositionModel {
 export default function EditWHPosition() {
     // 路由傳進來的
     const router = useRouter();
-    const { type, whid, trayname, whname, id, traycalled, traycalledname, traytransfer, url } = router.query;
+    const { type, whid, trayname, whname, id, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
 
     //備分原本model
     const [data, setData] = useState<WHPositionModel>([]);
@@ -62,9 +62,13 @@ export default function EditWHPosition() {
     // const [traycalledin, setTrayCalled] = useState<boolean | undefined>(false);
     // const [traycallednamein, setTrayCalledName] = useState<string | undefined>("");
     // const [traytransferin, setTrayTransfer] = useState<boolean | undefined>(false);
-    const [traycalledin, setTrayCalled] = useState<boolean>(traycalled === 'true');
-    const [traycallednamein, setTrayCalledName] = useState<string | undefined>(traycalledname?.toString() ?? "");
-    const [traytransferin, setTrayTransfer] = useState<boolean>(traytransfer !== trayname ?? false);
+
+    //托盤呼叫收回判定
+    const [whnamecalledin, setWhnameCalledin] = useState<string | undefined>(whnamecalled?.toString() ?? "");
+    const [traycalledin, setTrayCalledin] = useState<boolean>(traycalled === 'true');
+    const [traycallednamein, setTrayCalledNamein] = useState<string | undefined>(traycalledname?.toString() ?? "");
+    const [sametrayornotin, setTrayorNotin] = useState<boolean>(whnamecalled === data1.whname && traycalledname === data1.trayname ? true : false);
+    const [traytransferin, setTrayTransferin] = useState<boolean>(traytransfer !== trayname ?? false);
 
     const [mouseX, setMouseX] = useState('0px');
     const [mouseY, setMouseY] = useState('0px');
@@ -101,7 +105,8 @@ export default function EditWHPosition() {
                         whname: whname,
                         traycalled: traycalled,
                         traycalledname: traycalledname,
-                        traytransfer: traytransfer
+                        traytransfer: traytransfer,
+                        whnamecalled: whnamecalledin
                     }
                 });
             },
@@ -121,7 +126,8 @@ export default function EditWHPosition() {
                         whname: whname,
                         traycalled: traycalledin,
                         traycalledname: traycallednamein,
-                        traytransfer: traytransferin
+                        traytransfer: traytransferin,
+                        whnamecalled: whnamecalledin
                     }
                 });
             },
@@ -195,7 +201,7 @@ export default function EditWHPosition() {
         };
 
         fetchDataAndLayout();
-    }, [router.query, disabled]); // 當 router.query 或 disabled 改變時觸發
+    }, [router.query, disabled]);
 
     //撈取儲位資料 api
     const fetchData = async () => {
@@ -293,9 +299,6 @@ export default function EditWHPosition() {
                     id: id
                 },
             });
-
-            // 可以选择处理成功响应的逻辑，比如刷新数据等
-
         } catch (error) {
             console.error('Error updating data:', error);
         } finally {
@@ -346,6 +349,7 @@ export default function EditWHPosition() {
             setIsLoading(true);
 
             // 根據 whname 設置 deviceName
+            // 寫死
             const deviceName =
                 (whname === "101") ? "Device1" :
                     (whname === "102") ? "Device2" :
@@ -360,9 +364,19 @@ export default function EditWHPosition() {
             ) : "https://localhost:44383/";
 
 
-            // execcommand 的參數
+            // execcommand 的固定參數
             const regaddress = '253';
             const cmdvalue = '1';
+
+
+            // alert(whname + " : " + trayname);
+
+            // 設定呼叫的倉庫(setWhname)、托盤(setTrayCalled)，托盤狀態(setTrayCalledName)
+            setWhnameCalledin(data1.whname);
+            setTrayCalledin(true);
+            setTrayCalledNamein(data1.trayname);
+
+            // return;
 
             // 呼叫 traycommand API
             const response = await fetch(`${url}Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
@@ -393,11 +407,10 @@ export default function EditWHPosition() {
             console.log(response2);
 
             // 如果成功，設置 traycalled 和 traycalledname 狀態
-            setTrayCalled(true);
-            setTrayCalledName(data1.trayname); // 假設 trayname 是正確的名稱
+            setTrayCalledin(true);
+            setTrayCalledNamein(data1.trayname);
 
         } catch (error: any) {
-            // 處理錯誤，顯示警告
             myAlert.warning(error.message);
             console.error;
         } finally {
@@ -409,22 +422,37 @@ export default function EditWHPosition() {
         try {
             setIsLoading(true);
 
+
+
             // 根據 whname 設置 deviceName
             const deviceName =
-                (whname === "101") ? "Device1" :
-                    (whname === "102") ? "Device2" :
-                        (whname === "103") ? "Device3" : "";
-            const traynumber = trayname;
+                (whnamecalledin === "101") ? "Device1" :
+                    (whnamecalledin === "102") ? "Device2" :
+                        (whnamecalledin === "103") ? "Device3" : "";
+            const traynumber = traycallednamein;
             const traycommand = "200";
             const url = (setting.env === "prod") ? (
-                (whname === "101") ? "http://192.168.1.8/sjwms/" :
-                    (whname === "102") ? "http://192.168.1.9/sjwms/" :
-                        (whname === "103") ? "http://192.168.1.10/sjwms/" : ""
+                (whnamecalledin === "101") ? "http://192.168.1.8/sjwms/" :
+                    (whnamecalledin === "102") ? "http://192.168.1.9/sjwms/" :
+                        (whnamecalledin === "103") ? "http://192.168.1.10/sjwms/" : ""
             ) : "https://localhost:44383/";
+
+
+
 
             // execcommand 的參數
             const regaddress = '253';
             const cmdvalue = '1';
+
+
+            // alert(whnamecalledin + " : " + traycalledname);
+
+
+            // 收回清空設定的倉庫(setWhname)、托盤(setTrayCalled)，托盤狀態(setTrayCalledName)
+            setWhnameCalledin('');
+            setTrayCalledin(false);
+            setTrayCalledNamein('');
+            // return;
 
             // 呼叫 traycommand API
             const response = await fetch(`${url}Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
@@ -453,8 +481,9 @@ export default function EditWHPosition() {
             }
 
             // 如果成功，設置 traycalled 和 traycalledname 狀態
-            setTrayCalled(false);
-            setTrayCalledName('');
+            setTrayCalledin(false);
+            setTrayCalledNamein('');
+
 
         } catch (error: any) {
             // 處理錯誤，顯示警告
@@ -472,7 +501,7 @@ export default function EditWHPosition() {
                 myAlert.warning({ title: '請先收回托盤' });
             } else {
                 myAlert.confirm({
-                    title: `呼叫托盤: ${trayname}`,
+                    title: `呼叫: ${trayname}`,
                     content: '!!請勿靠近設備!!',
                     props: {
                         onOk: () => {
@@ -493,7 +522,7 @@ export default function EditWHPosition() {
             myAlert.warning({ title: '目前無托盤可收回' });
         } else {
             myAlert.confirm({
-                title: `收回托盤: ${trayname}`,
+                title: `收回: ${trayname}`,
                 content: '!!請勿靠近設備!!',
                 props: {
                     onOk: () => {
@@ -560,9 +589,12 @@ export default function EditWHPosition() {
             {/* <div style={{ display: !disabled ? 'block' : 'none', position: 'absolute', top: '0', left: '1%', transform: 'translateX(0%)', zIndex: '999' }}>編輯中....</div> */}
             {/* {hoverInfo && <div style={{ position: 'absolute', top: '55%', left: '50%', transform: 'translateX(0%)', zIndex: '999' }}>{hoverInfo}</div>} */}
 
-            {/* 托盤名稱:{trayname}<br />
+            {/* 所在倉庫:{data1.whname}<br />
+            托盤名稱:{trayname}<br />
             是否有托盤呼叫中:{traycalledin === true ? 'true' : 'false'}<br />
-            呼叫中的托盤名稱:{traycalledname}<br /> */}
+            倉庫名稱:{whnamecalledin}<br />
+            呼叫中的托盤名稱:{traycallednamein}<br /> */}
+            
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div className={scss.top}>
@@ -655,7 +687,7 @@ export default function EditWHPosition() {
                             <MyButton_v2 theme='danger' className={scss.addBtn} label="呼叫托盤" onClick={() => { CallTray(); }} />
                         </div>
                         <div className={scss.top} style={{ display: traycalledin === true ? '' : 'none' }}>
-                            <MyButton_v2 theme='danger' className={scss.addBtn} label="收回托盤" onClick={() => { CallTrayBack(); }} />
+                            <MyButton_v2 theme='danger' className={scss.addBtn} label={`收回托盤 (${whnamecalledin} : ${traycallednamein})`} onClick={() => { CallTrayBack(); }} />
                         </div>
                         {/* <div className={scss.top} style={{ display: traycalled === true && traytransfer === false ? '' : 'none' }}>
                             <MyButton_v2 theme='danger' className={scss.addBtn} label="收回托盤" onClick={() => { CallTrayBack(); }} />

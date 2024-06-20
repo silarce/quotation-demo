@@ -21,28 +21,26 @@ type Tquery = {
 
 
 export default function WHPositionList() {
+    //#region 路由參數
+    //路由參數
     const router = useRouter();
-    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url } = router.query;
-
-
-    const [data, setData] = useState<any[]>([]);
-    const [error, setError] = useState<string | null>(null);
-    const [traycalledin, setTrayCalled] = useState<boolean>(traycalled === 'true');
-
+    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
+    //#endregion
 
     const status = router.query.status as TquotationStatus;
-    // const traycode =router.query.whid as TquotationStatus;
-    const { wareHouseId } = router.query as Tquery;
+    //#region 參數宣告
+    //頁面回傳資料
+    const [data, setData] = useState<any[]>([]);
+    //錯誤訊息設定(可以拿掉)
+    const [error, setError] = useState<string | null>(null);
+    //是否有托盤已呼叫
+    const [traycalledin, setTrayCalled] = useState<boolean>(traycalled === 'true');
+    //set loading
     const [isLoading, setIsLoading] = useState(false);
     //search keyword
     const [DataByKeWord, setDataByKeWord] = useState<any[]>([]);
 
-
-
-    const doSearch = (valueArr: (string | Toption | null)[]) => {
-        const serachbar = valueArr[0] as string;
-    };
-
+    //查詢功能內容
     const searchTargetList = [
         {
             placeholder: '請輸入名稱、料號或規格',
@@ -50,7 +48,7 @@ export default function WHPositionList() {
 
     ];
 
-
+    //查詢功能作動
     const searchGroup = {
         searchTargetList,
         doSearch: (arr: any) => {
@@ -63,50 +61,53 @@ export default function WHPositionList() {
         }
     };
 
-
+    //上排右邊按紐區域
     const panelList: TpanelList = [
         { searchGroup },
         {
             type: 'myButton',
             label: '返回',
             onClick: () => {
-                if (traycalledin === true) {
-                    myAlert.warning({ title: '請先收回托盤' });
-                } else {
+                // if (traycalledin === true) {
+                //     myAlert.warning({ title: '請先收回托盤' });
+                // } else {
 
-                    router.push({
-                        pathname: `/factoryDepartment/trayList`,
-                        query: {
-                            type: 'WareHouse',
-                            whid: whid,
-                            whname: whname,
-                            traycalled: traycalled,
-                            traycalledname: traycalledname,
-                            traytransfer: traytransfer
-                        }
-                    });
-                }
+                router.push({
+                    pathname: `/factoryDepartment/trayList`,
+                    query: {
+                        type: 'WareHouse',
+                        whid: whid,
+                        whname: whname,
+                        traycalled: traycalled,
+                        traycalledname: traycalledname,
+                        traytransfer: traytransfer,
+                        whnamecalled: whnamecalled
+                    }
+                });
+                // }
             },
         },
     ];
+    //#endregion
 
 
+    //#region 監聽事件
     useEffect(() => {
         fetchData();
     }, []);
+    //#endregion
 
 
-
-    //call api
+    //#region call api
+    //取資料api
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            // 傳給api的參數JSON
+
             const conditionModel: { whid: string | undefined; trayname: string | undefined } = {
                 whid: whid as string | undefined,
                 trayname: trayname as string | undefined
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -116,15 +117,12 @@ export default function WHPositionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            //erpAPI
             const response = await fetch(`${setting.apipath}GetWHPosition?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
             setData(data);
-            console.log("GetWHPosition:" + data);
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -133,14 +131,13 @@ export default function WHPositionList() {
 
     };
 
+    //查詢api
     const searchData = async (keyword: string) => {
         try {
             setIsLoading(true);
-            // 傳給api的參數JSON
             const conditionModel: { keyword: string | undefined; } = {
                 keyword: keyword as string | undefined,
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -150,16 +147,12 @@ export default function WHPositionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            //erpAPI
             const response = await fetch(`${setting.apipath}SearchWHPositionByID?${queryParams}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                myAlert.err({ content: "Failed to fetch data" });
             }
             const data = await response.json();
             setData(data);
-            console.log("GetWHPosition:" + data);
-
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -167,14 +160,14 @@ export default function WHPositionList() {
         }
     };
 
-
+    //#endregion
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫名稱：' + whname + '｜托盤名稱：' + trayname} panelList={panelList} />
             <div>
                 <Thead01 type={'WHPosition'} />
-                <Tbody01 type={'WHPosition'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={url} />
+                <Tbody01 type={'WHPosition'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={url} whnamecalled={whnamecalled} />
             </div>
         </SubLayer>
     )

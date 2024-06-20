@@ -21,29 +21,25 @@ type Tquery = {
 };
 
 
-// interface ListType {
-//     type: string;
-// }
 export const setting = {
-    
+
     apipath: 'http://new-erp-api.beta.san-jeou.com.tw/WareHouse/', // 確保這裡包含正確的 API 路徑
-    env:'prod'
+    env: 'prod'
 };
 
-
-// export default function WareHouseList({type}:ListType) {
 export default function WareHouseList() {
+    const router = useRouter();
+    const { type, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
 
     const [data, setData] = useState<any[]>([]);
-    const [error, setError] = useState<string | null>(null); // 将 error 的类型更改为 Error | null
+    const [error, setError] = useState<string | null>(null);
 
-    const router = useRouter();
-    const { type } = router.query;
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
+    const [isLoading, setIsLoading] = useState(false);
 
     // wareHouseList/index.js
-   
+
 
     const searchTargetList = [
         {
@@ -94,9 +90,9 @@ export default function WareHouseList() {
     //call api
     const fetchData = async () => {
         try {
+            setIsLoading(true);
             // const response = await fetch('YOUR_C#_API_ENDPOINT');
             //erpAPI
-            // const response = await fetch('https://localhost:44383/WareHouse/GetWareHouse');
             const response = await fetch(`${setting.apipath}GetWareHouse`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
@@ -106,6 +102,9 @@ export default function WareHouseList() {
             console.log("vvvvv" + data);
         } catch (error: any) {
             setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
         }
     };
 
@@ -127,7 +126,6 @@ export default function WareHouseList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            // const response = await fetch(`https://localhost:44383/WareHouse/SearchWareHouseByID?${queryParams}`);
             const response = await fetch(`${setting.apipath}SearchWareHouseByID?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
@@ -144,14 +142,11 @@ export default function WareHouseList() {
     return (
 
         <SubLayer isLoading_subLayer={false}>
-            {/* <> */}
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫'} panelList={panelList} />
             <div>
-                {/* {apipath}<br/> */}
                 <Thead01 type={'WareHouse'} />
-                <Tbody01 type={'WareHouse'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} />
+                <Tbody01 type={'WareHouse'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
             </div>
-            {/* </> */}
         </SubLayer>
     )
 
