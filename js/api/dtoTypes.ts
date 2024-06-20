@@ -3734,10 +3734,14 @@ export type TcreateAccountantDto = Pick<
   | 'fee'
   | 'importAccountingNumber'
   | 'noteNumber'
+  | 'receiptCollectionDate'
+  | 'receiptEstimatedDate'
+  | 'receiptCashedDate'
+  | 'currency'
 > & {
   noteMaturityDate?: string | null; // 票據到期日
-  託收日?: string | null; // 託收日
-  預兌日?: string | null; // 預兌日
+  // receiptCollectionDate?: string | null; // 託收日
+  // receiptEstimatedDate?: string | null; // 預兌日
 };
 
 export type TupdateAccountantDto = Partial<

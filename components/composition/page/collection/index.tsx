@@ -56,7 +56,7 @@ import {
 
 import { apiPostAccountReceivableAccountant } from 'js/api/api_engineering';
 
-import { TperiodType } from 'js/api/dtoTypes';
+import { Tcurrency, TperiodType } from 'js/api/dtoTypes';
 
 // =============================================================================
 
@@ -87,6 +87,8 @@ type Tstate_accountant = {
   noteMaturityDate: Moment | null;
   receiptCollectionDate: Moment | null;
   receiptEstimatedDate: Moment | null;
+
+  currency: Tcurrency;
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -112,6 +114,20 @@ const ContractSelector = selectModalCreator_multi<['contract']>({
     },
   ],
 });
+
+const options_currency: {
+  label: string;
+  value: Tcurrency;
+}[] = [
+  {
+    label: 'TWD 新臺幣',
+    value: 'TWD 新臺幣',
+  },
+  {
+    label: 'USD 美元',
+    value: 'USD 美元',
+  },
+] as const;
 
 // =============================================================================
 
@@ -189,8 +205,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       price: Number(state_accountant.price),
       fee: 0,
       noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
-      託收日: state_accountant.receiptCollectionDate?.toISOString(true),
-      預兌日: state_accountant.receiptEstimatedDate?.toISOString(true),
+      receiptCollectionDate: state_accountant.receiptCollectionDate?.toISOString(true) ?? null,
+      // 在這個階段，receiptEstimatedDate與receiptCashedDate同步
+      receiptEstimatedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
+      receiptCashedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
+      currency: state_accountant.currency,
     };
 
     await apiPostAccountant({ body });
@@ -224,6 +243,12 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       price: Number(state_accountant.price),
       // fee: 0,
       noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
+
+      receiptCollectionDate: state_accountant.receiptCollectionDate?.toISOString(true) ?? null,
+      // 在這個階段，receiptEstimatedDate與receiptCashedDate同步
+      receiptEstimatedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
+      receiptCashedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
+      currency: state_accountant.currency,
     };
 
     await apiPatchAccountant(id, { body });
@@ -691,7 +716,13 @@ const Row = ({
       return;
     }
 
-    const { insertDate, noteMaturityDate, receiptCollectionDate, receiptEstimatedDate } = data_accountant;
+    const {
+      //
+      insertDate,
+      noteMaturityDate,
+      receiptCollectionDate,
+      receiptEstimatedDate,
+    } = data_accountant;
 
     setState_accountant({
       insertDate: insertDate ? moment(insertDate) : null,
@@ -707,6 +738,7 @@ const Row = ({
       noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
       receiptCollectionDate: receiptCollectionDate ? moment(receiptCollectionDate) : null,
       receiptEstimatedDate: receiptEstimatedDate ? moment(receiptEstimatedDate) : null,
+      currency: data_accountant.currency,
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -866,7 +898,14 @@ type TconfigList = {
 };
 
 const baseArr_before: TaccountantKey[] = ['btn', 'isImported'];
-const baseArr_after: TaccountantKey[] = ['accountingNumber', 'vendorName', 'price', 'billSerialNumber', 'notes'];
+const baseArr_after: TaccountantKey[] = [
+  'accountingNumber',
+  'vendorName',
+  'price',
+  'currency',
+  'billSerialNumber',
+  'notes',
+];
 
 const lookup_keyArr: {
   [key in TpaymentType]: TaccountantKey[];
@@ -882,6 +921,7 @@ const lookup_keyArr: {
     'vendorName',
     'noteMaturityDate',
     'price',
+    'currency',
     'receiptCollectionDate',
     'receiptEstimatedDate',
     'billSerialNumber',
@@ -1222,6 +1262,34 @@ const configList: TconfigList = {
       return { datePickerProps };
     },
   },
+  currency: {
+    label: '幣別',
+    style: {
+      width: 120,
+      // justifyContent: 'center',
+    },
+    className: '',
+    inputSelPropsCreator: ({ value, setState_accountant }) => {
+      const value_string = value as string;
+
+      const selectProps: TselectProps = {
+        props: {
+          value: value ? { label: value_string, value: value_string } : null,
+          options: options_currency,
+          onChange: (option) => {
+            if (!option) {
+              return;
+            }
+
+            const value = option.value as (typeof options_currency)[number]['value'];
+            setState_accountant((state) => ({ ...state, ['currency']: value }));
+          },
+        },
+      };
+
+      return { selectProps };
+    },
+  },
 };
 
 // =========================================================================
@@ -1240,4 +1308,5 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   noteMaturityDate: null,
   receiptCollectionDate: null,
   receiptEstimatedDate: null,
+  currency: 'TWD 新臺幣',
 });
