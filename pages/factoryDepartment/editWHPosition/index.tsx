@@ -361,7 +361,7 @@ export default function EditWHPosition() {
                 (whname === "101") ? "http://192.168.1.8/sjwms/" :
                     (whname === "102") ? "http://192.168.1.9/sjwms/" :
                         (whname === "103") ? "http://192.168.1.10/sjwms/" : ""
-            ) : "https://localhost:44383/";
+            ) : "https://localhost:44383/WareHouse/";
 
 
             // execcommand 的固定參數
@@ -435,7 +435,7 @@ export default function EditWHPosition() {
                 (whnamecalledin === "101") ? "http://192.168.1.8/sjwms/" :
                     (whnamecalledin === "102") ? "http://192.168.1.9/sjwms/" :
                         (whnamecalledin === "103") ? "http://192.168.1.10/sjwms/" : ""
-            ) : "https://localhost:44383/";
+            ) : "https://localhost:44383/WareHouse/";
 
 
 
