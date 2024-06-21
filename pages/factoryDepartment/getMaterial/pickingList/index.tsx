@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
 
-import scss from './materialList.module.scss';
+import scss from './pickingList.module.scss';
 import Thead01 from '../../ui/table/thead01';
 import Tbody01 from '../../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -183,6 +183,7 @@ export default function MaterialList() {
 
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={quotationStatusLookup[status] ?? '物料查詢'} panelList={panelList} />
+
             <div className={scss.main}>
                 <div className={scss.left}>
                     {/* <div className={scss.top}> */}

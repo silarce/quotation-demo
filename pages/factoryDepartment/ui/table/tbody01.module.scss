@@ -22,8 +22,8 @@ div.panelHeader {
     display: grid;
     grid-template-columns: 200px 200px 200px 200px 200px 250px 200px 100px 100px;
     gap: 15px;
-    margin-bottom: 16px;
-    padding-top:20px;
+    // margin-bottom: 16px;
+    // padding-top:20px;
   }
 
   .row02 {
@@ -70,8 +70,8 @@ div.panelHeader2 {
     display: grid;
     grid-template-columns: 200px 200px 150px 100px 150px 100px 200px 200px 100px 100px;
     gap: 15px;
-    margin-bottom: 16px;
-    padding-top:20px;
+    // margin-bottom: 16px;
+    // padding-top:20px;
   }
 
   .row02 {
@@ -114,8 +114,8 @@ div.panelHeader3 {
     display: grid;
     grid-template-columns: 200px 100px 150px 350px 100px 100px 100px 100px 100px;
     gap: 15px;
-    margin-bottom: 16px;
-    padding-top:20px;
+    // margin-bottom: 16px;
+    // padding-top:20px;
   }
 
   .row02 {
@@ -161,7 +161,7 @@ div.panelHeader4 {
     grid-template-columns:200px 200px 300px 100px 100px 100px;
     gap: 15px;
     // margin-bottom: 16px;
-    // padding-top:10px;
+    padding-top:10px;
 
   }
 
@@ -209,7 +209,8 @@ div.panelHeader5 {
     grid-template-columns:100px 100px 100px 100px;
     gap: 15px;
     // margin-bottom: 16px;
-    // padding-top:10px;
+    padding-top:10px;
+
 
   }
 

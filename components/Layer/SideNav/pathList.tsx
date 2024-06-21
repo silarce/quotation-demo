@@ -591,7 +591,7 @@ const sidePathList: TsidePathList = {
       path01,
       list: [
         {
-          label: '倉儲',
+          label: '庫存管理',
           erpFeature: devPass,
           list: [
             {
@@ -602,19 +602,25 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: devPass,
             },
+          ],
+        },
+        {
+          label: '領料',
+          erpFeature: devPass,
+          list: [
+            // {
+            //   label: '領料查詢',
+            //   path: path01 + '/getMaterial/pickingList',
+            //   erpFeature: devPass,
+            // },
             {
-              label: '領料',
+              label: '物料查詢',
               path: path01 + '/getMaterial/materialList',
               erpFeature: devPass,
             },
             // {
-            //   label: '托盤',
-            //   path: path01 + '/trayList',
-            //   erpFeature: devPass,
-            // },
-            // {
-            //   label: '儲位',
-            //   path: path01 + '/whPositionList',
+            //   label: '新增領料單',
+            //   path: path01 + '/getMaterial/addPickingList',
             //   erpFeature: devPass,
             // },
           ],

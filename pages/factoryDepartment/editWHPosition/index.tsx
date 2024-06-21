@@ -589,11 +589,11 @@ export default function EditWHPosition() {
             {/* <div style={{ display: !disabled ? 'block' : 'none', position: 'absolute', top: '0', left: '1%', transform: 'translateX(0%)', zIndex: '999' }}>編輯中....</div> */}
             {/* {hoverInfo && <div style={{ position: 'absolute', top: '55%', left: '50%', transform: 'translateX(0%)', zIndex: '999' }}>{hoverInfo}</div>} */}
 
-            所在倉庫:{data1.whname}<br />
+            {/* 所在倉庫:{data1.whname}<br />
             托盤名稱:{trayname}<br />
             是否有托盤呼叫中:{traycalledin === true ? 'true' : 'false'}<br />
             倉庫名稱:{whnamecalledin}<br />
-            呼叫中的托盤名稱:{traycallednamein}<br />
+            呼叫中的托盤名稱:{traycallednamein}<br /> */}
             
             <div className={scss.main}>
                 <div className={scss.left}>
