@@ -55,6 +55,7 @@ export default function CollectionDetailList() {
   const params: Tparams = useMemo(() => {
     return {
       populate: ['incomeBill', 'invoices'],
+      pageSize: 999999,
       filter: {
         insertDate: {
           $gte: moment()
