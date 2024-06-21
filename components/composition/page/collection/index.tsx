@@ -54,10 +54,13 @@ import {
   useGetAccountantPreset,
 } from 'js/api/api_accountant';
 
-import { apiPostAccountReceivableAccountant } from 'js/api/api_engineering';
+import {
+  TcreateAccountReceivableAccountsDto,
+  apiPostAccountReceivableAccountant,
+  apiPostAccountReceivableAccounts,
+} from 'js/api/api_engineering';
 
-import { TperiodType } from 'js/api/dtoTypes';
-import { content } from 'html2canvas/dist/types/css/property-descriptors/content';
+import { Tcurrency, TperiodType } from 'js/api/dtoTypes';
 
 // =============================================================================
 
@@ -86,16 +89,16 @@ type Tstate_accountant = {
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
 
   noteMaturityDate: Moment | null;
+  receiptCollectionDate: Moment | null;
+  receiptEstimatedDate: Moment | null;
+
+  currency: Tcurrency;
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
 type TreqPatch = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
 // type TreqPatchIsImported = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
-type TreqPatchIsImported = (
-  id: string,
-  isImported: boolean,
-  accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
-) => Promise<void>;
+type TreqPatchIsImported = (accountantId: string, type: TperiodType) => Promise<void>;
 type TreqDelete = (id: string) => Promise<void>;
 
 // =============================================================================
@@ -111,6 +114,20 @@ const ContractSelector = selectModalCreator_multi<['contract']>({
     },
   ],
 });
+
+const options_currency: {
+  label: string;
+  value: Tcurrency;
+}[] = [
+  {
+    label: 'TWD 新臺幣',
+    value: 'TWD 新臺幣',
+  },
+  {
+    label: 'USD 美元',
+    value: 'USD 美元',
+  },
+];
 
 // =============================================================================
 
@@ -188,6 +205,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       price: Number(state_accountant.price),
       fee: 0,
       noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
+      receiptCollectionDate: state_accountant.receiptCollectionDate?.toISOString(true) ?? null,
+      // 在這個階段，receiptEstimatedDate與receiptCashedDate同步
+      receiptEstimatedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
+      receiptCashedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
+      currency: state_accountant.currency,
     };
 
     await apiPostAccountant({ body });
@@ -221,6 +243,12 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       price: Number(state_accountant.price),
       // fee: 0,
       noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
+
+      receiptCollectionDate: state_accountant.receiptCollectionDate?.toISOString(true) ?? null,
+      // 在這個階段，receiptEstimatedDate與receiptCashedDate同步
+      receiptEstimatedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
+      receiptCashedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
+      currency: state_accountant.currency,
     };
 
     await apiPatchAccountant(id, { body });
@@ -228,11 +256,30 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     await update_accountant();
   };
 
+  //
+  // const reqPatchIsImported = async (
+  //   //
+  //   id: string,
+  //   isImported: boolean,
+  //   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
+  // ) => {
+  //   if (!isWorksDepartment) {
+  //     alert('isWorksDepartment should be false');
+
+  //     return;
+  //   }
+
+  //   await apiPatchAccountant_accountReceivable(id, {
+  //     accountsReceivableDeduction,
+  //     isImported,
+  //   });
+  //   await update_accountant();
+  // }; // reqPatchIsImported
+
   const reqPatchIsImported = async (
     //
-    id: string,
-    isImported: boolean,
-    accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
+    accountantId: string,
+    type: TperiodType
   ) => {
     if (!isWorksDepartment) {
       alert('isWorksDepartment should be false');
@@ -240,10 +287,12 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       return;
     }
 
-    await apiPatchAccountant_accountReceivable(id, {
-      accountsReceivableDeduction,
-      isImported,
-    });
+    const body: TcreateAccountReceivableAccountsDto = {
+      type,
+      accountantId: [accountantId],
+    };
+
+    await apiPostAccountReceivableAccounts(body);
     await update_accountant();
   }; // reqPatchIsImported
 
@@ -379,7 +428,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
             <span className={scss.totalPrice}>{totalPrice_localString}</span>
           </div>
         </div>
-        <div className={scss.cover_bottom}></div>
+        {/* <div className={scss.cover_bottom}></div> */}
 
         <ContractSelector
           showModal={!!accountantId}
@@ -665,15 +714,20 @@ const Row = ({
     }
   };
 
-  const handle_checkIsImported = async (isImported: boolean) => {
+  const handle_checkIsImported = async () => {
     if (data_accountant?.id && reqPatchIsImported) {
-      await reqPatchIsImported(data_accountant.id, isImported, state_accountant.accountsReceivableDeduction);
-      // if (data_accountant?.id && reqPatchIsImported) {
-      //   await reqPatchIsImported(data_accountant.id, state_accountant);
-      //   setDisabled(true);
-      // } else {
-      //   alert('錯誤，data_accountant.id或reqPatchIsImported為undefined');
-      // }
+      const modal = myAlert.btnBar({});
+
+      modal.update({
+        title: '匯入紙本應收帳款',
+        content: (
+          <MakeIsImported
+            reqPatchIsImported={reqPatchIsImported}
+            accountReceivableId={data_accountant.id}
+            onCancel={modal.destroy}
+          />
+        ),
+      });
     }
   };
 
@@ -688,8 +742,16 @@ const Row = ({
       return;
     }
 
+    const {
+      //
+      insertDate,
+      noteMaturityDate,
+      receiptCollectionDate,
+      receiptEstimatedDate,
+    } = data_accountant;
+
     setState_accountant({
-      insertDate: data_accountant.insertDate ? moment(data_accountant.insertDate) : null,
+      insertDate: insertDate ? moment(insertDate) : null,
       importAccountingNumber: data_accountant.importAccountingNumber ?? '',
       noteNumber: data_accountant.noteNumber ?? '',
       accountingNumber: data_accountant.accountingNumber ?? ' ',
@@ -699,7 +761,10 @@ const Row = ({
       notes: data_accountant.notes ?? '',
       isImported: data_accountant.isImported,
       accountsReceivableDeduction: data_accountant.accountsReceivableDeduction,
-      noteMaturityDate: data_accountant.noteMaturityDate ? moment(data_accountant.noteMaturityDate) : null,
+      noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
+      receiptCollectionDate: receiptCollectionDate ? moment(receiptCollectionDate) : null,
+      receiptEstimatedDate: receiptEstimatedDate ? moment(receiptEstimatedDate) : null,
+      currency: data_accountant.currency,
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -757,13 +822,10 @@ const Row = ({
           value,
           setState_accountant,
           handle_checkIsImported,
+          isAllowToEditIsImported,
         });
 
-        let theDiasbled = isbillSerialNumber || disabled;
-
-        if (key === 'isImported') {
-          theDiasbled = !isAllowToEditIsImported;
-        }
+        const theDiasbled = isbillSerialNumber || disabled;
 
         return (
           <div key={key} className={classNames(scss.cell, config?.className)} style={config?.style}>
@@ -823,6 +885,46 @@ const AddInovice = ({
   );
 };
 
+const MakeIsImported = ({
+  reqPatchIsImported,
+  accountReceivableId,
+  onCancel,
+}: {
+  onCancel: () => void;
+  accountReceivableId: string;
+  reqPatchIsImported: TreqPatchIsImported;
+}) => {
+  const handle_訂金 = async () => {
+    await reqPatchIsImported(accountReceivableId, '訂金');
+    onCancel();
+  };
+
+  const handle_請款 = async () => {
+    await reqPatchIsImported(accountReceivableId, '請款');
+    onCancel();
+  };
+
+  return (
+    <div>
+      <br />
+      <p>請選擇付款類型</p>
+      <div className="flex gap-5 mt-10">
+        <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
+          請款
+        </MyButton_v2>
+
+        <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
+          訂金
+        </MyButton_v2>
+
+        <MyButton_v2 theme="danger" px="px22" py="py6" buttonProps={{ htmlType: 'submit' }} onClick={onCancel}>
+          取消
+        </MyButton_v2>
+      </div>
+    </div>
+  );
+};
+
 // =========================================================================
 
 // region config
@@ -845,12 +947,14 @@ type Tconfig = {
     limitedDate?: Moment;
     value: string | Moment | null | boolean;
     setState_accountant: React.Dispatch<React.SetStateAction<Tstate_accountant>>;
-    handle_checkIsImported: (isImported: boolean) => void;
+    handle_checkIsImported: () => void;
+    isAllowToEditIsImported?: boolean;
   }) => {
     inputProps?: TinputProps;
     selectProps?: TselectProps;
     datePickerProps?: TdatePickerProps;
     checkBoxProps_v2?: TcheckBoxProps_v2;
+    reactNode?: React.ReactNode;
   };
 };
 
@@ -858,26 +962,37 @@ type TconfigList = {
   [key in TaccountantKey]?: Tconfig;
 };
 
-const baseArr_before: TaccountantKey[] = ['btn', 'isImported', 'insertDate'];
-const baseArr_after: TaccountantKey[] = ['accountingNumber', 'vendorName', 'price', 'billSerialNumber', 'notes'];
+const baseArr_before: TaccountantKey[] = ['btn', 'isImported'];
+const baseArr_after: TaccountantKey[] = [
+  'accountingNumber',
+  'vendorName',
+  'price',
+  'currency',
+  'billSerialNumber',
+  'notes',
+];
 
 const lookup_keyArr: {
   [key in TpaymentType]: TaccountantKey[];
 } = {
-  匯款: [...baseArr_before, 'importAccountingNumber', ...baseArr_after],
+  匯款: [...baseArr_before, 'insertDate', 'importAccountingNumber', ...baseArr_after],
   // 票據: [...baseArr_before, 'noteNumber', 'noteMaturityDate', ...baseArr_after],
   票據: [
     ...baseArr_before,
+    'insertDate',
     'noteNumber',
     'importAccountingNumber',
     'accountingNumber',
     'vendorName',
     'noteMaturityDate',
     'price',
+    'currency',
+    'receiptCollectionDate',
+    'receiptEstimatedDate',
     'billSerialNumber',
     'notes',
   ],
-  現金: [...baseArr_before, ...baseArr_after],
+  現金: [...baseArr_before, 'insertDate', ...baseArr_after],
 };
 
 const configList: TconfigList = {
@@ -904,7 +1019,8 @@ const configList: TconfigList = {
     },
     className: '',
     inputSelPropsCreator: ({
-      disabled,
+      isAllowToEditIsImported,
+      // disabled,
       bankAccountOptionArr,
       handle_checkIsImported,
       limitedDate,
@@ -915,16 +1031,14 @@ const configList: TconfigList = {
 
       const checkBoxProps_v2: TcheckBoxProps_v2 = {
         props: {
+          disabled: !!value_bool || !isAllowToEditIsImported,
           value: value_bool ? ['true'] : [],
           onChange: (arr) => {
             const isImported = arr[0];
 
             if (isImported === 'true') {
-              handle_checkIsImported?.(true);
+              handle_checkIsImported?.();
               // setState_accountant((state) => ({ ...state, isImported: true }));
-            } else {
-              handle_checkIsImported?.(false);
-              // setState_accountant((state) => ({ ...state, isImported: false }));
             }
           },
         },
@@ -1032,7 +1146,7 @@ const configList: TconfigList = {
     style: {
       width: 120,
     },
-    className: '',
+    className: scss.stickyLeft,
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
       const value_str = (value as string) || '';
       const inputProps: TinputProps = {
@@ -1149,7 +1263,8 @@ const configList: TconfigList = {
   },
   notes: {
     label: '備註',
-    style: { flex: 'auto' },
+    // style: { flex: 'auto' },
+    style: { width: 300 },
     className: '',
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
       const value_str = (value as string) || '';
@@ -1165,6 +1280,78 @@ const configList: TconfigList = {
       };
 
       return { inputProps };
+    },
+  },
+  receiptCollectionDate: {
+    label: '託收日',
+    style: {
+      width: 110,
+      // justifyContent: 'center',
+    },
+    className: '',
+    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, limitedDate, value, setState_accountant }) => {
+      const value_moment = value as Moment | null;
+
+      const datePickerProps: TdatePickerProps = {
+        props: {
+          value: value_moment,
+          onChange: (date) => {
+            setState_accountant((state) => ({ ...state, receiptCollectionDate: date }));
+          },
+        },
+      };
+
+      return { datePickerProps };
+    },
+  },
+  receiptEstimatedDate: {
+    label: '預兌日',
+    style: {
+      width: 110,
+      // justifyContent: 'center',
+    },
+    className: '',
+    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, limitedDate, value, setState_accountant }) => {
+      const value_moment = value as Moment | null;
+
+      const datePickerProps: TdatePickerProps = {
+        props: {
+          value: value_moment,
+          onChange: (date) => {
+            setState_accountant((state) => ({ ...state, receiptEstimatedDate: date }));
+          },
+        },
+      };
+
+      return { datePickerProps };
+    },
+  },
+  currency: {
+    label: '幣別',
+    style: {
+      width: 120,
+      // justifyContent: 'center',
+    },
+    className: '',
+    inputSelPropsCreator: ({ value, setState_accountant }) => {
+      const value_string = value as string;
+
+      const selectProps: TselectProps = {
+        props: {
+          value: value ? { label: value_string, value: value_string } : null,
+          options: options_currency,
+          onChange: (option) => {
+            if (!option) {
+              return;
+            }
+
+            const value = option.value as (typeof options_currency)[number]['value'];
+            setState_accountant((state) => ({ ...state, ['currency']: value }));
+          },
+        },
+      };
+
+      return { selectProps };
     },
   },
 };
@@ -1183,4 +1370,7 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   isImported: false,
   accountsReceivableDeduction: [],
   noteMaturityDate: null,
+  receiptCollectionDate: null,
+  receiptEstimatedDate: null,
+  currency: 'TWD 新臺幣',
 });
