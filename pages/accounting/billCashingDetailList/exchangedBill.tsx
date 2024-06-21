@@ -7,6 +7,9 @@ import classNames from 'classnames';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
+// component
+// import Pdf_exchangedBill from './pdf_exchangedBill';
+
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Row, { Cell } from 'components/global/gear/table/row';
@@ -34,6 +37,12 @@ export default function ExchangedBill() {
   const query = router.query as Tquery;
   const { id } = query;
 
+  // ---------------------------------------------------------------------------
+
+  const [showPdf, setShowPdf] = useState(false);
+
+  // ---------------------------------------------------------------------------
+
   const { data } = useGetAccountantExchangeFrom(id);
   const {
     accountant = [],
@@ -45,9 +54,24 @@ export default function ExchangedBill() {
 
   const priceTotal = accountant.reduce((acc, curr) => acc + (curr.price ?? 0), 0).toLocaleString();
 
+  // ---------------------------------------------------------------------------
+
+  // MARK: PROPS
+  const panelList: TpanelList = [
+    {
+      type: 'myButton',
+      label: '列印',
+      onClick: () => {},
+    },
+  ];
+
+  // ---------------------------------------------------------------------------
+
+  // MARK: RENDER
+
   return (
     <SubLayer>
-      <PageHeader02 tag="票據兌現" />
+      <PageHeader02 tag="票據兌現" panelList={panelList} />
 
       <div className={scss.main}>
         <div className={scss.info}>
@@ -147,9 +171,13 @@ export default function ExchangedBill() {
 
         {/*  */}
       </div>
+      {/* {data && <Pdf_exchangedBill accountantExchangeFromDto={data} />} */}
     </SubLayer>
   );
 }
+
+// MARK: END
+
 // ==========================================================================
 
 type Tkey =
