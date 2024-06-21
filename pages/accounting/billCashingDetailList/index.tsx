@@ -525,7 +525,7 @@ const keyArr: Tkey[] = [
   'price',
   'accountingNumber',
   'receiptEstimatedDate',
-] as const;
+];
 
 const keyArr_simple: Tkey[] = [
   'noteNumber',
@@ -536,7 +536,7 @@ const keyArr_simple: Tkey[] = [
   'accountingNumber',
   'receiptEstimatedDate',
   'receiptCashedDate',
-] as const;
+];
 
 type TconfigItem = {
   label: string;
