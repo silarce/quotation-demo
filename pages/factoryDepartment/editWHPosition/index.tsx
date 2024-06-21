@@ -379,7 +379,7 @@ export default function EditWHPosition() {
             // return;
 
             // 呼叫 traycommand API
-            const response = await fetch(`${url}Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
+            const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -393,7 +393,7 @@ export default function EditWHPosition() {
             console.log(response);
 
             // 呼叫 execcommand API
-            const response2 = await fetch(`${url}Modbus/execcommand?deviceName=${deviceName}&regaddress=${regaddress}&cmdvalue=${cmdvalue}`, {
+            const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -455,7 +455,7 @@ export default function EditWHPosition() {
             // return;
 
             // 呼叫 traycommand API
-            const response = await fetch(`${url}Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
+            const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -468,7 +468,7 @@ export default function EditWHPosition() {
             }
 
             // 呼叫 execcommand API
-            const response2 = await fetch(`${url}Modbus/execcommand?deviceName=${deviceName}&regaddress=${regaddress}&cmdvalue=${cmdvalue}`, {
+            const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
