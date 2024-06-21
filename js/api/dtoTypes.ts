@@ -3819,6 +3819,10 @@ export type TupdateAccountReceivableProductPaymentDto = {
 };
 
 export type TaccountantExchangeFromDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 匯兌單號
   sheetNumber: string;
   // 兌現日期

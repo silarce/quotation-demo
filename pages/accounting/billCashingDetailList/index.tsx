@@ -315,6 +315,8 @@ const Accountant = ({
   onCheck: (isChecked: boolean) => void;
   reqPatchReceiptCashedDate: TreqPatchReceiptCashedDate;
 }) => {
+  const router = useRouter();
+
   const [isFetching, setIsFetching] = useState(false);
   const [state_receiptCashedDate, setState_receiptCashedDate] = useState<Moment | null>(null);
 
@@ -356,6 +358,19 @@ const Accountant = ({
     setIsFetching(false);
   };
 
+  const handle_onDetailClick = () => {
+    if (!exchangeFrom) {
+      return;
+    }
+
+    router.push({
+      pathname: router.pathname + '/exchangedBill',
+      query: {
+        exchangeFromId: exchangeFrom.id,
+      },
+    });
+  };
+
   // -------------------------------------------------------------
   const list: { [key in Tkey]?: React.ReactNode } = {
     receiptStatus,
@@ -391,7 +406,10 @@ const Accountant = ({
         return (
           <Cell key={key} style={style}>
             {list[key]}
-            {key === 'sheetNumber' && list[key] && <IconDetail className="ml-1" />}
+            {key === 'sheetNumber' && list[key] && (
+              //
+              <IconDetail className="ml-1" onClick={handle_onDetailClick} />
+            )}
           </Cell>
         );
       })}
