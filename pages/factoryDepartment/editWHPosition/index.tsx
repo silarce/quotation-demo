@@ -358,9 +358,9 @@ export default function EditWHPosition() {
             const traycommand = "100";
 
             const url = (setting.env === "prod") ? (
-                (whname === "101") ? "http://192.168.1.8/sjwms/" :
-                    (whname === "102") ? "http://192.168.1.9/sjwms/" :
-                        (whname === "103") ? "http://192.168.1.10/sjwms/" : ""
+                (whname === "101") ? "https://192.168.1.8/sjwms/" :
+                    (whname === "102") ? "https://192.168.1.9/sjwms/" :
+                        (whname === "103") ? "https://192.168.1.10/sjwms/" : ""
             ) : "https://localhost:44383/WareHouse/";
 
 
@@ -379,7 +379,7 @@ export default function EditWHPosition() {
             // return;
 
             // 呼叫 traycommand API
-            const response = await fetch(`${url}Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
+            const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -393,7 +393,7 @@ export default function EditWHPosition() {
             console.log(response);
 
             // 呼叫 execcommand API
-            const response2 = await fetch(`${url}Modbus/execcommand?deviceName=${deviceName}&regaddress=${regaddress}&cmdvalue=${cmdvalue}`, {
+            const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -432,9 +432,9 @@ export default function EditWHPosition() {
             const traynumber = traycallednamein;
             const traycommand = "200";
             const url = (setting.env === "prod") ? (
-                (whnamecalledin === "101") ? "http://192.168.1.8/sjwms/" :
-                    (whnamecalledin === "102") ? "http://192.168.1.9/sjwms/" :
-                        (whnamecalledin === "103") ? "http://192.168.1.10/sjwms/" : ""
+                (whnamecalledin === "101") ? "https://192.168.1.8/sjwms/" :
+                    (whnamecalledin === "102") ? "https://192.168.1.9/sjwms/" :
+                        (whnamecalledin === "103") ? "https://192.168.1.10/sjwms/" : ""
             ) : "https://localhost:44383/WareHouse/";
 
 
@@ -455,7 +455,7 @@ export default function EditWHPosition() {
             // return;
 
             // 呼叫 traycommand API
-            const response = await fetch(`${url}Modbus/traycommand?deviceName=${deviceName}&traynumber=${traynumber}&traycommand=${traycommand}`, {
+            const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -468,7 +468,7 @@ export default function EditWHPosition() {
             }
 
             // 呼叫 execcommand API
-            const response2 = await fetch(`${url}Modbus/execcommand?deviceName=${deviceName}&regaddress=${regaddress}&cmdvalue=${cmdvalue}`, {
+            const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
