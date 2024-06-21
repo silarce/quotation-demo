@@ -15,9 +15,16 @@ const Row_pre = (
 ) => {
   const { thead, fullWidth } = props;
 
+  const attributes = {
+    ...props,
+  };
+
+  delete attributes.thead;
+  delete attributes.fullWidth;
+
   return (
     <div
-      {...props}
+      {...attributes}
       ref={ref}
       className={classNames(
         //

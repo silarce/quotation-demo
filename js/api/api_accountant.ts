@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -98,8 +98,19 @@ const useGetAccountant = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoUpdate, params]);
 
+  const list = useMemo(() => {
+    const list: { [id: string]: TaccountantDto } = {};
+
+    res?.data.forEach((item) => {
+      list[item.id] = item;
+    });
+
+    return list;
+  }, [res]);
+
   return {
     data: res?.data,
+    dataList: list,
     meta: res?.meta,
     update,
     isFetching,
@@ -262,7 +273,7 @@ const apiGetAccountantExchangeFrom = async (id: string) => {
     .catch((err) => Promise.reject(err));
 };
 
-const useGetAccountantExchangeFrom = (id: string, { autoUpdate = true }: { autoUpdate: boolean }) => {
+export const useGetAccountantExchangeFrom = (id: string, { autoUpdate = true }: { autoUpdate: boolean }) => {
   const [res, setRes] = useState<TaccountantExchangeFromDto>();
   const [isFetching, setIsFetching] = useState(false);
 
@@ -300,7 +311,7 @@ const useGetAccountantExchangeFrom = (id: string, { autoUpdate = true }: { autoU
 
 export const apiPostAccountantExchangeFrom = async (
   body: TcreateAccountantExchangeFromDto,
-  { callAlert = true }: { callAlert: boolean }
+  { callAlert = true }: { callAlert?: boolean } = {}
 ) => {
   const api = '/accountant-exchange-from';
 

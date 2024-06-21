@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import classNames from 'classnames';
@@ -18,6 +18,8 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'js/utils/helpers/hook/useYearMonth';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+
 import scss from './index.module.scss';
 
 // api
@@ -28,6 +30,7 @@ import {
   TupdateAccountReceivableDeductionDto,
   TaccountantDto,
   TaccountantExchangeFromDto,
+  TcreateAccountantExchangeFromDto,
   //
   apiPostAccountant,
   apiPatchAccountant,
@@ -36,8 +39,9 @@ import {
   apiPostAccountantExchangeFrom,
   //
   useGetAccountant,
-  useGetAccountantPreset,
+  useGetAccountantExchangeFrom,
 } from 'js/api/api_accountant';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // ============================================================================
 
@@ -46,6 +50,11 @@ type Tquery = {
   month: string;
   keyword: string;
 };
+
+type TreqPatchReceiptCashedDate = (
+  accountantId: string,
+  receiptCashedDate: string | null
+) => Promise<TupdateAccountantDto>;
 
 // ============================================================================
 
@@ -61,14 +70,14 @@ export default function BillCashingDetailList() {
 
   // --------------------------------------------------------------------------
 
-  const [selectedAccountantArr, setSelectedAccountantArr] = useState<TaccountantDto[]>([]);
+  const [selectedAccountantIdArr, setSelectedAccountantIdArr] = useState<string[]>([]);
 
   // --------------------------------------------------------------------------
 
   const params: Tparams = useMemo(() => {
-    return {
+    const params: Tparams = {
+      sort: 'exchangeFrom.sheetNumber',
       populate: [
-        //
         // 'incomeBill',
         // 'invoices',
         'exchangeFrom',
@@ -96,27 +105,77 @@ export default function BillCashingDetailList() {
         ],
       },
     };
+
+    return params;
   }, [year, month, keyword]);
 
-  const { data: data_accountantArr = [] } = useGetAccountant({ params });
+  const { data: data_accountantArr = [], dataList, update: update_accountant } = useGetAccountant({ params });
+
+  const selectedAccountantArr = useMemo(() => {
+    const arr = selectedAccountantIdArr.map((id) => {
+      return dataList[id];
+    });
+
+    return arr;
+  }, [selectedAccountantIdArr, dataList]);
 
   // --------------------------------------------------------------------------
+
+  // MARK: REQUEST
+
+  const reqPostExchangeFrom = async (accountantIdArr: string[]) => {
+    const body: TcreateAccountantExchangeFromDto = {
+      accountantId: accountantIdArr,
+    };
+
+    try {
+      await apiPostAccountantExchangeFrom(body);
+      await update_accountant();
+    } catch (err) {}
+  };
+
+  const reqPatchReceiptCashedDate: TreqPatchReceiptCashedDate = async (accountantId, receiptCashedDate) => {
+    const body: TupdateAccountantDto = { receiptCashedDate: receiptCashedDate || null };
+    const res = await apiPatchAccountant(accountantId, { body });
+    update_accountant();
+
+    return res;
+  };
+
   // MARK: FUNCTION
 
   const handle_check = (accountantId: string) => {
-    return selectedAccountantArr?.some((item) => item.id === accountantId);
+    return selectedAccountantIdArr?.some((id) => id === accountantId);
   };
 
-  const handle_onCheck = (accountant: TaccountantDto, checked: boolean) => {
-    setSelectedAccountantArr((prev) => {
+  const handle_onCheck = (accountantId: string, checked: boolean) => {
+    setSelectedAccountantIdArr((prev) => {
       if (checked) {
-        return [...prev, accountant];
+        return [...prev, accountantId];
       } else {
-        return prev.filter((item) => item !== accountant);
+        return prev.filter((item) => item !== accountantId);
       }
     });
   };
 
+  const handle_onExchange = async () => {
+    if (selectedAccountantIdArr.length === 0) {
+      return;
+    }
+
+    const onOk = async () => {
+      await reqPostExchangeFrom(selectedAccountantIdArr);
+      setSelectedAccountantIdArr([]);
+    };
+
+    const modal = myAlert.confirm({});
+    modal.update({
+      width: 'fit-content',
+      title: '請確認要匯出的票據',
+      content: <NoteTable accountantArr={selectedAccountantArr} />,
+      onOk,
+    });
+  };
   // --------------------------------------------------------------------------
 
   // MARK:PROPS
@@ -155,7 +214,7 @@ export default function BillCashingDetailList() {
     {
       type: 'myButton',
       label: '匯出',
-      onClick: () => {},
+      onClick: handle_onExchange,
     },
   ];
   // --------------------------------------------------------------------------
@@ -199,8 +258,9 @@ export default function BillCashingDetailList() {
                 data_accountant={data}
                 isChecked={handle_check(data.id)}
                 onCheck={(isChecked) => {
-                  handle_onCheck(data, isChecked);
+                  handle_onCheck(data.id, isChecked);
                 }}
+                reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
               />
             );
           })}
@@ -222,11 +282,14 @@ const Accountant = ({
   data_accountant,
   isChecked,
   onCheck,
+  reqPatchReceiptCashedDate,
 }: {
   data_accountant: TaccountantDto;
   isChecked: boolean;
   onCheck: (isChecked: boolean) => void;
+  reqPatchReceiptCashedDate: TreqPatchReceiptCashedDate;
 }) => {
+  const [isFetching, setIsFetching] = useState(false);
   const [state_receiptCashedDate, setState_receiptCashedDate] = useState<Moment | null>(null);
 
   const {
@@ -245,7 +308,30 @@ const Accountant = ({
 
   const { sheetNumber = '' } = exchangeFrom ?? {};
 
-  const list: { [key in Tkey]: React.ReactNode } = {
+  // -------------------------------------------------------------
+
+  const handle_onReceiptCashedDateChange = async (m: Moment | null) => {
+    const oldDate = state_receiptCashedDate;
+
+    setIsFetching(true);
+    setState_receiptCashedDate(m);
+    await reqPatchReceiptCashedDate(data_accountant.id, m?.toISOString() || null)
+      .then((res) => {
+        if ('receiptCashedDate' in res) {
+          setState_receiptCashedDate(res.receiptCashedDate ? moment(res.receiptCashedDate) : null);
+        } else {
+          throw new Error('回應沒有receiptCashedDate');
+        }
+      })
+      .catch(() => {
+        setState_receiptCashedDate(oldDate);
+      });
+
+    setIsFetching(false);
+  };
+
+  // -------------------------------------------------------------
+  const list: { [key in Tkey]?: React.ReactNode } = {
     receiptStatus,
     sheetNumber,
     noteNumber,
@@ -264,7 +350,7 @@ const Accountant = ({
 
   return (
     <Row fullWidth={true} className={scss.row}>
-      <Cell style={config.selectBox.style}>
+      <Cell className={classNames(sheetNumber && 'invisible')} style={config.selectBox.style}>
         <input
           className={'cursor-pointer scale-150'}
           type="checkbox"
@@ -272,30 +358,97 @@ const Accountant = ({
           onChange={(e) => onCheck(e.target.checked)}
         />
       </Cell>
+
       {keyArr.map((key) => {
         const { style } = config[key];
 
         return (
           <Cell key={key} style={style}>
             {list[key]}
+            {key === 'sheetNumber' && list[key] && <IconDetail className="ml-1" />}
           </Cell>
         );
       })}
       <Cell style={config.receiptCashedDate.style}>
-        <Spin spinning={false}>
+        <Spin spinning={isFetching}>
           <InputSel
+            disabled={!!sheetNumber}
+            showBaseline="auto"
             datePickerProps={{
               props: {
-                value: state_receiptCashedDate,
-                onChange: (m) => {
-                  setState_receiptCashedDate(m);
-                },
+                value: state_receiptCashedDate || null,
+                onChange: handle_onReceiptCashedDateChange,
               },
             }}
           />
         </Spin>
       </Cell>
     </Row>
+  );
+};
+
+const NoteTable = ({ accountantArr }: { accountantArr: TaccountantDto[] }) => {
+  return (
+    <div className={classNames(scss.table, 'mt-5')}>
+      <Row thead={true} fullWidth={true}>
+        <Cell style={config.selectBox.style} />
+        {keyArr_simple.map((key) => {
+          const { label, style } = config[key];
+
+          return (
+            <Cell key={key} style={style}>
+              {label}
+            </Cell>
+          );
+        })}
+      </Row>
+
+      {accountantArr.map((data) => {
+        const {
+          receiptStatus,
+          noteNumber,
+          importAccountingNumber,
+          vendorName,
+          noteMaturityDate,
+          price,
+          accountingNumber,
+          receiptEstimatedDate,
+          receiptCashedDate,
+
+          exchangeFrom,
+        } = data;
+
+        const { sheetNumber = '' } = exchangeFrom ?? {};
+
+        const list: { [key in Tkey]?: React.ReactNode } = {
+          receiptStatus,
+          sheetNumber,
+          noteNumber,
+          importAccountingNumber,
+          vendorName,
+          noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
+          price,
+          accountingNumber,
+          receiptEstimatedDate: getTaiwanDateStr(receiptEstimatedDate),
+          receiptCashedDate: getTaiwanDateStr(receiptCashedDate),
+        };
+
+        return (
+          <Row key={data.id} fullWidth={true}>
+            <Cell style={config.selectBox.style} />
+            {keyArr_simple.map((key) => {
+              const { label, style } = config[key];
+
+              return (
+                <Cell key={key} style={style}>
+                  {list[key]}
+                </Cell>
+              );
+            })}
+          </Row>
+        );
+      })}
+    </div>
   );
 };
 
@@ -314,6 +467,7 @@ type Tkey =
       | 'price'
       | 'accountingNumber'
       | 'receiptEstimatedDate'
+      | 'receiptCashedDate'
     >
   | keyof Pick<TaccountantExchangeFromDto, 'sheetNumber'>;
 
@@ -327,6 +481,17 @@ const keyArr: Tkey[] = [
   'price',
   'accountingNumber',
   'receiptEstimatedDate',
+] as const;
+
+const keyArr_simple: Tkey[] = [
+  'noteNumber',
+  'importAccountingNumber',
+  'vendorName',
+  'noteMaturityDate',
+  'price',
+  'accountingNumber',
+  'receiptEstimatedDate',
+  'receiptCashedDate',
 ] as const;
 
 type TconfigItem = {
@@ -357,7 +522,7 @@ const config: Tconfig = {
   sheetNumber: {
     label: '匯兌單號',
     style: {
-      width: '80px',
+      width: '100px',
     },
   },
   noteNumber: {
