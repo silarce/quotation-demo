@@ -97,11 +97,37 @@ export default function BillCashingDetailList() {
             .toISOString(),
         },
         $or: [
-          // {
-          //   vendorName: {
-          //     $contains: keyword,
-          //   },
-          // },
+          {
+            'exchangeFrom.sheetNumber': {
+              $eq: keyword,
+            },
+          },
+          {
+            noteNumber: {
+              $eq: keyword,
+            },
+          },
+          {
+            importAccountingNumber: {
+              $contains: keyword,
+            },
+          },
+          {
+            vendorName: {
+              $contains: keyword,
+            },
+          },
+          {
+            price: {
+              // $eq: keyword,
+              $eq: isNaN(Number(keyword)) ? undefined : keyword,
+            },
+          },
+          {
+            accountingNumber: {
+              $contains: keyword,
+            },
+          },
         ],
       },
     };
