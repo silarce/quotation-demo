@@ -262,18 +262,20 @@ const useGetAccountantPreset = ({
   };
 };
 
-// TaccountantExchangeFromDto
-// get /accountant-exchange-from/{id}
 const apiGetAccountantExchangeFrom = async (id: string) => {
   const api = `/accountant-exchange-from/${id}`;
 
+  const params = {
+    populate: ['accountant'],
+  };
+
   return axi
-    .get<TaccountantExchangeFromDto>(api)
+    .get<TaccountantExchangeFromDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetAccountantExchangeFrom = (id: string, { autoUpdate = true }: { autoUpdate: boolean }) => {
+export const useGetAccountantExchangeFrom = (id: string, { autoUpdate = true }: { autoUpdate?: boolean } = {}) => {
   const [res, setRes] = useState<TaccountantExchangeFromDto>();
   const [isFetching, setIsFetching] = useState(false);
 

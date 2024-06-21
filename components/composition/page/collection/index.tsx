@@ -963,19 +963,30 @@ type TconfigList = {
 };
 
 const baseArr_before: TaccountantKey[] = ['btn', 'isImported'];
-const baseArr_after: TaccountantKey[] = [
-  'accountingNumber',
-  'vendorName',
-  'price',
-  'currency',
-  'billSerialNumber',
-  'notes',
-];
+// const baseArr_after: TaccountantKey[] = [
+//   'accountingNumber',
+//   'vendorName',
+//   'price',
+//   'currency',
+//   'billSerialNumber',
+//   'notes',
+// ];
 
 const lookup_keyArr: {
   [key in TpaymentType]: TaccountantKey[];
 } = {
-  匯款: [...baseArr_before, 'insertDate', 'importAccountingNumber', ...baseArr_after],
+  匯款: [
+    ...baseArr_before,
+    'insertDate',
+    'importAccountingNumber',
+
+    'accountingNumber',
+    'vendorName',
+    'price',
+    'currency',
+    'billSerialNumber',
+    'notes',
+  ],
   // 票據: [...baseArr_before, 'noteNumber', 'noteMaturityDate', ...baseArr_after],
   票據: [
     ...baseArr_before,
@@ -986,13 +997,23 @@ const lookup_keyArr: {
     'vendorName',
     'noteMaturityDate',
     'price',
-    'currency',
+    // 'currency',
     'receiptCollectionDate',
     'receiptEstimatedDate',
     'billSerialNumber',
     'notes',
   ],
-  現金: [...baseArr_before, 'insertDate', ...baseArr_after],
+  現金: [
+    ...baseArr_before,
+    'insertDate',
+
+    'accountingNumber',
+    'vendorName',
+    'price',
+    // 'currency',
+    'billSerialNumber',
+    'notes',
+  ],
 };
 
 const configList: TconfigList = {
@@ -1112,31 +1133,31 @@ const configList: TconfigList = {
     inputSelPropsCreator: ({ disabled, bankAccountOptionArr, value, setState_accountant }) => {
       const value_str = (value as string) || '';
 
-      // const selectProps: TselectProps = {
-      //   props: {
-      //     isSearchable: true,
-      //     options: bankAccountOptionArr,
-      //     value: value_str ? { label: value_str, value: value_str } : null,
-      //     onChange: (option) => {
-      //       setState_accountant((state) => ({ ...state, ['accountingNumber']: option?.value ?? '' }));
-      //     },
-      //   },
-      // };
-
-      const inputProps: TinputProps = {
+      const selectProps: TselectProps = {
         props: {
-          placeholder: '請選擇',
-          type: 'text',
-          value: value_str,
-          onChange: (e) => {
-            setState_accountant((state) => ({ ...state, ['accountingNumber']: e.target.value }));
+          isSearchable: true,
+          options: bankAccountOptionArr,
+          value: value_str ? { label: value_str, value: value_str } : null,
+          onChange: (option) => {
+            setState_accountant((state) => ({ ...state, ['accountingNumber']: option?.value ?? '' }));
           },
         },
       };
 
+      // const inputProps: TinputProps = {
+      //   props: {
+      //     placeholder: '請選擇',
+      //     type: 'text',
+      //     value: value_str,
+      //     onChange: (e) => {
+      //       setState_accountant((state) => ({ ...state, ['accountingNumber']: e.target.value }));
+      //     },
+      //   },
+      // };
+
       return {
-        //  selectProps
-        inputProps,
+        selectProps,
+        // inputProps,
       };
     },
   },
