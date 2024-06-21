@@ -1,12 +1,19 @@
 import { Key, MouseEvent, useEffect, useState } from 'react';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import iconPlace from 'public/image/icon/place.svg';
-import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+import { IconAddCircle, IconChain, IconCross01, IconDetail, IconSearch, IconTearing, Icon_info } from 'public/image/icon/svgComponent/svgIcons';
 import scss from './tbody01.module.scss';
 import scss2 from './tbody02.module.scss';
 import router from 'next/router';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { Transfer } from 'antd';
+import { IconButton } from '@mui/material';
+import IconContext from '@ant-design/icons/lib/components/Context';
+import { IconMap } from 'antd/lib/result';
+import icon_arrowdown from 'public/image/icon/arrow_down_tray.svg';
+import icon_arrowup from 'public/image/icon/arrow_up_tray.svg';
+import icon_arrowchange from 'public/image/icon/arrow_change_tray.svg';
+
 
 type TBodyItemContent = {};
 
@@ -119,7 +126,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 {/* <span>{_item.create_by}</span> */}
                 <span>{_item.url}</span>
                 <span>{_item.update_by}</span>
-                <span>{convertToYearMonthDay('Datea', _item.update_at)}</span>
+                {/* <span>{convertToYearMonthDay('Datea', _item.update_at)}</span> */}
+                <span>{getTaiwanDateStr(_item.update_at)}</span>
                 <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
               </div>
             </CellWithBar>
@@ -171,6 +179,58 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span></span>
                 <span></span>
                 <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "materialList") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader4}>
+              <div className={scss.row01}>
+                <span>{_item.whpname}</span>
+                <span>{_item.materialnumber}</span>
+                <span>{_item.spec}</span>
+                <span>{_item.quantity}</span>
+                <span>{_item.whname}</span>
+                <span>{_item.trayname}</span>
+                {/* <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span> */}
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "GetMatWarehouseList") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader5}>
+              <div className={scss.row01}>
+                <span>{_item.whname}</span>
+                <span>{_item.trayname}</span>
+                {/* <span ><IconDetail onClick={() => {alert("ok")}}/></span> */}
+                <span ><button onClick={() => { alert("ok") }}>
+                  {/* {icon_arrowdown} */}
+                  <span>
+                    <img src={icon_arrowdown.src} alt="Arrow Down" style={{ width: '30px', height: '30px' }} />
+                  </span>
+                  &nbsp;
+                  <span>
+                    <img src={icon_arrowup.src} alt="Arrow Down" style={{ width: '30px', height: '30px' }} />
+                  </span>
+                  &nbsp;
+                  <span>
+                    <img src={icon_arrowchange.src} alt="Arrow Down" style={{ width: '30px', height: '20px' }} />
+                  </span>
+                </button></span>
               </div>
             </CellWithBar>
           ))
