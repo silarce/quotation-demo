@@ -7,6 +7,7 @@ import icon_setting from 'public/image/icon/setting.svg';
 import icon_domestic from 'public/image/icon/domestic.svg';
 import icon_foreign from 'public/image/icon/foreign.svg';
 import icon_project from 'public/image/icon/project.svg';
+import icon_warehouse from 'public/image/icon/warehouse.svg';
 
 type ErpFeaturesValues = (typeof erpFeaturesLookup)[keyof typeof erpFeaturesLookup];
 
@@ -635,6 +636,44 @@ const sidePathList: TsidePathList = {
       ],
     };
   })(),
+  '/factoryDepartment': ((): TsidePathConfig => {
+    const path01 = '/factoryDepartment';
+
+    return {
+      path01,
+      list: [
+        {
+          label: '倉儲',
+          erpFeature: devPass,
+          list: [
+            {
+              label: '入庫',
+              path: path01 + '/wareHouseList',
+              query: {
+                type: 'WareHouse',
+              },
+              erpFeature: devPass,
+            },
+            {
+              label: '領料',
+              path: path01 + '/whPositionList',
+              erpFeature: devPass,
+            },
+            // {
+            //   label: '托盤',
+            //   path: path01 + '/trayList',
+            //   erpFeature: devPass,
+            // },
+            // {
+            //   label: '儲位',
+            //   path: path01 + '/whPositionList',
+            //   erpFeature: devPass,
+            // },
+          ],
+        },
+      ],
+    };
+  })(),
 
   // =======================================
 };
@@ -730,6 +769,18 @@ const topPathList: TtopPathListConfig[] = [
       pathname: sidePathList['/accounting'].path01 + '/collection',
     },
     erpFeature: [accountsReceivable, accountingDepartment],
+  },
+  {
+    icon: icon_warehouse,
+    label: '廠務部',
+    path01: sidePathList['/factoryDepartment'].path01,
+    href: {
+      pathname: sidePathList['/factoryDepartment'].path01+'/wareHouseList',
+      query: {
+        type: 'WareHouse',
+      },
+    },
+    erpFeature: devPass,
   },
 ];
 
