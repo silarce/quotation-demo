@@ -13,5 +13,36 @@ $infoHeight: 200px;
   gap: 10px;
   height: $infoHeight;
   padding-top: 60px;
-  background-color: pink;
+  background-color: white;
+}
+
+.table {
+  border: solid 1px theme("colors.border");
+  border-width: 0 1px 0 1px;
+}
+
+.thead {
+  position: sticky;
+  top: $infoHeight;
+  border-top: solid 1px theme("colors.border");
+}
+.tbodyRow {
+  &:nth-last-of-type(1) {
+    border: 0;
+  }
+}
+
+.bottomRowWrapper {
+  position: sticky;
+  bottom: 0px;
+
+  .totalRow {
+    border: solid 1px theme("colors.border");
+    // border-bottom: 0;
+  }
+
+  .block {
+    height: 20px;
+    background-color: white;
+  }
 }
