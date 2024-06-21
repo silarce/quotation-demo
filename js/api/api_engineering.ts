@@ -61,6 +61,7 @@ import type {
   TaccountsReceivableInvoiceDto,
   TincomeBillSerialDto,
   TupdateIncomeBillSerialDto,
+  TcreateAccountReceivableAccountsDto,
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
@@ -117,6 +118,7 @@ export type {
   //
   TincomeBillSerialDto,
   TupdateIncomeBillSerialDto,
+  TcreateAccountReceivableAccountsDto,
 } from './dtoTypes';
 
 export type { TinvouceCheckResult };
@@ -1918,5 +1920,19 @@ export const apiPatchIncomeBill = async (id: string, body: TupdateIncomeBillSeri
       myAlert.err({ title: '更新收款明細失敗', content: err.message });
 
       Promise.reject(error);
+    });
+};
+
+export const apiPostAccountReceivableAccounts = async (body: TcreateAccountReceivableAccountsDto) => {
+  const api = `/engineering/account-receivable/accountants-to-paper`;
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({ title: '匯入紙本應收帳款失敗', content: err.message });
+
+      return Promise.reject(err);
     });
 };

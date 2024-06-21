@@ -1,0 +1,17 @@
+$infoHeight: 200px;
+
+.main {
+  padding: 0 50px;
+}
+
+.info {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  grid-auto-rows: fit-content(100%);
+  gap: 10px;
+  height: $infoHeight;
+  padding-top: 60px;
+  background-color: pink;
+}

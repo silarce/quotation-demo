@@ -7,6 +7,7 @@ import icon_setting from 'public/image/icon/setting.svg';
 import icon_domestic from 'public/image/icon/domestic.svg';
 import icon_foreign from 'public/image/icon/foreign.svg';
 import icon_project from 'public/image/icon/project.svg';
+import icon_warehouse from 'public/image/icon/warehouse.svg';
 
 type ErpFeaturesValues = (typeof erpFeaturesLookup)[keyof typeof erpFeaturesLookup];
 
@@ -24,7 +25,7 @@ type TsidePathConfig = {
     otherPermissions?: {
       grade?: number;
     };
-    activeChecker?: (props: { urlQuery: NextRouter['query'] }) => boolean;
+    activeChecker?: (props: { router: NextRouter }) => boolean;
     list?: {
       label: string;
       path: string;
@@ -40,7 +41,7 @@ type TsidePathConfig = {
       exception?: {
         idNumber?: string[];
       };
-      activeChecker?: (props: { urlQuery: NextRouter['query'] }) => boolean;
+      activeChecker?: (props: { router: NextRouter }) => boolean;
     }[];
   }[];
 };
@@ -263,8 +264,8 @@ const sidePathList: TsidePathList = {
                 status: 'Pending',
               },
               erpFeature: [domestic, accountsReceivable],
-              activeChecker: ({ urlQuery }) => {
-                const { status } = urlQuery;
+              activeChecker: ({ router }) => {
+                const { status } = router.query;
 
                 if (status === 'Pending' || status === 'TempPending') {
                   return true;
@@ -456,15 +457,37 @@ const sidePathList: TsidePathList = {
           path: path01 + '/todoList',
           erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
+
         {
-          label: '會計收款管理',
-          path: path01 + '/collection',
-          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
-        },
-        {
-          label: '收入傳票',
-          path: path01 + '/incomeSummons',
+          label: '收入作業',
           erpFeature: [incomeBill],
+          list: [
+            {
+              label: '會計收款管理',
+              path: path01 + '/collection',
+              erpFeature: [
+                worksDepartment,
+                accountsReceivable,
+                worksDepartment_worksheet,
+                worksDepartment_deliveryList,
+              ],
+            },
+            {
+              label: '收入傳票管理',
+              path: path01 + '/incomeSummons',
+              erpFeature: [incomeBill],
+            },
+            {
+              label: '開立發票管理',
+              path: path01 + '/invoiceIssuanceManagement',
+              erpFeature: [
+                worksDepartment,
+                accountsReceivable,
+                worksDepartment_worksheet,
+                worksDepartment_deliveryList,
+              ],
+            },
+          ],
         },
         // {
         //   label: '新增派工單',
@@ -560,9 +583,39 @@ const sidePathList: TsidePathList = {
       path01,
       list: [
         {
-          label: '收款管理',
-          path: path01 + '/collection',
+          label: '收款作業',
           erpFeature: [accountingDepartment],
+          list: [
+            {
+              label: '收款管理',
+              path: path01 + '/collection',
+              erpFeature: [accountingDepartment],
+              activeChecker: ({ router }) => {
+                if (router.route === '/accounting/collection') {
+                  return true;
+                }
+
+                return false;
+              },
+            },
+            {
+              label: '收款明細表',
+              path: path01 + '/collectionDetailList',
+              erpFeature: [accountingDepartment],
+              activeChecker: ({ router }) => {
+                if (router.route === '/accounting/collectionDetailList') {
+                  return true;
+                }
+
+                return false;
+              },
+            },
+            {
+              label: '票據兌現明細表',
+              path: path01 + '/billCashingDetailList',
+              erpFeature: [accountingDepartment],
+            },
+          ],
         },
         // {
         //   label: 'foo',
@@ -580,6 +633,50 @@ const sidePathList: TsidePathList = {
         //     },
         //   ],
         // },
+      ],
+    };
+  })(),
+  '/factoryDepartment': ((): TsidePathConfig => {
+    const path01 = '/factoryDepartment';
+
+    return {
+      path01,
+      list: [
+        {
+          label: '庫存管理',
+          erpFeature: devPass,
+          list: [
+            {
+              label: '入庫',
+              path: path01 + '/wareHouseList',
+              query: {
+                type: 'WareHouse',
+              },
+              erpFeature: devPass,
+            },
+          ],
+        },
+        {
+          label: '領料',
+          erpFeature: devPass,
+          list: [
+            // {
+            //   label: '領料查詢',
+            //   path: path01 + '/getMaterial/pickingList',
+            //   erpFeature: devPass,
+            // },
+            {
+              label: '物料查詢',
+              path: path01 + '/getMaterial/materialList',
+              erpFeature: devPass,
+            },
+            // {
+            //   label: '新增領料單',
+            //   path: path01 + '/getMaterial/addPickingList',
+            //   erpFeature: devPass,
+            // },
+          ],
+        },
       ],
     };
   })(),
@@ -678,6 +775,18 @@ const topPathList: TtopPathListConfig[] = [
       pathname: sidePathList['/accounting'].path01 + '/collection',
     },
     erpFeature: [accountsReceivable, accountingDepartment],
+  },
+  {
+    icon: icon_warehouse,
+    label: '廠務部',
+    path01: sidePathList['/factoryDepartment'].path01,
+    href: {
+      pathname: sidePathList['/factoryDepartment'].path01+'/wareHouseList',
+      query: {
+        type: 'WareHouse',
+      },
+    },
+    erpFeature: devPass,
   },
 ];
 
