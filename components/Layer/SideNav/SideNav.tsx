@@ -39,7 +39,7 @@ export default function SideNav() {
         let isActive = pathname.startsWith(path ?? 'undefined');
 
         if (activeChecker) {
-          isActive = activeChecker({ urlQuery: routerQuery });
+          isActive = activeChecker({ router });
         }
 
         let isPassed = false;
@@ -87,7 +87,7 @@ export default function SideNav() {
                     let isActive = pathname.startsWith(path);
 
                     if (activeChecker) {
-                      isActive = activeChecker({ urlQuery: routerQuery });
+                      isActive = activeChecker({ router });
                     } else if (query) {
                       isActive = _.isMatch(routerQuery, query ?? {});
                     }

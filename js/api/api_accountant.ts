@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -22,6 +22,8 @@ import type {
   TaccountantPresetDto,
   TcreateAccountantPresetDto,
   TupdateAccountantPresetDto,
+  TaccountantExchangeFromDto,
+  TcreateAccountantExchangeFromDto,
 } from './dtoTypes';
 
 export type {
@@ -37,6 +39,8 @@ export type {
   TaccountantPresetDto,
   TcreateAccountantPresetDto,
   TupdateAccountantPresetDto,
+  TaccountantExchangeFromDto,
+  TcreateAccountantExchangeFromDto,
 } from './dtoTypes';
 
 type TgetAccountant = TpageResponse<TaccountantDto>;
@@ -63,7 +67,7 @@ const useGetAccountant = ({
   params?: Tparams;
   autoUpdate?: boolean;
   callAlert?: boolean;
-}) => {
+} = {}) => {
   const [res, setRes] = useState<TgetAccountant>();
   const [isFetching, setIsFetching] = useState(false);
 
@@ -94,8 +98,19 @@ const useGetAccountant = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoUpdate, params]);
 
+  const list = useMemo(() => {
+    const list: { [id: string]: TaccountantDto } = {};
+
+    res?.data.forEach((item) => {
+      list[item.id] = item;
+    });
+
+    return list;
+  }, [res]);
+
   return {
     data: res?.data,
+    dataList: list,
     meta: res?.meta,
     update,
     isFetching,
@@ -245,6 +260,73 @@ const useGetAccountantPreset = ({
     update,
     isFetching,
   };
+};
+
+// TaccountantExchangeFromDto
+// get /accountant-exchange-from/{id}
+const apiGetAccountantExchangeFrom = async (id: string) => {
+  const api = `/accountant-exchange-from/${id}`;
+
+  return axi
+    .get<TaccountantExchangeFromDto>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountantExchangeFrom = (id: string, { autoUpdate = true }: { autoUpdate: boolean }) => {
+  const [res, setRes] = useState<TaccountantExchangeFromDto>();
+  const [isFetching, setIsFetching] = useState(false);
+
+  const update = useCallback(async () => {
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetAccountantExchangeFrom(id);
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '取得匯費資料失敗',
+        content: err.message,
+      });
+
+      return err;
+    } finally {
+      setIsFetching(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [update]);
+
+  return {
+    data: res,
+    update,
+    isFetching,
+  };
+};
+
+export const apiPostAccountantExchangeFrom = async (
+  body: TcreateAccountantExchangeFromDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = '/accountant-exchange-from';
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      callAlert &&
+        myAlert.err({
+          title: '新增票據兌現失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
 };
 
 // ==============================================================================
