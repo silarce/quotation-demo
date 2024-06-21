@@ -3826,7 +3826,7 @@ export type TaccountantExchangeFromDto = {
   // 匯兌單號
   sheetNumber: string;
   // 兌現日期
-  cashExchangeDate: Date | null;
+  cashExchangeDate: string | null;
   // 兌現帳戶
   cashExchangeAccount: string | null;
   // 包含的accountant

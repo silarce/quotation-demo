@@ -366,7 +366,7 @@ const Accountant = ({
     router.push({
       pathname: router.pathname + '/exchangedBill',
       query: {
-        exchangeFromId: exchangeFrom.id,
+        id: exchangeFrom.id,
       },
     });
   };
