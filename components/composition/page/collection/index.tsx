@@ -165,6 +165,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       const params: Tparams = {
         populate: ['accountsReceivableDeduction'],
         sort: 'insertDate',
+        pageSize: 999999,
         filter: {
           insertDate: {
             $gte: m_date.startOf('month').toISOString(),
