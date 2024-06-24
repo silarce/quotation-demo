@@ -928,7 +928,8 @@ const calcPrice = ({ currencyValue, exchangeRate }: Tstate_accountant) => {
   const d_currencyValue = new Decimal(currencyValue || 0);
   const d_price = d_currencyValue.mul(exchangeRate || 0);
 
-  return d_price.toNumber();
+  // return d_price.toNumber();
+  return d_price.toDecimalPlaces(0).toNumber();
 };
 
 // =========================================================================
