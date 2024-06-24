@@ -7,6 +7,7 @@ import { TquotationStatus } from 'js/api/dtoTypes';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { useEffect, useState } from 'react';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -254,15 +255,18 @@ export default function AddTray() {
             }
 
             const responseData = await response.json();
+            if (response.ok) {
+                myAlert.success({ title: '新增成功' });
+                router.push({
+                    pathname: `/factoryDepartment/trayList`,
+                    query: {
+                        type: 'WareHouse',
+                        whid: whid,
+                        whname: whname
+                    }
+                });
 
-            router.push({
-                pathname: `/factoryDepartment/trayList`,
-                query: {
-                    type: 'WareHouse',
-                    whid: whid,
-                    whname: whname
-                }
-            });
+            }
             // console.log("checkresponse: ", responseData);
 
             // setData11child(responseData);
