@@ -3716,6 +3716,9 @@ export type TaccountantDto = {
   currency: Tcurrency;
   // 票據實際兌現日
   receiptCashedDate: string | null;
+
+  exchangeRate: `${number}`; // 匯率
+  currencyValue: `${number}`; // 幣值
 };
 
 export type TcreateAccountantDto = Pick<
@@ -3734,6 +3737,8 @@ export type TcreateAccountantDto = Pick<
   | 'receiptEstimatedDate'
   | 'receiptCashedDate'
   | 'currency'
+  | 'exchangeRate'
+  | 'currencyValue'
 > & {
   noteMaturityDate?: string | null; // 票據到期日
   // receiptCollectionDate?: string | null; // 託收日
