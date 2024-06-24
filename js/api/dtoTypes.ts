@@ -3425,6 +3425,8 @@ export type TincomeBillSerialDto = {
   isForeign: boolean;
   // 差額 // 更新accountant的扣款明細、手續費會更新差額
   difference: string | null;
+  // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
+  isPaperImported: boolean;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3441,6 +3443,7 @@ export type TupdateIncomeBillSerialDto = Pick<
   | 'receivablePayment'
   | 'deductionPayment'
   | 'unpaidPayment'
+  | 'difference'
 >;
 
 export type TcreateAccountReceivableAccountsDto = {
