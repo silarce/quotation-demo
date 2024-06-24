@@ -20,12 +20,27 @@ import scss from './exchangedBill.module.scss';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // api
-import { TaccountantDto, useGetAccountantExchangeFrom } from 'js/api/api_accountant';
+import { TaccountantDto, TaccountantExchangeFromDto, useGetAccountantExchangeFrom } from 'js/api/api_accountant';
 
 // ==========================================================================
 
 type Tquery = {
   id: string;
+};
+
+type Trdlc_accountant = {
+  noteNumber: string; // 票據號碼
+  receiptEstimatedDate: string; // 預兌日
+  noteMaturityDate: string; // 到期日
+  price: string; // 票面金額
+  vendorName: string; // 客戶名稱
+};
+
+type Trdlc = {
+  sheetNumber: string; // 兌現單號
+  cashExchangeAccount: string; // 兌現帳戶
+  cashExchangeDate: string; // 兌現日期
+  accountantArr: Trdlc_accountant[];
 };
 
 // ==========================================================================
@@ -39,8 +54,6 @@ export default function ExchangedBill() {
 
   // ---------------------------------------------------------------------------
 
-  const [showPdf, setShowPdf] = useState(false);
-
   // ---------------------------------------------------------------------------
 
   const { data } = useGetAccountantExchangeFrom(id);
@@ -53,6 +66,14 @@ export default function ExchangedBill() {
   } = data ?? {};
 
   const priceTotal = accountant.reduce((acc, curr) => acc + (curr.price ?? 0), 0).toLocaleString();
+
+  // ---------------------------------------------------------------------------
+
+  // MARK: REQUEST
+  // 等api完成
+  const reqPostRdlc = () => {
+    const rdlc = buildRdlc(data);
+  };
 
   // ---------------------------------------------------------------------------
 
@@ -177,6 +198,47 @@ export default function ExchangedBill() {
 }
 
 // MARK: END
+
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// MARK:FUNCTION
+
+const buildRdlc = (accountantExchangeFrom: TaccountantExchangeFromDto | undefined) => {
+  if (!accountantExchangeFrom) {
+    return undefined;
+  }
+
+  const {
+    accountant = [],
+
+    sheetNumber,
+    cashExchangeAccount,
+    cashExchangeDate,
+  } = accountantExchangeFrom;
+
+  const accountantArr: Trdlc_accountant[] = accountant.map((acc) => {
+    const { noteNumber, receiptEstimatedDate, noteMaturityDate, price, vendorName } = acc;
+
+    return {
+      noteNumber: noteNumber || '',
+      receiptEstimatedDate: getTaiwanDateStr(receiptEstimatedDate) || '',
+      noteMaturityDate: getTaiwanDateStr(noteMaturityDate) || '',
+      price: price?.toLocaleString() ?? '',
+      vendorName: vendorName || '',
+    };
+  });
+
+  const rdlc: Trdlc = {
+    sheetNumber: sheetNumber || '',
+    cashExchangeAccount: cashExchangeAccount || '',
+    cashExchangeDate: cashExchangeDate ? getTaiwanDateStr(cashExchangeDate) || '' : '',
+    accountantArr,
+  };
+
+  return rdlc;
+};
 
 // ==========================================================================
 
