@@ -2722,7 +2722,7 @@ export type TengineeringContactDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  contractNumber: string;
+  contractNumber: string | null;
 
   /**請款狀態 */
   paymentStatus: string;
