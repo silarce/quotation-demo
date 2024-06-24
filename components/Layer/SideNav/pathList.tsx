@@ -617,6 +617,17 @@ const sidePathList: TsidePathList = {
             },
           ],
         },
+        {
+          label: '發票作業',
+          erpFeature: [accountingDepartment],
+          list: [
+            {
+              label: '購買發票',
+              path: path01 + '/invoiceBook',
+              erpFeature: [accountingDepartment],
+            },
+          ],
+        },
         // {
         //   label: 'foo',
         //   erpFeature: devPass,
@@ -781,7 +792,7 @@ const topPathList: TtopPathListConfig[] = [
     label: '廠務部',
     path01: sidePathList['/factoryDepartment'].path01,
     href: {
-      pathname: sidePathList['/factoryDepartment'].path01+'/wareHouseList',
+      pathname: sidePathList['/factoryDepartment'].path01 + '/wareHouseList',
       query: {
         type: 'WareHouse',
       },
