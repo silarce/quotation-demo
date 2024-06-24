@@ -8,6 +8,14 @@ import PageHeader02, { TsearchGroup } from 'components/PageHeader/PageHeader02/P
 // utils
 import { useYearMonth_options, useYearMonth_selectBar_query, SelectBar } from 'js/utils/helpers/hook/useYearMonth';
 
+// api
+import {
+  Tparams,
+  useGetAccountantInvoiceBook,
+  apiPostAccountantInvoiceBook,
+  apiPatchAccountantInvoiceBook,
+} from 'js/api/api_accountant';
+
 // ------------------------------------------------------------------------
 
 type Tquery = {
@@ -33,6 +41,20 @@ export default function InvoiceBook() {
   } = query;
 
   // ------------------------------------------------------------------------
+
+  const params: Tparams = useMemo(() => {
+    return {
+      pageSIze: 99999,
+      sort: 'latestInvoiceDate',
+    };
+  }, [year, month, keyword]);
+
+  const { data: data_invoiceBook, update: update_invoiceBook } = useGetAccountantInvoiceBook({ params });
+
+  // ------------------------------------------------------------------------
+
+  // region PROPS
+
   const selectPropsArr = useYearMonth_selectBar_query({
     year: year,
     month: month,
@@ -61,10 +83,12 @@ export default function InvoiceBook() {
 
   const panelList = [{ searchGroup }];
 
+  // MARK:RENDER
+
   return (
     <SubLayer>
       <PageHeader02
-        tag="開立發票管理"
+        tag="購買發票"
         customeLeft={[<SelectBar key="selectBar" className="ml-10" selectPropsArr={selectPropsArr} />]}
         panelList={panelList}
       />
@@ -73,3 +97,5 @@ export default function InvoiceBook() {
     </SubLayer>
   );
 }
+
+// MARK: END

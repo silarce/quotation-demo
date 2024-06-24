@@ -24,6 +24,9 @@ import type {
   TupdateAccountantPresetDto,
   TaccountantExchangeFromDto,
   TcreateAccountantExchangeFromDto,
+  accountantInvoiceBookDto,
+  TcreateAccountantInvoiceBookDto,
+  TupdateAccountantInvoiceBookDto,
 } from './dtoTypes';
 
 export type {
@@ -41,6 +44,9 @@ export type {
   TupdateAccountantPresetDto,
   TaccountantExchangeFromDto,
   TcreateAccountantExchangeFromDto,
+  accountantInvoiceBookDto,
+  TcreateAccountantInvoiceBookDto,
+  TupdateAccountantInvoiceBookDto,
 } from './dtoTypes';
 
 type TgetAccountant = TpageResponse<TaccountantDto>;
@@ -324,6 +330,109 @@ export const apiPostAccountantExchangeFrom = async (
       callAlert &&
         myAlert.err({
           title: '新增票據兌現失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
+};
+
+// ==============================================================================
+
+// MARK: invoice-book
+
+// accountantInvoiceBookDto
+// get /accountant-invoice-book
+
+const apiGetAccountantInvoiceBook = async (params?: Tparams) => {
+  const api = '/accountant-invoice-book';
+
+  return axi
+    .get<TpageResponse<accountantInvoiceBookDto>>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountantInvoiceBook = ({
+  params,
+  autoUpdate = true,
+  callAlert = true,
+}: {
+  params?: Tparams;
+  autoUpdate?: boolean;
+  callAlert?: boolean;
+} = {}) => {
+  const [res, setRes] = useState<TpageResponse<accountantInvoiceBookDto>>();
+  const [isFetching, setIsFetching] = useState(false);
+
+  const update = useCallback(async () => {
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetAccountantInvoiceBook(params);
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+      callAlert &&
+        myAlert.err({
+          title: '取得發票簿列表失敗',
+          content: err.message,
+        });
+
+      return err;
+    } finally {
+      setIsFetching(false);
+    }
+  }, [params]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [params]);
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+    isFetching,
+  };
+};
+
+export const apiPostAccountantInvoiceBook = async (
+  body: TcreateAccountantInvoiceBookDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = '/accountant-invoice-book';
+
+  return axi
+    .post<accountantInvoiceBookDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      callAlert &&
+        myAlert.err({
+          title: '新增發票簿失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
+};
+
+export const apiPatchAccountantInvoiceBook = async (
+  id: string,
+  body: TupdateAccountantInvoiceBookDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = `/accountant-invoice-book/${id}`;
+
+  return axi
+    .patch<accountantInvoiceBookDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      callAlert &&
+        myAlert.err({
+          title: '更新發票簿失敗',
           content: err.message,
         });
 
