@@ -360,7 +360,9 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   // ----------------------------------------------------------------------------
   // region RENDER
   return (
-    <SubLayer>
+    <SubLayer
+    //  isLoading_subLayer={isFetching}
+    >
       <PageHeader02
         tagList={tagList}
         customeLeft={[<SelectBar key="selectBar" className={'ml-5'} selectPropsArr={selectPropsArr} />]}
@@ -920,6 +922,16 @@ const MakeIsImported = ({
 };
 
 // =========================================================================
+// region: FUNCTION
+
+const calcPrice = ({ currencyValue, exchangeRate }: Tstate_accountant) => {
+  const d_currencyValue = new Decimal(currencyValue || 0);
+  const d_price = d_currencyValue.mul(exchangeRate || 0);
+
+  return d_price.toNumber();
+};
+
+// =========================================================================
 
 // region config
 
@@ -1142,20 +1154,8 @@ const configList: TconfigList = {
         },
       };
 
-      // const inputProps: TinputProps = {
-      //   props: {
-      //     placeholder: '請選擇',
-      //     type: 'text',
-      //     value: value_str,
-      //     onChange: (e) => {
-      //       setState_accountant((state) => ({ ...state, ['accountingNumber']: e.target.value }));
-      //     },
-      //   },
-      // };
-
       return {
         selectProps,
-        // inputProps,
       };
     },
   },
@@ -1232,24 +1232,29 @@ const configList: TconfigList = {
   price: {
     label: '新臺幣',
     style: {
-      width: 90,
+      width: 100,
       justifyContent: 'flex-end',
     },
     className: '',
+    inputSelProps: {
+      showBaseline: 'invisible',
+    },
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
-      const inputType = disabled ? 'text' : 'number';
+      // const inputType = disabled ? 'text' : 'number';
 
       const value_str = (value as string) || '';
-      const theValue = disabled ? Number(value_str).toLocaleString() : value_str;
+      // const theValue = disabled ? Number(value_str).toLocaleString() : value_str;
+      const theValue = Number(value_str).toLocaleString();
 
       const inputProps: TinputProps = {
         props: {
           style: { textAlign: 'end' },
           placeholder: '請輸入',
-          type: inputType,
+          // type: inputType,
+          readOnly: true,
           value: theValue,
           onChange: (e) => {
-            !disabled && setState_accountant((state) => ({ ...state, ['price']: e.target.value }));
+            // !disabled && setState_accountant((state) => ({ ...state, ['price']: e.target.value }));
           },
         },
       };
@@ -1389,7 +1394,13 @@ const configList: TconfigList = {
           type: 'number',
           value: value_str,
           onChange: (e) => {
-            setState_accountant((state) => ({ ...state, ['exchangeRate']: e.target.value }));
+            setState_accountant((state) => {
+              const copy = { ...state };
+              copy.exchangeRate = e.target.value;
+              const price = calcPrice(copy);
+
+              return { ...copy, price: String(price) };
+            });
           },
         },
       };
@@ -1402,19 +1413,29 @@ const configList: TconfigList = {
   currencyValue: {
     label: '幣值',
     style: {
-      width: 120,
+      width: 100,
+      justifyContent: 'flex-end',
     },
     className: '',
-    inputSelPropsCreator: ({ value, setState_accountant }) => {
+    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
+      const inputType = disabled ? 'text' : 'number';
       const value_str = (value as string) || '';
+      const theValue = disabled ? Number(value_str).toLocaleString() : value_str;
 
       const inputProps: TinputProps = {
         props: {
+          style: { textAlign: 'end' },
           placeholder: '幣值',
-          type: 'number',
-          value: value_str,
+          type: inputType,
+          value: theValue,
           onChange: (e) => {
-            setState_accountant((state) => ({ ...state, ['currencyValue']: e.target.value }));
+            setState_accountant((state) => {
+              const copy = { ...state };
+              copy.currencyValue = e.target.value;
+              const price = calcPrice(copy);
+
+              return { ...copy, price: String(price) };
+            });
           },
         },
       };

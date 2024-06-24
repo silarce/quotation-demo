@@ -3680,7 +3680,7 @@ export type TaccountantDto = {
   insertDate: string | null;
   // 廠商名稱
   vendorName: string | null;
-  // 金額
+  // 金額 // 新臺幣
   price: number;
   // 備註
   notes?: string | null;
