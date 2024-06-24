@@ -174,6 +174,10 @@ export default function CollectionDetailList() {
   };
 
   const panelList: TpanelList = [{ searchGroup }];
+  // ________________________________________________________________
+  // ________________________________________________________________
+
+  const total = data_accountant.reduce((acc, curr) => acc + curr.price || 0, 0).toLocaleString();
 
   // --------------------------------------------------------------
   // MARK: RENDER
@@ -192,67 +196,125 @@ export default function CollectionDetailList() {
         panelList={panelList}
       />
 
-      <div>
-        <div className={scss.table}>
-          <Row thead={true} fullWidth={true}>
-            {keyArr.map((key) => {
-              const { label, style } = config[key];
-
-              return (
-                <Cell key={key} style={style}>
-                  {label}
-                </Cell>
-              );
-            })}
-          </Row>
-
-          {data_accountant.map((accountant) => {
-            const {
-              id,
-              insertDate,
-              vendorName,
-              importAccountingNumber,
-              price,
-              notes,
-              noteNumber,
-              noteMaturityDate,
-              // invoiceNumber,
-              billSerialNumber,
-
-              // incomeBill,
-              invoices,
-            } = accountant;
-
-            const invoiceNumber = invoices?.[0]?.invoiceNumber as string | undefined;
-
-            const list = {
-              insertDate: getTaiwanDateStr(insertDate),
-              vendorName,
-              importAccountingNumber,
-              price: price.toLocaleString(),
-              notes,
-              noteNumber,
-              noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
-              invoiceNumber,
-              billSerialNumber,
-            } as const;
+      <div className={scss.table}>
+        <Row className={scss.thead} thead={true} fullWidth={true}>
+          {keyArr.map((key) => {
+            const { label, style } = config[key];
 
             return (
-              <Row key={id} fullWidth={true}>
-                {keyArr.map((key) => {
-                  const { style, bodyClassName } = config[key];
-
-                  return (
-                    <Cell key={key} style={style} className={classNames(bodyClassName)} preBuilt="block">
-                      {list[key]}
-                    </Cell>
-                  );
-                })}
-              </Row>
+              <Cell key={key} style={style}>
+                {label}
+              </Cell>
             );
           })}
-        </div>
+        </Row>
+
+        {data_accountant.map((accountant, index) => {
+          const {
+            id,
+            insertDate,
+            vendorName,
+            importAccountingNumber,
+            price,
+            notes,
+            noteNumber,
+            noteMaturityDate,
+            // invoiceNumber,
+            billSerialNumber,
+
+            // incomeBill,
+            invoices,
+          } = accountant;
+
+          const invoiceNumber = invoices?.[0]?.invoiceNumber as string | undefined;
+
+          const list = {
+            insertDate: getTaiwanDateStr(insertDate),
+            vendorName,
+            importAccountingNumber,
+            price: price.toLocaleString(),
+            notes,
+            noteNumber,
+            noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
+            invoiceNumber,
+            billSerialNumber,
+          } as const;
+
+          return (
+            <Row key={id} fullWidth={true}>
+              {keyArr.map((key) => {
+                const { style, bodyClassName } = config[key];
+
+                return (
+                  <Cell key={key} style={style} className={classNames(bodyClassName)} preBuilt="block">
+                    {list[key]}
+                  </Cell>
+                );
+              })}
+            </Row>
+          );
+        })}
+        {data_accountant.map((accountant, index) => {
+          const {
+            id,
+            insertDate,
+            vendorName,
+            importAccountingNumber,
+            price,
+            notes,
+            noteNumber,
+            noteMaturityDate,
+            // invoiceNumber,
+            billSerialNumber,
+
+            // incomeBill,
+            invoices,
+          } = accountant;
+
+          const invoiceNumber = invoices?.[0]?.invoiceNumber as string | undefined;
+
+          const list = {
+            insertDate: getTaiwanDateStr(insertDate),
+            vendorName,
+            importAccountingNumber,
+            price: price.toLocaleString(),
+            notes,
+            noteNumber,
+            noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
+            invoiceNumber,
+            billSerialNumber,
+          } as const;
+
+          return (
+            <Row key={id} fullWidth={true}>
+              {keyArr.map((key) => {
+                const { style, bodyClassName } = config[key];
+
+                return (
+                  <Cell key={key} style={style} className={classNames(bodyClassName)} preBuilt="block">
+                    {list[key]}
+                  </Cell>
+                );
+              })}
+            </Row>
+          );
+        })}
+
+        {/*  */}
+        {/*  */}
+
+        <Row className={scss.bottom} fullWidth={true}>
+          <Cell preBuilt="block" className={scss.totalCell} style={config.insertDate.style} />
+          <Cell preBuilt="block" className={scss.totalCell} style={config.vendorName.style} />
+          <Cell preBuilt="block" className={scss.totalCell} style={config.importAccountingNumber.style}>
+            總計
+          </Cell>
+          <Cell preBuilt="block" style={config.price.style}>
+            {total}
+          </Cell>
+        </Row>
       </div>
+      {/*  */}
     </SubLayer>
   );
 }
@@ -315,7 +377,7 @@ const config: Tconfig = {
   },
   price: {
     label: '收款金額',
-    style: { width: 90, textAlign: 'right' },
+    style: { width: 160, textAlign: 'right' },
   },
   notes: {
     label: '備註',
