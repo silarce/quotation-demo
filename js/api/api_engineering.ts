@@ -1,6 +1,6 @@
 // apiGetQuotationProducts
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -1904,7 +1904,49 @@ export const apiGetAccountReceivableIncomeBills = async (params?: Tparams) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetAccountReceivableIncomeBills = createUseInfinite<TpageResponse<TincomeBillSerialDto>>({
+export const useGetAccountReceivableIncomeBills = ({
+  //
+  autoUpdate = true,
+  callAlert = true,
+  params,
+}: {
+  params?: Tparams;
+  autoUpdate?: boolean;
+  callAlert?: boolean;
+}) => {
+  const [res, setRes] = useState<TpageResponse<TincomeBillSerialDto>>();
+  const [isFetching, setIsFetching] = useState(false);
+
+  const update = useCallback(async () => {
+    setIsFetching(true);
+
+    try {
+      const newRes = await apiGetAccountReceivableIncomeBills(params);
+
+      if (newRes) {
+        setRes(newRes);
+      }
+    } catch (error) {
+      const err = error as Error;
+      callAlert && myAlert.err({ title: '取得應收帳款收款明細列表失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
+    }
+  }, [params]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [params]);
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+    isFetching,
+  };
+};
+
+export const useGetAccountReceivableIncomeBills_infinite = createUseInfinite<TpageResponse<TincomeBillSerialDto>>({
   apiClient: apiGetAccountReceivableIncomeBills,
   errTitle: '取得應收帳款收款明細列表失敗',
 });
