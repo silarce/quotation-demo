@@ -93,6 +93,9 @@ type Tstate_accountant = {
   receiptEstimatedDate: Moment | null;
 
   currency: Tcurrency;
+
+  exchangeRate: string;
+  currencyValue: string;
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -211,6 +214,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       receiptEstimatedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
       receiptCashedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
       currency: state_accountant.currency,
+      exchangeRate: state_accountant.exchangeRate ? (state_accountant.exchangeRate as `${number}`) : '0',
+      currencyValue: state_accountant.currencyValue ? (state_accountant.currencyValue as `${number}`) : '0',
     };
 
     await apiPostAccountant({ body });
@@ -250,32 +255,14 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       receiptEstimatedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
       receiptCashedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
       currency: state_accountant.currency,
+      exchangeRate: state_accountant.exchangeRate ? (state_accountant.exchangeRate as `${number}`) : '0',
+      currencyValue: state_accountant.currencyValue ? (state_accountant.currencyValue as `${number}`) : '0',
     };
 
     await apiPatchAccountant(id, { body });
 
     await update_accountant();
   };
-
-  //
-  // const reqPatchIsImported = async (
-  //   //
-  //   id: string,
-  //   isImported: boolean,
-  //   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[]
-  // ) => {
-  //   if (!isWorksDepartment) {
-  //     alert('isWorksDepartment should be false');
-
-  //     return;
-  //   }
-
-  //   await apiPatchAccountant_accountReceivable(id, {
-  //     accountsReceivableDeduction,
-  //     isImported,
-  //   });
-  //   await update_accountant();
-  // }; // reqPatchIsImported
 
   const reqPatchIsImported = async (
     //
@@ -341,10 +328,14 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   // region PROPS
 
   let d_totalPrice = new Decimal(0);
+
   data_accountant?.forEach((data) => {
     d_totalPrice = d_totalPrice.add(data.price);
   });
   const totalPrice_localString = d_totalPrice.toNumber().toLocaleString();
+
+  // _____________________________________________________________________________
+  // _____________________________________________________________________________
 
   const tagList = useTagList();
 
@@ -369,7 +360,9 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   // ----------------------------------------------------------------------------
   // region RENDER
   return (
-    <SubLayer>
+    <SubLayer
+    //  isLoading_subLayer={isFetching}
+    >
       <PageHeader02
         tagList={tagList}
         customeLeft={[<SelectBar key="selectBar" className={'ml-5'} selectPropsArr={selectPropsArr} />]}
@@ -766,6 +759,8 @@ const Row = ({
       receiptCollectionDate: receiptCollectionDate ? moment(receiptCollectionDate) : null,
       receiptEstimatedDate: receiptEstimatedDate ? moment(receiptEstimatedDate) : null,
       currency: data_accountant.currency,
+      exchangeRate: String(data_accountant.exchangeRate || ''),
+      currencyValue: String(data_accountant.currencyValue || ''),
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -927,6 +922,17 @@ const MakeIsImported = ({
 };
 
 // =========================================================================
+// region: FUNCTION
+
+const calcPrice = ({ currencyValue, exchangeRate }: Tstate_accountant) => {
+  const d_currencyValue = new Decimal(currencyValue || 0);
+  const d_price = d_currencyValue.mul(exchangeRate || 0);
+
+  // return d_price.toNumber();
+  return d_price.toDecimalPlaces(0).toNumber();
+};
+
+// =========================================================================
 
 // region config
 
@@ -983,8 +989,12 @@ const lookup_keyArr: {
 
     'accountingNumber',
     'vendorName',
-    'price',
+
     'currency',
+    'exchangeRate',
+    'currencyValue',
+    'price',
+
     'billSerialNumber',
     'notes',
   ],
@@ -1145,20 +1155,8 @@ const configList: TconfigList = {
         },
       };
 
-      // const inputProps: TinputProps = {
-      //   props: {
-      //     placeholder: '請選擇',
-      //     type: 'text',
-      //     value: value_str,
-      //     onChange: (e) => {
-      //       setState_accountant((state) => ({ ...state, ['accountingNumber']: e.target.value }));
-      //     },
-      //   },
-      // };
-
       return {
         selectProps,
-        // inputProps,
       };
     },
   },
@@ -1233,26 +1231,31 @@ const configList: TconfigList = {
     },
   },
   price: {
-    label: '金額',
+    label: '新臺幣',
     style: {
-      width: 90,
+      width: 100,
       justifyContent: 'flex-end',
     },
     className: '',
+    inputSelProps: {
+      showBaseline: 'invisible',
+    },
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
-      const inputType = disabled ? 'text' : 'number';
+      // const inputType = disabled ? 'text' : 'number';
 
       const value_str = (value as string) || '';
-      const theValue = disabled ? Number(value_str).toLocaleString() : value_str;
+      // const theValue = disabled ? Number(value_str).toLocaleString() : value_str;
+      const theValue = Number(value_str).toLocaleString();
 
       const inputProps: TinputProps = {
         props: {
           style: { textAlign: 'end' },
           placeholder: '請輸入',
-          type: inputType,
+          // type: inputType,
+          readOnly: true,
           value: theValue,
           onChange: (e) => {
-            !disabled && setState_accountant((state) => ({ ...state, ['price']: e.target.value }));
+            // !disabled && setState_accountant((state) => ({ ...state, ['price']: e.target.value }));
           },
         },
       };
@@ -1376,6 +1379,73 @@ const configList: TconfigList = {
       return { selectProps };
     },
   },
+
+  exchangeRate: {
+    label: '匯率',
+    style: {
+      width: 60,
+    },
+    className: '',
+    inputSelPropsCreator: ({ value, setState_accountant }) => {
+      const value_str = (value as string) || '';
+
+      const inputProps: TinputProps = {
+        props: {
+          placeholder: '匯率',
+          type: 'number',
+          value: value_str,
+          onChange: (e) => {
+            setState_accountant((state) => {
+              const copy = { ...state };
+              copy.exchangeRate = e.target.value;
+              const price = calcPrice(copy);
+
+              return { ...copy, price: String(price) };
+            });
+          },
+        },
+      };
+
+      return {
+        inputProps,
+      };
+    },
+  },
+  currencyValue: {
+    label: '幣值',
+    style: {
+      width: 100,
+      justifyContent: 'flex-end',
+    },
+    className: '',
+    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
+      const inputType = disabled ? 'text' : 'number';
+      const value_str = (value as string) || '';
+      const theValue = disabled ? Number(value_str).toLocaleString() : value_str;
+
+      const inputProps: TinputProps = {
+        props: {
+          style: { textAlign: 'end' },
+          placeholder: '幣值',
+          type: inputType,
+          value: theValue,
+          onChange: (e) => {
+            setState_accountant((state) => {
+              const copy = { ...state };
+              copy.currencyValue = e.target.value;
+              const price = calcPrice(copy);
+
+              return { ...copy, price: String(price) };
+            });
+          },
+        },
+      };
+
+      return {
+        inputProps,
+      };
+    },
+  },
 };
 
 // =========================================================================
@@ -1395,4 +1465,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   receiptCollectionDate: null,
   receiptEstimatedDate: null,
   currency: 'TWD 新臺幣',
+  exchangeRate: '',
+  currencyValue: '',
 });

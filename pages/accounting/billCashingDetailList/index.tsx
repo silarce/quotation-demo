@@ -206,6 +206,14 @@ export default function BillCashingDetailList() {
 
   // MARK:PROPS
 
+  const total = useMemo(() => {
+    return data_accountantArr
+      .reduce((acc, item) => {
+        return acc + item.price || 0;
+      }, 0)
+      .toLocaleString();
+  }, [data_accountantArr]);
+
   const selectPropsArr = useYearMonth_selectBar_query({
     year,
     month,
@@ -260,37 +268,104 @@ export default function BillCashingDetailList() {
         ]}
         panelList={panelList}
       />
-      <div>
-        <div className={scss.table}>
-          <Row thead={true} fullWidth={true}>
-            <Cell style={config.selectBox.style} />
-            {keyArr.map((key) => {
-              const { label, style } = config[key];
 
-              return (
-                <Cell key={key} style={style}>
-                  {label}
-                </Cell>
-              );
-            })}
+      <div className={scss.table}>
+        <Row className={scss.thead} thead={true} fullWidth={true}>
+          <Cell style={config.selectBox.style} />
+          {keyArr.map((key) => {
+            const { label, style } = config[key];
 
-            <Cell style={config.receiptCashedDate.style}>{config.receiptCashedDate.label}</Cell>
-          </Row>
-
-          {data_accountantArr.map((data) => {
             return (
-              <Accountant
-                key={data.id}
-                data_accountant={data}
-                isChecked={handle_check(data.id)}
-                onCheck={(isChecked) => {
-                  handle_onCheck(data.id, isChecked);
-                }}
-                reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
-              />
+              <Cell key={key} style={style}>
+                {label}
+              </Cell>
             );
           })}
-        </div>
+
+          <Cell style={config.receiptCashedDate.style}>{config.receiptCashedDate.label}</Cell>
+        </Row>
+
+        {data_accountantArr.map((data) => {
+          return (
+            <Accountant
+              key={data.id}
+              data_accountant={data}
+              isChecked={handle_check(data.id)}
+              onCheck={(isChecked) => {
+                handle_onCheck(data.id, isChecked);
+              }}
+              reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
+            />
+          );
+        })}
+
+        {/*  */}
+        {/*  */}
+
+        {data_accountantArr.map((data) => {
+          return (
+            <Accountant
+              key={data.id}
+              data_accountant={data}
+              isChecked={handle_check(data.id)}
+              onCheck={(isChecked) => {
+                handle_onCheck(data.id, isChecked);
+              }}
+              reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
+            />
+          );
+        })}
+        {data_accountantArr.map((data) => {
+          return (
+            <Accountant
+              key={data.id}
+              data_accountant={data}
+              isChecked={handle_check(data.id)}
+              onCheck={(isChecked) => {
+                handle_onCheck(data.id, isChecked);
+              }}
+              reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
+            />
+          );
+        })}
+        {data_accountantArr.map((data) => {
+          return (
+            <Accountant
+              key={data.id}
+              data_accountant={data}
+              isChecked={handle_check(data.id)}
+              onCheck={(isChecked) => {
+                handle_onCheck(data.id, isChecked);
+              }}
+              reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
+            />
+          );
+        })}
+        {data_accountantArr.map((data) => {
+          return (
+            <Accountant
+              key={data.id}
+              data_accountant={data}
+              isChecked={handle_check(data.id)}
+              onCheck={(isChecked) => {
+                handle_onCheck(data.id, isChecked);
+              }}
+              reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
+            />
+          );
+        })}
+
+        {/*  */}
+        {/*  */}
+
+        <Row className={scss.bottom} fullWidth={true}>
+          <Cell style={config.selectBox.style} />
+          {keyArr.slice(0, 5).map((key) => {
+            return <Cell key={key} style={config[key].style} />;
+          })}
+          <Cell style={config['noteMaturityDate'].style}>總計</Cell>
+          <Cell style={config['price'].style}>{total}</Cell>
+        </Row>
       </div>
     </SubLayer>
   );
@@ -515,6 +590,18 @@ type Tkey =
     >
   | keyof Pick<TaccountantExchangeFromDto, 'sheetNumber'>;
 
+type TconfigItem = {
+  label: string;
+  style?: React.CSSProperties;
+  className?: string;
+  bodyClassName?: string;
+  bodyStyle?: React.CSSProperties;
+};
+
+type Tconfig = {
+  [key in Tkey | 'selectBox' | 'receiptCashedDate']: TconfigItem;
+};
+
 const keyArr: Tkey[] = [
   'receiptStatus',
   'sheetNumber',
@@ -537,18 +624,6 @@ const keyArr_simple: Tkey[] = [
   'receiptEstimatedDate',
   'receiptCashedDate',
 ];
-
-type TconfigItem = {
-  label: string;
-  style?: React.CSSProperties;
-  className?: string;
-  bodyClassName?: string;
-  bodyStyle?: React.CSSProperties;
-};
-
-type Tconfig = {
-  [key in Tkey | 'selectBox' | 'receiptCashedDate']: TconfigItem;
-};
 
 const config: Tconfig = {
   selectBox: {
@@ -596,7 +671,7 @@ const config: Tconfig = {
   price: {
     label: '金額',
     style: {
-      width: '90px',
+      width: '120px',
     },
   },
   accountingNumber: {

@@ -2722,7 +2722,7 @@ export type TengineeringContactDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  contractNumber: string;
+  contractNumber: string | null;
 
   /**請款狀態 */
   paymentStatus: string;
@@ -3425,6 +3425,8 @@ export type TincomeBillSerialDto = {
   isForeign: boolean;
   // 差額 // 更新accountant的扣款明細、手續費會更新差額
   difference: string | null;
+  // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
+  isPaperImported: boolean;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3441,6 +3443,7 @@ export type TupdateIncomeBillSerialDto = Pick<
   | 'receivablePayment'
   | 'deductionPayment'
   | 'unpaidPayment'
+  | 'difference'
 >;
 
 export type TcreateAccountReceivableAccountsDto = {
@@ -3680,7 +3683,7 @@ export type TaccountantDto = {
   insertDate: string | null;
   // 廠商名稱
   vendorName: string | null;
-  // 金額
+  // 金額 // 新臺幣
   price: number;
   // 備註
   notes?: string | null;
@@ -3716,6 +3719,9 @@ export type TaccountantDto = {
   currency: Tcurrency;
   // 票據實際兌現日
   receiptCashedDate: string | null;
+
+  exchangeRate: `${number}`; // 匯率
+  currencyValue: `${number}`; // 幣值
 };
 
 export type TcreateAccountantDto = Pick<
@@ -3734,6 +3740,8 @@ export type TcreateAccountantDto = Pick<
   | 'receiptEstimatedDate'
   | 'receiptCashedDate'
   | 'currency'
+  | 'exchangeRate'
+  | 'currencyValue'
 > & {
   noteMaturityDate?: string | null; // 票據到期日
   // receiptCollectionDate?: string | null; // 託收日
