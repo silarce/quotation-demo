@@ -20,7 +20,7 @@ type Tquery = {
 
 export default function TrayList() {
     const router = useRouter();
-    const { type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
+    const { firstin, type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
 
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
@@ -32,10 +32,13 @@ export default function TrayList() {
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
+    const [checkfirstin, setCheckFirstIn] = useState<number>(firstin ? parseInt(firstin as string, 10) : 0);
+
+
 
     const searchTargetList = [
         {
-            placeholder: '請輸入托盤名稱',
+            placeholder: '請輸入料號、名稱或規格',
         },
     ];
 
@@ -44,7 +47,7 @@ export default function TrayList() {
         doSearch: (arr: any) => {
             const keyword = arr[0] as string;
             if (keyword === '' || keyword === undefined) {
-                fetchData();
+                fetchData1(whid, trayname);
             } else {
                 searchData(keyword);
             }
@@ -52,7 +55,7 @@ export default function TrayList() {
     };
 
     const panelList: TpanelList = [
-        // { searchGroup },
+        { searchGroup },
         {
             type: 'addButton',
             label: '新增托盤',
@@ -87,9 +90,10 @@ export default function TrayList() {
     ];
 
     useEffect(() => {
+
         fetchData();
 
-    }, [whid, trayname]);
+    }, []);
 
     const fetchData = async () => {
         try {
@@ -100,14 +104,14 @@ export default function TrayList() {
             }
             const data = await response.json();
             setData(data);
-            console.log(data);
-            if (data.length !== 0) {
-                console.log(whid);
-                console.log(trayname);
-                await fetchData1();
-                await GetLayOut();
+            await new Promise(resolve => setTimeout(resolve, 50));
+            if (data.length > 0 && checkfirstin > 0) {
+                const firstItem = data[0];
+                const { whid, trayname } = firstItem;
+                fetchData1(whid, trayname);
+                GetLayOut(whid, trayname);
             }
-            console.log("Fetched data:", data);
+
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -130,13 +134,12 @@ export default function TrayList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}SearchTrayByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}SearchWHPositionByID?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            setData(data);
-            console.log("GetWHPosition:", data);
+            setData1(data);
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -144,9 +147,10 @@ export default function TrayList() {
         }
     };
 
-    const fetchData1 = async () => {
+    const fetchData1 = async (whid: any, trayname: any) => {
         try {
             setIsLoading(true);
+            console.log(whid);
 
             const conditionModel: { whid: string | undefined; trayname: string | undefined } = {
                 whid: whid as string | undefined,
@@ -165,8 +169,8 @@ export default function TrayList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
-            setData1(data);
+            const data1 = await response.json();
+            setData1(data1);
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -174,7 +178,7 @@ export default function TrayList() {
         }
     };
 
-    const GetLayOut = async () => {
+    const GetLayOut = async (whid: any, trayname: any) => {
         try {
             setIsLoading(true);
             const conditionModel: { whid: string | undefined; trayname: string | undefined; } = {
@@ -196,7 +200,6 @@ export default function TrayList() {
             }
 
             const responseData = await response.json();
-            console.log("GetLayOut:", responseData);
             setData11(responseData);
         } catch (error: any) {
             setError(error.message);
@@ -206,17 +209,23 @@ export default function TrayList() {
     };
 
     useEffect(() => {
-        const handleMouseMove = (event: globalThis.MouseEvent) => {
-            setMouseX(`${event.pageX}px`);
-            setMouseY(`${event.pageY}px`);
+        const fetchDataAndLayout = async () => {
+            await fetchData1(whid, trayname);
+            await GetLayOut(whid, trayname);
+            const handleMouseMove = (event: MouseEvent) => {
+                setMouseX(`${event.pageX}px`);
+                setMouseY(`${event.pageY}px`);
+            };
+
+            window.addEventListener('mousemove', handleMouseMove);
+
+            return () => {
+                window.removeEventListener('mousemove', handleMouseMove);
+            };
         };
 
-        window.addEventListener('mousemove', handleMouseMove);
-
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-        };
-    }, []);
+        fetchDataAndLayout();
+    }, [whid, trayname]);
 
     async function handlechangewhposition(id: any, whid: any, trayname: any, whname: any) {
         router.push({
@@ -235,31 +244,17 @@ export default function TrayList() {
         });
     }
 
-
     return (
-
-        // <SubLayer isLoading_subLayer={isLoading}>
-        //     <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname} panelList={panelList} />
-        //     <div>
-        //         <Thead01 type={'Tray'} />
-        //         <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={url} whnamecalled={whnamecalled} />
-        //     </div>
-        // </SubLayer>
-
-
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
-                    {/* <div className={scss.top}> */}
                     <div>
                         <Thead01 type={'Tray'} />
                         <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
-                        {/* </div> */}
                     </div>
                 </div>
                 <div className={scss.right}>
-                        {/* <input type="texts" style={{border:'1px solid gray'}}/> */}
                     <div className={scss.content}>
                         <Thead01 type={'WHPosition'} />
                         <Tbody01 type={'WHPosition'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
@@ -324,8 +319,5 @@ export default function TrayList() {
                 </div>
             </div>
         </SubLayer>
-
-    )
-
-
+    );
 }

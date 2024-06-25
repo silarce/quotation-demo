@@ -13,8 +13,10 @@ import { quotationStatusLookup } from 'config/lookupTable';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import { setting } from '../../wareHouseList/index';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
+import { WrappedTextarea, inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { AppContext } from 'pages/_app';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
 
 
 
@@ -26,7 +28,7 @@ type Tquery = {
 
 
 
-export default function MaterialList() {
+export default function PickingList() {
     const router = useRouter();
     const { type, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
 
@@ -39,8 +41,6 @@ export default function MaterialList() {
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
-
-    // wareHouseList/index.js
 
 
     const searchTargetList = [
@@ -146,9 +146,6 @@ export default function MaterialList() {
             }
             let data = await response.json();
             setData(data);
-            console.log(data);
-            // data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
-            // setData1(data);
         } catch (error: any) {
             setError(error.message);
         }
@@ -156,6 +153,44 @@ export default function MaterialList() {
             setIsLoading(false);
         }
     };
+
+    const fetchData1 = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                plnumber: string | undefined;
+            } = {
+                plnumber: "2024062500002" as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            //erpAPI
+            const response = await fetch(`${setting.apipath}GetPickingListDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            let data = await response.json();
+            console.log(data);
+            setData1(data);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData1();
+    }, []);
 
     const searchData = async (keywordWhpname: string, keywordMaterialnumber: string, keywordSpec: string) => {
         try {
@@ -192,6 +227,15 @@ export default function MaterialList() {
         }
     };
 
+    function gotoPick() {
+        router.push({
+            pathname: `/factoryDepartment/getMaterial/pickingListDetail`,
+            query: {
+                type: 'Tray',
+            },
+        });
+    }
+
 
     return (
 
@@ -208,11 +252,80 @@ export default function MaterialList() {
                     </div>
                 </div>
                 <div className={scss.right}>
-                    {/* <input type="texts" style={{border:'1px solid gray'}}/> */}
-                    <div className={scss.content}>
-                        <Thead01 type={'WHPosition'} />
-                        <Tbody01 type={'WHPosition'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
+                    <br />
+                    <MyButton_v2 px='px22' py='py4' theme='danger' className={scss.addBtn} label="領料" onClick={() => { gotoPick() }} />
+                    <MyButton_v2 disabled={true} px='px22' py='py4' theme='transparent' className={scss.addBtn} label="已領料" onClick={() => { alert("領料托盤") }} />
+                    <div className={scss.childmain}>
+                        <div>
+                            {/* <input type="texts" style={{border:'1px solid gray'}}/> */}
+                            <InputSel
+                                {...inputSelProps}
+                                caption="領料單號:"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: "2024062500002",
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="領料日期:"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: "113-06-25 ",
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="領料人員:"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: "賴彥廷3",
+                                    },
+                                }}
+                            />
+
+                        </div>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="工單單號:"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: "2024062500002",
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="派工日期:"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: "2024/06/25",
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="主件項目:"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: "無",
+                                    },
+                                }}
+                            />
+
+                        </div>
                     </div>
+                    <Thead01 type={'PickingDetailList'} />
+                    <Tbody01 type={'PickingDetailList'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
                 </div>
             </div>
         </SubLayer>

@@ -33,7 +33,8 @@
     overflow-x: hidden;
     overflow-y: auto;
     border: 2px solid gray;
-    min-height: 100vh-30vh; /* 自動調整高度到螢幕大小 */
+    min-height: 100vh-30vh;
+    /* 自動調整高度到螢幕大小 */
 }
 
 
@@ -53,6 +54,7 @@
     right: 0; // 距離視窗右側的距離
     padding-left: 10px;
     // background-color: red;
+    border:2px solid gray;
 }
 
 
@@ -71,10 +73,16 @@
     overflow-y: auto; // 垂直滾動（如果需要）
     // background-color: orange;
     height: 280px;
-    border:2px solid gray
+    border: 2px solid gray;
+
+    .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 150px; // 調整 input 的寬度
+
+    }
+
 }
-
-
 
 .traytable {
     width: 100%;
@@ -125,11 +133,29 @@
 
 
 
+.childmain {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    gap: 15px;
+    width: auto;
+    margin-top: 10px;
+    // margin-left: 62px;
+    margin-right: 62px;
+    // background-color: gray;
+}
+
+.textarea{
+    padding-left: 0px;
+    // background-color: orange;
+    width:400px;
+}
+
+
 .addBtn {
     position: sticky;
     left: 0;
     z-index: 1;
-    // text-align: center;
+    text-align: center;
     border: none;
     background-color: white;
 

@@ -107,7 +107,8 @@ export default function EditWHPosition() {
                         traycalled: traycalledin,
                         traycalledname: traycallednamein,
                         traytransfer: traytransferin,
-                        whnamecalled: whnamecalledin
+                        whnamecalled: whnamecalledin,
+                        firsin: 0
                     }
                 });
             },
@@ -129,7 +130,8 @@ export default function EditWHPosition() {
                         traycalled: traycalledin,
                         traycalledname: traycallednamein,
                         traytransfer: traytransferin,
-                        whnamecalled: whnamecalledin
+                        whnamecalled: whnamecalledin,
+                        firsin: 0
                     }
                 });
             },
