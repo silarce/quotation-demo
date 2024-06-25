@@ -81,7 +81,6 @@ type Tstate_accountant = {
   noteNumber: string;
   accountingNumber: string;
   vendorName: string;
-  price: string;
   billSerialNumber: string;
   notes: string;
 
@@ -92,10 +91,11 @@ type Tstate_accountant = {
   receiptCollectionDate: Moment | null;
   receiptEstimatedDate: Moment | null;
 
-  currency: Tcurrency;
-
+  currency: Tcurrency; // 幣別
+  // 匯率 不與幣別連動 // 手動輸入 在cre_emptyStateAccountant預設為1
   exchangeRate: string;
-  currencyValue: string;
+  currencyValue: string; // 金額
+  price: string; // 新台幣 = 匯率 * 金額
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -395,7 +395,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
               data_accountant={undefined}
               paymentType={paymentType}
               //
-              isReadOnly={isWorksDepartment}
+              // isReadOnly={isWorksDepartment}
               bankAccountOptionArr={bankAccountOptionArr}
               isWorksDepartment={isWorksDepartment}
             />
@@ -410,7 +410,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
                 reqPatch={reqPatch}
                 reqDelete={reqDelete}
                 reqPatchIsImported={reqPatchIsImported}
-                isReadOnly={isWorksDepartment}
+                // isReadOnly={isWorksDepartment}
                 setAccountantId={setAccountantId}
                 bankAccountOptionArr={bankAccountOptionArr}
                 isWorksDepartment={isWorksDepartment}
@@ -635,7 +635,7 @@ const Row = ({
   postProps,
   reqPatch,
   reqDelete,
-  isReadOnly,
+  // isReadOnly,
   setAccountantId,
   bankAccountOptionArr,
   reqPatchIsImported,
@@ -652,7 +652,7 @@ const Row = ({
   };
   reqPatch?: TreqPatch;
   reqDelete?: TreqDelete;
-  isReadOnly: boolean;
+  // isReadOnly: boolean;
   setAccountantId?: (id: string | undefined) => void;
   bankAccountOptionArr: Toption[];
   reqPatchIsImported?: TreqPatchIsImported;
@@ -678,6 +678,28 @@ const Row = ({
         year: postProps.year,
         month: postProps.month - 1,
       }));
+
+  // ---------------------------------------------------
+
+  const isAllowToEdit = !isWorksDepartment;
+
+  const { billSerialNumber, isImported, exchangeFromId } = data_accountant ?? {};
+
+  let isAllowToEditIsImported = false;
+
+  if (!isNew && isWorksDepartment && !state_accountant.billSerialNumber) {
+    isAllowToEditIsImported = true;
+  }
+
+  let fonbiddenText: string | null = null;
+
+  if ((isImported || billSerialNumber) && exchangeFromId) {
+    fonbiddenText = '已匯入/已兌現';
+  } else if (isImported || billSerialNumber) {
+    fonbiddenText = '已匯入';
+  } else if (exchangeFromId) {
+    fonbiddenText = '已兌現';
+  }
 
   // ---------------------------------------------------
 
@@ -765,13 +787,6 @@ const Row = ({
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
   // ---------------------------------------------------------------------------
-  let isAllowToEditIsImported = false;
-
-  if (!isNew && isWorksDepartment && !state_accountant.billSerialNumber) {
-    isAllowToEditIsImported = true;
-  }
-
-  // ---------------------------------------------------------------------------
 
   // region ROW RENDER
 
@@ -786,22 +801,26 @@ const Row = ({
         )}
         style={configList?.btn?.style}
       >
-        {!isReadOnly && !state_accountant.billSerialNumber && (
-          <>
-            <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_check} />
-            <IconEdit
-              //
-              className={classNames(!disabled && scss.active, scss.foo, isNew && 'invisible')}
-              onClick={() => setDisabled((state) => !state)}
-            />
-            <IconDelete01 className={classNames(!disabled && 'invisible')} onClick={handle_delete} />
-          </>
-        )}
-        {isReadOnly && !state_accountant.billSerialNumber && !state_accountant.isImported && (
-          <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant?.id)}>
-            匯入發票
-          </MyButton_v2>
-        )}
+        {
+          //
+          fonbiddenText ? (
+            <span className="text-center">{fonbiddenText}</span>
+          ) : isAllowToEdit ? (
+            <>
+              <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_check} />
+              <IconEdit
+                //
+                className={classNames(!disabled && scss.active, scss.foo, isNew && 'invisible')}
+                onClick={() => setDisabled((state) => !state)}
+              />
+              <IconDelete01 className={classNames(!disabled && 'invisible')} onClick={handle_delete} />
+            </>
+          ) : (
+            <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant?.id)}>
+              匯入發票
+            </MyButton_v2>
+          )
+        }
       </div>
 
       {theKeyArr.map((key) => {
@@ -1007,7 +1026,8 @@ const lookup_keyArr: {
     'accountingNumber',
     'vendorName',
     'noteMaturityDate',
-    'price',
+    'currencyValue',
+    // 'price',
     // 'currency',
     'receiptCollectionDate',
     'receiptEstimatedDate',
@@ -1020,7 +1040,8 @@ const lookup_keyArr: {
 
     'accountingNumber',
     'vendorName',
-    'price',
+    'currencyValue',
+    // 'price',
     // 'currency',
     'billSerialNumber',
     'notes',
@@ -1210,7 +1231,7 @@ const configList: TconfigList = {
   vendorName: {
     label: '廠商名稱',
     style: {
-      width: 200,
+      width: 100,
     },
     className: '',
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
@@ -1383,7 +1404,7 @@ const configList: TconfigList = {
   exchangeRate: {
     label: '匯率',
     style: {
-      width: 60,
+      width: 70,
     },
     className: '',
     inputSelPropsCreator: ({ value, setState_accountant }) => {
@@ -1412,7 +1433,7 @@ const configList: TconfigList = {
     },
   },
   currencyValue: {
-    label: '幣值',
+    label: '金額',
     style: {
       width: 100,
       justifyContent: 'flex-end',
@@ -1465,6 +1486,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   receiptCollectionDate: null,
   receiptEstimatedDate: null,
   currency: 'TWD 新臺幣',
-  exchangeRate: '',
-  currencyValue: '',
+  exchangeRate: '1', // 預設為1，不然price計算結果為0
+  currencyValue: '', // 金額
 });
