@@ -287,7 +287,8 @@ const Row = ({
         <div className={classNames(scss.cell, config.surface.className)}>{left?.surface}</div>
       </div>
 
-      <div className={classNames(scss.divider, !left && 'invisible')} />
+      {/* <div className={classNames(scss.divider, !left && 'invisible')} /> */}
+      <div className={classNames(scss.divider)} />
 
       <div className={scss.center}>
         <div className={classNames(scss.cell, config.projectName.className)}>{center?.projectName}</div>
@@ -636,8 +637,7 @@ const Panel = ({
           // }}
           textareaProps={{
             props: {
-              //
-              // value: state_employeeArr?.chName ?? state_outsourcing?.name ?? '',
+              maxRows: 3,
               value: (() => {
                 if (state_employeeArr && state_employeeArr.length > 0) {
                   return state_employeeArr.map((emp) => emp.chName).join('\n');

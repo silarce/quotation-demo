@@ -32,7 +32,8 @@ $top_headRow: calc($height_thead);
 
 .row {
   --bgcWhite: white;
-  --bgcGray: theme("colors.bgc01");
+  // --bgcGray: theme("colors.bgc01");
+  --bgcGray: white;
 
   position: relative;
   display: flex;
@@ -136,6 +137,7 @@ $top_headRow: calc($height_thead);
   &.headRow {
     // background-color: var(--bgcWhite);
     border-color: var(--bgcWhite);
+    border-top: solid 1px theme("colors.border");
 
     > .side {
       background-color: var(--bgcWhite);
@@ -155,12 +157,12 @@ $top_headRow: calc($height_thead);
     //   inset 0px 2px 2px rgba(0, 0, 0, 0.1);
 
     > .side {
-      background-color: theme("colors.hoverBgc");
+      // background-color: theme("colors.hoverBgc");
     }
 
     > .left {
       // background-color: #ffeeee;
-      background-color: theme("colors.hoverBgc");
+      // background-color: theme("colors.hoverBgc");
     }
   }
 } // .row
@@ -188,7 +190,8 @@ $top_headRow: calc($height_thead);
 
 .btnBar {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  // align-items: center;
   gap: 22px;
   svg {
     width: 16px;
@@ -207,7 +210,8 @@ $top_headRow: calc($height_thead);
 .panel {
   display: flex;
   gap: $gap;
-  align-items: center;
+  // align-items: center;
+  align-items: flex-end;
   font-size: 16px;
   .accessorie {
     white-space: pre-wrap;
