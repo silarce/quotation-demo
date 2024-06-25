@@ -458,12 +458,16 @@ export default function OutboundOrder({
       // ____________________________________________________________________
       // ____________________________________________________________________
       // MARK: prodRow
+
       const prodRow = createRowProps_prodRow({
         prod: product,
         serialNumber: index + 1,
-        worksheetItem: worksheetArr?.[0]?.worksheetItem,
-        worksheetItemQty: worksheetArr?.[0]?.worksheetItemArr.length,
-        worksheetCreatedAt: worksheetArr?.[0]?.worksheetCreatedAt || null,
+        worksheetArr: worksheetArr || [],
+        // worksheetItem: worksheetArr?.[0]?.worksheetItem,
+        // worksheetItemArr: worksheetArr?.[0]?.worksheetItemArr || [],
+        // worksheetItemArr: [],
+        // worksheetItemQty: worksheetArr?.[0]?.worksheetItemArr.length,
+        // worksheetCreatedAt: worksheetArr?.[0]?.worksheetCreatedAt || null,
       });
 
       rowPropsArr_group.push(prodRow);
@@ -799,37 +803,62 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
 const createRowProps_prodRow = ({
   prod,
   serialNumber,
-  worksheetItem,
-  worksheetItemQty,
-  worksheetCreatedAt,
+  worksheetArr,
 }: {
   prod: TquotationProductDto;
   serialNumber: React.ReactNode;
-  worksheetItem: TquotationProductItemDto | undefined;
-  worksheetItemQty: number | undefined;
-  worksheetCreatedAt: string | null;
+  worksheetArr: TproductWorksheetList[string]['worksheetList'][string][];
+  // worksheetItem: TquotationProductItemDto | undefined;
+  // worksheetItemArr: TquotationProductItemDto[];
+  // worksheetItemQty: number | undefined;
+  // worksheetCreatedAt: string | null;
 }): TrowProps => {
   const total_volume_prod = new Decimal(prod.quantity).mul(prod.volume || 0).toNumber();
 
-  const total_volume_worksheet =
-    worksheetItemQty && worksheetItem ? new Decimal(worksheetItemQty).mul(worksheetItem.volume || 0).toNumber() : '';
+  const { implementationQty, implementationVolume } = worksheetArr.reduce(
+    ({ implementationQty, implementationVolume }, current) => {
+      const { totalQty, totalVolume } = current;
 
-  const center: TrowProps['center'] = worksheetItem && {
-    projectName: worksheetItem.itemName,
-    L: new Decimal(worksheetItem.fullWidth).div(1000).toNumber(),
-    WG: new Decimal(worksheetItem.WG).div(1000).toNumber(),
-    h: new Decimal(worksheetItem.height).div(1000).toNumber(),
-    B: new Decimal(worksheetItem.boxB).div(1000).toNumber(),
-    qty: worksheetItemQty,
-    volume: worksheetItem.volume,
-    total_volume: total_volume_worksheet,
-    doorModelName: worksheetItem.doorModelName,
-    material: worksheetItem.materialName,
-    // horsepower: worksheetItem.horsepower,
-    horsepower: worksheetItem.horsepower,
-    surface: worksheetItem.materialSurface,
-    establishmentDate: getTaiwanDateStr(worksheetCreatedAt),
-  };
+      implementationQty = new Decimal(implementationQty).add(totalQty).toNumber();
+      implementationVolume = new Decimal(implementationVolume).add(totalVolume).toNumber();
+
+      return {
+        implementationQty,
+        implementationVolume,
+      };
+    },
+    {
+      implementationQty: 0,
+      implementationVolume: 0,
+    }
+  );
+
+  // const total_volume_worksheet =
+  //   worksheetItemQty && worksheetItem ? new Decimal(worksheetItemQty).mul(worksheetItem.volume || 0).toNumber() : '';
+  // const total_volume_worksheet = '要取陣列計算';
+
+  // const total_volume_worksheet = worksheetItemArr.reduce((total_volume, current) => {
+  //   const volume = current.volume || 0;
+
+  //   return new Decimal(volume).add(total_volume).toNumber();
+  // }, 0);
+
+  // const center: TrowProps['center'] = worksheetItem && {
+  //   projectName: worksheetItem.itemName,
+  //   L: new Decimal(worksheetItem.fullWidth).div(1000).toNumber(),
+  //   WG: new Decimal(worksheetItem.WG).div(1000).toNumber(),
+  //   h: new Decimal(worksheetItem.height).div(1000).toNumber(),
+  //   B: new Decimal(worksheetItem.boxB).div(1000).toNumber(),
+  //   qty: worksheetItemQty,
+  //   volume: worksheetItem.volume,
+  //   total_volume: total_volume_worksheet,
+  //   doorModelName: worksheetItem.doorModelName,
+  //   material: worksheetItem.materialName,
+  //   // horsepower: worksheetItem.horsepower,
+  //   horsepower: worksheetItem.horsepower,
+  //   surface: worksheetItem.materialSurface,
+  //   establishmentDate: getTaiwanDateStr(worksheetCreatedAt),
+  // };
 
   return {
     // key: prod.id,
@@ -844,15 +873,19 @@ const createRowProps_prodRow = ({
       WG: new Decimal(prod.WG).div(1000).toNumber(),
       h: new Decimal(prod.height).div(1000).toNumber(),
       B: new Decimal(prod.boxB).div(1000).toNumber(),
+      //
       qty: prod.quantity,
       volume: prod.volume,
       total_volume: total_volume_prod,
+
+      implementationQty,
+      implementationVolume,
+      //
       doorModelName: prod.doorModelName,
       material: prod.materialName,
       horsepower: prod.horsepower,
       surface: prod.materialSurface,
     },
-    center: center,
   };
 };
 

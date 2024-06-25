@@ -68,8 +68,10 @@ type TrowProps = {
     h?: React.ReactNode;
     B?: React.ReactNode;
     qty?: React.ReactNode;
+    implementationQty?: React.ReactNode;
     volume?: React.ReactNode;
     total_volume?: React.ReactNode;
+    implementationVolume?: React.ReactNode;
     doorModelName?: React.ReactNode;
     material?: React.ReactNode;
     horsepower?: React.ReactNode;
@@ -278,9 +280,14 @@ const Row = ({
         <div className={classNames(scss.cell, config.WG.className)}>{left?.WG}</div>
         <div className={classNames(scss.cell, config.h.className)}>{left?.h}</div>
         <div className={classNames(scss.cell, config.B.className)}>{left?.B}</div>
+        {/*  */}
         <div className={classNames(scss.cell, config.qty.className)}>{left?.qty}</div>
         <div className={classNames(scss.cell, config.volume.className)}>{left?.volume}</div>
         <div className={classNames(scss.cell, config.total_volume.className)}>{left?.total_volume}</div>
+        {/*  */}
+        <div className={classNames(scss.cell, config.implementationQty.className)}>{left?.implementationQty}</div>
+        <div className={classNames(scss.cell, config.implementationVolume.className)}>{left?.implementationVolume}</div>
+        {/*  */}
         <div className={classNames(scss.cell, config.doorModelName.className)}>{left?.doorModelName}</div>
         <div className={classNames(scss.cell, config.material.className)}>{left?.material}</div>
         <div className={classNames(scss.cell, config.horsepower.className)}>{left?.horsepower}</div>
@@ -296,9 +303,9 @@ const Row = ({
         <div className={classNames(scss.cell, config.WG.className)}>{center?.WG}</div>
         <div className={classNames(scss.cell, config.h.className)}>{center?.h}</div>
         <div className={classNames(scss.cell, config.B.className)}>{center?.B}</div>
-        <div className={classNames(scss.cell, config.qty.className)}>{center?.qty}</div>
+        {/* <div className={classNames(scss.cell, config.qty.className)}>{center?.qty}</div> */}
         <div className={classNames(scss.cell, config.volume.className)}>{center?.volume}</div>
-        <div className={classNames(scss.cell, config.total_volume.className)}>{center?.total_volume}</div>
+        {/* <div className={classNames(scss.cell, config.total_volume.className)}>{center?.total_volume}</div> */}
         <div className={classNames(scss.cell, config.doorModelName.className)}>{center?.doorModelName}</div>
         <div className={classNames(scss.cell, config.material.className)}>{center?.material}</div>
         <div className={classNames(scss.cell, config.horsepower.className)}>{center?.horsepower}</div>
@@ -377,8 +384,10 @@ const Thead = (rowProps_other: TrowProps_other) => {
         h: config.h.caption,
         B: config.B.caption,
         qty: config.qty.caption,
+        implementationQty: config.implementationQty.caption,
         volume: config.volume.caption,
         total_volume: config.total_volume.caption,
+        implementationVolume: config.implementationVolume.caption,
         doorModelName: config.doorModelName.caption,
         material: config.material.caption,
         horsepower: config.horsepower.caption,
@@ -747,8 +756,10 @@ type TcellKeys =
   | 'h'
   | 'B'
   | 'qty'
+  | 'implementationQty'
   | 'volume'
   | 'total_volume'
+  | 'implementationVolume'
   | 'doorModelName'
   | 'material'
   | 'horsepower'
@@ -792,27 +803,35 @@ const config: TconfigList = {
   },
   WG: {
     caption: 'WG',
-    className: 'w-9',
+    className: 'w-9 text-center',
   },
   h: {
     caption: 'h',
-    className: 'w-9',
+    className: 'w-9 text-center',
   },
   B: {
     caption: 'B',
-    className: 'w-9',
+    className: 'w-9 text-center',
   },
   qty: {
     caption: '數量',
-    className: 'w-8',
+    className: 'w-8 text-center',
+  },
+  implementationQty: {
+    caption: '實作數量',
+    className: 'w-16 text-center',
   },
   volume: {
     caption: '才數',
-    className: 'w-12',
+    className: 'w-12 text-center',
   },
   total_volume: {
     caption: '總才數',
-    className: 'w-14',
+    className: 'w-14 text-center',
+  },
+  implementationVolume: {
+    caption: '實作總才數',
+    className: 'w-20 text-center',
   },
   doorModelName: {
     caption: '門型',
