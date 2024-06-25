@@ -3861,7 +3861,7 @@ export type accountantInvoiceBookDto = {
   // 結尾號碼
   endNumber: string;
   // 發票類別
-  type: TinvoiceType;
+  type: TinvoiceType; // 二聯式/三聯式
   // 發票本已報稅
   isAlreadyDeclare: boolean;
   // 最後一張開立發票號碼
@@ -3875,7 +3875,6 @@ export type TcreateAccountantInvoiceBookDto = Pick<
   'year' | 'month' | 'alphabeticletter' | 'startNumber' | 'type'
 > & {
   bookQuantity: number; // 冊數(不紀錄的property);
-} & {
   isAlreadyDeclare?: boolean;
 };
 
@@ -3886,7 +3885,7 @@ export type TupdateAccountantInvoiceBookDto = Pick<
   id: string;
 };
 
-// MARK: /accountant end
+// MARK: /accountant_end
 // endregion /accountant
 
 // =========================================================================
