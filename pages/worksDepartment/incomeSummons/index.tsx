@@ -366,7 +366,7 @@ const Summons_pre = (
         });
 
         return (
-          <div key={key} style={style} className={className}>
+          <div key={key} style={style} className={classNames(className)}>
             <InputSel
               //
               disabled={disabled || !isPaperImported}
@@ -830,17 +830,18 @@ const config: Tconfig = {
       state_incomeBillSerial,
       setState_incomeBillSerial: setState_incomeBillSerial,
     }) => {
-      const { type, value } = reducer_input({
-        disabled,
-        value: state_incomeBillSerial.difference,
-      });
+      // const { type, value } = reducer_input({
+      //   disabled,
+      //   value: state_incomeBillSerial.difference,
+      // });
 
       return {
-        inputProps: {
+        textareaProps: {
+          allowNewLineByUser: true,
           props: {
             className: 'text-right',
-            type,
-            value,
+            // type,
+            value: state_incomeBillSerial.difference,
             onChange: (e) => {
               setState_incomeBillSerial((prev) => {
                 return {
