@@ -29,6 +29,7 @@ $topBlockHeight: 50px;
 .row {
   display: flex;
   flex-wrap: nowrap;
+  // align-items: flex-end;
   // gap: 10px;
 
   border-bottom: solid 1px theme("colors.border");
@@ -74,9 +75,13 @@ $topBlockHeight: 50px;
 
 .btnPanel {
   display: flex;
-
   justify-content: center;
-  align-items: center;
+  // align-items: center;
+  align-content: flex-start;
+  > * {
+    position: relative;
+    top: 3px;
+  }
   .enable {
     color: red;
   }
@@ -90,6 +95,7 @@ $topBlockHeight: 50px;
   z-index: 2;
   background-color: inherit;
 }
+
 .billSerialNumber {
   position: sticky;
   left: 70px;
