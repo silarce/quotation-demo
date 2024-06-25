@@ -97,15 +97,16 @@ export default function EditWHPosition() {
             label: '返回',
             onClick: () => {
                 router.push({
-                    pathname: `/factoryDepartment/whPositionList`,
+                    // pathname: `/factoryDepartment/whPositionList`,
+                    pathname: `/factoryDepartment/trayList`,
                     query: {
                         type: 'WareHouse',
                         whid: whid,
                         trayname: trayname,
                         whname: whname,
-                        traycalled: traycalled,
-                        traycalledname: traycalledname,
-                        traytransfer: traytransfer,
+                        traycalled: traycalledin,
+                        traycalledname: traycallednamein,
+                        traytransfer: traytransferin,
                         whnamecalled: whnamecalledin
                     }
                 });
@@ -118,7 +119,8 @@ export default function EditWHPosition() {
             label: '返回',
             onClick: () => {
                 router.push({
-                    pathname: `/factoryDepartment/whPositionList`,
+                    // pathname: `/factoryDepartment/whPositionList`,
+                    pathname: `/factoryDepartment/trayList`,
                     query: {
                         type: 'WareHouse',
                         whid: whid,
@@ -376,6 +378,7 @@ export default function EditWHPosition() {
             setTrayCalledin(true);
             setTrayCalledNamein(data1.trayname);
 
+            alert(url);
             // return;
 
             // 呼叫 traycommand API
@@ -422,8 +425,6 @@ export default function EditWHPosition() {
         try {
             setIsLoading(true);
 
-
-
             // 根據 whname 設置 deviceName
             const deviceName =
                 (whnamecalledin === "101") ? "Device1" :
@@ -437,22 +438,15 @@ export default function EditWHPosition() {
                         (whnamecalledin === "103") ? "https://192.168.1.10/sjwms/" : ""
             ) : "https://localhost:44383/WareHouse/";
 
-
-
-
             // execcommand 的參數
             const regaddress = '253';
             const cmdvalue = '1';
-
-
-            // alert(whnamecalledin + " : " + traycalledname);
-
 
             // 收回清空設定的倉庫(setWhname)、托盤(setTrayCalled)，托盤狀態(setTrayCalledName)
             setWhnameCalledin('');
             setTrayCalledin(false);
             setTrayCalledNamein('');
-            // return;
+            alert(url);
 
             // 呼叫 traycommand API
             const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
@@ -466,6 +460,9 @@ export default function EditWHPosition() {
             if (!response.ok) {
                 throw new Error('Failed to call traycommand API');
             }
+
+            // 等待一秒
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             // 呼叫 execcommand API
             const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
@@ -484,15 +481,15 @@ export default function EditWHPosition() {
             setTrayCalledin(false);
             setTrayCalledNamein('');
 
-
         } catch (error: any) {
             // 處理錯誤，顯示警告
             myAlert.warning(error.message);
-            console.error;
+            console.error(error); // 這裡需要傳遞錯誤對象
         } finally {
             setIsLoading(false);
         }
     };
+
 
 
     const CallTray = async () => {
@@ -594,7 +591,7 @@ export default function EditWHPosition() {
             是否有托盤呼叫中:{traycalledin === true ? 'true' : 'false'}<br />
             倉庫名稱:{whnamecalledin}<br />
             呼叫中的托盤名稱:{traycallednamein}<br /> */}
-            
+
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div className={scss.top}>
@@ -717,7 +714,7 @@ export default function EditWHPosition() {
                                                                             style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
                                                                             onMouseEnter={() => setHoverInfo(`${childDataItem.whpname}\n${childDataItem.spec}\n${childDataItem.quantity}`)}
                                                                             onMouseLeave={() => setHoverInfo(null)}>
-                                                                            {childDataItem.width}<br />
+                                                                            {childDataItem.length}-{childDataItem.width}<br />
                                                                         </button>
                                                                     </td>
                                                                 ))}

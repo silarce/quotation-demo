@@ -45,13 +45,13 @@ export default function MaterialList() {
 
     const searchTargetList = [
         {
-            placeholder: '物料名稱',
+            placeholder: '領料單號',
         },
         {
-            placeholder: '物料編號',
+            placeholder: '領料日期',
         },
         {
-            placeholder: '物料規格',
+            placeholder: '領料人員',
         },
     ];
 
@@ -85,6 +85,18 @@ export default function MaterialList() {
 
     const panelList: TpanelList = [
         { searchGroup },
+        {
+            type: 'addButton',
+            label: '新增領料單',
+            onClick: () => {
+                router.push({
+                    pathname: `/factoryDepartment/addTray`,
+                    query: {
+                        type: 'Tray',
+                    },
+                });
+            },
+        },
         // status === 'Contracting' ? attatchBtn : null,
         // {
         //     type: 'addButton',
@@ -112,8 +124,10 @@ export default function MaterialList() {
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const conditionModel: { keyword: string | undefined; } = {
-                keyword: "search" as string | undefined,
+            const conditionModel: {
+                // keyword: string | undefined;
+            } = {
+                // keyword: "search" as string | undefined,
             };
 
 
@@ -126,14 +140,15 @@ export default function MaterialList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
             //erpAPI
-            const response = await fetch(`${setting.apipath}GetMaterial?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetPickingList?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             let data = await response.json();
             setData(data);
-            data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
-            setData1(data);
+            console.log(data);
+            // data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
+            // setData1(data);
         } catch (error: any) {
             setError(error.message);
         }
@@ -182,21 +197,21 @@ export default function MaterialList() {
 
 
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '物料查詢'} panelList={panelList} />
-
+            <PageHeader02 tag={quotationStatusLookup[status] ?? '領料單'} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
                     {/* <div className={scss.top}> */}
                     <div>
-                        <Thead01 type={'materialList'} />
-                        <Tbody01 type={'materialList'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
+                        <Thead01 type={'PickingList'} />
+                        <Tbody01 type={'PickingList'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
                         {/* </div> */}
                     </div>
                 </div>
                 <div className={scss.right}>
+                    {/* <input type="texts" style={{border:'1px solid gray'}}/> */}
                     <div className={scss.content}>
-                        <Thead01 type={'GetMatWarehouseList'} />
-                        <Tbody01 type={'GetMatWarehouseList'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
+                        <Thead01 type={'WHPosition'} />
+                        <Tbody01 type={'WHPosition'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
                     </div>
                 </div>
             </div>
