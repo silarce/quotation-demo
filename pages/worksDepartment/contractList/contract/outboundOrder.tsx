@@ -447,6 +447,9 @@ export default function OutboundOrder({
     const rowPropsArr: TrowProps[] = [];
 
     Object.values(productWorksheetList).forEach((productWorksheet, index) => {
+      //
+      const rowPropsArr_group: TrowProps[] = [];
+
       const { product, worksheetList } = productWorksheet;
       const worksheetArr = Object.values(worksheetList) as
         | TproductWorksheetList[string]['worksheetList'][string][]
@@ -463,7 +466,7 @@ export default function OutboundOrder({
         worksheetCreatedAt: worksheetArr?.[0]?.worksheetCreatedAt || null,
       });
 
-      rowPropsArr.push(prodRow);
+      rowPropsArr_group.push(prodRow);
       // ____________________________________________________________________
       // ____________________________________________________________________
 
@@ -549,8 +552,12 @@ export default function OutboundOrder({
           isCenterCheck: !!seletedWorksheetItem[item.id],
         });
 
-        rowPropsArr.push(itemRow);
+        rowPropsArr_group.push(itemRow);
       });
+
+      prodRow.center = rowPropsArr_group[1].center;
+      prodRow.rightPanelArr = rowPropsArr_group[1].rightPanelArr;
+      rowPropsArr_group.splice(1, 1);
 
       // ____________________________________________________________________
       // 處理第一個worksheetArr的第一筆之外的worksheet
@@ -562,13 +569,12 @@ export default function OutboundOrder({
 
         const { worksheetItem, worksheetItemArr, worksheetCreatedAt } = worksheet;
 
-        const headRow = createRowProps_headRow({
-          worksheetItem: worksheetItem,
-          worksheetItemQty: worksheetItemArr.length,
-          worksheetCreatedAt,
-        });
-
-        rowPropsArr.push(headRow);
+        // const headRow = createRowProps_headRow({
+        //   worksheetItem: worksheetItem,
+        //   worksheetItemQty: worksheetItemArr.length,
+        //   worksheetCreatedAt,
+        // });
+        // rowPropsArr_group.push(headRow);
 
         worksheetItemArr.forEach((item) => {
           const itemRow = createRowProps_itemRow({
@@ -594,9 +600,11 @@ export default function OutboundOrder({
             isCenterCheck: !!seletedWorksheetItem[item.id],
           });
 
-          rowPropsArr.push(itemRow);
+          rowPropsArr_group.push(itemRow);
         });
       });
+
+      rowPropsArr.push(...rowPropsArr_group);
     }); // productWorksheetList
 
     return rowPropsArr;
@@ -1019,6 +1027,8 @@ const createRowProps_itemRow = ({
       onCopyClick: undefined,
     });
   }
+
+  rightPanelArr[rightPanelArr.length - 1].isLatest = true;
 
   return {
     // key: worksheetItem.id,

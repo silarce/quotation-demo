@@ -123,6 +123,8 @@ type Tpanel = {
   onDeleteClick: (() => void) | undefined;
   onConfirmClick?: (parameters: TpostDeliveryStatusParams) => Promise<void>;
   onCopyClick: ((parameters: TpostDeliveryStatusParams) => Promise<void>) | undefined;
+
+  isLatest?: boolean;
 };
 
 // type Tcontrol = {
@@ -442,6 +444,7 @@ const Panel = ({
   onDeleteClick,
   onConfirmClick,
   onCopyClick,
+  isLatest,
 }: Tpanel) => {
   const [disabled, setDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -517,8 +520,9 @@ const Panel = ({
       </div>
 
       <div className={classNames(scss.cell, scss.btnBar, config.btnBar.className)}>
-        {/* <IconAddCircle onClick={onAddClick} /> */}
-        {isUndefined && <IconAddCircle onClick={onAddClick} />}
+        <IconAddCircle className={classNames(!isLatest && 'invisible')} onClick={onAddClick} />
+
+        {/* {isUndefined && <IconAddCircle onClick={onAddClick} />} */}
         {!isUndefined && (
           <IconCopy
             onClick={() =>
@@ -838,7 +842,8 @@ const config: TconfigList = {
   },
   btnBar: {
     caption: '',
-    className: 'w-24',
+    className: 'w-30',
+    // className: 'w-[200px]',
   },
   installationItem: {
     caption: '安裝項目',
