@@ -22,14 +22,14 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   } else if (type === "WHPosition") {
     return (
       <div className={style.thead3}>
+        <span>儲位編碼</span>
         <span>物料編碼</span>
-        <span>批號</span>
+        {/* <span>批號</span> */}
         <span>物料名稱</span>
         <span>規格</span>
         <span>數量</span>
-        <span>物料單位</span>
-        <span>倉庫名稱</span>
-        <span>儲位編號</span>
+        {/* <span>物料單位</span> */}
+        {/* <span>倉庫名稱</span> */}
         {/* <span>儲位子編號</span> */}
         <span>{/* 按鈕格 留白 */}</span>
       </div>
@@ -37,15 +37,12 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   } else if (type === "Tray") {
     return (
       <div className={style.thead2}>
-        <span>托盤名稱</span>
+        <span>設備編號</span>
         {/* <span>倉庫代號</span> */}
-        <span>托盤代號</span>
-        <span>托盤格數</span>
-        <span>倉庫名稱</span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+        <span>托盤編碼</span>
+        <span>列數</span>
+        <span>行數</span>
+        {/* <span>修改時間</span> */}
         <span>{/* 按鈕格 留白 */}</span>
       </div>
     )
@@ -68,6 +65,16 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>托盤</span>
         <span> </span>
         <span> </span>
+        {/* <span>按鈕格 留白</span> */}
+      </div>
+    )
+  } else if (type === "PickingList") {
+    return (
+      <div className={style.thead6}>
+        <span>領料單號</span>
+        <span>領料日期</span>
+        <span>領料人員</span>
+        <span></span>
         {/* <span>按鈕格 留白</span> */}
       </div>
     )

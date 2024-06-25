@@ -643,7 +643,7 @@ const sidePathList: TsidePathList = {
       path01,
       list: [
         {
-          label: '庫存管理',
+          label: '倉儲',
           erpFeature: devPass,
           list: [
             {
@@ -651,6 +651,14 @@ const sidePathList: TsidePathList = {
               path: path01 + '/wareHouseList',
               query: {
                 type: 'WareHouse',
+              },
+              erpFeature: devPass,
+            },
+            {
+              label: '領料單',
+              path: path01 + '/getMaterial/pickingList',
+              query: {
+                type: 'pickingList',
               },
               erpFeature: devPass,
             },
