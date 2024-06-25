@@ -1007,7 +1007,8 @@ const lookup_keyArr: {
     'accountingNumber',
     'vendorName',
     'noteMaturityDate',
-    'price',
+    'currencyValue',
+    // 'price',
     // 'currency',
     'receiptCollectionDate',
     'receiptEstimatedDate',
@@ -1020,7 +1021,8 @@ const lookup_keyArr: {
 
     'accountingNumber',
     'vendorName',
-    'price',
+    'currencyValue',
+    // 'price',
     // 'currency',
     'billSerialNumber',
     'notes',
@@ -1210,7 +1212,7 @@ const configList: TconfigList = {
   vendorName: {
     label: '廠商名稱',
     style: {
-      width: 200,
+      width: 100,
     },
     className: '',
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
@@ -1383,7 +1385,7 @@ const configList: TconfigList = {
   exchangeRate: {
     label: '匯率',
     style: {
-      width: 60,
+      width: 70,
     },
     className: '',
     inputSelPropsCreator: ({ value, setState_accountant }) => {
@@ -1412,7 +1414,7 @@ const configList: TconfigList = {
     },
   },
   currencyValue: {
-    label: '幣值',
+    label: '金額',
     style: {
       width: 100,
       justifyContent: 'flex-end',
