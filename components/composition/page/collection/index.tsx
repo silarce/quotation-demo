@@ -81,7 +81,6 @@ type Tstate_accountant = {
   noteNumber: string;
   accountingNumber: string;
   vendorName: string;
-  price: string;
   billSerialNumber: string;
   notes: string;
 
@@ -92,10 +91,11 @@ type Tstate_accountant = {
   receiptCollectionDate: Moment | null;
   receiptEstimatedDate: Moment | null;
 
-  currency: Tcurrency;
-
+  currency: Tcurrency; // 幣別
+  // 匯率 不與幣別連動 // 手動輸入 在cre_emptyStateAccountant預設為1
   exchangeRate: string;
-  currencyValue: string;
+  currencyValue: string; // 金額
+  price: string; // 新台幣 = 匯率 * 金額
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -1486,6 +1486,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   receiptCollectionDate: null,
   receiptEstimatedDate: null,
   currency: 'TWD 新臺幣',
-  exchangeRate: '',
-  currencyValue: '',
+  exchangeRate: '1', // 預設為1，不然price計算結果為0
+  currencyValue: '', // 金額
 });
