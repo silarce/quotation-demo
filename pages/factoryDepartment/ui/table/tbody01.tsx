@@ -317,6 +317,28 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         )}
       </div>
     );
+  } else if (type === "PickingDetailList2") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader8}>
+              <div className={scss.row01}>
+                <span>{index + 1}</span>
+                <span>{_item.name}</span>
+                <span>{_item.quantity}</span>
+                <span>{_item.unit}</span>
+                <span>{_item.note}</span>
+                <span></span>
+                {/* <span><IconDetail/></span> */}
+                {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
   }
 
   return null; // Add default return in case type is not matched

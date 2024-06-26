@@ -246,7 +246,37 @@ div.panelHeader6 {
   }
 }
 
+//pickingLIst
 div.panelHeader7 {
+  // padding: 14px 30px;
+  padding-left: 30px;
+  border-bottom: solid 1px $colorBorder01;
+
+  //   background-color: rgb(245, 104, 69);
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 50px 200px 100px 150px 50px 150px;
+    gap: 15px;
+    // margin-bottom: 16px;
+    // padding-top:20px;
+  }
+}
+
+//pickingLIst2
+div.panelHeader8 {
   // padding: 14px 30px;
   padding-left: 30px;
   border-bottom: solid 1px $colorBorder01;

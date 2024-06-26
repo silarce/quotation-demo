@@ -1,7 +1,7 @@
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import scss from './pickingListDetail.module.scss';
 import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import router from 'next/router';
+import router, { useRouter } from 'next/router';
 import Thead01 from 'pages/factoryDepartment/ui/table/thead01';
 import Tbody01 from 'pages/factoryDepartment/ui/table/tbody01';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -9,14 +9,22 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { WrappedTextarea, inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { quotationStatusLookup } from 'config/lookupTable';
 import { TquotationStatus } from 'js/api/dtoTypes';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { setting } from '../../wareHouseList';
 
 export default function PickingListDetail() {
+    const router = useRouter();
+    const {
+        plnumber,
+    } = router.query;
+
 
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-
+    
     const status = router.query.status as TquotationStatus;
 
     const doSearch = (valueArr: (string | Toption | null)[]) => {
@@ -60,8 +68,44 @@ export default function PickingListDetail() {
         },
     ];
 
-    // 取pickinglist
-    
+    // 取pickinglistDetail
+    const getPickingListDetail = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                plnumber: string | undefined;
+            } = {
+                plnumber: plnumber as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            //erpAPI
+            const response = await fetch(`${setting.apipath}GetPickingListDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            let data = await response.json();
+            console.log(data);
+            setData1(data);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getPickingListDetail();
+    }, [plnumber]);
 
 
 
