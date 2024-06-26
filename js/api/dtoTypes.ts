@@ -2630,6 +2630,7 @@ export type TpaymentRatioDto = {
   note: string | null;
 };
 
+// 合約審核表
 export type TquotationVerifyFormDto = {
   id: string;
   createdAt: string;
