@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
@@ -23,16 +23,28 @@ import { apiSubmitContracting } from 'js/api/api_quotation';
 import scss from './contractReviewForm.module.scss';
 
 // type
-import { TpaymentRatioDto, TcreateQuotationVerifyFormDto, TquotationVerifyFormDto } from 'js/api/dtoTypes';
+import {
+  TpaymentRatioDto,
+  TcreateQuotationVerifyFormDto,
+  TquotationVerifyFormDto,
+  //
+  TquotationContentDto,
+} from 'js/api/dtoTypes';
 
 // ============================================================================
 
-type TpayMethod = {
+type TpaymentRatio = {
   title: string;
   percent: string;
   price: string;
   note: string;
 };
+
+type TpayMethodList = {
+  [key: string]: Class_payMethod;
+};
+
+export type { TpaymentRatio };
 
 // ============================================================================
 
@@ -48,6 +60,7 @@ function ContractReviewForm({
   verifyForm,
   forbidden,
   onConfirm,
+  defaultPaymentRatioArr,
 }: {
   showModal: boolean;
   close: () => void;
@@ -58,6 +71,7 @@ function ContractReviewForm({
   verifyForm: TquotationVerifyFormDto | undefined;
   forbidden?: boolean;
   onConfirm?: () => void;
+  defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
 }) {
   // ----------------------------------------------------------------------------
 
@@ -81,6 +95,7 @@ function ContractReviewForm({
         lastestContentId={lastestContentId}
         verifyForm={verifyForm}
         onConfirm={onConfirm}
+        defaultPaymentRatioArr={defaultPaymentRatioArr}
       />
     </Modal>
   );
@@ -333,6 +348,7 @@ function ReviewForm({
   contractPrice,
   lastestContentId,
   verifyForm,
+  defaultPaymentRatioArr,
   onConfirm,
 }: {
   disabled?: boolean;
@@ -342,6 +358,7 @@ function ReviewForm({
   contractPrice: number;
   lastestContentId: string | undefined;
   verifyForm: TquotationVerifyFormDto | undefined;
+  defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
   onConfirm?: () => void;
 }) {
   // ----------------------------------------------------------------------------
@@ -360,6 +377,8 @@ function ReviewForm({
 
   useEffect(() => {
     // verifyForm
+
+    let methodArr: TpaymentRatio[] | undefined = undefined;
 
     if (verifyForm) {
       reset({
@@ -380,6 +399,15 @@ function ReviewForm({
         performanceBondNote: verifyForm.performanceBondNote,
         warrantyPaymentNote: verifyForm.warrantyPaymentNote,
       });
+
+      methodArr = verifyForm?.paymentRatio.map((item) => {
+        return {
+          title: item.level,
+          percent: item.paymentRatio,
+          price: item.price,
+          note: item.note ?? '',
+        };
+      });
     } else {
       reset({
         askForPaymentDate: undefined,
@@ -397,21 +425,21 @@ function ReviewForm({
         performanceBondNote: undefined,
         warrantyPaymentNote: undefined,
       });
-    }
 
-    const methodArr = verifyForm?.paymentRatio.map((item) => {
-      return {
-        title: item.level,
-        percent: item.paymentRatio,
-        price: item.price,
-        note: item.note ?? '',
-      };
-    });
+      methodArr = defaultPaymentRatioArr?.map((item) => {
+        return {
+          title: item.level,
+          percent: item.paymentRatio,
+          price: item.price,
+          note: item.note ?? '',
+        };
+      });
+    }
 
     resetMethodList({ defaultPayMethodArr: methodArr });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled, verifyForm]);
+  }, [disabled, verifyForm, defaultPaymentRatioArr]);
 
   // ------------------------------------------------------------------
 
@@ -804,7 +832,7 @@ function ReviewForm({
 
 // ============================================================================
 
-// MARK: FUNCTION
+// MARK: FUNCTION HOOK
 
 const creEmptyMethod = () => {
   return {
@@ -814,6 +842,90 @@ const creEmptyMethod = () => {
     note: '',
   };
 };
+
+const usePayMethod = ({ contractPrice }: { contractPrice: number }) => {
+  const [render, setRender] = useState(0);
+  const [payMethodList, setPayMethodList] = useState<TpayMethodList>({});
+
+  const reRender = () => {
+    setRender((state) => state + 1);
+  };
+
+  const creDelMethod = (list: TpayMethodList) => {
+    return (key: string) => {
+      delete list[key];
+      reRender();
+    };
+  };
+
+  const addMethod = () => {
+    const newKey = nanoid();
+    payMethodList[newKey] = new Class_payMethod({
+      reRender,
+      payMethod: creEmptyMethod(),
+      delSelf: () => creDelMethod(payMethodList)(newKey),
+      contractPrice,
+    });
+    reRender();
+  };
+
+  const resetMethodList = ({ defaultPayMethodArr }: { defaultPayMethodArr?: TpaymentRatio[] } = {}) => {
+    const newList: TpayMethodList = {};
+
+    if (defaultPayMethodArr) {
+      defaultPayMethodArr.forEach((item) => {
+        const newKey = nanoid();
+        newList[newKey] = new Class_payMethod({
+          reRender,
+          payMethod: item,
+          delSelf: () => creDelMethod(newList)(newKey),
+          contractPrice,
+        });
+      });
+    } else {
+      const newKey = nanoid();
+      newList[newKey] = new Class_payMethod({
+        reRender,
+        payMethod: creEmptyMethod(),
+        delSelf: () => creDelMethod(newList)(newKey),
+        contractPrice,
+      });
+    }
+
+    setPayMethodList(newList);
+  };
+
+  useEffect(() => {
+    resetMethodList();
+  }, []);
+
+  const getMethodBodyArr = () => {
+    const arr = Object.values(payMethodList).map((item) => item.body);
+
+    return arr;
+  };
+
+  let allPercentStr = '';
+  Object.values(payMethodList).forEach((item, index, arr) => {
+    if (item.percent) {
+      allPercentStr = allPercentStr + item.percent + '%';
+
+      if (index !== arr.length - 1) {
+        allPercentStr = allPercentStr + ',';
+      }
+    }
+  });
+
+  return {
+    payMethodList,
+    addMethod,
+    resetMethodList,
+    getMethodBodyArr,
+    allPercentStr,
+  };
+}; // usePayMethod
+
+// ============================================================================
 
 // MARK: Class payMethod
 class Class_payMethod {
@@ -825,7 +937,7 @@ class Class_payMethod {
     delSelf,
   }: {
     reRender: () => void;
-    payMethod: TpayMethod;
+    payMethod: TpaymentRatio;
     contractPrice: number;
     delSelf: () => void;
   }) {
@@ -885,91 +997,43 @@ class Class_payMethod {
   }
 }
 
-type TpayMethodList = {
-  [key: string]: Class_payMethod;
-};
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
 
-const usePayMethod = ({ contractPrice }: { contractPrice: number }) => {
-  const [render, setRender] = useState(0);
-  const [payMethodList, setPayMethodList] = useState<TpayMethodList>({});
-
-  const reRender = () => {
-    setRender((state) => state + 1);
-  };
-
-  const creDelMethod = (list: TpayMethodList) => {
-    return (key: string) => {
-      delete list[key];
-      reRender();
-    };
-  };
-
-  const addMethod = () => {
-    const newKey = nanoid();
-    payMethodList[newKey] = new Class_payMethod({
-      reRender,
-      payMethod: creEmptyMethod(),
-      delSelf: () => creDelMethod(payMethodList)(newKey),
-      contractPrice,
-    });
-    reRender();
-  };
-
-  const resetMethodList = ({ defaultPayMethodArr }: { defaultPayMethodArr?: TpayMethod[] } = {}) => {
-    const newList: TpayMethodList = {};
-
-    if (defaultPayMethodArr) {
-      defaultPayMethodArr.forEach((item) => {
-        const newKey = nanoid();
-        newList[newKey] = new Class_payMethod({
-          reRender,
-          payMethod: item,
-          delSelf: () => creDelMethod(newList)(newKey),
-          contractPrice,
-        });
-      });
-    } else {
-      const newKey = nanoid();
-      newList[newKey] = new Class_payMethod({
-        reRender,
-        payMethod: creEmptyMethod(),
-        delSelf: () => creDelMethod(newList)(newKey),
-        contractPrice,
-      });
+const useDefaultPaymentRatio_quotationContent = (
+  quotationContent: TquotationContentDto | undefined
+): TpaymentRatioDto[] | undefined => {
+  const arr: TpaymentRatioDto[] | undefined = useMemo(() => {
+    if (!quotationContent) {
+      return undefined;
     }
 
-    setPayMethodList(newList);
-  };
+    const { paymentMethods, total } = quotationContent;
 
-  useEffect(() => {
-    resetMethodList();
-  }, []);
+    const arr: TpaymentRatioDto[] = paymentMethods.map((item) => {
+      const { milestone, totalPaymentRatio } = item;
 
-  const getMethodBodyArr = () => {
-    const arr = Object.values(payMethodList).map((item) => item.body);
+      const price = new Decimal(total)
+        .mul(totalPaymentRatio || 0)
+        .div(100)
+        .toString();
+
+      return {
+        level: milestone,
+        paymentRatio: totalPaymentRatio,
+        price,
+        note: '',
+      };
+    });
 
     return arr;
-  };
+  }, [quotationContent]);
 
-  let allPercentStr = '';
-  Object.values(payMethodList).forEach((item, index, arr) => {
-    if (item.percent) {
-      allPercentStr = allPercentStr + item.percent + '%';
-
-      if (index !== arr.length - 1) {
-        allPercentStr = allPercentStr + ',';
-      }
-    }
-  });
-
-  return {
-    payMethodList,
-    addMethod,
-    resetMethodList,
-    getMethodBodyArr,
-    allPercentStr,
-  };
-}; // usePayMethod
+  return arr;
+};
 
 export default ContractReviewForm;
-export { ReviewForm };
+export { ReviewForm, useDefaultPaymentRatio_quotationContent };
