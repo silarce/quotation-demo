@@ -74,7 +74,19 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>領料單號</span>
         <span>領料日期</span>
         <span>領料人員</span>
+        <span>狀態</span>
         <span></span>
+        {/* <span>按鈕格 留白</span> */}
+      </div>
+    )
+  } else if (type === "PickingDetailList") {
+    return (
+      <div className={style.thead7}>
+        <span>序號</span>
+        <span>品名/規格</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span>備註</span>
         {/* <span>按鈕格 留白</span> */}
       </div>
     )

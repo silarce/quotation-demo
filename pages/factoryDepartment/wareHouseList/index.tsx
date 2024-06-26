@@ -22,10 +22,10 @@ type Tquery = {
 
 
 export const setting = {
-
     apipath: 'https://new-erp-api.beta.san-jeou.com.tw/WareHouse/', // 確保這裡包含正確的 API 路徑
     // apipath: 'https://localhost:44383/WareHouse/', // 確保這裡包含正確的 API 路徑
     env: 'prod'
+    // env: 'local'
 };
 
 export default function WareHouseList() {
@@ -39,8 +39,6 @@ export default function WareHouseList() {
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
 
-    // wareHouseList/index.js
-
 
     const searchTargetList = [
         {
@@ -53,7 +51,6 @@ export default function WareHouseList() {
         searchTargetList,
         doSearch: (arr: any) => {
             const keyword = arr[0] as string;
-            // console.log("thisthishtishtis:" + keyword + "asdfasdfasdf");
             if (keyword === '' || keyword === undefined) {
                 fetchData();
             } else {
@@ -65,7 +62,6 @@ export default function WareHouseList() {
 
     const panelList: TpanelList = [
         { searchGroup },
-        // status === 'Contracting' ? attatchBtn : null,
         {
             type: 'addButton',
             label: '新增倉庫',
@@ -79,8 +75,6 @@ export default function WareHouseList() {
             },
         },
     ];
-
-
 
     useEffect(() => {
         fetchData();
