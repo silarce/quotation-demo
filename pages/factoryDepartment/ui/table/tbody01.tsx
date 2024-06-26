@@ -113,7 +113,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         create_by: create_by,
         lotnumber: lotnumber,
         picked: picked,
-        main_item: item.main_item
+        main_item: item.main_item,
+        note: item.note
       },
     });
   }

@@ -31,7 +31,16 @@ type Tquery = {
 
 export default function PickingList() {
     const router = useRouter();
-    const { type, plnumber, create_at, create_by, lotnumber, picked, main_item } = router.query;
+    const {
+        type,
+        plnumber,
+        create_at,
+        create_by,
+        lotnumber,
+        picked,
+        main_item,
+        note
+    } = router.query;
 
 
     const { userInfo } = useContext(AppContext);
@@ -150,7 +159,7 @@ export default function PickingList() {
             }
             const data = await response.json();
             console.log(data);
-            
+
             setData(data);
 
 
@@ -239,7 +248,8 @@ export default function PickingList() {
         router.push({
             pathname: `/factoryDepartment/getMaterial/pickingListDetail`,
             query: {
-                type: 'Tray',
+                //傳入領料單單號
+                plnumber: plnumber
             },
         });
     }
@@ -323,57 +333,20 @@ export default function PickingList() {
                             caption="主件項目"
                             disabled={true}
                             textareaProps={{
-
-                            }}
-                            inputProps={{
                                 props: {
+                                    // value: main_item ? main_item : ' ',
                                     value: main_item ? main_item : ' ',
 
                                 },
-
-                            }} />
-                        {/* <WrappedTextarea
-                            mt={'0px'}
-                            // className=''
-                            disabled={true}
-                            inputSelProps={{ caption: '主件項目:' }}
-                            textareaProps={{
-                                props: {
-                                    name: 'description',
-                                    maxRows: 3,
-                                    value: main_item ? main_item : ' ',
-                                    onChange: (e) => {
-
-                                    },
-                                },
                             }}
-                        /> */}
-                        {/* <WrappedTextarea
+                        />
+                        <InputSel {...inputSelProps}
+                            caption="備註"
                             disabled={true}
-                            inputSelProps={{ caption: '說明:' }}
                             textareaProps={{
                                 props: {
-                                    name: 'description',
-                                    maxRows: 3,
-                                    value: "領料",
-                                    onChange: (e) => {
+                                    value: note ? note : ' ',
 
-                                    },
-                                },
-                            }}
-                        /> */}
-                        <WrappedTextarea
-                            mt={'0px'}
-                            disabled={true}
-                            inputSelProps={{ caption: '備註' }}
-                            textareaProps={{
-                                props: {
-                                    name: 'description',
-                                    maxRows: 3,
-                                    value: "無",
-                                    onChange: (e) => {
-
-                                    },
                                 },
                             }}
                         />
