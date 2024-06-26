@@ -172,7 +172,8 @@
     margin-top: 4px;
     margin-left: 4px;
     margin-right: 4px;
-    border:1px solid gray
+    border:1px solid gray;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 .content1 {
     position: -webkit-sticky; // 為兼容性增加前綴
