@@ -3855,7 +3855,7 @@ export type accountantInvoiceBookDto = {
   // 發票本名稱(冊)
   name: string;
   // 字軌
-  alphabeticletter: string;
+  alphabeticLetter: string;
   // 起始號碼
   startNumber: string;
   // 結尾號碼
@@ -3872,7 +3872,7 @@ export type accountantInvoiceBookDto = {
 
 export type TcreateAccountantInvoiceBookDto = Pick<
   accountantInvoiceBookDto,
-  'year' | 'month' | 'alphabeticletter' | 'startNumber' | 'type'
+  'year' | 'month' | 'alphabeticLetter' | 'startNumber' | 'type'
 > & {
   bookQuantity: number; // 冊數(不紀錄的property);
   isAlreadyDeclare?: boolean;
@@ -3880,7 +3880,7 @@ export type TcreateAccountantInvoiceBookDto = Pick<
 
 export type TupdateAccountantInvoiceBookDto = Pick<
   TcreateAccountantInvoiceBookDto,
-  'year' | 'month' | 'alphabeticletter' | 'startNumber' | 'type' | 'isAlreadyDeclare'
+  'year' | 'month' | 'alphabeticLetter' | 'startNumber' | 'type' | 'isAlreadyDeclare'
 > & {
   id: string;
 };

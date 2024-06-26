@@ -440,6 +440,23 @@ export const apiPatchAccountantInvoiceBook = async (
     });
 };
 
+export const deleteAccountantInvoiceBook = async (id: string, { callAlert = true }: { callAlert?: boolean } = {}) => {
+  const api = `/accountant-invoice-book/${id}`;
+
+  return axi
+    .delete(api)
+    .then(({ data }) => data)
+    .catch((err) => {
+      callAlert &&
+        myAlert.err({
+          title: '刪除發票簿失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
+};
+
 // ==============================================================================
 export {
   apiGetAccountant,
