@@ -28,6 +28,17 @@ interface TbodyProps {
   whnamecalled: any;
 }
 
+
+export interface PickingListModel {
+  id?: string;
+  create_at?: string;
+  create_by?: string;
+  description?: string;
+  note?: string;
+  plnumber?: string;
+  picked?: string;
+}
+
 export default function Tbody01({ data, error, type, traycalled, traycalledname, traytransfer, url, whnamecalled }: TbodyProps) {
 
   async function getTrayByWareHouse(whid: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
@@ -88,7 +99,23 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         whnamecalled: whnamecalled
       },
     });
+  }
 
+  async function GetPickingListDetailById(plnumber: any, create_at: any, create_by: any, lotnumber: any, picked: any, item: any) {
+
+    console.log(item);
+    router.replace({
+      pathname: `/factoryDepartment/getMaterial/pickingList`,
+      query: {
+        type: 'ss',
+        plnumber: plnumber,
+        create_at: getTaiwanDateStr(create_at),
+        create_by: create_by,
+        lotnumber: lotnumber,
+        picked: picked,
+        main_item: item.main_item
+      },
+    });
   }
 
   // 日期格式處理
@@ -256,8 +283,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.plnumber}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.create_by}</span>
-                {/* <span><IconDetail/></span> */}
-                <span ><IconDetail onClick={() => { alert("跳轉至清單明細與領料畫面") }} /></span>
+                <span>
+                  <span style={{ color: '#14256a', display: `${_item.picked === true ? "" : "none"}` }}>已領</span>
+                  <span style={{ color: '#ea1833', display: `${_item.picked === false ? "" : "none"}` }}>未領</span>
+                </span>
+                <span ><IconDetail onClick={() => { GetPickingListDetailById(_item.plnumber, _item.create_at, _item.create_by, _item.lotnumber, _item.picked, _item) }} /></span>
               </div>
             </CellWithBar>
           ))
