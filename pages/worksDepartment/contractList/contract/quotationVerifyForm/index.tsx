@@ -5,6 +5,9 @@ import { useRouter } from 'next/router';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
+// component
+import { ReviewForm } from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
+
 // api
 // import { useGetEngineeringContact } from 'js/api/api_engineering';
 import { useGetContract_id } from 'js/api/api_quotation';
@@ -33,7 +36,19 @@ export default function QuotationVerifyForm() {
     ],
   });
 
-  const { engineeringContact } = contract ?? {};
+  const {
+    //
+    engineeringContact,
+    contractNumber,
+    content,
+  } = contract ?? {};
+
+  const {
+    //
+    verifyForm,
+    projectName,
+    total,
+  } = content ?? {};
 
   // ------------------------------------------------------------------------
 
@@ -52,7 +67,18 @@ export default function QuotationVerifyForm() {
         contractNumber={engineeringContact?.contractNumber ?? ''}
       />
 
-      <div>foooooo</div>
+      <div className="w-[1000px]">
+        <ReviewForm
+          disabled={true}
+          close={() => {}}
+          contractIdNumber={contractNumber ?? ''}
+          contractName={projectName ?? ''}
+          contractPrice={total ?? 0}
+          lastestContentId={undefined}
+          verifyForm={verifyForm}
+          onConfirm={() => {}}
+        />
+      </div>
     </SubLayer>
   );
 }

@@ -411,7 +411,7 @@ function ReviewForm({
     resetMethodList({ defaultPayMethodArr: methodArr });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled]);
+  }, [disabled, verifyForm]);
 
   // ------------------------------------------------------------------
 
