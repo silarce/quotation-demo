@@ -284,3 +284,11 @@ $top_headRow: calc($height_thead);
 .menuPortal.plus {
   z-index: 3;
 }
+
+.totalRow {
+  width: fit-content;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  border-top: solid 4px theme("colors.border");
+}

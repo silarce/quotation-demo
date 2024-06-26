@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
+import Decimal from 'decimal.js';
 
 // antd
 import { Checkbox, Popover, Button } from 'antd';
@@ -68,10 +69,10 @@ type TrowProps = {
     h?: React.ReactNode;
     B?: React.ReactNode;
     qty?: React.ReactNode;
-    implementationQty?: React.ReactNode;
+    implementationQty?: number | string;
     volume?: React.ReactNode;
     total_volume?: React.ReactNode;
-    implementationVolume?: React.ReactNode;
+    implementationVolume?: number | string;
     doorModelName?: React.ReactNode;
     material?: React.ReactNode;
     horsepower?: React.ReactNode;
@@ -177,6 +178,31 @@ export default function OrderTable({
   };
 
   // -------------------------------------------------------------------------------
+
+  const { totalImplementationQty, totalImplementationVolume } = useMemo(() => {
+    const totalImplementation = rowPropsArr.reduce(
+      (
+        { totalImplementationQty, totalImplementationVolume },
+        { left: { implementationQty, implementationVolume } = {} }
+      ) => {
+        const implementationQty_num = typeof implementationQty === 'number' ? implementationQty : 0;
+        const implementationVolume_num = typeof implementationVolume === 'number' ? implementationVolume : 0;
+
+        return {
+          totalImplementationQty: new Decimal(totalImplementationQty).add(implementationQty_num).toNumber(),
+          totalImplementationVolume: new Decimal(totalImplementationVolume).add(implementationVolume_num).toNumber(),
+        };
+      },
+      {
+        totalImplementationQty: 0,
+        totalImplementationVolume: 0,
+      }
+    );
+
+    return totalImplementation;
+  }, [rowPropsArr]);
+
+  // -------------------------------------------------------------------------------
   useEffect(() => {
     batchWorksheetItem.onBatchAddChange && batchWorksheetItem.onBatchAddChange(showBatchAdd);
   }, [showBatchAdd]);
@@ -225,6 +251,11 @@ export default function OrderTable({
             />
           );
         })}
+
+        <TotalRow
+          totalImplementationQty={totalImplementationQty}
+          totalImplementationVolume={totalImplementationVolume}
+        />
       </div>
     </div>
   );
@@ -433,6 +464,34 @@ const HeadRow = (rowProps: TrowProps & TrowProps_other) => {
       changeShowLeft={rowProps.changeShowLeft}
       className={classNames(scss.headRow, rowProps.isProdRow && scss.prodRow)}
     />
+  );
+};
+
+// ------------------------------------------------------------------------
+
+// region TotalRow
+const TotalRow = ({
+  totalImplementationQty,
+  totalImplementationVolume,
+}: {
+  totalImplementationQty: number | string;
+  totalImplementationVolume: number | string;
+}) => {
+  return (
+    <div className={scss.totalRow}>
+      <Row
+        left={{
+          implementationQty: '總實作數量',
+          implementationVolume: '總實作才數',
+        }}
+      />
+      <Row
+        left={{
+          implementationQty: totalImplementationQty,
+          implementationVolume: totalImplementationVolume,
+        }}
+      />
+    </div>
   );
 };
 
@@ -817,10 +876,6 @@ const config: TconfigList = {
     caption: '數量',
     className: 'w-8 text-center',
   },
-  implementationQty: {
-    caption: '實作數量',
-    className: 'w-16 text-center',
-  },
   volume: {
     caption: '才數',
     className: 'w-12 text-center',
@@ -828,6 +883,10 @@ const config: TconfigList = {
   total_volume: {
     caption: '總才數',
     className: 'w-14 text-center',
+  },
+  implementationQty: {
+    caption: '實作數量',
+    className: 'w-[75px] text-center',
   },
   implementationVolume: {
     caption: '實作總才數',
