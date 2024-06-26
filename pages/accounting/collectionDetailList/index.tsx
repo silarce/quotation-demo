@@ -254,53 +254,7 @@ export default function CollectionDetailList() {
             </Row>
           );
         })}
-        {data_accountant.map((accountant, index) => {
-          const {
-            id,
-            insertDate,
-            vendorName,
-            importAccountingNumber,
-            price,
-            notes,
-            noteNumber,
-            noteMaturityDate,
-            // invoiceNumber,
-            billSerialNumber,
 
-            // incomeBill,
-            invoices,
-          } = accountant;
-
-          const invoiceNumber = invoices?.[0]?.invoiceNumber as string | undefined;
-
-          const list = {
-            insertDate: getTaiwanDateStr(insertDate),
-            vendorName,
-            importAccountingNumber,
-            price: price.toLocaleString(),
-            notes,
-            noteNumber,
-            noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
-            invoiceNumber,
-            billSerialNumber,
-          } as const;
-
-          return (
-            <Row key={id} fullWidth={true}>
-              {keyArr.map((key) => {
-                const { style, bodyClassName } = config[key];
-
-                return (
-                  <Cell key={key} style={style} className={classNames(bodyClassName)} preBuilt="block">
-                    {list[key]}
-                  </Cell>
-                );
-              })}
-            </Row>
-          );
-        })}
-
-        {/*  */}
         {/*  */}
 
         <Row className={scss.bottom} fullWidth={true}>
