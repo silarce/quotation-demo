@@ -26,7 +26,19 @@ import scss from './contractReviewForm.module.scss';
 import { TpaymentRatioDto, TcreateQuotationVerifyFormDto, TquotationVerifyFormDto } from 'js/api/dtoTypes';
 
 // ============================================================================
-export default function ContractReviewForm({
+
+type TpayMethod = {
+  title: string;
+  percent: string;
+  price: string;
+  note: string;
+};
+
+// ============================================================================
+
+// region START
+
+function ContractReviewForm({
   showModal,
   close,
   contractIdNumber,
@@ -49,211 +61,6 @@ export default function ContractReviewForm({
 }) {
   // ----------------------------------------------------------------------------
 
-  const theDisabled = forbidden;
-
-  // ----------------------------------------------------------------------------
-
-  const { payMethodList, addMethod, resetMethodList, getMethodBodyArr, allPercentStr } = usePayMethod({
-    contractPrice,
-  });
-
-  // const { register, control, reset, watch, setValue } = useForm<TcontractReviewForm>();
-  const { register, control, reset, watch, setValue, getValues } =
-    useForm<Omit<TcreateQuotationVerifyFormDto, 'TpaymentRatioDto'>>();
-
-  const watchData = watch();
-
-  // ----------------------------------------------------------------------------
-  // 被選的employee
-  const [selEmployeeIdArr, setSelEmployeeIdArr] = useState<string[]>([]);
-
-  const params = {
-    pageSize: 20,
-    populate: ['jobs.department'],
-    sort: 'idNumber',
-    filter: {
-      'jobs.department.name': { $eq: '工務部' },
-    },
-  };
-
-  const {
-    dataArr: empArr,
-    viewRef_bottom,
-    isLoadingPage1,
-    reset: resetEmp,
-  } = useEmployee_infinite({ customParams: params });
-
-  useEffect(() => {
-    if (!showModal) {
-      setSelEmployeeIdArr([]);
-
-      return;
-    }
-
-    // verifyForm
-
-    if (verifyForm) {
-      reset({
-        askForPaymentDate: verifyForm.askForPaymentDate,
-        disbursementDate: verifyForm.disbursementDate,
-        // paymentRatio: verifyForm.paymentRatio,
-        paymentTenor: verifyForm.paymentTenor,
-        performanceBond: verifyForm.performanceBond,
-        depositPayment: verifyForm.depositPayment,
-        warrantyPeriod: verifyForm.warrantyPeriod,
-        note: verifyForm.note,
-        warrantyPayment: verifyForm.warrantyPayment,
-        fireproofCertificate: verifyForm.fireproofCertificate,
-        warranty: verifyForm.warranty,
-        testDrive: verifyForm.testDrive,
-        debitItem: verifyForm.debitItem,
-        // workDirectorId: verifyForm.workDirectorId,
-        performanceBondNote: verifyForm.performanceBondNote,
-        warrantyPaymentNote: verifyForm.warrantyPaymentNote,
-      });
-    } else {
-      reset({
-        askForPaymentDate: undefined,
-        disbursementDate: undefined,
-        paymentTenor: undefined,
-        performanceBond: undefined,
-        depositPayment: undefined,
-        warrantyPeriod: undefined,
-        note: undefined,
-        warrantyPayment: undefined,
-        fireproofCertificate: undefined,
-        warranty: undefined,
-        testDrive: undefined,
-        debitItem: undefined,
-        performanceBondNote: undefined,
-        warrantyPaymentNote: undefined,
-      });
-    }
-
-    setSelEmployeeIdArr([verifyForm?.workDirectorId ?? '']);
-    resetEmp();
-
-    const methodArr = verifyForm?.paymentRatio.map((item) => {
-      return {
-        title: item.level,
-        percent: item.paymentRatio,
-        price: item.price,
-        note: item.note ?? '',
-      };
-    });
-
-    resetMethodList({ defaultPayMethodArr: methodArr });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showModal]);
-
-  // ------------------------------------------------------------------
-  const onClick = (newEmp: TemployeeDto) => {
-    // const newArr = [...selEmployeeIdArr];
-
-    setSelEmployeeIdArr([newEmp.id]);
-
-    // if (selLimit === 1) {
-    //   newArr[0] = newEmp;
-    //   setSelEmployeeArr(newArr);
-
-    //   return;
-    // }
-
-    // const theIndex = newArr.findIndex((emp) => emp.id === newEmp.id);
-
-    // if (theIndex > -1) {
-    //   newArr.splice(theIndex, 1);
-    // } else {
-    //   newArr.push(newEmp);
-    // }
-
-    // setSelEmployeeArr(newArr);
-  };
-
-  const theOnConfirm = async () => {
-    if (!lastestContentId || theDisabled) {
-      return;
-    }
-
-    const preBody = watch();
-
-    if (isNaN(Number(preBody.askForPaymentDate))) {
-      preBody.askForPaymentDate = '';
-    }
-
-    if (isNaN(Number(preBody.disbursementDate))) {
-      preBody.disbursementDate = '';
-    }
-
-    const body: TcreateQuotationVerifyFormDto = {
-      // array
-      paymentRatio: Object.values(payMethodList).map((item) => item.body),
-      // date
-      askForPaymentDate: preBody.askForPaymentDate,
-      disbursementDate: preBody.disbursementDate,
-      paymentTenor: preBody.paymentTenor,
-      // boolean
-      performanceBond: preBody.performanceBond,
-      depositPayment: preBody.depositPayment,
-      warrantyPayment: preBody.warrantyPayment,
-      fireproofCertificate: preBody.fireproofCertificate,
-      warranty: preBody.warranty,
-      testDrive: preBody.testDrive,
-      // string
-      warrantyPeriod: preBody.warrantyPeriod ?? '',
-      note: preBody.note ?? '',
-      debitItem: preBody.debitItem ?? '',
-
-      performanceBondNote: preBody.performanceBondNote ?? '',
-      warrantyPaymentNote: preBody.warrantyPaymentNote ?? '',
-
-      //
-    };
-
-    let isPaymentOk = true;
-    body.paymentRatio.forEach((item) => {
-      const { level, paymentRatio, price, note } = item;
-
-      if (!level || !paymentRatio || !price) {
-        isPaymentOk = false;
-      }
-    });
-
-    if (!body.askForPaymentDate || !body.disbursementDate || !body.paymentTenor) {
-      return myAlert.warning({ title: '請填寫所有日期' });
-    } else if (
-      body.performanceBond === undefined ||
-      body.depositPayment === undefined ||
-      body.warrantyPayment === undefined ||
-      body.fireproofCertificate === undefined ||
-      body.warranty === undefined ||
-      body.testDrive === undefined
-    ) {
-      return myAlert.warning({ title: '請填寫所有二選一選項' });
-    } else if (!isPaymentOk) {
-      return myAlert.warning({ title: '請確實設定請款比例' });
-    }
-
-    try {
-      await apiSubmitContracting({ contentId: lastestContentId, body });
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '送出合約審核表失敗', content: err?.message });
-    }
-
-    close();
-    onConfirm && onConfirm();
-  };
-
-  const onCancel = () => {
-    // onCancel();
-    // setSelEmployeeArr([]);
-    close();
-  };
-
-  // ----------------------------------------------------------------------------
-
   return (
     <Modal
       className={scss.modal}
@@ -263,318 +70,25 @@ export default function ContractReviewForm({
       destroyOnClose={true}
       footer={null}
       width="800px"
-      onCancel={onCancel}
+      onCancel={close}
     >
-      <div className={scss.container}>
-        <p className={scss.title}>合約審核表</p>
-        {/*  */}
-        <div className={scss.subTitle}>
-          <span>合約編號</span>
-          <span>{contractIdNumber}</span>
-          <span>工程名稱</span>
-          <span>{contractName}</span>
-        </div>
-        {/*  */}
-        <div className={scss.list}>
-          <div className={scss.numIndex}>1</div>
-          <div>
-            <span>註明請款日</span>
-            <InputSel
-              className={scss.date}
-              disabled={theDisabled}
-              inputProps={{
-                props: {
-                  value: watchData.askForPaymentDate ?? '',
-                  onChange: (e) => {
-                    const str = e.target.value;
-
-                    if (str === '') {
-                      setValue('askForPaymentDate', str);
-                    } else {
-                      let num = parseInt(str);
-                      num = Math.abs(num);
-                      setValue('askForPaymentDate', String(num));
-                    }
-                  },
-                  type: 'number',
-                },
-              }}
-            />
-            <span>，放款日</span>
-            <InputSel
-              className={scss.date}
-              disabled={theDisabled}
-              inputProps={{
-                props: {
-                  value: watchData.disbursementDate ?? '',
-                  onChange: (e) => {
-                    const str = e.target.value;
-
-                    if (str === '') {
-                      setValue('disbursementDate', str);
-                    } else {
-                      let num = parseInt(str);
-                      num = Math.abs(num);
-                      setValue('disbursementDate', String(num));
-                    }
-                  },
-                  type: 'number',
-                },
-              }}
-            />
-          </div>
-          {/*  */}
-          <div className={scss.numIndex}>2</div>
-          <div className={scss.item2}>
-            <div>
-              <span>確定請款比例</span>
-              <InputBox inputAttr={{ className: 'pl-4', value: allPercentStr, disabled: true }} />
-            </div>
-            <div className={scss.payMethodContainer}>
-              {Object.values(payMethodList).map((item, index, arr) => {
-                let onDel = arr.length > 1 ? item.delSelf : undefined;
-
-                if (theDisabled) {
-                  onDel = undefined;
-                }
-
-                return (
-                  <Row
-                    key={index}
-                    disabled={theDisabled}
-                    onAdd={theDisabled ? undefined : addMethod}
-                    onDel={onDel}
-                    serialNumber={index + 1}
-                    title={{
-                      value: item.title,
-                      onChange: (e) => {
-                        item.title = e.target.value;
-                      },
-                    }}
-                    percent={{
-                      value: item.percent,
-                      onChange: (e) => {
-                        item.percent = e.target.value;
-                      },
-                    }}
-                    price={{
-                      value: item.price,
-                    }}
-                    note={{
-                      value: item.note,
-                      onChange: (e) => {
-                        item.note = e.target.value;
-                      },
-                    }}
-                  />
-                );
-              })}
-            </div>
-          </div>
-          {/*  */}
-          <div className={scss.numIndex}>3</div>
-          <div className={scss.paymentTenor}>
-            <span>合理的放款票期</span>
-            <InputSel
-              disabled={theDisabled}
-              inputProps={{
-                props: {
-                  value: watchData.paymentTenor ?? '',
-                  onChange: (e) => {
-                    setValue('paymentTenor', e.target.value);
-                  },
-                },
-              }}
-            />
-          </div>
-          {/*  */}
-          <div className={scss.numIndex}>4</div>
-          <div>
-            <RadioContainer
-              disabled={theDisabled}
-              label={'是否出具履約保證票'}
-              labelClassName="mr-[48px]"
-              value={watchData.performanceBond}
-              onChange={(v) => {
-                setValue('performanceBond', v);
-              }}
-            />
-            <InputBox
-              className="mt-1"
-              prefix="備註 :"
-              inputAttr={{
-                disabled: theDisabled,
-                value: watchData.performanceBondNote ?? '',
-                onChange: (e) => {
-                  setValue('performanceBondNote', e.target.value);
-                },
-                placeholder: '請輸入備註',
-              }}
-            />
-            <p className="text-[13px] text-[red] m-0">嚴禁使用商業本票</p>
-          </div>
-          {/*  */}
-          <div className={scss.numIndex}>5</div>
-          <div>
-            <RadioContainer
-              disabled={theDisabled}
-              label={'是否可請訂金款'}
-              labelClassName="mr-[75px]"
-              value={watchData.depositPayment}
-              onChange={(v) => {
-                setValue('depositPayment', v);
-              }}
-            />
-          </div>
-          {/*  */}
-          <div className={scss.numIndex}>6</div>
-          <div className="flex">
-            合理的保固期{' '}
-            <InputBox
-              boxStyle={{ width: '60px' }}
-              inputAttr={{
-                disabled: theDisabled,
-                ...register('warrantyPeriod'),
-                className: 'text-center',
-              }}
-            />
-            <span>年，備註</span>
-            <InputBox
-              className="flex-auto"
-              inputAttr={{
-                disabled: theDisabled,
-                ...register('note'),
-              }}
-            />
-          </div>
-          {/*  */}
-          <div className={scss.numIndex}>7</div>
-          <div>
-            <RadioContainer
-              disabled={theDisabled}
-              label={'是否出具保固票或保固金'}
-              labelClassName="mr-[48px]"
-              value={watchData.warrantyPayment}
-              onChange={(v) => {
-                setValue('warrantyPayment', v);
-              }}
-            />
-            <InputBox
-              className="mt-1"
-              prefix="備註 :"
-              inputAttr={{
-                disabled: theDisabled,
-                value: watchData.warrantyPaymentNote ?? '',
-                onChange: (e) => {
-                  setValue('warrantyPaymentNote', e.target.value);
-                },
-                placeholder: '請輸入備註',
-              }}
-            />
-          </div>
-          {/*  */}
-          <div className={scss.numIndex}>8</div>
-          <div>
-            <div>
-              <RadioContainer
-                disabled={theDisabled}
-                label={'是否註明收足90%出具防火證明、出廠證明'}
-                labelClassName="mr-[48px]"
-                value={watchData.fireproofCertificate}
-                onChange={(v) => {
-                  setValue('fireproofCertificate', v);
-                }}
-              />
-            </div>
-          </div>
-          {/*  */}
-          <div className={scss.numIndex}>9</div>
-          <div>
-            <div>
-              <RadioContainer
-                disabled={theDisabled}
-                label={'是否註明收足100%出具保固書'}
-                labelClassName="mr-[48px]"
-                value={watchData.warranty}
-                onChange={(v) => {
-                  setValue('warranty', v);
-                }}
-              />
-            </div>
-          </div>
-          {/*  */}
-          <div className={scss.numIndex}>10</div>
-          <div>
-            <div>
-              <RadioContainer
-                disabled={theDisabled}
-                label={'請按裝款時是否需配合工地試車'}
-                labelClassName="mr-[48px]"
-                value={watchData.testDrive}
-                onChange={(v) => {
-                  setValue('testDrive', v);
-                }}
-              />
-            </div>
-          </div>
-          {/*  */}
-          <div className={scss.numIndex}>11</div>
-          <div>
-            <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
-            <br />
-            <div className={scss.textaraeBox}>
-              <textarea
-                disabled={theDisabled}
-                className="w-full resize-none"
-                placeholder="請輸入"
-                {...register('debitItem')}
-              />
-            </div>
-          </div>
-          {/*  */}
-        </div>
-
-        <div className={scss.footer}>
-          <div>
-            <IconCaution />
-          </div>
-          <div>
-            <span>
-              簽訂合約，須注意以上事項，協助把關以利工務執行順暢、款項順利回收，合約成立後請將此審核表與合約一起轉工務部，謝謝！
-            </span>
-          </div>
-        </div>
-        {/*  */}
-        {/* 不需要了`,api更新後要拿掉 */}
-        {/* <div className="mt-9">
-          <p className="text-main text-[18px] text-center mb-[18px]">請選擇送審人員</p>
-          <div className={scss.table}>
-            <RowArr
-              empArr={empArr}
-              selEmployeeIdArr={selEmployeeIdArr}
-              viewRef_bottom={viewRef_bottom}
-              onClick={onClick}
-            />
-          </div>
-        </div> */}
-
-        <div className={scss.btnBox}>
-          <MyButton_v2
-            className={classNames(theDisabled && 'hidden')}
-            label="確定"
-            theme="danger"
-            onClick={theOnConfirm}
-            px="px44"
-          />
-          <MyButton_v2 label={theDisabled ? '關閉' : '取消'} onClick={onCancel} px="px44" />
-        </div>
-
-        {/*  */}
-      </div>
+      <ReviewForm
+        disabled={!showModal || forbidden}
+        close={close}
+        contractIdNumber={contractIdNumber}
+        contractName={contractName}
+        contractPrice={contractPrice}
+        lastestContentId={lastestContentId}
+        verifyForm={verifyForm}
+        onConfirm={onConfirm}
+      />
     </Modal>
   );
 }
 
+// endregion START
+// MARK: END
+
 // ============================================================================
 // ============================================================================
 // ============================================================================
@@ -582,6 +96,9 @@ export default function ContractReviewForm({
 // ============================================================================
 // ============================================================================
 // ============================================================================
+
+// region COMPONENT
+
 const InputBox = ({
   prefix,
   suffix,
@@ -806,14 +323,488 @@ const RowArr = ({
   );
 };
 
+// MARK:ReviewForm
+
+function ReviewForm({
+  disabled,
+  close,
+  contractIdNumber,
+  contractName,
+  contractPrice,
+  lastestContentId,
+  verifyForm,
+  onConfirm,
+}: {
+  disabled?: boolean;
+  close?: () => void;
+  contractIdNumber: string;
+  contractName: string;
+  contractPrice: number;
+  lastestContentId: string | undefined;
+  verifyForm: TquotationVerifyFormDto | undefined;
+  onConfirm?: () => void;
+}) {
+  // ----------------------------------------------------------------------------
+
+  const { payMethodList, addMethod, resetMethodList, getMethodBodyArr, allPercentStr } = usePayMethod({
+    contractPrice,
+  });
+
+  // const { register, control, reset, watch, setValue } = useForm<TcontractReviewForm>();
+  const { register, control, reset, watch, setValue, getValues } =
+    useForm<Omit<TcreateQuotationVerifyFormDto, 'TpaymentRatioDto'>>();
+
+  const watchData = watch();
+
+  // ----------------------------------------------------------------------------
+
+  useEffect(() => {
+    // verifyForm
+
+    if (verifyForm) {
+      reset({
+        askForPaymentDate: verifyForm.askForPaymentDate,
+        disbursementDate: verifyForm.disbursementDate,
+        // paymentRatio: verifyForm.paymentRatio,
+        paymentTenor: verifyForm.paymentTenor,
+        performanceBond: verifyForm.performanceBond,
+        depositPayment: verifyForm.depositPayment,
+        warrantyPeriod: verifyForm.warrantyPeriod,
+        note: verifyForm.note,
+        warrantyPayment: verifyForm.warrantyPayment,
+        fireproofCertificate: verifyForm.fireproofCertificate,
+        warranty: verifyForm.warranty,
+        testDrive: verifyForm.testDrive,
+        debitItem: verifyForm.debitItem,
+        // workDirectorId: verifyForm.workDirectorId,
+        performanceBondNote: verifyForm.performanceBondNote,
+        warrantyPaymentNote: verifyForm.warrantyPaymentNote,
+      });
+    } else {
+      reset({
+        askForPaymentDate: undefined,
+        disbursementDate: undefined,
+        paymentTenor: undefined,
+        performanceBond: undefined,
+        depositPayment: undefined,
+        warrantyPeriod: undefined,
+        note: undefined,
+        warrantyPayment: undefined,
+        fireproofCertificate: undefined,
+        warranty: undefined,
+        testDrive: undefined,
+        debitItem: undefined,
+        performanceBondNote: undefined,
+        warrantyPaymentNote: undefined,
+      });
+    }
+
+    const methodArr = verifyForm?.paymentRatio.map((item) => {
+      return {
+        title: item.level,
+        percent: item.paymentRatio,
+        price: item.price,
+        note: item.note ?? '',
+      };
+    });
+
+    resetMethodList({ defaultPayMethodArr: methodArr });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled]);
+
+  // ------------------------------------------------------------------
+
+  const theOnConfirm = async () => {
+    if (!lastestContentId || disabled) {
+      return;
+    }
+
+    const preBody = watch();
+
+    if (isNaN(Number(preBody.askForPaymentDate))) {
+      preBody.askForPaymentDate = '';
+    }
+
+    if (isNaN(Number(preBody.disbursementDate))) {
+      preBody.disbursementDate = '';
+    }
+
+    const body: TcreateQuotationVerifyFormDto = {
+      // array
+      paymentRatio: Object.values(payMethodList).map((item) => item.body),
+      // date
+      askForPaymentDate: preBody.askForPaymentDate,
+      disbursementDate: preBody.disbursementDate,
+      paymentTenor: preBody.paymentTenor,
+      // boolean
+      performanceBond: preBody.performanceBond,
+      depositPayment: preBody.depositPayment,
+      warrantyPayment: preBody.warrantyPayment,
+      fireproofCertificate: preBody.fireproofCertificate,
+      warranty: preBody.warranty,
+      testDrive: preBody.testDrive,
+      // string
+      warrantyPeriod: preBody.warrantyPeriod ?? '',
+      note: preBody.note ?? '',
+      debitItem: preBody.debitItem ?? '',
+
+      performanceBondNote: preBody.performanceBondNote ?? '',
+      warrantyPaymentNote: preBody.warrantyPaymentNote ?? '',
+
+      //
+    };
+
+    let isPaymentOk = true;
+    body.paymentRatio.forEach((item) => {
+      const { level, paymentRatio, price, note } = item;
+
+      if (!level || !paymentRatio || !price) {
+        isPaymentOk = false;
+      }
+    });
+
+    if (!body.askForPaymentDate || !body.disbursementDate || !body.paymentTenor) {
+      return myAlert.warning({ title: '請填寫所有日期' });
+    } else if (
+      body.performanceBond === undefined ||
+      body.depositPayment === undefined ||
+      body.warrantyPayment === undefined ||
+      body.fireproofCertificate === undefined ||
+      body.warranty === undefined ||
+      body.testDrive === undefined
+    ) {
+      return myAlert.warning({ title: '請填寫所有二選一選項' });
+    } else if (!isPaymentOk) {
+      return myAlert.warning({ title: '請確實設定請款比例' });
+    }
+
+    try {
+      await apiSubmitContracting({ contentId: lastestContentId, body });
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '送出合約審核表失敗', content: err?.message });
+    }
+
+    close?.();
+    onConfirm && onConfirm();
+  };
+
+  const onCancel = () => {
+    // onCancel();
+    // setSelEmployeeArr([]);
+    close?.();
+  };
+
+  // ----------------------------------------------------------------------------
+
+  // MARK: RENDER
+
+  return (
+    <div className={scss.container}>
+      <p className={scss.title}>合約審核表</p>
+      {/*  */}
+      <div className={scss.subTitle}>
+        <span>合約編號</span>
+        <span>{contractIdNumber}</span>
+        <span>工程名稱</span>
+        <span>{contractName}</span>
+      </div>
+      {/*  */}
+      <div className={scss.list}>
+        <div className={scss.numIndex}>1</div>
+        <div>
+          <span>註明請款日</span>
+          <InputSel
+            className={scss.date}
+            disabled={disabled}
+            inputProps={{
+              props: {
+                value: watchData.askForPaymentDate ?? '',
+                onChange: (e) => {
+                  const str = e.target.value;
+
+                  if (str === '') {
+                    setValue('askForPaymentDate', str);
+                  } else {
+                    let num = parseInt(str);
+                    num = Math.abs(num);
+                    setValue('askForPaymentDate', String(num));
+                  }
+                },
+                type: 'number',
+              },
+            }}
+          />
+          <span>，放款日</span>
+          <InputSel
+            className={scss.date}
+            disabled={disabled}
+            inputProps={{
+              props: {
+                value: watchData.disbursementDate ?? '',
+                onChange: (e) => {
+                  const str = e.target.value;
+
+                  if (str === '') {
+                    setValue('disbursementDate', str);
+                  } else {
+                    let num = parseInt(str);
+                    num = Math.abs(num);
+                    setValue('disbursementDate', String(num));
+                  }
+                },
+                type: 'number',
+              },
+            }}
+          />
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>2</div>
+        <div className={scss.item2}>
+          <div>
+            <span>確定請款比例</span>
+            <InputBox inputAttr={{ className: 'pl-4', value: allPercentStr, disabled: true }} />
+          </div>
+          <div className={scss.payMethodContainer}>
+            {Object.values(payMethodList).map((item, index, arr) => {
+              let onDel = arr.length > 1 ? item.delSelf : undefined;
+
+              if (disabled) {
+                onDel = undefined;
+              }
+
+              return (
+                <Row
+                  key={index}
+                  disabled={disabled}
+                  onAdd={disabled ? undefined : addMethod}
+                  onDel={onDel}
+                  serialNumber={index + 1}
+                  title={{
+                    value: item.title,
+                    onChange: (e) => {
+                      item.title = e.target.value;
+                    },
+                  }}
+                  percent={{
+                    value: item.percent,
+                    onChange: (e) => {
+                      item.percent = e.target.value;
+                    },
+                  }}
+                  price={{
+                    value: item.price,
+                  }}
+                  note={{
+                    value: item.note,
+                    onChange: (e) => {
+                      item.note = e.target.value;
+                    },
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>3</div>
+        <div className={scss.paymentTenor}>
+          <span>合理的放款票期</span>
+          <InputSel
+            disabled={disabled}
+            inputProps={{
+              props: {
+                value: watchData.paymentTenor ?? '',
+                onChange: (e) => {
+                  setValue('paymentTenor', e.target.value);
+                },
+              },
+            }}
+          />
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>4</div>
+        <div>
+          <RadioContainer
+            disabled={disabled}
+            label={'是否出具履約保證票'}
+            labelClassName="mr-[48px]"
+            value={watchData.performanceBond}
+            onChange={(v) => {
+              setValue('performanceBond', v);
+            }}
+          />
+          <InputBox
+            className="mt-1"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+              value: watchData.performanceBondNote ?? '',
+              onChange: (e) => {
+                setValue('performanceBondNote', e.target.value);
+              },
+              placeholder: '請輸入備註',
+            }}
+          />
+          <p className="text-[13px] text-[red] m-0">嚴禁使用商業本票</p>
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>5</div>
+        <div>
+          <RadioContainer
+            disabled={disabled}
+            label={'是否可請訂金款'}
+            labelClassName="mr-[75px]"
+            value={watchData.depositPayment}
+            onChange={(v) => {
+              setValue('depositPayment', v);
+            }}
+          />
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>6</div>
+        <div className="flex">
+          合理的保固期{' '}
+          <InputBox
+            boxStyle={{ width: '60px' }}
+            inputAttr={{
+              disabled: disabled,
+              ...register('warrantyPeriod'),
+              className: 'text-center',
+            }}
+          />
+          <span>年，備註</span>
+          <InputBox
+            className="flex-auto"
+            inputAttr={{
+              disabled: disabled,
+              ...register('note'),
+            }}
+          />
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>7</div>
+        <div>
+          <RadioContainer
+            disabled={disabled}
+            label={'是否出具保固票或保固金'}
+            labelClassName="mr-[48px]"
+            value={watchData.warrantyPayment}
+            onChange={(v) => {
+              setValue('warrantyPayment', v);
+            }}
+          />
+          <InputBox
+            className="mt-1"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+              value: watchData.warrantyPaymentNote ?? '',
+              onChange: (e) => {
+                setValue('warrantyPaymentNote', e.target.value);
+              },
+              placeholder: '請輸入備註',
+            }}
+          />
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>8</div>
+        <div>
+          <div>
+            <RadioContainer
+              disabled={disabled}
+              label={'是否註明收足90%出具防火證明、出廠證明'}
+              labelClassName="mr-[48px]"
+              value={watchData.fireproofCertificate}
+              onChange={(v) => {
+                setValue('fireproofCertificate', v);
+              }}
+            />
+          </div>
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>9</div>
+        <div>
+          <div>
+            <RadioContainer
+              disabled={disabled}
+              label={'是否註明收足100%出具保固書'}
+              labelClassName="mr-[48px]"
+              value={watchData.warranty}
+              onChange={(v) => {
+                setValue('warranty', v);
+              }}
+            />
+          </div>
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>10</div>
+        <div>
+          <div>
+            <RadioContainer
+              disabled={disabled}
+              label={'請按裝款時是否需配合工地試車'}
+              labelClassName="mr-[48px]"
+              value={watchData.testDrive}
+              onChange={(v) => {
+                setValue('testDrive', v);
+              }}
+            />
+          </div>
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>11</div>
+        <div>
+          <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
+          <br />
+          <div className={scss.textaraeBox}>
+            <textarea
+              disabled={disabled}
+              className="w-full resize-none"
+              placeholder="請輸入"
+              {...register('debitItem')}
+            />
+          </div>
+        </div>
+        {/*  */}
+      </div>
+
+      <div className={scss.footer}>
+        <div>
+          <IconCaution />
+        </div>
+        <div>
+          <span>
+            簽訂合約，須注意以上事項，協助把關以利工務執行順暢、款項順利回收，合約成立後請將此審核表與合約一起轉工務部，謝謝！
+          </span>
+        </div>
+      </div>
+      {/*  */}
+
+      {!disabled && (
+        <div className={scss.btnBox}>
+          <MyButton_v2
+            className={classNames(disabled && 'hidden')}
+            label="確定"
+            theme="danger"
+            onClick={theOnConfirm}
+            px="px44"
+          />
+          <MyButton_v2 label={disabled ? '關閉' : '取消'} onClick={onCancel} px="px44" />
+        </div>
+      )}
+
+      {/*  */}
+    </div>
+  );
+}
+
+// endregion COMPONENT
+
 // ============================================================================
 
-type TpayMethod = {
-  title: string;
-  percent: string;
-  price: string;
-  note: string;
-};
+// MARK: FUNCTION
 
 const creEmptyMethod = () => {
   return {
@@ -824,6 +815,7 @@ const creEmptyMethod = () => {
   };
 };
 
+// MARK: Class payMethod
 class Class_payMethod {
   constructor({
     //
@@ -978,3 +970,6 @@ const usePayMethod = ({ contractPrice }: { contractPrice: number }) => {
     allPercentStr,
   };
 }; // usePayMethod
+
+export default ContractReviewForm;
+export { ReviewForm };
