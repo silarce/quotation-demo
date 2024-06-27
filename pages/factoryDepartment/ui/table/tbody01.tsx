@@ -101,23 +101,36 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     });
   }
 
-  async function GetPickingListDetailById(plnumber: any, create_at: any, create_by: any, lotnumber: any, picked: any, item: any) {
+  async function GetPickingListDetailById(plid: any, create_at: any, create_by: any, lotid: any, picked: any, item: any) {
 
-    console.log(item);
+    // console.log(item);
     router.replace({
       pathname: `/factoryDepartment/getMaterial/pickingList`,
       query: {
         type: 'ss',
-        plnumber: plnumber,
+        plid: plid,
         create_at: getTaiwanDateStr(create_at),
         create_by: create_by,
-        lotnumber: lotnumber,
+        lotid: lotid,
         picked: picked,
         main_item: item.main_item,
         note: item.note
       },
     });
   }
+
+  //依據領料單物料取得符合料號與數量的托盤
+  async function GetTrayByMaterialNumber(item: any) {
+
+    // console.log(item);
+    router.replace({
+      pathname: `/factoryDepartment/getMaterial/pickingListDetail`,
+      query: {
+        type: 'ss',
+      },
+    });
+  }
+
 
   // 日期格式處理
   function convertToYearMonthDay(datetimetype: string, isoDateString: string | number | Date) {
@@ -274,6 +287,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       </div>
     );
   } else if (type === "PickingList") {
+    // 領料單
     return (
       <div>
         {error && <p>Error: {error}</p>}
@@ -281,14 +295,14 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader6}>
               <div className={scss.row01}>
-                <span>{_item.plnumber}</span>
+                <span>{_item.plid}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.create_by}</span>
                 <span>
                   <span style={{ color: '#14256a', display: `${_item.picked === true ? "" : "none"}` }}>已領</span>
                   <span style={{ color: '#ea1833', display: `${_item.picked === false ? "" : "none"}` }}>未領</span>
                 </span>
-                <span ><IconDetail onClick={() => { GetPickingListDetailById(_item.plnumber, _item.create_at, _item.create_by, _item.lotnumber, _item.picked, _item) }} /></span>
+                <span ><IconDetail onClick={() => { GetPickingListDetailById(_item.plid, _item.create_at, _item.create_by, _item.lotid, _item.picked, _item) }} /></span>
               </div>
             </CellWithBar>
           ))
@@ -296,6 +310,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       </div>
     );
   } else if (type === "PickingDetailList") {
+    // 領料單.領料單明細
     return (
       <div>
         {error && <p>Error: {error}</p>}
@@ -304,13 +319,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
             <CellWithBar key={index} className={scss.panelHeader7}>
               <div className={scss.row01}>
                 <span>{index + 1}</span>
-                <span>{_item.name}</span>
+                <span>{_item.productname}</span>
                 <span>{_item.quantity}</span>
                 <span>{_item.unit}</span>
                 <span>{_item.note}</span>
                 <span></span>
-                {/* <span><IconDetail/></span> */}
-                {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
               </div>
             </CellWithBar>
           ))
@@ -318,6 +331,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       </div>
     );
   } else if (type === "PickingDetailList2") {
+    // 領料明細單.開始領料
     return (
       <div>
         {error && <p>Error: {error}</p>}
@@ -326,11 +340,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
             <CellWithBar key={index} className={scss.panelHeader8}>
               <div className={scss.row01}>
                 <span>{index + 1}</span>
-                <span>{_item.name}</span>
+                <span>{_item.productname}</span>
                 <span>{_item.quantity}</span>
                 <span>{_item.unit}</span>
                 <span>{_item.note}</span>
-                <span></span>
+                <span ><IconDetail onClick={() => { GetTrayByMaterialNumber(_item) }} /></span>
                 {/* <span><IconDetail/></span> */}
                 {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
               </div>

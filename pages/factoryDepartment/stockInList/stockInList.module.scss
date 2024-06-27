@@ -16,7 +16,7 @@
 
 .main {
     display: grid;
-    grid-template-columns:840px 300px 1fr ; // 左右兩邊比例，可以調整
+    grid-template-columns: 550px 1fr; // 左右兩邊比例，可以調整
     gap: 15px;
     width: auto;
     margin-top: 4px;
@@ -26,6 +26,19 @@
 }
 
 .left {
+    display: grid;
+    grid-template-columns: 650px;
+    justify-content: space-between;
+    gap: 15px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 2px solid gray;
+    min-height: 100vh-30vh;
+    /* 自動調整高度到螢幕大小 */
+}
+
+
+.right {
     position: relative; // 確保子元素可以正確定位
     position: -webkit-sticky;
     ; // 固定在視窗位置
@@ -42,30 +55,6 @@
     padding-left: 10px;
     // background-color: red;
     border:2px solid gray;
-}
-
-.middle {
-    display: grid;
-    grid-template-columns: 650px;
-    justify-content: space-between;
-    gap: 15px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    border: 2px solid gray;
-    min-height: 100vh-30vh;
-    /* 自動調整高度到螢幕大小 */
-}
-
-.right {
-    display: grid;
-    grid-template-columns: 650px;
-    justify-content: space-between;
-    gap: 15px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    border: 2px solid gray;
-    min-height: 100vh-30vh;
-    /* 自動調整高度到螢幕大小 */
 }
 
 

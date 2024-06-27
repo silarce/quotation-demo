@@ -98,6 +98,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>數量</span>
         <span>單位</span>
         <span>備註</span>
+        <span></span>
         {/* <span>按鈕格 留白</span> */}
       </div>
     )

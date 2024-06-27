@@ -595,7 +595,7 @@ const sidePathList: TsidePathList = {
           erpFeature: devPass,
           list: [
             {
-              label: '入庫',
+              label: '儲位',
               path: path01 + '/wareHouseList',
               query: {
                 type: 'WareHouse',
@@ -603,7 +603,15 @@ const sidePathList: TsidePathList = {
               erpFeature: devPass,
             },
             {
-              label: '領料單',
+              label: '入庫',
+              path: path01 + '/stockInList',
+              query: {
+                type: 'stockInList',
+              },
+              erpFeature: devPass,
+            },
+            {
+              label: '領料',
               path: path01 + '/getMaterial/pickingList',
               query: {
                 type: 'pickingList',
@@ -737,7 +745,7 @@ const topPathList: TtopPathListConfig[] = [
     label: '廠務部',
     path01: sidePathList['/factoryDepartment'].path01,
     href: {
-      pathname: sidePathList['/factoryDepartment'].path01+'/wareHouseList',
+      pathname: sidePathList['/factoryDepartment'].path01 + '/wareHouseList',
       query: {
         type: 'WareHouse',
       },
