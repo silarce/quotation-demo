@@ -238,7 +238,12 @@ export default function PageHeader({
     // },
   ];
 
-  const linkList_domestic = [linkList_pass.find((item) => item?.label === '工程管理單')!];
+  const linkList_domestic = linkList_pass.reduce((arr, item) => {
+    item?.label === '工程管理單' && arr.push(item);
+    item?.label === '工程聯絡單' && arr.push(item);
+
+    return arr;
+  }, [] as typeof linkList_pass);
 
   const linkList = pass ? linkList_pass : domesticPass ? linkList_domestic : [];
 
