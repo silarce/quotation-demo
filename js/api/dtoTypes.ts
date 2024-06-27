@@ -28,6 +28,7 @@ export type TengineeringContactAttachmentType = 'color' | 'construction' | 'deta
 export type TaccountantPaymentType = '匯款' | '票據' | '現金';
 export type TreceiptStatus = '託收' | '已兌現';
 export type Tcurrency = 'TWD 新臺幣' | 'USD 美元';
+export type TinvoiceType = '三聯式' | '二聯式';
 
 // =============================================================================
 export type Tparams = {
@@ -2630,6 +2631,7 @@ export type TpaymentRatioDto = {
   note: string | null;
 };
 
+// 合約審核表
 export type TquotationVerifyFormDto = {
   id: string;
   createdAt: string;
@@ -3454,6 +3456,9 @@ export type TcreateAccountReceivableAccountsDto = {
 // endregion /engineering
 
 // =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
 // region /accountant
 
 // 公司銀行帳戶資料
@@ -3845,7 +3850,51 @@ export type TcreateAccountantExchangeFromDto = {
   accountantId: string[];
 };
 
-// MARK: /accountant end
+export type accountantInvoiceBookDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 發票本 年分
+  year: string;
+  // 發票本 月分
+  month: string;
+  // 期數
+  period: number;
+  // 發票本名稱(冊)
+  name: string;
+  // 字軌
+  alphabeticLetter: string;
+  // 起始號碼
+  startNumber: string;
+  // 結尾號碼
+  endNumber: string;
+  // 發票類別
+  type: TinvoiceType; // 二聯式/三聯式
+  // 發票本已報稅
+  isAlreadyDeclare: boolean;
+  // 最後一張開立發票號碼
+  latestInvoiceNumber: string | null;
+  // 最後一張開立發票日期
+  latestInvoiceDate: string | null;
+};
+
+export type TcreateAccountantInvoiceBookDto = Pick<
+  accountantInvoiceBookDto,
+  'year' | 'month' | 'alphabeticLetter' | 'startNumber' | 'type'
+> & {
+  bookQuantity: number; // 冊數(不紀錄的property);
+  isAlreadyDeclare?: boolean;
+};
+
+export type TupdateAccountantInvoiceBookDto = Pick<
+  TcreateAccountantInvoiceBookDto,
+  'year' | 'month' | 'alphabeticLetter' | 'startNumber' | 'type' | 'isAlreadyDeclare'
+> & {
+  id: string;
+};
+
+// MARK: /accountant_end
 // endregion /accountant
 
 // =========================================================================
