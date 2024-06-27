@@ -25,6 +25,9 @@ import type {
   TretainageType,
 } from 'js/api/dtoTypes';
 
+// api
+import { useGetAccountantInvoiceBook } from 'js/api/api_accountant';
+
 // ========================================================================
 // region type
 
@@ -156,6 +159,10 @@ export default function PeriodTable({
     tax: 0,
     contractTotal: 0,
   });
+
+  // --------------------------------------------------------------------------
+
+  const {} = useGetAccountantInvoiceBook({ autoUpdate: false });
 
   // --------------------------------------------------------------------------
 

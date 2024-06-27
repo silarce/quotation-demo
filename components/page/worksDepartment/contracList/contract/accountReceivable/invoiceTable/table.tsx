@@ -1,4 +1,13 @@
-import React, { useState, useEffect, useMemo, memo, forwardRef, useImperativeHandle } from 'react';
+import React, {
+  //
+  useState,
+  useEffect,
+  useMemo,
+  memo,
+  forwardRef,
+  useImperativeHandle,
+  useCallback,
+} from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
@@ -17,6 +26,7 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import scss from './periodTable.module.scss';
 
 import type {
+  Tparams,
   TfinalProduct,
   TaccountsReceivablePeriodDto,
   TquotationProductItemDto,
@@ -25,16 +35,24 @@ import type {
   TretainageType,
   TaccountsReceivableInvoiceDto,
 } from 'js/api/dtoTypes';
+import { Toption } from 'js/utils/options/options';
 
 import { Tinvoice_reduce as Tperiod_reduce, Tstate_period } from './periodTable';
 
 // api
 import { TinvouceCheckResult, useCheckInvoiceNumber } from 'js/api/api_engineering';
+import { useGetAccountantInvoiceBook } from 'js/api/api_accountant';
 
 // icon
 import { IconEdit, IconCheck01, IconCheck02, IconCross01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // ==========================================================================
+
+// type Tstate_invoiceBood = {
+//   value: string;
+//   label: string;
+// };
+type Tstate_invoiceBood = Toption | null;
 
 type Tcenter = {
   renderCount?: number; // 判斷是否要rerender用的，來自Tstate_invoice
@@ -97,6 +115,10 @@ type Tcenter = {
 type TimperativeHandle_panel = {
   getState: () => Tstate_period;
 };
+
+type TcustomFilter_invoiceBook = NonNullable<
+  NonNullable<Parameters<typeof useGetAccountantInvoiceBook>[0]>['customFilter']
+>;
 
 export type { Tcenter, TimperativeHandle_panel };
 
@@ -255,6 +277,7 @@ function PeriodPanel_pre(
 
   const [disabled, setDisabled] = useState(!isNew || !!totalsTotal);
   const [state_period, setState_period] = useState<Tstate_period>(defaultState);
+  const [state_invoiceBook, setState_InvoiceBook] = useState<Tstate_invoiceBood>(null);
 
   const {
     //
@@ -263,6 +286,51 @@ function PeriodPanel_pre(
   } = useCheckInvoiceNumber(state_period?.invoiceNumber, { pause: disabled });
 
   // --------------------------------------------------------------------------
+
+  const params_invoiceBook = useMemo(() => {
+    //
+
+    const year = state_period.invoiceDate?.year();
+    const month = (state_period.invoiceDate?.month() ?? -1) + 1;
+
+    if (!year || month < 1) {
+      return undefined;
+    }
+
+    //
+    const params: Tparams = {
+      pageSize: 99999,
+      filter: {
+        isAlreadyDeclare: { $eq: false },
+        year: { $eq: year },
+        month: { $eq: month },
+      },
+    };
+
+    //
+    return params;
+  }, [state_period.invoiceDate]);
+
+  const customFilter_invoiceBook: TcustomFilter_invoiceBook = useCallback((book) => {
+    const { endNumber, latestInvoiceNumber } = book;
+
+    if (endNumber === latestInvoiceNumber) {
+      return false;
+    } else {
+      return true;
+    }
+  }, []);
+
+  const {
+    //
+    data: data_invoiceBookArr,
+    update: update_invoiceBookArr,
+    clearData: clearData_invoiceBookArr,
+  } = useGetAccountantInvoiceBook({
+    params: params_invoiceBook,
+    autoUpdate: false,
+    customFilter: customFilter_invoiceBook,
+  });
 
   // --------------------------------------------------------------------------
 
@@ -637,6 +705,51 @@ function PeriodPanel_pre(
     };
   }, [state_period, totalsTotal]);
 
+  // _______________________________________________________________________
+  // _______________________________________________________________________
+
+  const invoiceBookOptions = useMemo(() => {
+    const options: Toption[] = (data_invoiceBookArr ?? []).map((book) => {
+      return {
+        value: book.id,
+        label: book.alphabeticLetter || '無字軌',
+      };
+    });
+
+    return options;
+  }, [data_invoiceBookArr]);
+
+  const invoiceNumberOptions = useMemo(() => {
+    if (!data_invoiceBookArr) {
+      return [];
+    }
+
+    const invoiceBook = data_invoiceBookArr.find((book) => book.id === state_invoiceBook?.value);
+
+    if (!invoiceBook) {
+      return [];
+    }
+
+    const { startNumber, endNumber } = invoiceBook;
+    const startNumber_num = Number(startNumber);
+    const endNumber_num = Number(endNumber);
+
+    const options: Toption[] = [];
+
+    for (let i = startNumber_num; i <= endNumber_num; i++) {
+      const value = String(i).padStart(8, '0');
+
+      options.push({
+        value,
+        label: value,
+      });
+    }
+
+    return options;
+
+    //
+  }, [state_invoiceBook]);
+
   // ==============================================================================
   // region  USE EFFECT
   useEffect(() => {
@@ -675,6 +788,16 @@ function PeriodPanel_pre(
       };
     });
   }, [state_period.id, isCheckingInvoiceNumber, isInvoiceNumberCheckPass, state_period.invoiceNumber]);
+
+  useEffect(() => {
+    if (isNew) {
+      if (params_invoiceBook) {
+        update_invoiceBookArr();
+      } else {
+        clearData_invoiceBookArr();
+      }
+    }
+  }, [params_invoiceBook]);
 
   // ==============================================================================
 
@@ -766,6 +889,11 @@ function PeriodPanel_pre(
         resetDefault={resetDefault}
         isCheckingInvoiceNumber={isCheckingInvoiceNumber}
         isInvoiceNumberCheckPass={isInvoiceNumberCheckPass}
+        //
+        invoiceBookOptions={invoiceBookOptions}
+        state_invoiceBook={state_invoiceBook}
+        setState_InvoiceBook={setState_InvoiceBook}
+        invoiceNumberOptions={invoiceNumberOptions}
       />
 
       <div className={classNames(scss.deleteBar, isTotal && 'invisible')}>
@@ -882,6 +1010,11 @@ const Tfoot = ({
   resetDefault,
   isCheckingInvoiceNumber,
   isInvoiceNumberCheckPass,
+  //
+  invoiceBookOptions,
+  state_invoiceBook,
+  setState_InvoiceBook,
+  invoiceNumberOptions,
 }: {
   readOnly: boolean;
   node_other: Tcenter['other'];
@@ -890,6 +1023,11 @@ const Tfoot = ({
   resetDefault: () => void;
   isCheckingInvoiceNumber: boolean;
   isInvoiceNumberCheckPass: TinvouceCheckResult;
+  //
+  invoiceBookOptions: Toption[];
+  state_invoiceBook: Tstate_invoiceBood;
+  setState_InvoiceBook: React.Dispatch<React.SetStateAction<Tstate_invoiceBood>>;
+  invoiceNumberOptions: Toption[];
 }) => {
   const {
     invoiceNumber,
@@ -1071,6 +1209,40 @@ const Tfoot = ({
       </div>
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
+        <span>發票日期</span>
+        <InputSel
+          disabled={readOnly}
+          showBaseline="auto"
+          datePickerProps={{
+            props: {
+              value: invoiceDate,
+              onChange: (date_m) => {
+                onChange_invoiceDate(date_m);
+                setState_InvoiceBook(null);
+              },
+            },
+          }}
+        />
+      </div>
+
+      <div className={classNames(scss.row, isTotal && 'invisible')}>
+        <span>發票簿</span>
+        <InputSel
+          disabled={readOnly}
+          showBaseline="auto"
+          selectProps={{
+            props: {
+              value: state_invoiceBook,
+              options: invoiceBookOptions,
+              onChange: (option) => {
+                setState_InvoiceBook(option);
+              },
+            },
+          }}
+        />
+      </div>
+
+      <div className={classNames(scss.row, isTotal && 'invisible')}>
         <div className={scss.invoiceNumberSpinWrapper}>
           <div className={classNames(!showInvoiceNumberCheck && 'invisible')}>
             {isCheckingInvoiceNumber && <Spin />}
@@ -1083,29 +1255,29 @@ const Tfoot = ({
           </div>
           <span>發票號碼</span>
         </div>
-        <input
+        {/* <input
           className={classNames(readOnly && scss.readyOnly)}
           value={invoiceNumber}
           onChange={(e) => onChange_invoiceNumber(e.target.value)}
           readOnly={readOnly}
-        />
-      </div>
+        /> */}
 
-      <div className={classNames(scss.row, isTotal && 'invisible')}>
-        <span>發票日期</span>
         <InputSel
           disabled={readOnly}
           showBaseline="auto"
-          datePickerProps={{
+          selectProps={{
             props: {
-              value: invoiceDate,
-              onChange: (mo) => {
-                onChange_invoiceDate(mo);
-              },
+              value: { label: invoiceNumber, value: invoiceNumber },
+              options: invoiceNumberOptions,
+              // value: invoiceDate,
+              // onChange: (mo) => {
+              //   onChange_invoiceDate(mo);
+              // },
             },
           }}
         />
       </div>
+
       {/*  */}
       {/*  */}
       {/*  */}

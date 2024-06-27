@@ -357,10 +357,12 @@ export const useGetAccountantInvoiceBook = ({
   params,
   autoUpdate = true,
   callAlert = true,
+  customFilter,
 }: {
   params?: Tparams;
   autoUpdate?: boolean;
   callAlert?: boolean;
+  customFilter?: (data: accountantInvoiceBookDto) => boolean;
 } = {}) => {
   const [res, setRes] = useState<TpageResponse<accountantInvoiceBookDto>>();
   const [isFetching, setIsFetching] = useState(false);
@@ -370,6 +372,13 @@ export const useGetAccountantInvoiceBook = ({
 
     try {
       const res = await apiGetAccountantInvoiceBook(params);
+
+      if (customFilter) {
+        let data = res.data;
+        data = data.filter(customFilter);
+        res.data = data;
+      }
+
       setRes(res);
 
       return res;
@@ -387,14 +396,19 @@ export const useGetAccountantInvoiceBook = ({
     }
   }, [params]);
 
+  const clearData = () => {
+    setRes(undefined);
+  };
+
   useEffect(() => {
     autoUpdate && update();
-  }, [params]);
+  }, [params, customFilter]);
 
   return {
     data: res?.data,
     meta: res?.meta,
     update,
+    clearData,
     isFetching,
   };
 };
