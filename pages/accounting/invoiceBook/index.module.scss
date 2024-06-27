@@ -1,0 +1,10 @@
+.row {
+  padding: 0 20px;
+
+  &.new {
+    background-color: theme("colors.hoverBgc");
+  }
+  &.delete {
+    background-color: theme("colors.chosenBgc");
+  }
+}

@@ -13,8 +13,11 @@ import { quotationStatusLookup } from 'config/lookupTable';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import { setting } from '../../wareHouseList/index';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
+import { WrappedTextarea, inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { AppContext } from 'pages/_app';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
+import { parseJSON } from 'date-fns';
 
 
 
@@ -26,9 +29,10 @@ type Tquery = {
 
 
 
-export default function MaterialList() {
+export default function PickingList() {
     const router = useRouter();
-    const { type, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
+    const { type, plnumber, create_at, create_by, lotnumber, picked, main_item } = router.query;
+
 
     const { userInfo } = useContext(AppContext);
 
@@ -36,11 +40,11 @@ export default function MaterialList() {
     const [data1, setData1] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
 
+
+
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
-
-    // wareHouseList/index.js
 
 
     const searchTargetList = [
@@ -115,13 +119,13 @@ export default function MaterialList() {
 
 
     useEffect(() => {
-        fetchData();
+        getPickingList();
     }, []);
 
 
 
     //call api
-    const fetchData = async () => {
+    const getPickingList = async () => {
         try {
             setIsLoading(true);
             const conditionModel: {
@@ -144,11 +148,12 @@ export default function MaterialList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            let data = await response.json();
-            setData(data);
+            const data = await response.json();
             console.log(data);
-            // data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
-            // setData1(data);
+            
+            setData(data);
+
+
         } catch (error: any) {
             setError(error.message);
         }
@@ -156,6 +161,44 @@ export default function MaterialList() {
             setIsLoading(false);
         }
     };
+
+    const getPickingListDetail = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                plnumber: string | undefined;
+            } = {
+                plnumber: plnumber as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            //erpAPI
+            const response = await fetch(`${setting.apipath}GetPickingListDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            let data = await response.json();
+            console.log(data);
+            setData1(data);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getPickingListDetail();
+    }, [plnumber]);
 
     const searchData = async (keywordWhpname: string, keywordMaterialnumber: string, keywordSpec: string) => {
         try {
@@ -192,6 +235,15 @@ export default function MaterialList() {
         }
     };
 
+    function gotoPick() {
+        router.push({
+            pathname: `/factoryDepartment/getMaterial/pickingListDetail`,
+            query: {
+                type: 'Tray',
+            },
+        });
+    }
+
 
     return (
 
@@ -203,15 +255,133 @@ export default function MaterialList() {
                     {/* <div className={scss.top}> */}
                     <div>
                         <Thead01 type={'PickingList'} />
-                        <Tbody01 type={'PickingList'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
+                        <Tbody01 type={'PickingList'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         {/* </div> */}
                     </div>
                 </div>
                 <div className={scss.right}>
-                    {/* <input type="texts" style={{border:'1px solid gray'}}/> */}
-                    <div className={scss.content}>
-                        <Thead01 type={'WHPosition'} />
-                        <Tbody01 type={'WHPosition'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
+                    {/* {type}
+                    {plnumber} */}
+                    <br />
+                    <span style={{ display: picked === "false" ? "" : "none" }}>
+                        <MyButton_v2 px='px22' py='py4' theme='danger' label="領料" onClick={() => { gotoPick() }} />
+                    </span>
+                    <span style={{ display: picked === "true" ? "" : "none" }}>
+                        <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已領" onClick={() => { alert("領料托盤") }} />
+                    </span>
+                    <div className={scss.childmain}>
+                        <div>
+                            {/* <input type="texts" style={{border:'1px solid gray'}}/> */}
+                            <InputSel
+                                {...inputSelProps}
+                                caption="領料單號"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: plnumber ? plnumber : ' ',
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="領料日期"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: create_at ? create_at : ' ',
+                                    },
+                                }}
+                            />
+
+
+                        </div>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="工單單號"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: lotnumber ? lotnumber : ' ',
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="領料人員"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: create_by ? create_by : ' ',
+                                    },
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div className={scss.main1}>
+                        <InputSel {...inputSelProps}
+                            caption="主件項目"
+                            disabled={true}
+                            textareaProps={{
+
+                            }}
+                            inputProps={{
+                                props: {
+                                    value: main_item ? main_item : ' ',
+
+                                },
+
+                            }} />
+                        {/* <WrappedTextarea
+                            mt={'0px'}
+                            // className=''
+                            disabled={true}
+                            inputSelProps={{ caption: '主件項目:' }}
+                            textareaProps={{
+                                props: {
+                                    name: 'description',
+                                    maxRows: 3,
+                                    value: main_item ? main_item : ' ',
+                                    onChange: (e) => {
+
+                                    },
+                                },
+                            }}
+                        /> */}
+                        {/* <WrappedTextarea
+                            disabled={true}
+                            inputSelProps={{ caption: '說明:' }}
+                            textareaProps={{
+                                props: {
+                                    name: 'description',
+                                    maxRows: 3,
+                                    value: "領料",
+                                    onChange: (e) => {
+
+                                    },
+                                },
+                            }}
+                        /> */}
+                        <WrappedTextarea
+                            mt={'0px'}
+                            disabled={true}
+                            inputSelProps={{ caption: '備註' }}
+                            textareaProps={{
+                                props: {
+                                    name: 'description',
+                                    maxRows: 3,
+                                    value: "無",
+                                    onChange: (e) => {
+
+                                    },
+                                },
+                            }}
+                        />
+                    </div>
+                    <br />
+                    <div className={scss.maincontent}>
+                        <Thead01 type={'PickingDetailList'} />
+                        <Tbody01 type={'PickingDetailList'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                     </div>
                 </div>
             </div>

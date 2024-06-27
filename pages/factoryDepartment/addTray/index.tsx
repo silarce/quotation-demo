@@ -8,6 +8,7 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { useEffect, useState } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { setting } from '../wareHouseList/index';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -98,7 +99,7 @@ export default function AddTray() {
 
             // console.log("checkinput: ", inputModel);
 
-            const response = await fetch('https://localhost:44383/WareHouse/SetTray', {
+            const response = await fetch(`${setting.apipath}SetTray`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -143,7 +144,7 @@ export default function AddTray() {
 
             // console.log("checkinput: ", inputModel);
 
-            const response = await fetch('https://localhost:44383/WareHouse/SetTray', {
+            const response = await fetch(`${setting.apipath}SetTray`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -190,7 +191,7 @@ export default function AddTray() {
 
             // console.log("checkinput: ", inputModel);
 
-            const response = await fetch('https://localhost:44383/WareHouse/SetTray', {
+            const response = await fetch(`${setting.apipath}SetTray`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -242,7 +243,7 @@ export default function AddTray() {
 
             // console.log("checkinput: ", inputModel);
 
-            const response = await fetch('https://localhost:44383/WareHouse/AddTray', {
+            const response = await fetch(`${setting.apipath}AddTray`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
