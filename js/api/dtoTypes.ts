@@ -3453,6 +3453,8 @@ export type TcreateAccountReceivableAccountsDto = {
   accountantId: string[];
 };
 
+// MARK: /engineering
+
 // endregion /engineering
 
 // =========================================================================
@@ -3661,11 +3663,11 @@ export type TaccountsReceivableInvoiceDto = {
   // 發票備註
   note: string | null;
   // 關聯收款紀錄
-  accountantList: TaccountantDto[];
+  accountantList?: TaccountantDto[];
   // 所屬應收帳款期數Id
   accountsReceivablePeriodId: string | null;
   // 所屬應收帳款期數
-  accountsReceivablePeriod: TaccountsReceivablePeriodDto;
+  accountsReceivablePeriod?: TaccountsReceivablePeriodDto;
   // 折讓
   allowance: number | null;
 };
