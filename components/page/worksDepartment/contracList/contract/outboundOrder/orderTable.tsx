@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
+import Decimal from 'decimal.js';
 
 // antd
 import { Checkbox, Popover, Button } from 'antd';
@@ -68,8 +69,10 @@ type TrowProps = {
     h?: React.ReactNode;
     B?: React.ReactNode;
     qty?: React.ReactNode;
+    implementationQty?: number | string;
     volume?: React.ReactNode;
     total_volume?: React.ReactNode;
+    implementationVolume?: number | string;
     doorModelName?: React.ReactNode;
     material?: React.ReactNode;
     horsepower?: React.ReactNode;
@@ -123,6 +126,8 @@ type Tpanel = {
   onDeleteClick: (() => void) | undefined;
   onConfirmClick?: (parameters: TpostDeliveryStatusParams) => Promise<void>;
   onCopyClick: ((parameters: TpostDeliveryStatusParams) => Promise<void>) | undefined;
+
+  isLatest?: boolean;
 };
 
 // type Tcontrol = {
@@ -173,6 +178,31 @@ export default function OrderTable({
   };
 
   // -------------------------------------------------------------------------------
+
+  const { totalImplementationQty, totalImplementationVolume } = useMemo(() => {
+    const totalImplementation = rowPropsArr.reduce(
+      (
+        { totalImplementationQty, totalImplementationVolume },
+        { left: { implementationQty, implementationVolume } = {} }
+      ) => {
+        const implementationQty_num = typeof implementationQty === 'number' ? implementationQty : 0;
+        const implementationVolume_num = typeof implementationVolume === 'number' ? implementationVolume : 0;
+
+        return {
+          totalImplementationQty: new Decimal(totalImplementationQty).add(implementationQty_num).toNumber(),
+          totalImplementationVolume: new Decimal(totalImplementationVolume).add(implementationVolume_num).toNumber(),
+        };
+      },
+      {
+        totalImplementationQty: 0,
+        totalImplementationVolume: 0,
+      }
+    );
+
+    return totalImplementation;
+  }, [rowPropsArr]);
+
+  // -------------------------------------------------------------------------------
   useEffect(() => {
     batchWorksheetItem.onBatchAddChange && batchWorksheetItem.onBatchAddChange(showBatchAdd);
   }, [showBatchAdd]);
@@ -221,6 +251,11 @@ export default function OrderTable({
             />
           );
         })}
+
+        <TotalRow
+          totalImplementationQty={totalImplementationQty}
+          totalImplementationVolume={totalImplementationVolume}
+        />
       </div>
     </div>
   );
@@ -276,16 +311,22 @@ const Row = ({
         <div className={classNames(scss.cell, config.WG.className)}>{left?.WG}</div>
         <div className={classNames(scss.cell, config.h.className)}>{left?.h}</div>
         <div className={classNames(scss.cell, config.B.className)}>{left?.B}</div>
+        {/*  */}
         <div className={classNames(scss.cell, config.qty.className)}>{left?.qty}</div>
         <div className={classNames(scss.cell, config.volume.className)}>{left?.volume}</div>
         <div className={classNames(scss.cell, config.total_volume.className)}>{left?.total_volume}</div>
+        {/*  */}
+        <div className={classNames(scss.cell, config.implementationQty.className)}>{left?.implementationQty}</div>
+        <div className={classNames(scss.cell, config.implementationVolume.className)}>{left?.implementationVolume}</div>
+        {/*  */}
         <div className={classNames(scss.cell, config.doorModelName.className)}>{left?.doorModelName}</div>
         <div className={classNames(scss.cell, config.material.className)}>{left?.material}</div>
         <div className={classNames(scss.cell, config.horsepower.className)}>{left?.horsepower}</div>
         <div className={classNames(scss.cell, config.surface.className)}>{left?.surface}</div>
       </div>
 
-      <div className={classNames(scss.divider, !left && 'invisible')} />
+      {/* <div className={classNames(scss.divider, !left && 'invisible')} /> */}
+      <div className={classNames(scss.divider)} />
 
       <div className={scss.center}>
         <div className={classNames(scss.cell, config.projectName.className)}>{center?.projectName}</div>
@@ -293,9 +334,9 @@ const Row = ({
         <div className={classNames(scss.cell, config.WG.className)}>{center?.WG}</div>
         <div className={classNames(scss.cell, config.h.className)}>{center?.h}</div>
         <div className={classNames(scss.cell, config.B.className)}>{center?.B}</div>
-        <div className={classNames(scss.cell, config.qty.className)}>{center?.qty}</div>
+        {/* <div className={classNames(scss.cell, config.qty.className)}>{center?.qty}</div> */}
         <div className={classNames(scss.cell, config.volume.className)}>{center?.volume}</div>
-        <div className={classNames(scss.cell, config.total_volume.className)}>{center?.total_volume}</div>
+        {/* <div className={classNames(scss.cell, config.total_volume.className)}>{center?.total_volume}</div> */}
         <div className={classNames(scss.cell, config.doorModelName.className)}>{center?.doorModelName}</div>
         <div className={classNames(scss.cell, config.material.className)}>{center?.material}</div>
         <div className={classNames(scss.cell, config.horsepower.className)}>{center?.horsepower}</div>
@@ -374,8 +415,10 @@ const Thead = (rowProps_other: TrowProps_other) => {
         h: config.h.caption,
         B: config.B.caption,
         qty: config.qty.caption,
+        implementationQty: config.implementationQty.caption,
         volume: config.volume.caption,
         total_volume: config.total_volume.caption,
+        implementationVolume: config.implementationVolume.caption,
         doorModelName: config.doorModelName.caption,
         material: config.material.caption,
         horsepower: config.horsepower.caption,
@@ -426,6 +469,34 @@ const HeadRow = (rowProps: TrowProps & TrowProps_other) => {
 
 // ------------------------------------------------------------------------
 
+// region TotalRow
+const TotalRow = ({
+  totalImplementationQty,
+  totalImplementationVolume,
+}: {
+  totalImplementationQty: number | string;
+  totalImplementationVolume: number | string;
+}) => {
+  return (
+    <div className={scss.totalRow}>
+      <Row
+        left={{
+          implementationQty: '總實作數量',
+          implementationVolume: '總實作才數',
+        }}
+      />
+      <Row
+        left={{
+          implementationQty: totalImplementationQty,
+          implementationVolume: totalImplementationVolume,
+        }}
+      />
+    </div>
+  );
+};
+
+// ------------------------------------------------------------------------
+
 // region Panel
 
 const Panel = ({
@@ -442,6 +513,7 @@ const Panel = ({
   onDeleteClick,
   onConfirmClick,
   onCopyClick,
+  isLatest,
 }: Tpanel) => {
   const [disabled, setDisabled] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -517,8 +589,9 @@ const Panel = ({
       </div>
 
       <div className={classNames(scss.cell, scss.btnBar, config.btnBar.className)}>
-        {/* <IconAddCircle onClick={onAddClick} /> */}
-        {isUndefined && <IconAddCircle onClick={onAddClick} />}
+        <IconAddCircle className={classNames(!isLatest && 'invisible')} onClick={onAddClick} />
+
+        {/* {isUndefined && <IconAddCircle onClick={onAddClick} />} */}
         {!isUndefined && (
           <IconCopy
             onClick={() =>
@@ -632,8 +705,7 @@ const Panel = ({
           // }}
           textareaProps={{
             props: {
-              //
-              // value: state_employeeArr?.chName ?? state_outsourcing?.name ?? '',
+              maxRows: 3,
               value: (() => {
                 if (state_employeeArr && state_employeeArr.length > 0) {
                   return state_employeeArr.map((emp) => emp.chName).join('\n');
@@ -743,8 +815,10 @@ type TcellKeys =
   | 'h'
   | 'B'
   | 'qty'
+  | 'implementationQty'
   | 'volume'
   | 'total_volume'
+  | 'implementationVolume'
   | 'doorModelName'
   | 'material'
   | 'horsepower'
@@ -788,27 +862,35 @@ const config: TconfigList = {
   },
   WG: {
     caption: 'WG',
-    className: 'w-9',
+    className: 'w-9 text-center',
   },
   h: {
     caption: 'h',
-    className: 'w-9',
+    className: 'w-9 text-center',
   },
   B: {
     caption: 'B',
-    className: 'w-9',
+    className: 'w-9 text-center',
   },
   qty: {
     caption: '數量',
-    className: 'w-8',
+    className: 'w-8 text-center',
   },
   volume: {
     caption: '才數',
-    className: 'w-12',
+    className: 'w-12 text-center',
   },
   total_volume: {
     caption: '總才數',
-    className: 'w-14',
+    className: 'w-14 text-center',
+  },
+  implementationQty: {
+    caption: '實作數量',
+    className: 'w-[75px] text-center',
+  },
+  implementationVolume: {
+    caption: '實作總才數',
+    className: 'w-20 text-center',
   },
   doorModelName: {
     caption: '門型',
@@ -838,7 +920,8 @@ const config: TconfigList = {
   },
   btnBar: {
     caption: '',
-    className: 'w-24',
+    className: 'w-30',
+    // className: 'w-[200px]',
   },
   installationItem: {
     caption: '安裝項目',

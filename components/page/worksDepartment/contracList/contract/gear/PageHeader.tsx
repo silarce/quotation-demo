@@ -81,6 +81,32 @@ export default function PageHeader({
   const pathHead = `/worksDepartment/contractList/contract`;
 
   const linkList_pass = [
+    isShowAccountReceivable
+      ? {
+          label: '合約',
+          disabled: !isShowAccountReceivable,
+          href: {
+            pathname: `${pathHead}/contractTable`,
+            query: {
+              contractId,
+              version,
+            },
+          },
+        }
+      : null,
+    isShowAccountReceivable
+      ? {
+          label: '合約審核表',
+          disabled: !isShowAccountReceivable,
+          href: {
+            pathname: `${pathHead}/quotationVerifyForm`,
+            query: {
+              contractId,
+              version,
+            },
+          },
+        }
+      : null,
     {
       label: '工程聯絡單',
       href: {
@@ -127,19 +153,7 @@ export default function PageHeader({
           },
         }
       : null,
-    isShowAccountReceivable
-      ? {
-          label: '合約',
-          disabled: !isShowAccountReceivable,
-          href: {
-            pathname: `${pathHead}/contractTable`,
-            query: {
-              contractId,
-              version,
-            },
-          },
-        }
-      : null,
+
     {
       label: '派工單列表',
       href: {
