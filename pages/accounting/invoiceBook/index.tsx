@@ -7,6 +7,10 @@ import classNames from 'classnames';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
+// antd
+import { Popover } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+
 // gear
 import Row, { Cell } from 'components/global/gear/table/row';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -74,7 +78,7 @@ type Thandle_edit = ({
 type Tkey = keyof Pick<Tstate, 'type' | 'alphabeticLetter' | 'startNumber' | 'endNumber' | 'latestInvoiceNumber'>;
 
 type TconfigItem = {
-  label: string;
+  label: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
   createInputProps?: (props: {
@@ -312,6 +316,16 @@ export default function InvoiceBook() {
       setDisabled(true);
     }; // callReq
 
+    const isStartNumberInvalid =
+      state_bookArr_new.some((item) => !checkStartNumber(item.startNumber)) ||
+      state_bookArr.some((item) => !checkStartNumber(item.startNumber));
+
+    if (isStartNumberInvalid) {
+      myAlert.info({ title: '起始號碼格式不符' });
+
+      return;
+    }
+
     const hasDelete = state_bookArr.some((item) => item.mark === 'delete');
 
     if (hasDelete) {
@@ -506,6 +520,11 @@ export default function InvoiceBook() {
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------
 
+const checkStartNumber = (value: string) => {
+  // 所有的字都是阿拉伯數字
+  return value.length === 8 && /^\d+$/.test(value);
+};
+
 // region CONFIG
 
 const keyArr: Tkey[] = ['type', 'alphabeticLetter', 'startNumber', 'endNumber', 'latestInvoiceNumber'];
@@ -522,6 +541,7 @@ const config: Tconfig = {
       return {
         selectProps: {
           props: {
+            className: 'text-center',
             options: optionsCreator_invoiceType(),
             value: { value: state.type, label: state.type },
             onChange: (option) => {
@@ -541,6 +561,7 @@ const config: Tconfig = {
       return {
         inputProps: {
           props: {
+            className: 'text-center',
             value: state.alphabeticLetter,
             onChange: (e) => {
               handle_edit({ id: state.id, key: 'alphabeticLetter', value: e.target.value });
@@ -551,12 +572,34 @@ const config: Tconfig = {
     },
   },
   startNumber: {
-    label: '起始號碼',
+    // label: '起始號碼',
+    label: (
+      <div>
+        <Popover
+          className="flex items-center gap-1"
+          content={
+            <>
+              <span>格式為數字8碼</span>
+            </>
+          }
+          trigger="hover"
+        >
+          <span>起始號碼</span>
+          <InfoCircleOutlined />
+        </Popover>
+      </div>
+    ),
     style: { width: 120 },
     createInputProps: ({ state, handle_edit }) => {
+      const value = state.startNumber;
+
+      const isValueValid = checkStartNumber(value);
+
       return {
         inputProps: {
           props: {
+            className: classNames('text-center', !isValueValid && 'text-red-500'),
+            placeholder: '數字八碼',
             value: state.startNumber,
             onChange: (e) => {
               handle_edit({ id: state.id, key: 'startNumber', value: e.target.value });
@@ -574,6 +617,8 @@ const config: Tconfig = {
         showBaseline: 'invisible',
         inputProps: {
           props: {
+            className: 'text-center',
+            placeholder: '',
             readOnly: true,
             value: state.endNumber,
             onChange: () => {},
@@ -590,6 +635,8 @@ const config: Tconfig = {
         showBaseline: 'invisible',
         inputProps: {
           props: {
+            className: 'text-center',
+            placeholder: '',
             value: state.latestInvoiceNumber ?? '',
             onChange: () => {},
           },
