@@ -1,0 +1,185 @@
+.top {
+    @extend .grid;
+
+    .address {
+        grid-column: span 1;
+    }
+
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 500px;
+    justify-content: space-between;
+    gap: 35px;
+}
+
+.main {
+    display: grid;
+    grid-template-columns: 480px 1fr; // 左右兩邊比例，可以調整
+    gap: 15px;
+    width: auto;
+    margin-top: 4px;
+    margin-left: 4px;
+    margin-right: 4px;
+    // background-color: gray;
+}
+
+.left {
+    display: grid;
+    grid-template-columns: 650px;
+    justify-content: space-between;
+    gap: 15px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 2px solid gray;
+    min-height: 100vh-30vh;
+    /* 自動調整高度到螢幕大小 */
+}
+
+
+.right {
+    position: relative; // 確保子元素可以正確定位
+    position: -webkit-sticky;
+    ; // 固定在視窗位置
+    top: 0; // 距離視窗頂部的距離
+    right: 0; // 距離視窗右側的距離
+    z-index: 1000; // 確保元素位於其他內容的上層
+    flex-direction: column; // 讓內容以列的方式排列
+    align-items: center; // 垂直居中
+    justify-content: flex-start; // 從頂部對齊
+    // background-color: blue; // 可選：背景色
+    // width: 1150px;
+    top: 0; // 距離視窗頂部的距離
+    right: 0; // 距離視窗右側的距離
+    padding-left: 10px;
+    // background-color: red;
+    border:2px solid gray;
+}
+
+
+
+
+.content {
+    position: -webkit-sticky; // 為兼容性增加前綴
+    position: sticky;
+    top: 0; // 距離視窗頂部的距離
+    right: 0; // 距離視窗右側的距離
+    z-index: 1000; // 確保元素位於其他內容的上層
+    // width: 1150px; // 設定固定寬度
+    height: 280px; // 設定固定高度
+    // overflow-x: hidden; // 禁止水平滾動
+    overflow-x: hidden; // 禁止水平滾動
+    overflow-y: auto; // 垂直滾動（如果需要）
+    // background-color: orange;
+    height: 280px;
+    border: 2px solid gray;
+
+    .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 150px; // 調整 input 的寬度
+
+    }
+
+}
+
+.traytable {
+    width: 100%;
+    max-width: 100%;
+    height: 80px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border: 1px solid black;
+    margin-bottom: 0px;
+    border: 0px;
+}
+
+.td {
+    height: 60px;
+    border: 1px solid #707070;
+    word-wrap: break-word;
+    text-align: center;
+    margin: 0px;
+}
+
+.childtraytable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.childtraytabletr td {
+    border: 1px solid #bbbaba;
+    word-wrap: break-word;
+    text-align: center;
+    background-color: white;
+}
+
+.childtraytabletr td button {
+    width: 100%;
+    height: 40px;
+    word-wrap: break-word;
+    text-align: center;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.childtraytabletr td button:hover {
+    background-color: #ea1833 !important;
+}
+
+
+
+.childmain {
+    display: grid;
+    grid-template-columns: 1fr 1fr; // 左右兩邊比例，可以調整
+    gap: 15px;
+    width: auto;
+    margin-top: 5px;
+    // margin-left: 62px;
+    margin-right: 62px;
+    // background-color: gray;
+}
+
+.textarea{
+    padding-left: 0px;
+    // background-color: orange;
+    width:400px;
+}
+
+
+.addBtn {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    text-align: center;
+    border: none;
+    background-color: white;
+
+}
+
+
+.main1 {
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
+    width: auto;
+    margin-top: 0px;
+    // margin-left: 4px;
+    margin-right: 50px;
+    // background-color: gray;
+}
+
+.maincontent{
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    gap: 15px;
+    width: auto;
+    // margin-top: 4px;
+    margin-left: 4px;
+    margin-right: 15px;
+    // background-color: gray;
+}

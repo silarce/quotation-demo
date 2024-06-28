@@ -132,6 +132,20 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   }
 
 
+  async function GetPerchaseOrder(item: any) {
+    console.log(item);
+    router.replace({
+      pathname: `/factoryDepartment/purchaseOrderList`,
+      query: {
+        purchaseorderid: item.purchaseorderid,
+        create_at: getTaiwanDateStr(item.create_at),
+        create_by: item.create_by,
+        receipted: item.receipted
+      }
+    })
+  }
+
+
   // 日期格式處理
   function convertToYearMonthDay(datetimetype: string, isoDateString: string | number | Date) {
     if (datetimetype === "Date") {
@@ -345,6 +359,53 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.unit}</span>
                 <span>{_item.note}</span>
                 <span ><IconDetail onClick={() => { GetTrayByMaterialNumber(_item) }} /></span>
+                {/* <span><IconDetail/></span> */}
+                {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "ProdEntry") {
+    // 領料明細單.開始領料
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader9}>
+              <div className={scss.row01}>
+                {/* <span>{index + 1}</span> */}
+                <span>{_item.prodentryid}</span>
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                <span>{_item.create_by}</span>
+                <span ><IconDetail onClick={() => { GetTrayByMaterialNumber(_item) }} /></span>
+                {/* <span><IconDetail/></span> */}
+                {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "PurchaseOrder") {
+    // 領料明細單.開始領料
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader10}>
+              <div className={scss.row01}>
+                {/* <span>{index + 1}</span> */}
+                <span>{_item.purchaseorderid}</span>
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                <span>{_item.create_by}</span>
+                <span>{_item.totalprice.toLocaleString()}</span>
+                <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已進貨</span>
+                <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>採購中</span>
+                <span ><IconDetail onClick={() => { GetPerchaseOrder(_item) }} /></span>
                 {/* <span><IconDetail/></span> */}
                 {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
               </div>

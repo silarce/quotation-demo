@@ -603,10 +603,26 @@ const sidePathList: TsidePathList = {
               erpFeature: devPass,
             },
             {
-              label: '入庫',
-              path: path01 + '/stockInList',
+              label: '採購',
+              path: path01 + '/purchaseOrderList',
               query: {
-                type: 'stockInList',
+                type: 'purchaseOrderList',
+              },
+              erpFeature: devPass,
+            },
+            {
+              label: '進貨',
+              path: path01 + '/prodReceiptList',
+              query: {
+                type: 'prodReceiptList',
+              },
+              erpFeature: devPass,
+            },
+            {
+              label: '入庫',
+              path: path01 + '/prodEntryList',
+              query: {
+                type: 'prodEntryList',
               },
               erpFeature: devPass,
             },

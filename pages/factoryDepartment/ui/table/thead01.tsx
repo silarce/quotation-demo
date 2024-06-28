@@ -102,6 +102,28 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         {/* <span>按鈕格 留白</span> */}
       </div>
     )
+  } else if (type === "ProdEntry") {
+    return (
+      <div className={style.thead9}>
+        <span>入庫單號</span>
+        <span>入庫日期</span>
+        <span>入庫人員</span>
+        <span></span>
+        {/* <span>按鈕格 留白</span> */}
+      </div>
+    )
+  } else if (type === "PurchaseOrder") {
+    return (
+      <div className={style.thead10}>
+        <span>採購單號</span>
+        <span>採購日期</span>
+        <span>製單人員</span>
+        <span>總金額</span>
+        <span>狀態</span>
+        <span></span>
+        {/* <span>按鈕格 留白</span> */}
+      </div>
+    )
   }
   else {
     return null;

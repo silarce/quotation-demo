@@ -303,3 +303,61 @@ div.panelHeader8 {
     // padding-top:20px;
   }
 }
+
+//入庫單
+div.panelHeader9 {
+  // padding: 14px 30px;
+  padding-left: 30px;
+  border-bottom: solid 1px $colorBorder01;
+
+  //   background-color: rgb(245, 104, 69);
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 100px 100px 100px 100px ;
+    gap: 15px;
+    // margin-bottom: 16px;
+    // padding-top:20px;
+  }
+}
+
+//採購單
+div.panelHeader10 {
+  // padding: 14px 30px;
+  padding-left: 30px;
+  border-bottom: solid 1px $colorBorder01;
+
+  //   background-color: rgb(245, 104, 69);
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 100px 80px 80px 80px 60px 80px;
+    gap: 15px;
+    // margin-bottom: 16px;
+    // padding-top:20px;
+  }
+}

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
 
-import scss from './stockInList.module.scss';
+import scss from './purchaseOrderList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -29,17 +29,13 @@ type Tquery = {
 
 
 
-export default function StockInList() {
+export default function purchaseOrderList() {
     const router = useRouter();
     const {
-        type,
-        plid,
+        purchaseorderid,
         create_at,
         create_by,
-        lotid,
-        picked,
-        main_item,
-        note
+        receipted
     } = router.query;
 
 
@@ -61,13 +57,13 @@ export default function StockInList() {
     //搜尋功能
     const searchTargetList = [
         {
-            placeholder: '領料單號',
+            placeholder: '採購單號',
         },
         {
-            placeholder: '領料日期',
+            placeholder: '採購日期',
         },
         {
-            placeholder: '領料人員',
+            placeholder: '採購人員',
         },
     ];
 
@@ -91,10 +87,10 @@ export default function StockInList() {
         { searchGroup },
         {
             type: 'addButton',
-            label: '新增領料單',
+            label: '新增採購單',
             onClick: () => {
                 router.push({
-                    pathname: `/factoryDepartment/addTray`,
+                    pathname: `/factoryDepartment/addPurchaseOrder`,
                     query: {
                         type: 'Tray',
                     },
@@ -110,7 +106,7 @@ export default function StockInList() {
 
     //#region call api
     //取領料單清單
-    const getPickingList = async () => {
+    const getPurchaseOrder = async () => {
         try {
             setIsLoading(true);
             const conditionModel: {
@@ -129,7 +125,7 @@ export default function StockInList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
             //erpAPI
-            const response = await fetch(`${setting.apipath}GetPickingList?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetPurchaseOrder?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -148,17 +144,17 @@ export default function StockInList() {
     };
 
     useEffect(() => {
-        getPickingList();
+        getPurchaseOrder();
     }, []);
 
-    //取對應的清單明細
+    //取對應的採購明細
     const getPickingListDetail = async () => {
         try {
             setIsLoading(true);
             const conditionModel: {
-                plid: string | undefined;
+                // plid: string | undefined;
             } = {
-                plid: plid as string | undefined,
+                // plid: plid as string | undefined,
             };
 
 
@@ -188,7 +184,7 @@ export default function StockInList() {
 
     useEffect(() => {
         getPickingListDetail();
-    }, [plid]);
+    }, [purchaseorderid]);
 
 
     const searchData = async (keywordWhpname: string, keywordMaterialnumber: string, keywordSpec: string) => {
@@ -228,50 +224,59 @@ export default function StockInList() {
 
 
     //#endregion
-    function gotoPick() {
-        router.push({
-            pathname: `/factoryDepartment/getMaterial/pickingListDetail`,
-            query: {
-                //傳入領料單單號
-                plid: plid
-            },
-        });
+    function gotoReceipt() {
+        // router.push({
+        //     pathname: `/factoryDepartment/getMaterial/pickingListDetail`,
+        //     query: {
+        //         //傳入領料單單號
+        //         plid: plid
+        //     },
+        // });
     }
 
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '入庫單'} panelList={panelList} />
+            <PageHeader02 tag={quotationStatusLookup[status] ?? '採購單'} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div>
-                        <Thead01 type={'PickingList'} />
-                        <Tbody01 type={'PickingList'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                        <Thead01 type={'PurchaseOrder'} />
+                        <Tbody01 type={'PurchaseOrder'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                     </div>
                 </div>
                 <div className={scss.right}>
-                    <br />
-                    <span style={{ display: picked === "false" ? "" : "none" }}>
-                        <MyButton_v2 px='px22' py='py4' theme='danger' label="領料" onClick={() => { gotoPick() }} />
-                    </span>
-                    <span style={{ display: picked === "true" ? "" : "none" }}>
-                        <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已領" onClick={() => { alert("領料托盤") }} />
-                    </span>
-                    <div className={scss.childmain}>
+                    <div className={scss.tite_main}>
                         <div>
+                            {/* <span style={{ fontSize: '25px', fontWeight: 'bolder', color: '#14256a'}}>
+                                採購單
+                            </span> */}
+                        </div>
+                        <div style={{textAlign:'right'}}>
+                            <span style={{ display: receipted === "false" ? "" : "none" }}>
+                                <MyButton_v2 px='px22' py='py4' theme='danger' label="進貨" onClick={() => { gotoReceipt() }} />
+                            </span>
+                            <span style={{ display: receipted === "true" ? "" : "none" }}>
+                                <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已進貨" onClick={() => { alert("領料托盤") }} />
+                            </span>
+                        </div>
+                    </div>
+                    <div className={scss.head_main}>
+                        <div>
+
                             <InputSel
                                 {...inputSelProps}
-                                caption="領料單號"
+                                caption="採購單號"
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: plid ? plid : ' ',
+                                        value: purchaseorderid ? purchaseorderid : ' ',
                                     },
                                 }}
                             />
                             <InputSel
                                 {...inputSelProps}
-                                caption="領料日期"
+                                caption="採購日期"
                                 disabled={true}
                                 inputProps={{
                                     props: {
@@ -285,17 +290,7 @@ export default function StockInList() {
                         <div>
                             <InputSel
                                 {...inputSelProps}
-                                caption="工單單號"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: lotid ? lotid : ' ',
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="領料人員"
+                                caption="採購人員"
                                 disabled={true}
                                 inputProps={{
                                     props: {
@@ -305,30 +300,11 @@ export default function StockInList() {
                             />
                         </div>
                     </div>
-                    <div className={scss.main1}>
-                        <InputSel {...inputSelProps}
-                            caption="主件項目"
-                            disabled={true}
-                            textareaProps={{
-                                props: {
-                                    value: main_item ? main_item : ' ',
-
-                                },
-                            }}
-                        />
-                        <InputSel {...inputSelProps}
-                            caption="備註"
-                            disabled={true}
-                            textareaProps={{
-                                props: {
-                                    value: note ? note : ' ',
-
-                                },
-                            }}
-                        />
+                    <div className={scss.content_main}>
+                        ddd
                     </div>
                     <br />
-                    <div className={scss.maincontent}>
+                    <div className={scss.content_main_content}>
                         <Thead01 type={'PickingDetailList'} />
                         <Tbody01 type={'PickingDetailList'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                     </div>
