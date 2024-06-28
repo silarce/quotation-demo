@@ -262,9 +262,7 @@ export default function InvoiceBook() {
         if (mark === 'delete') {
           try {
             await reqDelete(id);
-          } catch (error) {
-            alert('error_delete');
-          }
+          } catch (error) {}
         }
       }
 
@@ -283,9 +281,7 @@ export default function InvoiceBook() {
 
         try {
           await reqPost(body);
-        } catch (error) {
-          alert('error_post');
-        }
+        } catch (error) {}
       }
 
       // patch
@@ -307,9 +303,7 @@ export default function InvoiceBook() {
 
         try {
           await reqPatch(id, body);
-        } catch (error) {
-          alert('error_patch');
-        }
+        } catch (error) {}
       }
 
       await update_invoiceBook();
@@ -651,7 +645,7 @@ const config: Tconfig = {
 const createEmptyState = (id?: string): Tstate => ({
   id: id ?? '',
   isChanged: true,
-  type: '',
+  type: '二聯式',
   alphabeticLetter: '',
   startNumber: '',
   endNumber: '',
