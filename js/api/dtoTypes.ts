@@ -3453,6 +3453,8 @@ export type TcreateAccountReceivableAccountsDto = {
   accountantId: string[];
 };
 
+// MARK: /engineering
+
 // endregion /engineering
 
 // =========================================================================
@@ -3640,6 +3642,7 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   invoiceDate: string | null;
   invoiceNumber: string | null;
   actualPrice: number | null;
+  accountantInvoiceBookId: string | null;
 };
 
 export type TupdateAccountReceivablePeriodDto = Partial<TcreateAccountReceivablePeriodDto>;
@@ -3661,13 +3664,16 @@ export type TaccountsReceivableInvoiceDto = {
   // 發票備註
   note: string | null;
   // 關聯收款紀錄
-  accountantList: TaccountantDto[];
+  accountantList?: TaccountantDto[];
   // 所屬應收帳款期數Id
   accountsReceivablePeriodId: string | null;
   // 所屬應收帳款期數
-  accountsReceivablePeriod: TaccountsReceivablePeriodDto;
+  accountsReceivablePeriod?: TaccountsReceivablePeriodDto;
   // 折讓
   allowance: number | null;
+  //
+  accountantInvoiceBookId: string | null;
+  accountantInvoiceBook: TaccountantInvoiceBookDto | null;
 };
 
 //
@@ -3850,7 +3856,7 @@ export type TcreateAccountantExchangeFromDto = {
   accountantId: string[];
 };
 
-export type accountantInvoiceBookDto = {
+export type TaccountantInvoiceBookDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -3880,7 +3886,7 @@ export type accountantInvoiceBookDto = {
 };
 
 export type TcreateAccountantInvoiceBookDto = Pick<
-  accountantInvoiceBookDto,
+  TaccountantInvoiceBookDto,
   'year' | 'month' | 'alphabeticLetter' | 'startNumber' | 'type'
 > & {
   bookQuantity: number; // 冊數(不紀錄的property);

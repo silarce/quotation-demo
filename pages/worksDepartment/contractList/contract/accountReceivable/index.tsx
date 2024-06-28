@@ -116,6 +116,7 @@ export default function AccountReceivable() {
       // 'subContracts.content.verifyForm'
       'engineeringContact',
       'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
+      'accountReceivable.periods.invoices.accountantInvoiceBook',
       // 'accountReceivable.periods',
     ],
   });
@@ -230,11 +231,16 @@ export default function AccountReceivable() {
       invoiceNumber, // 發票號碼
       invoiceDate, // 發票日期
       actualPrice, // 發票實際金額
+
+      invoiceBook: accountantInvoiceBook,
     } = state_invoice;
 
-    if (invoiceNumber || invoiceDate || actualPrice) {
+    if (accountantInvoiceBook || actualPrice) {
       if (!(invoiceNumber && invoiceDate && actualPrice)) {
-        myAlert.info({ title: '請輸入發票實際金額、發票號碼、發票日期，或全部清除' });
+        myAlert.info({
+          title: '請輸入完整發票資料或清除所有發票資料',
+          content: '發票本、發票實際金額、發票號碼、發票日期',
+        });
 
         return Promise.reject();
       }
@@ -265,6 +271,7 @@ export default function AccountReceivable() {
       invoiceDate: invoiceDate ? invoiceDate.toISOString() : null,
       invoiceNumber: invoiceNumber || null,
       actualPrice: actualPrice ? Number(actualPrice) : null,
+      accountantInvoiceBookId: accountantInvoiceBook?.id || null,
     };
 
     try {
@@ -461,7 +468,7 @@ export default function AccountReceivable() {
   }
 
   return (
-    <SubLayer isLoading_all={isFetching} bodyClassName="snap-y">
+    <SubLayer isLoading_all={isFetching}>
       <PageHeader panelList={[]} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div className={scss.main}>
@@ -477,10 +484,10 @@ export default function AccountReceivable() {
 
         <AccountantDetails className="mt-10 " accountantArr={accountantArr} reqPatchAccountant={reqPatchAccountant} />
 
-        <DeductionDetail className="mt-10 snap-center" periodArr={periodArr} />
+        <DeductionDetail className="mt-10 " periodArr={periodArr} />
 
         <PeriodTable
-          className="mt-10 snap-end"
+          className="mt-10 "
           data_finalProdcut={data_finalProdcut}
           data_period={accountReceivable.periods}
           onAddConfirm={reqAddInvoice}

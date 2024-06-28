@@ -45,12 +45,13 @@ const Cell = (
   //
   props: React.HTMLAttributes<HTMLDivElement> & {
     preBuilt?: 'flex' | 'block' | 'unset';
+    bgc?: 'gray' | 'white';
   }
 ) => {
-  const { preBuilt = 'flex' } = props;
+  const { preBuilt = 'flex', bgc } = props;
 
   return (
-    <div {...props} className={classNames(scss.cell, scss[preBuilt], props.className)}>
+    <div {...props} className={classNames(scss.cell, scss[preBuilt], bgc && scss[bgc], props.className)}>
       {props.children}
     </div>
   );

@@ -48,7 +48,11 @@ export default function MyDatePicker({
         format={(theMoment) => {
           const twDate = convertDate_reduce1911(theMoment.toISOString());
 
-          return moment(twDate).format('yy-MM-DD');
+          const picker = props?.picker;
+
+          const format = picker === 'year' ? 'yy' : picker === 'month' ? 'yy-MM' : 'yy-MM-DD';
+
+          return moment(twDate).format(format);
         }}
         autoComplete="off"
         bordered={false}
