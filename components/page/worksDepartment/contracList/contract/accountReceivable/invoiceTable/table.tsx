@@ -70,46 +70,47 @@ type Tcenter = {
     tax: React.ReactNode;
     contractTotal: React.ReactNode;
   };
-  other: {
-    price: React.ReactNode; // 發票金額
-    invoiceNumber: string; // 發票號碼
+  other: Class_OtherNode;
+  // other: {
+  //   price: React.ReactNode; // 發票金額
+  //   invoiceNumber: string; // 發票號碼
 
-    retainage: string; // 保留款
-    deduction: string; // 扣款
-    writeOffDeposit: string; //沖訂金
-    retainage_localeString: string;
-    deduction_localeString: string;
-    writeOffDeposit_localeString: string;
-    minusRetainage: boolean;
-    minusDeduction: boolean;
-    minusWriteOffDeposit: boolean;
+  //   retainage: string; // 保留款
+  //   deduction: string; // 扣款
+  //   writeOffDeposit: string; //沖訂金
+  //   retainage_localeString: string;
+  //   deduction_localeString: string;
+  //   writeOffDeposit_localeString: string;
+  //   minusRetainage: boolean;
+  //   minusDeduction: boolean;
+  //   minusWriteOffDeposit: boolean;
 
-    retainageType: string;
-    allowance: string;
-    note: string;
+  //   retainageType: string;
+  //   allowance: string;
+  //   note: string;
 
-    allowEditDeduction: boolean;
+  //   allowEditDeduction: boolean;
 
-    actualPrice: string;
-    actualPrice_localeString: string;
-    invoiceDate: Moment | null;
+  //   actualPrice: string;
+  //   actualPrice_localeString: string;
+  //   invoiceDate: Moment | null;
 
-    onChange_invoiceNumber: (value: string) => void;
-    onChange_retainage: (value: string) => void;
-    onChange_deduction: (value: string) => void;
-    onChange_writeOffDeposit: (value: string) => void;
+  //   onChange_invoiceNumber: (value: string) => void;
+  //   onChange_retainage: (value: string) => void;
+  //   onChange_deduction: (value: string) => void;
+  //   onChange_writeOffDeposit: (value: string) => void;
 
-    onChange_minusRetainage: (checked: boolean) => void;
-    onChange_minusDeduction: (checked: boolean) => void;
-    onChange_minusWriteOffDeposit: (checked: boolean) => void;
+  //   onChange_minusRetainage: (checked: boolean) => void;
+  //   onChange_minusDeduction: (checked: boolean) => void;
+  //   onChange_minusWriteOffDeposit: (checked: boolean) => void;
 
-    onChange_retainageType: (value: TretainageType) => void;
-    onChange_allowance: (value: string) => void;
-    onChange_note: (value: string) => void;
+  //   onChange_retainageType: (value: TretainageType) => void;
+  //   onChange_allowance: (value: string) => void;
+  //   onChange_note: (value: string) => void;
 
-    onChange_acturePrice: (value: string) => void;
-    onChange_invoiceDate: (value: Moment | null) => void;
-  };
+  //   onChange_acturePrice: (value: string) => void;
+  //   onChange_invoiceDate: (value: Moment | null) => void;
+  // };
 };
 
 type TimperativeHandle_panel = {
@@ -381,93 +382,93 @@ function PeriodPanel_pre(
     });
   };
 
-  const handle_editInvoiceOther = ({
-    key,
-    value,
-  }: {
-    key:
-      | 'retainage'
-      //
-      | 'deduction'
-      | 'writeOffDeposit'
-      | 'invoiceNumber'
-      | 'allowance'
-      | 'note'
-      | 'actualPrice';
-    value: string;
-  }) => {
-    setState_period((invoice) => {
-      invoice = { ...invoice };
-      invoice.renderCount++;
-      invoice[key] = value;
+  // const handle_editInvoiceOther = ({
+  //   key,
+  //   value,
+  // }: {
+  //   key:
+  //     | 'retainage'
+  //     //
+  //     | 'deduction'
+  //     | 'writeOffDeposit'
+  //     | 'invoiceNumber'
+  //     | 'allowance'
+  //     | 'note'
+  //     | 'actualPrice';
+  //   value: string;
+  // }) => {
+  //   setState_period((invoice) => {
+  //     invoice = { ...invoice };
+  //     invoice.renderCount++;
+  //     invoice[key] = value;
 
-      if (key === 'retainage' || key === 'deduction' || key === 'writeOffDeposit') {
-        invoice.price = calcPrice(invoice);
-      }
+  //     if (key === 'retainage' || key === 'deduction' || key === 'writeOffDeposit') {
+  //       invoice.price = calcPrice(invoice);
+  //     }
 
-      return invoice;
-    });
-  };
+  //     return invoice;
+  //   });
+  // };
 
-  const handel_editCalcType = ({
-    key,
-    chcked,
-  }: {
-    key: 'minusRetainage' | 'minusDeduction' | 'minusWriteOffDeposit';
-    chcked: boolean;
-  }) => {
-    setState_period((invoice) => {
-      invoice = { ...invoice };
-      invoice.renderCount++;
-      invoice[key] = chcked;
-      invoice.price = calcPrice(invoice);
+  // const handel_editCalcType = ({
+  //   key,
+  //   chcked,
+  // }: {
+  //   key: 'minusRetainage' | 'minusDeduction' | 'minusWriteOffDeposit';
+  //   chcked: boolean;
+  // }) => {
+  //   setState_period((invoice) => {
+  //     invoice = { ...invoice };
+  //     invoice.renderCount++;
+  //     invoice[key] = chcked;
+  //     invoice.price = calcPrice(invoice);
 
-      return invoice;
-    });
-  };
+  //     return invoice;
+  //   });
+  // };
 
-  const handle_editTetainageType = ({
-    //
-    value,
-  }: {
-    value: Tstate_period['retainageType'];
-  }) => {
-    setState_period((invoice) => {
-      invoice = { ...invoice };
-      invoice.renderCount++;
-      invoice.retainageType = value;
+  // const handle_editTetainageType = ({
+  //   //
+  //   value,
+  // }: {
+  //   value: Tstate_period['retainageType'];
+  // }) => {
+  //   setState_period((invoice) => {
+  //     invoice = { ...invoice };
+  //     invoice.renderCount++;
+  //     invoice.retainageType = value;
 
-      const { subTotal, contractTotal, retainage, retainageType } = invoice;
+  //     const { subTotal, contractTotal, retainage, retainageType } = invoice;
 
-      if (retainageType === '含稅') {
-        invoice.retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
-      } else if (retainageType === '未稅') {
-        invoice.retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
-      } else {
-        invoice.retainage = '';
-      }
+  //     if (retainageType === '含稅') {
+  //       invoice.retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
+  //     } else if (retainageType === '未稅') {
+  //       invoice.retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
+  //     } else {
+  //       invoice.retainage = '';
+  //     }
 
-      invoice.price = calcPrice(invoice);
+  //     invoice.price = calcPrice(invoice);
 
-      return invoice;
-    });
-  };
+  //     return invoice;
+  //   });
+  // };
+
+  // const handle_editInvoiceDate = (value: Moment | null) => {
+  //   setState_period((invoice) => {
+  //     invoice = { ...invoice };
+  //     invoice.renderCount++;
+  //     invoice.invoiceDate = value;
+
+  //     return invoice;
+  //   });
+  // };
 
   const handle_editType = (type: Tperiod_reduce['type']) => {
     setState_period((invoice) => {
       invoice = { ...invoice };
       invoice.renderCount++;
       invoice.type = type as Tperiod_reduce['type'];
-
-      return invoice;
-    });
-  };
-
-  const handle_editInvoiceDate = (value: Moment | null) => {
-    setState_period((invoice) => {
-      invoice = { ...invoice };
-      invoice.renderCount++;
-      invoice.invoiceDate = value;
 
       return invoice;
     });
@@ -549,19 +550,19 @@ function PeriodPanel_pre(
       renderCount,
       rowArr: rowArr_state,
 
-      retainage,
-      deduction,
-      writeOffDeposit,
-      minusRetainage,
-      minusDeduction,
-      minusWriteOffDeposit,
+      // retainage,
+      // deduction,
+      // writeOffDeposit,
+      // minusRetainage,
+      // minusDeduction,
+      // minusWriteOffDeposit,
 
-      retainageType,
-      allowance,
-      note,
+      // retainageType,
+      // allowance,
+      // note,
 
-      price,
-      invoiceNumber,
+      // price,
+      // invoiceNumber,
 
       period,
       type,
@@ -570,10 +571,10 @@ function PeriodPanel_pre(
       tax,
       contractTotal,
 
-      allow_EditDeduction_or_deleteInvoice: allowEditDeduction,
+      // allow_EditDeduction_or_deleteInvoice: allowEditDeduction,
 
-      actualPrice,
-      invoiceDate,
+      // actualPrice,
+      // invoiceDate,
     } = state_period;
 
     let subTotal_d = new Decimal(0);
@@ -624,68 +625,76 @@ function PeriodPanel_pre(
     // _______________________________________________________________________
     // _______________________________________________________________________
 
-    const other: Tcenter['other'] = {
-      price: price ? price.toLocaleString() : '',
-      invoiceNumber,
-      retainage,
-      deduction,
-      writeOffDeposit,
-      retainage_localeString: retainage ? Number(retainage).toLocaleString() : '',
-      deduction_localeString: deduction ? Number(deduction).toLocaleString() : '',
-      writeOffDeposit_localeString: writeOffDeposit ? Number(writeOffDeposit).toLocaleString() : '',
-      minusRetainage,
-      minusDeduction,
-      minusWriteOffDeposit,
+    const other: Tcenter['other'] = new Class_OtherNode({
+      state_period,
+      setState_period,
+      state_invoiceBook,
+      setState_InvoiceBook,
+    });
+    // const other: Tcenter['other'] = {
+    //   price: price ? price.toLocaleString() : '',
+    //   invoiceNumber,
+    //   retainage,
+    //   deduction,
+    //   writeOffDeposit,
 
-      retainageType,
-      allowance,
-      note,
+    //   retainage_localeString: retainage ? Number(retainage).toLocaleString() : '',
+    //   deduction_localeString: deduction ? Number(deduction).toLocaleString() : '',
+    //   writeOffDeposit_localeString: writeOffDeposit ? Number(writeOffDeposit).toLocaleString() : '',
 
-      allowEditDeduction,
-      actualPrice,
-      actualPrice_localeString: actualPrice ? Number(actualPrice).toLocaleString() : '',
-      invoiceDate,
+    //   minusRetainage,
+    //   minusDeduction,
+    //   minusWriteOffDeposit,
 
-      onChange_invoiceNumber: (value) => {
-        handle_editInvoiceOther({ key: 'invoiceNumber', value });
-      },
-      onChange_retainage: (value) => {
-        handle_editInvoiceOther({ key: 'retainage', value });
-      },
-      onChange_deduction: (value) => {
-        handle_editInvoiceOther({ key: 'deduction', value });
-      },
-      onChange_writeOffDeposit: (value) => {
-        handle_editInvoiceOther({ key: 'writeOffDeposit', value });
-      },
-      onChange_minusRetainage: (checked) => {
-        handel_editCalcType({ key: 'minusRetainage', chcked: checked });
-      },
-      onChange_minusDeduction: (checked) => {
-        handel_editCalcType({ key: 'minusDeduction', chcked: checked });
-      },
-      onChange_minusWriteOffDeposit: (checked) => {
-        handel_editCalcType({ key: 'minusWriteOffDeposit', chcked: checked });
-      },
+    //   retainageType,
+    //   allowance,
+    //   note,
 
-      onChange_retainageType: (value) => {
-        handle_editTetainageType({ value });
-      },
-      onChange_allowance: (value) => {
-        handle_editInvoiceOther({ key: 'allowance', value });
-      },
-      onChange_note: (value) => {
-        handle_editInvoiceOther({ key: 'note', value });
-      },
+    //   allowEditDeduction,
+    //   actualPrice,
+    //   actualPrice_localeString: actualPrice ? Number(actualPrice).toLocaleString() : '',
+    //   invoiceDate,
 
-      onChange_acturePrice: (value) => {
-        handle_editInvoiceOther({ key: 'actualPrice', value });
-      },
+    //   onChange_invoiceNumber: (value) => {
+    //     handle_editInvoiceOther({ key: 'invoiceNumber', value });
+    //   },
+    //   onChange_retainage: (value) => {
+    //     handle_editInvoiceOther({ key: 'retainage', value });
+    //   },
+    //   onChange_deduction: (value) => {
+    //     handle_editInvoiceOther({ key: 'deduction', value });
+    //   },
+    //   onChange_writeOffDeposit: (value) => {
+    //     handle_editInvoiceOther({ key: 'writeOffDeposit', value });
+    //   },
+    //   onChange_minusRetainage: (checked) => {
+    //     handel_editCalcType({ key: 'minusRetainage', chcked: checked });
+    //   },
+    //   onChange_minusDeduction: (checked) => {
+    //     handel_editCalcType({ key: 'minusDeduction', chcked: checked });
+    //   },
+    //   onChange_minusWriteOffDeposit: (checked) => {
+    //     handel_editCalcType({ key: 'minusWriteOffDeposit', chcked: checked });
+    //   },
 
-      onChange_invoiceDate: (value) => {
-        handle_editInvoiceDate(value);
-      },
-    };
+    //   onChange_retainageType: (value) => {
+    //     handle_editTetainageType({ value });
+    //   },
+    //   onChange_allowance: (value) => {
+    //     handle_editInvoiceOther({ key: 'allowance', value });
+    //   },
+    //   onChange_note: (value) => {
+    //     handle_editInvoiceOther({ key: 'note', value });
+    //   },
+
+    //   onChange_acturePrice: (value) => {
+    //     handle_editInvoiceOther({ key: 'actualPrice', value });
+    //   },
+
+    //   onChange_invoiceDate: (value) => {
+    //     handle_editInvoiceDate(value);
+    //   },
+    // };
 
     // _______________________________________________________________________
     // _______________________________________________________________________
@@ -891,8 +900,8 @@ function PeriodPanel_pre(
         isInvoiceNumberCheckPass={isInvoiceNumberCheckPass}
         //
         invoiceBookOptions={invoiceBookOptions}
-        state_invoiceBook={state_invoiceBook}
-        setState_InvoiceBook={setState_InvoiceBook}
+        // state_invoiceBook={state_invoiceBook}
+        // setState_InvoiceBook={setState_InvoiceBook}
         invoiceNumberOptions={invoiceNumberOptions}
       />
 
@@ -1004,7 +1013,7 @@ const Tbody = ({
 const Tfoot = ({
   //
   readOnly,
-  node_other,
+  node_other: class_other,
   isTotal,
   onConfirm_allowance: onConfirm_allowance,
   resetDefault,
@@ -1012,8 +1021,8 @@ const Tfoot = ({
   isInvoiceNumberCheckPass,
   //
   invoiceBookOptions,
-  state_invoiceBook,
-  setState_InvoiceBook,
+  // state_invoiceBook,
+  // setState_InvoiceBook,
   invoiceNumberOptions,
 }: {
   readOnly: boolean;
@@ -1025,8 +1034,8 @@ const Tfoot = ({
   isInvoiceNumberCheckPass: TinvouceCheckResult;
   //
   invoiceBookOptions: Toption[];
-  state_invoiceBook: Tstate_invoiceBood;
-  setState_InvoiceBook: React.Dispatch<React.SetStateAction<Tstate_invoiceBood>>;
+  // state_invoiceBook: Tstate_invoiceBood;
+  // setState_InvoiceBook: React.Dispatch<React.SetStateAction<Tstate_invoiceBood>>;
   invoiceNumberOptions: Toption[];
 }) => {
   const {
@@ -1049,26 +1058,9 @@ const Tfoot = ({
     allowEditDeduction,
 
     invoiceDate,
+  } = class_other;
 
-    onChange_invoiceNumber,
-    onChange_retainage,
-    onChange_deduction,
-    onChange_writeOffDeposit,
-
-    onChange_minusRetainage,
-    onChange_minusDeduction,
-    onChange_minusWriteOffDeposit,
-
-    onChange_retainageType,
-
-    onChange_allowance,
-    onChange_note,
-
-    onChange_acturePrice,
-    onChange_invoiceDate,
-  } = node_other;
-
-  let { retainage, deduction, writeOffDeposit, actualPrice } = node_other;
+  let { retainage, deduction, writeOffDeposit, actualPrice } = class_other;
 
   if (readOnly) {
     retainage = retainage_localeString;
@@ -1117,7 +1109,7 @@ const Tfoot = ({
         <input
           className={classNames(readOnly && scss.readyOnly)}
           value={retainage}
-          onChange={(e) => onChange_retainage(e.target.value)}
+          onChange={(e) => (class_other.retainage = e.target.value)}
           readOnly={readOnly}
           type={inputType}
         />
@@ -1128,7 +1120,7 @@ const Tfoot = ({
         <input
           className={classNames((readOnly || !allowEditDeduction) && scss.readyOnly)}
           value={deduction}
-          onChange={(e) => onChange_deduction(e.target.value)}
+          onChange={(e) => (class_other.deduction = e.target.value)}
           readOnly={readOnly || !allowEditDeduction}
           type={inputType}
         />
@@ -1139,7 +1131,7 @@ const Tfoot = ({
         <input
           className={classNames(readOnly && scss.readyOnly)}
           value={writeOffDeposit}
-          onChange={(e) => onChange_writeOffDeposit(e.target.value)}
+          onChange={(e) => (class_other.writeOffDeposit = e.target.value)}
           readOnly={readOnly}
           type={inputType}
         />
@@ -1151,7 +1143,7 @@ const Tfoot = ({
           <Radio.Group
             disabled={readOnly}
             onChange={(e) => {
-              onChange_retainageType(e.target.value);
+              class_other.retainageType = e.target.value;
             }}
             value={retainageType}
           >
@@ -1167,7 +1159,7 @@ const Tfoot = ({
           disabled={readOnly}
           checked={haveRetainage}
           onChange={(e) => {
-            onChange_minusRetainage(e.target.checked);
+            class_other.minusRetainage = e.target.checked;
           }}
         >
           保留款
@@ -1176,7 +1168,7 @@ const Tfoot = ({
           disabled={readOnly}
           checked={haveDeduction}
           onChange={(e) => {
-            onChange_minusDeduction(e.target.checked);
+            class_other.minusDeduction = e.target.checked;
           }}
         >
           扣款
@@ -1185,7 +1177,7 @@ const Tfoot = ({
           disabled={readOnly}
           checked={haveWriteOffDeposit}
           onChange={(e) => {
-            onChange_minusWriteOffDeposit(e.target.checked);
+            class_other.minusWriteOffDeposit = e.target.checked;
           }}
         >
           沖訂金
@@ -1202,7 +1194,7 @@ const Tfoot = ({
         <input
           className={classNames(readOnly && scss.readyOnly)}
           value={actualPrice}
-          onChange={(e) => onChange_acturePrice(e.target.value)}
+          onChange={(e) => (class_other.actualPrice = e.target.value)}
           readOnly={readOnly}
           type={inputType}
         />
@@ -1217,9 +1209,9 @@ const Tfoot = ({
             props: {
               value: invoiceDate,
               onChange: (date_m) => {
-                onChange_invoiceDate(date_m);
-                setState_InvoiceBook(null);
-                onChange_invoiceNumber('');
+                class_other.invoiceDate = date_m;
+                class_other.invoiceBook = null;
+                class_other.invoiceNumber = '';
               },
             },
           }}
@@ -1233,11 +1225,11 @@ const Tfoot = ({
           showBaseline="auto"
           selectProps={{
             props: {
-              value: state_invoiceBook,
+              value: class_other.invoiceBook,
               options: invoiceBookOptions,
               onChange: (option) => {
-                setState_InvoiceBook(option);
-                onChange_invoiceNumber('');
+                class_other.invoiceBook = option;
+                class_other.invoiceNumber = '';
               },
             },
           }}
@@ -1273,7 +1265,7 @@ const Tfoot = ({
               options: invoiceNumberOptions,
               onChange: (option) => {
                 const value = option?.value || '';
-                onChange_invoiceNumber(value);
+                class_other.invoiceNumber = value;
               },
             },
           }}
@@ -1306,7 +1298,7 @@ const Tfoot = ({
           className={classNames(readOnly === false ? false : disabled_allowance && scss.readyOnly)}
           type="number"
           value={allowance}
-          onChange={(e) => onChange_allowance(e.target.value)}
+          onChange={(e) => (class_other.allowance = e.target.value)}
         />
       </div>
       {/*  */}
@@ -1317,7 +1309,7 @@ const Tfoot = ({
         <input
           className={classNames(readOnly && scss.readyOnly)}
           value={note}
-          onChange={(e) => onChange_note(e.target.value)}
+          onChange={(e) => (class_other.note = e.target.value)}
           readOnly={readOnly}
         />
       </div>
@@ -1346,8 +1338,8 @@ const calcTotals = (rowArr: { completedPayment: number | string }[]) => {
   };
 };
 
-const calcPrice = (state_invoice: Tstate_period) => {
-  const invoice = state_invoice;
+const calcPrice = (state_period: Tstate_period) => {
+  const period = state_period;
 
   const {
     //
@@ -1357,9 +1349,9 @@ const calcPrice = (state_invoice: Tstate_period) => {
     minusRetainage,
     minusDeduction,
     minusWriteOffDeposit,
-  } = invoice;
+  } = period;
 
-  const totals_num = calcTotals(invoice.rowArr);
+  const totals_num = calcTotals(period.rowArr);
   let price_d = new Decimal(totals_num.contractTotal);
 
   minusRetainage && (price_d = price_d.sub(retainage || 0));
@@ -1372,6 +1364,215 @@ const calcPrice = (state_invoice: Tstate_period) => {
 };
 
 // ==========================================================================
+
+class Class_OtherNode {
+  constructor({
+    //
+    state_period,
+    setState_period,
+    state_invoiceBook,
+    setState_InvoiceBook,
+  }: {
+    state_period: Tstate_period;
+    setState_period: React.Dispatch<React.SetStateAction<Tstate_period>>;
+    state_invoiceBook: Tstate_invoiceBood | null;
+    setState_InvoiceBook: React.Dispatch<React.SetStateAction<Tstate_invoiceBood | null>>;
+  }) {
+    this.state_period = _.cloneDeep(state_period);
+    this.setState_period = setState_period;
+    this.state_invoiceBook = state_invoiceBook;
+    this.setState_InvoiceBook = setState_InvoiceBook;
+  }
+
+  readonly state_period: Tstate_period;
+  readonly setState_period: React.Dispatch<React.SetStateAction<Tstate_period>>;
+  readonly state_invoiceBook: Tstate_invoiceBood | null;
+  readonly setState_InvoiceBook: React.Dispatch<React.SetStateAction<Tstate_invoiceBood | null>>;
+
+  // --------------------------------------------------------------------------
+  get price() {
+    const price = this.state_period.price;
+
+    return price ? price.toLocaleString() : '';
+  }
+
+  get invoiceNumber() {
+    return this.state_period.invoiceNumber;
+  }
+  set invoiceNumber(value) {
+    this.setState_period((period) => ({
+      ...period,
+      invoiceNumber: value,
+    }));
+  }
+
+  get retainage() {
+    return this.state_period.retainage;
+  }
+
+  set retainage(value) {
+    this.setState_period((period) => ({
+      ...period,
+      retainage: value,
+      price: calcPrice(period),
+    }));
+  }
+
+  get retainage_localeString() {
+    const retainage = this.state_period.retainage;
+
+    return retainage ? Number(retainage).toLocaleString() : '';
+  }
+
+  get deduction() {
+    return this.state_period.deduction;
+  }
+  set deduction(value) {
+    this.setState_period((period) => ({
+      ...period,
+      deduction: value,
+      price: calcPrice(period),
+    }));
+  }
+
+  get deduction_localeString() {
+    const deduction = this.state_period.deduction;
+
+    return deduction ? Number(deduction).toLocaleString() : '';
+  }
+
+  get writeOffDeposit() {
+    return this.state_period.writeOffDeposit;
+  }
+  set writeOffDeposit(value) {
+    this.setState_period((period) => ({
+      ...period,
+      writeOffDeposit: value,
+      price: calcPrice(period),
+    }));
+  }
+
+  get writeOffDeposit_localeString() {
+    const writeOffDeposit = this.state_period.writeOffDeposit;
+
+    return writeOffDeposit ? Number(writeOffDeposit).toLocaleString() : '';
+  }
+
+  get minusRetainage() {
+    return this.state_period.minusRetainage;
+  }
+  set minusRetainage(bool) {
+    this.setState_period((period) => ({
+      ...period,
+      minusRetainage: bool,
+      price: calcPrice(period),
+    }));
+  }
+
+  get minusDeduction() {
+    return this.state_period.minusDeduction;
+  }
+  set minusDeduction(bool) {
+    this.setState_period((period) => ({
+      ...period,
+      minusDeduction: bool,
+      price: calcPrice(period),
+    }));
+  }
+
+  get minusWriteOffDeposit() {
+    return this.state_period.minusWriteOffDeposit;
+  }
+  set minusWriteOffDeposit(bool) {
+    this.setState_period((period) => ({
+      ...period,
+      minusWriteOffDeposit: bool,
+      price: calcPrice(period),
+    }));
+  }
+
+  get retainageType() {
+    return this.state_period.retainageType;
+  }
+  set retainageType(value) {
+    this.setState_period((period) => {
+      period = { ...period };
+      period.retainageType = value;
+      const { subTotal, contractTotal, retainage, retainageType } = period;
+
+      if (retainageType === '含稅') {
+        period.retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
+      } else if (retainageType === '未稅') {
+        period.retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
+      } else {
+        period.retainage = '';
+      }
+
+      period.price = calcPrice(period);
+
+      return period;
+    });
+  }
+
+  get allowance() {
+    return this.state_period.allowance;
+  }
+  set allowance(value) {
+    this.setState_period((period) => ({
+      ...period,
+      allowance: value,
+    }));
+  }
+
+  get note() {
+    return this.state_period.note;
+  }
+  set note(value) {
+    this.setState_period((period) => ({
+      ...period,
+      note: value,
+    }));
+  }
+
+  get actualPrice() {
+    return this.state_period.actualPrice;
+  }
+  set actualPrice(string) {
+    this.setState_period((period) => ({
+      ...period,
+      actualPrice: string,
+    }));
+  }
+
+  get actualPrice_localeString() {
+    const actualPrice = this.state_period.actualPrice;
+
+    return actualPrice ? Number(actualPrice).toLocaleString() : '';
+  }
+
+  get invoiceDate() {
+    return this.state_period.invoiceDate;
+  }
+  set invoiceDate(date_m) {
+    this.setState_period((period) => ({
+      ...period,
+      invoiceDate: date_m,
+    }));
+  }
+
+  get allowEditDeduction() {
+    return this.state_period.allow_EditDeduction_or_deleteInvoice;
+  }
+
+  get invoiceBook() {
+    return this.state_invoiceBook;
+  }
+  set invoiceBook(value) {
+    this.setState_InvoiceBook(value);
+  }
+} // Class_OtherNode
+
+// ===============================================================================
 const create_emptyPeriod = (): Tperiod_reduce => {
   const invoice: Tperiod_reduce = {
     id: '',
