@@ -626,6 +626,11 @@ const sidePathList: TsidePathList = {
               path: path01 + '/invoiceBook',
               erpFeature: [accountingDepartment],
             },
+            {
+              label: '開立發票管理',
+              path: path01 + '/invoiceManagement',
+              erpFeature: [accountingDepartment],
+            },
           ],
         },
         // {
