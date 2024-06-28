@@ -235,9 +235,12 @@ export default function AccountReceivable() {
       invoiceBook: accountantInvoiceBook,
     } = state_invoice;
 
-    if (invoiceNumber || invoiceDate || actualPrice) {
+    if (accountantInvoiceBook || actualPrice) {
       if (!(invoiceNumber && invoiceDate && actualPrice)) {
-        myAlert.info({ title: '請輸入發票實際金額、發票號碼、發票日期，或全部清除' });
+        myAlert.info({
+          title: '請輸入完整發票資料或清除所有發票資料',
+          content: '發票本、發票實際金額、發票號碼、發票日期',
+        });
 
         return Promise.reject();
       }
