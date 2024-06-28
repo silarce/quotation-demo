@@ -24,7 +24,7 @@ import type {
   TupdateAccountantPresetDto,
   TaccountantExchangeFromDto,
   TcreateAccountantExchangeFromDto,
-  accountantInvoiceBookDto,
+  TaccountantInvoiceBookDto,
   TcreateAccountantInvoiceBookDto,
   TupdateAccountantInvoiceBookDto,
 } from './dtoTypes';
@@ -44,7 +44,7 @@ export type {
   TupdateAccountantPresetDto,
   TaccountantExchangeFromDto,
   TcreateAccountantExchangeFromDto,
-  accountantInvoiceBookDto,
+  TaccountantInvoiceBookDto,
   TcreateAccountantInvoiceBookDto,
   TupdateAccountantInvoiceBookDto,
 } from './dtoTypes';
@@ -341,28 +341,27 @@ export const apiPostAccountantExchangeFrom = async (
 
 // MARK: invoice-book
 
-// accountantInvoiceBookDto
-// get /accountant-invoice-book
-
 const apiGetAccountantInvoiceBook = async (params?: Tparams) => {
   const api = '/accountant-invoice-book';
 
   return axi
-    .get<TpageResponse<accountantInvoiceBookDto>>(api, { params })
+    .get<TpageResponse<TaccountantInvoiceBookDto>>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetAccountantInvoiceBook = ({
+const useGetAccountantInvoiceBook = ({
   params,
   autoUpdate = true,
   callAlert = true,
+  customFilter,
 }: {
   params?: Tparams;
   autoUpdate?: boolean;
   callAlert?: boolean;
+  customFilter?: (data: TaccountantInvoiceBookDto) => boolean;
 } = {}) => {
-  const [res, setRes] = useState<TpageResponse<accountantInvoiceBookDto>>();
+  const [res, setRes] = useState<TpageResponse<TaccountantInvoiceBookDto>>();
   const [isFetching, setIsFetching] = useState(false);
 
   const update = useCallback(async () => {
@@ -370,6 +369,13 @@ export const useGetAccountantInvoiceBook = ({
 
     try {
       const res = await apiGetAccountantInvoiceBook(params);
+
+      if (customFilter) {
+        let data = res.data;
+        data = data.filter(customFilter);
+        res.data = data;
+      }
+
       setRes(res);
 
       return res;
@@ -387,26 +393,36 @@ export const useGetAccountantInvoiceBook = ({
     }
   }, [params]);
 
+  const clearData = () => {
+    setRes(undefined);
+  };
+
   useEffect(() => {
     autoUpdate && update();
-  }, [params]);
+  }, [params, customFilter]);
 
   return {
     data: res?.data,
     meta: res?.meta,
     update,
+    clearData,
     isFetching,
   };
 };
 
-export const apiPostAccountantInvoiceBook = async (
+const useGetAccountantInvoiceBook_infinite = createUseInfinite<TpageResponse<TaccountantInvoiceBookDto>>({
+  apiClient: apiGetAccountantInvoiceBook,
+  errTitle: '取得發票本列表失敗',
+});
+
+const apiPostAccountantInvoiceBook = async (
   body: TcreateAccountantInvoiceBookDto,
   { callAlert = true }: { callAlert?: boolean } = {}
 ) => {
   const api = '/accountant-invoice-book';
 
   return axi
-    .post<accountantInvoiceBookDto>(api, body)
+    .post<TaccountantInvoiceBookDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => {
       callAlert &&
@@ -419,7 +435,7 @@ export const apiPostAccountantInvoiceBook = async (
     });
 };
 
-export const apiPatchAccountantInvoiceBook = async (
+const apiPatchAccountantInvoiceBook = async (
   id: string,
   body: TupdateAccountantInvoiceBookDto,
   { callAlert = true }: { callAlert?: boolean } = {}
@@ -427,7 +443,7 @@ export const apiPatchAccountantInvoiceBook = async (
   const api = `/accountant-invoice-book/${id}`;
 
   return axi
-    .patch<accountantInvoiceBookDto>(api, body)
+    .patch<TaccountantInvoiceBookDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => {
       callAlert &&
@@ -440,7 +456,7 @@ export const apiPatchAccountantInvoiceBook = async (
     });
 };
 
-export const deleteAccountantInvoiceBook = async (id: string, { callAlert = true }: { callAlert?: boolean } = {}) => {
+const deleteAccountantInvoiceBook = async (id: string, { callAlert = true }: { callAlert?: boolean } = {}) => {
   const api = `/accountant-invoice-book/${id}`;
 
   return axi
@@ -464,8 +480,13 @@ export {
   apiPatchAccountant,
   deleteAccountant,
   apiPatchAccountant_accountReceivable,
+  apiPostAccountantInvoiceBook,
+  apiPatchAccountantInvoiceBook,
+  deleteAccountantInvoiceBook,
   //
   useGetAccountant_infinite,
   useGetAccountant,
   useGetAccountantPreset,
+  useGetAccountantInvoiceBook,
+  useGetAccountantInvoiceBook_infinite,
 };

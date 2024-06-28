@@ -1,6 +1,7 @@
 import { useState, useRef, Fragment, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
+import moment from 'moment';
 
 // antd
 import { Modal } from 'antd';
@@ -34,11 +35,13 @@ import {
 import { TcustomerDto, useGetCustomers_infinite_2 } from 'js/api/api_customer';
 import { TsettleProductDto, useGetQuotationContentSettleProduct } from 'js/api/api_certificated-doc';
 import { TquotationContractDto, useContract_infinite_2 } from 'js/api/api_quotation';
+import { TaccountantInvoiceBookDto, useGetAccountantInvoiceBook_infinite } from 'js/api/api_accountant';
 
 // lookup and options
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 import { customerTypesLookup } from 'js/api/api_customer';
 import { Toption } from 'js/utils/options/options';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // ======================================================================
 // region 建立流程與使用方法
@@ -93,6 +96,7 @@ type TtypeLookup = {
   customer: Exclude<(typeof props_customer)['dataType'], undefined>;
   settleProduct: Exclude<(typeof props_settleProduct)['dataType'], undefined>;
   contract: Exclude<(typeof props_contract)['dataType'], undefined>;
+  invoiceBook: Exclude<(typeof props_invoiceBook)['dataType'], undefined>;
   // test: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   // foooo: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
 };
@@ -1202,6 +1206,128 @@ const props_contract: TselectorProps<TquotationContractDto> = {
   },
 };
 
+// region invoiceBook
+
+const props_invoiceBook: TselectorProps<TaccountantInvoiceBookDto> = {
+  useInfinit: useGetAccountantInvoiceBook_infinite,
+  selectedKey: 'alphabeticLetter',
+  params: {
+    sort: 'alphabeticLetter',
+  },
+  configArr: [
+    {
+      key: 'year',
+      width: 60,
+      thead: {
+        label: '年份',
+      },
+      tbody: {
+        reducer: (value) => {
+          const year = value as string;
+
+          return Number(year) - 1911;
+        },
+      },
+    },
+    {
+      key: 'month',
+      width: 60,
+      thead: {
+        label: '月份',
+      },
+    },
+    {
+      key: 'type',
+      width: 100,
+      thead: {
+        label: '發票類別',
+      },
+    },
+    {
+      key: 'alphabeticLetter',
+      width: 60,
+      thead: {
+        label: '字軌',
+      },
+    },
+    {
+      key: 'startNumber',
+      width: 100,
+      thead: {
+        label: '起始號碼',
+      },
+    },
+    {
+      key: 'endNumber',
+      width: 100,
+      thead: {
+        label: '結尾號碼',
+      },
+    },
+    {
+      key: 'latestInvoiceNumber',
+      width: 100,
+      thead: {
+        label: '最後一張開立發票號碼',
+      },
+      tbody: {
+        reducer: (value) => {
+          const latestInvoiceNumber = value as string | null;
+
+          return latestInvoiceNumber || '';
+        },
+      },
+    },
+    {
+      key: 'latestInvoiceDate',
+      width: 100,
+      thead: {
+        label: '最後一張開立發票日期',
+      },
+      tbody: {
+        reducer: (value) => {
+          const dateStr = value as string | null;
+
+          return getTaiwanDateStr(dateStr) || '';
+        },
+      },
+    },
+  ],
+  searchInputSelPropsArr: [
+    {
+      datePickerProps: {
+        wrapperStyle: { width: 150 },
+        props: {
+          placeholder: '民國年月',
+          picker: 'month',
+        },
+      },
+    },
+  ],
+  filter: ([dateStr]) => {
+    const { year, month } = (() => {
+      const date_m = moment(dateStr);
+
+      if (!date_m.isValid()) {
+        return {
+          year: undefined,
+          month: undefined,
+        };
+      }
+
+      const year = date_m.year();
+      const month = date_m.month() + 1;
+
+      return { year, month };
+    })();
+
+    return {
+      year: { $eq: year },
+      month: { $eq: month },
+    };
+  },
+};
+
 // -------------------------------------------------------------------------
 
 // ---
@@ -1222,6 +1348,7 @@ const propsLookup = {
   customer: () => _.cloneDeep(props_customer),
   settleProduct: () => _.cloneDeep(props_settleProduct),
   contract: () => _.cloneDeep(props_contract),
+  invoiceBook: () => _.cloneDeep(props_invoiceBook),
 
   // test: () => {
   //   return _.cloneDeep(props_outsourcing);

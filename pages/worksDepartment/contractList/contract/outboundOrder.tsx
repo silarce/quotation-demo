@@ -559,8 +559,8 @@ export default function OutboundOrder({
         rowPropsArr_group.push(itemRow);
       });
 
-      prodRow.center = rowPropsArr_group[1].center;
-      prodRow.rightPanelArr = rowPropsArr_group[1].rightPanelArr;
+      prodRow.center = rowPropsArr_group[1]?.center;
+      prodRow.rightPanelArr = rowPropsArr_group[1]?.rightPanelArr;
       rowPropsArr_group.splice(1, 1);
 
       // ____________________________________________________________________
