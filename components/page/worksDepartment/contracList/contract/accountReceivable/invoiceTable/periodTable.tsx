@@ -26,7 +26,7 @@ import type {
 } from 'js/api/dtoTypes';
 
 // api
-import { useGetAccountantInvoiceBook } from 'js/api/api_accountant';
+import { TaccountantInvoiceBookDto, useGetAccountantInvoiceBook } from 'js/api/api_accountant';
 
 // ========================================================================
 // region type
@@ -97,7 +97,10 @@ type Tstate_period = {
   actualPrice: string; // 實際金額
   invoiceDate: Moment | null;
 
-  isInvoiceNumberValid?: boolean;
+  // isInvoiceNumberValid?: boolean;
+  //
+
+  invoiceBook: TaccountantInvoiceBookDto | null;
 
   //
 };
@@ -194,11 +197,11 @@ export default function PeriodTable({
     const newInoviceState = ref_newInvoicePanel.current?.getState();
 
     if (newInoviceState) {
-      if (newInoviceState.isInvoiceNumberValid === false) {
-        myAlert.info({ title: '發票號碼已被使用或正在檢查' });
+      // if (newInoviceState.isInvoiceNumberValid === false) {
+      //   myAlert.info({ title: '發票號碼已被使用或正在檢查' });
 
-        return;
-      }
+      //   return;
+      // }
 
       await onAddConfirm(newInoviceState);
       setIsAddingNew(false);

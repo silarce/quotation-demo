@@ -41,7 +41,7 @@ import { Tinvoice_reduce as Tperiod_reduce, Tstate_period } from './periodTable'
 
 // api
 import { TinvouceCheckResult, useCheckInvoiceNumber } from 'js/api/api_engineering';
-import { useGetAccountantInvoiceBook } from 'js/api/api_accountant';
+import { TaccountantInvoiceBookDto, useGetAccountantInvoiceBook } from 'js/api/api_accountant';
 
 // icon
 import { IconEdit, IconCheck01, IconCheck02, IconCross01 } from 'public/image/icon/svgComponent/svgIcons';
@@ -164,13 +164,13 @@ function PeriodPanel_pre(
 
   const [disabled, setDisabled] = useState(!isNew || !!totalsTotal);
   const [state_period, setState_period] = useState<Tstate_period>(defaultState);
-  const [state_invoiceBook, setState_InvoiceBook] = useState<Tstate_invoiceBood>(null);
+  // const [state_invoiceBook, setState_InvoiceBook] = useState<Tstate_invoiceBood>(null);
 
-  const {
-    //
-    isFetching: isCheckingInvoiceNumber,
-    isPass: isInvoiceNumberCheckPass,
-  } = useCheckInvoiceNumber(state_period?.invoiceNumber, { pause: disabled });
+  // const {
+  //   //
+  //   isFetching: isCheckingInvoiceNumber,
+  //   isPass: isInvoiceNumberCheckPass,
+  // } = useCheckInvoiceNumber(state_period?.invoiceNumber, { pause: disabled });
 
   // --------------------------------------------------------------------------
 
@@ -186,6 +186,7 @@ function PeriodPanel_pre(
 
     //
     const params: Tparams = {
+      sort: 'alphabeticLetter',
       pageSize: 99999,
       filter: {
         isAlreadyDeclare: { $eq: false },
@@ -514,8 +515,8 @@ function PeriodPanel_pre(
     const other: Tcenter['other'] = new Class_OtherNode({
       state_period,
       setState_period,
-      state_invoiceBook,
-      setState_InvoiceBook,
+      // state_invoiceBook,
+      // setState_InvoiceBook,
     });
     // const other: Tcenter['other'] = {
     //   price: price ? price.toLocaleString() : '',
@@ -608,6 +609,7 @@ function PeriodPanel_pre(
       return {
         value: book.id,
         label: book.alphabeticLetter || '無字軌',
+        invoiceBook: book,
       };
     });
 
@@ -619,14 +621,22 @@ function PeriodPanel_pre(
       return [];
     }
 
-    const invoiceBook = data_invoiceBookArr.find((book) => book.id === state_invoiceBook?.value);
+    const invoiceBook = data_invoiceBookArr.find((book) => book.id === state_period.invoiceBook?.id);
 
     if (!invoiceBook) {
       return [];
     }
 
-    const { startNumber, endNumber } = invoiceBook;
-    const startNumber_num = Number(startNumber);
+    const {
+      alphabeticLetter,
+
+      startNumber,
+      endNumber,
+
+      latestInvoiceNumber,
+    } = invoiceBook;
+
+    const startNumber_num = latestInvoiceNumber ? Number(latestInvoiceNumber) + 1 : Number(startNumber);
     const endNumber_num = Number(endNumber);
 
     const options: Toption[] = [];
@@ -635,15 +645,15 @@ function PeriodPanel_pre(
       const value = String(i).padStart(8, '0');
 
       options.push({
-        value,
-        label: value,
+        value: alphabeticLetter + value,
+        label: alphabeticLetter + value,
       });
     }
 
     return options;
 
     //
-  }, [state_invoiceBook]);
+  }, [state_period.invoiceBook]);
 
   // ==============================================================================
   // region  USE EFFECT
@@ -658,31 +668,31 @@ function PeriodPanel_pre(
 
   // 判斷invoiceNumber是否有效
   // 若state_period.id存在，為既有發票，不可以編輯invoiceNumber，不需判斷
-  useEffect(() => {
-    if (state_period.id) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (state_period.id) {
+  //     return;
+  //   }
 
-    let isValid = false;
+  //   let isValid = false;
 
-    if (!state_period.invoiceNumber) {
-      isValid = true;
-    } else if (isInvoiceNumberCheckPass === 'pass') {
-      isValid = true;
-    }
+  //   if (!state_period.invoiceNumber) {
+  //     isValid = true;
+  //   } else if (isInvoiceNumberCheckPass === 'pass') {
+  //     isValid = true;
+  //   }
 
-    if (isCheckingInvoiceNumber) {
-      isValid = false;
-    }
+  //   if (isCheckingInvoiceNumber) {
+  //     isValid = false;
+  //   }
 
-    setState_period((period) => {
-      return {
-        ...period,
-        renderCount: period.renderCount + 1,
-        isInvoiceNumberValid: isValid,
-      };
-    });
-  }, [state_period.id, isCheckingInvoiceNumber, isInvoiceNumberCheckPass, state_period.invoiceNumber]);
+  //   setState_period((period) => {
+  //     return {
+  //       ...period,
+  //       renderCount: period.renderCount + 1,
+  //       isInvoiceNumberValid: isValid,
+  //     };
+  //   });
+  // }, [state_period.id, isCheckingInvoiceNumber, isInvoiceNumberCheckPass, state_period.invoiceNumber]);
 
   useEffect(() => {
     if (isNew) {
@@ -782,8 +792,8 @@ function PeriodPanel_pre(
         isTotal={isTotal}
         onConfirm_allowance={handle_confirm_allowance}
         resetDefault={resetDefault}
-        isCheckingInvoiceNumber={isCheckingInvoiceNumber}
-        isInvoiceNumberCheckPass={isInvoiceNumberCheckPass}
+        // isCheckingInvoiceNumber={isCheckingInvoiceNumber}
+        // isInvoiceNumberCheckPass={isInvoiceNumberCheckPass}
         //
         invoiceBookOptions={invoiceBookOptions}
         // state_invoiceBook={state_invoiceBook}
@@ -903,8 +913,8 @@ const Tfoot = ({
   isTotal,
   onConfirm_allowance: onConfirm_allowance,
   resetDefault,
-  isCheckingInvoiceNumber,
-  isInvoiceNumberCheckPass,
+  // isCheckingInvoiceNumber,
+  // isInvoiceNumberCheckPass,
   //
   invoiceBookOptions,
   // state_invoiceBook,
@@ -916,8 +926,8 @@ const Tfoot = ({
   isTotal: boolean;
   onConfirm_allowance: () => void;
   resetDefault: () => void;
-  isCheckingInvoiceNumber: boolean;
-  isInvoiceNumberCheckPass: TinvouceCheckResult;
+  // isCheckingInvoiceNumber: boolean;
+  // isInvoiceNumberCheckPass: TinvouceCheckResult;
   //
   invoiceBookOptions: Toption[];
   // state_invoiceBook: Tstate_invoiceBood;
@@ -1111,11 +1121,11 @@ const Tfoot = ({
           showBaseline="auto"
           selectProps={{
             props: {
-              value: class_other.invoiceBook,
+              value: class_other.invoiceBookOption,
               options: invoiceBookOptions,
               onChange: (option) => {
-                class_other.invoiceBook = option;
-                class_other.invoiceNumber = '';
+                const invoiceBook = (option?.invoiceBook || null) as TaccountantInvoiceBookDto | null;
+                class_other.invoiceBook = invoiceBook;
               },
             },
           }}
@@ -1124,7 +1134,7 @@ const Tfoot = ({
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
         <div className={scss.invoiceNumberSpinWrapper}>
-          <div className={classNames(!showInvoiceNumberCheck && 'invisible')}>
+          {/* <div className={classNames(!showInvoiceNumberCheck && 'invisible')}>
             {isCheckingInvoiceNumber && <Spin />}
             {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass === 'pass' && (
               <IconCheck01 className={classNames(scss.checkIcon, scss.check)} />
@@ -1132,7 +1142,7 @@ const Tfoot = ({
             {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass !== 'pass' && (
               <IconCross01 className={classNames(scss.checkIcon, scss.cross)} />
             )}
-          </div>
+          </div> */}
           <span>發票號碼</span>
         </div>
         {/* <input
@@ -1374,7 +1384,7 @@ const useDefaultState = ({
 
       actualPrice: String(actualPrice || ''),
       invoiceDate: invoiceDate ? moment(invoiceDate) : null,
-      accountantInvoiceBook: invoice?.accountantInvoiceBook ?? null,
+      invoiceBook: invoice?.accountantInvoiceBook ?? null,
     };
 
     return { defaultState, isNew };
@@ -1394,24 +1404,16 @@ class Class_OtherNode {
     //
     state_period,
     setState_period,
-    state_invoiceBook,
-    setState_InvoiceBook,
   }: {
     state_period: Tstate_period;
     setState_period: React.Dispatch<React.SetStateAction<Tstate_period>>;
-    state_invoiceBook: Tstate_invoiceBood | null;
-    setState_InvoiceBook: React.Dispatch<React.SetStateAction<Tstate_invoiceBood | null>>;
   }) {
     this.state_period = _.cloneDeep(state_period);
     this.setState_period = setState_period;
-    this.state_invoiceBook = state_invoiceBook;
-    this.setState_InvoiceBook = setState_InvoiceBook;
   }
 
   readonly state_period: Tstate_period;
   readonly setState_period: React.Dispatch<React.SetStateAction<Tstate_period>>;
-  readonly state_invoiceBook: Tstate_invoiceBood | null;
-  readonly setState_InvoiceBook: React.Dispatch<React.SetStateAction<Tstate_invoiceBood | null>>;
 
   // --------------------------------------------------------------------------
   get price() {
@@ -1589,11 +1591,32 @@ class Class_OtherNode {
   }
 
   get invoiceBook() {
-    return this.state_invoiceBook;
+    return this.state_period.invoiceBook;
   }
-  set invoiceBook(value) {
-    this.setState_InvoiceBook(value);
+  set invoiceBook(invoiceBook) {
+    this.setState_period((period) => ({
+      ...period,
+      invoiceBook,
+      invoiceNumber: '',
+    }));
   }
+
+  get invoiceBookOption() {
+    const invoiceBook = this.state_period.invoiceBook;
+
+    if (invoiceBook) {
+      return {
+        value: invoiceBook.id,
+        label: invoiceBook.alphabeticLetter,
+      };
+    } else {
+      return null;
+    }
+  }
+
+  // set invoiceBook(value) {
+
+  // }
 } // Class_OtherNode
 
 // ===============================================================================

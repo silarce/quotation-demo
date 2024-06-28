@@ -116,6 +116,7 @@ export default function AccountReceivable() {
       // 'subContracts.content.verifyForm'
       'engineeringContact',
       'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
+      'accountReceivable.periods.invoices.accountantInvoiceBook',
       // 'accountReceivable.periods',
     ],
   });
@@ -230,6 +231,8 @@ export default function AccountReceivable() {
       invoiceNumber, // 發票號碼
       invoiceDate, // 發票日期
       actualPrice, // 發票實際金額
+
+      invoiceBook: accountantInvoiceBook,
     } = state_invoice;
 
     if (invoiceNumber || invoiceDate || actualPrice) {
@@ -265,6 +268,7 @@ export default function AccountReceivable() {
       invoiceDate: invoiceDate ? invoiceDate.toISOString() : null,
       invoiceNumber: invoiceNumber || null,
       actualPrice: actualPrice ? Number(actualPrice) : null,
+      accountantInvoiceBookId: accountantInvoiceBook?.id || null,
     };
 
     try {

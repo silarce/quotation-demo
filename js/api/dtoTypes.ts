@@ -3640,6 +3640,7 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   invoiceDate: string | null;
   invoiceNumber: string | null;
   actualPrice: number | null;
+  accountantInvoiceBookId: string | null;
 };
 
 export type TupdateAccountReceivablePeriodDto = Partial<TcreateAccountReceivablePeriodDto>;
