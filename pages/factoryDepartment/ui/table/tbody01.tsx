@@ -134,13 +134,19 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
   async function GetPerchaseOrder(item: any) {
     console.log(item);
+    console.log(item.taxid)
     router.replace({
       pathname: `/factoryDepartment/purchaseOrderList`,
       query: {
         purchaseorderid: item.purchaseorderid,
         create_at: getTaiwanDateStr(item.create_at),
         create_by: item.create_by,
-        receipted: item.receipted
+        receipted: item.receipted,
+        suppliername: item.name,
+        suppliertaxid: item.taxid,
+        supplieraddress:item.address,
+        supplierphone:item.phone,
+        invoice:item.invoice
       }
     })
   }

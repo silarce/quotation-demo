@@ -35,7 +35,12 @@ export default function purchaseOrderList() {
         purchaseorderid,
         create_at,
         create_by,
-        receipted
+        receipted,
+        suppliername,
+        suppliertaxid,
+        supplieraddress,
+        supplierphone,
+        invoice
     } = router.query;
 
 
@@ -252,7 +257,7 @@ export default function purchaseOrderList() {
                                 採購單
                             </span> */}
                         </div>
-                        <div style={{textAlign:'right'}}>
+                        <div style={{ textAlign: 'right' }}>
                             <span style={{ display: receipted === "false" ? "" : "none" }}>
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="進貨" onClick={() => { gotoReceipt() }} />
                             </span>
@@ -274,6 +279,10 @@ export default function purchaseOrderList() {
                                     },
                                 }}
                             />
+
+
+                        </div>
+                        <div>
                             <InputSel
                                 {...inputSelProps}
                                 caption="採購日期"
@@ -284,8 +293,6 @@ export default function purchaseOrderList() {
                                     },
                                 }}
                             />
-
-
                         </div>
                         <div>
                             <InputSel
@@ -300,9 +307,66 @@ export default function purchaseOrderList() {
                             />
                         </div>
                     </div>
+                    <hr />
                     <div className={scss.content_main}>
-                        ddd
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="廠商名稱"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: suppliername ? suppliername : ' ',
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="統一編號"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: suppliertaxid ? suppliertaxid : ' ',
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="廠商地址"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: supplieraddress ? supplieraddress : ' ',
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="聯絡電話"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: supplierphone ? supplierphone : ' ',
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="發票號碼"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: invoice ? invoice : ' ',
+                                    },
+                                }}
+                            />
+                        </div>
                     </div>
+
                     <br />
                     <div className={scss.content_main_content}>
                         <Thead01 type={'PickingDetailList'} />
