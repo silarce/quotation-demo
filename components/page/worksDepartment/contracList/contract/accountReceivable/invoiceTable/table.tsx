@@ -154,124 +154,10 @@ function PeriodPanel_pre(
 ) {
   const isTotal = !!totalsTotal;
 
-  const { defaultState, isNew } = useMemo(() => {
-    const isNew = !data_period;
-
-    const {
-      //
-      id,
-      type,
-      period,
-      depositPeriod,
-      completedProduct = [],
-      retainage,
-      deduction,
-      writeOffDeposit,
-      isRetainage,
-      isDeduction,
-      isWriteOffDeposit,
-      //
-      retainageType,
-      // allowance,
-      note,
-      //
-      invoices,
-      price,
-      //
-      // invoiceNumber,
-      // price,
-      // accountantList,
-    } = data_period ?? create_emptyPeriod();
-
-    const notAllow_EditDeduction_or_deleteInvoice = invoices.some((invoice) => {
-      return invoice.accountantList.some((al) => {
-        return al.accountsReceivableDeduction.length > 0;
-      });
-    });
-
-    const completedProductList: { [id: string]: TcompletedProductDto } = {};
-    completedProduct?.forEach((cp) => {
-      completedProductList[cp.productId] = cp;
-    });
-
-    const rowArr: Tstate_period['rowArr'] = finalProdArr.map((finalProd) => {
-      const finalProdId = finalProd.id;
-
-      const cp = completedProductList[finalProdId] || {
-        productId: finalProdId,
-        // baseQty: finalProd.quantity,
-        basePrice: finalProd.unitPrice,
-        completedQuantity: '',
-        completedPayment: '',
-      };
-
-      return {
-        ...cp,
-        // baseQty: finalProd.quantity,
-        basePrice: finalProd.unitPrice,
-        completedQuantity: String(cp.completedQuantity),
-        completedPayment: String(cp.completedPayment),
-      };
-    });
-
-    const totals_num = calcTotals(rowArr);
-
-    // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
-    const invoice: TaccountsReceivableInvoiceDto | undefined = invoices[0];
-    const { invoiceDate, invoiceNumber = '' } = invoice ?? {};
-    let { actualPrice = 0, allowance = 0 } = invoice ?? {};
-
-    // 如果是最後的totalPanel，invoices會有多項。未來invoices也可能會有多項
-    if (invoices.length > 1) {
-      const totals = invoices.reduce(
-        (acc, cur) => {
-          acc.actualPrice += cur.actualPrice;
-          acc.allowance += cur.allowance ?? 0;
-
-          return acc;
-        },
-        { actualPrice: 0, allowance: 0 }
-      );
-
-      actualPrice = totals.actualPrice;
-      allowance = totals.allowance;
-    }
-
-    const defaultState: Tstate_period = {
-      id,
-      firstInvoiceId: invoices[0]?.id ?? null,
-      renderCount: 0,
-      rowArr,
-      retainage: String(retainage || ''),
-      deduction: String(deduction || ''),
-      writeOffDeposit: String(writeOffDeposit || ''),
-      price: price || 0,
-      invoiceNumber,
-
-      type,
-      period: period || depositPeriod || 0,
-
-      minusRetainage: isRetainage,
-      minusDeduction: isDeduction,
-      minusWriteOffDeposit: isWriteOffDeposit,
-
-      subTotal: totals_num.subTotal,
-      tax: totals_num.tax,
-      contractTotal: totals_num.contractTotal,
-
-      retainageType: retainageType || 'null',
-      allowance: String(allowance || ''),
-      note: note || '',
-
-      allow_EditDeduction_or_deleteInvoice: !notAllow_EditDeduction_or_deleteInvoice,
-
-      actualPrice: String(actualPrice || ''),
-      invoiceDate: invoiceDate ? moment(invoiceDate) : null,
-    };
-
-    return { defaultState, isNew };
-  }, [data_period, finalProdArr]);
-
+  const { defaultState, isNew } = useDefaultState({
+    data_period,
+    finalProdArr,
+  });
   // --------------------------------------------------------------------------
 
   // region STATE
@@ -1365,6 +1251,144 @@ const calcPrice = (state_period: Tstate_period) => {
 
 // ==========================================================================
 
+// region Hook
+
+const useDefaultState = ({
+  //
+  data_period,
+  finalProdArr,
+}: {
+  data_period: Tperiod_reduce | undefined;
+  finalProdArr: TquotationProductDto[];
+}) => {
+  const { defaultState, isNew } = useMemo(() => {
+    const isNew = !data_period;
+
+    const {
+      //
+      id,
+      type,
+      period,
+      depositPeriod,
+      completedProduct = [],
+      retainage,
+      deduction,
+      writeOffDeposit,
+      isRetainage,
+      isDeduction,
+      isWriteOffDeposit,
+      //
+      retainageType,
+      // allowance,
+      note,
+      //
+      invoices,
+      price,
+      //
+      // invoiceNumber,
+      // price,
+      // accountantList,
+    } = data_period ?? create_emptyPeriod();
+
+    const notAllow_EditDeduction_or_deleteInvoice = invoices.some((invoice) => {
+      return invoice.accountantList.some((al) => {
+        return al.accountsReceivableDeduction.length > 0;
+      });
+    });
+
+    const completedProductList: { [id: string]: TcompletedProductDto } = {};
+    completedProduct?.forEach((cp) => {
+      completedProductList[cp.productId] = cp;
+    });
+
+    const rowArr: Tstate_period['rowArr'] = finalProdArr.map((finalProd) => {
+      const finalProdId = finalProd.id;
+
+      const cp = completedProductList[finalProdId] || {
+        productId: finalProdId,
+        // baseQty: finalProd.quantity,
+        basePrice: finalProd.unitPrice,
+        completedQuantity: '',
+        completedPayment: '',
+      };
+
+      return {
+        ...cp,
+        // baseQty: finalProd.quantity,
+        basePrice: finalProd.unitPrice,
+        completedQuantity: String(cp.completedQuantity),
+        completedPayment: String(cp.completedPayment),
+      };
+    });
+
+    const totals_num = calcTotals(rowArr);
+
+    // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
+    const invoice: TaccountsReceivableInvoiceDto | undefined = invoices[0];
+    const { invoiceDate, invoiceNumber = '' } = invoice ?? {};
+    let { actualPrice = 0, allowance = 0 } = invoice ?? {};
+
+    // 如果是最後的totalPanel，invoices會有多項。未來invoices也可能會有多項
+    if (invoices.length > 1) {
+      const totals = invoices.reduce(
+        (acc, cur) => {
+          acc.actualPrice += cur.actualPrice;
+          acc.allowance += cur.allowance ?? 0;
+
+          return acc;
+        },
+        { actualPrice: 0, allowance: 0 }
+      );
+
+      actualPrice = totals.actualPrice;
+      allowance = totals.allowance;
+    }
+
+    const defaultState: Tstate_period = {
+      id,
+      firstInvoiceId: invoice?.id ?? null,
+      renderCount: 0,
+      rowArr,
+      retainage: String(retainage || ''),
+      deduction: String(deduction || ''),
+      writeOffDeposit: String(writeOffDeposit || ''),
+      price: price || 0,
+      invoiceNumber,
+
+      type,
+      period: period || depositPeriod || 0,
+
+      minusRetainage: isRetainage,
+      minusDeduction: isDeduction,
+      minusWriteOffDeposit: isWriteOffDeposit,
+
+      subTotal: totals_num.subTotal,
+      tax: totals_num.tax,
+      contractTotal: totals_num.contractTotal,
+
+      retainageType: retainageType || 'null',
+      allowance: String(allowance || ''),
+      note: note || '',
+
+      allow_EditDeduction_or_deleteInvoice: !notAllow_EditDeduction_or_deleteInvoice,
+
+      actualPrice: String(actualPrice || ''),
+      invoiceDate: invoiceDate ? moment(invoiceDate) : null,
+      accountantInvoiceBook: invoice?.accountantInvoiceBook ?? null,
+    };
+
+    return { defaultState, isNew };
+  }, [data_period, finalProdArr]);
+
+  return {
+    defaultState,
+    isNew,
+  };
+};
+
+// ==========================================================================
+
+// region Class_OtherNode
 class Class_OtherNode {
   constructor({
     //
