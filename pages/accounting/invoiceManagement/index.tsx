@@ -2,6 +2,7 @@ import { useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 // import { nanoid } from 'nanoid';
 import classNames from 'classnames';
+import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -21,16 +22,21 @@ import {
   useGetAccountReceivableInvoices_all,
   // useGetAccountReceivableInvoices_all_infinite
 } from 'js/api/api_engineering';
+import type { TinvoiceStatus } from 'js/api/dtoTypes';
+import type { Toption } from 'js/utils/options/options';
 
 // css
 import scss from './index.module.scss';
 
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 // =========================================================================
 
 type Tquery = {
-  year: string;
-  month: string;
-  keyword: string;
+  year?: string;
+  month?: string;
+  keyword?: string | undefined;
+  invoiceStatus?: string | undefined;
 };
 
 // ________________________________________________________________________
@@ -47,6 +53,7 @@ type configItem = {
   label: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
+  reducer?: (data: TaccountsReceivableInvoiceDto) => React.ReactNode;
 };
 
 type Tconfig = {
@@ -66,6 +73,7 @@ export default function InvoiceManagement() {
     year = thisYear.toString(),
     month = thisMonth.toString(),
     keyword,
+    invoiceStatus,
   } = query;
 
   // --------------------------------------------------------------------------
@@ -75,30 +83,29 @@ export default function InvoiceManagement() {
       pageSIze: 99999,
       sort: 'invoiceDate',
       filter: {
-        year: {
-          $eq: year,
+        invoiceDate: {
+          $gte: moment(`${year}-${month}`, 'YYYY-MM').startOf('month').toISOString(),
+          $lte: moment(`${year}-${month}`, 'YYYY-MM').endOf('month').toISOString(),
         },
-        month: {
-          $eq: month,
-        },
+
         $or: {
           invoiceNumber: {
             $eq: keyword,
           },
           actualPrice: {
-            $eq: keyword,
+            $eq: isNaN(Number(keyword)) ? undefined : keyword,
           },
           invoiceStatus: {
-            $eq: keyword,
+            $eq: checkInvoiceStatus(invoiceStatus),
           },
         },
       },
     };
-  }, [year, month, keyword]);
+  }, [year, month, keyword, invoiceStatus]);
 
   const { data: data_invoiceArr = [] } = useGetAccountReceivableInvoices_all({
     params,
-    autoUpdate: false,
+    // autoUpdate: false,
   });
 
   // --------------------------------------------------------------------------
@@ -126,17 +133,34 @@ export default function InvoiceManagement() {
   const searchGroup: TsearchGroup = {
     searchTargetList: [
       {
+        options: [
+          {
+            value: '已開立',
+            label: '已開立',
+          },
+          {
+            value: '已作廢',
+            label: '已作廢',
+          },
+        ],
+        defaultValue: invoiceStatus ?? '',
+        placeholder: '發票狀態',
+        width: '100px',
+      },
+      {
         defaultValue: keyword,
         placeholder: '請輸入關鍵字',
         width: '200px',
       },
     ],
     doSearch: (arr) => {
-      const keyword = arr[0] as string;
+      const invoiceStatus = arr[0] as Toption;
+      const keyword = arr[1] as string;
       router.replace({
         query: {
           ...query,
           keyword,
+          invoiceStatus: invoiceStatus.value,
         },
       });
     },
@@ -194,11 +218,17 @@ export default function InvoiceManagement() {
           return (
             <MyRow key={data.id}>
               {keyArr.map((key) => {
-                const { style, className } = config[key];
+                const { style, className, reducer } = config[key];
+
+                let value: React.ReactNode = list[key];
+
+                if (reducer) {
+                  value = reducer(data);
+                }
 
                 return (
                   <Cell key={key} style={style} className={className}>
-                    {list[key]}
+                    {value}
                   </Cell>
                 );
               })}
@@ -259,6 +289,11 @@ const config: Tconfig = {
   invoiceDate: {
     label: '開立日期',
     style: { width: 120 },
+    reducer: (data) => {
+      const invoiceDate = data.invoiceDate;
+
+      return getTaiwanDateStr(invoiceDate);
+    },
   },
   invoiceNumber: {
     label: '發票號碼',
@@ -293,24 +328,11 @@ const config: Tconfig = {
 // endregion CONFIG
 
 // =========================================================================
-// region FAKE
 
-// const fakeInvoiceArr: TaccountsReceivableInvoiceDto[] = Array.from({ length: 100 }, (_, i) => {
-//   const invoiceDate = `2021-09-${i.toString().padStart(2, '0')}`; // 生成日期，從2021-09-01開始
-//   const invoiceNumber = `A${(1001 + i).toString().padStart(4, '0')}`; // 生成發票號碼，從A1001開始
-//   const actualPrice = 1000 + i * 10; // 每個發票的實際價格增加10
-//   const invoiceStatus = i % 2 === 0 ? '已開立' : '已作廢'; // 交替設置發票狀態
+const checkInvoiceStatus = (value: string | undefined) => {
+  const statusArr: TinvoiceStatus[] = ['已開立', '已作廢'];
 
-//   return {
-//     id: nanoid(),
-//     createdAt: '2021-09-01',
-//     updatedAt: '2021-09-01',
-//     invoiceDate,
-//     invoiceNumber,
-//     actualPrice,
-//     invoiceStatus,
-//     note: '備註',
-//     accountsReceivablePeriodId: '1',
-//     allowance: 0,
-//   };
-// });
+  const isPass = statusArr.includes(value as TinvoiceStatus);
+
+  return isPass ? value : undefined;
+};
