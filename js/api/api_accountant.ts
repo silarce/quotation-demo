@@ -341,9 +341,6 @@ export const apiPostAccountantExchangeFrom = async (
 
 // MARK: invoice-book
 
-// accountantInvoiceBookDto
-// get /accountant-invoice-book
-
 const apiGetAccountantInvoiceBook = async (params?: Tparams) => {
   const api = '/accountant-invoice-book';
 
@@ -353,7 +350,7 @@ const apiGetAccountantInvoiceBook = async (params?: Tparams) => {
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetAccountantInvoiceBook = ({
+const useGetAccountantInvoiceBook = ({
   params,
   autoUpdate = true,
   callAlert = true,
@@ -413,7 +410,12 @@ export const useGetAccountantInvoiceBook = ({
   };
 };
 
-export const apiPostAccountantInvoiceBook = async (
+const useGetAccountantInvoiceBook_infinite = createUseInfinite<TpageResponse<TaccountantInvoiceBookDto>>({
+  apiClient: apiGetAccountantInvoiceBook,
+  errTitle: '取得發票本列表失敗',
+});
+
+const apiPostAccountantInvoiceBook = async (
   body: TcreateAccountantInvoiceBookDto,
   { callAlert = true }: { callAlert?: boolean } = {}
 ) => {
@@ -433,7 +435,7 @@ export const apiPostAccountantInvoiceBook = async (
     });
 };
 
-export const apiPatchAccountantInvoiceBook = async (
+const apiPatchAccountantInvoiceBook = async (
   id: string,
   body: TupdateAccountantInvoiceBookDto,
   { callAlert = true }: { callAlert?: boolean } = {}
@@ -454,7 +456,7 @@ export const apiPatchAccountantInvoiceBook = async (
     });
 };
 
-export const deleteAccountantInvoiceBook = async (id: string, { callAlert = true }: { callAlert?: boolean } = {}) => {
+const deleteAccountantInvoiceBook = async (id: string, { callAlert = true }: { callAlert?: boolean } = {}) => {
   const api = `/accountant-invoice-book/${id}`;
 
   return axi
@@ -478,8 +480,13 @@ export {
   apiPatchAccountant,
   deleteAccountant,
   apiPatchAccountant_accountReceivable,
+  apiPostAccountantInvoiceBook,
+  apiPatchAccountantInvoiceBook,
+  deleteAccountantInvoiceBook,
   //
   useGetAccountant_infinite,
   useGetAccountant,
   useGetAccountantPreset,
+  useGetAccountantInvoiceBook,
+  useGetAccountantInvoiceBook_infinite,
 };

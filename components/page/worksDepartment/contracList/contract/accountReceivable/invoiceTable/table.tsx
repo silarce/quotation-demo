@@ -3,10 +3,10 @@ import React, {
   useState,
   useEffect,
   useMemo,
-  memo,
+  // memo,
   forwardRef,
   useImperativeHandle,
-  useCallback,
+  // useCallback,
 } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -14,22 +14,26 @@ import Decimal from 'decimal.js';
 import moment, { Moment } from 'moment';
 
 // antd
-import { Checkbox, Radio, Spin } from 'antd';
+import {
+  Checkbox,
+  Radio,
+  //  Spin
+} from 'antd';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import TopBar from '../ui/topBar';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // css
 import scss from './periodTable.module.scss';
 
 import type {
-  Tparams,
-  TfinalProduct,
-  TaccountsReceivablePeriodDto,
-  TquotationProductItemDto,
+  // Tparams,
+  // TfinalProduct,
+  // TaccountsReceivablePeriodDto,
+  // TquotationProductItemDto,
   TquotationProductDto,
   TcompletedProductDto,
   TretainageType,
@@ -40,11 +44,16 @@ import { Toption } from 'js/utils/options/options';
 import { Tinvoice_reduce as Tperiod_reduce, Tstate_period } from './periodTable';
 
 // api
-import { TinvouceCheckResult, useCheckInvoiceNumber } from 'js/api/api_engineering';
+// import { TinvouceCheckResult, useCheckInvoiceNumber } from 'js/api/api_engineering';
 import { TaccountantInvoiceBookDto, useGetAccountantInvoiceBook } from 'js/api/api_accountant';
 
 // icon
-import { IconEdit, IconCheck01, IconCheck02, IconCross01 } from 'public/image/icon/svgComponent/svgIcons';
+import {
+  IconEdit,
+  //  IconCheck01,
+  IconCheck02,
+  //  IconCross01
+} from 'public/image/icon/svgComponent/svgIcons';
 
 // ==========================================================================
 
@@ -52,7 +61,7 @@ import { IconEdit, IconCheck01, IconCheck02, IconCross01 } from 'public/image/ic
 //   value: string;
 //   label: string;
 // };
-type Tstate_invoiceBood = Toption | null;
+// type Tstate_invoiceBood = Toption | null;
 
 type Tcenter = {
   renderCount?: number; // 判斷是否要rerender用的，來自Tstate_invoice
@@ -71,57 +80,32 @@ type Tcenter = {
     contractTotal: React.ReactNode;
   };
   other: Class_OtherNode;
-  // other: {
-  //   price: React.ReactNode; // 發票金額
-  //   invoiceNumber: string; // 發票號碼
-
-  //   retainage: string; // 保留款
-  //   deduction: string; // 扣款
-  //   writeOffDeposit: string; //沖訂金
-  //   retainage_localeString: string;
-  //   deduction_localeString: string;
-  //   writeOffDeposit_localeString: string;
-  //   minusRetainage: boolean;
-  //   minusDeduction: boolean;
-  //   minusWriteOffDeposit: boolean;
-
-  //   retainageType: string;
-  //   allowance: string;
-  //   note: string;
-
-  //   allowEditDeduction: boolean;
-
-  //   actualPrice: string;
-  //   actualPrice_localeString: string;
-  //   invoiceDate: Moment | null;
-
-  //   onChange_invoiceNumber: (value: string) => void;
-  //   onChange_retainage: (value: string) => void;
-  //   onChange_deduction: (value: string) => void;
-  //   onChange_writeOffDeposit: (value: string) => void;
-
-  //   onChange_minusRetainage: (checked: boolean) => void;
-  //   onChange_minusDeduction: (checked: boolean) => void;
-  //   onChange_minusWriteOffDeposit: (checked: boolean) => void;
-
-  //   onChange_retainageType: (value: TretainageType) => void;
-  //   onChange_allowance: (value: string) => void;
-  //   onChange_note: (value: string) => void;
-
-  //   onChange_acturePrice: (value: string) => void;
-  //   onChange_invoiceDate: (value: Moment | null) => void;
-  // };
 };
 
 type TimperativeHandle_panel = {
   getState: () => Tstate_period;
 };
 
-type TcustomFilter_invoiceBook = NonNullable<
-  NonNullable<Parameters<typeof useGetAccountantInvoiceBook>[0]>['customFilter']
->;
+// type TcustomFilter_invoiceBook = NonNullable<
+//   NonNullable<Parameters<typeof useGetAccountantInvoiceBook>[0]>['customFilter']
+// >;
 
 export type { Tcenter, TimperativeHandle_panel };
+
+// ==========================================================================
+
+const Selector = selectModalCreator_multi<['invoiceBook']>({
+  selectorArr: [
+    {
+      key: 'invoiceBook',
+      caption: '請選擇發票本',
+      limit: 1,
+      forbiddenCheck_dataList: (data) => {
+        return data.isAlreadyDeclare;
+      },
+    },
+  ],
+});
 
 // ==========================================================================
 
@@ -164,6 +148,9 @@ function PeriodPanel_pre(
 
   const [disabled, setDisabled] = useState(!isNew || !!totalsTotal);
   const [state_period, setState_period] = useState<Tstate_period>(defaultState);
+
+  const [showSelector, setShowSelector] = useState(false);
+
   // const [state_invoiceBook, setState_InvoiceBook] = useState<Tstate_invoiceBood>(null);
 
   // const {
@@ -174,51 +161,51 @@ function PeriodPanel_pre(
 
   // --------------------------------------------------------------------------
 
-  const params_invoiceBook = useMemo(() => {
-    //
+  // const params_invoiceBook = useMemo(() => {
+  //   //
 
-    const year = state_period.invoiceDate?.year();
-    const month = (state_period.invoiceDate?.month() ?? -1) + 1;
+  //   const year = state_period.invoiceDate?.year();
+  //   const month = (state_period.invoiceDate?.month() ?? -1) + 1;
 
-    if (!year || month < 1) {
-      return undefined;
-    }
+  //   if (!year || month < 1) {
+  //     return undefined;
+  //   }
 
-    //
-    const params: Tparams = {
-      sort: 'alphabeticLetter',
-      pageSize: 99999,
-      filter: {
-        isAlreadyDeclare: { $eq: false },
-        year: { $eq: year },
-        month: { $eq: month },
-      },
-    };
+  //   //
+  //   const params: Tparams = {
+  //     sort: 'alphabeticLetter',
+  //     pageSize: 99999,
+  //     filter: {
+  //       isAlreadyDeclare: { $eq: false },
+  //       year: { $eq: year },
+  //       month: { $eq: month },
+  //     },
+  //   };
 
-    //
-    return params;
-  }, [state_period.invoiceDate]);
+  //   //
+  //   return params;
+  // }, [state_period.invoiceDate]);
 
-  const customFilter_invoiceBook: TcustomFilter_invoiceBook = useCallback((book) => {
-    const { endNumber, latestInvoiceNumber } = book;
+  // const customFilter_invoiceBook: TcustomFilter_invoiceBook = useCallback((book) => {
+  //   const { endNumber, latestInvoiceNumber } = book;
 
-    if (endNumber === latestInvoiceNumber) {
-      return false;
-    } else {
-      return true;
-    }
-  }, []);
+  //   if (endNumber === latestInvoiceNumber) {
+  //     return false;
+  //   } else {
+  //     return true;
+  //   }
+  // }, []);
 
-  const {
-    //
-    data: data_invoiceBookArr,
-    update: update_invoiceBookArr,
-    clearData: clearData_invoiceBookArr,
-  } = useGetAccountantInvoiceBook({
-    params: params_invoiceBook,
-    autoUpdate: false,
-    customFilter: customFilter_invoiceBook,
-  });
+  // const {
+  //   //
+  //   data: data_invoiceBookArr,
+  //   update: update_invoiceBookArr,
+  //   clearData: clearData_invoiceBookArr,
+  // } = useGetAccountantInvoiceBook({
+  //   params: params_invoiceBook,
+  //   autoUpdate: false,
+  //   customFilter: customFilter_invoiceBook,
+  // });
 
   // --------------------------------------------------------------------------
 
@@ -268,88 +255,6 @@ function PeriodPanel_pre(
       return period;
     });
   };
-
-  // const handle_editInvoiceOther = ({
-  //   key,
-  //   value,
-  // }: {
-  //   key:
-  //     | 'retainage'
-  //     //
-  //     | 'deduction'
-  //     | 'writeOffDeposit'
-  //     | 'invoiceNumber'
-  //     | 'allowance'
-  //     | 'note'
-  //     | 'actualPrice';
-  //   value: string;
-  // }) => {
-  //   setState_period((invoice) => {
-  //     invoice = { ...invoice };
-  //     invoice.renderCount++;
-  //     invoice[key] = value;
-
-  //     if (key === 'retainage' || key === 'deduction' || key === 'writeOffDeposit') {
-  //       invoice.price = calcPrice(invoice);
-  //     }
-
-  //     return invoice;
-  //   });
-  // };
-
-  // const handel_editCalcType = ({
-  //   key,
-  //   chcked,
-  // }: {
-  //   key: 'minusRetainage' | 'minusDeduction' | 'minusWriteOffDeposit';
-  //   chcked: boolean;
-  // }) => {
-  //   setState_period((invoice) => {
-  //     invoice = { ...invoice };
-  //     invoice.renderCount++;
-  //     invoice[key] = chcked;
-  //     invoice.price = calcPrice(invoice);
-
-  //     return invoice;
-  //   });
-  // };
-
-  // const handle_editTetainageType = ({
-  //   //
-  //   value,
-  // }: {
-  //   value: Tstate_period['retainageType'];
-  // }) => {
-  //   setState_period((invoice) => {
-  //     invoice = { ...invoice };
-  //     invoice.renderCount++;
-  //     invoice.retainageType = value;
-
-  //     const { subTotal, contractTotal, retainage, retainageType } = invoice;
-
-  //     if (retainageType === '含稅') {
-  //       invoice.retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
-  //     } else if (retainageType === '未稅') {
-  //       invoice.retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
-  //     } else {
-  //       invoice.retainage = '';
-  //     }
-
-  //     invoice.price = calcPrice(invoice);
-
-  //     return invoice;
-  //   });
-  // };
-
-  // const handle_editInvoiceDate = (value: Moment | null) => {
-  //   setState_period((invoice) => {
-  //     invoice = { ...invoice };
-  //     invoice.renderCount++;
-  //     invoice.invoiceDate = value;
-
-  //     return invoice;
-  //   });
-  // };
 
   const handle_editType = (type: Tperiod_reduce['type']) => {
     setState_period((invoice) => {
@@ -518,70 +423,6 @@ function PeriodPanel_pre(
       // state_invoiceBook,
       // setState_InvoiceBook,
     });
-    // const other: Tcenter['other'] = {
-    //   price: price ? price.toLocaleString() : '',
-    //   invoiceNumber,
-    //   retainage,
-    //   deduction,
-    //   writeOffDeposit,
-
-    //   retainage_localeString: retainage ? Number(retainage).toLocaleString() : '',
-    //   deduction_localeString: deduction ? Number(deduction).toLocaleString() : '',
-    //   writeOffDeposit_localeString: writeOffDeposit ? Number(writeOffDeposit).toLocaleString() : '',
-
-    //   minusRetainage,
-    //   minusDeduction,
-    //   minusWriteOffDeposit,
-
-    //   retainageType,
-    //   allowance,
-    //   note,
-
-    //   allowEditDeduction,
-    //   actualPrice,
-    //   actualPrice_localeString: actualPrice ? Number(actualPrice).toLocaleString() : '',
-    //   invoiceDate,
-
-    //   onChange_invoiceNumber: (value) => {
-    //     handle_editInvoiceOther({ key: 'invoiceNumber', value });
-    //   },
-    //   onChange_retainage: (value) => {
-    //     handle_editInvoiceOther({ key: 'retainage', value });
-    //   },
-    //   onChange_deduction: (value) => {
-    //     handle_editInvoiceOther({ key: 'deduction', value });
-    //   },
-    //   onChange_writeOffDeposit: (value) => {
-    //     handle_editInvoiceOther({ key: 'writeOffDeposit', value });
-    //   },
-    //   onChange_minusRetainage: (checked) => {
-    //     handel_editCalcType({ key: 'minusRetainage', chcked: checked });
-    //   },
-    //   onChange_minusDeduction: (checked) => {
-    //     handel_editCalcType({ key: 'minusDeduction', chcked: checked });
-    //   },
-    //   onChange_minusWriteOffDeposit: (checked) => {
-    //     handel_editCalcType({ key: 'minusWriteOffDeposit', chcked: checked });
-    //   },
-
-    //   onChange_retainageType: (value) => {
-    //     handle_editTetainageType({ value });
-    //   },
-    //   onChange_allowance: (value) => {
-    //     handle_editInvoiceOther({ key: 'allowance', value });
-    //   },
-    //   onChange_note: (value) => {
-    //     handle_editInvoiceOther({ key: 'note', value });
-    //   },
-
-    //   onChange_acturePrice: (value) => {
-    //     handle_editInvoiceOther({ key: 'actualPrice', value });
-    //   },
-
-    //   onChange_invoiceDate: (value) => {
-    //     handle_editInvoiceDate(value);
-    //   },
-    // };
 
     // _______________________________________________________________________
     // _______________________________________________________________________
@@ -604,56 +445,56 @@ function PeriodPanel_pre(
   // _______________________________________________________________________
   // _______________________________________________________________________
 
-  const invoiceBookOptions = useMemo(() => {
-    const options: Toption[] = (data_invoiceBookArr ?? []).map((book) => {
-      return {
-        value: book.id,
-        label: book.alphabeticLetter || '無字軌',
-        invoiceBook: book,
-      };
-    });
+  // const invoiceBookOptions = useMemo(() => {
+  //   const options: Toption[] = (data_invoiceBookArr ?? []).map((book) => {
+  //     return {
+  //       value: book.id,
+  //       label: book.alphabeticLetter || '無字軌',
+  //       invoiceBook: book,
+  //     };
+  //   });
 
-    return options;
-  }, [data_invoiceBookArr]);
+  //   return options;
+  // }, [data_invoiceBookArr]);
 
-  const invoiceNumberOptions = useMemo(() => {
-    if (!data_invoiceBookArr) {
-      return [];
-    }
+  // const invoiceNumberOptions = useMemo(() => {
+  //   if (!data_invoiceBookArr) {
+  //     return [];
+  //   }
 
-    const invoiceBook = data_invoiceBookArr.find((book) => book.id === state_period.invoiceBook?.id);
+  //   const invoiceBook = data_invoiceBookArr.find((book) => book.id === state_period.invoiceBook?.id);
 
-    if (!invoiceBook) {
-      return [];
-    }
+  //   if (!invoiceBook) {
+  //     return [];
+  //   }
 
-    const {
-      alphabeticLetter,
+  //   const {
+  //     alphabeticLetter,
 
-      startNumber,
-      endNumber,
+  //     startNumber,
+  //     endNumber,
 
-      latestInvoiceNumber,
-    } = invoiceBook;
+  //     latestInvoiceNumber,
+  //   } = invoiceBook;
 
-    const startNumber_num = latestInvoiceNumber ? Number(latestInvoiceNumber) + 1 : Number(startNumber);
-    const endNumber_num = Number(endNumber);
+  //   const startNumber_num = latestInvoiceNumber ? Number(latestInvoiceNumber) + 1 : Number(startNumber);
+  //   const endNumber_num = Number(endNumber);
 
-    const options: Toption[] = [];
+  //   const options: Toption[] = [];
 
-    for (let i = startNumber_num; i <= endNumber_num; i++) {
-      const value = String(i).padStart(8, '0');
+  //   for (let i = startNumber_num; i <= endNumber_num; i++) {
+  //     const value = String(i).padStart(8, '0');
 
-      options.push({
-        value: alphabeticLetter + value,
-        label: alphabeticLetter + value,
-      });
-    }
+  //     options.push({
+  //       value: alphabeticLetter + value,
+  //       label: alphabeticLetter + value,
+  //     });
+  //   }
 
-    return options;
+  //   return options;
 
-    //
-  }, [state_period.invoiceBook]);
+  //   //
+  // }, [state_period.invoiceBook]);
 
   // ==============================================================================
   // region  USE EFFECT
@@ -694,15 +535,15 @@ function PeriodPanel_pre(
   //   });
   // }, [state_period.id, isCheckingInvoiceNumber, isInvoiceNumberCheckPass, state_period.invoiceNumber]);
 
-  useEffect(() => {
-    if (isNew) {
-      if (params_invoiceBook) {
-        update_invoiceBookArr();
-      } else {
-        clearData_invoiceBookArr();
-      }
-    }
-  }, [params_invoiceBook]);
+  // useEffect(() => {
+  //   if (isNew) {
+  //     if (params_invoiceBook) {
+  //       update_invoiceBookArr();
+  //     } else {
+  //       clearData_invoiceBookArr();
+  //     }
+  //   }
+  // }, [params_invoiceBook]);
 
   // ==============================================================================
 
@@ -795,10 +636,11 @@ function PeriodPanel_pre(
         // isCheckingInvoiceNumber={isCheckingInvoiceNumber}
         // isInvoiceNumberCheckPass={isInvoiceNumberCheckPass}
         //
-        invoiceBookOptions={invoiceBookOptions}
+        // invoiceBookOptions={invoiceBookOptions}
         // state_invoiceBook={state_invoiceBook}
         // setState_InvoiceBook={setState_InvoiceBook}
-        invoiceNumberOptions={invoiceNumberOptions}
+        // invoiceNumberOptions={invoiceNumberOptions}
+        setShowSelector={setShowSelector}
       />
 
       <div className={classNames(scss.deleteBar, isTotal && 'invisible')}>
@@ -827,6 +669,21 @@ function PeriodPanel_pre(
           </>
         )}
       </div>
+
+      <Selector
+        //
+        showModal={showSelector}
+        onConfirm={([invoiceBookArr]) => {
+          const invoiceBook = invoiceBookArr[0] as TaccountantInvoiceBookDto | undefined;
+
+          if (invoiceBook) {
+            other.invoiceBook = invoiceBook;
+          } else {
+            other.invoiceBook = null;
+          }
+        }}
+        onCancel={() => setShowSelector(false)}
+      />
     </div>
   );
 }
@@ -916,10 +773,11 @@ const Tfoot = ({
   // isCheckingInvoiceNumber,
   // isInvoiceNumberCheckPass,
   //
-  invoiceBookOptions,
+  // invoiceBookOptions,
   // state_invoiceBook,
   // setState_InvoiceBook,
-  invoiceNumberOptions,
+  // invoiceNumberOptions,
+  setShowSelector,
 }: {
   readOnly: boolean;
   node_other: Tcenter['other'];
@@ -929,10 +787,11 @@ const Tfoot = ({
   // isCheckingInvoiceNumber: boolean;
   // isInvoiceNumberCheckPass: TinvouceCheckResult;
   //
-  invoiceBookOptions: Toption[];
+  // invoiceBookOptions: Toption[];
   // state_invoiceBook: Tstate_invoiceBood;
   // setState_InvoiceBook: React.Dispatch<React.SetStateAction<Tstate_invoiceBood>>;
-  invoiceNumberOptions: Toption[];
+  // invoiceNumberOptions: Toption[];
+  setShowSelector: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const {
     invoiceNumber,
@@ -1097,6 +956,31 @@ const Tfoot = ({
       </div>
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
+        <span>發票本</span>
+        <InputSel
+          disabled={readOnly}
+          showBaseline="auto"
+          onClick={() => setShowSelector(true)}
+          inputProps={{
+            props: {
+              value: class_other.invoiceBook?.alphabeticLetter ?? '',
+              readOnly: true,
+            },
+          }}
+          // selectProps={{
+          //   props: {
+          //     value: class_other.invoiceBookOption,
+          //     options: invoiceBookOptions,
+          //     onChange: (option) => {
+          //       const invoiceBook = (option?.invoiceBook || null) as TaccountantInvoiceBookDto | null;
+          //       class_other.invoiceBook = invoiceBook;
+          //     },
+          //   },
+          // }}
+        />
+      </div>
+
+      <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>發票日期</span>
         <InputSel
           disabled={readOnly}
@@ -1106,27 +990,8 @@ const Tfoot = ({
               value: invoiceDate,
               onChange: (date_m) => {
                 class_other.invoiceDate = date_m;
-                class_other.invoiceBook = null;
-                class_other.invoiceNumber = '';
               },
-            },
-          }}
-        />
-      </div>
-
-      <div className={classNames(scss.row, isTotal && 'invisible')}>
-        <span>發票簿</span>
-        <InputSel
-          disabled={readOnly}
-          showBaseline="auto"
-          selectProps={{
-            props: {
-              value: class_other.invoiceBookOption,
-              options: invoiceBookOptions,
-              onChange: (option) => {
-                const invoiceBook = (option?.invoiceBook || null) as TaccountantInvoiceBookDto | null;
-                class_other.invoiceBook = invoiceBook;
-              },
+              disabledDate: (date_m) => class_other.disabledInvoiceDate(date_m),
             },
           }}
         />
@@ -1158,7 +1023,7 @@ const Tfoot = ({
           selectProps={{
             props: {
               value: { label: invoiceNumber, value: invoiceNumber },
-              options: invoiceNumberOptions,
+              options: class_other.invoiceNumberOptions,
               onChange: (option) => {
                 const value = option?.value || '';
                 class_other.invoiceNumber = value;
@@ -1398,7 +1263,7 @@ const useDefaultState = ({
 
 // ==========================================================================
 
-// region Class_OtherNode
+// MARK: Class_OtherNode
 class Class_OtherNode {
   constructor({
     //
@@ -1597,27 +1462,85 @@ class Class_OtherNode {
     this.setState_period((period) => ({
       ...period,
       invoiceBook,
+      invoiceDate: null,
       invoiceNumber: '',
     }));
   }
 
-  get invoiceBookOption() {
-    const invoiceBook = this.state_period.invoiceBook;
+  // get invoiceBookOption() {
+  //   const invoiceBook = this.state_period.invoiceBook;
 
-    if (invoiceBook) {
-      return {
-        value: invoiceBook.id,
-        label: invoiceBook.alphabeticLetter,
-      };
-    } else {
-      return null;
+  //   if (invoiceBook) {
+  //     return {
+  //       value: invoiceBook.id,
+  //       label: invoiceBook.alphabeticLetter,
+  //     };
+  //   } else {
+  //     return null;
+  //   }
+  // }
+
+  get invoiceNumberOptions() {
+    const invoiceBook = this.invoiceBook;
+
+    if (!invoiceBook) {
+      return [];
     }
+
+    const {
+      alphabeticLetter,
+
+      startNumber,
+      endNumber,
+
+      latestInvoiceNumber,
+    } = invoiceBook;
+
+    const startNumber_num = latestInvoiceNumber ? Number(latestInvoiceNumber) + 1 : Number(startNumber);
+    const endNumber_num = Number(endNumber);
+
+    const options: Toption[] = [];
+
+    for (let i = startNumber_num; i <= endNumber_num; i++) {
+      const value = String(i).padStart(8, '0');
+
+      options.push({
+        value: alphabeticLetter + value,
+        label: alphabeticLetter + value,
+      });
+    }
+
+    return options;
   }
 
-  // set invoiceBook(value) {
+  // ------------------------------------------------------------------------------
+  disabledInvoiceDate(currentDate: Moment): boolean {
+    let disabled = true;
 
-  // }
+    if (!this.invoiceBook) {
+      return disabled;
+    }
+
+    const { year, month, latestInvoiceDate } = this.invoiceBook;
+
+    const bookDate = moment(`${year}-${month}`, 'YYYY-MM');
+    const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
+
+    // 檢查是否在同一個年月
+    if (currentDate.isSame(bookDate, 'month')) {
+      if (!latestInvoiceDate) {
+        disabled = false;
+      } else {
+        // 檢查currentDate是否在latestInvoiceDate_m之後
+        disabled = !currentDate.isAfter(latestInvoiceDate_m);
+      }
+    }
+
+    return disabled;
+  }
 } // Class_OtherNode
+
+// MARK: Class_OtherNode
 
 // ===============================================================================
 const create_emptyPeriod = (): Tperiod_reduce => {
