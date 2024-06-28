@@ -1978,3 +1978,60 @@ export const apiPostAccountReceivableAccounts = async (body: TcreateAccountRecei
       return Promise.reject(err);
     });
 };
+
+const apiGetAccountReceivableInvoices_all = async (params?: Tparams) => {
+  const api = '/engineering/account-receivable/invoices';
+
+  return axi
+    .get<TpageResponse<TaccountsReceivableInvoiceDto>>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountReceivableInvoices_all = ({
+  params,
+  autoUpdate = true,
+  callAlert = true,
+}: {
+  params?: Tparams;
+  autoUpdate?: boolean;
+  callAlert?: boolean;
+} = {}) => {
+  const [res, setRes] = useState<TpageResponse<TaccountsReceivableInvoiceDto>>();
+  const [isFetching, setIsFetching] = useState(false);
+
+  const update = useCallback(async () => {
+    setIsFetching(true);
+
+    try {
+      const newRes = await apiGetAccountReceivableInvoices_all(params);
+
+      if (newRes) {
+        setRes(newRes);
+      }
+    } catch (error) {
+      const err = error as Error;
+      callAlert && myAlert.err({ title: '取得發票列表失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
+    }
+  }, [params]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [params]);
+
+  return {
+    data: res?.data,
+    meta: res?.meta,
+    update,
+    isFetching,
+  };
+};
+
+export const useGetAccountReceivableInvoices_all_infinite = createUseInfinite<
+  TpageResponse<TaccountsReceivableInvoiceDto>
+>({
+  apiClient: apiGetAccountReceivableInvoices_all,
+  errTitle: '取得發票列表失敗',
+});

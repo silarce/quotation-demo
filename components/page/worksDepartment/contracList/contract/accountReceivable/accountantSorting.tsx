@@ -167,7 +167,7 @@ export default function AccountantSorting({
 
       total_invoice_d = total_invoice_d.add(price || 0);
 
-      accountantList.forEach((accountant) => {
+      accountantList?.forEach((accountant) => {
         total_accountant_d = total_accountant_d.add(accountant.price || 0);
       });
     });

@@ -24,6 +24,8 @@
 }
 
 .cell {
+  border-color: theme("colors.border");
+
   &:not(.unset) {
     padding: 10px 0;
     white-space: pre-wrap;
@@ -50,5 +52,12 @@
   &.block {
     display: block;
     text-align: center;
+  }
+
+  &.gray {
+    background-color: theme("colors.bgc01");
+  }
+  &.white {
+    background-color: white;
   }
 }

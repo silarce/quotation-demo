@@ -161,6 +161,10 @@ function PeriodPanel_pre(
     } = data_period ?? create_emptyPeriod();
 
     const notAllow_EditDeduction_or_deleteInvoice = invoices.some((invoice) => {
+      if (!invoice.accountantList) {
+        return false;
+      }
+
       return invoice.accountantList.some((al) => {
         return al.accountsReceivableDeduction.length > 0;
       });
