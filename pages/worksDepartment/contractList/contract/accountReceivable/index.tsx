@@ -468,7 +468,7 @@ export default function AccountReceivable() {
   }
 
   return (
-    <SubLayer isLoading_all={isFetching} bodyClassName="snap-y">
+    <SubLayer isLoading_all={isFetching}>
       <PageHeader panelList={[]} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div className={scss.main}>
@@ -484,10 +484,10 @@ export default function AccountReceivable() {
 
         <AccountantDetails className="mt-10 " accountantArr={accountantArr} reqPatchAccountant={reqPatchAccountant} />
 
-        <DeductionDetail className="mt-10 snap-center" periodArr={periodArr} />
+        <DeductionDetail className="mt-10 " periodArr={periodArr} />
 
         <PeriodTable
-          className="mt-10 snap-end"
+          className="mt-10 "
           data_finalProdcut={data_finalProdcut}
           data_period={accountReceivable.periods}
           onAddConfirm={reqAddInvoice}
