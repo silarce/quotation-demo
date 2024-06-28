@@ -24,7 +24,7 @@ import type {
   TupdateAccountantPresetDto,
   TaccountantExchangeFromDto,
   TcreateAccountantExchangeFromDto,
-  accountantInvoiceBookDto,
+  TaccountantInvoiceBookDto,
   TcreateAccountantInvoiceBookDto,
   TupdateAccountantInvoiceBookDto,
 } from './dtoTypes';
@@ -44,7 +44,7 @@ export type {
   TupdateAccountantPresetDto,
   TaccountantExchangeFromDto,
   TcreateAccountantExchangeFromDto,
-  accountantInvoiceBookDto,
+  TaccountantInvoiceBookDto,
   TcreateAccountantInvoiceBookDto,
   TupdateAccountantInvoiceBookDto,
 } from './dtoTypes';
@@ -348,7 +348,7 @@ const apiGetAccountantInvoiceBook = async (params?: Tparams) => {
   const api = '/accountant-invoice-book';
 
   return axi
-    .get<TpageResponse<accountantInvoiceBookDto>>(api, { params })
+    .get<TpageResponse<TaccountantInvoiceBookDto>>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
@@ -362,9 +362,9 @@ export const useGetAccountantInvoiceBook = ({
   params?: Tparams;
   autoUpdate?: boolean;
   callAlert?: boolean;
-  customFilter?: (data: accountantInvoiceBookDto) => boolean;
+  customFilter?: (data: TaccountantInvoiceBookDto) => boolean;
 } = {}) => {
-  const [res, setRes] = useState<TpageResponse<accountantInvoiceBookDto>>();
+  const [res, setRes] = useState<TpageResponse<TaccountantInvoiceBookDto>>();
   const [isFetching, setIsFetching] = useState(false);
 
   const update = useCallback(async () => {
@@ -420,7 +420,7 @@ export const apiPostAccountantInvoiceBook = async (
   const api = '/accountant-invoice-book';
 
   return axi
-    .post<accountantInvoiceBookDto>(api, body)
+    .post<TaccountantInvoiceBookDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => {
       callAlert &&
@@ -441,7 +441,7 @@ export const apiPatchAccountantInvoiceBook = async (
   const api = `/accountant-invoice-book/${id}`;
 
   return axi
-    .patch<accountantInvoiceBookDto>(api, body)
+    .patch<TaccountantInvoiceBookDto>(api, body)
     .then(({ data }) => data)
     .catch((err) => {
       callAlert &&
