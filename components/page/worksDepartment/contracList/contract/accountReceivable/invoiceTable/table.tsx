@@ -1219,6 +1219,7 @@ const Tfoot = ({
               onChange: (date_m) => {
                 onChange_invoiceDate(date_m);
                 setState_InvoiceBook(null);
+                onChange_invoiceNumber('');
               },
             },
           }}
@@ -1236,6 +1237,7 @@ const Tfoot = ({
               options: invoiceBookOptions,
               onChange: (option) => {
                 setState_InvoiceBook(option);
+                onChange_invoiceNumber('');
               },
             },
           }}
@@ -1269,10 +1271,10 @@ const Tfoot = ({
             props: {
               value: { label: invoiceNumber, value: invoiceNumber },
               options: invoiceNumberOptions,
-              // value: invoiceDate,
-              // onChange: (mo) => {
-              //   onChange_invoiceDate(mo);
-              // },
+              onChange: (option) => {
+                const value = option?.value || '';
+                onChange_invoiceNumber(value);
+              },
             },
           }}
         />
