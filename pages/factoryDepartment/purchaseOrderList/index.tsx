@@ -18,8 +18,8 @@ import { AppContext } from 'pages/_app';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
 import { parseJSON } from 'date-fns';
-
-
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 
 
@@ -27,11 +27,13 @@ type Tquery = {
     wareHouseId: string | undefined;
 };
 
-
-
 export default function purchaseOrderList() {
+
+    //路由參數
     const router = useRouter();
     const {
+        firstin,
+        purchaseorderuuid,
         purchaseorderid,
         create_at,
         create_by,
@@ -43,9 +45,20 @@ export default function purchaseOrderList() {
         invoice
     } = router.query;
 
+    const getQueryParam = (param: any) => {
+        if (Array.isArray(param)) {
+            return param[0];
+        }
+        return param;
+    };
 
+    const purchaseorderuuidStr = getQueryParam(purchaseorderuuid);
+
+
+
+    //登入者資料
     const { userInfo } = useContext(AppContext);
-
+    //資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -56,6 +69,12 @@ export default function purchaseOrderList() {
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
 
+    const [totalprice, setTotalPrice] = useState<string>("");
+    const [taxprice, setTaxPrice] = useState<string>("");
+    const [totalpayprice, setTotalPayPrice] = useState<string>("");
+
+    const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(purchaseorderuuidStr as string, 10) : 0);
+    // const [checkfirstin, setCheckFirstIn] = useState<number>(firstin ? parseInt(firstin as string, 10) : 0);
 
     //#region 上方功能列
 
@@ -85,112 +104,6 @@ export default function purchaseOrderList() {
         searchTargetList,
         doSearch,
     };
-
-
-    //新增按鈕
-    const panelList: TpanelList = [
-        { searchGroup },
-        {
-            type: 'addButton',
-            label: '新增採購單',
-            onClick: () => {
-                router.push({
-                    pathname: `/factoryDepartment/addPurchaseOrder`,
-                    query: {
-                        type: 'Tray',
-                    },
-                });
-            },
-        },
-    ];
-
-    //#endregion
-
-
-
-
-    //#region call api
-    //取領料單清單
-    const getPurchaseOrder = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
-                // keyword: "search" as string | undefined,
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            //erpAPI
-            const response = await fetch(`${setting.apipath}GetPurchaseOrder?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            console.log(data);
-
-            setData(data);
-
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        getPurchaseOrder();
-    }, []);
-
-    //取對應的採購明細
-    const getPickingListDetail = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel: {
-                // plid: string | undefined;
-            } = {
-                // plid: plid as string | undefined,
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            //erpAPI
-            const response = await fetch(`${setting.apipath}GetPickingListDetailById?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            let data = await response.json();
-            console.log(data);
-            setData1(data);
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        getPickingListDetail();
-    }, [purchaseorderid]);
-
 
     const searchData = async (keywordWhpname: string, keywordMaterialnumber: string, keywordSpec: string) => {
         try {
@@ -228,8 +141,149 @@ export default function purchaseOrderList() {
     };
 
 
+
+    //新增按鈕
+    const panelList: TpanelList = [
+        { searchGroup },
+        {
+            type: 'addButton',
+            label: '新增採購單',
+            onClick: () => {
+                router.push({
+                    pathname: `/factoryDepartment/addPurchaseOrder`,
+                    query: {
+                        type: 'Tray',
+                    },
+                });
+            },
+        },
+    ];
     //#endregion
+
+    //#region call api
+    //取領料單清單
+    const getPurchaseOrder = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                // keyword: string | undefined;
+            } = {
+                // keyword: "search" as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}GetPurchaseOrder?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setData(data);
+            if (data.length > 0 && checkfirstin === 0) {
+                router.replace({
+                    pathname: `/factoryDepartment/purchaseOrderList`,
+                    query: {
+                        purchaseorderuuid: data[0].purchaseorderuuid,
+                        purchaseorderid: data[0].purchaseorderid,
+                        create_at: getTaiwanDateStr(data[0].create_at),
+                        create_by: data[0].create_by,
+                        receipted: data[0].receipted,
+                        suppliername: data[0].suppliername,
+                        suppliertaxid: data[0].suppliertaxid,
+                        supplieraddress: data[0].supplieraddress,
+                        supplierphone: data[0].supplierphone,
+                        invoice: data[0].invoice,
+                        firstin: 1
+                    }
+                })
+            }
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getPurchaseOrder();
+    }, []);
+
+    //取對應的採購明細
+    const getPurchaseOrderDetail = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                purchaseorderuuid: string | undefined
+            } = {
+                purchaseorderuuid: purchaseorderuuid as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}GetPurchaseOrderDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setData1(data);
+            let totalprice = 0;
+            data.forEach((element: { totalprice: any; }) => {
+                totalprice += element.totalprice;
+            });
+            setTotalPrice(totalprice.toLocaleString());
+            const taxPrice = Math.round(totalprice * 0.05);
+            setTaxPrice(taxPrice.toLocaleString());
+            const totalPayPrice = totalprice + taxPrice;
+            setTotalPayPrice(totalPayPrice.toLocaleString());
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (purchaseorderuuid) {
+            getPurchaseOrderDetail();
+        }
+    }, [purchaseorderuuid]);
+
+
+
+
+    //#endregion
+    // 轉為進貨單，開始驗收
     function gotoReceipt() {
+        myAlert.confirm({
+            title: '確定要轉為進貨單?',
+            content: <>
+                <h1>轉為進貨單後請開始驗收</h1>
+            </>,
+            props: {
+                onOk: () => {
+                    // alert("kkkk");
+                    
+
+                }
+            }
+        });
         // router.push({
         //     pathname: `/factoryDepartment/getMaterial/pickingListDetail`,
         //     query: {
@@ -256,8 +310,6 @@ export default function purchaseOrderList() {
                             {/* <span style={{ fontSize: '25px', fontWeight: 'bolder', color: '#14256a'}}>
                                 採購單
                             </span> */}
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
                             <span style={{ display: receipted === "false" ? "" : "none" }}>
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="進貨" onClick={() => { gotoReceipt() }} />
                             </span>
@@ -265,23 +317,11 @@ export default function purchaseOrderList() {
                                 <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已進貨" onClick={() => { alert("領料托盤") }} />
                             </span>
                         </div>
-                    </div>
-                    <div className={scss.head_main}>
-                        <div>
-
-                            <InputSel
-                                {...inputSelProps}
-                                caption="採購單號"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: purchaseorderid ? purchaseorderid : ' ',
-                                    },
-                                }}
-                            />
-
+                        <div style={{ textAlign: 'right', height: '35.77px' }}>
 
                         </div>
+                    </div>
+                    <div className={scss.head_main}>
                         <div>
                             <InputSel
                                 {...inputSelProps}
@@ -297,7 +337,19 @@ export default function purchaseOrderList() {
                         <div>
                             <InputSel
                                 {...inputSelProps}
-                                caption="採購人員"
+                                caption="採購單號"
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: purchaseorderid ? purchaseorderid : ' ',
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="經辦人員"
                                 disabled={true}
                                 inputProps={{
                                     props: {
@@ -307,7 +359,7 @@ export default function purchaseOrderList() {
                             />
                         </div>
                     </div>
-                    <hr />
+                    {/* <hr /> */}
                     <div className={scss.content_main}>
                         <div>
                             <InputSel
@@ -344,6 +396,28 @@ export default function purchaseOrderList() {
                         <div>
                             <InputSel
                                 {...inputSelProps}
+                                caption="排版用"
+                                disabled={true}
+                                className='invisible'
+                                inputProps={{
+                                    props: {
+                                        value: ' ',
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="排版用"
+                                disabled={true}
+                                className='invisible'
+                                inputProps={{
+                                    props: {
+                                        value: ' ',
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
                                 caption="聯絡電話"
                                 disabled={true}
                                 inputProps={{
@@ -354,6 +428,28 @@ export default function purchaseOrderList() {
                             />
                         </div>
                         <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="排版用"
+                                disabled={true}
+                                className='invisible'
+                                inputProps={{
+                                    props: {
+                                        value: ' ',
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="排版用"
+                                disabled={true}
+                                className='invisible'
+                                inputProps={{
+                                    props: {
+                                        value: ' ',
+                                    },
+                                }}
+                            />
                             <InputSel
                                 {...inputSelProps}
                                 caption="發票號碼"
@@ -369,8 +465,32 @@ export default function purchaseOrderList() {
 
                     <br />
                     <div className={scss.content_main_content}>
-                        <Thead01 type={'PickingDetailList'} />
-                        <Tbody01 type={'PickingDetailList'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                        <Thead01 type={'PurchaseOrderDetail'} />
+                        <Tbody01 type={'PurchaseOrderDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                    </div>
+                    <br />
+                    <div className={scss.foot_main}>
+                        <div>
+                        </div>
+                        <div>
+                        </div>
+                        <div>
+
+                            <table className={scss.count_table}>
+                                <tr>
+                                    <td>小計</td>
+                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice ? totalprice : '0'}</td>
+                                </tr>
+                                <tr>
+                                    <td>營業稅</td>
+                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice ? taxprice : '0'}</td>
+                                </tr>
+                                <tr>
+                                    <td>應付金額</td>
+                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice ? totalpayprice : '0'}</td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -133,20 +133,22 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
 
   async function GetPerchaseOrder(item: any) {
-    console.log(item);
-    console.log(item.taxid)
+    console.log("111");
+    // console.log(item.purchaseorderuuid);
     router.replace({
       pathname: `/factoryDepartment/purchaseOrderList`,
       query: {
+        purchaseorderuuid: item.purchaseorderuuid,
         purchaseorderid: item.purchaseorderid,
         create_at: getTaiwanDateStr(item.create_at),
         create_by: item.create_by,
         receipted: item.receipted,
-        suppliername: item.name,
-        suppliertaxid: item.taxid,
-        supplieraddress:item.address,
-        supplierphone:item.phone,
-        invoice:item.invoice
+        suppliername: item.suppliername,
+        suppliertaxid: item.suppliertaxid,
+        supplieraddress: item.supplieraddress,
+        supplierphone: item.supplierphone,
+        invoice: item.invoice,
+        firstin: 1
       }
     })
   }
@@ -241,7 +243,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.trayname}</span>
                 <span>{_item.length}</span>
                 <span>{_item.width}</span>
-                {/* <span>{getTaiwanDateStr(_item.update_at)}</span> */}
+                <span>{getTaiwanDateStr(_item.update_at)}</span>
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
                 {/* <span style={{ fontSize: '4vmin' }}>{_item.length}X{_item.width}</span> */}
                 <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled, _item.trayid)} /></span>
               </div>
@@ -395,25 +398,23 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         )}
       </div>
     );
-  } else if (type === "PurchaseOrder") {
-    // 領料明細單.開始領料
+  }
+  //#region 採購單
+  else if (type === "PurchaseOrder") {
     return (
       <div>
-        {error && <p>Error: {error}</p>}
+        {error && <p>Error1: {error}</p>}
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader10}>
               <div className={scss.row01}>
                 {/* <span>{index + 1}</span> */}
-                <span>{_item.purchaseorderid}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
-                <span>{_item.create_by}</span>
+                <span>{_item.purchaseorderid}</span>
                 <span>{_item.totalprice.toLocaleString()}</span>
-                <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已進貨</span>
-                <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>採購中</span>
+                <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>未進</span>
+                <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已進</span>
                 <span ><IconDetail onClick={() => { GetPerchaseOrder(_item) }} /></span>
-                {/* <span><IconDetail/></span> */}
-                {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
               </div>
             </CellWithBar>
           ))
@@ -421,6 +422,32 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       </div>
     );
   }
+  //#endregion
+  //#region 採購單明細
+  else if (type === "PurchaseOrderDetail") {
+    return (
+      <div>
+        {error && <p>Error2: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader11}>
+              <div className={scss.row01}>
+                <span>{index + 1}</span>
+                <span>{_item.productid}</span>
+                <span>{_item.name}</span>
+                <span>{_item.spec}</span>
+                <span>{_item.quantity}</span>
+                <span>{_item.unit}</span>
+                <span>{_item.unitprice.toLocaleString()}</span>
+                <span>{_item.totalprice.toLocaleString()}</span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  }
+  //#endregion
 
   return null; // Add default return in case type is not matched
 }

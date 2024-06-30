@@ -16,7 +16,7 @@
 
 .main {
     display: grid;
-    grid-template-columns: 550px 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 450px 1fr; // 左右兩邊比例，可以調整
     gap: 15px;
     width: auto;
     margin-top: 4px;
@@ -27,7 +27,7 @@
 
 .left {
     display: grid;
-    grid-template-columns: 650px;
+    grid-template-columns: 450px;
     justify-content: space-between;
     gap: 15px;
     overflow-x: hidden;
@@ -54,7 +54,7 @@
     right: 0; // 距離視窗右側的距離
     padding-left: 10px;
     // background-color: red;
-    border:2px solid gray;
+    border: 2px solid gray;
 }
 
 
@@ -84,63 +84,25 @@
 
 }
 
-.traytable {
-    width: 100%;
-    max-width: 100%;
-    height: 80px;
-    border-collapse: collapse;
-    table-layout: fixed;
-    border: 1px solid black;
-    margin-bottom: 0px;
-    border: 0px;
+.tite_main {
+    display: grid;
+    grid-template-columns: 1fr 1fr; // 左右兩邊比例，可以調整
+    gap: 15px;
+    width: auto;
+    margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+    // background-color: gray;
 }
-
-.td {
-    height: 60px;
-    border: 1px solid #707070;
-    word-wrap: break-word;
-    text-align: center;
-    margin: 0px;
-}
-
-.childtraytable {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-.childtraytabletr td {
-    border: 1px solid #bbbaba;
-    word-wrap: break-word;
-    text-align: center;
-    background-color: white;
-}
-
-.childtraytabletr td button {
-    width: 100%;
-    height: 40px;
-    word-wrap: break-word;
-    text-align: center;
-    background-color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.childtraytabletr td button:hover {
-    background-color: #ea1833 !important;
-}
-
-
 
 .head_main {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-    gap: 15px;
+    // gap: 15px;
     width: auto;
     margin-top: 5px;
-    // margin-left: 62px;
-    margin-right: 62px;
+    margin-left: 20px;
+    margin-right: 20px;
     // background-color: gray;
 }
 
@@ -162,33 +124,42 @@
     // gap: 15px;
     width: auto;
     margin-top: 0px;
-    // margin-left: 4px;
-    margin-right: 50px;
+    margin-left: 20px;
+    margin-right: 20px;
     // background-color: gray;
 }
 
-.content_main_content{
+.content_main_content {
     display: grid;
     grid-template-columns: 1fr; // 左右兩邊比例，可以調整
     gap: 15px;
     width: auto;
     // margin-top: 4px;
-    margin-left: 4px;
-    margin-right: 15px;
+    margin-left: 20px;
+    margin-right: 20px;
     // background-color: gray;
 }
 
-
-
-
-
-.tite_main {
+.foot_main {
     display: grid;
-    grid-template-columns: 1fr 1fr; // 左右兩邊比例，可以調整
-    gap: 15px;
+    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
     width: auto;
-    margin-top: 5px;
-    // margin-left: 62px;
-    margin-right: 62px;
+    margin-top: 0px;
+    margin-left: 20px;
+    margin-right: 20px;
     // background-color: gray;
+}
+
+.count_table{
+    font-size: 18px;
+    color:#1b2d5a;
+    text-align: right;
+    tr{
+        td{
+            // border: 1px solid gray;
+            text-align: right;
+            width:80px;
+        }
+    }
 }

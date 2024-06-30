@@ -89,36 +89,6 @@ export default function TrayList() {
         },
     ];
 
-    useEffect(() => {
-
-        fetchData();
-
-    }, []);
-
-    const fetchData = async () => {
-        try {
-            setIsLoading(true);
-            const response = await fetch(`${setting.apipath}GetTray?Input=${whid}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            setData(data);
-            await new Promise(resolve => setTimeout(resolve, 50));
-            if (data.length > 0 && checkfirstin > 0) {
-                const firstItem = data[0];
-                const { whid, trayname } = firstItem;
-                fetchData1(whid, trayname);
-                GetLayOut(whid, trayname);
-            }
-
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const searchData = async (keyword: string) => {
         try {
             setIsLoading(true);
@@ -146,6 +116,39 @@ export default function TrayList() {
             setIsLoading(false);
         }
     };
+
+
+   
+
+    const fetchData = async () => {
+        try {
+            setIsLoading(true);
+            const response = await fetch(`${setting.apipath}GetTray?Input=${whid}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setData(data);
+            await new Promise(resolve => setTimeout(resolve, 50));
+            if (data.length > 0 && checkfirstin > 0) {
+                const firstItem = data[0];
+                const { whid, trayname } = firstItem;
+                fetchData1(whid, trayname);
+                GetLayOut(whid, trayname);
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+
+        fetchData();
+
+    }, []);
 
     const fetchData1 = async (whid: any, trayname: any) => {
         try {

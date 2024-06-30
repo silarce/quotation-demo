@@ -16,7 +16,7 @@
 
 .main {
     display: grid;
-    grid-template-columns: 430px 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 700px 1fr; // 左右兩邊比例，可以調整
     gap: 15px;
     width: auto;
     margin-top: 4px;
@@ -27,7 +27,7 @@
 
 .left {
     display: grid;
-    grid-template-columns: 450px; // 左側寬度固定為 350px
+    grid-template-columns: 700px; // 左側寬度固定為 350px
     justify-content: space-between;
     gap: 15px;
     height: 280px;

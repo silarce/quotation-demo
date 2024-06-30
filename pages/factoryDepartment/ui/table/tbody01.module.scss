@@ -69,7 +69,7 @@ div.panelHeader2 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 80px 80px 50px 50px 50px;
+    grid-template-columns: 80px 80px 50px 50px 100px 100px 50px;
     gap: 15px;
     // margin-bottom: 16px;
     // padding-top:20px;
@@ -326,20 +326,18 @@ div.panelHeader9 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 100px 100px 100px 100px ;
+    grid-template-columns: 100px 100px 100px 100px;
     gap: 15px;
     // margin-bottom: 16px;
     // padding-top:20px;
   }
 }
 
-//採購單
+//#region 採購單
 div.panelHeader10 {
-  // padding: 14px 30px;
-  padding-left: 30px;
+  padding-left: 20px;
   border-bottom: solid 1px $colorBorder01;
 
-  //   background-color: rgb(245, 104, 69);
   .row01,
   .row02 {
     span {
@@ -355,9 +353,35 @@ div.panelHeader10 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 100px 80px 80px 80px 60px 80px;
+    grid-template-columns: 80px 100px 80px 40px 60px;
     gap: 15px;
-    // margin-bottom: 16px;
-    // padding-top:20px;
   }
 }
+
+//#endregion
+//#region 採購單
+div.panelHeader11 {
+  padding-left: 20px;
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
+
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 150px 300px 300px 80px 60px 60px 60px 80px;
+    gap: 5px;
+  }
+}
+
+//#endregion
