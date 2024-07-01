@@ -1345,6 +1345,7 @@ export const apiPostAccountReceivableAccountant = async (
   body: {
     accountantId: string[]; // 收款明細Id
     type: TperiodType;
+    incomeBillDate: string;
   },
   {
     callAlert = true,
