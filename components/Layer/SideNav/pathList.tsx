@@ -25,7 +25,7 @@ type TsidePathConfig = {
     otherPermissions?: {
       grade?: number;
     };
-    activeChecker?: (props: { urlQuery: NextRouter['query'] }) => boolean;
+    activeChecker?: (props: { router: NextRouter }) => boolean;
     list?: {
       label: string;
       path: string;
@@ -41,7 +41,7 @@ type TsidePathConfig = {
       exception?: {
         idNumber?: string[];
       };
-      activeChecker?: (props: { urlQuery: NextRouter['query'] }) => boolean;
+      activeChecker?: (props: { router: NextRouter }) => boolean;
     }[];
   }[];
 };
@@ -264,8 +264,8 @@ const sidePathList: TsidePathList = {
                 status: 'Pending',
               },
               erpFeature: [domestic, accountsReceivable],
-              activeChecker: ({ urlQuery }) => {
-                const { status } = urlQuery;
+              activeChecker: ({ router }) => {
+                const { status } = router.query;
 
                 if (status === 'Pending' || status === 'TempPending') {
                   return true;
@@ -457,15 +457,37 @@ const sidePathList: TsidePathList = {
           path: path01 + '/todoList',
           erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
         },
+
         {
-          label: '會計收款管理',
-          path: path01 + '/collection',
-          erpFeature: [worksDepartment, accountsReceivable, worksDepartment_worksheet, worksDepartment_deliveryList],
-        },
-        {
-          label: '收入傳票',
-          path: path01 + '/incomeSummons',
+          label: '收入作業',
           erpFeature: [incomeBill],
+          list: [
+            {
+              label: '會計收款管理',
+              path: path01 + '/collection',
+              erpFeature: [
+                worksDepartment,
+                accountsReceivable,
+                worksDepartment_worksheet,
+                worksDepartment_deliveryList,
+              ],
+            },
+            {
+              label: '收入傳票管理',
+              path: path01 + '/incomeSummons',
+              erpFeature: [incomeBill],
+            },
+            {
+              label: '開立發票管理',
+              path: path01 + '/invoiceIssuanceManagement',
+              erpFeature: [
+                worksDepartment,
+                accountsReceivable,
+                worksDepartment_worksheet,
+                worksDepartment_deliveryList,
+              ],
+            },
+          ],
         },
         // {
         //   label: '新增派工單',
@@ -561,9 +583,55 @@ const sidePathList: TsidePathList = {
       path01,
       list: [
         {
-          label: '收款管理',
-          path: path01 + '/collection',
+          label: '收款作業',
           erpFeature: [accountingDepartment],
+          list: [
+            {
+              label: '收款管理',
+              path: path01 + '/collection',
+              erpFeature: [accountingDepartment],
+              activeChecker: ({ router }) => {
+                if (router.route === '/accounting/collection') {
+                  return true;
+                }
+
+                return false;
+              },
+            },
+            {
+              label: '收款明細表',
+              path: path01 + '/collectionDetailList',
+              erpFeature: [accountingDepartment],
+              activeChecker: ({ router }) => {
+                if (router.route === '/accounting/collectionDetailList') {
+                  return true;
+                }
+
+                return false;
+              },
+            },
+            {
+              label: '票據兌現明細表',
+              path: path01 + '/billCashingDetailList',
+              erpFeature: [accountingDepartment],
+            },
+          ],
+        },
+        {
+          label: '發票作業',
+          erpFeature: [accountingDepartment],
+          list: [
+            {
+              label: '購買發票',
+              path: path01 + '/invoiceBook',
+              erpFeature: [accountingDepartment],
+            },
+            {
+              label: '開立發票管理',
+              path: path01 + '/invoiceManagement',
+              erpFeature: [accountingDepartment],
+            },
+          ],
         },
         // {
         //   label: 'foo',
