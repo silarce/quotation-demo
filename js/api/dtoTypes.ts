@@ -3429,6 +3429,8 @@ export type TincomeBillSerialDto = {
   difference: string | null;
   // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
   isPaperImported: boolean;
+  // 收入傳票歸屬的年月份
+  incomeBillDate: Date | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3451,6 +3453,7 @@ export type TupdateIncomeBillSerialDto = Pick<
 export type TcreateAccountReceivableAccountsDto = {
   type: TperiodType;
   accountantId: string[];
+  incomeBillDate: string;
 };
 
 // MARK: /engineering
