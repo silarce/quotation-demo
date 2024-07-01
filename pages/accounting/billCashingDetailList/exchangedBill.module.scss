@@ -1,0 +1,48 @@
+$infoHeight: 200px;
+
+.main {
+  padding: 0 50px;
+}
+
+.info {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  grid-auto-rows: fit-content(100%);
+  gap: 10px;
+  height: $infoHeight;
+  padding-top: 60px;
+  background-color: white;
+}
+
+.table {
+  border: solid 1px theme("colors.border");
+  border-width: 0 1px 0 1px;
+}
+
+.thead {
+  position: sticky;
+  top: $infoHeight;
+  border-top: solid 1px theme("colors.border");
+}
+.tbodyRow {
+  &:nth-last-of-type(1) {
+    border: 0;
+  }
+}
+
+.bottomRowWrapper {
+  position: sticky;
+  bottom: 0px;
+
+  .totalRow {
+    border: solid 1px theme("colors.border");
+    // border-bottom: 0;
+  }
+
+  .block {
+    height: 20px;
+    background-color: white;
+  }
+}

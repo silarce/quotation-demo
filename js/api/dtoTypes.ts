@@ -21,10 +21,14 @@ export type TdeliveryStatusInstallationItem = '門片' | '馬達' | '支軌';
 export type TinvoiceStatus = '已開立' | '已作廢';
 
 export type TperiodType = '請款' | '訂金';
-export type TaccountantPaymentType = '匯款' | '票據' | '現金';
 export type TretainageType = '含稅' | '未稅';
 
 export type TengineeringContactAttachmentType = 'color' | 'construction' | 'detail' | 'floor' | 'design';
+
+export type TaccountantPaymentType = '匯款' | '票據' | '現金';
+export type TreceiptStatus = '託收' | '已兌現';
+export type Tcurrency = 'TWD 新臺幣' | 'USD 美元';
+export type TinvoiceType = '三聯式' | '二聯式';
 
 // =============================================================================
 export type Tparams = {
@@ -2627,6 +2631,7 @@ export type TpaymentRatioDto = {
   note: string | null;
 };
 
+// 合約審核表
 export type TquotationVerifyFormDto = {
   id: string;
   createdAt: string;
@@ -2712,14 +2717,14 @@ export type TsubmitReviewQotuationContentDto = {
 
 // =========================================================================
 
-// MARK: /engineering
+// region /engineering
 
 // 工程聯絡單
 export type TengineeringContactDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  contractNumber: string;
+  contractNumber: string | null;
 
   /**請款狀態 */
   paymentStatus: string;
@@ -3422,6 +3427,8 @@ export type TincomeBillSerialDto = {
   isForeign: boolean;
   // 差額 // 更新accountant的扣款明細、手續費會更新差額
   difference: string | null;
+  // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
+  isPaperImported: boolean;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3438,11 +3445,25 @@ export type TupdateIncomeBillSerialDto = Pick<
   | 'receivablePayment'
   | 'deductionPayment'
   | 'unpaidPayment'
+  | 'difference'
 >;
 
+export type TcreateAccountReceivableAccountsDto = {
+  type: TperiodType;
+  accountantId: string[];
+};
+
+// MARK: /engineering
+
+// endregion /engineering
+
+// =========================================================================
+// =========================================================================
+// =========================================================================
 // =========================================================================
 // region /accountant
 
+// 公司銀行帳戶資料
 export type TaccountantPresetDto = {
   id: string;
   createdAt: string;
@@ -3621,6 +3642,7 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   invoiceDate: string | null;
   invoiceNumber: string | null;
   actualPrice: number | null;
+  accountantInvoiceBookId: string | null;
 };
 
 export type TupdateAccountReceivablePeriodDto = Partial<TcreateAccountReceivablePeriodDto>;
@@ -3642,13 +3664,16 @@ export type TaccountsReceivableInvoiceDto = {
   // 發票備註
   note: string | null;
   // 關聯收款紀錄
-  accountantList: TaccountantDto[];
+  accountantList?: TaccountantDto[];
   // 所屬應收帳款期數Id
   accountsReceivablePeriodId: string | null;
   // 所屬應收帳款期數
-  accountsReceivablePeriod: TaccountsReceivablePeriodDto;
+  accountsReceivablePeriod?: TaccountsReceivablePeriodDto;
   // 折讓
   allowance: number | null;
+  //
+  accountantInvoiceBookId: string | null;
+  accountantInvoiceBook: TaccountantInvoiceBookDto | null;
 };
 
 //
@@ -3659,28 +3684,55 @@ export type TaccountantDto = {
   createdAt: string;
   updatedAt: string;
 
-  paymentType: TaccountantPaymentType; // 收款類型
-  accountingNumber: string | null; // 存入帳號
-
-  insertDate: string | null; // 匯入日期 // 收款日 // 收票日
-  vendorName: string | null; // 廠商名稱
-
-  price: number; // 金額
-  notes: string | null; // 備註
-  noteNumber: string | null; // 票據號碼
-  fee: number; // 匯費
-
-  billSerialNumber: string | null; // 收入傳票序號
-  noteMaturityDate: string | null; // 票據到期日
-  invoices: TaccountsReceivableInvoiceDto[];
-  //
-  importAccountingNumber: string | null; // 匯入帳號 // 匯款來源帳號
-  order: number; // 排序用的
-  //
+  // 收款類型
+  paymentType: TaccountantPaymentType;
+  // 編號 / 現金存入帳號
+  accountingNumber: string | null;
+  // 匯入帳號 // 匯款來源帳號
+  importAccountingNumber: string | null;
+  // 匯入日期 // 收款日 // 收票日
+  insertDate: string | null;
+  // 廠商名稱
+  vendorName: string | null;
+  // 金額 // 新臺幣
+  price: number;
+  // 備註
+  notes?: string | null;
+  // 票據號碼
+  noteNumber?: string | null;
+  // 手續費
+  fee: number;
+  // 發票
+  invoices?: TaccountsReceivableInvoiceDto[];
+  // 收入傳票序號
+  billSerialNumber?: string | null;
+  // 收入傳票
+  incomeBill: TincomeBillSerialDto;
+  // 票據到期日
+  noteMaturityDate: string | null;
+  // 排序
+  order: number;
   // 扣款明細
   accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  // 已匯入紙本應收帳款(舊的收款紀錄)
+  isImported: boolean;
+  // 票據狀態
+  receiptStatus: TreceiptStatus | null;
+  // 票據託收日
+  receiptCollectionDate: string | null;
+  // 票據預兌日
+  receiptEstimatedDate: string | null;
+  // 匯兌單id
+  exchangeFromId: string | null;
+  // 匯兌單
+  exchangeFrom?: TaccountantExchangeFromDto | null;
+  // 幣別
+  currency: Tcurrency;
+  // 票據實際兌現日
+  receiptCashedDate: string | null;
 
-  isImported: boolean; // 是否已匯入紙本應收帳款
+  exchangeRate: `${number}`; // 匯率
+  currencyValue: `${number}`; // 幣值
 };
 
 export type TcreateAccountantDto = Pick<
@@ -3695,8 +3747,16 @@ export type TcreateAccountantDto = Pick<
   | 'fee'
   | 'importAccountingNumber'
   | 'noteNumber'
+  | 'receiptCollectionDate'
+  | 'receiptEstimatedDate'
+  | 'receiptCashedDate'
+  | 'currency'
+  | 'exchangeRate'
+  | 'currencyValue'
 > & {
   noteMaturityDate?: string | null; // 票據到期日
+  // receiptCollectionDate?: string | null; // 託收日
+  // receiptEstimatedDate?: string | null; // 預兌日
 };
 
 export type TupdateAccountantDto = Partial<
@@ -3777,7 +3837,71 @@ export type TupdateAccountReceivableProductPaymentDto = {
   id?: string; // ID, 不提供時將此筆視為新增資料
 };
 
-// MARK: /accountant end
+export type TaccountantExchangeFromDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 匯兌單號
+  sheetNumber: string;
+  // 兌現日期
+  cashExchangeDate: string | null;
+  // 兌現帳戶
+  cashExchangeAccount: string | null;
+  // 包含的accountant
+  accountant: TaccountantDto[];
+};
+
+export type TcreateAccountantExchangeFromDto = {
+  accountantId: string[];
+};
+
+export type TaccountantInvoiceBookDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 發票本 年分
+  year: string;
+  // 發票本 月分
+  month: string;
+  // 期數
+  period: number;
+  // 發票本名稱(冊)
+  name: string;
+  // 字軌
+  alphabeticLetter: string;
+  // 起始號碼
+  startNumber: string;
+  // 結尾號碼
+  endNumber: string;
+  // 發票類別
+  type: TinvoiceType; // 二聯式/三聯式
+  // 發票本已報稅
+  isAlreadyDeclare: boolean;
+  // 最後一張開立發票號碼
+  latestInvoiceNumber: string | null;
+  // 最後一張開立發票日期
+  latestInvoiceDate: string | null;
+};
+
+export type TcreateAccountantInvoiceBookDto = Pick<
+  TaccountantInvoiceBookDto,
+  'year' | 'month' | 'alphabeticLetter' | 'startNumber' | 'type'
+> & {
+  bookQuantity: number; // 冊數(不紀錄的property);
+  isAlreadyDeclare?: boolean;
+};
+
+export type TupdateAccountantInvoiceBookDto = Pick<
+  TcreateAccountantInvoiceBookDto,
+  'year' | 'month' | 'alphabeticLetter' | 'startNumber' | 'type' | 'isAlreadyDeclare'
+> & {
+  id: string;
+};
+
+// MARK: /accountant_end
+// endregion /accountant
 
 // =========================================================================
 

@@ -7,9 +7,9 @@ $height_thead: 44px;
 }
 
 .tabBar {
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  // position: sticky;
+  // top: 0;
+  // z-index: 1;
   display: flex;
   align-items: flex-end;
   width: 100%;
@@ -35,15 +35,21 @@ $height_thead: 44px;
 }
 
 .table {
+  width: fit-content;
+  max-width: 100%;
+  max-height: 620px;
   border: solid 1px theme("colors.border");
   border-top: 0;
   border-bottom: 0;
+  overflow: auto;
 }
 
 .row {
   display: flex;
   gap: 10px;
+  width: fit-content;
   border-bottom: solid 1px theme("colors.border");
+  background: white;
   > * {
     flex: none;
   }
@@ -55,15 +61,17 @@ $height_thead: 44px;
 
 .newRow {
   position: sticky;
-  top: calc($height_top + $height_thead);
+  // top: calc($height_top + $height_thead);
+  top: calc($height_thead);
   background-color: theme("colors.hoverBgc");
-  z-index: 1;
+  z-index: 2;
 }
 
 .thead {
   position: sticky;
-  top: $height_top;
-  z-index: 1;
+  // top: $height_top;
+  top: 0;
+  z-index: 2;
   height: $height_thead;
   background-color: theme("colors.bgc01");
   border-top: solid 1px theme("colors.border");
@@ -89,7 +97,10 @@ $height_thead: 44px;
 
 .totalPriceWrapper {
   position: sticky;
-  bottom: 20px;
+  // bottom: 20px;
+  z-index: 1;
+  left: 0;
+  bottom: 0px;
   padding: 10px;
   text-align: center;
   background-color: #fff;
@@ -112,10 +123,18 @@ $height_thead: 44px;
   bottom: 0px;
   width: 100%;
   height: 20px;
-  background-color: white;
-  z-index: 1;
+  // background-color: white;
+  background-color: pink;
+  z-index: 2;
 }
 
 .cell_span {
   text-align: center;
+}
+
+.stickyLeft {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background-color: inherit;
 }
