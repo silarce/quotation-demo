@@ -20,7 +20,10 @@ import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModa
 import { parseJSON } from 'date-fns';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import icon_edit from 'public/image/icon/edit.svg';
+import icon_save from 'public/image/icon/fc_save.svg';
+import icon_cancel from 'public/image/icon/fc_cancel.svg';
 
 
 type Tquery = {
@@ -77,6 +80,7 @@ export default function ProdReceiptList() {
     // const [receiptedin, setReceiptedin] = useState<string>("");
     const [inspectedin, setInspectedin] = useState<string>("");
     const [prodreceiptidin, setProdreceiptidin] = useState<string>("");
+    const [prodreceiptuuidin, setProdreceiptuuidin] = useState<string>("");
     const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
     const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
     const [purchaseordercreate_atin, setPurchaseordercreate_atin] = useState<string>("");
@@ -181,7 +185,7 @@ export default function ProdReceiptList() {
 
     //#region call api
     //取領料單清單
-    const getPurchaseOrder = async () => {
+    const getProdReceipt = async () => {
         try {
             // alert(checkfirstin);
             setIsLoading(true);
@@ -207,20 +211,23 @@ export default function ProdReceiptList() {
             }
             const data = await response.json();
             setData(data);
+            console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
+
                 // console.log(data[0].receipted);
-                // getPurchaseOrderDetail(data[0].purchaseorderuuid);
-                // setCreate_atin(data[0].create_at);
-                // setPurchaseorderuuidin(data[0].purchaseorderuuid);
-                // setPurchaseorderidin(data[0].purchaseorderid);
-                // setCreate_byin(data[0].create_by);
-                // setSuppliernamein(data[0].suppliername);
-                // setSuppliertaxidin(data[0].suppliertaxid);
-                // setReceiptedin(data[0].receipted.toString());
-                // setSupplieraddressin(data[0].supplieraddress);
-                // setPurchaseordercreate_atin(data[0].purchaseordercreate_at);
+                getProdReceiptDetail(data[0].prodreceiptuuid);
+                setCreate_atin(data[0].create_at);
+                setPurchaseorderuuidin(data[0].purchaseorderuuid);
+                setPurchaseorderidin(data[0].purchaseorderid);
+                setCreate_byin(data[0].create_by);
+                setSuppliernamein(data[0].suppliername);
+                setSuppliertaxidin(data[0].suppliertaxid);
+                setSupplieraddressin(data[0].supplieraddress);
+                setPurchaseordercreate_atin(data[0].purchaseordercreate_at);
                 setProdreceiptidin(data[0].prodreceiptid);
+                setProdreceiptuuidin(data[0].prodreceiptuuid);
+                setInspectedin(data[0].inspected.toString());
             }
         } catch (error: any) {
             setError(error.message);
@@ -231,17 +238,17 @@ export default function ProdReceiptList() {
     };
 
     useEffect(() => {
-        getPurchaseOrder();
+        getProdReceipt();
     }, []);
 
     //取對應的採購明細
-    const getPurchaseOrderDetail = async (purchaseorderuuid: any) => {
+    const getProdReceiptDetail = async (prodreceiptuuid: any) => {
         try {
             setIsLoading(true);
             const conditionModel: {
-                purchaseorderuuid: string | undefined
+                prodreceiptuuid: string | undefined
             } = {
-                purchaseorderuuid: purchaseorderuuid as string | undefined,
+                prodreceiptuuid: prodreceiptuuid as string | undefined,
             };
 
 
@@ -253,7 +260,7 @@ export default function ProdReceiptList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetPurchaseOrderDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetProdReceiptDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -279,7 +286,7 @@ export default function ProdReceiptList() {
     // 確保 getPurchaseOrderDetail 的 useEffect 中的依賴項設置正確
     useEffect(() => {
         if (purchaseorderid) {
-            getPurchaseOrderDetail(purchaseorderuuid);
+            getProdReceiptDetail(prodreceiptuuid);
             setPurchaseorderidin(purchaseorderid as string);
             setPurchaseorderuuidin(purchaseorderuuid as string);
             setCreate_atin(create_at as string);
@@ -290,12 +297,13 @@ export default function ProdReceiptList() {
             setSupplieraddressin(supplieraddress as string);
             setPurchaseordercreate_atin(purchaseordercreate_at as string);
             setProdreceiptidin(prodreceiptid as string);
+            setProdreceiptuuidin(prodreceiptuuid as string);
         }
-    }, [purchaseorderid]);
+    }, [prodreceiptid]);
 
 
 
-    //取對應的採購明細
+
     const TransferPurchaseOrderToProductReceipt = async () => {
         try {
             setIsLoading(true);
@@ -319,9 +327,9 @@ export default function ProdReceiptList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            getPurchaseOrder();
+            getProdReceipt();
 
-            getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+            getProdReceiptDetail(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -555,7 +563,44 @@ export default function ProdReceiptList() {
                     <br />
                     <div className={scss.content_main_content}>
                         <Thead01 type={'PurchaseOrderDetail'} />
-                        <Tbody01 type={'PurchaseOrderDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                        {/* <Tbody01 type={'PurchaseOrderDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                        {data1.map((_item: any, index: number) => (
+                            <CellWithBar key={index} className={scss.panelHeader13}>
+                                <div className={scss.row01}>
+                                    <span>{index + 1}</span>
+                                    <span>{_item.productid}</span>
+                                    <span>{_item.name}</span>
+                                    <span>{_item.spec}</span>
+                                    <span>{_item.quantity}</span>
+                                    <span>{_item.unit}</span>
+                                    {/* <span>{_item.unitprice.toLocaleString()}</span> */}
+                                    <span>
+                                        <InputSel
+                                            {...inputSelProps}
+                                            disabled={false}
+                                            inputProps={{
+                                                props: {
+                                                    value: _item.unitprice,
+                                                },
+                                            }}
+                                        />
+
+                                    </span>
+                                    <span>{_item.totalprice.toLocaleString()}</span>
+                                    <span>
+                                        <button>
+                                            <img src={icon_edit.src} alt="Arrow Down" style={{ width: '30px', height: '20px' }} />
+                                        </button>
+                                        <button>
+                                            <img src={icon_save.src} alt="Arrow Down" style={{ width: '30px', height: '20px' }} />
+                                        </button>
+                                        <button>
+                                            <img src={icon_cancel.src} alt="Arrow Down" style={{ width: '30px', height: '20px' }} />
+                                        </button>
+                                    </span>
+                                </div>
+                            </CellWithBar>
+                        ))}
                     </div>
                     <br />
                     <div className={scss.foot_main}>

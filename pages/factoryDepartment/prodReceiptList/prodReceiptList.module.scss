@@ -1,3 +1,4 @@
+@use "styles/theme01" as *;
 .top {
     @extend .grid;
 
@@ -166,3 +167,31 @@
         }
     }
 }
+
+
+//#region 進貨單明細
+div.panelHeader13 {
+    padding-left: 20px;
+    border-bottom: solid 1px $colorBorder01;
+  
+    .row01,
+    .row02 {
+      span {
+        font-weight: 400;
+        font-size: 16px;
+      }
+  
+      .clientName,
+      .country {
+        color: $colorMain;
+      }
+    }
+  
+    .row01 {
+      display: grid;
+      grid-template-columns: 30px 150px 300px 300px 80px 40px 60px 60px 60px;
+      gap: 5px;
+    }
+  }
+  
+  //#endregion

@@ -468,7 +468,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     );
   }
   //#endregion
-   //#region 採購單
+   //#region 進貨單
    else if (type === "ProdReceipt") {
     return (
       <div>

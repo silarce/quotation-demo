@@ -20,6 +20,7 @@ import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModa
 import { parseJSON } from 'date-fns';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 
 
@@ -201,6 +202,7 @@ export default function purchaseOrderList() {
             }
             const data = await response.json();
             setData(data);
+            console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
                 console.log(data[0].receipted);
@@ -251,6 +253,7 @@ export default function purchaseOrderList() {
             }
             const data = await response.json();
             setData1(data);
+            console.log(data);
             let totalprice = 0;
             data.forEach((element: { totalprice: any; }) => {
                 totalprice += element.totalprice;
@@ -562,7 +565,7 @@ export default function purchaseOrderList() {
                     </div>
                 </div>
             </div>
-        </SubLayer>
+        </SubLayer >
 
     )
 
