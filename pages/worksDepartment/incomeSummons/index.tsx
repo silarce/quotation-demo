@@ -81,7 +81,7 @@ export default function IncomeSummons() {
         isForeign: {
           $eq: isForeign === 'true',
         },
-        receiveDate: {
+        incomeBillDate: {
           $gte: moment(`${year}-${month}`).startOf('month').toISOString(),
           $lte: moment(`${year}-${month}`).endOf('month').toISOString(),
         },
@@ -441,7 +441,11 @@ const reducer_input = ({ disabled, value }: { disabled: boolean; value: string |
 
 // MARK: config
 
-type TconfigKey = keyof Omit<TincomeBillSerialDto, 'id' | 'createdAt' | 'updatedAt' | 'isForeign' | 'isPaperImported'>;
+type TconfigKey = keyof Omit<
+  TincomeBillSerialDto,
+  //
+  'id' | 'createdAt' | 'updatedAt' | 'isForeign' | 'isPaperImported' | 'incomeBillDate'
+>;
 
 type TconfigItem = {
   label: string;
