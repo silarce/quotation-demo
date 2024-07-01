@@ -1,11 +1,9 @@
 // 設計圖
 // https://www.figma.com/design/9Gix0Odt4g7ahSOQMysmVh/%E4%B8%89%E4%B9%85?node-id=1282-40444&t=bXAfdnwklJLF2pZu-0
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, createContext } from 'react';
 import { useRouter } from 'next/router';
-import classNames from 'classnames';
 import _ from 'lodash';
-import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -85,11 +83,38 @@ import {
   apiPatchAccountant_accountReceivable,
 } from 'js/api/api_accountant';
 
-import type { TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
+import type { TcustomerDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
 
 // css
 import scss from './index.module.scss';
 import { AxiosError } from 'axios';
+
+// ========================================================================
+
+type TaccountReceivableContext = {
+  customer: TcustomerDto | undefined;
+};
+
+// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
+// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
+// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
+// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
+// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
+// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
+// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
+// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
+// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
+// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
+// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
+// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
+// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
+// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
+// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
+// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
+
+// ========================================================================
+
+export const AccountReceivableContext = createContext<TaccountReceivableContext>(null!);
 
 // ========================================================================
 
@@ -233,6 +258,10 @@ export default function AccountReceivable() {
       actualPrice, // 發票實際金額
 
       invoiceBook: accountantInvoiceBook,
+      //
+      nameOfBusinessEntity,
+      businessIdNumber,
+      isOriginalCustomer,
     } = state_invoice;
 
     if (accountantInvoiceBook || actualPrice) {
@@ -272,6 +301,10 @@ export default function AccountReceivable() {
       invoiceNumber: invoiceNumber || null,
       actualPrice: actualPrice ? Number(actualPrice) : null,
       accountantInvoiceBookId: accountantInvoiceBook?.id || null,
+
+      nameOfBusinessEntity: nameOfBusinessEntity || null,
+      businessIdNumber: businessIdNumber || null,
+      isOriginalCustomer,
     };
 
     try {

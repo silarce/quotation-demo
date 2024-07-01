@@ -17,6 +17,7 @@ import moment, { Moment } from 'moment';
 import {
   Checkbox,
   Radio,
+  Popover,
   //  Spin
 } from 'antd';
 
@@ -52,8 +53,10 @@ import {
   IconEdit,
   //  IconCheck01,
   IconCheck02,
+  Icon_info,
   //  IconCross01
 } from 'public/image/icon/svgComponent/svgIcons';
+import { spawn } from 'child_process';
 
 // ==========================================================================
 
@@ -742,19 +745,23 @@ const Thead = ({ caption, children }: { caption?: React.ReactNode; children: Rea
 const Tbody = ({
   children,
   totals: { subTotal, tax, contractTotal },
+  isConrtract,
 }: {
   children: React.ReactNode;
   totals: Tcenter['totals'];
+  isConrtract?: boolean;
 }) => {
   return (
     <div className={scss.tbody}>
       <div>{children}</div>
       <div className={classNames(scss.totals)}>
-        <span>合約合計</span>
+        <span>{isConrtract ? '合約合計' : '本期合計'}</span>
         <span>{subTotal}</span>
         <span>營業稅5%</span>
         <span>{tax}</span>
-        <span>合約總計</span>
+        <span>
+          <span>{isConrtract ? '合約總計' : '本期總計'}</span>
+        </span>
         <span>{contractTotal}</span>
       </div>
     </div>
@@ -940,8 +947,29 @@ const Tfoot = ({
       </div>
 
       <div className={classNames(scss.row)}>
-        <span>發票金額</span>
+        <div className={scss.totalInfoWrapper}>
+          <Popover trigger="hover" title="計算方式" content={<span>金額總計 = 本期總計 - 保留款 - 扣款 - 冲訂金</span>}>
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          金額總計
+        </div>
         <span>{price}</span>
+      </div>
+
+      <div className={classNames(scss.row)}>
+        {/* isOriginalCustomer為true，此筆請款視為額外收入 */}
+        <span>額外收入</span>
+        <div className="m-auto ml-0 relative top-[-3px]">
+          <Checkbox
+            disabled={readOnly}
+            checked={class_other.isOriginalCustomer}
+            onChange={(e) => {
+              class_other.isOriginalCustomer = e.target.checked;
+            }}
+          />
+        </div>
       </div>
 
       <div className={classNames(scss.row)}>
@@ -967,16 +995,6 @@ const Tfoot = ({
               readOnly: true,
             },
           }}
-          // selectProps={{
-          //   props: {
-          //     value: class_other.invoiceBookOption,
-          //     options: invoiceBookOptions,
-          //     onChange: (option) => {
-          //       const invoiceBook = (option?.invoiceBook || null) as TaccountantInvoiceBookDto | null;
-          //       class_other.invoiceBook = invoiceBook;
-          //     },
-          //   },
-          // }}
         />
       </div>
 
@@ -999,23 +1017,8 @@ const Tfoot = ({
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
         <div className={scss.invoiceNumberSpinWrapper}>
-          {/* <div className={classNames(!showInvoiceNumberCheck && 'invisible')}>
-            {isCheckingInvoiceNumber && <Spin />}
-            {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass === 'pass' && (
-              <IconCheck01 className={classNames(scss.checkIcon, scss.check)} />
-            )}
-            {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass !== 'pass' && (
-              <IconCross01 className={classNames(scss.checkIcon, scss.cross)} />
-            )}
-          </div> */}
           <span>發票號碼</span>
         </div>
-        {/* <input
-          className={classNames(readOnly && scss.readyOnly)}
-          value={invoiceNumber}
-          onChange={(e) => onChange_invoiceNumber(e.target.value)}
-          readOnly={readOnly}
-        /> */}
 
         <InputSel
           disabled={readOnly}
@@ -1030,6 +1033,26 @@ const Tfoot = ({
               },
             },
           }}
+        />
+      </div>
+
+      <div className={classNames(scss.row)}>
+        <span>發票買受人</span>
+        <input
+          className={classNames(readOnly && scss.readyOnly)}
+          value={class_other.nameOfBusinessEntity}
+          onChange={(e) => (class_other.nameOfBusinessEntity = e.target.value)}
+          readOnly={readOnly}
+        />
+      </div>
+
+      <div className={classNames(scss.row)}>
+        <span>發票統一編號</span>
+        <input
+          className={classNames(readOnly && scss.readyOnly)}
+          value={class_other.businessIdNumber}
+          onChange={(e) => (class_other.businessIdNumber = e.target.value)}
+          readOnly={readOnly}
         />
       </div>
 
@@ -1200,7 +1223,13 @@ const useDefaultState = ({
 
     // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
     const invoice: TaccountsReceivableInvoiceDto | undefined = invoices[0];
-    const { invoiceDate, invoiceNumber = '' } = invoice ?? {};
+    const {
+      invoiceDate,
+      invoiceNumber = '',
+      nameOfBusinessEntity,
+      businessIdNumber,
+      isOriginalCustomer,
+    } = invoice ?? {};
     let { actualPrice = 0, allowance = 0 } = invoice ?? {};
 
     // 如果是最後的totalPanel，invoices會有多項。未來invoices也可能會有多項
@@ -1250,6 +1279,10 @@ const useDefaultState = ({
       actualPrice: String(actualPrice || ''),
       invoiceDate: invoiceDate ? moment(invoiceDate) : null,
       invoiceBook: invoice?.accountantInvoiceBook ?? null,
+      //
+      nameOfBusinessEntity: nameOfBusinessEntity ?? '',
+      businessIdNumber: businessIdNumber ?? '',
+      isOriginalCustomer,
     };
 
     return { defaultState, isNew };
@@ -1451,6 +1484,40 @@ class Class_OtherNode {
     }));
   }
 
+  get nameOfBusinessEntity() {
+    return this.state_period.nameOfBusinessEntity;
+  }
+
+  set nameOfBusinessEntity(value) {
+    this.setState_period((period) => ({
+      ...period,
+      nameOfBusinessEntity: value,
+    }));
+  }
+
+  get businessIdNumber() {
+    return this.state_period.businessIdNumber;
+  }
+
+  set businessIdNumber(value) {
+    this.setState_period((period) => ({
+      ...period,
+      businessIdNumber: value,
+    }));
+  }
+
+  get isOriginalCustomer() {
+    return this.state_period.isOriginalCustomer;
+  }
+
+  set isOriginalCustomer(bool) {
+    this.setState_period((period) => ({
+      ...period,
+      isOriginalCustomer: bool,
+    }));
+  }
+
+  // --------------------------------------------------------------------------
   get allowEditDeduction() {
     return this.state_period.allow_EditDeduction_or_deleteInvoice;
   }

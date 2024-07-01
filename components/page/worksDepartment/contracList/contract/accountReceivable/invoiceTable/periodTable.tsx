@@ -101,7 +101,10 @@ type Tstate_period = {
   //
 
   invoiceBook: TaccountantInvoiceBookDto | null;
-
+  //
+  nameOfBusinessEntity: string;
+  businessIdNumber: string;
+  isOriginalCustomer: boolean; // 若為true，那這筆請款視為額外收入
   //
 };
 
@@ -471,7 +474,7 @@ const Left = ({
           <span>合約單價</span>
         </div>
       </Thead>
-      <Tbody totals={totals}>
+      <Tbody totals={totals} isConrtract={true}>
         {rowArr.map((row, index) => {
           const { itemName, size, qty, contractPrice } = row;
 
