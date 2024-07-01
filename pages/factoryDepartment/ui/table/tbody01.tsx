@@ -13,6 +13,7 @@ import { IconMap } from 'antd/lib/result';
 import icon_arrowdown from 'public/image/icon/arrow_down_tray.svg';
 import icon_arrowup from 'public/image/icon/arrow_up_tray.svg';
 import icon_arrowchange from 'public/image/icon/arrow_change_tray.svg';
+import { inspect } from 'util';
 
 
 type TBodyItemContent = {};
@@ -133,8 +134,6 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
 
   async function GetPerchaseOrder(item: any) {
-    console.log("111");
-    // console.log(item.purchaseorderuuid);
     router.replace({
       pathname: `/factoryDepartment/purchaseOrderList`,
       query: {
@@ -152,7 +151,28 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       }
     })
   }
-
+  
+  async function GetProdReceipt(item: any) {
+    router.replace({
+      pathname: `/factoryDepartment/prodReceiptList`,
+      query: {
+        prodreceiptuuid:item.prodreceiptuuid,
+        prodreceiptid:item.prodreceiptid,
+        purchaseorderuuid: item.purchaseorderuuid,
+        purchaseorderid: item.purchaseorderid,
+        purchaseordercreate_at: getTaiwanDateStr(item.purchaseordercreate_at),
+        create_at: getTaiwanDateStr(item.create_at),
+        create_by: item.create_by,
+        inspected: item.inspected,
+        suppliername: item.suppliername,
+        suppliertaxid: item.suppliertaxid,
+        supplieraddress: item.supplieraddress,
+        supplierphone: item.supplierphone,
+        invoice: item.invoice,
+        firstin: 1
+      }
+    })
+  }
 
   // 日期格式處理
   function convertToYearMonthDay(datetimetype: string, isoDateString: string | number | Date) {
@@ -440,6 +460,30 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.unit}</span>
                 <span>{_item.unitprice.toLocaleString()}</span>
                 <span>{_item.totalprice.toLocaleString()}</span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  }
+  //#endregion
+   //#region 採購單
+   else if (type === "ProdReceipt") {
+    return (
+      <div>
+        {error && <p>Error1: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader12}>
+              <div className={scss.row01}>
+                {/* <span>{index + 1}</span> */}
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                <span>{_item.prodreceiptid}</span>
+                <span>{_item.totalprice.toLocaleString()}</span>
+                <span style={{ color: '#ea1833', display: `${_item.inspected === false ? "" : "none"}` }}>未轉</span>
+                <span style={{ color: '#14256a', display: `${_item.inspected === true ? "" : "none"}` }}>已轉</span>
+                <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span>
               </div>
             </CellWithBar>
           ))

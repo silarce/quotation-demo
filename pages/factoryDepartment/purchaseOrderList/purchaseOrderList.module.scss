@@ -16,7 +16,7 @@
 
 .main {
     display: grid;
-    grid-template-columns: 450px 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 430px 1fr; // 左右兩邊比例，可以調整
     gap: 15px;
     width: auto;
     margin-top: 4px;
@@ -27,7 +27,7 @@
 
 .left {
     display: grid;
-    grid-template-columns: 450px;
+    grid-template-columns: 430px;
     justify-content: space-between;
     gap: 15px;
     overflow-x: hidden;
@@ -126,6 +126,7 @@
     margin-top: 0px;
     margin-left: 20px;
     margin-right: 20px;
+    
     // background-color: gray;
 }
 
@@ -137,6 +138,7 @@
     // margin-top: 4px;
     margin-left: 20px;
     margin-right: 20px;
+    
     // background-color: gray;
 }
 
@@ -148,6 +150,7 @@
     margin-top: 0px;
     margin-left: 20px;
     margin-right: 20px;
+    padding-right:20px;
     // background-color: gray;
 }
 

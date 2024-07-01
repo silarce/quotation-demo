@@ -602,14 +602,14 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: devPass,
             },
-            {
-              label: '請購管理',
-              path: path01 + '/purchaseRequisitionList',
-              query: {
-                type: 'purchaseRequisitionList',
-              },
-              erpFeature: devPass,
-            },
+            // {
+            //   label: '請購管理',
+            //   path: path01 + '/purchaseRequisitionList',
+            //   query: {
+            //     type: 'purchaseRequisitionList',
+            //   },
+            //   erpFeature: devPass,
+            // },
             {
               label: '採購管理',
               path: path01 + '/purchaseOrderList',

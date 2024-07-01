@@ -69,12 +69,25 @@ export default function purchaseOrderList() {
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
 
+
+
+    const [receiptedin, setReceiptedin] = useState<string>("");
+    const [create_atin, setCreate_atin] = useState<string>("");
+    const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
+    const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
+    const [create_byin, setCreate_byin] = useState<string>("");
+    const [suppliernamein, setSuppliernamein] = useState<string>("");
+    const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
+    const [supplieraddressin, setSupplieraddressin] = useState<string>("");
+
+
     const [totalprice, setTotalPrice] = useState<string>("");
     const [taxprice, setTaxPrice] = useState<string>("");
     const [totalpayprice, setTotalPayPrice] = useState<string>("");
 
-    const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(purchaseorderuuidStr as string, 10) : 0);
-    // const [checkfirstin, setCheckFirstIn] = useState<number>(firstin ? parseInt(firstin as string, 10) : 0);
+    // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
+    const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
+
 
     //#region 上方功能列
 
@@ -164,6 +177,7 @@ export default function purchaseOrderList() {
     //取領料單清單
     const getPurchaseOrder = async () => {
         try {
+            // alert(checkfirstin);
             setIsLoading(true);
             const conditionModel: {
                 // keyword: string | undefined;
@@ -187,23 +201,18 @@ export default function purchaseOrderList() {
             }
             const data = await response.json();
             setData(data);
+            await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
-                router.replace({
-                    pathname: `/factoryDepartment/purchaseOrderList`,
-                    query: {
-                        purchaseorderuuid: data[0].purchaseorderuuid,
-                        purchaseorderid: data[0].purchaseorderid,
-                        create_at: getTaiwanDateStr(data[0].create_at),
-                        create_by: data[0].create_by,
-                        receipted: data[0].receipted,
-                        suppliername: data[0].suppliername,
-                        suppliertaxid: data[0].suppliertaxid,
-                        supplieraddress: data[0].supplieraddress,
-                        supplierphone: data[0].supplierphone,
-                        invoice: data[0].invoice,
-                        firstin: 1
-                    }
-                })
+                console.log(data[0].receipted);
+                getPurchaseOrderDetail(data[0].purchaseorderuuid);
+                setCreate_atin(data[0].create_at);
+                setPurchaseorderuuidin(data[0].purchaseorderuuid);
+                setPurchaseorderidin(data[0].purchaseorderid);
+                setCreate_byin(data[0].create_by);
+                setSuppliernamein(data[0].suppliername);
+                setSuppliertaxidin(data[0].suppliertaxid);
+                setReceiptedin(data[0].receipted.toString());
+                setSupplieraddressin(data[0].supplieraddress);
             }
         } catch (error: any) {
             setError(error.message);
@@ -218,7 +227,7 @@ export default function purchaseOrderList() {
     }, []);
 
     //取對應的採購明細
-    const getPurchaseOrderDetail = async () => {
+    const getPurchaseOrderDetail = async (purchaseorderuuid: any) => {
         try {
             setIsLoading(true);
             const conditionModel: {
@@ -259,11 +268,58 @@ export default function purchaseOrderList() {
         }
     };
 
+    // 確保 getPurchaseOrderDetail 的 useEffect 中的依賴項設置正確
     useEffect(() => {
-        if (purchaseorderuuid) {
-            getPurchaseOrderDetail();
+        if (purchaseorderid) {
+            getPurchaseOrderDetail(purchaseorderuuid);
+            setPurchaseorderidin(purchaseorderid as string);
+            setPurchaseorderuuidin(purchaseorderuuid as string);
+            setCreate_atin(create_at as string);
+            setCreate_byin(create_by as string);
+            setSuppliernamein(suppliername as string);
+            setSuppliertaxidin(suppliertaxid as string);
+            setReceiptedin(receipted as string);
+            setSupplieraddressin(supplieraddress as string);
         }
-    }, [purchaseorderuuid]);
+    }, [purchaseorderid]);
+
+
+
+    //取對應的採購明細
+    const TransferPurchaseOrderToProductReceipt = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                purchaseorderuuid: string | undefined
+            } = {
+                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}TransferPurchaseOrderToProductReceipt?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            getPurchaseOrder();
+
+            getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
 
 
 
@@ -274,12 +330,14 @@ export default function purchaseOrderList() {
         myAlert.confirm({
             title: '確定要轉為進貨單?',
             content: <>
-                <h1>轉為進貨單後請開始驗收</h1>
+                <h1>轉為確認進貨數量與金額後請開始驗收</h1>
             </>,
             props: {
                 onOk: () => {
                     // alert("kkkk");
-                    
+                    TransferPurchaseOrderToProductReceipt();
+
+
 
                 }
             }
@@ -295,7 +353,7 @@ export default function purchaseOrderList() {
 
 
     return (
-        <SubLayer isLoading_subLayer={false}>
+        <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={quotationStatusLookup[status] ?? '採購單'} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
@@ -310,10 +368,10 @@ export default function purchaseOrderList() {
                             {/* <span style={{ fontSize: '25px', fontWeight: 'bolder', color: '#14256a'}}>
                                 採購單
                             </span> */}
-                            <span style={{ display: receipted === "false" ? "" : "none" }}>
+                            <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "false" ? "" : "none" }}>
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="進貨" onClick={() => { gotoReceipt() }} />
                             </span>
-                            <span style={{ display: receipted === "true" ? "" : "none" }}>
+                            <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
                                 <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已進貨" onClick={() => { alert("領料托盤") }} />
                             </span>
                         </div>
@@ -329,19 +387,20 @@ export default function purchaseOrderList() {
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: create_at ? create_at : ' ',
+                                        value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
                                     },
                                 }}
                             />
                         </div>
                         <div>
+                            {/* {purchaseorderid} */}
                             <InputSel
                                 {...inputSelProps}
                                 caption="採購單號"
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: purchaseorderid ? purchaseorderid : ' ',
+                                        value: checkfirstin === 0 ? purchaseorderidin : purchaseorderid,
                                     },
                                 }}
                             />
@@ -353,7 +412,7 @@ export default function purchaseOrderList() {
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: create_by ? create_by : ' ',
+                                        value: checkfirstin === 0 ? create_byin : create_by,
                                     },
                                 }}
                             />
@@ -368,7 +427,7 @@ export default function purchaseOrderList() {
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: suppliername ? suppliername : ' ',
+                                        value: checkfirstin === 0 ? suppliernamein : suppliername,
                                     },
                                 }}
                             />
@@ -378,7 +437,7 @@ export default function purchaseOrderList() {
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: suppliertaxid ? suppliertaxid : ' ',
+                                        value: checkfirstin === 0 ? suppliertaxidin : suppliertaxid,
                                     },
                                 }}
                             />
@@ -388,7 +447,7 @@ export default function purchaseOrderList() {
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: supplieraddress ? supplieraddress : ' ',
+                                        value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
                                     },
                                 }}
                             />
@@ -478,14 +537,23 @@ export default function purchaseOrderList() {
 
                             <table className={scss.count_table}>
                                 <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                     <td>小計</td>
                                     <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice ? totalprice : '0'}</td>
                                 </tr>
                                 <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                     <td>營業稅</td>
                                     <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice ? taxprice : '0'}</td>
                                 </tr>
                                 <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                     <td>應付金額</td>
                                     <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice ? totalpayprice : '0'}</td>
                                 </tr>

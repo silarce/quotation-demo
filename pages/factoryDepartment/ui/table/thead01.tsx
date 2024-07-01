@@ -143,6 +143,18 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單位</span>
         <span>單價</span>
         <span>金額</span>
+      </div>
+    )
+  }
+  //#endregion
+   //#region 採購單
+   else if (type === "ProdReceipt") {
+    return (
+      <div className={style.thead12}>
+        <span>進貨日期</span>
+        <span>採購單號</span>
+        <span>總金額</span>
+        <span>狀態</span>
         <span></span>
       </div>
     )
