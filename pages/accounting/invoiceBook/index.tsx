@@ -36,6 +36,7 @@ import type { TinvoiceType, TcreateAccountantInvoiceBookDto, TupdateAccountantIn
 
 // css
 import scss from './index.module.scss';
+import { NumberFormat } from 'xlsx';
 
 // ------------------------------------------------------------------------
 
@@ -53,7 +54,7 @@ type Tstate = {
   type: string;
   alphabeticLetter: string;
   startNumber: string;
-  readonly endNumber: string;
+  endNumber: string;
   readonly latestInvoiceNumber: string | null;
   //
   mark?: 'delete' | 'new';
@@ -69,7 +70,7 @@ type Thandle_edit = ({
   value,
 }: {
   id: string;
-  key: keyof Pick<Tstate, 'type' | 'alphabeticLetter' | 'startNumber'>;
+  key: keyof Pick<Tstate, 'type' | 'alphabeticLetter' | 'startNumber' | 'endNumber'>;
   value: string;
 }) => void;
 
@@ -82,9 +83,9 @@ type TconfigItem = {
   style?: React.CSSProperties;
   className?: string;
   createInputProps?: (props: {
-    disabled: boolean;
+    disabled?: boolean;
     state: Tstate;
-    // setState: React.Dispatch<React.SetStateAction<Tstate>>;
+    setState: React.Dispatch<React.SetStateAction<TstateList>>;
     handle_edit: Thandle_edit;
   }) => TinputSelProps;
 };
@@ -114,7 +115,7 @@ export default function InvoiceBook() {
   const params: Tparams = useMemo(() => {
     return {
       pageSIze: 99999,
-      sort: 'endNumber',
+      sort: 'alphabeticLetter',
       filter: {
         year: {
           $eq: year,
@@ -179,15 +180,7 @@ export default function InvoiceBook() {
   const create_handle_edit = (isNew?: boolean) => {
     const setState = isNew ? setState_bookList_new : setState_bookList;
 
-    const handle_edit = ({
-      id,
-      key,
-      value,
-    }: {
-      id: string;
-      key: keyof Pick<Tstate, 'type' | 'alphabeticLetter' | 'startNumber'>;
-      value: string;
-    }) => {
+    const handle_edit: Thandle_edit = ({ id, key, value }) => {
       setState((list) => {
         const copy = { ...list };
         const item = copy[id];
@@ -311,11 +304,37 @@ export default function InvoiceBook() {
     }; // callReq
 
     const isStartNumberInvalid =
-      state_bookArr_new.some((item) => !checkStartNumber(item.startNumber)) ||
-      state_bookArr.some((item) => !checkStartNumber(item.startNumber));
+      state_bookArr_new.some((item) => {
+        if (item.mark === 'delete') {
+          return false;
+        } else {
+          return !checkStartNumber(item.startNumber);
+        }
+      }) ||
+      state_bookArr.some((item) => {
+        if (item.mark === 'delete') {
+          return false;
+        } else {
+          return !checkStartNumber(item.startNumber);
+        }
+      });
 
     if (isStartNumberInvalid) {
-      myAlert.info({ title: '起始號碼格式不符' });
+      myAlert.info({ title: '至少一筆資料起始號碼格式不符' });
+
+      return;
+    }
+
+    const intersectedAlphabeticLetter = checkStateListIntersection({
+      ...state_bookList,
+      ...state_bookList_new,
+    });
+
+    if (intersectedAlphabeticLetter) {
+      myAlert.info({
+        title: `發現起始號碼與截止號碼有重疊(未計入要刪除的資料)`,
+        content: `請檢查以下字軌，${intersectedAlphabeticLetter.join(', ')}`,
+      });
 
       return;
     }
@@ -462,6 +481,7 @@ export default function InvoiceBook() {
                   disabled: false,
                   state,
                   handle_edit: handle_edit_new,
+                  setState: setState_bookList_new,
                 });
 
                 return (
@@ -475,25 +495,27 @@ export default function InvoiceBook() {
         })}
 
         {state_bookArr.map((state) => {
-          const { id, mark } = state;
+          const { id, mark, latestInvoiceNumber } = state;
+          const isReadOnly = !!latestInvoiceNumber;
 
           return (
             <Row key={id} fullWidth={true} className={classNames(scss.row, mark === 'delete' && scss.delete)}>
-              <Cell style={config.btnCell.style} className={classNames(disabled && 'invisible')}>
+              <Cell style={config.btnCell.style} className={classNames((disabled || isReadOnly) && 'invisible')}>
                 <IconDelete01 onClick={() => handle_delete(id)} />
               </Cell>
               {keyArr.map((key) => {
                 const { label, style, createInputProps } = config[key];
 
                 const props = createInputProps?.({
-                  disabled: false,
+                  // disabled: false,
                   state,
                   handle_edit,
+                  setState: setState_bookList,
                 });
 
                 return (
                   <Cell key={key} style={style}>
-                    <InputSel disabled={disabled} showBaseline="auto" {...props} />
+                    <InputSel disabled={disabled || isReadOnly} showBaseline="auto" {...props} />
                   </Cell>
                 );
               })}
@@ -519,6 +541,65 @@ const checkStartNumber = (value: string) => {
   return value.length === 8 && /^\d+$/.test(value);
 };
 
+// 檢查多組數字是否有交集
+const checkIntersection = (ranges: [number, number][]): boolean => {
+  // 按起始值對範圍進行排序
+  ranges.sort((a, b) => a[0] - b[0]);
+
+  for (let i = 0; i < ranges.length - 1; i++) {
+    const [start1, end1] = ranges[i];
+    const [start2, end2] = ranges[i + 1];
+
+    // 檢查相鄰範圍是否有交集
+    if (end1 >= start2) {
+      return true; // 發現交集
+    }
+  }
+
+  return false; // 沒有交集
+};
+
+const checkStateListIntersection = (stateList: TstateList) => {
+  //
+  const sortedList = Object.values(stateList).reduce((list, state) => {
+    const { alphabeticLetter, mark } = state;
+
+    if (mark === 'delete') {
+      return list;
+    }
+
+    if (!list[alphabeticLetter]) {
+      list[alphabeticLetter] = [];
+    } else {
+      list[alphabeticLetter].push(state);
+    }
+
+    return list;
+  }, {} as { [id: string]: Tstate[] });
+  //
+
+  const intersectedAlphabeticLetter: string[] = [];
+
+  Object.entries(sortedList).forEach(([key, arr]) => {
+    const ranges: [number, number][] = arr.map((item) => {
+      const start = Number(item.startNumber);
+      const end = Number(item.endNumber);
+
+      return [start, end];
+    });
+
+    const hasIntersection = checkIntersection(ranges);
+
+    if (hasIntersection) {
+      intersectedAlphabeticLetter.push(key);
+    }
+  });
+
+  //
+  return intersectedAlphabeticLetter.length === 0 ? false : intersectedAlphabeticLetter;
+};
+
+// ===================================================================
 // region CONFIG
 
 const keyArr: Tkey[] = ['type', 'alphabeticLetter', 'startNumber', 'endNumber', 'latestInvoiceNumber'];
@@ -585,9 +666,7 @@ const config: Tconfig = {
     ),
     style: { width: 120 },
     createInputProps: ({ state, handle_edit }) => {
-      const value = state.startNumber;
-
-      const isValueValid = checkStartNumber(value);
+      const isValueValid = checkStartNumber(state.startNumber);
 
       return {
         inputProps: {
@@ -596,7 +675,21 @@ const config: Tconfig = {
             placeholder: '數字八碼',
             value: state.startNumber,
             onChange: (e) => {
-              handle_edit({ id: state.id, key: 'startNumber', value: e.target.value });
+              const value = e.target.value;
+
+              const isValueValid = checkStartNumber(value);
+
+              const value_num = Number(value);
+
+              let endNumber = '';
+
+              if (isValueValid) {
+                const endNumber_num = isNaN(value_num) ? '' : value_num + 49;
+                endNumber = endNumber_num.toString().padStart(8, '0');
+              }
+
+              handle_edit({ id: state.id, key: 'startNumber', value });
+              handle_edit({ id: state.id, key: 'endNumber', value: endNumber });
             },
           },
         },
