@@ -386,8 +386,8 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
                 return [...arr];
               });
 
-              delete list[id];
               reRender();
+              delete list[id];
             },
           });
         });
@@ -424,6 +424,13 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
       report.itemList[newItemid] = new Class_reportItem({
         reRender,
         delSelf: () => {
+          setReportItemKeyArr((arr) => {
+            const index = arr.indexOf(newItemid);
+            arr.splice(index, 1);
+
+            return [...arr];
+          });
+
           delete report?.itemList[newItemid];
           reRender();
         },
