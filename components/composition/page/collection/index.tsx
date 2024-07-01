@@ -6,7 +6,10 @@ import Decimal from 'decimal.js';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TpanelList, TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
+
+// component
+import { ExportToIncomeBill } from './exportToIncomeBill';
 
 // gaer
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
@@ -101,8 +104,10 @@ type Tstate_accountant = {
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
 type TreqPatch = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
 // type TreqPatchIsImported = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
-type TreqPatchIsImported = (accountantId: string, type: TperiodType) => Promise<void>;
+type TreqPatchIsImported = (accountantId: string, type: TperiodType, incomeBillDate: string) => Promise<void>;
 type TreqDelete = (id: string) => Promise<void>;
+
+export type { TreqPatchIsImported };
 
 // =============================================================================
 
@@ -267,7 +272,8 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   const reqPatchIsImported = async (
     //
     accountantId: string,
-    type: TperiodType
+    type: TperiodType,
+    incomeBillDate: string
   ) => {
     if (!isWorksDepartment) {
       alert('isWorksDepartment should be false');
@@ -278,6 +284,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     const body: TcreateAccountReceivableAccountsDto = {
       type,
       accountantId: [accountantId],
+      incomeBillDate,
     };
 
     await apiPostAccountReceivableAccounts(body);
@@ -290,7 +297,12 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   };
 
   // 匯入發票
-  const reqPostAccountReceivableAccountant = async (accountReceivableId: string, type: TperiodType) => {
+  const reqPostAccountReceivableAccountant = async (
+    //
+    accountReceivableId: string,
+    type: TperiodType,
+    incomeBillDate: string
+  ) => {
     if (!accountantId) {
       alert('accountantId為undefined');
 
@@ -301,6 +313,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       await apiPostAccountReceivableAccountant(accountReceivableId, {
         accountantId: [accountantId],
         type,
+        incomeBillDate,
       });
       await update_accountant();
     } catch (error) {
@@ -314,10 +327,17 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     modal.update({
       title: '請選擇匯入發票類型',
       content: (
-        <AddInovice
+        // <AddInovice
+        //   onCancel={modal.destroy}
+        //   accountReceivableId={accountReceivableId}
+        //   reqPostAccountReceivableAccountant={reqPostAccountReceivableAccountant}
+        // />
+        <ExportToIncomeBill
+          onRequestPaymentClick={(isoString) =>
+            reqPostAccountReceivableAccountant(accountReceivableId, '請款', isoString)
+          }
+          onDepositClick={(isoString) => reqPostAccountReceivableAccountant(accountReceivableId, '訂金', isoString)}
           onCancel={modal.destroy}
-          accountReceivableId={accountReceivableId}
-          reqPostAccountReceivableAccountant={reqPostAccountReceivableAccountant}
         />
       ),
     });
@@ -394,8 +414,6 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
               className={scss.newRow}
               data_accountant={undefined}
               paymentType={paymentType}
-              //
-              // isReadOnly={isWorksDepartment}
               bankAccountOptionArr={bankAccountOptionArr}
               isWorksDepartment={isWorksDepartment}
             />
@@ -410,7 +428,6 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
                 reqPatch={reqPatch}
                 reqDelete={reqDelete}
                 reqPatchIsImported={reqPatchIsImported}
-                // isReadOnly={isWorksDepartment}
                 setAccountantId={setAccountantId}
                 bankAccountOptionArr={bankAccountOptionArr}
                 isWorksDepartment={isWorksDepartment}
@@ -422,7 +439,6 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
             <span className={scss.totalPrice}>{totalPrice_localString}</span>
           </div>
         </div>
-        {/* <div className={scss.cover_bottom}></div> */}
 
         <ContractSelector
           showModal={!!accountantId}
@@ -737,9 +753,14 @@ const Row = ({
       modal.update({
         title: '匯入紙本應收帳款',
         content: (
-          <MakeIsImported
-            reqPatchIsImported={reqPatchIsImported}
-            accountReceivableId={data_accountant.id}
+          // <MakeIsImported
+          //   reqPatchIsImported={reqPatchIsImported}
+          //   accountReceivableId={data_accountant.id}
+          //   onCancel={modal.destroy}
+          // />
+          <ExportToIncomeBill
+            onRequestPaymentClick={(isoString) => reqPatchIsImported(data_accountant.id, '請款', isoString)}
+            onDepositClick={(isoString) => reqPatchIsImported(data_accountant.id, '訂金', isoString)}
             onCancel={modal.destroy}
           />
         ),
@@ -787,8 +808,6 @@ const Row = ({
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
   // ---------------------------------------------------------------------------
-
-  // region ROW RENDER
 
   return (
     <div className={classNames(scss.row, className)}>
@@ -861,84 +880,84 @@ const Row = ({
   );
 };
 
-const AddInovice = ({
-  reqPostAccountReceivableAccountant,
-  accountReceivableId,
-  onCancel,
-}: {
-  onCancel: () => void;
-  accountReceivableId: string;
-  reqPostAccountReceivableAccountant: (accountReceivableId: string, type: TperiodType) => Promise<void>;
-}) => {
-  const handle_訂金 = async () => {
-    await reqPostAccountReceivableAccountant(accountReceivableId, '訂金');
-    onCancel();
-  };
+// const AddInovice = ({
+//   reqPostAccountReceivableAccountant,
+//   accountReceivableId,
+//   onCancel,
+// }: {
+//   onCancel: () => void;
+//   accountReceivableId: string;
+//   reqPostAccountReceivableAccountant: (accountReceivableId: string, type: TperiodType) => Promise<void>;
+// }) => {
+//   const handle_訂金 = async () => {
+//     await reqPostAccountReceivableAccountant(accountReceivableId, '訂金');
+//     onCancel();
+//   };
 
-  const handle_請款 = async () => {
-    await reqPostAccountReceivableAccountant(accountReceivableId, '請款');
-    onCancel();
-  };
+//   const handle_請款 = async () => {
+//     await reqPostAccountReceivableAccountant(accountReceivableId, '請款');
+//     onCancel();
+//   };
 
-  return (
-    <div>
-      <br />
-      <div className="flex gap-5 mt-10">
-        <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
-          新增請款
-        </MyButton_v2>
+//   return (
+//     <div>
+//       <br />
+//       <div className="flex gap-5 mt-10">
+//         <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
+//           新增請款
+//         </MyButton_v2>
 
-        <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
-          新增訂金
-        </MyButton_v2>
+//         <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
+//           新增訂金
+//         </MyButton_v2>
 
-        <MyButton_v2 theme="danger" px="px22" py="py6" buttonProps={{ htmlType: 'submit' }} onClick={onCancel}>
-          取消
-        </MyButton_v2>
-      </div>
-    </div>
-  );
-};
+//         <MyButton_v2 theme="danger" px="px22" py="py6" buttonProps={{ htmlType: 'submit' }} onClick={onCancel}>
+//           取消
+//         </MyButton_v2>
+//       </div>
+//     </div>
+//   );
+// };
 
-const MakeIsImported = ({
-  reqPatchIsImported,
-  accountReceivableId,
-  onCancel,
-}: {
-  onCancel: () => void;
-  accountReceivableId: string;
-  reqPatchIsImported: TreqPatchIsImported;
-}) => {
-  const handle_訂金 = async () => {
-    await reqPatchIsImported(accountReceivableId, '訂金');
-    onCancel();
-  };
+// const MakeIsImported = ({
+//   reqPatchIsImported,
+//   accountReceivableId,
+//   onCancel,
+// }: {
+//   onCancel: () => void;
+//   accountReceivableId: string;
+//   reqPatchIsImported: TreqPatchIsImported;
+// }) => {
+//   const handle_訂金 = async () => {
+//     await reqPatchIsImported(accountReceivableId, '訂金');
+//     onCancel();
+//   };
 
-  const handle_請款 = async () => {
-    await reqPatchIsImported(accountReceivableId, '請款');
-    onCancel();
-  };
+//   const handle_請款 = async () => {
+//     await reqPatchIsImported(accountReceivableId, '請款');
+//     onCancel();
+//   };
 
-  return (
-    <div>
-      <br />
-      <p>請選擇付款類型</p>
-      <div className="flex gap-5 mt-10">
-        <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
-          請款
-        </MyButton_v2>
+//   return (
+//     <div>
+//       <br />
+//       <p>請選擇付款類型</p>
+//       <div className="flex gap-5 mt-10">
+//         <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
+//           請款
+//         </MyButton_v2>
 
-        <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
-          訂金
-        </MyButton_v2>
+//         <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
+//           訂金
+//         </MyButton_v2>
 
-        <MyButton_v2 theme="danger" px="px22" py="py6" buttonProps={{ htmlType: 'submit' }} onClick={onCancel}>
-          取消
-        </MyButton_v2>
-      </div>
-    </div>
-  );
-};
+//         <MyButton_v2 theme="danger" px="px22" py="py6" buttonProps={{ htmlType: 'submit' }} onClick={onCancel}>
+//           取消
+//         </MyButton_v2>
+//       </div>
+//     </div>
+//   );
+// };
 
 // =========================================================================
 // region: FUNCTION
