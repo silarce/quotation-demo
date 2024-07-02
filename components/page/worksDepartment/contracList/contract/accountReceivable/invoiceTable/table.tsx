@@ -7,6 +7,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
   // useCallback,
+  useContext,
 } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -56,15 +57,10 @@ import {
   Icon_info,
   //  IconCross01
 } from 'public/image/icon/svgComponent/svgIcons';
-import { spawn } from 'child_process';
+
+import { AccountReceivableContext } from 'pages/worksDepartment/contractList/contract/accountReceivable';
 
 // ==========================================================================
-
-// type Tstate_invoiceBood = {
-//   value: string;
-//   label: string;
-// };
-// type Tstate_invoiceBood = Toption | null;
 
 type Tcenter = {
   renderCount?: number; // 判斷是否要rerender用的，來自Tstate_invoice
@@ -646,6 +642,9 @@ function PeriodPanel_pre(
         setShowSelector={setShowSelector}
       />
 
+      {/* <br />
+      <br /> */}
+
       <div className={classNames(scss.deleteBar, isTotal && 'invisible')}>
         {!state_period.allow_EditDeduction_or_deleteInvoice && <p className="text-xl text-main">已連結收款</p>}
         {state_period.allow_EditDeduction_or_deleteInvoice && (
@@ -1038,11 +1037,16 @@ const Tfoot = ({
 
       <div className={classNames(scss.row)}>
         <span>發票買受人</span>
-        <input
-          className={classNames(readOnly && scss.readyOnly)}
-          value={class_other.nameOfBusinessEntity}
-          onChange={(e) => (class_other.nameOfBusinessEntity = e.target.value)}
-          readOnly={readOnly}
+        <InputSel
+          showBaseline="auto"
+          textareaProps={{
+            props: {
+              minRows: 2,
+              value: class_other.nameOfBusinessEntity,
+              onChange: (e) => (class_other.nameOfBusinessEntity = e.target.value),
+              readOnly: readOnly,
+            },
+          }}
         />
       </div>
 
@@ -1159,6 +1163,8 @@ const useDefaultState = ({
   data_period: Tperiod_reduce | undefined;
   finalProdArr: TquotationProductDto[];
 }) => {
+  const { customer } = useContext(AccountReceivableContext);
+
   const { defaultState, isNew } = useMemo(() => {
     const isNew = !data_period;
 
@@ -1280,8 +1286,9 @@ const useDefaultState = ({
       invoiceDate: invoiceDate ? moment(invoiceDate) : null,
       invoiceBook: invoice?.accountantInvoiceBook ?? null,
       //
-      nameOfBusinessEntity: nameOfBusinessEntity ?? '',
-      businessIdNumber: businessIdNumber ?? '',
+
+      nameOfBusinessEntity: (isNew ? customer?.name : nameOfBusinessEntity) ?? '',
+      businessIdNumber: (isNew ? customer?.taxId : businessIdNumber) ?? '',
       isOriginalCustomer,
     };
 

@@ -95,23 +95,6 @@ type TaccountReceivableContext = {
   customer: TcustomerDto | undefined;
 };
 
-// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
-// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
-// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
-// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
-// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
-// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
-// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
-// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
-// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
-// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
-// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
-// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
-// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
-// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
-// CreateAccountReceivablePeriodDto  的 isOriginalCustomer 我想改必填，如果沒有這一期是沒有要新增發票的，就送個true就好
-// 接著做context把customer送下去，nameOfBusinessEntity與businessIdNumber預設為customer的資料
-
 // ========================================================================
 
 export const AccountReceivableContext = createContext<TaccountReceivableContext>(null!);
@@ -139,6 +122,7 @@ export default function AccountReceivable() {
   } = useGetContract_id(contractId, {
     customPopulate: [
       // 'subContracts.content.verifyForm'
+      'content.customer',
       'engineeringContact',
       'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
       'accountReceivable.periods.invoices.accountantInvoiceBook',
@@ -485,6 +469,14 @@ export default function AccountReceivable() {
   }, [contractId]);
 
   // --------------------------------------------------------------------------
+
+  const contextValue = useMemo(() => {
+    return {
+      customer: contract?.content.customer,
+    };
+  }, [contract?.content.customer]);
+
+  // --------------------------------------------------------------------------
   // region RENDER
 
   if (!contract) {
@@ -519,15 +511,17 @@ export default function AccountReceivable() {
 
         <DeductionDetail className="mt-10 " periodArr={periodArr} />
 
-        <PeriodTable
-          className="mt-10 "
-          data_finalProdcut={data_finalProdcut}
-          data_period={accountReceivable.periods}
-          onAddConfirm={reqAddInvoice}
-          reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
-          reqDeleteInvoice={reqDeleteInvoice}
-          reqDeletePeriod={reqDeletePeriod}
-        />
+        <AccountReceivableContext.Provider value={contextValue}>
+          <PeriodTable
+            className="mt-10 "
+            data_finalProdcut={data_finalProdcut}
+            data_period={accountReceivable.periods}
+            onAddConfirm={reqAddInvoice}
+            reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
+            reqDeleteInvoice={reqDeleteInvoice}
+            reqDeletePeriod={reqDeletePeriod}
+          />
+        </AccountReceivableContext.Provider>
       </div>
     </SubLayer>
   );
