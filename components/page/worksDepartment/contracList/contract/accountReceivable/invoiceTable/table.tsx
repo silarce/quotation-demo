@@ -250,6 +250,8 @@ function PeriodPanel_pre(
       period.subTotal = totals_num.subTotal;
       period.tax = totals_num.tax;
       period.contractTotal = totals_num.contractTotal;
+
+      period.retainage = calcRetainage(period);
       period.price = calcPrice(period);
 
       return period;
@@ -867,12 +869,20 @@ const Tfoot = ({
   return (
     <div className={classNames(scss.tfoot)}>
       <div className={classNames(scss.row)}>
-        <span>保留款</span>
+        {/* <span>保留款</span> */}
+        <div className={scss.totalInfoWrapper}>
+          <Popover trigger="hover" content="保留款為含稅或未稅時不可以編輯">
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          保留款
+        </div>
         <input
-          className={classNames(readOnly && scss.readyOnly)}
+          className={classNames((readOnly || class_other.isRetainageLocked) && scss.readyOnly)}
           value={retainage}
           onChange={(e) => (class_other.retainage = e.target.value)}
-          readOnly={readOnly}
+          readOnly={readOnly || class_other.isRetainageLocked}
           type={inputType}
         />
       </div>
@@ -904,14 +914,14 @@ const Tfoot = ({
         <div className={scss.checkBar}>
           <Radio.Group
             disabled={readOnly}
+            value={retainageType}
             onChange={(e) => {
               class_other.retainageType = e.target.value;
             }}
-            value={retainageType}
           >
             <Radio value={'含稅' as TretainageType}>含稅</Radio>
             <Radio value={'未稅' as TretainageType}>未稅</Radio>
-            <Radio value={'null'}>無</Radio>
+            <Radio value={'null'}>自訂</Radio>
           </Radio.Group>
         </div>
       </div>
@@ -1176,7 +1186,18 @@ const calcPrice = (state_period: Tstate_period) => {
     minusRetainage,
     minusDeduction,
     minusWriteOffDeposit,
+    retainageType,
+    contractTotal,
+    subTotal,
   } = period;
+
+  // if (retainageType === '含稅') {
+  //   period.retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
+  // } else if (retainageType === '未稅') {
+  //   period.retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
+  // } else {
+  //   period.retainage = '';
+  // }
 
   const totals_num = calcTotals(period.rowArr);
   let price_d = new Decimal(totals_num.contractTotal);
@@ -1188,6 +1209,22 @@ const calcPrice = (state_period: Tstate_period) => {
   const price = price_d.toNumber();
 
   return price;
+};
+
+const calcRetainage = (state_period: Tstate_period) => {
+  const period = state_period;
+
+  const { subTotal, contractTotal, retainageType } = period;
+
+  let retainage = '';
+
+  if (retainageType === '含稅') {
+    retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
+  } else if (retainageType === '未稅') {
+    retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
+  }
+
+  return retainage;
 };
 
 // ==========================================================================
@@ -1477,16 +1514,7 @@ class Class_OtherNode {
     this.setState_period((period) => {
       period = { ...period };
       period.retainageType = value;
-      const { subTotal, contractTotal, retainage, retainageType } = period;
-
-      if (retainageType === '含稅') {
-        period.retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
-      } else if (retainageType === '未稅') {
-        period.retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
-      } else {
-        period.retainage = '';
-      }
-
+      period.retainage = calcRetainage(period);
       period.price = calcPrice(period);
 
       return period;
@@ -1600,6 +1628,14 @@ class Class_OtherNode {
       return true;
     } else {
       return false;
+    }
+  }
+
+  get isRetainageLocked() {
+    const retainageType = this.state_period.retainageType;
+
+    if (retainageType === '含稅' || retainageType === '未稅') {
+      return true;
     }
   }
 
