@@ -39,7 +39,7 @@ export default function AddChildTray() {
     const [data, setData] = useState<WHPositionModel>([]);
     const [data1, setData1] = useState<WHPositionModel>([]);
     const [data11, setData11] = useState<any[]>([]);
-    const parsedData11 = JSON.parse(data111 as string); // 將 JSON 字符串轉為對象
+    // const parsedData11 = JSON.parse(data111 as string); // 將 JSON 字符串轉為對象
     // const [data12, setData12] = useState<any[]>(data111); // 將 data111 賦值給 data12
     const [error, setError] = useState<string | null>(null); // 將 error 的類型更改為 string | null
     const [traylayout, setTrayLayOut] = useState<any[]>([]);
@@ -53,49 +53,49 @@ export default function AddChildTray() {
     const [isLoading, setIsLoading] = useState(false);
     ;
 
-    const AddLayOut = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                whid: whid as string | undefined,
-                trayname: "",
-                id: "",
-                traylayout: traylayout
-            };
-            console.log("checkmodel: ", conditionModel.traylayout);
-            console.log(parsedData11);
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'test',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
+    // const AddLayOut = async () => {
+    //     try {
+    //         setIsLoading(true);
+    //         const conditionModel = {
+    //             whid: whid as string | undefined,
+    //             trayname: "",
+    //             id: "",
+    //             traylayout: traylayout
+    //         };
+    //         console.log("checkmodel: ", conditionModel.traylayout);
+    //         console.log(parsedData11);
+    //         const inputModel = {
+    //             TypeName: 'ERP',
+    //             ServiceName: 'WareHouseService',
+    //             FunctionName: 'test',
+    //             FilterConditions: JSON.stringify(conditionModel),
+    //         };
 
-            console.log("checkinput: ", inputModel);
+    //         console.log("checkinput: ", inputModel);
 
-            const response = await fetch('https://localhost:44383/WareHouse/AddTray', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(inputModel)
-            });
+    //         const response = await fetch('https://localhost:44383/WareHouse/AddTray', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify(inputModel)
+    //         });
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch data');
+    //         }
 
-            const responseData = await response.json();
-            console.log("checkresponse: ", responseData);
+    //         const responseData = await response.json();
+    //         console.log("checkresponse: ", responseData);
 
-            setData11(responseData);
-        } catch (error: any) {
-            console.error("Error in AddLayOut: ", error);
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    //         setData11(responseData);
+    //     } catch (error: any) {
+    //         console.error("Error in AddLayOut: ", error);
+    //         setError(error.message);
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
 
 
 
@@ -113,7 +113,7 @@ export default function AddChildTray() {
             label: '返回',
             onClick: () => {
                 router.push({
-                    pathname: `/factoryDepartment/trayList`,
+                    pathname: `/factoryDepartment/addTray`,
                     query: {
                         type: 'WareHouse',
                         whid: whid,
@@ -193,7 +193,7 @@ export default function AddChildTray() {
 
 
     useEffect(() => {
-        AddLayOut();
+        // AddLayOut();
     }, [traylayout]);
 
 

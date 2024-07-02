@@ -1,7 +1,7 @@
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import scss from './pickingListDetail.module.scss';
 import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import router from 'next/router';
+import router, { useRouter } from 'next/router';
 import Thead01 from 'pages/factoryDepartment/ui/table/thead01';
 import Tbody01 from 'pages/factoryDepartment/ui/table/tbody01';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -9,8 +9,46 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { WrappedTextarea, inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { quotationStatusLookup } from 'config/lookupTable';
 import { TquotationStatus } from 'js/api/dtoTypes';
+import { useEffect, useState } from 'react';
+import { setting } from '../../wareHouseList';
 
 export default function PickingListDetail() {
+    const router = useRouter();
+    const {
+        plid,
+        materialnumber,
+        quantity
+    } = router.query;
+
+    //loading
+    const [isLoading, setIsLoading] = useState(false);
+
+    // data
+    const [data, setData] = useState<any[]>([]);
+    const [data1, setData1] = useState<any[]>([]);
+    const [data2, setData2] = useState<any[]>([]);
+
+
+    //錯誤訊息 其實可以不用管了
+    const [error, setError] = useState<string | null>(null);
+
+
+
+    const getQueryParam = (param: any) => {
+        if (Array.isArray(param)) {
+            return param[0];
+        }
+        return param;
+    };
+
+    const materialnumberStr = getQueryParam(materialnumber);
+    const quantityStr = getQueryParam(quantity);
+
+    //取符合物料名稱，物料數量所在的托盤位置
+    const [materialnumberin, setMaterialNumberIn] = useState<string | undefined>(materialnumberStr ? materialnumberStr : "");
+    const [quantityin, setQuantityIn] = useState<string | undefined>(quantityStr ? quantityStr : 0);
+
+
 
     const status = router.query.status as TquotationStatus;
 
@@ -40,141 +78,154 @@ export default function PickingListDetail() {
 
 
     const panelList: TpanelList = [
-        { searchGroup },
+        // { searchGroup },
         {
-            type: 'addButton',
-            label: '新增領料單',
+            type: 'myButton',
+            label: '返回',
             onClick: () => {
                 router.push({
-                    pathname: `/factoryDepartment/addTray`,
+                    pathname: `/factoryDepartment/getMaterial/pickingList`,
                     query: {
-                        type: 'Tray',
-                    },
+                        // type: 'WareHouse',
+                    }
                 });
             },
         },
     ];
+
+    // 取pickinglistDetail
+    const getPickingListDetail = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                plid: string | undefined;
+            } = {
+                plid: plid as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            //erpAPI
+            const response = await fetch(`${setting.apipath}GetPickingListDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            let data = await response.json();
+            console.log(data);
+            setData1(data);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getPickingListDetail();
+    }, [plid]);
+
+    // 取pickinglistDetail
+    const getWareHouseAndWhpositionDetail = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                plid: string | undefined;
+            } = {
+                plid: plid as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            //erpAPI
+            const response = await fetch(`${setting.apipath}GetPickingListDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            let data = await response.json();
+            console.log(data);
+            setData1(data);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        getPickingListDetail();
+    }, [plid]);
+
+    //取得物料的托盤位置
+    const getWareHouseAndTray = async () => {
+        try {
+            const conditionModel: {
+                materialnumber: string | undefined;
+            } = {
+                materialnumber: materialnumberin as string | undefined,
+            };
+        } catch (error) {
+
+        }
+
+    }
+
 
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={quotationStatusLookup[status] ?? '領料單'} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
-                    {/* <div className={scss.top}> */}
-                    <div>
-                        {/* <Thead01 type={'PickingList'} />
-                        <Tbody01 type={'PickingList'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} /> */}
-                        {/* </div> */}
-                    </div>
-                </div>
-                <div className={scss.right}>
-                    <br />
-                    {/* <MyButton_v2 px='px22' py='py4' theme='danger' className={scss.addBtn} label="領料" onClick={() => { gotoPick() }} />
-                    <MyButton_v2 disabled={true} px='px22' py='py4' theme='transparent' className={scss.addBtn} label="已領料" onClick={() => { alert("領料托盤") }} /> */}
                     <div className={scss.childmain}>
                         <div>
                             {/* <input type="texts" style={{border:'1px solid gray'}}/> */}
                             <InputSel
                                 {...inputSelProps}
-                                caption="領料單號:"
+                                caption="領料單號"
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: "2024062500002",
+                                        value: plid ? plid : '',
                                     },
                                 }}
                             />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="領料日期:"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: "113-06-25 ",
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="領料人員:"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: "賴彥廷3",
-                                    },
-                                }}
-                            />
-
                         </div>
-                        <div>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="工單單號:"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: "2024062500002",
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="派工日期:"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: "2024/06/25",
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="主件項目:"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: "無",
-                                    },
-                                }}
-                            />
-
+                        <br />
+                        <div className={scss.maincontent}>
+                            <Thead01 type={'PickingDetailList2'} />
+                            <Tbody01 type={'PickingDetailList2'} data={data1} error={undefined} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         </div>
                     </div>
-                    <div>
-                        <WrappedTextarea
-                            disabled={false}
-                            inputSelProps={{ caption: '說明:' }}
-                            textareaProps={{
-                                props: {
-                                    name: 'description',
-                                    maxRows: 3,
-                                    value: "",
-                                    onChange: (e) => {
-
-                                    },
-                                },
-                            }}
-                        />
-                        <WrappedTextarea
-                            disabled={false}
-                            inputSelProps={{ caption: '備註:' }}
-                            textareaProps={{
-                                props: {
-                                    name: 'description',
-                                    maxRows: 3,
-                                    value: "",
-                                    onChange: (e) => {
-
-                                    },
-                                },
-                            }}
-                        />
+                </div>
+                <div className={scss.middle}>
+                    {/* <MyButton_v2 px='px22' py='py4' theme='danger' className={scss.addBtn} label="領料" onClick={() => { gotoPick() }} />
+                    <MyButton_v2 disabled={true} px='px22' py='py4' theme='transparent' className={scss.addBtn} label="已領料" onClick={() => { alert("領料托盤") }} /> */}
+                    <div className={scss.childmain}>
+                        <Thead01 type={'GetMatWarehouseList'} />
+                        <Tbody01 type={'GetMatWarehouseList'} data={data2} error={undefined} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                     </div>
-                    <br />
                     {/* <Thead01 type={'PickingDetailList'} />
                     <Tbody01 type={'PickingDetailList'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} /> */}
                 </div>
+                <div className={scss.right}>
+
+                </div>
             </div>
-        </SubLayer>
+        </SubLayer >
     )
 }
