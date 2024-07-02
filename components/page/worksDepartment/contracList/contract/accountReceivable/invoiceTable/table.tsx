@@ -1695,14 +1695,16 @@ class Class_OtherNode {
     const { year, month, latestInvoiceDate } = this.invoiceBook;
 
     const bookDate = moment(`${year}-${month}`, 'YYYY-MM');
+    const bookDate_next = moment(`${year}-${Number(month) + 1}`, 'YYYY-MM');
+
     const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
     const begin = latestInvoiceDate_m.subtract(1, 'day');
 
-    if (currentDate.isSame(bookDate, 'month')) {
+    if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
       if (!latestInvoiceDate) {
         disabled = false;
       } else {
-        disabled = !currentDate.isAfter(begin);
+        disabled = currentDate.isBefore(begin);
       }
     }
 
