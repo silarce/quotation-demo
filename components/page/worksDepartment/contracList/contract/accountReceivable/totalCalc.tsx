@@ -27,6 +27,16 @@ export default function TotalCalc({
   className,
   accountReceivable,
 }: Tprops) {
+  const {
+    //
+    contractTotalPrice,
+    receivedPayment,
+    totalDeduction,
+    extraIncome,
+    unpaidPayment,
+    finalPayment,
+  } = accountReceivable;
+
   return (
     <div className={classNames(scss.totalCalc, className)}>
       <div className={scss.caption}>總計算</div>
@@ -35,17 +45,22 @@ export default function TotalCalc({
         <div className={scss.grid}>
           <span className={scss.operator}></span>
           <span>合約金額</span>
-          <span>{accountReceivable.contractTotalPrice}</span>
+          <span>{contractTotalPrice}</span>
         </div>
         <div className={scss.grid}>
           <Minus />
           <span>已收帳款金額</span>
-          <span>{accountReceivable.receivedPayment}</span>
+          <span>{receivedPayment}</span>
         </div>
         <div className={scss.grid}>
           <Minus />
           <span>扣款金額</span>
-          <span>{accountReceivable.totalDeduction}</span>
+          <span>{totalDeduction}</span>
+        </div>
+        <div className={scss.grid}>
+          <Minus />
+          <span>額外收入</span>
+          <span>{extraIncome}</span>
         </div>
       </div>
       {/*  */}
@@ -55,7 +70,7 @@ export default function TotalCalc({
         <div className={scss.grid}>
           <Equal />
           <span>未收款金額</span>
-          <span>{accountReceivable.unpaidPayment}</span>
+          <span>{unpaidPayment}</span>
         </div>
 
         {/* <div className={scss.grid}>
@@ -69,7 +84,7 @@ export default function TotalCalc({
           <Parentheses />
           <span>10%尾款</span>
           <span className={scss.latestCell}>
-            {accountReceivable.finalPayment}
+            {/* {finalPayment} */}
             <Parentheses turn={true} />
           </span>
         </div>

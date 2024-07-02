@@ -4,14 +4,14 @@ import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
 
-import scss from './pickingList.module.scss';
-import Thead01 from '../../ui/table/thead01';
-import Tbody01 from '../../ui/table/tbody01';
+import scss from './prodEntryList.module.scss';
+import Thead01 from '../ui/table/thead01';
+import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { quotationStatusLookup } from 'config/lookupTable';
 import { TquotationStatus } from 'js/api/dtoTypes';
-import { setting } from '../../wareHouseList/index';
+import { setting } from '../wareHouseList/index';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { WrappedTextarea, inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { AppContext } from 'pages/_app';
@@ -29,7 +29,7 @@ type Tquery = {
 
 
 
-export default function PickingList() {
+export default function ProdEntryList() {
     const router = useRouter();
     const {
         type,
@@ -110,7 +110,7 @@ export default function PickingList() {
 
     //#region call api
     //取領料單清單
-    const getPickingList = async () => {
+    const getProdEntry = async () => {
         try {
             setIsLoading(true);
             const conditionModel: {
@@ -129,7 +129,7 @@ export default function PickingList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
             //erpAPI
-            const response = await fetch(`${setting.apipath}GetPickingList?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetProdEntry?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -148,7 +148,7 @@ export default function PickingList() {
     };
 
     useEffect(() => {
-        getPickingList();
+        getProdEntry();
     }, []);
 
     //取對應的清單明細
@@ -241,12 +241,12 @@ export default function PickingList() {
 
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '領料單'} panelList={panelList} />
+            <PageHeader02 tag={quotationStatusLookup[status] ?? '入庫單'} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div>
-                        <Thead01 type={'PickingList'} />
-                        <Tbody01 type={'PickingList'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                        <Thead01 type={'ProdEntry'} />
+                        <Tbody01 type={'ProdEntry'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                     </div>
                 </div>
                 <div className={scss.right}>

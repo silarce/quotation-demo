@@ -663,15 +663,47 @@ const sidePathList: TsidePathList = {
           erpFeature: devPass,
           list: [
             {
-              label: '入庫',
+              label: '儲位資訊',
               path: path01 + '/wareHouseList',
               query: {
                 type: 'WareHouse',
               },
               erpFeature: devPass,
             },
+            // {
+            //   label: '請購管理',
+            //   path: path01 + '/purchaseRequisitionList',
+            //   query: {
+            //     type: 'purchaseRequisitionList',
+            //   },
+            //   erpFeature: devPass,
+            // },
             {
-              label: '領料單',
+              label: '採購管理',
+              path: path01 + '/purchaseOrderList',
+              query: {
+                type: 'purchaseOrderList',
+              },
+              erpFeature: devPass,
+            },
+            {
+              label: '進貨管理',
+              path: path01 + '/prodReceiptList',
+              query: {
+                type: 'prodReceiptList',
+              },
+              erpFeature: devPass,
+            },
+            {
+              label: '入庫管理',
+              path: path01 + '/prodEntryList',
+              query: {
+                type: 'prodEntryList',
+              },
+              erpFeature: devPass,
+            },
+            {
+              label: '領料管理',
               path: path01 + '/getMaterial/pickingList',
               query: {
                 type: 'pickingList',

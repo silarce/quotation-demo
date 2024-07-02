@@ -1,11 +1,9 @@
 // 設計圖
 // https://www.figma.com/design/9Gix0Odt4g7ahSOQMysmVh/%E4%B8%89%E4%B9%85?node-id=1282-40444&t=bXAfdnwklJLF2pZu-0
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, createContext } from 'react';
 import { useRouter } from 'next/router';
-import classNames from 'classnames';
 import _ from 'lodash';
-import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -85,11 +83,21 @@ import {
   apiPatchAccountant_accountReceivable,
 } from 'js/api/api_accountant';
 
-import type { TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
+import type { TcustomerDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
 
 // css
 import scss from './index.module.scss';
 import { AxiosError } from 'axios';
+
+// ========================================================================
+
+type TaccountReceivableContext = {
+  customer: TcustomerDto | undefined;
+};
+
+// ========================================================================
+
+export const AccountReceivableContext = createContext<TaccountReceivableContext>(null!);
 
 // ========================================================================
 
@@ -114,6 +122,7 @@ export default function AccountReceivable() {
   } = useGetContract_id(contractId, {
     customPopulate: [
       // 'subContracts.content.verifyForm'
+      'content.customer',
       'engineeringContact',
       'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
       'accountReceivable.periods.invoices.accountantInvoiceBook',
@@ -233,6 +242,10 @@ export default function AccountReceivable() {
       actualPrice, // 發票實際金額
 
       invoiceBook: accountantInvoiceBook,
+      //
+      nameOfBusinessEntity,
+      businessIdNumber,
+      isOriginalCustomer,
     } = state_invoice;
 
     if (accountantInvoiceBook || actualPrice) {
@@ -272,15 +285,23 @@ export default function AccountReceivable() {
       invoiceNumber: invoiceNumber || null,
       actualPrice: actualPrice ? Number(actualPrice) : null,
       accountantInvoiceBookId: accountantInvoiceBook?.id || null,
+
+      nameOfBusinessEntity: nameOfBusinessEntity || null,
+      businessIdNumber: businessIdNumber || null,
+      isOriginalCustomer,
     };
 
     try {
       setIsFetching_req(true);
-      await apiPostAccountReceivablePeriod(accountReceivable.id, body);
-      await update_contract();
+
+      return await apiPostAccountReceivablePeriod(accountReceivable.id, body).then(() => {
+        update_contract();
+      });
     } catch (error) {
       const err = error as AxiosError;
       myAlert.err({ title: '新增發票失敗', content: err.message });
+
+      throw err;
     } finally {
       setIsFetching_req(false);
     }
@@ -452,6 +473,14 @@ export default function AccountReceivable() {
   }, [contractId]);
 
   // --------------------------------------------------------------------------
+
+  const contextValue = useMemo(() => {
+    return {
+      customer: contract?.content.customer,
+    };
+  }, [contract?.content.customer]);
+
+  // --------------------------------------------------------------------------
   // region RENDER
 
   if (!contract) {
@@ -486,15 +515,17 @@ export default function AccountReceivable() {
 
         <DeductionDetail className="mt-10 " periodArr={periodArr} />
 
-        <PeriodTable
-          className="mt-10 "
-          data_finalProdcut={data_finalProdcut}
-          data_period={accountReceivable.periods}
-          onAddConfirm={reqAddInvoice}
-          reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
-          reqDeleteInvoice={reqDeleteInvoice}
-          reqDeletePeriod={reqDeletePeriod}
-        />
+        <AccountReceivableContext.Provider value={contextValue}>
+          <PeriodTable
+            className="mt-10 "
+            data_finalProdcut={data_finalProdcut}
+            data_period={accountReceivable.periods}
+            onAddConfirm={reqAddInvoice}
+            reqPatchInvoiceAllowance={reqPatchInvoiceAllowance}
+            reqDeleteInvoice={reqDeleteInvoice}
+            reqDeletePeriod={reqDeletePeriod}
+          />
+        </AccountReceivableContext.Provider>
       </div>
     </SubLayer>
   );

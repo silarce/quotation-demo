@@ -1213,6 +1213,7 @@ const props_invoiceBook: TselectorProps<TaccountantInvoiceBookDto> = {
   selectedKey: 'alphabeticLetter',
   params: {
     sort: 'alphabeticLetter',
+    order: 'ASC',
   },
   configArr: [
     {
@@ -1234,6 +1235,15 @@ const props_invoiceBook: TselectorProps<TaccountantInvoiceBookDto> = {
       width: 60,
       thead: {
         label: '月份',
+      },
+      tbody: {
+        reducer: (value) => {
+          const month = value as string;
+          let month_num = Number(month);
+          month_num % 2 === 0 && (month_num = month_num - 1);
+
+          return `${month_num}~${month_num + 1}`;
+        },
       },
     },
     {
@@ -1316,7 +1326,8 @@ const props_invoiceBook: TselectorProps<TaccountantInvoiceBookDto> = {
       }
 
       const year = date_m.year();
-      const month = date_m.month() + 1;
+      let month = date_m.month() + 1;
+      month = month % 2 === 0 ? month - 1 : month;
 
       return { year, month };
     })();
