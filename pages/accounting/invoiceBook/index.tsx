@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { nanoid } from 'nanoid';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -36,7 +37,8 @@ import type { TinvoiceType, TcreateAccountantInvoiceBookDto, TupdateAccountantIn
 
 // css
 import scss from './index.module.scss';
-import { NumberFormat } from 'xlsx';
+
+import { Toption } from 'js/utils/options/options';
 
 // ------------------------------------------------------------------------
 
@@ -99,16 +101,21 @@ type Tconfig = {
 // MARK: START
 
 export default function InvoiceBook() {
-  const { yearOptionArr, monthOptionArr, thisYear, thisMonth } = useYearMonth_options();
+  const { yearOptionArr, monthOptionArr: monthOptionArr_pre, thisYear, thisMonth } = useYearMonth_options();
+  const monthOptionArr = reduceMonthOptionArr(monthOptionArr_pre);
 
   const router = useRouter();
   const query = router.query as Tquery;
   const {
     //
     year = thisYear.toString(),
-    month = thisMonth.toString(),
+    month: month_pre = thisMonth.toString(),
     keyword,
   } = query;
+
+  const month_pre_num = Number(month_pre);
+
+  const month = month_pre_num % 2 === 0 ? (month_pre_num - 1).toString() : month_pre;
 
   // ------------------------------------------------------------------------
 
@@ -144,7 +151,15 @@ export default function InvoiceBook() {
     };
   }, [year, month, keyword]);
 
-  const { data: data_invoiceBook = [], update: update_invoiceBook } = useGetAccountantInvoiceBook({ params });
+  const { data: data_invoiceBook = [], update: update_invoiceBook } = useGetAccountantInvoiceBook({
+    //
+    params,
+    reducer: (invoiceBookArr) => {
+      invoiceBookArr = _.sortBy(invoiceBookArr, ['alphabeticLetter', 'startNumber']);
+
+      return invoiceBookArr;
+    },
+  });
 
   // ------------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
@@ -536,6 +551,8 @@ export default function InvoiceBook() {
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------
 
+// region Function
+
 const checkStartNumber = (value: string) => {
   // 所有的字都是阿拉伯數字
   return value.length === 8 && /^\d+$/.test(value);
@@ -598,6 +615,26 @@ const checkStateListIntersection = (stateList: TstateList) => {
   //
   return intersectedAlphabeticLetter.length === 0 ? false : intersectedAlphabeticLetter;
 };
+
+const reduceMonthOptionArr = (monthOptionArr: Toption[]) => {
+  monthOptionArr = monthOptionArr.filter((option) => {
+    const value_num = Number(option.value);
+
+    return value_num % 2 !== 0;
+  });
+
+  monthOptionArr = monthOptionArr.map((option) => {
+    const value_num = Number(option.value);
+
+    option.label = `${value_num}~${value_num + 1}`;
+
+    return option;
+  });
+
+  return monthOptionArr;
+};
+
+// endregion Function
 
 // ===================================================================
 // region CONFIG
