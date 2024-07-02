@@ -293,11 +293,15 @@ export default function AccountReceivable() {
 
     try {
       setIsFetching_req(true);
-      await apiPostAccountReceivablePeriod(accountReceivable.id, body);
-      await update_contract();
+
+      return await apiPostAccountReceivablePeriod(accountReceivable.id, body).then(() => {
+        update_contract();
+      });
     } catch (error) {
       const err = error as AxiosError;
       myAlert.err({ title: '新增發票失敗', content: err.message });
+
+      throw err;
     } finally {
       setIsFetching_req(false);
     }

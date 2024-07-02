@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import moment, { Moment } from 'moment';
+import { AxiosError } from 'axios';
 
 // component
 import PeriodPanel, { Thead, Tbody, Tfoot } from './table';
@@ -104,7 +105,7 @@ type Tstate_period = {
   //
   nameOfBusinessEntity: string;
   businessIdNumber: string;
-  isOriginalCustomer: boolean; // 若為true，那這筆請款視為額外收入
+  isOriginalCustomer: boolean; // 若為false，那這筆請款視為額外收入
   //
 };
 
@@ -147,7 +148,7 @@ export default function PeriodTable({
   data_period: TaccountsReceivablePeriodDto[] | undefined | null;
   // reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
   // reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
-  onAddConfirm: (state_invoice: Tstate_period) => void;
+  onAddConfirm: (state_invoice: Tstate_period) => Promise<void>;
   reqPatchInvoiceAllowance: (invoiceId: string, allowance: number) => void;
   reqDeleteInvoice: (invoiceId: string) => void;
   reqDeletePeriod: (periodId: string) => void;
@@ -206,8 +207,11 @@ export default function PeriodTable({
       //   return;
       // }
 
-      await onAddConfirm(newInoviceState);
-      setIsAddingNew(false);
+      await onAddConfirm(newInoviceState)
+        .then(() => {
+          setIsAddingNew(false);
+        })
+        .catch(() => {});
     }
   };
 

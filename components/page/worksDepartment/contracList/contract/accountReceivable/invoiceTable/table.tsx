@@ -98,6 +98,7 @@ const Selector = selectModalCreator_multi<['invoiceBook']>({
     {
       key: 'invoiceBook',
       caption: '請選擇發票本',
+      tip: '不選擇即可清空',
       limit: 1,
       forbiddenCheck_dataList: (data) => {
         return data.isAlreadyDeclare;
@@ -958,21 +959,45 @@ const Tfoot = ({
       </div>
 
       <div className={classNames(scss.row)}>
-        {/* isOriginalCustomer為true，此筆請款視為額外收入 */}
-        <span>額外收入</span>
+        <div className={scss.totalInfoWrapper}>
+          <Popover trigger="hover" content={<span>發票實際金額與發票本沒有值的時候強制設為不勾選</span>}>
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          額外收入
+        </div>
+        {/* isOriginalCustomer為false，此筆請款視為額外收入 */}
+        {/* 注意 checked與onChange都做了布林值逆轉 */}
         <div className="m-auto ml-0 relative top-[-3px]">
           <Checkbox
-            disabled={readOnly}
-            checked={class_other.isOriginalCustomer}
+            // disabled={readOnly || class_other.isOriginalCustomerLocked}
+            checked={!class_other.isOriginalCustomer}
             onChange={(e) => {
-              class_other.isOriginalCustomer = e.target.checked;
+              if (readOnly || class_other.isOriginalCustomerLocked) {
+                return;
+              }
+
+              class_other.isOriginalCustomer = !e.target.checked;
             }}
           />
         </div>
       </div>
 
       <div className={classNames(scss.row)}>
-        <span>發票實際金額</span>
+        <div className={scss.totalInfoWrapper}>
+          <Popover
+            trigger="hover"
+            title="發票實際金額或發票本有值的時候視為有發票"
+            content="這時必須填寫發票實際金額、發票本、發票日期、發票號碼"
+          >
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          發票實際金額
+        </div>
+
         <input
           className={classNames(readOnly && scss.readyOnly)}
           value={actualPrice}
@@ -983,7 +1008,19 @@ const Tfoot = ({
       </div>
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
-        <span>發票本</span>
+        {/* <span>發票本</span> */}
+        <div className={scss.totalInfoWrapper}>
+          <Popover
+            trigger="hover"
+            title="先選擇發票本才可以選擇發票日期與發票號碼"
+            content="點擊後請先選擇右上方的日期。若不選擇便會清空發票本"
+          >
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          發票本
+        </div>
         <InputSel
           disabled={readOnly}
           showBaseline="auto"
@@ -1000,10 +1037,12 @@ const Tfoot = ({
       <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>發票日期</span>
         <InputSel
+          key={class_other.invoiceDateRange?.toISOString()}
           disabled={readOnly}
           showBaseline="auto"
           datePickerProps={{
             props: {
+              defaultPickerValue: class_other.invoiceDateRange,
               value: invoiceDate,
               onChange: (date_m) => {
                 class_other.invoiceDate = date_m;
@@ -1170,7 +1209,7 @@ const useDefaultState = ({
 
     const {
       //
-      id,
+      id: periodId,
       type,
       period,
       depositPeriod,
@@ -1228,15 +1267,18 @@ const useDefaultState = ({
     const totals_num = calcTotals(rowArr);
 
     // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
-    const invoice: TaccountsReceivableInvoiceDto | undefined = invoices[0];
+    const invoice: TaccountsReceivableInvoiceDto | undefined = invoices[0] as TaccountsReceivableInvoiceDto | undefined;
     const {
+      //
+      id: invoiceId,
       invoiceDate,
       invoiceNumber = '',
       nameOfBusinessEntity,
       businessIdNumber,
-      isOriginalCustomer,
     } = invoice ?? {};
-    let { actualPrice = 0, allowance = 0 } = invoice ?? {};
+
+    let { actualPrice = 0, allowance = 0, isOriginalCustomer = true } = invoice ?? {};
+    !invoiceId && (isOriginalCustomer = true);
 
     // 如果是最後的totalPanel，invoices會有多項。未來invoices也可能會有多項
     if (invoices.length > 1) {
@@ -1255,7 +1297,7 @@ const useDefaultState = ({
     }
 
     const defaultState: Tstate_period = {
-      id,
+      id: periodId,
       firstInvoiceId: invoice?.id ?? null,
       renderCount: 0,
       rowArr,
@@ -1469,9 +1511,12 @@ class Class_OtherNode {
     return this.state_period.actualPrice;
   }
   set actualPrice(string) {
+    const isEmpty = !!string;
+
     this.setState_period((period) => ({
       ...period,
       actualPrice: string,
+      isOriginalCustomer: isEmpty === true ? true : period.isOriginalCustomer,
     }));
   }
 
@@ -1533,26 +1578,36 @@ class Class_OtherNode {
     return this.state_period.invoiceBook;
   }
   set invoiceBook(invoiceBook) {
+    const isEmpty = !!invoiceBook;
+
     this.setState_period((period) => ({
       ...period,
       invoiceBook,
       invoiceDate: null,
       invoiceNumber: '',
+      isOriginalCustomer: isEmpty === true ? true : period.isOriginalCustomer,
     }));
   }
 
-  // get invoiceBookOption() {
-  //   const invoiceBook = this.state_period.invoiceBook;
+  get isOriginalCustomerLocked() {
+    if (!this.actualPrice && !this.invoiceBook) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  //   if (invoiceBook) {
-  //     return {
-  //       value: invoiceBook.id,
-  //       label: invoiceBook.alphabeticLetter,
-  //     };
-  //   } else {
-  //     return null;
-  //   }
-  // }
+  get invoiceDateRange() {
+    if (!this.invoiceBook) {
+      return undefined;
+    }
+
+    const { year, month } = this.invoiceBook;
+
+    return moment()
+      .year(Number(year))
+      .month(Number(month) - 1);
+  }
 
   get invoiceNumberOptions() {
     const invoiceBook = this.invoiceBook;
@@ -1599,22 +1654,19 @@ class Class_OtherNode {
 
     const bookDate = moment(`${year}-${month}`, 'YYYY-MM');
     const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
+    const begin = latestInvoiceDate_m.subtract(1, 'day');
 
-    // 檢查是否在同一個年月
     if (currentDate.isSame(bookDate, 'month')) {
       if (!latestInvoiceDate) {
         disabled = false;
       } else {
-        // 檢查currentDate是否在latestInvoiceDate_m之後
-        disabled = !currentDate.isAfter(latestInvoiceDate_m);
+        disabled = !currentDate.isAfter(begin);
       }
     }
 
     return disabled;
   }
 } // Class_OtherNode
-
-// MARK: Class_OtherNode
 
 // ===============================================================================
 const create_emptyPeriod = (): Tperiod_reduce => {
