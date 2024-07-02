@@ -489,13 +489,6 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       return;
     }
 
-    // 暫時先留著好了，2023-11-01後還沒用到就砍掉吧
-    // if (reviewerArr.length === 0) {
-    //   return myAlert.warning({ title: '請選擇檢視人員' });
-    // }
-    // const reviewerIds = reviewerArr.map((emp) => emp.id);
-    // const examinerIds = examinerArr.map((emp) => emp.id);
-
     const theDate = reportInEdit.date;
 
     if (!theDate) {

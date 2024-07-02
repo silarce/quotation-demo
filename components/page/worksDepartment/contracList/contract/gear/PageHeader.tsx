@@ -7,6 +7,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import PageHeaderFlex01 from 'components/PageHeader/pageHeaderFlex01';
 
 import { AppContext } from 'pages/_app';
+import { erpFeaturesLookup, swappedErpFeaturesLookup } from 'components/Layer/SideNav/pathList';
 
 // ========================================================
 
@@ -17,6 +18,20 @@ export type { TpanelList };
 // ========================================================
 
 const documentType: TdocType = '保固書';
+
+const {
+  //
+  BasicDataCreation,
+  HRAuthoritySetup,
+  legacyContractIntegration,
+  domestic,
+  statisticsTable,
+  worksDepartment,
+  accountsReceivable,
+  accountingDepartment,
+  worksDepartment_worksheet,
+  worksDepartment_deliveryList,
+} = erpFeaturesLookup;
 
 // ========================================================
 export default function PageHeader({
@@ -29,6 +44,7 @@ export default function PageHeader({
   contractNumber?: string;
 }) {
   const { erpFeature } = useContext(AppContext);
+
   const router = useRouter();
   const query = router.query as {
     contractId: string | undefined;
@@ -40,13 +56,57 @@ export default function PageHeader({
   };
 
   const isShowAccountReceivable = !!erpFeature?.find((item) => item.name === '應收帳款');
+  // worksDepartment
+  // accountsReceivable
+  // worksDepartment_worksheet
+  // worksDepartment_deliveryList
+
+  const pass = erpFeature?.some((feature) => {
+    return (
+      feature.name === erpFeaturesLookup['worksDepartment'] ||
+      feature.name === erpFeaturesLookup['accountsReceivable'] ||
+      feature.name === erpFeaturesLookup['worksDepartment_worksheet'] ||
+      feature.name === erpFeaturesLookup['worksDepartment_deliveryList']
+    );
+  });
+
+  const domesticPass = erpFeature?.some((feature) => {
+    return feature.name === erpFeaturesLookup['domestic'];
+  });
 
   // -------------------------------------------------------------
 
   const tag = (tagCallback && tagCallback(contractId ?? '')) || `合約編號 ${contractNumber}`;
 
   const pathHead = `/worksDepartment/contractList/contract`;
-  const linkList = [
+
+  const linkList_pass = [
+    isShowAccountReceivable
+      ? {
+          label: '合約',
+          disabled: !isShowAccountReceivable,
+          href: {
+            pathname: `${pathHead}/contractTable`,
+            query: {
+              contractId,
+              version,
+            },
+          },
+        }
+      : null,
+    isShowAccountReceivable
+      ? {
+          label: '合約審核表',
+          disabled: !isShowAccountReceivable,
+          href: {
+            pathname: `${pathHead}/quotationVerifyForm`,
+            query: {
+              contractId,
+              version,
+            },
+          },
+        }
+      : null,
     {
       label: '工程聯絡單',
       href: {
@@ -56,6 +116,7 @@ export default function PageHeader({
           version,
         },
       },
+      erpFeatures: [],
     },
     {
       label: '工作表',
@@ -92,19 +153,7 @@ export default function PageHeader({
           },
         }
       : null,
-    isShowAccountReceivable
-      ? {
-          label: '合約',
-          disabled: !isShowAccountReceivable,
-          href: {
-            pathname: `${pathHead}/contractTable`,
-            query: {
-              contractId,
-              version,
-            },
-          },
-        }
-      : null,
+
     {
       label: '派工單列表',
       href: {
@@ -203,6 +252,15 @@ export default function PageHeader({
     // },
   ];
 
+  const linkList_domestic = linkList_pass.reduce((arr, item) => {
+    item?.label === '工程管理單' && arr.push(item);
+    item?.label === '工程聯絡單' && arr.push(item);
+
+    return arr;
+  }, [] as typeof linkList_pass);
+
+  const linkList = pass ? linkList_pass : domesticPass ? linkList_domestic : [];
+
   return (
     <div>
       {/* 上面的 */}
@@ -212,3 +270,5 @@ export default function PageHeader({
     </div>
   );
 }
+
+// ====================================================================

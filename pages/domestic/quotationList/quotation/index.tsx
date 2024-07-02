@@ -50,7 +50,9 @@ import QuotationPdf_part, {
   Tpart,
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
+import ContractReviewForm, {
+  useDefaultPaymentRatio_quotationContent,
+} from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
@@ -2278,6 +2280,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           await update();
           setIsLoading(false);
         }}
+        defaultPaymentRatioArr={useDefaultPaymentRatio_quotationContent(latestContent)}
       />
       <ThreeButtonModal
         visible={reviewModalShow}

@@ -1,0 +1,322 @@
+import { Key, MouseEvent, useEffect, useState } from 'react';
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import iconPlace from 'public/image/icon/place.svg';
+import { IconAddCircle, IconChain, IconCross01, IconDetail, IconSearch, IconTearing, Icon_info } from 'public/image/icon/svgComponent/svgIcons';
+import scss from './tbody01.module.scss';
+import scss2 from './tbody02.module.scss';
+import router from 'next/router';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { Transfer } from 'antd';
+import { IconButton } from '@mui/material';
+import IconContext from '@ant-design/icons/lib/components/Context';
+import { IconMap } from 'antd/lib/result';
+import icon_arrowdown from 'public/image/icon/arrow_down_tray.svg';
+import icon_arrowup from 'public/image/icon/arrow_up_tray.svg';
+import icon_arrowchange from 'public/image/icon/arrow_change_tray.svg';
+
+
+type TBodyItemContent = {};
+
+interface TbodyProps {
+  data: any[];
+  error: any;
+  type: string; // Add type here
+  traycalled: any;
+  traycalledname: any;
+  traytransfer: any;
+  url: any;
+  whnamecalled: any;
+}
+
+
+export interface PickingListModel {
+  id?: string;
+  create_at?: string;
+  create_by?: string;
+  description?: string;
+  note?: string;
+  plnumber?: string;
+  picked?: string;
+}
+
+export default function Tbody01({ data, error, type, traycalled, traycalledname, traytransfer, url, whnamecalled }: TbodyProps) {
+
+  async function getTrayByWareHouse(whid: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
+    router.push({
+      pathname: `/factoryDepartment/trayList`,
+      query: {
+        type: 'Tray',
+        whid: whid,
+        whname: whname,
+        url: url,
+        traycalled: traycalled,
+        traycalledname: traycalledname,
+        traytransfer: traytransfer,
+        whnamecalled: whnamecalled,
+        firstin: 1
+      },
+    });
+
+  }
+
+  async function getWHPositionByWareHouseAndTray(whid: any, trayname: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any, trayid: any) {
+    console.log(whid);
+    console.log(trayname);
+
+
+    router.replace({
+      // pathname: `/factoryDepartment/whPositionList`,
+      pathname: `/factoryDepartment/trayList`,
+      query: {
+        type: 'WHPosition',
+        whid: whid,
+        trayname: trayname,
+        whname: whname,
+        traycalled: traycalled,
+        traycalledname: traycalledname,
+        traytransfer: traytransfer,
+        url: url,
+        whnamecalled: whnamecalled,
+        firstin: 0,
+        trayid: trayid
+      },
+    });
+
+  }
+
+  async function editWHPositionById(id: any, whid: any, trayname: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
+    router.replace({
+      pathname: `/factoryDepartment/editWHPosition`,
+      query: {
+        type: 'WHPosition',
+        whid: whid,
+        trayname: trayname,
+        whname: whname,
+        id: id,
+        traycalled: traycalled,
+        traycalledname: traycalledname,
+        traytransfer: traytransfer,
+        whnamecalled: whnamecalled
+      },
+    });
+  }
+
+  async function GetPickingListDetailById(plnumber: any, create_at: any, create_by: any, lotnumber: any, picked: any, item: any) {
+
+    console.log(item);
+    router.replace({
+      pathname: `/factoryDepartment/getMaterial/pickingList`,
+      query: {
+        type: 'ss',
+        plnumber: plnumber,
+        create_at: getTaiwanDateStr(create_at),
+        create_by: create_by,
+        lotnumber: lotnumber,
+        picked: picked,
+        main_item: item.main_item
+      },
+    });
+  }
+
+  // 日期格式處理
+  function convertToYearMonthDay(datetimetype: string, isoDateString: string | number | Date) {
+    if (datetimetype === "Date") {
+      // onlyDate
+      const date = new Date(isoDateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+
+    } else {
+      // datetime
+      const date = new Date(isoDateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+  }
+
+
+
+
+  if (type === "WareHouse") {
+
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader}>
+              <div className={scss.row01}>
+                <span>{_item.whname}</span>
+                <span>{_item.position}</span>
+                <span style={{ color: '#14256a', fontWeight: 'bolder' }}>{_item.traycodetotal}</span>
+                {/* <span>{convertToYearMonthDay('Datea', _item.created_at)}</span> */}
+                {/* <span>{_item.create_by}</span> */}
+                <span>{_item.url}</span>
+                <span>{_item.update_by}</span>
+                {/* <span>{convertToYearMonthDay('Datea', _item.update_at)}</span> */}
+                <span>{getTaiwanDateStr(_item.update_at)}</span>
+                <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "WHPosition") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader3}  >
+              <div className={scss.row01} >
+                {/* <span>{_item.materialnumber}</span> */}
+                <span>{_item.length}-{_item.width}</span>
+                <span>{_item.materialnumber}</span>
+                {/* <span>{_item.batchnumber}</span> */}
+                <span>{_item.whpname}</span>
+                <span>{_item.spec}</span>
+                <span>{_item.quantity}</span>
+                {/* <span>{_item.unit}</span> */}
+                {/* <span>{_item.whname}</span> */}
+                {/* <span>{_item.whpchildid}</span> */}
+                <span ><IconDetail onClick={() => editWHPositionById(_item.id, _item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "Tray") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader2}>
+              <div className={scss.row01}>
+                <span>{_item.whname}</span>
+                <span>{_item.trayname}</span>
+                <span>{_item.length}</span>
+                <span>{_item.width}</span>
+                {/* <span>{getTaiwanDateStr(_item.update_at)}</span> */}
+                {/* <span style={{ fontSize: '4vmin' }}>{_item.length}X{_item.width}</span> */}
+                <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled, _item.trayid)} /></span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "materialList") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader4}>
+              <div className={scss.row01}>
+                <span>{_item.whpname}</span>
+                <span>{_item.materialnumber}</span>
+                <span>{_item.spec}</span>
+                <span>{_item.quantity}</span>
+                <span>{_item.whname}</span>
+                <span>{_item.trayname}</span>
+                {/* <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span> */}
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "GetMatWarehouseList") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader5}>
+              <div className={scss.row01}>
+                <span>{_item.whname}</span>
+                <span>{_item.trayname}</span>
+                {/* <span ><IconDetail onClick={() => {alert("ok")}}/></span> */}
+                <span >
+                  {/* {icon_arrowdown} */}
+                  <span>
+                    <button onClick={() => { alert("ok") }}>
+                      <img src={icon_arrowdown.src} alt="Arrow Down" style={{ width: '30px', height: '30px' }} />
+                    </button>
+                  </span>
+                  &nbsp;
+                  <span>
+                    <button onClick={() => { alert("ok") }}>
+                      <img src={icon_arrowup.src} alt="Arrow Down" style={{ width: '30px', height: '30px' }} />
+                    </button>
+                  </span>
+                  &nbsp;
+                  <span>
+                    <img src={icon_arrowchange.src} alt="Arrow Down" style={{ width: '30px', height: '20px' }} />
+                  </span>
+                </span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "PickingList") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader6}>
+              <div className={scss.row01}>
+                <span>{_item.plnumber}</span>
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                <span>{_item.create_by}</span>
+                <span>
+                  <span style={{ color: '#14256a', display: `${_item.picked === true ? "" : "none"}` }}>已領</span>
+                  <span style={{ color: '#ea1833', display: `${_item.picked === false ? "" : "none"}` }}>未領</span>
+                </span>
+                <span ><IconDetail onClick={() => { GetPickingListDetailById(_item.plnumber, _item.create_at, _item.create_by, _item.lotnumber, _item.picked, _item) }} /></span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  } else if (type === "PickingDetailList") {
+    return (
+      <div>
+        {error && <p>Error: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader7}>
+              <div className={scss.row01}>
+                <span>{index + 1}</span>
+                <span>{_item.name}</span>
+                <span>{_item.quantity}</span>
+                <span>{_item.unit}</span>
+                <span>{_item.note}</span>
+                <span></span>
+                {/* <span><IconDetail/></span> */}
+                {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  }
+
+  return null; // Add default return in case type is not matched
+}

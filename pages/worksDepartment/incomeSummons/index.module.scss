@@ -29,10 +29,13 @@ $topBlockHeight: 50px;
 .row {
   display: flex;
   flex-wrap: nowrap;
-  gap: 10px;
+  // align-items: flex-end;
+  // gap: 10px;
 
   border-bottom: solid 1px theme("colors.border");
   padding: 10px 0;
+  padding-right: 50px;
+
   width: fit-content;
   background-color: white;
   font-size: 16px;
@@ -40,6 +43,7 @@ $topBlockHeight: 50px;
   > div {
     text-align: center;
     background-color: inherit;
+    padding: 0 10px;
 
     > input {
       width: 100%;
@@ -71,15 +75,30 @@ $topBlockHeight: 50px;
 
 .btnPanel {
   display: flex;
-  gap: 10px;
   justify-content: center;
-  align-items: center;
+  // align-items: center;
+  align-content: flex-start;
+  > * {
+    position: relative;
+    top: 3px;
+  }
   .enable {
     color: red;
   }
 }
 
-.billSerialNumber {
+.btnPanel {
+  display: flex;
+  justify-content: space-between;
   position: sticky;
   left: 0;
+  z-index: 2;
+  background-color: inherit;
+}
+
+.billSerialNumber {
+  position: sticky;
+  left: 70px;
+  z-index: 1;
+  background-color: inherit;
 }
