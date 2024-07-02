@@ -2975,28 +2975,28 @@ export type TcreateDispatchingDto = Pick<
 
 export type TupdateDispatchingDto = Omit<Partial<TcreateDispatchingDto>, 'contractId'>;
 
-export type TelectronicSuppliesRecordDto = {
-  id: string;
-  electronicSuppliesId: string; // 前端用不到
-  createdAt: string;
-  updatedAt: string;
-  doorType: string;
-  itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
-  category: string;
-  quantity: number;
-  unit: string | null;
-};
+// export type TelectronicSuppliesRecordDto = {
+//   id: string;
+//   electronicSuppliesId: string; // 前端用不到
+//   createdAt: string;
+//   updatedAt: string;
+//   doorType: string;
+//   itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
+//   category: string;
+//   quantity: number;
+//   unit: string | null;
+// };
 
-export type TcreateElectronicSuppliesRecordDto = {
-  id?: string; // 後端沒有，前端為了方便加上去的
-  doorType: string;
-  itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
-  category: string;
-  quantity: number;
-  unit: string | null;
-};
+// export type TcreateElectronicSuppliesRecordDto = {
+//   id?: string; // 後端沒有，前端為了方便加上去的
+//   doorType: string;
+//   itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
+//   category: string;
+//   quantity: number;
+//   unit: string | null;
+// };
 
-export type TupdateElectronicSuppliesRecordDto = Partial<TcreateElectronicSuppliesRecordDto> & { id?: string };
+// export type TupdateElectronicSuppliesRecordDto = Partial<TcreateElectronicSuppliesRecordDto> & { id?: string };
 
 export type TelectronicSuppliesDto = {
   id: string;
@@ -3021,65 +3021,7 @@ export type TelectronicSuppliesDto = {
   requirementRecords: TelectronicSuppliesRequirementRecordDto[];
 };
 
-// export type TelectronicSuppliesDto = {
-//   id: string;
-//   createdAt: string; // date
-//   updatedAt: string; // date
-//   // 填表日期
-//   dispatchDate: string; //date
-//   // 需要日期
-//   requirementsDate: string; //date
-//   // 工程編號
-//   // engineeringNumber: string;
-//   projectNumber: string;
-//   // 工程名稱
-//   projectName: string;
-
-//   electronicSuppliesRecords: TelectronicSuppliesRecordDto[];
-//   // others: string;
-
-//   // 備料人員Id
-//   materialHandlerId?: string | null;
-//   // 備料人員
-//   materialHandler?: TemployeeDto | null;
-//   // 領料人員ID
-//   ingredientTechnicianId?: string | null;
-//   // 領料人員
-//   ingredientTechnician?: TemployeeDto | null;
-//   //填表人員ID
-//   formCompleterId?: string | null;
-//   // 填表人員
-//   formCompleter?: TemployeeDto | null;
-
-//   contractId?: string;
-//   contract?: TquotationContractDto;
-//   legacyContractId?: string;
-//   legacyContract?: TlegacyContractDto;
-//   // quotationId: string;
-//   // quotation: TquotationDto;
-// };
-
-export type TcreateElectronicSuppliesDto = Omit<
-  TelectronicSuppliesDto,
-  | 'id'
-  | 'createdAt'
-  | 'updatedAt'
-  | 'contract'
-  | 'legacyContract'
-  | 'quotation'
-  | 'materialHandler'
-  | 'ingredientTechnician'
-  | 'formCompleter'
-  | 'electronicSuppliesRecords'
-> & {
-  electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[];
-};
-
-export type TupdateElectronicSuppliesDto = Omit<Partial<TcreateElectronicSuppliesDto>, 'electronicSuppliesRecords'> & {
-  electronicSuppliesRecords: TupdateElectronicSuppliesRecordDto[];
-};
-
-type TelectronicSuppliesContentDto = {
+export type TelectronicSuppliesContentDto = {
   // 所屬送電備品表id
   electronicSuppliesId: string;
   // 所屬送電備品表
@@ -3098,7 +3040,7 @@ type TelectronicSuppliesContentDto = {
   quantity: number | null;
 };
 
-type TelectronicSuppliesRequirementRecordDto = {
+export type TelectronicSuppliesRequirementRecordDto = {
   // 所屬送電備品id
   electronicSuppliesId?: string | null;
   // 所屬送電備品
@@ -3113,7 +3055,7 @@ type TelectronicSuppliesRequirementRecordDto = {
   requirementRecordDetails: TelectronicSuppliesRequirementRecordDetailDto[];
 };
 
-type TelectronicSuppliesRequirementRecordDetailDto = {
+export type TelectronicSuppliesRequirementRecordDetailDto = {
   // 所屬送電備品需求單Id
   requirementRecordId?: string | null;
   // 所屬送電備品需求單
@@ -3128,7 +3070,7 @@ type TelectronicSuppliesRequirementRecordDetailDto = {
   unit: string | null;
 };
 
-type TelectronicSuppliesPickupRecordDto = {
+export type TelectronicSuppliesPickupRecordDto = {
   // 所屬送電備品id
   electronicSuppliesId: string | null;
   // 所屬送電備品
@@ -3145,7 +3087,7 @@ type TelectronicSuppliesPickupRecordDto = {
   pickupRecordDetails: TelectronicSuppliesPickupRecordDetailDto[];
 };
 
-type TelectronicSuppliesPickupRecordDetailDto = {
+export type TelectronicSuppliesPickupRecordDetailDto = {
   // 所屬送電備品領料單Id
   pickupRecordId?: string | null;
   // 所屬送電備品領料單

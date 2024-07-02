@@ -1,3 +1,11 @@
+// 東元的馬達 才會用到"馬達控制箱" 要依照他的馬力數和電供
+// 如果有"防颱滑動支撐中柱" 就要寫其他有幾隻
+// 如果有"遙控器(1:2)" 就要備註 什麼廠牌有幾個
+// 如果有"彈射門"的話 就會有彈射門控制箱 並依照馬達的馬力
+
+// https://github.com/San-Jeou/sanjeou-erp-fe/issues/248
+// https://github.com/San-Jeou/sanjeou-erp-fe/assets/65767828/3ab5b70e-bdda-42e4-af82-bb2ff6e2be63
+
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
@@ -20,8 +28,18 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
 
 // api
-import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
-// import { useGetEngineeringContact, useGetElectronicSupplies } from 'js/api/api_engineering';
+import {
+  //
+
+  useGetContract_id,
+  useGetContract_id_finalProductItem,
+} from 'js/api/api_quotation';
+import {
+  //
+  apiPostElectronicSupplies,
+  useGetEngineeringContact,
+  useElectronicSupplies_id,
+} from 'js/api/api_engineering';
 
 import { Icon_info } from 'public/image/icon/svgComponent/svgIcons';
 
@@ -145,35 +163,47 @@ export default function ElectronicSupplies() {
 
   // MARK: PROPS
 
-  const panelList_receiveHistory: TpanelList = [
-    {
-      type: 'addButton',
-      label: '新增',
-      onClick: () =>
-        router.push({
-          pathname: `${router.pathname}/editReceivedHistory`,
-          query: { ...router.query },
-        }),
-    },
-  ];
-  const panelList_demandHistory: TpanelList = [
-    {
-      type: 'addButton',
-      label: '新增',
-      onClick: () =>
-        router.push({
-          pathname: `${router.pathname}/editDemandHistory`,
-          query: { ...router.query },
-        }),
-    },
-  ];
+  // const panelList_receiveHistory: TpanelList = [
+  //   {
+  //     type: 'addButton',
+  //     label: '新增',
+  //     onClick: () =>
+  //       router.push({
+  //         pathname: `${router.pathname}/editReceivedHistory`,
+  //         query: { ...router.query },
+  //       }),
+  //   },
+  // ];
+  // const panelList_demandHistory: TpanelList = [
+  //   {
+  //     type: 'addButton',
+  //     label: '新增',
+  //     onClick: () =>
+  //       router.push({
+  //         pathname: `${router.pathname}/editDemandHistory`,
+  //         query: { ...router.query },
+  //       }),
+  //   },
+  // ];
 
-  const panelList =
-    listName === 'receiveHistory'
-      ? panelList_receiveHistory
-      : listName === 'demandHistory'
-      ? panelList_demandHistory
-      : [];
+  // const panelList =
+  //   listName === 'receiveHistory'
+  //     ? panelList_receiveHistory
+  //     : listName === 'demandHistory'
+  //     ? panelList_demandHistory
+  //     : [];
+
+  const panelList: TpanelList = [
+    {
+      type: 'addButton',
+      label: '更新送電備品總料單',
+      onClick: async () => {
+        await apiPostElectronicSupplies({
+          contractId: contractId,
+        });
+      },
+    },
+  ];
 
   // ------------------------------------------------------------------
 
