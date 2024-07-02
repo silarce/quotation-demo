@@ -432,8 +432,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.purchaseorderid}</span>
                 <span>{_item.totalprice.toLocaleString()}</span>
-                <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>未進</span>
-                <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已進</span>
+                <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>未結</span>
+                <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已結</span>
                 <span ><IconDetail onClick={() => { GetPerchaseOrder(_item) }} /></span>
               </div>
             </CellWithBar>

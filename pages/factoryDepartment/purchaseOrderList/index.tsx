@@ -1,4 +1,4 @@
-import { useState, MouseEvent, createContext, useEffect, Key, useContext } from 'react';
+import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -21,7 +21,11 @@ import { parseJSON } from 'date-fns';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-
+import icon_edit from 'public/image/icon/edit.svg';
+import icon_save from 'public/image/icon/fc_save.svg';
+import icon_cancel from 'public/image/icon/fc_cancel.svg';
+import icon_delete from 'public/image/icon/fc_delete.svg';
+import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
 
 
 type Tquery = {
@@ -62,8 +66,12 @@ export default function purchaseOrderList() {
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
+    const [data2, setData2] = useState<any[]>([]);
+    const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
 
+    const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
 
     const status = router.query.status as TquotationStatus;
@@ -81,6 +89,8 @@ export default function purchaseOrderList() {
     const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
 
+    const [editstatus, setEditStatus] = useState<boolean>(false);
+    const [editrowid, setEditRowId] = useState<number>(0);
 
     const [totalprice, setTotalPrice] = useState<string>("");
     const [taxprice, setTaxPrice] = useState<string>("");
@@ -207,6 +217,7 @@ export default function purchaseOrderList() {
             if (data.length > 0 && checkfirstin === 0) {
                 console.log(data[0].receipted);
                 getPurchaseOrderDetail(data[0].purchaseorderuuid);
+                GetProdReceiptDetailByPurchaseOrderId(data[0].purchaseorderuuid);
                 setCreate_atin(data[0].create_at);
                 setPurchaseorderuuidin(data[0].purchaseorderuuid);
                 setPurchaseorderidin(data[0].purchaseorderid);
@@ -253,6 +264,8 @@ export default function purchaseOrderList() {
             }
             const data = await response.json();
             setData1(data);
+            // setData2(data);
+
             console.log(data);
             let totalprice = 0;
             data.forEach((element: { totalprice: any; }) => {
@@ -273,8 +286,9 @@ export default function purchaseOrderList() {
 
     // 確保 getPurchaseOrderDetail 的 useEffect 中的依賴項設置正確
     useEffect(() => {
-        if (purchaseorderid) {
+        if (purchaseorderuuid) {
             getPurchaseOrderDetail(purchaseorderuuid);
+            GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid);
             setPurchaseorderidin(purchaseorderid as string);
             setPurchaseorderuuidin(purchaseorderuuid as string);
             setCreate_atin(create_at as string);
@@ -284,12 +298,85 @@ export default function purchaseOrderList() {
             setReceiptedin(receipted as string);
             setSupplieraddressin(supplieraddress as string);
         }
-    }, [purchaseorderid]);
+    }, [purchaseorderuuid]);
+
+    //取已對應採購單的已進貨明細
+    const GetProdReceiptDetailByPurchaseOrderId = async (purchaseorderuuid: any) => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                purchaseorderuuid: string | undefined
+            } = {
+                purchaseorderuuid: purchaseorderuuid as string | undefined,
+            };
 
 
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
 
-    //取對應的採購明細
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}GetProdReceiptDetailByPurchaseOrderId?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setData2(data);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+
     const TransferPurchaseOrderToProductReceipt = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                purchaseorderuuid: string | undefined,
+                data: any
+            } = {
+                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
+                data: data2
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}TransferPurchaseOrderToProductReceipt?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            getPurchaseOrder();
+
+            getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+            
+            GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+
+    //結案
+    const ClosePO = async () => {
         try {
             setIsLoading(true);
             const conditionModel: {
@@ -307,7 +394,7 @@ export default function purchaseOrderList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}TransferPurchaseOrderToProductReceipt?${queryParams}`);
+            const response = await fetch(`${setting.apipath}ClosePO?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -329,29 +416,81 @@ export default function purchaseOrderList() {
 
     //#endregion
     // 轉為進貨單，開始驗收
-    function gotoReceipt() {
+    function handleReceipt() {
         myAlert.confirm({
-            title: '確定要轉為進貨單?',
+            title: '確定要轉為進貨單嗎?',
             content: <>
-                <h1>轉為確認進貨數量與金額後請開始驗收</h1>
+                <h1>請確認內容金額是否正確</h1>
             </>,
             props: {
                 onOk: () => {
-                    // alert("kkkk");
                     TransferPurchaseOrderToProductReceipt();
-
-
-
+                    // console.log("XXXXXXXXXXXXXXXXXXX");
+                    // console.log(data2);
                 }
             }
         });
-        // router.push({
-        //     pathname: `/factoryDepartment/getMaterial/pickingListDetail`,
-        //     query: {
-        //         //傳入領料單單號
-        //         plid: plid
-        //     },
+    }
+
+    function handleClosePO() {
+        myAlert.confirm({
+            title: '確定結案?',
+            content: <>
+                <h1>轉為結案後將無法更改</h1>
+            </>,
+            props: {
+                onOk: () => {
+                    ClosePO();
+                }
+            }
+        });
+    }
+
+    // 編輯狀態控制
+    // 一次只提供編輯一列
+    const handleEditStatus = (index: number) => {
+        setEditRowId(index);
+        setEditStatus(true);
+        setData2Restore(data2);
+    };
+
+    const handleSaveEdit = (index: number) => {
+        setEditStatus(false);
+        console.log(data2);
+    };
+
+
+    const handleRemove = (index: number) => {
+        const updatedData = data2.filter((_, i) => i !== index);
+        setData2(updatedData);
+        // setData2(prevState => {
+        //     // 複製 prevState 以避免直接修改原始狀態
+        //     const updatedData = [...prevState];
+        //     // 移除指定索引的項目
+        //     updatedData.splice(index, 1);
+        //     return updatedData;
         // });
+    };
+
+
+    // const [data2, setData2] = useState([
+    //     { id: 1, quantity: 10 },
+    //     { id: 2, quantity: 15 },
+    //     { id: 3, quantity: 20 }
+    // ]);
+    const handleChange = (index: number, value: string | number) => {
+        setData2(prevState => {
+            const updatedData = [...prevState];
+            updatedData[index] = {
+                ...updatedData[index],
+                quantity: value // 更新 quantity 屬性的值
+            };
+            return updatedData;
+        });
+    };
+
+    const handleRestore = () => {
+        setData2(data2restore);
     }
 
 
@@ -372,10 +511,12 @@ export default function purchaseOrderList() {
                                 採購單
                             </span> */}
                             <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "false" ? "" : "none" }}>
-                                <MyButton_v2 px='px22' py='py4' theme='danger' label="進貨" onClick={() => { gotoReceipt() }} />
+                                <MyButton_v2 px='px22' py='py4' theme='danger' label="結案" onClick={() => { handleClosePO() }} />
+                                &nbsp;&nbsp;
+
                             </span>
                             <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
-                                <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已進貨" onClick={() => { alert("領料托盤") }} />
+                                <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" onClick={() => { alert("領料托盤") }} />
                             </span>
                         </div>
                         <div style={{ textAlign: 'right', height: '35.77px' }}>
@@ -562,6 +703,83 @@ export default function purchaseOrderList() {
                                 </tr>
                             </table>
                         </div>
+                    </div>
+                    <div className={scss.content_main_content}>
+                        <span className={scss.mytitle}>
+                            {/* <button onClick={() => { setData2(data2restore) }}>
+                                <img src={icon_autoadd.src} alt="add" style={{ width: '40px', height: '40px' }} />
+                            </button> */}
+                            <MyButton_v2 px='px22' py='py4' theme={undefined} label="進貨/批次進貨" onClick={handleReceipt} />
+                        </span>
+                        <Thead01 type={'PurchaseOrderDetail2'} />
+                        {data2.map((_item, index) => (
+                            <CellWithBar key={index} className={scss.panelHeader11}>
+                                <div className={scss.row01}>
+                                    <span>{index + 1}</span>
+                                    <span>{_item.productid}</span>
+                                    <span>{_item.name}</span>
+                                    <span style={{ color: 'red' }}>
+                                        {_item.alreadyinquantity}
+                                    </span>
+                                    <span>
+                                        <input
+                                            ref={quantityRefs.current[index]}
+                                            style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                            type="text"
+                                            value={_item.quantity !== undefined ? _item.quantity : 0}
+                                            readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                            onChange={(e) => {
+                                                const newData = [...data2];
+                                                const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                newData[index] = {
+                                                    ...newData[index],
+                                                    quantity: newQuantity,
+                                                    totalprice: newQuantity * newData[index].unitprice
+                                                };
+                                                setData2(newData);
+                                            }}
+                                        />
+                                    </span>
+                                    <span>{_item.unit}</span>
+                                    <span>
+                                        <input
+                                            ref={unitpriceRefs.current[index]}
+                                            style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                            type="text"
+                                            value={_item.unitprice.toLocaleString()}
+                                            readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                            onChange={(e) => {
+                                                const newData = [...data2];
+                                                const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                newData[index] = {
+                                                    ...newData[index],
+                                                    unitprice: newUnitPrice,
+                                                    totalprice: newUnitPrice * newData[index].quantity
+                                                };
+                                                setData2(newData);
+                                            }}
+                                        />
+                                    </span>
+                                    <span>
+                                        {_item.totalprice.toLocaleString()}
+                                    </span>
+                                    <span>
+                                        <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                            <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                                        </button>
+                                        <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
+                                            <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                        </button>
+                                        {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
+                                            <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
+                                        </button> */}
+                                        <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                            <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                        </button>
+                                    </span>
+                                </div>
+                            </CellWithBar>
+                        ))}
                     </div>
                 </div>
             </div>

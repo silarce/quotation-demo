@@ -1,3 +1,4 @@
+@use "styles/theme01" as *;
 .top {
     @extend .grid;
 
@@ -126,7 +127,7 @@
     margin-top: 0px;
     margin-left: 20px;
     margin-right: 20px;
-    
+
     // background-color: gray;
 }
 
@@ -138,7 +139,7 @@
     // margin-top: 4px;
     margin-left: 20px;
     margin-right: 20px;
-    
+
     // background-color: gray;
 }
 
@@ -150,19 +151,52 @@
     margin-top: 0px;
     margin-left: 20px;
     margin-right: 20px;
-    padding-right:20px;
+    padding-right: 20px;
     // background-color: gray;
 }
 
-.count_table{
-    font-size: 18px;
-    color:#1b2d5a;
+.count_table {
+    font-size: 16px;
+    color: #1b2d5a;
     text-align: right;
-    tr{
-        td{
+
+    tr {
+        td {
             // border: 1px solid gray;
             text-align: right;
-            width:80px;
+            width: 80px;
         }
     }
 }
+
+.mytitle {
+
+    font-size: 16px;
+    color: #1b2d5a;
+    text-align: left;
+}
+
+
+div.panelHeader11 {
+    padding-left: 20px;
+    border-bottom: solid 1px $colorBorder01;
+  
+    .row01,
+    .row02 {
+      span {
+        font-weight: 400;
+        font-size: 16px;
+      }
+  
+      .clientName,
+      .country {
+        color: $colorMain;
+      }
+    }
+  
+    .row01 {
+      display: grid;
+      grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 60px;
+      gap: 5px;
+    }
+  }

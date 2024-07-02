@@ -24,6 +24,7 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import icon_edit from 'public/image/icon/edit.svg';
 import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
+import { fontWeight } from 'html2canvas/dist/types/css/property-descriptors/font-weight';
 
 
 type Tquery = {
@@ -89,6 +90,9 @@ export default function ProdReceiptList() {
     const [suppliernamein, setSuppliernamein] = useState<string>("");
     const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
+
+    const [editstatus, setEditStatus] = useState<boolean>(false);
+    const [editrowid, setEditRowId] = useState<number>(0);
 
 
     const [totalprice, setTotalPrice] = useState<string>("");
@@ -346,28 +350,46 @@ export default function ProdReceiptList() {
     // 轉為進貨單，開始驗收
     function gotoReceipt() {
         myAlert.confirm({
-            title: '確定要轉為進貨單?',
+            title: '確定轉為驗收?',
             content: <>
-                <h1>轉為確認進貨數量與金額後請開始驗收</h1>
+                <h1>轉為驗收後無法進行更改</h1>
             </>,
             props: {
                 onOk: () => {
-                    // alert("kkkk");
-                    TransferPurchaseOrderToProductReceipt();
+                    alert("轉為驗收單");
+                    // TransferPurchaseOrderToProductReceipt();
 
 
 
                 }
             }
         });
-        // router.push({
-        //     pathname: `/factoryDepartment/getMaterial/pickingListDetail`,
-        //     query: {
-        //         //傳入領料單單號
-        //         plid: plid
-        //     },
-        // });
     }
+
+
+    // 編輯狀態控制
+    // 一次只提供編輯一列
+    const handleEditStatus = (index: number) => {
+        setEditRowId(index);
+        setEditStatus(true);
+    };
+
+    const handleSaveEdit = (prodreceiptuuid: any) => {
+        alert(prodreceiptuuid);
+        myAlert.confirm({
+            title: '確定修改單價?',
+            props: {
+                onOk: () => {
+                    alert("修改成功");
+                    // TransferPurchaseOrderToProductReceipt();
+                    setEditStatus(false)
+
+                }
+            }
+        });
+
+    }
+
 
 
     return (
@@ -577,7 +599,8 @@ export default function ProdReceiptList() {
                                     <span>
                                         <InputSel
                                             {...inputSelProps}
-                                            disabled={false}
+                                            className='text-sm'
+                                            disabled={index + 1 === editrowid && editstatus === true ? false : true}
                                             inputProps={{
                                                 props: {
                                                     value: _item.unitprice,
@@ -588,13 +611,13 @@ export default function ProdReceiptList() {
                                     </span>
                                     <span>{_item.totalprice.toLocaleString()}</span>
                                     <span>
-                                        <button>
+                                        <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                             <img src={icon_edit.src} alt="Arrow Down" style={{ width: '30px', height: '20px' }} />
                                         </button>
-                                        <button>
+                                        <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
                                             <img src={icon_save.src} alt="Arrow Down" style={{ width: '30px', height: '20px' }} />
                                         </button>
-                                        <button>
+                                        <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setEditStatus(false) }}>
                                             <img src={icon_cancel.src} alt="Arrow Down" style={{ width: '30px', height: '20px' }} />
                                         </button>
                                     </span>

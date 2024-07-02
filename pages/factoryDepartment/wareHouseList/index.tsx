@@ -132,7 +132,7 @@ export default function WareHouseList() {
             setError(error.message);
         }
     };
-
+    
 
     return (
 
