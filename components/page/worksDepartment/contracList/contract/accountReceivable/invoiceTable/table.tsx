@@ -1435,33 +1435,39 @@ class Class_OtherNode {
     return this.state_period.minusRetainage;
   }
   set minusRetainage(bool) {
-    this.setState_period((period) => ({
-      ...period,
-      minusRetainage: bool,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.minusRetainage = bool;
+      period.price = calcPrice(period);
+
+      return period;
+    });
   }
 
   get minusDeduction() {
     return this.state_period.minusDeduction;
   }
   set minusDeduction(bool) {
-    this.setState_period((period) => ({
-      ...period,
-      minusDeduction: bool,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.minusDeduction = bool;
+      period.price = calcPrice(period);
+
+      return period;
+    });
   }
 
   get minusWriteOffDeposit() {
     return this.state_period.minusWriteOffDeposit;
   }
   set minusWriteOffDeposit(bool) {
-    this.setState_period((period) => ({
-      ...period,
-      minusWriteOffDeposit: bool,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.minusWriteOffDeposit = bool;
+      period.price = calcPrice(period);
+
+      return period;
+    });
   }
 
   get retainageType() {
