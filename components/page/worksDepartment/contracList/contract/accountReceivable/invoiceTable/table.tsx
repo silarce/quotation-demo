@@ -968,7 +968,7 @@ const Tfoot = ({
         <span>{price}</span>
       </div>
 
-      <div className={classNames(scss.row)}>
+      <div className={classNames(scss.row, isTotal && 'invisible')}>
         <div className={scss.totalInfoWrapper}>
           <Popover trigger="hover" content={<span>發票實際金額與發票本沒有值的時候強制設為不勾選</span>}>
             <span>
@@ -1084,22 +1084,22 @@ const Tfoot = ({
         />
       </div>
 
-      <div className={classNames(scss.row)}>
+      <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>發票買受人</span>
         <InputSel
+          disabled={readOnly}
           showBaseline="auto"
           textareaProps={{
             props: {
               minRows: 2,
               value: class_other.nameOfBusinessEntity,
               onChange: (e) => (class_other.nameOfBusinessEntity = e.target.value),
-              readOnly: readOnly,
             },
           }}
         />
       </div>
 
-      <div className={classNames(scss.row)}>
+      <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>發票統一編號</span>
         <input
           className={classNames(readOnly && scss.readyOnly)}
@@ -1190,14 +1190,6 @@ const calcPrice = (state_period: Tstate_period) => {
     contractTotal,
     subTotal,
   } = period;
-
-  // if (retainageType === '含稅') {
-  //   period.retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
-  // } else if (retainageType === '未稅') {
-  //   period.retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
-  // } else {
-  //   period.retainage = '';
-  // }
 
   const totals_num = calcTotals(period.rowArr);
   let price_d = new Decimal(totals_num.contractTotal);
