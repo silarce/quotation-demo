@@ -3646,6 +3646,11 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   invoiceNumber: string | null;
   actualPrice: number | null;
   accountantInvoiceBookId: string | null;
+
+  nameOfBusinessEntity: string | null; // 買受人(公司抬頭)
+  businessIdNumber: string | null; // 統一編號
+  isOriginalCustomer: boolean; // 是否為合約原客戶 // 若為false，那這筆請款視為額外收入
+  // isOriginalCustomer: boolean; // 是否為合約原客戶
 };
 
 export type TupdateAccountReceivablePeriodDto = Partial<TcreateAccountReceivablePeriodDto>;
@@ -3677,6 +3682,20 @@ export type TaccountsReceivableInvoiceDto = {
   //
   accountantInvoiceBookId: string | null;
   accountantInvoiceBook: TaccountantInvoiceBookDto | null;
+
+  // 買受人(公司抬頭)
+  nameOfBusinessEntity: string | null;
+  // 統一編號
+  businessIdNumber: string | null;
+  // 是否為合約原客戶
+  isOriginalCustomer: boolean; // 若為false，那這筆請款視為額外收入
+  //
+  // 合約工程名稱
+  contractProjectName: string | null;
+  // 合約承包商
+  contractContractor: string | null;
+  // 合約編號
+  contractNumber: string | null;
 };
 
 //

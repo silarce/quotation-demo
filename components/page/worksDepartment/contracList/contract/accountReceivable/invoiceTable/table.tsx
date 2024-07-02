@@ -7,6 +7,7 @@ import React, {
   forwardRef,
   useImperativeHandle,
   // useCallback,
+  useContext,
 } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -17,6 +18,7 @@ import moment, { Moment } from 'moment';
 import {
   Checkbox,
   Radio,
+  Popover,
   //  Spin
 } from 'antd';
 
@@ -52,16 +54,13 @@ import {
   IconEdit,
   //  IconCheck01,
   IconCheck02,
+  Icon_info,
   //  IconCross01
 } from 'public/image/icon/svgComponent/svgIcons';
 
-// ==========================================================================
+import { AccountReceivableContext } from 'pages/worksDepartment/contractList/contract/accountReceivable';
 
-// type Tstate_invoiceBood = {
-//   value: string;
-//   label: string;
-// };
-// type Tstate_invoiceBood = Toption | null;
+// ==========================================================================
 
 type Tcenter = {
   renderCount?: number; // 判斷是否要rerender用的，來自Tstate_invoice
@@ -99,6 +98,7 @@ const Selector = selectModalCreator_multi<['invoiceBook']>({
     {
       key: 'invoiceBook',
       caption: '請選擇發票本',
+      tip: '不選擇即可清空',
       limit: 1,
       forbiddenCheck_dataList: (data) => {
         return data.isAlreadyDeclare;
@@ -250,6 +250,8 @@ function PeriodPanel_pre(
       period.subTotal = totals_num.subTotal;
       period.tax = totals_num.tax;
       period.contractTotal = totals_num.contractTotal;
+
+      period.retainage = calcRetainage(period);
       period.price = calcPrice(period);
 
       return period;
@@ -643,6 +645,9 @@ function PeriodPanel_pre(
         setShowSelector={setShowSelector}
       />
 
+      {/* <br />
+      <br /> */}
+
       <div className={classNames(scss.deleteBar, isTotal && 'invisible')}>
         {!state_period.allow_EditDeduction_or_deleteInvoice && <p className="text-xl text-main">已連結收款</p>}
         {state_period.allow_EditDeduction_or_deleteInvoice && (
@@ -742,19 +747,23 @@ const Thead = ({ caption, children }: { caption?: React.ReactNode; children: Rea
 const Tbody = ({
   children,
   totals: { subTotal, tax, contractTotal },
+  isConrtract,
 }: {
   children: React.ReactNode;
   totals: Tcenter['totals'];
+  isConrtract?: boolean;
 }) => {
   return (
     <div className={scss.tbody}>
       <div>{children}</div>
       <div className={classNames(scss.totals)}>
-        <span>合約合計</span>
+        <span>{isConrtract ? '合約合計' : '本期合計'}</span>
         <span>{subTotal}</span>
         <span>營業稅5%</span>
         <span>{tax}</span>
-        <span>合約總計</span>
+        <span>
+          <span>{isConrtract ? '合約總計' : '本期總計'}</span>
+        </span>
         <span>{contractTotal}</span>
       </div>
     </div>
@@ -860,12 +869,20 @@ const Tfoot = ({
   return (
     <div className={classNames(scss.tfoot)}>
       <div className={classNames(scss.row)}>
-        <span>保留款</span>
+        {/* <span>保留款</span> */}
+        <div className={scss.totalInfoWrapper}>
+          <Popover trigger="hover" content="保留款為含稅或未稅時不可以編輯">
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          保留款
+        </div>
         <input
-          className={classNames(readOnly && scss.readyOnly)}
+          className={classNames((readOnly || class_other.isRetainageLocked) && scss.readyOnly)}
           value={retainage}
           onChange={(e) => (class_other.retainage = e.target.value)}
-          readOnly={readOnly}
+          readOnly={readOnly || class_other.isRetainageLocked}
           type={inputType}
         />
       </div>
@@ -897,14 +914,14 @@ const Tfoot = ({
         <div className={scss.checkBar}>
           <Radio.Group
             disabled={readOnly}
+            value={retainageType}
             onChange={(e) => {
               class_other.retainageType = e.target.value;
             }}
-            value={retainageType}
           >
             <Radio value={'含稅' as TretainageType}>含稅</Radio>
             <Radio value={'未稅' as TretainageType}>未稅</Radio>
-            <Radio value={'null'}>無</Radio>
+            <Radio value={'null'}>自訂</Radio>
           </Radio.Group>
         </div>
       </div>
@@ -940,12 +957,57 @@ const Tfoot = ({
       </div>
 
       <div className={classNames(scss.row)}>
-        <span>發票金額</span>
+        <div className={scss.totalInfoWrapper}>
+          <Popover trigger="hover" title="計算方式" content={<span>金額總計 = 本期總計 - 保留款 - 扣款 - 冲訂金</span>}>
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          金額總計
+        </div>
         <span>{price}</span>
       </div>
 
       <div className={classNames(scss.row)}>
-        <span>發票實際金額</span>
+        <div className={scss.totalInfoWrapper}>
+          <Popover trigger="hover" content={<span>發票實際金額與發票本沒有值的時候強制設為不勾選</span>}>
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          額外收入
+        </div>
+        {/* isOriginalCustomer為false，此筆請款視為額外收入 */}
+        {/* 注意 checked與onChange都做了布林值逆轉 */}
+        <div className="m-auto ml-0 relative top-[-3px]">
+          <Checkbox
+            // disabled={readOnly || class_other.isOriginalCustomerLocked}
+            checked={!class_other.isOriginalCustomer}
+            onChange={(e) => {
+              if (readOnly || class_other.isOriginalCustomerLocked) {
+                return;
+              }
+
+              class_other.isOriginalCustomer = !e.target.checked;
+            }}
+          />
+        </div>
+      </div>
+
+      <div className={classNames(scss.row)}>
+        <div className={scss.totalInfoWrapper}>
+          <Popover
+            trigger="hover"
+            title="發票實際金額或發票本有值的時候視為有發票"
+            content="這時必須填寫發票實際金額、發票本、發票日期、發票號碼"
+          >
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          發票實際金額
+        </div>
+
         <input
           className={classNames(readOnly && scss.readyOnly)}
           value={actualPrice}
@@ -956,7 +1018,19 @@ const Tfoot = ({
       </div>
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
-        <span>發票本</span>
+        {/* <span>發票本</span> */}
+        <div className={scss.totalInfoWrapper}>
+          <Popover
+            trigger="hover"
+            title="先選擇發票本才可以選擇發票日期與發票號碼"
+            content="點擊後請先選擇右上方的日期。若不選擇便會清空發票本"
+          >
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          發票本
+        </div>
         <InputSel
           disabled={readOnly}
           showBaseline="auto"
@@ -967,26 +1041,18 @@ const Tfoot = ({
               readOnly: true,
             },
           }}
-          // selectProps={{
-          //   props: {
-          //     value: class_other.invoiceBookOption,
-          //     options: invoiceBookOptions,
-          //     onChange: (option) => {
-          //       const invoiceBook = (option?.invoiceBook || null) as TaccountantInvoiceBookDto | null;
-          //       class_other.invoiceBook = invoiceBook;
-          //     },
-          //   },
-          // }}
         />
       </div>
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
         <span>發票日期</span>
         <InputSel
+          key={class_other.invoiceDateRange?.toISOString()}
           disabled={readOnly}
           showBaseline="auto"
           datePickerProps={{
             props: {
+              defaultPickerValue: class_other.invoiceDateRange,
               value: invoiceDate,
               onChange: (date_m) => {
                 class_other.invoiceDate = date_m;
@@ -999,23 +1065,8 @@ const Tfoot = ({
 
       <div className={classNames(scss.row, isTotal && 'invisible')}>
         <div className={scss.invoiceNumberSpinWrapper}>
-          {/* <div className={classNames(!showInvoiceNumberCheck && 'invisible')}>
-            {isCheckingInvoiceNumber && <Spin />}
-            {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass === 'pass' && (
-              <IconCheck01 className={classNames(scss.checkIcon, scss.check)} />
-            )}
-            {!isCheckingInvoiceNumber && isInvoiceNumberCheckPass !== 'pass' && (
-              <IconCross01 className={classNames(scss.checkIcon, scss.cross)} />
-            )}
-          </div> */}
           <span>發票號碼</span>
         </div>
-        {/* <input
-          className={classNames(readOnly && scss.readyOnly)}
-          value={invoiceNumber}
-          onChange={(e) => onChange_invoiceNumber(e.target.value)}
-          readOnly={readOnly}
-        /> */}
 
         <InputSel
           disabled={readOnly}
@@ -1030,6 +1081,31 @@ const Tfoot = ({
               },
             },
           }}
+        />
+      </div>
+
+      <div className={classNames(scss.row)}>
+        <span>發票買受人</span>
+        <InputSel
+          showBaseline="auto"
+          textareaProps={{
+            props: {
+              minRows: 2,
+              value: class_other.nameOfBusinessEntity,
+              onChange: (e) => (class_other.nameOfBusinessEntity = e.target.value),
+              readOnly: readOnly,
+            },
+          }}
+        />
+      </div>
+
+      <div className={classNames(scss.row)}>
+        <span>發票統一編號</span>
+        <input
+          className={classNames(readOnly && scss.readyOnly)}
+          value={class_other.businessIdNumber}
+          onChange={(e) => (class_other.businessIdNumber = e.target.value)}
+          readOnly={readOnly}
         />
       </div>
 
@@ -1110,7 +1186,18 @@ const calcPrice = (state_period: Tstate_period) => {
     minusRetainage,
     minusDeduction,
     minusWriteOffDeposit,
+    retainageType,
+    contractTotal,
+    subTotal,
   } = period;
+
+  // if (retainageType === '含稅') {
+  //   period.retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
+  // } else if (retainageType === '未稅') {
+  //   period.retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
+  // } else {
+  //   period.retainage = '';
+  // }
 
   const totals_num = calcTotals(period.rowArr);
   let price_d = new Decimal(totals_num.contractTotal);
@@ -1122,6 +1209,22 @@ const calcPrice = (state_period: Tstate_period) => {
   const price = price_d.toNumber();
 
   return price;
+};
+
+const calcRetainage = (state_period: Tstate_period) => {
+  const period = state_period;
+
+  const { subTotal, contractTotal, retainageType } = period;
+
+  let retainage = '';
+
+  if (retainageType === '含稅') {
+    retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
+  } else if (retainageType === '未稅') {
+    retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
+  }
+
+  return retainage;
 };
 
 // ==========================================================================
@@ -1136,12 +1239,14 @@ const useDefaultState = ({
   data_period: Tperiod_reduce | undefined;
   finalProdArr: TquotationProductDto[];
 }) => {
+  const { customer } = useContext(AccountReceivableContext);
+
   const { defaultState, isNew } = useMemo(() => {
     const isNew = !data_period;
 
     const {
       //
-      id,
+      id: periodId,
       type,
       period,
       depositPeriod,
@@ -1199,9 +1304,18 @@ const useDefaultState = ({
     const totals_num = calcTotals(rowArr);
 
     // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
-    const invoice: TaccountsReceivableInvoiceDto | undefined = invoices[0];
-    const { invoiceDate, invoiceNumber = '' } = invoice ?? {};
-    let { actualPrice = 0, allowance = 0 } = invoice ?? {};
+    const invoice: TaccountsReceivableInvoiceDto | undefined = invoices[0] as TaccountsReceivableInvoiceDto | undefined;
+    const {
+      //
+      id: invoiceId,
+      invoiceDate,
+      invoiceNumber = '',
+      nameOfBusinessEntity,
+      businessIdNumber,
+    } = invoice ?? {};
+
+    let { actualPrice = 0, allowance = 0, isOriginalCustomer = true } = invoice ?? {};
+    !invoiceId && (isOriginalCustomer = true);
 
     // 如果是最後的totalPanel，invoices會有多項。未來invoices也可能會有多項
     if (invoices.length > 1) {
@@ -1220,7 +1334,7 @@ const useDefaultState = ({
     }
 
     const defaultState: Tstate_period = {
-      id,
+      id: periodId,
       firstInvoiceId: invoice?.id ?? null,
       renderCount: 0,
       rowArr,
@@ -1250,6 +1364,11 @@ const useDefaultState = ({
       actualPrice: String(actualPrice || ''),
       invoiceDate: invoiceDate ? moment(invoiceDate) : null,
       invoiceBook: invoice?.accountantInvoiceBook ?? null,
+      //
+
+      nameOfBusinessEntity: (isNew ? customer?.name : nameOfBusinessEntity) ?? '',
+      businessIdNumber: (isNew ? customer?.taxId : businessIdNumber) ?? '',
+      isOriginalCustomer,
     };
 
     return { defaultState, isNew };
@@ -1353,33 +1472,39 @@ class Class_OtherNode {
     return this.state_period.minusRetainage;
   }
   set minusRetainage(bool) {
-    this.setState_period((period) => ({
-      ...period,
-      minusRetainage: bool,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.minusRetainage = bool;
+      period.price = calcPrice(period);
+
+      return period;
+    });
   }
 
   get minusDeduction() {
     return this.state_period.minusDeduction;
   }
   set minusDeduction(bool) {
-    this.setState_period((period) => ({
-      ...period,
-      minusDeduction: bool,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.minusDeduction = bool;
+      period.price = calcPrice(period);
+
+      return period;
+    });
   }
 
   get minusWriteOffDeposit() {
     return this.state_period.minusWriteOffDeposit;
   }
   set minusWriteOffDeposit(bool) {
-    this.setState_period((period) => ({
-      ...period,
-      minusWriteOffDeposit: bool,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.minusWriteOffDeposit = bool;
+      period.price = calcPrice(period);
+
+      return period;
+    });
   }
 
   get retainageType() {
@@ -1389,16 +1514,7 @@ class Class_OtherNode {
     this.setState_period((period) => {
       period = { ...period };
       period.retainageType = value;
-      const { subTotal, contractTotal, retainage, retainageType } = period;
-
-      if (retainageType === '含稅') {
-        period.retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
-      } else if (retainageType === '未稅') {
-        period.retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
-      } else {
-        period.retainage = '';
-      }
-
+      period.retainage = calcRetainage(period);
       period.price = calcPrice(period);
 
       return period;
@@ -1429,9 +1545,12 @@ class Class_OtherNode {
     return this.state_period.actualPrice;
   }
   set actualPrice(string) {
+    const isEmpty = !!string;
+
     this.setState_period((period) => ({
       ...period,
       actualPrice: string,
+      isOriginalCustomer: isEmpty === true ? true : period.isOriginalCustomer,
     }));
   }
 
@@ -1451,6 +1570,40 @@ class Class_OtherNode {
     }));
   }
 
+  get nameOfBusinessEntity() {
+    return this.state_period.nameOfBusinessEntity;
+  }
+
+  set nameOfBusinessEntity(value) {
+    this.setState_period((period) => ({
+      ...period,
+      nameOfBusinessEntity: value,
+    }));
+  }
+
+  get businessIdNumber() {
+    return this.state_period.businessIdNumber;
+  }
+
+  set businessIdNumber(value) {
+    this.setState_period((period) => ({
+      ...period,
+      businessIdNumber: value,
+    }));
+  }
+
+  get isOriginalCustomer() {
+    return this.state_period.isOriginalCustomer;
+  }
+
+  set isOriginalCustomer(bool) {
+    this.setState_period((period) => ({
+      ...period,
+      isOriginalCustomer: bool,
+    }));
+  }
+
+  // --------------------------------------------------------------------------
   get allowEditDeduction() {
     return this.state_period.allow_EditDeduction_or_deleteInvoice;
   }
@@ -1459,26 +1612,44 @@ class Class_OtherNode {
     return this.state_period.invoiceBook;
   }
   set invoiceBook(invoiceBook) {
+    const isEmpty = !!invoiceBook;
+
     this.setState_period((period) => ({
       ...period,
       invoiceBook,
       invoiceDate: null,
       invoiceNumber: '',
+      isOriginalCustomer: isEmpty === true ? true : period.isOriginalCustomer,
     }));
   }
 
-  // get invoiceBookOption() {
-  //   const invoiceBook = this.state_period.invoiceBook;
+  get isOriginalCustomerLocked() {
+    if (!this.actualPrice && !this.invoiceBook) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
-  //   if (invoiceBook) {
-  //     return {
-  //       value: invoiceBook.id,
-  //       label: invoiceBook.alphabeticLetter,
-  //     };
-  //   } else {
-  //     return null;
-  //   }
-  // }
+  get isRetainageLocked() {
+    const retainageType = this.state_period.retainageType;
+
+    if (retainageType === '含稅' || retainageType === '未稅') {
+      return true;
+    }
+  }
+
+  get invoiceDateRange() {
+    if (!this.invoiceBook) {
+      return undefined;
+    }
+
+    const { year, month } = this.invoiceBook;
+
+    return moment()
+      .year(Number(year))
+      .month(Number(month) - 1);
+  }
 
   get invoiceNumberOptions() {
     const invoiceBook = this.invoiceBook;
@@ -1525,22 +1696,19 @@ class Class_OtherNode {
 
     const bookDate = moment(`${year}-${month}`, 'YYYY-MM');
     const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
+    const begin = latestInvoiceDate_m.subtract(1, 'day');
 
-    // 檢查是否在同一個年月
     if (currentDate.isSame(bookDate, 'month')) {
       if (!latestInvoiceDate) {
         disabled = false;
       } else {
-        // 檢查currentDate是否在latestInvoiceDate_m之後
-        disabled = !currentDate.isAfter(latestInvoiceDate_m);
+        disabled = !currentDate.isAfter(begin);
       }
     }
 
     return disabled;
   }
 } // Class_OtherNode
-
-// MARK: Class_OtherNode
 
 // ===============================================================================
 const create_emptyPeriod = (): Tperiod_reduce => {
