@@ -290,8 +290,14 @@ export default function AddTray() {
             onClick: () => {
                 // 可以在這裡添加其他新增邏輯
                 // alert("新增托盤")
-                AddTray();
+                if (trayname != "" && trayname != null && trayname != undefined) {
+                    AddTray();
+                } else {
+                    myAlert.err({
+                        title: "請輸入托盤名稱",
+                    })
 
+                }
             }
         },
         {
@@ -603,15 +609,16 @@ export default function AddTray() {
 
     }, [data11, traychildlayout]);
 
-    const layoutChildLengthAndWidth = (whid: string | undefined, whname: string | undefined, data11: any[]) => {
-        // router.push({
-        //     pathname: `/factoryDepartment/addChildTray`,
-        //     query: {
-        //         whid: whid,
-        //         whname: whname,
-        //         data11: JSON.stringify(data11)  // 確保 data11 是正確的 JSON 字符串
-        //     },
-        // });
+    const goToAddChildTray = (whid: any, whname: any, length: any, width: any) => {
+        router.push({
+            pathname: `/factoryDepartment/addChildTray`,
+            query: {
+                whid: whid,
+                whname: whname,
+                length: length,
+                width: width
+            },
+        });
     };
 
 
@@ -688,6 +695,7 @@ export default function AddTray() {
                                                                                 setLastChildParentWidth(childparentwidth);
                                                                                 setChildLength(1);
                                                                                 setChildWidth(1);
+                                                                                goToAddChildTray(childDataItem.whid, childDataItem.whname, childDataItem.length, childDataItem.width);
                                                                                 // console.log("check" + JSON.stringify(data11);
                                                                             }}
                                                                             style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
@@ -709,7 +717,7 @@ export default function AddTray() {
                     </div>
                 </div>
             </div>
-            <div className={scss.childmain} style={{ display: childwhpositionVisible }}>
+            {/* <div className={scss.childmain} style={{ display: childwhpositionVisible }}>
                 <div className={scss.left}>
                 </div>
                 <div className={scss.right}>
@@ -796,7 +804,7 @@ export default function AddTray() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </SubLayer>
     );
 }
