@@ -1213,6 +1213,7 @@ const props_invoiceBook: TselectorProps<TaccountantInvoiceBookDto> = {
   selectedKey: 'alphabeticLetter',
   params: {
     sort: 'alphabeticLetter',
+    order: 'ASC',
   },
   configArr: [
     {
