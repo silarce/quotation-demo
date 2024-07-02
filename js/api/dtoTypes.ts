@@ -29,6 +29,7 @@ export type TaccountantPaymentType = '匯款' | '票據' | '現金';
 export type TreceiptStatus = '託收' | '已兌現';
 export type Tcurrency = 'TWD 新臺幣' | 'USD 美元';
 export type TinvoiceType = '三聯式' | '二聯式';
+export type TelectronicSuppliesAction = '領取' | '退回';
 
 // =============================================================================
 export type Tparams = {
@@ -3001,39 +3002,62 @@ export type TelectronicSuppliesDto = {
   id: string;
   createdAt: string; // date
   updatedAt: string; // date
-  // 填表日期
-  dispatchDate: string; //date
-  // 需要日期
-  requirementsDate: string; //date
-  // 工程編號
-  // engineeringNumber: string;
-  projectNumber: string;
-  // 工程名稱
-  projectName: string;
 
-  electronicSuppliesRecords: TelectronicSuppliesRecordDto[];
-  // others: string;
-
-  // 備料人員Id
-  materialHandlerId?: string | null;
-  // 備料人員
-  materialHandler?: TemployeeDto | null;
-  // 領料人員ID
-  ingredientTechnicianId?: string | null;
-  // 領料人員
-  ingredientTechnician?: TemployeeDto | null;
-  //填表人員ID
-  formCompleterId?: string | null;
-  // 填表人員
-  formCompleter?: TemployeeDto | null;
-
-  contractId?: string;
+  // 所屬合約Id
+  contractId?: string | null;
+  // 所屬合約
   contract?: TquotationContractDto;
-  legacyContractId?: string;
+  // 所屬舊合約Id
+  legacyContractId?: string | null;
+  // 所屬舊合約
   legacyContract?: TlegacyContractDto;
-  // quotationId: string;
-  // quotation: TquotationDto;
+  // 完成領料
+  hasFinishPickUp: boolean;
+  // 送電備品內容
+  electronicSuppliesContents: TelectronicSuppliesContentDto[];
+  // 送電備品領料單紀錄
+  pickupRecords: TelectronicSuppliesPickupRecordDto[];
+  // 送電備品需求單紀錄
+  requirementRecords: TelectronicSuppliesRequirementRecordDto[];
 };
+
+// export type TelectronicSuppliesDto = {
+//   id: string;
+//   createdAt: string; // date
+//   updatedAt: string; // date
+//   // 填表日期
+//   dispatchDate: string; //date
+//   // 需要日期
+//   requirementsDate: string; //date
+//   // 工程編號
+//   // engineeringNumber: string;
+//   projectNumber: string;
+//   // 工程名稱
+//   projectName: string;
+
+//   electronicSuppliesRecords: TelectronicSuppliesRecordDto[];
+//   // others: string;
+
+//   // 備料人員Id
+//   materialHandlerId?: string | null;
+//   // 備料人員
+//   materialHandler?: TemployeeDto | null;
+//   // 領料人員ID
+//   ingredientTechnicianId?: string | null;
+//   // 領料人員
+//   ingredientTechnician?: TemployeeDto | null;
+//   //填表人員ID
+//   formCompleterId?: string | null;
+//   // 填表人員
+//   formCompleter?: TemployeeDto | null;
+
+//   contractId?: string;
+//   contract?: TquotationContractDto;
+//   legacyContractId?: string;
+//   legacyContract?: TlegacyContractDto;
+//   // quotationId: string;
+//   // quotation: TquotationDto;
+// };
 
 export type TcreateElectronicSuppliesDto = Omit<
   TelectronicSuppliesDto,
@@ -3054,6 +3078,89 @@ export type TcreateElectronicSuppliesDto = Omit<
 export type TupdateElectronicSuppliesDto = Omit<Partial<TcreateElectronicSuppliesDto>, 'electronicSuppliesRecords'> & {
   electronicSuppliesRecords: TupdateElectronicSuppliesRecordDto[];
 };
+
+type TelectronicSuppliesContentDto = {
+  // 所屬送電備品表id
+  electronicSuppliesId: string;
+  // 所屬送電備品表
+  electronicSupplies: TelectronicSuppliesDto;
+  // 品名
+  itemName: string;
+  // 種類
+  category: string;
+  // 單位
+  unit: string | null;
+  // 已領數量
+  pickUpQuantity: number | null;
+  // 未領數量
+  stayQuantity: number | null;
+  // 總需求數量
+  quantity: number | null;
+};
+
+type TelectronicSuppliesRequirementRecordDto = {
+  // 所屬送電備品id
+  electronicSuppliesId?: string | null;
+  // 所屬送電備品
+  electronicSupplies?: TelectronicSuppliesDto;
+  // 新增日期
+  operationDate: Date;
+  // 新增人員id
+  agentEmployeeId: string;
+  // 新增人員
+  agentEmployee: TemployeeDto;
+  // 需求明細
+  requirementRecordDetails: TelectronicSuppliesRequirementRecordDetailDto[];
+};
+
+type TelectronicSuppliesRequirementRecordDetailDto = {
+  // 所屬送電備品需求單Id
+  requirementRecordId?: string | null;
+  // 所屬送電備品需求單
+  requirementRecord?: TelectronicSuppliesRequirementRecordDto;
+  // 品名
+  itemName: string;
+  // 種類
+  category: string;
+  // 需求數量
+  quantity: number | null;
+  // 單位
+  unit: string | null;
+};
+
+type TelectronicSuppliesPickupRecordDto = {
+  // 所屬送電備品id
+  electronicSuppliesId: string | null;
+  // 所屬送電備品
+  electronicSupplies: TelectronicSuppliesDto;
+  // 領取/退回日期
+  operationDate: Date;
+  // 領料人員id
+  takeOffEmployeeId: string;
+  // 領料人員
+  takeOffEmployee: TemployeeDto;
+  // 領料/退回
+  action: TelectronicSuppliesAction;
+  // 領料明細
+  pickupRecordDetails: TelectronicSuppliesPickupRecordDetailDto[];
+};
+
+type TelectronicSuppliesPickupRecordDetailDto = {
+  // 所屬送電備品領料單Id
+  pickupRecordId?: string | null;
+  // 所屬送電備品領料單
+  pickupRecord?: TelectronicSuppliesPickupRecordDto;
+  // 品名
+  itemName: string;
+  // 種類
+  category: string;
+  // 需求數量
+  quantity: number | null;
+  // 單位
+  unit: string | null;
+};
+
+// ---------------------------------------------------------------------------
 
 export type TexchangeRecordDto = {
   id: string;
