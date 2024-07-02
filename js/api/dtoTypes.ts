@@ -3538,6 +3538,8 @@ export type TaccountsReceivableDto = {
   totalPayment: number;
   // 目前合計請款營業稅額
   totalTax: number;
+  // 額外收入
+  extraIncome: number;
 };
 
 export type TcreateAccountReceivableDto = {
