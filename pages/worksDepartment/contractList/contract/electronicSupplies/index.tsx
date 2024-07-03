@@ -261,7 +261,7 @@ export default function ElectronicSupplies() {
   return (
     <SubLayer>
       <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? '---'} />
-      <div className={scss.contain1er}>
+      <div className={scss.container}>
         <div className={scss.info}>
           <InputSel
             caption="工程編號"
