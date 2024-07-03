@@ -82,7 +82,7 @@ export type {
   TcreateDispatchingDto,
   TexchangeDto,
   TcreateExchgangeDto,
-
+  TworksheetDto,
   // TupdateWorkSheetItem,
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
@@ -346,7 +346,13 @@ export const apiPostElectronicSupplies = (body: { contractId: string }) => {
 
   return axi
     .post(api, body)
-    .then(({ data }) => data)
+    .then(({ data }) => {
+      myAlert.success({
+        title: '更新送電備品總表成功',
+      });
+
+      return data;
+    })
     .catch((err: AxiosError<TerrorContent>) => {
       let message = err.response?.data?.message || err.message;
       message === 'Cannot found worksheet!' && (message = '送電備品尚無需更新');
@@ -363,16 +369,24 @@ export const apiPostElectronicSupplies = (body: { contractId: string }) => {
 
 const apiGetElectronicSupplies_id = (id: string) => {
   const api = `/engineering/electronic-supplies/${id}`;
+  const params = {
+    populate: [
+      //
+      'electronicSuppliesContents',
+      'pickupRecords',
+      'requirementRecords',
+    ],
+  };
 
   return axi
-    .get(api)
+    .get(api, { params })
     .then(({ data }) => data)
     .catch((error) => {
       return Promise.reject(error);
     });
 };
 
-export const useElectronicSupplies_id = (id: string | undefined) => {
+export const useElectronicSupplies_id = (id: string | undefined | null) => {
   const [isFetching, setIsFetching] = useState(false);
   const [res, setRes] = useState<TelectronicSuppliesDto>();
 
@@ -393,6 +407,10 @@ export const useElectronicSupplies_id = (id: string | undefined) => {
       setIsFetching(false);
     }
   };
+
+  useEffect(() => {
+    update();
+  }, [id]);
 
   return {
     data: res,

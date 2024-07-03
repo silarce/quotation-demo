@@ -2214,6 +2214,8 @@ export type TquotationContractDto = {
   engineeringDeliveryList?: TengineeringDeliveryListDto;
   //
   certificatedDoc?: TcertificatedDocDto[];
+  electronicSuppliesId: string | null;
+  electronicSupplies?: TelectronicSuppliesDto;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
@@ -3020,14 +3022,18 @@ export type TelectronicSuppliesDto = {
   // 完成領料
   hasFinishPickUp: boolean;
   // 送電備品內容
-  electronicSuppliesContents: TelectronicSuppliesContentDto[];
+  electronicSuppliesContents?: TelectronicSuppliesContentDto[];
   // 送電備品領料單紀錄
-  pickupRecords: TelectronicSuppliesPickupRecordDto[];
+  pickupRecords?: TelectronicSuppliesPickupRecordDto[];
   // 送電備品需求單紀錄
-  requirementRecords: TelectronicSuppliesRequirementRecordDto[];
+  requirementRecords?: TelectronicSuppliesRequirementRecordDto[];
 };
 
 export type TelectronicSuppliesContentDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 所屬送電備品表id
   electronicSuppliesId: string;
   // 所屬送電備品表
@@ -3047,6 +3053,10 @@ export type TelectronicSuppliesContentDto = {
 };
 
 export type TelectronicSuppliesRequirementRecordDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 所屬送電備品id
   electronicSuppliesId?: string | null;
   // 所屬送電備品
@@ -3062,6 +3072,10 @@ export type TelectronicSuppliesRequirementRecordDto = {
 };
 
 export type TelectronicSuppliesRequirementRecordDetailDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 所屬送電備品需求單Id
   requirementRecordId?: string | null;
   // 所屬送電備品需求單
@@ -3077,23 +3091,31 @@ export type TelectronicSuppliesRequirementRecordDetailDto = {
 };
 
 export type TelectronicSuppliesPickupRecordDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 所屬送電備品id
   electronicSuppliesId: string | null;
   // 所屬送電備品
-  electronicSupplies: TelectronicSuppliesDto;
+  electronicSupplies?: TelectronicSuppliesDto;
   // 領取/退回日期
-  operationDate: Date;
+  operationDate: string;
   // 領料人員id
   takeOffEmployeeId: string;
   // 領料人員
-  takeOffEmployee: TemployeeDto;
+  takeOffEmployee?: TemployeeDto;
   // 領料/退回
   action: TelectronicSuppliesAction;
   // 領料明細
-  pickupRecordDetails: TelectronicSuppliesPickupRecordDetailDto[];
+  pickupRecordDetails?: TelectronicSuppliesPickupRecordDetailDto[];
 };
 
 export type TelectronicSuppliesPickupRecordDetailDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 所屬送電備品領料單Id
   pickupRecordId?: string | null;
   // 所屬送電備品領料單
@@ -3194,6 +3216,8 @@ export type TworksheetDto = {
   latestRecord: TworksheetRecordDto;
   // 已捨棄
   isAbandoned: boolean;
+  // 是否已依據此worksheet建立送電備品
+  isAlreadyToElectronicSupplies: boolean;
 };
 
 export type TworksheetDto_legacy = {

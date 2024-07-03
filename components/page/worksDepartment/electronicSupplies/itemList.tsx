@@ -6,11 +6,11 @@ import classNames from 'classnames';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
-import { TquotationProductItemDto } from 'js/api/dtoTypes';
-
 import scss from './itemList.module.scss';
 import scss_p from './_public.module.scss';
 
+// type
+import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
 // =============================================================
 type TproductItemList = {
   [key: string]: {
@@ -21,8 +21,43 @@ type TproductItemList = {
 
 // =============================================================
 
-export default function ItemList({ itemList }: { itemList: TproductItemList | undefined }) {
+// MARK:START
+
+export default function ItemList({
   //
+  worksheetArr,
+}: {
+  worksheetArr: TworksheetDto[];
+}) {
+  //
+
+  const productItemList: TproductItemList = useMemo(() => {
+    const list: TproductItemList = {};
+
+    worksheetArr.forEach((worksheet) => {
+      const { latestRecord, isAbandoned, isAlreadyToElectronicSupplies } = worksheet;
+
+      if (isAbandoned || !isAlreadyToElectronicSupplies) {
+        return;
+      }
+
+      const { id, contractProductItems } = latestRecord;
+
+      if (!contractProductItems?.[0]) {
+        return;
+      }
+
+      const qty = contractProductItems.length;
+
+      list[id] = {
+        productItem: contractProductItems[0],
+        qty,
+      };
+    }); // forEach
+
+    return list;
+    //
+  }, [worksheetArr]);
 
   const control_table: Ttable = useMemo(() => {
     const thead: Ttable['thead'] = {
@@ -34,9 +69,33 @@ export default function ItemList({ itemList }: { itemList: TproductItemList | un
       }),
     };
 
-    const tbodyRowArr: Ttable['tbody']['rowArr'] = Object.values(itemList ?? {}).map((item, pIndex) => {
+    const tbodyRowArr: Ttable['tbody']['rowArr'] = Object.values(productItemList ?? {}).map((item, pIndex) => {
       const { productItem, qty } = item;
-      const { itemName, itemNumber, doorModelName, motorVendor, motorVoltage, horsepower } = productItem;
+      const {
+        //
+        accessories,
+        itemName,
+        itemNumber,
+        doorModelName,
+        motorVendor,
+        motorVoltage,
+        horsepower,
+      } = productItem;
+
+      const electronicSupplies = {
+        obstacleSensor: false, // 障感器
+        infrared: false, // 紅外線
+        remoteControl: false, // 遙控器
+        bounceDoor: false, // 彈射門
+      };
+
+      accessories.forEach((acce) => {
+        const name = acce.name;
+        name.includes('障感器') && (electronicSupplies.obstacleSensor = true);
+        name.includes('紅外線') && (electronicSupplies.infrared = true);
+        name.includes('遙控器') && (electronicSupplies.remoteControl = true);
+        name.includes('彈射門') && (electronicSupplies.bounceDoor = true);
+      });
 
       return {
         cellArr: [
@@ -70,19 +129,19 @@ export default function ItemList({ itemList }: { itemList: TproductItemList | un
           },
           {
             ...configList.obstacleSensor,
-            children: <CheckBox_readonly />,
+            children: <CheckBox_readonly value={electronicSupplies.obstacleSensor} />,
           },
           {
             ...configList.infrared,
-            children: <CheckBox_readonly value={true} />,
+            children: <CheckBox_readonly value={electronicSupplies.infrared} />,
           },
           {
             ...configList.remoteControl,
-            children: <CheckBox_readonly value={true} />,
+            children: <CheckBox_readonly value={electronicSupplies.remoteControl} />,
           },
           {
             ...configList.bounceDoor,
-            children: <CheckBox_readonly />,
+            children: <CheckBox_readonly value={electronicSupplies.bounceDoor} />,
           },
         ],
       };
@@ -93,10 +152,14 @@ export default function ItemList({ itemList }: { itemList: TproductItemList | un
     };
 
     return { thead, tbody };
-  }, [itemList]);
+  }, [productItemList]);
 
-  return <Table01 {...control_table} className={classNames(scss_p.table)} />;
+  // region RENDER
+
+  return <Table01 {...control_table} className={classNames(scss.table, scss_p.table)} />;
 }
+
+// MARK: END
 
 // ==================================================================
 // ==================================================================
@@ -190,7 +253,7 @@ const configList: { [key: string]: Tconfig_table } = {
     justifyContent: 'center',
   },
   remoteControl: {
-    label: '遙控器(1:2)',
+    label: '遙控器',
     width: 200,
     justifyContent: 'center',
   },
