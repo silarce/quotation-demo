@@ -871,7 +871,26 @@ const Tfoot = ({
       <div className={classNames(scss.row)}>
         {/* <span>保留款</span> */}
         <div className={scss.totalInfoWrapper}>
-          <Popover trigger="hover" content="保留款為含稅或未稅時不可以編輯">
+          <Popover
+            //
+            trigger="hover"
+            title="保留款由下方的保留款百分比與含稅未稅選項決定"
+            content={
+              <div>
+                圈選含稅
+                <br />
+                保留款 = 保留款百分比 * 本期合計
+                <br />
+                <br />
+                圈選未稅
+                <br />
+                保留款 = 保留款百分比 * 本期總計
+                <br />
+                <br />
+                圈選無則保留款為0
+              </div>
+            }
+          >
             <span>
               <Icon_info />
             </span>
@@ -879,10 +898,15 @@ const Tfoot = ({
           保留款
         </div>
         <input
-          className={classNames((readOnly || class_other.isRetainageLocked) && scss.readyOnly)}
+          // className={classNames((readOnly || class_other.isRetainageLocked) && scss.readyOnly)}
+          className={classNames(scss.readyOnly)}
           value={retainage}
-          onChange={(e) => (class_other.retainage = e.target.value)}
-          readOnly={readOnly || class_other.isRetainageLocked}
+          onChange={(e) => {
+            // class_other.retainage = e.target.value;
+          }}
+          // readOnly={readOnly || class_other.isRetainageLocked}
+          // readOnly={readOnly}
+          readOnly={true}
           type={inputType}
         />
       </div>
@@ -910,7 +934,28 @@ const Tfoot = ({
       </div>
 
       <div className={classNames(isTotal && 'invisible')}>
-        保留款
+        <div className="flex gap-2">
+          <span>保留款</span>
+          <InputSel
+            //
+            wrapperStyle={{ width: 60, gap: '5px' }}
+            fontSize="14"
+            disabled={readOnly || class_other.retainageType === 'null'}
+            showBaseline="auto"
+            inputProps={{
+              props: {
+                type: 'number',
+                placeholder: '',
+                value: class_other.retainagePercent,
+                onChange: (e) => {
+                  class_other.retainagePercent = e.target.value;
+                },
+              },
+            }}
+            suffix="%"
+          />
+        </div>
+
         <div className={scss.checkBar}>
           <Radio.Group
             disabled={readOnly}
@@ -921,7 +966,25 @@ const Tfoot = ({
           >
             <Radio value={'含稅' as TretainageType}>含稅</Radio>
             <Radio value={'未稅' as TretainageType}>未稅</Radio>
-            <Radio value={'null'}>自訂</Radio>
+            <Radio value={'null'}>無</Radio>
+            {/* <Radio value={'null'}>
+              <div className={classNames(scss.inputInsideRadio)}>
+                <span>自訂</span>
+                <InputSel
+                  //
+                  wrapperStyle={{ width: 60, gap: '5px' }}
+                  fontSize="14"
+                  disabled={readOnly || class_other.retainageType !== 'null'}
+                  showBaseline="auto"
+                  inputProps={{
+                    props: {
+                      placeholder: '',
+                    },
+                  }}
+                  suffix="%"
+                />
+              </div>
+            </Radio> */}
           </Radio.Group>
         </div>
       </div>
@@ -1206,14 +1269,22 @@ const calcPrice = (state_period: Tstate_period) => {
 const calcRetainage = (state_period: Tstate_period) => {
   const period = state_period;
 
-  const { subTotal, contractTotal, retainageType } = period;
+  const { subTotal, contractTotal, retainageType, retainagePercent } = period;
 
   let retainage = '';
 
   if (retainageType === '含稅') {
-    retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
+    retainage = new Decimal(contractTotal)
+      .mul(0.1)
+      .mul(retainagePercent || 0)
+      .toDecimalPlaces(0)
+      .toString();
   } else if (retainageType === '未稅') {
-    retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
+    retainage = new Decimal(subTotal)
+      .mul(0.1)
+      .mul(retainagePercent || 0)
+      .toDecimalPlaces(0)
+      .toString();
   }
 
   return retainage;
@@ -1251,6 +1322,7 @@ const useDefaultState = ({
       isWriteOffDeposit,
       //
       retainageType,
+      retainagePercent,
       // allowance,
       note,
       //
@@ -1348,6 +1420,8 @@ const useDefaultState = ({
       contractTotal: totals_num.contractTotal,
 
       retainageType: retainageType || 'null',
+      retainagePercent: String(retainagePercent || ''),
+
       allowance: String(allowance || ''),
       note: note || '',
 
@@ -1506,6 +1580,27 @@ class Class_OtherNode {
     this.setState_period((period) => {
       period = { ...period };
       period.retainageType = value;
+
+      if (value === 'null') {
+        period.retainagePercent = '';
+      } else if (!period.retainagePercent) {
+        period.retainagePercent = '10';
+      }
+
+      period.retainage = calcRetainage(period);
+      period.price = calcPrice(period);
+
+      return period;
+    });
+  }
+
+  get retainagePercent() {
+    return this.state_period.retainagePercent;
+  }
+  set retainagePercent(value) {
+    this.setState_period((period) => {
+      period = { ...period };
+      period.retainagePercent = value;
       period.retainage = calcRetainage(period);
       period.price = calcPrice(period);
 
@@ -1721,7 +1816,8 @@ const create_emptyPeriod = (): Tperiod_reduce => {
     isRetainage: false,
     isDeduction: false,
     isWriteOffDeposit: false,
-    retainageType: null,
+    retainageType: '含稅',
+    retainagePercent: 10,
     // allowance: 0,
     note: '',
     // accountantList: [],

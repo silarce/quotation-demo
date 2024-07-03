@@ -3620,6 +3620,9 @@ export type TaccountsReceivablePeriodDto = {
   isWriteOffDeposit: boolean;
   // 保留款類型
   retainageType: TretainageType | null;
+  // 保留款百分比
+  retainagePercent: number | null;
+
   // 折讓 // 沒用到
   allowance: number | null;
   // 發票 // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
@@ -3641,6 +3644,7 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   | 'isDeduction'
   | 'isWriteOffDeposit'
   | 'retainageType'
+  | 'retainagePercent'
   | 'allowance' // 會記錄在invoice
   | 'price'
 > & {
