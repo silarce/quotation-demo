@@ -1414,7 +1414,7 @@ const useDefaultState = ({
       contractTotal: totals_num.contractTotal,
 
       retainageType: retainageType || 'null',
-      retainagePercent: String(retainagePercent || ''),
+      retainagePercent: retainagePercent || '',
 
       allowance: String(allowance || ''),
       note: note || '',
@@ -1811,7 +1811,7 @@ const create_emptyPeriod = (): Tperiod_reduce => {
     isDeduction: false,
     isWriteOffDeposit: false,
     retainageType: '含稅',
-    retainagePercent: 10,
+    retainagePercent: '10',
     // allowance: 0,
     note: '',
     // accountantList: [],

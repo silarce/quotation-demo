@@ -3621,7 +3621,7 @@ export type TaccountsReceivablePeriodDto = {
   // 保留款類型
   retainageType: TretainageType | null;
   // 保留款百分比
-  retainagePercent: number | null;
+  retainagePercent: string | null;
 
   // 折讓 // 沒用到
   allowance: number | null;
