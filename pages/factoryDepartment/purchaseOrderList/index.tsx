@@ -32,7 +32,7 @@ type Tquery = {
     wareHouseId: string | undefined;
 };
 
-export default function purchaseOrderList() {
+export default function PurchaseOrderList() {
 
     //路由參數
     const router = useRouter();
@@ -174,9 +174,9 @@ export default function purchaseOrderList() {
             label: '新增採購單',
             onClick: () => {
                 router.push({
-                    pathname: `/factoryDepartment/addPurchaseOrder`,
+                    pathname: `/factoryDepartment/purchaseOrderList/addPurchaseOrder`,
                     query: {
-                        type: 'Tray',
+                        type: 'AddPurchaseOrder',
                     },
                 });
             },
@@ -188,7 +188,7 @@ export default function purchaseOrderList() {
     //取領料單清單
     const getPurchaseOrder = async () => {
         try {
-            // alert(checkfirstin);
+            // console.log(userInfo);
             setIsLoading(true);
             const conditionModel: {
                 // keyword: string | undefined;
@@ -291,6 +291,8 @@ export default function purchaseOrderList() {
             GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid);
             setPurchaseorderidin(purchaseorderid as string);
             setPurchaseorderuuidin(purchaseorderuuid as string);
+            // setCreate_atin((create_at != null ? create_at : "") as string);
+            // alert(create_at)
             setCreate_atin(create_at as string);
             setCreate_byin(create_by as string);
             setSuppliernamein(suppliername as string);
@@ -338,41 +340,48 @@ export default function purchaseOrderList() {
     const TransferPurchaseOrderToProductReceipt = async () => {
         try {
             setIsLoading(true);
-            const conditionModel: {
-                purchaseorderuuid: string | undefined,
-                data: any
-            } = {
-                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
-                data: data2
+    
+            const conditionModel = {
+                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid,
+                data: data2,
+                username: userInfo?.username
             };
-
-
+    
             var inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}TransferPurchaseOrderToProductReceipt?${queryParams}`);
+    
+            const response = await fetch(`${setting.apipath}TransferPurchaseOrderToProductReceipt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ Input: inputModel }),
+            });
+    
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
+    
+            const responseData = await response.json();
+            console.log("Transfer response:", responseData);
+    
+            // 更新數據和其它操作
             getPurchaseOrder();
-
             getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
-            
             GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
-
-        } catch (error: any) {
+    
+        } catch (error:any) {
             setError(error.message);
-        }
-        finally {
+            console.error('Transfer failed:', error);
+        } finally {
             setIsLoading(false);
         }
     };
+    
 
 
     //結案
@@ -417,10 +426,11 @@ export default function purchaseOrderList() {
     //#endregion
     // 轉為進貨單，開始驗收
     function handleReceipt() {
+        // TransferPurchaseOrderToProductReceipt();
         myAlert.confirm({
             title: '確定要轉為進貨單嗎?',
             content: <>
-                <h1>請確認內容金額是否正確</h1>
+                <h1>請確認數量、金額是否正確</h1>
             </>,
             props: {
                 onOk: () => {
@@ -472,12 +482,6 @@ export default function purchaseOrderList() {
         // });
     };
 
-
-    // const [data2, setData2] = useState([
-    //     { id: 1, quantity: 10 },
-    //     { id: 2, quantity: 15 },
-    //     { id: 3, quantity: 20 }
-    // ]);
     const handleChange = (index: number, value: string | number) => {
         setData2(prevState => {
             const updatedData = [...prevState];
@@ -507,13 +511,9 @@ export default function purchaseOrderList() {
                 <div className={scss.right}>
                     <div className={scss.tite_main}>
                         <div>
-                            {/* <span style={{ fontSize: '25px', fontWeight: 'bolder', color: '#14256a'}}>
-                                採購單
-                            </span> */}
                             <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "false" ? "" : "none" }}>
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="結案" onClick={() => { handleClosePO() }} />
-                                &nbsp;&nbsp;
-
+                                {/* <button className={scss.greenbutton} onClick={() => { handleClosePO() }} >未結案</button> */}
                             </span>
                             <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
                                 <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" onClick={() => { alert("領料托盤") }} />
@@ -674,6 +674,9 @@ export default function purchaseOrderList() {
                     <br />
                     <div className={scss.foot_main}>
                         <div>
+                            (1).採購單請回簽.並確認可交貨日期。<br />
+                            (2).請於出貨單上註明本公司產品編號,及產品名稱,以利請款。<br />
+                            (3).請配合定量包裝及標示品名規格, 方便點收。
                         </div>
                         <div>
                         </div>
@@ -705,20 +708,18 @@ export default function purchaseOrderList() {
                         </div>
                     </div>
                     <div className={scss.content_main_content}>
-                        <span className={scss.mytitle}>
-                            {/* <button onClick={() => { setData2(data2restore) }}>
-                                <img src={icon_autoadd.src} alt="add" style={{ width: '40px', height: '40px' }} />
-                            </button> */}
+                        <span className={scss.mytitle} style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "none" : "" }}>
                             <MyButton_v2 px='px22' py='py4' theme={undefined} label="進貨/批次進貨" onClick={handleReceipt} />
+                            {/* <button onClick={()=>{handleReceipt()}}>sdf</button> */}
                         </span>
                         <Thead01 type={'PurchaseOrderDetail2'} />
                         {data2.map((_item, index) => (
-                            <CellWithBar key={index} className={scss.panelHeader11}>
+                            <CellWithBar key={index} className={scss.panelHeader13}>
                                 <div className={scss.row01}>
                                     <span>{index + 1}</span>
                                     <span>{_item.productid}</span>
                                     <span>{_item.name}</span>
-                                    <span style={{ color: 'red' }}>
+                                    <span style={{ color: '#ea1833' }}>
                                         {_item.alreadyinquantity}
                                     </span>
                                     <span>

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
 
-import scss from './prodReceiptList.module.scss';
+import scss from './purchaseRequisitionList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -26,27 +26,23 @@ import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
-
+import { Button, Modal } from 'antd';
 
 type Tquery = {
     wareHouseId: string | undefined;
 };
 
-export default function ProdReceiptList() {
+export default function PurchaseRequisitionList() {
 
     //路由參數
     const router = useRouter();
     const {
         firstin,
-        prodreceiptuuid,
-        prodreceiptid,
         purchaseorderuuid,
         purchaseorderid,
-        purchaseordercreate_at,
-        purchaseordercreate_by,
         create_at,
         create_by,
-        inspected,
+        receipted,
         suppliername,
         suppliertaxid,
         supplieraddress,
@@ -54,14 +50,15 @@ export default function ProdReceiptList() {
         invoice
     } = router.query;
 
-
-    // 路由參數排除
     const getQueryParam = (param: any) => {
         if (Array.isArray(param)) {
             return param[0];
         }
         return param;
     };
+
+    const purchaseorderuuidStr = getQueryParam(purchaseorderuuid);
+
 
 
     //登入者資料
@@ -83,15 +80,11 @@ export default function ProdReceiptList() {
 
 
 
-    const [inspectedin, setInspectedin] = useState<string>("");
+    const [receiptedin, setReceiptedin] = useState<string>("");
     const [create_atin, setCreate_atin] = useState<string>("");
-    const [create_byin, setCreate_byin] = useState<string>("");
-    const [purchaseordercreate_atin, setPurchaseordercreate_atin] = useState<string>("");
-    const [purchaseordercreate_byin, setPurchaseordercreate_byin] = useState<string>("");
     const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
     const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
-    const [prodreceiptuuidin, setProdreceiptuuidin] = useState<string>("");
-    const [prodreceiptidin, setProdreceiptidin] = useState<string>("");
+    const [create_byin, setCreate_byin] = useState<string>("");
     const [suppliernamein, setSuppliernamein] = useState<string>("");
     const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
@@ -106,6 +99,11 @@ export default function ProdReceiptList() {
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
 
+
+
+  
+        // const [open, setOpen] = useState(false);
+    
 
     //#region 上方功能列
 
@@ -178,12 +176,13 @@ export default function ProdReceiptList() {
         { searchGroup },
         {
             type: 'addButton',
-            label: '新增採購單',
+            label: '新增請購單',
             onClick: () => {
+                // setOpen(true);
                 router.push({
-                    pathname: `/factoryDepartment/addPurchaseOrder`,
+                    pathname: `/factoryDepartment/purchaseRequisitionList/addPurchaseRequisition`,
                     query: {
-                        type: 'Tray',
+                        type: 'AddPurchaseRequisition',
                     },
                 });
             },
@@ -192,10 +191,10 @@ export default function ProdReceiptList() {
     //#endregion
 
     //#region call api
-    //取進貨單主檔
-    const getProdReceipt = async () => {
+    //取領料單清單
+    const getPurchaseOrder = async () => {
         try {
-            // alert(checkfirstin);
+            // console.log(userInfo);
             setIsLoading(true);
             const conditionModel: {
                 // keyword: string | undefined;
@@ -213,7 +212,7 @@ export default function ProdReceiptList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetProdReceipt?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetPurchaseOrder?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -223,27 +222,19 @@ export default function ProdReceiptList() {
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
                 console.log(data[0].receipted);
-                getProdReceiptDetail(data[0].prodreceiptuuid);
-                // GetProdReceiptDetailByPurchaseOrderId(data[0].prodreceiptuuid);
+                getPurchaseOrderDetail(data[0].purchaseorderuuid);
+                GetProdReceiptDetailByPurchaseOrderId(data[0].purchaseorderuuid);
                 setCreate_atin(data[0].create_at);
                 setPurchaseorderuuidin(data[0].purchaseorderuuid);
                 setPurchaseorderidin(data[0].purchaseorderid);
-                setProdreceiptuuidin(data[0].prodreceiptuuid);
-                setProdreceiptidin(data[0].prodreceiptid);
                 setCreate_byin(data[0].create_by);
-                setPurchaseordercreate_atin(data[0].purchaseordercreate_at);
-                setPurchaseordercreate_byin(data[0].purchaseordercreate_by);
                 setSuppliernamein(data[0].suppliername);
                 setSuppliertaxidin(data[0].suppliertaxid);
-                setInspectedin(data[0].inspected.toString());
+                setReceiptedin(data[0].receipted.toString());
                 setSupplieraddressin(data[0].supplieraddress);
             }
         } catch (error: any) {
-            setError("getProdReceipt:" + error.message);
-            // myAlert.err({
-            //     title:'getProdReceipt',
-            //     content:error.message
-            // })
+            setError(error.message);
         }
         finally {
             setIsLoading(false);
@@ -251,17 +242,17 @@ export default function ProdReceiptList() {
     };
 
     useEffect(() => {
-        getProdReceipt();
+        getPurchaseOrder();
     }, []);
 
     //取對應的採購明細
-    const getProdReceiptDetail = async (prodreceiptuuid: any) => {
+    const getPurchaseOrderDetail = async (purchaseorderuuid: any) => {
         try {
             setIsLoading(true);
             const conditionModel: {
-                prodreceiptuuid: string | undefined
+                purchaseorderuuid: string | undefined
             } = {
-                prodreceiptuuid: prodreceiptuuid as string | undefined,
+                purchaseorderuuid: purchaseorderuuid as string | undefined,
             };
 
 
@@ -273,7 +264,7 @@ export default function ProdReceiptList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdReceiptDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetPurchaseOrderDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -292,7 +283,7 @@ export default function ProdReceiptList() {
             const totalPayPrice = totalprice + taxPrice;
             setTotalPayPrice(totalPayPrice.toLocaleString());
         } catch (error: any) {
-            setError("getProdReceiptDetail:" + error.message);
+            setError(error.message);
         }
         finally {
             setIsLoading(false);
@@ -301,32 +292,30 @@ export default function ProdReceiptList() {
 
     // 確保 getPurchaseOrderDetail 的 useEffect 中的依賴項設置正確
     useEffect(() => {
-        if (prodreceiptuuid) {
-            getProdReceiptDetail(prodreceiptuuid);
-            // GetProdReceiptDetailByPurchaseOrderId(prodreceiptuuid);
+        if (purchaseorderuuid) {
+            getPurchaseOrderDetail(purchaseorderuuid);
+            GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid);
             setPurchaseorderidin(purchaseorderid as string);
             setPurchaseorderuuidin(purchaseorderuuid as string);
-            setProdreceiptuuidin(prodreceiptuuid as string);
-            setProdreceiptidin(prodreceiptid as string);
+            // setCreate_atin((create_at != null ? create_at : "") as string);
+            // alert(create_at)
             setCreate_atin(create_at as string);
             setCreate_byin(create_by as string);
-            setPurchaseordercreate_atin(purchaseordercreate_at as string);
-            setPurchaseordercreate_byin(purchaseordercreate_by as string);
             setSuppliernamein(suppliername as string);
             setSuppliertaxidin(suppliertaxid as string);
-            setInspectedin(inspected as string);
+            setReceiptedin(receipted as string);
             setSupplieraddressin(supplieraddress as string);
         }
-    }, [prodreceiptuuid]);
+    }, [purchaseorderuuid]);
 
     //取已對應採購單的已進貨明細
-    const GetProdReceiptDetailByPurchaseOrderId = async (prodreceiptuuid: any) => {
+    const GetProdReceiptDetailByPurchaseOrderId = async (purchaseorderuuid: any) => {
         try {
             setIsLoading(true);
             const conditionModel: {
-                prodreceiptuuid: string | undefined
+                purchaseorderuuid: string | undefined
             } = {
-                prodreceiptuuid: prodreceiptuuid as string | undefined,
+                purchaseorderuuid: purchaseorderuuid as string | undefined,
             };
 
 
@@ -359,10 +348,12 @@ export default function ProdReceiptList() {
             setIsLoading(true);
             const conditionModel: {
                 purchaseorderuuid: string | undefined,
-                data: any
+                data: any,
+                username: string | undefined
             } = {
                 purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
-                data: data2
+                data: data2,
+                username: userInfo?.username
             };
 
 
@@ -379,11 +370,11 @@ export default function ProdReceiptList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            getProdReceipt();
+            getPurchaseOrder();
 
-            getProdReceiptDetail(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
+            getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
 
-            GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
+            GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -418,9 +409,9 @@ export default function ProdReceiptList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            getProdReceipt();
+            getPurchaseOrder();
 
-            getProdReceiptDetail(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
+            getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -443,7 +434,7 @@ export default function ProdReceiptList() {
             </>,
             props: {
                 onOk: () => {
-                    // TransferPurchaseOrderToProductReceipt();
+                    TransferPurchaseOrderToProductReceipt();
                     // console.log("XXXXXXXXXXXXXXXXXXX");
                     // console.log(data2);
                 }
@@ -515,12 +506,12 @@ export default function ProdReceiptList() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '進貨單'} panelList={panelList} />
+            <PageHeader02 tag={quotationStatusLookup[status] ?? '請購單'} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div>
-                        <Thead01 type={'ProdReceipt'} />
-                        <Tbody01 type={'ProdReceipt'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                        <Thead01 type={'PurchaseRequisition'} />
+                        <Tbody01 type={'PurchaseRequisition'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                     </div>
                 </div>
                 <div className={scss.right}>
@@ -529,11 +520,12 @@ export default function ProdReceiptList() {
                             {/* <span style={{ fontSize: '25px', fontWeight: 'bolder', color: '#14256a'}}>
                                 採購單
                             </span> */}
-                            <span style={{ display: (checkfirstin === 0 ? inspectedin : inspected) === "false" ? "" : "none" }}>
-                                <MyButton_v2 px='px22' py='py4' theme='danger' label="未驗收" onClick={() => { handleClosePO() }} />
+                            <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "false" ? "" : "none" }}>
+                                <MyButton_v2 px='px22' py='py4' theme='danger' label="結案" onClick={() => { handleClosePO() }} />
+                                {/* <button className={scss.greenbutton} onClick={() => { handleClosePO() }} >未結案</button> */}
                             </span>
-                            <span style={{ display: (checkfirstin === 0 ? inspectedin : inspected) === "true" ? "" : "none" }}>
-                                <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已驗收" />
+                            <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
+                                <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" onClick={() => { alert("領料托盤") }} />
                             </span>
                         </div>
                         <div style={{ textAlign: 'right', height: '35.77px' }}>
@@ -544,17 +536,7 @@ export default function ProdReceiptList() {
                         <div>
                             <InputSel
                                 {...inputSelProps}
-                                caption="採購日期"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? getTaiwanDateStr(purchaseordercreate_atin)?.toString() : purchaseordercreate_at,
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="進貨日期"
+                                caption="請購日期"
                                 disabled={true}
                                 inputProps={{
                                     props: {
@@ -564,9 +546,10 @@ export default function ProdReceiptList() {
                             />
                         </div>
                         <div>
+                            {/* {purchaseorderid} */}
                             <InputSel
                                 {...inputSelProps}
-                                caption="採購單號"
+                                caption="請購單號"
                                 disabled={true}
                                 inputProps={{
                                     props: {
@@ -574,31 +557,11 @@ export default function ProdReceiptList() {
                                     },
                                 }}
                             />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="進貨單號"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? prodreceiptidin : prodreceiptid,
-                                    },
-                                }}
-                            />
                         </div>
                         <div>
                             <InputSel
                                 {...inputSelProps}
-                                caption="採購人員"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? purchaseordercreate_byin : purchaseordercreate_by,
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="進貨人員"
+                                caption="請購人員"
                                 disabled={true}
                                 inputProps={{
                                     props: {
@@ -609,7 +572,7 @@ export default function ProdReceiptList() {
                         </div>
                     </div>
                     {/* <hr /> */}
-                    <div className={scss.content_main}>
+                    {/* <div className={scss.content_main}>
                         <div>
                             <InputSel
                                 {...inputSelProps}
@@ -710,12 +673,12 @@ export default function ProdReceiptList() {
                                 }}
                             />
                         </div>
-                    </div>
+                    </div> */}
 
                     <br />
                     <div className={scss.content_main_content}>
-                        <Thead01 type={'ProdReceiptDetail'} />
-                        <Tbody01 type={'ProdReceiptDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                        <Thead01 type={'PurchaseRequisitionDetail'} />
+                        <Tbody01 type={'PurchaseRequisitionDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                     </div>
                     <br />
                     <div className={scss.foot_main}>
@@ -751,19 +714,21 @@ export default function ProdReceiptList() {
                         </div>
                     </div>
                     <div className={scss.content_main_content}>
-                        <span className={scss.mytitle} style={{ display: (checkfirstin === 0 ? inspectedin : inspected) === "true" ? "none" : "" }}>
-                            <MyButton_v2 px='px22' py='py4' theme={undefined} label="驗收入庫" onClick={handleReceipt} />&nbsp;&nbsp;
-                            <MyButton_v2 px='px22' py='py4' theme='danger' label="退貨單" onClick={handleReceipt} />
-                            {/* <button className={scss.greenbutton}>退貨單</button> */}
+                        <span className={scss.mytitle} style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "none" : "" }}>
+
+                            {/* <button onClick={() => { setData2(data2restore) }}>
+                                <img src={icon_autoadd.src} alt="add" style={{ width: '40px', height: '40px' }} />
+                            </button> */}
+                            <MyButton_v2 px='px22' py='py4' theme={undefined} label="進貨/批次進貨" onClick={()=>{handleReceipt()}} />
                         </span>
                         <Thead01 type={'PurchaseOrderDetail2'} />
                         {data2.map((_item, index) => (
-                            <CellWithBar key={index} className={scss.panelHeader11}>
+                            <CellWithBar key={index} className={scss.panelHeader13}>
                                 <div className={scss.row01}>
                                     <span>{index + 1}</span>
                                     <span>{_item.productid}</span>
                                     <span>{_item.name}</span>
-                                    <span style={{ color: 'red' }}>
+                                    <span style={{ color: '#ea1833' }}>
                                         {_item.alreadyinquantity}
                                     </span>
                                     <span>
@@ -828,6 +793,7 @@ export default function ProdReceiptList() {
                     </div>
                 </div>
             </div>
+
         </SubLayer >
 
     )

@@ -151,16 +151,17 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       }
     })
   }
-  
+
   async function GetProdReceipt(item: any) {
     router.replace({
       pathname: `/factoryDepartment/prodReceiptList`,
       query: {
-        prodreceiptuuid:item.prodreceiptuuid,
-        prodreceiptid:item.prodreceiptid,
+        prodreceiptuuid: item.prodreceiptuuid,
+        prodreceiptid: item.prodreceiptid,
         purchaseorderuuid: item.purchaseorderuuid,
         purchaseorderid: item.purchaseorderid,
         purchaseordercreate_at: getTaiwanDateStr(item.purchaseordercreate_at),
+        purchaseordercreate_by: item.purchaseordercreate_by,
         create_at: getTaiwanDateStr(item.create_at),
         create_by: item.create_by,
         inspected: item.inspected,
@@ -443,6 +444,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     );
   }
   //#endregion
+
   //#region 採購單明細
   else if (type === "PurchaseOrderDetail") {
     return (
@@ -468,8 +470,9 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     );
   }
   //#endregion
-   //#region 進貨單
-   else if (type === "ProdReceipt") {
+
+  //#region 進貨單
+  else if (type === "ProdReceipt") {
     return (
       <div>
         {error && <p>Error1: {error}</p>}
@@ -479,11 +482,89 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
               <div className={scss.row01}>
                 {/* <span>{index + 1}</span> */}
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
+                <span>{_item.purchaseorderid}</span>
                 <span>{_item.prodreceiptid}</span>
-                <span>{_item.totalprice.toLocaleString()}</span>
-                <span style={{ color: '#ea1833', display: `${_item.inspected === false ? "" : "none"}` }}>未轉</span>
-                <span style={{ color: '#14256a', display: `${_item.inspected === true ? "" : "none"}` }}>已轉</span>
+                {/* <span>{_item.totalprice.toLocaleString()}</span> */}
+                <span style={{ color: '#ea1833', display: `${_item.inspected === false ? "" : "none"}` }}>未驗</span>
+                <span style={{ color: '#14256a', display: `${_item.inspected === true ? "" : "none"}` }}>已驗</span>
                 <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  }
+  //#endregion
+
+  //#region 進貨單明細
+  else if (type === "ProdReceiptDetail") {
+    return (
+      <div>
+        {error && <p>Error2: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader14}>
+              <div className={scss.row01}>
+                <span>{index + 1}</span>
+                <span>{_item.productid}</span>
+                <span>{_item.name}</span>
+                <span>{_item.spec}</span>
+                <span>{_item.quantity}</span>
+                <span>{_item.unit}</span>
+                <span>{_item.unitprice.toLocaleString()}</span>
+                <span>{_item.totalprice.toLocaleString()}</span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  }
+  //#endregion
+
+  //#region 請購單
+  else if (type === "PurchaseRequisition") {
+    return (
+      <div>
+        {error && <p>Error1: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader15}>
+              <div className={scss.row01}>
+                {/* <span>{index + 1}</span> */}
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                <span>{_item.purchaseorderid}</span>
+                {/* <span>{_item.totalprice.toLocaleString()}</span> */}
+                <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>未結</span>
+                <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已結</span>
+                <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  }
+  //#endregion
+   //#region 進貨單明細
+   else if (type === "PurchaseRequisitionDetail") {
+    return (
+      <div>
+        {error && <p>Error2: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader16}>
+              <div className={scss.row01}>
+                <span>{index + 1}</span>
+                <span>{_item.productid}</span>
+                <span>{_item.name}</span>
+                <span>{_item.spec}</span>
+                <span>{_item.quantity}</span>
+                <span>{_item.unit}</span>
+                <span>{_item.unitprice.toLocaleString()}</span>
+                <span>{_item.totalprice.toLocaleString()}</span>
+                <span>實驗工業股份有限公司</span>
               </div>
             </CellWithBar>
           ))
