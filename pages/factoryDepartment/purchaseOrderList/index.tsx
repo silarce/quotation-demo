@@ -340,48 +340,54 @@ export default function PurchaseOrderList() {
     const TransferPurchaseOrderToProductReceipt = async () => {
         try {
             setIsLoading(true);
-    
-            const conditionModel = {
-                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid,
+
+
+            const conditionModel: {
+                purchaseorderuuid: string | undefined,
+                data: any,
+                username: string | undefined
+            } = {
+                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
                 data: data2,
-                username: userInfo?.username
+                username: userInfo?.username as string | undefined
             };
-    
+
             var inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
                 FunctionName: 'no',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-    
+
+            // const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
             const response = await fetch(`${setting.apipath}TransferPurchaseOrderToProductReceipt`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ Input: inputModel }),
+                body: JSON.stringify(inputModel)
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-    
+
             const responseData = await response.json();
             console.log("Transfer response:", responseData);
-    
+
             // 更新數據和其它操作
             getPurchaseOrder();
             getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
             GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
-    
-        } catch (error:any) {
+
+        } catch (error: any) {
             setError(error.message);
             console.error('Transfer failed:', error);
         } finally {
             setIsLoading(false);
         }
     };
-    
+
 
 
     //結案
