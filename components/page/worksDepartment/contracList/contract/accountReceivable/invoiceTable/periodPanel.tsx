@@ -1271,20 +1271,14 @@ const calcRetainage = (state_period: Tstate_period) => {
 
   const { subTotal, contractTotal, retainageType, retainagePercent } = period;
 
+  const percent = new Decimal(retainagePercent || 0).div(100);
+
   let retainage = '';
 
   if (retainageType === '含稅') {
-    retainage = new Decimal(contractTotal)
-      .mul(0.1)
-      .mul(retainagePercent || 0)
-      .toDecimalPlaces(0)
-      .toString();
+    retainage = new Decimal(contractTotal).mul(percent).toDecimalPlaces(0).toString();
   } else if (retainageType === '未稅') {
-    retainage = new Decimal(subTotal)
-      .mul(0.1)
-      .mul(retainagePercent || 0)
-      .toDecimalPlaces(0)
-      .toString();
+    retainage = new Decimal(subTotal).mul(percent).toDecimalPlaces(0).toString();
   }
 
   return retainage;
