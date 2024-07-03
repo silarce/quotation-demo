@@ -3,16 +3,8 @@ import classNames from 'classnames';
 
 // component
 
-import Table01, {
-  Ttable,
-  Tconfig_table,
-  //
-  Row,
-  Cell,
-} from 'components/global/gear/table/table01';
-
 // gear
-import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import Row from 'components/global/gear/table/row';
 
 // css
 import scss from './supplyTable.module.scss';
@@ -20,428 +12,72 @@ import scss_p from '../_public.module.scss';
 
 // ==================================================================
 
-type Tcontrol_nestedRow = {
-  name: React.ReactNode;
-  typeName?: React.ReactNode;
-  subTypeArr: TsubType[];
+type Tgroup01 = {
+  // 品名
+  itemName: string;
+  rowArr: {
+    // 種類
+    category: string;
+    // 已領數量
+    pickUpQuantity: number | null;
+    // 未領數量
+    stayQuantity: number | null;
+    // 總需求數量
+    quantity: number | null;
+    //
+    // 需求數量
+    reqQty: number | null;
+  }[];
 };
 
-type TsubType = {
-  name: React.ReactNode;
-  unclaimedQty?: React.ReactNode;
-  receivedQty?: React.ReactNode;
-  needQty?: React.ReactNode;
-  receivedQty_inputAttr?: React.HTMLAttributes<HTMLInputElement>;
-  needQty_inputAttr?: React.HTMLAttributes<HTMLInputElement>;
+type Tgroup02 = {
+  // 品名
+  itemName: string;
+  subItemName: string;
+  rowArr: {
+    // 種類
+    category: string;
+    // 已領數量
+    pickUpQuantity: number | null;
+    // 未領數量
+    stayQuantity: number | null;
+    // 總需求數量
+    quantity: number | null;
+    //
+    // 需求數量
+    reqQty: number | null;
+  }[];
 };
 
-export type { Tcontrol_nestedRow, TsubType };
+export type {};
 
 // ==================================================================
 // supplyTable
-export default function SupplyTable({
-  rowArr,
-  qtyType = 'normal',
-  disabled,
-  className,
-}: {
-  rowArr?: Tcontrol_nestedRow[];
-  qtyType?: 'receive' | 'request' | 'normal';
-  disabled?: boolean;
-  className?: string;
-}) {
-  // const keyArr = ['name', 'subType', 'unclaimedQty', 'receivedQty', 'needQty'];
-
-  // 這個只會影響到thead
-  const keyArr = ['name', 'subType'];
-
-  if (qtyType === 'normal') {
-    keyArr.push('unclaimedQty', 'receivedQty', 'needQty');
-  } else if (qtyType === 'receive') {
-    keyArr.push('receivedQty_input');
-  } else if (qtyType === 'request') {
-    keyArr.push('needQty_input');
-  }
-
-  const control_table = useMemo(() => {
-    //
-    const thead: Ttable['thead'] = {
-      cellArr: keyArr.map((key) => {
-        return {
-          ...configList[key],
-          children: configList[key].label,
-        };
-      }),
-    };
-
-    //
-    const tbody: Ttable['tbody'] = {
-      rowArr: [],
-    };
-
-    return { thead, tbody };
-    //
-  }, []);
-
+export default function SupplyTable() {
   return (
-    <div className={classNames(scss.supplyList, className)}>
-      <Table01 {...control_table} className={classNames(scss_p.table)}>
-        {rowArr?.map((row, index) => {
-          return <Row_nested key={index} disabled={disabled} {...row} />;
-        })}
-      </Table01>
+    <div className={classNames(scss.supplyList)}>
+      <Row thead={true} fullWidth={true}>
+        <div>
+          <span>品名</span>
+        </div>
+        <div>
+          <span>種類</span>
+        </div>
+        <div>
+          <span>領取數量</span>
+        </div>
+      </Row>
     </div>
   );
 }
+// ============================================================================
 
-// ==================================================================
-// ==================================================================
-const Row_nested = ({
-  name,
-  typeName,
-  subTypeArr,
-  disabled,
-}: {
-  name: React.ReactNode;
-  typeName?: React.ReactNode;
-  subTypeArr?: TsubType[];
-  disabled?: boolean;
-}) => {
-  return (
-    <Row wrapperClassName={scss.row_nested}>
-      <Cell_name>{name}</Cell_name>
-      <Cell_group typeName={typeName} subTypeArr={subTypeArr} disabled={disabled} />
-    </Row>
-  );
-};
+// region COMPONENTS
 
-const Cell_name = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Cell
-      //
-      {...configList.name}
-      className={classNames(scss.cell)}
-    >
-      {children}
-    </Cell>
-  );
-};
+const Group = () => {};
 
-const Cell_group = ({
-  //
-  typeName,
-  subTypeArr,
-  disabled,
-}: {
-  typeName?: React.ReactNode;
-  subTypeArr?: TsubType[];
-  disabled?: boolean;
-}) => {
-  return (
-    <Cell
-      //
-      {...configList.typeGroup}
-      className={(scss.cell, scss.cell_type)}
-    >
-      {typeName !== undefined && (
-        <div className={scss.type} style={{ ...configList.type.tbody }}>
-          {typeName}
-        </div>
-      )}
-      <div className={scss.subTypeGroup}>
-        {subTypeArr?.map((item, index) => {
-          const {
-            //
-            name,
-            unclaimedQty,
-            receivedQty,
-            needQty,
-            receivedQty_inputAttr,
-            needQty_inputAttr,
-          } = item;
+// ============================================================================
 
-          return (
-            <CellWithBar key={index} className={scss.subTypeRow}>
-              <div className={scss.subType}>{name}</div>
-              {unclaimedQty !== undefined && (
-                <div style={{ ...configList.unclaimedQty }} className={scss.qtyCell}>
-                  {unclaimedQty}
-                </div>
-              )}
-              {receivedQty !== undefined && (
-                <div style={{ ...configList.receivedQty }} className={scss.qtyCell}>
-                  {receivedQty}
-                </div>
-              )}
-              {needQty !== undefined && (
-                <div style={{ ...configList.needQty }} className={scss.qtyCell}>
-                  {needQty}
-                </div>
-              )}
-              {receivedQty_inputAttr !== undefined && (
-                <div style={{ ...configList.receivedQty_input }} className={scss.qtyCell}>
-                  <input
-                    type="number"
-                    readOnly={disabled}
-                    {...receivedQty_inputAttr}
-                    className={classNames(disabled && scss.disabled, receivedQty_inputAttr.className)}
-                  />
-                </div>
-              )}
-              {needQty_inputAttr !== undefined && (
-                <div style={{ ...configList.receivedQty_input }} className={scss.qtyCell}>
-                  <input
-                    type="number"
-                    readOnly={disabled}
-                    {...needQty_inputAttr}
-                    className={classNames(disabled && scss.disabled, needQty_inputAttr.className)}
-                  />
-                </div>
-              )}
-            </CellWithBar>
-          );
-        })}
-      </div>
-    </Cell>
-  );
-};
+// region CONFIG
 
-// ==================================================================
-// ==================================================================
-
-const qtyConfig: Tconfig_table = {
-  width: 100,
-  justifyContent: 'center',
-};
-
-const configList: { [key: string]: Tconfig_table } = {
-  name: {
-    label: '名稱',
-    width: 200,
-    justifyContent: 'center',
-  },
-  type: {
-    flex: 'auto',
-    justifyContent: 'center',
-    tbody: {
-      width: 180,
-      justifyContent: 'center',
-    },
-  },
-  subType: {
-    label: '種類',
-    flex: 'auto',
-    justifyContent: 'center',
-    tbody: {
-      justifyContent: 'flex-start',
-    },
-  },
-  //
-  // 這是
-  typeGroup: {
-    flex: 'auto',
-  },
-  //
-  unclaimedQty: {
-    label: '未領數量',
-    ...qtyConfig,
-  },
-  receivedQty: {
-    label: '已領數量',
-    ...qtyConfig,
-  },
-  needQty: {
-    label: '需求總數量',
-    ...qtyConfig,
-  },
-  //
-  receivedQty_input: {
-    label: '領取數量',
-    ...qtyConfig,
-  },
-  needQty_input: {
-    label: '需求數量',
-    ...qtyConfig,
-  },
-} as const;
-
-// ==================================================================
-
-// const fakeData_lockbox: Tcontrol_nestedRow = {
-//   name: '鎖盒',
-//   subTypeArr: [
-//     {
-//       name: '智慧型（含主機）',
-//       unclaimedQty: 1,
-//       receivedQty: 2,
-//       needQty: 3,
-//     },
-//     {
-//       name: '智慧型（含主機）+ 發訊器',
-//       unclaimedQty: 5,
-//       receivedQty: <span className={'text-success'}>OK</span>,
-//       needQty: 3,
-//     },
-//     {
-//       name: '智慧型（含主機）+ 發射器',
-//       unclaimedQty: 9,
-//       receivedQty: <span className={'text-pass'}>OK</span>,
-//       needQty: 9,
-//     },
-//     {
-//       name: '智慧型（含主機）+ 發訊器 + 發射器',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '面板式',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '埋入式',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '外露式',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//   ],
-// };
-
-// const fakeData_key: Tcontrol_nestedRow = {
-//   name: '鎖匙',
-//   subTypeArr: [
-//     {
-//       name: '鎖號',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '特殊鎖號',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//   ],
-// };
-
-// const fakeData_panel: Tcontrol_nestedRow = {
-//   name: '控制箱/盤',
-//   typeName: '捲門/水閘門',
-//   subTypeArr: [
-//     {
-//       name: '馬達控制箱 220V 2HP',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '馬達控制箱 220V 2HP',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '馬達控制箱 220V 2HP',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '馬達控制箱 220V 2HP',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '馬達控制箱 220V 2HP',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//   ],
-// };
-
-// const fakeData_pressButton: Tcontrol_nestedRow = {
-//   name: '押扣',
-//   subTypeArr: [
-//     {
-//       name: '三點式（一般）',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//   ],
-// };
-// const fakeData_firefightingSupplies: Tcontrol_nestedRow = {
-//   name: '消防備品',
-//   subTypeArr: [
-//     {
-//       name: '煙感器',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '中繼器 1φ 220v',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '中繼器 3φ 380v',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//   ],
-// };
-
-// const fakeData_host: Tcontrol_nestedRow = {
-//   name: '主機',
-//   subTypeArr: [
-//     {
-//       name: '遙控器（1:2）+ 障感器',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '遙控器（1:2）',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '障感器',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//   ],
-// };
-// const fakeData_infrared: Tcontrol_nestedRow = {
-//   name: '紅外線',
-//   subTypeArr: [
-//     {
-//       name: '反射式',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//     {
-//       name: '對照式',
-//       unclaimedQty: 9,
-//       receivedQty: 9,
-//       needQty: 9,
-//     },
-//   ],
-// };
+// endregion CONFIG
