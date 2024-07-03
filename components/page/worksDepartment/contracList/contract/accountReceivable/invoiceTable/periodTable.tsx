@@ -6,8 +6,8 @@ import moment, { Moment } from 'moment';
 import { AxiosError } from 'axios';
 
 // component
-import PeriodPanel, { Thead, Tbody, Tfoot } from './table';
-import type { TimperativeHandle_panel, Tcenter } from './table';
+import PeriodPanel, { Thead, Tbody, Tfoot } from './periodPanel';
+import type { TimperativeHandle_panel, Tcenter } from './periodPanel';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
