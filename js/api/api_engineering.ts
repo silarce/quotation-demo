@@ -12,6 +12,7 @@ import { createUseInfinite } from './createUseInfinite';
 
 // type
 import type {
+  TerrorContent,
   Tparams,
   TpageMetaDto,
   TengineeringContactDto,
@@ -346,18 +347,17 @@ export const apiPostElectronicSupplies = (body: { contractId: string }) => {
   return axi
     .post(api, body)
     .then(({ data }) => data)
-    .catch((error) => {
-      const err = error as AxiosError;
-      console.log(error);
-      // const message = err.response?.data?.message || err.message;
-      // const message = err.response?.data?.message || err.message;
+    .catch((err: AxiosError<TerrorContent>) => {
+      let message = err.response?.data?.message || err.message;
+      message === 'Cannot found worksheet!' && (message = '送電備品尚無需更新');
 
-      // myAlert.err({
-      //   title: '更新送電備品總表失敗',
-      //   content: error.message,
-      // });
+      myAlert.err({
+        title: '更新送電備品總表失敗',
+        content: message,
+      });
 
-      return Promise.reject(error);
+      // return Promise.reject(err);
+      return Promise.reject();
     });
 };
 

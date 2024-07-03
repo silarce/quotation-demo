@@ -57,6 +57,12 @@ export type TpageResponse<Tdata> = {
   meta: TpageMetaDto;
 };
 
+export type TerrorContent = {
+  error: string;
+  message: string;
+  statusCode: number;
+};
+
 // =============================================================
 
 export type TfileDto = {
