@@ -17,7 +17,7 @@
 
 .main {
     display: grid;
-    grid-template-columns: 350px 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 330px 1fr; // 左右兩邊比例，可以調整
     gap: 15px;
     width: auto;
     margin-top: 4px;
@@ -28,7 +28,7 @@
 
 .left {
     display: grid;
-    grid-template-columns: 350px;
+    grid-template-columns: 330px;
     justify-content: space-between;
     gap: 15px;
     overflow-x: hidden;
@@ -204,7 +204,7 @@ div.panelHeader13 {
   .greenbutton {
     height: 36px;
     // padding: 0px 40px;
-    border: solid 1px #86bd07;
+    border: solid 1px #00BB00;
     background-color: $bgc01;
     padding-left: 22px;
     padding-right: 22px;
@@ -212,14 +212,14 @@ div.panelHeader13 {
     padding-bottom: 4px;
     font-weight: 500;
     font-size: 16px;
-    color:#86bd07;
+    color:#00BB00;
     transform: translateY(2px);
     &:hover {
-        border: solid 1px #86bd07;
-        background-color: rgb(0, 105, 23, 0.267);
+        border: solid 1px #00BB00;
+        background-color: #00bb0018
       }
       &:focus {
         background-color: $bgc01;
-        border: solid 1px #86bd07;
+        border: solid 1px #00BB00;
       }
 }

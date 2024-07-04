@@ -6,7 +6,7 @@ import scss from './tbody01.module.scss';
 import scss2 from './tbody02.module.scss';
 import router from 'next/router';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import { Transfer } from 'antd';
+import { Transfer, Button, Modal } from 'antd';
 import { IconButton } from '@mui/material';
 import IconContext from '@ant-design/icons/lib/components/Context';
 import { IconMap } from 'antd/lib/result';
@@ -14,6 +14,15 @@ import icon_arrowdown from 'public/image/icon/arrow_down_tray.svg';
 import icon_arrowup from 'public/image/icon/arrow_up_tray.svg';
 import icon_arrowchange from 'public/image/icon/arrow_change_tray.svg';
 import { inspect } from 'util';
+import Thead01 from './thead01';
+import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
+import icon_fc_exclam from 'public/image/icon/fc_exclam.svg';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
+import icon_fc_arrow_down_red from 'public/image/icon/fc_arrow_down_red.svg';
+import { setting } from '../../wareHouseList/index';
+import moment from 'moment';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 
 type TBodyItemContent = {};
@@ -41,6 +50,8 @@ export interface PickingListModel {
 }
 
 export default function Tbody01({ data, error, type, traycalled, traycalledname, traytransfer, url, whnamecalled }: TbodyProps) {
+
+
 
   async function getTrayByWareHouse(whid: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
     router.push({
@@ -174,7 +185,172 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       }
     })
   }
+  //#region 請購單
+  //請購單
+  async function GetPurchaseRequisition(item: any) {
+    router.replace({
+      pathname: `/factoryDepartment/purchaseRequisitionList`,
+      query: {
+        purchaserequisitionuuid: item.purchaserequisitionuuid,
+        purchaserequisitionid: item.purchaserequisitionid,
+        create_at: getTaiwanDateStr(item.create_at),
+        create_by: item.create_by,
+        approved: item.approved,
+        firstin: 1
+      }
+    })
+  }
 
+  //詢價單modal
+  const [prquotereqmodalopen, setPrquotereqmodalopen] = useState<boolean>(false);
+
+
+  //帶入詢價單畫面的資料(欲詢價物料)
+  const [quotereqname, setQuotereqname] = useState<string>("");
+  const [quotereqspec, setQuotereqspec] = useState<string>("");
+  const [quotereqquantity, setQuotereqquantity] = useState<string>("");
+  //對應詢價單主檔的詢價單明細
+  const [prquotereqdata, setPrquotereqdata] = useState<any[]>([]);
+  //加入詢價廠商
+  const [prquotereqadddata, setPrquotereqadddata] = useState({
+    // id: "",id 自增長不用寫入
+    quoterequuid: "",
+    quotereqid: "",
+    unitprice: "",
+    totalprice: "",
+    suppliername: "",
+    deliverydate: moment(),
+    unit: "",
+    note: ""
+  });
+
+
+  //打開詢價單modal
+  const prQuotereqModalOpen = async (item: any) => {
+    //清空
+    prquotereqadddata.quoterequuid = "";
+    prquotereqadddata.quotereqid = "";
+    prquotereqadddata.unitprice = "";
+    prquotereqadddata.totalprice = "";
+    prquotereqadddata.suppliername = "";
+    prquotereqadddata.deliverydate = moment();
+    prquotereqadddata.unit = "";
+    prquotereqadddata.note = "";
+    //預設詢價單主檔編號
+    prquotereqadddata.quoterequuid = item.quoterequuid;
+    prquotereqadddata.quoterequuid = item.quotereqid;
+
+
+    setQuotereqname(item.name);
+    setQuotereqspec(item.spec);
+    setQuotereqquantity(item.quantity);
+    getQuotereqDetail(item.quoterequuid);
+    setPrquotereqmodalopen(true);
+  }
+
+  //關閉詢價單modal
+  const prQuotereqModalClose = async () => {
+    setPrquotereqmodalopen(false);
+  }
+
+
+  //取得對應詢價單主檔的詢價單明細檔
+  const getQuotereqDetail = async (quoterequuid: any) => {
+    try {
+      // setIsLoading(true);
+      const conditionModel: {
+        quoterequuid: string | undefined
+      } = {
+        quoterequuid: quoterequuid as string | undefined,
+      };
+
+      var inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`${setting.apipath}GetQuotereqDetailById?${queryParams}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      const data = await response.json();
+      setPrquotereqdata(data);
+      console.log(prquotereqdata);
+    } catch (error: any) {
+      // setError(error.message);
+      console.log(error.message);
+    }
+    finally {
+      // setIsLoading(false);
+    }
+  };
+
+  //寫入詢價單明細
+  const addQuotereqDetail = async () => {
+    try {
+      alert("cc");
+      if (prquotereqadddata.suppliername === "" || prquotereqadddata.suppliername === undefined || prquotereqadddata.suppliername === null ||
+        prquotereqadddata.unitprice === "" || prquotereqadddata.unitprice === undefined || prquotereqadddata.unitprice === null ||
+        prquotereqadddata.totalprice === "" || prquotereqadddata.totalprice === undefined || prquotereqadddata.totalprice === null ||
+        prquotereqadddata.deliverydate < moment() || prquotereqadddata.deliverydate === null || prquotereqadddata.deliverydate === undefined
+      ) {
+        myAlert.err({ title: "請檢查欄位!!!", content: "請檢查欄位是否正確或交貨日期是否小於今天日期" })
+        return;
+      }
+      // setIsLoading(true);
+      const conditionModel: {
+        data: any,
+      } = {
+        data: prquotereqadddata
+      };
+
+      var inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const response = await fetch(`${setting.apipath}AddQuotereqDetail`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const responseData = await response.json();
+      console.log("Transfer response:", responseData);
+
+    } catch (error: any) {
+      // setError(error.message);
+      console.log(error.message);
+    }
+    finally {
+      // setIsLoading(false);
+    }
+  };
+
+  const handleChange = (key: any, value: any) => {
+    setPrquotereqadddata(prevState => ({
+      ...prevState,
+      [key]: value
+    }));
+  };
+
+
+  //#endregion
+
+
+
+  //#region 日期格式處理 收
   // 日期格式處理
   function convertToYearMonthDay(datetimetype: string, isoDateString: string | number | Date) {
     if (datetimetype === "Date") {
@@ -198,7 +374,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     }
 
   }
-
+  //#endregion
 
 
 
@@ -462,6 +638,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.unit}</span>
                 <span>{_item.unitprice.toLocaleString()}</span>
                 <span>{_item.totalprice.toLocaleString()}</span>
+                <span>
+                  <button onClick={() => { alert("ok") }}>
+                    <img src={icon_fc_arrow_down.src} alt="Arrow Down" style={{ width: '20px', height: '20px' }} />
+                  </button>
+                </span>
               </div>
             </CellWithBar>
           ))
@@ -534,11 +715,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
               <div className={scss.row01}>
                 {/* <span>{index + 1}</span> */}
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
-                <span>{_item.purchaseorderid}</span>
+                <span>{_item.purchaserequisitionid}</span>
                 {/* <span>{_item.totalprice.toLocaleString()}</span> */}
-                <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>未結</span>
-                <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已結</span>
-                <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span>
+                <span style={{ color: '#ea1833', display: `${_item.approved === false ? "" : "none"}` }}>未結</span>
+                <span style={{ color: '#14256a', display: `${_item.approved === true ? "" : "none"}` }}>已結</span>
+                <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span>
               </div>
             </CellWithBar>
           ))
@@ -547,8 +728,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     );
   }
   //#endregion
-   //#region 進貨單明細
-   else if (type === "PurchaseRequisitionDetail") {
+  //#region 請購單明細
+  else if (type === "PurchaseRequisitionDetail") {
     return (
       <div>
         {error && <p>Error2: {error}</p>}
@@ -562,9 +743,141 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.spec}</span>
                 <span>{_item.quantity}</span>
                 <span>{_item.unit}</span>
+                <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span>
                 <span>{_item.unitprice.toLocaleString()}</span>
                 <span>{_item.totalprice.toLocaleString()}</span>
-                <span>實驗工業股份有限公司</span>
+                <span>{_item.suppliername}</span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+        <Modal
+          visible={prquotereqmodalopen}
+          footer={null}
+          onCancel={prQuotereqModalClose}
+          // width={'fit-content'}
+          width="1000px"
+          maskClosable={false}
+        >
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
+            <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{quotereqname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{quotereqspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{quotereqquantity}</span>
+          </div>
+          <hr/>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
+            <div style={{ flex: '1 1 20%' }}>
+              <InputSel
+                {...inputSelProps}
+                caption="廠商"
+                disabled={false}
+                inputProps={{
+                  props: {
+                    value: prquotereqadddata.suppliername,
+                    onChange: (e) => handleChange('suppliername', e.target.value)
+                  },
+                }}
+              />
+            </div>
+            <div style={{ flex: '1 1 20%' }}>
+              <InputSel
+                {...inputSelProps}
+                caption="單價"
+                disabled={false}
+                inputProps={{
+                  props: {
+                    value: prquotereqadddata.unitprice,
+                    onChange: (e) => handleChange('unitprice', e.target.value)
+                  },
+                }}
+              />
+            </div>
+            <div style={{ flex: '1 1 20%' }}>
+              <InputSel
+                {...inputSelProps}
+                caption="單位"
+                disabled={false}
+                inputProps={{
+                  props: {
+                    value: prquotereqadddata.unit,
+                    onChange: (e) => handleChange('unit', e.target.value)
+                  },
+                }}
+              />
+            </div>
+            <div style={{ flex: '1 1 20%' }}>
+              <InputSel
+                {...inputSelProps}
+                caption="總價"
+                disabled={false}
+                inputProps={{
+                  props: {
+                    value: prquotereqadddata.totalprice,
+                    onChange: (e) => handleChange('totalprice', e.target.value)
+                  },
+                }}
+              />
+            </div>
+            <div style={{ flex: '1 1 20%' }}>
+              <InputSel
+                caption="出貨日期"
+                //
+                captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
+                // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                datePickerProps={{
+                  props: {
+                    value: prquotereqadddata.deliverydate,
+                    onChange: (e) => handleChange('deliverydate', e)
+                  },
+                }}
+              />
+
+            </div>
+            <div style={{ flex: '1 1 20%' }}>
+              <InputSel
+                {...inputSelProps}
+                caption="備註"
+                disabled={false}
+                inputProps={{
+                  props: {
+                    value: "",
+                  },
+                }}
+              />
+            </div>
+            <button className={scss.greenbutton} onClick={() => { addQuotereqDetail() }} >
+              <img src={icon_fc_arrow_down.src} alt="Arrow Down" style={{ width: '20px', height: '20px' }} />
+            </button>
+          </div>
+
+          <div>
+            <Thead01 type={'Quotereq'} />
+            <Tbody01 type={'Quotereq'} data={prquotereqdata} error={undefined} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+          </div>
+        </Modal>
+      </div>
+
+    );
+  }
+  //#endregion
+
+  //#region 詢價單明細
+  else if (type === "Quotereq") {
+    return (
+      <div>
+        {error && <p>Error1: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader17}>
+              <div className={scss.row01}>
+                <span>{index + 1}</span>
+                <span>{_item.unitprice}</span>
+                <span>{_item.totalprice}</span>
+                <span>{getTaiwanDateStr(_item.deliverydate)}</span>
+                <span>{_item.suppliername}</span>
+                <span>{_item.note}</span>
+                <span><input type='checkbox' /></span>
+                {/* <span><input type='checkbox'/></span> */}
               </div>
             </CellWithBar>
           ))
@@ -575,4 +888,6 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   //#endregion
 
   return null; // Add default return in case type is not matched
+
+
 }

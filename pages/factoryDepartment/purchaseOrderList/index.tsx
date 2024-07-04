@@ -302,6 +302,7 @@ export default function PurchaseOrderList() {
         }
     }, [purchaseorderuuid]);
 
+    //批次進貨
     //取已對應採購單的已進貨明細
     const GetProdReceiptDetailByPurchaseOrderId = async (purchaseorderuuid: any) => {
         try {
@@ -359,7 +360,6 @@ export default function PurchaseOrderList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            // const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
             const response = await fetch(`${setting.apipath}TransferPurchaseOrderToProductReceipt`, {
                 method: 'POST',
                 headers: {

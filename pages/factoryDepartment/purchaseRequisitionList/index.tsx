@@ -38,16 +38,11 @@ export default function PurchaseRequisitionList() {
     const router = useRouter();
     const {
         firstin,
-        purchaseorderuuid,
-        purchaseorderid,
+        purchaserequisitionuuid,
+        purchaserequisitionid,
         create_at,
         create_by,
-        receipted,
-        suppliername,
-        suppliertaxid,
-        supplieraddress,
-        supplierphone,
-        invoice
+        approved,
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -56,8 +51,6 @@ export default function PurchaseRequisitionList() {
         }
         return param;
     };
-
-    const purchaseorderuuidStr = getQueryParam(purchaseorderuuid);
 
 
 
@@ -80,14 +73,11 @@ export default function PurchaseRequisitionList() {
 
 
 
-    const [receiptedin, setReceiptedin] = useState<string>("");
-    const [create_atin, setCreate_atin] = useState<string>("");
-    const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
-    const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
+    const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>("");
+    const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>("");
     const [create_byin, setCreate_byin] = useState<string>("");
-    const [suppliernamein, setSuppliernamein] = useState<string>("");
-    const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
-    const [supplieraddressin, setSupplieraddressin] = useState<string>("");
+    const [create_atin, setCreate_atin] = useState<string>("");
+    const [approvedin, setApprovedin] = useState<string>("");
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -101,9 +91,9 @@ export default function PurchaseRequisitionList() {
 
 
 
-  
-        // const [open, setOpen] = useState(false);
-    
+
+    // const [open, setOpen] = useState(false);
+
 
     //#region 上方功能列
 
@@ -191,8 +181,8 @@ export default function PurchaseRequisitionList() {
     //#endregion
 
     //#region call api
-    //取領料單清單
-    const getPurchaseOrder = async () => {
+    //請購單主檔
+    const getPurchaseRequisition = async () => {
         try {
             // console.log(userInfo);
             setIsLoading(true);
@@ -212,7 +202,7 @@ export default function PurchaseRequisitionList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}GetPurchaseOrder?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetPurchaseRequisition?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -221,17 +211,17 @@ export default function PurchaseRequisitionList() {
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
-                console.log(data[0].receipted);
-                getPurchaseOrderDetail(data[0].purchaseorderuuid);
-                GetProdReceiptDetailByPurchaseOrderId(data[0].purchaseorderuuid);
+                console.log(data[0]);
+                getPurchaseRequisitionDetail(data[0].purchaserequisitionuuid);
+                // GetProdReceiptDetailByPurchaseOrderId(data[0].purchaseorderuuid);
                 setCreate_atin(data[0].create_at);
-                setPurchaseorderuuidin(data[0].purchaseorderuuid);
-                setPurchaseorderidin(data[0].purchaseorderid);
+                setPurchaserequisitionuuidin(data[0].purchaserequisitionuuid);
+                setPurchaserequisitionidin(data[0].purchaserequisitionid);
                 setCreate_byin(data[0].create_by);
-                setSuppliernamein(data[0].suppliername);
-                setSuppliertaxidin(data[0].suppliertaxid);
-                setReceiptedin(data[0].receipted.toString());
-                setSupplieraddressin(data[0].supplieraddress);
+                // setSuppliernamein(data[0].suppliername);
+                // setSuppliertaxidin(data[0].suppliertaxid);
+                setApprovedin(data[0].approved.toString());
+                // setSupplieraddressin(data[0].supplieraddress);
             }
         } catch (error: any) {
             setError(error.message);
@@ -242,17 +232,17 @@ export default function PurchaseRequisitionList() {
     };
 
     useEffect(() => {
-        getPurchaseOrder();
+        getPurchaseRequisition();
     }, []);
 
-    //取對應的採購明細
-    const getPurchaseOrderDetail = async (purchaseorderuuid: any) => {
+    //取對應的請購明細
+    const getPurchaseRequisitionDetail = async (purchaserequisitionuuid: any) => {
         try {
             setIsLoading(true);
             const conditionModel: {
-                purchaseorderuuid: string | undefined
+                purchaserequisitionuuid: string | undefined
             } = {
-                purchaseorderuuid: purchaseorderuuid as string | undefined,
+                purchaserequisitionuuid: purchaserequisitionuuid as string | undefined,
             };
 
 
@@ -264,7 +254,7 @@ export default function PurchaseRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetPurchaseOrderDetailById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetPurchaseRequisitionDetailById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -292,30 +282,30 @@ export default function PurchaseRequisitionList() {
 
     // 確保 getPurchaseOrderDetail 的 useEffect 中的依賴項設置正確
     useEffect(() => {
-        if (purchaseorderuuid) {
-            getPurchaseOrderDetail(purchaseorderuuid);
-            GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid);
-            setPurchaseorderidin(purchaseorderid as string);
-            setPurchaseorderuuidin(purchaseorderuuid as string);
+        if (purchaserequisitionuuid) {
+            getPurchaseRequisitionDetail(purchaserequisitionuuid);
+            // GetProdReceiptDetailByPurchaseOrderId(purchaserequisitionuuid);
+            setPurchaserequisitionidin(purchaserequisitionid as string);
+            setPurchaserequisitionuuidin(purchaserequisitionuuid as string);
             // setCreate_atin((create_at != null ? create_at : "") as string);
             // alert(create_at)
             setCreate_atin(create_at as string);
             setCreate_byin(create_by as string);
-            setSuppliernamein(suppliername as string);
-            setSuppliertaxidin(suppliertaxid as string);
-            setReceiptedin(receipted as string);
-            setSupplieraddressin(supplieraddress as string);
+            // setSuppliernamein(suppliername as string);
+            // setSuppliertaxidin(suppliertaxid as string);
+            setApprovedin(approved as string);
+            // setSupplieraddressin(supplieraddress as string);
         }
-    }, [purchaseorderuuid]);
+    }, [purchaserequisitionuuid]);
 
     //取已對應採購單的已進貨明細
-    const GetProdReceiptDetailByPurchaseOrderId = async (purchaseorderuuid: any) => {
+    const GetProdReceiptDetailByPurchaseOrderId = async (purchaserequisitionuuid: any) => {
         try {
             setIsLoading(true);
             const conditionModel: {
-                purchaseorderuuid: string | undefined
+                purchaserequisitionuuid: string | undefined
             } = {
-                purchaseorderuuid: purchaseorderuuid as string | undefined,
+                purchaserequisitionuuid: purchaserequisitionuuid as string | undefined,
             };
 
 
@@ -347,11 +337,11 @@ export default function PurchaseRequisitionList() {
         try {
             setIsLoading(true);
             const conditionModel: {
-                purchaseorderuuid: string | undefined,
+                purchaserequisitionuuid: string | undefined,
                 data: any,
                 username: string | undefined
             } = {
-                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
+                purchaserequisitionuuid: checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid as string | undefined,
                 data: data2,
                 username: userInfo?.username
             };
@@ -370,11 +360,11 @@ export default function PurchaseRequisitionList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            getPurchaseOrder();
+            getPurchaseRequisition();
 
-            getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+            getPurchaseRequisitionDetail(checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid);
 
-            GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+            GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -390,9 +380,9 @@ export default function PurchaseRequisitionList() {
         try {
             setIsLoading(true);
             const conditionModel: {
-                purchaseorderuuid: string | undefined
+                purchaserequisitionuuid: string | undefined
             } = {
-                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
+                purchaserequisitionuuid: checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid as string | undefined,
             };
 
 
@@ -409,9 +399,9 @@ export default function PurchaseRequisitionList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            getPurchaseOrder();
+            getPurchaseRequisition();
 
-            getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+            getPurchaseRequisitionDetail(checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -517,14 +507,11 @@ export default function PurchaseRequisitionList() {
                 <div className={scss.right}>
                     <div className={scss.tite_main}>
                         <div>
-                            {/* <span style={{ fontSize: '25px', fontWeight: 'bolder', color: '#14256a'}}>
-                                採購單
-                            </span> */}
-                            <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "false" ? "" : "none" }}>
+                            <span style={{ display: (checkfirstin === 0 ? approvedin : approved) === "false" ? "" : "none" }}>
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="結案" onClick={() => { handleClosePO() }} />
                                 {/* <button className={scss.greenbutton} onClick={() => { handleClosePO() }} >未結案</button> */}
                             </span>
-                            <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
+                            <span style={{ display: (checkfirstin === 0 ? approvedin : approved) === "true" ? "" : "none" }}>
                                 <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" onClick={() => { alert("領料托盤") }} />
                             </span>
                         </div>
@@ -553,7 +540,7 @@ export default function PurchaseRequisitionList() {
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: checkfirstin === 0 ? purchaseorderidin : purchaseorderid,
+                                        value: checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid,
                                     },
                                 }}
                             />
@@ -683,6 +670,7 @@ export default function PurchaseRequisitionList() {
                     <br />
                     <div className={scss.foot_main}>
                         <div>
+                            {/* <button className={scss.greenbutton} onClick={() => { alert('詢價') }} >詢價單</button> */}
                         </div>
                         <div>
                         </div>
@@ -714,12 +702,12 @@ export default function PurchaseRequisitionList() {
                         </div>
                     </div>
                     <div className={scss.content_main_content}>
-                        <span className={scss.mytitle} style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "none" : "" }}>
+                        <span className={scss.mytitle} style={{ display: (checkfirstin === 0 ? approvedin : approved) === "true" ? "none" : "" }}>
 
                             {/* <button onClick={() => { setData2(data2restore) }}>
                                 <img src={icon_autoadd.src} alt="add" style={{ width: '40px', height: '40px' }} />
                             </button> */}
-                            <MyButton_v2 px='px22' py='py4' theme={undefined} label="進貨/批次進貨" onClick={()=>{handleReceipt()}} />
+                            {/* <MyButton_v2 px='px22' py='py4' theme={undefined} label="進貨/批次進貨" onClick={() => { handleReceipt() }} /> */}
                         </span>
                         <Thead01 type={'PurchaseOrderDetail2'} />
                         {data2.map((_item, index) => (
