@@ -3564,6 +3564,7 @@ export type TupdateAccountReceivableDto = Partial<
     | 'finalPaymentPercent'
     | 'finalPayment'
     | 'paymentPending'
+    | 'unpaidPayment'
   >
 >;
 

@@ -12,7 +12,7 @@ import scss from './totalCalc.module.scss';
 
 import { IconEdit, IconCheck02, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
-import type { TfinalPaymentType, TaccountsReceivableDto } from 'js/api/dtoTypes';
+import type { TfinalPaymentType, TaccountsReceivableDto, TupdateAccountReceivableDto } from 'js/api/dtoTypes';
 import type { TreqPatchAccountReceivable } from 'pages/worksDepartment/contractList/contract/accountReceivable';
 
 // ============================================================================
@@ -139,13 +139,38 @@ export default function TotalCalc({
 
   // ---------------------------------------------------------------------------
 
-  // const onConfirm = async () => {
-  //   await reqPatchAccountReceivable({ pendingTasks: Number(state_pendingTasks || 0) })
-  //     .then(() => {
-  //       setReadOnly(true);
-  //     })
-  //     .catch(() => {});
-  // };
+  const onConfirm = async () => {
+    const {
+      finalPaymentType,
+      isFinalPaymentWithTax,
+      finalPaymentPercent,
+      // contractTotalPrice,
+      pendingTasks,
+      // receivedPayment,
+      // extraIncome,
+      // totalDeduction,
+      unpaidPayment,
+      finalPayment,
+      paymentPending,
+    } = state_payment;
+
+    const body: TupdateAccountReceivableDto = {
+      finalPaymentType, // '尾款' | '保留款'
+      isFinalPaymentWithTax, // 含稅未稅
+      finalPaymentPercent, // 百分比
+
+      pendingTasks, // 未施作項目
+      unpaidPayment, // 未收款金額
+      finalPayment, // 尾款 保留款
+      paymentPending, // 請款中未收到款項
+    };
+
+    await reqPatchAccountReceivable(body)
+      .then(() => {
+        setReadOnly(true);
+      })
+      .catch(() => {});
+  };
 
   // ---------------------------------------------------------------------------
 
@@ -206,8 +231,8 @@ export default function TotalCalc({
           />
         </div>
         <div className={scss.btnBar}>
-          <IconCheck02 className={classNames(readOnly && 'invisible')} />
-          <IconEdit onClick={switchReadOnly} className={classNames(!readOnly && scss.active)} />
+          <IconCheck02 className={classNames(readOnly && 'invisible')} onClick={onConfirm} />
+          <IconEdit className={classNames(!readOnly && scss.active)} onClick={switchReadOnly} />
         </div>
       </div>
       {/*  */}
@@ -409,8 +434,7 @@ const useDefaultStatePayment = (accountReceivable: TaccountsReceivableDto) => {
       unpaidPayment, // 未收款金額
       finalPayment, // 尾款
       paymentPending, // 請款中未收到款項
-    } = fakeAccountReceivable();
-    // } = accountReceivable;
+    } = accountReceivable;
 
     const state: Tstate_payment = {
       finalPaymentType,
@@ -435,20 +459,19 @@ const useDefaultStatePayment = (accountReceivable: TaccountsReceivableDto) => {
   }, [accountReceivable]);
 };
 
-1;
-const fakeAccountReceivable = () => ({
-  finalPaymentType: null,
-  isFinalPaymentWithTax: null,
-  finalPaymentPercent: '0',
+// const fakeAccountReceivable = () => ({
+//   finalPaymentType: null,
+//   isFinalPaymentWithTax: null,
+//   finalPaymentPercent: '0',
 
-  contractTotalPrice: 10000,
-  pendingTasks: 1000,
+//   contractTotalPrice: 10000,
+//   pendingTasks: 1000,
 
-  receivedPayment: 1000,
-  extraIncome: 1000,
-  totalDeduction: 1000,
+//   receivedPayment: 1000,
+//   extraIncome: 1000,
+//   totalDeduction: 1000,
 
-  unpaidPayment: 1000,
-  finalPayment: 1000,
-  paymentPending: 1000,
-});
+//   unpaidPayment: 1000,
+//   finalPayment: 1000,
+//   paymentPending: 1000,
+// });
