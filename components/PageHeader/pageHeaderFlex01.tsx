@@ -74,10 +74,6 @@ export default function PageHeaderFlex01({
 
   // ---
   function LinkList() {
-    if (!linkList[0]) {
-      return null;
-    }
-
     return (
       <>
         {linkList.map((props, index) => {

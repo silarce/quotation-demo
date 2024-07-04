@@ -233,6 +233,7 @@ export default function AccountReceivable() {
       minusWriteOffDeposit,
 
       retainageType,
+      retainagePercent,
       allowance,
       note,
 
@@ -289,6 +290,7 @@ export default function AccountReceivable() {
       nameOfBusinessEntity: nameOfBusinessEntity || null,
       businessIdNumber: businessIdNumber || null,
       isOriginalCustomer,
+      retainagePercent: retainagePercent || null,
     };
 
     try {
@@ -502,6 +504,7 @@ export default function AccountReceivable() {
 
       <div className={scss.main}>
         <Profile {...props_profile} />
+
         <TotalCalc className="mt-10" accountReceivable={accountReceivable} />
 
         <AccountantSorting

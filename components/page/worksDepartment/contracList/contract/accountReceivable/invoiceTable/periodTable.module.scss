@@ -211,3 +211,12 @@ $deleteBarHeight: 36px;
     color: red;
   }
 }
+
+.inputInsideRadio {
+  display: flex;
+  gap: 5px;
+  // input {
+  //   background-color: pink !important;
+  //   width: 30px;
+  // }
+}
