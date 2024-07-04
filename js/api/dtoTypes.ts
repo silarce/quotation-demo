@@ -847,14 +847,22 @@ export type TquotationContentOtherDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
+
+  // 項目
   item: string;
+  // 內容
   description: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  notes: string;
+  // 數量
+  quantity: string | null;
+  // 單位
   unit: string | null;
-  //
+  // 單價
+  unitPrice: number;
+  // 複價
+  totalPrice: string | null;
+  // 備註
+  notes: string;
+  // 尺寸規格
   spec: string | null;
 };
 

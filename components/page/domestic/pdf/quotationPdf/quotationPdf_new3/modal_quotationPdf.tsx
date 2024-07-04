@@ -1099,7 +1099,10 @@ const quotationProdAndOther_ToProdArr = ({
   })();
 
   const othersArr: Tprod[] = quotationOtherArr.map((item, index) => {
-    const { description, unitPrice, totalPrice, spec, unit } = item;
+    const { quantity, description, unitPrice, totalPrice, spec, unit } = item;
+
+    const quantity_num = Number(quantity || 0);
+    const totalPrice_num = Number(totalPrice || 0);
 
     return {
       itemName: item.item,
@@ -1112,14 +1115,14 @@ const quotationProdAndOther_ToProdArr = ({
       horsepower: '',
       closingType: '',
 
-      qty: String(item.quantity) + ' ' + unit,
+      qty: quantity_num + ' ' + unit,
       unitPrice: unitPrice.toLocaleString(),
-      totalPrice: totalPrice.toLocaleString(),
+      totalPrice: totalPrice_num ? totalPrice_num.toLocaleString() : '',
       notes: item.notes,
       //
       unitPrice_num: unitPrice,
-      totalPrice_num: totalPrice,
-      qty_num: item.quantity,
+      totalPrice_num: totalPrice_num,
+      qty_num: quantity_num,
       guideRailForExcel: null,
       unit: unit ?? '',
     };
