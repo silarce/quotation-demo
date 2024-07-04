@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
 // antd
 import { Radio } from 'antd';
@@ -32,23 +33,23 @@ type Tprops = {
   reqPatchAccountReceivable: TreqPatchAccountReceivable;
 };
 
-type Tstate_finalPayment = {
-  finalPaymentType: TfinalPaymentType; // '尾款' | '保留款'
+type Tstate_payment = {
+  finalPaymentType: TfinalPaymentType | null; // '尾款' | '保留款'
   isFinalPaymentWithTax: boolean | null; // 若為尾款則為null
   finalPaymentPercent: string;
   //
-  contractTotalPrice: string; // 合約總金額(會因為追加而增加)
-  pendingTasks: string; // 未施作項目
+  contractTotalPrice: number; // 合約總金額(會因為追加而增加)
+  pendingTasks: number; // 未施作項目
   //
-  completedPart: string; // 已完成項目(含稅) // 虛值，後端無紀錄
+  completedPart: number; // 已完成項目(含稅) // 虛值，後端無紀錄
   //
-  receivedPayment: string; // 已收帳款金額(目前總計請款)
-  extraIncome: string; // 額外收入
-  totalDeduction: string; // 總扣款金額
+  receivedPayment: number; // 已收帳款金額(目前總計請款)
+  extraIncome: number; // 額外收入
+  totalDeduction: number; // 總扣款金額
 
-  unpaidPayment: string; // 未收款金額
-  finalPayment: string; // 尾款
-  paymentPending: string; // 請款中未收到款項
+  unpaidPayment: number; // 未收款金額
+  finalPayment: number | null; // 尾款 保留款
+  paymentPending: number; // 請款中未收到款項
 };
 
 // ============================================================================
@@ -61,28 +62,79 @@ export default function TotalCalc({
   accountReceivable,
   reqPatchAccountReceivable,
 }: Tprops) {
-  const {
-    // totalFee, // 手續費總合計
-    // totalTax, // 目前合計請款營業稅額
-
-    contractTotalPrice, // 合約總金額(會因為追加而增加)
-    pendingTasks, // 未施作項目
-
-    receivedPayment, // 已收帳款金額(目前總計請款)
-    extraIncome, // 額外收入
-    totalDeduction, // 總扣款金額
-
-    unpaidPayment, // 未收款金額
-    finalPayment, // 尾款
-    paymentPending, // 請款中未收到款項
-  } = accountReceivable;
-
   // ---------------------------------------------------------------------------
 
   const [readOnly, setReadOnly] = useState(true);
 
   const switchReadOnly = () => {
     setReadOnly((state) => !state);
+  };
+
+  // ---------------------------------------------------------------------------
+
+  const defaultState = useDefaultStatePayment(accountReceivable);
+  const [state_payment, setState_payment] = useState<Tstate_payment>(defaultState);
+
+  // --------------------------------------------------------------------------
+
+  // region FUNCTION
+
+  // 合約保留款 尾款
+  const handle_finalPaymentType = (value: Tstate_payment['finalPaymentType']) => {
+    setState_payment((state) => {
+      state = { ...state };
+      state.finalPaymentType = value;
+
+      if (value === '尾款') {
+        state.isFinalPaymentWithTax = null;
+      } else if (value === '保留款') {
+        state.isFinalPaymentWithTax = true;
+      }
+
+      return {
+        ...state,
+        ...calcPayment(state),
+      };
+    });
+  };
+
+  // 含稅未稅
+  const handle_isFinalPaymentWithTax = (value: Tstate_payment['isFinalPaymentWithTax']) => {
+    setState_payment((state) => {
+      state = { ...state };
+      state.isFinalPaymentWithTax = value;
+
+      return {
+        ...state,
+        ...calcPayment(state),
+      };
+    });
+  };
+
+  // 百分比
+  const handle_finalPaymentPercent = (value: Tstate_payment['finalPaymentPercent']) => {
+    setState_payment((state) => {
+      state = { ...state };
+      state.finalPaymentPercent = value;
+
+      return {
+        ...state,
+        ...calcPayment(state),
+      };
+    });
+  };
+
+  // 未施作項目
+  const handle_pendingTasks = (value: Tstate_payment['pendingTasks']) => {
+    setState_payment((state) => {
+      state = { ...state };
+      state.pendingTasks = value;
+
+      return {
+        ...state,
+        ...calcPayment(state),
+      };
+    });
   };
 
   // ---------------------------------------------------------------------------
@@ -97,6 +149,10 @@ export default function TotalCalc({
 
   // ---------------------------------------------------------------------------
 
+  useEffect(() => {
+    setState_payment(defaultState);
+  }, [defaultState]);
+
   // ---------------------------------------------------------------------------
 
   // MARK: RENDER
@@ -105,14 +161,26 @@ export default function TotalCalc({
     <div className={classNames(scss.totalCalc, className)}>
       {/*  */}
       <div className={scss.percentPanel}>
-        <Radio.Group disabled={readOnly}>
-          <Radio value={'合約保留款'}>合約保留款</Radio>
+        <Radio.Group
+          disabled={readOnly}
+          value={state_payment.finalPaymentType}
+          onChange={(e) => {
+            handle_finalPaymentType(e.target.value);
+          }}
+        >
+          <Radio value={'保留款'}>合約保留款</Radio>
           <br />
           <Radio value={'尾款'}>尾款</Radio>
         </Radio.Group>
-        <Radio.Group disabled={readOnly}>
-          <Radio value={'含稅'}>含稅</Radio>
-          <Radio value={'未稅'}>未稅</Radio>
+        <Radio.Group
+          disabled={readOnly || state_payment.finalPaymentType !== '保留款'}
+          value={state_payment.isFinalPaymentWithTax}
+          onChange={(e) => {
+            handle_isFinalPaymentWithTax(e.target.value);
+          }}
+        >
+          <Radio value={true}>含稅</Radio>
+          <Radio value={false}>未稅</Radio>
         </Radio.Group>
         <div className={scss.inputSelWrapper}>
           <InputSel
@@ -124,10 +192,15 @@ export default function TotalCalc({
               width: '100px',
               gap: '5px',
             }}
-            caption="百分比"
+            caption="百分比 : "
+            suffix="%"
             inputProps={{
               props: {
                 placeholder: '',
+                value: state_payment.finalPaymentPercent,
+                onChange: (e) => {
+                  handle_finalPaymentPercent(e.target.value);
+                },
               },
             }}
           />
@@ -140,8 +213,9 @@ export default function TotalCalc({
       {/*  */}
       <div className={scss.caption}>總計算</div>
       {/*  */}
+      {/*  */}
       <div>
-        <Row symbol="undefined" caption="合約金額" value={'contractTotalPrice'} />
+        <Row symbol="undefined" caption="合約金額" value={state_payment['contractTotalPrice']} />
 
         <div className={scss.row}>
           <Minus />
@@ -155,11 +229,10 @@ export default function TotalCalc({
                 props: {
                   type: readOnly ? 'text' : 'number',
                   className: 'text-right',
-                  // value: readOnly ? Number(state_pendingTasks).toLocaleString() : state_pendingTasks,
-                  value: 'pendingTasks',
+                  value: readOnly ? state_payment.pendingTasks?.toLocaleString() : state_payment.pendingTasks,
                   readOnly: readOnly,
                   onChange: (e) => {
-                    // setState_pendingTasks(e.target.value);
+                    handle_pendingTasks(Number(e.target.value));
                   },
                 },
               }}
@@ -168,14 +241,14 @@ export default function TotalCalc({
         </div>
 
         <Hrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr />
-        <Row symbol="=" caption="已完成項目(含稅)" value={9999999} />
-        <Row symbol="-" caption="已收款金額" value={'receivedPayment'} />
-        <Row symbol="-" caption="額外收入(含稅)" value={'extraIncome'} />
-        <Row symbol="-" caption="扣款金額(含稅)" value={'totalDeduction'} />
+        <Row symbol="=" caption="已完成項目(含稅)" value={state_payment['completedPart']} />
+        <Row symbol="-" caption="已收款金額" value={state_payment['receivedPayment']} />
+        <Row symbol="-" caption="額外收入(含稅)" value={state_payment['extraIncome']} />
+        <Row symbol="-" caption="扣款金額(含稅)" value={state_payment['totalDeduction']} />
         <Hrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr />
-        <Row symbol="=" caption="未收款金額(含稅)" value={'unpaidPayment'} />
-        <Row symbol="-" caption="尾款/保留款(未稅或含稅)" value={'finalPayment'} />
-        <Row symbol="=" caption="請款中" value={'paymentPending'} />
+        <Row symbol="=" caption="未收款金額(含稅)" value={state_payment['unpaidPayment']} />
+        <Row symbol="-" caption="尾款/保留款(未稅或含稅)" value={state_payment['finalPayment']} />
+        <Row symbol="=" caption="請款中" value={state_payment['paymentPending']} />
       </div>
       {/*  */}
     </div>
@@ -274,3 +347,108 @@ const Row = ({
     </div>
   );
 };
+
+// =============================================================================
+
+// region FUNCTION
+
+const calcPayment = (state: Tstate_payment) => {
+  const {
+    // finalPaymentType,
+    isFinalPaymentWithTax,
+    finalPaymentPercent,
+
+    contractTotalPrice,
+    pendingTasks,
+
+    // completedPart,
+
+    receivedPayment,
+    extraIncome,
+    totalDeduction,
+
+    // unpaidPayment,
+
+    // finalPayment,
+    // paymentPending,
+  } = state;
+
+  const taxRate = isFinalPaymentWithTax ? 1.05 : 1;
+
+  const completedPart_d = new Decimal(contractTotalPrice).minus(pendingTasks);
+  const unpaidPayment_d = new Decimal(completedPart_d).minus(receivedPayment).minus(extraIncome).minus(totalDeduction);
+  const finalPayment_d = completedPart_d.div(taxRate).mul(finalPaymentPercent).div(100).toDecimalPlaces(0);
+  const paymentPending_d = new Decimal(unpaidPayment_d).minus(finalPayment_d);
+
+  return {
+    completedPart: completedPart_d.toNumber(),
+    unpaidPayment: unpaidPayment_d.toNumber(),
+    finalPayment: finalPayment_d.toNumber(),
+    paymentPending: paymentPending_d.toNumber(),
+  };
+};
+
+// =============================================================================
+
+// region HOOK
+
+const useDefaultStatePayment = (accountReceivable: TaccountsReceivableDto) => {
+  return useMemo(() => {
+    const {
+      finalPaymentType, // '尾款' | '保留款'
+      isFinalPaymentWithTax,
+      finalPaymentPercent,
+
+      contractTotalPrice, // 合約總金額(會因為追加而增加)
+      pendingTasks, // 未施作項目
+
+      receivedPayment, // 已收帳款金額(目前總計請款)
+      extraIncome, // 額外收入
+      totalDeduction, // 總扣款金額
+
+      unpaidPayment, // 未收款金額
+      finalPayment, // 尾款
+      paymentPending, // 請款中未收到款項
+    } = fakeAccountReceivable();
+    // } = accountReceivable;
+
+    const state: Tstate_payment = {
+      finalPaymentType,
+      isFinalPaymentWithTax,
+      finalPaymentPercent,
+
+      contractTotalPrice,
+      pendingTasks,
+
+      completedPart: 0,
+
+      receivedPayment,
+      extraIncome,
+      totalDeduction,
+
+      unpaidPayment,
+      finalPayment,
+      paymentPending,
+    };
+
+    return state;
+  }, [accountReceivable]);
+};
+
+1;
+const fakeAccountReceivable = () => ({
+  finalPaymentType: null,
+  isFinalPaymentWithTax: null,
+  finalPaymentPercent: '0',
+
+  contractTotalPrice: 10000,
+  pendingTasks: 1000,
+
+  receivedPayment: 1000,
+  extraIncome: 1000,
+  totalDeduction: 1000,
+
+  unpaidPayment: 1000,
+  finalPayment: 1000,
+  paymentPending: 1000,
+});
