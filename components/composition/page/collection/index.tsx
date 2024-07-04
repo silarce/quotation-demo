@@ -104,7 +104,7 @@ type Tstate_accountant = {
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
 type TreqPatch = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
 // type TreqPatchIsImported = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
-type TreqPatchIsImported = (accountantId: string, type: TperiodType, incomeBillDate: string) => Promise<void>;
+type TreqPatchIsImported = (accountantId: string, incomeBillDate: string) => Promise<void>;
 type TreqDelete = (id: string) => Promise<void>;
 
 export type { TreqPatchIsImported };
@@ -272,7 +272,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   const reqPatchIsImported = async (
     //
     accountantId: string,
-    type: TperiodType,
+
     incomeBillDate: string
   ) => {
     if (!isWorksDepartment) {
@@ -282,7 +282,6 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     }
 
     const body: TcreateAccountReceivableAccountsDto = {
-      type,
       accountantId: [accountantId],
       incomeBillDate,
     };
@@ -300,7 +299,6 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   const reqPostAccountReceivableAccountant = async (
     //
     accountReceivableId: string,
-    type: TperiodType,
     incomeBillDate: string
   ) => {
     if (!accountantId) {
@@ -312,7 +310,6 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     try {
       await apiPostAccountReceivableAccountant(accountReceivableId, {
         accountantId: [accountantId],
-        type,
         incomeBillDate,
       });
       await update_accountant();
@@ -325,7 +322,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   const handle_import = (accountReceivableId: string) => {
     const modal = myAlert.btnBar({});
     modal.update({
-      title: '請選擇匯入發票類型',
+      title: '匯入發票',
       content: (
         // <AddInovice
         //   onCancel={modal.destroy}
@@ -333,10 +330,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
         //   reqPostAccountReceivableAccountant={reqPostAccountReceivableAccountant}
         // />
         <ExportToIncomeBill
-          onRequestPaymentClick={(isoString) =>
-            reqPostAccountReceivableAccountant(accountReceivableId, '請款', isoString)
-          }
-          onDepositClick={(isoString) => reqPostAccountReceivableAccountant(accountReceivableId, '訂金', isoString)}
+          onConfirm={(isoString) => reqPostAccountReceivableAccountant(accountReceivableId, isoString)}
           onCancel={modal.destroy}
         />
       ),
@@ -759,8 +753,7 @@ const Row = ({
           //   onCancel={modal.destroy}
           // />
           <ExportToIncomeBill
-            onRequestPaymentClick={(isoString) => reqPatchIsImported(data_accountant.id, '請款', isoString)}
-            onDepositClick={(isoString) => reqPatchIsImported(data_accountant.id, '訂金', isoString)}
+            onConfirm={(isoString) => reqPatchIsImported(data_accountant.id, isoString)}
             onCancel={modal.destroy}
           />
         ),
@@ -1226,7 +1219,7 @@ const configList: TconfigList = {
   importAccountingNumber: {
     label: '付款帳號',
     style: {
-      width: 120,
+      width: 160,
     },
     className: '',
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {

@@ -6,8 +6,8 @@ import moment, { Moment } from 'moment';
 import { AxiosError } from 'axios';
 
 // component
-import PeriodPanel, { Thead, Tbody, Tfoot } from './table';
-import type { TimperativeHandle_panel, Tcenter } from './table';
+import PeriodPanel, { Thead, Tbody, Tfoot } from './periodPanel';
+import type { TimperativeHandle_panel, Tcenter } from './periodPanel';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -47,6 +47,7 @@ type Tperiod_reduce = Pick<
   | 'isDeduction'
   | 'isWriteOffDeposit'
   | 'retainageType'
+  | 'retainagePercent'
   // | 'allowance'
   | 'note'
   //
@@ -92,6 +93,8 @@ type Tstate_period = {
   invoiceNumber: string;
 
   retainageType: TretainageType | 'null'; // 保留款類型
+  retainagePercent: string; // 保留款百分比
+
   allowance: string; // 折讓金額
   note: string; // 備註
   //
@@ -325,6 +328,7 @@ export default function PeriodTable({
       isDeduction: false,
       isWriteOffDeposit: false,
       retainageType: null,
+      retainagePercent: null,
       // allowance: 0,
       note: '',
       // accountantList: [],

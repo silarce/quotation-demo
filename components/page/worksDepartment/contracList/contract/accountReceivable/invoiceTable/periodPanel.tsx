@@ -253,6 +253,7 @@ function PeriodPanel_pre(
 
       period.retainage = calcRetainage(period);
       period.price = calcPrice(period);
+      // period.retainagePercent = calcRegainagePercent(period);
 
       return period;
     });
@@ -871,7 +872,31 @@ const Tfoot = ({
       <div className={classNames(scss.row)}>
         {/* <span>保留款</span> */}
         <div className={scss.totalInfoWrapper}>
-          <Popover trigger="hover" content="保留款為含稅或未稅時不可以編輯">
+          <Popover
+            //
+            trigger="hover"
+            title="保留款由下方的保留款百分比與含稅未稅選項決定"
+            content={
+              <div>
+                圈選含稅
+                <br />
+                保留款 = 保留款百分比 * 本期合計
+                <br />
+                <br />
+                圈選未稅
+                <br />
+                保留款 = 保留款百分比 * 本期總計
+                <br />
+                <br />
+                圈選無則保留款為0
+                <br />
+                <br />
+                編輯完成數量或完成金額會依據保留款百分比與含稅未稅計算保留款
+                <br />
+                編輯保留款會依據本期合計或本期總計計算保留款百分比
+              </div>
+            }
+          >
             <span>
               <Icon_info />
             </span>
@@ -880,9 +905,14 @@ const Tfoot = ({
         </div>
         <input
           className={classNames((readOnly || class_other.isRetainageLocked) && scss.readyOnly)}
+          // className={classNames(scss.readyOnly)}
           value={retainage}
-          onChange={(e) => (class_other.retainage = e.target.value)}
+          onChange={(e) => {
+            class_other.retainage = e.target.value;
+          }}
           readOnly={readOnly || class_other.isRetainageLocked}
+          // readOnly={readOnly}
+          // readOnly={true}
           type={inputType}
         />
       </div>
@@ -910,7 +940,28 @@ const Tfoot = ({
       </div>
 
       <div className={classNames(isTotal && 'invisible')}>
-        保留款
+        <div className="flex gap-2">
+          <span>保留款</span>
+          <InputSel
+            //
+            wrapperStyle={{ width: 60, gap: '5px' }}
+            fontSize="14"
+            disabled={readOnly || class_other.retainageType === 'null'}
+            showBaseline="auto"
+            inputProps={{
+              props: {
+                type: 'number',
+                placeholder: '',
+                value: class_other.retainagePercent,
+                onChange: (e) => {
+                  class_other.retainagePercent = e.target.value;
+                },
+              },
+            }}
+            suffix="%"
+          />
+        </div>
+
         <div className={scss.checkBar}>
           <Radio.Group
             disabled={readOnly}
@@ -921,7 +972,25 @@ const Tfoot = ({
           >
             <Radio value={'含稅' as TretainageType}>含稅</Radio>
             <Radio value={'未稅' as TretainageType}>未稅</Radio>
-            <Radio value={'null'}>自訂</Radio>
+            <Radio value={'null'}>無</Radio>
+            {/* <Radio value={'null'}>
+              <div className={classNames(scss.inputInsideRadio)}>
+                <span>自訂</span>
+                <InputSel
+                  //
+                  wrapperStyle={{ width: 60, gap: '5px' }}
+                  fontSize="14"
+                  disabled={readOnly || class_other.retainageType !== 'null'}
+                  showBaseline="auto"
+                  inputProps={{
+                    props: {
+                      placeholder: '',
+                    },
+                  }}
+                  suffix="%"
+                />
+              </div>
+            </Radio> */}
           </Radio.Group>
         </div>
       </div>
@@ -1186,9 +1255,6 @@ const calcPrice = (state_period: Tstate_period) => {
     minusRetainage,
     minusDeduction,
     minusWriteOffDeposit,
-    retainageType,
-    contractTotal,
-    subTotal,
   } = period;
 
   const totals_num = calcTotals(period.rowArr);
@@ -1206,17 +1272,32 @@ const calcPrice = (state_period: Tstate_period) => {
 const calcRetainage = (state_period: Tstate_period) => {
   const period = state_period;
 
-  const { subTotal, contractTotal, retainageType } = period;
+  const { subTotal, contractTotal, retainageType, retainagePercent } = period;
+
+  const percent = new Decimal(retainagePercent || 0).div(100);
 
   let retainage = '';
 
   if (retainageType === '含稅') {
-    retainage = new Decimal(contractTotal).mul(0.1).toDecimalPlaces(0).toString();
+    retainage = new Decimal(contractTotal).mul(percent).toDecimalPlaces(0).toString();
   } else if (retainageType === '未稅') {
-    retainage = new Decimal(subTotal).mul(0.1).toDecimalPlaces(0).toString();
+    retainage = new Decimal(subTotal).mul(percent).toDecimalPlaces(0).toString();
   }
 
   return retainage;
+};
+
+const calcRegainagePercent = (state_period: Tstate_period) => {
+  const period = state_period;
+
+  const { subTotal, contractTotal, retainageType, retainage } = period;
+
+  const percent = new Decimal(retainage || 0)
+    .div(retainageType === '含稅' ? contractTotal : subTotal)
+    .mul(100)
+    .toDecimalPlaces(2);
+
+  return percent.toString();
 };
 
 // ==========================================================================
@@ -1251,6 +1332,7 @@ const useDefaultState = ({
       isWriteOffDeposit,
       //
       retainageType,
+      retainagePercent,
       // allowance,
       note,
       //
@@ -1348,6 +1430,8 @@ const useDefaultState = ({
       contractTotal: totals_num.contractTotal,
 
       retainageType: retainageType || 'null',
+      retainagePercent: retainagePercent || '',
+
       allowance: String(allowance || ''),
       note: note || '',
 
@@ -1413,11 +1497,15 @@ class Class_OtherNode {
   }
 
   set retainage(value) {
-    this.setState_period((period) => ({
-      ...period,
-      retainage: value,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.retainage = value;
+      period.price = calcPrice(period);
+
+      period.retainagePercent = calcRegainagePercent(period);
+
+      return period;
+    });
   }
 
   get retainage_localeString() {
@@ -1430,11 +1518,13 @@ class Class_OtherNode {
     return this.state_period.deduction;
   }
   set deduction(value) {
-    this.setState_period((period) => ({
-      ...period,
-      deduction: value,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.deduction = value;
+      period.price = calcPrice(period);
+
+      return period;
+    });
   }
 
   get deduction_localeString() {
@@ -1447,11 +1537,13 @@ class Class_OtherNode {
     return this.state_period.writeOffDeposit;
   }
   set writeOffDeposit(value) {
-    this.setState_period((period) => ({
-      ...period,
-      writeOffDeposit: value,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.writeOffDeposit = value;
+      period.price = calcPrice(period);
+
+      return period;
+    });
   }
 
   get writeOffDeposit_localeString() {
@@ -1506,6 +1598,27 @@ class Class_OtherNode {
     this.setState_period((period) => {
       period = { ...period };
       period.retainageType = value;
+
+      if (value === 'null') {
+        period.retainagePercent = '';
+      } else if (!period.retainagePercent) {
+        period.retainagePercent = '10';
+      }
+
+      period.retainage = calcRetainage(period);
+      period.price = calcPrice(period);
+
+      return period;
+    });
+  }
+
+  get retainagePercent() {
+    return this.state_period.retainagePercent;
+  }
+  set retainagePercent(value) {
+    this.setState_period((period) => {
+      period = { ...period };
+      period.retainagePercent = value;
       period.retainage = calcRetainage(period);
       period.price = calcPrice(period);
 
@@ -1626,7 +1739,10 @@ class Class_OtherNode {
   get isRetainageLocked() {
     const retainageType = this.state_period.retainageType;
 
-    if (retainageType === '含稅' || retainageType === '未稅') {
+    // if (retainageType === '含稅' || retainageType === '未稅') {
+    //   return true;
+    // }
+    if (retainageType === 'null') {
       return true;
     }
   }
@@ -1721,7 +1837,8 @@ const create_emptyPeriod = (): Tperiod_reduce => {
     isRetainage: false,
     isDeduction: false,
     isWriteOffDeposit: false,
-    retainageType: null,
+    retainageType: '含稅',
+    retainagePercent: '10',
     // allowance: 0,
     note: '',
     // accountantList: [],
