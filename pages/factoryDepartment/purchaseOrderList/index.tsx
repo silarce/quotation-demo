@@ -291,7 +291,7 @@ export default function PurchaseOrderList() {
     useEffect(() => {
         if (purchaseorderuuid) {
             getPurchaseOrderDetail(purchaseorderuuid);
-            // GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid);
+            GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid);
             setPurchaseorderidin(purchaseorderid as string);
             setPurchaseorderuuidin(purchaseorderuuid as string);
             // setCreate_atin((create_at != null ? create_at : "") as string);
@@ -303,12 +303,14 @@ export default function PurchaseOrderList() {
             setReceiptedin(receipted as string);
             setSupplieraddressin(supplieraddress as string);
         }
-    }, [purchaseorderuuid]);
+    }, [purchaseorderuuid,purchaseorderdetailuuid]);
 
     //批次進貨
     //取已對應採購單的已進貨明細
     const GetProdReceiptDetailByPurchaseOrderId = async (purchaseorderuuid: any) => {
         try {
+            alert(purchaseorderdetailuuid);
+            alert(purchaseorderuuid);
             setIsLoading(true);
             const conditionModel: {
                 purchaseorderuuid: string | undefined,

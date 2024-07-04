@@ -166,6 +166,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   }
 
   async function AddPurchaseOrderDetail(item: any) {
+    alert("in");
     router.replace({
       pathname: `/factoryDepartment/purchaseOrderList`,
       query: {
@@ -180,7 +181,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         supplierphone: item.supplierphone,
         invoice: item.invoice,
         firstin: 1,
-        purchaseorderdetailuuid: item.purchaseorderdetailuuid
+        purchaseorderdetailuuid: item.id
       }
     })
   }
@@ -664,7 +665,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.unitprice.toLocaleString()}</span>
                 <span>{_item.totalprice.toLocaleString()}</span>
                 <span>
-                  <button onClick={() => { AddPurchaseOrderDetail }}>
+                  <button onClick={()=>{AddPurchaseOrderDetail(_item)}}>
                     <img src={icon_fc_add.src} alt="add" style={{ width: '20px', height: '20px' }} />
                   </button>
                 </span>
