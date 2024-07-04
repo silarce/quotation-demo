@@ -1219,7 +1219,7 @@ const configList: TconfigList = {
   importAccountingNumber: {
     label: '付款帳號',
     style: {
-      width: 120,
+      width: 160,
     },
     className: '',
     inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
