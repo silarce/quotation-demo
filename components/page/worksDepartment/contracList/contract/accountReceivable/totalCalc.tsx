@@ -1,8 +1,15 @@
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
+
+// gear
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import scss from './totalCalc.module.scss';
 
+import { IconEdit, IconCheck02, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+
 import type { TaccountsReceivableDto } from 'js/api/dtoTypes';
+import type { TreqPatchAccountReceivable } from 'pages/worksDepartment/contractList/contract/accountReceivable';
 
 // ============================================================================
 
@@ -19,23 +26,70 @@ type Tprops = {
   className?: string;
   accountReceivable: TaccountsReceivableDto;
   valueList?: TvalueList;
+  reqPatchAccountReceivable: TreqPatchAccountReceivable;
 };
 
 // ============================================================================
+
+// MARK START
+
 export default function TotalCalc({
   //
   className,
   accountReceivable,
+  reqPatchAccountReceivable,
 }: Tprops) {
   const {
-    //
+    // 合約總金額(會因為追加而增加)
     contractTotalPrice,
+    // 已收帳款金額(目前總計請款)
     receivedPayment,
+    // 手續費總合計
+    totalFee,
+    // 總扣款金額
     totalDeduction,
-    extraIncome,
+    // 未收款金額
     unpaidPayment,
+    // 尾款
     finalPayment,
+    // 目前合計請款營業稅額
+    totalTax,
+    // 額外收入
+    extraIncome,
+    // 未施作項目
+    pendingTasks,
   } = accountReceivable;
+
+  // ---------------------------------------------------------------------------
+
+  const [readOnly, setReadOnly] = useState(true);
+  const [state_pendingTasks, setState_pendingTasks] = useState(String(pendingTasks));
+
+  const switchReadOnly = () => {
+    setReadOnly((state) => !state);
+  };
+
+  // ---------------------------------------------------------------------------
+
+  const onConfirm = async () => {
+    await reqPatchAccountReceivable({ pendingTasks: Number(state_pendingTasks || 0) })
+      .then(() => {
+        setReadOnly(true);
+      })
+      .catch(() => {});
+  };
+
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    if (readOnly) {
+      setState_pendingTasks(String(pendingTasks));
+    }
+  }, [readOnly]);
+
+  // ---------------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <div className={classNames(scss.totalCalc, className)}>
@@ -47,11 +101,38 @@ export default function TotalCalc({
           <span>合約金額</span>
           <span>{contractTotalPrice}</span>
         </div>
+
+        <div className={scss.grid}>
+          <Minus />
+          <span>未施作項目</span>
+          <div className="flex gap-3">
+            <IconCheck02 className={classNames(readOnly && 'invisible')} onClick={onConfirm} />
+            <IconEdit onClick={switchReadOnly} className={classNames(!readOnly && scss.active)} />
+
+            <InputSel
+              fontSize="16"
+              wrapperStyle={{ width: '100px' }}
+              showBaseline={readOnly ? 'invisible' : 'always'}
+              inputProps={{
+                props: {
+                  type: readOnly ? 'text' : 'number',
+                  className: 'text-right',
+                  value: readOnly ? Number(state_pendingTasks).toLocaleString() : state_pendingTasks,
+                  readOnly: readOnly,
+                  onChange: (e) => {
+                    setState_pendingTasks(e.target.value);
+                  },
+                },
+              }}
+            />
+          </div>
+        </div>
         <div className={scss.grid}>
           <Minus />
           <span>已收帳款金額</span>
           <span>{receivedPayment}</span>
         </div>
+
         <div className={scss.grid}>
           <Minus />
           <span>扣款金額</span>
@@ -92,6 +173,12 @@ export default function TotalCalc({
     </div>
   );
 }
+
+// MARK:END
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
 
 // region SVG
 const Minus = () => {

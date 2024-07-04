@@ -3540,6 +3540,8 @@ export type TaccountsReceivableDto = {
   totalTax: number;
   // 額外收入
   extraIncome: number;
+  // 未施作項目
+  pendingTasks: number;
 };
 
 export type TcreateAccountReceivableDto = {
@@ -3573,18 +3575,7 @@ export type TcreateAccountReceivableDto = {
   isDone: boolean;
 };
 
-export type TupdateAccountReceivableDto = Pick<
-  TaccountsReceivableDto,
-  | 'valuationDate'
-  | 'payOffDay'
-  | 'performanceBond'
-  | 'depositGuaranteeTicket'
-  | 'warrantyTicket'
-  | 'hasNoContract'
-  | 'hasUncollectedAmounts'
-  | 'hasNotInstall'
-  | 'isDone'
->;
+export type TupdateAccountReceivableDto = Pick<TaccountsReceivableDto, 'pendingTasks'>;
 
 // 期數
 export type TaccountsReceivablePeriodDto = {

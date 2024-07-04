@@ -48,6 +48,7 @@ import {
   TcreateAccountReceivablePeriodDto,
   TcreateAccountReceivableDto,
   TupdateAccountReceivablePeriodDto,
+  TupdateAccountReceivableDto,
   // TaccountsReceivableInvoiceDto,
   //
   // useGetEngineeringContact,
@@ -63,6 +64,7 @@ import {
   // apiPatchAccountReceivableAccountant,
   // apiPatchAccountReceivableVoidInvoice,
   apiPostAccountReceivable,
+  apiPatchAccountReceivable,
   // apiPostAccountReceivableAccountant,
   // apiDeleteAccountReceivableAccountant,
   apiPostAccountReceivablePeriod, // 新增應收帳款發票
@@ -94,6 +96,10 @@ import { AxiosError } from 'axios';
 type TaccountReceivableContext = {
   customer: TcustomerDto | undefined;
 };
+
+type TreqPatchAccountReceivable = (body: TupdateAccountReceivableDto) => Promise<void>;
+
+export type { TreqPatchAccountReceivable };
 
 // ========================================================================
 
@@ -172,7 +178,9 @@ export default function AccountReceivable() {
   //
   //
 
-  const reaPostAccountReceivable = async () => {
+  // MARK:PostAccountReceivable
+
+  const reqPostAccountReceivable = async () => {
     if (!contractId) {
       return myAlert.info({ title: '沒有合約編號' });
     }
@@ -206,7 +214,24 @@ export default function AccountReceivable() {
     }
   };
 
-  // region reqAddInvoice
+  // MARK: PatchAccountReceivable
+  const reqPatchAccountReceivable: TreqPatchAccountReceivable = async (body) => {
+    const id = accountReceivable?.id;
+
+    if (!id) {
+      return;
+    }
+
+    return await apiPatchAccountReceivable(id, body)
+      .then(async () => {
+        await update_contract();
+      })
+      .catch((err) => {
+        throw err;
+      });
+  };
+
+  // region AddInvoice
   const reqAddInvoice = async (state_invoice: Tstate_period) => {
     if (!accountReceivable?.id) {
       alert('沒有accountReceivable.id');
@@ -309,7 +334,7 @@ export default function AccountReceivable() {
     }
   };
 
-  // region  reqPatchInvoiceAllowance
+  // region  PatchInvoiceAllowance
   const reqPatchInvoiceAllowance = async (invoiceId: string, allowance: number) => {
     try {
       setIsFetching_req(true);
@@ -325,7 +350,7 @@ export default function AccountReceivable() {
     }
   }; //reqPatchInvoiceArr
 
-  // region reqPatchAccountant
+  // region PatchAccountant
   const reqPatchAccountant = async (state_accountant: Tstate_accountant[]) => {
     for (const state of state_accountant) {
       const state_deduction = state.state_deduction;
@@ -346,7 +371,7 @@ export default function AccountReceivable() {
     update_contract();
   };
 
-  // region reqPatchAccountant_sorting
+  // region PatchAccountant_sorting
   const reqPatchAccountant_sorting = async (
     //
     stateList: Tstate_accountantSorting
@@ -425,7 +450,7 @@ export default function AccountReceivable() {
     update_contract();
   };
 
-  // MARK: reqDeleteInvoice
+  // MARK: DeleteInvoice
   const reqDeleteInvoice = async (invoiceId: string) => {
     try {
       setIsFetching_req(true);
@@ -460,7 +485,7 @@ export default function AccountReceivable() {
   isFetching = isFetching_contract || isFetching_finalProduct || isFetching_req;
 
   const panelList_01: TpanelList = [
-    { type: 'myButton', label: '建立應收帳款明細', onClick: () => reaPostAccountReceivable() },
+    { type: 'myButton', label: '建立應收帳款明細', onClick: () => reqPostAccountReceivable() },
   ];
 
   const panelList = panelList_01;
@@ -505,7 +530,11 @@ export default function AccountReceivable() {
       <div className={scss.main}>
         <Profile {...props_profile} />
 
-        <TotalCalc className="mt-10" accountReceivable={accountReceivable} />
+        <TotalCalc
+          className="mt-10"
+          accountReceivable={accountReceivable}
+          reqPatchAccountReceivable={reqPatchAccountReceivable}
+        />
 
         <AccountantSorting
           //

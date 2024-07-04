@@ -1,7 +1,7 @@
 .totalCalc {
   width: 575px;
   border: solid 1px theme("colors.border");
-  hr {
+  > hr {
     border-color: theme("colors.border");
     border-width: 2px;
   }
@@ -38,4 +38,8 @@
     position: absolute;
     right: -10px;
   }
+}
+
+svg.active {
+  color: red;
 }
