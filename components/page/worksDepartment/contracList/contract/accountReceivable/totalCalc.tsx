@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 
+// antd
+import { Radio } from 'antd';
+
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
@@ -8,7 +11,7 @@ import scss from './totalCalc.module.scss';
 
 import { IconEdit, IconCheck02, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
-import type { TaccountsReceivableDto } from 'js/api/dtoTypes';
+import type { TfinalPaymentType, TaccountsReceivableDto } from 'js/api/dtoTypes';
 import type { TreqPatchAccountReceivable } from 'pages/worksDepartment/contractList/contract/accountReceivable';
 
 // ============================================================================
@@ -29,6 +32,25 @@ type Tprops = {
   reqPatchAccountReceivable: TreqPatchAccountReceivable;
 };
 
+type Tstate_finalPayment = {
+  finalPaymentType: TfinalPaymentType; // '尾款' | '保留款'
+  isFinalPaymentWithTax: boolean | null; // 若為尾款則為null
+  finalPaymentPercent: string;
+  //
+  contractTotalPrice: string; // 合約總金額(會因為追加而增加)
+  pendingTasks: string; // 未施作項目
+  //
+  completedPart: string; // 已完成項目(含稅) // 虛值，後端無紀錄
+  //
+  receivedPayment: string; // 已收帳款金額(目前總計請款)
+  extraIncome: string; // 額外收入
+  totalDeduction: string; // 總扣款金額
+
+  unpaidPayment: string; // 未收款金額
+  finalPayment: string; // 尾款
+  paymentPending: string; // 請款中未收到款項
+};
+
 // ============================================================================
 
 // MARK START
@@ -40,30 +62,24 @@ export default function TotalCalc({
   reqPatchAccountReceivable,
 }: Tprops) {
   const {
-    // 合約總金額(會因為追加而增加)
-    contractTotalPrice,
-    // 已收帳款金額(目前總計請款)
-    receivedPayment,
-    // 手續費總合計
-    totalFee,
-    // 總扣款金額
-    totalDeduction,
-    // 未收款金額
-    unpaidPayment,
-    // 尾款
-    finalPayment,
-    // 目前合計請款營業稅額
-    totalTax,
-    // 額外收入
-    extraIncome,
-    // 未施作項目
-    pendingTasks,
+    // totalFee, // 手續費總合計
+    // totalTax, // 目前合計請款營業稅額
+
+    contractTotalPrice, // 合約總金額(會因為追加而增加)
+    pendingTasks, // 未施作項目
+
+    receivedPayment, // 已收帳款金額(目前總計請款)
+    extraIncome, // 額外收入
+    totalDeduction, // 總扣款金額
+
+    unpaidPayment, // 未收款金額
+    finalPayment, // 尾款
+    paymentPending, // 請款中未收到款項
   } = accountReceivable;
 
   // ---------------------------------------------------------------------------
 
   const [readOnly, setReadOnly] = useState(true);
-  const [state_pendingTasks, setState_pendingTasks] = useState(String(pendingTasks));
 
   const switchReadOnly = () => {
     setReadOnly((state) => !state);
@@ -71,21 +87,15 @@ export default function TotalCalc({
 
   // ---------------------------------------------------------------------------
 
-  const onConfirm = async () => {
-    await reqPatchAccountReceivable({ pendingTasks: Number(state_pendingTasks || 0) })
-      .then(() => {
-        setReadOnly(true);
-      })
-      .catch(() => {});
-  };
+  // const onConfirm = async () => {
+  //   await reqPatchAccountReceivable({ pendingTasks: Number(state_pendingTasks || 0) })
+  //     .then(() => {
+  //       setReadOnly(true);
+  //     })
+  //     .catch(() => {});
+  // };
 
   // ---------------------------------------------------------------------------
-
-  useEffect(() => {
-    if (readOnly) {
-      setState_pendingTasks(String(pendingTasks));
-    }
-  }, [readOnly]);
 
   // ---------------------------------------------------------------------------
 
@@ -93,83 +103,81 @@ export default function TotalCalc({
 
   return (
     <div className={classNames(scss.totalCalc, className)}>
+      {/*  */}
+      <div className={scss.percentPanel}>
+        <Radio.Group disabled={readOnly}>
+          <Radio value={'合約保留款'}>合約保留款</Radio>
+          <br />
+          <Radio value={'尾款'}>尾款</Radio>
+        </Radio.Group>
+        <Radio.Group disabled={readOnly}>
+          <Radio value={'含稅'}>含稅</Radio>
+          <Radio value={'未稅'}>未稅</Radio>
+        </Radio.Group>
+        <div className={scss.inputSelWrapper}>
+          <InputSel
+            disabled={readOnly}
+            showBaseline="auto"
+            fontSize="14"
+            captionSize="14"
+            wrapperStyle={{
+              width: '100px',
+              gap: '5px',
+            }}
+            caption="百分比"
+            inputProps={{
+              props: {
+                placeholder: '',
+              },
+            }}
+          />
+        </div>
+        <div className={scss.btnBar}>
+          <IconCheck02 className={classNames(readOnly && 'invisible')} />
+          <IconEdit onClick={switchReadOnly} className={classNames(!readOnly && scss.active)} />
+        </div>
+      </div>
+      {/*  */}
       <div className={scss.caption}>總計算</div>
       {/*  */}
       <div>
-        <div className={scss.grid}>
-          <span className={scss.operator}></span>
-          <span>合約金額</span>
-          <span>{contractTotalPrice}</span>
-        </div>
+        <Row symbol="undefined" caption="合約金額" value={'contractTotalPrice'} />
 
-        <div className={scss.grid}>
+        <div className={scss.row}>
           <Minus />
           <span>未施作項目</span>
-          <div className="flex gap-3">
-            <IconCheck02 className={classNames(readOnly && 'invisible')} onClick={onConfirm} />
-            <IconEdit onClick={switchReadOnly} className={classNames(!readOnly && scss.active)} />
-
+          <div className="">
             <InputSel
               fontSize="16"
-              wrapperStyle={{ width: '100px' }}
+              wrapperStyle={{ width: '110px' }}
               showBaseline={readOnly ? 'invisible' : 'always'}
               inputProps={{
                 props: {
                   type: readOnly ? 'text' : 'number',
                   className: 'text-right',
-                  value: readOnly ? Number(state_pendingTasks).toLocaleString() : state_pendingTasks,
+                  // value: readOnly ? Number(state_pendingTasks).toLocaleString() : state_pendingTasks,
+                  value: 'pendingTasks',
                   readOnly: readOnly,
                   onChange: (e) => {
-                    setState_pendingTasks(e.target.value);
+                    // setState_pendingTasks(e.target.value);
                   },
                 },
               }}
             />
           </div>
         </div>
-        <div className={scss.grid}>
-          <Minus />
-          <span>已收帳款金額</span>
-          <span>{receivedPayment}</span>
-        </div>
 
-        <div className={scss.grid}>
-          <Minus />
-          <span>扣款金額</span>
-          <span>{totalDeduction}</span>
-        </div>
-        <div className={scss.grid}>
-          <Minus />
-          <span>額外收入</span>
-          <span>{extraIncome}</span>
-        </div>
+        <Hrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr />
+        <Row symbol="=" caption="已完成項目(含稅)" value={9999999} />
+        <Row symbol="-" caption="已收款金額" value={'receivedPayment'} />
+        <Row symbol="-" caption="額外收入(含稅)" value={'extraIncome'} />
+        <Row symbol="-" caption="扣款金額(含稅)" value={'totalDeduction'} />
+        <Hrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr />
+        <Row symbol="=" caption="未收款金額(含稅)" value={'unpaidPayment'} />
+        <Row symbol="-" caption="尾款/保留款(未稅或含稅)" value={'finalPayment'} />
+        <Row symbol="=" caption="請款中" value={'paymentPending'} />
       </div>
       {/*  */}
-      <hr />
-      {/*  */}
-      <div>
-        <div className={scss.grid}>
-          <Equal />
-          <span>未收款金額</span>
-          <span>{unpaidPayment}</span>
-        </div>
-
-        {/* <div className={scss.grid}>
-          <Parentheses />
-          <span>10%尾款</span>
-          <span>{accountReceivable.finalPayment}</span>
-        </div> */}
-
-        <div className={scss.grid}>
-          {/* <span></span> */}
-          <Parentheses />
-          <span>10%尾款</span>
-          <span className={scss.latestCell}>
-            {/* {finalPayment} */}
-            <Parentheses turn={true} />
-          </span>
-        </div>
-      </div>
     </div>
   );
 }
@@ -180,7 +188,8 @@ export default function TotalCalc({
 // ============================================================================
 // ============================================================================
 
-// region SVG
+// region COMPONENST
+
 const Minus = () => {
   return (
     <svg width="18" height="6" viewBox="0 0 18 6" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -232,5 +241,36 @@ const Parentheses = ({ turn }: { turn?: boolean }) => {
         </g>
       </g>
     </svg>
+  );
+};
+
+const Hrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr = () => {
+  return <hr className="border-border border-2" />;
+};
+
+const Row = ({
+  //
+  symbol = 'undefined',
+  caption,
+  value,
+}: {
+  symbol?: '-' | '=' | 'undefined';
+  caption: React.ReactNode;
+  value: React.ReactNode;
+}) => {
+  const symbolList = {
+    '-': Minus,
+    '=': Equal,
+    undefined: () => <span />,
+  } as const;
+
+  const Symbol = symbolList[symbol];
+
+  return (
+    <div className={scss.row}>
+      <Symbol />
+      <span>{caption}</span>
+      <span>{value}</span>
+    </div>
   );
 };
