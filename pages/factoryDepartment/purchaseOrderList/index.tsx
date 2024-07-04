@@ -334,7 +334,8 @@ export default function PurchaseOrderList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            setData2(data);
+            setData2(prevData2 => [...prevData2, ...data]);
+
 
         } catch (error: any) {
             setError(error.message);
