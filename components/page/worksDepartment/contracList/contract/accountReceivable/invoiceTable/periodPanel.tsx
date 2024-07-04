@@ -253,6 +253,7 @@ function PeriodPanel_pre(
 
       period.retainage = calcRetainage(period);
       period.price = calcPrice(period);
+      // period.retainagePercent = calcRegainagePercent(period);
 
       return period;
     });
@@ -888,6 +889,11 @@ const Tfoot = ({
                 <br />
                 <br />
                 圈選無則保留款為0
+                <br />
+                <br />
+                編輯完成數量或完成金額會依據保留款百分比與含稅未稅計算保留款
+                <br />
+                編輯保留款會依據本期合計或本期總計計算保留款百分比
               </div>
             }
           >
@@ -898,15 +904,15 @@ const Tfoot = ({
           保留款
         </div>
         <input
-          // className={classNames((readOnly || class_other.isRetainageLocked) && scss.readyOnly)}
-          className={classNames(scss.readyOnly)}
+          className={classNames((readOnly || class_other.isRetainageLocked) && scss.readyOnly)}
+          // className={classNames(scss.readyOnly)}
           value={retainage}
           onChange={(e) => {
-            // class_other.retainage = e.target.value;
+            class_other.retainage = e.target.value;
           }}
-          // readOnly={readOnly || class_other.isRetainageLocked}
+          readOnly={readOnly || class_other.isRetainageLocked}
           // readOnly={readOnly}
-          readOnly={true}
+          // readOnly={true}
           type={inputType}
         />
       </div>
@@ -1249,9 +1255,6 @@ const calcPrice = (state_period: Tstate_period) => {
     minusRetainage,
     minusDeduction,
     minusWriteOffDeposit,
-    retainageType,
-    contractTotal,
-    subTotal,
   } = period;
 
   const totals_num = calcTotals(period.rowArr);
@@ -1282,6 +1285,19 @@ const calcRetainage = (state_period: Tstate_period) => {
   }
 
   return retainage;
+};
+
+const calcRegainagePercent = (state_period: Tstate_period) => {
+  const period = state_period;
+
+  const { subTotal, contractTotal, retainageType, retainage } = period;
+
+  const percent = new Decimal(retainage || 0)
+    .div(retainageType === '含稅' ? contractTotal : subTotal)
+    .mul(100)
+    .toDecimalPlaces(2);
+
+  return percent.toString();
 };
 
 // ==========================================================================
@@ -1481,11 +1497,15 @@ class Class_OtherNode {
   }
 
   set retainage(value) {
-    this.setState_period((period) => ({
-      ...period,
-      retainage: value,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.retainage = value;
+      period.price = calcPrice(period);
+
+      period.retainagePercent = calcRegainagePercent(period);
+
+      return period;
+    });
   }
 
   get retainage_localeString() {
@@ -1498,11 +1518,13 @@ class Class_OtherNode {
     return this.state_period.deduction;
   }
   set deduction(value) {
-    this.setState_period((period) => ({
-      ...period,
-      deduction: value,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.deduction = value;
+      period.price = calcPrice(period);
+
+      return period;
+    });
   }
 
   get deduction_localeString() {
@@ -1515,11 +1537,13 @@ class Class_OtherNode {
     return this.state_period.writeOffDeposit;
   }
   set writeOffDeposit(value) {
-    this.setState_period((period) => ({
-      ...period,
-      writeOffDeposit: value,
-      price: calcPrice(period),
-    }));
+    this.setState_period((period) => {
+      period = { ...period };
+      period.writeOffDeposit = value;
+      period.price = calcPrice(period);
+
+      return period;
+    });
   }
 
   get writeOffDeposit_localeString() {
@@ -1715,7 +1739,10 @@ class Class_OtherNode {
   get isRetainageLocked() {
     const retainageType = this.state_period.retainageType;
 
-    if (retainageType === '含稅' || retainageType === '未稅') {
+    // if (retainageType === '含稅' || retainageType === '未稅') {
+    //   return true;
+    // }
+    if (retainageType === 'null') {
       return true;
     }
   }
