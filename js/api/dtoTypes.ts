@@ -3429,7 +3429,7 @@ export type TincomeBillSerialDto = {
   difference: string | null;
   // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
   isPaperImported: boolean;
-  // 收入傳票歸屬的年月份
+  // 收入傳票歸屬日期
   incomeBillDate: Date | null;
 };
 
@@ -3451,7 +3451,7 @@ export type TupdateIncomeBillSerialDto = Pick<
 >;
 
 export type TcreateAccountReceivableAccountsDto = {
-  type: TperiodType;
+  // type: TperiodType;
   accountantId: string[];
   incomeBillDate: string;
 };
@@ -3620,6 +3620,9 @@ export type TaccountsReceivablePeriodDto = {
   isWriteOffDeposit: boolean;
   // 保留款類型
   retainageType: TretainageType | null;
+  // 保留款百分比
+  retainagePercent: string | null;
+
   // 折讓 // 沒用到
   allowance: number | null;
   // 發票 // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
@@ -3641,6 +3644,7 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   | 'isDeduction'
   | 'isWriteOffDeposit'
   | 'retainageType'
+  | 'retainagePercent'
   | 'allowance' // 會記錄在invoice
   | 'price'
 > & {
