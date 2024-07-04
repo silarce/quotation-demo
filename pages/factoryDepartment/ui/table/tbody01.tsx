@@ -23,7 +23,8 @@ import icon_fc_arrow_down_red from 'public/image/icon/fc_arrow_down_red.svg';
 import { setting } from '../../wareHouseList/index';
 import moment from 'moment';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
+import icon_fc_add from 'public/image/icon/fc_add.svg';
+import PurchaseOrderList from 'pages/factoryDepartment/purchaseOrderList';
 
 type TBodyItemContent = {};
 
@@ -143,8 +144,9 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     });
   }
 
+  //#region 採購單
 
-  async function GetPerchaseOrder(item: any) {
+  async function GetPurchaseOrder(item: any) {
     router.replace({
       pathname: `/factoryDepartment/purchaseOrderList`,
       query: {
@@ -162,6 +164,29 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       }
     })
   }
+
+  async function AddPurchaseOrderDetail(item: any) {
+    router.replace({
+      pathname: `/factoryDepartment/purchaseOrderList`,
+      query: {
+        purchaseorderuuid: item.purchaseorderuuid,
+        purchaseorderid: item.purchaseorderid,
+        create_at: getTaiwanDateStr(item.create_at),
+        create_by: item.create_by,
+        receipted: item.receipted,
+        suppliername: item.suppliername,
+        suppliertaxid: item.suppliertaxid,
+        supplieraddress: item.supplieraddress,
+        supplierphone: item.supplierphone,
+        invoice: item.invoice,
+        firstin: 1,
+        purchaseorderdetailuuid: item.purchaseorderdetailuuid
+      }
+    })
+  }
+
+
+  //#endregion
 
   async function GetProdReceipt(item: any) {
     router.replace({
@@ -611,7 +636,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.totalprice.toLocaleString()}</span>
                 <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>未結</span>
                 <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已結</span>
-                <span ><IconDetail onClick={() => { GetPerchaseOrder(_item) }} /></span>
+                <span ><IconDetail onClick={() => { GetPurchaseOrder(_item) }} /></span>
               </div>
             </CellWithBar>
           ))
@@ -639,8 +664,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.unitprice.toLocaleString()}</span>
                 <span>{_item.totalprice.toLocaleString()}</span>
                 <span>
-                  <button onClick={() => { alert("ok") }}>
-                    <img src={icon_fc_arrow_down.src} alt="Arrow Down" style={{ width: '20px', height: '20px' }} />
+                  <button onClick={() => { AddPurchaseOrderDetail }}>
+                    <img src={icon_fc_add.src} alt="add" style={{ width: '20px', height: '20px' }} />
                   </button>
                 </span>
               </div>
@@ -764,7 +789,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
             <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{quotereqspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
             <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{quotereqquantity}</span>
           </div>
-          <hr/>
+          <hr />
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
             <div style={{ flex: '1 1 20%' }}>
               <InputSel

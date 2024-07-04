@@ -47,7 +47,8 @@ export default function PurchaseOrderList() {
         suppliertaxid,
         supplieraddress,
         supplierphone,
-        invoice
+        invoice,
+        purchaseorderdetailuuid
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -88,6 +89,8 @@ export default function PurchaseOrderList() {
     const [suppliernamein, setSuppliernamein] = useState<string>("");
     const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
+    const [purchaseorderdetailuuidin, setPurchaseorderdetailuuid] = useState<string>("");
+
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -217,7 +220,7 @@ export default function PurchaseOrderList() {
             if (data.length > 0 && checkfirstin === 0) {
                 console.log(data[0].receipted);
                 getPurchaseOrderDetail(data[0].purchaseorderuuid);
-                GetProdReceiptDetailByPurchaseOrderId(data[0].purchaseorderuuid);
+                // GetProdReceiptDetailByPurchaseOrderId(data[0].purchaseorderuuid);
                 setCreate_atin(data[0].create_at);
                 setPurchaseorderuuidin(data[0].purchaseorderuuid);
                 setPurchaseorderidin(data[0].purchaseorderid);
@@ -288,7 +291,7 @@ export default function PurchaseOrderList() {
     useEffect(() => {
         if (purchaseorderuuid) {
             getPurchaseOrderDetail(purchaseorderuuid);
-            GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid);
+            // GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid);
             setPurchaseorderidin(purchaseorderid as string);
             setPurchaseorderuuidin(purchaseorderuuid as string);
             // setCreate_atin((create_at != null ? create_at : "") as string);
@@ -308,9 +311,11 @@ export default function PurchaseOrderList() {
         try {
             setIsLoading(true);
             const conditionModel: {
-                purchaseorderuuid: string | undefined
+                purchaseorderuuid: string | undefined,
+                purchaseorderdetailuuid: string | undefined
             } = {
                 purchaseorderuuid: purchaseorderuuid as string | undefined,
+                purchaseorderdetailuuid: purchaseorderdetailuuid as string | undefined
             };
 
 
