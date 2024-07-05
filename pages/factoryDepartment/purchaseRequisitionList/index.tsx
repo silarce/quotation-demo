@@ -173,7 +173,7 @@ export default function PurchaseRequisitionList() {
             onClick: () => {
                 // setOpen(true);
                 router.push({
-                    pathname: `/factoryDepartment/purchaseRequisitionList/addPurchaseRequisition`,
+                    pathname: `/factoryDepartment/addPurchaseRequisition`,
                     query: {
                         type: 'AddPurchaseRequisition',
                     },

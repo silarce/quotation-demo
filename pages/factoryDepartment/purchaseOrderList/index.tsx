@@ -809,6 +809,7 @@ export default function PurchaseOrderList() {
                                 </div>
                             </CellWithBar>
                         ))}
+                        <br/>
                     </div>
                 </div>
             </div>
