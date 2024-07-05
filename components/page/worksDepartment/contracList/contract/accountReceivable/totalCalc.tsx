@@ -155,7 +155,7 @@ export default function TotalCalc({
     const body: TupdateAccountReceivableDto = {
       finalPaymentType, // '尾款' | '保留款'
       isFinalPaymentWithTax, // 含稅未稅
-      finalPaymentPercent, // 百分比
+      finalPaymentPercent: finalPaymentPercent || '0', // 百分比
 
       pendingTasks, // 未施作項目
       unpaidPayment, // 未收款金額
@@ -219,6 +219,7 @@ export default function TotalCalc({
             suffix="%"
             inputProps={{
               props: {
+                type: 'number',
                 placeholder: '',
                 value: state_payment.finalPaymentPercent,
                 onChange: (e) => {
@@ -270,7 +271,8 @@ export default function TotalCalc({
         <Row symbol="-" caption="扣款金額(含稅)" value={state_payment['totalDeduction']} />
         <Hrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr />
         <Row symbol="=" caption="未收款金額(含稅)" value={state_payment['unpaidPayment']} />
-        <Row symbol="-" caption="尾款/保留款(未稅或含稅)" value={state_payment['finalPayment']} />
+        {/* <Row symbol="-" caption="尾款/保留款(未稅或含稅)" value={state_payment['finalPayment']} /> */}
+        <Row symbol="-" caption={decideFinalPaymentCaption(state_payment)} value={state_payment['finalPayment']} />
         <Row symbol="=" caption="請款中" value={state_payment['paymentPending']} />
       </div>
       {/*  */}
@@ -379,7 +381,6 @@ const calcPayment = (state: Tstate_payment) => {
   const {
     // finalPaymentType,
     isFinalPaymentWithTax,
-    finalPaymentPercent,
 
     contractTotalPrice,
     pendingTasks,
@@ -396,6 +397,10 @@ const calcPayment = (state: Tstate_payment) => {
     // paymentPending,
   } = state;
 
+  let finalPaymentPercent = state.finalPaymentPercent;
+  !finalPaymentPercent && (finalPaymentPercent = '0');
+
+  // isFinalPaymentWithTax可能為null，不過不影響這個計算
   const taxRate = isFinalPaymentWithTax ? 1.05 : 1;
 
   const completedPart_d = new Decimal(contractTotalPrice).minus(pendingTasks);
@@ -409,6 +414,22 @@ const calcPayment = (state: Tstate_payment) => {
     finalPayment: finalPayment_d.toNumber(),
     paymentPending: paymentPending_d.toNumber(),
   };
+};
+
+const decideFinalPaymentCaption = (state: Tstate_payment) => {
+  const { finalPaymentType, isFinalPaymentWithTax } = state;
+  let finalPaymentPercent = state.finalPaymentPercent;
+
+  !finalPaymentPercent && (finalPaymentPercent = '0');
+
+  const percent = `${Number(finalPaymentPercent)}%`;
+  let caption = '請選擇保留款類型';
+
+  finalPaymentType === '尾款' && (caption = '尾款');
+  finalPaymentType === '保留款' && (caption = isFinalPaymentWithTax ? '保留款(含稅)' : '保留款(未稅)');
+  caption !== '請選擇保留款類型' && (caption = `${percent}${caption}`);
+
+  return caption;
 };
 
 // =============================================================================
