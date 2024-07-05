@@ -27,6 +27,9 @@ import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
 import { Button, Modal } from 'antd';
+import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -493,6 +496,264 @@ export default function PurchaseRequisitionList() {
         setData2(data2restore);
     }
 
+    //#region  詢價單modal
+    const [prquotereqmodalopen, setPrquotereqmodalopen] = useState<boolean>(false);
+
+    const [test, setTest] = useState<string>("");
+
+    //帶入詢價單畫面的資料(欲詢價物料)
+    const [quotereqname, setQuotereqname] = useState<string>("");
+    const [quotereqspec, setQuotereqspec] = useState<string>("");
+    const [quotereqquantity, setQuotereqquantity] = useState<string>("");
+    //對應詢價單主檔的詢價單明細
+    const [prquotereqdata, setPrquotereqdata] = useState<any[]>([]);
+    //確定廠商後更新請購單明細
+    const [refreshpurchaserequisitiondetail, setRefreshpurchaserequisitiondetail] = useState<any>();
+
+    //加入詢價廠商
+    const [prquotereqadddata, setPrquotereqadddata] = useState({
+        // id: "",id 自增長不用寫入
+        quoterequuid: "",
+        quotereqid: "",
+        unitprice: "",
+        totalprice: "",
+        suppliername: "",
+        deliverydate: moment(),
+        unit: "",
+        note: "",
+        awarded: false
+    });
+
+    //得標廠商id，update回quotereqdetail
+    const [lastselectedsupplier, setLastselectedsupplier] = useState<string>("");
+    const [selectedsupplier, setSelectedsupplier] = useState<string>("");
+
+
+    //打開詢價單modal
+    const prQuotereqModalOpen = async (item: any) => {
+
+        //清空
+        prquotereqadddata.quoterequuid = "";
+        prquotereqadddata.quotereqid = "";
+        prquotereqadddata.unitprice = "";
+        prquotereqadddata.totalprice = "";
+        prquotereqadddata.suppliername = "";
+        prquotereqadddata.deliverydate = moment();
+        prquotereqadddata.unit = "";
+        prquotereqadddata.note = "";
+        prquotereqadddata.awarded = false;
+        //預設詢價單主檔編號
+        prquotereqadddata.quoterequuid = item.quoterequuid;
+        prquotereqadddata.quotereqid = item.quotereqid;
+
+
+        setQuotereqname(item.name);
+        setQuotereqspec(item.spec);
+        setQuotereqquantity(item.quantity);
+        getQuotereqDetail(item.quoterequuid);
+        setPrquotereqmodalopen(true);
+    }
+
+    //關閉詢價單modal
+    const prQuotereqModalClose = async () => {
+        setPrquotereqmodalopen(false);
+    }
+
+    //取得對應詢價單主檔的詢價單明細檔
+    const getQuotereqDetail = async (quoterequuid: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel: {
+                quoterequuid: string | undefined
+            } = {
+                quoterequuid: quoterequuid as string | undefined,
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}GetQuotereqDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+
+            // let awardedItem = data.find((item: any) => item.awarded);
+            // if (awardedItem) {
+            //   alert(awardedItem.id)
+            //   setSelectedsupplier(awardedItem.id);
+            //   alert(selectedsupplier);
+            // }
+
+            setPrquotereqdata(data);
+            console.log(prquotereqdata);
+
+
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    };
+
+    //寫入詢價單明細
+    const addQuotereqDetail = async () => {
+        try {
+            // alert("cc");
+            if (prquotereqadddata.suppliername === "" || prquotereqadddata.suppliername === undefined || prquotereqadddata.suppliername === null ||
+                prquotereqadddata.unitprice === "" || prquotereqadddata.unitprice === undefined || prquotereqadddata.unitprice === null ||
+                prquotereqadddata.totalprice === "" || prquotereqadddata.totalprice === undefined || prquotereqadddata.totalprice === null ||
+                prquotereqadddata.deliverydate < moment() || prquotereqadddata.deliverydate === null || prquotereqadddata.deliverydate === undefined
+            ) {
+                myAlert.err({ title: "請檢查欄位!!!", content: "請檢查欄位是否正確或交貨日期是否小於今天日期" })
+                return;
+            }
+            // setIsLoading(true);
+            const conditionModel: {
+                data: any,
+            } = {
+                data: prquotereqadddata
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}AddQuotereqDetail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+            // 加入詢價單明細後從取詢價單明細
+            getQuotereqDetail(prquotereqadddata.quoterequuid);
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    };
+
+    const handlequotereqChange = (key: any, value: any) => {
+        setPrquotereqadddata(prevState => ({
+            ...prevState,
+            [key]: value
+        }));
+    };
+
+
+    const handleCheckboxChange = (item: any) => {
+
+        // 更新選中的供應商
+        setLastselectedsupplier(selectedsupplier);
+        setSelectedsupplier(item.id);
+        setTest("1");
+
+
+        // // 導航到新的路徑
+        // router.push({
+        //     pathname: `/factoryDepartment/purchaseRequisitionList`,
+        //     query: {
+        //         purchaserequisitionuuid: item.purchaserequisitionuuid,
+        //         purchaserequisitionid: item.purchaserequisitionid,
+        //         create_at: getTaiwanDateStr(item.create_at),
+        //         create_by: item.create_by,
+        //         approved: item.approved,
+        //         firstin: 1
+        //     }
+        // });
+    };
+
+
+    const updateQuotereqDetail = async (quotereqdetailid: string, lastquotereqdetailid: string) => {
+        try {
+            const conditionModel: {
+
+                lastquotereqdetailid: any,
+                quotereqdetailid: any,
+            } = {
+                lastquotereqdetailid: lastquotereqdetailid,
+                quotereqdetailid: quotereqdetailid
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}UpdateQuotereqDetailById`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+            // console.log("Transfer response:", responseData);
+            // getQuotereqDetail(prquotereqadddata.quoterequuid);
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+
+    };
+    useEffect(() => {
+        if (selectedsupplier) {
+            updateQuotereqDetail(selectedsupplier, lastselectedsupplier);
+        }
+    }, [selectedsupplier]);
+
+
+    useEffect(() => {
+        if (prquotereqdata && prquotereqdata.length > 0) {
+            const awardedItem = prquotereqdata.find((item: any) => item.awarded);
+            if (awardedItem) {
+                setSelectedsupplier(awardedItem.id);
+                setLastselectedsupplier(awardedItem.id);
+            }
+        }
+    }, [prquotereqdata]);
+
+    // useEffect(() => {
+    //     getPurchaseRequisitionDetail(getPurchaseRequisitionDetail(purchaserequisitionuuidin));
+    // }, [test]);
+    // //#endregion
+
+
+
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -665,8 +926,155 @@ export default function PurchaseRequisitionList() {
                     <br />
                     <div className={scss.content_main_content}>
                         <Thead01 type={'PurchaseRequisitionDetail'} />
-                        <Tbody01 type={'PurchaseRequisitionDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                        {/* <Tbody01 type={'PurchaseRequisitionDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                        {data1 && (
+                            data1.map((_item: any, index: number) => (
+                                <CellWithBar key={index} className={scss.panelHeader16}>
+                                    <div className={scss.row01}>
+                                        <span>{index + 1}</span>
+                                        <span>{_item.productid}</span>
+                                        <span>{_item.name}</span>
+                                        <span>{_item.spec}</span>
+                                        <span>{_item.quantity}</span>
+                                        <span>{_item.unit}</span>
+                                        <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span>
+                                        <span>{_item.unitprice.toLocaleString()}</span>
+                                        <span>{_item.totalprice.toLocaleString()}</span>
+                                        <span>{_item.suppliername}</span>
+                                    </div>
+                                </CellWithBar>
+                            ))
+                        )}
                     </div>
+                    <Modal
+                        visible={prquotereqmodalopen}
+                        footer={null}
+                        onCancel={prQuotereqModalClose}
+                        // width={'fit-content'}
+                        width="1000px"
+                        // maskClosable={false}
+                    >
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{quotereqname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '16px' }}>{quotereqspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{quotereqquantity}</span>
+                        </div>
+                        <hr />
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
+                            <div style={{ flex: '1 1 20%' }}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商"
+                                    disabled={false}
+                                    inputProps={{
+                                        props: {
+                                            value: prquotereqadddata.suppliername,
+                                            onChange: (e) => handlequotereqChange('suppliername', e.target.value.trim())
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div style={{ flex: '1 1 20%' }}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單價"
+                                    disabled={false}
+                                    inputProps={{
+                                        props: {
+                                            value: prquotereqadddata.unitprice,
+                                            onChange: (e) => handlequotereqChange('unitprice', e.target.value.trim())
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div style={{ flex: '1 1 20%' }}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單位"
+                                    disabled={false}
+                                    inputProps={{
+                                        props: {
+                                            value: prquotereqadddata.unit,
+                                            onChange: (e) => handlequotereqChange('unit', e.target.value.trim())
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div style={{ flex: '1 1 20%' }}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="總價"
+                                    disabled={false}
+                                    inputProps={{
+                                        props: {
+                                            value: prquotereqadddata.totalprice,
+                                            onChange: (e) => handlequotereqChange('totalprice', e.target.value.trim())
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div style={{ flex: '1 1 20%' }}>
+                                <InputSel
+                                    caption="出貨日期"
+                                    //
+                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
+                                    // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                    datePickerProps={{
+                                        props: {
+                                            value: prquotereqadddata.deliverydate,
+                                            onChange: (e) => handlequotereqChange('deliverydate', e)
+                                        },
+                                    }}
+                                />
+
+                            </div>
+                            <div style={{ flex: '1 1 20%' }}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="備註"
+                                    disabled={false}
+                                    inputProps={{
+                                        props: {
+                                            value: prquotereqadddata.note,
+                                            onChange: (e) => handlequotereqChange('note', e.target.value.trim())
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <button className={scss.greenbutton} onClick={() => { addQuotereqDetail() }} >
+                                <img src={icon_fc_arrow_down.src} alt="Arrow Down" style={{ width: '20px', height: '20px' }} />
+                            </button>
+                        </div>
+
+                        <div>
+                            <Thead01 type={'Quotereq'} />
+                            {/* <Tbody01 type={'Quotereq'} data={prquotereqdata} error={undefined} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                            {prquotereqdata && (
+                                prquotereqdata.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader17}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.suppliername}</span>
+                                            <span>{_item.unitprice}</span>
+                                            <span>{_item.totalprice}</span>
+                                            <span>{_item.unit}</span>
+                                            <span>{getTaiwanDateStr(_item.deliverydate)}</span>
+                                            <span>{_item.note}</span>
+                                            <span>
+                                                <input
+                                                    className={scss.quotereqdetail_checkbox}
+                                                    type='checkbox'
+                                                    checked={selectedsupplier === _item.id}
+                                                    onChange={() => handleCheckboxChange(_item)}
+                                                />
+                                            </span>
+                                            {/* <span><input type='checkbox'/></span> */}
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
+                        </div>
+                    </Modal>
                     <br />
                     <div className={scss.foot_main}>
                         <div>

@@ -221,6 +221,7 @@ else if (type === "PurchaseRequisitionDetail") {
       <span>單價</span>
       <span>金額</span>
       <span>廠商</span>
+      <span></span>
     </div>
   )
 }
@@ -230,10 +231,11 @@ else if (type === "PurchaseRequisitionDetail") {
   return (
     <div className={style.thead17}>
       <span>次序</span>
+      <span>供應商</span>
       <span>單價</span>
       <span>總價</span>
+      <span>單位</span>
       <span>出貨日</span>
-      <span>供應商</span>
       <span>備註</span>
       <span>得標</span>
       <span></span>
