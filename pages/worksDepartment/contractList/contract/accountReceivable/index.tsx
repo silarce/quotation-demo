@@ -31,49 +31,20 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import {
-  // Tparams,
-  // TupdateEngineeringContactDto,
-  // TupdateAccountReceivableDto,
-  // TaccountReceivableDto,
   TcreateAccountReceivablePeriodDto,
   TcreateAccountReceivableDto,
-  TupdateAccountReceivablePeriodDto,
   TupdateAccountReceivableDto,
-  // TaccountsReceivableInvoiceDto,
-  //
-  // useGetEngineeringContact,
-  // useGetAccountReceivableAccountants,
-  // useGetAccountReceivableIncoices,
-  // useGetAccountReceivable_id,
-  // useGetFinalProduct, // 不是這個
-  //
-  // apiPatchAccountReceivable,
-  // apiPatchEngineeringContact,
-  // apiPostWorkSheet,
   apiPatchAccountReceivablePeriodInvoiceAllowance,
-  // apiPatchAccountReceivableAccountant,
-  // apiPatchAccountReceivableVoidInvoice,
   apiPostAccountReceivable,
   apiPatchAccountReceivable,
-  // apiPostAccountReceivableAccountant,
-  // apiDeleteAccountReceivableAccountant,
   apiPostAccountReceivablePeriod, // 新增應收帳款發票
   apiPatchAccountantInvoice,
-  // apiPatchAccountReceivableDeduction_accountant, // 批量更新 應收帳款 扣款明細
   apiDeleteAccountReceivableInvoice,
   apiDeleteAccountReceivablePeriod,
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
-import {
-  TaccountantDto,
-  // TupdateAccountantDto,
-  // TupdateAccountantDeductionDto,
-
-  //
-  //  apiPatchAccountant,
-  apiPatchAccountant_accountReceivable,
-} from 'js/api/api_accountant';
+import { TaccountantDto, apiPatchAccountant_accountReceivable } from 'js/api/api_accountant';
 
 import type { TcustomerDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
 
@@ -117,22 +88,14 @@ export default function AccountReceivable() {
     isFetching: isFetching_contract,
   } = useGetContract_id(contractId, {
     customPopulate: [
-      // 'subContracts.content.verifyForm'
       'content.customer',
       'engineeringContact',
       'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
       'accountReceivable.periods.invoices.accountantInvoiceBook',
-      // 'accountReceivable.periods',
     ],
   });
 
   const { engineeringContact, accountReceivable } = contract ?? {};
-
-  // const {
-  //   data: data_finalProdcut,
-  //   update: update_finalProduct,
-  //   isFetching: isFetching_finalProduct,
-  // } = useGetFinalProduct(contractId); // 不是這個，這是舊的
 
   const {
     data: data_finalProdcut = [],
@@ -184,9 +147,7 @@ export default function AccountReceivable() {
       hasNoContract: false,
       hasUncollectedAmounts: false,
       hasNotInstall: false,
-      // accountantId: [],
-      // accountReceivableDeduction: [],
-      // invoices: [],
+
       contractId: contractId,
       legacyContractId: null,
       isDone: false,
@@ -230,15 +191,8 @@ export default function AccountReceivable() {
     }
 
     const {
-      // renderCount,
       type,
-      // period,
       rowArr,
-
-      // subTotal, // 虛的，後端沒有
-      // tax, // 虛的，後端沒有
-      // contractTotal, // 虛的，後端沒有
-
       retainage,
       deduction,
       writeOffDeposit,
@@ -452,7 +406,6 @@ export default function AccountReceivable() {
     }
   };
 
-  // apiDeleteAccountReceivablePeriod
   const reqDeletePeriod = async (periodId: string) => {
     try {
       setIsFetching_req(true);

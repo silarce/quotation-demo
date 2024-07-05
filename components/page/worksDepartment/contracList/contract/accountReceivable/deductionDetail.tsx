@@ -55,7 +55,7 @@ export default function DeductionDetail({
         type,
         period,
         depositPeriod,
-        // accountantList,
+
         invoices,
       } = acPeriod;
 
@@ -183,16 +183,3 @@ export default function DeductionDetail({
 const Row = ({ className, children }: { className?: string; children: React.ReactNode }) => {
   return <div className={classNames(scss.row, className)}>{children}</div>;
 };
-
-// accountantList.forEach((acct) => {
-//   acct.accountsReceivableDeduction.forEach((deduction) => {
-//     const { itemName, detailedAmount } = deduction;
-
-//     !deductionList[itemName] && (deductionList[itemName] = 0);
-//     deductionList[itemName] += detailedAmount;
-//     total += detailedAmount;
-
-//     !totalList[itemName] && (totalList[itemName] = 0);
-//     totalList[itemName] += detailedAmount;
-//   }); // acct.accountsReceivableDeduction.forEach
-// }); // accountantList.forEach

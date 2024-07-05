@@ -10,7 +10,7 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 import scss from './totalCalc.module.scss';
 
-import { IconEdit, IconCheck02, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+import { IconEdit, IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
 
 import type { TfinalPaymentType, TaccountsReceivableDto, TupdateAccountReceivableDto } from 'js/api/dtoTypes';
 import type { TreqPatchAccountReceivable } from 'pages/worksDepartment/contractList/contract/accountReceivable';
@@ -142,11 +142,7 @@ export default function TotalCalc({
       finalPaymentType,
       isFinalPaymentWithTax,
       finalPaymentPercent,
-      // contractTotalPrice,
       pendingTasks,
-      // receivedPayment,
-      // extraIncome,
-      // totalDeduction,
       unpaidPayment,
       finalPayment,
       paymentPending,
@@ -379,22 +375,14 @@ const Row = ({
 
 const calcPayment = (state: Tstate_payment) => {
   const {
-    // finalPaymentType,
     isFinalPaymentWithTax,
 
     contractTotalPrice,
     pendingTasks,
 
-    // completedPart,
-
     receivedPayment,
     extraIncome,
     totalDeduction,
-
-    // unpaidPayment,
-
-    // finalPayment,
-    // paymentPending,
   } = state;
 
   let finalPaymentPercent = state.finalPaymentPercent;
@@ -477,20 +465,3 @@ const useDefaultStatePayment = (accountReceivable: TaccountsReceivableDto) => {
     return state;
   }, [accountReceivable]);
 };
-
-// const fakeAccountReceivable = () => ({
-//   finalPaymentType: null,
-//   isFinalPaymentWithTax: null,
-//   finalPaymentPercent: '0',
-
-//   contractTotalPrice: 10000,
-//   pendingTasks: 1000,
-
-//   receivedPayment: 1000,
-//   extraIncome: 1000,
-//   totalDeduction: 1000,
-
-//   unpaidPayment: 1000,
-//   finalPayment: 1000,
-//   paymentPending: 1000,
-// });

@@ -15,7 +15,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import scss from './accountantDetails.module.scss';
 
 // type
-import type { TaccountantDto, TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
+import type { TaccountantDto } from 'js/api/dtoTypes';
 
 // icon
 import iconEyeOpen from 'public/image/icon/eyeOpen.svg';
@@ -41,7 +41,7 @@ type Tstate_accountant = {
   fee: string;
   billSerialNumber: string;
   //
-  // accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+
   state_deduction: Tstate_deduction[];
   deductionTotal: number; // 後端沒有 accountsReceivableDeduction金額的總和
 };
