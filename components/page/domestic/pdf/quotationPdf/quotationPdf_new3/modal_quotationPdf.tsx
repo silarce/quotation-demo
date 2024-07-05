@@ -702,7 +702,7 @@ const Center_pre = (
                 } else {
                   const fileName = node;
                   getSvg({ fileName });
-                  const src = svgList[fileName] ?? '';
+                  const src = svgList[fileName] ?? fileName ?? '';
                   node = <div dangerouslySetInnerHTML={{ __html: src }} className={scss.svgWrapper} />;
                 }
               }
