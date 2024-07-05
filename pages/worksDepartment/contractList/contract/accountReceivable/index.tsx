@@ -26,16 +26,6 @@ import AccountantSorting, {
   Tstate_accountantSorting,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantSorting';
 
-// import Table_requestPayment, {
-//   Tcontrol_table_requestPayment,
-// } from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_requestPayment';
-// import AccountReceivable_dynaTable, {
-//   Tcontrol_dynaTable,
-//   Trow,
-// } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountReceivable_dynaTable';
-// import DeductionDetails from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetails';
-// import Table_request from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_request';
-
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
