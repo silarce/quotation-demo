@@ -54,7 +54,7 @@ type Tstate_payment = {
 
 // ============================================================================
 
-// MARK START
+// MARK: START
 
 export default function TotalCalc({
   //
@@ -137,8 +137,6 @@ export default function TotalCalc({
     });
   };
 
-  // ---------------------------------------------------------------------------
-
   const onConfirm = async () => {
     const {
       finalPaymentType,
@@ -176,7 +174,7 @@ export default function TotalCalc({
 
   useEffect(() => {
     setState_payment(defaultState);
-  }, [defaultState]);
+  }, [defaultState, readOnly]);
 
   // ---------------------------------------------------------------------------
 
