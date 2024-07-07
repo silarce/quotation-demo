@@ -33,7 +33,7 @@
     gap: 15px;
     overflow-x: hidden;
     overflow-y: auto;
-    border: 2px solid gray;
+    border: 1px solid gray;
     min-height: 100vh-30vh;
     /* 自動調整高度到螢幕大小 */
 }
@@ -55,7 +55,7 @@
     right: 0; // 距離視窗右側的距離
     padding-left: 0px;
     // background-color: red;
-    border: 2px solid gray;
+    border: 1px solid gray;
     overflow-y: auto;
 }
 

@@ -484,11 +484,10 @@ export default function AddPurchaseRequisition() {
                     </div>
                 </div>
                 <div className={scss.right}>
-                    <div className={scss.tite_main}>
+                    {/* <div className={scss.tite_main}>
                         <div>
                             <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "false" ? "" : "none" }}>
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="結案" onClick={() => { handleClosePO() }} />
-                                {/* <button className={scss.greenbutton} onClick={() => { handleClosePO() }} >未結案</button> */}
                             </span>
                             <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
                                 <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" />
@@ -497,7 +496,7 @@ export default function AddPurchaseRequisition() {
                         <div style={{ textAlign: 'right', height: '35.77px' }}>
 
                         </div>
-                    </div>
+                    </div> */}
                     <div className={scss.head_main}>
                         <div>
                             <InputSel

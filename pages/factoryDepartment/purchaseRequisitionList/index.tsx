@@ -952,7 +952,7 @@ export default function PurchaseRequisitionList() {
                         onCancel={prQuotereqModalClose}
                         // width={'fit-content'}
                         width="1000px"
-                        // maskClosable={false}
+                        maskClosable={false}
                     >
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
                             <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{quotereqname}</span>&nbsp;&nbsp;&nbsp;&nbsp;

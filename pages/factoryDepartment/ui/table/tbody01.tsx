@@ -521,6 +521,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.productid}</span>
                 <span>{_item.name}</span>
                 <span>{_item.spec}</span>
+                <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
                 <span>{_item.quantity}</span>
                 <span>{_item.unit}</span>
                 <span>{_item.unitprice.toLocaleString()}</span>
