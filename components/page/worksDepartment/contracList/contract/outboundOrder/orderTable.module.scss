@@ -302,7 +302,7 @@ $top_headRow: calc($height_thead);
     cursor: pointer !important;
   }
 
-  &.disabled {
+  &.disabled.plus {
     * {
       cursor: auto;
     }
