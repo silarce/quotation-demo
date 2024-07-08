@@ -1154,7 +1154,7 @@ export const useGetAccountReceivable_id = (id: string, customeParams: Tparams) =
   };
 };
 
-/**新增 應收帳款明細 account-receivable */
+// 新增 應收帳款明細 account-receivable
 export const apiPostAccountReceivable = async (
   body: TcreateAccountReceivableDto,
   {
@@ -1176,14 +1176,18 @@ export const apiPostAccountReceivable = async (
     });
 };
 
-/**更新 應收帳款明細 account-receivable */
+// 更新 應收帳款明細 account-receivable
 export const apiPatchAccountReceivable = async (id: string, body: TupdateAccountReceivableDto) => {
   const api = `/engineering/account-receivable/${id}`;
 
   return axi
     .patch(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      myAlert.err({ title: '更新應收帳款明細失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };
 
 //
@@ -1193,7 +1197,7 @@ type TgetAccountReceivableIncoices = {
   meta: TpageMetaDto;
 };
 
-/**以 應收帳款id取得 所有 應收帳款發票 account-receivable */
+// 以 應收帳款id取得 所有 應收帳款發票 account-receivable
 export const apiGetAccountReceivableIncoices = async (accountReceivableId: string, params?: Tparams) => {
   const api = `/engineering/account-receivable/${accountReceivableId}/invoices`;
 

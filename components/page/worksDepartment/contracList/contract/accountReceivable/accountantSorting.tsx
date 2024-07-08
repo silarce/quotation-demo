@@ -380,13 +380,7 @@ export default function AccountantSorting({
         <div className={scss.footCaption}>已開立發票未收款項</div>
 
         <Group className={scss['total']}>
-          <Left>
-            {/* <Row>
-              <span></span>
-              <span>合計</span>
-              <span>20000</span>
-            </Row> */}
-          </Left>
+          <Left></Left>
           <Right>
             <Row>
               <span></span>
