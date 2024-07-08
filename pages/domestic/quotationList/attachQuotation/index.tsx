@@ -190,6 +190,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   let isSendToReview = false;
   let isSendToReview_pending = false;
 
+  let version: number | undefined = undefined;
+  let editNotes: string | undefined = undefined;
+
   //
   const isAttach = true;
   //
@@ -327,6 +330,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   toCashierAt = latestContent?.toCashierAt;
   toManagerAt = latestContent?.toManagerAt;
 
+  editNotes = latestContent?.editNotes;
+
   let agentEmployee: TemployeeDto | undefined | null;
 
   if (!quotationId) {
@@ -337,6 +342,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
   isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+
+  version = latestContent?.version;
+  editNotes = latestContent?.editNotes;
 
   if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
     if (salesReviewedAt && supervisorReviewedAt && managerReviewedAt) {
@@ -554,7 +562,7 @@ latestContentProdArr為這次追加追減的主產品
   // -----------------------------------------------------
   // -----------------------------------------------------
 
-  const [summary, setSummary] = useState<{
+  const [state_summary, setState_Summary] = useState<{
     discountRate: string;
     tuneTotal: string;
     subTotal: string;
@@ -618,7 +626,7 @@ latestContentProdArr為這次追加追減的主產品
     resetTrigger: contractArr,
     // onDoorTypeChange: onDoorTypeChange,
     productArr_attach: contentArr,
-    quotationDiscount: Number(summary.discountRate || '100'),
+    quotationDiscount: Number(state_summary.discountRate || '100'),
   });
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
@@ -669,7 +677,7 @@ latestContentProdArr為這次追加追減的主產品
     // setQr(quotationRanges ?? []);
     setPaymentMethod(paymentMethods);
 
-    setSummary({
+    setState_Summary({
       discountRate: discount,
       tuneTotal,
       subTotal: String(subTotal),
@@ -686,11 +694,11 @@ latestContentProdArr為這次追加追減的主產品
 
     const { subTotal, salesTax, total } = countPayInfoValue({
       // discount: summary.discountRate,
-      tuneTotal: summary.tuneTotal,
+      tuneTotal: state_summary.tuneTotal,
       prodSubTotal: attachTotal,
     });
 
-    setSummary((state) => {
+    setState_Summary((state) => {
       return {
         ...state,
         subTotal,
@@ -700,7 +708,7 @@ latestContentProdArr為這次追加追減的主產品
     });
   }, [
     // summary.discountRate,
-    summary.tuneTotal,
+    state_summary.tuneTotal,
     attachTotal,
   ]);
 
@@ -791,7 +799,7 @@ latestContentProdArr為這次追加追減的主產品
     payment: {
       haveTax: {
         // value: !!taxRate,
-        value: !!summary.salesTax,
+        value: !!state_summary.salesTax,
         onChange: (v) => {
           // if (quotationProdSubTotal === '') {
           //   calcSubTotalPrice();
@@ -803,10 +811,10 @@ latestContentProdArr為這次追加追減的主產品
       discountRate: {
         inputAttr: {
           disabled: disabled_static,
-          value: summary.discountRate,
+          value: state_summary.discountRate,
           onChange: (e) => {
             let v = e.target.value;
-            setSummary((state) => {
+            setState_Summary((state) => {
               const copy = { ...state };
 
               if ((v as string) === '') {
@@ -831,7 +839,7 @@ latestContentProdArr為這次追加追減的主產品
       tuneTotal: {
         inputAttr: {
           disabled: disabled,
-          value: summary.tuneTotal,
+          value: state_summary.tuneTotal,
           onChange: (e) => {
             const value_num = Number(e.target.value);
 
@@ -839,7 +847,7 @@ latestContentProdArr為這次追加追減的主產品
               return;
             }
 
-            setSummary((state) => ({
+            setState_Summary((state) => ({
               ...state,
               tuneTotal: e.target.value,
             }));
@@ -849,28 +857,28 @@ latestContentProdArr為這次追加追減的主產品
       subTotal: {
         inputAttr: {
           disabled: disabled_static,
-          value: summary.subTotal,
+          value: state_summary.subTotal,
         },
       },
       salesTax: {
         inputAttr: {
           disabled: disabled_static,
-          value: summary.salesTax,
+          value: state_summary.salesTax,
         },
       },
       total: {
         inputAttr: {
           disabled: disabled_static,
-          value: summary.total,
+          value: state_summary.total,
         },
       },
     },
 
     delivery: {
       deliveryLocation: {
-        value: summary.deliveryLocation,
+        value: state_summary.deliveryLocation,
         onChange: (v) => {
-          setSummary((state) => {
+          setState_Summary((state) => {
             const copy = { ...state };
             copy.deliveryLocation = v;
 
@@ -879,9 +887,9 @@ latestContentProdArr為這次追加追減的主產品
         },
       },
       deliveryDate: {
-        value: summary.deliveryDate,
+        value: state_summary.deliveryDate,
         onChange: (v) => {
-          setSummary((state) => {
+          setState_Summary((state) => {
             const copy = { ...state };
             copy.deliveryDate = v;
 
@@ -1300,13 +1308,13 @@ latestContentProdArr為這次追加追減的主產品
       trackProgress: state_profile.trackProgress ?? '',
       projectProgress: state_profile.projectProgress ?? '',
 
-      discount: `${Number(summary.discountRate ?? 0)}` ?? '100',
-      tuneTotal: summary.tuneTotal ?? '0',
-      subTotal: Number(summary.subTotal.replaceAll(',', '')),
-      salesTax: Number(summary.salesTax.replaceAll(',', '')),
-      total: Number(summary.total.replaceAll(',', '')),
-      deliveryLocation: summary.deliveryLocation,
-      deliveryDate: summary.deliveryDate,
+      discount: `${Number(state_summary.discountRate ?? 0)}` ?? '100',
+      tuneTotal: state_summary.tuneTotal ?? '0',
+      subTotal: Number(state_summary.subTotal.replaceAll(',', '')),
+      salesTax: Number(state_summary.salesTax.replaceAll(',', '')),
+      total: Number(state_summary.total.replaceAll(',', '')),
+      deliveryLocation: state_summary.deliveryLocation,
+      deliveryDate: state_summary.deliveryDate,
       paymentMethods: paymentMethod,
       //
       //
@@ -1562,6 +1570,21 @@ latestContentProdArr為這次追加追減的主產品
     }
   })();
 
+  const VersionLabel = () => {
+    return (
+      <div className="ml-2 mb-1 mt-auto">
+        <div>版本 : {version}</div>
+        <div>
+          {/* 總計 : {latestContent?.total ? latestContent.total.toLocaleString() : ''} */}
+          小計 : {state_summary.subTotal}　 營業稅: {state_summary.salesTax}　 總計 : {state_summary.total}
+          {/*  */}
+        </div>
+      </div>
+    );
+  };
+
+  const customeLeft: React.ReactNode[] = [<VersionLabel key="0" />];
+
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
@@ -1573,13 +1596,14 @@ latestContentProdArr為這次追加追減的主產品
       {/* <PageHeader02 tagList={tagList} panelList={!disabled ? panel_editable : panel_noEditable} /> */}
       <PageHeader02
         tag={`報價編號 ${quotationData?.latestContent.quotationNumber || ''}　追加追減報價單`}
+        customeLeft={customeLeft}
         panelList={panelList}
       />
 
       <div className={style.mainContainer}>
         <div className={style.quotation}>
           {/* 基本資料 */}
-          <QuotationProfile disabled={disabled} control={control_profile} />
+          <QuotationProfile disabled={disabled} control={control_profile} editNotes={editNotes} />
 
           <div className={classNames(style.switchBar)}>
             <div>報價項目</div>
@@ -1601,7 +1625,7 @@ latestContentProdArr為這次追加追減的主產品
               rowHeight="h60"
               isAttach={isAttach}
               attachTotal={attachDivTotal}
-              discountRate={summary.discountRate} // 報價單總折數
+              discountRate={state_summary.discountRate} // 報價單總折數
               changeDiscountRate={(v) => {
                 if (v === '') {
                   v = '0';
@@ -1617,7 +1641,7 @@ latestContentProdArr為這次追加追減的主產品
                   return;
                 }
 
-                setSummary((state) => {
+                setState_Summary((state) => {
                   return {
                     ...state,
                     discountRate: v,
@@ -1703,7 +1727,7 @@ latestContentProdArr為這次追加追減的主產品
               onVKeyChange={() => {}}
               rowHeight="h60"
               attachTotal={attachAddTotal}
-              discountRate={summary.discountRate} // 報價單總折數
+              discountRate={state_summary.discountRate} // 報價單總折數
               changeDiscountRate={(v) => {
                 if (v === '') {
                   v = '0';
@@ -1719,7 +1743,7 @@ latestContentProdArr為這次追加追減的主產品
                   return;
                 }
 
-                setSummary((state) => {
+                setState_Summary((state) => {
                   return {
                     ...state,
                     discountRate: v,
@@ -1879,7 +1903,7 @@ latestContentProdArr為這次追加追減的主產品
         close={() => setReviewFormShow(false)}
         contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
         contractName={quotationData?.latestContent.projectName ?? ''}
-        contractPrice={Number(summary.total.replaceAll(',', ''))}
+        contractPrice={Number(state_summary.total.replaceAll(',', ''))}
         lastestContentId={lastestContentId}
         verifyForm={verifyForm}
         onConfirm={async () => {
