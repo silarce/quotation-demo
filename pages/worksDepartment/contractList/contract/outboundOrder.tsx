@@ -776,7 +776,7 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
     {
       key: 'employee',
       caption: '員工',
-      tip: '單選',
+      // tip: '單選',
       // limit: 1,
       clearOther: [1],
     },

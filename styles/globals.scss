@@ -97,6 +97,8 @@ input::placeholder {
   color: #c1c1c1;
 }
 
+// ==========================================================================
+// MARK: ANTD
 .ant-modal {
   .ant-btn {
     > span {
@@ -104,6 +106,52 @@ input::placeholder {
     }
   }
 }
+
+
+
+// 在Radio或Checkbox的className加入originalDisabledStyle就可以取消以下的自訂樣式
+.ant-checkbox-wrapper:not(.originalDisabledStyle),
+.ant-radio-wrapper:not(.originalDisabledStyle) {
+  &.ant-checkbox-wrapper.ant-checkbox-wrapper-disabled {
+    cursor: auto;
+    .ant-checkbox-disabled {
+      cursor: auto;
+      & + span {
+        cursor: auto;
+      }
+    }
+  }
+
+  &.ant-radio-wrapper-disabled {
+    cursor: auto;
+
+    .ant-radio-disabled {
+      cursor: auto;
+      & + span {
+        cursor: auto;
+      }
+      .ant-radio-inner,
+      .ant-radio-input {
+        cursor: auto;
+      }
+    }
+  }
+
+  .ant-checkbox-disabled + span,
+  .ant-radio-disabled + span {
+    color: theme("colors.sub");
+  }
+
+  .ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner::after {
+    border-color: theme("colors.sub");
+  }
+
+  .ant-radio-disabled .ant-radio-inner::after {
+    background-color: theme("colors.sub");
+  }
+}
+
+// ==========================================================================
 
 // 出現404頁面的時候，把css蓋掉
 // 不然被bod的bgc會被設定成#000

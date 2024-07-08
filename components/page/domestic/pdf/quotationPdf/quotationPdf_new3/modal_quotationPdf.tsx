@@ -702,7 +702,7 @@ const Center_pre = (
                 } else {
                   const fileName = node;
                   getSvg({ fileName });
-                  const src = svgList[fileName] ?? '';
+                  const src = svgList[fileName] ?? fileName ?? '';
                   node = <div dangerouslySetInnerHTML={{ __html: src }} className={scss.svgWrapper} />;
                 }
               }
@@ -1013,6 +1013,7 @@ const quotationProdAndOther_ToProdArr = ({
     return quotationProductArr.map((pro) => {
       const {
         //
+        quoteType,
         itemName,
         doorModelName,
         fullWidth,
@@ -1050,7 +1051,16 @@ const quotationProdAndOther_ToProdArr = ({
       const boxB_formated = boxB_cm ? `＋${boxB_cm}` : '';
       const bounceDoorWidth_formated = bounceDoorWidth_cm ? `＋${bounceDoorWidth_cm}` : '';
 
-      const size = `${fullWidth_cm}${bounceDoorWidth_formated}Ｘ${height_cm}${boxB_formated}`;
+      // const size = `${fullWidth_cm}${bounceDoorWidth_formated}Ｘ${height_cm}${boxB_formated}`;
+      let size = '';
+
+      if (quoteType === '電動大門') {
+        size = `${fullWidth_cm}`;
+        boxB_cm && (size += `＋${boxB_cm}`);
+        size += `Ｘ${height_cm}`;
+      } else {
+        size = `${fullWidth_cm}${bounceDoorWidth_formated}Ｘ${height_cm}${boxB_formated}`;
+      }
 
       const thickness_num = Number(thickness || 0);
       const thickness_str = thickness_num === 0 ? '' : new Decimal(thickness_num).toFixed(1) + 't';
@@ -1099,7 +1109,10 @@ const quotationProdAndOther_ToProdArr = ({
   })();
 
   const othersArr: Tprod[] = quotationOtherArr.map((item, index) => {
-    const { description, unitPrice, totalPrice, spec, unit } = item;
+    const { quantity, description, unitPrice, totalPrice, spec, unit } = item;
+
+    const quantity_num = Number(quantity || 0);
+    const totalPrice_num = Number(totalPrice || 0);
 
     return {
       itemName: item.item,
@@ -1112,14 +1125,14 @@ const quotationProdAndOther_ToProdArr = ({
       horsepower: '',
       closingType: '',
 
-      qty: String(item.quantity) + ' ' + unit,
+      qty: quantity_num + ' ' + unit,
       unitPrice: unitPrice.toLocaleString(),
-      totalPrice: totalPrice.toLocaleString(),
+      totalPrice: totalPrice_num ? totalPrice_num.toLocaleString() : '',
       notes: item.notes,
       //
       unitPrice_num: unitPrice,
-      totalPrice_num: totalPrice,
-      qty_num: item.quantity,
+      totalPrice_num: totalPrice_num,
+      qty_num: quantity_num,
       guideRailForExcel: null,
       unit: unit ?? '',
     };

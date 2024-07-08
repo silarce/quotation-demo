@@ -216,7 +216,7 @@ const prodCellConfig: TcellConfig = {
   doorTrack: {
     label: '門軌',
     inputSelProps: {
-      wrapperStyle: { width: '70px' },
+      wrapperStyle: { width: '100px' },
       selectProps: {
         withIcon: true,
         creOptionWithIconProps: {

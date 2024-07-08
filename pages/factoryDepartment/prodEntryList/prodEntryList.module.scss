@@ -16,7 +16,7 @@
 
 .main {
     display: grid;
-    grid-template-columns: 700px 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 480px 1fr; // 左右兩邊比例，可以調整
     gap: 15px;
     width: auto;
     margin-top: 4px;
@@ -27,32 +27,17 @@
 
 .left {
     display: grid;
-    grid-template-columns: 700px; // 左側寬度固定為 350px
+    grid-template-columns: 650px;
     justify-content: space-between;
     gap: 15px;
-    height: 280px;
     overflow-x: hidden;
-    overflow-y: auto; // 垂直滾動（如果需要）
-    border:2px solid gray
-    // background-color: green;
+    overflow-y: auto;
+    border: 2px solid gray;
+    min-height: 100vh-30vh;
+    /* 自動調整高度到螢幕大小 */
 }
 
 
-
-// .right {
-//     position: -webkit-sticky; // 為兼容性增加前綴
-//     position: sticky;
-//     top: 0;
-//     z-index: 1000; // 確保元素位於其他內容的上層
-//     display: flex;
-//     flex-direction: column;
-//     /* 讓內容以列的方式排列 */
-//     align-items: center;
-//     /* 垂直居中 */
-//     justify-content: flex-start;
-//     /* 從頂部對齊 */
-//     // background-color: blue;
-// }
 .right {
     position: relative; // 確保子元素可以正確定位
     position: -webkit-sticky;
@@ -67,8 +52,9 @@
     // width: 1150px;
     top: 0; // 距離視窗頂部的距離
     right: 0; // 距離視窗右側的距離
-    padding-left: 0px;
+    padding-left: 10px;
     // background-color: red;
+    border:2px solid gray;
 }
 
 
@@ -87,10 +73,16 @@
     overflow-y: auto; // 垂直滾動（如果需要）
     // background-color: orange;
     height: 280px;
-    border:2px solid gray
+    border: 2px solid gray;
+
+    .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 150px; // 調整 input 的寬度
+
+    }
+
 }
-
-
 
 .traytable {
     width: 100%;
@@ -141,50 +133,53 @@
 
 
 
+.childmain {
+    display: grid;
+    grid-template-columns: 1fr 1fr; // 左右兩邊比例，可以調整
+    gap: 15px;
+    width: auto;
+    margin-top: 5px;
+    // margin-left: 62px;
+    margin-right: 62px;
+    // background-color: gray;
+}
+
+.textarea{
+    padding-left: 0px;
+    // background-color: orange;
+    width:400px;
+}
+
+
 .addBtn {
     position: sticky;
     left: 0;
     z-index: 1;
-    // text-align: center;
+    text-align: center;
     border: none;
     background-color: white;
 
 }
 
 
-// .main1 {
-//     display: grid;
-//     grid-template-columns: 450px 1fr; // 左右兩邊比例，可以調整
-//     gap: 15px;
-//     width: auto;
-//     margin-top: 4px;
-//     margin-left: 4px;
-//     margin-right: 4px;
-//     border: 1px solid gray;
-
-// }
-
 .main1 {
-    display: flex;
-    justify-content: center;
-    align-items: top;
-    // height: 100%; // 根據需要調整高度
-    margin-top: 4px;
-    margin-left: 4px;
-    margin-right: 4px;
-    border:1px solid gray;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
+    width: auto;
+    margin-top: 0px;
+    // margin-left: 4px;
+    margin-right: 50px;
+    // background-color: gray;
 }
-.content1 {
-    position: -webkit-sticky; // 為兼容性增加前綴
-    position: sticky;
-    top: 0; // 距離視窗頂部的距離
-    right: 0; // 距離視窗右側的距離
-    z-index: 1000; // 確保元素位於其他內容的上層
-    // height: 500px; // 設定固定高度
-    overflow-x: hidden; // 禁止水平滾動
-    overflow-y: hidden; // 垂直滾動（如果需要）
-    // background-color: orange;
-    // height: 350px;
-    // border: 1px solid gray;
+
+.maincontent{
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    gap: 15px;
+    width: auto;
+    // margin-top: 4px;
+    margin-left: 4px;
+    margin-right: 15px;
+    // background-color: gray;
 }

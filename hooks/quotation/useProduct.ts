@@ -518,7 +518,11 @@ const useProductList = ({
         const key = `${item.id}`;
         list[key] = new Class_other({
           reRender,
-          data: item,
+          data: {
+            ...item,
+            quantity: item.quantity ? Number(item.quantity) : 0,
+            totalPrice: item.totalPrice ? Number(item.unit) : 0,
+          },
           delSelf: () => delSelf_other(list, key),
           copySelf: () => copySelf_others(list, key),
           callCalcSubTotal,
@@ -570,7 +574,11 @@ const useProductList = ({
 
   const getOthersPostBodyArr: () => TcreateQuotationContentOtherDto[] = () => {
     return Object.values(othersList).map((item) => {
-      return item.body;
+      return {
+        ...item.body,
+        quantity: String(item.quantity),
+        totalPrice: String(item.unitPrice),
+      };
     });
   };
 

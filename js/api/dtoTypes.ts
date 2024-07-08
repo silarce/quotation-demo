@@ -30,6 +30,7 @@ export type TreceiptStatus = '託收' | '已兌現';
 export type Tcurrency = 'TWD 新臺幣' | 'USD 美元';
 export type TinvoiceType = '三聯式' | '二聯式';
 export type TelectronicSuppliesAction = '領取' | '退回';
+export type TfinalPaymentType = '尾款' | '保留款';
 
 // =============================================================================
 export type Tparams = {
@@ -854,14 +855,22 @@ export type TquotationContentOtherDto = {
   id: string;
   createdAt: string;
   updatedAt: string;
+
+  // 項目
   item: string;
+  // 內容
   description: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  notes: string;
+  // 數量
+  quantity: string | null;
+  // 單位
   unit: string | null;
-  //
+  // 單價
+  unitPrice: number;
+  // 複價
+  totalPrice: string | null;
+  // 備註
+  notes: string;
+  // 尺寸規格
   spec: string | null;
 };
 
@@ -3508,7 +3517,7 @@ export type TincomeBillSerialDto = {
   difference: string | null;
   // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
   isPaperImported: boolean;
-  // 收入傳票歸屬的年月份
+  // 收入傳票歸屬日期
   incomeBillDate: Date | null;
 };
 
@@ -3530,7 +3539,7 @@ export type TupdateIncomeBillSerialDto = Pick<
 >;
 
 export type TcreateAccountReceivableAccountsDto = {
-  type: TperiodType;
+  // type: TperiodType;
   accountantId: string[];
   incomeBillDate: string;
 };
@@ -3617,7 +3626,34 @@ export type TaccountsReceivableDto = {
   totalPayment: number;
   // 目前合計請款營業稅額
   totalTax: number;
+  // 額外收入
+  extraIncome: number;
+  // 未施作項目
+  pendingTasks: number;
+  //
+  // 請款中未收到款項
+  paymentPending: number;
+  // 保留款/尾款%數
+  finalPaymentPercent: string;
+  // 保留款/尾款類型
+  finalPaymentType: TfinalPaymentType | null;
+  // 保留款是否含稅
+  isFinalPaymentWithTax: boolean | null;
 };
+
+export type TupdateAccountReceivableDto = Partial<
+  Pick<
+    TaccountsReceivableDto,
+    | 'pendingTasks'
+    //
+    | 'finalPaymentType'
+    | 'isFinalPaymentWithTax'
+    | 'finalPaymentPercent'
+    | 'finalPayment'
+    | 'paymentPending'
+    | 'unpaidPayment'
+  >
+>;
 
 export type TcreateAccountReceivableDto = {
   // 估價日期
@@ -3649,19 +3685,6 @@ export type TcreateAccountReceivableDto = {
   // 是否已做完
   isDone: boolean;
 };
-
-export type TupdateAccountReceivableDto = Pick<
-  TaccountsReceivableDto,
-  | 'valuationDate'
-  | 'payOffDay'
-  | 'performanceBond'
-  | 'depositGuaranteeTicket'
-  | 'warrantyTicket'
-  | 'hasNoContract'
-  | 'hasUncollectedAmounts'
-  | 'hasNotInstall'
-  | 'isDone'
->;
 
 // 期數
 export type TaccountsReceivablePeriodDto = {
@@ -3697,6 +3720,9 @@ export type TaccountsReceivablePeriodDto = {
   isWriteOffDeposit: boolean;
   // 保留款類型
   retainageType: TretainageType | null;
+  // 保留款百分比
+  retainagePercent: string | null;
+
   // 折讓 // 沒用到
   allowance: number | null;
   // 發票 // 目前發票只會有一張，UI與post,patch的用法都是假設發票只有一張的情況
@@ -3718,6 +3744,7 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   | 'isDeduction'
   | 'isWriteOffDeposit'
   | 'retainageType'
+  | 'retainagePercent'
   | 'allowance' // 會記錄在invoice
   | 'price'
 > & {
@@ -3725,6 +3752,11 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   invoiceNumber: string | null;
   actualPrice: number | null;
   accountantInvoiceBookId: string | null;
+
+  nameOfBusinessEntity: string | null; // 買受人(公司抬頭)
+  businessIdNumber: string | null; // 統一編號
+  isOriginalCustomer: boolean; // 是否為合約原客戶 // 若為false，那這筆請款視為額外收入
+  // isOriginalCustomer: boolean; // 是否為合約原客戶
 };
 
 export type TupdateAccountReceivablePeriodDto = Partial<TcreateAccountReceivablePeriodDto>;
@@ -3756,6 +3788,20 @@ export type TaccountsReceivableInvoiceDto = {
   //
   accountantInvoiceBookId: string | null;
   accountantInvoiceBook: TaccountantInvoiceBookDto | null;
+
+  // 買受人(公司抬頭)
+  nameOfBusinessEntity: string | null;
+  // 統一編號
+  businessIdNumber: string | null;
+  // 是否為合約原客戶
+  isOriginalCustomer: boolean; // 若為false，那這筆請款視為額外收入
+  //
+  // 合約工程名稱
+  contractProjectName: string | null;
+  // 合約承包商
+  contractContractor: string | null;
+  // 合約編號
+  contractNumber: string | null;
 };
 
 //

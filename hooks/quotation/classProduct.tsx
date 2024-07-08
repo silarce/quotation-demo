@@ -2189,6 +2189,19 @@ class Class_product {
 
   // 門軌 options
   get options_doorTrack() {
+    if (this.isSpecialProd) {
+      return [
+        {
+          value: '',
+          label: '請直接輸入',
+
+          icon: '',
+          guideRailsOpening: '',
+          width: NaN,
+        },
+      ];
+    }
+
     const doorModel = this._doorModelList[this.doorType];
 
     if (!doorModel) {
@@ -2488,7 +2501,7 @@ class Class_product {
 
   get ignoreKeyArr_prod() {
     return [
-      'doorTrack',
+      // 'doorTrack',
       'typhoonProtection',
       'doorTrackSilencerStrip',
       'thickness',
@@ -3939,7 +3952,7 @@ class Class_product {
 
         area: null,
         volume: null,
-        guideRail: null,
+        // guideRail: null,
         motorVendor: null,
         motorVoltage: null,
         bottomBar: null,

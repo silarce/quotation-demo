@@ -595,14 +595,17 @@ function DndRow({
                   }
 
                   if (item.isSpecialProd || key === 'quoteType' || key === 'doorType') {
+                    if (key === 'doorTrack') {
+                      selectProps.creSingleValueWithIconProps &&
+                        (selectProps.creSingleValueWithIconProps.showLabel = true);
+                      selectProps.creOptionWithIconProps && (selectProps.creOptionWithIconProps.showLabel = true);
+                    }
+
                     selectProps.props.isSearchable = true;
                   }
 
                   const isOptionValue = prodCellConfig[key].isOptionValue;
 
-                  // if (key === 'doorTrack') {
-                  //   selectProps.dynaOptionsKey = item.typhoonProtection ? 'typhoonProtection' : 'normal';
-                  // }
                   const options = item[`options_${key}`] as Toption[] | undefined;
                   const staticOptions = selectProps.props.options;
                   // ___________________

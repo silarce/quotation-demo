@@ -5,7 +5,7 @@ $fontWeight: 500;
 $rowGap: 10px;
 // $invoiceHeight: 853px; // 沒時間處裡Left的高度問題了，直接設固定高度
 $invoiceHeight: fit-content;
-$tfootHeight: 496px; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
+$tfootHeight: 680px; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
 $deleteBarHeight: 36px;
 // $tfootHeight: fit-content; // left沒有Tfoot，所以直接放一個div然後設高度。tfoot也設一樣的高度
 
@@ -95,8 +95,12 @@ $deleteBarHeight: 36px;
   display: grid;
   gap: $rowGap;
   justify-items: center;
-  height: 30px;
+  padding: 2px 0;
+  // height: 30px;
+  // min-height: 30px; // 設了這個
+  // height: fit-content;
   font-size: $fontSize;
+  // border: solid 1px black;
 }
 
 .left {
@@ -184,6 +188,12 @@ $deleteBarHeight: 36px;
   }
 }
 
+.totalInfoWrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .invoiceNumberSpinWrapper {
   display: flex;
   align-items: center;
@@ -200,4 +210,13 @@ $deleteBarHeight: 36px;
   &.cross {
     color: red;
   }
+}
+
+.inputInsideRadio {
+  display: flex;
+  gap: 5px;
+  // input {
+  //   background-color: pink !important;
+  //   width: 30px;
+  // }
 }

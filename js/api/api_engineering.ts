@@ -1020,7 +1020,7 @@ export const useGetAccountReceivable_id = (id: string, customeParams: Tparams) =
   };
 };
 
-/**新增 應收帳款明細 account-receivable */
+// 新增 應收帳款明細 account-receivable
 export const apiPostAccountReceivable = async (
   body: TcreateAccountReceivableDto,
   {
@@ -1042,14 +1042,18 @@ export const apiPostAccountReceivable = async (
     });
 };
 
-/**更新 應收帳款明細 account-receivable */
+// 更新 應收帳款明細 account-receivable
 export const apiPatchAccountReceivable = async (id: string, body: TupdateAccountReceivableDto) => {
   const api = `/engineering/account-receivable/${id}`;
 
   return axi
     .patch(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      myAlert.err({ title: '更新應收帳款明細失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };
 
 //
@@ -1059,7 +1063,7 @@ type TgetAccountReceivableIncoices = {
   meta: TpageMetaDto;
 };
 
-/**以 應收帳款id取得 所有 應收帳款發票 account-receivable */
+// 以 應收帳款id取得 所有 應收帳款發票 account-receivable
 export const apiGetAccountReceivableIncoices = async (accountReceivableId: string, params?: Tparams) => {
   const api = `/engineering/account-receivable/${accountReceivableId}/invoices`;
 
@@ -1205,12 +1209,11 @@ export const useGetAccountReceivableAccountants = (
   };
 };
 
-/**新增 應收帳款 收款紀錄 account-receivable-accountant */
+// 新增 應收帳款 收款紀錄 account-receivable-accountant
 export const apiPostAccountReceivableAccountant = async (
   id: string, // 應收帳款Id 可以在contract下找到accountReceivableId
   body: {
     accountantId: string[]; // 收款明細Id
-    type: TperiodType;
     incomeBillDate: string;
   },
   {
