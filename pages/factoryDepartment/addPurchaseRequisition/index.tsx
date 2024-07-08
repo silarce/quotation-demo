@@ -200,7 +200,7 @@ export default function AddPurchaseRequisition() {
 
     //#region call api
     //取物料清單
-    const getPurchaseOrder = async () => {
+    const getProduct = async () => {
         try {
             // console.log(userInfo);
             setIsLoading(true);
@@ -251,7 +251,7 @@ export default function AddPurchaseRequisition() {
     };
 
     useEffect(() => {
-        getPurchaseOrder();
+        getProduct();
     }, []);
 
     //取對應的採購明細
@@ -405,7 +405,7 @@ export default function AddPurchaseRequisition() {
             console.log("Transfer response:", responseData);
 
             // 更新數據和其它操作
-            getPurchaseOrder();
+            getProduct();
             getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
             GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
 
@@ -443,7 +443,7 @@ export default function AddPurchaseRequisition() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            getPurchaseOrder();
+            getProduct();
 
             getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
 
@@ -546,60 +546,6 @@ export default function AddPurchaseRequisition() {
                 <div className={scss.left}>
                     <div className={scss.content}>
                         <div>
-                            {/* <div>
-                            <button className={scss.tabbutton} onClick={() => { alert("OK") }} >
-                                庫存告警
-                            </button>
-                            <button className={scss.tabbutton} onClick={() => { alert("OK") }} >
-                                物料查詢
-                            </button>
-                        </div> */}
-                            {/* <div className={scss.left_tite_main}>
-                                <div>
-                                    <InputSel
-                                    {...inputSelProps}
-                                    // caption="物料查詢"
-                                    disabled={false}
-                                    inputProps={{
-                                        props: {
-                                            // value: getTaiwanDateStr(moment().toString()) || '',
-                                            placeholder: '料號',
-                                            value: searchproduct,
-                                            onChange: (e) => setSearchProduct(e.target.value)
-                                        },
-                                    }}
-                                /></div>
-                                <div>
-                                    <InputSel
-                                    {...inputSelProps}
-                                    // caption="物料查詢"
-                                    disabled={false}
-                                    inputProps={{
-                                        props: {
-                                            // value: getTaiwanDateStr(moment().toString()) || '',
-                                            placeholder: '名稱',
-                                            value: searchproduct,
-                                            onChange: (e) => setSearchProduct(e.target.value)
-                                        },
-                                    }}
-                                />
-                                </div>
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        // caption="物料查詢"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                // value: getTaiwanDateStr(moment().toString()) || '',
-                                                placeholder: '規格',
-                                                value: searchproduct,
-                                                onChange: (e) => setSearchProduct(e.target.value)
-                                            },
-                                        }}
-                                    />
-                                </div>
-                            </div> */}
                             <Thead01 type={'AddPR_GetProduct'} />
                             <Tbody01 type={'AddPR_GetProduct'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                             {data && (
@@ -611,7 +557,7 @@ export default function AddPurchaseRequisition() {
                                             <span>{_item.spec}</span>
                                             {/* <span></span> */}
                                             <span>
-                                                <button  onClick={() => { alert("sent to list") }}>
+                                                <button onClick={() => {  }}>
                                                     <img src={icon_fc_add.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                                 </button>
                                             </span>
@@ -627,7 +573,7 @@ export default function AddPurchaseRequisition() {
                         <div className={scss.tite_main}>
                             <div>
                                 <span >
-                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="請購申請" onClick={() => { handleClosePO() }} />
+                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="送出申請" onClick={() => { handleClosePO() }} />
                                 </span>
                                 <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
                                     <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" />

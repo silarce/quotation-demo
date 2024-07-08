@@ -332,7 +332,8 @@ export default function QuotereqDetailList() {
                 prquotereqadddata.totalprice === "" || prquotereqadddata.totalprice === undefined || prquotereqadddata.totalprice === null ||
                 prquotereqadddata.deliverydate < moment() || prquotereqadddata.deliverydate === null || prquotereqadddata.deliverydate === undefined
             ) {
-                myAlert.err({ title: "請檢查欄位!!!", content: "請檢查欄位是否正確或交貨日期是否小於今天日期" })
+                myAlert.err({ title: "請檢查輸入是否正確!!!",
+                     content: "請檢查欄位是否正確或交貨日期是否小於今天日期" })
                 return;
             }
             // setIsLoading(true);
