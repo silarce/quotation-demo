@@ -90,8 +90,8 @@ export default function PurchaseOrderList() {
     const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
     const [purchaseorderdetailuuidin, setPurchaseorderdetailuuidin] = useState<string>("");
-
-
+    const [invoicein, setInvoicein] = useState<string>("");
+    const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
 
@@ -229,6 +229,9 @@ export default function PurchaseOrderList() {
                 setSuppliertaxidin(data[0].suppliertaxid);
                 setReceiptedin(data[0].receipted.toString());
                 setSupplieraddressin(data[0].supplieraddress);
+                setInvoicein(data[0].invoice);
+                setSupplierphonein(data[0].supplierphone);
+
             }
         } catch (error: any) {
             setError(error.message);
@@ -309,8 +312,8 @@ export default function PurchaseOrderList() {
             setSuppliertaxidin(suppliertaxid as string);
             setReceiptedin(receipted as string);
             setSupplieraddressin(supplieraddress as string);
-
-
+            setInvoicein(invoicein as string);
+            setSupplierphonein(supplierphone as string);
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
 
@@ -653,7 +656,7 @@ export default function PurchaseOrderList() {
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: supplierphone ? supplierphone : ' ',
+                                        value: checkfirstin === 0 ? supplierphonein : supplierphone,
                                     },
                                 }}
                             />
@@ -687,7 +690,7 @@ export default function PurchaseOrderList() {
                                 disabled={true}
                                 inputProps={{
                                     props: {
-                                        value: invoice ? invoice : ' ',
+                                        value: checkfirstin === 0 ? invoicein : invoice,
                                     },
                                 }}
                             />
@@ -809,7 +812,7 @@ export default function PurchaseOrderList() {
                                 </div>
                             </CellWithBar>
                         ))}
-                        <br/>
+                        <br />
                     </div>
                 </div>
             </div>

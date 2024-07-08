@@ -103,13 +103,13 @@ export default function PurchaseRequisitionList() {
     //搜尋功能
     const searchTargetList = [
         {
-            placeholder: '採購單號',
+            placeholder: '請購單號',
         },
         {
-            placeholder: '採購日期',
+            placeholder: '請購日期',
         },
         {
-            placeholder: '採購人員',
+            placeholder: '請購人員',
         },
     ];
 
@@ -135,7 +135,6 @@ export default function PurchaseRequisitionList() {
                 keywordMaterialnumber: keywordMaterialnumber as string | undefined,
                 keywordSpec: keywordSpec as string | undefined,
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -466,21 +465,9 @@ export default function PurchaseRequisitionList() {
     const handleRemove = (index: number) => {
         const updatedData = data2.filter((_, i) => i !== index);
         setData2(updatedData);
-        // setData2(prevState => {
-        //     // 複製 prevState 以避免直接修改原始狀態
-        //     const updatedData = [...prevState];
-        //     // 移除指定索引的項目
-        //     updatedData.splice(index, 1);
-        //     return updatedData;
-        // });
     };
 
 
-    // const [data2, setData2] = useState([
-    //     { id: 1, quantity: 10 },
-    //     { id: 2, quantity: 15 },
-    //     { id: 3, quantity: 20 }
-    // ]);
     const handleChange = (index: number, value: string | number) => {
         setData2(prevState => {
             const updatedData = [...prevState];
@@ -495,6 +482,16 @@ export default function PurchaseRequisitionList() {
     const handleRestore = () => {
         setData2(data2restore);
     }
+
+    const goQuotereqDetailList = () => {
+        router.push({
+            pathname: `/factoryDepartment/quotereqDetailList`,
+            query: {
+                purchaserequisitionuuid: checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid,
+            },
+        });
+    }
+
 
     //#region  詢價單modal
     const [prquotereqmodalopen, setPrquotereqmodalopen] = useState<boolean>(false);
@@ -777,7 +774,7 @@ export default function PurchaseRequisitionList() {
                             </span>
                         </div>
                         <div style={{ textAlign: 'right', height: '35.77px' }}>
-
+                            <span style={{ fontSize: '18px', color: '#14256a' }}>審核狀態：</span><span style={{ fontSize: '18px', color: '#ea1833' }}>已審核</span>
                         </div>
                     </div>
                     <div className={scss.head_main}>
@@ -818,113 +815,25 @@ export default function PurchaseRequisitionList() {
                                 }}
                             />
                         </div>
+
+
                     </div>
-                    {/* <hr /> */}
+                    <br />
                     {/* <div className={scss.content_main}>
                         <div>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="廠商名稱"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? suppliernamein : suppliername,
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="統一編號"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? suppliertaxidin : suppliertaxid,
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="廠商地址"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
-                                    },
-                                }}
-                            />
+                        
                         </div>
                         <div>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="排版用"
-                                disabled={true}
-                                className='invisible'
-                                inputProps={{
-                                    props: {
-                                        value: ' ',
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="排版用"
-                                disabled={true}
-                                className='invisible'
-                                inputProps={{
-                                    props: {
-                                        value: ' ',
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="聯絡電話"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: supplierphone ? supplierphone : ' ',
-                                    },
-                                }}
-                            />
+
                         </div>
                         <div>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="排版用"
-                                disabled={true}
-                                className='invisible'
-                                inputProps={{
-                                    props: {
-                                        value: ' ',
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="排版用"
-                                disabled={true}
-                                className='invisible'
-                                inputProps={{
-                                    props: {
-                                        value: ' ',
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="發票號碼"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: invoice ? invoice : ' ',
-                                    },
-                                }}
-                            />
+
                         </div>
                     </div> */}
-
-                    <br />
                     <div className={scss.content_main_content}>
+                        <span>
+                            <MyButton_v2 px='px22' py='py4' theme={undefined} label="詢價單" onClick={() => { goQuotereqDetailList() }} />
+                        </span>
                         <Thead01 type={'PurchaseRequisitionDetail'} />
                         {/* <Tbody01 type={'PurchaseRequisitionDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
                         {data1 && (
@@ -960,7 +869,7 @@ export default function PurchaseRequisitionList() {
                             <span style={{ fontSize: '16px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '16px' }}>{quotereqquantity}</span>
                         </div>
                         <hr />
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
+                        {/* <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
                             <div style={{ flex: '1 1 20%' }}>
                                 <InputSel
                                     {...inputSelProps}
@@ -1044,7 +953,7 @@ export default function PurchaseRequisitionList() {
                             <button className={scss.greenbutton} onClick={() => { addQuotereqDetail() }} >
                                 <img src={icon_fc_arrow_down.src} alt="Arrow Down" style={{ width: '20px', height: '20px' }} />
                             </button>
-                        </div>
+                        </div> */}
 
                         <div>
                             <Thead01 type={'Quotereq'} />
@@ -1062,10 +971,11 @@ export default function PurchaseRequisitionList() {
                                             <span>{_item.note}</span>
                                             <span>
                                                 <input
+                                                    readOnly
                                                     className={scss.quotereqdetail_checkbox}
                                                     type='checkbox'
                                                     checked={selectedsupplier === _item.id}
-                                                    onChange={() => handleCheckboxChange(_item)}
+                                                    // onChange={() => handleCheckboxChange(_item)}
                                                 />
                                             </span>
                                             {/* <span><input type='checkbox'/></span> */}

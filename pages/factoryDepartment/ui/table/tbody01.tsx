@@ -617,34 +617,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   }
   //#endregion
   //#region 請購單明細
-  // else if (type === "PurchaseRequisitionDetail") {
-  //   return (
-  //     <div>
-  //       {error && <p>Error2: {error}</p>}
-  //       {data && (
-  //         data.map((_item: any, index: number) => (
-  //           <CellWithBar key={index} className={scss.panelHeader16}>
-  //             <div className={scss.row01}>
-  //               <span>{index + 1}</span>
-  //               <span>{_item.productid}</span>
-  //               <span>{_item.name}</span>
-  //               <span>{_item.spec}</span>
-  //               <span>{_item.quantity}</span>
-  //               <span>{_item.unit}</span>
-  //               <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span>
-  //               <span>{_item.unitprice.toLocaleString()}</span>
-  //               <span>{_item.totalprice.toLocaleString()}</span>
-  //               <span>{_item.suppliername}</span>
-  //             </div>
-  //           </CellWithBar>
-  //         ))
-  //       )}
-  //       {/* 詢價單modal */}
-        
-  //     </div>
-
-  //   );
-  // }
+ //移到purchaseRequisitionList 請購單頁面
   //#endregion
 
   //#region 詢價單明細
@@ -681,6 +654,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   // }
   //#endregion
 
+  
   return null; // Add default return in case type is not matched
 
 

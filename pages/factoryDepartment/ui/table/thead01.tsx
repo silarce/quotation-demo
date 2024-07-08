@@ -208,42 +208,93 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-//#region 請購單明細
-else if (type === "PurchaseRequisitionDetail") {
-  return (
-    <div className={style.thead16}>
-      <span>次序</span>
-      <span>料號</span>
-      <span>品名</span>
-      <span>規格</span>
-      <span>數量</span>
-      <span>單位</span>
-      <span>詢價</span>
-      <span>單價</span>
-      <span>金額</span>
-      <span>廠商</span>
-      <span></span>
-    </div>
-  )
-}
-//#endregion
- //#region 詢價單明細
- else if (type === "Quotereq") {
-  return (
-    <div className={style.thead17}>
-      <span>次序</span>
-      <span>供應商</span>
-      <span>單價</span>
-      <span>總價</span>
-      <span>單位</span>
-      <span>出貨日</span>
-      <span>備註</span>
-      <span>得標</span>
-      <span></span>
-    </div>
-  )
-}
-//#endregion
+  //#region 請購單明細
+  else if (type === "PurchaseRequisitionDetail") {
+    return (
+      <div className={style.thead16}>
+        <span>次序</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>規格</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span>詢價</span>
+        <span>單價</span>
+        <span>金額</span>
+        <span>廠商</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 詢價單明細
+  else if (type === "Quotereq") {
+    return (
+      <div className={style.thead17}>
+        <span>次序</span>
+        <span>供應商</span>
+        <span>單價</span>
+        <span>總價</span>
+        <span>單位</span>
+        <span>出貨日</span>
+        <span>備註</span>
+        <span>得標</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 詢價單明細
+  else if (type === "QuotereqDetail") {
+    return (
+      <div className={style.thead18}>
+        <span>次序</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>數量</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 詢價單明細
+  else if (type === "QuotereqDetail") {
+    return (
+      <div className={style.thead18}>
+        <span>次序</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>數量</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+    //#region 物料明細
+    else if (type === "AddPR_GetProduct") {
+      return (
+        <div className={style.thead19}>
+          <span>料號</span>
+          <span>名稱</span>
+          <span>單位</span>
+          <span></span>
+        </div>
+      )
+    }
+    //#endregion
+  //#region 請購明細
+  else if (type === "AddPR_ReqList") {
+    return (
+      <div className={style.thead20}>
+        <span>次序</span>
+        <span>名稱</span>
+        <span>規格</span>
+        <span>數量</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
   else {
     return null;
   }

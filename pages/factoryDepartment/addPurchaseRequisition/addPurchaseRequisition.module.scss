@@ -15,74 +15,124 @@
     gap: 35px;
 }
 
-.main {
-    display: grid;
-    grid-template-columns: 600px 1fr; // 左右兩邊比例，可以調整
-    gap: 15px;
-    width: auto;
-    margin-top: 4px;
-    margin-left: 4px;
-    margin-right: 4px;
-    // background-color: gray;
+// .main {
+//     display: grid;
+//     grid-template-columns: 850px 1fr; // 左右兩邊比例，可以調整
+//     gap: 15px;
+//     width: auto;
+//     margin-top: 4px;
+//     margin-left: 4px;
+//     margin-right: 4px;
+//     // background-color: gray;
+// }
+
+// .left {
+//     display: grid;
+//     grid-template-columns: 845px;
+//     justify-content: space-between;
+//     gap: 15px;
+//     // overflow-x: hidden;
+//     overflow-y:visible;
+//     border: 2px solid gray;
+//     min-height: 100vh-30vh;
+//     /* 自動調整高度到螢幕大小 */
+// }
+
+// .right {
+//   position: sticky; 
+//   top: 0; /* 距離視窗頂部的距離 */
+//   right: 0; /* 距離視窗右側的距離 */
+//   z-index: 1000; /* 確保元素位於其他內容的上層 */
+//   display: flex;
+//   flex-direction: column; /* 讓內容以列的方式排列 */
+//   align-items: center; /* 垂直居中 */
+//   justify-content: flex-start; /* 從頂部對齊 */
+//   padding-left: 0px;
+//   border: 2px solid gray;
+//   overflow-y: auto; /* 右邊容器垂直滾動 */
+//   // flex: 1; /* 右邊容器佔據剩餘空間 */
+//   max-height: 100vh; /* 使右邊容器的高度不超過視窗高度 */
+// }
+
+
+// .content {
+//     position: -webkit-sticky; // 為兼容性增加前綴
+//     position: sticky;
+//     top: 0; // 距離視窗頂部的距離
+//     right: 0; // 距離視窗右側的距離
+//     z-index: 1000; // 確保元素位於其他內容的上層
+//     // width: 1150px; // 設定固定寬度
+//     height: 280px; // 設定固定高度
+//     // overflow-x: hidden; // 禁止水平滾動
+//     overflow-x: hidden; // 禁止水平滾動
+//     overflow-y: auto; // 垂直滾動（如果需要）
+//     // background-color: orange;
+//     height: 280px;
+//     border: 2px solid gray;
+
+//     .input-wrapper {
+//         display: flex;
+//         flex-direction: column;
+//         width: 150px; // 調整 input 的寬度
+
+//     }
+// }
+
+
+.container {
+  display: flex;
+  height: 100vh; /* 設置容器的高度為視窗高度 */
+  overflow-y: hidden; /* 防止外部容器出現滾動條 */
+  height:710px;
 }
 
+/* 左邊容器 */
 .left {
-    display: grid;
-    grid-template-columns: 600px;
-    justify-content: space-between;
-    gap: 15px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    border: 2px solid gray;
-    min-height: 100vh-30vh;
-    /* 自動調整高度到螢幕大小 */
+  flex: 1; /* 左邊容器佔據剩餘空間 */
+  display: grid;
+  grid-template-columns: 1fr; /* 佔滿容器寬度 */
+  justify-content: space-between;
+  gap: 15px;
+  border: 1px solid gray;
+  overflow-y: auto; /* 左邊容器垂直滾動 */
+  height:710px;
+  
 }
 
-
+/* 右邊容器 */
 .right {
-    position: relative; // 確保子元素可以正確定位
-    position: -webkit-sticky;
-    ; // 固定在視窗位置
-    top: 0; // 距離視窗頂部的距離
-    right: 0; // 距離視窗右側的距離
-    z-index: 1000; // 確保元素位於其他內容的上層
-    flex-direction: column; // 讓內容以列的方式排列
-    align-items: center; // 垂直居中
-    justify-content: flex-start; // 從頂部對齊
-    // background-color: blue; // 可選：背景色
-    // width: 1150px;
-    top: 0; // 距離視窗頂部的距離
-    right: 0; // 距離視窗右側的距離
-    padding-left: 0px;
-    // background-color: red;
-    border: 2px solid gray;
-    overflow-y: auto;
+  flex: 1; /* 右邊容器佔據剩餘空間 */
+  display: flex;
+  flex-direction: column; /* 讓內容以列的方式排列 */
+  align-items: center; /* 垂直居中 */
+  justify-content: flex-start; /* 從頂部對齊 */
+  border: 1px solid gray;
+  overflow-y: auto; /* 右邊容器垂直滾動 */
+  position: sticky; 
+  top: 0; /* 距離視窗頂部的距離 */
+  right: 0; /* 距離視窗右側的距離 */
+  z-index: 1000; /* 確保元素位於其他內容的上層 */
+  height:710px;
 }
-
 
 .content {
-    position: -webkit-sticky; // 為兼容性增加前綴
-    position: sticky;
-    top: 0; // 距離視窗頂部的距離
-    right: 0; // 距離視窗右側的距離
-    z-index: 1000; // 確保元素位於其他內容的上層
-    // width: 1150px; // 設定固定寬度
-    height: 280px; // 設定固定高度
-    // overflow-x: hidden; // 禁止水平滾動
-    overflow-x: hidden; // 禁止水平滾動
-    overflow-y: auto; // 垂直滾動（如果需要）
-    // background-color: orange;
-    height: 280px;
-    border: 2px solid gray;
-
-    .input-wrapper {
-        display: flex;
-        flex-direction: column;
-        width: 150px; // 調整 input 的寬度
-
-    }
+  width: 100%; /* 佔滿右邊容器的寬度 */
+  overflow-y: auto; /* 垂直滾動（如果需要） */
 }
 
+.left_tite_main {
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  // background-color: gray;
+}
 
 .tite_main {
     display: grid;
@@ -97,7 +147,7 @@
 
 .head_main {
     display: grid;
-    grid-template-columns: 250px 1fr 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -120,7 +170,7 @@
 
 .content_main {
     display: grid;
-    grid-template-columns: 250px 1fr 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     margin-top: 0px;
@@ -177,29 +227,33 @@
 }
 
 
-div.panelHeader13 {
-    padding-left: 20px;
-    border-bottom: solid 1px $colorBorder01;
+//#region 物料明細
+div.panelHeader19 {
   
-    .row01,
-    .row02 {
-      span {
-        font-weight: 400;
-        font-size: 16px;
-      }
-  
-      .clientName,
-      .country {
-        color: $colorMain;
-      }
+  padding-left: 20px;
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
     }
-  
-    .row01 {
-      display: grid;
-      grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 60px;
-      gap: 5px;
+
+    .clientName,
+    .country {
+      color: $colorMain;
     }
   }
+
+  .row01 {
+    display: grid;
+    grid-template-columns: 150px 300px 300px 30px;
+    gap: 5px;
+  }
+}
+
+//#endregion
 
 
 
@@ -264,7 +318,8 @@ div.panelHeader13 {
     padding-bottom: 4px;
     font-weight: 500;
     font-size: 16px;
-    color: #14256a;
+    // color: #14256a;
+    color: gray;
     transform: translateY(2px);
   
     &:hover {
@@ -275,5 +330,6 @@ div.panelHeader13 {
     &:focus {
       background-color: $bgc01;
       border: solid 1px #14256a1b;
+      color: #14256a;
     }
   }
