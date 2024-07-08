@@ -4,8 +4,7 @@ import moment from 'moment';
 import Decimal from 'decimal.js';
 
 // antd
-import { Checkbox, Popover, Button } from 'antd';
-import { Switch } from 'antd';
+import { Checkbox, Popover, Button, Switch, Select } from 'antd';
 
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -712,21 +711,42 @@ const Panel = ({
           //     onChange: () => {},
           //   },
           // }}
-          textareaProps={{
-            props: {
-              maxRows: 3,
-              value: (() => {
-                if (state_employeeArr && state_employeeArr.length > 0) {
-                  return state_employeeArr.map((emp) => emp.chName).join('\n');
+          // textareaProps={{
+          //   props: {
+          //     maxRows: 3,
+          //     value: (() => {
+          //       if (state_employeeArr && state_employeeArr.length > 0) {
+          //         return state_employeeArr.map((emp) => emp.chName).join('\n');
+          //       } else if (state_outsourcing) {
+          //         return state_outsourcing.name;
+          //       } else {
+          //         return '';
+          //       }
+          //     })(),
+          //     onChange: () => {},
+          //   },
+          // }}
+          suffix={
+            <Select
+              className={classNames(scss.antd_select, disabled && scss.disabled)}
+              disabled={disabled}
+              style={{ width: '160px' }}
+              mode="multiple"
+              value={(() => {
+                if (state_employeeArr && state_employeeArr?.length > 0) {
+                  return state_employeeArr.map((emp) => emp.chName);
                 } else if (state_outsourcing) {
-                  return state_outsourcing.name;
+                  return [state_outsourcing.name];
                 } else {
-                  return '';
+                  return undefined;
                 }
-              })(),
-              onChange: () => {},
-            },
-          }}
+              })()}
+              open={false}
+              removeIcon={null}
+              autoFocus={false}
+              bordered={false}
+            />
+          }
         />
       </div>
 
@@ -946,7 +966,7 @@ const config: TconfigList = {
   },
   installerEmployeesName: {
     caption: '安裝人員',
-    className: 'w-28',
+    className: 'w-[160px]',
   },
   itemName: {
     caption: '項目',
