@@ -238,7 +238,16 @@ export default function OrderTable({
           const { isHeadRow, key } = rowProps;
 
           if (isHeadRow) {
-            return <HeadRow key={key || index} showLeft={showLeft} changeShowLeft={changeShowLeft} {...rowProps} />;
+            return (
+              <HeadRow
+                //
+                key={key || index}
+                showLeft={showLeft}
+                changeShowLeft={changeShowLeft}
+                {...rowProps}
+                showBatchAdd={showBatchAdd}
+              />
+            );
           }
 
           return (
@@ -795,7 +804,7 @@ const Panel = ({
 };
 
 // region batchProdPanel
-
+// 被勾選的工作表，批次新增相同的管理單(deliveryStatus)
 const BatchProdPanel = ({ className, onBatchAddClick }: { className?: string; onBatchAddClick?: () => void }) => {
   return (
     <div className={classNames(className)}>
