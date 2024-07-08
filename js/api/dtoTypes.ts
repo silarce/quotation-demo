@@ -29,6 +29,7 @@ export type TaccountantPaymentType = '匯款' | '票據' | '現金';
 export type TreceiptStatus = '託收' | '已兌現';
 export type Tcurrency = 'TWD 新臺幣' | 'USD 美元';
 export type TinvoiceType = '三聯式' | '二聯式';
+export type TfinalPaymentType = '尾款' | '保留款';
 
 // =============================================================================
 export type Tparams = {
@@ -3548,7 +3549,32 @@ export type TaccountsReceivableDto = {
   totalTax: number;
   // 額外收入
   extraIncome: number;
+  // 未施作項目
+  pendingTasks: number;
+  //
+  // 請款中未收到款項
+  paymentPending: number;
+  // 保留款/尾款%數
+  finalPaymentPercent: string;
+  // 保留款/尾款類型
+  finalPaymentType: TfinalPaymentType | null;
+  // 保留款是否含稅
+  isFinalPaymentWithTax: boolean | null;
 };
+
+export type TupdateAccountReceivableDto = Partial<
+  Pick<
+    TaccountsReceivableDto,
+    | 'pendingTasks'
+    //
+    | 'finalPaymentType'
+    | 'isFinalPaymentWithTax'
+    | 'finalPaymentPercent'
+    | 'finalPayment'
+    | 'paymentPending'
+    | 'unpaidPayment'
+  >
+>;
 
 export type TcreateAccountReceivableDto = {
   // 估價日期
@@ -3580,19 +3606,6 @@ export type TcreateAccountReceivableDto = {
   // 是否已做完
   isDone: boolean;
 };
-
-export type TupdateAccountReceivableDto = Pick<
-  TaccountsReceivableDto,
-  | 'valuationDate'
-  | 'payOffDay'
-  | 'performanceBond'
-  | 'depositGuaranteeTicket'
-  | 'warrantyTicket'
-  | 'hasNoContract'
-  | 'hasUncollectedAmounts'
-  | 'hasNotInstall'
-  | 'isDone'
->;
 
 // 期數
 export type TaccountsReceivablePeriodDto = {

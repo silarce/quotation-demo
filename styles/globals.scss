@@ -107,41 +107,47 @@ input::placeholder {
   }
 }
 
-.ant-checkbox-disabled + span,
-.ant-radio-disabled + span {
-  color: theme("colors.sub");
-}
 
-.ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner::after {
-  border-color: theme("colors.sub");
-}
 
-.ant-radio-disabled .ant-radio-inner::after {
-  background-color: theme("colors.sub");
-}
-
-.ant-checkbox-wrapper.ant-checkbox-wrapper-disabled {
-  cursor: auto;
-  .ant-checkbox-disabled {
+// 在Radio或Checkbox的className加入originalDisabledStyle就可以取消以下的自訂樣式
+.ant-checkbox-wrapper:not(.originalDisabledStyle),
+.ant-radio-wrapper:not(.originalDisabledStyle) {
+  &.ant-checkbox-wrapper.ant-checkbox-wrapper-disabled {
     cursor: auto;
-    & + span {
+    .ant-checkbox-disabled {
       cursor: auto;
+      & + span {
+        cursor: auto;
+      }
     }
   }
-}
 
-.ant-radio-wrapper-disabled {
-  cursor: auto;
-
-  .ant-radio-disabled {
+  &.ant-radio-wrapper-disabled {
     cursor: auto;
-    & + span {
+
+    .ant-radio-disabled {
       cursor: auto;
+      & + span {
+        cursor: auto;
+      }
+      .ant-radio-inner,
+      .ant-radio-input {
+        cursor: auto;
+      }
     }
-    .ant-radio-inner,
-    .ant-radio-input {
-      cursor: auto;
-    }
+  }
+
+  .ant-checkbox-disabled + span,
+  .ant-radio-disabled + span {
+    color: theme("colors.sub");
+  }
+
+  .ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner::after {
+    border-color: theme("colors.sub");
+  }
+
+  .ant-radio-disabled .ant-radio-inner::after {
+    background-color: theme("colors.sub");
   }
 }
 

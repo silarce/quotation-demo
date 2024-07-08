@@ -4,8 +4,7 @@ import moment from 'moment';
 import Decimal from 'decimal.js';
 
 // antd
-import { Checkbox, Popover, Button } from 'antd';
-import { Switch } from 'antd';
+import { Checkbox, Popover, Button, Switch, Select } from 'antd';
 
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -238,7 +237,16 @@ export default function OrderTable({
           const { isHeadRow, key } = rowProps;
 
           if (isHeadRow) {
-            return <HeadRow key={key || index} showLeft={showLeft} changeShowLeft={changeShowLeft} {...rowProps} />;
+            return (
+              <HeadRow
+                //
+                key={key || index}
+                showLeft={showLeft}
+                changeShowLeft={changeShowLeft}
+                {...rowProps}
+                showBatchAdd={showBatchAdd}
+              />
+            );
           }
 
           return (
@@ -703,21 +711,42 @@ const Panel = ({
           //     onChange: () => {},
           //   },
           // }}
-          textareaProps={{
-            props: {
-              maxRows: 3,
-              value: (() => {
-                if (state_employeeArr && state_employeeArr.length > 0) {
-                  return state_employeeArr.map((emp) => emp.chName).join('\n');
+          // textareaProps={{
+          //   props: {
+          //     maxRows: 3,
+          //     value: (() => {
+          //       if (state_employeeArr && state_employeeArr.length > 0) {
+          //         return state_employeeArr.map((emp) => emp.chName).join('\n');
+          //       } else if (state_outsourcing) {
+          //         return state_outsourcing.name;
+          //       } else {
+          //         return '';
+          //       }
+          //     })(),
+          //     onChange: () => {},
+          //   },
+          // }}
+          suffix={
+            <Select
+              className={classNames(scss.antd_select, disabled && scss.disabled)}
+              disabled={disabled}
+              style={{ width: '160px' }}
+              mode="multiple"
+              value={(() => {
+                if (state_employeeArr && state_employeeArr?.length > 0) {
+                  return state_employeeArr.map((emp) => emp.chName);
                 } else if (state_outsourcing) {
-                  return state_outsourcing.name;
+                  return [state_outsourcing.name];
                 } else {
-                  return '';
+                  return undefined;
                 }
-              })(),
-              onChange: () => {},
-            },
-          }}
+              })()}
+              open={false}
+              removeIcon={null}
+              autoFocus={false}
+              bordered={false}
+            />
+          }
         />
       </div>
 
@@ -795,7 +824,7 @@ const Panel = ({
 };
 
 // region batchProdPanel
-
+// 被勾選的工作表，批次新增相同的管理單(deliveryStatus)
 const BatchProdPanel = ({ className, onBatchAddClick }: { className?: string; onBatchAddClick?: () => void }) => {
   return (
     <div className={classNames(className)}>
@@ -920,8 +949,7 @@ const config: TconfigList = {
   },
   btnBar: {
     caption: '',
-    className: 'w-30',
-    // className: 'w-[200px]',
+    className: 'w-[150px]',
   },
   installationItem: {
     caption: '安裝項目',
@@ -937,7 +965,7 @@ const config: TconfigList = {
   },
   installerEmployeesName: {
     caption: '安裝人員',
-    className: 'w-28',
+    className: 'w-[160px]',
   },
   itemName: {
     caption: '項目',

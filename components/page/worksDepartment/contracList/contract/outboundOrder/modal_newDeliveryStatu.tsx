@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import moment, { Moment } from 'moment';
+import classNames from 'classnames';
 
 // antd
-import { Modal, ModalProps } from 'antd';
+import { Modal, ModalProps, Select } from 'antd';
 
 // gear
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
@@ -43,8 +44,8 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
     {
       key: 'employee',
       caption: '員工',
-      tip: '單選',
-      limit: 1,
+      // tip: '單選',
+      // limit: 1,
       clearOther: [1],
     },
     {
@@ -65,9 +66,10 @@ export default function Modal_newDeliveryStatu({
 }: {
   onConfirm: (body: TpreCreateEngineeringDeliveryStatusDto) => void;
 } & ModalProps) {
+  //
   const [showSelector, setShowSelector] = useState(false);
 
-  const [state_employee, setState_Employee] = useState<TemployeeDto>();
+  const [state_employeeArr, setState_EmployeeArr] = useState<TemployeeDto[]>();
   const [state_outsourcing, setState_Outsourcing] = useState<ToutsourcingDto>();
   const [state_installationItem, setState_installationItem] = useState<Toption_installationItem | null>(null);
 
@@ -78,6 +80,7 @@ export default function Modal_newDeliveryStatu({
     notes: '',
   });
 
+  // -----------------------------------------------------------------------
   const reset = () => {
     setState({
       installationDate: null,
@@ -85,36 +88,21 @@ export default function Modal_newDeliveryStatu({
       itemName: '',
       notes: '',
     });
-    setState_Employee(undefined);
+    setState_EmployeeArr(undefined);
     setState_Outsourcing(undefined);
     setState_installationItem(null);
   };
 
-  const defaultSeletedDataArrArr = useMemo(() => {
-    type TdefaultSeletedDataArrArr = [TemployeeDto[] | undefined, ToutsourcingDto[] | undefined];
-    let arr: TdefaultSeletedDataArrArr = [[], []];
-
-    if (state_outsourcing) {
-      arr = [undefined, [state_outsourcing]] as TdefaultSeletedDataArrArr;
-    } else if (state_employee) {
-      arr = [[state_employee], undefined] as TdefaultSeletedDataArrArr;
-    }
-
-    return arr;
-  }, [state_outsourcing, state_employee]);
-
-  useEffect(() => {
-    !visible && reset();
-  }, [visible]);
-
   const confirm = () => {
+    const employeeIdArr = state_employeeArr?.map((em) => em.id) || null;
+
     const body: Omit<TcreateEngineeringDeliveryStatusDto, 'productItemId'> = {
       notes: state.notes,
       itemName: state.itemName,
       shippingDate: state.shippingDate?.toISOString() || null,
       installationDate: state.installationDate?.toISOString() || null,
       installerOutsourcingId: state_outsourcing?.id || null,
-      installerEmployees: state_employee?.id ? [state_employee.id] : null,
+      installerEmployees: employeeIdArr,
       installationItem: state_installationItem?.value || null,
 
       append: null,
@@ -122,6 +110,32 @@ export default function Modal_newDeliveryStatu({
     };
     onConfirm(body);
   };
+
+  // -----------------------------------------------------------------------------
+
+  const defaultSeletedDataArrArr = useMemo(() => {
+    type TdefaultSeletedDataArrArr = [TemployeeDto[] | undefined, ToutsourcingDto[] | undefined];
+    let arr: TdefaultSeletedDataArrArr = [[], []];
+
+    if (state_outsourcing) {
+      arr = [undefined, [state_outsourcing]] as TdefaultSeletedDataArrArr;
+    } else if (state_employeeArr) {
+      arr = [state_employeeArr, undefined] as TdefaultSeletedDataArrArr;
+    }
+
+    return arr;
+  }, [state_outsourcing, state_employeeArr]);
+
+  const installManNameArr =
+    state_employeeArr?.map((em) => em.chName) ||
+    (state_outsourcing ? [state_outsourcing.name || '未設定姓名'] : undefined);
+  // -----------------------------------------------------------------------------
+
+  useEffect(() => {
+    !visible && reset();
+  }, [visible]);
+
+  // -----------------------------------------------------------------------------
 
   return (
     <Modal visible={visible} onCancel={onCancel} footer={null} destroyOnClose={true} width={800}>
@@ -153,9 +167,22 @@ export default function Modal_newDeliveryStatu({
             onClick={() => {
               setShowSelector(true);
             }}
-            inputProps={{
-              props: { value: state_employee?.chName ?? state_outsourcing?.name ?? '', onChange: () => {} },
-            }}
+            // inputProps={{
+            //   props: { value: state_employeeArr?.chName ?? state_outsourcing?.name ?? '', onChange: () => {} },
+            // }}
+            suffix={
+              <Select
+                className={classNames(scss.antd_select)}
+                mode="multiple"
+                // value={state_employeeArr?.map((em) => em.chName)}
+                value={installManNameArr}
+                open={false}
+                removeIcon={null}
+                style={{ width: '231px' }}
+                autoFocus={false}
+                bordered={false}
+              />
+            }
           />
 
           <InputSel
@@ -231,25 +258,24 @@ export default function Modal_newDeliveryStatu({
             caption="安裝人員，選擇員工或外包廠商"
             tip="員工或外包擇一"
             onConfirm={(dataArr) => {
-              const employeeArr = dataArr[0];
-              const employee = employeeArr[0] as (typeof employeeArr)[0] | undefined;
+              const employeeArr = dataArr[0] ? dataArr[0] : undefined;
 
               const outsourcingArr = dataArr[1];
               const outsourcing = outsourcingArr[0] as (typeof outsourcingArr)[0] | undefined;
 
-              if (!employee && !outsourcing) {
+              if (!employeeArr && !outsourcing) {
                 myAlert.info({ title: '必須選擇安裝人員' });
 
                 return;
               }
 
-              if (employee) {
-                setState_Employee(employee);
+              if (employeeArr) {
+                setState_EmployeeArr(employeeArr);
                 setState_Outsourcing(undefined);
               }
 
               if (outsourcing) {
-                setState_Employee(undefined);
+                setState_EmployeeArr(undefined);
                 setState_Outsourcing(outsourcing);
               }
 

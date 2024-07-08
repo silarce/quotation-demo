@@ -2,6 +2,12 @@
 三久ERP 前端
 
 
+不完備的元件使用說明
+---
+1.在antd的Radio或Checkbox的className加入originalDisabledStyle就可以取消自訂樣式而使用原本的antd disabled樣式
+樣式寫在 styles/globals.scss
+
+
 QA
 ---
 Q1.
