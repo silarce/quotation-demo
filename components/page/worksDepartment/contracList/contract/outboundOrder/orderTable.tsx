@@ -949,8 +949,7 @@ const config: TconfigList = {
   },
   btnBar: {
     caption: '',
-    className: 'w-30',
-    // className: 'w-[200px]',
+    className: 'w-[150px]',
   },
   installationItem: {
     caption: '安裝項目',
