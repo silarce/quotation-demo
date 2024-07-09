@@ -6,22 +6,30 @@ import scss from './supplyList.module.scss';
 
 // ==================================================================
 
+type TstateItem = {
+  itemName: string;
+  subItemName?: string | null;
+  category: string;
+
+  // 已領數量
+  pickUpQuantity?: number | null;
+  // 未領數量
+  stayQuantity?: number | null;
+  // 總需求數量
+  quantity?: number | null;
+
+  // 領取數量
+  pickupRecord?: number | null;
+  // 需求數量
+  requirementQty?: number | null;
+};
+
+export type { TstateItem };
+
+// ==================================================================
+
 export default function SupplyList() {
-  return (
-    <div className={scss.supplyList}>
-      <SupplyTable
-      // rowArr={[
-      //   fakeData_lockbox,
-      //   fakeData_key,
-      //   fakeData_panel,
-      //   fakeData_pressButton,
-      //   fakeData_firefightingSupplies,
-      //   fakeData_host,
-      //   fakeData_infrared,
-      // ]}
-      />
-    </div>
-  );
+  return <div className={scss.supplyList}>{/* <SupplyTable /> */}</div>;
 }
 
 // ==================================================================
