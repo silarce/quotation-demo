@@ -78,8 +78,8 @@ export default function WdContractList() {
 
   const params: Tparams = {
     pageSize: 99999,
-    sort: 'content.quotationDate',
-    order: 'DESC',
+    sort: 'contractNumber',
+    order: 'ASC',
     populate: [
       //
       'content.customer',
