@@ -12,7 +12,7 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 // import scss from './receivedHistory.module.scss';
 import scss_p from './_public.module.scss';
 
-export default function DemandHistory() {
+export default function RequirementRecord() {
   const router = useRouter();
 
   // ------------------------------------------------------------------
@@ -32,6 +32,10 @@ export default function DemandHistory() {
     const tbodyRowArr: Ttable['tbody']['rowArr'] = [
       {
         cellArr: [
+          {
+            ...configList.indexNumber,
+            children: '1',
+          },
           {
             ...configList.date,
             children: '111-11-11',
@@ -120,6 +124,7 @@ export default function DemandHistory() {
 
 const keysArr = [
   //
+  'indexNumber',
   'date', // 領料日期
   'requestEmployee', // 領料人員
   'doorModelName',
@@ -129,6 +134,10 @@ const keysArr = [
 ];
 
 const configList: { [key: string]: Tconfig_table } = {
+  indexNumber: {
+    label: '流水號',
+    flex: '80px',
+  },
   date: {
     label: '新增日期',
     flex: '20%',

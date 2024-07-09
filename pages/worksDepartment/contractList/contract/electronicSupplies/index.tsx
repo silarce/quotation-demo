@@ -38,7 +38,7 @@ import { Popover } from 'antd';
 import SupplyList from 'components/page/worksDepartment/electronicSupplies/supplyList';
 import ItemList from 'components/page/worksDepartment/electronicSupplies/itemList';
 import ReceivedHistory from 'components/page/worksDepartment/electronicSupplies/receivedHistory';
-import DemandHistory from 'components/page/worksDepartment/electronicSupplies/demandHistory';
+import RequirementRecord from 'components/page/worksDepartment/electronicSupplies/requirementRecord';
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
@@ -71,7 +71,7 @@ import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
 
 type Tquery = {
   contractId: string;
-  listName: 'itemList' | 'supplyList' | 'receiveHistory' | 'demandHistory' | undefined;
+  listName: 'itemList' | 'supplyList' | 'receiveHistory' | 'requirementRecord' | undefined;
 };
 
 type TdoorQtySubTotalList = {
@@ -110,8 +110,8 @@ export default function ElectronicSupplies() {
     isFetching: isFetching_electronicSupplies,
   } = useElectronicSupplies_id(electronicSuppliesId);
 
-  const { data: data_finalProductItem, update: update_finalProductItem } =
-    useGetContract_id_finalProductItem(contractId);
+  // const { data: data_finalProductItem, update: update_finalProductItem } =
+  //   useGetContract_id_finalProductItem(contractId);
 
   const {
     //
@@ -120,6 +120,8 @@ export default function ElectronicSupplies() {
     // projectContent = '',
     projectNumber = '',
   } = engineeringContact ?? {};
+
+  const { electronicSuppliesContents, pickupRecords, requirementRecords } = data_electronicSupplies ?? {};
 
   // ------------------------------------------------------------------
 
@@ -178,7 +180,7 @@ export default function ElectronicSupplies() {
       label: '送電備品列表',
       isActive: listName === 'itemList',
       onClick: () => {
-        router.push({
+        router.replace({
           query: { ...router.query, listName: 'itemList' },
         });
       },
@@ -187,7 +189,7 @@ export default function ElectronicSupplies() {
       label: '送電備品總料單',
       isActive: listName === 'supplyList',
       onClick: () => {
-        router.push({
+        router.replace({
           query: { ...router.query, listName: 'supplyList' },
         });
       },
@@ -196,17 +198,17 @@ export default function ElectronicSupplies() {
       label: '送電備品料單領取歷程',
       isActive: listName === 'receiveHistory',
       onClick: () => {
-        router.push({
+        router.replace({
           query: { ...router.query, listName: 'receiveHistory' },
         });
       },
     },
     {
       label: '送電備品料單需求歷程',
-      isActive: listName === 'demandHistory',
+      isActive: listName === 'requirementRecord',
       onClick: () => {
-        router.push({
-          query: { ...router.query, listName: 'demandHistory' },
+        router.replace({
+          query: { ...router.query, listName: 'requirementRecord' },
         });
       },
     },
@@ -217,7 +219,7 @@ export default function ElectronicSupplies() {
 
   useEffect(() => {
     update();
-    update_finalProductItem();
+    // update_finalProductItem();
   }, []);
 
   // ------------------------------------------------------------------
@@ -292,7 +294,7 @@ export default function ElectronicSupplies() {
           {listName === 'itemList' && <ItemList worksheetArr={worksheet ?? []} />}
           {listName === 'supplyList' && <SupplyList />}
           {listName === 'receiveHistory' && <ReceivedHistory />}
-          {listName === 'demandHistory' && <DemandHistory />}
+          {listName === 'requirementRecord' && <RequirementRecord />}
         </Wrapper_tab>
       </div>
     </SubLayer>
