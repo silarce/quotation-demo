@@ -32,6 +32,7 @@ export type TinvoiceType = '三聯式' | '二聯式';
 export type TfinalPaymentType = '尾款' | '保留款';
 
 // =============================================================================
+
 export type Tparams = {
   order?: 'ASC' | 'DESC';
   page?: number;
@@ -55,6 +56,12 @@ export type TpageMetaDto = {
 export type TpageResponse<Tdata> = {
   data: Tdata[];
   meta: TpageMetaDto;
+};
+
+export type TapiError = {
+  error: string;
+  message: string;
+  status: number;
 };
 
 // =============================================================
@@ -3464,6 +3471,11 @@ export type TcreateAccountReceivableAccountsDto = {
   accountantId: string[];
   incomeBillDate: string;
 };
+
+export type TupdateAccountReceivableAccountantDto = {
+  invoiceId: string;
+  accountantId: string[];
+}[];
 
 // MARK: /engineering
 

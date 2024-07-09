@@ -6,7 +6,7 @@ import scss from './tbody01.module.scss';
 import scss2 from './tbody02.module.scss';
 import router from 'next/router';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import { Transfer } from 'antd';
+import { Transfer, Button, Modal } from 'antd';
 import { IconButton } from '@mui/material';
 import IconContext from '@ant-design/icons/lib/components/Context';
 import { IconMap } from 'antd/lib/result';
@@ -14,7 +14,18 @@ import icon_arrowdown from 'public/image/icon/arrow_down_tray.svg';
 import icon_arrowup from 'public/image/icon/arrow_up_tray.svg';
 import icon_arrowchange from 'public/image/icon/arrow_change_tray.svg';
 import { inspect } from 'util';
-
+import Thead01 from './thead01';
+import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
+import icon_fc_exclam from 'public/image/icon/fc_exclam.svg';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
+import icon_fc_arrow_down_red from 'public/image/icon/fc_arrow_down_red.svg';
+import { setting } from '../../wareHouseList/index';
+import moment from 'moment';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import icon_fc_add from 'public/image/icon/fc_add.svg';
+import PurchaseOrderList from 'pages/factoryDepartment/purchaseOrderList';
+import { first } from 'lodash';
 
 type TBodyItemContent = {};
 
@@ -41,6 +52,8 @@ export interface PickingListModel {
 }
 
 export default function Tbody01({ data, error, type, traycalled, traycalledname, traytransfer, url, whnamecalled }: TbodyProps) {
+
+
 
   async function getTrayByWareHouse(whid: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
     router.push({
@@ -132,8 +145,9 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     });
   }
 
+  //#region 採購單
 
-  async function GetPerchaseOrder(item: any) {
+  async function GetPurchaseOrder(item: any) {
     router.replace({
       pathname: `/factoryDepartment/purchaseOrderList`,
       query: {
@@ -151,16 +165,41 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       }
     })
   }
-  
+
+  async function AddPurchaseOrderDetail(item: any) {
+    // alert("in");
+    router.push({
+      pathname: `/factoryDepartment/purchaseOrderList`,
+      query: {
+        purchaseorderuuid: item.purchaseorderuuid,
+        purchaseorderid: item.purchaseorderid,
+        create_at: getTaiwanDateStr(item.create_at),
+        create_by: item.create_by,
+        receipted: item.receipted,
+        suppliername: item.suppliername,
+        suppliertaxid: item.suppliertaxid,
+        supplieraddress: item.supplieraddress,
+        supplierphone: item.supplierphone,
+        invoice: item.invoice,
+        firstin: 1,
+        purchaseorderdetailuuid: item.id
+      }
+    })
+  }
+
+
+  //#endregion
+
   async function GetProdReceipt(item: any) {
     router.replace({
       pathname: `/factoryDepartment/prodReceiptList`,
       query: {
-        prodreceiptuuid:item.prodreceiptuuid,
-        prodreceiptid:item.prodreceiptid,
+        prodreceiptuuid: item.prodreceiptuuid,
+        prodreceiptid: item.prodreceiptid,
         purchaseorderuuid: item.purchaseorderuuid,
         purchaseorderid: item.purchaseorderid,
         purchaseordercreate_at: getTaiwanDateStr(item.purchaseordercreate_at),
+        purchaseordercreate_by: item.purchaseordercreate_by,
         create_at: getTaiwanDateStr(item.create_at),
         create_by: item.create_by,
         inspected: item.inspected,
@@ -173,7 +212,32 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       }
     })
   }
+  //#region 請購單
+  //請購單
+  async function GetPurchaseRequisition(item: any) {
 
+    // setRefreshpurchaserequisitiondetail(item);
+
+    router.replace({
+      pathname: `/factoryDepartment/purchaseRequisitionList`,
+      query: {
+        purchaserequisitionuuid: item.purchaserequisitionuuid,
+        purchaserequisitionid: item.purchaserequisitionid,
+        create_at: getTaiwanDateStr(item.create_at),
+        create_by: item.create_by,
+        approved: item.approved,
+        firstin: 1
+      }
+    })
+  }
+
+  
+
+  //#endregion
+
+
+
+  //#region 日期格式處理 收
   // 日期格式處理
   function convertToYearMonthDay(datetimetype: string, isoDateString: string | number | Date) {
     if (datetimetype === "Date") {
@@ -197,7 +261,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     }
 
   }
-
+  //#endregion
 
 
 
@@ -434,7 +498,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.totalprice.toLocaleString()}</span>
                 <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>未結</span>
                 <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已結</span>
-                <span ><IconDetail onClick={() => { GetPerchaseOrder(_item) }} /></span>
+                <span ><IconDetail onClick={() => { GetPurchaseOrder(_item) }} /></span>
               </div>
             </CellWithBar>
           ))
@@ -443,6 +507,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     );
   }
   //#endregion
+
   //#region 採購單明細
   else if (type === "PurchaseOrderDetail") {
     return (
@@ -451,6 +516,64 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader11}>
+              <div className={scss.row01}>
+                <span>{index + 1}</span>
+                <span>{_item.productid}</span>
+                <span>{_item.name}</span>
+                <span>{_item.spec}</span>
+                <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
+                <span>{_item.quantity}</span>
+                <span>{_item.unit}</span>
+                <span>{_item.unitprice.toLocaleString()}</span>
+                <span>{_item.totalprice.toLocaleString()}</span>
+                <span>
+                  <button onClick={() => { AddPurchaseOrderDetail(_item) }}>
+                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                  </button>
+                </span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  }
+  //#endregion
+
+  //#region 進貨單
+  else if (type === "ProdReceipt") {
+    return (
+      <div>
+        {error && <p>Error1: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader12}>
+              <div className={scss.row01}>
+                {/* <span>{index + 1}</span> */}
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                <span>{_item.purchaseorderid}</span>
+                <span>{_item.prodreceiptid}</span>
+                {/* <span>{_item.totalprice.toLocaleString()}</span> */}
+                <span style={{ color: '#ea1833', display: `${_item.inspected === false ? "" : "none"}` }}>未驗</span>
+                <span style={{ color: '#14256a', display: `${_item.inspected === true ? "" : "none"}` }}>已驗</span>
+                <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  }
+  //#endregion
+
+  //#region 進貨單明細
+  else if (type === "ProdReceiptDetail") {
+    return (
+      <div>
+        {error && <p>Error2: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader14}>
               <div className={scss.row01}>
                 <span>{index + 1}</span>
                 <span>{_item.productid}</span>
@@ -468,22 +591,23 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     );
   }
   //#endregion
-   //#region 進貨單
-   else if (type === "ProdReceipt") {
+
+  //#region 請購單
+  else if (type === "PurchaseRequisition") {
     return (
       <div>
         {error && <p>Error1: {error}</p>}
         {data && (
           data.map((_item: any, index: number) => (
-            <CellWithBar key={index} className={scss.panelHeader12}>
+            <CellWithBar key={index} className={scss.panelHeader15}>
               <div className={scss.row01}>
                 {/* <span>{index + 1}</span> */}
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
-                <span>{_item.prodreceiptid}</span>
-                <span>{_item.totalprice.toLocaleString()}</span>
-                <span style={{ color: '#ea1833', display: `${_item.inspected === false ? "" : "none"}` }}>未轉</span>
-                <span style={{ color: '#14256a', display: `${_item.inspected === true ? "" : "none"}` }}>已轉</span>
-                <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span>
+                <span>{_item.purchaserequisitionid}</span>
+                {/* <span>{_item.totalprice.toLocaleString()}</span> */}
+                <span style={{ color: '#ea1833', display: `${_item.approved === false ? "" : "none"}` }}>未結</span>
+                <span style={{ color: '#14256a', display: `${_item.approved === true ? "" : "none"}` }}>已結</span>
+                <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span>
               </div>
             </CellWithBar>
           ))
@@ -492,6 +616,46 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     );
   }
   //#endregion
+  //#region 請購單明細
+ //移到purchaseRequisitionList 請購單頁面
+  //#endregion
 
+  //#region 詢價單明細
+  // else if (type === "Quotereq") {
+  //   return (
+  //     <div>
+  //       {error && <p>Error1: {error}</p>}
+  //       {data && (
+  //         data.map((_item: any, index: number) => (
+  //           <CellWithBar key={index} className={scss.panelHeader17}>
+  //             <div className={scss.row01}>
+  //               <span>{index + 1}</span>
+  //               <span>{_item.suppliername}</span>
+  //               <span>{_item.unitprice}</span>
+  //               <span>{_item.totalprice}</span>
+  //               <span>{_item.unit}</span>
+  //               <span>{getTaiwanDateStr(_item.deliverydate)}</span>
+  //               <span>{_item.note}</span>
+  //               <span>
+  //                 <input
+  //                   className={scss.quotereqdetail_checkbox}
+  //                   type='checkbox'
+  //                   checked={selectedsupplier === _item.id}
+  //                   onChange={() => handleCheckboxChange(_item)}
+  //                 />
+  //               </span>
+  //               {/* <span><input type='checkbox'/></span> */}
+  //             </div>
+  //           </CellWithBar>
+  //         ))
+  //       )}
+  //     </div>
+  //   );
+  // }
+  //#endregion
+
+  
   return null; // Add default return in case type is not matched
+
+
 }
