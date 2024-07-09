@@ -276,13 +276,14 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <div className={style.thead19}>
           <span>料號</span>
           <span>名稱</span>
-          <span>單位</span>
+          <span>規格</span>
+          <span>庫存</span>
           <span></span>
         </div>
       )
     }
     //#endregion
-  //#region 請購明細
+  //#region 新增請購單明細
   else if (type === "AddPR_ReqList") {
     return (
       <div className={style.thead20}>
