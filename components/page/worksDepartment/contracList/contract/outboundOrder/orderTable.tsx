@@ -728,7 +728,7 @@ const Panel = ({
           // }}
           suffix={
             <Select
-              className={classNames(scss.antd_select, disabled && scss.disabled)}
+              className={classNames(scss.antd_select, disabled && scss.disabled, scss.plus)}
               disabled={disabled}
               style={{ width: '160px' }}
               mode="multiple"
