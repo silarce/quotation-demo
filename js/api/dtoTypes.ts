@@ -3061,25 +3061,6 @@ export type TelectronicSuppliesContentDto = {
   quantity: number | null;
 };
 
-export type TelectronicSuppliesRequirementRecordDto = {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-
-  // 所屬送電備品id
-  electronicSuppliesId?: string | null;
-  // 所屬送電備品
-  electronicSupplies?: TelectronicSuppliesDto;
-  // 新增日期
-  operationDate: Date;
-  // 新增人員id
-  agentEmployeeId: string;
-  // 新增人員
-  agentEmployee: TemployeeDto;
-  // 需求明細
-  requirementRecordDetails: TelectronicSuppliesRequirementRecordDetailDto[];
-};
-
 export type TelectronicSuppliesRequirementRecordDetailDto = {
   id: string;
   createdAt: string;
@@ -3099,6 +3080,54 @@ export type TelectronicSuppliesRequirementRecordDetailDto = {
   unit: string | null;
 };
 
+export type TcreateElectronicSuppliesRecordDetailDto = Pick<
+  TelectronicSuppliesRequirementRecordDetailDto,
+  'itemName' | 'category' | 'quantity' | 'unit'
+> & {
+  code: string | null;
+};
+
+export type TupdateElectronicSuppliesRecordDetailDto = TcreateElectronicSuppliesRecordDetailDto & {
+  id?: string;
+};
+
+//
+// RequirementRecord系列為需求單
+export type TelectronicSuppliesRequirementRecordDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 所屬送電備品id
+  electronicSuppliesId?: string | null;
+  // 所屬送電備品
+  electronicSupplies?: TelectronicSuppliesDto;
+  // 新增日期
+  operationDate: string;
+  // 新增人員id
+  agentEmployeeId: string;
+  // 新增人員
+  agentEmployee: TemployeeDto;
+  // 需求明細
+  requirementRecordDetails: TelectronicSuppliesRequirementRecordDetailDto[];
+};
+
+export type TcreateElectronicSuppliesRequirementRecordDto = Pick<
+  TelectronicSuppliesRequirementRecordDto,
+  'operationDate'
+> & {
+  takeOffEmployeeId: string;
+  requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
+};
+
+export type TupdateElectronicSuppliesRequirementRecordDto = Pick<
+  TcreateElectronicSuppliesRequirementRecordDto,
+  'operationDate' | 'takeOffEmployeeId'
+> & {
+  requirementRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
+};
+
+// PickupRecord系列為領料單
 export type TelectronicSuppliesPickupRecordDto = {
   id: string;
   createdAt: string;
@@ -3137,6 +3166,19 @@ export type TelectronicSuppliesPickupRecordDetailDto = {
   quantity: number | null;
   // 單位
   unit: string | null;
+};
+
+export type TcreateElectronicSuppliesPickupRecordDto = Pick<
+  TelectronicSuppliesPickupRecordDto,
+  'operationDate' | 'takeOffEmployeeId' | 'action'
+> & {
+  pickupRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
+};
+
+export type TupdateElectronicSuppliesPickupRecordDto = Partial<
+  Pick<TcreateElectronicSuppliesPickupRecordDto, 'operationDate' | 'takeOffEmployeeId' | 'action'>
+> & {
+  pickupRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
 };
 
 // ---------------------------------------------------------------------------
