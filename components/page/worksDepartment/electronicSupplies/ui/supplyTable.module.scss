@@ -1,2 +1,79 @@
-.supplyList {
+.group {
+  display: flex;
+  width: 100%;
+
+  &.thead {
+    background-color: theme("colors.bgc01");
+    .cell {
+      justify-content: center;
+      font-weight: 500;
+      border-right-color: transparent;
+    }
+  }
+
+  &:nth-last-of-type(1) {
+    > .cell {
+      border-bottom: 0;
+    }
+    > .rowWrapper .row:nth-last-of-type(1) .cell {
+      border-bottom: 0;
+    }
+  }
+}
+
+.rowWrapper {
+  width: auto;
+  flex: 1;
+  .row {
+    display: flex;
+    justify-content: flex-start;
+    flex: 1;
+
+    .cell:nth-last-of-type(1) {
+      border-right: 0;
+    }
+  }
+}
+
+.cell {
+  padding: 10px;
+  border: solid 1px theme("colors.border");
+  border-width: 0 1px 1px 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &.itemName {
+    width: 200px;
+  }
+  &.subItemName {
+    width: 180px;
+    & + .rowWrapper .category {
+      justify-content: center;
+    }
+  }
+  &.category {
+    justify-content: flex-start;
+    flex: 1;
+  }
+
+  &.inputLabel {
+    width: 100px;
+  }
+  &.input {
+    @extend .inputLabel;
+    input {
+      width: 100%;
+      background-color: pink;
+      border-bottom: solid 1px transparent;
+      text-align: center;
+    }
+    &.abled > input {
+      border-color: theme("colors.sub");
+    }
+  }
+}
+
+.inputGroup_3 {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
 }
