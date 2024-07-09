@@ -25,10 +25,10 @@ type Tcontract = TtheadInfo & {
 };
 
 type Tcontrol = {
-  northernArr: Tcontract[];
-  centralArr: Tcontract[];
-  southernArr: Tcontract[];
-  easternArr: Tcontract[];
+  northernArr: Tcontract[]; // N
+  centralArr: Tcontract[]; // M
+  southernArr: Tcontract[]; // H
+  // easternArr: Tcontract[]; //
   abroadArr: Tcontract[];
 };
 
@@ -89,7 +89,7 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
   };
   // ------------------------------------------------------------------
 
-  const { northernArr, centralArr, southernArr, easternArr, abroadArr } = control;
+  const { northernArr, centralArr, southernArr, abroadArr } = control;
 
   // ------------------------------------------------------------------
   return (
@@ -219,7 +219,7 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
           );
         })}
         {/*  */}
-        <div className={style.sortTitle}>
+        {/* <div className={style.sortTitle}>
           <span>東部</span>
         </div>
         {easternArr.map((item) => {
@@ -253,10 +253,10 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
               <PanelBody contractDetailArr={detailArr} />
             </Panel>
           );
-        })}
+        })} */}
         {/*  */}
         <div className={style.sortTitle}>
-          <span>海外</span>
+          <span>海外或其他</span>
         </div>
         {abroadArr.map((item) => {
           const { contractId } = item;

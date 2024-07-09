@@ -1,5 +1,8 @@
 $invoicePadding: 10px 20px;
+$gridWidth_itemName: 80px;
+$gridTemplateColumns_left: $gridWidth_itemName 150px 50px 100px;
 $gridTemplateColumns_center: 130px 130px;
+$gridTemplateColumns_center_row: 130px 130px $gridWidth_itemName;
 $fontSize: 16px;
 $fontWeight: 500;
 $rowGap: 10px;
@@ -110,13 +113,23 @@ $deleteBarHeight: 36px;
   background-color: white;
   align-self: stretch;
   .row {
-    grid-template-columns: 80px 150px 50px 100px;
+    grid-template-columns: $gridTemplateColumns_left;
+    > span {
+      border-bottom: solid 1px transparent;
+    }
   }
 }
 
 .center {
   .row {
-    grid-template-columns: $gridTemplateColumns_center;
+    // grid-template-columns: $gridTemplateColumns_center;
+    grid-template-columns: $gridTemplateColumns_center_row;
+    width: 272px;
+    overflow: hidden;
+    align-items: flex-start;
+    > span {
+      border-bottom: solid 1px transparent;
+    }
     > input {
       width: 100%;
       text-align: center;

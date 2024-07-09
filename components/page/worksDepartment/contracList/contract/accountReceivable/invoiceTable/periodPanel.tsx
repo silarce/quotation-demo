@@ -49,6 +49,7 @@ type Tcenter = {
   caption: string;
 
   rowArr: {
+    itemName: string;
     completedQuantity: string;
     completedPayment: string;
     completedPayment_localeString: string;
@@ -274,11 +275,12 @@ function PeriodPanel_pre(
     let subTotal_d = new Decimal(0);
 
     const rowArr: Tcenter['rowArr'] = rowArr_state.map((row, rowIndex) => {
-      const { completedQuantity, completedPayment } = row;
+      const { itemName, completedQuantity, completedPayment } = row;
 
       subTotal_d = subTotal_d.add(completedPayment || 0);
 
       return {
+        itemName,
         completedQuantity: completedQuantity,
         completedPayment: completedPayment,
         completedPayment_localeString: Number(completedPayment).toLocaleString(),
@@ -403,6 +405,7 @@ function PeriodPanel_pre(
       <Tbody totals={totals}>
         {rowArr.map((row, index) => {
           const {
+            itemName,
             completedQuantity: doneQty,
             completedPayment_localeString: donePrice_localeString,
             oncompletedQuantityChange: onDoneQtyChange,
@@ -430,6 +433,7 @@ function PeriodPanel_pre(
                 readOnly={disabled}
                 type={inputType}
               />
+              <span className={scss.test}>{itemName}</span>
             </div>
           );
         })}
@@ -1114,7 +1118,7 @@ const useDefaultState = ({
     });
 
     const rowArr: Tstate_period['rowArr'] = finalProdArr.map((finalProd) => {
-      const finalProdId = finalProd.id;
+      const { id: finalProdId, itemName } = finalProd;
 
       const cp = completedProductList[finalProdId] || {
         productId: finalProdId,
@@ -1126,7 +1130,7 @@ const useDefaultState = ({
 
       return {
         ...cp,
-
+        itemName,
         basePrice: finalProd.unitPrice,
         completedQuantity: String(cp.completedQuantity),
         completedPayment: String(cp.completedPayment),
