@@ -121,7 +121,11 @@ export default function ElectronicSupplies() {
     projectNumber = '',
   } = engineeringContact ?? {};
 
-  const { electronicSuppliesContents, pickupRecords, requirementRecords } = data_electronicSupplies ?? {};
+  const {
+    electronicSuppliesContents = [],
+    pickupRecords = [],
+    requirementRecords = [],
+  } = data_electronicSupplies ?? {};
 
   // ------------------------------------------------------------------
 
@@ -292,7 +296,7 @@ export default function ElectronicSupplies() {
           // }}
         >
           {listName === 'itemList' && <ItemList worksheetArr={worksheet ?? []} />}
-          {listName === 'supplyList' && <SupplyList />}
+          {listName === 'supplyList' && <SupplyList electronicSuppliesContents={electronicSuppliesContents} />}
           {listName === 'receiveHistory' && <ReceivedHistory />}
           {listName === 'requirementRecord' && <RequirementRecord />}
         </Wrapper_tab>

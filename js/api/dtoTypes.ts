@@ -3046,7 +3046,7 @@ export type TelectronicSuppliesContentDto = {
   // 所屬送電備品表id
   electronicSuppliesId: string;
   // 所屬送電備品表
-  electronicSupplies: TelectronicSuppliesDto;
+  electronicSupplies?: TelectronicSuppliesDto;
   // 品名
   itemName: string;
   // 種類

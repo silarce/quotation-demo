@@ -63,9 +63,11 @@
     @extend .inputLabel;
     input {
       width: 100%;
-      background-color: pink;
       border-bottom: solid 1px transparent;
       text-align: center;
+      &.Ok {
+        color: theme("colors.success");
+      }
     }
     &.abled > input {
       border-color: theme("colors.sub");

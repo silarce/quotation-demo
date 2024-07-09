@@ -39,7 +39,7 @@ import scss_p from '../_public.module.scss';
 
 // type TrowProperty = 'pickUpQuantity' | 'stayQuantity' | 'quantity' | 'pickupRecord' | 'requirementQty';
 
-type Tgroup<> = {
+type Tgroup = {
   // 品名
   itemName: string;
   subItemName?: string | null;
@@ -47,10 +47,11 @@ type Tgroup<> = {
     // 種類
     category: string;
     valueArr: {
-      value: string;
+      value?: string;
       onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
       className?: string;
       readonly?: boolean;
+      defaultValue?: string;
     }[];
   }[];
 };
@@ -103,10 +104,11 @@ type Tprops_cell_input = {
   onChange?: React.InputHTMLAttributes<HTMLInputElement>['onChange'];
   readOnly?: React.InputHTMLAttributes<HTMLInputElement>['readOnly'];
   type?: React.InputHTMLAttributes<HTMLInputElement>['type'];
+  defaultValue?: React.InputHTMLAttributes<HTMLInputElement>['defaultValue'];
   inputAttr?: React.InputHTMLAttributes<HTMLInputElement>;
 } & Omit<Tprops_cell, 'children'>;
 
-export type {};
+export type { Tgroup, Tprops_cell, Tprops_cell_input };
 
 // const foo: TruePropertyKeys = ['stayQuantity', 'pickUpQuantity'];
 // ==================================================================
@@ -117,9 +119,11 @@ export default function SupplyTable({
   //
   valueLabelArr,
   groupArr,
+  disabled,
 }: {
   valueLabelArr: string[];
   groupArr: Tgroup[];
+  disabled?: boolean;
 }) {
   // MARK: RENDER
   return (
@@ -127,7 +131,7 @@ export default function SupplyTable({
       <Thead valueLabelArr={valueLabelArr} />
 
       {groupArr.map((props, index) => {
-        return <Group key={index} {...props} />;
+        return <Group key={index} disabled={disabled} {...props} />;
       })}
 
       {/* <Group02 /> */}
@@ -159,11 +163,17 @@ const Thead = ({ valueLabelArr }: { valueLabelArr: string[] }) => {
   );
 };
 
-const Group = ({ itemName, subItemName, rowArr }: Tgroup) => {
+const Group = ({
+  //
+  disabled,
+  itemName,
+  subItemName,
+  rowArr,
+}: Tgroup & { disabled?: boolean }) => {
   return (
     <div className={scss.group}>
       <Cell_itemName>{itemName}</Cell_itemName>
-      {subItemName && <Cell_category>{subItemName}</Cell_category>}
+      {subItemName && <Cell_subItemName>{subItemName}</Cell_subItemName>}
 
       <div className={scss.rowWrapper}>
         {rowArr.map((row, index) => {
@@ -173,7 +183,7 @@ const Group = ({ itemName, subItemName, rowArr }: Tgroup) => {
             <Row key={index}>
               <Cell_category>{category}</Cell_category>
               {valueArr.map((props, index) => {
-                return <Cell_input key={index} {...props} />;
+                return <Cell_input key={index} readOnly={disabled} {...props} />;
               })}
             </Row>
           );
@@ -271,27 +281,38 @@ const Cell_input = (props: Tprops_cell_input = {}) => {
     onChange,
     readOnly,
     inputAttr,
-    type = 'number',
+    defaultValue,
     ...cellProps
   } = props;
 
+  const isOk = value === 'OK' || defaultValue === 'OK';
+  const type = isOk ? 'text' : 'number';
+
   return (
-    <Cell className={classNames(scss.input, className)} {...cellProps}>
-      <input type={type} value={value} onChange={onChange} readOnly={readOnly} {...inputAttr} />
+    <Cell {...cellProps} className={classNames(scss.input, className)}>
+      <input
+        type={type}
+        defaultValue={defaultValue}
+        value={value}
+        onChange={onChange}
+        readOnly={readOnly}
+        {...inputAttr}
+        className={classNames(isOk && scss.Ok, inputAttr?.className)}
+      />
     </Cell>
   );
 };
 
-const InputGroup_3 = () => {
-  return (
-    <div className={classNames(scss.inputGroup_3)}>
-      <Cell_input />
-      <Cell_input />
-      {/* <Cell_input className={scss.abled} inputAttr={{ readOnly: false }} /> */}
-      <Cell_input />
-    </div>
-  );
-};
+// const InputGroup_3 = () => {
+//   return (
+//     <div className={classNames(scss.inputGroup_3)}>
+//       <Cell_input />
+//       <Cell_input />
+//       {/* <Cell_input className={scss.abled} inputAttr={{ readOnly: false }} /> */}
+//       <Cell_input />
+//     </div>
+//   );
+// };
 
 // ============================================================================
 
