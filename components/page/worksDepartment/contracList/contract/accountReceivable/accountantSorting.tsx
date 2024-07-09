@@ -48,6 +48,14 @@ import { CSS } from '@dnd-kit/utilities';
 
 // region TYPE
 
+type Tstate = {
+  isAccountantOrderChanged: boolean;
+  isInvoiceAllowanceChanged: boolean;
+  isInvoiceAccountantRelationChanged: boolean;
+  invoice: Tinvoice;
+  accountantArr: Taccountant[];
+};
+
 type Tinvoice = {
   id: UniqueIdentifier; // 就是string | number // id 必須唯一
   invoiceNumber: React.ReactNode;
@@ -66,13 +74,6 @@ type Taccountant = {
   //
   isRelationedInvoiceChanged: boolean;
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
-};
-
-type Tstate = {
-  isAccountantOrderChanged: boolean;
-  isInvoiceAllowanceChanged: boolean;
-  invoice: Tinvoice;
-  accountantArr: Taccountant[];
 };
 
 type TstateList = {
@@ -239,6 +240,7 @@ export default function AccountantSorting({
       list[invoiceId] = {
         isAccountantOrderChanged: false,
         isInvoiceAllowanceChanged: false,
+        isInvoiceAccountantRelationChanged: false,
         invoice: {
           id: invoiceId,
           invoiceNumber,
@@ -654,8 +656,6 @@ function handleDragOver(
 
   //over是否為Droppable container 就是useDroppable處理並綁定的的那個div
   if (over?.data.current?.isContainer) {
-    console.log(e);
-
     const {
       //  isContainer,
       invoice,
@@ -689,6 +689,8 @@ function handleDragOver(
 
       state_active.isAccountantOrderChanged = true;
       state_over.isAccountantOrderChanged = true;
+      state_active.isInvoiceAccountantRelationChanged = true;
+      state_over.isInvoiceAccountantRelationChanged = true;
 
       // 必須更新，送進SortableContext的items才會更新狀態
       state_active.accountantArr = [...state_active.accountantArr];
@@ -704,7 +706,7 @@ function handleDragOver(
     });
 
     return;
-  }
+  } // if (over?.data.current?.isContainer) close
 
   // const { invoice: invoice_active, accountant: accountant_active } = (active.data.current as TdndData) ?? {};
   // const { invoice: invoice_over, accountant: accountant_over } = (over?.data.current as TdndData) ?? {};
@@ -734,6 +736,8 @@ function handleDragOver(
 
     state_active.isAccountantOrderChanged = true;
     state_over.isAccountantOrderChanged = true;
+    state_active.isInvoiceAccountantRelationChanged = true;
+    state_over.isInvoiceAccountantRelationChanged = true;
 
     // 必須更新，送進SortableContext的items才會更新狀態
     state_active.accountantArr = [...state_active.accountantArr];

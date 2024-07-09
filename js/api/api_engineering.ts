@@ -12,6 +12,7 @@ import { createUseInfinite } from './createUseInfinite';
 
 // type
 import type {
+  TapiError,
   Tparams,
   TpageMetaDto,
   TengineeringContactDto,
@@ -62,11 +63,13 @@ import type {
   TincomeBillSerialDto,
   TupdateIncomeBillSerialDto,
   TcreateAccountReceivableAccountsDto,
+  TupdateAccountReceivableAccountantDto,
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
 
 export type {
+  TapiError,
   Tparams,
   TpageMetaDto,
   TengineeringContactDto,
@@ -119,6 +122,7 @@ export type {
   TincomeBillSerialDto,
   TupdateIncomeBillSerialDto,
   TcreateAccountReceivableAccountsDto,
+  TupdateAccountReceivableAccountantDto,
 } from './dtoTypes';
 
 export type { TinvouceCheckResult };
@@ -1381,23 +1385,19 @@ export const apiDeleteAccountReceivableAccountant = async (accountReceivableId: 
 };
 
 /**更新 收款紀錄與發票關聯 account-receivable-accountant */
-export const apiPatchAccountReceivableAccountant = async (
-  accountReceivableId: string,
-  accountantId: string,
-  body: string[]
-) => {
-  const api = `/engineering/account-receivable/${accountReceivableId}/accountant/${accountantId}`;
+// deprecated
+// export const apiPatchAccountReceivableAccountant = async (
+//   accountReceivableId: string,
+//   accountantId: string,
+//   body: string[]
+// ) => {
+//   const api = `/engineering/account-receivable/${accountReceivableId}/accountant/${accountantId}`;
 
-  return axi
-    .patch(api, body)
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
-};
-
-type TgetAccountReceivableDeductions = {
-  data: TaccountsReceivableDeductionDto[];
-  meta: TpageMetaDto;
-};
+//   return axi
+//     .patch(api, body)
+//     .then(({ data }) => data)
+//     .catch((err) => Promise.reject(err));
+// };
 
 /**取得 所有 應收帳款 扣款明細 account-receivable-deduction */
 const apiGetAccountReceivableDeductions = async (accountReceivableId: string, params?: Tparams) => {
@@ -1766,38 +1766,59 @@ export const apiPatchEngineeringContactReviewAttachment = async (id: string, bod
 
 // region 要找時間整理一下拉
 
-export const apiPatchAccountantInvoice = (
-  {
-    accountReceivableId,
-    invoiceId,
-    accountantId,
-  }: {
-    accountReceivableId: string;
-    invoiceId: string;
-    accountantId: string;
-  },
-  {
-    callAlert,
-  }: {
-    callAlert?: boolean;
-  } = {}
-) => {
-  const api = `/engineering/account-receivable/${accountReceivableId}/accountant/${accountantId}`;
+// 已無此api
+// export const apiPatchAccountantInvoice = (
+//   {
+//     accountReceivableId,
+//     invoiceId,
+//     accountantId,
+//   }: {
+//     accountReceivableId: string;
+//     invoiceId: string;
+//     accountantId: string;
+//   },
+//   {
+//     callAlert,
+//   }: {
+//     callAlert?: boolean;
+//   } = {}
+// ) => {
+//   const api = `/engineering/account-receivable/${accountReceivableId}/accountant/${accountantId}`;
 
-  const body = {
-    invoiceId,
-  };
+//   const body = {
+//     invoiceId,
+//   };
+
+//   return axi
+//     .patch(api, body)
+//     .then(({ data }) => data)
+//     .catch((err) => {
+//       if (callAlert) {
+//         myAlert.err({ title: '更新收款紀錄與發票關聯失敗', content: err.message });
+//       }
+
+//       return Promise.reject(err);
+//     });
+// };
+
+// 更新指定ReceivableAccountant下指定發票與accountant的關聯
+export const apiPatchAccountReceivableAccountant = async (id: string, body: TupdateAccountReceivableAccountantDto) => {
+  const api = `/engineering/account-receivable/${id}/accountant`;
 
   return axi
     .patch(api, body)
     .then(({ data }) => data)
-    .catch((err) => {
-      if (callAlert) {
-        myAlert.err({ title: '更新收款紀錄與發票關聯失敗', content: err.message });
-      }
+    .catch((err: AxiosError<TapiError>) => {
+      const { error, message, status } = err.response?.data ?? {};
+      myAlert.err({ title: '更新收款紀錄與發票關聯失敗', content: `${status}_${message}$` });
 
       return Promise.reject(err);
     });
+};
+
+type TgetAccountReceivableDeductions = {
+  data: TaccountsReceivableDeductionDto[];
+  meta: TpageMetaDto;
 };
 
 // 檢查發票號碼是否存在 // 這個api其實是用invoiceNumber找invoice

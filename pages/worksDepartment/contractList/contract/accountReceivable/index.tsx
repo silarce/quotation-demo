@@ -34,13 +34,14 @@ import {
   TcreateAccountReceivablePeriodDto,
   TcreateAccountReceivableDto,
   TupdateAccountReceivableDto,
+  TupdateAccountReceivableAccountantDto,
   apiPatchAccountReceivablePeriodInvoiceAllowance,
   apiPostAccountReceivable,
   apiPatchAccountReceivable,
   apiPostAccountReceivablePeriod, // 新增應收帳款發票
-  apiPatchAccountantInvoice,
   apiDeleteAccountReceivableInvoice,
   apiDeleteAccountReceivablePeriod,
+  apiPatchAccountReceivableAccountant,
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
@@ -315,11 +316,15 @@ export default function AccountReceivable() {
     update_contract();
   };
 
-  // region PatchAccountant_sorting
+  // MARK: PatchAccountant_sorting
   const reqPatchAccountant_sorting = async (
     //
     stateList: Tstate_accountantSorting
   ) => {
+    if (!accountReceivable) {
+      return;
+    }
+
     const accountantArr: {
       id: string;
       invoiceId: string;
@@ -328,13 +333,22 @@ export default function AccountReceivable() {
       isRelationedInvoiceChanged: boolean;
     }[] = [];
 
-    for (const state of Object.values(stateList)) {
+    const relationChangedList: Tstate_accountantSorting = {};
+
+    for (const key of Object.keys(stateList)) {
+      const state = stateList[key];
+
       const {
         isAccountantOrderChanged,
         isInvoiceAllowanceChanged,
+        isInvoiceAccountantRelationChanged,
         invoice,
         accountantArr: state_accountantArr,
       } = state;
+
+      if (isInvoiceAccountantRelationChanged) {
+        relationChangedList[key] = state;
+      }
 
       if (isInvoiceAllowanceChanged) {
         await apiPatchAccountReceivablePeriodInvoiceAllowance(String(invoice.id), {
@@ -362,26 +376,42 @@ export default function AccountReceivable() {
       }
     }
 
+    const relationChangedArr = Object.values(relationChangedList);
+
+    if (relationChangedArr.length > 0) {
+      const body: TupdateAccountReceivableAccountantDto = relationChangedArr.map((state) => {
+        const { invoice, accountantArr } = state;
+
+        return {
+          invoiceId: String(invoice.id),
+          accountantId: accountantArr.map((accountant) => String(accountant.id)),
+        };
+      });
+
+      await apiPatchAccountReceivableAccountant(accountReceivable.id, body);
+    }
+
     for (const accountant of accountantArr) {
       const {
         //
-        id,
-        invoiceId,
+        // id,
+        // invoiceId,
         order,
         accountsReceivableDeduction,
-        isRelationedInvoiceChanged,
+        // isRelationedInvoiceChanged,
       } = accountant;
 
+      // 棄用，以上面的apiPatchAccountReceivableAccountant取代;
       // 修改accountant的關聯invoice;
-      if (accountReceivable && isRelationedInvoiceChanged) {
-        await apiPatchAccountantInvoice({
-          accountReceivableId: accountReceivable.id,
-          invoiceId,
-          accountantId: id,
-        });
-      }
+      // if (accountReceivable && isRelationedInvoiceChanged) {
+      //   await apiPatchAccountantInvoice({
+      //     accountReceivableId: accountReceivable.id,
+      //     invoiceId,
+      //     accountantId: id,
+      //   });
+      // }
 
-      //修改排序
+      // 修改排序;
       await apiPatchAccountant_accountReceivable(accountant.id, {
         order: order,
         // 雖然只是要改order，但是不送accountsReceivableDeduction的話
