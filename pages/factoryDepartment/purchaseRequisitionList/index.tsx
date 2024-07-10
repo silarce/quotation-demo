@@ -47,7 +47,7 @@ export default function PurchaseRequisitionList() {
         create_by,
         approved,
     } = router.query;
-    
+
     const getQueryParam = (param: any) => {
         if (Array.isArray(param)) {
             return param[0];
@@ -251,7 +251,7 @@ export default function PurchaseRequisitionList() {
     //取對應的請購明細
     const getPurchaseRequisitionDetail = async (purchaserequisitionuuid: any) => {
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel: {
                 purchaserequisitionuuid: string | undefined
             } = {
@@ -289,7 +289,7 @@ export default function PurchaseRequisitionList() {
             setError(error.message);
         }
         finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
 
@@ -377,7 +377,7 @@ export default function PurchaseRequisitionList() {
 
             getPurchaseRequisitionDetail(checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid);
 
-            GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid);
+            // GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -502,6 +502,21 @@ export default function PurchaseRequisitionList() {
             },
         });
     }
+
+    const handleAddToList = (item: any) => {
+        console.log(item);
+        if (item.suppliername === null || item.suppliername === undefined || item.suppliername === '') {
+            myAlert.warning({title:'尚未詢價',content:'請確認是否詢價完畢，並確認供應商'})
+        } else {
+            // 判斷不重覆加入
+            if (!data2.find(existingItem => existingItem.purchaserequisitiondetailuuid === item.purchaserequisitiondetailuuid)) {
+                // 將item加入到data2中
+                setData2(prevData2 => [...prevData2, item]);
+            }
+        }
+    }
+
+
 
 
     //#region  詢價單modal
@@ -772,6 +787,9 @@ export default function PurchaseRequisitionList() {
 
 
 
+
+
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={quotationStatusLookup[status] ?? '請購單'} panelList={panelList} />
@@ -911,8 +929,8 @@ export default function PurchaseRequisitionList() {
                                         <span>{_item.totalprice.toLocaleString()}</span>
                                         <span>{_item.suppliername}</span>
                                         <span>
-                                            <button>
-                                                <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                            <button onClick={() => { handleAddToList(_item) }}>
+                                                <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
                                             </button>
                                         </span>
                                     </div>
@@ -1094,9 +1112,9 @@ export default function PurchaseRequisitionList() {
                             </button> */}
                             {/* <MyButton_v2 px='px22' py='py4' theme={undefined} label="進貨/批次進貨" onClick={() => { handleReceipt() }} /> */}
                         </span>
-                        <Thead01 type={'PurchaseOrderDetail2'} />
+                        <Thead01 type={'PurchaseRequisitionDetail2'} />
                         {data2.map((_item, index) => (
-                            <CellWithBar key={index} className={scss.panelHeader13}>
+                            <CellWithBar key={index} className={scss.panelHeader21}>
                                 <div className={scss.row01}>
                                     <span>{index + 1}</span>
                                     <span>{_item.productid}</span>
@@ -1145,6 +1163,9 @@ export default function PurchaseRequisitionList() {
                                     </span>
                                     <span>
                                         {_item.totalprice.toLocaleString()}
+                                    </span>
+                                    <span>
+                                        {_item.suppliername}
                                     </span>
                                     <span>
                                         <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>

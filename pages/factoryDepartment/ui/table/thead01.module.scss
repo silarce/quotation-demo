@@ -409,7 +409,6 @@
     color: #979797;
   }
 }
-
 //#endregion
 
 //#region 進貨單明細
@@ -481,6 +480,35 @@
   display: grid;
   grid-template-columns: 30px 150px 300px 300px 50px 40px 40px 60px 60px 150px 40px ;
   // gap: 5px;
+  height: 30px;
+  padding: 0 20px;
+  background-color: $bgc01;
+
+  >* {
+    margin: auto;
+    margin-left: 0;
+
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+
+  >span {
+    font-weight: 400;
+    font-size: 14px;
+    color: #979797;
+  }
+}
+//#endregion
+//#region 請購單明細2
+.thead21 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 70px;
+  gap: 5px;
   height: 30px;
   padding: 0 20px;
   background-color: $bgc01;

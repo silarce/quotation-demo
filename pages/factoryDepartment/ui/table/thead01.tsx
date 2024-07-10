@@ -227,6 +227,24 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
+    //#region 採購單明細2
+    else if (type === "PurchaseRequisitionDetail2") {
+      return (
+        <div className={style.thead21}>
+          <span>序</span>
+          <span>料號</span>
+          <span>品名</span>
+          <span>已進數量</span>
+          <span>數量</span>
+          <span>單位</span>
+          <span>單價</span>
+          <span>金額</span>
+          <span>廠商</span>
+          <span></span>
+        </div>
+      )
+    }
+    //#endregion
   //#region 詢價單明細
   else if (type === "Quotereq") {
     return (

@@ -115,6 +115,81 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     });
   }
 
+  const recodeWhpid = (length: any, width: any, childlength: any, childwidth: any) => {
+    const convertToAlpha = (num: number): string => {
+        return String.fromCharCode(65 + num - 1);
+    };
+
+    const convertToNumber = (num: number, pad: number): string => {
+        return num.toString().padStart(pad, '0');
+    };
+
+    const alphaIncrement = (alpha: string): string => {
+        if (alpha === 'Z') {
+            return 'A';
+        } else {
+            return String.fromCharCode(alpha.charCodeAt(0) + 1);
+        }
+    };
+
+    const numberIncrement = (num: number, max: number, pad: number): string => {
+        if (num >= max) {
+            return convertToNumber(1, pad);
+        } else {
+            return convertToNumber(num + 1, pad);
+        }
+    };
+
+    let newlength = '';
+    let newwidth = '';
+    let newchildlength = '';
+    let newchildwidth = '';
+
+    // 處理 length 的增量
+    if (length === '1') {
+        newlength = 'A';
+    } else {
+        newlength = convertToAlpha(parseInt(length, 10));
+    }
+
+    // 處理 width 的增量
+    if (width === '1') {
+        newwidth = '001';
+    } else {
+        newwidth = convertToNumber(parseInt(width, 10), 3);
+    }
+
+    // 處理 childlength 的增量
+    if (childlength === '1') {
+        newchildlength = 'A';
+    } else {
+        newchildlength = convertToAlpha(parseInt(childlength, 10));
+    }
+
+    // 處理 childwidth 的增量
+    if (childwidth === '1') {
+        newchildwidth = '1';
+    } else {
+        newchildwidth = numberIncrement(parseInt(childwidth), 100, 1);
+    }
+
+    // 增量操作
+    if (childlength !== '1' && newchildwidth === '001') {
+        newchildlength = alphaIncrement(newchildlength);
+    }
+
+    if (width !== '1' && newchildlength === 'A' && newchildwidth === '1') {
+        newwidth = numberIncrement(parseInt(width), 100, 3);
+    }
+
+    if (length !== '1' && newwidth === '001' && newchildlength === 'A' && newchildwidth === '1') {
+        newlength = alphaIncrement(newlength);
+    }
+
+    return newlength + newwidth + newchildlength + (parseInt(newchildwidth)-1).toString();
+};
+
+
   async function GetPickingListDetailById(plid: any, create_at: any, create_by: any, lotid: any, picked: any, item: any) {
 
     // console.log(item);
@@ -299,7 +374,10 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
             <CellWithBar key={index} className={scss.panelHeader3}  >
               <div className={scss.row01} >
                 {/* <span>{_item.materialnumber}</span> */}
-                <span>{_item.length}-{_item.width}</span>
+                <span>
+                {`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}
+                  {/* {_item.length}-{_item.width} */}
+                  </span>
                 <span>{_item.materialnumber}</span>
                 {/* <span>{_item.batchnumber}</span> */}
                 <span>{_item.whpname}</span>
