@@ -105,7 +105,11 @@ export default function ProdReceiptList() {
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
-
+    useEffect(() => {
+        if (firstin !== undefined) {
+            setCheckFirstIn(parseInt(firstin as string) || 0);
+        }
+    }, [firstin]);
 
     //#region 上方功能列
 
