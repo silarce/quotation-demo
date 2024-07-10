@@ -20,9 +20,9 @@
     grid-template-columns: 430px 1fr; // 左右兩邊比例，可以調整
     gap: 15px;
     width: auto;
-    margin-top: 4px;
-    margin-left: 4px;
-    margin-right: 4px;
+    // margin-top: 4px;
+    // margin-left: 4px;
+    // margin-right: 4px;
     // background-color: gray;
 }
 
@@ -34,7 +34,8 @@
     overflow-x: hidden;
     overflow-y: auto;
     border: 1px solid gray;
-    min-height: 100vh-30vh;
+    // min-height: 100vh-30vh;
+    height:715px;
     /* 自動調整高度到螢幕大小 */
 }
 
@@ -57,6 +58,7 @@
     // background-color: red;
     border: 1px solid gray;
     overflow-y: auto;
+    height:715px;
 }
 
 
@@ -196,7 +198,7 @@ div.panelHeader13 {
   
     .row01 {
       display: grid;
-      grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 60px;
+      grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 70px;
       gap: 5px;
     }
   }
