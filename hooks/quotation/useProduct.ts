@@ -690,11 +690,13 @@ const useProductList = ({
       // const list: TproductList = {};
 
       const keyArr_productList_attach = Object.keys(productList_attach);
+
       keyArr_productList_attach.forEach((key) => {
         delete productList_attach[key];
       });
 
       productArr_attach.forEach((prod) => {
+        // w 注意 order不是唯一值，若有多個prod的order一樣，後者會蓋掉前者
         const key = prod.order !== undefined ? `${prod.order}` : nanoid();
 
         // if (key in productList_attach) {
@@ -734,17 +736,22 @@ const useProductList = ({
 
   // TODO 暫時先在prod放attachId這個property處理每次list的key都不一樣的問題
   // 以後最好還是做成狀態較好
-  const attachProdList: { [key: string]: Class_product } = {};
-  Object.values(productList).forEach((prod, index) => {
-    Object.values(prod.exchangeProdList).forEach((item) => {
+  const attachProdList = useMemo(() => {
+    const attachProdList: { [key: string]: Class_product } = {};
+    Object.values(productList).forEach((prod, index) => {
+      Object.values(prod.exchangeProdList).forEach((item) => {
+        const newId = item.attachId;
+        attachProdList[newId] = item;
+      });
+    });
+
+    Object.values(productList_attach).forEach((item, index) => {
       const newId = item.attachId;
       attachProdList[newId] = item;
     });
-  });
-  Object.values(productList_attach).forEach((item, index) => {
-    const newId = item.attachId;
-    attachProdList[newId] = item;
-  });
+
+    return attachProdList;
+  }, [render, productList, productList_attach]);
 
   /**追加總金額 */
   let attachAddTotal = 0;

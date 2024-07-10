@@ -112,6 +112,8 @@ export default function AttachContract({
     []
   );
 
+  const [verticleKeyArr_attach, setVerticleKeyArr_attach] = useState<string[]>();
+
   // ------------------------------------------------------------------------------
 
   // region useData
@@ -239,6 +241,7 @@ export default function AttachContract({
       //
       state_paymentMethod,
       state_summary,
+      verticleKeyArr_attach,
     });
   };
 
@@ -581,7 +584,9 @@ export default function AttachContract({
               setTargetProd={setTargetProdKey_attach}
               defalutVKeyArr={Object.keys(attachProdList)}
               // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
-              onVKeyChange={() => {}}
+              onVKeyChange={(keyArr) => {
+                setVerticleKeyArr_attach(keyArr);
+              }}
               rowHeight="h60"
               // isAttach={true}
               // panelBox="resetChangeBox"
@@ -683,6 +688,7 @@ const reqModify = async ({
   //
   state_paymentMethod,
   state_summary,
+  verticleKeyArr_attach,
 }: {
   router: ReturnType<typeof useRouter>;
   setIsLading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -705,6 +711,7 @@ const reqModify = async ({
   //
   state_paymentMethod: Tstate_paymentMethodItem[];
   state_summary: Tstate_summary;
+  verticleKeyArr_attach: string[] | undefined;
 }) => {
   try {
     setIsLading(true);
@@ -778,13 +785,41 @@ const reqModify = async ({
     }
 
     // 追加跟變更
-    const attachProdArr = Object.values(attachProdList).map((prod, index) => {
-      if (!prod.isComponentOk) {
-        breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+    // const attachProdArr = Object.values(attachProdList).map((prod, index) => {
+    //   if (!prod.isComponentOk) {
+    //     breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+    //   }
+
+    //   return prod.body;
+    // });
+    // verticleKeyArr_attach
+    const attachProdArr = (() => {
+      if (verticleKeyArr_attach) {
+        return verticleKeyArr_attach.map((key, index) => {
+          const prod = attachProdList[key];
+
+          if (!prod.isComponentOk) {
+            breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+          }
+
+          const body = prod.body;
+          body.order = index;
+
+          return body;
+        });
       }
 
-      return prod.body;
-    });
+      return Object.values(attachProdList).map((prod, index) => {
+        if (!prod.isComponentOk) {
+          breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+        }
+
+        const body = prod.body;
+        body.order = index;
+
+        return body;
+      });
+    })();
 
     // console.log('attachProdArr', attachProdArr);
 
@@ -862,12 +897,11 @@ const reqModify = async ({
       return;
     }
 
-    // console.log('body', body);
-
     try {
-      await apiQuotationModify(contractId, body);
+      const res = await apiQuotationModify(contractId, body);
       setIsLading(false);
       // router.back();
+      router.push(`/domestic/quotationList/attachQuotation?id=${res.id}`);
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '上傳失敗', content: err.message });

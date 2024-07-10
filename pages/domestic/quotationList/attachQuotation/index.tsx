@@ -397,7 +397,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   // --------------------------------------------------------------------
-  const { contractArr, contentArr, contentProdList } = useMemo(() => {
+  const { contractProdArr, contentProdArr, contentProdList } = useMemo(() => {
     if (!quotationData) {
       return {};
     }
@@ -417,11 +417,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
     });
 
     /**
-latestVersionProductList為所有主產品迭代後的結果
-latestContentProdArr為這次追加追減的主產品
-有rootProductId的prod代表是追減而來的主產品，簡稱追減主產品
-將 latestVersionProductList[追減主產品.rootProductId].quantity
-減掉 追減主產品.quantity 即可得到 追減主產品的reduceQty
+    latestVersionProductList為所有主產品迭代後的結果
+    latestContentProdArr為這次追加追減的主產品
+    有rootProductId的prod代表是追減而來的主產品，簡稱追減主產品
+    將 latestVersionProductList[追減主產品.rootProductId].quantity
+    減掉 追減主產品.quantity 即可得到 追減主產品的reduceQty
 
     */
 
@@ -445,8 +445,8 @@ latestContentProdArr為這次追加追減的主產品
     });
 
     return {
-      contractArr: Object.values(contractProdList),
-      contentArr: Object.values(contentProdList),
+      contractProdArr: Object.values(contractProdList),
+      contentProdArr: Object.values(contentProdList),
       contentProdList,
     };
   }, [quotationData]);
@@ -457,7 +457,7 @@ latestContentProdArr為這次追加追減的主產品
     pdfData,
   } = useModalQuotationPdf({
     quotationContent: quotationData?.latestContent,
-    attachedProdArr: [...(contractArr ?? []), ...(contentArr ?? [])],
+    attachedProdArr: [...(contractProdArr ?? []), ...(contentProdArr ?? [])],
   });
 
   // -----------------------------------------------------
@@ -621,11 +621,11 @@ latestContentProdArr為這次追加追減的主產品
     attachTotal,
     avgDiscount_withQty,
   } = useProductList({
-    productArr: contractArr,
+    productArr: contractProdArr,
     others: quotationData?.latestContent.others,
-    resetTrigger: contractArr,
+    resetTrigger: contractProdArr,
     // onDoorTypeChange: onDoorTypeChange,
-    productArr_attach: contentArr,
+    productArr_attach: contentProdArr,
     quotationDiscount: Number(state_summary.discountRate || '100'),
   });
 

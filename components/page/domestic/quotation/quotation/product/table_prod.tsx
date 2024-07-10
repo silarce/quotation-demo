@@ -20,6 +20,12 @@ import { Class_product, TprodKey, TproductList } from 'hooks/quotation/useProduc
 import scss from './table_prod.module.scss';
 import scss_table from '../table.module.scss';
 
+// ============================================================================
+
+// ============================================================================
+
+// MARK: START
+
 export default function Table_prod({
   disabled,
   disabled_plus,
@@ -78,6 +84,7 @@ export default function Table_prod({
   const ref = useRef<HTMLDivElement>(null);
   // -----------------------------------------------------------------------
   const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
+
   // -----------------------------------------------------------------------
 
   const [showInputModal, setShowInputModal] = useState(false);
