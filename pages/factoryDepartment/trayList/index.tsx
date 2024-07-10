@@ -118,7 +118,7 @@ export default function TrayList() {
     };
 
 
-   
+
 
     const fetchData = async () => {
         try {
@@ -247,6 +247,83 @@ export default function TrayList() {
         });
     }
 
+    const recodeWhpid = (length: any, width: any, childlength: any, childwidth: any) => {
+        const convertToAlpha = (num: number): string => {
+            return String.fromCharCode(65 + num - 1);
+        };
+    
+        const convertToNumber = (num: number, pad: number): string => {
+            return num.toString().padStart(pad, '0');
+        };
+    
+        const alphaIncrement = (alpha: string): string => {
+            if (alpha === 'Z') {
+                return 'A';
+            } else {
+                return String.fromCharCode(alpha.charCodeAt(0) + 1);
+            }
+        };
+    
+        const numberIncrement = (num: number, max: number, pad: number): string => {
+            if (num >= max) {
+                return convertToNumber(1, pad);
+            } else {
+                return convertToNumber(num + 1, pad);
+            }
+        };
+    
+        let newlength = '';
+        let newwidth = '';
+        let newchildlength = '';
+        let newchildwidth = '';
+    
+        // 處理 length 的增量
+        if (length === '1') {
+            newlength = 'A';
+        } else {
+            newlength = convertToAlpha(parseInt(length, 10));
+        }
+    
+        // 處理 width 的增量
+        if (width === '1') {
+            newwidth = '001';
+        } else {
+            newwidth = convertToNumber(parseInt(width, 10), 3);
+        }
+    
+        // 處理 childlength 的增量
+        if (childlength === '1') {
+            newchildlength = 'A';
+        } else {
+            newchildlength = convertToAlpha(parseInt(childlength, 10));
+        }
+    
+        // 處理 childwidth 的增量
+        if (childwidth === '1') {
+            newchildwidth = '1';
+        } else {
+            newchildwidth = numberIncrement(parseInt(childwidth), 100, 1);
+        }
+    
+        // 增量操作
+        if (childlength !== '1' && newchildwidth === '001') {
+            newchildlength = alphaIncrement(newchildlength);
+        }
+    
+        if (width !== '1' && newchildlength === 'A' && newchildwidth === '1') {
+            newwidth = numberIncrement(parseInt(width), 100, 3);
+        }
+    
+        if (length !== '1' && newwidth === '001' && newchildlength === 'A' && newchildwidth === '1') {
+            newlength = alphaIncrement(newlength);
+        }
+    
+        return newlength + newwidth + newchildlength + (parseInt(newchildwidth)-1).toString();
+    };
+
+    
+    
+
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname} panelList={panelList} />
@@ -284,7 +361,8 @@ export default function TrayList() {
                                                                             style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
                                                                             onMouseEnter={() => setHoverInfo(`${childDataItem.whpname}\n${childDataItem.spec}\n${childDataItem.quantity}`)}
                                                                             onMouseLeave={() => setHoverInfo(null)}>
-                                                                            {childDataItem.length}-{childDataItem.width}<br />
+                                                                            {/* {childDataItem.length}-{childDataItem.width}-{childDataItem.childlength}-{childDataItem.childwidth}<br /> */}
+                                                                            {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
                                                                         </button>
                                                                     </td>
                                                                 ))}
