@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
@@ -7,7 +7,11 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
-import SupplyTable, { Tcontrol_nestedRow } from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
+import SupplyTable, {
+  Tgroup,
+  Tprops_cell,
+  Tprops_cell_input,
+} from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
 
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -19,17 +23,16 @@ import { TemployeeDto } from 'js/api/dtoTypes';
 
 // ==================================================================
 type Tquery = {
-  historyId: string | undefined;
+  requirementRecordId: string | undefined;
 };
 
 // ==================================================================
 export default function EditRequirementRecord() {
   const router = useRouter();
-  const { historyId } = router.query as Tquery;
+  const { requirementRecordId } = router.query as Tquery;
 
   // ------------------------------------------------------------------
   const [disabled, setDisabled] = useState(true);
-
   const [showSelector, setShowSelector] = useState(false);
 
   // ------------------------------------------------------------------
@@ -39,140 +42,8 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
-  const fakeData_lockbox: Tcontrol_nestedRow = {
-    name: '鎖盒',
-    subTypeArr: [
-      {
-        name: '智慧型（含主機）',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '智慧型（含主機）+ 發訊器',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '智慧型（含主機）+ 發射器',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '智慧型（含主機）+ 發訊器 + 發射器',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '面板式',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '埋入式',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '外露式',
-        needQty_inputAttr: {},
-      },
-    ],
-  };
-
-  const fakeData_key: Tcontrol_nestedRow = {
-    name: '鎖匙',
-    subTypeArr: [
-      {
-        name: '鎖號',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '特殊鎖號',
-        needQty_inputAttr: {},
-      },
-    ],
-  };
-
-  const fakeData_panel: Tcontrol_nestedRow = {
-    name: '控制箱/盤',
-    typeName: '捲門/水閘門',
-    subTypeArr: [
-      {
-        name: '馬達控制箱 220V 2HP',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '馬達控制箱 220V 2HP',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '馬達控制箱 220V 2HP',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '馬達控制箱 220V 2HP',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '馬達控制箱 220V 2HP',
-        needQty_inputAttr: {},
-      },
-    ],
-  };
-
-  const fakeData_pressButton: Tcontrol_nestedRow = {
-    name: '押扣',
-    subTypeArr: [
-      {
-        name: '三點式（一般）',
-        needQty_inputAttr: {},
-      },
-    ],
-  };
-
-  const fakeData_firefightingSupplies: Tcontrol_nestedRow = {
-    name: '消防備品',
-    subTypeArr: [
-      {
-        name: '煙感器',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '中繼器 1φ 220v',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '中繼器 3φ 380v',
-        needQty_inputAttr: {},
-      },
-    ],
-  };
-
-  const fakeData_host: Tcontrol_nestedRow = {
-    name: '主機',
-    subTypeArr: [
-      {
-        name: '遙控器（1:2）+ 障感器',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '遙控器（1:2）',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '障感器',
-        needQty_inputAttr: {},
-      },
-    ],
-  };
-
-  const fakeData_infrared: Tcontrol_nestedRow = {
-    name: '紅外線',
-    subTypeArr: [
-      {
-        name: '反射式',
-        needQty_inputAttr: {},
-      },
-      {
-        name: '對照式',
-        needQty_inputAttr: {},
-      },
-    ],
-  };
+  // const [state_count, set_state_count] = useState(0);
+  // const ref_form = useRef<HTMLFormElement>(null);
 
   // ------------------------------------------------------------------
 
@@ -259,20 +130,16 @@ export default function EditRequirementRecord() {
           <InputSel caption="樘數" {...confit_inputSel} disabled={disabled} inputProps={{ props: { value: '9999' } }} />
         </div>
         {/* table */}
-        <SupplyTable
-          className="mt-[50px]"
-          qtyType={'request'}
-          rowArr={[
-            fakeData_lockbox,
-            fakeData_key,
-            fakeData_panel,
-            fakeData_pressButton,
-            fakeData_firefightingSupplies,
-            fakeData_host,
-            fakeData_infrared,
-          ]}
-          disabled={disabled}
-        />
+        {/* <SupplyTable disabled={disabled} /> */}
+
+        {/* 考慮以form的方式或事件代理的方式處理這一大串的表格  */}
+        {/* <form key={state_count} ref={ref_form}>
+          <input defaultValue={'A'} type="text" data-foo="A" />
+          <input defaultValue={'B'} type="text" data-foo="B" />
+          <input defaultValue={'C'} type="text" data-foo="C" />
+        </form> */}
+
+        {/* <button onClick={() => set_state_count((state) => state + 1)}>btn</button> */}
 
         {/*  */}
         <SelectorGroup
@@ -289,6 +156,8 @@ export default function EditRequirementRecord() {
     </SubLayer>
   );
 }
+
+// ==================================================================
 
 // ==================================================================
 

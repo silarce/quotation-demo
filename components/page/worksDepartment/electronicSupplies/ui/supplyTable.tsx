@@ -14,29 +14,6 @@ import scss_p from '../_public.module.scss';
 
 // 先簡單處理，真的有效能問題再用memo
 
-// type Tgroup = {
-//   // 品名
-//   itemName: string;
-//   subItemName?: string | null;
-//   rowArr: {
-//     // 種類
-//     category: string;
-
-//     // 已領數量
-//     pickUpQuantity?: number | null;
-//     // 未領數量
-//     stayQuantity?: number | null;
-//     // 總需求數量
-//     quantity?: number | null;
-//     //
-
-//     // 領取數量
-//     pickupRecord?: TcontrolItem;
-//     // 需求數量
-//     requirementQty?: TcontrolItem;
-//   }[];
-// };
-
 // type TrowProperty = 'pickUpQuantity' | 'stayQuantity' | 'quantity' | 'pickupRecord' | 'requirementQty';
 
 type Tgroup = {
@@ -110,7 +87,6 @@ type Tprops_cell_input = {
 
 export type { Tgroup, Tprops_cell, Tprops_cell_input };
 
-// const foo: TruePropertyKeys = ['stayQuantity', 'pickUpQuantity'];
 // ==================================================================
 
 // MARK:START
@@ -133,8 +109,6 @@ export default function SupplyTable({
       {groupArr.map((props, index) => {
         return <Group key={index} disabled={disabled} {...props} />;
       })}
-
-      {/* <Group02 /> */}
     </div>
   );
 }
@@ -155,10 +129,6 @@ const Thead = ({ valueLabelArr }: { valueLabelArr: string[] }) => {
       {valueLabelArr.map((label, index) => {
         return <Cell_inputLabel key={index}>{label}</Cell_inputLabel>;
       })}
-
-      {/* <Cell_inputLabel>未領數量</Cell_inputLabel>
-      <Cell_inputLabel>已領數量</Cell_inputLabel>
-      <Cell_inputLabel>需求總數量</Cell_inputLabel> */}
     </div>
   );
 };
@@ -188,62 +158,10 @@ const Group = ({
             </Row>
           );
         })}
-
-        {/* <Row>
-          <Cell_category>喵</Cell_category>
-          <Cell_input />
-        </Row>
-        <Row>
-          <Cell_category>喵</Cell_category>
-          <Cell_input />
-        </Row>
-        <Row>
-          <Cell_category>喵</Cell_category>
-          <Cell_input />
-        </Row>
-        <Row>
-          <Cell_category>喵</Cell_category>
-          <Cell_input />
-        </Row> */}
       </div>
     </div>
   );
 };
-
-// const Group02 = () => {
-//   return (
-//     <div className={scss.group}>
-//       <Cell_itemName>鎖盒</Cell_itemName>
-//       <Cell_subItemName>汪</Cell_subItemName>
-//       <div className={scss.rowWrapper}>
-//         <Row>
-//           <Cell_category>喵</Cell_category>
-//           <Cell_input />
-//           <Cell_input />
-//           <Cell_input />
-//         </Row>
-//         <Row>
-//           <Cell_category>喵</Cell_category>
-//           <Cell_input />
-//           <Cell_input />
-//           <Cell_input />
-//         </Row>
-//         <Row>
-//           <Cell_category>喵</Cell_category>
-//           <Cell_input />
-//           <Cell_input />
-//           <Cell_input />
-//         </Row>
-//         <Row>
-//           <Cell_category>喵</Cell_category>
-//           <Cell_input />
-//           <Cell_input />
-//           <Cell_input />
-//         </Row>
-//       </div>
-//     </div>
-//   );
-// };
 
 const Row = (props: Tprops_cell) => {
   return (
@@ -303,22 +221,4 @@ const Cell_input = (props: Tprops_cell_input = {}) => {
   );
 };
 
-// const InputGroup_3 = () => {
-//   return (
-//     <div className={classNames(scss.inputGroup_3)}>
-//       <Cell_input />
-//       <Cell_input />
-//       {/* <Cell_input className={scss.abled} inputAttr={{ readOnly: false }} /> */}
-//       <Cell_input />
-//     </div>
-//   );
-// };
-
 // ============================================================================
-
-// region CONFIG
-
-// endregion CONFIG
-
-// 六種input
-// 未領數量 已領數量 需求總數量 /  已領數量 領取數量  / 需求數量
