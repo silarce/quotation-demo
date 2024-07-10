@@ -786,6 +786,8 @@ const reqModify = async ({
       return prod.body;
     });
 
+    // console.log('attachProdArr', attachProdArr);
+
     if (breakComponentProdIndex_attach) {
       return myAlert.warning({
         title: '追加/變更主產品之材料配件有誤',
@@ -860,10 +862,12 @@ const reqModify = async ({
       return;
     }
 
+    // console.log('body', body);
+
     try {
       await apiQuotationModify(contractId, body);
       setIsLading(false);
-      router.back();
+      // router.back();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '上傳失敗', content: err.message });

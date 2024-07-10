@@ -724,6 +724,11 @@ class Class_product {
 
     const prod: Tprod = {
       ...empty,
+      // 20240710
+      // 變更追加需要送來源產品id給後端，所以把id留下來
+      // 未仔細測試，不確定是否有問題
+      id: this._prodData.id,
+      //
       discount: this._prodData.discount,
       doorType: this.doorType,
       fullWidth: this.fullWidth,
@@ -794,6 +799,10 @@ class Class_product {
 
     const prod: Tprod = {
       ...empty,
+      // 20240710
+      // 變更追加需要送來源產品id給後端，所以把id留下來
+      // 未仔細測試，不確定是否有問題
+      id: this._prodData.id,
       doorType: this.doorType,
       quoteType: this._prodData.quoteType,
       itemName: this._prodData.itemName,
