@@ -26,62 +26,26 @@ import AccountantSorting, {
   Tstate_accountantSorting,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantSorting';
 
-// import Table_requestPayment, {
-//   Tcontrol_table_requestPayment,
-// } from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_requestPayment';
-// import AccountReceivable_dynaTable, {
-//   Tcontrol_dynaTable,
-//   Trow,
-// } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountReceivable_dynaTable';
-// import DeductionDetails from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetails';
-// import Table_request from 'components/page/worksDepartment/contracList/contract/accountReceivable/table_request';
-
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import {
-  // Tparams,
-  // TupdateEngineeringContactDto,
-  // TupdateAccountReceivableDto,
-  // TaccountReceivableDto,
   TcreateAccountReceivablePeriodDto,
   TcreateAccountReceivableDto,
-  TupdateAccountReceivablePeriodDto,
-  // TaccountsReceivableInvoiceDto,
-  //
-  // useGetEngineeringContact,
-  // useGetAccountReceivableAccountants,
-  // useGetAccountReceivableIncoices,
-  // useGetAccountReceivable_id,
-  // useGetFinalProduct, // 不是這個
-  //
-  // apiPatchAccountReceivable,
-  // apiPatchEngineeringContact,
-  // apiPostWorkSheet,
+  TupdateAccountReceivableDto,
+  TupdateAccountReceivableAccountantDto,
   apiPatchAccountReceivablePeriodInvoiceAllowance,
-  // apiPatchAccountReceivableAccountant,
-  // apiPatchAccountReceivableVoidInvoice,
   apiPostAccountReceivable,
-  // apiPostAccountReceivableAccountant,
-  // apiDeleteAccountReceivableAccountant,
+  apiPatchAccountReceivable,
   apiPostAccountReceivablePeriod, // 新增應收帳款發票
-  apiPatchAccountantInvoice,
-  // apiPatchAccountReceivableDeduction_accountant, // 批量更新 應收帳款 扣款明細
   apiDeleteAccountReceivableInvoice,
   apiDeleteAccountReceivablePeriod,
+  apiPatchAccountReceivableAccountant,
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
-import {
-  TaccountantDto,
-  // TupdateAccountantDto,
-  // TupdateAccountantDeductionDto,
-
-  //
-  //  apiPatchAccountant,
-  apiPatchAccountant_accountReceivable,
-} from 'js/api/api_accountant';
+import { TaccountantDto, apiPatchAccountant_accountReceivable } from 'js/api/api_accountant';
 
 import type { TcustomerDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
 
@@ -94,6 +58,10 @@ import { AxiosError } from 'axios';
 type TaccountReceivableContext = {
   customer: TcustomerDto | undefined;
 };
+
+type TreqPatchAccountReceivable = (body: TupdateAccountReceivableDto) => Promise<void>;
+
+export type { TreqPatchAccountReceivable };
 
 // ========================================================================
 
@@ -121,22 +89,14 @@ export default function AccountReceivable() {
     isFetching: isFetching_contract,
   } = useGetContract_id(contractId, {
     customPopulate: [
-      // 'subContracts.content.verifyForm'
       'content.customer',
       'engineeringContact',
       'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
       'accountReceivable.periods.invoices.accountantInvoiceBook',
-      // 'accountReceivable.periods',
     ],
   });
 
   const { engineeringContact, accountReceivable } = contract ?? {};
-
-  // const {
-  //   data: data_finalProdcut,
-  //   update: update_finalProduct,
-  //   isFetching: isFetching_finalProduct,
-  // } = useGetFinalProduct(contractId); // 不是這個，這是舊的
 
   const {
     data: data_finalProdcut = [],
@@ -172,7 +132,9 @@ export default function AccountReceivable() {
   //
   //
 
-  const reaPostAccountReceivable = async () => {
+  // MARK:PostAccountReceivable
+
+  const reqPostAccountReceivable = async () => {
     if (!contractId) {
       return myAlert.info({ title: '沒有合約編號' });
     }
@@ -186,9 +148,7 @@ export default function AccountReceivable() {
       hasNoContract: false,
       hasUncollectedAmounts: false,
       hasNotInstall: false,
-      // accountantId: [],
-      // accountReceivableDeduction: [],
-      // invoices: [],
+
       contractId: contractId,
       legacyContractId: null,
       isDone: false,
@@ -206,7 +166,24 @@ export default function AccountReceivable() {
     }
   };
 
-  // region reqAddInvoice
+  // MARK: PatchAccountReceivable
+  const reqPatchAccountReceivable: TreqPatchAccountReceivable = async (body) => {
+    const id = accountReceivable?.id;
+
+    if (!id) {
+      return;
+    }
+
+    return await apiPatchAccountReceivable(id, body)
+      .then(async () => {
+        await update_contract();
+      })
+      .catch((err) => {
+        throw err;
+      });
+  };
+
+  // region AddInvoice
   const reqAddInvoice = async (state_invoice: Tstate_period) => {
     if (!accountReceivable?.id) {
       alert('沒有accountReceivable.id');
@@ -215,15 +192,8 @@ export default function AccountReceivable() {
     }
 
     const {
-      // renderCount,
       type,
-      // period,
       rowArr,
-
-      // subTotal, // 虛的，後端沒有
-      // tax, // 虛的，後端沒有
-      // contractTotal, // 虛的，後端沒有
-
       retainage,
       deduction,
       writeOffDeposit,
@@ -309,7 +279,7 @@ export default function AccountReceivable() {
     }
   };
 
-  // region  reqPatchInvoiceAllowance
+  // region  PatchInvoiceAllowance
   const reqPatchInvoiceAllowance = async (invoiceId: string, allowance: number) => {
     try {
       setIsFetching_req(true);
@@ -325,7 +295,7 @@ export default function AccountReceivable() {
     }
   }; //reqPatchInvoiceArr
 
-  // region reqPatchAccountant
+  // region PatchAccountant
   const reqPatchAccountant = async (state_accountant: Tstate_accountant[]) => {
     for (const state of state_accountant) {
       const state_deduction = state.state_deduction;
@@ -346,11 +316,15 @@ export default function AccountReceivable() {
     update_contract();
   };
 
-  // region reqPatchAccountant_sorting
+  // MARK: PatchAccountant_sorting
   const reqPatchAccountant_sorting = async (
     //
     stateList: Tstate_accountantSorting
   ) => {
+    if (!accountReceivable) {
+      return;
+    }
+
     const accountantArr: {
       id: string;
       invoiceId: string;
@@ -359,13 +333,22 @@ export default function AccountReceivable() {
       isRelationedInvoiceChanged: boolean;
     }[] = [];
 
-    for (const state of Object.values(stateList)) {
+    const relationChangedList: Tstate_accountantSorting = {};
+
+    for (const key of Object.keys(stateList)) {
+      const state = stateList[key];
+
       const {
         isAccountantOrderChanged,
         isInvoiceAllowanceChanged,
+        isInvoiceAccountantRelationChanged,
         invoice,
         accountantArr: state_accountantArr,
       } = state;
+
+      if (isInvoiceAccountantRelationChanged) {
+        relationChangedList[key] = state;
+      }
 
       if (isInvoiceAllowanceChanged) {
         await apiPatchAccountReceivablePeriodInvoiceAllowance(String(invoice.id), {
@@ -393,26 +376,42 @@ export default function AccountReceivable() {
       }
     }
 
+    const relationChangedArr = Object.values(relationChangedList);
+
+    if (relationChangedArr.length > 0) {
+      const body: TupdateAccountReceivableAccountantDto = relationChangedArr.map((state) => {
+        const { invoice, accountantArr } = state;
+
+        return {
+          invoiceId: String(invoice.id),
+          accountantId: accountantArr.map((accountant) => String(accountant.id)),
+        };
+      });
+
+      await apiPatchAccountReceivableAccountant(accountReceivable.id, body);
+    }
+
     for (const accountant of accountantArr) {
       const {
         //
-        id,
-        invoiceId,
+        // id,
+        // invoiceId,
         order,
         accountsReceivableDeduction,
-        isRelationedInvoiceChanged,
+        // isRelationedInvoiceChanged,
       } = accountant;
 
+      // 棄用，以上面的apiPatchAccountReceivableAccountant取代;
       // 修改accountant的關聯invoice;
-      if (accountReceivable && isRelationedInvoiceChanged) {
-        await apiPatchAccountantInvoice({
-          accountReceivableId: accountReceivable.id,
-          invoiceId,
-          accountantId: id,
-        });
-      }
+      // if (accountReceivable && isRelationedInvoiceChanged) {
+      //   await apiPatchAccountantInvoice({
+      //     accountReceivableId: accountReceivable.id,
+      //     invoiceId,
+      //     accountantId: id,
+      //   });
+      // }
 
-      //修改排序
+      // 修改排序;
       await apiPatchAccountant_accountReceivable(accountant.id, {
         order: order,
         // 雖然只是要改order，但是不送accountsReceivableDeduction的話
@@ -425,7 +424,7 @@ export default function AccountReceivable() {
     update_contract();
   };
 
-  // MARK: reqDeleteInvoice
+  // MARK: DeleteInvoice
   const reqDeleteInvoice = async (invoiceId: string) => {
     try {
       setIsFetching_req(true);
@@ -437,7 +436,6 @@ export default function AccountReceivable() {
     }
   };
 
-  // apiDeleteAccountReceivablePeriod
   const reqDeletePeriod = async (periodId: string) => {
     try {
       setIsFetching_req(true);
@@ -460,7 +458,7 @@ export default function AccountReceivable() {
   isFetching = isFetching_contract || isFetching_finalProduct || isFetching_req;
 
   const panelList_01: TpanelList = [
-    { type: 'myButton', label: '建立應收帳款明細', onClick: () => reaPostAccountReceivable() },
+    { type: 'myButton', label: '建立應收帳款明細', onClick: () => reqPostAccountReceivable() },
   ];
 
   const panelList = panelList_01;
@@ -505,7 +503,11 @@ export default function AccountReceivable() {
       <div className={scss.main}>
         <Profile {...props_profile} />
 
-        <TotalCalc className="mt-10" accountReceivable={accountReceivable} />
+        <TotalCalc
+          className="mt-10"
+          accountReceivable={accountReceivable}
+          reqPatchAccountReceivable={reqPatchAccountReceivable}
+        />
 
         <AccountantSorting
           //

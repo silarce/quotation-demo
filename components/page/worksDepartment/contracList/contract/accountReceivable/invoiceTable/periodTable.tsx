@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useMemo, memo, useRef } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-import moment, { Moment } from 'moment';
-import { AxiosError } from 'axios';
+import { Moment } from 'moment';
 
 // component
 import PeriodPanel, { Thead, Tbody, Tfoot } from './periodPanel';
@@ -11,16 +10,13 @@ import type { TimperativeHandle_panel, Tcenter } from './periodPanel';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import TopBar from '../ui/topBar';
 
 // css
 import scss from './periodTable.module.scss';
 
 import type {
-  TfinalProduct,
   TaccountsReceivablePeriodDto,
-  TquotationProductItemDto,
   TquotationProductDto,
   TcompletedProductDto,
   TretainageType,
@@ -69,8 +65,8 @@ type Tstate_period = {
   period: number;
 
   rowArr: {
+    itemName: string;
     productId: string;
-    // baseQty: number;
     basePrice: number;
     completedQuantity: string;
     completedPayment: string;
@@ -101,7 +97,6 @@ type Tstate_period = {
   actualPrice: string; // 實際金額
   invoiceDate: Moment | null;
 
-  // isInvoiceNumberValid?: boolean;
   //
 
   invoiceBook: TaccountantInvoiceBookDto | null;
@@ -118,7 +113,6 @@ type Tleft = {
     size: React.ReactNode;
     qty: React.ReactNode;
     contractPrice: React.ReactNode;
-    // contractPrice_num: number;
   }[];
   totals: {
     subTotal: string;
@@ -138,19 +132,14 @@ export default function PeriodTable({
   className,
   data_finalProdcut = [],
   data_period = [],
-  // reqAddInvoice,
-  // reqPatchInvoiceArr,
   onAddConfirm,
   reqPatchInvoiceAllowance,
-
   reqDeleteInvoice,
   reqDeletePeriod,
 }: {
   className?: string;
   data_finalProdcut: TquotationProductDto[] | undefined | null;
   data_period: TaccountsReceivablePeriodDto[] | undefined | null;
-  // reqAddInvoice: (type: TaccountsReceivableInvoiceDto['type'], invoiceNumber: string) => void;
-  // reqPatchInvoiceArr: (state: Tstate_invoice[]) => Promise<void>;
   onAddConfirm: (state_invoice: Tstate_period) => Promise<void>;
   reqPatchInvoiceAllowance: (invoiceId: string, allowance: number) => void;
   reqDeleteInvoice: (invoiceId: string) => void;
@@ -159,10 +148,7 @@ export default function PeriodTable({
   const ref_newInvoicePanel = useRef<TimperativeHandle_panel>(null);
   const ref_invoicePanelArr = useRef<(TimperativeHandle_panel | null)[]>([]);
 
-  // const [disabled, setDisabled] = useState(true);
   const [isAddingNew, setIsAddingNew] = useState(false);
-
-  // const [state_invoiceArr, setState_invoiceArr] = useState<Tstate_invoice[]>([]);
 
   const [totalsTotal, setTotalsTotal] = useState({
     subTotal: 0,
@@ -204,12 +190,6 @@ export default function PeriodTable({
     const newInoviceState = ref_newInvoicePanel.current?.getState();
 
     if (newInoviceState) {
-      // if (newInoviceState.isInvoiceNumberValid === false) {
-      //   myAlert.info({ title: '發票號碼已被使用或正在檢查' });
-
-      //   return;
-      // }
-
       await onAddConfirm(newInoviceState)
         .then(() => {
           setIsAddingNew(false);
@@ -309,8 +289,6 @@ export default function PeriodTable({
 
   // region Right
 
-  // ref_invoicePanelArr.current.map((handle) => handle?.getState())
-
   const periodTotal = useMemo(() => {
     const periodTotal: Tperiod_reduce = {
       id: '',
@@ -318,8 +296,7 @@ export default function PeriodTable({
       type: '請款',
       period: 0,
       depositPeriod: 0,
-      // invoiceNumber: '',
-      // price: 0,
+
       completedProduct: [],
       retainage: 0,
       deduction: 0,
@@ -329,9 +306,9 @@ export default function PeriodTable({
       isWriteOffDeposit: false,
       retainageType: null,
       retainagePercent: null,
-      // allowance: 0,
+
       note: '',
-      // accountantList: [],
+
       invoices: [],
       price: 0,
     };
@@ -346,7 +323,7 @@ export default function PeriodTable({
         retainage,
         deduction,
         writeOffDeposit,
-        // allowance,
+
         invoices,
       } = period;
 
@@ -354,8 +331,7 @@ export default function PeriodTable({
       periodTotal.retainage = new Decimal(retainage || 0).add(periodTotal.retainage || 0).toNumber();
       periodTotal.deduction = new Decimal(deduction || 0).add(periodTotal.deduction || 0).toNumber();
       periodTotal.writeOffDeposit = new Decimal(writeOffDeposit || 0).add(periodTotal.writeOffDeposit || 0).toNumber();
-      // periodTotal.allowance = new Decimal(allowance || 0).add(periodTotal.allowance || 0).toNumber();
-      // periodTotal.invoices = [...periodTotal.invoices, ...invoices];
+
       periodTotal.invoices.push(...invoices);
 
       completedProduct?.forEach((prod) => {
@@ -424,9 +400,6 @@ export default function PeriodTable({
       <div className={scss.table}>
         <Left node_left={node_left} />
 
-        {/* {node_centerArr.map((center, index) => {
-          return <Center key={index} node_center={center} disabled={disabled} />;
-        })} */}
         {isAddingNew && <PeriodPanel ref={ref_newInvoicePanel} finalProdArr={finalProdArr} />}
 
         {periodArr_sorted.map((data_invoice, index) => {
@@ -499,7 +472,6 @@ const Left = ({
 
       <div className={scss.tfoot}></div>
       <div className={scss.deleteBar}></div>
-      {/* <div className={scss.tfoot}></div> */}
     </div>
   );
 };

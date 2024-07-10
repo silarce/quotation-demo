@@ -36,6 +36,7 @@ export default function Contract() {
   };
 
   const params = {
+    sort: 'contractNumber',
     filter: {
       version: { $eq: 1 },
       'content.county': { $eq: query.county as string },

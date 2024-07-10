@@ -1,4 +1,4 @@
-import { useState, MouseEvent, createContext, useEffect, Key } from 'react';
+import { useState, MouseEvent, createContext, useEffect, Key, useContext } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -11,6 +11,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { quotationStatusLookup } from 'config/lookupTable';
 import { TquotationStatus } from 'js/api/dtoTypes';
+import { AppContext } from 'pages/_app';
 
 
 
@@ -25,10 +26,12 @@ export const setting = {
     apipath: 'https://new-erp-api.beta.san-jeou.com.tw/WareHouse/', // 確保這裡包含正確的 API 路徑
     // apipath: 'https://localhost:44383/WareHouse/', // 確保這裡包含正確的 API 路徑
     env: 'prod'
-    // env: 'local'
+    // env: 'local',
 };
 
+
 export default function WareHouseList() {
+    
     const router = useRouter();
     const { type, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
 
@@ -132,7 +135,7 @@ export default function WareHouseList() {
             setError(error.message);
         }
     };
-    
+
 
     return (
 

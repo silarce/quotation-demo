@@ -292,3 +292,27 @@ $top_headRow: calc($height_thead);
   z-index: 1;
   border-top: solid 4px theme("colors.border");
 }
+
+.antd_select {
+  * {
+    cursor: pointer;
+  }
+
+  > :global(.ant-select-selector) {
+    cursor: pointer !important;
+  }
+
+  &.disabled.plus {
+    * {
+      cursor: auto;
+    }
+
+    > :global(.ant-select-selector) {
+      cursor: auto !important;
+    }
+  }
+
+  input {
+    display: none;
+  }
+}
