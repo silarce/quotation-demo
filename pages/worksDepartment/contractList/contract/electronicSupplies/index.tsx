@@ -37,7 +37,7 @@ import { Popover } from 'antd';
 // component
 import SupplyList from 'components/page/worksDepartment/electronicSupplies/supplyList';
 import ItemList from 'components/page/worksDepartment/electronicSupplies/itemList';
-import ReceivedHistory from 'components/page/worksDepartment/electronicSupplies/receivedHistory';
+import PickupRecord from 'components/page/worksDepartment/electronicSupplies/pickupRecord';
 import RequirementRecord from 'components/page/worksDepartment/electronicSupplies/requirementRecord';
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -71,7 +71,7 @@ import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
 
 type Tquery = {
   contractId: string;
-  listName: 'itemList' | 'supplyList' | 'receiveHistory' | 'requirementRecord' | undefined;
+  listName: 'itemList' | 'supplyList' | 'pickupRecord' | 'requirementRecord' | undefined;
 };
 
 type TdoorQtySubTotalList = {
@@ -80,19 +80,12 @@ type TdoorQtySubTotalList = {
 
 // ------------------------------------------------------------------
 
+// MARK: START
 export default function ElectronicSupplies() {
   const router = useRouter();
   const { contractId, listName = 'itemList' } = router.query as Tquery;
 
   // ------------------------------------------------------------------
-
-  // 雖然worksheet與electronicSupplies都可以從contract裡面拿
-  // 但考慮到worksheet與electronicSupplies的資料量可能會很大
-  // 擔心又發生取資料的時間太久而必須要分段取資料的情況
-  // 決定contract,worksheet,electronicSupplies分開取得
-  //
-  // 沒有依據contract.id取得worksheet的api
-  // worksheet只能從contract裡面拿
 
   const { data: contract, update } = useGetContract_id(contractId, {
     customPopulate: [
@@ -200,10 +193,10 @@ export default function ElectronicSupplies() {
     },
     {
       label: '送電備品料單領取歷程',
-      isActive: listName === 'receiveHistory',
+      isActive: listName === 'pickupRecord',
       onClick: () => {
         router.replace({
-          query: { ...router.query, listName: 'receiveHistory' },
+          query: { ...router.query, listName: 'pickupRecord' },
         });
       },
     },
@@ -297,7 +290,7 @@ export default function ElectronicSupplies() {
         >
           {listName === 'itemList' && <ItemList worksheetArr={worksheet ?? []} />}
           {listName === 'supplyList' && <SupplyList electronicSuppliesContents={electronicSuppliesContents} />}
-          {listName === 'receiveHistory' && <ReceivedHistory />}
+          {listName === 'pickupRecord' && <PickupRecord pickupRecords={pickupRecords} />}
           {listName === 'requirementRecord' && <RequirementRecord />}
         </Wrapper_tab>
       </div>

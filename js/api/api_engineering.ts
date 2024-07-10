@@ -373,7 +373,10 @@ const apiGetElectronicSupplies_id = (id: string) => {
     populate: [
       //
       'electronicSuppliesContents',
-      'pickupRecords',
+
+      'pickupRecords.takeOffEmployee',
+      'pickupRecords.TelectronicSuppliesPickupRecordDetailDto',
+
       'requirementRecords',
     ],
   };

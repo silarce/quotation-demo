@@ -3106,7 +3106,7 @@ export type TelectronicSuppliesRequirementRecordDto = {
   operationDate: string;
   // 新增人員id
   agentEmployeeId: string;
-  // 新增人員
+  // 新增人員 // '新增'不是動詞，這個是指新增這筆需求單的人員
   agentEmployee: TemployeeDto;
   // 需求明細
   requirementRecordDetails: TelectronicSuppliesRequirementRecordDetailDto[];
@@ -3116,13 +3116,14 @@ export type TcreateElectronicSuppliesRequirementRecordDto = Pick<
   TelectronicSuppliesRequirementRecordDto,
   'operationDate'
 > & {
-  takeOffEmployeeId: string;
+  // takeOffEmployeeId: string;
   requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
 };
 
 export type TupdateElectronicSuppliesRequirementRecordDto = Pick<
   TcreateElectronicSuppliesRequirementRecordDto,
-  'operationDate' | 'takeOffEmployeeId'
+  'operationDate'
+  // | 'takeOffEmployeeId'
 > & {
   requirementRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
 };
@@ -3143,7 +3144,7 @@ export type TelectronicSuppliesPickupRecordDto = {
   takeOffEmployeeId: string;
   // 領料人員
   takeOffEmployee?: TemployeeDto;
-  // 領料/退回
+  // 領取/退回
   action: TelectronicSuppliesAction;
   // 領料明細
   pickupRecordDetails?: TelectronicSuppliesPickupRecordDetailDto[];
@@ -3170,13 +3171,20 @@ export type TelectronicSuppliesPickupRecordDetailDto = {
 
 export type TcreateElectronicSuppliesPickupRecordDto = Pick<
   TelectronicSuppliesPickupRecordDto,
-  'operationDate' | 'takeOffEmployeeId' | 'action'
+  | 'operationDate'
+  // | 'takeOffEmployeeId'
+  | 'action'
 > & {
   pickupRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
 };
 
 export type TupdateElectronicSuppliesPickupRecordDto = Partial<
-  Pick<TcreateElectronicSuppliesPickupRecordDto, 'operationDate' | 'takeOffEmployeeId' | 'action'>
+  Pick<
+    TcreateElectronicSuppliesPickupRecordDto,
+    | 'operationDate'
+    // | 'takeOffEmployeeId'
+    | 'action'
+  >
 > & {
   pickupRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
 };

@@ -2,17 +2,23 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
 // gear
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
+// utils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 // css
-// import scss from './receivedHistory.module.scss';
+import scss from './pickupRecord.module.scss';
 import scss_p from './_public.module.scss';
 
-export default function ReceivedHistory() {
+import type { TelectronicSuppliesPickupRecordDto } from 'js/api/dtoTypes';
+
+export default function PickupRecord({ pickupRecords }: { pickupRecords: TelectronicSuppliesPickupRecordDto[] }) {
   const router = useRouter();
   // ------------------------------------------------------------------
 
@@ -28,97 +34,60 @@ export default function ReceivedHistory() {
     };
     //
 
-    const tbodyRowArr: Ttable['tbody']['rowArr'] = [
-      {
+    const tbodyRowArr: Ttable['tbody']['rowArr'] = pickupRecords.map((item) => {
+      const { id, operationDate, takeOffEmployee, action, pickupRecordDetails } = item;
+
+      const qty = pickupRecordDetails?.reduce((qty, item) => {
+        return new Decimal(qty).add(item.quantity || 0).toNumber();
+      }, 0);
+
+      return {
         cellArr: [
           {
             ...configList.date,
-            children: '111-11-11',
+            children: getTaiwanDateStr(operationDate),
           },
           {
             ...configList.ingredientTechnician,
-            children: '蓋特機器人',
+            children: takeOffEmployee?.chName ?? '',
           },
           {
             ...configList.doorModelName,
-            children: 'SJ-302',
+            children: '未串接',
           },
           {
             ...configList.qty,
-            children: 9999,
+            children: qty,
           },
           {
             ...configList.materialHandler,
-            children: '無敵鐵金剛',
+            children: '未串接',
           },
           {
+            width: 100,
             children: (
               <Link
                 href={{
                   pathname: router.pathname + '/editReceivedHistory',
                   query: {
-                    historyId: 'id9999999',
+                    pickupRecordId: id,
                   },
                 }}
               >
-                <IconDetail
-                // onClick={() =>
-                //   router.push({
-                //     pathname: router.pathname + '/editReceivedHistory',
-                //     query: {
-                //       historyId: 'id9999999',
-                //     },
-                //   })
-                // }
-                />
+                <IconDetail />
               </Link>
             ),
-            width: 100,
           },
         ],
-      },
-    ];
+      };
+    }); // tbodyRowArr close
 
     const tbody: Ttable['tbody'] = {
-      rowArr: [
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-      ],
+      rowArr: tbodyRowArr,
     };
 
     return { thead, tbody };
-  }, []);
+  }, [pickupRecords]);
   // ------------------------------------------------------------------
 
   return <Table01 {...control_table} className={classNames(scss_p.table)} />;
