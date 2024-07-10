@@ -29,7 +29,7 @@ import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
 import { Button, Modal } from 'antd';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
-
+import icon_search from 'public/image/icon/search.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -47,14 +47,14 @@ export default function PurchaseRequisitionList() {
         create_by,
         approved,
     } = router.query;
-
+    
     const getQueryParam = (param: any) => {
         if (Array.isArray(param)) {
             return param[0];
         }
         return param;
     };
-
+    const create_chance = getQueryParam(create_at);
 
 
     //登入者資料
@@ -82,6 +82,12 @@ export default function PurchaseRequisitionList() {
     const [create_atin, setCreate_atin] = useState<string>("");
     const [approvedin, setApprovedin] = useState<string>("");
 
+    //搜尋
+    const [keyword1, setKeyword1] = useState<string>("");
+    const [keyword2, setKeyword2] = useState<string>("");
+    const [keyword3, setKeyword3] = useState<string>("");
+
+
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
 
@@ -91,6 +97,11 @@ export default function PurchaseRequisitionList() {
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
+    useEffect(() => {
+        if (firstin !== undefined) {
+            setCheckFirstIn(parseInt(firstin as string) || 0);
+        }
+    }, [firstin]);
 
 
 
@@ -414,7 +425,7 @@ export default function PurchaseRequisitionList() {
     };
 
 
-    
+
 
     //#endregion
     // 轉為進貨單，開始驗收
@@ -750,6 +761,15 @@ export default function PurchaseRequisitionList() {
     // //#endregion
 
 
+    const handleSubmit = (e: any) => {
+        e.preventDefault();
+        searchData(keyword1, keyword2, keyword3)
+        // alert(keyword1);
+        // alert(keyword2);
+        // alert(keyword3);
+        // 在這裡可以添加搜索的邏輯，使用keyword1來進行搜索
+    };
+
 
 
     return (
@@ -757,6 +777,37 @@ export default function PurchaseRequisitionList() {
             <PageHeader02 tag={quotationStatusLookup[status] ?? '請購單'} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
+                    {/* <form onSubmit={handleSubmit}>
+                        <div className={scss.searchbar}>
+                            <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
+                                <input
+                                    type="text"
+                                    placeholder='物料號碼'
+                                    value={keyword1}
+                                    onChange={(e) => setKeyword1(e.target.value)}
+                                />
+                            </div>
+                            <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
+                                <input
+                                    type="text"
+                                    placeholder='物料名稱'
+                                    value={keyword2}
+                                    onChange={(e) => setKeyword2(e.target.value)}
+                                />
+                            </div>
+                            <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
+                                <input
+                                    type="text"
+                                    placeholder='物料規格'
+                                    value={keyword3}
+                                    onChange={(e) => setKeyword3(e.target.value)}
+                                />
+                                <button type="submit">
+                                    <img src={icon_search.src} alt="edit" style={{ width: '30px', height: '30px' }} />
+                                </button>
+                            </div>
+                        </div>
+                    </form> */}
                     <div>
                         <Thead01 type={'PurchaseRequisition'} />
                         <Tbody01 type={'PurchaseRequisition'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
@@ -766,7 +817,7 @@ export default function PurchaseRequisitionList() {
                     <div className={scss.tite_main}>
                         <div>
                             <span style={{ display: (checkfirstin === 0 ? approvedin : approved) === "false" ? "" : "none" }}>
-                                <MyButton_v2 px='px22' py='py4' theme='danger' label="結案" onClick={() => { handleClosePO() }} />
+                                <MyButton_v2 px='px22' py='py4' theme='danger' label="送出審核" onClick={() => { handleClosePO() }} />
                                 {/* <button className={scss.greenbutton} onClick={() => { handleClosePO() }} >未結案</button> */}
                             </span>
                             <span style={{ display: (checkfirstin === 0 ? approvedin : approved) === "true" ? "" : "none" }}>
@@ -774,7 +825,15 @@ export default function PurchaseRequisitionList() {
                             </span>
                         </div>
                         <div style={{ textAlign: 'right', height: '35.77px' }}>
-                            <span style={{ fontSize: '18px', color: '#14256a' }}>審核狀態：</span><span style={{ fontSize: '18px', color: '#ea1833' }}>已審核</span>
+                            <span style={{ fontSize: '18px', color: '#14256a' }}>
+                                審核狀態：
+                            </span>
+                            {/* <span style={{ fontSize: '18px', color: '#ea1833' }}>
+                                已審核
+                            </span> */}
+                            <span style={{ fontSize: '18px', color: '' }}>
+                                詢價中
+                            </span>
                         </div>
                     </div>
                     <div className={scss.head_main}>
@@ -786,6 +845,7 @@ export default function PurchaseRequisitionList() {
                                 inputProps={{
                                     props: {
                                         value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                        // value: checkfirstin
                                     },
                                 }}
                             />
@@ -832,7 +892,7 @@ export default function PurchaseRequisitionList() {
                     </div> */}
                     <div className={scss.content_main_content}>
                         <span>
-                            <MyButton_v2 px='px22' py='py4' theme={undefined} label="詢價單" onClick={() => { goQuotereqDetailList() }} />
+                            <MyButton_v2 px='px22' py='py4' theme={undefined} label="詢價明細" onClick={() => { goQuotereqDetailList() }} />
                         </span>
                         <Thead01 type={'PurchaseRequisitionDetail'} />
                         {/* <Tbody01 type={'PurchaseRequisitionDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
@@ -850,6 +910,11 @@ export default function PurchaseRequisitionList() {
                                         <span>{_item.unitprice.toLocaleString()}</span>
                                         <span>{_item.totalprice.toLocaleString()}</span>
                                         <span>{_item.suppliername}</span>
+                                        <span>
+                                            <button>
+                                                <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                            </button>
+                                        </span>
                                     </div>
                                 </CellWithBar>
                             ))
@@ -862,6 +927,8 @@ export default function PurchaseRequisitionList() {
                         // width={'fit-content'}
                         width="1000px"
                         maskClosable={false}
+                        // centered
+                        style={{ top: 250 }}
                     >
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
                             <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '16px' }}>{quotereqname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -975,7 +1042,7 @@ export default function PurchaseRequisitionList() {
                                                     className={scss.quotereqdetail_checkbox}
                                                     type='checkbox'
                                                     checked={selectedsupplier === _item.id}
-                                                    // onChange={() => handleCheckboxChange(_item)}
+                                                // onChange={() => handleCheckboxChange(_item)}
                                                 />
                                             </span>
                                             {/* <span><input type='checkbox'/></span> */}
@@ -1021,7 +1088,7 @@ export default function PurchaseRequisitionList() {
                     </div>
                     <div className={scss.content_main_content}>
                         <span className={scss.mytitle} style={{ display: (checkfirstin === 0 ? approvedin : approved) === "true" ? "none" : "" }}>
-
+                            <MyButton_v2 px='px22' py='py4' theme={undefined} label="轉採購單" onClick={handleReceipt} />
                             {/* <button onClick={() => { setData2(data2restore) }}>
                                 <img src={icon_autoadd.src} alt="add" style={{ width: '40px', height: '40px' }} />
                             </button> */}

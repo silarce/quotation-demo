@@ -479,8 +479,8 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 300px 50px 40px 40px 60px 60px 150px ;
-  gap: 5px;
+  grid-template-columns: 30px 150px 300px 300px 50px 40px 40px 60px 60px 150px 40px ;
+  // gap: 5px;
   height: 30px;
   padding: 0 20px;
   background-color: $bgc01;

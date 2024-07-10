@@ -82,7 +82,7 @@
 
 .container {
   display: flex;
-  height: 100vh;
+  // height: 100vh;
   /* 設置容器的高度為視窗高度 */
   overflow-y: hidden;
   /* 防止外部容器出現滾動條 */
@@ -136,15 +136,17 @@
   width: 100%;
   /* 佔滿右邊容器的寬度 */
   overflow-y: auto;
+  top: 0;
   /* 垂直滾動（如果需要） */
+  // background-color: yellow;
 }
 
 .left_tite_main {
   position: sticky;
   top: 0;
-  z-index: 1000; 
+  z-index: 1000;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; 
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 15px;
   width: auto;
   margin-top: 5px;
@@ -152,16 +154,24 @@
   margin-right: 20px;
 }
 
-.left_searchbar {
+.searchform {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.searchbar {
+  position: -webkit-sticky; // 為兼容性增加前綴
   position: sticky;
   top: 0;
   z-index: 1000;
   display: grid;
-  grid-template-columns:1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 15px;
   width: auto;
   margin: 5px 20px;
   height: 41px;
+  // background-color: orange;
 
   div {
     border-bottom: 1px solid gray;
@@ -187,6 +197,43 @@
   }
 }
 
+.addbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: 250px 280px 50px 50px 50px;
+  gap: 15px;
+  width: auto;
+  // margin: 5px 20px;
+  // height: 41px;
+
+  div {
+    // border-bottom: 1px solid gray;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    // width: 150px;
+
+    input {
+      // height: 32px;
+      font-size: 13px;
+      width:100%;
+      // border:1px solid #c1c1c1;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    img {
+      width: 30px;
+      height: 20px;
+    }
+  }
+}
 
 .tite_main {
   display: grid;
@@ -208,6 +255,7 @@
   margin-left: 20px;
   margin-right: 20px;
   // background-color: gray;
+  border-top: 1px solid rgba(128, 128, 128, 0.2);
 
 }
 
@@ -224,7 +272,7 @@
 
 .content_main {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
   // gap: 15px;
   width: auto;
   margin-top: 0px;
@@ -243,7 +291,7 @@
   margin-left: 20px;
   margin-right: 20px;
   // border-top:1px solid rgb(168, 168, 168);
-overflow-x: hidden;
+  overflow-x: hidden;
   // background-color: gray;
 }
 
@@ -314,6 +362,7 @@ div.panelHeader19 {
 div.panelHeader20 {
   padding-left: 15px;
   border-bottom: solid 1px $colorBorder01;
+
   .row01,
   .row02 {
     span {

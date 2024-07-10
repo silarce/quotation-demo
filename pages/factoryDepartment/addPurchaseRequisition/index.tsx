@@ -94,10 +94,20 @@ export default function AddPurchaseRequisition() {
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
     const [purchaseorderdetailuuidin, setPurchaseorderdetailuuidin] = useState<string>("");
     const [note, setNote] = useState<string>("");
+    const [need_date, setNeed_date] = useState<string>("");
+
+    //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
-    const [need_date, setNeed_date] = useState<string>("");
+    
+    //手key
+    const [handinputname, setHandinputname] = useState<string>("");
+    const [handinputspec, setHandinputspec] = useState<string>("");
+    const [handinputquantity, setHandinputquantity] = useState<string>("");
+    const [handinputunit, setHandinputunit] = useState<string>("");
+
+
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -211,7 +221,7 @@ export default function AddPurchaseRequisition() {
     //取物料清單
     const getProduct = async () => {
         try {
-            // console.log(userInfo);
+            //  console.log(userInfo);
             setIsLoading(true);
             const conditionModel: {
                 // keyword: string | undefined;
@@ -235,26 +245,9 @@ export default function AddPurchaseRequisition() {
             }
             const data = await response.json();
             setData(data);
-            console.log(data);
-            setCreate_atin(getTaiwanDateStr(moment().toString()) || '');
+            setCreate_atin(moment().format('YYYY-MM-DD') || '');
             setCreate_byin(userInfo?.username.toString() || '');
-            setNeed_date(getTaiwanDateStr(moment().toString()) || '');
-
-            console.log(need_date);
-            // await new Promise(resolve => setTimeout(resolve, 500));
-            // if (data.length > 0 && checkfirstin === 0) {
-            //     console.log(data[0].receipted);
-            //     getPurchaseOrderDetail(data[0].purchaseorderuuid);
-            //     // GetProdReceiptDetailByPurchaseOrderId(data[0].purchaseorderuuid);
-            //     setCreate_atin(data[0].create_at);
-            //     setPurchaseorderuuidin(data[0].purchaseorderuuid);
-            //     setPurchaseorderidin(data[0].purchaseorderid);
-            //     setCreate_byin(data[0].create_by);
-            //     setSuppliernamein(data[0].suppliername);
-            //     setSuppliertaxidin(data[0].suppliertaxid);
-            //     setReceiptedin(data[0].receipted.toString());
-            //     setSupplieraddressin(data[0].supplieraddress);
-            // }
+            setNeed_date(moment().format('YYYY-MM-DD') || '');
         } catch (error: any) {
             setError(error.message);
         }
@@ -270,7 +263,7 @@ export default function AddPurchaseRequisition() {
     const getProductById = async (productuuid: any) => {
         try {
             // alert(purchaseorderuuid)
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel: {
                 productuuid: string | undefined
             } = {
@@ -302,7 +295,7 @@ export default function AddPurchaseRequisition() {
             setError(error.message);
         }
         finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     };
     useEffect(() => {
@@ -336,7 +329,7 @@ export default function AddPurchaseRequisition() {
                 data: any,
             } = {
                 create_at: create_atin,
-                need_date: need_date,
+                need_date: moment(need_date).format('YYYY-MM-DD'),
                 create_by: create_byin,
                 note: note,
                 data: data2
@@ -356,6 +349,13 @@ export default function AddPurchaseRequisition() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
+            myAlert.info(
+                {
+                    title: '單據新增成功',
+                    content: `請購單據號碼為:${data}`
+                })
+            setData2([]);
+
             // getProduct();
 
             // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
@@ -395,6 +395,27 @@ export default function AddPurchaseRequisition() {
         }
     }
 
+    // 手key加入
+    const handleAddByHandKey = () => {
+        if (handinputname === '' && handinputspec === '' && handinputquantity === '' && handinputunit === '') {
+            myAlert.warning({ title: '請檢查欄位' });
+        } else {
+            const newEntry = {
+                name: handinputname,
+                spec: handinputspec,
+                quantity: handinputquantity,
+                unit: handinputunit
+            };
+
+            setData2(prevData2 => [...prevData2, newEntry]);
+
+            setHandinputname('');
+            setHandinputspec('');
+            setHandinputquantity('');
+            setHandinputunit('');
+        }
+    };
+
     // 結案按鈕
     function handleClosePR() {
 
@@ -411,7 +432,7 @@ export default function AddPurchaseRequisition() {
 
     const handleSaveEdit = (index: number) => {
         setEditStatus(false);
-        console.log(data2);
+        // // console.log(data2);
     };
 
     // 從口袋清單移除
@@ -454,9 +475,9 @@ export default function AddPurchaseRequisition() {
             {/* <div className={scss.main}> */}
             <div className={scss.container}>
                 <div className={scss.left}>
-                    <div className={scss.content}>
+                    <div>
                         <form onSubmit={handleSubmit}>
-                            <div className={scss.left_searchbar}>
+                            <div className={scss.searchbar}>
                                 <div style={{ borderBottom: '1px solid gray', textAlign: 'right' }}>
                                     <input
                                         type="text"
@@ -481,11 +502,14 @@ export default function AddPurchaseRequisition() {
                                         onChange={(e) => setKeyword3(e.target.value)}
                                     />
                                     <button type="submit">
-                                        <img src={icon_search.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                                        <img src={icon_search.src} alt="edit" style={{ width: '30px', height: '30px' }} />
                                     </button>
                                 </div>
                             </div>
                         </form>
+                    </div>
+                    <div className={scss.content}>
+
                         <div>
                             <Thead01 type={'AddPR_GetProduct'} />
                             <Tbody01 type={'AddPR_GetProduct'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
@@ -514,7 +538,7 @@ export default function AddPurchaseRequisition() {
                         <div className={scss.tite_main}>
                             <div>
                                 <span >
-                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="送出申請" onClick={() => { handleAddPR() }} />
+                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="新增請購" onClick={() => { handleAddPR() }} />
                                 </span>
                                 <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
                                     <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" />
@@ -532,7 +556,7 @@ export default function AddPurchaseRequisition() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: create_atin,
+                                            value: getTaiwanDateStr(create_atin || '') || '',
                                         },
                                     }}
                                 />
@@ -548,8 +572,8 @@ export default function AddPurchaseRequisition() {
                                     // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                     datePickerProps={{
                                         props: {
-                                            value: moment() || '',
-                                            onChange: (e) => { setNeed_date(e?.format('YYYY-MM-DD') || '') }
+                                            value: moment(need_date),
+                                            onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
                                         },
                                     }}
                                 />
@@ -594,8 +618,48 @@ export default function AddPurchaseRequisition() {
                         </div>
                         <br />
                         <div className={scss.content_main_content}>
-                            <Thead01 type={'AddPR_ReqList'} />
+
                             {/* <Tbody01 type={'AddPR_ReqList'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                            
+                            <div className={scss.addbar} style={{borderBottom:'1px solid #c1c1c1'}}>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='品項'
+                                        value={handinputname}
+                                        onChange={(e) => setHandinputname(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='規格'
+                                        value={handinputspec}
+                                        onChange={(e) => setHandinputspec(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='數量'
+                                        value={handinputquantity}
+                                        onChange={(e) => setHandinputquantity(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='單位'
+                                        value={handinputunit}
+                                        onChange={(e) => setHandinputunit(e.target.value)}
+                                    />
+
+                                </div>
+                                <button onClick={() => { handleAddByHandKey() }}>
+                                    <img src={icon_fc_add.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                                </button>
+                            </div>
+                            <Thead01 type={'AddPR_ReqList'} />
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
                                     <div className={scss.row01}>
@@ -605,11 +669,11 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={quantityRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '50px' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '50px' }}
                                                 type="text"
                                                 maxLength={5}
                                                 value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleChange(index, "quantity", e.target.value);
                                                 }}
@@ -640,10 +704,10 @@ export default function AddPurchaseRequisition() {
                                         {/* {_item.totalprice.toLocaleString()} */}
                                         {/* </span> */}
                                         <span>
-                                            &nbsp;&nbsp;
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button>
+                                            </button> */}
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
                                                 <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
                                             </button>
