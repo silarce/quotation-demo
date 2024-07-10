@@ -14,7 +14,7 @@ import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // css
-import scss from './editReceivedHistory.module.scss';
+import scss from './editRequirementRecord.module.scss';
 import { TemployeeDto } from 'js/api/dtoTypes';
 
 // ==================================================================
@@ -23,7 +23,7 @@ type Tquery = {
 };
 
 // ==================================================================
-export default function EditDemandHistory() {
+export default function EditRequirementRecord() {
   const router = useRouter();
   const { historyId } = router.query as Tquery;
 

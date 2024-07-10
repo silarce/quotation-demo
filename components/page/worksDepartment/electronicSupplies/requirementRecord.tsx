@@ -2,17 +2,28 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import classNames from 'classnames';
+import Decimal from 'decimal.js';
 
 // gear
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
+// utils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 // css
 // import scss from './receivedHistory.module.scss';
 import scss_p from './_public.module.scss';
 
-export default function RequirementRecord() {
+import type { TelectronicSuppliesRequirementRecordDto } from 'js/api/dtoTypes';
+
+// ==================================================================
+export default function RequirementRecord({
+  requirementRecords,
+}: {
+  requirementRecords: TelectronicSuppliesRequirementRecordDto[];
+}) {
   const router = useRouter();
 
   // ------------------------------------------------------------------
@@ -29,88 +40,60 @@ export default function RequirementRecord() {
     };
     //
 
-    const tbodyRowArr: Ttable['tbody']['rowArr'] = [
-      {
+    const tbodyRowArr: Ttable['tbody']['rowArr'] = requirementRecords.map((item, index) => {
+      const { id, operationDate, agentEmployee, requirementRecordDetails = [] } = item;
+
+      const qty = requirementRecordDetails?.reduce((qty, item) => {
+        return new Decimal(qty).add(item.quantity || 0).toNumber();
+      }, 0);
+
+      return {
         cellArr: [
           {
             ...configList.indexNumber,
-            children: '1',
+            children: index + 1,
           },
           {
             ...configList.date,
-            children: '111-11-11',
+            children: getTaiwanDateStr(operationDate),
           },
           {
             ...configList.requestEmployee,
-            children: '蓋特機器人',
+            children: '未串接',
           },
           {
             ...configList.doorModelName,
-            children: 'SJ-302',
+            children: '未串接',
           },
           {
             ...configList.qty,
-            children: 9999,
+            children: qty,
           },
           {
             ...configList.materialHandler,
-            children: '無敵鐵金剛',
+            children: '未串接',
           },
           {
+            width: 100,
             children: (
               <Link
                 href={{
-                  pathname: router.pathname + '/editDemandHistory',
+                  pathname: router.pathname + '/editRequirementRecord',
                   query: {
-                    historyId: 'id9999999',
+                    historyId: id,
                   },
                 }}
               >
                 <IconDetail />
               </Link>
             ),
-            width: 100,
           },
         ],
-      },
-    ];
+      };
+    }); // tbodyRowArr close
 
     const tbody: Ttable['tbody'] = {
-      rowArr: [
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-      ],
+      rowArr: tbodyRowArr,
     };
 
     return { thead, tbody };

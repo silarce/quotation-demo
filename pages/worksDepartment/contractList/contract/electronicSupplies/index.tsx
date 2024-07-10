@@ -291,7 +291,7 @@ export default function ElectronicSupplies() {
           {listName === 'itemList' && <ItemList worksheetArr={worksheet ?? []} />}
           {listName === 'supplyList' && <SupplyList electronicSuppliesContents={electronicSuppliesContents} />}
           {listName === 'pickupRecord' && <PickupRecord pickupRecords={pickupRecords} />}
-          {listName === 'requirementRecord' && <RequirementRecord />}
+          {listName === 'requirementRecord' && <RequirementRecord requirementRecords={requirementRecords} />}
         </Wrapper_tab>
       </div>
     </SubLayer>

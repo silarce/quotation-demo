@@ -35,7 +35,7 @@ export default function PickupRecord({ pickupRecords }: { pickupRecords: Telectr
     //
 
     const tbodyRowArr: Ttable['tbody']['rowArr'] = pickupRecords.map((item) => {
-      const { id, operationDate, takeOffEmployee, action, pickupRecordDetails } = item;
+      const { id, operationDate, takeOffEmployee, action, pickupRecordDetails = [] } = item;
 
       const qty = pickupRecordDetails?.reduce((qty, item) => {
         return new Decimal(qty).add(item.quantity || 0).toNumber();
@@ -68,7 +68,7 @@ export default function PickupRecord({ pickupRecords }: { pickupRecords: Telectr
             children: (
               <Link
                 href={{
-                  pathname: router.pathname + '/editReceivedHistory',
+                  pathname: router.pathname + '/editPickupRecord',
                   query: {
                     pickupRecordId: id,
                   },
