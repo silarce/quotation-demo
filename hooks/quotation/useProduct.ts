@@ -65,6 +65,7 @@ const useProductList = ({
   onDoorTypeChange,
   productArr_attach,
   quotationDiscount,
+  quotationDiscount_attach = 100,
 }: // onDiscountChange,
 {
   productArr: TquotationProductDto[] | undefined;
@@ -78,6 +79,7 @@ const useProductList = ({
   }) => void;
   productArr_attach?: TquotationProductDto[] | undefined;
   quotationDiscount: number;
+  quotationDiscount_attach?: number;
   // onDiscountChange?: (avgDiscount: number) => void;
 }) => {
   const [render, setRender] = useState(0);
@@ -619,15 +621,21 @@ const useProductList = ({
   }, [calcTrigger]);
 
   // 修改所有class_product的quotationDiscount
-  const changeAllProdQuotationDiscount = (v: number) => {
+  const changeAllProdQuotationDiscount = ({
+    discount,
+    discount_attach,
+  }: {
+    discount: number;
+    discount_attach: number;
+  }) => {
     Object.values(productList).forEach((prod) => {
-      prod.quotationDiscount = v;
+      prod.quotationDiscount = discount;
       Object.values(prod.exchangeProdList).forEach((exProd) => {
-        exProd.quotationDiscount = v;
+        exProd.quotationDiscount = discount_attach;
       });
     });
     Object.values(attachProdList).forEach((prod) => {
-      prod.quotationDiscount = v;
+      prod.quotationDiscount = discount_attach;
     });
   };
 
@@ -635,8 +643,11 @@ const useProductList = ({
     // component裡面只有紀錄牌價，其他金額都是算出來的
     // 因此即使沒有要變更主產品或總折數，也必須要執行changeAllProdQuotationDiscount
     // 否則若quotationDiscount不是100，component的單價就會錯誤
-    changeAllProdQuotationDiscount(quotationDiscount);
-  }, [quotationDiscount]);
+    changeAllProdQuotationDiscount({
+      discount: quotationDiscount,
+      discount_attach: quotationDiscount_attach,
+    });
+  }, [quotationDiscount, quotationDiscount_attach]);
 
   // ---------------------------------------------------------
   // 回到編輯前的狀態，就是以一開始取得的資料重新建立list
@@ -674,7 +685,7 @@ const useProductList = ({
       callCalcSubTotal,
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
-      quotationDiscount: quotationDiscount,
+      quotationDiscount: quotationDiscount_attach,
       onDiscountChange: calcDiscount_two,
       onQtyChange: calcDiscount_two,
     });
@@ -723,7 +734,7 @@ const useProductList = ({
           onDiscountChange: calcDiscount_two,
           onQtyChange: calcDiscount_two,
           disabled_quantity: true,
-          quotationDiscount: quotationDiscount,
+          quotationDiscount: quotationDiscount_attach,
         });
       });
 
@@ -876,7 +887,11 @@ const useProductList = ({
     // changeAllProductDiscount,
     // avgDiscount,
     // avgDiscount_withQty,
-    avgDiscount_withQty: new Decimal(avgDiscount_withQty).mul(quotationDiscount).div(100).toDecimalPlaces(3).toString(),
+    avgDiscount_withQty: new Decimal(avgDiscount_withQty)
+      .mul(quotationDiscount_attach)
+      .div(100)
+      .toDecimalPlaces(3)
+      .toString(),
   };
 };
 

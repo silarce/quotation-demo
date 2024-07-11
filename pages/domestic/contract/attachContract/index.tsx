@@ -91,7 +91,7 @@ export default function AttachContract({
   // ------------------------------------------------------------------------------
   // region useState
 
-  const [isLading, setIsLading] = useState(false);
+  const [isLoading, setIsLoadding] = useState(false);
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -191,9 +191,10 @@ export default function AttachContract({
     // addOthers,
     // getOthersPostBodyArr,
     // //
-    // subTotal: quotationProdSubTotal,
+    subTotal: quotationProdSubTotal,
     // reset: resetClass,
     //
+    calcSubTotalPrice,
     attachProdList,
     addProd_attach,
     attachAddTotal,
@@ -205,6 +206,7 @@ export default function AttachContract({
     others: formatedContent?.others,
     resetTrigger: data_contract,
     quotationDiscount: Number(formatedContent?.discount || '100'),
+    quotationDiscount_attach: Number(state_summary.discountRate || '100'),
   });
 
   const { control_profile, state_profile, state_customer } = useProfile({
@@ -224,7 +226,7 @@ export default function AttachContract({
 
   const handle_reqModify = () => {
     reqModify({
-      setIsLading,
+      setIsLoadding,
       router,
       data_contract,
       attachProdList,
@@ -242,6 +244,8 @@ export default function AttachContract({
       state_paymentMethod,
       state_summary,
       verticleKeyArr_attach,
+      //
+      discount: state_summary.discountRate,
     });
   };
 
@@ -281,7 +285,12 @@ export default function AttachContract({
         inputAttr: {
           disabled: true,
           value: state_summary.discountRate ?? '',
-          onChange: () => {},
+          onChange: (e) => {
+            setState_Summary((state) => ({
+              ...state,
+              discountRate: e.target.value,
+            }));
+          },
         },
       },
       tuneTotal: {
@@ -422,13 +431,13 @@ export default function AttachContract({
   useEffect(() => {
     (async () => {
       try {
-        setIsLading(true);
+        setIsLoadding(true);
         await update_contract();
       } catch (error) {
         const err = error as Error;
         myAlert.err({ title: '讀取追加追減報價單失敗', content: err.message });
       } finally {
-        setIsLading(false);
+        setIsLoadding(false);
       }
     })();
   }, [contractId]);
@@ -489,7 +498,7 @@ export default function AttachContract({
   // region RENDER
 
   return (
-    <SubLayer isLoading_all={isLading}>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader02 tag={`合約編號 ${data_contract?.contractNumber}　建立追加追減報價單`} panelList={panel} />{' '}
       <div>
         <div className={scss.quotation}>
@@ -520,8 +529,8 @@ export default function AttachContract({
               panelBox="resetChangeBox"
               targetProd={targetProd}
               attachTotal={attachDivTotal.toLocaleString()}
-              discountRate={data_contract?.discount ?? ''} // 報價單總折數
-              changeDiscountRate={(v) => {}}
+              // discountRate={data_contract?.discount ?? ''} // 報價單總折數
+              // changeDiscountRate={(v) => {}}
             />
 
             <br />
@@ -593,8 +602,38 @@ export default function AttachContract({
               // targetProd={targetProd}
               attachTotal={attachAddTotal}
               isRedBorder={true}
-              discountRate={data_contract?.discount ?? ''} // 報價單總折數
-              changeDiscountRate={(v) => {}}
+              // discountRate={data_contract?.discount ?? ''} // 報價單總折數
+              discountRate={state_summary.discountRate} // 報價單總折數
+              changeDiscountRate={(v) => {
+                // 如果quotationProdSubTotal為空字串會算出錯誤的值，
+                // 所以必須先計算出quotationProdSubTotal
+                if (quotationProdSubTotal === '') {
+                  calcSubTotalPrice();
+                }
+
+                if (v === '') {
+                  v = '0';
+                }
+
+                if (Number(v) > 500) {
+                  v = '500';
+                }
+
+                // const isValid = checkIsFloat(v, 3);
+
+                // if (!isValid) {
+                //   return;
+                // }
+
+                setState_Summary((state) => {
+                  // changeAllProdQuotationDiscount(Number(v));
+                  // changeAllProductDiscount(Number(v));
+                  return {
+                    ...state,
+                    discountRate: v,
+                  };
+                });
+              }}
             />
 
             <br />
@@ -671,7 +710,7 @@ export default function AttachContract({
 
 const reqModify = async ({
   //
-  setIsLading,
+  setIsLoadding: setIsLading,
   router,
   data_contract,
   attachProdList,
@@ -689,9 +728,11 @@ const reqModify = async ({
   state_paymentMethod,
   state_summary,
   verticleKeyArr_attach,
+  //
+  discount,
 }: {
   router: ReturnType<typeof useRouter>;
-  setIsLading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoadding: React.Dispatch<React.SetStateAction<boolean>>;
   data_contract: TquotationContractDto | undefined;
   attachProdList: {
     [key: string]: Class_product;
@@ -712,6 +753,7 @@ const reqModify = async ({
   state_paymentMethod: Tstate_paymentMethodItem[];
   state_summary: Tstate_summary;
   verticleKeyArr_attach: string[] | undefined;
+  discount: string;
 }) => {
   try {
     setIsLading(true);
@@ -721,9 +763,11 @@ const reqModify = async ({
     }
 
     const content_copy = _.cloneDeep(data_contract.content);
+
     const copy_shallow = {
       //
       ...content_copy,
+      discount: discount,
       // 根據api文件，後端不收
       // 但是預防萬一，還是把這些資料清掉比較安心
       reviewSalesEmployee: undefined,

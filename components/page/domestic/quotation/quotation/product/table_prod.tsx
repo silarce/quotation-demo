@@ -77,7 +77,7 @@ export default function Table_prod({
   isShowDndBtn?: boolean;
   // changeAllProductDiscount?: (v: `${number}`) => void;
   // avgDiscount?: number | string;
-  discountRate: string | number | undefined;
+  discountRate?: string | number | undefined;
   changeDiscountRate?: (v: string) => void;
 }) {
   const [allowMove, setAllowMove] = useState(false);
@@ -125,24 +125,26 @@ export default function Table_prod({
           {allowMove ? '確定排序' : '設定排序'}
         </button>
 
-        <InputSel
-          //
-          caption="總折數"
-          captionSize="18"
-          className={scss.totalDiscountChange}
-          disabled={disabled}
-          showBaseline="auto"
-          inputProps={{
-            props: {
-              type: 'number',
-              value: discountRate,
-              onChange: (e) => {
-                changeDiscountRate?.(e.target.value);
+        {discountRate !== undefined && (
+          <InputSel
+            //
+            caption="總折數"
+            captionSize="18"
+            className={scss.totalDiscountChange}
+            disabled={disabled}
+            showBaseline="auto"
+            inputProps={{
+              props: {
+                type: 'number',
+                value: discountRate,
+                onChange: (e) => {
+                  changeDiscountRate?.(e.target.value);
+                },
+                placeholder: '',
               },
-              placeholder: '',
-            },
-          }}
-        />
+            }}
+          />
+        )}
       </div>
 
       {/*  */}

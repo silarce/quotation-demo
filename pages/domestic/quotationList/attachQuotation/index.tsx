@@ -1625,29 +1625,29 @@ function TheQuotation({ router }: { router: NextRouter }) {
               rowHeight="h60"
               isAttach={isAttach}
               attachTotal={attachDivTotal}
-              discountRate={state_summary.discountRate} // 報價單總折數
-              changeDiscountRate={(v) => {
-                if (v === '') {
-                  v = '0';
-                }
+              // discountRate={state_summary.discountRate} // 報價單總折數
+              // changeDiscountRate={(v) => {
+              //   if (v === '') {
+              //     v = '0';
+              //   }
 
-                if (Number(v) > 500) {
-                  v = '500';
-                }
+              //   if (Number(v) > 500) {
+              //     v = '500';
+              //   }
 
-                const isValid = checkIsFloat(v, 3);
+              //   const isValid = checkIsFloat(v, 3);
 
-                if (!isValid) {
-                  return;
-                }
+              //   if (!isValid) {
+              //     return;
+              //   }
 
-                setState_Summary((state) => {
-                  return {
-                    ...state,
-                    discountRate: v,
-                  };
-                });
-              }}
+              //   setState_Summary((state) => {
+              //     return {
+              //       ...state,
+              //       discountRate: v,
+              //     };
+              //   });
+              // }}
             />
 
             {/* 材料配件設定 */}
