@@ -205,6 +205,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // const [disabled_reviewer, setDisabled_reviewer] = useState(true);
   const disabled_static = true;
 
+  const [vrKeyArr_attach, setVrKeyArr_attach] = useState<string[]>();
+
   // -----------------------------------------------------
   const [reviewFormShow, setReviewFormShow] = useState(false);
   const [reviewModalShow, setReviewModalShow] = useState(false);
@@ -425,12 +427,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     */
 
-    const latestContentProdArr = latestContent?.products;
+    let latestContentProdArr = latestContent?.products;
+    latestContentProdArr = _.orderBy(latestContentProdArr, 'order');
 
     // 上面的，被追減的主產品
     const contractProdList: { [key: string]: TquotationProductDto } = {};
     // 下面的，追加的主產品
     const contentProdList: { [key: string]: TquotationProductDto } = {};
+
+    // console.log('latestContentProdArr', latestContentProdArr);
 
     latestContentProdArr?.forEach((prod) => {
       const { rootProductId, quantity } = prod;
@@ -443,6 +448,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         contentProdList[rootProductId] = prod;
       }
     });
+
+    // console.log('contentProdLis', contentProdList);
 
     return {
       contractProdArr: Object.values(contractProdList),
@@ -1234,13 +1241,37 @@ function TheQuotation({ router }: { router: NextRouter }) {
       });
     }
 
-    const attachProdArr = Object.values(attachProdList).map((prod, index) => {
-      if (!prod.isComponentOk) {
-        breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
-      }
+    const attachProdArr = (() => {
+      if (vrKeyArr_attach) {
+        const attachProdArr = vrKeyArr_attach.map((key, index) => {
+          const prod = attachProdList[key];
 
-      return prod.body;
-    });
+          if (!prod.isComponentOk) {
+            breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+          }
+
+          const body = prod.body;
+          body.order = index;
+
+          return body;
+        });
+
+        return attachProdArr;
+      } else {
+        const attachProdArr = Object.values(attachProdList).map((prod, index) => {
+          if (!prod.isComponentOk) {
+            breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+          }
+
+          const body = prod.body;
+          body.order = index;
+
+          return body;
+        });
+
+        return attachProdArr;
+      }
+    })();
 
     if (breakComponentProdIndex_attach) {
       return myAlert.warning({
@@ -1724,7 +1755,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
               setTargetProd={setTargetProdKey_attach}
               // defalutVKeyArr={prodVKeyArr}
               // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
-              onVKeyChange={() => {}}
+              onVKeyChange={(arr) => {
+                setVrKeyArr_attach(arr);
+              }}
               rowHeight="h60"
               attachTotal={attachAddTotal}
               discountRate={state_summary.discountRate} // 報價單總折數

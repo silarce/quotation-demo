@@ -706,9 +706,18 @@ const useProductList = ({
         delete productList_attach[key];
       });
 
-      productArr_attach.forEach((prod) => {
+      const keyArr: string[] = [];
+
+      productArr_attach.forEach((prod, index) => {
         // w 注意 order不是唯一值，若有多個prod的order一樣，後者會蓋掉前者
-        const key = prod.order !== undefined ? `${prod.order}` : nanoid();
+        // const key = prod.order !== undefined ? `${prod.order}` : nanoid();
+        let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+
+        if (keyArr.includes(key)) {
+          key = `${key}-${index}`;
+        }
+
+        keyArr.push(key);
 
         // if (key in productList_attach) {
         //   key = nanoid();
