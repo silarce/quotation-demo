@@ -848,6 +848,9 @@ const reqModify = async ({
 
           const body = prod.body;
           body.order = index;
+          // attachProdList裡的是追加或追加變更的主產品
+          // 這兩種都不送attachedToProductId
+          body.attachedToProductId = undefined;
 
           return body;
         });
