@@ -46,6 +46,7 @@ export default function QuotereqDetailList() {
         create_at,
         create_by,
         approved,
+        quoterequuid
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -81,6 +82,7 @@ export default function QuotereqDetailList() {
     const [create_byin, setCreate_byin] = useState<string>("");
     const [create_atin, setCreate_atin] = useState<string>("");
     const [approvedin, setApprovedin] = useState<string>("");
+    const [quoterequuidin, setquoterequuidin] = useState<string>(quoterequuid as string)
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -155,7 +157,7 @@ export default function QuotereqDetailList() {
             const data = await response.json();
             setData1(data);
 
-            console.log(data);
+
 
             await new Promise(resolve => setTimeout(resolve, 500));
             setPurchaserequisitionidin(data[0].purchaserequisitionid);
@@ -164,6 +166,8 @@ export default function QuotereqDetailList() {
             setQuotereqquantity(data[0].quantity);
             getQuotereqDetail(data[0].quoterequuid);
             setQuoterequnit(data[0].unit);
+            setquoterequuidin(data[0].quoterequuid)
+            // alert(data[0].quoterequuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -301,21 +305,12 @@ export default function QuotereqDetailList() {
             }
             const data = await response.json();
 
-
-            // let awardedItem = data.find((item: any) => item.awarded);
-            // if (awardedItem) {
-            //   alert(awardedItem.id)
-            //   setSelectedsupplier(awardedItem.id);
-            //   alert(selectedsupplier);
-            // }
-
             setPrquotereqdata(data);
             console.log(prquotereqdata);
 
 
 
         } catch (error: any) {
-            // setError(error.message);
             console.log(error.message);
         }
         finally {
@@ -332,14 +327,18 @@ export default function QuotereqDetailList() {
                 prquotereqadddata.totalprice === "" || prquotereqadddata.totalprice === undefined || prquotereqadddata.totalprice === null ||
                 prquotereqadddata.deliverydate < moment() || prquotereqadddata.deliverydate === null || prquotereqadddata.deliverydate === undefined
             ) {
-                myAlert.err({ title: "請檢查輸入是否正確!!!",
-                     content: "請檢查欄位是否正確或交貨日期是否小於今天日期" })
+                myAlert.err({
+                    title: "請檢查輸入是否正確!!!",
+                    content: "請檢查欄位是否正確或交貨日期是否小於今天日期"
+                })
                 return;
             }
             // setIsLoading(true);
             const conditionModel: {
+                quoterequuid: any,
                 data: any,
             } = {
+                quoterequuid: quoterequuidin,
                 data: prquotereqadddata
             };
 
@@ -465,7 +464,7 @@ export default function QuotereqDetailList() {
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div>
-                    {/* <span style={{ fontSize: '18px', color: '#14256a' }}>請購單號：</span><span style={{ fontSize: '18px' }}>{purchaserequisitionidin}</span>&nbsp;&nbsp;&nbsp;&nbsp; */}
+                        {/* <span style={{ fontSize: '18px', color: '#14256a' }}>請購單號：</span><span style={{ fontSize: '18px' }}>{purchaserequisitionidin}</span>&nbsp;&nbsp;&nbsp;&nbsp; */}
                         <Thead01 type={'QuotereqDetail'} />
                         {/* <Tbody01 type={'PurchaseRequisitionDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
                         {data1 && (
@@ -614,35 +613,10 @@ export default function QuotereqDetailList() {
                     <br />
                     <div className={scss.foot_main}>
                         <div>
-                            {/* <button className={scss.greenbutton} onClick={() => { alert('詢價') }} >詢價單</button> */}
                         </div>
                         <div>
                         </div>
                         <div>
-
-                            {/* <table className={scss.count_table}>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>小計</td>
-                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice ? totalprice : '0'}</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>營業稅</td>
-                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice ? taxprice : '0'}</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>應付金額</td>
-                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice ? totalpayprice : '0'}</td>
-                                </tr>
-                            </table> */}
                         </div>
                     </div>
                     <div className={scss.content_main_content}>

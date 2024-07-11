@@ -120,8 +120,8 @@
 
 .tite_main {
     display: grid;
-    grid-template-columns: 1fr 1fr; // 左右兩邊比例，可以調整
-    gap: 15px;
+    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
     width: auto;
     margin-top: 5px;
     margin-left: 20px;
@@ -160,14 +160,26 @@
     margin-top: 0px;
     margin-left: 20px;
     margin-right: 20px;
+    margin-bottom: 10px;
 
     // background-color: gray;
+}
+
+.content_main_btn{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  width: auto;
+  padding-top:10px;
+  margin-left: 20px;
+  margin-right: 20px;
+  // border-top:1px solid #c1c1c1;
+  margin-bottom: 10px;
 }
 
 .content_main_content {
     // display: grid;
     grid-template-columns: 1fr; // 左右兩邊比例，可以調整
-    gap: 15px;
+    // gap: 15px;
     width: auto;
     // margin-top: 4px;
     margin-left: 20px;
@@ -202,6 +214,19 @@
     }
 }
 
+.foot_foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 0px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-right: 20px;
+  // background-color: gray;
+}
+
+
 .mytitle {
 
     font-size: 16px;
@@ -229,35 +254,14 @@ div.panelHeader21 {
   
     .row01 {
       display: grid;
-      grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 150px 60px;
+      grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 180px 60px ;
       gap: 5px;
     }
   }
 
 
 
-  .greenbutton {
-    height: 36px;
-    // padding: 0px 40px;
-    border: solid 1px #00BB00;
-    background-color: $bgc01;
-    padding-left: 22px;
-    padding-right: 22px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 16px;
-    color:#00BB00;
-    transform: translateY(2px);
-    &:hover {
-        border: solid 1px #00BB00;
-        background-color: #00bb0018
-      }
-      &:focus {
-        background-color: $bgc01;
-        border: solid 1px #00BB00;
-      }
-}
+
 
 
 //#region 請購單明細
@@ -280,11 +284,10 @@ div.panelHeader16 {
   
     .row01 {
       display: grid;
-      grid-template-columns: 30px 150px 300px 300px 50px 40px 40px 60px 60px 150px 30px;
+      grid-template-columns: 30px 150px 300px 300px 50px 40px 40px 60px 60px 180px 30px;
       // gap: 5px;
     }
   }
-  
   //#endregion
 
 
@@ -386,3 +389,63 @@ div.panelHeader17 {
   }
   
   //#endregion
+
+  .redbtn {
+    height: 36px;
+    // padding: 0px 40px;
+    border: solid 1px #ea1833
+    ;
+    background-color: $bgc01;
+    padding:4px 22px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ea1833
+    ;
+    transform: translateY(2px);
+  
+    &:hover {
+      border: solid 1px #ea1833
+      ;
+      background-color: #ea18341d
+
+    }
+  
+    &:focus {
+      background-color: $bgc01;
+      border: solid 1px #ea1833
+      ;
+    }
+  }
+
+  .graybtn {
+    height: 36px;
+    // padding: 0px 40px;
+    border: solid 1px #c1c1c1;
+    ;
+    background-color: $bgc01;
+    padding:4px 22px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #5b5a5ad6
+    ;
+    transform: translateY(2px);
+  
+    &:hover {
+      border: solid 1px #c1c1c1
+      ;
+      background-color: #c1c1c121
+
+    }
+  
+    &:focus {
+      background-color: $bgc01;
+      border: solid 1px #c1c1c1
+      ;
+    }
+  }
+
+  

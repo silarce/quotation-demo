@@ -117,27 +117,27 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
   const recodeWhpid = (length: any, width: any, childlength: any, childwidth: any) => {
     const convertToAlpha = (num: number): string => {
-        return String.fromCharCode(65 + num - 1);
+      return String.fromCharCode(65 + num - 1);
     };
 
     const convertToNumber = (num: number, pad: number): string => {
-        return num.toString().padStart(pad, '0');
+      return num.toString().padStart(pad, '0');
     };
 
     const alphaIncrement = (alpha: string): string => {
-        if (alpha === 'Z') {
-            return 'A';
-        } else {
-            return String.fromCharCode(alpha.charCodeAt(0) + 1);
-        }
+      if (alpha === 'Z') {
+        return 'A';
+      } else {
+        return String.fromCharCode(alpha.charCodeAt(0) + 1);
+      }
     };
 
     const numberIncrement = (num: number, max: number, pad: number): string => {
-        if (num >= max) {
-            return convertToNumber(1, pad);
-        } else {
-            return convertToNumber(num + 1, pad);
-        }
+      if (num >= max) {
+        return convertToNumber(1, pad);
+      } else {
+        return convertToNumber(num + 1, pad);
+      }
     };
 
     let newlength = '';
@@ -147,47 +147,47 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
     // 處理 length 的增量
     if (length === '1') {
-        newlength = 'A';
+      newlength = 'A';
     } else {
-        newlength = convertToAlpha(parseInt(length, 10));
+      newlength = convertToAlpha(parseInt(length, 10));
     }
 
     // 處理 width 的增量
     if (width === '1') {
-        newwidth = '001';
+      newwidth = '001';
     } else {
-        newwidth = convertToNumber(parseInt(width, 10), 3);
+      newwidth = convertToNumber(parseInt(width, 10), 3);
     }
 
     // 處理 childlength 的增量
     if (childlength === '1') {
-        newchildlength = 'A';
+      newchildlength = 'A';
     } else {
-        newchildlength = convertToAlpha(parseInt(childlength, 10));
+      newchildlength = convertToAlpha(parseInt(childlength, 10));
     }
 
     // 處理 childwidth 的增量
     if (childwidth === '1') {
-        newchildwidth = '1';
+      newchildwidth = '1';
     } else {
-        newchildwidth = numberIncrement(parseInt(childwidth), 100, 1);
+      newchildwidth = numberIncrement(parseInt(childwidth), 100, 1);
     }
 
     // 增量操作
     if (childlength !== '1' && newchildwidth === '001') {
-        newchildlength = alphaIncrement(newchildlength);
+      newchildlength = alphaIncrement(newchildlength);
     }
 
     if (width !== '1' && newchildlength === 'A' && newchildwidth === '1') {
-        newwidth = numberIncrement(parseInt(width), 100, 3);
+      newwidth = numberIncrement(parseInt(width), 100, 3);
     }
 
     if (length !== '1' && newwidth === '001' && newchildlength === 'A' && newchildwidth === '1') {
-        newlength = alphaIncrement(newlength);
+      newlength = alphaIncrement(newlength);
     }
 
-    return newlength + newwidth + newchildlength + (parseInt(newchildwidth)-1).toString();
-};
+    return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 1).toString();
+  };
 
 
   async function GetPickingListDetailById(plid: any, create_at: any, create_by: any, lotid: any, picked: any, item: any) {
@@ -287,12 +287,10 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       }
     })
   }
+  
   //#region 請購單
   //請購單
   async function GetPurchaseRequisition(item: any) {
-
-    // setRefreshpurchaserequisitiondetail(item);
-
     router.replace({
       pathname: `/factoryDepartment/purchaseRequisitionList`,
       query: {
@@ -301,13 +299,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         create_at: getTaiwanDateStr(item.create_at),
         create_by: item.create_by,
         approved: item.approved,
+        status: item.status,
         firstin: 1
       }
     })
   }
-
-  
-
   //#endregion
 
 
@@ -375,9 +371,9 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
               <div className={scss.row01} >
                 {/* <span>{_item.materialnumber}</span> */}
                 <span>
-                {`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}
+                  {`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}
                   {/* {_item.length}-{_item.width} */}
-                  </span>
+                </span>
                 <span>{_item.materialnumber}</span>
                 {/* <span>{_item.batchnumber}</span> */}
                 <span>{_item.whpname}</span>
@@ -695,7 +691,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   }
   //#endregion
   //#region 請購單明細
- //移到purchaseRequisitionList 請購單頁面
+  //移到purchaseRequisitionList 請購單頁面
   //#endregion
 
   //#region 詢價單明細
@@ -731,28 +727,28 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   //   );
   // }
   //#endregion
- //#region 新增請購單明細
- else if (type === "AddPR_ReqList") {
-  return (
-    <div>
-      {error && <p>Error2: {error}</p>}
-      {data && (
-        data.map((_item: any, index: number) => (
-          <CellWithBar key={index} className={scss.panelHeader20}>
-            <div className={scss.row01}>
-              <span>{index + 1}</span>
-              <span>{_item.name}</span>
-              <span>{_item.spec}</span>
-              <span>{_item.quantity}</span>
-            </div>
-          </CellWithBar>
-        ))
-      )}
-    </div>
-  );
-}
-//#endregion
-  
+  //#region 新增請購單明細
+  else if (type === "AddPR_ReqList") {
+    return (
+      <div>
+        {error && <p>Error2: {error}</p>}
+        {data && (
+          data.map((_item: any, index: number) => (
+            <CellWithBar key={index} className={scss.panelHeader20}>
+              <div className={scss.row01}>
+                <span>{index + 1}</span>
+                <span>{_item.name}</span>
+                <span>{_item.spec}</span>
+                <span>{_item.quantity}</span>
+              </div>
+            </CellWithBar>
+          ))
+        )}
+      </div>
+    );
+  }
+  //#endregion
+
   return null; // Add default return in case type is not matched
 
 

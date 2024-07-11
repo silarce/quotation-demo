@@ -309,6 +309,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>名稱</span>
         <span>規格</span>
         <span>數量</span>
+        <span>單位</span>
+        <span>備註(用途說明)</span>
         <span></span>
       </div>
     )

@@ -504,7 +504,7 @@ export default function PurchaseOrderList() {
         console.log(data2);
     };
 
-   // 從口袋清單移除
+    // 從口袋清單移除
     const handleRemove = (index: number) => {
         const updatedData = data2.filter((_, i) => i !== index);
         setData2(updatedData);
@@ -793,7 +793,7 @@ export default function PurchaseOrderList() {
                                         <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
                                             <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
                                         </button>
-                                        <span　style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span>
+                                        <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span>
                                         <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
                                             <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                         </button>

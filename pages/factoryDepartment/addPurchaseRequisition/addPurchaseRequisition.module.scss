@@ -202,7 +202,7 @@
   top: 0;
   z-index: 1000;
   display: grid;
-  grid-template-columns: 250px 280px 50px 50px 50px;
+  grid-template-columns: 30px 400px 400px 50px 70px 300px 50px;
   gap: 15px;
   width: auto;
   // margin: 5px 20px;
@@ -217,8 +217,8 @@
 
     input {
       // height: 32px;
-      font-size: 13px;
-      width:100%;
+      font-size: 16px;
+      width: 100%;
       // border:1px solid #c1c1c1;
     }
 
@@ -235,28 +235,36 @@
   }
 }
 
-.tite_main {
+.head_content1 {
   display: grid;
-  grid-template-columns: 1fr 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
   gap: 15px;
   width: auto;
   margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
+
+  div {
+    margin-right: 20px;
+  }
+
   // background-color: gray;
 }
 
-.head_main {
+.head_content2 {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 1fr 1fr 1fr;
   // gap: 15px;
   width: auto;
   margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
-  // background-color: gray;
-  border-top: 1px solid rgba(128, 128, 128, 0.2);
 
+  // background-color: gray;
+  // border-top: 1px solid rgba(128, 128, 128, 0.2);
+  div {
+    margin-right: 20px;
+  }
 }
 
 .addBtn {
@@ -270,16 +278,37 @@
 }
 
 
-.content_main {
+.head_content3 {
   display: grid;
-  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 100px 1fr; // 左右兩邊比例，可以調整
   // gap: 15px;
   width: auto;
-  margin-top: 0px;
+  margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
 
+
   // background-color: gray;
+}
+
+.head_foot1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.head_foot2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .content_main_content {
@@ -350,7 +379,7 @@ div.panelHeader19 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 145px 300px 300px 30px 30px;
+    grid-template-columns: 145px 300px 300px 40px 30px;
     gap: 5px;
   }
 }
@@ -378,7 +407,7 @@ div.panelHeader20 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 300px 300px 30px 70px;
+    grid-template-columns: 30px 415px 415px 65px 85px 300px 100px;
     // gap: 5px;
   }
 }
@@ -473,5 +502,80 @@ div.panelHeader20 {
     background-color: $bgc01;
     border: solid 1px #14256a1b;
     color: #14256a;
+  }
+}
+
+.redbtn {
+  height: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #ea1833;
+  background-color: $bgc01;
+  padding: 4px 22px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #ea1833;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #ea1833;
+    background-color: #ea18341d
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #ea1833;
+  }
+}
+
+.graybtn {
+  height: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  ;
+  background-color: $bgc01;
+  padding: 4px 22px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #5b5a5ad6;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #c1c1c1;
+    background-color: #c1c1c121
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #c1c1c1;
+  }
+}
+
+.minibtn {
+  height: 36px;
+  // width: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  ;
+  background-color: $bgc01;
+  padding: 4px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #14256a;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #c1c1c1;
+    background-color: #c1c1c121
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #c1c1c1;
   }
 }
