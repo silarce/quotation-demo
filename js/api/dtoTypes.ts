@@ -1811,6 +1811,7 @@ export type TquotationContentDto = {
   // ! 所以只設需要拿的東西
   // contract?: TquotationContractDto;
   contract?: {
+    // 設了populate卻不到，這個好像沒有?
     id: string;
   };
 
@@ -1818,6 +1819,7 @@ export type TquotationContentDto = {
   // rootContract?: Omit<TquotationContractDto, 'rootContract'>;
   // rootContract?: TquotationContractDto;
 
+  // 設了populate卻不到，這個好像沒有?
   // 為了避免check壞掉，暫時先這樣
   rootContract?: TquotationContentDto_copy;
   // 失件
