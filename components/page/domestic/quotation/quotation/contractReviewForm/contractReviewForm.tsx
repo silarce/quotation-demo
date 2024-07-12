@@ -102,241 +102,13 @@ function ContractReviewForm({
 }
 
 // endregion START
+
 // MARK: END
-
 // ============================================================================
 // ============================================================================
 // ============================================================================
 // ============================================================================
 // ============================================================================
-// ============================================================================
-// ============================================================================
-
-// region COMPONENT
-
-const InputBox = ({
-  prefix,
-  suffix,
-  boxStyle,
-  inputAttr,
-  className,
-}: {
-  prefix?: string;
-  suffix?: string;
-  boxStyle?: React.CSSProperties;
-  inputAttr?: React.InputHTMLAttributes<HTMLInputElement>;
-  className?: string;
-}) => {
-  return (
-    <div style={boxStyle} className={classNames(scss.inputBox, className)}>
-      <span>{prefix}</span>
-      <input type="text" {...inputAttr} />
-      <span>{suffix}</span>
-    </div>
-  );
-};
-
-const Row = ({
-  disabled,
-  serialNumber,
-  onAdd,
-  onDel,
-  title,
-  percent,
-  price,
-  note,
-}: {
-  disabled?: boolean;
-  serialNumber: number;
-  onAdd?: () => void;
-  onDel?: () => void;
-  title: {
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  };
-  percent: {
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  };
-  price: {
-    value: string;
-    // onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  };
-  note: {
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  };
-}) => {
-  return (
-    <div className={scss.payMethod}>
-      <div>
-        <InputBox
-          prefix={`${serialNumber}.`}
-          inputAttr={{
-            disabled: disabled,
-            value: title.value,
-            onChange: title.onChange,
-            placeholder: '請輸入標題',
-          }}
-        />
-        <InputBox
-          suffix="%"
-          inputAttr={{
-            disabled: disabled,
-            className: 'text-center',
-            value: percent.value,
-            onChange: percent.onChange,
-            type: 'number',
-            placeholder: '比例',
-          }}
-        />
-        <InputBox
-          prefix="$"
-          inputAttr={{
-            className: 'text-center',
-            value: price.value,
-            // onChange: price.onChange,
-            type: 'number',
-            disabled: true,
-          }}
-        />
-        <InputBox
-          prefix="備註 :"
-          inputAttr={{
-            disabled: disabled,
-            value: note.value,
-            onChange: note.onChange,
-            placeholder: '請輸入備註',
-          }}
-        />
-      </div>
-      <div>
-        <IconAdd attr={{ onClick: onAdd, className: classNames(!onAdd && scss.hidden) }} />
-        {/* {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />} */}
-        {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />}
-      </div>
-    </div>
-  );
-};
-
-const IconAdd = ({ attr }: { attr?: React.SVGProps<SVGSVGElement> }) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 18 18"
-      fill="none"
-      //
-      {...attr}
-    >
-      <circle cx="9" cy="9" r="8.5" stroke="#14256A" />
-      <line x1="4.5" y1="9" x2="13.5" y2="9" stroke="#14256A" />
-      <line x1="9" y1="4.5" x2="9" y2="13.5" stroke="#14256A" />
-    </svg>
-  );
-};
-
-const IconDel = ({ attr }: { attr?: React.SVGProps<SVGSVGElement> }) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 18 18"
-      fill="none"
-      //
-      {...attr}
-    >
-      <circle cx="9" cy="9" r="8.5" stroke="#14256A" />
-      <line x1="4.5" y1="9" x2="13.5" y2="9" stroke="#14256A" />
-    </svg>
-  );
-};
-
-const IconCaution = ({ attr }: { attr?: React.SVGProps<SVGSVGElement> }) => {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-      <circle cx="9" cy="9" r="8.5" stroke="#14256A" />
-      <path d="M9.83333 10.5H8.16667L7.75 7.26923V3.5H10.25V7.26923L9.83333 10.5Z" fill="#14256A" />
-      <circle cx="9" cy="13.25" r="1.25" fill="#14256A" />
-    </svg>
-  );
-};
-
-const RadioContainer = ({
-  label,
-  className,
-  labelClassName,
-  value,
-  onChange,
-  disabled,
-}: {
-  label: string;
-  className?: string;
-  labelClassName?: string;
-  value: boolean;
-  onChange: (v: boolean) => void;
-  disabled?: boolean;
-}) => {
-  return (
-    <div className={classNames(className)}>
-      <span className={classNames('inline-block', labelClassName)}>{label}</span>
-      <Radio.Group disabled={disabled} onChange={(e) => onChange(e.target.value)} value={value}>
-        <Radio value={true}>是</Radio>
-        <Radio value={false}>否</Radio>
-      </Radio.Group>
-    </div>
-  );
-};
-
-const RowArr = ({
-  empArr,
-  selEmployeeIdArr,
-  // skipArr,
-  viewRef_bottom,
-  // exceptEmpArr,
-  onClick,
-}: // exceptEmpCheck,
-{
-  empArr: TemployeeDto[];
-  selEmployeeIdArr: string[];
-  // skipArr?: TemployeeDto[];
-  onClick: (v: TemployeeDto) => void;
-  // exceptEmpArr?: { id: string }[];
-  viewRef_bottom?: (node?: Element | null | undefined) => void;
-  // exceptEmpCheck: ((emp: TemployeeDto) => boolean) | undefined;
-}) => {
-  return (
-    <>
-      {empArr.map((emp, index, arr) => {
-        const { idNumber, chName, jobs } = emp;
-        const { name, grade, department } = jobs?.[0] ?? {};
-
-        const theViewRef = (() => {
-          if (arr.length - 11 === index) {
-            return viewRef_bottom;
-          }
-
-          return undefined;
-        })();
-
-        const isActive = selEmployeeIdArr.some((selEmpId) => selEmpId === emp.id);
-
-        return (
-          <CellWithBar key={index} isActive={isActive}>
-            <div className={classNames(scss.row)} onClick={() => onClick(emp)} ref={theViewRef}>
-              <span className={scss.idNumber}>{idNumber}</span>
-              <span>{chName}</span>
-              <span>{name ? `${department?.name} / ${name}` : ''}</span>
-              <span>{grade && `Level ${grade}`}</span>
-            </div>
-          </CellWithBar>
-        );
-      })}
-    </>
-  );
-};
 
 // MARK:ReviewForm
 
@@ -361,7 +133,7 @@ function ReviewForm({
   defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
   onConfirm?: () => void;
 }) {
-  // ----------------------------------------------------------------------------
+  //
 
   const { payMethodList, addMethod, resetMethodList, getMethodBodyArr, allPercentStr } = usePayMethod({
     contractPrice,
@@ -375,75 +147,9 @@ function ReviewForm({
 
   // ----------------------------------------------------------------------------
 
-  useEffect(() => {
-    // verifyForm
+  // region REQUEST
 
-    let methodArr: TpaymentRatio[] | undefined = undefined;
-
-    if (verifyForm) {
-      reset({
-        askForPaymentDate: verifyForm.askForPaymentDate,
-        disbursementDate: verifyForm.disbursementDate,
-        // paymentRatio: verifyForm.paymentRatio,
-        paymentTenor: verifyForm.paymentTenor,
-        performanceBond: verifyForm.performanceBond,
-        depositPayment: verifyForm.depositPayment,
-        warrantyPeriod: verifyForm.warrantyPeriod,
-        note: verifyForm.note,
-        warrantyPayment: verifyForm.warrantyPayment,
-        fireproofCertificate: verifyForm.fireproofCertificate,
-        warranty: verifyForm.warranty,
-        testDrive: verifyForm.testDrive,
-        debitItem: verifyForm.debitItem,
-        // workDirectorId: verifyForm.workDirectorId,
-        performanceBondNote: verifyForm.performanceBondNote,
-        warrantyPaymentNote: verifyForm.warrantyPaymentNote,
-      });
-
-      methodArr = verifyForm?.paymentRatio.map((item) => {
-        return {
-          title: item.level,
-          percent: item.paymentRatio,
-          price: item.price,
-          note: item.note ?? '',
-        };
-      });
-    } else {
-      reset({
-        askForPaymentDate: undefined,
-        disbursementDate: undefined,
-        paymentTenor: undefined,
-        performanceBond: undefined,
-        depositPayment: undefined,
-        warrantyPeriod: undefined,
-        note: undefined,
-        warrantyPayment: undefined,
-        fireproofCertificate: undefined,
-        warranty: undefined,
-        testDrive: undefined,
-        debitItem: undefined,
-        performanceBondNote: undefined,
-        warrantyPaymentNote: undefined,
-      });
-
-      methodArr = defaultPaymentRatioArr?.map((item) => {
-        return {
-          title: item.level,
-          percent: item.paymentRatio,
-          price: item.price,
-          note: item.note ?? '',
-        };
-      });
-    }
-
-    resetMethodList({ defaultPayMethodArr: methodArr });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled, verifyForm, defaultPaymentRatioArr]);
-
-  // ------------------------------------------------------------------
-
-  const theOnConfirm = async () => {
+  const reqSubmitContracting = async () => {
     if (!lastestContentId || disabled) {
       return;
     }
@@ -513,16 +219,91 @@ function ReviewForm({
       const err = error as Error;
       myAlert.err({ title: '送出合約審核表失敗', content: err?.message });
     }
+  };
+  // ----------------------------------------------------------------------------
+
+  // region FUNCTION
+
+  const handle_confirm = async () => {
+    await reqSubmitContracting();
 
     close?.();
     onConfirm && onConfirm();
   };
 
   const onCancel = () => {
-    // onCancel();
-    // setSelEmployeeArr([]);
     close?.();
   };
+
+  // ----------------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    // verifyForm
+
+    let methodArr: TpaymentRatio[] | undefined = undefined;
+
+    if (verifyForm) {
+      reset({
+        askForPaymentDate: verifyForm.askForPaymentDate,
+        disbursementDate: verifyForm.disbursementDate,
+        // paymentRatio: verifyForm.paymentRatio,
+        paymentTenor: verifyForm.paymentTenor,
+        performanceBond: verifyForm.performanceBond,
+        depositPayment: verifyForm.depositPayment,
+        warrantyPeriod: verifyForm.warrantyPeriod,
+        note: verifyForm.note,
+        warrantyPayment: verifyForm.warrantyPayment,
+        fireproofCertificate: verifyForm.fireproofCertificate,
+        warranty: verifyForm.warranty,
+        testDrive: verifyForm.testDrive,
+        debitItem: verifyForm.debitItem,
+        // workDirectorId: verifyForm.workDirectorId,
+        performanceBondNote: verifyForm.performanceBondNote,
+        warrantyPaymentNote: verifyForm.warrantyPaymentNote,
+      });
+
+      methodArr = verifyForm?.paymentRatio.map((item) => {
+        return {
+          title: item.level,
+          percent: item.paymentRatio,
+          price: item.price,
+          note: item.note ?? '',
+        };
+      });
+    } else {
+      reset({
+        askForPaymentDate: undefined,
+        disbursementDate: undefined,
+        paymentTenor: undefined,
+        performanceBond: undefined,
+        depositPayment: undefined,
+        warrantyPeriod: undefined,
+        note: undefined,
+        warrantyPayment: undefined,
+        fireproofCertificate: undefined,
+        warranty: undefined,
+        testDrive: undefined,
+        debitItem: undefined,
+        performanceBondNote: undefined,
+        warrantyPaymentNote: undefined,
+      });
+
+      methodArr = defaultPaymentRatioArr?.map((item) => {
+        return {
+          title: item.level,
+          percent: item.paymentRatio,
+          price: item.price,
+          note: item.note ?? '',
+        };
+      });
+    }
+
+    resetMethodList({ defaultPayMethodArr: methodArr });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled, verifyForm, defaultPaymentRatioArr]);
 
   // ----------------------------------------------------------------------------
 
@@ -816,7 +597,7 @@ function ReviewForm({
             className={classNames(disabled && 'hidden')}
             label="確定"
             theme="danger"
-            onClick={theOnConfirm}
+            onClick={handle_confirm}
             px="px44"
           />
           <MyButton_v2 label={disabled ? '關閉' : '取消'} onClick={onCancel} px="px44" />
@@ -827,6 +608,240 @@ function ReviewForm({
     </div>
   );
 }
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+
+// region COMPONENT
+
+const InputBox = ({
+  prefix,
+  suffix,
+  boxStyle,
+  inputAttr,
+  className,
+}: {
+  prefix?: string;
+  suffix?: string;
+  boxStyle?: React.CSSProperties;
+  inputAttr?: React.InputHTMLAttributes<HTMLInputElement>;
+  className?: string;
+}) => {
+  return (
+    <div style={boxStyle} className={classNames(scss.inputBox, className)}>
+      <span>{prefix}</span>
+      <input type="text" {...inputAttr} />
+      <span>{suffix}</span>
+    </div>
+  );
+};
+
+const Row = ({
+  disabled,
+  serialNumber,
+  onAdd,
+  onDel,
+  title,
+  percent,
+  price,
+  note,
+}: {
+  disabled?: boolean;
+  serialNumber: number;
+  onAdd?: () => void;
+  onDel?: () => void;
+  title: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  };
+  percent: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  };
+  price: {
+    value: string;
+    // onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  };
+  note: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  };
+}) => {
+  return (
+    <div className={scss.payMethod}>
+      <div>
+        <InputBox
+          prefix={`${serialNumber}.`}
+          inputAttr={{
+            disabled: disabled,
+            value: title.value,
+            onChange: title.onChange,
+            placeholder: '請輸入標題',
+          }}
+        />
+        <InputBox
+          suffix="%"
+          inputAttr={{
+            disabled: disabled,
+            className: 'text-center',
+            value: percent.value,
+            onChange: percent.onChange,
+            type: 'number',
+            placeholder: '比例',
+          }}
+        />
+        <InputBox
+          prefix="$"
+          inputAttr={{
+            className: 'text-center',
+            value: price.value,
+            // onChange: price.onChange,
+            type: 'number',
+            disabled: true,
+          }}
+        />
+        <InputBox
+          prefix="備註 :"
+          inputAttr={{
+            disabled: disabled,
+            value: note.value,
+            onChange: note.onChange,
+            placeholder: '請輸入備註',
+          }}
+        />
+      </div>
+      <div>
+        <IconAdd attr={{ onClick: onAdd, className: classNames(!onAdd && scss.hidden) }} />
+        {/* {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />} */}
+        {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />}
+      </div>
+    </div>
+  );
+};
+
+const IconAdd = ({ attr }: { attr?: React.SVGProps<SVGSVGElement> }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      //
+      {...attr}
+    >
+      <circle cx="9" cy="9" r="8.5" stroke="#14256A" />
+      <line x1="4.5" y1="9" x2="13.5" y2="9" stroke="#14256A" />
+      <line x1="9" y1="4.5" x2="9" y2="13.5" stroke="#14256A" />
+    </svg>
+  );
+};
+
+const IconDel = ({ attr }: { attr?: React.SVGProps<SVGSVGElement> }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 18 18"
+      fill="none"
+      //
+      {...attr}
+    >
+      <circle cx="9" cy="9" r="8.5" stroke="#14256A" />
+      <line x1="4.5" y1="9" x2="13.5" y2="9" stroke="#14256A" />
+    </svg>
+  );
+};
+
+const IconCaution = ({ attr }: { attr?: React.SVGProps<SVGSVGElement> }) => {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <circle cx="9" cy="9" r="8.5" stroke="#14256A" />
+      <path d="M9.83333 10.5H8.16667L7.75 7.26923V3.5H10.25V7.26923L9.83333 10.5Z" fill="#14256A" />
+      <circle cx="9" cy="13.25" r="1.25" fill="#14256A" />
+    </svg>
+  );
+};
+
+const RadioContainer = ({
+  label,
+  className,
+  labelClassName,
+  value,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  className?: string;
+  labelClassName?: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+}) => {
+  return (
+    <div className={classNames(className)}>
+      <span className={classNames('inline-block', labelClassName)}>{label}</span>
+      <Radio.Group disabled={disabled} onChange={(e) => onChange(e.target.value)} value={value}>
+        <Radio value={true}>是</Radio>
+        <Radio value={false}>否</Radio>
+      </Radio.Group>
+    </div>
+  );
+};
+
+const RowArr = ({
+  empArr,
+  selEmployeeIdArr,
+  // skipArr,
+  viewRef_bottom,
+  // exceptEmpArr,
+  onClick,
+}: // exceptEmpCheck,
+{
+  empArr: TemployeeDto[];
+  selEmployeeIdArr: string[];
+  // skipArr?: TemployeeDto[];
+  onClick: (v: TemployeeDto) => void;
+  // exceptEmpArr?: { id: string }[];
+  viewRef_bottom?: (node?: Element | null | undefined) => void;
+  // exceptEmpCheck: ((emp: TemployeeDto) => boolean) | undefined;
+}) => {
+  return (
+    <>
+      {empArr.map((emp, index, arr) => {
+        const { idNumber, chName, jobs } = emp;
+        const { name, grade, department } = jobs?.[0] ?? {};
+
+        const theViewRef = (() => {
+          if (arr.length - 11 === index) {
+            return viewRef_bottom;
+          }
+
+          return undefined;
+        })();
+
+        const isActive = selEmployeeIdArr.some((selEmpId) => selEmpId === emp.id);
+
+        return (
+          <CellWithBar key={index} isActive={isActive}>
+            <div className={classNames(scss.row)} onClick={() => onClick(emp)} ref={theViewRef}>
+              <span className={scss.idNumber}>{idNumber}</span>
+              <span>{chName}</span>
+              <span>{name ? `${department?.name} / ${name}` : ''}</span>
+              <span>{grade && `Level ${grade}`}</span>
+            </div>
+          </CellWithBar>
+        );
+      })}
+    </>
+  );
+};
 
 // endregion COMPONENT
 
@@ -1034,6 +1049,10 @@ const useDefaultPaymentRatio_quotationContent = (
 
   return arr;
 };
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
 
 export default ContractReviewForm;
 export { ReviewForm, useDefaultPaymentRatio_quotationContent };
