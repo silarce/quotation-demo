@@ -633,7 +633,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
     resetTrigger: contractProdArr,
     // onDoorTypeChange: onDoorTypeChange,
     productArr_attach: contentProdArr,
-    quotationDiscount: Number(state_summary.discountRate || '100'),
+    quotationDiscount: 100,
+    quotationDiscount_attach: Number(state_summary.discountRate || '100'),
+    averageDiscount: quotationData?.latestContent?.averageDiscount,
+    isAttach: true,
   });
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
@@ -1356,6 +1359,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
       //
       isLost: state_profile.isLost ?? false,
+      averageDiscount: avgDiscount_withQty,
     };
 
     if (!body.customerId) {
@@ -1827,6 +1831,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           </div>
 
           {/*  */}
+
           <Summary
             disabled={disabled}
             payInfoControl={payInfoControl}

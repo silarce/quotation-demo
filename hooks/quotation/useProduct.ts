@@ -61,15 +61,18 @@ type TothersList = {
 const useProductList = ({
   productArr,
   others,
+  averageDiscount,
   resetTrigger,
   onDoorTypeChange,
   productArr_attach,
   quotationDiscount,
   quotationDiscount_attach = 100,
+  isAttach,
 }: // onDiscountChange,
 {
   productArr: TquotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
+  averageDiscount: string | null | undefined;
   resetTrigger: any;
   onDoorTypeChange?: (obj: {
     annoShouldRemove: string[] | undefined;
@@ -81,6 +84,7 @@ const useProductList = ({
   quotationDiscount: number;
   quotationDiscount_attach?: number;
   // onDiscountChange?: (avgDiscount: number) => void;
+  isAttach?: boolean;
 }) => {
   const [render, setRender] = useState(0);
 
@@ -163,12 +167,18 @@ const useProductList = ({
       let count = 0;
 
       Object.values(list).forEach((prod) => {
-        for (let i = 0; i < +prod.quantity; i++) {
-          discountTotal = discountTotal.add(prod.discount);
-          count = count + 1;
+        if (!isAttach) {
+          console.log('foo');
+
+          for (let i = 0; i < +prod.quantity; i++) {
+            discountTotal = discountTotal.add(prod.discount);
+            count = count + 1;
+          }
         }
 
         const exchangeProdList = prod.exchangeProdList;
+        console.log('exchangeProdList', exchangeProdList);
+        console.log('productList_attach', productList_attach);
 
         Object.values(exchangeProdList).forEach((exchangeProd) => {
           for (let i = 0; i < +exchangeProd.quantity; i++) {
@@ -848,6 +858,12 @@ const useProductList = ({
   //     prod.discount_noTimeout = String(str);
   //   });
   // };
+
+  // ---------------------------------------------------------
+
+  useEffect(() => {
+    setAvgDiscount_withQty(Number(averageDiscount || 100));
+  }, [averageDiscount]);
 
   // ---------------------------------------------------------
 

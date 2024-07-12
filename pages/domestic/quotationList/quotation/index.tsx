@@ -637,6 +637,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       projectProgress: state_profile.projectProgress ?? '',
 
       discount: `${Number(state_summary.discountRate ?? 0)}` ?? '100',
+      averageDiscount: avgDiscount_withQty || null,
       tuneTotal: state_summary.tuneTotal || '0',
       subTotal: Number(state_summary.subTotal.replaceAll(',', '')),
       salesTax: Number(state_summary.salesTax.replaceAll(',', '')),
@@ -999,6 +1000,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // others: quotationData?.latestContent.others,
     productArr: latestContent?.products,
     others: latestContent?.others,
+    averageDiscount: latestContent?.averageDiscount,
     resetTrigger: quotationData ?? quotationContentData,
     // onDoorTypeChange: onDoorTypeChange, // 棄用
     quotationDiscount: Number(state_summary.discountRate || '100'),

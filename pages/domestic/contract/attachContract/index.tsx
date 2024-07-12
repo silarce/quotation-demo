@@ -204,9 +204,11 @@ export default function AttachContract({
   } = useProductList({
     productArr: formatedContent?.products,
     others: formatedContent?.others,
+    averageDiscount: '100',
     resetTrigger: data_contract,
     quotationDiscount: Number(formatedContent?.discount || '100'),
     quotationDiscount_attach: Number(state_summary.discountRate || '100'),
+    isAttach: true,
   });
 
   const { control_profile, state_profile, state_customer } = useProfile({
@@ -246,6 +248,7 @@ export default function AttachContract({
       verticleKeyArr_attach,
       //
       discount: state_summary.discountRate,
+      averageDiscount: avgDiscount_withQty,
     });
   };
 
@@ -730,6 +733,7 @@ const reqModify = async ({
   verticleKeyArr_attach,
   //
   discount,
+  averageDiscount,
 }: {
   router: ReturnType<typeof useRouter>;
   setIsLoadding: React.Dispatch<React.SetStateAction<boolean>>;
@@ -754,6 +758,7 @@ const reqModify = async ({
   state_summary: Tstate_summary;
   verticleKeyArr_attach: string[] | undefined;
   discount: string;
+  averageDiscount: string;
 }) => {
   try {
     setIsLading(true);
@@ -929,6 +934,8 @@ const reqModify = async ({
       deliveryLocation: state_summary.deliveryLocation,
       deliveryDate: state_summary.deliveryDate,
       paymentMethods: state_paymentMethod,
+      //
+      averageDiscount,
     };
 
     let isDoorModalNameEmpty = false;
