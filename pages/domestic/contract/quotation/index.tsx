@@ -915,6 +915,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         <ContractReviewForm
           showModal={reviewFormShow}
           // forbidden={true}
+          isInContract={true}
           close={() => setReviewFormShow(false)}
           contractIdNumber={content?.quotationNumber ?? ''}
           contractName={content?.projectName ?? ''}

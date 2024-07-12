@@ -17,7 +17,11 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // api
 import { Tparams, TemployeeDto, useEmployee_infinite } from 'js/api/api_employee';
-import { apiSubmitContracting } from 'js/api/api_quotation';
+import {
+  //
+  apiSubmitContracting,
+  apiPatchQuotationVerifyForm,
+} from 'js/api/api_quotation';
 
 // css
 import scss from './contractReviewForm.module.scss';
@@ -52,6 +56,7 @@ export type { TpaymentRatio };
 
 function ContractReviewForm({
   showModal,
+  isInContract,
   close,
   contractIdNumber,
   contractName,
@@ -63,6 +68,7 @@ function ContractReviewForm({
   defaultPaymentRatioArr,
 }: {
   showModal: boolean;
+  isInContract?: boolean;
   close: () => void;
   contractIdNumber: string;
   contractName: string;
@@ -87,6 +93,7 @@ function ContractReviewForm({
       onCancel={close}
     >
       <ReviewForm
+        isInContract={isInContract}
         forbidden={forbidden}
         // disabled={false}
         close={close}
@@ -123,6 +130,7 @@ function ReviewForm({
   verifyForm,
   defaultPaymentRatioArr,
   onConfirm,
+  isInContract,
 }: {
   forbidden?: boolean;
   close?: () => void;
@@ -133,6 +141,7 @@ function ReviewForm({
   verifyForm: TquotationVerifyFormDto | undefined;
   defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
   onConfirm?: () => void;
+  isInContract?: boolean;
 }) {
   //
 
@@ -229,7 +238,14 @@ function ReviewForm({
     }
 
     try {
-      await apiSubmitContracting({ contentId: lastestContentId, body });
+      if (isInContract && verifyForm) {
+        await apiPatchQuotationVerifyForm({
+          verifyForm: verifyForm.id,
+          body,
+        });
+      } else {
+        await apiSubmitContracting({ contentId: lastestContentId, body });
+      }
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '送出合約審核表失敗', content: err?.message });
@@ -373,11 +389,8 @@ function ReviewForm({
   // MARK: RENDER
 
   return (
-    <div className={scss.container}>
-      <div
-        // className="flex justify-end justify-items-start gap-5 h-16"
-        className={scss.btnBar}
-      >
+    <div className={classNames(scss.container, disabled && scss.disabled)}>
+      <div className={classNames(scss.btnBar, forbidden && scss.forbidden)}>
         {!disabled && (
           <MyButton_v2 px="px22" py="py4" theme="danger" onClick={handle_confirm}>
             確定
@@ -457,8 +470,8 @@ function ReviewForm({
           <InputBox
             className="mt-1 w-full"
             prefix="備註 :"
+            disabled={disabled}
             inputAttr={{
-              disabled: disabled,
               placeholder: '請輸入備註',
               value: watchData.paymentDateNote ?? '',
               onChange: (e) => {
@@ -473,7 +486,7 @@ function ReviewForm({
         <div className={scss.item2}>
           <div>
             <span>確定請款比例</span>
-            <InputBox inputAttr={{ className: 'pl-4', value: allPercentStr, disabled: true }} />
+            <InputBox disabled={true} inputAttr={{ className: 'pl-4', value: allPercentStr }} />
           </div>
           <div className={scss.payMethodContainer}>
             {Object.values(payMethodList).map((item, index, arr) => {
@@ -760,7 +773,7 @@ function ReviewForm({
         <div className="mb-9">
           <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
           <br />
-          <div className={scss.textaraeBox}>
+          <div className={classNames(scss.textaraeBox, disabled && scss.disabled)}>
             <textarea
               disabled={disabled}
               className="w-full resize-none"
@@ -792,21 +805,6 @@ function ReviewForm({
         </div>
       </div>
       {/*  */}
-
-      {/* {!disabled && (
-        <div className={scss.btnBox}>
-          <MyButton_v2
-            className={classNames(disabled && 'hidden')}
-            label="確定"
-            theme="danger"
-            onClick={handle_confirm}
-            px="px44"
-          />
-          <MyButton_v2 label={disabled ? '關閉' : '取消'} onClick={onCancel} px="px44" />
-        </div>
-      )} */}
-
-      {/*  */}
     </div>
   );
 }
@@ -827,17 +825,19 @@ const InputBox = ({
   boxStyle,
   inputAttr,
   className,
+  disabled,
 }: {
   prefix?: string;
   suffix?: string;
   boxStyle?: React.CSSProperties;
   inputAttr?: React.InputHTMLAttributes<HTMLInputElement>;
   className?: string;
+  disabled?: boolean;
 }) => {
   return (
-    <div style={boxStyle} className={classNames(scss.inputBox, className)}>
+    <div style={boxStyle} className={classNames(scss.inputBox, disabled && scss.disabled, className)}>
       <span>{prefix}</span>
-      <input type="text" {...inputAttr} />
+      <input type="text" readOnly={disabled} {...inputAttr} />
       <span>{suffix}</span>
     </div>
   );

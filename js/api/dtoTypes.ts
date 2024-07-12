@@ -2689,9 +2689,9 @@ export type TquotationVerifyFormDto = {
   fireproofCertificateNote: string | null;
   // 保固書
   warranty: boolean;
-  // 防火證明%數
+  // 保證書%數
   warrantyPercent: number | null;
-  // 防火證明備註
+  // 保證書備註
   warrantyNote: string | null;
   // 是否需配合工地試車
   testDrive: boolean;

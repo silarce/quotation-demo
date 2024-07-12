@@ -1003,6 +1003,22 @@ export const apiQuotationUnlock = (id: string) => {
     .catch((err) => Promise.reject(err));
 };
 
+export const apiPatchQuotationVerifyForm = ({
+  //
+  verifyForm,
+  body,
+}: {
+  verifyForm: string;
+  body: TcreateQuotationVerifyFormDto;
+}) => {
+  const api = `/quotation/verify-form/${verifyForm}`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
 // ================================================================
 
 /**取得報價單附件 */
