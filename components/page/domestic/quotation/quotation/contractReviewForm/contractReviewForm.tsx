@@ -87,7 +87,8 @@ function ContractReviewForm({
       onCancel={close}
     >
       <ReviewForm
-        disabled={!showModal || forbidden}
+        // disabled={!showModal || forbidden}
+        disabled={false}
         close={close}
         contractIdNumber={contractIdNumber}
         contractName={contractName}
@@ -183,8 +184,17 @@ function ReviewForm({
       note: preBody.note ?? '',
       debitItem: preBody.debitItem ?? '',
 
+      paymentDateNote: preBody.paymentDateNote ?? '',
+      paymentTenorNote: preBody.paymentTenorNote ?? '',
       performanceBondNote: preBody.performanceBondNote ?? '',
+      depositPaymentNote: preBody.depositPaymentNote ?? '',
       warrantyPaymentNote: preBody.warrantyPaymentNote ?? '',
+      fireproofCertificateNote: preBody.fireproofCertificateNote ?? '',
+      warrantyNote: preBody.warrantyNote ?? '',
+      testDriveNote: preBody.testDriveNote ?? '',
+
+      fireproofCertificatePercent: preBody.fireproofCertificatePercent,
+      warrantyPercent: preBody.warrantyPercent,
 
       //
     };
@@ -245,23 +255,61 @@ function ReviewForm({
     let methodArr: TpaymentRatio[] | undefined = undefined;
 
     if (verifyForm) {
+      const {
+        askForPaymentDate,
+        disbursementDate,
+
+        paymentTenor,
+        performanceBond,
+        depositPayment,
+        warrantyPeriod,
+        note,
+        warrantyPayment,
+        fireproofCertificate,
+        warranty,
+        testDrive,
+        debitItem,
+
+        //
+        paymentDateNote,
+        paymentTenorNote,
+        performanceBondNote,
+        depositPaymentNote,
+        warrantyPaymentNote,
+        fireproofCertificateNote,
+        warrantyNote,
+        testDriveNote,
+
+        fireproofCertificatePercent,
+        warrantyPercent,
+      } = verifyForm;
+
       reset({
-        askForPaymentDate: verifyForm.askForPaymentDate,
-        disbursementDate: verifyForm.disbursementDate,
-        // paymentRatio: verifyForm.paymentRatio,
-        paymentTenor: verifyForm.paymentTenor,
-        performanceBond: verifyForm.performanceBond,
-        depositPayment: verifyForm.depositPayment,
-        warrantyPeriod: verifyForm.warrantyPeriod,
-        note: verifyForm.note,
-        warrantyPayment: verifyForm.warrantyPayment,
-        fireproofCertificate: verifyForm.fireproofCertificate,
-        warranty: verifyForm.warranty,
-        testDrive: verifyForm.testDrive,
-        debitItem: verifyForm.debitItem,
-        // workDirectorId: verifyForm.workDirectorId,
-        performanceBondNote: verifyForm.performanceBondNote,
-        warrantyPaymentNote: verifyForm.warrantyPaymentNote,
+        askForPaymentDate,
+        disbursementDate,
+        // paymentRatio,
+        paymentTenor,
+        performanceBond,
+        depositPayment,
+        warrantyPeriod,
+        note,
+        warrantyPayment,
+        fireproofCertificate,
+        warranty,
+        testDrive,
+        debitItem,
+        // workDirectorId,
+        paymentDateNote,
+        paymentTenorNote,
+        performanceBondNote,
+        depositPaymentNote,
+        warrantyPaymentNote,
+        fireproofCertificateNote,
+        warrantyNote,
+        testDriveNote,
+
+        fireproofCertificatePercent,
+        warrantyPercent,
       });
 
       methodArr = verifyForm?.paymentRatio.map((item) => {
@@ -286,8 +334,18 @@ function ReviewForm({
         warranty: undefined,
         testDrive: undefined,
         debitItem: undefined,
+
+        paymentDateNote: undefined,
+        paymentTenorNote: undefined,
         performanceBondNote: undefined,
+        depositPaymentNote: undefined,
         warrantyPaymentNote: undefined,
+        fireproofCertificateNote: undefined,
+        warrantyNote: undefined,
+        testDriveNote: undefined,
+
+        fireproofCertificatePercent: undefined,
+        warrantyPercent: undefined,
       });
 
       methodArr = defaultPaymentRatioArr?.map((item) => {
@@ -369,25 +427,16 @@ function ReviewForm({
             }}
           />
 
-          {/* <div className={scss.noteWrapper}>
-            <span>備註</span>
-            <InputSel
-              className={scss.inputSel_note}
-              // disabled={disabled}
-              // inputProps={{}}
-              textareaProps={{
-                allowNewLineByUser: true,
-              }}
-            />
-          </div> */}
-          <br />
           <InputBox
             className="mt-1 w-full"
             prefix="備註 :"
             inputAttr={{
               disabled: disabled,
-
               placeholder: '請輸入備註',
+              value: watchData.paymentDateNote ?? '',
+              onChange: (e) => {
+                setValue('paymentDateNote', e.target.value);
+              },
             }}
           />
         </div>
@@ -439,15 +488,6 @@ function ReviewForm({
               );
             })}
           </div>
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            inputAttr={{
-              disabled: disabled,
-
-              placeholder: '請輸入備註',
-            }}
-          />
         </div>
         {/* 3 */}
         <div className={scss.numIndex}>3</div>
@@ -471,8 +511,12 @@ function ReviewForm({
             prefix="備註 :"
             inputAttr={{
               disabled: disabled,
-
               placeholder: '請輸入備註',
+
+              value: watchData.paymentTenorNote ?? '',
+              onChange: (e) => {
+                setValue('paymentTenorNote', e.target.value);
+              },
             }}
           />
         </div>
@@ -519,8 +563,11 @@ function ReviewForm({
             prefix="備註 :"
             inputAttr={{
               disabled: disabled,
-
               placeholder: '請輸入備註',
+              value: watchData.depositPaymentNote ?? '',
+              onChange: (e) => {
+                setValue('depositPaymentNote', e.target.value);
+              },
             }}
           />
         </div>
@@ -577,7 +624,22 @@ function ReviewForm({
           <div>
             <RadioContainer
               disabled={disabled}
-              label={'是否註明收足90%出具防火證明、出廠證明'}
+              // label={'是否註明收足90%出具防火證明、出廠證明'}
+              label={
+                <span>
+                  是否註明收足
+                  <InputBox
+                    className="w-[50px] "
+                    inputAttr={{
+                      className: 'text-center',
+                      disabled: disabled,
+                      type: 'number',
+                      ...register('fireproofCertificatePercent'),
+                    }}
+                  />
+                  %出具防火證明、出廠證明
+                </span>
+              }
               labelClassName="mr-[48px]"
               value={watchData.fireproofCertificate}
               onChange={(v) => {
@@ -590,8 +652,11 @@ function ReviewForm({
             prefix="備註 :"
             inputAttr={{
               disabled: disabled,
-
               placeholder: '請輸入備註',
+              value: watchData.fireproofCertificateNote ?? '',
+              onChange: (e) => {
+                setValue('fireproofCertificateNote', e.target.value);
+              },
             }}
           />
         </div>
@@ -601,7 +666,21 @@ function ReviewForm({
           <div>
             <RadioContainer
               disabled={disabled}
-              label={'是否註明收足100%出具保固書'}
+              label={
+                <span>
+                  是否註明收足
+                  <InputBox
+                    className="w-[50px] "
+                    inputAttr={{
+                      className: 'text-center',
+                      disabled: disabled,
+                      type: 'number',
+                      ...register('warrantyPercent'),
+                    }}
+                  />
+                  %出具保固書
+                </span>
+              }
               labelClassName="mr-[48px]"
               value={watchData.warranty}
               onChange={(v) => {
@@ -614,8 +693,11 @@ function ReviewForm({
             prefix="備註 :"
             inputAttr={{
               disabled: disabled,
-
               placeholder: '請輸入備註',
+              value: watchData.warrantyNote ?? '',
+              onChange: (e) => {
+                setValue('warrantyNote', e.target.value);
+              },
             }}
           />
         </div>
@@ -638,8 +720,11 @@ function ReviewForm({
             prefix="備註 :"
             inputAttr={{
               disabled: disabled,
-
               placeholder: '請輸入備註',
+              value: watchData.testDriveNote ?? '',
+              onChange: (e) => {
+                setValue('testDriveNote', e.target.value);
+              },
             }}
           />
         </div>
@@ -867,7 +952,7 @@ const RadioContainer = ({
   onChange,
   disabled,
 }: {
-  label: string;
+  label: React.ReactNode;
   className?: string;
   labelClassName?: string;
   value: boolean;

@@ -2722,9 +2722,11 @@ export type TcreateQuotationVerifyFormDto = Pick<
   //
   | 'fireproofCertificate'
   | 'fireproofCertificateNote'
+  | 'fireproofCertificatePercent'
   //
   | 'warranty'
   | 'warrantyNote'
+  | 'warrantyPercent'
   //
   | 'testDrive'
   | 'testDriveNote'
