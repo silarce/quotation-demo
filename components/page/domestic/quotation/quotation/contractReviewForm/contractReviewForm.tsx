@@ -87,8 +87,8 @@ function ContractReviewForm({
       onCancel={close}
     >
       <ReviewForm
-        // disabled={!showModal || forbidden}
-        disabled={false}
+        forbidden={forbidden}
+        // disabled={false}
         close={close}
         contractIdNumber={contractIdNumber}
         contractName={contractName}
@@ -114,7 +114,7 @@ function ContractReviewForm({
 // MARK:ReviewForm
 
 function ReviewForm({
-  disabled,
+  forbidden,
   close,
   contractIdNumber,
   contractName,
@@ -124,7 +124,7 @@ function ReviewForm({
   defaultPaymentRatioArr,
   onConfirm,
 }: {
-  disabled?: boolean;
+  forbidden?: boolean;
   close?: () => void;
   contractIdNumber: string;
   contractName: string;
@@ -135,6 +135,11 @@ function ReviewForm({
   onConfirm?: () => void;
 }) {
   //
+
+  const stateObj_disabled = useState(true);
+  let disabled = stateObj_disabled[0];
+  const setDisabled = stateObj_disabled[1];
+  forbidden && (disabled = true);
 
   const { payMethodList, addMethod, resetMethodList, getMethodBodyArr, allPercentStr } = usePayMethod({
     contractPrice,
@@ -369,6 +374,28 @@ function ReviewForm({
 
   return (
     <div className={scss.container}>
+      <div
+        // className="flex justify-end justify-items-start gap-5 h-16"
+        className={scss.btnBar}
+      >
+        {!disabled && (
+          <MyButton_v2 px="px22" py="py4" theme="danger" onClick={handle_confirm}>
+            確定
+          </MyButton_v2>
+        )}
+
+        {disabled && (
+          <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
+            編輯
+          </MyButton_v2>
+        )}
+        {!disabled && (
+          <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
+            取消
+          </MyButton_v2>
+        )}
+      </div>
+
       <p className={scss.title}>合約審核表</p>
       {/*  */}
       <div className={scss.subTitle}>
@@ -766,7 +793,7 @@ function ReviewForm({
       </div>
       {/*  */}
 
-      {!disabled && (
+      {/* {!disabled && (
         <div className={scss.btnBox}>
           <MyButton_v2
             className={classNames(disabled && 'hidden')}
@@ -777,7 +804,7 @@ function ReviewForm({
           />
           <MyButton_v2 label={disabled ? '關閉' : '取消'} onClick={onCancel} px="px44" />
         </div>
-      )}
+      )} */}
 
       {/*  */}
     </div>

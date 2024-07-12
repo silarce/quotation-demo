@@ -69,7 +69,7 @@ export default function QuotationVerifyForm() {
 
       <div className="w-[1000px]">
         <ReviewForm
-          disabled={true}
+          forbidden={true}
           close={() => {}}
           contractIdNumber={contractNumber ?? ''}
           contractName={projectName ?? ''}

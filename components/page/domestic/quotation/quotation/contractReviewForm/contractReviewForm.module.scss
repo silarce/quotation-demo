@@ -15,7 +15,8 @@
 }
 
 .container {
-  padding: 30px 50px 50px 50px;
+  // padding: 30px 50px 50px 50px;
+  padding: 0px 50px 50px 50px;
   span,
   input,
   input::placeholder,
@@ -27,12 +28,27 @@
     padding: 0 5px;
   }
 }
+.btnBar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  align-items: flex-end;
+  height: 64px;
+
+  background-color: white;
+  z-index: 1;
+
+  box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.2);
+}
 
 .title {
-  margin-bottom: 54px;
+  margin-top: 10px;
+  margin-bottom: 30px;
   color: theme("colors.main");
   text-align: center;
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 400;
 }
 
