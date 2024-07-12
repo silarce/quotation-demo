@@ -363,19 +363,27 @@ export default function AddPurchaseRequisition() {
         if (data2.length === 0) {
             myAlert.warning({ title: "尚未加入任何請購項目" });
         } else {
-            myAlert.confirm({
-                title: '確定要送出請購單嗎?',
-                content: <>
-                    <h1>請檢查品名、數量是否正確</h1>
-                </>,
-                props: {
-                    onOk: () => {
-                        AddPurchaseRequisition();
+            // 檢查是否有任何一筆的 quantity 為 0
+            const hasZeroQuantity = data2.some(item => item.quantity === 0);
+
+            if (hasZeroQuantity) {
+                myAlert.warning({ title: "請購項目中有數量為0的項目，請檢查並修正。" });
+            } else {
+                myAlert.confirm({
+                    title: '確定要送出請購單嗎?',
+                    content: <>
+                        <h1>請檢查品名、數量是否正確</h1>
+                    </>,
+                    props: {
+                        onOk: () => {
+                            AddPurchaseRequisition();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
+
 
     // 手key加入
     const handleAddByHandKey = () => {
