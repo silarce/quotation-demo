@@ -170,7 +170,6 @@
 
 .textaraeBox {
   border-bottom: solid 1px black;
-  margin-bottom: 36px;
   > textarea {
     height: 100px;
     margin-top: 5px;
@@ -187,4 +186,12 @@
 
 .hidden {
   visibility: hidden;
+}
+
+.noteWrapper {
+  display: grid;
+  grid-template-columns: max-content auto;
+  textarea {
+    padding: 0 5px;
+  }
 }

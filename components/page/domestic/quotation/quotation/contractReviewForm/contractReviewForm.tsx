@@ -321,6 +321,7 @@ function ReviewForm({
       </div>
       {/*  */}
       <div className={scss.list}>
+        {/* 1 */}
         <div className={scss.numIndex}>1</div>
         <div>
           <span>註明請款日</span>
@@ -367,8 +368,31 @@ function ReviewForm({
               },
             }}
           />
+
+          {/* <div className={scss.noteWrapper}>
+            <span>備註</span>
+            <InputSel
+              className={scss.inputSel_note}
+              // disabled={disabled}
+              // inputProps={{}}
+              textareaProps={{
+                allowNewLineByUser: true,
+              }}
+            />
+          </div> */}
+          <br />
+          <InputBox
+            className="mt-1 w-full"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+
+              placeholder: '請輸入備註',
+            }}
+          />
         </div>
-        {/*  */}
+
+        {/* 2 */}
         <div className={scss.numIndex}>2</div>
         <div className={scss.item2}>
           <div>
@@ -415,24 +439,44 @@ function ReviewForm({
               );
             })}
           </div>
-        </div>
-        {/*  */}
-        <div className={scss.numIndex}>3</div>
-        <div className={scss.paymentTenor}>
-          <span>合理的放款票期</span>
-          <InputSel
-            disabled={disabled}
-            inputProps={{
-              props: {
-                value: watchData.paymentTenor ?? '',
-                onChange: (e) => {
-                  setValue('paymentTenor', e.target.value);
-                },
-              },
+          <InputBox
+            className="mt-1 w-full"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+
+              placeholder: '請輸入備註',
             }}
           />
         </div>
-        {/*  */}
+        {/* 3 */}
+        <div className={scss.numIndex}>3</div>
+        <div>
+          <div className={scss.paymentTenor}>
+            <span>合理的放款票期</span>
+            <InputSel
+              disabled={disabled}
+              inputProps={{
+                props: {
+                  value: watchData.paymentTenor ?? '',
+                  onChange: (e) => {
+                    setValue('paymentTenor', e.target.value);
+                  },
+                },
+              }}
+            />
+          </div>
+          <InputBox
+            className="mt-1 w-full"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+
+              placeholder: '請輸入備註',
+            }}
+          />
+        </div>
+        {/* 4 */}
         <div className={scss.numIndex}>4</div>
         <div>
           <RadioContainer
@@ -445,7 +489,7 @@ function ReviewForm({
             }}
           />
           <InputBox
-            className="mt-1"
+            className="mt-1 w-full"
             prefix="備註 :"
             inputAttr={{
               disabled: disabled,
@@ -458,7 +502,7 @@ function ReviewForm({
           />
           <p className="text-[13px] text-[red] m-0">嚴禁使用商業本票</p>
         </div>
-        {/*  */}
+        {/* 5 */}
         <div className={scss.numIndex}>5</div>
         <div>
           <RadioContainer
@@ -470,29 +514,39 @@ function ReviewForm({
               setValue('depositPayment', v);
             }}
           />
-        </div>
-        {/*  */}
-        <div className={scss.numIndex}>6</div>
-        <div className="flex">
-          合理的保固期{' '}
           <InputBox
-            boxStyle={{ width: '60px' }}
+            className="mt-1 w-full"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+
+              placeholder: '請輸入備註',
+            }}
+          />
+        </div>
+        {/* 6 */}
+        <div className={scss.numIndex}>6</div>
+        <div>
+          <InputBox
+            prefix="合理的保固期 :"
+            boxStyle={{ width: '160px' }}
             inputAttr={{
               disabled: disabled,
               ...register('warrantyPeriod'),
               className: 'text-center',
             }}
           />
-          <span>年，備註</span>
+
           <InputBox
-            className="flex-auto"
+            prefix="備註 :"
+            className="mt-1 w-full"
             inputAttr={{
               disabled: disabled,
               ...register('note'),
             }}
           />
         </div>
-        {/*  */}
+        {/* 7 */}
         <div className={scss.numIndex}>7</div>
         <div>
           <RadioContainer
@@ -505,7 +559,7 @@ function ReviewForm({
             }}
           />
           <InputBox
-            className="mt-1"
+            className="mt-1 w-full"
             prefix="備註 :"
             inputAttr={{
               disabled: disabled,
@@ -531,6 +585,15 @@ function ReviewForm({
               }}
             />
           </div>
+          <InputBox
+            className="mt-1 w-full"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+
+              placeholder: '請輸入備註',
+            }}
+          />
         </div>
         {/*  */}
         <div className={scss.numIndex}>9</div>
@@ -546,6 +609,15 @@ function ReviewForm({
               }}
             />
           </div>
+          <InputBox
+            className="mt-1 w-full"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+
+              placeholder: '請輸入備註',
+            }}
+          />
         </div>
         {/*  */}
         <div className={scss.numIndex}>10</div>
@@ -561,10 +633,19 @@ function ReviewForm({
               }}
             />
           </div>
+          <InputBox
+            className="mt-1 w-full"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+
+              placeholder: '請輸入備註',
+            }}
+          />
         </div>
         {/*  */}
         <div className={scss.numIndex}>11</div>
-        <div>
+        <div className="mb-9">
           <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
           <br />
           <div className={scss.textaraeBox}>
@@ -575,6 +656,15 @@ function ReviewForm({
               {...register('debitItem')}
             />
           </div>
+          <InputBox
+            className="mt-1 w-full"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+
+              placeholder: '請輸入備註',
+            }}
+          />
         </div>
         {/*  */}
       </div>
