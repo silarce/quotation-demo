@@ -5,13 +5,13 @@ import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
 import scss from './addPurchaseRequisition.module.scss';
-import Thead01 from '../ui/table/thead01';
-import Tbody01 from '../ui/table/tbody01';
+import Thead01 from '../../ui/table/thead01';
+import Tbody01 from '../../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { quotationStatusLookup } from 'config/lookupTable';
 import { TquotationStatus } from 'js/api/dtoTypes';
-import { setting } from '../wareHouseList/index';
+import { setting } from '../../wareHouseList/index';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { WrappedTextarea, inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { AppContext } from 'pages/_app';
@@ -30,6 +30,7 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_fc_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_search from 'public/image/icon/search.svg';
 import { Modal } from 'antd';
+import icon_close from 'public/image/icon/fc_close.svg';
 
 
 type Tquery = {
@@ -58,6 +59,7 @@ export default function AddPurchaseRequisition() {
 
     //登入者資料
     const { userInfo } = useContext(AppContext);
+    const { erpFeature } = useContext(AppContext);
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
@@ -72,7 +74,6 @@ export default function AddPurchaseRequisition() {
     const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
     const status = router.query.status as TquotationStatus;
-    // const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
 
     const [searchproduct, setSearchProduct] = useState<string>("");
@@ -97,6 +98,8 @@ export default function AddPurchaseRequisition() {
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
+
+    const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
@@ -230,6 +233,10 @@ export default function AddPurchaseRequisition() {
             setCreate_atin(moment().format('YYYY-MM-DD') || '');
             setCreate_byin(userInfo?.username.toString() || '');
             setNeed_date(moment().format('YYYY-MM-DD') || '');
+
+            console.log(userInfo);
+
+            console.log(erpFeature);
         } catch (error: any) {
             setError(error.message);
         }
@@ -268,10 +275,7 @@ export default function AddPurchaseRequisition() {
             const data = await response.json();
             // setData1(data);
 
-            // 判斷不重覆加入
-            if (!data2.find(existingItem => existingItem.purchaserequisitiondetailuuid === data.purchaserequisitiondetailuuid)) {
-                setData2(prevData2 => [...prevData2, ...data]);
-             }
+            setData2(prevData2 => [...prevData2, ...data]);
 
 
         } catch (error: any) {
@@ -522,7 +526,7 @@ export default function AddPurchaseRequisition() {
             <PageHeader02 tag={quotationStatusLookup[status] ?? '新增請購單'} panelList={panelList} />
             {/* <div className={scss.main}> */}
             <div className={scss.container}>
-                <div className={scss.left} style={{ display: 'none' }}>
+                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
                     <div>
                         <form onSubmit={handleSubmit}>
                             <div className={scss.searchbar}>
@@ -557,11 +561,10 @@ export default function AddPurchaseRequisition() {
                         </form>
                     </div>
                     <div className={scss.content}>
-
                         <div>
                             <Thead01 type={'AddPR_GetProduct'} />
                             {/* <Tbody01 type={'AddPR_GetProduct'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
-                            {data && (
+                            {/* {data && (
                                 data.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader19}>
                                         <div className={scss.row01}>
@@ -577,7 +580,7 @@ export default function AddPurchaseRequisition() {
                                         </div>
                                     </CellWithBar>
                                 ))
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>
@@ -671,9 +674,13 @@ export default function AddPurchaseRequisition() {
                         </div>
                         <div className={scss.head_foot2}>
                             <div>
+                                {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(true) }}>
+                                    <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} />
+                                    請購清單
+                                </button> */}
                                 <button className={scss.minibtn} onClick={() => { productSearchModalOpen() }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} />
-                                    查詢
+                                    品項查詢
                                 </button>
                             </div>
                             <div></div>
@@ -681,72 +688,8 @@ export default function AddPurchaseRequisition() {
                             <div style={{ textAlign: 'right' }}>
                             </div>
                         </div>
-                        <div className={scss.content_main_content}>
-
-                            {/* <Tbody01 type={'AddPR_ReqList'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
-
+                        <div className={scss.body_content1}>
                             <Thead01 type={'AddPR_ReqList'} />
-
-                            <Modal
-                                visible={productSearchmodalopen}
-                                footer={null}
-                                onCancel={productSearchModalClose}
-                                width="1000px"
-                                maskClosable={false}
-                                style={{ top: 250 }}
-                            >
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
-                                    {/* {selectedOption} */}
-                                    <span style={{ fontSize: '16px', color: '#14256a' }}>查詢種類：</span>
-                                    <span style={{ fontSize: '16px' }}>
-                                        <select value={selectedOption} onChange={(e) => { setSelectedOption(e.target.value) }}>
-                                            <option value="物料">物料</option>
-                                            <option value="全部">全部</option>
-                                            <option value="辦公室用品">辦公室用品</option>
-                                        </select>
-                                    </span>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
-                                    <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span>
-                                    <span style={{ fontSize: '16px' }}>
-                                        <form onSubmit={handleSubmit}>
-                                            <input
-                                                type="text"
-                                                placeholder='查詢名稱'
-                                                value={keyword3}
-                                                style={{ borderBottom: '1px solid #c1c1c1' }}
-                                                onChange={(e) => setKeyword3(e.target.value)}
-                                            />
-                                            <button type="submit">
-                                                <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
-                                            </button>
-                                        </form>
-                                    </span>
-                                </div>
-                                <hr />
-                                <div>
-                                    <Thead01 type={'AddPR_GetProduct'} />
-                                    <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                                        {data && (
-                                            data.map((_item: any, index: number) => (
-                                                <CellWithBar key={index} className={scss.panelHeader19}>
-                                                    <div className={scss.row01}>
-                                                        <span>{_item.productid}</span>
-                                                        <span>{_item.name}</span>
-                                                        <span>{_item.spec}</span>
-                                                        <span>{_item.count}</span>
-                                                        <span>
-                                                            <button onClick={() => { getProductById(_item.id) }}>
-                                                                <img src={icon_fc_add.src} alt="addToList" style={{ width: '30px', height: '20px' }} />
-                                                            </button>
-                                                        </span>
-                                                    </div>
-                                                </CellWithBar>
-                                            ))
-                                        )}
-                                    </div>
-                                </div>
-                            </Modal>
-
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader20}>
                                     <div className={scss.row01}>
@@ -754,10 +697,10 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={nameRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid #c1c1c1", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: `${editstatus === true ? '1px solid black' : ''}`, width: '95%' }}
                                                 type="text"
                                                 value={_item.name !== undefined ? _item.name : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "name", e.target.value);
                                                 }}
@@ -767,10 +710,10 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={specRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid #c1c1c1", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: `${editstatus === true ? '1px solid black' : ''}`, width: '95%' }}
                                                 type="text"
                                                 value={_item.spec !== undefined ? _item.spec : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "spec", e.target.value);
                                                 }}
@@ -779,11 +722,11 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={quantityRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid #c1c1c1", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: `${editstatus === true ? '1px solid black' : ''}`, width: '95%' }}
                                                 type="text"
                                                 maxLength={5}
                                                 value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleNumberChange(index, "quantity", e.target.value);
                                                 }}
@@ -792,10 +735,10 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={unitRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid #c1c1c1", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: `${editstatus === true ? '1px solid black' : ''}`, width: '95%' }}
                                                 type="text"
                                                 value={_item.unit !== undefined ? _item.unit : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "unit", e.target.value);
                                                 }}
@@ -804,10 +747,10 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={noteRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid #c1c1c1", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: `${editstatus === true ? '1px solid black' : ''}`, width: '95%' }}
                                                 type="text"
                                                 value={_item.note !== undefined ? _item.note : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "note", e.target.value);
                                                 }}
@@ -815,9 +758,9 @@ export default function AddPurchaseRequisition() {
                                         </span>
                                         <span>
                                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
+                                            </button>
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
                                                 <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
                                             </button>
@@ -890,22 +833,152 @@ export default function AddPurchaseRequisition() {
                             </div>
                         </div>
                         <br />
-                        <div className={scss.foot_main}>
+                        <div className={scss.body_foot1}>
                             <div>
                                 (1).如不知請購品項料號，可以利用查詢代入。<br />
-                                {/* (2).請於出貨單上註明本公司產品編號,及產品名稱,以利請款。<br />
-                                (3).請配合定量包裝及標示品名規格, 方便點收。 */}
                             </div>
                             <div>
                             </div>
                             <div>
                             </div>
-                        </div>
-                        <div className={scss.content_main_content}>
-
                         </div>
                     </div>
                 </div>
+
+                {/* 隱藏的popout */}
+                {/* 品項查詢 */}
+                <div style={{
+                    display: `${productSearchmodalopen === true ? '' : 'none'}`, position: 'fixed',
+                    top: '250px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '1000px',
+                    backgroundColor: '#fff',
+                    border: '1px solid #ccc',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    zIndex: 1000,
+                    padding: '16px'
+                }}>
+                    <div className={scss.modal_search_bar} >
+                        <div>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>查詢種類：</span>
+                            <span style={{ fontSize: '16px' }}>
+                                <select style={{ borderBottom: '1px solid gray', outline: 'none' }} value={selectedOption} onChange={(e) => { setSelectedOption(e.target.value) }}>
+                                    <option value="物料">物料</option>
+                                    <option value="全部">全部</option>
+                                    <option value="辦公室用品">辦公室用品</option>
+                                </select>
+                            </span>
+                        </div>
+                        <div>
+                            <span style={{ fontSize: '16px' }}>
+                                <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center' }}>
+                                    <input
+                                        type="text"
+                                        placeholder='查詢名稱'
+                                        value={keyword3}
+                                        style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
+                                        onChange={(e) => setKeyword3(e.target.value)}
+                                    />
+                                    <button type="submit" style={{ display: 'flex', alignItems: 'center', padding: '0', border: 'none', background: 'none' }}>
+                                        <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
+                                    </button>
+                                </form>
+                            </span>
+                        </div>
+                        <div></div>
+                        <div>
+                            <span>
+                                <button onClick={() => { setProductSearchmodalopen(false) }}>
+                                    <img src={icon_close.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <hr />
+                    <div>
+                        <Thead01 type={'AddPR_GetProduct'} />
+                        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                            {data && (
+                                data.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader19}>
+                                        <div className={scss.row01}>
+                                            <span>{_item.productid}</span>
+                                            <span>{_item.name}</span>
+                                            <span>{_item.spec}</span>
+                                            <span>{_item.count}</span>
+                                            <span>
+                                                <button onClick={() => { getProductById(_item.id) }}>
+                                                    <img src={icon_fc_add.src} alt="addToList" style={{ width: '30px', height: '20px' }} />
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* <Modal
+                                visible={productSearchmodalopen}
+                                footer={null}
+                                onCancel={productSearchModalClose}
+                                width="1000px"
+                                maskClosable={false}
+                                style={{ top: 250 }}
+                            >
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
+                                    <span style={{ fontSize: '16px', color: '#14256a' }}>查詢種類：</span>
+                                    <span style={{ fontSize: '16px' }}>
+                                        <select value={selectedOption} onChange={(e) => { setSelectedOption(e.target.value) }}>
+                                            <option value="物料">物料</option>
+                                            <option value="全部">全部</option>
+                                            <option value="辦公室用品">辦公室用品</option>
+                                        </select>
+                                    </span>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span style={{ fontSize: '16px', color: '#14256a' }}>品名：</span>
+                                    <span style={{ fontSize: '16px' }}>
+                                        <form onSubmit={handleSubmit}>
+                                            <input
+                                                type="text"
+                                                placeholder='查詢名稱'
+                                                value={keyword3}
+                                                style={{ borderBottom: '1px solid #c1c1c1' }}
+                                                onChange={(e) => setKeyword3(e.target.value)}
+                                            />
+                                            <button type="submit">
+                                                <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
+                                            </button>
+                                        </form>
+                                    </span>
+                                </div>
+                                <hr />
+                                <div>
+                                    <Thead01 type={'AddPR_GetProduct'} />
+                                    <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                                        {data && (
+                                            data.map((_item: any, index: number) => (
+                                                <CellWithBar key={index} className={scss.panelHeader19}>
+                                                    <div className={scss.row01}>
+                                                        <span>{_item.productid}</span>
+                                                        <span>{_item.name}</span>
+                                                        <span>{_item.spec}</span>
+                                                        <span>{_item.count}</span>
+                                                        <span>
+                                                            <button onClick={() => { getProductById(_item.id) }}>
+                                                                <img src={icon_fc_add.src} alt="addToList" style={{ width: '30px', height: '20px' }} />
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </CellWithBar>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            </Modal> */}
+
             </div>
         </SubLayer >
 

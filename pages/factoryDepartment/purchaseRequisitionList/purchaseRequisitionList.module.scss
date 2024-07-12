@@ -15,27 +15,22 @@
     gap: 35px;
 }
 
-.main {
-    display: grid;
-    grid-template-columns: 330px 1fr; // 左右兩邊比例，可以調整
-    gap: 15px;
-    width: auto;
-    margin-top: 4px;
-    margin-left: 4px;
-    margin-right: 4px;
-    // background-color: gray;
+.container {
+  display: flex;
+  overflow-y: hidden;
+  height: 712px;
 }
 
 .left {
-    display: grid;
-    grid-template-columns: 330px;
-    justify-content: space-between;
-    gap: 15px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    border: 1px solid gray;
-    min-height: 100vh-30vh;
-    /* 自動調整高度到螢幕大小 */
+  width:340px;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: space-between;
+  gap: 15px;
+  border: 1px solid #c1c1c1;
+  overflow-y: auto;
+  height: 712px;
+  // margin-right: 15px;
 }
 
 .searchbar {
@@ -75,71 +70,67 @@
 
 
 .right {
-    position: relative; // 確保子元素可以正確定位
-    position: -webkit-sticky;
-    ; // 固定在視窗位置
-    top: 0; // 距離視窗頂部的距離
-    right: 0; // 距離視窗右側的距離
-    z-index: 1000; // 確保元素位於其他內容的上層
-    flex-direction: column; // 讓內容以列的方式排列
-    align-items: center; // 垂直居中
-    justify-content: flex-start; // 從頂部對齊
-    // background-color: blue; // 可選：背景色
-    // width: 1150px;
-    top: 0; // 距離視窗頂部的距離
-    right: 0; // 距離視窗右側的距離
-    padding-left: 0px;
-    // background-color: red;
-    border: 1px solid gray;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid #c1c1c1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: sticky;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+  height: 712px;
 }
 
 
 .content {
-    position: -webkit-sticky; // 為兼容性增加前綴
-    position: sticky;
-    top: 0; // 距離視窗頂部的距離
-    right: 0; // 距離視窗右側的距離
-    z-index: 1000; // 確保元素位於其他內容的上層
-    // width: 1150px; // 設定固定寬度
-    height: 280px; // 設定固定高度
-    // overflow-x: hidden; // 禁止水平滾動
-    overflow-x: hidden; // 禁止水平滾動
-    overflow-y: auto; // 垂直滾動（如果需要）
-    // background-color: orange;
-    height: 280px;
-    border: 2px solid gray;
-
-    .input-wrapper {
-        display: flex;
-        flex-direction: column;
-        width: 150px; // 調整 input 的寬度
-
-    }
+  width: 100%;
+  overflow-y: auto;
+  top: 0;
 }
 
 
-.tite_main {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-    // gap: 15px;
-    width: auto;
-    margin-top: 5px;
-    margin-left: 20px;
+.head_content1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  div {
     margin-right: 20px;
-    // background-color: gray;
+  }
 }
 
-.head_main {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-    // gap: 15px;
-    width: auto;
-    margin-top: 5px;
-    margin-left: 20px;
+.head_content2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  div {
     margin-right: 20px;
-    // background-color: gray;
+  }
 }
 
+.head_content3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+
+
+  // background-color: gray;
+}
 
 .addBtn {
     position: sticky;
@@ -149,6 +140,27 @@
     border: none;
     background-color: white;
 
+}
+
+.head_foot1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.head_foot2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 5px;
 }
 
 
@@ -176,28 +188,29 @@
   margin-bottom: 10px;
 }
 
-.content_main_content {
-    // display: grid;
-    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
-    // gap: 15px;
-    width: auto;
-    // margin-top: 4px;
-    margin-left: 20px;
-    margin-right: 20px;
-
-    // background-color: gray;
+.body_content1 {
+  display: grid;
+  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+  gap: 0px;
+  width: auto;
+  // margin-top: 4px;
+  margin-left: 20px;
+  margin-right: 20px;
+  // border-top:1px solid rgb(168, 168, 168);
+  overflow-x: hidden;
+  // background-color: gray;
 }
 
-.foot_main {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-    // gap: 15px;
-    width: auto;
-    margin-top: 0px;
-    margin-left: 20px;
-    margin-right: 20px;
-    padding-right: 20px;
-    // background-color: gray;
+.body_foot1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 0px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-right: 20px;
+  // background-color: gray;
 }
 
 .count_table {
@@ -214,7 +227,40 @@
     }
 }
 
-.foot_foot {
+.foot_head1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 5px;
+  // div {
+  //     margin-right: 20px;
+  // }
+}
+
+.foot_content1 {
+  display: grid;
+  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+  gap: 0px;
+  width: auto;
+  // margin-top: 4px;
+  margin-left: 20px;
+  margin-right: 20px;
+  // border-top:1px solid rgb(168, 168, 168);
+  overflow-x: hidden;
+  // background-color: gray;
+}
+
+
+
+
+
+
+
+.foot_foot1 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
   // gap: 15px;
@@ -312,7 +358,7 @@ div.panelHeader17 {
   
     .row01 {
       display: grid;
-      grid-template-columns: 50px 150px 100px 100px 50px 100px 120px 100px;
+      grid-template-columns: 50px 200px 100px 100px 50px 100px 120px 100px;
       gap: 15px;
     }
   }
@@ -363,89 +409,160 @@ div.panelHeader17 {
     }
   }
   
-  .bluebutton {
-    height: 28.28px;
-    // padding: 0px 40px;
-    border: solid 1px #14256a;
-    background-color: $bgc01;
-    padding-left: 22px;
-    padding-right: 22px;
-    // padding-top: 4px;
-    padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 16px;
-    color: #14256a;
-    transform: translateY(2px);
-  
-    &:hover {
-      border: solid 1px #14256a;
-      background-color: #14256a1b
-    }
-  
-    &:focus {
-      background-color: $bgc01;
-      border: solid 1px #14256a;
-    }
-  }
   
   //#endregion
 
-  .redbtn {
-    height: 36px;
-    // padding: 0px 40px;
-    border: solid 1px #ea1833
-    ;
-    background-color: $bgc01;
-    padding:4px 22px;
-    // padding-top: 4px;
-    // padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 16px;
-    color: #ea1833
-    ;
-    transform: translateY(2px);
-  
-    &:hover {
-      border: solid 1px #ea1833
-      ;
-      background-color: #ea18341d
+ 
 
-    }
-  
-    &:focus {
-      background-color: $bgc01;
-      border: solid 1px #ea1833
-      ;
-    }
+// 按鈕
+.greenbutton {
+  height: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #86bd07;
+  background-color: $bgc01;
+  padding-left: 22px;
+  padding-right: 22px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #86bd07;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #86bd07;
+    background-color: rgb(0, 105, 23, 0.267);
   }
 
-  .graybtn {
-    height: 36px;
-    // padding: 0px 40px;
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #86bd07;
+  }
+}
+
+.bluebutton {
+  height: 28.28px;
+  // padding: 0px 40px;
+  // border: solid 1px gray;
+  background-color: $bgc01;
+  padding-left: 22px;
+  padding-right: 22px;
+  // padding-top: 4px;
+  padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #14256a;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #14256a;
+    background-color: #14256a1b
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #14256a;
+  }
+}
+
+.tabbutton {
+  height: 40px;
+  // padding: 0px 40px;
+  // border: solid 1px #14256a;
+  background-color: $bgc01;
+  padding-left: 22px;
+  padding-right: 22px;
+  // padding-top: 4px;
+  padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  // color: #14256a;
+  color: gray;
+  transform: translateY(2px);
+
+  &:hover {
+    //   border: solid 1px #14256a;
+    background-color: #14256a1b
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #14256a1b;
+    color: #14256a;
+  }
+}
+
+.redbtn {
+  height: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #ea1833;
+  background-color: $bgc01;
+  padding: 4px 22px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #ea1833;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #ea1833;
+    background-color: #ea18341d
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #ea1833;
+  }
+}
+
+.graybtn {
+  height: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  ;
+  background-color: $bgc01;
+  padding: 4px 22px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #5b5a5ad6;
+  transform: translateY(2px);
+
+  &:hover {
     border: solid 1px #c1c1c1;
-    ;
-    background-color: $bgc01;
-    padding:4px 22px;
-    // padding-top: 4px;
-    // padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 16px;
-    color: #5b5a5ad6
-    ;
-    transform: translateY(2px);
-  
-    &:hover {
-      border: solid 1px #c1c1c1
-      ;
-      background-color: #c1c1c121
-
-    }
-  
-    &:focus {
-      background-color: $bgc01;
-      border: solid 1px #c1c1c1
-      ;
-    }
+    background-color: #c1c1c121
   }
 
-  
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #c1c1c1;
+  }
+}
+
+.minibtn {
+  height: 36px;
+  // width: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  ;
+  background-color: $bgc01;
+  padding: 4px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #14256a;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #c1c1c1;
+    background-color: #c1c1c121
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #c1c1c1;
+  }
+}

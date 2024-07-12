@@ -157,7 +157,7 @@ export default function QuotereqDetailList() {
             const data = await response.json();
             setData1(data);
 
-
+            console.log(data);
 
             await new Promise(resolve => setTimeout(resolve, 500));
             setPurchaserequisitionidin(data[0].purchaserequisitionid);
@@ -309,7 +309,6 @@ export default function QuotereqDetailList() {
             console.log(prquotereqdata);
 
 
-
         } catch (error: any) {
             console.log(error.message);
         }
@@ -360,9 +359,10 @@ export default function QuotereqDetailList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-
+            myAlert.success({title:'詢價明細新增成功'});
             const responseData = await response.json();
-            // 加入詢價單明細後從取詢價單明細
+            // 加入詢價單明細後重新取詢價單明細
+            alert(prquotereqadddata.quoterequuid);
             getQuotereqDetail(prquotereqadddata.quoterequuid);
 
         } catch (error: any) {
@@ -474,7 +474,7 @@ export default function QuotereqDetailList() {
                                         <span>{index + 1}</span>
                                         <span>{_item.productid}</span>
                                         <span>{_item.name}</span>
-                                        <span>{_item.quantity}</span>
+                                        <span>{_item.alreadyquotereq}</span>
                                         <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span>
                                     </div>
                                 </CellWithBar>

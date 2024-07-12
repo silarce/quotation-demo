@@ -300,6 +300,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         create_by: item.create_by,
         approved: item.approved,
         status: item.status,
+        need_date:item.need_date,
         firstin: 1
       }
     })
