@@ -5,13 +5,13 @@ import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
 import scss from './addPurchaseRequisition.module.scss';
-import Thead01 from '../../ui/table/thead01';
-import Tbody01 from '../../ui/table/tbody01';
+import Thead01 from '../ui/table/thead01';
+import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { quotationStatusLookup } from 'config/lookupTable';
 import { TquotationStatus } from 'js/api/dtoTypes';
-import { setting } from '../../wareHouseList/index';
+import { setting } from '../wareHouseList/index';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { WrappedTextarea, inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { AppContext } from 'pages/_app';
@@ -594,6 +594,12 @@ export default function AddPurchaseRequisition() {
                 </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
+                        <div className={scss.head_head1}>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
                         <div className={scss.head_content1}>
                             <div>
                                 <InputSel
@@ -606,36 +612,18 @@ export default function AddPurchaseRequisition() {
                                         },
                                     }}
                                 />
-                            </div>
-                            <div>
                                 <InputSel
                                     caption="需用日期"
                                     disabled={false}
-                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
+                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                     // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                     datePickerProps={{
                                         props: {
-                                            value: moment(),
+                                            value: getTaiwanDateStr(need_date || '') ? moment(need_date) : null,
                                             onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
                                         },
                                     }}
                                 />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="經辦人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: create_byin,
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className={scss.head_content2}>
-                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="請購部門"
@@ -646,7 +634,32 @@ export default function AddPurchaseRequisition() {
                                         },
                                     }}
                                 />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="申請人"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: create_byin,
+                                        },
+                                    }}
+                                />
+                                <span className={scss.customContainer}>
+                                    <span className={scss.customLabel}>
+                                        備註
+                                    </span>
+                                    <textarea
+                                        className={scss.customInput}
+                                        value={note}
+                                        onChange={(e) => { setNote(e.target.value) }}
+                                    ></textarea>
+                                </span>
                             </div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div className={scss.head_content2}>
+                            <div></div>
                             <div></div>
                             <div></div>
                         </div>
@@ -664,12 +677,9 @@ export default function AddPurchaseRequisition() {
                                         },
                                     }}
                                 /> */}
-                                <span style={{ fontSize: '18px', color: '#14256a', verticalAlign: 'top' }}>備註　</span>
+
                             </div>
-                            <div>
-                                <textarea style={{ fontSize: '18px', borderBottom: '1px solid #14256a', height: '30px', width: '100%' }} value={note} onChange={(e) => { setNote(e.target.value) }}>
-                                </textarea>
-                            </div>
+                            <div></div>
                         </div>
                         <div className={scss.head_foot1}>
                             <div>
@@ -677,7 +687,10 @@ export default function AddPurchaseRequisition() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                <button className={scss.redbtn} onClick={() => { handleAddPR() }}>送出申請</button>
+                                {/* <button className={scss.redbtn} onClick={() => { handleAddPR() }}>送出申請</button> */}
+                                <button className={scss.minibtn} onClick={() => { handleAddPR() }}>
+                                    確定送出
+                                </button>
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
@@ -687,13 +700,20 @@ export default function AddPurchaseRequisition() {
                                     請購清單
                                 </button> */}
                                 <button className={scss.minibtn} onClick={() => { productSearchModalOpen() }}>
-                                    <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} />
+                                    {/* <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} /> */}
                                     品項查詢
                                 </button>
+                                <button className={scss.minibtn} onClick={() => { alert("OK") }}>
+                                    申請紀錄
+                                </button>
                             </div>
+                            <div style={{ marginTop: '5px' }}></div>
                             <div></div>
-                            <div></div>
-                            <div style={{ textAlign: 'right' }}>
+                            <div>
+                                <span style={{ fontSize: '18px', color: '#14256a', verticalAlign: 'bottom', }}>
+                                    總比數：
+                                    {data2.length}
+                                </span>
                             </div>
                         </div>
                         <div className={scss.body_content1}>
@@ -705,7 +725,7 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={nameRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: `${editstatus === true ? '1px solid black' : ''}`, width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
                                                 type="text"
                                                 value={_item.name !== undefined ? _item.name : ''}
                                                 readOnly={!(index + 1 === editrowid && editstatus === true)}
@@ -718,7 +738,7 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={specRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: `${editstatus === true ? '1px solid black' : ''}`, width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
                                                 type="text"
                                                 value={_item.spec !== undefined ? _item.spec : ''}
                                                 readOnly={!(index + 1 === editrowid && editstatus === true)}
@@ -730,7 +750,7 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={quantityRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: `${editstatus === true ? '1px solid black' : ''}`, width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
                                                 type="text"
                                                 maxLength={5}
                                                 value={_item.quantity !== undefined ? _item.quantity : 0}
@@ -743,7 +763,7 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={unitRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: `${editstatus === true ? '1px solid black' : ''}`, width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
                                                 type="text"
                                                 value={_item.unit !== undefined ? _item.unit : ''}
                                                 readOnly={!(index + 1 === editrowid && editstatus === true)}
@@ -755,7 +775,7 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={noteRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: `${editstatus === true ? '1px solid black' : ''}`, width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
                                                 type="text"
                                                 value={_item.note !== undefined ? _item.note : ''}
                                                 readOnly={!(index + 1 === editrowid && editstatus === true)}
@@ -840,10 +860,10 @@ export default function AddPurchaseRequisition() {
                                 </div>
                             </div>
                         </div>
-                        <br />
                         <div className={scss.body_foot1}>
                             <div>
-                                (1).如不知請購品項料號，可以利用查詢代入。<br />
+                                (1).可自行輸入請購項目。<br />
+                                (2).如不知請購品項料號，可以利用查詢代入。<br />
                             </div>
                             <div>
                             </div>
@@ -856,51 +876,61 @@ export default function AddPurchaseRequisition() {
                 {/* 隱藏的popout */}
                 {/* 品項查詢 */}
                 <div style={{
-                    display: `${productSearchmodalopen === true ? '' : 'none'}`, position: 'fixed',
+                    display: `${productSearchmodalopen === true ? '' : 'none'}`,
+                    position: 'fixed',
                     top: '250px',
                     left: '50%',
                     transform: 'translateX(-50%)',
                     width: '1000px',
                     backgroundColor: '#fff',
                     border: '1px solid #ccc',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
                     zIndex: 1000,
-                    padding: '16px'
+                    padding: '16px',
+                    maxHeight: '80vh', // 確保模態窗口不會超過視窗高度
+                    overflowY: 'auto',  // 啟用垂直滾動
+                    height: '650px'
                 }}>
-                    <div className={scss.modal_search_bar} >
-                        <div>
-                            <span style={{ fontSize: '16px', color: '#14256a' }}>查詢種類：</span>
-                            <span style={{ fontSize: '16px' }}>
-                                <select style={{ borderBottom: '1px solid gray', outline: 'none' }} value={selectedOption} onChange={(e) => { setSelectedOption(e.target.value) }}>
-                                    <option value="物料">物料</option>
-                                    <option value="全部">全部</option>
-                                    <option value="辦公室用品">辦公室用品</option>
-                                </select>
-                            </span>
-                        </div>
-                        <div>
-                            <span style={{ fontSize: '16px' }}>
-                                <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center' }}>
-                                    <input
-                                        type="text"
-                                        placeholder='查詢名稱'
-                                        value={keyword3}
-                                        style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
-                                        onChange={(e) => setKeyword3(e.target.value)}
-                                    />
-                                    <button type="submit" style={{ display: 'flex', alignItems: 'center', padding: '0', border: 'none', background: 'none' }}>
-                                        <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
-                                    </button>
-                                </form>
-                            </span>
-                        </div>
-                        <div></div>
-                        <div>
-                            <span>
-                                <button onClick={() => { setProductSearchmodalopen(false) }}>
-                                    <img src={icon_close.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        position: 'sticky',
+                        top: 0,
+                        backgroundColor: '#fff',
+                        zIndex: 1000
+                    }}>
+                        <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                            <div>
+                                <span style={{ fontSize: '16px', color: '#14256a' }}>查詢種類：</span>
+                                <span style={{ fontSize: '16px' }}>
+                                    <select style={{ borderBottom: '1px solid gray', outline: 'none', marginRight: '8px' }} value={selectedOption} onChange={(e) => { setSelectedOption(e.target.value) }}>
+                                        <option value="物料">物料</option>
+                                        <option value="全部">全部</option>
+                                        <option value="辦公室用品">辦公室用品</option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder='查詢名稱'
+                                    value={keyword3}
+                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
+                                    onChange={(e) => setKeyword3(e.target.value)}
+                                />
+                                <button type="submit" style={{ display: 'flex', alignItems: 'center', padding: '0', border: 'none', background: 'none' }}>
+                                    <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
                                 </button>
-                            </span>
+                            </div>
+                            <div>
+                            </div>
+                            <div></div>
+                        </form>
+                        <div>
+                            <button onClick={() => { setProductSearchmodalopen(false) }}>
+                                <img src={icon_close.src} alt="close" style={{ width: '30px', height: '20px' }} />
+                            </button>
                         </div>
                     </div>
                     <hr />
@@ -908,7 +938,7 @@ export default function AddPurchaseRequisition() {
                         <Thead01 type={'AddPR_GetProduct'} />
                         <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
                             {data && (
-                                data.map((_item: any, index: number) => (
+                                data.map((_item, index) => (
                                     <CellWithBar key={index} className={scss.panelHeader19}>
                                         <div className={scss.row01}>
                                             <span>{_item.productid}</span>

@@ -82,7 +82,7 @@ export default function QuotereqDetailList() {
     const [create_byin, setCreate_byin] = useState<string>("");
     const [create_atin, setCreate_atin] = useState<string>("");
     const [approvedin, setApprovedin] = useState<string>("");
-    const [quoterequuidin, setquoterequuidin] = useState<string>(quoterequuid as string)
+    const [quoterequuidin, setquoterequuidin] = useState<string>(quoterequuid as string);
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -283,6 +283,7 @@ export default function QuotereqDetailList() {
 
     //取得對應詢價單主檔的詢價單明細檔
     const getQuotereqDetail = async (quoterequuid: any) => {
+        // alert("in");
         try {
             // setIsLoading(true);
             const conditionModel: {
@@ -359,11 +360,13 @@ export default function QuotereqDetailList() {
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
-            myAlert.success({title:'詢價明細新增成功'});
+            myAlert.success({ title: '詢價明細新增成功' });
             const responseData = await response.json();
             // 加入詢價單明細後重新取詢價單明細
-            alert(prquotereqadddata.quoterequuid);
-            getQuotereqDetail(prquotereqadddata.quoterequuid);
+            // alert(prquotereqadddata.quoterequuid);
+            // alert(quoterequuid)
+
+            getQuotereqDetail(quoterequuidin);
 
         } catch (error: any) {
             // setError(error.message);
@@ -578,7 +581,8 @@ export default function QuotereqDetailList() {
                         </div>
                         <div></div>
                         <div style={{ textAlign: 'right' }}>
-                            <button className={scss.greenbutton} onClick={() => { addQuotereqDetail() }} >
+                            {quoterequuid}
+                            <button className={scss.greenbutton} onClick={() => { addQuotereqDetail();}} >
                                 <img src={icon_fc_arrow_down.src} alt="Arrow Down" style={{ width: '20px', height: '20px' }} />
                             </button>
                         </div>

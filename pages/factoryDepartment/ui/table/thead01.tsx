@@ -196,13 +196,14 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-  //#region 進貨單
+  //#region 請購單
   else if (type === "PurchaseRequisition") {
     return (
       <div className={style.thead15}>
         <span>請購日期</span>
         <span>請購單號</span>
         <span>狀態</span>
+        <span>請購人員</span>
         <span></span>
       </div>
     )

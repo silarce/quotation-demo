@@ -31,6 +31,8 @@ import icon_collapse_right from 'public/image/icon/fc_collapse_right.svg';
 import icon_collapse_left from 'public/image/icon/fc_collapse_left.svg';
 import icon_detail from 'public/image/icon/fc_detail.svg';
 import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
+import icon_close from 'public/image/icon/fc_close.svg';
+
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -103,6 +105,8 @@ export default function PurchaseRequisitionList() {
     const [taxprice1, setTaxPrice1] = useState<string>("");
     const [totalpayprice1, setTotalPayPrice1] = useState<string>("");
 
+    //詢價總數
+    const [totalreqprogress, setTotalreqprogress] = useState<string>("");
     //詢價進度
     const [quotereqprogress, setQuotereqprogress] = useState<string>("");
 
@@ -187,14 +191,13 @@ export default function PurchaseRequisitionList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        { searchGroup },
         {
             type: 'addButton',
             label: '新增請購單',
             onClick: () => {
                 // setOpen(true);
                 router.push({
-                    pathname: `/factoryDepartment/purchaseRequisitionList/addPurchaseRequisition`,
+                    pathname: `/factoryDepartment/addPurchaseRequisition`,
                     query: {
                         type: 'AddPurchaseRequisition',
                     },
@@ -303,7 +306,8 @@ export default function PurchaseRequisitionList() {
                     alreadyquotereq += 1;
                 }
             });
-            setQuotereqprogress(`${alreadyquotereq}/${totalquotereq}`);
+            setTotalreqprogress(totalquotereq);
+            setQuotereqprogress(`${alreadyquotereq}`);
 
 
         } catch (error: any) {
@@ -463,9 +467,9 @@ export default function PurchaseRequisitionList() {
             myAlert.warning({ title: "尚未加入任何採購項目" });
         } else {
             myAlert.confirm({
-                title: '確定要轉為進貨單嗎?',
+                title: '確定要新增採購單嗎?',
                 content: <>
-                    <h1>請確認數量、金額是否正確</h1>
+                    <h1>請確認數量、金額是否正確或是否為同一間廠商</h1>
                 </>,
                 props: {
                     onOk: () => {
@@ -568,6 +572,7 @@ export default function PurchaseRequisitionList() {
 
 
     //#region  詢價單modal
+    const [productSearchmodalopen, setProductSearchmodalopen] = useState<boolean>(false);
     const [prquotereqmodalopen, setPrquotereqmodalopen] = useState<boolean>(false);
 
     const [test, setTest] = useState<string>("");
@@ -576,6 +581,7 @@ export default function PurchaseRequisitionList() {
     const [quotereqname, setQuotereqname] = useState<string>("");
     const [quotereqspec, setQuotereqspec] = useState<string>("");
     const [quotereqquantity, setQuotereqquantity] = useState<string>("");
+    const [selectedOption, setSelectedOption] = useState('物料'); // 預設選項
     //對應詢價單主檔的詢價單明細
     const [prquotereqdata, setPrquotereqdata] = useState<any[]>([]);
     //確定廠商後更新請購單明細
@@ -602,7 +608,6 @@ export default function PurchaseRequisitionList() {
 
     //打開詢價單modal
     const prQuotereqModalOpen = async (item: any) => {
-
         //清空
         prquotereqadddata.quoterequuid = "";
         prquotereqadddata.quotereqid = "";
@@ -622,6 +627,8 @@ export default function PurchaseRequisitionList() {
         setQuotereqspec(item.spec);
         setQuotereqquantity(item.quantity);
         getQuotereqDetail(item.quoterequuid);
+        setPrquotereqmodalopen(true);
+        // setProductSearchmodalopen(true)
         setPrquotereqmodalopen(true);
     }
 
@@ -842,7 +849,7 @@ export default function PurchaseRequisitionList() {
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'請購單'} panelList={panelList} />
             <div className={scss.container}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
+                <div className={scss.left} style={{ display: `${leftbaropen === false ? '' : 'none'}` }}>
                     <div className={scss.content}>
                         <div>
                             <Thead01 type={'PurchaseRequisition'} />
@@ -854,16 +861,16 @@ export default function PurchaseRequisitionList() {
                 <div className={scss.right}>
 
                     <div className={scss.content}>
-                        <div style={{ display: `${leftbaropen === true ? 'none' : ''}` }}>
+                        {/* <div style={{ display: `${leftbaropen === true ? 'none' : ''}` }}>
                             <button>
                                 <img src={icon_collapse_right.src} alt="search" style={{ height: '30px', width: '30px', textAlign: 'left' }} onClick={() => { setLeftbaropen(!leftbaropen) }} />
                             </button>
-                        </div>
-                        <div style={{ display: `${leftbaropen === false ? 'none' : ''}` }}>
+                        </div> */}
+                        {/* <div style={{ display: `${leftbaropen === false ? 'none' : ''}` }}>
                             <button>
                                 <img src={icon_collapse_left.src} alt="search" style={{ height: '30px', width: '30px', textAlign: 'left' }} onClick={() => { setLeftbaropen(!leftbaropen) }} />
                             </button>
-                        </div>
+                        </div> */}
                         <div className={scss.head_content1}>
 
                             <div>
@@ -878,8 +885,6 @@ export default function PurchaseRequisitionList() {
                                         },
                                     }}
                                 />
-                            </div>
-                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="請購單號"
@@ -890,8 +895,6 @@ export default function PurchaseRequisitionList() {
                                         },
                                     }}
                                 />
-                            </div>
-                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="請購人員"
@@ -902,10 +905,6 @@ export default function PurchaseRequisitionList() {
                                         },
                                     }}
                                 />
-                            </div>
-                        </div>
-                        <div className={scss.head_content2}>
-                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="需用日期"
@@ -916,20 +915,6 @@ export default function PurchaseRequisitionList() {
                                         },
                                     }}
                                 />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="詢價進度"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: quotereqprogress
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="單據狀態"
@@ -941,37 +926,62 @@ export default function PurchaseRequisitionList() {
                                     }}
                                 />
                             </div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div className={scss.head_content2}>
+                            <div></div>
+                            <div></div>
+                            <div></div>
                         </div>
                         <div className={scss.head_content3}>
-                            <div>
-                            </div>
-                            <div>
-                            </div>
-                            <div>
-                            </div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
                         </div>
                         <div className={scss.head_foot1}>
-                            <div>
-                            </div>
-                            <div>
-
-                            </div>
+                            <div></div>
+                            <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                <button className={scss.redbtn}>送出審核</button>
+                                {/* {quotereqprogress}/{totalreqprogress} */}
+                                <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? '' : 'none'}` }}>
+                                    <button className={scss.redbtn}>送出審核</button>
+                                </span>
+                                <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }}>
+                                    <button className={scss.graybtn} onClick={() => { myAlert.warning({ title: '詢價尚未完成' }) }}>送出審核</button>
+                                </span>
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
                             <div>
+                                {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
+                                    請購紀錄
+                                </button> */}
+                                <button className={scss.minibtn} onClick={() => { setProductSearchmodalopen(!productSearchmodalopen) }}>
+                                    請購查詢
+                                </button>
                                 <button className={scss.minibtn} onClick={() => { goQuotereqDetailList('all') }}>
-                                    <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    詢價單
+                                    {/* <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                                    詢價管理
                                 </button>
                             </div>
-                            <div>
+                            <div style={{ marginTop: '5px' }}>
+                              
                             </div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
+                            <InputSel
+                                    {...inputSelProps}
+                                    caption="詢價進度"
+                                    className='align-bottom'
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: `${quotereqprogress}/${totalreqprogress}`
+                                        },
+                                    }}
+                                />
                             </div>
                         </div>
                         <div className={scss.body_content1}>
@@ -992,11 +1002,11 @@ export default function PurchaseRequisitionList() {
                                             <span>{_item.totalprice.toLocaleString()}</span>
                                             <span>{_item.suppliername}</span>
                                             <span>
-                                                <button onClick={() => { handleAddToList(_item) }} style={{ display: `${_item.suppliername != null ? '' : 'none'}` }}>
+                                                <button onClick={() => { handleAddToList(_item) }} style={{ display: `${_item.suppliername != null && _item.suppliername != "" ? '' : 'none'}` }}>
                                                     <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
                                                 </button>
-                                                <button onClick={() => { handleAddToList(_item) }} style={{ display: `${_item.suppliername != null ? 'none' : ''}` }}>
-                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color:'red',width: '20px', height: '20px' }} />
+                                                <button onClick={() => { handleAddToList(_item) }} style={{ display: `${_item.suppliername != null && _item.suppliername != "" ? 'none' : ''}` }}>
+                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button>
                                             </span>
                                         </div>
@@ -1007,9 +1017,10 @@ export default function PurchaseRequisitionList() {
 
                         <div className={scss.body_foot1}>
                             <div>
+                                (1).詢價完畢後請送出審核<br />
+                                (2).待審核完畢後請依廠商分類，將項目加入下方清單轉為採購單。
                             </div>
-                            <div>
-                            </div>
+                            <div></div>
                             <div>
                                 <table className={scss.count_table}>
                                     <tr>
@@ -1045,8 +1056,11 @@ export default function PurchaseRequisitionList() {
                                 {/* <span>
                                     <button className={scss.redbtn} onClick={() => { handlePO() }}>轉採購單</button>
                                 </span> */}
-                                <span>
-                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="轉採購單" onClick={() => { handlePO() }} />
+                                <span style={{ display: `${data2.length > 0 ? '' : 'none'}` }}>
+                                    <button className={scss.redbtn} onClick={() => { handlePO() }}>新增採購</button>
+                                </span>
+                                <span style={{ display: `${data2.length > 0 ? 'none' : ''}` }}>
+                                    <button className={scss.graybtn} onClick={() => { myAlert.warning({ title: '尚未加入任何轉出項目' }) }}>新增採購</button>
                                 </span>
                             </div>
                         </div>
@@ -1157,7 +1171,82 @@ export default function PurchaseRequisitionList() {
                     </div>
                 </div>
 
+                {/* 隱藏的popout */}
+                {/* 品項查詢 */}
+                <div style={{
+                    display: `${productSearchmodalopen === true ? '' : 'none'}`,
+                    position: 'fixed',
+                    top: '250px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '1000px',
+                    backgroundColor: '#fff',
+                    border: '1px solid #ccc',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
+                    zIndex: 1000,
+                    padding: '16px',
+                    maxHeight: '80vh', // 確保模態窗口不會超過視窗高度
+                    overflowY: 'auto'  // 啟用垂直滾動
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        position: 'sticky',
+                        top: 0,
+                        backgroundColor: '#fff',
+                        zIndex: 1000
+                    }}>
+                        <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder='單號'
+                                    value={keyword1}
+                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
+                                    onChange={(e) => setKeyword1(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder='名稱'
+                                    value={keyword2}
+                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
+                                    onChange={(e) => setKeyword2(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder='規格'
+                                    value={keyword3}
+                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
+                                    onChange={(e) => setKeyword3(e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <button type="submit" style={{ display: 'flex', alignItems: 'center', padding: '0', border: 'none', background: 'none' }}>
+                                    <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
+                                </button>
+                            </div>
+                        </form>
+                        <div>
+                            <button onClick={() => { setProductSearchmodalopen(false) }}>
+                                <img src={icon_close.src} alt="close" style={{ width: '30px', height: '20px' }} />
+                            </button>
+                        </div>
+                    </div>
+                    <hr />
+                    <div>
+                        <Thead01 type={'PurchaseRequisition'} />
+                        <Tbody01 type={'PurchaseRequisition'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                    </div>
+                </div>
 
+
+                {/* 隱藏的modal */}
+                {/* 詢價單檢視 */}
                 <Modal
                     visible={prquotereqmodalopen}
                     footer={null}
@@ -1175,7 +1264,6 @@ export default function PurchaseRequisitionList() {
                     <hr />
                     <div>
                         <Thead01 type={'Quotereq'} />
-                        {/* <Tbody01 type={'Quotereq'} data={prquotereqdata} error={undefined} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
                         {prquotereqdata && (
                             prquotereqdata.map((_item: any, index: number) => (
                                 <CellWithBar key={index} className={scss.panelHeader17}>
@@ -1193,10 +1281,8 @@ export default function PurchaseRequisitionList() {
                                                 className={scss.quotereqdetail_checkbox}
                                                 type='checkbox'
                                                 checked={selectedsupplier === _item.id}
-                                            // onChange={() => handleCheckboxChange(_item)}
                                             />
                                         </span>
-                                        {/* <span><input type='checkbox'/></span> */}
                                     </div>
                                 </CellWithBar>
                             ))

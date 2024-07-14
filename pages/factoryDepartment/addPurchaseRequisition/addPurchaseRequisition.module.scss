@@ -150,6 +150,22 @@
   }
 }
 
+.head_head1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+
+  div {
+    margin-right: 20px;
+  }
+
+  // background-color: gray;
+}
+
 .head_content1 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
@@ -201,7 +217,6 @@
   margin-left: 20px;
   margin-right: 20px;
 
-
   // background-color: gray;
 }
 
@@ -224,6 +239,7 @@
   margin-left: 20px;
   margin-right: 20px;
   margin-bottom: 5px;
+  border-top: 1px solid gray;
 }
 
 .body_content1 {
@@ -244,7 +260,7 @@
   grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
   // gap: 15px;
   width: auto;
-  margin-top: 0px;
+  margin-top: 10px;
   margin-left: 20px;
   margin-right: 20px;
   padding-right: 20px;
@@ -461,41 +477,71 @@ div.panelHeader20 {
 
 
 
+
 // 隱藏popout
 .modal_search_bar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  display: grid;
-  grid-template-columns: 200px 200px 500px 40px;
-  gap: 15px;
-  width: auto;
-
+  display: flex;
+  // justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom:5px;
   div {
-    // border-bottom: 1px solid gray;
     text-align: right;
     display: flex;
     align-items: center;
-    // width: 150px;
 
     input {
-      // height: 32px;
       font-size: 16px;
       width: 100%;
-      // border:1px solid #c1c1c1;
+      border-bottom: 1px solid #c1c1c1;
+      margin-right: 8px;
+    }
+
+    select {
+      border-bottom: 1px solid gray;
+      outline: none;
     }
 
     button {
       background: none;
       border: none;
       cursor: pointer;
-    }
 
-    img {
-      width: 30px;
-      height: 20px;
+      img {
+        width: 20px;
+        height: 20px;
+      }
     }
   }
 }
 
+.modal_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
+
+
+.customContainer {
+  display: flex;
+  align-items: center;
+}
+
+.customLabel {
+  font-size: 18px;
+  color: #14256a;
+  vertical-align: top;
+  margin-right: 8px; // 調整 label 和 textarea 之間的距離
+  white-space: nowrap; // 確保文字不換行
+}
+
+.customInput {
+  font-size: 18px;
+  border-bottom: 1px solid #14256a;
+  height: 30px;
+  width: 100%;
+  resize: none; // 禁用自由調整高度的功能
+  margin-left: 70px;
+  
+}

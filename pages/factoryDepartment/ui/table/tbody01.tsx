@@ -680,8 +680,9 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.purchaserequisitionid}</span>
                 {/* <span>{_item.totalprice.toLocaleString()}</span> */}
-                <span style={{ color: '#ea1833', display: `${_item.approved === false ? "" : "none"}` }}>未結</span>
+                <span style={{ color: '#ea1833', display: `${_item.approved === false ? "" : "none"}` }}>{_item.status}</span>
                 <span style={{ color: '#14256a', display: `${_item.approved === true ? "" : "none"}` }}>已結</span>
+                <span>{_item.create_by}</span>
                 <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span>
               </div>
             </CellWithBar>
