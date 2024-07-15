@@ -330,8 +330,9 @@ function ReviewForm({
   const handle_confirm = async () => {
     await reqSubmitContracting();
 
-    close?.();
-    onConfirm && onConfirm();
+    // close?.();
+    onConfirm && (await onConfirm());
+    setDisabled(true);
   };
 
   const handle_review = () => {
