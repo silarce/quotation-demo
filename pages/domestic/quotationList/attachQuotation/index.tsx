@@ -935,7 +935,7 @@ latestContentProdArr為這次追加追減的主產品
       addMethod: (v) => {
         setPaymentMethod((state) => {
           const copy = [...state];
-          copy.push({ milestone: v, totalPaymentRatio: '' });
+          copy.push({ milestone: v, totalPaymentRatio: '0' });
 
           return copy;
         });
