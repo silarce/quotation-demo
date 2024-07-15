@@ -1113,7 +1113,7 @@ export default function PurchaseRequisitionList() {
                                 {/* {parseInt(totalreqprogress)} */}
                                 {/* {quotereqprogress}/{totalreqprogress} */}
                                 <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }}>
-                                    <button className={scss.redbtn} onClick={() => { sentPRToReview("詢價") }}>送出審核</button>
+                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="送出審核" onClick={() => { sentPRToReview("詢價") }} />
                                 </span>
                                 <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }}>
                                     <button className={scss.graybtn} onClick={() => { myAlert.warning({ title: '詢價尚未完成' }) }}>送出審核</button>

@@ -644,16 +644,27 @@ export default function AddPurchaseRequisition() {
                                         },
                                     }}
                                 />
-                                <span className={scss.customContainer}>
-                                    <span className={scss.customLabel}>
+                                {/*<span className={scss.customContainer}>
+                                     <span className={scss.customLabel}>
                                         備註
                                     </span>
                                     <textarea
                                         className={scss.customInput}
                                         value={note}
                                         onChange={(e) => { setNote(e.target.value) }}
-                                    ></textarea>
-                                </span>
+                                    ></textarea> */}
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="備註"
+                                        disabled={false}
+                                        inputProps={{
+                                            props: {
+                                                value: note,
+                                                onChange: (e) => { setNote(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                {/* </span> */}
                             </div>
                             <div></div>
                             <div></div>

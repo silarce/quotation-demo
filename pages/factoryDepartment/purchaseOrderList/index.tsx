@@ -102,6 +102,12 @@ export default function PurchaseOrderList() {
     const [totalprice, setTotalPrice] = useState<string>("");
     const [taxprice, setTaxPrice] = useState<string>("");
     const [totalpayprice, setTotalPayPrice] = useState<string>("");
+    // 保存原始值
+    const [originalSuppliernamein, setOriginalSuppliernamein] = useState(suppliernamein);
+    const [originalSupplierphonein, setOriginalSupplierphonein] = useState(supplierphonein);
+    const [originalSuppliertaxidin, setOriginalSuppliertaxidin] = useState(suppliertaxidin);
+    const [originalInvoicein, setOriginalInvoicein] = useState(invoicein);
+    const [originalSupplieraddressin, setOriginalSupplieraddressin] = useState(supplieraddressin);
 
 
     //進貨總數
@@ -566,6 +572,33 @@ export default function PurchaseOrderList() {
     }
 
 
+
+    // 主檔編輯
+    const handleEdit = () => {
+        // 進入編輯模式時保存原始值
+        setOriginalSuppliernamein(suppliernamein);
+        setOriginalSupplierphonein(supplierphonein);
+        setOriginalSuppliertaxidin(suppliertaxidin);
+        setOriginalInvoicein(invoicein);
+        setOriginalSupplieraddressin(supplieraddressin);
+        setEditmain(true);
+    };
+
+    const handleCancel = () => {
+        // 取消編輯時恢復原始值
+        setSuppliernamein(originalSuppliernamein);
+        setSupplierphonein(originalSupplierphonein);
+        setSuppliertaxidin(originalSuppliertaxidin);
+        setInvoicein(originalInvoicein);
+        setSupplieraddressin(originalSupplieraddressin);
+        setEditmain(false);
+    };
+
+    const handleSave = () => {
+        // 儲存編輯後的值，這裡可以加入其他保存邏輯
+        setEditmain(false);
+    };
+
     return (
         <SubLayer isLoading_subLayer={false}>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
@@ -583,6 +616,16 @@ export default function PurchaseOrderList() {
                     <div className={scss.content}>
                         <div className={scss.head_content1}>
                             <div>
+                                <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
+                                    編輯
+                                </button>
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
+                                    取消
+                                </button>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="採購日期"
@@ -616,17 +659,18 @@ export default function PurchaseOrderList() {
                                 <InputSel
                                     {...inputSelProps}
                                     caption="廠商名稱"
-                                    disabled={editmain}
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? suppliernamein : suppliername,
+                                            value: suppliernamein,
+                                            onChange: (e) => { setSuppliernamein(e.target.value) }
                                         },
                                     }}
                                 />
                                 <InputSel
                                     {...inputSelProps}
                                     caption="廠商地址"
-                                    disabled={editmain}
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
                                             value: supplieraddressin,
@@ -672,7 +716,7 @@ export default function PurchaseOrderList() {
                                 <InputSel
                                     {...inputSelProps}
                                     caption="聯絡電話"
-                                    disabled={editmain}
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
                                             value: supplierphonein,
@@ -683,7 +727,7 @@ export default function PurchaseOrderList() {
                                 <InputSel
                                     {...inputSelProps}
                                     caption="統一編號"
-                                    disabled={editmain}
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
                                             value: suppliertaxidin,
@@ -729,7 +773,7 @@ export default function PurchaseOrderList() {
                                 <InputSel
                                     {...inputSelProps}
                                     caption="發票號碼"
-                                    disabled={editmain}
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
                                             value: invoicein,
@@ -751,14 +795,7 @@ export default function PurchaseOrderList() {
                             <div></div>
                         </div>
                         <div className={scss.head_content4}>
-                            <div>
-                                <button style={{ display: `${editmain === false ? 'none' : ''}` }} className={scss.minibtn} onClick={() => { setEditmain(!editmain) }}>
-                                    編輯
-                                </button>
-                                <button style={{ display: `${editmain === false ? '' : 'none'}` }} className={scss.miniredbtn} onClick={() => { setEditmain(!editmain) }}>
-                                    儲存
-                                </button>
-                            </div>
+                            <div></div>
                             <div></div>
                             <div></div>
                         </div>
@@ -867,8 +904,11 @@ export default function PurchaseOrderList() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "none" : "" }}>
-                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="進貨/批次進貨" onClick={handleReceipt} />
+                                <span style={{ display: data2.length > 0 ? "" : "none" }}>
+                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="新增進貨" onClick={handleReceipt} />
+                                </span>
+                                <span style={{ display: data2.length > 0 ? "none" : "" }}>
+                                    <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="新增進貨" onClick={handleReceipt} />
                                 </span>
                             </div>
                         </div>

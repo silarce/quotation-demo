@@ -429,7 +429,7 @@ div.panelHeader17 {
 .greenbutton {
   height: 36px;
   // padding: 0px 40px;
-  border: solid 1px #86bd07;
+  border: solid 1px #2e9619;
   background-color: $bgc01;
   padding-left: 22px;
   padding-right: 22px;
@@ -437,17 +437,17 @@ div.panelHeader17 {
   padding-bottom: 4px;
   font-weight: 500;
   font-size: 16px;
-  color: #86bd07;
+  color: #2e9619;
   transform: translateY(2px);
 
   &:hover {
-    border: solid 1px #86bd07;
-    background-color: rgb(0, 105, 23, 0.267);
+      border: solid 1px #2e9619;
+      background-color: #2e96192c;
   }
 
   &:focus {
-    background-color: $bgc01;
-    border: solid 1px #86bd07;
+      background-color: $bgc01;
+      border: solid 1px #2e9619;
   }
 }
 

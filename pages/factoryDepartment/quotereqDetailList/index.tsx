@@ -239,6 +239,9 @@ export default function QuotereqDetailList() {
         unitprice: "",
         totalprice: "",
         suppliername: "",
+        supplieraddress: "",
+        supplierphone: "",
+        suppliertaxid: "",
         deliverydate: moment(),
         unit: "",
         note: "",
@@ -525,14 +528,43 @@ export default function QuotereqDetailList() {
                             />
                         </div>
                         <div>
+
+                        </div>
+                        <div style={{ marginRight: '20px' }}>
                             <InputSel
                                 {...inputSelProps}
-                                caption="備註"
+                                caption="地址"
                                 disabled={false}
                                 inputProps={{
                                     props: {
-                                        value: prquotereqadddata.note,
-                                        onChange: (e) => handlequotereqChange('note', e.target.value.trim())
+                                        value: prquotereqadddata.supplieraddress,
+                                        onChange: (e) => handlequotereqChange('totalprice', e.target.value.trim())
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div style={{ marginRight: '20px' }}>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="電話"
+                                disabled={false}
+                                inputProps={{
+                                    props: {
+                                        value: prquotereqadddata.supplierphone,
+                                        onChange: (e) => handlequotereqChange('totalprice', e.target.value.trim())
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="統一編號"
+                                disabled={false}
+                                inputProps={{
+                                    props: {
+                                        value: prquotereqadddata.suppliertaxid,
+                                        onChange: (e) => handlequotereqChange('totalprice', e.target.value.trim())
                                     },
                                 }}
                             />
@@ -546,6 +578,17 @@ export default function QuotereqDetailList() {
                                     props: {
                                         value: prquotereqadddata.unitprice,
                                         onChange: (e) => handlequotereqChange('unitprice', e.target.value.trim())
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="備註"
+                                disabled={false}
+                                inputProps={{
+                                    props: {
+                                        value: prquotereqadddata.note,
+                                        onChange: (e) => handlequotereqChange('note', e.target.value.trim())
                                     },
                                 }}
                             />
@@ -575,16 +618,11 @@ export default function QuotereqDetailList() {
                                     },
                                 }}
                             />
-                        </div>
-                        <div style={{ marginRight: '20px' }}>
-
-                        </div>
-                        <div></div>
-                        <div style={{ textAlign: 'right' }}>
-                            {quoterequuid}
-                            <button className={scss.greenbutton} onClick={() => { addQuotereqDetail();}} >
-                                <img src={icon_fc_arrow_down.src} alt="Arrow Down" style={{ width: '20px', height: '20px' }} />
-                            </button>
+                            <span>
+                                <button className={scss.greenbutton} onClick={() => { addQuotereqDetail(); }} >
+                                    <img src={icon_fc_arrow_down.src} alt="Arrow Down" style={{ width: '20px', height: '20px' }} />
+                                </button>
+                            </span>
                         </div>
                         <br />
                     </div>
