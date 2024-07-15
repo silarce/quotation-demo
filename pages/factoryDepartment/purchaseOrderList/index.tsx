@@ -101,6 +101,11 @@ export default function PurchaseOrderList() {
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
+    useEffect(() => {
+        if (firstin !== undefined) {
+            setCheckFirstIn(parseInt(firstin as string) || 0);
+        }
+    }, [firstin]);
 
 
     //#region 上方功能列
@@ -499,28 +504,21 @@ export default function PurchaseOrderList() {
         console.log(data2);
     };
 
-
+   // 從口袋清單移除
     const handleRemove = (index: number) => {
         const updatedData = data2.filter((_, i) => i !== index);
         setData2(updatedData);
-        // setData2(prevState => {
-        //     // 複製 prevState 以避免直接修改原始狀態
-        //     const updatedData = [...prevState];
-        //     // 移除指定索引的項目
-        //     updatedData.splice(index, 1);
-        //     return updatedData;
-        // });
     };
 
-    const handleChange = (index: number, value: string | number) => {
-        setData2(prevState => {
-            const updatedData = [...prevState];
-            updatedData[index] = {
-                ...updatedData[index],
-                quantity: value // 更新 quantity 屬性的值
-            };
-            return updatedData;
-        });
+    // 改變口袋清單值
+    const handleChange = (index: any, target: any, value: any) => {
+        const newData = [...data2];
+        const newValue = parseFloat(value.replace(/,/g, '')) || 0;
+        newData[index] = {
+            ...newData[index],
+            [target]: newValue, // 使用計算屬性名稱來設置屬性
+        };
+        setData2(newData);
     };
 
     const handleRestore = () => {
@@ -544,7 +542,6 @@ export default function PurchaseOrderList() {
                         <div>
                             <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "false" ? "" : "none" }}>
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="結案" onClick={() => { handleClosePO() }} />
-                                {/* <button className={scss.greenbutton} onClick={() => { handleClosePO() }} >未結案</button> */}
                             </span>
                             <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
                                 <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" />
@@ -568,7 +565,6 @@ export default function PurchaseOrderList() {
                             />
                         </div>
                         <div>
-                            {/* {purchaseorderid} */}
                             <InputSel
                                 {...inputSelProps}
                                 caption="採購單號"
@@ -593,7 +589,6 @@ export default function PurchaseOrderList() {
                             />
                         </div>
                     </div>
-                    {/* <hr /> */}
                     <div className={scss.content_main}>
                         <div>
                             <InputSel
@@ -758,17 +753,11 @@ export default function PurchaseOrderList() {
                                             ref={quantityRefs.current[index]}
                                             style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
                                             type="text"
+                                            maxLength={9}
                                             value={_item.quantity !== undefined ? _item.quantity : 0}
                                             readOnly={!(index + 1 === editrowid && editstatus === true)}
                                             onChange={(e) => {
-                                                const newData = [...data2];
-                                                const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                newData[index] = {
-                                                    ...newData[index],
-                                                    quantity: newQuantity,
-                                                    totalprice: newQuantity * newData[index].unitprice
-                                                };
-                                                setData2(newData);
+                                                handleChange(index, "quantity", e.target.value);
                                             }}
                                         />
                                     </span>
@@ -778,6 +767,7 @@ export default function PurchaseOrderList() {
                                             ref={unitpriceRefs.current[index]}
                                             style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
                                             type="text"
+                                            maxLength={8}
                                             value={_item.unitprice.toLocaleString()}
                                             readOnly={!(index + 1 === editrowid && editstatus === true)}
                                             onChange={(e) => {
@@ -796,15 +786,14 @@ export default function PurchaseOrderList() {
                                         {_item.totalprice.toLocaleString()}
                                     </span>
                                     <span>
+                                        &nbsp;&nbsp;
                                         <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                             <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                         </button>
                                         <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
                                             <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
                                         </button>
-                                        {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
-                                            <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
-                                        </button> */}
+                                        <span　style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span>
                                         <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
                                             <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                         </button>
