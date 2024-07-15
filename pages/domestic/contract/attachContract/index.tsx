@@ -361,7 +361,7 @@ export default function AttachContract({
       addMethod: (v) => {
         setState_paymentMethod((state) => {
           const copy = [...state];
-          copy.push({ milestone: v, totalPaymentRatio: '' });
+          copy.push({ milestone: v, totalPaymentRatio: '0' });
 
           return copy;
         });
