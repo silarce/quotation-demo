@@ -101,7 +101,7 @@ function ContractReviewForm({
   onConfirm?: () => void;
   defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
   quotationContent?: TquotationContentDto;
-  quotationId: string | undefined;
+  quotationId?: string;
 }) {
   // ----------------------------------------------------------------------------
 
@@ -169,9 +169,9 @@ function ReviewForm({
   verifyForm: TquotationVerifyFormDto | undefined;
   defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
   onConfirm?: () => void;
-  isInContract: boolean | undefined;
-  quotationContent: TquotationContentDto | undefined;
-  quotationId: string | undefined;
+  isInContract?: boolean | undefined;
+  quotationContent?: TquotationContentDto | undefined;
+  quotationId?: string | undefined;
 }) {
   //
   const { userInfo } = useContext(AppContext);
