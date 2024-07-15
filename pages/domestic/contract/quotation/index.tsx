@@ -192,8 +192,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // const { data: contract, update } = useGetContract_id_noItems_2(id, { populate: ['content.settleProducts'] });
   // const { data: contract, update } = useGetContract_id_noItems_2(id);
   // 這個技術債以後重構時再還...
-  const { data: contract, update } = useGetContract_id_contentProductItems(id, {}, version);
+  const { data: contract, update } = useGetContract_id_contentProductItems(
+    id,
+
+    {
+      populate: ['quotation'],
+    },
+
+    version
+  );
   const engineeringContactId = contract?.engineeringContactId;
+  const quotationId = contract?.quotation?.id;
 
   // 合約項目
   // 選中合約版本的contnet
@@ -914,7 +923,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         <ContractReviewForm
           showModal={reviewFormShow}
-          forbidden={true}
+          // forbidden={true}
+          isInContract={true}
           close={() => setReviewFormShow(false)}
           contractIdNumber={content?.quotationNumber ?? ''}
           contractName={content?.projectName ?? ''}
@@ -926,6 +936,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
             await update();
             setIsLoading(false);
           }}
+          quotationContent={content}
+          quotationId={quotationId}
         />
       </div>
 
