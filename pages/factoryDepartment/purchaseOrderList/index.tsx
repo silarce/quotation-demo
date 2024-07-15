@@ -26,7 +26,9 @@ import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
-
+import icon_search from 'public/image/icon/search.svg';
+import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
+import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -78,7 +80,7 @@ export default function PurchaseOrderList() {
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
-
+    const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
 
 
     const [receiptedin, setReceiptedin] = useState<string>("");
@@ -95,9 +97,17 @@ export default function PurchaseOrderList() {
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
 
+    const [editmain, setEditmain] = useState<boolean>(false);
+
     const [totalprice, setTotalPrice] = useState<string>("");
     const [taxprice, setTaxPrice] = useState<string>("");
     const [totalpayprice, setTotalPayPrice] = useState<string>("");
+
+
+    //進貨總數
+    const [totalreq, setTotalreq] = useState<string>("");
+    //進貨進度
+    const [completereq, setCompletereq] = useState<number>(0);
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
@@ -289,6 +299,25 @@ export default function PurchaseOrderList() {
             setTaxPrice(taxPrice.toLocaleString());
             const totalPayPrice = totalprice + taxPrice;
             setTotalPayPrice(totalPayPrice.toLocaleString());
+
+            // 進貨進度
+            let totalreq = data.length; // 總數量
+            let completereq = 0; // 完成數量
+
+            data.forEach((element: any) => {
+                // 將 alreadyinquantity 和 quantity 轉換為整數
+                const alreadyInQuantity = parseInt(element.alreadyinquantity, 10);
+                const quantity = parseInt(element.quantity, 10);
+
+                if (!isNaN(alreadyInQuantity) && !isNaN(quantity) && alreadyInQuantity >= quantity) {
+                    completereq += 1;
+                }
+            });
+            setTotalreq(totalreq);
+            setCompletereq(completereq);
+
+
+
         } catch (error: any) {
             setError(error.message);
         }
@@ -305,7 +334,7 @@ export default function PurchaseOrderList() {
             }
             getPurchaseOrderDetail(purchaseorderuuid);
             if (purchaseorderdetailuuid) {
-                GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid);
+                GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid, purchaseorderdetailuuid);
             }
             setPurchaseorderidin(purchaseorderid as string);
             setPurchaseorderuuidin(purchaseorderuuid as string);
@@ -324,10 +353,11 @@ export default function PurchaseOrderList() {
 
     //批次進貨
     //取已對應採購單的已進貨明細
-    const GetProdReceiptDetailByPurchaseOrderId = async (purchaseorderuuid: any) => {
+    const GetProdReceiptDetailByPurchaseOrderId = async (purchaseorderuuid: any, purchaseorderdetailuuid: any) => {
         try {
             // alert("ss" + purchaseorderdetailuuid);
             // alert(purchaseorderuuid);
+
             setIsLoading(true);
             const conditionModel: {
                 purchaseorderuuid: string | undefined,
@@ -351,7 +381,17 @@ export default function PurchaseOrderList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            setData2(prevData2 => [...prevData2, ...data]);
+            setData2(prevData2 => {
+                // 创建一个 Set 来存储现有 ID
+                const existingIds = new Set(prevData2.map(item => item.id));
+
+                // 过滤掉重复项
+                const newItems = data.filter((item: { id: string }) => !existingIds.has(item.id));
+
+                // 将非重复的新项添加到 prevData2 中
+                return [...prevData2, ...newItems];
+            });
+            // setData2(prevData2 => [...prevData2, ...data]);
 
 
         } catch (error: any) {
@@ -402,8 +442,8 @@ export default function PurchaseOrderList() {
 
             // 更新數據和其它操作
             getPurchaseOrder();
-            getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
-            GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
+            getPurchaseOrderDetail(purchaseorderuuidin);
+            GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuidin, purchaseorderdetailuuidin);
 
         } catch (error: any) {
             setError(error.message);
@@ -504,7 +544,7 @@ export default function PurchaseOrderList() {
         console.log(data2);
     };
 
-   // 從口袋清單移除
+    // 從口袋清單移除
     const handleRemove = (index: number) => {
         const updatedData = data2.filter((_, i) => i !== index);
         setData2(updatedData);
@@ -530,280 +570,375 @@ export default function PurchaseOrderList() {
         <SubLayer isLoading_subLayer={false}>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
             <PageHeader02 tag={quotationStatusLookup[status] ?? '採購單'} panelList={panelList} />
-            <div className={scss.main}>
-                <div className={scss.left}>
-                    <div>
-                        <Thead01 type={'PurchaseOrder'} />
-                        <Tbody01 type={'PurchaseOrder'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+            <div className={scss.container}>
+                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
+                    <div className={scss.content}>
+                        <div>
+                            <Thead01 type={'PurchaseOrder'} />
+                            <Tbody01 type={'PurchaseOrder'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                        </div>
                     </div>
                 </div>
                 <div className={scss.right}>
-                    <div className={scss.tite_main}>
-                        <div>
-                            <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "false" ? "" : "none" }}>
-                                <MyButton_v2 px='px22' py='py4' theme='danger' label="結案" onClick={() => { handleClosePO() }} />
-                            </span>
-                            <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
-                                <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" />
-                            </span>
+                    <div className={scss.content}>
+                        <div className={scss.head_content1}>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="採購日期"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="採購單號"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? purchaseorderidin : purchaseorderid,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="採購人員"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? create_byin : create_by,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商名稱"
+                                    disabled={editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? suppliernamein : suppliername,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商地址"
+                                    disabled={editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: supplieraddressin,
+                                            onChange: (e) => { setSupplieraddressin(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="聯絡電話"
+                                    disabled={editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: supplierphonein,
+                                            onChange: (e) => { setSupplierphonein(e.target.value) }
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="統一編號"
+                                    disabled={editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: suppliertaxidin,
+                                            onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="發票號碼"
+                                    disabled={editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: invoicein,
+                                            onChange: (e) => { setInvoicein(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div></div>
                         </div>
-                        <div style={{ textAlign: 'right', height: '35.77px' }}>
+                        <div className={scss.head_content2}>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div className={scss.head_content3}>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div className={scss.head_content4}>
+                            <div>
+                                <button style={{ display: `${editmain === false ? 'none' : ''}` }} className={scss.minibtn} onClick={() => { setEditmain(!editmain) }}>
+                                    編輯
+                                </button>
+                                <button style={{ display: `${editmain === false ? '' : 'none'}` }} className={scss.miniredbtn} onClick={() => { setEditmain(!editmain) }}>
+                                    儲存
+                                </button>
+                            </div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div className={scss.head_foot1}>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div style={{ textAlign: 'right' }}>
+                                <span style={{ display: (parseInt(completereq.toString()) === parseInt(totalreq)) ? "" : "none" }}>
+                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="結案" onClick={() => { handleClosePO() }} />
+                                </span>
+                                <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
+                                    <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" />
+                                </span>
+                            </div>
+                        </div>
+                        <div className={scss.head_foot2}>
+                            <div>
+                                <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
+                                    {/* <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} /> */}
+                                    採購查詢
+                                </button>
+                            </div>
+                            <div>
 
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="進貨進度"
+                                    className='align-bottom'
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: `${completereq}/${totalreq}`
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div style={{ textAlign: 'right' }}></div>
                         </div>
-                    </div>
-                    <div className={scss.head_main}>
-                        <div>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="採購日期"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
-                                    },
-                                }}
-                            />
+                        <div className={scss.body_content1}>
+                            <Thead01 type={'PurchaseOrderDetail'} />
+                            {/* <Tbody01 type={'PurchaseOrderDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                            {data1 && (
+                                data1.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader11}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.productid}</span>
+                                            <span>{_item.name}</span>
+                                            <span>{_item.spec}</span>
+                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
+                                            <span>{_item.quantity}</span>
+                                            <span>{_item.unit}</span>
+                                            <span>{_item.unitprice.toLocaleString()}</span>
+                                            <span>{_item.totalprice.toLocaleString()}</span>
+                                            <span>
+                                                <button onClick={() => { GetProdReceiptDetailByPurchaseOrderId(_item.purchaseorderuuid, _item.id) }}>
+                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
                         </div>
-                        <div>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="採購單號"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? purchaseorderidin : purchaseorderid,
-                                    },
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="經辦人員"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? create_byin : create_by,
-                                    },
-                                }}
-                            />
-                        </div>
-                    </div>
-                    <div className={scss.content_main}>
-                        <div>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="廠商名稱"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? suppliernamein : suppliername,
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="統一編號"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? suppliertaxidin : suppliertaxid,
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="廠商地址"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
-                                    },
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="排版用"
-                                disabled={true}
-                                className='invisible'
-                                inputProps={{
-                                    props: {
-                                        value: ' ',
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="排版用"
-                                disabled={true}
-                                className='invisible'
-                                inputProps={{
-                                    props: {
-                                        value: ' ',
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="聯絡電話"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? supplierphonein : supplierphone,
-                                    },
-                                }}
-                            />
-                        </div>
-                        <div>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="排版用"
-                                disabled={true}
-                                className='invisible'
-                                inputProps={{
-                                    props: {
-                                        value: ' ',
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="排版用"
-                                disabled={true}
-                                className='invisible'
-                                inputProps={{
-                                    props: {
-                                        value: ' ',
-                                    },
-                                }}
-                            />
-                            <InputSel
-                                {...inputSelProps}
-                                caption="發票號碼"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? invoicein : invoice,
-                                    },
-                                }}
-                            />
-                        </div>
-                    </div>
-
-                    <br />
-                    <div className={scss.content_main_content}>
-                        <Thead01 type={'PurchaseOrderDetail'} />
-                        <Tbody01 type={'PurchaseOrderDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
-                    </div>
-                    <br />
-                    <div className={scss.foot_main}>
-                        <div>
-                            (1).採購單請回簽.並確認可交貨日期。<br />
-                            (2).請於出貨單上註明本公司產品編號,及產品名稱,以利請款。<br />
-                            (3).請配合定量包裝及標示品名規格, 方便點收。
-                        </div>
-                        <div>
-                        </div>
-                        <div>
-
-                            <table className={scss.count_table}>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>小計</td>
-                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice ? totalprice : '0'}</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>營業稅</td>
-                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice ? taxprice : '0'}</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>應付金額</td>
-                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice ? totalpayprice : '0'}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                    <div className={scss.content_main_content}>
-                        <span className={scss.mytitle} style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "none" : "" }}>
-                            <MyButton_v2 px='px22' py='py4' theme={undefined} label="進貨/批次進貨" onClick={handleReceipt} />
-                            {/* <button onClick={()=>{handleReceipt()}}>sdf</button> */}
-                        </span>
-                        <Thead01 type={'PurchaseOrderDetail2'} />
-                        {data2.map((_item, index) => (
-                            <CellWithBar key={index} className={scss.panelHeader13}>
-                                <div className={scss.row01}>
-                                    <span>{index + 1}</span>
-                                    <span>{_item.productid}</span>
-                                    <span>{_item.name}</span>
-                                    <span style={{ color: '#ea1833' }}>
-                                        {_item.alreadyinquantity}
-                                    </span>
-                                    <span>
-                                        <input
-                                            ref={quantityRefs.current[index]}
-                                            style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                            type="text"
-                                            maxLength={9}
-                                            value={_item.quantity !== undefined ? _item.quantity : 0}
-                                            readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                            onChange={(e) => {
-                                                handleChange(index, "quantity", e.target.value);
-                                            }}
-                                        />
-                                    </span>
-                                    <span>{_item.unit}</span>
-                                    <span>
-                                        <input
-                                            ref={unitpriceRefs.current[index]}
-                                            style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                            type="text"
-                                            maxLength={8}
-                                            value={_item.unitprice.toLocaleString()}
-                                            readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                            onChange={(e) => {
-                                                const newData = [...data2];
-                                                const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                newData[index] = {
-                                                    ...newData[index],
-                                                    unitprice: newUnitPrice,
-                                                    totalprice: newUnitPrice * newData[index].quantity
-                                                };
-                                                setData2(newData);
-                                            }}
-                                        />
-                                    </span>
-                                    <span>
-                                        {_item.totalprice.toLocaleString()}
-                                    </span>
-                                    <span>
-                                        &nbsp;&nbsp;
-                                        <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
-                                            <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                        </button>
-                                        <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                            <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
-                                        </button>
-                                        <span　style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span>
-                                        <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                            <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                        </button>
-                                    </span>
-                                </div>
-                            </CellWithBar>
-                        ))}
                         <br />
+                        <div className={scss.body_foot1}>
+                            <div>
+                                (1).採購單請回簽.並確認可交貨日期。<br />
+                                (2).請於出貨單上註明本公司產品編號,及產品名稱,以利請款。<br />
+                                (3).請配合定量包裝及標示品名規格, 方便點收。
+                            </div>
+                            <div>
+                            </div>
+                            <div>
+
+                                <table className={scss.count_table}>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>小計</td>
+                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice ? totalprice : '0'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>營業稅</td>
+                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice ? taxprice : '0'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>應付金額</td>
+                                        <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice ? totalpayprice : '0'}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div className={scss.foot_head1}>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div style={{ textAlign: 'right' }}>
+                                <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "none" : "" }}>
+                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="進貨/批次進貨" onClick={handleReceipt} />
+                                </span>
+                            </div>
+                        </div>
+                        <div className={scss.foot_content1}>
+                            <Thead01 type={'PurchaseOrderDetail2'} />
+                            {data2.map((_item, index) => (
+                                <CellWithBar key={index} className={scss.panelHeader13}>
+                                    <div className={scss.row01}>
+                                        <span>{index + 1}</span>
+                                        <span>{_item.productid}</span>
+                                        <span>{_item.name}</span>
+                                        <span style={{ color: '#ea1833' }}>
+                                            {_item.alreadyinquantity}
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={quantityRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                type="text"
+                                                maxLength={9}
+                                                value={_item.quantity !== undefined ? _item.quantity : 0}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    handleChange(index, "quantity", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>{_item.unit}</span>
+                                        <span>
+                                            <input
+                                                ref={unitpriceRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                type="text"
+                                                maxLength={8}
+                                                value={_item.unitprice.toLocaleString()}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        unitprice: newUnitPrice,
+                                                        totalprice: newUnitPrice * newData[index].quantity
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            {_item.totalprice.toLocaleString()}
+                                        </span>
+                                        <span>
+                                            &nbsp;&nbsp;
+                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                                            </button>
+                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
+                                                <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                            </button>
+                                            <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span>
+                                            <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                            </button>
+                                        </span>
+                                    </div>
+                                </CellWithBar>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                </div>s
             </div>
         </SubLayer >
 
