@@ -1768,8 +1768,8 @@ export type TquotationContentDto = {
   workDirectorReviewedAt: string | null;
   toWorkDirectorAt: string | null; // date
 
-  toCashierAt: string | null;
   reviewCashierEmployee: TemployeeDto | null;
+  toCashierAt: string | null;
   cashierReviewedAt: string | null;
 
   reviewManagerEmployee: TemployeeDto | null;
@@ -2652,68 +2652,89 @@ export type TquotationVerifyFormDto = {
   id: string;
   createdAt: string;
   updateAt: string;
-  //  請款日期
+
+  // 請款日期
   askForPaymentDate: string;
-  //  放款日期
+  // 放款日期
   disbursementDate: string;
-  //  請款比例
+  // 請款、放款日期備註
+  paymentDateNote: string | null;
+  // 請款比例
   paymentRatio: TpaymentRatioDto[];
-  //  合理放款票期
+  // 合理放款票期
   paymentTenor: string;
-  //  履約保證票
+  // 合理放款票期備註
+  paymentTenorNote: string | null;
+  // 履約保證票
   performanceBond: boolean;
+  // 履約保證票備註
   performanceBondNote: string | null;
-  //  可否請款訂金
+  // 可否請款訂金
   depositPayment: boolean;
-  //  保固期(年)
+  // 可否請款訂金備註
+  depositPaymentNote: string | null;
+  // 保固期(年)
   warrantyPeriod: number;
-  //  備註
-  note: string;
-  //  保固金或保固票
+  // 保固期備註
+  note: string | null;
+  // 保固金或保固票
   warrantyPayment: boolean;
+  // 保固金或保固票備註
   warrantyPaymentNote: string | null;
-  //  防火證明
+  // 防火證明
   fireproofCertificate: boolean;
-  //  保固書
+  // 防火證明%數
+  fireproofCertificatePercent: number | null;
+  // 防火證明備註
+  fireproofCertificateNote: string | null;
+  // 保固書
   warranty: boolean;
-  //  是否需配合工地試車
+  // 保證書%數
+  warrantyPercent: number | null;
+  // 保證書備註
+  warrantyNote: string | null;
+  // 是否需配合工地試車
   testDrive: boolean;
-  //  扣款項目、比例、金額
+  // 是否需配合工地試車備註
+  testDriveNote: string | null;
+  // 扣款項目、比例、金額
   debitItem: string;
-  // 合約審核表審核主管(工務部主管)
-  workDirectorId: string;
 };
 
-export type TcreateQuotationVerifyFormDto = {
-  //  請款日期
-  askForPaymentDate: string;
-  //  放款日期
-  disbursementDate: string;
-  //  請款比例
-  paymentRatio: TpaymentRatioDto[];
-  //  合理放款票期
-  paymentTenor: string;
-  //  履約保證票
-  performanceBond: boolean;
-  performanceBondNote: string | null;
-  //  可否請款訂金
-  depositPayment: boolean;
-  //  保固期(年)
-  warrantyPeriod: number;
-  //  備註
-  note: string;
-  //  保固金或保固票
-  warrantyPayment: boolean;
-  warrantyPaymentNote: string | null;
-  //  防火證明
-  fireproofCertificate: boolean;
-  //  保固書
-  warranty: boolean;
-  //  是否需配合工地試車
-  testDrive: boolean;
-  //  扣款項目、比例、金額
-  debitItem: string;
-};
+export type TcreateQuotationVerifyFormDto = Pick<
+  TquotationVerifyFormDto,
+  | 'askForPaymentDate'
+  | 'disbursementDate'
+  | 'paymentDateNote'
+  //
+  | 'paymentRatio'
+  | 'paymentTenor'
+  | 'paymentTenorNote'
+  //
+  | 'performanceBond'
+  | 'performanceBondNote'
+  //
+  | 'depositPayment'
+  | 'depositPaymentNote'
+  //
+  | 'warrantyPayment'
+  | 'warrantyPaymentNote'
+  //
+  | 'fireproofCertificate'
+  | 'fireproofCertificateNote'
+  | 'fireproofCertificatePercent'
+  //
+  | 'warranty'
+  | 'warrantyNote'
+  | 'warrantyPercent'
+  //
+  | 'testDrive'
+  | 'testDriveNote'
+  //
+  | 'warrantyPeriod'
+  | 'note'
+  | 'debitItem'
+>;
 
 export type TreviewQuotationContentDto = {
   reviewSalesEmployeeId?: string | null;
