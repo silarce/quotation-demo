@@ -203,7 +203,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>請購日期</span>
         <span>請購單號</span>
         <span>狀態</span>
-        <span>請購人員</span>
+        {/* <span>請購人員</span> */}
         <span></span>
       </div>
     )

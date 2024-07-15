@@ -914,7 +914,7 @@ export default function AddPurchaseRequisition() {
                             <div>
                                 <input
                                     type="text"
-                                    placeholder='查詢名稱'
+                                    placeholder='規格'
                                     value={keyword3}
                                     style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
                                     onChange={(e) => setKeyword3(e.target.value)}
