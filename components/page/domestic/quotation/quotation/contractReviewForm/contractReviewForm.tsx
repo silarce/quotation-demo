@@ -1,10 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useContext } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
 import Decimal from 'decimal.js';
 import { useForm, useFormState } from 'react-hook-form';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
+
+import { AppContext } from 'pages/_app';
 
 // antd
 import { Modal } from 'antd';
@@ -14,13 +16,16 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import SignatureBar, { TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 
 // api
 import { Tparams, TemployeeDto, useEmployee_infinite } from 'js/api/api_employee';
 import {
+  TreviewQuotationContentDto,
   //
   apiSubmitContracting,
   apiPatchQuotationVerifyForm,
+  apiQuotationReview,
 } from 'js/api/api_quotation';
 
 // css
@@ -33,7 +38,9 @@ import {
   TquotationVerifyFormDto,
   //
   TquotationContentDto,
+  TuserDto,
 } from 'js/api/dtoTypes';
+import { el } from 'date-fns/locale';
 
 // ============================================================================
 
@@ -46,6 +53,19 @@ type TpaymentRatio = {
 
 type TpayMethodList = {
   [key: string]: Class_payMethod;
+};
+
+type TreviewerItem = {
+  reviewer: TemployeeDto | null;
+  reviewedAt: string | null;
+  toReviewerAt: string | null;
+};
+
+type TreviewerList = {
+  manager: TreviewerItem;
+  workDirector: TreviewerItem;
+  cashier: TreviewerItem;
+  supervisor: TreviewerItem;
 };
 
 export type { TpaymentRatio };
@@ -66,6 +86,8 @@ function ContractReviewForm({
   forbidden,
   onConfirm,
   defaultPaymentRatioArr,
+  quotationContent,
+  quotationId,
 }: {
   showModal: boolean;
   isInContract?: boolean;
@@ -78,6 +100,8 @@ function ContractReviewForm({
   forbidden?: boolean;
   onConfirm?: () => void;
   defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
+  quotationContent?: TquotationContentDto;
+  quotationId: string | undefined;
 }) {
   // ----------------------------------------------------------------------------
 
@@ -104,6 +128,8 @@ function ContractReviewForm({
         verifyForm={verifyForm}
         onConfirm={onConfirm}
         defaultPaymentRatioArr={defaultPaymentRatioArr}
+        quotationContent={quotationContent}
+        quotationId={quotationId}
       />
     </Modal>
   );
@@ -131,6 +157,8 @@ function ReviewForm({
   defaultPaymentRatioArr,
   onConfirm,
   isInContract,
+  quotationContent,
+  quotationId,
 }: {
   forbidden?: boolean;
   close?: () => void;
@@ -141,14 +169,27 @@ function ReviewForm({
   verifyForm: TquotationVerifyFormDto | undefined;
   defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
   onConfirm?: () => void;
-  isInContract?: boolean;
+  isInContract: boolean | undefined;
+  quotationContent: TquotationContentDto | undefined;
+  quotationId: string | undefined;
 }) {
+  //
+  const { userInfo } = useContext(AppContext);
   //
 
   const stateObj_disabled = useState(true);
   let disabled = stateObj_disabled[0];
   const setDisabled = stateObj_disabled[1];
   forbidden && (disabled = true);
+
+  // ----------------------------------------------------------------------------
+
+  const { isReviewer, isManager, isWorkDirector, isCashier, isSupervisor } = checkIsReviewer({
+    userInfo,
+    quotationContent,
+  });
+
+  // ----------------------------------------------------------------------------
 
   const { payMethodList, addMethod, resetMethodList, getMethodBodyArr, allPercentStr } = usePayMethod({
     contractPrice,
@@ -251,9 +292,40 @@ function ReviewForm({
       myAlert.err({ title: '送出合約審核表失敗', content: err?.message });
     }
   };
+
+  const reqPatchQuotationReview = async ({ reviewResult }: { reviewResult: boolean }) => {
+    const userId = userInfo?.employee?.id;
+
+    if (!isReviewer || !userId || !quotationId) {
+      return;
+    }
+
+    const body: TreviewQuotationContentDto = {
+      reviewResult,
+    };
+
+    isManager
+      ? (body.reviewManagerEmployeeId = userId)
+      : isWorkDirector
+      ? (body.reviewWorkDirectorEmployeeId = userId)
+      : isCashier
+      ? (body.reviewCashierEmployeeId = userId)
+      : isSupervisor
+      ? (body.reviewSupervisorEmployeeId = userId)
+      : null;
+
+    await apiQuotationReview({ id: quotationId, body }).then(() => {
+      onConfirm && onConfirm();
+    });
+  };
+
   // ----------------------------------------------------------------------------
 
   // region FUNCTION
+
+  const onCancel = () => {
+    close?.();
+  };
 
   const handle_confirm = async () => {
     await reqSubmitContracting();
@@ -262,9 +334,124 @@ function ReviewForm({
     onConfirm && onConfirm();
   };
 
-  const onCancel = () => {
-    close?.();
+  const handle_review = () => {
+    const modal = myAlert.btnBar({ title: '合約審核表是否通過審核?' });
+
+    modal.update({
+      content: (
+        <div className="flex gap-5 mt-10">
+          <MyButton_v2
+            theme="danger"
+            onClick={async () => {
+              await reqPatchQuotationReview({ reviewResult: true });
+              modal.destroy();
+            }}
+          >
+            審核通過
+          </MyButton_v2>
+          <MyButton_v2
+            onClick={async () => {
+              await reqPatchQuotationReview({ reviewResult: false });
+              modal.destroy();
+            }}
+          >
+            審核不通過
+          </MyButton_v2>
+          <MyButton_v2 onClick={modal.destroy}>取消</MyButton_v2>
+        </div>
+      ),
+    });
   };
+
+  // ----------------------------------------------------------------------------
+
+  // region PROPS
+
+  const reviewerList = useMemo(() => {
+    if (!quotationContent) {
+      return undefined;
+    }
+
+    const {
+      // reviewSalesEmployee,
+      // salesReviewedAt,
+      // toSalesAt,
+
+      reviewSupervisorEmployee,
+      supervisorReviewedAt,
+      toSupervisorAt,
+
+      reviewWorkDirectorEmployee,
+      workDirectorReviewedAt,
+      toWorkDirectorAt,
+
+      toCashierAt,
+      reviewCashierEmployee,
+      cashierReviewedAt,
+
+      reviewManagerEmployee,
+      managerReviewedAt,
+      toManagerAt,
+    } = quotationContent;
+
+    const list: TreviewerList = {
+      manager: {
+        reviewer: reviewManagerEmployee,
+        reviewedAt: managerReviewedAt,
+        toReviewerAt: toManagerAt,
+      },
+      workDirector: {
+        reviewer: reviewWorkDirectorEmployee,
+        reviewedAt: workDirectorReviewedAt,
+        toReviewerAt: toWorkDirectorAt,
+      },
+      cashier: {
+        reviewer: reviewCashierEmployee,
+        reviewedAt: cashierReviewedAt,
+        toReviewerAt: toCashierAt,
+      },
+      supervisor: {
+        reviewer: reviewSupervisorEmployee,
+        reviewedAt: supervisorReviewedAt,
+        toReviewerAt: toSupervisorAt,
+      },
+    };
+
+    return list;
+  }, [quotationContent]);
+
+  const signatureArr: TsignatureBarItem[] = useMemo(() => {
+    if (!reviewerList) {
+      return [];
+    }
+
+    const { manager, workDirector, cashier, supervisor } = reviewerList;
+
+    const signatureArr: TsignatureBarItem[] = [
+      {
+        label: '總經理',
+        value: manager.reviewer?.chName ?? '',
+        isReviewed: manager.reviewedAt ? true : false,
+      },
+      {
+        label: '應收帳款',
+        value: cashier.reviewer?.chName ?? '',
+        isReviewed: cashier.reviewedAt ? true : false,
+      },
+      {
+        label: '應收帳款',
+        value: workDirector.reviewer?.chName ?? '',
+        isReviewed: workDirector.reviewedAt ? true : false,
+      },
+      {
+        label: '業務主管',
+        value: supervisor.reviewer?.chName ?? '',
+        isReviewed: supervisor.reviewedAt ? true : false,
+      },
+    ];
+
+    return signatureArr;
+  }, [userInfo, reviewerList]);
 
   // ----------------------------------------------------------------------------
 
@@ -392,20 +579,27 @@ function ReviewForm({
     <div className={classNames(scss.container, disabled && scss.disabled)}>
       <div className={classNames(scss.btnBar, forbidden && scss.forbidden)}>
         {!disabled && (
-          <MyButton_v2 px="px22" py="py4" theme="danger" onClick={handle_confirm}>
-            確定
-          </MyButton_v2>
+          <>
+            <MyButton_v2 px="px22" py="py4" theme="danger" onClick={handle_confirm}>
+              確定
+            </MyButton_v2>
+            <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
+              取消
+            </MyButton_v2>
+          </>
         )}
 
         {disabled && (
-          <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
-            編輯
-          </MyButton_v2>
-        )}
-        {!disabled && (
-          <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
-            取消
-          </MyButton_v2>
+          <>
+            {isReviewer && (
+              <MyButton_v2 theme="danger" px="px22" py="py4" onClick={handle_review}>
+                審核
+              </MyButton_v2>
+            )}
+            <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
+              編輯
+            </MyButton_v2>
+          </>
         )}
       </div>
 
@@ -804,6 +998,14 @@ function ReviewForm({
           </span>
         </div>
       </div>
+
+      <SignatureBar
+        className="mt-10"
+        control={{
+          signatureArr: signatureArr,
+        }}
+      />
+
       {/*  */}
     </div>
   );
@@ -1050,6 +1252,71 @@ const RowArr = ({
 // ============================================================================
 
 // MARK: FUNCTION HOOK
+
+const checkIsReviewer = ({
+  userInfo,
+  // reviewerList,
+  quotationContent,
+}: {
+  userInfo: TuserDto | undefined;
+  // reviewerList: TreviewerList;
+  quotationContent: TquotationContentDto | undefined;
+}) => {
+  const {
+    //
+    reviewManagerEmployee,
+    managerReviewedAt,
+
+    reviewWorkDirectorEmployee,
+    workDirectorReviewedAt,
+
+    reviewCashierEmployee,
+    toCashierAt,
+
+    reviewSupervisorEmployee,
+    supervisorReviewedAt,
+  } = quotationContent ?? {};
+
+  let isSupervisor = reviewSupervisorEmployee && reviewSupervisorEmployee?.id === userInfo?.employee?.id;
+  let isWorkDirector = reviewWorkDirectorEmployee && reviewWorkDirectorEmployee?.id === userInfo?.employee?.id;
+  let isCashier = reviewCashierEmployee && reviewCashierEmployee?.id === userInfo?.employee?.id;
+  let isManager = reviewManagerEmployee && reviewManagerEmployee?.id === userInfo?.employee?.id;
+
+  let isReviewer = false;
+
+  if (!supervisorReviewedAt) {
+    isSupervisor && (isReviewer = true);
+    isWorkDirector = false;
+    isCashier = false;
+    isManager = false;
+  } else if (!workDirectorReviewedAt) {
+    isWorkDirector && (isReviewer = true);
+    isSupervisor = false;
+    isCashier = false;
+    isManager = false;
+  } else if (toCashierAt) {
+    isCashier && (isReviewer = true);
+    isSupervisor = false;
+    isWorkDirector = false;
+    isManager = false;
+  } else if (!managerReviewedAt) {
+    isManager && (isReviewer = true);
+    isSupervisor = false;
+    isWorkDirector = false;
+    isCashier = false;
+  }
+
+  // isSupervisor && !supervisorReviewedAt && (isReviewer = true);
+  // isCashier && !toCashierAt && supervisorReviewedAt && (isReviewer = true);
+
+  return {
+    isReviewer,
+    isManager,
+    isWorkDirector,
+    isCashier,
+    isSupervisor,
+  };
+};
 
 const creEmptyMethod = () => {
   return {

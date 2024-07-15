@@ -975,7 +975,14 @@ export const apiQuotationSubmitReview = (id: string, body: TsubmitReviewQotuatio
 };
 
 // 審核該報價單
-export const apiQuotationReview = ({ id, body }: { id: string; body: TreviewQuotationContentDto }) => {
+export const apiQuotationReview = ({
+  //
+  id,
+  body,
+}: {
+  id: string;
+  body: TreviewQuotationContentDto;
+}) => {
   const api = `/quotation/${id}/review`;
 
   return axi
@@ -1003,6 +1010,7 @@ export const apiQuotationUnlock = (id: string) => {
     .catch((err) => Promise.reject(err));
 };
 
+// 編輯合約審核表，審核狀態會重置
 export const apiPatchQuotationVerifyForm = ({
   //
   verifyForm,

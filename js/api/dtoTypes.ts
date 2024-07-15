@@ -1768,8 +1768,8 @@ export type TquotationContentDto = {
   workDirectorReviewedAt: string | null;
   toWorkDirectorAt: string | null; // date
 
-  toCashierAt: string | null;
   reviewCashierEmployee: TemployeeDto | null;
+  toCashierAt: string | null;
   cashierReviewedAt: string | null;
 
   reviewManagerEmployee: TemployeeDto | null;

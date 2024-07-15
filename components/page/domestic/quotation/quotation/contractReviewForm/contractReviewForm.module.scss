@@ -206,10 +206,10 @@
 
 .textaraeBox {
   font-size: 0;
-  border: solid 1px theme("colors.border");
-  &.disabled {
-    border-color: transparent;
-  }
+  // border: solid 1px theme("colors.border");
+  // &.disabled {
+  //   border-color: transparent;
+  // }
   > textarea {
     height: 100px;
   }
