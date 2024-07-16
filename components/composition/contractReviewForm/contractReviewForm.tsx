@@ -324,8 +324,12 @@ Tprops_reviewForm) {
       warrantyNote: preBody.warrantyNote ?? '',
       testDriveNote: preBody.testDriveNote ?? '',
 
-      fireproofCertificatePercent: preBody.fireproofCertificatePercent,
-      warrantyPercent: preBody.warrantyPercent,
+      fireproofCertificatePercent: Number(preBody.fireproofCertificatePercent) || null,
+      warrantyPercent: Number(preBody.warrantyPercent) || null,
+
+      factoryCertificate: preBody.factoryCertificate,
+      factoryCertificatePercent: Number(preBody.factoryCertificatePercent) || null,
+      factoryCertificateNote: preBody.factoryCertificateNote,
 
       //
     };
@@ -577,6 +581,10 @@ Tprops_reviewForm) {
 
         fireproofCertificatePercent,
         warrantyPercent,
+
+        factoryCertificate,
+        factoryCertificatePercent,
+        factoryCertificateNote,
       } = verifyForm;
 
       reset({
@@ -605,6 +613,10 @@ Tprops_reviewForm) {
 
         fireproofCertificatePercent,
         warrantyPercent,
+
+        factoryCertificate,
+        factoryCertificatePercent,
+        factoryCertificateNote,
       });
 
       methodArr = verifyForm?.paymentRatio.map((item) => {
@@ -626,6 +638,7 @@ Tprops_reviewForm) {
         note: undefined,
         warrantyPayment: undefined,
         fireproofCertificate: undefined,
+        factoryCertificate: undefined,
         warranty: undefined,
         testDrive: undefined,
         debitItem: undefined,
@@ -636,10 +649,12 @@ Tprops_reviewForm) {
         depositPaymentNote: undefined,
         warrantyPaymentNote: undefined,
         fireproofCertificateNote: undefined,
+        factoryCertificateNote: undefined,
         warrantyNote: undefined,
         testDriveNote: undefined,
 
         fireproofCertificatePercent: 90,
+        factoryCertificatePercent: 90,
         warrantyPercent: 100,
       });
 
@@ -897,10 +912,19 @@ Tprops_reviewForm) {
         <div>
           <InputBox
             prefix="合理的保固期 :"
+            suffix="年"
             boxStyle={{ width: '160px' }}
             inputAttr={{
               disabled: disabled,
-              ...register('warrantyPeriod'),
+              value: watchData.warrantyPeriod ?? '',
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value;
+
+                if (!value.includes('.')) {
+                  setValue('warrantyPeriod', Number(value), { shouldValidate: true });
+                }
+              },
+              type: 'number',
               className: 'text-center',
             }}
           />
@@ -955,10 +979,17 @@ Tprops_reviewForm) {
                       className: 'text-center',
                       disabled: disabled,
                       type: 'number',
-                      ...register('fireproofCertificatePercent'),
+                      value: watchData.fireproofCertificatePercent ?? '',
+                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                        const value = e.target.value;
+
+                        if (!value.includes('.')) {
+                          setValue('fireproofCertificatePercent', Number(value));
+                        }
+                      },
                     }}
                   />
-                  %出具防火證明、出廠證明
+                  %出具防火證明
                 </span>
               }
               labelClassName="mr-[48px]"
@@ -987,6 +1018,7 @@ Tprops_reviewForm) {
           <div>
             <RadioContainer
               disabled={disabled}
+              // label={'是否註明收足90%出具防火證明、出廠證明'}
               label={
                 <span>
                   是否註明收足
@@ -996,7 +1028,62 @@ Tprops_reviewForm) {
                       className: 'text-center',
                       disabled: disabled,
                       type: 'number',
-                      ...register('warrantyPercent'),
+                      value: watchData.factoryCertificatePercent ?? '',
+                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                        const value = e.target.value;
+
+                        if (!value.includes('.')) {
+                          setValue('factoryCertificatePercent', Number(value));
+                        }
+                      },
+                    }}
+                  />
+                  %出具出廠證明
+                </span>
+              }
+              labelClassName="mr-[48px]"
+              value={watchData.factoryCertificate}
+              onChange={(v) => {
+                setValue('factoryCertificate', v);
+              }}
+            />
+          </div>
+          <InputBox
+            className="mt-1 w-full"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+              placeholder: '請輸入備註',
+              value: watchData.factoryCertificateNote ?? '',
+              onChange: (e) => {
+                setValue('factoryCertificateNote', e.target.value);
+              },
+            }}
+          />
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>10</div>
+        <div>
+          <div>
+            <RadioContainer
+              disabled={disabled}
+              label={
+                <span>
+                  是否註明收足
+                  <InputBox
+                    className="w-[50px] "
+                    inputAttr={{
+                      className: 'text-center',
+                      disabled: disabled,
+                      type: 'number',
+                      value: watchData.warrantyPercent ?? '',
+                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                        const value = e.target.value;
+
+                        if (!value.includes('.')) {
+                          setValue('warrantyPercent', Number(value));
+                        }
+                      },
                     }}
                   />
                   %出具保固書
@@ -1023,7 +1110,7 @@ Tprops_reviewForm) {
           />
         </div>
         {/*  */}
-        <div className={scss.numIndex}>10</div>
+        <div className={scss.numIndex}>11</div>
         <div>
           <div>
             <RadioContainer
@@ -1050,7 +1137,7 @@ Tprops_reviewForm) {
           />
         </div>
         {/*  */}
-        <div className={scss.numIndex}>11</div>
+        <div className={scss.numIndex}>12</div>
         <div className="mb-9">
           <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
           <br />
