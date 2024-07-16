@@ -923,21 +923,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         <ContractReviewForm
           showModal={reviewFormShow}
-          // forbidden={true}
           isInContract={true}
-          close={() => setReviewFormShow(false)}
-          contractIdNumber={content?.quotationNumber ?? ''}
-          contractName={content?.projectName ?? ''}
-          contractPrice={Number(content?.total ?? '')}
-          contentId={content?.id}
-          verifyForm={content?.verifyForm}
+          contractId={contract?.id}
+          // quotationId={quotationId}
+          onCancel={() => setReviewFormShow(false)}
           onConfirm={async () => {
             setIsLoading(true);
             await update();
             setIsLoading(false);
           }}
-          quotationContent={content}
-          quotationId={quotationId}
+
+          // contractNumber={content?.quotationNumber ?? ''}
+          // projectName={content?.projectName ?? ''}
+          // totalPrice={Number(content?.total ?? '')}
+          // contentId={content?.id}
+          // verifyForm={content?.verifyForm}
+          // quotationContent={content}
         />
       </div>
 

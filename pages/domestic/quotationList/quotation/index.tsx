@@ -2272,19 +2272,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
-        forbidden={status === 'Pending' && isSendToReview_pending}
-        close={() => setReviewFormShow(false)}
-        contractIdNumber={latestContent?.quotationNumber ?? ''}
-        contractName={latestContent?.projectName ?? ''}
-        contractPrice={Number(state_summary.total.replaceAll(',', ''))}
+        readOnly={status === 'Pending' && isSendToReview_pending}
+        onCancel={() => setReviewFormShow(false)}
         contentId={lastestContentId}
-        verifyForm={verifyForm}
+        // contractNumber={latestContent?.quotationNumber ?? ''}
+        // projectName={latestContent?.projectName ?? ''}
+        // totalPrice={Number(state_summary.total.replaceAll(',', ''))}
+        // verifyForm={verifyForm}
         onConfirm={async () => {
           setIsLoading(true);
           await update();
           setIsLoading(false);
         }}
-        defaultPaymentRatioArr={useDefaultPaymentRatio_quotationContent(latestContent)}
+        // defaultPaymentRatioArr={useDefaultPaymentRatio_quotationContent(latestContent)}
       />
       <ThreeButtonModal
         visible={reviewModalShow}

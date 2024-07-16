@@ -1899,13 +1899,14 @@ latestContentProdArr為這次追加追減的主產品
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
-        forbidden={status === 'Pending' && isSendToReview_pending}
-        close={() => setReviewFormShow(false)}
-        contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
-        contractName={quotationData?.latestContent.projectName ?? ''}
-        contractPrice={Number(state_summary.total.replaceAll(',', ''))}
-        contentId={lastestContentId}
-        verifyForm={verifyForm}
+        readOnly={status === 'Pending' && isSendToReview_pending}
+        onCancel={() => setReviewFormShow(false)}
+        // contractNumber={quotationData?.latestContent.quotationNumber ?? ''}
+        // projectName={quotationData?.latestContent.projectName ?? ''}
+        // totalPrice={Number(state_summary.total.replaceAll(',', ''))}
+        // contentId={lastestContentId}
+        quotationId={quotationData?.id}
+        // verifyForm={verifyForm}
         onConfirm={async () => {
           setIsLoading(true);
           await update();
