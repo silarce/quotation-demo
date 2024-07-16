@@ -662,7 +662,7 @@ Tprops_reviewForm) {
 
   return (
     <div className={classNames(scss.container, disabled && scss.disabled)}>
-      <div className={classNames(scss.btnBar, readOnly && scss.forbidden)}>
+      <div className={classNames(scss.btnBar, readOnly && scss.readOnly)}>
         {!disabled && (
           <>
             <MyButton_v2 px="px22" py="py4" theme="danger" onClick={handle_confirm}>
@@ -676,7 +676,7 @@ Tprops_reviewForm) {
 
         {disabled && (
           <>
-            {isReviewer && (
+            {isReviewer && isInContract && (
               <MyButton_v2 theme="danger" px="px22" py="py4" onClick={handle_review}>
                 審核
               </MyButton_v2>
@@ -1084,12 +1084,14 @@ Tprops_reviewForm) {
         </div>
       </div>
 
-      <SignatureBar
-        className="mt-10"
-        control={{
-          signatureArr: signatureArr,
-        }}
-      />
+      {isInContract && (
+        <SignatureBar
+          className="mt-10"
+          control={{
+            signatureArr: signatureArr,
+          }}
+        />
+      )}
 
       {/*  */}
     </div>

@@ -17,6 +17,8 @@ import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistr
 // api
 import { useContract_infinite } from 'js/api/api_quotation';
 
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+
 // ===========================================
 
 // const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true });
@@ -117,6 +119,10 @@ export default function Contract() {
     dataArr?.map((item, index) => {
       const content = item.content;
 
+      const { managerReviewedAt } = content;
+
+      const verifyFormText = managerReviewedAt ? '已審核完畢' : '未審核完畢';
+
       return {
         id: item.id,
         // quotationId: content.quotationNumber,
@@ -128,6 +134,12 @@ export default function Contract() {
         contactPerson: content.contactPerson,
         contactPhone: content.contactNumber,
         attn: content.agentEmployee?.chName ?? '',
+        verifyForm: (
+          <span>
+            <span style={{ color: !managerReviewedAt ? 'red' : undefined }}>{verifyFormText}</span>
+            <IconDetail className="inline-block" />
+          </span>
+        ),
         viewRef_bottom: index === dataArr.length - 5 ? viewRef_bottom : undefined,
       };
     }) ?? [];
