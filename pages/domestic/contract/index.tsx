@@ -10,7 +10,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 // components
 import ContractList from 'components/page/domestic/contract/contractList';
 // composition
-import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
+import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
 
 // option
 import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistrict';

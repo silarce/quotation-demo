@@ -44,7 +44,7 @@ import Table_com from 'components/page/domestic/quotation/quotation/product/tabl
 import Table_accessories from 'components/page/domestic/contract/table/table_accessories';
 import Table_others from 'components/page/domestic/contract/table/table_others';
 
-import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
+import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
 
 import Summary, {
   TsummaryControl,

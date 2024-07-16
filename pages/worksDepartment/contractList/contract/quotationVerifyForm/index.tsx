@@ -6,7 +6,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
-import { ReviewForm } from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
+import { ReviewForm } from 'components/composition/contractReviewForm/contractReviewForm';
 
 // api
 // import { useGetEngineeringContact } from 'js/api/api_engineering';
