@@ -637,8 +637,8 @@ Tprops_reviewForm) {
         warrantyNote: undefined,
         testDriveNote: undefined,
 
-        fireproofCertificatePercent: undefined,
-        warrantyPercent: undefined,
+        fireproofCertificatePercent: 90,
+        warrantyPercent: 100,
       });
 
       methodArr = defaultPaymentRatioArr?.map((item) => {

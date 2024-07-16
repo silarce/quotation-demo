@@ -1435,7 +1435,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         addMethod: (v) => {
           setState_PaymentMethod((state) => {
             const copy = [...state];
-            copy.push({ milestone: v, totalPaymentRatio: '' });
+            copy.push({ milestone: v, totalPaymentRatio: '0' });
 
             return copy;
           });
