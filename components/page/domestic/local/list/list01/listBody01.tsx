@@ -6,26 +6,35 @@ import style from './listBody01.module.scss';
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
-type TmemoList = {
-  memoId: string;
-  memoDate: string;
-  memoContent: string;
+type TsubContract = {
+  contractNumber: string;
+  createdAt: string;
+  projectName: string;
+  verifyForm: React.ReactNode;
   href: LinkProps['href'];
 };
 
-export type { TmemoList };
+export type { TsubContract };
 
-export default function ListBody01({ memoList }: { memoList: TmemoList[] }) {
+export default function ListBody01({ memoList }: { memoList: TsubContract[] }) {
   return (
     <div className={style.container}>
       {memoList.map((item, index) => {
-        const { memoId, memoDate, memoContent, href } = item;
+        const {
+          //
+          contractNumber,
+          createdAt,
+          projectName,
+          verifyForm,
+          href,
+        } = item;
 
         return (
           <Fragment key={index}>
-            <span>{memoId}</span>
-            <span>{memoDate}</span>
-            <span>{memoContent}</span>
+            <span>{contractNumber}</span>
+            <span>{createdAt}</span>
+            <span>{projectName}</span>
+            {verifyForm}
             <Link href={href}>
               <IconDetail />
             </Link>

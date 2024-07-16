@@ -1,3 +1,5 @@
+import Link, { LinkProps } from 'next/link';
+
 import { MouseEvent } from 'react';
 import classNames from 'classnames';
 
@@ -17,6 +19,7 @@ type Tcontract = {
   attn: string;
   verifyForm: React.ReactNode;
   viewRef_bottom?: (node?: Element | null | undefined) => void;
+  href: LinkProps['href'];
 };
 
 export type { Tcontract };
@@ -24,12 +27,10 @@ export type { Tcontract };
 export default function ListHeader01({
   className = '',
   contract,
-  onClick,
   isActive,
 }: {
   className?: string;
   contract: Tcontract;
-  onClick: ((e: MouseEvent) => void) | (() => void);
   isActive?: boolean;
 }) {
   const {
@@ -43,6 +44,7 @@ export default function ListHeader01({
     attn: Attn,
     verifyForm,
     viewRef_bottom,
+    href,
   } = contract;
 
   const parsedPriceTotal = priceTotal.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -61,7 +63,9 @@ export default function ListHeader01({
       <span>{Attn}</span>
       {verifyForm}
       <div>
-        <IconDetail onClick={onClick} className="inline-block" />
+        <Link href={href} onClick={(e) => e.stopPropagation()}>
+          <IconDetail className="inline-block" />
+        </Link>
       </div>
       {/* hover時左邊的藍色直條 */}
       <div className={scss.leftBar} />

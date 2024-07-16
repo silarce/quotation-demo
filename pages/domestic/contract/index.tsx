@@ -144,6 +144,7 @@ export default function Contract() {
         attn: content.agentEmployee?.chName ?? '',
         verifyForm: (
           <span
+            className="cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               setActiveContractId(contractId);
@@ -154,6 +155,10 @@ export default function Contract() {
           </span>
         ),
         viewRef_bottom: index === dataArr.length - 5 ? viewRef_bottom : undefined,
+        href: {
+          pathname: `/domestic/contract/quotation`,
+          query: { id: contractId, version: 1 },
+        },
       };
     }) ?? [];
 
@@ -163,7 +168,7 @@ export default function Contract() {
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div>
-        <ContractList contractList={contractList} />
+        <ContractList contractList={contractList} setActiveContractId={setActiveContractId} />
       </div>
 
       <ContractReviewForm
