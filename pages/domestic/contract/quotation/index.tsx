@@ -929,7 +929,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           contractIdNumber={content?.quotationNumber ?? ''}
           contractName={content?.projectName ?? ''}
           contractPrice={Number(content?.total ?? '')}
-          lastestContentId={content?.id}
+          contentId={content?.id}
           verifyForm={content?.verifyForm}
           onConfirm={async () => {
             setIsLoading(true);

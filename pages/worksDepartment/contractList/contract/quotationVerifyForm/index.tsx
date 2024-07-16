@@ -74,7 +74,7 @@ export default function QuotationVerifyForm() {
           contractIdNumber={contractNumber ?? ''}
           contractName={projectName ?? ''}
           contractPrice={total ?? 0}
-          lastestContentId={undefined}
+          contentId={undefined}
           verifyForm={verifyForm}
           onConfirm={() => {}}
         />

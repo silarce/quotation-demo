@@ -2277,7 +2277,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         contractIdNumber={latestContent?.quotationNumber ?? ''}
         contractName={latestContent?.projectName ?? ''}
         contractPrice={Number(state_summary.total.replaceAll(',', ''))}
-        lastestContentId={lastestContentId}
+        contentId={lastestContentId}
         verifyForm={verifyForm}
         onConfirm={async () => {
           setIsLoading(true);

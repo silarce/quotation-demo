@@ -1904,7 +1904,7 @@ latestContentProdArr為這次追加追減的主產品
         contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
         contractName={quotationData?.latestContent.projectName ?? ''}
         contractPrice={Number(state_summary.total.replaceAll(',', ''))}
-        lastestContentId={lastestContentId}
+        contentId={lastestContentId}
         verifyForm={verifyForm}
         onConfirm={async () => {
           setIsLoading(true);

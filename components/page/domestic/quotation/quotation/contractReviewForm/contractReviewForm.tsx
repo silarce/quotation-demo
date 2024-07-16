@@ -40,9 +40,29 @@ import {
   TquotationContentDto,
   TuserDto,
 } from 'js/api/dtoTypes';
-import { el } from 'date-fns/locale';
 
 // ============================================================================
+
+type Tprops_reviewForm = {
+  forbidden?: boolean;
+
+  verifyForm: TquotationVerifyFormDto | undefined;
+
+  contractIdNumber: string;
+  contractName: string;
+  contractPrice: number;
+
+  quotationContent?: TquotationContentDto | undefined; // 這是為了取得審核人員的資料
+
+  contentId: string | undefined; // 呼叫 apiSubmitContracting 所需
+  quotationId?: string | undefined; // 呼叫 apiQuotationReview 所需
+
+  close?: () => void;
+  onConfirm?: () => void;
+
+  defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
+  isInContract?: boolean | undefined; // 為true 呼叫 apiPatchQuotationVerifyForm 否則呼叫 apiSubmitContracting
+};
 
 type TpaymentRatio = {
   title: string;
@@ -76,32 +96,9 @@ export type { TpaymentRatio };
 
 function ContractReviewForm({
   showModal,
-  isInContract,
-  close,
-  contractIdNumber,
-  contractName,
-  contractPrice,
-  lastestContentId,
-  verifyForm,
-  forbidden,
-  onConfirm,
-  defaultPaymentRatioArr,
-  quotationContent,
-  quotationId,
-}: {
+  ...props_reviewForm
+}: Tprops_reviewForm & {
   showModal: boolean;
-  isInContract?: boolean;
-  close: () => void;
-  contractIdNumber: string;
-  contractName: string;
-  contractPrice: number;
-  lastestContentId: string | undefined;
-  verifyForm: TquotationVerifyFormDto | undefined;
-  forbidden?: boolean;
-  onConfirm?: () => void;
-  defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
-  quotationContent?: TquotationContentDto;
-  quotationId?: string;
 }) {
   // ----------------------------------------------------------------------------
 
@@ -116,21 +113,7 @@ function ContractReviewForm({
       width="800px"
       onCancel={close}
     >
-      <ReviewForm
-        isInContract={isInContract}
-        forbidden={forbidden}
-        // disabled={false}
-        close={close}
-        contractIdNumber={contractIdNumber}
-        contractName={contractName}
-        contractPrice={contractPrice}
-        lastestContentId={lastestContentId}
-        verifyForm={verifyForm}
-        onConfirm={onConfirm}
-        defaultPaymentRatioArr={defaultPaymentRatioArr}
-        quotationContent={quotationContent}
-        quotationId={quotationId}
-      />
+      <ReviewForm {...props_reviewForm} />
     </Modal>
   );
 }
@@ -152,27 +135,14 @@ function ReviewForm({
   contractIdNumber,
   contractName,
   contractPrice,
-  lastestContentId,
+  contentId,
   verifyForm,
   defaultPaymentRatioArr,
   onConfirm,
   isInContract,
   quotationContent,
   quotationId,
-}: {
-  forbidden?: boolean;
-  close?: () => void;
-  contractIdNumber: string;
-  contractName: string;
-  contractPrice: number;
-  lastestContentId: string | undefined;
-  verifyForm: TquotationVerifyFormDto | undefined;
-  defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
-  onConfirm?: () => void;
-  isInContract?: boolean | undefined;
-  quotationContent?: TquotationContentDto | undefined;
-  quotationId?: string | undefined;
-}) {
+}: Tprops_reviewForm) {
   //
   const { userInfo } = useContext(AppContext);
   //
@@ -206,7 +176,7 @@ function ReviewForm({
   // region REQUEST
 
   const reqSubmitContracting = async () => {
-    if (!lastestContentId || disabled) {
+    if (!contentId || disabled) {
       return;
     }
 
@@ -285,7 +255,7 @@ function ReviewForm({
           body,
         });
       } else {
-        await apiSubmitContracting({ contentId: lastestContentId, body });
+        await apiSubmitContracting({ contentId, body });
       }
     } catch (error) {
       const err = error as Error;
