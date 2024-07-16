@@ -11,6 +11,10 @@ import { AppContext } from 'pages/_app';
 // antd
 import { Modal } from 'antd';
 import { Radio } from 'antd';
+
+//
+import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
+
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -110,7 +114,7 @@ function ContractReviewForm({
       centered={true}
       destroyOnClose={true}
       footer={null}
-      width="800px"
+      width="1000px"
       onCancel={close}
     >
       <ReviewForm {...props_reviewForm} />
@@ -997,6 +1001,7 @@ const InputBox = ({
   suffix,
   boxStyle,
   inputAttr,
+  textareaProps,
   className,
   disabled,
 }: {
@@ -1004,13 +1009,15 @@ const InputBox = ({
   suffix?: string;
   boxStyle?: React.CSSProperties;
   inputAttr?: React.InputHTMLAttributes<HTMLInputElement>;
+  textareaProps?: TextareaAutosizeProps;
   className?: string;
   disabled?: boolean;
 }) => {
   return (
     <div style={boxStyle} className={classNames(scss.inputBox, disabled && scss.disabled, className)}>
       <span>{prefix}</span>
-      <input type="text" readOnly={disabled} {...inputAttr} />
+      {inputAttr && <input type="text" readOnly={disabled} {...inputAttr} />}
+      {textareaProps && <TextareaAutosize readOnly={disabled} {...textareaProps} />}
       <span>{suffix}</span>
     </div>
   );
@@ -1032,7 +1039,7 @@ const Row = ({
   onDel?: () => void;
   title: {
     value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   };
   percent: {
     value: string;
@@ -1044,7 +1051,7 @@ const Row = ({
   };
   note: {
     value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   };
 }) => {
   return (
@@ -1052,7 +1059,13 @@ const Row = ({
       <div>
         <InputBox
           prefix={`${serialNumber}.`}
-          inputAttr={{
+          // inputAttr={{
+          //   disabled: disabled,
+          //   value: title.value,
+          //   onChange: title.onChange,
+          //   placeholder: '請輸入標題',
+          // }}
+          textareaProps={{
             disabled: disabled,
             value: title.value,
             onChange: title.onChange,
@@ -1082,12 +1095,18 @@ const Row = ({
         />
         <InputBox
           prefix="備註 :"
-          inputAttr={{
+          textareaProps={{
             disabled: disabled,
             value: note.value,
             onChange: note.onChange,
             placeholder: '請輸入備註',
           }}
+          // inputAttr={{
+          //   disabled: disabled,
+          //   value: note.value,
+          //   onChange: note.onChange,
+          //   placeholder: '請輸入備註',
+          // }}
         />
       </div>
       <div>
