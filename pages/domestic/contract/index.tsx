@@ -134,14 +134,14 @@ export default function Contract() {
       return {
         id: contract.id,
         // quotationId: content.quotationNumber,
-        quotationId: contract.contractNumber ?? '',
-        clientName: content.customer?.name ?? '',
+        quotationId: contract.contractNumber ?? '---',
+        clientName: content.customer?.name ?? '---',
         quotationName: content.projectName,
         discount: contract.discount,
         priceTotal: String(contract.total),
         contactPerson: content.contactPerson,
         contactPhone: content.contactNumber,
-        attn: content.agentEmployee?.chName ?? '',
+        attn: content.agentEmployee?.chName ?? '---',
         verifyForm: (
           <span
             className="cursor-pointer"

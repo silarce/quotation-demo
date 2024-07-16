@@ -10,9 +10,16 @@
   background-color: $bgc01;
   max-height: 175px;
   overflow: auto;
+
   > span {
     font-weight: 400;
     font-size: 16px;
     overflow-wrap: break-word;
+  }
+  .link {
+    svg {
+      // display: inline-block;
+      transform: translateY(5px);
+    }
   }
 }

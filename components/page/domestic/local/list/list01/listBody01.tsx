@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import Link, { LinkProps } from 'next/link';
 
 // css
-import style from './listBody01.module.scss';
+import scss from './listBody01.module.scss';
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
@@ -18,7 +18,7 @@ export type { TsubContract };
 
 export default function ListBody01({ memoList }: { memoList: TsubContract[] }) {
   return (
-    <div className={style.container}>
+    <div className={scss.container}>
       {memoList.map((item, index) => {
         const {
           //
@@ -35,7 +35,7 @@ export default function ListBody01({ memoList }: { memoList: TsubContract[] }) {
             <span>{createdAt}</span>
             <span>{projectName}</span>
             {verifyForm}
-            <Link href={href}>
+            <Link href={href} className={scss.link}>
               <IconDetail />
             </Link>
           </Fragment>
