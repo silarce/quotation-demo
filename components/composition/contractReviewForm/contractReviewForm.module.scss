@@ -6,7 +6,7 @@
   }
   :global(.ant-modal-body) {
     padding: 0;
-    height: 100%;
+    // height: 100%;
     // margin-bottom: 19px;
   }
   :global(.ant-modal-footer) {
@@ -16,7 +16,13 @@
 
 .container {
   // padding: 30px 50px 50px 50px;
-  padding: 0px 50px 50px 50px;
+  // padding: 0px 50px 50px 50px;
+
+  // position: relative;
+  // width: fit-content;
+  // height: fit-content;
+  // overflow: hidden;
+
   span,
   input,
   input::placeholder,
@@ -40,6 +46,31 @@
     }
   }
 }
+
+.body {
+  // width: 1000px;
+  // height: auto;
+  // width: auto;
+  // height: 1400px;
+  // aspect-ratio: 210/297;
+
+  // padding: 30px 50px 25px 50px;
+  padding-left: 50px;
+  padding-right: 50px;
+
+  margin: 20px;
+
+  // background-color: #ffc0cb55;
+  // background-color: #ddd;
+  // overflow: visible;
+
+  border: solid 1px theme("colors.border");
+  &.pdfBody {
+    border: none;
+    margin: 0;
+  }
+}
+
 .btnBar {
   position: sticky;
   top: 0;
@@ -58,46 +89,73 @@
   }
 }
 
-.title {
-  margin-top: 30px;
-  margin-bottom: 20px;
-  color: theme("colors.main");
-  text-align: center;
-  font-size: 30px;
-  font-weight: 400;
-}
-
-.subTitle {
-  display: grid;
-  grid-template-columns: 72px auto;
-  gap: 5px 24px;
-  margin-bottom: 15px;
-  > span {
-    font-size: 18px;
+.head {
+  // border: solid 1px black;
+  .title {
+    // margin-top: 30px;
+    margin-bottom: 20px;
+    color: theme("colors.main");
+    text-align: center;
+    font-size: 30px;
     font-weight: 400;
-    &:nth-of-type(even) {
-      color: theme("colors.main");
+  }
+
+  .subTitle {
+    display: grid;
+    grid-template-columns: 72px auto;
+    gap: 5px 24px;
+    // margin-bottom: 15px;
+    > span {
+      font-size: 18px;
+      font-weight: 400;
+      &:nth-of-type(even) {
+        color: theme("colors.main");
+      }
     }
   }
 }
 
-.list {
+// .list {
+//   display: grid;
+//   grid-template-columns: 20px auto;
+//   gap: 30px 6px;
+//   .numIndex {
+//     height: fit-content;
+//     transform: translateY(2px);
+//   }
+//   .item2 {
+//     > div:nth-of-type(1) {
+//       display: grid;
+//       grid-template-columns: fit-content(100%) 1fr;
+//     }
+//   }
+
+//   > div:nth-of-type(2n) {
+//     position: relative;
+//   }
+// }
+
+.item {
   display: grid;
   grid-template-columns: 20px auto;
-  gap: 15px 6px;
+  gap: 0px 6px;
+  padding-top: 20px;
+  // border: solid 1px black;
+
   .numIndex {
     height: fit-content;
     transform: translateY(2px);
   }
+
+  > div:nth-of-type(2n) {
+    position: relative;
+  }
+
   .item2 {
     > div:nth-of-type(1) {
       display: grid;
       grid-template-columns: fit-content(100%) 1fr;
     }
-  }
-
-  > div:nth-of-type(2n) {
-    position: relative;
   }
 }
 
@@ -112,17 +170,30 @@
   textarea {
     resize: none;
   }
+  > .pdfSpan {
+    display: inline-block;
+    height: fit-content;
+    // background-color: pink;
+    width: 100%;
+    white-space: pre-wrap;
+    font-size: 16px;
+  }
 }
 
 .payMethodContainer {
   display: grid;
-  gap: 15px;
+  gap: 10px 15px;
   margin-top: 15px;
 
   .payMethod {
     display: grid;
     grid-template-columns: auto fit-content(100%);
     // align-items: center;
+
+    // .percent {
+    //   align-self: center;
+    // }
+
     > div:nth-of-type(1) {
       display: grid;
       grid-template-columns: auto 80px 100px 300px;
@@ -156,7 +227,9 @@
   display: grid;
   grid-template-columns: fit-content(100%) 1fr;
   gap: 12px;
+  width: 800px;
   padding: 25px;
+  margin: 25px auto 25px auto;
   background-color: theme("colors.bgc01");
   > span {
     color: theme("colors.main");
@@ -226,7 +299,8 @@
 .date {
   display: inline-block;
   width: 92px;
-  input {
+  input,
+  span {
     text-align: center;
   }
 }
@@ -242,3 +316,11 @@
     padding: 0 5px;
   }
 }
+
+.pdfWrapper {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+// =====================================================================
