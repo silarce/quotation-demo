@@ -1,6 +1,8 @@
 import html2canvas, { Options } from 'html2canvas';
 import jsPDF from 'jspdf';
 
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
+
 const dlPdf = async ({
   //
   divElementArr,
@@ -13,11 +15,11 @@ const dlPdf = async ({
   ISO216?: string;
   canvasOptions?: Partial<Options>;
 }) => {
-  // showRootLoading(true, '正在處理PDF');
+  showRootLoading(true, '正在處理PDF');
 
   const doc = new jsPDF('p', 'px', ISO216);
-  const pageWidth = doc.internal.pageSize.getWidth();
 
+  const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
   let isFirst = true;
@@ -50,7 +52,12 @@ const dlPdf = async ({
   }
 
   doc.save(`${fileName}.pdf`);
-  // showRootLoading(false);
+  showRootLoading(false);
 };
 
-export { dlPdf };
+const calcHeight_a4 = (width: number) => {
+  // 210/297 這是width/height的比例
+  return Math.round(width / (210 / 297));
+};
+
+export { dlPdf, calcHeight_a4 };
