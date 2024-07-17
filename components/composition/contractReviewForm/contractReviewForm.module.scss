@@ -166,6 +166,14 @@
   textarea {
     resize: none;
   }
+  > .pdfSpan {
+    display: inline-block;
+    height: fit-content;
+    // background-color: pink;
+    width: 100%;
+    white-space: pre-wrap;
+    font-size: 16px;
+  }
 }
 
 .payMethodContainer {
@@ -177,6 +185,11 @@
     display: grid;
     grid-template-columns: auto fit-content(100%);
     // align-items: center;
+
+    // .percent {
+    //   align-self: center;
+    // }
+
     > div:nth-of-type(1) {
       display: grid;
       grid-template-columns: auto 80px 100px 300px;
@@ -282,7 +295,8 @@
 .date {
   display: inline-block;
   width: 92px;
-  input {
+  input,
+  span {
     text-align: center;
   }
 }

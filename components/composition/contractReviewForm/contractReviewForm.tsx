@@ -27,8 +27,8 @@ import { Radio } from 'antd';
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 
 // gear
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import CellWithBar from 'components/global/gear/cell/cellWithBar';
+// import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+// import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import SignatureBar, { TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
@@ -771,7 +771,7 @@ function ReviewForm({
           <div className={scss.numIndex}>1</div>
           <div>
             <span>註明請款日</span>
-            <InputSel
+            {/* <InputSel
               className={scss.date}
               disabled={disabled}
               inputProps={{
@@ -791,9 +791,30 @@ function ReviewForm({
                   type: 'number',
                 },
               }}
+            /> */}
+
+            <InputBox
+              className={scss.date}
+              disabled={disabled}
+              inputAttr={{
+                value: watchData.askForPaymentDate ?? '',
+                onChange: (e) => {
+                  const str = e.target.value;
+
+                  if (str === '') {
+                    setValue('askForPaymentDate', str);
+                  } else {
+                    let num = parseInt(str);
+                    num = Math.abs(num);
+                    setValue('askForPaymentDate', String(num));
+                  }
+                },
+                type: 'number',
+              }}
             />
+
             <span>，放款日</span>
-            <InputSel
+            {/* <InputSel
               className={scss.date}
               disabled={disabled}
               inputProps={{
@@ -812,6 +833,25 @@ function ReviewForm({
                   },
                   type: 'number',
                 },
+              }}
+            /> */}
+            <InputBox
+              className={scss.date}
+              disabled={disabled}
+              inputAttr={{
+                value: watchData.disbursementDate ?? '',
+                onChange: (e) => {
+                  const str = e.target.value;
+
+                  if (str === '') {
+                    setValue('disbursementDate', str);
+                  } else {
+                    let num = parseInt(str);
+                    num = Math.abs(num);
+                    setValue('disbursementDate', String(num));
+                  }
+                },
+                type: 'number',
               }}
             />
 
@@ -887,7 +927,7 @@ function ReviewForm({
           <div>
             <div className={scss.paymentTenor}>
               <span>合理的放款票期</span>
-              <InputSel
+              {/* <InputSel
                 disabled={disabled}
                 inputProps={{
                   props: {
@@ -895,6 +935,17 @@ function ReviewForm({
                     onChange: (e) => {
                       setValue('paymentTenor', e.target.value);
                     },
+                  },
+                }}
+              /> */}
+
+              <InputBox
+                boxStyle={{ width: '200px' }}
+                disabled={disabled}
+                inputAttr={{
+                  value: watchData.paymentTenor ?? '',
+                  onChange: (e) => {
+                    setValue('paymentTenor', e.target.value);
                   },
                 }}
               />
@@ -1229,10 +1280,13 @@ function ReviewForm({
               {/* <textarea disabled={disabled} className="w-full resize-none" placeholder="" {...register('debitItem')} /> */}
               <InputBox
                 boxStyle={{ width: '100%' }}
+                disabled={disabled}
                 textareaProps={{
-                  ...register('debitItem'),
-
-                  disabled: disabled,
+                  // ...register('debitItem'),
+                  value: watchData.debitItem,
+                  onChange: (e) => {
+                    setValue('debitItem', e.target.value);
+                  },
                   minRows: disabled ? undefined : 3,
                   placeholder: '',
                 }}
@@ -1241,9 +1295,8 @@ function ReviewForm({
             <InputBox
               className="mt-1 w-full"
               prefix="備註 :"
+              disabled={disabled}
               inputAttr={{
-                disabled: disabled,
-
                 placeholder: '',
               }}
             />
@@ -1331,6 +1384,7 @@ const InputBox = ({
   boxStyle,
   inputAttr,
   textareaProps,
+  spanAttr,
   className,
   disabled,
 }: {
@@ -1339,14 +1393,20 @@ const InputBox = ({
   boxStyle?: React.CSSProperties;
   inputAttr?: React.InputHTMLAttributes<HTMLInputElement>;
   textareaProps?: TextareaAutosizeProps;
+  spanAttr?: React.HTMLAttributes<HTMLSpanElement>;
   className?: string;
   disabled?: boolean;
 }) => {
   return (
     <div style={boxStyle} className={classNames(scss.inputBox, disabled && scss.disabled, className)}>
       <span>{prefix}</span>
-      {inputAttr && <input type="text" readOnly={disabled} {...inputAttr} />}
-      {textareaProps && <TextareaAutosize readOnly={disabled} {...textareaProps} />}
+      {disabled && (
+        <span {...spanAttr} className={classNames(scss.pdfSpan, spanAttr?.className)}>
+          {inputAttr?.value || textareaProps?.value}
+        </span>
+      )}
+      {!disabled && inputAttr && <input type="text" readOnly={disabled} {...inputAttr} />}
+      {!disabled && textareaProps && <TextareaAutosize readOnly={disabled} {...textareaProps} />}
       <span>{suffix}</span>
     </div>
   );
@@ -1388,6 +1448,7 @@ const Row = ({
       <div>
         <InputBox
           prefix={`${serialNumber}.`}
+          disabled={disabled}
           // inputAttr={{
           //   disabled: disabled,
           //   value: title.value,
@@ -1395,7 +1456,7 @@ const Row = ({
           //   placeholder: '請輸入標題',
           // }}
           textareaProps={{
-            disabled: disabled,
+            // disabled: disabled,
             value: title.value,
             onChange: title.onChange,
             placeholder: '',
@@ -1403,8 +1464,14 @@ const Row = ({
         />
         <InputBox
           suffix="%"
+          disabled={disabled}
+          // className={scss.percent}
+          className={'self-end'}
+          spanAttr={{
+            className: 'text-center',
+          }}
           inputAttr={{
-            disabled: disabled,
+            // disabled: disabled,
             className: 'text-center',
             value: percent.value,
             onChange: percent.onChange,
@@ -1414,12 +1481,16 @@ const Row = ({
         />
         <InputBox
           prefix="$"
+          className={'self-end'}
+          disabled={disabled}
+          spanAttr={{
+            className: 'text-center',
+          }}
           inputAttr={{
             className: 'text-center',
             value: price.value,
             // onChange: price.onChange,
             type: 'number',
-            disabled: true,
           }}
         />
         <InputBox
