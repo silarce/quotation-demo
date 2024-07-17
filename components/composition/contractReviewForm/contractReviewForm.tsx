@@ -1030,7 +1030,7 @@ function ReviewForm({
             <InputBox
               prefix="合理的保固期 :"
               suffix="年"
-              boxStyle={{ width: '160px' }}
+              boxStyle={{ width: '180px' }}
               inputAttr={{
                 disabled: disabled,
                 value: watchData.warrantyPeriod ?? '',
@@ -1392,13 +1392,16 @@ const InputBox = ({
   return (
     <div style={boxStyle} className={classNames(scss.inputBox, disabled && scss.disabled, className)}>
       <span>{prefix}</span>
-      {disabled && (
+      {/* {disabled && (
         <span {...spanAttr} className={classNames(scss.pdfSpan, spanAttr?.className)}>
           {inputAttr?.value || textareaProps?.value}
         </span>
       )}
       {!disabled && inputAttr && <input type="text" readOnly={disabled} {...inputAttr} />}
-      {!disabled && textareaProps && <TextareaAutosize readOnly={disabled} {...textareaProps} />}
+      {!disabled && textareaProps && <TextareaAutosize readOnly={disabled} {...textareaProps} />} */}
+
+      {inputAttr && <input type="text" readOnly={disabled} {...inputAttr} />}
+      {textareaProps && <TextareaAutosize readOnly={disabled} {...textareaProps} />}
       <span>{suffix}</span>
     </div>
   );
@@ -1686,7 +1689,7 @@ const PDFBody_pre = (
   // -----------------------------------------------------------------------
 
   return (
-    <div className={scss.pdfBody}>
+    <div className={scss.pdfWrapper}>
       {pageArr.map((page, index) => {
         return (
           <Body
@@ -1694,6 +1697,7 @@ const PDFBody_pre = (
             style={style_body}
             ref={(ele) => (ref_pdf.current[index] = ele!)}
             key={index}
+            className={scss.pdfBody}
           >
             {page.map((item, index) => {
               return <div key={index} dangerouslySetInnerHTML={{ __html: item?.outerHTML || '' }} />;

@@ -65,6 +65,10 @@
   // overflow: visible;
 
   border: solid 1px theme("colors.border");
+  &.pdfBody {
+    border: none;
+    margin: 0;
+  }
 }
 
 .btnBar {
@@ -313,7 +317,7 @@
   }
 }
 
-.pdfBody {
+.pdfWrapper {
   width: 0;
   height: 0;
   overflow: hidden;
