@@ -42,15 +42,20 @@
 }
 
 .body {
-  width: 1000px;
-  height: auto;
-  padding: 30px 50px 25px 50px;
-
+  // width: 1000px;
+  // height: auto;
+  width: auto;
+  // height: 1400px;
   aspect-ratio: 210/297;
+
+  padding: 30px 50px 25px 50px;
+  margin: 20px;
 
   // background-color: #ffc0cb55;
   background-color: #ddd;
   overflow: hidden;
+
+  border: solid 1px theme("colors.border");
 }
 
 .btnBar {
@@ -72,7 +77,7 @@
 }
 
 .head {
-  border: solid 1px black;
+  // border: solid 1px black;
   .title {
     // margin-top: 30px;
     margin-bottom: 20px;
@@ -116,6 +121,30 @@
 //     position: relative;
 //   }
 // }
+
+.item {
+  display: grid;
+  grid-template-columns: 20px auto;
+  gap: 0px 6px;
+  padding-top: 20px;
+  // border: solid 1px black;
+
+  .numIndex {
+    height: fit-content;
+    transform: translateY(2px);
+  }
+
+  > div:nth-of-type(2n) {
+    position: relative;
+  }
+
+  .item2 {
+    > div:nth-of-type(1) {
+      display: grid;
+      grid-template-columns: fit-content(100%) 1fr;
+    }
+  }
+}
 
 .inputBox {
   display: inline-grid;
@@ -262,27 +291,3 @@
 }
 
 // =====================================================================
-
-.item {
-  display: grid;
-  grid-template-columns: 20px auto;
-  gap: 0px 6px;
-  padding-top: 20px;
-  border: solid 1px black;
-
-  .numIndex {
-    height: fit-content;
-    transform: translateY(2px);
-  }
-
-  > div:nth-of-type(2n) {
-    position: relative;
-  }
-
-  .item2 {
-    > div:nth-of-type(1) {
-      display: grid;
-      grid-template-columns: fit-content(100%) 1fr;
-    }
-  }
-}

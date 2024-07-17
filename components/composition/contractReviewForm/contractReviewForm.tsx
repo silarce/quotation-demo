@@ -1,4 +1,13 @@
-import { useState, useEffect, useMemo, useContext, forwardRef } from 'react';
+import {
+  //
+  useState,
+  useEffect,
+  useMemo,
+  useContext,
+  forwardRef,
+  useRef,
+  useImperativeHandle,
+} from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
@@ -50,6 +59,9 @@ import {
   TquotationContentDto,
   TuserDto,
 } from 'js/api/dtoTypes';
+
+// utils
+import { dlPdf } from 'js/utils/helpers/dlPdf';
 
 // ============================================================================
 
@@ -104,6 +116,10 @@ export type { TpaymentRatio };
 
 // ============================================================================
 
+const pdfHeight = 1400;
+
+// ============================================================================
+
 // region START
 
 function ContractReviewForm({
@@ -144,26 +160,13 @@ function ContractReviewForm({
 
 function ReviewForm({
   readOnly,
-
   contractId,
   quotationId: quotationId_param,
   contentId: contentId_param,
-  // contentId,
-
   isInContract,
-
   onCancel,
   onConfirm,
-}: // verifyForm,
-
-// contractNumber,
-// projectName,
-// totalPrice,
-
-// quotationContent,
-
-// defaultPaymentRatioArr,
-Tprops_reviewForm) {
+}: Tprops_reviewForm) {
   //
   const { userInfo } = useContext(AppContext);
   //
@@ -172,6 +175,17 @@ Tprops_reviewForm) {
   let disabled = stateObj_disabled[0];
   const setDisabled = stateObj_disabled[1];
   readOnly && (disabled = true);
+
+  // ----------------------------------------------------------------------------
+
+  const ref_head = useRef<HTMLDivElement>(null);
+
+  // w item從index 1開始加入，所以index 0是undefined
+  const ref_itemArr = useRef<HTMLDivElement[]>([]);
+
+  const ref_pdf = useRef<{
+    dlPdf: (fileName: string) => void;
+  }>(null);
 
   // ----------------------------------------------------------------------------
 
@@ -693,6 +707,9 @@ Tprops_reviewForm) {
 
         {disabled && (
           <>
+            <MyButton_v2 px="px22" py="py4" onClick={() => ref_pdf.current?.dlPdf('fooooo')}>
+              匯出
+            </MyButton_v2>
             {isReviewer && isInContract && (
               <MyButton_v2 theme="danger" px="px22" py="py4" onClick={handle_review}>
                 審核
@@ -705,8 +722,8 @@ Tprops_reviewForm) {
         )}
       </div>
 
-      <div className={scss.body}>
-        <div className={scss.head}>
+      <Body>
+        <div ref={ref_head} className={scss.head}>
           <p className={scss.title}>合約審核表</p>
           {/*  */}
           <div className={scss.subTitle}>
@@ -718,8 +735,8 @@ Tprops_reviewForm) {
         </div>
         {/*  */}
 
-        {/* 1 */}
-        <Item>
+        {/* // MARK: 1 */}
+        <Item ref={(ele) => (ref_itemArr.current[1] = ele!)}>
           <div className={scss.numIndex}>1</div>
           <div>
             <span>註明請款日</span>
@@ -782,8 +799,8 @@ Tprops_reviewForm) {
           </div>
         </Item>
 
-        {/* 2 */}
-        <Item>
+        {/* // MARK: 2 */}
+        <Item ref={(ele) => (ref_itemArr.current[2] = ele!)}>
           <div className={scss.numIndex}>2</div>
           <div className={scss.item2}>
             <div>
@@ -833,8 +850,8 @@ Tprops_reviewForm) {
           </div>
         </Item>
 
-        {/* 3 */}
-        <Item>
+        {/* // MARK: 3 */}
+        <Item ref={(ele) => (ref_itemArr.current[3] = ele!)}>
           <div className={scss.numIndex}>3</div>
           <div>
             <div className={scss.paymentTenor}>
@@ -866,9 +883,9 @@ Tprops_reviewForm) {
             />
           </div>
         </Item>
-        {/* 4 */}
 
-        <Item>
+        {/* // MARK: 4 */}
+        <Item ref={(ele) => (ref_itemArr.current[4] = ele!)}>
           <div className={scss.numIndex}>4</div>
           <div>
             <RadioContainer
@@ -896,8 +913,8 @@ Tprops_reviewForm) {
           </div>
         </Item>
 
-        {/* 5 */}
-        <Item>
+        {/* //MARK: 5 */}
+        <Item ref={(ele) => (ref_itemArr.current[5] = ele!)}>
           <div className={scss.numIndex}>5</div>
           <div>
             <RadioContainer
@@ -924,8 +941,8 @@ Tprops_reviewForm) {
           </div>
         </Item>
 
-        {/* 6 */}
-        <Item>
+        {/* // MARK: 6 */}
+        <Item ref={(ele) => (ref_itemArr.current[6] = ele!)}>
           <div className={scss.numIndex}>6</div>
           <div>
             <InputBox
@@ -958,8 +975,8 @@ Tprops_reviewForm) {
           </div>
         </Item>
 
-        {/* 7 */}
-        <Item>
+        {/* // MARK: 7 */}
+        <Item ref={(ele) => (ref_itemArr.current[7] = ele!)}>
           <div className={scss.numIndex}>7</div>
           <div>
             <RadioContainer
@@ -986,9 +1003,8 @@ Tprops_reviewForm) {
           </div>
         </Item>
 
-        {/* 8 */}
-
-        <Item>
+        {/* // MARK: 8 */}
+        <Item ref={(ele) => (ref_itemArr.current[8] = ele!)}>
           <div className={scss.numIndex}>8</div>
           <div>
             <div>
@@ -1039,8 +1055,8 @@ Tprops_reviewForm) {
           </div>
         </Item>
 
-        {/* 9 */}
-        <Item>
+        {/* // MARK: 9 */}
+        <Item ref={(ele) => (ref_itemArr.current[9] = ele!)}>
           <div className={scss.numIndex}>9</div>
           <div>
             <div>
@@ -1091,8 +1107,8 @@ Tprops_reviewForm) {
           </div>
         </Item>
 
-        {/* 10 */}
-        <Item>
+        {/* // MARK: 10 */}
+        <Item ref={(ele) => (ref_itemArr.current[10] = ele!)}>
           <div className={scss.numIndex}>10</div>
           <div>
             <div>
@@ -1142,8 +1158,8 @@ Tprops_reviewForm) {
           </div>
         </Item>
 
-        {/* 11 */}
-        <Item>
+        {/* // MARK: 11 */}
+        <Item ref={(ele) => (ref_itemArr.current[11] = ele!)}>
           <div className={scss.numIndex}>11</div>
           <div>
             <div>
@@ -1172,8 +1188,8 @@ Tprops_reviewForm) {
           </div>
         </Item>
 
-        {/* 12 */}
-        <Item>
+        {/* // MARK: 12 */}
+        <Item ref={(ele) => (ref_itemArr.current[12] = ele!)}>
           <div className={scss.numIndex}>12</div>
           <div>
             <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
@@ -1198,7 +1214,7 @@ Tprops_reviewForm) {
           </div>
         </Item>
         {/*  */}
-      </div>
+      </Body>
 
       <div className={scss.footer}>
         <div>
@@ -1221,6 +1237,18 @@ Tprops_reviewForm) {
       )}
 
       {/*  */}
+      {/*  */}
+
+      <br />
+      <br />
+      <br />
+
+      <PDFBody ref={ref_pdf} ref_head={ref_head} ref_itemArr={ref_itemArr} />
+
+      {/*  */}
+      {/*  */}
+
+      {/*  */}
     </div>
   );
 }
@@ -1235,6 +1263,24 @@ Tprops_reviewForm) {
 
 // region COMPONENT
 
+const Body_pre = (props: React.HTMLAttributes<HTMLDivElement>, ref: React.Ref<HTMLDivElement>) => {
+  const { children, ...attr } = props;
+
+  return (
+    <div
+      ref={ref}
+      {...attr}
+      className={classNames(scss.body, attr.className)}
+      style={{
+        height: `${pdfHeight}px`,
+        ...attr.style,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
 const Item_pre = (props: React.HTMLAttributes<HTMLDivElement>, ref: React.Ref<HTMLDivElement>) => {
   const { children, ...attr } = props;
 
@@ -1245,6 +1291,7 @@ const Item_pre = (props: React.HTMLAttributes<HTMLDivElement>, ref: React.Ref<HT
   );
 };
 
+const Body = forwardRef(Body_pre);
 const Item = forwardRef(Item_pre);
 
 const InputBox = ({
@@ -1441,53 +1488,125 @@ const RadioContainer = ({
   );
 };
 
-const RowArr = ({
-  empArr,
-  selEmployeeIdArr,
-  // skipArr,
-  viewRef_bottom,
-  // exceptEmpArr,
-  onClick,
-}: // exceptEmpCheck,
-{
-  empArr: TemployeeDto[];
-  selEmployeeIdArr: string[];
-  // skipArr?: TemployeeDto[];
-  onClick: (v: TemployeeDto) => void;
-  // exceptEmpArr?: { id: string }[];
-  viewRef_bottom?: (node?: Element | null | undefined) => void;
-  // exceptEmpCheck: ((emp: TemployeeDto) => boolean) | undefined;
-}) => {
+// const RowArr = ({
+//   empArr,
+//   selEmployeeIdArr,
+//   // skipArr,
+//   viewRef_bottom,
+//   // exceptEmpArr,
+//   onClick,
+// }: // exceptEmpCheck,
+// {
+//   empArr: TemployeeDto[];
+//   selEmployeeIdArr: string[];
+//   // skipArr?: TemployeeDto[];
+//   onClick: (v: TemployeeDto) => void;
+//   // exceptEmpArr?: { id: string }[];
+//   viewRef_bottom?: (node?: Element | null | undefined) => void;
+//   // exceptEmpCheck: ((emp: TemployeeDto) => boolean) | undefined;
+// }) => {
+//   return (
+//     <>
+//       {empArr.map((emp, index, arr) => {
+//         const { idNumber, chName, jobs } = emp;
+//         const { name, grade, department } = jobs?.[0] ?? {};
+
+//         const theViewRef = (() => {
+//           if (arr.length - 11 === index) {
+//             return viewRef_bottom;
+//           }
+
+//           return undefined;
+//         })();
+
+//         const isActive = selEmployeeIdArr.some((selEmpId) => selEmpId === emp.id);
+
+//         return (
+//           <CellWithBar key={index} isActive={isActive}>
+//             <div className={classNames(scss.row)} onClick={() => onClick(emp)} ref={theViewRef}>
+//               <span className={scss.idNumber}>{idNumber}</span>
+//               <span>{chName}</span>
+//               <span>{name ? `${department?.name} / ${name}` : ''}</span>
+//               <span>{grade && `Level ${grade}`}</span>
+//             </div>
+//           </CellWithBar>
+//         );
+//       })}
+//     </>
+//   );
+// };
+
+const PDFBody_pre = (
+  {
+    ref_head,
+    ref_itemArr,
+  }: {
+    ref_head: React.RefObject<HTMLDivElement> | null;
+    ref_itemArr: React.MutableRefObject<HTMLDivElement[]>; // w index 0 is undefined
+  },
+  ref: React.ForwardedRef<unknown>
+) => {
+  // -----------------------------------------------------------------------
+
+  const ref_pdf = useRef<HTMLDivElement[]>([]);
+
+  // -----------------------------------------------------------------------
+  // 將頁面分割，避免A4超出範圍
+  type TrefArr = (HTMLDivElement | null)[];
+  const allowHeight = pdfHeight;
+  let remainHeight = allowHeight;
+  const pageArr: TrefArr[] = [];
+  let refArr: TrefArr = [];
+
+  const height_head = ref_head?.current?.offsetHeight ?? 0;
+  refArr.push(ref_head?.current || null);
+  remainHeight -= height_head;
+
+  ref_itemArr.current.forEach((item, index) => {
+    const height = item?.offsetHeight ?? 0;
+
+    if (remainHeight - height < 0) {
+      pageArr.push(refArr);
+      refArr = [];
+      remainHeight = allowHeight;
+    }
+
+    refArr.push(item);
+    remainHeight -= height;
+
+    if (index === ref_itemArr.current.length - 1) {
+      pageArr.push(refArr);
+    }
+  });
+  // -----------------------------------------------------------------------
+
+  useImperativeHandle(ref, () => ({
+    dlPdf: (flleName: string) => {
+      dlPdf({
+        divElementArr: ref_pdf.current,
+        fileName: flleName,
+      });
+    },
+  }));
+
+  // -----------------------------------------------------------------------
+
   return (
-    <>
-      {empArr.map((emp, index, arr) => {
-        const { idNumber, chName, jobs } = emp;
-        const { name, grade, department } = jobs?.[0] ?? {};
-
-        const theViewRef = (() => {
-          if (arr.length - 11 === index) {
-            return viewRef_bottom;
-          }
-
-          return undefined;
-        })();
-
-        const isActive = selEmployeeIdArr.some((selEmpId) => selEmpId === emp.id);
-
+    <div>
+      {pageArr.map((page, index) => {
         return (
-          <CellWithBar key={index} isActive={isActive}>
-            <div className={classNames(scss.row)} onClick={() => onClick(emp)} ref={theViewRef}>
-              <span className={scss.idNumber}>{idNumber}</span>
-              <span>{chName}</span>
-              <span>{name ? `${department?.name} / ${name}` : ''}</span>
-              <span>{grade && `Level ${grade}`}</span>
-            </div>
-          </CellWithBar>
+          <Body ref={(ele) => (ref_pdf.current[index] = ele!)} key={index}>
+            {page.map((item, index) => {
+              return <div key={index} dangerouslySetInnerHTML={{ __html: item?.outerHTML || '' }} />;
+            })}
+          </Body>
         );
       })}
-    </>
+    </div>
   );
 };
+
+const PDFBody = forwardRef(PDFBody_pre);
 
 // endregion COMPONENT
 
