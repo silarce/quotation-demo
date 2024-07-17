@@ -1292,14 +1292,6 @@ function ReviewForm({
                 }}
               />
             </div>
-            <InputBox
-              className="mt-1 w-full"
-              prefix="備註 :"
-              disabled={disabled}
-              inputAttr={{
-                placeholder: '',
-              }}
-            />
           </div>
         </Item>
         {/*  */}
