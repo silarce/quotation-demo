@@ -519,7 +519,7 @@ export default function ProdReceiptList() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '進貨單'} panelList={panelList} />
+            <PageHeader02 tag={'進貨單'} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div>

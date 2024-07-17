@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
-
 import scss from './purchaseOrderList.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
@@ -50,7 +49,9 @@ export default function PurchaseOrderList() {
         supplieraddress,
         supplierphone,
         invoice,
-        purchaseorderdetailuuid
+        purchaseorderdetailuuid,
+        note,
+        status
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -72,17 +73,11 @@ export default function PurchaseOrderList() {
     const [data2, setData2] = useState<any[]>([]);
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
-
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-
-
-    const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
     const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
-
-
     const [receiptedin, setReceiptedin] = useState<string>("");
     const [create_atin, setCreate_atin] = useState<string>("");
     const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
@@ -94,11 +89,15 @@ export default function PurchaseOrderList() {
     const [purchaseorderdetailuuidin, setPurchaseorderdetailuuidin] = useState<string>("");
     const [invoicein, setInvoicein] = useState<string>("");
     const [supplierphonein, setSupplierphonein] = useState<string>("");
+    const [notein, setNotein] = useState<string>("");
+    const [statusin, setStatusin] = useState<string>("");
+
+
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
-
     const [editmain, setEditmain] = useState<boolean>(false);
 
+    // 計算金額
     const [totalprice, setTotalPrice] = useState<string>("");
     const [taxprice, setTaxPrice] = useState<string>("");
     const [totalpayprice, setTotalPayPrice] = useState<string>("");
@@ -238,6 +237,9 @@ export default function PurchaseOrderList() {
             setData(data);
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
+
+            console.log(data.length);
+            console.log(checkfirstin);
             if (data.length > 0 && checkfirstin === 0) {
                 console.log(data[0].receipted);
                 getPurchaseOrderDetail(data[0].purchaseorderuuid);
@@ -252,7 +254,8 @@ export default function PurchaseOrderList() {
                 setSupplieraddressin(data[0].supplieraddress);
                 setInvoicein(data[0].invoice);
                 setSupplierphonein(data[0].supplierphone);
-
+                setNotein(data[0].note);
+                setStatusin(data[0].status);
             }
         } catch (error: any) {
             setError(error.message);
@@ -354,6 +357,8 @@ export default function PurchaseOrderList() {
             setSupplieraddressin(supplieraddress as string);
             setInvoicein(invoicein as string);
             setSupplierphonein(supplierphone as string);
+            setNotein(note as string);
+            setStatusin(status as string);
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
 
@@ -444,7 +449,13 @@ export default function PurchaseOrderList() {
             }
 
             const responseData = await response.json();
-            console.log("Transfer response:", responseData);
+            myAlert.info(
+                {
+                    title: '單據新增成功',
+                    content: `請購單據號碼為:${responseData}`
+                })
+
+            setData2([]);
 
             // 更新數據和其它操作
             getPurchaseOrder();
@@ -462,13 +473,17 @@ export default function PurchaseOrderList() {
 
 
     //結案
-    const ClosePO = async () => {
+    const sentPOToReview = async (type: any) => {
         try {
             setIsLoading(true);
             const conditionModel: {
-                purchaseorderuuid: string | undefined
+                type: any,
+                purchaseorderuuid: string | undefined,
+                username: any
             } = {
-                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
+                type: type,
+                purchaseorderuuid: purchaseorderuuidin,
+                username: userInfo?.username,
             };
 
 
@@ -485,10 +500,13 @@ export default function PurchaseOrderList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
+            await new Promise(resolve => setTimeout(resolve, 500));
             getPurchaseOrder();
+            getPurchaseOrderDetail(purchaseorderuuidin);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            setStatusin(setStatus(type));
 
-            getPurchaseOrderDetail(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
-
+            // alert(type);
         } catch (error: any) {
             setError(error.message);
         }
@@ -497,6 +515,30 @@ export default function PurchaseOrderList() {
         }
     };
 
+    function setStatus(type: any) {
+        let status;
+        switch (type) {
+            case "請購":
+                status = "詢價中";
+                break;
+            case "詢價":
+                status = "審核中";
+                break;
+            case "核准":
+                status = "已核准";
+                break;
+            case "駁回":
+                status = "已駁回";
+                break;
+            case "結案":
+                status = "已結案";
+                break;
+            default:
+                status = "未知狀態";
+                break;
+        }
+        return status;
+    }
 
 
 
@@ -515,15 +557,13 @@ export default function PurchaseOrderList() {
                 props: {
                     onOk: () => {
                         TransferPurchaseOrderToProductReceipt();
-                        // console.log("XXXXXXXXXXXXXXXXXXX");
-                        // console.log(data2);
                     }
                 }
             });
         }
     }
 
-    function handleClosePO() {
+    function handleClosePO(type: any) {
         myAlert.confirm({
             title: '確定結案?',
             content: <>
@@ -531,7 +571,7 @@ export default function PurchaseOrderList() {
             </>,
             props: {
                 onOk: () => {
-                    ClosePO();
+                    sentPOToReview(type);
                 }
             }
         });
@@ -586,23 +626,81 @@ export default function PurchaseOrderList() {
 
     const handleCancel = () => {
         // 取消編輯時恢復原始值
-        setSuppliernamein(originalSuppliernamein);
-        setSupplierphonein(originalSupplierphonein);
-        setSuppliertaxidin(originalSuppliertaxidin);
-        setInvoicein(originalInvoicein);
-        setSupplieraddressin(originalSupplieraddressin);
-        setEditmain(false);
+        myAlert.confirm({
+            title: '確定要取消編輯嗎?',
+            content: <>
+                <h1>未儲存的資料將不會保存</h1>
+            </>,
+            props: {
+                onOk: () => {
+                    setSuppliernamein(originalSuppliernamein);
+                    setSupplierphonein(originalSupplierphonein);
+                    setSuppliertaxidin(originalSuppliertaxidin);
+                    setInvoicein(originalInvoicein);
+                    setSupplieraddressin(originalSupplieraddressin);
+                    setEditmain(false);
+                }
+            }
+        });
     };
 
-    const handleSave = () => {
-        // 儲存編輯後的值，這裡可以加入其他保存邏輯
-        setEditmain(false);
+    const handleSave = async () => {
+        // 顯示確認對話框
+        myAlert.confirm({
+            title: '確定要儲存異動的資料嗎?',
+            content: null,
+            props: {
+                onOk: async () => {
+                    try {
+                        // 建立要傳送的數據
+                        const data = {
+                            suppliername: suppliernamein,
+                            supplieraddress: supplieraddressin,
+                            supplierphone: supplierphonein,
+                            suppliertaxid: suppliertaxidin,
+                            invoice: invoicein
+                        };
+
+                        // 打印數據到控制台以供調試
+                        console.log(data);
+                        return;
+                        // 發送數據到 API
+                        const response = await fetch(`${setting.apipath}SaveData`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data),
+                        });
+
+                        // 檢查響應是否成功
+                        if (!response.ok) {
+                            throw new Error('Failed to save data');
+                        }
+
+                        // 解析 API 響應
+                        const result = await response.json();
+
+                        // 顯示成功提示
+                        alert("儲存成功");
+                        setEditmain(false);
+
+                        // 更新狀態或執行其他操作
+                        console.log(result);
+                    } catch (error: any) {
+                        // 顯示錯誤信息
+                        setError(error.message);
+                    }
+                }
+            }
+        });
     };
+
 
     return (
         <SubLayer isLoading_subLayer={false}>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '採購單'} panelList={panelList} />
+            <PageHeader02 tag={'採購單'} panelList={panelList} />
             <div className={scss.container}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
                     <div className={scss.content}>
@@ -616,9 +714,16 @@ export default function PurchaseOrderList() {
                     <div className={scss.content}>
                         <div className={scss.head_content1}>
                             <div>
-                                <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
-                                    編輯
-                                </button>
+                                <span style={{ display: `${statusin === "採購中" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
+                                        編輯
+                                    </button>
+                                </span>
+                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minidisabledbtn} >
+                                        編輯
+                                    </button>
+                                </span>
                                 <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
                                     儲存
                                 </button>
@@ -658,26 +763,15 @@ export default function PurchaseOrderList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="廠商名稱"
-                                    disabled={!editmain}
+                                    caption="單據狀態"
+                                    disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: suppliernamein,
-                                            onChange: (e) => { setSuppliernamein(e.target.value) }
+                                            value: statusin,
                                         },
                                     }}
                                 />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="廠商地址"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: supplieraddressin,
-                                            onChange: (e) => { setSupplieraddressin(e.target.value) }
-                                        },
-                                    }}
-                                />
+
                             </div>
                             <div>
                                 <InputSel
@@ -713,13 +807,68 @@ export default function PurchaseOrderList() {
                                         },
                                     }}
                                 />
+
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+
+                            </div>
+                            <div></div>
+                        </div>
+                        <div className={scss.head_content2}>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商名稱"
+                                    disabled={!editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: suppliernamein ? suppliernamein : ' ',
+                                            onChange: (e) => { setSuppliernamein(e.target.value) }
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商地址"
+                                    disabled={!editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: supplieraddressin ? supplieraddressin : ' ',
+                                            onChange: (e) => { setSupplieraddressin(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="聯絡電話"
                                     disabled={!editmain}
                                     inputProps={{
                                         props: {
-                                            value: supplierphonein,
+                                            value: supplierphonein ? supplierphonein : ' ',
                                             onChange: (e) => { setSupplierphonein(e.target.value) }
                                         },
                                     }}
@@ -730,7 +879,7 @@ export default function PurchaseOrderList() {
                                     disabled={!editmain}
                                     inputProps={{
                                         props: {
-                                            value: suppliertaxidin,
+                                            value: suppliertaxidin ? suppliertaxidin : ' ',
                                             onChange: (e) => { setSuppliertaxidin(e.target.value) }
                                         },
                                     }}
@@ -750,47 +899,31 @@ export default function PurchaseOrderList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
                                     caption="發票號碼"
                                     disabled={!editmain}
                                     inputProps={{
                                         props: {
-                                            value: invoicein,
+                                            value: invoicein ? invoicein : ' ',
                                             onChange: (e) => { setInvoicein(e.target.value) }
                                         },
                                     }}
                                 />
                             </div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_content2}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
                         </div>
                         <div className={scss.head_content3}>
-                            <div></div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="備註"
+                                    disabled={!editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: notein ? notein : ' ',
+                                            onChange: (e) => { setNotein(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
                             <div></div>
                             <div></div>
                         </div>
@@ -804,11 +937,14 @@ export default function PurchaseOrderList() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                <span style={{ display: (parseInt(completereq.toString()) === parseInt(totalreq)) ? "" : "none" }}>
-                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="結案" onClick={() => { handleClosePO() }} />
+                                <span style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }}>
+                                    <button className={scss.redbtn} onClick={() => { sentPOToReview("結案") }}>結案</button>
                                 </span>
-                                <span style={{ display: (checkfirstin === 0 ? receiptedin : receipted) === "true" ? "" : "none" }}>
-                                    <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已結案" />
+                                <span style={{ display: `${((parseInt(completereq.toString()) < parseInt(totalreq)) && statusin === "採購中") ? '' : 'none'}` }} onClick={() => { myAlert.warning({ title: '尚未達到需求數量' }) }}>
+                                    <button className={scss.disabledbtn}>結案</button>
+                                </span>
+                                <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
+                                    <button className={scss.disabledbtn}>已結案</button>
                                 </span>
                             </div>
                         </div>
@@ -866,7 +1002,8 @@ export default function PurchaseOrderList() {
                         <br />
                         <div className={scss.body_foot1}>
                             <div>
-                                (1).採購單請回簽.並確認可交貨日期。<br />
+                                流程順序：選擇進貨品項帶入下方{">"}修改進貨數量{">"}轉進貨單<br />
+                                (1).請確認進貨品項與數量是否正確。<br />
                                 (2).請於出貨單上註明本公司產品編號,及產品名稱,以利請款。<br />
                                 (3).請配合定量包裝及標示品名規格, 方便點收。
                             </div>
@@ -905,10 +1042,10 @@ export default function PurchaseOrderList() {
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
                                 <span style={{ display: data2.length > 0 ? "" : "none" }}>
-                                    <MyButton_v2 px='px22' py='py4' theme='danger' label="新增進貨" onClick={handleReceipt} />
+                                    <button className={scss.redbtn} onClick={handleReceipt} >新增進貨</button>
                                 </span>
                                 <span style={{ display: data2.length > 0 ? "none" : "" }}>
-                                    <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="新增進貨" onClick={handleReceipt} />
+                                    <button className={scss.disabledbtn}>新增進貨</button>
                                 </span>
                             </div>
                         </div>
@@ -932,7 +1069,15 @@ export default function PurchaseOrderList() {
                                                 value={_item.quantity !== undefined ? _item.quantity : 0}
                                                 readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
-                                                    handleChange(index, "quantity", e.target.value);
+                                                    const newData = [...data2];
+                                                    const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        quantity: newQuantity,
+                                                        totalprice: newQuantity * newData[index].unitprice
+                                                    };
+                                                    setData2(newData);
+                                                    // handleChange(index, "quantity", e.target.value);
                                                 }}
                                             />
                                         </span>
@@ -978,7 +1123,7 @@ export default function PurchaseOrderList() {
                             ))}
                         </div>
                     </div>
-                </div>s
+                </div>
             </div>
         </SubLayer >
 

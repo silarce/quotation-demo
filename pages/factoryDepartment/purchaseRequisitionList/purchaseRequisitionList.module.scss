@@ -567,13 +567,9 @@ div.panelHeader17 {
   transform: translateY(2px);
 
   &:hover {
-    border: solid 1px #c1c1c1;
-    background-color: #c1c1c121
-  }
-
-  &:focus {
-    background-color: $bgc01;
-    border: solid 1px #c1c1c1;
+    background-repeat: no-repeat;
+    background-position: center right 10px; /* 調整圖標位置 */
+    cursor: not-allowed; /* 添加這行使滑鼠顯示禁止符號 */
   }
 
 }
@@ -595,7 +591,7 @@ div.panelHeader17 {
 
   &:hover {
     border: solid 1px #c1c1c1;
-    background-color: #c1c1c121
+    background-color: #c1c1c17c
   }
 
   &:focus {
@@ -647,3 +643,4 @@ div.panelHeader17 {
   justify-content: space-between;
   align-items: center;
 }
+

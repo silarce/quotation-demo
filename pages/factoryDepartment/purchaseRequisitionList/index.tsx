@@ -33,7 +33,7 @@ import icon_detail from 'public/image/icon/fc_detail.svg';
 import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 import icon_close from 'public/image/icon/fc_close.svg';
 import MyDatePicker from 'components/global/gear/inputAndSel_v2/cog/myDatePicker';
-
+import icon_disable from 'public/image/icon/fc_disable.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -51,7 +51,8 @@ export default function PurchaseRequisitionList() {
         create_by,
         approved,
         status,
-        need_date
+        need_date,
+        note
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -87,6 +88,7 @@ export default function PurchaseRequisitionList() {
     const [approvedin, setApprovedin] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
     const [need_datein, setNeed_datein] = useState<string>("");
+    const [notein, setNotein] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -252,6 +254,7 @@ export default function PurchaseRequisitionList() {
                 setApprovedin(data[0].approved);
                 setStatusin(data[0].status);
                 setNeed_datein(data[0].need_date);
+                setNotein(data[0].note);
                 // alert(data[0].need_date);
             }
         } catch (error: any) {
@@ -345,6 +348,7 @@ export default function PurchaseRequisitionList() {
             setStatusin(status as string);
             setData2([]);
             setNeed_datein(need_date as string);
+            setNotein(note as string);
         }
     }, [purchaserequisitionuuid]);
 
@@ -384,6 +388,7 @@ export default function PurchaseRequisitionList() {
 
     const TransferPurchaseRequisitionToPurchaseOrder = async () => {
         try {
+
             console.log(data2);
             setIsLoading(true);
             const conditionModel: {
@@ -395,6 +400,7 @@ export default function PurchaseRequisitionList() {
                 username: string | undefined,
                 needdate: any,
                 data: any,
+                note: any
             } = {
                 purchaserequisitionuuid: checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid as string | undefined,
                 purchaserequisitionid: checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid as string | undefined,
@@ -404,6 +410,7 @@ export default function PurchaseRequisitionList() {
                 username: userInfo?.username,
                 needdate: need_datein,
                 data: data2,
+                note: notein
             };
 
 
@@ -414,8 +421,15 @@ export default function PurchaseRequisitionList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}TransferPurchaseRequisitionToPurchaseOrder?${queryParams}`);
+            const response = await fetch(`${setting.apipath}TransferPurchaseRequisitionToPurchaseOrder`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -477,7 +491,7 @@ export default function PurchaseRequisitionList() {
             getPurchaseRequisition();
             getPurchaseRequisitionDetail(purchaserequisitionuuidin);
             await new Promise(resolve => setTimeout(resolve, 500));
-            setStatusin(type);
+            // setStatusin(type);
         } catch (error: any) {
             setError(error.message);
         }
@@ -488,44 +502,6 @@ export default function PurchaseRequisitionList() {
     // useEffect(() => {
     //     getPurchaseRequisitionDetail(purchaserequisitionuuidin);
     // }, [statusin ]); // 依赖于这些状态
-
-
-
-    //結案
-    const ClosePR = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel: {
-                purchaserequisitionuuid: string | undefined
-            } = {
-                purchaserequisitionuuid: checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid as string | undefined,
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}ClosePR?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            getPurchaseRequisition();
-
-            getPurchaseRequisitionDetail(checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid);
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
 
 
 
@@ -550,26 +526,6 @@ export default function PurchaseRequisitionList() {
         }
     }
 
-    function handleClosePR() {
-        if (parseInt(transpoprogress.toString()) !== parseInt(totalreqprogress)) {
-            myAlert.warning({ title: '尚有項目未轉成採購' });
-        } else {
-            myAlert.confirm({
-                title: '確定結案?',
-                content: (
-                    <>
-                        <h1>轉為結案後將無法更改</h1>
-                    </>
-                ),
-                props: {
-                    onOk: () => {
-                        sentPRToReview("結案");
-                        // ClosePR();
-                    }
-                }
-            });
-        }
-    }
 
 
     // 編輯狀態控制
@@ -613,8 +569,8 @@ export default function PurchaseRequisitionList() {
             pathname: `/factoryDepartment/quotereqDetailList`,
             query: {
                 purchaserequisitionuuid: checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid,
-                quoterequuid: item.quoterequuid
-
+                quoterequuid: item.quoterequuid,
+                need_date: need_datein
 
             },
         });
@@ -1085,7 +1041,17 @@ export default function PurchaseRequisitionList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? statusin : status,
+                                            value: statusin,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="備註"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
                                         },
                                     }}
                                 />
@@ -1116,11 +1082,12 @@ export default function PurchaseRequisitionList() {
                                     <MyButton_v2 px='px22' py='py4' theme='danger' label="送出審核" onClick={() => { sentPRToReview("詢價") }} />
                                 </span>
                                 <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }}>
-                                    <button className={scss.graybtn} onClick={() => { myAlert.warning({ title: '詢價尚未完成' }) }}>送出審核</button>
+                                    <button className={scss.disabledbtn} onClick={() => { myAlert.warning({ title: '詢價尚未完成' }) }}>送出審核</button>
                                 </span>
                                 <span style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}>
                                     <button className={scss.redbtn} onClick={() => { sentPRToReview("核准") }}>核准</button>
                                 </span>
+                                &nbsp;
                                 <span style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}>
                                     <button className={scss.greenbutton} onClick={() => { sentPRToReview("駁回") }}>駁回</button>
                                 </span>
@@ -1128,7 +1095,7 @@ export default function PurchaseRequisitionList() {
                                     <button className={scss.redbtn} onClick={() => { sentPRToReview("結案") }}>結案</button>
                                 </span>
                                 <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
-                                    <button className={scss.graybtn}>已結案</button>
+                                    <button className={scss.disabledbtn}>已結案</button>
                                 </span>
                             </div>
                         </div>
@@ -1192,10 +1159,10 @@ export default function PurchaseRequisitionList() {
                                             <span>{_item.totalprice.toLocaleString()}</span>
                                             <span>{_item.suppliername}</span>
                                             <span>
-                                                <button onClick={() => { handleAddToList(_item) }} style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin =="已核准" ? '' : 'none'}` }}>
+                                                <button onClick={() => { handleAddToList(_item) }} style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? '' : 'none'}` }}>
                                                     <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
                                                 </button>
-                                                <button style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin =="已核准" ? 'none' : ''}` }}>
+                                                <button style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? 'none' : ''}` }}>
                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button>
                                             </span>

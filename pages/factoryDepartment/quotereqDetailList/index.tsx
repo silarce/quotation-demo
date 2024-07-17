@@ -46,7 +46,8 @@ export default function QuotereqDetailList() {
         create_at,
         create_by,
         approved,
-        quoterequuid
+        quoterequuid,
+        need_date
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -161,12 +162,14 @@ export default function QuotereqDetailList() {
 
             await new Promise(resolve => setTimeout(resolve, 500));
             setPurchaserequisitionidin(data[0].purchaserequisitionid);
+            setPurchaserequisitionuuidin(purchaserequisitionuuid);
             setQuotereqname(data[0].name);
             setQuotereqspec(data[0].spec);
             setQuotereqquantity(data[0].quantity);
             getQuotereqDetail(data[0].quoterequuid);
             setQuoterequnit(data[0].unit);
             setquoterequuidin(data[0].quoterequuid)
+
             // alert(data[0].quoterequuid);
 
         } catch (error: any) {
@@ -233,7 +236,7 @@ export default function QuotereqDetailList() {
 
     //加入詢價廠商
     const [prquotereqadddata, setPrquotereqadddata] = useState({
-        // id: "",id 自增長不用寫入
+
         quoterequuid: "",
         quotereqid: "",
         unitprice: "",
@@ -262,6 +265,9 @@ export default function QuotereqDetailList() {
         prquotereqadddata.unitprice = "";
         prquotereqadddata.totalprice = "";
         prquotereqadddata.suppliername = "";
+        prquotereqadddata.supplieraddress = "";
+        prquotereqadddata.supplierphone = "";
+        prquotereqadddata.suppliertaxid = "";
         prquotereqadddata.deliverydate = moment();
         prquotereqadddata.unit = "";
         prquotereqadddata.note = "";
@@ -323,16 +329,21 @@ export default function QuotereqDetailList() {
 
     //寫入詢價單明細
     const addQuotereqDetail = async () => {
+
+        let deliverydate = prquotereqadddata.deliverydate.startOf('day');
+        let needdate = moment(need_date).startOf('day');
+
+        // return;
         try {
-            // alert("cc");
             if (prquotereqadddata.suppliername === "" || prquotereqadddata.suppliername === undefined || prquotereqadddata.suppliername === null ||
                 prquotereqadddata.unitprice === "" || prquotereqadddata.unitprice === undefined || prquotereqadddata.unitprice === null ||
                 prquotereqadddata.totalprice === "" || prquotereqadddata.totalprice === undefined || prquotereqadddata.totalprice === null ||
-                prquotereqadddata.deliverydate < moment() || prquotereqadddata.deliverydate === null || prquotereqadddata.deliverydate === undefined
+                deliverydate > needdate || prquotereqadddata.deliverydate === null || prquotereqadddata.deliverydate === undefined
+
             ) {
                 myAlert.err({
                     title: "請檢查輸入是否正確!!!",
-                    content: "請檢查欄位是否正確或交貨日期是否小於今天日期"
+                    content: "交貨日期不可小於今日也不可超過需用日"
                 })
                 return;
             }
@@ -368,7 +379,7 @@ export default function QuotereqDetailList() {
             // 加入詢價單明細後重新取詢價單明細
             // alert(prquotereqadddata.quoterequuid);
             // alert(quoterequuid)
-
+            getPurchaseRequisitionDetail(purchaserequisitionidin);
             getQuotereqDetail(quoterequuidin);
 
         } catch (error: any) {
@@ -490,15 +501,13 @@ export default function QuotereqDetailList() {
                 </div>
                 <div className={scss.right}>
                     <div className={scss.tite_main}>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
                             <span style={{ fontSize: '18px', color: '#14256a' }}>品名：</span><span style={{ fontSize: '18px' }}>{quotereqname}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                             <span style={{ fontSize: '18px', color: '#14256a' }}>規格：</span><span style={{ fontSize: '18px' }}>{quotereqspec}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                             <span style={{ fontSize: '18px', color: '#14256a' }}>數量：</span><span style={{ fontSize: '18px' }}>{quotereqquantity}</span>&nbsp;&nbsp;&nbsp;&nbsp;
                             <span style={{ fontSize: '18px', color: '#14256a' }}>單位：</span><span style={{ fontSize: '18px' }}>{quoterequnit}</span>
+                            <span style={{ fontSize: '18px', color: '#14256a' }}>需用日：</span><span style={{ fontSize: '18px' }}>{getTaiwanDateStr(moment(need_date).toString())}</span>
                             {/* <span style={{ fontSize: '18px', color: '#14256a' }}>歷史單價：</span><span style={{ fontSize: '18px' }}>{quotereqquantity}</span> */}
-                        </div>
-                        <div>
-
                         </div>
                     </div>
                     <div className={scss.head_main}>
@@ -514,6 +523,7 @@ export default function QuotereqDetailList() {
                                     },
                                 }}
                             />
+                            {/* <button>編輯</button> */}
                         </div>
                         <div style={{ marginRight: '20px' }}>
                             <InputSel
@@ -538,7 +548,7 @@ export default function QuotereqDetailList() {
                                 inputProps={{
                                     props: {
                                         value: prquotereqadddata.supplieraddress,
-                                        onChange: (e) => handlequotereqChange('totalprice', e.target.value.trim())
+                                        onChange: (e) => handlequotereqChange('supplieraddress', e.target.value.trim())
                                     },
                                 }}
                             />
@@ -551,7 +561,7 @@ export default function QuotereqDetailList() {
                                 inputProps={{
                                     props: {
                                         value: prquotereqadddata.supplierphone,
-                                        onChange: (e) => handlequotereqChange('totalprice', e.target.value.trim())
+                                        onChange: (e) => handlequotereqChange('supplierphone', e.target.value.trim())
                                     },
                                 }}
                             />
@@ -564,7 +574,7 @@ export default function QuotereqDetailList() {
                                 inputProps={{
                                     props: {
                                         value: prquotereqadddata.suppliertaxid,
-                                        onChange: (e) => handlequotereqChange('totalprice', e.target.value.trim())
+                                        onChange: (e) => handlequotereqChange('suppliertaxid', e.target.value.trim())
                                     },
                                 }}
                             />
@@ -625,6 +635,10 @@ export default function QuotereqDetailList() {
                             </span>
                         </div>
                         <br />
+                        {/* <button className={scss.minibtn} onClick={() => {alert("廠商查詢")}}>
+                            廠商查詢
+                        </button> */}
+
                     </div>
                     <div className={scss.content_main_content}>
                         <Thead01 type={'Quotereq'} />

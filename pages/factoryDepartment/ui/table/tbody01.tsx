@@ -236,7 +236,9 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         supplieraddress: item.supplieraddress,
         supplierphone: item.supplierphone,
         invoice: item.invoice,
-        firstin: 1
+        firstin: 1,
+        status: item.status,
+        note: item.note
       }
     })
   }
@@ -287,7 +289,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       }
     })
   }
-  
+
   //#region 請購單
   //請購單
   async function GetPurchaseRequisition(item: any) {
@@ -300,7 +302,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         create_by: item.create_by,
         approved: item.approved,
         status: item.status,
-        need_date:item.need_date,
+        need_date: item.need_date,
+        note: item.note,
         firstin: 1
       }
     })
@@ -571,7 +574,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.purchaseorderid}</span>
                 <span>{_item.totalprice.toLocaleString()}</span>
-                <span style={{ color: '#ea1833'}}>{_item.status}</span>
+                <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
                 {/* <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>未結</span>
                 <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已結</span> */}
                 <span ><IconDetail onClick={() => { GetPurchaseOrder(_item) }} /></span>
@@ -681,8 +684,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.purchaserequisitionid}</span>
                 {/* <span>{_item.totalprice.toLocaleString()}</span> */}
-                <span style={{ color: '#ea1833', display: `${_item.approved === false ? "" : "none"}` }}>{_item.status}</span>
-                <span style={{ color: '#14256a', display: `${_item.approved === true ? "" : "none"}` }}>已結</span>
+                <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
                 {/* <span>{_item.create_by}</span> */}
                 <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span>
               </div>

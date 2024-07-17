@@ -359,10 +359,10 @@ export default function AddPurchaseRequisition() {
 
     // 送出按鈕
     function handleAddPR() {
-        // TransferPurchaseOrderToProductReceipt();
         if (data2.length === 0) {
             myAlert.warning({ title: "尚未加入任何請購項目" });
-        } else {
+        }
+        else {
             // 檢查是否有任何一筆的 quantity 為 0
             const hasZeroQuantity = data2.some(item => item.quantity === 0);
 
@@ -653,17 +653,17 @@ export default function AddPurchaseRequisition() {
                                         value={note}
                                         onChange={(e) => { setNote(e.target.value) }}
                                     ></textarea> */}
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="備註"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: note,
-                                                onChange: (e) => { setNote(e.target.value) }
-                                            },
-                                        }}
-                                    />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="備註"
+                                    disabled={false}
+                                    inputProps={{
+                                        props: {
+                                            value: note,
+                                            onChange: (e) => { setNote(e.target.value) }
+                                        },
+                                    }}
+                                />
                                 {/* </span> */}
                             </div>
                             <div></div>
