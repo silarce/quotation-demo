@@ -38,7 +38,7 @@ import QuotationPdf_part, {
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
 
-import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
+import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
 
 // global gear
 import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -1899,13 +1899,14 @@ latestContentProdArr為這次追加追減的主產品
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
-        forbidden={status === 'Pending' && isSendToReview_pending}
-        close={() => setReviewFormShow(false)}
-        contractIdNumber={quotationData?.latestContent.quotationNumber ?? ''}
-        contractName={quotationData?.latestContent.projectName ?? ''}
-        contractPrice={Number(state_summary.total.replaceAll(',', ''))}
-        lastestContentId={lastestContentId}
-        verifyForm={verifyForm}
+        readOnly={status === 'Pending' && isSendToReview_pending}
+        onCancel={() => setReviewFormShow(false)}
+        // contractNumber={quotationData?.latestContent.quotationNumber ?? ''}
+        // projectName={quotationData?.latestContent.projectName ?? ''}
+        // totalPrice={Number(state_summary.total.replaceAll(',', ''))}
+        // contentId={lastestContentId}
+        quotationId={quotationData?.id}
+        // verifyForm={verifyForm}
         onConfirm={async () => {
           setIsLoading(true);
           await update();

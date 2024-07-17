@@ -52,7 +52,7 @@
   z-index: 1;
   box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.2);
 
-  &.forbidden {
+  &.readOnly {
     visibility: hidden;
     height: 0px;
   }
@@ -60,7 +60,7 @@
 
 .title {
   margin-top: 30px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   color: theme("colors.main");
   text-align: center;
   font-size: 30px;
@@ -70,8 +70,8 @@
 .subTitle {
   display: grid;
   grid-template-columns: 72px auto;
-  gap: 20px 24px;
-  margin-bottom: 34px;
+  gap: 5px 24px;
+  margin-bottom: 15px;
   > span {
     font-size: 18px;
     font-weight: 400;
@@ -84,7 +84,7 @@
 .list {
   display: grid;
   grid-template-columns: 20px auto;
-  gap: 30px 6px;
+  gap: 15px 6px;
   .numIndex {
     height: fit-content;
     transform: translateY(2px);
@@ -109,6 +109,9 @@
   input {
     width: 100%;
   }
+  textarea {
+    resize: none;
+  }
 }
 
 .payMethodContainer {
@@ -119,17 +122,22 @@
   .payMethod {
     display: grid;
     grid-template-columns: auto fit-content(100%);
+    // align-items: center;
     > div:nth-of-type(1) {
       display: grid;
-      grid-template-columns: auto 60px 100px 233px;
+      grid-template-columns: auto 80px 100px 300px;
       gap: 16px;
       margin-right: 6px;
+      input {
+        height: fit-content;
+      }
     }
     > div:nth-of-type(2) {
       display: flex;
       flex-wrap: nowrap;
       gap: 6px;
       width: 42px;
+      margin-top: 5px;
       > svg {
         cursor: pointer;
       }

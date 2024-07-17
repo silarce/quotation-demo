@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 // layer
@@ -9,6 +9,8 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 
 // components
 import ContractList from 'components/page/domestic/contract/contractList';
+// composition
+import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
 
 // option
 import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistrict';
@@ -16,6 +18,8 @@ import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistr
 
 // api
 import { useContract_infinite } from 'js/api/api_quotation';
+
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // ===========================================
 
@@ -34,6 +38,12 @@ export default function Contract() {
     customerName: string | undefined;
     projectName: string | undefined;
   };
+
+  // --------------------------------------------------
+
+  const [activeContractId, setActiveContractId] = useState<string>();
+
+  // --------------------------------------------------
 
   const params = {
     sort: 'contractNumber',
@@ -114,21 +124,41 @@ export default function Contract() {
   // ===================================================
 
   const contractList =
-    dataArr?.map((item, index) => {
-      const content = item.content;
+    dataArr?.map((contract, index) => {
+      const { id: contractId, content } = contract;
+
+      const { managerReviewedAt } = content;
+
+      const verifyFormText = managerReviewedAt ? '已審核完畢' : '未審核完畢';
 
       return {
-        id: item.id,
+        id: contract.id,
         // quotationId: content.quotationNumber,
-        quotationId: item.contractNumber ?? '',
-        clientName: content.customer?.name ?? '',
+        quotationId: contract.contractNumber ?? '---',
+        clientName: content.customer?.name ?? '---',
         quotationName: content.projectName,
-        discount: item.discount,
-        priceTotal: String(item.total),
+        discount: contract.discount,
+        priceTotal: String(contract.total),
         contactPerson: content.contactPerson,
         contactPhone: content.contactNumber,
-        attn: content.agentEmployee?.chName ?? '',
+        attn: content.agentEmployee?.chName ?? '---',
+        verifyForm: (
+          <span
+            className="cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveContractId(contractId);
+            }}
+          >
+            <span style={{ color: !managerReviewedAt ? 'red' : undefined }}>{verifyFormText}</span>
+            <IconDetail className="inline-block" />
+          </span>
+        ),
         viewRef_bottom: index === dataArr.length - 5 ? viewRef_bottom : undefined,
+        href: {
+          pathname: `/domestic/contract/quotation`,
+          query: { id: contractId, version: 1 },
+        },
       };
     }) ?? [];
 
@@ -138,8 +168,16 @@ export default function Contract() {
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div>
-        <ContractList contractList={contractList} />
+        <ContractList contractList={contractList} setActiveContractId={setActiveContractId} />
       </div>
+
+      <ContractReviewForm
+        showModal={!!activeContractId}
+        readOnly={true}
+        contractId={activeContractId}
+        isInContract={true}
+        onCancel={() => setActiveContractId(undefined)}
+      />
     </SubLayer>
   );
 }
