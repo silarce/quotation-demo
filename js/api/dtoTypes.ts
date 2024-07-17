@@ -2681,12 +2681,21 @@ export type TquotationVerifyFormDto = {
   warrantyPayment: boolean;
   // 保固金或保固票備註
   warrantyPaymentNote: string | null;
+
   // 防火證明
   fireproofCertificate: boolean;
   // 防火證明%數
   fireproofCertificatePercent: number | null;
   // 防火證明備註
   fireproofCertificateNote: string | null;
+
+  // 出廠證明
+  factoryCertificate: boolean;
+  // 出廠證明%數
+  factoryCertificatePercent?: number | null;
+  // 出廠證明備註
+  factoryCertificateNote?: string | null;
+
   // 保固書
   warranty: boolean;
   // 保證書%數
@@ -2723,6 +2732,10 @@ export type TcreateQuotationVerifyFormDto = Pick<
   | 'fireproofCertificate'
   | 'fireproofCertificateNote'
   | 'fireproofCertificatePercent'
+  //
+  | 'factoryCertificate'
+  | 'factoryCertificatePercent'
+  | 'factoryCertificateNote'
   //
   | 'warranty'
   | 'warrantyNote'

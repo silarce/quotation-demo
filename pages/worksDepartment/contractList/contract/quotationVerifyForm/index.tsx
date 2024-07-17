@@ -6,7 +6,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
-import { ReviewForm } from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
+import { ReviewForm } from 'components/composition/contractReviewForm/contractReviewForm';
 
 // api
 // import { useGetEngineeringContact } from 'js/api/api_engineering';
@@ -69,14 +69,15 @@ export default function QuotationVerifyForm() {
 
       <div className="w-[1000px]">
         <ReviewForm
-          forbidden={true}
-          close={() => {}}
-          contractIdNumber={contractNumber ?? ''}
-          contractName={projectName ?? ''}
-          contractPrice={total ?? 0}
-          lastestContentId={undefined}
-          verifyForm={verifyForm}
+          contractId={contract?.id}
+          readOnly={true}
+          onCancel={() => {}}
           onConfirm={() => {}}
+          // contractNumber={contractNumber ?? ''}
+          // projectName={projectName ?? ''}
+          // totalPrice={total ?? 0}
+          // contentId={undefined}
+          // verifyForm={verifyForm}
         />
       </div>
     </SubLayer>
