@@ -61,7 +61,7 @@ import {
 } from 'js/api/dtoTypes';
 
 // utils
-import { dlPdf } from 'js/utils/helpers/dlPdf';
+import { dlPdf, calcHeight_a4 } from 'js/utils/dlPdf';
 
 // ============================================================================
 
@@ -115,8 +115,17 @@ type TreviewerList = {
 export type { TpaymentRatio };
 
 // ============================================================================
-
-const pdfHeight = 1400;
+// calcHeight_a4
+const bodyWidth = 1000;
+const bodyHeight = calcHeight_a4(bodyWidth);
+const bodyPaddingTop = 30;
+const bodyPaddingBottom = 25;
+const style_body = {
+  width: `${bodyWidth}px`,
+  height: `${bodyHeight}px`,
+  paddingTop: `${bodyPaddingTop}px`,
+  paddingBottom: `${bodyPaddingBottom}px`,
+};
 
 // ============================================================================
 
@@ -175,6 +184,8 @@ function ReviewForm({
   let disabled = stateObj_disabled[0];
   const setDisabled = stateObj_disabled[1];
   readOnly && (disabled = true);
+
+  const [forceRender, setForceRender] = useState(0);
 
   // ----------------------------------------------------------------------------
 
@@ -383,7 +394,8 @@ function ReviewForm({
       }
 
       await update();
-      onConfirm && onConfirm();
+      onConfirm && (await onConfirm());
+      setDisabled(true);
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '送出合約審核表失敗', content: err?.message });
@@ -429,8 +441,8 @@ function ReviewForm({
     await reqSubmitContracting();
 
     // close?.();
-    onConfirm && (await onConfirm());
-    setDisabled(true);
+    // onConfirm && (await onConfirm());
+    // setDisabled(true);
   };
 
   const handle_review = () => {
@@ -460,6 +472,10 @@ function ReviewForm({
         </div>
       ),
     });
+  };
+
+  const handle_dlPdf = () => {
+    ref_pdf.current?.dlPdf(`合約審核表_${contractNumber}_${projectName}`);
   };
 
   // ----------------------------------------------------------------------------
@@ -689,6 +705,16 @@ function ReviewForm({
 
   // ----------------------------------------------------------------------------
 
+  useEffect(() => {
+    // 為了確保匯出時ref的值是新的，
+    // 這個做法髒髒的，希望未來能找到更好的解法
+    setTimeout(() => {
+      setForceRender((state) => state + 1);
+    }, 10);
+  }, [data_contract, data_quotation, data_quotationContent, disabled]);
+
+  // ----------------------------------------------------------------------------
+
   // MARK: RENDER
 
   return (
@@ -707,7 +733,7 @@ function ReviewForm({
 
         {disabled && (
           <>
-            <MyButton_v2 px="px22" py="py4" onClick={() => ref_pdf.current?.dlPdf('fooooo')}>
+            <MyButton_v2 px="px22" py="py4" onClick={handle_dlPdf}>
               匯出
             </MyButton_v2>
             {isReviewer && isInContract && (
@@ -722,7 +748,12 @@ function ReviewForm({
         )}
       </div>
 
-      <Body>
+      <Body
+        style={{
+          ...style_body,
+          height: 'auto',
+        }}
+      >
         <div ref={ref_head} className={scss.head}>
           <p className={scss.title}>合約審核表</p>
           {/*  */}
@@ -789,7 +820,7 @@ function ReviewForm({
               prefix="備註 :"
               disabled={disabled}
               inputAttr={{
-                placeholder: '請輸入備註',
+                placeholder: '',
                 value: watchData.paymentDateNote ?? '',
                 onChange: (e) => {
                   setValue('paymentDateNote', e.target.value);
@@ -873,7 +904,7 @@ function ReviewForm({
               prefix="備註 :"
               inputAttr={{
                 disabled: disabled,
-                placeholder: '請輸入備註',
+                placeholder: '',
 
                 value: watchData.paymentTenorNote ?? '',
                 onChange: (e) => {
@@ -906,7 +937,7 @@ function ReviewForm({
                 onChange: (e) => {
                   setValue('performanceBondNote', e.target.value);
                 },
-                placeholder: '請輸入備註',
+                placeholder: '',
               }}
             />
             <p className="text-[13px] text-[red] m-0">嚴禁使用商業本票</p>
@@ -931,7 +962,7 @@ function ReviewForm({
               prefix="備註 :"
               inputAttr={{
                 disabled: disabled,
-                placeholder: '請輸入備註',
+                placeholder: '',
                 value: watchData.depositPaymentNote ?? '',
                 onChange: (e) => {
                   setValue('depositPaymentNote', e.target.value);
@@ -997,7 +1028,7 @@ function ReviewForm({
                 onChange: (e) => {
                   setValue('warrantyPaymentNote', e.target.value);
                 },
-                placeholder: '請輸入備註',
+                placeholder: '',
               }}
             />
           </div>
@@ -1045,7 +1076,7 @@ function ReviewForm({
               prefix="備註 :"
               inputAttr={{
                 disabled: disabled,
-                placeholder: '請輸入備註',
+                placeholder: '',
                 value: watchData.fireproofCertificateNote ?? '',
                 onChange: (e) => {
                   setValue('fireproofCertificateNote', e.target.value);
@@ -1097,7 +1128,7 @@ function ReviewForm({
               prefix="備註 :"
               inputAttr={{
                 disabled: disabled,
-                placeholder: '請輸入備註',
+                placeholder: '',
                 value: watchData.factoryCertificateNote ?? '',
                 onChange: (e) => {
                   setValue('factoryCertificateNote', e.target.value);
@@ -1148,7 +1179,7 @@ function ReviewForm({
               prefix="備註 :"
               inputAttr={{
                 disabled: disabled,
-                placeholder: '請輸入備註',
+                placeholder: '',
                 value: watchData.warrantyNote ?? '',
                 onChange: (e) => {
                   setValue('warrantyNote', e.target.value);
@@ -1178,7 +1209,7 @@ function ReviewForm({
               prefix="備註 :"
               inputAttr={{
                 disabled: disabled,
-                placeholder: '請輸入備註',
+                placeholder: '',
                 value: watchData.testDriveNote ?? '',
                 onChange: (e) => {
                   setValue('testDriveNote', e.target.value);
@@ -1195,11 +1226,16 @@ function ReviewForm({
             <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
             <br />
             <div className={classNames(scss.textaraeBox, disabled && scss.disabled)}>
-              <textarea
-                disabled={disabled}
-                className="w-full resize-none"
-                placeholder="請輸入"
-                {...register('debitItem')}
+              {/* <textarea disabled={disabled} className="w-full resize-none" placeholder="" {...register('debitItem')} /> */}
+              <InputBox
+                boxStyle={{ width: '100%' }}
+                textareaProps={{
+                  ...register('debitItem'),
+
+                  disabled: disabled,
+                  minRows: disabled ? undefined : 3,
+                  placeholder: '',
+                }}
               />
             </div>
             <InputBox
@@ -1208,7 +1244,7 @@ function ReviewForm({
               inputAttr={{
                 disabled: disabled,
 
-                placeholder: '請輸入備註',
+                placeholder: '',
               }}
             />
           </div>
@@ -1242,7 +1278,6 @@ function ReviewForm({
       <br />
       <br />
       <br />
-
       <PDFBody ref={ref_pdf} ref_head={ref_head} ref_itemArr={ref_itemArr} />
 
       {/*  */}
@@ -1272,7 +1307,6 @@ const Body_pre = (props: React.HTMLAttributes<HTMLDivElement>, ref: React.Ref<HT
       {...attr}
       className={classNames(scss.body, attr.className)}
       style={{
-        height: `${pdfHeight}px`,
         ...attr.style,
       }}
     >
@@ -1290,9 +1324,6 @@ const Item_pre = (props: React.HTMLAttributes<HTMLDivElement>, ref: React.Ref<HT
     </div>
   );
 };
-
-const Body = forwardRef(Body_pre);
-const Item = forwardRef(Item_pre);
 
 const InputBox = ({
   prefix,
@@ -1367,7 +1398,7 @@ const Row = ({
             disabled: disabled,
             value: title.value,
             onChange: title.onChange,
-            placeholder: '請輸入標題',
+            placeholder: '',
           }}
         />
         <InputBox
@@ -1397,7 +1428,7 @@ const Row = ({
             disabled: disabled,
             value: note.value,
             onChange: note.onChange,
-            placeholder: '請輸入備註',
+            placeholder: '',
           }}
           // inputAttr={{
           //   disabled: disabled,
@@ -1553,7 +1584,7 @@ const PDFBody_pre = (
   // -----------------------------------------------------------------------
   // 將頁面分割，避免A4超出範圍
   type TrefArr = (HTMLDivElement | null)[];
-  const allowHeight = pdfHeight;
+  const allowHeight = bodyHeight - bodyPaddingTop - bodyPaddingBottom;
   let remainHeight = allowHeight;
   const pageArr: TrefArr[] = [];
   let refArr: TrefArr = [];
@@ -1592,10 +1623,15 @@ const PDFBody_pre = (
   // -----------------------------------------------------------------------
 
   return (
-    <div>
+    <div className={scss.pdfBody}>
       {pageArr.map((page, index) => {
         return (
-          <Body ref={(ele) => (ref_pdf.current[index] = ele!)} key={index}>
+          <Body
+            //
+            style={style_body}
+            ref={(ele) => (ref_pdf.current[index] = ele!)}
+            key={index}
+          >
             {page.map((item, index) => {
               return <div key={index} dangerouslySetInnerHTML={{ __html: item?.outerHTML || '' }} />;
             })}
@@ -1606,6 +1642,8 @@ const PDFBody_pre = (
   );
 };
 
+const Body = forwardRef(Body_pre);
+const Item = forwardRef(Item_pre);
 const PDFBody = forwardRef(PDFBody_pre);
 
 // endregion COMPONENT
