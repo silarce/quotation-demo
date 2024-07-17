@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect, useMemo, useContext, forwardRef } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
@@ -122,7 +122,8 @@ function ContractReviewForm({
       centered={true}
       destroyOnClose={true}
       footer={null}
-      width="1000px"
+      // width="1000px"
+      width="fit-content"
       onCancel={props_reviewForm.onCancel}
     >
       <ReviewForm {...props_reviewForm} />
@@ -224,7 +225,6 @@ Tprops_reviewForm) {
   };
 
   const {
-    //
     contractNumber,
     projectName,
     totalPrice,
@@ -705,460 +705,498 @@ Tprops_reviewForm) {
         )}
       </div>
 
-      <p className={scss.title}>合約審核表</p>
-      {/*  */}
-      <div className={scss.subTitle}>
-        <span>合約編號</span>
-        <span>{contractNumber}</span>
-        <span>工程名稱</span>
-        <span>{projectName}</span>
-      </div>
-      {/*  */}
-      <div className={scss.list}>
+      <div className={scss.body}>
+        <div className={scss.head}>
+          <p className={scss.title}>合約審核表</p>
+          {/*  */}
+          <div className={scss.subTitle}>
+            <span>合約編號</span>
+            <span>{contractNumber}</span>
+            <span>工程名稱</span>
+            <span>{projectName}</span>
+          </div>
+        </div>
+        {/*  */}
+
         {/* 1 */}
-        <div className={scss.numIndex}>1</div>
-        <div>
-          <span>註明請款日</span>
-          <InputSel
-            className={scss.date}
-            disabled={disabled}
-            inputProps={{
-              props: {
-                value: watchData.askForPaymentDate ?? '',
-                onChange: (e) => {
-                  const str = e.target.value;
-
-                  if (str === '') {
-                    setValue('askForPaymentDate', str);
-                  } else {
-                    let num = parseInt(str);
-                    num = Math.abs(num);
-                    setValue('askForPaymentDate', String(num));
-                  }
-                },
-                type: 'number',
-              },
-            }}
-          />
-          <span>，放款日</span>
-          <InputSel
-            className={scss.date}
-            disabled={disabled}
-            inputProps={{
-              props: {
-                value: watchData.disbursementDate ?? '',
-                onChange: (e) => {
-                  const str = e.target.value;
-
-                  if (str === '') {
-                    setValue('disbursementDate', str);
-                  } else {
-                    let num = parseInt(str);
-                    num = Math.abs(num);
-                    setValue('disbursementDate', String(num));
-                  }
-                },
-                type: 'number',
-              },
-            }}
-          />
-
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            disabled={disabled}
-            inputAttr={{
-              placeholder: '請輸入備註',
-              value: watchData.paymentDateNote ?? '',
-              onChange: (e) => {
-                setValue('paymentDateNote', e.target.value);
-              },
-            }}
-          />
-        </div>
-
-        {/* 2 */}
-        <div className={scss.numIndex}>2</div>
-        <div className={scss.item2}>
+        <Item>
+          <div className={scss.numIndex}>1</div>
           <div>
-            <span>確定請款比例</span>
-            <InputBox disabled={true} inputAttr={{ className: 'pl-4', value: allPercentStr }} />
-          </div>
-          <div className={scss.payMethodContainer}>
-            {Object.values(payMethodList).map((item, index, arr) => {
-              let onDel = arr.length > 1 ? item.delSelf : undefined;
-
-              if (disabled) {
-                onDel = undefined;
-              }
-
-              return (
-                <Row
-                  key={index}
-                  disabled={disabled}
-                  onAdd={disabled ? undefined : addMethod}
-                  onDel={onDel}
-                  serialNumber={index + 1}
-                  title={{
-                    value: item.title,
-                    onChange: (e) => {
-                      item.title = e.target.value;
-                    },
-                  }}
-                  percent={{
-                    value: item.percent,
-                    onChange: (e) => {
-                      item.percent = e.target.value;
-                    },
-                  }}
-                  price={{
-                    value: item.price,
-                  }}
-                  note={{
-                    value: item.note,
-                    onChange: (e) => {
-                      item.note = e.target.value;
-                    },
-                  }}
-                />
-              );
-            })}
-          </div>
-        </div>
-        {/* 3 */}
-        <div className={scss.numIndex}>3</div>
-        <div>
-          <div className={scss.paymentTenor}>
-            <span>合理的放款票期</span>
+            <span>註明請款日</span>
             <InputSel
+              className={scss.date}
               disabled={disabled}
               inputProps={{
                 props: {
-                  value: watchData.paymentTenor ?? '',
+                  value: watchData.askForPaymentDate ?? '',
                   onChange: (e) => {
-                    setValue('paymentTenor', e.target.value);
+                    const str = e.target.value;
+
+                    if (str === '') {
+                      setValue('askForPaymentDate', str);
+                    } else {
+                      let num = parseInt(str);
+                      num = Math.abs(num);
+                      setValue('askForPaymentDate', String(num));
+                    }
                   },
+                  type: 'number',
+                },
+              }}
+            />
+            <span>，放款日</span>
+            <InputSel
+              className={scss.date}
+              disabled={disabled}
+              inputProps={{
+                props: {
+                  value: watchData.disbursementDate ?? '',
+                  onChange: (e) => {
+                    const str = e.target.value;
+
+                    if (str === '') {
+                      setValue('disbursementDate', str);
+                    } else {
+                      let num = parseInt(str);
+                      num = Math.abs(num);
+                      setValue('disbursementDate', String(num));
+                    }
+                  },
+                  type: 'number',
+                },
+              }}
+            />
+
+            <InputBox
+              className="mt-1 w-full"
+              prefix="備註 :"
+              disabled={disabled}
+              inputAttr={{
+                placeholder: '請輸入備註',
+                value: watchData.paymentDateNote ?? '',
+                onChange: (e) => {
+                  setValue('paymentDateNote', e.target.value);
                 },
               }}
             />
           </div>
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            inputAttr={{
-              disabled: disabled,
-              placeholder: '請輸入備註',
+        </Item>
 
-              value: watchData.paymentTenorNote ?? '',
-              onChange: (e) => {
-                setValue('paymentTenorNote', e.target.value);
-              },
-            }}
-          />
-        </div>
-        {/* 4 */}
-        <div className={scss.numIndex}>4</div>
-        <div>
-          <RadioContainer
-            disabled={disabled}
-            label={'是否出具履約保證票'}
-            labelClassName="mr-[48px]"
-            value={watchData.performanceBond}
-            onChange={(v) => {
-              setValue('performanceBond', v);
-            }}
-          />
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            inputAttr={{
-              disabled: disabled,
-              value: watchData.performanceBondNote ?? '',
-              onChange: (e) => {
-                setValue('performanceBondNote', e.target.value);
-              },
-              placeholder: '請輸入備註',
-            }}
-          />
-          <p className="text-[13px] text-[red] m-0">嚴禁使用商業本票</p>
-        </div>
-        {/* 5 */}
-        <div className={scss.numIndex}>5</div>
-        <div>
-          <RadioContainer
-            disabled={disabled}
-            label={'是否可請訂金款'}
-            labelClassName="mr-[75px]"
-            value={watchData.depositPayment}
-            onChange={(v) => {
-              setValue('depositPayment', v);
-            }}
-          />
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            inputAttr={{
-              disabled: disabled,
-              placeholder: '請輸入備註',
-              value: watchData.depositPaymentNote ?? '',
-              onChange: (e) => {
-                setValue('depositPaymentNote', e.target.value);
-              },
-            }}
-          />
-        </div>
-        {/* 6 */}
-        <div className={scss.numIndex}>6</div>
-        <div>
-          <InputBox
-            prefix="合理的保固期 :"
-            suffix="年"
-            boxStyle={{ width: '160px' }}
-            inputAttr={{
-              disabled: disabled,
-              value: watchData.warrantyPeriod ?? '',
-              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                const value = e.target.value;
+        {/* 2 */}
+        <Item>
+          <div className={scss.numIndex}>2</div>
+          <div className={scss.item2}>
+            <div>
+              <span>確定請款比例</span>
+              <InputBox disabled={true} inputAttr={{ className: 'pl-4', value: allPercentStr }} />
+            </div>
+            <div className={scss.payMethodContainer}>
+              {Object.values(payMethodList).map((item, index, arr) => {
+                let onDel = arr.length > 1 ? item.delSelf : undefined;
 
-                if (!value.includes('.')) {
-                  setValue('warrantyPeriod', Number(value), { shouldValidate: true });
+                if (disabled) {
+                  onDel = undefined;
                 }
-              },
-              type: 'number',
-              className: 'text-center',
-            }}
-          />
 
-          <InputBox
-            prefix="備註 :"
-            className="mt-1 w-full"
-            inputAttr={{
-              disabled: disabled,
-              ...register('note'),
-            }}
-          />
-        </div>
+                return (
+                  <Row
+                    key={index}
+                    disabled={disabled}
+                    onAdd={disabled ? undefined : addMethod}
+                    onDel={onDel}
+                    serialNumber={index + 1}
+                    title={{
+                      value: item.title,
+                      onChange: (e) => {
+                        item.title = e.target.value;
+                      },
+                    }}
+                    percent={{
+                      value: item.percent,
+                      onChange: (e) => {
+                        item.percent = e.target.value;
+                      },
+                    }}
+                    price={{
+                      value: item.price,
+                    }}
+                    note={{
+                      value: item.note,
+                      onChange: (e) => {
+                        item.note = e.target.value;
+                      },
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </Item>
+
+        {/* 3 */}
+        <Item>
+          <div className={scss.numIndex}>3</div>
+          <div>
+            <div className={scss.paymentTenor}>
+              <span>合理的放款票期</span>
+              <InputSel
+                disabled={disabled}
+                inputProps={{
+                  props: {
+                    value: watchData.paymentTenor ?? '',
+                    onChange: (e) => {
+                      setValue('paymentTenor', e.target.value);
+                    },
+                  },
+                }}
+              />
+            </div>
+            <InputBox
+              className="mt-1 w-full"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: disabled,
+                placeholder: '請輸入備註',
+
+                value: watchData.paymentTenorNote ?? '',
+                onChange: (e) => {
+                  setValue('paymentTenorNote', e.target.value);
+                },
+              }}
+            />
+          </div>
+        </Item>
+        {/* 4 */}
+
+        <Item>
+          <div className={scss.numIndex}>4</div>
+          <div>
+            <RadioContainer
+              disabled={disabled}
+              label={'是否出具履約保證票'}
+              labelClassName="mr-[48px]"
+              value={watchData.performanceBond}
+              onChange={(v) => {
+                setValue('performanceBond', v);
+              }}
+            />
+            <InputBox
+              className="mt-1 w-full"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: disabled,
+                value: watchData.performanceBondNote ?? '',
+                onChange: (e) => {
+                  setValue('performanceBondNote', e.target.value);
+                },
+                placeholder: '請輸入備註',
+              }}
+            />
+            <p className="text-[13px] text-[red] m-0">嚴禁使用商業本票</p>
+          </div>
+        </Item>
+
+        {/* 5 */}
+        <Item>
+          <div className={scss.numIndex}>5</div>
+          <div>
+            <RadioContainer
+              disabled={disabled}
+              label={'是否可請訂金款'}
+              labelClassName="mr-[75px]"
+              value={watchData.depositPayment}
+              onChange={(v) => {
+                setValue('depositPayment', v);
+              }}
+            />
+            <InputBox
+              className="mt-1 w-full"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: disabled,
+                placeholder: '請輸入備註',
+                value: watchData.depositPaymentNote ?? '',
+                onChange: (e) => {
+                  setValue('depositPaymentNote', e.target.value);
+                },
+              }}
+            />
+          </div>
+        </Item>
+
+        {/* 6 */}
+        <Item>
+          <div className={scss.numIndex}>6</div>
+          <div>
+            <InputBox
+              prefix="合理的保固期 :"
+              suffix="年"
+              boxStyle={{ width: '160px' }}
+              inputAttr={{
+                disabled: disabled,
+                value: watchData.warrantyPeriod ?? '',
+                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                  const value = e.target.value;
+
+                  if (!value.includes('.')) {
+                    setValue('warrantyPeriod', Number(value), { shouldValidate: true });
+                  }
+                },
+                type: 'number',
+                className: 'text-center',
+              }}
+            />
+
+            <InputBox
+              prefix="備註 :"
+              className="mt-1 w-full"
+              inputAttr={{
+                disabled: disabled,
+                ...register('note'),
+              }}
+            />
+          </div>
+        </Item>
+
         {/* 7 */}
-        <div className={scss.numIndex}>7</div>
-        <div>
-          <RadioContainer
-            disabled={disabled}
-            label={'是否出具保固票或保固金'}
-            labelClassName="mr-[48px]"
-            value={watchData.warrantyPayment}
-            onChange={(v) => {
-              setValue('warrantyPayment', v);
-            }}
-          />
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            inputAttr={{
-              disabled: disabled,
-              value: watchData.warrantyPaymentNote ?? '',
-              onChange: (e) => {
-                setValue('warrantyPaymentNote', e.target.value);
-              },
-              placeholder: '請輸入備註',
-            }}
-          />
-        </div>
-        {/*  */}
-        <div className={scss.numIndex}>8</div>
-        <div>
+        <Item>
+          <div className={scss.numIndex}>7</div>
           <div>
             <RadioContainer
               disabled={disabled}
-              // label={'是否註明收足90%出具防火證明、出廠證明'}
-              label={
-                <span>
-                  是否註明收足
-                  <InputBox
-                    className="w-[50px] "
-                    inputAttr={{
-                      className: 'text-center',
-                      disabled: disabled,
-                      type: 'number',
-                      value: watchData.fireproofCertificatePercent ?? '',
-                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                        const value = e.target.value;
-
-                        if (!value.includes('.')) {
-                          setValue('fireproofCertificatePercent', Number(value));
-                        }
-                      },
-                    }}
-                  />
-                  %出具防火證明
-                </span>
-              }
+              label={'是否出具保固票或保固金'}
               labelClassName="mr-[48px]"
-              value={watchData.fireproofCertificate}
+              value={watchData.warrantyPayment}
               onChange={(v) => {
-                setValue('fireproofCertificate', v);
+                setValue('warrantyPayment', v);
+              }}
+            />
+            <InputBox
+              className="mt-1 w-full"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: disabled,
+                value: watchData.warrantyPaymentNote ?? '',
+                onChange: (e) => {
+                  setValue('warrantyPaymentNote', e.target.value);
+                },
+                placeholder: '請輸入備註',
               }}
             />
           </div>
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            inputAttr={{
-              disabled: disabled,
-              placeholder: '請輸入備註',
-              value: watchData.fireproofCertificateNote ?? '',
-              onChange: (e) => {
-                setValue('fireproofCertificateNote', e.target.value);
-              },
-            }}
-          />
-        </div>
-        {/*  */}
-        <div className={scss.numIndex}>9</div>
-        <div>
+        </Item>
+
+        {/* 8 */}
+
+        <Item>
+          <div className={scss.numIndex}>8</div>
           <div>
-            <RadioContainer
-              disabled={disabled}
-              // label={'是否註明收足90%出具防火證明、出廠證明'}
-              label={
-                <span>
-                  是否註明收足
-                  <InputBox
-                    className="w-[50px] "
-                    inputAttr={{
-                      className: 'text-center',
-                      disabled: disabled,
-                      type: 'number',
-                      value: watchData.factoryCertificatePercent ?? '',
-                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                        const value = e.target.value;
+            <div>
+              <RadioContainer
+                disabled={disabled}
+                // label={'是否註明收足90%出具防火證明、出廠證明'}
+                label={
+                  <span>
+                    是否註明收足
+                    <InputBox
+                      className="w-[50px] "
+                      inputAttr={{
+                        className: 'text-center',
+                        disabled: disabled,
+                        type: 'number',
+                        value: watchData.fireproofCertificatePercent ?? '',
+                        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                          const value = e.target.value;
 
-                        if (!value.includes('.')) {
-                          setValue('factoryCertificatePercent', Number(value));
-                        }
-                      },
-                    }}
-                  />
-                  %出具出廠證明
-                </span>
-              }
-              labelClassName="mr-[48px]"
-              value={watchData.factoryCertificate}
-              onChange={(v) => {
-                setValue('factoryCertificate', v);
+                          if (!value.includes('.')) {
+                            setValue('fireproofCertificatePercent', Number(value));
+                          }
+                        },
+                      }}
+                    />
+                    %出具防火證明
+                  </span>
+                }
+                labelClassName="mr-[48px]"
+                value={watchData.fireproofCertificate}
+                onChange={(v) => {
+                  setValue('fireproofCertificate', v);
+                }}
+              />
+            </div>
+            <InputBox
+              className="mt-1 w-full"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: disabled,
+                placeholder: '請輸入備註',
+                value: watchData.fireproofCertificateNote ?? '',
+                onChange: (e) => {
+                  setValue('fireproofCertificateNote', e.target.value);
+                },
               }}
             />
           </div>
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            inputAttr={{
-              disabled: disabled,
-              placeholder: '請輸入備註',
-              value: watchData.factoryCertificateNote ?? '',
-              onChange: (e) => {
-                setValue('factoryCertificateNote', e.target.value);
-              },
-            }}
-          />
-        </div>
-        {/*  */}
-        <div className={scss.numIndex}>10</div>
-        <div>
+        </Item>
+
+        {/* 9 */}
+        <Item>
+          <div className={scss.numIndex}>9</div>
           <div>
-            <RadioContainer
-              disabled={disabled}
-              label={
-                <span>
-                  是否註明收足
-                  <InputBox
-                    className="w-[50px] "
-                    inputAttr={{
-                      className: 'text-center',
-                      disabled: disabled,
-                      type: 'number',
-                      value: watchData.warrantyPercent ?? '',
-                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                        const value = e.target.value;
+            <div>
+              <RadioContainer
+                disabled={disabled}
+                // label={'是否註明收足90%出具防火證明、出廠證明'}
+                label={
+                  <span>
+                    是否註明收足
+                    <InputBox
+                      className="w-[50px] "
+                      inputAttr={{
+                        className: 'text-center',
+                        disabled: disabled,
+                        type: 'number',
+                        value: watchData.factoryCertificatePercent ?? '',
+                        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                          const value = e.target.value;
 
-                        if (!value.includes('.')) {
-                          setValue('warrantyPercent', Number(value));
-                        }
-                      },
-                    }}
-                  />
-                  %出具保固書
-                </span>
-              }
-              labelClassName="mr-[48px]"
-              value={watchData.warranty}
-              onChange={(v) => {
-                setValue('warranty', v);
+                          if (!value.includes('.')) {
+                            setValue('factoryCertificatePercent', Number(value));
+                          }
+                        },
+                      }}
+                    />
+                    %出具出廠證明
+                  </span>
+                }
+                labelClassName="mr-[48px]"
+                value={watchData.factoryCertificate}
+                onChange={(v) => {
+                  setValue('factoryCertificate', v);
+                }}
+              />
+            </div>
+            <InputBox
+              className="mt-1 w-full"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: disabled,
+                placeholder: '請輸入備註',
+                value: watchData.factoryCertificateNote ?? '',
+                onChange: (e) => {
+                  setValue('factoryCertificateNote', e.target.value);
+                },
               }}
             />
           </div>
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            inputAttr={{
-              disabled: disabled,
-              placeholder: '請輸入備註',
-              value: watchData.warrantyNote ?? '',
-              onChange: (e) => {
-                setValue('warrantyNote', e.target.value);
-              },
-            }}
-          />
-        </div>
-        {/*  */}
-        <div className={scss.numIndex}>11</div>
-        <div>
+        </Item>
+
+        {/* 10 */}
+        <Item>
+          <div className={scss.numIndex}>10</div>
           <div>
-            <RadioContainer
-              disabled={disabled}
-              label={'請按裝款時是否需配合工地試車'}
-              labelClassName="mr-[48px]"
-              value={watchData.testDrive}
-              onChange={(v) => {
-                setValue('testDrive', v);
+            <div>
+              <RadioContainer
+                disabled={disabled}
+                label={
+                  <span>
+                    是否註明收足
+                    <InputBox
+                      className="w-[50px] "
+                      inputAttr={{
+                        className: 'text-center',
+                        disabled: disabled,
+                        type: 'number',
+                        value: watchData.warrantyPercent ?? '',
+                        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                          const value = e.target.value;
+
+                          if (!value.includes('.')) {
+                            setValue('warrantyPercent', Number(value));
+                          }
+                        },
+                      }}
+                    />
+                    %出具保固書
+                  </span>
+                }
+                labelClassName="mr-[48px]"
+                value={watchData.warranty}
+                onChange={(v) => {
+                  setValue('warranty', v);
+                }}
+              />
+            </div>
+            <InputBox
+              className="mt-1 w-full"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: disabled,
+                placeholder: '請輸入備註',
+                value: watchData.warrantyNote ?? '',
+                onChange: (e) => {
+                  setValue('warrantyNote', e.target.value);
+                },
               }}
             />
           </div>
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            inputAttr={{
-              disabled: disabled,
-              placeholder: '請輸入備註',
-              value: watchData.testDriveNote ?? '',
-              onChange: (e) => {
-                setValue('testDriveNote', e.target.value);
-              },
-            }}
-          />
-        </div>
-        {/*  */}
-        <div className={scss.numIndex}>12</div>
-        <div className="mb-9">
-          <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
-          <br />
-          <div className={classNames(scss.textaraeBox, disabled && scss.disabled)}>
-            <textarea
-              disabled={disabled}
-              className="w-full resize-none"
-              placeholder="請輸入"
-              {...register('debitItem')}
+        </Item>
+
+        {/* 11 */}
+        <Item>
+          <div className={scss.numIndex}>11</div>
+          <div>
+            <div>
+              <RadioContainer
+                disabled={disabled}
+                label={'請按裝款時是否需配合工地試車'}
+                labelClassName="mr-[48px]"
+                value={watchData.testDrive}
+                onChange={(v) => {
+                  setValue('testDrive', v);
+                }}
+              />
+            </div>
+            <InputBox
+              className="mt-1 w-full"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: disabled,
+                placeholder: '請輸入備註',
+                value: watchData.testDriveNote ?? '',
+                onChange: (e) => {
+                  setValue('testDriveNote', e.target.value);
+                },
+              }}
             />
           </div>
-          <InputBox
-            className="mt-1 w-full"
-            prefix="備註 :"
-            inputAttr={{
-              disabled: disabled,
+        </Item>
 
-              placeholder: '請輸入備註',
-            }}
-          />
-        </div>
+        {/* 12 */}
+        <Item>
+          <div className={scss.numIndex}>12</div>
+          <div>
+            <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
+            <br />
+            <div className={classNames(scss.textaraeBox, disabled && scss.disabled)}>
+              <textarea
+                disabled={disabled}
+                className="w-full resize-none"
+                placeholder="請輸入"
+                {...register('debitItem')}
+              />
+            </div>
+            <InputBox
+              className="mt-1 w-full"
+              prefix="備註 :"
+              inputAttr={{
+                disabled: disabled,
+
+                placeholder: '請輸入備註',
+              }}
+            />
+          </div>
+        </Item>
         {/*  */}
       </div>
 
@@ -1175,7 +1213,7 @@ Tprops_reviewForm) {
 
       {isInContract && (
         <SignatureBar
-          className="mt-10"
+          className="m-10 mb-0"
           control={{
             signatureArr: signatureArr,
           }}
@@ -1196,6 +1234,18 @@ Tprops_reviewForm) {
 // ============================================================================
 
 // region COMPONENT
+
+const Item_pre = (props: React.HTMLAttributes<HTMLDivElement>, ref: React.Ref<HTMLDivElement>) => {
+  const { children, ...attr } = props;
+
+  return (
+    <div ref={ref} {...attr} className={classNames(scss.item, attr.className)}>
+      {children}
+    </div>
+  );
+};
+
+const Item = forwardRef(Item_pre);
 
 const InputBox = ({
   prefix,
@@ -1310,6 +1360,7 @@ const Row = ({
           // }}
         />
       </div>
+
       <div>
         <IconAdd attr={{ onClick: onAdd, className: classNames(!onAdd && scss.hidden) }} />
         {/* {onDel && <IconDel attr={{ onClick: onDel, className: classNames(!onDel && scss.hidden) }} />} */}
