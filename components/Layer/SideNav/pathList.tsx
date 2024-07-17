@@ -659,6 +659,22 @@ const sidePathList: TsidePathList = {
       path01,
       list: [
         {
+          label: '單據管理',
+          erpFeature: devPass,
+          list: [
+            {
+              label: '請購申請',
+              path: path01 + '/addPurchaseRequisition',
+              erpFeature: devPass,
+            },
+            // {
+            //   label: '待審單據',
+            //   path: path01 + '/myReqList',
+            //   erpFeature: devPass,
+            // },
+          ],
+        },
+        {
           label: '倉儲',
           erpFeature: devPass,
           list: [
@@ -712,27 +728,28 @@ const sidePathList: TsidePathList = {
             },
           ],
         },
-        {
-          label: '領料',
-          erpFeature: devPass,
-          list: [
-            // {
-            //   label: '領料查詢',
-            //   path: path01 + '/getMaterial/pickingList',
-            //   erpFeature: devPass,
-            // },
-            {
-              label: '物料查詢',
-              path: path01 + '/getMaterial/materialList',
-              erpFeature: devPass,
-            },
-            // {
-            //   label: '新增領料單',
-            //   path: path01 + '/getMaterial/addPickingList',
-            //   erpFeature: devPass,
-            // },
-          ],
-        },
+        // {
+        //   label: '領料',
+        //   erpFeature: devPass,
+        //   list: [
+        //     // {
+        //     //   label: '領料查詢',
+        //     //   path: path01 + '/getMaterial/pickingList',
+        //     //   erpFeature: devPass,
+        //     // },
+        //     {
+        //       label: '物料查詢',
+        //       path: path01 + '/getMaterial/materialList',
+        //       erpFeature: devPass,
+        //     },
+        //     // {
+        //     //   label: '新增領料單',
+        //     //   path: path01 + '/getMaterial/addPickingList',
+        //     //   erpFeature: devPass,
+        //     // },
+        //   ],
+        // },
+       
       ],
     };
   })(),

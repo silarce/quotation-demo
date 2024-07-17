@@ -3,14 +3,20 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
 import Decimal from 'decimal.js';
-import { useForm, useFormState } from 'react-hook-form';
-import moment, { Moment } from 'moment';
+import {
+  useForm,
+  // useFormState
+} from 'react-hook-form';
 
 import { AppContext } from 'pages/_app';
 
 // antd
 import { Modal } from 'antd';
 import { Radio } from 'antd';
+
+//
+import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
+
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -26,6 +32,10 @@ import {
   apiSubmitContracting,
   apiPatchQuotationVerifyForm,
   apiQuotationReview,
+  //
+  useGetContract_id,
+  useGetQuotation_id,
+  useGetQuotationContent_id_2,
 } from 'js/api/api_quotation';
 
 // css
@@ -40,9 +50,31 @@ import {
   TquotationContentDto,
   TuserDto,
 } from 'js/api/dtoTypes';
-import { el } from 'date-fns/locale';
 
 // ============================================================================
+
+type Tprops_reviewForm = {
+  readOnly?: boolean;
+
+  contractId?: string | undefined; // 有contractId
+  quotationId?: string | undefined; // 呼叫 apiQuotationReview 所需
+  contentId?: string | undefined; // 呼叫 apiSubmitContracting 所需
+
+  onCancel?: () => void;
+  onConfirm?: () => void;
+
+  isInContract?: boolean | undefined; // 為true 呼叫 apiPatchQuotationVerifyForm 否則呼叫 apiSubmitContracting
+
+  // verifyForm: TquotationVerifyFormDto | undefined;
+
+  // contractNumber: string;
+  // projectName: string;
+  // totalPrice: number;
+
+  // quotationContent?: TquotationContentDto | undefined; // 這是為了取得審核人員的資料
+
+  // defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
+};
 
 type TpaymentRatio = {
   title: string;
@@ -76,32 +108,9 @@ export type { TpaymentRatio };
 
 function ContractReviewForm({
   showModal,
-  isInContract,
-  close,
-  contractIdNumber,
-  contractName,
-  contractPrice,
-  lastestContentId,
-  verifyForm,
-  forbidden,
-  onConfirm,
-  defaultPaymentRatioArr,
-  quotationContent,
-  quotationId,
-}: {
+  ...props_reviewForm
+}: Tprops_reviewForm & {
   showModal: boolean;
-  isInContract?: boolean;
-  close: () => void;
-  contractIdNumber: string;
-  contractName: string;
-  contractPrice: number;
-  lastestContentId: string | undefined;
-  verifyForm: TquotationVerifyFormDto | undefined;
-  forbidden?: boolean;
-  onConfirm?: () => void;
-  defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
-  quotationContent?: TquotationContentDto;
-  quotationId?: string;
 }) {
   // ----------------------------------------------------------------------------
 
@@ -113,24 +122,10 @@ function ContractReviewForm({
       centered={true}
       destroyOnClose={true}
       footer={null}
-      width="800px"
-      onCancel={close}
+      width="1000px"
+      onCancel={props_reviewForm.onCancel}
     >
-      <ReviewForm
-        isInContract={isInContract}
-        forbidden={forbidden}
-        // disabled={false}
-        close={close}
-        contractIdNumber={contractIdNumber}
-        contractName={contractName}
-        contractPrice={contractPrice}
-        lastestContentId={lastestContentId}
-        verifyForm={verifyForm}
-        onConfirm={onConfirm}
-        defaultPaymentRatioArr={defaultPaymentRatioArr}
-        quotationContent={quotationContent}
-        quotationId={quotationId}
-      />
+      <ReviewForm {...props_reviewForm} />
     </Modal>
   );
 }
@@ -147,32 +142,27 @@ function ContractReviewForm({
 // MARK:ReviewForm
 
 function ReviewForm({
-  forbidden,
-  close,
-  contractIdNumber,
-  contractName,
-  contractPrice,
-  lastestContentId,
-  verifyForm,
-  defaultPaymentRatioArr,
-  onConfirm,
+  readOnly,
+
+  contractId,
+  quotationId: quotationId_param,
+  contentId: contentId_param,
+  // contentId,
+
   isInContract,
-  quotationContent,
-  quotationId,
-}: {
-  forbidden?: boolean;
-  close?: () => void;
-  contractIdNumber: string;
-  contractName: string;
-  contractPrice: number;
-  lastestContentId: string | undefined;
-  verifyForm: TquotationVerifyFormDto | undefined;
-  defaultPaymentRatioArr?: TpaymentRatioDto[] | undefined;
-  onConfirm?: () => void;
-  isInContract?: boolean | undefined;
-  quotationContent?: TquotationContentDto | undefined;
-  quotationId?: string | undefined;
-}) {
+
+  onCancel,
+  onConfirm,
+}: // verifyForm,
+
+// contractNumber,
+// projectName,
+// totalPrice,
+
+// quotationContent,
+
+// defaultPaymentRatioArr,
+Tprops_reviewForm) {
   //
   const { userInfo } = useContext(AppContext);
   //
@@ -180,7 +170,93 @@ function ReviewForm({
   const stateObj_disabled = useState(true);
   let disabled = stateObj_disabled[0];
   const setDisabled = stateObj_disabled[1];
-  forbidden && (disabled = true);
+  readOnly && (disabled = true);
+
+  // ----------------------------------------------------------------------------
+
+  // useGetContract_id
+  const { data: data_contract, update: update_contract } = useGetContract_id(contractId, {
+    customPopulate: [
+      'quotation',
+      'content.verifyForm',
+      'content.reviewSupervisorEmployee',
+      'content.reviewWorkDirectorEmployee',
+      'content.reviewCashierEmployee',
+      'content.reviewManagerEmployee',
+    ],
+  });
+
+  const { data: data_quotation, update: update_quotation } = useGetQuotation_id(quotationId_param, {
+    params: {
+      populate: [
+        'latestContent.verifyForm',
+        'latestContent.reviewSupervisorEmployee',
+        'latestContent.reviewWorkDirectorEmployee',
+        'latestContent.reviewCashierEmployee',
+        'latestContent.reviewManagerEmployee',
+      ],
+    },
+  });
+
+  const { data: data_quotationContent, update: update_quotationContent } = useGetQuotationContent_id_2(
+    contentId_param,
+    {
+      params: {
+        populate: [
+          'verifyForm',
+          'reviewSupervisorEmployee',
+          'reviewWorkDirectorEmployee',
+          'reviewCashierEmployee',
+          'reviewManagerEmployee',
+        ],
+      },
+    }
+  );
+
+  const update = async () => {
+    if (contractId) {
+      await update_contract();
+    } else if (quotationId_param) {
+      await update_quotation();
+    } else if (contentId_param) {
+      await update_quotationContent();
+    }
+  };
+
+  const {
+    //
+    contractNumber,
+    projectName,
+    totalPrice,
+    quotationContent,
+    verifyForm,
+    defaultPaymentRatioArr,
+    quotationId,
+    contentId,
+  } = useMemo(() => {
+    const contractNumber = data_contract?.contractNumber ?? '';
+
+    const content = data_contract?.content || data_quotation?.latestContent || data_quotationContent;
+    const quotationId = data_contract?.quotation.id || data_quotation?.id;
+
+    const defaultPaymentRatioArr = content ? createDefaultPaymentRatio(content) : undefined;
+
+    return {
+      verifyForm: content?.verifyForm,
+
+      contractNumber: contractNumber,
+
+      projectName: content?.projectName ?? '',
+      totalPrice: content?.total ?? 0,
+      quotationContent: content,
+
+      defaultPaymentRatioArr,
+
+      quotationId,
+
+      contentId: content?.id,
+    };
+  }, [data_contract, data_quotation, data_quotationContent]);
 
   // ----------------------------------------------------------------------------
 
@@ -192,7 +268,7 @@ function ReviewForm({
   // ----------------------------------------------------------------------------
 
   const { payMethodList, addMethod, resetMethodList, getMethodBodyArr, allPercentStr } = usePayMethod({
-    contractPrice,
+    contractPrice: totalPrice,
   });
 
   // const { register, control, reset, watch, setValue } = useForm<TcontractReviewForm>();
@@ -206,7 +282,7 @@ function ReviewForm({
   // region REQUEST
 
   const reqSubmitContracting = async () => {
-    if (!lastestContentId || disabled) {
+    if (!contentId || disabled) {
       return;
     }
 
@@ -248,8 +324,12 @@ function ReviewForm({
       warrantyNote: preBody.warrantyNote ?? '',
       testDriveNote: preBody.testDriveNote ?? '',
 
-      fireproofCertificatePercent: preBody.fireproofCertificatePercent,
-      warrantyPercent: preBody.warrantyPercent,
+      fireproofCertificatePercent: Number(preBody.fireproofCertificatePercent) || null,
+      warrantyPercent: Number(preBody.warrantyPercent) || null,
+
+      factoryCertificate: preBody.factoryCertificate,
+      factoryCertificatePercent: Number(preBody.factoryCertificatePercent) || null,
+      factoryCertificateNote: preBody.factoryCertificateNote,
 
       //
     };
@@ -285,8 +365,11 @@ function ReviewForm({
           body,
         });
       } else {
-        await apiSubmitContracting({ contentId: lastestContentId, body });
+        await apiSubmitContracting({ contentId, body });
       }
+
+      await update();
+      onConfirm && onConfirm();
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '送出合約審核表失敗', content: err?.message });
@@ -314,7 +397,8 @@ function ReviewForm({
       ? (body.reviewSupervisorEmployeeId = userId)
       : null;
 
-    await apiQuotationReview({ id: quotationId, body }).then(() => {
+    await apiQuotationReview({ id: quotationId, body }).then(async () => {
+      await update();
       onConfirm && onConfirm();
     });
   };
@@ -323,8 +407,8 @@ function ReviewForm({
 
   // region FUNCTION
 
-  const onCancel = () => {
-    close?.();
+  const handle_Cancel = () => {
+    onCancel?.();
   };
 
   const handle_confirm = async () => {
@@ -459,6 +543,12 @@ function ReviewForm({
   // region useEffect
 
   useEffect(() => {
+    update();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractId, quotationId_param]);
+
+  useEffect(() => {
     // verifyForm
 
     let methodArr: TpaymentRatio[] | undefined = undefined;
@@ -491,6 +581,10 @@ function ReviewForm({
 
         fireproofCertificatePercent,
         warrantyPercent,
+
+        factoryCertificate,
+        factoryCertificatePercent,
+        factoryCertificateNote,
       } = verifyForm;
 
       reset({
@@ -519,6 +613,10 @@ function ReviewForm({
 
         fireproofCertificatePercent,
         warrantyPercent,
+
+        factoryCertificate,
+        factoryCertificatePercent,
+        factoryCertificateNote,
       });
 
       methodArr = verifyForm?.paymentRatio.map((item) => {
@@ -540,6 +638,7 @@ function ReviewForm({
         note: undefined,
         warrantyPayment: undefined,
         fireproofCertificate: undefined,
+        factoryCertificate: undefined,
         warranty: undefined,
         testDrive: undefined,
         debitItem: undefined,
@@ -550,10 +649,12 @@ function ReviewForm({
         depositPaymentNote: undefined,
         warrantyPaymentNote: undefined,
         fireproofCertificateNote: undefined,
+        factoryCertificateNote: undefined,
         warrantyNote: undefined,
         testDriveNote: undefined,
 
         fireproofCertificatePercent: 90,
+        factoryCertificatePercent: 90,
         warrantyPercent: 100,
       });
 
@@ -578,7 +679,7 @@ function ReviewForm({
 
   return (
     <div className={classNames(scss.container, disabled && scss.disabled)}>
-      <div className={classNames(scss.btnBar, forbidden && scss.forbidden)}>
+      <div className={classNames(scss.btnBar, readOnly && scss.readOnly)}>
         {!disabled && (
           <>
             <MyButton_v2 px="px22" py="py4" theme="danger" onClick={handle_confirm}>
@@ -592,7 +693,7 @@ function ReviewForm({
 
         {disabled && (
           <>
-            {isReviewer && (
+            {isReviewer && isInContract && (
               <MyButton_v2 theme="danger" px="px22" py="py4" onClick={handle_review}>
                 審核
               </MyButton_v2>
@@ -608,9 +709,9 @@ function ReviewForm({
       {/*  */}
       <div className={scss.subTitle}>
         <span>合約編號</span>
-        <span>{contractIdNumber}</span>
+        <span>{contractNumber}</span>
         <span>工程名稱</span>
-        <span>{contractName}</span>
+        <span>{projectName}</span>
       </div>
       {/*  */}
       <div className={scss.list}>
@@ -811,10 +912,19 @@ function ReviewForm({
         <div>
           <InputBox
             prefix="合理的保固期 :"
+            suffix="年"
             boxStyle={{ width: '160px' }}
             inputAttr={{
               disabled: disabled,
-              ...register('warrantyPeriod'),
+              value: watchData.warrantyPeriod ?? '',
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value;
+
+                if (!value.includes('.')) {
+                  setValue('warrantyPeriod', Number(value), { shouldValidate: true });
+                }
+              },
+              type: 'number',
               className: 'text-center',
             }}
           />
@@ -869,10 +979,17 @@ function ReviewForm({
                       className: 'text-center',
                       disabled: disabled,
                       type: 'number',
-                      ...register('fireproofCertificatePercent'),
+                      value: watchData.fireproofCertificatePercent ?? '',
+                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                        const value = e.target.value;
+
+                        if (!value.includes('.')) {
+                          setValue('fireproofCertificatePercent', Number(value));
+                        }
+                      },
                     }}
                   />
-                  %出具防火證明、出廠證明
+                  %出具防火證明
                 </span>
               }
               labelClassName="mr-[48px]"
@@ -901,6 +1018,7 @@ function ReviewForm({
           <div>
             <RadioContainer
               disabled={disabled}
+              // label={'是否註明收足90%出具防火證明、出廠證明'}
               label={
                 <span>
                   是否註明收足
@@ -910,7 +1028,62 @@ function ReviewForm({
                       className: 'text-center',
                       disabled: disabled,
                       type: 'number',
-                      ...register('warrantyPercent'),
+                      value: watchData.factoryCertificatePercent ?? '',
+                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                        const value = e.target.value;
+
+                        if (!value.includes('.')) {
+                          setValue('factoryCertificatePercent', Number(value));
+                        }
+                      },
+                    }}
+                  />
+                  %出具出廠證明
+                </span>
+              }
+              labelClassName="mr-[48px]"
+              value={watchData.factoryCertificate}
+              onChange={(v) => {
+                setValue('factoryCertificate', v);
+              }}
+            />
+          </div>
+          <InputBox
+            className="mt-1 w-full"
+            prefix="備註 :"
+            inputAttr={{
+              disabled: disabled,
+              placeholder: '請輸入備註',
+              value: watchData.factoryCertificateNote ?? '',
+              onChange: (e) => {
+                setValue('factoryCertificateNote', e.target.value);
+              },
+            }}
+          />
+        </div>
+        {/*  */}
+        <div className={scss.numIndex}>10</div>
+        <div>
+          <div>
+            <RadioContainer
+              disabled={disabled}
+              label={
+                <span>
+                  是否註明收足
+                  <InputBox
+                    className="w-[50px] "
+                    inputAttr={{
+                      className: 'text-center',
+                      disabled: disabled,
+                      type: 'number',
+                      value: watchData.warrantyPercent ?? '',
+                      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                        const value = e.target.value;
+
+                        if (!value.includes('.')) {
+                          setValue('warrantyPercent', Number(value));
+                        }
+                      },
                     }}
                   />
                   %出具保固書
@@ -937,7 +1110,7 @@ function ReviewForm({
           />
         </div>
         {/*  */}
-        <div className={scss.numIndex}>10</div>
+        <div className={scss.numIndex}>11</div>
         <div>
           <div>
             <RadioContainer
@@ -964,7 +1137,7 @@ function ReviewForm({
           />
         </div>
         {/*  */}
-        <div className={scss.numIndex}>11</div>
+        <div className={scss.numIndex}>12</div>
         <div className="mb-9">
           <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
           <br />
@@ -1000,12 +1173,14 @@ function ReviewForm({
         </div>
       </div>
 
-      <SignatureBar
-        className="mt-10"
-        control={{
-          signatureArr: signatureArr,
-        }}
-      />
+      {isInContract && (
+        <SignatureBar
+          className="mt-10"
+          control={{
+            signatureArr: signatureArr,
+          }}
+        />
+      )}
 
       {/*  */}
     </div>
@@ -1027,6 +1202,7 @@ const InputBox = ({
   suffix,
   boxStyle,
   inputAttr,
+  textareaProps,
   className,
   disabled,
 }: {
@@ -1034,13 +1210,15 @@ const InputBox = ({
   suffix?: string;
   boxStyle?: React.CSSProperties;
   inputAttr?: React.InputHTMLAttributes<HTMLInputElement>;
+  textareaProps?: TextareaAutosizeProps;
   className?: string;
   disabled?: boolean;
 }) => {
   return (
     <div style={boxStyle} className={classNames(scss.inputBox, disabled && scss.disabled, className)}>
       <span>{prefix}</span>
-      <input type="text" readOnly={disabled} {...inputAttr} />
+      {inputAttr && <input type="text" readOnly={disabled} {...inputAttr} />}
+      {textareaProps && <TextareaAutosize readOnly={disabled} {...textareaProps} />}
       <span>{suffix}</span>
     </div>
   );
@@ -1062,7 +1240,7 @@ const Row = ({
   onDel?: () => void;
   title: {
     value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   };
   percent: {
     value: string;
@@ -1074,7 +1252,7 @@ const Row = ({
   };
   note: {
     value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   };
 }) => {
   return (
@@ -1082,7 +1260,13 @@ const Row = ({
       <div>
         <InputBox
           prefix={`${serialNumber}.`}
-          inputAttr={{
+          // inputAttr={{
+          //   disabled: disabled,
+          //   value: title.value,
+          //   onChange: title.onChange,
+          //   placeholder: '請輸入標題',
+          // }}
+          textareaProps={{
             disabled: disabled,
             value: title.value,
             onChange: title.onChange,
@@ -1112,12 +1296,18 @@ const Row = ({
         />
         <InputBox
           prefix="備註 :"
-          inputAttr={{
+          textareaProps={{
             disabled: disabled,
             value: note.value,
             onChange: note.onChange,
             placeholder: '請輸入備註',
           }}
+          // inputAttr={{
+          //   disabled: disabled,
+          //   value: note.value,
+          //   onChange: note.onChange,
+          //   placeholder: '請輸入備註',
+          // }}
         />
       </div>
       <div>
@@ -1488,6 +1678,28 @@ class Class_payMethod {
 // ============================================================================
 // ============================================================================
 
+const createDefaultPaymentRatio = (quotationContent: TquotationContentDto): TpaymentRatioDto[] => {
+  const { paymentMethods, total } = quotationContent;
+
+  const arr: TpaymentRatioDto[] = paymentMethods.map((item) => {
+    const { milestone, totalPaymentRatio } = item;
+
+    const price = new Decimal(total)
+      .mul(totalPaymentRatio || 0)
+      .div(100)
+      .toString();
+
+    return {
+      level: milestone,
+      paymentRatio: totalPaymentRatio,
+      price,
+      note: '',
+    };
+  });
+
+  return arr;
+};
+
 const useDefaultPaymentRatio_quotationContent = (
   quotationContent: TquotationContentDto | undefined
 ): TpaymentRatioDto[] | undefined => {
@@ -1496,25 +1708,27 @@ const useDefaultPaymentRatio_quotationContent = (
       return undefined;
     }
 
-    const { paymentMethods, total } = quotationContent;
+    return createDefaultPaymentRatio(quotationContent);
 
-    const arr: TpaymentRatioDto[] = paymentMethods.map((item) => {
-      const { milestone, totalPaymentRatio } = item;
+    // const { paymentMethods, total } = quotationContent;
 
-      const price = new Decimal(total)
-        .mul(totalPaymentRatio || 0)
-        .div(100)
-        .toString();
+    // const arr: TpaymentRatioDto[] = paymentMethods.map((item) => {
+    //   const { milestone, totalPaymentRatio } = item;
 
-      return {
-        level: milestone,
-        paymentRatio: totalPaymentRatio,
-        price,
-        note: '',
-      };
-    });
+    //   const price = new Decimal(total)
+    //     .mul(totalPaymentRatio || 0)
+    //     .div(100)
+    //     .toString();
 
-    return arr;
+    //   return {
+    //     level: milestone,
+    //     paymentRatio: totalPaymentRatio,
+    //     price,
+    //     note: '',
+    //   };
+    // });
+
+    // return arr;
   }, [quotationContent]);
 
   return arr;
