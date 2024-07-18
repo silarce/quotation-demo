@@ -635,6 +635,43 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
   };
 };
 
+export const apiGetContract_employee = async (employeeId: string, params?: Tparams) => {
+  const api = `/quotation/contracts/employee/${employeeId}`;
+
+  return axi
+    .get<TquotationContractDto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetContract_employee = (employeeId: string | undefined, customParams?: Tparams) => {
+  const [res, setRes] = useState<TquotationContractDto[]>();
+
+  const update = async () => {
+    if (!employeeId) {
+      return;
+    }
+
+    try {
+      const newRes = await apiGetContract_employee(employeeId, customParams);
+
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得合約資料失敗', content: err.message });
+    }
+  };
+
+  return {
+    data: res,
+    update,
+  };
+};
+
 export const apiGetContract_Id = async (contractId: string, params?: Tparams) => {
   const api = `/quotation/contracts/${contractId}`;
 
