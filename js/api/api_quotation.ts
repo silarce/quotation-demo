@@ -334,6 +334,9 @@ const apiGetQuotationContent_Id = async (id: string) => {
       'products.items.rootProductId',
       'others',
       'verifyForm',
+
+      'attachedToContract.content.products',
+      'attachedToContract.subContracts.content.products',
     ],
   };
 

@@ -86,7 +86,7 @@ import {
   apiPatchQuotationToPending,
   //
   useGetQuotation_id_2,
-  useGetQuotationContent_id_2,
+  useGetQuotationContent_id,
   useQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
@@ -248,12 +248,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
   // 資料
-  const { data: quotationData, update } = useGetQuotation_id_2(quotationId as string, {
+  const { data: quotationData, update: update_quotation } = useGetQuotation_id_2(quotationId as string, {
     preBuiltPopulate: ['simple', 'attached'],
   });
-  const lastestContentId = quotationData?.latestContent.id;
-  const latestContent = quotationData?.latestContent;
-  const verifyForm = latestContent?.verifyForm;
+
+  const { data: data_content, update: update_content } = useGetQuotationContent_id(contentId);
+
+  const theContent = data_content ?? quotationData?.latestContent;
+  const theCntentId = theContent?.id;
+  const verifyForm = theContent?.verifyForm;
 
   // --------------------------------------------------------------------
 
@@ -263,39 +266,39 @@ function TheQuotation({ router }: { router: NextRouter }) {
   isSupervisor = false;
   isManager = false;
 
-  reviewSalesEmployeeId = latestContent?.reviewSalesEmployee?.id;
-  reviewWorkDirectorEmployeeId = latestContent?.reviewWorkDirectorEmployee?.id;
-  reviewCashierEmployeeId = latestContent?.reviewCashierEmployee?.id;
-  reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
-  reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
+  reviewSalesEmployeeId = theContent?.reviewSalesEmployee?.id;
+  reviewWorkDirectorEmployeeId = theContent?.reviewWorkDirectorEmployee?.id;
+  reviewCashierEmployeeId = theContent?.reviewCashierEmployee?.id;
+  reviewSupervisorEmployeeId = theContent?.reviewSupervisorEmployee?.id;
+  reviewManagerEmployeeId = theContent?.reviewManagerEmployee?.id;
 
-  salesReviewedAt = latestContent?.salesReviewedAt;
-  supervisorReviewedAt = latestContent?.supervisorReviewedAt;
-  workDirectorReviewedAt = latestContent?.workDirectorReviewedAt;
-  cashierReviewedAt = latestContent?.cashierReviewedAt;
-  managerReviewedAt = latestContent?.managerReviewedAt;
+  salesReviewedAt = theContent?.salesReviewedAt;
+  supervisorReviewedAt = theContent?.supervisorReviewedAt;
+  workDirectorReviewedAt = theContent?.workDirectorReviewedAt;
+  cashierReviewedAt = theContent?.cashierReviewedAt;
+  managerReviewedAt = theContent?.managerReviewedAt;
 
-  toSalesAt = latestContent?.toSalesAt;
-  toSupervisorAt = latestContent?.toSupervisorAt;
-  toWorkDirectorAt = latestContent?.toWorkDirectorAt;
-  toCashierAt = latestContent?.toCashierAt;
-  toManagerAt = latestContent?.toManagerAt;
+  toSalesAt = theContent?.toSalesAt;
+  toSupervisorAt = theContent?.toSupervisorAt;
+  toWorkDirectorAt = theContent?.toWorkDirectorAt;
+  toCashierAt = theContent?.toCashierAt;
+  toManagerAt = theContent?.toManagerAt;
 
-  editNotes = latestContent?.editNotes;
+  editNotes = theContent?.editNotes;
 
   let agentEmployee: TemployeeDto | undefined | null;
 
   if (!quotationId) {
     agentEmployee = userInfo?.employee;
   } else {
-    agentEmployee = latestContent?.agentEmployee;
+    agentEmployee = theContent?.agentEmployee;
   }
 
   isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
   isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
 
-  version = latestContent?.version;
-  editNotes = latestContent?.editNotes;
+  version = theContent?.version;
+  editNotes = theContent?.editNotes;
 
   if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
     if (salesReviewedAt && supervisorReviewedAt && managerReviewedAt) {
@@ -348,12 +351,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   // --------------------------------------------------------------------
+
+  // FIXME
+  // content所屬追加追減合約與subContracts最新的合約不一定會是同一筆，
+  // 這會導致取得的資料錯誤
+  // query有version是content的version，不是合約的version，不能用
+
   const { contractProdArr, contentProdArr, contentProdList } = useMemo(() => {
-    if (!quotationData) {
+    if (!quotationData || !theContent) {
       return {};
     }
 
-    const latestContent = quotationData.latestContent;
+    const content = theContent;
     const attachedToContract = quotationData.attachedToContract;
     let subContracts = attachedToContract?.subContracts;
     subContracts = _.sortBy(subContracts, 'version');
@@ -376,7 +385,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     */
 
-    let latestContentProdArr = latestContent?.products;
+    let latestContentProdArr = content?.products;
     latestContentProdArr = _.orderBy(latestContentProdArr, 'order');
 
     // 上面的，被追減的主產品
@@ -403,14 +412,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       contentProdArr: Object.values(contentProdList),
       contentProdList,
     };
-  }, [quotationData]);
+  }, [quotationData, theContent]);
 
   const {
     visible: pdfModalVisible,
     setVisible: setPdfModalVisible,
     pdfData,
   } = useModalQuotationPdf({
-    quotationContent: quotationData?.latestContent,
+    quotationContent: theContent,
     attachedProdArr: [...(contractProdArr ?? []), ...(contentProdArr ?? [])],
   });
 
@@ -420,7 +429,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
   // -----------------------------------------------------
 
-  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(lastestContentId);
+  const { attachments, updateAttachments, domain } = useQuotation_id_attachments(theCntentId);
 
   const removeFileInfo = (index: number) => {
     fileInfoArr[index].willDelete = true;
@@ -476,12 +485,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // -----------------------------------------------------
 
   const { control_profile, state_profile, state_customer } = useProfile({
-    quotationContent: quotationData?.latestContent,
+    quotationContent: theContent,
     disabled,
   });
 
   const { state_anno, state_qr, control_anno, control_qr } = useAnnoAndQr({
-    quotationContent: quotationData?.latestContent,
+    quotationContent: theContent,
     disabled,
   });
 
@@ -525,13 +534,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
     avgDiscount_withQty,
   } = useProductList({
     productArr: contractProdArr,
-    others: quotationData?.latestContent.others,
+    others: theContent?.others,
     resetTrigger: contractProdArr,
     // onDoorTypeChange: onDoorTypeChange,
     productArr_attach: contentProdArr,
     quotationDiscount: 100,
     quotationDiscount_attach: Number(state_summary.discountRate || '100'),
-    averageDiscount: quotationData?.latestContent?.averageDiscount,
+    averageDiscount: theContent?.averageDiscount,
     isAttach: true,
   });
 
@@ -657,7 +666,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
 
     const body: TcreateQuotationContentDto = {
-      quotationDate: latestContent?.quotationDate ?? '',
+      quotationDate: theContent?.quotationDate ?? '',
       validityPeriod: state_profile.validityPeriod ?? '',
       //
       customerId: state_customer?.id ?? '',
@@ -732,17 +741,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
         const res = await apiPatchQuotation(body, quotationId);
         showRootLoading(true, '正在更新附件');
         await uploadAttachment(res.latestContent.id);
-        await Promise.all([update(), updateAttachments()]);
-      } else {
-        const res = await apiPostQuotation(body);
-        showRootLoading(true, '正在更新附件');
-        await uploadAttachment(res.latestContent.id);
-        router.push({
-          query: {
-            id: res.id,
-          },
-        });
+        await Promise.all([
+          update_quotation(),
+          // updateAttachments()
+        ]);
       }
+      // 追加追減報價單不應該會有post，應該是以前趕時間一起複製過來的
+      //  else {
+      //   const res = await apiPostQuotation(body);
+      //   showRootLoading(true, '正在更新附件');
+      //   await uploadAttachment(res.latestContent.id);
+      //   router.push({
+      //     query: {
+      //       id: res.id,
+      //     },
+      //   });
+      // }
 
       setDisabled(true);
     } catch (error) {
@@ -809,7 +823,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           pathname: '/domestic/contract',
         });
       } else {
-        await update();
+        await update_quotation();
       }
     } catch (error) {
       const err = error as Error;
@@ -850,7 +864,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         reviewSalesEmployeeId,
         reviewSupervisorEmployeeId,
       });
-      await update();
+      await update_quotation();
       setShowEmployeSelector(false);
     } catch (error) {
       const err = error as Error;
@@ -868,7 +882,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     try {
       setIsLoading(true);
       await apiQuotationUnlock(quotationId);
-      await update();
+      await update_quotation();
       myAlert.success({ title: '解除鎖定成功' });
       router.push({
         query: {
@@ -886,7 +900,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // 轉為準合約
   const reqToPending = async () => {
-    if (!lastestContentId) {
+    if (!theCntentId) {
       return;
     }
 
@@ -906,8 +920,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     try {
       setIsLoading(true);
-      await apiPatchQuotationToPending({ contentId: lastestContentId });
-      await update();
+      await apiPatchQuotationToPending({ contentId: theCntentId });
+      await update_quotation();
       router.push({
         query: {
           ...router.query,
@@ -938,13 +952,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // region PROPS
 
   const history = useMemo(() => {
-    let content = quotationData?.contents ?? [];
+    let contentArr = quotationData?.contents ?? [];
 
-    if (content) {
-      content = _.sortBy(content, (item) => item.createdAt);
+    if (contentId && theContent) {
+      contentArr = [theContent];
     }
 
-    return content.map((item, index, arr) => {
+    if (contentArr) {
+      contentArr = _.sortBy(contentArr, (item) => item.createdAt);
+    }
+
+    return contentArr.map((item, index, arr) => {
       const { status, quotationDate, createdAt } = item;
       const preStatus = arr[index - 1]?.status;
 
@@ -954,7 +972,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isoString: moment(createdAt).toISOString(),
       };
     });
-  }, [quotationData]);
+  }, [quotationData, theContent]);
 
   const payInfoControl: TpayInfoControl = {
     payment: {
@@ -1106,12 +1124,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const pdfPartPropsArr = useMemo(() => {
     const pdfPartPropsArr_productList = extractPdfPartFromClassProduct({
-      quotationNumber: latestContent?.quotationNumber ?? '無報價編號',
+      quotationNumber: theContent?.quotationNumber ?? '無報價編號',
       productList,
     });
 
     const pdfPartPropsArr_attachProductList = extractPdfPartFromClassProduct({
-      quotationNumber: latestContent?.quotationNumber ?? '無報價編號',
+      quotationNumber: theContent?.quotationNumber ?? '無報價編號',
       productList: attachProdList,
     });
 
@@ -1138,27 +1156,27 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
       {
         label: '總經理',
-        value: quotationData?.latestContent.reviewManagerEmployee?.chName,
+        value: theContent?.reviewManagerEmployee?.chName,
         style: { width: '200px' },
       },
       {
         label: '應收帳款',
-        value: quotationData?.latestContent.reviewCashierEmployee?.chName,
+        value: theContent?.reviewCashierEmployee?.chName,
         style: { width: '200px' },
       },
       {
         label: '應收帳款',
-        value: quotationData?.latestContent.reviewWorkDirectorEmployee?.chName,
+        value: theContent?.reviewWorkDirectorEmployee?.chName,
         style: { width: '200px' },
       },
       {
         label: '業務主管',
-        value: quotationData?.latestContent.reviewSupervisorEmployee?.chName,
+        value: theContent?.reviewSupervisorEmployee?.chName,
         style: { width: '200px' },
       },
       {
         label: '業務',
-        value: quotationData?.latestContent.reviewSalesEmployee?.chName,
+        value: theContent?.reviewSalesEmployee?.chName,
         style: { width: '200px' },
       },
       {
@@ -1181,10 +1199,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     };
 
     const defaultSeletedDataArrArr: Parameters<typeof EmployeeSelectorGroup>[0]['defaultSeletedDataArrArr'] = [
-      quotationData?.latestContent.reviewSalesEmployee ? [quotationData.latestContent.reviewSalesEmployee] : undefined,
-      quotationData?.latestContent.reviewSupervisorEmployee
-        ? [quotationData.latestContent.reviewSupervisorEmployee]
-        : undefined,
+      theContent?.reviewSalesEmployee ? [theContent.reviewSalesEmployee] : undefined,
+      theContent?.reviewSupervisorEmployee ? [theContent.reviewSupervisorEmployee] : undefined,
     ];
 
     const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
@@ -1195,7 +1211,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     return { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, quotationData?.latestContent]);
+  }, [status, theContent]);
 
   // optionQuotationState
   const panel_editable: TpanelList = [
@@ -1313,7 +1329,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         }
       : null,
 
-    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+    // 有contentId就會取用content，就不應該編輯
+    !contentId ? { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) } : null,
 
     { type: 'myButton', label: '返回', onClick: () => router.back() },
   ];
@@ -1331,9 +1348,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // region useEffect
 
   useEffect(() => {
-    setStatus(latestContent?.status ?? 'Budget');
+    setStatus(theContent?.status ?? 'Budget');
     // setEditNotes(latestContent?.editNotes ?? '');
-  }, [quotationData, disabled]);
+  }, [theContent, disabled]);
 
   useEffect(() => {
     const arr = attachments?.map((item) => {
@@ -1369,7 +1386,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }, [productList]);
 
   useEffect(() => {
-    if (!quotationData) {
+    if (!theContent) {
       return;
     }
 
@@ -1385,7 +1402,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       paymentMethods,
       annotations,
       quotationRanges,
-    } = quotationData.latestContent;
+    } = theContent;
 
     // setAnnotation(annotations ?? []);
     // setQr(quotationRanges ?? []);
@@ -1400,7 +1417,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       deliveryLocation,
       deliveryDate,
     });
-  }, [quotationData]);
+  }, [theContent]);
 
   useEffect(() => {
     // 進入page後會自動計算attachTotal
@@ -1427,15 +1444,21 @@ function TheQuotation({ router }: { router: NextRouter }) {
   ]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        await Promise.all([update(), updateAttachments()]);
-      } catch (error) {}
+    // (async () => {
+    //   try {
+    //     setIsLoading(true);
+    //     await Promise.all([update(), updateAttachments()]);
+    //   } catch (error) {}
 
+    //   setIsLoading(false);
+    // })();
+
+    (async () => {
+      setIsLoading(true);
+      await Promise.all([update_content(), update_quotation()]);
       setIsLoading(false);
     })();
-  }, [quotationId]);
+  }, [quotationId, contentId]);
 
   // --------------------------------------------------------------------------
 
@@ -1445,7 +1468,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     <div className={classNames(style.container, 'relative')}>
       {/* <PageHeader02 tagList={tagList} panelList={!disabled ? panel_editable : panel_noEditable} /> */}
       <PageHeader02
-        tag={`報價編號 ${quotationData?.latestContent.quotationNumber || ''}　追加追減報價單`}
+        tag={`報價編號 ${theContent?.quotationNumber || ''}　追加追減報價單`}
         customeLeft={customeLeft}
         panelList={panelList}
       />
@@ -1697,14 +1720,14 @@ function TheQuotation({ router }: { router: NextRouter }) {
       只有型號 doorModel為 303A 303AS 時才要呈現出支板 其他doorModel都隱藏
       */}
 
-      {latestContent && (
+      {theContent && (
         <QuotationPdf
           visible={pdfModalVisible}
           onCancel={() => {
             setPdfModalVisible(false);
           }}
           pdfData={pdfData}
-          fileName={`報價單-${latestContent?.quotationNumber}`}
+          fileName={`報價單-${theContent?.quotationNumber}`}
           // productArr_f={Object.values(productList)}
           // basicInfo={latestContent}
 
@@ -1746,7 +1769,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           setShowPdf_part(false);
         }}
         mainProductArr={pdfPartPropsArr}
-        quotationId={latestContent?.quotationNumber ?? ''}
+        quotationId={theContent?.quotationNumber ?? ''}
       />
 
       {/* 合約審核表 */}
@@ -1759,10 +1782,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
         // totalPrice={Number(state_summary.total.replaceAll(',', ''))}
         // contentId={lastestContentId}
         quotationId={quotationData?.id}
+        contentId={theContent?.id}
         // verifyForm={verifyForm}
         onConfirm={async () => {
           setIsLoading(true);
-          await update();
+          await update_quotation();
           setIsLoading(false);
         }}
       />

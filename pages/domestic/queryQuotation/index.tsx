@@ -266,7 +266,9 @@ export default function Budget() {
           };
           const href_body_attach = {
             pathname: '/domestic/quotationList/attachQuotation',
-            query,
+            query: {
+              ...query,
+            },
           };
 
           const href = isAttachtQuotation ? href_body_attach : href_body;
