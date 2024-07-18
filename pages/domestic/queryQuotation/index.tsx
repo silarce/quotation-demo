@@ -253,7 +253,7 @@ export default function Budget() {
             id: id,
             status: status,
             contentId: content.id,
-            contnetVersion: version,
+            contentVersion: version,
           };
 
           if (isContract) {
