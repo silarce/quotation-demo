@@ -51,7 +51,8 @@ export default function ProdReceiptList() {
         suppliertaxid,
         supplieraddress,
         supplierphone,
-        invoice
+        invoice,
+        status
     } = router.query;
 
 
@@ -75,9 +76,6 @@ export default function ProdReceiptList() {
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-
-
-    const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
     const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
@@ -95,6 +93,9 @@ export default function ProdReceiptList() {
     const [suppliernamein, setSuppliernamein] = useState<string>("");
     const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
+    const [supplierphonein, setSupplierphonein] = useState<string>("");
+    const [statusin, setStatusin] = useState<string>("");
+
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -179,19 +180,19 @@ export default function ProdReceiptList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        { searchGroup },
-        {
-            type: 'addButton',
-            label: '新增採購單',
-            onClick: () => {
-                router.push({
-                    pathname: `/factoryDepartment/addPurchaseOrder`,
-                    query: {
-                        type: 'Tray',
-                    },
-                });
-            },
-        },
+        // { searchGroup },
+        // {
+        //     type: 'addButton',
+        //     label: '新增採購單',
+        //     onClick: () => {
+        //         router.push({
+        //             pathname: `/factoryDepartment/addPurchaseOrder`,
+        //             query: {
+        //                 type: 'Tray',
+        //             },
+        //         });
+        //     },
+        // },
     ];
     //#endregion
 
@@ -241,6 +242,8 @@ export default function ProdReceiptList() {
                 setSuppliertaxidin(data[0].suppliertaxid);
                 setInspectedin(data[0].inspected.toString());
                 setSupplieraddressin(data[0].supplieraddress);
+                setStatusin(data[0].status);
+                setSupplierphonein(data[0].supplierphone);
             }
         } catch (error: any) {
             setError("getProdReceipt:" + error.message);
@@ -320,6 +323,8 @@ export default function ProdReceiptList() {
             setSuppliertaxidin(suppliertaxid as string);
             setInspectedin(inspected as string);
             setSupplieraddressin(supplieraddress as string);
+            setStatusin(status as string);
+            setSupplierphonein(supplierphone as string);
         }
     }, [prodreceiptuuid]);
 
@@ -557,21 +562,74 @@ export default function ProdReceiptList() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="採購日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(purchaseordercreate_atin)?.toString() : purchaseordercreate_at,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
                                     caption="進貨日期"
                                     disabled={true}
                                     inputProps={{
                                         props: {
                                             value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="進貨單號"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? prodreceiptidin : prodreceiptid,
+                                        },
+                                    }}
+                                />
+
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="進貨人員"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? create_byin : create_by,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: statusin,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商名稱"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? suppliernamein : suppliername,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商地址"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="採購日期"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? getTaiwanDateStr(purchaseordercreate_atin)?.toString() : purchaseordercreate_at,
                                         },
                                     }}
                                 />
@@ -587,16 +645,6 @@ export default function ProdReceiptList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="進貨單號"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? prodreceiptidin : prodreceiptid,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
                                     caption="採購人員"
                                     disabled={true}
                                     inputProps={{
@@ -605,38 +653,7 @@ export default function ProdReceiptList() {
                                         },
                                     }}
                                 />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="進貨人員"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? create_byin : create_by,
-                                        },
-                                    }}
-                                />
-                                {/* <InputSel
-                                {...inputSelProps}
-                                caption="進貨人員"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: checkfirstin === 0 ? create_byin : create_by,
-                                    },
-                                }}
-                            /> */}
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="廠商名稱"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? suppliernamein : suppliername,
-                                        },
-                                    }}
-                                />
+
                                 <InputSel
                                     {...inputSelProps}
                                     caption="統一編號"
@@ -649,46 +666,36 @@ export default function ProdReceiptList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="廠商地址"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
                                     caption="聯絡電話"
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: supplierphone ? supplierphone : ' ',
+                                            value: supplierphonein ? supplierphone : ' ',
                                         },
                                     }}
                                 />
+                                {/* <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                /> */}
                             </div>
                             <div>
                                 <InputSel
@@ -737,17 +744,21 @@ export default function ProdReceiptList() {
                             <div></div>
                         </div>
                         <div className={scss.head_foot1}>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div style={{ textAlign: "right" }}>
+                                <span >
+                                    <button className={scss.redbtn} onClick={() => { alert("結案") }}>結案</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div className={scss.head_foot2}>
                             <div>
                                 <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     進貨查詢
                                 </button>
                             </div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_foot2}>
-                            <div></div>
                             <div></div>
                             <div></div>
                             <div></div>
@@ -796,9 +807,13 @@ export default function ProdReceiptList() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
+                                <span>
+                                    <button className={scss.redbtn} onClick={() => { alert("新增付款單") }}>新增付款</button>
+                                </span>
+                                &nbsp;
                                 {/* <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}> */}
                                 <span>
-                                    <button className={scss.redbtn} >新增入庫單</button>
+                                    <button className={scss.redbtn} onClick={() => { alert("新增入庫單") }}>新增入庫</button>
                                 </span>
                             </div>
                         </div>

@@ -28,6 +28,8 @@ import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
 import icon_search from 'public/image/icon/search.svg';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
+import icon_fc_collapse_right from 'public/image/icon/fc_collapse_right.svg';
+
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -77,7 +79,7 @@ export default function PurchaseOrderList() {
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
-    const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
+    const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
     const [receiptedin, setReceiptedin] = useState<string>("");
     const [create_atin, setCreate_atin] = useState<string>("");
     const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
@@ -91,6 +93,7 @@ export default function PurchaseOrderList() {
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [notein, setNotein] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
+
 
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
@@ -191,19 +194,19 @@ export default function PurchaseOrderList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        { searchGroup },
-        {
-            type: 'addButton',
-            label: '新增採購單',
-            onClick: () => {
-                router.push({
-                    pathname: `/factoryDepartment/purchaseOrderList/addPurchaseOrder`,
-                    query: {
-                        type: 'AddPurchaseOrder',
-                    },
-                });
-            },
-        },
+        // { searchGroup },
+        // {
+        //     type: 'addButton',
+        //     label: '新增採購單',
+        //     onClick: () => {
+        //         router.push({
+        //             pathname: `/factoryDepartment/purchaseOrderList/addPurchaseOrder`,
+        //             query: {
+        //                 type: 'AddPurchaseOrder',
+        //             },
+        //         });
+        //     },
+        // },
     ];
     //#endregion
 
@@ -452,7 +455,7 @@ export default function PurchaseOrderList() {
             myAlert.info(
                 {
                     title: '單據新增成功',
-                    content: `請購單據號碼為:${responseData}`
+                    content: `進貨單號為:${responseData}`
                 })
 
             setData2([]);
@@ -663,7 +666,7 @@ export default function PurchaseOrderList() {
 
                         // 打印數據到控制台以供調試
                         console.log(data);
-                        return;
+                        // return;
                         // 發送數據到 API
                         const response = await fetch(`${setting.apipath}SaveData`, {
                             method: 'POST',
@@ -951,8 +954,11 @@ export default function PurchaseOrderList() {
                         <div className={scss.head_foot2}>
                             <div>
                                 <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    {/* <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} /> */}
+                                    {/* <img src={icon_fc_collapse_right.src} alt="search" style={{ height: '15px', width: '15px' }} /> */}
                                     採購查詢
+                                </button>
+                                <button className={scss.minibtn} onClick={() => { alert("comming soon!") }}>
+                                    進貨明細
                                 </button>
                             </div>
                             <div>
@@ -990,8 +996,11 @@ export default function PurchaseOrderList() {
                                             <span>{_item.unitprice.toLocaleString()}</span>
                                             <span>{_item.totalprice.toLocaleString()}</span>
                                             <span>
-                                                <button onClick={() => { GetProdReceiptDetailByPurchaseOrderId(_item.purchaseorderuuid, _item.id) }}>
+                                                <button style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }} onClick={() => { GetProdReceiptDetailByPurchaseOrderId(_item.purchaseorderuuid, _item.id) }}>
                                                     <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                                </button>
+                                                <button style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button>
                                             </span>
                                         </div>

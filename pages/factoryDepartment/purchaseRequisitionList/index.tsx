@@ -438,7 +438,7 @@ export default function PurchaseRequisitionList() {
             myAlert.info(
                 {
                     title: '單據新增成功',
-                    content: `採購單據號碼為:${data}`
+                    content: `採購單號為:${data}`
                 })
             getPurchaseRequisition();
             getPurchaseRequisitionDetail(purchaserequisitionuuidin);
@@ -1108,7 +1108,11 @@ export default function PurchaseRequisitionList() {
                                 <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     請購查詢
                                 </button>
-                                <button className={scss.minibtn} onClick={() => { goQuotereqDetailList('all') }}>
+                                <button style={{ display: `${statusin === '已結案' ? 'none' : ''}` }} className={scss.minibtn} onClick={() => { goQuotereqDetailList('all') }}>
+                                    {/* <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
+                                    詢價管理
+                                </button>
+                                <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.minidisabledbtn} >
                                     {/* <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                     詢價管理
                                 </button>
