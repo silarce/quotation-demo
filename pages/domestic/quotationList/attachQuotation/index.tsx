@@ -75,19 +75,19 @@ import {
   TquotationDto,
   TquotationContentDto,
   TcreateQuotationContentDto,
-  // useGetQuotation_id,
-  useGetQuotation_id_2,
+  //
   apiPostQuotation,
   apiPatchQuotation,
   apiQuotationSubmitReview,
   apiQuotationReview,
   apiQuotationUnlock,
-  //
-  useQuotation_id_attachments,
   apiPostQuotation_id_attachments,
   apiDelQuotation_id_attachments,
-  //
   apiPatchQuotationToPending,
+  //
+  useGetQuotation_id_2,
+  useGetQuotationContent_id_2,
+  useQuotation_id_attachments,
 } from 'js/api/api_quotation';
 
 import { Class_product, useProductList } from 'hooks/quotation/useProduct';
@@ -137,6 +137,13 @@ type Tprofile = {
   isLost: boolean;
 };
 
+type Tquery = {
+  id: string; // 報價單id
+  contentId: string | undefined;
+  contentVersion: string | undefined;
+  // status: string | undefined;
+};
+
 // ------------------------------------------------------------------
 export default function Quotation() {
   const router = useRouter();
@@ -154,9 +161,7 @@ export default function Quotation() {
 // =================================================================
 
 function TheQuotation({ router }: { router: NextRouter }) {
-  const {
-    id: quotationId, //報價單id //若為新增報價單則為undefined
-  } = router.query as { id: string | undefined };
+  const { id: quotationId, contentId, contentVersion } = router.query as Tquery;
   const { userInfo } = useContext(AppContext);
   const userId = userInfo?.employee?.id;
 
@@ -202,7 +207,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [isLoading, setIsLoading] = useState(false);
   // 是否可編輯
   const [disabled, setDisabled] = useState(true);
-  // const [disabled_reviewer, setDisabled_reviewer] = useState(true);
   const disabled_static = true;
 
   const [vrKeyArr_attach, setVrKeyArr_attach] = useState<string[]>();
@@ -212,89 +216,35 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [reviewModalShow, setReviewModalShow] = useState(false);
   const [showEmployeSelector, setShowEmployeSelector] = useState(false);
 
-  // const [showPdf, setShowPdf] = useState(false);
   const [showPdf_part, setShowPdf_part] = useState(false);
 
   const [showMemoModal, setShowMemoModal] = useState(false);
   // -----------------------------------------------------
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
 
-  // const [anno, setAnnotation] = useState<string[]>([]);
-  // const [qr, setQr] = useState<string[]>([]);
+  // -----------------------------------------------------
 
-  // const onDoorTypeChange = ({
-  //   annoShouldRemove,
-  //   annoArr,
-  //   qrShouldRemove,
-  //   qrArr,
-  // }: {
-  //   annoShouldRemove: string[] | undefined;
-  //   annoArr: string[] | undefined;
-  //   qrShouldRemove: string[] | undefined;
-  //   qrArr: string[] | undefined;
-  // }) => {
-  //   setAnnotation((anno) => {
-  //     let annoCopy = [...anno];
+  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
-  //     // 把應該被移除拿掉
-  //     if (annoShouldRemove) {
-  //       annoShouldRemove.forEach((asmStr) => {
-  //         const delIndex = annoCopy.findIndex((str) => asmStr === str);
+  const [state_summary, setState_Summary] = useState<{
+    discountRate: string;
+    tuneTotal: string;
+    subTotal: string;
+    salesTax: string;
+    total: string;
+    deliveryLocation: string;
+    deliveryDate: string;
+  }>({
+    discountRate: '100',
+    tuneTotal: '',
+    subTotal: '',
+    salesTax: '',
+    total: '',
+    deliveryLocation: '',
+    deliveryDate: '',
+  });
 
-  //         if (delIndex > -1) {
-  //           annoCopy.splice(delIndex, 1);
-  //         }
-  //       });
-  //     }
-
-  //     // 先把重複的拿掉，再把新的放進去
-  //     if (annoArr) {
-  //       annoArr.forEach((asmStr) => {
-  //         const delIndex = annoCopy.findIndex((str) => asmStr === str);
-
-  //         if (delIndex > -1) {
-  //           annoCopy.splice(delIndex, 1);
-  //         }
-  //       });
-
-  //       annoCopy = [...annoCopy, ...annoArr];
-  //     }
-
-  //     return annoCopy;
-  //   });
-
-  //   setQr((qr) => {
-  //     let qrCopy = [...qr];
-
-  //     // 把應該被移除拿掉
-  //     if (qrShouldRemove) {
-  //       qrShouldRemove.forEach((asmStr) => {
-  //         const delIndex = qrCopy.findIndex((str) => asmStr === str);
-
-  //         if (delIndex > -1) {
-  //           qrCopy.splice(delIndex, 1);
-  //         }
-  //       });
-  //     }
-
-  //     // 先把重複的拿掉，再把新的放進去
-  //     if (qrArr) {
-  //       qrArr.forEach((asmStr) => {
-  //         const delIndex = qrCopy.findIndex((str) => asmStr === str);
-
-  //         if (delIndex > -1) {
-  //           qrCopy.splice(delIndex, 1);
-  //         }
-  //       });
-
-  //       qrCopy = [...qrCopy, ...qrArr];
-  //     }
-
-  //     return qrCopy;
-  //   });
-
-  //   // setAnnotation(annoCopy);
-  // };
+  const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   // -----------------------------------------------------
   // 資料
@@ -307,7 +257,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // --------------------------------------------------------------------
 
-  // --------------------------------------------------------------------
   isReviewer = false;
   isSales = false;
   isWorkDirector = false;
@@ -473,26 +422,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const { attachments, updateAttachments, domain } = useQuotation_id_attachments(lastestContentId);
 
-  const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
-
-  useEffect(() => {
-    const arr = attachments?.map((item) => {
-      const imageReg = /^image/;
-      const pdfReg = /pdf$/;
-      const fileType = imageReg.test(item.mime) ? 'image' : pdfReg.test(item.mime) ? 'pdf' : 'other';
-
-      return {
-        fileId: item.id,
-        fileType,
-        fileName: item.name,
-        fileSrc: `${domain}/file/download/${item.id}`,
-        isNew: false,
-      };
-    });
-    setFileInfoArr(arr ?? []);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attachments]);
-
   const removeFileInfo = (index: number) => {
     fileInfoArr[index].willDelete = true;
     setFileInfoArr([...fileInfoArr]);
@@ -546,13 +475,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // -----------------------------------------------------
 
-  // -----------------------------------------------------
-
-  useEffect(() => {
-    setStatus(latestContent?.status ?? 'Budget');
-    // setEditNotes(latestContent?.editNotes ?? '');
-  }, [quotationData, disabled]);
-
   const { control_profile, state_profile, state_customer } = useProfile({
     quotationContent: quotationData?.latestContent,
     disabled,
@@ -562,30 +484,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     quotationContent: quotationData?.latestContent,
     disabled,
   });
-
-  // -----------------------------------------------------
-  // -----------------------------------------------------
-  // -----------------------------------------------------
-
-  const [state_summary, setState_Summary] = useState<{
-    discountRate: string;
-    tuneTotal: string;
-    subTotal: string;
-    salesTax: string;
-    total: string;
-    deliveryLocation: string;
-    deliveryDate: string;
-  }>({
-    discountRate: '100',
-    tuneTotal: '',
-    subTotal: '',
-    salesTax: '',
-    total: '',
-    deliveryLocation: '',
-    deliveryDate: '',
-  });
-
-  const [paymentMethod, setPaymentMethod] = useState<{ milestone: string; totalPaymentRatio: string }[]>([]);
 
   // -----------------------------------------------------
 
@@ -643,558 +541,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [targetProdKey_attach, setTargetProdKey_attach] = useState<string>('n');
   const targetProd_attach = attachProdList[targetProdKey_attach];
 
-  useEffect(() => {
-    if (!productList) {
-      return;
-    }
-
-    Object.values(productList).forEach((prod) => {
-      const childContent = prod.id ? contentProdList?.[prod.id] : undefined;
-      const qty = childContent?.quantity ? childContent?.quantity : undefined;
-
-      if (qty !== undefined) {
-        prod.reduceQty = String(Number(prod.quantity) - qty);
-      }
-    });
-  }, [productList]);
-
-  // -------------------------------------------------------
-  // -------------------------------------------------------
-  // -------------------------------------------------------
-
-  useEffect(() => {
-    if (!quotationData) {
-      return;
-    }
-
-    const {
-      //
-      discount,
-      tuneTotal,
-      subTotal,
-      salesTax,
-      total,
-      deliveryLocation,
-      deliveryDate,
-      paymentMethods,
-      annotations,
-      quotationRanges,
-    } = quotationData.latestContent;
-
-    // setAnnotation(annotations ?? []);
-    // setQr(quotationRanges ?? []);
-    setPaymentMethod(paymentMethods);
-
-    setState_Summary({
-      discountRate: discount,
-      tuneTotal,
-      subTotal: String(subTotal),
-      salesTax: String(salesTax),
-      total: String(total),
-      deliveryLocation,
-      deliveryDate,
-    });
-  }, [quotationData]);
-
-  useEffect(() => {
-    // 進入page後會自動計算attachTotal
-    // 所以沒有報價單那邊那樣的的問題
-
-    const { subTotal, salesTax, total } = countPayInfoValue({
-      // discount: summary.discountRate,
-      tuneTotal: state_summary.tuneTotal,
-      prodSubTotal: attachTotal,
-    });
-
-    setState_Summary((state) => {
-      return {
-        ...state,
-        subTotal,
-        salesTax,
-        total,
-      };
-    });
-  }, [
-    // summary.discountRate,
-    state_summary.tuneTotal,
-    attachTotal,
-  ]);
-
-  //
-  //
-  //
-
-  // const control_anno: TsummaryControl = {
-  //   stringArr: anno,
-  //   editString: (index, v) => {
-  //     setAnnotation((state) => {
-  //       const copy = [...state];
-  //       copy[index] = v;
-
-  //       return copy;
-  //     });
-  //   },
-  //   addString: (v: string) => {
-  //     setAnnotation((state) => {
-  //       const copy = [...state];
-  //       copy.push(v);
-
-  //       return copy;
-  //     });
-  //   },
-  //   delString: (index: number) => {
-  //     setAnnotation((state) => {
-  //       const copy = [...state];
-  //       copy.splice(index, 1);
-
-  //       return copy;
-  //     });
-  //   },
-  //   addStrArr: (vArr: string[]) => {
-  //     setAnnotation((state) => {
-  //       const copy = [...state];
-  //       copy.push(...vArr);
-
-  //       return copy;
-  //     });
-  //   },
-  //   replaceStrArr: (strArr: string[]) => {
-  //     setAnnotation(strArr);
-  //   },
-  // };
-
-  // const control_qr: TsummaryControl = {
-  //   stringArr: qr,
-  //   editString: (index, v) => {
-  //     setQr((state) => {
-  //       const copy = [...state];
-  //       copy[index] = v;
-
-  //       return copy;
-  //     });
-  //   },
-  //   addString: (v: string) => {
-  //     setQr((state) => {
-  //       const copy = [...state];
-  //       copy.push(v);
-
-  //       return copy;
-  //     });
-  //   },
-  //   delString: (index: number) => {
-  //     setQr((state) => {
-  //       const copy = [...state];
-  //       copy.splice(index, 1);
-
-  //       return copy;
-  //     });
-  //   },
-  //   addStrArr: (vArr: string[]) => {
-  //     setQr((state) => {
-  //       const copy = [...state];
-  //       copy.push(...vArr);
-
-  //       return copy;
-  //     });
-  //   },
-  //   replaceStrArr: (strArr: string[]) => {
-  //     setQr(strArr);
-  //   },
-  // };
-
-  // ----------------------------------------------------------------------
-  const payInfoControl: TpayInfoControl = {
-    payment: {
-      haveTax: {
-        // value: !!taxRate,
-        value: !!state_summary.salesTax,
-        onChange: (v) => {
-          // if (quotationProdSubTotal === '') {
-          //   calcSubTotalPrice();
-          // }
-          // setTaxRate(v ? 0.05 : 0);
-        },
-      },
-
-      discountRate: {
-        inputAttr: {
-          disabled: disabled_static,
-          value: state_summary.discountRate,
-          onChange: (e) => {
-            let v = e.target.value;
-            setState_Summary((state) => {
-              const copy = { ...state };
-
-              if ((v as string) === '') {
-                v = '0';
-              }
-
-              if (Number(v) > 500) {
-                v = '500';
-              }
-
-              if (v.split('.')[1]?.length > 3) {
-                return copy;
-              }
-
-              copy.discountRate = v;
-
-              return copy;
-            });
-          },
-        },
-      },
-      tuneTotal: {
-        inputAttr: {
-          disabled: disabled,
-          value: state_summary.tuneTotal,
-          onChange: (e) => {
-            const value_num = Number(e.target.value);
-
-            if (Math.abs(value_num) > 10) {
-              return;
-            }
-
-            setState_Summary((state) => ({
-              ...state,
-              tuneTotal: e.target.value,
-            }));
-          },
-        },
-      },
-      subTotal: {
-        inputAttr: {
-          disabled: disabled_static,
-          value: state_summary.subTotal,
-        },
-      },
-      salesTax: {
-        inputAttr: {
-          disabled: disabled_static,
-          value: state_summary.salesTax,
-        },
-      },
-      total: {
-        inputAttr: {
-          disabled: disabled_static,
-          value: state_summary.total,
-        },
-      },
-    },
-
-    delivery: {
-      deliveryLocation: {
-        value: state_summary.deliveryLocation,
-        onChange: (v) => {
-          setState_Summary((state) => {
-            const copy = { ...state };
-            copy.deliveryLocation = v;
-
-            return copy;
-          });
-        },
-      },
-      deliveryDate: {
-        value: state_summary.deliveryDate,
-        onChange: (v) => {
-          setState_Summary((state) => {
-            const copy = { ...state };
-            copy.deliveryDate = v;
-
-            return copy;
-          });
-        },
-      },
-    },
-    paymentMethod: {
-      arr: paymentMethod.map((item, index) => {
-        const { milestone, totalPaymentRatio } = item;
-
-        const onChange = (v: string) => {
-          if (v === '') {
-            v = '0';
-          }
-
-          setPaymentMethod((state) => {
-            const copy = [...state];
-            copy[index].totalPaymentRatio = v;
-
-            return copy;
-          });
-        };
-
-        const delSelf = () => {
-          setPaymentMethod((state) => {
-            const copy = [...state];
-            copy.splice(index, 1);
-
-            return copy;
-          });
-        };
-
-        return {
-          label: milestone,
-          value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
-          onChange,
-          delSelf,
-        };
-        //
-      }),
-      addMethod: (v) => {
-        setPaymentMethod((state) => {
-          const copy = [...state];
-          copy.push({ milestone: v, totalPaymentRatio: '' });
-
-          return copy;
-        });
-      },
-    },
-  };
-
-  // ----------------------------------------------------------------
-
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsLoading(true);
-        await Promise.all([update(), updateAttachments()]);
-      } catch (error) {}
-
-      setIsLoading(false);
-    })();
-  }, [quotationId]);
-
-  const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useMemo(() => {
-    const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
-      {
-        label: '總經理',
-        value: quotationData?.latestContent.reviewManagerEmployee?.chName,
-        style: { width: '200px' },
-      },
-      {
-        label: '應收帳款',
-        value: quotationData?.latestContent.reviewCashierEmployee?.chName,
-        style: { width: '200px' },
-      },
-      {
-        label: '應收帳款',
-        value: quotationData?.latestContent.reviewWorkDirectorEmployee?.chName,
-        style: { width: '200px' },
-      },
-      {
-        label: '業務主管',
-        value: quotationData?.latestContent.reviewSupervisorEmployee?.chName,
-        style: { width: '200px' },
-      },
-      {
-        label: '業務',
-        value: quotationData?.latestContent.reviewSalesEmployee?.chName,
-        style: { width: '200px' },
-      },
-      {
-        label: '經辦',
-        value: agentEmployee?.chName,
-        style: { width: '200px' },
-      },
-    ];
-
-    if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-      signatureArr.splice(1, 2);
-    }
-
-    if (status === 'Pending') {
-      signatureArr.splice(5, 1);
-    }
-
-    const control_signature = {
-      signatureArr,
-    };
-
-    const defaultSeletedDataArrArr: Parameters<typeof EmployeeSelectorGroup>[0]['defaultSeletedDataArrArr'] = [
-      quotationData?.latestContent.reviewSalesEmployee ? [quotationData.latestContent.reviewSalesEmployee] : undefined,
-      quotationData?.latestContent.reviewSupervisorEmployee
-        ? [quotationData.latestContent.reviewSupervisorEmployee]
-        : undefined,
-    ];
-
-    const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
-
-    if (status === 'Pending' && dynaSelectorPropsList[0]) {
-      dynaSelectorPropsList[0].isSkip = true;
-    }
-
-    return { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, quotationData?.latestContent]);
-
-  // --------------------------------------------------------------------------
-
-  const inputModalOnConfirm = (v: string) => {
-    if (!v) {
-      return myAlert.warning({ title: '請輸入註解' });
-    }
-
-    setShowMemoModal(false);
-    reqUpdateQuotation({ editNotes: v });
-  };
-
-  const history = useMemo(() => {
-    let content = quotationData?.contents ?? [];
-
-    if (content) {
-      content = _.sortBy(content, (item) => item.createdAt);
-    }
-
-    return content.map((item, index, arr) => {
-      const { status, quotationDate, createdAt } = item;
-      const preStatus = arr[index - 1]?.status;
-
-      return {
-        state_from: quotationStatusLookup[preStatus] ?? '建立',
-        state_to: quotationStatusLookup[status] ?? '',
-        isoString: moment(createdAt).toISOString(),
-      };
-    });
-  }, [quotationData]);
-
-  // optionQuotationState
-  const panel_editable: TpanelList = [
-    {
-      // 報價/歷史狀態狀態
-      custom: (
-        <QuotationStateSel
-          quotationState={{ value: status, label: quotationStatusLookup[status] }}
-          setQuotationState={(option) => {
-            setStatus(option.value as TquotationContentDto['status']);
-          }}
-          history={history}
-        />
-      ),
-    },
-    { type: 'redButton', label: '上傳', onClick: () => setShowMemoModal(true) },
-    {
-      type: 'myButton',
-      label: '取消',
-      onClick: () => {
-        setDisabled(true);
-        resetClass();
-        setTargetProdKey('n');
-      },
-    },
-  ];
-  const panel_noEditable: TpanelList = [
-    {
-      type: 'myButton',
-      label: '匯出報價單',
-      img: iconUpload.src,
-      onClick: () => setPdfModalVisible(true),
-    },
-    {
-      type: 'myButton',
-      label: '匯出材料/配件',
-      img: iconUpload.src,
-      onClick: () => setShowPdf_part(true),
-    },
-    isAllReviewedBeforePending && quotationId
-      ? {
-          type: 'redButton',
-          label: '轉為準合約',
-          onClick: () => {
-            myAlert.confirm({
-              title: '確定轉為準合約',
-              props: {
-                onOk: () => {
-                  reqToPending();
-                },
-              },
-            });
-          },
-        }
-      : null,
-
-    (!!isReviewer || null) && {
-      type: 'myButton',
-      label: '審核',
-      onClick: () => setReviewModalShow(true),
-    },
-
-    quotationId
-      ? {
-          type: 'myButton',
-          label: '送審',
-          onClick: () => {
-            if (status === 'Pending' && !verifyForm) {
-              return myAlert.warning({ title: '請先送出合約審核表' });
-            }
-
-            if (status === 'Pending' && toSupervisorAt) {
-              myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
-            } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
-              myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
-            } else {
-              setShowEmployeSelector(true);
-            }
-
-            if (status === 'Pending') {
-              myAlert.info({
-                title: '送審後合約審核表將被鎖定',
-                content: '建議先確認合約審核表是否正確',
-                props: { width: 450 },
-              });
-            }
-          }, // onClick close
-        }
-      : null,
-
-    (() => {
-      if (status === 'Pending') {
-        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
-      } else {
-        return null;
-      }
-    })(),
-
-    status === 'Pending'
-      ? {
-          type: 'myButton',
-          label: '解除鎖定',
-          img: iconRedLock.src,
-          onClick: () => {
-            myAlert.confirm({
-              title: '確定要解除鎖定?',
-              content: '此報價單將需要重新送審並回到發包狀態',
-              props: {
-                onOk: () => {
-                  reqUnlock();
-                },
-              },
-            });
-          },
-        }
-      : null,
-
-    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
-
-    { type: 'myButton', label: '返回', onClick: () => router.back() },
-  ];
-
-  // const panel_editReviewer: TpanelList = [
-  //   {
-  //     type: 'redButton',
-  //     label: '送審',
-  //     onClick: () => {
-  //       reqPatchReviewer();
-  //     },
-  //   },
-  //   {
-  //     type: 'myButton',
-  //     label: '取消',
-  //     onClick: () => setDisabled_reviewer(true),
-  //   },
-  // ];
-
-  // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
 
   // region REQUEST
@@ -1407,7 +753,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     }
   }; // reqUpdateQuotation
 
-  // --------------------------------------------
+  // _______________________________________________________________________
 
   const reqReview = async (isPass: boolean) => {
     if (!quotationId || !isReviewer) {
@@ -1575,8 +921,188 @@ function TheQuotation({ router }: { router: NextRouter }) {
   };
 
   // --------------------------------------------------------------------------
+
+  // region FUNCTION
+
+  const inputModalOnConfirm = (v: string) => {
+    if (!v) {
+      return myAlert.warning({ title: '請輸入註解' });
+    }
+
+    setShowMemoModal(false);
+    reqUpdateQuotation({ editNotes: v });
+  };
+
   // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
+
+  // region PROPS
+
+  const history = useMemo(() => {
+    let content = quotationData?.contents ?? [];
+
+    if (content) {
+      content = _.sortBy(content, (item) => item.createdAt);
+    }
+
+    return content.map((item, index, arr) => {
+      const { status, quotationDate, createdAt } = item;
+      const preStatus = arr[index - 1]?.status;
+
+      return {
+        state_from: quotationStatusLookup[preStatus] ?? '建立',
+        state_to: quotationStatusLookup[status] ?? '',
+        isoString: moment(createdAt).toISOString(),
+      };
+    });
+  }, [quotationData]);
+
+  const payInfoControl: TpayInfoControl = {
+    payment: {
+      haveTax: {
+        // value: !!taxRate,
+        value: !!state_summary.salesTax,
+        onChange: (v) => {
+          // if (quotationProdSubTotal === '') {
+          //   calcSubTotalPrice();
+          // }
+          // setTaxRate(v ? 0.05 : 0);
+        },
+      },
+
+      discountRate: {
+        inputAttr: {
+          disabled: disabled_static,
+          value: state_summary.discountRate,
+          onChange: (e) => {
+            let v = e.target.value;
+            setState_Summary((state) => {
+              const copy = { ...state };
+
+              if ((v as string) === '') {
+                v = '0';
+              }
+
+              if (Number(v) > 500) {
+                v = '500';
+              }
+
+              if (v.split('.')[1]?.length > 3) {
+                return copy;
+              }
+
+              copy.discountRate = v;
+
+              return copy;
+            });
+          },
+        },
+      },
+      tuneTotal: {
+        inputAttr: {
+          disabled: disabled,
+          value: state_summary.tuneTotal,
+          onChange: (e) => {
+            const value_num = Number(e.target.value);
+
+            if (Math.abs(value_num) > 10) {
+              return;
+            }
+
+            setState_Summary((state) => ({
+              ...state,
+              tuneTotal: e.target.value,
+            }));
+          },
+        },
+      },
+      subTotal: {
+        inputAttr: {
+          disabled: disabled_static,
+          value: state_summary.subTotal,
+        },
+      },
+      salesTax: {
+        inputAttr: {
+          disabled: disabled_static,
+          value: state_summary.salesTax,
+        },
+      },
+      total: {
+        inputAttr: {
+          disabled: disabled_static,
+          value: state_summary.total,
+        },
+      },
+    },
+
+    delivery: {
+      deliveryLocation: {
+        value: state_summary.deliveryLocation,
+        onChange: (v) => {
+          setState_Summary((state) => {
+            const copy = { ...state };
+            copy.deliveryLocation = v;
+
+            return copy;
+          });
+        },
+      },
+      deliveryDate: {
+        value: state_summary.deliveryDate,
+        onChange: (v) => {
+          setState_Summary((state) => {
+            const copy = { ...state };
+            copy.deliveryDate = v;
+
+            return copy;
+          });
+        },
+      },
+    },
+    paymentMethod: {
+      arr: paymentMethod.map((item, index) => {
+        const { milestone, totalPaymentRatio } = item;
+
+        const onChange = (v: string) => {
+          if (v === '') {
+            v = '0';
+          }
+
+          setPaymentMethod((state) => {
+            const copy = [...state];
+            copy[index].totalPaymentRatio = v;
+
+            return copy;
+          });
+        };
+
+        const delSelf = () => {
+          setPaymentMethod((state) => {
+            const copy = [...state];
+            copy.splice(index, 1);
+
+            return copy;
+          });
+        };
+
+        return {
+          label: milestone,
+          value: totalPaymentRatio === '0' ? '' : totalPaymentRatio,
+          onChange,
+          delSelf,
+        };
+        //
+      }),
+      addMethod: (v) => {
+        setPaymentMethod((state) => {
+          const copy = [...state];
+          copy.push({ milestone: v, totalPaymentRatio: '' });
+
+          return copy;
+        });
+      },
+    },
+  };
 
   const pdfPartPropsArr = useMemo(() => {
     const pdfPartPropsArr_productList = extractPdfPartFromClassProduct({
@@ -1593,16 +1119,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachProdList, productList]);
 
-  // --------------------------------------------------------------------------
-
-  const panelList = (() => {
-    if (disabled) {
-      return panel_noEditable;
-    } else {
-      return panel_editable;
-    }
-  })();
-
   const VersionLabel = () => {
     return (
       <div className="ml-2 mb-1 mt-auto">
@@ -1618,8 +1134,309 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   const customeLeft: React.ReactNode[] = [<VersionLabel key="0" />];
 
+  const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useMemo(() => {
+    const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
+      {
+        label: '總經理',
+        value: quotationData?.latestContent.reviewManagerEmployee?.chName,
+        style: { width: '200px' },
+      },
+      {
+        label: '應收帳款',
+        value: quotationData?.latestContent.reviewCashierEmployee?.chName,
+        style: { width: '200px' },
+      },
+      {
+        label: '應收帳款',
+        value: quotationData?.latestContent.reviewWorkDirectorEmployee?.chName,
+        style: { width: '200px' },
+      },
+      {
+        label: '業務主管',
+        value: quotationData?.latestContent.reviewSupervisorEmployee?.chName,
+        style: { width: '200px' },
+      },
+      {
+        label: '業務',
+        value: quotationData?.latestContent.reviewSalesEmployee?.chName,
+        style: { width: '200px' },
+      },
+      {
+        label: '經辦',
+        value: agentEmployee?.chName,
+        style: { width: '200px' },
+      },
+    ];
+
+    if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+      signatureArr.splice(1, 2);
+    }
+
+    if (status === 'Pending') {
+      signatureArr.splice(5, 1);
+    }
+
+    const control_signature = {
+      signatureArr,
+    };
+
+    const defaultSeletedDataArrArr: Parameters<typeof EmployeeSelectorGroup>[0]['defaultSeletedDataArrArr'] = [
+      quotationData?.latestContent.reviewSalesEmployee ? [quotationData.latestContent.reviewSalesEmployee] : undefined,
+      quotationData?.latestContent.reviewSupervisorEmployee
+        ? [quotationData.latestContent.reviewSupervisorEmployee]
+        : undefined,
+    ];
+
+    const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
+
+    if (status === 'Pending' && dynaSelectorPropsList[0]) {
+      dynaSelectorPropsList[0].isSkip = true;
+    }
+
+    return { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, quotationData?.latestContent]);
+
+  // optionQuotationState
+  const panel_editable: TpanelList = [
+    {
+      // 報價/歷史狀態狀態
+      custom: (
+        <QuotationStateSel
+          quotationState={{ value: status, label: quotationStatusLookup[status] }}
+          setQuotationState={(option) => {
+            setStatus(option.value as TquotationContentDto['status']);
+          }}
+          history={history}
+        />
+      ),
+    },
+    { type: 'redButton', label: '上傳', onClick: () => setShowMemoModal(true) },
+    {
+      type: 'myButton',
+      label: '取消',
+      onClick: () => {
+        setDisabled(true);
+        resetClass();
+        setTargetProdKey('n');
+      },
+    },
+  ];
+  const panel_noEditable: TpanelList = [
+    {
+      type: 'myButton',
+      label: '匯出報價單',
+      img: iconUpload.src,
+      onClick: () => setPdfModalVisible(true),
+    },
+    {
+      type: 'myButton',
+      label: '匯出材料/配件',
+      img: iconUpload.src,
+      onClick: () => setShowPdf_part(true),
+    },
+    isAllReviewedBeforePending && quotationId
+      ? {
+          type: 'redButton',
+          label: '轉為準合約',
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定轉為準合約',
+              props: {
+                onOk: () => {
+                  reqToPending();
+                },
+              },
+            });
+          },
+        }
+      : null,
+
+    (!!isReviewer || null) && {
+      type: 'myButton',
+      label: '審核',
+      onClick: () => setReviewModalShow(true),
+    },
+
+    quotationId
+      ? {
+          type: 'myButton',
+          label: '送審',
+          onClick: () => {
+            if (status === 'Pending' && !verifyForm) {
+              return myAlert.warning({ title: '請先送出合約審核表' });
+            }
+
+            if (status === 'Pending' && toSupervisorAt) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更審核人員' });
+            } else if (status !== 'Pending' && (toSalesAt || toSupervisorAt)) {
+              myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
+            } else {
+              setShowEmployeSelector(true);
+            }
+
+            if (status === 'Pending') {
+              myAlert.info({
+                title: '送審後合約審核表將被鎖定',
+                content: '建議先確認合約審核表是否正確',
+                props: { width: 450 },
+              });
+            }
+          }, // onClick close
+        }
+      : null,
+
+    (() => {
+      if (status === 'Pending') {
+        return { type: 'myButton', label: '合約審核表', onClick: () => setReviewFormShow(true) };
+      } else {
+        return null;
+      }
+    })(),
+
+    status === 'Pending'
+      ? {
+          type: 'myButton',
+          label: '解除鎖定',
+          img: iconRedLock.src,
+          onClick: () => {
+            myAlert.confirm({
+              title: '確定要解除鎖定?',
+              content: '此報價單將需要重新送審並回到發包狀態',
+              props: {
+                onOk: () => {
+                  reqUnlock();
+                },
+              },
+            });
+          },
+        }
+      : null,
+
+    { type: 'myButton', label: '編輯', onClick: () => setDisabled(false) },
+
+    { type: 'myButton', label: '返回', onClick: () => router.back() },
+  ];
+
+  const panelList = (() => {
+    if (disabled) {
+      return panel_noEditable;
+    } else {
+      return panel_editable;
+    }
+  })();
+
   // --------------------------------------------------------------------------
-  // --------------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    setStatus(latestContent?.status ?? 'Budget');
+    // setEditNotes(latestContent?.editNotes ?? '');
+  }, [quotationData, disabled]);
+
+  useEffect(() => {
+    const arr = attachments?.map((item) => {
+      const imageReg = /^image/;
+      const pdfReg = /pdf$/;
+      const fileType = imageReg.test(item.mime) ? 'image' : pdfReg.test(item.mime) ? 'pdf' : 'other';
+
+      return {
+        fileId: item.id,
+        fileType,
+        fileName: item.name,
+        fileSrc: `${domain}/file/download/${item.id}`,
+        isNew: false,
+      };
+    });
+    setFileInfoArr(arr ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attachments]);
+
+  useEffect(() => {
+    if (!productList) {
+      return;
+    }
+
+    Object.values(productList).forEach((prod) => {
+      const childContent = prod.id ? contentProdList?.[prod.id] : undefined;
+      const qty = childContent?.quantity ? childContent?.quantity : undefined;
+
+      if (qty !== undefined) {
+        prod.reduceQty = String(Number(prod.quantity) - qty);
+      }
+    });
+  }, [productList]);
+
+  useEffect(() => {
+    if (!quotationData) {
+      return;
+    }
+
+    const {
+      //
+      discount,
+      tuneTotal,
+      subTotal,
+      salesTax,
+      total,
+      deliveryLocation,
+      deliveryDate,
+      paymentMethods,
+      annotations,
+      quotationRanges,
+    } = quotationData.latestContent;
+
+    // setAnnotation(annotations ?? []);
+    // setQr(quotationRanges ?? []);
+    setPaymentMethod(paymentMethods);
+
+    setState_Summary({
+      discountRate: discount,
+      tuneTotal,
+      subTotal: String(subTotal),
+      salesTax: String(salesTax),
+      total: String(total),
+      deliveryLocation,
+      deliveryDate,
+    });
+  }, [quotationData]);
+
+  useEffect(() => {
+    // 進入page後會自動計算attachTotal
+    // 所以沒有報價單那邊那樣的的問題
+
+    const { subTotal, salesTax, total } = countPayInfoValue({
+      // discount: summary.discountRate,
+      tuneTotal: state_summary.tuneTotal,
+      prodSubTotal: attachTotal,
+    });
+
+    setState_Summary((state) => {
+      return {
+        ...state,
+        subTotal,
+        salesTax,
+        total,
+      };
+    });
+  }, [
+    // summary.discountRate,
+    state_summary.tuneTotal,
+    attachTotal,
+  ]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsLoading(true);
+        await Promise.all([update(), updateAttachments()]);
+      } catch (error) {}
+
+      setIsLoading(false);
+    })();
+  }, [quotationId]);
+
   // --------------------------------------------------------------------------
 
   // region RENDER
@@ -2015,7 +1832,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
 //
 //
 //
-// region use AnnoAndQr
 
 // ===============================================================================
 // region FUNCTION
