@@ -183,7 +183,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "PurchaseOrderDetail2") {
     return (
       <div className={style.thead13}>
-        <span>次序</span>
+        <span>序</span>
         <span>料號</span>
         <span>品名</span>
         <span>已進數量</span>
@@ -196,13 +196,14 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-  //#region 進貨單
+  //#region 請購單
   else if (type === "PurchaseRequisition") {
     return (
       <div className={style.thead15}>
         <span>請購日期</span>
         <span>請購單號</span>
         <span>狀態</span>
+        {/* <span>請購人員</span> */}
         <span></span>
       </div>
     )
@@ -212,7 +213,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "PurchaseRequisitionDetail") {
     return (
       <div className={style.thead16}>
-        <span>次序</span>
+        <span>序</span>
         <span>料號</span>
         <span>品名</span>
         <span>規格</span>
@@ -227,11 +228,29 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
+    //#region 採購單明細2
+    else if (type === "PurchaseRequisitionDetail2") {
+      return (
+        <div className={style.thead21}>
+          <span>序</span>
+          <span>料號</span>
+          <span>品名</span>
+          <span>已進數量</span>
+          <span>數量</span>
+          <span>單位</span>
+          <span>單價</span>
+          <span>金額</span>
+          <span>廠商</span>
+          <span></span>
+        </div>
+      )
+    }
+    //#endregion
   //#region 詢價單明細
   else if (type === "Quotereq") {
     return (
       <div className={style.thead17}>
-        <span>次序</span>
+        <span>序</span>
         <span>供應商</span>
         <span>單價</span>
         <span>總價</span>
@@ -248,10 +267,10 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "QuotereqDetail") {
     return (
       <div className={style.thead18}>
-        <span>次序</span>
+        <span>序</span>
         <span>料號</span>
         <span>品名</span>
-        <span>數量</span>
+        <span>已詢數</span>
         <span></span>
       </div>
     )
@@ -261,7 +280,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "QuotereqDetail") {
     return (
       <div className={style.thead18}>
-        <span>次序</span>
+        <span>序</span>
         <span>料號</span>
         <span>品名</span>
         <span>數量</span>
@@ -276,20 +295,23 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <div className={style.thead19}>
           <span>料號</span>
           <span>名稱</span>
-          <span>單位</span>
+          <span>規格</span>
+          <span>庫存</span>
           <span></span>
         </div>
       )
     }
     //#endregion
-  //#region 請購明細
+  //#region 新增請購單明細
   else if (type === "AddPR_ReqList") {
     return (
       <div className={style.thead20}>
-        <span>次序</span>
+        <span>序</span>
         <span>名稱</span>
         <span>規格</span>
         <span>數量</span>
+        <span>單位</span>
+        <span>備註(用途說明)</span>
         <span></span>
       </div>
     )

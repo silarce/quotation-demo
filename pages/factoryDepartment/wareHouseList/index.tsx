@@ -139,7 +139,7 @@ export default function WareHouseList() {
 
     return (
 
-        <SubLayer isLoading_subLayer={false}>
+        <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫'} panelList={panelList} />
             <div>
                 <Thead01 type={'WareHouse'} />

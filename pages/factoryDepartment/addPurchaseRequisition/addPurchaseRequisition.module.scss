@@ -1,235 +1,278 @@
 @use "styles/theme01" as *;
-.top {
-    @extend .grid;
 
-    .address {
-        grid-column: span 1;
-    }
+.top {
+  @extend .grid;
+
+  .address {
+    grid-column: span 1;
+  }
 
 }
 
 .grid {
-    display: grid;
-    grid-template-columns: 500px;
-    justify-content: space-between;
-    gap: 35px;
+  display: grid;
+  grid-template-columns: 500px;
+  justify-content: space-between;
+  gap: 35px;
 }
-
-// .main {
-//     display: grid;
-//     grid-template-columns: 850px 1fr; // 左右兩邊比例，可以調整
-//     gap: 15px;
-//     width: auto;
-//     margin-top: 4px;
-//     margin-left: 4px;
-//     margin-right: 4px;
-//     // background-color: gray;
-// }
-
-// .left {
-//     display: grid;
-//     grid-template-columns: 845px;
-//     justify-content: space-between;
-//     gap: 15px;
-//     // overflow-x: hidden;
-//     overflow-y:visible;
-//     border: 2px solid gray;
-//     min-height: 100vh-30vh;
-//     /* 自動調整高度到螢幕大小 */
-// }
-
-// .right {
-//   position: sticky; 
-//   top: 0; /* 距離視窗頂部的距離 */
-//   right: 0; /* 距離視窗右側的距離 */
-//   z-index: 1000; /* 確保元素位於其他內容的上層 */
-//   display: flex;
-//   flex-direction: column; /* 讓內容以列的方式排列 */
-//   align-items: center; /* 垂直居中 */
-//   justify-content: flex-start; /* 從頂部對齊 */
-//   padding-left: 0px;
-//   border: 2px solid gray;
-//   overflow-y: auto; /* 右邊容器垂直滾動 */
-//   // flex: 1; /* 右邊容器佔據剩餘空間 */
-//   max-height: 100vh; /* 使右邊容器的高度不超過視窗高度 */
-// }
-
-
-// .content {
-//     position: -webkit-sticky; // 為兼容性增加前綴
-//     position: sticky;
-//     top: 0; // 距離視窗頂部的距離
-//     right: 0; // 距離視窗右側的距離
-//     z-index: 1000; // 確保元素位於其他內容的上層
-//     // width: 1150px; // 設定固定寬度
-//     height: 280px; // 設定固定高度
-//     // overflow-x: hidden; // 禁止水平滾動
-//     overflow-x: hidden; // 禁止水平滾動
-//     overflow-y: auto; // 垂直滾動（如果需要）
-//     // background-color: orange;
-//     height: 280px;
-//     border: 2px solid gray;
-
-//     .input-wrapper {
-//         display: flex;
-//         flex-direction: column;
-//         width: 150px; // 調整 input 的寬度
-
-//     }
-// }
-
 
 .container {
   display: flex;
-  height: 100vh; /* 設置容器的高度為視窗高度 */
-  overflow-y: hidden; /* 防止外部容器出現滾動條 */
-  height:710px;
+  overflow-y: hidden;
+  height: 712px;
 }
 
-/* 左邊容器 */
 .left {
-  flex: 1; /* 左邊容器佔據剩餘空間 */
+  flex: 80px;
   display: grid;
-  grid-template-columns: 1fr; /* 佔滿容器寬度 */
+  grid-template-columns: 1fr;
   justify-content: space-between;
   gap: 15px;
-  border: 1px solid gray;
-  overflow-y: auto; /* 左邊容器垂直滾動 */
-  height:710px;
-  
+  border: 1px solid #c1c1c1;
+  overflow-y: auto;
+  height: 712px;
+  margin-right: 15px;
 }
 
-/* 右邊容器 */
 .right {
-  flex: 1; /* 右邊容器佔據剩餘空間 */
+  flex: 1;
   display: flex;
-  flex-direction: column; /* 讓內容以列的方式排列 */
-  align-items: center; /* 垂直居中 */
-  justify-content: flex-start; /* 從頂部對齊 */
-  border: 1px solid gray;
-  overflow-y: auto; /* 右邊容器垂直滾動 */
-  position: sticky; 
-  top: 0; /* 距離視窗頂部的距離 */
-  right: 0; /* 距離視窗右側的距離 */
-  z-index: 1000; /* 確保元素位於其他內容的上層 */
-  height:710px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid #c1c1c1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: sticky;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+  height: 712px;
 }
 
 .content {
-  width: 100%; /* 佔滿右邊容器的寬度 */
-  overflow-y: auto; /* 垂直滾動（如果需要） */
+  width: 100%;
+  overflow-y: auto;
+  top: 0;
 }
 
 .left_tite_main {
   position: sticky;
   top: 0;
-  z-index: 1000; // 確保元素位於其他內容的上層
+  z-index: 1000;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 15px;
   width: auto;
   margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
+}
+
+.searchform {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.searchbar {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  width: auto;
+  margin: 5px 20px;
+  height: 41px;
+  // background-color: orange;
+
+  div {
+    border-bottom: 1px solid gray;
+    text-align: right;
+    display: flex;
+    align-items: center;
+
+    input {
+      height: 32px;
+      font-size: 16px;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    img {
+      width: 30px;
+      height: 20px;
+    }
+  }
+}
+
+.addbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: 30px 400px 400px 50px 70px 300px 50px;
+  gap: 15px;
+  width: auto;
+  // margin: 5px 20px;
+  // height: 41px;
+
+  div {
+    // border-bottom: 1px solid gray;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    // width: 150px;
+
+    input {
+      // height: 32px;
+      font-size: 16px;
+      width: 100%;
+      // border:1px solid #c1c1c1;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    img {
+      width: 30px;
+      height: 20px;
+    }
+  }
+}
+
+.head_head1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+
+  div {
+    margin-right: 20px;
+  }
+
   // background-color: gray;
 }
 
-.tite_main {
-    display: grid;
-    grid-template-columns: 1fr 1fr; // 左右兩邊比例，可以調整
-    gap: 15px;
-    width: auto;
-    margin-top: 5px;
-    margin-left: 20px;
+.head_content1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+
+  div {
     margin-right: 20px;
-    // background-color: gray;
+  }
+
+  // background-color: gray;
 }
 
-.head_main {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-    // gap: 15px;
-    width: auto;
-    margin-top: 5px;
-    margin-left: 20px;
-    margin-right: 20px;
-    // background-color: gray;
-}
+.head_content2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
 
+  // background-color: gray;
+  // border-top: 1px solid rgba(128, 128, 128, 0.2);
+  div {
+    margin-right: 20px;
+  }
+}
 
 .addBtn {
-    position: sticky;
-    left: 0;
-    z-index: 1;
-    text-align: center;
-    border: none;
-    background-color: white;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: center;
+  border: none;
+  background-color: white;
 
 }
 
+.head_content3 {
+  display: grid;
+  grid-template-columns: 100px 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
 
-.content_main {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-    // gap: 15px;
-    width: auto;
-    margin-top: 0px;
-    margin-left: 20px;
-    margin-right: 20px;
-
-    // background-color: gray;
+  // background-color: gray;
 }
 
-.content_main_content {
-    display: grid;
-    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
-    gap: 15px;
-    width: auto;
-    // margin-top: 4px;
-    margin-left: 20px;
-    margin-right: 20px;
-    // border-top:1px solid rgb(168, 168, 168);
-
-    // background-color: gray;
+.head_foot1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
-.foot_main {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
-    // gap: 15px;
-    width: auto;
-    margin-top: 0px;
-    margin-left: 20px;
-    margin-right: 20px;
-    padding-right: 20px;
-    // background-color: gray;
+.head_foot2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 5px;
+  border-top: 1px solid gray;
 }
 
-.count_table {
-    font-size: 16px;
-    color: #1b2d5a;
-    text-align: right;
-
-    tr {
-        td {
-            // border: 1px solid gray;
-            text-align: right;
-            width: 80px;
-        }
-    }
+.body_content1 {
+  display: grid;
+  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+  gap: 0px;
+  width: auto;
+  // margin-top: 4px;
+  margin-left: 20px;
+  margin-right: 20px;
+  // border-top:1px solid rgb(168, 168, 168);
+  overflow-x: hidden;
+  // background-color: gray;
 }
 
-.mytitle {
-    padding-top:5px;
-    font-size: 16px;
-    color: #1b2d5a;
-    text-align: left;
+.body_foot1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-right: 20px;
+  // background-color: gray;
 }
 
 
-//#region 物料明細
+
+// grid
+//物料明細
 div.panelHeader19 {
-  
+
   padding-left: 20px;
   border-bottom: solid 1px $colorBorder01;
 
@@ -248,88 +291,257 @@ div.panelHeader19 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 150px 300px 300px 30px;
+    grid-template-columns: 145px 300px 300px 40px 30px;
     gap: 5px;
   }
 }
 
-//#endregion
+//新增請購單明細
+div.panelHeader20 {
+  padding-left: 15px;
+  border-bottom: solid 1px $colorBorder01;
 
+  .row01,
+  .row02 {
+    span {
+      font-weight: 400;
+      font-size: 16px;
+    }
 
+    .clientName,
+    .country {
+      color: $colorMain;
+    }
+  }
 
-  .greenbutton {
-    height: 36px;
-    // padding: 0px 40px;
-    border: solid 1px #86bd07;
-    background-color: $bgc01;
-    padding-left: 22px;
-    padding-right: 22px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 16px;
-    color:#86bd07;
-    transform: translateY(2px);
-    &:hover {
-        border: solid 1px #86bd07;
-        background-color: rgb(0, 105, 23, 0.267);
-      }
-      &:focus {
-        background-color: $bgc01;
-        border: solid 1px #86bd07;
-      }
+  .row01 {
+    display: grid;
+    grid-template-columns: 30px 415px 415px 65px 85px 300px 100px;
+    // gap: 5px;
+  }
 }
 
 
-.bluebutton {
-    height: 28.28px;
-    // padding: 0px 40px;
-    // border: solid 1px gray;
-    background-color: $bgc01;
-    padding-left: 22px;
-    padding-right: 22px;
-    // padding-top: 4px;
-    padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 16px;
-    color: #14256a;
-    transform: translateY(2px);
-  
-    &:hover {
-      border: solid 1px #14256a;
-      background-color: #14256a1b
-    }
-  
-    &:focus {
-      background-color: $bgc01;
-      border: solid 1px #14256a;
-    }
+// 按鈕
+.greenbutton {
+  height: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #86bd07;
+  background-color: $bgc01;
+  padding-left: 22px;
+  padding-right: 22px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #86bd07;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #86bd07;
+    background-color: rgb(0, 105, 23, 0.267);
   }
 
-  
-.tabbutton {
-    height: 40px;
-    // padding: 0px 40px;
-    // border: solid 1px #14256a;
+  &:focus {
     background-color: $bgc01;
-    padding-left: 22px;
-    padding-right: 22px;
-    // padding-top: 4px;
-    padding-bottom: 4px;
-    font-weight: 500;
-    font-size: 16px;
-    // color: #14256a;
-    color: gray;
-    transform: translateY(2px);
-  
-    &:hover {
+    border: solid 1px #86bd07;
+  }
+}
+
+.bluebutton {
+  height: 28.28px;
+  // padding: 0px 40px;
+  // border: solid 1px gray;
+  background-color: $bgc01;
+  padding-left: 22px;
+  padding-right: 22px;
+  // padding-top: 4px;
+  padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #14256a;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #14256a;
+    background-color: #14256a1b
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #14256a;
+  }
+}
+
+.tabbutton {
+  height: 40px;
+  // padding: 0px 40px;
+  // border: solid 1px #14256a;
+  background-color: $bgc01;
+  padding-left: 22px;
+  padding-right: 22px;
+  // padding-top: 4px;
+  padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  // color: #14256a;
+  color: gray;
+  transform: translateY(2px);
+
+  &:hover {
     //   border: solid 1px #14256a;
-      background-color: #14256a1b
+    background-color: #14256a1b
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #14256a1b;
+    color: #14256a;
+  }
+}
+
+.redbtn {
+  height: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #ea1833;
+  background-color: $bgc01;
+  padding: 4px 22px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #ea1833;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #ea1833;
+    background-color: #ea18341d
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #ea1833;
+  }
+}
+
+.graybtn {
+  height: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  ;
+  background-color: $bgc01;
+  padding: 4px 22px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #5b5a5ad6;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #c1c1c1;
+    background-color: #c1c1c121
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #c1c1c1;
+  }
+}
+
+.minibtn {
+  height: 36px;
+  // width: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  ;
+  background-color: $bgc01;
+  padding: 4px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #14256a;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #c1c1c1;
+    background-color: #c1c1c121
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #c1c1c1;
+  }
+}
+
+
+
+
+// 隱藏popout
+.modal_search_bar {
+  display: flex;
+  // justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom:5px;
+  div {
+    text-align: right;
+    display: flex;
+    align-items: center;
+
+    input {
+      font-size: 16px;
+      width: 100%;
+      border-bottom: 1px solid #c1c1c1;
+      margin-right: 8px;
     }
-  
-    &:focus {
-      background-color: $bgc01;
-      border: solid 1px #14256a1b;
-      color: #14256a;
+
+    select {
+      border-bottom: 1px solid gray;
+      outline: none;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+
+      img {
+        width: 20px;
+        height: 20px;
+      }
     }
   }
+}
+
+.modal_container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+
+.customContainer {
+  display: flex;
+  align-items: center;
+}
+
+.customLabel {
+  font-size: 18px;
+  color: #14256a;
+  vertical-align: top;
+  margin-right: 8px; // 調整 label 和 textarea 之間的距離
+  white-space: nowrap; // 確保文字不換行
+}
+
+.customInput {
+  font-size: 18px;
+  border-bottom: 1px solid #14256a;
+  height: 30px;
+  width: 100%;
+  resize: none; // 禁用自由調整高度的功能
+  margin-left: 70px;
+  
+}

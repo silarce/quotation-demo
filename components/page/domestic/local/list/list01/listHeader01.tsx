@@ -1,8 +1,11 @@
+import Link, { LinkProps } from 'next/link';
+
 import { MouseEvent } from 'react';
+import classNames from 'classnames';
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
-import style from './listHeader01.module.scss';
+import scss from './listHeader01.module.scss';
 
 type Tcontract = {
   id: string;
@@ -14,7 +17,9 @@ type Tcontract = {
   contactPerson: string;
   contactPhone: string;
   attn: string;
+  verifyForm: React.ReactNode;
   viewRef_bottom?: (node?: Element | null | undefined) => void;
+  href: LinkProps['href'];
 };
 
 export type { Tcontract };
@@ -22,12 +27,10 @@ export type { Tcontract };
 export default function ListHeader01({
   className = '',
   contract,
-  onClick,
   isActive,
 }: {
   className?: string;
   contract: Tcontract;
-  onClick: ((e: MouseEvent) => void) | (() => void);
   isActive?: boolean;
 }) {
   const {
@@ -39,17 +42,17 @@ export default function ListHeader01({
     contactPerson,
     contactPhone,
     attn: Attn,
+    verifyForm,
     viewRef_bottom,
+    href,
   } = contract;
 
   const parsedPriceTotal = priceTotal.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-  const active = isActive ? style.active : '';
-
   return (
-    <div className={`${className} ${style.container} ${active}`} ref={viewRef_bottom}>
+    <div className={classNames(scss.container, className, isActive && scss.active)} ref={viewRef_bottom}>
       <span>{quotationId}</span>
-      <div className={style.name}>
+      <div className={scss.name}>
         <span>{clientName}</span>
         <span>{quotationName}</span>
       </div>
@@ -58,11 +61,14 @@ export default function ListHeader01({
       <span>{contactPerson}</span>
       <span>{contactPhone}</span>
       <span>{Attn}</span>
+      {verifyForm}
       <div>
-        <IconDetail onClick={onClick} />
+        <Link href={href} onClick={(e) => e.stopPropagation()}>
+          <IconDetail className="inline-block" />
+        </Link>
       </div>
       {/* hover時左邊的藍色直條 */}
-      <div className={style.leftBar} />
+      <div className={scss.leftBar} />
     </div>
   );
 }

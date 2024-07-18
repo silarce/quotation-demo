@@ -529,7 +529,7 @@ const useProductList = ({
           data: {
             ...item,
             quantity: item.quantity ? Number(item.quantity) : 0,
-            totalPrice: item.totalPrice ? Number(item.unit) : 0,
+            totalPrice: item.totalPrice ? Number(item.totalPrice) : 0,
           },
           delSelf: () => delSelf_other(list, key),
           copySelf: () => copySelf_others(list, key),
