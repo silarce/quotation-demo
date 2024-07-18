@@ -65,6 +65,8 @@ const options_productMaterial = optionsCreator_productMaterial({ haveEmpty: true
 
 // ===========================================
 
+// MARK: START
+
 export default function Budget() {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -142,7 +144,6 @@ export default function Budget() {
   };
 
   const {
-    //
     dataArr: quoatationArr,
     dataList,
     viewRef_bottom,
@@ -151,12 +152,9 @@ export default function Budget() {
     setDataList,
   } = useGetQuotation_infinite({ customParams: params });
 
-  useEffect(() => {
-    reset();
-    // }, [county, prodMaterial, doorModel, customerName, keyWord]);
-  }, [query]);
-
   // ----------------------------------------------------------------------
+
+  // region PROPS
 
   const panelArr = useMemo(() => {
     const panelArr: Tcontrol_queryQuotationList['panelArr'] = [];
@@ -249,12 +247,13 @@ export default function Budget() {
         };
 
         const body = sortedContent.map((content) => {
-          const { status, quotationDate, county, projectName, customer } = content;
+          const { status, quotationDate, county, projectName, customer, version } = content;
 
           const query: { [key: string]: string | number | boolean | undefined } = {
             id: id,
             status: status,
             contentId: content.id,
+            contnetVersion: version,
           };
 
           if (isContract) {
@@ -265,6 +264,12 @@ export default function Budget() {
             pathname: '/domestic/quotationList/quotation',
             query,
           };
+          const href_body_attach = {
+            pathname: '/domestic/quotationList/attachQuotation',
+            query,
+          };
+
+          const href = isAttachtQuotation ? href_body_attach : href_body;
 
           return {
             status: <Status status={quotationStatusLookup[status]} isLost={content.isLost} />,
@@ -272,7 +277,7 @@ export default function Budget() {
             county: county,
             projectName: projectName,
             customerName: customer?.name ?? '',
-            href: href_body,
+            href,
           };
         });
 
@@ -293,9 +298,7 @@ export default function Budget() {
     panelArr: panelArr,
   };
 
-  // ----------------------------------------------------------------------
   // 搜尋用的
-
   const searchTargetList: TsearchGroup['searchTargetList'] = [
     {
       placeholder: '主產品門型',
@@ -348,15 +351,25 @@ export default function Budget() {
     searchTargetList,
     doSearch,
   };
-  // -----------------------------------------------------------------------
+
+  // ____________________________________________________________________________
+  // ____________________________________________________________________________
 
   const popFormList = usePopFormListCreator();
+  const panelList: TpanelList = [{ searchGroup }];
 
   // -----------------------------------------------------------------------
 
-  const panelList: TpanelList = [{ searchGroup }];
+  // region useEffect
 
-  // ===================================================
+  useEffect(() => {
+    reset();
+    // }, [county, prodMaterial, doorModel, customerName, keyWord]);
+  }, [query]);
+
+  // -----------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SubLayer isLoading_subLayer={isLoadingPage1}>
@@ -369,6 +382,8 @@ export default function Budget() {
     </SubLayer>
   );
 }
+
+// MARK: END
 
 // ===================================================================
 
