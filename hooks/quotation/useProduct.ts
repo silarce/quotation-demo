@@ -168,8 +168,6 @@ const useProductList = ({
 
       Object.values(list).forEach((prod) => {
         if (!isAttach) {
-          console.log('foo');
-
           for (let i = 0; i < +prod.quantity; i++) {
             discountTotal = discountTotal.add(prod.discount);
             count = count + 1;
@@ -177,8 +175,6 @@ const useProductList = ({
         }
 
         const exchangeProdList = prod.exchangeProdList;
-        console.log('exchangeProdList', exchangeProdList);
-        console.log('productList_attach', productList_attach);
 
         Object.values(exchangeProdList).forEach((exchangeProd) => {
           for (let i = 0; i < +exchangeProd.quantity; i++) {

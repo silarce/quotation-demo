@@ -449,8 +449,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
       }
     });
 
-    // console.log('contentProdLis', contentProdList);
-
     return {
       contractProdArr: Object.values(contractProdList),
       contentProdArr: Object.values(contentProdList),

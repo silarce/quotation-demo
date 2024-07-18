@@ -314,6 +314,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = useGetQuotationContent_id(contentId as string);
 
   const latestContent = quotationData?.latestContent ?? quotationContentData;
+
   const lastestContentId = latestContent?.id;
   // const status = latestContent?.status;
   const verifyForm = latestContent?.verifyForm;
@@ -1020,7 +1021,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setVisible: setPdfModalVisible,
     pdfData,
   } = useModalQuotationPdf({
-    quotationContent: quotationData?.latestContent,
+    quotationContent: latestContent,
     emptySomeProperty: status === 'Bidding',
   });
 
