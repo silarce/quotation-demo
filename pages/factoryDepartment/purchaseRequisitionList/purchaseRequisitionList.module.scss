@@ -165,7 +165,7 @@
   margin-left: 20px;
   margin-right: 20px;
   margin-bottom: 5px;
-  border-top: 1px solid gray;
+  border-top: 1px solid #c1c1c1;
 }
 
 
@@ -429,7 +429,7 @@ div.panelHeader17 {
 .greenbutton {
   height: 36px;
   // padding: 0px 40px;
-  border: solid 1px #86bd07;
+  border: solid 1px #2e9619;
   background-color: $bgc01;
   padding-left: 22px;
   padding-right: 22px;
@@ -437,17 +437,17 @@ div.panelHeader17 {
   padding-bottom: 4px;
   font-weight: 500;
   font-size: 16px;
-  color: #86bd07;
+  color: #2e9619;
   transform: translateY(2px);
 
   &:hover {
-    border: solid 1px #86bd07;
-    background-color: rgb(0, 105, 23, 0.267);
+      border: solid 1px #2e9619;
+      background-color: #2e96192c;
   }
 
   &:focus {
-    background-color: $bgc01;
-    border: solid 1px #86bd07;
+      background-color: $bgc01;
+      border: solid 1px #2e9619;
   }
 }
 
@@ -567,13 +567,9 @@ div.panelHeader17 {
   transform: translateY(2px);
 
   &:hover {
-    border: solid 1px #c1c1c1;
-    background-color: #c1c1c121
-  }
-
-  &:focus {
-    background-color: $bgc01;
-    border: solid 1px #c1c1c1;
+    background-repeat: no-repeat;
+    background-position: center right 10px; /* 調整圖標位置 */
+    cursor: not-allowed; /* 添加這行使滑鼠顯示禁止符號 */
   }
 
 }
@@ -595,7 +591,7 @@ div.panelHeader17 {
 
   &:hover {
     border: solid 1px #c1c1c1;
-    background-color: #c1c1c121
+    background-color: #c1c1c17c
   }
 
   &:focus {
@@ -646,4 +642,28 @@ div.panelHeader17 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.minidisabledbtn {
+  height: 36px;
+  // width: 36px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  ;
+  background-color: $bgc01;
+  padding: 4px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #5b5a5ad6;
+  transform: translateY(2px);
+
+  &:hover {
+      background-repeat: no-repeat;
+      background-position: center right 10px;
+      /* 調整圖標位置 */
+      cursor: not-allowed;
+      /* 添加這行使滑鼠顯示禁止符號 */
+  }
 }
