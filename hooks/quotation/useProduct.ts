@@ -185,6 +185,7 @@ const useProductList = ({
       });
 
       // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+
       Object.values(productList_attach).forEach((prod_attach) => {
         for (let i = 0; i < +prod_attach.quantity; i++) {
           discountTotal = discountTotal.add(prod_attach.discount);
@@ -193,7 +194,8 @@ const useProductList = ({
       });
 
       // const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
-      const avgDiscount_withQty = discountTotal.div(count).toNumber();
+
+      const avgDiscount_withQty = count ? discountTotal.div(count).toNumber() : 0;
 
       setAvgDiscount_withQty(avgDiscount_withQty);
 
@@ -908,11 +910,18 @@ const useProductList = ({
     // changeAllProductDiscount,
     // avgDiscount,
     // avgDiscount_withQty,
-    avgDiscount_withQty: new Decimal(avgDiscount_withQty)
-      .mul(quotationDiscount_attach)
-      .div(100)
-      .toDecimalPlaces(3)
-      .toString(),
+    // avgDiscount_withQty: new Decimal(avgDiscount_withQty)
+    //   .mul(quotationDiscount_attach)
+    //   .div(100)
+    //   .toDecimalPlaces(3)
+    //   .toString(),
+    avgDiscount_withQty: (() => {
+      if (avgDiscount_withQty === 0) {
+        return String(quotationDiscount_attach);
+      } else {
+        return new Decimal(avgDiscount_withQty).mul(quotationDiscount_attach).div(100).toDecimalPlaces(3).toString();
+      }
+    })(),
   };
 };
 
