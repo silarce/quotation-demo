@@ -18,11 +18,12 @@ import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistr
 // import { optionsCreator_doorModel } from 'js/utils/options/productOptions';
 
 // api
-import { useContract_infinite } from 'js/api/api_quotation';
+import { Tparams, useContract_infinite, useGetContract_employee } from 'js/api/api_quotation';
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 import scss from './index.module.scss';
+import { TuserDto } from 'js/api/dtoTypes';
 
 // ===========================================
 
@@ -30,7 +31,7 @@ type Tquery = {
   county: string | undefined;
   customerName: string | undefined;
   projectName: string | undefined;
-  source: string | undefined;
+  source: 'all' | 'pendingReview' | undefined;
 };
 
 // ===========================================
@@ -45,11 +46,13 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 // 合約列表單個項目展開裡的內容是追加追減項目
 
 // MARK: START
-export default function Contract() {
+export default function Contract({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
   const query = router.query as Tquery;
   query.source = query.source || 'all';
-  const { county, customerName, projectName } = query;
+  const { county, customerName, projectName, source } = query;
+
+  const userId = userInfo.employee?.id;
 
   // --------------------------------------------------
 
@@ -57,23 +60,35 @@ export default function Contract() {
 
   // --------------------------------------------------
 
-  const params = {
-    sort: 'contractNumber',
-    filter: {
-      version: { $eq: 1 },
-      'content.county': { $eq: county },
-      'content.customer.name': { $contains: customerName },
-      'content.projectName': { $contains: projectName },
-    },
-  };
+  const params: Tparams = useMemo(() => {
+    return {
+      sort: 'contractNumber',
+      filter: {
+        version: { $eq: 1 },
+        'content.county': { $eq: county },
+        'content.customer.name': { $contains: customerName },
+        'content.projectName': { $contains: projectName },
+      },
+    };
+  }, [county, customerName, projectName]);
 
   const {
     //
-    dataArr,
+    dataArr: dataArr_infinite,
     viewRef_bottom,
     isLoadingPage1,
     reset,
   } = useContract_infinite({ customParams: params });
+
+  const {
+    //
+    data: data_contractArr_employee = [],
+    update: update_contractArr_employee,
+  } = useGetContract_employee(userId, {
+    customParams: params,
+  });
+
+  const dataArr = source === 'all' ? dataArr_infinite : data_contractArr_employee;
 
   // --------------------------------------------------
 
@@ -110,7 +125,7 @@ export default function Contract() {
             <IconDetail className="inline-block" />
           </span>
         ),
-        viewRef_bottom: index === dataArr.length - 5 ? viewRef_bottom : undefined,
+        viewRef_bottom: source === 'all' && index === dataArr.length - 5 ? viewRef_bottom : undefined,
         href: {
           pathname: `/domestic/contract/quotation`,
           query: { id: contractId, version: 1 },
@@ -179,8 +194,8 @@ export default function Contract() {
   // region useEffect
 
   useEffect(() => {
-    reset();
-  }, [county, customerName, projectName]);
+    source === 'all' ? reset() : update_contractArr_employee();
+  }, [county, customerName, projectName, source]);
 
   // -----------------------------------------------------------------------
   // MARK: RENDER
@@ -215,9 +230,6 @@ export default function Contract() {
 // ========================================================================
 
 const ApprovalsBar = ({ query }: { query: Tquery }) => {
-  // const router = useRouter();
-  // const query = router.query as Tquery;
-
   const linkList: Tlink[] = [
     {
       label: '全部',

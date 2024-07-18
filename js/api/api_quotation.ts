@@ -644,7 +644,10 @@ export const apiGetContract_employee = async (employeeId: string, params?: Tpara
     .catch((err) => Promise.reject(err.message));
 };
 
-export const useGetContract_employee = (employeeId: string | undefined, customParams?: Tparams) => {
+export const useGetContract_employee = (
+  employeeId: string | undefined,
+  { customParams }: { customParams?: Tparams } = {}
+) => {
   const [res, setRes] = useState<TquotationContractDto[]>();
 
   const update = async () => {
