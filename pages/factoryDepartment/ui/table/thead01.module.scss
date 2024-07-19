@@ -357,7 +357,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 80px 100px 100px 40px 60px;
+  grid-template-columns: 80px 100px 50px 50px 50px;
   gap: 15px;
   height: 40px;
   padding: 0 20px;
@@ -418,7 +418,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 300px 80px 40px 60px 60px 60px;
+  grid-template-columns: 30px 150px 300px 300px 40px 40px 40px 60px 70px 60px;
   gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -478,7 +478,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 300px 50px 40px 40px 60px 60px 150px 40px ;
+  grid-template-columns: 30px 150px 300px 300px 50px 40px 40px 60px 60px 200px 40px ;
   // gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -507,7 +507,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 70px;
+  grid-template-columns: 30px 150px 300px 80px 60px 80px 80px 200px 60px;
   gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -537,7 +537,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 250px 80px 100px 50px 100px 200px 50px;
+  grid-template-columns: 50px 200px 100px 100px 50px 100px 120px 100px;
   gap: 15px;
   height: 30px;
   padding: 0px 20px;
@@ -648,15 +648,76 @@
   }
 }
 //#endregion
-// thead21
+
+// thead22
 //#region 詢價管理廠商帶入清單
-.thead21 {
+.thead22 {
   position: -webkit-sticky; // 為兼容性增加前綴
   position: sticky;
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
   grid-template-columns: 145px 300px 300px 30px 30px;
+  gap: 5px;
+  height: 30px;
+  padding: 0 20px;
+  background-color: $bgc01;
+
+  >* {
+    margin: auto;
+    margin-left: 0;
+
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+
+  >span {
+    font-weight: 400;
+    font-size: 14px;
+    color: #979797;
+  }
+}
+//#endregion
+
+//#region 詢價單明細
+.thead23 {
+  // position: -webkit-sticky; // 為兼容性增加前綴
+  // position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 30px 250px 80px 100px 50px 100px 200px 50px;
+  gap: 15px;
+  height: 30px;
+  padding: 0px 20px;
+  background-color: $bgc01;
+
+  >* {
+    margin: auto;
+    margin-left: 0;
+
+    &:nth-last-of-type(1) {
+      margin-left: auto;
+    }
+  }
+
+  >span {
+    font-weight: 400;
+    font-size: 14px;
+    color: #979797;
+  }
+}
+//#endregion
+
+//#region 採購單明細
+.thead24 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 70px;
   gap: 5px;
   height: 30px;
   padding: 0 20px;

@@ -76,7 +76,7 @@
 
 .head_content2 {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 600px 1fr 1fr;
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -90,7 +90,7 @@
 
 .head_content3 {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 600px 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     margin-top: 5px;

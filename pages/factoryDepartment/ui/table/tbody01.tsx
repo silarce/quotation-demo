@@ -630,11 +630,10 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
               <div className={scss.row01}>
                 {/* <span>{index + 1}</span> */}
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
-                <span>{_item.purchaseorderid}</span>
                 <span>{_item.prodreceiptid}</span>
-                {/* <span>{_item.totalprice.toLocaleString()}</span> */}
-                <span style={{ color: '#ea1833', display: `${_item.inspected === false ? "" : "none"}` }}>未驗</span>
-                <span style={{ color: '#14256a', display: `${_item.inspected === true ? "" : "none"}` }}>已驗</span>
+                <span style={{ color: `${_item.entry_status === "未入庫" ? "#ea1833" : "#14256a"}` }}>{_item.entry_status}</span>
+                <span style={{ color: `${_item.pay_status === "未請付" ? "#ea1833" : "#14256a"}` }}>{_item.pay_status}</span>
+                <span style={{ color: `${_item.status === "未結案" ? "#ea1833" : "#14256a"}` }}>{_item.status}</span>
                 <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span>
               </div>
             </CellWithBar>
@@ -684,7 +683,10 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.purchaserequisitionid}</span>
                 {/* <span>{_item.totalprice.toLocaleString()}</span> */}
-                <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
+                <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
+                  {_item.status}
+                </span>
+
                 {/* <span>{_item.create_by}</span> */}
                 <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span>
               </div>

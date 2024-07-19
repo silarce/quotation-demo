@@ -27,6 +27,9 @@ import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
 import icon_search from 'public/image/icon/search.svg';
+import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
+import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
+
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -261,7 +264,7 @@ export default function ProdReceiptList() {
         getProdReceipt();
     }, []);
 
-    //取對應的採購明細
+    //取對應的進貨明細
     const getProdReceiptDetail = async (prodreceiptuuid: any) => {
         try {
             setIsLoading(true);
@@ -328,14 +331,16 @@ export default function ProdReceiptList() {
         }
     }, [prodreceiptuuid]);
 
-    //取已對應採購單的已進貨明細
-    const GetProdReceiptDetailByPurchaseOrderId = async (prodreceiptuuid: any) => {
+    //取已對應進貨單的已入庫單
+    const GetProdEntryDetailByProdReceiptId = async (prodreceiptuuid: any, prodreceiptdetailuuid: any) => {
         try {
             setIsLoading(true);
             const conditionModel: {
-                prodreceiptuuid: string | undefined
+                prodreceiptuuid: string | undefined,
+                prodreceiptdetailuuid: string | undefined
             } = {
                 prodreceiptuuid: prodreceiptuuid as string | undefined,
+                prodreceiptdetailuuid: prodreceiptdetailuuid as string | undefined
             };
 
 
@@ -347,7 +352,7 @@ export default function ProdReceiptList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdReceiptDetailByPurchaseOrderId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetProdEntryDetailByProdReceiptId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -362,8 +367,8 @@ export default function ProdReceiptList() {
         }
     };
 
-
-    const TransferPurchaseOrderToProductReceipt = async () => {
+    // 進貨單入庫
+    const TransferProdReceiptToProdEntry = async () => {
         try {
             setIsLoading(true);
             const conditionModel: {
@@ -383,7 +388,7 @@ export default function ProdReceiptList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}TransferPurchaseOrderToProductReceipt?${queryParams}`);
+            const response = await fetch(`${setting.apipath}TransferProdReceiptToProdEntry?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -392,7 +397,7 @@ export default function ProdReceiptList() {
 
             getProdReceiptDetail(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
 
-            GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
+            // GetProdEntryDetailByProdReceiptId(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -535,7 +540,7 @@ export default function ProdReceiptList() {
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={'進貨單'} panelList={panelList} />
             <div className={scss.container}>
-                <div className={scss.left} style={{ display: `${leftbaropen === false ? '' : 'none'}` }}>
+                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
                     <div className={scss.content}>
                         <hr />
                         <div>
@@ -591,36 +596,6 @@ export default function ProdReceiptList() {
                                         },
                                     }}
                                 />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: statusin,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="廠商名稱"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? suppliernamein : suppliername,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="廠商地址"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
-                                        },
-                                    }}
-                                />
                             </div>
                             <div>
                                 <InputSel
@@ -653,7 +628,56 @@ export default function ProdReceiptList() {
                                         },
                                     }}
                                 />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: statusin,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </div>
 
+                        <div className={scss.head_content2}>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商名稱"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: suppliernamein ? suppliernamein : ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商地址"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="統一編號"
@@ -674,52 +698,8 @@ export default function ProdReceiptList() {
                                         },
                                     }}
                                 />
-                                {/* <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                /> */}
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
                                 <InputSel
                                     {...inputSelProps}
                                     caption="發票號碼"
@@ -731,12 +711,6 @@ export default function ProdReceiptList() {
                                     }}
                                 />
                             </div>
-                        </div>
-
-                        <div className={scss.head_content2}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
                         </div>
                         <div className={scss.head_content3}>
                             <div></div>
@@ -765,11 +739,42 @@ export default function ProdReceiptList() {
                         </div>
                         <div className={scss.body_content1}>
                             <Thead01 type={'ProdReceiptDetail'} />
-                            <Tbody01 type={'ProdReceiptDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            {/* <Tbody01 type={'ProdReceiptDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                            {data1 && (
+                                data1.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader14}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.productid}</span>
+                                            <span>{_item.name}</span>
+                                            <span>{_item.spec}</span>
+                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
+                                            <span>{_item.quantity}</span>
+                                            <span>{_item.unit}</span>
+                                            <span>{_item.unitprice.toLocaleString()}</span>
+                                            <span>{_item.totalprice.toLocaleString()}</span>
+                                            <span>
+                                                <button onClick={() => { GetProdEntryDetailByProdReceiptId(_item.prodreceiptuuid, _item.id) }}>
+                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                                </button>
+                                                {/* <button style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }} onClick={() => { alert("OK") }}>
+                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                                </button> */}
+                                                {/* <button style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                </button> */}
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
                         </div>
                         <br />
                         <div className={scss.body_foot1}>
-                            <div></div>
+                            <div>
+                                (1).轉入庫單進行入庫<br />
+                                (2).轉付款申請單請附款項。
+                            </div>
                             <div></div>
                             <div>
                                 <table className={scss.count_table}>
@@ -803,24 +808,26 @@ export default function ProdReceiptList() {
                                 <MyButton_v2 px='px22' py='py4' theme={undefined} label="驗收入庫" onClick={handleReceipt} />&nbsp;&nbsp;
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="退貨單" onClick={handleReceipt} />
                             </span> */}
+                                <span>
+                                    <button className={scss.redbtn} onClick={() => { alert("新增入庫單") }}>新增入庫</button>
+                                </span>
                             </div>
                             <div></div>
-                            <div></div>
+                            <div>
+
+                            </div>
                             <div style={{ textAlign: 'right' }}>
                                 <span>
                                     <button className={scss.redbtn} onClick={() => { alert("新增付款單") }}>新增付款</button>
                                 </span>
-                                &nbsp;
                                 {/* <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}> */}
-                                <span>
-                                    <button className={scss.redbtn} onClick={() => { alert("新增入庫單") }}>新增入庫</button>
-                                </span>
+
                             </div>
                         </div>
 
                         <div className={scss.foot_content1}>
 
-                            <Thead01 type={'PurchaseOrderDetail2'} />
+                            <Thead01 type={'ProdReceiptDetail2'} />
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader11}>
                                     <div className={scss.row01}>

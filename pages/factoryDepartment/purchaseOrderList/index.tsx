@@ -29,6 +29,7 @@ import icon_search from 'public/image/icon/search.svg';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 import icon_fc_collapse_right from 'public/image/icon/fc_collapse_right.svg';
+import { content } from 'html2canvas/dist/types/css/property-descriptors/content';
 
 
 type Tquery = {
@@ -358,15 +359,15 @@ export default function PurchaseOrderList() {
             setSuppliertaxidin(suppliertaxid as string);
             setReceiptedin(receipted as string);
             setSupplieraddressin(supplieraddress as string);
-            setInvoicein(invoicein as string);
+            setInvoicein(invoice as string);
             setSupplierphonein(supplierphone as string);
             setNotein(note as string);
             setStatusin(status as string);
         }
     }, [purchaseorderuuid, purchaseorderdetailuuid]);
 
-    //批次進貨
-    //取已對應採購單的已進貨明細
+
+    //取該筆採購單的進貨單
     const GetProdReceiptDetailByPurchaseOrderId = async (purchaseorderuuid: any, purchaseorderdetailuuid: any) => {
         try {
             // alert("ss" + purchaseorderdetailuuid);
@@ -448,7 +449,7 @@ export default function PurchaseOrderList() {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                throw new Error('Failed to fetch data11111');
             }
 
             const responseData = await response.json();
@@ -463,7 +464,7 @@ export default function PurchaseOrderList() {
             // 更新數據和其它操作
             getPurchaseOrder();
             getPurchaseOrderDetail(purchaseorderuuidin);
-            GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuidin, purchaseorderdetailuuidin);
+            // GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuidin, purchaseorderdetailuuidin);
 
         } catch (error: any) {
             setError(error.message);
@@ -551,7 +552,10 @@ export default function PurchaseOrderList() {
         // TransferPurchaseOrderToProductReceipt();
         if (editstatus === true) {
             myAlert.warning({ title: "請先結束編輯狀態" });
-        } else {
+        } else if (invoicein === "" || invoicein === undefined || invoicein === null) {
+            myAlert.warning({ title: "發票號碼尚未輸入" });
+        }
+        else {
             myAlert.confirm({
                 title: '確定要轉為進貨單嗎?',
                 content: <>
@@ -573,8 +577,8 @@ export default function PurchaseOrderList() {
                 <h1>轉為結案後將無法更改</h1>
             </>,
             props: {
-                onOk: () => {
-                    sentPOToReview(type);
+                onOk: async () => {
+                    await sentPOToReview(type);
                 }
             }
         });
@@ -667,32 +671,52 @@ export default function PurchaseOrderList() {
                         // 打印數據到控制台以供調試
                         console.log(data);
                         // return;
+
+                        const conditionModel: {
+                            purchaseorderuuid: any,
+                            data: any,
+                        } = {
+                            purchaseorderuuid: purchaseorderuuidin,
+                            data: data
+                        };
+
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+
+
+
                         // 發送數據到 API
-                        const response = await fetch(`${setting.apipath}SaveData`, {
+                        const response = await fetch(`${setting.apipath}UpdatePOSupplier`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                             },
-                            body: JSON.stringify(data),
+                            body: JSON.stringify(inputModel),
                         });
 
-                        // 檢查響應是否成功
                         if (!response.ok) {
-                            throw new Error('Failed to save data');
-                        }
+                            myAlert.err({ title: 'PO_handleSave', content: `API Status: ${response.status}` })
 
+                        }
                         // 解析 API 響應
                         const result = await response.json();
 
                         // 顯示成功提示
-                        alert("儲存成功");
+                        myAlert.success({ title: '更新成功' })
                         setEditmain(false);
+                        getPurchaseOrder();
 
                         // 更新狀態或執行其他操作
                         console.log(result);
                     } catch (error: any) {
                         // 顯示錯誤信息
-                        setError(error.message);
+                        myAlert.err({ title: 'FunctionError', content: error.message },)
                     }
                 }
             }
@@ -705,7 +729,7 @@ export default function PurchaseOrderList() {
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
             <PageHeader02 tag={'採購單'} panelList={panelList} />
             <div className={scss.container}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
+                <div className={scss.left} style={{ display: `${leftbaropen === false ? '' : 'none'}` }}>
                     <div className={scss.content}>
                         <div>
                             <Thead01 type={'PurchaseOrder'} />
@@ -941,7 +965,7 @@ export default function PurchaseOrderList() {
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
                                 <span style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }}>
-                                    <button className={scss.redbtn} onClick={() => { sentPOToReview("結案") }}>結案</button>
+                                    <button className={scss.redbtn} onClick={() => { handleClosePO("結案") }}>結案</button>
                                 </span>
                                 <span style={{ display: `${((parseInt(completereq.toString()) < parseInt(totalreq)) && statusin === "採購中") ? '' : 'none'}` }} onClick={() => { myAlert.warning({ title: '尚未達到需求數量' }) }}>
                                     <button className={scss.disabledbtn}>結案</button>
@@ -1013,8 +1037,9 @@ export default function PurchaseOrderList() {
                             <div>
                                 流程順序：選擇進貨品項帶入下方{">"}修改進貨數量{">"}轉進貨單<br />
                                 (1).請確認進貨品項與數量是否正確。<br />
-                                (2).請於出貨單上註明本公司產品編號,及產品名稱,以利請款。<br />
-                                (3).請配合定量包裝及標示品名規格, 方便點收。
+                                (2).發票號碼請向廠商詢問完後點選編輯填入<br />
+                                (3).請於出貨單上註明本公司產品編號,及產品名稱,以利請款。<br />
+                                (4).請配合定量包裝及標示品名規格, 方便點收。
                             </div>
                             <div>
                             </div>

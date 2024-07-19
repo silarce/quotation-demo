@@ -78,7 +78,7 @@ export default function PurchaseRequisitionList() {
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
-    const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
+    const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
 
 
     const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>("");
@@ -1235,9 +1235,9 @@ export default function PurchaseRequisitionList() {
                                         <span>{index + 1}</span>
                                         <span>{_item.productid}</span>
                                         <span>{_item.name}</span>
-                                        <span style={{ color: '#ea1833' }}>
+                                        {/* <span style={{ color: '#ea1833' }}>
                                             {_item.alreadyinquantity}
-                                        </span>
+                                        </span> */}
                                         <span>
                                             <input
                                                 ref={quantityRefs.current[index]}

@@ -2,7 +2,7 @@ import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
-import _ from 'lodash';
+import _, { size } from 'lodash';
 
 import scss from './quotereqDetailList.module.scss';
 import Thead01 from '../ui/table/thead01';
@@ -353,6 +353,7 @@ export default function QuotereqDetailList() {
 
     //取得對應詢價單主檔的詢價單明細檔
     const getQuotereqDetail = async (quoterequuid: any) => {
+
         // alert("in");
         try {
             // setIsLoading(true);
@@ -378,6 +379,7 @@ export default function QuotereqDetailList() {
 
             setPrquotereqdata(data);
             console.log(prquotereqdata);
+
 
 
         } catch (error: any) {
@@ -440,7 +442,7 @@ export default function QuotereqDetailList() {
             // 加入詢價單明細後重新取詢價單明細
             // alert(prquotereqadddata.quoterequuid);
             // alert(quoterequuid)
-            getPurchaseRequisitionDetail(purchaserequisitionuuidin);
+            // getPurchaseRequisitionDetail(purchaserequisitionuuidin);
             getQuotereqDetail(quoterequuidin);
 
         } catch (error: any) {
@@ -600,6 +602,19 @@ export default function QuotereqDetailList() {
 
 
 
+    function handlechangeQuotereqDetail(item: any): void {
+        setSelectedsupplier("");
+        setPurchaserequisitionidin(item.purchaserequisitionid);
+        setPurchaserequisitionuuidin(item.purchaserequisitionuuid);
+        setQuotereqname(item.name);
+        setQuotereqspec(item.spec);
+        setQuotereqquantity(item.quantity);
+        setQuoterequnit(item.unit);
+        setquoterequuidin(item.quoterequuid)
+        setPurchaserequisitiondetailuuidin(item.purchaserequisitiondetailuuid);
+        getQuotereqDetail(item.quoterequuid);
+    }
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={`請購單：${purchaserequisitionidin}｜詢價明細`} panelList={panelList} />
@@ -616,8 +631,7 @@ export default function QuotereqDetailList() {
                                             <span>{_item.productid}</span>
                                             <span>{_item.name}</span>
                                             <span>{_item.alreadyquotereq}</span>
-                                            {/* <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span> */}
-                                            <span><IconDetail onClick={() => getQuotereqDetail(_item.quoterequuid)} /></span>
+                                            <span><IconDetail onClick={() => handlechangeQuotereqDetail(_item)} /></span>
                                             {/* <span><IconDetail onClick={() => {alert(_item.quoterequuid)}} /></span> */}
                                         </div>
                                     </CellWithBar>
@@ -664,6 +678,7 @@ export default function QuotereqDetailList() {
                             <div>
                                 <button>
                                     <IconDetail onClick={() => { setPrquotereqmodalopen(!prquotereqmodalopen); getQuotereqSupplier(); }} />
+
                                 </button>
                             </div>
                             <div></div>
@@ -927,10 +942,10 @@ export default function QuotereqDetailList() {
                         </div>
                     </div>
                     <div className={scss.body_content1}>
-                        <Thead01 type={'Quotereq'} />
+                        <Thead01 type={'Quotereq2'} />
                         {prquotereqdata && (
                             prquotereqdata.map((_item: any, index: number) => (
-                                <CellWithBar key={index} className={scss.panelHeader17}>
+                                <CellWithBar key={index} className={scss.panelHeader23}>
                                     <div className={scss.row01}>
                                         <span>{index + 1}</span>
                                         <span>{_item.suppliername}</span>
@@ -951,6 +966,7 @@ export default function QuotereqDetailList() {
                                 </CellWithBar>
                             ))
                         )}
+
                     </div>
                     <div className={scss.body_foot1}>
                         <div>
