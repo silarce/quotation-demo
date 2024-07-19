@@ -1686,8 +1686,6 @@ class Class_product {
 
   //計算prod所有的價格
   private calcProdAllprice() {
-    console.log('call calcProdAllprice');
-
     this.calcAccessoriesAllprice();
     this.calcComAllPrice();
 
@@ -1751,8 +1749,6 @@ class Class_product {
   } // calcAccessoriesAllprice
 
   calcComAllPrice() {
-    console.log('call calcComAllprice');
-
     let d_price = new Decimal(0);
     let d_dualPrice = new Decimal(0);
     let d_unitPrice = new Decimal(0);
@@ -1764,8 +1760,6 @@ class Class_product {
 
     arr.forEach((item) => {
       if (!item) {
-        console.log('!item', item);
-
         return;
       }
 
@@ -3814,8 +3808,6 @@ class Class_product {
 
   // 清空變更prod
   clearAttach() {
-    console.log('this', this);
-
     this._exchangeProdList = {};
     this._reduceQty = '0';
     this.onDiscountChange();
