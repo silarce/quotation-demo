@@ -56,6 +56,8 @@ import { useProductList } from 'hooks/quotation/useProduct';
 
 import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/appendix_legacy_noReview';
 
+// import testPayload from 'z_ignore/tempJSON/testPayload02.json';
+
 // ===========================================================================
 
 type Tstate_paymentMethodItem = { milestone: string; totalPaymentRatio: string };
@@ -118,7 +120,13 @@ export default function AttachContract({
 
   // region useData
 
-  const { data: data_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
+  // const data_contract = testPayload as unknown as TquotationContractDto;
+
+  const {
+    data: data_contract,
+
+    update: update_contract,
+  } = useGetContract_id_forAttach(contractId);
 
   taxRate = data_contract?.salesTax ? 0.05 : 0;
 
