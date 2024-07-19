@@ -86,6 +86,10 @@ const useProductList = ({
   // onDiscountChange?: (avgDiscount: number) => void;
   isAttach?: boolean;
 }) => {
+  console.log('89 productArr', productArr);
+  console.log('90 productArr_attach', productArr_attach);
+  console.log('91 isAttach', isAttach);
+
   const [render, setRender] = useState(0);
 
   const reRender: TreRender = () => setRender((state) => ++state);
@@ -265,6 +269,9 @@ const useProductList = ({
 
         const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
 
+        console.log('272 prod', prod);
+        console.log('273 prodData', prodData);
+
         list[key] = new Class_product({
           reRender,
           prodData,
@@ -284,6 +291,7 @@ const useProductList = ({
           onDiscountChange: calcDiscount_two,
           onQtyChange: calcDiscount_two,
         });
+        console.log('291 建立時的price', list[key].price);
       });
 
       // setProductList(list);
