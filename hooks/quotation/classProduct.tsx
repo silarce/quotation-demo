@@ -880,7 +880,8 @@ class Class_product {
         isAntiTyphoon,
         fullWidth,
         WG: undefined,
-        hp: this.isWgChanged ? hp : undefined,
+        // hp: this.isWgChanged ? hp : undefined,
+        hp: hp || undefined,
       };
     })();
 
@@ -1306,6 +1307,7 @@ class Class_product {
       // fullWidth: Number(this.fullWidth || 0) * 1000,
       fullWidth: new Decimal(this.fullWidth || 0).mul(1000).toNumber(),
       WG: undefined,
+      hp: this.horsepower.replaceAll('HP', '') as Thp,
     });
 
     if (!res_spec) {

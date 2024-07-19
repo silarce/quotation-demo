@@ -1274,7 +1274,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       onClick: () => setReviewModalShow(true),
     },
 
-    quotationId
+    quotationId && !contentId
       ? {
           type: 'myButton',
           label: '送審',

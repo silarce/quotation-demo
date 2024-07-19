@@ -66,21 +66,19 @@ export default function BudgetList({
           const isActive = activeIndex === index;
           const status = latestContent.status;
 
-          const openQuotation = (e: MouseEvent) => {
-            e.stopPropagation();
-
-            if (attachedToContract) {
-              router.push({
-                pathname: `/domestic/quotationList/attachQuotation`,
-                query: { id },
-              });
-            } else {
-              router.push({
-                pathname: `/domestic/quotationList/quotation`,
-                query: { id, status },
-              });
-            }
-          };
+          const linkProps = attachedToContract
+            ? {
+                href: {
+                  pathname: `/domestic/quotationList/attachQuotation`,
+                  query: { id },
+                },
+              }
+            : {
+                href: {
+                  pathname: `/domestic/quotationList/quotation`,
+                  query: { id, status },
+                },
+              };
 
           const quotationContent: TBodyItemContent = {
             ...latestContent,
@@ -130,7 +128,8 @@ export default function BudgetList({
                   //
                   quotationContent={quotationContent}
                   isActive={isActive}
-                  openQuotation={openQuotation}
+                  // openQuotation={openQuotation}
+                  linkProps={linkProps}
                 >
                   {/* <ReviewChain reviewStatuArr={reviewStatuArr} /> */}
 
