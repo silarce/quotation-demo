@@ -334,6 +334,9 @@ const apiGetQuotationContent_Id = async (id: string) => {
       'products.items.rootProductId',
       'others',
       'verifyForm',
+
+      'attachedToContract.content.products',
+      'attachedToContract.subContracts.content.products',
     ],
   };
 
@@ -389,22 +392,14 @@ export const useGetQuotationContent_id_2 = (
   id: string | undefined | null,
   {
     params,
-  }: // preBuiltPopulate
-  {
+  }: {
     params?: Tparams;
-    // 做錯了，quotationContent的預建populate還沒建立
-    //  preBuiltPopulate?: TquotationPopulateList[]
   } = {}
 ) => {
   const [res, setRes] = useState<TquotationContentDto>();
   const [isLoading, setIsLoading] = useState(false);
 
-  // 做錯了，quotationContent的預建populate還沒建立
-  // const populate = preBuiltPopulate ? undefined : quotationPopulateGeter(preBuiltPopulate ?? ['simple']);
-  const populate = undefined;
-
   const theParams: Tparams = {
-    populate,
     ...params,
   };
 
