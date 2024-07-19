@@ -312,6 +312,13 @@ export default function ProdReceiptList() {
     // 確保 getPurchaseOrderDetail 的 useEffect 中的依賴項設置正確
     useEffect(() => {
         if (prodreceiptuuid) {
+            if (prodreceiptuuidin != prodreceiptuuid) {
+                setData2([]);
+            }
+            // getProdReceiptDetail(prodreceiptuuid);
+            // if (prodreceiptdetailuuid) {
+            //     GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid, purchaseorderdetailuuid);
+            // }
             getProdReceiptDetail(prodreceiptuuid);
             // GetProdReceiptDetailByPurchaseOrderId(prodreceiptuuid);
             setPurchaseorderidin(purchaseorderid as string);
@@ -829,7 +836,7 @@ export default function ProdReceiptList() {
 
                             <Thead01 type={'ProdReceiptDetail2'} />
                             {data2.map((_item, index) => (
-                                <CellWithBar key={index} className={scss.panelHeader11}>
+                                <CellWithBar key={index} className={scss.panelHeader13}>
                                     <div className={scss.row01}>
                                         <span>{index + 1}</span>
                                         <span>{_item.productid}</span>

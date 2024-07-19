@@ -224,6 +224,19 @@
     // }
   }
 
+  .foot_content1 {
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    gap: 0px;
+    width: auto;
+    // margin-top: 4px;
+    margin-left: 20px;
+    margin-right: 20px;
+    // border-top:1px solid rgb(168, 168, 168);
+    overflow-x: hidden;
+    // background-color: gray;
+}
+
 .mytitle {
     padding-top: 5px;
     font-size: 16px;
@@ -555,3 +568,27 @@ div.panelHeader14 {
 }
 
 //#endregion
+
+div.panelHeader13 {
+  padding-left: 20px;
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+      span {
+          font-weight: 400;
+          font-size: 16px;
+      }
+
+      .clientName,
+      .country {
+          color: $colorMain;
+      }
+  }
+
+  .row01 {
+      display: grid;
+      grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 70px;
+      gap: 5px;
+  }
+}
