@@ -243,8 +243,8 @@ export default function LegacyContractIntegration() {
                       <TbodyItem01
                         quotationContent={quotationContent}
                         isActive={isActive}
-                        openQuotation={() => {
-                          router.push(href);
+                        linkProps={{
+                          href,
                         }}
                       />
                     </div>
