@@ -1,4 +1,5 @@
 import { MouseEvent } from 'react';
+import Link, { LinkProps } from 'next/link';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -33,15 +34,13 @@ export type { TBodyItemContent };
 export default function TbodyItem01({
   quotationContent,
   isActive,
-  openQuotation,
+  linkProps,
   children,
-}: // approvalsStatus,
-{
+}: {
   quotationContent: TBodyItemContent;
   isActive: boolean;
-  openQuotation: (e: MouseEvent) => void;
+  linkProps: LinkProps;
   children?: React.ReactNode;
-  // approvalsStatus?: string;
 }) {
   const {
     quotationNumber,
@@ -75,7 +74,9 @@ export default function TbodyItem01({
         <span>{quantity}</span>
         <span>{totalPrice.toLocaleString()}</span>
         <div>
-          <IconDetail onClick={openQuotation} />
+          <Link {...linkProps} onClick={(e) => e.stopPropagation()}>
+            <IconDetail />
+          </Link>
         </div>
       </div>
 

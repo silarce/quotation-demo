@@ -313,8 +313,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
     const customerName = valueArr[1] as string;
     const projectName = valueArr[2] as string;
 
-    router.push({
-      href: '',
+    router.replace({
       query: {
         ...router.query,
         // doorType,
@@ -394,8 +393,8 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
     {
       label: '待審核',
       linkProps: {
+        replace: true,
         href: {
-          pathname: '',
           query: {
             ...query,
             reviewStatus: '待審核',
@@ -407,8 +406,8 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
     {
       label: '審核中',
       linkProps: {
+        replace: true,
         href: {
-          pathname: '',
           query: {
             ...query,
             reviewStatus: '審核中',
@@ -420,8 +419,8 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
     {
       label: '審核完成',
       linkProps: {
+        replace: true,
         href: {
-          pathname: '',
           query: {
             ...query,
             reviewStatus: '審核完成',
