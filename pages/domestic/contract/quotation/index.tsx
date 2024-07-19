@@ -389,6 +389,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = useProductList({
     productArr: content?.products ?? [],
     others: content?.others ?? [],
+    averageDiscount: content?.averageDiscount,
     resetTrigger: content?.products,
     quotationDiscount: Number(content?.discount || '100'),
   }); // 合約項目
@@ -1025,6 +1026,7 @@ const OldQuotationProduction = ({
   } = useProductList({
     productArr: rootContent?.products ?? [],
     others: [],
+    averageDiscount: rootContent?.averageDiscount,
     resetTrigger: rootContent?.products,
     quotationDiscount: Number(rootContent?.discount || '100'),
   });

@@ -1785,8 +1785,12 @@ export type TquotationContentDto = {
   trackProgress: string; // 追蹤狀態
   projectProgress: string; //工地進度
   productsOrder?: string[]; // 已棄用
-  /** 總折數*/
+
+  // 總折數
   discount: string;
+  // 平均折數
+  averageDiscount: string | null;
+
   // 小計微調
   tuneTotal: string;
   /**小計 */
@@ -1811,6 +1815,7 @@ export type TquotationContentDto = {
   // ! 所以只設需要拿的東西
   // contract?: TquotationContractDto;
   contract?: {
+    // 設了populate卻不到，這個好像沒有?
     id: string;
   };
 
@@ -1818,12 +1823,14 @@ export type TquotationContentDto = {
   // rootContract?: Omit<TquotationContractDto, 'rootContract'>;
   // rootContract?: TquotationContractDto;
 
+  // 設了populate卻不到，這個好像沒有?
   // 為了避免check壞掉，暫時先這樣
   rootContract?: TquotationContentDto_copy;
   // 失件
   isLost: boolean;
   //
   settleProducts: TsettleProductDto[];
+  //
 };
 
 export type TquotationDto = {
@@ -2162,6 +2169,7 @@ export type TcreateQuotationContentDto = {
   // 報價範圍
   quotationRanges: string[];
   discount: `${number}`; // api文件上是string,但送number似乎也行 // 總折數
+  averageDiscount: string | null;
   // 小計微調
   tuneTotal: string;
   subTotal: number;

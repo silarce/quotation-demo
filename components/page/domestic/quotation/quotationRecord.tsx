@@ -230,6 +230,7 @@ const ProdRow = ({
   } = useProductList({
     productArr: prodArr ?? [],
     others: [],
+    averageDiscount: null,
     resetTrigger: prodArr,
     quotationDiscount: quotationDiscount,
   });

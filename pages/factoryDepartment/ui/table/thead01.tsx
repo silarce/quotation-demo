@@ -228,24 +228,24 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-    //#region 採購單明細2
-    else if (type === "PurchaseRequisitionDetail2") {
-      return (
-        <div className={style.thead21}>
-          <span>序</span>
-          <span>料號</span>
-          <span>品名</span>
-          <span>已進數量</span>
-          <span>數量</span>
-          <span>單位</span>
-          <span>單價</span>
-          <span>金額</span>
-          <span>廠商</span>
-          <span></span>
-        </div>
-      )
-    }
-    //#endregion
+  //#region 採購單明細2
+  else if (type === "PurchaseRequisitionDetail2") {
+    return (
+      <div className={style.thead21}>
+        <span>序</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>已進數量</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span>單價</span>
+        <span>金額</span>
+        <span>廠商</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
   //#region 詢價單明細
   else if (type === "Quotereq") {
     return (
@@ -276,32 +276,19 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-  //#region 詢價單明細
-  else if (type === "QuotereqDetail") {
+  //#region 物料明細
+  else if (type === "AddPR_GetProduct") {
     return (
-      <div className={style.thead18}>
-        <span>序</span>
+      <div className={style.thead19}>
         <span>料號</span>
-        <span>品名</span>
-        <span>數量</span>
+        <span>名稱</span>
+        <span>規格</span>
+        <span>庫存</span>
         <span></span>
       </div>
     )
   }
   //#endregion
-    //#region 物料明細
-    else if (type === "AddPR_GetProduct") {
-      return (
-        <div className={style.thead19}>
-          <span>料號</span>
-          <span>名稱</span>
-          <span>規格</span>
-          <span>庫存</span>
-          <span></span>
-        </div>
-      )
-    }
-    //#endregion
   //#region 新增請購單明細
   else if (type === "AddPR_ReqList") {
     return (
@@ -312,6 +299,19 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>數量</span>
         <span>單位</span>
         <span>備註(用途說明)</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 物料明細
+  else if (type === "qoDetail_SupplierList") {
+    return (
+      <div className={style.thead21}>
+        <span>名稱</span>
+        <span>地址</span>
+        <span>電話</span>
+        <span>統編</span>
         <span></span>
       </div>
     )

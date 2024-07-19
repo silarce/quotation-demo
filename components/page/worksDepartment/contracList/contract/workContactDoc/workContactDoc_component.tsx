@@ -196,6 +196,7 @@ function PreWorkContactDoc_component(
   } = useProductList({
     productArr: productArr,
     others: [],
+    averageDiscount: null,
     resetTrigger: productArr,
     quotationDiscount: Number(latestQuotationDiscount) || 100,
   });
