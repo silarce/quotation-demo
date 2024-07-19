@@ -314,6 +314,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = useGetQuotationContent_id(contentId as string);
 
   const latestContent = quotationData?.latestContent ?? quotationContentData;
+
   const lastestContentId = latestContent?.id;
   // const status = latestContent?.status;
   const verifyForm = latestContent?.verifyForm;
@@ -637,6 +638,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       projectProgress: state_profile.projectProgress ?? '',
 
       discount: `${Number(state_summary.discountRate ?? 0)}` ?? '100',
+      averageDiscount: avgDiscount_withQty || null,
       tuneTotal: state_summary.tuneTotal || '0',
       subTotal: Number(state_summary.subTotal.replaceAll(',', '')),
       salesTax: Number(state_summary.salesTax.replaceAll(',', '')),
@@ -999,6 +1001,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // others: quotationData?.latestContent.others,
     productArr: latestContent?.products,
     others: latestContent?.others,
+    averageDiscount: latestContent?.averageDiscount,
     resetTrigger: quotationData ?? quotationContentData,
     // onDoorTypeChange: onDoorTypeChange, // 棄用
     quotationDiscount: Number(state_summary.discountRate || '100'),
@@ -1018,7 +1021,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setVisible: setPdfModalVisible,
     pdfData,
   } = useModalQuotationPdf({
-    quotationContent: quotationData?.latestContent,
+    quotationContent: latestContent,
     emptySomeProperty: status === 'Bidding',
   });
 

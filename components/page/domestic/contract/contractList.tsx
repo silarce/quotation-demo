@@ -1,6 +1,7 @@
 import { useState, useEffect, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
+import classNames from 'classnames';
 
 // components
 import ContractListTop from '../local/list/list01/listTop01';
@@ -26,9 +27,11 @@ const { Panel } = Collapse;
 
 export default function ContractList({
   //
+  className,
   contractList,
   setActiveContractId,
 }: {
+  className?: string;
   contractList: Tcontract[];
   setActiveContractId: (id: string) => void;
 }) {
@@ -92,7 +95,7 @@ export default function ContractList({
 
   // ----------------------------------------------------------
   return (
-    <div className={style.container}>
+    <div className={classNames(style.container, className)}>
       <ContractListTop />
       <Collapse
         //

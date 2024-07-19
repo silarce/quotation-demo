@@ -20,6 +20,12 @@ import { Class_product, TprodKey, TproductList } from 'hooks/quotation/useProduc
 import scss from './table_prod.module.scss';
 import scss_table from '../table.module.scss';
 
+// ============================================================================
+
+// ============================================================================
+
+// MARK: START
+
 export default function Table_prod({
   disabled,
   disabled_plus,
@@ -71,13 +77,14 @@ export default function Table_prod({
   isShowDndBtn?: boolean;
   // changeAllProductDiscount?: (v: `${number}`) => void;
   // avgDiscount?: number | string;
-  discountRate: string | number | undefined;
+  discountRate?: string | number | undefined;
   changeDiscountRate?: (v: string) => void;
 }) {
   const [allowMove, setAllowMove] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   // -----------------------------------------------------------------------
   const [verticalKeyArr, setVerticalKeyArr] = useState<string[]>([]);
+
   // -----------------------------------------------------------------------
 
   const [showInputModal, setShowInputModal] = useState(false);
@@ -118,24 +125,26 @@ export default function Table_prod({
           {allowMove ? '確定排序' : '設定排序'}
         </button>
 
-        <InputSel
-          //
-          caption="總折數"
-          captionSize="18"
-          className={scss.totalDiscountChange}
-          disabled={disabled}
-          showBaseline="auto"
-          inputProps={{
-            props: {
-              type: 'number',
-              value: discountRate,
-              onChange: (e) => {
-                changeDiscountRate?.(e.target.value);
+        {discountRate !== undefined && (
+          <InputSel
+            //
+            caption="總折數"
+            captionSize="18"
+            className={scss.totalDiscountChange}
+            disabled={disabled}
+            showBaseline="auto"
+            inputProps={{
+              props: {
+                type: 'number',
+                value: discountRate,
+                onChange: (e) => {
+                  changeDiscountRate?.(e.target.value);
+                },
+                placeholder: '',
               },
-              placeholder: '',
-            },
-          }}
-        />
+            }}
+          />
+        )}
       </div>
 
       {/*  */}
