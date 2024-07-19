@@ -162,10 +162,10 @@ export const useGetQuotation_detail_infinite = createUseInfinite<TgetQuotation>(
   errTitle: '取得報價單失敗',
 });
 
-export const apiGetQuotation_Id = async (id: string) => {
+export const apiGetQuotation_Id = async (id: string, params?: Tparams) => {
   const api = `/quotation/${id}`;
 
-  const params = {
+  params = {
     populate: [
       // 'contents',
       'contents.customer',
@@ -190,6 +190,7 @@ export const apiGetQuotation_Id = async (id: string) => {
       'attachedToContract.subContracts.content.products',
       // 'subContracts.content.products',
     ],
+    ...params,
   };
 
   return axi
@@ -198,7 +199,7 @@ export const apiGetQuotation_Id = async (id: string) => {
     .catch((err) => Promise.reject(err.message));
 };
 
-export const useGetQuotation_id = (id: string | undefined) => {
+export const useGetQuotation_id = (id: string | undefined, { params }: { params?: Tparams }) => {
   const [res, setRes] = useState<TquotationDto>();
 
   const update = async () => {
@@ -207,7 +208,7 @@ export const useGetQuotation_id = (id: string | undefined) => {
     }
 
     try {
-      const newRes = await apiGetQuotation_Id(id);
+      const newRes = await apiGetQuotation_Id(id, params);
 
       if (newRes) {
         setRes(newRes);
@@ -333,6 +334,9 @@ const apiGetQuotationContent_Id = async (id: string) => {
       'products.items.rootProductId',
       'others',
       'verifyForm',
+
+      'attachedToContract.content.products',
+      'attachedToContract.subContracts.content.products',
     ],
   };
 
@@ -388,22 +392,14 @@ export const useGetQuotationContent_id_2 = (
   id: string | undefined | null,
   {
     params,
-  }: // preBuiltPopulate
-  {
+  }: {
     params?: Tparams;
-    // 做錯了，quotationContent的預建populate還沒建立
-    //  preBuiltPopulate?: TquotationPopulateList[]
   } = {}
 ) => {
   const [res, setRes] = useState<TquotationContentDto>();
   const [isLoading, setIsLoading] = useState(false);
 
-  // 做錯了，quotationContent的預建populate還沒建立
-  // const populate = preBuiltPopulate ? undefined : quotationPopulateGeter(preBuiltPopulate ?? ['simple']);
-  const populate = undefined;
-
   const theParams: Tparams = {
-    populate,
     ...params,
   };
 
@@ -631,6 +627,46 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
     meta,
     init,
     reset,
+  };
+};
+
+export const apiGetContract_employee = async (employeeId: string, params?: Tparams) => {
+  const api = `/quotation/contracts/employee/${employeeId}`;
+
+  return axi
+    .get<TquotationContractDto[]>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err.message));
+};
+
+export const useGetContract_employee = (
+  employeeId: string | undefined,
+  { customParams }: { customParams?: Tparams } = {}
+) => {
+  const [res, setRes] = useState<TquotationContractDto[]>();
+
+  const update = async () => {
+    if (!employeeId) {
+      return;
+    }
+
+    try {
+      const newRes = await apiGetContract_employee(employeeId, customParams);
+
+      if (newRes) {
+        setRes(newRes);
+      }
+
+      return newRes;
+    } catch (error) {
+      const err = error as Error;
+      myAlert.err({ title: '取得合約資料失敗', content: err.message });
+    }
+  };
+
+  return {
+    data: res,
+    update,
   };
 };
 
@@ -975,7 +1011,14 @@ export const apiQuotationSubmitReview = (id: string, body: TsubmitReviewQotuatio
 };
 
 // 審核該報價單
-export const apiQuotationReview = ({ id, body }: { id: string; body: TreviewQuotationContentDto }) => {
+export const apiQuotationReview = ({
+  //
+  id,
+  body,
+}: {
+  id: string;
+  body: TreviewQuotationContentDto;
+}) => {
   const api = `/quotation/${id}/review`;
 
   return axi
@@ -999,6 +1042,23 @@ export const apiQuotationUnlock = (id: string) => {
 
   return axi
     .patch<undefined>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+// 編輯合約審核表，審核狀態會重置
+export const apiPatchQuotationVerifyForm = ({
+  //
+  verifyForm,
+  body,
+}: {
+  verifyForm: string;
+  body: TcreateQuotationVerifyFormDto;
+}) => {
+  const api = `/quotation/verify-form/${verifyForm}`;
+
+  return axi
+    .patch(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };

@@ -724,6 +724,11 @@ class Class_product {
 
     const prod: Tprod = {
       ...empty,
+      // 20240710
+      // 變更追加需要送來源產品id給後端，所以把id留下來
+      // 未仔細測試，不確定是否有問題
+      id: this._prodData.id,
+      //
       discount: this._prodData.discount,
       doorType: this.doorType,
       fullWidth: this.fullWidth,
@@ -794,6 +799,10 @@ class Class_product {
 
     const prod: Tprod = {
       ...empty,
+      // 20240710
+      // 變更追加需要送來源產品id給後端，所以把id留下來
+      // 未仔細測試，不確定是否有問題
+      id: this._prodData.id,
       doorType: this.doorType,
       quoteType: this._prodData.quoteType,
       itemName: this._prodData.itemName,
@@ -3193,6 +3202,8 @@ class Class_product {
   set price(v) {
     // v = v.replace(/,/g, '');
 
+    console.log('call price', v);
+
     this._prodData.price = Number(v);
     this._price = v;
 
@@ -3797,8 +3808,6 @@ class Class_product {
 
   // 清空變更prod
   clearAttach() {
-    console.log('this', this);
-
     this._exchangeProdList = {};
     this._reduceQty = '0';
     this.onDiscountChange();
@@ -4029,13 +4038,13 @@ class Class_product {
       components: this.comBodyArr,
       accessories: this.acceBodyArr,
 
-      distributionBoxPrice: Number(this.subComList.distributionBox.price),
-      distributionBoxUnitPrice: Number(this.subComList.distributionBox.unitPrice),
-      installationFeePrice: Number(this.subComList.installationFee.price),
-      installationFeeDualPrice: Number(this.subComList.installationFee.dualPrice),
-      installationFeeQuantity: Number(this.subComList.installationFee.quantity),
-      installationFeeUnitPrice: Number(this.subComList.installationFee.unitPrice),
-      installationFeeTotalPrice: Number(this.subComList.installationFee.totalPrice),
+      distributionBoxPrice: Number(this.subComList.distributionBox?.price || 0),
+      distributionBoxUnitPrice: Number(this.subComList.distributionBox?.unitPrice || 0),
+      installationFeePrice: Number(this.subComList.installationFee?.price || 0),
+      installationFeeDualPrice: Number(this.subComList.installationFee?.dualPrice || 0),
+      installationFeeQuantity: Number(this.subComList.installationFee?.quantity || 0),
+      installationFeeUnitPrice: Number(this.subComList.installationFee?.unitPrice || 0),
+      installationFeeTotalPrice: Number(this.subComList.installationFee?.totalPrice || 0),
 
       bearingHousingSize: this._doorGeneralSpecs?.bearingHousingSize ?? 0,
       bearingHousingTotalLength: String(this._doorGeneralSpecs?.bearingHousingTotalLength ?? 0),

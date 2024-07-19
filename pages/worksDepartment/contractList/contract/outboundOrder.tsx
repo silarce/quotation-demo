@@ -137,6 +137,7 @@ export default function OutboundOrder({
     //
     data: contract,
     update: update_contract,
+    isFetching: isFetching_contract,
   } = useGetContract_id(contractId, {
     customPopulate: [
       //
@@ -162,7 +163,11 @@ export default function OutboundOrder({
     worksheet: worksheetArr,
   } = contract ?? {};
 
-  const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
+  const {
+    data: finalProduct = [],
+    update: update_finalProduce,
+    isLoading: isFetching_finalProduct,
+  } = useGetContract_id_finalProductItem(contractId);
 
   // --------------------------------------------------------------------------
 
@@ -662,7 +667,7 @@ export default function OutboundOrder({
   // region RENDER
 
   return (
-    <SubLayer isLoading_all={isLoading}>
+    <SubLayer isLoading_all={isLoading || isFetching_contract || isFetching_finalProduct}>
       <PageHeader contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div>

@@ -44,7 +44,7 @@ import Table_com from 'components/page/domestic/quotation/quotation/product/tabl
 import Table_accessories from 'components/page/domestic/contract/table/table_accessories';
 import Table_others from 'components/page/domestic/contract/table/table_others';
 
-import ContractReviewForm from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
+import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
 
 import Summary, {
   TsummaryControl,
@@ -192,8 +192,17 @@ function TheQuotation({ router }: { router: NextRouter }) {
   // const { data: contract, update } = useGetContract_id_noItems_2(id, { populate: ['content.settleProducts'] });
   // const { data: contract, update } = useGetContract_id_noItems_2(id);
   // 這個技術債以後重構時再還...
-  const { data: contract, update } = useGetContract_id_contentProductItems(id, {}, version);
+  const { data: contract, update } = useGetContract_id_contentProductItems(
+    id,
+
+    {
+      populate: ['quotation'],
+    },
+
+    version
+  );
   const engineeringContactId = contract?.engineeringContactId;
+  const quotationId = contract?.quotation?.id;
 
   // 合約項目
   // 選中合約版本的contnet
@@ -380,6 +389,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = useProductList({
     productArr: content?.products ?? [],
     others: content?.others ?? [],
+    averageDiscount: content?.averageDiscount,
     resetTrigger: content?.products,
     quotationDiscount: Number(content?.discount || '100'),
   }); // 合約項目
@@ -914,18 +924,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
         <ContractReviewForm
           showModal={reviewFormShow}
-          forbidden={true}
-          close={() => setReviewFormShow(false)}
-          contractIdNumber={content?.quotationNumber ?? ''}
-          contractName={content?.projectName ?? ''}
-          contractPrice={Number(content?.total ?? '')}
-          lastestContentId={content?.id}
-          verifyForm={content?.verifyForm}
+          isInContract={true}
+          contractId={contract?.id}
+          // quotationId={quotationId}
+          onCancel={() => setReviewFormShow(false)}
           onConfirm={async () => {
             setIsLoading(true);
             await update();
             setIsLoading(false);
           }}
+
+          // contractNumber={content?.quotationNumber ?? ''}
+          // projectName={content?.projectName ?? ''}
+          // totalPrice={Number(content?.total ?? '')}
+          // contentId={content?.id}
+          // verifyForm={content?.verifyForm}
+          // quotationContent={content}
         />
       </div>
 
@@ -1012,6 +1026,7 @@ const OldQuotationProduction = ({
   } = useProductList({
     productArr: rootContent?.products ?? [],
     others: [],
+    averageDiscount: rootContent?.averageDiscount,
     resetTrigger: rootContent?.products,
     quotationDiscount: Number(rootContent?.discount || '100'),
   });

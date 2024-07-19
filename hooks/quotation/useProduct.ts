@@ -61,14 +61,18 @@ type TothersList = {
 const useProductList = ({
   productArr,
   others,
+  averageDiscount,
   resetTrigger,
   onDoorTypeChange,
   productArr_attach,
   quotationDiscount,
+  quotationDiscount_attach = 100,
+  isAttach,
 }: // onDiscountChange,
 {
   productArr: TquotationProductDto[] | undefined;
   others: TquotationContentOtherDto[] | undefined;
+  averageDiscount: string | null | undefined;
   resetTrigger: any;
   onDoorTypeChange?: (obj: {
     annoShouldRemove: string[] | undefined;
@@ -78,7 +82,9 @@ const useProductList = ({
   }) => void;
   productArr_attach?: TquotationProductDto[] | undefined;
   quotationDiscount: number;
+  quotationDiscount_attach?: number;
   // onDiscountChange?: (avgDiscount: number) => void;
+  isAttach?: boolean;
 }) => {
   const [render, setRender] = useState(0);
 
@@ -161,9 +167,11 @@ const useProductList = ({
       let count = 0;
 
       Object.values(list).forEach((prod) => {
-        for (let i = 0; i < +prod.quantity; i++) {
-          discountTotal = discountTotal.add(prod.discount);
-          count = count + 1;
+        if (!isAttach) {
+          for (let i = 0; i < +prod.quantity; i++) {
+            discountTotal = discountTotal.add(prod.discount);
+            count = count + 1;
+          }
         }
 
         const exchangeProdList = prod.exchangeProdList;
@@ -177,6 +185,7 @@ const useProductList = ({
       });
 
       // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+
       Object.values(productList_attach).forEach((prod_attach) => {
         for (let i = 0; i < +prod_attach.quantity; i++) {
           discountTotal = discountTotal.add(prod_attach.discount);
@@ -185,7 +194,8 @@ const useProductList = ({
       });
 
       // const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
-      const avgDiscount_withQty = discountTotal.div(count).toNumber();
+
+      const avgDiscount_withQty = count ? discountTotal.div(count).toNumber() : 0;
 
       setAvgDiscount_withQty(avgDiscount_withQty);
 
@@ -521,7 +531,7 @@ const useProductList = ({
           data: {
             ...item,
             quantity: item.quantity ? Number(item.quantity) : 0,
-            totalPrice: item.totalPrice ? Number(item.unit) : 0,
+            totalPrice: item.totalPrice ? Number(item.totalPrice) : 0,
           },
           delSelf: () => delSelf_other(list, key),
           copySelf: () => copySelf_others(list, key),
@@ -619,15 +629,35 @@ const useProductList = ({
   }, [calcTrigger]);
 
   // 修改所有class_product的quotationDiscount
-  const changeAllProdQuotationDiscount = (v: number) => {
+  const changeAllProdQuotationDiscount = ({
+    discount,
+    discount_attach,
+  }: {
+    discount: number;
+    discount_attach: number;
+  }) => {
     Object.values(productList).forEach((prod) => {
-      prod.quotationDiscount = v;
+      // 20240719 發現bug，若quotationDiscount不是100，會多次呼叫changeAllProdQuotationDiscount
+      // 而在合約追加追減，原主產品的component是空的，
+      // prod.quotationDiscount更新後重新計算金額時因為component是空的，只會計算subComponent的金額
+      // 致使金額錯誤 (set price被呼叫)
+      // 因此判斷isAttach為true時(處理追加追減時)，不更新prod.quotationDiscount
+      // 畢竟在這時原本的主產品是不應該改變的
+      // 但是奇怪的是，set price被呼叫，改變了price的值
+      // 在開發環境畫面上的price並沒有改變
+      // 但在生產環境是正確改變的
+      // 未來有時間最好調查一下
+
+      if (!isAttach) {
+        prod.quotationDiscount = discount;
+      }
+
       Object.values(prod.exchangeProdList).forEach((exProd) => {
-        exProd.quotationDiscount = v;
+        exProd.quotationDiscount = discount_attach;
       });
     });
     Object.values(attachProdList).forEach((prod) => {
-      prod.quotationDiscount = v;
+      prod.quotationDiscount = discount_attach;
     });
   };
 
@@ -635,8 +665,11 @@ const useProductList = ({
     // component裡面只有紀錄牌價，其他金額都是算出來的
     // 因此即使沒有要變更主產品或總折數，也必須要執行changeAllProdQuotationDiscount
     // 否則若quotationDiscount不是100，component的單價就會錯誤
-    changeAllProdQuotationDiscount(quotationDiscount);
-  }, [quotationDiscount]);
+    changeAllProdQuotationDiscount({
+      discount: quotationDiscount,
+      discount_attach: quotationDiscount_attach,
+    });
+  }, [quotationDiscount, quotationDiscount_attach]);
 
   // ---------------------------------------------------------
   // 回到編輯前的狀態，就是以一開始取得的資料重新建立list
@@ -674,7 +707,7 @@ const useProductList = ({
       callCalcSubTotal,
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
-      quotationDiscount: quotationDiscount,
+      quotationDiscount: quotationDiscount_attach,
       onDiscountChange: calcDiscount_two,
       onQtyChange: calcDiscount_two,
     });
@@ -690,12 +723,23 @@ const useProductList = ({
       // const list: TproductList = {};
 
       const keyArr_productList_attach = Object.keys(productList_attach);
+
       keyArr_productList_attach.forEach((key) => {
         delete productList_attach[key];
       });
 
-      productArr_attach.forEach((prod) => {
-        const key = prod.order !== undefined ? `${prod.order}` : nanoid();
+      const keyArr: string[] = [];
+
+      productArr_attach.forEach((prod, index) => {
+        // w 注意 order不是唯一值，若有多個prod的order一樣，後者會蓋掉前者
+        // const key = prod.order !== undefined ? `${prod.order}` : nanoid();
+        let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+
+        if (keyArr.includes(key)) {
+          key = `${key}-${index}`;
+        }
+
+        keyArr.push(key);
 
         // if (key in productList_attach) {
         //   key = nanoid();
@@ -721,7 +765,7 @@ const useProductList = ({
           onDiscountChange: calcDiscount_two,
           onQtyChange: calcDiscount_two,
           disabled_quantity: true,
-          quotationDiscount: quotationDiscount,
+          quotationDiscount: quotationDiscount_attach,
         });
       });
 
@@ -734,17 +778,22 @@ const useProductList = ({
 
   // TODO 暫時先在prod放attachId這個property處理每次list的key都不一樣的問題
   // 以後最好還是做成狀態較好
-  const attachProdList: { [key: string]: Class_product } = {};
-  Object.values(productList).forEach((prod, index) => {
-    Object.values(prod.exchangeProdList).forEach((item) => {
+  const attachProdList = useMemo(() => {
+    const attachProdList: { [key: string]: Class_product } = {};
+    Object.values(productList).forEach((prod, index) => {
+      Object.values(prod.exchangeProdList).forEach((item) => {
+        const newId = item.attachId;
+        attachProdList[newId] = item;
+      });
+    });
+
+    Object.values(productList_attach).forEach((item, index) => {
       const newId = item.attachId;
       attachProdList[newId] = item;
     });
-  });
-  Object.values(productList_attach).forEach((item, index) => {
-    const newId = item.attachId;
-    attachProdList[newId] = item;
-  });
+
+    return attachProdList;
+  }, [render, productList, productList_attach]);
 
   /**追加總金額 */
   let attachAddTotal = 0;
@@ -824,6 +873,12 @@ const useProductList = ({
 
   // ---------------------------------------------------------
 
+  useEffect(() => {
+    setAvgDiscount_withQty(Number(averageDiscount || 100));
+  }, [averageDiscount]);
+
+  // ---------------------------------------------------------
+
   return {
     reRender,
     reset,
@@ -869,7 +924,18 @@ const useProductList = ({
     // changeAllProductDiscount,
     // avgDiscount,
     // avgDiscount_withQty,
-    avgDiscount_withQty: new Decimal(avgDiscount_withQty).mul(quotationDiscount).div(100).toDecimalPlaces(3).toString(),
+    // avgDiscount_withQty: new Decimal(avgDiscount_withQty)
+    //   .mul(quotationDiscount_attach)
+    //   .div(100)
+    //   .toDecimalPlaces(3)
+    //   .toString(),
+    avgDiscount_withQty: (() => {
+      if (avgDiscount_withQty === 0) {
+        return String(quotationDiscount_attach);
+      } else {
+        return new Decimal(avgDiscount_withQty).mul(quotationDiscount_attach).div(100).toDecimalPlaces(3).toString();
+      }
+    })(),
   };
 };
 

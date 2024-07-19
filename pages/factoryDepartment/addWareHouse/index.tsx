@@ -33,6 +33,8 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import InputSelBar from 'components/global/gear/inputAndSel/inputSelBar/inputSelBar';
 import MyButton from 'components/global/gear/button/myButton';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
+import { setting } from '../wareHouseList/index';
+
 
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
@@ -158,7 +160,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`https://localhost:44383/WareHouse/AddWareHouse?${queryParams}`);
+            const response = await fetch(`${setting.apipath}AddWareHouse?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }

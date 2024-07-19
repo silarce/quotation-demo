@@ -91,7 +91,7 @@ export default function AttachContract({
   // ------------------------------------------------------------------------------
   // region useState
 
-  const [isLading, setIsLading] = useState(false);
+  const [isLoading, setIsLoadding] = useState(false);
 
   const [fileInfoArr, setFileInfoArr] = useState<TfileInfo[]>([]);
 
@@ -112,11 +112,17 @@ export default function AttachContract({
     []
   );
 
+  const [verticleKeyArr_attach, setVerticleKeyArr_attach] = useState<string[]>();
+
   // ------------------------------------------------------------------------------
 
   // region useData
 
-  const { data: data_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
+  const {
+    data: data_contract,
+
+    update: update_contract,
+  } = useGetContract_id_forAttach(contractId);
 
   taxRate = data_contract?.salesTax ? 0.05 : 0;
 
@@ -189,9 +195,10 @@ export default function AttachContract({
     // addOthers,
     // getOthersPostBodyArr,
     // //
-    // subTotal: quotationProdSubTotal,
+    subTotal: quotationProdSubTotal,
     // reset: resetClass,
     //
+    calcSubTotalPrice,
     attachProdList,
     addProd_attach,
     attachAddTotal,
@@ -201,8 +208,11 @@ export default function AttachContract({
   } = useProductList({
     productArr: formatedContent?.products,
     others: formatedContent?.others,
+    averageDiscount: '100',
     resetTrigger: data_contract,
     quotationDiscount: Number(formatedContent?.discount || '100'),
+    quotationDiscount_attach: Number(state_summary.discountRate || '100'),
+    isAttach: true,
   });
 
   const { control_profile, state_profile, state_customer } = useProfile({
@@ -222,7 +232,7 @@ export default function AttachContract({
 
   const handle_reqModify = () => {
     reqModify({
-      setIsLading,
+      setIsLoadding,
       router,
       data_contract,
       attachProdList,
@@ -239,6 +249,10 @@ export default function AttachContract({
       //
       state_paymentMethod,
       state_summary,
+      verticleKeyArr_attach,
+      //
+      discount: state_summary.discountRate,
+      averageDiscount: avgDiscount_withQty,
     });
   };
 
@@ -278,7 +292,12 @@ export default function AttachContract({
         inputAttr: {
           disabled: true,
           value: state_summary.discountRate ?? '',
-          onChange: () => {},
+          onChange: (e) => {
+            setState_Summary((state) => ({
+              ...state,
+              discountRate: e.target.value,
+            }));
+          },
         },
       },
       tuneTotal: {
@@ -361,7 +380,7 @@ export default function AttachContract({
       addMethod: (v) => {
         setState_paymentMethod((state) => {
           const copy = [...state];
-          copy.push({ milestone: v, totalPaymentRatio: '' });
+          copy.push({ milestone: v, totalPaymentRatio: '0' });
 
           return copy;
         });
@@ -419,13 +438,13 @@ export default function AttachContract({
   useEffect(() => {
     (async () => {
       try {
-        setIsLading(true);
+        setIsLoadding(true);
         await update_contract();
       } catch (error) {
         const err = error as Error;
         myAlert.err({ title: '讀取追加追減報價單失敗', content: err.message });
       } finally {
-        setIsLading(false);
+        setIsLoadding(false);
       }
     })();
   }, [contractId]);
@@ -486,7 +505,7 @@ export default function AttachContract({
   // region RENDER
 
   return (
-    <SubLayer isLoading_all={isLading}>
+    <SubLayer isLoading_all={isLoading}>
       <PageHeader02 tag={`合約編號 ${data_contract?.contractNumber}　建立追加追減報價單`} panelList={panel} />{' '}
       <div>
         <div className={scss.quotation}>
@@ -517,8 +536,8 @@ export default function AttachContract({
               panelBox="resetChangeBox"
               targetProd={targetProd}
               attachTotal={attachDivTotal.toLocaleString()}
-              discountRate={data_contract?.discount ?? ''} // 報價單總折數
-              changeDiscountRate={(v) => {}}
+              // discountRate={data_contract?.discount ?? ''} // 報價單總折數
+              // changeDiscountRate={(v) => {}}
             />
 
             <br />
@@ -581,15 +600,47 @@ export default function AttachContract({
               setTargetProd={setTargetProdKey_attach}
               defalutVKeyArr={Object.keys(attachProdList)}
               // onVKeyChange={(keyArr) => setProdVKeyArr(keyArr)}
-              onVKeyChange={() => {}}
+              onVKeyChange={(keyArr) => {
+                setVerticleKeyArr_attach(keyArr);
+              }}
               rowHeight="h60"
               // isAttach={true}
               // panelBox="resetChangeBox"
               // targetProd={targetProd}
               attachTotal={attachAddTotal}
               isRedBorder={true}
-              discountRate={data_contract?.discount ?? ''} // 報價單總折數
-              changeDiscountRate={(v) => {}}
+              // discountRate={data_contract?.discount ?? ''} // 報價單總折數
+              discountRate={state_summary.discountRate} // 報價單總折數
+              changeDiscountRate={(v) => {
+                // 如果quotationProdSubTotal為空字串會算出錯誤的值，
+                // 所以必須先計算出quotationProdSubTotal
+                if (quotationProdSubTotal === '') {
+                  calcSubTotalPrice();
+                }
+
+                if (v === '') {
+                  v = '0';
+                }
+
+                if (Number(v) > 500) {
+                  v = '500';
+                }
+
+                // const isValid = checkIsFloat(v, 3);
+
+                // if (!isValid) {
+                //   return;
+                // }
+
+                setState_Summary((state) => {
+                  // changeAllProdQuotationDiscount(Number(v));
+                  // changeAllProductDiscount(Number(v));
+                  return {
+                    ...state,
+                    discountRate: v,
+                  };
+                });
+              }}
             />
 
             <br />
@@ -666,7 +717,7 @@ export default function AttachContract({
 
 const reqModify = async ({
   //
-  setIsLading,
+  setIsLoadding: setIsLading,
   router,
   data_contract,
   attachProdList,
@@ -683,9 +734,13 @@ const reqModify = async ({
   //
   state_paymentMethod,
   state_summary,
+  verticleKeyArr_attach,
+  //
+  discount,
+  averageDiscount,
 }: {
   router: ReturnType<typeof useRouter>;
-  setIsLading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsLoadding: React.Dispatch<React.SetStateAction<boolean>>;
   data_contract: TquotationContractDto | undefined;
   attachProdList: {
     [key: string]: Class_product;
@@ -705,6 +760,9 @@ const reqModify = async ({
   //
   state_paymentMethod: Tstate_paymentMethodItem[];
   state_summary: Tstate_summary;
+  verticleKeyArr_attach: string[] | undefined;
+  discount: string;
+  averageDiscount: string;
 }) => {
   try {
     setIsLading(true);
@@ -714,9 +772,11 @@ const reqModify = async ({
     }
 
     const content_copy = _.cloneDeep(data_contract.content);
+
     const copy_shallow = {
       //
       ...content_copy,
+      discount: discount,
       // 根據api文件，後端不收
       // 但是預防萬一，還是把這些資料清掉比較安心
       reviewSalesEmployee: undefined,
@@ -778,13 +838,46 @@ const reqModify = async ({
     }
 
     // 追加跟變更
-    const attachProdArr = Object.values(attachProdList).map((prod, index) => {
-      if (!prod.isComponentOk) {
-        breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+    // const attachProdArr = Object.values(attachProdList).map((prod, index) => {
+    //   if (!prod.isComponentOk) {
+    //     breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+    //   }
+
+    //   return prod.body;
+    // });
+    // verticleKeyArr_attach
+    const attachProdArr = (() => {
+      if (verticleKeyArr_attach) {
+        return verticleKeyArr_attach.map((key, index) => {
+          const prod = attachProdList[key];
+
+          if (!prod.isComponentOk) {
+            breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+          }
+
+          const body = prod.body;
+          body.order = index;
+          // attachProdList裡的是追加或追加變更的主產品
+          // 這兩種都不送attachedToProductId
+          body.attachedToProductId = undefined;
+
+          return body;
+        });
       }
 
-      return prod.body;
-    });
+      return Object.values(attachProdList).map((prod, index) => {
+        if (!prod.isComponentOk) {
+          breakComponentProdIndex_attach = breakComponentProdIndex_attach + `${index + 1} `;
+        }
+
+        const body = prod.body;
+        body.order = index;
+
+        return body;
+      });
+    })();
+
+    // console.log('attachProdArr', attachProdArr);
 
     if (breakComponentProdIndex_attach) {
       return myAlert.warning({
@@ -845,6 +938,8 @@ const reqModify = async ({
       deliveryLocation: state_summary.deliveryLocation,
       deliveryDate: state_summary.deliveryDate,
       paymentMethods: state_paymentMethod,
+      //
+      averageDiscount,
     };
 
     let isDoorModalNameEmpty = false;
@@ -861,9 +956,10 @@ const reqModify = async ({
     }
 
     try {
-      await apiQuotationModify(contractId, body);
+      const res = await apiQuotationModify(contractId, body);
       setIsLading(false);
-      router.back();
+      // router.back();
+      router.push(`/domestic/quotationList/attachQuotation?id=${res.id}`);
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '上傳失敗', content: err.message });

@@ -1,11 +1,12 @@
 import { useState, useEffect, MouseEvent } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
+import classNames from 'classnames';
 
 // components
 import ContractListTop from '../local/list/list01/listTop01';
 import ListHeader01, { Tcontract } from '../local/list/list01/listHeader01';
-import ListBody01, { TmemoList } from '../local/list/list01/listBody01';
+import ListBody01, { TsubContract } from '../local/list/list01/listBody01';
 
 // antd
 import { Collapse } from 'antd';
@@ -18,13 +19,22 @@ import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 import { useGetContract_id_noItems_2 } from 'js/api/api_quotation';
 
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+
 export type { Tcontract };
 
 const { Panel } = Collapse;
 
-export default function ContractList({ contractList }: { contractList: Tcontract[] }) {
-  const router = useRouter();
-
+export default function ContractList({
+  //
+  className,
+  contractList,
+  setActiveContractId,
+}: {
+  className?: string;
+  contractList: Tcontract[];
+  setActiveContractId: (id: string) => void;
+}) {
   // 點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1);
   const [activeContract, setActiveContract] = useState<Tcontract>();
@@ -46,28 +56,46 @@ export default function ContractList({ contractList }: { contractList: Tcontract
 
   // ----------------------------------------------------------
 
-  const memoArr: TmemoList[] =
-    subContracts?.map((item) => {
-      return {
-        // memoId: item.content.quotationNumber,
-        memoId: item.contractNumber ?? '',
-        memoDate: moment(item.content.createdAt).format('YYYY-MM-DD'),
-        // memoContent: item.content.editNotes,
-        memoContent: '',
+  const memoArr: TsubContract[] =
+    subContracts?.map((subContract) => {
+      const { id: subContractId, content } = subContract;
+
+      const { managerReviewedAt } = content;
+
+      const verifyFormText = managerReviewedAt ? '已審核完畢' : '未審核完畢';
+
+      const obj: TsubContract = {
+        contractNumber: subContract.contractNumber ?? '---',
+        createdAt: moment(subContract.content.createdAt).format('YYYY-MM-DD'),
+        projectName: subContract.content.projectName,
+        verifyForm: (
+          <span
+            className="cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveContractId(subContractId);
+            }}
+          >
+            <span style={{ color: !managerReviewedAt ? 'red' : undefined }}>{verifyFormText}</span>
+            <IconDetail className="inline-block" />
+          </span>
+        ),
         href: {
           pathname: '/domestic/contract/quotation',
           query: {
             id: subContracts[0].id,
-            version: item.version,
+            version: subContract.version,
           },
         },
       };
+
+      return obj;
     }) ?? [];
   memoArr.shift();
 
   // ----------------------------------------------------------
   return (
-    <div className={style.container}>
+    <div className={classNames(style.container, className)}>
       <ContractListTop />
       <Collapse
         //
@@ -76,23 +104,15 @@ export default function ContractList({ contractList }: { contractList: Tcontract
         destroyInactivePanel={true}
         onChange={changeActive}
       >
-        {contractList.map((item, index) => {
-          const { quotationId, id } = item;
+        {contractList.map((contract, index) => {
           const isActive = activeIndex === index;
-
-          const onClick = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.push({
-              pathname: `/domestic/contract/quotation`,
-              query: { id, version: 1 },
-            });
-          };
 
           return (
             <Panel
               key={index}
+              //
               className={style.panel}
-              header={<ListHeader01 contract={item} onClick={onClick} isActive={isActive} />}
+              header={<ListHeader01 contract={contract} isActive={isActive} />}
             >
               <ListBody01 memoList={memoArr} />
             </Panel>

@@ -11,6 +11,7 @@ export default function ContractListTop() {
       <span>聯絡人</span>
       <span>連絡電話</span>
       <span>承辦人</span>
+      <span>合約審核表</span>
       <span>{/* 按鈕格 留白 */}</span>
     </div>
   );

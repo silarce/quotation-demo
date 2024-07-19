@@ -65,6 +65,7 @@ type Tstate_period = {
   period: number;
 
   rowArr: {
+    itemName: string;
     productId: string;
     basePrice: number;
     completedQuantity: string;

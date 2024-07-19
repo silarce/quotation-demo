@@ -52,7 +52,7 @@ import QuotationPdf_part, {
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
 import ContractReviewForm, {
   useDefaultPaymentRatio_quotationContent,
-} from 'components/page/domestic/quotation/quotation/contractReviewForm/contractReviewForm';
+} from 'components/composition/contractReviewForm/contractReviewForm';
 import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
@@ -314,6 +314,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   } = useGetQuotationContent_id(contentId as string);
 
   const latestContent = quotationData?.latestContent ?? quotationContentData;
+
   const lastestContentId = latestContent?.id;
   // const status = latestContent?.status;
   const verifyForm = latestContent?.verifyForm;
@@ -637,6 +638,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       projectProgress: state_profile.projectProgress ?? '',
 
       discount: `${Number(state_summary.discountRate ?? 0)}` ?? '100',
+      averageDiscount: avgDiscount_withQty || null,
       tuneTotal: state_summary.tuneTotal || '0',
       subTotal: Number(state_summary.subTotal.replaceAll(',', '')),
       salesTax: Number(state_summary.salesTax.replaceAll(',', '')),
@@ -999,6 +1001,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     // others: quotationData?.latestContent.others,
     productArr: latestContent?.products,
     others: latestContent?.others,
+    averageDiscount: latestContent?.averageDiscount,
     resetTrigger: quotationData ?? quotationContentData,
     // onDoorTypeChange: onDoorTypeChange, // 棄用
     quotationDiscount: Number(state_summary.discountRate || '100'),
@@ -1018,7 +1021,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     setVisible: setPdfModalVisible,
     pdfData,
   } = useModalQuotationPdf({
-    quotationContent: quotationData?.latestContent,
+    quotationContent: latestContent,
     emptySomeProperty: status === 'Bidding',
   });
 
@@ -1435,7 +1438,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         addMethod: (v) => {
           setState_PaymentMethod((state) => {
             const copy = [...state];
-            copy.push({ milestone: v, totalPaymentRatio: '' });
+            copy.push({ milestone: v, totalPaymentRatio: '0' });
 
             return copy;
           });
@@ -2272,19 +2275,19 @@ function TheQuotation({ router }: { router: NextRouter }) {
       {/* 合約審核表 */}
       <ContractReviewForm
         showModal={reviewFormShow}
-        forbidden={status === 'Pending' && isSendToReview_pending}
-        close={() => setReviewFormShow(false)}
-        contractIdNumber={latestContent?.quotationNumber ?? ''}
-        contractName={latestContent?.projectName ?? ''}
-        contractPrice={Number(state_summary.total.replaceAll(',', ''))}
-        lastestContentId={lastestContentId}
-        verifyForm={verifyForm}
+        readOnly={status === 'Pending' && isSendToReview_pending}
+        onCancel={() => setReviewFormShow(false)}
+        contentId={lastestContentId}
+        // contractNumber={latestContent?.quotationNumber ?? ''}
+        // projectName={latestContent?.projectName ?? ''}
+        // totalPrice={Number(state_summary.total.replaceAll(',', ''))}
+        // verifyForm={verifyForm}
         onConfirm={async () => {
           setIsLoading(true);
           await update();
           setIsLoading(false);
         }}
-        defaultPaymentRatioArr={useDefaultPaymentRatio_quotationContent(latestContent)}
+        // defaultPaymentRatioArr={useDefaultPaymentRatio_quotationContent(latestContent)}
       />
       <ThreeButtonModal
         visible={reviewModalShow}

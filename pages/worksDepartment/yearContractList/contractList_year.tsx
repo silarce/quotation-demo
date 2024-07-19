@@ -78,8 +78,8 @@ export default function WdContractList() {
 
   const params: Tparams = {
     pageSize: 99999,
-    sort: 'content.quotationDate',
-    order: 'DESC',
+    sort: 'contractNumber',
+    order: 'ASC',
     populate: [
       //
       'content.customer',
@@ -139,12 +139,14 @@ export default function WdContractList() {
       northernArr: [],
       centralArr: [],
       southernArr: [],
-      easternArr: [],
+      // easternArr: [],
       abroadArr: [],
     };
 
     dataArr.forEach((contract) => {
-      const { content, accountReceivable, contractNumber } = contract;
+      const { content, accountReceivable } = contract;
+      let { contractNumber } = contract;
+      contractNumber = contractNumber || '';
 
       const {
         //
@@ -173,17 +175,25 @@ export default function WdContractList() {
         remindLight: hasUncollectedAmounts,
       };
 
-      if (northernCountyArr.includes(county as TnorthernCounty)) {
-        list.northernArr.push(obj);
-      } else if (centralCountyArr.includes(county as TcentralCounty)) {
-        list.centralArr.push(obj);
-      } else if (southernCountyArr.includes(county as TsouthernCounty)) {
-        list.southernArr.push(obj);
-      } else if (easternCountyArr.includes(county as TeasternCounty)) {
-        list.easternArr.push(obj);
-      } else if (abroadArr.includes(county as Tabroad)) {
-        list.abroadArr.push(obj);
-      }
+      contractNumber.startsWith('N-')
+        ? list.northernArr.push(obj)
+        : contractNumber.startsWith('M-')
+        ? list.centralArr.push(obj)
+        : contractNumber.startsWith('H-')
+        ? list.southernArr.push(obj)
+        : list.abroadArr.push(obj);
+
+      // if (northernCountyArr.includes(county as TnorthernCounty)) {
+      //   list.northernArr.push(obj);
+      // } else if (centralCountyArr.includes(county as TcentralCounty)) {
+      //   list.centralArr.push(obj);
+      // } else if (southernCountyArr.includes(county as TsouthernCounty)) {
+      //   list.southernArr.push(obj);
+      // } else if (easternCountyArr.includes(county as TeasternCounty)) {
+      //   list.easternArr.push(obj);
+      // } else if (abroadArr.includes(county as Tabroad)) {
+      //   list.abroadArr.push(obj);
+      // }
     });
 
     return list;
@@ -307,18 +317,18 @@ export default function WdContractList() {
   );
 }
 
-// 判斷依據是跟後端要的
-const northernCountyArr: TnorthernCounty[] = [
-  '臺北市',
-  '新北市',
-  '基隆市',
-  '新竹市',
-  '桃園市',
-  '新竹縣',
-  '宜蘭縣',
-  '連江縣',
-];
-const centralCountyArr: TcentralCounty[] = ['臺中市', '苗栗縣', '彰化縣', '南投縣', '雲林縣', '金門縣'];
-const southernCountyArr: TsouthernCounty[] = ['高雄市', '臺南市', '嘉義市', '嘉義縣', '屏東縣', '澎湖縣'];
-const easternCountyArr: TeasternCounty[] = ['花蓮縣', '臺東縣'];
-const abroadArr: Tabroad[] = ['海外'];
+// // 判斷依據是跟後端要的
+// const northernCountyArr: TnorthernCounty[] = [
+//   '臺北市',
+//   '新北市',
+//   '基隆市',
+//   '新竹市',
+//   '桃園市',
+//   '新竹縣',
+//   '宜蘭縣',
+//   '連江縣',
+// ];
+// const centralCountyArr: TcentralCounty[] = ['臺中市', '苗栗縣', '彰化縣', '南投縣', '雲林縣', '金門縣'];
+// const southernCountyArr: TsouthernCounty[] = ['高雄市', '臺南市', '嘉義市', '嘉義縣', '屏東縣', '澎湖縣'];
+// const easternCountyArr: TeasternCounty[] = ['花蓮縣', '臺東縣'];
+// const abroadArr: Tabroad[] = ['海外'];
