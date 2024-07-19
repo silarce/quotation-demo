@@ -118,7 +118,11 @@ export default function AttachContract({
 
   // region useData
 
-  const { data: data_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
+  const {
+    data: data_contract,
+
+    update: update_contract,
+  } = useGetContract_id_forAttach(contractId);
 
   taxRate = data_contract?.salesTax ? 0.05 : 0;
 

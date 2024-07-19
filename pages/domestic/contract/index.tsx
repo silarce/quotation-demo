@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import Link, { LinkProps } from 'next/link';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
-import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TpanelList, Tlink } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // components
 import ContractList from 'components/page/domestic/contract/contractList';
@@ -17,9 +18,21 @@ import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistr
 // import { optionsCreator_doorModel } from 'js/utils/options/productOptions';
 
 // api
-import { useContract_infinite } from 'js/api/api_quotation';
+import { Tparams, useContract_infinite, useGetContract_employee } from 'js/api/api_quotation';
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+
+import scss from './index.module.scss';
+import { TuserDto } from 'js/api/dtoTypes';
+
+// ===========================================
+
+type Tquery = {
+  county: string | undefined;
+  customerName: string | undefined;
+  projectName: string | undefined;
+  source: 'all' | 'pendingReview' | undefined;
+};
 
 // ===========================================
 
@@ -31,13 +44,15 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 // 合約列表單個項目展開裡的內容是追加追減項目
 // 合約列表單個項目展開裡的內容是追加追減項目
 // 合約列表單個項目展開裡的內容是追加追減項目
-export default function Contract() {
+
+// MARK: START
+export default function Contract({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
-  const query = router.query as {
-    county: string | undefined;
-    customerName: string | undefined;
-    projectName: string | undefined;
-  };
+  const query = router.query as Tquery;
+  query.source = query.source || 'all';
+  const { county, customerName, projectName, source } = query;
+
+  const userId = userInfo.employee?.id;
 
   // --------------------------------------------------
 
@@ -45,29 +60,82 @@ export default function Contract() {
 
   // --------------------------------------------------
 
-  const params = {
-    sort: 'contractNumber',
-    filter: {
-      version: { $eq: 1 },
-      'content.county': { $eq: query.county as string },
-      'content.customer.name': { $contains: query.customerName as string },
-      'content.projectName': { $contains: query.projectName as string },
-    },
-  };
+  const params: Tparams = useMemo(() => {
+    return {
+      sort: 'contractNumber',
+      filter: {
+        version: { $eq: 1 },
+        'content.county': { $eq: county },
+        'content.customer.name': { $contains: customerName },
+        'content.projectName': { $contains: projectName },
+      },
+    };
+  }, [county, customerName, projectName]);
 
   const {
     //
-    dataArr,
+    dataArr: dataArr_infinite,
     viewRef_bottom,
     isLoadingPage1,
     reset,
   } = useContract_infinite({ customParams: params });
 
-  useEffect(() => {
-    reset();
-  }, [router.query]);
+  const {
+    //
+    data: data_contractArr_employee = [],
+    update: update_contractArr_employee,
+  } = useGetContract_employee(userId, {
+    customParams: params,
+  });
+
+  const dataArr = source === 'all' ? dataArr_infinite : data_contractArr_employee;
 
   // --------------------------------------------------
+
+  // PROPS
+
+  const contractList = useMemo(() => {
+    return (dataArr ?? []).map((contract, index) => {
+      const { id: contractId, content } = contract;
+
+      const { managerReviewedAt } = content;
+
+      const verifyFormText = managerReviewedAt ? '已審核完畢' : '未審核完畢';
+
+      return {
+        id: contract.id,
+        // quotationId: content.quotationNumber,
+        quotationId: contract.contractNumber ?? '---',
+        clientName: content.customer?.name ?? '---',
+        quotationName: content.projectName,
+        discount: contract.discount,
+        priceTotal: String(contract.total),
+        contactPerson: content.contactPerson,
+        contactPhone: content.contactNumber,
+        attn: content.agentEmployee?.chName ?? '---',
+        verifyForm: (
+          <span
+            className="cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveContractId(contractId);
+            }}
+          >
+            <span style={{ color: !managerReviewedAt ? 'red' : undefined }}>{verifyFormText}</span>
+            <IconDetail className="inline-block" />
+          </span>
+        ),
+        viewRef_bottom: source === 'all' && index === dataArr.length - 5 ? viewRef_bottom : undefined,
+        href: {
+          pathname: `/domestic/contract/quotation`,
+          query: { id: contractId, version: 1 },
+        },
+      };
+    });
+  }, [dataArr]);
+
+  // ______________________________________________________________________
+  // ______________________________________________________________________
 
   const searchTargetList = [
     // {
@@ -121,46 +189,16 @@ export default function Contract() {
     },
   ];
 
-  // ===================================================
+  // -----------------------------------------------------------------------
 
-  const contractList =
-    dataArr?.map((contract, index) => {
-      const { id: contractId, content } = contract;
+  // region useEffect
 
-      const { managerReviewedAt } = content;
+  useEffect(() => {
+    source === 'all' ? reset() : update_contractArr_employee();
+  }, [county, customerName, projectName, source]);
 
-      const verifyFormText = managerReviewedAt ? '已審核完畢' : '未審核完畢';
-
-      return {
-        id: contract.id,
-        // quotationId: content.quotationNumber,
-        quotationId: contract.contractNumber ?? '---',
-        clientName: content.customer?.name ?? '---',
-        quotationName: content.projectName,
-        discount: contract.discount,
-        priceTotal: String(contract.total),
-        contactPerson: content.contactPerson,
-        contactPhone: content.contactNumber,
-        attn: content.agentEmployee?.chName ?? '---',
-        verifyForm: (
-          <span
-            className="cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation();
-              setActiveContractId(contractId);
-            }}
-          >
-            <span style={{ color: !managerReviewedAt ? 'red' : undefined }}>{verifyFormText}</span>
-            <IconDetail className="inline-block" />
-          </span>
-        ),
-        viewRef_bottom: index === dataArr.length - 5 ? viewRef_bottom : undefined,
-        href: {
-          pathname: `/domestic/contract/quotation`,
-          query: { id: contractId, version: 1 },
-        },
-      };
-    }) ?? [];
+  // -----------------------------------------------------------------------
+  // MARK: RENDER
 
   return (
     <SubLayer isLoading_subLayer={isLoadingPage1}>
@@ -168,7 +206,12 @@ export default function Contract() {
       <PageHeader02 tag="合約" panelList={panelList} />
       {/*  */}
       <div>
-        <ContractList contractList={contractList} setActiveContractId={setActiveContractId} />
+        <ApprovalsBar query={query} />
+        <ContractList
+          className={'m-[4px] mt-0'}
+          contractList={contractList}
+          setActiveContractId={setActiveContractId}
+        />
       </div>
 
       <ContractReviewForm
@@ -181,3 +224,46 @@ export default function Contract() {
     </SubLayer>
   );
 }
+
+// MARK: END
+
+// ========================================================================
+
+const ApprovalsBar = ({ query }: { query: Tquery }) => {
+  const linkList: Tlink[] = [
+    {
+      label: '全部',
+      linkProps: {
+        replace: true,
+        href: {
+          pathname: '',
+          query: {
+            ...query,
+            source: 'all',
+          },
+        },
+      },
+      isActive: query.source === 'all',
+    },
+    {
+      label: '待審核',
+      linkProps: {
+        replace: true,
+        href: {
+          pathname: '',
+          query: {
+            ...query,
+            source: 'pendingReview',
+          },
+        },
+      },
+      isActive: query.source === 'pendingReview',
+    },
+  ];
+
+  return (
+    <div className={scss.approvalsBar}>
+      <PageHeader02 linkList={linkList} />
+    </div>
+  );
+};

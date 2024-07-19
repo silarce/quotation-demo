@@ -3202,6 +3202,8 @@ class Class_product {
   set price(v) {
     // v = v.replace(/,/g, '');
 
+    console.log('call price', v);
+
     this._prodData.price = Number(v);
     this._price = v;
 
@@ -3806,8 +3808,6 @@ class Class_product {
 
   // 清空變更prod
   clearAttach() {
-    console.log('this', this);
-
     this._exchangeProdList = {};
     this._reduceQty = '0';
     this.onDiscountChange();

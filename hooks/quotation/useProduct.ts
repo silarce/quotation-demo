@@ -637,7 +637,21 @@ const useProductList = ({
     discount_attach: number;
   }) => {
     Object.values(productList).forEach((prod) => {
-      prod.quotationDiscount = discount;
+      // 20240719 發現bug，若quotationDiscount不是100，會多次呼叫changeAllProdQuotationDiscount
+      // 而在合約追加追減，原主產品的component是空的，
+      // prod.quotationDiscount更新後重新計算金額時因為component是空的，只會計算subComponent的金額
+      // 致使金額錯誤 (set price被呼叫)
+      // 因此判斷isAttach為true時(處理追加追減時)，不更新prod.quotationDiscount
+      // 畢竟在這時原本的主產品是不應該改變的
+      // 但是奇怪的是，set price被呼叫，改變了price的值
+      // 在開發環境畫面上的price並沒有改變
+      // 但在生產環境是正確改變的
+      // 未來有時間最好調查一下
+
+      if (!isAttach) {
+        prod.quotationDiscount = discount;
+      }
+
       Object.values(prod.exchangeProdList).forEach((exProd) => {
         exProd.quotationDiscount = discount_attach;
       });
