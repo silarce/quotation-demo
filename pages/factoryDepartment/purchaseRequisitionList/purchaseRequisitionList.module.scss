@@ -94,6 +94,22 @@
   top: 0;
 }
 
+.head_head1 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
+  width: auto;
+  margin-top: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgb(214, 214, 214);
+  div {
+    margin-right: 20px;
+  }
+
+  // background-color: gray;
+}
 
 .head_content1 {
   display: grid;
@@ -575,13 +591,13 @@ div.panelHeader17 {
 }
 
 .minibtn {
-  height: 36px;
+  height: 28.28px;
   // width: 36px;
   // padding: 0px 40px;
   border: solid 1px #c1c1c1;
   ;
   background-color: $bgc01;
-  padding: 4px 8px;
+  padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
   font-weight: 500;
@@ -645,13 +661,13 @@ div.panelHeader17 {
 }
 
 .minidisabledbtn {
-  height: 36px;
+  height: 28.28px;
   // width: 36px;
   // padding: 0px 40px;
   border: solid 1px #c1c1c1;
   ;
   background-color: $bgc01;
-  padding: 4px 8px;
+  padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
   font-weight: 500;

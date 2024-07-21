@@ -98,7 +98,7 @@ export default function ProdReceiptList() {
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
-
+    const [invoicein, setInvoicein] = useState<string>("");
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -230,7 +230,6 @@ export default function ProdReceiptList() {
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
-                console.log(data[0].receipted);
                 getProdReceiptDetail(data[0].prodreceiptuuid);
                 // GetProdReceiptDetailByPurchaseOrderId(data[0].prodreceiptuuid);
                 setCreate_atin(data[0].create_at);
@@ -247,13 +246,10 @@ export default function ProdReceiptList() {
                 setSupplieraddressin(data[0].supplieraddress);
                 setStatusin(data[0].status);
                 setSupplierphonein(data[0].supplierphone);
+                setInvoicein(data[0].invoice);
             }
         } catch (error: any) {
             setError("getProdReceipt:" + error.message);
-            // myAlert.err({
-            //     title:'getProdReceipt',
-            //     content:error.message
-            // })
         }
         finally {
             setIsLoading(false);
@@ -335,6 +331,7 @@ export default function ProdReceiptList() {
             setSupplieraddressin(supplieraddress as string);
             setStatusin(status as string);
             setSupplierphonein(supplierphone as string);
+            setInvoicein(invoice as string);
         }
     }, [prodreceiptuuid]);
 
@@ -376,16 +373,21 @@ export default function ProdReceiptList() {
 
     // 進貨單入庫
     const TransferProdReceiptToProdEntry = async () => {
+        alert("in");
         try {
+            // return;
             setIsLoading(true);
-            const conditionModel: {
-                purchaseorderuuid: string | undefined,
-                data: any
-            } = {
-                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
-                data: data2
-            };
 
+
+            const conditionModel: {
+                prodreceiptuuid: string | undefined,
+                data: any,
+                username: string | undefined
+            } = {
+                prodreceiptuuid: checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid as string | undefined,
+                data: data2,
+                username: userInfo?.username as string | undefined
+            };
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -394,12 +396,26 @@ export default function ProdReceiptList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}TransferProdReceiptToProdEntry?${queryParams}`);
+            const response = await fetch(`${setting.apipath}TransferProdReceiptToProdEntry`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                throw new Error('Failed to fetch data11111');
             }
-            const data = await response.json();
+
+            const responseData = await response.json();
+            myAlert.info(
+                {
+                    title: '單據新增成功',
+                    content: `進貨單號為:${responseData}`
+                })
+
+            setData2([]);
             getProdReceipt();
 
             getProdReceiptDetail(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
@@ -543,6 +559,25 @@ export default function ProdReceiptList() {
     };
 
 
+    function handleTransfer() {
+        if (editstatus === true) {
+            myAlert.warning({ title: "請先結束編輯狀態" });
+        }
+        else {
+            myAlert.confirm({
+                title: '確定要轉為入庫單嗎?',
+                content: <>
+                    <h1>請確認數量是否正確</h1>
+                </>,
+                props: {
+                    onOk: () => {
+                        TransferProdReceiptToProdEntry();
+                    }
+                }
+            });
+        }
+    }
+
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={'進貨單'} panelList={panelList} />
@@ -558,17 +593,16 @@ export default function ProdReceiptList() {
                 </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        {/* <div>
-                            <span style={{ fontSize: '25px', fontWeight: 'bolder', color: '#14256a'}}>
-                                採購單
-                            </span>
-                            <span style={{ display: (checkfirstin === 0 ? inspectedin : inspected) === "false" ? "" : "none" }}>
-                                <MyButton_v2 px='px22' py='py4' theme='danger' label="未驗收" onClick={() => { handleClosePO() }} />
-                            </span>
-                            <span style={{ display: (checkfirstin === 0 ? inspectedin : inspected) === "true" ? "" : "none" }}>
-                                <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已驗收" />
-                            </span>
-                        </div> */}
+                        <div className={scss.head_head1}>
+                            <div>
+                                <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
+                                    進貨查詢
+                                </button>
+                            </div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
 
                         <div className={scss.head_content1}>
                             <div>
@@ -701,7 +735,7 @@ export default function ProdReceiptList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: supplierphonein ? supplierphone : ' ',
+                                            value: supplierphonein ? supplierphonein : ' ',
                                         },
                                     }}
                                 />
@@ -713,7 +747,7 @@ export default function ProdReceiptList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: invoice ? invoice : ' ',
+                                            value: invoicein ? invoicein : ' ',
                                         },
                                     }}
                                 />
@@ -736,9 +770,7 @@ export default function ProdReceiptList() {
                         </div>
                         <div className={scss.head_foot2}>
                             <div>
-                                <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    進貨查詢
-                                </button>
+
                             </div>
                             <div></div>
                             <div></div>
@@ -815,8 +847,11 @@ export default function ProdReceiptList() {
                                 <MyButton_v2 px='px22' py='py4' theme={undefined} label="驗收入庫" onClick={handleReceipt} />&nbsp;&nbsp;
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="退貨單" onClick={handleReceipt} />
                             </span> */}
-                                <span>
-                                    <button className={scss.redbtn} onClick={() => { alert("新增入庫單") }}>新增入庫</button>
+                                <span style={{ display: `${data2.length > 0 ? '' : 'none'}` }}>
+                                    <button className={scss.redbtn} onClick={() => { handleTransfer() }}>新增入庫</button>
+                                </span>
+                                <span style={{ display: `${data2.length > 0 ? 'none' : ''}` }}>
+                                    <button className={scss.disabledbtn} >新增入庫</button>
                                 </span>
                             </div>
                             <div></div>
@@ -853,7 +888,11 @@ export default function ProdReceiptList() {
                                                 readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     const newData = [...data2];
-                                                    const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                    let newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                    // 如果新數量超過最大數量，設置為最大數量
+                                                    if (newQuantity > _item.maxquantity) {
+                                                        newQuantity = _item.maxquantity;
+                                                    }
                                                     newData[index] = {
                                                         ...newData[index],
                                                         quantity: newQuantity,
@@ -867,10 +906,11 @@ export default function ProdReceiptList() {
                                         <span>
                                             <input
                                                 ref={unitpriceRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                style={{ backgroundColor: 'transparent', width: '80px' }}
                                                 type="text"
                                                 value={_item.unitprice.toLocaleString()}
-                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     const newData = [...data2];
                                                     const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;

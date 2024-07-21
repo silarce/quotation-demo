@@ -464,6 +464,8 @@ export default function QuotereqDetailList() {
         handlequotereqChange('unitprice', '')
         handlequotereqChange('totalprice', '')
         handlequotereqChange('note', '')
+        myAlert.success({title:'廠商資訊帶入成功'});
+        
     }
 
     const handlequotereqChange = (key: any, value: any) => {

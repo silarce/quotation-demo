@@ -275,7 +275,25 @@ export default function AddPurchaseRequisition() {
             const data = await response.json();
             // setData1(data);
 
-            setData2(prevData2 => [...prevData2, ...data]);
+            console.log(data);
+            // setData2(prevData2 => [...prevData2, ...data]);
+            setData2(prevData2 => {
+                // 取得當前的productid列表
+                const existingProductIds = prevData2.map(item => item.productid);
+
+                // 檢查並提示哪些productid已經存在
+                const duplicateProductIds = data.filter((item: { productid: any; }) => existingProductIds.includes(item.productid));
+                if (duplicateProductIds.length > 0) {
+                    myAlert.info({ title: `${duplicateProductIds.map((item: { productid: any; }) => item.productid).join(', ')}已加入` });
+                }
+
+                // 過濾掉已經存在的productid
+                const newData = data.filter((item: { productid: any; }) => !existingProductIds.includes(item.productid));
+
+                // 返回合併的結果
+                return [...prevData2, ...newData];
+            });
+
 
 
         } catch (error: any) {
@@ -605,7 +623,11 @@ export default function AddPurchaseRequisition() {
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
-                            <div></div>
+                            <div>
+                                <button className={scss.minibtn} onClick={() => { alert("OK") }}>
+                                    申請紀錄
+                                </button>
+                            </div>
                             <div></div>
                             <div></div>
                             <div></div>
@@ -654,15 +676,12 @@ export default function AddPurchaseRequisition() {
                                         },
                                     }}
                                 />
-                                {/*<span className={scss.customContainer}>
-                                     <span className={scss.customLabel}>
-                                        備註
-                                    </span>
-                                    <textarea
-                                        className={scss.customInput}
-                                        value={note}
-                                        onChange={(e) => { setNote(e.target.value) }}
-                                    ></textarea> */}
+                            </div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div className={scss.head_content2}>
+                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="備註"
@@ -674,30 +693,12 @@ export default function AddPurchaseRequisition() {
                                         },
                                     }}
                                 />
-                                {/* </span> */}
                             </div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_content2}>
-                            <div></div>
                             <div></div>
                             <div></div>
                         </div>
                         <div className={scss.head_content3}>
                             <div style={{ marginRight: '20px' }}>
-
-                                {/* <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={false}
-                                    inputProps={{
-                                        props: {
-                                            value: note,
-                                            onChange: (e) => { setNote(e.target.value) }
-                                        },
-                                    }}
-                                /> */}
 
                             </div>
                             <div></div>
@@ -716,16 +717,9 @@ export default function AddPurchaseRequisition() {
                         </div>
                         <div className={scss.head_foot2}>
                             <div>
-                                {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(true) }}>
-                                    <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} />
-                                    請購清單
-                                </button> */}
-                                <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
+                            <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
                                     {/* <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} /> */}
                                     品項查詢
-                                </button>
-                                <button className={scss.minibtn} onClick={() => { alert("OK") }}>
-                                    申請紀錄
                                 </button>
                             </div>
                             <div style={{ marginTop: '5px' }}></div>

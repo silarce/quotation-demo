@@ -578,17 +578,25 @@ export default function PurchaseRequisitionList() {
 
     const handleAddToList = (item: any) => {
         console.log(item);
-        if (item.suppliername === null || item.suppliername === undefined || item.suppliername === '') {
-            myAlert.warning({ title: '尚未詢價', content: '請確認是否詢價完畢，並確認供應商' })
-        } else {
-            // 判斷不重覆加入
-            if (!data2.find(existingItem => existingItem.purchaserequisitiondetailuuid === item.purchaserequisitiondetailuuid)) {
-                // 將item加入到data2中
-                setData2(prevData2 => [...prevData2, item]);
 
+        // 檢查 suppliername 是否存在
+        if (item.suppliername === null || item.suppliername === undefined || item.suppliername === '') {
+            myAlert.warning({ title: '尚未詢價', content: '請確認是否詢價完畢，並確認供應商' });
+        } else {
+            // 檢查是否有不同供應商
+            if (data2.length > 0 && data2[0].suppliername !== item.suppliername) {
+                myAlert.warning({ title: '不同供應商', content: '不同供應商不能放在同一個清單中採購' });
+            } else {
+                // 檢查是否已經存在於列表中
+                if (!data2.find(existingItem => existingItem.purchaserequisitiondetailuuid === item.purchaserequisitiondetailuuid)) {
+                    // 將 item 加入到 data2 中
+                    setData2(prevData2 => [...prevData2, item]);
+                }
             }
         }
-    }
+    };
+
+
     useEffect(() => {
         // 每次 data2 更新時，重新計算總價和稅金
         let totalprice = 0;
@@ -981,16 +989,16 @@ export default function PurchaseRequisitionList() {
                 <div className={scss.right}>
 
                     <div className={scss.content}>
-                        {/* <div style={{ display: `${leftbaropen === true ? 'none' : ''}` }}>
-                            <button>
-                                <img src={icon_collapse_right.src} alt="search" style={{ height: '30px', width: '30px', textAlign: 'left' }} onClick={() => { setLeftbaropen(!leftbaropen) }} />
-                            </button>
-                        </div> */}
-                        {/* <div style={{ display: `${leftbaropen === false ? 'none' : ''}` }}>
-                            <button>
-                                <img src={icon_collapse_left.src} alt="search" style={{ height: '30px', width: '30px', textAlign: 'left' }} onClick={() => { setLeftbaropen(!leftbaropen) }} />
-                            </button>
-                        </div> */}
+                        <div className={scss.head_head1}>
+                            <div>
+                                <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
+                                    請購查詢
+                                </button>
+                            </div>
+                        </div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
                         <div className={scss.head_content1}>
 
                             <div>
@@ -1105,9 +1113,7 @@ export default function PurchaseRequisitionList() {
                                     請購紀錄
                                 </button> */}
                                 {/* <button className={scss.minibtn} onClick={() => { setProductSearchmodalopen(!productSearchmodalopen) }}> */}
-                                <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    請購查詢
-                                </button>
+
                                 <button style={{ display: `${statusin === '已結案' ? 'none' : ''}` }} className={scss.minibtn} onClick={() => { goQuotereqDetailList('all') }}>
                                     {/* <img src={icon_detail.src} alt="search" style={{ height: '20px', width: '20px' }} /> */}
                                     詢價管理

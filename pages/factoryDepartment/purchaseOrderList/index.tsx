@@ -548,12 +548,14 @@ export default function PurchaseOrderList() {
 
     //#endregion
     // 轉為進貨單，開始驗收
-    function handleReceipt() {
+    function handleTransfer() {
         // TransferPurchaseOrderToProductReceipt();
         if (editstatus === true) {
             myAlert.warning({ title: "請先結束編輯狀態" });
         } else if (invoicein === "" || invoicein === undefined || invoicein === null) {
             myAlert.warning({ title: "發票號碼尚未輸入" });
+        } else if (editmain===true) {
+            myAlert.warning({ title: "尚未儲存或取消編輯" });
         }
         else {
             myAlert.confirm({
@@ -739,25 +741,21 @@ export default function PurchaseOrderList() {
                 </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
+                        <div className={scss.head_head1}>
+                            <div>
+                                <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
+                                    {/* <img src={icon_fc_collapse_right.src} alt="search" style={{ height: '15px', width: '15px' }} /> */}
+                                    採購查詢
+                                </button>
+                            </div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+
                         <div className={scss.head_content1}>
                             <div>
-                                <span style={{ display: `${statusin === "採購中" ? '' : 'none'}` }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
-                                        編輯
-                                    </button>
-                                </span>
-                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minidisabledbtn} >
-                                        編輯
-                                    </button>
-                                </span>
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
-                                    儲存
-                                </button>
-                                &nbsp;
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
-                                    取消
-                                </button>
+
                                 <InputSel
                                     {...inputSelProps}
                                     caption="採購日期"
@@ -865,6 +863,23 @@ export default function PurchaseOrderList() {
                         </div>
                         <div className={scss.head_content2}>
                             <div>
+                                <span style={{ display: `${statusin === "採購中" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
+                                        編輯
+                                    </button>
+                                </span>
+                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minidisabledbtn} >
+                                        編輯
+                                    </button>
+                                </span>
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
+                                    取消
+                                </button>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="廠商名稱"
@@ -891,6 +906,17 @@ export default function PurchaseOrderList() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
                                     caption="聯絡電話"
                                     disabled={!editmain}
                                     inputProps={{
@@ -913,6 +939,17 @@ export default function PurchaseOrderList() {
                                 />
                             </div>
                             <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
                                 <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
@@ -977,10 +1014,6 @@ export default function PurchaseOrderList() {
                         </div>
                         <div className={scss.head_foot2}>
                             <div>
-                                <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    {/* <img src={icon_fc_collapse_right.src} alt="search" style={{ height: '15px', width: '15px' }} /> */}
-                                    採購查詢
-                                </button>
                                 <button className={scss.minibtn} onClick={() => { alert("comming soon!") }}>
                                     進貨明細
                                 </button>
@@ -1076,7 +1109,7 @@ export default function PurchaseOrderList() {
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
                                 <span style={{ display: data2.length > 0 ? "" : "none" }}>
-                                    <button className={scss.redbtn} onClick={handleReceipt} >新增進貨</button>
+                                    <button className={scss.redbtn} onClick={handleTransfer} >新增進貨</button>
                                 </span>
                                 <span style={{ display: data2.length > 0 ? "none" : "" }}>
                                     <button className={scss.disabledbtn}>新增進貨</button>
