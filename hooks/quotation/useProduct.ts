@@ -302,7 +302,7 @@ const useProductList = ({
     return { createProdList, addProd, calcDiscount_two, calcAvgDiscount };
 
     // reRender();
-  }, [resetTrigger, doorModelList]);
+  }, [resetTrigger, doorModelList, quotationDiscount]);
 
   useEffect(() => {
     createProdList();
