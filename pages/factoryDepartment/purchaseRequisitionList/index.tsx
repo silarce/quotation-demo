@@ -911,7 +911,7 @@ export default function PurchaseRequisitionList() {
                                         style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
                                         onChange={(e) => setKeyword1(e.target.value)}
                                     /> */}
-                                    {/* <DatePicker
+                                    <DatePicker
                                         placeholder='年/月/日'
                                         style={{
                                             border: 'none', // 去除外框
@@ -921,7 +921,7 @@ export default function PurchaseRequisitionList() {
                                         }}
                                         value={getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null}
                                         onChange={(e) => { setKeyword1((e?.toString() || '') || '') }}
-                                    /> */}
+                                    />
                                     {/* <InputSel
                                         caption="需用日期"
                                         disabled={false}
@@ -946,6 +946,7 @@ export default function PurchaseRequisitionList() {
                                             }
                                         }}
                                     /> */}
+
                                 </div>
                                 <div>
 
@@ -966,11 +967,11 @@ export default function PurchaseRequisitionList() {
                                         onChange={(e) => setKeyword3(e.target.value)}
                                     /> 
                                 </div>*/}
-                                <div>
+                                {/* <div>
                                     <button type="submit" style={{ display: 'flex', alignItems: 'center', padding: '0', border: 'none', background: 'none' }}>
                                         <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
                                     </button>
-                                </div>
+                                </div> */}
                             </form>
                             {/* <div>
                                 <button onClick={() => { setProductSearchmodalopen(false) }}>

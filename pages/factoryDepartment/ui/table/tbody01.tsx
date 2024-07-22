@@ -316,7 +316,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     router.replace({
       pathname: `/factoryDepartment/prodEntryList`,
       query: {
-        prodentryuuid: item.prodentryuuid,
+        prodentryuuid: item.id,
         prodentryid: item.prodentryid,
         prodreceiptuuid: item.prodreceiptuuid,
         prodreceiptid: item.prodreceiptid,

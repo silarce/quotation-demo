@@ -618,40 +618,16 @@ div.panelHeader17 {
 
 // 隱藏popout
 .modal_search_bar {
-  display: flex;
-  // justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr; // 左右兩邊比例，可以調整
+  // gap: 15px;
   width: 100%;
-  margin-bottom: 5px;
+  margin-top: 5px;
+  // margin-left: 20px;
+  // margin-right: 20px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgb(214, 214, 214);
 
-  div {
-    text-align: right;
-    display: flex;
-    align-items: center;
-
-    input {
-      font-size: 16px;
-      width: 100%;
-      border-bottom: 1px solid #c1c1c1;
-      margin-right: 8px;
-    }
-
-    select {
-      border-bottom: 1px solid gray;
-      outline: none;
-    }
-
-    button {
-      background: none;
-      border: none;
-      cursor: pointer;
-
-      img {
-        width: 20px;
-        height: 20px;
-      }
-    }
-  }
 }
 
 .modal_container {
