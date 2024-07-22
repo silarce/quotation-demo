@@ -1004,6 +1004,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     averageDiscount: latestContent?.averageDiscount,
     resetTrigger: quotationData ?? quotationContentData,
     // onDoorTypeChange: onDoorTypeChange, // 棄用
+    discount_fromData: Number(latestContent?.discount ?? 0),
     quotationDiscount: Number(state_summary.discountRate || '100'),
   });
 
