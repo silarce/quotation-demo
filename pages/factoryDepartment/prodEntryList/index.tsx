@@ -1223,14 +1223,13 @@ export default function ProdEntryList() {
                     </div>
                 </div>
                 <div className={scss.modal_container2}>
-
-                    <div className={scss.modal_right2}>
+                    <div className={scss.modal_bottom}>
                         <div className={scss.modal_content}>
-                            <div className={scss.modal_body_content1}>
+                            <div className={scss.modal_head_content1}>
                                 <div>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="物料名稱"
+                                        caption="物料編號"
                                         disabled={true}
                                         inputProps={{
                                             props: {
@@ -1238,9 +1237,12 @@ export default function ProdEntryList() {
                                             },
                                         }}
                                     />
+
+                                </div>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="物料規格"
+                                        caption="物料名稱"
                                         disabled={true}
                                         inputProps={{
                                             props: {
@@ -1252,7 +1254,7 @@ export default function ProdEntryList() {
                                 <div>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="物料名稱"
+                                        caption="儲位數量"
                                         disabled={true}
                                         inputProps={{
                                             props: {
@@ -1262,13 +1264,10 @@ export default function ProdEntryList() {
                                     />
                                 </div>
                             </div>
-                            <div>3</div>
-                        </div>
-                    </div>
-                    <div className={scss.modal_left}>
-                        <div className={scss.modal_content}>
-                            <div className={scss.modal_body_content1}>
-
+                            <div className={scss.modal_head_content2}>
+                                <div>1</div>
+                                <div>2</div>
+                                <div>3</div>
                             </div>
                         </div>
                     </div>

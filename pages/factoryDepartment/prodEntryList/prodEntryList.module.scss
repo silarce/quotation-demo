@@ -661,7 +661,7 @@ div.panelHeader13 {
     height: 200px;
   }
 
-  .modal_right2 {
+  .modal_bottom {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -675,6 +675,7 @@ div.panelHeader13 {
     right: 0;
     z-index: 1000;
   }
+
   
   //#region 進貨單明細
 div.panelHeader26 {
@@ -752,7 +753,19 @@ div.panelHeader26 {
 }
 
 
-.modal_body_content1 {
+.modal_head_content1 {
+    display: grid;
+    grid-template-columns: 300px 1fr 1fr; // 左右兩邊比例，可以調整
+    gap: 0px;
+    width: auto;
+    // margin-top: 4px;
+    margin-left: 20px;
+    margin-right: 20px;
+    // border-top:1px solid rgb(168, 168, 168);
+    overflow-x: hidden;
+    // background-color: gray;
+  }
+  .modal_head_content2 {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
     gap: 0px;
@@ -764,3 +777,6 @@ div.panelHeader26 {
     overflow-x: hidden;
     // background-color: gray;
   }
+
+
+  
