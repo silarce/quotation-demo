@@ -199,6 +199,7 @@ function PreWorkContactDoc_component(
     averageDiscount: null,
     resetTrigger: productArr,
     quotationDiscount: Number(latestQuotationDiscount) || 100,
+    discount_fromData: Number(latestQuotationDiscount) || 100,
   });
 
   // ---------------------------------------------------------------------------

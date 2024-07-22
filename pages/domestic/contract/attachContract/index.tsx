@@ -211,6 +211,7 @@ export default function AttachContract({
     averageDiscount: '100',
     resetTrigger: data_contract,
     quotationDiscount: Number(formatedContent?.discount || '100'),
+    discount_fromData: Number(formatedContent?.discount || '100'),
     quotationDiscount_attach: Number(state_summary.discountRate || '100'),
     isAttach: true,
   });
