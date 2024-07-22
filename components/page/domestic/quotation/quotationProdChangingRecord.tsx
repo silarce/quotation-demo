@@ -227,6 +227,7 @@ const ProdRow = ({
     averageDiscount: null,
     resetTrigger: prodArr,
     quotationDiscount: quotationDiscount,
+    discount_fromData: quotationDiscount,
   });
 
   return (
