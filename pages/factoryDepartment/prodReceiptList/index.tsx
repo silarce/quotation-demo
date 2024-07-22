@@ -82,6 +82,7 @@ export default function ProdReceiptList() {
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
     const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
+    const [addprodentrybtn, setAddprodentrybtn] = useState<boolean>(true);
 
 
     const [inspectedin, setInspectedin] = useState<string>("");
@@ -106,6 +107,11 @@ export default function ProdReceiptList() {
     const [totalprice, setTotalPrice] = useState<string>("");
     const [taxprice, setTaxPrice] = useState<string>("");
     const [totalpayprice, setTotalPayPrice] = useState<string>("");
+
+    //入庫總數
+    const [totalentry, setTotalentry] = useState<string>("");
+    //入庫進度
+    const [completeentry, setCompleteentry] = useState<number>(0);
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
@@ -297,6 +303,25 @@ export default function ProdReceiptList() {
             setTaxPrice(taxPrice.toLocaleString());
             const totalPayPrice = totalprice + taxPrice;
             setTotalPayPrice(totalPayPrice.toLocaleString());
+
+            // 進貨進度
+            let totalentry = data.length; // 總數量
+            let completeentry = 0; // 完成數量
+
+            data.forEach((element: any) => {
+                // 將 alreadyinquantity 和 quantity 轉換為整數
+                const alreadyInQuantity = parseInt(element.alreadyinquantity, 10);
+                const quantity = parseInt(element.quantity, 10);
+
+                if (!isNaN(alreadyInQuantity) && !isNaN(quantity) && alreadyInQuantity >= quantity) {
+                    completeentry += 1;
+                }
+            });
+            setTotalentry(totalentry);
+            setCompleteentry(completeentry);
+
+
+
         } catch (error: any) {
             setError("getProdReceiptDetail:" + error.message);
         }
@@ -347,7 +372,6 @@ export default function ProdReceiptList() {
                 prodreceiptdetailuuid: prodreceiptdetailuuid as string | undefined
             };
 
-
             var inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
@@ -361,12 +385,25 @@ export default function ProdReceiptList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            setData2(data);
+            setData2(prevData2 => {
+                // 创建一个 Set 来存储现有 ID
+                const existingIds = new Set(prevData2.map(item => item.id));
+
+                // 过滤掉重复项
+                const newItems = data.filter((item: { id: string; }) => !existingIds.has(item.id));
+
+                // 将非重复的新项添加到 prevData2 中
+                const updatedData = [...prevData2, ...newItems];
+
+                // 调用 handleAddProdEntry 更新按钮状态
+                handleAddProdEntry(updatedData);
+
+                return updatedData;
+            });
 
         } catch (error: any) {
             setError(error.message);
-        }
-        finally {
+        } finally {
             setIsLoading(false);
         }
     };
@@ -519,13 +556,7 @@ export default function ProdReceiptList() {
     const handleRemove = (index: number) => {
         const updatedData = data2.filter((_, i) => i !== index);
         setData2(updatedData);
-        // setData2(prevState => {
-        //     // 複製 prevState 以避免直接修改原始狀態
-        //     const updatedData = [...prevState];
-        //     // 移除指定索引的項目
-        //     updatedData.splice(index, 1);
-        //     return updatedData;
-        // });
+        handleAddProdEntry(updatedData); // 在删除后检查并更新按钮状态
     };
 
 
@@ -577,6 +608,40 @@ export default function ProdReceiptList() {
             });
         }
     }
+
+    const handleAddProdEntry = (data: any) => {
+        let shouldDisable = false; // 默认情况下，新增入庫按钮是启用的
+
+        for (let i = 0; i < data.length; i++) {
+            const alreadyInQuantity = parseFloat(data[i].alreadyinquantity); // 将 alreadyinquantity 转换为数字类型
+            const quantity = parseFloat(data[i].quantity); // 将 quantity 转换为数字类型
+
+            // 如果有任何一项 alreadyinquantity 等于 quantity，则应禁用新增入庫按钮
+            if (!isNaN(alreadyInQuantity) && !isNaN(quantity) && alreadyInQuantity === quantity) {
+                shouldDisable = true;
+                break; // 找到符合条件的项就可以退出循环了
+            }
+
+            // 如果有任何一项 alreadyinquantity 大于 quantity，则应禁用新增入庫按钮
+            if (!isNaN(alreadyInQuantity) && !isNaN(quantity) && alreadyInQuantity > quantity) {
+                shouldDisable = true;
+                break; // 找到符合条件的项就可以退出循环了
+            }
+        }
+
+        // 在这里输出 addprodentrybtn 的状态，看看是否正确
+        console.log("shouldDisable:", shouldDisable);
+
+        setAddprodentrybtn(!shouldDisable); // 根据 shouldDisable 的值来设置 addprodentrybtn 的状态
+    };
+
+    // useEffect(() => {
+    //     console.log(addprodentrybtn);
+    // }, [addprodentrybtn]);
+
+
+
+
 
     return (
         <SubLayer isLoading_subLayer={false}>
@@ -716,6 +781,15 @@ export default function ProdReceiptList() {
                                             value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
                                         },
                                     }}
+                                />                                <InputSel
+                                    {...inputSelProps}
+                                    caption="聯絡電話"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: supplierphonein ? supplierphonein : ' ',
+                                        },
+                                    }}
                                 />
                             </div>
                             <div>
@@ -726,16 +800,6 @@ export default function ProdReceiptList() {
                                     inputProps={{
                                         props: {
                                             value: checkfirstin === 0 ? suppliertaxidin : suppliertaxid,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="聯絡電話"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: supplierphonein ? supplierphonein : ' ',
                                         },
                                     }}
                                 />
@@ -773,7 +837,19 @@ export default function ProdReceiptList() {
 
                             </div>
                             <div></div>
-                            <div></div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="入庫進度"
+                                    className='align-bottom'
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: `${completeentry}/${totalentry}`
+                                        },
+                                    }}
+                                />
+                            </div>
                             <div></div>
                         </div>
                         <div className={scss.body_content1}>
@@ -847,11 +923,11 @@ export default function ProdReceiptList() {
                                 <MyButton_v2 px='px22' py='py4' theme={undefined} label="驗收入庫" onClick={handleReceipt} />&nbsp;&nbsp;
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="退貨單" onClick={handleReceipt} />
                             </span> */}
-                                <span style={{ display: `${data2.length > 0 ? '' : 'none'}` }}>
+                                <span style={{ display: `${(data2.length > 0 && addprodentrybtn) ? '' : 'none'}` }}>
                                     <button className={scss.redbtn} onClick={() => { handleTransfer() }}>新增入庫</button>
                                 </span>
-                                <span style={{ display: `${data2.length > 0 ? 'none' : ''}` }}>
-                                    <button className={scss.disabledbtn} >新增入庫</button>
+                                <span style={{ display: `${(data2.length > 0 && addprodentrybtn) ? 'none' : ''}` }}>
+                                    <button className={scss.disabledbtn}>新增入庫</button>
                                 </span>
                             </div>
                             <div></div>

@@ -310,7 +310,32 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   }
   //#endregion
 
-
+  //#region 入庫單
+  //入庫單
+  async function GetProdEntry(item: any) {
+    router.replace({
+      pathname: `/factoryDepartment/prodEntryList`,
+      query: {
+        prodentryuuid: item.prodentryuuid,
+        prodentryid: item.prodentryid,
+        prodreceiptuuid: item.prodreceiptuuid,
+        prodreceiptid: item.prodreceiptid,
+        create_at: getTaiwanDateStr(item.create_at),
+        create_by: item.create_by,
+        status: item.status,
+        note: item.note,
+        suppliername: item.suppliername,
+        suppliertaxid: item.suppliertaxid,
+        supplieraddress: item.supplieraddress,
+        supplierphone: item.supplierphone,
+        invoice: item.invoice,
+        prodreceiptcreate_at: getTaiwanDateStr(item.prodreceiptcreate_at),
+        prodreceiptcreate_by: item.prodreceiptcreate_by,
+        firstin: 1
+      }
+    })
+  }
+  //#endregion
 
   //#region 日期格式處理 收
   // 日期格式處理
@@ -548,10 +573,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
             <CellWithBar key={index} className={scss.panelHeader9}>
               <div className={scss.row01}>
                 {/* <span>{index + 1}</span> */}
-                <span>{_item.prodentryid}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
-                <span>{_item.create_by}</span>
-                <span ><IconDetail onClick={() => { GetTrayByMaterialNumber(_item) }} /></span>
+                <span>{_item.prodentryid}</span>
+                <span></span>
+                <span>{_item.status}</span>
+                <span ><IconDetail onClick={() => { GetProdEntry(_item) }} /></span>
                 {/* <span><IconDetail/></span> */}
                 {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
               </div>
