@@ -34,6 +34,7 @@ import { Modal } from 'antd';
 import icon_fc_inbox from 'public/image/icon/fc_inbox.svg';
 import icon_fc_tray from 'public/image/icon/fc_tray.svg';
 import EditWHPosition from '../editWHPosition';
+import { color } from 'html2canvas/dist/types/css/types/color';
 
 
 type Tquery = {
@@ -1474,7 +1475,7 @@ export default function ProdEntryList() {
                 onCancel={whpositionqModalClose}
                 width="1500px"
                 maskClosable={false}
-                style={{ top: 150 }}
+                style={{ top: 100 }}
             >
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0px', marginBottom: '16px', width: '1500px' }}>
                     <span style={{ fontSize: '16px', color: '#14256a' }}>
@@ -1646,12 +1647,12 @@ export default function ProdEntryList() {
                                 <div>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="目前托盤"
+                                        caption="目前呼叫"
                                         className='align-bottom'
                                         disabled={true}
                                         inputProps={{
                                             props: {
-                                                value: `倉庫：${whnamecalled} 托盤：${traynamecalled}`
+                                                value: `${whnamecalled!=""? `倉庫：${whnamecalled} 托盤：${traynamecalled}`:' '}`
                                             },
                                         }}
                                     />
