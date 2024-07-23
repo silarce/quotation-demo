@@ -15,6 +15,7 @@ import type {
   TaccountsReceivablePeriodDto,
   TupdateAccountReceivableDeductionDto,
   TaccountsReceivableInvoiceDto,
+  TaccountantDto,
 } from 'js/api/dtoTypes';
 
 // DND
@@ -25,7 +26,7 @@ import {
   useSensor,
   useSensors,
   // useDraggable,
-  DragOverlay,
+  // DragOverlay,
   DndContext,
   closestCenter,
   // KeyboardSensor,
@@ -40,7 +41,13 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 
-import { restrictToHorizontalAxis, restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
+import {
+  //
+  // restrictToHorizontalAxis,
+  restrictToVerticalAxis,
+  // restrictToWindowEdges,
+  restrictToFirstScrollableAncestor,
+} from '@dnd-kit/modifiers';
 
 import { CSS } from '@dnd-kit/utilities';
 
@@ -57,7 +64,7 @@ type Tstate = {
 };
 
 type Tinvoice = {
-  id: UniqueIdentifier; // 就是string | number // id 必須唯一
+  id: UniqueIdentifier | 'noInvoice'; // 就是string | number // id 必須唯一
   invoiceNumber: React.ReactNode;
   invoiceDate: React.ReactNode;
   price: React.ReactNode;
@@ -71,6 +78,8 @@ type Taccountant = {
   importAccountingNumber: React.ReactNode;
   noteMaturityDate: React.ReactNode; // 票據到期日
   price: React.ReactNode;
+  price_num: number;
+  // price: number;
   //
   isRelationedInvoiceChanged: boolean;
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
@@ -98,10 +107,12 @@ export type { TstateList as Tstate_accountantSorting };
 export default function AccountantSorting({
   className,
   periodArr,
+  accountantArr_noInvoice,
   onConfirm,
 }: {
   className?: string;
   periodArr: TaccountsReceivablePeriodDto[];
+  accountantArr_noInvoice: TaccountantDto[];
   onConfirm: (stateList: TstateList) => Promise<void>;
 }) {
   const [disabled, setDisabled] = useState(true);
@@ -126,7 +137,9 @@ export default function AccountantSorting({
   };
 
   const handle_confirm = async () => {
-    await onConfirm(stateList);
+    const { noInvoice, ...rest } = stateList;
+
+    await onConfirm(rest);
     setDisabled(true);
   };
 
@@ -149,9 +162,41 @@ export default function AccountantSorting({
 
   const sensors = useSensors(useSensor(PointerSensor));
 
-  const { total_invoice, total_accountant, amountNotCollected } = useMemo(() => {
+  // const { total_invoice, total_accountant, amountNotCollected } = useMemo(() => {
+  //   let total_invoice_d = new Decimal(0);
+  //   let total_accountant_d = new Decimal(0);
+
+  //   periodArr.forEach((period) => {
+  //     const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
+  //       | TaccountsReceivableInvoiceDto
+  //       | undefined;
+
+  //     if (!invoice) {
+  //       return;
+  //     }
+
+  //     const price = period.price || 0;
+
+  //     const { accountantList } = invoice;
+
+  //     total_invoice_d = total_invoice_d.add(price || 0);
+
+  //     accountantList?.forEach((accountant) => {
+  //       total_accountant_d = total_accountant_d.add(accountant.price || 0);
+  //     });
+  //   });
+
+  //   return {
+  //     total_invoice: total_invoice_d.toNumber().toLocaleString(),
+
+  //     total_accountant: total_accountant_d.toNumber().toLocaleString(),
+
+  //     amountNotCollected: total_invoice_d.minus(total_accountant_d).toNumber().toLocaleString(),
+  //   };
+  // }, [periodArr]);
+
+  const { total_invoice, total_invoice_num } = useMemo(() => {
     let total_invoice_d = new Decimal(0);
-    let total_accountant_d = new Decimal(0);
 
     periodArr.forEach((period) => {
       const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
@@ -164,21 +209,34 @@ export default function AccountantSorting({
 
       const price = period.price || 0;
 
-      const { accountantList } = invoice;
-
       total_invoice_d = total_invoice_d.add(price || 0);
-
-      accountantList?.forEach((accountant) => {
-        total_accountant_d = total_accountant_d.add(accountant.price || 0);
-      });
     });
 
     return {
+      total_invoice_num: total_invoice_d.toNumber(),
       total_invoice: total_invoice_d.toNumber().toLocaleString(),
-      total_accountant: total_accountant_d.toNumber().toLocaleString(),
-      amountNotCollected: total_invoice_d.minus(total_accountant_d).toNumber().toLocaleString(),
     };
   }, [periodArr]);
+
+  const { total_accountant, amountNotCollected } = useMemo(() => {
+    let total_accountant = new Decimal(0);
+
+    const { noInvoice, ...rest } = stateList;
+
+    Object.values(rest).forEach((state) => {
+      state.accountantArr.forEach((acc) => {
+        total_accountant = total_accountant.add(acc.price_num || 0);
+      });
+    });
+
+    // const amountNotCollected = total_accountant.minus(total_invoice_num).toNumber().toLocaleString();
+    const amountNotCollected = new Decimal(total_invoice_num).minus(total_accountant).toNumber().toLocaleString();
+
+    return {
+      total_accountant: total_accountant.toNumber().toLocaleString(),
+      amountNotCollected,
+    };
+  }, [total_invoice_num, stateList]);
 
   // -----------------------------------------------------------------------------
 
@@ -190,6 +248,7 @@ export default function AccountantSorting({
 
   useEffect(() => {
     const list: TstateList = {};
+    list.noInvoice = createNoInvoiceState(accountantArr_noInvoice);
 
     periodArr.forEach((period) => {
       const price = period.price || 0;
@@ -232,6 +291,7 @@ export default function AccountantSorting({
           importAccountingNumber,
           noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
           price: price.toLocaleString(),
+          price_num: price,
           accountsReceivableDeduction,
           isRelationedInvoiceChanged: false,
         } as Taccountant;
@@ -253,7 +313,7 @@ export default function AccountantSorting({
     }); // invoiceArr.forEach
 
     setStateListArr(list);
-  }, [periodArr, disabled]);
+  }, [periodArr, accountantArr_noInvoice, disabled]);
 
   // -----------------------------------------------------------------------------
   // region RENDER
@@ -325,7 +385,7 @@ export default function AccountantSorting({
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
+            modifiers={[restrictToVerticalAxis, restrictToFirstScrollableAncestor]}
             //
             onDragStart={handle_onDragStart}
             onDragEnd={handle_onDragEnd}
@@ -463,6 +523,8 @@ const Group_Dnd = ({
     allowance = disabled ? Number(allowance).toLocaleString() : allowance;
   }
 
+  const isNoInvoice = invoice.id === 'noInvoice';
+
   return (
     <Group className={classNames(scss['tbody'], !disabled && scss.abled)}>
       <Left>
@@ -472,13 +534,13 @@ const Group_Dnd = ({
           <span className="justify-self-end mr-5">{price}</span>
         </Row>
 
-        <Row className={classNames(scss.allowance, scss.plus, disabled && scss.disabled)}>
+        <Row className={classNames(scss.allowance, scss.plus, (disabled || isNoInvoice) && scss.disabled)}>
           <div></div>
           <p>折讓</p>
           <input
             className="justify-self-end mr-5"
             placeholder="無折讓"
-            readOnly={disabled}
+            readOnly={disabled || isNoInvoice}
             type={disabled ? 'text' : 'number'}
             value={allowance}
             onChange={(e) => {
@@ -758,3 +820,73 @@ function handleDragOver(
     return list;
   });
 }
+
+// ===============================================================================
+
+const createNoInvoiceState = (accountantArr_noInvoice: TaccountantDto[]) => {
+  const virtualInvoice: Tinvoice = {
+    id: 'noInvoice',
+    invoiceNumber: '---',
+    invoiceDate: '---',
+    price: '---',
+    allowance: '',
+  };
+
+  const accountantArr_noInvoice_order = _.sortBy(accountantArr_noInvoice, 'order');
+
+  const accountantArr = accountantArr_noInvoice_order.map((accountant) => {
+    const {
+      //
+      id: accountantId,
+      insertDate,
+      importAccountingNumber,
+      noteMaturityDate,
+      price,
+      accountsReceivableDeduction,
+    } = accountant;
+
+    return {
+      id: accountantId,
+      invoiceId: 'noInvoice',
+      insertDate: getTaiwanDateStr(insertDate),
+      importAccountingNumber,
+      noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
+      price: price.toLocaleString(),
+      price_num: price,
+      accountsReceivableDeduction,
+      isRelationedInvoiceChanged: false,
+    } as Taccountant;
+  });
+
+  // const fake_accountantArr: Taccountant[] = [
+  //   {
+  //     id: '1',
+  //     invoiceId: 'noInvoice',
+  //     insertDate: '110/10/10',
+  //     importAccountingNumber: '123456',
+  //     noteMaturityDate: '110/10/10',
+  //     price: '1000',
+  //     isRelationedInvoiceChanged: false,
+  //     accountsReceivableDeduction: [],
+  //   },
+  //   {
+  //     id: '2',
+  //     invoiceId: 'noInvoice',
+  //     insertDate: '110/10/10',
+  //     importAccountingNumber: '654321',
+  //     noteMaturityDate: '110/10/10',
+  //     price: '2000',
+  //     isRelationedInvoiceChanged: false,
+  //     accountsReceivableDeduction: [],
+  //   },
+  // ];
+
+  return {
+    isAccountantOrderChanged: false,
+    isInvoiceAllowanceChanged: false,
+    isInvoiceAccountantRelationChanged: false,
+    invoice: virtualInvoice,
+    accountantArr,
+    // accountantArr: fake_accountantArr,
+  };
+};
