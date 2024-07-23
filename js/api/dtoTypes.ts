@@ -3614,6 +3614,8 @@ export type TaccountsReceivableDto = {
   finalPaymentType: TfinalPaymentType | null;
   // 保留款是否含稅
   isFinalPaymentWithTax: boolean | null;
+  //
+  accountantList?: TaccountantDto[];
 };
 
 export type TupdateAccountReceivableDto = Partial<

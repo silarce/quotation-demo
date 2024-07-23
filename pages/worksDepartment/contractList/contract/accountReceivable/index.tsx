@@ -93,6 +93,7 @@ export default function AccountReceivable() {
       'engineeringContact',
       'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
       'accountReceivable.periods.invoices.accountantInvoiceBook',
+      'accountReceivable.accountantList',
     ],
   });
 
@@ -108,21 +109,38 @@ export default function AccountReceivable() {
     return _.sortBy(accountReceivable?.periods, 'createdAt');
   }, [accountReceivable?.periods]);
 
-  const accountantArr = useMemo(() => {
-    if (!periodArr) {
-      return [];
-    }
+  // const accountantArr = useMemo(() => {
+  //   if (!periodArr) {
+  //     return [];
+  //   }
 
-    const arr: TaccountantDto[] = [];
-    periodArr.forEach((period) => {
-      const invoiceArr = period.invoices;
-      invoiceArr.forEach((invoice) => {
-        invoice.accountantList && arr.push(...invoice.accountantList);
-      });
+  //   const arr: TaccountantDto[] = [];
+  //   periodArr.forEach((period) => {
+  //     const invoiceArr = period.invoices;
+  //     invoiceArr.forEach((invoice) => {
+  //       invoice.accountantList && arr.push(...invoice.accountantList);
+  //     });
+  //   });
+
+  //   return arr;
+  // }, [periodArr]);
+
+  const { accountantArr, accountantArr_noInvoice } = useMemo(() => {
+    const accountantArr = accountReceivable?.accountantList ?? [];
+
+    const accountantArr_noInvoice = accountantArr.filter((acc) => {
+      if (!acc.invoices) {
+        return true;
+      } else if (acc.invoices.length === 0) {
+        return true;
+      }
     });
 
-    return arr;
-  }, [periodArr]);
+    return {
+      accountantArr,
+      accountantArr_noInvoice,
+    };
+  }, [accountReceivable?.accountantList]);
 
   // --------------------------------------------------------------------------
 
@@ -513,6 +531,7 @@ export default function AccountReceivable() {
           //
           className="mt-10"
           periodArr={periodArr}
+          accountantArr_noInvoice={accountantArr_noInvoice}
           onConfirm={reqPatchAccountant_sorting}
         />
 
