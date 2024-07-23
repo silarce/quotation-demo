@@ -152,6 +152,8 @@ export default function ProdEntryList() {
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
 
+    const [modalcheckfirstin, setModalcheckfirstin] = useState<number>(0);
+
 
     useEffect(() => {
         if (firstin !== undefined) {
@@ -408,15 +410,16 @@ export default function ProdEntryList() {
             GetLayOut(data[0].whid, data[0].trayname, data[0].id);
 
             console.log(data);
-            setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
-            setWhpname(data[0].name);
-            setWhpproductid(data[0].productid);
-            setWhpspec(data[0].spec);
-            setWhpquantity(data[0].quantity);
-            setNowwhname(data[0].whname);
-            setNowtrayname(data[0].trayname);
-            setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
-
+            if (modalcheckfirstin === 0) {
+                setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
+                setWhpname(data[0].name);
+                setWhpproductid(data[0].productid);
+                setWhpspec(data[0].spec);
+                setWhpquantity(data[0].quantity);
+                setNowwhname(data[0].whname);
+                setNowtrayname(data[0].trayname);
+                setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
+            }
             console.log(data);
 
 
@@ -1075,6 +1078,14 @@ export default function ProdEntryList() {
             setInboxquantity(0);
         }
         setNowwhpositionuuid(item.id);
+        setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+        setWhpname(item.name);
+        setWhpproductid(item.productid);
+        setWhpspec(item.spec);
+        setWhpquantity(item.quantity);
+        setNowwhname(item.whname);
+        setNowtrayname(item.trayname);
+        setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
 
     }
 
@@ -1634,18 +1645,30 @@ export default function ProdEntryList() {
                                 </div>
                                 <div>
                                     <InputSel
-                                    {...inputSelProps}
-                                    caption="目前托盤"
-                                    className='align-bottom'
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: `倉庫：${whnamecalled} 托盤：${traynamecalled}`
-                                        },
-                                    }}
-                                />
+                                        {...inputSelProps}
+                                        caption="目前托盤"
+                                        className='align-bottom'
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: `倉庫：${whnamecalled} 托盤：${traynamecalled}`
+                                            },
+                                        }}
+                                    />
                                 </div>
-                                <div></div>
+                                <div>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="入庫狀態"
+                                        className='align-bottom'
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: `${nowentryqty} / ${nowquantity}`
+                                            },
+                                        }}
+                                    />
+                                </div>
                                 <div style={{ textAlign: 'right' }}>
                                     <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity && traycalled === true) ? '' : 'none'}` }}>
                                         <button className={scss.redbtn} onClick={() => { handleaddquantity() }}>確認入庫</button>
@@ -1735,7 +1758,7 @@ export default function ProdEntryList() {
                                     <InputSel
                                         {...inputSelProps}
                                         caption="入庫數量"
-                                        disabled={traycalled === true ? false : true}
+                                        disabled={(traycalled === true && nowentryqty < nowquantity) ? false : true}
                                         inputProps={{
                                             props: {
                                                 max: maxinboxquantity,
