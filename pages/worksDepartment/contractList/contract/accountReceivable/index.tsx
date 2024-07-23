@@ -93,7 +93,8 @@ export default function AccountReceivable() {
       'engineeringContact',
       'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
       'accountReceivable.periods.invoices.accountantInvoiceBook',
-      'accountReceivable.accountantList.invoices',
+      // 'accountReceivable.accountantList.invoices.accountantInvoiceBook',
+      'accountReceivable.accountantList.accountsReceivableDeduction',
     ],
   });
 
