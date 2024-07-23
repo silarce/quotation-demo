@@ -65,6 +65,7 @@ const useProductList = ({
   resetTrigger,
   onDoorTypeChange,
   productArr_attach,
+  discount_fromData,
   quotationDiscount,
   quotationDiscount_attach = 100,
   isAttach,
@@ -81,6 +82,7 @@ const useProductList = ({
     qrArr: string[] | undefined;
   }) => void;
   productArr_attach?: TquotationProductDto[] | undefined;
+  discount_fromData: number;
   quotationDiscount: number;
   quotationDiscount_attach?: number;
   // onDiscountChange?: (avgDiscount: number) => void;
@@ -135,38 +137,189 @@ const useProductList = ({
   const [subTotal, setSubTotal] = useState('');
   const [prodVKeyArr, setProdVKeyArr] = useState<string[]>();
 
-  const { createProdList, addProd, calcDiscount_two } = useMemo(() => {
-    //
-    const list: TproductList = {};
-    //
+  // 追加追減
+  const [productList_attach, setProductList_attach] = useState<TproductList>({});
 
-    const calcAvgDiscount = () => {
-      // 棄用
-      // let discountTotal = new Decimal(0);
-      // let count = 0;
-      // Object.values(list).forEach((prod) => {
-      //   discountTotal = discountTotal.add(prod.discount);
-      //   count = count + 1;
-      //   const exchangeProdList = prod.exchangeProdList;
-      //   Object.values(exchangeProdList).forEach((exchangeProd) => {
-      //     discountTotal = discountTotal.add(exchangeProd.discount);
-      //     count = count + 1;
-      //   });
-      // });
-      // // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
-      // Object.values(productList_attach).forEach((prod_attach) => {
-      //   discountTotal = discountTotal.add(prod_attach.discount);
-      //   count = count + 1;
-      // });
-      // const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
-      // setAvgDiscount(avgDiscount);
-    };
+  // const { createProdList, addProd, calcDiscount_two } = useMemo(() => {
+  //   //
+  //   const list: TproductList = {};
+  //   //
 
+  //   const calcAvgDiscount = () => {
+  //     // 棄用
+  //     // let discountTotal = new Decimal(0);
+  //     // let count = 0;
+  //     // Object.values(list).forEach((prod) => {
+  //     //   discountTotal = discountTotal.add(prod.discount);
+  //     //   count = count + 1;
+  //     //   const exchangeProdList = prod.exchangeProdList;
+  //     //   Object.values(exchangeProdList).forEach((exchangeProd) => {
+  //     //     discountTotal = discountTotal.add(exchangeProd.discount);
+  //     //     count = count + 1;
+  //     //   });
+  //     // });
+  //     // // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+  //     // Object.values(productList_attach).forEach((prod_attach) => {
+  //     //   discountTotal = discountTotal.add(prod_attach.discount);
+  //     //   count = count + 1;
+  //     // });
+  //     // const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+  //     // setAvgDiscount(avgDiscount);
+  //   };
+
+  //   const calcAvgDiscount_withQty = () => {
+  //     let discountTotal = new Decimal(0);
+  //     let count = 0;
+
+  //     Object.values(list).forEach((prod) => {
+  //       if (!isAttach) {
+  //         for (let i = 0; i < +prod.quantity; i++) {
+  //           discountTotal = discountTotal.add(prod.discount);
+  //           count = count + 1;
+  //         }
+  //       }
+
+  //       const exchangeProdList = prod.exchangeProdList;
+
+  //       Object.values(exchangeProdList).forEach((exchangeProd) => {
+  //         for (let i = 0; i < +exchangeProd.quantity; i++) {
+  //           discountTotal = discountTotal.add(exchangeProd.discount);
+  //           count = count + 1;
+  //         }
+  //       });
+  //     });
+
+  //     // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+
+  //     Object.values(productList_attach).forEach((prod_attach) => {
+  //       for (let i = 0; i < +prod_attach.quantity; i++) {
+  //         discountTotal = discountTotal.add(prod_attach.discount);
+  //         count = count + 1;
+  //       }
+  //     });
+
+  //     // const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+
+  //     const avgDiscount_withQty = count ? discountTotal.div(count).toNumber() : 0;
+
+  //     setAvgDiscount_withQty(avgDiscount_withQty);
+
+  //     return avgDiscount_withQty;
+  //   };
+
+  //   const calcDiscount_two = () => {
+  //     calcAvgDiscount_withQty();
+  //     calcAvgDiscount();
+  //   };
+
+  //   const addProd = () => {
+  //     if (!doorModelList) {
+  //       return myAlert.info({ title: '尚未取得門型資料' });
+  //     }
+
+  //     const newKey = nanoid();
+  //     const classProd = new Class_product({
+  //       reRender,
+  //       delSelf: () => {
+  //         delSelf_prod(list, newKey);
+  //         calcDiscount_two();
+  //       },
+  //       copySelf: () => {
+  //         copySelf_prod(list, newKey);
+  //         calcDiscount_two();
+  //       },
+  //       callCalcSubTotal,
+  //       // calcSubTotalPrice,
+  //       doorModelList,
+  //       onDoorTypeChange: onClassDoorTypeChange,
+  //       quotationDiscount: discount_fromData,
+  //       onDiscountChange: calcDiscount_two,
+  //       onQtyChange: calcDiscount_two,
+  //     });
+  //     list[newKey] = classProd;
+
+  //     calcDiscount_two();
+
+  //     reRender();
+  //   };
+
+  //   const createProdList = () => {
+  //     if (!doorModelList) {
+  //       return;
+  //     }
+
+  //     const listKeyArr = Object.keys(list);
+  //     listKeyArr.forEach((key) => {
+  //       delete list[key];
+  //     });
+
+  //     const copyArr = _.cloneDeep(productArr ?? []);
+  //     // TODO 之後要改為以productOrder排序
+  //     // 考慮到不同的追加追減合約裡的主產品的order可能會重複
+  //     // 所以要用productOrder排序
+  //     const sortedProdArr = _.sortBy(copyArr, 'order');
+
+  //     // 每次上傳前會將prod的order依照當時的排序重新設定
+  //     // 所以理論上order不會重複
+  //     sortedProdArr.forEach((prod) => {
+  //       let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+
+  //       if (key in list) {
+  //         key = nanoid();
+  //       }
+
+  //       const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
+
+  //       list[key] = new Class_product({
+  //         reRender,
+  //         prodData,
+  //         delSelf: () => {
+  //           delSelf_prod(list, key);
+  //           calcDiscount_two();
+  //         },
+  //         copySelf: () => {
+  //           copySelf_prod(list, key);
+  //           calcDiscount_two();
+  //         },
+  //         callCalcSubTotal,
+  //         doorModelList,
+  //         originProd: prod,
+  //         onDoorTypeChange: onClassDoorTypeChange,
+  //         quotationDiscount: discount_fromData,
+  //         onDiscountChange: calcDiscount_two,
+  //         onQtyChange: calcDiscount_two,
+  //       });
+  //     });
+
+  //     // setProductList(list);
+  //     // setProductList((state) => {
+  //     //   const keyArr = Object.keys(state);
+
+  //     //   return state;
+  //     // });
+
+  //     // Object.assign(productList, list);
+
+  //     calcDiscount_two();
+  //     setProductList(list);
+  //   };
+
+  //   return { createProdList, addProd, calcDiscount_two, calcAvgDiscount };
+  // }, [resetTrigger, doorModelList, discount_fromData]);
+
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  const classProdList = useMemo(() => {
+    return {} as TproductList;
+  }, [resetTrigger, doorModelList, discount_fromData]);
+
+  const calcDiscount_two = useCallback(() => {
     const calcAvgDiscount_withQty = () => {
       let discountTotal = new Decimal(0);
       let count = 0;
 
-      Object.values(list).forEach((prod) => {
+      Object.values(classProdList).forEach((prod) => {
         if (!isAttach) {
           for (let i = 0; i < +prod.quantity; i++) {
             discountTotal = discountTotal.add(prod.discount);
@@ -202,111 +355,148 @@ const useProductList = ({
       return avgDiscount_withQty;
     };
 
-    const calcDiscount_two = () => {
-      calcAvgDiscount_withQty();
-      calcAvgDiscount();
+    const calcAvgDiscount = () => {
+      // 棄用
+      // let discountTotal = new Decimal(0);
+      // let count = 0;
+      // Object.values(list).forEach((prod) => {
+      //   discountTotal = discountTotal.add(prod.discount);
+      //   count = count + 1;
+      //   const exchangeProdList = prod.exchangeProdList;
+      //   Object.values(exchangeProdList).forEach((exchangeProd) => {
+      //     discountTotal = discountTotal.add(exchangeProd.discount);
+      //     count = count + 1;
+      //   });
+      // });
+      // // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+      // Object.values(productList_attach).forEach((prod_attach) => {
+      //   discountTotal = discountTotal.add(prod_attach.discount);
+      //   count = count + 1;
+      // });
+      // const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+      // setAvgDiscount(avgDiscount);
     };
 
-    const addProd = () => {
-      if (!doorModelList) {
-        return myAlert.info({ title: '尚未取得門型資料' });
+    //
+    calcAvgDiscount_withQty();
+    // calcAvgDiscount()
+    //
+  }, [
+    classProdList,
+    isAttach, // isAttach基本上不會改變
+    productList_attach, // productList_attach目前都不會改變參照
+  ]);
+
+  const addProd = useCallback(() => {
+    if (!doorModelList) {
+      return myAlert.info({ title: '尚未取得門型資料' });
+    }
+
+    const newKey = nanoid();
+    const classProd = new Class_product({
+      reRender,
+      delSelf: () => {
+        delSelf_prod(classProdList, newKey);
+        calcDiscount_two();
+      },
+      copySelf: () => {
+        copySelf_prod(classProdList, newKey);
+        calcDiscount_two();
+      },
+      callCalcSubTotal,
+      // calcSubTotalPrice,
+      doorModelList,
+      onDoorTypeChange: onClassDoorTypeChange,
+      quotationDiscount: quotationDiscount,
+      onDiscountChange: calcDiscount_two,
+      onQtyChange: calcDiscount_two,
+    });
+    classProdList[newKey] = classProd;
+
+    calcDiscount_two();
+
+    reRender();
+  }, [
+    classProdList,
+    quotationDiscount,
+    doorModelList,
+    // calcDiscount_two,
+    // copySelf_prod,
+    // delSelf_prod,
+    // onClassDoorTypeChange,
+  ]);
+
+  const createProdList = useCallback(() => {
+    if (!doorModelList) {
+      return;
+    }
+
+    const listKeyArr = Object.keys(classProdList);
+    listKeyArr.forEach((key) => {
+      delete classProdList[key];
+    });
+
+    const copyArr = _.cloneDeep(productArr ?? []);
+    // TODO 之後要改為以productOrder排序
+    // 考慮到不同的追加追減合約裡的主產品的order可能會重複
+    // 所以要用productOrder排序
+    const sortedProdArr = _.sortBy(copyArr, 'order');
+
+    // 每次上傳前會將prod的order依照當時的排序重新設定
+    // 所以理論上order不會重複
+    sortedProdArr.forEach((prod) => {
+      let key = prod.order !== undefined ? `${prod.order}` : nanoid();
+
+      if (key in classProdList) {
+        key = nanoid();
       }
 
-      const newKey = nanoid();
-      const classProd = new Class_product({
+      const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
+
+      classProdList[key] = new Class_product({
         reRender,
+        prodData,
         delSelf: () => {
-          delSelf_prod(list, newKey);
+          delSelf_prod(classProdList, key);
           calcDiscount_two();
         },
         copySelf: () => {
-          copySelf_prod(list, newKey);
+          copySelf_prod(classProdList, key);
           calcDiscount_two();
         },
         callCalcSubTotal,
-        // calcSubTotalPrice,
         doorModelList,
+        originProd: prod,
         onDoorTypeChange: onClassDoorTypeChange,
-        quotationDiscount: quotationDiscount,
+        quotationDiscount: discount_fromData,
         onDiscountChange: calcDiscount_two,
         onQtyChange: calcDiscount_two,
       });
-      list[newKey] = classProd;
+    });
 
-      calcDiscount_two();
+    calcDiscount_two();
+    setProductList(classProdList);
+  }, [
+    classProdList,
+    calcDiscount_two,
 
-      reRender();
-    };
+    // // resetTrigger,
+    // // doorModelList,
+    // // discount_fromData,
 
-    const createProdList = () => {
-      if (!doorModelList) {
-        return;
-      }
+    // productArr,
 
-      const listKeyArr = Object.keys(list);
-      listKeyArr.forEach((key) => {
-        delete list[key];
-      });
-
-      const copyArr = _.cloneDeep(productArr ?? []);
-      // TODO 之後要改為以productOrder排序
-      // 考慮到不同的追加追減合約裡的主產品的order可能會重複
-      // 所以要用productOrder排序
-      const sortedProdArr = _.sortBy(copyArr, 'order');
-
-      // 每次上傳前會將prod的order依照當時的排序重新設定
-      // 所以理論上order不會重複
-      sortedProdArr.forEach((prod) => {
-        let key = prod.order !== undefined ? `${prod.order}` : nanoid();
-
-        if (key in list) {
-          key = nanoid();
-        }
-
-        const prodData: Tprod = quotationProductToProd({ quotationProduct: prod });
-
-        list[key] = new Class_product({
-          reRender,
-          prodData,
-          delSelf: () => {
-            delSelf_prod(list, key);
-            calcDiscount_two();
-          },
-          copySelf: () => {
-            copySelf_prod(list, key);
-            calcDiscount_two();
-          },
-          callCalcSubTotal,
-          doorModelList,
-          originProd: prod,
-          onDoorTypeChange: onClassDoorTypeChange,
-          quotationDiscount: quotationDiscount,
-          onDiscountChange: calcDiscount_two,
-          onQtyChange: calcDiscount_two,
-        });
-      });
-
-      // setProductList(list);
-      // setProductList((state) => {
-      //   const keyArr = Object.keys(state);
-
-      //   return state;
-      // });
-
-      // Object.assign(productList, list);
-
-      calcDiscount_two();
-      setProductList(list);
-    };
-
-    return { createProdList, addProd, calcDiscount_two, calcAvgDiscount };
-
-    // reRender();
-  }, [resetTrigger, doorModelList]);
+    // copySelf_prod,
+    // delSelf_prod,
+    // onClassDoorTypeChange,
+  ]);
 
   useEffect(() => {
     createProdList();
   }, [createProdList]);
+
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   // const createProdList = () => {
   //   // if (!productArr || !doorModelList) {
@@ -685,8 +875,6 @@ const useProductList = ({
   // 追加追減
   // 追加追減
   // 追加追減
-
-  const [productList_attach, setProductList_attach] = useState<TproductList>({});
 
   const addProd_attach = () => {
     if (!doorModelList) {

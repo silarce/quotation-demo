@@ -540,6 +540,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     productArr_attach: contentProdArr,
     quotationDiscount: 100,
     quotationDiscount_attach: Number(state_summary.discountRate || '100'),
+    discount_fromData: Number(theContent?.discount ?? 0),
     averageDiscount: theContent?.averageDiscount,
     isAttach: true,
   });
@@ -1274,7 +1275,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       onClick: () => setReviewModalShow(true),
     },
 
-    quotationId
+    quotationId && !contentId
       ? {
           type: 'myButton',
           label: '送審',

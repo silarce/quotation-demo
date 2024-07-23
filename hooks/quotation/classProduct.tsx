@@ -834,6 +834,20 @@ class Class_product {
     this.creSubComList();
   }
 
+  clearProd_comList() {
+    this.comList = undefined;
+
+    this._prodData.price = 0;
+    this._prodData.dualPrice = 0;
+    this._prodData.unitPrice = 0;
+    this._prodData.totalPrice = 0;
+
+    this._price = String(this._prodData.price);
+    this._dualPrice = String(this._prodData.dualPrice);
+    this._unitPrice = String(this._prodData.unitPrice);
+    this._totalPrice = String(this._prodData.totalPrice);
+  }
+
   // ---------------------------------------------------------
   // ---------------------------------------------------------
   // ---------------------------------------------------------
@@ -880,7 +894,8 @@ class Class_product {
         isAntiTyphoon,
         fullWidth,
         WG: undefined,
-        hp: this.isWgChanged ? hp : undefined,
+        // hp: this.isWgChanged ? hp : undefined,
+        hp: hp || undefined,
       };
     })();
 
@@ -894,6 +909,7 @@ class Class_product {
 
     if (!res) {
       // this.isWgChanged = false;
+      this.clearProd();
 
       return false;
     }
@@ -1021,6 +1037,8 @@ class Class_product {
 
       return true;
     } else {
+      this.clearProd_comList();
+
       return false;
     }
   } //  req_getProdAvailableComponents
@@ -1149,6 +1167,8 @@ class Class_product {
       } else {
         message = JSON.stringify(err.response?.data.message);
       }
+
+      this.clearProd_comList();
 
       myAlert.err({ title: '取得bom資料失敗', content: message });
     }
@@ -1306,6 +1326,7 @@ class Class_product {
       // fullWidth: Number(this.fullWidth || 0) * 1000,
       fullWidth: new Decimal(this.fullWidth || 0).mul(1000).toNumber(),
       WG: undefined,
+      hp: this.horsepower.replaceAll('HP', '') as Thp,
     });
 
     if (!res_spec) {
@@ -3202,8 +3223,6 @@ class Class_product {
   set price(v) {
     // v = v.replace(/,/g, '');
 
-    console.log('call price', v);
-
     this._prodData.price = Number(v);
     this._price = v;
 
@@ -4468,34 +4487,34 @@ const reqGetComAndAcce = async (id: string | undefined) => {
   }
 };
 
-const calcFullwidthWithWG = async ({
-  body,
-}: {
-  body: {
-    modelName: TpcgsPrams['modelName'];
-    height: number; // 單位為mm
-    isAntiTyphoon: boolean;
-    // fullWidth?:undefined
-    WG: number; // 單位為mm
-    hp: Thp;
-  };
-}) => {
-  try {
-    const res = await apiGetProdCalcGeneralSpec(body);
-    const { gapA, gapC } = res;
+// const calcFullwidthWithWG = async ({
+//   body,
+// }: {
+//   body: {
+//     modelName: TpcgsPrams['modelName'];
+//     height: number; // 單位為mm
+//     isAntiTyphoon: boolean;
+//     // fullWidth?:undefined
+//     WG: number; // 單位為mm
+//     hp: Thp;
+//   };
+// }) => {
+//   try {
+//     const res = await apiGetProdCalcGeneralSpec(body);
+//     const { gapA, gapC } = res;
 
-    // const fullWidth = gapA + gapC + body.WG;
-    const fullWidth = calcProductFullWidth({
-      gapA,
-      gapC,
-      WG: body.WG,
-    });
+//     // const fullWidth = gapA + gapC + body.WG;
+//     const fullWidth = calcProductFullWidth({
+//       gapA,
+//       gapC,
+//       WG: body.WG,
+//     });
 
-    return fullWidth;
-  } catch (error) {
-    return 0;
-  }
-};
+//     return fullWidth;
+//   } catch (error) {
+//     return 0;
+//   }
+// };
 
 const reqGetCalcGeneralSpec = async ({
   modelName,
@@ -4526,9 +4545,7 @@ const reqGetCalcGeneralSpec = async ({
   }
 
   try {
-    const res = await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
-
-    return res;
+    return await apiGetProdCalcGeneralSpec(body as TpcgsPrams);
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     myAlert.err({ title: '計算規格失敗', content: err.response?.data.message });

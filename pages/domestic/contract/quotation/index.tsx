@@ -392,6 +392,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     averageDiscount: content?.averageDiscount,
     resetTrigger: content?.products,
     quotationDiscount: Number(content?.discount || '100'),
+    discount_fromData: Number(content?.discount || '100'),
   }); // 合約項目
 
   const targetProd = productList[targetProdKey];
@@ -1029,6 +1030,7 @@ const OldQuotationProduction = ({
     averageDiscount: rootContent?.averageDiscount,
     resetTrigger: rootContent?.products,
     quotationDiscount: Number(rootContent?.discount || '100'),
+    discount_fromData: Number(rootContent?.discount || '100'),
   });
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
