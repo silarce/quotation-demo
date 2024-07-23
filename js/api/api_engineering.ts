@@ -425,6 +425,61 @@ export const useElectronicSupplies_id = (id: string | undefined | null) => {
   };
 };
 
+const apiGetElectronicSuppliesRequirementRecord_id = (requirementRecordId: string) => {
+  const api = `/engineering/electronic-supplies/requirement-record/${requirementRecordId}`;
+
+  const params = {
+    populate: ['agentEmployee', 'requirementRecordDetails'],
+  };
+
+  return axi
+    .get<TelectronicSuppliesRequirementRecordDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
+export const useGetElectronicSuppliesRequirementRecord_id = (
+  requirementRecordId: string | undefined,
+  {
+    autoUpdate = true,
+  }: {
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TelectronicSuppliesRequirementRecordDto>();
+
+  const update = async () => {
+    if (!requirementRecordId) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetElectronicSuppliesRequirementRecord_id(requirementRecordId);
+      setRes(res);
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({ title: '取得送電備品需求單失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [requirementRecordId]);
+
+  return {
+    data: res,
+    update,
+    isFetching,
+  };
+};
+
 // endregion 送電備品
 
 // ------------------------------------------------------------------------

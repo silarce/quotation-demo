@@ -78,7 +78,7 @@ export default function RequirementRecord({
             children: (
               <Link
                 href={{
-                  pathname: router.pathname + '/editRequirementRecord',
+                  pathname: router.pathname + '/editRequirement',
                   query: {
                     requirementRecordId: id,
                   },

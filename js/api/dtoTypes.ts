@@ -32,6 +32,31 @@ export type TinvoiceType = '三聯式' | '二聯式';
 export type TelectronicSuppliesAction = '領取' | '退回';
 export type TfinalPaymentType = '尾款' | '保留款';
 
+//_______________________________________________________
+
+// TelectronicSuppliesRequirementRecordDetailDto的itemName、category雖然是string
+// 但是在需求單有預設的itemName與category
+export type TelectronicSuppliesDefaultCategory = {
+  鎖盒:
+    | '智慧型（含主機）'
+    | '智慧型（含主機）+ 發訊器'
+    | '智慧型（含主機）+ 發射器'
+    | '智慧型（含主機）+ 發訊器 + 發射器'
+    | '面板式'
+    | '埋入式'
+    | '外露式';
+  鎖匙: '鎖號' | '特殊鎖號';
+  '控制箱/盤': '3HP馬達控制箱(380V)' | '2HP馬達控制箱(380V)' | '3HP馬達控制箱(220V)' | '2HP馬達控制箱(220V)';
+  押扣: '三點式(一般)';
+  消防備品: '煙感器' | '中繼器 1φ 220v' | '中繼器 3φ 380v';
+  主機: '遙控器（1:2）+ 障感器' | '遙控器（1:2）' | '障感器';
+  紅外線: '反射式' | '對照式';
+};
+export type TelectronicSuppliesDefaultSubItemName = {
+  '控制箱/盤': '捲門/水閘門';
+};
+export type TelectronicSuppliesDefaultItemName = keyof TelectronicSuppliesDefaultCategory;
+
 // =============================================================================
 
 export type Tparams = {
@@ -3121,6 +3146,8 @@ export type TelectronicSuppliesRequirementRecordDetailDto = {
   quantity: number | null;
   // 單位
   unit: string | null;
+  code: string | null;
+  note: string | null;
 };
 
 export type TcreateElectronicSuppliesRecordDetailDto = Pick<
@@ -3150,9 +3177,9 @@ export type TelectronicSuppliesRequirementRecordDto = {
   // 新增人員id
   agentEmployeeId: string;
   // 新增人員 // '新增'不是動詞，這個是指新增這筆需求單的人員
-  agentEmployee: TemployeeDto;
+  agentEmployee?: TemployeeDto;
   // 需求明細
-  requirementRecordDetails: TelectronicSuppliesRequirementRecordDetailDto[];
+  requirementRecordDetails?: TelectronicSuppliesRequirementRecordDetailDto[];
 };
 
 export type TcreateElectronicSuppliesRequirementRecordDto = Pick<

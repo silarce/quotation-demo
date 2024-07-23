@@ -10,6 +10,8 @@ import classNames from 'classnames';
 import scss from './supplyTable.module.scss';
 import scss_p from '../_public.module.scss';
 
+import type { Tstate_electronicItem } from 'pages/worksDepartment/contractList/contract/electronicSupplies';
+
 // ==================================================================
 
 // 先簡單處理，真的有效能問題再用memo
@@ -93,17 +95,19 @@ export type { Tgroup, Tprops_cell, Tprops_cell_input };
 
 export default function SupplyTable({
   //
+  className,
   valueLabelArr,
   groupArr,
   disabled,
 }: {
+  className?: string;
   valueLabelArr: string[];
   groupArr: Tgroup[];
   disabled?: boolean;
 }) {
   // MARK: RENDER
   return (
-    <div className={classNames(scss.supplyList)}>
+    <div className={classNames(scss.supplyList, className)}>
       <Thead valueLabelArr={valueLabelArr} />
 
       {groupArr.map((props, index) => {
@@ -207,7 +211,7 @@ const Cell_input = (props: Tprops_cell_input = {}) => {
   const type = isOk ? 'text' : 'number';
 
   return (
-    <Cell {...cellProps} className={classNames(scss.input, className)}>
+    <Cell {...cellProps} className={classNames(scss.input, !readOnly && scss.abled, className)}>
       <input
         type={type}
         defaultValue={defaultValue}
@@ -222,3 +226,45 @@ const Cell_input = (props: Tprops_cell_input = {}) => {
 };
 
 // ============================================================================
+
+// region HOOK
+
+const useStateToGroup = (
+  //
+  stateArr: Tstate_electronicItem[],
+  handler_editItemQty: (key: string, qty: number) => void
+) => {
+  return useMemo(() => {
+    const list: {
+      [key: string]: Tgroup;
+    } = {};
+
+    stateArr.forEach((item) => {
+      const { itemName, category, quantity, subItemName } = item;
+
+      if (!list[itemName]) {
+        list[itemName] = {
+          itemName,
+          subItemName,
+          rowArr: [],
+        };
+      }
+
+      list[itemName].rowArr.push({
+        category,
+        valueArr: [
+          {
+            value: String(quantity || '0'),
+            onChange: (e) => {
+              handler_editItemQty(category, Number(e.target.value));
+            },
+          },
+        ],
+      });
+    });
+
+    return Object.values(list);
+  }, [stateArr]);
+};
+
+export { useStateToGroup };

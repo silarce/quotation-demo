@@ -26,6 +26,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import _ from 'lodash';
+import moment, { Moment } from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -46,7 +47,6 @@ import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_ta
 // api
 import {
   //
-
   useGetContract_id,
   useGetContract_id_finalProductItem,
 } from 'js/api/api_quotation';
@@ -65,7 +65,12 @@ import scss from './electronicSupplies.module.scss';
 // utils
 // import { workSheetReducer, TquotationProductItemDto } from 'js/utils/worksheet/reducer';
 
-import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
+import {
+  TemployeeDto,
+  //
+  TworksheetDto,
+  TquotationProductItemDto,
+} from 'js/api/dtoTypes';
 
 // ------------------------------------------------------------------
 
@@ -77,6 +82,49 @@ type Tquery = {
 type TdoorQtySubTotalList = {
   [doorModelName: string]: number;
 };
+
+// type Tstate_electronicItem = {
+//   itemName: string;
+//   subItemName?: string | null;
+//   category: string;
+
+//   // 已領數量
+//   pickUpQuantity?: number | null;
+//   // 未領數量
+//   stayQuantity?: number | null;
+//   // 總需求數量
+//   quantity?: number | null;
+
+//   // 領取數量
+//   pickupRecord?: number | null;
+//   // 需求數量
+//   requirementQty?: number | null;
+// };
+
+type Tstate_electronicItem = {
+  id?: string;
+  category: string;
+  itemName: string;
+  quantity: number | null;
+  unit: string | null;
+  code: string | null;
+  // code: string | null;
+  subItemName?: null | '捲門/水閘門';
+};
+// itemName為'控制箱/盤'時，subItemName為'捲門/水閘門'，其他為null或undefined
+
+type Tstate_info = {
+  date: Moment | null;
+  indexNumber: string;
+  picker: TemployeeDto | undefined;
+  preparer: TemployeeDto | undefined;
+  doorModelName: string | undefined;
+  doorQty: `${number}` | '';
+};
+
+export type { Tstate_electronicItem, Tstate_info };
+
+// ------------------------------------------------------------------
 
 // ------------------------------------------------------------------
 
@@ -158,17 +206,7 @@ export default function ElectronicSupplies() {
   //     ? panelList_demandHistory
   //     : [];
 
-  const panelList: TpanelList = [
-    {
-      type: 'addButton',
-      label: '更新送電備品總料單',
-      onClick: async () => {
-        await apiPostElectronicSupplies({
-          contractId: contractId,
-        });
-      },
-    },
-  ];
+  const panelList = usePanelList();
 
   // ------------------------------------------------------------------
 
@@ -324,8 +362,9 @@ const Info = ({ doorModalQtyList }: { doorModalQtyList: TdoorQtySubTotalList }) 
   );
 };
 
-// ===========================================================================
-// region FUNCTION
+// =======================================================================
+
+// region HOOK
 
 const useCalcDoorModal = (worksheetArr: TworksheetDto[]) => {
   const obj: {
@@ -368,3 +407,54 @@ const useCalcDoorModal = (worksheetArr: TworksheetDto[]) => {
 
   return obj;
 };
+
+const usePanelList = () => {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const { listName } = query;
+
+  // ------------------------------------------------------------------------
+  //
+  const panelList_itemList: TpanelList = [];
+  //
+  const panelList_supplyList: TpanelList = [];
+  //
+  const panelList_pickupRecord: TpanelList = [];
+  //
+  const panelList_requirementRecord: TpanelList = [
+    {
+      type: 'addButton',
+      label: '新增需求單',
+      onClick: () =>
+        router.push({
+          pathname: `${router.pathname}/editRequirement`,
+          query,
+        }),
+    },
+  ];
+
+  //
+  //
+
+  const list = {
+    itemList: panelList_itemList,
+    supplyList: panelList_supplyList,
+    pickupRecord: panelList_pickupRecord,
+    requirementRecord: panelList_requirementRecord,
+  };
+
+  return listName ? list[listName] : [];
+};
+
+// ============================================================================
+
+const createEmployeeStateInfo = (): Tstate_info => ({
+  date: moment(),
+  indexNumber: '',
+  picker: undefined,
+  preparer: undefined,
+  doorModelName: undefined,
+  doorQty: '',
+});
+
+export { createEmployeeStateInfo };
