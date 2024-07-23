@@ -93,7 +93,7 @@ export default function AccountReceivable() {
       'engineeringContact',
       'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
       'accountReceivable.periods.invoices.accountantInvoiceBook',
-      'accountReceivable.accountantList',
+      'accountReceivable.accountantList.invoices',
     ],
   });
 
@@ -435,7 +435,7 @@ export default function AccountReceivable() {
         // 雖然只是要改order，但是不送accountsReceivableDeduction的話
         // 原本的accountsReceivableDeduction會被清空
         // 所以要送跟原本一樣的accountsReceivableDeduction過去
-        accountsReceivableDeduction: accountsReceivableDeduction,
+        accountsReceivableDeduction: accountsReceivableDeduction ?? [],
       });
     }
 
