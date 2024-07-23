@@ -674,7 +674,7 @@ const sidePathList: TsidePathList = {
           erpFeature: devPass,
           list: [
             {
-              label: '儲位資訊',
+              label: '儲位管理',
               path: path01 + '/wareHouseList',
               query: {
                 type: 'WareHouse',

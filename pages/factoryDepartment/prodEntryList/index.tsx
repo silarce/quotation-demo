@@ -116,6 +116,35 @@ export default function ProdEntryList() {
     const [taxprice, setTaxPrice] = useState<string>("");
     const [totalpayprice, setTotalPayPrice] = useState<string>("");
 
+
+    //modal
+    const [whpnumber, setWhpnumber] = useState<string>("");
+    const [whpproductid, setWhpproductid] = useState<string>("");
+    const [whpname, setWhpname] = useState<string>("");
+    const [whpspec, setWhpspec] = useState<string>("");
+    const [whpquantity, setWhpquantity] = useState<string>("");
+
+    const [maxinboxquantity, setMaxinboxquantity] = useState<number>(0);
+    const [inboxquantity, setInboxquantity] = useState<number>(0);
+
+    const [traycalled, setTraycalled] = useState<boolean>(false);
+    const [whnamecalled, setWhnamecalled] = useState<string>("");
+    const [traynamecalled, setTraynamecalled] = useState<string>("");
+
+
+    const [nowname, setNowname] = useState<string>("");
+    const [nowproductid, setNowproductid] = useState<string>("");
+    const [nowspec, setNowspec] = useState<string>("");
+    const [nowquantity, setNowquantity] = useState<string>("");
+    const [nowwhname, setNowwhname] = useState<string>("");
+    const [nowtrayname, setNowtrayname] = useState<string>("");
+    const [nowwhposition, setNowwhposition] = useState<string>("");
+    const [nowentryqty, setNowentryqty] = useState<string>("");
+    const [nowwhpositionuuid, setNowwhpositionuuid] = useState<string>("");
+    const [nowprodentrydetailuuid, setNowprodentrydetailuuid] = useState<string>("");
+
+
+
     //#region  儲位入庫modal
     const [whpositionqmodalopen, setWhpositionqmodalopen] = useState<boolean>(false);
     // const [whpositionqmodalopen, setwhpositionqmodalopen] = useState<boolean>(false);
@@ -377,6 +406,17 @@ export default function ProdEntryList() {
             setData3(data);
 
             GetLayOut(data[0].whid, data[0].trayname, data[0].id);
+
+            console.log(data);
+            setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
+            setWhpname(data[0].name);
+            setWhpproductid(data[0].productid);
+            setWhpspec(data[0].spec);
+            setWhpquantity(data[0].quantity);
+            setNowwhname(data[0].whname);
+            setNowtrayname(data[0].trayname);
+            setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
+
             console.log(data);
 
 
@@ -415,10 +455,10 @@ export default function ProdEntryList() {
             }
 
             const responseData = await response.json();
+
             console.log(responseData);
 
             setData11(responseData);
-
 
         } catch (error: any) {
             setError(error.message);
@@ -428,6 +468,189 @@ export default function ProdEntryList() {
     };
 
 
+
+    const CallTray = async () => {
+        try {
+            if (traycalled === true) {
+                myAlert.warning({ title: '請先收回托盤' });
+            } else {
+                myAlert.confirm({
+                    title: `呼叫: ${nowwhname}-${nowtrayname}`,
+                    content: '!!請勿靠近設備!!',
+                    props: {
+                        onOk: () => {
+                            CallTrayAPI();
+                            // alert("呼叫托盤");
+                        }
+                    }
+                });
+
+            }
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+
+    const CallTrayBack = async () => {
+        if (traycalled != true) {
+            myAlert.warning({ title: '目前無托盤可收回' });
+        } else {
+            myAlert.confirm({
+                title: `收回: ${nowwhname}-${nowtrayname}`,
+                content: '!!請勿靠近設備!!',
+                props: {
+                    onOk: () => {
+                        CallTrayBackAPI();
+                    }
+                }
+            });
+        }
+    }
+
+
+    const CallTrayAPI = async () => {
+        try {
+            setIsLoading(true);
+
+            // 根據 whname 設置 deviceName
+            // 寫死
+            const deviceName =
+                (nowwhname === "101") ? "Device1" :
+                    (nowwhname === "102") ? "Device2" :
+                        (nowwhname === "103") ? "Device3" : "";
+            const traynumber = nowtrayname;
+            const traycommand = "100";
+
+            const url = (setting.env === "prod") ? (
+                (nowwhname === "101") ? "https://192.168.1.8/sjwms/" :
+                    (nowwhname === "102") ? "https://192.168.1.9/sjwms/" :
+                        (nowwhname === "103") ? "https://192.168.1.10/sjwms/" : ""
+            ) : "https://localhost:44383/WareHouse/";
+
+
+            // execcommand 的固定參數
+            const regaddress = '253';
+            const cmdvalue = '1';
+
+
+            // alert(whname + " : " + trayname);
+
+            // 設定呼叫的倉庫(setWhname)、托盤(setTrayCalled)，托盤狀態(setTrayCalledName)
+            setTraycalled(true);
+            setWhnamecalled(nowwhname);
+            setTraynamecalled(nowtrayname);
+
+            // alert(url);
+            // return;
+
+            // 呼叫 traycommand API
+            const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            // 檢查 traycommand API 的回應
+            if (!response.ok) {
+                throw new Error('Failed to call traycommand API');
+            }
+            console.log(response);
+
+            // 呼叫 execcommand API
+            const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            // 檢查 execcommand API 的回應
+            if (!response2.ok) {
+                throw new Error('Failed to call execcommand API');
+            }
+            console.log(response2);
+
+            // 如果成功，設置 traycalled 和 traycalledname 狀態
+            setTraycalled(true);
+            setTraynamecalled(nowtrayname);
+
+        } catch (error: any) {
+            myAlert.warning(error.message);
+            console.error;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const CallTrayBackAPI = async () => {
+        try {
+            setIsLoading(true);
+
+            // 根據 whname 設置 deviceName
+            const deviceName =
+                (whnamecalled === "101") ? "Device1" :
+                    (whnamecalled === "102") ? "Device2" :
+                        (whnamecalled === "103") ? "Device3" : "";
+            const traynumber = traynamecalled;
+            const traycommand = "200";
+            const url = (setting.env === "prod") ? (
+                (whnamecalled === "101") ? "https://192.168.1.8/sjwms/" :
+                    (whnamecalled === "102") ? "https://192.168.1.9/sjwms/" :
+                        (whnamecalled === "103") ? "https://192.168.1.10/sjwms/" : ""
+            ) : "https://localhost:44383/WareHouse/";
+
+            // execcommand 的參數
+            const regaddress = '253';
+            const cmdvalue = '1';
+
+            // 收回清空設定的倉庫(setWhname)、托盤(setTrayCalled)，托盤狀態(setTrayCalledName)
+            setWhnamecalled('');
+            setTraycalled(false);
+            setTraynamecalled('');
+            // alert(url);
+
+            // 呼叫 traycommand API
+            const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            // 檢查 traycommand API 的回應
+            if (!response.ok) {
+                throw new Error('Failed to call traycommand API');
+            }
+
+            // 等待一秒
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // 呼叫 execcommand API
+            const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            // 檢查 execcommand API 的回應
+            if (!response2.ok) {
+                throw new Error('Failed to call execcommand API');
+            }
+
+            // 如果成功，設置 traycalled 和 traycalledname 狀態
+            setTraycalled(false);
+            setTraynamecalled('');
+
+        } catch (error: any) {
+            // 處理錯誤，顯示警告
+            myAlert.warning(error.message);
+            console.error(error); // 這裡需要傳遞錯誤對象
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
 
     //取已對應進貨單的已入庫單
@@ -536,6 +759,46 @@ export default function ProdEntryList() {
             setIsLoading(false);
         }
     };
+
+
+    const addWHPositionQuantity = async () => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                whpositionuuid: string | undefined,
+                prodentrydetailuuid: string | undefined,
+                quantity: string | undefined
+            } = {
+                whpositionuuid: nowwhpositionuuid,
+                prodentrydetailuuid: nowprodentrydetailuuid,
+                quantity: inboxquantity.toString() as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}AddWHPositionQuantity?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            getWhpositionDetailByProductId(nowproductid);
+
+        } catch (error: any) {
+            setError("getProdReceiptDetail:" + error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
 
 
     // //結案
@@ -788,6 +1051,48 @@ export default function ProdEntryList() {
         return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 1).toString();
     };
 
+    function handleinbox(item: any) {
+        console.log(item);
+        getWhpositionDetailByProductId(item.productid);
+        setWhpositionqmodalopen(!whpositionqmodalopen);
+        setMaxinboxquantity(item.quantity);
+        setNowproductid(item.productid);
+        setNowname(item.name);
+        setNowspec(item.spec);
+        setNowquantity(item.quantity);
+        setNowentryqty(item.entry_qty);
+        setNowprodentrydetailuuid(item.id);
+        // setNowWhp
+    }
+
+    function handleGetLayOut(item: any) {
+        console.log(item);
+        setNowwhname(item.whname);
+        setNowtrayname(item.trayname);
+        setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+        GetLayOut(item.whid, item.trayname, item.id)
+        if (recodeWhpid(item.length, item.width, item.childlength, item.childwidth) != nowwhposition) {
+            setInboxquantity(0);
+        }
+        setNowwhpositionuuid(item.id);
+
+    }
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value;
+        // 檢查輸入是否為數字
+        if (!isNaN(Number(value))) {
+            let numericValue = Number(value);
+            if (numericValue > maxinboxquantity) {
+                numericValue = maxinboxquantity;
+            }
+            setInboxquantity(numericValue);
+        }
+    };
+
+    function handleaddquantity() {
+        addWHPositionQuantity();
+    }
 
 
     return (
@@ -809,6 +1114,9 @@ export default function ProdEntryList() {
                             <div>
                                 <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     入庫查詢
+                                </button>
+                                <button className={scss.minibtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList`, query: {}, }); }}>
+                                    儲位管理
                                 </button>
                             </div>
                             <div></div>
@@ -1006,7 +1314,7 @@ export default function ProdEntryList() {
                                             <span>
 
                                                 {/* <IconDetail onClick={() => { setWhpositionqmodalopen(!whpositionqmodalopen); getWhpositionDetailByProductId(_item.productid) }}></IconDetail> */}
-                                                <button onClick={() => { setWhpositionqmodalopen(!whpositionqmodalopen); getWhpositionDetailByProductId(_item.productid) }}>
+                                                <button onClick={() => { handleinbox(_item) }}>
                                                     <img src={icon_fc_tray.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                 </button>
                                             </span>
@@ -1018,8 +1326,7 @@ export default function ProdEntryList() {
                         <br />
                         <div className={scss.body_foot1}>
                             <div>
-                                (1).轉入庫單進行入庫<br />
-                                (2).轉付款申請單請附款項。
+                                (1).如沒有對應的儲格可以存放，請前往儲位管理維護儲位資訊<br />
                             </div>
                             <div></div>
                             <div>
@@ -1054,21 +1361,21 @@ export default function ProdEntryList() {
                                 <MyButton_v2 px='px22' py='py4' theme={undefined} label="驗收入庫" onClick={handleReceipt} />&nbsp;&nbsp;
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="退貨單" onClick={handleReceipt} />
                             </span> */}
-                                <span style={{ display: `${(data2.length > 0 && addprodentrybtn) ? '' : 'none'}` }}>
+                                {/* <span style={{ display: `${(data2.length > 0 && addprodentrybtn) ? '' : 'none'}` }}>
                                     <button className={scss.redbtn} onClick={() => { handleTransfer() }}>新增入庫</button>
                                 </span>
                                 <span style={{ display: `${(data2.length > 0 && addprodentrybtn) ? 'none' : ''}` }}>
                                     <button className={scss.disabledbtn}>新增入庫</button>
-                                </span>
+                                </span> */}
                             </div>
                             <div></div>
                             <div>
 
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <span>
+                                {/* <span>
                                     <button className={scss.redbtn} onClick={() => { alert("新增付款單") }}>新增付款</button>
-                                </span>
+                                </span> */}
                                 {/* <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}> */}
 
                             </div>
@@ -1076,7 +1383,7 @@ export default function ProdEntryList() {
 
                         <div className={scss.foot_content1}>
 
-                            <Thead01 type={'ProdReceiptDetail2'} />
+                            {/* <Thead01 type={'ProdReceiptDetail2'} />
                             {data2.map((_item, index) => (
                                 <CellWithBar key={index} className={scss.panelHeader13}>
                                     <div className={scss.row01}>
@@ -1096,7 +1403,6 @@ export default function ProdEntryList() {
                                                 onChange={(e) => {
                                                     const newData = [...data2];
                                                     let newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                    // 如果新數量超過最大數量，設置為最大數量
                                                     if (newQuantity > _item.maxquantity) {
                                                         newQuantity = _item.maxquantity;
                                                     }
@@ -1116,7 +1422,6 @@ export default function ProdEntryList() {
                                                 style={{ backgroundColor: 'transparent', width: '80px' }}
                                                 type="text"
                                                 value={_item.unitprice.toLocaleString()}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 readOnly
                                                 onChange={(e) => {
                                                     const newData = [...data2];
@@ -1140,16 +1445,13 @@ export default function ProdEntryList() {
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
                                                 <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
                                             </button>
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
-                                            <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
-                                        </button> */}
                                             <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
                                                 <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button>
                                         </span>
                                     </div>
                                 </CellWithBar>
-                            ))}
+                            ))} */}
                         </div>
                     </div>
                 </div>
@@ -1163,7 +1465,60 @@ export default function ProdEntryList() {
                 maskClosable={false}
                 style={{ top: 150 }}
             >
-                物料儲位
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0px', marginBottom: '16px', width: '1500px' }}>
+                    <span style={{ fontSize: '16px', color: '#14256a' }}>
+                        <InputSel
+                            {...inputSelProps}
+                            caption="料號"
+                            className='align-bottom'
+                            disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: nowproductid ? nowproductid : ' '
+                                },
+                            }}
+                        />
+                    </span>
+                    <span style={{ fontSize: '16px' }}>
+                        <InputSel
+                            {...inputSelProps}
+                            caption="名稱"
+                            className='align-bottom'
+                            disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: nowname ? nowname : ' '
+                                },
+                            }}
+                        />
+                    </span>
+                    <span style={{ fontSize: '16px', color: '#14256a' }}>
+                        <InputSel
+                            {...inputSelProps}
+                            caption="規格"
+                            className='align-bottom'
+                            disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: nowspec ? nowspec : ' '
+                                },
+                            }}
+                        />
+                    </span>
+                    <span style={{ fontSize: '16px', color: '#14256a' }}>
+                        <InputSel
+                            {...inputSelProps}
+                            caption="數量"
+                            className='align-bottom'
+                            disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: nowquantity ? nowquantity : ' '
+                                },
+                            }}
+                        />
+                    </span>
+                </div>
                 <div className={scss.modal_container}>
                     <div className={scss.modal_left}>
                         <div className={scss.modal_content}>
@@ -1176,8 +1531,9 @@ export default function ProdEntryList() {
                                                 <span>{_item.whname}</span>
                                                 <span>{_item.trayname}</span>
                                                 <span>{`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}</span>
+                                                <span>{_item.quantity}</span>
                                                 <span>
-                                                    <button onClick={() => { GetLayOut(_item.whid, _item.trayname, _item.id) }}>
+                                                    <button onClick={() => { handleGetLayOut(_item) }}>
                                                         <img src={icon_fc_inbox.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                     </button>
                                                 </span>
@@ -1189,6 +1545,41 @@ export default function ProdEntryList() {
                         </div>
                     </div>
                     <div className={scss.modal_right}>
+                        <div className={scss.modal_right_head}>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="倉庫編號"
+                                className='align-bottom'
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: nowwhname ? nowwhname : ' '
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="托盤編號"
+                                className='align-bottom'
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: nowtrayname ? nowtrayname : ' '
+                                    },
+                                }}
+                            />
+                            <InputSel
+                                {...inputSelProps}
+                                caption="儲格編號"
+                                className='align-bottom'
+                                disabled={true}
+                                inputProps={{
+                                    props: {
+                                        value: nowwhposition ? nowwhposition : ' '
+                                    },
+                                }}
+                            />
+                        </div>
                         <div className={scss.modal_right_content}>
                             {data11.map((Data) => (
                                 <table className={scss.traytable} style={{ border: 'solid 1px black' }}>
@@ -1225,15 +1616,84 @@ export default function ProdEntryList() {
                 <div className={scss.modal_container2}>
                     <div className={scss.modal_bottom}>
                         <div className={scss.modal_content}>
+                            <div className={scss.modal_head_head1}>
+                                <div>
+                                    <span style={{ display: `${traycalled === true ? 'none' : ''}` }}>
+                                        <button className={scss.redbtn} onClick={() => { CallTray() }}>呼叫托盤</button>
+                                    </span>
+                                    <span style={{ display: `${traycalled === true ? '' : 'none'}` }}>
+                                        <button className={scss.disabledbtn}>呼叫托盤</button>
+                                    </span>
+                                    &nbsp;
+                                    <span style={{ display: `${traycalled === true ? '' : 'none'}` }}>
+                                        <button className={scss.greenbutton} onClick={() => { CallTrayBack() }}>收回托盤</button>
+                                    </span>
+                                    <span style={{ display: `${traycalled === true ? 'none' : ''}` }} >
+                                        <button className={scss.disabledbtn} >收回托盤</button>
+                                    </span>
+                                </div>
+                                <div>
+                                    <InputSel
+                                    {...inputSelProps}
+                                    caption="目前托盤"
+                                    className='align-bottom'
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: `倉庫：${whnamecalled} 托盤：${traynamecalled}`
+                                        },
+                                    }}
+                                />
+                                </div>
+                                <div></div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity && traycalled === true) ? '' : 'none'}` }}>
+                                        <button className={scss.redbtn} onClick={() => { handleaddquantity() }}>確認入庫</button>
+                                    </span>
+                                    <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity || traycalled === false) ? '' : 'none'}` }}>
+                                        <button className={scss.disabledbtn}>確認入庫</button>
+                                    </span>
+                                </div>
+                            </div>
                             <div className={scss.modal_head_content1}>
                                 <div>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="儲格編號"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: whpnumber ? whpnumber : ' ',
+                                            },
+                                        }}
+                                    />
                                     <InputSel
                                         {...inputSelProps}
                                         caption="物料編號"
                                         disabled={true}
                                         inputProps={{
                                             props: {
-                                                value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                                value: whpproductid ? whpproductid : ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="物料名稱"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: whpname ? whpname : ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="物料規格"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: whpspec ? whpspec : ' ',
                                             },
                                         }}
                                     />
@@ -1242,32 +1702,75 @@ export default function ProdEntryList() {
                                 <div>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="物料名稱"
+                                        caption="排版用"
                                         disabled={true}
+                                        className='invisible'
                                         inputProps={{
                                             props: {
-                                                value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                                value: ' ',
                                             },
                                         }}
                                     />
-                                </div>
-                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="儲位數量"
                                         disabled={true}
                                         inputProps={{
                                             props: {
-                                                value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                                value: whpquantity.toString() ? whpquantity.toString() : ' ',
                                             },
                                         }}
                                     />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="入庫數量"
+                                        disabled={traycalled === true ? false : true}
+                                        inputProps={{
+                                            props: {
+                                                max: maxinboxquantity,
+                                                value: inboxquantity ? inboxquantity : 0,
+                                                onChange: handleInputChange
+                                            },
+                                        }}
+                                    />
+                                    <span style={{ color: '#ea1833' }}>
+                                        ※不可超過入庫單該品項的數量
+                                    </span>
+                                </div>
+                                <div>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
+                                    流程順序：選取儲位{'>'}呼叫托盤{'>'}輸入要放置儲位的數量{'>'}確認入庫<br />
+                                    (1).入庫前請確認入庫數量是否正確<br />
+                                    (2).入庫後不可更動，需另外申請庫存調整。
                                 </div>
                             </div>
                             <div className={scss.modal_head_content2}>
-                                <div>1</div>
-                                <div>2</div>
-                                <div>3</div>
+                                <div></div>
+                                <div style={{ textAlign: 'right' }}>
+
+                                </div>
+                                <div></div>
                             </div>
                         </div>
                     </div>

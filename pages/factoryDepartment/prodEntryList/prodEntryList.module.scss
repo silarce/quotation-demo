@@ -609,6 +609,15 @@ div.panelHeader13 {
 
 
 
+.modal_head {
+  position: absolute; /* 使其絕對定位 */
+  top: 0; /* 使其對齊到父容器的頂部 */
+  left: 0; /* 使其對齊到父容器的左側 */
+  width: 100%; /* 根據需要調整 */
+  display: flex;
+  justify-content: flex-start; /* 水平方向左對齊 */
+  align-items: flex-start; /* 垂直方向上對齊 */
+}
 
 .modal_container {
     display: flex;
@@ -631,7 +640,7 @@ div.panelHeader13 {
   }
   
   .modal_left {
-    width: 300px;
+    width: 400px;
     display: grid;
     grid-template-columns: 1fr;
     justify-content: space-between;
@@ -640,6 +649,17 @@ div.panelHeader13 {
     overflow-y: auto;
   }
   
+  .modal_right_head {
+    position: absolute; /* 使其絕對定位 */
+    top: 0; /* 使其對齊到父容器的頂部 */
+    left: 0; /* 使其對齊到父容器的左側 */
+    width: 100%; /* 根據需要調整 */
+    display: flex;
+    justify-content: flex-start; /* 水平方向左對齊 */
+    align-items: flex-start; /* 垂直方向上對齊 */
+}
+
+
   .modal_right {
     flex: 1;
     display: flex;
@@ -697,7 +717,7 @@ div.panelHeader26 {
   
     .row01 {
       display: grid;
-      grid-template-columns: 50px 80px 80px 30px;
+      grid-template-columns: 50px 80px 80px 50px 20px;
       gap: 5px;
     }
   }
@@ -752,22 +772,37 @@ div.panelHeader26 {
     background-color: #ea1833 !important;
 }
 
+.modal_head_head1 {
+  display: grid;
+  grid-template-columns: 300px 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  gap: 0px;
+  width: auto;
+  // margin-top: 4px;
+  margin-left: 20px;
+  margin-right: 20px;
+  // border-top:1px solid rgb(168, 168, 168);
+  overflow-x: hidden;
+  // background-color: gray;
+  padding-bottom: 5px;
+}
 
 .modal_head_content1 {
     display: grid;
-    grid-template-columns: 300px 1fr 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 500px 1fr 1fr; // 左右兩邊比例，可以調整
     gap: 0px;
     width: auto;
     // margin-top: 4px;
     margin-left: 20px;
     margin-right: 20px;
-    // border-top:1px solid rgb(168, 168, 168);
+    border-top:1px solid rgb(168, 168, 168);
     overflow-x: hidden;
     // background-color: gray;
+    padding-bottom: 5px;
   }
+  
   .modal_head_content2 {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 500px 1fr 1fr; // 左右兩邊比例，可以調整
     gap: 0px;
     width: auto;
     // margin-top: 4px;
@@ -776,6 +811,7 @@ div.panelHeader26 {
     // border-top:1px solid rgb(168, 168, 168);
     overflow-x: hidden;
     // background-color: gray;
+    padding-bottom: 5px;
   }
 
 

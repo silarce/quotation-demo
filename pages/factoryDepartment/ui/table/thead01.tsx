@@ -379,7 +379,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>倉庫</span>
         <span>托盤</span>
         <span>儲格</span>
-
+        <span>數量</span>
         <span></span>
       </div>
     )
