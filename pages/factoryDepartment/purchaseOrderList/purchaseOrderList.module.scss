@@ -23,8 +23,7 @@
 }
 
 .left {
-    // flex: 80px;
-    width: 450px;
+    width: 360px;
     display: grid;
     grid-template-columns: 1fr;
     justify-content: space-between;
@@ -69,12 +68,13 @@
     margin-right: 20px;
     padding-bottom: 5px;
     border-bottom: 1px solid rgb(214, 214, 214);
+
     div {
-      margin-right: 20px;
+        margin-right: 20px;
     }
-  
+
     // background-color: gray;
-  }
+}
 
 .head_content1 {
     display: grid;
@@ -539,4 +539,16 @@ div.panelHeader13 {
         /* 添加這行使滑鼠顯示禁止符號 */
     }
 
+}
+
+// 隱藏popout
+.modal_search_bar {
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
+    width: 100%;
+    margin-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgb(214, 214, 214);
+    // padding-right:10px;
 }

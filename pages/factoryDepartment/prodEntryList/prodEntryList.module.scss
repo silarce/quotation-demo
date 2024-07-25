@@ -24,7 +24,7 @@
 }
 
 .left {
-  width: 500px;
+  width: 360px;
   display: grid;
   grid-template-columns: 1fr;
   justify-content: space-between;
@@ -516,44 +516,6 @@ div.panelHeader13 {
 }
 
 
-// 隱藏popout
-.modal_search_bar {
-  display: flex;
-  // justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 5px;
-
-  div {
-    text-align: right;
-    display: flex;
-    align-items: center;
-
-    input {
-      font-size: 16px;
-      width: 100%;
-      border-bottom: 1px solid #c1c1c1;
-      margin-right: 8px;
-    }
-
-    select {
-      border-bottom: 1px solid gray;
-      outline: none;
-    }
-
-    button {
-      background: none;
-      border: none;
-      cursor: pointer;
-
-      img {
-        width: 20px;
-        height: 20px;
-      }
-    }
-  }
-}
-
 
 //#region 進貨單明細
 div.panelHeader14 {
@@ -774,7 +736,7 @@ div.panelHeader26 {
 
 .modal_head_head1 {
   display: grid;
-  grid-template-columns: 300px 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 300px 500px 1fr 1fr; // 左右兩邊比例，可以調整
   gap: 0px;
   width: auto;
   // margin-top: 4px;
@@ -815,4 +777,13 @@ div.panelHeader26 {
   }
 
 
-  
+  .modal_search_bar {
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
+    width: 100%;
+    margin-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgb(214, 214, 214);
+    // padding-right:10px;
+}

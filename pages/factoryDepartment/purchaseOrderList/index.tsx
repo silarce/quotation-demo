@@ -73,6 +73,7 @@ export default function PurchaseOrderList() {
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
+    const [data1restore, setData1Restore] = useState<any[]>([]);
     const [data2, setData2] = useState<any[]>([]);
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -95,7 +96,10 @@ export default function PurchaseOrderList() {
     const [notein, setNotein] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
 
-
+    //搜尋
+    const [keyword1, setKeyword1] = useState<string>("");
+    const [keyword2, setKeyword2] = useState<string>("");
+    const [keyword3, setKeyword3] = useState<string>("");
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -156,15 +160,18 @@ export default function PurchaseOrderList() {
         doSearch,
     };
 
-    const searchData = async (keywordWhpname: string, keywordMaterialnumber: string, keywordSpec: string) => {
+    const searchData = async (keyword1: string, keyword2: string, keyword3: string) => {
         try {
+            if (keyword1 === "" && keyword2 === "" && keyword3 === "") {
+                setData(data1restore);
+                return;
+            }
             // keywordSpec
-            const conditionModel: { keywordWhpname: string | undefined, keywordMaterialnumber: string | undefined, keywordSpec: string | undefined } = {
-                keywordWhpname: keywordWhpname as string | undefined,
-                keywordMaterialnumber: keywordMaterialnumber as string | undefined,
-                keywordSpec: keywordSpec as string | undefined,
+            const conditionModel: { keyword1: string | undefined, keyword2: string | undefined, keyword3: string | undefined } = {
+                keyword1: getTaiwanDateStr(keyword1) as string | undefined,
+                keyword2: keyword2 as string | undefined,
+                keyword3: keyword3 as string | undefined
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -176,14 +183,12 @@ export default function PurchaseOrderList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchMaterialById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}SearchPurchaseOrderById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             let data = await response.json();
             setData(data);
-            data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
-            setData1(data);
 
 
         } catch (error: any) {
@@ -239,6 +244,7 @@ export default function PurchaseOrderList() {
             }
             const data = await response.json();
             setData(data);
+            setData1Restore(data);
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -554,7 +560,7 @@ export default function PurchaseOrderList() {
             myAlert.warning({ title: "請先結束編輯狀態" });
         } else if (invoicein === "" || invoicein === undefined || invoicein === null) {
             myAlert.warning({ title: "發票號碼尚未輸入" });
-        } else if (editmain===true) {
+        } else if (editmain === true) {
             myAlert.warning({ title: "尚未儲存或取消編輯" });
         }
         else {
@@ -725,6 +731,12 @@ export default function PurchaseOrderList() {
         });
     };
 
+    const handleSubmit = (e: any) => {
+
+        e.preventDefault();
+        searchData(keyword1, keyword2, keyword3);
+
+    };
 
     return (
         <SubLayer isLoading_subLayer={false}>
@@ -733,8 +745,67 @@ export default function PurchaseOrderList() {
             <div className={scss.container}>
                 <div className={scss.left} style={{ display: `${leftbaropen === false ? '' : 'none'}` }}>
                     <div className={scss.content}>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            position: 'sticky',
+                            top: 0,
+                            backgroundColor: '#fff',
+                            zIndex: 1000,
+
+                        }}>
+                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
+                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                    <InputSel
+                                        caption="採購日期"
+                                        disabled={false}
+                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                        datePickerProps={{
+                                            props: {
+                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
+                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="採購單號"
+                                        disabled={false}
+                                        inputProps={{
+                                            props: {
+                                                value: keyword2 ? keyword2 : ' ',
+                                                onChange: (e) => { setKeyword2(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="單據狀態"
+                                        disabled={false}
+                                        inputProps={{
+                                            props: {
+                                                value: keyword3 ? keyword3 : ' ',
+                                                onChange: (e) => { setKeyword3(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ textAlign: 'right', paddingRight: '10px', paddingLeft: '10px',paddingBottom:'5px' }}>
+                                    <button className={scss.minibtn} type="submit">搜尋</button>
+                                </div>
+                                <div>
+                                    <Thead01 type={'PurchaseOrder'} />
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* <hr /> */}
+
                         <div>
-                            <Thead01 type={'PurchaseOrder'} />
                             <Tbody01 type={'PurchaseOrder'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         </div>
                     </div>
@@ -744,8 +815,7 @@ export default function PurchaseOrderList() {
                         <div className={scss.head_head1}>
                             <div>
                                 <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    {/* <img src={icon_fc_collapse_right.src} alt="search" style={{ height: '15px', width: '15px' }} /> */}
-                                    採購查詢
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                 </button>
                             </div>
                             <div></div>

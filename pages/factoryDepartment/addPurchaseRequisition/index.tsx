@@ -189,11 +189,12 @@ export default function AddPurchaseRequisition() {
                     </>,
                     props: {
                         onOk: () => {
-                            router.push({
-                                pathname: `/factoryDepartment/purchaseRequisitionList`,
-                                query: {
-                                },
-                            });
+                            router.back();
+                            // router.push({
+                            //     pathname: `/factoryDepartment/purchaseRequisitionList`,
+                            //     query: {
+                            //     },
+                            // });
                         }
                     }
                 });
@@ -546,6 +547,9 @@ export default function AddPurchaseRequisition() {
     //關閉詢價單modal
     const productSearchModalClose = async () => {
         setData([]);
+        setKeyword1("");
+        setKeyword2("");
+        setKeyword3("");
         await new Promise(resolve => setTimeout(resolve, 50));
         setProductSearchmodalopen(false);
     }
@@ -624,7 +628,7 @@ export default function AddPurchaseRequisition() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.minibtn} onClick={() => { alert("OK") }}>
+                                <button className={scss.minibtn} onClick={() => { alert("comming soon") }}>
                                     申請紀錄
                                 </button>
                             </div>
@@ -887,91 +891,6 @@ export default function AddPurchaseRequisition() {
                         </div>
                     </div>
                 </div>
-
-                {/* 隱藏的popout */}
-                {/* 品項查詢 */}
-                {/* <div style={{
-                    display: `${productSearchmodalopen === true ? '' : 'none'}`,
-                    position: 'fixed',
-                    top: '250px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '1000px',
-                    backgroundColor: '#fff',
-                    border: '1px solid #ccc',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
-                    zIndex: 1000,
-                    padding: '16px',
-                    maxHeight: '80vh', // 確保模態窗口不會超過視窗高度
-                    overflowY: 'auto',  // 啟用垂直滾動
-                    height: '650px'
-                }}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        position: 'sticky',
-                        top: 0,
-                        backgroundColor: '#fff',
-                        zIndex: 1000
-                    }}>
-                        <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                            <div>
-                                <span style={{ fontSize: '16px', color: '#14256a' }}>查詢種類：</span>
-                                <span style={{ fontSize: '16px' }}>
-                                    <select style={{ borderBottom: '1px solid gray', outline: 'none', marginRight: '8px' }} value={selectedOption} onChange={(e) => { setSelectedOption(e.target.value) }}>
-                                        <option value="物料">物料</option>
-                                        <option value="全部">全部</option>
-                                        <option value="辦公室用品">辦公室用品</option>
-                                    </select>
-                                </span>
-                            </div>
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder='規格'
-                                    value={keyword3}
-                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
-                                    onChange={(e) => setKeyword3(e.target.value)}
-                                />
-                                <button type="submit" style={{ display: 'flex', alignItems: 'center', padding: '0', border: 'none', background: 'none' }}>
-                                    <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
-                                </button>
-                            </div>
-                            <div>
-                            </div>
-                            <div></div>
-                        </form>
-                        <div>
-                            <button onClick={() => { setProductSearchmodalopen(false) }}>
-                                <img src={icon_close.src} alt="close" style={{ width: '30px', height: '20px' }} />
-                            </button>
-                        </div>
-                    </div>
-                    <hr />
-                    <div>
-                        <Thead01 type={'AddPR_GetProduct'} />
-                        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                            {data && (
-                                data.map((_item, index) => (
-                                    <CellWithBar key={index} className={scss.panelHeader19}>
-                                        <div className={scss.row01}>
-                                            <span>{_item.productid}</span>
-                                            <span>{_item.name}</span>
-                                            <span>{_item.spec}</span>
-                                            <span>{_item.count}</span>
-                                            <span>
-                                                <button onClick={() => { getProductById(_item.id) }}>
-                                                    <img src={icon_fc_add.src} alt="addToList" style={{ width: '30px', height: '20px' }} />
-                                                </button>
-                                            </span>
-                                        </div>
-                                    </CellWithBar>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                </div> */}
 
                 <Modal
                     visible={productSearchmodalopen}

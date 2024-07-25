@@ -266,10 +266,10 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 100px 100px 60px 60px 30px;
+  grid-template-columns: 80px 100px 50px 30px;
   gap: 15px;
   height: 40px;
-  padding: 0 30px;
+  padding: 0 20px;
   background-color: $bgc01;
 
   >* {
@@ -295,7 +295,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 80px 100px 100px 50px 30px;
+  grid-template-columns: 80px 100px 50px 30px;
   gap: 15px;
   height: 40px;
   padding: 0 20px;
@@ -357,7 +357,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 80px 100px 60px 60px 30px;
+  grid-template-columns: 80px 100px 30px 30px;
   gap: 15px;
   height: 40px;
   padding: 0 20px;

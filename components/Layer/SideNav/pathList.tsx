@@ -713,14 +713,14 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: devPass,
             },
-            {
-              label: '領料管理',
-              path: path01 + '/getMaterial/pickingList',
-              query: {
-                type: 'pickingList',
-              },
-              erpFeature: devPass,
-            },
+            // {
+            //   label: '領料管理',
+            //   path: path01 + '/getMaterial/pickingList',
+            //   query: {
+            //     type: 'pickingList',
+            //   },
+            //   erpFeature: devPass,
+            // },
           ],
         },
         // {

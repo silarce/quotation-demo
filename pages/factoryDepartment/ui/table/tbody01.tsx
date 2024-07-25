@@ -285,6 +285,9 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         supplieraddress: item.supplieraddress,
         supplierphone: item.supplierphone,
         invoice: item.invoice,
+        status: item.status,
+        entrystatus: item.entry_status,
+        paystatus: item.pay_status,
         firstin: 1
       }
     })
@@ -564,7 +567,6 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       </div>
     );
   } else if (type === "ProdEntry") {
-    // 領料明細單.開始領料
     return (
       <div>
         {error && <p>Error: {error}</p>}
@@ -575,8 +577,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 {/* <span>{index + 1}</span> */}
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.prodentryid}</span>
-                <span></span>
-                <span>{_item.status}</span>
+                <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
                 <span ><IconDetail onClick={() => { GetProdEntry(_item) }} /></span>
                 {/* <span><IconDetail/></span> */}
                 {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
@@ -599,7 +600,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 {/* <span>{index + 1}</span> */}
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.purchaseorderid}</span>
-                <span>{_item.totalprice.toLocaleString()}</span>
+                {/* <span>{_item.totalprice.toLocaleString()}</span> */}
                 <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
                 {/* <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>未結</span>
                 <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已結</span> */}
@@ -657,8 +658,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 {/* <span>{index + 1}</span> */}
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.prodreceiptid}</span>
-                <span style={{ color: `${_item.entry_status === "未入庫" ? "#ea1833" : "#14256a"}` }}>{_item.entry_status}</span>
-                <span style={{ color: `${_item.pay_status === "未請付" ? "#ea1833" : "#14256a"}` }}>{_item.pay_status}</span>
+                {/* <span style={{ color: `${_item.entry_status === "未入庫" ? "#ea1833" : "#14256a"}` }}>{_item.entry_status}</span>
+                <span style={{ color: `${_item.pay_status === "未請付" ? "#ea1833" : "#14256a"}` }}>{_item.pay_status}</span> */}
                 <span style={{ color: `${_item.status === "未結案" ? "#ea1833" : "#14256a"}` }}>{_item.status}</span>
                 <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span>
               </div>

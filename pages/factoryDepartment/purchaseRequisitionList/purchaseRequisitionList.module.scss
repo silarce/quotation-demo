@@ -23,7 +23,7 @@
 }
 
 .left {
-  width: 340px;
+  width: 360px;
   display: grid;
   grid-template-columns: 1fr;
   justify-content: space-between;
@@ -40,7 +40,7 @@
   top: 0;
   z-index: 1000;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns:30px 1fr;
   gap: 15px;
   width: auto;
   margin: 5px 20px;
@@ -619,15 +619,13 @@ div.panelHeader17 {
 // 隱藏popout
 .modal_search_bar {
   display: grid;
-  grid-template-columns: 1fr 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
   // gap: 15px;
   width: 100%;
   margin-top: 5px;
-  // margin-left: 20px;
-  // margin-right: 20px;
   padding-bottom: 5px;
   border-bottom: 1px solid rgb(214, 214, 214);
-
+  // padding-right:10px;
 }
 
 .modal_container {

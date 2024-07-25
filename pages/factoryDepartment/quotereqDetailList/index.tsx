@@ -51,7 +51,8 @@ export default function QuotereqDetailList() {
         create_by,
         approved,
         quoterequuid,
-        need_date
+        need_date,
+        note
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -95,6 +96,9 @@ export default function QuotereqDetailList() {
     const [approvedin, setApprovedin] = useState<string>("");
     const [quoterequuidin, setquoterequuidin] = useState<string>(quoterequuid as string);
     const [purchaserequisitiondetailuuidin, setPurchaserequisitiondetailuuidin] = useState<string>("");
+    const [notein, setNotein] = useState<string>("");
+    const [statusin, setStatusin] = useState<string>("");
+
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -128,14 +132,20 @@ export default function QuotereqDetailList() {
                     </>,
                     props: {
                         onOk: () => {
-                            router.push({
-                                pathname: `/factoryDepartment/purchaseRequisitionList`,
-                                query: {
-                                    purchaserequisitionuuid: checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid,
-                                    // purchaserequisitiondetailuuid: purchaserequisitiondetailuuidin,
-                                    // firstin:1
-                                },
-                            });
+                            router.back();
+                            // router.push({
+                            //     pathname: `/factoryDepartment/purchaseRequisitionList`,
+                            //     query: {
+                            //         purchaserequisitionuuid: purchaserequisitionuuidin,
+                            //         purchaserequisitionid: purchaserequisitionidin,
+                            //         create_at: getTaiwanDateStr(create_atin),
+                            //         create_by: create_byin,
+                            //         // approved: approvedin,
+                            //         status: statusin,
+                            //         note: notein,
+                            //         firstin: 1
+                            //     },
+                            // });
                         }
                     }
                 });
@@ -216,15 +226,17 @@ export default function QuotereqDetailList() {
             console.log(data);
 
             await new Promise(resolve => setTimeout(resolve, 500));
-            setPurchaserequisitionidin(data[0].purchaserequisitionid);
-            setPurchaserequisitionuuidin(purchaserequisitionuuid);
-            setQuotereqname(data[0].name);
-            setQuotereqspec(data[0].spec);
-            setQuotereqquantity(data[0].quantity);
-            getQuotereqDetail(data[0].quoterequuid);
-            setQuoterequnit(data[0].unit);
-            setquoterequuidin(data[0].quoterequuid)
-            setPurchaserequisitiondetailuuidin(data[0].purchaserequisitiondetailuuid);
+            if (checkfirstin === 0) {
+                setPurchaserequisitionidin(data[0].purchaserequisitionid);
+                setPurchaserequisitionuuidin(purchaserequisitionuuid);
+                setQuotereqname(data[0].name);
+                setQuotereqspec(data[0].spec);
+                setQuotereqquantity(data[0].quantity);
+                getQuotereqDetail(data[0].quoterequuid);
+                setQuoterequnit(data[0].unit);
+                setquoterequuidin(data[0].quoterequuid)
+                setPurchaserequisitiondetailuuidin(data[0].purchaserequisitiondetailuuid);
+            }
 
             // alert(data[0].quoterequuid);
 
@@ -238,6 +250,8 @@ export default function QuotereqDetailList() {
 
     useEffect(() => {
         getPurchaseRequisitionDetail(purchaserequisitionuuid);
+        setStatusin(status as string);
+        setNotein(note as string);
     }, [purchaserequisitionuuid]);
 
     // 編輯狀態控制
@@ -442,7 +456,7 @@ export default function QuotereqDetailList() {
             // 加入詢價單明細後重新取詢價單明細
             // alert(prquotereqadddata.quoterequuid);
             // alert(quoterequuid)
-            // getPurchaseRequisitionDetail(purchaserequisitionuuidin);
+            getPurchaseRequisitionDetail(purchaserequisitionuuidin);
             getQuotereqDetail(quoterequuidin);
 
         } catch (error: any) {
@@ -464,8 +478,8 @@ export default function QuotereqDetailList() {
         handlequotereqChange('unitprice', '')
         handlequotereqChange('totalprice', '')
         handlequotereqChange('note', '')
-        myAlert.success({title:'廠商資訊帶入成功'});
-        
+        myAlert.success({ title: '廠商資訊帶入成功' });
+
     }
 
     const handlequotereqChange = (key: any, value: any) => {
@@ -605,6 +619,7 @@ export default function QuotereqDetailList() {
 
 
     function handlechangeQuotereqDetail(item: any): void {
+        setCheckFirstIn(1);
         setSelectedsupplier("");
         setPurchaserequisitionidin(item.purchaserequisitionid);
         setPurchaserequisitionuuidin(item.purchaserequisitionuuid);

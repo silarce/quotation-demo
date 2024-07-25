@@ -78,6 +78,7 @@ export default function ProdEntryList() {
     const { userInfo } = useContext(AppContext);
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
+    const [datarestore,setDatarestore]= useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
     const [data2, setData2] = useState<any[]>([]);
     const [data3, setData3] = useState<any[]>([]);
@@ -110,6 +111,11 @@ export default function ProdEntryList() {
     const [statusin, setStatusin] = useState<string>("");
     const [invoicein, setInvoicein] = useState<string>("");
 
+    //搜尋
+    const [keyword1, setKeyword1] = useState<string>("");
+    const [keyword2, setKeyword2] = useState<string>("");
+    const [keyword3, setKeyword3] = useState<string>("");
+
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
 
@@ -131,6 +137,7 @@ export default function ProdEntryList() {
     const [traycalled, setTraycalled] = useState<boolean>(false);
     const [whnamecalled, setWhnamecalled] = useState<string>("");
     const [traynamecalled, setTraynamecalled] = useState<string>("");
+    const [whpnamecalled, setWhpnamecalled] = useState<string>("");
 
 
     const [nowname, setNowname] = useState<string>("");
@@ -193,15 +200,18 @@ export default function ProdEntryList() {
         doSearch,
     };
 
-    const searchData = async (keywordWhpname: string, keywordMaterialnumber: string, keywordSpec: string) => {
+    const searchData = async (keyword1: string, keyword2: string, keyword3: string) => {
         try {
+            if (keyword1 === "" && keyword2 === "" && keyword3 === "") {
+                setData(datarestore);
+                return;
+            }
             // keywordSpec
-            const conditionModel: { keywordWhpname: string | undefined, keywordMaterialnumber: string | undefined, keywordSpec: string | undefined } = {
-                keywordWhpname: keywordWhpname as string | undefined,
-                keywordMaterialnumber: keywordMaterialnumber as string | undefined,
-                keywordSpec: keywordSpec as string | undefined,
+            const conditionModel: { keyword1: string | undefined, keyword2: string | undefined, keyword3: string | undefined } = {
+                keyword1: getTaiwanDateStr(keyword1) as string | undefined,
+                keyword2: keyword2 as string | undefined,
+                keyword3: keyword3 as string | undefined
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -213,21 +223,18 @@ export default function ProdEntryList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchMaterialById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}SearchProdEntryById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             let data = await response.json();
             setData(data);
-            data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
-            setData1(data);
 
 
         } catch (error: any) {
             setError(error.message);
         }
     };
-
 
 
     //新增按鈕
@@ -276,6 +283,7 @@ export default function ProdEntryList() {
             }
             const data = await response.json();
             setData(data);
+            setDatarestore(data);
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
@@ -334,7 +342,7 @@ export default function ProdEntryList() {
             const data = await response.json();
             setData1(data);
             // setData2(data);
-
+            
             console.log(data);
             let totalprice = 0;
             data.forEach((element: { totalprice: any; }) => {
@@ -380,6 +388,11 @@ export default function ProdEntryList() {
             setStatusin(status as string);
             setSupplierphonein(supplierphone as string);
             setInvoicein(invoice as string);
+            setData3([]);
+            setData11([]);
+            setNowwhname("");
+            setNowtrayname("");
+            setNowwhposition("");
         }
     }, [prodentryuuid]);
 
@@ -406,6 +419,15 @@ export default function ProdEntryList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
+
+            if (data.length === 0) {
+                myAlert.warning({
+                    title: "查詢結果",
+                    content: "目前沒有可存放的儲位資訊"
+                });
+                return;
+            }
+
             setData3(data);
 
             GetLayOut(data[0].whid, data[0].trayname, data[0].id);
@@ -425,7 +447,10 @@ export default function ProdEntryList() {
 
 
         } catch (error: any) {
-            setError("getProdReceiptDetail:" + error.message);
+            myAlert.err({
+                title: "prodEntry(getWhpositionDetailByProductId)",
+                content: error.message
+            })
         }
         finally {
             setIsLoading(false);
@@ -543,6 +568,7 @@ export default function ProdEntryList() {
             setTraycalled(true);
             setWhnamecalled(nowwhname);
             setTraynamecalled(nowtrayname);
+            setWhpnamecalled(nowwhposition);
 
             // alert(url);
             // return;
@@ -577,7 +603,9 @@ export default function ProdEntryList() {
 
             // 如果成功，設置 traycalled 和 traycalledname 狀態
             setTraycalled(true);
+            setWhnamecalled(nowwhname);
             setTraynamecalled(nowtrayname);
+            setWhpnamecalled(nowwhposition);
 
         } catch (error: any) {
             myAlert.warning(error.message);
@@ -612,6 +640,7 @@ export default function ProdEntryList() {
             setWhnamecalled('');
             setTraycalled(false);
             setTraynamecalled('');
+            setWhpnamecalled('');
             // alert(url);
 
             // 呼叫 traycommand API
@@ -645,7 +674,9 @@ export default function ProdEntryList() {
 
             // 如果成功，設置 traycalled 和 traycalledname 狀態
             setTraycalled(false);
+            setWhnamecalled('');
             setTraynamecalled('');
+            setWhpnamecalled('')
 
         } catch (error: any) {
             // 處理錯誤，顯示警告
@@ -707,7 +738,7 @@ export default function ProdEntryList() {
 
     // 進貨單入庫
     const TransferProdReceiptToProdEntry = async () => {
-        alert("in");
+        // alert("in");
         try {
             // return;
             setIsLoading(true);
@@ -794,6 +825,8 @@ export default function ProdEntryList() {
             const data = await response.json();
 
             getWhpositionDetailByProductId(nowproductid);
+            setNowentryqty((parseInt(nowentryqty) + 1).toString());
+            getProdEntryDetail(prodentryuuidin);
 
         } catch (error: any) {
             setError("getProdReceiptDetail:" + error.message);
@@ -919,7 +952,7 @@ export default function ProdEntryList() {
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
-        // searchData(keyword1, keyword2)
+        searchData(keyword1, keyword2, keyword3);
         // alert(keyword1);
         // alert(keyword2);
         // alert(keyword3);
@@ -1059,7 +1092,7 @@ export default function ProdEntryList() {
         console.log(item);
         getWhpositionDetailByProductId(item.productid);
         setWhpositionqmodalopen(!whpositionqmodalopen);
-        setMaxinboxquantity(item.quantity);
+        // setMaxinboxquantity(item.quantity);
         setNowproductid(item.productid);
         setNowname(item.name);
         setNowspec(item.spec);
@@ -1091,12 +1124,21 @@ export default function ProdEntryList() {
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // let value = e.target.value;
+        // // 檢查輸入是否為數字
+        // if (!isNaN(Number(value))) {
+        //     let numericValue = Number(value);
+        //     if (numericValue > maxinboxquantity) {
+        //         numericValue = maxinboxquantity;
+        //     }
+        //     setInboxquantity(numericValue);
+        // }
         let value = e.target.value;
         // 檢查輸入是否為數字
         if (!isNaN(Number(value))) {
             let numericValue = Number(value);
-            if (numericValue > maxinboxquantity) {
-                numericValue = maxinboxquantity;
+            if (numericValue > (parseInt(nowquantity) - parseInt(nowentryqty))) {
+                numericValue = (parseInt(nowquantity) - parseInt(nowentryqty));
             }
             setInboxquantity(numericValue);
         }
@@ -1113,9 +1155,64 @@ export default function ProdEntryList() {
             <div className={scss.container}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
                     <div className={scss.content}>
-                        <hr />
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            position: 'sticky',
+                            top: 0,
+                            backgroundColor: '#fff',
+                            zIndex: 1000
+                        }}>
+                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
+                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                    <InputSel
+                                        caption="入庫日期"
+                                        disabled={false}
+                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                        datePickerProps={{
+                                            props: {
+                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
+                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="入庫單號"
+                                        disabled={false}
+                                        inputProps={{
+                                            props: {
+                                                value: keyword2 ? keyword2 : ' ',
+                                                onChange: (e) => { setKeyword2(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="單據狀態"
+                                        disabled={false}
+                                        inputProps={{
+                                            props: {
+                                                value: keyword3 ? keyword3 : ' ',
+                                                onChange: (e) => { setKeyword3(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ textAlign: 'right', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
+                                    <button className={scss.minibtn} type="submit">搜尋</button>
+                                </div>
+                                <div>
+                                    <Thead01 type={'ProdEntry'} />
+                                </div>
+                            </form>
+                        </div>
+                        {/* <hr /> */}
                         <div>
-                            <Thead01 type={'ProdEntry'} />
                             <Tbody01 type={'ProdEntry'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         </div>
                     </div>
@@ -1125,8 +1222,9 @@ export default function ProdEntryList() {
                         <div className={scss.head_head1}>
                             <div>
                                 <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    入庫查詢
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                 </button>
+                                &nbsp;
                                 <button className={scss.minibtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList`, query: {}, }); }}>
                                     儲位管理
                                 </button>
@@ -1630,10 +1728,10 @@ export default function ProdEntryList() {
                         <div className={scss.modal_content}>
                             <div className={scss.modal_head_head1}>
                                 <div>
-                                    <span style={{ display: `${traycalled === true ? 'none' : ''}` }}>
-                                        <button className={scss.redbtn} onClick={() => { CallTray() }}>呼叫托盤</button>
+                                    <span style={{ display: `${traycalled === true || data3.length === 0 ? 'none' : ''}` }}>
+                                        <button className={scss.redbtn} onClick={CallTray}>呼叫托盤</button>
                                     </span>
-                                    <span style={{ display: `${traycalled === true ? '' : 'none'}` }}>
+                                    <span style={{ display: `${traycalled === true || data3.length === 0 ? '' : 'none'}` }}>
                                         <button className={scss.disabledbtn}>呼叫托盤</button>
                                     </span>
                                     &nbsp;
@@ -1644,7 +1742,7 @@ export default function ProdEntryList() {
                                         <button className={scss.disabledbtn} >收回托盤</button>
                                     </span>
                                 </div>
-                                <div>
+                                <div style={{paddingTop:'5px'}}>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="目前呼叫"
@@ -1652,12 +1750,12 @@ export default function ProdEntryList() {
                                         disabled={true}
                                         inputProps={{
                                             props: {
-                                                value: `${whnamecalled!=""? `倉庫：${whnamecalled} 托盤：${traynamecalled}`:' '}`
+                                                value: `${whnamecalled != "" ? `倉庫：${whnamecalled} 托盤：${traynamecalled} 儲位：${whpnamecalled}` : ' '}`
                                             },
                                         }}
                                     />
                                 </div>
-                                <div>
+                                <div style={{paddingTop:'5px'}}>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="入庫狀態"
@@ -1763,6 +1861,8 @@ export default function ProdEntryList() {
                                         inputProps={{
                                             props: {
                                                 max: maxinboxquantity,
+                                                // max: (parseInt(nowquantity)-parseInt(nowentryqty)),
+                                                // nowentryqty} / ${nowquantity
                                                 value: inboxquantity ? inboxquantity : 0,
                                                 onChange: handleInputChange
                                             },
