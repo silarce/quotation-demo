@@ -77,6 +77,7 @@ export default function IncomeSummons() {
   const params = useMemo(() => {
     return {
       sort: 'receiveDate',
+      pageSIze: 999999,
       filter: {
         isForeign: {
           $eq: isForeign === 'true',
