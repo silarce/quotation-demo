@@ -378,19 +378,22 @@ export const apiPostElectronicSupplies = (body: { contractId: string }) => {
     });
 };
 
-const apiGetElectronicSupplies_id = (id: string) => {
+const apiGetElectronicSupplies_id = (id: string, { params_cover }: { params_cover?: Tparams } = {}) => {
   const api = `/engineering/electronic-supplies/${id}`;
-  const params = {
+
+  let params: Tparams = {
     populate: [
       //
       'electronicSuppliesContents',
-
       'pickupRecords.takeOffEmployee',
       'pickupRecords.TelectronicSuppliesPickupRecordDetailDto',
-
       'requirementRecords',
     ],
   };
+
+  if (params_cover) {
+    params = params_cover;
+  }
 
   return axi
     .get(api, { params })
@@ -400,7 +403,10 @@ const apiGetElectronicSupplies_id = (id: string) => {
     });
 };
 
-export const useElectronicSupplies_id = (id: string | undefined | null) => {
+export const useElectronicSupplies_id = (
+  id: string | undefined | null,
+  { params_cover }: { params_cover?: Tparams } = {}
+) => {
   const [isFetching, setIsFetching] = useState(false);
   const [res, setRes] = useState<TelectronicSuppliesDto>();
 
@@ -412,7 +418,7 @@ export const useElectronicSupplies_id = (id: string | undefined | null) => {
     setIsFetching(true);
 
     try {
-      const res = await apiGetElectronicSupplies_id(id);
+      const res = await apiGetElectronicSupplies_id(id, { params_cover });
       setRes(res);
     } catch (error) {
       const err = error as AxiosError;
@@ -526,8 +532,6 @@ export const apiPatchElectronicSuppliesRequirementRecord = (
     });
 };
 
-// /engineering/electronic-supplies/pick-up-record/{id}
-// TelectronicSuppliesPickupRecordDto
 const apiGetElectronicSuppliesPickupRecord_id = (id: string) => {
   const api = `/engineering/electronic-supplies/pick-up-record/${id}`;
 

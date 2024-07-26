@@ -7,6 +7,9 @@ import moment from 'moment';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
+// antd
+import { Select } from 'antd';
+
 // component
 import SupplyTable, {
   Tgroup,
@@ -19,9 +22,15 @@ import SupplyTable, {
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // api
-import { useGetElectronicSuppliesPickupRecord_id } from 'js/api/api_engineering';
+import {
+  //
+  useGetElectronicSuppliesPickupRecord_id,
+  useElectronicSupplies_id,
+  useGetElectronicSuppliesRequirementRecord_id,
+} from 'js/api/api_engineering';
 import { useGetContract_id } from 'js/api/api_quotation';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
@@ -77,6 +86,8 @@ export default function EditPickup() {
   const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
   const [state_info, setState_info] = useState<Tstate_info>(createEmptyStateInfo());
 
+  const [requirementRecordIdArr, setRequirementRecordIdArr] = useState<string[]>();
+
   // ------------------------------------------------------------------
 
   const { data: data_contract, update: update_contract } = useGetContract_id(contractId, {
@@ -95,7 +106,93 @@ export default function EditPickup() {
   const { electronicSuppliesId } = data_contract ?? {};
   const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
 
+  const {
+    data: data_electronicSupplies,
+    update: update_electronicSupplies,
+    isFetching: isFetching_electronicSupplies,
+  } = useElectronicSupplies_id(electronicSuppliesId, {
+    params_cover: {
+      populate: ['requirementRecords.requirementRecordDetails'],
+    },
+  });
+
+  // const { data: data_requirementRecord } = useGetElectronicSuppliesRequirementRecord_id(requirementRecordId);
+
   // ------------------------------------------------------------------
+
+  const defaultState = useMemo(() => {
+    const { pickupRecordDetails = [] } = data_pickup ?? {};
+
+    const list: { [key: string]: Tstate_electronicItem } = {};
+
+    pickupRecordDetails.forEach((detail) => {
+      const {
+        category,
+        itemName,
+        quantity,
+        unit,
+        //  code
+      } = detail;
+
+      list[category] = {
+        ...list[category], // 可能是undefined // 會將subItemName帶入
+        category,
+        itemName,
+        quantity,
+        unit,
+        // code,
+      };
+
+      //
+    });
+
+    // let stateInfo = createEmptyStateInfo();
+
+    // if (data_pickup) {
+    //   stateInfo = {
+    //     date: data_pickup.operationDate ? moment(data_pickup.operationDate) : null,
+    //     indexNumber: data_pickup.number,
+    //     picker: undefined,
+    //     preparer: data_pickup.takeOffEmployee || undefined,
+    //     doorModelName: data_pickup.doorType ?? '',
+    //   };
+    // }
+
+    return list;
+  }, [data_pickup]);
+
+  // const requirementState = useMemo(() => {
+  //   let requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
+
+  //   requirementRecords = requirementRecords.filter((record) => {
+  //     return requirementRecordIdArr?.includes(record.id);
+  //   });
+
+  //   const detailArr = requirementRecords
+  //     .flatMap((record) => record.requirementRecordDetails)
+  //     .filter((detail) => !!detail);
+
+  //   const list: { [key: string]: Tstate_electronicItem } = {};
+
+  //   detailArr.forEach((detail) => {
+  //     const { category, itemName, quantity, unit, code } = detail;
+
+  //     if (!list[category]) {
+  //       list[category] = {
+  //         category,
+  //         itemName,
+  //         quantity: quantity || 0,
+  //         unit,
+  //         code,
+  //       };
+  //     } else {
+  //       list[category].quantity! += quantity || 0;
+  //     }
+  //   });
+
+  //   return list;
+  // }, [data_electronicSupplies?.requirementRecords, requirementRecordIdArr]);
+
   // ------------------------------------------------------------------
 
   // region FUNCTION
@@ -111,6 +208,42 @@ export default function EditPickup() {
       };
     });
   };
+
+  const replaceState = () => {
+    let requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
+
+    requirementRecords = requirementRecords.filter((record) => {
+      return requirementRecordIdArr?.includes(record.id);
+    });
+
+    const detailArr = requirementRecords
+      .flatMap((record) => record.requirementRecordDetails)
+      .filter((detail) => !!detail);
+
+    const list: { [key: string]: Tstate_electronicItem } = {};
+
+    detailArr.forEach((detail) => {
+      const { category, itemName, quantity, unit, code } = detail;
+
+      const subItemName = itemName === '控制箱/盤' ? '捲門/水閘門' : undefined;
+
+      if (!list[category]) {
+        list[category] = {
+          category,
+          itemName,
+          quantity: quantity || 0,
+          unit,
+          code,
+          subItemName,
+        };
+      } else {
+        list[category].quantity! += quantity || 0;
+      }
+    });
+
+    setState_electronicItemList(list);
+  };
+
   // ------------------------------------------------------------------
 
   const groupArr = useStateToGroup(Object.values(state_electronicItemList), editItemQty);
@@ -118,7 +251,19 @@ export default function EditPickup() {
   // ------------------------------------------------------------------
   // region PROPS
 
-  // region PROPS
+  const requirementRecordOptions = useMemo(() => {
+    const requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
+
+    return requirementRecords.map((record) => {
+      return {
+        value: record.id,
+        label: record.number || '無單號',
+      };
+    });
+
+    //
+  }, [data_electronicSupplies?.requirementRecords]);
+
   const defaultSeletedDataArrArr: Parameters<typeof SelectorGroup>[0]['defaultSeletedDataArrArr'] = useMemo(() => {
     const arr01 = [];
 
@@ -187,46 +332,55 @@ export default function EditPickup() {
     update_contract();
   }, [contractId]);
 
+  // useEffect(() => {
+  //   if (!disabled && data_pickup) {
+  //     return;
+  //   }
+
+  //   const { pickupRecordDetails = [] } = data_pickup ?? {};
+
+  //   const list: { [key: string]: Tstate_electronicItem } = {};
+
+  //   pickupRecordDetails.forEach((detail) => {
+  //     const {
+  //       category,
+  //       itemName,
+  //       quantity,
+  //       unit,
+  //       //  code
+  //     } = detail;
+
+  //     list[category] = {
+  //       ...list[category], // 可能是undefined // 會將subItemName帶入
+  //       category,
+  //       itemName,
+  //       quantity,
+  //       unit,
+  //       // code,
+  //     };
+
+  //     //
+  //   });
+
+  //   let stateInfo = createEmptyStateInfo();
+
+  //   if (data_pickup) {
+  //     stateInfo = {
+  //       date: data_pickup.operationDate ? moment(data_pickup.operationDate) : null,
+  //       indexNumber: data_pickup.number,
+  //       picker: undefined,
+  //       preparer: data_pickup.takeOffEmployee || undefined,
+  //       doorModelName: data_pickup.doorType ?? '',
+  //     };
+  //   }
+
+  //   setState_electronicItemList(list);
+  //   setState_info(stateInfo);
+  // }, [disabled, data_pickup]);
   useEffect(() => {
     if (!disabled && data_pickup) {
       return;
     }
-
-    const {
-      // electronicSuppliesId,
-      // electronicSupplies,
-      // operationDate,
-      // agentEmployeeId,
-      // agentEmployee,
-      pickupRecordDetails = [],
-      // doorType,
-      // storageManagementPersonnel,
-      // storageManagementPersonnelId,
-      // number: idNumber,
-    } = data_pickup ?? {};
-
-    const list: { [key: string]: Tstate_electronicItem } = {};
-
-    pickupRecordDetails.forEach((detail) => {
-      const {
-        category,
-        itemName,
-        quantity,
-        unit,
-        //  code
-      } = detail;
-
-      list[category] = {
-        ...list[category], // 可能是undefined // 會將subItemName帶入
-        category,
-        itemName,
-        quantity,
-        unit,
-        // code,
-      };
-
-      //
-    });
 
     let stateInfo = createEmptyStateInfo();
 
@@ -240,18 +394,20 @@ export default function EditPickup() {
       };
     }
 
-    setState_electronicItemList(list);
     setState_info(stateInfo);
   }, [disabled, data_pickup]);
 
+  useEffect(() => {
+    if (disabled) {
+      setState_electronicItemList(defaultState);
+    }
+  }, [defaultState]);
+
   // ------------------------------------------------------------------
+  // MARK: RENDER
   return (
     <SubLayer>
-      <PageHeader
-        panelList={panelList}
-        //  contractNumber={contract?.contractNumber ?? '---'}
-        contractNumber={'foooo'}
-      />
+      <PageHeader panelList={panelList} contractNumber={data_contract?.contractNumber ?? '---'} />
 
       <div className={scss.container}>
         {/* info */}
@@ -336,6 +492,27 @@ export default function EditPickup() {
             }}
           /> */}
         </div>
+
+        {isNew && (
+          <div className={scss.selectBar}>
+            <Select
+              placeholder="請選擇需求單"
+              size="large"
+              className="w-96"
+              mode="multiple"
+              allowClear
+              options={requirementRecordOptions}
+              value={requirementRecordIdArr}
+              onChange={(value) => {
+                setRequirementRecordIdArr(value as string[]);
+              }}
+            />
+            <MyButton_v2 px="px22" py="py4" onClick={replaceState}>
+              代入需求單
+            </MyButton_v2>
+          </div>
+        )}
+
         {/* table */}
         <SupplyTable
           className="border border-border mt-10"

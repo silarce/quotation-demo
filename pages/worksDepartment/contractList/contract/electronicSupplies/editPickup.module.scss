@@ -8,3 +8,11 @@
   grid-template-columns: 230px auto;
   gap: 20px 134px;
 }
+
+.selectBar {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+
+  margin-top: 20px;
+}
