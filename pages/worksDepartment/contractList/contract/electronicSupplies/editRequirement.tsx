@@ -130,9 +130,6 @@ export default function EditRequirementRecord() {
   // region REQUIREST
 
   const reqPostPatch = async () => {
-    state_electronicItemList;
-    state_info;
-
     const {
       date,
       // indexNumber,
@@ -141,20 +138,6 @@ export default function EditRequirementRecord() {
       doorModelName,
       //  doorQty
     } = state_info;
-
-    const requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[] = Object.values(
-      state_electronicItemList
-    ).map((item) => {
-      const { id, category, itemName, quantity, unit, code, subItemName } = item;
-
-      return {
-        itemName,
-        category,
-        quantity,
-        unit,
-        code,
-      };
-    });
 
     if (!electronicSuppliesId) {
       myAlert.err({ title: '沒有electronicSuppliesId' });
@@ -172,6 +155,29 @@ export default function EditRequirementRecord() {
       myAlert.err({ title: '請選擇備料人員' });
 
       return;
+    }
+
+    let requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[] = Object.values(
+      state_electronicItemList
+    ).map((item) => {
+      const { id, category, itemName, quantity, unit, code, subItemName } = item;
+
+      return {
+        // 必須要送id，若id為undefined將會新增一筆detail
+        // 預期:新增時每一筆資料都沒有id、編輯時每一筆資料都有id，
+        id,
+        itemName,
+        category,
+        quantity,
+        unit,
+        code,
+      };
+    });
+
+    if (isNew) {
+      requirementRecordDetails = requirementRecordDetails.filter((details) => {
+        return !!details.quantity;
+      });
     }
 
     const body: TcreateElectronicSuppliesRequirementRecordDto & TupdateElectronicSuppliesRequirementRecordDto = {
@@ -292,6 +298,7 @@ export default function EditRequirementRecord() {
   useEffect(() => {
     update_doorModelList();
   }, []);
+
   useEffect(() => {
     update_contract();
   }, [contractId]);
@@ -309,18 +316,19 @@ export default function EditRequirementRecord() {
       // operationDate,
       // agentEmployeeId,
       // agentEmployee,
-      requirementRecordDetails = [],
+      requirementRecordDetails,
       // doorType,
       // storageManagementPersonnel,
       // storageManagementPersonnelId,
       // number: idNumber,
     } = data_requirementRecord ?? {};
 
-    requirementRecordDetails.forEach((detail) => {
-      const { category, itemName, quantity, unit, code } = detail;
+    requirementRecordDetails?.forEach((detail) => {
+      const { id: detailId, category, itemName, quantity, unit, code } = detail;
 
       defaultStateList[category] = {
         ...defaultStateList[category], // 可能是undefined // 會將subItemName帶入
+        id: detailId,
         category,
         itemName,
         quantity,
@@ -330,6 +338,16 @@ export default function EditRequirementRecord() {
 
       //
     });
+
+    // 若不是新增而是編輯
+    if (!isNew) {
+      // 將defaultStateList中所有沒有id的item刪掉
+      for (const [key, value] of Object.entries(defaultStateList)) {
+        if (!value.id) {
+          delete defaultStateList[key];
+        }
+      }
+    }
 
     let stateInfo = createEmptyStateInfo();
 
@@ -362,7 +380,7 @@ export default function EditRequirementRecord() {
         <div className={scss.info}>
           <InputSel
             caption="需求日期"
-            {...confit_inputSel}
+            {...config_inputSel}
             disabled={disabled}
             datePickerProps={{
               props: {
@@ -379,7 +397,7 @@ export default function EditRequirementRecord() {
           <InputSel
             key={state_info.indexNumber}
             caption="領料單號"
-            {...confit_inputSel}
+            {...config_inputSel}
             disabled={true}
             inputProps={{ props: { defaultValue: state_info.indexNumber } }}
           />
@@ -399,7 +417,7 @@ export default function EditRequirementRecord() {
 
           <InputSel
             caption="備料人員"
-            {...confit_inputSel}
+            {...config_inputSel}
             disabled={disabled}
             onClick={() => setShowSelector(true)}
             inputProps={{
@@ -411,7 +429,7 @@ export default function EditRequirementRecord() {
           />
           <InputSel
             caption="門型"
-            {...confit_inputSel}
+            {...config_inputSel}
             disabled={disabled}
             selectProps={{
               props: {
@@ -477,7 +495,7 @@ export default function EditRequirementRecord() {
 
 // ==================================================================
 
-const confit_inputSel: TinputSelProps = {
+const config_inputSel: TinputSelProps = {
   showBaseline: 'auto',
   captionStyle: { width: '80px' },
   wrapperStyle: { gap: '25px' },
