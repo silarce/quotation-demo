@@ -45,7 +45,7 @@ import {
   Tstate_electronicItem,
   Tstate_info,
   //
-  createEmployeeStateInfo,
+  createEmptyStateInfo,
 } from '.';
 import {
   //
@@ -102,7 +102,7 @@ export default function EditRequirementRecord() {
   // ------------------------------------------------------------------
 
   const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
-  const [state_info, setState_info] = useState<Tstate_info>(createEmployeeStateInfo());
+  const [state_info, setState_info] = useState<Tstate_info>(createEmptyStateInfo());
 
   // ------------------------------------------------------------------
 
@@ -331,7 +331,7 @@ export default function EditRequirementRecord() {
       //
     });
 
-    let stateInfo = createEmployeeStateInfo();
+    let stateInfo = createEmptyStateInfo();
 
     if (data_requirementRecord) {
       stateInfo = {

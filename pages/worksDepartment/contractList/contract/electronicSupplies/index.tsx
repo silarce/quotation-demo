@@ -419,7 +419,21 @@ const usePanelList = () => {
   //
   const panelList_supplyList: TpanelList = [];
   //
-  const panelList_pickupRecord: TpanelList = [];
+  const panelList_pickupRecord: TpanelList = [
+    {
+      type: 'addButton',
+      label: '新增領取單',
+      onClick: () =>
+        router.push({
+          pathname: `${router.pathname}/editRequirement`,
+          // query,
+          query: {
+            ...query,
+            contractId: contractId, // 確保要有contractId
+          },
+        }),
+    },
+  ];
   //
   const panelList_requirementRecord: TpanelList = [
     {
@@ -452,7 +466,7 @@ const usePanelList = () => {
 
 // ============================================================================
 
-const createEmployeeStateInfo = (): Tstate_info => ({
+const createEmptyStateInfo = (): Tstate_info => ({
   date: moment(),
   indexNumber: '',
   picker: undefined,
@@ -461,4 +475,4 @@ const createEmployeeStateInfo = (): Tstate_info => ({
   // doorQty: '',
 });
 
-export { createEmployeeStateInfo };
+export { createEmptyStateInfo };
