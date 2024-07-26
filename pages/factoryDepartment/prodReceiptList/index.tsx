@@ -27,6 +27,9 @@ import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
 import icon_search from 'public/image/icon/search.svg';
+import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
+import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
+
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -52,7 +55,9 @@ export default function ProdReceiptList() {
         supplieraddress,
         supplierphone,
         invoice,
-        status
+        status,
+        entrystatus,
+        paystatus
     } = router.query;
 
 
@@ -69,6 +74,7 @@ export default function ProdReceiptList() {
     const { userInfo } = useContext(AppContext);
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
+    const [datarestore, setDatarestore] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
     const [data2, setData2] = useState<any[]>([]);
     const [data2restore, setData2Restore] = useState<any[]>([]);
@@ -79,6 +85,7 @@ export default function ProdReceiptList() {
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
     const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
+    const [addprodentrybtn, setAddprodentrybtn] = useState<boolean>(true);
 
 
     const [inspectedin, setInspectedin] = useState<string>("");
@@ -95,7 +102,15 @@ export default function ProdReceiptList() {
     const [supplieraddressin, setSupplieraddressin] = useState<string>("");
     const [supplierphonein, setSupplierphonein] = useState<string>("");
     const [statusin, setStatusin] = useState<string>("");
+    const [invoicein, setInvoicein] = useState<string>("");
+    const [entrystatusin, setEntrystatusin] = useState<string>("");
+    const [paystatusin, setPaystatusin] = useState<string>("");
 
+
+    //搜尋
+    const [keyword1, setKeyword1] = useState<string>("");
+    const [keyword2, setKeyword2] = useState<string>("");
+    const [keyword3, setKeyword3] = useState<string>("");
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -103,6 +118,11 @@ export default function ProdReceiptList() {
     const [totalprice, setTotalPrice] = useState<string>("");
     const [taxprice, setTaxPrice] = useState<string>("");
     const [totalpayprice, setTotalPayPrice] = useState<string>("");
+
+    //入庫總數
+    const [totalentry, setTotalentry] = useState<string>("");
+    //入庫進度
+    const [completeentry, setCompleteentry] = useState<number>(0);
 
     // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
     const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
@@ -129,10 +149,7 @@ export default function ProdReceiptList() {
 
     //搜尋功能
     const doSearch = (valueArr: (string | Toption | null)[]) => {
-        const keywordWhpname = valueArr[0] as string;
-        const keywordMaterialnumber = valueArr[1] as string;
-        const keywordSpec = valueArr[2] as string;
-        searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
+
     };
 
     // 搜尋功能
@@ -141,15 +158,18 @@ export default function ProdReceiptList() {
         doSearch,
     };
 
-    const searchData = async (keywordWhpname: string, keywordMaterialnumber: string, keywordSpec: string) => {
+    const searchData = async (keyword1: string, keyword2: string, keyword3: string) => {
         try {
+            if (keyword1 === "" && keyword2 === "" && keyword3 === "") {
+                setData(datarestore);
+                return;
+            }
             // keywordSpec
-            const conditionModel: { keywordWhpname: string | undefined, keywordMaterialnumber: string | undefined, keywordSpec: string | undefined } = {
-                keywordWhpname: keywordWhpname as string | undefined,
-                keywordMaterialnumber: keywordMaterialnumber as string | undefined,
-                keywordSpec: keywordSpec as string | undefined,
+            const conditionModel: { keyword1: string | undefined, keyword2: string | undefined, keyword3: string | undefined } = {
+                keyword1: getTaiwanDateStr(keyword1) as string | undefined,
+                keyword2: keyword2 as string | undefined,
+                keyword3: keyword3 as string | undefined
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -161,20 +181,19 @@ export default function ProdReceiptList() {
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
             //erpAPI
-            const response = await fetch(`${setting.apipath}SearchMaterialById?${queryParams}`);
+            const response = await fetch(`${setting.apipath}SearchProdReceiptById?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             let data = await response.json();
             setData(data);
-            data = _.uniqBy(data, (item: any) => item.whname + item.trayname); // 去重
-            setData1(data);
 
 
         } catch (error: any) {
             setError(error.message);
         }
     };
+
 
 
 
@@ -224,10 +243,10 @@ export default function ProdReceiptList() {
             }
             const data = await response.json();
             setData(data);
+            setDatarestore(data);
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
-                console.log(data[0].receipted);
                 getProdReceiptDetail(data[0].prodreceiptuuid);
                 // GetProdReceiptDetailByPurchaseOrderId(data[0].prodreceiptuuid);
                 setCreate_atin(data[0].create_at);
@@ -244,13 +263,12 @@ export default function ProdReceiptList() {
                 setSupplieraddressin(data[0].supplieraddress);
                 setStatusin(data[0].status);
                 setSupplierphonein(data[0].supplierphone);
+                setInvoicein(data[0].invoice);
+                setEntrystatusin(data[0].entry_status);
+                setPaystatusin(data[0].pay_status);
             }
         } catch (error: any) {
             setError("getProdReceipt:" + error.message);
-            // myAlert.err({
-            //     title:'getProdReceipt',
-            //     content:error.message
-            // })
         }
         finally {
             setIsLoading(false);
@@ -261,7 +279,7 @@ export default function ProdReceiptList() {
         getProdReceipt();
     }, []);
 
-    //取對應的採購明細
+    //取對應的進貨明細
     const getProdReceiptDetail = async (prodreceiptuuid: any) => {
         try {
             setIsLoading(true);
@@ -298,6 +316,25 @@ export default function ProdReceiptList() {
             setTaxPrice(taxPrice.toLocaleString());
             const totalPayPrice = totalprice + taxPrice;
             setTotalPayPrice(totalPayPrice.toLocaleString());
+
+            // 進貨進度
+            let totalentry = data.length; // 總數量
+            let completeentry = 0; // 完成數量
+
+            data.forEach((element: any) => {
+                // 將 alreadyinquantity 和 quantity 轉換為整數
+                const alreadyInQuantity = parseInt(element.alreadyinquantity, 10);
+                const quantity = parseInt(element.quantity, 10);
+
+                if (!isNaN(alreadyInQuantity) && !isNaN(quantity) && alreadyInQuantity >= quantity) {
+                    completeentry += 1;
+                }
+            });
+            setTotalentry(totalentry);
+            setCompleteentry(completeentry);
+
+
+
         } catch (error: any) {
             setError("getProdReceiptDetail:" + error.message);
         }
@@ -309,6 +346,13 @@ export default function ProdReceiptList() {
     // 確保 getPurchaseOrderDetail 的 useEffect 中的依賴項設置正確
     useEffect(() => {
         if (prodreceiptuuid) {
+            if (prodreceiptuuidin != prodreceiptuuid) {
+                setData2([]);
+            }
+            // getProdReceiptDetail(prodreceiptuuid);
+            // if (prodreceiptdetailuuid) {
+            //     GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid, purchaseorderdetailuuid);
+            // }
             getProdReceiptDetail(prodreceiptuuid);
             // GetProdReceiptDetailByPurchaseOrderId(prodreceiptuuid);
             setPurchaseorderidin(purchaseorderid as string);
@@ -325,19 +369,23 @@ export default function ProdReceiptList() {
             setSupplieraddressin(supplieraddress as string);
             setStatusin(status as string);
             setSupplierphonein(supplierphone as string);
+            setInvoicein(invoice as string);
+            setEntrystatusin(entrystatus as string);
+            setPaystatusin(paystatus as string);
         }
     }, [prodreceiptuuid]);
 
-    //取已對應採購單的已進貨明細
-    const GetProdReceiptDetailByPurchaseOrderId = async (prodreceiptuuid: any) => {
+    //取已對應進貨單的已入庫單
+    const GetProdEntryDetailByProdReceiptId = async (prodreceiptuuid: any, prodreceiptdetailuuid: any) => {
         try {
             setIsLoading(true);
             const conditionModel: {
-                prodreceiptuuid: string | undefined
+                prodreceiptuuid: string | undefined,
+                prodreceiptdetailuuid: string | undefined
             } = {
                 prodreceiptuuid: prodreceiptuuid as string | undefined,
+                prodreceiptdetailuuid: prodreceiptdetailuuid as string | undefined
             };
-
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -347,33 +395,50 @@ export default function ProdReceiptList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProdReceiptDetailByPurchaseOrderId?${queryParams}`);
+            const response = await fetch(`${setting.apipath}GetProdEntryDetailByProdReceiptId?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            setData2(data);
+            setData2(prevData2 => {
+                // 创建一个 Set 来存储现有 ID
+                const existingIds = new Set(prevData2.map(item => item.id));
+
+                // 过滤掉重复项
+                const newItems = data.filter((item: { id: string; }) => !existingIds.has(item.id));
+
+                // 将非重复的新项添加到 prevData2 中
+                const updatedData = [...prevData2, ...newItems];
+
+                // 调用 handleAddProdEntry 更新按钮状态
+                handleAddProdEntry(updatedData);
+
+                return updatedData;
+            });
 
         } catch (error: any) {
             setError(error.message);
-        }
-        finally {
+        } finally {
             setIsLoading(false);
         }
     };
 
-
-    const TransferPurchaseOrderToProductReceipt = async () => {
+    // 進貨單入庫
+    const TransferProdReceiptToProdEntry = async () => {
         try {
+            // return;
             setIsLoading(true);
-            const conditionModel: {
-                purchaseorderuuid: string | undefined,
-                data: any
-            } = {
-                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
-                data: data2
-            };
 
+
+            const conditionModel: {
+                prodreceiptuuid: string | undefined,
+                data: any,
+                username: string | undefined
+            } = {
+                prodreceiptuuid: checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid as string | undefined,
+                data: data2,
+                username: userInfo?.username as string | undefined
+            };
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -382,54 +447,32 @@ export default function ProdReceiptList() {
                 FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}TransferPurchaseOrderToProductReceipt?${queryParams}`);
+            const response = await fetch(`${setting.apipath}TransferProdReceiptToProdEntry`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                throw new Error('Failed to fetch data11111');
             }
-            const data = await response.json();
+
+            const responseData = await response.json();
+            myAlert.info(
+                {
+                    title: '單據新增成功',
+                    content: `進貨單號為:${responseData}`
+                })
+
+            setData2([]);
             getProdReceipt();
 
-            getProdReceiptDetail(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
-
-            GetProdReceiptDetailByPurchaseOrderId(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-
-    //結案
-    const ClosePO = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel: {
-                purchaseorderuuid: string | undefined
-            } = {
-                purchaseorderuuid: checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid as string | undefined,
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}ClosePO?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            getProdReceipt();
-
-            getProdReceiptDetail(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
+            getProdReceiptDetail(prodreceiptuuidin);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            setEntrystatusin("入庫中");
+            // GetProdEntryDetailByProdReceiptId(checkfirstin === 0 ? prodreceiptuuidin : prodreceiptuuid);
 
         } catch (error: any) {
             setError(error.message);
@@ -460,20 +503,6 @@ export default function ProdReceiptList() {
         });
     }
 
-    function handleClosePO() {
-        myAlert.confirm({
-            title: '確定結案?',
-            content: <>
-                <h1>轉為結案後將無法更改</h1>
-            </>,
-            props: {
-                onOk: () => {
-                    ClosePO();
-                }
-            }
-        });
-    }
-
     // 編輯狀態控制
     // 一次只提供編輯一列
     const handleEditStatus = (index: number) => {
@@ -491,13 +520,7 @@ export default function ProdReceiptList() {
     const handleRemove = (index: number) => {
         const updatedData = data2.filter((_, i) => i !== index);
         setData2(updatedData);
-        // setData2(prevState => {
-        //     // 複製 prevState 以避免直接修改原始狀態
-        //     const updatedData = [...prevState];
-        //     // 移除指定索引的項目
-        //     updatedData.splice(index, 1);
-        //     return updatedData;
-        // });
+        handleAddProdEntry(updatedData); // 在删除后检查并更新按钮状态
     };
 
 
@@ -523,7 +546,7 @@ export default function ProdReceiptList() {
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
-        // searchData(keyword1, keyword2)
+        searchData(keyword1, keyword2, keyword3);
         // alert(keyword1);
         // alert(keyword2);
         // alert(keyword3);
@@ -531,32 +554,180 @@ export default function ProdReceiptList() {
     };
 
 
+    function handleTransfer() {
+        if (editstatus === true) {
+            myAlert.warning({ title: "請先結束編輯狀態" });
+        }
+        else {
+            myAlert.confirm({
+                title: '確定要轉為入庫單嗎?',
+                content: <>
+                    <h1>請確認數量是否正確</h1>
+                </>,
+                props: {
+                    onOk: () => {
+                        TransferProdReceiptToProdEntry();
+                    }
+                }
+            });
+        }
+    }
+
+    const handleAddProdEntry = (data: any) => {
+        let shouldDisable = false; // 默认情况下，新增入庫按钮是启用的
+
+        for (let i = 0; i < data.length; i++) {
+            const alreadyInQuantity = parseFloat(data[i].alreadyinquantity); // 将 alreadyinquantity 转换为数字类型
+            const quantity = parseFloat(data[i].quantity); // 将 quantity 转换为数字类型
+
+            // 如果有任何一项 alreadyinquantity 等于 quantity，则应禁用新增入庫按钮
+            if (!isNaN(alreadyInQuantity) && !isNaN(quantity) && alreadyInQuantity === quantity) {
+                shouldDisable = true;
+                break; // 找到符合条件的项就可以退出循环了
+            }
+
+            // 如果有任何一项 alreadyinquantity 大于 quantity，则应禁用新增入庫按钮
+            if (!isNaN(alreadyInQuantity) && !isNaN(quantity) && alreadyInQuantity > quantity) {
+                shouldDisable = true;
+                break; // 找到符合条件的项就可以退出循环了
+            }
+        }
+
+        // 在这里输出 addprodentrybtn 的状态，看看是否正确
+        console.log("shouldDisable:", shouldDisable);
+
+        setAddprodentrybtn(!shouldDisable); // 根据 shouldDisable 的值来设置 addprodentrybtn 的状态
+    };
+
+    // useEffect(() => {
+    //     console.log(addprodentrybtn);
+    // }, [addprodentrybtn]);
+
+    const sentPREToReview = async (type: any) => {
+        try {
+            setIsLoading(true);
+            const conditionModel: {
+                type: string | undefined,
+                prodreceiptuuid: string | undefined,
+                username: string | undefined
+            } = {
+                type: type,
+                prodreceiptuuid: prodreceiptuuidin as string | undefined,
+                username: userInfo?.username as string | undefined
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}sentPREToReview?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            // setData(data);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            getProdReceipt();
+            getProdReceiptDetail(prodreceiptuuidin);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            // setStatusin(type);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
+
+
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={'進貨單'} panelList={panelList} />
             <div className={scss.container}>
-                <div className={scss.left} style={{ display: `${leftbaropen === false ? '' : 'none'}` }}>
+                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
                     <div className={scss.content}>
-                        <hr />
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            position: 'sticky',
+                            top: 0,
+                            backgroundColor: '#fff',
+                            zIndex: 1000,
+                        }}>
+                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
+                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                    <InputSel
+                                        caption="進貨日期"
+                                        disabled={false}
+                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                        datePickerProps={{
+                                            props: {
+                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
+                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="進貨單號"
+                                        disabled={false}
+                                        inputProps={{
+                                            props: {
+                                                value: keyword2 ? keyword2 : ' ',
+                                                onChange: (e) => { setKeyword2(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="單據狀態"
+                                        disabled={false}
+                                        inputProps={{
+                                            props: {
+                                                value: keyword3 ? keyword3 : ' ',
+                                                onChange: (e) => { setKeyword3(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div style={{ textAlign: 'right', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
+                                    <button className={scss.minibtn} type="submit">搜尋</button>
+                                </div>
+                                <div>
+                                    <Thead01 type={'ProdReceipt'} />
+                                </div>
+                            </form>
+                        </div>
+                        {/* <hr /> */}
                         <div>
-                            <Thead01 type={'ProdReceipt'} />
+                            {/* <Thead01 type={'ProdReceipt'} /> */}
                             <Tbody01 type={'ProdReceipt'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         </div>
                     </div>
                 </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
-                        {/* <div>
-                            <span style={{ fontSize: '25px', fontWeight: 'bolder', color: '#14256a'}}>
-                                採購單
-                            </span>
-                            <span style={{ display: (checkfirstin === 0 ? inspectedin : inspected) === "false" ? "" : "none" }}>
-                                <MyButton_v2 px='px22' py='py4' theme='danger' label="未驗收" onClick={() => { handleClosePO() }} />
-                            </span>
-                            <span style={{ display: (checkfirstin === 0 ? inspectedin : inspected) === "true" ? "" : "none" }}>
-                                <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="已驗收" />
-                            </span>
-                        </div> */}
+                        <div className={scss.head_head1}>
+                            <div>
+                                <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                </button>
+                            </div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
 
                         <div className={scss.head_content1}>
                             <div>
@@ -588,36 +759,6 @@ export default function ProdReceiptList() {
                                     inputProps={{
                                         props: {
                                             value: checkfirstin === 0 ? create_byin : create_by,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: statusin,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="廠商名稱"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? suppliernamein : suppliername,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="廠商地址"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
                                         },
                                     }}
                                 />
@@ -653,7 +794,74 @@ export default function ProdReceiptList() {
                                         },
                                     }}
                                 />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: statusin,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="入庫狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: entrystatusin,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="請付狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: paystatusin,
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </div>
 
+                        <div className={scss.head_content2}>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商名稱"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: suppliernamein ? suppliernamein : ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商地址"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
+                                        },
+                                    }}
+                                />                                <InputSel
+                                    {...inputSelProps}
+                                    caption="聯絡電話"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: supplierphonein ? supplierphonein : ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="統一編號"
@@ -664,79 +872,19 @@ export default function ProdReceiptList() {
                                         },
                                     }}
                                 />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="聯絡電話"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: supplierphonein ? supplierphone : ' ',
-                                        },
-                                    }}
-                                />
-                                {/* <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                /> */}
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
                                 <InputSel
                                     {...inputSelProps}
                                     caption="發票號碼"
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: invoice ? invoice : ' ',
+                                            value: invoicein ? invoicein : ' ',
                                         },
                                     }}
                                 />
                             </div>
-                        </div>
-
-                        <div className={scss.head_content2}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
                         </div>
                         <div className={scss.head_content3}>
                             <div></div>
@@ -748,28 +896,77 @@ export default function ProdReceiptList() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: "right" }}>
-                                <span >
-                                    <button className={scss.redbtn} onClick={() => { alert("結案") }}>結案</button>
+                                <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin!="已結案") ? '' : 'none'}` }}>
+                                    <button className={scss.redbtn} onClick={() => { alert((completeentry >= parseInt(totalentry, 10)).toString()); }}>結案</button>
+                                </span>
+                                <span style={{ display: `${(entrystatusin != "已入庫" || paystatusin != "已請付") ? '' : 'none'}` }}>
+                                    <button className={scss.disabledbtn}>未結案</button>
+                                </span>
+                                <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin==="已結案") ? '' : 'none'}` }}>
+                                    <button className={scss.disabledbtn} >已結案</button>
                                 </span>
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
                             <div>
-                                <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    進貨查詢
-                                </button>
+
                             </div>
-                            <div></div>
-                            <div></div>
+                            <div>
+
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="入庫進度"
+                                    className='align-bottom'
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: `${completeentry}/${totalentry}`
+                                        },
+                                    }}
+                                />
+                            </div>
                             <div></div>
                         </div>
                         <div className={scss.body_content1}>
                             <Thead01 type={'ProdReceiptDetail'} />
-                            <Tbody01 type={'ProdReceiptDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            {/* <Tbody01 type={'ProdReceiptDetail'} data={data1} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
+                            {data1 && (
+                                data1.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader14}>
+                                        <div className={scss.row01}>
+                                            <span>{index + 1}</span>
+                                            <span>{_item.productid}</span>
+                                            <span>{_item.name}</span>
+                                            <span>{_item.spec}</span>
+                                            <span style={{ color: '#ea1833' }}>{_item.alreadyinquantity}</span>
+                                            <span>{_item.quantity}</span>
+                                            <span>{_item.unit}</span>
+                                            <span>{_item.unitprice.toLocaleString()}</span>
+                                            <span>{_item.totalprice.toLocaleString()}</span>
+                                            <span>
+                                                <button onClick={() => { GetProdEntryDetailByProdReceiptId(_item.prodreceiptuuid, _item.id) }}>
+                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                                </button>
+                                                {/* <button style={{ display: `${(statusin === "採購中") ? '' : 'none'}` }} onClick={() => { alert("OK") }}>
+                                                    <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
+                                                </button> */}
+                                                {/* <button style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                                    <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
+                                                </button> */}
+                                            </span>
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
                         </div>
                         <br />
                         <div className={scss.body_foot1}>
-                            <div></div>
+                            <div>
+                                (1).轉入庫單進行入庫<br />
+                                (2).轉付款申請單請附款項。
+                            </div>
                             <div></div>
                             <div>
                                 <table className={scss.count_table}>
@@ -803,26 +1000,39 @@ export default function ProdReceiptList() {
                                 <MyButton_v2 px='px22' py='py4' theme={undefined} label="驗收入庫" onClick={handleReceipt} />&nbsp;&nbsp;
                                 <MyButton_v2 px='px22' py='py4' theme='danger' label="退貨單" onClick={handleReceipt} />
                             </span> */}
+                                <span style={{ display: `${(data2.length > 0 && addprodentrybtn) ? '' : 'none'}` }}>
+                                    <button className={scss.redbtn} onClick={() => { handleTransfer() }}>新增入庫</button>
+                                </span>
+                                <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) || data2.length > 0 ? 'none' : ''}` }}>
+                                    <button className={scss.disabledbtn}>新增入庫</button>
+                                </span>
+                                <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) ? '' : 'none'}` }}>
+                                    <button className={scss.disabledbtn}>轉入庫中</button>
+                                </span>
+                                {/* <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) && entrystatusin === "已入庫" ? '' : 'none'}` }}>
+                                    <button className={scss.disabledbtn}>入庫完畢</button>
+                                </span> */}
                             </div>
                             <div></div>
-                            <div></div>
+                            <div>
+                            </div>
                             <div style={{ textAlign: 'right' }}>
-                                <span>
-                                    <button className={scss.redbtn} onClick={() => { alert("新增付款單") }}>新增付款</button>
+
+                                <span style={{ display: `${(data2.length > 0  ? '' : 'none')}` }}>
+                                    <button className={scss.redbtn} onClick={() => { alert("comming soon") }}>新增付款</button>
                                 </span>
-                                &nbsp;
-                                {/* <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}> */}
-                                <span>
-                                    <button className={scss.redbtn} onClick={() => { alert("新增入庫單") }}>新增入庫</button>
+                                <span style={{ display: `${(data2.length > 0 ? 'none' : '')}` }}>
+                                    <button className={scss.disabledbtn}>新增付款</button>
                                 </span>
+
                             </div>
                         </div>
 
                         <div className={scss.foot_content1}>
 
-                            <Thead01 type={'PurchaseOrderDetail2'} />
+                            <Thead01 type={'ProdReceiptDetail2'} />
                             {data2.map((_item, index) => (
-                                <CellWithBar key={index} className={scss.panelHeader11}>
+                                <CellWithBar key={index} className={scss.panelHeader13}>
                                     <div className={scss.row01}>
                                         <span>{index + 1}</span>
                                         <span>{_item.productid}</span>
@@ -839,7 +1049,11 @@ export default function ProdReceiptList() {
                                                 readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     const newData = [...data2];
-                                                    const newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                    let newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                                                    // 如果新數量超過最大數量，設置為最大數量
+                                                    if (newQuantity > _item.maxquantity) {
+                                                        newQuantity = _item.maxquantity;
+                                                    }
                                                     newData[index] = {
                                                         ...newData[index],
                                                         quantity: newQuantity,
@@ -853,10 +1067,11 @@ export default function ProdReceiptList() {
                                         <span>
                                             <input
                                                 ref={unitpriceRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                style={{ backgroundColor: 'transparent', width: '80px' }}
                                                 type="text"
                                                 value={_item.unitprice.toLocaleString()}
-                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly
                                                 onChange={(e) => {
                                                     const newData = [...data2];
                                                     const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
