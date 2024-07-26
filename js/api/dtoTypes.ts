@@ -3180,20 +3180,23 @@ export type TelectronicSuppliesRequirementRecordDto = {
   agentEmployee?: TemployeeDto;
   // 需求明細
   requirementRecordDetails?: TelectronicSuppliesRequirementRecordDetailDto[];
+  //
+  doorType: string | null;
+  storageManagementPersonnel?: TemployeeDto | null;
+  storageManagementPersonnelId: string | null;
 };
 
 export type TcreateElectronicSuppliesRequirementRecordDto = Pick<
   TelectronicSuppliesRequirementRecordDto,
-  'operationDate'
+  'operationDate' | 'doorType'
 > & {
-  // takeOffEmployeeId: string;
+  storageManagementPersonnelId: string;
   requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
 };
 
 export type TupdateElectronicSuppliesRequirementRecordDto = Pick<
   TcreateElectronicSuppliesRequirementRecordDto,
-  'operationDate'
-  // | 'takeOffEmployeeId'
+  'operationDate' | 'storageManagementPersonnelId' | 'doorType'
 > & {
   requirementRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
 };

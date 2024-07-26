@@ -66,9 +66,11 @@ import type {
   TelectronicSuppliesRequirementRecordDetailDto,
   TelectronicSuppliesPickupRecordDto,
   TelectronicSuppliesPickupRecordDetailDto,
+  TcreateElectronicSuppliesRequirementRecordDto,
 
   //
   TupdateAccountReceivableAccountantDto,
+  TcreateElectronicSuppliesRecordDetailDto,
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
@@ -133,6 +135,9 @@ export type {
   TelectronicSuppliesPickupRecordDetailDto,
   //
   TupdateAccountReceivableAccountantDto,
+  //
+  TcreateElectronicSuppliesRequirementRecordDto,
+  TcreateElectronicSuppliesRecordDetailDto,
 } from './dtoTypes';
 
 export type { TinvouceCheckResult };
@@ -429,7 +434,7 @@ const apiGetElectronicSuppliesRequirementRecord_id = (requirementRecordId: strin
   const api = `/engineering/electronic-supplies/requirement-record/${requirementRecordId}`;
 
   const params = {
-    populate: ['agentEmployee', 'requirementRecordDetails'],
+    populate: ['agentEmployee', 'requirementRecordDetails', 'storageManagementPersonnel'],
   };
 
   return axi
@@ -478,6 +483,25 @@ export const useGetElectronicSuppliesRequirementRecord_id = (
     update,
     isFetching,
   };
+};
+
+export const apiPostElectronicSuppliesRequirementRecord = (
+  electronicSupplyid: string,
+  body: TcreateElectronicSuppliesRequirementRecordDto
+) => {
+  const api = `/engineering/electronic-supplies/${electronicSupplyid}/requirement-record`;
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((error: AxiosError<TapiError>) => {
+      myAlert.err({
+        title: '新增送電備品需求單失敗',
+        content: error.response?.data?.message || error.message,
+      });
+
+      return Promise.reject(error);
+    });
 };
 
 // endregion 送電備品

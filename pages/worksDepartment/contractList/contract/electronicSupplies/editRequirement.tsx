@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import _ from 'lodash';
+import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -19,13 +20,23 @@ import SupplyTable, {
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import scss from './editRequirement.module.scss';
 
 // api
-import { useGetElectronicSuppliesRequirementRecord_id } from 'js/api/api_engineering';
+import {
+  TcreateElectronicSuppliesRequirementRecordDto,
+  TcreateElectronicSuppliesRecordDetailDto,
+  //
+  apiPostElectronicSuppliesRequirementRecord,
+  //
+  useGetElectronicSuppliesRequirementRecord_id,
+} from 'js/api/api_engineering';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
+
+import { useGetContract_id } from 'js/api/api_quotation';
 
 // type
 import {
@@ -44,6 +55,7 @@ import {
 
 // ==================================================================
 type Tquery = {
+  contractId: string | undefined;
   requirementRecordId: string | undefined;
 };
 
@@ -53,14 +65,14 @@ type TstateList = {
 
 // ==================================================================
 
-const SelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
+const SelectorGroup = selectModalCreator_multi<['employee']>({
   selectorArr: [
-    {
-      key: 'employee',
-      caption: '領料人員',
-      tip: '單選',
-      limit: 1,
-    },
+    // {
+    //   key: 'employee',
+    //   caption: '領料人員',
+    //   tip: '單選',
+    //   limit: 1,
+    // },
     {
       key: 'employee',
       caption: '備料人員',
@@ -76,7 +88,7 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
 
 export default function EditRequirementRecord() {
   const router = useRouter();
-  const { requirementRecordId } = router.query as Tquery;
+  const { contractId, requirementRecordId } = router.query as Tquery;
   const isNew = !requirementRecordId;
 
   // ------------------------------------------------------------------
@@ -85,15 +97,19 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
-  // const [employee00, setEmployee00] = useState<TemployeeDto>();
-  // const [employee01, setEmployee01] = useState<TemployeeDto>();
-
   // ------------------------------------------------------------------
 
   const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
   const [state_info, setState_info] = useState<Tstate_info>(createEmployeeStateInfo());
 
   // ------------------------------------------------------------------
+
+  const { data: data_contract, update: update_contract } = useGetContract_id(contractId, {
+    // customPopulate: [
+    //   //
+    //   'engineeringContact',
+    // ],
+  });
 
   const {
     data: data_requirementRecord,
@@ -103,7 +119,72 @@ export default function EditRequirementRecord() {
     autoUpdate: !isNew,
   });
 
+  const { electronicSuppliesId } = data_contract ?? {};
+
   const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
+
+  // ------------------------------------------------------------------
+
+  // region REQUIREST
+
+  const reqPost = async () => {
+    state_electronicItemList;
+    state_info;
+
+    const {
+      date,
+      // indexNumber,
+      // picker,
+      preparer,
+      doorModelName,
+      //  doorQty
+    } = state_info;
+
+    const requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[] = Object.values(
+      state_electronicItemList
+    ).map((item) => {
+      const { id, category, itemName, quantity, unit, code, subItemName } = item;
+
+      return {
+        itemName,
+        category,
+        quantity,
+        unit,
+        code,
+      };
+    });
+
+    if (!electronicSuppliesId) {
+      myAlert.err({ title: '沒有electronicSuppliesId' });
+
+      return;
+    }
+
+    if (!date) {
+      myAlert.err({ title: '請設定需求日期' });
+
+      return;
+    }
+
+    if (!preparer) {
+      myAlert.err({ title: '請選擇備料人員' });
+
+      return;
+    }
+
+    const body: TcreateElectronicSuppliesRequirementRecordDto = {
+      operationDate: date?.toISOString(),
+      storageManagementPersonnelId: preparer.id,
+      doorType: doorModelName || null,
+      requirementRecordDetails,
+    };
+
+    // apiPostElectronicSuppliesRequirementRecord
+    await apiPostElectronicSuppliesRequirementRecord(electronicSuppliesId, body).then(() => {
+      setDisabled(true);
+    });
+    // .catch(() => {});
+  };
 
   // ------------------------------------------------------------------
 
@@ -129,13 +210,16 @@ export default function EditRequirementRecord() {
 
   // region PROPS
   const defaultSeletedDataArrArr: Parameters<typeof SelectorGroup>[0]['defaultSeletedDataArrArr'] = useMemo(() => {
-    const arr01 = [];
+    // const arr01 = [];
     const arr02 = [];
 
-    state_info.picker && arr01.push(state_info.picker);
+    // state_info.picker && arr01.push(state_info.picker);
     state_info.preparer && arr02.push(state_info.preparer);
 
-    return [arr01, arr02];
+    return [
+      // arr01,
+      arr02,
+    ];
   }, [state_info.picker, state_info.preparer]);
 
   const panelList_disabled: TpanelList = [
@@ -176,9 +260,7 @@ export default function EditRequirementRecord() {
     {
       type: 'redButton',
       label: '上傳',
-      onClick: () => {
-        alert('上傳');
-      },
+      onClick: reqPost,
     },
     {
       type: 'myButton',
@@ -197,6 +279,7 @@ export default function EditRequirementRecord() {
 
   useEffect(() => {
     update_doorModelList();
+    update_contract();
   }, []);
 
   useEffect(() => {
@@ -206,7 +289,17 @@ export default function EditRequirementRecord() {
 
     const { defaultStateList } = createDefaultState();
 
-    const { requirementRecordDetails = [] } = data_requirementRecord ?? {};
+    const {
+      electronicSuppliesId,
+      electronicSupplies,
+      operationDate,
+      agentEmployeeId,
+      agentEmployee,
+      requirementRecordDetails = [],
+      doorType,
+      storageManagementPersonnel,
+      storageManagementPersonnelId,
+    } = data_requirementRecord ?? {};
 
     requirementRecordDetails.forEach((detail) => {
       const { category, itemName, quantity, unit, code } = detail;
@@ -223,8 +316,20 @@ export default function EditRequirementRecord() {
       //
     });
 
+    let stateInfo = createEmployeeStateInfo();
+
+    if (data_requirementRecord) {
+      stateInfo = {
+        date: data_requirementRecord.operationDate ? moment(data_requirementRecord.operationDate) : null,
+        indexNumber: '',
+        picker: undefined,
+        preparer: data_requirementRecord.storageManagementPersonnel || undefined,
+        doorModelName: data_requirementRecord.doorType ?? '',
+      };
+    }
+
     setState_electronicItemList(defaultStateList);
-    setState_info(createEmployeeStateInfo());
+    setState_info(stateInfo);
   }, [disabled, data_requirementRecord]);
 
   // ------------------------------------------------------------------
@@ -265,7 +370,8 @@ export default function EditRequirementRecord() {
             disabled={disabled}
             inputProps={{ props: { defaultValue: state_info.indexNumber } }}
           />
-          <InputSel
+
+          {/* <InputSel
             caption="領料人員"
             {...confit_inputSel}
             disabled={disabled}
@@ -276,7 +382,8 @@ export default function EditRequirementRecord() {
                 value: state_info.picker?.chName ?? '',
               },
             }}
-          />
+          /> */}
+
           <InputSel
             caption="備料人員"
             {...confit_inputSel}
@@ -304,8 +411,7 @@ export default function EditRequirementRecord() {
               },
             }}
           />
-          <InputSel
-            //
+          {/* <InputSel
             caption="樘數"
             {...confit_inputSel}
             disabled={disabled}
@@ -319,7 +425,7 @@ export default function EditRequirementRecord() {
                 },
               },
             }}
-          />
+          /> */}
         </div>
         {/* table */}
         <SupplyTable
@@ -335,12 +441,14 @@ export default function EditRequirementRecord() {
         showModal={showSelector}
         defaultSeletedDataArrArr={defaultSeletedDataArrArr}
         onConfirm={(arr) => {
-          const picker = arr[0][0] as TemployeeDto | undefined;
-          const preparer = arr[1][0] as TemployeeDto | undefined;
+          // const picker = arr[0][0] as TemployeeDto | undefined;
+          // const preparer = arr[1][0] as TemployeeDto | undefined;
+
+          const preparer = arr[0][0] as TemployeeDto | undefined;
 
           setState_info((state) => ({
             ...state,
-            picker,
+            // picker,
             preparer,
           }));
         }}
