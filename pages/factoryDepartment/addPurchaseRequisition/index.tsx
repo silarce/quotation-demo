@@ -189,11 +189,12 @@ export default function AddPurchaseRequisition() {
                     </>,
                     props: {
                         onOk: () => {
-                            router.push({
-                                pathname: `/factoryDepartment/purchaseRequisitionList`,
-                                query: {
-                                },
-                            });
+                            router.back();
+                            // router.push({
+                            //     pathname: `/factoryDepartment/purchaseRequisitionList`,
+                            //     query: {
+                            //     },
+                            // });
                         }
                     }
                 });
@@ -275,7 +276,25 @@ export default function AddPurchaseRequisition() {
             const data = await response.json();
             // setData1(data);
 
-            setData2(prevData2 => [...prevData2, ...data]);
+            console.log(data);
+            // setData2(prevData2 => [...prevData2, ...data]);
+            setData2(prevData2 => {
+                // 取得當前的productid列表
+                const existingProductIds = prevData2.map(item => item.productid);
+
+                // 檢查並提示哪些productid已經存在
+                const duplicateProductIds = data.filter((item: { productid: any; }) => existingProductIds.includes(item.productid));
+                if (duplicateProductIds.length > 0) {
+                    myAlert.info({ title: `${duplicateProductIds.map((item: { productid: any; }) => item.productid).join(', ')}已加入` });
+                }
+
+                // 過濾掉已經存在的productid
+                const newData = data.filter((item: { productid: any; }) => !existingProductIds.includes(item.productid));
+
+                // 返回合併的結果
+                return [...prevData2, ...newData];
+            });
+
 
 
         } catch (error: any) {
@@ -528,6 +547,9 @@ export default function AddPurchaseRequisition() {
     //關閉詢價單modal
     const productSearchModalClose = async () => {
         setData([]);
+        setKeyword1("");
+        setKeyword2("");
+        setKeyword3("");
         await new Promise(resolve => setTimeout(resolve, 50));
         setProductSearchmodalopen(false);
     }
@@ -605,7 +627,11 @@ export default function AddPurchaseRequisition() {
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
-                            <div></div>
+                            <div>
+                                <button className={scss.minibtn} onClick={() => { alert("comming soon") }}>
+                                    申請紀錄
+                                </button>
+                            </div>
                             <div></div>
                             <div></div>
                             <div></div>
@@ -654,15 +680,12 @@ export default function AddPurchaseRequisition() {
                                         },
                                     }}
                                 />
-                                {/*<span className={scss.customContainer}>
-                                     <span className={scss.customLabel}>
-                                        備註
-                                    </span>
-                                    <textarea
-                                        className={scss.customInput}
-                                        value={note}
-                                        onChange={(e) => { setNote(e.target.value) }}
-                                    ></textarea> */}
+                            </div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div className={scss.head_content2}>
+                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="備註"
@@ -674,30 +697,12 @@ export default function AddPurchaseRequisition() {
                                         },
                                     }}
                                 />
-                                {/* </span> */}
                             </div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.head_content2}>
-                            <div></div>
                             <div></div>
                             <div></div>
                         </div>
                         <div className={scss.head_content3}>
                             <div style={{ marginRight: '20px' }}>
-
-                                {/* <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={false}
-                                    inputProps={{
-                                        props: {
-                                            value: note,
-                                            onChange: (e) => { setNote(e.target.value) }
-                                        },
-                                    }}
-                                /> */}
 
                             </div>
                             <div></div>
@@ -716,16 +721,9 @@ export default function AddPurchaseRequisition() {
                         </div>
                         <div className={scss.head_foot2}>
                             <div>
-                                {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(true) }}>
-                                    <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} />
-                                    請購清單
-                                </button> */}
-                                <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
+                            <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
                                     {/* <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} /> */}
                                     品項查詢
-                                </button>
-                                <button className={scss.minibtn} onClick={() => { alert("OK") }}>
-                                    申請紀錄
                                 </button>
                             </div>
                             <div style={{ marginTop: '5px' }}></div>
@@ -893,91 +891,6 @@ export default function AddPurchaseRequisition() {
                         </div>
                     </div>
                 </div>
-
-                {/* 隱藏的popout */}
-                {/* 品項查詢 */}
-                {/* <div style={{
-                    display: `${productSearchmodalopen === true ? '' : 'none'}`,
-                    position: 'fixed',
-                    top: '250px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '1000px',
-                    backgroundColor: '#fff',
-                    border: '1px solid #ccc',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.5)',
-                    zIndex: 1000,
-                    padding: '16px',
-                    maxHeight: '80vh', // 確保模態窗口不會超過視窗高度
-                    overflowY: 'auto',  // 啟用垂直滾動
-                    height: '650px'
-                }}>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        position: 'sticky',
-                        top: 0,
-                        backgroundColor: '#fff',
-                        zIndex: 1000
-                    }}>
-                        <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-                            <div>
-                                <span style={{ fontSize: '16px', color: '#14256a' }}>查詢種類：</span>
-                                <span style={{ fontSize: '16px' }}>
-                                    <select style={{ borderBottom: '1px solid gray', outline: 'none', marginRight: '8px' }} value={selectedOption} onChange={(e) => { setSelectedOption(e.target.value) }}>
-                                        <option value="物料">物料</option>
-                                        <option value="全部">全部</option>
-                                        <option value="辦公室用品">辦公室用品</option>
-                                    </select>
-                                </span>
-                            </div>
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder='規格'
-                                    value={keyword3}
-                                    style={{ borderBottom: '1px solid #c1c1c1', marginRight: '8px' }}
-                                    onChange={(e) => setKeyword3(e.target.value)}
-                                />
-                                <button type="submit" style={{ display: 'flex', alignItems: 'center', padding: '0', border: 'none', background: 'none' }}>
-                                    <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
-                                </button>
-                            </div>
-                            <div>
-                            </div>
-                            <div></div>
-                        </form>
-                        <div>
-                            <button onClick={() => { setProductSearchmodalopen(false) }}>
-                                <img src={icon_close.src} alt="close" style={{ width: '30px', height: '20px' }} />
-                            </button>
-                        </div>
-                    </div>
-                    <hr />
-                    <div>
-                        <Thead01 type={'AddPR_GetProduct'} />
-                        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                            {data && (
-                                data.map((_item, index) => (
-                                    <CellWithBar key={index} className={scss.panelHeader19}>
-                                        <div className={scss.row01}>
-                                            <span>{_item.productid}</span>
-                                            <span>{_item.name}</span>
-                                            <span>{_item.spec}</span>
-                                            <span>{_item.count}</span>
-                                            <span>
-                                                <button onClick={() => { getProductById(_item.id) }}>
-                                                    <img src={icon_fc_add.src} alt="addToList" style={{ width: '30px', height: '20px' }} />
-                                                </button>
-                                            </span>
-                                        </div>
-                                    </CellWithBar>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                </div> */}
 
                 <Modal
                     visible={productSearchmodalopen}

@@ -658,28 +658,23 @@ const sidePathList: TsidePathList = {
     return {
       path01,
       list: [
-        {
-          label: '單據管理',
-          erpFeature: devPass,
-          list: [
-            {
-              label: '請購申請',
-              path: path01 + '/addPurchaseRequisition',
-              erpFeature: devPass,
-            },
-            // {
-            //   label: '待審單據',
-            //   path: path01 + '/myReqList',
-            //   erpFeature: devPass,
-            // },
-          ],
-        },
+        // {
+        //   label: '單據管理',
+        //   erpFeature: devPass,
+        //   list: [
+        //     {
+        //       label: '請購申請',
+        //       path: path01 + '/addPurchaseRequisition',
+        //       erpFeature: devPass,
+        //     },
+        //   ],
+        // },
         {
           label: '倉儲',
           erpFeature: devPass,
           list: [
             {
-              label: '儲位資訊',
+              label: '儲位管理',
               path: path01 + '/wareHouseList',
               query: {
                 type: 'WareHouse',
@@ -718,14 +713,14 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: devPass,
             },
-            {
-              label: '領料管理',
-              path: path01 + '/getMaterial/pickingList',
-              query: {
-                type: 'pickingList',
-              },
-              erpFeature: devPass,
-            },
+            // {
+            //   label: '領料管理',
+            //   path: path01 + '/getMaterial/pickingList',
+            //   query: {
+            //     type: 'pickingList',
+            //   },
+            //   erpFeature: devPass,
+            // },
           ],
         },
         // {
