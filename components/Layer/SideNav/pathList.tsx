@@ -684,6 +684,20 @@ const sidePathList: TsidePathList = {
             {
               label: '請購管理',
               path: path01 + '/purchaseRequisitionList',
+              activeChecker: ({ router }) => {
+
+                const { pathname, query } = router
+                console.log(router);
+                if (pathname === "/factoryDepartment/addPurchaseRequisition") {
+                  return true;
+                } else if (pathname === "/factoryDepartment/purchaseRequisitionList") {
+                  return true;
+                } else if (pathname === "/factoryDepartment/quotereqDetailList") {
+                  return true;
+                }
+                return false;
+
+              },
               query: {
                 type: 'purchaseRequisitionList',
               },
@@ -692,6 +706,16 @@ const sidePathList: TsidePathList = {
             {
               label: '採購管理',
               path: path01 + '/purchaseOrderList',
+              activeChecker: ({ router }) => {
+
+                const { pathname, query } = router
+                console.log(router);
+                if (pathname === "/factoryDepartment/purchaseOrderList") {
+                  return true;
+                }
+                return false;
+
+              },
               query: {
                 type: 'purchaseOrderList',
               },
@@ -744,7 +768,7 @@ const sidePathList: TsidePathList = {
         //     // },
         //   ],
         // },
-       
+
       ],
     };
   })(),

@@ -122,10 +122,12 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "PurchaseOrder") {
     return (
       <div className={style.thead10}>
+        <span>序</span>
         <span>採購日期</span>
         <span>採購單號</span>
         {/* <span>總金額</span> */}
         <span>狀態</span>
+        <span>廠商名稱</span>
         <span></span>
       </div>
     )
@@ -203,9 +205,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "PurchaseRequisition") {
     return (
       <div className={style.thead15}>
-        <span>請購日期</span>
+        <span>序</span>
         <span>請購單號</span>
+        <span>請購日期</span>
         <span>狀態</span>
+        <span>備註</span>
         {/* <span>請購人員</span> */}
         <span></span>
       </div>

@@ -223,7 +223,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   //#region 採購單
 
   async function GetPurchaseOrder(item: any) {
-    router.replace({
+    handleRowClick(item.purchaseorderid)
+    router.push({
       pathname: `/factoryDepartment/purchaseOrderList`,
       query: {
         purchaseorderuuid: item.purchaseorderuuid,
@@ -296,7 +297,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   //#region 請購單
   //請購單
   async function GetPurchaseRequisition(item: any) {
-    router.replace({
+    handleRowClick(item.purchaserequisitionid);
+    router.push({
       pathname: `/factoryDepartment/purchaseRequisitionList`,
       query: {
         purchaserequisitionuuid: item.purchaserequisitionuuid,
@@ -365,6 +367,14 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
   }
   //#endregion
+
+
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+  // 點擊處理函數
+  const handleRowClick = (itemId: string) => {
+    setSelectedItemId(itemId);
+  };
 
 
 
@@ -596,20 +606,25 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader10}>
-              <div className={scss.row01}>
-                {/* <span>{index + 1}</span> */}
+              {/* <div className={scss.row01}
+                onClick={() => { GetPurchaseOrder(_item) }}  > */}
+              <div
+                key={index}
+                className={`${scss.row01} ${_item.purchaseorderid === selectedItemId ? scss.selectedRow : ''}`}
+                onClick={() => GetPurchaseOrder(_item)}
+              >
+                <span>{index + 1}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.purchaseorderid}</span>
-                {/* <span>{_item.totalprice.toLocaleString()}</span> */}
                 <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
-                {/* <span style={{ color: '#ea1833', display: `${_item.receipted === false ? "" : "none"}` }}>未結</span>
-                <span style={{ color: '#14256a', display: `${_item.receipted === true ? "" : "none"}` }}>已結</span> */}
-                <span ><IconDetail onClick={() => { GetPurchaseOrder(_item) }} /></span>
+                <span>{_item.suppliername}</span>
+                {/* <span ><IconDetail onClick={() => { GetPurchaseOrder(_item) }} /></span> */}
               </div>
             </CellWithBar>
           ))
-        )}
-      </div>
+        )
+        }
+      </div >
     );
   }
   //#endregion
@@ -705,17 +720,20 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader15}>
-              <div className={scss.row01}>
-                {/* <span>{index + 1}</span> */}
-                <span>{getTaiwanDateStr(_item.create_at)}</span>
+              <div
+                key={index}
+                className={`${scss.row01} ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
+                onClick={() => { GetPurchaseRequisition(_item) }}>
+                <span>{index + 1}</span>
                 <span>{_item.purchaserequisitionid}</span>
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
                 {/* <span>{_item.totalprice.toLocaleString()}</span> */}
                 <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
                   {_item.status}
                 </span>
-
+                <span>{_item.note}</span>
                 {/* <span>{_item.create_by}</span> */}
-                <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span>
+                {/* <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span> */}
               </div>
             </CellWithBar>
           ))

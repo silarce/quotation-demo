@@ -29,7 +29,7 @@ export const setting = {
     // env: 'local',
 };
 
-
+            
 export default function WareHouseList() {
 
     const router = useRouter();

@@ -541,14 +541,52 @@ div.panelHeader13 {
 
 }
 
-// 隱藏popout
-.modal_search_bar {
+.modal_head_head1 {
     display: grid;
-    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
-    width: 100%;
-    margin-top: 5px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid rgb(214, 214, 214);
-    // padding-right:10px;
-}
+    width: auto;
+    // margin-top: 5px;
+    // margin-left: 20px;
+    // margin-right: 20px;  
+  
+  
+  }
+  
+  .modal_head_content1 {
+    display: grid;
+    grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
+    width: auto;
+    // margin-top: 5px;
+    // margin-left: 20px;
+    // margin-right: 20px;
+  
+  
+  }
+  
+  .squarebtn {
+    height: 39px;
+    width: 39px;
+    // padding: 0px 40px;
+    border: solid 1px #c1c1c1;
+    ;
+    background-color: $bgc01;
+    padding: 0px 8px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #14256a;
+    transform: translateY(2px);
+  
+    &:hover {
+      border: solid 1px #c1c1c1;
+      background-color: #c1c1c17c
+    }
+  
+    &:focus {
+      background-color: $bgc01;
+      border: solid 1px #c1c1c1;
+    }
+  }
