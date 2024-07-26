@@ -23,8 +23,7 @@
 }
 
 .left {
-    // flex: 80px;
-    width: 450px;
+    width: 360px;
     display: grid;
     grid-template-columns: 1fr;
     justify-content: space-between;
@@ -59,6 +58,23 @@
     top: 0;
 }
 
+.head_head1 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
+    width: auto;
+    margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgb(214, 214, 214);
+
+    div {
+        margin-right: 20px;
+    }
+
+    // background-color: gray;
+}
 
 .head_content1 {
     display: grid;
@@ -76,7 +92,7 @@
 
 .head_content2 {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 600px 1fr 1fr;
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -90,7 +106,7 @@
 
 .head_content3 {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr; // 左右兩邊比例，可以調整
+    grid-template-columns: 600px 1fr 1fr; // 左右兩邊比例，可以調整
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -426,13 +442,13 @@ div.panelHeader13 {
 
 
 .minibtn {
-    height: 36px;
+    height: 28.28px;
     // width: 36px;
     // padding: 0px 40px;
     border: solid 1px #c1c1c1;
     ;
     background-color: $bgc01;
-    padding: 4px 8px;
+    padding: 0px 8px;
     // padding-top: 4px;
     // padding-bottom: 4px;
     font-weight: 500;
@@ -452,13 +468,13 @@ div.panelHeader13 {
 }
 
 .miniredbtn {
-    height: 36px;
+    height: 28.28px;
     // width: 36px;
     // padding: 0px 40px;
     border: solid 1px #ea1833;
     ;
     background-color: $bgc01;
-    padding: 4px 8px;
+    padding: 0px 8px;
     // padding-top: 4px;
     // padding-bottom: 4px;
     font-weight: 500;
@@ -478,13 +494,13 @@ div.panelHeader13 {
 }
 
 .minidisabledbtn {
-    height: 36px;
+    height: 28.28px;
     // width: 36px;
     // padding: 0px 40px;
     border: solid 1px #c1c1c1;
     ;
     background-color: $bgc01;
-    padding: 4px 8px;
+    padding: 0px 8px;
     // padding-top: 4px;
     // padding-bottom: 4px;
     font-weight: 500;
@@ -523,4 +539,16 @@ div.panelHeader13 {
         /* 添加這行使滑鼠顯示禁止符號 */
     }
 
+}
+
+// 隱藏popout
+.modal_search_bar {
+    display: grid;
+    grid-template-columns: 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
+    width: 100%;
+    margin-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgb(214, 214, 214);
+    // padding-right:10px;
 }

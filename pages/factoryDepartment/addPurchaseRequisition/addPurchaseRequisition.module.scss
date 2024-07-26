@@ -158,7 +158,8 @@
   margin-top: 5px;
   margin-left: 20px;
   margin-right: 20px;
-
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgb(214, 214, 214);
   div {
     margin-right: 20px;
   }
@@ -239,7 +240,7 @@
   margin-left: 20px;
   margin-right: 20px;
   margin-bottom: 5px;
-  border-top: 1px solid gray;
+  border-top: 1px solid rgb(214, 214, 214);
 }
 
 .body_content1 {
@@ -450,13 +451,13 @@ div.panelHeader20 {
 }
 
 .minibtn {
-  height: 36px;
+  height: 28.28px;
   // width: 36px;
   // padding: 0px 40px;
   border: solid 1px #c1c1c1;
   ;
   background-color: $bgc01;
-  padding: 4px 8px;
+  padding: 0px 8px;
   // padding-top: 4px;
   // padding-bottom: 4px;
   font-weight: 500;

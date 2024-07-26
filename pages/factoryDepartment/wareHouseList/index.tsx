@@ -31,7 +31,7 @@ export const setting = {
 
 
 export default function WareHouseList() {
-    
+
     const router = useRouter();
     const { type, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
 

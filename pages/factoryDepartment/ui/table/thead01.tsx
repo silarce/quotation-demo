@@ -108,9 +108,9 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "ProdEntry") {
     return (
       <div className={style.thead9}>
-        <span>入庫單號</span>
         <span>入庫日期</span>
-        <span>入庫人員</span>
+        <span>入庫單號</span>
+        <span>狀態</span>
         <span></span>
         {/* <span>按鈕格 留白</span> */}
 
@@ -124,7 +124,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
       <div className={style.thead10}>
         <span>採購日期</span>
         <span>採購單號</span>
-        <span>總金額</span>
+        {/* <span>總金額</span> */}
         <span>狀態</span>
         <span></span>
       </div>
@@ -135,7 +135,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "PurchaseOrderDetail") {
     return (
       <div className={style.thead11}>
-        <span>次序</span>
+        <span>序</span>
         <span>料號</span>
         <span>品名</span>
         <span>規格</span>
@@ -154,8 +154,10 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     return (
       <div className={style.thead12}>
         <span>進貨日期</span>
-        <span>採購單號</span>
+        {/* <span>採購單號</span> */}
         <span>進貨單號</span>
+        {/* <span>入庫狀態</span>
+        <span>付款狀態</span> */}
         <span>狀態</span>
         <span></span>
       </div>
@@ -166,10 +168,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "ProdReceiptDetail") {
     return (
       <div className={style.thead14}>
-        <span>次序</span>
+        <span>序</span>
         <span>料號</span>
         <span>品名</span>
         <span>規格</span>
+        <span>已入</span>
         <span>數量</span>
         <span>單位</span>
         <span>單價</span>
@@ -235,7 +238,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>序</span>
         <span>料號</span>
         <span>品名</span>
-        <span>已進數量</span>
+        {/* <span>已進數量</span> */}
         <span>數量</span>
         <span>單位</span>
         <span>單價</span>
@@ -307,11 +310,75 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   //#region 物料明細
   else if (type === "qoDetail_SupplierList") {
     return (
-      <div className={style.thead21}>
+      <div className={style.thead22}>
         <span>名稱</span>
         <span>地址</span>
         <span>電話</span>
         <span>統編</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 詢價單明細
+  else if (type === "Quotereq2") {
+    return (
+      <div className={style.thead23}>
+        <span>序</span>
+        <span>供應商</span>
+        <span>單價</span>
+        <span>總價</span>
+        <span>單位</span>
+        <span>出貨日</span>
+        <span>備註</span>
+        <span>得標</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 進貨單明細2
+  else if (type === "ProdReceiptDetail2") {
+    return (
+      <div className={style.thead24}>
+        <span>序</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>已入</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span>單價</span>
+        <span>金額</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 入庫單明細
+  else if (type === "ProdEntryDetail") {
+    return (
+      <div className={style.thead25}>
+        <span>序</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>規格</span>
+        <span>已入</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span>庫存</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 入庫單明細
+  else if (type === "ProdEntryWhpositionList") {
+    return (
+      <div className={style.thead26}>
+        <span>倉庫</span>
+        <span>托盤</span>
+        <span>儲格</span>
+        <span>數量</span>
         <span></span>
       </div>
     )
