@@ -18,6 +18,10 @@ import scss_p from './_public.module.scss';
 
 import type { TelectronicSuppliesRequirementRecordDto } from 'js/api/dtoTypes';
 
+type Tquery = {
+  contractId: string | undefined;
+};
+
 // ==================================================================
 export default function RequirementRecord({
   requirementRecords,
@@ -25,6 +29,7 @@ export default function RequirementRecord({
   requirementRecords: TelectronicSuppliesRequirementRecordDto[];
 }) {
   const router = useRouter();
+  const { contractId } = router.query as Tquery;
 
   // ------------------------------------------------------------------
 
@@ -81,6 +86,7 @@ export default function RequirementRecord({
                   pathname: router.pathname + '/editRequirement',
                   query: {
                     requirementRecordId: id,
+                    contractId,
                   },
                 }}
               >

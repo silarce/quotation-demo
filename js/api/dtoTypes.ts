@@ -3182,8 +3182,9 @@ export type TelectronicSuppliesRequirementRecordDto = {
   requirementRecordDetails?: TelectronicSuppliesRequirementRecordDetailDto[];
   //
   doorType: string | null;
-  storageManagementPersonnel?: TemployeeDto | null;
+  storageManagementPersonnelEmployee?: TemployeeDto | null;
   storageManagementPersonnelId: string | null;
+  number: string; // 就叫number，這同時是保留字，請小心使用
 };
 
 export type TcreateElectronicSuppliesRequirementRecordDto = Pick<

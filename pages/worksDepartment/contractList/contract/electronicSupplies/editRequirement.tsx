@@ -29,8 +29,10 @@ import scss from './editRequirement.module.scss';
 import {
   TcreateElectronicSuppliesRequirementRecordDto,
   TcreateElectronicSuppliesRecordDetailDto,
+  TupdateElectronicSuppliesRequirementRecordDto,
   //
   apiPostElectronicSuppliesRequirementRecord,
+  apiPatchElectronicSuppliesRequirementRecord,
   //
   useGetElectronicSuppliesRequirementRecord_id,
 } from 'js/api/api_engineering';
@@ -113,7 +115,7 @@ export default function EditRequirementRecord() {
 
   const {
     data: data_requirementRecord,
-    // update: update_requirementRecord,
+    update: update_requirementRecord,
     isFetching: isFetching_requirementRecord,
   } = useGetElectronicSuppliesRequirementRecord_id(requirementRecordId, {
     autoUpdate: !isNew,
@@ -127,7 +129,7 @@ export default function EditRequirementRecord() {
 
   // region REQUIREST
 
-  const reqPost = async () => {
+  const reqPostPatch = async () => {
     state_electronicItemList;
     state_info;
 
@@ -172,17 +174,29 @@ export default function EditRequirementRecord() {
       return;
     }
 
-    const body: TcreateElectronicSuppliesRequirementRecordDto = {
+    const body: TcreateElectronicSuppliesRequirementRecordDto & TupdateElectronicSuppliesRequirementRecordDto = {
       operationDate: date?.toISOString(),
       storageManagementPersonnelId: preparer.id,
       doorType: doorModelName || null,
       requirementRecordDetails,
     };
 
-    // apiPostElectronicSuppliesRequirementRecord
-    await apiPostElectronicSuppliesRequirementRecord(electronicSuppliesId, body).then(() => {
-      setDisabled(true);
-    });
+    if (requirementRecordId) {
+      await apiPatchElectronicSuppliesRequirementRecord(requirementRecordId, body).then(async () => {
+        await update_requirementRecord();
+        setDisabled(true);
+      });
+    } else {
+      await apiPostElectronicSuppliesRequirementRecord(electronicSuppliesId, body).then(async (reqData) => {
+        const requirementRecordId = reqData.id;
+        router.replace({
+          query: { ...router.query, requirementRecordId },
+        });
+        await update_requirementRecord();
+        setDisabled(true);
+      });
+    }
+
     // .catch(() => {});
   };
 
@@ -243,9 +257,7 @@ export default function EditRequirementRecord() {
     {
       type: 'redButton',
       label: '上傳',
-      onClick: () => {
-        alert('上傳');
-      },
+      onClick: reqPostPatch,
     },
     {
       type: 'myButton',
@@ -260,7 +272,7 @@ export default function EditRequirementRecord() {
     {
       type: 'redButton',
       label: '上傳',
-      onClick: reqPost,
+      onClick: reqPostPatch,
     },
     {
       type: 'myButton',
@@ -279,8 +291,10 @@ export default function EditRequirementRecord() {
 
   useEffect(() => {
     update_doorModelList();
-    update_contract();
   }, []);
+  useEffect(() => {
+    update_contract();
+  }, [contractId]);
 
   useEffect(() => {
     if (!disabled && data_requirementRecord) {
@@ -290,15 +304,16 @@ export default function EditRequirementRecord() {
     const { defaultStateList } = createDefaultState();
 
     const {
-      electronicSuppliesId,
-      electronicSupplies,
-      operationDate,
-      agentEmployeeId,
-      agentEmployee,
+      // electronicSuppliesId,
+      // electronicSupplies,
+      // operationDate,
+      // agentEmployeeId,
+      // agentEmployee,
       requirementRecordDetails = [],
-      doorType,
-      storageManagementPersonnel,
-      storageManagementPersonnelId,
+      // doorType,
+      // storageManagementPersonnel,
+      // storageManagementPersonnelId,
+      // number: idNumber,
     } = data_requirementRecord ?? {};
 
     requirementRecordDetails.forEach((detail) => {
@@ -321,9 +336,9 @@ export default function EditRequirementRecord() {
     if (data_requirementRecord) {
       stateInfo = {
         date: data_requirementRecord.operationDate ? moment(data_requirementRecord.operationDate) : null,
-        indexNumber: '',
+        indexNumber: data_requirementRecord.number,
         picker: undefined,
-        preparer: data_requirementRecord.storageManagementPersonnel || undefined,
+        preparer: data_requirementRecord.storageManagementPersonnelEmployee || undefined,
         doorModelName: data_requirementRecord.doorType ?? '',
       };
     }
@@ -337,12 +352,10 @@ export default function EditRequirementRecord() {
   // MARK: RENDER
 
   return (
-    <SubLayer isLoading_subLayer={isFetching_requirementRecord}>
-      <PageHeader
-        panelList={panelList}
-        //  contractNumber={contract?.contractNumber ?? '---'}
-        contractNumber={'foooo'}
-      />
+    <SubLayer
+    // isLoading_subLayer={isFetching_requirementRecord} api回應很快，不需要
+    >
+      <PageHeader panelList={panelList} contractNumber={data_contract?.contractNumber ?? '---'} />
 
       <div className={scss.container}>
         {/* info */}
@@ -367,7 +380,7 @@ export default function EditRequirementRecord() {
             key={state_info.indexNumber}
             caption="領料單號"
             {...confit_inputSel}
-            disabled={disabled}
+            disabled={true}
             inputProps={{ props: { defaultValue: state_info.indexNumber } }}
           />
 

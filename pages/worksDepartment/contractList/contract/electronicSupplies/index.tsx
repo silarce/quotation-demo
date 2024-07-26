@@ -411,7 +411,7 @@ const useCalcDoorModal = (worksheetArr: TworksheetDto[]) => {
 const usePanelList = () => {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { listName } = query;
+  const { listName, contractId } = query;
 
   // ------------------------------------------------------------------------
   //
@@ -428,7 +428,11 @@ const usePanelList = () => {
       onClick: () =>
         router.push({
           pathname: `${router.pathname}/editRequirement`,
-          query,
+          // query,
+          query: {
+            ...query,
+            contractId: contractId, // 確保要有contractId
+          },
         }),
     },
   ];

@@ -71,6 +71,7 @@ import type {
   //
   TupdateAccountReceivableAccountantDto,
   TcreateElectronicSuppliesRecordDetailDto,
+  TupdateElectronicSuppliesRequirementRecordDto,
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
@@ -138,6 +139,7 @@ export type {
   //
   TcreateElectronicSuppliesRequirementRecordDto,
   TcreateElectronicSuppliesRecordDetailDto,
+  TupdateElectronicSuppliesRequirementRecordDto,
 } from './dtoTypes';
 
 export type { TinvouceCheckResult };
@@ -434,7 +436,7 @@ const apiGetElectronicSuppliesRequirementRecord_id = (requirementRecordId: strin
   const api = `/engineering/electronic-supplies/requirement-record/${requirementRecordId}`;
 
   const params = {
-    populate: ['agentEmployee', 'requirementRecordDetails', 'storageManagementPersonnel'],
+    populate: ['agentEmployee', 'requirementRecordDetails', 'storageManagementPersonnelEmployee'],
   };
 
   return axi
@@ -492,7 +494,7 @@ export const apiPostElectronicSuppliesRequirementRecord = (
   const api = `/engineering/electronic-supplies/${electronicSupplyid}/requirement-record`;
 
   return axi
-    .post(api, body)
+    .post<TelectronicSuppliesRequirementRecordDto>(api, body)
     .then(({ data }) => data)
     .catch((error: AxiosError<TapiError>) => {
       myAlert.err({
@@ -501,6 +503,25 @@ export const apiPostElectronicSuppliesRequirementRecord = (
       });
 
       return Promise.reject(error);
+    });
+};
+
+export const apiPatchElectronicSuppliesRequirementRecord = (
+  requirementrecordId: string,
+  body: TupdateElectronicSuppliesRequirementRecordDto
+) => {
+  const api = `/engineering/electronic-supplies/requirement-record/${requirementrecordId}`;
+
+  return axi
+    .patch<TelectronicSuppliesRequirementRecordDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError<TapiError>) => {
+      myAlert.err({
+        title: '更新送電備品需求單失敗',
+        content: err.response?.data?.message || err.message,
+      });
+
+      return Promise.reject(err);
     });
 };
 
