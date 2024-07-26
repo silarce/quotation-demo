@@ -525,6 +525,63 @@ export const apiPatchElectronicSuppliesRequirementRecord = (
     });
 };
 
+// /engineering/electronic-supplies/pick-up-record/{id}
+// TelectronicSuppliesPickupRecordDto
+const apiGetElectronicSuppliesPickupRecord_id = (id: string) => {
+  const api = `/engineering/electronic-supplies/pick-up-record/${id}`;
+
+  const params = {
+    populate: ['takeOffEmployee', 'pickupRecordDetails'],
+  };
+
+  return axi
+    .get<TelectronicSuppliesPickupRecordDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
+export const useGetElectronicSuppliesPickupRecord_id = (
+  pickupRecordId: string | undefined | null,
+  {
+    autoUpdate = true,
+  }: {
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TelectronicSuppliesPickupRecordDto>();
+
+  const update = async () => {
+    if (!pickupRecordId) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetElectronicSuppliesPickupRecord_id(pickupRecordId);
+      setRes(res);
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({ title: '取得送電備品領料單失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [pickupRecordId]);
+
+  return {
+    data: res,
+    update,
+    isFetching,
+  };
+};
+
 // endregion 送電備品
 
 // ------------------------------------------------------------------------

@@ -3184,7 +3184,7 @@ export type TelectronicSuppliesRequirementRecordDto = {
   doorType: string | null;
   storageManagementPersonnelEmployee?: TemployeeDto | null;
   storageManagementPersonnelId: string | null;
-  number: string; // 就叫number，這同時是保留字，請小心使用
+  number: string; // 就叫number，這個key是保留字，請小心使用
 };
 
 export type TcreateElectronicSuppliesRequirementRecordDto = Pick<
@@ -3222,6 +3222,9 @@ export type TelectronicSuppliesPickupRecordDto = {
   action: TelectronicSuppliesAction;
   // 領料明細
   pickupRecordDetails?: TelectronicSuppliesPickupRecordDetailDto[];
+  //
+  doorType: string | null;
+  number: string; // 就叫number，這個key是保留字，請小心使用
 };
 
 export type TelectronicSuppliesPickupRecordDetailDto = {

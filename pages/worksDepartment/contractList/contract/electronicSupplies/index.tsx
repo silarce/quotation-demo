@@ -425,7 +425,7 @@ const usePanelList = () => {
       label: '新增領取單',
       onClick: () =>
         router.push({
-          pathname: `${router.pathname}/editRequirement`,
+          pathname: `${router.pathname}/editPickup`,
           // query,
           query: {
             ...query,
