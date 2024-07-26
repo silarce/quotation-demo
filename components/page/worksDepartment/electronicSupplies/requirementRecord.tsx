@@ -103,7 +103,7 @@ export default function RequirementRecord({
     };
 
     return { thead, tbody };
-  }, []);
+  }, [requirementRecords]);
 
   // ------------------------------------------------------------------
   return <Table01 {...control_table} className={classNames(scss_p.table)} />;
