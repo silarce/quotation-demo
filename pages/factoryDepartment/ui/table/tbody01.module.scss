@@ -307,7 +307,7 @@ div.panelHeader8 {
 //入庫單
 div.panelHeader9 {
   // padding: 14px 30px;
-  padding-left: 30px;
+  padding-left: 20px;
   border-bottom: solid 1px $colorBorder01;
 
   //   background-color: rgb(245, 104, 69);
@@ -326,7 +326,7 @@ div.panelHeader9 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 100px 100px 100px 100px;
+    grid-template-columns: 80px 100px 50px 30px;
     gap: 15px;
     // margin-bottom: 16px;
     // padding-top:20px;
@@ -353,7 +353,7 @@ div.panelHeader10 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 80px 100px 80px 50px 60px;
+    grid-template-columns: 80px 100px 50px 30px;
     gap: 15px;
   }
 }
@@ -407,7 +407,7 @@ div.panelHeader12 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 80px 100px 100px 40px 60px;
+    grid-template-columns: 80px 100px 50px 30px;
     gap: 15px;
   }
 }

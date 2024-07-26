@@ -940,7 +940,8 @@ function ReviewForm({
               /> */}
 
               <InputBox
-                boxStyle={{ width: '200px' }}
+                // boxStyle={{ width: 'auto' }}
+                className="w-full"
                 disabled={disabled}
                 inputAttr={{
                   value: watchData.paymentTenor ?? '',
