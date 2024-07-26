@@ -170,43 +170,19 @@ export default function ElectronicSupplies() {
 
   // ------------------------------------------------------------------
 
+  // region REQUEST
+
+  const reqCreateRequirementRecordFromIWorksheet = async () => {
+    await apiPostElectronicSupplies({ contractId }).then(update);
+  };
+
   // ------------------------------------------------------------------
 
   // MARK: PROPS
 
   const { doorModalQtyList, doorQtyTotal } = useCalcDoorModal(worksheet ?? []);
 
-  // const panelList_receiveHistory: TpanelList = [
-  //   {
-  //     type: 'addButton',
-  //     label: '新增',
-  //     onClick: () =>
-  //       router.push({
-  //         pathname: `${router.pathname}/editReceivedHistory`,
-  //         query: { ...router.query },
-  //       }),
-  //   },
-  // ];
-  // const panelList_demandHistory: TpanelList = [
-  //   {
-  //     type: 'addButton',
-  //     label: '新增',
-  //     onClick: () =>
-  //       router.push({
-  //         pathname: `${router.pathname}/editDemandHistory`,
-  //         query: { ...router.query },
-  //       }),
-  //   },
-  // ];
-
-  // const panelList =
-  //   listName === 'receiveHistory'
-  //     ? panelList_receiveHistory
-  //     : listName === 'demandHistory'
-  //     ? panelList_demandHistory
-  //     : [];
-
-  const panelList = usePanelList();
+  const panelList = usePanelList({ reqCreateRequirementRecordFromIWorksheet });
 
   // ------------------------------------------------------------------
 
@@ -408,7 +384,12 @@ const useCalcDoorModal = (worksheetArr: TworksheetDto[]) => {
   return obj;
 };
 
-const usePanelList = () => {
+const usePanelList = ({
+  //
+  reqCreateRequirementRecordFromIWorksheet,
+}: {
+  reqCreateRequirementRecordFromIWorksheet: () => void;
+}) => {
   const router = useRouter();
   const query = router.query as Tquery;
   const { listName, contractId } = query;
@@ -436,6 +417,11 @@ const usePanelList = () => {
   ];
   //
   const panelList_requirementRecord: TpanelList = [
+    {
+      type: 'addButton',
+      label: '自動產生需求單',
+      onClick: reqCreateRequirementRecordFromIWorksheet,
+    },
     {
       type: 'addButton',
       label: '新增需求單',

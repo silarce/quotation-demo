@@ -351,6 +351,7 @@ export const apiDeleteEngineeringDispatching = async (id: string) => {
 // ------------------------------------------------------------------------
 // region 送電備品
 
+// 從工作表(items)產生送電備品需求單
 export const apiPostElectronicSupplies = (body: { contractId: string }) => {
   const api = '/engineering/electronic-supplies';
 
@@ -358,22 +359,22 @@ export const apiPostElectronicSupplies = (body: { contractId: string }) => {
     .post(api, body)
     .then(({ data }) => {
       myAlert.success({
-        title: '更新送電備品總表成功',
+        title: '產生送電備品需求單',
       });
 
       return data;
     })
     .catch((err: AxiosError<TapiError>) => {
-      let message = err.response?.data?.message || err.message;
-      message === 'Cannot found worksheet!' && (message = '送電備品尚無需更新');
+      const message = err.response?.data?.message || err.message;
+      // message === 'Cannot found worksheet!' && (message = '送電備品尚無需更新');
 
       myAlert.err({
-        title: '更新送電備品總表失敗',
+        title: '產生失敗',
         content: message,
       });
 
-      // return Promise.reject(err);
       return Promise.reject();
+      // return Promise.reject(err);
     });
 };
 
