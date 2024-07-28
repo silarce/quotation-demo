@@ -353,14 +353,14 @@ div.panelHeader10 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 80px 100px 50px 200px;
+    grid-template-columns: 30px 100px 80px 50px 200px;
     gap: 15px;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
 
   .selectedRow {
-    background-color: hsla(202, 100%, 67%, 0.692);
+    background-color: #ecf1ff;
     /* 當前選擇項目的背景顏色 */
   }
 }
@@ -414,8 +414,15 @@ div.panelHeader12 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 80px 100px 50px 30px;
+    grid-template-columns: 30px 100px 80px 50px 200px;
     gap: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
   }
 }
 
@@ -470,7 +477,7 @@ div.panelHeader15 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 100px 80px 50px 200px 30px;
+    grid-template-columns: 30px 100px 80px 50px 200px;
     gap: 15px;
     // border-bottom: 1px solid #ddd;
     cursor: pointer;
@@ -478,7 +485,7 @@ div.panelHeader15 {
   }
 
   .selectedRow {
-    background-color: hsla(202, 100%, 67%, 0.692);
+    background-color: #ecf1ff;
     /* 當前選擇項目的背景顏色 */
   }
 }

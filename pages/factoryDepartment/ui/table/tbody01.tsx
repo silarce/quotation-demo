@@ -269,6 +269,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   //#endregion
 
   async function GetProdReceipt(item: any) {
+    handleRowClick(item.prodreceiptid)
     router.replace({
       pathname: `/factoryDepartment/prodReceiptList`,
       query: {
@@ -614,8 +615,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 onClick={() => GetPurchaseOrder(_item)}
               >
                 <span>{index + 1}</span>
-                <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.purchaseorderid}</span>
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
                 <span>{_item.suppliername}</span>
                 {/* <span ><IconDetail onClick={() => { GetPurchaseOrder(_item) }} /></span> */}
@@ -669,14 +670,20 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader12}>
-              <div className={scss.row01}>
-                {/* <span>{index + 1}</span> */}
-                <span>{getTaiwanDateStr(_item.create_at)}</span>
+              {/* <div className={scss.row01}> */}
+              <div
+                key={index}
+                className={`${scss.row01} ${_item.prodreceiptid === selectedItemId ? scss.selectedRow : ''}`}
+                onClick={() => GetProdReceipt(_item)}
+              >
+                <span>{index + 1}</span>
                 <span>{_item.prodreceiptid}</span>
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
                 {/* <span style={{ color: `${_item.entry_status === "未入庫" ? "#ea1833" : "#14256a"}` }}>{_item.entry_status}</span>
                 <span style={{ color: `${_item.pay_status === "未請付" ? "#ea1833" : "#14256a"}` }}>{_item.pay_status}</span> */}
                 <span style={{ color: `${_item.status === "未結案" ? "#ea1833" : "#14256a"}` }}>{_item.status}</span>
-                <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span>
+                {/* <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span> */}
+                <span>{_item.suppliername}</span>
               </div>
             </CellWithBar>
           ))

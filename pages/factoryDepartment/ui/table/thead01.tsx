@@ -123,8 +123,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     return (
       <div className={style.thead10}>
         <span>序</span>
-        <span>採購日期</span>
         <span>採購單號</span>
+        <span>採購日期</span>
         {/* <span>總金額</span> */}
         <span>狀態</span>
         <span>廠商名稱</span>
@@ -147,6 +147,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單價</span>
         <span>金額</span>
         <span></span>
+        <span>備註</span>
+        <span></span>
       </div>
     )
   }
@@ -155,12 +157,14 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "ProdReceipt") {
     return (
       <div className={style.thead12}>
+        <span>序</span>
+        <span>進貨單號</span>
         <span>進貨日期</span>
         {/* <span>採購單號</span> */}
-        <span>進貨單號</span>
         {/* <span>入庫狀態</span>
         <span>付款狀態</span> */}
         <span>狀態</span>
+        <span>廠商名稱</span>
         <span></span>
       </div>
     )
@@ -231,6 +235,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>金額</span>
         <span>廠商</span>
         <span></span>
+        <span>備註</span>
+        <span></span>
       </div>
     )
   }
@@ -248,6 +254,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單價</span>
         <span>金額</span>
         <span>廠商</span>
+        <span>備註</span>
         <span></span>
       </div>
     )

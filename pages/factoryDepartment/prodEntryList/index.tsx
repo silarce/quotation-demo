@@ -26,7 +26,7 @@ import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
-import icon_search from 'public/image/icon/search.svg';
+import icon_search from 'public/image/icon/fc_search.svg';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
@@ -35,6 +35,8 @@ import icon_fc_inbox from 'public/image/icon/fc_inbox.svg';
 import icon_fc_tray from 'public/image/icon/fc_tray.svg';
 import EditWHPosition from '../editWHPosition';
 import { color } from 'html2canvas/dist/types/css/types/color';
+import icon_print from 'public/image/icon/fc_printer.svg';
+import icon_wh from 'public/image/icon/fc_wh.svg';
 
 
 type Tquery = {
@@ -78,7 +80,7 @@ export default function ProdEntryList() {
     const { userInfo } = useContext(AppContext);
     //資料列宣告
     const [data, setData] = useState<any[]>([]);
-    const [datarestore,setDatarestore]= useState<any[]>([]);
+    const [datarestore, setDatarestore] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
     const [data2, setData2] = useState<any[]>([]);
     const [data3, setData3] = useState<any[]>([]);
@@ -342,7 +344,7 @@ export default function ProdEntryList() {
             const data = await response.json();
             setData1(data);
             // setData2(data);
-            
+
             console.log(data);
             let totalprice = 0;
             data.forEach((element: { totalprice: any; }) => {
@@ -1149,11 +1151,17 @@ export default function ProdEntryList() {
     }
 
 
+    // 入庫單查詢
+    const [searchmodalopen, setSearchmodalopen] = useState<boolean>(false);
+    const SearchModalClose = async () => {
+        setSearchmodalopen(false);
+    }
+
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={'入庫單'} panelList={panelList} />
             <div className={scss.container}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? '' : 'none'}` }}>
+                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
                         <div style={{
                             display: 'flex',
@@ -1221,12 +1229,23 @@ export default function ProdEntryList() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
+                                {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                </button> */}
+                                {/* &nbsp; */}
+                                {/* <button className={scss.minibtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList`, query: {}, }); }}>
+                                    儲位管理
+                                </button> */}
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查尋">
+                                    <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                                 &nbsp;
-                                <button className={scss.minibtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList`, query: {}, }); }}>
-                                    儲位管理
+                                <button className={scss.squarebtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList` }); }} title="儲位管理">
+                                    <img src={icon_wh.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                </button>
+                                &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
+                                    <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                             </div>
                             <div></div>
@@ -1742,7 +1761,7 @@ export default function ProdEntryList() {
                                         <button className={scss.disabledbtn} >收回托盤</button>
                                     </span>
                                 </div>
-                                <div style={{paddingTop:'5px'}}>
+                                <div style={{ paddingTop: '5px' }}>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="目前呼叫"
@@ -1755,7 +1774,7 @@ export default function ProdEntryList() {
                                         }}
                                     />
                                 </div>
-                                <div style={{paddingTop:'5px'}}>
+                                <div style={{ paddingTop: '5px' }}>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="入庫狀態"
@@ -1900,6 +1919,213 @@ export default function ProdEntryList() {
                     </div>
                 </div>
             </Modal>
+
+            <Modal
+                visible={searchmodalopen}
+                footer={null}
+                onCancel={SearchModalClose}
+                width="1000px"
+                maskClosable={false}
+                title={
+                    // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
+                    //     <span>查詢條件</span>
+                    //     <span >筆數：共 {data.length} 筆</span>
+                    // </div>
+                    <div className={scss.modal_head_head1}>
+                        <div>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
+                        </div>
+                        <div>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {data.length} 筆</span>
+                        </div>
+                    </div>
+                }
+                // centered
+                style={{ top: 200 }}
+            >
+                <div className={scss.modal_head_content1}>
+                    <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
+                        <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
+                            {/* <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                    <InputSel
+                                        caption="起始日期"
+                                        disabled={false}
+                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                        datePickerProps={{
+                                            props: {
+                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
+                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                <br />
+                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                    <InputSel
+                                        caption="截止日期"
+                                        disabled={false}
+                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                        datePickerProps={{
+                                            props: {
+                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
+                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                            }
+                                        }}
+                                    />
+                                </div> */}
+                            <br />
+                            <div>
+                                <InputSel
+                                    caption="入庫日期"
+                                    disabled={false}
+                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                    // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                    datePickerProps={{
+                                        props: {
+                                            value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
+                                            onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <br />
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="入庫單號"
+                                    disabled={false}
+                                    inputProps={{
+                                        props: {
+                                            value: keyword2 ? keyword2 : ' ',
+                                            onChange: (e) => { setKeyword2(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <br />
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    disabled={false}
+                                    inputProps={{
+                                        props: {
+                                            value: keyword3 ? keyword3 : ' ',
+                                            onChange: (e) => { setKeyword3(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <br />
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="廠商名稱"
+                                    disabled={false}
+                                    inputProps={{
+                                        props: {
+                                            value: keyword3 ? keyword3 : ' ',
+                                            onChange: (e) => { setKeyword3(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <br />
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <br />
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <br />
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <br />
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <br />
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
+                                <span>
+                                    <button className={scss.minibtn} type="submit">清除條件</button>
+                                </span>
+                                <span>
+                                    <button className={scss.minibtn} type="submit">查找</button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                    <div style={{
+                        maxHeight: '500px',
+                        overflowY: 'auto',
+                        border: '1px solid #c1c1c1',
+                        // boxShadow: 'inset 0px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.5)',
+                        // padding: '10px',
+                        // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
+                    }}>
+                        <Thead01 type={'ProdEntry'} />
+                        <Tbody01 type={'ProdEntry'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                    </div>
+
+                </div>
+            </Modal >
         </SubLayer >
 
     )

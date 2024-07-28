@@ -28,7 +28,7 @@ import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_fc_add from 'public/image/icon/fc_add.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_fc_arrow_right from 'public/image/icon/fc_arrow_right.svg';
-import icon_search from 'public/image/icon/search.svg';
+import icon_search from 'public/image/icon/fc_search.svg';
 import { Modal } from 'antd';
 import icon_close from 'public/image/icon/fc_close.svg';
 
@@ -243,6 +243,11 @@ export default function AddPurchaseRequisition() {
             setIsLoading(false);
         }
     };
+    useEffect(() => {
+        getProduct();
+    }, []);
+
+
     useEffect(() => {
         setCreate_atin(moment().format('YYYY-MM-DD') || '');
         setCreate_byin(userInfo?.username.toString() || '');
@@ -557,6 +562,34 @@ export default function AddPurchaseRequisition() {
 
 
 
+    interface DataItem {
+        name: string;
+    }
+
+    // const [handinputname, setHandinputname] = useState("");
+
+    // const [handinputname, setHandinputname] = useState("");
+    const [filteredData, setFilteredData] = useState<DataItem[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const inputValue = e.target.value;
+        setHandinputname(inputValue);
+        console.log(data);
+        if (inputValue) {
+            const filtered = data.filter(item => item.name.toLowerCase().includes(inputValue.toLowerCase()));
+            setFilteredData(filtered);
+            setShowSuggestions(true);
+        } else {
+            setFilteredData([]);
+            setShowSuggestions(false);
+        }
+    };
+
+    const handleSelect = (name: string) => {
+        setHandinputname(name);
+        setShowSuggestions(false);
+    };
 
 
 
@@ -628,8 +661,8 @@ export default function AddPurchaseRequisition() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.minibtn} onClick={() => { alert("comming soon") }}>
-                                    申請紀錄
+                                <button className={scss.squarebtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
+                                    <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                             </div>
                             <div></div>
@@ -721,10 +754,9 @@ export default function AddPurchaseRequisition() {
                         </div>
                         <div className={scss.head_foot2}>
                             <div>
-                                <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
-                                    {/* <img src={icon_search.src} alt="search" style={{ height: '15px', width: '15px' }} /> */}
+                                {/* <button className={scss.minibtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
                                     品項查詢
-                                </button>
+                                </button> */}
                             </div>
                             <div style={{ marginTop: '5px' }}></div>
                             <div></div>
@@ -824,17 +856,55 @@ export default function AddPurchaseRequisition() {
                                     </div>
                                 </CellWithBar>
                             ))}
+                            {showSuggestions && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: '50%',
+                                            zIndex: 1002,
+                                            backgroundColor: 'white',
+                                            border: '1px solid #ccc',
+                                            width: '200px', // 可以根據需要調整寬度
+                                            marginLeft: '10px', // 調整與輸入框的間距
+                                            maxHeight: '300px',
+                                            overflowY: 'auto'
+                                        }}>
+                                            {filteredData.length > 0 ? (
+                                                filteredData.map((item, index) => (
+                                                    <div
+                                                        key={index}
+                                                        onClick={() => handleSelect(item.name)}
+                                                        style={{ padding: '8px', cursor: 'pointer' }}
+                                                        onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
+                                                    >
+                                                        {item.name}
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div style={{ padding: '8px' }}>沒有匹配的結果</div>
+                                            )}
+                                        </div>
+                                    )}
+
                             <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1' }}>
                                 <div>
 
                                 </div>
                                 <div>
-                                    <input
+                                    {/* <input
                                         type="text"
                                         placeholder='請輸入品項名稱'
                                         value={handinputname}
                                         onChange={(e) => setHandinputname(e.target.value)}
+                                    /> */}
+                                    <input
+                                        type="text"
+                                        placeholder="請輸入品項名稱"
+                                        value={handinputname}
+                                        onChange={handleChange}
+                                        style={{ width: '100%' }}
                                     />
+                                    
                                 </div>
                                 <div>
                                     <input

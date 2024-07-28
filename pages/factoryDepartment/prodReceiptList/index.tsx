@@ -1125,7 +1125,7 @@ export default function ProdReceiptList() {
                     title={
                         <div className={scss.modal_head_head1}>
                             <div>
-                                <span style={{ fontSize: '16px', color: '#14256a' }}>查詢條件：</span>
+                                <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
                             </div>
                             <div>
                                 <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {data.length} 筆</span>
@@ -1136,7 +1136,7 @@ export default function ProdReceiptList() {
                 >
 
                     <div className={scss.modal_head_content1}>
-                        <div style={{ border: '1px solid gray', borderRight: '0px' }}>
+                        <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
                             <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
                                 {/* <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
                                     <InputSel
@@ -1168,7 +1168,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div> */}
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         caption="進貨日期"
                                         disabled={false}
@@ -1183,7 +1183,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="進貨 單號"
@@ -1197,7 +1197,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="單據狀態"
@@ -1211,7 +1211,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="廠商名稱"
@@ -1225,7 +1225,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1239,7 +1239,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1253,7 +1253,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1267,7 +1267,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1281,7 +1281,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1294,9 +1294,13 @@ export default function ProdReceiptList() {
                                         }}
                                     />
                                 </div>
-                                <div style={{ textAlign: 'right', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
-                                    {/* <button className={scss.minibtn} type="submit">搜尋</button> */}
-                                    <button className={scss.minibtn} type="submit">搜尋</button>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
+                                    <span>
+                                        <button className={scss.minibtn} type="submit">清除條件</button>
+                                    </span>
+                                    <span>
+                                        <button className={scss.minibtn} type="submit">查找</button>
+                                    </span>
                                 </div>
 
                             </form>

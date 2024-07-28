@@ -35,6 +35,8 @@ import icon_close from 'public/image/icon/fc_close.svg';
 import MyDatePicker from 'components/global/gear/inputAndSel_v2/cog/myDatePicker';
 import icon_disable from 'public/image/icon/fc_disable.svg';
 import icon_print from 'public/image/icon/fc_printer.svg';
+import { color } from 'html2canvas/dist/types/css/types/color';
+import { orange } from '@mui/material/colors';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -77,6 +79,7 @@ export default function PurchaseRequisitionList() {
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
     const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
@@ -843,7 +846,6 @@ export default function PurchaseRequisitionList() {
 
 
 
-
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'請購單'} panelList={panelList} />
@@ -931,10 +933,24 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                             </div>
+                            <div></div>
+                            <div></div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    captionStyle={{ paddingTop: '5px' }}
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red', paddingTop: '5px' },
+                                            value: statusin,
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div></div>
                         </div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
                         <div className={scss.head_content1}>
 
                             <div>
@@ -971,16 +987,6 @@ export default function PurchaseRequisitionList() {
                                 />
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="需用日期"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '',
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
                                     caption="備註"
                                     disabled={true}
                                     inputProps={{
@@ -989,15 +995,16 @@ export default function PurchaseRequisitionList() {
                                         },
                                     }}
                                 />
+
                             </div>
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="單據狀態"
+                                    caption="需用日期"
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: statusin,
+                                            value: checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '',
                                         },
                                     }}
                                 />
@@ -1113,6 +1120,7 @@ export default function PurchaseRequisitionList() {
                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button>
                                             </span>
+                                            <span>{_item.note}</span>
                                         </div>
                                     </CellWithBar>
                                 ))
@@ -1227,6 +1235,25 @@ export default function PurchaseRequisitionList() {
                                         </span>
                                         <span>
                                             {_item.suppliername}
+                                        </span>
+                                        <span>
+                                            <input
+                                                ref={noteRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '250px' }}
+                                                type="text"
+                                                value={_item.note}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newNote = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        note: newNote
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
                                         </span>
                                         <span>
                                             {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
@@ -1406,25 +1433,27 @@ export default function PurchaseRequisitionList() {
                     onCancel={SearchModalClose}
                     width="1000px"
                     maskClosable={false}
-                    title={
-                        // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
-                        //     <span>查詢條件</span>
-                        //     <span >筆數：共 {data.length} 筆</span>
-                        // </div>
-                        <div className={scss.modal_head_head1}>
-                            <div>
-                                <span style={{ fontSize: '16px', color: '#14256a' }}>查詢條件：</span>
-                            </div>
-                            <div>
-                                <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {data.length} 筆</span>
-                            </div>
-                        </div>
-                    }
+                    // title='單據查找'
+                    // title={
+                    // <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%',paddingRight:'20px' }}>
+                    //     <span>查詢條件</span>
+                    //     <span >筆數：共 {data.length} 筆</span>
+                    // </div>
+
+                    // }
                     // centered
-                    style={{ top: 250 }}
+                    style={{ top: 200 }}
                 >
+                    <div className={scss.modal_head_head1}>
+                        <div>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
+                        </div>
+                        <div>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {data.length} 筆</span>
+                        </div>
+                    </div>
                     <div className={scss.modal_head_content1}>
-                        <div style={{ border: '1px solid gray', borderRight: '0px' }}>
+                        <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
                             <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
                                 {/* <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
                                     <InputSel
@@ -1456,7 +1485,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div> */}
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         caption="請購日期"
                                         disabled={false}
@@ -1471,7 +1500,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="請購單號"
@@ -1485,7 +1514,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="單據狀態"
@@ -1499,7 +1528,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="廠商名稱"
@@ -1513,7 +1542,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1527,7 +1556,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1541,7 +1570,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1555,7 +1584,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1569,7 +1598,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '20px', paddingLeft: '20px' }}>
+                                <div>
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1582,17 +1611,20 @@ export default function PurchaseRequisitionList() {
                                         }}
                                     />
                                 </div>
-                                <div style={{ textAlign: 'right', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
-                                    {/* <button className={scss.minibtn} type="submit">搜尋</button> */}
-                                    <button className={scss.minibtn} type="submit">搜尋</button>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
+                                    <span>
+                                        <button className={scss.minibtn} type="submit">清除條件</button>
+                                    </span>
+                                    <span>
+                                        <button className={scss.minibtn} type="submit">查找</button>
+                                    </span>
                                 </div>
-
                             </form>
                         </div>
                         <div style={{
                             maxHeight: '500px',
                             overflowY: 'auto',
-                            border: '1px solid gray',
+                            border: '1px solid #c1c1c1',
                             // boxShadow: 'inset 0px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.5)',
                             // padding: '10px',
                             // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
