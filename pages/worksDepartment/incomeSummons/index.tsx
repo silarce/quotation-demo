@@ -305,8 +305,10 @@ const Summons_pre = (
       receivablePayment,
       deductionPayment,
       unpaidPayment,
-      difference,
     } = incomeBillSerial;
+
+    let { difference } = incomeBillSerial;
+    difference = (difference ?? '').trimEnd();
 
     const defaultState: Tstate_incomeBillSerial = {
       billSerialNumber: billSerialNumber,
