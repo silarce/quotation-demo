@@ -14,7 +14,6 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 // import scss from './receivedHistory.module.scss';
-import scss_p from './_public.module.scss';
 
 import type { TelectronicSuppliesRequirementRecordDto } from 'js/api/dtoTypes';
 
@@ -24,8 +23,10 @@ type Tquery = {
 
 // ==================================================================
 export default function RequirementRecord({
+  className,
   requirementRecords,
 }: {
+  className?: string;
   requirementRecords: TelectronicSuppliesRequirementRecordDto[];
 }) {
   const router = useRouter();
@@ -115,7 +116,7 @@ export default function RequirementRecord({
   }, [requirementRecords]);
 
   // ------------------------------------------------------------------
-  return <Table01 {...control_table} className={classNames(scss_p.table)} />;
+  return <Table01 {...control_table} className={classNames(className)} />;
 }
 
 // ==================================================================

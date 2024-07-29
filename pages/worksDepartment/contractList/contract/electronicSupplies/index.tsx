@@ -303,10 +303,12 @@ export default function ElectronicSupplies() {
           //   top: '50px',
           // }}
         >
-          {listName === 'itemList' && <ItemList worksheetArr={worksheet ?? []} />}
+          {listName === 'itemList' && <ItemList className={scss.table} worksheetArr={worksheet ?? []} />}
           {listName === 'supplyList' && <SupplyList electronicSuppliesContents={electronicSuppliesContents} />}
-          {listName === 'pickupRecord' && <PickupRecord pickupRecords={pickupRecords} />}
-          {listName === 'requirementRecord' && <RequirementRecord requirementRecords={requirementRecords} />}
+          {listName === 'pickupRecord' && <PickupRecord className={scss.table} pickupRecords={pickupRecords} />}
+          {listName === 'requirementRecord' && (
+            <RequirementRecord className={scss.table} requirementRecords={requirementRecords} />
+          )}
         </Wrapper_tab>
       </div>
     </SubLayer>

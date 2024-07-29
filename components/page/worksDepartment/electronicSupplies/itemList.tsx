@@ -7,7 +7,6 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 import scss from './itemList.module.scss';
-import scss_p from './_public.module.scss';
 
 // type
 import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
@@ -25,8 +24,10 @@ type TproductItemList = {
 
 export default function ItemList({
   //
+  className,
   worksheetArr,
 }: {
+  className?: string;
   worksheetArr: TworksheetDto[];
 }) {
   //
@@ -156,7 +157,7 @@ export default function ItemList({
 
   // region RENDER
 
-  return <Table01 {...control_table} className={classNames(scss.table)} />;
+  return <Table01 {...control_table} className={classNames(className)} />;
 }
 
 // MARK: END

@@ -8,7 +8,6 @@ import classNames from 'classnames';
 
 // css
 import scss from './supplyTable.module.scss';
-import scss_p from '../_public.module.scss';
 
 import type { Tstate_electronicItem } from 'pages/worksDepartment/contractList/contract/electronicSupplies';
 

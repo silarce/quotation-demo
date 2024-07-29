@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import classNames from 'classnames';
-import Decimal from 'decimal.js';
 
 // gear
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
@@ -11,10 +10,6 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-
-// css
-import scss from './pickupRecord.module.scss';
-import scss_p from './_public.module.scss';
 
 import type { TelectronicSuppliesPickupRecordDto } from 'js/api/dtoTypes';
 
@@ -25,7 +20,13 @@ type Tquery = {
 };
 
 // ==================================================================
-export default function PickupRecord({ pickupRecords }: { pickupRecords: TelectronicSuppliesPickupRecordDto[] }) {
+export default function PickupRecord({
+  className,
+  pickupRecords,
+}: {
+  className?: string;
+  pickupRecords: TelectronicSuppliesPickupRecordDto[];
+}) {
   const router = useRouter();
   const query = router.query as Tquery;
   const { contractId } = router.query as Tquery;
@@ -107,7 +108,7 @@ export default function PickupRecord({ pickupRecords }: { pickupRecords: Telectr
   }, [pickupRecords]);
   // ------------------------------------------------------------------
 
-  return <Table01 {...control_table} className={classNames(scss_p.table)} />;
+  return <Table01 {...control_table} className={classNames(className)} />;
 }
 
 // ==================================================================
