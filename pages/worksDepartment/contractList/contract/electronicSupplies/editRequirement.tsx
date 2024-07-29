@@ -185,6 +185,7 @@ export default function EditRequirementRecord() {
       storageManagementPersonnelId: preparer.id,
       doorType: doorModelName || null,
       requirementRecordDetails,
+      // quantity: Number(state_info.doorQty || 0),
     };
 
     if (requirementRecordId) {
@@ -358,6 +359,7 @@ export default function EditRequirementRecord() {
         picker: undefined,
         preparer: data_requirementRecord.storageManagementPersonnelEmployee || undefined,
         doorModelName: data_requirementRecord.doorType ?? '',
+        doorQty: String(data_requirementRecord.quantity || '') as Tstate_info['doorQty'],
       };
     }
 
@@ -442,9 +444,9 @@ export default function EditRequirementRecord() {
               },
             }}
           />
-          {/* <InputSel
+          <InputSel
             caption="樘數"
-            {...confit_inputSel}
+            {...config_inputSel}
             disabled={disabled}
             inputProps={{
               props: {
@@ -456,7 +458,7 @@ export default function EditRequirementRecord() {
                 },
               },
             }}
-          /> */}
+          />
         </div>
         {/* table */}
         <SupplyTable

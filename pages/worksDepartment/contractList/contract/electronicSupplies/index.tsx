@@ -119,7 +119,7 @@ type Tstate_info = {
   picker: TemployeeDto | undefined;
   preparer: TemployeeDto | undefined;
   doorModelName: string | undefined;
-  // doorQty: `${number}` | ''; // 目前api不收
+  doorQty: `${number}` | '';
 };
 
 export type { Tstate_electronicItem, Tstate_info };
@@ -458,7 +458,7 @@ const createEmptyStateInfo = (): Tstate_info => ({
   picker: undefined,
   preparer: undefined,
   doorModelName: undefined,
-  // doorQty: '',
+  doorQty: '',
 });
 
 export { createEmptyStateInfo };

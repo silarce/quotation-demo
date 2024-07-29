@@ -86,7 +86,9 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
 // ==================================================================
 export default function EditPickup() {
   const router = useRouter();
-  const { contractId, pickupRecordId } = router.query as Tquery;
+  const query = router.query as Tquery;
+  const { contractId, pickupRecordId } = query;
+
   const isNew = !pickupRecordId;
 
   // ------------------------------------------------------------------
@@ -198,9 +200,9 @@ export default function EditPickup() {
       pickupRecordDetails = pickupRecordDetails.filter((detail) => !!detail.quantity);
     }
 
-    const totalQuantity = pickupRecordDetails
-      .reduce((acc, detail) => acc.add(detail.quantity!), new Decimal(0))
-      .toNumber();
+    // const totalQuantity = pickupRecordDetails
+    //   .reduce((acc, detail) => acc.add(detail.quantity!), new Decimal(0))
+    //   .toNumber();
 
     const body: TcreateElectronicSuppliesPickupRecordDto = {
       operationDate: state_info.date!.toISOString(),
@@ -211,12 +213,17 @@ export default function EditPickup() {
       requirementRecordId: requirementRecordId || null,
 
       pickupRecordDetails,
-      totalQuantity,
+      totalQuantity: Number(state_info.doorQty || 0),
     };
 
     if (isNew) {
-      await apiPostElectronicSuppliesPickupRecord(data_electronicSupplies.id, body).then(async () => {
-        await update_pickup();
+      await apiPostElectronicSuppliesPickupRecord(data_electronicSupplies.id, body).then(async (res) => {
+        router.replace({
+          query: {
+            ...query,
+            pickupRecordId: res.id,
+          },
+        });
         setDisabled(true);
       });
     } else if (!data_pickup?.id) {
@@ -391,6 +398,7 @@ export default function EditPickup() {
         picker: data_pickup.preparationEmployee || undefined,
         preparer: data_pickup.takeOffEmployee || undefined,
         doorModelName: data_pickup.doorModel ?? '',
+        doorQty: String(data_pickup.totalQuantity ?? '') as Tstate_info['doorQty'],
       };
     }
 
@@ -482,7 +490,7 @@ export default function EditPickup() {
               },
             }}
           />
-          {/* <InputSel
+          <InputSel
             caption="樘數"
             {...config_inputSel}
             disabled={disabled}
@@ -496,7 +504,7 @@ export default function EditPickup() {
                 },
               },
             }}
-          /> */}
+          />
         </div>
 
         {isNew && (
