@@ -3176,15 +3176,22 @@ export type TelectronicSuppliesRequirementRecordDto = {
   operationDate: string;
   // 新增人員id
   agentEmployeeId: string;
-  // 新增人員 // '新增'不是動詞，這個是指新增這筆需求單的人員
-  agentEmployee?: TemployeeDto;
+  // 新增人員
+  agentEmployee: TemployeeDto;
   // 需求明細
-  requirementRecordDetails?: TelectronicSuppliesRequirementRecordDetailDto[];
-  //
-  doorType: string | null;
-  storageManagementPersonnelEmployee?: TemployeeDto | null;
+  requirementRecordDetails: TelectronicSuppliesRequirementRecordDetailDto[];
+  // 領料單是否已選擇過此需求單
+  isPickupRecordAlreadyChoose: boolean;
+  // 領料單號
+  number: string | null; // 就叫number，這個key是保留字，請小心使用
+  // 備料人員id
   storageManagementPersonnelId: string | null;
-  number: string; // 就叫number，這個key是保留字，請小心使用
+  // 備料人員
+  storageManagementPersonnelEmployee: TemployeeDto;
+  // 門型
+  doorType: string | null;
+  // 樘數
+  quantity: string | null;
 };
 
 export type TcreateElectronicSuppliesRequirementRecordDto = Pick<
@@ -3212,19 +3219,26 @@ export type TelectronicSuppliesPickupRecordDto = {
   electronicSuppliesId: string | null;
   // 所屬送電備品
   electronicSupplies?: TelectronicSuppliesDto;
+  // 領料/退回
+  action: TelectronicSuppliesAction;
   // 領取/退回日期
   operationDate: string;
+  // 門型
+  doorModel: string;
+  // 總樘數
+  totalQuantity: number;
   // 領料人員id
-  takeOffEmployeeId: string;
+  takeOffEmployeeId: string | null;
   // 領料人員
   takeOffEmployee?: TemployeeDto;
-  // 領取/退回
-  action: TelectronicSuppliesAction;
+  // 備料人員id
+  preparationEmployeeId: string | null;
+  // 備料人員
+  preparationEmployee?: TemployeeDto;
   // 領料明細
   pickupRecordDetails?: TelectronicSuppliesPickupRecordDetailDto[];
-  //
-  doorType: string | null;
-  number: string; // 就叫number，這個key是保留字，請小心使用
+  // 編號
+  number: string | null; // 就叫number，這個key是保留字，請小心使用
 };
 
 export type TelectronicSuppliesPickupRecordDetailDto = {
@@ -3244,14 +3258,15 @@ export type TelectronicSuppliesPickupRecordDetailDto = {
   quantity: number | null;
   // 單位
   unit: string | null;
+  //
+  code: string | null;
 };
 
 export type TcreateElectronicSuppliesPickupRecordDto = Pick<
   TelectronicSuppliesPickupRecordDto,
-  | 'operationDate'
-  // | 'takeOffEmployeeId'
-  | 'action'
+  'operationDate' | 'takeOffEmployeeId' | 'action' | 'preparationEmployeeId' | 'doorModel' | 'totalQuantity'
 > & {
+  requirementRecordId: string | null;
   pickupRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
 };
 
@@ -3259,8 +3274,12 @@ export type TupdateElectronicSuppliesPickupRecordDto = Partial<
   Pick<
     TcreateElectronicSuppliesPickupRecordDto,
     | 'operationDate'
-    // | 'takeOffEmployeeId'
+    | 'takeOffEmployeeId'
     | 'action'
+    | 'preparationEmployeeId'
+    | 'doorModel'
+    | 'totalQuantity'
+    | 'requirementRecordId'
   >
 > & {
   pickupRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];

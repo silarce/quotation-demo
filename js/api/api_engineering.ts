@@ -66,6 +66,8 @@ import type {
   TelectronicSuppliesRequirementRecordDetailDto,
   TelectronicSuppliesPickupRecordDto,
   TelectronicSuppliesPickupRecordDetailDto,
+  TcreateElectronicSuppliesPickupRecordDto,
+  TupdateElectronicSuppliesPickupRecordDto,
   TcreateElectronicSuppliesRequirementRecordDto,
 
   //
@@ -140,6 +142,8 @@ export type {
   TcreateElectronicSuppliesRequirementRecordDto,
   TcreateElectronicSuppliesRecordDetailDto,
   TupdateElectronicSuppliesRequirementRecordDto,
+  TcreateElectronicSuppliesPickupRecordDto,
+  TupdateElectronicSuppliesPickupRecordDto,
 } from './dtoTypes';
 
 export type { TinvouceCheckResult };
@@ -536,7 +540,7 @@ const apiGetElectronicSuppliesPickupRecord_id = (id: string) => {
   const api = `/engineering/electronic-supplies/pick-up-record/${id}`;
 
   const params = {
-    populate: ['takeOffEmployee', 'pickupRecordDetails'],
+    populate: ['takeOffEmployee', 'pickupRecordDetails', 'preparationEmployee'],
   };
 
   return axi
@@ -585,6 +589,38 @@ export const useGetElectronicSuppliesPickupRecord_id = (
     update,
     isFetching,
   };
+};
+
+export const apiPostElectronicSuppliesPickupRecord = (id: string, body: TcreateElectronicSuppliesPickupRecordDto) => {
+  const api = `/engineering/electronic-supplies/${id}/pickup-record`;
+
+  return axi
+    .post<TelectronicSuppliesPickupRecordDto>(api, body)
+    .then(({ data }) => data)
+    .catch((error: AxiosError<TapiError>) => {
+      myAlert.err({
+        title: '新增送電備品領取單失敗',
+        content: error.response?.data?.message || error.message,
+      });
+
+      return Promise.reject(error);
+    });
+};
+
+export const apiPatchElectronicSuppliesPickupRecord = (id: string, body: TupdateElectronicSuppliesPickupRecordDto) => {
+  const api = `/engineering/electronic-supplies/pickup-record/${id}`;
+
+  return axi
+    .patch<TelectronicSuppliesPickupRecordDto>(api, body)
+    .then(({ data }) => data)
+    .catch((error: AxiosError<TapiError>) => {
+      myAlert.err({
+        title: '更新送電備品領取單失敗',
+        content: error.response?.data?.message || error.message,
+      });
+
+      return Promise.reject(error);
+    });
 };
 
 // endregion 送電備品
