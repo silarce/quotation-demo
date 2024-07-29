@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 // gear
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
@@ -33,6 +34,8 @@ export default function PickupRecord({
   // ------------------------------------------------------------------
 
   const control_table = useMemo(() => {
+    const pickupRecords_ordered = _.sortBy(pickupRecords, 'number').reverse();
+
     //
     const thead: Ttable['thead'] = {
       cellArr: keysArr.map((key) => {
@@ -44,7 +47,7 @@ export default function PickupRecord({
     };
     //
 
-    const tbodyRowArr: Ttable['tbody']['rowArr'] = pickupRecords.map((item) => {
+    const tbodyRowArr: Ttable['tbody']['rowArr'] = pickupRecords_ordered.map((item) => {
       const {
         //
         id,

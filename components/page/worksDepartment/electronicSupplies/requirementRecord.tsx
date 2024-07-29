@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import classNames from 'classnames';
-import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // gear
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
@@ -11,9 +11,6 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-
-// css
-// import scss from './receivedHistory.module.scss';
 
 import type { TelectronicSuppliesRequirementRecordDto } from 'js/api/dtoTypes';
 
@@ -35,6 +32,8 @@ export default function RequirementRecord({
   // ------------------------------------------------------------------
 
   const control_table = useMemo(() => {
+    const requirementRecords_ordered = _.sortBy(requirementRecords, 'number').reverse();
+
     //
     const thead: Ttable['thead'] = {
       cellArr: keysArr.map((key) => {
@@ -46,7 +45,7 @@ export default function RequirementRecord({
     };
     //
 
-    const tbodyRowArr: Ttable['tbody']['rowArr'] = requirementRecords.map((item, index) => {
+    const tbodyRowArr: Ttable['tbody']['rowArr'] = requirementRecords_ordered.map((item, index) => {
       const {
         //
         id,
