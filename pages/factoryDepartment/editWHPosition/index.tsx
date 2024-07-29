@@ -3,7 +3,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import scss from './editWHPosition.module.scss';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { quotationStatusLookup } from 'config/lookupTable';
-import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useEffect, useState } from 'react';
+import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -15,6 +15,8 @@ import MyButton from 'components/global/gear/button/myButton';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
 import { setting } from '../wareHouseList/index';
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+import { AppContext } from 'pages/_app';
 
 
 
@@ -52,6 +54,7 @@ export default function EditWHPosition() {
     const router = useRouter();
     const { type, whid, trayname, whname, id, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
 
+    const { userInfo } = useContext(AppContext);
     //備分原本model
     const [data, setData] = useState<WHPositionModel>([]);
     const [data1, setData1] = useState<WHPositionModel>([]);
@@ -97,7 +100,6 @@ export default function EditWHPosition() {
             label: '返回',
             onClick: () => {
                 router.push({
-                    // pathname: `/factoryDepartment/whPositionList`,
                     pathname: `/factoryDepartment/trayList`,
                     query: {
                         type: 'WareHouse',
@@ -271,20 +273,32 @@ export default function EditWHPosition() {
     const updateData = async (updatedData: WHPositionModel) => {
         try {
             setIsLoading(true);
-            const check = JSON.stringify(updatedData);
-            console.log(check);
+
+            const conditionModel: {
+                data: any,
+                username: string | undefined,
+            } = {
+                username: userInfo?.username as string | undefined,
+                data: updatedData
+            };
 
             const inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
                 FunctionName: 'test',
-                FilterConditions: JSON.stringify(updatedData),
+                FilterConditions: JSON.stringify(conditionModel),
             };
 
             console.log(inputModel);
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}UpdateWHPositionByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}UpdateWHPositionByID`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+            
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -583,11 +597,11 @@ export default function EditWHPosition() {
         const convertToAlpha = (num: number): string => {
             return String.fromCharCode(65 + num - 1);
         };
-    
+
         const convertToNumber = (num: number, pad: number): string => {
             return num.toString().padStart(pad, '0');
         };
-    
+
         const alphaIncrement = (alpha: string): string => {
             if (alpha === 'Z') {
                 return 'A';
@@ -595,7 +609,7 @@ export default function EditWHPosition() {
                 return String.fromCharCode(alpha.charCodeAt(0) + 1);
             }
         };
-    
+
         const numberIncrement = (num: number, max: number, pad: number): string => {
             if (num >= max) {
                 return convertToNumber(1, pad);
@@ -603,54 +617,54 @@ export default function EditWHPosition() {
                 return convertToNumber(num + 1, pad);
             }
         };
-    
+
         let newlength = '';
         let newwidth = '';
         let newchildlength = '';
         let newchildwidth = '';
-    
+
         // 處理 length 的增量
         if (length === '1') {
             newlength = 'A';
         } else {
             newlength = convertToAlpha(parseInt(length, 10));
         }
-    
+
         // 處理 width 的增量
         if (width === '1') {
             newwidth = '001';
         } else {
             newwidth = convertToNumber(parseInt(width, 10), 3);
         }
-    
+
         // 處理 childlength 的增量
         if (childlength === '1') {
             newchildlength = 'A';
         } else {
             newchildlength = convertToAlpha(parseInt(childlength, 10));
         }
-    
+
         // 處理 childwidth 的增量
         if (childwidth === '1') {
             newchildwidth = '1';
         } else {
             newchildwidth = numberIncrement(parseInt(childwidth), 100, 1);
         }
-    
+
         // 增量操作
         if (childlength !== '1' && newchildwidth === '001') {
             newchildlength = alphaIncrement(newchildlength);
         }
-    
+
         if (width !== '1' && newchildlength === 'A' && newchildwidth === '1') {
             newwidth = numberIncrement(parseInt(width), 100, 3);
         }
-    
+
         if (length !== '1' && newwidth === '001' && newchildlength === 'A' && newchildwidth === '1') {
             newlength = alphaIncrement(newlength);
         }
-    
-        return newlength + newwidth + newchildlength + (parseInt(newchildwidth)-1).toString();
+
+        return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 1).toString();
     };
 
 
@@ -686,6 +700,7 @@ export default function EditWHPosition() {
                                 },
                             }}
                         />
+                        <IconDetail onClick={() => { alert("OK") }}>asdf</IconDetail>
                         <InputSel
                             {...inputSelProps}
                             caption="物料名稱"

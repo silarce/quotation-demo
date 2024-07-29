@@ -6,9 +6,11 @@ import { useRouter } from 'next/router';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { setting } from '../wareHouseList/index';
+import { userInfo } from 'os';
+import { AppContext } from 'pages/_app';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -45,6 +47,7 @@ export interface TrayModel {
 
 
 export default function AddTray() {
+    const { userInfo } = useContext(AppContext);
     // 備分原本model
     const [data, setData] = useState<WHPositionModel>([]);
     const [data1, setData1] = useState<WHPositionModel>([]);
@@ -228,6 +231,7 @@ export default function AddTray() {
                     length: length as number | undefined,
                     width: width as number | undefined,
                     whname: whname as string | undefined,
+                    create_by: userInfo?.username
                 },
                 traylayout: traylayout,
             };
@@ -304,14 +308,15 @@ export default function AddTray() {
             type: 'myButton',
             label: '返回',
             onClick: () => {
-                router.push({
-                    pathname: `/factoryDepartment/trayList`,
-                    query: {
-                        type: 'WareHouse',
-                        whid: whid,
-                        whname: whname
-                    }
-                });
+                router.back();
+                // router.push({
+                //     pathname: `/factoryDepartment/trayList`,
+                //     query: {
+                //         type: 'WareHouse',
+                //         whid: whid,
+                //         whname: whname
+                //     }
+                // });
             },
         },
     ];

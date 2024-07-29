@@ -55,13 +55,14 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
 
 
-  async function getTrayByWareHouse(whid: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
+  async function getTrayByWareHouse(item: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
+    handleRowClick(item.id)
     router.push({
       pathname: `/factoryDepartment/trayList`,
       query: {
         type: 'Tray',
-        whid: whid,
-        whname: whname,
+        whid: item.id,
+        whname: item.whname,
         url: url,
         traycalled: traycalled,
         traycalledname: traycalledname,
@@ -73,40 +74,39 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
 
   }
 
-  async function getWHPositionByWareHouseAndTray(whid: any, trayname: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any, trayid: any) {
-    console.log(whid);
-    console.log(trayname);
-
-
+  // async function getWHPositionByWareHouseAndTray(whid: any, trayname: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any, trayid: any) {
+  async function getWHPositionByWareHouseAndTray(item: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
+    handleRowClick(item.id)
     router.replace({
       // pathname: `/factoryDepartment/whPositionList`,
       pathname: `/factoryDepartment/trayList`,
       query: {
         type: 'WHPosition',
-        whid: whid,
-        trayname: trayname,
-        whname: whname,
+        whid: item.whid,
+        trayname: item.trayname,
+        whname: item.whname,
         traycalled: traycalled,
         traycalledname: traycalledname,
         traytransfer: traytransfer,
         url: url,
         whnamecalled: whnamecalled,
         firstin: 0,
-        trayid: trayid
+        trayid: item.trayid
       },
     });
 
   }
 
-  async function editWHPositionById(id: any, whid: any, trayname: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
+  // async function editWHPositionById(id: any, whid: any, trayname: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
+  async function editWHPositionById(item: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
     router.replace({
       pathname: `/factoryDepartment/editWHPosition`,
       query: {
         type: 'WHPosition',
-        whid: whid,
-        trayname: trayname,
-        whname: whname,
-        id: id,
+        whid: item.whid,
+        trayname: item.trayname,
+        whname: item.whname,
+        id: item.id,
         traycalled: traycalled,
         traycalledname: traycalledname,
         traytransfer: traytransfer,
@@ -290,6 +290,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         status: item.status,
         entrystatus: item.entry_status,
         paystatus: item.pay_status,
+        note: item.note,
         firstin: 1
       }
     })
@@ -319,6 +320,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   //#region 入庫單
   //入庫單
   async function GetProdEntry(item: any) {
+    handleRowClick(item.prodentryid);
     router.replace({
       pathname: `/factoryDepartment/prodEntryList`,
       query: {
@@ -387,7 +389,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader}>
-              <div className={scss.row01}>
+              <div
+                key={index}
+                className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                onClick={() => getTrayByWareHouse(_item, traycalled, traycalledname, traytransfer, url, whnamecalled,)}
+              >
                 <span>{_item.whname}</span>
                 <span>{_item.position}</span>
                 <span style={{ color: '#14256a', fontWeight: 'bolder' }}>{_item.traycodetotal}</span>
@@ -397,7 +403,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.update_by}</span>
                 {/* <span>{convertToYearMonthDay('Datea', _item.update_at)}</span> */}
                 <span>{getTaiwanDateStr(_item.update_at)}</span>
-                <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
+                {/* <span ><IconDetail onClick={() => getTrayByWareHouse(_item.id, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span> */}
+                <span></span>
               </div>
             </CellWithBar>
           ))
@@ -411,7 +418,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader3}  >
-              <div className={scss.row01} >
+              <div
+                key={index}
+                className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                onClick={() => editWHPositionById(_item, traycalled, traycalledname, traytransfer, url, whnamecalled,)}
+              >
                 {/* <span>{_item.materialnumber}</span> */}
                 <span>
                   {`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}
@@ -425,7 +436,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 {/* <span>{_item.unit}</span> */}
                 {/* <span>{_item.whname}</span> */}
                 {/* <span>{_item.whpchildid}</span> */}
-                <span ><IconDetail onClick={() => editWHPositionById(_item.id, _item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span>
+                {/* <span ><IconDetail onClick={() => editWHPositionById(_item.id, _item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span> */}
+                <span></span>
               </div>
             </CellWithBar>
           ))
@@ -439,15 +451,20 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader2}>
-              <div className={scss.row01}>
+              <div
+                key={index}
+                className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                onClick={() => getWHPositionByWareHouseAndTray(_item, traycalled, traycalledname, traytransfer, url, whnamecalled,)}
+              >
                 <span>{_item.whname}</span>
                 <span>{_item.trayname}</span>
                 <span>{_item.length}</span>
                 <span>{_item.width}</span>
                 <span>{getTaiwanDateStr(_item.update_at)}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
+                <span></span>
                 {/* <span style={{ fontSize: '4vmin' }}>{_item.length}X{_item.width}</span> */}
-                <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled, _item.trayid)} /></span>
+                {/* <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled, _item.trayid)} /></span> */}
               </div>
             </CellWithBar>
           ))
@@ -584,12 +601,17 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         {data && (
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader9}>
-              <div className={scss.row01}>
+              <div
+                key={index}
+                className={`${scss.row01} ${_item.prodentryid === selectedItemId ? scss.selectedRow : ''}`}
+                onClick={() => GetProdEntry(_item)}
+              >
                 {/* <span>{index + 1}</span> */}
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.prodentryid}</span>
                 <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
-                <span ><IconDetail onClick={() => { GetProdEntry(_item) }} /></span>
+                {/* <span ><IconDetail onClick={() => { GetProdEntry(_item) }} /></span> */}
+                <span>{_item.note}</span>
                 {/* <span><IconDetail/></span> */}
                 {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
               </div>

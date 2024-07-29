@@ -58,7 +58,8 @@ export default function ProdReceiptList() {
         invoice,
         status,
         entrystatus,
-        paystatus
+        paystatus,
+        note
     } = router.query;
 
 
@@ -83,6 +84,7 @@ export default function ProdReceiptList() {
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+    const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
     const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
@@ -106,7 +108,7 @@ export default function ProdReceiptList() {
     const [invoicein, setInvoicein] = useState<string>("");
     const [entrystatusin, setEntrystatusin] = useState<string>("");
     const [paystatusin, setPaystatusin] = useState<string>("");
-
+    const [notein, setNotein] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -115,10 +117,20 @@ export default function ProdReceiptList() {
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
+    const [editmain, setEditmain] = useState<boolean>(false);
+
 
     const [totalprice, setTotalPrice] = useState<string>("");
     const [taxprice, setTaxPrice] = useState<string>("");
     const [totalpayprice, setTotalPayPrice] = useState<string>("");
+
+    // 保存原始值
+    const [originalSuppliernamein, setOriginalSuppliernamein] = useState(suppliernamein);
+    const [originalSupplierphonein, setOriginalSupplierphonein] = useState(supplierphonein);
+    const [originalSuppliertaxidin, setOriginalSuppliertaxidin] = useState(suppliertaxidin);
+    const [originalInvoicein, setOriginalInvoicein] = useState(invoicein);
+    const [originalSupplieraddressin, setOriginalSupplieraddressin] = useState(supplieraddressin);
+
 
     //入庫總數
     const [totalentry, setTotalentry] = useState<string>("");
@@ -267,6 +279,7 @@ export default function ProdReceiptList() {
                 setInvoicein(data[0].invoice);
                 setEntrystatusin(data[0].entry_status);
                 setPaystatusin(data[0].pay_status);
+                setNotein(data[0].note);
             }
         } catch (error: any) {
             setError("getProdReceipt:" + error.message);
@@ -373,6 +386,7 @@ export default function ProdReceiptList() {
             setInvoicein(invoice as string);
             setEntrystatusin(entrystatus as string);
             setPaystatusin(paystatus as string);
+            setNotein(note as string);
         }
     }, [prodreceiptuuid]);
 
@@ -652,6 +666,117 @@ export default function ProdReceiptList() {
         setSearchmodalopen(false);
     }
 
+
+    // 主檔編輯
+    const handleEdit = () => {
+        // 進入編輯模式時保存原始值
+        setOriginalSuppliernamein(suppliernamein);
+        setOriginalSupplierphonein(supplierphonein);
+        setOriginalSuppliertaxidin(suppliertaxidin);
+        setOriginalInvoicein(invoicein);
+        setOriginalSupplieraddressin(supplieraddressin);
+        setEditmain(true);
+    };
+
+    const handleCancel = () => {
+        // 取消編輯時恢復原始值
+        myAlert.confirm({
+            title: '確定要取消編輯嗎?',
+            content: <>
+                <h1>未儲存的資料將不會保存</h1>
+            </>,
+            props: {
+                onOk: () => {
+                    setSuppliernamein(originalSuppliernamein);
+                    setSupplierphonein(originalSupplierphonein);
+                    setSuppliertaxidin(originalSuppliertaxidin);
+                    setInvoicein(originalInvoicein);
+                    setSupplieraddressin(originalSupplieraddressin);
+                    setEditmain(false);
+                }
+            }
+        });
+    };
+
+    const handleSave = async () => {
+        // 顯示確認對話框
+        myAlert.confirm({
+            title: '確定要儲存異動的資料嗎?',
+            content: null,
+            props: {
+                onOk: async () => {
+                    try {
+                        // 建立要傳送的數據
+                        const data = {
+                            suppliername: suppliernamein,
+                            supplieraddress: supplieraddressin,
+                            supplierphone: supplierphonein,
+                            suppliertaxid: suppliertaxidin,
+                            invoice: invoicein
+                        };
+
+                        // 打印數據到控制台以供調試
+                        console.log(data);
+                        // return;
+
+                        const conditionModel: {
+                            prodreceiptuuid: any,
+                            data: any,
+                            note: any
+                        } = {
+                            prodreceiptuuid: prodreceiptuuidin,
+                            data: data,
+                            note: notein
+                        };
+
+
+                        var inputModel = {
+                            TypeName: 'ERP',
+                            ServiceName: 'WareHouseService',
+                            FunctionName: 'no',
+                            FilterConditions: JSON.stringify(conditionModel),
+                        };
+
+
+
+
+                        // 發送數據到 API
+                        const response = await fetch(`${setting.apipath}UpdatePReceiptSupplier`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(inputModel),
+                        });
+
+                        if (!response.ok) {
+                            myAlert.err({ title: 'PO_handleSave', content: `API Status: ${response.status}` })
+
+                        }
+                        // 解析 API 響應
+                        const result = await response.json();
+
+                        // 顯示成功提示
+                        myAlert.success({ title: '更新成功' })
+                        setEditmain(false);
+                        getProdReceipt();
+
+                        // 更新狀態或執行其他操作
+                        console.log(result);
+                    } catch (error: any) {
+                        // 顯示錯誤信息
+                        myAlert.err({ title: 'FunctionError', content: error.message },)
+                    }
+                }
+            }
+        });
+    };
+
+
+
+
+
+
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={'進貨單'} panelList={panelList} />
@@ -725,24 +850,63 @@ export default function ProdReceiptList() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }}>
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }}>
+                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                             </div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="入庫狀態"
+                                    captionStyle={{ paddingTop: '5px' }}
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red', paddingTop: '5px' },
+                                            value: entrystatusin,
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="請付狀態"
+                                    captionStyle={{ paddingTop: '5px' }}
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red', paddingTop: '5px' },
+                                            value: paystatusin,
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    captionStyle={{ paddingTop: '5px' }}
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red', paddingTop: '5px' },
+                                            value: statusin,
+                                        },
+                                    }}
+                                />
+                            </div>
                         </div>
 
                         <div className={scss.head_content1}>
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="進貨日期"
+                                    caption="採購日期"
                                     disabled={true}
                                     inputProps={{
                                         props: {
@@ -805,79 +969,82 @@ export default function ProdReceiptList() {
                                 />
                             </div>
                             <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: statusin,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="入庫狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: entrystatusin,
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請付狀態"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: paystatusin,
-                                        },
-                                    }}
-                                />
                             </div>
                         </div>
 
                         <div className={scss.head_content2}>
                             <div>
+                                <span style={{ display: `${statusin === "未結案" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
+                                        編輯
+                                    </button>
+                                </span>
+                                <span style={{ display: `${statusin === "已結案" ? '' : 'none'}` }}>
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minidisabledbtn} >
+                                        編輯
+                                    </button>
+                                </span>
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
+                                    取消
+                                </button>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="廠商名稱"
-                                    disabled={true}
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
                                             value: suppliernamein ? suppliernamein : ' ',
+                                            onChange: (e) => { setSuppliernamein(e.target.value) }
                                         },
                                     }}
                                 />
                                 <InputSel
                                     {...inputSelProps}
                                     caption="廠商地址"
-                                    disabled={true}
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? supplieraddressin : supplieraddress,
+                                            value: supplieraddressin ? supplieraddressin : ' ',
+                                            onChange: (e) => { setSupplieraddressin(e.target.value) }
                                         },
                                     }}
-                                />                                <InputSel
+                                />
+                            </div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
                                     {...inputSelProps}
                                     caption="聯絡電話"
-                                    disabled={true}
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
                                             value: supplierphonein ? supplierphonein : ' ',
+                                            onChange: (e) => { setSupplierphonein(e.target.value) }
                                         },
                                     }}
                                 />
-                            </div>
-                            <div>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="統一編號"
-                                    disabled={true}
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? suppliertaxidin : suppliertaxid,
+                                            value: suppliertaxidin ? suppliertaxidin : ' ',
+                                            onChange: (e) => { setSuppliertaxidin(e.target.value) }
                                         },
                                     }}
                                 />
@@ -885,18 +1052,53 @@ export default function ProdReceiptList() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="發票號碼"
+                                    caption="排版用"
                                     disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="發票號碼"
+                                    disabled={!editmain}
                                     inputProps={{
                                         props: {
                                             value: invoicein ? invoicein : ' ',
+                                            onChange: (e) => { setInvoicein(e.target.value) }
                                         },
                                     }}
                                 />
                             </div>
                         </div>
                         <div className={scss.head_content3}>
-                            <div></div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="備註"
+                                    disabled={!editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: notein ? notein : ' ',
+                                            onChange: (e) => { setNotein(e.target.value) }
+                                        },
+                                    }}
+                                />
+                            </div>
                             <div></div>
                             <div></div>
                         </div>
@@ -965,6 +1167,7 @@ export default function ProdReceiptList() {
                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button> */}
                                             </span>
+                                            <span>{_item.note}</span>
                                         </div>
                                     </CellWithBar>
                                 ))
@@ -1052,10 +1255,11 @@ export default function ProdReceiptList() {
                                         <span>
                                             <input
                                                 ref={quantityRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
                                                 type="text"
                                                 value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     const newData = [...data2];
                                                     let newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
@@ -1076,11 +1280,11 @@ export default function ProdReceiptList() {
                                         <span>
                                             <input
                                                 ref={unitpriceRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', width: '80px' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
                                                 type="text"
                                                 value={_item.unitprice.toLocaleString()}
                                                 // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                readOnly
+                                                // readOnly
                                                 onChange={(e) => {
                                                     const newData = [...data2];
                                                     const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
@@ -1097,18 +1301,39 @@ export default function ProdReceiptList() {
                                             {_item.totalprice.toLocaleString()}
                                         </span>
                                         <span>
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                            <input
+                                                ref={noteRefs.current[index]}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '250px' }}
+                                                type="text"
+                                                value={_item.note}
+                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    const newData = [...data2];
+                                                    const newNote = e.target.value;
+                                                    newData[index] = {
+                                                        ...newData[index],
+                                                        note: newNote
+                                                    };
+                                                    setData2(newData);
+                                                }}
+                                            />
+                                        </span>
+
+                                        <span>
+                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button>
+                                            </button> */}
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                                <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button>
                                             {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
                                             <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
                                         </button> */}
-                                            <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
                                                 <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
+                                            </button> */}
                                         </span>
                                     </div>
                                 </CellWithBar>
@@ -1186,7 +1411,7 @@ export default function ProdReceiptList() {
                                 <div>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="進貨 單號"
+                                        caption="進貨單號"
                                         disabled={false}
                                         inputProps={{
                                             props: {

@@ -676,6 +676,18 @@ const sidePathList: TsidePathList = {
             {
               label: '儲位管理',
               path: path01 + '/wareHouseList',
+              activeChecker: ({ router }) => {
+                const { pathname, query } = router
+                if (pathname === "/factoryDepartment/trayList") {
+                  return true;
+                } else if (pathname === "/factoryDepartment/addTray") {
+                  return true;
+                } else if (pathname === "/factoryDepartment/wareHouseList") {
+                  return true
+                }
+                return false;
+
+              },
               query: {
                 type: 'WareHouse',
               },
@@ -712,6 +724,8 @@ const sidePathList: TsidePathList = {
                 console.log(router);
                 if (pathname === "/factoryDepartment/purchaseOrderList") {
                   return true;
+                } else if (pathname === "/factoryDepartment/addPurchaseOrder") {
+                  return true;
                 }
                 return false;
 
@@ -724,6 +738,16 @@ const sidePathList: TsidePathList = {
             {
               label: '進貨管理',
               path: path01 + '/prodReceiptList',
+              activeChecker: ({ router }) => {
+
+                const { pathname, query } = router
+                console.log(router);
+                if (pathname === "/factoryDepartment/prodReceiptList") {
+                  return true;
+                }
+                return false;
+
+              },
               query: {
                 type: 'prodReceiptList',
               },
@@ -732,6 +756,16 @@ const sidePathList: TsidePathList = {
             {
               label: '入庫管理',
               path: path01 + '/prodEntryList',
+              activeChecker: ({ router }) => {
+
+                const { pathname, query } = router
+                console.log(router);
+                if (pathname === "/factoryDepartment/prodEntryList") {
+                  return true;
+                }
+                return false;
+
+              },
               query: {
                 type: 'prodEntryList',
               },

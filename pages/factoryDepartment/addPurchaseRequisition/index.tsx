@@ -563,6 +563,8 @@ export default function AddPurchaseRequisition() {
 
 
     interface DataItem {
+        productid: string;
+        spec: string;
         name: string;
     }
 
@@ -856,35 +858,7 @@ export default function AddPurchaseRequisition() {
                                     </div>
                                 </CellWithBar>
                             ))}
-                            {showSuggestions && (
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: '50%',
-                                            zIndex: 1002,
-                                            backgroundColor: 'white',
-                                            border: '1px solid #ccc',
-                                            width: '200px', // 可以根據需要調整寬度
-                                            marginLeft: '10px', // 調整與輸入框的間距
-                                            maxHeight: '300px',
-                                            overflowY: 'auto'
-                                        }}>
-                                            {filteredData.length > 0 ? (
-                                                filteredData.map((item, index) => (
-                                                    <div
-                                                        key={index}
-                                                        onClick={() => handleSelect(item.name)}
-                                                        style={{ padding: '8px', cursor: 'pointer' }}
-                                                        onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
-                                                    >
-                                                        {item.name}
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div style={{ padding: '8px' }}>沒有匹配的結果</div>
-                                            )}
-                                        </div>
-                                    )}
+
 
                             <div className={scss.addbar} style={{ borderBottom: '1px solid #c1c1c1' }}>
                                 <div>
@@ -904,7 +878,7 @@ export default function AddPurchaseRequisition() {
                                         onChange={handleChange}
                                         style={{ width: '100%' }}
                                     />
-                                    
+
                                 </div>
                                 <div>
                                     <input
@@ -955,10 +929,43 @@ export default function AddPurchaseRequisition() {
                         </div>
                         <div className={scss.body_foot1}>
                             <div>
-                                (1).可自行輸入請購項目。<br />
-                                (2).如不知請購品項料號，可以利用查詢代入。<br />
+                            (1).可自行輸入請購項目。<br />
+                            (2).如不知請購品項料號，可以利用查詢代入。<br />
+                                {showSuggestions && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '47%',
+                                        // left: '50%',
+                                        zIndex: 1002,
+                                        backgroundColor: 'white',
+                                        border: '1px solid #ccc',
+                                        width: '500px', // 可以根據需要調整寬度
+                                        marginLeft: '10px', // 調整與輸入框的間距
+                                        maxHeight: '200px',
+                                        overflowY: 'auto'
+                                    }}>
+                                        {filteredData.length > 0 ? (
+                                            filteredData.map((item, index) => (
+                                                <div
+                                                    key={index}
+                                                    onClick={() => handleSelect(item.name)}
+                                                    style={{ padding: '8px', cursor: 'pointer' }}
+                                                    onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
+                                                >
+                                                    {item.name}/{item.spec}/{item.productid}
+                                                </div>
+
+
+
+                                            ))
+                                        ) : (
+                                            <div style={{ padding: '8px' }}>沒有匹配的結果</div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                             <div>
+
                             </div>
                             <div>
                             </div>

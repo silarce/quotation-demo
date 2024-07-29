@@ -202,19 +202,19 @@ export default function PurchaseOrderList() {
 
     //新增按鈕
     const panelList: TpanelList = [
-        // { searchGroup },
-        // {
-        //     type: 'addButton',
-        //     label: '新增採購單',
-        //     onClick: () => {
-        //         router.push({
-        //             pathname: `/factoryDepartment/purchaseOrderList/addPurchaseOrder`,
-        //             query: {
-        //                 type: 'AddPurchaseOrder',
-        //             },
-        //         });
-        //     },
-        // },
+        {
+            type: 'addButton',
+            label: '新增採購單',
+            onClick: () => {
+                // setOpen(true);
+                router.push({
+                    pathname: `/factoryDepartment/addPurchaseOrder`,
+                    query: {
+                        type: 'AddPurchaseRequisition',
+                    },
+                });
+            },
+        },
     ];
     //#endregion
 
@@ -689,9 +689,11 @@ export default function PurchaseOrderList() {
                         const conditionModel: {
                             purchaseorderuuid: any,
                             data: any,
+                            note: any
                         } = {
                             purchaseorderuuid: purchaseorderuuidin,
-                            data: data
+                            data: data,
+                            note: notein
                         };
 
 
@@ -832,11 +834,11 @@ export default function PurchaseOrderList() {
                                 {/* <button className={scss.squarebtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button> */}
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }}>
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }}>
+                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                             </div>

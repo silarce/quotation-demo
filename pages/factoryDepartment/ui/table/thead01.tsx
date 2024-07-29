@@ -111,6 +111,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>入庫日期</span>
         <span>入庫單號</span>
         <span>狀態</span>
+        <span>備註</span>
         <span></span>
         {/* <span>按鈕格 留白</span> */}
 
@@ -183,6 +184,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單位</span>
         <span>單價</span>
         <span>金額</span>
+        <span></span>
+        <span>備註</span>
         <span></span>
       </div>
     )
@@ -360,6 +363,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單位</span>
         <span>單價</span>
         <span>金額</span>
+        <span>備註</span>
+        <span></span>
         <span></span>
       </div>
     )
@@ -377,6 +382,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>數量</span>
         <span>單位</span>
         <span>庫存</span>
+        <span></span>
+        <span>備註</span>
         <span></span>
       </div>
     )

@@ -925,11 +925,11 @@ export default function PurchaseRequisitionList() {
                                 {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                 </button> */}
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }}>
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }}>
+                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                             </div>
@@ -1109,9 +1109,9 @@ export default function PurchaseRequisitionList() {
                                             <span>{_item.unit}</span>
                                             {/* <span><IconDetail onClick={() => goQuotereqDetailList(_item)} /></span> */}
                                             <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span>
-                                            <span>{_item.unitprice.toLocaleString()}</span>
-                                            <span>{_item.totalprice.toLocaleString()}</span>
-                                            <span>{_item.suppliername}</span>
+                                            <span style={{backgroundColor:'#e9eff5'}}>{_item.unitprice.toLocaleString()}</span>
+                                            <span style={{backgroundColor:'#e9eff5'}}>{_item.totalprice.toLocaleString()}</span>
+                                            <span style={{backgroundColor:'#e9eff5'}}>{_item.suppliername}</span>
                                             <span>
                                                 <button onClick={() => { handleAddToList(_item) }} style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? '' : 'none'}` }}>
                                                     <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
