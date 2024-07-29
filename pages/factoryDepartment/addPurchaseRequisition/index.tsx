@@ -929,12 +929,12 @@ export default function AddPurchaseRequisition() {
                         </div>
                         <div className={scss.body_foot1}>
                             <div>
-                            (1).可自行輸入請購項目。<br />
-                            (2).如不知請購品項料號，可以利用查詢代入。<br />
+                            {/* (1).可自行輸入請購項目。<br />
+                            (2).如不知請購品項料號，可以利用查詢代入。<br /> */}
                                 {showSuggestions && (
                                     <div style={{
-                                        position: 'absolute',
-                                        top: '47%',
+                                        position: 'sticky',
+                                        // top: '47%',
                                         // left: '50%',
                                         zIndex: 1002,
                                         backgroundColor: 'white',
@@ -952,6 +952,7 @@ export default function AddPurchaseRequisition() {
                                                     style={{ padding: '8px', cursor: 'pointer' }}
                                                     onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
                                                 >
+                                                    <div></div>
                                                     {item.name}/{item.spec}/{item.productid}
                                                 </div>
 
