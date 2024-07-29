@@ -139,20 +139,12 @@ export default function EditRequirementRecord() {
       //  doorQty
     } = state_info;
 
-    if (!electronicSuppliesId) {
-      myAlert.err({ title: '沒有electronicSuppliesId' });
+    const pass = check_stateInfo(state_info);
 
-      return;
-    }
-
-    if (!date) {
-      myAlert.err({ title: '請設定需求日期' });
-
-      return;
-    }
-
-    if (!preparer) {
-      myAlert.err({ title: '請選擇備料人員' });
+    if (!pass) {
+      myAlert.info({
+        title: '請填寫必要欄位',
+      });
 
       return;
     }
@@ -181,8 +173,8 @@ export default function EditRequirementRecord() {
     }
 
     const body: TcreateElectronicSuppliesRequirementRecordDto & TupdateElectronicSuppliesRequirementRecordDto = {
-      operationDate: date?.toISOString(),
-      storageManagementPersonnelId: preparer.id,
+      operationDate: date!.toISOString(),
+      storageManagementPersonnelId: preparer!.id,
       doorType: doorModelName || null,
       requirementRecordDetails,
       // quantity: Number(state_info.doorQty || 0),
@@ -194,6 +186,12 @@ export default function EditRequirementRecord() {
         setDisabled(true);
       });
     } else {
+      if (!electronicSuppliesId) {
+        myAlert.err({ title: '沒有electronicSuppliesId' });
+
+        return;
+      }
+
       await apiPostElectronicSuppliesRequirementRecord(electronicSuppliesId, body).then(async (reqData) => {
         const requirementRecordId = reqData.id;
         router.replace({
@@ -381,6 +379,7 @@ export default function EditRequirementRecord() {
         {/* info */}
         <div className={scss.info}>
           <InputSel
+            className="global_tip_must"
             caption="需求日期"
             {...config_inputSel}
             disabled={disabled}
@@ -418,6 +417,7 @@ export default function EditRequirementRecord() {
           /> */}
 
           <InputSel
+            className="global_tip_must"
             caption="備料人員"
             {...config_inputSel}
             disabled={disabled}
@@ -430,6 +430,7 @@ export default function EditRequirementRecord() {
             }}
           />
           <InputSel
+            className="global_tip_must"
             caption="門型"
             {...config_inputSel}
             disabled={disabled}
@@ -444,7 +445,7 @@ export default function EditRequirementRecord() {
               },
             }}
           />
-          <InputSel
+          {/* <InputSel
             caption="樘數"
             {...config_inputSel}
             disabled={disabled}
@@ -458,7 +459,7 @@ export default function EditRequirementRecord() {
                 },
               },
             }}
-          />
+          /> */}
         </div>
         {/* table */}
         <SupplyTable
@@ -737,4 +738,16 @@ const createDefaultState = () => {
     defaultStateArr,
     defaultStateList,
   };
+};
+
+// ==================================================================
+
+const check_stateInfo = (state_info: Tstate_info) => {
+  let pass = true;
+
+  !state_info.date && (pass = false);
+  !state_info.preparer && (pass = false);
+  !state_info.doorModelName && (pass = false);
+
+  return pass;
 };
