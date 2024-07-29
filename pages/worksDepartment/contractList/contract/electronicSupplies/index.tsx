@@ -147,7 +147,7 @@ export default function ElectronicSupplies() {
 
   const {
     data: data_electronicSupplies,
-    update: update_electronicSupplies,
+    // update: update_electronicSupplies,
     isFetching: isFetching_electronicSupplies,
   } = useElectronicSupplies_id(electronicSuppliesId);
 
@@ -163,6 +163,7 @@ export default function ElectronicSupplies() {
   } = engineeringContact ?? {};
 
   const {
+    hasFinishPickUp,
     electronicSuppliesContents = [],
     pickupRecords = [],
     requirementRecords = [],
@@ -238,7 +239,7 @@ export default function ElectronicSupplies() {
   // MARK: RENDER
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isFetching_electronicSupplies}>
       <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? '---'} />
       <div className={scss.container}>
         <div className={scss.info}>
@@ -287,9 +288,9 @@ export default function ElectronicSupplies() {
             wrapperStyle={{ gap: '25px' }}
             inputProps={{
               props: {
-                value: '領料尚未完成',
+                value: hasFinishPickUp ? '送電材料皆領料完成' : '尚未領料完成',
                 readOnly: true,
-                className: classNames(scss.supplyStatus, false && scss.isDone),
+                className: classNames(scss.supplyStatus, hasFinishPickUp && scss.isDone),
               },
             }}
           />

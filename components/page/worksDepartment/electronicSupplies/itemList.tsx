@@ -156,7 +156,7 @@ export default function ItemList({
 
   // region RENDER
 
-  return <Table01 {...control_table} className={classNames(scss.table, scss_p.table)} />;
+  return <Table01 {...control_table} className={classNames(scss.table)} />;
 }
 
 // MARK: END
