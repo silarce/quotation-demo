@@ -259,9 +259,10 @@ export default function EditPickup() {
       return requirementRecordId?.includes(record.id);
     });
 
-    const detailArr = requirementRecords
+    let detailArr = requirementRecords
       .flatMap((record) => record.requirementRecordDetails)
       .filter((detail) => !!detail);
+    detailArr = orderDetailArr({ detailArr });
 
     const list: { [key: string]: Tstate_electronicItem } = {};
 
