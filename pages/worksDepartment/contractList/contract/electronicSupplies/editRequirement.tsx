@@ -354,7 +354,7 @@ export default function EditRequirementRecord() {
     if (data_requirementRecord) {
       stateInfo = {
         date: data_requirementRecord.operationDate ? moment(data_requirementRecord.operationDate) : null,
-        indexNumber: data_requirementRecord.number,
+        indexNumber: data_requirementRecord.number ?? '',
         picker: undefined,
         preparer: data_requirementRecord.storageManagementPersonnelEmployee || undefined,
         doorModelName: data_requirementRecord.doorType ?? '',
