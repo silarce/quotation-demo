@@ -20,12 +20,8 @@ import type {
   TcreateEngineeringContactDto,
   TdispatchingDto,
   TcreateDispatchingDto,
-  TelectronicSuppliesDto,
-  TcreateElectronicSuppliesDto,
-  TupdateElectronicSuppliesDto,
   TexchangeDto,
   TcreateExchgangeDto,
-  TcreateElectronicSuppliesRecordDto,
   TworksheetDto,
   TcreateWorksheetDto,
   // TupdateWorkSheetItem,
@@ -63,7 +59,21 @@ import type {
   TincomeBillSerialDto,
   TupdateIncomeBillSerialDto,
   TcreateAccountReceivableAccountsDto,
+  // electronicSupplies
+  TelectronicSuppliesDto,
+  TelectronicSuppliesContentDto,
+  TelectronicSuppliesRequirementRecordDto,
+  TelectronicSuppliesRequirementRecordDetailDto,
+  TelectronicSuppliesPickupRecordDto,
+  TelectronicSuppliesPickupRecordDetailDto,
+  TcreateElectronicSuppliesPickupRecordDto,
+  TupdateElectronicSuppliesPickupRecordDto,
+  TcreateElectronicSuppliesRequirementRecordDto,
+
+  //
   TupdateAccountReceivableAccountantDto,
+  TcreateElectronicSuppliesRecordDetailDto,
+  TupdateElectronicSuppliesRequirementRecordDto,
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
@@ -77,12 +87,9 @@ export type {
   TcreateEngineeringContactDto,
   TdispatchingDto,
   TcreateDispatchingDto,
-  TelectronicSuppliesDto,
-  TcreateElectronicSuppliesDto,
-  TupdateElectronicSuppliesDto,
   TexchangeDto,
   TcreateExchgangeDto,
-  TcreateElectronicSuppliesRecordDto,
+  TworksheetDto,
   // TupdateWorkSheetItem,
   TupdateWorkSheet,
   TengineeringDeliveryListDto,
@@ -122,7 +129,21 @@ export type {
   TincomeBillSerialDto,
   TupdateIncomeBillSerialDto,
   TcreateAccountReceivableAccountsDto,
+  // electronicSupplies
+  TelectronicSuppliesDto,
+  TelectronicSuppliesContentDto,
+  TelectronicSuppliesRequirementRecordDto,
+  TelectronicSuppliesRequirementRecordDetailDto,
+  TelectronicSuppliesPickupRecordDto,
+  TelectronicSuppliesPickupRecordDetailDto,
+  //
   TupdateAccountReceivableAccountantDto,
+  //
+  TcreateElectronicSuppliesRequirementRecordDto,
+  TcreateElectronicSuppliesRecordDetailDto,
+  TupdateElectronicSuppliesRequirementRecordDto,
+  TcreateElectronicSuppliesPickupRecordDto,
+  TupdateElectronicSuppliesPickupRecordDto,
 } from './dtoTypes';
 
 export type { TinvouceCheckResult };
@@ -332,191 +353,67 @@ export const apiDeleteEngineeringDispatching = async (id: string) => {
 };
 
 // ------------------------------------------------------------------------
-// 送電備品
+// region 送電備品
 
-type TgetElectronicSupplies = {
-  data: TelectronicSuppliesDto[];
-  meta: TpageMetaDto;
-};
-
-/**取得送電備品列表 */
-export const apiGetElectronicSupplies = async (params?: Tparams) => {
-  const api = `/engineering/electronic-supplies`;
+// 從工作表(items)產生送電備品需求單
+export const apiPostElectronicSupplies = (body: { contractId: string }) => {
+  const api = '/engineering/electronic-supplies';
 
   return axi
-    .get<TgetElectronicSupplies>(api, { params })
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .post(api, body)
+    .then(({ data }) => {
+      myAlert.success({
+        title: '產生送電備品需求單',
+      });
+
+      return data;
+    })
+    .catch((err: AxiosError<TapiError>) => {
+      const message = err.response?.data?.message || err.message;
+      // message === 'Cannot found worksheet!' && (message = '送電備品尚無需更新');
+
+      myAlert.err({
+        title: '產生失敗',
+        content: message,
+      });
+
+      return Promise.reject();
+      // return Promise.reject(err);
+    });
 };
 
-export const useGetElectronicSupplies = (customParams?: Tparams) => {
-  const [res, setRes] = useState<TgetElectronicSupplies>();
-
-  const params = {
-    pageSize: 9999,
-    populate: [
-      'contractId',
-      //  'contract',
-      'quotationId',
-      //  'quotation'
-    ],
-    ...customParams,
-  };
-
-  const update = async () => {
-    const newRes = await apiGetElectronicSupplies(params);
-
-    if (newRes) {
-      setRes(newRes);
-    }
-
-    return newRes;
-  };
-
-  return {
-    data: res?.data,
-    meta: res?.meta,
-    update,
-  };
-};
-
-export const useElectronicSupplies_infinite = ({ customParams }: { customParams?: Tparams } = {}) => {
-  /**resetCount就只是用來使呼叫reset後，若page沒有改變的話，還是可以觸發update*/
-  const [resetCount, setResetCount] = useState(0);
-  const [isLoadingPage1, setIsLoadingPage1] = useState(false);
-  const [isLoading, setIsloading] = useState(false);
-  const [viewRef_top, inView_top] = useInView();
-  const [viewRef_bottom, inView_bottom] = useInView();
-  // ----------------------------------------------------------------
-  const [dataList, setDataList] = useState<{ [key: `${number}`]: TelectronicSuppliesDto[] }>({});
-
-  const [page, setPage] = useState<number>();
-  const [meta, setMeta] = useState<TpageMetaDto>();
-  const [hasNextPage, setHasNextPage] = useState<boolean>();
-
-  // ----------------------------------------------------------------
-  const defaultParams = {
-    page,
-    populate: ['contract'],
-  };
-  // ----------------------------------------------------------------
-
-  const update = async (dynaParams?: Tparams) => {
-    const params = {
-      ...defaultParams,
-      ...customParams,
-      ...dynaParams,
-    };
-
-    try {
-      if (page === 1) {
-        setIsLoadingPage1(true);
-      }
-
-      setIsloading(true);
-
-      const res = await apiGetElectronicSupplies(params);
-
-      if (res) {
-        setDataList((list) => {
-          list[`${res.meta.page}`] = res.data;
-
-          return { ...list };
-        });
-        setMeta(res.meta);
-        setHasNextPage(res.meta.hasNextPage);
-      }
-
-      return res;
-      //
-    } catch (error) {
-      myAlert.err({ title: '取得列表失敗' });
-      console.log(error);
-    } finally {
-      setIsloading(false);
-      setIsLoadingPage1(false);
-    }
-  };
-
-  const nextPage = () => {
-    if (hasNextPage === false || !page) {
-      return;
-    }
-
-    setPage((page) => (page ? page + 1 : page));
-  };
-
-  // -----------------------------------------------
-  const init = () => {
-    setDataList({});
-    setPage(undefined);
-    setHasNextPage(undefined);
-    setResetCount(0);
-  };
-
-  const reset = () => {
-    setDataList({});
-    setPage(1);
-    setHasNextPage(true);
-    setResetCount((count) => ++count);
-  };
-
-  // -----------------------------------------------
-  useEffect(() => {
-    if (!page) {
-      return;
-    }
-
-    update();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, resetCount]);
-
-  useEffect(() => {
-    if (isLoading) {
-      return;
-    }
-
-    if (inView_bottom) {
-      nextPage();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inView_bottom, isLoading]);
-  // -----------------------------------------------
-
-  return {
-    dataList,
-    dataArr: _.flatten(Object.values(dataList)),
-    viewRef_top,
-    viewRef_bottom,
-    isLoadingPage1,
-    isLoading,
-    meta,
-    init,
-    reset,
-  };
-};
-
-export const apiGetElectronicSupplies_id = async (id: string) => {
+const apiGetElectronicSupplies_id = (id: string, { params_cover }: { params_cover?: Tparams } = {}) => {
   const api = `/engineering/electronic-supplies/${id}`;
 
-  const params = {
+  let params: Tparams = {
     populate: [
-      'contractId',
-      //  'contract',
-      'electronicSuppliesRecords',
-      'materialHandler',
-      'ingredientTechnician',
-      'formCompleter',
+      //
+      'electronicSuppliesContents',
+      'pickupRecords.takeOffEmployee',
+      'pickupRecords.preparationEmployee',
+      'pickupRecords.TelectronicSuppliesPickupRecordDetailDto',
+      'requirementRecords.agentEmployee',
+      'requirementRecords.storageManagementPersonnelEmployee',
     ],
   };
 
+  if (params_cover) {
+    params = params_cover;
+  }
+
   return axi
-    .get<TelectronicSuppliesDto>(api, { params })
+    .get(api, { params })
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((error) => {
+      return Promise.reject(error);
+    });
 };
 
-export const useGetElectronicSupplies_id = (id: string | undefined) => {
+export const useElectronicSupplies_id = (
+  id: string | undefined | null,
+  { params_cover }: { params_cover?: Tparams } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
   const [res, setRes] = useState<TelectronicSuppliesDto>();
 
   const update = async () => {
@@ -524,40 +421,211 @@ export const useGetElectronicSupplies_id = (id: string | undefined) => {
       return;
     }
 
-    const newRes = await apiGetElectronicSupplies_id(id);
+    setIsFetching(true);
 
-    if (newRes) {
-      setRes(newRes);
+    try {
+      const res = await apiGetElectronicSupplies_id(id, { params_cover });
+      setRes(res);
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({ title: '取得送電備品失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
     }
-
-    return newRes;
   };
+
+  useEffect(() => {
+    update();
+  }, [id]);
 
   return {
     data: res,
     update,
+    isFetching,
   };
 };
 
-/**新增送電備品表 */
-export const apiPostElectronicSupplies = async (body: TcreateElectronicSuppliesDto) => {
-  const api = '/engineering/electronic-supplies';
+const apiGetElectronicSuppliesRequirementRecord_id = (requirementRecordId: string) => {
+  const api = `/engineering/electronic-supplies/requirement-record/${requirementRecordId}`;
+
+  const params = {
+    populate: ['agentEmployee', 'requirementRecordDetails', 'storageManagementPersonnelEmployee'],
+  };
 
   return axi
-    .post(api, body)
+    .get<TelectronicSuppliesRequirementRecordDto>(api, { params })
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((error) => {
+      return Promise.reject(error);
+    });
 };
 
-/**更新送電備品表 */
-export const apiPatchElectronicSupplies = async (id: string, body: TupdateElectronicSuppliesDto) => {
-  const api = `/engineering/electronic-supplies/${id}`;
+export const useGetElectronicSuppliesRequirementRecord_id = (
+  requirementRecordId: string | undefined,
+  {
+    autoUpdate = true,
+  }: {
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TelectronicSuppliesRequirementRecordDto>();
+
+  const update = async () => {
+    if (!requirementRecordId) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetElectronicSuppliesRequirementRecord_id(requirementRecordId);
+      setRes(res);
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({ title: '取得送電備品需求單失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [requirementRecordId]);
+
+  return {
+    data: res,
+    update,
+    isFetching,
+  };
+};
+
+export const apiPostElectronicSuppliesRequirementRecord = (
+  electronicSupplyid: string,
+  body: TcreateElectronicSuppliesRequirementRecordDto
+) => {
+  const api = `/engineering/electronic-supplies/${electronicSupplyid}/requirement-record`;
 
   return axi
-    .patch(api, body)
+    .post<TelectronicSuppliesRequirementRecordDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((error: AxiosError<TapiError>) => {
+      myAlert.err({
+        title: '新增送電備品需求單失敗',
+        content: error.response?.data?.message || error.message,
+      });
+
+      return Promise.reject(error);
+    });
 };
+
+export const apiPatchElectronicSuppliesRequirementRecord = (
+  requirementrecordId: string,
+  body: TupdateElectronicSuppliesRequirementRecordDto
+) => {
+  const api = `/engineering/electronic-supplies/requirement-record/${requirementrecordId}`;
+
+  return axi
+    .patch<TelectronicSuppliesRequirementRecordDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError<TapiError>) => {
+      myAlert.err({
+        title: '更新送電備品需求單失敗',
+        content: err.response?.data?.message || err.message,
+      });
+
+      return Promise.reject(err);
+    });
+};
+
+const apiGetElectronicSuppliesPickupRecord_id = (id: string) => {
+  const api = `/engineering/electronic-supplies/pick-up-record/${id}`;
+
+  const params = {
+    populate: ['takeOffEmployee', 'pickupRecordDetails', 'preparationEmployee'],
+  };
+
+  return axi
+    .get<TelectronicSuppliesPickupRecordDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((error) => {
+      return Promise.reject(error);
+    });
+};
+
+export const useGetElectronicSuppliesPickupRecord_id = (
+  pickupRecordId: string | undefined | null,
+  {
+    autoUpdate = true,
+  }: {
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TelectronicSuppliesPickupRecordDto>();
+
+  const update = async () => {
+    if (!pickupRecordId) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetElectronicSuppliesPickupRecord_id(pickupRecordId);
+      setRes(res);
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({ title: '取得送電備品領料單失敗', content: err.message });
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [pickupRecordId]);
+
+  return {
+    data: res,
+    update,
+    isFetching,
+  };
+};
+
+export const apiPostElectronicSuppliesPickupRecord = (id: string, body: TcreateElectronicSuppliesPickupRecordDto) => {
+  const api = `/engineering/electronic-supplies/${id}/pickup-record`;
+
+  return axi
+    .post<TelectronicSuppliesPickupRecordDto>(api, body)
+    .then(({ data }) => data)
+    .catch((error: AxiosError<TapiError>) => {
+      myAlert.err({
+        title: '新增送電備品領取單失敗',
+        content: error.response?.data?.message || error.message,
+      });
+
+      return Promise.reject(error);
+    });
+};
+
+export const apiPatchElectronicSuppliesPickupRecord = (id: string, body: TupdateElectronicSuppliesPickupRecordDto) => {
+  const api = `/engineering/electronic-supplies/pickup-record/${id}`;
+
+  return axi
+    .patch<TelectronicSuppliesPickupRecordDto>(api, body)
+    .then(({ data }) => data)
+    .catch((error: AxiosError<TapiError>) => {
+      myAlert.err({
+        title: '更新送電備品領取單失敗',
+        content: error.response?.data?.message || error.message,
+      });
+
+      return Promise.reject(error);
+    });
+};
+
+// endregion 送電備品
 
 // ------------------------------------------------------------------------
 // 調退貨單
@@ -1764,7 +1832,13 @@ export const apiPatchEngineeringContactReviewAttachment = async (id: string, bod
 
 // ==============================================================================
 
-// region 要找時間整理一下拉
+// MARK: 要找時間
+//
+//
+//
+//
+//
+// MARK: 整理一下拉
 
 // 已無此api
 // export const apiPatchAccountantInvoice = (

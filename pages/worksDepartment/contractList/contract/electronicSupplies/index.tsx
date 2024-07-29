@@ -1,6 +1,32 @@
+// 東元的馬達 才會用到"馬達控制箱" 要依照他的馬力數和電供
+// 如果有"防颱滑動支撐中柱" 就要寫其他有幾隻
+// 如果有"遙控器(1:2)" 就要備註 什麼廠牌有幾個
+// 如果有"彈射門"的話 就會有彈射門控制箱 並依照馬達的馬力
+
+// https://github.com/San-Jeou/sanjeou-erp-fe/issues/248
+// https://github.com/San-Jeou/sanjeou-erp-fe/assets/65767828/3ab5b70e-bdda-42e4-af82-bb2ff6e2be63
+
+// 送電備品列表
+// 一個row就是一個工作表，列出其中的指定送電備品
+
+// 送電備品總料單
+// 列出所有的送電備品
+// 資料為electronicSupplies.electronicSuppliesContents
+// 表格格式為 動態 的
+
+// 送電備品料單領取歷程
+// 資料為electronicSupplies.pickupRecords
+// 表格格式為 動態 的
+
+// 送電備品需求歷程
+// 資料為electronicSupplies.requirementRecords
+// 表格格式為 靜態 的，列出設計圖上的送電備品項目
+
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
+// import _ from 'lodash';
+// import moment, { Moment } from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -12,15 +38,24 @@ import { Popover } from 'antd';
 // component
 import SupplyList from 'components/page/worksDepartment/electronicSupplies/supplyList';
 import ItemList from 'components/page/worksDepartment/electronicSupplies/itemList';
-import ReceivedHistory from 'components/page/worksDepartment/electronicSupplies/receivedHistory';
-import DemandHistory from 'components/page/worksDepartment/electronicSupplies/demandHistory';
+import PickupRecord from 'components/page/worksDepartment/electronicSupplies/pickupRecord';
+import RequirementRecord from 'components/page/worksDepartment/electronicSupplies/requirementRecord';
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
 
 // api
-import { useGetContract_id } from 'js/api/api_quotation';
-// import { useGetEngineeringContact, useGetElectronicSupplies } from 'js/api/api_engineering';
+import {
+  //
+  useGetContract_id,
+  useGetContract_id_finalProductItem,
+} from 'js/api/api_quotation';
+import {
+  //
+  apiPostElectronicSupplies,
+  useGetEngineeringContact,
+  useElectronicSupplies_id,
+} from 'js/api/api_engineering';
 
 import { Icon_info } from 'public/image/icon/svgComponent/svgIcons';
 
@@ -30,24 +65,33 @@ import scss from './electronicSupplies.module.scss';
 // utils
 // import { workSheetReducer, TquotationProductItemDto } from 'js/utils/worksheet/reducer';
 
-import { TquotationProductItemDto } from 'js/api/dtoTypes';
+import {
+  TemployeeDto,
+  //
+  TworksheetDto,
+  TquotationProductItemDto,
+} from 'js/api/dtoTypes';
+
+import {
+  Tstate_electronicItem,
+  Tstate_info,
+  createEmptyStateInfo,
+} from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
 
 // ------------------------------------------------------------------
 
 type Tquery = {
   contractId: string;
-  listName: 'itemList' | 'supplyList' | 'receiveHistory' | 'demandHistory' | undefined;
+  listName: 'itemList' | 'supplyList' | 'pickupRecord' | 'requirementRecord' | undefined;
 };
 
-type TproductItemList = {
-  [key: string]: {
-    productItem: TquotationProductItemDto;
-    qty: number;
-  };
+type TdoorQtySubTotalList = {
+  [doorModelName: string]: number;
 };
 
 // ------------------------------------------------------------------
 
+// MARK: START
 export default function ElectronicSupplies() {
   const router = useRouter();
   const { contractId, listName = 'itemList' } = router.query as Tquery;
@@ -55,105 +99,54 @@ export default function ElectronicSupplies() {
   // ------------------------------------------------------------------
 
   const { data: contract, update } = useGetContract_id(contractId, {
-    customPopulate: ['engineeringContact', 'worksheet.contractProductItems.accessories'],
+    customPopulate: [
+      //
+      'engineeringContact',
+      'worksheet.latestRecord.contractProductItems.accessories',
+    ],
   });
-  // const engineeringContactId = contract?.engineeringContactId ?? '';
 
-  const worksheet = contract?.worksheet;
+  const { engineeringContact, worksheet, electronicSuppliesId, engineeringContactId } = contract ?? {};
 
   const {
-    contractNumber = '',
+    data: data_electronicSupplies,
+    // update: update_electronicSupplies,
+    isFetching: isFetching_electronicSupplies,
+  } = useElectronicSupplies_id(electronicSuppliesId);
+
+  // const { data: data_finalProductItem, update: update_finalProductItem } =
+  //   useGetContract_id_finalProductItem(contractId);
+
+  const {
+    //
+    // contractNumber = '',
     projectName = '',
-    projectContent = '',
+    // projectContent = '',
     projectNumber = '',
-  } = contract?.engineeringContact ?? {};
-  // ------------------------------------------------------------------
+  } = engineeringContact ?? {};
 
-  // !因為worksheet資料結構改變，這段程式碼不能用了，先註解
-
-  // const { itemList, doorQtySubTotal, doorQtyTotal } = useMemo(() => {
-  //   if (!worksheet?.latestRecord.contractProductItems) {
-  //     return {};
-  //   }
-
-  //   const itemList: TproductItemList = {};
-  //   const doorQtySubTotal: { [key: string]: number } = {};
-  //   let doorQtyTotal = 0;
-
-  //   const { itemTokenList, itemIdArrList } = workSheetReducer({ worksheet });
-
-  //   Object.keys(itemIdArrList).forEach((idKey) => {
-  //     const list = itemTokenList[idKey];
-
-  //     for (const [key, value] of Object.entries(list)) {
-  //       if (key === 'originalItem') {
-  //         continue;
-  //       }
-
-  //       const qty = itemIdArrList[idKey][key].length;
-
-  //       const doorType = value.doorModelName;
-
-  //       if (!doorQtySubTotal[doorType]) {
-  //         doorQtySubTotal[doorType] = qty;
-  //       } else {
-  //         doorQtySubTotal[doorType] += qty;
-  //       }
-
-  //       doorQtyTotal += qty;
-
-  //       itemList[key] = {
-  //         productItem: value,
-  //         qty,
-  //       };
-  //     }
-  //   });
-
-  //   return {
-  //     itemTokenList,
-  //     itemIdArrList,
-  //     itemList,
-  //     doorQtySubTotal,
-  //     doorQtyTotal,
-  //   };
-  // }, [worksheet]);
+  const {
+    hasFinishPickUp,
+    electronicSuppliesContents = [],
+    pickupRecords = [],
+    requirementRecords = [],
+  } = data_electronicSupplies ?? {};
 
   // ------------------------------------------------------------------
 
-  useEffect(() => {
-    update();
-  }, []);
+  // region REQUEST
+
+  const reqCreateRequirementRecordFromIWorksheet = async () => {
+    await apiPostElectronicSupplies({ contractId }).then(update);
+  };
 
   // ------------------------------------------------------------------
-  const panelList_receiveHistory: TpanelList = [
-    {
-      type: 'addButton',
-      label: '新增',
-      onClick: () =>
-        router.push({
-          pathname: `${router.pathname}/editReceivedHistory`,
-          query: { ...router.query },
-        }),
-    },
-  ];
-  const panelList_demandHistory: TpanelList = [
-    {
-      type: 'addButton',
-      label: '新增',
-      onClick: () =>
-        router.push({
-          pathname: `${router.pathname}/editDemandHistory`,
-          query: { ...router.query },
-        }),
-    },
-  ];
 
-  const panelList =
-    listName === 'receiveHistory'
-      ? panelList_receiveHistory
-      : listName === 'demandHistory'
-      ? panelList_demandHistory
-      : [];
+  // MARK: PROPS
+
+  const { doorModalQtyList, doorQtyTotal } = useCalcDoorModal(worksheet ?? []);
+
+  const panelList = usePanelList({ reqCreateRequirementRecordFromIWorksheet });
 
   // ------------------------------------------------------------------
 
@@ -162,7 +155,7 @@ export default function ElectronicSupplies() {
       label: '送電備品列表',
       isActive: listName === 'itemList',
       onClick: () => {
-        router.push({
+        router.replace({
           query: { ...router.query, listName: 'itemList' },
         });
       },
@@ -171,35 +164,45 @@ export default function ElectronicSupplies() {
       label: '送電備品總料單',
       isActive: listName === 'supplyList',
       onClick: () => {
-        router.push({
+        router.replace({
           query: { ...router.query, listName: 'supplyList' },
         });
       },
     },
     {
       label: '送電備品料單領取歷程',
-      isActive: listName === 'receiveHistory',
+      isActive: listName === 'pickupRecord',
       onClick: () => {
-        router.push({
-          query: { ...router.query, listName: 'receiveHistory' },
+        router.replace({
+          query: { ...router.query, listName: 'pickupRecord' },
         });
       },
     },
     {
       label: '送電備品料單需求歷程',
-      isActive: listName === 'demandHistory',
+      isActive: listName === 'requirementRecord',
       onClick: () => {
-        router.push({
-          query: { ...router.query, listName: 'demandHistory' },
+        router.replace({
+          query: { ...router.query, listName: 'requirementRecord' },
         });
       },
     },
   ];
 
   // ------------------------------------------------------------------
+  // MARK: useEffect
+
+  useEffect(() => {
+    update();
+    // update_finalProductItem();
+  }, []);
+
+  // ------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isFetching_electronicSupplies}>
       <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? '---'} />
       <div className={scss.container}>
         <div className={scss.info}>
@@ -227,8 +230,8 @@ export default function ElectronicSupplies() {
               },
             }}
           />
-          {/* // !因為worksheet資料結構改變，這段程式碼不能用了，先註解 */}
-          {/* <InputSel
+
+          <InputSel
             caption="門型數量"
             showBaseline="invisible"
             captionStyle={{ width: '80px' }}
@@ -239,8 +242,8 @@ export default function ElectronicSupplies() {
                 readOnly: true,
               },
             }}
-            suffix={<Info doorQtySubTotal={doorQtySubTotal} />}
-          /> */}
+            suffix={<Info doorModalQtyList={doorModalQtyList} />}
+          />
           <InputSel
             caption="領料狀態"
             showBaseline="invisible"
@@ -248,26 +251,21 @@ export default function ElectronicSupplies() {
             wrapperStyle={{ gap: '25px' }}
             inputProps={{
               props: {
-                value: '領料尚未完成',
+                value: hasFinishPickUp ? '送電材料皆領料完成' : '尚未領料完成',
                 readOnly: true,
-                className: classNames(scss.supplyStatus, false && scss.isDone),
+                className: classNames(scss.supplyStatus, hasFinishPickUp && scss.isDone),
               },
             }}
           />
         </div>
 
-        <Wrapper_tab
-          tabArr={tabArr}
-          className={classNames('mt-10', 'w-full')}
-          // stickyTop={{
-          //   top: '50px',
-          // }}
-        >
-          {/* // !因為worksheet資料結構改變，這段程式碼不能用了，先註解 */}
-          {/* {listName === 'itemList' && <ItemList itemList={itemList} />} */}
-          {listName === 'supplyList' && <SupplyList />}
-          {listName === 'receiveHistory' && <ReceivedHistory />}
-          {listName === 'demandHistory' && <DemandHistory />}
+        <Wrapper_tab tabArr={tabArr} className={classNames('mt-10', 'w-full')}>
+          {listName === 'itemList' && <ItemList className={scss.table} worksheetArr={worksheet ?? []} />}
+          {listName === 'supplyList' && <SupplyList electronicSuppliesContents={electronicSuppliesContents} />}
+          {listName === 'pickupRecord' && <PickupRecord className={scss.table} pickupRecords={pickupRecords} />}
+          {listName === 'requirementRecord' && (
+            <RequirementRecord className={scss.table} requirementRecords={requirementRecords} />
+          )}
         </Wrapper_tab>
       </div>
     </SubLayer>
@@ -275,14 +273,16 @@ export default function ElectronicSupplies() {
 }
 // ===========================================================
 
-const Info = ({ doorQtySubTotal }: { doorQtySubTotal: { [key: string]: number } | undefined }) => {
+// region COMPONENT
+
+const Info = ({ doorModalQtyList }: { doorModalQtyList: TdoorQtySubTotalList }) => {
   const Content = (
     <ul>
-      {Object.keys(doorQtySubTotal ?? {}).map((key, index) => {
+      {Object.entries(doorModalQtyList).map(([key, qty]) => {
         return (
-          <li key={index} className="flex gap-3">
+          <li key={key} className="flex gap-3">
             <span>{key}</span>
-            <span>{doorQtySubTotal![key]}樘</span>
+            <span>{qty}樘</span>
           </li>
         );
       })}
@@ -297,3 +297,117 @@ const Info = ({ doorQtySubTotal }: { doorQtySubTotal: { [key: string]: number } 
     </Popover>
   );
 };
+
+// =======================================================================
+
+// region HOOK
+
+const useCalcDoorModal = (worksheetArr: TworksheetDto[]) => {
+  const obj: {
+    doorModalQtyList: TdoorQtySubTotalList;
+    doorQtyTotal: number;
+  } = useMemo(() => {
+    const list: TdoorQtySubTotalList = {};
+    let total = 0;
+
+    worksheetArr.forEach((worksheet) => {
+      const { latestRecord, isAbandoned, isAlreadyToElectronicSupplies } = worksheet;
+
+      if (isAbandoned || !isAlreadyToElectronicSupplies) {
+        return;
+      }
+
+      const { contractProductItems } = latestRecord;
+
+      if (!contractProductItems?.[0]) {
+        return;
+      }
+
+      const qty = contractProductItems.length;
+      const doorModelName = contractProductItems[0].doorModelName;
+
+      if (!list[doorModelName]) {
+        list[doorModelName] = 0;
+      }
+
+      list[doorModelName] += qty;
+      total += qty;
+    }); // forEach
+
+    return {
+      doorModalQtyList: list,
+      doorQtyTotal: total,
+    };
+    //
+  }, [worksheetArr]);
+
+  return obj;
+};
+
+const usePanelList = ({
+  //
+  reqCreateRequirementRecordFromIWorksheet,
+}: {
+  reqCreateRequirementRecordFromIWorksheet: () => void;
+}) => {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const { listName, contractId } = query;
+
+  // ------------------------------------------------------------------------
+  //
+  const panelList_itemList: TpanelList = [];
+  //
+  const panelList_supplyList: TpanelList = [];
+  //
+  const panelList_pickupRecord: TpanelList = [
+    {
+      type: 'addButton',
+      label: '新增領取單',
+      onClick: () =>
+        router.push({
+          pathname: `${router.pathname}/editPickup`,
+          // query,
+          query: {
+            ...query,
+            contractId: contractId, // 確保要有contractId
+          },
+        }),
+    },
+  ];
+  //
+  const panelList_requirementRecord: TpanelList = [
+    {
+      type: 'addButton',
+      label: '自動產生需求單',
+      onClick: reqCreateRequirementRecordFromIWorksheet,
+    },
+    {
+      type: 'addButton',
+      label: '新增需求單',
+      onClick: () =>
+        router.push({
+          pathname: `${router.pathname}/editRequirement`,
+          // query,
+          query: {
+            ...query,
+            contractId: contractId, // 確保要有contractId
+          },
+        }),
+    },
+  ];
+
+  //
+  //
+
+  const list = {
+    itemList: panelList_itemList,
+    supplyList: panelList_supplyList,
+    pickupRecord: panelList_pickupRecord,
+    requirementRecord: panelList_requirementRecord,
+  };
+
+  return listName ? list[listName] : [];
+};
+
+// ============================================================================
