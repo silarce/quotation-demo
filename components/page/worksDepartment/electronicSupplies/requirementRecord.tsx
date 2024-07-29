@@ -46,7 +46,16 @@ export default function RequirementRecord({
     //
 
     const tbodyRowArr: Ttable['tbody']['rowArr'] = requirementRecords.map((item, index) => {
-      const { id, operationDate, agentEmployee, requirementRecordDetails = [] } = item;
+      const {
+        //
+        id,
+        operationDate,
+        agentEmployee,
+        requirementRecordDetails = [],
+        quantity,
+        doorType,
+        storageManagementPersonnelEmployee,
+      } = item;
 
       const qty = requirementRecordDetails?.reduce((qty, item) => {
         return new Decimal(qty).add(item.quantity || 0).toNumber();
@@ -64,19 +73,19 @@ export default function RequirementRecord({
           },
           {
             ...configList.requestEmployee,
-            children: '未串接',
+            children: agentEmployee?.chName,
           },
           {
             ...configList.doorModelName,
-            children: '未串接',
+            children: doorType,
           },
           {
             ...configList.qty,
-            children: qty,
+            children: quantity,
           },
           {
             ...configList.materialHandler,
-            children: '未串接',
+            children: storageManagementPersonnelEmployee?.chName || '---',
           },
           {
             width: 100,
