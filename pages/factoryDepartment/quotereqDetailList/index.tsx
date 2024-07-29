@@ -2,7 +2,7 @@ import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
-import _ from 'lodash';
+import _, { size } from 'lodash';
 
 import scss from './quotereqDetailList.module.scss';
 import Thead01 from '../ui/table/thead01';
@@ -51,7 +51,8 @@ export default function QuotereqDetailList() {
         create_by,
         approved,
         quoterequuid,
-        need_date
+        need_date,
+        note
     } = router.query;
 
     const getQueryParam = (param: any) => {
@@ -95,6 +96,9 @@ export default function QuotereqDetailList() {
     const [approvedin, setApprovedin] = useState<string>("");
     const [quoterequuidin, setquoterequuidin] = useState<string>(quoterequuid as string);
     const [purchaserequisitiondetailuuidin, setPurchaserequisitiondetailuuidin] = useState<string>("");
+    const [notein, setNotein] = useState<string>("");
+    const [statusin, setStatusin] = useState<string>("");
+
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -128,14 +132,20 @@ export default function QuotereqDetailList() {
                     </>,
                     props: {
                         onOk: () => {
-                            router.push({
-                                pathname: `/factoryDepartment/purchaseRequisitionList`,
-                                query: {
-                                    purchaserequisitionuuid: checkfirstin === 0 ? purchaserequisitionuuidin : purchaserequisitionuuid,
-                                    // purchaserequisitiondetailuuid: purchaserequisitiondetailuuidin,
-                                    // firstin:1
-                                },
-                            });
+                            router.back();
+                            // router.push({
+                            //     pathname: `/factoryDepartment/purchaseRequisitionList`,
+                            //     query: {
+                            //         purchaserequisitionuuid: purchaserequisitionuuidin,
+                            //         purchaserequisitionid: purchaserequisitionidin,
+                            //         create_at: getTaiwanDateStr(create_atin),
+                            //         create_by: create_byin,
+                            //         // approved: approvedin,
+                            //         status: statusin,
+                            //         note: notein,
+                            //         firstin: 1
+                            //     },
+                            // });
                         }
                     }
                 });
@@ -216,15 +226,17 @@ export default function QuotereqDetailList() {
             console.log(data);
 
             await new Promise(resolve => setTimeout(resolve, 500));
-            setPurchaserequisitionidin(data[0].purchaserequisitionid);
-            setPurchaserequisitionuuidin(purchaserequisitionuuid);
-            setQuotereqname(data[0].name);
-            setQuotereqspec(data[0].spec);
-            setQuotereqquantity(data[0].quantity);
-            getQuotereqDetail(data[0].quoterequuid);
-            setQuoterequnit(data[0].unit);
-            setquoterequuidin(data[0].quoterequuid)
-            setPurchaserequisitiondetailuuidin(data[0].purchaserequisitiondetailuuid);
+            if (checkfirstin === 0) {
+                setPurchaserequisitionidin(data[0].purchaserequisitionid);
+                setPurchaserequisitionuuidin(purchaserequisitionuuid);
+                setQuotereqname(data[0].name);
+                setQuotereqspec(data[0].spec);
+                setQuotereqquantity(data[0].quantity);
+                getQuotereqDetail(data[0].quoterequuid);
+                setQuoterequnit(data[0].unit);
+                setquoterequuidin(data[0].quoterequuid)
+                setPurchaserequisitiondetailuuidin(data[0].purchaserequisitiondetailuuid);
+            }
 
             // alert(data[0].quoterequuid);
 
@@ -238,6 +250,8 @@ export default function QuotereqDetailList() {
 
     useEffect(() => {
         getPurchaseRequisitionDetail(purchaserequisitionuuid);
+        setStatusin(status as string);
+        setNotein(note as string);
     }, [purchaserequisitionuuid]);
 
     // 編輯狀態控制
@@ -353,6 +367,7 @@ export default function QuotereqDetailList() {
 
     //取得對應詢價單主檔的詢價單明細檔
     const getQuotereqDetail = async (quoterequuid: any) => {
+
         // alert("in");
         try {
             // setIsLoading(true);
@@ -378,6 +393,7 @@ export default function QuotereqDetailList() {
 
             setPrquotereqdata(data);
             console.log(prquotereqdata);
+
 
 
         } catch (error: any) {
@@ -462,6 +478,8 @@ export default function QuotereqDetailList() {
         handlequotereqChange('unitprice', '')
         handlequotereqChange('totalprice', '')
         handlequotereqChange('note', '')
+        myAlert.success({ title: '廠商資訊帶入成功' });
+
     }
 
     const handlequotereqChange = (key: any, value: any) => {
@@ -600,6 +618,20 @@ export default function QuotereqDetailList() {
 
 
 
+    function handlechangeQuotereqDetail(item: any): void {
+        setCheckFirstIn(1);
+        setSelectedsupplier("");
+        setPurchaserequisitionidin(item.purchaserequisitionid);
+        setPurchaserequisitionuuidin(item.purchaserequisitionuuid);
+        setQuotereqname(item.name);
+        setQuotereqspec(item.spec);
+        setQuotereqquantity(item.quantity);
+        setQuoterequnit(item.unit);
+        setquoterequuidin(item.quoterequuid)
+        setPurchaserequisitiondetailuuidin(item.purchaserequisitiondetailuuid);
+        getQuotereqDetail(item.quoterequuid);
+    }
+
     return (
         <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={`請購單：${purchaserequisitionidin}｜詢價明細`} panelList={panelList} />
@@ -616,8 +648,7 @@ export default function QuotereqDetailList() {
                                             <span>{_item.productid}</span>
                                             <span>{_item.name}</span>
                                             <span>{_item.alreadyquotereq}</span>
-                                            {/* <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span> */}
-                                            <span><IconDetail onClick={() => getQuotereqDetail(_item.quoterequuid)} /></span>
+                                            <span><IconDetail onClick={() => handlechangeQuotereqDetail(_item)} /></span>
                                             {/* <span><IconDetail onClick={() => {alert(_item.quoterequuid)}} /></span> */}
                                         </div>
                                     </CellWithBar>
@@ -664,6 +695,7 @@ export default function QuotereqDetailList() {
                             <div>
                                 <button>
                                     <IconDetail onClick={() => { setPrquotereqmodalopen(!prquotereqmodalopen); getQuotereqSupplier(); }} />
+
                                 </button>
                             </div>
                             <div></div>
@@ -927,10 +959,10 @@ export default function QuotereqDetailList() {
                         </div>
                     </div>
                     <div className={scss.body_content1}>
-                        <Thead01 type={'Quotereq'} />
+                        <Thead01 type={'Quotereq2'} />
                         {prquotereqdata && (
                             prquotereqdata.map((_item: any, index: number) => (
-                                <CellWithBar key={index} className={scss.panelHeader17}>
+                                <CellWithBar key={index} className={scss.panelHeader23}>
                                     <div className={scss.row01}>
                                         <span>{index + 1}</span>
                                         <span>{_item.suppliername}</span>
@@ -951,6 +983,7 @@ export default function QuotereqDetailList() {
                                 </CellWithBar>
                             ))
                         )}
+
                     </div>
                     <div className={scss.body_foot1}>
                         <div>

@@ -18,7 +18,7 @@ import { IconCheck02, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
 import scss from './index.module.scss';
 
 // type
-import type { TincomeBillSerialDto } from 'js/api/dtoTypes';
+import type { Tparams, TincomeBillSerialDto } from 'js/api/dtoTypes';
 
 // api
 import {
@@ -74,9 +74,10 @@ export default function IncomeSummons() {
 
   // -----------------------------------------------------------------------------
 
-  const params = useMemo(() => {
+  const params: Tparams = useMemo(() => {
     return {
       sort: 'receiveDate',
+      pageSize: 999999,
       filter: {
         isForeign: {
           $eq: isForeign === 'true',
