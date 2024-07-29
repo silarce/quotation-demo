@@ -107,8 +107,6 @@ input::placeholder {
   }
 }
 
-
-
 // 在Radio或Checkbox的className加入originalDisabledStyle就可以取消以下的自訂樣式
 .ant-checkbox-wrapper:not(.originalDisabledStyle),
 .ant-radio-wrapper:not(.originalDisabledStyle) {
@@ -256,4 +254,16 @@ input:focus-visible {
   top: 0;
   right: -15px;
   transform: translate(50%, -50%);
+}
+
+.global_tip_must {
+  position: relative;
+  &:before {
+    content: "*";
+    font-size: 30px;
+    color: red;
+    position: absolute;
+    top: -5px;
+    left: -15px;
+  }
 }
