@@ -9,7 +9,8 @@ import classNames from 'classnames';
 // css
 import scss from './supplyTable.module.scss';
 
-import type { Tstate_electronicItem } from 'pages/worksDepartment/contractList/contract/electronicSupplies';
+// type
+import type { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
 
 // ==================================================================
 

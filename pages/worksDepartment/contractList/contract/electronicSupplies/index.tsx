@@ -25,8 +25,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import _ from 'lodash';
-import moment, { Moment } from 'moment';
+// import _ from 'lodash';
+// import moment, { Moment } from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -72,6 +72,12 @@ import {
   TquotationProductItemDto,
 } from 'js/api/dtoTypes';
 
+import {
+  Tstate_electronicItem,
+  Tstate_info,
+  createEmptyStateInfo,
+} from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+
 // ------------------------------------------------------------------
 
 type Tquery = {
@@ -82,49 +88,6 @@ type Tquery = {
 type TdoorQtySubTotalList = {
   [doorModelName: string]: number;
 };
-
-// type Tstate_electronicItem = {
-//   itemName: string;
-//   subItemName?: string | null;
-//   category: string;
-
-//   // 已領數量
-//   pickUpQuantity?: number | null;
-//   // 未領數量
-//   stayQuantity?: number | null;
-//   // 總需求數量
-//   quantity?: number | null;
-
-//   // 領取數量
-//   pickupRecord?: number | null;
-//   // 需求數量
-//   requirementQty?: number | null;
-// };
-
-type Tstate_electronicItem = {
-  id?: string;
-  category: string;
-  itemName: string;
-  quantity: number | null;
-  unit: string | null;
-  code: string | null;
-  // code: string | null;
-  subItemName?: null | '捲門/水閘門';
-};
-// itemName為'控制箱/盤'時，subItemName為'捲門/水閘門'，其他為null或undefined
-
-type Tstate_info = {
-  date: Moment | null;
-  indexNumber: string;
-  picker: TemployeeDto | undefined;
-  preparer: TemployeeDto | undefined;
-  doorModelName: string | undefined;
-  doorQty: `${number}` | '';
-};
-
-export type { Tstate_electronicItem, Tstate_info };
-
-// ------------------------------------------------------------------
 
 // ------------------------------------------------------------------
 
@@ -454,14 +417,3 @@ const usePanelList = ({
 };
 
 // ============================================================================
-
-const createEmptyStateInfo = (): Tstate_info => ({
-  date: moment(),
-  indexNumber: '',
-  picker: undefined,
-  preparer: undefined,
-  doorModelName: undefined,
-  doorQty: '',
-});
-
-export { createEmptyStateInfo };

@@ -8,6 +8,8 @@ import scss from './supplyList.module.scss';
 
 import type { TelectronicSuppliesContentDto } from 'js/api/dtoTypes';
 
+import { orderDetailArr } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+
 // ==================================================================
 
 export default function SupplyList({
@@ -19,6 +21,8 @@ export default function SupplyList({
     const list: {
       [key: string]: Tgroup;
     } = {};
+
+    electronicSuppliesContents = orderDetailArr({ detailArr: electronicSuppliesContents });
 
     electronicSuppliesContents.forEach((item) => {
       const {

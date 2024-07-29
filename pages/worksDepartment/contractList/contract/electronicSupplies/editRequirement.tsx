@@ -40,19 +40,20 @@ import { useApiGetProdDoorModels } from 'js/api/api_product';
 
 import { useGetContract_id } from 'js/api/api_quotation';
 
-// type
 import {
   Tstate_electronicItem,
   Tstate_info,
-  //
   createEmptyStateInfo,
-} from '.';
+  createDefaultState,
+  // orderDetailArr,
+} from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+
 import {
   //
-  TelectronicSuppliesDefaultItemName,
   TemployeeDto,
-  TelectronicSuppliesRequirementRecordDto,
-  TelectronicSuppliesDefaultCategory,
+  // TelectronicSuppliesDefaultItemName,
+  // TelectronicSuppliesRequirementRecordDto,
+  // TelectronicSuppliesDefaultCategory,
 } from 'js/api/dtoTypes';
 
 // ==================================================================
@@ -309,18 +310,10 @@ export default function EditRequirementRecord() {
 
     const { defaultStateList } = createDefaultState();
 
-    const {
-      // electronicSuppliesId,
-      // electronicSupplies,
-      // operationDate,
-      // agentEmployeeId,
-      // agentEmployee,
-      requirementRecordDetails,
-      // doorType,
-      // storageManagementPersonnel,
-      // storageManagementPersonnelId,
-      // number: idNumber,
-    } = data_requirementRecord ?? {};
+    const { requirementRecordDetails = [] } = data_requirementRecord ?? {};
+
+    // 其實沒有必要用orderDetailArr排序
+    // requirementRecordDetails = orderDetailArr({ detailArr: requirementRecordDetails });
 
     requirementRecordDetails?.forEach((detail) => {
       const { id: detailId, category, itemName, quantity, unit, code } = detail;
@@ -502,242 +495,6 @@ const config_inputSel: TinputSelProps = {
   showBaseline: 'auto',
   captionStyle: { width: '80px' },
   wrapperStyle: { gap: '25px' },
-};
-
-// ==================================================================
-
-// region DEFAULT
-
-// const defaultStateList: {
-//   [key in TelectronicSuppliesDefaultCategory[keyof TelectronicSuppliesDefaultCategory]]: Tstate;
-// } = {
-//   '智慧型（含主機）': {
-//     itemName: '鎖盒',
-//     category: '智慧型（含主機）',
-//     quantity: null,
-//   },
-// };
-
-// w category應該會是唯一的，並且之後會用category作為key
-const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
-  {
-    category: '智慧型（含主機）',
-    itemName: '鎖盒',
-    subItemName: undefined,
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '智慧型（含主機）+ 發訊器',
-    itemName: '鎖盒',
-    subItemName: undefined,
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '智慧型（含主機）+ 發射器',
-    itemName: '鎖盒',
-    subItemName: undefined,
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '智慧型（含主機）+ 發訊器 + 發射器',
-    itemName: '鎖盒',
-    subItemName: undefined,
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '面板式',
-    itemName: '鎖盒',
-    subItemName: undefined,
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '埋入式',
-    itemName: '鎖盒',
-    subItemName: undefined,
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '外露式',
-    itemName: '鎖盒',
-    subItemName: undefined,
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-];
-
-const defaultStateArr_鎖匙: Tstate_electronicItem[] = [
-  {
-    category: '鎖號',
-    itemName: '鎖匙',
-    subItemName: undefined,
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '特殊鎖號',
-    itemName: '鎖匙',
-    subItemName: undefined,
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-];
-
-const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
-  {
-    category: '3HP馬達控制箱(380V)',
-    itemName: '控制箱/盤',
-    subItemName: '捲門/水閘門',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '2HP馬達控制箱(380V)',
-    itemName: '控制箱/盤',
-    subItemName: '捲門/水閘門',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '3HP馬達控制箱(220V)',
-    itemName: '控制箱/盤',
-    subItemName: '捲門/水閘門',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '2HP馬達控制箱(220V)',
-    itemName: '控制箱/盤',
-    subItemName: '捲門/水閘門',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-];
-
-const defaultStateArr_押扣: Tstate_electronicItem[] = [
-  {
-    itemName: '押扣',
-    subItemName: undefined,
-    category: '三點式(一般)',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-];
-
-const defaultStateArr_消防備品: Tstate_electronicItem[] = [
-  {
-    itemName: '消防備品',
-    subItemName: undefined,
-    category: '煙感器',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    itemName: '消防備品',
-    subItemName: undefined,
-    category: '中繼器 1φ 220v',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    itemName: '消防備品',
-    subItemName: undefined,
-    category: '中繼器 3φ 380v',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-];
-
-const defaultStateArr_主機: Tstate_electronicItem[] = [
-  {
-    itemName: '主機',
-    subItemName: undefined,
-    category: '遙控器（1:2）+ 障感器',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    itemName: '主機',
-    subItemName: undefined,
-    category: '遙控器（1:2）',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    itemName: '主機',
-    subItemName: undefined,
-    category: '障感器',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-];
-
-const defaultStateArr_紅外線: Tstate_electronicItem[] = [
-  {
-    itemName: '紅外線',
-    subItemName: undefined,
-    category: '反射式',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    itemName: '紅外線',
-    subItemName: undefined,
-    category: '對照式',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-];
-
-const createDefaultState = () => {
-  const defaultStateArr = _.cloneDeep([
-    ...defaultStateArr_鎖盒,
-    ...defaultStateArr_鎖匙,
-    ...defaultStateArr_控制箱盤,
-    ...defaultStateArr_押扣,
-    ...defaultStateArr_消防備品,
-    ...defaultStateArr_主機,
-    ...defaultStateArr_紅外線,
-  ]);
-
-  const defaultStateList: { [key: string]: Tstate_electronicItem } = {};
-
-  defaultStateArr.forEach((item) => {
-    const { category } = item;
-    defaultStateList[category] = item;
-  });
-
-  return {
-    defaultStateArr,
-    defaultStateList,
-  };
 };
 
 // ==================================================================

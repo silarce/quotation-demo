@@ -45,13 +45,12 @@ import { useApiGetProdDoorModels } from 'js/api/api_product';
 // css
 import scss from './editPickup.module.scss';
 
-// type
 import {
   Tstate_electronicItem,
   Tstate_info,
-  //
   createEmptyStateInfo,
-} from '.';
+  orderDetailArr,
+} from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
 
 // ==================================================================
 
@@ -133,9 +132,11 @@ export default function EditPickup() {
   // ------------------------------------------------------------------
 
   const defaultState = useMemo(() => {
-    const { pickupRecordDetails = [] } = data_pickup ?? {};
+    let { pickupRecordDetails = [] } = data_pickup ?? {};
 
     const list: { [key: string]: Tstate_electronicItem } = {};
+
+    pickupRecordDetails = orderDetailArr({ detailArr: pickupRecordDetails });
 
     pickupRecordDetails.forEach((detail) => {
       const { id, category, itemName, quantity, unit, code } = detail;
