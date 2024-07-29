@@ -3200,11 +3200,12 @@ export type TcreateElectronicSuppliesRequirementRecordDto = Pick<
 > & {
   storageManagementPersonnelId: string;
   requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
+  quantity: string | null;
 };
 
 export type TupdateElectronicSuppliesRequirementRecordDto = Pick<
   TcreateElectronicSuppliesRequirementRecordDto,
-  'operationDate' | 'storageManagementPersonnelId' | 'doorType'
+  'operationDate' | 'storageManagementPersonnelId' | 'doorType' | 'quantity'
 > & {
   requirementRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
 };

@@ -136,7 +136,7 @@ export default function EditRequirementRecord() {
       // picker,
       preparer,
       doorModelName,
-      //  doorQty
+      doorQty,
     } = state_info;
 
     const pass = check_stateInfo(state_info);
@@ -177,7 +177,7 @@ export default function EditRequirementRecord() {
       storageManagementPersonnelId: preparer!.id,
       doorType: doorModelName || null,
       requirementRecordDetails,
-      // quantity: Number(state_info.doorQty || 0),
+      quantity: doorQty ? String(doorQty || 0) : null,
     };
 
     if (requirementRecordId) {
@@ -382,7 +382,7 @@ export default function EditRequirementRecord() {
             className="global_tip_must"
             caption="需求日期"
             {...config_inputSel}
-            disabled={disabled}
+            disabled={true}
             datePickerProps={{
               props: {
                 value: state_info.date,
@@ -445,7 +445,7 @@ export default function EditRequirementRecord() {
               },
             }}
           />
-          {/* <InputSel
+          <InputSel
             caption="樘數"
             {...config_inputSel}
             disabled={disabled}
@@ -459,7 +459,7 @@ export default function EditRequirementRecord() {
                 },
               },
             }}
-          /> */}
+          />
         </div>
         {/* table */}
         <SupplyTable
