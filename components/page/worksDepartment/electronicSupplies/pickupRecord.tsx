@@ -51,14 +51,19 @@ export default function PickupRecord({
         operationDate,
         takeOffEmployee,
         totalQuantity,
-        action,
-        pickupRecordDetails = [],
+        // action,
+        // pickupRecordDetails = [],
         doorModel,
         preparationEmployee,
+        number: idNumber,
       } = item;
 
       return {
         cellArr: [
+          {
+            ...configList.idNumber,
+            children: idNumber,
+          },
           {
             ...configList.date,
             children: getTaiwanDateStr(operationDate),
@@ -115,6 +120,7 @@ export default function PickupRecord({
 
 const keysArr = [
   //
+  'idNumber',
   'date', // 領料日期
   'ingredientTechnician', // 領料人員
   'doorModelName',
@@ -124,6 +130,10 @@ const keysArr = [
 ];
 
 const configList: { [key: string]: Tconfig_table } = {
+  idNumber: {
+    label: '領料單號',
+    width: 150,
+  },
   date: {
     label: '領料日期',
     flex: '20%',

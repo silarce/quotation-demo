@@ -56,17 +56,14 @@ export default function RequirementRecord({
         quantity,
         doorType,
         storageManagementPersonnelEmployee,
+        number: idNumber,
       } = item;
-
-      const qty = requirementRecordDetails?.reduce((qty, item) => {
-        return new Decimal(qty).add(item.quantity || 0).toNumber();
-      }, 0);
 
       return {
         cellArr: [
           {
-            ...configList.indexNumber,
-            children: index + 1,
+            ...configList.idNumber,
+            children: idNumber,
           },
           {
             ...configList.date,
@@ -123,7 +120,7 @@ export default function RequirementRecord({
 
 const keysArr = [
   //
-  'indexNumber',
+  'idNumber',
   'date', // 領料日期
   'requestEmployee', // 領料人員
   'doorModelName',
@@ -133,9 +130,9 @@ const keysArr = [
 ];
 
 const configList: { [key: string]: Tconfig_table } = {
-  indexNumber: {
-    label: '流水號',
-    flex: '80px',
+  idNumber: {
+    label: '需求單號',
+    flex: '150px',
   },
   date: {
     label: '新增日期',

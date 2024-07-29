@@ -390,7 +390,7 @@ export default function EditRequirementRecord() {
           />
           <InputSel
             key={state_info.indexNumber}
-            caption="領料單號"
+            caption="需求單號"
             {...config_inputSel}
             disabled={true}
             inputProps={{ props: { defaultValue: state_info.indexNumber } }}

@@ -259,13 +259,7 @@ export default function ElectronicSupplies() {
           />
         </div>
 
-        <Wrapper_tab
-          tabArr={tabArr}
-          className={classNames('mt-10', 'w-full')}
-          // stickyTop={{
-          //   top: '50px',
-          // }}
-        >
+        <Wrapper_tab tabArr={tabArr} className={classNames('mt-10', 'w-full')}>
           {listName === 'itemList' && <ItemList className={scss.table} worksheetArr={worksheet ?? []} />}
           {listName === 'supplyList' && <SupplyList electronicSuppliesContents={electronicSuppliesContents} />}
           {listName === 'pickupRecord' && <PickupRecord className={scss.table} pickupRecords={pickupRecords} />}
