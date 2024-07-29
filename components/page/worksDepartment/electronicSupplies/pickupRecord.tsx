@@ -18,8 +18,17 @@ import scss_p from './_public.module.scss';
 
 import type { TelectronicSuppliesPickupRecordDto } from 'js/api/dtoTypes';
 
+// ==================================================================
+
+type Tquery = {
+  contractId: string | undefined;
+};
+
+// ==================================================================
 export default function PickupRecord({ pickupRecords }: { pickupRecords: TelectronicSuppliesPickupRecordDto[] }) {
   const router = useRouter();
+  const query = router.query as Tquery;
+  const { contractId } = router.query as Tquery;
   // ------------------------------------------------------------------
 
   const control_table = useMemo(() => {
@@ -68,8 +77,10 @@ export default function PickupRecord({ pickupRecords }: { pickupRecords: Telectr
             children: (
               <Link
                 href={{
-                  pathname: router.pathname + '/editPickupRecord',
+                  pathname: router.pathname + '/editPickup',
                   query: {
+                    ...query,
+                    contractId: contractId, // 確保要有contractId
                     pickupRecordId: id,
                   },
                 }}

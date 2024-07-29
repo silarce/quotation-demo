@@ -2,13 +2,14 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
+import Decimal from 'decimal.js';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // antd
-import { Select } from 'antd';
+import { Select, SelectProps } from 'antd';
 
 // component
 import SupplyTable, {
@@ -23,13 +24,20 @@ import SupplyTable, {
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import {
+  TcreateElectronicSuppliesPickupRecordDto,
+  TupdateElectronicSuppliesPickupRecordDto,
+  TcreateElectronicSuppliesRecordDetailDto,
   //
   useGetElectronicSuppliesPickupRecord_id,
   useElectronicSupplies_id,
   useGetElectronicSuppliesRequirementRecord_id,
+  //
+  apiPostElectronicSuppliesPickupRecord,
+  apiPatchElectronicSuppliesPickupRecord,
 } from 'js/api/api_engineering';
 import { useGetContract_id } from 'js/api/api_quotation';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
@@ -45,8 +53,6 @@ import {
   createEmptyStateInfo,
 } from '.';
 
-import { TemployeeDto } from 'js/api/dtoTypes';
-
 // ==================================================================
 
 type Tquery = {
@@ -60,11 +66,17 @@ type TstateList = {
 
 // ==================================================================
 
-const SelectorGroup = selectModalCreator_multi<['employee']>({
+const SelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
   selectorArr: [
     {
       key: 'employee',
       caption: '領料人員',
+      tip: '單選',
+      limit: 1,
+    },
+    {
+      key: 'employee',
+      caption: '備料人員',
       tip: '單選',
       limit: 1,
     },
@@ -78,7 +90,7 @@ export default function EditPickup() {
   const isNew = !pickupRecordId;
 
   // ------------------------------------------------------------------
-  const [disabled, setDisabled] = useState(true);
+  const [disabled, setDisabled] = useState(!isNew);
   const [showSelector, setShowSelector] = useState(false);
 
   // ------------------------------------------------------------------
@@ -86,7 +98,7 @@ export default function EditPickup() {
   const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
   const [state_info, setState_info] = useState<Tstate_info>(createEmptyStateInfo());
 
-  const [requirementRecordIdArr, setRequirementRecordIdArr] = useState<string[]>();
+  const [requirementRecordId, setRequirementRecordId] = useState<string>();
 
   // ------------------------------------------------------------------
 
@@ -116,8 +128,6 @@ export default function EditPickup() {
     },
   });
 
-  // const { data: data_requirementRecord } = useGetElectronicSuppliesRequirementRecord_id(requirementRecordId);
-
   // ------------------------------------------------------------------
 
   const defaultState = useMemo(() => {
@@ -126,13 +136,7 @@ export default function EditPickup() {
     const list: { [key: string]: Tstate_electronicItem } = {};
 
     pickupRecordDetails.forEach((detail) => {
-      const {
-        category,
-        itemName,
-        quantity,
-        unit,
-        //  code
-      } = detail;
+      const { category, itemName, quantity, unit, code } = detail;
 
       list[category] = {
         ...list[category], // 可能是undefined // 會將subItemName帶入
@@ -140,58 +144,92 @@ export default function EditPickup() {
         itemName,
         quantity,
         unit,
-        // code,
+        code,
       };
 
       //
     });
 
-    // let stateInfo = createEmptyStateInfo();
-
-    // if (data_pickup) {
-    //   stateInfo = {
-    //     date: data_pickup.operationDate ? moment(data_pickup.operationDate) : null,
-    //     indexNumber: data_pickup.number,
-    //     picker: undefined,
-    //     preparer: data_pickup.takeOffEmployee || undefined,
-    //     doorModelName: data_pickup.doorType ?? '',
-    //   };
-    // }
-
     return list;
   }, [data_pickup]);
 
-  // const requirementState = useMemo(() => {
-  //   let requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
+  // ------------------------------------------------------------------
 
-  //   requirementRecords = requirementRecords.filter((record) => {
-  //     return requirementRecordIdArr?.includes(record.id);
-  //   });
+  // region REQUEST
 
-  //   const detailArr = requirementRecords
-  //     .flatMap((record) => record.requirementRecordDetails)
-  //     .filter((detail) => !!detail);
+  const reqPostPatch = async () => {
+    if (!data_electronicSupplies?.id) {
+      myAlert.err({
+        title: '尚未取得送電備品資料',
+      });
 
-  //   const list: { [key: string]: Tstate_electronicItem } = {};
+      return;
+    }
 
-  //   detailArr.forEach((detail) => {
-  //     const { category, itemName, quantity, unit, code } = detail;
+    const pass = check_stateInfo(state_info);
 
-  //     if (!list[category]) {
-  //       list[category] = {
-  //         category,
-  //         itemName,
-  //         quantity: quantity || 0,
-  //         unit,
-  //         code,
-  //       };
-  //     } else {
-  //       list[category].quantity! += quantity || 0;
-  //     }
-  //   });
+    if (!pass) {
+      myAlert.info({
+        title: '請填寫必要欄位',
+      });
 
-  //   return list;
-  // }, [data_electronicSupplies?.requirementRecords, requirementRecordIdArr]);
+      return;
+    }
+
+    let pickupRecordDetails: (TcreateElectronicSuppliesRecordDetailDto & { id?: string })[] = Object.values(
+      state_electronicItemList
+    ).map((item) => {
+      const { id, category, itemName, quantity, unit, code, subItemName } = item;
+      const detail = {
+        // 必須要送id，若id為undefined將會新增一筆detail
+        // 預期:新增時每一筆資料都沒有id、編輯時每一筆資料都有id，
+        id,
+        itemName,
+        category,
+        quantity,
+        unit,
+        code,
+      };
+
+      return detail;
+    });
+
+    if (isNew) {
+      pickupRecordDetails = pickupRecordDetails.filter((detail) => !!detail.quantity);
+    }
+
+    const totalQuantity = pickupRecordDetails
+      .reduce((acc, detail) => acc.add(detail.quantity!), new Decimal(0))
+      .toNumber();
+
+    const body: TcreateElectronicSuppliesPickupRecordDto = {
+      operationDate: state_info.date!.toISOString(),
+      takeOffEmployeeId: state_info.picker!.id,
+      action: '領取',
+      preparationEmployeeId: state_info.preparer!.id,
+      doorModel: state_info.doorModelName!,
+      requirementRecordId: requirementRecordId || null,
+
+      pickupRecordDetails,
+      totalQuantity,
+    };
+
+    if (isNew) {
+      await apiPostElectronicSuppliesPickupRecord(data_electronicSupplies.id, body).then(async () => {
+        await update_pickup();
+        setDisabled(true);
+      });
+    } else if (!data_pickup?.id) {
+      myAlert.err({ title: '沒有領取單id' });
+
+      return;
+    } else {
+      await apiPatchElectronicSuppliesPickupRecord(data_pickup.id, body).then(async () => {
+        await update_pickup();
+        setDisabled(true);
+      });
+    }
+  };
 
   // ------------------------------------------------------------------
 
@@ -213,7 +251,7 @@ export default function EditPickup() {
     let requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
 
     requirementRecords = requirementRecords.filter((record) => {
-      return requirementRecordIdArr?.includes(record.id);
+      return requirementRecordId?.includes(record.id);
     });
 
     const detailArr = requirementRecords
@@ -255,22 +293,29 @@ export default function EditPickup() {
     const requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
 
     return requirementRecords.map((record) => {
-      return {
+      const { isPickupRecordAlreadyChoose } = record;
+
+      const option: NonNullable<SelectProps['options']>[number] = {
         value: record.id,
         label: record.number || '無單號',
+        className: classNames(isPickupRecordAlreadyChoose && scss.antd_usedOption),
       };
+
+      return option;
     });
 
     //
   }, [data_electronicSupplies?.requirementRecords]);
 
   const defaultSeletedDataArrArr: Parameters<typeof SelectorGroup>[0]['defaultSeletedDataArrArr'] = useMemo(() => {
-    const arr01 = [];
+    const arr_picker = [];
+    const arr_preparer = [];
 
-    state_info.picker && arr01.push(state_info.picker);
+    state_info.picker && arr_picker.push(state_info.picker);
+    state_info.preparer && arr_preparer.push(state_info.preparer);
 
-    return [arr01];
-  }, [state_info.picker]);
+    return [arr_picker];
+  }, [state_info.picker, state_info.preparer]);
 
   const panelList_disabled: TpanelList = [
     {
@@ -293,7 +338,7 @@ export default function EditPickup() {
     {
       type: 'redButton',
       label: '上傳',
-      onClick: () => {},
+      onClick: reqPostPatch,
     },
     {
       type: 'myButton',
@@ -308,7 +353,7 @@ export default function EditPickup() {
     {
       type: 'redButton',
       label: '上傳',
-      onClick: () => {},
+      onClick: reqPostPatch,
     },
     {
       type: 'myButton',
@@ -332,51 +377,6 @@ export default function EditPickup() {
     update_contract();
   }, [contractId]);
 
-  // useEffect(() => {
-  //   if (!disabled && data_pickup) {
-  //     return;
-  //   }
-
-  //   const { pickupRecordDetails = [] } = data_pickup ?? {};
-
-  //   const list: { [key: string]: Tstate_electronicItem } = {};
-
-  //   pickupRecordDetails.forEach((detail) => {
-  //     const {
-  //       category,
-  //       itemName,
-  //       quantity,
-  //       unit,
-  //       //  code
-  //     } = detail;
-
-  //     list[category] = {
-  //       ...list[category], // 可能是undefined // 會將subItemName帶入
-  //       category,
-  //       itemName,
-  //       quantity,
-  //       unit,
-  //       // code,
-  //     };
-
-  //     //
-  //   });
-
-  //   let stateInfo = createEmptyStateInfo();
-
-  //   if (data_pickup) {
-  //     stateInfo = {
-  //       date: data_pickup.operationDate ? moment(data_pickup.operationDate) : null,
-  //       indexNumber: data_pickup.number,
-  //       picker: undefined,
-  //       preparer: data_pickup.takeOffEmployee || undefined,
-  //       doorModelName: data_pickup.doorType ?? '',
-  //     };
-  //   }
-
-  //   setState_electronicItemList(list);
-  //   setState_info(stateInfo);
-  // }, [disabled, data_pickup]);
   useEffect(() => {
     if (!disabled && data_pickup) {
       return;
@@ -387,10 +387,10 @@ export default function EditPickup() {
     if (data_pickup) {
       stateInfo = {
         date: data_pickup.operationDate ? moment(data_pickup.operationDate) : null,
-        indexNumber: data_pickup.number,
-        picker: undefined,
+        indexNumber: data_pickup.number || '',
+        picker: data_pickup.preparationEmployee || undefined,
         preparer: data_pickup.takeOffEmployee || undefined,
-        doorModelName: data_pickup.doorType ?? '',
+        doorModelName: data_pickup.doorModel ?? '',
       };
     }
 
@@ -413,9 +413,10 @@ export default function EditPickup() {
         {/* info */}
         <div className={scss.info}>
           <InputSel
-            caption="需求日期"
+            className="global_tip_must"
+            caption="領取日期"
             {...config_inputSel}
-            disabled={disabled}
+            disabled={true}
             datePickerProps={{
               props: {
                 value: state_info.date,
@@ -436,7 +437,8 @@ export default function EditPickup() {
             inputProps={{ props: { defaultValue: state_info.indexNumber } }}
           />
 
-          {/* <InputSel
+          <InputSel
+            className="global_tip_must"
             caption="領料人員"
             {...config_inputSel}
             disabled={disabled}
@@ -445,11 +447,13 @@ export default function EditPickup() {
               props: {
                 placeholder: '',
                 value: state_info.picker?.chName ?? '',
+                onChange: () => {},
               },
             }}
-          /> */}
+          />
 
           <InputSel
+            className="global_tip_must"
             caption="備料人員"
             {...config_inputSel}
             disabled={disabled}
@@ -458,10 +462,12 @@ export default function EditPickup() {
               props: {
                 placeholder: '',
                 value: state_info.preparer?.chName ?? '',
+                onChange: () => {},
               },
             }}
           />
           <InputSel
+            className="global_tip_must"
             caption="門型"
             {...config_inputSel}
             disabled={disabled}
@@ -494,17 +500,18 @@ export default function EditPickup() {
         </div>
 
         {isNew && (
-          <div className={scss.selectBar}>
+          <div className={classNames(scss.selectBar, disabled && 'invisible')}>
             <Select
               placeholder="請選擇需求單"
               size="large"
-              className="w-96"
-              mode="multiple"
+              // className="w-96"
+              className={classNames('w-36')}
+              // mode="multiple"
               allowClear
               options={requirementRecordOptions}
-              value={requirementRecordIdArr}
+              value={requirementRecordId}
               onChange={(value) => {
-                setRequirementRecordIdArr(value as string[]);
+                setRequirementRecordId(value);
               }}
             />
             <MyButton_v2 px="px22" py="py4" onClick={replaceState}>
@@ -524,8 +531,14 @@ export default function EditPickup() {
         <SelectorGroup
           showModal={showSelector}
           onConfirm={(arr) => {
-            // setEmployee00(arr[0][0]);
-            // setEmployee01(arr[1][0]);
+            const picker = arr[0][0];
+            const preparer = arr[1][0];
+
+            setState_info((state) => ({
+              ...state,
+              picker,
+              preparer,
+            }));
           }}
           onCancel={() => {
             setShowSelector(false);
@@ -548,3 +561,14 @@ const config_inputSel: TinputSelProps = {
 };
 
 // ============================================================================
+
+const check_stateInfo = (state_info: Tstate_info) => {
+  let pass = true;
+
+  !state_info.date && (pass = false);
+  !state_info.preparer && (pass = false);
+  !state_info.picker && (pass = false);
+  !state_info.doorModelName && (pass = false);
+
+  return pass;
+};
