@@ -138,10 +138,11 @@ export default function EditPickup() {
     const list: { [key: string]: Tstate_electronicItem } = {};
 
     pickupRecordDetails.forEach((detail) => {
-      const { category, itemName, quantity, unit, code } = detail;
+      const { id, category, itemName, quantity, unit, code } = detail;
 
       list[category] = {
         ...list[category], // 可能是undefined // 會將subItemName帶入
+        id,
         category,
         itemName,
         quantity,
@@ -199,10 +200,6 @@ export default function EditPickup() {
     if (isNew) {
       pickupRecordDetails = pickupRecordDetails.filter((detail) => !!detail.quantity);
     }
-
-    // const totalQuantity = pickupRecordDetails
-    //   .reduce((acc, detail) => acc.add(detail.quantity!), new Decimal(0))
-    //   .toNumber();
 
     const body: TcreateElectronicSuppliesPickupRecordDto = {
       operationDate: state_info.date!.toISOString(),
