@@ -2,6 +2,12 @@
   padding: 50px;
 }
 
+.table {
+  width: 100%;
+  max-height: 380px;
+  overflow: auto;
+}
+
 .info {
   display: grid;
   grid-template-columns: 230px auto;

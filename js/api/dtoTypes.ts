@@ -29,7 +29,33 @@ export type TaccountantPaymentType = '匯款' | '票據' | '現金';
 export type TreceiptStatus = '託收' | '已兌現';
 export type Tcurrency = 'TWD 新臺幣' | 'USD 美元';
 export type TinvoiceType = '三聯式' | '二聯式';
+export type TelectronicSuppliesAction = '領取' | '退回';
 export type TfinalPaymentType = '尾款' | '保留款';
+
+//_______________________________________________________
+
+// TelectronicSuppliesRequirementRecordDetailDto的itemName、category雖然是string
+// 但是在需求單有預設的itemName與category
+export type TelectronicSuppliesDefaultCategory = {
+  鎖盒:
+    | '智慧型（含主機）'
+    | '智慧型（含主機）+ 發訊器'
+    | '智慧型（含主機）+ 發射器'
+    | '智慧型（含主機）+ 發訊器 + 發射器'
+    | '面板式'
+    | '埋入式'
+    | '外露式';
+  鎖匙: '鎖號' | '特殊鎖號';
+  '控制箱/盤': '3HP馬達控制箱(380V)' | '2HP馬達控制箱(380V)' | '3HP馬達控制箱(220V)' | '2HP馬達控制箱(220V)';
+  押扣: '三點式(一般)';
+  消防備品: '煙感器' | '中繼器 1φ 220v' | '中繼器 3φ 380v';
+  主機: '遙控器（1:2）+ 障感器' | '遙控器（1:2）' | '障感器';
+  紅外線: '反射式' | '對照式';
+};
+export type TelectronicSuppliesDefaultSubItemName = {
+  '控制箱/盤': '捲門/水閘門';
+};
+export type TelectronicSuppliesDefaultItemName = keyof TelectronicSuppliesDefaultCategory;
 
 // =============================================================================
 
@@ -1639,7 +1665,7 @@ export type TquotationProductItemDto = {
   deliveryStatusType: TdeliveryStatus;
   // 外包單堂計價
   itemPrice: number | null;
-  // 工作表id
+  // 工作表id 所屬工作表id 在工作表介面下被分堆後，同一堆的item應該會有同樣的工作表id
   worksheetId: string | null;
   // 工作表紀錄id
   worksheetRecordId: string | null;
@@ -2231,6 +2257,8 @@ export type TquotationContractDto = {
   engineeringDeliveryList?: TengineeringDeliveryListDto;
   //
   certificatedDoc?: TcertificatedDocDto[];
+  electronicSuppliesId: string | null;
+  electronicSupplies?: TelectronicSuppliesDto;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
@@ -3032,86 +3060,233 @@ export type TcreateDispatchingDto = Pick<
 
 export type TupdateDispatchingDto = Omit<Partial<TcreateDispatchingDto>, 'contractId'>;
 
-export type TelectronicSuppliesRecordDto = {
-  id: string;
-  electronicSuppliesId: string; // 前端用不到
-  createdAt: string;
-  updatedAt: string;
-  doorType: string;
-  itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
-  category: string;
-  quantity: number;
-  unit: string | null;
-};
+// export type TelectronicSuppliesRecordDto = {
+//   id: string;
+//   electronicSuppliesId: string; // 前端用不到
+//   createdAt: string;
+//   updatedAt: string;
+//   doorType: string;
+//   itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
+//   category: string;
+//   quantity: number;
+//   unit: string | null;
+// };
 
-export type TcreateElectronicSuppliesRecordDto = {
-  id?: string; // 後端沒有，前端為了方便加上去的
-  doorType: string;
-  itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
-  category: string;
-  quantity: number;
-  unit: string | null;
-};
+// export type TcreateElectronicSuppliesRecordDto = {
+//   id?: string; // 後端沒有，前端為了方便加上去的
+//   doorType: string;
+//   itemName: '鎖盒' | '鑰匙' | '押扣' | '控制箱/盤' | '消防備品' | '板門配件' | '主機' | '紅外線' | '防颱配件' | '其他';
+//   category: string;
+//   quantity: number;
+//   unit: string | null;
+// };
 
-export type TupdateElectronicSuppliesRecordDto = Partial<TcreateElectronicSuppliesRecordDto> & { id?: string };
+// export type TupdateElectronicSuppliesRecordDto = Partial<TcreateElectronicSuppliesRecordDto> & { id?: string };
 
 export type TelectronicSuppliesDto = {
   id: string;
   createdAt: string; // date
   updatedAt: string; // date
-  // 填表日期
-  dispatchDate: string; //date
-  // 需要日期
-  requirementsDate: string; //date
-  // 工程編號
-  // engineeringNumber: string;
-  projectNumber: string;
-  // 工程名稱
-  projectName: string;
 
-  electronicSuppliesRecords: TelectronicSuppliesRecordDto[];
-  // others: string;
-
-  // 備料人員Id
-  materialHandlerId?: string | null;
-  // 備料人員
-  materialHandler?: TemployeeDto | null;
-  // 領料人員ID
-  ingredientTechnicianId?: string | null;
-  // 領料人員
-  ingredientTechnician?: TemployeeDto | null;
-  //填表人員ID
-  formCompleterId?: string | null;
-  // 填表人員
-  formCompleter?: TemployeeDto | null;
-
-  contractId?: string;
+  // 所屬合約Id
+  contractId?: string | null;
+  // 所屬合約
   contract?: TquotationContractDto;
-  legacyContractId?: string;
+  // 所屬舊合約Id
+  legacyContractId?: string | null;
+  // 所屬舊合約
   legacyContract?: TlegacyContractDto;
-  // quotationId: string;
-  // quotation: TquotationDto;
+  // 完成領料
+  hasFinishPickUp: boolean;
+  // 送電備品內容
+  electronicSuppliesContents?: TelectronicSuppliesContentDto[];
+  // 送電備品領料單紀錄
+  pickupRecords?: TelectronicSuppliesPickupRecordDto[];
+  // 送電備品需求單紀錄
+  requirementRecords?: TelectronicSuppliesRequirementRecordDto[];
 };
 
-export type TcreateElectronicSuppliesDto = Omit<
-  TelectronicSuppliesDto,
-  | 'id'
-  | 'createdAt'
-  | 'updatedAt'
-  | 'contract'
-  | 'legacyContract'
-  | 'quotation'
-  | 'materialHandler'
-  | 'ingredientTechnician'
-  | 'formCompleter'
-  | 'electronicSuppliesRecords'
+export type TelectronicSuppliesContentDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 所屬送電備品表id
+  electronicSuppliesId: string;
+  // 所屬送電備品表
+  electronicSupplies?: TelectronicSuppliesDto;
+  // 品名
+  itemName: string;
+  // 種類
+  category: string;
+  // 單位
+  unit: string | null;
+  // 已領數量
+  pickUpQuantity: number | null;
+  // 未領數量
+  stayQuantity: number | null;
+  // 總需求數量
+  quantity: number | null;
+};
+
+export type TelectronicSuppliesRequirementRecordDetailDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 所屬送電備品需求單Id
+  requirementRecordId?: string | null;
+  // 所屬送電備品需求單
+  requirementRecord?: TelectronicSuppliesRequirementRecordDto;
+  // 品名
+  itemName: string;
+  // 種類
+  category: string;
+  // 需求數量
+  quantity: number | null;
+  // 單位
+  unit: string | null;
+  code: string | null;
+  note: string | null;
+};
+
+export type TcreateElectronicSuppliesRecordDetailDto = Pick<
+  TelectronicSuppliesRequirementRecordDetailDto,
+  'itemName' | 'category' | 'quantity' | 'unit'
 > & {
-  electronicSuppliesRecords: TcreateElectronicSuppliesRecordDto[];
+  code: string | null;
 };
 
-export type TupdateElectronicSuppliesDto = Omit<Partial<TcreateElectronicSuppliesDto>, 'electronicSuppliesRecords'> & {
-  electronicSuppliesRecords: TupdateElectronicSuppliesRecordDto[];
+export type TupdateElectronicSuppliesRecordDetailDto = TcreateElectronicSuppliesRecordDetailDto & {
+  id?: string;
 };
+
+//
+// RequirementRecord系列為需求單
+export type TelectronicSuppliesRequirementRecordDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 所屬送電備品id
+  electronicSuppliesId?: string | null;
+  // 所屬送電備品
+  electronicSupplies?: TelectronicSuppliesDto;
+  // 新增日期
+  operationDate: string;
+  // 新增人員id
+  agentEmployeeId: string;
+  // 新增人員
+  agentEmployee: TemployeeDto;
+  // 需求明細
+  requirementRecordDetails: TelectronicSuppliesRequirementRecordDetailDto[];
+  // 領料單是否已選擇過此需求單
+  isPickupRecordAlreadyChoose: boolean;
+  // 領料單號
+  number: string | null; // 就叫number，這個key是保留字，請小心使用
+  // 備料人員id
+  storageManagementPersonnelId: string | null;
+  // 備料人員
+  storageManagementPersonnelEmployee: TemployeeDto;
+  // 門型
+  doorType: string | null;
+  // 樘數
+  quantity: string | null;
+};
+
+export type TcreateElectronicSuppliesRequirementRecordDto = Pick<
+  TelectronicSuppliesRequirementRecordDto,
+  'operationDate' | 'doorType'
+> & {
+  storageManagementPersonnelId: string;
+  requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
+  quantity: string | null;
+};
+
+export type TupdateElectronicSuppliesRequirementRecordDto = Pick<
+  TcreateElectronicSuppliesRequirementRecordDto,
+  'operationDate' | 'storageManagementPersonnelId' | 'doorType' | 'quantity'
+> & {
+  requirementRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
+};
+
+// PickupRecord系列為領料單
+export type TelectronicSuppliesPickupRecordDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 所屬送電備品id
+  electronicSuppliesId: string | null;
+  // 所屬送電備品
+  electronicSupplies?: TelectronicSuppliesDto;
+  // 領料/退回
+  action: TelectronicSuppliesAction;
+  // 領取/退回日期
+  operationDate: string;
+  // 門型
+  doorModel: string;
+  // 總樘數
+  totalQuantity: number;
+  // 領料人員id
+  takeOffEmployeeId: string | null;
+  // 領料人員
+  takeOffEmployee?: TemployeeDto;
+  // 備料人員id
+  preparationEmployeeId: string | null;
+  // 備料人員
+  preparationEmployee?: TemployeeDto;
+  // 領料明細
+  pickupRecordDetails?: TelectronicSuppliesPickupRecordDetailDto[];
+  // 編號
+  number: string | null; // 就叫number，這個key是保留字，請小心使用
+};
+
+export type TelectronicSuppliesPickupRecordDetailDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 所屬送電備品領料單Id
+  pickupRecordId?: string | null;
+  // 所屬送電備品領料單
+  pickupRecord?: TelectronicSuppliesPickupRecordDto;
+  // 品名
+  itemName: string;
+  // 種類
+  category: string;
+  // 需求數量
+  quantity: number | null;
+  // 單位
+  unit: string | null;
+  //
+  code: string | null;
+};
+
+export type TcreateElectronicSuppliesPickupRecordDto = Pick<
+  TelectronicSuppliesPickupRecordDto,
+  'operationDate' | 'takeOffEmployeeId' | 'action' | 'preparationEmployeeId' | 'doorModel' | 'totalQuantity'
+> & {
+  requirementRecordId: string | null;
+  pickupRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
+};
+
+export type TupdateElectronicSuppliesPickupRecordDto = Partial<
+  Pick<
+    TcreateElectronicSuppliesPickupRecordDto,
+    | 'operationDate'
+    | 'takeOffEmployeeId'
+    | 'action'
+    | 'preparationEmployeeId'
+    | 'doorModel'
+    | 'totalQuantity'
+    | 'requirementRecordId'
+  >
+> & {
+  pickupRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
+};
+
+// ---------------------------------------------------------------------------
 
 export type TexchangeRecordDto = {
   id: string;
@@ -3197,6 +3372,8 @@ export type TworksheetDto = {
   latestRecord: TworksheetRecordDto;
   // 已捨棄
   isAbandoned: boolean;
+  // 是否已依據此worksheet建立送電備品
+  isAlreadyToElectronicSupplies: boolean;
 };
 
 export type TworksheetDto_legacy = {
