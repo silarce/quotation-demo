@@ -390,6 +390,7 @@ const apiGetElectronicSupplies_id = (id: string, { params_cover }: { params_cove
       //
       'electronicSuppliesContents',
       'pickupRecords.takeOffEmployee',
+      'pickupRecords.preparationEmployee',
       'pickupRecords.TelectronicSuppliesPickupRecordDetailDto',
       'requirementRecords',
     ],

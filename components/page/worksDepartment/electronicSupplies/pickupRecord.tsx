@@ -44,11 +44,17 @@ export default function PickupRecord({ pickupRecords }: { pickupRecords: Telectr
     //
 
     const tbodyRowArr: Ttable['tbody']['rowArr'] = pickupRecords.map((item) => {
-      const { id, operationDate, takeOffEmployee, action, pickupRecordDetails = [] } = item;
-
-      const qty = pickupRecordDetails?.reduce((qty, item) => {
-        return new Decimal(qty).add(item.quantity || 0).toNumber();
-      }, 0);
+      const {
+        //
+        id,
+        operationDate,
+        takeOffEmployee,
+        totalQuantity,
+        action,
+        pickupRecordDetails = [],
+        doorModel,
+        preparationEmployee,
+      } = item;
 
       return {
         cellArr: [
@@ -58,19 +64,19 @@ export default function PickupRecord({ pickupRecords }: { pickupRecords: Telectr
           },
           {
             ...configList.ingredientTechnician,
-            children: takeOffEmployee?.chName ?? '',
+            children: takeOffEmployee?.chName ?? '---',
           },
           {
             ...configList.doorModelName,
-            children: '未串接',
+            children: doorModel,
           },
           {
             ...configList.qty,
-            children: qty,
+            children: totalQuantity,
           },
           {
             ...configList.materialHandler,
-            children: '未串接',
+            children: preparationEmployee?.chName ?? '---',
           },
           {
             width: 100,
