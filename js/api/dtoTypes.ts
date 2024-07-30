@@ -3656,7 +3656,7 @@ export type TincomeBillSerialDto = {
   receivablePayment: number | null;
   // 扣款金額
   deductionPayment: number | null;
-  // 未收款金額
+  // 未收款金額 // 餘額
   unpaidPayment: number | null;
   // 是否為國外收入傳票
   isForeign: boolean;

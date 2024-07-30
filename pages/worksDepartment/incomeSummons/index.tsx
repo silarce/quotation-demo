@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, forwardRef } from 'react';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
+import Decimal from 'decimal.js';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -449,6 +450,27 @@ const reducer_input = ({ disabled, value }: { disabled: boolean; value: string |
   };
 };
 
+const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
+  // 餘額=承攬價/本期計價-上期已計價-扣款-匯費
+
+  const {
+    //
+    contractPayment,
+    periodPayment,
+    priorPeriodPayment,
+    deductionPayment,
+    fee,
+  } = state_incomeBillSerial;
+
+  const unpaidPayment = new Decimal(contractPayment || periodPayment || 0)
+    .minus(priorPeriodPayment || 0)
+    .minus(deductionPayment || 0)
+    .minus(fee || 0)
+    .toNumber();
+
+  return unpaidPayment;
+};
+
 // ==============================================================================
 
 // MARK: config
@@ -505,9 +527,9 @@ const keyArr: TconfigKey[] = [
   'noteMaturityDate',
   'receivablePayment',
   'deductionPayment',
+  'fee',
   'unpaidPayment',
   'difference',
-  'fee',
 ];
 
 const config: Tconfig = {
@@ -623,6 +645,7 @@ const config: Tconfig = {
     className: 'text-right',
     createInputSelProps: ({
       disabled,
+      isPaperImported,
       state_incomeBillSerial,
       setState_incomeBillSerial: setState_incomeBillSerial,
     }) => {
@@ -631,7 +654,18 @@ const config: Tconfig = {
         value: state_incomeBillSerial.contractPayment,
       });
 
-      return {
+      const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setState_incomeBillSerial((prev) => {
+          const copy = { ...prev };
+          copy.contractPayment = e.target.value;
+          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+          copy.periodPayment = '';
+
+          return copy;
+        });
+      };
+
+      const inputSelProps = {
         disabled,
         inputProps: {
           props: {
@@ -639,17 +673,12 @@ const config: Tconfig = {
             type,
             value,
             readOnly: disabled,
-            onChange: (e) => {
-              setState_incomeBillSerial((prev) => {
-                return {
-                  ...prev,
-                  contractPayment: e.target.value,
-                };
-              });
-            },
+            onChange,
           },
         },
       };
+
+      return inputSelProps;
     },
   },
   periodPayment: {
@@ -658,6 +687,7 @@ const config: Tconfig = {
     className: 'text-right',
     createInputSelProps: ({
       disabled,
+      isPaperImported,
       state_incomeBillSerial,
       setState_incomeBillSerial: setState_incomeBillSerial,
     }) => {
@@ -666,7 +696,18 @@ const config: Tconfig = {
         value: state_incomeBillSerial.periodPayment,
       });
 
-      return {
+      const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setState_incomeBillSerial((prev) => {
+          const copy = { ...prev };
+          copy.periodPayment = e.target.value;
+          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+          copy.contractPayment = '';
+
+          return copy;
+        });
+      };
+
+      const inputSelProps = {
         disabled,
         inputProps: {
           props: {
@@ -674,17 +715,12 @@ const config: Tconfig = {
             type,
             value,
             readOnly: disabled,
-            onChange: (e) => {
-              setState_incomeBillSerial((prev) => {
-                return {
-                  ...prev,
-                  periodPayment: e.target.value,
-                };
-              });
-            },
+            onChange: onChange,
           },
         },
       };
+
+      return inputSelProps;
     },
   },
   priorPeriodPayment: {
@@ -693,6 +729,7 @@ const config: Tconfig = {
     className: 'text-right',
     createInputSelProps: ({
       disabled,
+      isPaperImported,
       state_incomeBillSerial,
       setState_incomeBillSerial: setState_incomeBillSerial,
     }) => {
@@ -701,7 +738,17 @@ const config: Tconfig = {
         value: state_incomeBillSerial.priorPeriodPayment,
       });
 
-      return {
+      const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setState_incomeBillSerial((prev) => {
+          const copy = { ...prev };
+          copy.priorPeriodPayment = e.target.value;
+          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+
+          return copy;
+        });
+      };
+
+      const inputSelProps = {
         disabled,
         inputProps: {
           props: {
@@ -709,17 +756,12 @@ const config: Tconfig = {
             type,
             value,
             readOnly: disabled,
-            onChange: (e) => {
-              setState_incomeBillSerial((prev) => {
-                return {
-                  ...prev,
-                  priorPeriodPayment: e.target.value,
-                };
-              });
-            },
+            onChange: onChange,
           },
         },
       };
+
+      return inputSelProps;
     },
   },
   importAccountingNumber: {
@@ -854,24 +896,28 @@ const config: Tconfig = {
         value: state_incomeBillSerial.deductionPayment,
       });
 
-      return {
+      const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setState_incomeBillSerial((prev) => {
+          const copy = { ...prev };
+          copy.deductionPayment = e.target.value;
+          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+
+          return copy;
+        });
+      };
+
+      const inputSelProps = {
         inputProps: {
           props: {
             className: 'text-right',
             type,
             value,
-            // placeholder: isPaperImported ? '請輸入' : '',
-            onChange: (e) => {
-              setState_incomeBillSerial((prev) => {
-                return {
-                  ...prev,
-                  deductionPayment: e.target.value,
-                };
-              });
-            },
+            onChange: onChange,
           },
         },
       };
+
+      return inputSelProps;
     },
   },
   unpaidPayment: {
@@ -895,7 +941,6 @@ const config: Tconfig = {
             className: 'text-right',
             type,
             value,
-            // placeholder: isPaperImported ? '請輸入' : '',
             onChange: (e) => {
               setState_incomeBillSerial((prev) => {
                 return {
