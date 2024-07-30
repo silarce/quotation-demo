@@ -27,6 +27,9 @@ import {
   apiPatchIncomeBill,
 } from 'js/api/api_engineering';
 
+// untils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 // ==============================================================================
 
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
@@ -52,6 +55,8 @@ type Tstate_incomeBillSerial = {
   deductionPayment: string;
   unpaidPayment: string;
   difference: string;
+  //
+  fee: string;
 };
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
@@ -78,6 +83,7 @@ export default function IncomeSummons() {
     return {
       sort: 'receiveDate',
       pageSize: 999999,
+      populate: ['accountant'],
       filter: {
         isForeign: {
           $eq: isForeign === 'true',
@@ -139,9 +145,7 @@ export default function IncomeSummons() {
       difference: difference ? difference : null,
     };
 
-    await apiPatchIncomeBill(incomeBillSerialId, body).then(async (res) => {
-      await update_incomeBill();
-    });
+    await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
   };
 
   // -----------------------------------------------------------------------------
@@ -305,6 +309,8 @@ const Summons_pre = (
       receivablePayment,
       deductionPayment,
       unpaidPayment,
+      //
+      accountant,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
@@ -325,6 +331,7 @@ const Summons_pre = (
       deductionPayment: String(deductionPayment || ''),
       unpaidPayment: String(unpaidPayment || ''),
       difference: difference || '',
+      fee: String(accountant?.fee || '0'),
     };
 
     return defaultState;
@@ -334,6 +341,7 @@ const Summons_pre = (
 
   const [disabled, setDisabled] = useState(true);
 
+  // isPaperImported 已匯入紙本應收帳款(舊的收款紀錄)，若為true，則可以編輯所有欄位
   const isPaperImported = incomeBillSerial.isPaperImported;
 
   // ---------------------------------------------------------------------
@@ -363,7 +371,8 @@ const Summons_pre = (
         const { style, className, createInputSelProps: createInputAttr } = config[key];
 
         const inputSelProps = createInputAttr({
-          disabled,
+          disabled: disabled,
+          isPaperImported,
           state_incomeBillSerial,
           setState_incomeBillSerial,
         });
@@ -444,11 +453,25 @@ const reducer_input = ({ disabled, value }: { disabled: boolean; value: string |
 
 // MARK: config
 
-type TconfigKey = keyof Omit<
-  TincomeBillSerialDto,
-  //
-  'id' | 'createdAt' | 'updatedAt' | 'isForeign' | 'isPaperImported' | 'incomeBillDate'
->;
+type TconfigKey =
+  | keyof Pick<
+      TincomeBillSerialDto,
+      | 'billSerialNumber'
+      | 'receiveDate'
+      | 'contractNumber'
+      | 'projectName'
+      | 'contractPayment'
+      | 'periodPayment'
+      | 'priorPeriodPayment'
+      | 'importAccountingNumber'
+      | 'noteNumber'
+      | 'noteMaturityDate'
+      | 'receivablePayment'
+      | 'deductionPayment'
+      | 'unpaidPayment'
+      | 'difference'
+    >
+  | 'fee';
 
 type TconfigItem = {
   label: string;
@@ -456,6 +479,7 @@ type TconfigItem = {
   className?: string;
   createInputSelProps: (props: {
     disabled: boolean;
+    isPaperImported: boolean;
     state_incomeBillSerial: Tstate_incomeBillSerial;
     setState_incomeBillSerial: React.Dispatch<React.SetStateAction<Tstate_incomeBillSerial>>;
   }) => TinputSelProps;
@@ -483,6 +507,7 @@ const keyArr: TconfigKey[] = [
   'deductionPayment',
   'unpaidPayment',
   'difference',
+  'fee',
 ];
 
 const config: Tconfig = {
@@ -504,6 +529,7 @@ const config: Tconfig = {
         props: {
           className: 'text-center',
           value: state_incomeBillSerial.billSerialNumber,
+          onChange: () => {},
         },
       },
     }),
@@ -512,8 +538,14 @@ const config: Tconfig = {
   receiveDate: {
     label: '日期',
     style: { width: 130 },
-    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
-      datePickerProps: {
+    className: 'text-center',
+    createInputSelProps: ({
+      disabled,
+      isPaperImported,
+      state_incomeBillSerial,
+      setState_incomeBillSerial: setState_incomeBillSerial,
+    }) => {
+      const datePickerProps: TinputSelProps['datePickerProps'] = {
         props: {
           value: state_incomeBillSerial.receiveDate,
           onChange: (date) => {
@@ -525,8 +557,22 @@ const config: Tconfig = {
             });
           },
         },
-      },
-    }),
+      };
+
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          className: 'text-center',
+          value: state_incomeBillSerial.receiveDate
+            ? getTaiwanDateStr(state_incomeBillSerial.receiveDate.toISOString()) ?? ''
+            : '',
+          onChange: () => {},
+        },
+      };
+
+      const inputSelProps = disabled || !isPaperImported ? { inputProps } : { datePickerProps };
+
+      return inputSelProps;
+    },
   },
   contractNumber: {
     label: '合約編號',
@@ -557,7 +603,7 @@ const config: Tconfig = {
     createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
       inputProps: {
         props: {
-          className: 'text-center',
+          // className: 'text-center',
           value: state_incomeBillSerial.projectName,
           onChange: (e) => {
             setState_incomeBillSerial((prev) => {
@@ -574,6 +620,7 @@ const config: Tconfig = {
   contractPayment: {
     label: '承攬價',
     style: { width: 100 },
+    className: 'text-right',
     createInputSelProps: ({
       disabled,
       state_incomeBillSerial,
@@ -608,6 +655,7 @@ const config: Tconfig = {
   periodPayment: {
     label: '本期計價',
     style: { width: 100 },
+    className: 'text-right',
     createInputSelProps: ({
       disabled,
       state_incomeBillSerial,
@@ -642,6 +690,7 @@ const config: Tconfig = {
   priorPeriodPayment: {
     label: '前期已收',
     style: { width: 100 },
+    className: 'text-right',
     createInputSelProps: ({
       disabled,
       state_incomeBillSerial,
@@ -675,7 +724,8 @@ const config: Tconfig = {
   },
   importAccountingNumber: {
     label: '票據/匯入帳號',
-    style: { width: 140 },
+    className: 'text-center',
+    style: { width: 250 },
     createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
       inputProps: {
         props: {
@@ -695,7 +745,8 @@ const config: Tconfig = {
   },
   noteNumber: {
     label: '票據號碼',
-    style: { width: 100 },
+    style: { width: 150 },
+    className: 'text-center',
     createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
       inputProps: {
         props: {
@@ -716,10 +767,18 @@ const config: Tconfig = {
   noteMaturityDate: {
     label: '票據日期', // (到期日)
     style: { width: 130 },
-    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
-      datePickerProps: {
+    className: 'text-center',
+    createInputSelProps: ({
+      disabled,
+      isPaperImported,
+      state_incomeBillSerial,
+      setState_incomeBillSerial: setState_incomeBillSerial,
+    }) => {
+      const datePickerProps: TinputSelProps['datePickerProps'] = {
         props: {
+          placeholder: '',
           value: state_incomeBillSerial.noteMaturityDate,
+          className: 'text-center',
           onChange: (date) => {
             setState_incomeBillSerial((prev) => {
               return {
@@ -729,12 +788,28 @@ const config: Tconfig = {
             });
           },
         },
-      },
-    }),
+      };
+
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          className: 'text-center',
+          placeholder: '',
+          value: state_incomeBillSerial.noteMaturityDate
+            ? getTaiwanDateStr(state_incomeBillSerial.noteMaturityDate.toISOString()) ?? ''
+            : '',
+          onChange: () => {},
+        },
+      };
+
+      const inputSelProps = disabled || !isPaperImported ? { inputProps } : { datePickerProps };
+
+      return inputSelProps;
+    },
   },
   receivablePayment: {
     label: '收款金額',
     style: { width: 100 },
+    className: 'text-right',
     createInputSelProps: ({
       disabled,
       state_incomeBillSerial,
@@ -767,13 +842,15 @@ const config: Tconfig = {
   deductionPayment: {
     label: '扣款金額',
     style: { width: 100 },
+    className: 'text-right',
     createInputSelProps: ({
       disabled,
+      isPaperImported,
       state_incomeBillSerial,
       setState_incomeBillSerial: setState_incomeBillSerial,
     }) => {
       const { type, value } = reducer_input({
-        disabled: disabled,
+        disabled: disabled || !isPaperImported,
         value: state_incomeBillSerial.deductionPayment,
       });
 
@@ -783,6 +860,7 @@ const config: Tconfig = {
             className: 'text-right',
             type,
             value,
+            // placeholder: isPaperImported ? '請輸入' : '',
             onChange: (e) => {
               setState_incomeBillSerial((prev) => {
                 return {
@@ -799,13 +877,15 @@ const config: Tconfig = {
   unpaidPayment: {
     label: '餘額',
     style: { width: 100 },
+    className: 'text-right',
     createInputSelProps: ({
       disabled,
+      isPaperImported,
       state_incomeBillSerial,
       setState_incomeBillSerial: setState_incomeBillSerial,
     }) => {
       const { type, value } = reducer_input({
-        disabled,
+        disabled: disabled || !isPaperImported,
         value: state_incomeBillSerial.unpaidPayment,
       });
 
@@ -815,6 +895,7 @@ const config: Tconfig = {
             className: 'text-right',
             type,
             value,
+            // placeholder: isPaperImported ? '請輸入' : '',
             onChange: (e) => {
               setState_incomeBillSerial((prev) => {
                 return {
@@ -832,6 +913,7 @@ const config: Tconfig = {
   difference: {
     label: '差額',
     style: { width: 200 },
+    className: 'text-right',
     createInputSelProps: ({
       disabled,
       state_incomeBillSerial,
@@ -847,6 +929,7 @@ const config: Tconfig = {
           allowNewLineByUser: true,
           props: {
             className: 'text-right',
+            placeholder: '',
             // type,
             value: state_incomeBillSerial.difference,
             onChange: (e) => {
@@ -860,6 +943,25 @@ const config: Tconfig = {
           },
         },
       };
+    },
+  },
+
+  fee: {
+    label: '匯費',
+    style: { width: 100 },
+    className: 'text-right',
+    createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const inputSelProps: TinputSelProps = {
+        disabled: true,
+        inputProps: {
+          props: {
+            className: 'text-right',
+            defaultValue: state_incomeBillSerial.fee,
+          },
+        },
+      };
+
+      return inputSelProps;
     },
   },
 } as const;

@@ -3665,7 +3665,10 @@ export type TincomeBillSerialDto = {
   // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
   isPaperImported: boolean;
   // 收入傳票歸屬日期
-  incomeBillDate: Date | null;
+  incomeBillDate: string | null;
+  //
+  accountantId: string;
+  accountant: TaccountantDto;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
