@@ -339,6 +339,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         invoice: item.invoice,
         prodreceiptcreate_at: getTaiwanDateStr(item.prodreceiptcreate_at),
         prodreceiptcreate_by: item.prodreceiptcreate_by,
+        batchid: item.batchid,
         firstin: 1
       }
     })
@@ -818,6 +819,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
             <CellWithBar key={index} className={scss.panelHeader20}>
               <div className={scss.row01}>
                 <span>{index + 1}</span>
+                <span>{_item.productid}</span>
                 <span>{_item.name}</span>
                 <span>{_item.spec}</span>
                 <span>{_item.quantity}</span>

@@ -3,7 +3,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import scss from './editWHPosition.module.scss';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { quotationStatusLookup } from 'config/lookupTable';
-import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useContext, useEffect, useState } from 'react';
+import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useContext, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -56,6 +56,7 @@ export default function EditWHPosition() {
 
     const { userInfo } = useContext(AppContext);
     //備分原本model
+    const [productdata, setProductdata] = useState<any[]>([]);
     const [data, setData] = useState<WHPositionModel>([]);
     const [data1, setData1] = useState<WHPositionModel>([]);
     const [data11, setData11] = useState<any[]>([]);
@@ -89,7 +90,7 @@ export default function EditWHPosition() {
     //還沒編輯前功能紐
     const panelList_unedit: TpanelList = canedit ? [
         {
-            type: 'redButton',
+            type: 'myButton',
             label: '編輯',
             onClick: () => {
                 setDisabled(false);
@@ -144,7 +145,7 @@ export default function EditWHPosition() {
     //點選編輯後功能紐
     const panelList_edit: TpanelList = [
         {
-            type: 'myButton',
+            type: 'redButton',
             label: '儲存',
             onClick: () => {
                 if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
@@ -208,6 +209,49 @@ export default function EditWHPosition() {
 
         fetchDataAndLayout();
     }, [router.query, disabled]);
+
+    const getProduct = async () => {
+        try {
+            //  console.log(userInfo);
+            setIsLoading(true);
+            const conditionModel: {
+                // keyword: string | undefined;
+            } = {
+                // keyword: "search" as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}GetProduct?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setProductdata(data);
+
+
+            console.log(userInfo);
+
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+    useEffect(() => {
+        getProduct();
+    }, []);
+
 
     //撈取儲位資料 api
     const fetchData = async () => {
@@ -298,7 +342,7 @@ export default function EditWHPosition() {
                 },
                 body: JSON.stringify(inputModel)
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -669,6 +713,97 @@ export default function EditWHPosition() {
 
 
 
+
+
+
+
+    interface DataItem {
+        id: string;
+        productid: string;
+        spec: string | null; // spec 可能為 null
+        name: string;
+        unit: string;
+    }
+
+
+    // const [handinputname, setHandinputname] = useState("");
+    // const [handinputspec, setHandinputspec] = useState("");
+    const [filteredData, setFilteredData] = useState<DataItem[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const isSelectingRef = useRef(false);
+    // const data: DataItem[] = [
+    //     // 你的資料項目
+    // ];
+
+    useEffect(() => {
+        if (isSelectingRef.current) return;
+
+        let filtered = productdata;
+        const { materialnumber, whpname, spec } = data1;
+
+        // 根據條件過濾數據
+        if (materialnumber) {
+            filtered = filtered.filter(item =>
+                item.productid.includes(materialnumber)
+            );
+        }
+
+        if (whpname) {
+            filtered = filtered.filter(item =>
+                item.name.includes(whpname)
+            );
+        }
+
+        if (spec) {
+            filtered = filtered.filter(item =>
+                item.spec && item.spec.includes(spec)
+            );
+        }
+
+        // 更新過濾後的數據
+        setFilteredData(filtered);
+
+        // 當有過濾條件且有匹配結果時才顯示建議框
+        const shouldShowSuggestions = filtered.length > 0 && (materialnumber || whpname || spec) && canedit === true;
+        setShowSuggestions(Boolean(shouldShowSuggestions));
+    }, [data1.materialnumber, data1.whpname, data1.spec, productdata]);
+
+
+
+    const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        isSelectingRef.current = false;
+        handleChange('materialnumber', e.target.value);
+    };
+
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        isSelectingRef.current = false;
+        handleChange('whpname', e.target.value);
+    };
+
+    const handleSpecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        isSelectingRef.current = false;
+        handleChange('spec', e.target.value);
+    };
+
+
+    const handleSelect = (item: DataItem) => {
+        // alert(item.id);
+        isSelectingRef.current = true;
+        // setHandinputproductuuid(item.id);
+        data1.materialnumber = item.productid;
+        data1.whpname = item.name;
+        data1.spec = item.spec || '';
+        data1.unit = item.unit;
+        setShowSuggestions(false);
+    };
+
+
+
+
+
+
+
+
     return (
         <SubLayer isLoading_subLayer={false}>
             {/* <> */}
@@ -696,11 +831,71 @@ export default function EditWHPosition() {
                             inputProps={{
                                 props: {
                                     value: data1.materialnumber,
-                                    onChange: (e) => handleChange('materialnumber', e.target.value),
+                                    onChange: handleProductidChange,
                                 },
                             }}
                         />
-                        <IconDetail onClick={() => { alert("OK") }}>asdf</IconDetail>
+                        {showSuggestions && (
+                            <div style={{
+                                position: 'absolute',
+                                zIndex: 1002,
+                                backgroundColor: 'white',
+                                border: '1px solid #ccc',
+                                width: '750px',
+                                maxHeight: '200px',
+                                overflowY: 'auto',
+                                fontSize: '16px',
+                                left: '25%',
+                                top: '20%',
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px' }}>
+                                    <button
+                                        onClick={() => setShowSuggestions(false)}
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            fontSize: '16px',
+                                            cursor: 'pointer',
+                                            fontWeight: 'bold',
+                                        }}
+                                    >
+                                        X
+                                    </button>
+                                </div>
+                                <table>
+                                    {filteredData.length > 0 ? (
+                                        filteredData.map((item, index) => (
+                                            <tr
+                                                key={index}
+                                                onClick={() => handleSelect(item)}
+                                                style={{ padding: '8px', cursor: 'pointer', border: '1px solid gray' }}
+                                                onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
+                                                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
+                                                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
+                                            >
+                                                <td style={{ width: '150px' }}>
+                                                    {item.productid}
+                                                </td>
+                                                <td style={{ width: '250px' }}>
+                                                    {item.name}
+                                                </td>
+                                                <td style={{ width: '350px' }}>
+                                                    {item.spec}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={3}>
+                                                <div style={{ padding: '8px', textAlign: 'center' }}>沒有匹配的結果</div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </table>
+                            </div>
+                        )}
+
+                        {/* <IconDetail onClick={() => { alert("OK") }}>asdf</IconDetail> */}
                         <InputSel
                             {...inputSelProps}
                             caption="物料名稱"
@@ -709,7 +904,22 @@ export default function EditWHPosition() {
                             inputProps={{
                                 props: {
                                     value: data1.whpname,
-                                    onChange: (e) => handleChange('whpname', e.target.value),
+                                    // onChange: (e) => handleChange('whpname', e.target.value),
+                                    onChange: handleNameChange,
+                                },
+                            }}
+                        />
+
+                        <InputSel
+                            {...inputSelProps}
+                            caption="物料規格"
+                            disabled={disabled}
+                            // disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: data1.spec,
+                                    // onChange: (e) => handleChange('spec', e.target.value),
+                                    onChange: handleSpecChange,
                                 },
                             }}
                         />
@@ -722,18 +932,6 @@ export default function EditWHPosition() {
                                 props: {
                                     value: data1.batchnumber,
                                     onChange: (e) => handleChange('batchnumber', e.target.value),
-                                },
-                            }}
-                        />
-                        <InputSel
-                            {...inputSelProps}
-                            caption="物料規格"
-                            disabled={disabled}
-                            // disabled={true}
-                            inputProps={{
-                                props: {
-                                    value: data1.spec,
-                                    onChange: (e) => handleChange('spec', e.target.value),
                                 },
                             }}
                         />

@@ -64,7 +64,8 @@ export default function ProdEntryList() {
         supplierphone,
         invoice,
         status,
-        note
+        note,
+        batchid
     } = router.query;
 
 
@@ -114,6 +115,7 @@ export default function ProdEntryList() {
     const [statusin, setStatusin] = useState<string>("");
     const [invoicein, setInvoicein] = useState<string>("");
     const [notein, setNotein] = useState<string>("");
+    const [batchidin, setBatchidin] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -315,6 +317,7 @@ export default function ProdEntryList() {
                 setSupplierphonein(data[0].supplierphone);
                 setInvoicein(data[0].invoice);
                 setNotein(data[0].note);
+                setBatchidin(data[0].batchid);
             }
         } catch (error: any) {
             setError("getProdEntry:" + error.message);
@@ -406,6 +409,7 @@ export default function ProdEntryList() {
             setNowtrayname("");
             setNowwhposition("");
             setNotein(note as string);
+            setBatchidin(batchid as string);
         }
     }, [prodentryuuid]);
 
@@ -810,16 +814,19 @@ export default function ProdEntryList() {
 
 
     const addWHPositionQuantity = async () => {
+
         try {
             setIsLoading(true);
             const conditionModel: {
                 whpositionuuid: string | undefined,
                 prodentrydetailuuid: string | undefined,
-                quantity: string | undefined
+                quantity: string | undefined,
+                batchid: string | undefined,
             } = {
                 whpositionuuid: nowwhpositionuuid,
                 prodentrydetailuuid: nowprodentrydetailuuid,
                 quantity: inboxquantity.toString() as string | undefined,
+                batchid: batchidin
             };
 
 
@@ -840,6 +847,7 @@ export default function ProdEntryList() {
             getWhpositionDetailByProductId(nowproductid);
             setNowentryqty((parseInt(nowentryqty) + 1).toString());
             getProdEntryDetail(prodentryuuidin);
+            setWhpquantity((parseInt(whpquantity) + inboxquantity).toString());
 
         } catch (error: any) {
             setError("getProdReceiptDetail:" + error.message);
@@ -1116,6 +1124,7 @@ export default function ProdEntryList() {
     }
 
     function handleGetLayOut(item: any) {
+        handleRowClick(item.id);
         console.log(item);
         setNowwhname(item.whname);
         setNowtrayname(item.trayname);
@@ -1126,8 +1135,8 @@ export default function ProdEntryList() {
         }
         setNowwhpositionuuid(item.id);
         setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-        setWhpname(item.name);
-        setWhpproductid(item.productid);
+        setWhpname(item.whpname);
+        setWhpproductid(item.materialnumber);
         setWhpspec(item.spec);
         setWhpquantity(item.quantity);
         setNowwhname(item.whname);
@@ -1159,8 +1168,7 @@ export default function ProdEntryList() {
 
     function handleaddquantity() {
         myAlert.confirm({
-            title: `呼叫: ${nowwhname}-${nowtrayname}`,
-            content: '!!請勿靠近設備!!',
+            title: `確定要入到此儲格嗎?: ${nowwhname}-${nowtrayname}-${whpnamecalled}`,
             props: {
                 onOk: () => {
                     addWHPositionQuantity();
@@ -1282,6 +1290,13 @@ export default function ProdEntryList() {
         });
     };
 
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+    // 點擊處理函數
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
+    };
+
 
     return (
         <SubLayer isLoading_subLayer={false}>
@@ -1387,7 +1402,7 @@ export default function ProdEntryList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
                                         },
                                     }}
                                 />
@@ -1397,7 +1412,7 @@ export default function ProdEntryList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? prodentryidin : prodentryid,
+                                            value: (checkfirstin === 0 ? prodentryidin : prodentryid) || ' ',
                                         },
                                     }}
                                 />
@@ -1408,7 +1423,7 @@ export default function ProdEntryList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? create_byin : create_by,
+                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
                                         },
                                     }}
                                 />
@@ -1420,7 +1435,7 @@ export default function ProdEntryList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(prodreceiptcreate_atin)?.toString() : prodreceiptcreate_at,
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(prodreceiptcreate_atin)?.toString() : prodreceiptcreate_at) || ' ',
                                         },
                                     }}
                                 />
@@ -1430,7 +1445,7 @@ export default function ProdEntryList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? prodreceiptidin : prodreceiptid,
+                                            value: (checkfirstin === 0 ? prodreceiptidin : prodreceiptid) || ' ',
                                         },
                                     }}
                                 />
@@ -1440,7 +1455,7 @@ export default function ProdEntryList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? prodreceiptcreate_byin : prodreceiptcreate_by,
+                                            value: (checkfirstin === 0 ? prodreceiptcreate_byin : prodreceiptcreate_by) || ' ',
                                         },
                                     }}
                                 />
@@ -1452,7 +1467,7 @@ export default function ProdEntryList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: statusin,
+                                            value: statusin || ' ',
                                         },
                                     }}
                                 />
@@ -1851,15 +1866,19 @@ export default function ProdEntryList() {
                                 {data3 && (
                                     data3.map((_item: any, index: number) => (
                                         <CellWithBar key={index} className={scss.panelHeader26}>
-                                            <div className={scss.row01}>
+                                            <div
+                                                key={index}
+                                                className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                                onClick={() => handleGetLayOut(_item)}
+                                            >
                                                 <span>{_item.whname}</span>
                                                 <span>{_item.trayname}</span>
                                                 <span>{`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}</span>
                                                 <span>{_item.quantity}</span>
                                                 <span>
-                                                    <button onClick={() => { handleGetLayOut(_item) }}>
+                                                    {/* <button onClick={() => {  }}>
                                                         <img src={icon_fc_inbox.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                    </button>
+                                                    </button> */}
                                                 </span>
                                             </div>
                                         </CellWithBar>
@@ -2074,6 +2093,7 @@ export default function ProdEntryList() {
                                         disabled={(traycalled === true && nowentryqty < nowquantity) ? false : true}
                                         inputProps={{
                                             props: {
+                                                style: { color: 'red' },
                                                 max: maxinboxquantity,
                                                 // max: (parseInt(nowquantity)-parseInt(nowentryqty)),
                                                 // nowentryqty} / ${nowquantity

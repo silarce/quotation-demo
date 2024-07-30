@@ -684,6 +684,8 @@ const sidePathList: TsidePathList = {
                   return true;
                 } else if (pathname === "/factoryDepartment/wareHouseList") {
                   return true
+                } else if (pathname === "/factoryDepartment/editWHPosition") {
+                  return true
                 }
                 return false;
 

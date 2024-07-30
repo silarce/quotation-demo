@@ -255,6 +255,15 @@ export default function ProdReceiptList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
+
+            // if (data.length === 0) {
+            //     myAlert.warning({
+            //         title: "查詢結果",
+            //         content: "目前沒有單據資訊可以顯示"
+            //     });
+            //     return;
+            // }
+
             setData(data);
             setDatarestore(data);
             console.log(data);
@@ -289,9 +298,12 @@ export default function ProdReceiptList() {
         }
     };
 
+
     useEffect(() => {
         getProdReceipt();
     }, []);
+
+
 
     //取對應的進貨明細
     const getProdReceiptDetail = async (prodreceiptuuid: any) => {
@@ -867,7 +879,7 @@ export default function ProdReceiptList() {
                                     inputProps={{
                                         props: {
                                             style: { color: 'red', paddingTop: '5px' },
-                                            value: entrystatusin,
+                                            value: entrystatusin || ' ',
                                         },
                                     }}
                                 />
@@ -881,7 +893,7 @@ export default function ProdReceiptList() {
                                     inputProps={{
                                         props: {
                                             style: { color: 'red', paddingTop: '5px' },
-                                            value: paystatusin,
+                                            value: paystatusin || ' ',
                                         },
                                     }}
                                 />
@@ -895,7 +907,7 @@ export default function ProdReceiptList() {
                                     inputProps={{
                                         props: {
                                             style: { color: 'red', paddingTop: '5px' },
-                                            value: statusin,
+                                            value: statusin || ' ',
                                         },
                                     }}
                                 />
@@ -906,11 +918,11 @@ export default function ProdReceiptList() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="採購日期"
+                                    caption="進貨日期"
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
                                         },
                                     }}
                                 />
@@ -920,7 +932,7 @@ export default function ProdReceiptList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? prodreceiptidin : prodreceiptid,
+                                            value: (checkfirstin === 0 ? prodreceiptidin : prodreceiptid) || ' ',
                                         },
                                     }}
                                 />
@@ -931,7 +943,7 @@ export default function ProdReceiptList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? create_byin : create_by,
+                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
                                         },
                                     }}
                                 />
@@ -943,7 +955,7 @@ export default function ProdReceiptList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(purchaseordercreate_atin)?.toString() : purchaseordercreate_at,
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(purchaseordercreate_atin)?.toString() : purchaseordercreate_at) || ' ',
                                         },
                                     }}
                                 />
@@ -953,7 +965,7 @@ export default function ProdReceiptList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? purchaseorderidin : purchaseorderid,
+                                            value: (checkfirstin === 0 ? purchaseorderidin : purchaseorderid) || ' ',
                                         },
                                     }}
                                 />
@@ -963,7 +975,7 @@ export default function ProdReceiptList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? purchaseordercreate_byin : purchaseordercreate_by,
+                                            value: (checkfirstin === 0 ? purchaseordercreate_byin : purchaseordercreate_by) || ' ',
                                         },
                                     }}
                                 />

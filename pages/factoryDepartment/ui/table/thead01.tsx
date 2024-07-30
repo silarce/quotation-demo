@@ -28,10 +28,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>物料名稱</span>
         <span>規格</span>
         <span>數量</span>
-        {/* <span>物料單位</span> */}
-        {/* <span>倉庫名稱</span> */}
-        {/* <span>儲位子編號</span> */}
-        <span>{/* 按鈕格 留白 */}</span>
+        <span></span>
       </div>
     );
   } else if (type === "Tray") {
@@ -311,6 +308,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     return (
       <div className={style.thead20}>
         <span>序</span>
+        <span>料號</span>
         <span>名稱</span>
         <span>規格</span>
         <span>數量</span>
