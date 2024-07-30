@@ -10,7 +10,7 @@ export default function Thead01() {
       <span>聯絡人</span>
       <span>聯絡電話</span>
       <span>承辦人</span>
-      <span>總折數</span>
+      <span>平均折數</span>
       <span>樘數</span>
       <span>合約金額</span>
       <span>{/* 按鈕格 留白 */}</span>
