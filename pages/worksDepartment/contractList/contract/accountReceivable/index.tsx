@@ -236,9 +236,10 @@ export default function AccountReceivable() {
       nameOfBusinessEntity,
       businessIdNumber,
       isOriginalCustomer,
+      isOlderInvoice,
     } = state_invoice;
 
-    if (accountantInvoiceBook || actualPrice) {
+    if (!isOlderInvoice && (accountantInvoiceBook || actualPrice)) {
       if (!(invoiceNumber && invoiceDate && actualPrice)) {
         myAlert.info({
           title: '請輸入完整發票資料或清除所有發票資料',
@@ -280,7 +281,15 @@ export default function AccountReceivable() {
       businessIdNumber: businessIdNumber || null,
       isOriginalCustomer,
       retainagePercent: retainagePercent || null,
+      isOlderInvoice,
     };
+
+    // 測試舊發票相關功能
+    // 測試舊發票相關功能
+    // 測試舊發票相關功能
+    // 測試舊發票相關功能
+    // 測試舊發票相關功能
+    // 測試舊發票相關功能
 
     try {
       setIsFetching_req(true);

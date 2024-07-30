@@ -3913,7 +3913,7 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   nameOfBusinessEntity: string | null; // 買受人(公司抬頭)
   businessIdNumber: string | null; // 統一編號
   isOriginalCustomer: boolean; // 是否為合約原客戶 // 若為false，那這筆請款視為額外收入
-  // isOriginalCustomer: boolean; // 是否為合約原客戶
+  isOlderInvoice: boolean; // 是否為舊的手key發票
 };
 
 export type TupdateAccountReceivablePeriodDto = Partial<TcreateAccountReceivablePeriodDto>;
@@ -3952,6 +3952,8 @@ export type TaccountsReceivableInvoiceDto = {
   businessIdNumber: string | null;
   // 是否為合約原客戶
   isOriginalCustomer: boolean; // 若為false，那這筆請款視為額外收入
+  // 是否為舊的手key發票
+  isOlderInvoice: boolean;
   //
   // 合約工程名稱
   contractProjectName: string | null;

@@ -202,9 +202,6 @@ export default function AccountantSorting({
     total_accountant,
     amountNotCollected,
   } = useMemo(() => {
-    console.log('accountantArr_noInvoice', accountantArr_noInvoice);
-    console.log('periodArr', periodArr);
-
     let total_invoice_d = new Decimal(0);
     let total_accountant_d = new Decimal(0);
 
