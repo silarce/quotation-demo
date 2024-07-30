@@ -801,7 +801,45 @@ export default function EditWHPosition() {
 
 
 
+    const [dragging, setDragging] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [offset, setOffset] = useState({ x: 0, y: 0 });
+    
 
+
+    const handleMouseUp = () => {
+        setDragging(false);
+    };
+    
+
+    useEffect(() => {
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [dragging, offset, position]);
+    
+    const handleMouseMove = (event:any) => {
+        if (dragging) {
+            setPosition({
+                x: event.clientX - offset.x,
+                y: event.clientY - offset.y,
+            });
+        }
+    };
+    
+    const handleMouseDown = (event:any) => {
+        setDragging(true);
+        // 記錄下滑鼠的偏差
+        setOffset({
+            x: event.clientX - position.x,
+            y: event.clientY - position.y,
+        });
+    };
+    
 
 
     return (
@@ -836,18 +874,22 @@ export default function EditWHPosition() {
                             }}
                         />
                         {showSuggestions && (
-                            <div style={{
-                                position: 'absolute',
-                                zIndex: 1002,
-                                backgroundColor: 'white',
-                                border: '1px solid #ccc',
-                                width: '750px',
-                                maxHeight: '200px',
-                                overflowY: 'auto',
-                                fontSize: '16px',
-                                left: '25%',
-                                top: '20%',
-                            }}>
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    zIndex: 1002,
+                                    backgroundColor: 'white',
+                                    border: '1px solid #ccc',
+                                    width: '750px',
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
+                                    fontSize: '16px',
+                                    left: `${position.x}px`,
+                                    top: `${position.y}px`,
+                                    cursor: 'move',
+                                }}
+                                onMouseDown={handleMouseDown}
+                            >
                                 <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px' }}>
                                     <button
                                         onClick={() => setShowSuggestions(false)}
@@ -894,6 +936,7 @@ export default function EditWHPosition() {
                                 </table>
                             </div>
                         )}
+
 
                         {/* <IconDetail onClick={() => { alert("OK") }}>asdf</IconDetail> */}
                         <InputSel
