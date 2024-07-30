@@ -1008,6 +1008,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     quotationDiscount: Number(state_summary.discountRate || '100'),
   });
 
+  console.log(avgDiscount_withQty);
+
   const targetProd = productList[targetProdKey];
 
   const comList = useMemo(() => {
