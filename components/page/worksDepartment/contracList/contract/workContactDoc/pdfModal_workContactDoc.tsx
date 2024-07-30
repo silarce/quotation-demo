@@ -76,7 +76,7 @@ export default function PdfModal({
 
   // --------------------------------------------------------------------------
 
-  const testProductArr = [...productArr, ...productArr, ...productArr, ...productArr];
+  const testProductArr = productArr;
 
   // ========================================================================
 
