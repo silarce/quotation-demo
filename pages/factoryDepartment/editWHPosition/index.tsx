@@ -708,7 +708,7 @@ export default function EditWHPosition() {
             newlength = alphaIncrement(newlength);
         }
 
-        return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 1).toString();
+        return newlength + newwidth + newchildlength + (parseInt(newchildwidth)-2).toString();
     };
 
 

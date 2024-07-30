@@ -1106,7 +1106,7 @@ export default function ProdEntryList() {
             newlength = alphaIncrement(newlength);
         }
 
-        return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 1).toString();
+        return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
     };
 
     function handleinbox(item: any) {
