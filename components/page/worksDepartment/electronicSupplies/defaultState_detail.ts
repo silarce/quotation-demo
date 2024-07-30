@@ -192,7 +192,7 @@ const defaultStateArr_主機: Tstate_electronicItem[] = [
     category: '遙控器（1:2）',
     quantity: null,
     unit: null,
-    code: null,
+    code: 'A',
   },
   {
     itemName: '主機',
@@ -211,7 +211,7 @@ const defaultStateArr_紅外線: Tstate_electronicItem[] = [
     category: '反射式',
     quantity: null,
     unit: null,
-    code: null,
+    code: 'E',
   },
   {
     itemName: '紅外線',
