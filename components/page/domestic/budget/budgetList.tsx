@@ -88,6 +88,7 @@ export default function BudgetList({
             // viewRef_bottom: viewRef_bottom,
             viewRef_bottom: index === quotationArr.length - 5 ? viewRef_bottom : undefined,
             isAttachQuotation: !!attachedToContract,
+            discount: latestContent.averageDiscount ?? '',
           };
 
           const processChain = quotationToReiviewChain(latestContent);
@@ -95,7 +96,7 @@ export default function BudgetList({
           const sortedContent = _.sortBy(contents, (content) => content.version).reverse();
 
           const recordArr = sortedContent.map((content) => {
-            const { quotationDate, editNotes, discount, quantity, total } = content;
+            const { quotationDate, editNotes, averageDiscount, quantity, total } = content;
 
             const href_body = {
               pathname: '/domestic/quotationList/quotation',
@@ -111,7 +112,7 @@ export default function BudgetList({
             return {
               date: moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD'),
               editNotes,
-              discount,
+              discount: averageDiscount ?? '',
               doorQty: String(quantity),
               total: total.toLocaleString(),
               href: href_body,

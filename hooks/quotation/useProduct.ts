@@ -314,7 +314,17 @@ const useProductList = ({
     return {} as TproductList;
   }, [resetTrigger, doorModelList, discount_fromData]);
 
-  const calcDiscount_two = useCallback(() => {
+  // WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+  // WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+  // WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+  // WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+
+  // 將calcQuotationAvgDiscount_dyna放入一個memo中，
+  // 然後用useEffect，當calcQuotationAvgDiscount_dyna更新時，更新memo中的calcQuotationAvgDiscount
+  // 最後在建立一個函數，內容為執行memo中的calcQuotationAvgDiscount
+  // 如此便可以在不更新productList的情況下更新classProd中使用的calcQuotationAvgDiscount
+
+  const calcQuotationAvgDiscount_dyna = useCallback(() => {
     const calcAvgDiscount_withQty = () => {
       let discountTotal = new Decimal(0);
       let count = 0;
@@ -346,46 +356,116 @@ const useProductList = ({
         }
       });
 
-      // const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+      if (!isAttach) {
+        discountTotal = discountTotal.mul(quotationDiscount).div(100);
+      } else {
+        discountTotal = discountTotal.mul(quotationDiscount_attach).div(100);
+      }
 
-      const avgDiscount_withQty = count ? discountTotal.div(count).toNumber() : 0;
+      const avgDiscount_withQty = count
+        ? discountTotal.div(count).toDecimalPlaces(3).toNumber()
+        : isAttach
+        ? quotationDiscount_attach
+        : quotationDiscount;
 
       setAvgDiscount_withQty(avgDiscount_withQty);
 
       return avgDiscount_withQty;
     };
 
-    const calcAvgDiscount = () => {
-      // 棄用
-      // let discountTotal = new Decimal(0);
-      // let count = 0;
-      // Object.values(list).forEach((prod) => {
-      //   discountTotal = discountTotal.add(prod.discount);
-      //   count = count + 1;
-      //   const exchangeProdList = prod.exchangeProdList;
-      //   Object.values(exchangeProdList).forEach((exchangeProd) => {
-      //     discountTotal = discountTotal.add(exchangeProd.discount);
-      //     count = count + 1;
-      //   });
-      // });
-      // // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
-      // Object.values(productList_attach).forEach((prod_attach) => {
-      //   discountTotal = discountTotal.add(prod_attach.discount);
-      //   count = count + 1;
-      // });
-      // const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
-      // setAvgDiscount(avgDiscount);
-    };
-
     //
     calcAvgDiscount_withQty();
-    // calcAvgDiscount()
+
     //
   }, [
     classProdList,
     isAttach, // isAttach基本上不會改變
     productList_attach, // productList_attach目前都不會改變參照
+    quotationDiscount,
+    quotationDiscount_attach,
   ]);
+
+  const calcDiscount_two_wrapper = useMemo(() => {
+    return {
+      calcQuotationAvgDiscount: calcQuotationAvgDiscount_dyna,
+    };
+  }, []);
+
+  useEffect(() => {
+    calcDiscount_two_wrapper.calcQuotationAvgDiscount = calcQuotationAvgDiscount_dyna;
+    calcQuotationAvgDiscount_dyna();
+  }, [calcQuotationAvgDiscount_dyna]);
+
+  const calcQuotationAvgDiscount = () => {
+    calcDiscount_two_wrapper.calcQuotationAvgDiscount();
+  };
+
+  // const calcDiscount_two = useCallback(() => {
+  //   // quotationDiscount
+  //   // quotationDiscount_attach
+
+  //   const calcAvgDiscount_withQty = () => {
+  //     let discountTotal = new Decimal(0);
+  //     let count = 0;
+
+  //     Object.values(classProdList).forEach((prod) => {
+  //       if (!isAttach) {
+  //         for (let i = 0; i < +prod.quantity; i++) {
+  //           discountTotal = discountTotal.add(prod.discount);
+  //           count = count + 1;
+  //         }
+  //       }
+
+  //       const exchangeProdList = prod.exchangeProdList;
+
+  //       Object.values(exchangeProdList).forEach((exchangeProd) => {
+  //         for (let i = 0; i < +exchangeProd.quantity; i++) {
+  //           discountTotal = discountTotal.add(exchangeProd.discount);
+  //           count = count + 1;
+  //         }
+  //       });
+  //     });
+
+  //     // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+
+  //     Object.values(productList_attach).forEach((prod_attach) => {
+  //       for (let i = 0; i < +prod_attach.quantity; i++) {
+  //         discountTotal = discountTotal.add(prod_attach.discount);
+  //         count = count + 1;
+  //       }
+  //     });
+
+  //     // const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+
+  //     if (!isAttach) {
+  //       discountTotal = discountTotal.mul(quotationDiscount).div(100);
+  //     } else {
+  //       discountTotal = discountTotal.mul(quotationDiscount_attach).div(100);
+  //     }
+
+  //     const avgDiscount_withQty = count ? discountTotal.div(count).toNumber() : 0;
+
+  //     // const avgDiscount_withQty = count ? discountTotal.div(count).toNumber() : 0;
+
+  //     setAvgDiscount_withQty(avgDiscount_withQty);
+
+  //     return avgDiscount_withQty;
+  //   };
+
+  //   //
+  //   calcAvgDiscount_withQty();
+
+  //   //
+  // }, [
+  //   classProdList,
+  //   isAttach, // isAttach基本上不會改變
+  //   productList_attach, // productList_attach目前都不會改變參照
+  // ]);
+
+  // WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+  // WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+  // WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+  // WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 
   const addProd = useCallback(() => {
     if (!doorModelList) {
@@ -397,23 +477,23 @@ const useProductList = ({
       reRender,
       delSelf: () => {
         delSelf_prod(classProdList, newKey);
-        calcDiscount_two();
+        calcQuotationAvgDiscount();
       },
       copySelf: () => {
         copySelf_prod(classProdList, newKey);
-        calcDiscount_two();
+        calcQuotationAvgDiscount();
       },
       callCalcSubTotal,
       // calcSubTotalPrice,
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
       quotationDiscount: quotationDiscount,
-      onDiscountChange: calcDiscount_two,
-      onQtyChange: calcDiscount_two,
+      onDiscountChange: calcQuotationAvgDiscount,
+      onQtyChange: calcQuotationAvgDiscount,
     });
     classProdList[newKey] = classProd;
 
-    calcDiscount_two();
+    calcQuotationAvgDiscount();
 
     reRender();
   }, [
@@ -458,27 +538,27 @@ const useProductList = ({
         prodData,
         delSelf: () => {
           delSelf_prod(classProdList, key);
-          calcDiscount_two();
+          calcQuotationAvgDiscount();
         },
         copySelf: () => {
           copySelf_prod(classProdList, key);
-          calcDiscount_two();
+          calcQuotationAvgDiscount();
         },
         callCalcSubTotal,
         doorModelList,
         originProd: prod,
         onDoorTypeChange: onClassDoorTypeChange,
         quotationDiscount: discount_fromData,
-        onDiscountChange: calcDiscount_two,
-        onQtyChange: calcDiscount_two,
+        onDiscountChange: calcQuotationAvgDiscount,
+        onQtyChange: calcQuotationAvgDiscount,
       });
     });
 
-    calcDiscount_two();
+    calcQuotationAvgDiscount();
     setProductList(classProdList);
   }, [
     classProdList,
-    calcDiscount_two,
+    // calcDiscount_two,
 
     // // resetTrigger,
     // // doorModelList,
@@ -590,12 +670,12 @@ const useProductList = ({
 
     copy.delSelf = () => {
       delSelf_prod(list, newKey);
-      calcDiscount_two();
+      calcQuotationAvgDiscount();
     };
 
     copy.copySelf = () => {
       copySelf_prod(list, newKey);
-      calcDiscount_two();
+      calcQuotationAvgDiscount();
     };
 
     if (!shouldKeepId) {
@@ -886,22 +966,22 @@ const useProductList = ({
       reRender,
       delSelf: () => {
         delSelf_prod(productList_attach, newKey);
-        calcDiscount_two();
+        calcQuotationAvgDiscount();
       },
       copySelf: () => {
         copySelf_prod(productList_attach, newKey);
-        calcDiscount_two();
+        calcQuotationAvgDiscount();
       },
       callCalcSubTotal,
       doorModelList,
       onDoorTypeChange: onClassDoorTypeChange,
       quotationDiscount: quotationDiscount_attach,
-      onDiscountChange: calcDiscount_two,
-      onQtyChange: calcDiscount_two,
+      onDiscountChange: calcQuotationAvgDiscount,
+      onQtyChange: calcQuotationAvgDiscount,
     });
     productList_attach[newKey] = classProd;
 
-    calcDiscount_two();
+    calcQuotationAvgDiscount();
 
     reRender();
   };
@@ -940,18 +1020,18 @@ const useProductList = ({
           prodData,
           delSelf: () => {
             delSelf_prod(productList_attach, key);
-            calcDiscount_two();
+            calcQuotationAvgDiscount();
           },
           copySelf: () => {
             copySelf_prod(productList_attach, key);
-            calcDiscount_two();
+            calcQuotationAvgDiscount();
           },
           callCalcSubTotal,
           doorModelList,
           originProd: prod,
           onDoorTypeChange: onClassDoorTypeChange,
-          onDiscountChange: calcDiscount_two,
-          onQtyChange: calcDiscount_two,
+          onDiscountChange: calcQuotationAvgDiscount,
+          onQtyChange: calcQuotationAvgDiscount,
           disabled_quantity: true,
           quotationDiscount: quotationDiscount_attach,
         });
@@ -959,7 +1039,7 @@ const useProductList = ({
 
       // setProductList_attach(list);
 
-      calcDiscount_two();
+      calcQuotationAvgDiscount();
       reRender();
     }
   }, [productArr_attach]);
@@ -1117,13 +1197,15 @@ const useProductList = ({
     //   .div(100)
     //   .toDecimalPlaces(3)
     //   .toString(),
-    avgDiscount_withQty: (() => {
-      if (avgDiscount_withQty === 0) {
-        return String(quotationDiscount_attach);
-      } else {
-        return new Decimal(avgDiscount_withQty).mul(quotationDiscount_attach).div(100).toDecimalPlaces(3).toString();
-      }
-    })(),
+
+    // avgDiscount_withQty: (() => {
+    //   if (avgDiscount_withQty === 0) {
+    //     return String(quotationDiscount_attach);
+    //   } else {
+    //     return new Decimal(avgDiscount_withQty).mul(quotationDiscount_attach).div(100).toDecimalPlaces(3).toString();
+    //   }
+    // })(),
+    avgDiscount_withQty: avgDiscount_withQty.toString(),
   };
 };
 
@@ -1413,3 +1495,92 @@ export type {
 // useProducts
 // calcSubTotalPrice 計算productlist與otehrs totalPrice的總和`
 // 這個方法會送到Class_prod與Class_otehrs，於需要時呼叫
+
+// ===============================================================================
+// const classProdList = useMemo(() => {
+//   return {} as TproductList;
+// }, [resetTrigger, doorModelList, discount_fromData]);
+
+// const calcDiscount_two = useCallback(() => {
+//   // quotationDiscount
+//   // quotationDiscount_attach
+
+//   const calcAvgDiscount_withQty = () => {
+//     let discountTotal = new Decimal(0);
+//     let count = 0;
+
+//     Object.values(classProdList).forEach((prod) => {
+//       if (!isAttach) {
+//         for (let i = 0; i < +prod.quantity; i++) {
+//           discountTotal = discountTotal.add(prod.discount);
+//           count = count + 1;
+//         }
+//       }
+
+//       const exchangeProdList = prod.exchangeProdList;
+
+//       Object.values(exchangeProdList).forEach((exchangeProd) => {
+//         for (let i = 0; i < +exchangeProd.quantity; i++) {
+//           discountTotal = discountTotal.add(exchangeProd.discount);
+//           count = count + 1;
+//         }
+//       });
+//     });
+
+//     // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+
+//     Object.values(productList_attach).forEach((prod_attach) => {
+//       for (let i = 0; i < +prod_attach.quantity; i++) {
+//         discountTotal = discountTotal.add(prod_attach.discount);
+//         count = count + 1;
+//       }
+//     });
+
+//     // const avgDiscount_withQty = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+
+//     if (!isAttach) {
+//       discountTotal = discountTotal.mul(quotationDiscount).div(100);
+//     } else {
+//       discountTotal = discountTotal.mul(quotationDiscount_attach).div(100);
+//     }
+
+//     const avgDiscount_withQty = count ? discountTotal.div(count).toNumber() : 0;
+
+//     // const avgDiscount_withQty = count ? discountTotal.div(count).toNumber() : 0;
+
+//     setAvgDiscount_withQty(avgDiscount_withQty);
+
+//     return avgDiscount_withQty;
+//   };
+
+//   // const calcAvgDiscount = () => {
+//   // 棄用
+//   // let discountTotal = new Decimal(0);
+//   // let count = 0;
+//   // Object.values(list).forEach((prod) => {
+//   //   discountTotal = discountTotal.add(prod.discount);
+//   //   count = count + 1;
+//   //   const exchangeProdList = prod.exchangeProdList;
+//   //   Object.values(exchangeProdList).forEach((exchangeProd) => {
+//   //     discountTotal = discountTotal.add(exchangeProd.discount);
+//   //     count = count + 1;
+//   //   });
+//   // });
+//   // // 目前productList_attach從頭到尾都是同一個，setProductList_attach沒有被使用過
+//   // Object.values(productList_attach).forEach((prod_attach) => {
+//   //   discountTotal = discountTotal.add(prod_attach.discount);
+//   //   count = count + 1;
+//   // });
+//   // const avgDiscount = discountTotal.div(count).toDecimalPlaces(3).toNumber();
+//   // setAvgDiscount(avgDiscount);
+//   // };
+
+//   //
+//   calcAvgDiscount_withQty();
+//   // calcAvgDiscount()
+//   //
+// }, [
+//   classProdList,
+//   isAttach, // isAttach基本上不會改變
+//   productList_attach, // productList_attach目前都不會改變參照
+// ]);

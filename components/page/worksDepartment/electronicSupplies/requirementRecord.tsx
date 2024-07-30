@@ -2,22 +2,38 @@ import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 // gear
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
-// css
-// import scss from './receivedHistory.module.scss';
-import scss_p from './_public.module.scss';
+// utils
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-export default function DemandHistory() {
+import type { TelectronicSuppliesRequirementRecordDto } from 'js/api/dtoTypes';
+
+type Tquery = {
+  contractId: string | undefined;
+};
+
+// ==================================================================
+export default function RequirementRecord({
+  className,
+  requirementRecords,
+}: {
+  className?: string;
+  requirementRecords: TelectronicSuppliesRequirementRecordDto[];
+}) {
   const router = useRouter();
+  const { contractId } = router.query as Tquery;
 
   // ------------------------------------------------------------------
 
   const control_table = useMemo(() => {
+    const requirementRecords_ordered = _.sortBy(requirementRecords, 'number').reverse();
+
     //
     const thead: Ttable['thead'] = {
       cellArr: keysArr.map((key) => {
@@ -29,97 +45,81 @@ export default function DemandHistory() {
     };
     //
 
-    const tbodyRowArr: Ttable['tbody']['rowArr'] = [
-      {
+    const tbodyRowArr: Ttable['tbody']['rowArr'] = requirementRecords_ordered.map((item, index) => {
+      const {
+        //
+        id,
+        operationDate,
+        agentEmployee,
+        requirementRecordDetails = [],
+        quantity,
+        doorType,
+        storageManagementPersonnelEmployee,
+        number: idNumber,
+      } = item;
+
+      return {
         cellArr: [
           {
+            ...configList.idNumber,
+            children: idNumber,
+          },
+          {
             ...configList.date,
-            children: '111-11-11',
+            children: getTaiwanDateStr(operationDate),
           },
           {
             ...configList.requestEmployee,
-            children: '蓋特機器人',
+            children: agentEmployee?.chName,
           },
           {
             ...configList.doorModelName,
-            children: 'SJ-302',
+            children: doorType,
           },
           {
             ...configList.qty,
-            children: 9999,
+            children: quantity,
           },
           {
             ...configList.materialHandler,
-            children: '無敵鐵金剛',
+            children: storageManagementPersonnelEmployee?.chName || '---',
           },
           {
+            width: 100,
             children: (
               <Link
                 href={{
-                  pathname: router.pathname + '/editDemandHistory',
+                  pathname: router.pathname + '/editRequirement',
                   query: {
-                    historyId: 'id9999999',
+                    requirementRecordId: id,
+                    contractId,
                   },
                 }}
               >
                 <IconDetail />
               </Link>
             ),
-            width: 100,
           },
         ],
-      },
-    ];
+      };
+    }); // tbodyRowArr close
 
     const tbody: Ttable['tbody'] = {
-      rowArr: [
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-        ...tbodyRowArr,
-      ],
+      rowArr: tbodyRowArr,
     };
 
     return { thead, tbody };
-  }, []);
+  }, [requirementRecords]);
 
   // ------------------------------------------------------------------
-  return <Table01 {...control_table} className={classNames(scss_p.table)} />;
+  return <Table01 {...control_table} className={classNames(className)} />;
 }
 
 // ==================================================================
 
 const keysArr = [
   //
+  'idNumber',
   'date', // 領料日期
   'requestEmployee', // 領料人員
   'doorModelName',
@@ -129,6 +129,10 @@ const keysArr = [
 ];
 
 const configList: { [key: string]: Tconfig_table } = {
+  idNumber: {
+    label: '需求單號',
+    flex: '150px',
+  },
   date: {
     label: '新增日期',
     flex: '20%',

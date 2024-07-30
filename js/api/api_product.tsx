@@ -27,6 +27,8 @@ import type {
   TdoorAccessoryDto,
 } from './dtoTypes';
 
+import { Toption } from 'js/utils/options/options';
+
 // const apiGetAssets = (path: string) => {
 //   return `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/${path}`;
 // };
@@ -120,11 +122,20 @@ export const useApiGetProdDoorModels = () => {
     return false;
   };
 
+  const options_doorModel: Toption[] = useMemo(() => {
+    if (!res) {
+      return [];
+    }
+
+    return res.map((item) => ({ label: item.name, value: item.name }));
+  }, [res]);
+
   return {
     res,
     update,
     doorModelList,
     checkIsSpecialDoor,
+    options_doorModel,
   };
 };
 
