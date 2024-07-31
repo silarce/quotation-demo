@@ -65,6 +65,9 @@ export default function AddPurchaseRequisition() {
     const [data1, setData1] = useState<any[]>([]);
     const [data2, setData2] = useState<any[]>([]);
     const [data2restore, setData2Restore] = useState<any[]>([]);
+    const [modaldata, setModalData] = useState<any[]>([]);
+    const [searchbardata, setSearchBarData] = useState<any[]>([]);
+
     const [error, setError] = useState<string | null>(null);
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -233,7 +236,8 @@ export default function AddPurchaseRequisition() {
             }
             const data = await response.json();
             setData(data);
-
+            setModalData(data);
+            setSearchBarData(data);
 
             console.log(userInfo);
 
@@ -558,12 +562,13 @@ export default function AddPurchaseRequisition() {
 
     //打開查詢modal
     const productSearchModalOpen = async () => {
-        setProductSearchmodalopen(true);
+        setModalData(data);
+        setProductSearchmodalopen(!productSearchmodalopen);
     }
 
     //關閉詢價單modal
     const productSearchModalClose = async () => {
-        setData([]);
+        setModalData([]);
         setKeyword1("");
         setKeyword2("");
         setKeyword3("");
@@ -595,32 +600,34 @@ export default function AddPurchaseRequisition() {
     useEffect(() => {
         if (isSelectingRef.current) return;
 
-        let filtered = data;
+        let filtered = searchbardata;
+
         if (handinputproductuuid) {
-            filtered = filtered.filter(item =>
+            filtered = searchbardata.filter(item =>
                 item.id.includes(handinputproductuuid)
             );
         }
         if (handinputproductid) {
-            filtered = filtered.filter(item =>
+            filtered = searchbardata.filter(item =>
                 item.productid.includes(handinputproductid)
             );
         }
 
         if (handinputname) {
-            filtered = filtered.filter(item =>
+            filtered = searchbardata.filter(item =>
                 item.name.includes(handinputname)
             );
         }
 
         if (handinputspec) {
-            filtered = filtered.filter(item =>
+            filtered = searchbardata.filter(item =>
                 item.spec && item.spec.includes(handinputspec)
             );
         }
 
         setFilteredData(filtered);
-        setShowSuggestions(filtered.length > 0);
+        // const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
+        setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
     }, [handinputproductuuid, handinputproductid, handinputname, handinputspec]);
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -629,6 +636,7 @@ export default function AddPurchaseRequisition() {
     };
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // setFilteredData(data);
         isSelectingRef.current = false;
         setHandinputname(e.target.value);
     };
@@ -639,7 +647,6 @@ export default function AddPurchaseRequisition() {
     };
 
     const handleSelect = (item: DataItem) => {
-        // alert(item.id);
         isSelectingRef.current = true;
         setHandinputproductuuid(item.id);
         setHandinputproductid(item.productid);
@@ -648,6 +655,54 @@ export default function AddPurchaseRequisition() {
         setHandinputunit(item.unit);
         setShowSuggestions(false);
     };
+
+
+
+
+
+    const [dragging, setDragging] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+
+
+    const handleMouseUp = () => {
+        setDragging(false);
+    };
+
+
+    useEffect(() => {
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [dragging, offset, position]);
+
+    const handleMouseMove = (event: any) => {
+        if (dragging) {
+            setPosition({
+                x: event.clientX - offset.x,
+                y: event.clientY - offset.y,
+            });
+        }
+    };
+
+    const handleMouseDown = (event: any) => {
+        setDragging(true);
+        // 記錄下滑鼠的偏差
+        setOffset({
+            x: event.clientX - position.x,
+            y: event.clientY - position.y,
+        });
+    };
+
+
+
+
+
 
 
     return (
@@ -718,7 +773,7 @@ export default function AddPurchaseRequisition() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { getProduct(); setProductSearchmodalopen(!productSearchmodalopen); }}>
+                                <button className={scss.squarebtn} onClick={() => { productSearchModalOpen() }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                             </div>
@@ -995,17 +1050,45 @@ export default function AddPurchaseRequisition() {
                                 {/* (1).可自行輸入請購項目。<br />
                             (2).如不知請購品項料號，可以利用查詢代入。<br /> */}
                                 {showSuggestions && (
-                                    <div style={{
-                                        position: 'sticky',
-                                        zIndex: 1002,
-                                        backgroundColor: 'white',
-                                        border: '1px solid #ccc',
-                                        width: '750px',
-                                        maxHeight: '200px',
-                                        overflowY: 'auto',
-                                        fontSize: '16px'
-                                    }}>
-                                        <table>
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            zIndex: 1001,
+                                            backgroundColor: 'white',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                                            width: '750px',
+                                            maxHeight: '200px',
+                                            overflowY: 'auto',
+                                            fontSize: '16px',
+                                            left: `${position.x}px`,
+                                            top: `${position.y}px`,
+                                            cursor: 'default',
+                                        }}
+                                        onMouseDown={handleMouseDown}
+                                    >
+                                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px', borderBottom: '1px solid #ccc' }}>
+                                            <button
+                                                onClick={() => setShowSuggestions(false)}
+                                                style={{
+                                                    background: 'transparent',
+                                                    border: 'none',
+                                                    fontSize: '16px',
+                                                    cursor: 'pointer',
+                                                    fontWeight: 'bold',
+                                                    color: '#555',
+                                                    outline: 'none',
+                                                    transition: 'color 0.3s ease',
+
+                                                }}
+                                                onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
+                                                onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                             {filteredData.length > 0 ? (
                                                 filteredData.map((item, index) => (
                                                     <tr
@@ -1016,21 +1099,21 @@ export default function AddPurchaseRequisition() {
                                                         onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
                                                         onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
                                                     >
-                                                        <td style={{ width: '150px' }}>
+                                                        <td style={{ padding: '8px', width: '150px' }}>
                                                             {item.productid}
                                                         </td>
-                                                        <td style={{ width: '350px' }}>
-                                                            {item.spec}
-                                                        </td>
-                                                        <td style={{ width: '250px' }}>
+                                                        <td style={{ padding: '8px', width: '250px' }}>
                                                             {item.name}
+                                                        </td>
+                                                        <td style={{ padding: '8px', width: '350px' }}>
+                                                            {item.spec}
                                                         </td>
                                                     </tr>
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td>
-                                                        <div style={{ padding: '8px', textAlign: 'center' }}>沒有匹配的結果</div>
+                                                    <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
+                                                        沒有匹配的結果
                                                     </td>
                                                 </tr>
                                             )}
@@ -1099,8 +1182,8 @@ export default function AddPurchaseRequisition() {
                     <div>
                         <Thead01 type={'AddPR_GetProduct'} />
                         <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                            {data && (
-                                data.map((_item: any, index: number) => (
+                            {modaldata && (
+                                modaldata.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader19}>
                                         <div className={scss.row01}>
                                             <span>{_item.productid}</span>

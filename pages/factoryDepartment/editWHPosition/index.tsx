@@ -45,6 +45,9 @@ export interface WHPositionModel {
     whname?: string;
     trayname?: string;
     canedit?: boolean;
+    productname?: string;
+    productspec?: string;
+    productid?: string;
 }
 
 
@@ -295,7 +298,10 @@ export default function EditWHPosition() {
                 quantity: responseData.quantity,
                 whname: responseData.whname,
                 trayname: responseData.trayname,
-                canedit: responseData.canedit
+                canedit: responseData.canedit,
+                productname: responseData.productname,
+                productspec: responseData.productspec,
+                productid: responseData.productid
             };
 
             setData1(dataModel);
@@ -615,6 +621,7 @@ export default function EditWHPosition() {
     };
 
     const handleRestore = () => {
+        console.log(data);
         setData1(data);
     }
 
@@ -708,7 +715,7 @@ export default function EditWHPosition() {
             newlength = alphaIncrement(newlength);
         }
 
-        return newlength + newwidth + newchildlength + (parseInt(newchildwidth)-2).toString();
+        return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
     };
 
 
@@ -739,24 +746,24 @@ export default function EditWHPosition() {
         if (isSelectingRef.current) return;
 
         let filtered = productdata;
-        const { materialnumber, whpname, spec } = data1;
+        const { materialnumber, productname, productspec } = data1;
 
         // 根據條件過濾數據
         if (materialnumber) {
-            filtered = filtered.filter(item =>
+            filtered = productdata.filter(item =>
                 item.productid.includes(materialnumber)
             );
         }
 
-        if (whpname) {
-            filtered = filtered.filter(item =>
-                item.name.includes(whpname)
+        if (productname) {
+            filtered = productdata.filter(item =>
+                item.name.includes(productname)
             );
         }
 
-        if (spec) {
-            filtered = filtered.filter(item =>
-                item.spec && item.spec.includes(spec)
+        if (productspec) {
+            filtered = productdata.filter(item =>
+                item.spec && item.spec.includes(productspec)
             );
         }
 
@@ -764,9 +771,9 @@ export default function EditWHPosition() {
         setFilteredData(filtered);
 
         // 當有過濾條件且有匹配結果時才顯示建議框
-        const shouldShowSuggestions = filtered.length > 0 && (materialnumber || whpname || spec) && canedit === true;
+        const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
         setShowSuggestions(Boolean(shouldShowSuggestions));
-    }, [data1.materialnumber, data1.whpname, data1.spec, productdata]);
+    }, [data1.materialnumber, data1.productname, data1.productspec, productdata]);
 
 
 
@@ -777,12 +784,12 @@ export default function EditWHPosition() {
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
-        handleChange('whpname', e.target.value);
+        handleChange('productname', e.target.value);
     };
 
     const handleSpecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
-        handleChange('spec', e.target.value);
+        handleChange('productspec', e.target.value);
     };
 
 
@@ -791,8 +798,8 @@ export default function EditWHPosition() {
         isSelectingRef.current = true;
         // setHandinputproductuuid(item.id);
         data1.materialnumber = item.productid;
-        data1.whpname = item.name;
-        data1.spec = item.spec || '';
+        data1.productname = item.name;
+        data1.productspec = item.spec || '';
         data1.unit = item.unit;
         setShowSuggestions(false);
     };
@@ -804,25 +811,25 @@ export default function EditWHPosition() {
     const [dragging, setDragging] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [offset, setOffset] = useState({ x: 0, y: 0 });
-    
+
 
 
     const handleMouseUp = () => {
         setDragging(false);
     };
-    
+
 
     useEffect(() => {
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
-    
+
         return () => {
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
         };
     }, [dragging, offset, position]);
-    
-    const handleMouseMove = (event:any) => {
+
+    const handleMouseMove = (event: any) => {
         if (dragging) {
             setPosition({
                 x: event.clientX - offset.x,
@@ -830,8 +837,8 @@ export default function EditWHPosition() {
             });
         }
     };
-    
-    const handleMouseDown = (event:any) => {
+
+    const handleMouseDown = (event: any) => {
         setDragging(true);
         // 記錄下滑鼠的偏差
         setOffset({
@@ -839,7 +846,7 @@ export default function EditWHPosition() {
             y: event.clientY - position.y,
         });
     };
-    
+
 
 
     return (
@@ -874,23 +881,26 @@ export default function EditWHPosition() {
                             }}
                         />
                         {showSuggestions && (
+                            
                             <div
                                 style={{
                                     position: 'absolute',
-                                    zIndex: 1002,
+                                    zIndex: 1001,
                                     backgroundColor: 'white',
                                     border: '1px solid #ccc',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
                                     width: '750px',
                                     maxHeight: '200px',
                                     overflowY: 'auto',
                                     fontSize: '16px',
                                     left: `${position.x}px`,
                                     top: `${position.y}px`,
-                                    cursor: 'move',
+                                    cursor: 'default',
                                 }}
                                 onMouseDown={handleMouseDown}
                             >
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '4px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px', borderBottom: '1px solid #ccc' }}>
                                     <button
                                         onClick={() => setShowSuggestions(false)}
                                         style={{
@@ -899,37 +909,48 @@ export default function EditWHPosition() {
                                             fontSize: '16px',
                                             cursor: 'pointer',
                                             fontWeight: 'bold',
+                                            color: '#555',
+                                            outline: 'none',
+                                            transition: 'color 0.3s ease',
+                                            
                                         }}
+                                        onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
+                                        onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
                                     >
-                                        X
+                                        ×
                                     </button>
                                 </div>
-                                <table>
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                     {filteredData.length > 0 ? (
                                         filteredData.map((item, index) => (
                                             <tr
                                                 key={index}
                                                 onClick={() => handleSelect(item)}
-                                                style={{ padding: '8px', cursor: 'pointer', border: '1px solid gray' }}
+                                                style={{
+                                                    padding: '8px',
+                                                    cursor: 'pointer',
+                                                    borderBottom: '1px solid #ddd',
+                                                    backgroundColor: '#fff',
+                                                }}
                                                 onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
-                                                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
-                                                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
+                                                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                                                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
                                             >
-                                                <td style={{ width: '150px' }}>
+                                                <td style={{ padding: '8px', width: '150px' }}>
                                                     {item.productid}
                                                 </td>
-                                                <td style={{ width: '250px' }}>
+                                                <td style={{ padding: '8px', width: '250px' }}>
                                                     {item.name}
                                                 </td>
-                                                <td style={{ width: '350px' }}>
+                                                <td style={{ padding: '8px', width: '350px' }}>
                                                     {item.spec}
                                                 </td>
                                             </tr>
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan={3}>
-                                                <div style={{ padding: '8px', textAlign: 'center' }}>沒有匹配的結果</div>
+                                            <td  style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
+                                                沒有匹配的結果
                                             </td>
                                         </tr>
                                     )}
@@ -946,7 +967,7 @@ export default function EditWHPosition() {
                             // disabled={true}
                             inputProps={{
                                 props: {
-                                    value: data1.whpname,
+                                    value: data1.productname,
                                     // onChange: (e) => handleChange('whpname', e.target.value),
                                     onChange: handleNameChange,
                                 },
@@ -960,7 +981,7 @@ export default function EditWHPosition() {
                             // disabled={true}
                             inputProps={{
                                 props: {
-                                    value: data1.spec,
+                                    value: data1.productspec,
                                     // onChange: (e) => handleChange('spec', e.target.value),
                                     onChange: handleSpecChange,
                                 },

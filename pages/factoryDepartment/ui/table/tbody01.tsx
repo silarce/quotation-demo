@@ -431,8 +431,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 </span>
                 <span>{_item.materialnumber}</span>
                 {/* <span>{_item.batchnumber}</span> */}
-                <span>{_item.whpname}</span>
-                <span>{_item.spec}</span>
+                <span>{_item.productname}</span>
+                <span>{_item.productspec}</span>
                 <span>{_item.quantity}</span>
                 {/* <span>{_item.unit}</span> */}
                 {/* <span>{_item.whname}</span> */}
