@@ -117,7 +117,7 @@ export default function AccountantSorting({
 }) {
   const [disabled, setDisabled] = useState(true);
 
-  const [stateList, setStateListArr] = useState<TstateList>({});
+  const [stateList, setStateList] = useState<TstateList>({});
   const [activeAccountant, setActiveAccountant] = useState<Taccountant>();
 
   // -----------------------------------------------------------------------------
@@ -129,11 +129,11 @@ export default function AccountantSorting({
   };
 
   const handle_onDragEnd = (e: DragEndEvent) => {
-    handleDragEnd(e, stateList, setActiveAccountant, setStateListArr);
+    handleDragEnd(e, stateList, setActiveAccountant, setStateList);
   };
 
   const handle_onDragOver = (e: DragOverEvent) => {
-    handleDragOver(e, stateList, setStateListArr);
+    handleDragOver(e, stateList, setStateList);
   };
 
   const handle_confirm = async () => {
@@ -144,7 +144,7 @@ export default function AccountantSorting({
   };
 
   const handle_editAllowance = (invoiceId: string, value: string) => {
-    setStateListArr((list) => {
+    setStateList((list) => {
       list = { ...list };
       const state = list[invoiceId];
       const invoice = state.invoice;
@@ -195,8 +195,15 @@ export default function AccountantSorting({
   //   };
   // }, [periodArr]);
 
-  const { total_invoice, total_invoice_num } = useMemo(() => {
+  const {
+    //
+    total_invoice,
+    total_invoice_num,
+    total_accountant,
+    amountNotCollected,
+  } = useMemo(() => {
     let total_invoice_d = new Decimal(0);
+    let total_accountant_d = new Decimal(0);
 
     periodArr.forEach((period) => {
       const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
@@ -207,36 +214,54 @@ export default function AccountantSorting({
         return;
       }
 
-      const price = period.price || 0;
+      const accountantList = invoice.accountantList;
+
+      // const price = period.price || 0;
+      const price = invoice.actualPrice || 0;
 
       total_invoice_d = total_invoice_d.add(price || 0);
+
+      accountantList?.forEach((acct) => {
+        const { price } = acct;
+        total_accountant_d = total_accountant_d.add(price || 0);
+      });
+    }); // periodArr.forEach
+
+    accountantArr_noInvoice?.forEach((acct) => {
+      const { price } = acct;
+      total_accountant_d = total_accountant_d.add(price || 0);
     });
+
+    const amountNotCollected = new Decimal(total_invoice_d).minus(total_accountant_d).toNumber().toLocaleString();
 
     return {
       total_invoice_num: total_invoice_d.toNumber(),
       total_invoice: total_invoice_d.toNumber().toLocaleString(),
-    };
-  }, [periodArr]);
-
-  const { total_accountant, amountNotCollected } = useMemo(() => {
-    let total_accountant = new Decimal(0);
-
-    const { noInvoice, ...rest } = stateList;
-
-    Object.values(rest).forEach((state) => {
-      state.accountantArr.forEach((acc) => {
-        total_accountant = total_accountant.add(acc.price_num || 0);
-      });
-    });
-
-    // const amountNotCollected = total_accountant.minus(total_invoice_num).toNumber().toLocaleString();
-    const amountNotCollected = new Decimal(total_invoice_num).minus(total_accountant).toNumber().toLocaleString();
-
-    return {
-      total_accountant: total_accountant.toNumber().toLocaleString(),
+      total_accountant: total_accountant_d.toNumber().toLocaleString(),
       amountNotCollected,
     };
-  }, [total_invoice_num, stateList]);
+  }, [periodArr, accountantArr_noInvoice]);
+
+  // 棄用
+  // const { total_accountant, amountNotCollected } = useMemo(() => {
+  //   let total_accountant = new Decimal(0);
+
+  //   const { noInvoice, ...rest } = stateList;
+
+  //   Object.values(rest).forEach((state) => {
+  //     state.accountantArr.forEach((acc) => {
+  //       total_accountant = total_accountant.add(acc.price_num || 0);
+  //     });
+  //   });
+
+  //   // const amountNotCollected = total_accountant.minus(total_invoice_num).toNumber().toLocaleString();
+  //   const amountNotCollected = new Decimal(total_invoice_num).minus(total_accountant).toNumber().toLocaleString();
+
+  //   return {
+  //     total_accountant: total_accountant.toNumber().toLocaleString(),
+  //     amountNotCollected,
+  //   };
+  // }, [total_invoice_num, stateList]);
 
   // -----------------------------------------------------------------------------
 
@@ -251,7 +276,7 @@ export default function AccountantSorting({
     list.noInvoice = createNoInvoiceState(accountantArr_noInvoice);
 
     periodArr.forEach((period) => {
-      const price = period.price || 0;
+      // const periodPrice = period.price || 0;
 
       const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
         | TaccountsReceivableInvoiceDto
@@ -267,7 +292,7 @@ export default function AccountantSorting({
         accountantList,
         invoiceNumber,
         invoiceDate,
-
+        actualPrice: invoiceActualPrice,
         allowance,
       } = invoice;
 
@@ -290,12 +315,13 @@ export default function AccountantSorting({
           insertDate: getTaiwanDateStr(insertDate),
           importAccountingNumber,
           noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
+          // price: price.toLocaleString(),
           price: price.toLocaleString(),
           price_num: price,
           accountsReceivableDeduction,
           isRelationedInvoiceChanged: false,
         } as Taccountant;
-      });
+      }); // accountantArr
 
       list[invoiceId] = {
         isAccountantOrderChanged: false,
@@ -305,14 +331,15 @@ export default function AccountantSorting({
           id: invoiceId,
           invoiceNumber,
           invoiceDate: invoiceDate ? getTaiwanDateStr(invoiceDate) : '',
-          price: price.toLocaleString(),
+          // price: periodPrice.toLocaleString(),
+          price: invoiceActualPrice.toLocaleString(),
           allowance: String(allowance || ''),
         },
         accountantArr: accountantArr,
       };
     }); // invoiceArr.forEach
 
-    setStateListArr(list);
+    setStateList(list);
   }, [periodArr, accountantArr_noInvoice, disabled]);
 
   // -----------------------------------------------------------------------------
@@ -858,35 +885,11 @@ const createNoInvoiceState = (accountantArr_noInvoice: TaccountantDto[]) => {
     } as Taccountant;
   });
 
-  // const fake_accountantArr: Taccountant[] = [
-  //   {
-  //     id: '1',
-  //     invoiceId: 'noInvoice',
-  //     insertDate: '110/10/10',
-  //     importAccountingNumber: '123456',
-  //     noteMaturityDate: '110/10/10',
-  //     price: '1000',
-  //     isRelationedInvoiceChanged: false,
-  //     accountsReceivableDeduction: [],
-  //   },
-  //   {
-  //     id: '2',
-  //     invoiceId: 'noInvoice',
-  //     insertDate: '110/10/10',
-  //     importAccountingNumber: '654321',
-  //     noteMaturityDate: '110/10/10',
-  //     price: '2000',
-  //     isRelationedInvoiceChanged: false,
-  //     accountsReceivableDeduction: [],
-  //   },
-  // ];
-
   return {
     isAccountantOrderChanged: false,
     isInvoiceAllowanceChanged: false,
     isInvoiceAccountantRelationChanged: false,
     invoice: virtualInvoice,
     accountantArr,
-    // accountantArr: fake_accountantArr,
   };
 };

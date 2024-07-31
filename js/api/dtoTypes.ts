@@ -3656,7 +3656,7 @@ export type TincomeBillSerialDto = {
   receivablePayment: number | null;
   // 扣款金額
   deductionPayment: number | null;
-  // 未收款金額
+  // 未收款金額 // 餘額
   unpaidPayment: number | null;
   // 是否為國外收入傳票
   isForeign: boolean;
@@ -3665,7 +3665,10 @@ export type TincomeBillSerialDto = {
   // 已匯入紙本應收帳款(舊的收款紀錄) // 與TaccountantPaymentType.isImported連動
   isPaperImported: boolean;
   // 收入傳票歸屬日期
-  incomeBillDate: Date | null;
+  incomeBillDate: string | null;
+  //
+  accountantId: string;
+  accountant: TaccountantDto;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3910,7 +3913,7 @@ export type TcreateAccountReceivablePeriodDto = Pick<
   nameOfBusinessEntity: string | null; // 買受人(公司抬頭)
   businessIdNumber: string | null; // 統一編號
   isOriginalCustomer: boolean; // 是否為合約原客戶 // 若為false，那這筆請款視為額外收入
-  // isOriginalCustomer: boolean; // 是否為合約原客戶
+  isOlderInvoice: boolean; // 是否為舊的手key發票
 };
 
 export type TupdateAccountReceivablePeriodDto = Partial<TcreateAccountReceivablePeriodDto>;
@@ -3949,6 +3952,8 @@ export type TaccountsReceivableInvoiceDto = {
   businessIdNumber: string | null;
   // 是否為合約原客戶
   isOriginalCustomer: boolean; // 若為false，那這筆請款視為額外收入
+  // 是否為舊的手key發票
+  isOlderInvoice: boolean;
   //
   // 合約工程名稱
   contractProjectName: string | null;

@@ -18,7 +18,7 @@ import { Checkbox, Radio, Popover } from 'antd';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 
 // css
@@ -831,6 +831,30 @@ const Tfoot = ({
         </div>
       </div>
 
+      <div className={classNames(scss.row, isTotal && 'invisible')}>
+        <div className={scss.totalInfoWrapper}>
+          <Popover trigger="hover" content={<span>是否為舊的手key發票</span>}>
+            <span>
+              <Icon_info />
+            </span>
+          </Popover>
+          舊發票
+        </div>
+
+        <div className="m-auto ml-0 relative top-[-3px]">
+          <Checkbox
+            checked={class_other.isOlderInvoice}
+            onChange={(e) => {
+              if (readOnly) {
+                return;
+              }
+
+              class_other.isOlderInvoice = e.target.checked;
+            }}
+          />
+        </div>
+      </div>
+
       <div className={classNames(scss.row)}>
         <div className={scss.totalInfoWrapper}>
           <Popover
@@ -870,11 +894,14 @@ const Tfoot = ({
         <InputSel
           disabled={readOnly}
           showBaseline="auto"
-          onClick={() => setShowSelector(true)}
+          onClick={() => {
+            !class_other.isOlderInvoice && setShowSelector(true);
+          }}
           inputProps={{
             props: {
               value: class_other.invoiceBook?.alphabeticLetter ?? '',
-              readOnly: true,
+              readOnly: class_other.isOlderInvoice,
+              onChange: () => {},
             },
           }}
         />
@@ -891,6 +918,7 @@ const Tfoot = ({
               defaultPickerValue: class_other.invoiceDateRange,
               value: invoiceDate,
               onChange: (date_m) => {
+                date_m && (date_m = date_m.startOf('day'));
                 class_other.invoiceDate = date_m;
               },
               disabledDate: (date_m) => class_other.disabledInvoiceDate(date_m),
@@ -907,16 +935,31 @@ const Tfoot = ({
         <InputSel
           disabled={readOnly}
           showBaseline="auto"
-          selectProps={{
-            props: {
-              value: { label: invoiceNumber, value: invoiceNumber },
-              options: class_other.invoiceNumberOptions,
-              onChange: (option) => {
-                const value = option?.value || '';
-                class_other.invoiceNumber = value;
+          {...(() => {
+            const selectProps: TinputSelProps['selectProps'] = {
+              props: {
+                value: { label: class_other.invoiceNumber, value: class_other.invoiceNumber },
+                options: class_other.invoiceNumberOptions,
+                onChange: (option) => {
+                  const value = option?.value || '';
+                  class_other.invoiceNumber = value;
+                },
               },
-            },
-          }}
+            };
+
+            const inputProps: TinputSelProps['inputProps'] = {
+              props: {
+                value: class_other.invoiceNumber,
+                onChange: (e) => {
+                  class_other.invoiceNumber = e.target.value;
+                },
+              },
+            };
+
+            const inputSelProps = class_other.isOlderInvoice ? { inputProps } : { selectProps };
+
+            return inputSelProps;
+          })()}
         />
       </div>
 
@@ -1148,6 +1191,7 @@ const useDefaultState = ({
       invoiceNumber = '',
       nameOfBusinessEntity,
       businessIdNumber,
+      isOlderInvoice = false,
     } = invoice ?? {};
 
     let { actualPrice = 0, allowance = 0, isOriginalCustomer = true } = invoice ?? {};
@@ -1202,11 +1246,13 @@ const useDefaultState = ({
       actualPrice: String(actualPrice || ''),
       invoiceDate: invoiceDate ? moment(invoiceDate) : null,
       invoiceBook: invoice?.accountantInvoiceBook ?? null,
+
       //
 
       nameOfBusinessEntity: (isNew ? customer?.name : nameOfBusinessEntity) ?? '',
       businessIdNumber: (isNew ? customer?.taxId : businessIdNumber) ?? '',
       isOriginalCustomer,
+      isOlderInvoice,
     };
 
     return { defaultState, isNew };
@@ -1506,6 +1552,19 @@ class Class_OtherNode {
     }
   }
 
+  // 舊發票
+  get isOlderInvoice() {
+    return this.state_period.isOlderInvoice;
+  }
+
+  set isOlderInvoice(bool: boolean) {
+    this.setState_period((state) => ({
+      ...state,
+      isOlderInvoice: bool,
+      invoiceBook: null,
+    }));
+  }
+
   get invoiceDateRange() {
     if (!this.invoiceBook) {
       return undefined;
@@ -1553,6 +1612,10 @@ class Class_OtherNode {
 
   // ------------------------------------------------------------------------------
   disabledInvoiceDate(currentDate: Moment): boolean {
+    if (this.isOlderInvoice) {
+      return false;
+    }
+
     let disabled = true;
 
     if (!this.invoiceBook) {
