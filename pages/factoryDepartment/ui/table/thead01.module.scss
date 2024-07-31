@@ -60,7 +60,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 80px 150px 150px 300px 50px 100px;
+  grid-template-columns: 80px 150px 250px 300px 30px 30px;
   gap: 15px;
   height: 40px;
   padding: 30px;
@@ -266,7 +266,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 80px 100px 50px 30px;
+  grid-template-columns: 80px 100px 50px 200px 30px;
   gap: 15px;
   height: 40px;
   padding: 0 20px;
@@ -295,7 +295,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 80px 100px 50px 30px;
+  grid-template-columns: 30px 80px 100px 50px 200px 30px;
   gap: 15px;
   height: 40px;
   padding: 0 20px;
@@ -326,7 +326,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 300px 50px 50px 40px 60px 80px 60px;
+  grid-template-columns: 30px 150px 300px 300px 50px 50px 40px 60px 80px 30px 250px 30px;
   gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -357,7 +357,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 80px 100px 30px 30px;
+  grid-template-columns: 30px 100px 80px 50px 200px 30px;
   gap: 15px;
   height: 40px;
   padding: 0 20px;
@@ -418,7 +418,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 300px 40px 40px 40px 60px 70px 60px;
+  grid-template-columns: 30px 150px 300px 300px 40px 40px 40px 60px 70px 30px 250px 30px;
   gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -448,7 +448,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 80px 100px 50px 30px;
+  grid-template-columns:30px 100px 80px 50px 200px 30px;
   gap: 15px;
   height: 40px;
   padding: 0 20px;
@@ -478,7 +478,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 300px 50px 40px 40px 60px 60px 200px 40px ;
+  grid-template-columns: 30px 150px 300px 300px 50px 40px 40px 60px 60px 200px 30px 250px 30px;
   // gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -507,7 +507,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 80px 60px 80px 80px 200px 60px;
+  grid-template-columns: 30px 150px 300px 80px 60px 80px 80px 200px 250px 60px;
   gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -626,7 +626,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 415px 415px 65px 85px 300px 50px;
+  grid-template-columns: 30px 150px 415px 415px 65px 85px 300px 50px;
   // gap: 5px;
   height: 30px;
   padding: 0 15px;
@@ -717,7 +717,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 70px;
+  grid-template-columns: 30px 150px 300px 80px 80px 60px 80px 80px 250px 60px;
   gap: 5px;
   height: 30px;
   padding: 0 20px;
@@ -747,7 +747,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 30px 150px 300px 300px 40px 40px 40px 60px 60px;
+  grid-template-columns: 30px 150px 300px 300px 40px 40px 40px 60px 30px 250px 30px;
   gap: 5px;
   height: 30px;
   padding: 0 20px;

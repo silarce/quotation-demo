@@ -22,25 +22,13 @@ div.panelHeader {
     display: grid;
     grid-template-columns: 200px 200px 200px 200px 200px 250px 200px 100px 100px;
     gap: 15px;
-    // margin-bottom: 16px;
-    // padding-top:20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
 
-  .row02 {
-    display: grid;
-    grid-template-columns: 110px 65px auto 100px;
-    gap: 15px;
-
-    .place {
-      >* {
-        display: inline-block;
-        vertical-align: middle;
-      }
-
-      >span {
-        margin-left: 5px;
-      }
-    }
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
   }
 }
 
@@ -71,25 +59,13 @@ div.panelHeader2 {
     display: grid;
     grid-template-columns: 80px 80px 50px 50px 100px 100px 50px;
     gap: 15px;
-    // margin-bottom: 16px;
-    // padding-top:20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
 
-  .row02 {
-    display: grid;
-    grid-template-columns: 110px 65px auto 100px;
-    gap: 15px;
-
-    .place {
-      >* {
-        display: inline-block;
-        vertical-align: middle;
-      }
-
-      >span {
-        margin-left: 5px;
-      }
-    }
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
   }
 }
 
@@ -113,27 +89,15 @@ div.panelHeader3 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 80px 150px 150px 300px 50px 100px;
+    grid-template-columns: 80px 150px 250px 300px 30px 30px;
     gap: 15px;
-    // margin-bottom: 16px;
-    // padding-top:20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
   }
 
-  .row02 {
-    display: grid;
-    grid-template-columns: 110px 65px auto 100px;
-    gap: 15px;
-
-    .place {
-      >* {
-        display: inline-block;
-        vertical-align: middle;
-      }
-
-      >span {
-        margin-left: 5px;
-      }
-    }
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
   }
 }
 
@@ -326,10 +290,15 @@ div.panelHeader9 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 80px 100px 50px 30px;
+    grid-template-columns: 80px 100px 50px 200px 30px;
     gap: 15px;
-    // margin-bottom: 16px;
-    // padding-top:20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
   }
 }
 
@@ -353,8 +322,15 @@ div.panelHeader10 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 80px 100px 50px 30px;
+    grid-template-columns: 30px 100px 80px 50px 200px;
     gap: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
   }
 }
 
@@ -407,8 +383,15 @@ div.panelHeader12 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 80px 100px 50px 30px;
+    grid-template-columns: 30px 100px 80px 50px 200px;
     gap: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
   }
 }
 
@@ -463,8 +446,16 @@ div.panelHeader15 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 80px 100px 50px 30px;
+    grid-template-columns: 30px 100px 80px 50px 200px;
     gap: 15px;
+    // border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
   }
 }
 
@@ -472,25 +463,30 @@ div.panelHeader15 {
 
 //#region 請購單明細
 div.panelHeader16 {}
+
 //移到purchaseRequisitionList 請購單頁面
 //#endregion
 
 //#region 詢價單明細(只可以檢視)
 div.panelHeader17 {}
+
 //移到purchaseRequisitionList 請購單頁面
 //#endregion
 
 //#region 詢價單
 div.panelHeader18 {}
+
 //移到quotereqDetailList 詢價單明細頁面
 //#endregion
 
 //#region 新增請購單取物料明細
 div.panelHeader19 {}
+
 //移到addPurchaseRequisition新增請購單頁面
 //#endregion
 
 //#region 新增請購單明細
 div.panelHeader20 {}
+
 //移到addPurchaseRequisition新增請購單頁面
 //#endregion
