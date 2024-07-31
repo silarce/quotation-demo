@@ -284,13 +284,6 @@ export default function AccountReceivable() {
       isOlderInvoice,
     };
 
-    // 測試舊發票相關功能
-    // 測試舊發票相關功能
-    // 測試舊發票相關功能
-    // 測試舊發票相關功能
-    // 測試舊發票相關功能
-    // 測試舊發票相關功能
-
     try {
       setIsFetching_req(true);
 
