@@ -918,6 +918,7 @@ const Tfoot = ({
               defaultPickerValue: class_other.invoiceDateRange,
               value: invoiceDate,
               onChange: (date_m) => {
+                date_m && (date_m = date_m.startOf('day'));
                 class_other.invoiceDate = date_m;
               },
               disabledDate: (date_m) => class_other.disabledInvoiceDate(date_m),
