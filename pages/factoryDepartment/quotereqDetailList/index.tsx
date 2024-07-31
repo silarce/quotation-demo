@@ -236,6 +236,7 @@ export default function QuotereqDetailList() {
                 setQuoterequnit(data[0].unit);
                 setquoterequuidin(data[0].quoterequuid)
                 setPurchaserequisitiondetailuuidin(data[0].purchaserequisitiondetailuuid);
+                prquotereqadddata.unit = data[0].unit;
             }
 
             // alert(data[0].quoterequuid);
@@ -469,7 +470,7 @@ export default function QuotereqDetailList() {
     };
 
     const handleAutoSetSupplier = (item: any) => {
-
+        handleRowClick(item.supplierid);
 
         handlequotereqChange('suppliername', item.name.trim())
         handlequotereqChange('supplieraddress', item.address.trim())
@@ -630,7 +631,16 @@ export default function QuotereqDetailList() {
         setquoterequuidin(item.quoterequuid)
         setPurchaserequisitiondetailuuidin(item.purchaserequisitiondetailuuid);
         getQuotereqDetail(item.quoterequuid);
+        prquotereqadddata.unit = item.unit;
     }
+
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+    // 點擊處理函數
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
+    };
+
 
     return (
         <SubLayer isLoading_subLayer={isLoading}>
@@ -1028,20 +1038,10 @@ export default function QuotereqDetailList() {
                 onCancel={prQuotereqModalClose}
                 width="1000px"
                 maskClosable={false}
-                // centered
                 style={{ top: 250 }}
             >
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
-                    {/* <span style={{ fontSize: '16px', color: '#14256a' }}>查詢種類：</span>
-                    <span style={{ fontSize: '16px' }}>
-                        <select value={selectedOption} onChange={(e) => { setSelectedOption(e.target.value) }}>
-                            <option value="物料">物料</option>
-                            <option value="全部">全部</option>
-                                <option value="辦公室用品">辦公室用品</option>
-                        </select>
-                    </span> */}
-
                     <span style={{ fontSize: '16px', color: '#14256a' }}>查詢：</span>
                     <span style={{ fontSize: '16px' }}>
                         <form onSubmit={handleSubmit}>
@@ -1081,15 +1081,16 @@ export default function QuotereqDetailList() {
                         {suplrdata && (
                             suplrdata.map((_item: any, index: number) => (
                                 <CellWithBar key={index} className={scss.panelHeader21}>
-                                    <div className={scss.row01}>
+                                    <div
+                                        key={index}
+                                        className={`${scss.row01} ${_item.supplierid === selectedItemId ? scss.selectedRow : ''}`}
+                                        onClick={() => handleAutoSetSupplier(_item)}
+                                    >
                                         <span>{_item.name}</span>
                                         <span>{_item.address}</span>
                                         <span>{_item.phone}</span>
                                         <span>{_item.taxid}</span>
                                         <span>
-                                            <button onClick={() => { handleAutoSetSupplier(_item) }}>
-                                                <img src={icon_fc_add.src} alt="addToList" style={{ width: '30px', height: '20px' }} />
-                                            </button>
                                         </span>
                                     </div>
                                 </CellWithBar>
@@ -1099,6 +1100,7 @@ export default function QuotereqDetailList() {
                 </div>
             </Modal>
 
+         
 
 
 

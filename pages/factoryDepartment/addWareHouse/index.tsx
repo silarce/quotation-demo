@@ -34,6 +34,7 @@ import InputSelBar from 'components/global/gear/inputAndSel/inputSelBar/inputSel
 import MyButton from 'components/global/gear/button/myButton';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
 import { setting } from '../wareHouseList/index';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 
 const optionsCounty = optionsCreator_county();
@@ -239,10 +240,11 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
                             inputProps={{
                                 props: {
                                     value: localTime,
-                                    onChange: (e) => setCreated_at(localTime.trim())
+                                    onChange: (e) => setCreated_at(localTime ? localTime.trim() : '')
                                 },
                             }}
                         />
+
                         <InputSel
                             {...inputSelProps}
                             caption="IP位址"

@@ -16,8 +16,8 @@
 
 .main {
     display: grid;
-    grid-template-columns: 700px 1fr; // 左右兩邊比例，可以調整
-    gap: 15px;
+    grid-template-columns: 650px 1fr; // 左右兩邊比例，可以調整
+    // gap: 15px;
     width: auto;
     margin-top: 4px;
     margin-left: 4px;
@@ -29,11 +29,11 @@
     display: grid;
     grid-template-columns: 700px; // 左側寬度固定為 350px
     justify-content: space-between;
-    gap: 15px;
+    // gap: 15px;
     height: 280px;
     overflow-x: hidden;
     overflow-y: auto; // 垂直滾動（如果需要）
-    border:2px solid gray
+    border:1px solid gray
     // background-color: green;
 }
 
@@ -87,7 +87,7 @@
     overflow-y: auto; // 垂直滾動（如果需要）
     // background-color: orange;
     height: 280px;
-    border:2px solid gray
+    border:1px solid gray
 }
 
 

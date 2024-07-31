@@ -3,7 +3,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import scss from './editWHPosition.module.scss';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { quotationStatusLookup } from 'config/lookupTable';
-import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useEffect, useState } from 'react';
+import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useContext, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -15,6 +15,8 @@ import MyButton from 'components/global/gear/button/myButton';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
 import { setting } from '../wareHouseList/index';
+import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+import { AppContext } from 'pages/_app';
 
 
 
@@ -43,6 +45,9 @@ export interface WHPositionModel {
     whname?: string;
     trayname?: string;
     canedit?: boolean;
+    productname?: string;
+    productspec?: string;
+    productid?: string;
 }
 
 
@@ -52,7 +57,9 @@ export default function EditWHPosition() {
     const router = useRouter();
     const { type, whid, trayname, whname, id, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
 
+    const { userInfo } = useContext(AppContext);
     //備分原本model
+    const [productdata, setProductdata] = useState<any[]>([]);
     const [data, setData] = useState<WHPositionModel>([]);
     const [data1, setData1] = useState<WHPositionModel>([]);
     const [data11, setData11] = useState<any[]>([]);
@@ -86,7 +93,7 @@ export default function EditWHPosition() {
     //還沒編輯前功能紐
     const panelList_unedit: TpanelList = canedit ? [
         {
-            type: 'redButton',
+            type: 'myButton',
             label: '編輯',
             onClick: () => {
                 setDisabled(false);
@@ -97,7 +104,6 @@ export default function EditWHPosition() {
             label: '返回',
             onClick: () => {
                 router.push({
-                    // pathname: `/factoryDepartment/whPositionList`,
                     pathname: `/factoryDepartment/trayList`,
                     query: {
                         type: 'WareHouse',
@@ -142,7 +148,7 @@ export default function EditWHPosition() {
     //點選編輯後功能紐
     const panelList_edit: TpanelList = [
         {
-            type: 'myButton',
+            type: 'redButton',
             label: '儲存',
             onClick: () => {
                 if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
@@ -207,6 +213,49 @@ export default function EditWHPosition() {
         fetchDataAndLayout();
     }, [router.query, disabled]);
 
+    const getProduct = async () => {
+        try {
+            //  console.log(userInfo);
+            setIsLoading(true);
+            const conditionModel: {
+                // keyword: string | undefined;
+            } = {
+                // keyword: "search" as string | undefined,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}GetProduct?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setProductdata(data);
+
+
+            console.log(userInfo);
+
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+    useEffect(() => {
+        getProduct();
+    }, []);
+
+
     //撈取儲位資料 api
     const fetchData = async () => {
         try {
@@ -249,7 +298,10 @@ export default function EditWHPosition() {
                 quantity: responseData.quantity,
                 whname: responseData.whname,
                 trayname: responseData.trayname,
-                canedit: responseData.canedit
+                canedit: responseData.canedit,
+                productname: responseData.productname,
+                productspec: responseData.productspec,
+                productid: responseData.productid
             };
 
             setData1(dataModel);
@@ -271,20 +323,32 @@ export default function EditWHPosition() {
     const updateData = async (updatedData: WHPositionModel) => {
         try {
             setIsLoading(true);
-            const check = JSON.stringify(updatedData);
-            console.log(check);
+
+            const conditionModel: {
+                data: any,
+                username: string | undefined,
+            } = {
+                username: userInfo?.username as string | undefined,
+                data: updatedData
+            };
 
             const inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
                 FunctionName: 'test',
-                FilterConditions: JSON.stringify(updatedData),
+                FilterConditions: JSON.stringify(conditionModel),
             };
 
             console.log(inputModel);
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}UpdateWHPositionByID?${queryParams}`);
+            const response = await fetch(`${setting.apipath}UpdateWHPositionByID`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -557,6 +621,7 @@ export default function EditWHPosition() {
     };
 
     const handleRestore = () => {
+        console.log(data);
         setData1(data);
     }
 
@@ -583,11 +648,11 @@ export default function EditWHPosition() {
         const convertToAlpha = (num: number): string => {
             return String.fromCharCode(65 + num - 1);
         };
-    
+
         const convertToNumber = (num: number, pad: number): string => {
             return num.toString().padStart(pad, '0');
         };
-    
+
         const alphaIncrement = (alpha: string): string => {
             if (alpha === 'Z') {
                 return 'A';
@@ -595,7 +660,7 @@ export default function EditWHPosition() {
                 return String.fromCharCode(alpha.charCodeAt(0) + 1);
             }
         };
-    
+
         const numberIncrement = (num: number, max: number, pad: number): string => {
             if (num >= max) {
                 return convertToNumber(1, pad);
@@ -603,54 +668,183 @@ export default function EditWHPosition() {
                 return convertToNumber(num + 1, pad);
             }
         };
-    
+
         let newlength = '';
         let newwidth = '';
         let newchildlength = '';
         let newchildwidth = '';
-    
+
         // 處理 length 的增量
         if (length === '1') {
             newlength = 'A';
         } else {
             newlength = convertToAlpha(parseInt(length, 10));
         }
-    
+
         // 處理 width 的增量
         if (width === '1') {
             newwidth = '001';
         } else {
             newwidth = convertToNumber(parseInt(width, 10), 3);
         }
-    
+
         // 處理 childlength 的增量
         if (childlength === '1') {
             newchildlength = 'A';
         } else {
             newchildlength = convertToAlpha(parseInt(childlength, 10));
         }
-    
+
         // 處理 childwidth 的增量
         if (childwidth === '1') {
             newchildwidth = '1';
         } else {
             newchildwidth = numberIncrement(parseInt(childwidth), 100, 1);
         }
-    
+
         // 增量操作
         if (childlength !== '1' && newchildwidth === '001') {
             newchildlength = alphaIncrement(newchildlength);
         }
-    
+
         if (width !== '1' && newchildlength === 'A' && newchildwidth === '1') {
             newwidth = numberIncrement(parseInt(width), 100, 3);
         }
-    
+
         if (length !== '1' && newwidth === '001' && newchildlength === 'A' && newchildwidth === '1') {
             newlength = alphaIncrement(newlength);
         }
-    
-        return newlength + newwidth + newchildlength + (parseInt(newchildwidth)-1).toString();
+
+        return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
+    };
+
+
+
+
+
+
+
+    interface DataItem {
+        id: string;
+        productid: string;
+        spec: string | null; // spec 可能為 null
+        name: string;
+        unit: string;
+    }
+
+
+    // const [handinputname, setHandinputname] = useState("");
+    // const [handinputspec, setHandinputspec] = useState("");
+    const [filteredData, setFilteredData] = useState<DataItem[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const isSelectingRef = useRef(false);
+    // const data: DataItem[] = [
+    //     // 你的資料項目
+    // ];
+
+    useEffect(() => {
+        if (isSelectingRef.current) return;
+
+        let filtered = productdata;
+        const { materialnumber, productname, productspec } = data1;
+
+        // 根據條件過濾數據
+        if (materialnumber) {
+            filtered = productdata.filter(item =>
+                item.productid.includes(materialnumber)
+            );
+        }
+
+        if (productname) {
+            filtered = productdata.filter(item =>
+                item.name.includes(productname)
+            );
+        }
+
+        if (productspec) {
+            filtered = productdata.filter(item =>
+                item.spec && item.spec.includes(productspec)
+            );
+        }
+
+        // 更新過濾後的數據
+        setFilteredData(filtered);
+
+        // 當有過濾條件且有匹配結果時才顯示建議框
+        const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
+        setShowSuggestions(Boolean(shouldShowSuggestions));
+    }, [data1.materialnumber, data1.productname, data1.productspec, productdata]);
+
+
+
+    const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        isSelectingRef.current = false;
+        handleChange('materialnumber', e.target.value);
+    };
+
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        isSelectingRef.current = false;
+        handleChange('productname', e.target.value);
+    };
+
+    const handleSpecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        isSelectingRef.current = false;
+        handleChange('productspec', e.target.value);
+    };
+
+
+    const handleSelect = (item: DataItem) => {
+        // alert(item.id);
+        isSelectingRef.current = true;
+        // setHandinputproductuuid(item.id);
+        data1.materialnumber = item.productid;
+        data1.productname = item.name;
+        data1.productspec = item.spec || '';
+        data1.unit = item.unit;
+        setShowSuggestions(false);
+    };
+
+
+
+
+
+    const [dragging, setDragging] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+
+
+    const handleMouseUp = () => {
+        setDragging(false);
+    };
+
+
+    useEffect(() => {
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [dragging, offset, position]);
+
+    const handleMouseMove = (event: any) => {
+        if (dragging) {
+            setPosition({
+                x: event.clientX - offset.x,
+                y: event.clientY - offset.y,
+            });
+        }
+    };
+
+    const handleMouseDown = (event: any) => {
+        setDragging(true);
+        // 記錄下滑鼠的偏差
+        setOffset({
+            x: event.clientX - position.x,
+            y: event.clientY - position.y,
+        });
     };
 
 
@@ -682,10 +876,90 @@ export default function EditWHPosition() {
                             inputProps={{
                                 props: {
                                     value: data1.materialnumber,
-                                    onChange: (e) => handleChange('materialnumber', e.target.value),
+                                    onChange: handleProductidChange,
                                 },
                             }}
                         />
+                        {showSuggestions && (
+                            
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    zIndex: 1001,
+                                    backgroundColor: 'white',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                                    width: '750px',
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
+                                    fontSize: '16px',
+                                    left: `${position.x}px`,
+                                    top: `${position.y}px`,
+                                    cursor: 'default',
+                                }}
+                                onMouseDown={handleMouseDown}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px', borderBottom: '1px solid #ccc' }}>
+                                    <button
+                                        onClick={() => setShowSuggestions(false)}
+                                        style={{
+                                            background: 'transparent',
+                                            border: 'none',
+                                            fontSize: '16px',
+                                            cursor: 'pointer',
+                                            fontWeight: 'bold',
+                                            color: '#555',
+                                            outline: 'none',
+                                            transition: 'color 0.3s ease',
+                                            
+                                        }}
+                                        onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
+                                        onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    {filteredData.length > 0 ? (
+                                        filteredData.map((item, index) => (
+                                            <tr
+                                                key={index}
+                                                onClick={() => handleSelect(item)}
+                                                style={{
+                                                    padding: '8px',
+                                                    cursor: 'pointer',
+                                                    borderBottom: '1px solid #ddd',
+                                                    backgroundColor: '#fff',
+                                                }}
+                                                onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
+                                                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
+                                                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+                                            >
+                                                <td style={{ padding: '8px', width: '150px' }}>
+                                                    {item.productid}
+                                                </td>
+                                                <td style={{ padding: '8px', width: '250px' }}>
+                                                    {item.name}
+                                                </td>
+                                                <td style={{ padding: '8px', width: '350px' }}>
+                                                    {item.spec}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td  style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
+                                                沒有匹配的結果
+                                            </td>
+                                        </tr>
+                                    )}
+                                </table>
+                            </div>
+                        )}
+
+
+                        {/* <IconDetail onClick={() => { alert("OK") }}>asdf</IconDetail> */}
                         <InputSel
                             {...inputSelProps}
                             caption="物料名稱"
@@ -693,8 +967,23 @@ export default function EditWHPosition() {
                             // disabled={true}
                             inputProps={{
                                 props: {
-                                    value: data1.whpname,
-                                    onChange: (e) => handleChange('whpname', e.target.value),
+                                    value: data1.productname,
+                                    // onChange: (e) => handleChange('whpname', e.target.value),
+                                    onChange: handleNameChange,
+                                },
+                            }}
+                        />
+
+                        <InputSel
+                            {...inputSelProps}
+                            caption="物料規格"
+                            disabled={disabled}
+                            // disabled={true}
+                            inputProps={{
+                                props: {
+                                    value: data1.productspec,
+                                    // onChange: (e) => handleChange('spec', e.target.value),
+                                    onChange: handleSpecChange,
                                 },
                             }}
                         />
@@ -707,18 +996,6 @@ export default function EditWHPosition() {
                                 props: {
                                     value: data1.batchnumber,
                                     onChange: (e) => handleChange('batchnumber', e.target.value),
-                                },
-                            }}
-                        />
-                        <InputSel
-                            {...inputSelProps}
-                            caption="物料規格"
-                            disabled={disabled}
-                            // disabled={true}
-                            inputProps={{
-                                props: {
-                                    value: data1.spec,
-                                    onChange: (e) => handleChange('spec', e.target.value),
                                 },
                             }}
                         />
