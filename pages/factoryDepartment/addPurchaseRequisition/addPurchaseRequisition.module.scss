@@ -117,7 +117,7 @@
   top: 0;
   z-index: 1000;
   display: grid;
-  grid-template-columns: 30px 400px 400px 50px 70px 300px 50px;
+  grid-template-columns: 15px 150px 400px 400px 50px 70px 300px 50px;
   gap: 15px;
   width: auto;
   // margin: 5px 20px;
@@ -317,7 +317,7 @@ div.panelHeader20 {
 
   .row01 {
     display: grid;
-    grid-template-columns: 30px 415px 415px 65px 85px 300px 100px;
+    grid-template-columns: 30px 150px 415px 415px 65px 85px 300px 100px;
     // gap: 5px;
   }
 }
@@ -545,4 +545,30 @@ div.panelHeader20 {
   resize: none; // 禁用自由調整高度的功能
   margin-left: 70px;
   
+}
+
+.squarebtn {
+  height: 39px;
+  width: 39px;
+  // padding: 0px 40px;
+  border: solid 1px #c1c1c1;
+  ;
+  background-color: $bgc01;
+  padding: 0px 8px;
+  // padding-top: 4px;
+  // padding-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  color: #14256a;
+  transform: translateY(2px);
+
+  &:hover {
+    border: solid 1px #c1c1c1;
+    background-color: #c1c1c17c
+  }
+
+  &:focus {
+    background-color: $bgc01;
+    border: solid 1px #c1c1c1;
+  }
 }

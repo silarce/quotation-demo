@@ -34,7 +34,7 @@ export default function TrayList() {
     const [isLoading, setIsLoading] = useState(false);
     const [checkfirstin, setCheckFirstIn] = useState<number>(firstin ? parseInt(firstin as string, 10) : 0);
 
-
+    const [datatrans, setDataTrans] = useState<any[]>([]);
 
     const searchTargetList = [
         {
@@ -203,6 +203,7 @@ export default function TrayList() {
             }
 
             const responseData = await response.json();
+            console.log(responseData);
             setData11(responseData);
         } catch (error: any) {
             setError(error.message);
@@ -251,11 +252,11 @@ export default function TrayList() {
         const convertToAlpha = (num: number): string => {
             return String.fromCharCode(65 + num - 1);
         };
-    
+
         const convertToNumber = (num: number, pad: number): string => {
             return num.toString().padStart(pad, '0');
         };
-    
+
         const alphaIncrement = (alpha: string): string => {
             if (alpha === 'Z') {
                 return 'A';
@@ -263,7 +264,7 @@ export default function TrayList() {
                 return String.fromCharCode(alpha.charCodeAt(0) + 1);
             }
         };
-    
+
         const numberIncrement = (num: number, max: number, pad: number): string => {
             if (num >= max) {
                 return convertToNumber(1, pad);
@@ -271,64 +272,151 @@ export default function TrayList() {
                 return convertToNumber(num + 1, pad);
             }
         };
-    
+
         let newlength = '';
         let newwidth = '';
         let newchildlength = '';
         let newchildwidth = '';
-    
+
         // 處理 length 的增量
         if (length === '1') {
             newlength = 'A';
         } else {
             newlength = convertToAlpha(parseInt(length, 10));
         }
-    
+
         // 處理 width 的增量
         if (width === '1') {
             newwidth = '001';
         } else {
             newwidth = convertToNumber(parseInt(width, 10), 3);
         }
-    
+
         // 處理 childlength 的增量
         if (childlength === '1') {
             newchildlength = 'A';
         } else {
             newchildlength = convertToAlpha(parseInt(childlength, 10));
         }
-    
+
         // 處理 childwidth 的增量
         if (childwidth === '1') {
             newchildwidth = '1';
         } else {
             newchildwidth = numberIncrement(parseInt(childwidth), 100, 1);
         }
-    
+
         // 增量操作
         if (childlength !== '1' && newchildwidth === '001') {
             newchildlength = alphaIncrement(newchildlength);
         }
-    
+
         if (width !== '1' && newchildlength === 'A' && newchildwidth === '1') {
             newwidth = numberIncrement(parseInt(width), 100, 3);
         }
-    
+
         if (length !== '1' && newwidth === '001' && newchildlength === 'A' && newchildwidth === '1') {
             newlength = alphaIncrement(newlength);
         }
-    
-        return newlength + newwidth + newchildlength + (parseInt(newchildwidth)-1).toString();
+
+        return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
     };
 
-    
-    
+    //#region 轉換編碼
+    // const getDataTrans = async () => {
+    //     try {
+    //         const conditionModel = {
+    //             type: "select",
+    //             data2: datatrans
+    //         };
+
+    //         const inputModel = {
+    //             TypeName: 'ERP',
+    //             ServiceName: 'WareHouseService',
+    //             FunctionName: 'no',
+    //             FilterConditions: JSON.stringify(conditionModel),
+    //         };
+
+    //         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+    //         const response = await fetch(`${setting.apipath}GetDataTrans?${queryParams}`);
+
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch data');
+    //         }
+    //         const data = await response.json();
+    //         // console.log('Fetched data:', data);
+    //         setDataTrans(data);
+    //         await new Promise(resolve => setTimeout(resolve, 500));
+
+
+    //     } catch (error: any) {
+    //         setError(error.message);
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
+
+    // useEffect(() => {
+    //     if (datatrans.length > 0) {
+    //         const updatedDataTrans = datatrans.map(item => {
+    //             const whpname = recodeWhpid(item.length, item.width, item.childlength, item.childwidth);
+    //             return { ...item, whpname };
+    //         });
+    //         // console.log('Updated data:', updatedDataTrans);
+    //         setDataTrans(updatedDataTrans); // 更新狀態
+    //     }
+    // }, [datatrans]);
+
+    // const DataTrans = async () => {
+    //     // console.log('Updated data:', updatedDataTrans);
+    //     console.log(datatrans);
+    //     // return;
+    //     try {
+    //         setIsLoading(true);
+
+    //         const conditionModel = {
+    //             type: "Update",
+    //             data2: datatrans
+    //         };
+
+    //         var inputModel = {
+    //             TypeName: 'ERP',
+    //             ServiceName: 'WareHouseService',
+    //             FunctionName: 'no',
+    //             FilterConditions: JSON.stringify(conditionModel),
+    //         };
+
+    //         const response = await fetch(`${setting.apipath}DataTrans`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(inputModel)
+    //         });
+
+    //         if (!response.ok) {
+    //             throw new Error('Failed to fetch dataTrans');
+    //         }
+
+    //         const responseData = await response.json();
+    //     } catch (error: any) {
+    //         setError(error.message);
+    //         console.error('Transfer failed:', error);
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
+    //#endregion 轉換編碼
+
+
 
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
+                    {/* <button onClick={() => { getDataTrans() }}>取得</button>
+                    <button onClick={() => { DataTrans() }}>轉換</button> */}
                     <div>
                         <Thead01 type={'Tray'} />
                         <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
@@ -359,7 +447,7 @@ export default function TrayList() {
                                                                         <button className={scss.childtraytabletdButton}
                                                                             onClick={() => handlechangewhposition(childDataItem.id, childDataItem.whid, childDataItem.trayname, childDataItem.whname)}
                                                                             style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
-                                                                            onMouseEnter={() => setHoverInfo(`${childDataItem.whpname}\n${childDataItem.spec}\n${childDataItem.quantity}`)}
+                                                                            onMouseEnter={() => setHoverInfo(`${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`)}
                                                                             onMouseLeave={() => setHoverInfo(null)}>
                                                                             {/* {childDataItem.length}-{childDataItem.width}-{childDataItem.childlength}-{childDataItem.childwidth}<br /> */}
                                                                             {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
