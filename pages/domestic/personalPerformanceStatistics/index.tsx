@@ -21,8 +21,17 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
 
 // api
-import { useQuotationAccounting_personalContract, TquotationAccounting_personal_contract } from 'js/api/api_quotation';
+import {
+  TquotationAccounting_personal_contract,
+  //
+  useQuotationAccounting_personalContract,
+} from 'js/api/api_quotation';
 import { useEmployee, Tparams } from 'js/api/api_employee';
+import {
+  TbonusDto,
+  //
+  useGetReportForm_bonus,
+} from 'js/api/api_reportForm';
 
 // css
 import scss from './index.module.scss';
@@ -53,6 +62,9 @@ const empParams: Tparams = {
 };
 
 // ==================================================================
+
+// MARK: STARt
+
 // 個人業績統計表
 export default function PersonalPerformanceStatistics() {
   const router = useRouter();
@@ -65,7 +77,6 @@ export default function PersonalPerformanceStatistics() {
   } = query;
 
   // ------------------------------------------------------------------
-  const [isLoading, setIsLoading] = useState(false);
 
   // ------------------------------------------------------------------
 
@@ -75,32 +86,49 @@ export default function PersonalPerformanceStatistics() {
     employeeId: emp,
   };
 
-  const { data, update } = useQuotationAccounting_personalContract(params);
+  const { data, update, isFetching } = useQuotationAccounting_personalContract(params);
 
-  const toUpdateData = async () => {
-    try {
-      setIsLoading(true);
-      await update();
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '取得報表失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    toUpdateData();
+  const params_bouus: Tparams = useMemo(() => {
+    return {
+      // populate: ['salesEmployee'],
+      filter: {
+        bonusYear: { $eq: Number(year) + 1911 },
+        bonusMonth: { $eq: month ? String(month) : undefined },
+        salesEmployeeId: { $eq: emp },
+      },
+    };
   }, [year, month, emp]);
+
+  const { data: data_bonus, update: update_bonus, isFetching: isFetching_bonus } = useGetReportForm_bonus(params_bouus);
+
+  const { bonus, sales } = useMemo(() => {
+    if (!data_bonus) {
+      return {
+        bonus: '---',
+        sales: '---',
+      };
+    }
+
+    let bonus_d = new Decimal(0);
+    let sales_d = new Decimal(0);
+
+    data_bonus.forEach((data) => {
+      const { totalBonus, totalSales } = data;
+
+      bonus_d = bonus_d.add(totalBonus || 0);
+      sales_d = sales_d.add(totalSales || 0);
+    });
+
+    return {
+      bonus: bonus_d.toNumber().toLocaleString(),
+      sales: sales_d.toNumber().toLocaleString(),
+    };
+  }, [data_bonus]);
 
   // ------------------------------------------------------------------
 
   const { data: data_emp, update: update_emp } = useEmployee(empParams);
   const haveData = data && data.length > 0;
-
-  useEffect(() => {
-    update_emp();
-  }, []);
 
   const empOptionArr = useMemo(() => {
     if (!data_emp) {
@@ -124,6 +152,7 @@ export default function PersonalPerformanceStatistics() {
   const control_table = useControl_personalPerformanceStatistics(data);
 
   // ------------------------------------------------------------------
+
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
@@ -202,15 +231,33 @@ export default function PersonalPerformanceStatistics() {
 
   // ------------------------------------------------------------------
 
+  // region useEffect
+
+  useEffect(() => {
+    update();
+  }, [year, month, emp]);
+
+  useEffect(() => {
+    update_emp();
+  }, []);
+
+  // ------------------------------------------------------------------
+
   // region render
 
   return (
-    <SubLayer isLoading_subLayer={isLoading} bodyClassName={scss.subLayerBody}>
+    <SubLayer isLoading_subLayer={isFetching || isFetching_bonus} bodyClassName={scss.subLayerBody}>
       <PageHeader02 tagList={tagList} />
 
       <div className={scss.body}>
         <div className={scss.selectBarWrapper}>
-          <SelectBar className={''} selectPropsArr={selectPropsArr} />
+          <SelectBar selectPropsArr={selectPropsArr} />
+          <div className={scss.bonusBar}>
+            <span>業績 : </span>
+            <span>{sales}</span>
+            <span>獎金 : </span>
+            <span>{bonus}</span>
+          </div>
         </div>
 
         <div className={scss.tableWrapper}>

@@ -1371,6 +1371,7 @@ export const useQuotationAccounting_personalContract = (
     year: number | undefined;
   }
 ) => {
+  const [isFetching, setIsFetching] = useState(false);
   const [res, setRes] = useState<TcontractAccountingReportFormDto[]>();
 
   const update = async () => {
@@ -1384,18 +1385,23 @@ export const useQuotationAccounting_personalContract = (
       employeeId: params.employeeId,
     };
 
-    const newRes = await apiQuotationAccounting_personalContract(theParams);
-
-    if (newRes) {
-      setRes(newRes);
-    }
-
-    return newRes;
+    setIsFetching(true);
+    await apiQuotationAccounting_personalContract(theParams)
+      .then((res) => {
+        setRes(res);
+      })
+      .catch((err: AxiosError<TapiError>) => {
+        myAlert.err({ title: '取得個人業績統計表失敗', content: err.response?.data.message || err.message });
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
   };
 
   return {
     data: res,
     update,
+    isFetching,
   };
 };
 
