@@ -86,7 +86,6 @@ type Tstate_period = {
   allow_EditDeduction_or_deleteInvoice: boolean;
 
   price: number; // 發票金額 自動計算
-  invoiceNumber: string;
 
   retainageType: TretainageType | 'null'; // 保留款類型
   retainagePercent: string; // 保留款百分比
@@ -95,15 +94,18 @@ type Tstate_period = {
   note: string; // 備註
   //
   actualPrice: string; // 實際金額
-  invoiceDate: Moment | null;
 
   //
 
   invoiceBook: TaccountantInvoiceBookDto | null;
+  invoiceNumber: string;
+  invoiceDate: Moment | null;
+
   //
   nameOfBusinessEntity: string;
   businessIdNumber: string;
   isOriginalCustomer: boolean; // 若為false，那這筆請款視為額外收入
+  isOlderInvoice: boolean;
   //
 };
 

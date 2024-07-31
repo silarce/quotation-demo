@@ -41,7 +41,7 @@ $topBlockHeight: 50px;
   font-size: 16px;
 
   > div {
-    text-align: center;
+    // text-align: center;
     background-color: inherit;
     padding: 0 10px;
 
@@ -101,4 +101,5 @@ $topBlockHeight: 50px;
   left: 70px;
   z-index: 1;
   background-color: inherit;
+  text-align: center;
 }
