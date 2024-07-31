@@ -44,29 +44,33 @@
     textarea {
       padding-left: 25px;
     }
+
+    display: flex;
+    gap: 20px;
+
     > .btnSelectCustomer {
-      position: absolute;
-      top: 50%;
-      left: 104px;
-      transform: translateY(-50%);
-      padding: 5px 17px;
-      color: $colorMain;
-      font-weight: 400;
-      font-size: 16px;
-      background-color: $bgc01;
-      border: solid 1px $colorBorder01;
+      // position: absolute;
+      // top: 50%;
+      // left: 104px;
+      // transform: translateY(-50%);
+      // padding: 5px 17px;
+      // color: $colorMain;
+      // font-weight: 400;
+      // font-size: 16px;
+      // background-color: $bgc01;
+      // border: solid 1px $colorBorder01;
     }
     > .btnAddCustomer {
-      position: absolute;
-      top: 50%;
-      left: 250px;
-      transform: translateY(-50%);
-      padding: 5px 17px;
-      color: $colorMain;
-      font-weight: 400;
-      font-size: 16px;
-      background-color: $bgc01;
-      border: solid 1px $colorBorder01;
+      // position: absolute;
+      // top: 50%;
+      // left: 250px;
+      // transform: translateY(-50%);
+      // padding: 5px 17px;
+      // color: $colorMain;
+      // font-weight: 400;
+      // font-size: 16px;
+      // background-color: $bgc01;
+      // border: solid 1px $colorBorder01;
     }
     > svg {
       position: absolute;
