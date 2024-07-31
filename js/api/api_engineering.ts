@@ -1325,6 +1325,12 @@ export const apiPostAccountReceivablePeriod = async (
   accountReceivableId: string,
   body: TcreateAccountReceivablePeriodDto
 ) => {
+  // w 注意 body.invoiceDate的時分秒務必設為00:00:00
+  // w 後端會檢查invoiceDate是否比該發票本的latestInvoiceDate更晚
+  // w 更晚的話會404，所以統一設為00:00:00
+  // 是不是該考慮直接在這邊設定就好?
+  // 如果哪天需要設定invoiceDate的時分秒的話會出問題，所以不可以
+
   const api = `/engineering/account-receivable/${accountReceivableId}/period`;
 
   return axi

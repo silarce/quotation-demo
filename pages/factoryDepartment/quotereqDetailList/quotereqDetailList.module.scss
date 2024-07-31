@@ -501,6 +501,13 @@ div.panelHeader21 {
     display: grid;
     grid-template-columns: 200px 350px 150px 100px 30px;
     gap: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+    background-color: #ecf1ff;
+    /* 當前選擇項目的背景顏色 */
   }
 }
 

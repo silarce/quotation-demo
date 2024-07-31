@@ -236,9 +236,10 @@ export default function AccountReceivable() {
       nameOfBusinessEntity,
       businessIdNumber,
       isOriginalCustomer,
+      isOlderInvoice,
     } = state_invoice;
 
-    if (accountantInvoiceBook || actualPrice) {
+    if (!isOlderInvoice && (accountantInvoiceBook || actualPrice)) {
       if (!(invoiceNumber && invoiceDate && actualPrice)) {
         myAlert.info({
           title: '請輸入完整發票資料或清除所有發票資料',
@@ -271,6 +272,10 @@ export default function AccountReceivable() {
       allowance: Number(allowance),
       price,
       //
+      // w 注意 invoiceDate的時分秒務必設為00:00:00
+      // w 後端會檢查invoiceDate是否比該發票本的latestInvoiceDate更晚
+      // w 更晚的話會404，所以統一設為00:00:00
+      // 已在源頭onChange設為00:00:00
       invoiceDate: invoiceDate ? invoiceDate.toISOString() : null,
       invoiceNumber: invoiceNumber || null,
       actualPrice: actualPrice ? Number(actualPrice) : null,
@@ -280,6 +285,7 @@ export default function AccountReceivable() {
       businessIdNumber: businessIdNumber || null,
       isOriginalCustomer,
       retainagePercent: retainagePercent || null,
+      isOlderInvoice,
     };
 
     try {
