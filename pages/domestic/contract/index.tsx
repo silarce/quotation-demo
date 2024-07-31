@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import Link, { LinkProps } from 'next/link';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
-// global gear
+//  gear
 import PageHeader02, { TpanelList, Tlink } from 'components/PageHeader/PageHeader02/PageHeader02';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // components
 import ContractList from 'components/page/domestic/contract/contractList';
@@ -78,6 +78,7 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
     viewRef_bottom,
     isLoadingPage1,
     reset,
+    reqSignedBack, // 簽回
   } = useContract_infinite({ customParams: params });
 
   const {
@@ -96,7 +97,7 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
 
   const contractList = useMemo(() => {
     return (dataArr ?? []).map((contract, index) => {
-      const { id: contractId, content } = contract;
+      const { id: contractId, content, isSignedBack, contractNumber } = contract;
 
       const { managerReviewedAt } = content;
 
@@ -129,6 +130,15 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
         href: {
           pathname: `/domestic/contract/quotation`,
           query: { id: contractId, version: 1 },
+        },
+        isSignedBack: isSignedBack,
+        onSignedBackClick: () => {
+          myAlert.confirm({
+            title: `確認簽回${contractNumber || content.projectName}?`,
+            props: {
+              onOk: async () => await reqSignedBack(contractId),
+            },
+          });
         },
       };
     });

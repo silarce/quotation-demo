@@ -31,6 +31,7 @@ import type {
   TquotationAccounting_modifyContract,
   TquotationStatus,
   TbonusDto,
+  TapiError,
 } from './dtoTypes';
 
 export type {
@@ -513,7 +514,8 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
   const [viewRef_top, inView_top] = useInView();
   const [viewRef_bottom, inView_bottom] = useInView();
   // ----------------------------------------------------------------
-  const [dataList, setDataList] = useState<{ [key: `${number}`]: TquotationContractDto[] }>({});
+  const [dataList_raw, setDataList_raw] = useState<{ [id: string]: TquotationContractDto }>({});
+  const [dataList, setDataList] = useState<{ [page: `${number}`]: TquotationContractDto[] }>({});
 
   const [page, setPage] = useState<number>();
   const [meta, setMeta] = useState<TpageMetaDto>();
@@ -552,8 +554,20 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
       const res = await apiGetContract(params);
 
       if (res) {
+        const arr = res.data;
+
+        setDataList_raw((list) => {
+          const copy = { ...list };
+
+          arr.forEach((item) => {
+            copy[item.id] = item;
+          });
+
+          return copy;
+        });
+
         setDataList((list) => {
-          list[`${res.meta.page}`] = res.data;
+          list[`${res.meta.page}`] = arr;
 
           return { ...list };
         });
@@ -617,6 +631,23 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
   }, [inView_bottom, isLoading]);
   // -----------------------------------------------
 
+  // 簽回
+  const reqSignedBack = async (contractId: string) => {
+    await apiPatchContractStatus(contractId, { isSignedBack: true })
+      .then((res) => {
+        const id = res.id;
+        setDataList_raw((list) => {
+          const copy = { ...list };
+          list[id].isSignedBack = res.isSignedBack;
+
+          return copy;
+        });
+      })
+      .catch(() => true);
+  };
+
+  // -----------------------------------------------
+
   return {
     dataList,
     dataArr: _.flatten(Object.values(dataList)),
@@ -627,6 +658,7 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
     meta,
     init,
     reset,
+    reqSignedBack,
   };
 };
 
@@ -971,7 +1003,7 @@ export const useGetContract_id_finalProductItem = (contractId: string | undefine
   };
 };
 
-/**取得主產品資料 */
+// 取得主產品資料
 export const apiGetQuotationProducts = async (productId: string) => {
   const api = `/quotation/products/${productId}`;
 
@@ -979,6 +1011,20 @@ export const apiGetQuotationProducts = async (productId: string) => {
     .get<TquotationProductDto>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+// 合約簽回
+export const apiPatchContractStatus = async (contractId: string, body: { isSignedBack: boolean }) => {
+  const api = `/quotation/quotation-contract/${contractId}/status`;
+
+  return axi
+    .patch<TquotationContractDto>(api, body)
+    .then(({ data }) => data)
+    .catch((err: AxiosError<TapiError>) => {
+      myAlert.err({ title: '合約簽回失敗', content: err.response?.data.message || err.message });
+
+      return Promise.reject(err);
+    });
 };
 
 // ==================================================================

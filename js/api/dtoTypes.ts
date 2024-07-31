@@ -2259,6 +2259,9 @@ export type TquotationContractDto = {
   certificatedDoc?: TcertificatedDocDto[];
   electronicSuppliesId: string | null;
   electronicSupplies?: TelectronicSuppliesDto;
+  //
+  // 是否已簽回
+  isSignedBack: boolean;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
