@@ -746,12 +746,12 @@ export default function EditWHPosition() {
         if (isSelectingRef.current) return;
 
         let filtered = productdata;
-        const { materialnumber, productname, productspec } = data1;
+        const { productid, productname, productspec } = data1;
 
         // 根據條件過濾數據
-        if (materialnumber) {
+        if (productid) {
             filtered = productdata.filter(item =>
-                item.productid.includes(materialnumber)
+                item.productid.includes(productid)
             );
         }
 
@@ -771,15 +771,15 @@ export default function EditWHPosition() {
         setFilteredData(filtered);
 
         // 當有過濾條件且有匹配結果時才顯示建議框
-        const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
+        const shouldShowSuggestions = filtered.length > 0 && (productid || productname || productspec) && canedit === true;
         setShowSuggestions(Boolean(shouldShowSuggestions));
-    }, [data1.materialnumber, data1.productname, data1.productspec, productdata]);
+    }, [data1.productid, data1.productname, data1.productspec, productdata]);
 
 
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
-        handleChange('materialnumber', e.target.value);
+        handleChange('productid', e.target.value);
     };
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -797,7 +797,7 @@ export default function EditWHPosition() {
         // alert(item.id);
         isSelectingRef.current = true;
         // setHandinputproductuuid(item.id);
-        data1.materialnumber = item.productid;
+        data1.productid = item.productid;
         data1.productname = item.name;
         data1.productspec = item.spec || '';
         data1.unit = item.unit;
@@ -875,7 +875,7 @@ export default function EditWHPosition() {
                             // disabled={true}
                             inputProps={{
                                 props: {
-                                    value: data1.materialnumber,
+                                    value: data1.productid,
                                     onChange: handleProductidChange,
                                 },
                             }}
