@@ -856,8 +856,10 @@ const useProductList = ({
     return Object.values(othersList).map((item) => {
       return {
         ...item.body,
-        quantity: String(item.quantity),
-        totalPrice: String(item.totalPrice),
+        // quantity: String(item.quantity || 0),
+        // totalPrice: String(item.totalPrice || 0),
+        quantity: `${item.quantity || 0}`,
+        totalPrice: `${item.totalPrice || 0}`,
       };
     });
   };
