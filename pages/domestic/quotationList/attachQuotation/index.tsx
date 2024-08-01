@@ -724,16 +724,16 @@ function TheQuotation({ router }: { router: NextRouter }) {
       body.deliveryDate = null;
     }
 
-    let hasSurface = true;
-    body.products.forEach((item) => {
-      if (!item.materialSurface) {
-        hasSurface = false;
-      }
-    });
+    // let hasSurface = true;
+    // body.products.forEach((item) => {
+    //   if (!item.materialSurface) {
+    //     hasSurface = false;
+    //   }
+    // });
 
-    if (!hasSurface) {
-      return myAlert.warning({ title: '所有主產品必須選擇表面' });
-    }
+    // if (!hasSurface) {
+    //   return myAlert.warning({ title: '所有主產品必須選擇表面' });
+    // }
 
     try {
       setIsLoading(true);
