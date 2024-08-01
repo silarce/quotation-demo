@@ -756,7 +756,7 @@ export default function PurchaseOrderList() {
 
 
     return (
-        <SubLayer isLoading_subLayer={false}>
+        <SubLayer isLoading_subLayer={isLoading}>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
             <PageHeader02 tag={'採購單'} panelList={panelList} />
             <div className={scss.container}>
@@ -844,20 +844,7 @@ export default function PurchaseOrderList() {
                             </div>
                             <div></div>
                             <div></div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    captionStyle={{ paddingTop: '5px' }}
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red', paddingTop: '5px' },
-                                            value: statusin,
-                                        },
-                                    }}
-                                />
-                            </div>
+                            <div></div>
                         </div>
 
                         <div className={scss.head_content1}>
@@ -869,7 +856,7 @@ export default function PurchaseOrderList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
                                         },
                                     }}
                                 />
@@ -879,7 +866,7 @@ export default function PurchaseOrderList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? purchaseorderidin : purchaseorderid,
+                                            value: (checkfirstin === 0 ? purchaseorderidin : purchaseorderid) || ' ',
                                         },
                                     }}
                                 />
@@ -889,7 +876,7 @@ export default function PurchaseOrderList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? create_byin : create_by,
+                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
                                         },
                                     }}
                                 />
@@ -957,7 +944,41 @@ export default function PurchaseOrderList() {
                                 />
 
                             </div>
-                            <div></div>
+                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red' },
+                                            value: statusin || ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
                         </div>
                         <div className={scss.head_content2}>
                             <div>
