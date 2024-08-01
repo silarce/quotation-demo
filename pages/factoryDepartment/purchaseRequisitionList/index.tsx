@@ -2,7 +2,7 @@ import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
-import _ from 'lodash';
+import _, { filter } from 'lodash';
 
 import scss from './purchaseRequisitionList.module.scss';
 import Thead01 from '../ui/table/thead01';
@@ -76,6 +76,7 @@ export default function PurchaseRequisitionList() {
     const [data2, setData2] = useState<any[]>([]);
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [searchdata, setSearchdata] = useState<any[]>([]);
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -98,7 +99,8 @@ export default function PurchaseRequisitionList() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
-
+    const [keywordstartdate, setKeywordstartdate] = useState<string>("");
+    const [keywordenddate, setKeywordenddate] = useState<string>("");
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -248,6 +250,7 @@ export default function PurchaseRequisitionList() {
             const data = await response.json();
             setData(data);
             setData1Restore(data);
+            setSearchdata(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
                 console.log(data[0]);
@@ -842,6 +845,58 @@ export default function PurchaseRequisitionList() {
     };
 
     //#endregion
+
+    const filterData = (e: any) => {
+        e.preventDefault();
+        console.log('Keyword2:', keyword2); // 調試點
+        const startDate = keywordstartdate ? moment(keywordstartdate) : null;
+        const endDate = keywordenddate ? moment(keywordenddate) : null;
+        const requisitionId = keyword2 ? keyword2.trim() : '';
+        const status = keyword3 ? keyword3.trim() : '';
+
+        if (startDate===null || endDate===null){
+            myAlert.warning({title:'日期區間不可為空'})
+            return;
+        }
+
+            // 檢查是否所有條件都為空
+            if ((!startDate || !startDate.isValid()) &&
+                (!endDate || !endDate.isValid()) &&
+                !requisitionId &&
+                !status) {
+                setSearchdata(data);
+                return;
+            }
+
+        // 過濾資料
+        let filteredData = data.filter(item => {
+            const createAt = moment(item.create_at);
+            const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
+                ? true
+                : createAt.isBetween(startDate, endDate, 'days', '[]');
+            return isDateInRange;
+        });
+
+        // 模糊查詢請購單號
+        if (requisitionId) {
+            filteredData = filteredData.filter(item =>
+                item.purchaserequisitionid.toString().includes(requisitionId)
+            );
+        }
+
+        // 模糊查詢單據狀態
+        if (status) {
+            filteredData = filteredData.filter(item =>
+                item.status.toString().includes(status)
+            );
+        }
+
+        // 檢查 filteredData 長度
+
+        setSearchdata(filteredData);
+
+    }
+
 
 
 
@@ -1478,39 +1533,41 @@ export default function PurchaseRequisitionList() {
                     </div>
                     <div className={scss.modal_head_content1}>
                         <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
-                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
-                                {/* <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                            <form className={scss.modal_search_bar} onSubmit={filterData} style={{ alignItems: 'center', width: '100%' }}>
+                                <div>
                                     <InputSel
                                         caption="起始日期"
+                                        className='global_tip_must'
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                         // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                                value: getTaiwanDateStr(keywordstartdate || '') ? moment(keywordstartdate) : null,
+                                                onChange: (e) => { setKeywordstartdate((e?.toString() || '') || '') }
                                             }
                                         }}
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                <div>
                                     <InputSel
                                         caption="截止日期"
+                                        className='global_tip_must'
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                         // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                                value: getTaiwanDateStr(keywordenddate || '') ? moment(keywordenddate) : null,
+                                                onChange: (e) => { setKeywordenddate((e?.toString() || '') || '') }
                                             }
                                         }}
                                     />
-                                </div> */}
+                                </div>
                                 <br />
                                 <div>
-                                    <InputSel
+                                    {/* <InputSel
                                         caption="請購日期"
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
@@ -1521,10 +1578,7 @@ export default function PurchaseRequisitionList() {
                                                 onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
                                             }
                                         }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
+                                    /> */}
                                     <InputSel
                                         {...inputSelProps}
                                         caption="請購單號"
@@ -1553,17 +1607,9 @@ export default function PurchaseRequisitionList() {
                                 </div>
                                 <br />
                                 <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="廠商名稱"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
-                                            },
-                                        }}
-                                    />
+                                </div>
+                                <br />
+                                <div>
                                 </div>
                                 <br />
                                 <div>
@@ -1654,7 +1700,7 @@ export default function PurchaseRequisitionList() {
                             // backgroundColor: '#f0f0f0' // 根據需要調整背景顏色
                         }}>
                             <Thead01 type={'PurchaseRequisition'} />
-                            <Tbody01 type={'PurchaseRequisition'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         </div>
 
                     </div>
