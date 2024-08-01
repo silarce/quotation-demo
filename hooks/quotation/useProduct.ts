@@ -857,7 +857,7 @@ const useProductList = ({
       return {
         ...item.body,
         quantity: String(item.quantity),
-        totalPrice: String(item.unitPrice),
+        totalPrice: String(item.totalPrice),
       };
     });
   };
