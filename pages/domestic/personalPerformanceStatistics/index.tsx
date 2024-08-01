@@ -257,6 +257,7 @@ export default function PersonalPerformanceStatistics() {
             <span>{sales}</span>
             <span>獎金 : </span>
             <span>{bonus}</span>
+            <button onClick={() => dlExcel(control_table)}>Excel TEST</button>
           </div>
         </div>
 
@@ -270,7 +271,7 @@ export default function PersonalPerformanceStatistics() {
 
 // ===========================================================
 
-// region hook
+// region HOOK
 
 const useControl_personalPerformanceStatistics = (data: TquotationAccounting_personal_contract[] | undefined) => {
   const control: Tcontrol_personalPerformanceStatistics = useMemo(() => {
@@ -429,4 +430,158 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
   }, [data]);
 
   return control;
+};
+
+// =====================================================================
+
+import _ from 'lodash';
+import ExcelJs, { TableProperties } from 'exceljs';
+import moment from 'moment';
+
+const dlExcel = async (
+  //
+  data: Tcontrol_personalPerformanceStatistics
+) => {
+  const { listKeyArr, rowArr, subTotalList, total } = data;
+
+  const workbook = new ExcelJs.Workbook();
+  const sheetName = 'TEST';
+  const sheet = workbook.addWorksheet(sheetName);
+
+  const listColumnsProps = listKeyArr.reduce((current, key) => {
+    current.push(
+      {
+        header: key,
+        key,
+        width: 10,
+      },
+      {
+        width: 10,
+      },
+      {
+        width: 10,
+      }
+    );
+
+    return current;
+  }, [] as Partial<ExcelJs.Column>[]);
+
+  sheet.columns = [
+    { header: '編號', key: 'idNumber', width: 10 },
+    { header: '工程名稱', key: 'projectName', width: 32 },
+    { header: '營造', key: 'C', width: 32 }, // 目前還沒有相關資料
+    { header: '設計單位', key: 'D', width: 32 }, // 目前還沒有相關資料
+    ...listColumnsProps,
+  ];
+
+  const c_idNumber = sheet.getColumn('idNumber');
+  const c_projectName = sheet.getColumn('projectName');
+
+  sheet.columns.forEach((col, index) => {
+    if (index <= 3) {
+      return;
+    }
+
+    if (col.key) {
+      sheet.mergeCells(1, index + 1, 1, index + 1 + 2);
+      sheet.getCell(`${col.letter}${1}`).alignment = { vertical: 'middle', horizontal: 'center' };
+    }
+  });
+
+  const listColumns = sheet.columns.slice(4).filter((col) => col.key);
+
+  listColumns.forEach((col) => {
+    const tableProps = createTable({
+      column: col,
+      rowArr,
+    });
+
+    sheet.addTable(tableProps);
+  });
+
+  console.log(sheet.getCell('F6'));
+
+  // sheet.mergeCells('A1', 'B1');
+
+  // c_idNumber.values = ['編號', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+  // c_projectName.values = ['工程名稱', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+
+  // worksheet.getColumn(6).values = [1, 2, 3, 4, 5];
+
+  // // 添加稀疏列值
+  // worksheet.getColumn(7).values = [, , 2, 3, , 5, , 7, , , , 11];
+
+  // --------------------------------------------------------------------
+  // start row, start column, end row, end column
+  // worksheet.mergeCells(10, 11, 12, 13);
+  //
+  // worksheet.mergeCells('A1');
+  // worksheet.mergeCells('A1', 'B2');
+  // --------------------------------------------------------------------
+
+  // 先定義好多個table，然後將迭代每一筆資料，將資料送入對應的table
+  // 這個想法可能不適合
+
+  // sheet.addTable({
+  //   name: 'MyTable',
+  //   ref: `${c_projectName.letter}${2}`,
+  //   style: {
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore
+  //     theme: null,
+  //   },
+  //   columns: [{ name: '牌價' }, { name: '承價' }, { name: '百分比' }],
+  //   rows: [],
+  // });
+
+  // --------------------------------------------------------------------
+  await workbook.xlsx.writeBuffer();
+
+  workbook.xlsx.writeBuffer().then((content) => {
+    const link = document.createElement('a');
+    const blobData = new Blob([content], {
+      type: 'application/vnd.ms-excel;charset=utf-8;',
+    });
+
+    const today = moment().format('yyyy-MM-DD');
+    link.download = `${'test'}_${today}.xlsx`;
+    link.href = URL.createObjectURL(blobData);
+    link.click();
+    link.remove();
+  });
+};
+
+const createTable = ({
+  //
+  column,
+  rowArr,
+}: {
+  column: Partial<ExcelJs.Column>;
+  rowArr: Tcontrol_personalPerformanceStatistics['rowArr'];
+}) => {
+  const rows: TableProperties['rows'] = rowArr.map((row) => {
+    const { list } = row;
+
+    if (!column.key || !list[column.key]) {
+      return [];
+    }
+
+    const { totalsum, pricesum, percentage } = list[column.key] ?? {};
+
+    return [totalsum, pricesum, percentage];
+  });
+
+  const tableProps: TableProperties = {
+    name: column.key ?? 'undefined',
+    ref: `${column.letter}${2}`,
+    style: {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      theme: null,
+    },
+    columns: [{ name: '牌價' }, { name: '承價' }, { name: '百分比' }],
+    rows,
+  };
+
+  return tableProps;
 };
