@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import Link, { LinkProps } from 'next/link';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -31,6 +30,7 @@ type Tquery = {
   county: string | undefined;
   customerName: string | undefined;
   projectName: string | undefined;
+  contractNumber: string | undefined;
   source: 'all' | 'pendingReview' | undefined;
 };
 
@@ -49,8 +49,14 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 export default function Contract({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  query.source = query.source || 'all';
-  const { county, customerName, projectName, source } = query;
+  const {
+    //
+    county,
+    customerName,
+    projectName,
+    contractNumber,
+    source = 'all',
+  } = query;
 
   const userId = userInfo.employee?.id;
 
@@ -68,9 +74,10 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
         'content.county': { $eq: county },
         'content.customer.name': { $contains: customerName },
         'content.projectName': { $contains: projectName },
+        contractNumber: { $contains: contractNumber },
       },
     };
-  }, [county, customerName, projectName]);
+  }, [county, customerName, projectName, contractNumber]);
 
   const {
     //
@@ -148,32 +155,36 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
       options: optionsCounty,
       placeholder: '選擇地區',
       width: '80px',
-      defaultValue: router.query.county as string,
+      defaultValue: query.county,
     },
     {
       placeholder: '請輸入客戶名稱',
-      defaultValue: router.query.clientName as string,
+      defaultValue: query.customerName,
     },
     {
       placeholder: '請輸入專案名稱',
-      defaultValue: router.query.projectName as string,
+      defaultValue: query.projectName,
+    },
+    {
+      placeholder: '請輸入合約編號',
+      defaultValue: query.contractNumber,
     },
   ];
 
   const doSearch = (valueArr: (string | Toption | null)[]) => {
-    // const doorModel = (valueArr[0] as Toption).value;
     const county = (valueArr[0] as Toption).value;
     const customerName = valueArr[1] as string;
     const projectName = valueArr[2] as string;
+    const contractNumber = valueArr[3] as string;
 
     router.push({
       href: '',
       query: {
         ...router.query,
-        // doorModel,
         county,
         customerName,
         projectName,
+        contractNumber,
       },
     });
   };

@@ -29,6 +29,17 @@ import { AppContext } from 'pages/_app';
 import { TquotationStatus } from 'js/api/dtoTypes';
 
 // ===========================================================
+
+type Tquery = {
+  county: string | undefined;
+  customerName: string | undefined;
+  projectName: string | undefined;
+  quotationNumber: string | undefined;
+  reviewStatus: string | undefined;
+  status: TquotationStatus | undefined;
+};
+
+// ===========================================================
 // const optionDoorModel = optionsCreator_doorModel({ haveEmpty: true });
 const optionsCounty = optionsCreator_county();
 optionsCounty.unshift({ value: '', label: '不拘' });
@@ -37,11 +48,8 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 
 export default function QuotationList({ userGrade }: { userGrade: number }) {
   const router = useRouter();
-  const { county, customerName, projectName, reviewStatus } = router.query as { [key: string]: string };
-  // Budget
-  // Bidding
-  // Contracting
-  const status = router.query.status as TquotationStatus;
+  const query = router.query as Tquery;
+  const { county, customerName, projectName, quotationNumber, reviewStatus, status } = query;
 
   const { userInfo } = useContext(AppContext);
   const userEmp = userInfo?.employee;
@@ -262,6 +270,9 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       'latestContent.projectName': {
         $contains: projectName || undefined,
       },
+      quotationNumber: {
+        $contains: quotationNumber || undefined,
+      },
       'latestContent.isLost': { $eq: false },
       // ...reviewStatusFilter,
       ...filter,
@@ -285,25 +296,23 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
   // panelList
 
   const searchTargetList = [
-    // {
-    //   options: optionDoorModel,
-    //   placeholder: '選擇門型',
-    //   width: '100px',
-    //   defaultValue: router.query.doorModel as string,
-    // },
     {
       options: optionsCounty,
       placeholder: '選擇地區',
       width: '80px',
-      defaultValue: router.query.county as string,
+      defaultValue: query.county,
     },
     {
       placeholder: '請輸入客戶名稱',
-      defaultValue: router.query.clientName as string,
+      defaultValue: query.customerName,
     },
     {
       placeholder: '請輸入專案名稱',
-      defaultValue: router.query.projectName as string,
+      defaultValue: query.projectName,
+    },
+    {
+      placeholder: '報價單編號',
+      defaultValue: query.quotationNumber,
     },
   ];
 
@@ -312,14 +321,15 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
     const county = (valueArr[0] as Toption).value;
     const customerName = valueArr[1] as string;
     const projectName = valueArr[2] as string;
+    const quotationNumber = valueArr[3] as string;
 
     router.replace({
       query: {
-        ...router.query,
-        // doorType,
+        ...query,
         county,
         customerName,
         projectName,
+        quotationNumber,
       },
     });
   };
@@ -360,7 +370,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
 
   return (
     <SubLayer isLoading_subLayer={isLoadingPage1}>
-      <PageHeader02 tag={quotationStatusLookup[status] ?? '--'} panelList={panelList} />
+      <PageHeader02 tag={status ? quotationStatusLookup[status] : '--'} panelList={panelList} />
       <div>
         <ApprovalsBar router={router} />
         <BudgeList className="m-[4px] mt-0" quotationArr={quoatationArr} viewRef_bottom={viewRef_bottom} />
