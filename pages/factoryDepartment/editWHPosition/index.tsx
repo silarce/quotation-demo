@@ -460,7 +460,8 @@ export default function EditWHPosition() {
                 throw new Error('Failed to call traycommand API');
             }
             console.log(response);
-
+            // 等待一秒
+            await new Promise(resolve => setTimeout(resolve, 1000));
             // 呼叫 execcommand API
             const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
                 method: 'POST',
@@ -746,12 +747,12 @@ export default function EditWHPosition() {
         if (isSelectingRef.current) return;
 
         let filtered = productdata;
-        const { materialnumber, productname, productspec } = data1;
+        const { productid, productname, productspec } = data1;
 
         // 根據條件過濾數據
-        if (materialnumber) {
+        if (productid) {
             filtered = productdata.filter(item =>
-                item.productid.includes(materialnumber)
+                item.productid.includes(productid)
             );
         }
 
@@ -771,15 +772,15 @@ export default function EditWHPosition() {
         setFilteredData(filtered);
 
         // 當有過濾條件且有匹配結果時才顯示建議框
-        const shouldShowSuggestions = filtered.length > 0 && (materialnumber || productname || productspec) && canedit === true;
+        const shouldShowSuggestions = filtered.length > 0 && (productid || productname || productspec) && canedit === true;
         setShowSuggestions(Boolean(shouldShowSuggestions));
-    }, [data1.materialnumber, data1.productname, data1.productspec, productdata]);
+    }, [data1.productid, data1.productname, data1.productspec, productdata]);
 
 
 
     const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         isSelectingRef.current = false;
-        handleChange('materialnumber', e.target.value);
+        handleChange('productid', e.target.value);
     };
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -797,7 +798,7 @@ export default function EditWHPosition() {
         // alert(item.id);
         isSelectingRef.current = true;
         // setHandinputproductuuid(item.id);
-        data1.materialnumber = item.productid;
+        data1.productid = item.productid;
         data1.productname = item.name;
         data1.productspec = item.spec || '';
         data1.unit = item.unit;
@@ -875,13 +876,13 @@ export default function EditWHPosition() {
                             // disabled={true}
                             inputProps={{
                                 props: {
-                                    value: data1.materialnumber,
+                                    value: data1.productid,
                                     onChange: handleProductidChange,
                                 },
                             }}
                         />
                         {showSuggestions && (
-                            
+
                             <div
                                 style={{
                                     position: 'absolute',
@@ -912,7 +913,7 @@ export default function EditWHPosition() {
                                             color: '#555',
                                             outline: 'none',
                                             transition: 'color 0.3s ease',
-                                            
+
                                         }}
                                         onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
                                         onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
@@ -949,7 +950,7 @@ export default function EditWHPosition() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td  style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
+                                            <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
                                                 沒有匹配的結果
                                             </td>
                                         </tr>
@@ -1067,9 +1068,10 @@ export default function EditWHPosition() {
                                                                         <button className={scss.childtraytabletdButton}
                                                                             onClick={() => handlechangewhposition(childDataItem.id, childDataItem.whid, childDataItem.trayname, childDataItem.whname)}
                                                                             style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
-                                                                            onMouseEnter={() => setHoverInfo(`${childDataItem.whpname}\n${childDataItem.spec}\n${childDataItem.quantity}`)}
+                                                                            onMouseEnter={() => setHoverInfo(`${childDataItem.productid}\n${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`)}
                                                                             onMouseLeave={() => setHoverInfo(null)}>
                                                                             {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
+                                                                            {/* <span style={{fontSize:'10px'}}>{`${childDataItem.productid}\n`}</span><br /> */}
                                                                         </button>
                                                                     </td>
                                                                 ))}
