@@ -447,10 +447,11 @@ export default function TrayList() {
                                                                         <button className={scss.childtraytabletdButton}
                                                                             onClick={() => handlechangewhposition(childDataItem.id, childDataItem.whid, childDataItem.trayname, childDataItem.whname)}
                                                                             style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
-                                                                            onMouseEnter={() => setHoverInfo(`${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`)}
+                                                                            onMouseEnter={() => setHoverInfo(`${childDataItem.productid}\n${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`)}
                                                                             onMouseLeave={() => setHoverInfo(null)}>
                                                                             {/* {childDataItem.length}-{childDataItem.width}-{childDataItem.childlength}-{childDataItem.childwidth}<br /> */}
                                                                             {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
+                                                                            <span style={{fontSize:'10px'}}>{`${childDataItem.productid}\n`}</span><br />
                                                                         </button>
                                                                     </td>
                                                                 ))}
