@@ -429,7 +429,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                   {`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}
                   {/* {_item.length}-{_item.width} */}
                 </span>
-                <span>{_item.materialnumber}</span>
+                <span>{_item.productid}</span>
                 {/* <span>{_item.batchnumber}</span> */}
                 <span>{_item.productname}</span>
                 <span>{_item.productspec}</span>
