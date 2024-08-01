@@ -29,8 +29,7 @@ import { TuserDto } from 'js/api/dtoTypes';
 type Tquery = {
   county: string | undefined;
   customerName: string | undefined;
-  projectName: string | undefined;
-  contractNumber: string | undefined;
+  keyWord: string | undefined;
   source: 'all' | 'pendingReview' | undefined;
 };
 
@@ -53,8 +52,7 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
     //
     county,
     customerName,
-    projectName,
-    contractNumber,
+    keyWord,
     source = 'all',
   } = query;
 
@@ -73,11 +71,13 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
         version: { $eq: 1 },
         'content.county': { $eq: county },
         'content.customer.name': { $contains: customerName },
-        'content.projectName': { $contains: projectName },
-        contractNumber: { $contains: contractNumber },
+        $or: {
+          'content.projectName': { $contains: keyWord },
+          contractNumber: { $contains: keyWord },
+        },
       },
     };
-  }, [county, customerName, projectName, contractNumber]);
+  }, [county, customerName, keyWord]);
 
   const {
     //
@@ -162,20 +162,15 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
       defaultValue: query.customerName,
     },
     {
-      placeholder: '請輸入專案名稱',
-      defaultValue: query.projectName,
-    },
-    {
-      placeholder: '請輸入合約編號',
-      defaultValue: query.contractNumber,
+      placeholder: '請輸入專案名稱或合約編號',
+      defaultValue: query.keyWord,
     },
   ];
 
   const doSearch = (valueArr: (string | Toption | null)[]) => {
     const county = (valueArr[0] as Toption).value;
     const customerName = valueArr[1] as string;
-    const projectName = valueArr[2] as string;
-    const contractNumber = valueArr[3] as string;
+    const keyWord = valueArr[2] as string;
 
     router.push({
       href: '',
@@ -183,8 +178,7 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
         ...router.query,
         county,
         customerName,
-        projectName,
-        contractNumber,
+        keyWord,
       },
     });
   };
@@ -206,7 +200,7 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
 
   useEffect(() => {
     source === 'all' ? reset() : update_contractArr_employee();
-  }, [county, customerName, projectName, source]);
+  }, [county, customerName, keyWord, source]);
 
   // -----------------------------------------------------------------------
   // MARK: RENDER

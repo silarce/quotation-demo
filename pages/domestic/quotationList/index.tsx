@@ -33,8 +33,7 @@ import { TquotationStatus } from 'js/api/dtoTypes';
 type Tquery = {
   county: string | undefined;
   customerName: string | undefined;
-  projectName: string | undefined;
-  quotationNumber: string | undefined;
+  keyWord: string | undefined;
   reviewStatus: string | undefined;
   status: TquotationStatus | undefined;
 };
@@ -49,7 +48,7 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 export default function QuotationList({ userGrade }: { userGrade: number }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { county, customerName, projectName, quotationNumber, reviewStatus, status } = query;
+  const { county, customerName, keyWord: keyWord, reviewStatus, status } = query;
 
   const { userInfo } = useContext(AppContext);
   const userEmp = userInfo?.employee;
@@ -267,11 +266,13 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       'latestContent.customer.name': {
         $contains: customerName || undefined,
       },
-      'latestContent.projectName': {
-        $contains: projectName || undefined,
-      },
-      'latestContent.quotationNumber': {
-        $contains: quotationNumber || undefined,
+      $or: {
+        'latestContent.projectName': {
+          $contains: keyWord || undefined,
+        },
+        'latestContent.quotationNumber': {
+          $contains: keyWord || undefined,
+        },
       },
       'latestContent.isLost': { $eq: false },
       // ...reviewStatusFilter,
@@ -307,12 +308,8 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       defaultValue: query.customerName,
     },
     {
-      placeholder: '請輸入專案名稱',
-      defaultValue: query.projectName,
-    },
-    {
-      placeholder: '報價單編號',
-      defaultValue: query.quotationNumber,
+      placeholder: '請輸入專案名稱或報價單編號',
+      defaultValue: query.keyWord,
     },
   ];
 
@@ -320,16 +317,14 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
     // const doorType = (valueArr[0] as Toption).value;
     const county = (valueArr[0] as Toption).value;
     const customerName = valueArr[1] as string;
-    const projectName = valueArr[2] as string;
-    const quotationNumber = valueArr[3] as string;
+    const keyWord = valueArr[2] as string;
 
     router.replace({
       query: {
         ...query,
         county,
         customerName,
-        projectName,
-        quotationNumber,
+        keyWord,
       },
     });
   };
