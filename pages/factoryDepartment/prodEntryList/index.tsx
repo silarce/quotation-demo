@@ -1135,8 +1135,8 @@ export default function ProdEntryList() {
         }
         setNowwhpositionuuid(item.id);
         setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-        setWhpname(item.whpname);
-        setWhpproductid(item.materialnumber);
+        setWhpname(item.name);
+        setWhpproductid(item.productid);
         setWhpspec(item.spec);
         setWhpquantity(item.quantity);
         setNowwhname(item.whname);
