@@ -270,7 +270,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       'latestContent.projectName': {
         $contains: projectName || undefined,
       },
-      quotationNumber: {
+      'latestContent.quotationNumber': {
         $contains: quotationNumber || undefined,
       },
       'latestContent.isLost': { $eq: false },
