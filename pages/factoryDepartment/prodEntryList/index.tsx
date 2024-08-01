@@ -603,7 +603,7 @@ export default function ProdEntryList() {
                 throw new Error('Failed to call traycommand API');
             }
             console.log(response);
-
+            await new Promise(resolve => setTimeout(resolve, 1000));
             // 呼叫 execcommand API
             const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
                 method: 'POST',
@@ -1461,17 +1461,31 @@ export default function ProdEntryList() {
                                 />
                             </div>
                             <div>
+                            </div>
+                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
                                 <InputSel
                                     {...inputSelProps}
                                     caption="單據狀態"
                                     disabled={true}
                                     inputProps={{
                                         props: {
+                                            style: { color: 'red' },
                                             value: statusin || ' ',
                                         },
                                     }}
                                 />
-                                <InputSel
+                                 <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                 <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
                                     disabled={true}
