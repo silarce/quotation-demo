@@ -15,6 +15,10 @@ const quotationToReiviewChain = (content: TquotationDto['contents'][number]) => 
     supervisorReviewedAt,
     toSupervisorAt,
 
+    toSalesManagerAt,
+    reviewSalesManagerEmployee,
+    salesManagerReviewedAt,
+
     reviewWorkDirectorEmployee,
     workDirectorReviewedAt,
     toWorkDirectorAt,
@@ -38,6 +42,10 @@ const quotationToReiviewChain = (content: TquotationDto['contents'][number]) => 
   let dotColor_supervisor: TdotColor = 'gray';
   toSupervisorAt && (dotColor_supervisor = 'red');
   supervisorReviewedAt && (dotColor_supervisor = 'green');
+
+  let dotColor_salesManager: TdotColor = 'gray';
+  toSalesManagerAt && (dotColor_salesManager = 'red');
+  salesManagerReviewedAt && (dotColor_salesManager = 'green');
 
   let dotColor_workDirector: TdotColor = 'gray';
   toWorkDirectorAt && (dotColor_workDirector = 'red');
@@ -65,6 +73,10 @@ const quotationToReiviewChain = (content: TquotationDto['contents'][number]) => 
       dotColor: dotColor_supervisor,
     },
     {
+      label: `業務經理 ${reviewSalesManagerEmployee?.chName ?? ''}`,
+      dotColor: dotColor_salesManager,
+    },
+    {
       label: `應收帳款 ${reviewWorkDirectorEmployee?.chName ?? ''}`,
       dotColor: dotColor_workDirector,
     },
@@ -78,7 +90,7 @@ const quotationToReiviewChain = (content: TquotationDto['contents'][number]) => 
     },
   ];
 
-  (status === 'Budget' || status === 'Bidding' || status === 'Contracting') && processChain.splice(3, 2);
+  (status === 'Budget' || status === 'Bidding' || status === 'Contracting') && processChain.splice(4, 2);
   // status === 'Pending' && processChain.shift();
 
   return processChain;
