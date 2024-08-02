@@ -73,7 +73,17 @@ export default function ListHeader01({
       {verifyForm}
       <div className={scss.btnCell}>
         <div>
-          {isSignedBack && <Tag color="success">已簽回</Tag>}
+          {isSignedBack && (
+            <Tag
+              color="success"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSignedBackClick();
+              }}
+            >
+              已簽回
+            </Tag>
+          )}
           {!isSignedBack && (
             <Tag
               color="#c1c1c1"

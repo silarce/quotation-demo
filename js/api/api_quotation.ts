@@ -632,13 +632,13 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
   // -----------------------------------------------
 
   // 簽回
-  const reqSignedBack = async (contractId: string) => {
-    await apiPatchContractStatus(contractId, { isSignedBack: true })
-      .then((res) => {
-        const id = res.id;
+  const reqSignedBack = async (contractId: string, signedBack = true) => {
+    await apiPatchContractStatus(contractId, { isSignedBack: signedBack })
+      .then(() => {
+        // const id = res.id;
         setDataList_raw((list) => {
           const copy = { ...list };
-          list[id].isSignedBack = res.isSignedBack;
+          list[contractId].isSignedBack = signedBack;
 
           return copy;
         });
