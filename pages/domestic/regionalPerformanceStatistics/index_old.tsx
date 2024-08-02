@@ -33,9 +33,9 @@ type Tquery = {
 
 type Tdata = {
   /**地區 */
-  [area: string]: {
+  [key: string]: {
     /**門型 追加 合計 */
-    [quotetype: string]: {
+    [key: string]: {
       totalsum: string; // 牌價複價
       pricesum: string; // 單價複價
       percentage: string; // 百分比
@@ -90,57 +90,47 @@ export default function RegionalPerformanceStatistics() {
     const quotetypeList: { [key: string]: string } = {};
 
     data.forEach((item) => {
-      const {
-        //  year, month,
-        totalsum,
-        pricesum,
-      } = item;
-      let {
-        //
-        percentage,
-        quotetype,
-        // county,
-        // area,
-      } = item;
-      let area: TquotationAccouting_area['area'] | '---' = item.area;
+      const { year, month, totalsum, pricesum } = item;
+      let { percentage, quotetype, county } = item;
 
       if (percentage === null) {
         percentage = 0;
       }
 
       if (!quotetype) {
-        quotetype = '---';
+        quotetype = '無資料';
       }
 
-      if (!area) {
-        area = '---';
+      if (!county) {
+        county = '無城市資料';
       }
 
       quotetypeList[quotetype] = quotetype;
 
-      if (!list[area]) {
-        list[area] = {};
-        countList[area] = {};
+      if (!list[county]) {
+        list[county] = {};
+        countList[county] = {};
       }
 
-      if (!list[area][quotetype]) {
-        list[area][quotetype] = {
+      if (!list[county][quotetype]) {
+        list[county][quotetype] = {
           totalsum: totalsum,
           pricesum: pricesum,
           percentage: String(percentage),
         };
-        countList[area][quotetype] = {
+        countList[county][quotetype] = {
           count: 1,
         };
       } else {
-        list[area][quotetype].totalsum = new Decimal(list[area][quotetype].totalsum).add(totalsum).toString();
-        list[area][quotetype].pricesum = new Decimal(list[area][quotetype].pricesum).add(pricesum).toString();
-        list[area][quotetype].percentage = new Decimal(list[area][quotetype].percentage).add(percentage).toString();
-        countList[area][quotetype].count += 1;
+        list[county][quotetype].totalsum = new Decimal(list[county][quotetype].totalsum).add(totalsum).toString();
+        list[county][quotetype].pricesum = new Decimal(list[county][quotetype].pricesum).add(pricesum).toString();
+        list[county][quotetype].percentage = new Decimal(list[county][quotetype].percentage).add(percentage).toString();
+        countList[county][quotetype].count += 1;
       }
     });
     //
     //
+    // Object.values(list).forEach((item_c) => {
     Object.keys(list).forEach((key_c) => {
       const item_c = list[key_c];
 

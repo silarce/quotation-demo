@@ -82,7 +82,7 @@ export default function IncomeSummons() {
 
   const params: Tparams = useMemo(() => {
     return {
-      sort: 'receiveDate',
+      sort: 'billSerialNumber',
       pageSize: 999999,
       populate: ['accountant'],
       filter: {
