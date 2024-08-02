@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
+import ExcelJs, { TableProperties } from 'exceljs';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TpanelList, TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import Table, {
@@ -15,7 +16,6 @@ import Table, {
 
 // gaer
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // option
 import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
@@ -28,7 +28,7 @@ import {
 } from 'js/api/api_quotation';
 import { useEmployee, Tparams } from 'js/api/api_employee';
 import {
-  TbonusDto,
+  // TbonusDto,
   //
   useGetReportForm_bonus,
 } from 'js/api/api_reportForm';
@@ -63,7 +63,7 @@ const empParams: Tparams = {
 
 // ==================================================================
 
-// MARK: STARt
+// MARK: START
 
 // 個人業績統計表
 export default function PersonalPerformanceStatistics() {
@@ -75,8 +75,6 @@ export default function PersonalPerformanceStatistics() {
     month,
     emp,
   } = query;
-
-  // ------------------------------------------------------------------
 
   // ------------------------------------------------------------------
 
@@ -99,8 +97,61 @@ export default function PersonalPerformanceStatistics() {
     };
   }, [year, month, emp]);
 
-  const { data: data_bonus, update: update_bonus, isFetching: isFetching_bonus } = useGetReportForm_bonus(params_bouus);
+  const {
+    //
+    data: data_bonus,
+    update: update_bonus,
+    isFetching: isFetching_bonus,
+  } = useGetReportForm_bonus(params_bouus);
 
+  // ------------------------------------------------------------------
+
+  const { data: data_emp, update: update_emp } = useEmployee(empParams);
+
+  // ------------------------------------------------------------------
+
+  // region FUNCTION
+
+  const handle_dlExcel = () => {
+    const theMonth = month ? month.padStart(2, '0') : '';
+
+    dlExcel({
+      data: control_table,
+      sheetName: activeEmp?.label ?? '',
+      excelName: `個人業績統計表_${activeEmp?.label}_${year}${theMonth}`,
+      year,
+      month,
+    });
+  };
+
+  // ------------------------------------------------------------------
+  // region PROPS
+
+  const empOptionArr = useMemo(() => {
+    if (!data_emp) {
+      return [];
+    }
+
+    const empArr = data_emp.data;
+
+    const optionArr = empArr.map((emp) => {
+      return {
+        label: emp.chName || emp.enName || '---',
+        value: emp.id,
+      };
+    });
+
+    return optionArr;
+  }, [data_emp]);
+
+  //________________________________________________________________________
+  //________________________________________________________________________
+  const activeEmp = empOptionArr.find((option) => option.value === emp);
+  //________________________________________________________________________
+  //________________________________________________________________________
+  const control_table = useControl_personalPerformanceStatistics(data);
+  //________________________________________________________________________
+  //________________________________________________________________________
   const { bonus, sales } = useMemo(() => {
     if (!data_bonus) {
       return {
@@ -124,35 +175,8 @@ export default function PersonalPerformanceStatistics() {
       sales: sales_d.toNumber().toLocaleString(),
     };
   }, [data_bonus]);
-
-  // ------------------------------------------------------------------
-
-  const { data: data_emp, update: update_emp } = useEmployee(empParams);
-  const haveData = data && data.length > 0;
-
-  const empOptionArr = useMemo(() => {
-    if (!data_emp) {
-      return [];
-    }
-
-    const empArr = data_emp.data;
-
-    const optionArr = empArr.map((emp) => {
-      return {
-        label: emp.chName || emp.enName || '---',
-        value: emp.id,
-      };
-    });
-
-    return optionArr;
-  }, [data_emp]);
-
-  // ------------------------------------------------------------------
-
-  const control_table = useControl_personalPerformanceStatistics(data);
-
-  // ------------------------------------------------------------------
-
+  //________________________________________________________________________
+  //________________________________________________________________________
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
@@ -209,7 +233,8 @@ export default function PersonalPerformanceStatistics() {
       boxStyle: { width: '140px' },
     },
   ];
-
+  //________________________________________________________________________
+  //________________________________________________________________________
   const tagList: TtagList = [
     {
       label: '個人業績統計表',
@@ -228,6 +253,15 @@ export default function PersonalPerformanceStatistics() {
       },
     },
   ];
+  //________________________________________________________________________
+  //________________________________________________________________________
+  const panelList: TpanelList = [
+    {
+      type: 'myButton',
+      label: '下載Excel',
+      onClick: handle_dlExcel,
+    },
+  ];
 
   // ------------------------------------------------------------------
 
@@ -243,11 +277,15 @@ export default function PersonalPerformanceStatistics() {
 
   // ------------------------------------------------------------------
 
-  // region render
+  // region RENDER
 
   return (
-    <SubLayer isLoading_subLayer={isFetching || isFetching_bonus} bodyClassName={scss.subLayerBody}>
-      <PageHeader02 tagList={tagList} />
+    <SubLayer
+      //
+      isLoading_subLayer={isFetching || isFetching_bonus}
+      bodyClassName={scss.subLayerBody}
+    >
+      <PageHeader02 tagList={tagList} panelList={panelList} />
 
       <div className={scss.body}>
         <div className={scss.selectBarWrapper}>
@@ -257,7 +295,6 @@ export default function PersonalPerformanceStatistics() {
             <span>{sales}</span>
             <span>獎金 : </span>
             <span>{bonus}</span>
-            <button onClick={() => dlExcel(control_table)}>Excel TEST</button>
           </div>
         </div>
 
@@ -269,6 +306,11 @@ export default function PersonalPerformanceStatistics() {
   );
 }
 
+// MARK: END
+
+// ===========================================================
+// ===========================================================
+// ===========================================================
 // ===========================================================
 
 // region HOOK
@@ -433,132 +475,279 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
 };
 
 // =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
 
-import _ from 'lodash';
-import ExcelJs, { TableProperties } from 'exceljs';
-import moment from 'moment';
+// region dlExcel
 
-const dlExcel = async (
+const dlExcel = async ({
+  data,
+  sheetName,
+  excelName,
+  year,
+  month,
+}: {
+  data: Tcontrol_personalPerformanceStatistics;
+  sheetName: string;
+  excelName: string;
+  year: string | number;
+  month: string | undefined;
+}) =>
   //
-  data: Tcontrol_personalPerformanceStatistics
-) => {
-  const { listKeyArr, rowArr, subTotalList, total } = data;
+  {
+    const { listKeyArr, rowArr, subTotalList, total } = data;
 
-  const workbook = new ExcelJs.Workbook();
-  const sheetName = 'TEST';
-  const sheet = workbook.addWorksheet(sheetName);
+    const workbook = new ExcelJs.Workbook();
+    const sheet = workbook.addWorksheet(sheetName);
 
-  const listColumnsProps = listKeyArr.reduce((current, key) => {
-    current.push(
-      {
-        header: key,
-        key,
-        width: 10,
-      },
-      {
-        width: 10,
-      },
-      {
-        width: 10,
+    sheet.views = [{ state: 'frozen', xSplit: 2 }];
+
+    // ----------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------
+    // 先建好columns
+
+    const listColumnsProps = listKeyArr.reduce((current, key) => {
+      current.push(
+        {
+          header: key,
+          key,
+          width: 15,
+        },
+        {
+          width: 15,
+        },
+        {
+          width: 15,
+        }
+      );
+
+      return current;
+    }, [] as Partial<ExcelJs.Column>[]);
+
+    sheet.columns = [
+      { header: '編號', key: 'idNumber', width: 15 },
+      { header: '工程名稱', key: 'projectName', width: 32 },
+      { header: '營造', key: 'C', width: 15 }, // 目前還沒有相關資料
+      { header: '設計單位', key: 'D', width: 15 }, // 目前還沒有相關資料
+      ...listColumnsProps,
+    ];
+
+    // ----------------------------------------------------------------------
+    const titleRow = sheet.insertRow(1, ['三久建材股份有限公司']);
+    titleRow.font = {
+      bold: true,
+      size: 20,
+    };
+    sheet.mergeCells('A1:B1');
+
+    // const dateRow = sheet.insertRow(2, [`${year}年${month}月業績統計表`]);
+    const dateRow = sheet.insertRow(2, [`${year}年${month ? `${month}月` : ''}業績統計表`]);
+    dateRow.font = {
+      bold: true,
+      size: 20,
+    };
+    sheet.mergeCells('A2:B2');
+
+    // ----------------------------------------------------------------------
+
+    // 取得放資料的row
+
+    const row_start = 5;
+    const row_end = rowArr.length;
+    const rowArr_excel = sheet.getRows(row_start, row_end) ?? [];
+
+    // ----------------------------------------------------------------------
+
+    // 把編號與工程名稱放進去
+
+    rowArr.forEach((row, index_row) => {
+      const { quotationNumber, projectName } = row;
+
+      if (rowArr_excel[index_row]) {
+        rowArr_excel[index_row].values = [quotationNumber, projectName];
       }
+    });
+
+    // ----------------------------------------------------------------------
+
+    // 建立table並把資料放進去
+
+    sheet.columns.forEach((col, index) => {
+      if (index <= 3) {
+        return;
+      }
+
+      if (col.key) {
+        sheet.mergeCells(3, index + 1, 3, index + 1 + 2);
+        sheet.getCell(`${col.letter}${3}`).alignment = { vertical: 'middle', horizontal: 'center' };
+      }
+    });
+
+    const listColumns = sheet.columns.slice(4).filter((col) => col.key);
+
+    listColumns.forEach((column) => {
+      const tableProps = createTable({
+        column,
+        rowArr,
+        subTotalList,
+      });
+
+      sheet.addTable(tableProps);
+    });
+
+    sheet.columns.forEach((col, index) => {
+      if (index < 4) {
+        return;
+      }
+
+      col.numFmt = '$#,##0.00';
+
+      if ((index - 3) % 3 === 0) {
+        col.numFmt = '0.00%';
+      }
+    });
+
+    const row_subTotal = sheet.lastRow;
+
+    if (row_subTotal) {
+      row_subTotal.getCell(4).value = '小計';
+      row_subTotal.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
+    }
+
+    // --------------------------------------------------------------------
+
+    const col_total = sheet.getColumn(sheet.columns.length + 1);
+    col_total.width = 20;
+    col_total.numFmt = '$#,##0.00';
+
+    col_total.values = rowArr.reduce(
+      (values, row) => {
+        values.push(Number(row.total.replaceAll(',', '')));
+
+        return values;
+      },
+      [undefined, undefined, undefined, '總價'] as (undefined | string | number)[]
     );
 
-    return current;
-  }, [] as Partial<ExcelJs.Column>[]);
+    // --------------------------------------------------------------------
 
-  sheet.columns = [
-    { header: '編號', key: 'idNumber', width: 10 },
-    { header: '工程名稱', key: 'projectName', width: 32 },
-    { header: '營造', key: 'C', width: 32 }, // 目前還沒有相關資料
-    { header: '設計單位', key: 'D', width: 32 }, // 目前還沒有相關資料
-    ...listColumnsProps,
-  ];
+    // 處理小計與總計
 
-  const c_idNumber = sheet.getColumn('idNumber');
-  const c_projectName = sheet.getColumn('projectName');
+    sheet.addRow([]);
+    const row_totalLabel = sheet.addRow([]);
 
-  sheet.columns.forEach((col, index) => {
-    if (index <= 3) {
-      return;
-    }
+    const row_total = sheet.addRow([]);
 
-    if (col.key) {
-      sheet.mergeCells(1, index + 1, 1, index + 1 + 2);
-      sheet.getCell(`${col.letter}${1}`).alignment = { vertical: 'middle', horizontal: 'center' };
-    }
-  });
+    row_totalLabel.values = [
+      //
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      '牌價',
+      '承價',
+      '百分比',
+    ];
 
-  const listColumns = sheet.columns.slice(4).filter((col) => col.key);
+    row_total.values = [
+      //
+      undefined,
+      undefined,
+      undefined,
+      '總計',
+      Number(total.totalsum.replaceAll(',', '')),
+      Number(total.pricesum.replaceAll(',', '')),
+      new Decimal(total.percentage.replace('%', '')).div(100).toNumber(),
+    ];
 
-  listColumns.forEach((col) => {
-    const tableProps = createTable({
-      column: col,
-      rowArr,
+    row_total.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
+
+    // ----------------------------------------------------------------------
+
+    // const titleRow = sheet.insertRow(1, ['三  久  建  材  股  份  有  限  公  司']);
+    // titleRow.font = {
+    //   bold: true,
+    //   size: 20,
+    // };
+    // // titleRow.getCell(1)
+    // sheet.mergeCells('A1:D1');
+
+    // ----------------------------------------------------------------------
+
+    // 調整樣式
+
+    row_subTotal?.eachCell({ includeEmpty: true }, (cell) => {
+      cell.border = {
+        top: {
+          style: 'double',
+          color: { argb: 'FF000000' },
+        },
+      };
     });
 
-    sheet.addTable(tableProps);
-  });
+    rowArr_excel.forEach((row, index_row) => {
+      const isOdd = index_row % 2 === 0;
 
-  console.log(sheet.getCell('F6'));
-
-  // sheet.mergeCells('A1', 'B1');
-
-  // c_idNumber.values = ['編號', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
-  // c_projectName.values = ['工程名稱', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
-
-  // worksheet.getColumn(6).values = [1, 2, 3, 4, 5];
-
-  // // 添加稀疏列值
-  // worksheet.getColumn(7).values = [, , 2, 3, , 5, , 7, , , , 11];
-
-  // --------------------------------------------------------------------
-  // start row, start column, end row, end column
-  // worksheet.mergeCells(10, 11, 12, 13);
-  //
-  // worksheet.mergeCells('A1');
-  // worksheet.mergeCells('A1', 'B2');
-  // --------------------------------------------------------------------
-
-  // 先定義好多個table，然後將迭代每一筆資料，將資料送入對應的table
-  // 這個想法可能不適合
-
-  // sheet.addTable({
-  //   name: 'MyTable',
-  //   ref: `${c_projectName.letter}${2}`,
-  //   style: {
-  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //     // @ts-ignore
-  //     theme: null,
-  //   },
-  //   columns: [{ name: '牌價' }, { name: '承價' }, { name: '百分比' }],
-  //   rows: [],
-  // });
-
-  // --------------------------------------------------------------------
-  await workbook.xlsx.writeBuffer();
-
-  workbook.xlsx.writeBuffer().then((content) => {
-    const link = document.createElement('a');
-    const blobData = new Blob([content], {
-      type: 'application/vnd.ms-excel;charset=utf-8;',
+      row.eachCell({ includeEmpty: true }, (cell) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: isOdd ? 'ffeeeeee' : 'ffdddddd' },
+        };
+      });
+      row.commit();
     });
 
-    const today = moment().format('yyyy-MM-DD');
-    link.download = `${'test'}_${today}.xlsx`;
-    link.href = URL.createObjectURL(blobData);
-    link.click();
-    link.remove();
-  });
-};
+    sheet.getRow(4).eachCell((cell) => {
+      cell.alignment = {
+        vertical: 'middle',
+        horizontal: 'right',
+      };
+    });
+
+    row_totalLabel.eachCell((cell) => {
+      cell.alignment = {
+        vertical: 'middle',
+        horizontal: 'right',
+      };
+    });
+
+    // --------------------------------------------------------------------
+    await workbook.xlsx.writeBuffer();
+
+    workbook.xlsx.writeBuffer().then((content) => {
+      const link = document.createElement('a');
+      const blobData = new Blob([content], {
+        type: 'application/vnd.ms-excel;charset=utf-8;',
+      });
+
+      link.download = `${excelName}.xlsx`;
+      link.href = URL.createObjectURL(blobData);
+      link.click();
+      link.remove();
+    });
+  };
+
+// =====================================================================
+
+// region createTable
 
 const createTable = ({
   //
   column,
   rowArr,
+  subTotalList,
 }: {
   column: Partial<ExcelJs.Column>;
   rowArr: Tcontrol_personalPerformanceStatistics['rowArr'];
+  subTotalList: Tcontrol_personalPerformanceStatistics['subTotalList'];
 }) => {
+  const subTotal: Tcontrol_personalPerformanceStatistics['subTotalList'][string] | undefined =
+    subTotalList[column.key ?? 'undefined'];
+
   const rows: TableProperties['rows'] = rowArr.map((row) => {
     const { list } = row;
 
@@ -566,21 +755,69 @@ const createTable = ({
       return [];
     }
 
-    const { totalsum, pricesum, percentage } = list[column.key] ?? {};
+    let totalsum: string | number = list[column.key]?.totalsum || 'n/a';
+    let pricesum: string | number = list[column.key]?.pricesum || 'n/a';
+    let percentage: string | number = list[column.key]?.percentage || 'n/a';
+
+    if (totalsum !== 'n/a') {
+      totalsum = Number(totalsum.replaceAll(',', ''));
+    }
+
+    if (pricesum !== 'n/a') {
+      pricesum = Number(pricesum.replaceAll(',', ''));
+    }
+
+    if (percentage !== 'n/a') {
+      // percentage = Number(percentage.replace('%', ''));
+      percentage = percentage.replace('%', '');
+      percentage = new Decimal(percentage).div(100).toNumber();
+    }
 
     return [totalsum, pricesum, percentage];
   });
 
+  const lastRow = (() => {
+    let totalsum: string | number = subTotal.totalsum || 'n/a';
+    let pricesum: string | number = subTotal.pricesum || 'n/a';
+    let percentage: string | number = subTotal.percentage || 'n/a';
+
+    if (totalsum !== 'n/a') {
+      totalsum = Number(totalsum.replaceAll(',', ''));
+    }
+
+    if (pricesum !== 'n/a') {
+      pricesum = Number(pricesum.replaceAll(',', ''));
+    }
+
+    if (percentage !== 'n/a') {
+      // percentage = Number(percentage.replace('%', ''));
+      percentage = percentage.replace('%', '');
+      percentage = new Decimal(percentage).div(100).toNumber();
+    }
+
+    return [totalsum, pricesum, percentage];
+  })();
+
   const tableProps: TableProperties = {
     name: column.key ?? 'undefined',
-    ref: `${column.letter}${2}`,
+    ref: `${column.letter}${4}`,
+    headerRow: true,
+    // totalsRow: true,
     style: {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       theme: null,
+      showRowStripes: true,
     },
-    columns: [{ name: '牌價' }, { name: '承價' }, { name: '百分比' }],
-    rows,
+    columns: [
+      {
+        name: '牌價',
+        totalsRowFunction: 'sum',
+      },
+      { name: '承價', totalsRowFunction: 'sum' },
+      { name: '百分比', totalsRowFunction: 'average' },
+    ],
+    rows: [...rows, lastRow],
   };
 
   return tableProps;
