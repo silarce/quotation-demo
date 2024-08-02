@@ -778,10 +778,10 @@ const sidePathList: TsidePathList = {
               erpFeature: devPass,
             },
             {
-              label: '物料管理',
-              path: path01 + '/getMaterial/pickingList',
+              label: '物料維護',
+              path: path01 + '/productList',
               query: {
-                type: 'pickingList',
+                type: 'productList',
               },
               erpFeature: devPass,
             },

@@ -1,7 +1,7 @@
 import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import _, { filter } from 'lodash';
 
 import scss from './purchaseRequisitionList.module.scss';
@@ -99,8 +99,13 @@ export default function PurchaseRequisitionList() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
-    const [keywordstartdate, setKeywordstartdate] = useState<string>("");
-    const [keywordenddate, setKeywordenddate] = useState<string>("");
+    // 預設截止日期為今天，起始日期為今天往前推30天
+    const defaultEndDate = moment();
+    const defaultStartDate = moment().subtract(30, 'days');
+
+    // 使用 Moment 類型作為狀態
+    const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
+    const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -846,27 +851,20 @@ export default function PurchaseRequisitionList() {
 
     //#endregion
 
-    const filterData = (e: any) => {
-        e.preventDefault();
-        console.log('Keyword2:', keyword2); // 調試點
-        const startDate = keywordstartdate ? moment(keywordstartdate) : null;
-        const endDate = keywordenddate ? moment(keywordenddate) : null;
-        const requisitionId = keyword2 ? keyword2.trim() : '';
-        const status = keyword3 ? keyword3.trim() : '';
+    const filterData = () => {
+        const startDate = keywordstartdate;
+        const endDate = keywordenddate;
+        const requisitionId = keyword2.trim();
+        const status = keyword3.trim();
 
-        if (startDate===null || endDate===null){
-            myAlert.warning({title:'日期區間不可為空'})
+        // 檢查是否所有條件都為空
+        if ((!startDate || !startDate.isValid()) &&
+            (!endDate || !endDate.isValid()) &&
+            !requisitionId &&
+            !status) {
+            setSearchdata(data);
             return;
         }
-
-            // 檢查是否所有條件都為空
-            if ((!startDate || !startDate.isValid()) &&
-                (!endDate || !endDate.isValid()) &&
-                !requisitionId &&
-                !status) {
-                setSearchdata(data);
-                return;
-            }
 
         // 過濾資料
         let filteredData = data.filter(item => {
@@ -891,11 +889,27 @@ export default function PurchaseRequisitionList() {
             );
         }
 
-        // 檢查 filteredData 長度
-
         setSearchdata(filteredData);
+    };
 
+    // 監聽條件變更
+    useEffect(() => {
+        filterData();
+    }, [keywordstartdate, keywordenddate, keyword2, keyword3]);
+
+
+
+    const clearFilterData = (e: any) => {
+        e.preventDefault();
+        setKeywordstartdate(null)
+        setKeywordenddate(null);
+        setKeyword2('');
+        setKeyword3('');
+        // setSearchdata(data);
     }
+
+
+
 
 
 
@@ -1002,7 +1016,7 @@ export default function PurchaseRequisitionList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at,
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(create_atin)?.toString() : create_at) || ' ',
                                             // value: checkfirstin
                                         },
                                     }}
@@ -1013,7 +1027,7 @@ export default function PurchaseRequisitionList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid,
+                                            value: (checkfirstin === 0 ? purchaserequisitionidin : purchaserequisitionid) || ' ',
                                         },
                                     }}
                                 />
@@ -1023,7 +1037,7 @@ export default function PurchaseRequisitionList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? create_byin : create_by,
+                                            value: (checkfirstin === 0 ? create_byin : create_by) || ' ',
                                         },
                                     }}
                                 />
@@ -1037,7 +1051,7 @@ export default function PurchaseRequisitionList() {
                                     disabled={true}
                                     inputProps={{
                                         props: {
-                                            value: checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '',
+                                            value: (checkfirstin === 0 ? getTaiwanDateStr(need_datein as string || '') || '' : getTaiwanDateStr(need_date as string || '') || '') || ' ',
                                         },
                                     }}
                                 />
@@ -1051,7 +1065,7 @@ export default function PurchaseRequisitionList() {
                                     inputProps={{
                                         props: {
                                             style: { color: 'red' },
-                                            value: statusin,
+                                            value: statusin || ' ',
                                         },
                                     }}
                                 />
@@ -1528,23 +1542,34 @@ export default function PurchaseRequisitionList() {
                             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
                         </div>
                         <div>
-                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {data.length} 筆</span>
+                            <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {searchdata.length} 筆</span>
                         </div>
                     </div>
                     <div className={scss.modal_head_content1}>
                         <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
-                            <form className={scss.modal_search_bar} onSubmit={filterData} style={{ alignItems: 'center', width: '100%' }}>
+                            <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
+                                <div>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
                                 <div>
                                     <InputSel
                                         caption="起始日期"
-                                        className='global_tip_must'
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(keywordstartdate || '') ? moment(keywordstartdate) : null,
-                                                onChange: (e) => { setKeywordstartdate((e?.toString() || '') || '') }
+                                                value: keywordstartdate || null,
+                                                onChange: (e: Moment | null) => { setKeywordstartdate(e) }
                                             }
                                         }}
                                     />
@@ -1553,40 +1578,26 @@ export default function PurchaseRequisitionList() {
                                 <div>
                                     <InputSel
                                         caption="截止日期"
-                                        className='global_tip_must'
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(keywordenddate || '') ? moment(keywordenddate) : null,
-                                                onChange: (e) => { setKeywordenddate((e?.toString() || '') || '') }
+                                                value: keywordenddate || null,
+                                                onChange: (e: Moment | null) => { setKeywordenddate(e) }
                                             }
                                         }}
                                     />
                                 </div>
                                 <br />
                                 <div>
-                                    {/* <InputSel
-                                        caption="請購日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
-                                            }
-                                        }}
-                                    /> */}
                                     <InputSel
                                         {...inputSelProps}
                                         caption="請購單號"
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword2 ? keyword2 : ' ',
-                                                onChange: (e) => { setKeyword2(e.target.value) }
+                                                value: keyword2 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
                                             },
                                         }}
                                     />
@@ -1599,28 +1610,8 @@ export default function PurchaseRequisitionList() {
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                </div>
-                                <br />
-                                <div>
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
+                                                value: keyword3 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />
@@ -1640,7 +1631,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div>
+                                <div >
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1654,7 +1645,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div>
+                                <div >
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1668,7 +1659,7 @@ export default function PurchaseRequisitionList() {
                                     />
                                 </div>
                                 <br />
-                                <div>
+                                <div >
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1681,18 +1672,18 @@ export default function PurchaseRequisitionList() {
                                         }}
                                     />
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
                                     <span>
-                                        <button className={scss.minibtn} type="submit">清除條件</button>
+                                        <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
                                     </span>
-                                    <span>
+                                    {/* <span>
                                         <button className={scss.minibtn} type="submit">查找</button>
-                                    </span>
+                                    </span> */}
                                 </div>
                             </form>
                         </div>
                         <div style={{
-                            maxHeight: '500px',
+                            maxHeight: '465.81px',
                             overflowY: 'auto',
                             border: '1px solid #c1c1c1',
                             // boxShadow: 'inset 0px 2px 5px rgba(0, 0, 0, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.5)',

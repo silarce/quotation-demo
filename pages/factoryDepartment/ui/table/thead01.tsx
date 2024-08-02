@@ -105,13 +105,13 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   else if (type === "ProdEntry") {
     return (
       <div className={style.thead9}>
-        <span>入庫日期</span>
+        <span>序</span>
         <span>入庫單號</span>
+        <span>入庫日期</span>
         <span>狀態</span>
-        <span>備註</span>
+        <span>廠商名稱</span>
         <span></span>
         {/* <span>按鈕格 留白</span> */}
-
       </div>
     )
   }
@@ -400,6 +400,22 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
+    //#region 物料明細
+    else if (type === "ProductList") {
+      return (
+        <div className={style.thead27}>
+          <span>序</span>
+          <span>料號</span>
+          <span>名稱</span>
+          <span>規格</span>
+          <span>庫存</span>
+          <span>建立日期</span>
+          <span>更新日期</span>
+          <span></span>
+        </div>
+      )
+    }
+    //#endregion
   else {
     return null;
   }

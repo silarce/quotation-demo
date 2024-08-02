@@ -816,15 +816,13 @@ div.panelHeader26 {
 .modal_head_content1 {
   display: grid;
   grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
-  gap: 0px;
+  // gap: 15px;
   width: auto;
-  // margin-top: 4px;
-  margin-left: 20px;
-  margin-right: 20px;
-  border-top: 1px solid rgb(168, 168, 168);
-  overflow-x: hidden;
-  // background-color: gray;
-  padding-bottom: 5px;
+  // margin-top: 5px;
+  // margin-left: 20px;
+  // margin-right: 20px;
+
+
 }
 
 .modal_head_content2 {
@@ -841,17 +839,6 @@ div.panelHeader26 {
   padding-bottom: 5px;
 }
 
-
-.modal_search_bar {
-  display: grid;
-  grid-template-columns: 1fr; // 左右兩邊比例，可以調整
-  // gap: 15px;
-  width: 100%;
-  margin-top: 5px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid rgb(214, 214, 214);
-  // padding-right:10px;
-}
 
 
 .modal_head_head1 {

@@ -794,19 +794,6 @@ export default function AddPurchaseRequisition() {
                                     }}
                                 />
                                 <InputSel
-                                    caption="需用日期"
-                                    className="global_tip_must"
-                                    disabled={false}
-                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                    // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                    datePickerProps={{
-                                        props: {
-                                            value: getTaiwanDateStr(need_date || '') ? moment(need_date) : null,
-                                            onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
-                                        },
-                                    }}
-                                />
-                                <InputSel
                                     {...inputSelProps}
                                     caption="請購部門"
                                     disabled={true}
@@ -827,7 +814,21 @@ export default function AddPurchaseRequisition() {
                                     }}
                                 />
                             </div>
-                            <div></div>
+                            <div>
+                            <InputSel
+                                    caption="需用日期"
+                                    className="global_tip_must"
+                                    disabled={false}
+                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                                    // wrapperStyle={{ width: '500px', margin: 'auto' }}
+                                    datePickerProps={{
+                                        props: {
+                                            value: getTaiwanDateStr(need_date || '') ? moment(need_date) : null,
+                                            onChange: (e) => { setNeed_date((e?.toString() || '') || '') }
+                                        },
+                                    }}
+                                />
+                            </div>
                             <div></div>
                         </div>
                         <div className={scss.head_content2}>
@@ -859,10 +860,9 @@ export default function AddPurchaseRequisition() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                {/* <button className={scss.redbtn} onClick={() => { handleAddPR() }}>送出申請</button> */}
-                                <button className={scss.minibtn} onClick={() => { handleAddPR() }}>
-                                    送出申請
-                                </button>
+                                <span>
+                                    <button className={scss.redbtn} onClick={() => { handleAddPR() }}>新增採購</button>
+                                </span>
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
