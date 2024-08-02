@@ -210,6 +210,7 @@ function ReviewForm({
       'content.reviewWorkDirectorEmployee',
       'content.reviewCashierEmployee',
       'content.reviewManagerEmployee',
+      'content.reviewSalesManagerEmployee',
     ],
   });
 
@@ -221,6 +222,7 @@ function ReviewForm({
         'latestContent.reviewWorkDirectorEmployee',
         'latestContent.reviewCashierEmployee',
         'latestContent.reviewManagerEmployee',
+        'latestContent.reviewSalesManagerEmployee',
       ],
     },
   });
@@ -235,6 +237,7 @@ function ReviewForm({
           'reviewWorkDirectorEmployee',
           'reviewCashierEmployee',
           'reviewManagerEmployee',
+          'reviewSalesManagerEmployee',
         ],
       },
     }
@@ -286,7 +289,7 @@ function ReviewForm({
 
   // ----------------------------------------------------------------------------
 
-  const { isReviewer, isManager, isWorkDirector, isCashier, isSupervisor } = checkIsReviewer({
+  const { isReviewer, isManager, isWorkDirector, isCashier, isSalesManager, isSupervisor } = checkIsReviewer({
     userInfo,
     quotationContent,
   });
@@ -422,6 +425,8 @@ function ReviewForm({
       ? (body.reviewWorkDirectorEmployeeId = userId)
       : isCashier
       ? (body.reviewCashierEmployeeId = userId)
+      : isSalesManager
+      ? (body.reviewSalesManagerEmployeeId = userId)
       : isSupervisor
       ? (body.reviewSupervisorEmployeeId = userId)
       : null;
@@ -1819,6 +1824,7 @@ const checkIsReviewer = ({
     isWorkDirector,
     isCashier,
     isSupervisor,
+    isSalesManager,
   };
 };
 
