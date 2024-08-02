@@ -134,9 +134,12 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
         isSignedBack: isSignedBack,
         onSignedBackClick: () => {
           myAlert.confirm({
-            title: `確認簽回${contractNumber || content.projectName}?`,
+            // title: `確認簽回${contractNumber || content.projectName}?`,
+            title: !isSignedBack
+              ? `確認簽回${contractNumber || content.projectName}?`
+              : `確認取消簽回${contractNumber || content.projectName}?`,
             props: {
-              onOk: async () => await reqSignedBack(contractId),
+              onOk: async () => await reqSignedBack(contractId, !isSignedBack),
             },
           });
         },
