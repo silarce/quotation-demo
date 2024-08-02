@@ -2266,6 +2266,9 @@ export type TquotationContractDto = {
   certificatedDoc?: TcertificatedDocDto[];
   electronicSuppliesId: string | null;
   electronicSupplies?: TelectronicSuppliesDto;
+  //
+  // 是否已簽回
+  isSignedBack: boolean;
 };
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
@@ -2347,6 +2350,8 @@ export type TquotationAccouting_years = {
 
 // 全區業績統計表
 export type TquotationAccouting_area = {
+  area: '北部' | '中部' | '南部' | '外銷';
+  contractnumber: string | null;
   quotetype: string;
   year: number;
   month: number;

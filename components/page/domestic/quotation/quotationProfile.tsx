@@ -5,6 +5,7 @@ import moment from 'moment';
 // glogal gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import AddressBar, { TaddressProps } from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import CustomerSelector from 'components/global/gear/modal/customerSelector';
 
@@ -202,7 +203,7 @@ export default function QuotationProfile({
         />
         {/*  */}
         <div className={scss.form02}>
-          <div className={`${scss.clientName} ${disabled ? scss.disabled : ''}`}>
+          <div className={classNames(scss.clientName, disabled && scss.disabled)}>
             <div>
               <InputSel
                 caption={'客戶名稱'}
@@ -210,7 +211,10 @@ export default function QuotationProfile({
                 showBaseline="invisible"
                 captionClassName={scss.input02}
                 captionStyle={{ width: captionStyle.width }}
-                wrapperStyle={{ gap: wrapperStyle.gap }}
+                wrapperStyle={{
+                  width: customer.value ? undefined : '85px',
+                  gap: wrapperStyle.gap,
+                }}
                 textareaProps={{
                   props: {
                     placeholder: undefined,
@@ -222,26 +226,67 @@ export default function QuotationProfile({
               />
               {!customer.value && (
                 <>
-                  <button className={scss.btnSelectCustomer} onClick={openModal}>
+                  <MyButton_v2 px="px22" py="py4" className={scss.btnSelectCustomer} onClick={openModal}>
                     請選擇客戶
-                  </button>
-                  <button
+                  </MyButton_v2>
+                  <MyButton_v2
+                    px="px22"
+                    py="py4"
                     className={scss.btnAddCustomer}
                     onClick={() => {
-                      // router.push({
-                      //   pathname: '/domestic/customer/add',
-                      //   query: { shouldReDeirector: true },
-                      // });
                       window.open('/domestic/customer/add?reDeirectorToEdit=true', '_blank');
                     }}
                   >
                     新增客戶
-                  </button>
+                  </MyButton_v2>
                 </>
               )}
               {customer.value && !disabled && <IconRemove02 onClick={clearClient} />}
             </div>
           </div>
+
+          {/* <div className={classNames(scss.clientName, disabled && scss.disabled)}>
+            <div>
+              <InputSel
+                caption={'設計單位'}
+                disabled={true}
+                showBaseline="invisible"
+                captionClassName={scss.input02}
+                captionStyle={{ width: captionStyle.width }}
+                // wrapperStyle={{ gap: wrapperStyle.gap }}
+                wrapperStyle={{
+                  width: customer.value ? undefined : '85px',
+                  gap: wrapperStyle.gap,
+                }}
+                textareaProps={{
+                  props: {
+                    placeholder: undefined,
+                    value: customer.value?.name ?? '',
+                    className: 'overflow-hidden',
+                    // style: { height: 30 },
+                  },
+                }}
+              />
+              {!customer.value && (
+                <>
+                  <MyButton_v2 px="px22" py="py4" className={scss.btnSelectCustomer} onClick={openModal}>
+                    請選擇設計單位
+                  </MyButton_v2>
+                  <MyButton_v2
+                    px="px22"
+                    py="py4"
+                    className={scss.btnAddCustomer}
+                    onClick={() => {
+                      window.open('/domestic/customer/add?reDeirectorToEdit=true', '_blank');
+                    }}
+                  >
+                    新增設計單位
+                  </MyButton_v2>
+                </>
+              )}
+              {customer.value && !disabled && <IconRemove02 onClick={clearClient} />}
+            </div>
+          </div> */}
 
           <div>
             {/* 聯絡人，連絡電話，傳真號碼 */}
