@@ -900,7 +900,14 @@ export type TquotationContentOtherDto = {
   spec: string | null;
 };
 
-export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
+// export type TcreateQuotationContentOtherDto = Omit<TquotationContentOtherDto, 'id' | 'createdAt' | 'updatedAt'>;
+export type TcreateQuotationContentOtherDto = Pick<
+  TquotationContentOtherDto,
+  'item' | 'description' | 'unit' | 'unitPrice' | 'notes' | 'spec'
+> & {
+  quantity: `${number}`;
+  totalPrice: `${number}`;
+};
 
 /**選配設定 */
 export type TquotationProductAccessoryDto = {

@@ -870,48 +870,9 @@ export default function ProdReceiptList() {
                                     <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                             </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="入庫狀態"
-                                    captionStyle={{ paddingTop: '5px' }}
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red', paddingTop: '5px' },
-                                            value: entrystatusin || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="請付狀態"
-                                    captionStyle={{ paddingTop: '5px' }}
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red', paddingTop: '5px' },
-                                            value: paystatusin || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    captionStyle={{ paddingTop: '5px' }}
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red', paddingTop: '5px' },
-                                            value: statusin || ' ',
-                                        },
-                                    }}
-                                />
-                            </div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
                         </div>
 
                         <div className={scss.head_content1}>
@@ -980,7 +941,41 @@ export default function ProdReceiptList() {
                                     }}
                                 />
                             </div>
-                            <div>
+                            <div></div>
+                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red' },
+                                            value: statusin || ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="入庫狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red' },
+                                            value: entrystatusin || ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="請付狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red' },
+                                            value: paystatusin || ' ',
+                                        },
+                                    }}
+                                />
                             </div>
                         </div>
 

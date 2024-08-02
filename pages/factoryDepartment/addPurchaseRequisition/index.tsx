@@ -795,6 +795,7 @@ export default function AddPurchaseRequisition() {
                                 />
                                 <InputSel
                                     caption="需用日期"
+                                    className="global_tip_must"
                                     disabled={false}
                                     captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                                     // wrapperStyle={{ width: '500px', margin: 'auto' }}
@@ -837,7 +838,7 @@ export default function AddPurchaseRequisition() {
                                     disabled={false}
                                     inputProps={{
                                         props: {
-                                            value: note,
+                                            value: note || ' ',
                                             onChange: (e) => { setNote(e.target.value) }
                                         },
                                     }}

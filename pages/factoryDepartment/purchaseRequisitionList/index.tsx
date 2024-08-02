@@ -935,20 +935,7 @@ export default function PurchaseRequisitionList() {
                             </div>
                             <div></div>
                             <div></div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="單據狀態"
-                                    captionStyle={{ paddingTop: '5px' }}
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            style: { color: 'red', paddingTop: '5px' },
-                                            value: statusin,
-                                        },
-                                    }}
-                                />
-                            </div>
+                            <div></div>
                             <div></div>
                         </div>
                         <div className={scss.head_content1}>
@@ -985,16 +972,7 @@ export default function PurchaseRequisitionList() {
                                         },
                                     }}
                                 />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="備註"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
-                                        },
-                                    }}
-                                />
+
 
                             </div>
                             <div>
@@ -1010,9 +988,55 @@ export default function PurchaseRequisitionList() {
                                 />
                             </div>
                             <div></div>
+                            <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="單據狀態"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            style: { color: 'red' },
+                                            value: statusin,
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                            </div>
                         </div>
                         <div className={scss.head_content2}>
-                            <div></div>
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="備註"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: checkfirstin === 0 ? (notein || ' ') : (note || ' '),
+                                        },
+                                    }}
+                                />
+                            </div>
                             <div></div>
                             <div></div>
                         </div>
@@ -1109,9 +1133,9 @@ export default function PurchaseRequisitionList() {
                                             <span>{_item.unit}</span>
                                             {/* <span><IconDetail onClick={() => goQuotereqDetailList(_item)} /></span> */}
                                             <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span>
-                                            <span style={{backgroundColor:'#e9eff5'}}>{_item.unitprice.toLocaleString()}</span>
-                                            <span style={{backgroundColor:'#e9eff5'}}>{_item.totalprice.toLocaleString()}</span>
-                                            <span style={{backgroundColor:'#e9eff5'}}>{_item.suppliername}</span>
+                                            <span>{_item.unitprice.toLocaleString()}</span>
+                                            <span>{_item.totalprice.toLocaleString()}</span>
+                                            <span style={{ backgroundColor: '#e9eff5' }}>{_item.suppliername}</span>
                                             <span>
                                                 <button onClick={() => { handleAddToList(_item) }} style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? '' : 'none'}` }}>
                                                     <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
