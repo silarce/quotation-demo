@@ -806,10 +806,10 @@ export default function ProductList() {
         //     return isDateInRange;
         // });
 
-        let filteredData = data;
+        let filteredData =  searchdata;
         // 模糊查詢請購單號
         if (requisitionId) {
-            filteredData = filteredData.filter(item =>
+            filteredData = searchdata.filter(item =>
                 item.productid.toString().includes(requisitionId)
             );
         }
@@ -827,7 +827,8 @@ export default function ProductList() {
         }
 
 
-        setSearchdata(filteredData);
+        // setSearchdata(filteredData);
+        setFilteredData(filteredData);
     };
 
 
@@ -1110,7 +1111,7 @@ export default function ProductList() {
                                 <div></div>
                                 <div></div>
                             </div> */}
-                            {/* <div className={scss.head_foot2}>
+                            <div className={scss.head_foot2}>
                                 <div></div>
                                 <div></div>
                                 <div></div>
@@ -1127,12 +1128,12 @@ export default function ProductList() {
                                         }}
                                     />
                                 </div>
-                            </div> */}
+                            </div>
                             <Thead01 type={'ProductList'} />
                         </div>
                         <div className={scss.body_content1}>
                             {filteredData && (
-                                filteredData.map((_item: any, index: number) => (
+                                filteredData.slice(0, 100).map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader21}>
                                         <div
                                             key={index}
