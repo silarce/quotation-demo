@@ -99,7 +99,7 @@ export default function WdContractList() {
       },
       $or: {
         'content.projectName': { $contains: keyWord },
-        'content.quotationNumber': { $eq: keyWord },
+        'content.quotationNumber': { $contains: keyWord },
       },
       engineeringContactId: { $notNull: true },
       'content.quotationDate': {

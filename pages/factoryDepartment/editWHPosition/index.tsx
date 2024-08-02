@@ -460,7 +460,8 @@ export default function EditWHPosition() {
                 throw new Error('Failed to call traycommand API');
             }
             console.log(response);
-
+            // 等待一秒
+            await new Promise(resolve => setTimeout(resolve, 1000));
             // 呼叫 execcommand API
             const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
                 method: 'POST',
@@ -881,7 +882,7 @@ export default function EditWHPosition() {
                             }}
                         />
                         {showSuggestions && (
-                            
+
                             <div
                                 style={{
                                     position: 'absolute',
@@ -912,7 +913,7 @@ export default function EditWHPosition() {
                                             color: '#555',
                                             outline: 'none',
                                             transition: 'color 0.3s ease',
-                                            
+
                                         }}
                                         onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
                                         onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
@@ -949,7 +950,7 @@ export default function EditWHPosition() {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td  style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
+                                            <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
                                                 沒有匹配的結果
                                             </td>
                                         </tr>
@@ -1067,9 +1068,10 @@ export default function EditWHPosition() {
                                                                         <button className={scss.childtraytabletdButton}
                                                                             onClick={() => handlechangewhposition(childDataItem.id, childDataItem.whid, childDataItem.trayname, childDataItem.whname)}
                                                                             style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
-                                                                            onMouseEnter={() => setHoverInfo(`${childDataItem.whpname}\n${childDataItem.spec}\n${childDataItem.quantity}`)}
+                                                                            onMouseEnter={() => setHoverInfo(`${childDataItem.productid}\n${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`)}
                                                                             onMouseLeave={() => setHoverInfo(null)}>
                                                                             {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
+                                                                            {/* <span style={{fontSize:'10px'}}>{`${childDataItem.productid}\n`}</span><br /> */}
                                                                         </button>
                                                                     </td>
                                                                 ))}
