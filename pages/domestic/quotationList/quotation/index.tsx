@@ -1486,31 +1486,37 @@ function TheQuotation({ router }: { router: NextRouter }) {
         label: '總經理',
         value: quotationData?.latestContent.reviewManagerEmployee?.chName,
         style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.managerReviewedAt,
       },
       {
         label: '應收帳款',
         value: quotationData?.latestContent.reviewCashierEmployee?.chName,
         style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.cashierReviewedAt,
       },
       {
         label: '應收帳款',
         value: quotationData?.latestContent.reviewWorkDirectorEmployee?.chName,
         style: { width: '180px' },
-      },
-      {
-        label: '業務主管',
-        value: quotationData?.latestContent.reviewSupervisorEmployee?.chName,
-        style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.workDirectorReviewedAt,
       },
       {
         label: '業務經理',
         value: quotationData?.latestContent.reviewSalesManagerEmployee?.chName,
         style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.salesManagerReviewedAt,
+      },
+      {
+        label: '業務主管',
+        value: quotationData?.latestContent.reviewSupervisorEmployee?.chName,
+        style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.supervisorReviewedAt,
       },
       {
         label: '業務',
         value: quotationData?.latestContent.reviewSalesEmployee?.chName,
         style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.salesReviewedAt,
       },
       {
         label: '經辦',
