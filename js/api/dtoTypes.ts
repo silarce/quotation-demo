@@ -2758,6 +2758,9 @@ export type TquotationVerifyFormDto = {
   testDriveNote: string | null;
   // 扣款項目、比例、金額
   debitItem: string;
+  //
+  secondAskForPaymentDate: string; // 第二註明請款日 單純的字串
+  secondDisbursementDate: string; // 第二放款日 單純的字串
 };
 
 export type TcreateQuotationVerifyFormDto = Pick<
@@ -2765,6 +2768,8 @@ export type TcreateQuotationVerifyFormDto = Pick<
   | 'askForPaymentDate'
   | 'disbursementDate'
   | 'paymentDateNote'
+  | 'secondAskForPaymentDate'
+  | 'secondDisbursementDate'
   //
   | 'paymentRatio'
   | 'paymentTenor'

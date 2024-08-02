@@ -358,6 +358,8 @@ function ReviewForm({
       factoryCertificateNote: preBody.factoryCertificateNote,
 
       //
+      secondAskForPaymentDate: preBody.secondAskForPaymentDate,
+      secondDisbursementDate: preBody.secondDisbursementDate,
     };
 
     let isPaymentOk = true;
@@ -630,6 +632,9 @@ function ReviewForm({
         factoryCertificate,
         factoryCertificatePercent,
         factoryCertificateNote,
+        //
+        secondAskForPaymentDate,
+        secondDisbursementDate,
       } = verifyForm;
 
       reset({
@@ -662,6 +667,9 @@ function ReviewForm({
         factoryCertificate,
         factoryCertificatePercent,
         factoryCertificateNote,
+
+        secondAskForPaymentDate,
+        secondDisbursementDate,
       });
 
       methodArr = verifyForm?.paymentRatio.map((item) => {
@@ -701,6 +709,9 @@ function ReviewForm({
         fireproofCertificatePercent: 90,
         factoryCertificatePercent: 90,
         warrantyPercent: 100,
+
+        secondAskForPaymentDate: undefined,
+        secondDisbursementDate: undefined,
       });
 
       methodArr = defaultPaymentRatioArr?.map((item) => {
@@ -786,28 +797,6 @@ function ReviewForm({
           <div className={scss.numIndex}>1</div>
           <div>
             <span>註明請款日</span>
-            {/* <InputSel
-              className={scss.date}
-              disabled={disabled}
-              inputProps={{
-                props: {
-                  value: watchData.askForPaymentDate ?? '',
-                  onChange: (e) => {
-                    const str = e.target.value;
-
-                    if (str === '') {
-                      setValue('askForPaymentDate', str);
-                    } else {
-                      let num = parseInt(str);
-                      num = Math.abs(num);
-                      setValue('askForPaymentDate', String(num));
-                    }
-                  },
-                  type: 'number',
-                },
-              }}
-            /> */}
-
             <InputBox
               className={scss.date}
               disabled={disabled}
@@ -827,29 +816,28 @@ function ReviewForm({
                 type: 'number',
               }}
             />
-
-            <span>，放款日</span>
-            {/* <InputSel
+            <span>，第二註明請款日</span>
+            <InputBox
               className={scss.date}
               disabled={disabled}
-              inputProps={{
-                props: {
-                  value: watchData.disbursementDate ?? '',
-                  onChange: (e) => {
-                    const str = e.target.value;
+              inputAttr={{
+                value: watchData.secondAskForPaymentDate ?? '',
+                onChange: (e) => {
+                  const str = e.target.value;
 
-                    if (str === '') {
-                      setValue('disbursementDate', str);
-                    } else {
-                      let num = parseInt(str);
-                      num = Math.abs(num);
-                      setValue('disbursementDate', String(num));
-                    }
-                  },
-                  type: 'number',
+                  if (str === '') {
+                    setValue('secondAskForPaymentDate', str);
+                  } else {
+                    let num = parseInt(str);
+                    num = Math.abs(num);
+                    setValue('secondAskForPaymentDate', String(num));
+                  }
                 },
+                type: 'number',
               }}
-            /> */}
+            />
+
+            <span>，放款日</span>
             <InputBox
               className={scss.date}
               disabled={disabled}
@@ -864,6 +852,26 @@ function ReviewForm({
                     let num = parseInt(str);
                     num = Math.abs(num);
                     setValue('disbursementDate', String(num));
+                  }
+                },
+                type: 'number',
+              }}
+            />
+            <span>，第二放款日</span>
+            <InputBox
+              className={scss.date}
+              disabled={disabled}
+              inputAttr={{
+                value: watchData.secondDisbursementDate ?? '',
+                onChange: (e) => {
+                  const str = e.target.value;
+
+                  if (str === '') {
+                    setValue('secondDisbursementDate', str);
+                  } else {
+                    let num = parseInt(str);
+                    num = Math.abs(num);
+                    setValue('secondDisbursementDate', String(num));
                   }
                 },
                 type: 'number',
