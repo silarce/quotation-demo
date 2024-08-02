@@ -132,16 +132,18 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
           query: { id: contractId, version: 1 },
         },
         isSignedBack: isSignedBack,
-        onSignedBackClick: () => {
-          myAlert.confirm({
-            // title: `確認簽回${contractNumber || content.projectName}?`,
-            title: !isSignedBack
-              ? `確認簽回${contractNumber || content.projectName}?`
-              : `確認取消簽回${contractNumber || content.projectName}?`,
-            props: {
-              onOk: async () => await reqSignedBack(contractId, !isSignedBack),
-            },
-          });
+        onSignedBackClick: async () => {
+          await reqSignedBack(contractId, !isSignedBack);
+
+          // myAlert.confirm({
+          //   // title: `確認簽回${contractNumber || content.projectName}?`,
+          //   title: !isSignedBack
+          //     ? `確認簽回${contractNumber || content.projectName}?`
+          //     : `確認取消簽回${contractNumber || content.projectName}?`,
+          //   props: {
+          //     onOk: async () => await reqSignedBack(contractId, !isSignedBack),
+          //   },
+          // });
         },
       };
     });
