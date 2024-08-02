@@ -831,7 +831,8 @@ export default function ProductList() {
     };
 
 
-
+    // const [filteredData, setFilteredData] = useState<DataItem[]>([]);
+    const [filteredData, setFilteredData] = useState<any[]>([]);
     const isSelectingRef = useRef(false);
     // 監聽條件變更
     useEffect(() => {
@@ -851,7 +852,7 @@ export default function ProductList() {
             );
         }
 
-
+        setFilteredData(filteredData);
     }, [keyword2, keyword3, keyword4]);
 
 
@@ -983,7 +984,7 @@ export default function ProductList() {
                                         inputProps={{
                                             props: {
                                                 value: keyword2 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
+                                                onChange: (e) => { setKeyword2(e.target.value) }
                                             },
                                         }}
                                     />
@@ -996,7 +997,7 @@ export default function ProductList() {
                                         inputProps={{
                                             props: {
                                                 value: keyword3 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { handleNameChange(e) }
+                                                onChange: (e) => { handleNameChange(e) }
                                             },
                                         }}
                                     />
@@ -1130,8 +1131,8 @@ export default function ProductList() {
                             <Thead01 type={'ProductList'} />
                         </div>
                         <div className={scss.body_content1}>
-                            {searchdata && (
-                                searchdata.map((_item: any, index: number) => (
+                            {filteredData && (
+                                filteredData.map((_item: any, index: number) => (
                                     <CellWithBar key={index} className={scss.panelHeader21}>
                                         <div
                                             key={index}
