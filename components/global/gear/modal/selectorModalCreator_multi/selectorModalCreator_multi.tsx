@@ -1199,7 +1199,7 @@ const props_contract: TselectorProps<TquotationContractDto> = {
   ],
   filter: (strArr) => {
     return {
-      contractNumber: { $eq: strArr[0] },
+      contractNumber: { $contains: strArr[0] },
       'content.projectName': { $contains: strArr[1] },
       'content.customer.name': { $contains: strArr[2] },
     };
