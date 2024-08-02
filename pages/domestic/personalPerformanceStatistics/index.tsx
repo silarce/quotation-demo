@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
+import ExcelJs, { TableProperties } from 'exceljs';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TpanelList, TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import Table, {
@@ -15,14 +16,22 @@ import Table, {
 
 // gaer
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // option
 import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
 
 // api
-import { useQuotationAccounting_personalContract, TquotationAccounting_personal_contract } from 'js/api/api_quotation';
+import {
+  TquotationAccounting_personal_contract,
+  //
+  useQuotationAccounting_personalContract,
+} from 'js/api/api_quotation';
 import { useEmployee, Tparams } from 'js/api/api_employee';
+import {
+  // TbonusDto,
+  //
+  useGetReportForm_bonus,
+} from 'js/api/api_reportForm';
 
 // css
 import scss from './index.module.scss';
@@ -53,6 +62,9 @@ const empParams: Tparams = {
 };
 
 // ==================================================================
+
+// MARK: START
+
 // 個人業績統計表
 export default function PersonalPerformanceStatistics() {
   const router = useRouter();
@@ -65,9 +77,6 @@ export default function PersonalPerformanceStatistics() {
   } = query;
 
   // ------------------------------------------------------------------
-  const [isLoading, setIsLoading] = useState(false);
-
-  // ------------------------------------------------------------------
 
   const params = {
     year: year ? Number(year) + 1911 : undefined,
@@ -75,32 +84,48 @@ export default function PersonalPerformanceStatistics() {
     employeeId: emp,
   };
 
-  const { data, update } = useQuotationAccounting_personalContract(params);
+  const { data, update, isFetching } = useQuotationAccounting_personalContract(params);
 
-  const toUpdateData = async () => {
-    try {
-      setIsLoading(true);
-      await update();
-    } catch (error) {
-      const err = error as Error;
-      myAlert.err({ title: '取得報表失敗', content: err.message });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    toUpdateData();
+  const params_bouus: Tparams = useMemo(() => {
+    return {
+      // populate: ['salesEmployee'],
+      filter: {
+        bonusYear: { $eq: Number(year) + 1911 },
+        bonusMonth: { $eq: month ? String(month) : undefined },
+        salesEmployeeId: { $eq: emp },
+      },
+    };
   }, [year, month, emp]);
+
+  const {
+    //
+    data: data_bonus,
+    update: update_bonus,
+    isFetching: isFetching_bonus,
+  } = useGetReportForm_bonus(params_bouus);
 
   // ------------------------------------------------------------------
 
   const { data: data_emp, update: update_emp } = useEmployee(empParams);
-  const haveData = data && data.length > 0;
 
-  useEffect(() => {
-    update_emp();
-  }, []);
+  // ------------------------------------------------------------------
+
+  // region FUNCTION
+
+  const handle_dlExcel = () => {
+    const theMonth = month ? month.padStart(2, '0') : '';
+
+    dlExcel({
+      data: control_table,
+      sheetName: activeEmp?.label ?? '',
+      excelName: `個人業績統計表_${activeEmp?.label}_${year}${theMonth}`,
+      year,
+      month,
+    });
+  };
+
+  // ------------------------------------------------------------------
+  // region PROPS
 
   const empOptionArr = useMemo(() => {
     if (!data_emp) {
@@ -119,11 +144,39 @@ export default function PersonalPerformanceStatistics() {
     return optionArr;
   }, [data_emp]);
 
-  // ------------------------------------------------------------------
-
+  //________________________________________________________________________
+  //________________________________________________________________________
+  const activeEmp = empOptionArr.find((option) => option.value === emp);
+  //________________________________________________________________________
+  //________________________________________________________________________
   const control_table = useControl_personalPerformanceStatistics(data);
+  //________________________________________________________________________
+  //________________________________________________________________________
+  const { bonus, sales } = useMemo(() => {
+    if (!data_bonus) {
+      return {
+        bonus: '---',
+        sales: '---',
+      };
+    }
 
-  // ------------------------------------------------------------------
+    let bonus_d = new Decimal(0);
+    let sales_d = new Decimal(0);
+
+    data_bonus.forEach((data) => {
+      const { totalBonus, totalSales } = data;
+
+      bonus_d = bonus_d.add(totalBonus || 0);
+      sales_d = sales_d.add(totalSales || 0);
+    });
+
+    return {
+      bonus: bonus_d.toNumber().toLocaleString(),
+      sales: sales_d.toNumber().toLocaleString(),
+    };
+  }, [data_bonus]);
+  //________________________________________________________________________
+  //________________________________________________________________________
   const selectPropsArr: TselectPropsArr = [
     {
       selectProps: {
@@ -180,7 +233,8 @@ export default function PersonalPerformanceStatistics() {
       boxStyle: { width: '140px' },
     },
   ];
-
+  //________________________________________________________________________
+  //________________________________________________________________________
   const tagList: TtagList = [
     {
       label: '個人業績統計表',
@@ -199,18 +253,49 @@ export default function PersonalPerformanceStatistics() {
       },
     },
   ];
+  //________________________________________________________________________
+  //________________________________________________________________________
+  const panelList: TpanelList = [
+    {
+      type: 'myButton',
+      label: '下載Excel',
+      onClick: handle_dlExcel,
+    },
+  ];
 
   // ------------------------------------------------------------------
 
-  // region render
+  // region useEffect
+
+  useEffect(() => {
+    update();
+  }, [year, month, emp]);
+
+  useEffect(() => {
+    update_emp();
+  }, []);
+
+  // ------------------------------------------------------------------
+
+  // region RENDER
 
   return (
-    <SubLayer isLoading_subLayer={isLoading} bodyClassName={scss.subLayerBody}>
-      <PageHeader02 tagList={tagList} />
+    <SubLayer
+      //
+      isLoading_subLayer={isFetching || isFetching_bonus}
+      bodyClassName={scss.subLayerBody}
+    >
+      <PageHeader02 tagList={tagList} panelList={panelList} />
 
       <div className={scss.body}>
         <div className={scss.selectBarWrapper}>
-          <SelectBar className={''} selectPropsArr={selectPropsArr} />
+          <SelectBar selectPropsArr={selectPropsArr} />
+          <div className={scss.bonusBar}>
+            <span>業績 : </span>
+            <span>{sales}</span>
+            <span>獎金 : </span>
+            <span>{bonus}</span>
+          </div>
         </div>
 
         <div className={scss.tableWrapper}>
@@ -221,9 +306,14 @@ export default function PersonalPerformanceStatistics() {
   );
 }
 
+// MARK: END
+
+// ===========================================================
+// ===========================================================
+// ===========================================================
 // ===========================================================
 
-// region hook
+// region HOOK
 
 const useControl_personalPerformanceStatistics = (data: TquotationAccounting_personal_contract[] | undefined) => {
   const control: Tcontrol_personalPerformanceStatistics = useMemo(() => {
@@ -382,4 +472,353 @@ const useControl_personalPerformanceStatistics = (data: TquotationAccounting_per
   }, [data]);
 
   return control;
+};
+
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+// =====================================================================
+
+// region dlExcel
+
+const dlExcel = async ({
+  data,
+  sheetName,
+  excelName,
+  year,
+  month,
+}: {
+  data: Tcontrol_personalPerformanceStatistics;
+  sheetName: string;
+  excelName: string;
+  year: string | number;
+  month: string | undefined;
+}) =>
+  //
+  {
+    const { listKeyArr, rowArr, subTotalList, total } = data;
+
+    const workbook = new ExcelJs.Workbook();
+    const sheet = workbook.addWorksheet(sheetName);
+
+    sheet.views = [{ state: 'frozen', xSplit: 2 }];
+
+    // ----------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------
+    // 先建好columns
+
+    const listColumnsProps = listKeyArr.reduce((current, key) => {
+      current.push(
+        {
+          header: key,
+          key,
+          width: 15,
+        },
+        {
+          width: 15,
+        },
+        {
+          width: 15,
+        }
+      );
+
+      return current;
+    }, [] as Partial<ExcelJs.Column>[]);
+
+    sheet.columns = [
+      { header: '編號', key: 'idNumber', width: 15 },
+      { header: '工程名稱', key: 'projectName', width: 32 },
+      { header: '營造', key: 'C', width: 15 }, // 目前還沒有相關資料
+      { header: '設計單位', key: 'D', width: 15 }, // 目前還沒有相關資料
+      ...listColumnsProps,
+    ];
+
+    // ----------------------------------------------------------------------
+    const titleRow = sheet.insertRow(1, ['三久建材股份有限公司']);
+    titleRow.font = {
+      bold: true,
+      size: 20,
+    };
+    sheet.mergeCells('A1:B1');
+
+    // const dateRow = sheet.insertRow(2, [`${year}年${month}月業績統計表`]);
+    const dateRow = sheet.insertRow(2, [`${year}年${month ? `${month}月` : ''}業績統計表`]);
+    dateRow.font = {
+      bold: true,
+      size: 20,
+    };
+    sheet.mergeCells('A2:B2');
+
+    // ----------------------------------------------------------------------
+
+    // 取得放資料的row
+
+    const row_start = 5;
+    const row_end = rowArr.length;
+    const rowArr_excel = sheet.getRows(row_start, row_end) ?? [];
+
+    // ----------------------------------------------------------------------
+
+    // 把編號與工程名稱放進去
+
+    rowArr.forEach((row, index_row) => {
+      const { quotationNumber, projectName } = row;
+
+      if (rowArr_excel[index_row]) {
+        rowArr_excel[index_row].values = [quotationNumber, projectName];
+      }
+    });
+
+    // ----------------------------------------------------------------------
+
+    // 建立table並把資料放進去
+
+    sheet.columns.forEach((col, index) => {
+      if (index <= 3) {
+        return;
+      }
+
+      if (col.key) {
+        sheet.mergeCells(3, index + 1, 3, index + 1 + 2);
+        sheet.getCell(`${col.letter}${3}`).alignment = { vertical: 'middle', horizontal: 'center' };
+      }
+    });
+
+    const listColumns = sheet.columns.slice(4).filter((col) => col.key);
+
+    listColumns.forEach((column) => {
+      const tableProps = createTable({
+        column,
+        rowArr,
+        subTotalList,
+      });
+
+      sheet.addTable(tableProps);
+    });
+
+    sheet.columns.forEach((col, index) => {
+      if (index < 4) {
+        return;
+      }
+
+      col.numFmt = '$#,##0.00';
+
+      if ((index - 3) % 3 === 0) {
+        col.numFmt = '0.00%';
+      }
+    });
+
+    const row_subTotal = sheet.lastRow;
+
+    if (row_subTotal) {
+      row_subTotal.getCell(4).value = '小計';
+      row_subTotal.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
+    }
+
+    // --------------------------------------------------------------------
+
+    const col_total = sheet.getColumn(sheet.columns.length + 1);
+    col_total.width = 20;
+    col_total.numFmt = '$#,##0.00';
+
+    col_total.values = rowArr.reduce(
+      (values, row) => {
+        values.push(Number(row.total.replaceAll(',', '')));
+
+        return values;
+      },
+      [undefined, undefined, undefined, '總價'] as (undefined | string | number)[]
+    );
+
+    // --------------------------------------------------------------------
+
+    // 處理小計與總計
+
+    sheet.addRow([]);
+    const row_totalLabel = sheet.addRow([]);
+
+    const row_total = sheet.addRow([]);
+
+    row_totalLabel.values = [
+      //
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      '牌價',
+      '承價',
+      '百分比',
+    ];
+
+    row_total.values = [
+      //
+      undefined,
+      undefined,
+      undefined,
+      '總計',
+      Number(total.totalsum.replaceAll(',', '')),
+      Number(total.pricesum.replaceAll(',', '')),
+      new Decimal(total.percentage.replace('%', '')).div(100).toNumber(),
+    ];
+
+    row_total.getCell(4).alignment = { vertical: 'middle', horizontal: 'right' };
+
+    // ----------------------------------------------------------------------
+
+    // const titleRow = sheet.insertRow(1, ['三  久  建  材  股  份  有  限  公  司']);
+    // titleRow.font = {
+    //   bold: true,
+    //   size: 20,
+    // };
+    // // titleRow.getCell(1)
+    // sheet.mergeCells('A1:D1');
+
+    // ----------------------------------------------------------------------
+
+    // 調整樣式
+
+    row_subTotal?.eachCell({ includeEmpty: true }, (cell) => {
+      cell.border = {
+        top: {
+          style: 'double',
+          color: { argb: 'FF000000' },
+        },
+      };
+    });
+
+    rowArr_excel.forEach((row, index_row) => {
+      const isOdd = index_row % 2 === 0;
+
+      row.eachCell({ includeEmpty: true }, (cell) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: isOdd ? 'ffeeeeee' : 'ffdddddd' },
+        };
+      });
+      row.commit();
+    });
+
+    sheet.getRow(4).eachCell((cell) => {
+      cell.alignment = {
+        vertical: 'middle',
+        horizontal: 'right',
+      };
+    });
+
+    row_totalLabel.eachCell((cell) => {
+      cell.alignment = {
+        vertical: 'middle',
+        horizontal: 'right',
+      };
+    });
+
+    // --------------------------------------------------------------------
+    await workbook.xlsx.writeBuffer();
+
+    workbook.xlsx.writeBuffer().then((content) => {
+      const link = document.createElement('a');
+      const blobData = new Blob([content], {
+        type: 'application/vnd.ms-excel;charset=utf-8;',
+      });
+
+      link.download = `${excelName}.xlsx`;
+      link.href = URL.createObjectURL(blobData);
+      link.click();
+      link.remove();
+    });
+  };
+
+// =====================================================================
+
+// region createTable
+
+const createTable = ({
+  //
+  column,
+  rowArr,
+  subTotalList,
+}: {
+  column: Partial<ExcelJs.Column>;
+  rowArr: Tcontrol_personalPerformanceStatistics['rowArr'];
+  subTotalList: Tcontrol_personalPerformanceStatistics['subTotalList'];
+}) => {
+  const subTotal: Tcontrol_personalPerformanceStatistics['subTotalList'][string] | undefined =
+    subTotalList[column.key ?? 'undefined'];
+
+  const rows: TableProperties['rows'] = rowArr.map((row) => {
+    const { list } = row;
+
+    if (!column.key || !list[column.key]) {
+      return [];
+    }
+
+    let totalsum: string | number = list[column.key]?.totalsum || 'n/a';
+    let pricesum: string | number = list[column.key]?.pricesum || 'n/a';
+    let percentage: string | number = list[column.key]?.percentage || 'n/a';
+
+    if (totalsum !== 'n/a') {
+      totalsum = Number(totalsum.replaceAll(',', ''));
+    }
+
+    if (pricesum !== 'n/a') {
+      pricesum = Number(pricesum.replaceAll(',', ''));
+    }
+
+    if (percentage !== 'n/a') {
+      // percentage = Number(percentage.replace('%', ''));
+      percentage = percentage.replace('%', '');
+      percentage = new Decimal(percentage).div(100).toNumber();
+    }
+
+    return [totalsum, pricesum, percentage];
+  });
+
+  const lastRow = (() => {
+    let totalsum: string | number = subTotal.totalsum || 'n/a';
+    let pricesum: string | number = subTotal.pricesum || 'n/a';
+    let percentage: string | number = subTotal.percentage || 'n/a';
+
+    if (totalsum !== 'n/a') {
+      totalsum = Number(totalsum.replaceAll(',', ''));
+    }
+
+    if (pricesum !== 'n/a') {
+      pricesum = Number(pricesum.replaceAll(',', ''));
+    }
+
+    if (percentage !== 'n/a') {
+      // percentage = Number(percentage.replace('%', ''));
+      percentage = percentage.replace('%', '');
+      percentage = new Decimal(percentage).div(100).toNumber();
+    }
+
+    return [totalsum, pricesum, percentage];
+  })();
+
+  const tableProps: TableProperties = {
+    name: column.key ?? 'undefined',
+    ref: `${column.letter}${4}`,
+    headerRow: true,
+    // totalsRow: true,
+    style: {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      theme: null,
+      showRowStripes: true,
+    },
+    columns: [
+      {
+        name: '牌價',
+        totalsRowFunction: 'sum',
+      },
+      { name: '承價', totalsRowFunction: 'sum' },
+      { name: '百分比', totalsRowFunction: 'average' },
+    ],
+    rows: [...rows, lastRow],
+  };
+
+  return tableProps;
 };

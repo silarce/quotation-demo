@@ -1902,7 +1902,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       projectProgress: latestContent?.projectProgress ?? '',
       isLost: latestContent?.isLost ?? false,
     });
-  }, [quotationData, quotationContentData]);
+  }, [quotationData, quotationContentData, disabled]);
 
   useEffect(() => {
     if (targetProd) {
