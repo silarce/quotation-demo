@@ -1788,23 +1788,30 @@ export type TquotationContentDto = {
   supervisorEmployee: TemployeeDto | null;
   agentEmployee?: TemployeeDto;
 
-  //審核相關
+  // 審核相關
+  // 業務 選擇
   reviewSalesEmployee: TemployeeDto | null;
   salesReviewedAt: string | null;
   toSalesAt: string | null; // date
-
+  // 業務主管 選擇
   reviewSupervisorEmployee: TemployeeDto | null;
   supervisorReviewedAt: string | null;
   toSupervisorAt: string | null; // date
 
+  // 業務經理 固定
+  toSalesManagerAt?: string | null;
+  reviewSalesManagerEmployee?: TemployeeDto | null;
+  salesManagerReviewedAt?: string | null;
+
+  // 應收帳款 固定 慧銀
   reviewWorkDirectorEmployee: TemployeeDto | null;
   workDirectorReviewedAt: string | null;
   toWorkDirectorAt: string | null; // date
-
+  // 應收帳款 固定 雅芬
   reviewCashierEmployee: TemployeeDto | null;
   toCashierAt: string | null;
   cashierReviewedAt: string | null;
-
+  // 總經理 固定
   reviewManagerEmployee: TemployeeDto | null;
   managerReviewedAt: string | null;
   toManagerAt: string | null; // date
@@ -2756,6 +2763,9 @@ export type TquotationVerifyFormDto = {
   testDriveNote: string | null;
   // 扣款項目、比例、金額
   debitItem: string;
+  //
+  secondAskForPaymentDate: string; // 第二註明請款日 單純的字串
+  secondDisbursementDate: string; // 第二放款日 單純的字串
 };
 
 export type TcreateQuotationVerifyFormDto = Pick<
@@ -2763,6 +2773,8 @@ export type TcreateQuotationVerifyFormDto = Pick<
   | 'askForPaymentDate'
   | 'disbursementDate'
   | 'paymentDateNote'
+  | 'secondAskForPaymentDate'
+  | 'secondDisbursementDate'
   //
   | 'paymentRatio'
   | 'paymentTenor'
@@ -2800,6 +2812,7 @@ export type TcreateQuotationVerifyFormDto = Pick<
 export type TreviewQuotationContentDto = {
   reviewSalesEmployeeId?: string | null;
   reviewSupervisorEmployeeId?: string | null;
+  reviewSalesManagerEmployeeId?: string | null;
   reviewWorkDirectorEmployeeId?: string | null;
   reviewCashierEmployeeId?: string | null;
   reviewManagerEmployeeId?: string | null;

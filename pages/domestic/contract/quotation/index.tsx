@@ -619,32 +619,37 @@ function TheQuotation({ router }: { router: NextRouter }) {
       {
         label: '總經理',
         value: contract?.content?.reviewManagerEmployee?.chName ?? '',
-        style: { width: '200px' },
+        style: { width: '170px' },
       },
       {
         label: '應收帳款',
         value: contract?.content?.reviewCashierEmployee?.chName ?? '',
-        style: { width: '200px' },
+        style: { width: '170px' },
       },
       {
         label: '應收帳款',
         value: contract?.content?.reviewWorkDirectorEmployee?.chName ?? '',
-        style: { width: '200px' },
+        style: { width: '170px' },
+      },
+      {
+        label: '業務經理',
+        value: contract?.content?.reviewSalesManagerEmployee?.chName ?? '',
+        style: { width: '170px' },
       },
       {
         label: '業務主管',
         value: contract?.content?.reviewSupervisorEmployee?.chName ?? '',
-        style: { width: '200px' },
+        style: { width: '170px' },
       },
       {
         label: '業務',
         value: contract?.content?.reviewSalesEmployee?.chName ?? '',
-        style: { width: '200px' },
+        style: { width: '170px' },
       },
       {
         label: '經辦',
         value: contract?.content?.agentEmployee?.chName ?? '',
-        style: { width: '200px' },
+        style: { width: '170px' },
       },
     ];
 

@@ -87,6 +87,7 @@ import { AppContext } from 'pages/_app';
 
 // utils
 import { urlToFile } from 'js/utils/helpers/urlToFile';
+import { init_variable } from 'components/page/domestic/quotation/function/utils_quotation';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -210,41 +211,38 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   // region  判斷用的參數
 
-  let reviewSalesEmployeeId: string | undefined = undefined;
-  let reviewWorkDirectorEmployeeId: string | undefined = undefined;
-  let reviewCashierEmployeeId: string | undefined = undefined;
-  let reviewSupervisorEmployeeId: string | undefined = undefined;
-  let reviewManagerEmployeeId: string | undefined = undefined;
-
-  let isReviewer = false;
-  let isSales = false;
-  let isWorkDirector = false;
-  let isCashier = false;
-  let isSupervisor = false;
-  let isManager = false;
-
-  let salesReviewedAt: string | null | undefined = undefined;
-  let supervisorReviewedAt: string | null | undefined = undefined;
-  let workDirectorReviewedAt: string | null | undefined = undefined;
-  let cashierReviewedAt: string | null | undefined = undefined;
-  let managerReviewedAt: string | null | undefined = undefined;
-
-  let toSalesAt: string | null | undefined = undefined;
-  let toSupervisorAt: string | null | undefined = undefined;
-  let toWorkDirectorAt: string | null | undefined = undefined;
-  let toCashierAt: string | null | undefined = undefined;
-  let toManagerAt: string | null | undefined = undefined;
-
-  let isSendToReview = false;
-  let isSendToReview_pending = false;
-
-  //
-  let isAttach = undefined;
-  //
-  let isAllReviewedBeforePending = false;
-  //
-  let version: number | undefined = undefined;
-  let editNotes: string | undefined = undefined;
+  let {
+    reviewSalesEmployeeId,
+    reviewWorkDirectorEmployeeId,
+    reviewCashierEmployeeId,
+    reviewSupervisorEmployeeId,
+    reviewSalesManagerEmployeeId,
+    reviewManagerEmployeeId,
+    isReviewer,
+    isSales,
+    isWorkDirector,
+    isCashier,
+    isSupervisor,
+    isSalesManagerEmployee,
+    isManager,
+    salesReviewedAt,
+    supervisorReviewedAt,
+    salesManagerReviewedAt,
+    workDirectorReviewedAt,
+    cashierReviewedAt,
+    managerReviewedAt,
+    toSalesAt,
+    toSupervisorAt,
+    toWorkDirectorAt,
+    toCashierAt,
+    toManagerAt,
+    isSendToReview,
+    isSendToReview_pending,
+    isAttach,
+    isAllReviewedBeforePending,
+    version,
+    editNotes,
+  } = init_variable();
 
   // -----------------------------------------------------
 
@@ -334,10 +332,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
   reviewWorkDirectorEmployeeId = latestContent?.reviewWorkDirectorEmployee?.id;
   reviewCashierEmployeeId = latestContent?.reviewCashierEmployee?.id;
   reviewSupervisorEmployeeId = latestContent?.reviewSupervisorEmployee?.id;
+  reviewSalesManagerEmployeeId = latestContent?.reviewSalesManagerEmployee?.id;
   reviewManagerEmployeeId = latestContent?.reviewManagerEmployee?.id;
 
   salesReviewedAt = latestContent?.salesReviewedAt;
   supervisorReviewedAt = latestContent?.supervisorReviewedAt;
+  salesManagerReviewedAt = latestContent?.salesManagerReviewedAt;
   workDirectorReviewedAt = latestContent?.workDirectorReviewedAt;
   cashierReviewedAt = latestContent?.cashierReviewedAt;
   managerReviewedAt = latestContent?.managerReviewedAt;
@@ -363,7 +363,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
   }
 
   if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-    if (salesReviewedAt && supervisorReviewedAt && managerReviewedAt) {
+    if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && managerReviewedAt) {
       isAllReviewedBeforePending = true;
     }
   }
@@ -377,13 +377,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isSupervisor = true;
         isReviewer = true;
       }
-    } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
+    } else if (userId === reviewSalesManagerEmployeeId && toSupervisorAt) {
       if (salesReviewedAt && supervisorReviewedAt) {
+        isSalesManagerEmployee = true;
+        isReviewer = true;
+      }
+    } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
+      if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) {
         isWorkDirector = true;
         isReviewer = true;
       }
     } else if (userId === reviewCashierEmployeeId && toCashierAt) {
-      if (salesReviewedAt && supervisorReviewedAt && toWorkDirectorAt) {
+      if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && toWorkDirectorAt) {
         isCashier = true;
         isReviewer = true;
       }
@@ -395,7 +400,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
       if (status !== 'Pending' && salesReviewedAt && supervisorReviewedAt) {
         isManager = true;
         isReviewer = true;
-      } else if (salesReviewedAt && workDirectorReviewedAt && cashierReviewedAt && supervisorReviewedAt) {
+      } else if (
+        salesReviewedAt &&
+        workDirectorReviewedAt &&
+        cashierReviewedAt &&
+        supervisorReviewedAt &&
+        salesManagerReviewedAt
+      ) {
         isManager = true;
         isReviewer = true;
       }
@@ -718,6 +729,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     const body = {
       reviewSalesEmployeeId: isSales ? userId : null,
       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
+      reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
       reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
       reviewCashierEmployeeId: isCashier ? userId : null,
       reviewManagerEmployeeId: isManager ? userId : null,
@@ -735,7 +747,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
         !reviewSalesEmployeeId ||
         !reviewWorkDirectorEmployeeId ||
         !reviewCashierEmployeeId ||
-        !reviewSupervisorEmployeeId
+        !reviewSupervisorEmployeeId ||
+        !reviewSalesManagerEmployeeId
       ) {
         return myAlert.warning({ title: '請先設定所有審核人員' });
       }
@@ -744,6 +757,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
     if (isSales && salesReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
     } else if (isSupervisor && supervisorReviewedAt && body.reviewResult) {
+      return myAlert.warning({ title: '您已經審核過此報價單' });
+    } else if (isSalesManagerEmployee && salesManagerReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
     } else if (isWorkDirector && workDirectorReviewedAt && body.reviewResult) {
       return myAlert.warning({ title: '您已經審核過此報價單' });
@@ -1470,32 +1485,43 @@ function TheQuotation({ router }: { router: NextRouter }) {
       {
         label: '總經理',
         value: quotationData?.latestContent.reviewManagerEmployee?.chName,
-        style: { width: '200px' },
+        style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.managerReviewedAt,
       },
       {
         label: '應收帳款',
         value: quotationData?.latestContent.reviewCashierEmployee?.chName,
-        style: { width: '200px' },
+        style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.cashierReviewedAt,
       },
       {
         label: '應收帳款',
         value: quotationData?.latestContent.reviewWorkDirectorEmployee?.chName,
-        style: { width: '200px' },
+        style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.workDirectorReviewedAt,
+      },
+      {
+        label: '業務經理',
+        value: quotationData?.latestContent.reviewSalesManagerEmployee?.chName,
+        style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.salesManagerReviewedAt,
       },
       {
         label: '業務主管',
         value: quotationData?.latestContent.reviewSupervisorEmployee?.chName,
-        style: { width: '200px' },
+        style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.supervisorReviewedAt,
       },
       {
         label: '業務',
         value: quotationData?.latestContent.reviewSalesEmployee?.chName,
-        style: { width: '200px' },
+        style: { width: '180px' },
+        isReviewed: !!quotationData?.latestContent.salesReviewedAt,
       },
       {
         label: '經辦',
         value: agentEmployee?.chName,
-        style: { width: '200px' },
+        style: { width: '180px' },
       },
     ];
 
