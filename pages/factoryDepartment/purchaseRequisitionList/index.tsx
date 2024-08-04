@@ -253,6 +253,13 @@ export default function PurchaseRequisitionList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
+
+            if (data.length === 0) {
+                myAlert.warning({
+                    title: '尚無單據'
+                })
+            }
+
             setData(data);
             setData1Restore(data);
             setSearchdata(data);
@@ -278,9 +285,15 @@ export default function PurchaseRequisitionList() {
         }
     };
 
+    const hasFetchedData = useRef(false);
+
     useEffect(() => {
-        getPurchaseRequisition();
+        if (!hasFetchedData.current) {
+            getPurchaseRequisition();
+            hasFetchedData.current = true;
+        }
     }, []);
+
 
     //取對應的請購明細
     const getPurchaseRequisitionDetail = async (purchaserequisitionuuid: any) => {

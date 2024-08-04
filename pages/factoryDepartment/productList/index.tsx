@@ -279,6 +279,7 @@ export default function ProductList() {
             setData(data);
             setDatarestore(data);
             setSearchdata(data);
+            setFilteredData(data);
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
@@ -806,7 +807,7 @@ export default function ProductList() {
         //     return isDateInRange;
         // });
 
-        let filteredData =  searchdata;
+        let filteredData = searchdata;
         // 模糊查詢請購單號
         if (requisitionId) {
             filteredData = searchdata.filter(item =>
@@ -861,7 +862,7 @@ export default function ProductList() {
         // setFilteredData(data);
         isSelectingRef.current = false;
         setKeyword3(e.target.value);
-        
+
     };
 
 
@@ -895,10 +896,30 @@ export default function ProductList() {
     }
 
 
+
+    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+    useEffect(() => {
+        // 定義事件處理器
+        const handleResize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+
+        // 在元件掛載時設置事件監聽器
+        window.addEventListener('resize', handleResize);
+
+        // 在元件卸載時移除事件監聽器
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []); // 空依賴陣列確保只在掛載和卸載時運行
+
+
+
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={'物料維護'} panelList={panelList} />
-            <div className={scss.container}>
+            <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
                     <div className={scss.content}>
                         <div style={{
@@ -926,37 +947,31 @@ export default function ProductList() {
 
                             <div className={scss.head_head1}>
                                 <div>
-                                    {/* <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
+                                    <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
                                         <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
-                                    </button> */}
-                                    {/* &nbsp; */}
+                                    </button>
+                                    &nbsp;
                                     <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
                                         <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                     </button>
                                     {/* <InputSel
-                                        caption="起始日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: keywordstartdate || null,
-                                                onChange: (e: Moment | null) => { setKeywordstartdate(e) }
-                                            }
-                                        }}
-                                    /> */}
-                                    {/* <InputSel
                                         {...inputSelProps}
-                                        caption="物料編號"
+                                        caption="物料查找 "
+                                        captionStyle={{ paddingTop: '10px' }}
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword2 || ' ',
-                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
+                                                placeholder: '料號、名稱、規格',
+                                                value: keyword3 || ' ',
+                                                onChange: (e) => { handleNameChange(e) }
                                             },
                                         }}
                                     /> */}
+
+
                                 </div>
                                 <div>
+
                                     {/* <InputSel
                                         caption="截止日期"
                                         disabled={false}
@@ -971,6 +986,8 @@ export default function ProductList() {
 
                                 </div>
                                 <div>
+                                    {/* <p>視窗寬度: {windowSize.width}px</p>
+                                <p>視窗高度: {windowSize.height}px</p> */}
 
                                 </div>
                                 <div></div>
@@ -978,33 +995,33 @@ export default function ProductList() {
                             </div>
                             <div className={scss.head_content1}>
                                 <div>
-                                    <InputSel
+                                    {/* <InputSel
                                         {...inputSelProps}
                                         caption="物料編號"
                                         disabled={false}
                                         inputProps={{
                                             props: {
                                                 value: keyword2 || ' ',
-                                                onChange: (e) => { setKeyword2(e.target.value) }
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
                                             },
                                         }}
-                                    />
+                                    /> */}
                                 </div>
                                 <div>
-                                    <InputSel
+                                    {/* <InputSel
                                         {...inputSelProps}
                                         caption="物料名稱"
                                         disabled={false}
                                         inputProps={{
                                             props: {
                                                 value: keyword3 || ' ',
-                                                onChange: (e) => { handleNameChange(e) }
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
-                                    />
+                                    /> */}
                                 </div>
                                 <div>
-                                    <InputSel
+                                    {/* <InputSel
                                         {...inputSelProps}
                                         caption="物料規格"
                                         disabled={false}
@@ -1014,7 +1031,7 @@ export default function ProductList() {
                                                 onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword4(e.target.value) }
                                             },
                                         }}
-                                    />
+                                    /> */}
                                 </div>
                                 <div></div>
                             </div>
@@ -1114,9 +1131,12 @@ export default function ProductList() {
                             <div className={scss.head_foot2}>
                                 <div></div>
                                 <div></div>
-                                <div></div>
                                 <div>
-                                    <InputSel
+                                    <p style={{ fontSize: '16px' }}>符合總數: {filteredData.length}</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: '16px' }}>物料總數: {searchdata.length}</p>
+                                    {/* <InputSel
                                         {...inputSelProps}
                                         caption="物料數量"
                                         className='align-bottom'
@@ -1126,198 +1146,134 @@ export default function ProductList() {
                                                 value: `${searchdata.length}`
                                             },
                                         }}
-                                    />
+                                    /> */}
                                 </div>
                             </div>
                             <Thead01 type={'ProductList'} />
                         </div>
-                        <div className={scss.body_content1}>
-                            {filteredData && (
-                                filteredData.slice(0, 100).map((_item: any, index: number) => (
-                                    <CellWithBar key={index} className={scss.panelHeader21}>
-                                        <div
-                                            key={index}
-                                            className={`${scss.row01} ${_item.productid === selectedItemId ? scss.selectedRow : ''}`}
-                                        >
-                                            <span>{index + 1}</span>
-                                            <span>{_item.productid}</span>
-                                            <span>{_item.name}</span>
-                                            <span>{_item.spec}</span>
-                                            <span>{_item.count}</span>
-                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                            <span>{getTaiwanDateStr(_item.update_at)}</span>
-                                            <span>
-                                                <button onClick={() => { editProduct(_item) }}>
-                                                    <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                                </button>
-                                            </span>
-                                        </div>
-                                    </CellWithBar>
-                                ))
-                            )}
+                        <div className={scss.body_content1} style={{ height: '300px', border: '1px solid #c1c1c1' }}>
+                            <span>
+                                {filteredData && (
+                                    filteredData.slice(0, 100).map((_item: any, index: number) => (
+                                        <CellWithBar key={index} className={scss.panelHeader21}>
+                                            <div
+                                                key={index}
+                                                className={`${scss.row01} ${_item.productid === selectedItemId ? scss.selectedRow : ''}`}
+                                                onClick={() => { editProduct(_item) }}
+                                            >
+                                                <span>{index + 1}</span>
+                                                <span>{_item.productid}</span>
+                                                <span>{_item.name}</span>
+                                                <span>{_item.spec}</span>
+                                                <span>{_item.count}</span>
+                                                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                                <span>{getTaiwanDateStr(_item.update_at)}</span>
+                                                <span>
+                                                    {/* <button onClick={() => { editProduct(_item) }}>
+                                                        <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
+                                                    </button> */}
+                                                </span>
+                                            </div>
+                                        </CellWithBar>
+                                    ))
+                                )}
+                            </span>
                         </div>
                         <br />
                         <div className={scss.body_foot1}>
                             <div></div>
                             <div></div>
-                            <div>
-                                <table className={scss.count_table}>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </table>
-                            </div>
+                            <div></div>
                         </div>
                         <div className={scss.foot_head1}>
                             <div>
-                                {/* <span className={scss.mytitle} style={{ display: (checkfirstin === 0 ? inspectedin : inspected) === "true" ? "none" : "" }}>
-                                <MyButton_v2 px='px22' py='py4' theme={undefined} label="驗收入庫" onClick={handleReceipt} />&nbsp;&nbsp;
-                                <MyButton_v2 px='px22' py='py4' theme='danger' label="退貨單" onClick={handleReceipt} />
-                            </span> */}
-                                <span style={{ display: `${(data2.length > 0 && addprodentrybtn) ? '' : 'none'}` }}>
-                                    <button className={scss.redbtn} onClick={() => { handleTransfer() }}>新增入庫</button>
+                                <span >
+                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
+                                        編輯
+                                    </button>
                                 </span>
-                                <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) || data2.length > 0 ? 'none' : ''}` }}>
-                                    <button className={scss.disabledbtn}>新增入庫</button>
-                                </span>
-                                <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) ? '' : 'none'}` }}>
-                                    <button className={scss.disabledbtn}>轉入庫中</button>
-                                </span>
-                                {/* <span style={{ display: `${(completeentry >= parseInt(totalentry, 10) === true) && entrystatusin === "已入庫" ? '' : 'none'}` }}>
-                                    <button className={scss.disabledbtn}>入庫完畢</button>
-                                </span> */}
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
+                                    儲存
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
+                                    取消
+                                </button>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="物料編號"
+                                    disabled={true}
+                                    inputProps={{
+                                        props: {
+                                            value: suppliernamein ? suppliernamein : ' ',
+                                            onChange: (e) => { setSuppliernamein(e.target.value) }
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="物料名稱"
+                                    disabled={!editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: suppliernamein ? suppliernamein : ' ',
+                                            onChange: (e) => { setSuppliernamein(e.target.value) }
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="物料規格"
+                                    disabled={!editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: suppliernamein ? suppliernamein : ' ',
+                                            onChange: (e) => { setSuppliernamein(e.target.value) }
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="庫存數量"
+                                    disabled={!editmain}
+                                    inputProps={{
+                                        props: {
+                                            value: suppliernamein ? suppliernamein : ' ',
+                                            onChange: (e) => { setSuppliernamein(e.target.value) }
+                                        },
+                                    }}
+                                />
                             </div>
-                            <div></div>
                             <div>
+
                             </div>
-                            <div style={{ textAlign: 'right' }}>
-
-                                <span style={{ display: `${(data2.length > 0 ? '' : 'none')}` }}>
-                                    <button className={scss.redbtn} onClick={() => { alert("comming soon") }}>新增付款</button>
-                                </span>
-                                <span style={{ display: `${(data2.length > 0 ? 'none' : '')}` }}>
-                                    <button className={scss.disabledbtn}>新增付款</button>
-                                </span>
-
+                            <div>
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
+                                <InputSel
+                                    {...inputSelProps}
+                                    caption="排版用"
+                                    disabled={true}
+                                    className='invisible'
+                                    inputProps={{
+                                        props: {
+                                            value: ' ',
+                                        },
+                                    }}
+                                />
                             </div>
                         </div>
 
                         <div className={scss.foot_content1}>
-
-                            <Thead01 type={'ProdReceiptDetail2'} />
-                            {data2.map((_item, index) => (
-                                <CellWithBar key={index} className={scss.panelHeader13}>
-                                    <div className={scss.row01}>
-                                        <span>{index + 1}</span>
-                                        <span>{_item.productid}</span>
-                                        <span>{_item.name}</span>
-                                        <span style={{ color: 'red' }}>
-                                            {_item.alreadyinquantity}
-                                        </span>
-                                        <span>
-                                            <input
-                                                ref={quantityRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
-                                                type="text"
-                                                value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    let newQuantity = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                    // 如果新數量超過最大數量，設置為最大數量
-                                                    if (newQuantity > _item.maxquantity) {
-                                                        newQuantity = _item.maxquantity;
-                                                    }
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        quantity: newQuantity,
-                                                        totalprice: newQuantity * newData[index].unitprice
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>{_item.unit}</span>
-                                        <span>
-                                            <input
-                                                ref={unitpriceRefs.current[index]}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
-                                                type="text"
-                                                value={_item.unitprice.toLocaleString()}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                // readOnly
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newUnitPrice = parseFloat(e.target.value.replace(/,/g, '')) || 0;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        unitprice: newUnitPrice,
-                                                        totalprice: newUnitPrice * newData[index].quantity
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-                                        <span>
-                                            {_item.totalprice.toLocaleString()}
-                                        </span>
-                                        <span>
-                                            <input
-                                                ref={noteRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '80px' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '250px' }}
-                                                type="text"
-                                                value={_item.note}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                onChange={(e) => {
-                                                    const newData = [...data2];
-                                                    const newNote = e.target.value;
-                                                    newData[index] = {
-                                                        ...newData[index],
-                                                        note: newNote
-                                                    };
-                                                    setData2(newData);
-                                                }}
-                                            />
-                                        </span>
-
-                                        <span>
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
-                                                <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
-                                            <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
-                                        </button> */}
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
-                                        </span>
-                                    </div>
-                                </CellWithBar>
-                            ))}
                         </div>
                     </div>
                 </div>
@@ -1325,8 +1281,8 @@ export default function ProductList() {
                     visible={searchmodalopen}
                     footer={null}
                     onCancel={SearchModalClose}
-                    width='80%'
-                    maskClosable={false}
+                    width='50%'
+                    // maskClosable={false}
                     maskStyle={{ backgroundColor: 'transparent' }}
                     // title={
                     //     <div className={scss.modal_head_head1}>
@@ -1336,7 +1292,7 @@ export default function ProductList() {
                     //     </div>
                     // }
                     // style={{ top: 235,left:-200}}
-                    style={{ top: 235, left: 50 }}
+                    style={{ top: 235, left: -230 }}
                 >
 
                     {/* <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}> */}
@@ -1423,9 +1379,9 @@ export default function ProductList() {
                                 />
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
-                                <span>
+                                {/* <span>
                                     <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
-                                </span>
+                                </span> */}
                                 {/* <span>
                                         <button className={scss.minibtn} type="submit">查找</button>
                                     </span> */}
