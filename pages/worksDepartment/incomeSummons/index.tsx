@@ -8,6 +8,9 @@ import Decimal from 'decimal.js';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
+// component
+import EditDefunctionBtn from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDeductionEditor';
+
 // gear
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -30,6 +33,7 @@ import {
 
 // untils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { error } from 'console';
 
 // ==============================================================================
 
@@ -255,7 +259,14 @@ export default function IncomeSummons() {
             </Row>
 
             {data_incomeBill.map((data, index) => {
-              return <Summons key={data.id} incomeBillSerial={data} reqPatch={reqPatch} />;
+              return (
+                <Summons
+                  key={data.id}
+                  incomeBillSerial={data}
+                  reqPatch={reqPatch}
+                  update_incomeBill={update_incomeBill}
+                />
+              );
             })}
           </div>
         </div>
@@ -298,12 +309,16 @@ const Summons_pre = (
     //
     incomeBillSerial,
     reqPatch,
+    update_incomeBill,
   }: {
     incomeBillSerial: TincomeBillSerialDto;
     reqPatch: TreqPatch;
+    update_incomeBill: () => void;
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
+  const accountantId = incomeBillSerial.accountant.id;
+
   const defaultState = useMemo(() => {
     const {
       billSerialNumber,
@@ -396,6 +411,8 @@ const Summons_pre = (
           isPaperImported,
           state_incomeBillSerial,
           setState_incomeBillSerial,
+          accountantId,
+          update_incomeBill,
         });
 
         return (
@@ -529,6 +546,9 @@ type TconfigItem = {
     isPaperImported: boolean;
     state_incomeBillSerial: Tstate_incomeBillSerial;
     setState_incomeBillSerial: React.Dispatch<React.SetStateAction<Tstate_incomeBillSerial>>;
+    //
+    accountantId?: string;
+    update_incomeBill?: () => void;
   }) => TinputSelProps;
 };
 
@@ -914,13 +934,15 @@ const config: Tconfig = {
   },
   deductionPayment: {
     label: '扣款金額',
-    style: { width: 100 },
+    style: { width: 150 },
     className: 'text-right',
     createInputSelProps: ({
       disabled,
       isPaperImported,
       state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
+      setState_incomeBillSerial,
+      accountantId,
+      update_incomeBill,
     }) => {
       const { type, value } = reducer_input({
         disabled: disabled || !isPaperImported,
@@ -937,7 +959,7 @@ const config: Tconfig = {
         });
       };
 
-      const inputSelProps = {
+      const inputSelProps: TinputSelProps = {
         inputProps: {
           props: {
             className: 'text-right',
@@ -946,6 +968,7 @@ const config: Tconfig = {
             onChange: onChange,
           },
         },
+        suffix: accountantId && <EditDefunctionBtn accountantId={accountantId} onConfirm={update_incomeBill} />,
       };
 
       return inputSelProps;
