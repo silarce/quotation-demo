@@ -82,7 +82,9 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
           $and: {
             // 'latestContent.toSalesAt': { $null: true },
             'latestContent.toSupervisorAt': { $null: true },
+            'latestContent.toSalesManagerAt': { $null: true },
             'latestContent.toWorkDirectorAt': { $null: true },
+            'latestContent.cashierReviewedAt': { $null: true },
             'latestContent.toManagerAt': { $null: true },
           },
         };
@@ -95,7 +97,9 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
         $and: {
           'latestContent.toSalesAt': { $null: true },
           'latestContent.toSupervisorAt': { $null: true },
+          'latestContent.toSalesManagerAt': { $null: true },
           'latestContent.toWorkDirectorAt': { $null: true },
+          'latestContent.cashierReviewedAt': { $null: true },
           'latestContent.toManagerAt': { $null: true },
         },
       };
@@ -114,23 +118,26 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
                 'latestContent.agentEmployee.id': { $eq: userId },
                 'latestContent.reviewSalesEmployee.id': { $eq: userId },
                 'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+                'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
                 'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
                 'latestContent.reviewManagerEmployee.id': { $eq: userId },
               },
             },
-            // 2 報價單已送審審核業務或業務主管
+            // 2 報價單已送審審核業務或業務主管或業務經理
             '2': {
               $or: {
                 'latestContent.toSalesAt': { $notNull: true },
                 'latestContent.toSupervisorAt': { $notNull: true },
+                'latestContent.toSalesManagerAt': { $notNull: true },
                 'latestContent.toManagerAt': { $notNull: true },
               },
             },
-            // 3 報價單沒有同時被被審核業務與業務主管審核過
+            // 3 報價單沒有同時被 審核業務 業務主管 業務經理 審核過
             '3': {
               $or: {
                 'latestContent.salesReviewedAt': { $null: true },
                 'latestContent.supervisorReviewedAt': { $null: true },
+                'latestContent.salesManagerReviewedAt': { $null: true },
                 'latestContent.managerReviewedAt': { $null: true },
               },
             },
@@ -147,6 +154,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
               'latestContent.agentEmployee.id': { $eq: userId },
               'latestContent.reviewSalesEmployee.id': { $eq: userId },
               'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+              'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
               'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
               'latestContent.reviewManagerEmployee.id': { $eq: userId },
             },
@@ -156,6 +164,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
             $or: {
               // 'latestContent.toSalesAt': { $notNull: true },
               'latestContent.toSupervisorAt': { $notNull: true },
+              'latestContent.toSalesManagerAt': { $notNull: true },
               'latestContent.toWorkDirectorAt': { $notNull: true },
               'latestContent.toManagerAt': { $notNull: true },
             },
@@ -165,6 +174,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
             $or: {
               'latestContent.salesReviewedAt': { $null: true },
               'latestContent.supervisorReviewedAt': { $null: true },
+              'latestContent.salesManagerReviewedAt': { $null: true },
               'latestContent.workDirectorReviewedAt': { $null: true },
               'latestContent.managerReviewedAt': { $null: true },
             },
@@ -185,15 +195,17 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
                 'latestContent.agentEmployee.id': { $eq: userId },
                 'latestContent.reviewSalesEmployee.id': { $eq: userId },
                 'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+                'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
                 'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
                 'latestContent.reviewManagerEmployee.id': { $eq: userId },
               },
             },
-            // 2 報價單被業務與業務主管審核過
+            // 2 報價單被 業務 業務主管 業務經理 審核過
             '2': {
               $and: {
                 'latestContent.salesReviewedAt': { $notNull: true },
                 'latestContent.supervisorReviewedAt': { $notNull: true },
+                'latestContent.salesManagerReviewedAt': { $notNull: true },
                 'latestContent.managerReviewedAt': { $notNull: true },
               },
             },
@@ -209,6 +221,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
               'latestContent.agentEmployee.id': { $eq: userId },
               'latestContent.reviewSalesEmployee.id': { $eq: userId },
               'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+              'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
               'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
               'latestContent.reviewManagerEmployee.id': { $eq: userId },
             },
@@ -218,6 +231,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
             $and: {
               'latestContent.salesReviewedAt': { $notNull: true },
               'latestContent.supervisorReviewedAt': { $notNull: true },
+              'latestContent.salesManagerReviewedAt': { $notNull: true },
               'latestContent.workDirectorReviewedAt': { $notNull: true },
               'latestContent.managerReviewedAt': { $notNull: true },
             },
@@ -250,6 +264,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewWorkDirectorEmployee',
       'latestContent.reviewSupervisorEmployee',
+      'latestContent.reviewSalesManagerEmployee',
       'latestContent.reviewCashierEmployee',
       'latestContent.reviewManagerEmployee',
 

@@ -109,6 +109,7 @@ type TreviewerList = {
   manager: TreviewerItem;
   workDirector: TreviewerItem;
   cashier: TreviewerItem;
+  salesManager: TreviewerItem;
   supervisor: TreviewerItem;
 };
 
@@ -209,6 +210,7 @@ function ReviewForm({
       'content.reviewWorkDirectorEmployee',
       'content.reviewCashierEmployee',
       'content.reviewManagerEmployee',
+      'content.reviewSalesManagerEmployee',
     ],
   });
 
@@ -220,6 +222,7 @@ function ReviewForm({
         'latestContent.reviewWorkDirectorEmployee',
         'latestContent.reviewCashierEmployee',
         'latestContent.reviewManagerEmployee',
+        'latestContent.reviewSalesManagerEmployee',
       ],
     },
   });
@@ -234,6 +237,7 @@ function ReviewForm({
           'reviewWorkDirectorEmployee',
           'reviewCashierEmployee',
           'reviewManagerEmployee',
+          'reviewSalesManagerEmployee',
         ],
       },
     }
@@ -285,7 +289,7 @@ function ReviewForm({
 
   // ----------------------------------------------------------------------------
 
-  const { isReviewer, isManager, isWorkDirector, isCashier, isSupervisor } = checkIsReviewer({
+  const { isReviewer, isManager, isWorkDirector, isCashier, isSalesManager, isSupervisor } = checkIsReviewer({
     userInfo,
     quotationContent,
   });
@@ -357,6 +361,8 @@ function ReviewForm({
       factoryCertificateNote: preBody.factoryCertificateNote,
 
       //
+      secondAskForPaymentDate: preBody.secondAskForPaymentDate,
+      secondDisbursementDate: preBody.secondDisbursementDate,
     };
 
     let isPaymentOk = true;
@@ -419,6 +425,8 @@ function ReviewForm({
       ? (body.reviewWorkDirectorEmployeeId = userId)
       : isCashier
       ? (body.reviewCashierEmployeeId = userId)
+      : isSalesManager
+      ? (body.reviewSalesManagerEmployeeId = userId)
       : isSupervisor
       ? (body.reviewSupervisorEmployeeId = userId)
       : null;
@@ -496,6 +504,10 @@ function ReviewForm({
       supervisorReviewedAt,
       toSupervisorAt,
 
+      toSalesManagerAt,
+      reviewSalesManagerEmployee,
+      salesManagerReviewedAt,
+
       reviewWorkDirectorEmployee,
       workDirectorReviewedAt,
       toWorkDirectorAt,
@@ -525,6 +537,11 @@ function ReviewForm({
         reviewedAt: cashierReviewedAt,
         toReviewerAt: toCashierAt,
       },
+      salesManager: {
+        reviewer: reviewSalesManagerEmployee || null,
+        reviewedAt: salesManagerReviewedAt || null,
+        toReviewerAt: toSalesManagerAt || null,
+      },
       supervisor: {
         reviewer: reviewSupervisorEmployee,
         reviewedAt: supervisorReviewedAt,
@@ -540,7 +557,7 @@ function ReviewForm({
       return [];
     }
 
-    const { manager, workDirector, cashier, supervisor } = reviewerList;
+    const { manager, workDirector, cashier, salesManager, supervisor } = reviewerList;
 
     const signatureArr: TsignatureBarItem[] = [
       {
@@ -557,6 +574,11 @@ function ReviewForm({
         label: '應收帳款',
         value: workDirector.reviewer?.chName ?? '',
         isReviewed: workDirector.reviewedAt ? true : false,
+      },
+      {
+        label: '業務經理',
+        value: salesManager.reviewer?.chName ?? '',
+        isReviewed: salesManager.reviewedAt ? true : false,
       },
       {
         label: '業務主管',
@@ -615,6 +637,9 @@ function ReviewForm({
         factoryCertificate,
         factoryCertificatePercent,
         factoryCertificateNote,
+        //
+        secondAskForPaymentDate,
+        secondDisbursementDate,
       } = verifyForm;
 
       reset({
@@ -647,6 +672,9 @@ function ReviewForm({
         factoryCertificate,
         factoryCertificatePercent,
         factoryCertificateNote,
+
+        secondAskForPaymentDate,
+        secondDisbursementDate,
       });
 
       methodArr = verifyForm?.paymentRatio.map((item) => {
@@ -686,6 +714,9 @@ function ReviewForm({
         fireproofCertificatePercent: 90,
         factoryCertificatePercent: 90,
         warrantyPercent: 100,
+
+        secondAskForPaymentDate: undefined,
+        secondDisbursementDate: undefined,
       });
 
       methodArr = defaultPaymentRatioArr?.map((item) => {
@@ -771,28 +802,6 @@ function ReviewForm({
           <div className={scss.numIndex}>1</div>
           <div>
             <span>註明請款日</span>
-            {/* <InputSel
-              className={scss.date}
-              disabled={disabled}
-              inputProps={{
-                props: {
-                  value: watchData.askForPaymentDate ?? '',
-                  onChange: (e) => {
-                    const str = e.target.value;
-
-                    if (str === '') {
-                      setValue('askForPaymentDate', str);
-                    } else {
-                      let num = parseInt(str);
-                      num = Math.abs(num);
-                      setValue('askForPaymentDate', String(num));
-                    }
-                  },
-                  type: 'number',
-                },
-              }}
-            /> */}
-
             <InputBox
               className={scss.date}
               disabled={disabled}
@@ -812,29 +821,28 @@ function ReviewForm({
                 type: 'number',
               }}
             />
-
-            <span>，放款日</span>
-            {/* <InputSel
+            <span>，第二註明請款日</span>
+            <InputBox
               className={scss.date}
               disabled={disabled}
-              inputProps={{
-                props: {
-                  value: watchData.disbursementDate ?? '',
-                  onChange: (e) => {
-                    const str = e.target.value;
+              inputAttr={{
+                value: watchData.secondAskForPaymentDate ?? '',
+                onChange: (e) => {
+                  const str = e.target.value;
 
-                    if (str === '') {
-                      setValue('disbursementDate', str);
-                    } else {
-                      let num = parseInt(str);
-                      num = Math.abs(num);
-                      setValue('disbursementDate', String(num));
-                    }
-                  },
-                  type: 'number',
+                  if (str === '') {
+                    setValue('secondAskForPaymentDate', str);
+                  } else {
+                    let num = parseInt(str);
+                    num = Math.abs(num);
+                    setValue('secondAskForPaymentDate', String(num));
+                  }
                 },
+                type: 'number',
               }}
-            /> */}
+            />
+
+            <span>，放款日</span>
             <InputBox
               className={scss.date}
               disabled={disabled}
@@ -849,6 +857,26 @@ function ReviewForm({
                     let num = parseInt(str);
                     num = Math.abs(num);
                     setValue('disbursementDate', String(num));
+                  }
+                },
+                type: 'number',
+              }}
+            />
+            <span>，第二放款日</span>
+            <InputBox
+              className={scss.date}
+              disabled={disabled}
+              inputAttr={{
+                value: watchData.secondDisbursementDate ?? '',
+                onChange: (e) => {
+                  const str = e.target.value;
+
+                  if (str === '') {
+                    setValue('secondDisbursementDate', str);
+                  } else {
+                    let num = parseInt(str);
+                    num = Math.abs(num);
+                    setValue('secondDisbursementDate', String(num));
                   }
                 },
                 type: 'number',
@@ -1740,11 +1768,15 @@ const checkIsReviewer = ({
     reviewCashierEmployee,
     toCashierAt,
 
+    reviewSalesManagerEmployee,
+    salesManagerReviewedAt,
+
     reviewSupervisorEmployee,
     supervisorReviewedAt,
   } = quotationContent ?? {};
 
   let isSupervisor = reviewSupervisorEmployee && reviewSupervisorEmployee?.id === userInfo?.employee?.id;
+  let isSalesManager = reviewSalesManagerEmployee && reviewSalesManagerEmployee?.id === userInfo?.employee?.id;
   let isWorkDirector = reviewWorkDirectorEmployee && reviewWorkDirectorEmployee?.id === userInfo?.employee?.id;
   let isCashier = reviewCashierEmployee && reviewCashierEmployee?.id === userInfo?.employee?.id;
   let isManager = reviewManagerEmployee && reviewManagerEmployee?.id === userInfo?.employee?.id;
@@ -1753,21 +1785,31 @@ const checkIsReviewer = ({
 
   if (!supervisorReviewedAt) {
     isSupervisor && (isReviewer = true);
+    isSalesManager = false;
+    isWorkDirector = false;
+    isCashier = false;
+    isManager = false;
+  } else if (!salesManagerReviewedAt) {
+    isSalesManager && (isReviewer = true);
+    isSupervisor = false;
     isWorkDirector = false;
     isCashier = false;
     isManager = false;
   } else if (!workDirectorReviewedAt) {
     isWorkDirector && (isReviewer = true);
+    isSalesManager = false;
     isSupervisor = false;
     isCashier = false;
     isManager = false;
   } else if (toCashierAt) {
     isCashier && (isReviewer = true);
+    isSalesManager = false;
     isSupervisor = false;
     isWorkDirector = false;
     isManager = false;
   } else if (!managerReviewedAt) {
     isManager && (isReviewer = true);
+    isSalesManager = false;
     isSupervisor = false;
     isWorkDirector = false;
     isCashier = false;
@@ -1782,6 +1824,7 @@ const checkIsReviewer = ({
     isWorkDirector,
     isCashier,
     isSupervisor,
+    isSalesManager,
   };
 };
 
