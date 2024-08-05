@@ -37,6 +37,8 @@ import EditWHPosition from '../editWHPosition';
 import { color } from 'html2canvas/dist/types/css/types/color';
 import icon_print from 'public/image/icon/fc_printer.svg';
 import icon_wh from 'public/image/icon/fc_wh.svg';
+import icon_sidebar from 'public/image/icon/fc_sidebar.svg';
+
 
 
 type Tquery = {
@@ -91,6 +93,9 @@ export default function ProdEntryList() {
 
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [hoverInfo, setHoverInfo] = useState<string | null>(null);
+    const [mouseX, setMouseX] = useState('0px');
+    const [mouseY, setMouseY] = useState('0px');
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -161,6 +166,10 @@ export default function ProdEntryList() {
     const [traynamecalled, setTraynamecalled] = useState<string>("");
     const [whpnamecalled, setWhpnamecalled] = useState<string>("");
 
+
+    const [selectedOption, setSelectedOption] = useState(''); // 預設選項
+    const [selectWhnamedata, setSelectwhnamedata] = useState<any[]>([]);
+    const [selecttraynamedata, setSelecttraynamedata] = useState<any[]>([]);
 
     const [nowname, setNowname] = useState<string>("");
     const [nowproductid, setNowproductid] = useState<string>("");
@@ -337,8 +346,13 @@ export default function ProdEntryList() {
         }
     };
 
+    const hasFetchedData = useRef(false);
+
     useEffect(() => {
-        getProdEntry();
+        if (!hasFetchedData.current) {
+            getProdEntry();
+            hasFetchedData.current = true;
+        }
     }, []);
 
     //取對應的進貨明細
@@ -459,6 +473,7 @@ export default function ProdEntryList() {
 
             GetLayOut(data[0].whid, data[0].trayname, data[0].id);
 
+
             console.log(data);
             if (modalcheckfirstin === 0) {
                 setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
@@ -471,6 +486,22 @@ export default function ProdEntryList() {
                 setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
             }
             console.log(data);
+
+
+
+            const distinctWhnames = data
+                .map((item: { whname: any; }) => item.whname)  // 提取所有 whname
+                .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index);  // 去重
+
+            setSelectwhnamedata(distinctWhnames);
+
+            const distincttraynames = data
+                .map((item: { trayname: any; }) => item.trayname)  // 提取所有 trayname
+                .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index);  // 去重
+
+
+            setSelecttraynamedata(distincttraynames);
+
 
 
         } catch (error: any) {
@@ -832,11 +863,15 @@ export default function ProdEntryList() {
                 prodentrydetailuuid: string | undefined,
                 quantity: string | undefined,
                 batchid: string | undefined,
+                type: string | undefined,
+                productid: string | undefined
             } = {
                 whpositionuuid: nowwhpositionuuid,
                 prodentrydetailuuid: nowprodentrydetailuuid,
                 quantity: inboxquantity.toString() as string | undefined,
-                batchid: batchidin
+                batchid: batchidin,
+                type: whpproductid != nowproductid ? 'false' : 'true',
+                productid: nowproductid
             };
 
 
@@ -858,6 +893,7 @@ export default function ProdEntryList() {
             setNowentryqty((parseInt(nowentryqty) + 1).toString());
             getProdEntryDetail(prodentryuuidin);
             setWhpquantity((parseInt(whpquantity) + inboxquantity).toString());
+            setInboxquantity(0);
 
         } catch (error: any) {
             setError("getProdReceiptDetail:" + error.message);
@@ -1370,11 +1406,50 @@ export default function ProdEntryList() {
         // setSearchdata(data);
     }
 
+    useEffect(() => {
+        // 明確指定參數類型為 Window 的 MouseEvent
+        const handleMouseMove = (event: globalThis.MouseEvent) => {
+            setMouseX(`${event.pageX}px`);
+            setMouseY(`${event.pageY}px`);
+        };
+
+        // 當組件加載時添加事件監聽器
+        window.addEventListener('mousemove', handleMouseMove);
+
+        // 返回一個清理函數，在組件卸載時移除事件監聽器
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+        };
+    }, []); // 空依賴數組，確保只在組件加載和卸載時運行
+
+
+
+
+    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+    useEffect(() => {
+        // 定義事件處理器
+        const handleResize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+
+        // 在元件掛載時設置事件監聽器
+        window.addEventListener('resize', handleResize);
+
+        // 在元件卸載時移除事件監聽器
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []); // 空依賴陣列確保只在掛載和卸載時運行
+
+
+
+
     return (
-        <SubLayer isLoading_subLayer={false}>
+        <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'入庫單'} panelList={panelList} />
-            <div className={scss.container}>
-                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
+            <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
+                <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : ''}` }}>
                     <div className={scss.content}>
                         <div style={{
                             display: 'flex',
@@ -1442,10 +1517,10 @@ export default function ProdEntryList() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
-                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                </button> */}
-                                {/* &nbsp; */}
+                                <button className={scss.squarebtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
+                                    <img src={icon_sidebar.src} alt="sidebar" style={{ height: '30px', width: '30px' }} title="側欄" />
+                                </button>
+                                &nbsp;
                                 {/* <button className={scss.minibtn} onClick={() => { router.push({ pathname: `/factoryDepartment/wareHouseList`, query: {}, }); }}>
                                     儲位管理
                                 </button> */}
@@ -1948,6 +2023,31 @@ export default function ProdEntryList() {
                     <div className={scss.modal_left}>
                         <div className={scss.modal_content}>
                             <div>
+                                {/* <span style={{ fontSize: '18px', }}>倉庫：</span>
+                                <select
+                                    value={selectedOption}
+                                    style={{ fontSize: '18px', borderBottom: '1px solid #c1c1c1' }}
+                                    onChange={(e) => setSelectedOption(e.target.value)}
+                                >
+                                    {selectWhnamedata.map((whname, index) => (
+                                        <option key={index} value={whname}>
+                                            {whname}
+                                        </option>
+                                    ))}
+                                </select>
+                                &nbsp;
+                                <span style={{ fontSize: '18px', }}>托盤：</span>
+                                <select
+                                    value={selectedOption}
+                                    style={{ fontSize: '18px', borderBottom: '1px solid #c1c1c1' }}
+                                    onChange={(e) => setSelectedOption(e.target.value)}
+                                >
+                                    {selecttraynamedata.map((trayname, index) => (
+                                        <option key={index} value={trayname}>
+                                            {trayname}
+                                        </option>
+                                    ))}
+                                </select> */}
                                 <Thead01 type={'ProdEntryWhpositionList'} />
                                 {data3 && (
                                     data3.map((_item: any, index: number) => (
@@ -1957,10 +2057,12 @@ export default function ProdEntryList() {
                                                 className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
                                                 onClick={() => handleGetLayOut(_item)}
                                             >
+                                                <span>{index}</span>
                                                 <span>{_item.whname}</span>
                                                 <span>{_item.trayname}</span>
                                                 <span>{`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}</span>
-                                                <span>{_item.quantity}</span>
+                                                <span style={{ color: `${_item.productid != nowproductid ? 'red' : 'black'}` }}>{_item.productid}</span>
+                                                <span style={{ color: `${_item.quantity === 0 ? 'red' : 'black'}` }}>{_item.quantity}</span>
                                                 <span>
                                                     {/* <button onClick={() => {  }}>
                                                         <img src={icon_fc_inbox.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
@@ -2022,11 +2124,13 @@ export default function ProdEntryList() {
                                                                 <tr className={scss.childtraytabletr}>
                                                                     {childitem.childwidthdata.map((childDataItem: any) => (
                                                                         <td className={scss.childtraytabletd} key={childDataItem.id} style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}>
-                                                                            <span className={scss.childtraytabletdButton}
+                                                                            <button className={scss.childtraytabletdButton}
                                                                                 style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
+                                                                                onMouseEnter={() => setHoverInfo(`${childDataItem.productid}\n${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`)}
+                                                                                onMouseLeave={() => setHoverInfo(null)}
                                                                             >
                                                                                 {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
-                                                                            </span>
+                                                                            </button>
                                                                         </td>
                                                                     ))}
                                                                 </tr>
@@ -2039,6 +2143,25 @@ export default function ProdEntryList() {
                                     </tbody>
                                 </table>
                             ))}
+                            {hoverInfo && (
+                                <div
+                                    style={{
+                                        backgroundColor: '#dfdcdc',
+                                        position: 'fixed',
+                                        top: mouseY,
+                                        left: mouseX,
+                                        transform: 'translate(10%, 60%)',
+                                        padding: '5px',
+                                        borderRadius: '5px',
+                                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                                        zIndex: '1002',
+                                        whiteSpace: 'pre-line', // 控制換行的 CSS 屬性
+                                        fontSize: '16px'
+                                    }}
+                                >
+                                    {hoverInfo}
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -2077,7 +2200,7 @@ export default function ProdEntryList() {
                                 <div style={{ paddingTop: '5px' }}>
                                     <InputSel
                                         {...inputSelProps}
-                                        caption="入庫狀態"
+                                        caption="入庫進度"
                                         className='align-bottom'
                                         disabled={true}
                                         inputProps={{

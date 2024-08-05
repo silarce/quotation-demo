@@ -186,7 +186,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       newlength = alphaIncrement(newlength);
     }
 
-    return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 1).toString();
+    return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
   };
 
 

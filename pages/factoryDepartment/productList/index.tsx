@@ -2,7 +2,7 @@ import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
-import _ from 'lodash';
+import _, { update } from 'lodash';
 
 import scss from './productList.module.scss';
 import Thead01 from '../ui/table/thead01';
@@ -48,7 +48,6 @@ export default function ProductList() {
         purchaseorderid,
         purchaseordercreate_at,
         purchaseordercreate_by,
-        create_at,
         create_by,
         inspected,
         suppliername,
@@ -110,9 +109,14 @@ export default function ProductList() {
     const [entrystatusin, setEntrystatusin] = useState<string>("");
     const [paystatusin, setPaystatusin] = useState<string>("");
     const [notein, setNotein] = useState<string>("");
-    const [productname, setProductname] = useState<string>("");
-
-
+    const [productnamein, setProductnamein] = useState<string>("");
+    const [productidin, setProductidin] = useState<string>("");
+    const [productspecin, setProductspecin] = useState<string>("");
+    const [productquantityin, setProductquantityin] = useState<string>("");
+    const [update_atin, setUpdate_atin] = useState<string>("");
+    const [unitin, setUnitin] = useState<string>("");
+    const [materialin, setMaterialin] = useState<string>("");
+    const [surfacein, setSurfacein] = useState<string>("");
 
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
@@ -137,11 +141,20 @@ export default function ProductList() {
     const [totalpayprice, setTotalPayPrice] = useState<string>("");
 
     // 保存原始值
-    const [originalSuppliernamein, setOriginalSuppliernamein] = useState(suppliernamein);
-    const [originalSupplierphonein, setOriginalSupplierphonein] = useState(supplierphonein);
-    const [originalSuppliertaxidin, setOriginalSuppliertaxidin] = useState(suppliertaxidin);
-    const [originalInvoicein, setOriginalInvoicein] = useState(invoicein);
-    const [originalSupplieraddressin, setOriginalSupplieraddressin] = useState(supplieraddressin);
+    const [originalproductnamein, setOriginalproductnamein] = useState(productnamein);
+    const [originalproductidin, setOriginalproductidin] = useState(productidin);
+    const [originalproductspecin, setOriginalproductspecin] = useState(productspecin);
+    const [originalunitin, setOriginalunitin] = useState(unitin);
+    const [originalmaterialin, setOriginalmaterialin] = useState(materialin);
+    const [originalsurfacein, setOriginalsurfacein] = useState(surfacein);
+
+    //新增物料
+    const [addproductid, setAddProductid] = useState<string>("");
+    const [addproductname, setAddProductname] = useState<string>("");
+    const [addproductspec, setAddProductspec] = useState<string>("");
+    const [addproductunit, setAddProductunit] = useState<string>("");
+    const [addproductmaterial, setAddProductmaterial] = useState<string>("");
+    const [addproductsurface, setAddProductsurface] = useState<string>("");
 
 
     //入庫總數
@@ -281,9 +294,21 @@ export default function ProductList() {
             setSearchdata(data);
             setFilteredData(data);
             console.log(data);
+
+            setProductidin(data[0].productid);
+            setProductnamein(data[0].name);
+            setProductspecin(data[0].spec);
+            setProductquantityin(data[0].count);
+            setCreate_atin(data[0].create_at);
+            setUpdate_atin(data[0].create_at);
+            setCreate_byin(data[0].create_by);
+            setUnitin(data[0].unit);
+            setMaterialin(data[0].material);
+            setSurfacein(data[0].surface);
+
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
-                setProductname(data[0].name);
+                // setProductnamein(data[0].name);
             }
         } catch (error: any) {
             setError("getProduct:" + error.message);
@@ -363,39 +388,6 @@ export default function ProductList() {
             setIsLoading(false);
         }
     };
-
-    // 確保 getPurchaseOrderDetail 的 useEffect 中的依賴項設置正確
-    useEffect(() => {
-        if (prodreceiptuuid) {
-            if (prodreceiptuuidin != prodreceiptuuid) {
-                setData2([]);
-            }
-            // getProdReceiptDetail(prodreceiptuuid);
-            // if (prodreceiptdetailuuid) {
-            //     GetProdReceiptDetailByPurchaseOrderId(purchaseorderuuid, purchaseorderdetailuuid);
-            // }
-            getProdReceiptDetail(prodreceiptuuid);
-            // GetProdReceiptDetailByPurchaseOrderId(prodreceiptuuid);
-            setPurchaseorderidin(purchaseorderid as string);
-            setPurchaseorderuuidin(purchaseorderuuid as string);
-            setProdreceiptuuidin(prodreceiptuuid as string);
-            setProdreceiptidin(prodreceiptid as string);
-            setCreate_atin(create_at as string);
-            setCreate_byin(create_by as string);
-            setPurchaseordercreate_atin(purchaseordercreate_at as string);
-            setPurchaseordercreate_byin(purchaseordercreate_by as string);
-            setSuppliernamein(suppliername as string);
-            setSuppliertaxidin(suppliertaxid as string);
-            setInspectedin(inspected as string);
-            setSupplieraddressin(supplieraddress as string);
-            setStatusin(status as string);
-            setSupplierphonein(supplierphone as string);
-            setInvoicein(invoice as string);
-            setEntrystatusin(entrystatus as string);
-            setPaystatusin(paystatus as string);
-            setNotein(note as string);
-        }
-    }, [prodreceiptuuid]);
 
     //取已對應進貨單的已入庫單
     const GetProdEntryDetailByProdReceiptId = async (prodreceiptuuid: any, prodreceiptdetailuuid: any) => {
@@ -668,20 +660,21 @@ export default function ProductList() {
     }
 
     // editModal
-    const [searchmodalopen, setSearchmodalopen] = useState<boolean>(false);
-    const SearchModalClose = async () => {
-        setSearchmodalopen(false);
+    const [addmodalopen, setAddmodalopen] = useState<boolean>(false);
+    const AddModalClose = async () => {
+        setAddmodalopen(false);
     }
 
 
     // 主檔編輯
     const handleEdit = () => {
         // 進入編輯模式時保存原始值
-        setOriginalSuppliernamein(suppliernamein);
-        setOriginalSupplierphonein(supplierphonein);
-        setOriginalSuppliertaxidin(suppliertaxidin);
-        setOriginalInvoicein(invoicein);
-        setOriginalSupplieraddressin(supplieraddressin);
+        setOriginalproductnamein(productnamein);
+        setOriginalproductidin(productidin);
+        setOriginalproductspecin(productspecin);
+        setOriginalunitin(unitin);
+        setOriginalmaterialin(materialin);
+        setOriginalsurfacein(surfacein);
         setEditmain(true);
     };
 
@@ -694,11 +687,12 @@ export default function ProductList() {
             </>,
             props: {
                 onOk: () => {
-                    setSuppliernamein(originalSuppliernamein);
-                    setSupplierphonein(originalSupplierphonein);
-                    setSuppliertaxidin(originalSuppliertaxidin);
-                    setInvoicein(originalInvoicein);
-                    setSupplieraddressin(originalSupplieraddressin);
+                    setProductnamein(originalproductnamein);
+                    setProductidin(originalproductidin);
+                    setProductspecin(originalproductspecin);
+                    setMaterialin(originalmaterialin);
+                    setUnitin(originalunitin);
+                    setSurfacein(originalsurfacein);
                     setEditmain(false);
                 }
             }
@@ -715,11 +709,12 @@ export default function ProductList() {
                     try {
                         // 建立要傳送的數據
                         const data = {
-                            suppliername: suppliernamein,
-                            supplieraddress: supplieraddressin,
-                            supplierphone: supplierphonein,
-                            suppliertaxid: suppliertaxidin,
-                            invoice: invoicein
+                            name: productnamein,
+                            spec: productspecin,
+                            unit: unitin,
+                            update_by: userInfo?.username,
+                            update_at: moment().format('YYYY-MM-DD')
+
                         };
 
                         // 打印數據到控制台以供調試
@@ -748,7 +743,7 @@ export default function ProductList() {
 
 
                         // 發送數據到 API
-                        const response = await fetch(`${setting.apipath}UpdatePReceiptSupplier`, {
+                        const response = await fetch(`${setting.apipath}UpdateProduct`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -854,6 +849,13 @@ export default function ProductList() {
             );
         }
 
+        if (keyword4) {
+            filteredData = searchdata.filter(item =>
+                item.spec && item.spec.toString().includes(keyword4.trim())
+            );
+        }
+
+
         setFilteredData(filteredData);
     }, [keyword2, keyword3, keyword4]);
 
@@ -888,10 +890,17 @@ export default function ProductList() {
 
     const editProduct = (item: any) => {
         handleRowClick(item.productid);
-        setProductname(item.name);
-
-
-
+        console.log(item);
+        setProductnamein(item.name);
+        setProductidin(item.productid);
+        setProductspecin(item.spec);
+        setProductquantityin(item.count);
+        setCreate_atin(item.create_at);
+        setUpdate_atin(item.update_at);
+        setCreate_byin(item.create_by);
+        setUnitin(item.unit);
+        setMaterialin(item.material);
+        setSurfacein(item.surface);
         // alert(item.productid);
     }
 
@@ -917,7 +926,7 @@ export default function ProductList() {
 
 
     return (
-        <SubLayer isLoading_subLayer={false}>
+        <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'物料維護'} panelList={panelList} />
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
@@ -947,28 +956,17 @@ export default function ProductList() {
 
                             <div className={scss.head_head1}>
                                 <div>
-                                    <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
+                                    {/* <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
                                         <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                    </button>
+                                    &nbsp; */}
+                                    <button className={scss.squarebtn} onClick={() => { setAddmodalopen(!addmodalopen) }} title="新增物料">
+                                        <img src={icon_autoadd.src} alt="addProduct" style={{ height: '30px', width: '30px' }} />
                                     </button>
                                     &nbsp;
                                     <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
                                         <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                     </button>
-                                    {/* <InputSel
-                                        {...inputSelProps}
-                                        caption="物料查找 "
-                                        captionStyle={{ paddingTop: '10px' }}
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                placeholder: '料號、名稱、規格',
-                                                value: keyword3 || ' ',
-                                                onChange: (e) => { handleNameChange(e) }
-                                            },
-                                        }}
-                                    /> */}
-
-
                                 </div>
                                 <div>
 
@@ -1129,13 +1127,39 @@ export default function ProductList() {
                                 <div></div>
                             </div> */}
                             <div className={scss.head_foot2}>
-                                <div></div>
-                                <div></div>
                                 <div>
-                                    <p style={{ fontSize: '16px' }}>符合總數: {filteredData.length}</p>
+                                    <input
+                                        type="text"
+                                        placeholder='　料號'
+                                        value={keyword2}
+                                        style={{ padding: '0px 5px', width: '200px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                        onChange={(e) => setKeyword2(e.target.value)}
+                                    />
+
                                 </div>
                                 <div>
-                                    <p style={{ fontSize: '16px' }}>物料總數: {searchdata.length}</p>
+                                    <input
+                                        type="text"
+                                        placeholder='　名稱'
+                                        value={keyword3}
+                                        style={{ padding: '0px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
+                                        onChange={(e) => setKeyword3(e.target.value)}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='　規格'
+                                        value={keyword4}
+                                        style={{ padding: '0px 5px', width: '350px', fontSize: '16px', borderBottom: '1px solid #c1c1c1' }}
+                                        onChange={(e) => setKeyword4(e.target.value)}
+                                    />
+                                </div>
+                                <div style={{ padding: '0px 5px', textAlign: 'right' }}>
+                                    <p style={{ color: '#14256a', fontSize: '16px' }}>符合總數：<span style={{ color: 'gray' }}>{filteredData.length}</span></p>
+                                </div>
+                                <div style={{ padding: '0px 5px', textAlign: 'right' }}>
+                                    <p style={{ color: '#14256a', fontSize: '16px' }}>物料總數: <span style={{ color: 'gray' }}>{searchdata.length}</span></p>
                                     {/* <InputSel
                                         {...inputSelProps}
                                         caption="物料數量"
@@ -1151,7 +1175,7 @@ export default function ProductList() {
                             </div>
                             <Thead01 type={'ProductList'} />
                         </div>
-                        <div className={scss.body_content1} style={{ height: '300px', border: '1px solid #c1c1c1' }}>
+                        <div className={scss.body_content1} style={{ height: '350px', border: '1px solid #c1c1c1' }}>
                             <span>
                                 {filteredData && (
                                     filteredData.slice(0, 100).map((_item: any, index: number) => (
@@ -1166,8 +1190,8 @@ export default function ProductList() {
                                                 <span>{_item.name}</span>
                                                 <span>{_item.spec}</span>
                                                 <span>{_item.count}</span>
-                                                <span>{getTaiwanDateStr(_item.create_at)}</span>
                                                 <span>{getTaiwanDateStr(_item.update_at)}</span>
+                                                <span>{getTaiwanDateStr(_item.create_at)}</span>
                                                 <span>
                                                     {/* <button onClick={() => { editProduct(_item) }}>
                                                         <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
@@ -1179,76 +1203,153 @@ export default function ProductList() {
                                 )}
                             </span>
                         </div>
-                        <br />
                         <div className={scss.body_foot1}>
-                            <div></div>
-                            <div></div>
-                            <div></div>
-                        </div>
-                        <div className={scss.foot_head1}>
                             <div>
-                                <span >
-                                    <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
-                                        編輯
-                                    </button>
+                                <span style={{ color: '#ea1833' }}>
+                                    ※只顯示100筆資訊，請利用條件查找縮小範圍
                                 </span>
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
-                                    儲存
-                                </button>
-                                &nbsp;
-                                <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
-                                    取消
-                                </button>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="物料編號"
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: suppliernamein ? suppliernamein : ' ',
-                                            onChange: (e) => { setSuppliernamein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="物料名稱"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: suppliernamein ? suppliernamein : ' ',
-                                            onChange: (e) => { setSuppliernamein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="物料規格"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: suppliernamein ? suppliernamein : ' ',
-                                            onChange: (e) => { setSuppliernamein(e.target.value) }
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="庫存數量"
-                                    disabled={!editmain}
-                                    inputProps={{
-                                        props: {
-                                            value: suppliernamein ? suppliernamein : ' ',
-                                            onChange: (e) => { setSuppliernamein(e.target.value) }
-                                        },
-                                    }}
-                                />
                             </div>
-                            <div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <div style={{ border: '1px solid #c1c1c1', margin: '0px 20px' }}>
+                            <div className={scss.foot_head1}>
+                                <div>
+                                    <span >
+                                        <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
+                                            編輯
+                                        </button>
+                                    </span>
+                                    <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
+                                        儲存
+                                    </button>
+                                    &nbsp;
+                                    <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.minibtn} onClick={handleCancel}>
+                                        取消
+                                    </button>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="物料編號"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: productidin || ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="庫存數量"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: productquantityin || ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div></div>
+                                <div></div>
+                            </div>
+                            <div className={scss.foot_head2}>
+                                <div>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="物料名稱"
+                                        disabled={!editmain}
+                                        inputProps={{
+                                            props: {
+                                                value: productnamein || ' ',
+                                                onChange: (e) => { setProductnamein(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="物料規格"
+                                        disabled={!editmain}
+                                        inputProps={{
+                                            props: {
+                                                value: productspecin || ' ',
+                                                onChange: (e) => { setProductspecin(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="material"
+                                        disabled={!editmain}
+                                        inputProps={{
+                                            props: {
+                                                value: materialin || ' ',
+                                                onChange: (e) => { setMaterialin(e.target.value) }
+                                            },
+                                        }}
+                                    />
 
-                            </div>
-                            <div>
-                                <InputSel
+                                </div>
+                                <div>
+
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="物料單位"
+                                        disabled={!editmain}
+                                        inputProps={{
+                                            props: {
+                                                value: unitin || ' ',
+                                                onChange: (e) => { setUnitin(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="表面"
+                                        disabled={!editmain}
+                                        inputProps={{
+                                            props: {
+                                                value: surfacein || ' ',
+                                                onChange: (e) => { setSurfacein(e.target.value) }
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="更新時間"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: getTaiwanDateStr(update_atin) || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="更新人員"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: create_byin || ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    {/* <InputSel
                                     {...inputSelProps}
                                     caption="排版用"
                                     disabled={true}
@@ -1258,145 +1359,160 @@ export default function ProductList() {
                                             value: ' ',
                                         },
                                     }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
+                                /> */}
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="建立時間"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: getTaiwanDateStr(create_atin) || ' ',
+                                            },
+                                        }}
+                                    />
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="建立人員"
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: create_byin || ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
-
-                        <div className={scss.foot_content1}>
-                        </div>
+                        {/* <div className={scss.foot_content1}>
+                        </div> */}
                     </div>
                 </div>
                 <Modal
-                    visible={searchmodalopen}
+                    visible={addmodalopen}
                     footer={null}
-                    onCancel={SearchModalClose}
-                    width='50%'
-                    // maskClosable={false}
-                    maskStyle={{ backgroundColor: 'transparent' }}
-                    // title={
-                    //     <div className={scss.modal_head_head1}>
-                    //         <div>
-                    //             <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
-                    //         </div>
-                    //     </div>
-                    // }
-                    // style={{ top: 235,left:-200}}
-                    style={{ top: 235, left: -230 }}
-                >
-
-                    {/* <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}> */}
-                    <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
-                        <div className={scss.modal_head_content1}>
-                            {/* <div>
-                                <InputSel
-                                    caption="起始日期"
-                                    disabled={false}
-                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                    datePickerProps={{
-                                        props: {
-                                            value: keywordstartdate || null,
-                                            onChange: (e: Moment | null) => { setKeywordstartdate(e) }
-                                        }
-                                    }}
-                                />
+                    onCancel={AddModalClose}
+                    width="1000px"
+                    maskClosable={false}
+                    title={
+                        <div className={scss.modal_head_head1}>
+                            <div>
+                                <span style={{ fontSize: '16px', color: '#14256a' }}>新增物料：</span>
                             </div>
                             <div>
-                                <InputSel
-                                    caption="截止日期"
-                                    disabled={false}
-                                    captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                    datePickerProps={{
-                                        props: {
-                                            value: keywordenddate || null,
-                                            onChange: (e: Moment | null) => { setKeywordenddate(e) }
-                                        }
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="排版用"
-                                    disabled={true}
-                                    className='invisible'
-                                    inputProps={{
-                                        props: {
-                                            value: ' ',
-                                        },
-                                    }}
-                                />
-                            </div> */}
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="物料編號"
-                                    disabled={false}
-                                    inputProps={{
-                                        props: {
-                                            value: keyword2 || ' ',
-                                            onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
-                                        },
-                                    }}
-                                />
-
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="物料名稱"
-                                    disabled={false}
-                                    inputProps={{
-                                        props: {
-                                            value: keyword3 || ' ',
-                                            onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
-                                        },
-                                    }}
-                                />
-
-                            </div>
-                            <div>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="物料規格"
-                                    disabled={false}
-                                    inputProps={{
-                                        props: {
-                                            value: keyword4 || ' ',
-                                            onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword4(e.target.value) }
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
-                                {/* <span>
-                                    <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
-                                </span> */}
-                                {/* <span>
-                                        <button className={scss.minibtn} type="submit">查找</button>
-                                    </span> */}
+                                <span style={{ fontSize: '16px', color: '#14256a' }}></span>
                             </div>
                         </div>
-                    </form>
-                    {/* </div> */}
-                    {/* <div style={{
-                            maxHeight: '465.81px',
-                            overflowY: 'auto',
-                            border: '1px solid gray',
-                        }}>
-                            <Thead01 type={'ProductList'} />
-                            <Tbody01 type={'ProductList'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
-                        </div> */}
+                    }
+                    style={{ top: 250 }}
+                >
+
+                    <div className={scss.modal_head_content1}>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="物料編號"
+                                disabled={false}
+                                inputProps={{
+                                    props: {
+                                        value: addproductid || ' ',
+                                        onChange: (e) => { setAddProductid(e.target.value) }
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div>
+                            {/* <span style={{ color: '#ea1833' }}>
+                                ※料號名
+                            </span> */}
+                        </div>
+                        <div></div>
+                    </div>
+                    <div className={scss.modal_head_content2}>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="物料名稱"
+                                disabled={false}
+                                inputProps={{
+                                    props: {
+                                        value: addproductname || ' ',
+                                        onChange: (e) => { setAddProductname(e.target.value) }
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div>
+
+                        </div>
+                        <div></div>
+                    </div>
+                    <div className={scss.modal_head_content3}>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="物料規格"
+                                disabled={false}
+                                inputProps={{
+                                    props: {
+                                        value: addproductspec || ' ',
+                                        onChange: (e) => { setAddProductspec(e.target.value) }
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div></div>
+                    </div>
+                    <div className={scss.modal_head_content4}>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="單位"
+                                disabled={false}
+                                inputProps={{
+                                    props: {
+                                        value: addproductunit || ' ',
+                                        onChange: (e) => { setAddProductunit(e.target.value) }
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div className={scss.modal_head_content5}>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="material"
+                                disabled={false}
+                                inputProps={{
+                                    props: {
+                                        value: addproductmaterial || ' ',
+                                        onChange: (e) => { setAddProductmaterial(e.target.value) }
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div className={scss.modal_head_content6}>
+                        <div>
+                            <InputSel
+                                {...inputSelProps}
+                                caption="表面"
+                                disabled={false}
+                                inputProps={{
+                                    props: {
+                                        value: addproductsurface || ' ',
+                                        onChange: (e) => { setAddProductsurface(e.target.value) }
+                                    },
+                                }}
+                            />
+                        </div>
+                        <div></div>
+                        <div></div>
+                    </div>
                 </Modal >
             </div>
         </SubLayer >

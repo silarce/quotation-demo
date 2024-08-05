@@ -308,9 +308,13 @@ export default function ProdReceiptList() {
         }
     };
 
+    const hasFetchedData = useRef(false);
 
     useEffect(() => {
-        getProdReceipt();
+        if (!hasFetchedData.current) {
+            getProdReceipt();
+            hasFetchedData.current = true;
+        }
     }, []);
 
 
@@ -861,7 +865,7 @@ export default function ProdReceiptList() {
 
 
     return (
-        <SubLayer isLoading_subLayer={false}>
+        <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'進貨單'} panelList={panelList} />
             <div className={scss.container}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>

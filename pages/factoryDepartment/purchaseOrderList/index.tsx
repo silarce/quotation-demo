@@ -287,10 +287,17 @@ export default function PurchaseOrderList() {
             setIsLoading(false);
         }
     };
+    
+    const hasFetchedData = useRef(false);
 
     useEffect(() => {
-        getPurchaseOrder();
+        if (!hasFetchedData.current) {
+            getPurchaseOrder();
+            hasFetchedData.current = true;
+        }
     }, []);
+
+
 
     //取對應的採購明細
     const getPurchaseOrderDetail = async (purchaseorderuuid: any) => {

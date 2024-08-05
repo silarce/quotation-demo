@@ -235,13 +235,6 @@ export default function AddPurchaseRequisition() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-
-            if (data.length === 0) {
-                myAlert.warning({
-                    title: '尚未加入任何物料',
-                    content: '請至物料維護頁面新增'
-                })
-            }
             setData(data);
             setModalData(data);
             setSearchBarData(data);
@@ -256,15 +249,9 @@ export default function AddPurchaseRequisition() {
             setIsLoading(false);
         }
     };
-    const hasFetchedData = useRef(false);
-
     useEffect(() => {
-        if (!hasFetchedData.current) {
-            getProduct();
-            hasFetchedData.current = true;
-        }
+        getProduct();
     }, []);
-
 
 
     useEffect(() => {
@@ -828,7 +815,7 @@ export default function AddPurchaseRequisition() {
                                 />
                             </div>
                             <div>
-                                <InputSel
+                            <InputSel
                                     caption="需用日期"
                                     className="global_tip_must"
                                     disabled={false}
@@ -1060,61 +1047,48 @@ export default function AddPurchaseRequisition() {
                             </div>
                         </div>
                         <div className={scss.body_foot1}>
-                            {showSuggestions && (
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        zIndex: 1001,
-                                        backgroundColor: 'white',
-                                        border: '1px solid #ccc',
-                                        borderRadius: '8px',
-                                        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-                                        width: '750px',
-                                        maxHeight: '300px', // 擴大整個容器的高度
-                                        overflow: 'hidden', // 隱藏整個容器的滾動條
-                                        fontSize: '16px',
-                                        left: `${position.x}px`,
-                                        top: `${position.y}px`,
-                                        cursor: 'default',
-                                    }}
-                                    onMouseDown={handleMouseDown}
-                                >
+                            <div>
+                                {/* (1).可自行輸入請購項目。<br />
+                            (2).如不知請購品項料號，可以利用查詢代入。<br /> */}
+                                {showSuggestions && (
                                     <div
                                         style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            padding: '8px',
-                                            borderBottom: '1px solid #ccc',
-                                            backgroundColor: '#f5f5f5', // 標題列的背景色
-                                            cursor: 'move', // 讓用戶知道可以拖動
+                                            position: 'absolute',
+                                            zIndex: 1001,
+                                            backgroundColor: 'white',
+                                            border: '1px solid #ccc',
+                                            borderRadius: '8px',
+                                            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+                                            width: '750px',
+                                            maxHeight: '200px',
+                                            overflowY: 'auto',
+                                            fontSize: '16px',
+                                            left: `${position.x}px`,
+                                            top: `${position.y}px`,
+                                            cursor: 'default',
                                         }}
+                                        onMouseDown={handleMouseDown}
                                     >
-                                        <div style={{ fontWeight: 'bold' }}>查詢結果</div> {/* 標題文字 */}
-                                        <button
-                                            onClick={() => setShowSuggestions(false)}
-                                            style={{
-                                                background: 'transparent',
-                                                border: 'none',
-                                                fontSize: '16px',
-                                                cursor: 'pointer',
-                                                fontWeight: 'bold',
-                                                color: '#555',
-                                                outline: 'none',
-                                                transition: 'color 0.3s ease',
-                                            }}
-                                            onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
-                                            onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
-                                        >
-                                            ×
-                                        </button>
-                                    </div>
-                                    <div
-                                        style={{
-                                            maxHeight: '350px', // 限制table區域的最大高度
-                                            overflowY: 'auto', // 允許垂直滾動
-                                        }}
-                                    >
+                                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px', borderBottom: '1px solid #ccc' }}>
+                                            <button
+                                                onClick={() => setShowSuggestions(false)}
+                                                style={{
+                                                    background: 'transparent',
+                                                    border: 'none',
+                                                    fontSize: '16px',
+                                                    cursor: 'pointer',
+                                                    fontWeight: 'bold',
+                                                    color: '#555',
+                                                    outline: 'none',
+                                                    transition: 'color 0.3s ease',
+
+                                                }}
+                                                onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
+                                                onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
                                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                             {filteredData.length > 0 ? (
                                                 filteredData.map((item, index) => (
@@ -1146,9 +1120,13 @@ export default function AddPurchaseRequisition() {
                                             )}
                                         </table>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
+                            <div>
 
+                            </div>
+                            <div>
+                            </div>
                         </div>
                     </div>
                 </div>
