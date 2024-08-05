@@ -60,7 +60,9 @@ type Tstate_incomeBillSerial = {
   fee: string;
   //
   temporary_note: string;
-  temporary_separatePayment: string;
+
+  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+  // temporary_separatePayment: string;
 };
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
@@ -320,7 +322,9 @@ const Summons_pre = (
       accountant,
       //
       temporary_note,
-      temporary_separatePayment,
+
+      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+      // temporary_separatePayment,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
@@ -344,7 +348,9 @@ const Summons_pre = (
       fee: String(accountant?.fee || '0'),
       //
       temporary_note: temporary_note ?? '',
-      temporary_separatePayment: (temporary_separatePayment || 0).toLocaleString(),
+
+      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+      // temporary_separatePayment: (temporary_separatePayment || 0).toLocaleString(),
     };
 
     return defaultState;
@@ -505,7 +511,9 @@ type TconfigKey =
       | 'unpaidPayment'
       | 'difference'
       | 'temporary_note'
-      | 'temporary_separatePayment'
+
+      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+      // | 'temporary_separatePayment'
     >
   | 'fee';
 
@@ -546,7 +554,9 @@ const keyArr: TconfigKey[] = [
   'difference',
 
   'temporary_note',
-  'temporary_separatePayment',
+
+  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+  // 'temporary_separatePayment',
 ];
 
 const config: Tconfig = {
@@ -1053,24 +1063,25 @@ const config: Tconfig = {
     },
   },
 
-  temporary_separatePayment: {
-    label: '分出金額',
-    style: { width: 100 },
-    className: 'text-right',
-    createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
-      const inputSelProps: TinputSelProps = {
-        disabled: true,
-        inputProps: {
-          props: {
-            className: 'text-right',
-            defaultValue: state_incomeBillSerial.temporary_separatePayment,
-          },
-        },
-      };
+  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+  // temporary_separatePayment: {
+  //   label: '分出金額',
+  //   style: { width: 100 },
+  //   className: 'text-right',
+  //   createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
+  //     const inputSelProps: TinputSelProps = {
+  //       disabled: true,
+  //       inputProps: {
+  //         props: {
+  //           className: 'text-right',
+  //           defaultValue: state_incomeBillSerial.temporary_separatePayment,
+  //         },
+  //       },
+  //     };
 
-      return inputSelProps;
-    },
-  },
+  //     return inputSelProps;
+  //   },
+  // },
 
   //
 } as const;
