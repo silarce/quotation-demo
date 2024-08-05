@@ -60,6 +60,7 @@ type Tstate_incomeBillSerial = {
   fee: string;
   //
   temporary_note: string;
+  vendorName: string;
 
   // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
   // temporary_separatePayment: string;
@@ -348,6 +349,7 @@ const Summons_pre = (
       fee: String(accountant?.fee || '0'),
       //
       temporary_note: temporary_note ?? '',
+      vendorName: accountant.vendorName ?? '',
 
       // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
       // temporary_separatePayment: (temporary_separatePayment || 0).toLocaleString(),
@@ -515,7 +517,8 @@ type TconfigKey =
       // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
       // | 'temporary_separatePayment'
     >
-  | 'fee';
+  | 'fee'
+  | 'vendorName';
 
 type TconfigItem = {
   label: string;
@@ -541,6 +544,7 @@ const keyArr: TconfigKey[] = [
   'receiveDate',
   'contractNumber',
   'projectName',
+  'vendorName',
   'contractPayment',
   'periodPayment',
   'priorPeriodPayment',
@@ -1055,6 +1059,27 @@ const config: Tconfig = {
                 };
               });
             },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  vendorName: {
+    label: '廠商名稱',
+    style: { width: 150 },
+    // className: 'text-center',
+    createInputSelProps: ({ state_incomeBillSerial }) => {
+      const inputSelProps: TinputSelProps = {
+        disabled: true,
+        showBaseline: 'invisible',
+        inputProps: {
+          props: {
+            // className: 'text-center',
+            value: state_incomeBillSerial.vendorName,
+            disabled: true,
           },
         },
       };
