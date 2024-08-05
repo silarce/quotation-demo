@@ -4,21 +4,17 @@ import Image from 'next/image';
 import Decimal from 'decimal.js';
 
 // component
-import EditDeduction from './editDeduction';
+import EditDefunctionBtn from './accountantDeductionEditor';
 
 // gear
 import TopBar from 'components/page/worksDepartment/contracList/contract/accountReceivable/ui/topBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
 import scss from './accountantDetails.module.scss';
 
 // type
 import type { TaccountantDto } from 'js/api/dtoTypes';
-
-// icon
-import iconEyeOpen from 'public/image/icon/eyeOpen.svg';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
@@ -77,31 +73,43 @@ export default function AccountantDetails({
     });
   };
 
-  const handle_editDeduction = (index: number, state_deduction: Tstate_deduction[]) => {
-    const modal = myAlert.btnBar({});
+  // const handle_editDeduction = (index: number, state_deduction: Tstate_deduction[]) => {
+  //   const modal = myAlert.btnBar({});
 
-    const onConfirm = (state_deduction: Tstate_deduction[]) => {
-      const deductionTotal = state_deduction.reduce((acc, cur) => acc + Number(cur.detailedAmount), 0);
+  //   const onConfirm = (state_deduction: Tstate_deduction[]) => {
+  //     const deductionTotal = state_deduction.reduce((acc, cur) => acc + Number(cur.detailedAmount), 0);
 
-      setState_accountantArr((arr) => {
-        const copy = [...arr];
-        copy[index].state_deduction = state_deduction;
-        copy[index].deductionTotal = deductionTotal;
+  //     setState_accountantArr((arr) => {
+  //       const copy = [...arr];
+  //       copy[index].state_deduction = state_deduction;
+  //       copy[index].deductionTotal = deductionTotal;
 
-        return copy;
-      });
-      modal.destroy();
-    };
+  //       return copy;
+  //     });
+  //     modal.destroy();
+  //   };
 
-    modal.update({
-      content: (
-        <EditDeduction
-          //
-          state_deduction={state_deduction}
-          onCancel={modal.destroy}
-          onConfirm={onConfirm}
-        />
-      ),
+  //   modal.update({
+  //     content: (
+  //       <EditDeduction
+  //         //
+  //         state_deduction={state_deduction}
+  //         onCancel={modal.destroy}
+  //         onConfirm={onConfirm}
+  //       />
+  //     ),
+  //   });
+  // };
+
+  const handle_editDeduction = (index: number, state_deductionArr: Tstate_deduction[]) => {
+    const deductionTotal = state_deductionArr.reduce((acc, cur) => acc + Number(cur.detailedAmount), 0);
+
+    setState_accountantArr((arr) => {
+      const copy = [...arr];
+      copy[index].state_deduction = state_deductionArr;
+      copy[index].deductionTotal = deductionTotal;
+
+      return copy;
     });
   };
 
@@ -161,6 +169,7 @@ export default function AccountantDetails({
       } = accountant;
 
       const deductionTotal = accountsReceivableDeduction.reduce((acc, cur) => acc + cur.detailedAmount, 0);
+
       const state_deduction = accountsReceivableDeduction.map((deduction) => {
         const { id, itemName, detailedAmount } = deduction;
 
@@ -293,11 +302,17 @@ export default function AccountantDetails({
 
               <div className={scss.cell} style={configList['btn'].style}>
                 {!disabled && (
-                  <Image
-                    className="cursor-pointer"
-                    src={iconEyeOpen}
-                    alt="編輯扣款"
-                    onClick={() => handle_editDeduction(index_state, state_deduction)}
+                  // <Image
+                  //   className="cursor-pointer"
+                  //   src={iconEyeOpen}
+                  //   alt="編輯扣款"
+                  //   onClick={() => handle_editDeduction(index_state, state_deduction)}
+                  // />
+                  <EditDefunctionBtn
+                    defaultStateArr={state_deduction}
+                    onConfirm={({ state_deductionArr }) => {
+                      handle_editDeduction(index_state, state_deductionArr);
+                    }}
                   />
                 )}
               </div>

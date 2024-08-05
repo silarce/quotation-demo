@@ -1,9 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 
 // gear
-import TopBar from 'components/page/worksDepartment/contracList/contract/accountReceivable/ui/topBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -17,13 +16,6 @@ import { optionsCreator_deduction } from 'js/utils/options/options';
 
 // css
 import scss from './index.module.scss';
-
-// type
-import type {
-  //
-  TaccountantDto,
-  TaccountsReceivableDeductionDto,
-} from 'js/api/dtoTypes';
 
 import {
   TupdateAccountantDeductionDto,
@@ -42,19 +34,22 @@ type Tstate_deduction = {
 };
 
 type Tprops = {
-  accountantId: string;
+  accountantId?: string;
+  defaultStateArr?: Tstate_deduction[];
+
   // 現在api只有回傳fee跟id，未來真的需要時再請後端回傳完整的TaccountantDto
-  // onConfirm: (accountant: TaccountantDto) => void;
-  onConfirm?: () => void;
+  onConfirm?: (props: { accountant: null; state_deductionArr: Tstate_deduction[] }) => void;
   onCancel?: () => void;
   cancelOnSuccess?: boolean;
 };
 
-type Tprops_modal = Pick<Tprops, 'accountantId' | 'onConfirm' | 'cancelOnSuccess'>;
+type Tprops_modal = Pick<Tprops, 'accountantId' | 'defaultStateArr' | 'onConfirm' | 'cancelOnSuccess'>;
+
+export type { Tstate_deduction };
 
 // ===============================================================]
 
-const editDeduction = ({ accountantId, onConfirm, cancelOnSuccess }: Tprops_modal) => {
+const editDeduction = ({ accountantId, defaultStateArr, onConfirm, cancelOnSuccess }: Tprops_modal) => {
   const modal = myAlert.clear({});
 
   modal.update({
@@ -62,6 +57,7 @@ const editDeduction = ({ accountantId, onConfirm, cancelOnSuccess }: Tprops_moda
       <EditDeductionPanel
         //
         accountantId={accountantId}
+        defaultStateArr={defaultStateArr}
         onConfirm={onConfirm}
         onCancel={modal.destroy}
         cancelOnSuccess={cancelOnSuccess}
@@ -74,8 +70,11 @@ const editDeduction = ({ accountantId, onConfirm, cancelOnSuccess }: Tprops_moda
 // MARK:START
 
 function EditDeductionPanel({
-  //
+  // accountantId與defaultStateArr擇一
+  // 若有accountantId就會呼叫api取得資料，否則就會用defaultStateArr
+  // accountantId與defaultStateArr都有的話，accountantId會優先
   accountantId,
+  defaultStateArr,
   onConfirm,
   onCancel,
   cancelOnSuccess = true,
@@ -85,7 +84,10 @@ function EditDeductionPanel({
 
   // --------------------------------------------------------------------
 
-  const { data: data_accountant, isFetching: isFetching_accountant } = useGetAccountant_id(accountantId);
+  const {
+    data: data_accountant,
+    // isFetching: isFetching_accountant
+  } = useGetAccountant_id(accountantId);
 
   // --------------------------------------------------------------------
 
@@ -120,20 +122,33 @@ function EditDeductionPanel({
       accountsReceivableDeduction,
     };
 
-    // 現在api只有回傳fee跟id，未來真的需要時再請後端回傳完整的TaccountantDto
-    const res = await apiPatchAccountant_accountReceivable(accountantId, body).then((res) => {
+    if (accountantId) {
+      // 現在api只有回傳fee跟id，未來真的需要時再請後端回傳完整的TaccountantDto
+      const res = await apiPatchAccountant_accountReceivable(accountantId, body)
+        .then((res) => {
+          onConfirm?.({
+            accountant: null,
+            state_deductionArr,
+          });
+
+          cancelOnSuccess && onCancel?.();
+
+          return res;
+        })
+        .catch(() => {});
+    } else {
+      onConfirm?.({
+        accountant: null,
+        state_deductionArr,
+      });
       cancelOnSuccess && onCancel?.();
-
-      return res;
-    });
-
-    onConfirm?.();
+    }
   };
 
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
-    const deductionArr = data_accountant?.accountsReceivableDeduction || [];
+    const deductionArr = data_accountant?.accountsReceivableDeduction || defaultStateArr || [];
 
     const state_deductionArr: Tstate_deduction[] = deductionArr.map((deduction) => {
       return {
@@ -144,7 +159,7 @@ function EditDeductionPanel({
     });
 
     setState_deductionArr(state_deductionArr);
-  }, [data_accountant]);
+  }, [data_accountant, defaultStateArr]);
 
   // ---------------------------------------------------------------------------
 
@@ -225,6 +240,7 @@ function EditDeductionPanel({
 const EditDefunctionBtn = ({
   className,
   accountantId,
+  defaultStateArr,
   onConfirm,
 }: {
   className?: string;
@@ -237,6 +253,7 @@ const EditDefunctionBtn = ({
       onClick={() => {
         editDeduction({
           accountantId,
+          defaultStateArr,
           onConfirm,
         });
       }}

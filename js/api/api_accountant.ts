@@ -133,7 +133,7 @@ const apiGetAccountant_id = async (id: string, params?: Tparams) => {
 };
 
 export const useGetAccountant_id = (
-  id: string,
+  id: string | undefined | null,
   {
     //
     autoUpdate = true,
@@ -160,6 +160,10 @@ export const useGetAccountant_id = (
   const [isFetching, setIsFetching] = useState(false);
 
   const update = useCallback(async () => {
+    if (!id) {
+      return;
+    }
+
     setIsFetching(true);
 
     try {
