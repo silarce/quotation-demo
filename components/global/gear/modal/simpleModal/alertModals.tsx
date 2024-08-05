@@ -222,6 +222,33 @@ export const ModalBtnBar = ({
 
 // ====================================================
 
+const ModalClear = (props?: ModalFuncProps) => {
+  return Modal.info({
+    width: 'fit-content',
+    icon: <></>,
+    maskClosable: true,
+    centered: true,
+    cancelButtonProps: {
+      style: { display: 'none' },
+    },
+    okButtonProps: {
+      style: { display: 'none' },
+    },
+    // bodyStyle: {
+    //   padding: 'unset',
+    // },
+    ...props,
+    className: classNames(
+      //
+      style.clear,
+      props?.className
+      // modalProps.className
+    ),
+  });
+};
+
+// ====================================================
+
 const BtnBar = ({ btnPropsArr }: { btnPropsArr: TbtnPropsArr }) => {
   return (
     <div className={style.btnBar}>
@@ -243,6 +270,7 @@ const myAlert = {
   loading: ModalLoading,
   destroyAll: Modal.destroyAll,
   btnBar: ModalBtnBar,
+  clear: ModalClear,
 };
 
 export default myAlert;

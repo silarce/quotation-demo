@@ -123,6 +123,74 @@ const useGetAccountant = ({
   };
 };
 
+const apiGetAccountant_id = async (id: string, params?: Tparams) => {
+  const api = `/accountant/${id}`;
+
+  return axi
+    .get<TaccountantDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountant_id = (
+  id: string,
+  {
+    //
+    autoUpdate = true,
+    params,
+  }: {
+    //
+    autoUpdate?: boolean;
+    params?: Tparams;
+  } = {}
+) => {
+  //
+  params = {
+    populate: [
+      //
+      'invoices',
+      'incomeBill',
+      'accountsReceivableDeduction',
+      'exchangeFrom',
+    ],
+    ...params,
+  };
+
+  const [res, setRes] = useState<TaccountantDto>();
+  const [isFetching, setIsFetching] = useState(false);
+
+  const update = useCallback(async () => {
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetAccountant_id(id, params);
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '取得收款紀錄失敗',
+        content: err.message,
+      });
+
+      return err;
+    } finally {
+      setIsFetching(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [update]);
+
+  return {
+    data: res,
+    update,
+    isFetching,
+  };
+};
+
 const apiPostAccountant = async ({
   //
   body,
