@@ -58,6 +58,9 @@ type Tstate_incomeBillSerial = {
   difference: string;
   //
   fee: string;
+  //
+  temporary_note: string;
+  temporary_separatePayment: string;
 };
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
@@ -128,6 +131,8 @@ export default function IncomeSummons() {
       deductionPayment,
       unpaidPayment,
       difference,
+      //
+      temporary_note,
     } = state_incomeBillSerial;
 
     const body: TupdateIncomeBillSerialDto = {
@@ -144,6 +149,7 @@ export default function IncomeSummons() {
       deductionPayment: deductionPayment ? Number(deductionPayment) : null,
       unpaidPayment: unpaidPayment ? Number(unpaidPayment) : null,
       difference: difference ? difference : null,
+      temporary_note: temporary_note,
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
@@ -312,6 +318,9 @@ const Summons_pre = (
       unpaidPayment,
       //
       accountant,
+      //
+      temporary_note,
+      temporary_separatePayment,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
@@ -333,6 +342,9 @@ const Summons_pre = (
       unpaidPayment: String(unpaidPayment || ''),
       difference: difference || '',
       fee: String(accountant?.fee || '0'),
+      //
+      temporary_note: temporary_note ?? '',
+      temporary_separatePayment: (temporary_separatePayment || 0).toLocaleString(),
     };
 
     return defaultState;
@@ -492,6 +504,8 @@ type TconfigKey =
       | 'deductionPayment'
       | 'unpaidPayment'
       | 'difference'
+      | 'temporary_note'
+      | 'temporary_separatePayment'
     >
   | 'fee';
 
@@ -530,6 +544,9 @@ const keyArr: TconfigKey[] = [
   'fee',
   'unpaidPayment',
   'difference',
+
+  'temporary_note',
+  'temporary_separatePayment',
 ];
 
 const config: Tconfig = {
@@ -1009,4 +1026,51 @@ const config: Tconfig = {
       return inputSelProps;
     },
   },
+
+  temporary_note: {
+    label: '備註',
+    style: { width: 200 },
+    className: '',
+    createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const inputSelProps: TinputSelProps = {
+        textareaProps: {
+          allowNewLineByUser: true,
+          props: {
+            value: state_incomeBillSerial.temporary_note,
+            onChange: (e) => {
+              setState_incomeBillSerial((prev) => {
+                return {
+                  ...prev,
+                  temporary_note: e.target.value,
+                };
+              });
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  temporary_separatePayment: {
+    label: '分出金額',
+    style: { width: 100 },
+    className: 'text-right',
+    createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const inputSelProps: TinputSelProps = {
+        disabled: true,
+        inputProps: {
+          props: {
+            className: 'text-right',
+            defaultValue: state_incomeBillSerial.temporary_separatePayment,
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  //
 } as const;
