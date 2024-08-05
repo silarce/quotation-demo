@@ -10,7 +10,7 @@ import scss from './exportToIncomeBill.module.scss';
 
 // ============================================================================
 
-type TonClick = (isoString: string) => Promise<void>;
+type TonConfirm = (params: { isoString: string; temporary_separatePayment: number }) => Promise<void>;
 
 // ============================================================================
 
@@ -19,14 +19,18 @@ const ExportToIncomeBill = ({
   onConfirm,
   onCancel,
 }: {
-  onConfirm: TonClick;
+  onConfirm: TonConfirm;
   onCancel: () => void;
 }) => {
-  const [incomeBillDate, setIncomeBillDate] = useState<Moment | null>(null);
+  const [state_incomeBillDate, setState_incomeBillDate] = useState<Moment | null>(null);
+  const [state_temporary_separatePayment, setState_temporary_separatePayment] = useState<number | null>(null);
 
   const handle_onConfirm = async () => {
-    if (incomeBillDate) {
-      await onConfirm(incomeBillDate.toISOString());
+    if (state_incomeBillDate) {
+      await onConfirm({
+        isoString: state_incomeBillDate.toISOString(),
+        temporary_separatePayment: state_temporary_separatePayment || 0,
+      });
       onCancel();
     } else {
       myAlert.info({ title: '請選擇日期' });
@@ -36,15 +40,30 @@ const ExportToIncomeBill = ({
   return (
     <div className="w-[300px]">
       <br />
-      <p className="text-2xl mb-3">收入傳票日期</p>
+
       <InputSel
+        caption="收入傳票日期"
         datePickerProps={{
           props: {
             className: scss.datePicker,
             placeholder: '請選擇日期',
-            value: incomeBillDate,
+            value: state_incomeBillDate,
             onChange: (m) => {
-              setIncomeBillDate(m);
+              setState_incomeBillDate(m);
+            },
+          },
+        }}
+      />
+
+      <InputSel
+        className="mt-3"
+        caption="分出金額"
+        inputProps={{
+          props: {
+            type: 'number',
+            value: state_temporary_separatePayment ?? '',
+            onChange: (e) => {
+              setState_temporary_separatePayment(Number(e.target.value));
             },
           },
         }}

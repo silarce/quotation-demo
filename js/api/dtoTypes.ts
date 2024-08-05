@@ -3729,11 +3729,13 @@ export type TcreateAccountReceivableAccountsDto = {
   // type: TperiodType;
   accountantId: string[];
   incomeBillDate: string;
+  temporary_separatePayment: number;
 };
 
 export type TupdateAccountReceivableAccountantDto = {
   invoiceId: string;
   accountantId: string[];
+  // temporary_separatePayment: number;
 }[];
 
 // MARK: /engineering
@@ -4057,6 +4059,9 @@ export type TaccountantDto = {
 
   exchangeRate: `${number}`; // 匯率
   currencyValue: `${number}`; // 幣值
+
+  // 已分出金額
+  temporary_separatePayment: number | null;
 };
 
 export type TcreateAccountantDto = Pick<

@@ -99,15 +99,24 @@ type Tstate_accountant = {
   exchangeRate: string;
   currencyValue: string; // 金額
   price: string; // 新台幣 = 匯率 * 金額
+
+  // 已分出金額
+  readonly temporary_separatePayment: string;
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
 type TreqPatch = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
-// type TreqPatchIsImported = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
-type TreqPatchIsImported = (accountantId: string, incomeBillDate: string) => Promise<void>;
+
+type TreqPostPatchIsImported = (
+  //
+  accountantId: string,
+  incomeBillDate: string,
+  temporary_separatePayment: number
+) => Promise<void>;
+
 type TreqDelete = (id: string) => Promise<void>;
 
-export type { TreqPatchIsImported };
+export type { TreqPostPatchIsImported };
 
 // =============================================================================
 
@@ -269,11 +278,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     await update_accountant();
   };
 
-  const reqPatchIsImported = async (
+  const reqPatchIsImported: TreqPostPatchIsImported = async (
     //
-    accountantId: string,
-
-    incomeBillDate: string
+    accountantId,
+    incomeBillDate,
+    temporary_separatePayment
   ) => {
     if (!isWorksDepartment) {
       alert('isWorksDepartment should be false');
@@ -284,6 +293,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     const body: TcreateAccountReceivableAccountsDto = {
       accountantId: [accountantId],
       incomeBillDate,
+      temporary_separatePayment,
     };
 
     await apiPostAccountReceivableAccounts(body);
@@ -296,10 +306,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   };
 
   // 匯入發票
-  const reqPostAccountReceivableAccountant = async (
+  const reqPostAccountReceivableAccountant: TreqPostPatchIsImported = async (
     //
-    accountReceivableId: string,
-    incomeBillDate: string
+    accountReceivableId,
+    incomeBillDate,
+    temporary_separatePayment
   ) => {
     if (!accountantId) {
       alert('accountantId為undefined');
@@ -311,6 +322,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       await apiPostAccountReceivableAccountant(accountReceivableId, {
         accountantId: [accountantId],
         incomeBillDate,
+        temporary_separatePayment,
       });
       await update_accountant();
     } catch (error) {
@@ -330,7 +342,9 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
         //   reqPostAccountReceivableAccountant={reqPostAccountReceivableAccountant}
         // />
         <ExportToIncomeBill
-          onConfirm={(isoString) => reqPostAccountReceivableAccountant(accountReceivableId, isoString)}
+          onConfirm={({ isoString, temporary_separatePayment: separatePayment }) =>
+            reqPostAccountReceivableAccountant(accountReceivableId, isoString, separatePayment)
+          }
           onCancel={modal.destroy}
         />
       ),
@@ -665,7 +679,7 @@ const Row = ({
   // isReadOnly: boolean;
   setAccountantId?: (id: string | undefined) => void;
   bankAccountOptionArr: Toption[];
-  reqPatchIsImported?: TreqPatchIsImported;
+  reqPatchIsImported?: TreqPostPatchIsImported;
   isWorksDepartment: boolean;
 }) => {
   const isNew = !!postProps;
@@ -753,7 +767,9 @@ const Row = ({
           //   onCancel={modal.destroy}
           // />
           <ExportToIncomeBill
-            onConfirm={(isoString) => reqPatchIsImported(data_accountant.id, isoString)}
+            onConfirm={({ isoString, temporary_separatePayment: separatePayment }) =>
+              reqPatchIsImported(data_accountant.id, isoString, separatePayment)
+            }
             onCancel={modal.destroy}
           />
         ),
@@ -778,6 +794,8 @@ const Row = ({
       noteMaturityDate,
       receiptCollectionDate,
       receiptEstimatedDate,
+
+      temporary_separatePayment,
     } = data_accountant;
 
     setState_accountant({
@@ -797,6 +815,8 @@ const Row = ({
       currency: data_accountant.currency,
       exchangeRate: String(data_accountant.exchangeRate || ''),
       currencyValue: String(data_accountant.currencyValue || ''),
+
+      temporary_separatePayment: temporary_separatePayment ? temporary_separatePayment.toLocaleString() : '',
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -1028,6 +1048,8 @@ const lookup_keyArr: {
 
     'billSerialNumber',
     'notes',
+
+    'temporary_separatePayment',
   ],
   // 票據: [...baseArr_before, 'noteNumber', 'noteMaturityDate', ...baseArr_after],
   票據: [
@@ -1045,6 +1067,8 @@ const lookup_keyArr: {
     'receiptEstimatedDate',
     'billSerialNumber',
     'notes',
+
+    'temporary_separatePayment',
   ],
   現金: [
     ...baseArr_before,
@@ -1057,6 +1081,8 @@ const lookup_keyArr: {
     // 'currency',
     'billSerialNumber',
     'notes',
+
+    'temporary_separatePayment',
   ],
 };
 
@@ -1479,6 +1505,29 @@ const configList: TconfigList = {
       };
     },
   },
+  temporary_separatePayment: {
+    label: '已分出金額',
+    style: {
+      width: 100,
+    },
+    className: '',
+    inputSelPropsCreator({ value }) {
+      const inputProps: TinputProps = {
+        props: {
+          placeholder: '',
+          readOnly: true,
+          style: { textAlign: 'end' },
+          value: value as string,
+          onChange: () => {},
+        },
+      };
+
+      return {
+        disabled: true,
+        inputProps,
+      };
+    },
+  },
 };
 
 // =========================================================================
@@ -1500,4 +1549,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   currency: 'TWD 新臺幣',
   exchangeRate: '1', // 預設為1，不然price計算結果為0
   currencyValue: '', // 金額
+
+  temporary_separatePayment: '',
 });

@@ -1424,10 +1424,7 @@ export const useGetAccountReceivableAccountants = (
 // 新增 應收帳款 收款紀錄 account-receivable-accountant
 export const apiPostAccountReceivableAccountant = async (
   id: string, // 應收帳款Id 可以在contract下找到accountReceivableId
-  body: {
-    accountantId: string[]; // 收款明細Id
-    incomeBillDate: string;
-  },
+  body: TcreateAccountReceivableAccountsDto,
   {
     callAlert = true,
   }: {
