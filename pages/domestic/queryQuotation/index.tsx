@@ -105,6 +105,7 @@ export default function Budget() {
       // 'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',
+      'latestContent.reviewSalesManagerEmployee',
       'latestContent.reviewWorkDirectorEmployee',
       'latestContent.reviewCashierEmployee',
       'latestContent.reviewSupervisorEmployee',
