@@ -410,7 +410,10 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
           <span>料號</span>
           <span>名稱</span>
           <span>規格</span>
+          <span>材質</span>
+          <span>表面</span>
           <span>庫存</span>
+          <span>單位</span>
           <span>更新日期</span>
           <span>建立日期</span>
           <span></span>

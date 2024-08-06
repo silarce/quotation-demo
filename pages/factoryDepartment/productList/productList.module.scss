@@ -168,7 +168,7 @@
 
 .head_foot2 {
     display: grid;
-    grid-template-columns: 200px 350px 350px 1fr 1fr;
+    grid-template-columns:30px 200px 350px 350px 60px 1fr 1fr;
     // gap: 15px;
     width: auto;
     //   margin-top: 5px;
@@ -249,7 +249,7 @@
 
 .foot_head1 {
     display: grid;
-    grid-template-columns: 550px 1fr 1fr 1fr;
+    grid-template-columns: 390px 1fr 1fr 1fr;
     // gap: 15px;
     width: auto;
     margin-top: 5px;
@@ -265,7 +265,7 @@
 
 .foot_head2 {
     display: grid;
-    grid-template-columns: 550px 1fr 1fr 1fr;
+    grid-template-columns: 700px 1fr 1fr 1fr;
     // gap: 15px;
     width: auto;
     // margin-top: 5px;
@@ -425,6 +425,41 @@ div.panelHeader13 {
         /* 添加這行使滑鼠顯示禁止符號 */
     }
 }
+
+.minitabbtn {
+    height: 39px;
+    // width: 36px;
+    // padding: 0px 40px;
+    border: solid 1px #c1c1c1;
+    border-bottom: 0px;
+    // border-bottom: 0px;
+    background-color: #c1c1c17c;
+    padding: 0px 8px;
+    // padding-top: 4px;
+    // padding-bottom: 4px;
+    font-weight: 500;
+    font-size: 16px;
+    // color: #14256a;
+    color: #7c0101;
+    transform: translateY(2px);
+    width:69px;
+
+    &:hover {
+        border: solid 1px #c1c1c1;
+        border-bottom: 0px;
+        color:#ea1833;
+        background-color: #c1c1c17c
+    }
+
+    // &:focus {
+    //     color: #14256a;
+    //     // background-color: $bgc01;
+    //     border: solid 1px #c1c1c1;
+    //     border-bottom: 0px;
+        
+    // }
+}
+
 
 // 按鈕
 .greenbutton {
@@ -779,7 +814,7 @@ div.panelHeader21 {
 
     .row01 {
         display: grid;
-        grid-template-columns: 30px 150px 300px 400px 30px 100px 100px 30px;
+        grid-template-columns: 30px 150px 300px 400px 100px 100px 30px 50px 100px 100px 30px;
         gap: 15px;
         // border-bottom: 1px solid #ddd;
         cursor: pointer;

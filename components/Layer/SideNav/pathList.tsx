@@ -730,6 +730,24 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: devPass,
             },
+            {
+              label: '領料管理',
+              path: path01 + '/pickingList',
+              activeChecker: ({ router }) => {
+
+                const { pathname, query } = router
+                console.log(router);
+                if (pathname === "/factoryDepartment/pickingList") {
+                  return true;
+                }
+                return false;
+
+              },
+              query: {
+                type: 'prodReceiptList',
+              },
+              erpFeature: devPass,
+            },
           ],
         },
         {

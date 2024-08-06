@@ -861,7 +861,7 @@ export default function AddPurchaseRequisition() {
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
                                 <span>
-                                    <button className={scss.redbtn} onClick={() => { handleAddPR() }}>新增採購</button>
+                                    <button className={scss.redbtn} onClick={() => { handleAddPR() }}>新增請購</button>
                                 </span>
                             </div>
                         </div>

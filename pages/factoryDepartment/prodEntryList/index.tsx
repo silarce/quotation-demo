@@ -1458,15 +1458,14 @@ export default function ProdEntryList() {
                             position: 'sticky',
                             top: 0,
                             backgroundColor: '#fff',
-                            zIndex: 1000
+                            zIndex: 1002
                         }}>
-                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
+                            {/*    <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
                                 <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
                                     <InputSel
                                         caption="入庫日期"
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
                                                 value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
@@ -1503,13 +1502,13 @@ export default function ProdEntryList() {
                                     <button className={scss.minibtn} type="submit">搜尋</button>
                                 </div>
                                 <div>
-                                    <Thead01 type={'ProdEntry'} />
                                 </div>
-                            </form>
+                            </form>*/}
                         </div>
-                        {/* <hr /> */}
+
                         <div>
-                            <Tbody01 type={'ProdEntry'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            <Thead01 type={'ProdEntry'} />
+                            <Tbody01 type={'ProdEntry'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         </div>
                     </div>
                 </div>
