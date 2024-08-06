@@ -62,187 +62,13 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
 
   // ----------------------------------------------------
   //
-  // agent 經辦
-  // reviewSales 業務
-  // reviewSupervisor 業務主管
-  // reviewWorkDirector 應收帳款
-  // reviewManager 總經理
 
   // 待審核
-  const filter = (() => {
-    if (!reviewStatus || reviewStatus === '待審核') {
-      if (status === 'Pending' || status === 'TempPending') {
-        return {
-          // 使用者為經辦或審核業務
-          $or: {
-            'latestContent.agentEmployee.id': { $eq: userId },
-            'latestContent.reviewSalesEmployee.id': { $eq: userId },
-          },
-          // 還沒送審給業務以外的任一階段審核者
-          $and: {
-            // 'latestContent.toSalesAt': { $null: true },
-            'latestContent.toSupervisorAt': { $null: true },
-            'latestContent.toSalesManagerAt': { $null: true },
-            'latestContent.toWorkDirectorAt': { $null: true },
-            'latestContent.cashierReviewedAt': { $null: true },
-            'latestContent.toManagerAt': { $null: true },
-          },
-        };
-      }
-
-      return {
-        // 使用者為經辦
-        'latestContent.agentEmployee.id': { $eq: userId },
-        // 還沒送審給任一階段審核者
-        $and: {
-          'latestContent.toSalesAt': { $null: true },
-          'latestContent.toSupervisorAt': { $null: true },
-          'latestContent.toSalesManagerAt': { $null: true },
-          'latestContent.toWorkDirectorAt': { $null: true },
-          'latestContent.cashierReviewedAt': { $null: true },
-          'latestContent.toManagerAt': { $null: true },
-        },
-      };
-    }
-
-    // _____________________________________________
-    if (reviewStatus === '審核中') {
-      // 如果在預算或投標階段
-      if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-        return {
-          // 同時滿足兩個條件
-          $and: {
-            // 1 使用者為經辦或任一階段的審核者
-            '1': {
-              $or: {
-                'latestContent.agentEmployee.id': { $eq: userId },
-                'latestContent.reviewSalesEmployee.id': { $eq: userId },
-                'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
-                'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
-                'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
-                'latestContent.reviewManagerEmployee.id': { $eq: userId },
-              },
-            },
-            // 2 報價單已送審審核業務或業務主管或業務經理
-            '2': {
-              $or: {
-                'latestContent.toSalesAt': { $notNull: true },
-                'latestContent.toSupervisorAt': { $notNull: true },
-                'latestContent.toSalesManagerAt': { $notNull: true },
-                'latestContent.toManagerAt': { $notNull: true },
-              },
-            },
-            // 3 報價單沒有同時被 審核業務 業務主管 業務經理 審核過
-            '3': {
-              $or: {
-                'latestContent.salesReviewedAt': { $null: true },
-                'latestContent.supervisorReviewedAt': { $null: true },
-                'latestContent.salesManagerReviewedAt': { $null: true },
-                'latestContent.managerReviewedAt': { $null: true },
-              },
-            },
-          },
-        };
-      }
-
-      return {
-        // 同時滿足兩個條件
-        $and: {
-          // 1 使用者為經辦或任一階段的審核者
-          '1': {
-            $or: {
-              'latestContent.agentEmployee.id': { $eq: userId },
-              'latestContent.reviewSalesEmployee.id': { $eq: userId },
-              'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
-              'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
-              'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
-              'latestContent.reviewManagerEmployee.id': { $eq: userId },
-            },
-          },
-          // 2 報價單已送審給任一階段的審核者(除了業務)
-          '2': {
-            $or: {
-              // 'latestContent.toSalesAt': { $notNull: true },
-              'latestContent.toSupervisorAt': { $notNull: true },
-              'latestContent.toSalesManagerAt': { $notNull: true },
-              'latestContent.toWorkDirectorAt': { $notNull: true },
-              'latestContent.toManagerAt': { $notNull: true },
-            },
-          },
-          // 3 報價單有任一審核者沒有審核過
-          '3': {
-            $or: {
-              'latestContent.salesReviewedAt': { $null: true },
-              'latestContent.supervisorReviewedAt': { $null: true },
-              'latestContent.salesManagerReviewedAt': { $null: true },
-              'latestContent.workDirectorReviewedAt': { $null: true },
-              'latestContent.managerReviewedAt': { $null: true },
-            },
-          },
-        },
-      };
-    }
-
-    // _____________________________________________
-    if (reviewStatus === '審核完成') {
-      // 如果在預算或投標階段
-      if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-        return {
-          $and: {
-            // 1 使用者為經辦或任一階段的審核者
-            '1': {
-              $or: {
-                'latestContent.agentEmployee.id': { $eq: userId },
-                'latestContent.reviewSalesEmployee.id': { $eq: userId },
-                'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
-                'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
-                'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
-                'latestContent.reviewManagerEmployee.id': { $eq: userId },
-              },
-            },
-            // 2 報價單被 業務 業務主管 業務經理 審核過
-            '2': {
-              $and: {
-                'latestContent.salesReviewedAt': { $notNull: true },
-                'latestContent.supervisorReviewedAt': { $notNull: true },
-                'latestContent.salesManagerReviewedAt': { $notNull: true },
-                'latestContent.managerReviewedAt': { $notNull: true },
-              },
-            },
-          },
-        };
-      }
-
-      return {
-        $and: {
-          // 1 使用者為經辦或任一階段的審核者
-          '1': {
-            $or: {
-              'latestContent.agentEmployee.id': { $eq: userId },
-              'latestContent.reviewSalesEmployee.id': { $eq: userId },
-              'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
-              'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
-              'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
-              'latestContent.reviewManagerEmployee.id': { $eq: userId },
-            },
-          },
-          // 2 報價單被所有審核者審核過
-          '2': {
-            $and: {
-              'latestContent.salesReviewedAt': { $notNull: true },
-              'latestContent.supervisorReviewedAt': { $notNull: true },
-              'latestContent.salesManagerReviewedAt': { $notNull: true },
-              'latestContent.workDirectorReviewedAt': { $notNull: true },
-              'latestContent.managerReviewedAt': { $notNull: true },
-            },
-          },
-        },
-      };
-    }
-
-    // _____________________________________________
-    return {};
-  })();
+  const filter = createFilter({
+    reviewStatus,
+    status,
+    userId,
+  });
 
   const params: Tparams = {
     // sort: 'updatedAt',
@@ -457,3 +283,389 @@ const ApprovalsBar = ({ router }: { router: NextRouter }) => {
     </div>
   );
 };
+// =============================================================================
+
+const createFilter = ({
+  //
+  reviewStatus,
+  status,
+  userId,
+}: {
+  //
+  reviewStatus: string | undefined;
+  status: TquotationStatus | undefined;
+  userId: string | undefined;
+}) => {
+  // agent 經辦
+  // reviewSales 業務
+  // reviewSupervisor 業務主管
+  // reviewSalesManager 業務經理
+  // reviewWorkDirector 應收帳款
+  //  reviewCashier 也是 應收帳款
+  // reviewManager 總經理
+
+  if (!reviewStatus || reviewStatus === '待審核') {
+    // 準合約階段
+    if (status === 'Pending' || status === 'TempPending') {
+      return {
+        // 使用者為經辦或審核業務
+        $or: {
+          'latestContent.agentEmployee.id': { $eq: userId },
+          'latestContent.reviewSalesEmployee.id': { $eq: userId },
+        },
+        // 還沒送審給業務以外的任一階段審核者
+        $and: {
+          // 'latestContent.toSalesAt': { $null: true },
+          'latestContent.toSupervisorAt': { $null: true },
+          'latestContent.toSalesManagerAt': { $null: true },
+          'latestContent.toWorkDirectorAt': { $null: true },
+          'latestContent.cashierReviewedAt': { $null: true },
+          'latestContent.toManagerAt': { $null: true },
+        },
+      };
+    }
+
+    //  預算、投標、發包階段
+    return {
+      // 使用者為經辦
+      'latestContent.agentEmployee.id': { $eq: userId },
+      // 還沒送審給任一階段審核者
+      $and: {
+        'latestContent.toSalesAt': { $null: true },
+        'latestContent.toSupervisorAt': { $null: true },
+        'latestContent.toSalesManagerAt': { $null: true },
+        'latestContent.toWorkDirectorAt': { $null: true },
+        'latestContent.cashierReviewedAt': { $null: true },
+        'latestContent.toManagerAt': { $null: true },
+      },
+    };
+  }
+
+  // _____________________________________________
+  if (reviewStatus === '審核中') {
+    // 如果在 預算 或 投標 或 發包 階段
+    if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+      return {
+        // 同時滿足兩個條件
+        $and: {
+          // 1 使用者為經辦或任一階段的審核者，WorkDirector與cashier除外
+          '1': {
+            $or: {
+              'latestContent.agentEmployee.id': { $eq: userId },
+              'latestContent.reviewSalesEmployee.id': { $eq: userId },
+              'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+              'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
+              // 'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+              'latestContent.reviewManagerEmployee.id': { $eq: userId },
+            },
+          },
+          // 2 報價單已送審審核業務或業務主管或業務經理
+          '2': {
+            $or: {
+              'latestContent.toSalesAt': { $notNull: true },
+              'latestContent.toSupervisorAt': { $notNull: true },
+              'latestContent.toSalesManagerAt': { $notNull: true },
+              'latestContent.toManagerAt': { $notNull: true },
+            },
+          },
+          // // 3 報價單沒有同時被 審核業務 業務主管 業務經理 審核過
+          // 3 報價單沒有被總經理審核過
+          '3': {
+            // $or: {
+            //   'latestContent.salesReviewedAt': { $null: true },
+            //   'latestContent.supervisorReviewedAt': { $null: true },
+            //   'latestContent.salesManagerReviewedAt': { $null: true },
+            //   'latestContent.managerReviewedAt': { $null: true },
+            // },
+            'latestContent.managerReviewedAt': { $null: true },
+          },
+        },
+      };
+    }
+
+    // 準合約階段
+    return {
+      // 同時滿足3個條件
+      $and: {
+        // 1 使用者為經辦或任一階段的審核者
+        '1': {
+          $or: {
+            'latestContent.agentEmployee.id': { $eq: userId },
+            'latestContent.reviewSalesEmployee.id': { $eq: userId },
+            'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+            'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
+            'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+            'latestContent.reviewCashierEmployee.id': { $eq: userId },
+            'latestContent.reviewManagerEmployee.id': { $eq: userId },
+          },
+        },
+        // 2 報價單已送審給任一階段的審核者(除了業務)
+        '2': {
+          $or: {
+            // 'latestContent.toSalesAt': { $notNull: true },
+            'latestContent.toSupervisorAt': { $notNull: true },
+            'latestContent.toSalesManagerAt': { $notNull: true },
+            'latestContent.toWorkDirectorAt': { $notNull: true },
+            'latestContent.toCashierAt': { $notNull: true },
+            'latestContent.toManagerAt': { $notNull: true },
+          },
+        },
+        // // 3 報價單有任一審核者沒有審核過
+        // 3 總經理沒有審核過
+        '3': {
+          // $or: {
+          //   'latestContent.salesReviewedAt': { $null: true },
+          //   'latestContent.supervisorReviewedAt': { $null: true },
+          //   'latestContent.salesManagerReviewedAt': { $null: true },
+          //   'latestContent.workDirectorReviewedAt': { $null: true },
+          //   'latestContent.managerReviewedAt': { $null: true },
+          // },
+          'latestContent.managerReviewedAt': { $null: true },
+        },
+      },
+    };
+  }
+
+  // _____________________________________________
+  if (reviewStatus === '審核完成') {
+    // 如果在 預算 投標 發包 階段
+    if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+      return {
+        $and: {
+          // 1 使用者為經辦或任一階段的審核者 WorkDirector與cashier除外
+          '1': {
+            $or: {
+              'latestContent.agentEmployee.id': { $eq: userId },
+              'latestContent.reviewSalesEmployee.id': { $eq: userId },
+              'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+              'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
+              // 'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+              'latestContent.reviewManagerEmployee.id': { $eq: userId },
+            },
+          },
+          // // 2 報價單被 業務 業務主管 業務經理 審核過
+          //  2 報價單被總經理審核過
+          '2': {
+            // $and: {
+            //   'latestContent.salesReviewedAt': { $notNull: true },
+            //   'latestContent.supervisorReviewedAt': { $notNull: true },
+            //   'latestContent.salesManagerReviewedAt': { $notNull: true },
+            //   'latestContent.managerReviewedAt': { $notNull: true },
+            // },
+            'latestContent.managerReviewedAt': { $notNull: true },
+          },
+        },
+      };
+    }
+
+    // 準合約階段
+    return {
+      $and: {
+        // 1 使用者為經辦或任一階段的審核者
+        '1': {
+          $or: {
+            'latestContent.agentEmployee.id': { $eq: userId },
+            'latestContent.reviewSalesEmployee.id': { $eq: userId },
+            'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+            'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
+            'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+            'latestContent.reviewCashierEmployee.id': { $eq: userId },
+            'latestContent.reviewManagerEmployee.id': { $eq: userId },
+          },
+        },
+        // // 2 報價單被所有審核者審核過\
+        // 2 報價單被總經理審核過
+        '2': {
+          // $and: {
+          //   'latestContent.salesReviewedAt': { $notNull: true },
+          //   'latestContent.supervisorReviewedAt': { $notNull: true },
+          //   'latestContent.salesManagerReviewedAt': { $notNull: true },
+          //   'latestContent.workDirectorReviewedAt': { $notNull: true },
+          //   'latestContent.managerReviewedAt': { $notNull: true },
+          // },
+          'latestContent.managerReviewedAt': { $notNull: true },
+        },
+      },
+    };
+  }
+
+  // _____________________________________________
+  return {};
+};
+
+// 舊的filter 留做參考又或許未來某天會拿出來用
+// 要注意的是，裡面忘記對cashier做處理
+// const filter = (() => {
+//   if (!reviewStatus || reviewStatus === '待審核') {
+//     if (status === 'Pending' || status === 'TempPending') {
+//       return {
+//         // 使用者為經辦或審核業務
+//         $or: {
+//           'latestContent.agentEmployee.id': { $eq: userId },
+//           'latestContent.reviewSalesEmployee.id': { $eq: userId },
+//         },
+//         // 還沒送審給業務以外的任一階段審核者
+//         $and: {
+//           // 'latestContent.toSalesAt': { $null: true },
+//           'latestContent.toSupervisorAt': { $null: true },
+//           'latestContent.toSalesManagerAt': { $null: true },
+//           'latestContent.toWorkDirectorAt': { $null: true },
+//           'latestContent.cashierReviewedAt': { $null: true },
+//           'latestContent.toManagerAt': { $null: true },
+//         },
+//       };
+//     }
+
+//     return {
+//       // 使用者為經辦
+//       'latestContent.agentEmployee.id': { $eq: userId },
+//       // 還沒送審給任一階段審核者
+//       $and: {
+//         'latestContent.toSalesAt': { $null: true },
+//         'latestContent.toSupervisorAt': { $null: true },
+//         'latestContent.toSalesManagerAt': { $null: true },
+//         'latestContent.toWorkDirectorAt': { $null: true },
+//         'latestContent.cashierReviewedAt': { $null: true },
+//         'latestContent.toManagerAt': { $null: true },
+//       },
+//     };
+//   }
+
+//   // _____________________________________________
+//   if (reviewStatus === '審核中') {
+//     // 如果在預算或投標階段
+//     if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+//       return {
+//         // 同時滿足兩個條件
+//         $and: {
+//           // 1 使用者為經辦或任一階段的審核者
+//           '1': {
+//             $or: {
+//               'latestContent.agentEmployee.id': { $eq: userId },
+//               'latestContent.reviewSalesEmployee.id': { $eq: userId },
+//               'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+//               'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
+//               'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+//               'latestContent.reviewManagerEmployee.id': { $eq: userId },
+//             },
+//           },
+//           // 2 報價單已送審審核業務或業務主管或業務經理
+//           '2': {
+//             $or: {
+//               'latestContent.toSalesAt': { $notNull: true },
+//               'latestContent.toSupervisorAt': { $notNull: true },
+//               'latestContent.toSalesManagerAt': { $notNull: true },
+//               'latestContent.toManagerAt': { $notNull: true },
+//             },
+//           },
+//           // 3 報價單沒有同時被 審核業務 業務主管 業務經理 審核過
+//           '3': {
+//             $or: {
+//               'latestContent.salesReviewedAt': { $null: true },
+//               'latestContent.supervisorReviewedAt': { $null: true },
+//               'latestContent.salesManagerReviewedAt': { $null: true },
+//               'latestContent.managerReviewedAt': { $null: true },
+//             },
+//           },
+//         },
+//       };
+//     }
+
+//     return {
+//       // 同時滿足兩個條件
+//       $and: {
+//         // 1 使用者為經辦或任一階段的審核者
+//         '1': {
+//           $or: {
+//             'latestContent.agentEmployee.id': { $eq: userId },
+//             'latestContent.reviewSalesEmployee.id': { $eq: userId },
+//             'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+//             'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
+//             'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+//             'latestContent.reviewManagerEmployee.id': { $eq: userId },
+//           },
+//         },
+//         // 2 報價單已送審給任一階段的審核者(除了業務)
+//         '2': {
+//           $or: {
+//             // 'latestContent.toSalesAt': { $notNull: true },
+//             'latestContent.toSupervisorAt': { $notNull: true },
+//             'latestContent.toSalesManagerAt': { $notNull: true },
+//             'latestContent.toWorkDirectorAt': { $notNull: true },
+//             'latestContent.toManagerAt': { $notNull: true },
+//           },
+//         },
+//         // 3 報價單有任一審核者沒有審核過
+//         '3': {
+//           $or: {
+//             'latestContent.salesReviewedAt': { $null: true },
+//             'latestContent.supervisorReviewedAt': { $null: true },
+//             'latestContent.salesManagerReviewedAt': { $null: true },
+//             'latestContent.workDirectorReviewedAt': { $null: true },
+//             'latestContent.managerReviewedAt': { $null: true },
+//           },
+//         },
+//       },
+//     };
+//   }
+
+//   // _____________________________________________
+//   if (reviewStatus === '審核完成') {
+//     // 如果在預算或投標階段
+//     if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+//       return {
+//         $and: {
+//           // 1 使用者為經辦或任一階段的審核者
+//           '1': {
+//             $or: {
+//               'latestContent.agentEmployee.id': { $eq: userId },
+//               'latestContent.reviewSalesEmployee.id': { $eq: userId },
+//               'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+//               'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
+//               'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+//               'latestContent.reviewManagerEmployee.id': { $eq: userId },
+//             },
+//           },
+//           // 2 報價單被 業務 業務主管 業務經理 審核過
+//           '2': {
+//             $and: {
+//               'latestContent.salesReviewedAt': { $notNull: true },
+//               'latestContent.supervisorReviewedAt': { $notNull: true },
+//               'latestContent.salesManagerReviewedAt': { $notNull: true },
+//               'latestContent.managerReviewedAt': { $notNull: true },
+//             },
+//           },
+//         },
+//       };
+//     }
+
+//     return {
+//       $and: {
+//         // 1 使用者為經辦或任一階段的審核者
+//         '1': {
+//           $or: {
+//             'latestContent.agentEmployee.id': { $eq: userId },
+//             'latestContent.reviewSalesEmployee.id': { $eq: userId },
+//             'latestContent.reviewSupervisorEmployee.id': { $eq: userId },
+//             'latestContent.reviewSalesManagerEmployee.id': { $eq: userId },
+//             'latestContent.reviewWorkDirectorEmployee.id': { $eq: userId },
+//             'latestContent.reviewManagerEmployee.id': { $eq: userId },
+//           },
+//         },
+//         // 2 報價單被所有審核者審核過
+//         '2': {
+//           $and: {
+//             'latestContent.salesReviewedAt': { $notNull: true },
+//             'latestContent.supervisorReviewedAt': { $notNull: true },
+//             'latestContent.salesManagerReviewedAt': { $notNull: true },
+//             'latestContent.workDirectorReviewedAt': { $notNull: true },
+//             'latestContent.managerReviewedAt': { $notNull: true },
+//           },
+//         },
+//       },
+//     };
+//   }
+
+//   // _____________________________________________
+//   return {};
+// })();
