@@ -6,7 +6,7 @@ import Decimal from 'decimal.js';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import EditDefunctionBtn from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDeductionEditor';
@@ -14,6 +14,9 @@ import EditDefunctionBtn from 'components/page/worksDepartment/contracList/contr
 // gear
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import Row, { Cell } from 'components/global/gear/table/row';
+import SignatureBar, { TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 
 // icon
 import { IconCheck02, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
@@ -33,7 +36,6 @@ import {
 
 // untils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import { error } from 'console';
 
 // ==============================================================================
 
@@ -72,6 +74,13 @@ type Tstate_incomeBillSerial = {
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
 
+type TtableRow = {
+  caption: React.ReactNode;
+  foreign: React.ReactNode;
+  domestic: React.ReactNode;
+  total: React.ReactNode;
+};
+
 // ==============================================================================
 
 // MARK:START
@@ -87,6 +96,10 @@ export default function IncomeSummons() {
     year = String(thisYear),
     month = String(thisMonth),
   } = query;
+
+  // -----------------------------------------------------------------------------
+
+  const [showTable, setShowTable] = useState(false);
 
   // -----------------------------------------------------------------------------
 
@@ -234,6 +247,16 @@ export default function IncomeSummons() {
     ] as TselectPropsArr;
   }, [year, month, yearOptionArr, monthOptionArr]);
 
+  const panelList: TpanelList = [
+    {
+      type: 'myButton',
+      label: '收款統計明細表',
+      onClick: () => {
+        setShowTable(true);
+      },
+    },
+  ];
+
   // -----------------------------------------------------------------------------
   // MARK: RENDER
   return (
@@ -241,11 +264,12 @@ export default function IncomeSummons() {
       <PageHeader02
         tagList={tagList}
         customeLeft={[<SelectBar key="selectBar" className={'ml-5'} selectPropsArr={selectPropsArr} />]}
+        panelList={panelList}
       />
       <div className={scss.main}>
         <div className={scss.tableWrapper}>
           <div className={scss.table}>
-            <Row className={scss.thead}>
+            <SummonsRow className={scss.thead}>
               <div style={config.btnPanel.style} className={config.btnPanel.className}></div>
               {keyArr.map((key) => {
                 const { label, style, className } = config[key];
@@ -256,7 +280,7 @@ export default function IncomeSummons() {
                   </div>
                 );
               })}
-            </Row>
+            </SummonsRow>
 
             {data_incomeBill.map((data, index) => {
               return (
@@ -271,6 +295,7 @@ export default function IncomeSummons() {
           </div>
         </div>
         {/*  */}
+        <Table showTable={showTable} onCrossClick={() => setShowTable(false)} />
       </div>
     </SubLayer>
   );
@@ -283,8 +308,13 @@ export default function IncomeSummons() {
 // ==============================================================================
 // ==============================================================================
 // MARK: COMPONENT
-
-const Row_pre = (
+//
+//
+//
+//
+//
+// MARK: Row
+const SummonsRow_pre = (
   {
     //
     className,
@@ -302,7 +332,7 @@ const Row_pre = (
   );
 };
 
-const Row = forwardRef(Row_pre);
+// MARK: Summons
 
 const Summons_pre = (
   {
@@ -397,7 +427,7 @@ const Summons_pre = (
   // ---------------------------------------------------------------------
 
   return (
-    <Row ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled)}>
+    <SummonsRow ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled)}>
       <div className={scss.btnPanel} style={config.btnPanel.style}>
         <IconEdit className={classNames(!disabled && scss.enable)} onClick={() => setDisabled((state) => !state)} />
         <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_onConfirm} />
@@ -426,11 +456,124 @@ const Summons_pre = (
           </div>
         );
       })}
-    </Row>
+    </SummonsRow>
+  );
+};
+
+const Table = ({ showTable, onCrossClick }: { showTable: boolean; onCrossClick: () => void }) => {
+  const fakeData: TtableRow[] = [
+    {
+      caption: '本月實際收款額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+    {
+      caption: '本月預估收款額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+    {
+      caption: '不足預估之收款額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+    {
+      caption: '下月預估收款額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+    {
+      caption: '99月累計收款額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+    {
+      caption: '應收帳款總額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+  ];
+
+  const signatureArr: TsignatureBarItem[] = useMemo(() => {
+    const signatureArr: TsignatureBarItem[] = [
+      {
+        label: '總經理',
+        className: 'w-[100px]',
+        value: '',
+        isReviewed: false,
+      },
+      {
+        label: '經理',
+        className: 'w-[100px]',
+        value: '',
+        isReviewed: false,
+      },
+      {
+        label: '主管',
+        className: 'w-[100px]',
+        value: '',
+        isReviewed: false,
+      },
+      {
+        label: '製表',
+        className: 'w-[100px]',
+        value: '',
+        isReviewed: false,
+      },
+    ];
+
+    return signatureArr;
+  }, []);
+
+  return (
+    <DragableModal
+      handleText="收款統計明細表"
+      //
+      show={showTable}
+      onCrossClick={onCrossClick}
+    >
+      <div className={scss.tableContainer}>
+        <p className={scss.tableTitle}>{`${999}年${99}月收款統計明細表`}</p>
+
+        <div className={scss.table}>
+          <Row thead={true}>
+            <Cell style={config_table.caption.style}></Cell>
+            <Cell style={config_table.foreign.style}>外銷</Cell>
+            <Cell style={config_table.domestic.style}>國內</Cell>
+            <Cell style={config_table.total.style}>合計</Cell>
+          </Row>
+          {fakeData.map((data, index) => {
+            const { caption, foreign, domestic, total } = data;
+
+            return (
+              <Row key={index}>
+                <Cell style={config_table.caption.style}>{caption}</Cell>
+                <Cell style={config_table.foreign.style}>{foreign}</Cell>
+                <Cell style={config_table.domestic.style}>{domestic}</Cell>
+                <Cell style={config_table.total.style}>{total}</Cell>
+              </Row>
+            );
+          })}
+        </div>
+        <SignatureBar
+          className="mt-5"
+          control={{
+            signatureArr: signatureArr,
+          }}
+        />
+      </div>
+    </DragableModal>
   );
 };
 
 // forwardRef
+const SummonsRow = forwardRef(SummonsRow_pre);
 const Summons = forwardRef(Summons_pre);
 
 // ==============================================================================
@@ -1133,3 +1276,35 @@ const config: Tconfig = {
 
   //
 } as const;
+
+type Tconfig_table_item = {
+  label: string;
+  style?: React.CSSProperties;
+  className?: string;
+};
+
+type Tconfig_table = {
+  [key: string]: Tconfig_table_item;
+};
+
+const config_table: Tconfig_table = {
+  caption: {
+    label: '',
+    style: {
+      width: 150,
+      // flex: '1',
+    },
+  },
+  foreign: {
+    label: '外銷',
+    style: { width: 120 },
+  },
+  domestic: {
+    label: '國內',
+    style: { width: 120 },
+  },
+  total: {
+    label: '合計',
+    style: { width: 120 },
+  },
+};
