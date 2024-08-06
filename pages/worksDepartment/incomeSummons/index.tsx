@@ -113,8 +113,12 @@ export default function IncomeSummons() {
           $eq: isForeign === 'true',
         },
         incomeBillDate: {
-          $gte: moment(`${year}-${month}`).startOf('month').toISOString(),
-          $lte: moment(`${year}-${month}`).endOf('month').toISOString(),
+          $gte: moment(`${year}-${month.padStart(2, '0')}`)
+            .startOf('month')
+            .toISOString(),
+          $lte: moment(`${year}-${month.padStart(2, '0')}`)
+            .endOf('month')
+            .toISOString(),
         },
       },
     };
