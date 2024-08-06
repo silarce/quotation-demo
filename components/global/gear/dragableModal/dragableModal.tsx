@@ -66,25 +66,25 @@ const DragableModal = ({
         return;
       }
 
-      let { movementX, movementY } = e;
+      const { movementX, movementY } = e;
       const currentTarget = e.currentTarget as Element;
-      const { left, right, top, bottom } = currentTarget.getBoundingClientRect();
+      const { left, right, top, bottom, width, height } = currentTarget.getBoundingClientRect();
 
-      if (left <= 0 && movementX < 0) {
-        movementX = 0;
-      }
+      // if (left <= 0 && movementX < 0) {
+      //   movementX = 0;
+      // }
 
-      if (right >= windowSize.width && movementX > 0) {
-        movementX = 0;
-      }
+      // if (right >= windowSize.width && movementX > 0) {
+      //   movementX = 0;
+      // }
 
-      if (top <= 0 && movementY < 0) {
-        movementY = 0;
-      }
+      // if (top <= 0 && movementY < 0) {
+      //   movementY = 0;
+      // }
 
-      if (bottom >= windowSize.height && movementY > 0) {
-        movementY = 0;
-      }
+      // if (bottom >= windowSize.height && movementY > 0) {
+      //   movementY = 0;
+      // }
 
       setCoordinate((座標) => {
         let x = 座標.x + movementX;
@@ -92,6 +92,11 @@ const DragableModal = ({
         // 必須取整數，不然子元素與子元素，子元素與父元素之間會有間隙
         x = Math.round(x);
         y = Math.round(y);
+
+        x < 0 && (x = 0);
+        y < 0 && (y = 0);
+        x + width >= windowSize.width && (x = windowSize.width - width);
+        y + height >= windowSize.height && (y = windowSize.height - height);
 
         return { x, y };
       });
@@ -167,6 +172,15 @@ const DragableModal = ({
             className={classNames(scss.cross, crossClassName)}
             style={crossStyle}
             onClick={onCrossClick}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+            }}
+            onMouseUp={(e) => {
+              e.stopPropagation();
+            }}
+            onMouseUpCapture={(e) => {
+              e.stopPropagation();
+            }}
           />
         )}
       </div>
