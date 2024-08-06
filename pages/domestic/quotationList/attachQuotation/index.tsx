@@ -196,6 +196,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     managerReviewedAt,
     toSalesAt,
     toSupervisorAt,
+    toSalesManagerAt,
     toWorkDirectorAt,
     toCashierAt,
     toManagerAt,
@@ -289,6 +290,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   toSalesAt = theContent?.toSalesAt;
   toSupervisorAt = theContent?.toSupervisorAt;
+  toSalesManagerAt = theContent?.toSalesManagerAt;
   toWorkDirectorAt = theContent?.toWorkDirectorAt;
   toCashierAt = theContent?.toCashierAt;
   toManagerAt = theContent?.toManagerAt;
@@ -303,8 +305,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
     agentEmployee = theContent?.agentEmployee;
   }
 
-  isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
-  isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+  isSendToReview = !!(
+    toSalesAt ||
+    toSupervisorAt ||
+    toSalesManagerAt ||
+    toWorkDirectorAt ||
+    toCashierAt ||
+    toManagerAt
+  );
+  isSendToReview_pending = !!(toSupervisorAt || toSalesManagerAt || toWorkDirectorAt || toCashierAt || toManagerAt);
 
   version = theContent?.version;
   editNotes = theContent?.editNotes;
@@ -326,7 +335,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isSupervisor = true;
         isReviewer = true;
       }
-    } else if (userId === reviewSalesManagerEmployeeId && toSupervisorAt) {
+    } else if (userId === reviewSalesManagerEmployeeId && toSalesManagerAt) {
       if (salesReviewedAt && supervisorReviewedAt) {
         isSalesManagerEmployee = true;
         isReviewer = true;
