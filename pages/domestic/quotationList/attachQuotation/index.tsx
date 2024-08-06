@@ -310,9 +310,11 @@ function TheQuotation({ router }: { router: NextRouter }) {
   editNotes = theContent?.editNotes;
 
   if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-    if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && managerReviewedAt) {
-      isAllReviewedBeforePending = true;
-    }
+    // if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt && managerReviewedAt) {
+    //   isAllReviewedBeforePending = true;
+    // }
+
+    managerReviewedAt && (isAllReviewedBeforePending = true);
   }
 
   if (userId) {
