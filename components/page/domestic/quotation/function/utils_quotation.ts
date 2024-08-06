@@ -24,7 +24,7 @@ const init_variable = (): {
 
   toSalesAt: string | null | undefined;
   toSupervisorAt: string | null | undefined;
-
+  toSalesManagerAt: string | null | undefined;
   toWorkDirectorAt: string | null | undefined;
   toCashierAt: string | null | undefined;
   toManagerAt: string | null | undefined;
@@ -63,6 +63,7 @@ const init_variable = (): {
 
   const toSalesAt = undefined;
   const toSupervisorAt = undefined;
+  const toSalesManagerAt = undefined;
 
   const toWorkDirectorAt = undefined;
   const toCashierAt = undefined;
@@ -101,6 +102,7 @@ const init_variable = (): {
     managerReviewedAt,
     toSalesAt,
     toSupervisorAt,
+    toSalesManagerAt,
     toWorkDirectorAt,
     toCashierAt,
     toManagerAt,

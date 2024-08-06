@@ -196,6 +196,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
     managerReviewedAt,
     toSalesAt,
     toSupervisorAt,
+    toSalesManagerAt,
     toWorkDirectorAt,
     toCashierAt,
     toManagerAt,
@@ -289,6 +290,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   toSalesAt = theContent?.toSalesAt;
   toSupervisorAt = theContent?.toSupervisorAt;
+  toSalesManagerAt = theContent?.toSalesManagerAt;
   toWorkDirectorAt = theContent?.toWorkDirectorAt;
   toCashierAt = theContent?.toCashierAt;
   toManagerAt = theContent?.toManagerAt;
@@ -303,8 +305,15 @@ function TheQuotation({ router }: { router: NextRouter }) {
     agentEmployee = theContent?.agentEmployee;
   }
 
-  isSendToReview = !!(toSalesAt || toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
-  isSendToReview_pending = !!(toSupervisorAt || toWorkDirectorAt || toCashierAt || toManagerAt);
+  isSendToReview = !!(
+    toSalesAt ||
+    toSupervisorAt ||
+    toSalesManagerAt ||
+    toWorkDirectorAt ||
+    toCashierAt ||
+    toManagerAt
+  );
+  isSendToReview_pending = !!(toSupervisorAt || toSalesManagerAt || toWorkDirectorAt || toCashierAt || toManagerAt);
 
   version = theContent?.version;
   editNotes = theContent?.editNotes;
@@ -326,13 +335,18 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isSupervisor = true;
         isReviewer = true;
       }
-    } else if (userId === reviewSalesManagerEmployeeId && toSupervisorAt) {
+    } else if (userId === reviewSalesManagerEmployeeId && toSalesManagerAt) {
       if (salesReviewedAt && supervisorReviewedAt) {
         isSalesManagerEmployee = true;
         isReviewer = true;
       }
     } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
-      if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) {
+      if (
+        (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) ||
+        // 正常的流程，在這個步驟toSalesManager一定有值，若在這個步驟toSalesManager是null
+        // 代表這個content是在SalesManager這個property被加進來之前的content
+        (salesReviewedAt && supervisorReviewedAt && !toSalesManagerAt)
+      ) {
         isWorkDirector = true;
         isReviewer = true;
       }
@@ -352,9 +366,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
       } else if (
         //
         salesReviewedAt &&
-        workDirectorReviewedAt &&
         supervisorReviewedAt &&
-        salesManagerReviewedAt
+        salesManagerReviewedAt &&
+        workDirectorReviewedAt &&
+        cashierReviewedAt
       ) {
         isManager = true;
         isReviewer = true;
