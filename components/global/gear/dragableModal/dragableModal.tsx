@@ -49,6 +49,7 @@ const DragableModal = ({
   //---------------------------------------------------------------------
 
   const handler_mouseDown = () => {
+    window.getSelection()?.removeAllRanges();
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
     setWindowSize({ width: windowWidth, height: windowHeight });
