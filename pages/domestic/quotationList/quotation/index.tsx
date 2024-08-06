@@ -393,7 +393,12 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isReviewer = true;
       }
     } else if (userId === reviewWorkDirectorEmployeeId && toWorkDirectorAt) {
-      if (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) {
+      if (
+        (salesReviewedAt && supervisorReviewedAt && salesManagerReviewedAt) ||
+        // 正常的流程，在這個步驟toSalesManager一定有值，若在這個步驟toSalesManager是null
+        // 代表這個content是在SalesManager這個property被加進來之前的content
+        (salesReviewedAt && supervisorReviewedAt && !toSalesManagerAt)
+      ) {
         isWorkDirector = true;
         isReviewer = true;
       }
@@ -412,10 +417,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
         isReviewer = true;
       } else if (
         salesReviewedAt &&
-        workDirectorReviewedAt &&
-        cashierReviewedAt &&
         supervisorReviewedAt &&
-        salesManagerReviewedAt
+        salesManagerReviewedAt &&
+        workDirectorReviewedAt &&
+        cashierReviewedAt
       ) {
         isManager = true;
         isReviewer = true;
