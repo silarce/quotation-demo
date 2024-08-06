@@ -3729,7 +3729,7 @@ export type TcreateAccountReceivableAccountsDto = {
   // type: TperiodType;
   accountantId: string[];
   incomeBillDate: string;
-  temporary_separatePayment: number;
+  splitPayment: number;
 };
 
 export type TupdateAccountReceivableAccountantDto = {
@@ -4061,7 +4061,7 @@ export type TaccountantDto = {
   currencyValue: `${number}`; // 幣值
 
   // 已分出金額
-  temporary_separatePayment: number | null;
+  splitPayment: number | null;
 };
 
 export type TcreateAccountantDto = Pick<

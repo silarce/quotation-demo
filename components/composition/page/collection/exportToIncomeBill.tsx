@@ -10,7 +10,7 @@ import scss from './exportToIncomeBill.module.scss';
 
 // ============================================================================
 
-type TonConfirm = (params: { isoString: string; temporary_separatePayment: number }) => Promise<void>;
+type TonConfirm = (params: { isoString: string; splitPayment: number }) => Promise<void>;
 
 // ============================================================================
 
@@ -18,18 +18,20 @@ const ExportToIncomeBill = ({
   //
   onConfirm,
   onCancel,
+  defaultPayment,
 }: {
   onConfirm: TonConfirm;
   onCancel: () => void;
+  defaultPayment: number;
 }) => {
   const [state_incomeBillDate, setState_incomeBillDate] = useState<Moment | null>(null);
-  const [state_temporary_separatePayment, setState_temporary_separatePayment] = useState<number | null>(null);
+  const [state_splitPayment, setState_splitPayment] = useState<number | null>(defaultPayment);
 
   const handle_onConfirm = async () => {
     if (state_incomeBillDate) {
       await onConfirm({
         isoString: state_incomeBillDate.toISOString(),
-        temporary_separatePayment: state_temporary_separatePayment || 0,
+        splitPayment: state_splitPayment || 0,
       });
       onCancel();
     } else {
@@ -61,9 +63,9 @@ const ExportToIncomeBill = ({
         inputProps={{
           props: {
             type: 'number',
-            value: state_temporary_separatePayment ?? '',
+            value: state_splitPayment ?? '',
             onChange: (e) => {
-              setState_temporary_separatePayment(Number(e.target.value));
+              setState_splitPayment(Number(e.target.value));
             },
           },
         }}
