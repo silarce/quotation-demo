@@ -3986,8 +3986,10 @@ export type TaccountsReceivableInvoiceDto = {
   invoiceStatus: TinvoiceStatus;
   // 發票備註
   note: string | null;
+
   // 關聯收款紀錄
   accountantList?: TaccountantDto[];
+
   // 所屬應收帳款期數Id
   accountsReceivablePeriodId: string | null;
   // 所屬應收帳款期數
@@ -4044,7 +4046,8 @@ export type TaccountantDto = {
   // 發票
   invoices?: TaccountsReceivableInvoiceDto[];
   // 收入傳票序號
-  billSerialNumber?: string | null;
+  // billSerialNumber?: string | null;
+  billSerialNumber?: string[] | null;
   // 收入傳票
   incomeBill: TincomeBillSerialDto;
   // 票據到期日
@@ -4054,7 +4057,7 @@ export type TaccountantDto = {
   // ! accountant下的accountsReceivableDeduction將不會再更新
   // ! 要取得 accountsReceivableDeduction 要從 TincomeBillSerialDto取得
   // ! 也就是上面幾行的那個incomeBill
-  // 扣款明細
+  // 扣款明細 // 後端還會用到，但前端不再使用，前端就當作沒有這個property
   // accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
