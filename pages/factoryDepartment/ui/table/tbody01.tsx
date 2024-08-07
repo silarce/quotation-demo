@@ -190,19 +190,16 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   };
 
 
-  async function GetPickingListDetailById(plid: any, create_at: any, create_by: any, lotid: any, picked: any, item: any) {
+  async function GetPickingListDetailById(item: any) {
 
     // console.log(item);
     router.replace({
       pathname: `/factoryDepartment/getMaterial/pickingList`,
       query: {
-        type: 'ss',
-        plid: plid,
-        create_at: getTaiwanDateStr(create_at),
-        create_by: create_by,
-        lotid: lotid,
-        picked: picked,
-        main_item: item.main_item,
+        pickinglistid: item.pickinglistid,
+        create_at: getTaiwanDateStr(item.create_at),
+        create_by: item.create_by,
+        lotid: item.lotid,
         note: item.note
       },
     });
@@ -537,14 +534,13 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader6}>
               <div className={scss.row01}>
-                <span>{_item.plid}</span>
+                <span>{_item.pickinglistid}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.create_by}</span>
-                <span>
-                  <span style={{ color: '#14256a', display: `${_item.picked === true ? "" : "none"}` }}>已領</span>
-                  <span style={{ color: '#ea1833', display: `${_item.picked === false ? "" : "none"}` }}>未領</span>
+                <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "領料中" ? '#28a745' : '#ea1833' }}>
+                  {_item.status}
                 </span>
-                <span ><IconDetail onClick={() => { GetPickingListDetailById(_item.plid, _item.create_at, _item.create_by, _item.lotid, _item.picked, _item) }} /></span>
+                <span ><IconDetail onClick={() => { GetPickingListDetailById(_item) }} /></span>
               </div>
             </CellWithBar>
           ))

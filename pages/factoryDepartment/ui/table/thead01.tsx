@@ -309,11 +309,12 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
       <div className={style.thead20}>
         <span>序</span>
         <span>料號</span>
-        <span>名稱</span>
+        <span>品名</span>
         <span>規格</span>
         <span>數量</span>
         <span>單位</span>
         <span>備註(用途說明)</span>
+        <span></span>
         <span></span>
       </div>
     )
@@ -402,25 +403,42 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
     )
   }
   //#endregion
-    //#region 物料明細
-    else if (type === "ProductList") {
-      return (
-        <div className={style.thead27}>
-          <span>序</span>
-          <span>料號</span>
-          <span>名稱</span>
-          <span>規格</span>
-          <span>材質</span>
-          <span>表面</span>
-          <span>庫存</span>
-          <span>單位</span>
-          <span>更新日期</span>
-          <span>建立日期</span>
-          <span></span>
-        </div>
-      )
-    }
-    //#endregion
+  //#region 物料明細
+  else if (type === "ProductList") {
+    return (
+      <div className={style.thead27}>
+        <span>序</span>
+        <span>料號</span>
+        <span>名稱</span>
+        <span>規格</span>
+        <span>材質</span>
+        <span>表面</span>
+        <span>庫存</span>
+        <span>單位</span>
+        <span>更新日期</span>
+        <span>建立日期</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
+  //#region 新增領料單明細
+  else if (type === "AddPR_PickingList") {
+    return (
+      <div className={style.thead28}>
+        <span>序</span>
+        <span>料號</span>
+        <span>品名</span>
+        <span>規格</span>
+        <span>數量</span>
+        <span>單位</span>
+        <span>備註(用途說明)</span>
+        <span>領料人</span>
+        <span></span>
+      </div>
+    )
+  }
+  //#endregion
   else {
     return null;
   }

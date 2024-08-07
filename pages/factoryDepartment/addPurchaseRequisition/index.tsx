@@ -31,6 +31,8 @@ import icon_fc_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_search from 'public/image/icon/fc_search.svg';
 import { Modal } from 'antd';
 import icon_close from 'public/image/icon/fc_close.svg';
+import icon_remove from 'public/image/icon/fc_remove.svg';
+import icon_clear from 'public/image/icon/fc_clear.svg';
 
 
 type Tquery = {
@@ -400,8 +402,16 @@ export default function AddPurchaseRequisition() {
 
     // 送出按鈕
     function handleAddPR() {
+
+        let needDateObj = new Date(need_date);
+        let createAtinObj = new Date(create_atin);
+
         if (data2.length === 0) {
             myAlert.warning({ title: "尚未加入任何請購項目" });
+            return;
+        } else if (needDateObj < createAtinObj) {
+            myAlert.warning({ title: "需用日期不可小於今日" });
+            return;
         }
         else {
             // 檢查是否有任何一筆的 quantity 為 0
@@ -701,6 +711,16 @@ export default function AddPurchaseRequisition() {
 
 
 
+    const handleClearHandKey = () => {
+        setHandinputproductuuid('');
+        setHandinputproductid('');
+        setHandinputname('');
+        setHandinputspec('');
+        setHandinputunit('');
+        setHandinputnote('');
+        setHandinputquantity('');
+        setShowSuggestions(false);
+    }
 
 
 
@@ -793,7 +813,7 @@ export default function AddPurchaseRequisition() {
                                         },
                                     }}
                                 />
-                                <InputSel
+                                {/* <InputSel
                                     {...inputSelProps}
                                     caption="請購部門"
                                     disabled={true}
@@ -802,10 +822,10 @@ export default function AddPurchaseRequisition() {
                                             value: create_byin,
                                         },
                                     }}
-                                />
+                                /> */}
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="申請人"
+                                    caption="申請人員"
                                     disabled={true}
                                     inputProps={{
                                         props: {
@@ -815,7 +835,7 @@ export default function AddPurchaseRequisition() {
                                 />
                             </div>
                             <div>
-                            <InputSel
+                                <InputSel
                                     caption="需用日期"
                                     className="global_tip_must"
                                     disabled={false}
@@ -835,7 +855,7 @@ export default function AddPurchaseRequisition() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="備註"
+                                    caption="請購備註"
                                     disabled={false}
                                     inputProps={{
                                         props: {
@@ -959,7 +979,7 @@ export default function AddPurchaseRequisition() {
                                             </button> */}
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                <img src={icon_remove.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                             </button>
                                             {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
                                             {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
@@ -1043,6 +1063,10 @@ export default function AddPurchaseRequisition() {
                                     <button onClick={() => { handleAddByHandKey() }}>
                                         <img src={icon_fc_add.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                     </button>
+                                    &nbsp;&nbsp;
+                                    <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote ? '' : 'none' }}>
+                                        <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1054,14 +1078,14 @@ export default function AddPurchaseRequisition() {
                                     <div
                                         style={{
                                             position: 'absolute',
-                                            zIndex: 1001,
+                                            zIndex: 1003,
                                             backgroundColor: 'white',
                                             border: '1px solid #ccc',
                                             borderRadius: '8px',
                                             boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
                                             width: '750px',
-                                            maxHeight: '200px',
-                                            overflowY: 'auto',
+                                            maxHeight: '300px', // 擴大整個容器的高度
+                                            overflow: 'hidden', // 隱藏整個容器的滾動條
                                             fontSize: '16px',
                                             left: `${position.x}px`,
                                             top: `${position.y}px`,
@@ -1069,7 +1093,18 @@ export default function AddPurchaseRequisition() {
                                         }}
                                         onMouseDown={handleMouseDown}
                                     >
-                                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px', borderBottom: '1px solid #ccc' }}>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                padding: '8px',
+                                                borderBottom: '1px solid #ccc',
+                                                backgroundColor: '#f5f5f5', // 標題列的背景色
+                                                cursor: 'move', // 讓用戶知道可以拖動
+                                            }}
+                                        >
+                                            <div style={{ fontWeight: 'bold' }}>查詢結果</div> {/* 標題文字 */}
                                             <button
                                                 onClick={() => setShowSuggestions(false)}
                                                 style={{
@@ -1081,7 +1116,6 @@ export default function AddPurchaseRequisition() {
                                                     color: '#555',
                                                     outline: 'none',
                                                     transition: 'color 0.3s ease',
-
                                                 }}
                                                 onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
                                                 onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
@@ -1089,36 +1123,43 @@ export default function AddPurchaseRequisition() {
                                                 ×
                                             </button>
                                         </div>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                            {filteredData.length > 0 ? (
-                                                filteredData.map((item, index) => (
-                                                    <tr
-                                                        key={index}
-                                                        onClick={() => handleSelect(item)}
-                                                        style={{ padding: '8px', cursor: 'pointer', border: '1px solid gray' }}
-                                                        onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
-                                                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
-                                                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
-                                                    >
-                                                        <td style={{ padding: '8px', width: '150px' }}>
-                                                            {item.productid}
-                                                        </td>
-                                                        <td style={{ padding: '8px', width: '250px' }}>
-                                                            {item.name}
-                                                        </td>
-                                                        <td style={{ padding: '8px', width: '350px' }}>
-                                                            {item.spec}
+                                        <div
+                                            style={{
+                                                maxHeight: '350px', // 限制table區域的最大高度
+                                                overflowY: 'auto', // 允許垂直滾動
+                                            }}
+                                        >
+                                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                                {filteredData.length > 0 ? (
+                                                    filteredData.map((item, index) => (
+                                                        <tr
+                                                            key={index}
+                                                            onClick={() => handleSelect(item)}
+                                                            style={{ padding: '8px', cursor: 'pointer', border: '1px solid gray' }}
+                                                            onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
+                                                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
+                                                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
+                                                        >
+                                                            <td style={{ padding: '8px', width: '150px' }}>
+                                                                {item.productid}
+                                                            </td>
+                                                            <td style={{ padding: '8px', width: '250px' }}>
+                                                                {item.name}
+                                                            </td>
+                                                            <td style={{ padding: '8px', width: '350px' }}>
+                                                                {item.spec}
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
+                                                            沒有匹配的結果
                                                         </td>
                                                     </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
-                                                        沒有匹配的結果
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </table>
+                                                )}
+                                            </table>
+                                        </div>
                                     </div>
                                 )}
                             </div>

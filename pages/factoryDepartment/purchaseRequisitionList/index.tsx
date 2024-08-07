@@ -37,6 +37,9 @@ import icon_disable from 'public/image/icon/fc_disable.svg';
 import icon_print from 'public/image/icon/fc_printer.svg';
 import { color } from 'html2canvas/dist/types/css/types/color';
 import { orange } from '@mui/material/colors';
+import icon_remove from 'public/image/icon/fc_remove.svg';
+import icon_fc_arrow_up from 'public/image/icon/fc_arrow_up.svg';
+
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -1367,7 +1370,7 @@ export default function PurchaseRequisitionList() {
                                             </button> */}
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
                                                 {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '20px', height: '20px' }} />
                                             </button>
                                             {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(_item.prodreceiptuuid) }}>
                                             <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />

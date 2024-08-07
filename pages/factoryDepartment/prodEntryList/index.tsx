@@ -38,6 +38,7 @@ import { color } from 'html2canvas/dist/types/css/types/color';
 import icon_print from 'public/image/icon/fc_printer.svg';
 import icon_wh from 'public/image/icon/fc_wh.svg';
 import icon_sidebar from 'public/image/icon/fc_sidebar.svg';
+import icon_task_close from 'public/image/icon/fc_task_close.svg';
 
 
 
@@ -1536,8 +1537,14 @@ export default function ProdEntryList() {
                                 </button>
                             </div>
                             <div></div>
-                            <div></div>
-                            <div></div>
+                            <div>
+
+                            </div>
+                            <div>
+                                {/* <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
+                                    <img src={icon_task_close.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                </button> */}
+                            </div>
                         </div>
 
                         <div className={scss.head_content1}>
