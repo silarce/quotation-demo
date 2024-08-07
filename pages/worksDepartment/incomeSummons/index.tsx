@@ -17,6 +17,9 @@ import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import Row, { Cell } from 'components/global/gear/table/row';
 import SignatureBar, { TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
+import { Collapse, useActiveKey, UpDownArrow } from 'components/global/myAntd/collapse';
+import ProcessChain, { Tcontrol_processChain, TstatusLabelProps } from 'components/global/gear/processChain';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // icon
 import { IconCheck02, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
@@ -83,6 +86,10 @@ type TtableRow = {
 
 // ==============================================================================
 
+const Panel = Collapse.Panel;
+
+// ==============================================================================
+
 // MARK:START
 
 export default function IncomeSummons() {
@@ -100,6 +107,8 @@ export default function IncomeSummons() {
   // -----------------------------------------------------------------------------
 
   const [showTable, setShowTable] = useState(false);
+  // const [activeIdArr, setActiveIdArr] = useState<string | string[]>([]);
+  const { activePanelKeyArr, changeActive } = useActiveKey();
 
   // -----------------------------------------------------------------------------
 
@@ -178,6 +187,8 @@ export default function IncomeSummons() {
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
   };
+
+  // -----------------------------------------------------------------------------
 
   // -----------------------------------------------------------------------------
 
@@ -271,6 +282,8 @@ export default function IncomeSummons() {
         panelList={panelList}
       />
       <div className={scss.main}>
+        {/*  */}
+
         <div className={scss.tableWrapper}>
           <div className={scss.table}>
             <SummonsRow className={scss.thead}>
@@ -286,21 +299,31 @@ export default function IncomeSummons() {
               })}
             </SummonsRow>
 
-            {data_incomeBill.map((data, index) => {
-              return (
-                <Summons
-                  key={data.id}
-                  incomeBillSerial={data}
-                  reqPatch={reqPatch}
-                  update_incomeBill={update_incomeBill}
-                />
-              );
-            })}
+            <Collapse activeKey={activePanelKeyArr} noTlrBorder={true}>
+              {data_incomeBill.map((data, index) => {
+                return (
+                  <Panel
+                    className={classNames(scss.panel, scss.plus)}
+                    key={data.id}
+                    header={
+                      <Summons
+                        incomeBillSerial={data}
+                        reqPatch={reqPatch}
+                        update_incomeBill={update_incomeBill}
+                        changeActive={() => changeActive(data.id)}
+                      />
+                    }
+                  >
+                    <OtherInfo incomeBillSerial={data} />
+                  </Panel>
+                );
+              })}
+            </Collapse>
           </div>
         </div>
-        {/*  */}
-        <Table showTable={showTable} onCrossClick={() => setShowTable(false)} />
       </div>
+      {/*  */}
+      <Table showTable={showTable} onCrossClick={() => setShowTable(false)} />
     </SubLayer>
   );
 }
@@ -344,10 +367,12 @@ const Summons_pre = (
     incomeBillSerial,
     reqPatch,
     update_incomeBill,
+    changeActive,
   }: {
     incomeBillSerial: TincomeBillSerialDto;
     reqPatch: TreqPatch;
     update_incomeBill: () => void;
+    changeActive: () => void;
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
@@ -433,6 +458,7 @@ const Summons_pre = (
   return (
     <SummonsRow ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled)}>
       <div className={scss.btnPanel} style={config.btnPanel.style}>
+        <UpDownArrow className="h-[20px]" onClick={changeActive} />
         <IconEdit className={classNames(!disabled && scss.enable)} onClick={() => setDisabled((state) => !state)} />
         <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_onConfirm} />
       </div>
@@ -573,6 +599,44 @@ const Table = ({ showTable, onCrossClick }: { showTable: boolean; onCrossClick: 
         />
       </div>
     </DragableModal>
+  );
+};
+
+const OtherInfo = ({ incomeBillSerial }: { incomeBillSerial: TincomeBillSerialDto }) => {
+  const processChainControl = useMemo(() => {
+    // Tcontrol_processChain
+    // TstatusLabelProps
+    const arr: TstatusLabelProps[] = [
+      {
+        label: 'MEOW',
+        dotColor: 'gray',
+      },
+      {
+        label: 'WANG',
+        dotColor: 'red',
+      },
+      {
+        label: 'WEEEEEEEEE',
+        dotColor: 'green',
+      },
+    ];
+
+    const processChainControl = {
+      statusArr: arr,
+    };
+
+    return processChainControl;
+  }, [incomeBillSerial]);
+
+  return (
+    <div className={scss.otherInfo}>
+      <div className={scss.reviewBar}>
+        <MyButton_v2 px="px22" py="py4">
+          審核
+        </MyButton_v2>
+        <ProcessChain control={processChainControl} />
+      </div>
+    </div>
   );
 };
 
@@ -733,7 +797,7 @@ const keyArr: TconfigKey[] = [
 const config: Tconfig = {
   btnPanel: {
     label: '',
-    style: { width: 70 },
+    style: { width: 120 },
     className: scss.btnPanel,
     createInputSelProps: () => ({}),
   },
@@ -1312,3 +1376,7 @@ const config_table: Tconfig_table = {
     style: { width: 120 },
   },
 };
+
+{
+  /* <span className="text-9xl">&#11137;</span> */
+}
