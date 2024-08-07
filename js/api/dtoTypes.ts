@@ -3705,6 +3705,7 @@ export type TincomeBillSerialDto = {
   // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
   // temporary_separatePayment: number | null;
   //
+  accountsReceivableDeduction?: TaccountsReceivableDeductionDto[];
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3723,7 +3724,19 @@ export type TupdateIncomeBillSerialDto = Pick<
   | 'unpaidPayment'
   | 'difference'
   | 'note'
->;
+> & {
+  incomeBillDeduction: TupdateIncomeBillDeductionDto[];
+  fee: number | null;
+} & {
+  order?: number;
+  isImported?: boolean;
+};
+
+type TupdateIncomeBillDeductionDto = {
+  id?: string; // 不提供則將此筆視為新資料
+  itemName: string; // 項目
+  detailedAmount: number; // 明細金額
+};
 
 export type TcreateAccountReceivableAccountsDto = {
   // type: TperiodType;
@@ -3799,7 +3812,7 @@ export type TaccountsReceivableDto = {
   // 所屬舊合約
   legacyContract: TlegacyContractDto | null;
   // 扣款明細 // 棄用?
-  accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
+  // accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
   // 收款期
   periods: TaccountsReceivablePeriodDto[] | null;
   // 合約總金額(會因為追加而增加)
@@ -4038,8 +4051,13 @@ export type TaccountantDto = {
   noteMaturityDate: string | null;
   // 排序
   order: number;
+  // ! accountant下的accountsReceivableDeduction將不會再更新
+  // ! 要取得 accountsReceivableDeduction 要從 TincomeBillSerialDto取得
+  // ! 也就是上面幾行的那個incomeBill
   // 扣款明細
-  accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  // accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   // 已匯入紙本應收帳款(舊的收款紀錄)
   isImported: boolean;
   // 票據狀態
