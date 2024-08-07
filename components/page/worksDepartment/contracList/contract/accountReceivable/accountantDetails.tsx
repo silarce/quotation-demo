@@ -165,8 +165,9 @@ export default function AccountantDetails({
         noteMaturityDate = '',
         fee,
         billSerialNumber = '',
-        accountsReceivableDeduction = [],
+        incomeBill,
       } = accountant;
+      const accountsReceivableDeduction = incomeBill.accountsReceivableDeduction ?? [];
 
       const deductionTotal = accountsReceivableDeduction.reduce((acc, cur) => acc + cur.detailedAmount, 0);
 

@@ -51,7 +51,7 @@ import {
   apiPostAccountant,
   apiPatchAccountant,
   deleteAccountant,
-  apiPatchAccountant_accountReceivable,
+
   //
   useGetAccountant,
   useGetAccountantPreset,
@@ -182,7 +182,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       });
 
       const params: Tparams = {
-        populate: ['accountsReceivableDeduction'],
+        populate: ['incomeBill.accountsReceivableDeduction'],
         sort: 'insertDate',
         pageSize: 999999,
         filter: {
@@ -817,7 +817,7 @@ const Row = ({
       billSerialNumber: data_accountant.billSerialNumber ?? '',
       notes: data_accountant.notes ?? '',
       isImported: data_accountant.isImported,
-      accountsReceivableDeduction: data_accountant.accountsReceivableDeduction,
+      accountsReceivableDeduction: data_accountant.incomeBill.accountsReceivableDeduction ?? [],
       noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
       receiptCollectionDate: receiptCollectionDate ? moment(receiptCollectionDate) : null,
       receiptEstimatedDate: receiptEstimatedDate ? moment(receiptEstimatedDate) : null,
