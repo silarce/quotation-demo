@@ -66,13 +66,16 @@ type Tstate_incomeBillSerial = {
   unpaidPayment: string;
   difference: string;
   //
-  fee: string;
+  readonly fee: number; // 現在是從accountant裡面拿
   //
   note: string;
   vendorName: string;
 
   // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
   // temporary_separatePayment: string;
+
+  //
+  readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
 };
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
@@ -116,7 +119,8 @@ export default function IncomeSummons() {
     return {
       sort: 'billSerialNumber',
       pageSize: 999999,
-      populate: ['accountant'],
+      // populate: ['accountant'],
+      populate: ['accountant', 'accountsReceivableDeduction'],
       filter: {
         isForeign: {
           $eq: isForeign === 'true',
@@ -166,6 +170,8 @@ export default function IncomeSummons() {
       difference,
       //
       note,
+      accountsReceivableDeduction,
+      fee,
     } = state_incomeBillSerial;
 
     const body: TupdateIncomeBillSerialDto = {
@@ -183,6 +189,9 @@ export default function IncomeSummons() {
       unpaidPayment: unpaidPayment ? Number(unpaidPayment) : null,
       difference: difference ? difference : null,
       note: note,
+
+      fee,
+      incomeBillDeduction: accountsReceivableDeduction ?? [],
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
@@ -398,6 +407,8 @@ const Summons_pre = (
       //
       note,
 
+      accountsReceivableDeduction,
+
       // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
       // temporary_separatePayment,
     } = incomeBillSerial;
@@ -420,10 +431,12 @@ const Summons_pre = (
       deductionPayment: String(deductionPayment || ''),
       unpaidPayment: String(unpaidPayment || ''),
       difference: difference || '',
-      fee: String(accountant?.fee || '0'),
+      fee: accountant?.fee || 0,
       //
       note: note ?? '',
       vendorName: accountant.vendorName ?? '',
+
+      accountsReceivableDeduction: accountsReceivableDeduction,
 
       // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
       // temporary_separatePayment: (temporary_separatePayment || 0).toLocaleString(),
@@ -1266,7 +1279,7 @@ const config: Tconfig = {
         inputProps: {
           props: {
             className: 'text-right',
-            defaultValue: state_incomeBillSerial.fee,
+            defaultValue: state_incomeBillSerial.fee.toLocaleString(),
           },
         },
       };
