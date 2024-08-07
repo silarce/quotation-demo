@@ -67,7 +67,7 @@ export default function DeductionDetail({
       const deductionList_num: { [itemName: string]: number } = {};
 
       // 將所有accountantList中的accountsReceivableDeduction抽出來放進同一個陣列中
-      const deductionArr = _.flatMap(accountantArr, (acct) => acct?.accountsReceivableDeduction);
+      const deductionArr = _.flatMap(accountantArr, (acct) => acct?.incomeBill.accountsReceivableDeduction);
 
       deductionArr.forEach((deduction) => {
         const { itemName = '', detailedAmount = 0 } = deduction ?? {};

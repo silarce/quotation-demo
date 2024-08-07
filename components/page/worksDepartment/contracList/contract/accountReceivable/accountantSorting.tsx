@@ -306,7 +306,8 @@ export default function AccountantSorting({
           importAccountingNumber,
           noteMaturityDate,
           price,
-          accountsReceivableDeduction,
+          // accountsReceivableDeduction,
+          incomeBill: { accountsReceivableDeduction },
         } = accountant;
 
         return {
@@ -869,7 +870,7 @@ const createNoInvoiceState = (accountantArr_noInvoice: TaccountantDto[]) => {
       importAccountingNumber,
       noteMaturityDate,
       price,
-      accountsReceivableDeduction,
+      incomeBill: { accountsReceivableDeduction },
     } = accountant;
 
     return {

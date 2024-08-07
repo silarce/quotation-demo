@@ -45,7 +45,7 @@ import {
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
-import { TaccountantDto, apiPatchAccountant_accountReceivable } from 'js/api/api_accountant';
+import { TaccountantDto } from 'js/api/api_accountant';
 
 import type { TcustomerDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
 
@@ -91,10 +91,15 @@ export default function AccountReceivable() {
     customPopulate: [
       'content.customer',
       'engineeringContact',
-      'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
+
+      // 'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
+      // 現在 invoices下沒有accountantList
+      'accountReceivable.periods.invoices',
+
       'accountReceivable.periods.invoices.accountantInvoiceBook',
       'accountReceivable.accountantList.invoices',
       'accountReceivable.accountantList.accountsReceivableDeduction',
+      'accountReceivable.incomeBillList',
     ],
   });
 
@@ -526,7 +531,7 @@ export default function AccountReceivable() {
       <PageHeader panelList={[]} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div className={scss.main}>
-        <Profile {...props_profile} />
+        {/* <Profile {...props_profile} />
 
         <TotalCalc
           className="mt-10"
@@ -556,7 +561,7 @@ export default function AccountReceivable() {
             reqDeleteInvoice={reqDeleteInvoice}
             reqDeletePeriod={reqDeletePeriod}
           />
-        </AccountReceivableContext.Provider>
+        </AccountReceivableContext.Provider> */}
       </div>
     </SubLayer>
   );
