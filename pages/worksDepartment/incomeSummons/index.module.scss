@@ -37,12 +37,14 @@ $topBlockHeight: 50px;
   padding-right: 50px;
 
   width: fit-content;
-  background-color: inherit;
+  // background-color: inherit;
+  background-color: #fff;
   font-size: 16px;
 
   > div {
     // text-align: center;
     background-color: inherit;
+    // background-color: #fff;
     padding: 0 10px;
 
     > input {
