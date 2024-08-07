@@ -35,7 +35,7 @@ type Tstate_accountant = {
   noteNumber: string;
   noteMaturityDate: string | null;
   fee: string;
-  billSerialNumber: string;
+  billSerialNumber: string[];
   //
 
   state_deduction: Tstate_deduction[];
@@ -164,7 +164,7 @@ export default function AccountantDetails({
         noteNumber = '',
         noteMaturityDate = '',
         fee,
-        billSerialNumber = '',
+        billSerialNumber,
         incomeBill,
       } = accountant;
       const accountsReceivableDeduction = incomeBill.accountsReceivableDeduction ?? [];
@@ -192,7 +192,7 @@ export default function AccountantDetails({
         noteNumber: noteNumber ?? '',
         noteMaturityDate,
         fee: String(fee),
-        billSerialNumber: billSerialNumber ?? '',
+        billSerialNumber: billSerialNumber ?? [],
         state_deduction: state_deduction,
         deductionTotal,
       };
@@ -294,7 +294,10 @@ export default function AccountantDetails({
                 />
               </div>
 
-              <div className={scss.cell} style={configList['billSerialNumber'].style}>
+              <div
+                className={classNames(scss.cell, configList['billSerialNumber'].className)}
+                style={configList['billSerialNumber'].style}
+              >
                 {billSerialNumber}
               </div>
               <div className={scss.cell} style={configList['deductionTotal'].style}>
@@ -303,12 +306,6 @@ export default function AccountantDetails({
 
               <div className={scss.cell} style={configList['btn'].style}>
                 {!disabled && (
-                  // <Image
-                  //   className="cursor-pointer"
-                  //   src={iconEyeOpen}
-                  //   alt="編輯扣款"
-                  //   onClick={() => handle_editDeduction(index_state, state_deduction)}
-                  // />
                   <EditDefunctionBtn
                     defaultStateArr={state_deduction}
                     onConfirm={({ state_deductionArr }) => {
@@ -473,6 +470,7 @@ const configList: TconfigList = {
   billSerialNumber: {
     label: '收入傳票序號',
     style: { width: '165px' },
+    className: 'whitespace-pre-wrap break-words',
   },
   deductionTotal: {
     label: '扣款總額',
