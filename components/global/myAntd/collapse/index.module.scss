@@ -7,16 +7,20 @@
   }
 }
 .panel.plus {
+  background-color: #fff;
   :global(.ant-collapse-header) {
     display: block;
     padding: 0;
-    background-color: #fff;
+    background-color: inherit;
     cursor: auto;
   }
 
-  :global(.ant-collapse-content-box) {
-    padding: 0;
-    background-color: #fff;
+  :global(.ant-collapse-content) {
+    background-color: inherit;
+    :global(.ant-collapse-content-box) {
+      padding: 0;
+      background-color: inherit;
+    }
   }
 }
 
