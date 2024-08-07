@@ -3700,7 +3700,7 @@ export type TincomeBillSerialDto = {
   accountantId: string;
   accountant: TaccountantDto;
   //
-  temporary_note: string | null;
+  note: string | null;
 
   // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
   // temporary_separatePayment: number | null;
@@ -3722,7 +3722,7 @@ export type TupdateIncomeBillSerialDto = Pick<
   | 'deductionPayment'
   | 'unpaidPayment'
   | 'difference'
-  | 'temporary_note'
+  | 'note'
 >;
 
 export type TcreateAccountReceivableAccountsDto = {

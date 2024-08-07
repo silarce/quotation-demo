@@ -68,7 +68,7 @@ type Tstate_incomeBillSerial = {
   //
   fee: string;
   //
-  temporary_note: string;
+  note: string;
   vendorName: string;
 
   // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
@@ -165,7 +165,7 @@ export default function IncomeSummons() {
       unpaidPayment,
       difference,
       //
-      temporary_note,
+      note,
     } = state_incomeBillSerial;
 
     const body: TupdateIncomeBillSerialDto = {
@@ -182,7 +182,7 @@ export default function IncomeSummons() {
       deductionPayment: deductionPayment ? Number(deductionPayment) : null,
       unpaidPayment: unpaidPayment ? Number(unpaidPayment) : null,
       difference: difference ? difference : null,
-      temporary_note: temporary_note,
+      note: note,
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
@@ -396,7 +396,7 @@ const Summons_pre = (
       //
       accountant,
       //
-      temporary_note,
+      note,
 
       // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
       // temporary_separatePayment,
@@ -422,7 +422,7 @@ const Summons_pre = (
       difference: difference || '',
       fee: String(accountant?.fee || '0'),
       //
-      temporary_note: temporary_note ?? '',
+      note: note ?? '',
       vendorName: accountant.vendorName ?? '',
 
       // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
@@ -740,7 +740,7 @@ type TconfigKey =
       | 'deductionPayment'
       | 'unpaidPayment'
       | 'difference'
-      | 'temporary_note'
+      | 'note'
 
       // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
       // | 'temporary_separatePayment'
@@ -788,7 +788,7 @@ const keyArr: TconfigKey[] = [
   'unpaidPayment',
   'difference',
 
-  'temporary_note',
+  'note',
 
   // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
   // 'temporary_separatePayment',
@@ -1275,7 +1275,7 @@ const config: Tconfig = {
     },
   },
 
-  temporary_note: {
+  note: {
     label: '備註',
     style: { width: 200 },
     className: '',
@@ -1284,12 +1284,12 @@ const config: Tconfig = {
         textareaProps: {
           allowNewLineByUser: true,
           props: {
-            value: state_incomeBillSerial.temporary_note,
+            value: state_incomeBillSerial.note,
             onChange: (e) => {
               setState_incomeBillSerial((prev) => {
                 return {
                   ...prev,
-                  temporary_note: e.target.value,
+                  note: e.target.value,
                 };
               });
             },
