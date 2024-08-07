@@ -149,7 +149,7 @@ export const useGetAccountant_id = (
     populate: [
       //
       'invoices',
-      'incomeBill.incomeBillDeduction',
+      'incomeBill.accountsReceivableDeduction',
       'accountsReceivableDeduction',
       'exchangeFrom',
     ],
