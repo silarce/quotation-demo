@@ -501,6 +501,8 @@ const Summons_pre = (
       {keyArr.map((key) => {
         const { style, className, createInputSelProps: createInputAttr } = config[key];
 
+        // 要使!isPaperImported為true的狀態仍可以編輯
+        // 將送進createInputAttr中的disabled回傳即可
         const inputSelProps = createInputAttr({
           disabled: disabled,
           isPaperImported,
@@ -1322,6 +1324,7 @@ const config: Tconfig = {
     className: '',
     createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const inputSelProps: TinputSelProps = {
+        disabled,
         textareaProps: {
           allowNewLineByUser: true,
           props: {
