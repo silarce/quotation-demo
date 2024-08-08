@@ -20,7 +20,7 @@ import PeriodTable, {
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable/periodTable';
 import IncomeBillDetails, {
   Tstate_incomeBill,
-} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDetails';
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/incomeBillDetails';
 import DeductionDetail from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetail';
 import AccountantSorting, {
   Tstate_incomeBillSorting,
