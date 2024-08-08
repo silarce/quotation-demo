@@ -15,7 +15,7 @@ import type {
   TaccountsReceivablePeriodDto,
   TupdateAccountReceivableDeductionDto,
   TaccountsReceivableInvoiceDto,
-  TaccountantDto,
+  TincomeBillSerialDto,
 } from 'js/api/dtoTypes';
 
 // DND
@@ -60,7 +60,7 @@ type Tstate = {
   isInvoiceAllowanceChanged: boolean;
   isInvoiceAccountantRelationChanged: boolean;
   invoice: Tinvoice;
-  accountantArr: Taccountant[];
+  accountantArr: TincomeBill[];
 };
 
 type Tinvoice = {
@@ -71,15 +71,16 @@ type Tinvoice = {
   allowance: string;
 };
 
-type Taccountant = {
+type TincomeBill = {
   id: UniqueIdentifier; // 就是string | number // id 必須唯一
   invoiceId: UniqueIdentifier; //  同所屬invoice
-  insertDate: React.ReactNode;
   importAccountingNumber: React.ReactNode;
   noteMaturityDate: React.ReactNode; // 票據到期日
-  price: React.ReactNode;
-  price_num: number;
-  // price: number;
+
+  receiveDate: React.ReactNode;
+  receivablePayment: React.ReactNode;
+  receivablePayment_num: number;
+
   //
   isRelationedInvoiceChanged: boolean;
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
@@ -91,7 +92,7 @@ type TstateList = {
 
 type TdndData_row = {
   invoice: Tinvoice;
-  accountant: Taccountant;
+  incomeBill: TincomeBill;
 };
 
 type TdndData_group = {
@@ -107,18 +108,18 @@ export type { TstateList as Tstate_accountantSorting };
 export default function AccountantSorting({
   className,
   periodArr,
-  accountantArr_noInvoice,
+  incomeBillList_noInvoice,
   onConfirm,
 }: {
   className?: string;
   periodArr: TaccountsReceivablePeriodDto[];
-  accountantArr_noInvoice: TaccountantDto[];
+  incomeBillList_noInvoice: TincomeBillSerialDto[];
   onConfirm: (stateList: TstateList) => Promise<void>;
 }) {
   const [disabled, setDisabled] = useState(true);
 
   const [stateList, setStateList] = useState<TstateList>({});
-  const [activeAccountant, setActiveAccountant] = useState<Taccountant>();
+  const [activeAccountant, setActiveAccountant] = useState<TincomeBill>();
 
   // -----------------------------------------------------------------------------
 
@@ -214,22 +215,20 @@ export default function AccountantSorting({
         return;
       }
 
-      const accountantList = invoice.accountantList;
+      const incomeBillList = invoice.incomeBillList;
 
       // const price = period.price || 0;
       const price = invoice.actualPrice || 0;
 
       total_invoice_d = total_invoice_d.add(price || 0);
 
-      accountantList?.forEach((acct) => {
-        const { price } = acct;
-        total_accountant_d = total_accountant_d.add(price || 0);
+      incomeBillList?.forEach((incomeBill) => {
+        total_accountant_d = total_accountant_d.add(incomeBill.receivablePayment || 0);
       });
     }); // periodArr.forEach
 
-    accountantArr_noInvoice?.forEach((acct) => {
-      const { price } = acct;
-      total_accountant_d = total_accountant_d.add(price || 0);
+    incomeBillList_noInvoice?.forEach((incomeBill) => {
+      total_accountant_d = total_accountant_d.add(incomeBill.receivablePayment || 0);
     });
 
     const amountNotCollected = new Decimal(total_invoice_d).minus(total_accountant_d).toNumber().toLocaleString();
@@ -240,7 +239,7 @@ export default function AccountantSorting({
       total_accountant: total_accountant_d.toNumber().toLocaleString(),
       amountNotCollected,
     };
-  }, [periodArr, accountantArr_noInvoice]);
+  }, [periodArr, incomeBillList_noInvoice]);
 
   // 棄用
   // const { total_accountant, amountNotCollected } = useMemo(() => {
@@ -273,7 +272,7 @@ export default function AccountantSorting({
 
   useEffect(() => {
     const list: TstateList = {};
-    list.noInvoice = createNoInvoiceState(accountantArr_noInvoice);
+    list.noInvoice = createNoInvoiceState(incomeBillList_noInvoice);
 
     periodArr.forEach((period) => {
       // const periodPrice = period.price || 0;
@@ -289,39 +288,38 @@ export default function AccountantSorting({
       const {
         //
         id: invoiceId,
-        accountantList,
+        incomeBillList,
         invoiceNumber,
         invoiceDate,
         actualPrice: invoiceActualPrice,
         allowance,
       } = invoice;
 
-      const orderedAccountantList = _.sortBy(accountantList, 'order');
+      const orderedincomeBillList = _.sortBy(incomeBillList, 'order');
 
-      const accountantArr = orderedAccountantList.map((accountant) => {
+      const accountantArr = orderedincomeBillList.map((incomeBill) => {
         const {
           //
           id: accountantId,
-          insertDate,
+          receiveDate,
           importAccountingNumber,
           noteMaturityDate,
-          price,
-          // accountsReceivableDeduction,
-          incomeBill: { accountsReceivableDeduction },
-        } = accountant;
+          receivablePayment,
+          accountsReceivableDeduction,
+        } = incomeBill;
 
         return {
           id: accountantId,
           invoiceId,
-          insertDate: getTaiwanDateStr(insertDate),
+          receiveDate: getTaiwanDateStr(receiveDate),
           importAccountingNumber,
           noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
           // price: price.toLocaleString(),
-          price: price.toLocaleString(),
-          price_num: price,
+          receivablePayment: receivablePayment?.toLocaleString(),
+          receivablePayment_num: receivablePayment || 0,
           accountsReceivableDeduction,
           isRelationedInvoiceChanged: false,
-        } as Taccountant;
+        } as TincomeBill;
       }); // accountantArr
 
       list[invoiceId] = {
@@ -341,7 +339,7 @@ export default function AccountantSorting({
     }); // invoiceArr.forEach
 
     setStateList(list);
-  }, [periodArr, accountantArr_noInvoice, disabled]);
+  }, [periodArr, incomeBillList_noInvoice, disabled]);
 
   // -----------------------------------------------------------------------------
   // region RENDER
@@ -590,10 +588,10 @@ const Group_Dnd = ({
             const {
               //
               id,
-              insertDate,
+              receiveDate: insertDate,
               importAccountingNumber,
               noteMaturityDate,
-              price,
+              receivablePayment: price,
             } = accountant;
 
             return (
@@ -628,7 +626,7 @@ const Row_Dnd = ({
   id: UniqueIdentifier; // accountant id
   children: React.ReactNode;
   invoice: Tinvoice;
-  accountant: Taccountant;
+  accountant: TincomeBill;
   className?: string;
 }) => {
   const {
@@ -664,7 +662,7 @@ const Row_Dnd = ({
 // region FUNCTION
 
 const findIdIndex = (dndData: TdndData_row, stateList: TstateList) => {
-  const { invoice, accountant } = dndData;
+  const { invoice, incomeBill: accountant } = dndData;
   const { id: invoiceId } = invoice;
   const { id: accountantId } = accountant;
 
@@ -680,11 +678,11 @@ const findIdIndex = (dndData: TdndData_row, stateList: TstateList) => {
 
 function handleDragStart(
   e: DragStartEvent,
-  setActiveState: React.Dispatch<React.SetStateAction<Taccountant | undefined>>
+  setActiveState: React.Dispatch<React.SetStateAction<TincomeBill | undefined>>
 ) {
   const { active } = e;
   const { data } = active;
-  const activeAccountant = data.current?.accountant as Taccountant;
+  const activeAccountant = data.current?.accountant as TincomeBill;
   setActiveState(activeAccountant);
 }
 
@@ -694,7 +692,7 @@ function handleDragEnd(
   //
   e: DragEndEvent,
   stateList: TstateList,
-  setActiveState: React.Dispatch<React.SetStateAction<Taccountant | undefined>>,
+  setActiveState: React.Dispatch<React.SetStateAction<TincomeBill | undefined>>,
   setStateListArr: React.Dispatch<React.SetStateAction<TstateList>>
 ) {
   const { active, over } = e;
@@ -766,7 +764,7 @@ function handleDragOver(
       return;
     }
 
-    const activeAccountant = (active.data.current as TdndData_row)?.accountant;
+    const activeAccountant = (active.data.current as TdndData_row)?.incomeBill;
 
     activeAccountant.isRelationedInvoiceChanged = true;
     activeAccountant.invoiceId = invoiceId_over;
@@ -814,7 +812,7 @@ function handleDragOver(
     return;
   }
 
-  const activeAccountant = (active.data.current as TdndData_row)?.accountant;
+  const activeAccountant = (active.data.current as TdndData_row)?.incomeBill;
 
   activeAccountant.isRelationedInvoiceChanged = true;
   activeAccountant.invoiceId = invoiceId_over;
@@ -851,7 +849,7 @@ function handleDragOver(
 
 // ===============================================================================
 
-const createNoInvoiceState = (accountantArr_noInvoice: TaccountantDto[]) => {
+const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]) => {
   const virtualInvoice: Tinvoice = {
     id: 'noInvoice',
     invoiceNumber: '---',
@@ -860,30 +858,30 @@ const createNoInvoiceState = (accountantArr_noInvoice: TaccountantDto[]) => {
     allowance: '',
   };
 
-  const accountantArr_noInvoice_order = _.sortBy(accountantArr_noInvoice, 'order');
+  const incomeBillList_noInvoice_order = _.sortBy(incomeBillList_noInvoice, 'order');
 
-  const accountantArr = accountantArr_noInvoice_order.map((accountant) => {
+  const accountantArr = incomeBillList_noInvoice_order.map((incomeBill) => {
     const {
       //
       id: accountantId,
-      insertDate,
+      receiveDate,
       importAccountingNumber,
       noteMaturityDate,
-      price,
-      incomeBill: { accountsReceivableDeduction },
-    } = accountant;
+      receivablePayment,
+      accountsReceivableDeduction,
+    } = incomeBill;
 
     return {
       id: accountantId,
       invoiceId: 'noInvoice',
-      insertDate: getTaiwanDateStr(insertDate),
+      receiveDate: getTaiwanDateStr(receiveDate),
       importAccountingNumber,
       noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
-      price: price.toLocaleString(),
-      price_num: price,
+      receivablePayment: receivablePayment?.toLocaleString(),
+      receivablePayment_num: receivablePayment,
       accountsReceivableDeduction,
       isRelationedInvoiceChanged: false,
-    } as Taccountant;
+    } as TincomeBill;
   });
 
   return {

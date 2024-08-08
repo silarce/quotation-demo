@@ -94,12 +94,12 @@ export default function AccountReceivable() {
 
       // 'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
       // 現在 invoices下沒有accountantList
-      'accountReceivable.periods.invoices',
+      'accountReceivable.periods.invoices.incomeBillList',
 
       'accountReceivable.periods.invoices.accountantInvoiceBook',
       'accountReceivable.accountantList.invoices',
       'accountReceivable.accountantList.accountsReceivableDeduction',
-      'accountReceivable.incomeBillList',
+      // 'accountReceivable.incomeBillList',
     ],
   });
 
@@ -131,22 +131,27 @@ export default function AccountReceivable() {
   //   return arr;
   // }, [periodArr]);
 
-  const { accountantArr, accountantArr_noInvoice } = useMemo(() => {
-    const accountantArr = accountReceivable?.accountantList ?? [];
+  const { accountantArr, incomeBillList_noInvoice: incomeBillList_noInvoice } = useMemo(() => {
+    // const accountantArr = accountReceivable?.accountantList ?? [];
+    const incomeBillList = accountReceivable?.incomeBillList ?? [];
 
-    const accountantArr_noInvoice = accountantArr.filter((acc) => {
-      if (!acc.invoices) {
-        return true;
-      } else if (acc.invoices.length === 0) {
-        return true;
-      }
+    // const accountantArr_noInvoice = accountantArr.filter((acc) => {
+    //   if (!acc.invoices) {
+    //     return true;
+    //   } else if (acc.invoices.length === 0) {
+    //     return true;
+    //   }
+    // });
+
+    const incomeBillList_noInvoice = incomeBillList.filter((income) => {
+      return !income.invoices || income.invoices.length === 0;
     });
 
     return {
-      accountantArr,
-      accountantArr_noInvoice,
+      accountantArr: undefined,
+      incomeBillList_noInvoice,
     };
-  }, [accountReceivable?.accountantList]);
+  }, [accountReceivable?.incomeBillList]);
 
   // --------------------------------------------------------------------------
 
@@ -531,7 +536,7 @@ export default function AccountReceivable() {
       <PageHeader panelList={[]} contractNumber={engineeringContact?.contractNumber ?? ''} />
 
       <div className={scss.main}>
-        {/* <Profile {...props_profile} />
+        <Profile {...props_profile} />
 
         <TotalCalc
           className="mt-10"
@@ -543,15 +548,15 @@ export default function AccountReceivable() {
           //
           className="mt-10"
           periodArr={periodArr}
-          accountantArr_noInvoice={accountantArr_noInvoice}
+          incomeBillList_noInvoice={incomeBillList_noInvoice}
           onConfirm={reqPatchAccountant_sorting}
         />
 
-        <AccountantDetails className="mt-10 " accountantArr={accountantArr} reqPatchAccountant={reqPatchAccountant} />
+        {/* <AccountantDetails className="mt-10 " accountantArr={accountantArr} reqPatchAccountant={reqPatchAccountant} /> */}
 
-        <DeductionDetail className="mt-10 " periodArr={periodArr} />
+        {/* <DeductionDetail className="mt-10 " periodArr={periodArr} /> */}
 
-        <AccountReceivableContext.Provider value={contextValue}>
+        {/* <AccountReceivableContext.Provider value={contextValue}>
           <PeriodTable
             className="mt-10 "
             data_finalProdcut={data_finalProdcut}

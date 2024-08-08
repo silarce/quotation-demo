@@ -3706,6 +3706,8 @@ export type TincomeBillSerialDto = {
   // temporary_separatePayment: number | null;
   //
   accountsReceivableDeduction?: TaccountsReceivableDeductionDto[];
+  order: number | null;
+  invoices?: TaccountsReceivableInvoiceDto[];
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3745,9 +3747,12 @@ export type TcreateAccountReceivableAccountsDto = {
   splitPayment: number;
 };
 
+// apiPatchAccountReceivableAccountant用的
+// 更新指定ReceivableAccountant下指定發票與incomeBill的關聯
 export type TupdateAccountReceivableAccountantDto = {
   invoiceId: string;
-  accountantId: string[];
+  // accountantId: string[];
+  incomeBillId: string[];
   // temporary_separatePayment: number;
 }[];
 
@@ -3847,7 +3852,9 @@ export type TaccountsReceivableDto = {
   // 保留款是否含稅
   isFinalPaymentWithTax: boolean | null;
   //
-  accountantList?: TaccountantDto[];
+  // 棄用 後端會留著，但前端不會再用了，視為沒有這個property
+  // accountantList?: TaccountantDto[];
+  incomeBillList?: TincomeBillSerialDto[];
 };
 
 export type TupdateAccountReceivableDto = Partial<
@@ -3988,7 +3995,9 @@ export type TaccountsReceivableInvoiceDto = {
   note: string | null;
 
   // 關聯收款紀錄
-  accountantList?: TaccountantDto[];
+  // accountantList?: TaccountantDto[];
+
+  incomeBillList?: TincomeBillSerialDto[];
 
   // 所屬應收帳款期數Id
   accountsReceivablePeriodId: string | null;
