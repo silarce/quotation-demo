@@ -431,9 +431,7 @@ const Summons_pre = (
       note,
 
       accountsReceivableDeduction,
-
-      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-      // temporary_separatePayment,
+      fee,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
@@ -455,7 +453,7 @@ const Summons_pre = (
       deductionPayment: String(deductionPayment || ''),
       unpaidPayment: String(unpaidPayment || ''),
       difference: difference || '',
-      fee: accountant?.fee || 0,
+      fee: fee || 0,
       //
       note: note ?? '',
       vendorName: accountant.vendorName ?? '',
