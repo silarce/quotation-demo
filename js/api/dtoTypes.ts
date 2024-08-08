@@ -4092,7 +4092,7 @@ export type TaccountantDto = {
   currencyValue: `${number}`; // 幣值
 
   // 已分出金額
-  splitPayment: number | null;
+  splitPayment: number[] | null;
 };
 
 export type TcreateAccountantDto = Pick<

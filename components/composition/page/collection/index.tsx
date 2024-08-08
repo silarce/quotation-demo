@@ -102,7 +102,7 @@ type Tstate_accountant = {
   price: string; // 新台幣 = 匯率 * 金額
 
   // 已分出金額
-  readonly splitPayment: string;
+  readonly splitPayment: number[];
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
@@ -850,7 +850,7 @@ const Row = ({
       exchangeRate: String(exchangeRate || ''),
       currencyValue: String(currencyValue || ''),
 
-      splitPayment: splitPayment ? splitPayment.toLocaleString() : '',
+      splitPayment: splitPayment ?? [],
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -1476,20 +1476,12 @@ const configList: TconfigList = {
     },
     className: '',
     inputSelPropsCreator({ state_accountant }) {
-      const reactNode = <span className="whitespace-pre-wrap break-words">{state_accountant.splitPayment}</span>;
+      const strArr = state_accountant.splitPayment.map((payment) => payment.toLocaleString());
+      const str = strArr.join('\n');
 
-      // const inputProps: TinputProps = {
-      //   props: {
-      //     placeholder: '',
-      //     readOnly: true,
-      //     style: { textAlign: 'end' },
-      //     value: state_accountant.splitPayment,
-      //     onChange: () => {},
-      //   },
-      // };
+      const reactNode = <span className="whitespace-pre-wrap break-words">{str}</span>;
 
       return {
-        disabled: true,
         reactNode,
       };
     },
@@ -1516,5 +1508,5 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   exchangeRate: '1', // 預設為1，不然price計算結果為0
   currencyValue: '', // 金額
 
-  splitPayment: '',
+  splitPayment: [],
 });
