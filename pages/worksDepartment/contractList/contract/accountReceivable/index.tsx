@@ -18,7 +18,7 @@ import TotalCalc from 'components/page/worksDepartment/contracList/contract/acco
 import PeriodTable, {
   Tstate_period,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable/periodTable';
-import AccountantDetails, {
+import IncomeBillDetails, {
   Tstate_incomeBill,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDetails';
 import DeductionDetail from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetail';
@@ -99,7 +99,7 @@ export default function AccountReceivable() {
       'accountReceivable.periods.invoices.accountantInvoiceBook',
       'accountReceivable.accountantList.invoices',
       'accountReceivable.accountantList.accountsReceivableDeduction',
-      // 'accountReceivable.incomeBillList',
+      'accountReceivable.incomeBillList.accountant',
     ],
   });
 
@@ -551,14 +551,13 @@ export default function AccountReceivable() {
         />
 
         <AccountantSorting
-          //
           className="mt-10"
           periodArr={periodArr}
           incomeBillList_noInvoice={incomeBillList_noInvoice}
           onConfirm={reqPatchAccountant_sorting}
         />
 
-        <AccountantDetails className="mt-10 " incomeBillList={incomeBillList} reqPatchAccountant={reqPatchAccountant} />
+        <IncomeBillDetails className="mt-10 " incomeBillList={incomeBillList} reqPatchAccountant={reqPatchAccountant} />
 
         {/* <DeductionDetail className="mt-10 " periodArr={periodArr} /> */}
 

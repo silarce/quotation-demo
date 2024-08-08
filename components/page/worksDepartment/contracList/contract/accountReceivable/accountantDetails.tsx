@@ -50,7 +50,7 @@ export type { Tstate_incomeBill, Tstate_deduction };
 // ============================================================================
 // region START
 // 收款明細
-export default function AccountantDetails({
+export default function IncomeBillDetails({
   className,
   incomeBillList,
   reqPatchAccountant,
@@ -74,34 +74,6 @@ export default function AccountantDetails({
       return copy;
     });
   };
-
-  // const handle_editDeduction = (index: number, state_deduction: Tstate_deduction[]) => {
-  //   const modal = myAlert.btnBar({});
-
-  //   const onConfirm = (state_deduction: Tstate_deduction[]) => {
-  //     const deductionTotal = state_deduction.reduce((acc, cur) => acc + Number(cur.detailedAmount), 0);
-
-  //     setState_accountantArr((arr) => {
-  //       const copy = [...arr];
-  //       copy[index].state_deduction = state_deduction;
-  //       copy[index].deductionTotal = deductionTotal;
-
-  //       return copy;
-  //     });
-  //     modal.destroy();
-  //   };
-
-  //   modal.update({
-  //     content: (
-  //       <EditDeduction
-  //         //
-  //         state_deduction={state_deduction}
-  //         onCancel={modal.destroy}
-  //         onConfirm={onConfirm}
-  //       />
-  //     ),
-  //   });
-  // };
 
   const handle_editDeduction = (index: number, state_deductionArr: Tstate_deduction[]) => {
     const deductionTotal = state_deductionArr.reduce((acc, cur) => acc + Number(cur.detailedAmount), 0);
@@ -160,7 +132,7 @@ export default function AccountantDetails({
       const {
         id,
         receiveDate: insertDate = '',
-        accountant: { paymentType = 'n/a' },
+        accountant: { paymentType = '' },
         importAccountingNumber,
         receivablePayment = 0,
         noteNumber = '',
@@ -244,7 +216,7 @@ export default function AccountantDetails({
         }}
       >
         <Thead />
-        {state_incomeBillArr.map((accountant, index_state) => {
+        {state_incomeBillArr.map((incomeBill, index_state) => {
           const {
             id,
             receiveDate,
@@ -257,7 +229,7 @@ export default function AccountantDetails({
             billSerialNumber,
             state_deduction,
             deductionTotal,
-          } = accountant;
+          } = incomeBill;
 
           return (
             <Row key={id}>
