@@ -10,7 +10,7 @@ import TopBar from 'components/page/worksDepartment/contracList/contract/account
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // css
-import scss from './accountantDetails.module.scss';
+import scss from './incomeBillDetails.module.scss';
 
 // type
 import type { TincomeBillSerialDto } from 'js/api/dtoTypes';
@@ -96,8 +96,8 @@ export default function IncomeBillDetails({
       (acc, cur) => {
         const { receivablePayment: price, fee, deductionTotal } = cur;
 
-        const acc_priceNum = new Decimal(price).add(acc.price).toNumber();
-        const acc_feeNum = new Decimal(fee).add(acc.fee).toNumber();
+        const acc_priceNum = new Decimal(price || 0).add(acc.price).toNumber();
+        const acc_feeNum = new Decimal(fee || 0).add(acc.fee).toNumber();
         const acc_deductionTotalNum = new Decimal(deductionTotal).add(acc.deductionTotal).toNumber();
 
         return {
@@ -166,7 +166,7 @@ export default function IncomeBillDetails({
         receivablePayment: receivablePayment || 0,
         noteNumber: noteNumber ?? '',
         noteMaturityDate,
-        fee: String(fee),
+        fee: String(fee || 0),
         billSerialNumber: billSerialNumber,
         state_deduction: state_deduction,
         deductionTotal,
