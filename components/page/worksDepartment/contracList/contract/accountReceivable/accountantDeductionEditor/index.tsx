@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 
@@ -37,6 +37,7 @@ type Tstate_deduction = {
 
 type Tprops = {
   accountantId?: string;
+  incomeBillId?: string;
   defaultStateArr?: Tstate_deduction[];
 
   // 現在api只有回傳fee跟id，未來真的需要時再請後端回傳完整的TaccountantDto
@@ -45,7 +46,7 @@ type Tprops = {
   cancelOnSuccess?: boolean;
 };
 
-type Tprops_modal = Pick<Tprops, 'accountantId' | 'defaultStateArr' | 'onConfirm' | 'cancelOnSuccess'>;
+type Tprops_modal = Pick<Tprops, 'accountantId' | 'incomeBillId' | 'defaultStateArr' | 'onConfirm' | 'cancelOnSuccess'>;
 
 export type { Tstate_deduction };
 
@@ -59,6 +60,7 @@ function EditDeductionPanel({
   // 若有accountantId就會呼叫api取得資料，否則就會用defaultStateArr
   // accountantId與defaultStateArr都有的話，accountantId會優先
   accountantId,
+  incomeBillId,
   defaultStateArr,
   onConfirm,
   onCancel,
@@ -73,6 +75,25 @@ function EditDeductionPanel({
     data: data_accountant,
     // isFetching: isFetching_accountant
   } = useGetAccountant_id(accountantId);
+
+  const data_incomeBill = useMemo(() => {
+    if (!data_accountant) {
+      return null;
+    }
+
+    const incomeBill = data_accountant.incomeBill.find((item) => item.id === incomeBillId);
+
+    !incomeBill &&
+      myAlert.err({
+        title: '找不到incomeBill',
+        content: `
+      accountantId:${accountantId}，
+      incomeBillId:${incomeBillId}
+      `,
+      });
+
+    return incomeBill || null;
+  }, [data_accountant, incomeBillId]);
 
   // --------------------------------------------------------------------
 
@@ -96,10 +117,7 @@ function EditDeductionPanel({
   };
 
   const handle_confirm = async () => {
-    if (!data_accountant) {
-      return;
-    }
-
+    //
     const accountsReceivableDeduction = state_deductionArr.map((item) => {
       return {
         ...item,
@@ -107,13 +125,17 @@ function EditDeductionPanel({
       };
     });
 
-    const body: TupdateIncomeBillSerialDto = {
-      ...data_accountant.incomeBill,
-      incomeBillDeduction: accountsReceivableDeduction,
-      fee: data_accountant.fee,
-    };
-
     if (accountantId) {
+      if (!data_incomeBill) {
+        return;
+      }
+
+      const body: TupdateIncomeBillSerialDto = {
+        ...data_incomeBill,
+        incomeBillDeduction: accountsReceivableDeduction,
+        fee: data_incomeBill.fee,
+      };
+
       // 現在api只有回傳fee跟id，未來真的需要時再請後端回傳完整的TaccountantDto
       const res = await apiPatchIncomeBill(accountantId, body)
         .then((res) => {
@@ -139,7 +161,21 @@ function EditDeductionPanel({
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
-    const deductionArr = data_accountant?.incomeBill?.accountsReceivableDeduction || defaultStateArr || [];
+    const deductionArr = (() => {
+      let deductionArr;
+
+      if (!data_accountant) {
+        deductionArr = defaultStateArr;
+      } else {
+        const incomeBill = data_accountant.incomeBill.find((item) => item.id === incomeBillId);
+
+        if (incomeBill) {
+          deductionArr = incomeBill?.accountsReceivableDeduction;
+        }
+      }
+
+      return deductionArr || [];
+    })();
 
     const state_deductionArr: Tstate_deduction[] = deductionArr.map((deduction) => {
       return {
@@ -229,7 +265,7 @@ function EditDeductionPanel({
 // ====================================================================
 
 // 直接呼叫modal的靜態函式
-const editDeduction = ({ accountantId, defaultStateArr, onConfirm, cancelOnSuccess }: Tprops_modal) => {
+const editDeduction = ({ accountantId, incomeBillId, defaultStateArr, onConfirm, cancelOnSuccess }: Tprops_modal) => {
   const modal = myAlert.clear({});
 
   modal.update({
@@ -237,6 +273,7 @@ const editDeduction = ({ accountantId, defaultStateArr, onConfirm, cancelOnSucce
       <EditDeductionPanel
         //
         accountantId={accountantId}
+        incomeBillId={incomeBillId}
         defaultStateArr={defaultStateArr}
         onConfirm={onConfirm}
         onCancel={modal.destroy}
@@ -249,6 +286,7 @@ const editDeduction = ({ accountantId, defaultStateArr, onConfirm, cancelOnSucce
 const EditDefunctionBtn = ({
   className,
   accountantId,
+  incomeBillId,
   defaultStateArr,
   onConfirm,
 }: {
@@ -262,6 +300,7 @@ const EditDefunctionBtn = ({
       onClick={() => {
         editDeduction({
           accountantId,
+          incomeBillId,
           defaultStateArr,
           onConfirm,
         });

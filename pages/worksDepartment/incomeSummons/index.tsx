@@ -51,6 +51,7 @@ type Tquery = {
 };
 
 type Tstate_incomeBillSerial = {
+  id: string;
   billSerialNumber: string;
   receiveDate: Moment | null;
   contractNumber: string;
@@ -85,6 +86,27 @@ type TtableRow = {
   foreign: React.ReactNode;
   domestic: React.ReactNode;
   total: React.ReactNode;
+};
+
+type TconfigItem = {
+  label: string;
+  style?: React.CSSProperties;
+  className?: string;
+  createInputSelProps: (props: {
+    disabled: boolean;
+    isPaperImported: boolean;
+    state_incomeBillSerial: Tstate_incomeBillSerial;
+    setState_incomeBillSerial: React.Dispatch<React.SetStateAction<Tstate_incomeBillSerial>>;
+    //
+    accountantId?: string;
+    update_incomeBill?: () => void;
+  }) => TinputSelProps;
+};
+
+type Tconfig = {
+  [key in TconfigKey]: TconfigItem;
+} & {
+  btnPanel: TconfigItem;
 };
 
 // ==============================================================================
@@ -389,6 +411,7 @@ const Summons_pre = (
 
   const defaultState = useMemo(() => {
     const {
+      id,
       billSerialNumber,
       receiveDate,
       contractNumber,
@@ -417,6 +440,7 @@ const Summons_pre = (
     difference = (difference ?? '').trimEnd();
 
     const defaultState: Tstate_incomeBillSerial = {
+      id,
       billSerialNumber: billSerialNumber,
       receiveDate: receiveDate ? moment(receiveDate) : null,
       contractNumber: contractNumber || '',
@@ -760,27 +784,6 @@ type TconfigKey =
     >
   | 'fee'
   | 'vendorName';
-
-type TconfigItem = {
-  label: string;
-  style?: React.CSSProperties;
-  className?: string;
-  createInputSelProps: (props: {
-    disabled: boolean;
-    isPaperImported: boolean;
-    state_incomeBillSerial: Tstate_incomeBillSerial;
-    setState_incomeBillSerial: React.Dispatch<React.SetStateAction<Tstate_incomeBillSerial>>;
-    //
-    accountantId?: string;
-    update_incomeBill?: () => void;
-  }) => TinputSelProps;
-};
-
-type Tconfig = {
-  [key in TconfigKey]: TconfigItem;
-} & {
-  btnPanel: TconfigItem;
-};
 
 const keyArr: TconfigKey[] = [
   'billSerialNumber',
@@ -1192,7 +1195,14 @@ const config: Tconfig = {
             onChange: onChange,
           },
         },
-        suffix: accountantId && <EditDefunctionBtn accountantId={accountantId} onConfirm={update_incomeBill} />,
+        suffix: accountantId && (
+          <EditDefunctionBtn
+            //
+            accountantId={accountantId}
+            incomeBillId={state_incomeBillSerial.id}
+            onConfirm={update_incomeBill}
+          />
+        ),
       };
 
       return inputSelProps;

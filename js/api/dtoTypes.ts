@@ -3731,7 +3731,7 @@ export type TupdateIncomeBillSerialDto = Pick<
   incomeBillDeduction: TupdateIncomeBillDeductionDto[];
   fee: number | null;
 } & {
-  order?: number;
+  order?: number | null;
   isImported?: boolean;
 };
 
@@ -4059,7 +4059,7 @@ export type TaccountantDto = {
   // billSerialNumber?: string | null;
   billSerialNumber?: string[] | null;
   // 收入傳票
-  incomeBill: TincomeBillSerialDto;
+  incomeBill: TincomeBillSerialDto[];
   // 票據到期日
   noteMaturityDate: string | null;
   // 排序
