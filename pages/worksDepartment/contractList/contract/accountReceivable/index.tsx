@@ -559,7 +559,7 @@ export default function AccountReceivable() {
 
         <IncomeBillDetails className="mt-10 " incomeBillList={incomeBillList} reqPatchAccountant={reqPatchAccountant} />
 
-        {/* <DeductionDetail className="mt-10 " periodArr={periodArr} /> */}
+        <DeductionDetail className="mt-10 " periodArr={periodArr} />
 
         {/* <AccountReceivableContext.Provider value={contextValue}>
           <PeriodTable

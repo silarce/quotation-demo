@@ -42,8 +42,6 @@ export default function DeductionDetail({
   const height = ref_table.current?.offsetHeight;
 
   // --------------------------------------------------------------------------
-
-  // --------------------------------------------------------------------------
   const { rowArr, deductionKeyArr } = useMemo(() => {
     const deductionTotalList_num: { [itemName: string]: number } = {};
     defaultKeyArr.forEach((key) => (deductionTotalList_num[key] = 0));
@@ -60,14 +58,14 @@ export default function DeductionDetail({
       } = acPeriod;
 
       // 把invoices中的accountantList抽出來
-      const accountantArr = invoices.map((invoice) => invoice.accountantList).flat();
+      const incomeBillList = invoices.map((invoice) => invoice.incomeBillList).flat();
 
       const thePeriod = `第${period || depositPeriod}期 ${type}`;
       let total = 0;
       const deductionList_num: { [itemName: string]: number } = {};
 
-      // 將所有accountantList中的accountsReceivableDeduction抽出來放進同一個陣列中
-      const deductionArr = _.flatMap(accountantArr, (acct) => acct?.incomeBill.accountsReceivableDeduction);
+      // 將所有incomeBill中的accountsReceivableDeduction抽出來放進同一個陣列中
+      const deductionArr = _.flatMap(incomeBillList, (incomeBill) => incomeBill?.accountsReceivableDeduction);
 
       deductionArr.forEach((deduction) => {
         const { itemName = '', detailedAmount = 0 } = deduction ?? {};
