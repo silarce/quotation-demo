@@ -900,10 +900,26 @@ const config: Tconfig = {
       // flex: '1',
       width: 200,
     },
-    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
-      inputProps: {
+    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => {
+      //
+      // const inputProps: TinputSelProps['inputProps'] = {
+      //   props: {
+      //     // className: 'text-center',
+      //     value: state_incomeBillSerial.projectName,
+      //     onChange: (e) => {
+      //       setState_incomeBillSerial((prev) => {
+      //         return {
+      //           ...prev,
+      //           projectName: e.target.value,
+      //         };
+      //       });
+      //     },
+      //   },
+      // };
+      //
+
+      const textareaProps: TinputSelProps['textareaProps'] = {
         props: {
-          // className: 'text-center',
           value: state_incomeBillSerial.projectName,
           onChange: (e) => {
             setState_incomeBillSerial((prev) => {
@@ -914,8 +930,12 @@ const config: Tconfig = {
             });
           },
         },
-      },
-    }),
+      };
+
+      //
+
+      return { textareaProps };
+    },
   },
   contractPayment: {
     label: '承攬價',
