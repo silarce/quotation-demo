@@ -27,7 +27,7 @@ import { selectModalCreator_multi } from 'components/global/gear/modal/selectorM
 
 // type
 import type { Toption } from 'js/utils/options/options';
-import type { TaccountantDto } from 'js/api/dtoTypes';
+import type { TaccountantDto, TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
 import type { AxiosError } from 'axios';
 
 // icon
@@ -825,9 +825,12 @@ const Row = ({
       //
     } = data_accountant;
 
-    const accountsReceivableDeduction = incomeBill
+    // 在IDE裡型別為TaccountsReceivableDeductionDto[]，
+    // 但是在編譯時被認為是(TaccountsReceivableDeductionDto | undefined)[]
+    // 因此在最後使用型別斷言
+    const accountsReceivableDeduction: TaccountsReceivableDeductionDto[] = incomeBill
       .flatMap((ib) => ib.accountsReceivableDeduction)
-      .filter((item) => !!item);
+      .filter((item) => !!item) as TaccountsReceivableDeductionDto[];
 
     setState_accountant({
       insertDate: insertDate ? moment(insertDate) : null,
