@@ -35,6 +35,8 @@ import {
   TcreateAccountReceivableDto,
   TupdateAccountReceivableDto,
   TupdateAccountReceivableAccountantDto,
+  //
+  apiPatchIncomeBill,
   apiPatchAccountReceivablePeriodInvoiceAllowance,
   apiPostAccountReceivable,
   apiPatchAccountReceivable,
@@ -337,9 +339,9 @@ export default function AccountReceivable() {
   }; //reqPatchInvoiceArr
 
   // region PatchAccountant
-  const reqPatchAccountant = async (state_accountant: Tstate_incomeBill[]) => {
-    for (const state of state_accountant) {
-      const state_deduction = state.state_deduction;
+  const reqPatchIncomeBill_feeAndDeduction = async (state_incomeBillArr: Tstate_incomeBill[]) => {
+    for (const state_incomeBill of state_incomeBillArr) {
+      const state_deduction = state_incomeBill.state_deduction;
 
       const accountsReceivableDeduction = state_deduction.map((item) => {
         return {
@@ -348,9 +350,10 @@ export default function AccountReceivable() {
         };
       });
 
-      await apiPatchAccountant_accountReceivable(state.id, {
-        fee: Number(state.fee),
-        accountsReceivableDeduction,
+      await apiPatchIncomeBill(state_incomeBill.id, {
+        ...state_incomeBill.raw,
+        fee: Number(state_incomeBill.fee),
+        incomeBillDeduction: accountsReceivableDeduction,
       });
     }
 
@@ -557,11 +560,15 @@ export default function AccountReceivable() {
           onConfirm={reqPatchAccountant_sorting}
         />
 
-        <IncomeBillDetails className="mt-10 " incomeBillList={incomeBillList} reqPatchAccountant={reqPatchAccountant} />
+        <IncomeBillDetails
+          className="mt-10 "
+          incomeBillList={incomeBillList}
+          reqPatchIncomeBill_feeAndDeduction={reqPatchIncomeBill_feeAndDeduction}
+        />
 
         <DeductionDetail className="mt-10 " periodArr={periodArr} />
 
-        {/* <AccountReceivableContext.Provider value={contextValue}>
+        <AccountReceivableContext.Provider value={contextValue}>
           <PeriodTable
             className="mt-10 "
             data_finalProdcut={data_finalProdcut}
@@ -571,7 +578,7 @@ export default function AccountReceivable() {
             reqDeleteInvoice={reqDeleteInvoice}
             reqDeletePeriod={reqDeletePeriod}
           />
-        </AccountReceivableContext.Provider> */}
+        </AccountReceivableContext.Provider>
       </div>
     </SubLayer>
   );

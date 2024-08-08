@@ -43,6 +43,8 @@ type Tstate_incomeBill = {
   //
   state_deduction: Tstate_deduction[];
   deductionTotal: number; // 後端沒有 accountsReceivableDeduction金額的總和
+  //
+  raw: TincomeBillSerialDto; // 原本的資料
 };
 
 export type { Tstate_incomeBill, Tstate_deduction };
@@ -53,11 +55,11 @@ export type { Tstate_incomeBill, Tstate_deduction };
 export default function IncomeBillDetails({
   className,
   incomeBillList,
-  reqPatchAccountant,
+  reqPatchIncomeBill_feeAndDeduction,
 }: {
   className?: string;
   incomeBillList: TincomeBillSerialDto[];
-  reqPatchAccountant: (data: Tstate_incomeBill[]) => void;
+  reqPatchIncomeBill_feeAndDeduction: (state: Tstate_incomeBill[]) => void;
 }) {
   const [disabled, setDisabled] = useState(true);
   const [state_incomeBillArr, setState_incomeBillArr] = useState<Tstate_incomeBill[]>([]);
@@ -115,7 +117,7 @@ export default function IncomeBillDetails({
   }, [state_incomeBillArr]);
 
   const handle_confirm = async () => {
-    await reqPatchAccountant(state_incomeBillArr);
+    await reqPatchIncomeBill_feeAndDeduction(state_incomeBillArr);
     setDisabled(true);
   };
 
@@ -168,6 +170,7 @@ export default function IncomeBillDetails({
         billSerialNumber: billSerialNumber,
         state_deduction: state_deduction,
         deductionTotal,
+        raw: incomeBill,
       };
 
       return state;
