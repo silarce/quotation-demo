@@ -3708,6 +3708,7 @@ export type TincomeBillSerialDto = {
   accountsReceivableDeduction?: TaccountsReceivableDeductionDto[];
   order: number | null;
   invoices?: TaccountsReceivableInvoiceDto[];
+  fee: number | null;
 };
 
 export type TupdateIncomeBillSerialDto = Pick<

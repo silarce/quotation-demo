@@ -19,7 +19,7 @@ import PeriodTable, {
   Tstate_period,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable/periodTable';
 import AccountantDetails, {
-  Tstate_accountant,
+  Tstate_incomeBill,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDetails';
 import DeductionDetail from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetail';
 import AccountantSorting, {
@@ -131,7 +131,11 @@ export default function AccountReceivable() {
   //   return arr;
   // }, [periodArr]);
 
-  const { accountantArr, incomeBillList_noInvoice: incomeBillList_noInvoice } = useMemo(() => {
+  const {
+    accountantArr,
+    incomeBillList,
+    incomeBillList_noInvoice: incomeBillList_noInvoice,
+  } = useMemo(() => {
     // const accountantArr = accountReceivable?.accountantList ?? [];
     const incomeBillList = accountReceivable?.incomeBillList ?? [];
 
@@ -148,7 +152,9 @@ export default function AccountReceivable() {
     });
 
     return {
-      accountantArr: undefined,
+      // accountantArr: undefined,
+      accountantArr: Error,
+      incomeBillList,
       incomeBillList_noInvoice,
     };
   }, [accountReceivable?.incomeBillList]);
@@ -331,7 +337,7 @@ export default function AccountReceivable() {
   }; //reqPatchInvoiceArr
 
   // region PatchAccountant
-  const reqPatchAccountant = async (state_accountant: Tstate_accountant[]) => {
+  const reqPatchAccountant = async (state_accountant: Tstate_incomeBill[]) => {
     for (const state of state_accountant) {
       const state_deduction = state.state_deduction;
 
@@ -552,7 +558,7 @@ export default function AccountReceivable() {
           onConfirm={reqPatchAccountant_sorting}
         />
 
-        {/* <AccountantDetails className="mt-10 " accountantArr={accountantArr} reqPatchAccountant={reqPatchAccountant} /> */}
+        <AccountantDetails className="mt-10 " incomeBillList={incomeBillList} reqPatchAccountant={reqPatchAccountant} />
 
         {/* <DeductionDetail className="mt-10 " periodArr={periodArr} /> */}
 
