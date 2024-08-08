@@ -22,9 +22,9 @@ import IncomeBillDetails, {
   Tstate_incomeBill,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/incomeBillDetails';
 import DeductionDetail from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetail';
-import AccountantSorting, {
+import IncomeBillSorting, {
   Tstate_incomeBillSorting,
-} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantSorting';
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/incomeBillSorting';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -115,11 +115,14 @@ export default function AccountReceivable() {
     return _.sortBy(accountReceivable?.periods, 'createdAt');
   }, [accountReceivable?.periods]);
 
-  const { incomeBillList, incomeBillList_noInvoice: incomeBillList_noInvoice } = useMemo(() => {
-    const incomeBillList = accountReceivable?.incomeBillList ?? [];
-    const incomeBillList_noInvoice = incomeBillList.filter((income) => {
+  const { incomeBillList, incomeBillList_noInvoice } = useMemo(() => {
+    let incomeBillList = accountReceivable?.incomeBillList ?? [];
+    let incomeBillList_noInvoice = incomeBillList.filter((income) => {
       return !income.invoices || income.invoices.length === 0;
     });
+
+    incomeBillList = _.sortBy(incomeBillList, 'billSerialNumber');
+    incomeBillList_noInvoice = _.sortBy(incomeBillList_noInvoice, 'billSerialNumber');
 
     return {
       incomeBillList,
@@ -350,14 +353,14 @@ export default function AccountReceivable() {
       const state = stateList[key];
 
       const {
-        isAccountantOrderChanged,
+        isIncomeBillOrderChanged,
         isInvoiceAllowanceChanged,
-        isInvoiceAccountantRelationChanged,
+        isInvoiceIncomeBillRelationChanged,
         invoice,
         incomeBillArr: state_incomeBillArr,
       } = state;
 
-      if (isInvoiceAccountantRelationChanged) {
+      if (isInvoiceIncomeBillRelationChanged) {
         relationChangedList[key] = state;
       }
 
@@ -367,7 +370,7 @@ export default function AccountReceivable() {
         });
       }
 
-      if (isAccountantOrderChanged) {
+      if (isIncomeBillOrderChanged) {
         state_incomeBillArr.forEach((incomeBill, index) => {
           const {
             //
@@ -510,27 +513,32 @@ export default function AccountReceivable() {
       <div className={scss.main}>
         <Profile {...props_profile} />
 
+        {/* 總計算 */}
         <TotalCalc
           className="mt-10"
           accountReceivable={accountReceivable}
           reqPatchAccountReceivable={reqPatchAccountReceivable}
         />
 
-        <AccountantSorting
+        {/* 應收帳款管理 */}
+        <IncomeBillSorting
           className="mt-10"
           periodArr={periodArr}
           incomeBillList_noInvoice={incomeBillList_noInvoice}
           onConfirm={reqPatchAccountant_sorting}
         />
 
+        {/* 已收款紀錄 */}
         <IncomeBillDetails
           className="mt-10 "
           incomeBillList={incomeBillList}
           reqPatchIncomeBill_feeAndDeduction={reqPatchIncomeBill_feeAndDeduction}
         />
 
+        {/* 扣款明細 */}
         <DeductionDetail className="mt-10 " periodArr={periodArr} />
 
+        {/* 請款明細 */}
         <AccountReceivableContext.Provider value={contextValue}>
           <PeriodTable
             className="mt-10 "
