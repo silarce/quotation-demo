@@ -60,7 +60,7 @@ type Tstate = {
   isInvoiceAllowanceChanged: boolean;
   isInvoiceAccountantRelationChanged: boolean;
   invoice: Tinvoice;
-  accountantArr: TincomeBill[];
+  incomeBillArr: TincomeBill[];
 };
 
 type Tinvoice = {
@@ -84,6 +84,8 @@ type TincomeBill = {
   //
   isRelationedInvoiceChanged: boolean;
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
+
+  raw: TincomeBillSerialDto;
 };
 
 type TstateList = {
@@ -101,7 +103,7 @@ type TdndData_group = {
   isEmpty: boolean;
 };
 
-export type { TstateList as Tstate_accountantSorting };
+export type { TstateList as Tstate_incomeBillSorting };
 
 // ================================================================================
 // region START
@@ -297,10 +299,10 @@ export default function AccountantSorting({
 
       const orderedincomeBillList = _.sortBy(incomeBillList, 'order');
 
-      const accountantArr = orderedincomeBillList.map((incomeBill) => {
+      const incomeBillArr = orderedincomeBillList.map((incomeBill) => {
         const {
           //
-          id: accountantId,
+          id: incomeBillId,
           receiveDate,
           importAccountingNumber,
           noteMaturityDate,
@@ -309,7 +311,7 @@ export default function AccountantSorting({
         } = incomeBill;
 
         return {
-          id: accountantId,
+          id: incomeBillId,
           invoiceId,
           receiveDate: getTaiwanDateStr(receiveDate),
           importAccountingNumber,
@@ -319,6 +321,7 @@ export default function AccountantSorting({
           receivablePayment_num: receivablePayment || 0,
           accountsReceivableDeduction,
           isRelationedInvoiceChanged: false,
+          raw: incomeBill,
         } as TincomeBill;
       }); // accountantArr
 
@@ -334,7 +337,7 @@ export default function AccountantSorting({
           price: invoiceActualPrice.toLocaleString(),
           allowance: String(allowance || ''),
         },
-        accountantArr: accountantArr,
+        incomeBillArr: incomeBillArr,
       };
     }); // invoiceArr.forEach
 
@@ -531,7 +534,7 @@ const Group_Dnd = ({
   activeAccountandId?: UniqueIdentifier | undefined;
   handle_editAllowance: (invoiceId: string, value: string) => void;
 }) => {
-  const { invoice, accountantArr } = state;
+  const { invoice, incomeBillArr: accountantArr } = state;
   const { id, invoiceNumber, invoiceDate, price } = invoice;
   let { allowance } = invoice;
 
@@ -667,7 +670,7 @@ const findIdIndex = (dndData: TdndData_row, stateList: TstateList) => {
   const { id: accountantId } = accountant;
 
   const state = stateList[invoiceId];
-  const { accountantArr } = state;
+  const { incomeBillArr: accountantArr } = state;
   const accountantIndex = accountantArr.findIndex((item) => item.id === accountantId);
 
   return {
@@ -726,7 +729,7 @@ function handleDragEnd(
   setStateListArr((list) => {
     list = { ...list };
     const state = list[invoiceId_active];
-    state.accountantArr = arrayMove(state.accountantArr, accountantIndex_old, accountantIndex_new);
+    state.incomeBillArr = arrayMove(state.incomeBillArr, accountantIndex_old, accountantIndex_new);
     state.isAccountantOrderChanged = true;
 
     return list;
@@ -781,11 +784,11 @@ function handleDragOver(
       state_over.isInvoiceAccountantRelationChanged = true;
 
       // 必須更新，送進SortableContext的items才會更新狀態
-      state_active.accountantArr = [...state_active.accountantArr];
-      state_over.accountantArr = [...state_over.accountantArr];
+      state_active.incomeBillArr = [...state_active.incomeBillArr];
+      state_over.incomeBillArr = [...state_over.incomeBillArr];
 
-      const accountantArr_active = state_active.accountantArr;
-      const accountantArr_over = state_over.accountantArr;
+      const accountantArr_active = state_active.incomeBillArr;
+      const accountantArr_over = state_over.incomeBillArr;
 
       accountantArr_active.splice(accountantIndex_active, 1);
       accountantArr_over.push(activeAccountant);
@@ -828,11 +831,11 @@ function handleDragOver(
     state_over.isInvoiceAccountantRelationChanged = true;
 
     // 必須更新，送進SortableContext的items才會更新狀態
-    state_active.accountantArr = [...state_active.accountantArr];
-    state_over.accountantArr = [...state_over.accountantArr];
+    state_active.incomeBillArr = [...state_active.incomeBillArr];
+    state_over.incomeBillArr = [...state_over.incomeBillArr];
 
-    const accountantArr_active = state_active.accountantArr;
-    const accountantArr_over = state_over.accountantArr;
+    const accountantArr_active = state_active.incomeBillArr;
+    const accountantArr_over = state_over.incomeBillArr;
 
     accountantArr_active.splice(accountantIndex_active, 1);
 
@@ -860,10 +863,10 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]) 
 
   const incomeBillList_noInvoice_order = _.sortBy(incomeBillList_noInvoice, 'order');
 
-  const accountantArr = incomeBillList_noInvoice_order.map((incomeBill) => {
+  const incomeBillArr = incomeBillList_noInvoice_order.map((incomeBill) => {
     const {
       //
-      id: accountantId,
+      id: incomeBillId,
       receiveDate,
       importAccountingNumber,
       noteMaturityDate,
@@ -872,7 +875,7 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]) 
     } = incomeBill;
 
     return {
-      id: accountantId,
+      id: incomeBillId,
       invoiceId: 'noInvoice',
       receiveDate: getTaiwanDateStr(receiveDate),
       importAccountingNumber,
@@ -881,6 +884,7 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]) 
       receivablePayment_num: receivablePayment,
       accountsReceivableDeduction,
       isRelationedInvoiceChanged: false,
+      raw: incomeBill,
     } as TincomeBill;
   });
 
@@ -889,6 +893,6 @@ const createNoInvoiceState = (incomeBillList_noInvoice: TincomeBillSerialDto[]) 
     isInvoiceAllowanceChanged: false,
     isInvoiceAccountantRelationChanged: false,
     invoice: virtualInvoice,
-    accountantArr,
+    incomeBillArr,
   };
 };
