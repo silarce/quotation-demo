@@ -125,7 +125,7 @@ function EditDeductionPanel({
       };
     });
 
-    if (accountantId) {
+    if (accountantId && incomeBillId) {
       if (!data_incomeBill) {
         return;
       }
@@ -137,7 +137,7 @@ function EditDeductionPanel({
       };
 
       // 現在api只有回傳fee跟id，未來真的需要時再請後端回傳完整的TaccountantDto
-      const res = await apiPatchIncomeBill(accountantId, body)
+      const res = await apiPatchIncomeBill(incomeBillId, body)
         .then((res) => {
           onConfirm?.({
             accountant: null,

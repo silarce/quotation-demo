@@ -47,8 +47,6 @@ import {
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
-import { TaccountantDto } from 'js/api/api_accountant';
-
 import type { TcustomerDto, TincomeBillSerialDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
 
 // css
@@ -117,45 +115,13 @@ export default function AccountReceivable() {
     return _.sortBy(accountReceivable?.periods, 'createdAt');
   }, [accountReceivable?.periods]);
 
-  // const accountantArr = useMemo(() => {
-  //   if (!periodArr) {
-  //     return [];
-  //   }
-
-  //   const arr: TaccountantDto[] = [];
-  //   periodArr.forEach((period) => {
-  //     const invoiceArr = period.invoices;
-  //     invoiceArr.forEach((invoice) => {
-  //       invoice.accountantList && arr.push(...invoice.accountantList);
-  //     });
-  //   });
-
-  //   return arr;
-  // }, [periodArr]);
-
-  const {
-    accountantArr,
-    incomeBillList,
-    incomeBillList_noInvoice: incomeBillList_noInvoice,
-  } = useMemo(() => {
-    // const accountantArr = accountReceivable?.accountantList ?? [];
+  const { incomeBillList, incomeBillList_noInvoice: incomeBillList_noInvoice } = useMemo(() => {
     const incomeBillList = accountReceivable?.incomeBillList ?? [];
-
-    // const accountantArr_noInvoice = accountantArr.filter((acc) => {
-    //   if (!acc.invoices) {
-    //     return true;
-    //   } else if (acc.invoices.length === 0) {
-    //     return true;
-    //   }
-    // });
-
     const incomeBillList_noInvoice = incomeBillList.filter((income) => {
       return !income.invoices || income.invoices.length === 0;
     });
 
     return {
-      // accountantArr: undefined,
-      accountantArr: Error,
       incomeBillList,
       incomeBillList_noInvoice,
     };
@@ -457,7 +423,7 @@ export default function AccountReceivable() {
         // 雖然只是要改order，但是不送accountsReceivableDeduction的話
         // 原本的accountsReceivableDeduction會被清空
         // 所以要送跟原本一樣的accountsReceivableDeduction過去
-        // 20240808 api換了，incomeBillDeduction為必須要送
+        // 2024-08-08 api換了，incomeBillDeduction為必須要送
         incomeBillDeduction: accountsReceivableDeduction ?? [],
       });
     }
