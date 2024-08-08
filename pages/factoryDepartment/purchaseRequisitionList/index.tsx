@@ -39,7 +39,11 @@ import { color } from 'html2canvas/dist/types/css/types/color';
 import { orange } from '@mui/material/colors';
 import icon_remove from 'public/image/icon/fc_remove.svg';
 import icon_fc_arrow_up from 'public/image/icon/fc_arrow_up.svg';
-
+import icon_task_open from 'public/image/icon/fc_task_open.svg';
+import icon_task_close from 'public/image/icon/fc_task_close.svg';
+import icon_task_approved from 'public/image/icon/fc_approved.svg';
+import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
+import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -1010,18 +1014,52 @@ export default function PurchaseRequisitionList() {
                                 {/* <button className={scss.minibtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                 </button> */}
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
-                                    <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查尋單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    查詢
                                 </button>
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
-                                    <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    列印
                                 </button>
                             </div>
+                            <div>
+                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("核准") }} title="單據核准">
+                                    <img src={icon_task_approved.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    核准
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${statusin === '審核中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("駁回") }} title="單據核准">
+                                    <img src={icon_task_rejected.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    駁回
+                                </button>
+
+                            </div>
                             <div></div>
-                            <div></div>
-                            <div></div>
-                            <div></div>
+                            <div>
+                                <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("詢價") }} title="單據送審">
+                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    送審
+                                </button>
+                                <button style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }} className={scss.disablesquarebtn} title="單據送審">
+                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    送審
+                                </button>
+                                <button style={{ display: `${parseInt(transpoprogress.toString()) === parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPRToReview("結案") }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                                <button style={{ display: `${parseInt(transpoprogress.toString()) != parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} onClick={() => { sentPRToReview("結案") }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據已結">
+                                    <img src={icon_task_close.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    已結
+                                </button>
+                            </div>
                         </div>
                         <div className={scss.head_content1}>
 
@@ -1135,11 +1173,8 @@ export default function PurchaseRequisitionList() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                {/* {statusin} */}
-                                {/* {transpoprogress} */}
-                                {/* {parseInt(totalreqprogress)} */}
-                                {/* {quotereqprogress}/{totalreqprogress} */}
-                                <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }}>
+
+                                {/* <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) && statusin === '詢價中' ? '' : 'none'}` }}>
                                     <MyButton_v2 px='px22' py='py4' theme='danger' label="送出審核" onClick={() => { sentPRToReview("詢價") }} />
                                 </span>
                                 <span style={{ display: `${parseInt(quotereqprogress, 10) === parseInt(totalreqprogress, 10) ? 'none' : ''}` }}>
@@ -1157,7 +1192,7 @@ export default function PurchaseRequisitionList() {
                                 </span>
                                 <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>已結案</button>
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
@@ -1271,20 +1306,26 @@ export default function PurchaseRequisitionList() {
                         </div>
                         <br />
                         <div className={scss.foot_head1}>
-                            <div></div>
+                            <div>
+                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }} className={scss.squarebtn} onClick={() => { handlePO() }} title="新增單據">
+                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
+                                <button style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }} className={scss.disablesquarebtn} onClick={() => { handlePO() }} title="新增單據">
+                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
+                            </div>
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                {/* <span>
-                                    <button className={scss.redbtn} onClick={() => { handlePO() }}>轉採購單</button>
-                                </span> */}
-                                <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}>
+
+                                {/* <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? '' : 'none'}` }}>
                                     <button className={scss.redbtn} onClick={() => { handlePO() }}>新增採購</button>
                                 </span>
                                 <span style={{ display: `${data2.length > 0 && statusin === '已核准' ? 'none' : ''}` }}>
                                     <button className={scss.disabledbtn}>新增採購</button>
-                                    {/* <MyButton_v2 disabled={true} px='px22' py='py4' theme={undefined} label="新增採購" /> */}
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                         <div className={scss.foot_content1}>

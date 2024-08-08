@@ -22,6 +22,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import icon_edit from 'public/image/icon/edit.svg';
 import icon_save from 'public/image/icon/fc_save.svg';
+import icon_save_gray from 'public/image/icon/fc_save_gray.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_fc_add from 'public/image/icon/fc_add.svg';
@@ -32,6 +33,8 @@ import { Modal } from 'antd';
 import icon_close from 'public/image/icon/fc_close.svg';
 import icon_fc_add2 from 'public/image/icon/fc_add2.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
+import icon_task_open from 'public/image/icon/fc_task_open.svg';
+import icon_task_close from 'public/image/icon/fc_task_close.svg';
 
 
 type Tquery = {
@@ -69,6 +72,8 @@ export default function AddPurchaseRequisition() {
     const [modaldata, setModalData] = useState<any[]>([]);
     const [searchbardata, setSearchBarData] = useState<any[]>([]);
     const [searchdata, setSearchdata] = useState<any[]>([]);
+    const [employeedata, setEmployeedata] = useState<any[]>([]);
+
 
 
     const [error, setError] = useState<string | null>(null);
@@ -114,6 +119,7 @@ export default function AddPurchaseRequisition() {
     const [handinputproductid, setHandinputproductid] = useState<string>("");
     const [handinputproductuuid, setHandinputproductuuid] = useState<string>("");
     const [handinputpickingby, setHandinputpickingby] = useState<string>("");
+
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -293,12 +299,16 @@ export default function AddPurchaseRequisition() {
             // setDatarestore(data);
             setSearchdata(data);
 
+
+            console.log(data);
             setPickinglistid(data[0].pickinglistid);
+            setPickinglistuuid(data[0].id);
             setCreate_atin(data[0].create_at);
             setNote(data[0].note);
             setStatus(data[0].status);
             setCreate_byin(data[0].create_by);
 
+            getPickingListDetailById(data[0].id);
 
 
             console.log(userInfo);
@@ -311,30 +321,14 @@ export default function AddPurchaseRequisition() {
             setIsLoading(false);
         }
     };
-    const hasFetchedData = useRef(false);
-    useEffect(() => {
-        if (!hasFetchedData.current) {
-            getProduct();
-            getPickingList()
-            hasFetchedData.current = true;
-        }
-    }, []);
 
-    useEffect(() => {
-        setCreate_atin(moment().format('YYYY-MM-DD') || '');
-        setCreate_byin(userInfo?.username.toString() || '');
-        setNeed_date(moment().format('YYYY-MM-DD') || '');
-    }, []);
 
-    //取所有物料，for查詢代入用
-    const getProductById = async (productuuid: any) => {
+    const getEmployeeList = async () => {
         try {
-            // alert(purchaseorderuuid)
-            // setIsLoading(true);
-            const conditionModel: {
-                productuuid: string | undefined
-            } = {
-                productuuid: productuuid as string | undefined,
+            //  console.log(userInfo);
+            setIsLoading(true);
+            const conditionModel = {
+                // keyword: "search" as string | undefined,
             };
 
 
@@ -346,41 +340,79 @@ export default function AddPurchaseRequisition() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}GetProductById?${queryParams}`);
+
+            const response = await fetch(`${setting.apipath}GetEmployeeList?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            // setData1(data);
 
             console.log(data);
-            // setData2(prevData2 => [...prevData2, ...data]);
-            setData2(prevData2 => {
-                // 取得當前的productid列表
-                const existingProductIds = prevData2.map(item => item.productid);
-
-                // 檢查並提示哪些productid已經存在
-                const duplicateProductIds = data.filter((item: { productid: any; }) => existingProductIds.includes(item.productid));
-                if (duplicateProductIds.length > 0) {
-                    myAlert.info({ title: `${duplicateProductIds.map((item: { productid: any; }) => item.productid).join(', ')}已加入` });
-                }
-
-                // 過濾掉已經存在的productid
-                const newData = data.filter((item: { productid: any; }) => !existingProductIds.includes(item.productid));
-
-                // 返回合併的結果
-                return [...prevData2, ...newData];
-            });
-
+            setEmployeedata(data);
 
 
         } catch (error: any) {
             setError(error.message);
         }
         finally {
-            // setIsLoading(false);
+            setIsLoading(false);
         }
     };
+
+
+    const hasFetchedData = useRef(false);
+    useEffect(() => {
+        if (!hasFetchedData.current) {
+            getProduct();
+            getPickingList();
+            getEmployeeList();
+            hasFetchedData.current = true;
+        }
+    }, []);
+
+    useEffect(() => {
+        setCreate_atin(moment().format('YYYY-MM-DD') || '');
+        setCreate_byin(userInfo?.username.toString() || '');
+        setNeed_date(moment().format('YYYY-MM-DD') || '');
+    }, []);
+
+
+
+    const getPickingListDetailById = async (pickinglistuuid: any) => {
+        try {
+            //  console.log(userInfo);
+            setIsLoading(true);
+            const conditionModel = {
+                pickinglistuuid: pickinglistuuid
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}GetPickingListDetailById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            setData2(data);
+
+            console.log(data2);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+
 
     //新增領料單主檔
     const AddPickingList = async () => {
@@ -427,6 +459,7 @@ export default function AddPurchaseRequisition() {
             setPickinglistid(data.pickinglistid);
             setPickinglistuuid(data.id);
             setStatus(data.status);
+            setData2([]);
             // getProduct();
 
             // getProductById(checkfirstin === 0 ? purchaseorderuuidin : purchaseorderuuid);
@@ -476,13 +509,17 @@ export default function AddPurchaseRequisition() {
 
     // 手key加入
     const handleAddByHandKey = async () => {
-
+        console.log(pickinglistuuid);
 
         // console.log(handinputquantity);
 
         if (handinputname === '' || handinputspec === '' || handinputquantity === '') {
-            myAlert.warning({ title: '未輸入品名、規格或數量' });
-        } else {
+            myAlert.warning({ title: '請確認品名、規格或數量是否遺漏' });
+        }
+        else if (handinputpickingby === '') {
+            myAlert.warning({ title: '請輸入領料人員' });
+        }
+        else {
             const newPicking = {
                 id: handinputproductuuid,
                 productid: handinputproductid,
@@ -491,13 +528,15 @@ export default function AddPurchaseRequisition() {
                 quantity: handinputquantity,
                 unit: handinputunit,
                 note: handinputnote,
-                username:handinputpickingby
+                username: handinputpickingby,
+                productuuid: handinputproductuuid,
+                picking_by: handinputpickingby
             };
 
             // console.log(newPicking);
             // console.log()
 
-            setData2(prevData2 => [...prevData2, newPicking]);
+            // setData2(prevData2 => [...prevData2, newPicking]);
 
             setHandinputproductuuid('');
             setHandinputproductid('');
@@ -516,6 +555,8 @@ export default function AddPurchaseRequisition() {
 
                 const conditionModel = {
                     data: newPicking,
+                    pickinglistid: pickinglistid,
+                    pickinglistuuid: pickinglistuuid
                 };
 
                 const inputModel = {
@@ -539,11 +580,10 @@ export default function AddPurchaseRequisition() {
 
                 const data = await response.json();
 
-                setPickinglistid(data.pickinglistid);
-                setPickinglistuuid(data.id);
-                setStatus(data.status);
+                setData2(prevData2 => [...prevData2, data]);
 
-            } catch (error:any) {
+
+            } catch (error: any) {
                 setError(error.message);
             } finally {
                 setIsLoading(false);
@@ -567,6 +607,7 @@ export default function AddPurchaseRequisition() {
     };
 
     const handleSaveEdit = (index: number) => {
+        alert(index);
         setEditStatus(false);
         // // console.log(data2);
     };
@@ -742,6 +783,7 @@ export default function AddPurchaseRequisition() {
         setHandinputspec(e.target.value);
     };
 
+
     const handleSelect = (item: DataItem) => {
         isSelectingRef.current = true;
         setHandinputproductuuid(item.id);
@@ -751,6 +793,40 @@ export default function AddPurchaseRequisition() {
         setHandinputunit(item.unit);
         setShowSuggestions(false);
     };
+
+
+
+
+
+    const [employeefilteredData, setEmployeeFilteredData] = useState<any[]>([]);
+    const [showempSuggestions, setShowEmpSuggestions] = useState(false);
+    useEffect(() => {
+        if (isSelectingRef.current) return;
+
+        let filtered = employeedata;
+
+        if (handinputpickingby) {
+            filtered = employeedata.filter(item =>
+                item.ch_name.includes(handinputpickingby)
+            );
+        }
+
+        setEmployeeFilteredData(filtered);
+        setShowEmpSuggestions(Boolean(filtered.length > 0 && (handinputpickingby)))
+    }, [handinputpickingby]);
+
+    const handlePickingByChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        isSelectingRef.current = false;
+        setHandinputpickingby(e.target.value)
+    };
+
+    const handlePickingbyclick = (ch_name: any) => {
+        isSelectingRef.current = true;
+        setHandinputpickingby(ch_name);
+        setShowEmpSuggestions(true);
+    }
+
+
 
 
 
@@ -866,6 +942,9 @@ export default function AddPurchaseRequisition() {
         setPickinglistid(item.pickinglistid);
         setStatus(item.status);
         setNote(item.note);
+        setCreate_atin(item.create_at);
+        getPickingListDetailById(item.id);
+        setData2([]);
     }
 
     const handleClearHandKey = () => {
@@ -877,6 +956,15 @@ export default function AddPurchaseRequisition() {
         setHandinputpickingby('');
         setHandinputquantity('');
         setShowSuggestions(false);
+    }
+
+    const handlepreAddPickingList = () => {
+        setPickinglistid("儲存後建立")
+        setCreate_atin(moment().format('YYYY-MM-DD') || '');
+        // console.log(data[0].pickinglistid.toString()); 
+        // return;
+        // setPickinglistid(data[0].pickinglistid.toString());
+        setStatus("未儲存");
     }
 
     return (
@@ -947,17 +1035,35 @@ export default function AddPurchaseRequisition() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
-                                    <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                <button className={scss.squarebtn} onClick={() => { handlepreAddPickingList() }} title="新增單據">
+                                    <img src={icon_fc_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
+                                    新增
                                 </button>
                                 &nbsp;
-                                <button className={scss.squarebtn} onClick={() => { AddPickingList() }} title="新增單據">
-                                    <img src={icon_fc_add2.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    查詢
+                                </button>
+                                &nbsp;
+                            </div>
+                            <div>
+                                <button className={status === '未儲存' ? scss.squarebtn : scss.disablesquarebtn} onClick={() => { AddPickingList() }} title="查詢單據">
+                                    <img src={status === '未儲存' ?icon_save.src:icon_save_gray.src} alt="search" style={{ height: '20px', width: '20px'}} />
+                                    儲存
                                 </button>
                             </div>
                             <div></div>
-                            <div></div>
-                            <div></div>
+                            <div>
+                                <button style={{ display: `${status === "領料中" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { alert("close") }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                                &nbsp;
+                                <button style={{ display: `${status === "領料中" ? 'none' : ''}` }} className={scss.disablesquarebtn} onClick={() => { alert("close") }} title="單據已結">
+                                    <img src={icon_task_close.src} alt="closed" style={{ height: '20px', width: '20px' }} />
+                                    已結
+                                </button>
+                            </div>
                         </div>
                         <div className={scss.head_content1}>
                             <div>
@@ -969,7 +1075,7 @@ export default function AddPurchaseRequisition() {
                                         props: {
                                             // value: getTaiwanDateStr(create_atin || '') || '',
                                             style: { color: `${pickinglistid ? '#404040' : '#c1c1c1'}` },
-                                            value: pickinglistid || '尚未建立單據'
+                                            value: pickinglistid || ' '
                                         },
                                     }}
                                 />
@@ -1017,7 +1123,7 @@ export default function AddPurchaseRequisition() {
                                 <InputSel
                                     {...inputSelProps}
                                     caption="備註"
-                                    disabled={false}
+                                    disabled={(status === '領料中' || status === '已結案') ? true : false}
                                     inputProps={{
                                         props: {
                                             value: note,
@@ -1041,9 +1147,9 @@ export default function AddPurchaseRequisition() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                <span>
+                                {/* <span>
                                     <button className={scss.redbtn} onClick={() => { handleAddPR() }}>結案</button>
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
@@ -1071,11 +1177,11 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={nameRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
                                                 type="text"
                                                 value={_item.name !== undefined ? _item.name : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "name", e.target.value);
                                                 }}
@@ -1097,12 +1203,12 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={quantityRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
                                                 type="text"
                                                 maxLength={5}
                                                 value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleNumberChange(index, "quantity", e.target.value);
                                                 }}
@@ -1123,29 +1229,45 @@ export default function AddPurchaseRequisition() {
                                         <span>
                                             <input
                                                 ref={noteRefs.current[index]}
-                                                // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
                                                 type="text"
                                                 value={_item.note !== undefined ? _item.note : ''}
-                                                // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
                                                 onChange={(e) => {
                                                     handleStringChange(index, "note", e.target.value);
                                                 }}
                                             />
                                         </span>
                                         <span>
-                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                            {/* <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
+                                            <input
+                                                ref={noteRefs.current[index]}
+                                                style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                                                // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '95%' }}
+                                                type="text"
+                                                value={_item.picking_by !== undefined ? _item.picking_by : ''}
+                                                readOnly={!(index + 1 === editrowid && editstatus === true)}
+                                                onChange={(e) => {
+                                                    handleStringChange(index, "picking_by", e.target.value);
+                                                }}
+                                            />
+                                        </span>
+                                        <span>
+                                            &nbsp;&nbsp;&nbsp;
+                                            <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
+                                            </button>
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
-                                                {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
+                                                {/* <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} /> */}
                                             </button>
                                             {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
-                                            {/* <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
+                                            <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(index) }}>
+                                                <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
+                                            </button>
+                                            <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
                                                 <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button> */}
+                                            </button>
                                         </span>
 
                                     </div>
@@ -1222,9 +1344,10 @@ export default function AddPurchaseRequisition() {
                                 <div>
                                     <input
                                         type="text"
-                                        placeholder='姓名'
                                         value={handinputpickingby}
-                                        onChange={(e) => setHandinputpickingby(e.target.value)}
+                                        onChange={handlePickingByChange}
+                                        placeholder="姓名"
+                                        style={{ width: '100%' }}
                                     />
                                 </div>
                                 <div>
@@ -1239,11 +1362,41 @@ export default function AddPurchaseRequisition() {
 
                                 </div>
                             </div>
+
+                        </div>
+                        <div>
+                            {employeefilteredData.length > 0 && (
+                                <ul style={{
+                                    border: '1px solid #ccc',
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
+                                    marginTop: '0px',
+                                    right: '55px',
+                                    position: 'absolute',
+                                    width: '150px',
+                                    backgroundColor: 'white',
+                                    zIndex: 1004, // 確保下拉清單在最上層,
+                                    display: `${showempSuggestions ? '' : 'none'}`
+                                }}>
+                                    {employeefilteredData.map(emp => (
+                                        <li
+                                            key={emp.id}
+                                            onClick={() => {
+                                                handlePickingbyclick(emp.ch_name);
+                                                setEmployeeFilteredData([]);
+                                            }}
+                                            style={{ cursor: 'pointer', padding: '8px' }}
+                                        >
+                                            {emp.ch_name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                         <div className={scss.body_foot1}>
                             <div>
-                                {/* (1).可自行輸入請購項目。<br />
-                            (2).如不知請購品項料號，可以利用查詢代入。<br /> */}
+                                (1).請確實填領取品名、規格與數量。<br />
+                                (2).如不知請購品項料號，可以利用查詢代入。<br />
                                 {showSuggestions && (
                                     <div
                                         style={{
@@ -1325,78 +1478,6 @@ export default function AddPurchaseRequisition() {
                     </div>
                 </div>
 
-                <Modal
-                    visible={productSearchmodalopen}
-                    footer={null}
-                    onCancel={productSearchModalClose}
-                    width="1000px"
-                    maskClosable={false}
-                    style={{ top: 250 }}
-                >
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px', width: '920px' }}>
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>類別：</span>
-                        <span style={{ fontSize: '16px' }}>
-                            <select value={selectedOption}
-                                style={{ borderBottom: '1px solid #c1c1c1' }}
-                                onChange={(e) => { setSelectedOption(e.target.value) }}>
-                                <option value="物料">物料</option>
-                            </select>
-                        </span>
-
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>查詢：</span>
-                        <span style={{ fontSize: '16px' }}>
-                            <form onSubmit={handleSubmit}>
-                                <input
-                                    type="text"
-                                    placeholder='　料號'
-                                    value={keyword1}
-                                    style={{ borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                    onChange={(e) => setKeyword1(e.target.value)}
-                                />
-                                <input
-                                    type="text"
-                                    placeholder='　名稱'
-                                    value={keyword2}
-                                    style={{ borderBottom: '1px solid #c1c1c1', borderRight: '1px solid #f0eded' }}
-                                    onChange={(e) => setKeyword2(e.target.value)}
-                                />
-                                <input
-                                    type="text"
-                                    placeholder='　規格'
-                                    value={keyword3}
-                                    style={{ borderBottom: '1px solid #c1c1c1' }}
-                                    onChange={(e) => setKeyword3(e.target.value)}
-                                />
-                                <button type="submit">
-                                    <img src={icon_search.src} alt="edit" style={{ width: '20px', height: '20px' }} />
-                                </button>
-                            </form>
-                        </span>
-                    </div>
-                    <hr />
-                    <div>
-                        <Thead01 type={'AddPR_GetProduct'} />
-                        <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                            {modaldata && (
-                                modaldata.map((_item: any, index: number) => (
-                                    <CellWithBar key={index} className={scss.panelHeader19}>
-                                        <div className={scss.row01}>
-                                            <span>{_item.productid}</span>
-                                            <span>{_item.name}</span>
-                                            <span>{_item.spec}</span>
-                                            <span>{_item.count}</span>
-                                            <span>
-                                                <button onClick={() => { getProductById(_item.id) }}>
-                                                    <img src={icon_fc_add.src} alt="addToList" style={{ width: '30px', height: '20px' }} />
-                                                </button>
-                                            </span>
-                                        </div>
-                                    </CellWithBar>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                </Modal>
 
                 <Modal
                     visible={searchmodalopen}
