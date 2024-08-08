@@ -805,27 +805,47 @@ const Row = ({
       noteMaturityDate,
       receiptCollectionDate,
       receiptEstimatedDate,
+      //
 
+      importAccountingNumber,
+      noteNumber,
+      accountingNumber,
+      vendorName,
+      price,
+      billSerialNumber,
+      notes,
+      isImported,
+      currency,
+      exchangeRate,
+      currencyValue,
+      incomeBill,
+
+      //
       splitPayment,
+      //
     } = data_accountant;
+
+    const accountsReceivableDeduction = incomeBill
+      .flatMap((ib) => ib.accountsReceivableDeduction)
+      .filter((item) => !!item);
 
     setState_accountant({
       insertDate: insertDate ? moment(insertDate) : null,
-      importAccountingNumber: data_accountant.importAccountingNumber ?? '',
-      noteNumber: data_accountant.noteNumber ?? '',
-      accountingNumber: data_accountant.accountingNumber ?? ' ',
-      vendorName: data_accountant.vendorName ?? '',
-      price: String(data_accountant.price),
-      billSerialNumber: data_accountant.billSerialNumber ?? [],
-      notes: data_accountant.notes ?? '',
-      isImported: data_accountant.isImported,
-      accountsReceivableDeduction: data_accountant.incomeBill.accountsReceivableDeduction ?? [],
+      importAccountingNumber: importAccountingNumber ?? '',
+      noteNumber: noteNumber ?? '',
+      accountingNumber: accountingNumber ?? ' ',
+      vendorName: vendorName ?? '',
+      price: String(price),
+      billSerialNumber: billSerialNumber ?? [],
+      notes: notes ?? '',
+      isImported: isImported,
+      accountsReceivableDeduction: accountsReceivableDeduction,
       noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
       receiptCollectionDate: receiptCollectionDate ? moment(receiptCollectionDate) : null,
       receiptEstimatedDate: receiptEstimatedDate ? moment(receiptEstimatedDate) : null,
-      currency: data_accountant.currency,
-      exchangeRate: String(data_accountant.exchangeRate || ''),
-      currencyValue: String(data_accountant.currencyValue || ''),
+      currency: currency,
+      exchangeRate: String(exchangeRate || ''),
+      currencyValue: String(currencyValue || ''),
 
       splitPayment: splitPayment ? splitPayment.toLocaleString() : '',
     });
