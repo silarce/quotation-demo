@@ -905,7 +905,7 @@ export default function AddPurchaseRequisition() {
         // 模糊查詢請購單號
         if (requisitionId) {
             filteredData = filteredData.filter(item =>
-                item.purchaseorderid.toString().includes(requisitionId)
+                item.pickinglistid.toString().includes(requisitionId)
             );
         }
 
