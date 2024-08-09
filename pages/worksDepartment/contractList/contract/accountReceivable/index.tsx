@@ -18,13 +18,13 @@ import TotalCalc from 'components/page/worksDepartment/contracList/contract/acco
 import PeriodTable, {
   Tstate_period,
 } from 'components/page/worksDepartment/contracList/contract/accountReceivable/invoiceTable/periodTable';
-import AccountantDetails, {
-  Tstate_accountant,
-} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDetails';
+import IncomeBillDetails, {
+  Tstate_incomeBill,
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/incomeBillDetails';
 import DeductionDetail from 'components/page/worksDepartment/contracList/contract/accountReceivable/deductionDetail';
-import AccountantSorting, {
-  Tstate_accountantSorting,
-} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantSorting';
+import IncomeBillSorting, {
+  Tstate_incomeBillSorting,
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/incomeBillSorting';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -35,6 +35,8 @@ import {
   TcreateAccountReceivableDto,
   TupdateAccountReceivableDto,
   TupdateAccountReceivableAccountantDto,
+  //
+  apiPatchIncomeBill,
   apiPatchAccountReceivablePeriodInvoiceAllowance,
   apiPostAccountReceivable,
   apiPatchAccountReceivable,
@@ -45,9 +47,7 @@ import {
 } from 'js/api/api_engineering';
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 
-import { TaccountantDto, apiPatchAccountant_accountReceivable } from 'js/api/api_accountant';
-
-import type { TcustomerDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
+import type { TcustomerDto, TincomeBillSerialDto, TupdateAccountReceivableDeductionDto } from 'js/api/dtoTypes';
 
 // css
 import scss from './index.module.scss';
@@ -91,10 +91,18 @@ export default function AccountReceivable() {
     customPopulate: [
       'content.customer',
       'engineeringContact',
-      'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
+
+      // 'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
+      // 現在 invoices下沒有accountantList
+      // 'accountReceivable.periods.invoices.incomeBillList',
+      // 'accountReceivable.periods.invoices.incomeBillSerialList',
+      'accountReceivable.periods.invoices.incomeBillSerialList.invoices',
+
       'accountReceivable.periods.invoices.accountantInvoiceBook',
       'accountReceivable.accountantList.invoices',
       'accountReceivable.accountantList.accountsReceivableDeduction',
+      'accountReceivable.incomeBillList.accountant',
+      'accountReceivable.incomeBillList.invoices',
     ],
   });
 
@@ -110,38 +118,20 @@ export default function AccountReceivable() {
     return _.sortBy(accountReceivable?.periods, 'createdAt');
   }, [accountReceivable?.periods]);
 
-  // const accountantArr = useMemo(() => {
-  //   if (!periodArr) {
-  //     return [];
-  //   }
-
-  //   const arr: TaccountantDto[] = [];
-  //   periodArr.forEach((period) => {
-  //     const invoiceArr = period.invoices;
-  //     invoiceArr.forEach((invoice) => {
-  //       invoice.accountantList && arr.push(...invoice.accountantList);
-  //     });
-  //   });
-
-  //   return arr;
-  // }, [periodArr]);
-
-  const { accountantArr, accountantArr_noInvoice } = useMemo(() => {
-    const accountantArr = accountReceivable?.accountantList ?? [];
-
-    const accountantArr_noInvoice = accountantArr.filter((acc) => {
-      if (!acc.invoices) {
-        return true;
-      } else if (acc.invoices.length === 0) {
-        return true;
-      }
+  const { incomeBillList, incomeBillList_noInvoice } = useMemo(() => {
+    let incomeBillList = accountReceivable?.incomeBillList ?? [];
+    let incomeBillList_noInvoice = incomeBillList.filter((incomeBill) => {
+      return !incomeBill.invoices || incomeBill.invoices.length === 0;
     });
 
+    incomeBillList = _.sortBy(incomeBillList, 'billSerialNumber');
+    incomeBillList_noInvoice = _.sortBy(incomeBillList_noInvoice, 'billSerialNumber');
+
     return {
-      accountantArr,
-      accountantArr_noInvoice,
+      incomeBillList,
+      incomeBillList_noInvoice,
     };
-  }, [accountReceivable?.accountantList]);
+  }, [accountReceivable?.incomeBillList]);
 
   // --------------------------------------------------------------------------
 
@@ -321,9 +311,9 @@ export default function AccountReceivable() {
   }; //reqPatchInvoiceArr
 
   // region PatchAccountant
-  const reqPatchAccountant = async (state_accountant: Tstate_accountant[]) => {
-    for (const state of state_accountant) {
-      const state_deduction = state.state_deduction;
+  const reqPatchIncomeBill_feeAndDeduction = async (state_incomeBillArr: Tstate_incomeBill[]) => {
+    for (const state_incomeBill of state_incomeBillArr) {
+      const state_deduction = state_incomeBill.state_deduction;
 
       const accountsReceivableDeduction = state_deduction.map((item) => {
         return {
@@ -332,9 +322,10 @@ export default function AccountReceivable() {
         };
       });
 
-      await apiPatchAccountant_accountReceivable(state.id, {
-        fee: Number(state.fee),
-        accountsReceivableDeduction,
+      await apiPatchIncomeBill(state_incomeBill.id, {
+        ...state_incomeBill.raw,
+        fee: Number(state_incomeBill.fee),
+        incomeBillDeduction: accountsReceivableDeduction,
       });
     }
 
@@ -344,34 +335,35 @@ export default function AccountReceivable() {
   // MARK: PatchAccountant_sorting
   const reqPatchAccountant_sorting = async (
     //
-    stateList: Tstate_accountantSorting
+    stateList: Tstate_incomeBillSorting
   ) => {
     if (!accountReceivable) {
       return;
     }
 
-    const accountantArr: {
+    const incomeBillArr: {
       id: string;
       invoiceId: string;
       order: number;
       accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
       isRelationedInvoiceChanged: boolean;
+      raw: TincomeBillSerialDto;
     }[] = [];
 
-    const relationChangedList: Tstate_accountantSorting = {};
+    const relationChangedList: Tstate_incomeBillSorting = {};
 
     for (const key of Object.keys(stateList)) {
       const state = stateList[key];
 
       const {
-        isAccountantOrderChanged,
+        isIncomeBillOrderChanged,
         isInvoiceAllowanceChanged,
-        isInvoiceAccountantRelationChanged,
+        isInvoiceIncomeBillRelationChanged,
         invoice,
-        accountantArr: state_accountantArr,
+        incomeBillArr: state_incomeBillArr,
       } = state;
 
-      if (isInvoiceAccountantRelationChanged) {
+      if (isInvoiceIncomeBillRelationChanged) {
         relationChangedList[key] = state;
       }
 
@@ -381,21 +373,23 @@ export default function AccountReceivable() {
         });
       }
 
-      if (isAccountantOrderChanged) {
-        state_accountantArr.forEach((accountant, index) => {
+      if (isIncomeBillOrderChanged) {
+        state_incomeBillArr.forEach((incomeBill, index) => {
           const {
             //
-            id: accountantId,
+            id: incomeBillId,
             accountsReceivableDeduction,
             isRelationedInvoiceChanged,
-          } = accountant;
+            raw,
+          } = incomeBill;
 
-          accountantArr.push({
-            id: String(accountantId),
+          incomeBillArr.push({
+            id: String(incomeBillId),
             invoiceId: String(invoice.id),
             order: index + 1,
             accountsReceivableDeduction: accountsReceivableDeduction,
             isRelationedInvoiceChanged: isRelationedInvoiceChanged,
+            raw,
           });
         });
       }
@@ -405,44 +399,38 @@ export default function AccountReceivable() {
 
     if (relationChangedArr.length > 0) {
       const body: TupdateAccountReceivableAccountantDto = relationChangedArr.map((state) => {
-        const { invoice, accountantArr } = state;
+        const { invoice, incomeBillArr: incomeBillArr } = state;
 
         return {
           invoiceId: String(invoice.id),
-          accountantId: accountantArr.map((accountant) => String(accountant.id)),
+          // accountantId: incomeBillArr.map((accountant) => String(accountant.id)),
+          incomeBillId: incomeBillArr.map((accountant) => String(accountant.id)),
         };
       });
 
       await apiPatchAccountReceivableAccountant(accountReceivable.id, body);
     }
 
-    for (const accountant of accountantArr) {
+    for (const incomeBill of incomeBillArr) {
       const {
         //
-        // id,
+        id: incomeBillId,
         // invoiceId,
         order,
         accountsReceivableDeduction,
+        raw,
         // isRelationedInvoiceChanged,
-      } = accountant;
-
-      // 棄用，以上面的apiPatchAccountReceivableAccountant取代;
-      // 修改accountant的關聯invoice;
-      // if (accountReceivable && isRelationedInvoiceChanged) {
-      //   await apiPatchAccountantInvoice({
-      //     accountReceivableId: accountReceivable.id,
-      //     invoiceId,
-      //     accountantId: id,
-      //   });
-      // }
+      } = incomeBill;
 
       // 修改排序;
-      await apiPatchAccountant_accountReceivable(accountant.id, {
+      await apiPatchIncomeBill(incomeBillId, {
+        ...raw,
         order: order,
         // 雖然只是要改order，但是不送accountsReceivableDeduction的話
         // 原本的accountsReceivableDeduction會被清空
         // 所以要送跟原本一樣的accountsReceivableDeduction過去
-        accountsReceivableDeduction: accountsReceivableDeduction ?? [],
+        // 2024-08-08 api換了，incomeBillDeduction為必須要送
+        incomeBillDeduction: accountsReceivableDeduction ?? [],
       });
     }
 
@@ -528,24 +516,32 @@ export default function AccountReceivable() {
       <div className={scss.main}>
         <Profile {...props_profile} />
 
+        {/* 總計算 */}
         <TotalCalc
           className="mt-10"
           accountReceivable={accountReceivable}
           reqPatchAccountReceivable={reqPatchAccountReceivable}
         />
 
-        <AccountantSorting
-          //
+        {/* 應收帳款管理 */}
+        <IncomeBillSorting
           className="mt-10"
           periodArr={periodArr}
-          accountantArr_noInvoice={accountantArr_noInvoice}
+          incomeBillList_noInvoice={incomeBillList_noInvoice}
           onConfirm={reqPatchAccountant_sorting}
         />
 
-        <AccountantDetails className="mt-10 " accountantArr={accountantArr} reqPatchAccountant={reqPatchAccountant} />
+        {/* 已收款紀錄 */}
+        <IncomeBillDetails
+          className="mt-10 "
+          incomeBillList={incomeBillList}
+          reqPatchIncomeBill_feeAndDeduction={reqPatchIncomeBill_feeAndDeduction}
+        />
 
+        {/* 扣款明細 */}
         <DeductionDetail className="mt-10 " periodArr={periodArr} />
 
+        {/* 請款明細 */}
         <AccountReceivableContext.Provider value={contextValue}>
           <PeriodTable
             className="mt-10 "

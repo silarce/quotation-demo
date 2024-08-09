@@ -16,6 +16,7 @@ import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel, {
   TinputProps,
+  TtextareaProps,
   TselectProps,
   TdatePickerProps,
   TcheckBoxProps_v2,
@@ -26,7 +27,7 @@ import { selectModalCreator_multi } from 'components/global/gear/modal/selectorM
 
 // type
 import type { Toption } from 'js/utils/options/options';
-import type { TaccountantDto } from 'js/api/dtoTypes';
+import type { TaccountantDto, TaccountsReceivableDeductionDto } from 'js/api/dtoTypes';
 import type { AxiosError } from 'axios';
 
 // icon
@@ -51,7 +52,7 @@ import {
   apiPostAccountant,
   apiPatchAccountant,
   deleteAccountant,
-  apiPatchAccountant_accountReceivable,
+
   //
   useGetAccountant,
   useGetAccountantPreset,
@@ -84,7 +85,7 @@ type Tstate_accountant = {
   noteNumber: string;
   accountingNumber: string;
   vendorName: string;
-  billSerialNumber: string;
+  billSerialNumber: string[];
   notes: string;
 
   isImported: boolean;
@@ -99,15 +100,24 @@ type Tstate_accountant = {
   exchangeRate: string;
   currencyValue: string; // 金額
   price: string; // 新台幣 = 匯率 * 金額
+
+  // 已分出金額
+  readonly splitPayment: number[];
 };
 
 type TreqPost = (state_accountant: Tstate_accountant) => Promise<void>;
 type TreqPatch = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
-// type TreqPatchIsImported = (id: string, state_accountant: Tstate_accountant) => Promise<void>;
-type TreqPatchIsImported = (accountantId: string, incomeBillDate: string) => Promise<void>;
+
+type TreqPostPatchIsImported = (
+  //
+  accountantId: string,
+  incomeBillDate: string,
+  splitPayment: number
+) => Promise<void>;
+
 type TreqDelete = (id: string) => Promise<void>;
 
-export type { TreqPatchIsImported };
+export type { TreqPostPatchIsImported };
 
 // =============================================================================
 
@@ -153,7 +163,9 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
 
   const [disabled = isWorksDepartment, setDisabled] = useState(true);
   const [showNewRow, setShowNewRow] = useState(false);
-  const [accountantId, setAccountantId] = useState<string>();
+
+  // const [accountantId, setAccountantId] = useState<string>();
+  const [accountantWillImport, setAccountantWillImport] = useState<TaccountantDto>();
 
   // ----------------------------------------------------------------------------
 
@@ -171,7 +183,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       });
 
       const params: Tparams = {
-        populate: ['accountsReceivableDeduction'],
+        populate: ['incomeBill.accountsReceivableDeduction'],
         sort: 'insertDate',
         pageSize: 999999,
         filter: {
@@ -269,11 +281,12 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     await update_accountant();
   };
 
-  const reqPatchIsImported = async (
+  // 匯入紙本應收帳款
+  const reqPatchIsImported: TreqPostPatchIsImported = async (
     //
-    accountantId: string,
-
-    incomeBillDate: string
+    accountantId,
+    incomeBillDate,
+    splitPayment
   ) => {
     if (!isWorksDepartment) {
       alert('isWorksDepartment should be false');
@@ -284,8 +297,10 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     const body: TcreateAccountReceivableAccountsDto = {
       accountantId: [accountantId],
       incomeBillDate,
+      splitPayment,
     };
 
+    // apiPostAccountReceivableAccounts 最後的單字是Accounts不是Accountant
     await apiPostAccountReceivableAccounts(body);
     await update_accountant();
   }; // reqPatchIsImported
@@ -296,21 +311,24 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
   };
 
   // 匯入發票
-  const reqPostAccountReceivableAccountant = async (
+  const reqPostAccountReceivableAccountant: TreqPostPatchIsImported = async (
     //
-    accountReceivableId: string,
-    incomeBillDate: string
+    accountReceivableId,
+    incomeBillDate,
+    splitPayment
   ) => {
-    if (!accountantId) {
+    if (!accountantWillImport) {
       alert('accountantId為undefined');
 
       return;
     }
 
     try {
+      // apiPostAccountReceivableAccountant 最後的單字是Accountant不是Accounts
       await apiPostAccountReceivableAccountant(accountReceivableId, {
-        accountantId: [accountantId],
+        accountantId: [accountantWillImport.id],
         incomeBillDate,
+        splitPayment: splitPayment,
       });
       await update_accountant();
     } catch (error) {
@@ -319,7 +337,9 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     }
   };
 
-  const handle_import = (accountReceivableId: string) => {
+  // region FUNCTION
+
+  const handle_import = (accountReceivableId: string, accountantWillImport: TaccountantDto) => {
     const modal = myAlert.btnBar({});
     modal.update({
       title: '匯入發票',
@@ -330,8 +350,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
         //   reqPostAccountReceivableAccountant={reqPostAccountReceivableAccountant}
         // />
         <ExportToIncomeBill
-          onConfirm={(isoString) => reqPostAccountReceivableAccountant(accountReceivableId, isoString)}
+          onConfirm={({ isoString, splitPayment }) =>
+            reqPostAccountReceivableAccountant(accountReceivableId, isoString, splitPayment)
+          }
           onCancel={modal.destroy}
+          defaultPayment={accountantWillImport.price}
         />
       ),
     });
@@ -422,7 +445,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
                 reqPatch={reqPatch}
                 reqDelete={reqDelete}
                 reqPatchIsImported={reqPatchIsImported}
-                setAccountantId={setAccountantId}
+                setAccountantId={setAccountantWillImport}
                 bankAccountOptionArr={bankAccountOptionArr}
                 isWorksDepartment={isWorksDepartment}
               />
@@ -435,7 +458,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
         </div>
 
         <ContractSelector
-          showModal={!!accountantId}
+          showModal={!!accountantWillImport}
           onConfirm={(arr) => {
             const contractArr = arr[0];
             const accountReceivableId: string | undefined | null = contractArr[0]?.accountReceivableId;
@@ -445,11 +468,11 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
             }
 
             if (accountReceivableId) {
-              handle_import(accountReceivableId);
+              handle_import(accountReceivableId, accountantWillImport!);
             }
           }}
           onCancel={() => {
-            setAccountantId(undefined);
+            setAccountantWillImport(undefined);
           }}
         />
 
@@ -663,9 +686,9 @@ const Row = ({
   reqPatch?: TreqPatch;
   reqDelete?: TreqDelete;
   // isReadOnly: boolean;
-  setAccountantId?: (id: string | undefined) => void;
+  setAccountantId?: (accountant: TaccountantDto | undefined) => void;
   bankAccountOptionArr: Toption[];
-  reqPatchIsImported?: TreqPatchIsImported;
+  reqPatchIsImported?: TreqPostPatchIsImported;
   isWorksDepartment: boolean;
 }) => {
   const isNew = !!postProps;
@@ -694,18 +717,19 @@ const Row = ({
   const isAllowToEdit = !isWorksDepartment;
 
   const { billSerialNumber, isImported, exchangeFromId } = data_accountant ?? {};
+  const isBillSerialNumberValid = billSerialNumber && billSerialNumber.length > 0;
 
   let isAllowToEditIsImported = false;
 
-  if (!isNew && isWorksDepartment && !state_accountant.billSerialNumber) {
+  if (!isNew && isWorksDepartment && !state_accountant.billSerialNumber.length) {
     isAllowToEditIsImported = true;
   }
 
   let fonbiddenText: string | null = null;
 
-  if ((isImported || billSerialNumber) && exchangeFromId) {
+  if ((isImported || isBillSerialNumberValid) && exchangeFromId) {
     fonbiddenText = '已匯入/已兌現';
-  } else if (isImported || billSerialNumber) {
+  } else if (isImported || isBillSerialNumberValid) {
     fonbiddenText = '已匯入';
   } else if (exchangeFromId) {
     fonbiddenText = '已兌現';
@@ -753,8 +777,11 @@ const Row = ({
           //   onCancel={modal.destroy}
           // />
           <ExportToIncomeBill
-            onConfirm={(isoString) => reqPatchIsImported(data_accountant.id, isoString)}
+            onConfirm={({ isoString, splitPayment: separatePayment }) =>
+              reqPatchIsImported(data_accountant.id, isoString, separatePayment)
+            }
             onCancel={modal.destroy}
+            defaultPayment={Number(state_accountant.price)}
           />
         ),
       });
@@ -778,25 +805,52 @@ const Row = ({
       noteMaturityDate,
       receiptCollectionDate,
       receiptEstimatedDate,
+      //
+
+      importAccountingNumber,
+      noteNumber,
+      accountingNumber,
+      vendorName,
+      price,
+      billSerialNumber,
+      notes,
+      isImported,
+      currency,
+      exchangeRate,
+      currencyValue,
+      incomeBill,
+
+      //
+      splitPayment,
+      //
     } = data_accountant;
+
+    // 在IDE裡型別為TaccountsReceivableDeductionDto[]，
+    // 但是在編譯時被認為是(TaccountsReceivableDeductionDto | undefined)[]
+    // 因此在最後使用型別斷言
+    const accountsReceivableDeduction: TaccountsReceivableDeductionDto[] = incomeBill
+      .flatMap((ib) => ib.accountsReceivableDeduction)
+      .filter((item) => !!item) as TaccountsReceivableDeductionDto[];
 
     setState_accountant({
       insertDate: insertDate ? moment(insertDate) : null,
-      importAccountingNumber: data_accountant.importAccountingNumber ?? '',
-      noteNumber: data_accountant.noteNumber ?? '',
-      accountingNumber: data_accountant.accountingNumber ?? ' ',
-      vendorName: data_accountant.vendorName ?? '',
-      price: String(data_accountant.price),
-      billSerialNumber: data_accountant.billSerialNumber ?? '',
-      notes: data_accountant.notes ?? '',
-      isImported: data_accountant.isImported,
-      accountsReceivableDeduction: data_accountant.accountsReceivableDeduction,
+      importAccountingNumber: importAccountingNumber ?? '',
+      noteNumber: noteNumber ?? '',
+      accountingNumber: accountingNumber ?? ' ',
+      vendorName: vendorName ?? '',
+      price: String(price),
+      billSerialNumber: billSerialNumber ?? [],
+      notes: notes ?? '',
+      isImported: isImported,
+      accountsReceivableDeduction: accountsReceivableDeduction,
       noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
       receiptCollectionDate: receiptCollectionDate ? moment(receiptCollectionDate) : null,
       receiptEstimatedDate: receiptEstimatedDate ? moment(receiptEstimatedDate) : null,
-      currency: data_accountant.currency,
-      exchangeRate: String(data_accountant.exchangeRate || ''),
-      currencyValue: String(data_accountant.currencyValue || ''),
+      currency: currency,
+      exchangeRate: String(exchangeRate || ''),
+      currencyValue: String(currencyValue || ''),
+
+      splitPayment: splitPayment ?? [],
     });
   }, [disabled, data_accountant?.id, data_accountant?.updatedAt]);
 
@@ -828,7 +882,7 @@ const Row = ({
               <IconDelete01 className={classNames(!disabled && 'invisible')} onClick={handle_delete} />
             </>
           ) : (
-            <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant?.id)}>
+            <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant)}>
               匯入發票
             </MyButton_v2>
           )
@@ -840,30 +894,33 @@ const Row = ({
 
         const config = configList[key];
 
-        const value = state_accountant[key];
-
-        const props = config?.inputSelPropsCreator({
-          disabled,
-          bankAccountOptionArr,
-          limitedDate,
-          value,
-          setState_accountant,
-          handle_checkIsImported,
-          isAllowToEditIsImported,
-        });
+        const { reactNode, ...props } =
+          config?.inputSelPropsCreator({
+            disabled,
+            bankAccountOptionArr,
+            limitedDate,
+            state_accountant,
+            setState_accountant,
+            handle_checkIsImported,
+            isAllowToEditIsImported,
+          }) ?? {};
 
         const theDiasbled = isbillSerialNumber || disabled;
 
         return (
           <div key={key} className={classNames(scss.cell, config?.className)} style={config?.style}>
-            <InputSel
-              //
-              disabled={theDiasbled}
-              showBaseline="auto"
-              fontSize="14"
-              {...config?.inputSelProps}
-              {...props}
-            />
+            {reactNode ? (
+              reactNode
+            ) : (
+              <InputSel
+                //
+                disabled={theDiasbled}
+                showBaseline="auto"
+                fontSize="14"
+                {...config?.inputSelProps}
+                {...props}
+              />
+            )}
           </div>
         );
       })}
@@ -872,85 +929,6 @@ const Row = ({
     </div>
   );
 };
-
-// const AddInovice = ({
-//   reqPostAccountReceivableAccountant,
-//   accountReceivableId,
-//   onCancel,
-// }: {
-//   onCancel: () => void;
-//   accountReceivableId: string;
-//   reqPostAccountReceivableAccountant: (accountReceivableId: string, type: TperiodType) => Promise<void>;
-// }) => {
-//   const handle_訂金 = async () => {
-//     await reqPostAccountReceivableAccountant(accountReceivableId, '訂金');
-//     onCancel();
-//   };
-
-//   const handle_請款 = async () => {
-//     await reqPostAccountReceivableAccountant(accountReceivableId, '請款');
-//     onCancel();
-//   };
-
-//   return (
-//     <div>
-//       <br />
-//       <div className="flex gap-5 mt-10">
-//         <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
-//           新增請款
-//         </MyButton_v2>
-
-//         <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
-//           新增訂金
-//         </MyButton_v2>
-
-//         <MyButton_v2 theme="danger" px="px22" py="py6" buttonProps={{ htmlType: 'submit' }} onClick={onCancel}>
-//           取消
-//         </MyButton_v2>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const MakeIsImported = ({
-//   reqPatchIsImported,
-//   accountReceivableId,
-//   onCancel,
-// }: {
-//   onCancel: () => void;
-//   accountReceivableId: string;
-//   reqPatchIsImported: TreqPatchIsImported;
-// }) => {
-//   const handle_訂金 = async () => {
-//     await reqPatchIsImported(accountReceivableId, '訂金');
-//     onCancel();
-//   };
-
-//   const handle_請款 = async () => {
-//     await reqPatchIsImported(accountReceivableId, '請款');
-//     onCancel();
-//   };
-
-//   return (
-//     <div>
-//       <br />
-//       <p>請選擇付款類型</p>
-//       <div className="flex gap-5 mt-10">
-//         <MyButton_v2 px="px22" py="py6" onClick={handle_請款}>
-//           請款
-//         </MyButton_v2>
-
-//         <MyButton_v2 px="px22" py="py6" onClick={handle_訂金}>
-//           訂金
-//         </MyButton_v2>
-
-//         <MyButton_v2 theme="danger" px="px22" py="py6" buttonProps={{ htmlType: 'submit' }} onClick={onCancel}>
-//           取消
-//         </MyButton_v2>
-//       </div>
-//     </div>
-//   );
-// };
 
 // =========================================================================
 // region: FUNCTION
@@ -983,12 +961,14 @@ type Tconfig = {
     disabled?: boolean;
     bankAccountOptionArr?: Toption[];
     limitedDate?: Moment;
-    value: string | Moment | null | boolean;
+    // value: string | Moment | null | boolean;
+    state_accountant: Tstate_accountant;
     setState_accountant: React.Dispatch<React.SetStateAction<Tstate_accountant>>;
     handle_checkIsImported: () => void;
     isAllowToEditIsImported?: boolean;
   }) => {
     inputProps?: TinputProps;
+    textareaProps?: TtextareaProps;
     selectProps?: TselectProps;
     datePickerProps?: TdatePickerProps;
     checkBoxProps_v2?: TcheckBoxProps_v2;
@@ -1028,6 +1008,8 @@ const lookup_keyArr: {
 
     'billSerialNumber',
     'notes',
+
+    'splitPayment',
   ],
   // 票據: [...baseArr_before, 'noteNumber', 'noteMaturityDate', ...baseArr_after],
   票據: [
@@ -1045,6 +1027,8 @@ const lookup_keyArr: {
     'receiptEstimatedDate',
     'billSerialNumber',
     'notes',
+
+    'splitPayment',
   ],
   現金: [
     ...baseArr_before,
@@ -1057,6 +1041,8 @@ const lookup_keyArr: {
     // 'currency',
     'billSerialNumber',
     'notes',
+
+    'splitPayment',
   ],
 };
 
@@ -1089,9 +1075,11 @@ const configList: TconfigList = {
       bankAccountOptionArr,
       handle_checkIsImported,
       limitedDate,
-      value,
+      state_accountant,
       setState_accountant,
     }) => {
+      const value = state_accountant.isImported;
+
       const value_bool = !!value as boolean;
 
       const checkBoxProps_v2: TcheckBoxProps_v2 = {
@@ -1128,8 +1116,8 @@ const configList: TconfigList = {
       票據: '收票日期',
       現金: '收現日期',
     },
-    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, limitedDate, value, setState_accountant }) => {
-      const value_moment = value as Moment | null;
+    inputSelPropsCreator: ({ limitedDate, state_accountant, setState_accountant }) => {
+      const value_moment = state_accountant.insertDate;
 
       const datePickerProps: TdatePickerProps = {
         props: {
@@ -1153,8 +1141,8 @@ const configList: TconfigList = {
       // justifyContent: 'center',
     },
     className: '',
-    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, limitedDate, value, setState_accountant }) => {
-      const value_moment = value as Moment | null;
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
+      const value_moment = state_accountant.noteMaturityDate;
 
       const datePickerProps: TdatePickerProps = {
         props: {
@@ -1174,8 +1162,8 @@ const configList: TconfigList = {
       width: 200,
     },
     className: '',
-    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, value, setState_accountant }) => {
-      const value_str = (value as string) || '';
+    inputSelPropsCreator: ({ bankAccountOptionArr, state_accountant, setState_accountant }) => {
+      const value_str = state_accountant.accountingNumber || '';
 
       const selectProps: TselectProps = {
         props: {
@@ -1200,8 +1188,8 @@ const configList: TconfigList = {
       width: 120,
     },
     className: scss.stickyLeft,
-    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
-      const value_str = (value as string) || '';
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
+      const value_str = state_accountant.noteNumber || '';
       const inputProps: TinputProps = {
         props: {
           placeholder: '請輸入',
@@ -1222,8 +1210,8 @@ const configList: TconfigList = {
       width: 160,
     },
     className: '',
-    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
-      const value_str = (value as string) || '';
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
+      const value_str = state_accountant.importAccountingNumber || '';
 
       const inputProps: TinputProps = {
         props: {
@@ -1246,8 +1234,8 @@ const configList: TconfigList = {
       width: 100,
     },
     className: '',
-    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
-      const value_str = (value as string) || '';
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
+      const value_str = state_accountant.vendorName || '';
 
       const inputProps: TinputProps = {
         props: {
@@ -1273,10 +1261,10 @@ const configList: TconfigList = {
     inputSelProps: {
       showBaseline: 'invisible',
     },
-    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
       // const inputType = disabled ? 'text' : 'number';
 
-      const value_str = (value as string) || '';
+      const value_str = state_accountant.price || '';
       // const theValue = disabled ? Number(value_str).toLocaleString() : value_str;
       const theValue = Number(value_str).toLocaleString();
 
@@ -1302,21 +1290,23 @@ const configList: TconfigList = {
       width: 120,
     },
     className: '',
-    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
-      const value_str = (value as string) || '';
-      const inputProps: TinputProps = {
-        props: {
-          readOnly: true,
-          placeholder: '系統自動產生',
-          type: 'text',
-          value: value_str,
-          onChange: (e) => {
-            // setState_accountant((state) => ({ ...state, ['billSerialNumber']: e.target.value }));
-          },
-        },
-      };
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
+      // const value_str = state_accountant.billSerialNumber || '';
+      const value_Arr = state_accountant.billSerialNumber || [];
+      const value = value_Arr.join('\n');
 
-      return { inputProps };
+      const reactNode = <span className="whitespace-pre-wrap">{value}</span>;
+
+      // const textareaProps: TtextareaProps = {
+      //   props: {
+      //     readOnly: true,
+      //     placeholder: '系統自動產生',
+      //     value,
+      //     onChange: (e) => {},
+      //   },
+      // };
+
+      return { reactNode };
     },
   },
   notes: {
@@ -1324,8 +1314,8 @@ const configList: TconfigList = {
     // style: { flex: 'auto' },
     style: { width: 300 },
     className: '',
-    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
-      const value_str = (value as string) || '';
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
+      const value_str = state_accountant.notes || '';
       const inputProps: TinputProps = {
         props: {
           placeholder: '請輸入',
@@ -1347,8 +1337,8 @@ const configList: TconfigList = {
       // justifyContent: 'center',
     },
     className: '',
-    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, limitedDate, value, setState_accountant }) => {
-      const value_moment = value as Moment | null;
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
+      const value_moment = state_accountant.receiptCollectionDate;
 
       const datePickerProps: TdatePickerProps = {
         props: {
@@ -1369,8 +1359,8 @@ const configList: TconfigList = {
       // justifyContent: 'center',
     },
     className: '',
-    inputSelPropsCreator: ({ disabled, bankAccountOptionArr, limitedDate, value, setState_accountant }) => {
-      const value_moment = value as Moment | null;
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
+      const value_moment = state_accountant.receiptEstimatedDate;
 
       const datePickerProps: TdatePickerProps = {
         props: {
@@ -1391,12 +1381,12 @@ const configList: TconfigList = {
       // justifyContent: 'center',
     },
     className: '',
-    inputSelPropsCreator: ({ value, setState_accountant }) => {
-      const value_string = value as string;
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
+      const value_string = state_accountant.currency;
 
       const selectProps: TselectProps = {
         props: {
-          value: value ? { label: value_string, value: value_string } : null,
+          value: value_string ? { label: value_string, value: value_string } : null,
           options: options_currency,
           onChange: (option) => {
             if (!option) {
@@ -1419,8 +1409,8 @@ const configList: TconfigList = {
       width: 70,
     },
     className: '',
-    inputSelPropsCreator: ({ value, setState_accountant }) => {
-      const value_str = (value as string) || '';
+    inputSelPropsCreator: ({ state_accountant, setState_accountant }) => {
+      const value_str = state_accountant.exchangeRate || '';
 
       const inputProps: TinputProps = {
         props: {
@@ -1451,9 +1441,9 @@ const configList: TconfigList = {
       justifyContent: 'flex-end',
     },
     className: '',
-    inputSelPropsCreator: ({ disabled, value, setState_accountant }) => {
+    inputSelPropsCreator: ({ disabled, state_accountant, setState_accountant }) => {
       const inputType = disabled ? 'text' : 'number';
-      const value_str = (value as string) || '';
+      const value_str = state_accountant.currencyValue || '';
       const theValue = disabled ? Number(value_str).toLocaleString() : value_str;
 
       const inputProps: TinputProps = {
@@ -1479,6 +1469,23 @@ const configList: TconfigList = {
       };
     },
   },
+  splitPayment: {
+    label: '已分出金額',
+    style: {
+      width: 100,
+    },
+    className: '',
+    inputSelPropsCreator({ state_accountant }) {
+      const strArr = state_accountant.splitPayment.map((payment) => payment.toLocaleString());
+      const str = strArr.join('\n');
+
+      const reactNode = <span className="whitespace-pre-wrap break-words">{str}</span>;
+
+      return {
+        reactNode,
+      };
+    },
+  },
 };
 
 // =========================================================================
@@ -1490,7 +1497,7 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   accountingNumber: '',
   vendorName: '',
   price: '',
-  billSerialNumber: '',
+  billSerialNumber: [],
   notes: '',
   isImported: false,
   accountsReceivableDeduction: [],
@@ -1500,4 +1507,6 @@ const cre_emptyStateAccountant = (): Tstate_accountant => ({
   currency: 'TWD 新臺幣',
   exchangeRate: '1', // 預設為1，不然price計算結果為0
   currencyValue: '', // 金額
+
+  splitPayment: [],
 });

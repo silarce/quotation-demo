@@ -1150,8 +1150,8 @@ const useDefaultState = ({
     } = data_period ?? create_emptyPeriod();
 
     const notAllow_EditDeduction_or_deleteInvoice = invoices.some((invoice) => {
-      return invoice.accountantList?.some((al) => {
-        return al.accountsReceivableDeduction.length > 0;
+      return invoice.incomeBillSerialList?.some(({ accountsReceivableDeduction }) => {
+        return accountsReceivableDeduction && accountsReceivableDeduction.length > 0;
       });
     });
 

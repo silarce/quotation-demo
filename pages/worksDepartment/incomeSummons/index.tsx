@@ -6,11 +6,20 @@ import Decimal from 'decimal.js';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+
+// component
+import EditDefunctionBtn from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDeductionEditor';
 
 // gear
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import Row, { Cell } from 'components/global/gear/table/row';
+import SignatureBar, { TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
+import { Collapse, useActiveKey, UpDownArrow } from 'components/global/myAntd/collapse';
+import ProcessChain, { Tcontrol_processChain, TstatusLabelProps } from 'components/global/gear/processChain';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // icon
 import { IconCheck02, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
@@ -42,6 +51,7 @@ type Tquery = {
 };
 
 type Tstate_incomeBillSerial = {
+  id: string;
   billSerialNumber: string;
   receiveDate: Moment | null;
   contractNumber: string;
@@ -57,10 +67,51 @@ type Tstate_incomeBillSerial = {
   unpaidPayment: string;
   difference: string;
   //
-  fee: string;
+  readonly fee: number; // 現在是從accountant裡面拿
+  //
+  note: string;
+  vendorName: string;
+
+  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+  // temporary_separatePayment: string;
+
+  //
+  readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
 };
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
+
+type TtableRow = {
+  caption: React.ReactNode;
+  foreign: React.ReactNode;
+  domestic: React.ReactNode;
+  total: React.ReactNode;
+};
+
+type TconfigItem = {
+  label: string;
+  style?: React.CSSProperties;
+  className?: string;
+  createInputSelProps: (props: {
+    disabled: boolean;
+    isPaperImported: boolean;
+    state_incomeBillSerial: Tstate_incomeBillSerial;
+    setState_incomeBillSerial: React.Dispatch<React.SetStateAction<Tstate_incomeBillSerial>>;
+    //
+    accountantId?: string;
+    update_incomeBill?: () => void;
+  }) => TinputSelProps;
+};
+
+type Tconfig = {
+  [key in TconfigKey]: TconfigItem;
+} & {
+  btnPanel: TconfigItem;
+};
+
+// ==============================================================================
+
+const Panel = Collapse.Panel;
 
 // ==============================================================================
 
@@ -80,18 +131,29 @@ export default function IncomeSummons() {
 
   // -----------------------------------------------------------------------------
 
+  const [showTable, setShowTable] = useState(false);
+  // const [activeIdArr, setActiveIdArr] = useState<string | string[]>([]);
+  const { activePanelKeyArr, changeActive } = useActiveKey();
+
+  // -----------------------------------------------------------------------------
+
   const params: Tparams = useMemo(() => {
     return {
       sort: 'billSerialNumber',
       pageSize: 999999,
-      populate: ['accountant'],
+      // populate: ['accountant'],
+      populate: ['accountant', 'accountsReceivableDeduction'],
       filter: {
         isForeign: {
           $eq: isForeign === 'true',
         },
         incomeBillDate: {
-          $gte: moment(`${year}-${month}`).startOf('month').toISOString(),
-          $lte: moment(`${year}-${month}`).endOf('month').toISOString(),
+          $gte: moment(`${year}-${month.padStart(2, '0')}`)
+            .startOf('month')
+            .toISOString(),
+          $lte: moment(`${year}-${month.padStart(2, '0')}`)
+            .endOf('month')
+            .toISOString(),
         },
       },
     };
@@ -128,6 +190,10 @@ export default function IncomeSummons() {
       deductionPayment,
       unpaidPayment,
       difference,
+      //
+      note,
+      accountsReceivableDeduction,
+      fee,
     } = state_incomeBillSerial;
 
     const body: TupdateIncomeBillSerialDto = {
@@ -144,10 +210,16 @@ export default function IncomeSummons() {
       deductionPayment: deductionPayment ? Number(deductionPayment) : null,
       unpaidPayment: unpaidPayment ? Number(unpaidPayment) : null,
       difference: difference ? difference : null,
+      note: note,
+
+      fee,
+      incomeBillDeduction: accountsReceivableDeduction ?? [],
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
   };
+
+  // -----------------------------------------------------------------------------
 
   // -----------------------------------------------------------------------------
 
@@ -221,6 +293,16 @@ export default function IncomeSummons() {
     ] as TselectPropsArr;
   }, [year, month, yearOptionArr, monthOptionArr]);
 
+  const panelList: TpanelList = [
+    {
+      type: 'myButton',
+      label: '收款統計明細表',
+      onClick: () => {
+        setShowTable(true);
+      },
+    },
+  ];
+
   // -----------------------------------------------------------------------------
   // MARK: RENDER
   return (
@@ -228,11 +310,14 @@ export default function IncomeSummons() {
       <PageHeader02
         tagList={tagList}
         customeLeft={[<SelectBar key="selectBar" className={'ml-5'} selectPropsArr={selectPropsArr} />]}
+        panelList={panelList}
       />
       <div className={scss.main}>
+        {/*  */}
+
         <div className={scss.tableWrapper}>
           <div className={scss.table}>
-            <Row className={scss.thead}>
+            <SummonsRow className={scss.thead}>
               <div style={config.btnPanel.style} className={config.btnPanel.className}></div>
               {keyArr.map((key) => {
                 const { label, style, className } = config[key];
@@ -243,15 +328,33 @@ export default function IncomeSummons() {
                   </div>
                 );
               })}
-            </Row>
+            </SummonsRow>
 
-            {data_incomeBill.map((data, index) => {
-              return <Summons key={data.id} incomeBillSerial={data} reqPatch={reqPatch} />;
-            })}
+            <Collapse activeKey={activePanelKeyArr} noTlrBorder={true}>
+              {data_incomeBill.map((data, index) => {
+                return (
+                  <Panel
+                    className={classNames(scss.panel, scss.plus)}
+                    key={data.id}
+                    header={
+                      <Summons
+                        incomeBillSerial={data}
+                        reqPatch={reqPatch}
+                        update_incomeBill={update_incomeBill}
+                        changeActive={() => changeActive(data.id)}
+                      />
+                    }
+                  >
+                    <OtherInfo incomeBillSerial={data} />
+                  </Panel>
+                );
+              })}
+            </Collapse>
           </div>
         </div>
-        {/*  */}
       </div>
+      {/*  */}
+      <Table showTable={showTable} onCrossClick={() => setShowTable(false)} />
     </SubLayer>
   );
 }
@@ -263,8 +366,13 @@ export default function IncomeSummons() {
 // ==============================================================================
 // ==============================================================================
 // MARK: COMPONENT
-
-const Row_pre = (
+//
+//
+//
+//
+//
+// MARK: Row
+const SummonsRow_pre = (
   {
     //
     className,
@@ -282,21 +390,28 @@ const Row_pre = (
   );
 };
 
-const Row = forwardRef(Row_pre);
+// MARK: Summons
 
 const Summons_pre = (
   {
     //
     incomeBillSerial,
     reqPatch,
+    update_incomeBill,
+    changeActive,
   }: {
     incomeBillSerial: TincomeBillSerialDto;
     reqPatch: TreqPatch;
+    update_incomeBill: () => void;
+    changeActive: () => void;
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
+  const accountantId = incomeBillSerial.accountant.id;
+
   const defaultState = useMemo(() => {
     const {
+      id,
       billSerialNumber,
       receiveDate,
       contractNumber,
@@ -312,12 +427,18 @@ const Summons_pre = (
       unpaidPayment,
       //
       accountant,
+      //
+      note,
+
+      accountsReceivableDeduction,
+      fee,
     } = incomeBillSerial;
 
     let { difference } = incomeBillSerial;
     difference = (difference ?? '').trimEnd();
 
     const defaultState: Tstate_incomeBillSerial = {
+      id,
       billSerialNumber: billSerialNumber,
       receiveDate: receiveDate ? moment(receiveDate) : null,
       contractNumber: contractNumber || '',
@@ -332,7 +453,15 @@ const Summons_pre = (
       deductionPayment: String(deductionPayment || ''),
       unpaidPayment: String(unpaidPayment || ''),
       difference: difference || '',
-      fee: String(accountant?.fee || '0'),
+      fee: fee || 0,
+      //
+      note: note ?? '',
+      vendorName: accountant.vendorName ?? '',
+
+      accountsReceivableDeduction: accountsReceivableDeduction,
+
+      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+      // temporary_separatePayment: (temporary_separatePayment || 0).toLocaleString(),
     };
 
     return defaultState;
@@ -362,8 +491,9 @@ const Summons_pre = (
   // ---------------------------------------------------------------------
 
   return (
-    <Row ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled)}>
+    <SummonsRow ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled)}>
       <div className={scss.btnPanel} style={config.btnPanel.style}>
+        <UpDownArrow className="h-[20px]" onClick={changeActive} />
         <IconEdit className={classNames(!disabled && scss.enable)} onClick={() => setDisabled((state) => !state)} />
         <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_onConfirm} />
       </div>
@@ -371,11 +501,15 @@ const Summons_pre = (
       {keyArr.map((key) => {
         const { style, className, createInputSelProps: createInputAttr } = config[key];
 
+        // 要使!isPaperImported為true的狀態仍可以編輯
+        // 將送進createInputAttr中的disabled回傳即可
         const inputSelProps = createInputAttr({
           disabled: disabled,
           isPaperImported,
           state_incomeBillSerial,
           setState_incomeBillSerial,
+          accountantId,
+          update_incomeBill,
         });
 
         return (
@@ -389,11 +523,162 @@ const Summons_pre = (
           </div>
         );
       })}
-    </Row>
+    </SummonsRow>
+  );
+};
+
+const Table = ({ showTable, onCrossClick }: { showTable: boolean; onCrossClick: () => void }) => {
+  const fakeData: TtableRow[] = [
+    {
+      caption: '本月實際收款額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+    {
+      caption: '本月預估收款額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+    {
+      caption: '不足預估之收款額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+    {
+      caption: '下月預估收款額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+    {
+      caption: '99月累計收款額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+    {
+      caption: '應收帳款總額',
+      foreign: 99999,
+      domestic: 99999,
+      total: 999999,
+    },
+  ];
+
+  const signatureArr: TsignatureBarItem[] = useMemo(() => {
+    const signatureArr: TsignatureBarItem[] = [
+      {
+        label: '總經理',
+        className: 'w-[100px]',
+        value: '',
+        isReviewed: false,
+      },
+      {
+        label: '經理',
+        className: 'w-[100px]',
+        value: '',
+        isReviewed: false,
+      },
+      {
+        label: '主管',
+        className: 'w-[100px]',
+        value: '',
+        isReviewed: false,
+      },
+      {
+        label: '製表',
+        className: 'w-[100px]',
+        value: '',
+        isReviewed: false,
+      },
+    ];
+
+    return signatureArr;
+  }, []);
+
+  return (
+    <DragableModal
+      handleText="收款統計明細表"
+      //
+      show={showTable}
+      onCrossClick={onCrossClick}
+    >
+      <div className={scss.tableContainer}>
+        <p className={scss.tableTitle}>{`${999}年${99}月收款統計明細表`}</p>
+
+        <div className={scss.table}>
+          <Row thead={true}>
+            <Cell style={config_table.caption.style}></Cell>
+            <Cell style={config_table.foreign.style}>外銷</Cell>
+            <Cell style={config_table.domestic.style}>國內</Cell>
+            <Cell style={config_table.total.style}>合計</Cell>
+          </Row>
+          {fakeData.map((data, index) => {
+            const { caption, foreign, domestic, total } = data;
+
+            return (
+              <Row key={index}>
+                <Cell style={config_table.caption.style}>{caption}</Cell>
+                <Cell style={config_table.foreign.style}>{foreign}</Cell>
+                <Cell style={config_table.domestic.style}>{domestic}</Cell>
+                <Cell style={config_table.total.style}>{total}</Cell>
+              </Row>
+            );
+          })}
+        </div>
+        <SignatureBar
+          className="mt-5"
+          control={{
+            signatureArr: signatureArr,
+          }}
+        />
+      </div>
+    </DragableModal>
+  );
+};
+
+const OtherInfo = ({ incomeBillSerial }: { incomeBillSerial: TincomeBillSerialDto }) => {
+  const processChainControl = useMemo(() => {
+    // Tcontrol_processChain
+    // TstatusLabelProps
+    const arr: TstatusLabelProps[] = [
+      {
+        label: 'MEOW',
+        dotColor: 'gray',
+      },
+      {
+        label: 'WANG',
+        dotColor: 'red',
+      },
+      {
+        label: 'WEEEEEEEEE',
+        dotColor: 'green',
+      },
+    ];
+
+    const processChainControl = {
+      statusArr: arr,
+    };
+
+    return processChainControl;
+  }, [incomeBillSerial]);
+
+  return (
+    <div className={scss.otherInfo}>
+      <div className={scss.reviewBar}>
+        <MyButton_v2 px="px22" py="py4">
+          審核
+        </MyButton_v2>
+        <ProcessChain control={processChainControl} />
+      </div>
+    </div>
   );
 };
 
 // forwardRef
+const SummonsRow = forwardRef(SummonsRow_pre);
 const Summons = forwardRef(Summons_pre);
 
 // ==============================================================================
@@ -492,26 +777,13 @@ type TconfigKey =
       | 'deductionPayment'
       | 'unpaidPayment'
       | 'difference'
+      | 'note'
+
+      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+      // | 'temporary_separatePayment'
     >
-  | 'fee';
-
-type TconfigItem = {
-  label: string;
-  style?: React.CSSProperties;
-  className?: string;
-  createInputSelProps: (props: {
-    disabled: boolean;
-    isPaperImported: boolean;
-    state_incomeBillSerial: Tstate_incomeBillSerial;
-    setState_incomeBillSerial: React.Dispatch<React.SetStateAction<Tstate_incomeBillSerial>>;
-  }) => TinputSelProps;
-};
-
-type Tconfig = {
-  [key in TconfigKey]: TconfigItem;
-} & {
-  btnPanel: TconfigItem;
-};
+  | 'fee'
+  | 'vendorName';
 
 const keyArr: TconfigKey[] = [
   'billSerialNumber',
@@ -519,6 +791,7 @@ const keyArr: TconfigKey[] = [
   'receiveDate',
   'contractNumber',
   'projectName',
+  'vendorName',
   'contractPayment',
   'periodPayment',
   'priorPeriodPayment',
@@ -530,12 +803,17 @@ const keyArr: TconfigKey[] = [
   'fee',
   'unpaidPayment',
   'difference',
+
+  'note',
+
+  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+  // 'temporary_separatePayment',
 ];
 
 const config: Tconfig = {
   btnPanel: {
     label: '',
-    style: { width: 70 },
+    style: { width: 120 },
     className: scss.btnPanel,
     createInputSelProps: () => ({}),
   },
@@ -622,10 +900,26 @@ const config: Tconfig = {
       // flex: '1',
       width: 200,
     },
-    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => ({
-      inputProps: {
+    createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => {
+      //
+      // const inputProps: TinputSelProps['inputProps'] = {
+      //   props: {
+      //     // className: 'text-center',
+      //     value: state_incomeBillSerial.projectName,
+      //     onChange: (e) => {
+      //       setState_incomeBillSerial((prev) => {
+      //         return {
+      //           ...prev,
+      //           projectName: e.target.value,
+      //         };
+      //       });
+      //     },
+      //   },
+      // };
+      //
+
+      const textareaProps: TinputSelProps['textareaProps'] = {
         props: {
-          // className: 'text-center',
           value: state_incomeBillSerial.projectName,
           onChange: (e) => {
             setState_incomeBillSerial((prev) => {
@@ -636,8 +930,12 @@ const config: Tconfig = {
             });
           },
         },
-      },
-    }),
+      };
+
+      //
+
+      return { textareaProps };
+    },
   },
   contractPayment: {
     label: '承攬價',
@@ -883,13 +1181,15 @@ const config: Tconfig = {
   },
   deductionPayment: {
     label: '扣款金額',
-    style: { width: 100 },
+    style: { width: 150 },
     className: 'text-right',
     createInputSelProps: ({
       disabled,
       isPaperImported,
       state_incomeBillSerial,
-      setState_incomeBillSerial: setState_incomeBillSerial,
+      setState_incomeBillSerial,
+      accountantId,
+      update_incomeBill,
     }) => {
       const { type, value } = reducer_input({
         disabled: disabled || !isPaperImported,
@@ -906,7 +1206,7 @@ const config: Tconfig = {
         });
       };
 
-      const inputSelProps = {
+      const inputSelProps: TinputSelProps = {
         inputProps: {
           props: {
             className: 'text-right',
@@ -915,6 +1215,14 @@ const config: Tconfig = {
             onChange: onChange,
           },
         },
+        suffix: accountantId && (
+          <EditDefunctionBtn
+            //
+            accountantId={accountantId}
+            incomeBillId={state_incomeBillSerial.id}
+            onConfirm={update_incomeBill}
+          />
+        ),
       };
 
       return inputSelProps;
@@ -1001,7 +1309,7 @@ const config: Tconfig = {
         inputProps: {
           props: {
             className: 'text-right',
-            defaultValue: state_incomeBillSerial.fee,
+            defaultValue: state_incomeBillSerial.fee.toLocaleString(),
           },
         },
       };
@@ -1009,4 +1317,110 @@ const config: Tconfig = {
       return inputSelProps;
     },
   },
+
+  note: {
+    label: '備註',
+    style: { width: 200 },
+    className: '',
+    createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
+      const inputSelProps: TinputSelProps = {
+        disabled,
+        textareaProps: {
+          allowNewLineByUser: true,
+          props: {
+            value: state_incomeBillSerial.note,
+            onChange: (e) => {
+              setState_incomeBillSerial((prev) => {
+                return {
+                  ...prev,
+                  note: e.target.value,
+                };
+              });
+            },
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  vendorName: {
+    label: '廠商名稱',
+    style: { width: 150 },
+    // className: 'text-center',
+    createInputSelProps: ({ state_incomeBillSerial }) => {
+      const inputSelProps: TinputSelProps = {
+        disabled: true,
+        showBaseline: 'invisible',
+        inputProps: {
+          props: {
+            // className: 'text-center',
+            value: state_incomeBillSerial.vendorName,
+            disabled: true,
+          },
+        },
+      };
+
+      return inputSelProps;
+    },
+  },
+
+  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+  // temporary_separatePayment: {
+  //   label: '分出金額',
+  //   style: { width: 100 },
+  //   className: 'text-right',
+  //   createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
+  //     const inputSelProps: TinputSelProps = {
+  //       disabled: true,
+  //       inputProps: {
+  //         props: {
+  //           className: 'text-right',
+  //           defaultValue: state_incomeBillSerial.temporary_separatePayment,
+  //         },
+  //       },
+  //     };
+
+  //     return inputSelProps;
+  //   },
+  // },
+
+  //
 } as const;
+
+type Tconfig_table_item = {
+  label: string;
+  style?: React.CSSProperties;
+  className?: string;
+};
+
+type Tconfig_table = {
+  [key: string]: Tconfig_table_item;
+};
+
+const config_table: Tconfig_table = {
+  caption: {
+    label: '',
+    style: {
+      width: 150,
+      // flex: '1',
+    },
+  },
+  foreign: {
+    label: '外銷',
+    style: { width: 120 },
+  },
+  domestic: {
+    label: '國內',
+    style: { width: 120 },
+  },
+  total: {
+    label: '合計',
+    style: { width: 120 },
+  },
+};
+
+{
+  /* <span className="text-9xl">&#11137;</span> */
+}

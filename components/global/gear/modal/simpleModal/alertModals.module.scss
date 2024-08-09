@@ -63,6 +63,20 @@
   }
 }
 
+.clear {
+  :global(.ant-modal-content) {
+    :global(.ant-modal-body) {
+      padding: unset;
+      :global(.ant-modal-confirm-content) {
+        margin-top: unset;
+      }
+      :global(.ant-modal-confirm-btns) {
+        display: none;
+      }
+    }
+  }
+}
+
 // =======================================================================
 // .inputConfirm {
 //   :global(.ant-modal-confirm-body-wrapper) {
@@ -165,10 +179,6 @@
   gap: 30px;
   margin-top: 20px;
 }
-
-
-
-
 
 // :global(){
 

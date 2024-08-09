@@ -1,0 +1,29 @@
+.collapse {
+  width: fit-content;
+  &.noTlrBorder {
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+}
+.panel.plus {
+  background-color: #fff;
+  :global(.ant-collapse-header) {
+    display: block;
+    padding: 0;
+    background-color: inherit;
+    cursor: auto;
+  }
+
+  :global(.ant-collapse-content) {
+    background-color: inherit;
+    :global(.ant-collapse-content-box) {
+      padding: 0;
+      background-color: inherit;
+    }
+  }
+}
+
+.icon {
+  cursor: pointer;
+}
