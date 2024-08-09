@@ -754,15 +754,15 @@ const OtherInfo = ({ incomeBillSerial }: { incomeBillSerial: TincomeBillSerialDt
     // TstatusLabelProps
     const arr: TstatusLabelProps[] = [
       {
-        label: 'MEOW',
+        label: '開發中',
         dotColor: 'gray',
       },
       {
-        label: 'WANG',
+        label: '開發中',
         dotColor: 'red',
       },
       {
-        label: 'WEEEEEEEEE',
+        label: '開發中',
         dotColor: 'green',
       },
     ];
