@@ -3707,8 +3707,11 @@ export type TincomeBillSerialDto = {
   //
   accountsReceivableDeduction?: TaccountsReceivableDeductionDto[];
   order: number | null;
-  invoices?: TaccountsReceivableInvoiceDto[];
   fee: number | null;
+
+  // 沒意外的話invoices裡應該最多只會有一筆資料
+  invoiceNumber: string | null;
+  invoices?: TaccountsReceivableInvoiceDto[];
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3998,7 +4001,7 @@ export type TaccountsReceivableInvoiceDto = {
   // 關聯收款紀錄
   // accountantList?: TaccountantDto[];
 
-  incomeBillList?: TincomeBillSerialDto[];
+  incomeBillSerialList?: TincomeBillSerialDto[];
 
   // 所屬應收帳款期數Id
   accountsReceivablePeriodId: string | null;
