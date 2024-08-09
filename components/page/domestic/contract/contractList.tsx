@@ -1,7 +1,7 @@
-import { useState, useEffect, MouseEvent } from 'react';
-import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 // components
 import ContractListTop from '../local/list/list01/listTop01';
@@ -13,9 +13,6 @@ import { Collapse } from 'antd';
 
 // css
 import style from './contractList.module.scss';
-
-// type
-import { TsearchObj } from 'components/global/gear/HOC/searchBar/searchBar';
 
 import { useGetContract_id_noItems_2 } from 'js/api/api_quotation';
 
@@ -57,7 +54,7 @@ export default function ContractList({
   // ----------------------------------------------------------
 
   const memoArr: TsubContract[] =
-    subContracts?.map((subContract) => {
+    _.sortBy(subContracts, 'version')?.map((subContract) => {
       const { id: subContractId, content } = subContract;
 
       const { managerReviewedAt } = content;
@@ -83,7 +80,7 @@ export default function ContractList({
         href: {
           pathname: '/domestic/contract/quotation',
           query: {
-            id: subContracts[0].id,
+            id: subContracts![0].id,
             version: subContract.version,
           },
         },
@@ -91,6 +88,8 @@ export default function ContractList({
 
       return obj;
     }) ?? [];
+
+  // 第一個version 1 ，不需要顯示在這邊
   memoArr.shift();
 
   // ----------------------------------------------------------
