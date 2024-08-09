@@ -10,7 +10,7 @@ import scss from './exportToIncomeBill.module.scss';
 
 // ============================================================================
 
-type TonClick = (isoString: string) => Promise<void>;
+type TonConfirm = (params: { isoString: string; splitPayment: number }) => Promise<void>;
 
 // ============================================================================
 
@@ -18,15 +18,21 @@ const ExportToIncomeBill = ({
   //
   onConfirm,
   onCancel,
+  defaultPayment,
 }: {
-  onConfirm: TonClick;
+  onConfirm: TonConfirm;
   onCancel: () => void;
+  defaultPayment: number;
 }) => {
-  const [incomeBillDate, setIncomeBillDate] = useState<Moment | null>(null);
+  const [state_incomeBillDate, setState_incomeBillDate] = useState<Moment | null>(null);
+  const [state_splitPayment, setState_splitPayment] = useState<number | null>(defaultPayment);
 
   const handle_onConfirm = async () => {
-    if (incomeBillDate) {
-      await onConfirm(incomeBillDate.toISOString());
+    if (state_incomeBillDate) {
+      await onConfirm({
+        isoString: state_incomeBillDate.toISOString(),
+        splitPayment: state_splitPayment || 0,
+      });
       onCancel();
     } else {
       myAlert.info({ title: '請選擇日期' });
@@ -36,15 +42,30 @@ const ExportToIncomeBill = ({
   return (
     <div className="w-[300px]">
       <br />
-      <p className="text-2xl mb-3">收入傳票日期</p>
+
       <InputSel
+        caption="收入傳票日期"
         datePickerProps={{
           props: {
             className: scss.datePicker,
             placeholder: '請選擇日期',
-            value: incomeBillDate,
+            value: state_incomeBillDate,
             onChange: (m) => {
-              setIncomeBillDate(m);
+              setState_incomeBillDate(m);
+            },
+          },
+        }}
+      />
+
+      <InputSel
+        className="mt-3"
+        caption="分出金額"
+        inputProps={{
+          props: {
+            type: 'number',
+            value: state_splitPayment ?? '',
+            onChange: (e) => {
+              setState_splitPayment(Number(e.target.value));
             },
           },
         }}

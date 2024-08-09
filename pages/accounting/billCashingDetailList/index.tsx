@@ -35,7 +35,6 @@ import {
   apiPostAccountant,
   apiPatchAccountant,
   deleteAccountant,
-  apiPatchAccountant_accountReceivable,
   apiPostAccountantExchangeFrom,
   //
   useGetAccountant,

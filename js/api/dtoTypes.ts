@@ -1,3 +1,8 @@
+// MARK: 說明
+
+// 字首為temporary的型別，代表還未確認的型別，但是前端要開發了，所以先寫一個暫時的型別
+
+// ---------------------------------------------------------------------------
 export type TdoorModel = 'SJ-302' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
 
 // 表面處理
@@ -3694,6 +3699,19 @@ export type TincomeBillSerialDto = {
   //
   accountantId: string;
   accountant: TaccountantDto;
+  //
+  note: string | null;
+
+  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+  // temporary_separatePayment: number | null;
+  //
+  accountsReceivableDeduction?: TaccountsReceivableDeductionDto[];
+  order: number | null;
+  fee: number | null;
+
+  // 沒意外的話invoices裡應該最多只會有一筆資料
+  invoiceNumber: string | null;
+  invoices?: TaccountsReceivableInvoiceDto[];
 };
 
 export type TupdateIncomeBillSerialDto = Pick<
@@ -3711,17 +3729,35 @@ export type TupdateIncomeBillSerialDto = Pick<
   | 'deductionPayment'
   | 'unpaidPayment'
   | 'difference'
->;
+  | 'note'
+> & {
+  incomeBillDeduction: TupdateIncomeBillDeductionDto[];
+  fee: number | null;
+} & {
+  order?: number | null;
+  isImported?: boolean;
+};
+
+type TupdateIncomeBillDeductionDto = {
+  id?: string; // 不提供則將此筆視為新資料
+  itemName: string; // 項目
+  detailedAmount: number; // 明細金額
+};
 
 export type TcreateAccountReceivableAccountsDto = {
   // type: TperiodType;
   accountantId: string[];
   incomeBillDate: string;
+  splitPayment: number;
 };
 
+// apiPatchAccountReceivableAccountant用的
+// 更新指定ReceivableAccountant下指定發票與incomeBill的關聯
 export type TupdateAccountReceivableAccountantDto = {
   invoiceId: string;
-  accountantId: string[];
+  // accountantId: string[];
+  incomeBillId: string[];
+  // temporary_separatePayment: number;
 }[];
 
 // MARK: /engineering
@@ -3785,7 +3821,7 @@ export type TaccountsReceivableDto = {
   // 所屬舊合約
   legacyContract: TlegacyContractDto | null;
   // 扣款明細 // 棄用?
-  accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
+  // accountReceivableDeduction: TaccountsReceivableDeductionDto[] | null;
   // 收款期
   periods: TaccountsReceivablePeriodDto[] | null;
   // 合約總金額(會因為追加而增加)
@@ -3820,7 +3856,9 @@ export type TaccountsReceivableDto = {
   // 保留款是否含稅
   isFinalPaymentWithTax: boolean | null;
   //
-  accountantList?: TaccountantDto[];
+  // 棄用 後端會留著，但前端不會再用了，視為沒有這個property
+  // accountantList?: TaccountantDto[];
+  incomeBillList?: TincomeBillSerialDto[];
 };
 
 export type TupdateAccountReceivableDto = Partial<
@@ -3959,8 +3997,12 @@ export type TaccountsReceivableInvoiceDto = {
   invoiceStatus: TinvoiceStatus;
   // 發票備註
   note: string | null;
+
   // 關聯收款紀錄
-  accountantList?: TaccountantDto[];
+  // accountantList?: TaccountantDto[];
+
+  incomeBillSerialList?: TincomeBillSerialDto[];
+
   // 所屬應收帳款期數Id
   accountsReceivablePeriodId: string | null;
   // 所屬應收帳款期數
@@ -4017,15 +4059,21 @@ export type TaccountantDto = {
   // 發票
   invoices?: TaccountsReceivableInvoiceDto[];
   // 收入傳票序號
-  billSerialNumber?: string | null;
+  // billSerialNumber?: string | null;
+  billSerialNumber?: string[] | null;
   // 收入傳票
-  incomeBill: TincomeBillSerialDto;
+  incomeBill: TincomeBillSerialDto[];
   // 票據到期日
   noteMaturityDate: string | null;
   // 排序
   order: number;
-  // 扣款明細
-  accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  // ! accountant下的accountsReceivableDeduction將不會再更新
+  // ! 要取得 accountsReceivableDeduction 要從 TincomeBillSerialDto取得
+  // ! 也就是上面幾行的那個incomeBill
+  // 扣款明細 // 後端還會用到，但前端不再使用，前端就當作沒有這個property
+  // accountsReceivableDeduction: TaccountsReceivableDeductionDto[];
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   // 已匯入紙本應收帳款(舊的收款紀錄)
   isImported: boolean;
   // 票據狀態
@@ -4045,6 +4093,9 @@ export type TaccountantDto = {
 
   exchangeRate: `${number}`; // 匯率
   currencyValue: `${number}`; // 幣值
+
+  // 已分出金額
+  splitPayment: number[] | null;
 };
 
 export type TcreateAccountantDto = Pick<

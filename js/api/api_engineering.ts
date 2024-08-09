@@ -1424,10 +1424,7 @@ export const useGetAccountReceivableAccountants = (
 // 新增 應收帳款 收款紀錄 account-receivable-accountant
 export const apiPostAccountReceivableAccountant = async (
   id: string, // 應收帳款Id 可以在contract下找到accountReceivableId
-  body: {
-    accountantId: string[]; // 收款明細Id
-    incomeBillDate: string;
-  },
+  body: TcreateAccountReceivableAccountsDto,
   {
     callAlert = true,
   }: {
@@ -1881,9 +1878,12 @@ export const apiPatchEngineeringContactReviewAttachment = async (id: string, bod
 //     });
 // };
 
-// 更新指定ReceivableAccountant下指定發票與accountant的關聯
-export const apiPatchAccountReceivableAccountant = async (id: string, body: TupdateAccountReceivableAccountantDto) => {
-  const api = `/engineering/account-receivable/${id}/accountant`;
+// 更新指定ReceivableAccountant下指定發票與incomeBill的關聯
+export const apiPatchAccountReceivableAccountant = async (
+  accountReceivableId: string,
+  body: TupdateAccountReceivableAccountantDto
+) => {
+  const api = `/engineering/account-receivable/${accountReceivableId}/accountant`;
 
   return axi
     .patch(api, body)
