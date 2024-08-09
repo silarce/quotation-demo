@@ -596,7 +596,12 @@ class Class_product {
   }
 
   // acceDataArr會來自acce選擇器
+  // addAcce(acceDataArr: TdoorAccessoryDto[]) {
   addAcce(acceDataArr: TdoorAccessoryDto[]) {
+    // 檢查是否已經存在，若已存在則從acceDataArr中移除
+    const existCodeNameArr = Object.values(this.accessoriesList).map((acce) => acce.codeName);
+    acceDataArr = acceDataArr.filter((acceData) => !existCodeNameArr.includes(acceData.id));
+
     acceDataArr.forEach((acceData) => {
       const newKey = `new-${nanoid()}`;
       const acceClassData: Taccessories = {

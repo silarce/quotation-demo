@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import classNames from 'classnames';
 
 // components
@@ -8,7 +8,7 @@ import Tbody, { TcellConfig } from '../tbody';
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import AccessorySelector, { TdoorAccessoryDto } from 'components/global/gear/modal/accessorySelector';
+import AccessorySelector, { Tprops_accessorySelector } from 'components/global/gear/modal/accessorySelector';
 
 // type
 import { TaccessoriesKey, TaccessoriesList } from 'hooks/quotation/useProduct';
@@ -37,7 +37,8 @@ export default function Table_accessories({
   defalutVKeyArr?: string[] | undefined;
   onVKeyChange?: (keyArr: string[] | undefined) => void;
   doorModel: string | undefined;
-  onSelectorConfirm: (arr: TdoorAccessoryDto[]) => void;
+  // onSelectorConfirm: (arr: TdoorAccessoryDto[]) => void;
+  onSelectorConfirm: Tprops_accessorySelector['onConfirm'];
   panelBox?: 'copyDelBtnBox' | 'easyBox' | 'comBox';
   emptyBlockWidth?: string;
   isRedBorder?: boolean;
@@ -45,6 +46,14 @@ export default function Table_accessories({
   const [showSelector, setShowSelector] = useState(false);
 
   const [allowMove, setAllowMove] = useState(false);
+
+  // 應該是用不到，但還是暫時先留著
+  // const defaultIdArr: string[] | undefined = useMemo(() => {
+  //   return Object.values(list ?? {}).map((acce) => acce.codeName);
+  // }, [list]);
+  // const defaultIdArr: string[] | undefined = Object.values(list ?? {}).map((acce) => acce.codeName);
+
+  const exceptAcceArr = Object.values(list ?? {}).map((acce) => ({ id: acce.codeName }));
 
   return (
     <div className={classNames(scss.tableContainer, isRedBorder && scss.redBorder)}>
@@ -106,6 +115,8 @@ export default function Table_accessories({
         modelName={doorModel}
         onConfirm={onSelectorConfirm}
         onCancel={() => setShowSelector(false)}
+        // defaultIdArr={defaultIdArr}
+        exceptAcceArr={exceptAcceArr}
       />
     </div>
   );

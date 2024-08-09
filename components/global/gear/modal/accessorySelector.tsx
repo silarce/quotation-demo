@@ -1,11 +1,10 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 
 // global gear
 import SelectorShell, { TsearcbBarProps } from './selectorShell';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
 // css
@@ -16,9 +15,28 @@ import scss from './accessorySelector.module.scss';
 // api
 import { apiGetProdAccessories, TdoorAccessoryDto } from 'js/api/api_product';
 
-// import { AppContext } from 'pages/_app';
+// ===========================================================================
 
-export type { TdoorAccessoryDto };
+type Tprops = {
+  showModal: boolean;
+  onConfirm: (v: TdoorAccessoryDto[]) => void;
+  onCancel: () => void;
+  label?: string;
+  tip?: React.ReactNode;
+  selLimit?: 1;
+  // customParams: { modelName: string | undefined };
+  // customFilter?: Tparams['filter'];
+  // customPopulate?: Tparams['populate'];
+  modelName: string | undefined;
+  defaultAcceArr?: TdoorAccessoryDto[];
+  defaultIdArr?: string[];
+  exceptAcceArr?: { id: string }[];
+  isCancelOnConfirm?: boolean;
+  exceptAcceCheck?: (acce: TdoorAccessoryDto) => boolean;
+};
+
+export type { TdoorAccessoryDto, Tprops as Tprops_accessorySelector };
+// ===========================================================================
 
 export default function AccessorySelector({
   showModal,
@@ -32,46 +50,18 @@ export default function AccessorySelector({
   // customPopulate,
   modelName,
   defaultAcceArr,
+  defaultIdArr,
   exceptAcceArr,
   isCancelOnConfirm = true,
   exceptAcceCheck: exceptEmpCheck,
-}: {
-  showModal: boolean;
-  onConfirm: (v: TdoorAccessoryDto[]) => void;
-  onCancel: () => void;
-  label?: string;
-  tip?: React.ReactNode;
-  selLimit?: 1;
-  // customParams: { modelName: string | undefined };
-  // customFilter?: Tparams['filter'];
-  // customPopulate?: Tparams['populate'];
-  modelName: string | undefined;
-  defaultAcceArr?: TdoorAccessoryDto[];
-  exceptAcceArr?: { id: string }[];
-  isCancelOnConfirm?: boolean;
-  exceptAcceCheck?: (acce: TdoorAccessoryDto) => boolean;
-}) {
-  // const { rwd1023 } = useContext(AppContext);
-
+}: Tprops) {
   const [acceArr, setAcceArr] = useState<TdoorAccessoryDto[]>([]);
-
-  const getReq = async () => {
-    if (modelName) {
-      try {
-        const res = await apiGetProdAccessories({ modelName });
-        const arr = _.sortBy(res, 'name');
-        setAcceArr(arr);
-      } catch (error) {}
-    }
-  };
+  const [searchValue, setSearchValue] = useState<string[]>([]);
 
   // 被選的資料
   const [selAcceArr, setSelAcceArr] = useState<TdoorAccessoryDto[]>([]);
 
-  const [searchValue, setSearchValue] = useState<string[]>([]);
-
-  //
-
+  // ---------------------------------------------------------------------------
   useEffect(() => {
     if (!showModal) {
       setSearchValue([]);
@@ -81,14 +71,44 @@ export default function AccessorySelector({
       return;
     }
 
-    if (defaultAcceArr) {
-      setSelAcceArr(defaultAcceArr);
-    }
+    const updateAcceArr = async () => {
+      if (modelName) {
+        try {
+          const res = await apiGetProdAccessories({ modelName });
+          const arr = _.sortBy(res, 'name');
+          setAcceArr(arr);
+        } catch (error) {}
+      }
+    };
 
-    getReq();
+    updateAcceArr();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal, modelName]);
+
+  useEffect(() => {
+    if (!showModal) {
+      return;
+    }
+
+    setSelAcceArr([]);
+
+    if (defaultAcceArr) {
+      setSelAcceArr(() => _.cloneDeep(defaultAcceArr));
+    }
+
+    if (defaultIdArr) {
+      let defaultArr = acceArr.filter((acce) => defaultIdArr?.includes(acce.id));
+      defaultArr = _.cloneDeep(defaultArr);
+      setSelAcceArr((arr) => [...arr, ...defaultArr]);
+    }
+  }, [
+    //
+    showModal,
+    acceArr,
+    defaultAcceArr,
+    defaultIdArr,
+  ]);
 
   // ==================================================
 
@@ -114,11 +134,7 @@ export default function AccessorySelector({
   };
 
   const theOnConfirm = () => {
-    // if (!selAcceArr) {
-    //   return ModalInfo('請選擇人員');
-    // }
-
-    onConfirm(selAcceArr);
+    onConfirm(_.cloneDeep(selAcceArr));
 
     if (isCancelOnConfirm) {
       theOnCancel();
