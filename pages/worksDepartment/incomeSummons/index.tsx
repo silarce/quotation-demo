@@ -999,26 +999,26 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
 
 type TconfigKey =
   | keyof Pick<
-      TincomeBillSerialDto,
-      | 'billSerialNumber'
-      | 'receiveDate'
-      | 'contractNumber'
-      | 'projectName'
-      | 'contractPayment'
-      | 'periodPayment'
-      | 'priorPeriodPayment'
-      | 'importAccountingNumber'
-      | 'noteNumber'
-      | 'noteMaturityDate'
-      | 'receivablePayment'
-      | 'deductionPayment'
-      | 'unpaidPayment'
-      | 'difference'
-      | 'note'
+    TincomeBillSerialDto,
+    | 'billSerialNumber'
+    | 'receiveDate'
+    | 'contractNumber'
+    | 'projectName'
+    | 'contractPayment'
+    | 'periodPayment'
+    | 'priorPeriodPayment'
+    | 'importAccountingNumber'
+    | 'noteNumber'
+    | 'noteMaturityDate'
+    | 'receivablePayment'
+    | 'deductionPayment'
+    | 'unpaidPayment'
+    | 'difference'
+    | 'note'
 
-      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-      // | 'temporary_separatePayment'
-    >
+  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+  // | 'temporary_separatePayment'
+  >
   | 'fee'
   | 'vendorName';
 
@@ -1066,7 +1066,7 @@ const config: Tconfig = {
         props: {
           className: 'text-center',
           value: state_incomeBillSerial.billSerialNumber,
-          onChange: () => {},
+          onChange: () => { },
         },
       },
     }),
@@ -1102,7 +1102,7 @@ const config: Tconfig = {
           value: state_incomeBillSerial.receiveDate
             ? getTaiwanDateStr(state_incomeBillSerial.receiveDate.toISOString()) ?? ''
             : '',
-          onChange: () => {},
+          onChange: () => { },
         },
       };
 
@@ -1374,7 +1374,7 @@ const config: Tconfig = {
           value: state_incomeBillSerial.noteMaturityDate
             ? getTaiwanDateStr(state_incomeBillSerial.noteMaturityDate.toISOString()) ?? ''
             : '',
-          onChange: () => {},
+          onChange: () => { },
         },
       };
 
@@ -1542,7 +1542,7 @@ const config: Tconfig = {
     className: 'text-right',
     createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const inputSelProps: TinputSelProps = {
-        disabled: true,
+        disabled: disabled,
         inputProps: {
           props: {
             className: 'text-right',
