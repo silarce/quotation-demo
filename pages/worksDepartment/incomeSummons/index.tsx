@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -380,7 +381,12 @@ export default function IncomeSummons() {
         </div>
       </div>
       {/*  */}
-      <Table showTable={showTable} onCrossClick={() => setShowTable(false)} />
+      <Table
+        //
+        showTable={showTable}
+        date={`${year}-${month.padStart(2, '0')}`}
+        onCrossClick={() => setShowTable(false)}
+      />
     </SubLayer>
   );
 }
@@ -553,76 +559,153 @@ const Summons_pre = (
   );
 };
 
-const Table = ({ showTable, onCrossClick }: { showTable: boolean; onCrossClick: () => void }) => {
-  const fakeData: TtableRow[] = [
-    {
-      caption: '本月實際收款額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-    {
-      caption: '本月預估收款額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-    {
-      caption: '不足預估之收款額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-    {
-      caption: '下月預估收款額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-    {
-      caption: '99月累計收款額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-    {
-      caption: '應收帳款總額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-  ];
+// MARK: Table
 
-  const signatureArr: TsignatureBarItem[] = useMemo(() => {
-    const signatureArr: TsignatureBarItem[] = [
+const Table = ({
+  //
+  showTable,
+  date,
+  onCrossClick,
+}: {
+  showTable: boolean;
+  date: string;
+  onCrossClick: () => void;
+}) => {
+  const { data, update } = useGetIncomeBillSerialSettlementForm(new Date(date), { autoUpdate: false });
+
+  const title = useMemo(() => {
+    if (!data) {
+      return '';
+    }
+
+    const date_m = moment(data.date);
+    const year = date_m.year() - 1911;
+    const month = (date_m.month() + 1).toString().padStart(2, '0');
+
+    return `${year}年${month}月收款統計明細表`;
+  }, [data]);
+
+  const rowArr = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+
+    const {
+      // 本月實際收款額(國內)
+      internalActualReceivablePayment,
+      // 本月實際收款額(外銷)
+      foreignActualReceivablePayment,
+
+      // 本月預估收款額(國內)
+      internalEstimatePayment,
+      // 本月預估收款額(外銷)
+      foreignEstimatePayment,
+
+      // 下月預估收款額(國內)
+      internalNextMonthEstimatePayment,
+      // 下月預估收款額(外銷)
+      foreignNextMonthEstimatePayment,
+
+      // 應收帳款總額(國內)
+      internalReceivablePayment,
+      // 應收帳款總額(外銷)
+      foreignReceivablePayment,
+
+      // 年度至今累積收款額(國內)
+      internalAccumulatePayment,
+      // 年度至今累積收款額(外銷)
+      foreignAccumulatePayment,
+    } = data;
+
+    return [
       {
-        label: '總經理',
-        className: 'w-[100px]',
-        value: '',
-        isReviewed: false,
+        caption: '本月實際收款額',
+        foreign: internalActualReceivablePayment.toLocaleString(),
+        domestic: foreignActualReceivablePayment.toLocaleString(),
+        total: new Decimal(internalActualReceivablePayment)
+          .add(foreignActualReceivablePayment)
+          .toNumber()
+          .toLocaleString(),
       },
       {
-        label: '經理',
-        className: 'w-[100px]',
-        value: '',
-        isReviewed: false,
+        caption: '本月預估收款額',
+        foreign: internalEstimatePayment.toLocaleString(),
+        domestic: foreignEstimatePayment.toLocaleString(),
+        total: new Decimal(internalEstimatePayment).add(foreignEstimatePayment).toNumber().toLocaleString(),
       },
       {
-        label: '主管',
-        className: 'w-[100px]',
-        value: '',
-        isReviewed: false,
+        caption: '下月預估收款額',
+        foreign: internalNextMonthEstimatePayment.toLocaleString(),
+        domestic: foreignNextMonthEstimatePayment.toLocaleString(),
+        total: new Decimal(internalNextMonthEstimatePayment)
+          .add(foreignNextMonthEstimatePayment)
+          .toNumber()
+          .toLocaleString(),
       },
       {
-        label: '製表',
-        className: 'w-[100px]',
-        value: '',
-        isReviewed: false,
+        caption: '應收帳款總額',
+        foreign: internalReceivablePayment.toLocaleString(),
+        domestic: foreignReceivablePayment.toLocaleString(),
+        total: new Decimal(internalReceivablePayment).add(foreignReceivablePayment).toNumber().toLocaleString(),
+      },
+      {
+        caption: '年度至今累積收款額',
+        foreign: internalAccumulatePayment.toLocaleString(),
+        domestic: foreignAccumulatePayment.toLocaleString(),
+        total: new Decimal(internalAccumulatePayment).add(foreignAccumulatePayment).toNumber().toLocaleString(),
       },
     ];
+  }, [data]);
+
+  const signatureArr: TsignatureBarItem[] = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+
+    let {
+      // 應收帳款狀態
+      // reviewStatus,
+      // 審核狀態
+      reviewRecord,
+
+      // // 經辦(製表)
+      // agentEmployeeId,
+      // // 經辦(製表)
+      // agentEmployee,
+      // // 包含的所有收入傳票
+      // incomeBills,
+    } = data;
+
+    reviewRecord = _.sortBy(reviewRecord, 'level');
+
+    const signatureArr: TsignatureBarItem[] = reviewRecord.map((record) => {
+      const {
+        //
+        // reviewerEmployeeId,
+        reviewerTitle: label,
+        reviewerName: value,
+        status,
+        // level,
+        // settlementFormId,
+        // settlementForm,
+      } = record;
+
+      const isReviewed = status === 'audited' ? true : false;
+
+      return {
+        label,
+        value,
+        isReviewed,
+        className: 'w-[100px]',
+      };
+    });
 
     return signatureArr;
-  }, []);
+  }, [data]);
+
+  useEffect(() => {
+    showTable && update();
+  }, [showTable, date]);
 
   return (
     <DragableModal
@@ -632,7 +715,7 @@ const Table = ({ showTable, onCrossClick }: { showTable: boolean; onCrossClick: 
       onCrossClick={onCrossClick}
     >
       <div className={scss.tableContainer}>
-        <p className={scss.tableTitle}>{`${999}年${99}月收款統計明細表`}</p>
+        <p className={scss.tableTitle}>{title}</p>
 
         <div className={scss.table}>
           <Row thead={true}>
@@ -641,7 +724,7 @@ const Table = ({ showTable, onCrossClick }: { showTable: boolean; onCrossClick: 
             <Cell style={config_table.domestic.style}>國內</Cell>
             <Cell style={config_table.total.style}>合計</Cell>
           </Row>
-          {fakeData.map((data, index) => {
+          {rowArr.map((data, index) => {
             const { caption, foreign, domestic, total } = data;
 
             return (

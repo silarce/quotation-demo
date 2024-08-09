@@ -2159,21 +2159,32 @@ export const useGetAccountReceivableInvoices_all_infinite = createUseInfinite<
 const apiGetIncomeBillSerialSettlementForm = async (date: string) => {
   const api = `/engineering/account-receivable/income-bill-serial-settlement-form/${date}`;
 
+  const params = {
+    populate: ['reviewStatus', 'reviewRecord', 'agentEmployee', 'incomeBills'],
+  };
+
   return axi
-    .get<TincomeBillSerialSettlementFormDto>(api)
+    .get<TincomeBillSerialSettlementFormDto>(api, { params })
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
 };
 
-export const useGetIncomeBillSerialSettlementForm = (date: Moment | Date | undefined | null) => {
+export const useGetIncomeBillSerialSettlementForm = (
+  date: Moment | Date | undefined | null,
+  {
+    autoUpdate = true,
+  }: {
+    autoUpdate?: boolean;
+  } = {}
+) => {
   const [res, setRes] = useState<TincomeBillSerialSettlementFormDto>();
+
+  const dateStr = moment(date).format('YYYY-MM-DD');
 
   const update = useCallback(async () => {
     if (!date) {
       return;
     }
-
-    const dateStr = moment(date).format('YYYY-MM-DD');
 
     return await apiGetIncomeBillSerialSettlementForm(dateStr)
       .then((res) => {
@@ -2182,10 +2193,10 @@ export const useGetIncomeBillSerialSettlementForm = (date: Moment | Date | undef
       .catch((err: AxiosError<TapiError>) => {
         myAlert.err({ title: '取得收款明細結算表失敗', content: err.message });
       });
-  }, [date]);
+  }, [dateStr]);
 
   useEffect(() => {
-    update();
+    autoUpdate && update();
   }, [update]);
 
   return {

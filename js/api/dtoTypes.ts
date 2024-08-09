@@ -3773,6 +3773,10 @@ export type TupdateAccountReceivableAccountantDto = {
 }[];
 
 export type TincomeBillSerialSettlementFormDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
   // 年份月份
   date: string;
   // 本月實際收款額(國內)
@@ -3795,10 +3799,12 @@ export type TincomeBillSerialSettlementFormDto = {
   foreignAccumulatePayment: number;
   // 應收帳款總額(外銷)
   foreignReceivablePayment: number;
-  // 應收帳款總額(外銷)
+
+  // 應收帳款狀態
   reviewStatus: TincomeBillSerialSettlementFormStatus;
-  // 應收帳款總額(外銷)
+  // 審核狀態
   reviewRecord?: TincomeBillSerialSettlementFormReviewRecordDto[];
+
   // 經辦(製表)
   agentEmployeeId: string | null;
   // 經辦(製表)
@@ -3816,7 +3822,7 @@ export type TincomeBillSerialSettlementFormReviewRecordDto = {
   reviewerName: string;
   // 審核狀態
   status: TincomeBillSettlementReviewStatus;
-  // 審核層級
+  // 審核層級 // 數字越大越後面審核
   level: number;
   // 所屬收入傳票統計表id
   settlementFormId: string | null;
