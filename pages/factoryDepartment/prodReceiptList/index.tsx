@@ -1249,7 +1249,7 @@ export default function ProdReceiptList() {
                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button> */}
                                             </span>
-                                            <span>{_item.note}</span>
+                                            <span className="truncate" title={_item.note}>{_item.note}</span>
                                         </div>
                                     </CellWithBar>
                                 ))

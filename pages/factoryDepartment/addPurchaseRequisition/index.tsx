@@ -33,7 +33,7 @@ import { Modal } from 'antd';
 import icon_close from 'public/image/icon/fc_close.svg';
 import icon_remove from 'public/image/icon/fc_remove.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
-
+import icon_add2 from 'public/image/icon/fc_add2.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -793,11 +793,17 @@ export default function AddPurchaseRequisition() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { productSearchModalOpen() }}>
-                                    <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                <button className={scss.squarebtn} onClick={() => { productSearchModalOpen() }} title="查詢單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    查詢
                                 </button>
                             </div>
-                            <div></div>
+                            <div>
+                                <button className={scss.squarebtn} onClick={() => { handleAddPR() }} title="新增單據">
+                                    <img src={icon_add2.src} alt="add" style={{ height: '20px', width: '20px' }} />
+                                    新增
+                                </button>
+                            </div>
                             <div></div>
                             <div></div>
                         </div>
@@ -855,7 +861,7 @@ export default function AddPurchaseRequisition() {
                             <div>
                                 <InputSel
                                     {...inputSelProps}
-                                    caption="請購備註"
+                                    caption="備註"
                                     disabled={false}
                                     inputProps={{
                                         props: {

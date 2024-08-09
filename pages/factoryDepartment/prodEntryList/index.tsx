@@ -39,6 +39,8 @@ import icon_print from 'public/image/icon/fc_printer.svg';
 import icon_wh from 'public/image/icon/fc_wh.svg';
 import icon_sidebar from 'public/image/icon/fc_sidebar.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
+import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
+
 
 
 
@@ -443,8 +445,10 @@ export default function ProdEntryList() {
             setIsLoading(true);
             const conditionModel: {
                 productid: string | undefined
+                type: string | undefined
             } = {
                 productid: productid as string | undefined,
+                type: "entry"
             };
 
 
@@ -1157,7 +1161,13 @@ export default function ProdEntryList() {
     };
 
     function handleinbox(item: any) {
-        console.log(item);
+        setWhpnumber('');
+        setWhpproductid('');
+        setWhpname('');
+        setWhpspec('');
+        setWhpquantity('');
+        setData3([]);
+        setData11([]);
         getWhpositionDetailByProductId(item.productid);
         setWhpositionqmodalopen(!whpositionqmodalopen);
         // setMaxinboxquantity(item.quantity);
@@ -1193,23 +1203,27 @@ export default function ProdEntryList() {
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // let value = e.target.value;
-        // // 檢查輸入是否為數字
-        // if (!isNaN(Number(value))) {
-        //     let numericValue = Number(value);
-        //     if (numericValue > maxinboxquantity) {
-        //         numericValue = maxinboxquantity;
-        //     }
-        //     setInboxquantity(numericValue);
-        // }
         let value = e.target.value;
+
         // 檢查輸入是否為數字
-        if (!isNaN(Number(value))) {
+        if (!isNaN(Number(value)) && value !== "") {
             let numericValue = Number(value);
-            if (numericValue > (parseInt(nowquantity) - parseInt(nowentryqty))) {
-                numericValue = (parseInt(nowquantity) - parseInt(nowentryqty));
+
+            // 獲取最大允許值
+            const maxValue = parseInt(nowquantity) - parseInt(nowentryqty);
+
+            // 比較輸入值和最大值
+            if (numericValue > maxValue) {
+                numericValue = maxValue;
+            } else if (numericValue < 0) {
+                numericValue = 0; // 確保最小值為0
             }
+
+            // 更新狀態
             setInboxquantity(numericValue);
+        } else {
+            // 處理非數字輸入
+            setInboxquantity(0); // 或者保留先前的狀態，具體看你的需求
         }
     };
 
@@ -1810,20 +1824,18 @@ export default function ProdEntryList() {
                                             <span>{index + 1}</span>
                                             <span>{_item.productid}</span>
                                             <span>{_item.name}</span>
+                                            {/* <span>{_item.spec}</span> */}
                                             <span>{_item.spec}</span>
                                             <span style={{ color: '#ea1833' }}>{_item.entry_qty}</span>
                                             <span>{_item.quantity}</span>
                                             <span>{_item.unit}</span>
-                                            <span>{_item.total_quantity}</span>
-                                            {/* <span>{_item.totalprice.toLocaleString()}</span> */}
                                             <span>
-
-                                                {/* <IconDetail onClick={() => { setWhpositionqmodalopen(!whpositionqmodalopen); getWhpositionDetailByProductId(_item.productid) }}></IconDetail> */}
                                                 <button onClick={() => { handleinbox(_item) }}>
-                                                    <img src={icon_fc_tray.src} alt="tray" style={{ width: '30px', height: '20px' }} />
+                                                    <img src={icon_tray_in.src} alt="tray" style={{ width: '30px', height: '20px' }} />
                                                 </button>
                                             </span>
-                                            <span>{_item.note}</span>
+                                            <span>{_item.total_quantity}</span>
+                                            <span className="truncate" title={_item.note}>{_item.note}</span>
                                         </div>
                                     </CellWithBar>
                                 ))
@@ -1967,9 +1979,10 @@ export default function ProdEntryList() {
                 visible={whpositionqmodalopen}
                 footer={null}
                 onCancel={whpositionqModalClose}
-                width="1500px"
+                // width="2000px"
+                width="100%"
                 maskClosable={false}
-                style={{ top: 100 }}
+                style={{ top: 70 }}
             >
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0px', marginBottom: '16px', width: '1500px' }}>
                     <span style={{ fontSize: '16px', color: '#14256a' }}>
@@ -2063,7 +2076,7 @@ export default function ProdEntryList() {
                                                 className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
                                                 onClick={() => handleGetLayOut(_item)}
                                             >
-                                                <span>{index}</span>
+                                                <span>{index + 1}</span>
                                                 <span>{_item.whname}</span>
                                                 <span>{_item.trayname}</span>
                                                 <span>{`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}</span>
@@ -2308,10 +2321,11 @@ export default function ProdEntryList() {
                                         disabled={(traycalled === true && nowentryqty < nowquantity) ? false : true}
                                         inputProps={{
                                             props: {
+                                                type: "number",
+                                                min: 0, // 設置最小值為0
+                                                step: 1, // 設置步進值，默認為1
+                                                max: parseInt(nowquantity) - parseInt(nowentryqty), // 設置最大值
                                                 style: { color: 'red' },
-                                                max: maxinboxquantity,
-                                                // max: (parseInt(nowquantity)-parseInt(nowentryqty)),
-                                                // nowentryqty} / ${nowquantity
                                                 value: inboxquantity ? inboxquantity : 0,
                                                 onChange: handleInputChange
                                             },

@@ -380,8 +380,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>已入</span>
         <span>數量</span>
         <span>單位</span>
-        <span>庫存</span>
         <span></span>
+        <span>庫存</span>
         <span>備註</span>
         <span></span>
       </div>
@@ -432,6 +432,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>規格</span>
         <span>數量</span>
         <span>單位</span>
+        <span></span>
         <span>備註(用途說明)</span>
         <span>領料人員</span>
         <span></span>

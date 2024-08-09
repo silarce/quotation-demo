@@ -40,6 +40,7 @@ import { orange } from '@mui/material/colors';
 import icon_remove from 'public/image/icon/fc_remove.svg';
 import icon_fc_arrow_up from 'public/image/icon/fc_arrow_up.svg';
 import icon_task_open from 'public/image/icon/fc_task_open.svg';
+import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_task_approved from 'public/image/icon/fc_approved.svg';
 import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
@@ -1050,8 +1051,8 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     結案
                                 </button>
-                                <button style={{ display: `${parseInt(transpoprogress.toString()) != parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} onClick={() => { sentPRToReview("結案") }} title="單據結案">
-                                    <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                <button style={{ display: `${parseInt(transpoprogress.toString()) != parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據結案">
+                                    <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     結案
                                 </button>
                                 &nbsp;
@@ -1255,7 +1256,7 @@ export default function PurchaseRequisitionList() {
                                             <span><IconDetail onClick={() => prQuotereqModalOpen(_item)} /></span>
                                             <span>{_item.unitprice.toLocaleString()}</span>
                                             <span>{_item.totalprice.toLocaleString()}</span>
-                                            <span style={{ backgroundColor: '#e9eff5' }}>{_item.suppliername}</span>
+                                            <span>{_item.suppliername}</span>
                                             <span>
                                                 <button onClick={() => { handleAddToList(_item) }} style={{ display: `${(_item.suppliername != null && _item.suppliername != "") && _item.status != "已轉採購" && statusin == "已核准" ? '' : 'none'}` }}>
                                                     <img src={icon_fc_arrow_down.src} alt="addtoList" style={{ width: '20px', height: '20px' }} />
@@ -1264,13 +1265,13 @@ export default function PurchaseRequisitionList() {
                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button>
                                             </span>
-                                            <span>{_item.note}</span>
+                                            <span className="truncate" title={_item.note}>{_item.note}</span>
                                         </div>
                                     </CellWithBar>
                                 ))
                             )}
                         </div>
-
+                        
                         <div className={scss.body_foot1}>
                             <div>
                                 流程順序：詢價{'>'}審核{'>'}加入清單{'>'}轉採購單<br />
@@ -1287,20 +1288,6 @@ export default function PurchaseRequisitionList() {
                                         <td>小計</td>
                                         <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalprice ? totalprice : '0'}</td>
                                     </tr>
-                                    {/* <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>營業稅</td>
-                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{taxprice ? taxprice : '0'}</td>
-                                </tr> */}
-                                    {/* <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td>應付金額</td>
-                                    <td style={{ color: 'black' }}>&nbsp;&nbsp;{totalpayprice ? totalpayprice : '0'}</td>
-                                </tr> */}
                                 </table>
                             </div>
                         </div>
