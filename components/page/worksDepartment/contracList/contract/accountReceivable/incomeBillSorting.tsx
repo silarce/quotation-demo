@@ -184,7 +184,7 @@ export default function IncomeBillSorting({
         return;
       }
 
-      const incomeBillList = invoice.incomeBillList;
+      const incomeBillList = invoice.incomeBillSerialList;
 
       // const price = period.price || 0;
       const price = invoice.actualPrice || 0;
@@ -225,6 +225,8 @@ export default function IncomeBillSorting({
     periodArr.forEach((period) => {
       // const periodPrice = period.price || 0;
 
+      // 一期對應一個發票
+      // period.invoices下應該最多只會有一筆資料
       const invoice: TaccountsReceivableInvoiceDto | undefined = period.invoices[0] as
         | TaccountsReceivableInvoiceDto
         | undefined;
@@ -236,7 +238,7 @@ export default function IncomeBillSorting({
       const {
         //
         id: invoiceId,
-        incomeBillList,
+        incomeBillSerialList: incomeBillList,
         invoiceNumber,
         invoiceDate,
         actualPrice: invoiceActualPrice,

@@ -94,12 +94,15 @@ export default function AccountReceivable() {
 
       // 'accountReceivable.periods.invoices.accountantList.accountsReceivableDeduction',
       // 現在 invoices下沒有accountantList
-      'accountReceivable.periods.invoices.incomeBillList',
+      // 'accountReceivable.periods.invoices.incomeBillList',
+      // 'accountReceivable.periods.invoices.incomeBillSerialList',
+      'accountReceivable.periods.invoices.incomeBillSerialList.invoices',
 
       'accountReceivable.periods.invoices.accountantInvoiceBook',
       'accountReceivable.accountantList.invoices',
       'accountReceivable.accountantList.accountsReceivableDeduction',
       'accountReceivable.incomeBillList.accountant',
+      'accountReceivable.incomeBillList.invoices',
     ],
   });
 
@@ -117,8 +120,8 @@ export default function AccountReceivable() {
 
   const { incomeBillList, incomeBillList_noInvoice } = useMemo(() => {
     let incomeBillList = accountReceivable?.incomeBillList ?? [];
-    let incomeBillList_noInvoice = incomeBillList.filter((income) => {
-      return !income.invoices || income.invoices.length === 0;
+    let incomeBillList_noInvoice = incomeBillList.filter((incomeBill) => {
+      return !incomeBill.invoices || incomeBill.invoices.length === 0;
     });
 
     incomeBillList = _.sortBy(incomeBillList, 'billSerialNumber');
