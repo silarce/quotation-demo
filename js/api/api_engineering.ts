@@ -2183,6 +2183,8 @@ export const useGetIncomeBillSerialSettlementForm = (
 
   const update = useCallback(async () => {
     if (!date) {
+      setRes(undefined);
+
       return;
     }
 
@@ -2191,6 +2193,7 @@ export const useGetIncomeBillSerialSettlementForm = (
         setRes(res);
       })
       .catch((err: AxiosError<TapiError>) => {
+        setRes(undefined);
         myAlert.err({ title: '取得收款明細結算表失敗', content: err.message });
       });
   }, [dateStr]);
@@ -2201,6 +2204,7 @@ export const useGetIncomeBillSerialSettlementForm = (
 
   return {
     data: res,
+    setData: setRes,
     update,
   };
 };

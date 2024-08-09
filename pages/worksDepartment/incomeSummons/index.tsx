@@ -87,13 +87,6 @@ type Tstate_incomeBillSerial = {
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
 
-type TtableRow = {
-  caption: React.ReactNode;
-  foreign: React.ReactNode;
-  domestic: React.ReactNode;
-  total: React.ReactNode;
-};
-
 type TconfigItem = {
   label: string;
   style?: React.CSSProperties;
@@ -113,6 +106,13 @@ type Tconfig = {
   [key in TconfigKey]: TconfigItem;
 } & {
   btnPanel: TconfigItem;
+};
+
+type Tstate_nextMonthEstimatePayment = {
+  readonly caption: string;
+  foreign: number;
+  domestic: number;
+  total: number;
 };
 
 // ==============================================================================
@@ -571,7 +571,20 @@ const Table = ({
   date: string;
   onCrossClick: () => void;
 }) => {
+  const [disabled, setDisabled] = useState(true);
+
+  const [state_nextMonthEstimatePayment, setState_nextMonthEstimatePayment] = useState<Tstate_nextMonthEstimatePayment>(
+    {
+      caption: '---',
+      foreign: 0,
+      domestic: 0,
+      total: 0,
+    }
+  );
+
+  // ------------------------------------------------------------------------
   const { data, update } = useGetIncomeBillSerialSettlementForm(new Date(date), { autoUpdate: false });
+  // ------------------------------------------------------------------------
 
   const title = useMemo(() => {
     if (!data) {
@@ -585,9 +598,17 @@ const Table = ({
     return `${year}年${month}月收款統計明細表`;
   }, [data]);
 
-  const rowArr = useMemo(() => {
+  const { rowArr, defaultState } = useMemo(() => {
     if (!data) {
-      return [];
+      return {
+        rowArr: [],
+        defaultState: {
+          caption: '---',
+          foreign: 0,
+          domestic: 0,
+          total: 0,
+        },
+      };
     }
 
     const {
@@ -617,7 +638,7 @@ const Table = ({
       foreignAccumulatePayment,
     } = data;
 
-    return [
+    const rowArr = [
       {
         caption: '本月實際收款額',
         foreign: internalActualReceivablePayment.toLocaleString(),
@@ -634,15 +655,6 @@ const Table = ({
         total: new Decimal(internalEstimatePayment).add(foreignEstimatePayment).toNumber().toLocaleString(),
       },
       {
-        caption: '下月預估收款額',
-        foreign: internalNextMonthEstimatePayment.toLocaleString(),
-        domestic: foreignNextMonthEstimatePayment.toLocaleString(),
-        total: new Decimal(internalNextMonthEstimatePayment)
-          .add(foreignNextMonthEstimatePayment)
-          .toNumber()
-          .toLocaleString(),
-      },
-      {
         caption: '應收帳款總額',
         foreign: internalReceivablePayment.toLocaleString(),
         domestic: foreignReceivablePayment.toLocaleString(),
@@ -654,7 +666,28 @@ const Table = ({
         domestic: foreignAccumulatePayment.toLocaleString(),
         total: new Decimal(internalAccumulatePayment).add(foreignAccumulatePayment).toNumber().toLocaleString(),
       },
+      // {
+      //   caption: '下月預估收款額',
+      //   foreign: internalNextMonthEstimatePayment.toLocaleString(),
+      //   domestic: foreignNextMonthEstimatePayment.toLocaleString(),
+      //   total: new Decimal(internalNextMonthEstimatePayment)
+      //     .add(foreignNextMonthEstimatePayment)
+      //     .toNumber()
+      //     .toLocaleString(),
+      // },
     ];
+
+    const defaultState = {
+      caption: '下月預估收款額',
+      foreign: internalNextMonthEstimatePayment,
+      domestic: foreignNextMonthEstimatePayment,
+      total: new Decimal(internalNextMonthEstimatePayment).add(foreignNextMonthEstimatePayment).toNumber(),
+    };
+
+    return {
+      rowArr,
+      defaultState,
+    };
   }, [data]);
 
   const signatureArr: TsignatureBarItem[] = useMemo(() => {
@@ -703,9 +736,50 @@ const Table = ({
     return signatureArr;
   }, [data]);
 
+  // -=---------------------------------------------------------------------
+
+  const reqApiPatchIncomeBillSerialSettlementForm = async () => {
+    if (!data?.id) {
+      myAlert.err({ title: '錯誤', content: '沒有收款統計明細表' });
+
+      return;
+    }
+
+    const body = {
+      internalNextMonthEstimatePayment: state_nextMonthEstimatePayment.foreign,
+      foreignNextMonthEstimatePayment: state_nextMonthEstimatePayment.domestic,
+    };
+
+    await apiPatchIncomeBillSerialSettlementForm(data.id, body)
+      .then(update)
+      .then(() => setDisabled(true));
+  };
+
+  // -=---------------------------------------------------------------------
+
+  const editNextMonthEstimatePayment = (key: 'foreign' | 'domestic', value: string) => {
+    value = value.replace(/,/g, '');
+    const value_num = Number(value || '0');
+
+    setState_nextMonthEstimatePayment((prev) => {
+      const copy = { ...prev };
+      copy[key] = value_num;
+      copy.total = new Decimal(copy.foreign).add(copy.domestic).toNumber();
+
+      return copy;
+    });
+  };
+
+  // -=---------------------------------------------------------------------
   useEffect(() => {
     showTable && update();
   }, [showTable, date]);
+
+  useEffect(() => {
+    setState_nextMonthEstimatePayment(defaultState);
+  }, [defaultState, disabled]);
+
+  // -=---------------------------------------------------------------------
 
   return (
     <DragableModal
@@ -714,10 +788,33 @@ const Table = ({
       show={showTable}
       onCrossClick={onCrossClick}
     >
-      <div className={scss.tableContainer}>
-        <p className={scss.tableTitle}>{title}</p>
+      <div className={scss.nextMonthEstimatePayment_tableContainer}>
+        <div className={scss.top}>
+          <p className={scss.tableTitle}>{title}</p>
+          <div className={classNames(scss.btnBar, !data?.id && 'invisible')}>
+            {disabled && (
+              <>
+                <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
+                  編輯
+                </MyButton_v2>
+              </>
+            )}
 
-        <div className={scss.table}>
+            {!disabled && (
+              <>
+                <MyButton_v2 theme={'danger'} px="px22" py="py4" onClick={reqApiPatchIncomeBillSerialSettlementForm}>
+                  確認
+                </MyButton_v2>
+
+                <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
+                  取消
+                </MyButton_v2>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div>
           <Row thead={true}>
             <Cell style={config_table.caption.style}></Cell>
             <Cell style={config_table.foreign.style}>外銷</Cell>
@@ -736,6 +833,37 @@ const Table = ({
               </Row>
             );
           })}
+          <br />
+          <Row>
+            <Cell style={config_table.caption.style}>{state_nextMonthEstimatePayment.caption}</Cell>
+            <Cell style={config_table.foreign.style}>
+              <input
+                readOnly={disabled}
+                className={classNames(scss.input, disabled && scss.disabled)}
+                type={disabled ? 'text' : 'number'}
+                value={
+                  disabled
+                    ? state_nextMonthEstimatePayment.foreign.toLocaleString()
+                    : state_nextMonthEstimatePayment.foreign
+                }
+                onChange={(e) => editNextMonthEstimatePayment('foreign', e.target.value)}
+              />
+            </Cell>
+            <Cell style={config_table.domestic.style}>
+              <input
+                readOnly={disabled}
+                className={classNames(scss.input, disabled && scss.disabled)}
+                type={disabled ? 'text' : 'number'}
+                value={
+                  disabled
+                    ? state_nextMonthEstimatePayment.domestic.toLocaleString()
+                    : state_nextMonthEstimatePayment.domestic
+                }
+                onChange={(e) => editNextMonthEstimatePayment('domestic', e.target.value)}
+              />
+            </Cell>
+            <Cell style={config_table.total.style}>{state_nextMonthEstimatePayment.total}</Cell>
+          </Row>
         </div>
         <SignatureBar
           className="mt-5"
@@ -1513,23 +1641,22 @@ const config_table: Tconfig_table = {
     label: '',
     style: {
       width: 150,
+      justifyContent: 'flex-start',
       // flex: '1',
     },
   },
   foreign: {
     label: '外銷',
-    style: { width: 120 },
+    style: { width: 120, justifyContent: 'flex-end' },
+    className: 'text-right',
   },
   domestic: {
     label: '國內',
-    style: { width: 120 },
+    style: { width: 120, justifyContent: 'flex-end' },
+    className: 'text-right',
   },
   total: {
     label: '合計',
-    style: { width: 120 },
+    style: { width: 120, justifyContent: 'flex-end' },
   },
 };
-
-{
-  /* <span className="text-9xl">&#11137;</span> */
-}
