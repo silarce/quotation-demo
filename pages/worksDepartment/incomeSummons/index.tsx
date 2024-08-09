@@ -20,6 +20,7 @@ import SignatureBar, { TsignatureBarItem } from 'components/global/gear/signatur
 import { Collapse, useActiveKey, UpDownArrow } from 'components/global/myAntd/collapse';
 import ProcessChain, { Tcontrol_processChain, TstatusLabelProps } from 'components/global/gear/processChain';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // icon
 import { IconCheck02, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
@@ -33,8 +34,12 @@ import type { Tparams, TincomeBillSerialDto } from 'js/api/dtoTypes';
 // api
 import {
   TupdateIncomeBillSerialDto,
-  useGetAccountReceivableIncomeBills,
   apiPatchIncomeBill,
+  useGetAccountReceivableIncomeBills,
+  //
+  apiPostIncomeBillSerialSettlementForm,
+  apiPatchIncomeBillSerialSettlementForm,
+  useGetIncomeBillSerialSettlementForm,
 } from 'js/api/api_engineering';
 
 // untils
@@ -219,7 +224,23 @@ export default function IncomeSummons() {
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
   };
 
+  const reqApiPostIncomeBillSerialSettlementForm = async () => {
+    return await apiPostIncomeBillSerialSettlementForm({});
+  };
+
   // -----------------------------------------------------------------------------
+
+  // region FUNCTION
+
+  const handle_reqApiPostIncomeBillSerialSettlementForm = () => {
+    myAlert.confirm({
+      title: `確定要結算${month}月份收款統計明細表嗎`,
+      content: '結算後無法回朔，且同一個月份不可以結算第二次',
+      props: {
+        onOk: reqApiPostIncomeBillSerialSettlementForm,
+      },
+    });
+  };
 
   // -----------------------------------------------------------------------------
 
@@ -294,6 +315,11 @@ export default function IncomeSummons() {
   }, [year, month, yearOptionArr, monthOptionArr]);
 
   const panelList: TpanelList = [
+    {
+      type: 'redButton',
+      label: '結算收款統計明細表',
+      onClick: handle_reqApiPostIncomeBillSerialSettlementForm,
+    },
     {
       type: 'myButton',
       label: '收款統計明細表',
