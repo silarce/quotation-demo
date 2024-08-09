@@ -2583,6 +2583,7 @@ class Class_product {
 
     // ________________________
     if (this.isSpecialProd) {
+      this.clearProd_all();
       this.reRender();
 
       return;
