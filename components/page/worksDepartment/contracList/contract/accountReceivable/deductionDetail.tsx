@@ -57,13 +57,12 @@ export default function DeductionDetail({
         invoices,
       } = acPeriod;
 
-      // 把invoices中的accountantList抽出來
-      const incomeBillList = invoices.map((invoice) => invoice.incomeBillList).flat();
-
       const thePeriod = `第${period || depositPeriod}期 ${type}`;
       let total = 0;
       const deductionList_num: { [itemName: string]: number } = {};
 
+      // 把invoices中的incomeBillList抽出來
+      const incomeBillList = invoices.map((invoice) => invoice.incomeBillSerialList).flat();
       // 將所有incomeBill中的accountsReceivableDeduction抽出來放進同一個陣列中
       const deductionArr = _.flatMap(incomeBillList, (incomeBill) => incomeBill?.accountsReceivableDeduction);
 
