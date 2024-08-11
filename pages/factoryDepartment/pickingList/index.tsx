@@ -1961,6 +1961,33 @@ export default function AddPurchaseRequisition() {
 
                         </div>
                         <div>
+                            {filteredData.length > 0 && (
+                                <ul style={{
+                                    border: '1px solid #ccc',
+                                    maxHeight: '200px',
+                                    overflowY: 'auto',
+                                    marginTop: '0px',
+                                    // right: '55px',
+                                    left:'100px',
+                                    position: 'absolute',
+                                    width: '150px',
+                                    backgroundColor: 'white',
+                                    zIndex: 1004, // 確保下拉清單在最上層,
+                                    display: `${showSuggestions ? '' : 'none'}`
+                                }}>
+                                    {filteredData.map(item => (
+                                        <li
+                                            key={item.id}
+                                            onClick={() => handleSelect(item)}
+                                            style={{ cursor: 'pointer', padding: '8px' }}
+                                        >
+                                             {item.productid}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                        <div>
                             {employeefilteredData.length > 0 && (
                                 <ul style={{
                                     border: '1px solid #ccc',
