@@ -123,6 +123,78 @@ const useGetAccountant = ({
   };
 };
 
+const apiGetAccountant_id = async (id: string, params?: Tparams) => {
+  const api = `/accountant/${id}`;
+
+  return axi
+    .get<TaccountantDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetAccountant_id = (
+  id: string | undefined | null,
+  {
+    //
+    autoUpdate = true,
+    params,
+  }: {
+    //
+    autoUpdate?: boolean;
+    params?: Tparams;
+  } = {}
+) => {
+  //
+  params = {
+    populate: [
+      //
+      'invoices',
+      'incomeBill.accountsReceivableDeduction',
+      'accountsReceivableDeduction',
+      'exchangeFrom',
+    ],
+    ...params,
+  };
+
+  const [res, setRes] = useState<TaccountantDto>();
+  const [isFetching, setIsFetching] = useState(false);
+
+  const update = useCallback(async () => {
+    if (!id) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetAccountant_id(id, params);
+      setRes(res);
+
+      return res;
+    } catch (error) {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '取得收款紀錄失敗',
+        content: err.message,
+      });
+
+      return err;
+    } finally {
+      setIsFetching(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [update]);
+
+  return {
+    data: res,
+    update,
+    isFetching,
+  };
+};
+
 const apiPostAccountant = async ({
   //
   body,
@@ -186,27 +258,28 @@ const deleteAccountant = async (
     });
 };
 
+// 棄用
 // 以 id 更新 匯費和扣款明細與排序
-const apiPatchAccountant_accountReceivable = async (
-  id: string,
-  body: TupdateAccountantDeductionDto,
-  {
-    callAlert = true,
-  }: {
-    callAlert?: boolean;
-  } = {}
-) => {
-  const api = `/accountant/${id}/account-receivable`;
-
-  return axi
-    .patch(api, body)
-    .then(({ data }) => data)
-    .catch((err) => {
-      callAlert && myAlert.err({ title: '更新收款紀錄失敗', content: err.message });
-
-      return Promise.reject(err);
-    });
-};
+// // const apiPatchAccountant_accountReceivable = async (
+// //   id: string,
+// //   body: TupdateAccountantDeductionDto,
+// //   {
+// //     callAlert = true,
+// //   }: {
+// //     callAlert?: boolean;
+// //   } = {}
+// // ) => {
+// //   const api = `/accountant/${id}/account-receivable`;
+//
+// //   return axi
+// //     .patch(api, body)
+// //     .then(({ data }) => data)
+// //     .catch((err) => {
+// //       callAlert && myAlert.err({ title: '更新收款紀錄失敗', content: err.message });
+//
+// //       return Promise.reject(err);
+// //     });
+// // };
 
 const apiGetAccountantPreset = async (params?: Tparams) => {
   const api = '/accountant-preset';
@@ -477,7 +550,7 @@ export {
   apiPostAccountant,
   apiPatchAccountant,
   deleteAccountant,
-  apiPatchAccountant_accountReceivable,
+  //  // apiPatchAccountant_accountReceivable,
   apiPostAccountantInvoiceBook,
   apiPatchAccountantInvoiceBook,
   deleteAccountantInvoiceBook,

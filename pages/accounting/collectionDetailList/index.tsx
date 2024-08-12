@@ -23,7 +23,7 @@ import {
   apiPostAccountant,
   apiPatchAccountant,
   deleteAccountant,
-  apiPatchAccountant_accountReceivable,
+
   //
   useGetAccountant,
   useGetAccountantPreset,
