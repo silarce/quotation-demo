@@ -1066,9 +1066,9 @@ export default function PurchaseRequisitionList() {
                                     <img src={icon_task_open.src} alt="search" style={{ height: '20px', width: '20px' }} />
                                     結案
                                 </button>
-                                <button style={{ display: `${parseInt(transpoprogress.toString()) != parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據結案">
+                                <button style={{ display: `${parseInt(transpoprogress.toString()) != parseInt(totalreqprogress) && statusin === '已核准' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據未結">
                                     <img src={icon_task_open_gray.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                    結案
+                                    未結
                                 </button>
                                 &nbsp;
                                 <button style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} className={scss.disablesquarebtn} title="單據已結">

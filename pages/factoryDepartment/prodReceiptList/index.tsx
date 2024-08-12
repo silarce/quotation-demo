@@ -31,6 +31,9 @@ import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 import icon_print from 'public/image/icon/fc_printer.svg';
 import { Modal } from 'antd';
+import icon_task_open from 'public/image/icon/fc_task_open.svg';
+import icon_task_close from 'public/image/icon/fc_task_close.svg';
+import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -937,17 +940,54 @@ export default function ProdReceiptList() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    查詢
+                                </button>
+                                &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
+                                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    列印
+                                </button>
+                                {/* <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
-                                </button>
+                                </button> */}
+
+
                             </div>
                             <div></div>
                             <div></div>
-                            <div></div>
+                            <div>
+                                <button className={scss.squarebtn} style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                                <button className={scss.disablesquarebtn} style={{ display: `${(entrystatusin != "已入庫" || paystatusin != "已請付") ? '' : 'none'}` }} title="單據未結">
+                                    <img src={icon_task_open_gray.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    未結
+                                </button>
+                                <button className={scss.disablesquarebtn} style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin === "已結案") ? '' : 'none'}` }} title="單據結案">
+                                    <img src={icon_task_close.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    已結
+                                </button>
+
+
+                                
+                                {/* <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }}>
+                                    <button className={scss.redbtn} onClick={() => { alert((completeentry >= parseInt(totalentry, 10)).toString()); }}>結案</button>
+                                </span> */}
+                                {/* <span style={{ display: `${(entrystatusin != "已入庫" || paystatusin != "已請付") ? '' : 'none'}` }}>
+                                    <button className={scss.disabledbtn}>未結案</button>
+                                </span>
+                                <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin === "已結案") ? '' : 'none'}` }}>
+                                    <button className={scss.disabledbtn} >已結案</button>
+                                </span> */}
+
+                            </div>
                         </div>
 
                         <div className={scss.head_content1}>

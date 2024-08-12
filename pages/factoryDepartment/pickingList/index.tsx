@@ -1514,9 +1514,88 @@ export default function AddPurchaseRequisition() {
         }
     };
 
+    //送出審核
+    const sentPickinglsitToReview = async (type: any) => {
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                type: type,
+                pickinglistuuid: pickinglistuuid,
+                username: userInfo?.username
+            };
 
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}sentPickingListToReview?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            // setData(data);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            getPickingList();
+            getPickingListDetailById(pickinglistid);
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+
+
+            let status = '';
+            switch (type) {
+                case '製單':
+                    status = '領料中';
+                    break;
+                case '結案':
+                    status = '已結案';
+                    break;
+                default:
+                    status = '未知狀態'; // 或者你可以選擇其他合適的默認值
+                    break;
+            }
+
+            setStatus(status);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
 
     //#endregion
+
+
+    const dropdownRef = useRef<HTMLUListElement | null>(null);
+
+    useEffect(() => {
+        // 按下 ESC 鍵關閉下拉選單
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.keyCode === 27) { // ESC 鍵的 keyCode 是 27
+                setFilteredData([]);
+                if (dropdownRef.current) {
+                    dropdownRef.current.style.display = 'none';
+                }
+            }
+        };
+    
+        // 為整個 document 添加事件監聽器
+        document.addEventListener('keydown', handleKeyDown);
+    
+        // 清理事件監聽器
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+    
+
+
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
             {/* <SubLayer isLoading_subLayer={isLoading}> */}
@@ -1625,12 +1704,12 @@ export default function AddPurchaseRequisition() {
                             </div>
                             <div></div>
                             <div>
-                                <button style={{ display: `${status === "領料中" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { alert("close") }} title="單據結案">
+                                <button style={{ display: `${status === "領料中" ? '' : 'none'}` }} className={scss.redsquarebtn} onClick={() => { sentPickinglsitToReview("結案") }} title="單據結案">
                                     <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
                                     結案
                                 </button>
                                 &nbsp;
-                                <button style={{ display: `${status === "領料中" || status === '' || status === '未儲存' ? 'none' : ''}` }} className={scss.disablesquarebtn} onClick={() => { alert("close") }} title="單據已結">
+                                <button style={{ display: `${status === "領料中" || status === '' || status === '未儲存' ? 'none' : ''}` }} className={scss.disablesquarebtn} title="單據已結">
                                     <img src={icon_task_close.src} alt="closed" style={{ height: '20px', width: '20px' }} />
                                     已結
                                 </button>
@@ -1840,21 +1919,19 @@ export default function AddPurchaseRequisition() {
                                             />
                                         </span>
                                         <span>
-                                            &nbsp;&nbsp;&nbsp;
+                                            {/* &nbsp;&nbsp;&nbsp;
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleEditStatus(index + 1) }}>
                                                 <img src={icon_edit.src} alt="edit" style={{ width: '30px', height: '20px' }} />
                                             </button>
                                             <button style={{ display: (editstatus === false) ? '' : 'none' }} onClick={() => { handleRemove(index) }}>
                                                 <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} />
-                                                {/* <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} /> */}
                                             </button>
-                                            {/* <span style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }}>　</span> */}
                                             <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { handleSaveEdit(index) }}>
                                                 <img src={icon_save.src} alt="save" style={{ width: '30px', height: '20px' }} />
                                             </button>
                                             <button style={{ display: (index + 1 === editrowid && editstatus === true) ? '' : 'none' }} onClick={() => { setData2(data2); setEditStatus(false) }}>
                                                 <img src={icon_cancel.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                            </button>
+                                            </button> */}
 
                                         </span>
 
@@ -1962,30 +2039,47 @@ export default function AddPurchaseRequisition() {
                         </div>
                         <div>
                             {filteredData.length > 0 && (
-                                <ul style={{
-                                    border: '1px solid #ccc',
-                                    maxHeight: '200px',
-                                    overflowY: 'auto',
-                                    marginTop: '0px',
-                                    // right: '55px',
-                                    left:'100px',
-                                    position: 'absolute',
-                                    width: '150px',
-                                    backgroundColor: 'white',
-                                    zIndex: 1004, // 確保下拉清單在最上層,
-                                    display: `${showSuggestions ? '' : 'none'}`
-                                }}>
+                                <ul ref={dropdownRef}
+                                    style={{
+                                        border: '1px solid #c1c1c1',
+                                        maxHeight: '200px',
+                                        overflowY: 'auto',
+                                        marginTop: '0px',
+                                        left: '20px',
+                                        position: 'absolute',
+                                        width: '900px',
+                                        backgroundColor: 'white',
+                                        zIndex: 1004,
+                                        display: `${showSuggestions ? '' : 'none'}`
+                                    }}>
                                     {filteredData.map(item => (
                                         <li
                                             key={item.id}
                                             onClick={() => handleSelect(item)}
-                                            style={{ cursor: 'pointer', padding: '8px' }}
+                                            style={{
+                                                fontSize: '16px',
+                                                cursor: 'pointer',
+                                                padding: '8px',
+                                                border: '1px solid #c1c1c1',
+                                                display: 'flex', // 使用 flexbox
+                                                justifyContent: 'space-between', // 在項目之間創建間距
+                                                alignItems: 'center' // 垂直置中
+                                            }}
                                         >
-                                             {item.productid}
+                                            <span style={{ flex: '1 1 20%' }}> {/* 30% 的寬度，根據需要調整 */}
+                                                {item.productid}
+                                            </span>
+                                            <span style={{ flex: '1 1 47%' }}> {/* 40% 的寬度，根據需要調整 */}
+                                                {item.name}
+                                            </span>
+                                            <span style={{ flex: '1 1 30%' }}> {/* 30% 的寬度，根據需要調整 */}
+                                                {item.spec}
+                                            </span>
                                         </li>
                                     ))}
                                 </ul>
                             )}
+
                         </div>
                         <div>
                             {employeefilteredData.length > 0 && (
@@ -2020,7 +2114,7 @@ export default function AddPurchaseRequisition() {
                             <div>
                                 (1).請確實填寫品名、規格與數量。<br />
                                 (2).如不知領取品項料號，可以利用查詢代入。<br />
-                                {showSuggestions && (
+                                {/* {showSuggestions && (
                                     <div
                                         style={{
                                             position: 'absolute',
@@ -2090,7 +2184,7 @@ export default function AddPurchaseRequisition() {
                                             )}
                                         </table>
                                     </div>
-                                )}
+                                )} */}
                             </div>
                             <div>
 

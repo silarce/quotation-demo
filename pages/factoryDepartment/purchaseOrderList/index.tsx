@@ -32,6 +32,10 @@ import icon_fc_collapse_right from 'public/image/icon/fc_collapse_right.svg';
 import { content } from 'html2canvas/dist/types/css/property-descriptors/content';
 import icon_print from 'public/image/icon/fc_printer.svg';
 import { Modal } from 'antd';
+import icon_task_open from 'public/image/icon/fc_task_open.svg';
+import icon_task_close from 'public/image/icon/fc_task_close.svg';
+import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
+
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -914,22 +918,38 @@ export default function PurchaseOrderList() {
                                 {/* <button className={scss.squarebtn} onClick={() => { setLeftbaropen(!leftbaropen) }}>
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button> */}
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
-                                    <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    查詢
                                 </button>
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
-                                    <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
+                                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    列印
                                 </button>
                             </div>
                             <div></div>
-                            <div></div>
-                            <div></div>
+                            <div>
+
+                            </div>
+                            <div>
+                                <button className={scss.squarebtn} style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }} onClick={() => { handleClosePO("結案") }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                                <button className={scss.disablesquarebtn} style={{ display: `${((parseInt(completereq.toString()) < parseInt(totalreq)) && statusin === "採購中") ? '' : 'none'}` }} title="單據未結">
+                                    <img src={icon_task_open_gray.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    未結
+                                </button>
+                                <button className={scss.disablesquarebtn} style={{ display: `${statusin === '已結案' ? '' : 'none'}` }} title="單據已結">
+                                    <img src={icon_task_close.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    已結
+                                </button>
+                            </div>
                         </div>
 
                         <div className={scss.head_content1}>
                             <div>
-
                                 <InputSel
                                     {...inputSelProps}
                                     caption="採購日期"
@@ -1200,7 +1220,7 @@ export default function PurchaseOrderList() {
                             <div></div>
                             <div></div>
                             <div style={{ textAlign: 'right' }}>
-                                <span style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }}>
+                                {/* <span style={{ display: `${(parseInt(completereq.toString()) === parseInt(totalreq)) && statusin === "採購中" ? "" : "none"}` }}>
                                     <button className={scss.redbtn} onClick={() => { handleClosePO("結案") }}>結案</button>
                                 </span>
                                 <span style={{ display: `${((parseInt(completereq.toString()) < parseInt(totalreq)) && statusin === "採購中") ? '' : 'none'}` }} onClick={() => { myAlert.warning({ title: '尚未達到需求數量' }) }}>
@@ -1208,7 +1228,7 @@ export default function PurchaseOrderList() {
                                 </span>
                                 <span style={{ display: `${statusin === '已結案' ? '' : 'none'}` }}>
                                     <button className={scss.disabledbtn}>已結案</button>
-                                </span>
+                                </span> */}
                             </div>
                         </div>
                         <div className={scss.head_foot2}>
