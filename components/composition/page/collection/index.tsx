@@ -137,15 +137,15 @@ const options_currency: {
   label: string;
   value: Tcurrency;
 }[] = [
-  {
-    label: 'TWD 新臺幣',
-    value: 'TWD 新臺幣',
-  },
-  {
-    label: 'USD 美元',
-    value: 'USD 美元',
-  },
-];
+    {
+      label: 'TWD 新臺幣',
+      value: 'TWD 新臺幣',
+    },
+    {
+      label: 'USD 美元',
+      value: 'USD 美元',
+    },
+  ];
 
 // =============================================================================
 
@@ -716,7 +716,7 @@ const Row = ({
 
   const isAllowToEdit = !isWorksDepartment;
 
-  const { billSerialNumber, isImported, exchangeFromId } = data_accountant ?? {};
+  const { billSerialNumber, isImported, exchangeFromId, isAlreadyImportIncomeBill } = data_accountant ?? {};
   const isBillSerialNumberValid = billSerialNumber && billSerialNumber.length > 0;
 
   let isAllowToEditIsImported = false;
@@ -727,13 +727,18 @@ const Row = ({
 
   let fonbiddenText: string | null = null;
 
-  if ((isImported || isBillSerialNumberValid) && exchangeFromId) {
+
+  if (isAlreadyImportIncomeBill) {
     fonbiddenText = '已匯入/已兌現';
-  } else if (isImported || isBillSerialNumberValid) {
-    fonbiddenText = '已匯入';
-  } else if (exchangeFromId) {
-    fonbiddenText = '已兌現';
   }
+
+  // if ((isImported || isBillSerialNumberValid) && exchangeFromId) {
+  //   fonbiddenText = '已匯入/已兌現';
+  // } else if (isImported || isBillSerialNumberValid) {
+  //   fonbiddenText = '已匯入';
+  // } else if (exchangeFromId) {
+  //   fonbiddenText = '已兌現';
+  // }
 
   // ---------------------------------------------------
 

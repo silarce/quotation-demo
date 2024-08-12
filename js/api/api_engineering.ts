@@ -9,6 +9,7 @@ import { axi } from './_axiosCreator';
 import { AxiosError } from 'axios';
 
 import { createUseInfinite } from './createUseInfinite';
+import moment, { Moment } from 'moment';
 
 // type
 import type {
@@ -74,6 +75,11 @@ import type {
   TupdateAccountReceivableAccountantDto,
   TcreateElectronicSuppliesRecordDetailDto,
   TupdateElectronicSuppliesRequirementRecordDto,
+  //
+  TincomeBillSerialSettlementFormDto,
+  TincomeBillSerialSettlementFormReviewRecordDto,
+  TcreateIncomeBillSettlementFormDto,
+  TupdateIncomeBillSettlementFormDto,
 } from './dtoTypes';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
@@ -144,6 +150,11 @@ export type {
   TupdateElectronicSuppliesRequirementRecordDto,
   TcreateElectronicSuppliesPickupRecordDto,
   TupdateElectronicSuppliesPickupRecordDto,
+  //
+  TincomeBillSerialSettlementFormDto,
+  TincomeBillSerialSettlementFormReviewRecordDto,
+  TcreateIncomeBillSettlementFormDto,
+  TupdateIncomeBillSettlementFormDto,
 } from './dtoTypes';
 
 export type { TinvouceCheckResult };
@@ -2140,3 +2151,93 @@ export const useGetAccountReceivableInvoices_all_infinite = createUseInfinite<
   apiClient: apiGetAccountReceivableInvoices_all,
   errTitle: '取得發票列表失敗',
 });
+
+// ---------------------------------------------------------------------------
+
+// date不計入DD
+// 會回應當月的報表一個，只有一個
+const apiGetIncomeBillSerialSettlementForm = async (date: string) => {
+  const api = `/engineering/account-receivable/income-bill-serial-settlement-form/${date}`;
+
+  const params = {
+    populate: ['reviewStatus', 'reviewRecord', 'agentEmployee', 'incomeBills'],
+  };
+
+  return axi
+    .get<TincomeBillSerialSettlementFormDto>(api, { params })
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const useGetIncomeBillSerialSettlementForm = (
+  date: Moment | Date | undefined | null,
+  {
+    autoUpdate = true,
+  }: {
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [res, setRes] = useState<TincomeBillSerialSettlementFormDto>();
+
+  const dateStr = moment(date).format('YYYY-MM-DD');
+
+  const update = useCallback(async () => {
+    if (!date) {
+      setRes(undefined);
+
+      return;
+    }
+
+    return await apiGetIncomeBillSerialSettlementForm(dateStr)
+      .then((res) => {
+        setRes(res);
+      })
+      .catch((err: AxiosError<TapiError>) => {
+        setRes(undefined);
+        myAlert.err({ title: '取得收款明細結算表失敗', content: err.message });
+      });
+  }, [dateStr]);
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [update]);
+
+  return {
+    data: res,
+    setData: setRes,
+    update,
+  };
+};
+
+// incomeBillIds若為undefined，則是結算當月
+// 已被結算過的incomeBillId不可以再次結算，應該會失敗
+// 但是沒有限制一個月只能呼叫一次
+// w 疑問
+// TcreateIncomeBillSettlementFormDto.incomeBillIds，incomeBill有沒有限制不可以跨月?
+// 月中呼叫過一次，月底再次呼叫，兩次都送入不同的incomeBillIds，會不會有問題?
+
+export const apiPostIncomeBillSerialSettlementForm = async (body: TcreateIncomeBillSettlementFormDto) => {
+  const api = `/engineering/account-receivable/income-bill-serial-settlement-form`;
+
+  return axi
+    .post(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      myAlert.err({ title: '產生報表失敗' });
+
+      return Promise.reject(err);
+    });
+};
+
+export const apiPatchIncomeBillSerialSettlementForm = async (id: string, body: TupdateIncomeBillSettlementFormDto) => {
+  const api = `/engineering/account-receivable/income-bill-serial-settlement-form/${id}`;
+
+  return axi
+    .patch(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      myAlert.err({ title: '更新報表失敗' });
+
+      return Promise.reject(err);
+    });
+};
