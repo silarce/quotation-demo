@@ -3841,6 +3841,11 @@ export type TupdateIncomeBillSettlementFormDto = {
   internalNextMonthEstimatePayment: number;
   // 下月預估收款額(外銷)
   foreignNextMonthEstimatePayment: number;
+
+  // 應收帳款總額
+  internalReceivablePayment: number;
+  // 應收帳款總額(外銷)
+  foreignReceivablePayment: number;
 };
 
 // MARK: /engineering
