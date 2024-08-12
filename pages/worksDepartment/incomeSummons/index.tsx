@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
+import Decimal from 'decimal.js';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -131,6 +132,19 @@ export default function IncomeSummons() {
   } = useGetAccountReceivableIncomeBills({
     params,
   });
+
+  const totals = useMemo(() => {
+    let total_receivablePayment = new Decimal(0);
+
+    data_incomeBill.forEach((data) => {
+      const receivablePayment = new Decimal(data.receivablePayment || 0);
+      total_receivablePayment = total_receivablePayment.add(receivablePayment);
+    });
+
+    return {
+      receivablePayment: total_receivablePayment.toNumber(),
+    };
+  }, [data_incomeBill]);
 
   // -----------------------------------------------------------------------------
 
@@ -339,6 +353,28 @@ export default function IncomeSummons() {
               })}
             </Collapse>
           </div>
+        </div>
+        {/*  */}
+
+        <div className={scss.totalBar}>
+          <SummonsRow className={scss.thead}>
+            <div style={cellPropsList_summon.btnPanel.style} className={cellPropsList_summon.btnPanel.className}></div>
+            {keyArr.map((key) => {
+              const { label, style, className } = cellPropsList_summon[key];
+
+              let node: React.ReactNode = null;
+
+              if (key === 'receivablePayment') {
+                node = <div className={scss.total_receivablePayment}>{totals.receivablePayment.toLocaleString()}</div>;
+              }
+
+              return (
+                <div key={key} style={style} className={className}>
+                  {node}
+                </div>
+              );
+            })}
+          </SummonsRow>
         </div>
       </div>
       {/*  */}

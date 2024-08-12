@@ -35,3 +35,21 @@ $topBlockHeight: 50px;
   // border-top: solid 1px theme("colors.border");
   font-weight: 500;
 }
+
+.totalBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+}
+.total_receivablePayment {
+  font-size: 18px;
+  position: relative;
+  &::before {
+    content: "收款合計 : ";
+    display: inline-block;
+    width: max-content;
+    position: absolute;
+    right: 100%;
+    top: 0;
+  }
+}
