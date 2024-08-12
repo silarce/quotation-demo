@@ -69,7 +69,7 @@ type TconfigItem = {
   }) => TinputSelProps;
 };
 
-type Tconfig = {
+type TcellPropsList_summon = {
   [key in TconfigKey]: TconfigItem;
 } & {
   btnPanel: TconfigItem;
@@ -224,14 +224,14 @@ const Summons_pre = (
 
   return (
     <SummonsRow ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled)}>
-      <div className={scss.btnPanel} style={config.btnPanel.style}>
+      <div className={scss.btnPanel} style={cellPropsList_summon.btnPanel.style}>
         <UpDownArrow className="h-[20px]" onClick={changeActive} />
         <IconEdit className={classNames(!disabled && scss.enable)} onClick={() => setDisabled((state) => !state)} />
         <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_onConfirm} />
       </div>
 
       {keyArr.map((key) => {
-        const { style, className, createInputSelProps: createInputAttr } = config[key];
+        const { style, className, createInputSelProps: createInputAttr } = cellPropsList_summon[key];
 
         // 要使!isPaperImported為true的狀態仍可以編輯
         // 將送進createInputAttr中的disabled回傳即可
@@ -289,7 +289,7 @@ const keyArr: TconfigKey[] = [
   'note',
 ];
 
-const config: Tconfig = {
+const cellPropsList_summon: TcellPropsList_summon = {
   btnPanel: {
     label: '',
     style: { width: 120 },
@@ -905,4 +905,4 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
 // =============================================================================
 
 export default Summons;
-export { SummonsRow, keyArr, config };
+export { SummonsRow, keyArr, cellPropsList_summon };

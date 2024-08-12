@@ -9,7 +9,11 @@ import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHe
 // component
 import IncomeBillSerialSettlementForm from 'components/page/worksDepartment/incomeSummons/incomeBillSerialSettlementForm';
 import OtherInfo from 'components/page/worksDepartment/incomeSummons/otherInfo';
-import Summons, { SummonsRow, keyArr, config } from 'components/page/worksDepartment/incomeSummons/summon';
+import Summons, {
+  SummonsRow,
+  keyArr,
+  cellPropsList_summon,
+} from 'components/page/worksDepartment/incomeSummons/summon';
 
 // gear
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
@@ -300,9 +304,12 @@ export default function IncomeSummons() {
         <div className={scss.tableWrapper}>
           <div className={scss.table}>
             <SummonsRow className={scss.thead}>
-              <div style={config.btnPanel.style} className={config.btnPanel.className}></div>
+              <div
+                style={cellPropsList_summon.btnPanel.style}
+                className={cellPropsList_summon.btnPanel.className}
+              ></div>
               {keyArr.map((key) => {
-                const { label, style, className } = config[key];
+                const { label, style, className } = cellPropsList_summon[key];
 
                 return (
                   <div key={key} style={style} className={className}>
