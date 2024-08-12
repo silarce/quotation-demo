@@ -679,8 +679,8 @@ const Table = ({
 
     const defaultState = {
       caption: '下月預估收款額',
-      foreign: internalNextMonthEstimatePayment,
-      domestic: foreignNextMonthEstimatePayment,
+      foreign: foreignNextMonthEstimatePayment,
+      domestic: internalNextMonthEstimatePayment,
       total: new Decimal(internalNextMonthEstimatePayment).add(foreignNextMonthEstimatePayment).toNumber(),
     };
 
@@ -746,8 +746,8 @@ const Table = ({
     }
 
     const body = {
-      internalNextMonthEstimatePayment: state_nextMonthEstimatePayment.foreign,
-      foreignNextMonthEstimatePayment: state_nextMonthEstimatePayment.domestic,
+      internalNextMonthEstimatePayment: state_nextMonthEstimatePayment.domestic,
+      foreignNextMonthEstimatePayment: state_nextMonthEstimatePayment.foreign,
     };
 
     await apiPatchIncomeBillSerialSettlementForm(data.id, body)
@@ -999,26 +999,26 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
 
 type TconfigKey =
   | keyof Pick<
-    TincomeBillSerialDto,
-    | 'billSerialNumber'
-    | 'receiveDate'
-    | 'contractNumber'
-    | 'projectName'
-    | 'contractPayment'
-    | 'periodPayment'
-    | 'priorPeriodPayment'
-    | 'importAccountingNumber'
-    | 'noteNumber'
-    | 'noteMaturityDate'
-    | 'receivablePayment'
-    | 'deductionPayment'
-    | 'unpaidPayment'
-    | 'difference'
-    | 'note'
+      TincomeBillSerialDto,
+      | 'billSerialNumber'
+      | 'receiveDate'
+      | 'contractNumber'
+      | 'projectName'
+      | 'contractPayment'
+      | 'periodPayment'
+      | 'priorPeriodPayment'
+      | 'importAccountingNumber'
+      | 'noteNumber'
+      | 'noteMaturityDate'
+      | 'receivablePayment'
+      | 'deductionPayment'
+      | 'unpaidPayment'
+      | 'difference'
+      | 'note'
 
-  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-  // | 'temporary_separatePayment'
-  >
+      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+      // | 'temporary_separatePayment'
+    >
   | 'fee'
   | 'vendorName';
 
@@ -1066,7 +1066,7 @@ const config: Tconfig = {
         props: {
           className: 'text-center',
           value: state_incomeBillSerial.billSerialNumber,
-          onChange: () => { },
+          onChange: () => {},
         },
       },
     }),
@@ -1102,7 +1102,7 @@ const config: Tconfig = {
           value: state_incomeBillSerial.receiveDate
             ? getTaiwanDateStr(state_incomeBillSerial.receiveDate.toISOString()) ?? ''
             : '',
-          onChange: () => { },
+          onChange: () => {},
         },
       };
 
@@ -1374,7 +1374,7 @@ const config: Tconfig = {
           value: state_incomeBillSerial.noteMaturityDate
             ? getTaiwanDateStr(state_incomeBillSerial.noteMaturityDate.toISOString()) ?? ''
             : '',
-          onChange: () => { },
+          onChange: () => {},
         },
       };
 
