@@ -329,11 +329,6 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     modal.update({
       title: '匯入發票',
       content: (
-        // <AddInovice
-        //   onCancel={modal.destroy}
-        //   accountReceivableId={accountReceivableId}
-        //   reqPostAccountReceivableAccountant={reqPostAccountReceivableAccountant}
-        // />
         <ExportToIncomeBill
           onConfirm={({ isoString, splitPayment }) =>
             reqPostAccountReceivableAccountant(accountReceivableId, isoString, splitPayment)

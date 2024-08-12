@@ -69,20 +69,18 @@ const Thead = ({ paymentType }: { paymentType: TpaymentType }) => {
 // ============================================================================
 
 const Row = ({
-  // children,
   paymentType,
   data_accountant,
   className,
   postProps,
   reqPatch,
   reqDelete,
-  // isReadOnly,
+
   setAccountantId,
   bankAccountOptionArr,
   reqPatchIsImported,
   isWorksDepartment,
 }: {
-  // children: React.ReactNode;
   paymentType: TpaymentType;
   data_accountant: TaccountantDto | undefined;
   className?: string;
@@ -107,7 +105,6 @@ const Row = ({
   let keyArr = lookup_keyArr[paymentType];
   keyArr = [...keyArr];
 
-  // keyArr = keyArr.slice(baseArr_before.length);
   keyArr = keyArr.slice(1);
 
   const theKeyArr = keyArr as Exclude<TaccountantKey, 'btn' | 'accountsReceivableDeduction'>[];
@@ -124,8 +121,12 @@ const Row = ({
 
   const isAllowToEdit = !isWorksDepartment;
 
-  const { billSerialNumber, isImported, exchangeFromId, isAlreadyImportIncomeBill } = data_accountant ?? {};
-  const isBillSerialNumberValid = billSerialNumber && billSerialNumber.length > 0;
+  const {
+    // billSerialNumber,
+    // isImported, exchangeFromId,
+    isAlreadyImportIncomeBill,
+  } = data_accountant ?? {};
+  // const isBillSerialNumberValid = billSerialNumber && billSerialNumber.length > 0;
 
   let isAllowToEditIsImported = false;
 
@@ -183,11 +184,6 @@ const Row = ({
       modal.update({
         title: '匯入紙本應收帳款',
         content: (
-          // <MakeIsImported
-          //   reqPatchIsImported={reqPatchIsImported}
-          //   accountReceivableId={data_accountant.id}
-          //   onCancel={modal.destroy}
-          // />
           <ExportToIncomeBill
             onConfirm={({ isoString, splitPayment: separatePayment }) =>
               reqPatchIsImported(data_accountant.id, isoString, separatePayment)
