@@ -12,6 +12,7 @@ import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHe
 // component
 import EditDefunctionBtn from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDeductionEditor';
 import IncomeBillSerialSettlementForm from 'components/page/worksDepartment/incomeSummons/incomeBillSerialSettlementForm';
+import OtherInfo from 'components/page/worksDepartment/incomeSummons/otherInfo';
 
 // gear
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
@@ -560,44 +561,6 @@ const Summons_pre = (
   );
 };
 
-const OtherInfo = ({ incomeBillSerial }: { incomeBillSerial: TincomeBillSerialDto }) => {
-  const processChainControl = useMemo(() => {
-    // Tcontrol_processChain
-    // TstatusLabelProps
-    const arr: TstatusLabelProps[] = [
-      {
-        label: '開發中',
-        dotColor: 'gray',
-      },
-      {
-        label: '開發中',
-        dotColor: 'red',
-      },
-      {
-        label: '開發中',
-        dotColor: 'green',
-      },
-    ];
-
-    const processChainControl = {
-      statusArr: arr,
-    };
-
-    return processChainControl;
-  }, [incomeBillSerial]);
-
-  return (
-    <div className={scss.otherInfo}>
-      <div className={scss.reviewBar}>
-        <MyButton_v2 px="px22" py="py4">
-          審核
-        </MyButton_v2>
-        <ProcessChain control={processChainControl} />
-      </div>
-    </div>
-  );
-};
-
 // forwardRef
 const SummonsRow = forwardRef(SummonsRow_pre);
 const Summons = forwardRef(Summons_pre);
@@ -726,9 +689,6 @@ const keyArr: TconfigKey[] = [
   'difference',
 
   'note',
-
-  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-  // 'temporary_separatePayment',
 ];
 
 const config: Tconfig = {
