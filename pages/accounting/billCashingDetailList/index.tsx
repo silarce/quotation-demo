@@ -25,20 +25,15 @@ import scss from './index.module.scss';
 // api
 import {
   Tparams,
-  TcreateAccountantDto,
   TupdateAccountantDto,
-  TupdateAccountReceivableDeductionDto,
   TaccountantDto,
   TaccountantExchangeFromDto,
   TcreateAccountantExchangeFromDto,
   //
-  apiPostAccountant,
   apiPatchAccountant,
-  deleteAccountant,
   apiPostAccountantExchangeFrom,
   //
   useGetAccountant,
-  useGetAccountantExchangeFrom,
 } from 'js/api/api_accountant';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -284,62 +279,6 @@ export default function BillCashingDetailList() {
           <Cell style={config.receiptCashedDate.style}>{config.receiptCashedDate.label}</Cell>
         </Row>
 
-        {data_accountantArr.map((data) => {
-          return (
-            <Accountant
-              key={data.id}
-              data_accountant={data}
-              isChecked={handle_check(data.id)}
-              onCheck={(isChecked) => {
-                handle_onCheck(data.id, isChecked);
-              }}
-              reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
-            />
-          );
-        })}
-
-        {/*  */}
-        {/*  */}
-
-        {data_accountantArr.map((data) => {
-          return (
-            <Accountant
-              key={data.id}
-              data_accountant={data}
-              isChecked={handle_check(data.id)}
-              onCheck={(isChecked) => {
-                handle_onCheck(data.id, isChecked);
-              }}
-              reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
-            />
-          );
-        })}
-        {data_accountantArr.map((data) => {
-          return (
-            <Accountant
-              key={data.id}
-              data_accountant={data}
-              isChecked={handle_check(data.id)}
-              onCheck={(isChecked) => {
-                handle_onCheck(data.id, isChecked);
-              }}
-              reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
-            />
-          );
-        })}
-        {data_accountantArr.map((data) => {
-          return (
-            <Accountant
-              key={data.id}
-              data_accountant={data}
-              isChecked={handle_check(data.id)}
-              onCheck={(isChecked) => {
-                handle_onCheck(data.id, isChecked);
-              }}
-              reqPatchReceiptCashedDate={reqPatchReceiptCashedDate}
-            />
-          );
-        })}
         {data_accountantArr.map((data) => {
           return (
             <Accountant
