@@ -4179,7 +4179,7 @@ export type TaccountantDto = {
 
   // 已分出金額
   splitPayment: number[] | null;
-  isAlreadyImportIncomeBill :boolean;
+  isAlreadyImportIncomeBill: boolean;
 };
 
 export type TcreateAccountantDto = Pick<
