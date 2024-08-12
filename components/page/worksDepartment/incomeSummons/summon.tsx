@@ -303,7 +303,7 @@ const keyArr: TconfigKey[] = [
   'deductionPayment',
   'fee',
   'unpaidPayment',
-  'difference',
+  // 'difference',
 
   'note',
 ];
