@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -20,6 +21,7 @@ import SignatureBar, { TsignatureBarItem } from 'components/global/gear/signatur
 import { Collapse, useActiveKey, UpDownArrow } from 'components/global/myAntd/collapse';
 import ProcessChain, { Tcontrol_processChain, TstatusLabelProps } from 'components/global/gear/processChain';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // icon
 import { IconCheck02, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
@@ -33,8 +35,12 @@ import type { Tparams, TincomeBillSerialDto } from 'js/api/dtoTypes';
 // api
 import {
   TupdateIncomeBillSerialDto,
-  useGetAccountReceivableIncomeBills,
   apiPatchIncomeBill,
+  useGetAccountReceivableIncomeBills,
+  //
+  apiPostIncomeBillSerialSettlementForm,
+  apiPatchIncomeBillSerialSettlementForm,
+  useGetIncomeBillSerialSettlementForm,
 } from 'js/api/api_engineering';
 
 // untils
@@ -81,13 +87,6 @@ type Tstate_incomeBillSerial = {
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
 
-type TtableRow = {
-  caption: React.ReactNode;
-  foreign: React.ReactNode;
-  domestic: React.ReactNode;
-  total: React.ReactNode;
-};
-
 type TconfigItem = {
   label: string;
   style?: React.CSSProperties;
@@ -107,6 +106,13 @@ type Tconfig = {
   [key in TconfigKey]: TconfigItem;
 } & {
   btnPanel: TconfigItem;
+};
+
+type Tstate_nextMonthEstimatePayment = {
+  readonly caption: string;
+  foreign: number;
+  domestic: number;
+  total: number;
 };
 
 // ==============================================================================
@@ -219,7 +225,23 @@ export default function IncomeSummons() {
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);
   };
 
+  const reqApiPostIncomeBillSerialSettlementForm = async () => {
+    return await apiPostIncomeBillSerialSettlementForm({});
+  };
+
   // -----------------------------------------------------------------------------
+
+  // region FUNCTION
+
+  const handle_reqApiPostIncomeBillSerialSettlementForm = () => {
+    myAlert.confirm({
+      title: `確定要結算${month}月份收款統計明細表嗎`,
+      content: '結算後無法回朔，且同一個月份不可以結算第二次',
+      props: {
+        onOk: reqApiPostIncomeBillSerialSettlementForm,
+      },
+    });
+  };
 
   // -----------------------------------------------------------------------------
 
@@ -295,6 +317,11 @@ export default function IncomeSummons() {
 
   const panelList: TpanelList = [
     {
+      type: 'redButton',
+      label: '結算收款統計明細表',
+      onClick: handle_reqApiPostIncomeBillSerialSettlementForm,
+    },
+    {
       type: 'myButton',
       label: '收款統計明細表',
       onClick: () => {
@@ -354,7 +381,12 @@ export default function IncomeSummons() {
         </div>
       </div>
       {/*  */}
-      <Table showTable={showTable} onCrossClick={() => setShowTable(false)} />
+      <Table
+        //
+        showTable={showTable}
+        date={`${year}-${month.padStart(2, '0')}`}
+        onCrossClick={() => setShowTable(false)}
+      />
     </SubLayer>
   );
 }
@@ -527,76 +559,227 @@ const Summons_pre = (
   );
 };
 
-const Table = ({ showTable, onCrossClick }: { showTable: boolean; onCrossClick: () => void }) => {
-  const fakeData: TtableRow[] = [
-    {
-      caption: '本月實際收款額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-    {
-      caption: '本月預估收款額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-    {
-      caption: '不足預估之收款額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-    {
-      caption: '下月預估收款額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-    {
-      caption: '99月累計收款額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-    {
-      caption: '應收帳款總額',
-      foreign: 99999,
-      domestic: 99999,
-      total: 999999,
-    },
-  ];
+// MARK: Table
 
-  const signatureArr: TsignatureBarItem[] = useMemo(() => {
-    const signatureArr: TsignatureBarItem[] = [
+const Table = ({
+  //
+  showTable,
+  date,
+  onCrossClick,
+}: {
+  showTable: boolean;
+  date: string;
+  onCrossClick: () => void;
+}) => {
+  const [disabled, setDisabled] = useState(true);
+
+  const [state_nextMonthEstimatePayment, setState_nextMonthEstimatePayment] = useState<Tstate_nextMonthEstimatePayment>(
+    {
+      caption: '---',
+      foreign: 0,
+      domestic: 0,
+      total: 0,
+    }
+  );
+
+  // ------------------------------------------------------------------------
+  const { data, update } = useGetIncomeBillSerialSettlementForm(new Date(date), { autoUpdate: false });
+  // ------------------------------------------------------------------------
+
+  const title = useMemo(() => {
+    if (!data) {
+      return '';
+    }
+
+    const date_m = moment(data.date);
+    const year = date_m.year() - 1911;
+    const month = (date_m.month() + 1).toString().padStart(2, '0');
+
+    return `${year}年${month}月收款統計明細表`;
+  }, [data]);
+
+  const { rowArr, defaultState } = useMemo(() => {
+    if (!data) {
+      return {
+        rowArr: [],
+        defaultState: {
+          caption: '---',
+          foreign: 0,
+          domestic: 0,
+          total: 0,
+        },
+      };
+    }
+
+    const {
+      // 本月實際收款額(國內)
+      internalActualReceivablePayment,
+      // 本月實際收款額(外銷)
+      foreignActualReceivablePayment,
+
+      // 本月預估收款額(國內)
+      internalEstimatePayment,
+      // 本月預估收款額(外銷)
+      foreignEstimatePayment,
+
+      // 下月預估收款額(國內)
+      internalNextMonthEstimatePayment,
+      // 下月預估收款額(外銷)
+      foreignNextMonthEstimatePayment,
+
+      // 應收帳款總額(國內)
+      internalReceivablePayment,
+      // 應收帳款總額(外銷)
+      foreignReceivablePayment,
+
+      // 年度至今累積收款額(國內)
+      internalAccumulatePayment,
+      // 年度至今累積收款額(外銷)
+      foreignAccumulatePayment,
+    } = data;
+
+    const rowArr = [
       {
-        label: '總經理',
-        className: 'w-[100px]',
-        value: '',
-        isReviewed: false,
+        caption: '本月實際收款額',
+        foreign: internalActualReceivablePayment.toLocaleString(),
+        domestic: foreignActualReceivablePayment.toLocaleString(),
+        total: new Decimal(internalActualReceivablePayment)
+          .add(foreignActualReceivablePayment)
+          .toNumber()
+          .toLocaleString(),
       },
       {
-        label: '經理',
-        className: 'w-[100px]',
-        value: '',
-        isReviewed: false,
+        caption: '本月預估收款額',
+        foreign: internalEstimatePayment.toLocaleString(),
+        domestic: foreignEstimatePayment.toLocaleString(),
+        total: new Decimal(internalEstimatePayment).add(foreignEstimatePayment).toNumber().toLocaleString(),
       },
       {
-        label: '主管',
-        className: 'w-[100px]',
-        value: '',
-        isReviewed: false,
+        caption: '應收帳款總額',
+        foreign: internalReceivablePayment.toLocaleString(),
+        domestic: foreignReceivablePayment.toLocaleString(),
+        total: new Decimal(internalReceivablePayment).add(foreignReceivablePayment).toNumber().toLocaleString(),
       },
       {
-        label: '製表',
-        className: 'w-[100px]',
-        value: '',
-        isReviewed: false,
+        caption: '年度至今累積收款額',
+        foreign: internalAccumulatePayment.toLocaleString(),
+        domestic: foreignAccumulatePayment.toLocaleString(),
+        total: new Decimal(internalAccumulatePayment).add(foreignAccumulatePayment).toNumber().toLocaleString(),
       },
+      // {
+      //   caption: '下月預估收款額',
+      //   foreign: internalNextMonthEstimatePayment.toLocaleString(),
+      //   domestic: foreignNextMonthEstimatePayment.toLocaleString(),
+      //   total: new Decimal(internalNextMonthEstimatePayment)
+      //     .add(foreignNextMonthEstimatePayment)
+      //     .toNumber()
+      //     .toLocaleString(),
+      // },
     ];
 
+    const defaultState = {
+      caption: '下月預估收款額',
+      foreign: internalNextMonthEstimatePayment,
+      domestic: foreignNextMonthEstimatePayment,
+      total: new Decimal(internalNextMonthEstimatePayment).add(foreignNextMonthEstimatePayment).toNumber(),
+    };
+
+    return {
+      rowArr,
+      defaultState,
+    };
+  }, [data]);
+
+  const signatureArr: TsignatureBarItem[] = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+
+    let {
+      // 應收帳款狀態
+      // reviewStatus,
+      // 審核狀態
+      reviewRecord,
+
+      // // 經辦(製表)
+      // agentEmployeeId,
+      // // 經辦(製表)
+      // agentEmployee,
+      // // 包含的所有收入傳票
+      // incomeBills,
+    } = data;
+
+    reviewRecord = _.sortBy(reviewRecord, 'level');
+
+    const signatureArr: TsignatureBarItem[] = reviewRecord.map((record) => {
+      const {
+        //
+        // reviewerEmployeeId,
+        reviewerTitle: label,
+        reviewerName: value,
+        status,
+        // level,
+        // settlementFormId,
+        // settlementForm,
+      } = record;
+
+      const isReviewed = status === 'audited' ? true : false;
+
+      return {
+        label,
+        value,
+        isReviewed,
+        className: 'w-[100px]',
+      };
+    });
+
     return signatureArr;
-  }, []);
+  }, [data]);
+
+  // -=---------------------------------------------------------------------
+
+  const reqApiPatchIncomeBillSerialSettlementForm = async () => {
+    if (!data?.id) {
+      myAlert.err({ title: '錯誤', content: '沒有收款統計明細表' });
+
+      return;
+    }
+
+    const body = {
+      internalNextMonthEstimatePayment: state_nextMonthEstimatePayment.foreign,
+      foreignNextMonthEstimatePayment: state_nextMonthEstimatePayment.domestic,
+    };
+
+    await apiPatchIncomeBillSerialSettlementForm(data.id, body)
+      .then(update)
+      .then(() => setDisabled(true));
+  };
+
+  // -=---------------------------------------------------------------------
+
+  const editNextMonthEstimatePayment = (key: 'foreign' | 'domestic', value: string) => {
+    value = value.replace(/,/g, '');
+    const value_num = Number(value || '0');
+
+    setState_nextMonthEstimatePayment((prev) => {
+      const copy = { ...prev };
+      copy[key] = value_num;
+      copy.total = new Decimal(copy.foreign).add(copy.domestic).toNumber();
+
+      return copy;
+    });
+  };
+
+  // -=---------------------------------------------------------------------
+  useEffect(() => {
+    showTable && update();
+  }, [showTable, date]);
+
+  useEffect(() => {
+    setState_nextMonthEstimatePayment(defaultState);
+  }, [defaultState, disabled]);
+
+  // -=---------------------------------------------------------------------
 
   return (
     <DragableModal
@@ -605,17 +788,40 @@ const Table = ({ showTable, onCrossClick }: { showTable: boolean; onCrossClick: 
       show={showTable}
       onCrossClick={onCrossClick}
     >
-      <div className={scss.tableContainer}>
-        <p className={scss.tableTitle}>{`${999}年${99}月收款統計明細表`}</p>
+      <div className={scss.nextMonthEstimatePayment_tableContainer}>
+        <div className={scss.top}>
+          <p className={scss.tableTitle}>{title}</p>
+          <div className={classNames(scss.btnBar, !data?.id && 'invisible')}>
+            {disabled && (
+              <>
+                <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(false)}>
+                  編輯
+                </MyButton_v2>
+              </>
+            )}
 
-        <div className={scss.table}>
+            {!disabled && (
+              <>
+                <MyButton_v2 theme={'danger'} px="px22" py="py4" onClick={reqApiPatchIncomeBillSerialSettlementForm}>
+                  確認
+                </MyButton_v2>
+
+                <MyButton_v2 px="px22" py="py4" onClick={() => setDisabled(true)}>
+                  取消
+                </MyButton_v2>
+              </>
+            )}
+          </div>
+        </div>
+
+        <div>
           <Row thead={true}>
             <Cell style={config_table.caption.style}></Cell>
             <Cell style={config_table.foreign.style}>外銷</Cell>
             <Cell style={config_table.domestic.style}>國內</Cell>
             <Cell style={config_table.total.style}>合計</Cell>
           </Row>
-          {fakeData.map((data, index) => {
+          {rowArr.map((data, index) => {
             const { caption, foreign, domestic, total } = data;
 
             return (
@@ -627,6 +833,37 @@ const Table = ({ showTable, onCrossClick }: { showTable: boolean; onCrossClick: 
               </Row>
             );
           })}
+          <br />
+          <Row>
+            <Cell style={config_table.caption.style}>{state_nextMonthEstimatePayment.caption}</Cell>
+            <Cell style={config_table.foreign.style}>
+              <input
+                readOnly={disabled}
+                className={classNames(scss.input, disabled && scss.disabled)}
+                type={disabled ? 'text' : 'number'}
+                value={
+                  disabled
+                    ? state_nextMonthEstimatePayment.foreign.toLocaleString()
+                    : state_nextMonthEstimatePayment.foreign
+                }
+                onChange={(e) => editNextMonthEstimatePayment('foreign', e.target.value)}
+              />
+            </Cell>
+            <Cell style={config_table.domestic.style}>
+              <input
+                readOnly={disabled}
+                className={classNames(scss.input, disabled && scss.disabled)}
+                type={disabled ? 'text' : 'number'}
+                value={
+                  disabled
+                    ? state_nextMonthEstimatePayment.domestic.toLocaleString()
+                    : state_nextMonthEstimatePayment.domestic
+                }
+                onChange={(e) => editNextMonthEstimatePayment('domestic', e.target.value)}
+              />
+            </Cell>
+            <Cell style={config_table.total.style}>{state_nextMonthEstimatePayment.total}</Cell>
+          </Row>
         </div>
         <SignatureBar
           className="mt-5"
@@ -645,15 +882,15 @@ const OtherInfo = ({ incomeBillSerial }: { incomeBillSerial: TincomeBillSerialDt
     // TstatusLabelProps
     const arr: TstatusLabelProps[] = [
       {
-        label: 'MEOW',
+        label: '開發中',
         dotColor: 'gray',
       },
       {
-        label: 'WANG',
+        label: '開發中',
         dotColor: 'red',
       },
       {
-        label: 'WEEEEEEEEE',
+        label: '開發中',
         dotColor: 'green',
       },
     ];
@@ -762,26 +999,26 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
 
 type TconfigKey =
   | keyof Pick<
-      TincomeBillSerialDto,
-      | 'billSerialNumber'
-      | 'receiveDate'
-      | 'contractNumber'
-      | 'projectName'
-      | 'contractPayment'
-      | 'periodPayment'
-      | 'priorPeriodPayment'
-      | 'importAccountingNumber'
-      | 'noteNumber'
-      | 'noteMaturityDate'
-      | 'receivablePayment'
-      | 'deductionPayment'
-      | 'unpaidPayment'
-      | 'difference'
-      | 'note'
+    TincomeBillSerialDto,
+    | 'billSerialNumber'
+    | 'receiveDate'
+    | 'contractNumber'
+    | 'projectName'
+    | 'contractPayment'
+    | 'periodPayment'
+    | 'priorPeriodPayment'
+    | 'importAccountingNumber'
+    | 'noteNumber'
+    | 'noteMaturityDate'
+    | 'receivablePayment'
+    | 'deductionPayment'
+    | 'unpaidPayment'
+    | 'difference'
+    | 'note'
 
-      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-      // | 'temporary_separatePayment'
-    >
+  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
+  // | 'temporary_separatePayment'
+  >
   | 'fee'
   | 'vendorName';
 
@@ -829,7 +1066,7 @@ const config: Tconfig = {
         props: {
           className: 'text-center',
           value: state_incomeBillSerial.billSerialNumber,
-          onChange: () => {},
+          onChange: () => { },
         },
       },
     }),
@@ -865,7 +1102,7 @@ const config: Tconfig = {
           value: state_incomeBillSerial.receiveDate
             ? getTaiwanDateStr(state_incomeBillSerial.receiveDate.toISOString()) ?? ''
             : '',
-          onChange: () => {},
+          onChange: () => { },
         },
       };
 
@@ -1137,7 +1374,7 @@ const config: Tconfig = {
           value: state_incomeBillSerial.noteMaturityDate
             ? getTaiwanDateStr(state_incomeBillSerial.noteMaturityDate.toISOString()) ?? ''
             : '',
-          onChange: () => {},
+          onChange: () => { },
         },
       };
 
@@ -1305,7 +1542,7 @@ const config: Tconfig = {
     className: 'text-right',
     createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
       const inputSelProps: TinputSelProps = {
-        disabled: true,
+        disabled: disabled,
         inputProps: {
           props: {
             className: 'text-right',
@@ -1404,23 +1641,22 @@ const config_table: Tconfig_table = {
     label: '',
     style: {
       width: 150,
+      justifyContent: 'flex-start',
       // flex: '1',
     },
   },
   foreign: {
     label: '外銷',
-    style: { width: 120 },
+    style: { width: 120, justifyContent: 'flex-end' },
+    className: 'text-right',
   },
   domestic: {
     label: '國內',
-    style: { width: 120 },
+    style: { width: 120, justifyContent: 'flex-end' },
+    className: 'text-right',
   },
   total: {
     label: '合計',
-    style: { width: 120 },
+    style: { width: 120, justifyContent: 'flex-end' },
   },
 };
-
-{
-  /* <span className="text-9xl">&#11137;</span> */
-}

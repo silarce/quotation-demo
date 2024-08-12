@@ -37,6 +37,18 @@ export type TinvoiceType = '三聯式' | '二聯式';
 export type TelectronicSuppliesAction = '領取' | '退回';
 export type TfinalPaymentType = '尾款' | '保留款';
 
+export type TincomeBillSettlementReviewStatus =
+  | 'notSubmitted' //未審核
+  | 'audited' //審核通過
+  | 'fail'; //審核不通過
+
+export type TincomeBillSerialSettlementFormStatus =
+  | 'notSubmitted' //未審核
+  | 'submitted' //已送審
+  | 'supervisorReviewed' //主管已審核
+  | 'managerReviewed' //經理已審核
+  | 'generalReviewed'; //總經理已審核
+
 //_______________________________________________________
 
 // TelectronicSuppliesRequirementRecordDetailDto的itemName、category雖然是string
@@ -3760,6 +3772,77 @@ export type TupdateAccountReceivableAccountantDto = {
   // temporary_separatePayment: number;
 }[];
 
+export type TincomeBillSerialSettlementFormDto = {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // 年份月份
+  date: string;
+  // 本月實際收款額(國內)
+  internalActualReceivablePayment: number;
+  // 本月預估收款額(國內)
+  internalEstimatePayment: number;
+  // 下月預估收款額(國內)
+  internalNextMonthEstimatePayment: number;
+  // 年度至今累積收款額(國內)
+  internalAccumulatePayment: number;
+  // 應收帳款總額(國內)
+  internalReceivablePayment: number;
+  // 本月實際收款額(外銷)
+  foreignActualReceivablePayment: number;
+  // 本月預估收款額(外銷)
+  foreignEstimatePayment: number;
+  // 下月預估收款額(外銷)
+  foreignNextMonthEstimatePayment: number;
+  // 年度至今累積收款額(外銷)
+  foreignAccumulatePayment: number;
+  // 應收帳款總額(外銷)
+  foreignReceivablePayment: number;
+
+  // 應收帳款狀態
+  reviewStatus: TincomeBillSerialSettlementFormStatus;
+  // 審核狀態
+  reviewRecord?: TincomeBillSerialSettlementFormReviewRecordDto[];
+
+  // 經辦(製表)
+  agentEmployeeId: string | null;
+  // 經辦(製表)
+  agentEmployee?: TemployeeDto;
+  // 包含的所有收入傳票
+  incomeBills?: TincomeBillSerialDto[];
+};
+
+export type TincomeBillSerialSettlementFormReviewRecordDto = {
+  // 審核人員id
+  reviewerEmployeeId: string;
+  // 審核人員職稱
+  reviewerTitle: string;
+  // 審核人員姓名
+  reviewerName: string;
+  // 審核狀態
+  status: TincomeBillSettlementReviewStatus;
+  // 審核層級 // 數字越大越後面審核
+  level: number;
+  // 所屬收入傳票統計表id
+  settlementFormId: string | null;
+  //  所屬收入傳票統計表
+  settlementForm: TincomeBillSerialSettlementFormDto;
+};
+
+export type TcreateIncomeBillSettlementFormDto = {
+  // 需結算之收入傳票 @IsUUID() // 不送這個property就是結算當月
+  // 已被結算過的incomeBillId不可以再次結算，應該會失敗
+  incomeBillIds?: string[];
+};
+
+export type TupdateIncomeBillSettlementFormDto = {
+  // 下月預估收款額
+  internalNextMonthEstimatePayment: number;
+  // 下月預估收款額(外銷)
+  foreignNextMonthEstimatePayment: number;
+};
+
 // MARK: /engineering
 
 // endregion /engineering
@@ -4096,6 +4179,7 @@ export type TaccountantDto = {
 
   // 已分出金額
   splitPayment: number[] | null;
+  isAlreadyImportIncomeBill :boolean;
 };
 
 export type TcreateAccountantDto = Pick<
