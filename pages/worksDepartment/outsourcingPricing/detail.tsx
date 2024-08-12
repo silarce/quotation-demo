@@ -459,7 +459,20 @@ const useTable01 = ({
 
       const itemPrice = state_installItem[index].itemPrice;
 
-      const dualPrice = new Decimal(itemPrice || 0).mul(1).toDecimalPlaces(0).toNumber();
+      // const dualPrice = new Decimal(itemPrice || 0).mul(qty).toDecimalPlaces(0).toNumber();
+      // 才數*才數單價*樘數
+      const dualPrice = new Decimal(volume || 0)
+        .mul(itemPrice ?? 0)
+        .mul(1)
+        .toDecimalPlaces(0)
+        .toNumber();
+
+      // const dualPrice = new Decimal(itemPrice || 0)
+      //   .mul(volume ?? 0)
+      //   .mul(1)
+      //   .toDecimalPlaces(0)
+      //   .toNumber();
+
       decimal_subTotal = decimal_subTotal.add(dualPrice);
 
       const cellArr: Tcell[] = [
