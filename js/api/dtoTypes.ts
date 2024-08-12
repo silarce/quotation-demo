@@ -3834,6 +3834,7 @@ export type TcreateIncomeBillSettlementFormDto = {
   // 需結算之收入傳票 @IsUUID() // 不送這個property就是結算當月
   // 已被結算過的incomeBillId不可以再次結算，應該會失敗
   incomeBillIds?: string[];
+  temp_date?: string; // 預接api，不知道property
 };
 
 export type TupdateIncomeBillSettlementFormDto = {

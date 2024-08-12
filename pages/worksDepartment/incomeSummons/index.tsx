@@ -96,6 +96,9 @@ export default function IncomeSummons() {
     month = String(thisMonth),
   } = query;
 
+  const month_whole = month.padStart(2, '0');
+  const isoDate = moment(`${year}-${month_whole}`).toISOString();
+
   // -----------------------------------------------------------------------------
 
   const [showTable, setShowTable] = useState(false);
@@ -114,16 +117,12 @@ export default function IncomeSummons() {
           $eq: isForeign === 'true',
         },
         incomeBillDate: {
-          $gte: moment(`${year}-${month.padStart(2, '0')}`)
-            .startOf('month')
-            .toISOString(),
-          $lte: moment(`${year}-${month.padStart(2, '0')}`)
-            .endOf('month')
-            .toISOString(),
+          $gte: moment(`${year}-${month_whole}`).startOf('month').toISOString(),
+          $lte: moment(`${year}-${month_whole}`).endOf('month').toISOString(),
         },
       },
     };
-  }, [isForeign, month, year]);
+  }, [isForeign, month_whole, year]);
 
   const {
     data: data_incomeBill = [],
@@ -199,7 +198,9 @@ export default function IncomeSummons() {
   };
 
   const reqApiPostIncomeBillSerialSettlementForm = async () => {
-    return await apiPostIncomeBillSerialSettlementForm({});
+    return await apiPostIncomeBillSerialSettlementForm({
+      temp_date: isoDate,
+    });
   };
 
   // -----------------------------------------------------------------------------
