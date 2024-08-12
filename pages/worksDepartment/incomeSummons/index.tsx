@@ -99,7 +99,7 @@ export default function IncomeSummons() {
   // -----------------------------------------------------------------------------
 
   const [showTable, setShowTable] = useState(false);
-  const { activePanelKeyArr, changeActive } = useActiveKey();
+  // const { activePanelKeyArr, changeActive } = useActiveKey(); // 棄用
 
   // -----------------------------------------------------------------------------
 
@@ -333,7 +333,20 @@ export default function IncomeSummons() {
               })}
             </SummonsRow>
 
-            <Collapse activeKey={activePanelKeyArr} noTlrBorder={true}>
+            {data_incomeBill.map((data, index) => {
+              return (
+                <Summons
+                  key={data.id}
+                  incomeBillSerial={data}
+                  reqPatch={reqPatch}
+                  update_incomeBill={update_incomeBill}
+                  // changeActive={() => changeActive(data.id)}
+                  changeActive={() => {}} // 棄用 待串接上審核api時再拿掉
+                />
+              );
+            })}
+
+            {/* <Collapse activeKey={activePanelKeyArr} noTlrBorder={true}>
               {data_incomeBill.map((data, index) => {
                 return (
                   <Panel
@@ -351,7 +364,7 @@ export default function IncomeSummons() {
                   </Panel>
                 );
               })}
-            </Collapse>
+            </Collapse> */}
           </div>
         </div>
         {/*  */}

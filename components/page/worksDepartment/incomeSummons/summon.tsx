@@ -3,6 +3,9 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
 
+// antd
+import { Badge } from 'antd';
+
 // component
 import EditDefunctionBtn from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDeductionEditor';
 
@@ -126,11 +129,13 @@ const SummonsRow_pre = (
 const Summons_pre = (
   {
     //
+    className,
     incomeBillSerial,
     reqPatch,
     update_incomeBill,
     changeActive,
   }: {
+    className?: string;
     incomeBillSerial: TincomeBillSerialDto;
     reqPatch: TreqPatch;
     update_incomeBill: () => void;
@@ -222,9 +227,24 @@ const Summons_pre = (
   // ---------------------------------------------------------------------
 
   return (
-    <SummonsRow ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled)}>
+    <SummonsRow ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled, className)}>
       <div className={scss.btnPanel} style={cellPropsList_summon.btnPanel.style}>
-        <UpDownArrow className="h-[20px]" onClick={changeActive} />
+        <div className={scss.reviewerBox}>
+          <div className={scss.reviewer}>
+            <Badge status="default" />
+            <span>名字</span>
+          </div>
+          <div className={scss.reviewer}>
+            <Badge status="success" />
+            <span>名字</span>
+          </div>
+          <div className={scss.reviewer}>
+            <Badge status="error" />
+            <span>名字</span>
+          </div>
+        </div>
+        {/* <UpDownArrow className="h-[20px]" onClick={changeActive} /> */}
+
         <IconEdit className={classNames(!disabled && scss.enable)} onClick={() => setDisabled((state) => !state)} />
         <IconCheck02 className={classNames(disabled && 'invisible')} onClick={handle_onConfirm} />
       </div>
@@ -291,7 +311,7 @@ const keyArr: TconfigKey[] = [
 const cellPropsList_summon: TcellPropsList_summon = {
   btnPanel: {
     label: '',
-    style: { width: 120 },
+    style: { width: 170 },
     className: scss.btnPanel,
     createInputSelProps: () => ({}),
   },

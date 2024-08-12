@@ -4,7 +4,7 @@
   // align-items: flex-end;
   // gap: 10px;
 
-  // border-bottom: solid 1px theme("colors.border");
+  border-bottom: solid 1px theme("colors.border");
   padding: 10px 0;
   padding-right: 50px;
 
@@ -35,6 +35,9 @@
       border-color: theme("colors.sub");
     }
   }
+  &:nth-last-of-type(1) {
+    border-bottom: 0;
+  }
 }
 
 .thead {
@@ -63,11 +66,25 @@
 
 .btnPanel {
   display: flex;
-  justify-content: space-between;
+  // justify-content: space-between;
   position: sticky;
   left: 0;
   z-index: 2;
+  gap: 10px;
   background-color: inherit;
+  // > * {
+  //   flex: none;
+  // }
+  .reviewerBox {
+    display: grid;
+    gap: 5px;
+    height: fit-content;
+    flex: 1;
+    user-select: none;
+    > .reviewer {
+      cursor: pointer;
+    }
+  }
 }
 
 .billSerialNumber {
