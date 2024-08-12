@@ -32,17 +32,19 @@ $topBlockHeight: 50px;
   // align-items: flex-end;
   // gap: 10px;
 
-  border-bottom: solid 1px theme("colors.border");
+  // border-bottom: solid 1px theme("colors.border");
   padding: 10px 0;
   padding-right: 50px;
 
   width: fit-content;
-  background-color: white;
+  // background-color: inherit;
+  background-color: #fff;
   font-size: 16px;
 
   > div {
     // text-align: center;
     background-color: inherit;
+    // background-color: #fff;
     padding: 0 10px;
 
     > input {
@@ -98,8 +100,61 @@ $topBlockHeight: 50px;
 
 .billSerialNumber {
   position: sticky;
-  left: 70px;
+  left: 120px;
   z-index: 1;
   background-color: inherit;
   text-align: center;
+}
+
+// ============================================================
+
+.nextMonthEstimatePayment_tableContainer {
+  // width: 650px;
+  padding: 20px;
+
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    .tableTitle {
+      font-size: 20px;
+      font-weight: 500;
+    }
+    .btnBar {
+      display: flex;
+      gap: 10px;
+    }
+  }
+
+  .input {
+    width: 100%;
+    text-align: right;
+    border-bottom: solid 1px black;
+    &.disabled {
+      border-color: transparent;
+    }
+  }
+}
+
+// ============================================================
+
+.panel.plus {
+  // &:nth-of-type(2n) {
+  //   background-color: #ddd;
+  // }
+}
+
+.otherInfo {
+  padding: 10px;
+  // width: auto;
+  // background-color: theme("colors.bgc01");
+}
+.reviewBar {
+  position: sticky;
+  left: 10px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  width: fit-content;
 }
