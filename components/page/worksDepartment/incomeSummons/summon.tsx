@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect, forwardRef } from 'react';
 import classNames from 'classnames';
-import { useRouter } from 'next/router';
 import moment, { Moment } from 'moment';
 import Decimal from 'decimal.js';
 
@@ -11,7 +10,7 @@ import EditDefunctionBtn from 'components/page/worksDepartment/contracList/contr
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // type
-import type { Tparams, TincomeBillSerialDto } from 'js/api/dtoTypes';
+import type { TincomeBillSerialDto } from 'js/api/dtoTypes';
 import { TreqPatch } from 'pages/worksDepartment/incomeSummons';
 
 // icon
@@ -380,23 +379,6 @@ const cellPropsList_summon: TcellPropsList_summon = {
       width: 200,
     },
     createInputSelProps: ({ state_incomeBillSerial, setState_incomeBillSerial: setState_incomeBillSerial }) => {
-      //
-      // const inputProps: TinputSelProps['inputProps'] = {
-      //   props: {
-      //     // className: 'text-center',
-      //     value: state_incomeBillSerial.projectName,
-      //     onChange: (e) => {
-      //       setState_incomeBillSerial((prev) => {
-      //         return {
-      //           ...prev,
-      //           projectName: e.target.value,
-      //         };
-      //       });
-      //     },
-      //   },
-      // };
-      //
-
       const textareaProps: TinputSelProps['textareaProps'] = {
         props: {
           value: state_incomeBillSerial.projectName,
@@ -844,28 +826,6 @@ const cellPropsList_summon: TcellPropsList_summon = {
       return inputSelProps;
     },
   },
-
-  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-  // temporary_separatePayment: {
-  //   label: '分出金額',
-  //   style: { width: 100 },
-  //   className: 'text-right',
-  //   createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
-  //     const inputSelProps: TinputSelProps = {
-  //       disabled: true,
-  //       inputProps: {
-  //         props: {
-  //           className: 'text-right',
-  //           defaultValue: state_incomeBillSerial.temporary_separatePayment,
-  //         },
-  //       },
-  //     };
-
-  //     return inputSelProps;
-  //   },
-  // },
-
-  //
 } as const;
 
 // ============================================================================
