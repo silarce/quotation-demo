@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
+import Decimal from 'decimal.js';
+import _ from 'lodash';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
@@ -26,6 +28,8 @@ import {
 } from 'js/api/api_accountant';
 
 import { TupdateIncomeBillSerialDto, apiPatchIncomeBill } from 'js/api/api_engineering';
+
+import calcIncomeBillUnpaidPayment from 'js/utils/calc/calcIncomeBillUnpaidPayment';
 
 // ===============================================================]
 
@@ -64,15 +68,25 @@ function EditDeductionPanel({
   defaultStateArr,
   onConfirm,
   onCancel,
-  cancelOnSuccess = true,
+  cancelOnSuccess,
 }: Tprops) {
   // --------------------------------------------------------------------
+  const [readonly, setReadonly] = useState(true);
   const [state_deductionArr, setState_deductionArr] = useState<Tstate_deduction[]>([]);
+
+  if (cancelOnSuccess === undefined) {
+    if (!!accountantId) {
+      cancelOnSuccess = false;
+    } else {
+      cancelOnSuccess = true;
+    }
+  }
 
   // --------------------------------------------------------------------
 
   const {
     data: data_accountant,
+    update: update_accountant,
     // isFetching: isFetching_accountant
   } = useGetAccountant_id(accountantId);
 
@@ -130,21 +144,40 @@ function EditDeductionPanel({
         return;
       }
 
+      const deductionPayment = accountsReceivableDeduction.reduce((deductionPayment, item) => {
+        deductionPayment = new Decimal(deductionPayment).add(item.detailedAmount || 0).toNumber();
+
+        return deductionPayment;
+      }, 0);
+
+      const unpaidPayment = calcIncomeBillUnpaidPayment({
+        contractPayment: Number(data_incomeBill.contractPayment || 0),
+        periodPayment: Number(data_incomeBill.periodPayment || 0),
+        priorPeriodPayment: Number(data_incomeBill.priorPeriodPayment || 0),
+        deductionPayment: deductionPayment,
+        fee: Number(data_incomeBill.fee || 0),
+      });
+
       const body: TupdateIncomeBillSerialDto = {
         ...data_incomeBill,
         incomeBillDeduction: accountsReceivableDeduction,
-        fee: data_incomeBill.fee,
+        unpaidPayment,
       };
 
       // 現在api只有回傳fee跟id，未來真的需要時再請後端回傳完整的TaccountantDto
       const res = await apiPatchIncomeBill(incomeBillId, body)
-        .then((res) => {
+        .then(async (res) => {
           onConfirm?.({
             accountant: null,
             state_deductionArr,
           });
 
-          cancelOnSuccess && onCancel?.();
+          if (cancelOnSuccess) {
+            onCancel?.();
+          } else {
+            await update_accountant();
+            setReadonly(true);
+          }
 
           return res;
         })
@@ -155,12 +188,15 @@ function EditDeductionPanel({
         state_deductionArr,
       });
       cancelOnSuccess && onCancel?.();
+      setReadonly(true);
     }
   };
 
   // ---------------------------------------------------------------------------
 
-  useEffect(() => {
+  // MARK: useEffect
+
+  const defaultState = useMemo(() => {
     const deductionArr = (() => {
       let deductionArr;
 
@@ -185,8 +221,12 @@ function EditDeductionPanel({
       };
     });
 
-    setState_deductionArr(state_deductionArr);
+    return state_deductionArr;
   }, [data_accountant, defaultStateArr]);
+
+  useEffect(() => {
+    setState_deductionArr(_.cloneDeep(defaultState));
+  }, [defaultState, readonly]);
 
   // ---------------------------------------------------------------------------
 
@@ -197,7 +237,7 @@ function EditDeductionPanel({
       {/*  */}
       <div className={scss.table}>
         <div className={classNames(scss.row, scss.thead)}>
-          <div className={scss.cell}>
+          <div className={classNames(scss.cell, readonly && 'invisible')}>
             <IconAddCircle onClick={handle_Add} className={scss.btn_svg} />
           </div>
           <div className={scss.cell}>扣款項目</div>
@@ -211,11 +251,13 @@ function EditDeductionPanel({
 
           return (
             <div key={index} className={classNames(scss.row)}>
-              <div className={scss.cell}>
+              <div className={classNames(scss.cell, readonly && 'invisible')}>
                 <IconRemoveCircle className={scss.btn_svg} onClick={() => handle_Remove(index)} />
               </div>
 
               <InputSel
+                disabled={readonly}
+                showBaseline="auto"
                 selectProps={{
                   props: {
                     menuPortalTarget: undefined,
@@ -234,6 +276,8 @@ function EditDeductionPanel({
               />
 
               <InputSel
+                disabled={readonly}
+                showBaseline="auto"
                 inputProps={{
                   props: {
                     value: detailedAmount,
@@ -249,12 +293,21 @@ function EditDeductionPanel({
       </div>
       {/*  */}
 
-      <div className={scss.btnBar}>
-        <MyButton_v2 theme="danger" onClick={handle_confirm}>
-          確定
-        </MyButton_v2>
-        <MyButton_v2 onClick={onCancel}>取消</MyButton_v2>
-      </div>
+      {!readonly && (
+        <div className={classNames(scss.btnBar)}>
+          <MyButton_v2 onClick={() => setReadonly(true)}>取消</MyButton_v2>
+          <MyButton_v2 theme="danger" onClick={handle_confirm}>
+            確定
+          </MyButton_v2>
+        </div>
+      )}
+
+      {readonly && (
+        <div className={classNames(scss.btnBar)}>
+          <MyButton_v2 onClick={() => setReadonly(false)}>編輯</MyButton_v2>
+          <MyButton_v2 onClick={onCancel}>關閉</MyButton_v2>
+        </div>
+      )}
 
       {/*  */}
     </div>
