@@ -1,7 +1,7 @@
 import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import _ from 'lodash';
 
 import scss from './prodReceiptList.module.scss';
@@ -31,6 +31,9 @@ import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
 import icon_print from 'public/image/icon/fc_printer.svg';
 import { Modal } from 'antd';
+import icon_task_open from 'public/image/icon/fc_task_open.svg';
+import icon_task_close from 'public/image/icon/fc_task_close.svg';
+import icon_task_open_gray from 'public/image/icon/fc_task_open_gray.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -81,6 +84,7 @@ export default function ProdReceiptList() {
     const [data2, setData2] = useState<any[]>([]);
     const [data2restore, setData2Restore] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [searchdata, setSearchdata] = useState<any[]>([]);
 
     const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
     const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
@@ -114,6 +118,14 @@ export default function ProdReceiptList() {
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
+    const [keyword4, setKeyword4] = useState<string>("");
+    // 預設截止日期為今天，起始日期為今天往前推30天
+    const defaultEndDate = moment();
+    const defaultStartDate = moment().subtract(30, 'days');
+
+    // 使用 Moment 類型作為狀態
+    const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
+    const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
 
     const [editstatus, setEditStatus] = useState<boolean>(false);
     const [editrowid, setEditRowId] = useState<number>(0);
@@ -266,6 +278,7 @@ export default function ProdReceiptList() {
 
             setData(data);
             setDatarestore(data);
+            setSearchdata(data);
             console.log(data);
             await new Promise(resolve => setTimeout(resolve, 500));
             if (data.length > 0 && checkfirstin === 0) {
@@ -298,9 +311,13 @@ export default function ProdReceiptList() {
         }
     };
 
+    const hasFetchedData = useRef(false);
 
     useEffect(() => {
-        getProdReceipt();
+        if (!hasFetchedData.current) {
+            getProdReceipt();
+            hasFetchedData.current = true;
+        }
     }, []);
 
 
@@ -785,12 +802,73 @@ export default function ProdReceiptList() {
     };
 
 
+    const filterData = () => {
+        const startDate = keywordstartdate;
+        const endDate = keywordenddate;
+        const requisitionId = keyword2.trim();
+        const status = keyword3.trim();
+        const suppliername = keyword4.trim();
 
+        // 檢查是否所有條件都為空
+        if ((!startDate || !startDate.isValid()) &&
+            (!endDate || !endDate.isValid()) &&
+            !requisitionId &&
+            !status &&
+            !suppliername) {
+            setSearchdata(data);
+            return;
+        }
+
+        // 過濾資料
+        let filteredData = data.filter(item => {
+            const createAt = moment(item.create_at);
+            const isDateInRange = (!startDate || !startDate.isValid() || !endDate || !endDate.isValid())
+                ? true
+                : createAt.isBetween(startDate, endDate, 'days', '[]');
+            return isDateInRange;
+        });
+
+        // 模糊查詢請購單號
+        if (requisitionId) {
+            filteredData = filteredData.filter(item =>
+                item.prodreceiptid.toString().includes(requisitionId)
+            );
+        }
+
+        // 模糊查詢單據狀態
+        if (status) {
+            filteredData = filteredData.filter(item =>
+                item.status.toString().includes(status)
+            );
+        }
+        if (suppliername) {
+            filteredData = filteredData.filter(item =>
+                item.suppliername.toString().includes(suppliername)
+            );
+        }
+
+        setSearchdata(filteredData);
+    };
+
+    // 監聽條件變更
+    useEffect(() => {
+        filterData();
+    }, [keywordstartdate, keywordenddate, keyword2, keyword3, keyword4]);
+
+    const clearFilterData = (e: any) => {
+        e.preventDefault();
+        setKeywordstartdate(null)
+        setKeywordenddate(null);
+        setKeyword2('');
+        setKeyword3('');
+        setKeyword4('');
+        // setSearchdata(data);
+    }
 
 
 
     return (
-        <SubLayer isLoading_subLayer={false}>
+        <SubLayer isLoading_subLayer={isLoading}>
             <PageHeader02 tag={'進貨單'} panelList={panelList} />
             <div className={scss.container}>
                 <div className={scss.left} style={{ display: `${leftbaropen === true ? 'none' : 'none'}` }}>
@@ -862,17 +940,54 @@ export default function ProdReceiptList() {
                     <div className={scss.content}>
                         <div className={scss.head_head1}>
                             <div>
-                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
+                                <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查詢單據">
+                                    <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    查詢
+                                </button>
+                                &nbsp;
+                                <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
+                                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    列印
+                                </button>
+                                {/* <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查找">
                                     <img src={icon_search.src} alt="search" style={{ height: '30px', width: '30px' }} />
                                 </button>
                                 &nbsp;
                                 <button className={scss.squarebtn} onClick={() => { alert("comming soon") }} title="列印">
                                     <img src={icon_print.src} alt="search" style={{ height: '30px', width: '30px' }} />
-                                </button>
+                                </button> */}
+
+
                             </div>
                             <div></div>
                             <div></div>
-                            <div></div>
+                            <div>
+                                <button className={scss.squarebtn} style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }} title="單據結案">
+                                    <img src={icon_task_open.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    結案
+                                </button>
+                                <button className={scss.disablesquarebtn} style={{ display: `${(entrystatusin != "已入庫" || paystatusin != "已請付") ? '' : 'none'}` }} title="單據未結">
+                                    <img src={icon_task_open_gray.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    未結
+                                </button>
+                                <button className={scss.disablesquarebtn} style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin === "已結案") ? '' : 'none'}` }} title="單據結案">
+                                    <img src={icon_task_close.src} alt="close" style={{ height: '20px', width: '20px' }} />
+                                    已結
+                                </button>
+
+
+                                
+                                {/* <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin != "已結案") ? '' : 'none'}` }}>
+                                    <button className={scss.redbtn} onClick={() => { alert((completeentry >= parseInt(totalentry, 10)).toString()); }}>結案</button>
+                                </span> */}
+                                {/* <span style={{ display: `${(entrystatusin != "已入庫" || paystatusin != "已請付") ? '' : 'none'}` }}>
+                                    <button className={scss.disabledbtn}>未結案</button>
+                                </span>
+                                <span style={{ display: `${(entrystatusin === "已入庫" && paystatusin === "已請付" && statusin === "已結案") ? '' : 'none'}` }}>
+                                    <button className={scss.disabledbtn} >已結案</button>
+                                </span> */}
+
+                            </div>
                         </div>
 
                         <div className={scss.head_content1}>
@@ -1174,7 +1289,7 @@ export default function ProdReceiptList() {
                                                     <img src={icon_fc_arrow_down_gray.src} alt="addtoList" style={{ color: 'red', width: '20px', height: '20px' }} />
                                                 </button> */}
                                             </span>
-                                            <span>{_item.note}</span>
+                                            <span className="truncate" title={_item.note}>{_item.note}</span>
                                         </div>
                                     </CellWithBar>
                                 ))
@@ -1360,7 +1475,7 @@ export default function ProdReceiptList() {
                                 <span style={{ fontSize: '16px', color: '#14256a' }}>查找條件：</span>
                             </div>
                             <div>
-                                <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {data.length} 筆</span>
+                                <span style={{ fontSize: '16px', color: '#14256a' }}>筆數：共 {searchdata.length} 筆</span>
                             </div>
                         </div>
                     }
@@ -1369,47 +1484,43 @@ export default function ProdReceiptList() {
 
                     <div className={scss.modal_head_content1}>
                         <div style={{ border: '1px solid #c1c1c1', borderRight: '0px', paddingRight: '50px', paddingLeft: '50px' }}>
-                            <form className={scss.modal_search_bar} onSubmit={handleSubmit} style={{ alignItems: 'center', width: '100%' }}>
-                                {/* <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                            <form className={scss.modal_search_bar} style={{ alignItems: 'center', width: '100%' }}>
+                                <div>
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption="排版用"
+                                        disabled={true}
+                                        className='invisible'
+                                        inputProps={{
+                                            props: {
+                                                value: ' ',
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div>
                                     <InputSel
                                         caption="起始日期"
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                                value: keywordstartdate || null,
+                                                onChange: (e: Moment | null) => { setKeywordstartdate(e) }
                                             }
                                         }}
                                     />
                                 </div>
                                 <br />
-                                <div style={{ paddingRight: '10px', paddingLeft: '10px' }}>
+                                <div>
                                     <InputSel
                                         caption="截止日期"
                                         disabled={false}
                                         captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
                                         datePickerProps={{
                                             props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
-                                            }
-                                        }}
-                                    />
-                                </div> */}
-                                <br />
-                                <div>
-                                    <InputSel
-                                        caption="進貨日期"
-                                        disabled={false}
-                                        captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
-                                        // wrapperStyle={{ width: '500px', margin: 'auto' }}
-                                        datePickerProps={{
-                                            props: {
-                                                value: getTaiwanDateStr(keyword1 || '') ? moment(keyword1) : null,
-                                                onChange: (e) => { setKeyword1((e?.toString() || '') || '') }
+                                                value: keywordenddate || null,
+                                                onChange: (e: Moment | null) => { setKeywordenddate(e) }
                                             }
                                         }}
                                     />
@@ -1422,8 +1533,8 @@ export default function ProdReceiptList() {
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword2 ? keyword2 : ' ',
-                                                onChange: (e) => { setKeyword2(e.target.value) }
+                                                value: keyword2 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword2(e.target.value) }
                                             },
                                         }}
                                     />
@@ -1436,8 +1547,8 @@ export default function ProdReceiptList() {
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
+                                                value: keyword3 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword3(e.target.value) }
                                             },
                                         }}
                                     />
@@ -1450,14 +1561,14 @@ export default function ProdReceiptList() {
                                         disabled={false}
                                         inputProps={{
                                             props: {
-                                                value: keyword3 ? keyword3 : ' ',
-                                                onChange: (e) => { setKeyword3(e.target.value) }
+                                                value: keyword4 || ' ',
+                                                onChange: (e: React.ChangeEvent<HTMLInputElement>) => { setKeyword4(e.target.value) }
                                             },
                                         }}
                                     />
                                 </div>
                                 <br />
-                                <div>
+                                <div >
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1471,7 +1582,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <br />
-                                <div>
+                                <div >
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1485,7 +1596,7 @@ export default function ProdReceiptList() {
                                     />
                                 </div>
                                 <br />
-                                <div>
+                                <div >
                                     <InputSel
                                         {...inputSelProps}
                                         caption="排版用"
@@ -1498,52 +1609,23 @@ export default function ProdReceiptList() {
                                         }}
                                     />
                                 </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <br />
-                                <div>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="排版用"
-                                        disabled={true}
-                                        className='invisible'
-                                        inputProps={{
-                                            props: {
-                                                value: ' ',
-                                            },
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '5px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingRight: '10px', paddingLeft: '10px', paddingBottom: '15px' }}>
                                     <span>
-                                        <button className={scss.minibtn} type="submit">清除條件</button>
+                                        <button className={scss.minibtn} onClick={(e) => { clearFilterData(e) }}>清除條件</button>
                                     </span>
-                                    <span>
+                                    {/* <span>
                                         <button className={scss.minibtn} type="submit">查找</button>
-                                    </span>
+                                    </span> */}
                                 </div>
-
                             </form>
                         </div>
                         <div style={{
-                            maxHeight: '500px',
+                            maxHeight: '465.81px',
                             overflowY: 'auto',
                             border: '1px solid gray',
                         }}>
                             <Thead01 type={'ProdReceipt'} />
-                            <Tbody01 type={'ProdReceipt'} data={data} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
+                            <Tbody01 type={'ProdReceipt'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} />
                         </div>
 
                     </div>
