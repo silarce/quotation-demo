@@ -3744,6 +3744,7 @@ export type TupdateIncomeBillSerialDto = Pick<
   | 'noteNumber'
   | 'noteMaturityDate'
   | 'receivablePayment'
+  // 20240813 發現patch deductionPayment無效，還未知後端有沒有修正
   | 'deductionPayment'
   | 'unpaidPayment'
   | 'difference'

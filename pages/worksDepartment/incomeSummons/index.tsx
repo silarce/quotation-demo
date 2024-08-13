@@ -14,11 +14,12 @@ import Summons, {
   SummonsRow,
   keyArr,
   cellPropsList_summon,
+  Tstate_incomeBillSerial,
 } from 'components/page/worksDepartment/incomeSummons/summon';
 
 // gear
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
-import { Collapse, useActiveKey } from 'components/global/myAntd/collapse';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
@@ -46,39 +47,37 @@ type Tquery = {
   month: string;
 };
 
-type Tstate_incomeBillSerial = {
-  id: string;
-  billSerialNumber: string;
-  receiveDate: Moment | null;
-  contractNumber: string;
-  projectName: string;
-  contractPayment: string;
-  periodPayment: string;
-  priorPeriodPayment: string;
-  importAccountingNumber: string;
-  noteNumber: string;
-  noteMaturityDate: Moment | null;
-  receivablePayment: string;
-  deductionPayment: string;
-  unpaidPayment: string;
-  difference: string;
-  //
-  readonly fee: number; // 現在是從accountant裡面拿
-  //
-  note: string;
-  vendorName: string;
+// type Tstate_incomeBillSerial = {
+//   id: string;
+//   billSerialNumber: string;
+//   receiveDate: Moment | null;
+//   contractNumber: string;
+//   projectName: string;
+//   contractPayment: string;
+//   periodPayment: string;
+//   priorPeriodPayment: string;
+//   importAccountingNumber: string;
+//   noteNumber: string;
+//   noteMaturityDate: Moment | null;
+//   receivablePayment: string;
+//   deductionPayment: string;
+//   unpaidPayment: string;
+//   difference: string;
+//   //
+//   readonly fee: number; // 現在是從accountant裡面拿
+//   //
+//   note: string;
+//   vendorName: string;
 
-  //
-  readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
-};
+//   //
+//   readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
+// };
 
 type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_incomeBillSerial) => Promise<void>;
 
 export type { TreqPatch };
 
 // ==============================================================================
-
-const Panel = Collapse.Panel;
 
 // ==============================================================================
 
@@ -170,9 +169,16 @@ export default function IncomeSummons() {
       difference,
       //
       note,
-      accountsReceivableDeduction,
+      state_deduction,
       fee,
     } = state_incomeBillSerial;
+
+    const incomeBillDeduction = state_deduction.map((item) => {
+      return {
+        ...item,
+        detailedAmount: Number(item.detailedAmount || 0),
+      };
+    });
 
     const body: TupdateIncomeBillSerialDto = {
       receiveDate: receiveDate ? receiveDate.toISOString() : null,
@@ -191,7 +197,7 @@ export default function IncomeSummons() {
       note: note,
 
       fee,
-      incomeBillDeduction: accountsReceivableDeduction ?? [],
+      incomeBillDeduction: incomeBillDeduction,
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);

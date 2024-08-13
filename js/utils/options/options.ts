@@ -478,6 +478,7 @@ export const optionsCreator_deduction = ({ emptyOption }: { emptyOption?: boolea
     { value: '點工移料費', label: '點工移料費' },
     { value: '堆高機租用費', label: '堆高機租用費' },
     { value: '流動廁所分攤費', label: '流動廁所分攤費' },
+    { value: '點工修繕費', label: '點工修繕費' },
   ];
 
   if (emptyOption) {
