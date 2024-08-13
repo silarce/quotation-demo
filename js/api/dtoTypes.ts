@@ -2297,6 +2297,12 @@ export type TquotationContractDto = {
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
 
+export type TcopyQuotationDto = {
+  quotationId: string;
+  customerId: string;
+  isRelationQuotation?: boolean;
+};
+
 // export type TcreateModifyQuotationDto = {
 //   // 報價日期
 //   quotationDate?: string;
