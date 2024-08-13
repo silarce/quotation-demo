@@ -261,9 +261,9 @@ export default function IncomeBillSorting({
         return {
           id: incomeBillId,
           invoiceId,
-          receiveDate: getTaiwanDateStr(receiveDate),
-          importAccountingNumber,
-          noteMaturityDate: getTaiwanDateStr(noteMaturityDate),
+          receiveDate: getTaiwanDateStr(receiveDate) || '---',
+          importAccountingNumber: importAccountingNumber || '---',
+          noteMaturityDate: getTaiwanDateStr(noteMaturityDate) || '---',
           // price: price.toLocaleString(),
           receivablePayment: receivablePayment?.toLocaleString(),
           receivablePayment_num: receivablePayment || 0,
