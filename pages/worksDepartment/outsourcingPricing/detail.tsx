@@ -70,6 +70,9 @@ type Tstate_installItem = {
 };
 
 // =======================================================================
+
+// MARK: START
+
 export default function OutsourcingPricingDetail() {
   const router = useRouter();
   const { paymentDetailId } = router.query as Tquery;
@@ -99,10 +102,6 @@ export default function OutsourcingPricingDetail() {
 
   // ---------------------------------------------------------------------
 
-  useEffect(() => {
-    update();
-  }, [paymentDetailId]);
-
   // ---------------------------------------------------------------------
 
   const {
@@ -125,7 +124,7 @@ export default function OutsourcingPricingDetail() {
   const control_table_total = useTable_total({ subTotal01, subTotal02 });
 
   // ---------------------------------------------------------------------
-  // _req
+  // region REQUEST
 
   const reqPatchOutsourcingPaymentDetail = async () => {
     if (!paymentDetailId || !engineeringContact?.id) {
@@ -184,9 +183,15 @@ export default function OutsourcingPricingDetail() {
       return;
     }
 
+    const installItems = Object.values(installItemList).map((item) => {
+      const { firstDeliveryStatusId, ...installItems } = item;
+
+      return installItems;
+    });
+
     const body: TupdateOutsourcingPaymentDetailDto = {
       engineeringContactId: engineeringContact.id,
-      installItems: Object.values(installItemList),
+      installItems: installItems,
       outsourcingTotal: new Decimal(subTotal01).add(subTotal02).toNumber(),
     };
 
@@ -202,6 +207,8 @@ export default function OutsourcingPricingDetail() {
   };
 
   // ---------------------------------------------------------------------
+
+  // region PROPS
 
   const panelList_disabled: TpanelList = [
     {
@@ -243,6 +250,18 @@ export default function OutsourcingPricingDetail() {
   const panelList = disabled ? panelList_disabled : panelList_enabled;
 
   // ---------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    update();
+  }, [paymentDetailId]);
+
+  // endregion useEffect
+
+  // ---------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SubLayer isLoading_subLayer={isLoading_outsourcingPaymentDetail}>
@@ -361,6 +380,8 @@ export default function OutsourcingPricingDetail() {
   );
 }
 
+// MARK:END
+
 // ===========================================================================
 // ===========================================================================
 // ===========================================================================
@@ -438,7 +459,20 @@ const useTable01 = ({
 
       const itemPrice = state_installItem[index].itemPrice;
 
-      const dualPrice = new Decimal(itemPrice || 0).mul(1).toDecimalPlaces(0).toNumber();
+      // const dualPrice = new Decimal(itemPrice || 0).mul(qty).toDecimalPlaces(0).toNumber();
+      // 才數*才數單價*樘數
+      const dualPrice = new Decimal(volume || 0)
+        .mul(itemPrice ?? 0)
+        .mul(1)
+        .toDecimalPlaces(0)
+        .toNumber();
+
+      // const dualPrice = new Decimal(itemPrice || 0)
+      //   .mul(volume ?? 0)
+      //   .mul(1)
+      //   .toDecimalPlaces(0)
+      //   .toNumber();
+
       decimal_subTotal = decimal_subTotal.add(dualPrice);
 
       const cellArr: Tcell[] = [
@@ -552,8 +586,8 @@ const useTable02 = ({
       item[key] = value;
 
       if (key === 'otherQuantity' || key === 'otherUnitPrice') {
-        const otherSubTotalPrice = new Decimal(item.otherQuantity)
-          .mul(item.otherUnitPrice)
+        const otherSubTotalPrice = new Decimal(item.otherQuantity || 0)
+          .mul(item.otherUnitPrice || 0)
           .toDecimalPlaces(0)
           .toString();
         copy[index].otherSubTotalPrice = otherSubTotalPrice;
@@ -585,19 +619,6 @@ const useTable02 = ({
 
     const arr: Tstate_otherWorkItem[] = [];
     const otherWorkItemsOptionArr: Toption[] = [];
-
-    // TODO
-    // 因為需求還未確定，後端也還就還沒確定資料結構，所以做了一些權宜的暫時處理
-    // 代都確定後要修改
-    // 以下是現在的狀況
-    // 工程管理單 每一筆contractProductItems 可能只會有一個 deliveryStatus
-    // 但是deliveryStatus是陣列，且可以post多筆deliveryStatus
-    // 不同筆的deliveryStatus可能是不同廠商
-    // 暫時的處理方式:
-    // 假設未來deliveryStatus只會有一筆
-    // 所以先過濾deliveryStatus，
-    // 取出item.installerEmployeeId === outsourcingId的資料，建立deliveryStatusArr
-    // 再取第一筆deliveryStatus
 
     installItems.forEach((item) => {
       const { deliveryStatus, id, itemName } = item;

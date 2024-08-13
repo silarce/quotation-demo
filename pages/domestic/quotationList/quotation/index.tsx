@@ -21,7 +21,7 @@
 // =============================================================
 
 // 報價單
-import React, { useState, useEffect, useContext, useMemo, memo } from 'react';
+import React, { useState, useReducer, useEffect, useContext, useMemo, memo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 import moment from 'moment';
 import classNames from 'classnames';
@@ -73,6 +73,7 @@ import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpl
 import CustomerSelector from 'components/global/gear/modal/customerSelector';
 import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import Dropdown from 'components/global/gear/dropdown/Dropdown';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
@@ -124,6 +125,7 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 import { TcreateQuotationProductDto, TcustomerDto } from 'js/api/dtoTypes';
 
 import { checkIsFloat } from 'js/utils/checkValue';
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // ------------------------------------------------------------------
 
@@ -173,6 +175,11 @@ type Tstate_summary = {
   total: string;
   deliveryLocation: string;
   deliveryDate: string;
+};
+
+type TcustomerSelectorShow = {
+  show: boolean;
+  isRelationQuotation: boolean | undefined;
 };
 
 // ------------------------------------------------------------------
@@ -270,7 +277,31 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const [taxRate, setTaxRate] = useState(0.05);
 
   // 複製報價單之客戶狀態
-  const [customerSelectorShow, setCustomerSelectorShow] = useState(false);
+  const [customerSelectorShow, setCustomerSelectorShow] = useReducer(
+    (state: TcustomerSelectorShow, action: TcustomerSelectorShow | boolean) => {
+      let copy = { ...state };
+
+      if (action === false) {
+        copy = {
+          show: false,
+          isRelationQuotation: undefined,
+        };
+      } else if (action === true) {
+        copy = {
+          show: true,
+          isRelationQuotation: undefined,
+        };
+      } else {
+        copy = action;
+      }
+
+      return copy;
+    },
+    {
+      show: false,
+      isRelationQuotation: undefined,
+    }
+  );
 
   const [status, setStatus] = useState<TquotationContentDto['status']>('Budget');
 
@@ -934,6 +965,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       const res = await apiPostCopyQuotation({
         quotationId,
         customerId,
+        isRelationQuotation: customerSelectorShow.isRelationQuotation,
       });
 
       if (res) {
@@ -1759,22 +1791,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
           },
         }
       : null,
-    {
-      type: 'myButton',
-      label: '匯出報價單',
-      img: iconUpload.src,
-      // onClick: () => setShowPdf(true),
+    // {
+    //   type: 'myButton',
+    //   label: '匯出報價單',
+    //   img: iconUpload.src,
+    //   // onClick: () => setShowPdf(true),
 
-      onClick: () => setPdfModalVisible(true),
-    },
-    {
-      type: 'myButton',
-      label: '單價分析',
-      img: iconUpload.src,
-      onClick: () => {
-        setShowPdf_part(true);
-      },
-    },
+    //   onClick: () => setPdfModalVisible(true),
+    // },
+    // {
+    //   type: 'myButton',
+    //   label: '單價分析',
+    //   img: iconUpload.src,
+    //   onClick: () => {
+    //     setShowPdf_part(true);
+    //   },
+    // },
 
     !contentId && isReviewer
       ? {
@@ -1822,22 +1854,22 @@ function TheQuotation({ router }: { router: NextRouter }) {
       : null,
 
     // !contentId && status === 'Bidding'
-    !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting')
-      ? {
-          type: 'myButton',
-          label: '複製報價單',
-          onClick: () => {
-            myAlert.confirm({
-              title: '確定複製報價單?',
-              props: {
-                onOk: () => {
-                  setCustomerSelectorShow(true);
-                },
-              },
-            });
-          },
-        }
-      : null,
+    // !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting')
+    //   ? {
+    //       type: 'myButton',
+    //       label: '複製報價單',
+    //       onClick: () => {
+    //         myAlert.confirm({
+    //           title: '確定複製報價單?',
+    //           props: {
+    //             onOk: () => {
+    //               setCustomerSelectorShow(true);
+    //             },
+    //           },
+    //         });
+    //       },
+    //     }
+    //   : null,
 
     status === 'Pending' || status === 'TempPending'
       ? {
@@ -1900,6 +1932,50 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return panel_editable;
     }
   })();
+
+  const customeRight = [
+    !contentId && (status === 'Budget' || status === 'Bidding' || status === 'Contracting') ? (
+      <Dropdown
+        key="1"
+        // placement="bottomRight"
+        itemArr={[
+          //
+          <MyButton_v2 key="1" onClick={() => setCustomerSelectorShow(true)}>
+            一般複製
+          </MyButton_v2>,
+          <MyButton_v2
+            key="2"
+            onClick={() =>
+              setCustomerSelectorShow({
+                show: true,
+                isRelationQuotation: true,
+              })
+            }
+          >
+            關聯報價
+          </MyButton_v2>,
+        ]}
+      >
+        複製報價單
+      </Dropdown>
+    ) : null,
+
+    <Dropdown
+      key="1"
+      // placement="bottomRight"
+      itemArr={[
+        //
+        <MyButton_v2 key="1" img={iconUpload.src} onClick={() => setPdfModalVisible(true)}>
+          匯出報價單
+        </MyButton_v2>,
+        <MyButton_v2 key="2" img={iconUpload.src} onClick={() => setShowPdf_part(true)}>
+          單價分析
+        </MyButton_v2>,
+      ]}
+    >
+      匯出
+    </Dropdown>,
+  ];
 
   // --------------------------------------------------------------------------
 
@@ -2103,7 +2179,13 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
   return (
     <div className={classNames(style.container, 'relative')}>
-      <PageHeader02 tagList={tagList} customeLeft={customeLeft} panelList={panelList} />
+      <PageHeader02
+        //
+        tagList={tagList}
+        customeLeft={customeLeft}
+        customeRight={customeRight}
+        panelList={panelList}
+      />
 
       <div className={style.mainContainer}>
         <div className={style.quotation}>
@@ -2354,7 +2436,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       />
       {/*  客戶選擇器 */}
       <CustomerSelector
-        showModal={customerSelectorShow}
+        showModal={customerSelectorShow.show}
         label="複製報價單之客戶"
         onConfirm={(customerArr) => {
           const customerId = customerArr[0]?.id;

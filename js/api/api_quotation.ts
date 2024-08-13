@@ -13,6 +13,7 @@ import { AxiosError } from 'axios';
 import type {
   Tparams,
   TpageMetaDto,
+  TapiError,
   TquotationContentDto,
   TquotationDto,
   TcreateQuotationContentDto,
@@ -31,7 +32,7 @@ import type {
   TquotationAccounting_modifyContract,
   TquotationStatus,
   TbonusDto,
-  TapiError,
+  TcopyQuotationDto,
 } from './dtoTypes';
 
 export type {
@@ -1443,7 +1444,7 @@ export const apiPatchQuotationToPending = ({ contentId }: { contentId: string })
 // };
 
 // 複製報價單
-export const apiPostCopyQuotation = (body: { quotationId: string; customerId: string }) => {
+export const apiPostCopyQuotation = (body: TcopyQuotationDto) => {
   const api = '/quotation/copy-quotation';
 
   return axi
