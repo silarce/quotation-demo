@@ -1,12 +1,15 @@
 import { useState, useMemo, useEffect, forwardRef } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
+import Decimal from 'decimal.js';
 
 // antd
 import { Badge } from 'antd';
 
 // component
-import EditDefunctionBtn from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDeductionEditor';
+import EditDefunctionBtn, {
+  Tprops_deductionEditor_modal,
+} from 'components/page/worksDepartment/contracList/contract/accountReceivable/accountantDeductionEditor';
 
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -17,7 +20,7 @@ import { TreqPatch } from 'pages/worksDepartment/incomeSummons';
 
 // icon
 import { IconCheck02, IconEdit } from 'public/image/icon/svgComponent/svgIcons';
-import { UpDownArrow } from 'components/global/myAntd/collapse';
+// import { UpDownArrow } from 'components/global/myAntd/collapse';
 
 import scss from './summon.module.scss';
 
@@ -49,11 +52,15 @@ type Tstate_incomeBillSerial = {
   note: string;
   vendorName: string;
 
-  // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-  // temporary_separatePayment: string;
-
   //
-  readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
+  // readonly accountsReceivableDeduction: TincomeBillSerialDto['accountsReceivableDeduction'];
+  state_deduction: Tstate_deduction[];
+};
+
+type Tstate_deduction = {
+  id?: string;
+  itemName: string; // 扣款項目
+  detailedAmount: string; // 扣款金額
 };
 
 type TconfigItem = {
@@ -101,6 +108,8 @@ type TconfigKey =
     >
   | 'fee'
   | 'vendorName';
+
+export type { Tstate_incomeBillSerial };
 
 // ============================================================================
 // MARK:SummonsRow_pre
@@ -626,15 +635,37 @@ const cellPropsList_summon: TcellPropsList_summon = {
         value: state_incomeBillSerial.deductionPayment,
       });
 
-      const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setState_incomeBillSerial((prev) => {
-          const copy = { ...prev };
-          copy.deductionPayment = e.target.value;
-          copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+      const editDefunctionBtnProps_able: Tprops_deductionEditor_modal = {
+        accountantId: undefined,
+        incomeBillId: undefined,
+        defaultStateArr: state_incomeBillSerial.state_deduction,
+        onConfirm: ({ state_deductionArr }) => {
+          const deductionPayment = state_deductionArr.reduce((deductionPayment, item) => {
+            deductionPayment = new Decimal(deductionPayment).add(item.detailedAmount || 0).toNumber();
 
-          return copy;
-        });
+            return deductionPayment;
+          }, 0);
+
+          setState_incomeBillSerial((prev) => {
+            const copy = { ...prev };
+            copy.state_deduction = state_deductionArr;
+            copy.deductionPayment = deductionPayment.toString();
+            copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+
+            return copy;
+          });
+        },
       };
+
+      const editDefunctionBtnProps_disable: Tprops_deductionEditor_modal = {
+        accountantId: accountantId,
+        incomeBillId: state_incomeBillSerial.id,
+        // defaultStateArr: undefined,
+        // onConfirm: update_incomeBill,
+        forbidden: true,
+      };
+
+      const editDefunctionBtnProps = disabled ? editDefunctionBtnProps_disable : editDefunctionBtnProps_able;
 
       const inputSelProps: TinputSelProps = {
         disabled: true,
@@ -643,15 +674,17 @@ const cellPropsList_summon: TcellPropsList_summon = {
             className: 'text-right',
             type,
             value,
-            onChange: onChange,
+            onChange: () => {},
           },
         },
         suffix: accountantId && (
           <EditDefunctionBtn
+            {...editDefunctionBtnProps}
             //
-            accountantId={accountantId}
-            incomeBillId={state_incomeBillSerial.id}
-            onConfirm={update_incomeBill}
+            // accountantId={accountantId}
+            // incomeBillId={state_incomeBillSerial.id}
+            // defaultStateArr={defaultStateArr}
+            // onConfirm={update_incomeBill}
           />
         ),
       };
@@ -890,6 +923,14 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
     let { difference } = incomeBillSerial;
     difference = (difference ?? '').trimEnd();
 
+    const state_deduction = (accountsReceivableDeduction ?? []).map((item) => {
+      return {
+        id: item.id,
+        itemName: item.itemName,
+        detailedAmount: String(item.detailedAmount),
+      };
+    });
+
     const defaultState: Tstate_incomeBillSerial = {
       id,
       billSerialNumber: billSerialNumber,
@@ -911,7 +952,7 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       note: note ?? '',
       vendorName: accountant.vendorName ?? '',
 
-      accountsReceivableDeduction: accountsReceivableDeduction,
+      state_deduction: state_deduction,
     };
 
     return defaultState;
