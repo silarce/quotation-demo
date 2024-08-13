@@ -662,11 +662,11 @@ const sidePathList: TsidePathList = {
           label: '單據管理',
           erpFeature: devPass,
           list: [
-            {
-              label: '單據審核',
-              path: path01 + '/reviewList',
-              erpFeature: devPass,
-            },
+            // {
+            //   label: '單據審核',
+            //   path: path01 + '/reviewList',
+            //   erpFeature: devPass,
+            // },
             {
               label: '請購申請',
               path: path01 + '/addPurchaseRequisition',
@@ -730,6 +730,24 @@ const sidePathList: TsidePathList = {
               },
               erpFeature: devPass,
             },
+            {
+              label: '領料管理',
+              path: path01 + '/pickingList',
+              activeChecker: ({ router }) => {
+
+                const { pathname, query } = router
+                console.log(router);
+                if (pathname === "/factoryDepartment/pickingList") {
+                  return true;
+                }
+                return false;
+
+              },
+              query: {
+                type: 'prodReceiptList',
+              },
+              erpFeature: devPass,
+            },
           ],
         },
         {
@@ -778,10 +796,10 @@ const sidePathList: TsidePathList = {
               erpFeature: devPass,
             },
             {
-              label: '物料管理',
-              path: path01 + '/getMaterial/pickingList',
+              label: '物料維護',
+              path: path01 + '/productList',
               query: {
-                type: 'pickingList',
+                type: 'productList',
               },
               erpFeature: devPass,
             },

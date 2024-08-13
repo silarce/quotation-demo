@@ -1,6 +1,6 @@
-import { useState, useEffect, MouseEvent } from 'react';
-
+import { useState, useEffect, MouseEvent, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import _ from 'lodash';
 
 // components
 import Thead from './contractList/thead';
@@ -41,17 +41,22 @@ export default function ContractList({
 
   const [contractId, setContractId] = useState<string>();
 
-  const { data: contract, update, clear } = useGetContract_id(contractId, { preBuiltPopulate: 'worksDepartment03' });
-  const subContracts = contract?.subContracts;
-
-  useEffect(() => {
-    update();
-  }, [contractId]);
+  // panelHeader點擊變粉紅色用
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   // ------------------------------------------------------------------
 
-  // panelHeader點擊變粉紅色用
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const { data: contract, update, clear } = useGetContract_id(contractId, { preBuiltPopulate: 'worksDepartment03' });
+
+  const subContracts = useMemo(() => {
+    let subContracts = contract?.subContracts ?? [];
+
+    subContracts = _.sortBy(subContracts, 'version');
+
+    return subContracts;
+  }, [contract?.subContracts]);
+
+  // ------------------------------------------------------------------
 
   const changeActive = (panelIndex: string | string[]) => {
     panelIndex = panelIndex as string;
@@ -66,23 +71,34 @@ export default function ContractList({
 
   // ------------------------------------------------------------------
 
-  const contractDetailArr: Tdetail[] =
-    subContracts?.map((item) => {
-      const content = item.content;
+  const contractDetailArr: Tdetail[] = useMemo(() => {
+    const [first, ...subContracts_reduce] = subContracts;
 
-      const detail: Tdetail = {
-        date: content.quotationDate,
-        describe: '',
-        onIconClick: () => {
-          router.push({
-            pathname: '/worksDepartment/contractList/contract/workContactDoc',
-            query: { contractId, version: item.version },
-          });
-        },
-      };
+    const contractDetailArr =
+      subContracts_reduce.map((item, index) => {
+        const content = item.content;
+        const detail: Tdetail = {
+          date: content.quotationDate,
+          describe: '',
+          onIconClick: () => {
+            router.push({
+              pathname: '/worksDepartment/contractList/contract/workContactDoc',
+              query: { contractId, version: item.version },
+            });
+          },
+        };
 
-      return detail;
-    }) ?? [];
+        return detail;
+      }) ?? [];
+
+    return contractDetailArr;
+  }, [subContracts]);
+
+  // ------------------------------------------------------------------
+
+  useEffect(() => {
+    update();
+  }, [contractId]);
 
   // ------------------------------------------------------------------
   return (

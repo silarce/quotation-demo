@@ -27,6 +27,7 @@ import type {
   TaccountantInvoiceBookDto,
   TcreateAccountantInvoiceBookDto,
   TupdateAccountantInvoiceBookDto,
+  TapiError,
 } from './dtoTypes';
 
 export type {
@@ -231,8 +232,8 @@ const apiPatchAccountant = async (
   return axi
     .patch<TaccountantDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => {
-      callAlert && myAlert.err({ title: '更新收款紀錄失敗', content: err.message });
+    .catch((err: AxiosError<TapiError>) => {
+      callAlert && myAlert.err({ title: '更新收款紀錄失敗', content: err.response?.data.message ?? err.message });
 
       return Promise.reject(err);
     });

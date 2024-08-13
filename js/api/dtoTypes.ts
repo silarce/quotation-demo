@@ -2297,6 +2297,12 @@ export type TquotationContractDto = {
 
 export type TcreateModifyQuotationDto = TcreateQuotationContentDto;
 
+export type TcopyQuotationDto = {
+  quotationId: string;
+  customerId: string;
+  isRelationQuotation?: boolean;
+};
+
 // export type TcreateModifyQuotationDto = {
 //   // 報價日期
 //   quotationDate?: string;
@@ -3738,6 +3744,7 @@ export type TupdateIncomeBillSerialDto = Pick<
   | 'noteNumber'
   | 'noteMaturityDate'
   | 'receivablePayment'
+  // 20240813 發現patch deductionPayment無效，還未知後端有沒有修正
   | 'deductionPayment'
   | 'unpaidPayment'
   | 'difference'
@@ -3834,6 +3841,7 @@ export type TcreateIncomeBillSettlementFormDto = {
   // 需結算之收入傳票 @IsUUID() // 不送這個property就是結算當月
   // 已被結算過的incomeBillId不可以再次結算，應該會失敗
   incomeBillIds?: string[];
+  temp_date?: string; // 預接api，不知道property
 };
 
 export type TupdateIncomeBillSettlementFormDto = {
@@ -3841,6 +3849,11 @@ export type TupdateIncomeBillSettlementFormDto = {
   internalNextMonthEstimatePayment: number;
   // 下月預估收款額(外銷)
   foreignNextMonthEstimatePayment: number;
+
+  // 應收帳款總額
+  internalReceivablePayment: number;
+  // 應收帳款總額(外銷)
+  foreignReceivablePayment: number;
 };
 
 // MARK: /engineering
@@ -4179,7 +4192,7 @@ export type TaccountantDto = {
 
   // 已分出金額
   splitPayment: number[] | null;
-  isAlreadyImportIncomeBill :boolean;
+  isAlreadyImportIncomeBill: boolean;
 };
 
 export type TcreateAccountantDto = Pick<

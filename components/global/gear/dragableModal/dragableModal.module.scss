@@ -21,7 +21,7 @@ $borderColor: theme("colors.border");
   padding: 10px;
   background-color: theme("colors.bgc01");
   border-bottom: solid 1px $borderColor;
-  cursor: pointer;
+  cursor: move;
   user-select: none;
 
   > .text {
@@ -36,6 +36,7 @@ $borderColor: theme("colors.border");
     width: 20px;
     // 必須有z-index，確保croll可以在遮罩的上面，才能被點到
     z-index: 0;
+    cursor: pointer;
   }
 
   &.isDragging {
