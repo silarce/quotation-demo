@@ -18,7 +18,7 @@ import Summons, {
 
 // gear
 import SelectBar from 'components/global/gear/select/selectBar/selectBar';
-import { Collapse, useActiveKey } from 'components/global/myAntd/collapse';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // css
@@ -77,8 +77,6 @@ type TreqPatch = (incomeBillSerialId: string, state_incomeBillSerial: Tstate_inc
 export type { TreqPatch };
 
 // ==============================================================================
-
-const Panel = Collapse.Panel;
 
 // ==============================================================================
 

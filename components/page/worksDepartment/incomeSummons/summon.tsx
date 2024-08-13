@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect, forwardRef } from 'react';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
-import Decimal from 'decimal.js';
 
 // antd
 import { Badge } from 'antd';
@@ -24,6 +23,7 @@ import scss from './summon.module.scss';
 
 // untils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import calcIncomeBillUnpaidPayment from 'js/utils/calc/calcIncomeBillUnpaidPayment';
 
 // ============================================================================
 
@@ -420,7 +420,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
   },
   contractPayment: {
     label: '承攬價',
-    style: { width: 100 },
+    style: { width: 120 },
     className: 'text-right',
     createInputSelProps: ({
       disabled,
@@ -673,7 +673,8 @@ const cellPropsList_summon: TcellPropsList_summon = {
       update_incomeBill,
     }) => {
       const { type, value } = reducer_input({
-        disabled: disabled || !isPaperImported,
+        // disabled: disabled || !isPaperImported,
+        disabled: true,
         value: state_incomeBillSerial.deductionPayment,
       });
 
@@ -688,6 +689,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
       };
 
       const inputSelProps: TinputSelProps = {
+        disabled: true,
         inputProps: {
           props: {
             className: 'text-right',
@@ -711,7 +713,7 @@ const cellPropsList_summon: TcellPropsList_summon = {
   },
   unpaidPayment: {
     label: '餘額',
-    style: { width: 100 },
+    style: { width: 120 },
     className: 'text-right',
     createInputSelProps: ({
       disabled,
@@ -873,11 +875,18 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
     fee,
   } = state_incomeBillSerial;
 
-  const unpaidPayment = new Decimal(contractPayment || periodPayment || 0)
-    .minus(priorPeriodPayment || 0)
-    .minus(deductionPayment || 0)
-    .minus(fee || 0)
-    .toNumber();
+  const unpaidPayment = calcIncomeBillUnpaidPayment({
+    contractPayment: Number(contractPayment),
+    periodPayment: Number(periodPayment),
+    priorPeriodPayment: Number(priorPeriodPayment),
+    deductionPayment: Number(deductionPayment),
+    fee: Number(fee),
+  });
+  // const unpaidPayment = new Decimal(contractPayment || periodPayment || 0)
+  //   .minus(priorPeriodPayment || 0)
+  //   .minus(deductionPayment || 0)
+  //   .minus(fee || 0)
+  //   .toNumber();
 
   return unpaidPayment;
 };
