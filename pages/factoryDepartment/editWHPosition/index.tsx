@@ -882,7 +882,6 @@ export default function EditWHPosition() {
                             }}
                         />
                         {showSuggestions && (
-
                             <div
                                 style={{
                                     position: 'absolute',
@@ -892,8 +891,8 @@ export default function EditWHPosition() {
                                     borderRadius: '8px',
                                     boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
                                     width: '750px',
-                                    maxHeight: '200px',
-                                    overflowY: 'auto',
+                                    maxHeight: '300px', // 擴大整個容器的高度
+                                    overflow: 'hidden', // 隱藏整個容器的滾動條
                                     fontSize: '16px',
                                     left: `${position.x}px`,
                                     top: `${position.y}px`,
@@ -901,7 +900,18 @@ export default function EditWHPosition() {
                                 }}
                                 onMouseDown={handleMouseDown}
                             >
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px', borderBottom: '1px solid #ccc' }}>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        padding: '8px',
+                                        borderBottom: '1px solid #ccc',
+                                        backgroundColor: '#f5f5f5', // 標題列的背景色
+                                        cursor: 'move', // 讓用戶知道可以拖動
+                                    }}
+                                >
+                                    <div style={{ fontWeight: 'bold' }}>查詢結果</div> {/* 標題文字 */}
                                     <button
                                         onClick={() => setShowSuggestions(false)}
                                         style={{
@@ -913,7 +923,6 @@ export default function EditWHPosition() {
                                             color: '#555',
                                             outline: 'none',
                                             transition: 'color 0.3s ease',
-
                                         }}
                                         onMouseOver={(e) => (e.currentTarget.style.color = '#000')}
                                         onMouseOut={(e) => (e.currentTarget.style.color = '#555')}
@@ -921,41 +930,43 @@ export default function EditWHPosition() {
                                         ×
                                     </button>
                                 </div>
-                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                    {filteredData.length > 0 ? (
-                                        filteredData.map((item, index) => (
-                                            <tr
-                                                key={index}
-                                                onClick={() => handleSelect(item)}
-                                                style={{
-                                                    padding: '8px',
-                                                    cursor: 'pointer',
-                                                    borderBottom: '1px solid #ddd',
-                                                    backgroundColor: '#fff',
-                                                }}
-                                                onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
-                                                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f9f9f9')}
-                                                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
-                                            >
-                                                <td style={{ padding: '8px', width: '150px' }}>
-                                                    {item.productid}
-                                                </td>
-                                                <td style={{ padding: '8px', width: '250px' }}>
-                                                    {item.name}
-                                                </td>
-                                                <td style={{ padding: '8px', width: '350px' }}>
-                                                    {item.spec}
+                                <div
+                                    style={{
+                                        maxHeight: '350px', // 限制table區域的最大高度
+                                        overflowY: 'auto', // 允許垂直滾動
+                                    }}
+                                >
+                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                        {filteredData.length > 0 ? (
+                                            filteredData.map((item, index) => (
+                                                <tr
+                                                    key={index}
+                                                    onClick={() => handleSelect(item)}
+                                                    style={{ padding: '8px', cursor: 'pointer', border: '1px solid gray' }}
+                                                    onMouseDown={(e) => e.preventDefault()} // 防止 blur 事件
+                                                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#f0f0f0')}
+                                                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'white')}
+                                                >
+                                                    <td style={{ padding: '8px', width: '150px' }}>
+                                                        {item.productid}
+                                                    </td>
+                                                    <td style={{ padding: '8px', width: '250px' }}>
+                                                        {item.name}
+                                                    </td>
+                                                    <td style={{ padding: '8px', width: '350px' }}>
+                                                        {item.spec}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
+                                                    沒有匹配的結果
                                                 </td>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td style={{ textAlign: 'center', padding: '8px', color: '#888' }}>
-                                                沒有匹配的結果
-                                            </td>
-                                        </tr>
-                                    )}
-                                </table>
+                                        )}
+                                    </table>
+                                </div>
                             </div>
                         )}
 

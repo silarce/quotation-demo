@@ -186,23 +186,20 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       newlength = alphaIncrement(newlength);
     }
 
-    return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 1).toString();
+    return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
   };
 
 
-  async function GetPickingListDetailById(plid: any, create_at: any, create_by: any, lotid: any, picked: any, item: any) {
+  async function GetPickingListDetailById(item: any) {
 
     // console.log(item);
     router.replace({
       pathname: `/factoryDepartment/getMaterial/pickingList`,
       query: {
-        type: 'ss',
-        plid: plid,
-        create_at: getTaiwanDateStr(create_at),
-        create_by: create_by,
-        lotid: lotid,
-        picked: picked,
-        main_item: item.main_item,
+        pickinglistid: item.pickinglistid,
+        create_at: getTaiwanDateStr(item.create_at),
+        create_by: item.create_by,
+        lotid: item.lotid,
         note: item.note
       },
     });
@@ -537,14 +534,13 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader6}>
               <div className={scss.row01}>
-                <span>{_item.plid}</span>
+                <span>{_item.pickinglistid}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.create_by}</span>
-                <span>
-                  <span style={{ color: '#14256a', display: `${_item.picked === true ? "" : "none"}` }}>已領</span>
-                  <span style={{ color: '#ea1833', display: `${_item.picked === false ? "" : "none"}` }}>未領</span>
+                <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "領料中" ? '#28a745' : '#ea1833' }}>
+                  {_item.status}
                 </span>
-                <span ><IconDetail onClick={() => { GetPickingListDetailById(_item.plid, _item.create_at, _item.create_by, _item.lotid, _item.picked, _item) }} /></span>
+                <span ><IconDetail onClick={() => { GetPickingListDetailById(_item) }} /></span>
               </div>
             </CellWithBar>
           ))
@@ -607,14 +603,14 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 className={`${scss.row01} ${_item.prodentryid === selectedItemId ? scss.selectedRow : ''}`}
                 onClick={() => GetProdEntry(_item)}
               >
-                {/* <span>{index + 1}</span> */}
-                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                <span>{index + 1}</span>
                 <span>{_item.prodentryid}</span>
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
                 {/* <span ><IconDetail onClick={() => { GetProdEntry(_item) }} /></span> */}
-                <span>{_item.note}</span>
                 {/* <span><IconDetail/></span> */}
                 {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
+                <span>{_item.suppliername}</span>
               </div>
             </CellWithBar>
           ))
@@ -810,19 +806,43 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   // }
   //#endregion
   //#region 新增請購單明細
-  else if (type === "AddPR_ReqList") {
+  // else if (type === "AddPR_ReqList") {
+  //   return (
+  //     <div>
+  //       {error && <p>Error2: {error}</p>}
+  //       {data && (
+  //         data.map((_item: any, index: number) => (
+  //           <CellWithBar key={index} className={scss.panelHeader20}>
+  //             <div className={scss.row01}>
+  //               <span>{index + 1}</span>
+  //               <span>{_item.productid}</span>
+  //               <span>{_item.name}</span>
+  //               <span>{_item.spec}</span>
+  //               <span>{_item.quantity}</span>
+  //             </div>
+  //           </CellWithBar>
+  //         ))
+  //       )}
+  //     </div>
+  //   );
+  // }
+  //#endregion
+  //#region productList明細
+  else if (type === "ProductList") {
     return (
       <div>
         {error && <p>Error2: {error}</p>}
         {data && (
           data.map((_item: any, index: number) => (
-            <CellWithBar key={index} className={scss.panelHeader20}>
+            <CellWithBar key={index} className={scss.panelHeader21}>
               <div className={scss.row01}>
                 <span>{index + 1}</span>
                 <span>{_item.productid}</span>
                 <span>{_item.name}</span>
                 <span>{_item.spec}</span>
-                <span>{_item.quantity}</span>
+                <span>{_item.count}</span>
+                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                <span>{getTaiwanDateStr(_item.update_at)}</span>
               </div>
             </CellWithBar>
           ))
@@ -831,6 +851,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     );
   }
   //#endregion
+
 
   return null; // Add default return in case type is not matched
 
