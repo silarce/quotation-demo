@@ -139,72 +139,14 @@ const Summons_pre = (
     incomeBillSerial: TincomeBillSerialDto;
     reqPatch: TreqPatch;
     update_incomeBill: () => void;
-    changeActive: () => void;
+    changeActive?: () => void;
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
   const accountantId = incomeBillSerial.accountant.id;
-
-  const defaultState = useMemo(() => {
-    const {
-      id,
-      billSerialNumber,
-      receiveDate,
-      contractNumber,
-      projectName,
-      contractPayment,
-      periodPayment,
-      priorPeriodPayment,
-      importAccountingNumber,
-      noteNumber,
-      noteMaturityDate,
-      receivablePayment,
-      deductionPayment,
-      unpaidPayment,
-      //
-      accountant,
-      //
-      note,
-
-      accountsReceivableDeduction,
-      fee,
-    } = incomeBillSerial;
-
-    let { difference } = incomeBillSerial;
-    difference = (difference ?? '').trimEnd();
-
-    const defaultState: Tstate_incomeBillSerial = {
-      id,
-      billSerialNumber: billSerialNumber,
-      receiveDate: receiveDate ? moment(receiveDate) : null,
-      contractNumber: contractNumber || '',
-      projectName: projectName || '',
-      contractPayment: String(contractPayment || ''),
-      periodPayment: String(periodPayment || ''),
-      priorPeriodPayment: String(priorPeriodPayment || ''),
-      importAccountingNumber: importAccountingNumber || '',
-      noteNumber: noteNumber || '',
-      noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
-      receivablePayment: String(receivablePayment || ''),
-      deductionPayment: String(deductionPayment || ''),
-      unpaidPayment: String(unpaidPayment || ''),
-      difference: difference || '',
-      fee: fee || 0,
-      //
-      note: note ?? '',
-      vendorName: accountant.vendorName ?? '',
-
-      accountsReceivableDeduction: accountsReceivableDeduction,
-
-      // 看錯需求，這是不需要的，待PR之前再把這個註解刪掉
-      // temporary_separatePayment: (temporary_separatePayment || 0).toLocaleString(),
-    };
-
-    return defaultState;
-  }, [incomeBillSerial]);
+  const defaultState = useDefaultState(incomeBillSerial);
 
   const [state_incomeBillSerial, setState_incomeBillSerial] = useState<Tstate_incomeBillSerial>(defaultState);
-
   const [disabled, setDisabled] = useState(true);
 
   // isPaperImported 已匯入紙本應收帳款(舊的收款紀錄)，若為true，則可以編輯所有欄位
@@ -225,6 +167,8 @@ const Summons_pre = (
   }, [defaultState, disabled]);
 
   // ---------------------------------------------------------------------
+
+  // MARK: RENDER
 
   return (
     <SummonsRow ref={ref} className={classNames(scss.tbody, !disabled && scss.enabled, className)}>
@@ -278,6 +222,8 @@ const Summons_pre = (
   );
 };
 
+// MARK: END
+
 // forwardRef
 const SummonsRow = forwardRef(SummonsRow_pre);
 const Summons = forwardRef(Summons_pre);
@@ -285,6 +231,8 @@ const Summons = forwardRef(Summons_pre);
 // ============================================================================
 // ============================================================================
 // ============================================================================
+
+// region PROPSLIST
 
 const keyArr: TconfigKey[] = [
   'billSerialNumber',
@@ -786,13 +734,33 @@ const cellPropsList_summon: TcellPropsList_summon = {
     label: '匯費',
     style: { width: 100 },
     className: 'text-right',
-    createInputSelProps: ({ disabled, state_incomeBillSerial, setState_incomeBillSerial }) => {
+    createInputSelProps: ({
+      //
+      disabled,
+      state_incomeBillSerial,
+      setState_incomeBillSerial,
+    }) => {
+      const { type, value } = reducer_input({
+        disabled: disabled,
+        value: state_incomeBillSerial.fee,
+      });
+
       const inputSelProps: TinputSelProps = {
         disabled: disabled,
         inputProps: {
           props: {
+            type,
             className: 'text-right',
-            defaultValue: state_incomeBillSerial.fee.toLocaleString(),
+            value,
+            onChange: (e) => {
+              setState_incomeBillSerial((state) => {
+                const copy = { ...state };
+                copy.fee = Number(e.target.value || 0);
+                copy.unpaidPayment = calcUnpaidPayment(copy).toString();
+
+                return copy;
+              });
+            },
           },
         },
       };
@@ -889,6 +857,65 @@ const calcUnpaidPayment = (state_incomeBillSerial: Tstate_incomeBillSerial) => {
   //   .toNumber();
 
   return unpaidPayment;
+};
+
+// =============================================================================
+
+const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
+  return useMemo(() => {
+    const {
+      id,
+      billSerialNumber,
+      receiveDate,
+      contractNumber,
+      projectName,
+      contractPayment,
+      periodPayment,
+      priorPeriodPayment,
+      importAccountingNumber,
+      noteNumber,
+      noteMaturityDate,
+      receivablePayment,
+      deductionPayment,
+      unpaidPayment,
+      //
+      accountant,
+      //
+      note,
+
+      accountsReceivableDeduction,
+      fee,
+    } = incomeBillSerial;
+
+    let { difference } = incomeBillSerial;
+    difference = (difference ?? '').trimEnd();
+
+    const defaultState: Tstate_incomeBillSerial = {
+      id,
+      billSerialNumber: billSerialNumber,
+      receiveDate: receiveDate ? moment(receiveDate) : null,
+      contractNumber: contractNumber || '',
+      projectName: projectName || '',
+      contractPayment: String(contractPayment || ''),
+      periodPayment: String(periodPayment || ''),
+      priorPeriodPayment: String(priorPeriodPayment || ''),
+      importAccountingNumber: importAccountingNumber || '',
+      noteNumber: noteNumber || '',
+      noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
+      receivablePayment: String(receivablePayment || ''),
+      deductionPayment: String(deductionPayment || ''),
+      unpaidPayment: String(unpaidPayment || ''),
+      difference: difference || '',
+      fee: fee || 0,
+      //
+      note: note ?? '',
+      vendorName: accountant.vendorName ?? '',
+
+      accountsReceivableDeduction: accountsReceivableDeduction,
+    };
+
+    return defaultState;
+  }, [incomeBillSerial]);
 };
 
 // =============================================================================
