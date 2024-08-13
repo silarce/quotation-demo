@@ -48,11 +48,15 @@ type Tprops = {
   onConfirm?: (props: { accountant: null; state_deductionArr: Tstate_deduction[] }) => void;
   onCancel?: () => void;
   cancelOnSuccess?: boolean;
+  forbidden?: boolean;
 };
 
-type Tprops_modal = Pick<Tprops, 'accountantId' | 'incomeBillId' | 'defaultStateArr' | 'onConfirm' | 'cancelOnSuccess'>;
+type Tprops_modal = Pick<
+  Tprops,
+  'accountantId' | 'incomeBillId' | 'defaultStateArr' | 'onConfirm' | 'cancelOnSuccess' | 'forbidden'
+>;
 
-export type { Tstate_deduction };
+export type { Tstate_deduction, Tprops_modal as Tprops_deductionEditor_modal };
 
 // ===============================================================]
 
@@ -69,9 +73,11 @@ function EditDeductionPanel({
   onConfirm,
   onCancel,
   cancelOnSuccess,
+  forbidden,
 }: Tprops) {
   // --------------------------------------------------------------------
   const [readonly, setReadonly] = useState(true);
+
   const [state_deductionArr, setState_deductionArr] = useState<Tstate_deduction[]>([]);
 
   if (cancelOnSuccess === undefined) {
@@ -293,7 +299,7 @@ function EditDeductionPanel({
       </div>
       {/*  */}
 
-      {!readonly && (
+      {!readonly && !forbidden && (
         <div className={classNames(scss.btnBar)}>
           <MyButton_v2 onClick={() => setReadonly(true)}>取消</MyButton_v2>
           <MyButton_v2 theme="danger" onClick={handle_confirm}>
@@ -302,7 +308,7 @@ function EditDeductionPanel({
         </div>
       )}
 
-      {readonly && (
+      {readonly && !forbidden && (
         <div className={classNames(scss.btnBar)}>
           <MyButton_v2 onClick={() => setReadonly(false)}>編輯</MyButton_v2>
           <MyButton_v2 onClick={onCancel}>關閉</MyButton_v2>
@@ -318,7 +324,15 @@ function EditDeductionPanel({
 // ====================================================================
 
 // 直接呼叫modal的靜態函式
-const editDeduction = ({ accountantId, incomeBillId, defaultStateArr, onConfirm, cancelOnSuccess }: Tprops_modal) => {
+const editDeduction = ({
+  //
+  accountantId,
+  incomeBillId,
+  defaultStateArr,
+  onConfirm,
+  cancelOnSuccess,
+  forbidden,
+}: Tprops_modal) => {
   const modal = myAlert.clear({});
 
   modal.update({
@@ -331,6 +345,7 @@ const editDeduction = ({ accountantId, incomeBillId, defaultStateArr, onConfirm,
         onConfirm={onConfirm}
         onCancel={modal.destroy}
         cancelOnSuccess={cancelOnSuccess}
+        forbidden={forbidden}
       />
     ),
   });
@@ -342,6 +357,7 @@ const EditDefunctionBtn = ({
   incomeBillId,
   defaultStateArr,
   onConfirm,
+  forbidden,
 }: {
   className?: string;
 } & Tprops_modal) => {
@@ -356,6 +372,7 @@ const EditDefunctionBtn = ({
           incomeBillId,
           defaultStateArr,
           onConfirm,
+          forbidden,
         });
       }}
     />
