@@ -38,18 +38,19 @@ import moment_tz from 'moment-timezone';
 // 時區設為台北時間
 moment_tz.tz.setDefault('Asia/Taipei');
 
+const AppContext = createContext<TappContext>(null!);
+
+// =============================================================================
+
 // eslint-disable-next-line @typescript-eslint/ban-types
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
-
-export const AppContext = createContext<TappContext>(null!);
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-// =============================================================================
 type TappContext = {
   rwd1023: boolean;
   rwd1439: boolean;
@@ -58,17 +59,28 @@ type TappContext = {
   erpFeature: TerpFeatureDto[] | undefined;
 };
 
+type TmyPageProps = {
+  isAdmin: boolean;
+  userInfo: TuserDto | undefined;
+  userGrade: number;
+  userErpFeature: TerpFeatureDto[] | undefined;
+  rwd1023: boolean;
+  rwd1439: boolean;
+  onLogin: ({ account, password }: { account: string; password: string }) => Promise<void>;
+};
+
 // =============================================================================
 function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const router = appProps.router;
-  const [ready, setReady] = useState(false);
+
   const rwd1023 = useMediaQuery({ query: '(max-width: 1023px)' });
   const rwd1439 = useMediaQuery({ query: '(max-width: 1439px)' });
 
+  useGlobalErrorCatcher();
+
+  const [ready, setReady] = useState(false);
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe();
   const { erpFeature: userErpFeature, setErpFeature, updateErpFeature: updateUserErpFeature } = useApiErpFeaturesMe();
-
-  useGlobalErrorCatcher();
 
   // ----------------------------------------------------------------------------
 
@@ -93,7 +105,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     }
   };
 
-  // -----------------------------------------------------------------------
   const reqLogout = async () => {
     try {
       await apiLogout();
@@ -166,6 +177,18 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   根据 Ant Design 设计规范要求，我们会在按钮内(文本按钮和链接按钮除外)只有两个汉字时自动添加空格，如果你不需要这个特性，可以设置 ConfigProvider 的 autoInsertSpaceInButton 为 false。
    */
   // ------------------------------------------------------------------
+
+  const myPageProps: TmyPageProps = {
+    isAdmin: userInfo?.account === 'admin3',
+    userInfo: userInfo,
+    userGrade: userGrade,
+    userErpFeature: userErpFeature,
+    rwd1023: rwd1023,
+    rwd1439: rwd1439,
+    onLogin: onLogin,
+  };
+
+  // ------------------------------------------------------------------
   return (
     <AntdConfigProvider autoInsertSpaceInButton={false}>
       <Head>
@@ -175,13 +198,14 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
         {getLayout(
           <Component
             {...pageProps}
-            isAdmin={userInfo?.account === 'admin3'}
-            userInfo={userInfo}
-            userGrade={userGrade}
-            userErpFeature={userErpFeature}
-            rwd1023={rwd1023}
-            rwd1439={rwd1439}
-            onLogin={onLogin}
+            {...myPageProps}
+            // isAdmin={userInfo?.account === 'admin3'}
+            // userInfo={userInfo}
+            // userGrade={userGrade}
+            // userErpFeature={userErpFeature}
+            // rwd1023={rwd1023}
+            // rwd1439={rwd1439}
+            // onLogin={onLogin}
           />
         )}
       </AppContext.Provider>
@@ -191,8 +215,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     </AntdConfigProvider>
   );
 }
-
-export default MyApp;
 
 // =============================================================
 
@@ -261,3 +283,8 @@ const Foo = ({ onBtnClick }: { onBtnClick?: () => void }) => {
     </div>
   );
 };
+
+// =======================================================================
+export type { NextPageWithLayout, TappContext, TmyPageProps };
+export default MyApp;
+export { AppContext };
