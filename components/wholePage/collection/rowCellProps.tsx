@@ -38,7 +38,7 @@ type TrowCellProps = {
     state_accountant: Tstate_accountant;
     setState_accountant: React.Dispatch<React.SetStateAction<Tstate_accountant>>;
     handle_checkIsImported: () => void;
-    isAllowToEditIsImported?: boolean;
+    // isAllowToEditIsImported?: boolean;
   }) => {
     inputProps?: TinputProps;
     textareaProps?: TtextareaProps;
@@ -171,13 +171,13 @@ const rowCellPropsList: TconfigList = {
     },
     className: '',
     inputSelPropsCreator: ({
-      isAllowToEditIsImported,
+      // isAllowToEditIsImported,
       // disabled,
-      bankAccountOptionArr,
-      handle_checkIsImported,
-      limitedDate,
+      // bankAccountOptionArr,
+      // handle_checkIsImported,
+      // limitedDate,
       state_accountant,
-      setState_accountant,
+      // setState_accountant,
     }) => {
       const value = state_accountant.isImported;
 
@@ -186,7 +186,8 @@ const rowCellPropsList: TconfigList = {
       const checkBoxProps_v2: TcheckBoxProps_v2 = {
         props: {
           // disabled: !!value_bool || !isAllowToEditIsImported,
-          disabled: !isAllowToEditIsImported,
+          // disabled: !isAllowToEditIsImported,
+          disabled: true,
           value: value_bool ? ['true'] : [],
           // onChange: (arr) => {
           //   const isImported = arr[0];
@@ -398,15 +399,6 @@ const rowCellPropsList: TconfigList = {
       const value = value_Arr.join('\n');
 
       const reactNode = <span className="whitespace-pre-wrap">{value}</span>;
-
-      // const textareaProps: TtextareaProps = {
-      //   props: {
-      //     readOnly: true,
-      //     placeholder: '系統自動產生',
-      //     value,
-      //     onChange: (e) => {},
-      //   },
-      // };
 
       return { reactNode };
     },

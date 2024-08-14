@@ -147,7 +147,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
 
   // ------------------------------------------------------------------------------
 
-  const [disabled = isWorksDepartment, setDisabled] = useState(true);
+  // const [disabled = isWorksDepartment, setDisabled] = useState(true);
   const [showNewRow, setShowNewRow] = useState(false);
 
   // const [accountantId, setAccountantId] = useState<string>();
