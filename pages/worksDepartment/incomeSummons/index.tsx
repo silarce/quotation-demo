@@ -171,6 +171,10 @@ export default function IncomeSummons() {
       note,
       state_deduction,
       fee,
+      //
+      isCashierSeen,
+      isWorkSupervisorSeen,
+      isManagerSeen,
     } = state_incomeBillSerial;
 
     const incomeBillDeduction = state_deduction.map((item) => {
@@ -198,6 +202,9 @@ export default function IncomeSummons() {
 
       fee,
       incomeBillDeduction: incomeBillDeduction,
+      isCashierSeen,
+      isWorkSupervisorSeen,
+      isManagerSeen,
     };
 
     await apiPatchIncomeBill(incomeBillSerialId, body).then(update_incomeBill);

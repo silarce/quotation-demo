@@ -82,7 +82,13 @@
     flex: 1;
     user-select: none;
     > .reviewer {
-      cursor: pointer;
+      &.isReviewer {
+        cursor: pointer;
+        &:hover {
+          background-color: theme("colors.hoverBgc");
+        }
+      }
+      width: fit-content;
     }
   }
 }
