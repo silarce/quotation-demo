@@ -130,7 +130,12 @@ const Row = ({
 
   let isAllowToEditIsImported = false;
 
-  if (!isNew && isWorksDepartment && !state_accountant.billSerialNumber.length) {
+  if (
+    !isNew &&
+    isWorksDepartment &&
+    // && !state_accountant.billSerialNumber.length
+    !isAlreadyImportIncomeBill
+  ) {
     isAllowToEditIsImported = true;
   }
 
@@ -240,6 +245,8 @@ const Row = ({
       .flatMap((ib) => ib.accountsReceivableDeduction)
       .filter((item) => !!item) as TaccountsReceivableDeductionDto[];
 
+    // const isPaperImported = incomeBill.some((bill) => bill.isPaperImported);
+
     setState_accountant({
       insertDate: insertDate ? moment(insertDate) : null,
       importAccountingNumber: importAccountingNumber ?? '',
@@ -290,9 +297,14 @@ const Row = ({
               <IconDelete01 className={classNames(!disabled && 'invisible')} onClick={handle_delete} />
             </>
           ) : (
-            <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant)}>
-              匯入發票
-            </MyButton_v2>
+            <div className={scss.subBtnBar}>
+              <MyButton_v2 px="px22" py="py4" onClick={() => setAccountantId?.(data_accountant)}>
+                匯入發票
+              </MyButton_v2>
+              <MyButton_v2 px="px22" py="py4" onClick={handle_checkIsImported}>
+                匯入紙本
+              </MyButton_v2>
+            </div>
           )
         }
       </div>

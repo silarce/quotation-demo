@@ -185,16 +185,17 @@ const rowCellPropsList: TconfigList = {
 
       const checkBoxProps_v2: TcheckBoxProps_v2 = {
         props: {
-          disabled: !!value_bool || !isAllowToEditIsImported,
+          // disabled: !!value_bool || !isAllowToEditIsImported,
+          disabled: !isAllowToEditIsImported,
           value: value_bool ? ['true'] : [],
-          onChange: (arr) => {
-            const isImported = arr[0];
+          // onChange: (arr) => {
+          //   const isImported = arr[0];
 
-            if (isImported === 'true') {
-              handle_checkIsImported?.();
-              // setState_accountant((state) => ({ ...state, isImported: true }));
-            }
-          },
+          //   if (isImported === 'true') {
+          //     handle_checkIsImported?.();
+          //     // setState_accountant((state) => ({ ...state, isImported: true }));
+          //   }
+          // },
         },
         checkBoxPropsArr: [
           {
