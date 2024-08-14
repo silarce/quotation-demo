@@ -951,10 +951,9 @@ export default function PurchaseRequisitionList() {
     const Print = async (purchaserequisitionuuid: any) => {
         try {
             setIsLoading(true);
-            const conditionModel= {
-                
-            };
+            const conditionModel = {
 
+            };
 
             var inputModel = {
                 TypeName: 'ERP',
@@ -964,20 +963,69 @@ export default function PurchaseRequisitionList() {
             };
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`http://127.0.0.1:5050/api/print/Print1?${queryParams}`);
+            const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+                myAlert.warning({ title: '請檢查列印程式是否開啟' })
             }
-            const data = await response.json();
-            setData2(data);
+            const data = await response.text();
+            console.log(data);
+            sentToPrint(data);
 
         } catch (error: any) {
             setError(error.message);
+            myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
         }
         finally {
             setIsLoading(false);
         }
     };
+
+
+    const sentToPrint = async (ip: any) => {
+        try {
+            const conditionModel = {
+                id: purchaserequisitionidin,
+                type: "purchaserequisition",
+                clientip: ip,
+                data: []
+            };
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}Print`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // const responseData = await response.json();
+            // console.log("Transfer response:", responseData);
+            // getQuotereqDetail(prquotereqadddata.quoterequuid);
+
+        } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+
+    };
+
+
+
+
 
 
     return (
@@ -1315,7 +1363,7 @@ export default function PurchaseRequisitionList() {
                                 ))
                             )}
                         </div>
-                        
+
                         <div className={scss.body_foot1}>
                             <div>
                                 流程順序：詢價{'>'}審核{'>'}加入清單{'>'}轉採購單<br />
